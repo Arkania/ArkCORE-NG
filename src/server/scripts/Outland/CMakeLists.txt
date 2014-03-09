@@ -63,7 +63,6 @@ set(scripts_STAT_SRCS
   Outland/TempestKeep/arcatraz/boss_harbinger_skyriss.cpp
   Outland/TempestKeep/arcatraz/instance_arcatraz.cpp
   Outland/TempestKeep/arcatraz/arcatraz.h
-  Outland/TempestKeep/arcatraz/arcatraz.cpp
   Outland/Auchindoun/AuchenaiCrypts/boss_shirrak_the_dead_watcher.cpp
   Outland/Auchindoun/AuchenaiCrypts/boss_exarch_maladaar.cpp
   Outland/Auchindoun/ManaTombs/boss_pandemonius.cpp
@@ -106,6 +105,8 @@ set(scripts_STAT_SRCS
   Outland/zone_netherstorm.cpp
   Outland/zone_zangarmarsh.cpp
   Outland/zone_nagrand.cpp
+
+  Outland/TempestKeep/arcatraz/zone_arcatraz.cpp
 
 )
 
