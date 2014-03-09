@@ -27,7 +27,7 @@
 struct CreatureTextEntry
 {
     uint32 entry;
-    uint8 group;
+    uint8 groupid;
     uint8 id;
     std::string text;
     ChatMsg type;

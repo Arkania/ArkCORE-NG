@@ -627,7 +627,7 @@ struct ItemTemplate
     uint32 ItemId;
     uint32 Class;                                           // id from ItemClass.dbc
     uint32 SubClass;                                        // id from ItemSubClass.dbc
-    int32  Unk0;
+    int32  SoundOverrideSubclass;
     std::string Name1;
     uint32 DisplayInfoID;                                   // id from ItemDisplayInfo.dbc
     uint32 Quality;
