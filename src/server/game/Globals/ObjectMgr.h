@@ -817,21 +817,21 @@ class ObjectMgr
         }
 
         void LoadQuests();
-        void LoadQuestRelations()
+        void LoadQuestStartersAndEnders()
         {
             sLog->outString("Loading GO Start Quest Data...");
-            LoadGameobjectQuestRelations();
+            LoadGameobjectQuestStarters();
             sLog->outString("Loading GO End Quest Data...");
-            LoadGameobjectInvolvedRelations();
+            LoadGameobjectQuestEnders();
             sLog->outString("Loading Creature Start Quest Data...");
-            LoadCreatureQuestRelations();
+            LoadCreatureQuestStarters();
             sLog->outString("Loading Creature End Quest Data...");
-            LoadCreatureInvolvedRelations();
+            LoadCreatureQuestEnders();
         }
-        void LoadGameobjectQuestRelations();
-        void LoadGameobjectInvolvedRelations();
-        void LoadCreatureQuestRelations();
-        void LoadCreatureInvolvedRelations();
+        void LoadGameobjectQuestStarters();
+        void LoadGameobjectQuestEnders();
+        void LoadCreatureQuestStarters();
+        void LoadCreatureQuestEnders();
 
         QuestRelations* GetGOQuestRelationMap()
         {
@@ -1298,7 +1298,7 @@ class ObjectMgr
     private:
         void LoadScripts(ScriptsType type);
         void CheckScripts(ScriptsType type, std::set<int32>& ids);
-        void LoadQuestRelationsHelper(QuestRelations& map, std::string table, bool starter, bool go);
+        void LoadQuestStartersAndEndersHelper(QuestRelations& map, std::string table, bool starter, bool go);
         void PlayerCreateInfoAddItemHelper(uint32 race_, uint32 class_, uint32 itemId, int32 count);
 
         MailLevelRewardContainer _mailLevelRewardStore;

@@ -1481,7 +1481,7 @@ void World::SetInitialWorldSettings()
 
     sLog->outString("Loading Quests Relations...");
     sLog->outString();
-    sObjectMgr->LoadQuestRelations();                            // must be after quest load
+    sObjectMgr->LoadQuestStartersAndEnders();                            // must be after quest load
 
     sLog->outString("Loading Objects Pooling Data...");
     sPoolMgr->LoadFromDB();
