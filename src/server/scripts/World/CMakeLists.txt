@@ -15,7 +15,7 @@ set(scripts_STAT_SRCS
   World/boss_emerald_dragons.cpp
   World/chat_log.cpp
   World/go_scripts.cpp
-  World/guards.cpp
+  World/npc_guards.cpp
   World/item_scripts.cpp
   World/mob_generic_creature.cpp
   World/npc_innkeeper.cpp

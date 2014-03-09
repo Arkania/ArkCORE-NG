@@ -10,7 +10,6 @@
 
 set(scripts_STAT_SRCS
   ${scripts_STAT_SRCS}
-  Maelstrom/kezan.cpp
   Maelstrom/StoneCore/boss_corborus.cpp
   Maelstrom/StoneCore/boss_slabhide.cpp
   Maelstrom/StoneCore/boss_ozruk.cpp
@@ -18,6 +17,9 @@ set(scripts_STAT_SRCS
   Maelstrom/StoneCore/stonecore.h
   Maelstrom/StoneCore/stonecore.cpp
   Maelstrom/StoneCore/instance_stonecore.cpp
+
+  Maelstrom/zone_kezan.cpp
+  
 )
 
 message("  -> Prepared: Maelstrom")
