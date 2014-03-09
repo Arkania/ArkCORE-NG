@@ -162,6 +162,7 @@ void WorldSession::HandleVoidStorageQuery(WorldPacket& recvData)
         itemData.WriteByteSeq(itemId[0]);
         itemData.WriteByteSeq(itemId[6]);
         itemData.WriteByteSeq(creatorGuid[0]);
+        itemData.WriteByteSeq(creatorGuid[1]);
             
         itemData << uint32(item->ItemRandomPropertyId);
 
@@ -371,7 +372,7 @@ void WorldSession::HandleVoidStorageTransfer(WorldPacket& recvData)
 
         Item* item = player->StoreNewItem(dest, itemVS->ItemEntry, true, itemVS->ItemRandomPropertyId);
         item->SetUInt64Value(ITEM_FIELD_CREATOR, uint64(itemVS->CreatorGuid));
-		item->SetBinding(true);
+    	item->SetBinding(true);
         player->SendNewItem(item, 1, false, false, false);
 
         withdrawItems[withdrawCount++] = *itemVS;
