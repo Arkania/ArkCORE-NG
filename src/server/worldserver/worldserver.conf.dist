@@ -1450,7 +1450,7 @@ DBC.EnforceItemAttributes = 1
 AccountInstancesPerHour = 5
 
 #
-#	RealmServerInfo.IsTournament
+#    RealmServerInfo.IsTournament
 #		Description: Designates if the realm is a tournament one
 #		Default:	0 - Normal
 #					1 - Tournament
@@ -2986,6 +2986,13 @@ PlayerDump.DisallowPaths = 1
 #        Default:     1
 
 PlayerDump.DisallowOverwrite = 1
+
+#   Livers.Aura.Enable
+#     At the Liver of the Dungeon Finder imposed aura
+#       Default: 0 - Disable
+#              1 - Enable
+
+Livers.Aura.Enable = 1
 
 #
 ###################################################################################################
