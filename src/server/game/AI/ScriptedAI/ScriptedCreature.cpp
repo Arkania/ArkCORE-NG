@@ -506,17 +506,17 @@ void BossAI::_JustDied()
                 if (Player* player = i->getSource())
                 {
                     if (map->GetEntry()->Expansion() == 1 && map->GetEntry()->IsRaid())
-                        player->ModifyCurrency(395, 1000);
+                        player->ModifyCurrency(395, 10);
                     else if (map->GetEntry()->Expansion() == 2 && !map->IsRaid() && map->IsHeroic())
-                        player->ModifyCurrency(395, 1600);
+                        player->ModifyCurrency(395, 16);
                     else if (map->GetEntry()->Expansion() == 2 && map->IsRaid())
-                        player->ModifyCurrency(395, 2300);
+                        player->ModifyCurrency(395, 23);
                     else if (map->GetEntry()->Expansion() == 3 && !map->IsRaid() && map->IsHeroic())
-                        player->ModifyCurrency(395, 7500);
+                        player->ModifyCurrency(395, 75);
                     else if (map->GetEntry()->Expansion() == 3 && map->IsRaid() && !Is25ManRaid())
-                        player->ModifyCurrency(396, 7500);
+                        player->ModifyCurrency(396, 75);
                     else if (map->GetEntry()->Expansion() == 3 && Is25ManRaid())
-                        player->ModifyCurrency(396, 10500);
+                        player->ModifyCurrency(396, 105);
                 }
             }
         }
