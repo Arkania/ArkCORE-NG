@@ -454,7 +454,7 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
     data->FlushBits();
 
     // Data
-    for (int i = 0; i < transportFrames.size(); ++i)
+    for (uint32 i = 0; i < transportFrames.size(); ++i)
         *data << uint32(transportFrames[i]);
 
     if (flags & UPDATEFLAG_LIVING)

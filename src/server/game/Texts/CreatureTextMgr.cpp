@@ -143,7 +143,7 @@ void CreatureTextMgr::LoadCreatureTexts()
         CreatureTextEntry temp;
 
         temp.entry          = fields[0].GetUInt32();
-        temp.group          = fields[1].GetUInt8();
+        temp.groupid        = fields[1].GetUInt8();
         temp.id             = fields[2].GetUInt8();
         temp.text           = fields[3].GetString();
         temp.type           = ChatMsg(fields[4].GetUInt8());
@@ -156,25 +156,25 @@ void CreatureTextMgr::LoadCreatureTexts()
         if (temp.sound)
         {
             if (!sSoundEntriesStore.LookupEntry(temp.sound)){
-                sLog->outErrorDb("CreatureTextMgr:  Entry %u, Group %u in table `creature_texts` has Sound %u but sound does not exist.", temp.entry, temp.group, temp.sound);
+                sLog->outErrorDb("CreatureTextMgr:  Entry %u, GroupId %u in table `creature_texts` has Sound %u but sound does not exist.", temp.entry, temp.groupid, temp.sound);
                 temp.sound = 0;
             }
         }
         if (!GetLanguageDescByID(temp.lang))
         {
-            sLog->outErrorDb("CreatureTextMgr:  Entry %u, Group %u in table `creature_texts` using Language %u but Language does not exist.", temp.entry, temp.group, uint32(temp.lang));
+            sLog->outErrorDb("CreatureTextMgr:  Entry %u, GroupId %u in table `creature_texts` using Language %u but Language does not exist.", temp.entry, temp.groupid, uint32(temp.lang));
             temp.lang = LANG_UNIVERSAL;
         }
         if (temp.type >= MAX_CHAT_MSG_TYPE)
         {
-            sLog->outErrorDb("CreatureTextMgr:  Entry %u, Group %u in table `creature_texts` has Type %u but this Chat Type does not exist.", temp.entry, temp.group, uint32(temp.type));
+            sLog->outErrorDb("CreatureTextMgr:  Entry %u, GroupId %u in table `creature_texts` has Type %u but this Chat Type does not exist.", temp.entry, temp.groupid, uint32(temp.type));
             temp.type = CHAT_MSG_SAY;
         }
         if (temp.emote)
         {
             if (!sEmotesStore.LookupEntry(temp.emote))
             {
-                sLog->outErrorDb("CreatureTextMgr:  Entry %u, Group %u in table `creature_texts` has Emote %u but emote does not exist.", temp.entry, temp.group, uint32(temp.emote));
+                sLog->outErrorDb("CreatureTextMgr:  Entry %u, GroupId %u in table `creature_texts` has Emote %u but emote does not exist.", temp.entry, temp.groupid, uint32(temp.emote));
                 temp.emote = EMOTE_ONESHOT_NONE;
             }
         }
@@ -183,7 +183,7 @@ void CreatureTextMgr::LoadCreatureTexts()
             ++creatureCount;
 
         //add the text into our entry's group
-        mTextMap[temp.entry][temp.group].push_back(temp);
+        mTextMap[temp.entry][temp.groupid].push_back(temp);
 
         ++textCount;
     } while (result->NextRow());
@@ -198,7 +198,7 @@ void CreatureTextMgr::LoadCreatureTextLocales()
 
     mLocaleTextMap.clear(); // for reload case
 
-    QueryResult result = WorldDatabase.Query("SELECT entry, textGroup, id, text_loc1, text_loc2, text_loc3, text_loc4, text_loc5, text_loc6, text_loc7, text_loc8 FROM locales_creature_text");
+    QueryResult result = WorldDatabase.Query("SELECT entry, groupid, id, text_loc1, text_loc2, text_loc3, text_loc4, text_loc5, text_loc6, text_loc7, text_loc8 FROM locales_creature_text");
 
     if (!result)
         return;
@@ -315,12 +315,12 @@ uint32 CreatureTextMgr::SendChat(Creature* source, uint8 textGroup, uint64 whisp
 
     if (srcPlr)
     {
-        PlayerTextBuilder builder(source, finalSource, finalType, iter->group, iter->id, finalLang, whisperGuid);
+        PlayerTextBuilder builder(source, finalSource, finalType, iter->groupid, iter->id, finalLang, whisperGuid);
         SendChatPacket(finalSource, builder, finalType, whisperGuid, range, team, gmOnly);
     }
     else
     {
-        CreatureTextBuilder builder(finalSource, finalType, iter->group, iter->id, finalLang, whisperGuid);
+        CreatureTextBuilder builder(finalSource, finalType, iter->groupid, iter->id, finalLang, whisperGuid);
         SendChatPacket(finalSource, builder, finalType, whisperGuid, range, team, gmOnly);
     }
     if (isEqualChanced || (!isEqualChanced && totalChance == 100.0f))
