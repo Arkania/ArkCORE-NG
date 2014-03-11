@@ -133,6 +133,19 @@ set(scripts_STAT_SRCS
   Kalimdor/ThroneOfTheFourWinds/throne_of_the_four_winds.h
   Kalimdor/ThroneOfTheFourWinds/boss_alakir.cpp
   Kalimdor/ThroneOfTheFourWinds/boss_conclave_of_wind.cpp
+  Kalimdor/TheVortexPinnacle/boss_grand_vizier_ertan.cpp
+  Kalimdor/TheVortexPinnacle/boss_altairus.cpp
+  Kalimdor/TheVortexPinnacle/boss_asaad.cpp
+  Kalimdor/TheVortexPinnacle/instance_the_vortex_pinnacle.cpp
+  Kalimdor/TheVortexPinnacle/the_vortex_pinnacle.cpp
+  Kalimdor/TheVortexPinnacle/the_vortex_pinnacle.h
+  Kalimdor/LostCityOfTheTolvir/boss_general_husam.cpp
+  Kalimdor/LostCityOfTheTolvir/boss_lockmaw_augh.cpp
+  Kalimdor/LostCityOfTheTolvir/boss_high_prophet_barim.cpp
+  Kalimdor/LostCityOfTheTolvir/boss_siamat.cpp
+  Kalimdor/LostCityOfTheTolvir/instance_lost_city_of_the_tolvir.cpp
+  Kalimdor/LostCityOfTheTolvir/lost_city_of_the_tolvir.cpp
+  Kalimdor/LostCityOfTheTolvir/lost_city_of_the_tolvir.h  
   
   Kalimdor/zone_stonetalon_mountains.cpp
   Kalimdor/zone_silithus.cpp
