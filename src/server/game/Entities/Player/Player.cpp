@@ -25825,6 +25825,46 @@ void Player::SendClearCooldown(uint32 spell_id, Unit* target)
     SendDirectMessage(&data);
 }
 
+void Player::SendClearCooldownMap(Unit* target)
+{
+    uint32 size = uint32(m_spellCooldownToRemove.size());
+    if (size == 0)
+        return;
+
+    ObjectGuid guid = target->GetGUID();
+    WorldPacket data(SMSG_CLEAR_COOLDOWNS, 3 + 1 + 8 + (4 * size));
+
+	data.WriteByteMask(guid[1]);
+	data.WriteByteMask(guid[3]);
+	data.WriteByteMask(guid[6]);
+
+	data.WriteBits(size, 24);
+
+	data.WriteByteMask(guid[7]);
+	data.WriteByteMask(guid[5]);
+	data.WriteByteMask(guid[2]);
+	data.WriteByteMask(guid[4]);
+	data.WriteByteMask(guid[0]);
+
+	data.WriteByteSeq(guid[7]);
+	data.WriteByteSeq(guid[2]);
+	data.WriteByteSeq(guid[4]);
+	data.WriteByteSeq(guid[5]);
+	data.WriteByteSeq(guid[1]);
+	data.WriteByteSeq(guid[3]);
+
+    for (SpellCooldownToRemove::const_iterator itr = m_spellCooldownToRemove.begin(); itr != m_spellCooldownToRemove.end(); ++itr)
+        data << uint32((*itr));
+
+    
+	data.WriteByteSeq(guid[0]);
+	data.WriteByteSeq(guid[6]);
+
+    SendDirectMessage(&data);
+
+    m_spellCooldownToRemove.clear();
+}
+
 void Player::SendClearAllCooldowns(Unit* target)
 {
     uint32 spellCount = m_spellCooldowns.size();
