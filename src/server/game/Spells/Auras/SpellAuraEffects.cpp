@@ -6412,7 +6412,7 @@ void AuraEffect::HandlePeriodicDummyAuraTick(Unit* target, Unit* caster) const
             }
             break;
         case SPELLFAMILY_PALADIN:
-			// Holy Radiance
+    		// Holy Radiance
             if (GetId() == 82327)
                 caster->CastSpell(target, 86452, true);
 
@@ -6956,14 +6956,17 @@ void AuraEffect::HandlePeriodicDamageAurasTick(Unit* target, Unit* caster) const
     }
     else
         damage = uint32(target->CountPctFromMaxHealth(damage));
-
-    // bool crit = IsPeriodicTickCrit(target, caster);
-    bool crit = false;
-    if (roll_chance_i(10) && caster->GetTypeId() == TYPEID_PLAYER)
+		
+    if (m_spellInfo->Effects[m_effIndex].IsTargetingArea() || m_spellInfo->Effects[m_effIndex].IsAreaAuraEffect() || m_spellInfo->Effects[m_effIndex].IsEffect(SPELL_EFFECT_PERSISTENT_AREA_AURA))
     {
-        crit = true;
-        damage = caster->SpellCriticalDamageBonus(m_spellInfo, damage, target);
+        damage = int32(float(damage) * target->GetTotalAuraMultiplierByMiscMask(SPELL_AURA_MOD_AOE_DAMAGE_AVOIDANCE, m_spellInfo->SchoolMask));
+        if (caster->GetTypeId() != TYPEID_PLAYER)
+            damage = int32(float(damage) * target->GetTotalAuraMultiplierByMiscMask(SPELL_AURA_MOD_CREATURE_AOE_DAMAGE_AVOIDANCE, m_spellInfo->SchoolMask));
     }
+
+    bool crit = IsPeriodicTickCrit(target, caster);
+    if (crit)
+        damage = caster->SpellCriticalDamageBonus(m_spellInfo, damage, target);
 
     int32 dmg = damage;
     caster->ApplyResilience(target, &dmg);
