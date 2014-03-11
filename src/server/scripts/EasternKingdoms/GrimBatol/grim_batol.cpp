@@ -43,8 +43,8 @@ enum Creatures
     NPC_TWILIGHT_ARMSMASTER_1    = 40306,
     NPC_TWILIGHT_ARMSMASTER_2    = 41073,
     NPC_TWILIGHT_BEGUILER        = 40167,
-    NPC_TWILIGHT_DRAKE_1        = 41095,
-    NPC_TWILIGHT_DRAKE_2        = 39390,
+    npc_twilight_drake_gb_1        = 41095,
+    npc_twilight_drake_gb_2        = 39390,
     NPC_TWILIGHT_EARTHSHAPER    = 39890,
     NPC_TWILIGHT_ENFORCER_1        = 40448,
     NPC_TWILIGHT_ENFORCER_2        = 39956,
@@ -1272,20 +1272,20 @@ class npc_twilight_beguiler : public CreatureScript
         };
 };
 
-class npc_twilight_drake : public CreatureScript
+class npc_twilight_drake_gb : public CreatureScript
 {
     public:
 
-        npc_twilight_drake() : CreatureScript("npc_twilight_drake"){}
+        npc_twilight_drake_gb() : CreatureScript("npc_twilight_drake_gb"){}
 
         CreatureAI* GetAI(Creature* pCreature) const
         {
-            return new npc_twilight_drakeAI(pCreature);
+            return new npc_twilight_drake_gbAI(pCreature);
         }
 
-        struct npc_twilight_drakeAI : public ScriptedAI
+        struct npc_twilight_drake_gbAI : public ScriptedAI
         {
-            npc_twilight_drakeAI(Creature* creature) : ScriptedAI(creature)
+            npc_twilight_drake_gbAI(Creature* creature) : ScriptedAI(creature)
             {
             }
             
@@ -1746,7 +1746,7 @@ class npc_twilight_wyrmcaller : public CreatureScript
                     {
                     case EVENT_CALL_WYRM:
                         me->MonsterYell(SAY_CALL_WYRM, 0, 0);
-                        if (Creature* _wyrm = me->SummonCreature(NPC_TWILIGHT_DRAKE_1, 
+                        if (Creature* _wyrm = me->SummonCreature(npc_twilight_drake_gb_1, 
                             me->GetPositionX(),
                             me->GetPositionY(),
                             me->GetPositionZ() + 20.0f,
@@ -1758,7 +1758,7 @@ class npc_twilight_wyrmcaller : public CreatureScript
                         events.ScheduleEvent(EVENT_FEED_PET, urand(3000, 5000));
                         break;
                     case EVENT_FEED_PET:
-                        if (Creature* _wyrm = me->FindNearestCreature(NPC_TWILIGHT_DRAKE_1, 100.0f, true))
+                        if (Creature* _wyrm = me->FindNearestCreature(npc_twilight_drake_gb_1, 100.0f, true))
                             DoCast(_wyrm, SPELL_FEED_PET);
                         break;
                     }
@@ -2012,7 +2012,7 @@ void AddSC_grim_batol()
     new npc_trogg_dweller();
     new npc_twilight_armsmaster();
     new npc_twilight_beguiler();
-    new npc_twilight_drake();
+    new npc_twilight_drake_gb();
     new npc_twilight_earthshaper();
     new npc_twilight_enforcer();
     new npc_twilight_firecatcher();
