@@ -394,6 +394,23 @@ void AddSC_boss_ascendant_council();
 void AddSC_boss_chogall();
 void AddSC_boss_sinestra();
 
+void AddSC_instance_grim_batol(); // Grim Batol
+void AddSC_grim_batol();
+void AddSC_boss_general_umbriss();
+void AddSC_boss_forgemaster_throngus();
+void AddSC_boss_drahga_shadowburner();
+void AddSC_boss_erudax();
+
+// gilneas
+void AddSC_gilneas();
+
+void AddSC_instance_throne_of_the_tides(); // Throne of the Tides
+void AddSC_throne_of_the_tides();
+void AddSC_boss_lady_nazjar();
+void AddSC_boss_commander_ulthok();
+void AddSC_boss_erunak_stonespeaker();
+void AddSC_boss_ozumat();
+
 // Kalimdor zones
 void AddSC_ashenvale();
 void AddSC_azshara();
@@ -1092,6 +1109,23 @@ void AddKalimdorScripts()
     AddSC_boss_ascendant_council();
     AddSC_boss_chogall();
     AddSC_boss_sinestra();
+	
+    AddSC_instance_throne_of_the_tides(); // Throne of the Tides
+    AddSC_throne_of_the_tides();
+    AddSC_boss_lady_nazjar();
+    AddSC_boss_commander_ulthok();
+    AddSC_boss_erunak_stonespeaker();
+    AddSC_boss_ozumat();
+	
+    AddSC_instance_grim_batol(); // Grim Batol
+    AddSC_grim_batol();
+    AddSC_boss_general_umbriss();
+    AddSC_boss_forgemaster_throngus();
+    AddSC_boss_drahga_shadowburner();
+    AddSC_boss_erudax();
+
+    // gilneas
+    AddSC_gilneas();	
 
     //Kalimdor zones
     AddSC_ashenvale();
