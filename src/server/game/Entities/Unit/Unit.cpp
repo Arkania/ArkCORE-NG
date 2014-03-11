@@ -14799,6 +14799,22 @@ CharmInfo* Unit::InitCharmInfo()
     return m_charmInfo;
 }
 
+void Unit::EnableAI()
+{
+    if (GetTypeId() == TYPEID_PLAYER)
+        return;
+
+    ToCreature()->NeedChangeAI = false;
+    ToCreature()->IsAIEnabled = true;
+
+    if (i_disabledAI)
+    {
+        delete i_AI;
+        i_AI = i_disabledAI;
+        i_disabledAI = NULL;
+    }
+}
+
 void Unit::DeleteCharmInfo()
 {
     if (!m_charmInfo)

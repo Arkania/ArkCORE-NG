@@ -335,6 +335,8 @@ class SpellScript : public _SpellScript
 
         // returns: WorldLocation which was selected as a spell destination or NULL
         WorldLocation const* GetExplTargetDest();
+		
+		void GetTargetSpeedXYZ(float &speedXY, float &speedZ);
 
         void SetExplTargetDest(WorldLocation& loc);
 

@@ -195,6 +195,22 @@ set(scripts_STAT_SRCS
   EasternKingdoms/BastionOfTwilight/boss_ascendant_council.cpp;
   EasternKingdoms/BastionOfTwilight/boss_chogall.cpp;
   EasternKingdoms/BastionOfTwilight/boss_sinestra.cpp;
+  EasternKingdoms/Gilneas/gilneas.h
+  EasternKingdoms/Gilneas/gilneas.cpp
+  EasternKingdoms/ThroneOfTheTides/boss_lady_nazjar.cpp
+  EasternKingdoms/ThroneOfTheTides/boss_commander_ulthok.cpp
+  EasternKingdoms/ThroneOfTheTides/boss_mindebender_ghursha.cpp
+  EasternKingdoms/ThroneOfTheTides/boss_ozumat.cpp
+  EasternKingdoms/ThroneOfTheTides/instance_throne_of_the_tides.cpp
+  EasternKingdoms/ThroneOfTheTides/throne_of_the_tides.cpp
+  EasternKingdoms/ThroneOfTheTides/throne_of_the_tides.h
+  EasternKingdoms/GrimBatol/boss_general_umbriss.cpp
+  EasternKingdoms/GrimBatol/boss_forgemaster_throngus.cpp
+  EasternKingdoms/GrimBatol/boss_drahga_shadowburner.cpp
+  EasternKingdoms/GrimBatol/boss_erudax.cpp
+  EasternKingdoms/GrimBatol/instance_grim_batol.cpp
+  EasternKingdoms/GrimBatol/grim_batol.cpp
+  EasternKingdoms/GrimBatol/grim_batol.h  
   
   EasternKingdoms/zone_alterac_mountains.cpp
   EasternKingdoms/zone_alterac_valley.cpp  
