@@ -518,7 +518,7 @@ class spell_sha_flame_shock : public SpellScriptLoader
                     return;
 
                 if (Unit* minion = ObjectAccessor::GetUnit(*GetCaster(), GetCaster()->m_SummonSlot[SUMMON_SLOT_TOTEM]))
-                    if (minion->isTotem() && minion->GetEntry() == 2523) // Searing Totem
+                    if (minion->IsTotem() && minion->GetEntry() == 2523) // Searing Totem
                     {
                        // static_cast<TotemAI*>(minion->GetAI())->SetVictim(GetHitUnit()->GetGUID());
                     }

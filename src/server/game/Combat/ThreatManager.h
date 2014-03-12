@@ -129,7 +129,7 @@ class HostileReference : public Reference<Unit, ThreatManager>
         // Inform the source, that the status of that reference was changed
         void fireStatusChanged(ThreatRefStatusChangeEvent& threatRefStatusChangeEvent);
 
-        Unit* getSourceUnit();
+        Unit* GetSourceUnit();
     private:
         float iThreat;
         float iTempThreatModifier;                          // used for taunt

@@ -172,7 +172,7 @@ void HostileReference::updateOnlineStatus()
     bool accessible = false;
 
     if (!isValid())
-        if (Unit* target = ObjectAccessor::GetUnit(*getSourceUnit(), getUnitGuid()))
+        if (Unit* target = ObjectAccessor::GetUnit(*GetSourceUnit(), getUnitGuid()))
             link(target, GetSource());
 
     // only check for online status if
@@ -182,11 +182,11 @@ void HostileReference::updateOnlineStatus()
     if (isValid()
         && (GetTarget()->GetTypeId() != TYPEID_PLAYER || !GetTarget()->ToPlayer()->isGameMaster())
         && !GetTarget()->HasUnitState(UNIT_STATE_IN_FLIGHT)
-        && GetTarget()->IsInMap(getSourceUnit())
-        && GetTarget()->InSamePhase(getSourceUnit())
+        && GetTarget()->IsInMap(GetSourceUnit())
+        && GetTarget()->InSamePhase(GetSourceUnit())
         )
     {
-        Creature* creature = getSourceUnit()->ToCreature();
+        Creature* creature = GetSourceUnit()->ToCreature();
         online = GetTarget()->isInAccessiblePlaceFor(creature);
         if (!online)
         {
@@ -244,7 +244,7 @@ void HostileReference::removeReference()
 
 //============================================================
 
-Unit* HostileReference::getSourceUnit()
+Unit* HostileReference::GetSourceUnit()
 {
     return (GetSource()->getOwner());
 }

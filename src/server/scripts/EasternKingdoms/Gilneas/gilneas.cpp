@@ -484,20 +484,20 @@ public:
                 Unit* target = NULL;
 
                 if (target = me->FindNearestCreature(NPC_RAMPAGING_WORGEN, 40.0f))
-                    if (target != me->getVictim())
+                    if (target != me->GetVictim())
                     {
-                        me->getThreatManager().modifyThreatPercent(me->getVictim(), -100);
+                        me->getThreatManager().modifyThreatPercent(me->GetVictim(), -100);
                         me->CombatStart(target);
                         me->AddThreat(target, 1000);
                     }
 
-                if (!me->IsWithinMeleeRange(me->getVictim(), 0.0f))
+                if (!me->IsWithinMeleeRange(me->GetVictim(), 0.0f))
                 {
-                    me->Attack(me->getVictim(), false);
-                    me->CastSpell(me->getVictim(), SPELL_SHOOT, false);
+                    me->Attack(me->GetVictim(), false);
+                    me->CastSpell(me->GetVictim(), SPELL_SHOOT, false);
                 }
                 else
-                    me->Attack(me->getVictim(), true);
+                    me->Attack(me->GetVictim(), true);
             }
             else
                 uiShootTimer -= diff;
@@ -511,8 +511,8 @@ public:
             else
                 uiSayTimer -= diff;
 
-            if (me->getVictim()->GetTypeId() == TYPEID_UNIT)
-                if (me->getVictim()->GetHealthPct() < 90)
+            if (me->GetVictim()->GetTypeId() == TYPEID_UNIT)
+                if (me->GetVictim()->GetHealthPct() < 90)
                     miss = true;
                 else
                     miss = false;
@@ -574,7 +574,7 @@ public:
 
             Unit* victim = NULL;
 
-            if (victim = me->getVictim())
+            if (victim = me->GetVictim())
                 if (victim->GetTypeId() == TYPEID_PLAYER)
                     return;
 
@@ -596,8 +596,8 @@ public:
                 enrage = true;
             }
 
-            if (me->getVictim()->GetTypeId() == TYPEID_UNIT)
-                if (me->getVictim()->GetHealthPct() < 90)
+            if (me->GetVictim()->GetTypeId() == TYPEID_UNIT)
+                if (me->GetVictim()->GetHealthPct() < 90)
                     miss = true;
                 else
                     miss = false;
@@ -695,8 +695,8 @@ public:
                 else
                     uiYellTimer -= diff;
 
-            if (me->getVictim()->GetTypeId() == TYPEID_UNIT)
-                if (me->getVictim()->GetHealthPct() < 90)
+            if (me->GetVictim()->GetTypeId() == TYPEID_UNIT)
+                if (me->GetVictim()->GetHealthPct() < 90)
                     miss = true;
                 else
                     miss = false;
@@ -706,32 +706,32 @@ public:
                 uiShootTimer = 2500;
                 Unit* target = NULL;
 
-                if (!me->IsWithinMeleeRange(me->getVictim(), 0.0f))
+                if (!me->IsWithinMeleeRange(me->GetVictim(), 0.0f))
                     if (uiEnemyEntry)
                         if (target = me->FindNearestCreature(uiEnemyEntry, 40.0f))
-                            if (target != me->getVictim())
+                            if (target != me->GetVictim())
                             {
-                                me->getThreatManager().modifyThreatPercent(me->getVictim(), -100);
+                                me->getThreatManager().modifyThreatPercent(me->GetVictim(), -100);
                                 me->CombatStart(target);
                                 me->AddThreat(target, 1000);
                             }
 
-                if (!me->IsWithinMeleeRange(me->getVictim(), 0.0f))
+                if (!me->IsWithinMeleeRange(me->GetVictim(), 0.0f))
                 {
                     if (me->HasUnitState(UNIT_STATE_MELEE_ATTACKING))
                     {
                         me->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
                         me->ClearUnitState(UNIT_STATE_MELEE_ATTACKING);
-                        me->SendMeleeAttackStop(me->getVictim());
+                        me->SendMeleeAttackStop(me->GetVictim());
                     }
 
-                    me->CastSpell(me->getVictim(), SPELL_SHOOT, false);
+                    me->CastSpell(me->GetVictim(), SPELL_SHOOT, false);
                 }
                 else
                     if (!me->HasUnitState(UNIT_STATE_MELEE_ATTACKING))
                     {
                         me->AddUnitState(UNIT_STATE_MELEE_ATTACKING);
-                        me->SendMeleeAttackStart(me->getVictim());
+                        me->SendMeleeAttackStart(me->GetVictim());
                     }
             }
             else
@@ -783,7 +783,7 @@ public:
         {
             if (point == 1)
             {
-                if (me->isSummon())
+                if (me->IsSummon())
                     if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                         if (Player* player = summoner->ToPlayer())
                             player->KilledMonsterCredit(NPC_QEMS_KILL_CREDIT, 0);
@@ -851,7 +851,7 @@ public:
             {
                 me->SetReactState(REACT_AGGRESSIVE);
                 me->RemoveFlag(UNIT_FIELD_FLAGS,UNIT_FLAG_NON_ATTACKABLE);
-                if (me->isSummon())
+                if (me->IsSummon())
                     if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                         AttackStart(summoner);
                     else
@@ -1097,7 +1097,7 @@ public:
             me->SetReactState(REACT_AGGRESSIVE);
             me->RemoveFlag(UNIT_FIELD_FLAGS,UNIT_FLAG_NON_ATTACKABLE);
 
-            if (me->isSummon())
+            if (me->IsSummon())
                 if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                 {
                     me->CombatStart(summoner);
@@ -1342,7 +1342,7 @@ public:
             uiPlayerGUID = 0;
             me->SetReactState(REACT_PASSIVE);
 
-            if (me->isSummon())
+            if (me->IsSummon())
                 Event = true;
             else
                 Event = false;
@@ -1458,7 +1458,7 @@ public:
                 uint32 uiPhase = me->GetPhaseMask();
 
                 for (Map::PlayerList::const_iterator i = PlList.begin(); i != PlList.end(); ++i)
-                    if (Player* player = i->getSource())
+                    if (Player* player = i->GetSource())
                         if (uiPhase == player->GetPhaseMask())
                             if (me->GetDistance(player) < 35.0f)
                                 if (abs(z - player->GetPositionZ()) < 5.0f)
@@ -1704,7 +1704,7 @@ public:
             me->SetReactState(REACT_PASSIVE);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 
-            if (me->isSummon())
+            if (me->IsSummon())
                 if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                     if (Vehicle* vehicle = summoner->GetVehicle())
                         if (vehicle->HasEmptySeat(1))
@@ -1787,7 +1787,7 @@ public:
 
                                 if (!lGuards.empty())
                                     for (std::list<Creature*>::const_iterator itr = lGuards.begin(); itr != lGuards.end(); ++itr)
-                                        if ((*itr)->isAlive())
+                                        if ((*itr)->IsAlive())
                                             if (Creature* worgen = (*itr)->FindNearestCreature(NPC_WORGEN_QSKA, 90.0f))
                                                 (*itr)->CastSpell(worgen, SPELL_SHOOT_QSKA, false);
                             }
@@ -1971,7 +1971,7 @@ public:
                     cannon->CastSpell(cannon, SPELL_CANNON_FIRE, false);
 
                 for (std::list<Creature*>::iterator itr = lSummons.begin(); itr != lSummons.end(); ++itr)
-                    if ((*itr)->isAlive())
+                    if ((*itr)->IsAlive())
                         (*itr)->Kill(*itr);
 
                 lSummons.clear();
@@ -2358,17 +2358,17 @@ public:
             }
             else tEnrage -= diff;
 
-            if (me->getVictim()->GetTypeId() == TYPEID_PLAYER)
+            if (me->GetVictim()->GetTypeId() == TYPEID_PLAYER)
             {
                 Miss = false;
             }
-            else if (me->getVictim()->isPet())
+            else if (me->GetVictim()->IsPet())
             {
                 Miss = false;
             }
-            else if (me->getVictim()->GetEntry() == 36057)
+            else if (me->GetVictim()->GetEntry() == 36057)
             {
-                if (me->getVictim()->GetHealthPct() < 90)
+                if (me->GetVictim()->GetHealthPct() < 90)
                 {
                     Miss = true;
                 }
@@ -2396,7 +2396,7 @@ public:
             {
                 Burning = true;
 
-                if(me->getVictim()->GetTypeId() == TYPEID_PLAYER)
+                if(me->GetVictim()->GetTypeId() == TYPEID_PLAYER)
                 {
                     me->getThreatManager().resetAllAggro();
                     horse->AddThreat(me, 1.0f);
@@ -2685,7 +2685,7 @@ public:
             player->RemoveAura(59073);
             player->SaveToDB();
 
-            if (creature->isSummon())
+            if (creature->IsSummon())
                 if (Unit* summoner = creature->ToTempSummon()->GetSummoner())
                     if (Creature* krennan = summoner->ToCreature())
                         krennan->AI()->DoAction(ACTION_EVENT_DONE);
@@ -2710,7 +2710,7 @@ public:
         {
             Event = false;
 
-            if (!creature->isSummon())
+            if (!creature->IsSummon())
                 creature->DespawnOrUnsummon();
             else
             {
@@ -3099,7 +3099,7 @@ public:
 
             Unit* victim = NULL;
 
-            if (victim = me->getVictim())
+            if (victim = me->GetVictim())
                 if (victim->GetTypeId() == TYPEID_PLAYER)
                     return;
 
@@ -3131,9 +3131,9 @@ public:
             if (!UpdateVictim())
                 return;
 
-            if (me->getVictim() && me->getVictim()->GetTypeId() == TYPEID_UNIT)
+            if (me->GetVictim() && me->GetVictim()->GetTypeId() == TYPEID_UNIT)
             {
-                if (me->getVictim()->GetHealthPct() < 90)
+                if (me->GetVictim()->GetHealthPct() < 90)
                     miss = true;
                 else
                     miss = false;
@@ -3781,7 +3781,7 @@ public:
         void WaypointReached(uint32 point)
         {
             if (point == 1)
-                if (me->isSummon())
+                if (me->IsSummon())
                     if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                         {
                             me->UpdateEntry(NPC_WAHL_WORGEN);
@@ -3843,7 +3843,7 @@ public:
             if (id == POINT_CATCH_CHANCE)
             {
                 me->HandleEmoteCommand(EMOTE_ONESHOT_KNEEL);
-                if (me->isSummon())
+                if (me->IsSummon())
                     if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                         if (Creature* chance = summoner->ToCreature())
                         {
@@ -3910,8 +3910,8 @@ public:
             {
                 uiShootTimer = 1000;
 
-                if (me->GetDistance(me->getVictim()) > 2.0f)
-                    DoCast(me->getVictim(), 41440);
+                if (me->GetDistance(me->GetVictim()) > 2.0f)
+                    DoCast(me->GetVictim(), 41440);
             }
             else
                 uiShootTimer -= diff;
@@ -4122,7 +4122,7 @@ public:
         {
             me->SetReactState(REACT_PASSIVE);
 
-            if (me->isSummon())
+            if (me->IsSummon())
                 if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                     if (Player* player = summoner->ToPlayer())
                     {
@@ -4216,7 +4216,7 @@ public:
                         go->UseDoorOrButton();
                     break;
                 case 12:
-                    if (me->isSummon())
+                    if (me->IsSummon())
                         if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                             if (Player* player = summoner->ToPlayer())
                             {
@@ -4531,7 +4531,7 @@ public:
             uiEventTimer = 1500;
             SummonList.clear();
 
-            if (creature->isSummon())
+            if (creature->IsSummon())
                 if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                     if (Player* player = summoner->ToPlayer())
                     {
@@ -4568,7 +4568,7 @@ public:
                                     DoScriptText(LORNA_YELL_CARRIAGE, player);
                     break;
                 case 180:
-                    if (me->isSummon())
+                    if (me->IsSummon())
                         if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                         {
                             summoner->ExitVehicle();
@@ -4605,7 +4605,7 @@ public:
 
             for (std::list<Creature*>::const_iterator itr = OrgeList.begin(); itr != OrgeList.end(); ++itr)
             {
-                if (!(*itr)->isAlive())
+                if (!(*itr)->IsAlive())
                     (*itr)->setDeathState(ALIVE);
 
                 float x, y, z;
@@ -4625,7 +4625,7 @@ public:
             if (Unit* horse = me->GetVehicleKit()->GetPassenger(1))
                 horse->SetPhaseMask(EXODUS_PHASE_MASK, false);
 
-            if (me->isSummon())
+            if (me->IsSummon())
                 if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                     if (Unit* carriage = me->GetVehicleKit()->GetPassenger(2))
                     {
@@ -4829,8 +4829,8 @@ public:
             if (!UpdateVictim())
                 return;
 
-            if (me->getVictim()->GetTypeId() == TYPEID_UNIT)
-                if (me->getVictim()->GetHealthPct() < 90)
+            if (me->GetVictim()->GetTypeId() == TYPEID_UNIT)
+                if (me->GetVictim()->GetHealthPct() < 90)
                     miss = true;
                 else
                     miss = false;
@@ -4860,7 +4860,7 @@ public:
         {
             miss = false;
 
-            if (me->isSummon())
+            if (me->IsSummon())
                 if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                 {
                     summoner->getThreatManager().resetAllAggro();
@@ -4877,7 +4877,7 @@ public:
 
             Unit* victim = NULL;
 
-            if (victim = me->getVictim())
+            if (victim = me->GetVictim())
                 if (victim->GetTypeId() == TYPEID_PLAYER)
                     return;
 
@@ -4890,7 +4890,7 @@ public:
 
         void JustDied(Unit* /*who*/)
         {
-            if (me->isSummon())
+            if (me->IsSummon())
                 if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                 {
                     uint8 roll = urand(0, 3);
@@ -4906,8 +4906,8 @@ public:
             if (!UpdateVictim())
                 return;
 
-            if (me->getVictim()->GetTypeId() == TYPEID_UNIT)
-                if (me->getVictim()->GetHealthPct() < 90)
+            if (me->GetVictim()->GetTypeId() == TYPEID_UNIT)
+                if (me->GetVictim()->GetHealthPct() < 90)
                     miss = true;
                 else
                     miss = false;
@@ -5001,7 +5001,7 @@ public:
             uiCleaveTimer = 250;
             uiDemoralizingShoutTimer = 500;
 
-            if (me->isSummon())
+            if (me->IsSummon())
             {
                 for (int i = 0; i < 14; ++i)
                     AddWaypoint(i, KorothWP[i][0], KorothWP[i][1], KorothWP[i][2]);
@@ -5016,7 +5016,7 @@ public:
 
         void FinishEscort()
         {
-            if (me->isSummon())
+            if (me->IsSummon())
                 if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                 {
                     me->SetReactState(REACT_AGGRESSIVE);
@@ -5025,7 +5025,7 @@ public:
                     if (Creature* capitan = summoner->ToCreature())
                         capitan->AI()->DoAction(ACTION_KOROTH_ATTACK);
 
-                    if (summoner->isSummon())
+                    if (summoner->IsSummon())
                         if (Unit* _summoner = summoner->ToTempSummon()->GetSummoner())
                             if (Player* player = _summoner->ToPlayer())
                                 DoScriptText(KOROTH_YELL_MY_BANNER, player/*, true*/);
@@ -5045,7 +5045,7 @@ public:
             if (uiCleaveTimer <= diff)
             {
                 uiCleaveTimer = urand(2500, 15000);
-                DoCast(me->getVictim(), SPELL_CLEAVE);
+                DoCast(me->GetVictim(), SPELL_CLEAVE);
             }
             else
                 uiCleaveTimer -= diff;
@@ -5083,7 +5083,7 @@ public:
             me->SetReactState(REACT_PASSIVE);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 
-            if (me->isSummon())
+            if (me->IsSummon())
                 StartEvent();
         }
 
@@ -5156,7 +5156,7 @@ public:
             {
                 Creature* member = itr->soldier;
 
-                if (!member->isAlive() || member->getVictim())
+                if (!member->IsAlive() || member->GetVictim())
                     continue;
 
                 float angle = itr->follow_angle;
@@ -5487,7 +5487,7 @@ public:
             if (Player* player = who->ToPlayer())
                 if (me->IsWithinDistInMap(player, 20.0f) && player->GetQuestStatus(QUEST_LOSING_YOUR_TAIL) == QUEST_STATUS_INCOMPLETE)
                 {
-                    if (player->isInCombat())
+                    if (player->IsInCombat())
                         return;
 
                     if (Creature* scout = me->SummonCreature(NPC_DARK_SCOUT, -2239.28f, 1429.67f, -22.86f))
@@ -5562,7 +5562,7 @@ public:
                 if (uiShotTimer <= diff)
                 {
                     uiShotTimer = 2000;
-                    DoCast(me->getVictim(), SPELL_AIMED_SHOT);
+                    DoCast(me->GetVictim(), SPELL_AIMED_SHOT);
                 }
                 else
                     uiShotTimer -= diff;
@@ -5706,7 +5706,7 @@ public:
             creature->SetReactState(REACT_PASSIVE);
             creature->SetFlag(UNIT_FIELD_FLAGS,UNIT_FLAG_NON_ATTACKABLE);
 
-            if (creature->isSummon())
+            if (creature->IsSummon())
                 SummonTrackers();
         }
 
@@ -5726,7 +5726,7 @@ public:
 
             for (std::list<Creature*>::const_iterator itr = RangerList.begin(); itr != RangerList.end(); ++itr)
             {
-                if ((*itr)->isAlive())
+                if ((*itr)->IsAlive())
                 {
                     Position pos;
                     (*itr)->GetNearPosition(pos, 2.0f, (*itr)->GetOrientation());
@@ -5982,7 +5982,7 @@ public:
         void WaypointReached(uint32 point)
         {
             if (point == 1)
-                if (me->isSummon())
+                if (me->IsSummon())
                     if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                         if (Player* player = summoner->ToPlayer())
                         {
@@ -6046,7 +6046,7 @@ public:
 
         void StartEvent()
         {
-            if (!me->isSummon())
+            if (!me->IsSummon())
             {
                 me->DespawnOrUnsummon();
                 return;
@@ -6242,7 +6242,7 @@ public:
             switch (point)
             {
             case 1:
-                if (me->isSummon())
+                if (me->IsSummon())
                     if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                         if (Player* player = summoner->ToPlayer())
                         {
@@ -6266,7 +6266,7 @@ public:
                 {
                     ++uiSpeachId;
 
-                    if (me->isSummon())
+                    if (me->IsSummon())
                         if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                             if (Player* player = summoner->ToPlayer())
                                 switch (uiSpeachId)
@@ -7638,7 +7638,7 @@ public:
                             {
                                 sylvanas->CastSpell(me, SPELL_SHOOT_LIAM, false);
                                 DoCast(SPELL_BFGC_COMPLETE);
-                                if (me->isSummon())
+                                if (me->IsSummon())
                                     if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                                         if (Creature* krennan = summoner->ToCreature())
                                             krennan->AI()->DoAction(ACTION_BATTLE_COMPLETE);
@@ -7684,7 +7684,7 @@ public:
             if (uiShootTimer <= diff)
             {
                 uiShootTimer = 1500;
-                DoCast(me->getVictim(), SPELL_SHOOT);
+                DoCast(me->GetVictim(), SPELL_SHOOT);
             }
             else
                 uiShootTimer -= diff;
@@ -7692,7 +7692,7 @@ public:
             if (uiMultiShotTimer <= diff)
             {
                 uiMultiShotTimer = 3000;
-                DoCast(me->getVictim(), SPELL_MULTI_SHOT);
+                DoCast(me->GetVictim(), SPELL_MULTI_SHOT);
             }
             else
                 uiMultiShotTimer -= diff;
@@ -7757,7 +7757,7 @@ public:
         void WaypointReached(uint32 point)
         {
             if (point == uiPausePoint)
-                if (me->isSummon())
+                if (me->IsSummon())
                     if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                         if (Creature* liam = summoner->ToCreature())
                         {
@@ -7794,8 +7794,8 @@ public:
             {
                 uiShotTimer = 2000;
 
-                if (me->getVictim() && me->IsInRange(me->getVictim(), 2.0f, 25.0f, false))
-                    DoCast(me->getVictim(), SPELL_SHOOT_TBFGC);
+                if (me->GetVictim() && me->IsInRange(me->GetVictim(), 2.0f, 25.0f, false))
+                    DoCast(me->GetVictim(), SPELL_SHOOT_TBFGC);
             }
             else
                 uiShotTimer -= diff;
@@ -7803,7 +7803,7 @@ public:
             if (uiIWingClipTimer <= diff)
             {
                 uiIWingClipTimer = urand(30000, 60000);
-                DoCast(me->getVictim(), SPELL_IMPROVED_WING_CLIP);
+                DoCast(me->GetVictim(), SPELL_IMPROVED_WING_CLIP);
             }
             else
                 uiIWingClipTimer -= diff;
@@ -7811,7 +7811,7 @@ public:
             if (uiSunderArmorTimer <= diff)
             {
                 uiSunderArmorTimer = 12000;
-                DoCast(me->getVictim(), SPELL_SUNDER_ARMOR);
+                DoCast(me->GetVictim(), SPELL_SUNDER_ARMOR);
             }
             else
                 uiSunderArmorTimer -= diff;
@@ -7876,14 +7876,14 @@ public:
             switch (point)
             {
                 case 30:
-                    if (me->isSummon())
+                    if (me->IsSummon())
                         if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                             if (Creature* liam = summoner->ToCreature())
                                 if (liam->AI()->GetData(DATA_CURRENT_PHASE) == PHASE_MERCHANT_SQUARE)
                                     SetEscortPaused(true);
                     break;
                 case 59:
-                    if (me->isSummon())
+                    if (me->IsSummon())
                         if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                             if (Creature* liam = summoner->ToCreature())
                                 if (liam->AI()->GetData(DATA_CURRENT_PHASE) == PHASE_MILITARY_DISTRICT)
@@ -7902,7 +7902,7 @@ public:
             if (uiFireBlastTimer <= diff)
             {
                 uiFireBlastTimer = urand(5000, 15000);
-                DoCast(me->getVictim(), SPELL_FIRE_BLAST);
+                DoCast(me->GetVictim(), SPELL_FIRE_BLAST);
             }
             else
                 uiFireBlastTimer -= diff;
@@ -7918,7 +7918,7 @@ public:
             if (uiFrostboltTimer <= diff)
             {
                 uiFrostboltTimer = urand(5000, 15000);
-                DoCast(me->getVictim(), SPELL_FROSTBOLT);
+                DoCast(me->GetVictim(), SPELL_FROSTBOLT);
             }
             else
                 uiFrostboltTimer -= diff;
@@ -7979,7 +7979,7 @@ public:
             switch (point)
             {
                 case 9:
-                    if (me->isSummon())
+                    if (me->IsSummon())
                         if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                         {
                             if (Creature* ranger = summoner->SummonCreature(NPC_DARK_RANGER_ELITE, -1572.91f,1319.44f,35.556f))
@@ -8000,14 +8000,14 @@ public:
                         }
                     break;
                 case 17:
-                    if (me->isSummon())
+                    if (me->IsSummon())
                         if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                             if (Creature* liam = summoner->ToCreature())
                                 if (liam->AI()->GetData(DATA_CURRENT_PHASE) == PHASE_MERCHANT_SQUARE)
                                     SetEscortPaused(true);
                     break;
                 case 46:
-                    if (me->isSummon())
+                    if (me->IsSummon())
                         if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                             if (Creature* liam = summoner->ToCreature())
                                 if (liam->AI()->GetData(DATA_CURRENT_PHASE) == PHASE_MILITARY_DISTRICT)
@@ -8077,7 +8077,7 @@ public:
 
         void JustDied(Unit* /*killer*/)
         {
-            if (me->isSummon())
+            if (me->IsSummon())
                 if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                     if (Creature* liam = summoner->ToCreature())
                         CAST_AI(npc_prince_liam_greymane_tbfgc::npc_prince_liam_greymane_tbfgcAI, liam->AI())->KilledBoss();
@@ -8101,7 +8101,7 @@ public:
             if (uiShootTimer <= diff)
             {
                 uiShootTimer = 1500;
-                DoCast(me->getVictim(), SPELL_SHOOT);
+                DoCast(me->GetVictim(), SPELL_SHOOT);
             }
             else
                 uiShootTimer -= diff;
@@ -8194,13 +8194,13 @@ public:
             {
                 case 8:
                     DoScriptText(LORNA_BATTLE_BATTLE_1, me);
-                    if (me->isSummon())
+                    if (me->IsSummon())
                         if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                             if (Creature* liam = summoner->ToCreature())
                                 liam->AI()->DoAction(ACTION_CANNON_AT_POSITION);
                     break;
                 case 41:
-                    if (me->isSummon())
+                    if (me->IsSummon())
                         if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                             if (Creature* liam = summoner->ToCreature())
                                 if (liam->AI()->GetData(DATA_CURRENT_PHASE) == PHASE_MILITARY_DISTRICT)
@@ -8219,7 +8219,7 @@ public:
             if (uiShootTimer <= diff)
             {
                 uiShootTimer = 1500;
-                DoCast(me->getVictim(), SPELL_SHOOT);
+                DoCast(me->GetVictim(), SPELL_SHOOT);
             }
             else
                 uiShootTimer -= diff;
@@ -8287,7 +8287,7 @@ public:
         void WaypointReached(uint32 point)
         {
             if (point == 10)
-                if (me->isSummon())
+                if (me->IsSummon())
                     if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                         if (Creature* liam = summoner->ToCreature())
                             if (liam->AI()->GetData(DATA_CURRENT_PHASE) == PHASE_MILITARY_DISTRICT)
@@ -8326,7 +8326,7 @@ public:
                     uiFeralLeapTimer = 1500;
                     float x, y, z;
 
-                    if (Unit* target = me->getVictim())
+                    if (Unit* target = me->GetVictim())
                     {
                         target->GetPosition(x, y, z);
                         me->CastSpell(x, y, z, SPELL_FERAL_LEAP, false);
@@ -8351,7 +8351,7 @@ public:
                 if (uiTauntTimer <= diff)
                 {
                     uiTauntTimer = 10000;
-                    DoCast(me->getVictim(), SPELL_TAUNT);
+                    DoCast(me->GetVictim(), SPELL_TAUNT);
                 }
                 else
                     uiTauntTimer -= diff;
@@ -8360,10 +8360,10 @@ public:
                 {
                     uiInterceptTimer = 11000;
 
-                    if (Unit* target = me->getVictim())
+                    if (Unit* target = me->GetVictim())
                     {
-                        if (me->getVictim() && me->IsInRange(me->getVictim(), 8.0f, 25.0f, false))
-                            DoCast(me->getVictim(), SPELL_INTERCEPT);
+                        if (me->GetVictim() && me->IsInRange(me->GetVictim(), 8.0f, 25.0f, false))
+                            DoCast(me->GetVictim(), SPELL_INTERCEPT);
                     }
                 }
                 else
@@ -8413,7 +8413,7 @@ public:
         void WaypointReached(uint32 point)
         {
             if (point == 10)
-                if (me->isSummon())
+                if (me->IsSummon())
                     if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                         if (Creature* liam = summoner->ToCreature())
                             if (liam->AI()->GetData(DATA_CURRENT_PHASE) == PHASE_MILITARY_DISTRICT)
@@ -8470,7 +8470,7 @@ public:
             {
                 DoScriptText(GOREROT_YELL_CRUSH, me);
 
-                if (me->isSummon())
+                if (me->IsSummon())
                     if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                         AttackStart(summoner);
             }
@@ -8478,7 +8478,7 @@ public:
 
         void JustDied(Unit* /*killer*/)
         {
-            if (me->isSummon())
+            if (me->IsSummon())
                 if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                     if (Creature* liam = summoner->ToTempSummon())
                         liam->AI()->DoAction(ACTION_GOREROT_DIED);
@@ -8713,7 +8713,7 @@ public:
                 me->SetReactState(REACT_PASSIVE);
                 me->CombatStop();
 
-                if (me->isSummon())
+                if (me->IsSummon())
                     if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                         if (Creature* liam = summoner->ToCreature())
                             liam->AI()->DoAction(ACTION_FINISH_TBFGC);
@@ -8820,7 +8820,7 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature)
     {
-        if (creature->isQuestGiver())
+        if (creature->IsQuestGiver())
             player->PrepareQuestMenu(creature->GetGUID());
 
          /*
@@ -9341,14 +9341,14 @@ public:
             switch (point)
             {
                 case 2:
-                    if (me->isSummon())
+                    if (me->IsSummon())
                         if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                             if (Creature* tobias = summoner->ToCreature())
                                 CAST_AI(npc_tobias_mistmantle_qthfs::npc_tobias_mistmantle_qthfsAI, tobias->AI())->Ide = true;
                     break;
                 case 3:
                 SetEscortPaused(true);
-                if (me->isSummon())
+                if (me->IsSummon())
                     if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                         if (Creature* tobias = summoner->ToCreature())
                             CAST_AI(npc_tobias_mistmantle_qthfs::npc_tobias_mistmantle_qthfsAI, tobias->AI())->Event = true;
@@ -9583,7 +9583,7 @@ public:
             uiEventTimer = 700;
             uiPhase = 0;
 
-            if (me->isSummon())
+            if (me->IsSummon())
                 Event = true;
             else
                 Event = false;
@@ -9617,7 +9617,7 @@ public:
 
         void SummonEventCreatures()
         {
-            if (me->isSummon())
+            if (me->IsSummon())
                 if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                     if (Player* player = summoner->ToPlayer())
                     {
@@ -9668,7 +9668,7 @@ public:
 
         void DespawnEvent()
         {
-            if (me->isSummon())
+            if (me->IsSummon())
                 if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                     if (Player* player = summoner->ToPlayer())
                     {
@@ -9700,7 +9700,7 @@ public:
             {
                 Despawn = false;
 
-                if (me->isSummon())
+                if (me->IsSummon())
                     if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                         if (Player* player = summoner->ToPlayer())
                             player->TeleportTo(654, -1725.0f, 1871.91f, 17.7934f, 3.17831f);
@@ -9711,7 +9711,7 @@ public:
                 {
                     ++uiPhase;
 
-                    if (me->isSummon())
+                    if (me->IsSummon())
                         if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                             if (Player* player = summoner->ToPlayer())
                             switch (uiPhase)
@@ -10098,8 +10098,8 @@ public:
             if (!UpdateVictim())
                 return;
 
-            if (me->getVictim()->GetTypeId() == TYPEID_UNIT)
-                if (me->getVictim()->GetHealthPct() < 90)
+            if (me->GetVictim()->GetTypeId() == TYPEID_UNIT)
+                if (me->GetVictim()->GetHealthPct() < 90)
                     miss = true;
                 else
                     miss = false;
@@ -10109,31 +10109,31 @@ public:
                 uiShootTimer = 1500;
                 Unit* target = NULL;
 
-                if (!me->IsWithinMeleeRange(me->getVictim(), 0.0f))
+                if (!me->IsWithinMeleeRange(me->GetVictim(), 0.0f))
                     if (target = me->FindNearestCreature(NPC_FORSAKEN_INVADER, 40.0f))
-                        if (target != me->getVictim())
+                        if (target != me->GetVictim())
                         {
-                            me->getThreatManager().modifyThreatPercent(me->getVictim(), -100);
+                            me->getThreatManager().modifyThreatPercent(me->GetVictim(), -100);
                             me->CombatStart(target);
                             me->AddThreat(target, 1000);
                         }
 
-                if (!me->IsWithinMeleeRange(me->getVictim(), 0.0f))
+                if (!me->IsWithinMeleeRange(me->GetVictim(), 0.0f))
                 {
                     if (me->HasUnitState(UNIT_STATE_MELEE_ATTACKING))
                     {
                         me->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
                         me->ClearUnitState(UNIT_STATE_MELEE_ATTACKING);
-                        me->SendMeleeAttackStop(me->getVictim());
+                        me->SendMeleeAttackStop(me->GetVictim());
                     }
 
-                    me->CastSpell(me->getVictim(), SPELL_SHOOT, false);
+                    me->CastSpell(me->GetVictim(), SPELL_SHOOT, false);
                 }
                 else
                     if (!me->HasUnitState(UNIT_STATE_MELEE_ATTACKING))
                     {
                         me->AddUnitState(UNIT_STATE_MELEE_ATTACKING);
-                        me->SendMeleeAttackStart(me->getVictim());
+                        me->SendMeleeAttackStart(me->GetVictim());
                     }
             }
             else
@@ -10187,14 +10187,14 @@ public:
 
             if (target = me->FindNearestCreature(NPC_FORSAKEN_FOOTSOLDIER, 40.0f))
             {
-                if (target != me->getVictim())
+                if (target != me->GetVictim())
                 {
-                    if (me->getVictim())
+                    if (me->GetVictim())
                     {
-                        if (target == me->getVictim())
+                        if (target == me->GetVictim())
                             return;
 
-                        me->getThreatManager().modifyThreatPercent(me->getVictim(), -100);
+                        me->getThreatManager().modifyThreatPercent(me->GetVictim(), -100);
                     }
 
                     me->AddThreat(target, 1000);
@@ -10215,10 +10215,10 @@ public:
 
             for (std::list<Creature*>::const_iterator itr = EnemyList.begin(); itr != EnemyList.end(); ++itr)
             {
-                if ((*itr)->isInCombat())
+                if ((*itr)->IsInCombat())
                     continue;
 
-                if (!(*itr)->isAlive())
+                if (!(*itr)->IsAlive())
                     continue;
 
                 if (!(*itr)->IsWithinLOSInMap(me))
@@ -10238,12 +10238,12 @@ public:
 
             if (target)
             {
-                if (me->getVictim())
+                if (me->GetVictim())
                 {
-                    if (target == me->getVictim())
+                    if (target == me->GetVictim())
                         return;
 
-                    me->getThreatManager().modifyThreatPercent(me->getVictim(), -100);
+                    me->getThreatManager().modifyThreatPercent(me->GetVictim(), -100);
                 }
 
                 target->SetInCombatWith(me);
@@ -10273,8 +10273,8 @@ public:
             {
                 uiFindEnemyTimer = 10000;
 
-                if (me->getVictim())
-                    if (me->IsWithinMeleeRange(me->getVictim(), 0.0f))
+                if (me->GetVictim())
+                    if (me->IsWithinMeleeRange(me->GetVictim(), 0.0f))
                         return;
 
                 FindEnemy();
@@ -10285,8 +10285,8 @@ public:
             if (!UpdateVictim())
                 return;
 
-            if (me->getVictim()->GetTypeId() == TYPEID_UNIT)
-                if (me->getVictim()->GetHealthPct() < 90)
+            if (me->GetVictim()->GetTypeId() == TYPEID_UNIT)
+                if (me->GetVictim()->GetHealthPct() < 90)
                     miss = true;
                 else
                     miss = false;
@@ -10295,22 +10295,22 @@ public:
             {
                 uiShootTimer = 1500;
 
-                if (!me->IsWithinMeleeRange(me->getVictim(), 0.0f))
+                if (!me->IsWithinMeleeRange(me->GetVictim(), 0.0f))
                 {
                     if (me->HasUnitState(UNIT_STATE_MELEE_ATTACKING))
                     {
                         me->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
                         me->ClearUnitState(UNIT_STATE_MELEE_ATTACKING);
-                        me->SendMeleeAttackStop(me->getVictim());
+                        me->SendMeleeAttackStop(me->GetVictim());
                     }
 
-                    me->CastSpell(me->getVictim(), SPELL_SHOOT, false);
+                    me->CastSpell(me->GetVictim(), SPELL_SHOOT, false);
                 }
                 else
                     if (!me->HasUnitState(UNIT_STATE_MELEE_ATTACKING))
                     {
                         me->AddUnitState(UNIT_STATE_MELEE_ATTACKING);
-                        me->SendMeleeAttackStart(me->getVictim());
+                        me->SendMeleeAttackStart(me->GetVictim());
                     }
             }
             else
@@ -10348,7 +10348,7 @@ public:
 
             Unit* victim = NULL;
 
-            if (victim = me->getVictim())
+            if (victim = me->GetVictim())
                 if (victim->GetTypeId() == TYPEID_PLAYER)
                     return;
 
@@ -10364,8 +10364,8 @@ public:
             if (!UpdateVictim())
                 return;
 
-            if (me->getVictim()->GetTypeId() == TYPEID_UNIT)
-                if (me->getVictim()->GetHealthPct() < 90)
+            if (me->GetVictim()->GetTypeId() == TYPEID_UNIT)
+                if (me->GetVictim()->GetHealthPct() < 90)
                     miss = true;
                 else
                     miss = false;
@@ -10442,7 +10442,7 @@ public:
 
             if (!lMastiffs.empty())
                 for (std::list<Creature*>::const_iterator itr = lMastiffs.begin(); itr != lMastiffs.end(); ++itr)
-                    if ((*itr)->isAlive())
+                    if ((*itr)->IsAlive())
                     {
                         (*itr)->SetReactState(REACT_PASSIVE);
                         (*itr)->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -10460,7 +10460,7 @@ public:
             if (uiShootTimer <= diff)
             {
                 uiShootTimer = 1000;
-                DoCast(me->getVictim(), SPELL_SHOOT_LOTP);
+                DoCast(me->GetVictim(), SPELL_SHOOT_LOTP);
             }
             else
                 uiShootTimer -= diff;
@@ -10519,7 +10519,7 @@ public:
             if (uiLeapTimer <= diff)
             {
                 uiLeapTimer = 1000;
-                DoCast(me->getVictim(), SPELL_LEAP);
+                DoCast(me->GetVictim(), SPELL_LEAP);
             }
             else
                 uiLeapTimer -= diff;
@@ -10527,7 +10527,7 @@ public:
             if (uiTaunt <= diff)
             {
                 uiTaunt = 1000;
-                DoCast(me->getVictim(), SPELL_TAUNT_LOTP);
+                DoCast(me->GetVictim(), SPELL_TAUNT_LOTP);
             }
             else
                 uiTaunt -= diff;
@@ -10649,10 +10649,10 @@ public:
 
             for (std::list<Creature*>::const_iterator itr = EnemyList.begin(); itr != EnemyList.end(); ++itr)
             {
-                if ((*itr)->isInCombat())
+                if ((*itr)->IsInCombat())
                     continue;
 
-                if (!(*itr)->isAlive())
+                if (!(*itr)->IsAlive())
                     continue;
 
                 if (!(*itr)->IsWithinLOSInMap(me))
@@ -10672,12 +10672,12 @@ public:
 
             if (target)
             {
-                if (me->getVictim())
+                if (me->GetVictim())
                 {
-                    if (target == me->getVictim())
+                    if (target == me->GetVictim())
                         return;
 
-                    me->getThreatManager().modifyThreatPercent(me->getVictim(), -100);
+                    me->getThreatManager().modifyThreatPercent(me->GetVictim(), -100);
                 }
 
                 target->SetInCombatWith(me);
@@ -10718,8 +10718,8 @@ public:
             {
                 uiFindEnemyTimer = 10000;
 
-                if (me->getVictim())
-                    if (me->IsWithinMeleeRange(me->getVictim(), 0.0f))
+                if (me->GetVictim())
+                    if (me->IsWithinMeleeRange(me->GetVictim(), 0.0f))
                         return;
 
                 FindEnemy();
@@ -10730,9 +10730,9 @@ public:
             if (!UpdateVictim())
                 return;
 
-            if (me->getVictim())
-                if (me->getVictim()->GetTypeId() == TYPEID_UNIT)
-                    if (me->getVictim()->GetHealthPct() < 90)
+            if (me->GetVictim())
+                if (me->GetVictim()->GetTypeId() == TYPEID_UNIT)
+                    if (me->GetVictim()->GetHealthPct() < 90)
                         miss = true;
                     else
                         miss = false;
@@ -10892,7 +10892,7 @@ public:
                 return;
 
             for (Map::PlayerList::const_iterator i = PlList.begin(); i != PlList.end(); ++i)
-                if (Player* player = i->getSource())
+                if (Player* player = i->GetSource())
                     if (uiPhase & player->GetPhaseMask())
                         player->CastSpell(player, uiSpellId, false);
         }
@@ -11186,7 +11186,7 @@ public:
             if (uiBoltTimer <= diff)
             {
                 uiBoltTimer = 2000;
-                DoCast(me->getVictim(), SPELL_FROSTBOLT_NO_DAMAGE);
+                DoCast(me->GetVictim(), SPELL_FROSTBOLT_NO_DAMAGE);
             }
             else
                 uiBoltTimer -= diff;
@@ -11246,8 +11246,8 @@ public:
             if (!UpdateVictim())
                 return;
 
-            if (me->getVictim()->GetTypeId() == TYPEID_UNIT)
-                if (me->getVictim()->GetHealthPct() < 90)
+            if (me->GetVictim()->GetTypeId() == TYPEID_UNIT)
+                if (me->GetVictim()->GetHealthPct() < 90)
                     miss = true;
                 else
                     miss = false;

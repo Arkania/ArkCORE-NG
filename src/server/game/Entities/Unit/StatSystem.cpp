@@ -1109,7 +1109,7 @@ void Guardian::UpdateAttackSpeed()
     AuraEffectList const& petHasteAuras = GetAuraEffectsByType(SPELL_AURA_MELEE_SLOW);
     for (AuraEffectList::const_iterator i = petHasteAuras.begin(); i != petHasteAuras.end(); ++i)
     {
-        if (sObjectMgr->isPetScalingSpell((*i)->GetId()))
+        if (sObjectMgr->IsPetScalingSpell((*i)->GetId()))
             (*i)->RecalculateAmount(true);
     }
 }

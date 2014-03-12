@@ -391,7 +391,7 @@ class npc_whipping_wind : public CreatureScript
 					switch (eventId)
 					{
 					case EVENT_WHW_LIGHTNING_BOLT:
-						DoCast(me->getVictim(), SPELL_WHW_LIGHTNING_BOLT);
+						DoCast(me->GetVictim(), SPELL_WHW_LIGHTNING_BOLT);
 						events.ScheduleEvent(EVENT_WHW_LIGHTNING_BOLT, 2000);
 						break;
 					}
@@ -457,7 +457,7 @@ class npc_young_storm_dragon : public CreatureScript
 					switch (eventId)
 					{
 					case EVENT_CHILLING_BLAST:
-						DoCast(me->getVictim(), SPELL_CHILLING_BLAST);
+						DoCast(me->GetVictim(), SPELL_CHILLING_BLAST);
 						events.ScheduleEvent(EVENT_CHILLING_BLAST, urand(15000, 18000));
 						break;
 					}
@@ -633,7 +633,7 @@ class npc_executor_of_the_caliph : public CreatureScript
 						events.ScheduleEvent(EVENT_SHOCKWAVE, urand(16000, 30000));
 						break;
 					case EVENT_DEVASTATE:
-						DoCast(me->getVictim(), SPELL_DEVASTATE);
+						DoCast(me->GetVictim(), SPELL_DEVASTATE);
 						events.ScheduleEvent(EVENT_DEVASTATE, urand(15000, 18000));
 						break;
 					}
@@ -692,7 +692,7 @@ class npc_gust_soldier : public CreatureScript
 						events.ScheduleEvent(EVENT_AIR_NOVA, urand(10000, 15000));
 						break;
 					case EVENT_WIND_BLAST:
-						DoCast(me->getVictim(), SPELL_WIND_BLAST);
+						DoCast(me->GetVictim(), SPELL_WIND_BLAST);
 						events.ScheduleEvent(EVENT_WIND_BLAST, urand(6000, 8000));
 						break;
 					}
@@ -792,7 +792,7 @@ class npc_howling_gale : public CreatureScript
 					{
 						uint8 _attackersnum = 0;
 						for (Map::PlayerList::const_iterator itr = me->GetMap()->GetPlayers().begin(); itr != me->GetMap()->GetPlayers().end(); ++itr)
-							if (me->GetDistance2d(itr->getSource()) < 30.0f)
+							if (me->GetDistance2d(itr->GetSource()) < 30.0f)
 								_attackersnum++;
 
 						if (_attackersnum == 0)
@@ -925,7 +925,7 @@ class npc_servant_of_asaad : public CreatureScript
 					switch (eventId)
 					{
 					case EVENT_CRUSADER_STRIKE:
-						DoCast(me->getVictim(), SPELL_CRUSADER_STRIKE);
+						DoCast(me->GetVictim(), SPELL_CRUSADER_STRIKE);
 						events.ScheduleEvent(EVENT_CRUSADER_STRIKE, urand(8000, 12000));
 						break;
 					case EVENT_HAND_OF_PROTECTION:
@@ -985,7 +985,7 @@ class npc_temple_adept : public CreatureScript
 					switch (eventId)
 					{
 					case EVENT_HOLY_SMITE:
-						DoCast(me->getVictim(), SPELL_HOLY_SMITE);
+						DoCast(me->GetVictim(), SPELL_HOLY_SMITE);
 						events.ScheduleEvent(EVENT_HOLY_SMITE, urand(5000, 6000));
 						break;
 					case EVENT_DESPERATE_SPEED:
@@ -1134,7 +1134,7 @@ class npc_wild_vortex : public CreatureScript
 						events.ScheduleEvent(EVENT_WIND_SHOCK, urand(10000, 20000));
 						break;
 					case EVENT_WV_LIGHTNING_BOLT:
-						DoCast(me->getVictim(), SPELL_WV_LIGHTNING_BOLT);
+						DoCast(me->GetVictim(), SPELL_WV_LIGHTNING_BOLT);
 						events.ScheduleEvent(EVENT_WV_LIGHTNING_BOLT, 3000);
 						break;
 					}

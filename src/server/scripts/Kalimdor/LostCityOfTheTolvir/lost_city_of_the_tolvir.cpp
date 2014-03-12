@@ -187,7 +187,7 @@ public:
             if (uiImpaleTimer <= diff)
             {
                 uiImpaleTimer = urand(10000, 25000);
-                me->CastSpell(me->getVictim(), 83783, false);
+                me->CastSpell(me->GetVictim(), 83783, false);
             }
             else
                 uiImpaleTimer -= diff;

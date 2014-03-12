@@ -257,7 +257,7 @@ class boss_erudax : public CreatureScript
                         events.ScheduleEvent(EVENT_SHADOW_GALE, urand(40000,44000));
                         break;
                     case EVENT_ENFEEBLING_BLOW:
-                        DoCast(me->getVictim(), SPELL_ENFEEBLING_BLOW);
+                        DoCast(me->GetVictim(), SPELL_ENFEEBLING_BLOW);
                         events.ScheduleEvent(EVENT_ENFEEBLING_BLOW, urand(20000, 30000));
                         break;
                     case EVENT_BINDING_SHADOWS:

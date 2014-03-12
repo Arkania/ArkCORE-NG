@@ -257,7 +257,7 @@ public:
                                 if (itr == lStalkers.end())
                                     itr = lStalkers.begin();
 
-                                if ((*itr) && (*itr)->isAlive())
+                                if ((*itr) && (*itr)->IsAlive())
                                     (*itr)->CastSpell((*itr), 84242, false);
 
                                 ++itr;
@@ -316,7 +316,7 @@ public:
                 return;
 
             for(Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
-                if(Player* player = itr->getSource())
+                if(Player* player = itr->GetSource())
                 {
                     if (player->HasAura(DUNGEON_MODE(SPELL_SCENT_OF_BLOOD_NORMAL, SPELL_SCENT_OF_BLOOD_HEROIC)))
                         me->AddThreat(player, 100500.0f);
@@ -352,7 +352,7 @@ public:
                         break;
                     case EVENT_VICIOUS_CROC_VICIOUS_BITE:
                         events.ScheduleEvent(EVENT_VICIOUS_CROC_VICIOUS_BITE, urand(5000, 10000));
-                        me->CastSpell(me->getVictim(), SPELL_VICIOUS_BITE, false);
+                        me->CastSpell(me->GetVictim(), SPELL_VICIOUS_BITE, false);
                         break;
                 }
             }
@@ -457,7 +457,7 @@ public:
                     {
                         case AUGH_PHASE_ACTIVE:
                             me->SetControlled(true, UNIT_STATE_ROOT);
-                            me->CastSpell(me->getVictim(), SPELL_PARALYTIC_BLOW_DART, false);
+                            me->CastSpell(me->GetVictim(), SPELL_PARALYTIC_BLOW_DART, false);
                             me->CastSpell(me, SPELL_SMOKE_BOMB, false);
                             uiPhase = AUGH_PHASE_STEALTHED;
                             uiEventTimer = 1500;
@@ -572,7 +572,7 @@ public:
                 {
                     lockmaw->AI()->JustSummoned(me);
 
-                    if (me->isSummon())
+                    if (me->IsSummon())
                         if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                             if (Creature* crock = summoner->ToCreature())
                                 lockmaw->AI()->JustSummoned(crock);
@@ -621,7 +621,7 @@ public:
                     case AUGH_PHASE_DISMOUNTED:
                         uiPhase = AUGH_PHASE_DESPAWNED;
                         uiEventTimer = 2500;
-                        me->CastSpell(me->getVictim(), 83776, false);
+                        me->CastSpell(me->GetVictim(), 83776, false);
                         me->CastSpell(me, SPELL_SMOKE_BOMB, false);
                         break;
                     case AUGH_PHASE_DESPAWNED:
@@ -791,12 +791,12 @@ public:
                     }
                     case EVENT_BLOW_DART:
                         if (SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
-                            me->CastSpell(me->getVictim(), SPELL_PARALYTIC_BLOW_DART, false);
+                            me->CastSpell(me->GetVictim(), SPELL_PARALYTIC_BLOW_DART, false);
 
                         events.ScheduleEvent(EVENT_BLOW_DART, urand(5000, 10000));
                         break;
                     case EVENT_DRAGONS_BREATH:
-                        me->CastSpell(me->getVictim(), 83776, false);
+                        me->CastSpell(me->GetVictim(), 83776, false);
                         events.ScheduleEvent(EVENT_DRAGONS_BREATH, urand(5000, 10000));
                         break;
                     case EVENT_SMOKE_BOMB:

@@ -28,6 +28,8 @@ set(scripts_STAT_SRCS
   EasternKingdoms/Scholomance/instance_scholomance.cpp
   EasternKingdoms/Scholomance/boss_lorekeeper_polkelt.cpp
   EasternKingdoms/Scholomance/boss_ras_frostwhisper.cpp
+  EasternKingdoms/Scholomance/boss_kirtonos_the_herald.cpp
+  EasternKingdoms/TheStockade/instance_the_stockade.cpp
   EasternKingdoms/ZulGurub/boss_grilek.cpp
   EasternKingdoms/ZulGurub/boss_hazzarah.cpp
   EasternKingdoms/ZulGurub/boss_jindo_the_godbreaker.cpp
@@ -113,7 +115,17 @@ set(scripts_STAT_SRCS
   EasternKingdoms/BlackrockSpire/boss_highlord_omokk.cpp
   EasternKingdoms/BlackrockSpire/boss_the_beast.cpp
   EasternKingdoms/BlackrockSpire/blackrock_spire.h
+  EasternKingdoms/BlackrockSpire/boss_lord_valthalak.cpp
+  EasternKingdoms/BlackrockSpire/boss_urok_doomhowl.cpp
+  EasternKingdoms/BlackrockSpire/boss_gizrul_the_slavener.cpp
   EasternKingdoms/BlackrockSpire/instance_blackrock_spire.cpp
+  EasternKingdoms/BlackrockCaverns/blackrock_caverns.h
+  EasternKingdoms/BlackrockCaverns/boss_ascendant_lord_obsidius.cpp
+  EasternKingdoms/BlackrockCaverns/boss_beauty.cpp
+  EasternKingdoms/BlackrockCaverns/boss_corla_herald_of_twilight.cpp
+  EasternKingdoms/BlackrockCaverns/boss_karsh_steelbender.cpp
+  EasternKingdoms/BlackrockCaverns/boss_romogg_bonecrusher.cpp
+  EasternKingdoms/BlackrockCaverns/instance_blackrock_caverns.cpp
   EasternKingdoms/SunwellPlateau/boss_eredar_twins.cpp
   EasternKingdoms/SunwellPlateau/boss_kiljaeden.cpp
   EasternKingdoms/SunwellPlateau/sunwell_plateau.h
@@ -174,27 +186,30 @@ set(scripts_STAT_SRCS
   EasternKingdoms/Karazhan/boss_moroes.cpp
   EasternKingdoms/Karazhan/boss_terestian_illhoof.cpp
   EasternKingdoms/Karazhan/karazhan.h
-  EasternKingdoms/BlackwingDescent/blackwing_descent.h;
-  EasternKingdoms/BlackwingDescent/blackwing_descent.cpp;
-  EasternKingdoms/BlackwingDescent/instance_blackwing_descent.cpp;
-  EasternKingdoms/BlackwingDescent/boss_magmaw.cpp;
-  EasternKingdoms/BlackwingDescent/boss_omnotron_defense_system.cpp;
-  EasternKingdoms/BlackwingDescent/boss_atramedes.cpp;
-  EasternKingdoms/BlackwingDescent/boss_chimaeron.cpp;
-  EasternKingdoms/BlackwingDescent/boss_maloriak.cpp;
-  EasternKingdoms/BlackwingDescent/boss_bd_nefarian.cpp;
+  EasternKingdoms/BlackwingDescent/blackwing_descent.h
+  EasternKingdoms/BlackwingDescent/blackwing_descent.cpp
+  EasternKingdoms/BlackwingDescent/instance_blackwing_descent.cpp
+  EasternKingdoms/BlackwingDescent/boss_magmaw.cpp
+  EasternKingdoms/BlackwingDescent/boss_omnotron_defense_system.cpp
+  EasternKingdoms/BlackwingDescent/boss_atramedes.cpp
+  EasternKingdoms/BlackwingDescent/boss_chimaeron.cpp
+  EasternKingdoms/BlackwingDescent/boss_maloriak.cpp
+  EasternKingdoms/BlackwingDescent/boss_bd_nefarian.cpp
   EasternKingdoms/BaradinHold/boss_argaloth.cpp
   EasternKingdoms/BaradinHold/boss_alizabal.cpp
   EasternKingdoms/BaradinHold/boss_occuthar.cpp
+  EasternKingdoms/BaradinHold/instance_baradin_hold.cpp
   EasternKingdoms/BaradinHold/bh_trash.cpp
-  EasternKingdoms/BastionOfTwilight/bastion_of_twilight.h;
-  EasternKingdoms/BastionOfTwilight/bastion_of_twilight.cpp;
-  EasternKingdoms/BastionOfTwilight/instance_bastion_of_twilight.cpp;
-  EasternKingdoms/BastionOfTwilight/boss_halfus.cpp;
-  EasternKingdoms/BastionOfTwilight/boss_valiona_theralion.cpp;
-  EasternKingdoms/BastionOfTwilight/boss_ascendant_council.cpp;
-  EasternKingdoms/BastionOfTwilight/boss_chogall.cpp;
-  EasternKingdoms/BastionOfTwilight/boss_sinestra.cpp;
+  EasternKingdoms/BaradinHold/boss_pit_lord_argaloth.cpp
+  EasternKingdoms/BastionOfTwilight/bastion_of_twilight.h
+  EasternKingdoms/BastionOfTwilight/bastion_of_twilight.cpp
+  EasternKingdoms/BastionOfTwilight/instance_bastion_of_twilight.cpp
+  EasternKingdoms/BastionOfTwilight/boss_halfus.cpp
+  EasternKingdoms/BastionOfTwilight/boss_valiona_theralion.cpp
+  EasternKingdoms/BastionOfTwilight/boss_ascendant_council.cpp
+  EasternKingdoms/BastionOfTwilight/boss_chogall.cpp
+  EasternKingdoms/BastionOfTwilight/boss_sinestra.cpp
+  EasternKingdoms/BastionOfTwilight/boss_assembly_of_ascendents.cpp
   EasternKingdoms/Gilneas/gilneas.h
   EasternKingdoms/Gilneas/gilneas.cpp
   EasternKingdoms/ThroneOfTheTides/boss_lady_nazjar.cpp
@@ -236,6 +251,8 @@ set(scripts_STAT_SRCS
   EasternKingdoms/zone_redridge_mountains.cpp
   EasternKingdoms/zone_ironforge.cpp
   EasternKingdoms/zone_eastern_plaguelands.cpp
+  EasternKingdoms/zone_elwynn_forest.cpp
+  EasternKingdoms/zone_coldridge_valley.cpp
 
 
   

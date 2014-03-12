@@ -195,7 +195,7 @@ class boss_asaad : public CreatureScript
 						break;
 					case EVENT_SUMMON_STAR:
 						if (Creature* _star = me->SummonCreature(NPC_SKYFALL_STAR, starPos[urand(0, 5)]))
-							_star->AI()->AttackStart(me->getVictim());
+							_star->AI()->AttackStart(me->GetVictim());
 						events.ScheduleEvent(EVENT_SUMMON_STAR, urand(18000, 24000));
 						break;
 					case EVENT_STATIC_CLING:
@@ -254,7 +254,7 @@ class boss_asaad : public CreatureScript
 							_field3->DespawnOrUnsummon();
 						me->SetCanFly(false);
 						me->SetReactState(REACT_AGGRESSIVE);
-						AttackStart(me->getVictim());
+						AttackStart(me->GetVictim());
 						events.ScheduleEvent(EVENT_FIELD, 45000);
 						break;
 					}

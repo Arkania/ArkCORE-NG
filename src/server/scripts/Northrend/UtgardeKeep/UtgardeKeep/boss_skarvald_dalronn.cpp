@@ -82,13 +82,13 @@ public:
         uint32 StoneStrike_Timer;
         uint32 Response_Timer;
         uint32 Check_Timer;
-        bool Dalronn_isDead;
+        bool Dalronn_IsDead;
 
         void Reset()
         {
             Charge_Timer = 5000;
             StoneStrike_Timer = 10000;
-            Dalronn_isDead = false;
+            Dalronn_IsDead = false;
             Check_Timer = 5000;
 
             ghost = (me->GetEntry() == MOB_SKARVALD_GHOST);
@@ -175,13 +175,13 @@ public:
                         Unit* dalronn = Unit::GetUnit(*me, instance ? instance->GetData64(DATA_DALRONN) : 0);
                         if (dalronn && dalronn->IsDead())
                         {
-                            Dalronn_isDead = true;
+                            Dalronn_IsDead = true;
                             Response_Timer = 2000;
                             Check_Timer = 0;
                         }
                     } else Check_Timer -= diff;
                 }
-                if (Response_Timer && Dalronn_isDead)
+                if (Response_Timer && Dalronn_IsDead)
                 {
                     if (Response_Timer <= diff)
                     {
@@ -237,7 +237,7 @@ public:
         uint32 Response_Timer;
         uint32 Check_Timer;
         uint32 AggroYell_Timer;
-        bool Skarvald_isDead;
+        bool Skarvald_IsDead;
 
         void Reset()
         {
@@ -245,7 +245,7 @@ public:
             Debilitate_Timer = 5000;
             Summon_Timer = 10000;
             Check_Timer = 5000;
-            Skarvald_isDead = false;
+            Skarvald_IsDead = false;
             AggroYell_Timer = 0;
 
             ghost = me->GetEntry() == MOB_DALRONN_GHOST;
@@ -344,14 +344,14 @@ public:
                         Unit* skarvald = Unit::GetUnit(*me, instance ? instance->GetData64(DATA_SKARVALD) : 0);
                         if (skarvald && skarvald->IsDead())
                         {
-                            Skarvald_isDead = true;
+                            Skarvald_IsDead = true;
                             Response_Timer = 2000;
                             Check_Timer = 0;
                         }
                     } else Check_Timer -= diff;
                 }
 
-                if (Response_Timer && Skarvald_isDead)
+                if (Response_Timer && Skarvald_IsDead)
                 {
                     if (Response_Timer <= diff)
                     {

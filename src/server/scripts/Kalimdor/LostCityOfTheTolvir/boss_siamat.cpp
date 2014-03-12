@@ -255,7 +255,7 @@ public:
                             {
                                 events.SetPhase(PHASE_SIAMAT);
                                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-                                me->GetMotionMaster()->MoveChase(me->getVictim());
+                                me->GetMotionMaster()->MoveChase(me->GetVictim());
                                 events.ScheduleEvent(EVENT_ABSORB_STORMS, 15000, 0, PHASE_SIAMAT);
                                 events.ScheduleEvent(EVENT_STORM_BOLT_S, urand(10000, 25000), 0, PHASE_SIAMAT);
                             }
@@ -377,7 +377,7 @@ public:
                         events.ScheduleEvent(EVENT_THUNDER_CRASH, urand(7000, 15000));
                         break;
                     case EVENT_LIGHTNING_NOVA:
-                        me->CastSpell(me->getVictim(), SPELL_LIGHTNING_NOVA, false);
+                        me->CastSpell(me->GetVictim(), SPELL_LIGHTNING_NOVA, false);
                         events.ScheduleEvent(EVENT_LIGHTNING_NOVA, urand(7000, 15000));
                         break;
                 }
@@ -470,7 +470,7 @@ public:
 
             if (events.ExecuteEvent() == EVENT_CHAIN_LIGHTNING)
             {
-                me->CastSpell(me->getVictim(), SPELL_CHAIN_LIGHTNING, false);
+                me->CastSpell(me->GetVictim(), SPELL_CHAIN_LIGHTNING, false);
                 events.ScheduleEvent(EVENT_CHAIN_LIGHTNING, 2000);
             }
 

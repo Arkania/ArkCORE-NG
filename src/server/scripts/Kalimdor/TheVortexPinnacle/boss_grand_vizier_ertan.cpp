@@ -163,7 +163,7 @@ class boss_grand_vizier_ertan : public CreatureScript
 					case EVENT_LIGHTNING_BOLT:
 						if (me->HasUnitState(UNIT_STATE_CASTING))
 							return;
-						DoCast(me->getVictim(), SPELL_LIGHTNING_BOLT);
+						DoCast(me->GetVictim(), SPELL_LIGHTNING_BOLT);
 						events.ScheduleEvent(EVENT_LIGHTNING_BOLT, 2000);
 						break;
 					case EVENT_CALL_VORTEX:
@@ -195,13 +195,13 @@ class boss_grand_vizier_ertan : public CreatureScript
 							return;
 						for (Map::PlayerList::const_iterator itr = me->GetMap()->GetPlayers().begin(); itr != me->GetMap()->GetPlayers().end(); ++itr)
 						{
-                            if (Player* pPlayer = itr->getSource())
+                            if (Player* pPlayer = itr->GetSource())
                             {
                                 if (me->GetDistance2d(pPlayer) > _distance)
 							    {
 								    //uint8 i = urand(0, 7);
 								    //if (_vortexes[i])
-									    //_vortexes[i]->CastSpell(itr->getSource(), SPELL_STORM_EDGE, true);
+									    //_vortexes[i]->CastSpell(itr->GetSource(), SPELL_STORM_EDGE, true);
 							        DoCast(pPlayer, SPELL_STORM_EDGE, true);
                                 }
                             }

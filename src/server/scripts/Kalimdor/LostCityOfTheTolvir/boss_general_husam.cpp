@@ -235,7 +235,7 @@ public:
                     case EVENT_HAMMER_FIST:
                         {
                             ++uiHammerFistCount;
-                            me->CastSpell(me->getVictim(), SPELL_HAMMER_FIST, false);
+                            me->CastSpell(me->GetVictim(), SPELL_HAMMER_FIST, false);
 
                             if (uiHammerFistCount < 4)
                                 events.ScheduleEvent(EVENT_HAMMER_FIST, 500);
@@ -401,7 +401,7 @@ public:
             uiCheckTimer = 250;
             instance = creature->GetInstanceScript();
 
-            if (me->isSummon())
+            if (me->IsSummon())
                 if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                 {
                     float x, y, _x, _y, z = me->GetPositionZ();

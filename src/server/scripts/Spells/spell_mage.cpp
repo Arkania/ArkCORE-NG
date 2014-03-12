@@ -559,7 +559,7 @@ class ImpactTargetCheck
 
         bool operator() (Unit* unit)
         {
-            return unit == _originalTarget || !unit->isAlive();
+            return unit == _originalTarget || !unit->IsAlive();
         }
 
     private:
@@ -597,7 +597,7 @@ public:
         {
             Unit* caster = GetCaster();
             Unit* target = GetExplTargetUnit();
-            if (!caster || !target || !target->isAlive())
+            if (!caster || !target || !target->IsAlive())
                 return;
 
             // Build target list

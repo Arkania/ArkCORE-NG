@@ -170,10 +170,10 @@ class boss_altairus : public CreatureScript
 				if (me->HasUnitState(UNIT_STATE_CASTING))
 					return;
 
-				if (me->getVictim())
-					if (me->getVictim()->GetDistance2d(me->GetHomePosition().GetPositionX(), me->GetHomePosition().GetPositionY()) > 55.0f)
+				if (me->GetVictim())
+					if (me->GetVictim()->GetDistance2d(me->GetHomePosition().GetPositionX(), me->GetHomePosition().GetPositionY()) > 55.0f)
 					{
-						DoCast(me->getVictim(), SPELL_LIGHTNING_BLAST);
+						DoCast(me->GetVictim(), SPELL_LIGHTNING_BLAST);
                         return;
 					}
 
@@ -206,15 +206,15 @@ class boss_altairus : public CreatureScript
 
 						for (Map::PlayerList::const_iterator itr = me->GetMap()->GetPlayers().begin(); itr != me->GetMap()->GetPlayers().end(); ++itr) 
 						{
-							if (CheckOrientation(itr->getSource()->GetOrientation(), _aircurrent->GetOrientation()))
+							if (CheckOrientation(itr->GetSource()->GetOrientation(), _aircurrent->GetOrientation()))
 							{
-								itr->getSource()->RemoveAurasDueToSpell(SPELL_DOWNWIND_OF_ALTAIRUS);
-								me->AddAura(SPELL_UPWIND_OF_ALTAIRUS, itr->getSource());
+								itr->GetSource()->RemoveAurasDueToSpell(SPELL_DOWNWIND_OF_ALTAIRUS);
+								me->AddAura(SPELL_UPWIND_OF_ALTAIRUS, itr->GetSource());
 							}
 							else
 							{
-								itr->getSource()->RemoveAurasDueToSpell(SPELL_UPWIND_OF_ALTAIRUS);
-								me->AddAura(SPELL_DOWNWIND_OF_ALTAIRUS, itr->getSource());
+								itr->GetSource()->RemoveAurasDueToSpell(SPELL_UPWIND_OF_ALTAIRUS);
+								me->AddAura(SPELL_DOWNWIND_OF_ALTAIRUS, itr->GetSource());
 							}
 						}
 						events.ScheduleEvent(EVENT_CHECK_FACING, 3000);

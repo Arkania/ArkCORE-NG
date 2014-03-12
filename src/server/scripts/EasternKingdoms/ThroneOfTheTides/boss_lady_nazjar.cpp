@@ -134,7 +134,7 @@ class boss_lady_nazjar : public CreatureScript
             {
                 if (!instance || static_cast<InstanceMap*>(me->GetMap())->GetScriptId() != sObjectMgr->GetScriptId(TotTScriptName))
                     me->IsAIEnabled = false;
-                else if (!me->isDead())
+                else if (!me->IsDead())
                     Reset();
             }
 
@@ -182,7 +182,7 @@ class boss_lady_nazjar : public CreatureScript
                 {
                 case NPC_TEMPEST_WITCH:
                 case NPC_HONNOR_GUARD:
-                    if (me->isInCombat())
+                    if (me->IsInCombat())
                         summon->SetInCombatWithZone();
                     break;
                 case NPC_WATERSPOUT:
@@ -252,7 +252,7 @@ class boss_lady_nazjar : public CreatureScript
                 me->CastStop();
                 SetCombatMovement(true);
                 me->SetReactState(REACT_AGGRESSIVE);
-                me->GetMotionMaster()->MoveChase(me->getVictim());
+                me->GetMotionMaster()->MoveChase(me->GetVictim());
                 events.RescheduleEvent(EVENT_GEYSER, 11000);
                 events.RescheduleEvent(EVENT_FUNGAL_SPORES, urand(3000,10000));
                 events.RescheduleEvent(EVENT_SHOCK_BLAST, urand(6000,12000));
@@ -327,7 +327,7 @@ class boss_lady_nazjar : public CreatureScript
                             events.ScheduleEvent(EVENT_FUNGAL_SPORES, urand(15000,18000));
                             break;
                         case EVENT_SHOCK_BLAST:
-                            DoCast(me->getVictim(), SPELL_SHOCK_BLAST);
+                            DoCast(me->GetVictim(), SPELL_SHOCK_BLAST);
                             events.ScheduleEvent(EVENT_SHOCK_BLAST, urand(12000,14000));
                             break;
                         }
@@ -450,7 +450,7 @@ class npc_lady_nazjar_tempest_witch : public CreatureScript
                         events.ScheduleEvent(EVENT_LIGHTNING_SURGE, urand(10000, 15000));
                         break;
                     case EVENT_CHAIN_LIGHTNING:
-                        DoCast(me->getVictim(), SPELL_CHAIN_LIGHTNING);
+                        DoCast(me->GetVictim(), SPELL_CHAIN_LIGHTNING);
                         events.ScheduleEvent(EVENT_CHAIN_LIGHTNING, 2000);
                         break;
                     }

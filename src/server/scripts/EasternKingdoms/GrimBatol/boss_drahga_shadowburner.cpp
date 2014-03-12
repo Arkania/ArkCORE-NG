@@ -348,7 +348,7 @@ class npc_drahga_valiona : public CreatureScript
                         events.ScheduleEvent(EVENT_VALIONAS_FLAME, urand(15000, 22000));
                         break;
                     case EVENT_SHREDDING_SWIPE:
-                        DoCast(me->getVictim(), SPELL_SHREDDING_SWIPE);
+                        DoCast(me->GetVictim(), SPELL_SHREDDING_SWIPE);
                         events.ScheduleEvent(EVENT_SHREDDING_SWIPE, urand(20000, 22000));
                         break;
                     }
