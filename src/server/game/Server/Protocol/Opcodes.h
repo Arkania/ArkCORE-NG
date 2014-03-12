@@ -570,7 +570,7 @@ enum Opcodes
     CMSG_VOICE_SESSION_ENABLE                         = 0x2314,
     CMSG_VOID_STORAGE_QUERY                           = 0x790A,
     CMSG_VOID_STORAGE_TRANSFER                        = 0x380E,
-	CMSG_VOID_STORAGE_UNLOCK                          = 0x7B14,
+    CMSG_VOID_STORAGE_UNLOCK                          = 0x7B14,
 	CMSG_VOID_SWAP_ITEM                               = 0x3204,
     CMSG_WARDEN_DATA                                  = 0x25A2,
     CMSG_WARGAME_ACCEPT                               = 0x2410,
@@ -589,7 +589,13 @@ enum Opcodes
     MSG_GM_SHOWLABEL                                  = 0x0000,
     MSG_GM_SUMMON                                     = 0x0000,
     MSG_INSPECT_ARENA_TEAMS                           = 0x2704,
-    MSG_LIST_STABLED_PETS                             = 0x0834,
+    MSG_LIST_STABLED_PETS                             = 0x0834, // hope this works (4.3.4)
+    CMSG_STABLE_PET                                   = 0x1271, // hope this works (4.3.4)
+    CMSG_UNSTABLE_PET                                 = 0x1272, // hope this works (4.3.4)
+    CMSG_BUY_STABLE_SLOT                              = 0x1273, // hope this works (4.3.4)
+    SMSG_STABLE_RESULT                                = 0x2204, // hope this works (4.3.4)
+    CMSG_STABLE_REVIVE_PET                            = 0x1275, // hope this works (4.3.4)
+    CMSG_STABLE_SWAP_PET                              = 0x1276, // hope this works (4.3.4)
     MSG_MINIMAP_PING                                  = 0x6635,
     MSG_MOVE_CHARM_TELEPORT_CHEAT                     = 0x7A08,
     MSG_MOVE_FALL_LAND                                = 0x380A,
@@ -965,7 +971,6 @@ enum Opcodes
     SMSG_INSPECT_RATED_BG_STATS                       = 0x19A5,
     SMSG_INSPECT_RESULTS_UPDATE                       = 0x0C14,
     SMSG_INSPECT_TALENT                               = 0x4014,
-    SMSG_INSTANCE_DIFFICULTY                          = 0x0000,
     SMSG_INSTANCE_LOCK_WARNING_QUERY                  = 0x4F17,
     SMSG_INSTANCE_RESET                               = 0x6F05,
     SMSG_INSTANCE_RESET_FAILED                        = 0x4725,
@@ -1305,7 +1310,6 @@ enum Opcodes
     SMSG_SPLINE_MOVE_UNSET_FLYING                     = 0x58A6,
     SMSG_SPLINE_MOVE_UNSET_HOVER                      = 0x7DA5,
     SMSG_SPLINE_MOVE_WATER_WALK                       = 0x50A2,
-    SMSG_STABLE_RESULT                                = 0x2204,
     SMSG_STANDSTATE_UPDATE                            = 0x6F04,
     SMSG_START_MIRROR_TIMER                           = 0x6824,
     SMSG_START_TIMER                                  = 0x59A5,
