@@ -174,7 +174,7 @@ public:
                             if (counter >= 5)
                                 break;
 
-                            if (Unit* target = (*itr)->getTarget())
+                            if (Unit* target = (*itr)->GetTarget())
                             {
                                 Player* player = target->ToPlayer();
 

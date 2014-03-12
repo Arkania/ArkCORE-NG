@@ -108,7 +108,7 @@ public:
 
             if (Repentance_Timer <= diff)
             {
-                DoCast(me->getVictim(), SPELL_REPENTANCE);
+                DoCast(me->GetVictim(), SPELL_REPENTANCE);
                 DoScriptText(RAND(SAY_REPENTANCE1, SAY_REPENTANCE2), me);
 
                 Repentance_Timer = urand(25000, 35000);        //A little randomness on that spell

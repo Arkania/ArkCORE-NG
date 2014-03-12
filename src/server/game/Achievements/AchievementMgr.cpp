@@ -1952,7 +1952,7 @@ void AchievementMgr<Guild>::CompletedAchievement(AchievementEntry const* achieve
 
         if (Group const* group = referencePlayer->GetGroup())
             for (GroupReference const* ref = group->GetFirstMember(); ref != NULL; ref = ref->next())
-                if (Player const* groupMember = ref->getSource())
+                if (Player const* groupMember = ref->GetSource())
                     if (groupMember->GetGuildId() == GetOwner()->GetId())
                         ca.guids.insert(groupMember->GetGUID());
     }
@@ -2725,7 +2725,7 @@ bool AchievementMgr<T>::AdditionalRequirementsSatisfied(AchievementCriteriaEntry
                     return false;
                 break;
             case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_TARGET_MUST_BE_DEAD: // 6
-                if (!unit || unit->isAlive())
+                if (!unit || unit->IsAlive())
                     return false;
                 break;
             case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_TARGET_MUST_BE_ENEMY: // 7

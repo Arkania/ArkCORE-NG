@@ -238,7 +238,7 @@ void Object::BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target) c
         }
     }
 
-    if (ToUnit() && ToUnit()->getVictim())
+    if (ToUnit() && ToUnit()->GetVictim())
         flags |= UPDATEFLAG_HAS_TARGET;
 
     ByteBuffer buf(500);
@@ -433,7 +433,7 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
 
     if (flags & UPDATEFLAG_HAS_TARGET)
     {
-        ObjectGuid victimGuid = ToUnit()->getVictim()->GetGUID();   // checked in BuildCreateUpdateBlockForPlayer
+        ObjectGuid victimGuid = ToUnit()->GetVictim()->GetGUID();   // checked in BuildCreateUpdateBlockForPlayer
         data->WriteBit(victimGuid[2]);
         data->WriteBit(victimGuid[7]);
         data->WriteBit(victimGuid[0]);
@@ -615,7 +615,7 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
 
     if (flags & UPDATEFLAG_HAS_TARGET)
     {
-        ObjectGuid victimGuid = ToUnit()->getVictim()->GetGUID();   // checked in BuildCreateUpdateBlockForPlayer
+        ObjectGuid victimGuid = ToUnit()->GetVictim()->GetGUID();   // checked in BuildCreateUpdateBlockForPlayer
         data->WriteByteSeq(victimGuid[4]);
         data->WriteByteSeq(victimGuid[0]);
         data->WriteByteSeq(victimGuid[3]);
@@ -1859,7 +1859,7 @@ void WorldObject::UpdateAllowedPositionZ(float x, float y, float &z) const
             // non swim unit must be at ground (mostly speedup, because it don't must be in water and water level check less fast
             if (!ToCreature()->CanFly())
             {
-                bool canSwim = ToCreature()->canSwim();
+                bool canSwim = ToCreature()->CanSwim();
                 float ground_z = z;
                 float max_z = canSwim
                     ? GetBaseMap()->GetWaterOrGroundLevel(x, y, z, &ground_z, !ToUnit()->HasAuraType(SPELL_AURA_WATER_WALK))
@@ -1973,7 +1973,7 @@ bool WorldObject::canSeeOrDetect(WorldObject const* obj, bool ignoreStealth, boo
         bool corpseCheck = false;
         if (Player const* thisPlayer = ToPlayer())
         {
-            if (thisPlayer->isDead() && thisPlayer->GetHealth() > 0 && // Cheap way to check for ghost state
+            if (thisPlayer->IsDead() && thisPlayer->GetHealth() > 0 && // Cheap way to check for ghost state
                 !(obj->m_serverSideVisibility.GetValue(SERVERSIDE_VISIBILITY_GHOST) & m_serverSideVisibility.GetValue(SERVERSIDE_VISIBILITY_GHOST) & GHOST_VISIBILITY_GHOST))
             {
                 if (Corpse* corpse = thisPlayer->GetCorpse())
@@ -2266,8 +2266,8 @@ void WorldObject::MonsterYellToZone(int32 textId, uint32 language, uint64 Target
 
     Map::PlayerList const& pList = GetMap()->GetPlayers();
     for (Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
-        if (itr->getSource()->GetZoneId() == zoneid)
-            say_do(itr->getSource());
+        if (itr->GetSource()->GetZoneId() == zoneid)
+            say_do(itr->GetSource());
 }
 
 void WorldObject::MonsterTextEmote(const char* text, uint64 TargetGuid, bool IsBossEmote)
@@ -2853,7 +2853,7 @@ namespace Trinity
 
                 float x, y, z;
 
-                if (!c->isAlive() || c->HasUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED | UNIT_STATE_DISTRACTED) ||
+                if (!c->IsAlive() || c->HasUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED | UNIT_STATE_DISTRACTED) ||
                     !c->GetMotionMaster()->GetDestination(x, y, z))
                 {
                     x = c->GetPositionX();
@@ -3229,7 +3229,7 @@ struct WorldObjectChangeAccumulator
         Player* source = NULL;
         for (PlayerMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
         {
-            source = iter->getSource();
+            source = iter->GetSource();
 
             BuildPacket(source);
 
@@ -3247,7 +3247,7 @@ struct WorldObjectChangeAccumulator
         Creature* source = NULL;
         for (CreatureMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
         {
-            source = iter->getSource();
+            source = iter->GetSource();
             if (!source->GetSharedVisionList().empty())
             {
                 SharedVisionList::const_iterator it = source->GetSharedVisionList().begin();
@@ -3262,7 +3262,7 @@ struct WorldObjectChangeAccumulator
         DynamicObject* source = NULL;
         for (DynamicObjectMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
         {
-            source = iter->getSource();
+            source = iter->GetSource();
             uint64 guid = source->GetCasterGUID();
 
             if (IS_PLAYER_GUID(guid))

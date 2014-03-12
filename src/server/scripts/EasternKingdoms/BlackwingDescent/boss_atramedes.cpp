@@ -214,7 +214,7 @@ public:
             std::list<Creature*> gongs;
             me->GetCreatureListWithEntryInGrid(gongs, NPC_GONG, 200.0f);
             for (std::list<Creature*>::iterator itr = gongs.begin(); itr != gongs.end(); ++itr)
-                if (!(*itr)->isAlive())
+                if (!(*itr)->IsAlive())
                     (*itr)->Respawn();
 
             if (instance)
@@ -656,7 +656,7 @@ public:
         {
             if (timerCast <= diff)
             {
-                DoCast(me->getVictim(), SPELL_OBNOXIOUS);
+                DoCast(me->GetVictim(), SPELL_OBNOXIOUS);
                 timerCast = 3000;
             } else timerCast -= diff;
 
@@ -781,7 +781,7 @@ public:
 
             if (!PlayerList.isEmpty())
               for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-                if (Player* playr = i->getSource())
+                if (Player* playr = i->GetSource())
                     playr->AddAura(SPELL_SOUND_AURA, playr); // reset the bar.
 
             creature->setDeathState(JUST_DIED);
@@ -802,7 +802,7 @@ public:
         { 
             // Don't use gongs out of combat
             if (Creature* atramedes = me->FindNearestCreature(BOSS_ATRAMEDES, 200.0f))
-                if (!atramedes->isInCombat())
+                if (!atramedes->IsInCombat())
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 else
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);

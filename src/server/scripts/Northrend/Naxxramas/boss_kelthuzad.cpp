@@ -257,7 +257,7 @@ struct NotCharmedTargetSelector : public std::unary_function<Unit*, bool>
 
     bool operator()(Unit const* target) const
     {
-        return !target->isCharmed();
+        return !target->IsCharmed();
     }
 };
 
@@ -436,7 +436,7 @@ public:
                             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NOT_SELECTABLE);
                             me->CastStop();
 
-                            DoStartMovement(me->getVictim());
+                            DoStartMovement(me->GetVictim());
                             events.ScheduleEvent(EVENT_BOLT, urand(5000, 10000));
                             events.ScheduleEvent(EVENT_NOVA, 15000);
                             events.ScheduleEvent(EVENT_DETONATE, urand(30000, 40000));
@@ -509,7 +509,7 @@ public:
                             for (uint8 i = 1; i <= count; i++)
                             {
                                 Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 200, true);
-                                if (target && !target->isCharmed() && (chained.find(target->GetGUID()) == chained.end()))
+                                if (target && !target->IsCharmed() && (chained.find(target->GetGUID()) == chained.end()))
                                 {
                                     DoCast(target, SPELL_CHAINS_OF_KELTHUZAD);
                                     float scale = target->GetFloatValue(OBJECT_FIELD_SCALE_X);
@@ -530,7 +530,7 @@ public:
                             {
                                 if (Unit* player = Unit::GetPlayer(*me, (*itr).first))
                                 {
-                                    if (!player->isCharmed())
+                                    if (!player->IsCharmed())
                                     {
                                         player->SetObjectScale((*itr).second);
                                         std::map<uint64, float>::iterator next = itr;
@@ -608,10 +608,10 @@ public:
                             std::list<HostileReference*> *threatList = &me->getThreatManager().getThreatList();
                             for (std::list<HostileReference*>::const_iterator itr = threatList->begin(); itr != threatList->end(); ++itr)
                             {
-                                if ((*itr)->getTarget()->GetTypeId() == TYPEID_PLAYER
-                                    && (*itr)->getTarget()->getPowerType() == POWER_MANA
-                                    && (*itr)->getTarget()->GetPower(POWER_MANA))
-                                    unitList.push_back((*itr)->getTarget());
+                                if ((*itr)->GetTarget()->GetTypeId() == TYPEID_PLAYER
+                                    && (*itr)->GetTarget()->getPowerType() == POWER_MANA
+                                    && (*itr)->GetTarget()->GetPower(POWER_MANA))
+                                    unitList.push_back((*itr)->GetTarget());
                             }
 
                             if (!unitList.empty())

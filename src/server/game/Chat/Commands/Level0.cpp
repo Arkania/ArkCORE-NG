@@ -55,21 +55,21 @@ bool ChatHandler::HandleStartCommand(const char* /*args*/)
 {
     Player* player = m_session->GetPlayer();
 
-    if (player->isInFlight())
+    if (player->IsInFlight())
     {
         SendSysMessage(LANG_YOU_IN_FLIGHT);
         SetSentErrorMessage(true);
         return false;
     }
 
-    if (player->isInCombat())
+    if (player->IsInCombat())
     {
         SendSysMessage(LANG_YOU_IN_COMBAT);
         SetSentErrorMessage(true);
         return false;
     }
 
-    if (player->isDead() || player->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))
+    if (player->IsDead() || player->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))
     {
         // if player is dead and stuck, send ghost to graveyard
         player->RepopAtGraveyard();
@@ -93,7 +93,7 @@ bool ChatHandler::HandleDismountCommand(const char* /*args*/)
         return false;
     }
 
-    if (player->isInFlight())
+    if (player->IsInFlight())
     {
         SendSysMessage(LANG_YOU_IN_FLIGHT);
         SetSentErrorMessage(true);

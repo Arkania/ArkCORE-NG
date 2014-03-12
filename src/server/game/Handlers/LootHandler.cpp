@@ -83,7 +83,7 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket & recvData)
     {
         Creature* creature = GetPlayer()->GetMap()->GetCreature(lguid);
 
-        bool lootAllowed = creature && creature->isAlive() == (player->getClass() == CLASS_ROGUE && creature->lootForPickPocketed);
+        bool lootAllowed = creature && creature->IsAlive() == (player->getClass() == CLASS_ROGUE && creature->lootForPickPocketed);
 
         if (!lootAllowed || !creature->IsWithinDistInMap(_player, INTERACTION_DISTANCE))
         {
@@ -114,7 +114,7 @@ void WorldSession::HandleLootCurrencyOpcode(WorldPacket& recvData)
         case HIGHGUID_VEHICLE:
         {
             Creature* creature = player->GetMap()->GetCreature(lguid);
-            bool lootAllowed = creature && !creature->isAlive();
+            bool lootAllowed = creature && !creature->IsAlive();
 
             if (lootAllowed)
                 loot = &creature->loot;
@@ -188,11 +188,11 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recvData*/)
         case HIGHGUID_VEHICLE:
         {
             Creature* creature = player->GetMap()->GetCreature(guid);
-            bool lootAllowed = creature && creature->isAlive() == (player->getClass() == CLASS_ROGUE && creature->lootForPickPocketed);
+            bool lootAllowed = creature && creature->IsAlive() == (player->getClass() == CLASS_ROGUE && creature->lootForPickPocketed);
             if (lootAllowed && creature->IsWithinDistInMap(player, INTERACTION_DISTANCE))
             {
                 loot = &creature->loot;
-                if (creature->isAlive())
+                if (creature->IsAlive())
                     shareMoney = false;
             }
             break;
@@ -211,7 +211,7 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recvData*/)
             std::vector<Player*> playersNear;
             for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
             {
-                Player* member = itr->getSource();
+                Player* member = itr->GetSource();
                 if (!member)
                     continue;
 
@@ -275,7 +275,7 @@ void WorldSession::HandleLootOpcode(WorldPacket & recvData)
     recvData >> guid;
 
     // Check possible cheat
-    if (!GetPlayer()->isAlive() || !IS_CRE_OR_VEH_GUID(guid))
+    if (!GetPlayer()->IsAlive() || !IS_CRE_OR_VEH_GUID(guid))
         return;
 
     GetPlayer()->SendLoot(guid, LOOT_CORPSE);
@@ -453,7 +453,7 @@ void WorldSession::DoLootRelease(uint64 lguid)
     {
         Creature* creature = GetPlayer()->GetMap()->GetCreature(lguid);
 
-        bool lootAllowed = creature && creature->isAlive() == (player->getClass() == CLASS_ROGUE && creature->lootForPickPocketed);
+        bool lootAllowed = creature && creature->IsAlive() == (player->getClass() == CLASS_ROGUE && creature->lootForPickPocketed);
         if (!lootAllowed || !creature->IsWithinDistInMap(_player, INTERACTION_DISTANCE))
             return;
 
@@ -461,7 +461,7 @@ void WorldSession::DoLootRelease(uint64 lguid)
         if (loot->isLooted())
         {
             // skip pickpocketing loot for speed, skinning timer reduction is no-op in fact
-            if (!creature->isAlive())
+            if (!creature->IsAlive())
                 creature->AllLootRemovedFromCorpse();
 
             // save player every time when loot

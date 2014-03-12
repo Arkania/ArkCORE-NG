@@ -109,27 +109,27 @@ public:
             {
                 DoScriptText(SAY_QUAKE, me);
                 if (bPhase)
-                    DoCast(me->getVictim(), SPELL_QUAKE, true);
+                    DoCast(me->GetVictim(), SPELL_QUAKE, true);
                 else
-                    DoCast(me->getVictim(), SPELL_GROUND_TREMOR, true);
+                    DoCast(me->GetVictim(), SPELL_GROUND_TREMOR, true);
                 uiGroundTremorTimer = 10*IN_MILLISECONDS;
             } else uiGroundTremorTimer -= uiDiff;
 
             if (uiNumblingShoutTimer <= uiDiff)
             {
                 if (bPhase)
-                    DoCast(me->getVictim(), SPELL_NUMBING_ROAR, true);
+                    DoCast(me->GetVictim(), SPELL_NUMBING_ROAR, true);
                 else
-                    DoCast(me->getVictim(), SPELL_NUMBING_SHOUT, true);
+                    DoCast(me->GetVictim(), SPELL_NUMBING_SHOUT, true);
                 uiNumblingShoutTimer = 10*IN_MILLISECONDS;
             } else uiNumblingShoutTimer -=uiDiff;
 
             if (uiDeterminedStabTimer <= uiDiff)
             {
                 if (bPhase)
-                    DoCast(me->getVictim(), SPELL_DETERMINED_GORE);
+                    DoCast(me->GetVictim(), SPELL_DETERMINED_GORE);
                 else
-                    DoCast(me->getVictim(), SPELL_DETERMINED_STAB, true);
+                    DoCast(me->GetVictim(), SPELL_DETERMINED_STAB, true);
                 uiDeterminedStabTimer = 8*IN_MILLISECONDS;
             } else uiDeterminedStabTimer -=uiDiff;
 

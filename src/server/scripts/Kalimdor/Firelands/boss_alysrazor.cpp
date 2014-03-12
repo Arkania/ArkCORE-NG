@@ -1765,8 +1765,8 @@ public:
             if (!PlayerList.isEmpty())
 				for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
 					if (Creature* tornado = me->FindNearestCreature(53693, 5000.0f))
-						if (i->getSource()->GetDistance(tornado) > 60.0f)
-							me->AddAura(SPELL_HARSH_WINDS,i->getSource());
+						if (i->GetSource()->GetDistance(tornado) > 60.0f)
+							me->AddAura(SPELL_HARSH_WINDS,i->GetSource());
 		}
 
 		void SetPlayersInCombat()
@@ -1775,8 +1775,8 @@ public:
 			Map::PlayerList const &PlayerList = me->GetMap()->GetPlayers();
             if (!PlayerList.isEmpty())
 				for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-					if (Player *player = i->getSource())
-						if (player->isAlive())
+					if (Player *player = i->GetSource())
+						if (player->IsAlive())
 						{
 							++players;
 							player->SetInCombatWith(me->ToUnit());
@@ -1790,8 +1790,8 @@ public:
 			Map::PlayerList const &PlayerList = me->GetMap()->GetPlayers();
             if (!PlayerList.isEmpty())
 				for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-					if (i->getSource()->HasAura(SPELL_FLY))
-						i->getSource()->RemoveAura(SPELL_FLY);
+					if (i->GetSource()->HasAura(SPELL_FLY))
+						i->GetSource()->RemoveAura(SPELL_FLY);
 		}
 
 	    void RemoveAllFeathers()
@@ -1799,8 +1799,8 @@ public:
 			Map::PlayerList const &PlayerList = me->GetMap()->GetPlayers();
             if (!PlayerList.isEmpty())
 				for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-					if (i->getSource()->HasAura(SPELL_CAST_ON_MOVE_VISUAL))
-						i->getSource()->RemoveAura(SPELL_CAST_ON_MOVE_VISUAL);
+					if (i->GetSource()->HasAura(SPELL_CAST_ON_MOVE_VISUAL))
+						i->GetSource()->RemoveAura(SPELL_CAST_ON_MOVE_VISUAL);
 		}
 
 		void RemoveEncounterAuras()
@@ -1809,14 +1809,14 @@ public:
             if (!PlayerList.isEmpty())
 				for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
 				{
-					if (i->getSource()->HasAura(SPELL_FLY))
-						i->getSource()->RemoveAura(SPELL_FLY);
-					if (i->getSource()->HasAura(SPELL_INDICATOR))
-						i->getSource()->RemoveAura(SPELL_INDICATOR);
-					if (i->getSource()->HasAura(SPELL_CAST_ON_MOVE_VISUAL))
-						i->getSource()->RemoveAura(SPELL_CAST_ON_MOVE_VISUAL);
-					if (i->getSource()->HasAura(SPELL_IMPRINTED))
-						i->getSource()->RemoveAura(SPELL_IMPRINTED);
+					if (i->GetSource()->HasAura(SPELL_FLY))
+						i->GetSource()->RemoveAura(SPELL_FLY);
+					if (i->GetSource()->HasAura(SPELL_INDICATOR))
+						i->GetSource()->RemoveAura(SPELL_INDICATOR);
+					if (i->GetSource()->HasAura(SPELL_CAST_ON_MOVE_VISUAL))
+						i->GetSource()->RemoveAura(SPELL_CAST_ON_MOVE_VISUAL);
+					if (i->GetSource()->HasAura(SPELL_IMPRINTED))
+						i->GetSource()->RemoveAura(SPELL_IMPRINTED);
 				}
 		}
 

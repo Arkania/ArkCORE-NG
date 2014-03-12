@@ -274,7 +274,7 @@ class instance_trial_of_the_crusader : public InstanceMapScript
                                     data = DONE;
                                 break;
                             case DONE:
-                                if (instance->GetPlayers().getFirst()->getSource()->GetTeam() == ALLIANCE)
+                                if (instance->GetPlayers().getFirst()->GetSource()->GetTeam() == ALLIANCE)
                                     EventStage = 4020;
                                 else
                                     EventStage = 4030;

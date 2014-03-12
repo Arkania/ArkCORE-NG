@@ -189,7 +189,7 @@ public:
 
         void InitializeAI()
         {
-          if(!me->isDead())
+          if(!me->IsDead())
             Reset();
         }
 
@@ -381,14 +381,14 @@ public:
 						events.ScheduleEvent(EVENT_SUMMON_ENGORGED_BROODLING, urand(30000,40000), EVENT_GROUP_UP_PHASE);
 					break;
 					case EVENT_ATTACK_START:
-                        me->GetMotionMaster()->MoveChase(me->getVictim());
+                        me->GetMotionMaster()->MoveChase(me->GetVictim());
 					break;
 					case EVENT_FRENZY:
 						DoCast(me, SPELL_FRENZY);
 						events.ScheduleEvent(EVENT_FRENZY, 15000);
 					break;
 					case EVENT_WIDOWS_KISS:
-						if (Unit* target = me->getVictim())
+						if (Unit* target = me->GetVictim())
 							me->AddAura(SPELL_THE_WIDOWS_KISS, target);
 						events.ScheduleEvent(EVENT_WIDOWS_KISS, 20000);
 					break;
@@ -401,7 +401,7 @@ public:
 							Map::PlayerList const& Players = map->GetPlayers();
 							for (Map::PlayerList::const_iterator itr = Players.begin(); itr != Players.end(); ++itr)
 							{
-								if (Player* player = itr->getSource())
+								if (Player* player = itr->GetSource())
 								{
 									if(player->GetPositionZ() > 108.0f)
 										TargetList.push_back(player);
@@ -470,7 +470,7 @@ public:
 
 		void InitializeAI()
         {
-			if (!me->isDead())
+			if (!me->IsDead())
                 Reset();
         }
 
@@ -505,7 +505,7 @@ public:
 				me->RemoveUnitMovementFlag(MOVEMENTFLAG_SWIMMING);
 				me->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
 				me->Attack(who, true);
-				me->GetMotionMaster()->MoveChase(me->getVictim());
+				me->GetMotionMaster()->MoveChase(me->GetVictim());
 			}
 		}
 
@@ -515,7 +515,7 @@ public:
 
 		void JustDied(Unit* /*killer*/)
 		{
-			if (me->isSummon())
+			if (me->IsSummon())
 			{
 				if (Unit* summoner = me->ToTempSummon()->GetSummoner())
 					summoner->SummonCreature(NPC_SPIDERWEB_FILAMENT,summoner->GetPositionX(),summoner->GetPositionY(),summoner->GetPositionZ() - 15.0f, 0, TEMPSUMMON_TIMED_DESPAWN, 60000);
@@ -558,7 +558,7 @@ public:
 						me->SetDisableGravity(false);
 						me->RemoveUnitMovementFlag(MOVEMENTFLAG_SWIMMING);
 						me->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
-						me->GetMotionMaster()->MoveChase(me->getVictim());
+						me->GetMotionMaster()->MoveChase(me->GetVictim());
 					}
 					break;
 				case EVENT_FIERY_WEB_SPIN:
@@ -597,7 +597,7 @@ public:
 
 		void InitializeAI()
         {
-			if (!me->isDead())
+			if (!me->IsDead())
                 Reset();
 
 			SummonLift = true;
@@ -782,7 +782,7 @@ public:
 
 		void InitializeAI()
         {
-			if (!me->isDead())
+			if (!me->IsDead())
                 Reset();
         }
 		bool Founded;
@@ -846,7 +846,7 @@ public:
 							else
 								for (std::list<Creature*>::iterator iter = creatures.begin(); iter != creatures.end(); ++iter)
 								{
-									if((*iter)->GetPositionZ() < 100.0f && (*iter)->isAlive())
+									if((*iter)->GetPositionZ() < 100.0f && (*iter)->IsAlive())
 									{
 										me->GetMotionMaster()->MoveFollow(*iter, 1.0f, 0.0f);
 										Founded = true;
@@ -993,7 +993,7 @@ public:
 					Map::PlayerList const& Players = me->GetMap()->GetPlayers();
 					for (Map::PlayerList::const_iterator itr = Players.begin(); itr != Players.end(); ++itr)
 					{
-						if (Player* player = itr->getSource())
+						if (Player* player = itr->GetSource())
 						{
 							if(player->GetDistance(me) <= 6.0f)
 								TargetList.push_back(player);
@@ -1050,7 +1050,7 @@ public:
             {
                 if (!apply)
                     return;
-				else if (me->isSummon())
+				else if (me->IsSummon())
 					if(Unit* lifthandler = me->ToTempSummon()->GetSummoner())
 					{
 						seated = true;

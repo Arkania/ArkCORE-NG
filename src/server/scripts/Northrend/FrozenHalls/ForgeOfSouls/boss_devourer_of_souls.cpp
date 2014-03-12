@@ -134,7 +134,7 @@ class boss_devourer_of_souls : public CreatureScript
             {
                 if (!instance || static_cast<InstanceMap*>(me->GetMap())->GetScriptId() != sObjectMgr->GetScriptId(FoSScriptName))
                     me->IsAIEnabled = false;
-                else if (!me->isDead())
+                else if (!me->IsDead())
                     Reset();
             }
 
@@ -346,7 +346,7 @@ class boss_devourer_of_souls : public CreatureScript
                                 me->SetReactState(REACT_AGGRESSIVE);
                                 me->SetDisplayId(DISPLAY_ANGER);
                                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-                                me->GetMotionMaster()->MoveChase(me->getVictim());
+                                me->GetMotionMaster()->MoveChase(me->GetVictim());
                                 events.ScheduleEvent(EVENT_WAILING_SOULS, urand(60000, 70000));
                             }
                             break;

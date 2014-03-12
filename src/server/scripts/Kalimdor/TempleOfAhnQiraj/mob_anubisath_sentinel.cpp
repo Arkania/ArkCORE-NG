@@ -140,7 +140,7 @@ public:
                 Creature* c = Unit::GetCreature(*me, NearbyGUID[i]);
                 if (c)
                 {
-                    if (!c->isInCombat())
+                    if (!c->IsInCombat())
                     {
                         c->SetNoCallAssistance(true);
                         if (c->AI())
@@ -212,7 +212,7 @@ public:
 
         void Reset()
         {
-            if (!me->isDead())
+            if (!me->IsDead())
             {
                 for (int i=0; i<3; ++i)
                 {
@@ -220,7 +220,7 @@ public:
                         continue;
                     if (Creature* pNearby = Unit::GetCreature(*me, NearbyGUID[i]))
                     {
-                        if (pNearby->isDead())
+                        if (pNearby->IsDead())
                             pNearby->Respawn();
                     }
                 }
@@ -250,7 +250,7 @@ public:
                 Creature* sent = Unit::GetCreature(*me, NearbyGUID[ni]);
                 if (!sent)
                     continue;
-                if (sent->isDead())
+                if (sent->IsDead())
                     continue;
                 sent->ModifyHealth(int32(sent->CountPctFromMaxHealth(50)));
                 CAST_AI(aqsentinelAI, sent->AI())->GainSentinelAbility(ability);

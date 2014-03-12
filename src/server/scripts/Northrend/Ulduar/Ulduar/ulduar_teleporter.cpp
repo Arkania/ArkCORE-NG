@@ -55,7 +55,7 @@ class ulduar_teleporter : public GameObjectScript
             player->PlayerTalkClass->ClearMenus();
             if (sender != GOSSIP_SENDER_MAIN)
                 return false;
-            if (!player->getAttackers().empty())
+            if (!player->GetAttackers().empty())
                 return false;
 
             switch (action)

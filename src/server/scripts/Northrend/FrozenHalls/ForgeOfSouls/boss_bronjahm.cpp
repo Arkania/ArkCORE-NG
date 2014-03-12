@@ -75,7 +75,7 @@ class boss_bronjahm : public CreatureScript
             {
                 if (!instance || static_cast<InstanceMap*>(me->GetMap())->GetScriptId() != sObjectMgr->GetScriptId(FoSScriptName))
                     me->IsAIEnabled = false;
-                else if (!me->isDead())
+                else if (!me->IsDead())
                     Reset();
             }
 
@@ -155,7 +155,7 @@ class boss_bronjahm : public CreatureScript
                             events.ScheduleEvent(EVENT_MAGIC_BANE, urand(8000, 20000));
                             break;
                         case EVENT_SHADOW_BOLT:
-                            if (!me->IsWithinMeleeRange(me->getVictim()))
+                            if (!me->IsWithinMeleeRange(me->GetVictim()))
                                 DoCastVictim(SPELL_SHADOW_BOLT);
                             events.ScheduleEvent(EVENT_SHADOW_BOLT, 2000);
                             break;

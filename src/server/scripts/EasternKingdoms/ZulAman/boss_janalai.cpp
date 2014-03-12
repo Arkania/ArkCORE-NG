@@ -474,8 +474,8 @@ public:
 
                 Map::PlayerList const &PlayerList = map->GetPlayers();
                 for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-                    if (Player* i_pl = i->getSource())
-                        if (i_pl->isAlive())
+                    if (Player* i_pl = i->GetSource())
+                        if (i_pl->IsAlive())
                             DoTeleportPlayer(i_pl, JanalainPos[0][0]-5+rand()%10, JanalainPos[0][1]-5+rand()%10, JanalainPos[0][2], 0);
                 return;
             } else BombTimer -= diff;
@@ -552,7 +552,7 @@ public:
 
             for (std::list<Creature*>::iterator iter = creatures.begin(); iter != creatures.end(); ++iter)
             {
-                if ((*iter)->isDead())
+                if ((*iter)->IsDead())
                     (*iter)->Respawn();
 
                 if((*iter)->GetDisplayId() == 11686)
@@ -713,7 +713,7 @@ public:
 
             if (BuffetTimer <= diff)
             {
-                DoCast(me->getVictim(), SPELL_FLAMEBUFFET, false);
+                DoCast(me->GetVictim(), SPELL_FLAMEBUFFET, false);
                 BuffetTimer = 10000;
             } else BuffetTimer -= diff;
 

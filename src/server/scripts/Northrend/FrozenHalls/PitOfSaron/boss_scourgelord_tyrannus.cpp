@@ -393,8 +393,8 @@ class player_overlord_brandAI : public PlayerAI
 
         void DamageDealt(Unit* /*victim*/, uint32& damage, DamageEffectType /*damageType*/)
         {
-            if (tyrannus->getVictim())
-                me->CastCustomSpell(SPELL_OVERLORD_BRAND_DAMAGE, SPELLVALUE_BASE_POINT0, damage, tyrannus->getVictim(), true, NULL, NULL, tyrannus->GetGUID());
+            if (tyrannus->GetVictim())
+                me->CastCustomSpell(SPELL_OVERLORD_BRAND_DAMAGE, SPELLVALUE_BASE_POINT0, damage, tyrannus->GetVictim(), true, NULL, NULL, tyrannus->GetGUID());
         }
 
         void HealDone(Unit* /*target*/, uint32& addHealth)

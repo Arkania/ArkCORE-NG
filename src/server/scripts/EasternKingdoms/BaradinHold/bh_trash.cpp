@@ -117,7 +117,7 @@ class npc_disciple_of_hate : public CreatureScript
 
                 if (m_uiRunThroughTimer <= uiDiff)
                 {
-                    DoCast(me->getVictim(), SPELL_RUN_THROUGH);
+                    DoCast(me->GetVictim(), SPELL_RUN_THROUGH);
                     m_uiRunThroughTimer = urand(9000, 12000);
                 }
                 else

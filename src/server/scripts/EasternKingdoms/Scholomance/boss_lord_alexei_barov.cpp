@@ -89,7 +89,7 @@ public:
             //VeilofShadow_Timer
             if (VeilofShadow_Timer <= diff)
             {
-                DoCast(me->getVictim(), SPELL_VEILOFSHADOW);
+                DoCast(me->GetVictim(), SPELL_VEILOFSHADOW);
                 VeilofShadow_Timer = 20000;
             } else VeilofShadow_Timer -= diff;
 

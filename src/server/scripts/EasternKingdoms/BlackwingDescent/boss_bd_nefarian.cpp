@@ -407,7 +407,7 @@ public:
                 return;
 
             if (Creature* Onyxia = me->FindNearestCreature(NPC_ONYXIA, 150.0f, true))
-                if (Onyxia && !Onyxia->isInCombat() && said == false)
+                if (Onyxia && !Onyxia->IsInCombat() && said == false)
                 {
                     Talk(SAY_AVOID_WIPE);
                     said = true;
@@ -495,7 +495,7 @@ public:
                         me->SetDisableGravity(false);
                         me->SendMovementFlagUpdate();
                         EnterPhaseGround();
-                        me->GetMotionMaster()->MoveChase(me->getVictim());
+                        me->GetMotionMaster()->MoveChase(me->GetVictim());
                         me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                         break;
 
@@ -562,8 +562,8 @@ public:
                     case EVENT_GROUND:
                         EnterPhaseFinal();
                         me->SetReactState(REACT_AGGRESSIVE);
-                        AttackStart(me->getVictim());
-                        me->GetMotionMaster()->MoveChase(me->getVictim());
+                        AttackStart(me->GetVictim());
+                        me->GetMotionMaster()->MoveChase(me->GetVictim());
                         if(GameObject* elevator = me->FindNearestGameObject(207834, 200.0f))
                             elevator->SetGoState(GO_STATE_ACTIVE);
 

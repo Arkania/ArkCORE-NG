@@ -105,7 +105,7 @@ public:
                 if (me->IsNonMeleeSpellCasted(false))
                     me->InterruptNonMeleeSpells(false);
 
-                DoCast(me->getVictim(), SPELL_SAND_BREATH);
+                DoCast(me->GetVictim(), SPELL_SAND_BREATH);
 
                 DoScriptText(RAND(SAY_BREATH1, SAY_BREATH2), me);
 
@@ -114,7 +114,7 @@ public:
 
             if (ImpendingDeath_Timer <= diff)
             {
-                DoCast(me->getVictim(), SPELL_IMPENDING_DEATH);
+                DoCast(me->GetVictim(), SPELL_IMPENDING_DEATH);
                 ImpendingDeath_Timer = 25000+rand()%5000;
             } else ImpendingDeath_Timer -= diff;
 

@@ -82,7 +82,7 @@ public:
     {
         npc_frost_tombAI(Creature* creature) : ScriptedAI(creature)
         {
-            if (me->isSummon())
+            if (me->IsSummon())
                 if (Unit* summon = me->ToTempSummon()->GetSummoner())
                     DoCast(summon, SPELL_FROST_TOMB, true);
 
@@ -275,7 +275,7 @@ public:
                         DoCast(me, SPELL_SHADOW_FISSURE, true);
                         me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                         me->RemoveFlag(UNIT_FIELD_BYTES_1, UNIT_STAND_STATE_DEAD);
-                        me->GetMotionMaster()->MoveChase(me->getVictim());
+                        me->GetMotionMaster()->MoveChase(me->GetVictim());
                         events.ScheduleEvent(EVENT_DECREPIFY, urand(4,6)*IN_MILLISECONDS);
                         break;
                 }
@@ -302,7 +302,7 @@ class spell_frost_tomb : public SpellScriptLoader
             {
                 if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_DEATH)
                     if (Unit* caster = GetCaster())
-                        if (caster->ToCreature() && caster->isAlive())
+                        if (caster->ToCreature() && caster->IsAlive())
                             caster->ToCreature()->DespawnOrUnsummon(1000);
             }
 

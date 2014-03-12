@@ -341,8 +341,8 @@ public:
             for (uint8 i = 0; i < 2; ++i)
             {
                 Unit* Temp = Unit::GetUnit(*me, AddGUID[i]);
-                if (Temp && Temp->isAlive())
-                    CAST_CRE(Temp)->AI()->AttackStart(me->getVictim());
+                if (Temp && Temp->IsAlive())
+                    CAST_CRE(Temp)->AI()->AttackStart(me->GetVictim());
                 else
                 {
                     EnterEvadeMode();
@@ -369,7 +369,7 @@ public:
             for (uint8 i = 0; i < 2; ++i)
             {
                 Unit* Temp = Unit::GetUnit(*me, AddGUID[i]);
-                if (Temp && Temp->isAlive())
+                if (Temp && Temp->IsAlive())
                     Temp->DealDamage(Temp, Temp->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
             }
         }
@@ -394,7 +394,7 @@ public:
             for (uint8 i = 0; i < 2; ++i)
             {
                 Creature* creature = (Unit::GetCreature((*me), AddGUID[i]));
-                if (!creature || !creature->isAlive())
+                if (!creature || !creature->IsAlive())
                 {
                     if (creature) creature->setDeathState(DEAD);
                     creature = me->SummonCreature(AddEntry[i], Pos_X[i], POS_Y, POS_Z, ORIENT, TEMPSUMMON_DEAD_DESPAWN, 0);
@@ -481,9 +481,9 @@ public:
                         for (uint8 i = 0; i < 2; ++i)
                             if (Creature* temp = Unit::GetCreature(*me, AddGUID[i]))
                             {
-                                if (temp->isAlive() && !temp->getVictim())
-                                    temp->AI()->AttackStart(me->getVictim());
-                                else if(!temp->isAlive() && addDeadSays < 2)
+                                if (temp->IsAlive() && !temp->GetVictim())
+                                    temp->AI()->AttackStart(me->GetVictim());
+                                else if(!temp->IsAlive() && addDeadSays < 2)
                                 {
                                     Talk(RAND(YELL_ADD_1, YELL_ADD_2, YELL_ADD_3));
                                     addDeadSays++;
@@ -518,7 +518,7 @@ public:
                     target = me;
                     break;
                 case ABILITY_TARGET_VICTIM:
-                    target = me->getVictim();
+                    target = me->GetVictim();
                     break;
                 case ABILITY_TARGET_ENEMY:
                 default:
@@ -588,7 +588,7 @@ class boss_thurg : public CreatureScript
 
                 if (cleave_timer <= diff)
                 {
-                    DoCast(me->getVictim(), SPELL_CLEAVE, false);
+                    DoCast(me->GetVictim(), SPELL_CLEAVE, false);
                     cleave_timer = 12000; //3 sec cast
                 } else cleave_timer -= diff;
 
@@ -715,7 +715,7 @@ class boss_gazakroth : public CreatureScript
         
                 if (firebolt_timer <= diff)
                 {
-                    DoCast(me->getVictim(), SPELL_FIREBOLT, false);
+                    DoCast(me->GetVictim(), SPELL_FIREBOLT, false);
                     firebolt_timer = 700;
                 } else firebolt_timer -= diff;
         
@@ -757,13 +757,13 @@ class boss_lord_raadan : public CreatureScript
 
                 if (thunderclap_timer <= diff)
                 {
-                    DoCast(me->getVictim(), SPELL_THUNDERCLAP, false);
+                    DoCast(me->GetVictim(), SPELL_THUNDERCLAP, false);
                     thunderclap_timer = 12000;
                 } else thunderclap_timer -= diff;
 
                 if (flamebreath_timer <= diff)
                 {
-                    DoCast(me->getVictim(), SPELL_FLAME_BREATH, false);
+                    DoCast(me->GetVictim(), SPELL_FLAME_BREATH, false);
                     flamebreath_timer = 12000;
                 } else flamebreath_timer -= diff;
 
@@ -803,7 +803,7 @@ class boss_darkheart : public CreatureScript
 
                 if (psychicwail_timer <= diff)
                 {
-                    DoCast(me->getVictim(), SPELL_PSYCHIC_WAIL, false);
+                    DoCast(me->GetVictim(), SPELL_PSYCHIC_WAIL, false);
                     psychicwail_timer = 12000;
                 } else psychicwail_timer -= diff;
 
@@ -900,7 +900,7 @@ class boss_fenstalker : public CreatureScript
                 if (volatileinf_timer <= diff)
                 {
                     // core bug
-                    me->getVictim()->CastSpell(me->getVictim(), SPELL_VOLATILE_INFECTION, false);
+                    me->GetVictim()->CastSpell(me->GetVictim(), SPELL_VOLATILE_INFECTION, false);
                     volatileinf_timer = 12000;
                 } else volatileinf_timer -= diff;
 
@@ -942,7 +942,7 @@ class boss_koragg : public CreatureScript
 
                 if (mightyblow_timer <= diff)
                 {
-                    DoCast(me->getVictim(), SPELL_MIGHTY_BLOW, false);
+                    DoCast(me->GetVictim(), SPELL_MIGHTY_BLOW, false);
                     mightyblow_timer = 12000;
                 }
                 if (coldstare_timer <= diff)

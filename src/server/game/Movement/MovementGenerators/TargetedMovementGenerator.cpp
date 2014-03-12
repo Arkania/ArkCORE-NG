@@ -67,7 +67,7 @@ void TargetedMovementGeneratorMedium<T,D>::_setTargetLocation(T &owner)
         // We need to subtract GetObjectSize() because it gets added back further down the chain
         //  and that makes pets too far away. Subtracting it allows pets to properly
         //  be (GetCombatReach() + i_offset) away.
-        if (owner.isPet())
+        if (owner.IsPet())
         {
             dist = i_target->GetCombatReach();
             size = i_target->GetCombatReach() - i_target->GetObjectSize();
@@ -112,7 +112,7 @@ void TargetedMovementGeneratorMedium<T,D>::_setTargetLocation(T &owner)
     // Using the same condition for facing target as the one that is used for SetInFront on movement end
     // - applies to ChaseMovementGenerator mostly
     if (i_angle == 0.f)
-        init.SetFacing(i_target.getTarget()); 
+        init.SetFacing(i_target.GetTarget()); 
     init.Launch();
 }
 
@@ -148,7 +148,7 @@ bool TargetedMovementGeneratorMedium<T,D>::Update(T &owner, const uint32 & time_
     if (!i_target.isValid() || !i_target->IsInWorld())
         return false;
 
-    if (!owner.isAlive())
+    if (!owner.IsAlive())
         return true;
 
     if (owner.HasUnitState(UNIT_STATE_NOT_MOVE))
@@ -186,8 +186,8 @@ bool TargetedMovementGeneratorMedium<T,D>::Update(T &owner, const uint32 & time_
     if (owner.movespline->Finalized())
     {
         static_cast<D*>(this)->MovementInform(owner);
-        if (i_angle == 0.f && !owner.HasInArc(0.01f, i_target.getTarget()))
-            owner.SetInFront(i_target.getTarget());
+        if (i_angle == 0.f && !owner.HasInArc(0.01f, i_target.GetTarget()))
+            owner.SetInFront(i_target.GetTarget());
 
         if (!i_targetReached)
         {
@@ -207,8 +207,8 @@ bool TargetedMovementGeneratorMedium<T,D>::Update(T &owner, const uint32 & time_
 template<class T>
 void ChaseMovementGenerator<T>::_reachTarget(T &owner)
 {
-    if (owner.IsWithinMeleeRange(this->i_target.getTarget()))
-        owner.Attack(this->i_target.getTarget(),true);
+    if (owner.IsWithinMeleeRange(this->i_target.GetTarget()))
+        owner.Attack(this->i_target.GetTarget(),true);
 }
 
 template<>
@@ -248,7 +248,7 @@ void ChaseMovementGenerator<Creature>::MovementInform(Creature &unit)
 {
     // Pass back the GUIDLow of the target. If it is pet's owner then PetAI will handle
     if (unit.AI())
-        unit.AI()->MovementInform(CHASE_MOTION_TYPE, i_target.getTarget()->GetGUIDLow());
+        unit.AI()->MovementInform(CHASE_MOTION_TYPE, i_target.GetTarget()->GetGUIDLow());
 }
 
 //-----------------------------------------------//
@@ -275,7 +275,7 @@ void FollowMovementGenerator<Creature>::_updateSpeed(Creature& owner)
 {
     // pet only sync speed with owner
     // Make sure we are not in the process of a map change
-    if (!owner.isPet() || !owner.IsInWorld() || !i_target.isValid() || i_target->GetGUID() != owner.GetOwnerGUID()) 
+    if (!owner.IsPet() || !owner.IsInWorld() || !i_target.isValid() || i_target->GetGUID() != owner.GetOwnerGUID()) 
         return;
 
     owner.UpdateSpeed(MOVE_RUN, true);
@@ -322,7 +322,7 @@ void FollowMovementGenerator<Creature>::MovementInform(Creature &unit)
 {
     // Pass back the GUIDLow of the target. If it is pet's owner then PetAI will handle
     if (unit.AI())
-        unit.AI()->MovementInform(FOLLOW_MOTION_TYPE, i_target.getTarget()->GetGUIDLow());
+        unit.AI()->MovementInform(FOLLOW_MOTION_TYPE, i_target.GetTarget()->GetGUIDLow());
 }
 
 //-----------------------------------------------//

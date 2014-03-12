@@ -356,7 +356,7 @@ class npc_seeker : public CreatureScript
 
                 if (m_uiPrisonTimer <= uiDiff)
                 {
-                    DoCast(me->getVictim(), SPELL_MAGIC_PRISON);
+                    DoCast(me->GetVictim(), SPELL_MAGIC_PRISON);
                     m_uiPrisonTimer = 31000;
                 }
                 else

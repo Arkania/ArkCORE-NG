@@ -107,7 +107,7 @@ public:
                     m_uiGrandmasterVorpil = creature->GetGUID();
                     break;
                 case 18796:
-                    if (creature->isAlive())
+                    if (creature->IsAlive())
                     {
                         ++m_uiFelOverseerCount;
                         sLog->outDebug(LOG_FILTER_TSCR, "TSCR: Shadow Labyrinth: counting %u Fel Overseers.", m_uiFelOverseerCount);

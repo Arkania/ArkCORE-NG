@@ -369,7 +369,7 @@ public:
                     me->RemoveAurasDueToSpell(SPELL_SUBMERGE_ANUBARAK);
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
                     DoCast(me, SPELL_EMERGE_ANUBARAK);
-                    me->GetMotionMaster()->MoveChase(me->getVictim());
+                    me->GetMotionMaster()->MoveChase(me->GetVictim());
                     m_uiSummonNerubianTimer = 10*IN_MILLISECONDS;
                     m_uiNerubianShadowStrikeTimer = 30*IN_MILLISECONDS;
                     m_uiSummonScarabTimer = 2*IN_MILLISECONDS;
@@ -447,7 +447,7 @@ public:
             me->SetInCombatWithZone();
             if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
                 me->AddThreat(target, 20000.0f);
-            if (!me->isInCombat())
+            if (!me->IsInCombat())
                 me->DisappearAndDie();
         }
 
@@ -515,7 +515,7 @@ public:
             DoCast(me, SPELL_EXPOSE_WEAKNESS);
             DoCast(me, SPELL_SPIDER_FRENZY);
             me->SetInCombatWithZone();
-            if (!me->isInCombat())
+            if (!me->IsInCombat())
                 me->DisappearAndDie();
         }
 
@@ -683,7 +683,7 @@ public:
         void UpdateAI(const uint32 uiDiff)
         {
             Unit* target = Unit::GetPlayer(*me, m_uiTargetGUID);
-            if (!target || !target->isAlive() || !target->HasAura(SPELL_MARK))
+            if (!target || !target->IsAlive() || !target->HasAura(SPELL_MARK))
             {
                 if (Creature* pAnubarak = Unit::GetCreature((*me), instance->GetData64(NPC_ANUBARAK)))
                     pAnubarak->CastSpell(pAnubarak, SPELL_SPIKE_TELE, false);

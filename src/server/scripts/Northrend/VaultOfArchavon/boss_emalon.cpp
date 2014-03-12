@@ -91,7 +91,7 @@ class boss_emalon : public CreatureScript
 
                 // AttackStart has NULL-check for victim
                 if (summoned->AI())
-                    summoned->AI()->AttackStart(me->getVictim());
+                    summoned->AI()->AttackStart(me->GetVictim());
             }
 
             void EnterCombat(Unit* who)
@@ -101,7 +101,7 @@ class boss_emalon : public CreatureScript
                     for (std::list<uint64>::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
                     {
                         Creature* minion = Unit::GetCreature(*me, *itr);
-                        if (minion && minion->isAlive() && !minion->getVictim() && minion->AI())
+                        if (minion && minion->IsAlive() && !minion->GetVictim() && minion->AI())
                             minion->AI()->AttackStart(who);
                     }
                 }
@@ -141,7 +141,7 @@ class boss_emalon : public CreatureScript
                             if (!summons.empty())
                             {
                                 Creature* minion = Unit::GetCreature(*me, Trinity::Containers::SelectRandomContainerElement(summons));
-                                if (minion && minion->isAlive())
+                                if (minion && minion->IsAlive())
                                 {
                                     minion->CastSpell(me, SPELL_OVERCHARGED, true);
                                     minion->SetFullHealth();
@@ -194,7 +194,7 @@ class mob_tempest_minion : public CreatureScript
             {
                 if (Creature* emalon = Unit::GetCreature(*me, instance ? instance->GetData64(DATA_EMALON) : 0))
                 {
-                    if (emalon->isAlive())
+                    if (emalon->IsAlive())
                     {
                         emalon->SummonCreature(MOB_TEMPEST_MINION, 0, 0, 0, 0, TEMPSUMMON_CORPSE_DESPAWN, 0);
                         DoScriptText(EMOTE_MINION_RESPAWN, me);
@@ -209,7 +209,7 @@ class mob_tempest_minion : public CreatureScript
 
                 if (Creature* pEmalon = Unit::GetCreature(*me, instance ? instance->GetData64(DATA_EMALON) : 0))
                 {
-                    if (!pEmalon->getVictim() && pEmalon->AI())
+                    if (!pEmalon->GetVictim() && pEmalon->AI())
                         pEmalon->AI()->AttackStart(who);
                 }
             }

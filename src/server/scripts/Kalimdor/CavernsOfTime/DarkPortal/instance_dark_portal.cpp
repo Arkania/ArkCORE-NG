@@ -180,7 +180,7 @@ public:
                     {
                         if (Creature* pMedivh = instance->GetCreature(MedivhGUID))
                         {
-                            if (pMedivh->isAlive())
+                            if (pMedivh->IsAlive())
                             {
                                 pMedivh->DealDamage(pMedivh, pMedivh->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
                                 m_auiEncounter[0] = FAIL;
@@ -209,7 +209,7 @@ public:
                         {
                             for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                             {
-                                if (Player* player = itr->getSource())
+                                if (Player* player = itr->GetSource())
                                 {
                                     if (player->GetQuestStatus(QUEST_OPENING_PORTAL) == QUEST_STATUS_INCOMPLETE)
                                         player->AreaExploredOrEventHappens(QUEST_OPENING_PORTAL);

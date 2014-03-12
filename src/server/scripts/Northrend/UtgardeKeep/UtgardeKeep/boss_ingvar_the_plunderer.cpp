@@ -175,8 +175,8 @@ public:
             bEventInProgress = false;
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             me->UpdateEntry(MOB_INGVAR_UNDEAD);
-            me->SetInCombatWith(me->getVictim());
-            me->GetMotionMaster()->MoveChase(me->getVictim());
+            me->SetInCombatWith(me->GetVictim());
+            me->GetMotionMaster()->MoveChase(me->GetVictim());
 
             DoScriptText(YELL_AGGRO_2, me);
         }
@@ -393,7 +393,7 @@ public:
                         {
                             ingvar->RemoveAurasDueToSpell(SPELL_SCOURG_RESURRECTION_DUMMY);
 
-                            if (ingvar->getVictim())
+                            if (ingvar->GetVictim())
                                 if (boss_ingvar_the_plunderer::boss_ingvar_the_plundererAI* ai = CAST_AI(boss_ingvar_the_plunderer::boss_ingvar_the_plundererAI, ingvar->AI()))
                                     ai->StartZombiePhase();
 

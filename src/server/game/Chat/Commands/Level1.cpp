@@ -202,7 +202,7 @@ bool ChatHandler::HandleSummonCommand(const char* args)
             ChatHandler(target).PSendSysMessage(LANG_SUMMONED_BY, playerLink(_player->GetName()).c_str());
 
         // stop flight if need
-        if (target->isInFlight())
+        if (target->IsInFlight())
         {
             target->GetMotionMaster()->MovementExpired();
             target->CleanupAfterTaxiFlight();
@@ -334,7 +334,7 @@ bool ChatHandler::HandleAppearCommand(const char* args)
         PSendSysMessage(LANG_APPEARING_AT, chrNameLink.c_str());
 
         // stop flight if need
-        if (_player->isInFlight())
+        if (_player->IsInFlight())
         {
             _player->GetMotionMaster()->MovementExpired();
             _player->CleanupAfterTaxiFlight();
@@ -368,7 +368,7 @@ bool ChatHandler::HandleAppearCommand(const char* args)
             return false;
 
         // stop flight if need
-        if (_player->isInFlight())
+        if (_player->IsInFlight())
         {
             _player->GetMotionMaster()->MovementExpired();
             _player->CleanupAfterTaxiFlight();
@@ -402,7 +402,7 @@ bool ChatHandler::HandleRecallCommand(const char* args)
     }
 
     // stop flight if need
-    if (target->isInFlight())
+    if (target->IsInFlight())
     {
         target->GetMotionMaster()->MovementExpired();
         target->CleanupAfterTaxiFlight();
@@ -579,7 +579,7 @@ bool ChatHandler::HandleGroupSummonCommand(const char* args)
 
     for (GroupReference* itr = grp->GetFirstMember(); itr != NULL; itr = itr->next())
     {
-        Player* player = itr->getSource();
+        Player* player = itr->GetSource();
 
         if (!player || player == m_session->GetPlayer() || !player->GetSession())
             continue;
@@ -615,7 +615,7 @@ bool ChatHandler::HandleGroupSummonCommand(const char* args)
             ChatHandler(player).PSendSysMessage(LANG_SUMMONED_BY, GetNameLink().c_str());
 
         // stop flight if need
-        if (player->isInFlight())
+        if (player->IsInFlight())
         {
             player->GetMotionMaster()->MovementExpired();
             player->CleanupAfterTaxiFlight();

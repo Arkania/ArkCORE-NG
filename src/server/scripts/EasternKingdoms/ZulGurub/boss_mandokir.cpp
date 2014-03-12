@@ -414,7 +414,7 @@ class npc_chained_spirit : public CreatureScript
             void JustDied(Unit* /*killer*/)
             {
                 Player* target = ObjectAccessor::GetPlayer(*me, _revivePlayerGUID);
-                if (!target || target->isAlive())
+                if (!target || target->IsAlive())
                     return;
 
                 if (Creature* mandokir = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_MANDOKIR)))
@@ -450,7 +450,7 @@ class spell_mandokir_decapitate : public SpellScriptLoader
 
             void FilterTargets(std::list<WorldObject*>& targets)
             {
-                targets.remove(GetCaster()->getVictim());
+                targets.remove(GetCaster()->GetVictim());
                 if (targets.empty())
                     return;
 
@@ -581,7 +581,7 @@ class spell_mandokir_devastating_slam : public SpellScriptLoader
 
             void FilterTargets(std::list<WorldObject*>& targets)
             {
-                targets.remove_if(DevastatingSlamTargetSelector(GetCaster()->ToCreature(), GetCaster()->getVictim()));
+                targets.remove_if(DevastatingSlamTargetSelector(GetCaster()->ToCreature(), GetCaster()->GetVictim()));
                 if (targets.empty())
                     return;
 

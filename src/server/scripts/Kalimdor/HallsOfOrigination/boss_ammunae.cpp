@@ -453,7 +453,7 @@ class npc_blossom : public CreatureScript
                     
                 if (m_uiThornSlashTimer <= uiDiff)
                 {
-                    DoCast(me->getVictim(), IsHeroic() ? SPELL_THORN_SLASH_H : SPELL_THORN_SLASH);
+                    DoCast(me->GetVictim(), IsHeroic() ? SPELL_THORN_SLASH_H : SPELL_THORN_SLASH);
                     m_uiThornSlashTimer = urand(15000, 20000);
                 }
                 else

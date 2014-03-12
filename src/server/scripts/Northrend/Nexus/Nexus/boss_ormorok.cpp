@@ -291,9 +291,9 @@ public:
         {
             if (uiRootsTimer <= diff)
             {
-                if (me->IsWithinDist(me->getVictim(), 5.0f, false))
+                if (me->IsWithinDist(me->GetVictim(), 5.0f, false))
                 {
-                    DoCast(me->getVictim(), SPELL_ROOTS);
+                    DoCast(me->GetVictim(), SPELL_ROOTS);
                     uiRootsTimer = 15*IN_MILLISECONDS;
                 }
             } else uiRootsTimer -= diff;

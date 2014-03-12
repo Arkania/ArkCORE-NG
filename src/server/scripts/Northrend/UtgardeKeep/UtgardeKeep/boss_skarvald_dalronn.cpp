@@ -95,7 +95,7 @@ public:
             if (!ghost && instance)
             {
                 Unit* dalronn = Unit::GetUnit(*me, instance->GetData64(DATA_DALRONN));
-                if (dalronn && dalronn->isDead())
+                if (dalronn && dalronn->IsDead())
                     CAST_CRE(dalronn)->Respawn();
 
                 instance->SetData(DATA_SKARVALD_DALRONN_EVENT, NOT_STARTED);
@@ -109,7 +109,7 @@ public:
                 DoScriptText(YELL_SKARVALD_AGGRO, me);
 
                 Unit* dalronn = Unit::GetUnit(*me, instance->GetData64(DATA_DALRONN));
-                if (dalronn && dalronn->isAlive() && !dalronn->getVictim())
+                if (dalronn && dalronn->IsAlive() && !dalronn->GetVictim())
                     dalronn->getThreatManager().addThreat(who, 0.0f);
 
                 instance->SetData(DATA_SKARVALD_DALRONN_EVENT, IN_PROGRESS);
@@ -123,7 +123,7 @@ public:
                 Unit* dalronn = Unit::GetUnit(*me, instance->GetData64(DATA_DALRONN));
                 if (dalronn)
                 {
-                    if (dalronn->isDead())
+                    if (dalronn->IsDead())
                     {
                         DoScriptText(YELL_SKARVALD_DAL_DIED, me);
 
@@ -173,7 +173,7 @@ public:
                     {
                         Check_Timer = 5000;
                         Unit* dalronn = Unit::GetUnit(*me, instance ? instance->GetData64(DATA_DALRONN) : 0);
-                        if (dalronn && dalronn->isDead())
+                        if (dalronn && dalronn->IsDead())
                         {
                             Dalronn_isDead = true;
                             Response_Timer = 2000;
@@ -200,7 +200,7 @@ public:
 
             if (StoneStrike_Timer <= diff)
             {
-                DoCast(me->getVictim(), SPELL_STONE_STRIKE);
+                DoCast(me->GetVictim(), SPELL_STONE_STRIKE);
                 StoneStrike_Timer = 5000+rand()%5000;
             } else StoneStrike_Timer -= diff;
 
@@ -252,7 +252,7 @@ public:
             if (!ghost && instance)
             {
                 Unit* skarvald = Unit::GetUnit(*me, instance->GetData64(DATA_SKARVALD));
-                if (skarvald && skarvald->isDead())
+                if (skarvald && skarvald->IsDead())
                     CAST_CRE(skarvald)->Respawn();
 
                 instance->SetData(DATA_SKARVALD_DALRONN_EVENT, NOT_STARTED);
@@ -264,7 +264,7 @@ public:
             if (!ghost && instance)
             {
                 Unit* skarvald = Unit::GetUnit(*me, instance->GetData64(DATA_SKARVALD));
-                if (skarvald && skarvald->isAlive() && !skarvald->getVictim())
+                if (skarvald && skarvald->IsAlive() && !skarvald->GetVictim())
                     skarvald->getThreatManager().addThreat(who, 0.0f);
 
                 AggroYell_Timer = 5000;
@@ -281,7 +281,7 @@ public:
                 Unit* skarvald = Unit::GetUnit(*me, instance->GetData64(DATA_SKARVALD));
                 if (skarvald)
                 {
-                    if (skarvald->isDead())
+                    if (skarvald->IsDead())
                     {
                         DoScriptText(YELL_DALRONN_SKA_DIED, me);
 
@@ -342,7 +342,7 @@ public:
                     {
                         Check_Timer = 5000;
                         Unit* skarvald = Unit::GetUnit(*me, instance ? instance->GetData64(DATA_SKARVALD) : 0);
-                        if (skarvald && skarvald->isDead())
+                        if (skarvald && skarvald->IsDead())
                         {
                             Skarvald_isDead = true;
                             Response_Timer = 2000;

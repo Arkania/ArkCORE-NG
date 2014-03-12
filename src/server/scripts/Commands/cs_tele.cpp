@@ -182,7 +182,7 @@ public:
                 (ChatHandler(target)).PSendSysMessage(LANG_TELEPORTED_TO_BY, handler->GetNameLink().c_str());
 
             // stop flight if need
-            if (target->isInFlight())
+            if (target->IsInFlight())
             {
                 target->GetMotionMaster()->MovementExpired();
                 target->CleanupAfterTaxiFlight();
@@ -256,7 +256,7 @@ public:
 
         for (GroupReference* itr = grp->GetFirstMember(); itr != NULL; itr = itr->next())
         {
-            Player* player = itr->getSource();
+            Player* player = itr->GetSource();
 
             if (!player || !player->GetSession())
                 continue;
@@ -278,7 +278,7 @@ public:
                 (ChatHandler(player)).PSendSysMessage(LANG_TELEPORTED_TO_BY, nameLink.c_str());
 
             // stop flight if need
-            if (player->isInFlight())
+            if (player->IsInFlight())
             {
                 player->GetMotionMaster()->MovementExpired();
                 player->CleanupAfterTaxiFlight();
@@ -310,7 +310,7 @@ public:
             return false;
         }
 
-        if (me->isInCombat())
+        if (me->IsInCombat())
         {
             handler->SendSysMessage(LANG_YOU_IN_COMBAT);
             handler->SetSentErrorMessage(true);
@@ -326,7 +326,7 @@ public:
         }
 
         // stop flight if need
-        if (me->isInFlight())
+        if (me->IsInFlight())
         {
             me->GetMotionMaster()->MovementExpired();
             me->CleanupAfterTaxiFlight();

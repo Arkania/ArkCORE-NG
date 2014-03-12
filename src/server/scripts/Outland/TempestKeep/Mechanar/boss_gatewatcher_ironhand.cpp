@@ -113,7 +113,7 @@ class boss_gatewatcher_iron_hand : public CreatureScript
                     {
                         //TODO: expect cast this about 5 times in a row (?), announce it by emote only once
                         DoScriptText(EMOTE_HAMMER, me);
-                        DoCast(me->getVictim(), SPELL_JACKHAMMER);
+                        DoCast(me->GetVictim(), SPELL_JACKHAMMER);
 
                         //chance to yell, but not same time as emote (after spell in fact casted)
                         if (rand()%2)
@@ -128,7 +128,7 @@ class boss_gatewatcher_iron_hand : public CreatureScript
                     //Stream of Machine Fluid
                     if (Stream_of_Machine_Fluid_Timer <= diff)
                     {
-                        DoCast(me->getVictim(), SPELL_STREAM_OF_MACHINE_FLUID);
+                        DoCast(me->GetVictim(), SPELL_STREAM_OF_MACHINE_FLUID);
                         Stream_of_Machine_Fluid_Timer = urand(35000, 50000);
                     }
                     else

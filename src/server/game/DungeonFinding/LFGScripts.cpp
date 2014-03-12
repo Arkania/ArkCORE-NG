@@ -76,7 +76,7 @@ void LFGGroupScript::OnAddMember(Group* group, uint64 guid)
     LfgUpdateData updateData = LfgUpdateData(LFG_UPDATETYPE_CLEAR_LOCK_LIST);
     for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
     {
-        if (Player* plrg = itr->getSource())
+        if (Player* plrg = itr->GetSource())
         {
             plrg->GetSession()->SendLfgUpdatePlayer(updateData);
             plrg->GetSession()->SendLfgUpdateParty(updateData);

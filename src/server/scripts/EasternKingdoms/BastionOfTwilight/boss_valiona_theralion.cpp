@@ -350,8 +350,8 @@ public:
             castBlackout = false;
 
             if (Creature* Theralion = me->FindNearestCreature(NPC_THERALION_BOT, 500.0f, true))
-                if (Theralion && !Theralion->isInCombat())
-                    Theralion->AI()->AttackStart(me->getVictim());
+                if (Theralion && !Theralion->IsInCombat())
+                    Theralion->AI()->AttackStart(me->GetVictim());
 
             if (me->GetMap()->IsHeroic())
                 SetSentriesInCombat();
@@ -446,7 +446,7 @@ public:
             summons.Summon(summon);
             summon->setActive(true);
 
-            if(me->isInCombat())
+            if(me->IsInCombat())
             summon->AI()->DoZoneInCombat();
         }
 
@@ -538,21 +538,21 @@ public:
                             break;
 
                         case EVENT_TWILIGHT_SHIFT:
-                            if (!me->getVictim()->HasAura(SPELL_TWILIGHT_SHIFT))
-                                DoCast(me->getVictim(), SPELL_TWILIGHT_SHIFT);
+                            if (!me->GetVictim()->HasAura(SPELL_TWILIGHT_SHIFT))
+                                DoCast(me->GetVictim(), SPELL_TWILIGHT_SHIFT);
                             else
-                            if (Aura * aura = me->getVictim()->GetAura(SPELL_TWILIGHT_SHIFT))
+                            if (Aura * aura = me->GetVictim()->GetAura(SPELL_TWILIGHT_SHIFT))
                             {
                                 if (aura->GetStackAmount() < 5)
-                                    DoCast(me->getVictim(), SPELL_TWILIGHT_SHIFT);
+                                    DoCast(me->GetVictim(), SPELL_TWILIGHT_SHIFT);
                                 else
                                 {
-                                    me->getVictim()->RemoveAura(SPELL_TWILIGHT_SHIFT);
-                                    me->AddAura(SPELL_TWILIGHT_ZONE, me->getVictim()); // Send target to Twilight Realm.
-                                    me->AddAura(SPELL_TWILIGHT_REALM, me->getVictim()); // Send target to Twilight Realm.
+                                    me->GetVictim()->RemoveAura(SPELL_TWILIGHT_SHIFT);
+                                    me->AddAura(SPELL_TWILIGHT_ZONE, me->GetVictim()); // Send target to Twilight Realm.
+                                    me->AddAura(SPELL_TWILIGHT_REALM, me->GetVictim()); // Send target to Twilight Realm.
 
                                     if (me->GetMap()->IsHeroic())
-                                        me->AddAura(SPELL_TWILIGHT_ZONE_AUR, me->getVictim()); // Twilight Realm damage debuff.
+                                        me->AddAura(SPELL_TWILIGHT_ZONE_AUR, me->GetVictim()); // Twilight Realm damage debuff.
                                 }
                             }
                             events.ScheduleEvent(EVENT_TWILIGHT_SHIFT, 20000, PHASE_GROUND);
@@ -733,8 +733,8 @@ public:
             uiDazzlingDestructionCount = 0;
 
             if (Creature* Valiona = me->FindNearestCreature(NPC_VALIONA_BOT, 500.0f, true))
-                if(Valiona && !Valiona->isInCombat())
-                    Valiona->AI()->AttackStart(me->getVictim());
+                if(Valiona && !Valiona->IsInCombat())
+                    Valiona->AI()->AttackStart(me->GetVictim());
 
             phase = PHASE_GROUND;
             events.SetPhase(PHASE_GROUND);
@@ -816,7 +816,7 @@ public:
             summons.Summon(summon);
             summon->setActive(true);
 
-            if(me->isInCombat())
+            if(me->IsInCombat())
             summon->AI()->DoZoneInCombat();
         }
 
@@ -905,21 +905,21 @@ public:
                             break;
 
                         case EVENT_TWILIGHT_SHIFT:
-                            if (!me->getVictim()->HasAura(SPELL_TWILIGHT_SHIFT))
-                                DoCast(me->getVictim(), SPELL_TWILIGHT_SHIFT);
+                            if (!me->GetVictim()->HasAura(SPELL_TWILIGHT_SHIFT))
+                                DoCast(me->GetVictim(), SPELL_TWILIGHT_SHIFT);
                             else
-                            if (Aura * aura = me->getVictim()->GetAura(SPELL_TWILIGHT_SHIFT))
+                            if (Aura * aura = me->GetVictim()->GetAura(SPELL_TWILIGHT_SHIFT))
                             {
                                 if (aura->GetStackAmount() < 5)
-                                    DoCast(me->getVictim(), SPELL_TWILIGHT_SHIFT);
+                                    DoCast(me->GetVictim(), SPELL_TWILIGHT_SHIFT);
                                 else
                                 {
-                                    me->getVictim()->RemoveAura(SPELL_TWILIGHT_SHIFT);
-                                    me->AddAura(SPELL_TWILIGHT_ZONE, me->getVictim()); // Send target to Twilight Realm.
-                                    me->AddAura(SPELL_TWILIGHT_REALM, me->getVictim()); // Send target to Twilight Realm.
+                                    me->GetVictim()->RemoveAura(SPELL_TWILIGHT_SHIFT);
+                                    me->AddAura(SPELL_TWILIGHT_ZONE, me->GetVictim()); // Send target to Twilight Realm.
+                                    me->AddAura(SPELL_TWILIGHT_REALM, me->GetVictim()); // Send target to Twilight Realm.
 
                                     if (me->GetMap()->IsHeroic())
-                                        me->AddAura(SPELL_TWILIGHT_ZONE_AUR, me->getVictim()); // Twilight Realm damage debuff.
+                                        me->AddAura(SPELL_TWILIGHT_ZONE_AUR, me->GetVictim()); // Twilight Realm damage debuff.
                                 }
                             }
                             events.ScheduleEvent(EVENT_TWILIGHT_SHIFT, 20000, PHASE_GROUND);
@@ -1130,7 +1130,7 @@ public:
                 {
                     case EVENT_TWILIGHT_RIFT_SUMMON:
                         if (Creature* Valiona = me->FindNearestCreature(NPC_VALIONA_BOT, 500.0f, true))
-                            if (Valiona && Valiona->isInCombat())
+                            if (Valiona && Valiona->IsInCombat())
                             {
                                 if (!me->HasAura(SPELL_SUM_TW_RIFT_ORBS))
                                     me->AddAura(SPELL_SUM_TW_RIFT_ORBS, me);

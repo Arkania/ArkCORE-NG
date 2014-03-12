@@ -330,7 +330,7 @@ class npc_anhuur_viper : public CreatureScript
 
                 if (m_uiViperDotTimer <= uiDiff)
                 {
-                    DoCast(me->getVictim(), IsHeroic() ? SPELL_VIPER_DOT_H : SPELL_VIPER_DOT);
+                    DoCast(me->GetVictim(), IsHeroic() ? SPELL_VIPER_DOT_H : SPELL_VIPER_DOT);
                     m_uiViperDotTimer = urand(41000, 50000);
                 }
                 else

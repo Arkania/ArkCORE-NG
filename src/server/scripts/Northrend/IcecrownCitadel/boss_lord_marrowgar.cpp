@@ -205,7 +205,7 @@ class boss_lord_marrowgar : public CreatureScript
                         case EVENT_BONE_STORM_END:
                             if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == POINT_MOTION_TYPE)
                                 me->GetMotionMaster()->MovementExpired();
-                            DoStartMovement(me->getVictim());
+                            DoStartMovement(me->GetVictim());
                             me->SetSpeed(MOVE_RUN, _baseSpeed, true);
                             events.CancelEvent(EVENT_BONE_STORM_MOVE);
                             events.ScheduleEvent(EVENT_ENABLE_BONE_SLICE, 10000);
@@ -239,7 +239,7 @@ class boss_lord_marrowgar : public CreatureScript
                     return;
 
                 // lock movement
-                DoStartNoMovement(me->getVictim());
+                DoStartNoMovement(me->GetVictim());
             }
 
             Position const* GetLastColdflamePosition() const

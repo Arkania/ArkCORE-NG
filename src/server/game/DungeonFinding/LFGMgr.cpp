@@ -515,8 +515,8 @@ void LFGMgr::Join(Player* player, uint8 roles, const LfgDungeonSet& selectedDung
             if (grp)
             {
                 for (GroupReference* itr = grp->GetFirstMember(); itr != NULL; itr = itr->next())
-                    if (itr->getSource() && itr->getSource()->GetSession())
-                        itr->getSource()->GetSession()->SendLfgUpdateStatus(updateData,true);
+                    if (itr->GetSource() && itr->GetSource()->GetSession())
+                        itr->GetSource()->GetSession()->SendLfgUpdateStatus(updateData,true);
             }
             return;
         }
@@ -542,7 +542,7 @@ void LFGMgr::Join(Player* player, uint8 roles, const LfgDungeonSet& selectedDung
             uint8 memberCount = 0;
             for (GroupReference* itr = grp->GetFirstMember(); itr != NULL && joinData.result == LFG_JOIN_OK; itr = itr->next())
             {
-                if (Player* plrg = itr->getSource())
+                if (Player* plrg = itr->GetSource())
                 {
                     if (plrg->HasAura(LFG_SPELL_DUNGEON_DESERTER))
                         joinData.result = LFG_JOIN_PARTY_DESERTER;
@@ -648,7 +648,7 @@ void LFGMgr::Join(Player* player, uint8 roles, const LfgDungeonSet& selectedDung
         LfgUpdateData updateData = LfgUpdateData(LFG_UPDATETYPE_JOIN_PROPOSAL, dungeons, comment);
         for (GroupReference* itr = grp->GetFirstMember(); itr != NULL; itr = itr->next())
         {
-            if (Player* plrg = itr->getSource())
+            if (Player* plrg = itr->GetSource())
             {
                 uint64 pguid = plrg->GetGUID();
                 plrg->GetSession()->SendLfgUpdateStatus(updateData,false);
@@ -733,7 +733,7 @@ void LFGMgr::Leave(Player* player, Group* grp /* = NULL*/)
                 {
                     RestoreState(guid);
                     for (GroupReference* itr = grp->GetFirstMember(); itr != NULL; itr = itr->next())
-                        if (Player* plrg = itr->getSource())
+                        if (Player* plrg = itr->GetSource())
                         {
                             plrg->GetSession()->SendLfgUpdateStatus(updateData,true);
                             uint64 pguid = plrg->GetGUID();
@@ -1660,7 +1660,7 @@ void LFGMgr::InitBoot(Group* grp, uint64 kicker, uint64 victim, std::string reas
     // Set votes
     for (GroupReference* itr = grp->GetFirstMember(); itr != NULL; itr = itr->next())
     {
-        if (Player* plrg = itr->getSource())
+        if (Player* plrg = itr->GetSource())
         {
             uint64 guid = plrg->GetGUID();
             SetState(guid, LFG_STATE_BOOT);
@@ -1770,7 +1770,7 @@ void LFGMgr::TeleportPlayer(Player* player, bool out, bool fromOpcode /*= false*
 
     if (!grp || !grp->isLFGGroup())                        // should never happen, but just in case...
         error = LFG_TELEPORTERROR_INVALID_LOCATION;
-    else if (!player->isAlive())
+    else if (!player->IsAlive())
         error = LFG_TELEPORTERROR_PLAYER_DEAD;
     else if (player->IsFalling() || player->HasUnitState(UNIT_STATE_JUMPING))
         error = LFG_TELEPORTERROR_FALLING;
@@ -1809,7 +1809,7 @@ void LFGMgr::TeleportPlayer(Player* player, bool out, bool fromOpcode /*= false*
                 // Select a player inside to be teleported to
                 for (GroupReference* itr = grp->GetFirstMember(); itr != NULL && !mapid; itr = itr->next())
                 {
-                    Player* plrg = itr->getSource();
+                    Player* plrg = itr->GetSource();
                     if (plrg && plrg != player && plrg->GetMapId() == uint32(dungeon->map))
                     {
                         mapid = plrg->GetMapId();
@@ -1844,7 +1844,7 @@ void LFGMgr::TeleportPlayer(Player* player, bool out, bool fromOpcode /*= false*
                 if (!player->GetMap()->IsDungeon())
                     player->SetBattlegroundEntryPoint();
 
-                if (player->isInFlight())
+                if (player->IsInFlight())
                 {
                     player->GetMotionMaster()->MovementExpired();
                     player->CleanupAfterTaxiFlight();

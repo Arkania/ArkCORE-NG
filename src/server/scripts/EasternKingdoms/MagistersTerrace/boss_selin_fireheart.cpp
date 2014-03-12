@@ -108,7 +108,7 @@ public:
                     Unit* unit = Unit::GetUnit(*me, *itr);
                     if (unit)
                     {
-                        if (!unit->isAlive())
+                        if (!unit->IsAlive())
                             CAST_CRE(unit)->Respawn();      // Let the core handle setting death state, etc.
 
                         // Only need to set unselectable flag. You can't attack unselectable units so non_attackable flag is not necessary here.
@@ -152,7 +152,7 @@ public:
                 pCrystal = NULL;
                 //pCrystal = Unit::GetUnit(*me, FelCrystals[i]);
                 pCrystal = Unit::GetUnit(*me, *itr);
-                if (pCrystal && pCrystal->isAlive())
+                if (pCrystal && pCrystal->IsAlive())
                 {
                     // select nearest
                     if (!CrystalChosen || me->GetDistanceOrder(pCrystal, CrystalChosen, false))
@@ -188,7 +188,7 @@ public:
             {
                 //Creature* pCrystal = (Unit::GetCreature(*me, FelCrystals[i]));
                 Creature* pCrystal = Unit::GetCreature(*me, *itr);
-                if (pCrystal && pCrystal->isAlive())
+                if (pCrystal && pCrystal->IsAlive())
                     pCrystal->Kill(pCrystal);
             }
         }
@@ -212,7 +212,7 @@ public:
             if (type == POINT_MOTION_TYPE && id == 1)
             {
                 Unit* CrystalChosen = Unit::GetUnit(*me, CrystalGUID);
-                if (CrystalChosen && CrystalChosen->isAlive())
+                if (CrystalChosen && CrystalChosen->IsAlive())
                 {
                     // Make the crystal attackable
                     // We also remove NON_ATTACKABLE in case the database has it set.
@@ -304,14 +304,14 @@ public:
                         DoScriptText(SAY_EMPOWERED, me);
 
                         Unit* CrystalChosen = Unit::GetUnit(*me, CrystalGUID);
-                        if (CrystalChosen && CrystalChosen->isAlive())
+                        if (CrystalChosen && CrystalChosen->IsAlive())
                             // Use Deal Damage to kill it, not setDeathState.
                             CrystalChosen->Kill(CrystalChosen);
 
                         CrystalGUID = 0;
 
                         me->GetMotionMaster()->Clear();
-                        me->GetMotionMaster()->MoveChase(me->getVictim());
+                        me->GetMotionMaster()->MoveChase(me->GetVictim());
                     } else EmpowerTimer -= diff;
                 }
             }
@@ -347,7 +347,7 @@ public:
             if (InstanceScript* instance = me->GetInstanceScript())
             {
                 Creature* Selin = (Unit::GetCreature(*me, instance->GetData64(DATA_SELIN)));
-                if (Selin && Selin->isAlive())
+                if (Selin && Selin->IsAlive())
                 {
                     if (CAST_AI(boss_selin_fireheart::boss_selin_fireheartAI, Selin->AI())->CrystalGUID == me->GetGUID())
                     {
@@ -355,10 +355,10 @@ public:
                         CAST_AI(boss_selin_fireheart::boss_selin_fireheartAI, Selin->AI())->DrainingCrystal = false;
                         CAST_AI(boss_selin_fireheart::boss_selin_fireheartAI, Selin->AI())->IsDraining = false;
                         CAST_AI(boss_selin_fireheart::boss_selin_fireheartAI, Selin->AI())->EmpowerTimer = 10000;
-                        if (Selin->getVictim())
+                        if (Selin->GetVictim())
                         {
-                            Selin->AI()->AttackStart(Selin->getVictim());
-                            Selin->GetMotionMaster()->MoveChase(Selin->getVictim());
+                            Selin->AI()->AttackStart(Selin->GetVictim());
+                            Selin->GetMotionMaster()->MoveChase(Selin->GetVictim());
                         }
                     }
                 }

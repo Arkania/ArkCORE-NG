@@ -177,7 +177,7 @@ class instance_uldaman : public InstanceMapScript
                 for (std::vector<uint64>::const_iterator i = vStoneKeeper.begin(); i != vStoneKeeper.end(); ++i)
                 {
                     Creature* target = instance->GetCreature(*i);
-                    if (!target || !target->isAlive() || target->getFaction() == 14)
+                    if (!target || !target->IsAlive() || target->getFaction() == 14)
                         continue;
                     target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
                     target->setFaction(14);
@@ -198,7 +198,7 @@ class instance_uldaman : public InstanceMapScript
                 for (std::vector<uint64>::const_iterator i = vArchaedasWallMinions.begin(); i != vArchaedasWallMinions.end(); ++i)
                 {
                     Creature* target = instance->GetCreature(*i);
-                    if (!target || !target->isAlive() || target->getFaction() == 14)
+                    if (!target || !target->IsAlive() || target->getFaction() == 14)
                         continue;
                     archaedas->CastSpell(target, SPELL_AWAKEN_VAULT_WALKER, true);
                     target->CastSpell(target, SPELL_ARCHAEDAS_AWAKEN, true);
@@ -213,7 +213,7 @@ class instance_uldaman : public InstanceMapScript
                 for (std::vector<uint64>::const_iterator i = vArchaedasWallMinions.begin(); i != vArchaedasWallMinions.end(); ++i)
                 {
                     Creature* target = instance->GetCreature(*i);
-                    if (!target || target->isDead() || target->getFaction() != 14)
+                    if (!target || target->IsDead() || target->getFaction() != 14)
                         continue;
                     target->setDeathState(JUST_DIED);
                     target->RemoveCorpse();
@@ -223,7 +223,7 @@ class instance_uldaman : public InstanceMapScript
                 for (std::vector<uint64>::const_iterator i = vVaultWalker.begin(); i != vVaultWalker.end(); ++i)
                 {
                     Creature* target = instance->GetCreature(*i);
-                    if (!target || target->isDead() || target->getFaction() != 14)
+                    if (!target || target->IsDead() || target->getFaction() != 14)
                         continue;
                     target->setDeathState(JUST_DIED);
                     target->RemoveCorpse();
@@ -233,7 +233,7 @@ class instance_uldaman : public InstanceMapScript
                 for (std::vector<uint64>::const_iterator i = vEarthenGuardian.begin(); i != vEarthenGuardian.end(); ++i)
                 {
                     Creature* target = instance->GetCreature(*i);
-                    if (!target || target->isDead() || target->getFaction() != 14)
+                    if (!target || target->IsDead() || target->getFaction() != 14)
                         continue;
                     target->setDeathState(JUST_DIED);
                     target->RemoveCorpse();
@@ -270,7 +270,7 @@ class instance_uldaman : public InstanceMapScript
                 for (std::vector<uint64>::const_iterator i = vArchaedasWallMinions.begin(); i != vArchaedasWallMinions.end(); ++i)
                 {
                     Creature* target = instance->GetCreature(*i);
-                    if (target && target->isDead())
+                    if (target && target->IsDead())
                     {
                         target->Respawn();
                         target->GetMotionMaster()->MoveTargetedHome();
@@ -282,7 +282,7 @@ class instance_uldaman : public InstanceMapScript
                 for (std::vector<uint64>::const_iterator i = vVaultWalker.begin(); i != vVaultWalker.end(); ++i)
                 {
                     Creature* target = instance->GetCreature(*i);
-                    if (target && target->isDead())
+                    if (target && target->IsDead())
                     {
                         target->Respawn();
                         target->GetMotionMaster()->MoveTargetedHome();
@@ -294,7 +294,7 @@ class instance_uldaman : public InstanceMapScript
                 for (std::vector<uint64>::const_iterator i = vEarthenGuardian.begin(); i != vEarthenGuardian.end(); ++i)
                 {
                     Creature* target = instance->GetCreature(*i);
-                    if (target && target->isDead())
+                    if (target && target->IsDead())
                     {
                         target->Respawn();
                         target->GetMotionMaster()->MoveTargetedHome();

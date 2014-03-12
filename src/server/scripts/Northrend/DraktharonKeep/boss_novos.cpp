@@ -288,7 +288,7 @@ public:
 
             if (uiFlashOfDarknessTimer <= diff)
             {
-                DoCast(me->getVictim(), DUNGEON_MODE(SPELL_FLASH_OF_DARKNESS, H_SPELL_FLASH_OF_DARKNESS));
+                DoCast(me->GetVictim(), DUNGEON_MODE(SPELL_FLASH_OF_DARKNESS, H_SPELL_FLASH_OF_DARKNESS));
                 uiFlashOfDarknessTimer = 5*IN_MILLISECONDS;
             } else uiFlashOfDarknessTimer -= diff;
 

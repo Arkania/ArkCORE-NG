@@ -35,7 +35,16 @@ enum Data
     DATA_GYTH,
     DATA_THE_BEAST,
     DATA_GENERAL_DRAKKISATH,
+	DATA_LORD_VALTHALAK,
+
     DATA_DRAGONSPIRE_ROOM,
+	DATA_HALL_RUNE_1,              
+    DATA_HALL_RUNE_2,               
+    DATA_HALL_RUNE_3, 
+    DATA_HALL_RUNE_4, 
+    DATA_HALL_RUNE_5,
+    DATA_HALL_RUNE_6,
+    DATA_HALL_RUNE_7, 
 };
 enum Npc
 {
@@ -56,6 +65,8 @@ enum Npc
     NPC_BLACKHAND_DREADWEAVER       = 9817,
     NPC_BLACKHAND_SUMMONER          = 9818,
     NPC_BLACKHAND_VETERAN           = 9819,
+	NPC_BLACKHAND_INCARCERATOR      = 10316,
+    NPC_LORD_VICTOR_NEFARIUS        = 10162,
 };
 
 enum AdditionalData
@@ -63,6 +74,7 @@ enum AdditionalData
     SPELL_SUMMON_ROOKERY_WHELP      = 15745,
     MAX_ENCOUNTER                   = 14,
     MAX_DRAGONSPIRE_HALL_RUNES      = 7,
+	EVENT_UROK_DOOMHOWL             = 4845,
     EVENT_PYROGUARD_EMBERSEER       = 4884,
     AREATRIGGER_ENTER_UBRS          = 2046,
     AREATRIGGER_STADIUM             = 2026,
@@ -98,6 +110,10 @@ enum GameObjects
     GO_EMBERSEER_RUNE_5             = 175270,
     GO_EMBERSEER_RUNE_6             = 175271,
     GO_EMBERSEER_RUNE_7             = 175272,
+	 // For Gyth event
+    GO_DR_PORTCULLIS                = 175185,
+    GO_PORTCULLIS_ACTIVE            = 164726,
+    GO_PORTCULLIS_TOBOSSROOMS       = 175186,
 };
 
 #endif

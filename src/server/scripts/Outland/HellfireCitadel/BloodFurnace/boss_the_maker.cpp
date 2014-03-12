@@ -115,7 +115,7 @@ class boss_the_maker : public CreatureScript
 
                 if (AcidSpray_Timer <= diff)
                 {
-                    DoCast(me->getVictim(), SPELL_ACID_SPRAY);
+                    DoCast(me->GetVictim(), SPELL_ACID_SPRAY);
                     AcidSpray_Timer = 15000+rand()%8000;
                 }
                 else
@@ -144,7 +144,7 @@ class boss_the_maker : public CreatureScript
 
                 if (Knockdown_Timer <= diff)
                 {
-                    DoCast(me->getVictim(), SPELL_KNOCKDOWN);
+                    DoCast(me->GetVictim(), SPELL_KNOCKDOWN);
                     Knockdown_Timer = 4000+rand()%8000;
                 }
                 else

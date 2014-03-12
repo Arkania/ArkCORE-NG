@@ -137,7 +137,7 @@ class UnitAI
         virtual void AttackStart(Unit* /*target*/);
         virtual void UpdateAI(uint32 const diff) = 0;
 
-        virtual void InitializeAI() { if (!me->isDead()) Reset(); }
+        virtual void InitializeAI() { if (!me->IsDead()) Reset(); }
 
         virtual void Reset() {};
 
@@ -162,8 +162,8 @@ class UnitAI
 
             std::list<Unit*> targetList;
             for (std::list<HostileReference*>::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
-                if (predicate((*itr)->getTarget()))
-                    targetList.push_back((*itr)->getTarget());
+                if (predicate((*itr)->GetTarget()))
+                    targetList.push_back((*itr)->GetTarget());
 
             if (position >= targetList.size())
                 return NULL;
@@ -211,8 +211,8 @@ class UnitAI
                 return;
 
             for (std::list<HostileReference*>::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
-                if (predicate((*itr)->getTarget()))
-                    targetList.push_back((*itr)->getTarget());
+                if (predicate((*itr)->GetTarget()))
+                    targetList.push_back((*itr)->GetTarget());
 
             if (targetList.size() < maxTargets)
                 return;

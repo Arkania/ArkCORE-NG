@@ -384,12 +384,12 @@ class boss_lord_rhyolith : public CreatureScript
 
 			void SummonAndSetLegsInBoss()
 			{
-				if (!me || !me->isAlive())
+				if (!me || !me->IsAlive())
 					return;
 
 				if (GetRightLeg())
 				{
-					if (!GetRightLeg()->isAlive())
+					if (!GetRightLeg()->IsAlive())
 						GetRightLeg()->Respawn(true);
 
 					if (Vehicle* pVehicle = me->GetVehicleKit())
@@ -403,7 +403,7 @@ class boss_lord_rhyolith : public CreatureScript
 
 				if (GetLeftLeg())
 				{
-					if (!GetLeftLeg()->isAlive())
+					if (!GetLeftLeg()->IsAlive())
 						GetLeftLeg()->Respawn(true);
 
 					if (Vehicle* pVehicle = me->GetVehicleKit())
@@ -440,8 +440,8 @@ class boss_lord_rhyolith : public CreatureScript
 				if (!PlayerList.isEmpty())
 					for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
 					{
-						if (i->getSource()->HasAura(SPELL_ORIENTATION_BAR))
-							i->getSource()->RemoveAura(SPELL_ORIENTATION_BAR);
+						if (i->GetSource()->HasAura(SPELL_ORIENTATION_BAR))
+							i->GetSource()->RemoveAura(SPELL_ORIENTATION_BAR);
 					}
 			}
 
@@ -574,8 +574,8 @@ class boss_lord_rhyolith : public CreatureScript
 				Map::PlayerList const &PlayerList = me->GetMap()->GetPlayers();
 				if (!PlayerList.isEmpty())
 					for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-						if (Player *player = i->getSource())
-							if (player->isAlive() && player->GetDistance(me) <= 150.0f)
+						if (Player *player = i->GetSource())
+							if (player->IsAlive() && player->GetDistance(me) <= 150.0f)
 							{
 								++players;
 								player->SetInCombatWith(me->ToUnit());
@@ -598,14 +598,14 @@ class boss_lord_rhyolith : public CreatureScript
 
 				if (me->HasAura(SPELL_OBSIDIAN_ARMOR) && Phase != PHASE_2)
 				{
-					if (GetLeftLeg() && GetLeftLeg()->isAlive())
+					if (GetLeftLeg() && GetLeftLeg()->IsAlive())
 					{
 						if (!GetLeftLeg()->HasAura(SPELL_OBSIDIAN_ARMOR))
 							GetLeftLeg()->CastSpell(GetLeftLeg(), SPELL_OBSIDIAN_ARMOR, true);
 						else if (GetLeftLeg()->GetAura(SPELL_OBSIDIAN_ARMOR)->GetStackAmount() != me->GetAura(SPELL_OBSIDIAN_ARMOR)->GetStackAmount())
 							GetLeftLeg()->SetAuraStack(SPELL_OBSIDIAN_ARMOR, GetLeftLeg(), me->GetAura(SPELL_OBSIDIAN_ARMOR)->GetStackAmount());
 					}
-					if (GetRightLeg() && GetRightLeg()->isAlive())
+					if (GetRightLeg() && GetRightLeg()->IsAlive())
 					{
 						if (!GetRightLeg()->HasAura(SPELL_OBSIDIAN_ARMOR))
 							GetRightLeg()->CastSpell(GetRightLeg(), SPELL_OBSIDIAN_ARMOR, true);
@@ -807,8 +807,8 @@ public:
 			Map::PlayerList const &PlayerList = me->GetMap()->GetPlayers();
 			if (!PlayerList.isEmpty())
 				for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-					if (Player *player = i->getSource())
-						if (player->isAlive() && GetRhyo() && player->GetDistance(GetRhyo()) <= 150.0f)
+					if (Player *player = i->GetSource())
+						if (player->IsAlive() && GetRhyo() && player->GetDistance(GetRhyo()) <= 150.0f)
 							player->SetPower(POWER_ALTERNATE_POWER, player->GetPower(POWER_ALTERNATE_POWER) + power);
 		}
 
@@ -822,7 +822,7 @@ public:
 		void EnterCombat(Unit* /*who*/)
         {
 			me->SetInCombatWithZone();
-			if (GetRhyo() && GetRhyo()->isAlive())
+			if (GetRhyo() && GetRhyo()->IsAlive())
 				GetRhyo()->AI()->DoZoneInCombat();
         }
 
@@ -892,8 +892,8 @@ public:
 			Map::PlayerList const &PlayerList = me->GetMap()->GetPlayers();
 			if (!PlayerList.isEmpty())
 				for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-					if (Player *player = i->getSource())
-						if (player->isAlive() && GetRhyo() && player->GetDistance(GetRhyo()) <= 150.0f)
+					if (Player *player = i->GetSource())
+						if (player->IsAlive() && GetRhyo() && player->GetDistance(GetRhyo()) <= 150.0f)
 							player->SetPower(POWER_ALTERNATE_POWER, player->GetPower(POWER_ALTERNATE_POWER) + power);
 		}
 
@@ -907,7 +907,7 @@ public:
 		void EnterCombat(Unit* /*who*/)
         {
 			me->SetInCombatWithZone();
-			if (GetRhyo() && GetRhyo()->isAlive())
+			if (GetRhyo() && GetRhyo()->IsAlive())
 				GetRhyo()->AI()->DoZoneInCombat();
         }
 
@@ -1181,7 +1181,7 @@ public:
 					   return;
 
 					for (std::list<Creature*>::iterator iter = creatures.begin(); iter != creatures.end(); ++iter)
-						if ((*iter)->isSummon() && (*iter)->ToTempSummon()->GetSummonerGUID() == me->GetGUID())
+						if ((*iter)->IsSummon() && (*iter)->ToTempSummon()->GetSummonerGUID() == me->GetGUID())
 						{
 							(*iter)->CastSpell((*iter),97234,true);
 							(*iter)->DespawnOrUnsummon(1000);

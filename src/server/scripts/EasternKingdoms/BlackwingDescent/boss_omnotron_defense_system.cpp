@@ -631,7 +631,7 @@ public:
         {
             if (isFirstTron)
                 if (Creature* omnotron = me->FindNearestCreature(BOSS_OMNOTRON, 100.0f, true))
-                    if (!omnotron->isInCombat())
+                    if (!omnotron->IsInCombat())
                         me->GetMotionMaster()->MovePoint(NowPos, wayPos[(NowPos - 1)]);
 
             if (!UpdateVictim() || !activated)

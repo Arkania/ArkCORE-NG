@@ -391,7 +391,7 @@ class boss_isiset : public CreatureScript
                 if (SupernovaTimer <= diff && Phased == false)
                 {
                     Talk(SAY_SUPERNOVA);
-                    DoCast(me->getVictim(), SPELL_SUPERNOVA);
+                    DoCast(me->GetVictim(), SPELL_SUPERNOVA);
                     SupernovaTimer = urand(25000, 35000);
                 } else SupernovaTimer -= diff;
 
@@ -478,7 +478,7 @@ class npc_celestial_familiar : public CreatureScript
 
                 if (m_uiBarrageTimer <= uiDiff)
                 {
-                    DoCast(me->getVictim(), IsHeroic() ? SPELL_ARCANE_BARRAGE_H : SPELL_ARCANE_BARRAGE);
+                    DoCast(me->GetVictim(), IsHeroic() ? SPELL_ARCANE_BARRAGE_H : SPELL_ARCANE_BARRAGE);
                     m_uiBarrageTimer = urand(2000, 3000);
                 }
                 else
@@ -584,7 +584,7 @@ class npc_celestial_call : public CreatureScript
 
                 if (m_uiBarrageTimer <= uiDiff)
                 {
-                    DoCast(me->getVictim(), IsHeroic() ? SPELL_ARCANE_BARRAGE_H : SPELL_ARCANE_BARRAGE);
+                    DoCast(me->GetVictim(), IsHeroic() ? SPELL_ARCANE_BARRAGE_H : SPELL_ARCANE_BARRAGE);
                     m_uiBarrageTimer = 2000;
                 }
                 else

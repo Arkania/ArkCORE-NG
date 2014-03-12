@@ -363,7 +363,7 @@ class boss_algalon_the_observer : public CreatureScript
                     case EVENT_DESPAWN_ALGALON:
                         events.Reset();
                         events.SetPhase(PHASE_ROLE_PLAY);
-                        if (me->isInCombat())
+                        if (me->IsInCombat())
                             events.ScheduleEvent(EVENT_ASCEND_TO_THE_HEAVENS, 1);
                         events.ScheduleEvent(EVENT_DESPAWN_ALGALON_1, 5000);
                         events.ScheduleEvent(EVENT_DESPAWN_ALGALON_2, 17000);
@@ -1009,7 +1009,7 @@ class go_celestial_planetarium_access : public GameObjectScript
                 return false;
             }
 
-            void UpdateAI(uint32 diff)
+            void UpdateAI(const uint32 diff)
             {
                 if (_events.Empty())
                     return;
@@ -1077,7 +1077,7 @@ class spell_algalon_phase_punch : public SpellScriptLoader
 class NotVictimFilter
 {
     public:
-        NotVictimFilter(Unit* caster) : _victim(caster->getVictim())
+        NotVictimFilter(Unit* caster) : _victim(caster->GetVictim())
         {
         }
 

@@ -550,7 +550,7 @@ void Aura::UpdateTargetMap(Unit* caster, bool apply)
             // persistent area aura does not hit flying targets
             if (GetType() == DYNOBJ_AURA_TYPE)
             {
-                if (itr->first->isInFlight())
+                if (itr->first->IsInFlight())
                     addUnit = false;
             }
             // unit auras can not stack with each other
@@ -1432,7 +1432,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         caster->GetAura(GetId())->GetEffect(2)->ChangeAmount(91711);
                 }
                 // Soul link glyph
-                else if (GetId() == 25228 && caster->isPet())
+                else if (GetId() == 25228 && caster->IsPet())
                 {
                     if (caster->GetOwner()->HasAura(63312))
                         caster->GetOwner()->GetAura(GetId())->GetEffect(0)->ChangeAmount(25);
@@ -1455,7 +1455,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     }
 
                 if (GetId() == 63560) //Dark transformation, on cast remove the aura
-                    if (target->ToCreature()->isPet())
+                    if (target->ToCreature()->IsPet())
                         target->ToCreature()->GetOwner()->RemoveAurasDueToSpell(93426);
 
                 // Chains of Ice

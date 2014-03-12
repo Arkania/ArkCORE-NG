@@ -2646,7 +2646,7 @@ class Player : public Unit, public GridObject<Player>
         void SetTemporaryUnsummonedPetNumber(uint32 petnumber) { m_temporaryUnsummonedPetNumber = petnumber; }
         void UnsummonPetTemporaryIfAny();
         void ResummonPetTemporaryUnSummonedIfAny();
-        bool IsPetNeedBeTemporaryUnsummoned() const { return !IsInWorld() || !isAlive() || IsMounted() /*+in flight*/; }
+        bool IsPetNeedBeTemporaryUnsummoned() const { return !IsInWorld() || !IsAlive() || IsMounted() /*+in flight*/; }
 
         //Worgen Transformations
         bool isInWorgenForm();
@@ -2706,8 +2706,8 @@ class Player : public Unit, public GridObject<Player>
 
         Group* GetGroupInvite() { return m_groupInvite; }
         void SetGroupInvite(Group* group) { m_groupInvite = group; }
-        Group* GetGroup() { return m_group.getTarget(); }
-        const Group* GetGroup() const { return (const Group*)m_group.getTarget(); }
+        Group* GetGroup() { return m_group.GetTarget(); }
+        const Group* GetGroup() const { return (const Group*)m_group.GetTarget(); }
         GroupReference& GetGroupRef() { return m_group; }
         void SetGroup(Group* group, int8 subgroup = -1);
         uint8 GetSubGroup() const { return m_group.getSubGroup(); }
@@ -2721,7 +2721,7 @@ class Player : public Unit, public GridObject<Player>
         // Battleground / Battlefield Group System
         void SetBattlegroundOrBattlefieldRaid(Group* group, int8 subgroup = -1);
         void RemoveFromBattlegroundOrBattlefieldRaid();
-        Group* GetOriginalGroup() { return m_originalGroup.getTarget(); }
+        Group* GetOriginalGroup() { return m_originalGroup.GetTarget(); }
         GroupReference& GetOriginalGroupRef() { return m_originalGroup; }
         uint8 GetOriginalSubGroup() const { return m_originalGroup.getSubGroup(); }
         void SetOriginalGroup(Group* group, int8 subgroup = -1);

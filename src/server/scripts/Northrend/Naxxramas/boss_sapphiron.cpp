@@ -161,7 +161,7 @@ public:
                     {
                         Map::PlayerList const &players = map->GetPlayers();
                         for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                            itr->getSource()->CompletedAchievement(AchievTheHundredClub);
+                            itr->GetSource()->CompletedAchievement(AchievTheHundredClub);
                     }
                 }
             }
@@ -189,7 +189,7 @@ public:
                 Map::PlayerList const &players = map->GetPlayers();
                 for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                 {
-                    if (itr->getSource()->GetResistance(SPELL_SCHOOL_FROST) > MAX_FROST_RESISTANCE)
+                    if (itr->GetSource()->GetResistance(SPELL_SCHOOL_FROST) > MAX_FROST_RESISTANCE)
                     {
                         CanTheHundredClub = false;
                         break;
@@ -252,7 +252,7 @@ public:
                             DoCast(me, SPELL_BERSERK);
                             return;
                         case EVENT_CLEAVE:
-                            DoCast(me->getVictim(), SPELL_CLEAVE);
+                            DoCast(me->GetVictim(), SPELL_CLEAVE);
                             events.ScheduleEvent(EVENT_CLEAVE, 5000+rand()%10000, 0, PHASE_GROUND);
                             return;
                         case EVENT_TAIL:
@@ -307,8 +307,8 @@ public:
                             std::vector<Unit*> targets;
                             std::list<HostileReference*>::const_iterator i = me->getThreatManager().getThreatList().begin();
                             for (; i != me->getThreatManager().getThreatList().end(); ++i)
-                                if ((*i)->getTarget()->GetTypeId() == TYPEID_PLAYER && !(*i)->getTarget()->HasAura(SPELL_ICEBOLT))
-                                    targets.push_back((*i)->getTarget());
+                                if ((*i)->GetTarget()->GetTypeId() == TYPEID_PLAYER && !(*i)->GetTarget()->HasAura(SPELL_ICEBOLT))
+                                    targets.push_back((*i)->GetTarget());
 
                             if (targets.empty())
                                 iceboltCount = 0;
@@ -365,7 +365,7 @@ public:
             std::list<HostileReference*>::const_iterator i = me->getThreatManager().getThreatList().begin();
             for (; i != me->getThreatManager().getThreatList().end(); ++i)
             {
-                Unit* target = (*i)->getTarget();
+                Unit* target = (*i)->GetTarget();
                 if (target->GetTypeId() != TYPEID_PLAYER)
                     continue;
 

@@ -324,11 +324,11 @@ public:
     		events.ScheduleEvent(EVENT_CHECK_POSITION, 1500);
     
     		if (Creature* nezir = me->FindNearestCreature(BOSS_NEZIR, 500.0f, true))
-    			if (nezir && !nezir->isInCombat())
+    			if (nezir && !nezir->IsInCombat())
     				nezir->AI()->DoZoneInCombat(nezir, 500.0f);
     			
     		if (Creature* rohash = me->FindNearestCreature(BOSS_ROHASH, 500.0f, true))
-    			if (rohash && !rohash->isInCombat())
+    			if (rohash && !rohash->IsInCombat())
     				rohash->AI()->DoZoneInCombat(rohash, 500.0f);
     	}
     
@@ -563,11 +563,11 @@ public:
 			events.ScheduleEvent(EVENT_CHECK_POSITION, 1500);
 
 			if (Creature* anshal = me->FindNearestCreature(BOSS_ANSHAL, 500.0f, true))
-				if (anshal && !anshal->isInCombat())
+				if (anshal && !anshal->IsInCombat())
 					anshal->AI()->DoZoneInCombat(anshal, 500.0f);
 
 			if (Creature* rohash = me->FindNearestCreature(BOSS_ROHASH, 500.0f, true))
-				if (rohash && !rohash->isInCombat())
+				if (rohash && !rohash->IsInCombat())
 					rohash->AI()->DoZoneInCombat(rohash, 500.0f);
         }
 
@@ -784,11 +784,11 @@ public:
 			events.ScheduleEvent(EVENT_CHECK_POSITION, 1500);
 
 			if (Creature* nezir = me->FindNearestCreature(BOSS_NEZIR, 500.0f, true))
-				if (nezir && !nezir->isInCombat())
+				if (nezir && !nezir->IsInCombat())
 						nezir->AI()->DoZoneInCombat(nezir, 500.0f);
 					
 			if (Creature* anshal = me->FindNearestCreature(BOSS_ANSHAL, 500.0f, true))
-				if (anshal && !anshal->isInCombat())
+				if (anshal && !anshal->IsInCombat())
 					anshal->AI()->DoZoneInCombat(anshal, 500.0f);
         }
 		

@@ -490,7 +490,7 @@ public:
                             break;
 
                         case EVENT_FLAME_BREATH:
-                            DoCast(me->getVictim(), SPELL_FLAME_BREATH);
+                            DoCast(me->GetVictim(), SPELL_FLAME_BREATH);
                             events.ScheduleEvent(EVENT_FLAME_BREATH, 28000, PHASE_ONE);
                             break;
 
@@ -518,7 +518,7 @@ public:
                             break;
 							
 						case EVENT_TWILIGHT_BLAST:
-                            if (Unit* target = me->getVictim())
+                            if (Unit* target = me->GetVictim())
                             {
                                 if (target->IsWithinDistInMap(me, 1.0f)) // check if tank is in melee range.
                                     inMeleeRange = true;
@@ -803,7 +803,7 @@ public:
             events.Update(diff);
 
             if(Creature* sinestra = me->FindNearestCreature(NPC_SINESTRA, 200.0f, true))
-                if(!sinestra || !sinestra->isInCombat()) // Is dead / evaded.
+                if(!sinestra || !sinestra->IsInCombat()) // Is dead / evaded.
                     me->DespawnOrUnsummon();
 
             while (uint32 eventId = events.ExecuteEvent())
@@ -811,7 +811,7 @@ public:
                 switch (eventId)
                 {
                     case EVENT_SPIT:
-                        DoCast(me->getVictim(), SPELL_TWI_SPIT);
+                        DoCast(me->GetVictim(), SPELL_TWI_SPIT);
                         events.ScheduleEvent(EVENT_SPIT, urand(9000, 12000));
                     break;
                 }
@@ -864,7 +864,7 @@ public:
             events.Update(diff);
 
             if(Creature* sinestra = me->FindNearestCreature(NPC_SINESTRA, 200.0f, true))
-                if(!sinestra || !sinestra->isInCombat()) // Is dead / evaded.
+                if(!sinestra || !sinestra->IsInCombat()) // Is dead / evaded.
                     me->DespawnOrUnsummon();
 
             while (uint32 eventId = events.ExecuteEvent())

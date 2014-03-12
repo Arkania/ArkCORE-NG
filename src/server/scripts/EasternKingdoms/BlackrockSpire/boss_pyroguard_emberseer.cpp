@@ -116,11 +116,11 @@ public:
                 switch (eventId)
                 {
                     case EVENT_FIRENOVA:
-                        DoCast(me->getVictim(), SPELL_FIRENOVA);
+                        DoCast(me->GetVictim(), SPELL_FIRENOVA);
                         events.ScheduleEvent(EVENT_FIRENOVA, 6 * IN_MILLISECONDS);
                         break;
                     case EVENT_FLAMEBUFFET:
-                        DoCast(me->getVictim(), SPELL_FLAMEBUFFET);
+                        DoCast(me->GetVictim(), SPELL_FLAMEBUFFET);
                         events.ScheduleEvent(EVENT_FLAMEBUFFET, 14 * IN_MILLISECONDS);
                         break;
                     case EVENT_PYROBLAST:

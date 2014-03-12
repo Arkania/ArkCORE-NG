@@ -357,7 +357,7 @@ class boss_blood_queen_lana_thel : public CreatureScript
                         case EVENT_BLOOD_MIRROR:
                         {
                             // victim can be NULL when this is processed in the same update tick as EVENT_AIR_PHASE
-                            if (me->getVictim())
+                            if (me->GetVictim())
                             {
                                 Player* newOfftank = SelectRandomTarget(true);
                                 if (_offtank != newOfftank)
@@ -366,8 +366,8 @@ class boss_blood_queen_lana_thel : public CreatureScript
                                     if (_offtank)
                                     {
                                         // both spells have SPELL_ATTR5_SINGLE_TARGET_SPELL, no manual removal needed
-                                        _offtank->CastSpell(me->getVictim(), SPELL_BLOOD_MIRROR_DAMAGE, true);
-                                        me->getVictim()->CastSpell(_offtank, SPELL_BLOOD_MIRROR_DUMMY, true);
+                                        _offtank->CastSpell(me->GetVictim(), SPELL_BLOOD_MIRROR_DAMAGE, true);
+                                        me->GetVictim()->CastSpell(_offtank, SPELL_BLOOD_MIRROR_DUMMY, true);
                                         DoCastVictim(SPELL_BLOOD_MIRROR_VISUAL);
                                         if (Item* shadowsEdge = _offtank->GetWeaponForAttack(BASE_ATTACK, true))
                                             if (!_offtank->HasAura(SPELL_THIRST_QUENCHED) && shadowsEdge->GetEntry() == ITEM_SHADOW_S_EDGE && !_offtank->HasAura(SPELL_GUSHING_WOUND))
@@ -470,8 +470,8 @@ class boss_blood_queen_lana_thel : public CreatureScript
                     return NULL;
 
                 for (std::list<HostileReference*>::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
-                    if (Unit* refTarget = (*itr)->getTarget())
-                        if (refTarget != me->getVictim() && refTarget->GetTypeId() == TYPEID_PLAYER && (includeOfftank ? true : (refTarget != _offtank)))
+                    if (Unit* refTarget = (*itr)->GetTarget())
+                        if (refTarget != me->GetVictim() && refTarget->GetTypeId() == TYPEID_PLAYER && (includeOfftank ? true : (refTarget != _offtank)))
                             tempTargets.push_back(refTarget->ToPlayer());
 
                 if (tempTargets.empty())
@@ -485,7 +485,7 @@ class boss_blood_queen_lana_thel : public CreatureScript
 
                 if (includeOfftank)
                 {
-                    tempTargets.sort(Trinity::ObjectDistanceOrderPred(me->getVictim()));
+                    tempTargets.sort(Trinity::ObjectDistanceOrderPred(me->GetVictim()));
                     return tempTargets.front();
                 }
 

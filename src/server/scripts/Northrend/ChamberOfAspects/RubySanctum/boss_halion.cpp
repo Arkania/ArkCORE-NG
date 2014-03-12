@@ -510,7 +510,7 @@ class boss_twilight_halion : public CreatureScript
                     if (me->IsDamageEnoughForLootingAndReward())
                         halion->LowerPlayerDamageReq(halion->GetMaxHealth());
 
-                    if (halion->isAlive())
+                    if (halion->IsAlive())
                         killer->Kill(halion);
                 }
 
@@ -685,10 +685,10 @@ class npc_halion_controller : public CreatureScript
 
             void UpdateAI(uint32 const diff)
             {
-                // The isInCombat() check is needed because that check should be false when Halion is
+                // The IsInCombat() check is needed because that check should be false when Halion is
                 // not engaged, while it would return true without as UpdateVictim() checks for
                 // combat state.
-                if (!(_events.GetPhaseMask() & PHASE_INTRO_MASK) && me->isInCombat() && !UpdateVictim())
+                if (!(_events.GetPhaseMask() & PHASE_INTRO_MASK) && me->IsInCombat() && !UpdateVictim())
                 {
                     EnterEvadeMode();
                     return;

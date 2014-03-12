@@ -186,7 +186,7 @@ public:
 			summons.Summon(summon);
 			summon->setActive(true);
  
-			if (me->isInCombat())
+			if (me->IsInCombat())
 			    summon->AI()->DoZoneInCombat();
 
             if (summon->GetEntry() == MOB_SPIRIT_LYNX)
@@ -385,7 +385,7 @@ public:
                     case EVENT_SELECT_TARGET:
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
                         {
-                            DoModifyThreatPercent(me->getVictim(), -100);
+                            DoModifyThreatPercent(me->GetVictim(), -100);
                             AttackStart(target);
                             DoCast(target, SPELL_FIXATE);
                             DoModifyThreatPercent(target, 100);

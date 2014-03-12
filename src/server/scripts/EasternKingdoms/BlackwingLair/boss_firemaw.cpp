@@ -68,16 +68,16 @@ public:
             //ShadowFlame_Timer
             if (ShadowFlame_Timer <= diff)
             {
-                DoCast(me->getVictim(), SPELL_SHADOWFLAME);
+                DoCast(me->GetVictim(), SPELL_SHADOWFLAME);
                 ShadowFlame_Timer = urand(15000, 18000);
             } else ShadowFlame_Timer -= diff;
 
             //WingBuffet_Timer
             if (WingBuffet_Timer <= diff)
             {
-                DoCast(me->getVictim(), SPELL_WINGBUFFET);
-                if (DoGetThreat(me->getVictim()))
-                    DoModifyThreatPercent(me->getVictim(), -75);
+                DoCast(me->GetVictim(), SPELL_WINGBUFFET);
+                if (DoGetThreat(me->GetVictim()))
+                    DoModifyThreatPercent(me->GetVictim(), -75);
 
                 WingBuffet_Timer = 25000;
             } else WingBuffet_Timer -= diff;
@@ -85,7 +85,7 @@ public:
             //FlameBuffet_Timer
             if (FlameBuffet_Timer <= diff)
             {
-                DoCast(me->getVictim(), SPELL_FLAMEBUFFET);
+                DoCast(me->GetVictim(), SPELL_FLAMEBUFFET);
                 FlameBuffet_Timer = 5000;
             } else FlameBuffet_Timer -= diff;
 

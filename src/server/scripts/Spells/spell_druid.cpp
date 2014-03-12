@@ -608,7 +608,7 @@ class spell_druid_wild_mushroom : public SpellScriptLoader
                     player->GetCreatureListWithEntryInGrid(list, DRUID_NPC_WILD_MUSHROOM, 500.0f);
                     for (std::list<Creature*>::iterator i = list.begin(); i != list.end(); ++i)
                     {
-                        if ((*i)->isSummon() && (*i)->GetCharmerOrOwner() == player)
+                        if ((*i)->IsSummon() && (*i)->GetCharmerOrOwner() == player)
                             if (!player)
                                 return;
                         continue;
@@ -680,7 +680,7 @@ class spell_druid_wild_mushroom_detonate : public SpellScriptLoader
 
                 for (std::list<Creature*>::const_iterator i = list.begin(); i != list.end(); ++i)
                 {
-                    if ((*i)->isSummon() && (*i)->GetCharmerOrOwner() == player)
+                    if ((*i)->IsSummon() && (*i)->GetCharmerOrOwner() == player)
                     {
                         summonList.push_back((*i)->ToTempSummon());
                         continue;
@@ -778,7 +778,7 @@ class spell_druid_wild_mushroom_detonate : public SpellScriptLoader
 
                     for (std::list<Creature*>::const_iterator i = fungal_list.begin(); i != fungal_list.end(); ++i)
                     {
-                        if ((*i)->isSummon() && (*i)->GetCharmerOrOwner() == player)
+                        if ((*i)->IsSummon() && (*i)->GetCharmerOrOwner() == player)
                         {
                             fungalsummonList.push_back((*i)->ToTempSummon());
                             continue;
@@ -801,7 +801,7 @@ class spell_druid_wild_mushroom_detonate : public SpellScriptLoader
                     player->GetCreatureListWithEntryInGrid(list, DRUID_NPC_WILD_MUSHROOM, 500.0f);
                     for (std::list<Creature*>::iterator i = list.begin(); i != list.end(); ++i)
                     {
-                        if ((*i)->isSummon() && (*i)->GetCharmerOrOwner() == player)
+                        if ((*i)->IsSummon() && (*i)->GetCharmerOrOwner() == player)
                             if (!player)
                                 return;
                         continue;

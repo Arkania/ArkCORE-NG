@@ -437,7 +437,7 @@ bool ChatHandler::HandleDieCommand(const char* /*args*/)
             return false;
     }
 
-    if (target->isAlive())
+    if (target->IsAlive())
     {
         if (sWorld->getBoolConfig(CONFIG_DIE_COMMAND_MODE))
             m_session->GetPlayer()->Kill(target);
@@ -468,7 +468,7 @@ bool ChatHandler::HandleDamageCommand(const char * args)
             return false;
     }
 
-    if (!target->isAlive())
+    if (!target->IsAlive())
         return true;
 
     char* damageStr = strtok((char*)args, " ");
@@ -946,14 +946,14 @@ bool ChatHandler::HandleRespawnCommand(const char* /*args*/)
     Unit* target = getSelectedUnit();
     if (player->GetSelection() && target)
     {
-        if (target->GetTypeId() != TYPEID_UNIT || target->isPet())
+        if (target->GetTypeId() != TYPEID_UNIT || target->IsPet())
         {
             SendSysMessage(LANG_SELECT_CREATURE);
             SetSentErrorMessage(true);
             return false;
         }
 
-        if (target->isDead())
+        if (target->IsDead())
             target->ToCreature()->Respawn();
         return true;
     }
@@ -1561,7 +1561,7 @@ bool ChatHandler::HandleFreezeCommand(const char *args)
             {
                 pet->SavePetToDB(PET_SLOT_ACTUAL_PET_SLOT);
                 // not let dismiss dead pet
-                if (pet && pet->isAlive())
+                if (pet && pet->IsAlive())
                     player->RemovePet(pet, PET_SLOT_HUNTER_FIRST);
             }
         }
@@ -1751,7 +1751,7 @@ bool ChatHandler::HandleUnbindSightCommand(const char * /*args*/)
 {
     Player* player = m_session->GetPlayer();
 
-    if (player->isPossessing())
+    if (player->IsPossessing())
         return false;
 
     player->StopCastingBindSight();

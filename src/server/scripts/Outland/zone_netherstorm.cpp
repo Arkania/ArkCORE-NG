@@ -645,7 +645,7 @@ public:
         if (!player->HasAura(SPELL_SUNFURY_DISGUISE))
             return false;
 
-        if (player->isAlive() && player->GetQuestStatus(QUEST_INFO_GATHERING) == QUEST_STATUS_INCOMPLETE)
+        if (player->IsAlive() && player->GetQuestStatus(QUEST_INFO_GATHERING) == QUEST_STATUS_INCOMPLETE)
         {
             Creature* Dawnforge = player->FindNearestCreature(CreatureEntry[1], 30.0f);
             if (!Dawnforge)
@@ -700,7 +700,7 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature)
     {
-        if (creature->isQuestGiver())
+        if (creature->IsQuestGiver())
             player->PrepareQuestMenu(creature->GetGUID());
 
         if (player->GetQuestStatus(QUEST_ON_NETHERY_WINGS) == QUEST_STATUS_INCOMPLETE && !player->HasItemCount(29778, 1))

@@ -95,7 +95,7 @@ public:
             if (CurseOfBlood_Timer <= diff)
             {
                 //Cast
-                DoCast(me->getVictim(), SPELL_CURSEOFBLOOD);
+                DoCast(me->GetVictim(), SPELL_CURSEOFBLOOD);
 
                 //45 seconds
                 CurseOfBlood_Timer = 30000;
@@ -110,7 +110,7 @@ public:
                 me->setFaction(35);
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 me->SetDisplayId(11686);  // Invisible Model
-                DoModifyThreatPercent(me->getVictim(), -99);
+                DoModifyThreatPercent(me->GetVictim(), -99);
 
                 //Summon 10 Illusions attacking random gamers
                 Unit* target = NULL;
@@ -131,7 +131,7 @@ public:
             //            if (Illusion_Timer <= diff)
             //            {
             //                  //Cast
-            //                DoCast(me->getVictim(), SPELL_ILLUSION);
+            //                DoCast(me->GetVictim(), SPELL_ILLUSION);
             //
             //                  //3 Illusion will be summoned
             //                  if (Illusioncounter < 3)
@@ -191,7 +191,7 @@ public:
             if (Cleave_Timer <= diff)
             {
                 //Cast
-                DoCast(me->getVictim(), SPELL_CLEAVE);
+                DoCast(me->GetVictim(), SPELL_CLEAVE);
 
                 //5-8 seconds
                 Cleave_Timer = urand(5000, 8000);

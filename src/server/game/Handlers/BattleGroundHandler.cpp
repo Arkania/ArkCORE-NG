@@ -46,7 +46,7 @@ void WorldSession::HandleBattlemasterHelloOpcode(WorldPacket& recvData)
     if (!unit)
         return;
 
-    if (!unit->isBattleMaster())                             // it's not battlemaster
+    if (!unit->IsBattleMaster())                             // it's not battlemaster
         return;
 
     // Stop the npc if moving
@@ -241,7 +241,7 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket & recvData)
 
         for (GroupReference* itr = grp->GetFirstMember(); itr != NULL; itr = itr->next())
         {
-            Player* member = itr->getSource();
+            Player* member = itr->GetSource();
             if (!member)
                 continue; // this should never happen
 
@@ -522,7 +522,7 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recvData)
                 _player->SetBattlegroundEntryPoint();
 
             // resurrect the player
-            if (!_player->isAlive())
+            if (!_player->IsAlive())
             {
                 _player->ResurrectPlayer(1.0f);
                 _player->SpawnCorpseBones();
@@ -533,7 +533,7 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recvData)
                 _player->RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
 
             // stop taxi flight at port
-            if (_player->isInFlight())
+            if (_player->IsInFlight())
             {
                 _player->GetMotionMaster()->MovementExpired();
                 _player->CleanupAfterTaxiFlight();
@@ -595,7 +595,7 @@ void WorldSession::HandleBattlefieldLeaveOpcode(WorldPacket& recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recvd CMSG_BATTLEFIELD_LEAVE Message");
 
     // not allow leave battleground in combat
-    if (_player->isInCombat())
+    if (_player->IsInCombat())
         if (Battleground* bg = _player->GetBattleground())
             if (bg->GetStatus() != STATUS_WAIT_LEAVE)
                 return;
@@ -756,7 +756,7 @@ void WorldSession::HandleBattlemasterJoinArena(WorldPacket & recvData)
 
         for (GroupReference* itr = grp->GetFirstMember(); itr != NULL; itr = itr->next())
         {
-            Player* member = itr->getSource();
+            Player* member = itr->GetSource();
             if (!member)
                 continue;
 

@@ -97,8 +97,8 @@ void SummonCroneIfReady(InstanceScript* instance, Creature* creature)
     {
         if (Creature* pCrone = creature->SummonCreature(CREATURE_CRONE, -10891.96f, -1755.95f, creature->GetPositionZ(), 4.64f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, HOUR*2*IN_MILLISECONDS))
         {
-            if (creature->getVictim())
-                pCrone->AI()->AttackStart(creature->getVictim());
+            if (creature->GetVictim())
+                pCrone->AI()->AttackStart(creature->GetVictim());
         }
     }
 };
@@ -201,7 +201,7 @@ public:
 
             if (FearTimer <= diff)
             {
-                DoCast(me->getVictim(), SPELL_SCREAM);
+                DoCast(me->GetVictim(), SPELL_SCREAM);
                 FearTimer = 30000;
             } else FearTimer -= diff;
 
@@ -248,7 +248,7 @@ public:
             if (DorotheeGUID)
             {
                 Creature* Dorothee = (Unit::GetCreature((*me), DorotheeGUID));
-                if (Dorothee && Dorothee->isAlive())
+                if (Dorothee && Dorothee->IsAlive())
                 {
                     CAST_AI(boss_dorothee::boss_dorotheeAI, Dorothee->AI())->TitoDied = true;
                     DoScriptText(SAY_DOROTHEE_TITO_DEATH, Dorothee);
@@ -263,7 +263,7 @@ public:
 
             if (YipTimer <= diff)
             {
-                DoCast(me->getVictim(), SPELL_YIPPING);
+                DoCast(me->GetVictim(), SPELL_YIPPING);
                 YipTimer = 10000;
             } else YipTimer -= diff;
 
@@ -279,7 +279,7 @@ void boss_dorothee::boss_dorotheeAI::SummonTito()
     {
         DoScriptText(SAY_DOROTHEE_SUMMON, me);
         CAST_AI(mob_tito::mob_titoAI, pTito->AI())->DorotheeGUID = me->GetGUID();
-        pTito->AI()->AttackStart(me->getVictim());
+        pTito->AI()->AttackStart(me->GetVictim());
         SummonedTito = true;
         TitoDied = false;
     }
@@ -383,7 +383,7 @@ public:
 
             if (BrainBashTimer <= diff)
             {
-                DoCast(me->getVictim(), SPELL_BRAIN_BASH);
+                DoCast(me->GetVictim(), SPELL_BRAIN_BASH);
                 BrainBashTimer = 15000;
             } else BrainBashTimer -= diff;
 
@@ -489,7 +489,7 @@ public:
 
             if (CleaveTimer <= diff)
             {
-                DoCast(me->getVictim(), SPELL_CLEAVE);
+                DoCast(me->GetVictim(), SPELL_CLEAVE);
                 CleaveTimer = 5000;
             } else CleaveTimer -= diff;
 
@@ -597,19 +597,19 @@ public:
 
             if (MangleTimer <= diff)
             {
-                DoCast(me->getVictim(), SPELL_MANGLE);
+                DoCast(me->GetVictim(), SPELL_MANGLE);
                 MangleTimer = urand(5000, 8000);
             } else MangleTimer -= diff;
 
             if (ShredTimer <= diff)
             {
-                DoCast(me->getVictim(), SPELL_SHRED);
+                DoCast(me->GetVictim(), SPELL_SHRED);
                 ShredTimer = urand(10000, 15000);
             } else ShredTimer -= diff;
 
             if (ScreamTimer <= diff)
             {
-                DoCast(me->getVictim(), SPELL_FRIGHTENED_SCREAM);
+                DoCast(me->GetVictim(), SPELL_FRIGHTENED_SCREAM);
                 ScreamTimer = urand(20000, 30000);
             } else ScreamTimer -= diff;
 
@@ -691,7 +691,7 @@ public:
 
             if (ChainLightningTimer <= diff)
             {
-                DoCast(me->getVictim(), SPELL_CHAIN_LIGHTNING);
+                DoCast(me->GetVictim(), SPELL_CHAIN_LIGHTNING);
                 ChainLightningTimer = 15000;
             } else ChainLightningTimer -= diff;
 
@@ -905,13 +905,13 @@ public:
 
             if (FearTimer <= diff)
             {
-                DoCast(me->getVictim(), SPELL_TERRIFYING_HOWL);
+                DoCast(me->GetVictim(), SPELL_TERRIFYING_HOWL);
                 FearTimer = urand(25000, 35000);
             } else FearTimer -= diff;
 
             if (SwipeTimer <= diff)
             {
-                DoCast(me->getVictim(), SPELL_WIDE_SWIPE);
+                DoCast(me->GetVictim(), SPELL_WIDE_SWIPE);
                 SwipeTimer = urand(25000, 30000);
             } else SwipeTimer -= diff;
 
@@ -984,10 +984,10 @@ void Resurrect(Creature* target)
     target->SetFullHealth();
     target->SetStandState(UNIT_STAND_STATE_STAND);
     target->CastSpell(target, SPELL_RES_VISUAL, true);
-    if (target->getVictim())
+    if (target->GetVictim())
     {
-        target->GetMotionMaster()->MoveChase(target->getVictim());
-        target->AI()->AttackStart(target->getVictim());
+        target->GetMotionMaster()->MoveChase(target->GetVictim());
+        target->AI()->AttackStart(target->GetVictim());
     }
         else
             target->GetMotionMaster()->Initialize();
@@ -1231,10 +1231,10 @@ public:
             if (JulianneGUID)
             {
                 Creature* Julianne = (Unit::GetCreature((*me), JulianneGUID));
-                if (Julianne && Julianne->getVictim())
+                if (Julianne && Julianne->GetVictim())
                 {
-                    me->AddThreat(Julianne->getVictim(), 1.0f);
-                    AttackStart(Julianne->getVictim());
+                    me->AddThreat(Julianne->GetVictim(), 1.0f);
+                    AttackStart(Julianne->GetVictim());
                 }
             }
         }
@@ -1313,7 +1313,7 @@ public:
 
             if (PoisonThrustTimer <= diff)
             {
-                DoCast(me->getVictim(), SPELL_POISON_THRUST);
+                DoCast(me->GetVictim(), SPELL_POISON_THRUST);
                 PoisonThrustTimer = urand(10000, 20000);
             } else PoisonThrustTimer -= diff;
 
@@ -1382,8 +1382,8 @@ void boss_julianne::boss_julianneAI::UpdateAI(const uint32 diff)
             Phase = PHASE_BOTH;
             IsFakingDeath = false;
 
-            if (me->getVictim())
-                AttackStart(me->getVictim());
+            if (me->GetVictim())
+                AttackStart(me->GetVictim());
 
             ResurrectSelfTimer = 0;
             ResurrectTimer = 1000;
@@ -1433,7 +1433,7 @@ void boss_julianne::boss_julianneAI::UpdateAI(const uint32 diff)
         if (urand(0, 1) && SummonedRomulo)
         {
             Creature* Romulo = (Unit::GetCreature((*me), RomuloGUID));
-            if (Romulo && Romulo->isAlive() && !RomuloDead)
+            if (Romulo && Romulo->IsAlive() && !RomuloDead)
                 DoCast(Romulo, SPELL_ETERNAL_AFFECTION);
         } else DoCast(me, SPELL_ETERNAL_AFFECTION);
 

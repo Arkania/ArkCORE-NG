@@ -50,7 +50,7 @@ class npc_tornado_moving : public CreatureScript
 
             void UpdateAI(uint32 const diff)
             {
-				if (GetAlakir() && GetAlakir()->isAlive())
+				if (GetAlakir() && GetAlakir()->IsAlive())
 				{
 					float distanceX = GetAlakir()->GetPositionX() > me->GetPositionX() ? GetAlakir()->GetPositionX() - me->GetPositionX() : me->GetPositionX() - GetAlakir()->GetPositionX();
 					float distanceY = GetAlakir()->GetPositionY() > me->GetPositionY() ? GetAlakir()->GetPositionY() - me->GetPositionY() : me->GetPositionY() - GetAlakir()->GetPositionY();

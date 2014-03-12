@@ -23,7 +23,7 @@
 void GroupReference::targetObjectBuildLink()
 {
     // called from link()
-    getTarget()->LinkMember(this);
+    GetTarget()->LinkMember(this);
 }
 
 void GroupReference::targetObjectDestroyLink()

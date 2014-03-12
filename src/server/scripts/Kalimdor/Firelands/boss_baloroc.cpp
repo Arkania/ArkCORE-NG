@@ -192,7 +192,7 @@ public:
 			summon->setActive(true);
 			summon->SetFlag(UNIT_FIELD_FLAGS,UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NOT_SELECTABLE);
  
-			if(me->isInCombat())
+			if(me->IsInCombat())
 			   summon->AI()->DoZoneInCombat();
 		}
 		
@@ -200,7 +200,7 @@ public:
 		{
 			Map::PlayerList const& players = me->GetMap()->GetPlayers();
             for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-				if (Player* player = itr->getSource())
+				if (Player* player = itr->GetSource())
 					if (player->HasAura(SPELL_BLAZE_OF_GLORY))
 						player->RemoveAura(SPELL_BLAZE_OF_GLORY);
 		}
@@ -262,7 +262,7 @@ public:
 		            break;
 				
 				case EVENT_BLAZE_OF_GLORY:
-					DoCast(me->getVictim(), SPELL_BLAZE_OF_GLORY);
+					DoCast(me->GetVictim(), SPELL_BLAZE_OF_GLORY);
 					DoCast(me, SPELL_INCENDIARY_SOUL);
 					
 					events.ScheduleEvent(EVENT_BLAZE_OF_GLORY, 20000);

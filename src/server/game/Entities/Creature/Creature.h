@@ -464,12 +464,12 @@ class Creature : public Unit, public GridObject<Creature>, public MapCreature
 
         void SetCorpseDelay(uint32 delay) { m_corpseDelay = delay; }
         uint32 GetCorpseDelay() const { return m_corpseDelay; }
-        bool isRacialLeader() const { return GetCreatureTemplate()->RacialLeader; }
-        bool isCivilian() const { return GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_CIVILIAN; }
-        bool isTrigger() const { return GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_TRIGGER; }
-        bool isGuard() const { return GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_GUARD; }
-        bool canWalk() const { return GetCreatureTemplate()->InhabitType & INHABIT_GROUND; }
-        bool canSwim() const { return GetCreatureTemplate()->InhabitType & INHABIT_WATER; }
+        bool IsRacialLeader() const { return GetCreatureTemplate()->RacialLeader; }
+        bool IsCivilian() const { return GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_CIVILIAN; }
+        bool IsTrigger() const { return GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_TRIGGER; }
+        bool IsGuard() const { return GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_GUARD; }
+        bool CanWalk() const { return GetCreatureTemplate()->InhabitType & INHABIT_GROUND; }
+        bool CanSwim() const { return GetCreatureTemplate()->InhabitType & INHABIT_WATER; }
         bool CanFly()  const { return GetCreatureTemplate()->InhabitType & INHABIT_AIR; }
 
         void SetReactState(ReactStates st) { m_reactState = st; }
@@ -477,11 +477,11 @@ class Creature : public Unit, public GridObject<Creature>, public MapCreature
         bool HasReactState(ReactStates state) const { return (m_reactState == state); }
         void InitializeReactState()
         {
-            if (isTotem() || isTrigger() || GetCreatureType() == CREATURE_TYPE_CRITTER || isSpiritService())
+            if (IsTotem() || IsTrigger() || GetCreatureType() == CREATURE_TYPE_CRITTER || IsSpiritService())
                 SetReactState(REACT_PASSIVE);
             else
                 SetReactState(REACT_AGGRESSIVE);
-            /*else if (isCivilian())
+            /*else if (IsCivilian())
             SetReactState(REACT_DEFENSIVE);*/;
         }
 
@@ -496,7 +496,7 @@ class Creature : public Unit, public GridObject<Creature>, public MapCreature
                                                             // redefine Unit::IsImmunedToSpellEffect
         bool isElite() const
         {
-            if (isPet())
+            if (IsPet())
                 return false;
 
             uint32 rank = GetCreatureTemplate()->rank;
@@ -505,7 +505,7 @@ class Creature : public Unit, public GridObject<Creature>, public MapCreature
 
         bool isWorldBoss() const
         {
-            if (isPet())
+            if (IsPet())
                 return false;
 
             return GetCreatureTemplate()->type_flags & CREATURE_TYPEFLAGS_BOSS;

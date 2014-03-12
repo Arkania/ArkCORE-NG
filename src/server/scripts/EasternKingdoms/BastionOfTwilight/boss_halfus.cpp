@@ -153,7 +153,7 @@ class boss_halfus : public CreatureScript
 
             void InitializeAI()
             {
-              if(!me->isDead())
+              if(!me->IsDead())
                 Reset();
             }
 
@@ -202,7 +202,7 @@ class boss_halfus : public CreatureScript
                 summons.Summon(summon);
                 summon->setActive(true);
             
-                if(me->isInCombat())
+                if(me->IsInCombat())
                 summon->AI()->DoZoneInCombat();
             }
 
@@ -220,7 +220,7 @@ class boss_halfus : public CreatureScript
                 Talk(SAY_AGGRO);
 
                 if (Creature* behemoth = me->FindNearestCreature(NPC_PROTO_BEHEMOTH, 500.0f, true))
-                    behemoth->AI()->AttackStart(me->getVictim());
+                    behemoth->AI()->AttackStart(me->GetVictim());
 
                 if(instance)
                 {
@@ -564,7 +564,7 @@ class npc_proto_behemoth : public CreatureScript
                     return;
 
                 if (Creature* Halfus = me->FindNearestCreature(NPC_HALFUS_WORMBREAKER, 500.0f, true))
-                    if (!Halfus->isInCombat())
+                    if (!Halfus->IsInCombat())
                         me->AI()->EnterEvadeMode();
 
                 if (me->HasAura(SPELL_DANCING_FLAMES) && !canBarrage)
@@ -789,7 +789,7 @@ public:
                     me->AddAura(SPELL_ATROPHIC_POISON, behemoth);
                     behemoth->SetAuraStack(SPELL_ATROPHIC_POISON, behemoth, 8);
 
-                    if (!Halfus->isInCombat())
+                    if (!Halfus->IsInCombat())
                         Halfus->AI()->DoZoneInCombat(Halfus, 150.0f);
                     Halfus->AddAura(SPELL_BIND_WILL, me);
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -836,12 +836,12 @@ public:
         {
             if (GetCaster()->HasAura(SPELL_TIME_DILATION))
             {
-                if (Unit* victim = GetCaster()->getVictim())
+                if (Unit* victim = GetCaster()->GetVictim())
                     GetCaster()->CastSpell(victim, SPELL_FIREBALL_BARRAGE_DAMAGE_TD, false);
             }
             else
             {
-                if (Unit* victim = GetCaster()->getVictim())
+                if (Unit* victim = GetCaster()->GetVictim())
                     GetCaster()->CastSpell(victim, SPELL_FIREBALL_BARRAGE_DAMAGE, false);
             }
         }
@@ -879,7 +879,7 @@ public:
 
         void HandleDummy(SpellEffIndex effIndex)
         {
-            GetCaster()->CastSpell(GetCaster()->getVictim(), SPELL_FIREBALL_BARRAGE_DAMAGE_TD, false);
+            GetCaster()->CastSpell(GetCaster()->GetVictim(), SPELL_FIREBALL_BARRAGE_DAMAGE_TD, false);
         }
 
         void Register()

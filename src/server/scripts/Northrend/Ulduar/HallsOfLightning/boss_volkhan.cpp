@@ -161,7 +161,7 @@ public:
                     {
                         Map::PlayerList const &players = map->GetPlayers();
                         for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                            itr->getSource()->CompletedAchievement(AchievShatterResistant);
+                            itr->GetSource()->CompletedAchievement(AchievShatterResistant);
                     }
                 }
             }
@@ -181,7 +181,7 @@ public:
             {
                 if (Creature* temp = Unit::GetCreature(*me, *itr))
                 {
-                    if (temp->isAlive())
+                    if (temp->IsAlive())
                         temp->DespawnOrUnsummon();
                 }
             }
@@ -199,7 +199,7 @@ public:
                 if (Creature* temp = Unit::GetCreature(*me, *itr))
                 {
                     // Only shatter brittle golems
-                    if (temp->isAlive() && temp->GetEntry() == NPC_BRITTLE_GOLEM)
+                    if (temp->IsAlive() && temp->GetEntry() == NPC_BRITTLE_GOLEM)
                     {
                         temp->CastSpell(temp, DUNGEON_MODE(SPELL_SHATTER_N, SPELL_SHATTER_H), false);
                         GolemsShattered += 1;
@@ -241,8 +241,8 @@ public:
                 if (m_uiPause_Timer <= uiDiff)
                 {
                     if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() != CHASE_MOTION_TYPE)
-                        if (me->getVictim())
-                            me->GetMotionMaster()->MoveChase(me->getVictim());
+                        if (me->GetVictim())
+                            me->GetMotionMaster()->MoveChase(me->GetVictim());
 
                     m_bHasTemper = false;
                     m_bIsStriking = false;
@@ -448,7 +448,7 @@ public:
 
             if (m_uiImmolation_Timer <= uiDiff)
             {
-                DoCast(me->getVictim(), SPELL_IMMOLATION_STRIKE_N);
+                DoCast(me->GetVictim(), SPELL_IMMOLATION_STRIKE_N);
                 m_uiImmolation_Timer = 5000;
             }
             else

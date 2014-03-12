@@ -178,7 +178,7 @@ class boss_ignis : public CreatureScript
                     summon->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_PACIFIED | UNIT_FLAG_STUNNED | UNIT_FLAG_DISABLE_MOVE);
                 }
 
-                summon->AI()->AttackStart(me->getVictim());
+                summon->AI()->AttackStart(me->GetVictim());
                 summon->AI()->DoZoneInCombat();
                 summons.Summon(summon);
             }
@@ -254,7 +254,7 @@ class boss_ignis : public CreatureScript
                             break;
                         case EVENT_SCORCH:
                             DoScriptText(RAND(SAY_SCORCH_1, SAY_SCORCH_2), me);
-                            if (Unit* target = me->getVictim())
+                            if (Unit* target = me->GetVictim())
                                 me->SummonCreature(NPC_GROUND_SCORCH, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 45000);
                             DoCast(SPELL_SCORCH);
                             events.ScheduleEvent(EVENT_SCORCH, 25000);
@@ -455,7 +455,7 @@ class spell_ignis_slag_pot : public SpellScriptLoader
 
             void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
-                if (GetTarget()->isAlive())
+                if (GetTarget()->IsAlive())
                     GetTarget()->CastSpell(GetTarget(), SPELL_SLAG_IMBUED, true);
             }
 

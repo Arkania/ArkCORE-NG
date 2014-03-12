@@ -174,7 +174,7 @@ class instance_ulduar : public InstanceMapScript
                 {
                     Map::PlayerList const& Players = instance->GetPlayers();
                     if (!Players.isEmpty())
-                        if (Player* player = Players.begin()->getSource())
+                        if (Player* player = Players.begin()->GetSource())
                             TeamInInstance = player->GetTeam();
                 }
 
@@ -480,7 +480,7 @@ class instance_ulduar : public InstanceMapScript
             {
                 // Flame Leviathan's Tower Event triggers
                 Creature* FlameLeviathan = instance->GetCreature(LeviathanGUID);
-                if (FlameLeviathan && FlameLeviathan->isAlive()) // No leviathan, no event triggering ;)
+                if (FlameLeviathan && FlameLeviathan->IsAlive()) // No leviathan, no event triggering ;)
                 {
                     switch (eventId)
                     {
@@ -570,7 +570,7 @@ class instance_ulduar : public InstanceMapScript
                             // get item level (recheck weapons)
                             Map::PlayerList const& players = instance->GetPlayers();
                             for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                                if (Player* player = itr->getSource())
+                                if (Player* player = itr->GetSource())
                                     for (uint8 slot = EQUIPMENT_SLOT_MAINHAND; slot <= EQUIPMENT_SLOT_RANGED; ++slot)
                                         if (Item* item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
                                             if (item->GetTemplate()->ItemLevel > _maxWeaponItemLevel)
@@ -582,7 +582,7 @@ class instance_ulduar : public InstanceMapScript
                             Map::PlayerList const& players = instance->GetPlayers();
                             for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                             {
-                                if (Player* player = itr->getSource())
+                                if (Player* player = itr->GetSource())
                                 {
                                     for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; ++slot)
                                     {

@@ -199,7 +199,7 @@ class boss_rajh : public CreatureScript
 
                 if (leap_timer <= uiDiff && leap == true)
                 {                
-                    DoCast(me->getVictim(), SPELL_INFERNO_LEAP);
+                    DoCast(me->GetVictim(), SPELL_INFERNO_LEAP);
                     leap = false;
                 } else leap_timer -= uiDiff;
 

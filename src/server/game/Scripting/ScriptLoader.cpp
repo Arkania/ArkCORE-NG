@@ -240,6 +240,35 @@ void AddSC_boss_venoxis();
 void AddSC_boss_wushoolay();
 void AddSC_boss_zanzil();
 void AddSC_instance_zulgurub();
+void AddSC_boss_pit_lord_argaloth();
+void AddSC_instance_baradin_hold();
+void AddSC_boss_assembly_of_ascendents();
+void AddSC_boss_ascendant_lord_obsidius();
+void AddSC_boss_beauty();
+void AddSC_boss_corla_herald_of_twilight();
+void AddSC_boss_karsh_steelbender();
+void AddSC_boss_romogg_bonecrusher();
+void AddSC_instance_blackrock_caverns();
+void AddSC_boss_gizrul_the_slavener();
+void AddSC_boss_urok_doomhowl();
+void AddSC_boss_lord_valthalak();
+void AddSC_boss_drahga_shadowburner();
+void AddSC_boss_erudax();
+void AddSC_boss_throngus();
+void AddSC_boss_general_umbriss();
+void AddSC_instance_grim_batol();
+void AddSC_npc_trash_grim_batol();
+void AddSC_boss_kirtonos_the_herald();
+void AddSC_instance_the_stockade();
+void AddSC_boss_commander_ulthok();
+void AddSC_boss_erunak_stonespeaker();
+void AddSC_boss_lady_nazjar();
+void AddSC_instance_throne_of_the_tides();
+void AddSC_neptulon();
+void AddSC_coldridge_valley();
+void AddSC_elwynn_forest();
+
+
 
 //void AddSC_alterac_mountains();
 void AddSC_arathi_highlands();
@@ -989,6 +1018,36 @@ void AddEasternKingdomsScripts()
     AddSC_western_plaguelands();
     AddSC_westfall();
     AddSC_wetlands();
+	AddSC_boss_pit_lord_argaloth();
+	AddSC_instance_baradin_hold();
+	AddSC_boss_assembly_of_ascendents();
+	AddSC_boss_ascendant_lord_obsidius();
+	AddSC_boss_beauty();
+	AddSC_boss_corla_herald_of_twilight();
+	AddSC_boss_karsh_steelbender();
+	AddSC_boss_romogg_bonecrusher();
+	AddSC_instance_blackrock_caverns();
+	AddSC_boss_gizrul_the_slavener();
+	AddSC_boss_urok_doomhowl();
+	AddSC_boss_lord_valthalak();
+	AddSC_boss_drahga_shadowburner();
+	AddSC_boss_erudax();
+	AddSC_boss_throngus();
+	AddSC_boss_general_umbriss();
+	AddSC_instance_grim_batol();
+	AddSC_npc_trash_grim_batol();
+	AddSC_boss_kirtonos_the_herald();
+	AddSC_instance_the_stockade();
+    AddSC_boss_commander_ulthok();
+    AddSC_boss_erunak_stonespeaker();
+    AddSC_boss_lady_nazjar();
+    AddSC_instance_throne_of_the_tides();
+    AddSC_neptulon();
+	AddSC_coldridge_valley();
+	AddSC_elwynn_forest();
+
+
+
 #endif
 }
 
