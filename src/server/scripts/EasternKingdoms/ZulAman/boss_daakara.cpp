@@ -215,7 +215,7 @@ public:
             summons.Summon(summon);
 			summon->setActive(true);
  
-			if (me->isInCombat())
+			if (me->IsInCombat())
 			    summon->AI()->DoZoneInCombat();
         }
 
@@ -272,7 +272,7 @@ public:
                     events.ScheduleEvent(EVENT_OVERPOWER, 15000);
                     events.ScheduleEvent(EVENT_CREEPING_PARALYSIS, 9000);
 
-                    me->AI()->AttackStart(me->getVictim());
+                    me->AI()->AttackStart(me->GetVictim());
                     break;
 
                 case PHASE_LYNX:
@@ -286,7 +286,7 @@ public:
                     events.ScheduleEvent(EVENT_LYNX_RUSH, 14000);
                     events.ScheduleEvent(EVENT_SUMMON_LYNX, 2000);
 
-                    me->AI()->AttackStart(me->getVictim());
+                    me->AI()->AttackStart(me->GetVictim());
                     break;
 
                 case PHASE_EAGLE:
@@ -298,7 +298,7 @@ public:
 
                     Map::PlayerList const& players = me->GetMap()->GetPlayers();
                     for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                        if (Player* player = itr->getSource())
+                        if (Player* player = itr->GetSource())
                         {
                             Creature* Vortex = me->SummonCreature(CREATURE_FEATHER_VORTEX, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetOrientation(), TEMPSUMMON_MANUAL_DESPAWN);
                             if (Vortex)
@@ -331,7 +331,7 @@ public:
                     events.ScheduleEvent(EVENT_FLAME_WHIRL, 5000);
                     events.ScheduleEvent(EVENT_PILLAR_OF_FIRE, 6000);
 
-                    me->AI()->AttackStart(me->getVictim());
+                    me->AI()->AttackStart(me->GetVictim());
                     break;
 
                 default:
@@ -422,7 +422,7 @@ public:
 						{
                             Map::PlayerList const& players = me->GetMap()->GetPlayers();
                             for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                                if (Player* player = itr->getSource())
+                                if (Player* player = itr->GetSource())
                                     DoCast(player, SPELL_CREEPING_PARALYSIS);
 
                             events.ScheduleEvent(EVENT_CREEPING_PARALYSIS, urand(19000, 21000));
@@ -608,7 +608,7 @@ public:
         void UpdateAI(const uint32 /*diff*/)
         {
             // if the vortex reach the target, it change his target to another player (not used, they move on sweeping winds!).
-            // if (me->IsWithinMeleeRange(me->getVictim()))
+            // if (me->IsWithinMeleeRange(me->GetVictim()))
             //    AttackStart(SelectTarget(SELECT_TARGET_RANDOM, 0));
         }
     };

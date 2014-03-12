@@ -510,7 +510,7 @@ bool ChatHandler::HandleCreatePetCommand(const char* /*args*/)
     Player* player = m_session->GetPlayer();
     Creature* creatureTarget = getSelectedCreature();
 
-    if (!creatureTarget || creatureTarget->isPet() || creatureTarget->GetTypeId() == TYPEID_PLAYER)
+    if (!creatureTarget || creatureTarget->IsPet() || creatureTarget->GetTypeId() == TYPEID_PLAYER)
     {
         PSendSysMessage(LANG_SELECT_CREATURE);
         SetSentErrorMessage(true);

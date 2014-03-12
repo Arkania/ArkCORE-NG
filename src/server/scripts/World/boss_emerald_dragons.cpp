@@ -686,7 +686,7 @@ class boss_taerar : public CreatureScript
 
             void UpdateAI(uint32 const diff)
             {
-                if (!me->isInCombat())
+                if (!me->IsInCombat())
                     return;
 
                 if (_banished)

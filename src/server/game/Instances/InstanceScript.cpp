@@ -91,15 +91,15 @@ void InstanceScript::UpdateMinionState(Creature* minion, EncounterState state)
     switch (state)
     {
         case NOT_STARTED:
-            if (!minion->isAlive())
+            if (!minion->IsAlive())
                 minion->Respawn();
-            else if (minion->isInCombat())
+            else if (minion->IsInCombat())
                 minion->AI()->EnterEvadeMode();
             break;
         case IN_PROGRESS:
-            if (!minion->isAlive())
+            if (!minion->IsAlive())
                 minion->Respawn();
-            else if (!minion->getVictim())
+            else if (!minion->GetVictim())
                 minion->AI()->DoZoneInCombat();
             break;
         default:
@@ -211,7 +211,7 @@ bool InstanceScript::SetBossState(uint32 id, EncounterState state)
 
             if (state == DONE)
                 for (MinionSet::iterator i = bossInfo->minion.begin(); i != bossInfo->minion.end(); ++i)
-                    if ((*i)->isWorldBoss() && (*i)->isAlive())
+                    if ((*i)->isWorldBoss() && (*i)->IsAlive())
                         return false;
 
             bossInfo->state = state;
@@ -232,11 +232,11 @@ bool InstanceScript::SetBossState(uint32 id, EncounterState state)
 
             for(Map::PlayerList::const_iterator itr = instance->GetPlayers().begin(); itr != instance->GetPlayers().end();++itr)
             {
-                if(pGuild != itr->getSource()->GetGuild())
-                    pGuild = itr->getSource()->GetGuild();
+                if(pGuild != itr->GetSource()->GetGuild())
+                    pGuild = itr->GetSource()->GetGuild();
 
                 if(pGuild)
-                    pGuild->GetChallengesMgr()->CheckInstanceChallenge(this,itr->getSource()->GetGroup());
+                    pGuild->GetChallengesMgr()->CheckInstanceChallenge(this,itr->GetSource()->GetGroup());
             }
         }
 
@@ -313,7 +313,7 @@ void InstanceScript::DoUpdateWorldState(uint32 uiStateId, uint32 uiStateData)
     if (!lPlayers.isEmpty())
     {
         for (Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
-            if (Player* player = itr->getSource())
+            if (Player* player = itr->GetSource())
                 player->SendUpdateWorldState(uiStateId, uiStateData);
     }
     else
@@ -333,7 +333,7 @@ void InstanceScript::DoSendNotifyToInstance(char const* format, ...)
         vsnprintf(buff, 1024, format, ap);
         va_end(ap);
         for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
-            if (Player* player = i->getSource())
+            if (Player* player = i->GetSource())
                 if (WorldSession* session = player->GetSession())
                     session->SendNotification("%s", buff);
     }
@@ -346,7 +346,7 @@ void InstanceScript::DoUpdateAchievementCriteria(AchievementCriteriaTypes type, 
 
     if (!PlayerList.isEmpty())
         for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-            if (Player* player = i->getSource())
+            if (Player* player = i->GetSource())
                 player->UpdateAchievementCriteria(type, miscValue1, miscValue2, 0, unit);
 }
 
@@ -357,7 +357,7 @@ void InstanceScript::DoStartTimedAchievement(AchievementCriteriaTimedTypes type,
 
     if (!PlayerList.isEmpty())
         for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-            if (Player* player = i->getSource())
+            if (Player* player = i->GetSource())
                 player->GetAchievementMgr().StartTimedAchievement(type, entry);
 }
 
@@ -368,7 +368,7 @@ void InstanceScript::DoStopTimedAchievement(AchievementCriteriaTimedTypes type, 
 
     if (!PlayerList.isEmpty())
         for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-            if (Player* player = i->getSource())
+            if (Player* player = i->GetSource())
                 player->GetAchievementMgr().RemoveTimedAchievement(type, entry);
 }
 
@@ -380,7 +380,7 @@ void InstanceScript::DoRemoveAurasDueToSpellOnPlayers(uint32 spell)
     {
         for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
         {
-            if (Player* player = itr->getSource())
+            if (Player* player = itr->GetSource())
             {
                 player->RemoveAurasDueToSpell(spell);
                 if (Pet* pet = player->GetPet())
@@ -397,7 +397,7 @@ void InstanceScript::DoCastSpellOnPlayers(uint32 spell)
 
     if (!PlayerList.isEmpty())
         for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-            if (Player* player = i->getSource())
+            if (Player* player = i->GetSource())
                 player->CastSpell(player, spell, true);
 }
 
@@ -408,7 +408,7 @@ void InstanceScript::NormaliseAltPower()
 
     if (!PlayerList.isEmpty())
         for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-            if (Player* player = i->getSource())
+            if (Player* player = i->GetSource())
                 player->SetAltPower(player->GetPower(POWER_ALTERNATE_POWER));
 }
 
@@ -419,7 +419,7 @@ void InstanceScript::DoAddAuraOnPlayers(uint32 spell)
 
     if (!PlayerList.isEmpty())
         for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-            if (Player* player = i->getSource())
+            if (Player* player = i->GetSource())
                 player->AddAura(spell, player);
 }
 
@@ -481,7 +481,7 @@ void InstanceScript::UpdateEncounterState(EncounterCreditType type, uint32 credi
                 Map::PlayerList const& players = instance->GetPlayers();
                 if (!players.isEmpty())
                     for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
-                        if (Player* player = i->getSource())
+                        if (Player* player = i->GetSource())
                             if (!source || player->IsAtGroupRewardDistance(source))
                                 sLFGMgr->RewardDungeonDoneFor(dungeonId, player);
             }
@@ -497,6 +497,6 @@ void InstanceScript::UpdatePhasing()
 
     Map::PlayerList const& players = instance->GetPlayers();
     for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-        if (Player* player = itr->getSource())
+        if (Player* player = itr->GetSource())
             player->GetPhaseMgr().NotifyConditionChanged(phaseUdateData);
 }

@@ -377,7 +377,7 @@ public:
                     case EVENT_MAGMA_SPIT:
                         me->AttackStop();
                         CastMagmaSpit();
-                        me->Attack(me->getVictim(), true);
+                        me->Attack(me->GetVictim(), true);
                         events.ScheduleEvent(EVENT_MAGMA_SPIT, urand(8000, 11000));
                         break;
 
@@ -414,7 +414,7 @@ public:
                         break;
 
                     case EVENT_MANGLE:
-                        if (Unit* victim = me->getVictim())
+                        if (Unit* victim = me->GetVictim())
                         {
                             if (victim->GetTypeId() == TYPEID_PLAYER)
                             {
@@ -631,7 +631,7 @@ public:
             {
                 for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                 {
-                    DoCast(i->getSource(), Spell);
+                    DoCast(i->GetSource(), Spell);
                 }
             }
         }
@@ -644,7 +644,7 @@ public:
                 for (uint8 i = 0; i <= (Is25ManRaid() ? 8 : 2); ++i)
                     if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, i))
                     {
-                        if (!me->IsWithinDistInMap(me->getVictim(), 15.0f)) // Check tank in range for enrage.
+                        if (!me->IsWithinDistInMap(me->GetVictim(), 15.0f)) // Check tank in range for enrage.
                             DoCast(target, SPELL_MAGMA_SPIT_TANTRUM);
                         else
                             DoCast(target, SPELL_MAGMA_SPIT_N);
@@ -784,7 +784,7 @@ public:
                         break;
 
                     case EVENT_FIERY_SLASH:
-                        DoCast(me->getVictim(), SPELL_FIERY_SLASH);
+                        DoCast(me->GetVictim(), SPELL_FIERY_SLASH);
                         events.ScheduleEvent(EVENT_FIERY_SLASH, urand(13000, 17000));
                         break;
                 }

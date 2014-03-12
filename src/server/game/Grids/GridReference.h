@@ -32,18 +32,18 @@ class GridReference : public Reference<GridRefManager<OBJECT>, OBJECT>
         void targetObjectBuildLink()
         {
             // called from link()
-            this->getTarget()->insertFirst(this);
-            this->getTarget()->incSize();
+            this->GetTarget()->insertFirst(this);
+            this->GetTarget()->incSize();
         }
         void targetObjectDestroyLink()
         {
             // called from unlink()
-            if (this->isValid()) this->getTarget()->decSize();
+            if (this->isValid()) this->GetTarget()->decSize();
         }
         void sourceObjectDestroyLink()
         {
             // called from invalidate()
-            this->getTarget()->decSize();
+            this->GetTarget()->decSize();
         }
     public:
         GridReference() : Reference<GridRefManager<OBJECT>, OBJECT>() {}

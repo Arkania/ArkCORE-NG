@@ -323,7 +323,7 @@ public:
                 
                 case EVENT_WAIT_SWITCH_PHASE:
                     me->SetReactState(REACT_AGGRESSIVE);
-                    me->GetMotionMaster()->MoveChase(me->getVictim());
+                    me->GetMotionMaster()->MoveChase(me->GetVictim());
 
                     // Intialize Phase Events
                     switch(phase)
@@ -460,7 +460,7 @@ public:
                     Map::PlayerList const &PlayerList = me->GetMap()->GetPlayers();
                     if (!PlayerList.isEmpty())
                     for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-                    me->AddAura(SPELL_ACID_NOVA,  i->getSource());
+                    me->AddAura(SPELL_ACID_NOVA,  i->GetSource());
                     }
                     events.ScheduleEvent(EVENT_ACID_NOVA, urand(20000, 30000));
                     break;
@@ -651,7 +651,7 @@ public:
             Map::PlayerList const &PlayerList = me->GetMap()->GetPlayers();
             if (!PlayerList.isEmpty())
                 for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-                    me->AddAura(SPELL_DEBILITATING_SLIME_DEBUFF,  i->getSource());
+                    me->AddAura(SPELL_DEBILITATING_SLIME_DEBUFF,  i->GetSource());
 
             // Maloriak and all his Minions
             me->AddAura(SPELL_DEBILITATING_SLIME_DEBUFF, me);

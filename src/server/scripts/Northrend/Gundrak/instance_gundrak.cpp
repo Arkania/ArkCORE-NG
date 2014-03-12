@@ -148,7 +148,7 @@ public:
                 case CREATURE_DRAKKARICOLOSSUS: uiDrakkariColossus = creature->GetGUID(); break;
                 case CREATURE_ECK: uiEckTheFerocious = creature->GetGUID(); break;
                 case CREATURE_RUIN_DWELLER:
-                    if (creature->isAlive())
+                    if (creature->IsAlive())
                         DwellerGUIDs.insert(creature->GetGUID());
                     break;
             }

@@ -374,7 +374,7 @@ void WorldSession::HandleSetEveryoneIsAssistant(WorldPacket& recvData)
     if (active)
     {
         for (GroupReference *itr = group->GetFirstMember(); itr != NULL; itr = itr->next()) // Loop through all members
-            if (Player *player = itr->getSource())
+            if (Player *player = itr->GetSource())
                 group->SetGroupMemberFlag(player->GetGUID(), active, MEMBER_FLAG_ASSISTANT);
 
         group->SendUpdate();
@@ -382,7 +382,7 @@ void WorldSession::HandleSetEveryoneIsAssistant(WorldPacket& recvData)
     else
     {
         for (GroupReference *itr = group->GetFirstMember(); itr != NULL; itr = itr->next()) // Loop through all members
-            if (Player *player = itr->getSource())
+            if (Player *player = itr->GetSource())
                 group->SetGroupMemberFlag(player->GetGUID(), !active, MEMBER_FLAG_ASSISTANT);
 
         group->SendUpdate();
@@ -1013,7 +1013,7 @@ void WorldSession::BuildPartyMemberStatsChangedPacket(Player* player, WorldPacke
             if (player->IsPvP())
                 playerStatus |= MEMBER_STATUS_PVP;
 
-            if (!player->isAlive())
+            if (!player->IsAlive())
             {
                 if (player->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))
                     playerStatus |= MEMBER_STATUS_GHOST;

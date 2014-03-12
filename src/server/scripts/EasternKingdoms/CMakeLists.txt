@@ -28,6 +28,7 @@ set(scripts_STAT_SRCS
   EasternKingdoms/Scholomance/instance_scholomance.cpp
   EasternKingdoms/Scholomance/boss_lorekeeper_polkelt.cpp
   EasternKingdoms/Scholomance/boss_ras_frostwhisper.cpp
+  EasternKingdoms/Scholomance/boss_kirtonos_the_herald.cpp
   EasternKingdoms/ZulGurub/boss_grilek.cpp
   EasternKingdoms/ZulGurub/boss_hazzarah.cpp
   EasternKingdoms/ZulGurub/boss_jindo_the_godbreaker.cpp
@@ -114,6 +115,9 @@ set(scripts_STAT_SRCS
   EasternKingdoms/BlackrockSpire/boss_the_beast.cpp
   EasternKingdoms/BlackrockSpire/blackrock_spire.h
   EasternKingdoms/BlackrockSpire/instance_blackrock_spire.cpp
+  EasternKingdoms/BlackrockSpire/boss_gizrul_the_slavener.cpp
+  EasternKingdoms/BlackrockSpire/boss_urok_doomhowl.cpp
+  EasternKingdoms/BlackrockSpire/boss_lord_valthalak.cpp  
   EasternKingdoms/SunwellPlateau/boss_eredar_twins.cpp
   EasternKingdoms/SunwellPlateau/boss_kiljaeden.cpp
   EasternKingdoms/SunwellPlateau/sunwell_plateau.h
@@ -187,6 +191,8 @@ set(scripts_STAT_SRCS
   EasternKingdoms/BaradinHold/boss_alizabal.cpp
   EasternKingdoms/BaradinHold/boss_occuthar.cpp
   EasternKingdoms/BaradinHold/bh_trash.cpp
+  EasternKingdoms/BaradinHold/boss_pit_lord_argaloth.cpp
+  EasternKingdoms/BaradinHold/instance_baradin_hold.cpp
   EasternKingdoms/BastionOfTwilight/bastion_of_twilight.h;
   EasternKingdoms/BastionOfTwilight/bastion_of_twilight.cpp;
   EasternKingdoms/BastionOfTwilight/instance_bastion_of_twilight.cpp;
@@ -195,6 +201,29 @@ set(scripts_STAT_SRCS
   EasternKingdoms/BastionOfTwilight/boss_ascendant_council.cpp;
   EasternKingdoms/BastionOfTwilight/boss_chogall.cpp;
   EasternKingdoms/BastionOfTwilight/boss_sinestra.cpp;
+  EasternKingdoms/BastionOfTwilight/boss_assembly_of_ascendents.cpp
+  EasternKingdoms/BlackrockCaverns/blackrock_caverns.h
+  EasternKingdoms/BlackrockCaverns/boss_ascendant_lord_obsidius.cpp
+  EasternKingdoms/BlackrockCaverns/boss_beauty.cpp
+  EasternKingdoms/BlackrockCaverns/boss_corla_herald_of_twilight.cpp
+  EasternKingdoms/BlackrockCaverns/boss_karsh_steelbender.cpp
+  EasternKingdoms/BlackrockCaverns/boss_romogg_bonecrusher.cpp 
+  EasternKingdoms/BlackrockCaverns/instance_blackrock_caverns.cpp    
+  EasternKingdoms/GrimBatol/boss_drahga.cpp
+  EasternKingdoms/GrimBatol/boss_erudax.cpp
+  EasternKingdoms/GrimBatol/boss_throngus.cpp
+  EasternKingdoms/GrimBatol/boss_umbriss.cpp
+  EasternKingdoms/GrimBatol/grimbatol.h
+  EasternKingdoms/GrimBatol/instance_grim_batol.cpp
+  EasternKingdoms/GrimBatol/mob_trash_grimbatol.cpp
+  EasternKingdoms/TheStockade/instance_the_stockade.cpp
+  EasternKingdoms/ThroneOfTheTides/throne_of_the_tides.h
+  EasternKingdoms/ThroneOfTheTides/boss_commander_ulthok.cpp
+  EasternKingdoms/ThroneOfTheTides/boss_erunak_stonespeaker.cpp
+  EasternKingdoms/ThroneOfTheTides/boss_lady_nazjar.cpp
+  EasternKingdoms/ThroneOfTheTides/npc_neptulon.cpp
+  EasternKingdoms/ThroneOfTheTides/instance_throne_of_the_tides.cpp   
+
   
   EasternKingdoms/zone_alterac_mountains.cpp
   EasternKingdoms/zone_alterac_valley.cpp  
@@ -220,8 +249,9 @@ set(scripts_STAT_SRCS
   EasternKingdoms/zone_redridge_mountains.cpp
   EasternKingdoms/zone_ironforge.cpp
   EasternKingdoms/zone_eastern_plaguelands.cpp
-
-
+  EasternKingdoms/zone_gilneas.cpp
+  EasternKingdoms/zone_elwynn_forest.cpp
+  EasternKingdoms/zone_coldridge_valley.cpp 
   
 )
 

@@ -56,7 +56,7 @@ enum SpellScriptState
 class _SpellScript
 {
     // internal use classes & functions
-    // DO NOT OVERRIDE THESE IN SCRIPTS
+    // DO NOT  THESE IN SCRIPTS
     protected:
         virtual bool _Validate(SpellInfo const* entry);
 
@@ -149,7 +149,7 @@ enum SpellScriptHookType
 class SpellScript : public _SpellScript
 {
     // internal use classes & functions
-    // DO NOT OVERRIDE THESE IN SCRIPTS
+    // DO NOT  THESE IN SCRIPTS
     public:
         #define SPELLSCRIPT_FUNCTION_TYPE_DEFINES(CLASSNAME) \
             typedef SpellCastResult(CLASSNAME::*SpellCheckCastFnType)(); \
@@ -437,7 +437,7 @@ enum AuraScriptHookType
 class AuraScript : public _SpellScript
 {
     // internal use classes & functions
-    // DO NOT OVERRIDE THESE IN SCRIPTS
+    // DO NOT  THESE IN SCRIPTS
     public:
 
     #define AURASCRIPT_FUNCTION_TYPE_DEFINES(CLASSNAME) \

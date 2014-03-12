@@ -128,8 +128,8 @@ class boss_occuthar : public CreatureScript
                        {
                        const std::list<HostileReference*>& threatlist = me->getThreatManager().getThreatList();
                          for (std::list<HostileReference*>::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
-                             if ((*itr)->getTarget()->GetTypeId() == TYPEID_PLAYER)
-                                targetList.push_back((*itr)->getTarget());
+                             if ((*itr)->GetTarget()->GetTypeId() == TYPEID_PLAYER)
+                                targetList.push_back((*itr)->GetTarget());
                         }
 
                          for (std::list<Unit*>::iterator itr = targetList.begin(); itr != targetList.end(); ++itr)
@@ -146,7 +146,7 @@ class boss_occuthar : public CreatureScript
 
                 if (m_uiSearingShadowsTimer <= uiDiff)
                 {
-                    DoCast(me->getVictim(), SPELL_SEARING_SHADOWS);
+                    DoCast(me->GetVictim(), SPELL_SEARING_SHADOWS);
                     m_uiSearingShadowsTimer = 20000;
                 }
                 else

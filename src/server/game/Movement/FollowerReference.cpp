@@ -23,16 +23,16 @@
 
 void FollowerReference::targetObjectBuildLink()
 {
-    getTarget()->addFollower(this);
+    GetTarget()->addFollower(this);
 }
 
 void FollowerReference::targetObjectDestroyLink()
 {
-    getTarget()->removeFollower(this);
+    GetTarget()->removeFollower(this);
 }
 
 void FollowerReference::sourceObjectDestroyLink()
 {
-    getSource()->stopFollowing();
+    GetSource()->stopFollowing();
 }
 

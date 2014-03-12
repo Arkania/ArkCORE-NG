@@ -212,7 +212,7 @@ public:
         void SummonedCreatureDespawn(Creature* summon)
         {
             if (summon->GetEntry() == NPC_SNOBOLD_VASSAL)
-                if (summon->isAlive())
+                if (summon->IsAlive())
                     ++m_uiSummonCount;
             Summons.Despawn(summon);
         }
@@ -327,7 +327,7 @@ public:
         void JustDied(Unit* /*killer*/)
         {
             if (Unit* target = Unit::GetPlayer(*me, m_uiTargetGUID))
-                if (target->isAlive())
+                if (target->IsAlive())
                     target->RemoveAurasDueToSpell(SPELL_SNOBOLLED);
             if (instance)
                 instance->SetData(DATA_SNOBOLD_COUNT, DECREASE);
@@ -340,12 +340,12 @@ public:
 
             if (Unit* target = Unit::GetPlayer(*me, m_uiTargetGUID))
             {
-                if (!target->isAlive())
+                if (!target->IsAlive())
                 {
                     if (instance)
                     {
                         Unit* gormok = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_GORMOK));
-                        if (gormok && gormok->isAlive())
+                        if (gormok && gormok->IsAlive())
                         {
                             SetCombatMovement(false);
                             m_bTargetDied = true;
@@ -414,7 +414,7 @@ struct boss_jormungarAI : public ScriptedAI
         {
             if (Creature* otherWorm = Unit::GetCreature(*me, instanceScript->GetData64(otherWormEntry)))
             {
-                if (!otherWorm->isAlive())
+                if (!otherWorm->IsAlive())
                 {
                     instanceScript->SetData(TYPE_NORTHREND_BEASTS, SNAKES_DONE);
 
@@ -576,7 +576,7 @@ struct boss_jormungarAI : public ScriptedAI
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
                 SetCombatMovement(true);
-                me->GetMotionMaster()->MoveChase(me->getVictim());
+                me->GetMotionMaster()->MoveChase(me->GetVictim());
                 stage = 0;
                 break;
         }
@@ -968,8 +968,8 @@ public:
                         Map::PlayerList const &lPlayers = me->GetMap()->GetPlayers();
                         for (Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
                         {
-                            if (Unit* player = itr->getSource())
-                                if (player->isAlive() && player->IsWithinDistInMap(me, 6.0f))
+                            if (Unit* player = itr->GetSource())
+                                if (player->IsAlive() && player->IsWithinDistInMap(me, 6.0f))
                                 {
                                     DoCastAOE(SPELL_TRAMPLE);
                                     m_uiTrampleTimer = IN_MILLISECONDS;
@@ -986,7 +986,7 @@ public:
                     }
                     m_bMovementStarted = false;
                     me->GetMotionMaster()->MovementExpired();
-                    me->GetMotionMaster()->MoveChase(me->getVictim());
+                    me->GetMotionMaster()->MoveChase(me->GetVictim());
                     SetCombatMovement(true);
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     m_uiStage = 0;

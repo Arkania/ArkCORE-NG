@@ -164,7 +164,7 @@ public:
             //Whirlwind
             if (Whirlwind_Timer <= diff)
             {
-                DoCast(me->getVictim(), SPELL_WHIRLWIND);
+                DoCast(me->GetVictim(), SPELL_WHIRLWIND);
                 Whirlwind_Timer = 20000+rand()%5000;
             } else Whirlwind_Timer -= diff;
 
@@ -172,7 +172,7 @@ public:
             if (Fear_Timer <= diff)
             {
                 DoScriptText(SAY_SHOUT, me);
-                DoCast(me->getVictim(), SPELL_FRIGHTENING_SHOUT);
+                DoCast(me->GetVictim(), SPELL_FRIGHTENING_SHOUT);
                 Fear_Timer = 25000+rand()%10000;
             } else Fear_Timer -= diff;
 
@@ -180,7 +180,7 @@ public:
             if (MortalStrike_Timer <= diff)
             {
                 DoScriptText(SAY_MORTAL, me);
-                DoCast(me->getVictim(), SPELL_MORTAL_STRIKE);
+                DoCast(me->GetVictim(), SPELL_MORTAL_STRIKE);
                 MortalStrike_Timer = 20000+rand()%10000;
             } else MortalStrike_Timer -= diff;
 

@@ -128,17 +128,17 @@ public:
             //ArcaneExplosion_Timer
             if (ArcaneExplosion_Timer <= diff)
             {
-                DoCast(me->getVictim(), SPELL_ARCANE_EXPLOSION);
+                DoCast(me->GetVictim(), SPELL_ARCANE_EXPLOSION);
                 ArcaneExplosion_Timer = urand(8000, 18000);
             } else ArcaneExplosion_Timer -= diff;
 
             //If we are within range melee the target
-            if (me->IsWithinMeleeRange(me->getVictim()))
+            if (me->IsWithinMeleeRange(me->GetVictim()))
             {
                 //Make sure our attack is ready and we arn't currently casting
                 if (me->isAttackReady() && !me->IsNonMeleeSpellCasted(false))
                 {
-                    me->AttackerStateUpdate(me->getVictim());
+                    me->AttackerStateUpdate(me->GetVictim());
                     me->resetAttackTimer();
                 }
             }else
@@ -146,7 +146,7 @@ public:
                 //EarthShock_Timer
                 if (EarthShock_Timer <= diff)
                 {
-                    DoCast(me->getVictim(), SPELL_EARTH_SHOCK);
+                    DoCast(me->GetVictim(), SPELL_EARTH_SHOCK);
                     EarthShock_Timer = 1000;
                 } else EarthShock_Timer -= diff;
             }

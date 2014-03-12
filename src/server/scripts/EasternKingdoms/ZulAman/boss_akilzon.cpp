@@ -159,7 +159,7 @@ public:
 			summons.Summon(summon);
 			summon->setActive(true);
  
-			if (me->isInCombat())
+			if (me->IsInCombat())
 			    summon->AI()->DoZoneInCombat();
         }
 
@@ -272,8 +272,8 @@ public:
                             Creature* creature = me->SummonCreature(MOB_SOARING_EAGLE, x, y, z, 0, TEMPSUMMON_CORPSE_DESPAWN, 0);
                             if (creature)
                             {
-                                creature->AddThreat(me->getVictim(), 1.0f);
-                                creature->AI()->AttackStart(me->getVictim());
+                                creature->AddThreat(me->GetVictim(), 1.0f);
+                                creature->AI()->AttackStart(me->GetVictim());
                             }
                         }
                         events.ScheduleEvent(EVENT_SUMMON_EAGLES, urand(50000, 60000));
@@ -405,7 +405,7 @@ public:
         {
             Map::PlayerList const& players = me->GetMap()->GetPlayers();
             for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-            	if (Player* player = itr->getSource())
+            	if (Player* player = itr->GetSource())
             		++numb;
         }
 

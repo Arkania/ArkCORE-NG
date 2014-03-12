@@ -99,7 +99,7 @@ public:
                     if(Creature* Anshal = instance->GetCreature(uiAnshal))
                         if(Creature* Nezir = instance->GetCreature(uiNezir))
                             if(Creature* Rohash = instance->GetCreature(uiRohash))
-                                if(!Anshal->isInCombat() && !Nezir->isInCombat() && !Rohash->isInCombat())
+                                if(!Anshal->IsInCombat() && !Nezir->IsInCombat() && !Rohash->IsInCombat())
                                     Encounter[0] = data;
                                 else
                                     return;

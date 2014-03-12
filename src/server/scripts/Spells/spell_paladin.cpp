@@ -401,7 +401,7 @@ class spell_pal_righteous_defense : public SpellScriptLoader
 
                 if (Unit* target = GetExplTargetUnit())
                 {
-                    if (!target->IsFriendlyTo(caster) || target->getAttackers().empty())
+                    if (!target->IsFriendlyTo(caster) || target->GetAttackers().empty())
                         return SPELL_FAILED_BAD_TARGETS;
                 }
                 else

@@ -154,7 +154,7 @@ class boss_alizabal : public CreatureScript
                         }
 						break;
                         case 1:
-                            DoCast(me->getVictim(), SPELL_SKEWER);
+                            DoCast(me->GetVictim(), SPELL_SKEWER);
                             Talk(SAY_SKEWER);
                             skewer = true;
                             seethingTimer = 8000;
@@ -168,7 +168,7 @@ class boss_alizabal : public CreatureScript
 
                 if (skewerTimer <= uiDiff && seething == true)
                 {
-                    DoCast(me->getVictim(), SPELL_SKEWER);
+                    DoCast(me->GetVictim(), SPELL_SKEWER);
                     Talk(SAY_SKEWER);
                     seething = false;
                 }
@@ -228,7 +228,7 @@ class boss_alizabal : public CreatureScript
                     if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == POINT_MOTION_TYPE)
                         me->GetMotionMaster()->MovementExpired();
 
-                    me->GetMotionMaster()->MoveChase(me->getVictim());
+                    me->GetMotionMaster()->MoveChase(me->GetVictim());
 
                     me->SetSpeed(MOVE_WALK, 1.0f);
                     me->SetSpeed(MOVE_RUN, 1.14f);

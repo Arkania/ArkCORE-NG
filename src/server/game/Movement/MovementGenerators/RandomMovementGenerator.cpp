@@ -117,7 +117,7 @@ void RandomMovementGenerator<Creature>::SetRandomLocation(Creature& creature)
 template<>
 void RandomMovementGenerator<Creature>::Initialize(Creature &creature)
 {
-    if (!creature.isAlive())
+    if (!creature.IsAlive())
         return;
 
     if (!_wanderDistance)

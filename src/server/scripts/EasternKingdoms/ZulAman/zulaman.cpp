@@ -156,7 +156,7 @@ public:
 
         bool OnGossipHello(Player* player, Creature* creature)
         {
-            if (creature->isQuestGiver())
+            if (creature->IsQuestGiver())
                 player->PrepareQuestMenu(creature->GetGUID());
 
             player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "We're ready to open the gates.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
@@ -698,7 +698,7 @@ class npc_zulaman_hierophant : public CreatureScript
 
             void UpdateAI(uint32 const diff)
             {
-                if (!UpdateVictim() && me->isInCombat() || me->HasUnitState(UNIT_STATE_CASTING))
+                if (!UpdateVictim() && me->IsInCombat() || me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
                 if (me->HealthBelowPct(36) && !gloryCasted)

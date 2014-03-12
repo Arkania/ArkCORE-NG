@@ -143,7 +143,7 @@ class boss_pathaleon_the_calculator : public CreatureScript
 
                 if (ManaTap_Timer <= diff)
                 {
-                    DoCast(me->getVictim(), SPELL_MANA_TAP);
+                    DoCast(me->GetVictim(), SPELL_MANA_TAP);
                     ManaTap_Timer = urand(14000, 22000);
                 }
                 else
@@ -151,7 +151,7 @@ class boss_pathaleon_the_calculator : public CreatureScript
 
                 if (ArcaneTorrent_Timer <= diff)
                 {
-                    DoCast(me->getVictim(), SPELL_ARCANE_TORRENT);
+                    DoCast(me->GetVictim(), SPELL_ARCANE_TORRENT);
                     ArcaneTorrent_Timer = urand(12000, 18000);
                 }
                 else
@@ -174,7 +174,7 @@ class boss_pathaleon_the_calculator : public CreatureScript
                 {
                     if (ArcaneExplosion_Timer <= diff)
                     {
-                        DoCast(me->getVictim(), H_SPELL_ARCANE_EXPLOSION);
+                        DoCast(me->GetVictim(), H_SPELL_ARCANE_EXPLOSION);
                         ArcaneExplosion_Timer = urand(10000, 14000);
                     }
                     else
@@ -237,7 +237,7 @@ class mob_nether_wraith : public CreatureScript
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1))
                         DoCast(target, SPELL_ARCANE_MISSILES);
                     else
-                        DoCast(me->getVictim(), SPELL_ARCANE_MISSILES);
+                        DoCast(me->GetVictim(), SPELL_ARCANE_MISSILES);
                     ArcaneMissiles_Timer = urand(5000, 10000);
                 }
                 else

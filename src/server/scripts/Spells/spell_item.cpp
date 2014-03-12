@@ -1191,7 +1191,7 @@ class spell_item_crystal_prison_dummy_dnd : public SpellScriptLoader
             void HandleDummy(SpellEffIndex /* effIndex */)
             {
                 if (Creature* target = GetHitCreature())
-                    if (target->isDead() && !target->isPet())
+                    if (target->IsDead() && !target->IsPet())
                     {
                         GetCaster()->SummonGameObject(OBJECT_IMPRISONED_DOOMGUARD, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation(), 0, 0, 0, 0, uint32(target->GetRespawnTime()-time(NULL)));
                         target->DespawnOrUnsummon();
@@ -1459,7 +1459,7 @@ class spell_item_demon_broiled_surprise : public SpellScriptLoader
                     return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
 
                 if (Creature* creature = player->FindNearestCreature(NPC_ABYSSAL_FLAMEBRINGER, 10, false))
-                    if (creature->isDead())
+                    if (creature->IsDead())
                         return SPELL_CAST_OK;
                 return SPELL_FAILED_NOT_HERE;
             }
@@ -1926,7 +1926,7 @@ class spell_item_muisek_vessel : public SpellScriptLoader
             void HandleDummy(SpellEffIndex /*effIndex*/)
             {
                 if (Creature* target = GetHitCreature())
-                    if (target->isDead())
+                    if (target->IsDead())
                         target->DespawnOrUnsummon();
             }
 

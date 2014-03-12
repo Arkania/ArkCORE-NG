@@ -89,8 +89,8 @@ void ConfusedMovementGenerator<T>::Initialize(T &unit)
 template<>
 void ConfusedMovementGenerator<Creature>::_InitSpecific(Creature &creature, bool &is_water_ok, bool &is_land_ok)
 {
-    is_water_ok = creature.canSwim();
-    is_land_ok  = creature.canWalk();
+    is_water_ok = creature.CanSwim();
+    is_land_ok  = creature.CanWalk();
 }
 
 template<>
@@ -161,8 +161,8 @@ void ConfusedMovementGenerator<Creature>::Finalize(Creature &unit)
 {
     unit.RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_CONFUSED);
     unit.ClearUnitState(UNIT_STATE_CONFUSED | UNIT_STATE_CONFUSED_MOVE);
-    if (unit.getVictim())
-        unit.SetTarget(unit.getVictim()->GetGUID());
+    if (unit.GetVictim())
+        unit.SetTarget(unit.GetVictim()->GetGUID());
 }
 
 template void ConfusedMovementGenerator<Player>::Initialize(Player &player);

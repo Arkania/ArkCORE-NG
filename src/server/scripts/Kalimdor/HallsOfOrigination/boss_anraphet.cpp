@@ -157,7 +157,7 @@ class boss_anraphet : public CreatureScript
 
                 if (m_uiNemesisStrikeTimer <= uiDiff)
                 {
-                    DoCast(me->getVictim(), IsHeroic() ? SPELL_NEMESIS_STRIKE_H : SPELL_NEMESIS_STRIKE);
+                    DoCast(me->GetVictim(), IsHeroic() ? SPELL_NEMESIS_STRIKE_H : SPELL_NEMESIS_STRIKE);
                     m_uiNemesisStrikeTimer = urand(15000, 20000);
                 }
                 else
@@ -216,8 +216,8 @@ class boss_anraphet : public CreatureScript
                     std::vector<Unit*> targets;
                     std::list<HostileReference*>::const_iterator i = me->getThreatManager().getThreatList().begin();
                     for (; i != me->getThreatManager().getThreatList().end(); ++i)
-                        if ((*i)->getTarget()->GetTypeId() == TYPEID_PLAYER)
-                            me->AddAura(IsHeroic() ? SPELL_CRUMBLING_RUIN_H : SPELL_CRUMBLING_RUIN, (*i)->getTarget());
+                        if ((*i)->GetTarget()->GetTypeId() == TYPEID_PLAYER)
+                            me->AddAura(IsHeroic() ? SPELL_CRUMBLING_RUIN_H : SPELL_CRUMBLING_RUIN, (*i)->GetTarget());
 
                     m_uiCrumblingRuinTimer = IsHeroic() ? 45000 : 50000;
                 }
@@ -226,7 +226,7 @@ class boss_anraphet : public CreatureScript
                 if (IsHeroic())
                     if (m_uiOmegaStanceTimer <= uiDiff)
                     {
-                        DoCast(me->getVictim(), SPELL_OMEGA_STANCE_H);
+                        DoCast(me->GetVictim(), SPELL_OMEGA_STANCE_H);
                         //if(urand(1, 3) == 1)
                             //me->MonsterYell(SAY_OMEGA, LANG_UNIVERSAL, NULL);
                         m_uiOmegaStanceTimer = 40000;
@@ -238,8 +238,8 @@ class boss_anraphet : public CreatureScript
                     std::vector<Unit*> targets;
                     std::list<HostileReference*>::const_iterator i = me->getThreatManager().getThreatList().begin();
                     for (; i != me->getThreatManager().getThreatList().end(); ++i)
-                        if ((*i)->getTarget()->GetTypeId() == TYPEID_PLAYER && (*i)->getTarget()->HasAura(IsHeroic() ? SPELL_CRUMBLING_RUIN_H : SPELL_CRUMBLING_RUIN))
-                            (*i)->getTarget()->RemoveAura(IsHeroic() ? SPELL_CRUMBLING_RUIN_H : SPELL_CRUMBLING_RUIN);
+                        if ((*i)->GetTarget()->GetTypeId() == TYPEID_PLAYER && (*i)->GetTarget()->HasAura(IsHeroic() ? SPELL_CRUMBLING_RUIN_H : SPELL_CRUMBLING_RUIN))
+                            (*i)->GetTarget()->RemoveAura(IsHeroic() ? SPELL_CRUMBLING_RUIN_H : SPELL_CRUMBLING_RUIN);
                 }
                 DoMeleeAttackIfReady();
             }

@@ -232,7 +232,7 @@ class ThreatManager
             {
                 HostileReference* ref = (*itr);
 
-                if (predicate(ref->getTarget()))
+                if (predicate(ref->GetTarget()))
                 {
                     ref->setThreat(0);
                     setDirty(true);

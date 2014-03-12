@@ -305,7 +305,7 @@ public:
             std::list<HostileReference*> &m_threatlist = me->getThreatManager().getThreatList();
             for (std::list<HostileReference*>::const_iterator itr = m_threatlist.begin(); itr!= m_threatlist.end(); ++itr)
             {
-                if (Unit* target = (*itr)->getTarget())
+                if (Unit* target = (*itr)->GetTarget())
                 {
                     if (target->GetTypeId() != TYPEID_PLAYER)
                         continue;
@@ -400,7 +400,7 @@ public:
 
         void MoveInLineOfSight(Unit* who)
         {
-            if (!me->isInCombat())
+            if (!me->IsInCombat())
                 return;
 
             if (who->GetEntry() == NPC_POWER_SPARK)
@@ -552,11 +552,11 @@ public:
                         Talk(SAY_AGGRO_P_TWO);
                         break;
                     case EVENT_ARCANE_BREATH:
-                        DoCast(me->getVictim(), SPELL_ARCANE_BREATH);
+                        DoCast(me->GetVictim(), SPELL_ARCANE_BREATH);
                         events.ScheduleEvent(EVENT_ARCANE_BREATH, urand(35, 60)*IN_MILLISECONDS, 0, PHASE_ONE);
                         break;
                     case EVENT_ARCANE_STORM:
-                        DoCast(me->getVictim(), SPELL_ARCANE_STORM);
+                        DoCast(me->GetVictim(), SPELL_ARCANE_STORM);
                         events.ScheduleEvent(EVENT_ARCANE_STORM, urand(5, 10)*IN_MILLISECONDS, 0, PHASE_ONE);
                         break;
                     case EVENT_VORTEX:
@@ -683,7 +683,7 @@ class spell_malygos_vortex_visual : public SpellScriptLoader
                     std::list<HostileReference*> &m_threatlist = caster->getThreatManager().getThreatList();
                     for (std::list<HostileReference*>::const_iterator itr = m_threatlist.begin(); itr!= m_threatlist.end(); ++itr)
                     {
-                        if (Unit* target = (*itr)->getTarget())
+                        if (Unit* target = (*itr)->GetTarget())
                         {
                             Player* targetPlayer = target->ToPlayer();
 
@@ -708,7 +708,7 @@ class spell_malygos_vortex_visual : public SpellScriptLoader
                         malygos->SetDisableGravity(false);
                         malygos->SetCanFly(false);
 
-                        malygos->GetMotionMaster()->MoveChase(caster->getVictim());
+                        malygos->GetMotionMaster()->MoveChase(caster->GetVictim());
                         malygos->RemoveAura(SPELL_VORTEX_1);
                     }
                 }
@@ -1041,7 +1041,7 @@ public:
             if (!_instance)
                 return;
 
-			if (me->isSummon())
+			if (me->IsSummon())
 				if (Unit* summoner = me->ToTempSummon()->GetSummoner())
 				{
 					if (Creature* malygos = Unit::GetCreature(*me, _instance->GetData64(DATA_MALYGOS)))

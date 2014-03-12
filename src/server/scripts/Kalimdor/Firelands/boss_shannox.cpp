@@ -303,7 +303,7 @@ public:
 			summons.Summon(summon);
 			summon->setActive(true);
 
-			if(me->isInCombat())
+			if(me->IsInCombat())
 				summon->AI()->DoZoneInCombat();
 		}
 
@@ -378,9 +378,9 @@ public:
 
 		void UpdateAI(const uint32 diff)
 		{
-			if (!me->getVictim()) {}
+			if (!me->GetVictim()) {}
 
-			if( (!introSpeechDone) && (!me->isInCombat()) )
+			if( (!introSpeechDone) && (!me->IsInCombat()) )
 			{
 				introSpeechDone = true;
 				DoScriptText(SAY_INTRO_SPECH_PART_ONE,me);
@@ -458,7 +458,7 @@ public:
 					break;
 
 				case EVENT_HURL_SPEAR_OR_MAGMA_RUPTURE:
-					if(GetRiplimb() && GetRiplimb()->isDead())
+					if(GetRiplimb() && GetRiplimb()->IsDead())
 					{ 
 						// Cast Magma Rupture when Ripclimb is Death
 						DoCastVictim(SPELL_MAGMA_RUPTURE_SHANNOX);
@@ -513,7 +513,7 @@ public:
 			if (!UpdateVictim())
 				return;
 
-			if(((GetRiplimb() && GetRiplimb()->GetDistance2d(me) >= maxDistanceBetweenShannoxAndDogs && GetRiplimb()->isAlive()) || (GetRageface() && GetRageface()->GetDistance2d(me) >= maxDistanceBetweenShannoxAndDogs) && GetRageface() ->isAlive()) && (!me->HasAura(SPELL_SEPERATION_ANXIETY)))
+			if(((GetRiplimb() && GetRiplimb()->GetDistance2d(me) >= maxDistanceBetweenShannoxAndDogs && GetRiplimb()->IsAlive()) || (GetRageface() && GetRageface()->GetDistance2d(me) >= maxDistanceBetweenShannoxAndDogs) && GetRageface() ->IsAlive()) && (!me->HasAura(SPELL_SEPERATION_ANXIETY)))
 				DoCast(me, SPELL_SEPERATION_ANXIETY);
 
 			if (uiPhase == PHASE_RIPLIMB_BRINGS_SPEER && GetRiplimb() && GetRiplimb()->GetDistance(me) <= 1)
@@ -530,10 +530,10 @@ public:
 					GetRiplimb()->RemoveAura(SPEAR_VISIBLE_FETCH);
 
 				GetRiplimb()->setActive(true);
-				GetRiplimb()->GetMotionMaster()->MoveChase(GetRiplimb()->getVictim());
-				GetRiplimb()->AI()->AttackStart(GetRiplimb()->getVictim());
+				GetRiplimb()->GetMotionMaster()->MoveChase(GetRiplimb()->GetVictim());
+				GetRiplimb()->AI()->AttackStart(GetRiplimb()->GetVictim());
 			}
-			else if (uiPhase == PHASE_RIPLIMB_GOS_TO_SPEER && GetRiplimb() && GetRiplimb()->isAlive())
+			else if (uiPhase == PHASE_RIPLIMB_GOS_TO_SPEER && GetRiplimb() && GetRiplimb()->IsAlive())
 			{
 				if (GetSpear() && !GetRiplimb()->HasAura(CRYSTAL_PRISON_EFFECT))
 				{
@@ -541,7 +541,7 @@ public:
 					GetRiplimb()->GetMotionMaster()->MovePoint(0,GetSpear()->GetPositionX(),GetSpear()->GetPositionY(),GetSpear()->GetPositionZ());
 				}
 			}
-			else if (uiPhase == PHASE_RIPLIMB_BRINGS_SPEER && GetRiplimb() && GetRiplimb()->isAlive())
+			else if (uiPhase == PHASE_RIPLIMB_BRINGS_SPEER && GetRiplimb() && GetRiplimb()->IsAlive())
 			{
 				GetRiplimb()->GetMotionMaster()->MoveIdle();
 				GetRiplimb()->GetMotionMaster()->MovePoint(0,me->GetPositionX(),me->GetPositionY(),me->GetPositionZ());
@@ -623,7 +623,7 @@ public:
             me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_ATTACK_ME, true);
 
 			me->GetMotionMaster()->MoveIdle();
-			me->GetMotionMaster()->MoveChase(me->getVictim());
+			me->GetMotionMaster()->MoveChase(me->GetVictim());
 
 			events.ScheduleEvent(EVENT_CHANGE_TARGET, urand(9000,15000));
 
@@ -650,15 +650,15 @@ public:
         {
             if (damage >= 40000 && me->HasAura(RAID_MODE(SPELL_FACE_RAGE_10N, SPELL_FACE_RAGE_25N,SPELL_FACE_RAGE_10H, SPELL_FACE_RAGE_25H)))
             {
-	            me-> getVictim()->RemoveAurasDueToSpell(SPELL_FACE_RAGE);
+	            me-> GetVictim()->RemoveAurasDueToSpell(SPELL_FACE_RAGE);
 	            me-> RemoveAurasDueToSpell(RAID_MODE(SPELL_FACE_RAGE_10N, SPELL_FACE_RAGE_25N,SPELL_FACE_RAGE_10H, SPELL_FACE_RAGE_25H));
             }
         }
 
 		void UpdateAI(const uint32 diff)
 		{
-			if (me->getVictim())
-				if(!me->HasAura(RAID_MODE(SPELL_FACE_RAGE_10N, SPELL_FACE_RAGE_25N,SPELL_FACE_RAGE_10H, SPELL_FACE_RAGE_25H)) && me->getVictim()->HasAura(SPELL_FACE_RAGE) && !me->HasAura(CRYSTAL_PRISON_EFFECT))
+			if (me->GetVictim())
+				if(!me->HasAura(RAID_MODE(SPELL_FACE_RAGE_10N, SPELL_FACE_RAGE_25N,SPELL_FACE_RAGE_10H, SPELL_FACE_RAGE_25H)) && me->GetVictim()->HasAura(SPELL_FACE_RAGE) && !me->HasAura(CRYSTAL_PRISON_EFFECT))
 				{
 					if (Unit *RageTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 500.0f, true, SPELL_RAGE))
 					{
@@ -671,10 +671,10 @@ public:
 						me->GetMotionMaster()->MoveChase(RageTarget);
 						me->AI()->AttackStart(RageTarget);
 					}
-					me->getVictim()->RemoveAurasDueToSpell(SPELL_FACE_RAGE);
+					me->GetVictim()->RemoveAurasDueToSpell(SPELL_FACE_RAGE);
 				}
 
-			if(GetShannox() && !me->isInCombat())
+			if(GetShannox() && !me->IsInCombat())
 			{
 				if (me->GetDistance(GetShannox()) > 20.0f)
 					me->SetPosition(GetShannox()->GetPositionX()+5,GetShannox()->GetPositionY()-5,GetShannox()->GetPositionZ(),0);
@@ -689,7 +689,7 @@ public:
 				switch (eventId)
 				{
 				case EVENT_CHANGE_TARGET:
-					if (!me->getVictim()->HasAura(SPELL_RAGE) && !me->HasAura(RAID_MODE(SPELL_FACE_RAGE_10N, SPELL_FACE_RAGE_25N,SPELL_FACE_RAGE_10H, SPELL_FACE_RAGE_25H)))
+					if (!me->GetVictim()->HasAura(SPELL_RAGE) && !me->HasAura(RAID_MODE(SPELL_FACE_RAGE_10N, SPELL_FACE_RAGE_25N,SPELL_FACE_RAGE_10H, SPELL_FACE_RAGE_25H)))
 						SelectNewTarget();
 
 					events.ScheduleEvent(EVENT_CHANGE_TARGET, urand(9000,15000));
@@ -716,7 +716,7 @@ public:
 					{
 						int32 dmg = prison->GetMaxHealth() * 0.20;
 						me->DealDamage(prison,dmg);
-						if (prison->isAlive())
+						if (prison->IsAlive())
 							events.ScheduleEvent(EVENT_PRISON_DOG_ATTACK_RAGEFACE, 1000);
 					}
 					break;
@@ -751,7 +751,7 @@ public:
 			if (!UpdateVictim())
 				return;
 
-            if(Unit* victim = me->getVictim()) // DoMeleeAttackIfReady implementation of Feeding Frenzy.
+            if(Unit* victim = me->GetVictim()) // DoMeleeAttackIfReady implementation of Feeding Frenzy.
             if (me->isAttackReady() && me->IsWithinMeleeRange(victim))
             {
                 me->AttackerStateUpdate(victim);
@@ -830,16 +830,16 @@ public:
 			inTakingSpearPhase = false;
 
 			me->GetMotionMaster()->MoveIdle();
-			me->GetMotionMaster()->MoveChase(me->getVictim());
+			me->GetMotionMaster()->MoveChase(me->GetVictim());
 
 			events.ScheduleEvent(EVENT_LIMB_RIP, 12000); //TODO Find out the correct Time
 		}
 
 		void UpdateAI(const uint32 diff)
 		{
-			if (!me->getVictim()) {}
+			if (!me->GetVictim()) {}
 
-			if(GetShannox() && !me->isInCombat())
+			if(GetShannox() && !me->IsInCombat())
 			{
 				if (me->GetDistance(GetShannox()) > 20.0f)
 					me->SetPosition(GetShannox()->GetPositionX()+5,GetShannox()->GetPositionY()-5,GetShannox()->GetPositionZ(),0);
@@ -881,7 +881,7 @@ public:
 					{
 						int32 dmg = prison->GetMaxHealth() * 0.10;
 						me->DealDamage(prison,dmg);
-						if (prison->isAlive())
+						if (prison->IsAlive())
 							events.ScheduleEvent(EVENT_PRISON_DOG_ATTACK_RIPLIMB, 1000);
 					}
 					break;
@@ -931,7 +931,7 @@ public:
 			if (!UpdateVictim())
 				return;
 
-            if(Unit* victim = me->getVictim()) // DoMeleeAttackIfReady implementation of Feeding Frenzy.
+            if(Unit* victim = me->GetVictim()) // DoMeleeAttackIfReady implementation of Feeding Frenzy.
             if (me->isAttackReady() && me->IsWithinMeleeRange(victim))
             {
                 me->AttackerStateUpdate(victim);
@@ -1090,9 +1090,9 @@ public:
 				case EVENT_IMMOLATION_TRAP_TRIGGER:
 					//Riplimb and Rageface has a higher Priority than Players...
 
-					if(GetRiplimb() && GetRiplimb()->GetDistance(me) <= 3.0f && !GetRiplimb()->HasAura(RAID_MODE(SPELL_WARY_10N, SPELL_WARY_25N, SPELL_WARY_10H, SPELL_WARY_25H)) && GetRiplimb()->isAlive() && GetShannox()->AI()->GetData(DATA_PHASE) == PHASE_SHANNOX_HAS_SPEER)
+					if(GetRiplimb() && GetRiplimb()->GetDistance(me) <= 3.0f && !GetRiplimb()->HasAura(RAID_MODE(SPELL_WARY_10N, SPELL_WARY_25N, SPELL_WARY_10H, SPELL_WARY_25H)) && GetRiplimb()->IsAlive() && GetShannox()->AI()->GetData(DATA_PHASE) == PHASE_SHANNOX_HAS_SPEER)
 						tempTarget = GetRiplimb();
-					else if (GetRageface() && GetRageface()->GetDistance(me) <= 3.0f && !GetRageface()->HasAura(RAID_MODE(SPELL_WARY_10N, SPELL_WARY_25N, SPELL_WARY_10H, SPELL_WARY_25H)) && GetRageface()->isAlive())
+					else if (GetRageface() && GetRageface()->GetDistance(me) <= 3.0f && !GetRageface()->HasAura(RAID_MODE(SPELL_WARY_10N, SPELL_WARY_25N, SPELL_WARY_10H, SPELL_WARY_25H)) && GetRageface()->IsAlive())
 						tempTarget = GetRageface();
 					else 
 						tempTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 1.0f, true);
@@ -1189,9 +1189,9 @@ public:
 
 					//Riplimb has a higher Priority than Players...
 
-					if(GetRiplimb() && GetRiplimb()->GetDistance(me) <= 2.0f && (!GetRiplimb()->HasAura(RAID_MODE(SPELL_WARY_10N, SPELL_WARY_25N, SPELL_WARY_10H, SPELL_WARY_25H))) && GetRiplimb()->isAlive() && GetShannox()->AI()->GetData(DATA_PHASE) == PHASE_SHANNOX_HAS_SPEER)
+					if(GetRiplimb() && GetRiplimb()->GetDistance(me) <= 2.0f && (!GetRiplimb()->HasAura(RAID_MODE(SPELL_WARY_10N, SPELL_WARY_25N, SPELL_WARY_10H, SPELL_WARY_25H))) && GetRiplimb()->IsAlive() && GetShannox()->AI()->GetData(DATA_PHASE) == PHASE_SHANNOX_HAS_SPEER)
 						tempTarget = GetRiplimb();
-					else if(GetRageface() && GetRageface()->GetDistance(me) <= 3.0f && !GetRageface()->HasAura(RAID_MODE(SPELL_WARY_10N, SPELL_WARY_25N, SPELL_WARY_10H, SPELL_WARY_25H)) && GetRageface()->isAlive())
+					else if(GetRageface() && GetRageface()->GetDistance(me) <= 3.0f && !GetRageface()->HasAura(RAID_MODE(SPELL_WARY_10N, SPELL_WARY_25N, SPELL_WARY_10H, SPELL_WARY_25H)) && GetRageface()->IsAlive())
 						tempTarget = GetRageface();
 					else
 						tempTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 2.0f, true);
@@ -1233,7 +1233,7 @@ public:
 				}
 			}	
 
-			if(myPrison && myPrison->isDead())
+			if(myPrison && myPrison->IsDead())
 			{
 				myPrison->DisappearAndDie();
 				tempTarget->RemoveAurasDueToSpell(CRYSTAL_PRISON_EFFECT);

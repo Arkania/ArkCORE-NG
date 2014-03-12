@@ -195,7 +195,7 @@ class boss_majordomus : public CreatureScript
 			summons.Summon(summon);
 			summon->setActive(true);
  
-			if(me->isInCombat())
+			if(me->IsInCombat())
 			summon->AI()->DoZoneInCombat();
 		}
  
@@ -266,7 +266,7 @@ class boss_majordomus : public CreatureScript
 						uint8 numb = 0;
 						Map::PlayerList const& players = me->GetMap()->GetPlayers();
 						for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-							if (Player* player = itr->getSource())
+							if (Player* player = itr->GetSource())
 								if (me->GetDistance(player) <= 7.0f)
 									++numb;
 

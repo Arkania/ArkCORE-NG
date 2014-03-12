@@ -168,7 +168,7 @@ class boss_warchief_kargath_bladefist : public CreatureScript
                 for (std::vector<uint64>::const_iterator itr = adds.begin(); itr!= adds.end(); ++itr)
                 {
                     Unit* temp = Unit::GetUnit(*me, *itr);
-                    if (temp && temp->isAlive())
+                    if (temp && temp->IsAlive())
                     {
                         (*temp).GetMotionMaster()->Clear(true);
                         me->DealDamage(temp, temp->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
@@ -180,7 +180,7 @@ class boss_warchief_kargath_bladefist : public CreatureScript
                 for (std::vector<uint64>::const_iterator itr = assassins.begin(); itr!= assassins.end(); ++itr)
                 {
                     Unit* temp = Unit::GetUnit(*me, *itr);
-                    if (temp && temp->isAlive())
+                    if (temp && temp->IsAlive())
                     {
                         (*temp).GetMotionMaster()->Clear(true);
                         me->DealDamage(temp, temp->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
@@ -225,7 +225,7 @@ class boss_warchief_kargath_bladefist : public CreatureScript
                                 // stop bladedance
                                 InBlade = false;
                                 me->SetSpeed(MOVE_RUN, 2);
-                                me->GetMotionMaster()->MoveChase(me->getVictim());
+                                me->GetMotionMaster()->MoveChase(me->GetVictim());
                                 Blade_Dance_Timer = 30000;
                                 Wait_Timer = 0;
                                 if (IsHeroic())

@@ -155,7 +155,7 @@ public:
 
         void DoAction(const int32 param)
         {
-            if (!me->isAlive())
+            if (!me->IsAlive())
                 return;
 
             switch (param)
@@ -194,7 +194,7 @@ public:
             }
 
             me->SetVisible(true);
-            me->GetMotionMaster()->MoveChase(me->getVictim());
+            me->GetMotionMaster()->MoveChase(me->GetVictim());
         }
 
         uint32 GetData(uint32 type)
@@ -247,7 +247,7 @@ public:
                         {
                             for (std::list<uint64>::const_iterator itr = m_waterElements.begin(); itr != m_waterElements.end(); ++itr)
                                 if (Creature* temp = Unit::GetCreature(*me, *itr))
-                                    if (temp->isAlive())
+                                    if (temp->IsAlive())
                                     {
                                         bIsWaterElementsAlive = true;
                                         break;

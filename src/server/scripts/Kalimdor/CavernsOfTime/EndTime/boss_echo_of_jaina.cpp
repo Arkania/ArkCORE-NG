@@ -155,7 +155,7 @@ class boss_echo_of_jaina : public CreatureScript
 		    	summons.Summon(summon);
 		    	summon->setActive(true);
 
-                if(me->isInCombat())
+                if(me->IsInCombat())
 		    	summon->AI()->DoZoneInCombat();
 
                 switch(summon->GetEntry())
@@ -200,7 +200,7 @@ class boss_echo_of_jaina : public CreatureScript
                     switch (eventId)
                     {
                         case EVENT_PYROBLAST:
-                            DoCast(me->getVictim(), SPELL_PYROBLAST);
+                            DoCast(me->GetVictim(), SPELL_PYROBLAST);
                             events.ScheduleEvent(EVENT_PYROBLAST, urand(3500, 4500));
                             break;
 

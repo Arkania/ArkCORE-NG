@@ -205,7 +205,7 @@ public:
                 if (AddGUID[i])
                 {
                     Temp = Creature::GetCreature((*me), AddGUID[i]);
-                    if (Temp && Temp->isAlive())
+                    if (Temp && Temp->IsAlive())
                         Temp->DisappearAndDie();
                 }
             }
@@ -219,9 +219,9 @@ public:
                 if (AddGUID[i])
                 {
                     Temp = Creature::GetCreature((*me), AddGUID[i]);
-                    if (Temp && Temp->isAlive())
+                    if (Temp && Temp->IsAlive())
                     {
-                        Temp->AI()->AttackStart(me->getVictim());
+                        Temp->AI()->AttackStart(me->GetVictim());
                         DoZoneInCombat(Temp);
                     } else
                         EnterEvadeMode();
@@ -254,9 +254,9 @@ public:
                     if (AddGUID[i])
                     {
                         Temp = Unit::GetCreature((*me), AddGUID[i]);
-                        if (Temp && Temp->isAlive())
-                            if (!Temp->getVictim())
-                                Temp->AI()->AttackStart(me->getVictim());
+                        if (Temp && Temp->IsAlive())
+                            if (!Temp->GetVictim())
+                                Temp->AI()->AttackStart(me->GetVictim());
                     }
                 }
                 CheckAdds_Timer = 5000;
@@ -350,7 +350,7 @@ struct boss_moroes_guestAI : public ScriptedAI
         if (TempGUID)
         {
             Unit* unit = Unit::GetUnit(*me, TempGUID);
-            if (unit && unit->isAlive())
+            if (unit && unit->IsAlive())
                 return unit;
         }
 
@@ -433,7 +433,7 @@ public:
 
             if (MindFlay_Timer <= diff)
             {
-                DoCast(me->getVictim(), SPELL_MINDFLY);
+                DoCast(me->GetVictim(), SPELL_MINDFLY);
                 MindFlay_Timer = 12000;                         // 3 sec channeled
             } else MindFlay_Timer -= diff;
 
@@ -502,13 +502,13 @@ public:
 
             if (JudgementOfCommand_Timer <= diff)
             {
-                DoCast(me->getVictim(), SPELL_JUDGEMENTOFCOMMAND);
+                DoCast(me->GetVictim(), SPELL_JUDGEMENTOFCOMMAND);
                 JudgementOfCommand_Timer = SealOfCommand_Timer + 29000;
             } else JudgementOfCommand_Timer -= diff;
 
             if (HammerOfJustice_Timer <= diff)
             {
-                DoCast(me->getVictim(), SPELL_HAMMEROFJUSTICE);
+                DoCast(me->GetVictim(), SPELL_HAMMEROFJUSTICE);
                 HammerOfJustice_Timer = 12000;
             } else HammerOfJustice_Timer -= diff;
         }
@@ -571,7 +571,7 @@ public:
 
             if (HolyFire_Timer <= diff)
             {
-                DoCast(me->getVictim(), SPELL_HOLYFIRE);
+                DoCast(me->GetVictim(), SPELL_HOLYFIRE);
                 HolyFire_Timer = 22000;
             } else HolyFire_Timer -= diff;
 
@@ -699,13 +699,13 @@ public:
 
             if (Hamstring_Timer <= diff)
             {
-                DoCast(me->getVictim(), SPELL_HAMSTRING);
+                DoCast(me->GetVictim(), SPELL_HAMSTRING);
                 Hamstring_Timer = 12000;
             } else Hamstring_Timer -= diff;
 
             if (MortalStrike_Timer <= diff)
             {
-                DoCast(me->getVictim(), SPELL_MORTALSTRIKE);
+                DoCast(me->GetVictim(), SPELL_MORTALSTRIKE);
                 MortalStrike_Timer = 18000;
             } else MortalStrike_Timer -= diff;
 
@@ -758,19 +758,19 @@ public:
 
             if (Disarm_Timer <= diff)
             {
-                DoCast(me->getVictim(), SPELL_DISARM);
+                DoCast(me->GetVictim(), SPELL_DISARM);
                 Disarm_Timer = 12000;
             } else Disarm_Timer -= diff;
 
             if (HeroicStrike_Timer <= diff)
             {
-                DoCast(me->getVictim(), SPELL_HEROICSTRIKE);
+                DoCast(me->GetVictim(), SPELL_HEROICSTRIKE);
                 HeroicStrike_Timer = 10000;
             } else HeroicStrike_Timer -= diff;
 
             if (ShieldBash_Timer <= diff)
             {
-                DoCast(me->getVictim(), SPELL_SHIELDBASH);
+                DoCast(me->GetVictim(), SPELL_SHIELDBASH);
                 ShieldBash_Timer = 13000;
             } else ShieldBash_Timer -= diff;
 

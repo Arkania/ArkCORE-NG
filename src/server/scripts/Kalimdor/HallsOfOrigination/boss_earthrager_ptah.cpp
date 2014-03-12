@@ -189,7 +189,7 @@ class boss_earthrager_ptah : public CreatureScript
                 Map::PlayerList const& players = me->GetMap()->GetPlayers();
                 if (!players.isEmpty())
                     for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                        if (Player* player = itr->getSource())
+                        if (Player* player = itr->GetSource())
                             if (player->GetAreaId() == AREA_TOMB_OF_THE_EARTHRAGER)
                                 player->GetSession()->SendPacket(data);
             }
@@ -337,7 +337,7 @@ class npc_horror : public CreatureScript
 
                 if (m_uiSmashTimer <= uiDiff)
                 {
-                    DoCast(me->getVictim(), SPELL_SMASH);
+                    DoCast(me->GetVictim(), SPELL_SMASH);
                     m_uiSmashTimer = urand(7000, 12000);
                 }
                 else

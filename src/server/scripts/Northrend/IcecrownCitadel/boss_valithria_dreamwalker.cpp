@@ -156,8 +156,8 @@ class RisenArchmageCheck
         // look for all permanently spawned Risen Archmages that are not yet in combat
         bool operator()(Creature* creature)
         {
-            return creature->isAlive() && creature->GetEntry() == NPC_RISEN_ARCHMAGE &&
-                creature->GetDBTableGUIDLow() && !creature->isInCombat();
+            return creature->IsAlive() && creature->GetEntry() == NPC_RISEN_ARCHMAGE &&
+                creature->GetDBTableGUIDLow() && !creature->IsInCombat();
         }
 };
 
@@ -291,7 +291,7 @@ class boss_valithria_dreamwalker : public CreatureScript
                     if (data->curhealth)
                         _spawnHealth = data->curhealth;
 
-                if (!me->isDead())
+                if (!me->IsDead())
                     Reset();
             }
 
@@ -548,7 +548,7 @@ class npc_green_dragon_combat_trigger : public CreatureScript
 
             void UpdateAI(uint32 const /*diff*/)
             {
-                if (!me->isInCombat())
+                if (!me->IsInCombat())
                     return;
 
                 std::list<HostileReference*> const& threatList = me->getThreatManager().getThreatList();
@@ -565,7 +565,7 @@ class npc_green_dragon_combat_trigger : public CreatureScript
 
                 // check if there is any player on threatlist, if not - evade
                 for (std::list<HostileReference*>::const_iterator itr = threatList.begin(); itr != threatList.end(); ++itr)
-                    if (Unit* target = (*itr)->getTarget())
+                    if (Unit* target = (*itr)->GetTarget())
                         if (target->GetTypeId() == TYPEID_PLAYER)
                             return; // found any player, return
 
@@ -737,7 +737,7 @@ class npc_risen_archmage : public CreatureScript
 
             void UpdateAI(uint32 const diff)
             {
-                if (!me->isInCombat())
+                if (!me->IsInCombat())
                     if (me->GetDBTableGUIDLow())
                         if (!me->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
                             DoCast(me, SPELL_CORRUPTION);
@@ -821,7 +821,7 @@ class npc_blazing_skeleton : public CreatureScript
                     switch (eventId)
                     {
                         case EVENT_FIREBALL:
-                            if (!me->IsWithinMeleeRange(me->getVictim()))
+                            if (!me->IsWithinMeleeRange(me->GetVictim()))
                                 DoCastVictim(SPELL_FIREBALL);
                             _events.ScheduleEvent(EVENT_FIREBALL, urand(2000, 4000));
                             break;
@@ -897,7 +897,7 @@ class npc_suppresser : public CreatureScript
                 }
 
                 // this creature has REACT_PASSIVE so it does not always have victim here
-                if (Unit* victim = me->getVictim())
+                if (Unit* victim = me->GetVictim())
                     if (victim->GetEntry() != NPC_VALITHRIA_DREAMWALKER)
                         DoMeleeAttackIfReady();
             }

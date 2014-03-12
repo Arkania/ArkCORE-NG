@@ -144,8 +144,8 @@ class boss_moam : public CreatureScript
                             {
                                 const std::list<HostileReference*>& threatlist = me->getThreatManager().getThreatList();
                                 for (std::list<HostileReference*>::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
-                                    if ((*itr)->getTarget()->GetTypeId() == TYPEID_PLAYER && (*itr)->getTarget()->getPowerType() == POWER_MANA)
-                                        targetList.push_back((*itr)->getTarget());
+                                    if ((*itr)->GetTarget()->GetTypeId() == TYPEID_PLAYER && (*itr)->GetTarget()->getPowerType() == POWER_MANA)
+                                        targetList.push_back((*itr)->GetTarget());
                             }
 
                             Trinity::Containers::RandomResizeList(targetList, 5);

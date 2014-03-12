@@ -237,7 +237,7 @@ class spell_hun_pet_heart_of_the_phoenix : public SpellScriptLoader
 
             bool Load()
             {
-                if (!GetCaster()->isPet())
+                if (!GetCaster()->IsPet())
                     return false;
                 return true;
             }
@@ -284,7 +284,7 @@ class spell_hun_pet_carrion_feeder : public SpellScriptLoader
 
             bool Load()
             {
-                if (!GetCaster()->isPet())
+                if (!GetCaster()->IsPet())
                     return false;
                 return true;
             }
@@ -399,7 +399,7 @@ class spell_hun_disengage : public SpellScriptLoader
             SpellCastResult CheckCast()
             {
                 Unit* caster = GetCaster();
-                if (caster->GetTypeId() == TYPEID_PLAYER && !caster->isInCombat())
+                if (caster->GetTypeId() == TYPEID_PLAYER && !caster->IsInCombat())
                     return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
 
                 return SPELL_CAST_OK;
@@ -534,16 +534,16 @@ public:
         {
             Pet* pet = GetCaster()->ToPlayer()->GetPet();
 
-            if (!pet || pet->isDead())
+            if (!pet || pet->IsDead())
                 return SPELL_FAILED_NO_PET;
 
-			if (!pet->isInCombat())
+			if (!pet->IsInCombat())
 				return SPELL_FAILED_INTERRUPTED_COMBAT;
 
-			if (!pet->getVictim())
+			if (!pet->GetVictim())
 				return SPELL_FAILED_BAD_TARGETS;
 
-            if (pet->GetDistance(pet->getVictim()) > 5.0f)
+            if (pet->GetDistance(pet->GetVictim()) > 5.0f)
                 return SPELL_FAILED_OUT_OF_RANGE;
 
             return SPELL_CAST_OK;
@@ -552,7 +552,7 @@ public:
         void HandleScriptEffect (SpellEffIndex /*effIndex*/)
         {
             if (Pet* pet = GetCaster()->ToPlayer()->GetPet())
-				pet->CastCustomSpell(pet->getVictim(), (uint32) GetEffectValue(), 0, NULL, NULL, true, NULL, NULL, pet->GetGUID());
+				pet->CastCustomSpell(pet->GetVictim(), (uint32) GetEffectValue(), 0, NULL, NULL, true, NULL, NULL, pet->GetGUID());
         }
 
         void Register ()

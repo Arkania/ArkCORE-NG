@@ -147,7 +147,7 @@ struct boss_horAI : ScriptedAI
         summons.Despawn(summoned);
         if (summons.empty())
         {
-            if (summoned->isAlive())
+            if (summoned->IsAlive())
                 instance->SetData(DATA_WAVE_COUNT, NOT_STARTED);
             else
                 instance->SetData(DATA_WAVE_COUNT, SPECIAL);

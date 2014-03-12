@@ -170,7 +170,7 @@ public:
         {
             Creature* creature = Unit::GetCreature(*me, SpawnedGUID);
 
-            if (creature && creature->isAlive())
+            if (creature && creature->IsAlive())
                 return creature;
 
             return NULL;
@@ -215,7 +215,7 @@ public:
                             }
 
                             if (markAura->GetDuration() < AURA_DURATION_TIME_LEFT)
-                                if (!lastSpawnedGuard->getVictim())
+                                if (!lastSpawnedGuard->GetVictim())
                                     lastSpawnedGuard->AI()->AttackStart(who);
                         }
                         else
@@ -242,7 +242,7 @@ public:
                             return;
 
                         // ROOFTOP only triggers if the player is on the ground
-                        if (!playerTarget->IsFlying() && !lastSpawnedGuard->getVictim())
+                        if (!playerTarget->IsFlying() && !lastSpawnedGuard->GetVictim())
                             lastSpawnedGuard->AI()->AttackStart(who);
 
                         break;
@@ -747,7 +747,7 @@ public:
 
         void SpellHit(Unit* caster, SpellInfo const* spell)
         {
-            if (caster->GetTypeId() == TYPEID_PLAYER && me->isAlive() && spell->Id == 20804)
+            if (caster->GetTypeId() == TYPEID_PLAYER && me->IsAlive() && spell->Id == 20804)
             {
                 if ((CAST_PLR(caster)->GetQuestStatus(6624) == QUEST_STATUS_INCOMPLETE) || (CAST_PLR(caster)->GetQuestStatus(6622) == QUEST_STATUS_INCOMPLETE))
                     if (DoctorGUID)
@@ -787,10 +787,10 @@ public:
         void UpdateAI(uint32 const /*diff*/)
         {
             //lower HP on every world tick makes it a useful counter, not officlone though
-            if (me->isAlive() && me->GetHealth() > 6)
+            if (me->IsAlive() && me->GetHealth() > 6)
                 me->ModifyHealth(-5);
 
-            if (me->isAlive() && me->GetHealth() <= 6)
+            if (me->IsAlive() && me->GetHealth() <= 6)
             {
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT);
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -938,7 +938,7 @@ public:
             if (Spell->Id == SPELL_LESSER_HEAL_R2 || Spell->Id == SPELL_FORTITUDE_R1)
             {
                 //not while in combat
-                if (me->isInCombat())
+                if (me->IsInCombat())
                     return;
 
                 //nothing to be done now
@@ -1050,7 +1050,7 @@ public:
 
         void UpdateAI(uint32 const diff)
         {
-            if (CanRun && !me->isInCombat())
+            if (CanRun && !me->IsInCombat())
             {
                 if (RunAwayTimer <= diff)
                 {
@@ -1127,7 +1127,7 @@ public:
 
             if (me->isAttackReady())
             {
-                DoCast(me->getVictim(), SPELL_DEATHTOUCH, true);
+                DoCast(me->GetVictim(), SPELL_DEATHTOUCH, true);
                 me->resetAttackTimer();
             }
         }
@@ -1150,7 +1150,7 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature)
     {
-        if (creature->isQuestGiver())
+        if (creature->IsQuestGiver())
             player->PrepareQuestMenu(creature->GetGUID());
 
         bool canBuy = false;
@@ -1221,7 +1221,7 @@ public:
 
         if (canBuy)
         {
-            if (creature->isVendor())
+            if (creature->IsVendor())
                 player->ADD_GOSSIP_ITEM(GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
             player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
         }
@@ -1253,10 +1253,10 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature)
     {
-        if (creature->isQuestGiver())
+        if (creature->IsQuestGiver())
             player->PrepareQuestMenu(creature->GetGUID());
 
-        if (creature->isTrainer())
+        if (creature->IsTrainer())
             player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TRAINER, GOSSIP_TEXT_TRAIN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
 
         if (creature->isCanTrainingAndResetTalentsOf(player))
@@ -1359,7 +1359,7 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature)
     {
-        if (creature->isQuestGiver())
+        if (creature->IsQuestGiver())
             player->PrepareQuestMenu(creature->GetGUID());
 
         if (player->HasSpellCooldown(SPELL_INT) ||
@@ -1669,16 +1669,16 @@ public:
             me->SetStatFloatValue(UNIT_FIELD_RANGED_ATTACK_POWER, float(Info->attackpower));
 
             // Start attacking attacker of owner on first ai update after spawn - move in line of sight may choose better target
-            if (!me->getVictim() && me->isSummon())
+            if (!me->GetVictim() && me->IsSummon())
                 if (Unit* Owner = me->ToTempSummon()->GetSummoner())
-                    if (Owner->getAttackerForHelper())
-                        AttackStart(Owner->getAttackerForHelper());
+                    if (Owner->GetAttackerForHelper())
+                        AttackStart(Owner->GetAttackerForHelper());
         }
 
         //Redefined for random target selection:
         void MoveInLineOfSight(Unit* who)
         {
-            if (!me->getVictim() && me->canCreatureAttack(who))
+            if (!me->GetVictim() && me->canCreatureAttack(who))
             {
                 if (me->GetDistanceZ(who) > CREATURE_Z_ATTACK_RANGE)
                     return;
@@ -1701,7 +1701,7 @@ public:
             if (!UpdateVictim())
                 return;
 
-            if (me->getVictim()->HasBreakableByDamageCrowdControlAura(me))
+            if (me->GetVictim()->HasBreakableByDamageCrowdControlAura(me))
             {
                 me->InterruptNonMeleeSpells(false);
                 return;
@@ -1719,7 +1719,7 @@ public:
                         else
                             spell = SPELL_CRIPPLING_POISON;
 
-                        DoCast(me->getVictim(), spell);
+                        DoCast(me->GetVictim(), spell);
                     }
 
                     SpellTimer = VIPER_TIMER;
@@ -1727,7 +1727,7 @@ public:
                 else //Venomous Snake
                 {
                     if (urand(0, 2) == 0) //33% chance to cast
-                        DoCast(me->getVictim(), SPELL_DEADLY_POISON);
+                        DoCast(me->GetVictim(), SPELL_DEADLY_POISON);
                     SpellTimer = VENOMOUS_SNAKE_TIMER + (rand() % 5) * 100;
                 }
             }
@@ -1898,8 +1898,8 @@ public:
             events.Update(diff);
 
             bool hasCC = false;
-            if (me->GetCharmerOrOwnerGUID() && me->getVictim())
-                hasCC = me->getVictim()->HasAuraType(SPELL_AURA_MOD_CONFUSE);
+            if (me->GetCharmerOrOwnerGUID() && me->GetVictim())
+                hasCC = me->GetVictim()->HasAuraType(SPELL_AURA_MOD_CONFUSE);
 
             if (hasCC)
             {
@@ -1919,7 +1919,7 @@ public:
                     events.ScheduleEvent(spellId, 500);
                     return;
                 }
-				DoCast(me->getVictim(), spellId);
+				DoCast(me->GetVictim(), spellId);
                 uint32 casttime = me->GetCurrentSpellCastTime(spellId);
                 events.ScheduleEvent(spellId, (casttime ? casttime : 500) + GetAISpellInfo(spellId)->realCooldown);
             }
@@ -1928,7 +1928,7 @@ public:
         // Do not reload Creature templates on evade mode enter - prevent visual lost
         void EnterEvadeMode()
         {
-            if (me->IsInEvadeMode() || !me->isAlive())
+            if (me->IsInEvadeMode() || !me->IsAlive())
                 return;
 
             Unit* owner = me->GetCharmerOrOwner();
@@ -1991,7 +1991,7 @@ public:
         // Fly away when dismissed
         void SpellHit(Unit* source, SpellInfo const* spell)
         {
-            if (spell->Id != 50515 || !me->isAlive())
+            if (spell->Id != 50515 || !me->IsAlive())
                 return;
 
             Unit* owner = me->GetOwner();
@@ -2056,7 +2056,7 @@ class npc_lightwell : public CreatureScript
 
             void EnterEvadeMode()
             {
-                if (!me->isAlive())
+                if (!me->IsAlive())
                     return;
 
                 me->DeleteThreatList();
@@ -2180,7 +2180,7 @@ public:
 
         void Reset()
         {
-            if (me->isSummon())
+            if (me->IsSummon())
                 if (Unit* owner = me->ToTempSummon()->GetSummoner())
                     if (Unit* pet = owner->GetGuardianPet())
                         pet->CastSpell(pet, MANA_LEECH, true);
@@ -2188,7 +2188,7 @@ public:
 
         void DamageTaken(Unit* /*killer*/, uint32& damage)
         {
-            if (me->isSummon())
+            if (me->IsSummon())
                 if (Unit* owner = me->ToTempSummon()->GetSummoner())
                     if (owner->HasAura(GLYPH_OF_SHADOWFIEND) && damage >= me->GetHealth())
                         owner->CastSpell(owner, GLYPH_OF_SHADOWFIEND_MANA, true);
@@ -2247,7 +2247,7 @@ public:
 
             if (FireShield_Timer <= diff)
             {
-                DoCast(me->getVictim(), SPELL_FIRESHIELD);
+                DoCast(me->GetVictim(), SPELL_FIRESHIELD);
                 FireShield_Timer = 2 * IN_MILLISECONDS;
             }
             else
@@ -2255,7 +2255,7 @@ public:
 
             if (FireBlast_Timer <= diff)
             {
-                DoCast(me->getVictim(), SPELL_FIREBLAST);
+                DoCast(me->GetVictim(), SPELL_FIREBLAST);
                 FireBlast_Timer = 5000 + rand() % 15000; // 5-20 sec cd
             }
             else
@@ -2263,7 +2263,7 @@ public:
 
             if (FireNova_Timer <= diff)
             {
-                DoCast(me->getVictim(), SPELL_FIRENOVA);
+                DoCast(me->GetVictim(), SPELL_FIRENOVA);
                 FireNova_Timer = 5000 + rand() % 15000; // 5-20 sec cd
             }
             else
@@ -2308,7 +2308,7 @@ public:
 
             if (AngeredEarth_Timer <= diff)
             {
-                DoCast(me->getVictim(), SPELL_ANGEREDEARTH);
+                DoCast(me->GetVictim(), SPELL_ANGEREDEARTH);
                 AngeredEarth_Timer = 5000 + rand() % 15000; // 5-20 sec cd
             }
             else
@@ -2374,7 +2374,7 @@ class npc_wormhole : public CreatureScript
 
         bool OnGossipHello(Player* player, Creature* creature)
         {
-            if (creature->isSummon())
+            if (creature->IsSummon())
             {
                 if (player == creature->ToTempSummon()->GetSummoner())
                 {
@@ -2458,7 +2458,7 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature)
     {
-        if (creature->isQuestGiver())
+        if (creature->IsQuestGiver())
             player->PrepareQuestMenu(creature->GetGUID());
 
         if (player->getClass() == CLASS_HUNTER)
@@ -3231,7 +3231,7 @@ public:
 
         void UpdateAI (const uint32 diff)
         {
-            if (!me->isInCombat() && CombatCheck == false)
+            if (!me->IsInCombat() && CombatCheck == false)
             {
                 me->SetSpeed(MOVE_RUN, 2, true);
                 me->SetSpeed(MOVE_FLIGHT, 2, true);
@@ -3315,7 +3315,7 @@ public:
 
         void UpdateAI (const uint32 diff)
         {
-            if (!me->isInCombat() && CombatCheck == false)
+            if (!me->IsInCombat() && CombatCheck == false)
             {
                 me->SetSpeed(MOVE_RUN, 2, true);
                 me->SetSpeed(MOVE_FLIGHT, 2, true);
@@ -3444,12 +3444,12 @@ public:
 			if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-			if (!me->isInCombat())
+			if (!me->IsInCombat())
 				return;
 
 		    if (DoomBoltTimer <= uiDiff)
             {
-				if (Unit *victim = me->GetOwner()->getVictim())
+				if (Unit *victim = me->GetOwner()->GetVictim())
 					me->CastSpell(victim,85692,true);
 				else if (Unit* target = me->SelectNearestTarget(40))
 					me->CastSpell(target,85692,true);
@@ -3524,7 +3524,7 @@ public:
 
         void CheckIfMoveInRing (Unit *who)
         {
-            if (who->isAlive() && me->IsInRange(who, 0, 6.0f) && !who->HasAura(82691)/*<= target already frozen*/
+            if (who->IsAlive() && me->IsInRange(who, 0, 6.0f) && !who->HasAura(82691)/*<= target already frozen*/
             && !who->HasAura(91264)/*<= target is immune*/
             && me->IsWithinLOSInMap(who) && Isready)
 			{
@@ -3617,7 +3617,7 @@ public:
                 if (!owner)
                     return;
 
-                if (Unit* target = owner->getAttackerForHelper())
+                if (Unit* target = owner->GetAttackerForHelper())
                 {
                     me->Attack(target, false);
                     me->AddThreat(target, 100.0f);
@@ -3743,8 +3743,8 @@ public:
             {
                 if (me->GetOwner())
                 {
-                    if (me->GetOwner()->getVictim())
-                        AttackStart(me->GetOwner()->getVictim());
+                    if (me->GetOwner()->GetVictim())
+                        AttackStart(me->GetOwner()->GetVictim());
 
                     DoCast(me, 86703, true);
                 }
@@ -3757,8 +3757,8 @@ public:
                 return;
 
             if (me->GetOwner())
-                if (Unit* newVictim = me->GetOwner()->getVictim())
-                    if (me->getVictim() != newVictim)
+                if (Unit* newVictim = me->GetOwner()->GetVictim())
+                    if (me->GetVictim() != newVictim)
                         AttackStart(newVictim);
 
             if (me->HasUnitState(UNIT_STATE_CASTING))
@@ -3791,16 +3791,16 @@ public:
         {
 			me->SetReactState(REACT_AGGRESSIVE);
             // Start attacking attacker of owner on first ai update after spawn - move in line of sight may choose better target
-            if (!me->getVictim() && me->isSummon())
+            if (!me->GetVictim() && me->IsSummon())
                 if (Unit* Owner = me->ToTempSummon()->GetSummoner())
-                    if (Owner->getAttackerForHelper())
-                        AttackStart(Owner->getAttackerForHelper());
+                    if (Owner->GetAttackerForHelper())
+                        AttackStart(Owner->GetAttackerForHelper());
         }
 
         //Redefined for random target selection:
         void MoveInLineOfSight(Unit* who)
         {
-            if (!me->getVictim() && me->canCreatureAttack(who))
+            if (!me->GetVictim() && me->canCreatureAttack(who))
             {
                 if (me->GetDistanceZ(who) > CREATURE_Z_ATTACK_RANGE)
                     return;
@@ -3857,16 +3857,16 @@ public:
         {
 			me->SetReactState(REACT_AGGRESSIVE);
             // Start attacking attacker of owner on first ai update after spawn - move in line of sight may choose better target
-            if (!me->getVictim() && me->isSummon())
+            if (!me->GetVictim() && me->IsSummon())
                 if (Unit* Owner = me->ToTempSummon()->GetSummoner())
-                    if (Owner->getAttackerForHelper())
-                        AttackStart(Owner->getAttackerForHelper());
+                    if (Owner->GetAttackerForHelper())
+                        AttackStart(Owner->GetAttackerForHelper());
         }
 
         //Redefined for random target selection:
         void MoveInLineOfSight(Unit* who)
         {
-            if (!me->getVictim() && me->canCreatureAttack(who))
+            if (!me->GetVictim() && me->canCreatureAttack(who))
             {
                 if (me->GetDistanceZ(who) > CREATURE_Z_ATTACK_RANGE)
                     return;

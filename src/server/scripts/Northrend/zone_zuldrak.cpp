@@ -209,7 +209,7 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature)
     {
-        if (creature->isQuestGiver())
+        if (creature->IsQuestGiver())
             player->PrepareQuestMenu(creature->GetGUID());
 
         player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
@@ -657,7 +657,7 @@ public:
             if (!bSummoned && !HealthAbovePct(50))
             {
                 DoScriptText(SAY_CALL_FOR_HELP, me);
-                //DoCast(me->getVictim(), SPELL_SUMMON_WHISKER); petai is not working correctly???
+                //DoCast(me->GetVictim(), SPELL_SUMMON_WHISKER); petai is not working correctly???
 
                 if (Creature* pWhisker = me->SummonCreature(NPC_WHISKER, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 0))
                     uiWhisker = pWhisker->GetGUID();
@@ -672,12 +672,12 @@ public:
             switch (summon->GetEntry())
             {
                 case NPC_WHISKER:
-                    summon->AI()->AttackStart(me->getVictim());
+                    summon->AI()->AttackStart(me->GetVictim());
                     break;
                 case NPC_HUNGRY_PENGUIN:
                     if (Unit* pAffected = Unit::GetUnit(*me, AffectedGUID))
                     {
-                        if (pAffected->isAlive())
+                        if (pAffected->IsAlive())
                             summon->AI()->AttackStart(pAffected);
                     }
                     break;
@@ -834,7 +834,7 @@ public:
             if (!UpdateVictim())
                 return;
 
-            if (me->getVictim()->GetPositionZ() >= 286.276f)
+            if (me->GetVictim()->GetPositionZ() >= 286.276f)
             {
                 std::list<HostileReference*> t_list = me->getThreatManager().getThreatList();
                 for (std::list<HostileReference*>::const_iterator itr = t_list.begin(); itr!= t_list.end(); ++itr)
@@ -854,13 +854,13 @@ public:
 
             if (uiCleaveTimer <= uiDiff)
             {
-                DoCast(me->getVictim(), SPELL_CLEAVE);
+                DoCast(me->GetVictim(), SPELL_CLEAVE);
                 uiCleaveTimer = 9000;
             } else uiCleaveTimer -= uiDiff;
 
             if (uiCorrodeFleshTimer <= uiDiff)
             {
-                DoCast(me->getVictim(), SPELL_CORRODE_FLESH);
+                DoCast(me->GetVictim(), SPELL_CORRODE_FLESH);
                 uiCorrodeFleshTimer = 6000;
             } else uiCorrodeFleshTimer -= uiDiff;
 
@@ -869,7 +869,7 @@ public:
 
         void JustDied(Unit* killer)
         {
-			if (me->isSummon())
+			if (me->IsSummon())
 				if (Unit* summoner = me->ToTempSummon()->GetSummoner())
 				{
 					std::string sText = (std::string(killer->GetName()) + " has defeated Yg.. Yggg-really big worm!");
@@ -955,7 +955,7 @@ public:
             if (!UpdateVictim())
                 return;
 
-            if (Unit* victim = me->getVictim())
+            if (Unit* victim = me->GetVictim())
             {
                 if (victim->GetPositionZ() >= 286.276f)
                 {
@@ -986,7 +986,7 @@ public:
             {
                 if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
                 {
-                    if (target && target->isAlive())
+                    if (target && target->IsAlive())
                         DoCast(target, SPELL_KNOCK_AWAY);
                 }
                 uiKnockAwayTimer = 10000;
@@ -996,7 +996,7 @@ public:
             {
                 if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
                 {
-                    if (target && target->isAlive())
+                    if (target && target->IsAlive())
                         DoCast(target, SPELL_STINKY_BEARD);
                 }
                 uiStinkyBeardTimer = 15000;
@@ -1102,7 +1102,7 @@ public:
             if (!UpdateVictim())
                 return;
 
-            if (me->getVictim()->GetPositionZ() >= 286.276f)
+            if (me->GetVictim()->GetPositionZ() >= 286.276f)
             {
                 std::list<HostileReference*> t_list = me->getThreatManager().getThreatList();
                 for (std::list<HostileReference*>::const_iterator itr = t_list.begin(); itr!= t_list.end(); ++itr)
@@ -1137,8 +1137,8 @@ public:
                             if (temp->GetPositionZ() >= 287.00f)
                                 continue;
 
-                            if (temp->getVictim())
-                                temp->GetMotionMaster()->MoveChase(temp->getVictim());
+                            if (temp->GetVictim())
+                                temp->GetMotionMaster()->MoveChase(temp->GetVictim());
                         }
                     }
 
@@ -1160,7 +1160,7 @@ public:
 
             std::string sText = (std::string(killer->GetName()) + " is victorious once more!");
 
-			if (me->isSummon())
+			if (me->IsSummon())
 				if (Unit* summoner = me->ToTempSummon()->GetSummoner())
 					summoner->MonsterYell(sText.c_str(), LANG_UNIVERSAL, 0);
         }

@@ -504,7 +504,7 @@ class boss_ragnaros_firelands : public CreatureScript
                 summons.Summon(summon);
                 summon->setActive(true);
 
-			    if (me->isInCombat())
+			    if (me->IsInCombat())
 			        summon->AI()->DoZoneInCombat();
 
                 switch (summon->GetEntry())
@@ -696,7 +696,7 @@ class boss_ragnaros_firelands : public CreatureScript
                             break;
 
                         case EVENT_MAGMA_BLAST:
-                            if (Unit* target = me->getVictim())
+                            if (Unit* target = me->GetVictim())
                             {
                                 if (target->IsWithinDistInMap(me, 1.0f)) // check if tank is in melee range.
                                     inMeleeRange = true;
@@ -1664,10 +1664,10 @@ class npc_living_meteor : public CreatureScript
             {
                 if (m_uiRangeCheckTimer <= diff)
                 {
-                    if (me->IsWithinDistInMap(me->getVictim(), 2.0f))
+                    if (me->IsWithinDistInMap(me->GetVictim(), 2.0f))
                     {
                         DoCast(me, SPELL_IMPACT);
-                        me->getVictim()->RemoveAurasDueToSpell(SPELL_FLAMING_FIXATE);
+                        me->GetVictim()->RemoveAurasDueToSpell(SPELL_FLAMING_FIXATE);
                         me->DespawnOrUnsummon();
                     }
 
@@ -1678,8 +1678,8 @@ class npc_living_meteor : public CreatureScript
 
                 if (m_uiTargetChangeTimer <= diff)
                 {
-                    me->getVictim()->RemoveAurasDueToSpell(SPELL_FLAMING_FIXATE);
-                    me->AddThreat(me->getVictim(), -1000.0f);
+                    me->GetVictim()->RemoveAurasDueToSpell(SPELL_FLAMING_FIXATE);
+                    me->AddThreat(me->GetVictim(), -1000.0f);
 
                     if (Unit *target = SelectTarget(SELECT_TARGET_RANDOM, 0, NonTankTargetSelector(me)))
                     {

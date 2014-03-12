@@ -324,7 +324,7 @@ public:
                                         {
                                             Map::PlayerList const &players = map->GetPlayers();
                                             for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                                                itr->getSource()->CompletedAchievement(AchievWC);
+                                                itr->GetSource()->CompletedAchievement(AchievWC);
                                         }
                                     }
                                     if (me->HasAura(SPELL_NARALEXS_AWAKENING))

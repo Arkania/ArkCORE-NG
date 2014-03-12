@@ -132,7 +132,7 @@ public:
 
             if (SpellSummonVoidTimer <= diff)
             {
-                DoCast(me->getVictim(), SPELL_SUMMON_VOID_SENTRY, false);
+                DoCast(me->GetVictim(), SPELL_SUMMON_VOID_SENTRY, false);
                 SpellSummonVoidTimer = 20000;
             } else SpellSummonVoidTimer -=diff;
 
@@ -145,7 +145,7 @@ public:
 
             if (SpellShroudOfDarknessTimer <= diff)
             {
-                DoCast(me->getVictim(), SPELL_SHROUD_OF_DARKNESS);
+                DoCast(me->GetVictim(), SPELL_SHROUD_OF_DARKNESS);
                 SpellShroudOfDarknessTimer = 20000;
             } else SpellShroudOfDarknessTimer -=diff;
 
@@ -195,7 +195,7 @@ public:
 
         void JustSummoned(Creature* summon)
         {
-            summon->AI()->AttackStart(me->getVictim());
+            summon->AI()->AttackStart(me->GetVictim());
             summon->AI()->DoCastAOE(SPELL_ZURAMAT_ADD_2);
             summon->SetPhaseMask(17, true);
         }

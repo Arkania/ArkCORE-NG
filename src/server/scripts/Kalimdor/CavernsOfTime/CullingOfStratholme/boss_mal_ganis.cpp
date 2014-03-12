@@ -158,7 +158,7 @@ public:
                     }
 
                     if (Creature* pArthas = me->GetCreature(*me, instance ? instance->GetData64(DATA_ARTHAS) : 0))
-                        if (pArthas->isDead())
+                        if (pArthas->IsDead())
                         {
                             EnterEvadeMode();
                             me->DisappearAndDie();

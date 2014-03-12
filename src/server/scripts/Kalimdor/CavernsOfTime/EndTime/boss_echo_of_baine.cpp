@@ -191,7 +191,7 @@ class boss_echo_of_baine : public CreatureScript
                 Map::PlayerList const &PlayerList = me->GetMap()->GetPlayers();    
                 if (!PlayerList.isEmpty())
                   for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-                    if (Player* playr = i->getSource())
+                    if (Player* playr = i->GetSource())
                         if (playr->IsInWater() && !playr->HasAura(SPELL_MOLTEN_FIST))
                             playr->AddAura(SPELL_MOLTEN_FIST, playr); // Add the damage aura to players in Magma.
 

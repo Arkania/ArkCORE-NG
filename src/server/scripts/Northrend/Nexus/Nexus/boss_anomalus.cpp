@@ -141,7 +141,7 @@ class boss_anomalus : public CreatureScript
                     if (uiChaoticRiftGUID)
                     {
                         Creature* Rift = ObjectAccessor::GetCreature(*me, uiChaoticRiftGUID);
-                        if (Rift && Rift->isDead())
+                        if (Rift && Rift->IsDead())
                         {
                             me->RemoveAurasDueToSpell(SPELL_RIFT_SHIELD);
                             uiChaoticRiftGUID = 0;

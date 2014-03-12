@@ -94,7 +94,7 @@ public:
             if (waypointId == 7 && instance)
             {
                 Unit* target = Unit::GetUnit(*me, instance->GetData64(DATA_JAINAPROUDMOORE));
-                if (target && target->isAlive())
+                if (target && target->IsAlive())
                     me->AddThreat(target, 0.0f);
             }
         }
@@ -218,7 +218,7 @@ public:
 
         void MoveInLineOfSight(Unit* who)
         {
-            if (me->IsWithinDist(who, 50) && !me->isInCombat() && me->IsValidAttackTarget(who))
+            if (me->IsWithinDist(who, 50) && !me->IsInCombat() && me->IsValidAttackTarget(who))
                 AttackStart(who);
         }
 
@@ -229,7 +229,7 @@ public:
                 if (AnetheronGUID)
                 {
                     Creature* boss = Unit::GetCreature((*me), AnetheronGUID);
-                    if (!boss || (boss && boss->isDead()))
+                    if (!boss || (boss && boss->IsDead()))
                     {
                         me->setDeathState(JUST_DIED);
                         me->RemoveCorpse();

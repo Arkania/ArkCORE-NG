@@ -136,7 +136,7 @@ public:
             Creature* pAda = instance->GetCreature(uiAdaGUID);
             Creature* pAsh = instance->GetCreature(uiAshGUID);
 
-            if (pAda && pAda->isAlive() && pAsh && pAsh->isAlive())
+            if (pAda && pAda->IsAlive() && pAsh && pAsh->IsAlive())
             {
                 DoScriptText(SAY_BOSS_DIE_AD, pAda);
                 DoScriptText(SAY_BOSS_DIE_AS, pAsh);
@@ -242,7 +242,7 @@ public:
             Creature* pArchmage = instance->GetCreature(uiArchmageArugalGUID);
             Creature* summon = NULL;
 
-            if (!pArchmage || !pArchmage->isAlive())
+            if (!pArchmage || !pArchmage->IsAlive())
                 return;
 
             if (uiPhase)

@@ -482,7 +482,7 @@ void Transport::TeleportTransport(uint32 newMapid, float x, float y, float z)
         Player* player = *itr;
         ++itr;
 
-        if (player->isDead() && !player->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))
+        if (player->IsDead() && !player->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))
             player->ResurrectPlayer(1.0f);
 
         player->TeleportTo(newMapid, x, y, z, GetOrientation(), TELE_TO_NOT_LEAVE_TRANSPORT);
@@ -583,13 +583,13 @@ void Transport::UpdateForMap(Map const* targetMap)
     {
         for (Map::PlayerList::const_iterator itr = player.begin(); itr != player.end(); ++itr)
         {
-            if (this != itr->getSource()->GetTransport())
+            if (this != itr->GetSource()->GetTransport())
             {
                 UpdateData transData(GetMapId());
-                BuildCreateUpdateBlockForPlayer(&transData, itr->getSource());
+                BuildCreateUpdateBlockForPlayer(&transData, itr->GetSource());
                 WorldPacket packet;
                 transData.BuildPacket(&packet);
-                itr->getSource()->SendDirectMessage(&packet);
+                itr->GetSource()->SendDirectMessage(&packet);
             }
         }
     }
@@ -601,8 +601,8 @@ void Transport::UpdateForMap(Map const* targetMap)
         transData.BuildPacket(&out_packet);
 
         for (Map::PlayerList::const_iterator itr = player.begin(); itr != player.end(); ++itr)
-            if (this != itr->getSource()->GetTransport())
-                itr->getSource()->SendDirectMessage(&out_packet);
+            if (this != itr->GetSource()->GetTransport())
+                itr->GetSource()->SendDirectMessage(&out_packet);
     }
 }
 

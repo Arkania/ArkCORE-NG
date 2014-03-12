@@ -170,7 +170,7 @@ public:
                 DoCast(me, SPELL_FADE_BLINK);
                 FadeTimer = 30000 + rand()%5000;
                 // if the victim is out of melee range she cast multi shot
-                if (Unit* victim = me->getVictim())
+                if (Unit* victim = me->GetVictim())
                     if (me->GetDistance(victim) > 10.0f)
                         DoCast(victim, SPELL_MULTI_SHOT);
             } else FadeTimer -= diff;
@@ -183,7 +183,7 @@ public:
             
             if (BlackArrowTimer <= diff)
             {
-                if (Unit* victim = me->getVictim())
+                if (Unit* victim = me->GetVictim())
                 {
                     DoCast(victim, SPELL_BLACK_ARROW);
                     BlackArrowTimer = 15000 + rand()%5000;
@@ -192,7 +192,7 @@ public:
             
             if (ShotTimer <= diff)
             {
-                if (Unit* victim = me->getVictim())
+                if (Unit* victim = me->GetVictim())
                 {
                     DoCast(victim, SPELL_SHOT);
                     ShotTimer = 8000 + rand()%2000;
@@ -201,7 +201,7 @@ public:
                    
             if (MultiShotTimer <= diff)
             {
-                if (Unit* victim = me->getVictim())
+                if (Unit* victim = me->GetVictim())
                 {
                     DoCast(victim, SPELL_MULTI_SHOT);
                     MultiShotTimer = 10000 + rand()%3000;
@@ -303,7 +303,7 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature)
     {
-        if (creature->isQuestGiver())
+        if (creature->IsQuestGiver())
             player->PrepareQuestMenu(creature->GetGUID());
 
         if (player->GetQuestStatus(6628) == QUEST_STATUS_INCOMPLETE && !player->HasAura(SPELL_MARK_OF_SHAME))

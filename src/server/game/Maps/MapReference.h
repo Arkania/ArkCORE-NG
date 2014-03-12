@@ -29,18 +29,18 @@ class MapReference : public Reference<Map, Player>
         void targetObjectBuildLink()
         {
             // called from link()
-            getTarget()->m_mapRefManager.insertFirst(this);
-            getTarget()->m_mapRefManager.incSize();
+            GetTarget()->m_mapRefManager.insertFirst(this);
+            GetTarget()->m_mapRefManager.incSize();
         }
         void targetObjectDestroyLink()
         {
             // called from unlink()
-            if (isValid()) getTarget()->m_mapRefManager.decSize();
+            if (isValid()) GetTarget()->m_mapRefManager.decSize();
         }
         void sourceObjectDestroyLink()
         {
             // called from invalidate()
-            getTarget()->m_mapRefManager.decSize();
+            GetTarget()->m_mapRefManager.decSize();
         }
     public:
         MapReference() : Reference<Map, Player>() {}

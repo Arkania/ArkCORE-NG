@@ -183,7 +183,7 @@ public:
             {
                 if (OverloadTimer <= diff)
                 {
-                    DoCast(me->getVictim(), SPELL_OVERLOAD);
+                    DoCast(me->GetVictim(), SPELL_OVERLOAD);
 
                     OverloadTimer = 2000;
                 } else OverloadTimer -= diff;
@@ -215,7 +215,7 @@ public:
         {
             if (Unit* temp = me->GetOwner())
             {
-                if (temp && temp->isAlive())
+                if (temp && temp->IsAlive())
                     slayer->CastSpell(slayer, SPELL_ENERGY_FEEDBACK, true, 0, 0, temp->GetGUID());
             }
         }

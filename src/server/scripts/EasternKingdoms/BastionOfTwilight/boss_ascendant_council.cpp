@@ -373,12 +373,12 @@ public:
                     summon->SetMaxHealth(me->GetMaxHealth());
                     summon->SetHealth(me->GetHealth());
 
-                    if (me->isInCombat())
+                    if (me->IsInCombat())
                         summon->AI()->DoZoneInCombat(summon, 150.0f);
                     break;
 
                 default:
-                    if (me->isInCombat())
+                    if (me->IsInCombat())
                         summon->AI()->DoZoneInCombat(summon, 150.0f);
                     break;
             }
@@ -439,7 +439,7 @@ public:
 
             if (!PlayerList.isEmpty())
               for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-                if (Player* playr = i->getSource())
+                if (Player* playr = i->GetSource())
                     playr->AddAura(SPELL_ELEMENTAL_STASIS, playr); // Trap all players while Monstrosity spawns.
         }
 
@@ -600,7 +600,7 @@ class boss_feludius : public CreatureScript
             {
                 if (!instance)
                     me->IsAIEnabled = false;
-                else if (!me->isDead())
+                else if (!me->IsDead())
                     Reset();
             }
 
@@ -637,14 +637,14 @@ class boss_feludius : public CreatureScript
 
                 if (controller && ignacious && arion && terrastra) // Check to prevent any damn crashes.
                 {
-                    if (!controller->isInCombat())
-                        controller->AI()->AttackStart(me->getVictim());
-                    if (!ignacious->isInCombat())
-                        ignacious->AI()->AttackStart(me->getVictim());
-                    if (!arion->isInCombat())
-                        arion->AI()->AttackStart(me->getVictim());
-                    if (!terrastra->isInCombat())
-                        terrastra->AI()->AttackStart(me->getVictim());
+                    if (!controller->IsInCombat())
+                        controller->AI()->AttackStart(me->GetVictim());
+                    if (!ignacious->IsInCombat())
+                        ignacious->AI()->AttackStart(me->GetVictim());
+                    if (!arion->IsInCombat())
+                        arion->AI()->AttackStart(me->GetVictim());
+                    if (!terrastra->IsInCombat())
+                        terrastra->AI()->AttackStart(me->GetVictim());
                 }
 
                 Talk(SAY_F_AGGRO);
@@ -697,7 +697,7 @@ class boss_feludius : public CreatureScript
                 summons.Summon(summon);
                 summon->setActive(true);
 
-                if (me->isInCombat())
+                if (me->IsInCombat())
                     summon->AI()->DoZoneInCombat();
             }
 
@@ -812,7 +812,7 @@ class boss_ignacious : public CreatureScript
             {
                 if (!instance)
                     me->IsAIEnabled = false;
-                else if (!me->isDead())
+                else if (!me->IsDead())
                     Reset();
             }
 
@@ -850,12 +850,12 @@ class boss_ignacious : public CreatureScript
 
                 if (feludius && arion && terrastra) // Check to prevent any damn crashes.
                 {
-                    if (!feludius->isInCombat())
-                        feludius->AI()->AttackStart(me->getVictim());
-                    if (!arion->isInCombat())
-                        arion->AI()->AttackStart(me->getVictim());
-                    if (!terrastra->isInCombat())
-                        terrastra->AI()->AttackStart(me->getVictim());
+                    if (!feludius->IsInCombat())
+                        feludius->AI()->AttackStart(me->GetVictim());
+                    if (!arion->IsInCombat())
+                        arion->AI()->AttackStart(me->GetVictim());
+                    if (!terrastra->IsInCombat())
+                        terrastra->AI()->AttackStart(me->GetVictim());
                 }
 
                 infernoSummoned = 0;
@@ -919,7 +919,7 @@ class boss_ignacious : public CreatureScript
                         break;
 
                     default:
-                        if (me->isInCombat())
+                        if (me->IsInCombat())
                             summon->AI()->DoZoneInCombat(summon, 150.0f);
                         break;
                 }
@@ -1063,7 +1063,7 @@ class boss_arion : public CreatureScript
             {
                 if (!instance)
                     me->IsAIEnabled = false;
-                else if (!me->isDead())
+                else if (!me->IsDead())
                     Reset();
             }
 
@@ -1145,7 +1145,7 @@ class boss_arion : public CreatureScript
                 summons.Summon(summon);
                 summon->setActive(true);
 
-                if (me->isInCombat())
+                if (me->IsInCombat())
                     summon->AI()->DoZoneInCombat();
             }
 
@@ -1229,7 +1229,7 @@ class boss_arion : public CreatureScript
                             break;
 
                         case EVENT_LIGHTNING_BLAST:
-                            DoCast(me->getVictim(), SPELL_LIGHTNING_BLAST);
+                            DoCast(me->GetVictim(), SPELL_LIGHTNING_BLAST);
                             break;
 
                         case EVENT_THUNDERSHOCK:
@@ -1290,7 +1290,7 @@ class boss_terrastra : public CreatureScript
             {
                 if (!instance)
                     me->IsAIEnabled = false;
-                else if (!me->isDead())
+                else if (!me->IsDead())
                     Reset();
             }
 
@@ -1376,7 +1376,7 @@ class boss_terrastra : public CreatureScript
                         break;
 
                     default:
-                        if (me->isInCombat())
+                        if (me->IsInCombat())
                             summon->AI()->DoZoneInCombat(summon, 150.0f);
                         break;
                 }
@@ -1491,7 +1491,7 @@ class boss_monstrosity : public CreatureScript
             {
                 if (!instance)
                     me->IsAIEnabled = false;
-                else if (!me->isDead())
+                else if (!me->IsDead())
                     Reset();
             }
 
@@ -1538,7 +1538,7 @@ class boss_monstrosity : public CreatureScript
                 summons.Summon(summon);
                 summon->setActive(true);
             
-                if(me->isInCombat())
+                if(me->IsInCombat())
                 summon->AI()->DoZoneInCombat();
             }
 
@@ -2020,7 +2020,7 @@ class npc_feludius_frozen_orb : public CreatureScript // 49518
 
                         case EVENT_CHECK_FROZEN_TARGET:
                             DoCast(me, SPELL_INCREASE_RUN_SPEED);
-                            if(me->GetDistance2d(me->getVictim()) < 3.0f)
+                            if(me->GetDistance2d(me->GetVictim()) < 3.0f)
                             {
                                 DoCast(me, SPELL_GLACIATE);
                                 me->DespawnOrUnsummon();

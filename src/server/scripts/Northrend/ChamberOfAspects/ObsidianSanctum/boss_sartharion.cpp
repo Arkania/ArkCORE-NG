@@ -291,7 +291,7 @@ public:
                 if (pTenebron)
                 {
                     pTenebron->SetHomePosition(3239.07f, 657.235f, 86.8775f, 4.74729f);
-                    if (pTenebron->isAlive())
+                    if (pTenebron->IsAlive())
                     {
                         if (pTenebron->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
                             pTenebron->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -309,7 +309,7 @@ public:
                 if (pShadron)
                 {
                     pShadron->SetHomePosition(3363.06f, 525.28f, 98.362f, 4.76475f);
-                    if (pShadron->isAlive())
+                    if (pShadron->IsAlive())
                     {
                         if (pShadron->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
                             pShadron->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -327,7 +327,7 @@ public:
                 if (pVesperon)
                 {
                     pVesperon->SetHomePosition(3145.68f, 520.71f, 89.7f, 4.64258f);
-                    if (pVesperon->isAlive())
+                    if (pVesperon->IsAlive())
                     {
                         if (pVesperon->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
                             pVesperon->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -372,11 +372,11 @@ public:
                 Creature* pTenebron = Unit::GetCreature(*me, instance->GetData64(DATA_TENEBRON));
                 Creature* pShadron = Unit::GetCreature(*me, instance->GetData64(DATA_SHADRON));
                 Creature* pVesperon = Unit::GetCreature(*me, instance->GetData64(DATA_VESPERON));
-                if (pTenebron && pTenebron->isAlive())
+                if (pTenebron && pTenebron->IsAlive())
                     pTenebron->DisappearAndDie();
-                if (pShadron && pShadron->isAlive())
+                if (pShadron && pShadron->IsAlive())
                     pShadron->DisappearAndDie();
-                if (pVesperon && pVesperon->isAlive())
+                if (pVesperon && pVesperon->IsAlive())
                     pVesperon->DisappearAndDie();
 
                 instance->SetData(TYPE_SARTHARION_EVENT, DONE);
@@ -423,10 +423,10 @@ public:
             //if at least one of the dragons are alive and are being called
             bool bCanUseWill = false;
 
-            if (pFetchTene && pFetchTene->isAlive() && !pFetchTene->getVictim())
+            if (pFetchTene && pFetchTene->IsAlive() && !pFetchTene->GetVictim())
             {
                 bCanUseWill = true;
-                if (!pFetchTene->isInCombat())
+                if (!pFetchTene->IsInCombat())
                 {
                     DoCast(me, SPELL_POWER_OF_TENEBRON);
                     AddDrakeLootMode();
@@ -438,10 +438,10 @@ public:
                     pFetchTene->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             }
 
-            if (pFetchShad && pFetchShad->isAlive() && !pFetchShad->getVictim())
+            if (pFetchShad && pFetchShad->IsAlive() && !pFetchShad->GetVictim())
             {
                 bCanUseWill = true;
-                if (!pFetchShad->isInCombat())
+                if (!pFetchShad->IsInCombat())
                 {
                     DoCast(me, SPELL_POWER_OF_SHADRON);
                     AddDrakeLootMode();
@@ -453,10 +453,10 @@ public:
                     pFetchShad->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             }
 
-            if (pFetchVesp && pFetchVesp->isAlive() && !pFetchVesp->getVictim())
+            if (pFetchVesp && pFetchVesp->IsAlive() && !pFetchVesp->GetVictim())
             {
                 bCanUseWill = true;
-                if (!pFetchVesp->isInCombat())
+                if (!pFetchVesp->IsInCombat())
                 {
                     DoCast(me, SPELL_POWER_OF_VESPERON);
                     AddDrakeLootMode();
@@ -478,7 +478,7 @@ public:
             {
                 if (Creature* temp = Unit::GetCreature(*me, instance->GetData64(uiDataId)))
                 {
-                    if (temp->isAlive() && !temp->getVictim())
+                    if (temp->IsAlive() && !temp->GetVictim())
                     {
                         if (temp->HasUnitMovementFlag(MOVEMENTFLAG_WALKING))
                             temp->SetWalk(false);
@@ -522,8 +522,8 @@ public:
 
                     if (!PlayerList.isEmpty())
                         for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-                            if (i->getSource() && i->getSource()->isAlive())
-                                DoScriptText(WHISPER_LAVA_CHURN, me, i->getSource());
+                            if (i->GetSource() && i->GetSource()->IsAlive())
+                                DoScriptText(WHISPER_LAVA_CHURN, me, i->GetSource());
                 }
         }
 
@@ -560,7 +560,7 @@ public:
 
             //spell will target dragons, if they are still alive at 35%
             if (!m_bIsBerserk && !HealthAbovePct(35)
-                && ((pTene && pTene->isAlive()) || (pShad && pShad->isAlive()) || (pVesp && pVesp->isAlive())))
+                && ((pTene && pTene->IsAlive()) || (pShad && pShad->IsAlive()) || (pVesp && pVesp->IsAlive())))
             {
                 DoScriptText(SAY_SARTHARION_BERSERK, me);
                 DoCast(me, SPELL_BERSERK);
@@ -621,7 +621,7 @@ public:
             if (m_uiFlameBreathTimer <= uiDiff)
             {
                 DoScriptText(SAY_SARTHARION_BREATH, me);
-                DoCast(me->getVictim(), RAID_MODE(SPELL_FLAME_BREATH, SPELL_FLAME_BREATH_H));
+                DoCast(me->GetVictim(), RAID_MODE(SPELL_FLAME_BREATH, SPELL_FLAME_BREATH_H));
                 m_uiFlameBreathTimer = urand(25000, 35000);
             }
             else
@@ -630,7 +630,7 @@ public:
             // Tail Sweep
             if (m_uiTailSweepTimer <= uiDiff)
             {
-                DoCast(me->getVictim(), RAID_MODE(SPELL_TAIL_LASH, SPELL_TAIL_LASH_H));
+                DoCast(me->GetVictim(), RAID_MODE(SPELL_TAIL_LASH, SPELL_TAIL_LASH_H));
                 m_uiTailSweepTimer = urand(15000, 20000);
             }
             else
@@ -639,7 +639,7 @@ public:
             // Cleave
             if (m_uiCleaveTimer <= uiDiff)
             {
-                DoCast(me->getVictim(), SPELL_CLEAVE);
+                DoCast(me->GetVictim(), SPELL_CLEAVE);
                 m_uiCleaveTimer = urand(7000, 10000);
             }
             else
@@ -825,7 +825,7 @@ struct dummy_dragonAI : public ScriptedAI
             if (!PlayerList.isEmpty())
             {
                 for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-                    DoScriptText(iTextId, me, i->getSource());
+                    DoScriptText(iTextId, me, i->GetSource());
             }
         }
     }
@@ -953,7 +953,7 @@ struct dummy_dragonAI : public ScriptedAI
 
             // Twilight Revenge to main boss
             if (Unit* pSartharion = Unit::GetUnit(*me, instance->GetData64(DATA_SARTHARION)))
-                if (pSartharion->isAlive())
+                if (pSartharion->IsAlive())
                 {
                     pSartharion->RemoveAurasDueToSpell(uiSpellId);
                     DoCast(pSartharion, SPELL_TWILIGHT_REVENGE, true);
@@ -1057,7 +1057,7 @@ public:
             if (m_uiShadowBreathTimer <= uiDiff)
             {
                 DoScriptText(SAY_TENEBRON_BREATH, me);
-                DoCast(me->getVictim(), RAID_MODE(SPELL_SHADOW_BREATH, SPELL_SHADOW_BREATH_H));
+                DoCast(me->GetVictim(), RAID_MODE(SPELL_SHADOW_BREATH, SPELL_SHADOW_BREATH_H));
                 m_uiShadowBreathTimer = urand(20000, 25000);
             }
             else
@@ -1161,7 +1161,7 @@ public:
             if (m_uiShadowBreathTimer <= uiDiff)
             {
                 DoScriptText(SAY_SHADRON_BREATH, me);
-                DoCast(me->getVictim(), RAID_MODE(SPELL_SHADOW_BREATH, SPELL_SHADOW_BREATH_H));
+                DoCast(me->GetVictim(), RAID_MODE(SPELL_SHADOW_BREATH, SPELL_SHADOW_BREATH_H));
                 m_uiShadowBreathTimer = urand(20000, 25000);
             }
             else
@@ -1245,7 +1245,7 @@ public:
                 else
                 {
                     OpenPortal();
-                    DoCast(me->getVictim(), SPELL_TWILIGHT_TORMENT_VESP);
+                    DoCast(me->GetVictim(), SPELL_TWILIGHT_TORMENT_VESP);
                     m_uiAcolyteVesperonTimer = urand(60000, 70000);
                 }
             }
@@ -1256,7 +1256,7 @@ public:
             if (m_uiShadowBreathTimer <= uiDiff)
             {
                 DoScriptText(SAY_VESPERON_BREATH, me);
-                DoCast(me->getVictim(), RAID_MODE(SPELL_SHADOW_BREATH, SPELL_SHADOW_BREATH_H));
+                DoCast(me->GetVictim(), RAID_MODE(SPELL_SHADOW_BREATH, SPELL_SHADOW_BREATH_H));
                 m_uiShadowBreathTimer = urand(20000, 25000);
             }
             else
@@ -1337,24 +1337,24 @@ public:
 
                     for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                     {
-                        if (i->getSource()->isAlive() && i->getSource()->HasAura(SPELL_TWILIGHT_SHIFT, 0) && !i->getSource()->getVictim())
+                        if (i->GetSource()->IsAlive() && i->GetSource()->HasAura(SPELL_TWILIGHT_SHIFT, 0) && !i->GetSource()->GetVictim())
                         {
-                            i->getSource()->CastSpell(i->getSource(), SPELL_TWILIGHT_SHIFT_REMOVAL_ALL, true);
-                            i->getSource()->CastSpell(i->getSource(), SPELL_TWILIGHT_RESIDUE, true);
-                            i->getSource()->RemoveAurasDueToSpell(SPELL_TWILIGHT_SHIFT);
-                            i->getSource()->RemoveAurasDueToSpell(SPELL_TWILIGHT_SHIFT_ENTER);
+                            i->GetSource()->CastSpell(i->GetSource(), SPELL_TWILIGHT_SHIFT_REMOVAL_ALL, true);
+                            i->GetSource()->CastSpell(i->GetSource(), SPELL_TWILIGHT_RESIDUE, true);
+                            i->GetSource()->RemoveAurasDueToSpell(SPELL_TWILIGHT_SHIFT);
+                            i->GetSource()->RemoveAurasDueToSpell(SPELL_TWILIGHT_SHIFT_ENTER);
                         }
                    }
                 }
 
                 //not solo fight, so main boss has deduff
                 pDebuffTarget = instance->instance->GetCreature(instance->GetData64(DATA_SARTHARION));
-                if (pDebuffTarget && pDebuffTarget->isAlive() && pDebuffTarget->HasAura(SPELL_GIFT_OF_TWILIGTH_SAR))
+                if (pDebuffTarget && pDebuffTarget->IsAlive() && pDebuffTarget->HasAura(SPELL_GIFT_OF_TWILIGTH_SAR))
                     pDebuffTarget->RemoveAurasDueToSpell(SPELL_GIFT_OF_TWILIGTH_SAR);
 
                 //event not in progress, then solo fight and must remove debuff mini-boss
                 pDebuffTarget = instance->instance->GetCreature(instance->GetData64(DATA_SHADRON));
-                if (pDebuffTarget && pDebuffTarget->isAlive() && pDebuffTarget->HasAura(SPELL_GIFT_OF_TWILIGTH_SHA))
+                if (pDebuffTarget && pDebuffTarget->IsAlive() && pDebuffTarget->HasAura(SPELL_GIFT_OF_TWILIGTH_SHA))
                     pDebuffTarget->RemoveAurasDueToSpell(SPELL_GIFT_OF_TWILIGTH_SHA);
             }
         }
@@ -1423,7 +1423,7 @@ public:
                 if (pVesperon)
                     (CAST_AI(mob_vesperon::mob_vesperonAI, pVesperon->AI()))->m_bHasPortalOpen = false;
 
-                if (pVesperon && pVesperon->isAlive() && pVesperon->HasAura(SPELL_TWILIGHT_TORMENT_VESP))
+                if (pVesperon && pVesperon->IsAlive() && pVesperon->HasAura(SPELL_TWILIGHT_TORMENT_VESP))
                     pVesperon->RemoveAurasDueToSpell(SPELL_TWILIGHT_TORMENT_VESP);
 
                 Map* map = me->GetMap();
@@ -1436,15 +1436,15 @@ public:
 
                     for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                     {
-                        if (i->getSource()->isAlive() && i->getSource()->HasAura(SPELL_TWILIGHT_SHIFT, 0) && !i->getSource()->getVictim())
+                        if (i->GetSource()->IsAlive() && i->GetSource()->HasAura(SPELL_TWILIGHT_SHIFT, 0) && !i->GetSource()->GetVictim())
                         {
-                            i->getSource()->CastSpell(i->getSource(), SPELL_TWILIGHT_SHIFT_REMOVAL_ALL, true);
-                            i->getSource()->CastSpell(i->getSource(), SPELL_TWILIGHT_RESIDUE, true);
-                            i->getSource()->RemoveAurasDueToSpell(SPELL_TWILIGHT_SHIFT);
-                            i->getSource()->RemoveAurasDueToSpell(SPELL_TWILIGHT_SHIFT_ENTER);
+                            i->GetSource()->CastSpell(i->GetSource(), SPELL_TWILIGHT_SHIFT_REMOVAL_ALL, true);
+                            i->GetSource()->CastSpell(i->GetSource(), SPELL_TWILIGHT_RESIDUE, true);
+                            i->GetSource()->RemoveAurasDueToSpell(SPELL_TWILIGHT_SHIFT);
+                            i->GetSource()->RemoveAurasDueToSpell(SPELL_TWILIGHT_SHIFT_ENTER);
                         }
-                        if (i->getSource()->isAlive() && i->getSource()->HasAura(SPELL_TWILIGHT_TORMENT_VESP, 0) && !i->getSource()->getVictim())
-                            i->getSource()->RemoveAurasDueToSpell(SPELL_TWILIGHT_TORMENT_VESP);
+                        if (i->GetSource()->IsAlive() && i->GetSource()->HasAura(SPELL_TWILIGHT_TORMENT_VESP, 0) && !i->GetSource()->GetVictim())
+                            i->GetSource()->RemoveAurasDueToSpell(SPELL_TWILIGHT_TORMENT_VESP);
                     }
                 }
 
@@ -1633,8 +1633,8 @@ public:
             {
                 DoCastAOE(RAID_MODE(SPELL_VOID_BLAST, SPELL_VOID_BLAST_H));
                 ////twilight realm
-                //DoCast(me->getVictim(), 57620, true);
-                //DoCast(me->getVictim(), 57874, true);
+                //DoCast(me->GetVictim(), 57620, true);
+                //DoCast(me->GetVictim(), 57874, true);
                 VoidBlast_Timer = 9000;
                 me->RemoveAllAuras();
                 me->Kill(me);
@@ -1683,7 +1683,7 @@ public:
             // twilight torment
             if (m_uiFadeArmorTimer <= uiDiff)
             {
-                DoCast(me->getVictim(), SPELL_FADE_ARMOR);
+                DoCast(me->GetVictim(), SPELL_FADE_ARMOR);
                 m_uiFadeArmorTimer = urand(5000, 10000);
             }
             else

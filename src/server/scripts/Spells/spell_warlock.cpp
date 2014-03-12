@@ -302,7 +302,7 @@ class spell_warl_demonic_empowerment : public SpellScriptLoader
             {
                 if (Creature* targetCreature = GetHitCreature())
                 {
-                    if (targetCreature->isPet())
+                    if (targetCreature->IsPet())
                     {
                         CreatureTemplate const* ci = sObjectMgr->GetCreatureTemplate(targetCreature->GetEntry());
                         switch (ci->family)
@@ -956,7 +956,7 @@ class spell_warl_shadowburn_glyph : public SpellScriptLoader
 
             void HandleAfterHit()
             {
-                if (GetHitUnit()->isAlive() && GetHitUnit()->HealthBelowPct(20))
+                if (GetHitUnit()->IsAlive() && GetHitUnit()->HealthBelowPct(20))
                     GetCaster()->ToPlayer()->RemoveSpellCooldown(17877);
             }
 
@@ -984,7 +984,7 @@ public:
 
         bool Load()
         {
-            if (!GetCaster()->isPet() || !GetCaster()->ToPet()->GetOwner())
+            if (!GetCaster()->IsPet() || !GetCaster()->ToPet()->GetOwner())
                 return false;
 
             if (AuraEffect* aurEff = GetCaster()->ToPet()->GetOwner()->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_WARLOCK, 3171, 0))

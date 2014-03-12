@@ -186,7 +186,7 @@ class boss_ozruk : public CreatureScript
                                 break;
                                 
                             case EVENT_PARALYZE_DAMAGE:
-                                if (Unit* target = me->getVictim())
+                                if (Unit* target = me->GetVictim())
                                 {
                                     std::list<HostileReference*> t_list = me->getThreatManager().getThreatList();
                                     for (std::list<HostileReference*>::const_iterator itr = t_list.begin(); itr!= t_list.end(); ++itr)
@@ -248,7 +248,7 @@ public:
         {
             if (timerAura <= diff)
             {
-            if (Unit* target = me->getVictim())
+            if (Unit* target = me->GetVictim())
                 if (target && target->IsWithinDistInMap(me, 2.0f))
                 {
                     DoCast(target, SPELL_RUPTURE_DMG);

@@ -473,7 +473,7 @@ public:
                             break;
 
                         case EVENT_FURY_OF_CHOGALL:
-                            DoCast(me->getVictim(), SPELL_FURY_OF_CHOGALL);
+                            DoCast(me->GetVictim(), SPELL_FURY_OF_CHOGALL);
                             events.ScheduleEvent(EVENT_FURY_OF_CHOGALL, urand(45000, 49000), PHASE_ONE);
                             break;
 
@@ -500,7 +500,7 @@ public:
                     switch (eventId)
                     {
                         case EVENT_FURY_OF_CHOGALL:
-                            DoCast(me->getVictim(), SPELL_FURY_OF_CHOGALL);
+                            DoCast(me->GetVictim(), SPELL_FURY_OF_CHOGALL);
                             events.ScheduleEvent(EVENT_FURY_OF_CHOGALL, urand(45000, 49000), PHASE_TWO);
                             break;
 
@@ -788,7 +788,7 @@ public:
                 me->DespawnOrUnsummon(); // Is dead.
 
             if(Unit* chogall = me->FindNearestCreature(NPC_CHOGALL, 200.0f, true))
-                if(!chogall->isInCombat()) // evaded.
+                if(!chogall->IsInCombat()) // evaded.
                     me->DespawnOrUnsummon();
 
             while (uint32 eventId = events.ExecuteEvent())
@@ -808,7 +808,7 @@ public:
                     break;
 
                     case EVENT_MELEE_INCR_CORRUPTION:
-                    if (Unit* target = me->getVictim())
+                    if (Unit* target = me->GetVictim())
                         if (me->IsWithinMeleeRange(target))
                             target->SetPower(POWER_ALTERNATE_POWER, target->GetPower(POWER_ALTERNATE_POWER) + 10);
                     break;

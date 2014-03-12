@@ -119,7 +119,7 @@ public:
                     eregosGUID = creature->GetGUID();
                     break;
                 case NPC_CENTRIFUGE_CONSTRUCT:
-                    if (creature->isAlive())
+                    if (creature->IsAlive())
                         DoUpdateWorldState(WORLD_STATE_CENTRIFUGE_CONSTRUCT_AMOUNT, ++centrifugueConstructCounter);
                     break;
             }

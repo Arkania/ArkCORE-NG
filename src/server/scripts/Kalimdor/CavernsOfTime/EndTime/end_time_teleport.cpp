@@ -86,13 +86,13 @@ class end_time_teleport : public GameObjectScript
                 return true;
             }
 
-            void UpdateAI(uint32 diff) { }
+            void UpdateAI(const uint32 diff) { }
         };
 
         bool OnGossipSelect(Player* player, GameObject* go, uint32 sender, uint32 action) 
 		{
             //player->PlayerTalkClass->ClearMenus();
-            if (!player->getAttackers().empty())
+            if (!player->GetAttackers().empty())
                 return false;
             
             switch (action) 
