@@ -76,7 +76,6 @@ set(scripts_STAT_SRCS
   Kalimdor/CavernsOfTime/DarkPortal/dark_portal.cpp
   Kalimdor/CavernsOfTime/DarkPortal/boss_aeonus.cpp
   Kalimdor/CavernsOfTime/DarkPortal/boss_temporus.cpp
-  Kalimdor/CavernsOfTime/TheBlackMorass/the_black_morass.cpp
   Kalimdor/DireMaul/instance_dire_maul.cpp
   Kalimdor/BlackfathomDeeps/boss_kelris.cpp
   Kalimdor/BlackfathomDeeps/instance_blackfathom_deeps.cpp

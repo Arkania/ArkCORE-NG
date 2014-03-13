@@ -252,16 +252,11 @@ void AddSC_instance_blackrock_caverns();
 void AddSC_boss_gizrul_the_slavener();
 void AddSC_boss_urok_doomhowl();
 void AddSC_boss_lord_valthalak();
-void AddSC_boss_drahga_shadowburner();
-void AddSC_boss_erudax();
-void AddSC_boss_general_umbriss();
-void AddSC_instance_grim_batol();
 void AddSC_boss_kirtonos_the_herald();
 void AddSC_instance_the_stockade();
 void AddSC_boss_commander_ulthok();
 void AddSC_boss_erunak_stonespeaker();
 void AddSC_boss_lady_nazjar();
-void AddSC_instance_throne_of_the_tides();
 void AddSC_coldridge_valley();
 void AddSC_elwynn_forest();
 
@@ -372,7 +367,6 @@ void AddSC_wailing_caverns();                //Wailing caverns
 void AddSC_instance_wailing_caverns();
 void AddSC_zulfarrak();                     //Zul'Farrak generic
 void AddSC_instance_zulfarrak();            //Zul'Farrak instance script
-void AddSC_the_black_morass();
 void AddSC_instance_dire_maul();
 void AddSC_boss_ptah();
 void AddSC_elementaires_sdo();  // french
@@ -1044,16 +1038,11 @@ void AddEasternKingdomsScripts()
 	AddSC_boss_gizrul_the_slavener();
 	AddSC_boss_urok_doomhowl();
 	AddSC_boss_lord_valthalak();
-	AddSC_boss_drahga_shadowburner();
-	AddSC_boss_erudax();
-	AddSC_boss_general_umbriss();
-	AddSC_instance_grim_batol();
 	AddSC_boss_kirtonos_the_herald();
 	AddSC_instance_the_stockade();
     AddSC_boss_commander_ulthok();
     AddSC_boss_erunak_stonespeaker();
     AddSC_boss_lady_nazjar();
-    AddSC_instance_throne_of_the_tides();
 	AddSC_coldridge_valley();
 	AddSC_elwynn_forest();
 
@@ -1145,7 +1134,6 @@ void AddKalimdorScripts()
     AddSC_instance_wailing_caverns();
     AddSC_zulfarrak();                      //Zul'Farrak generic
     AddSC_instance_zulfarrak();             //Zul'Farrak instance script
-	AddSC_the_black_morass();
 	AddSC_instance_dire_maul();
 	AddSC_boss_ptah();
 	AddSC_elementaires_sdo();   
