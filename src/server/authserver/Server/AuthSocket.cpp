@@ -862,6 +862,9 @@ bool AuthSocket::_HandleRealmList()
         uint8 AmountOfCharacters;
 
         // No SQL injection. id of realm is controlled by the database.
+        // We don't need the port number from which client connects with but the realm's port
+        clientAddr.set_port_number(i->second.ExternalAddress.get_port_number());
+
         stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_NUM_CHARS_ON_REALM);
         stmt->setUInt32(0, i->second.m_ID);
         stmt->setUInt32(1, id);
