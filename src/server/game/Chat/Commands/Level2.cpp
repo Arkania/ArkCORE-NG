@@ -57,7 +57,7 @@ bool ChatHandler::HandleMuteCommand(const char* args)
     char *mutereason = strtok(NULL, "\r");
     std::string mutereasonstr = "No reason";
     if (mutereason != NULL)
-         mutereasonstr = mutereason;
+        mutereasonstr = mutereason;
 
     Player* target;
     uint64 target_guid;
@@ -79,29 +79,31 @@ bool ChatHandler::HandleMuteCommand(const char* args)
         return false;
 
     PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_MUTE_TIME);
+        std::string muteBy = "";
+        if (GetSession())
+            muteBy = GetSession()->GetPlayerName();
+        else
+            muteBy = "Console";
 
     if (target)
     {
         // Target is online, mute will be in effect right away.
         int64 muteTime = time(NULL) + notspeaktime * MINUTE;
         target->GetSession()->m_muteTime = muteTime;
-
         stmt->setInt64(0, muteTime);
-
-        ChatHandler(target).PSendSysMessage(LANG_YOUR_CHAT_DISABLED, notspeaktime, mutereasonstr.c_str());
+        ChatHandler(target).PSendSysMessage(LANG_YOUR_CHAT_DISABLED, notspeaktime, muteBy.c_str(), mutereasonstr.c_str());
     }
     else
     {
         // Target is offline, mute will be in effect starting from the next login.
         int32 muteTime = -int32(notspeaktime * MINUTE);
-
         stmt->setInt64(0, muteTime);
     }
 
-    stmt->setUInt32(1, accountId);
-
+    stmt->setString(1, mutereasonstr.c_str());
+    stmt->setString(2, muteBy.c_str());
+    stmt->setUInt32(3, accountId);
     LoginDatabase.Execute(stmt);
-
     std::string nameLink = playerLink(target_name);
 
     PSendSysMessage(target ? LANG_YOU_DISABLE_CHAT : LANG_COMMAND_DISABLE_CHAT_DELAYED, nameLink.c_str(), notspeaktime, mutereasonstr.c_str());
@@ -142,10 +144,10 @@ bool ChatHandler::HandleUnmuteCommand(const char* args)
     }
 
     PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_MUTE_TIME);
-
     stmt->setInt64(0, 0);
-    stmt->setUInt32(1, accountId);
-
+    stmt->setString(1, "");
+    stmt->setString(2, "");
+    stmt->setUInt32(3, accountId);
     LoginDatabase.Execute(stmt);
 
     if (target)
@@ -302,6 +304,8 @@ bool ChatHandler::HandlePInfoCommand(const char* args)
 
     std::string username   = GetTrinityString(LANG_ERROR);
     std::string email      = GetTrinityString(LANG_ERROR);
+    std::string muteReason  = "";
+    std::string muteBy      = "";
     std::string last_ip    = GetTrinityString(LANG_ERROR);
     uint32 security        = 0;
     std::string last_login = GetTrinityString(LANG_ERROR);
@@ -318,6 +322,8 @@ bool ChatHandler::HandlePInfoCommand(const char* args)
         security      = fields[1].GetUInt8();
         email         = fields[2].GetString();
         muteTime      = fields[5].GetUInt64();
+        muteReason    = fields[6].GetString();
+        muteBy        = fields[7].GetString();
 
         if (email.empty())
             email = "-";
@@ -379,7 +385,7 @@ bool ChatHandler::HandlePInfoCommand(const char* args)
     }
 
     if (muteTime > 0)
-        PSendSysMessage(LANG_PINFO_MUTE, secsToTimeString(muteTime - time(NULL), true).c_str());
+        PSendSysMessage(LANG_PINFO_MUTE, secsToTimeString(muteTime - time(NULL), true).c_str(), muteBy.c_str(), muteReason.c_str());
 
     if (banTime >= 0)
         PSendSysMessage(LANG_PINFO_BAN, banTime > 0 ? secsToTimeString(banTime - time(NULL), true).c_str() : "permanently", bannedby.c_str(), banreason.c_str());
