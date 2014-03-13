@@ -38,15 +38,15 @@
 enum Intro
 {
     // intro
-    LIAM_INTRO_1                     = -1977000,
-    LIAM_INTRO_2                     = -1977001,
-    LIAM_INTRO_3                     = -1977002,
-    CITIZEN_SAY_WHAT_AT_THE_ROOF     = -1977003,
+    LIAM_INTRO_1                     = 0,
+    LIAM_INTRO_2                     = 1,
+    LIAM_INTRO_3                     = 2,
+    CITIZEN_SAY_WHAT_AT_THE_ROOF     = 0, // -1977003,
     // phase 1, merchant square
-    LIAM_RANDOM_YELL                 = -1977019,  // (-1977019 to -1977023)
+    LIAM_RANDOM_YELL                 = 0,  // (-1977019 to -1977023)
 
-    PANICKED_CITIZEN_RANDOM_SAY      = -1977152,  // (-1977152 to -1977154)
-    GILNEAS_CITY_GUARD_RANDOM_SAY    = -1977155,  // (-1977155 to -1977157)
+    PANICKED_CITIZEN_RANDOM_SAY      = 0,  // (-1977152 to -1977154)
+    GILNEAS_CITY_GUARD_RANDOM_SAY    = 0,  // (-1977155 to -1977157)
 
     SPELL_ENRAGE                     = 8599,
     SPELL_SHOOT                      = 20463,
@@ -69,7 +69,7 @@ enum eAttackedCreatures
     NPC_NORTHGATE_REBEL_PHASE_5      = 36057,
     NPC_BLOODFANG_STALKER_PHASE_5    = 35229,
 
-    GUARD_RANDOM_YELL                = -1977161,    //  -1977161 to -1977163
+    GUARD_RANDOM_YELL                = 0,    //  -1977161 to -1977163
 };
 
 enum eDuskhavenAttackers
@@ -182,8 +182,8 @@ public:
                                     {
                                         ++uiEventPhase;
                                         uiEventTimer = urand(5000, 10000);
-                                        uint8 roll = urand(0, 2);
-                                        DoScriptText(PANICKED_CITIZEN_RANDOM_SAY - roll, citizen);
+                                        //uint8 roll = urand(0, 2);
+                                        Talk(PANICKED_CITIZEN_RANDOM_SAY , citizen->GetGUID());
                                         return;
                                     }
                                 }
@@ -194,8 +194,8 @@ public:
                         case 1:
                             --uiEventPhase;
                             uiEventTimer = urand(10000, 40000);
-                            uint8 roll = urand(0, 2);
-                            DoScriptText(GILNEAS_CITY_GUARD_RANDOM_SAY - roll, me);
+                            // uint8 roll = urand(0, 2);
+                            Talk(GILNEAS_CITY_GUARD_RANDOM_SAY , me->GetGUID());
                             break;
                     }
                 }
@@ -339,16 +339,11 @@ class npc_prince_liam_greymane_intro : public CreatureScript
 public:
     npc_prince_liam_greymane_intro() : CreatureScript("npc_prince_liam_greymane_intro") { }
 
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new npc_prince_liam_greymane_introAI (creature);
-    }
-
     bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
     {
         if (quest->GetQuestId() == 14078)
             if (Creature* citizen = creature->FindNearestCreature(34851, 20.0f))
-                DoScriptText(CITIZEN_SAY_WHAT_AT_THE_ROOF, player);
+             citizen->MonsterSay(CITIZEN_SAY_WHAT_AT_THE_ROOF, 0, player->GetGUID());
 
         return true;
     }
@@ -375,16 +370,16 @@ public:
                 switch (uiSayCount)
                 {
                     case 1:
-                        DoScriptText(LIAM_INTRO_1, me);
-                        uiSayTimer = 12000;
+                        Talk(LIAM_INTRO_1, me->GetGUID());
+                        uiSayTimer = 15000;
                         break;
                     case 2:
-                        DoScriptText(LIAM_INTRO_2, me);
-                        uiSayTimer = 12000;
+                        Talk(LIAM_INTRO_2, me->GetGUID());
+                        uiSayTimer = 18000;
                         break;
                     case 3:
-                        DoScriptText(LIAM_INTRO_3, me);
-                        uiSayTimer = 18000;
+                        Talk(LIAM_INTRO_3, me->GetGUID());
+                        uiSayTimer = 25000;
                         uiSayCount = 0;
                         break;
                 }
@@ -393,6 +388,13 @@ public:
                 uiSayTimer -= diff;
         }
     };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_prince_liam_greymane_introAI (creature);
+    }
+
+
 };
 
 ///////////
@@ -505,8 +507,8 @@ public:
             if (uiSayTimer <= diff)
             {
                 uiSayTimer = urand(30000, 120000);
-                uint8 id = urand(0, 4);
-                DoScriptText(LIAM_RANDOM_YELL - id, me);
+               // uint8 id = urand(0, 4);
+                Talk(LIAM_RANDOM_YELL, me->GetGUID());
             }
             else
                 uiSayTimer -= diff;
@@ -2247,11 +2249,11 @@ public:
                     break;
                 case 29:
                     if (Vehicle* pVehicle = me->GetVehicleKit())
-                    {
-						Player* passenger;
-                        if (pVehicle->GetPassenger(0))
-                            passenger->ExitVehicle();
-                        if (pVehicle->GetPassenger(1))
+                    {						
+                        if (Player* passenger = pVehicle->GetPassenger(0)->ToPlayer())
+							passenger->ExitVehicle();
+
+                        if (Player* passenger = pVehicle->GetPassenger(1)->ToPlayer())
                             passenger->ToCreature()->DespawnOrUnsummon();
                     }
                     me->DespawnOrUnsummon();
@@ -2471,7 +2473,7 @@ class spell_summon_crowley_horse : public SpellScriptLoader
                 if (!player)
                     return;
 
-                Vehicle* vehicle;
+                Vehicle* vehicle = NULL;
                 Creature* horse = NULL;
                 Creature* crowley = NULL;
                 horse = player->SummonCreature(NPC_CROWLEYS_HORSE, -1737.68f, 1655.11f, 20.56283f, 1.64061f);
