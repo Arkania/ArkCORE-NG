@@ -468,6 +468,9 @@ void Pet::SavePetToDB(PetSaveMode mode)
         CharacterDatabase.EscapeString(name);
         trans = CharacterDatabase.BeginTransaction();
         // remove current data
+		trans->PAppend("DELETE FROM character_pet WHERE owner = '%u' AND id = '%u'", owner, m_charmInfo->GetPetNumber());
+		// Remove duplicate ghouls (dks can only have 1 ghoul at the same time)
+		trans->PAppend("DELETE FROM character_pet WHERE owner = '%u' AND `owner` IN (SELECT `guid` FROM `characters` WHERE `class`=6);", owner);		
 
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_PET_BY_ID);
         stmt->setUInt32(0, m_charmInfo->GetPetNumber());
