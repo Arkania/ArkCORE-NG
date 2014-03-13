@@ -25,6 +25,7 @@
 ///#include "ScriptedVehicleEscortAI.h"
 #include "ObjectMgr.h"
 #include "Creature.h"
+#include "CreatureAI.h"
 #include "SpellScript.h"
 #include "ScriptedCreature.h"
 #include "Object.h"
@@ -108,7 +109,7 @@ public:
     {
         npc_panicked_citizen_gateAI(Creature* creature) : ScriptedAI(creature)
         {
-            uiRandomEmoteTimer = urand(4000, 8000);
+            uiRandomEmoteTimer = urand(1000, 60000);
         }
 
         uint32 uiRandomEmoteTimer;
@@ -117,7 +118,7 @@ public:
         {
             if (uiRandomEmoteTimer <= diff)
             {
-                uiRandomEmoteTimer = urand(2000, 5000);
+                uiRandomEmoteTimer = urand(10000, 60000);
                 uint8 roll = urand(0, 5);
                 me->HandleEmoteCommand(PanickedCitizenRandomEmote[roll]);
             }
@@ -180,10 +181,11 @@ public:
 
                                     if (citizen)
                                     {
-                                        ++uiEventPhase;
+                                        uiEventPhase=1;
                                         uiEventTimer = urand(5000, 10000);
                                         //uint8 roll = urand(0, 2);
-                                        Talk(PANICKED_CITIZEN_RANDOM_SAY , citizen->GetGUID());
+                                        citizen->AI()->Talk(PANICKED_CITIZEN_RANDOM_SAY, me->GetGUID());
+										
                                         return;
                                     }
                                 }
@@ -192,7 +194,7 @@ public:
                             }
                             break;
                         case 1:
-                            --uiEventPhase;
+                            uiEventPhase=0;
                             uiEventTimer = urand(10000, 40000);
                             // uint8 roll = urand(0, 2);
                             Talk(GILNEAS_CITY_GUARD_RANDOM_SAY , me->GetGUID());
