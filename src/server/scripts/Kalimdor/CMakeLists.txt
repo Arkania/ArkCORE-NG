@@ -14,9 +14,14 @@ set(scripts_STAT_SRCS
   Kalimdor/RazorfenDowns/instance_razorfen_downs.cpp
   Kalimdor/RazorfenDowns/boss_amnennar_the_coldbringer.cpp
   Kalimdor/RazorfenDowns/razorfen_downs.h
+  Kalimdor/RazorfenDowns/boss_tuten_kash.cpp
+  Kalimdor/RazorfenDowns/boss_mordresh_fire_eye.cpp
+  Kalimdor/RazorfenDowns/boss_glutton.cpp
+  Kalimdor/RagefireChasm/instance_ragefire_chasm.cpp
   Kalimdor/ZulFarrak/zulfarrak.h
   Kalimdor/ZulFarrak/zulfarrak.cpp
   Kalimdor/ZulFarrak/instance_zulfarrak.cpp
+  Kalimdor/ZulFarrak/boss_zum_rah.cpp  
   Kalimdor/CavernsOfTime/EscapeFromDurnholdeKeep/boss_epoch_hunter.cpp
   Kalimdor/CavernsOfTime/EscapeFromDurnholdeKeep/old_hillsbrad.h
   Kalimdor/CavernsOfTime/EscapeFromDurnholdeKeep/boss_leutenant_drake.cpp
@@ -71,6 +76,8 @@ set(scripts_STAT_SRCS
   Kalimdor/CavernsOfTime/DarkPortal/dark_portal.cpp
   Kalimdor/CavernsOfTime/DarkPortal/boss_aeonus.cpp
   Kalimdor/CavernsOfTime/DarkPortal/boss_temporus.cpp
+  Kalimdor/CavernsOfTime/TheBlackMorass/the_black_morass.cpp
+  Kalimdor/DireMaul/instance_dire_maul.cpp
   Kalimdor/BlackfathomDeeps/boss_kelris.cpp
   Kalimdor/BlackfathomDeeps/instance_blackfathom_deeps.cpp
   Kalimdor/BlackfathomDeeps/boss_gelihast.cpp
@@ -81,6 +88,7 @@ set(scripts_STAT_SRCS
   Kalimdor/Maraudon/boss_landslide.cpp
   Kalimdor/Maraudon/boss_celebras_the_cursed.cpp
   Kalimdor/Maraudon/boss_noxxion.cpp
+  Kalimdor/Maraudon/instance_maraudon.cpp
   Kalimdor/TempleOfAhnQiraj/boss_fankriss.cpp
   Kalimdor/TempleOfAhnQiraj/boss_huhuran.cpp
   Kalimdor/TempleOfAhnQiraj/instance_temple_of_ahnqiraj.cpp
@@ -128,6 +136,9 @@ set(scripts_STAT_SRCS
   Kalimdor/HallsOfOrigination/boss_isiset.cpp
   Kalimdor/HallsOfOrigination/boss_rajh.cpp
   Kalimdor/HallsOfOrigination/boss_setesh.cpp
+  Kalimdor/HallsOfOrigination/boss_ptah.cpp
+  Kalimdor/HallsOfOrigination/elementaires_sdo.cpp
+  Kalimdor/HallsOfOrigination/trash_origine.cpp
   Kalimdor/ThroneOfTheFourWinds/instance_throne_of_the_four_winds.cpp
   Kalimdor/ThroneOfTheFourWinds/throne_of_the_four_winds.cpp
   Kalimdor/ThroneOfTheFourWinds/throne_of_the_four_winds.h

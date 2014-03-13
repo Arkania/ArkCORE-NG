@@ -33,4 +33,9 @@ enum zfPyramidPhases
     PYRAMID_KILLED_ALL_TROLLS,
 };
 
+enum eData
+{
+	DATA_ZUM_RAH,
+};
+
 #endif

@@ -372,6 +372,16 @@ void AddSC_wailing_caverns();                //Wailing caverns
 void AddSC_instance_wailing_caverns();
 void AddSC_zulfarrak();                     //Zul'Farrak generic
 void AddSC_instance_zulfarrak();            //Zul'Farrak instance script
+void AddSC_the_black_morass();
+void AddSC_instance_dire_maul();
+void AddSC_boss_ptah();
+void AddSC_elementaires_sdo();  // french
+void AddSC_npc_trash_sdo();		// french
+void AddSC_instance_maraudon();
+void AddSC_boss_tuten_kash();
+void AddSC_boss_mordresh_fire_eye();
+void AddSC_boss_glutton();
+void AddSC_boss_zum_rah();
 
 // Cataclysm scripts here
     //Firelands
@@ -1128,7 +1138,17 @@ void AddKalimdorScripts()
     AddSC_instance_wailing_caverns();
     AddSC_zulfarrak();                      //Zul'Farrak generic
     AddSC_instance_zulfarrak();             //Zul'Farrak instance script
-    
+	AddSC_the_black_morass();
+	AddSC_instance_dire_maul();
+	AddSC_boss_ptah();
+	AddSC_elementaires_sdo();   
+	AddSC_npc_trash_sdo();
+	AddSC_instance_maraudon();
+	AddSC_boss_tuten_kash();
+	AddSC_boss_mordresh_fire_eye();
+	AddSC_boss_glutton();
+	AddSC_boss_zum_rah();
+
     // Cataclysm scripts here
     
     //Firelands
