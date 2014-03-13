@@ -41,8 +41,14 @@ set(scripts_STAT_SRCS
   Outland/CoilfangReservoir/SerpentShrine/boss_leotheras_the_blind.cpp
   Outland/CoilfangReservoir/SerpentShrine/boss_lurker_below.cpp
   Outland/CoilfangReservoir/SerpentShrine/boss_morogrim_tidewalker.cpp
-  Outland/CoilfangReservoir/underbog/boss_hungarfen.cpp
-  Outland/CoilfangReservoir/underbog/boss_the_black_stalker.cpp
+  Outland/CoilfangReservoir/TheSlavePens/instance_the_slave_pens.cpp
+  Outland/CoilfangReservoir/TheSlavePens/the_slave_pens.h
+  Outland/CoilfangReservoir/TheSlavePens/boss_mennu_the_betrayer.cpp
+  Outland/CoilfangReservoir/TheSlavePens/boss_rokmar_the_crackler.cpp
+  Outland/CoilfangReservoir/TheSlavePens/boss_quagmirran.cpp
+  Outland/CoilfangReservoir/TheUnderbog/boss_hungarfen.cpp
+  Outland/CoilfangReservoir/TheUnderbog/boss_the_black_stalker.cpp
+  Outland/CoilfangReservoir/TheUnderbog/instance_the_underbog.cpp
   Outland/TempestKeep/Mechanar/boss_mechano_lord_capacitus.cpp
   Outland/TempestKeep/Mechanar/boss_pathaleon_the_calculator.cpp
   Outland/TempestKeep/Mechanar/boss_nethermancer_sepethrea.cpp
@@ -60,17 +66,29 @@ set(scripts_STAT_SRCS
   Outland/TempestKeep/botanica/boss_high_botanist_freywinn.cpp
   Outland/TempestKeep/botanica/boss_warp_splinter.cpp
   Outland/TempestKeep/botanica/boss_laj.cpp
+  Outland/TempestKeep/botanica/the_botanica.h
+  Outland/TempestKeep/botanica/instance_the_botanica.cpp
+  Outland/TempestKeep/botanica/boss_commander_sarannis.cpp
+  Outland/TempestKeep/botanica/boss_thorngrin_the_tender.cpp  
   Outland/TempestKeep/arcatraz/boss_harbinger_skyriss.cpp
   Outland/TempestKeep/arcatraz/instance_arcatraz.cpp
   Outland/TempestKeep/arcatraz/arcatraz.h
+  Outland/TempestKeep/arcatraz/boss_zereketh_the_unbound.cpp
+  Outland/TempestKeep/arcatraz/boss_dalliah_the_doomsayer.cpp
+  Outland/TempestKeep/arcatraz/boss_wrath_scryer_soccothrates.cpp
   Outland/Auchindoun/AuchenaiCrypts/boss_shirrak_the_dead_watcher.cpp
   Outland/Auchindoun/AuchenaiCrypts/boss_exarch_maladaar.cpp
+  Outland/Auchindoun/AuchenaiCrypts/instance_auchenai_crypts.cpp
+  Outland/Auchindoun/AuchenaiCrypts/auchenai_crypts.h
   Outland/Auchindoun/ManaTombs/boss_pandemonius.cpp
   Outland/Auchindoun/ManaTombs/boss_nexusprince_shaffar.cpp
+  Outland/Auchindoun/ManaTombs/instance_mana_tombs.cpp
+  Outland/Auchindoun/ManaTombs/mana_tombs.h
   Outland/Auchindoun/SethekkHalls/boss_tailonking_ikiss.cpp
   Outland/Auchindoun/SethekkHalls/boss_darkweaver_syth.cpp
   Outland/Auchindoun/SethekkHalls/instance_sethekk_halls.cpp
   Outland/Auchindoun/SethekkHalls/sethekk_halls.h
+  Outland/Auchindoun/SethekkHalls/boss_anzu.cpp
   Outland/Auchindoun/ShadowLabyrinth/boss_murmur.cpp
   Outland/Auchindoun/ShadowLabyrinth/boss_ambassador_hellmaw.cpp
   Outland/Auchindoun/ShadowLabyrinth/boss_blackheart_the_inciter.cpp
@@ -93,6 +111,7 @@ set(scripts_STAT_SRCS
   Outland/GruulsLair/boss_gruul.cpp
   Outland/GruulsLair/gruuls_lair.h
   Outland/GruulsLair/instance_gruuls_lair.cpp
+
   
   Outland/boss_doomwalker.cpp
   Outland/boss_doomlord_kazzak.cpp

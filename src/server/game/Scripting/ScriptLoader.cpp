@@ -382,6 +382,13 @@ void AddSC_boss_tuten_kash();
 void AddSC_boss_mordresh_fire_eye();
 void AddSC_boss_glutton();
 void AddSC_boss_zum_rah();
+void AddSC_zone_tolbarad_peninsula();
+void AddSC_zone_tolbarad();
+void AddSC_zone_the_maelstrom();
+void AddSC_zone_lost_isles();
+void AddSC_zone_deepholm();
+void AddSC_zone_darkmoon_island();
+
 
 // Cataclysm scripts here
     //Firelands
@@ -1148,6 +1155,12 @@ void AddKalimdorScripts()
 	AddSC_boss_mordresh_fire_eye();
 	AddSC_boss_glutton();
 	AddSC_boss_zum_rah();
+	AddSC_zone_tolbarad_peninsula();
+	AddSC_zone_tolbarad();
+	AddSC_zone_the_maelstrom();
+	AddSC_zone_lost_isles();
+	AddSC_zone_deepholm();
+	AddSC_zone_darkmoon_island();
 
     // Cataclysm scripts here
     

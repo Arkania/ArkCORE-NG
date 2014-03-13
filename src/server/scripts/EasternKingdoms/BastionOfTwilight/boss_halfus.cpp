@@ -806,7 +806,7 @@ public:
 
         void JustDied(Unit* /*killer*/) {}
 
-        void UpdateAI(uint32 const diff) 
+        void UpdateAI(const uint32 diff) 
         {
             DoMeleeAttackIfReady();
         }

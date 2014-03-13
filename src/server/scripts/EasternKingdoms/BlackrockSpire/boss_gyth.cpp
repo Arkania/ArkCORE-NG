@@ -93,7 +93,7 @@ public:
                         Summoned->AddThreat(target, 250.0f);
         }
 
-        void UpdateAI(uint32 const diff)
+        void UpdateAI(const uint32 diff)
         {
             if (!UpdateVictim())
                 return;

@@ -286,7 +286,7 @@ class npc_flarecore : public CreatureScript
                 events.ScheduleEvent(EVENT_EXPLODE, 10000);
             }
 
-            void UpdateAI(uint32 const diff)
+            void UpdateAI(const uint32 diff)
             {
                 if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                     return;

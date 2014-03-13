@@ -71,7 +71,7 @@ public:
                 DoCast(me, SPELL_SUMMON_SPIRE_SPIDERLING, true);
         }
 
-        void UpdateAI(uint32 const diff)
+        void UpdateAI(const uint32 diff)
         {
             if (!UpdateVictim())
                 return;

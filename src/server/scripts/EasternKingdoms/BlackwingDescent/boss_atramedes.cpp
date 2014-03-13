@@ -798,7 +798,7 @@ public:
     {
         mob_atramedes_gongAI(Creature* creature) : ScriptedAI(creature){ }
 
-        void UpdateAI(uint32 const diff)
+        void UpdateAI(const uint32 diff)
         { 
             // Don't use gongs out of combat
             if (Creature* atramedes = me->FindNearestCreature(BOSS_ATRAMEDES, 200.0f))
@@ -865,7 +865,7 @@ public:
                  (*iter)->DespawnOrUnsummon();
         }
 
-        void UpdateAI(uint32 const diff) 
+        void UpdateAI(const uint32 diff) 
         {
             if (timer <= diff)
             {

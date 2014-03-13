@@ -27,12 +27,6 @@ EndScriptData */
 #include "ScriptPCH.h"
 #include "sethekk_halls.h"
 
-enum eEnums
-{
-    NPC_ANZU   = 23035,
-    IKISS_DOOR = 183398,
-};
-
 class instance_sethekk_halls : public InstanceMapScript
 {
 public:
@@ -69,7 +63,7 @@ public:
 
         void OnGameObjectCreate(GameObject* go)
         {
-             if (go->GetEntry() == IKISS_DOOR)
+             if (go->GetEntry() == GO_IKISS_DOOR)
                 m_uiIkissDoorGUID = go->GetGUID();
         }
 

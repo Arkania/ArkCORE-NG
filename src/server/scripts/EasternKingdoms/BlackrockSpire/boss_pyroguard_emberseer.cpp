@@ -100,7 +100,7 @@ public:
                     door3->SetGoState(GO_STATE_ACTIVE);
        }
 
-        void UpdateAI(uint32 const diff)
+        void UpdateAI(const uint32 diff)
         {
             if (!UpdateVictim())
 

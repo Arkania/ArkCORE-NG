@@ -137,7 +137,7 @@ struct emerald_dragonAI : public WorldBossAI
         }
     }
 
-    void UpdateAI(uint32 const diff)
+    void UpdateAI(const uint32 diff)
     {
         if (!UpdateVictim())
             return;
@@ -177,7 +177,7 @@ class npc_dream_fog : public CreatureScript
                 _roamTimer = 0;
             }
 
-            void UpdateAI(uint32 const diff)
+            void UpdateAI(const uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -684,7 +684,7 @@ class boss_taerar : public CreatureScript
                 }
             }
 
-            void UpdateAI(uint32 const diff)
+            void UpdateAI(const uint32 diff)
             {
                 if (!me->IsInCombat())
                     return;

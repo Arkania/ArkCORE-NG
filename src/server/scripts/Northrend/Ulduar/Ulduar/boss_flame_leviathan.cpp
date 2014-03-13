@@ -374,7 +374,7 @@ class boss_flame_leviathan : public CreatureScript
                     Unbroken = data ? true : false;
             }
 
-            void UpdateAI(uint32 const diff)
+            void UpdateAI(const uint32 diff)
             {
                 if (!UpdateVictim() || !CheckInRoom())
                     return;
@@ -650,7 +650,7 @@ class boss_flame_leviathan_defense_cannon : public CreatureScript
                 DoCast(me, AURA_STEALTH_DETECTION);
             }
 
-            void UpdateAI(uint32 const diff)
+            void UpdateAI(const uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -764,7 +764,7 @@ class boss_flame_leviathan_safety_container : public CreatureScript
                 me->SetPosition(x, y, z, 0);
             }
 
-            void UpdateAI(uint32 const /*diff*/)
+            void UpdateAI(const uint32 /*diff*/)
             {
             }
         };
@@ -863,7 +863,7 @@ class npc_pool_of_tar : public CreatureScript
                     me->CastSpell(me, SPELL_BLAZE, true);
             }
 
-            void UpdateAI(uint32 const /*diff*/) {}
+            void UpdateAI(const uint32 /*diff*/) {}
         };
 
         CreatureAI* GetAI(Creature* creature) const
@@ -892,7 +892,7 @@ class npc_colossus : public CreatureScript
                     instance->SetData(DATA_COLOSSUS, instance->GetData(DATA_COLOSSUS)+1);
             }
 
-            void UpdateAI(uint32 const /*diff*/)
+            void UpdateAI(const uint32 /*diff*/)
             {
                 if (!UpdateVictim())
                     return;
@@ -929,7 +929,7 @@ class npc_thorims_hammer : public CreatureScript
                 }
             }
 
-            void UpdateAI(uint32 const /*diff*/)
+            void UpdateAI(const uint32 /*diff*/)
             {
                 if (!me->HasAura(AURA_DUMMY_BLUE))
                     me->CastSpell(me, AURA_DUMMY_BLUE, true);
@@ -975,7 +975,7 @@ public:
 
         uint32 infernoTimer;
 
-        void UpdateAI(uint32 const diff)
+        void UpdateAI(const uint32 diff)
         {
             npc_escortAI::UpdateAI(diff);
 
@@ -1024,7 +1024,7 @@ class npc_hodirs_fury : public CreatureScript
                 }
             }
 
-            void UpdateAI(uint32 const /*diff*/)
+            void UpdateAI(const uint32 /*diff*/)
             {
                 if (!me->HasAura(AURA_DUMMY_GREEN))
                     me->CastSpell(me, AURA_DUMMY_GREEN, true);
@@ -1058,7 +1058,7 @@ class npc_freyas_ward : public CreatureScript
                 summonTimer = 5000;
             }
 
-            void UpdateAI(uint32 const diff)
+            void UpdateAI(const uint32 diff)
             {
                 if (summonTimer <= diff)
                 {
@@ -1101,7 +1101,7 @@ class npc_freya_ward_summon : public CreatureScript
                 lashTimer = 5000;
             }
 
-            void UpdateAI(uint32 const diff)
+            void UpdateAI(const uint32 diff)
             {
                 if (!UpdateVictim())
                     return;

@@ -64,7 +64,7 @@ class boss_ayamiss : public CreatureScript
 
             }
 
-            void UpdateAI(uint32 const diff)
+            void UpdateAI(const uint32 diff)
             {
                 if (!UpdateVictim())
                     return;

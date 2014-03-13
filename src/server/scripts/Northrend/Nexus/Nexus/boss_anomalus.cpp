@@ -124,7 +124,7 @@ class boss_anomalus : public CreatureScript
                     chaosTheory = false;
             }
 
-            void UpdateAI(uint32 const diff)
+            void UpdateAI(const uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -213,7 +213,7 @@ class mob_chaotic_rift : public CreatureScript
                 DoCast(me, SPELL_ARCANEFORM, false);
             }
 
-            void UpdateAI(uint32 const diff)
+            void UpdateAI(const uint32 diff)
             {
                 if (!UpdateVictim())
                     return;

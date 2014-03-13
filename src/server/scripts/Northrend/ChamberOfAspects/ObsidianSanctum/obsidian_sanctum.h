@@ -30,12 +30,14 @@ enum eTypes
     DATA_TENEBRON               = 11,
     DATA_SHADRON                = 12,
     DATA_VESPERON               = 13,
+	DATA_PORTAL_OPEN            = 14,
+    TWILIGHT_ACHIEVEMENTS       = 15,
 
     NPC_SARTHARION              = 28860,
     NPC_TENEBRON                = 30452,
     NPC_SHADRON                 = 30451,
     NPC_VESPERON                = 30449,
-    GO_TWILIGHT_PORTAL          = 193988
+    GO_TWILIGHT_PORTAL          = 193988,
 };
 
 #endif

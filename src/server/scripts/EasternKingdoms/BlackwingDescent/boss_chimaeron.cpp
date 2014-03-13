@@ -395,7 +395,7 @@ public:
         uint32 despawnTimer;
         bool canFree;
 
-        void UpdateAI(uint32 const diff) 
+        void UpdateAI(const uint32 diff) 
         {
             if (GameObject* cage = me->FindNearestGameObject(204929, 30.0f)) // Cage
                 if (cage && cage->GetGoState() == GO_STATE_ACTIVE)

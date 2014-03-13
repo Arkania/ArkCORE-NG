@@ -235,7 +235,7 @@ class boss_razorscale_controller : public CreatureScript
                 }
             }
 
-            void UpdateAI(uint32 const Diff)
+            void UpdateAI(const uint32 const Diff)
             {
                 events.Update(Diff);
 
@@ -386,7 +386,7 @@ class boss_razorscale : public CreatureScript
                 return 0;
             }
 
-            void UpdateAI(uint32 const Diff)
+            void UpdateAI(const uint32 const Diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -631,7 +631,7 @@ class npc_expedition_commander : public CreatureScript
                 }
             }
 
-            void UpdateAI(uint32 const Diff)
+            void UpdateAI(const uint32 const Diff)
             {
                 if (AttackStartTimer <= Diff)
                 {
@@ -753,7 +753,7 @@ class npc_mole_machine_trigger : public CreatureScript
                 NpcSummoned = false;
             }
 
-            void UpdateAI(uint32 const Diff)
+            void UpdateAI(const uint32 const Diff)
             {
                 if (!GobSummoned && SummonGobTimer <= Diff)
                 {
@@ -847,7 +847,7 @@ class npc_darkrune_watcher : public CreatureScript
                 LightTimer = urand(1000, 3000);
             }
 
-            void UpdateAI(uint32 const Diff)
+            void UpdateAI(const uint32 const Diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -907,7 +907,7 @@ class npc_darkrune_guardian : public CreatureScript
             }
 
 
-            void UpdateAI(uint32 const Diff)
+            void UpdateAI(const uint32 const Diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -953,7 +953,7 @@ class npc_darkrune_sentinel : public CreatureScript
                 ShoutTimer = urand(15000, 30000);
             }
 
-            void UpdateAI(uint32 const Diff)
+            void UpdateAI(const uint32 const Diff)
             {
                 if (!UpdateVictim())
                     return;

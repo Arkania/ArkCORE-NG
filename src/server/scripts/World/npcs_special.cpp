@@ -330,7 +330,7 @@ public:
 
         void EnterCombat(Unit* /*who*/) {}
 
-        void UpdateAI(uint32 const diff)
+        void UpdateAI(const uint32 diff)
         {
             // Reset flags after a certain time has passed so that the next player has to start the 'event' again
             if (me->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER))
@@ -430,7 +430,7 @@ public:
             me->SendMessageToSet(&data, true);*/
         }
 
-        void UpdateAI(uint32 const diff)
+        void UpdateAI(const uint32 diff)
         {
             if (!Active)
             {
@@ -675,7 +675,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 const diff);
+        void UpdateAI(const uint32 diff);
 
         void EnterCombat(Unit* /*who*/){}
     };
@@ -784,7 +784,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 const /*diff*/)
+        void UpdateAI(const uint32 /*diff*/)
         {
             //lower HP on every world tick makes it a useful counter, not officlone though
             if (me->IsAlive() && me->GetHealth() > 6)
@@ -1048,7 +1048,7 @@ public:
 
         }
 
-        void UpdateAI(uint32 const diff)
+        void UpdateAI(const uint32 diff)
         {
             if (CanRun && !me->IsInCombat())
             {
@@ -1120,7 +1120,7 @@ public:
         {
         }
 
-        void UpdateAI(uint32 const /*diff*/)
+        void UpdateAI(const uint32 /*diff*/)
         {
             if (!UpdateVictim())
                 return;
@@ -1537,7 +1537,7 @@ public:
         void AttackStart(Unit* /*who*/) { }
         void MoveInLineOfSight(Unit* /*who*/) { }
 
-        void UpdateAI(uint32 const diff)
+        void UpdateAI(const uint32 diff)
         {
             if (ExplosionTimer <= diff)
             {
@@ -1696,7 +1696,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 const diff)
+        void UpdateAI(const uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -1775,7 +1775,7 @@ public:
 
         void EnterCombat(Unit* /*who*/){}
 
-        void UpdateAI(uint32 const diff)
+        void UpdateAI(const uint32 diff)
         {
             if (me->HasAura(20372))
             {
@@ -2122,7 +2122,7 @@ public:
                 return;
         }
 
-        void UpdateAI(uint32 const diff)
+        void UpdateAI(const uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -2194,7 +2194,7 @@ public:
                         owner->CastSpell(owner, GLYPH_OF_SHADOWFIEND_MANA, true);
         }
 
-        void UpdateAI(uint32 const /*diff*/)
+        void UpdateAI(const uint32 /*diff*/)
         {
             if (!UpdateVictim())
                 return;

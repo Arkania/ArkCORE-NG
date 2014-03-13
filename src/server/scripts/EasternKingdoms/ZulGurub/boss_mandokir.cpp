@@ -231,7 +231,7 @@ class boss_mandokir : public CreatureScript
                 _reviveGUID = guid;
             }
 
-            void UpdateAI(uint32 const diff)
+            void UpdateAI(const uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -342,7 +342,7 @@ class npc_ohgan : public CreatureScript
                 }
             }
 
-            void UpdateAI(uint32 const diff)
+            void UpdateAI(const uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -426,7 +426,7 @@ class npc_chained_spirit : public CreatureScript
                 me->DespawnOrUnsummon();
             }
 
-            void UpdateAI(uint32 const /*diff*/) { }
+            void UpdateAI(const uint32 /*diff*/) { }
 
         private:
             InstanceScript* _instance;

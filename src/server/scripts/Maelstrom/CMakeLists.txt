@@ -10,16 +10,21 @@
 
 set(scripts_STAT_SRCS
   ${scripts_STAT_SRCS}
-  Maelstrom/StoneCore/boss_corborus.cpp
-  Maelstrom/StoneCore/boss_slabhide.cpp
-  Maelstrom/StoneCore/boss_ozruk.cpp
-  Maelstrom/StoneCore/boss_azil.cpp
-  Maelstrom/StoneCore/stonecore.h
-  Maelstrom/StoneCore/stonecore.cpp
-  Maelstrom/StoneCore/instance_stonecore.cpp
+  Maelstrom/TheStoneCore/boss_corborus.cpp
+  Maelstrom/TheStoneCore/boss_slabhide.cpp
+  Maelstrom/TheStoneCore/boss_ozruk.cpp
+  Maelstrom/TheStoneCore/boss_azil.cpp
+  Maelstrom/TheStoneCore/stonecore.h
+  Maelstrom/TheStoneCore/stonecore.cpp
+  Maelstrom/TheStoneCore/instance_stonecore.cpp
 
   Maelstrom/zone_kezan.cpp
-  
+  Maelstrom/zone_darkmoon_island.cpp
+  Maelstrom/zone_deepholm.cpp
+  Maelstrom/zone_lost_isles.cpp
+  Maelstrom/zone_the_maelstrom.cpp
+  Maelstrom/zone_tol_barad.cpp
+  Maelstrom/zone_tolbarad_peninsula.cpp
 )
 
 message("  -> Prepared: Maelstrom")

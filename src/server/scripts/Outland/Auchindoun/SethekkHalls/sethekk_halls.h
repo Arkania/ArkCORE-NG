@@ -23,7 +23,33 @@
 enum eTypes
 {
     DATA_IKISSDOOREVENT = 1,
-    TYPE_ANZU_ENCOUNTER = 2,
+    TYPE_ANZU_ENCOUNTER = 2,	
 };
+
+
+#define SHScriptName "instance_sethekk_halls"
+
+uint32 const EncounterCount             = 3;
+
+enum DataTypes
+{
+    // Encounter States/Boss GUIDs
+    DATA_DARKWEAVER_SYTH                = 0,
+    DATA_TALON_KING_IKISS               = 1,
+    DATA_ANZU                           = 2,
+};
+
+enum CreatureIds
+{
+    NPC_ANZU                            = 23035,
+    NPC_BROOD_OF_ANZU                   = 23132,
+};
+
+enum GameObjectIds
+{
+    GO_IKISS_DOOR                       = 177203,
+};
+
+
 #endif
 

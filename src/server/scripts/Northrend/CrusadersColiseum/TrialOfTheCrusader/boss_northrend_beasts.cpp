@@ -217,7 +217,7 @@ public:
             Summons.Despawn(summon);
         }
 
-        void UpdateAI(uint32 const diff)
+        void UpdateAI(const uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -333,7 +333,7 @@ public:
                 instance->SetData(DATA_SNOBOLD_COUNT, DECREASE);
         }
 
-        void UpdateAI(uint32 const diff)
+        void UpdateAI(const uint32 diff)
         {
             if (m_bTargetDied || !UpdateVictim())
                 return;
@@ -453,7 +453,7 @@ struct boss_jormungarAI : public ScriptedAI
             instanceScript->SetData(TYPE_NORTHREND_BEASTS, SNAKES_IN_PROGRESS);
     }
 
-    void UpdateAI(uint32 const diff)
+    void UpdateAI(const uint32 diff)
     {
         if (!UpdateVictim())
             return;
@@ -733,7 +733,7 @@ public:
             me->SetReactState(REACT_PASSIVE);
         }
 
-        void UpdateAI(uint32 const /*diff*/)
+        void UpdateAI(const uint32 /*diff*/)
         {
             if (!casted)
             {
@@ -880,7 +880,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 const diff)
+        void UpdateAI(const uint32 diff)
         {
             if (!UpdateVictim())
                 return;

@@ -1041,7 +1041,7 @@ class npc_hurricane : public CreatureScript
                 grabbedPlayer = guid;
             }
 
-            void UpdateAI(uint32 const diff)
+            void UpdateAI(const uint32 diff)
             {
                 if (!UpdateVictim())
                     return;

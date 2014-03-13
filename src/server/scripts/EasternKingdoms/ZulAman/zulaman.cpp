@@ -487,7 +487,7 @@ class npc_zulaman_archon : public CreatureScript
                 events.ScheduleEvent(EVENT_SIGIL_OF_FROST, 8000);
             }
 
-            void UpdateAI(uint32 const diff)
+            void UpdateAI(const uint32 diff)
             {
                 if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                     return;
@@ -584,7 +584,7 @@ class npc_zulaman_juggernaut : public CreatureScript
 
             void EnterCombat(Unit* /*who*/) { }
 
-            void UpdateAI(uint32 const diff)
+            void UpdateAI(const uint32 diff)
             {
                 if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                     return;
@@ -696,7 +696,7 @@ class npc_zulaman_hierophant : public CreatureScript
                 }
             }
 
-            void UpdateAI(uint32 const diff)
+            void UpdateAI(const uint32 diff)
             {
                 if (!UpdateVictim() && me->IsInCombat() || me->HasUnitState(UNIT_STATE_CASTING))
                     return;

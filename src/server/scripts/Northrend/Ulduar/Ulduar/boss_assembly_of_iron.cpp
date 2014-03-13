@@ -277,7 +277,7 @@ class boss_steelbreaker : public CreatureScript
                     DoCast(me, SPELL_ELECTRICAL_CHARGE);
             }
 
-            void UpdateAI(uint32 const diff)
+            void UpdateAI(const uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -398,7 +398,7 @@ class boss_runemaster_molgeim : public CreatureScript
                 DoScriptText(RAND(SAY_MOLGEIM_SLAY_1, SAY_MOLGEIM_SLAY_2), me);
             }
 
-            void UpdateAI(uint32 const diff)
+            void UpdateAI(const uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -532,7 +532,7 @@ class mob_rune_of_summoning : public CreatureScript
             uint32 summonCount;
             uint32 summonTimer;
 
-            void UpdateAI(uint32 const diff)
+            void UpdateAI(const uint32 diff)
             {
                 if (summonTimer <= diff)
                     SummonLightningElemental();
@@ -643,7 +643,7 @@ class boss_stormcaller_brundir : public CreatureScript
                 DoScriptText(RAND(SAY_BRUNDIR_SLAY_1, SAY_BRUNDIR_SLAY_2), me);
             }
 
-            void UpdateAI(uint32 const diff)
+            void UpdateAI(const uint32 diff)
             {
                 if (!UpdateVictim())
                     return;

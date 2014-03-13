@@ -440,7 +440,7 @@ class npc_tournament_training_dummy : public CreatureScript
                         isVulnerable = true;
             }
 
-            void UpdateAI(uint32 const diff)
+            void UpdateAI(const uint32 diff)
             {
                 events.Update(diff);
 

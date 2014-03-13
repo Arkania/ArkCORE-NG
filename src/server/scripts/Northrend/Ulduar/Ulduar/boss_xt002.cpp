@@ -448,7 +448,7 @@ class mob_xt002_heart : public CreatureScript
             {
             }
 
-            void UpdateAI(uint32 const /*diff*/) { }
+            void UpdateAI(const uint32 /*diff*/) { }
 
             void JustDied(Unit* /*killer*/)
             {
@@ -693,7 +693,7 @@ class mob_boombot : public CreatureScript
                 }
             }
 
-            void UpdateAI(uint32 const /*diff*/)
+            void UpdateAI(const uint32 /*diff*/)
             {
                 if (!UpdateVictim())
                     return;

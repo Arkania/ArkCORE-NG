@@ -599,7 +599,7 @@ class npc_scourge_hulk : public CreatureScript
                     killedByRitualStrike = true;
             }
 
-            void UpdateAI(uint32 const diff)
+            void UpdateAI(const uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
