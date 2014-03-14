@@ -185,7 +185,7 @@ public:
                                         uiEventTimer = urand(5000, 10000);
                                         //uint8 roll = urand(0, 2);
                                         citizen->AI()->Talk(PANICKED_CITIZEN_RANDOM_SAY, me->GetGUID());
-										
+
                                         return;
                                     }
                                 }
@@ -2229,9 +2229,9 @@ public:
         }
 
         uint32 uiRandomSpeachTimer;
-		Creature* horse;
-		Player* passenger;
-		Creature* creature;
+        Creature* horse;
+        Player* passenger;
+        Creature* creature;
 
         void WaypointReached(uint32 point)
         {
@@ -2239,21 +2239,21 @@ public:
             {
                 case 1:
      //               if (Vehicle* pVehicle = me->GetVehicleKit())
-					//	if(!pVehicle->GetPassenger(0))
-					//		passenger->Rio_EnterVehicle(pVehicle,0);
-					//if (Vehicle* pVehicle = me->GetVehicleKit())
-					//		if(!pVehicle->GetPassenger(1))
-					//			creature->Rio_EnterVehicle(pVehicle,1);
-					DoScriptText(CROWLEY_SAY_START, passenger);
+                    //    if(!pVehicle->GetPassenger(0))
+                    //        passenger->Rio_EnterVehicle(pVehicle,0);
+                    //if (Vehicle* pVehicle = me->GetVehicleKit())
+                    //        if(!pVehicle->GetPassenger(1))
+                    //            creature->Rio_EnterVehicle(pVehicle,1);
+                    DoScriptText(CROWLEY_SAY_START, passenger);
                     break;
                 case 26:
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     break;
                 case 29:
                     if (Vehicle* pVehicle = me->GetVehicleKit())
-                    {						
+                    {
                         if (Player* passenger = pVehicle->GetPassenger(0)->ToPlayer())
-							passenger->ExitVehicle();
+                            passenger->ExitVehicle();
 
                         if (Player* passenger = pVehicle->GetPassenger(1)->ToPlayer())
                             passenger->ToCreature()->DespawnOrUnsummon();
@@ -2273,19 +2273,19 @@ public:
                 uint8 roll = urand(0, 2);
 
     //            if (Vehicle* pVehicle = me->GetVehicleKit())
-				//	if(!pVehicle->GetPassenger(0))
-				//		passenger->Rio_EnterVehicle(pVehicle,0);
-				//if (Vehicle* pVehicle = me->GetVehicleKit())
-				//	if(!pVehicle->GetPassenger(1))
-				//		creature->Rio_EnterVehicle(pVehicle,1);
-				//if (Vehicle* pVehicle = me->GetVehicleKit())
-				//	if(pVehicle->GetPassenger(0))
-				//		passenger->ExitVehicle();
-				//if (Vehicle* pVehicle = me->GetVehicleKit())
-				//	if(pVehicle->GetPassenger(1))
-				//		creature->ExitVehicle();
+                //    if(!pVehicle->GetPassenger(0))
+                //        passenger->Rio_EnterVehicle(pVehicle,0);
+                //if (Vehicle* pVehicle = me->GetVehicleKit())
+                //    if(!pVehicle->GetPassenger(1))
+                //        creature->Rio_EnterVehicle(pVehicle,1);
+                //if (Vehicle* pVehicle = me->GetVehicleKit())
+                //    if(pVehicle->GetPassenger(0))
+                //        passenger->ExitVehicle();
+                //if (Vehicle* pVehicle = me->GetVehicleKit())
+                //    if(pVehicle->GetPassenger(1))
+                //        creature->ExitVehicle();
 
-				DoScriptText(CROWLEY_RANDOM_SAY - roll, passenger);
+                DoScriptText(CROWLEY_RANDOM_SAY - roll, passenger);
             }
             else
                 uiRandomSpeachTimer -= diff;
@@ -2493,10 +2493,10 @@ class spell_summon_crowley_horse : public SpellScriptLoader
 
       //              if (Vehicle* pVehicle = horse->GetVehicleKit())
       //                  if (!pVehicle->GetPassenger(0))
-						//{
-						//	player->Rio_EnterVehicle(pVehicle, 0);
-						//	player->ClearUnitState(UNIT_STATE_ONVEHICLE);
-						//}
+                        //{
+                        //    player->Rio_EnterVehicle(pVehicle, 0);
+                        //    player->ClearUnitState(UNIT_STATE_ONVEHICLE);
+                        //}
       //                  if (Vehicle* pVehicle = horse->GetVehicleKit())
       //                      if (!pVehicle->GetPassenger(1))
       //                      {

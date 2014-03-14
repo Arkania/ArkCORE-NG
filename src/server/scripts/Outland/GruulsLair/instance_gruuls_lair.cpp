@@ -171,7 +171,7 @@ public:
             OUT_SAVE_INST_DATA;
             std::ostringstream stream;
             stream << m_auiEncounter[0] << ' ' << m_auiEncounter[1];
-			
+
             OUT_SAVE_INST_DATA_COMPLETE;
             return stream.str();
         }

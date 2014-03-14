@@ -50,7 +50,7 @@ class DynamicObject : public WorldObject, public GridObject<DynamicObject>
         int32 GetDuration() const;
         void Delay(int32 delaytime);
         void SetAura(Aura* aura);
-		Aura* GetAura();
+        Aura* GetAura();
         void RemoveAura();
         void SetCasterViewpoint();
         void RemoveCasterViewpoint();

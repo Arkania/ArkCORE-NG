@@ -107,10 +107,10 @@ void WorldSession::HandleLootCurrencyOpcode(WorldPacket& recvData)
     uint8 lootSlot = 0;
 
     recvData >> lootSlot;
-	
-	switch (GUID_HIPART(lguid))
+
+    switch (GUID_HIPART(lguid))
     {
-	    case HIGHGUID_UNIT:
+        case HIGHGUID_UNIT:
         case HIGHGUID_VEHICLE:
         {
             Creature* creature = player->GetMap()->GetCreature(lguid);
@@ -136,7 +136,7 @@ void WorldSession::HandleLootCurrencyOpcode(WorldPacket& recvData)
             return;
     }
 
-    loot->NotifyCurrencyRemoved(lootSlot);	
+    loot->NotifyCurrencyRemoved(lootSlot);
 }
 
 void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recvData*/)

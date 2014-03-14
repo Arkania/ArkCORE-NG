@@ -108,17 +108,17 @@ public:
         {
             switch(type)
             {
-			    case DATA_FIRST_ENCOUNTER:
-			        uiEncounter[1] = data;
-			        break;
+                case DATA_FIRST_ENCOUNTER:
+                    uiEncounter[1] = data;
+                    break;
 
-			    case DATA_SECOND_ENCOUNTER:
-			        uiEncounter[2] = data;
-			        break;
+                case DATA_SECOND_ENCOUNTER:
+                    uiEncounter[2] = data;
+                    break;
 
-			    case DATA_LAST_ENCOUNTER:
-			        uiEncounter[3] = data;
-			        break;
+                case DATA_LAST_ENCOUNTER:
+                    uiEncounter[3] = data;
+                    break;
 
                 case DATA_JAINA_PICKED_STATE:
                     switch (data)
@@ -131,7 +131,7 @@ public:
                             break;
                     }
                     JainaPickedState = data;
-			        break;
+                    break;
             }
          
             if (data == DONE)

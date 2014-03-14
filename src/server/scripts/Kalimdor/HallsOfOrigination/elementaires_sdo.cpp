@@ -22,31 +22,31 @@ public:
        struct npc_gardien_dairAI : public ScriptedAI
        {
             npc_gardien_dairAI(Creature * pCreature) : ScriptedAI(pCreature) {}
-			
-			uint32 cisaille_de_vent;
-			
-		    void Reset()
-			{
-			 cisaille_de_vent = 10000;
-			}
-			
-			void UpdateAI(const uint32 diff)
-			{
-			if (!UpdateVictim())
+            
+            uint32 cisaille_de_vent;
+            
+            void Reset()
+            {
+             cisaille_de_vent = 10000;
+            }
+            
+            void UpdateAI(const uint32 diff)
+            {
+            if (!UpdateVictim())
             return;
-      	   
+             
             if (cisaille_de_vent<= diff)
-			{
-			if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 1, 10.0f, true))
-			DoCast(pTarget, spell_cisaille_de_vent);
-			cisaille_de_vent = 10000;
-			} else cisaille_de_vent -= diff;
-			
-			DoMeleeAttackIfReady();
+            {
+            if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 1, 10.0f, true))
+            DoCast(pTarget, spell_cisaille_de_vent);
+            cisaille_de_vent = 10000;
+            } else cisaille_de_vent -= diff;
+            
+            DoMeleeAttackIfReady();
          }
        };
-	   
-	CreatureAI* GetAI(Creature* pCreature) const
+       
+    CreatureAI* GetAI(Creature* pCreature) const
     {
          return new npc_gardien_dairAI(pCreature);
     }
@@ -64,39 +64,39 @@ class npc_gardien_de_flammes: public CreatureScript
 {
 public:
        npc_gardien_de_flammes() : CreatureScript("npc_gardien_de_flammes") {}
-	   
-	   struct npc_gardien_de_flammesAI : public ScriptedAI
-	   {
-	          npc_gardien_de_flammesAI(Creature * pCreature) : ScriptedAI(pCreature) {}
-			  
-			  uint32 eruption_de_lave;
-			  uint32 inferno_dechaine;
-			  
-			  void Reset()
-			  {
-			  eruption_de_lave = 10000;
-			  inferno_dechaine = 25000;
-			  }
-			  
-			  void UpdateAI(const uint32 diff)
-			  {
-			  if (!UpdateVictim())
+       
+       struct npc_gardien_de_flammesAI : public ScriptedAI
+       {
+              npc_gardien_de_flammesAI(Creature * pCreature) : ScriptedAI(pCreature) {}
+              
+              uint32 eruption_de_lave;
+              uint32 inferno_dechaine;
+              
+              void Reset()
+              {
+              eruption_de_lave = 10000;
+              inferno_dechaine = 25000;
+              }
+              
+              void UpdateAI(const uint32 diff)
+              {
+              if (!UpdateVictim())
               return;
-			  
-			  if (eruption_de_lave<= diff)
-			  {
-			  DoCast(SelectTarget(SELECT_TARGET_RANDOM,1,100,true), spell_eruption_de_lave);
-			  eruption_de_lave = 10000;
-			  } else eruption_de_lave -= diff;
-			  
-			  DoMeleeAttackIfReady();
+              
+              if (eruption_de_lave<= diff)
+              {
+              DoCast(SelectTarget(SELECT_TARGET_RANDOM,1,100,true), spell_eruption_de_lave);
+              eruption_de_lave = 10000;
+              } else eruption_de_lave -= diff;
+              
+              DoMeleeAttackIfReady();
               }
        };
-		
-	CreatureAI* GetAI(Creature* pCreature) const
+        
+    CreatureAI* GetAI(Creature* pCreature) const
     {
         return new npc_gardien_de_flammesAI(pCreature);
-	}	  
+    }      
 
 };
 
@@ -112,51 +112,51 @@ class npc_gardien_de_terre: public CreatureScript
 public:
     npc_gardien_de_terre() : CreatureScript("npc_gardien_de_terre") {}
 
-		struct npc_gardien_de_terreAI : public ScriptedAI
-	    {    
+        struct npc_gardien_de_terreAI : public ScriptedAI
+        {    
          npc_gardien_de_terreAI(Creature * pCreature) : ScriptedAI(pCreature) {}
 
-			uint32 empaler;
-			uint32 vague_de_roche;
+            uint32 empaler;
+            uint32 vague_de_roche;
 
-			void Reset()
-			{
-				empaler = 12000;
-				vague_de_roche = 20000;
-			}
+            void Reset()
+            {
+                empaler = 12000;
+                vague_de_roche = 20000;
+            }
 
             void UpdateAI(const uint32 diff)
-			{
-				if (!UpdateVictim())
-				return;
+            {
+                if (!UpdateVictim())
+                return;
 
-				if (empaler<= diff)
-				{
-					DoCast(me->GetVictim(), spell_empaler);
-					empaler = 12000;
-				} else empaler -= diff;
+                if (empaler<= diff)
+                {
+                    DoCast(me->GetVictim(), spell_empaler);
+                    empaler = 12000;
+                } else empaler -= diff;
 
-				if (vague_de_roche<= diff)
-				{
-					DoCast(me, spell_vague_de_roche);
-					vague_de_roche = 20000;
-				} else vague_de_roche -= diff;
-			  
-				DoMeleeAttackIfReady();
+                if (vague_de_roche<= diff)
+                {
+                    DoCast(me, spell_vague_de_roche);
+                    vague_de_roche = 20000;
+                } else vague_de_roche -= diff;
+              
+                DoMeleeAttackIfReady();
 
             }
         };
 
-	CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-		return new npc_gardien_de_terreAI(pCreature);
+        return new npc_gardien_de_terreAI(pCreature);
     }
 
 };
 
 void AddSC_elementaires_sdo()
 {
-	new npc_gardien_dair();
-	new npc_gardien_de_flammes();
-	new npc_gardien_de_terre();
+    new npc_gardien_dair();
+    new npc_gardien_de_flammes();
+    new npc_gardien_de_terre();
 }

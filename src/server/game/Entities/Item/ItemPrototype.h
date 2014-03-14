@@ -197,7 +197,7 @@ enum ItemFlagsExtra
     ITEM_FLAGS_EXTRA_EXT_COST_REQUIRES_GOLD  = 0x00000004, // when item uses extended cost, gold is also required
     ITEM_FLAGS_EXTRA_NEED_ROLL_DISABLED      = 0x00000100,
     ITEM_FLAGS_EXTRA_CASTER_WEAPON           = 0x00000200,
-	ITEM_FLAGS_EXTRA_HAS_NORMAL_PRICE        = 0x00004000,
+    ITEM_FLAGS_EXTRA_HAS_NORMAL_PRICE        = 0x00004000,
     ITEM_FLAGS_EXTRA_BNET_ACCOUNT_BOUND      = 0x00020000,
     ITEM_FLAGS_EXTRA_CANNOT_BE_TRANSMOG      = 0x00200000,
     ITEM_FLAGS_EXTRA_CANNOT_TRANSMOG         = 0x00400000,
@@ -728,7 +728,7 @@ struct ItemTemplate
     {
         return (Stackable == 2147483647 || Stackable <= 0) ? uint32(0x7FFFFFFF-1) : uint32(Stackable);
     }
-	
+
     float GetItemLevelIncludingQuality() const
     {
         float itemLevel = (float)ItemLevel;
@@ -755,7 +755,7 @@ struct ItemTemplate
     bool IsPotion() const { return Class == ITEM_CLASS_CONSUMABLE && SubClass == ITEM_SUBCLASS_POTION; }
     bool IsVellum() const { return Class == ITEM_CLASS_TRADE_GOODS && SubClass == ITEM_SUBCLASS_ENCHANTMENT; }
     bool IsConjuredConsumable() const { return Class == ITEM_CLASS_CONSUMABLE && (Flags & ITEM_PROTO_FLAG_CONJURED); }
-	
+
     bool IsRangedWeapon() const
     {
         return Class == ITEM_CLASS_WEAPON ||

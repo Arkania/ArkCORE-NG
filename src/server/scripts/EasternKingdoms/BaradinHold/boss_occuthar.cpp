@@ -81,12 +81,12 @@ class boss_occuthar : public CreatureScript
 
             void EnterEvadeMode() // AKA Wipe.
             {
-			    me->GetMotionMaster()->MoveTargetedHome();
+                me->GetMotionMaster()->MoveTargetedHome();
                 me->SetHealth(me->GetMaxHealth());
 
                 if (me->HasAura(47008))
                     me->RemoveAura(47008);
-					
+
                 if (m_pInstance)
                    m_pInstance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me); // Remove
             }
@@ -108,7 +108,7 @@ class boss_occuthar : public CreatureScript
                 if (!UpdateVictim())
                     return;
 
-				if (me->HasUnitState(UNIT_STATE_CASTING))
+                if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
                 if (m_uiEyesOfOccutharTimer <= uiDiff)
@@ -124,7 +124,7 @@ class boss_occuthar : public CreatureScript
 
                 if (m_uiEyesTimer <= uiDiff && eyes == true)
                 {
-					   std::list<Unit*> targetList;
+                       std::list<Unit*> targetList;
                        {
                        const std::list<HostileReference*>& threatlist = me->getThreatManager().getThreatList();
                          for (std::list<HostileReference*>::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
@@ -157,8 +157,8 @@ class boss_occuthar : public CreatureScript
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, NonTankTargetSelector(me)))
                     DoCast(target, SPELL_FOCUSED_FIRE_SUMMON);
 
-                    m_uiFocusedFireTimer = 15000;					
-					focusTimer = 200;
+                    m_uiFocusedFireTimer = 15000;
+                    focusTimer = 200;
                     focus = true;
                 }
                 else
@@ -223,16 +223,16 @@ class npc_occuthar_eye : public CreatureScript
                 if (!UpdateVictim())
                     return;
 
-				if (me->HasUnitState(UNIT_STATE_CASTING))
+                if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
                 if (m_uiGazeTimer <= uiDiff && gaze == true)
                 {
                     if (Unit* target = me->FindNearestPlayer(10.0f, true))
-					{
+                    {
                         DoCast(target, SPELL_GAZE_OF_OCCUTHAR);
                         DoCast(target, 68985);
-					}
+                    }
                     m_uiExplodeTimer = 10100;
                     gaze = false;
                 }

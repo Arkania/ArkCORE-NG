@@ -494,7 +494,7 @@ void BossAI::_JustDied()
      LichKingRaid           = 23  JusticePoints / boss
      CataclysmHeroics       = 75  JusticePoints / boss
      CataclysmRaid 10man    = 75  ValorPoints   / boss
-	 CataclysmRaid 10man    = 105 ValorPoints   / boss
+     CataclysmRaid 10man    = 105 ValorPoints   / boss
      */
     if (Map* map = instance->instance)
     {

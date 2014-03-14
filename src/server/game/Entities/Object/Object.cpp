@@ -2553,8 +2553,7 @@ void WorldObject::SetZoneScript()
         else if (!map->IsBattlegroundOrArena())
         {
             if (Battlefield* bf = sBattlefieldMgr->GetBattlefieldToZoneId(GetZoneId()))
-			
-          	m_zoneScript = bf;
+                m_zoneScript = bf;
             else
             {
                 if (Battlefield* bf = sBattlefieldMgr->GetBattlefieldToZoneId(GetZoneId()))
@@ -2633,7 +2632,7 @@ Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
     pet->SetCreatorGUID(GetGUID());
     pet->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, getFaction());
 
-	pet->setPowerType(POWER_MANA);
+    pet->setPowerType(POWER_MANA);
     pet->SetUInt32Value(UNIT_NPC_FLAGS, 0);
     pet->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
     pet->InitStatsForLevel(getLevel());
@@ -2646,20 +2645,20 @@ Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
             // this enables pet details window (Shift+P)
             pet->GetCharmInfo()->SetPetNumber(pet_number, true);
 
-			if (pet->IsPetGhoul())
-			{
-				pet->SetByteValue(UNIT_FIELD_BYTES_0, 1, 4);
-				pet->SetByteValue(UNIT_FIELD_BYTES_0, 3, POWER_ENERGY);
-				pet->SetMaxPower(POWER_ENERGY,100);
-				pet->SetPower(POWER_ENERGY,100);
-			}
-			else
-				pet->SetUInt32Value(UNIT_FIELD_BYTES_0, 2048);
+            if (pet->IsPetGhoul())
+            {
+                pet->SetByteValue(UNIT_FIELD_BYTES_0, 1, 4);
+                pet->SetByteValue(UNIT_FIELD_BYTES_0, 3, POWER_ENERGY);
+                pet->SetMaxPower(POWER_ENERGY,100);
+                pet->SetPower(POWER_ENERGY,100);
+            }
+            else
+                pet->SetUInt32Value(UNIT_FIELD_BYTES_0, 2048);
 
             pet->SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
             pet->SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, 1000);
             pet->SetFullHealth();
-			pet->SetPower(POWER_MANA, pet->GetMaxPower(POWER_MANA));
+            pet->SetPower(POWER_MANA, pet->GetMaxPower(POWER_MANA));
             pet->SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, uint32(time(NULL))); // cast can't be helped in this case
             break;
         default:

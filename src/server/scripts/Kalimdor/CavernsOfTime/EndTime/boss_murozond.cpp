@@ -55,10 +55,10 @@ class boss_murozond : public CreatureScript
         {
             boss_murozondAI(Creature* creature) : BossAI(creature, BOSS_MUROZOND)
             {
-				instance = me->GetInstanceScript();
+                instance = me->GetInstanceScript();
             }
 
-			InstanceScript* instance;
+            InstanceScript* instance;
 
             void Reset()
             {

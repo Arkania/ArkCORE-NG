@@ -96,7 +96,7 @@ bool DynamicObject::CreateDynamicObject(uint32 guidlow, Unit* caster, SpellInfo 
     SetObjectScale(1);
     SetUInt64Value(DYNAMICOBJECT_CASTER, caster->GetGUID());
     SetUInt32Value(DYNAMICOBJECT_BYTES, spell->SpellVisual[0] | (type << 28));
-	SetUInt32Value(DYNAMICOBJECT_SPELLID, spell->Id);
+    SetUInt32Value(DYNAMICOBJECT_SPELLID, spell->Id);
     SetFloatValue(DYNAMICOBJECT_RADIUS, radius);
     SetUInt32Value(DYNAMICOBJECT_CASTTIME, getMSTime());
 

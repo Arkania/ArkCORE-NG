@@ -45,8 +45,8 @@ enum HostageYells
 Position const wayPos[3] =
 {
     {120.234f, 1656.628f, 42.021f},
-	{129.312f, 1645.332f, 42.021f},
-	{120.660f, 1638.805f, 42.358f}
+    {129.312f, 1645.332f, 42.021f},
+    {120.660f, 1638.805f, 42.358f}
 };
 
 enum HierophantYells
@@ -76,14 +76,14 @@ enum HierophantYells
 
 enum Events
 {
-	EVENT_MOVE_0 = 1,
-	EVENT_MOVE_1,
-	EVENT_MOVE_2,
-	EVENT_STOP_MOVE,
-	EVENT_GONG_START,
-	EVENT_GONG_RESET,
-	EVENT_SAY_OPEN,
-	EVENT_OPEN_GATES,
+    EVENT_MOVE_0 = 1,
+    EVENT_MOVE_1,
+    EVENT_MOVE_2,
+    EVENT_STOP_MOVE,
+    EVENT_GONG_START,
+    EVENT_GONG_RESET,
+    EVENT_SAY_OPEN,
+    EVENT_OPEN_GATES,
 
     // Mobs
     EVENT_DIALOGUE_1,
@@ -145,8 +145,8 @@ enum MobSpells
 
 enum Action
 {
-	ACTION_EVENTS_START,
-	ACTION_GONG_COMPLETE
+    ACTION_EVENTS_START,
+    ACTION_GONG_COMPLETE
 };
 
 class npc_zulaman_voljin : public CreatureScript
@@ -469,16 +469,16 @@ class npc_zulaman_archon : public CreatureScript
                 gloryCasted = false;
             }
 
-		    void EnterEvadeMode()
-		    {
+            void EnterEvadeMode()
+            {
                 if (me->HasAura(SPELL_GLORY_ARCHON))
-					me->RemoveAura(SPELL_GLORY_ARCHON);
+                    me->RemoveAura(SPELL_GLORY_ARCHON);
 
-				me->GetMotionMaster()->MoveTargetedHome();
+                me->GetMotionMaster()->MoveTargetedHome();
                 Reset();
 
                 me->SetHealth(me->GetMaxHealth());
-		    }
+            }
 
             void EnterCombat(Unit* /*who*/)
             {
@@ -500,26 +500,26 @@ class npc_zulaman_archon : public CreatureScript
                     gloryCasted = true;
                 }
 
-			    events.Update(diff);
+                events.Update(diff);
                 
-			    while (uint32 eventId = events.ExecuteEvent())
-			    {
+                while (uint32 eventId = events.ExecuteEvent())
+                {
                     switch (eventId)
                     {
                         case EVENT_SIGIL_OF_DEATH:
-						    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
+                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
                                 me->AddAura(SPELL_SIGIL_OF_DEATH, target);
                             events.ScheduleEvent(EVENT_SIGIL_OF_DEATH, urand(25000, 29000));
                             break;
 
                         case EVENT_SIGIL_OF_FLAME:
-						    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
+                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
                                 DoCast(target, SPELL_SIGIL_OF_FLAME);
                             events.ScheduleEvent(EVENT_SIGIL_OF_FLAME, urand(25000, 29000));
                             break;
 
                         case EVENT_SIGIL_OF_FROST:
-						    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
+                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
                                 DoCast(target, SPELL_SIGIL_OF_FROST);
                             events.ScheduleEvent(EVENT_SIGIL_OF_FROST, urand(25000, 29000));
                             break;
@@ -571,16 +571,16 @@ class npc_zulaman_juggernaut : public CreatureScript
                 gloryCasted = false;
             }
 
-		    void EnterEvadeMode()
-		    {
+            void EnterEvadeMode()
+            {
                 if (me->HasAura(SPELL_GLORY_JUGGERNAUT))
-					me->RemoveAura(SPELL_GLORY_JUGGERNAUT);
+                    me->RemoveAura(SPELL_GLORY_JUGGERNAUT);
 
-				me->GetMotionMaster()->MoveTargetedHome();
+                me->GetMotionMaster()->MoveTargetedHome();
                 Reset();
 
                 me->SetHealth(me->GetMaxHealth());
-		    }
+            }
 
             void EnterCombat(Unit* /*who*/) { }
 
@@ -597,10 +597,10 @@ class npc_zulaman_juggernaut : public CreatureScript
                     gloryCasted = true;
                 }
 
-			    events.Update(diff);
+                events.Update(diff);
                 
-			    while (uint32 eventId = events.ExecuteEvent())
-			    {
+                while (uint32 eventId = events.ExecuteEvent())
+                {
                     switch (eventId)
                     {
                         case EVENT_BLESSING_ZAND_JUGGER:
@@ -657,16 +657,16 @@ class npc_zulaman_hierophant : public CreatureScript
                 gloryCasted = false;
             }
 
-		    void EnterEvadeMode()
-		    {
+            void EnterEvadeMode()
+            {
                 if (me->HasAura(SPELL_GLORY_HIEROPHANT))
-					me->RemoveAura(SPELL_GLORY_HIEROPHANT);
+                    me->RemoveAura(SPELL_GLORY_HIEROPHANT);
 
-				me->GetMotionMaster()->MoveTargetedHome();
+                me->GetMotionMaster()->MoveTargetedHome();
                 Reset();
 
                 me->SetHealth(me->GetMaxHealth());
-		    }
+            }
 
             void EnterCombat(Unit* who)
             {
@@ -709,10 +709,10 @@ class npc_zulaman_hierophant : public CreatureScript
                     gloryCasted = true;
                 }
 
-			    events.Update(diff);
+                events.Update(diff);
                 
-			    while (uint32 eventId = events.ExecuteEvent())
-			    {
+                while (uint32 eventId = events.ExecuteEvent())
+                {
                     switch (eventId)
                     {
                         case EVENT_DIALOGUE_1:
@@ -769,7 +769,7 @@ class npc_zulaman_hierophant : public CreatureScript
                             break;
 
                         case EVENT_POWER:
-						    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
+                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
                                 DoCast(target, SPELL_ANCIENT_POWER);
                             events.ScheduleEvent(EVENT_POWER, urand(9000, 17000));
                             break;
@@ -780,7 +780,7 @@ class npc_zulaman_hierophant : public CreatureScript
                             break;
 
                         case EVENT_HYPOTHERMIA:
-						    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
+                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
                                 me->AddAura(SPELL_HYPOTHERMIA, target);
                             events.ScheduleEvent(EVENT_HYPOTHERMIA, urand(15000, 20000));
                             break;
@@ -799,7 +799,7 @@ class npc_zulaman_hierophant : public CreatureScript
 
 void AddSC_zulaman()
 {
-	new npc_zulaman_voljin();
+    new npc_zulaman_voljin();
     new npc_forest_frog();
     new npc_zulaman_hostage();
     new npc_zulaman_archon();

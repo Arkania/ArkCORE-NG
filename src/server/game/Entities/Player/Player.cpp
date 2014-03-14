@@ -19153,7 +19153,6 @@ void Player::SaveToDB(bool create /*=false*/)
             if (GetPowerIndexByClass(Powers(i), getClass()) != MAX_POWERS)
             {
                 stmt->setUInt32(index++, GetUInt32Value(UNIT_FIELD_POWER1 + storedPowers));
-
                 if (++storedPowers >= MAX_STORED_POWERS)
                     break;
             }
@@ -21521,7 +21520,7 @@ bool Player::BuyCurrencyFromVendorSlot(uint64 vendorGuid, uint32 vendorSlot, uin
         if (!iece)
         {
             sLog->outError("Currency %u have wrong ExtendedCost field value %u", currency, crItem->ExtendedCost);
-    		return false;
+            return false;
         }
 
         for (uint8 i = 0; i < MAX_ITEM_EXT_COST_ITEMS; ++i)
@@ -21578,7 +21577,7 @@ bool Player::BuyCurrencyFromVendorSlot(uint64 vendorGuid, uint32 vendorSlot, uin
 
     // cheating attempt
     if (count < 1) 
-		count = 1;
+        count = 1;
 
     if (!IsAlive())
         return false;
@@ -25834,31 +25833,31 @@ void Player::SendClearCooldownMap(Unit* target)
     ObjectGuid guid = target->GetGUID();
     WorldPacket data(SMSG_CLEAR_COOLDOWNS, 3 + 1 + 8 + (4 * size));
 
-	data.WriteByteMask(guid[1]);
-	data.WriteByteMask(guid[3]);
-	data.WriteByteMask(guid[6]);
+    data.WriteByteMask(guid[1]);
+    data.WriteByteMask(guid[3]);
+    data.WriteByteMask(guid[6]);
 
-	data.WriteBits(size, 24);
+    data.WriteBits(size, 24);
 
-	data.WriteByteMask(guid[7]);
-	data.WriteByteMask(guid[5]);
-	data.WriteByteMask(guid[2]);
-	data.WriteByteMask(guid[4]);
-	data.WriteByteMask(guid[0]);
+    data.WriteByteMask(guid[7]);
+    data.WriteByteMask(guid[5]);
+    data.WriteByteMask(guid[2]);
+    data.WriteByteMask(guid[4]);
+    data.WriteByteMask(guid[0]);
 
-	data.WriteByteSeq(guid[7]);
-	data.WriteByteSeq(guid[2]);
-	data.WriteByteSeq(guid[4]);
-	data.WriteByteSeq(guid[5]);
-	data.WriteByteSeq(guid[1]);
-	data.WriteByteSeq(guid[3]);
+    data.WriteByteSeq(guid[7]);
+    data.WriteByteSeq(guid[2]);
+    data.WriteByteSeq(guid[4]);
+    data.WriteByteSeq(guid[5]);
+    data.WriteByteSeq(guid[1]);
+    data.WriteByteSeq(guid[3]);
 
     for (SpellCooldownToRemove::const_iterator itr = m_spellCooldownToRemove.begin(); itr != m_spellCooldownToRemove.end(); ++itr)
         data << uint32((*itr));
 
     
-	data.WriteByteSeq(guid[0]);
-	data.WriteByteSeq(guid[6]);
+    data.WriteByteSeq(guid[0]);
+    data.WriteByteSeq(guid[6]);
 
     SendDirectMessage(&data);
 
@@ -27298,7 +27297,7 @@ uint32 Player::GetDigsiteEntry()
                 return iter->first;
     }
 
-    return 0;	
+    return 0;
 }
 
 Guild* Player::GetGuild()

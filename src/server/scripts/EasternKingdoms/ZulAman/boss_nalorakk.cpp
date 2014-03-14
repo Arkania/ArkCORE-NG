@@ -183,8 +183,8 @@ public:
             }
         }
 
-		void DamageTaken(Unit* who, uint32& damage)
-		{
+        void DamageTaken(Unit* who, uint32& damage)
+        {
             if (!inCombat) 
             {
                 Talk(SAY_AGGRO);
@@ -197,7 +197,7 @@ public:
                 
                 events.ScheduleEvent(EVENT_BERSERK, 10 * MINUTE * IN_MILLISECONDS);
             }
-		}
+        }
 
         void JustDied(Unit* /*killer*/)
         {
@@ -289,7 +289,7 @@ public:
                 rangeTalk = true;
 
                 me->SetReactState(REACT_DEFENSIVE);
-				me->SetHomePosition(me->GetPositionX(),me->GetPositionY(),me->GetPositionZ(),me->GetOrientation());
+                me->SetHomePosition(me->GetPositionX(),me->GetPositionY(),me->GetPositionZ(),me->GetOrientation());
 
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             }

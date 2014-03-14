@@ -1167,7 +1167,7 @@ public:
         handler->PSendSysMessage(LANG_COMMAND_MODIFY_HONOR, handler->GetNameLink(target).c_str(), target->GetCurrency(uint32(currencyid)));
         return true;
     }
-	
+
     static bool HandleModifyDrunkCommand(ChatHandler* handler, const char* args)
     {
         if (!*args)
@@ -1179,7 +1179,7 @@ public:
 
         if (Player* target = handler->getSelectedPlayer())
             target->SetDrunkValue(drunklevel);
-			
+
         return true;
     }
 

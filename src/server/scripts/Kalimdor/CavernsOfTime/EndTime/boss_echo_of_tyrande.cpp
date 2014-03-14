@@ -55,10 +55,10 @@ class boss_echo_of_tyrande : public CreatureScript
         {
             boss_echo_of_tyrandeAI(Creature* creature) : BossAI(creature, BOSS_ECHO_OF_TYRANDE)
             {
-				instance = me->GetInstanceScript();
+                instance = me->GetInstanceScript();
             }
 
-			InstanceScript* instance;
+            InstanceScript* instance;
 
             void Reset()
             {
@@ -70,10 +70,10 @@ class boss_echo_of_tyrande : public CreatureScript
             void JustDied(Unit* killer)
             {
                 if (instance)
-				 if (instance->GetData(DATA_FIRST_ENCOUNTER) == IN_PROGRESS)
-				  instance->SetData(DATA_FIRST_ENCOUNTER, DONE);
-				 else  
-				  instance->SetData(DATA_SECOND_ENCOUNTER, DONE);
+                 if (instance->GetData(DATA_FIRST_ENCOUNTER) == IN_PROGRESS)
+                  instance->SetData(DATA_FIRST_ENCOUNTER, DONE);
+                 else  
+                  instance->SetData(DATA_SECOND_ENCOUNTER, DONE);
             }
 
             void EnterCombat(Unit* /*who*/)

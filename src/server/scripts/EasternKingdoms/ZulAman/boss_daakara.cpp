@@ -166,8 +166,8 @@ public:
 
         void Reset()
         {
-			events.Reset();
-			summons.DespawnAll();
+            events.Reset();
+            summons.DespawnAll();
 
             if (instance)
                 instance->SetData(DATA_DAAKARAEVENT, NOT_STARTED);
@@ -184,7 +184,7 @@ public:
 
             isFlameBreathing = false;
 
-			SetEquipmentSlots(false, 69916, 0, 0);
+            SetEquipmentSlots(false, 69916, 0, 0);
         }
 
         void MoveInLineOfSight(Unit* who)
@@ -213,17 +213,17 @@ public:
         void JustSummoned(Creature* summon)
         {
             summons.Summon(summon);
-			summon->setActive(true);
+            summon->setActive(true);
  
-			if (me->IsInCombat())
-			    summon->AI()->DoZoneInCombat();
+            if (me->IsInCombat())
+                summon->AI()->DoZoneInCombat();
         }
 
         void EnterEvadeMode()
         {
             Reset();
-			me->GetMotionMaster()->MoveTargetedHome();
-			me->RemoveAllAuras();
+            me->GetMotionMaster()->MoveTargetedHome();
+            me->RemoveAllAuras();
             me->SetHealth(me->GetMaxHealth());
 
             if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE))
@@ -244,7 +244,7 @@ public:
         void JustDied(Unit* /*killer*/)
         {
             Talk(YELL_DEATH);
-			summons.DespawnAll();
+            summons.DespawnAll();
 
             if (instance)
             {
@@ -263,7 +263,7 @@ public:
                     break;
 
                 case PHASE_BEAR:
-			        SetEquipmentSlots(false, 0, 0, 0);
+                    SetEquipmentSlots(false, 0, 0, 0);
                     Talk(YELL_BEAR);
                     Talk(ANN_BEAR);
                     DoCast(me, SPELL_SHAPE_OF_THE_BEAR);
@@ -276,7 +276,7 @@ public:
                     break;
 
                 case PHASE_LYNX:
-			        SetEquipmentSlots(false, 0, 0, 0);
+                    SetEquipmentSlots(false, 0, 0, 0);
                     Talk(YELL_LYNX);
                     Talk(ANN_LYNX);
                     DoCast(me, SPELL_SHAPE_OF_THE_LYNX);
@@ -291,7 +291,7 @@ public:
 
                 case PHASE_EAGLE:
                 {
-			        SetEquipmentSlots(false, 0, 0, 0);
+                    SetEquipmentSlots(false, 0, 0, 0);
                     Talk(YELL_EAGLE);
                     Talk(ANN_EAGLE);
                     me->RemoveAurasDueToSpell(me->HasAura(SPELL_SHAPE_OF_THE_BEAR? SPELL_SHAPE_OF_THE_BEAR : SPELL_SHAPE_OF_THE_LYNX));
@@ -321,7 +321,7 @@ public:
                     break;
 
                 case PHASE_DRAGONHAWK:
-			        SetEquipmentSlots(false, 0, 0, 0);
+                    SetEquipmentSlots(false, 0, 0, 0);
                     Talk(YELL_DRAGONHAWK);
                     Talk(ANN_DRAGONHAWK);
                     me->RemoveAurasDueToSpell(me->HasAura(SPELL_SHAPE_OF_THE_BEAR? SPELL_SHAPE_OF_THE_BEAR : SPELL_SHAPE_OF_THE_LYNX));
@@ -419,14 +419,14 @@ public:
                         break;
 
                     case EVENT_CREEPING_PARALYSIS:
-						{
+                        {
                             Map::PlayerList const& players = me->GetMap()->GetPlayers();
                             for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                                 if (Player* player = itr->GetSource())
                                     DoCast(player, SPELL_CREEPING_PARALYSIS);
 
                             events.ScheduleEvent(EVENT_CREEPING_PARALYSIS, urand(19000, 21000));
-						}
+                        }
                         break;
 
                     //====== Lynx Form
@@ -537,18 +537,18 @@ public:
                         {
                             me->AttackStop();
                             me->GetMotionMaster()->Clear();
-						    
+
                             for (uint8 i = 0; i < 7; i++)
                             {
                                 float x, y, z;
                                 me->GetClosePoint(x, y, z, me->GetObjectSize() / 3, 1.0f + (4 * i));
                                 me->CastSpell(x, y, z, SPELL_SUMMON_BREATH_LINE, true);
                             }
-						    
+
                             DoCast(target, SPELL_FLAME_BREATH);
                             me->StopMoving();
                             isFlameBreathing = true;
-						}
+                        }
 
                         events.ScheduleEvent(EVENT_FLAME_BREATH, urand(10000, 15000));
                         break;

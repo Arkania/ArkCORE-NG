@@ -141,7 +141,7 @@ void ArcheologyMgr::SaveDigsitesToDB()
                 stmt->setFloat(5+(i*2),itr->second.artifacts[i].positionY);
             }
 
-            trans->Append(stmt);			
+            trans->Append(stmt);
         }
     }
     CharacterDatabase.CommitTransaction(trans);
@@ -716,7 +716,7 @@ uint32 ArcheologyMgr::GenerateRandomDigSite(uint32 MapId) // For generating a di
 
     stmt->setUInt16(0, levelToSelect);
     stmt->setUInt16(1, MapId);
-	
+
     PreparedQueryResult result = WorldDatabase.Query(stmt);
 
     if(result && result->GetRowCount() > 0)
@@ -1055,11 +1055,11 @@ uint32 ArcheologyMgr::GetCompletedProjectsTime(uint32 guid, uint32 projectId)
     stmt->setUInt32(1, projectId);
     PreparedQueryResult result = CharacterDatabase.Query(stmt);
     if (result) //load
-	{
+    {
         Field* fields = result->Fetch();
         uint32 complete_time = fields[0].GetUInt32();
         return complete_time;
-	}
+    }
     else
         return 0;
 }

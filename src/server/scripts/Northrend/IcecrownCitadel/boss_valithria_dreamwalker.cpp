@@ -1435,10 +1435,10 @@ class achievement_portal_jockey : public AchievementCriteriaScript
         {
             if (!target)
                 return false;
-			else
+            else
             //if (target && !target->GetAI()->GetData(MISSED_PORTALS))
-			//	return true;
-			return false;
+            //    return true;
+            return false;
         }
 };
 

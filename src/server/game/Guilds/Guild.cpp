@@ -2425,7 +2425,7 @@ void Guild::HandleRemoveRank(WorldSession* session, uint8 rankId)
 void Guild::HandleMemberDepositMoney(WorldSession* session, uint64 amount, bool cashFlow /*=false*/)
 {
     Player* player = session->GetPlayer();
-	uint32 ammount = uint32(amount);
+    uint32 ammount = uint32(amount);
 
     // Call script after validation and before money transfer.
     sScriptMgr->OnGuildMemberDepositMoney(this, player, ammount);
@@ -4281,11 +4281,11 @@ void Guild::ResetDisbandCharacterReputationGuild(uint32 guid)
     stmt->setUInt32(0, guid);
     PreparedQueryResult result = CharacterDatabase.Query(stmt);
     if (result) //load
-	{
+    {
         Field* fields = result->Fetch();
         time_t disband_time = fields[0].GetUInt32();
         return disband_time;
-	}
+    }
     else
         return 0;
 }

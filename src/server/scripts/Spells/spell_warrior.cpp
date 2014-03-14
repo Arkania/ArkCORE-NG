@@ -506,7 +506,7 @@ public:
 
 enum Ralling_Cry
 {
-	SPELL_RALLING_CRY_TRIGGERED        = 97463,
+    SPELL_RALLING_CRY_TRIGGERED        = 97463,
 };
 
 class spell_warr_ralling_cry : public SpellScriptLoader
@@ -529,15 +529,15 @@ class spell_warr_ralling_cry : public SpellScriptLoader
             {
                 if (Unit* caster = GetCaster())
                 {
-					int32 bp = 0;
-					std::list<Unit*> PartyMembers;
-					caster->GetPartyMembers(PartyMembers);
-					for (std::list<Unit*>::iterator itr = PartyMembers.begin(); itr != PartyMembers.end(); ++itr)          // If caster is in party with a player
-						if (caster->GetDistance((*itr)) <= 30.0f)
-						{
-							bp = (*itr)->CountPctFromMaxHealth(20);
-							caster->CastCustomSpell((*itr), SPELL_RALLING_CRY_TRIGGERED, &bp, NULL, NULL, true, NULL);
-						}
+                    int32 bp = 0;
+                    std::list<Unit*> PartyMembers;
+                    caster->GetPartyMembers(PartyMembers);
+                    for (std::list<Unit*>::iterator itr = PartyMembers.begin(); itr != PartyMembers.end(); ++itr)          // If caster is in party with a player
+                        if (caster->GetDistance((*itr)) <= 30.0f)
+                        {
+                            bp = (*itr)->CountPctFromMaxHealth(20);
+                            caster->CastCustomSpell((*itr), SPELL_RALLING_CRY_TRIGGERED, &bp, NULL, NULL, true, NULL);
+                        }
                 }
             }
 

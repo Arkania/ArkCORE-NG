@@ -105,7 +105,7 @@ enum Spells
     SPELL_SPLITTING_BLOW_SOUTH          = 98951,
     SPELL_SUBMERGE                      = 98982,  // in transition phases, w/ lava bolt casts
     SPELL_DISABLE_ANIM                  = 16245,  // hack to prevent him getting up from the lava again.
-	SPELL_LAVA_BOLTS                    = 98981,
+    SPELL_LAVA_BOLTS                    = 98981,
     SPELL_SULFURAS_AURA                 = 100456, // Warning marker + periodic damage
 
     // Phase 2
@@ -114,7 +114,7 @@ enum Spells
     SPELL_DAMAGE_ENGULFING              = 100185,
     SPELL_WORLD_IN_FLAMES               = 100190, // p2 3 engulfing flames cast 2 sec- heroic
     SPELL_MOLTEN_SEED_VISUAL            = 98520,  // just the visual.
-	SPELL_MOLTEN_SEED_MISSILE           = 98495,  // the actual damage of the 98520
+    SPELL_MOLTEN_SEED_MISSILE           = 98495,  // the actual damage of the 98520
     SPELL_MOLTEN_SEED_DAMAGE            = 98498,
 
     // Phase 3
@@ -135,9 +135,9 @@ enum Spells
     SPELL_METEOR_OF_FROST               = 100567,
     SPELL_VISUAL_BREATH                 = 100478,
     SPELL_PROTECT_SUPERHEAT             = 100503, // protects from Superheated
-	SPELL_WATER_VISUAL                  = 69657,  // totally wrong but will announce dreadflame end
-	SPELL_NATURE                        = 34770,  // totally wrong, but visual for roots
-	SPELL_VISUAL_ROOTS                  = 96527,
+    SPELL_WATER_VISUAL                  = 69657,  // totally wrong but will announce dreadflame end
+    SPELL_NATURE                        = 34770,  // totally wrong, but visual for roots
+    SPELL_VISUAL_ROOTS                  = 96527,
 
     /*** Creatures & Summons ****/
 
@@ -189,8 +189,8 @@ enum Events
 {
     // Ragnaros
     EVENT_SULFURAS_SMASH  = 1, // P1 - 3 fire pools on the ground - 93824 visual, after 4 secs comes the drop.
-	// Npc 53266 is summoned in front where hammer will hit (boss summons npc in one of 5 designated locations), it casts damage spell 98608 @self after 4s (Boss casts 98710 on self after 1.5s), 
-	// and summons three 53268 npc's, one on each side, which summon the waves and the waves go forward.
+    // Npc 53266 is summoned in front where hammer will hit (boss summons npc in one of 5 designated locations), it casts damage spell 98608 @self after 4s (Boss casts 98710 on self after 1.5s), 
+    // and summons three 53268 npc's, one on each side, which summon the waves and the waves go forward.
     EVENT_SUL_SMASH,
     EVENT_LAVA_WAVE,
     EVENT_WRATH_OF_RAGNAROS,   // P1 - 25p 3 targets, damage, knockback - 98263
@@ -253,34 +253,34 @@ Position const EngulfingPos[ENGULFING_FLAME_COUNT] =
     {1025.552f, -57.613f, 55.779f, 6.175f},
     {1029.401f, -38.686f, 55.790f, 5.747f},
     {1040.756f, -23.403f, 55.924f, 5.343f},
-	{1057.850f, -15.040f, 55.782f, 4.963f},
-	{1074.199f, -14.966f, 55.789f, 4.663f},
-	{1057.500f, -55.968f, 53.238f, 3.172f},
+    {1057.850f, -15.040f, 55.782f, 4.963f},
+    {1074.199f, -14.966f, 55.789f, 4.663f},
+    {1057.500f, -55.968f, 53.238f, 3.172f},
 };
 Position const EngulfingPos2[ENGULFING_FLAME_COUNT] =
 {
     {1046.256f, -110.471f, 55.804f, 4.893f},
-	{1053.341f, -7.916f, 55.781f, 6.141f},
-	{1030.295f, -9.514f, 55.803f, 5.601f},
-	{1017.908f, -23.645f, 55.791f, 5.766f},
-	{1009.825f, -40.884f, 55.774f, 5.984f},
-	{1003.884f, -59.484f, 55.765f, 0.018f},
-	{1009.150f, -78.064f, 55.770f, 0.147f},
-	{1019.707f, -95.570f, 55.809f, 0.300f},
-	{1029.262f, -113.527f, 55.802f, 0.756f},
+    {1053.341f, -7.916f, 55.781f, 6.141f},
+    {1030.295f, -9.514f, 55.803f, 5.601f},
+    {1017.908f, -23.645f, 55.791f, 5.766f},
+    {1009.825f, -40.884f, 55.774f, 5.984f},
+    {1003.884f, -59.484f, 55.765f, 0.018f},
+    {1009.150f, -78.064f, 55.770f, 0.147f},
+    {1019.707f, -95.570f, 55.809f, 0.300f},
+    {1029.262f, -113.527f, 55.802f, 0.756f},
 };
 
 Position const EngulfingPos3[ENGULFING_FLAME_COUNT] =
 {
-	{1013.335f, -105.794f, 55.802f, 0.615f},
-	{1020.382f, -124.228f, 55.803f, 1.361f},
-	{997.749f, -93.560f, 55.796f, 0.409f},
-	{986.682f, -76.356f, 55.786f, 0.271f},
-	{984.630f, -57.194f, 55.797f, 6.228f},
-	{987.328f, -38.069f, 55.790f, 5.989f},
-	{1000.162f, -22.790f, 55.794f, 5.679f},
-	{1015.802f, -10.481f, 55.802f, 5.635f},
-	{1025.504f, 2.655f, 55.802f, 5.391f},
+    {1013.335f, -105.794f, 55.802f, 0.615f},
+    {1020.382f, -124.228f, 55.803f, 1.361f},
+    {997.749f, -93.560f, 55.796f, 0.409f},
+    {986.682f, -76.356f, 55.786f, 0.271f},
+    {984.630f, -57.194f, 55.797f, 6.228f},
+    {987.328f, -38.069f, 55.790f, 5.989f},
+    {1000.162f, -22.790f, 55.794f, 5.679f},
+    {1015.802f, -10.481f, 55.802f, 5.635f},
+    {1025.504f, 2.655f, 55.802f, 5.391f},
 };
 
     /*** Sons of Flame ***/
@@ -332,7 +332,7 @@ Position const SummonPositions[3] =
 {
     {1039.866f, -28.044f, 55.781f, 2.21f},  // 1 Top
     {1028.017f, -58.241f, 55.781f, 3.12f},  // 2 Middle for Sulfuras
-    {1039.649f, -88.337f, 55.781f, 4.18f},  // 3 Bottom	
+    {1039.649f, -88.337f, 55.781f, 4.18f},  // 3 Bottom    
 };
 
     /*** Lava Scion ***/
@@ -347,7 +347,7 @@ Position const HeroPos[3] =
 {
     {985.100f, -59.000f, 55.800f, 6.20f},   // Malfurion
     {990.000f, -78.000f, 55.800f, 0.15f},   // Cenarius
-	{975.000f, -40.000f, 55.800f, 5.40f},   // Hamuul
+    {975.000f, -40.000f, 55.800f, 5.40f},   // Hamuul
 };
 
 /*####################
@@ -408,17 +408,17 @@ class boss_ragnaros_firelands : public CreatureScript
                 _Reset();
             }
 
-		    void EnterEvadeMode()
+            void EnterEvadeMode()
             {
                 Reset();
 
-			    me->GetMotionMaster()->MoveTargetedHome();
+                me->GetMotionMaster()->MoveTargetedHome();
                 me->SetHealth(me->GetMaxHealth());
                 me->AddAura(SPELL_BASE_VISUAL, me);
                 if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 
-			    if (instance)
+                if (instance)
                 {
                     instance->SetData(DATA_RAGNAROS, FAIL);
                     instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me); // Remove
@@ -466,7 +466,7 @@ class boss_ragnaros_firelands : public CreatureScript
 
             void EnterCombat(Unit* who)
             {
-			    me->setActive(true);
+                me->setActive(true);
 
                 if (instance)
                 {
@@ -504,8 +504,8 @@ class boss_ragnaros_firelands : public CreatureScript
                 summons.Summon(summon);
                 summon->setActive(true);
 
-			    if (me->IsInCombat())
-			        summon->AI()->DoZoneInCombat();
+                if (me->IsInCombat())
+                    summon->AI()->DoZoneInCombat();
 
                 switch (summon->GetEntry())
                 {
@@ -515,7 +515,7 @@ class boss_ragnaros_firelands : public CreatureScript
                         break;
 
                     case NPC_MOLTEN_SEED:
-						summon->CastSpell(summon, SPELL_MOLTEN_SEED_VISUAL, false);
+                        summon->CastSpell(summon, SPELL_MOLTEN_SEED_VISUAL, false);
                         break;
 
                     case NPC_PLATFORM_STALKER:
@@ -539,9 +539,9 @@ class boss_ragnaros_firelands : public CreatureScript
                         summon->SetReactState(REACT_PASSIVE);
                         break;
 
-					case NPC_CENARIUS:
-					case NPC_MALFURION:
-					case NPC_HAMUUL:
+                    case NPC_CENARIUS:
+                    case NPC_MALFURION:
+                    case NPC_HAMUUL:
                         summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE|UNIT_FLAG_NON_ATTACKABLE);
                         break;
 
@@ -649,7 +649,7 @@ class boss_ragnaros_firelands : public CreatureScript
                                                     }
                                 }
                             }
-					        break;
+                            break;
 
                         case EVENT_SULFURAS_SMASH:
                             {
@@ -708,7 +708,7 @@ class boss_ragnaros_firelands : public CreatureScript
                                 }
                             }
                             events.ScheduleEvent(EVENT_MAGMA_BLAST, urand(4000, 5000)); 
-					        break;
+                            break;
 
                         // ====== INTERMISSION 1 : Minions of Fire! ====== //
 
@@ -819,7 +819,7 @@ class boss_ragnaros_firelands : public CreatureScript
 
                                 events.ScheduleEvent(EVENT_MOLTEN_SEED, 60000);
                             }
-					        break;
+                            break;
 
                         case EVENT_ENFULGING_FLAMES:
                                 DoScriptText(SAY_ENGULFING, me);
@@ -876,7 +876,7 @@ class boss_ragnaros_firelands : public CreatureScript
                             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                             me->GetMotionMaster()->Clear();
                             me->AttackStop();
-					        me->SetReactState(REACT_PASSIVE);
+                            me->SetReactState(REACT_PASSIVE);
                             DoScriptText(SAY_SPLITTING, me);
 
                             switch (urand(0, 2))
@@ -972,7 +972,7 @@ class boss_ragnaros_firelands : public CreatureScript
                             if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 200.0f, true))
                                 DoCast(target, SPELL_LIVING_METEOR);                 
                             events.ScheduleEvent(EVENT_METEORITE, 45000);
-					        break;
+                            break;
 
                         /**** STAGE 4 : The True Power of the Firelord! ****/
 
@@ -985,7 +985,7 @@ class boss_ragnaros_firelands : public CreatureScript
                             events.ScheduleEvent(EVENT_SUPERHEATED, 10000);
                             events.ScheduleEvent(EVENT_EMPOWER, 12000);
                             events.ScheduleEvent(EVENT_HEROIC_DANCE, 2000);
-					        break;
+                            break;
 
                         case EVENT_HEROIC_DANCE:
                             if (Creature* malfurion = me->SummonCreature(NPC_MALFURION, HeroPos[0].GetPositionX(), HeroPos[0].GetPositionY(), HeroPos[0].GetPositionZ(), HeroPos[0].GetOrientation(), TEMPSUMMON_CORPSE_DESPAWN, 1000))
@@ -993,7 +993,7 @@ class boss_ragnaros_firelands : public CreatureScript
                             if (Creature* cenarius = me->SummonCreature(NPC_CENARIUS, HeroPos[1].GetPositionX(), HeroPos[1].GetPositionY(), HeroPos[1].GetPositionZ(), HeroPos[1].GetOrientation(), TEMPSUMMON_CORPSE_DESPAWN, 1000))
                                 cenarius->AI()->DoAction(ACTION_START_DANCE);
                             if (Creature* hamuul = me->SummonCreature(NPC_HAMUUL, HeroPos[2].GetPositionX(), HeroPos[2].GetPositionY(), HeroPos[2].GetPositionZ(), HeroPos[2].GetOrientation(), TEMPSUMMON_CORPSE_DESPAWN, 1000))
-                                hamuul->AI()->DoAction(ACTION_START_DANCE);    								
+                                hamuul->AI()->DoAction(ACTION_START_DANCE);                                    
                             break;
 
                         case EVENT_SUPERHEATED:                
@@ -1012,7 +1012,7 @@ class boss_ragnaros_firelands : public CreatureScript
                             //http://www.wowhead.com/npc=53952 - Ragnaros platform stalkers... can't imagine a different use for the bitches
                             events.ScheduleEvent(EVENT_DREADFLAME, 12000);
                             break;
-					}                  
+                    }                  
                 }
 
                 if(!me->HasAura(SPELL_SUBMERGE))
@@ -1042,8 +1042,8 @@ class npc_sulfuras_smash_trigger : public CreatureScript // 53266
                 Movement::MoveSplineInit init(*creature);
                 init.SetOrientationFixed(true);
                 init.Launch();
-				m_uiSummonTimer  = 100;
-				m_uiDamageTimer  = 4000;
+                m_uiSummonTimer  = 100;
+                m_uiDamageTimer  = 4000;
                 m_uiDespawnTimer = 5000;
             }
 
@@ -1203,7 +1203,7 @@ class npc_magma_trap : public CreatureScript
                 }
                 else
                     m_uiCheckTimer -= diff;
-					
+                    
                 if (m_uiDespawnTimer <= diff)
                 {
                     me->DespawnOrUnsummon();
@@ -1245,7 +1245,7 @@ class npc_splitting_blow : public CreatureScript
             {       
                 if (m_uiDespawnTimer <= diff)
                 {
-					me->SummonCreature(NPC_SULFURAS, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation(), TEMPSUMMON_MANUAL_DESPAWN);
+                    me->SummonCreature(NPC_SULFURAS, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation(), TEMPSUMMON_MANUAL_DESPAWN);
                     me->DespawnOrUnsummon(100);
                     m_uiDespawnTimer = -1;
                 }
@@ -1330,10 +1330,10 @@ class npc_son_of_flame : public CreatureScript
             void DamageTaken(Unit* /*who*/, uint32& damage)
             {
                 if (me->HasAura(SPELL_BURNING_SPEED))
-        		    if (Aura * aura = me->GetAura(SPELL_BURNING_SPEED))
-        		    {
-        			    if (aura->GetStackAmount() > 1)
-        		            me->SetAuraStack(SPELL_BURNING_SPEED, me, aura->GetStackAmount() - 1);
+                    if (Aura * aura = me->GetAura(SPELL_BURNING_SPEED))
+                    {
+                        if (aura->GetStackAmount() > 1)
+                            me->SetAuraStack(SPELL_BURNING_SPEED, me, aura->GetStackAmount() - 1);
                         else
                             me->RemoveAurasDueToSpell(SPELL_BURNING_SPEED);
                     }
@@ -1349,7 +1349,7 @@ class npc_son_of_flame : public CreatureScript
                     me->RemoveAurasDueToSpell(SPELL_VISUAL_PRESPAWN);
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE|UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
                     me->AddAura(SPELL_BURNING_SPEED, me);
-        			me->SetAuraStack(SPELL_BURNING_SPEED, me, 10);
+                    me->SetAuraStack(SPELL_BURNING_SPEED, me, 10);
                     me->AddAura(SPELL_HIT_ME, me);
                     me->SetSpeed(MOVE_RUN, 0.5f);
                     me->SetSpeed(MOVE_WALK, 0.5f);
@@ -1360,7 +1360,7 @@ class npc_son_of_flame : public CreatureScript
                 }
                 else
                     m_uiEmergeTimer -= diff;
-					
+                    
                 if (m_uiSulfurasCheckTimer <= diff)
                 {
                     if (Creature* sulfuras = me->FindNearestCreature(NPC_SULFURAS, 2.0f, true))
@@ -1410,7 +1410,7 @@ class npc_molten_seed : public CreatureScript
                 if (m_uiMoltenInfernoTimer <= diff)
                 {
                     DoCast(me, SPELL_MOLTEN_INFERNO);
-					DoCastAOE(SPELL_MOLTEN_SEED_MISSILE);
+                    DoCastAOE(SPELL_MOLTEN_SEED_MISSILE);
                     me->SummonCreature(NPC_MOLTEN_ELEMENTAL, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation(), TEMPSUMMON_CORPSE_DESPAWN, 1000);
                     m_uiMoltenInfernoTimer = 10000;
                 }
@@ -1484,14 +1484,14 @@ class npc_molten_elemental : public CreatureScript
             {
                 instance = creature->GetInstanceScript();
                 if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-				{
+                {
                     creature->AI()->AttackStart(target);
                     creature->AddThreat(target, 1000.0f);
                     creature->CastSpell(target, SPELL_ELEMENTAL_FIXATE, false);
                     // Not tauntable.
                     creature->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, true);
                     creature->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_ATTACK_ME, true);
-				}
+                }
 
                 m_uiMoltenPowerCheckTimer = 3000;
             }
@@ -1588,10 +1588,10 @@ class npc_dreadflame : public CreatureScript
                 {
                     if(Player* player= me->FindNearestPlayer(2.5f, true))
                         if(player->IsWithinDistInMap(me, 2.5f) && player->HasAura(SPELL_DELUGE))
-					    {
-					    	DoCast(me, SPELL_WATER_VISUAL);
+                        {
+                            DoCast(me, SPELL_WATER_VISUAL);
                             me->DespawnOrUnsummon();
-					    }
+                        }
 
                     m_uiCheckDeluge = 250;
                 }
@@ -1634,8 +1634,8 @@ class npc_living_meteor : public CreatureScript
 
                 if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, NonTankTargetSelector(creature)))
                 {
-					if (creature->Attack(target, true))
-						creature->GetMotionMaster()->MoveChase(target);
+                    if (creature->Attack(target, true))
+                        creature->GetMotionMaster()->MoveChase(target);
 
                     creature->AddThreat(target, 1000.0f);
                     creature->CastSpell(target, SPELL_FLAMING_FIXATE, false);
@@ -1739,7 +1739,7 @@ class npc_entrapping_roots : public CreatureScript
                 me->DespawnOrUnsummon(60000);
                 searchragnaros = 1000;
                 DoStartNoMovement(me);
-				DoCast(me, SPELL_VISUAL_ROOTS);
+                DoCast(me, SPELL_VISUAL_ROOTS);
                 me->SetInCombatWithZone();
                 me->SetReactState(REACT_PASSIVE);
             }
@@ -1798,8 +1798,8 @@ class npc_cloudburst : public CreatureScript
                             me->DespawnOrUnsummon(100);
                         }
                     }
-			}
-		};
+            }
+        };
 };
 
 class npc_breathoffrost : public CreatureScript
@@ -1836,7 +1836,7 @@ class npc_breathoffrost : public CreatureScript
                         }
                         //else player->ApplySpellImmune(0, IMMUNITY_ID, SPELL_SUPERHEATED, true);
                     }
-			}
+            }
      };
 };
 
@@ -1991,7 +1991,7 @@ class npc_heartofragnaros : public CreatureScript
                     }
                     return;//this might be very incorect and this whole thing may need a timer.
                  }
-			}
+            }
 
       };
 };
@@ -2065,7 +2065,7 @@ void AddSC_boss_ragnaros_firelands()
     new npc_cloudburst();
     new npc_breathoffrost();
     new npc_hamuul();
-	new npc_malfurion();
+    new npc_malfurion();
     new npc_cenarius();
     new npc_heartofragnaros();
 }

@@ -51,7 +51,7 @@ class npc_containment_unit : public CreatureScript
                 if (!UpdateVictim())
                     return;
 
-				if (me->HasUnitState(UNIT_STATE_CASTING))
+                if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
                 if (m_uiRepellentRayTimer <= uiDiff)
@@ -104,7 +104,7 @@ class npc_disciple_of_hate : public CreatureScript
                 if (!UpdateVictim())
                     return;
 
-				if (me->HasUnitState(UNIT_STATE_CASTING))
+                if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
                 if (m_uiWhirlingBladesTimer <= uiDiff)
@@ -164,7 +164,7 @@ class npc_eye_of_occuthar : public CreatureScript
                 if (!UpdateVictim())
                     return;
 
-				if (me->HasUnitState(UNIT_STATE_CASTING))
+                if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
                 if (m_uiGazeTimer <= uiDiff)
@@ -190,4 +190,3 @@ void AddSC_bh_trash()
     new npc_eye_of_occuthar();
     new npc_disciple_of_hate();
 }
-	

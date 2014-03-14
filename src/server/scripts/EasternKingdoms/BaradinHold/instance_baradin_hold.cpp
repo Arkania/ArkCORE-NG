@@ -20,16 +20,16 @@
 
 enum Instance_baradin_hold
 {
-	DATA_ARGALOTH           = 0,
+    DATA_ARGALOTH           = 0,
     DATA_OCCUTHAR           = 1,
     DATA_ALIZABAL           = 2,
 
-	BOSS_ARGALOTH           = 47120,
+    BOSS_ARGALOTH           = 47120,
     BOSS_OCCUTHAR           = 52363,
-	BOSS_ALIZABAL           = 55869,
-	BOSS_EncounterCount		= 3,
+    BOSS_ALIZABAL           = 55869,
+    BOSS_EncounterCount        = 3,
 
-	GO_ARGALOTH_DOOR        = 207619,
+    GO_ARGALOTH_DOOR        = 207619,
     GO_OCCUTHAR_DOOR        = 208953,
     GO_ALIZABAL_DOOR        = 209849,
 };

@@ -414,7 +414,7 @@ public:
                     me->CastSpell(me, 51923, true);
                     me->SetSpeed(MOVE_FLIGHT, 3.4f, true);
                     me->GetMotionMaster()->MovePoint(0, 1711.0f, -5820.0f, 147.0f);
-					IsActive = true;
+                    IsActive = true;
                     return;
                 }
                 else

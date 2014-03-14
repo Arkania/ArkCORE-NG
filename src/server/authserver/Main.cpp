@@ -101,19 +101,19 @@ extern int main(int argc, char **argv)
     sLog->Initialize();
 
     sLog->outString("%s (authserver)", _FULLVERSION);
-	sLog->outString(" ");
-	sLog->outString(" A World of Warcraft Cataclsym 4.3.4 Emulator	");
-	sLog->outString("       _/_/              _/          _/_/_/    _/_/    _/_/_/    _/_/_/_/  ");
-	sLog->outString("    _/    _/  _/  _/_/  _/  _/    _/        _/    _/  _/    _/  _/         ");
-	sLog->outString("   _/_/_/_/  _/_/      _/_/      _/        _/    _/  _/_/_/    _/_/_/      ");
-	sLog->outString("  _/    _/  _/        _/  _/    _/        _/    _/  _/    _/  _/           ");
-	sLog->outString(" _/    _/  _/        _/    _/    _/_/_/    _/_/    _/    _/  _/_/_/_/    NG");
-	sLog->outString(" Arkania Community (c) 2014!");
-	sLog->outString("      <http://arkania.net/>");
-	sLog->outString(" ");    
-	sLog->outString("<Ctrl-C> to stop.\n");
+    sLog->outString(" ");
+    sLog->outString(" A World of Warcraft Cataclsym 4.3.4 Emulator ");
+    sLog->outString("       _/_/              _/          _/_/_/    _/_/    _/_/_/    _/_/_/_/  ");
+    sLog->outString("    _/    _/  _/  _/_/  _/  _/    _/        _/    _/  _/    _/  _/         ");
+    sLog->outString("   _/_/_/_/  _/_/      _/_/      _/        _/    _/  _/_/_/    _/_/_/      ");
+    sLog->outString("  _/    _/  _/        _/  _/    _/        _/    _/  _/    _/  _/           ");
+    sLog->outString(" _/    _/  _/        _/    _/    _/_/_/    _/_/    _/    _/  _/_/_/_/   NG ");
+    sLog->outString(" Arkania Community (c) 2014! ");
+    sLog->outString("    <http://arkania.net/>    ");
+    sLog->outString(" ");
+    sLog->outString("<Ctrl-C> to stop.\n");
     sLog->outString("Using configuration file %s.", cfg_file);
-    sLog->outDetail("%s (Library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));	
+    sLog->outDetail("%s (Library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
 
 #if defined (ACE_HAS_EVENT_POLL) || defined (ACE_HAS_DEV_POLL)
     ACE_Reactor::instance(new ACE_Reactor(new ACE_Dev_Poll_Reactor(ACE::max_handles(), 1), 1), true);

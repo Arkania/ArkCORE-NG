@@ -134,7 +134,7 @@ class ByteBuffer
         {
             _storage.reserve(reserve);
         }
-		
+
         // copy constructor
         ByteBuffer(const ByteBuffer &buf) : _rpos(buf._rpos), _wpos(buf._wpos),
             _bitpos(buf._bitpos), _curbitval(buf._curbitval), _storage(buf._storage)
@@ -165,7 +165,6 @@ class ByteBuffer
             _curbitval = 0;
             _bitpos = 8;
         }
- 	
 
         void ResetBitReader()
         {
@@ -215,7 +214,7 @@ class ByteBuffer
 
             return value;
         }
-		
+
         uint64 ReadGuid(uint8* mask, uint8* bytes)
         {
             uint8 guidMask[8];
@@ -236,7 +235,7 @@ class ByteBuffer
             return guid;
         }
 
-		// Reads a byte (if needed) in-place
+        // Reads a byte (if needed) in-place
         void ReadByteSeq(uint8& b)
         {
             if (b != 0)
@@ -248,7 +247,7 @@ class ByteBuffer
             if (b != 0)
                 append<uint8>(b ^ 1);
         }
-		
+
         BitStream ReadBitStream(uint32 len)
         {
             BitStream b;
@@ -656,7 +655,7 @@ class ByteBuffer
             (*this) >> f;
             return f;
         }
-	
+
         //! Method for writing strings that have their length sent separately in packet
         //! without null-terminating the string
         void WriteString(std::string const& str)

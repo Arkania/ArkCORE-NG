@@ -1283,19 +1283,19 @@ void Spell::SelectImplicitAreaTargets(SpellEffIndex effIndex, SpellImplicitTarge
             case SPELLFAMILY_GENERIC:
                 switch (m_spellInfo->Id)
                 {
-    				case 99052: // Smoldering Devastation
-					case 98934: // Embare Flare
-					case 100648:
-					case 100834:
-					case 100835:
-						for (std::list<Unit*>::iterator itr = unitTargets.begin(); itr != unitTargets.end();)
-						{
-							if (((*itr)->GetPositionZ() > m_caster->GetPositionZ() ? ((*itr)->GetPositionZ() - m_caster->GetPositionZ()) : (m_caster->GetPositionZ() - (*itr)->GetPositionZ())) > 5.0f)
-								itr = unitTargets.erase(itr);
-							else
-								++itr;
-						}
-						break;
+                    case 99052: // Smoldering Devastation
+                    case 98934: // Embare Flare
+                    case 100648:
+                    case 100834:
+                    case 100835:
+                        for (std::list<Unit*>::iterator itr = unitTargets.begin(); itr != unitTargets.end();)
+                        {
+                            if (((*itr)->GetPositionZ() > m_caster->GetPositionZ() ? ((*itr)->GetPositionZ() - m_caster->GetPositionZ()) : (m_caster->GetPositionZ() - (*itr)->GetPositionZ())) > 5.0f)
+                                itr = unitTargets.erase(itr);
+                            else
+                                ++itr;
+                        }
+                        break;
                     case 52759: // Ancestral Awakening
                     case 71610: // Echoes of Light (Althor's Abacus normal version)
                     case 71641: // Echoes of Light (Althor's Abacus heroic version)

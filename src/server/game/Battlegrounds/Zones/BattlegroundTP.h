@@ -43,12 +43,12 @@ enum BG_TP_Sound
 
 enum BG_TP_SpellId
 {
-    BG_TP_SPELL_HORDE_FLAG				= 23333,
-    BG_TP_SPELL_HORDE_FLAG_DROPPED		= 23334,
-    BG_TP_SPELL_HORDE_FLAG_PICKED		= 61266,    // fake spell, does not exist but used as timer start event
-    BG_TP_SPELL_ALLIANCE_FLAG			= 23335,
-    BG_TP_SPELL_ALLIANCE_FLAG_DROPPED	= 23336,
-    BG_TP_SPELL_ALLIANCE_FLAG_PICKED	= 61265,    // fake spell, does not exist but used as timer start event
+    BG_TP_SPELL_HORDE_FLAG              = 23333,
+    BG_TP_SPELL_HORDE_FLAG_DROPPED      = 23334,
+    BG_TP_SPELL_HORDE_FLAG_PICKED       = 61266,    // fake spell, does not exist but used as timer start event
+    BG_TP_SPELL_ALLIANCE_FLAG           = 23335,
+    BG_TP_SPELL_ALLIANCE_FLAG_DROPPED   = 23336,
+    BG_TP_SPELL_ALLIANCE_FLAG_PICKED    = 61265,    // fake spell, does not exist but used as timer start event
     BG_TP_SPELL_FOCUSED_ASSAULT         = 46392,
     BG_TP_SPELL_BRUTAL_ASSAULT          = 46393
 };

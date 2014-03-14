@@ -147,7 +147,7 @@ class boss_halfus : public CreatureScript
                 }
 
                 me->RemoveAllAuras();
-						
+
                 _Reset();
             }
 

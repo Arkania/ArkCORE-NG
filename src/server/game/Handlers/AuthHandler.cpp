@@ -28,7 +28,7 @@ void WorldSession::SendAuthResponse(uint8 code, bool queued, uint32 queuePos)
         packet.WriteBit(0);
 
     packet.WriteBit(1);                                    // has account info
-	
+
     packet.FlushBits();
 
     // account info

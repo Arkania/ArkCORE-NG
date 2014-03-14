@@ -40,7 +40,7 @@ class GameObjectAI
 
         virtual void Reset() {};
 
-		virtual void IsSummonedBy(Unit* /*summoner*/, GameObject* /*go*/) {}
+        virtual void IsSummonedBy(Unit* /*summoner*/, GameObject* /*go*/) {}
 
         static int Permissible(GameObject const* go);
 

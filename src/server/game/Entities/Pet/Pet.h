@@ -127,7 +127,7 @@ class Pet : public Guardian
         void setDeathState(DeathState s);                   // overwrite virtual Creature::setDeathState and Unit::setDeathState
         void Update(uint32 diff);                           // overwrite virtual Creature::Update and Unit::Update
 
-		void SetHunterPetSlot (uint32 guidlow);
+        void SetHunterPetSlot (uint32 guidlow);
 
         uint8 GetPetAutoSpellSize() const { return m_autospells.size(); }
         uint32 GetPetAutoSpellOnPos(uint8 pos) const
@@ -138,7 +138,7 @@ class Pet : public Guardian
                 return m_autospells[pos];
         }
 
-		void SetSlot(uint8 slot) { m_slot = slot; }
+        void SetSlot(uint8 slot) { m_slot = slot; }
         uint8 GetSlot() { return m_slot; }
 
         void GivePetXP(uint32 xp);
@@ -183,7 +183,7 @@ class Pet : public Guardian
         bool unlearnSpell(uint32 spell_id, bool learn_prev, bool clear_ab = true);
         bool removeSpell(uint32 spell_id, bool learn_prev, bool clear_ab = true);
         void CleanupActionBar();
-		void PetBonuses ();
+        void PetBonuses ();
         virtual void ProhibitSpellSchool(SpellSchoolMask idSchoolMask, uint32 unTimeMs);
 
         PetSpellMap     m_spells;
@@ -217,7 +217,7 @@ class Pet : public Guardian
         uint64  m_auraRaidUpdateMask;
         bool    m_loading;
         uint32  m_regenTimer;
-		uint8   m_slot;
+        uint8   m_slot;
 
         DeclinedName *m_declinedname;
 

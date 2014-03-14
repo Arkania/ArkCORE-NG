@@ -525,23 +525,23 @@ void WorldSession::SendLfgUpdateStatus(const LfgUpdateData& updateData, bool isP
     {
         case LFG_UPDATETYPE_JOIN_PROPOSAL:
             joined = true;
-			if(!isParty)
-				queued = true;
+            if(!isParty)
+                queued = true;
             break;
         case LFG_UPDATETYPE_CLEAR_LOCK_LIST:
             // join = true;  // TODO: Sometimes queued and extrainfo - Check ocurrences...
             queued = true;
             break;
         case LFG_UPDATETYPE_PROPOSAL_BEGIN: 
-			joined = true;
-			if(isParty)
-				LFGJoined = true;
-			break;
+            joined = true;
+            if(isParty)
+                LFGJoined = true;
+            break;
         case LFG_UPDATETYPE_ADDED_TO_QUEUE:
             joined = true;
             queued = true;
-			if(isParty)
-				LFGJoined = true;
+            if(isParty)
+                LFGJoined = true;
             break;
         case LFG_UPDATETYPE_GROUP_FOUND:
             UnkBit = true;

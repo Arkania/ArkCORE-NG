@@ -38,7 +38,7 @@ enum Yells
 {
     SAY_AGGRO_1 = 1,
     SAY_AGGRO_2,
-	SAY_FROST_BLADES, // Spell 1
+    SAY_FROST_BLADES, // Spell 1
     SAY_FROSTBOLT_VOLLEY, // Spell 2
     SAY_BLINK, // Spell 3
     SAY_SLAY_1,
@@ -97,10 +97,10 @@ class boss_echo_of_jaina : public CreatureScript
         {
             boss_echo_of_jainaAI(Creature* creature) : BossAI(creature, BOSS_ECHO_OF_JAINA), summons(me)
             {
-				instance = me->GetInstanceScript();
+                instance = me->GetInstanceScript();
             }
 
-			InstanceScript* instance;
+            InstanceScript* instance;
             uint32 VolleyCount;
             SummonList summons;
             EventMap events;
@@ -114,9 +114,9 @@ class boss_echo_of_jaina : public CreatureScript
                 VolleyCount = 0;
             }
 
-		    void EnterEvadeMode()
-		    {
-				me->GetMotionMaster()->MoveTargetedHome();
+            void EnterEvadeMode()
+            {
+                me->GetMotionMaster()->MoveTargetedHome();
                 Reset();
 
                 me->SetHealth(me->GetMaxHealth());
@@ -126,7 +126,7 @@ class boss_echo_of_jaina : public CreatureScript
                     instance->SetBossState(BOSS_ECHO_OF_JAINA, FAIL);
                     instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me); // Remove
                 }
-		    }
+            }
 
             void JustDied(Unit* killer)
             {
@@ -134,10 +134,10 @@ class boss_echo_of_jaina : public CreatureScript
 
                 if (instance)
                 {
-				    if (instance->GetData(DATA_FIRST_ENCOUNTER) == IN_PROGRESS)
-				        instance->SetData(DATA_FIRST_ENCOUNTER, DONE);
-				    else  
-				        instance->SetData(DATA_SECOND_ENCOUNTER, DONE);
+                    if (instance->GetData(DATA_FIRST_ENCOUNTER) == IN_PROGRESS)
+                        instance->SetData(DATA_FIRST_ENCOUNTER, DONE);
+                    else  
+                        instance->SetData(DATA_SECOND_ENCOUNTER, DONE);
                     
                     instance->SetBossState(BOSS_ECHO_OF_JAINA, DONE);
                     instance->SetData(DATA_JAINA_PICKED_STATE, DONE);
@@ -150,13 +150,13 @@ class boss_echo_of_jaina : public CreatureScript
                 Talk(RAND(SAY_SLAY_1, SAY_SLAY_2, SAY_SLAY_3));
             }
 
-		    void JustSummoned(Creature* summon)
-		    {
-		    	summons.Summon(summon);
-		    	summon->setActive(true);
+            void JustSummoned(Creature* summon)
+            {
+                summons.Summon(summon);
+                summon->setActive(true);
 
                 if(me->IsInCombat())
-		    	summon->AI()->DoZoneInCombat();
+                summon->AI()->DoZoneInCombat();
 
                 switch(summon->GetEntry())
                 {
@@ -171,7 +171,7 @@ class boss_echo_of_jaina : public CreatureScript
                     default:
                         break;
                 }
-		    }
+            }
 
             void EnterCombat(Unit* /*who*/)
             {
@@ -310,8 +310,8 @@ class npc_flarecore : public CreatureScript
                         DoCast(me, SPELL_TIME_EXPIRE_FLARE);
                         me->DespawnOrUnsummon(100);
                         break;
-					}
-				}
+                    }
+                }
             }
         };
 

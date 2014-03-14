@@ -749,7 +749,7 @@ bool Item::HasEnchantRequiredSkill(const Player* player) const
     {
         if (enchant_slot > PRISMATIC_ENCHANTMENT_SLOT || enchant_slot < PROP_ENCHANTMENT_SLOT_0)    // not holding enchantment id
             continue;
-			
+
         if (uint32 enchant_id = GetEnchantmentId(EnchantmentSlot(enchant_slot)))
             if (SpellItemEnchantmentEntry const* enchantEntry = sSpellItemEnchantmentStore.LookupEntry(enchant_id))
                 if (enchantEntry->requiredSkill && player->GetSkillValue(enchantEntry->requiredSkill) < enchantEntry->requiredSkillValue)
@@ -768,13 +768,13 @@ uint32 Item::GetEnchantRequiredLevel() const
     {
         if (enchant_slot > PRISMATIC_ENCHANTMENT_SLOT || enchant_slot < PROP_ENCHANTMENT_SLOT_0)    // not holding enchantment id
             continue;
-			
+
         if (uint32 enchant_id = GetEnchantmentId(EnchantmentSlot(enchant_slot)))
             if (SpellItemEnchantmentEntry const* enchantEntry = sSpellItemEnchantmentStore.LookupEntry(enchant_id))
                 if (enchantEntry->requiredLevel > level)
                     level = enchantEntry->requiredLevel;
     }
-	
+
     return level;
 }
 
@@ -791,7 +791,7 @@ bool Item::IsBoundByEnchant() const
                 if (enchantEntry->slot & ENCHANTMENT_CAN_SOULBOUND)
                     return true;
     }
-	
+
     return false;
 }
 

@@ -522,22 +522,22 @@ public:
         PrepareSpellScript(spell_pal_word_of_glory_heal_SpellScript)
 
         int32 totalheal;
-		int32 holyStack;
+        int32 holyStack;
 
         bool Load()
         {
             if (GetCaster()->GetTypeId() != TYPEID_PLAYER)
                 return false;
 
-			holyStack = 0;
+            holyStack = 0;
 
             return true;
         }
 
         void HandleBeforeCast()
         {
-			if (Unit* caster = GetCaster())
-				holyStack = caster->GetPower(POWER_HOLY_POWER);
+            if (Unit* caster = GetCaster())
+                holyStack = caster->GetPower(POWER_HOLY_POWER);
         }
 
         void ChangeHeal(SpellEffIndex /*effIndex*/)
@@ -545,28 +545,28 @@ public:
             Unit* caster = GetCaster();
             Unit* target = GetHitUnit();
 
-			int32 ap = caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.198;
-			int32 sp = caster->ToPlayer()->GetBaseSpellPowerBonus() * 0.209;
-			int32 stack = caster->HasAura(SPELL_DIVINE_PURPOSE_PROC) ? 3 : caster->GetPower(POWER_HOLY_POWER);
+            int32 ap = caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.198;
+            int32 sp = caster->ToPlayer()->GetBaseSpellPowerBonus() * 0.209;
+            int32 stack = caster->HasAura(SPELL_DIVINE_PURPOSE_PROC) ? 3 : caster->GetPower(POWER_HOLY_POWER);
 
             if (!target)
                 return;
 
-			totalheal = (GetHitHeal() + ap + sp) * stack;
+            totalheal = (GetHitHeal() + ap + sp) * stack;
 
             SetHitHeal(totalheal);
         }
 
-		void HandleAfterCast()
-		{
-			// Eternal Glory
-			if (Unit* caster = GetCaster())
-				if (AuraEffect const* pAurEff = caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_PALADIN, 2944, 0))
-					if (roll_chance_i(pAurEff->GetAmount()))
-						caster->CastCustomSpell(caster,88676, &holyStack, NULL,NULL,true);
-		}
+        void HandleAfterCast()
+        {
+            // Eternal Glory
+            if (Unit* caster = GetCaster())
+                if (AuraEffect const* pAurEff = caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_PALADIN, 2944, 0))
+                    if (roll_chance_i(pAurEff->GetAmount()))
+                        caster->CastCustomSpell(caster,88676, &holyStack, NULL,NULL,true);
+        }
 
-		void HandlePeriodic()
+        void HandlePeriodic()
         {
             // Glyph of Long Word
             if (!GetCaster()->HasAura(93466))
@@ -575,10 +575,10 @@ public:
 
         void Register()
         {
-			BeforeCast += SpellCastFn(spell_pal_word_of_glory_heal_SpellScript::HandleBeforeCast);
+            BeforeCast += SpellCastFn(spell_pal_word_of_glory_heal_SpellScript::HandleBeforeCast);
             OnEffectHitTarget += SpellEffectFn(spell_pal_word_of_glory_heal_SpellScript::ChangeHeal, EFFECT_0, SPELL_EFFECT_HEAL);
-			AfterHit += SpellHitFn(spell_pal_word_of_glory_heal_SpellScript::HandlePeriodic);
-			AfterCast += SpellCastFn(spell_pal_word_of_glory_heal_SpellScript::HandleAfterCast);
+            AfterHit += SpellHitFn(spell_pal_word_of_glory_heal_SpellScript::HandlePeriodic);
+            AfterCast += SpellCastFn(spell_pal_word_of_glory_heal_SpellScript::HandleAfterCast);
         }
     };
 
@@ -644,21 +644,21 @@ public:
                 int32 damage = GetHitDamage();
                 int32 power = caster->GetPower(POWER_HOLY_POWER);
 
-				if (caster->HasAura(SPELL_DIVINE_PURPOSE_PROC))
-					damage = int32(damage * 7.83f);
-				else
-					switch (power)
-					{
-						case 1:
-							damage = int32(damage); // normal 30% wd.
-							break;
-						case 2:
-							damage = int32(damage * 3.0f); // 90% wd.
-							break;
-						case 3:
-							damage = int32(damage * 7.83f); // 235% wd.
-							break;
-					}
+                if (caster->HasAura(SPELL_DIVINE_PURPOSE_PROC))
+                    damage = int32(damage * 7.83f);
+                else
+                    switch (power)
+                    {
+                        case 1:
+                            damage = int32(damage); // normal 30% wd.
+                            break;
+                        case 2:
+                            damage = int32(damage * 3.0f); // 90% wd.
+                            break;
+                        case 3:
+                            damage = int32(damage * 7.83f); // 235% wd.
+                            break;
+                    }
 
                 SetHitDamage(damage);
             }
@@ -721,48 +721,48 @@ public:
     {
         PrepareSpellScript(spell_pal_selfless_healer_SpellScript)
 
-		uint8 holyStack;
+        uint8 holyStack;
 
         bool Load()
         {
             if (GetCaster()->GetTypeId() != TYPEID_PLAYER)
                 return false;
 
-			holyStack = 0;
+            holyStack = 0;
 
             return GetCaster()->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_PALADIN, 3924, 0);
         }
 
         void HandleBeforeCast()
         {
-			if (Unit* caster = GetCaster())
-				holyStack = caster->GetPower(POWER_HOLY_POWER);
+            if (Unit* caster = GetCaster())
+                holyStack = caster->GetPower(POWER_HOLY_POWER);
         }
 
         void HandleAfterHit()
         {
             if (Unit* caster = GetCaster())
             {
-				int32 baseAmount = 0;
-				int32 amount = 0;
+                int32 baseAmount = 0;
+                int32 amount = 0;
 
-				if (AuraEffect const* pAurEff = caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_PALADIN, 3924, 1))
-					baseAmount = pAurEff->GetAmount();
+                if (AuraEffect const* pAurEff = caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_PALADIN, 3924, 1))
+                    baseAmount = pAurEff->GetAmount();
 
                 if (caster->HasAura(SPELL_DIVINE_PURPOSE_PROC))
                     amount = baseAmount * 3;
-				else
-					amount = baseAmount * holyStack;
+                else
+                    amount = baseAmount * holyStack;
 
-				if (amount != 0)
-					caster->CastCustomSpell(caster, 90811, &amount, NULL, NULL, true);
+                if (amount != 0)
+                    caster->CastCustomSpell(caster, 90811, &amount, NULL, NULL, true);
             }
         }
 
         void Register()
         {
-			BeforeCast += SpellCastFn(spell_pal_selfless_healer_SpellScript::HandleBeforeCast);
-			AfterHit += SpellHitFn(spell_pal_selfless_healer_SpellScript::HandleAfterHit);
+            BeforeCast += SpellCastFn(spell_pal_selfless_healer_SpellScript::HandleBeforeCast);
+            AfterHit += SpellHitFn(spell_pal_selfless_healer_SpellScript::HandleAfterHit);
         }
     };
 
@@ -782,7 +782,7 @@ public:
     {
         PrepareSpellScript(spell_pal_divine_purpose_SpellScript)
 
-		uint8 holyStack;
+        uint8 holyStack;
 
         bool Load()
         {
@@ -795,14 +795,14 @@ public:
         void HandleAfterHit()
         {
             if (Unit* caster = GetCaster())
-				if (AuraEffect const* pAurEff = caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_PALADIN, 2170, 0))
-					if (roll_chance_i(pAurEff->GetAmount()))
-						caster->CastSpell(caster, 90174, true);
+                if (AuraEffect const* pAurEff = caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_PALADIN, 2170, 0))
+                    if (roll_chance_i(pAurEff->GetAmount()))
+                        caster->CastSpell(caster, 90174, true);
         }
 
         void Register()
         {
-			AfterHit += SpellHitFn(spell_pal_divine_purpose_SpellScript::HandleAfterHit);
+            AfterHit += SpellHitFn(spell_pal_divine_purpose_SpellScript::HandleAfterHit);
         }
     };
 

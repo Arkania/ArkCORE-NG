@@ -437,11 +437,11 @@ enum UnitMods
     UNIT_MOD_RESISTANCE_SHADOW,
     UNIT_MOD_RESISTANCE_ARCANE,
     UNIT_MOD_ATTACK_POWER,
-	UNIT_MOD_ATTACK_POWER_POS,
-	UNIT_MOD_ATTACK_POWER_NEG,
+    UNIT_MOD_ATTACK_POWER_POS,
+    UNIT_MOD_ATTACK_POWER_NEG,
     UNIT_MOD_ATTACK_POWER_RANGED,
-	UNIT_MOD_ATTACK_POWER_RANGED_POS,
-	UNIT_MOD_ATTACK_POWER_RANGED_NEG,
+    UNIT_MOD_ATTACK_POWER_RANGED_POS,
+    UNIT_MOD_ATTACK_POWER_RANGED_NEG,
     UNIT_MOD_DAMAGE_MAINHAND,
     UNIT_MOD_DAMAGE_OFFHAND,
     UNIT_MOD_DAMAGE_RANGED,
@@ -1306,7 +1306,7 @@ class Unit : public WorldObject
         Unit* SelectNearbyTarget(Unit* exclude = NULL, float dist = NOMINAL_MELEE_RANGE) const;
         void SendMeleeAttackStop(Unit* victim = NULL);
         void SendMeleeAttackStart(Unit* victim);
-		bool IsVisionObscured(Unit* victim);
+        bool IsVisionObscured(Unit* victim);
 
         void AddUnitState(uint32 f) { m_state |= f; }
         bool HasUnitState(const uint32 f) const { return (m_state & f); }
@@ -1439,7 +1439,7 @@ class Unit : public WorldObject
         MountCapabilityEntry const* GetMountCapability(uint32 mountType) const;
 
         void SendDurabilityLoss(Player* receiver, uint32 percent);
-		void PlayOneShotAnimKit(uint32 id);
+        void PlayOneShotAnimKit(uint32 id);
 
         uint16 GetMaxSkillValueForLevel(Unit const* target = NULL) const { return (target ? getLevelForTarget(target) : getLevel()) * 5; }
         void DealDamageMods(Unit* victim, uint32 &damage, uint32* absorb);
@@ -1469,7 +1469,7 @@ class Unit : public WorldObject
 
         void ApplyResilience (const Unit * pVictim, int32 * damage) const;
 
-		// player or player's pet resilience (-1%), cap 100%
+        // player or player's pet resilience (-1%), cap 100%
         uint32 GetPlayerDamageReduction (uint32 damage) const
         {
         return GetCombatRatingDamageReduction(CR_RESILIENCE_PLAYER_DAMAGE_TAKEN, 1.0f, 100.0f, damage);
@@ -1725,7 +1725,7 @@ class Unit : public WorldObject
         CharmInfo* InitCharmInfo();
         void DeleteCharmInfo();
         void UpdateCharmAI();
-		void EnableAI();
+        void EnableAI();
         //Player* GetMoverSource() const;
         Player* m_movedPlayer;
         SharedVisionList const& GetSharedVisionList() { return m_sharedVision; }
@@ -1930,7 +1930,7 @@ class Unit : public WorldObject
         EventProcessor m_Events;
 
         // stat system
-		void ModifyAurOnWeaponChange(WeaponAttackType attackType,bool apply);
+        void ModifyAurOnWeaponChange(WeaponAttackType attackType,bool apply);
         bool HandleStatModifier(UnitMods unitMod, UnitModifierType modifierType, float amount, bool apply);
         void SetModifierValue(UnitMods unitMod, UnitModifierType modifierType, float value) { m_auraModifiersGroup[unitMod][modifierType] = value; }
         float GetModifierValue(UnitMods unitMod, UnitModifierType modifierType) const;
@@ -1991,7 +1991,7 @@ class Unit : public WorldObject
         void RemoveVisibleAura(uint8 slot){ m_visibleAuras.erase(slot); UpdateAuraForGroup(slot);}
 
         uint32 GetInterruptMask() const { return m_interruptMask; }
-		void SendAuraVisualForSelf(bool apply, uint32 id, uint8 effmask = 0);
+        void SendAuraVisualForSelf(bool apply, uint32 id, uint8 effmask = 0);
         void AddInterruptMask(uint32 mask) { m_interruptMask |= mask; }
         void UpdateInterruptMask();
 
@@ -2044,7 +2044,7 @@ class Unit : public WorldObject
         uint32 SpellCriticalDamageBonus(SpellInfo const* spellProto, uint32 damage, Unit* victim);
         uint32 SpellCriticalHealingBonus(SpellInfo const* spellProto, uint32 damage, Unit* victim);
 
-		void SpellReceivedCriticalValue(Unit* victim,const SpellInfo* spellProto) const;
+        void SpellReceivedCriticalValue(Unit* victim,const SpellInfo* spellProto) const;
 
         void SetContestedPvP(Player* attackedPlayer = NULL);
 
@@ -2269,29 +2269,29 @@ class Unit : public WorldObject
         int32 GetEclipsePower() {return eclipse;};
         void SetEclipsePower(int32 power);
 
-		//alt power 10
+        //alt power 10
         int32 alt;
         int32 GetAltPower() {return alt;};
         void SetAltPower(int32 power);
 
-		//Soul swap dot's save
-		std::list<uint32> soulSwapDots;
+        //Soul swap dot's save
+        std::list<uint32> soulSwapDots;
 
-		//Pyromaniac
-		uint8 PyromaniacCount;
+        //Pyromaniac
+        uint8 PyromaniacCount;
 
-		//Nature's bounty
-		uint8 NatureBounty;
+        //Nature's bounty
+        uint8 NatureBounty;
 
-		uint32 m_heal_done[120];
-		uint32 m_damage_done[120];
-		uint32 m_damage_taken[120];
-		int32 DmgandHealDoneTimer;
-		uint32 GetHealingDoneInPastSecs (uint32 secs);
-		uint32 GetDamageDoneInPastSecs (uint32 secs);
-		uint32 GetDamageTakenInPastSecs (uint32 secs);
-		void ResetDamageDoneInPastSecs (uint32 secs);
-		void ResetHealingDoneInPastSecs (uint32 secs);
+        uint32 m_heal_done[120];
+        uint32 m_damage_done[120];
+        uint32 m_damage_taken[120];
+        int32 DmgandHealDoneTimer;
+        uint32 GetHealingDoneInPastSecs (uint32 secs);
+        uint32 GetDamageDoneInPastSecs (uint32 secs);
+        uint32 GetDamageTakenInPastSecs (uint32 secs);
+        void ResetDamageDoneInPastSecs (uint32 secs);
+        void ResetHealingDoneInPastSecs (uint32 secs);
 
     protected:
         explicit Unit (bool isWorldObject);

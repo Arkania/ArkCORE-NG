@@ -394,33 +394,33 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
         for (Unit::AuraEffectList::const_iterator itr = swaps.begin(); itr != swaps.end(); ++itr)
             if ((*itr)->IsAffectingSpell(spellInfo))
             {
-				//Nether ward
-				if ((*itr)->GetId() == 28176 || (*itr)->GetId() == 687)
-					if (!_player->HasAura(91713))
-						continue;
+                //Nether ward
+                if ((*itr)->GetId() == 28176 || (*itr)->GetId() == 687)
+                    if (!_player->HasAura(91713))
+                        continue;
 
-				// Chakra
-				if ((*itr)->GetId() == 81206 || (*itr)->GetId() == 81208)
-					if (!_player->HasAura(88627))
-						continue;
+                // Chakra
+                if ((*itr)->GetId() == 81206 || (*itr)->GetId() == 81208)
+                    if (!_player->HasAura(88627))
+                        continue;
 
                 if (SpellInfo const* newInfo = sSpellMgr->GetSpellInfo((*itr)->GetAmount()))
                 {
-					spellInfo = newInfo;
-					spellId = newInfo->Id;
+                    spellInfo = newInfo;
+                    spellId = newInfo->Id;
                 }
                 break;
             }
 
-	switch (spellInfo->Id)
-	{
-	   case 1949: // Inferno 
-		   if (_player->HasAura(85105))
-				if (SpellInfo const* Inferno = sSpellMgr->GetSpellInfo(85403))
-				{
-					spellInfo = Inferno;
-					spellId = Inferno->Id;
-				}
+    switch (spellInfo->Id)
+    {
+       case 1949: // Inferno 
+           if (_player->HasAura(85105))
+                if (SpellInfo const* Inferno = sSpellMgr->GetSpellInfo(85403))
+                {
+                    spellInfo = Inferno;
+                    spellId = Inferno->Id;
+                }
         case 19434: // Fuego!
            if (_player->HasAura(82926))
                 if (SpellInfo const* Fire = sSpellMgr->GetSpellInfo(82928))
@@ -428,14 +428,14 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
                     spellInfo = Fire;
                     spellId = Fire->Id;
                 }
-	   case 33763: // Lifebloom
-		   if (_player->HasAura(33891))
-			   	if (SpellInfo const* Lifebloom = sSpellMgr->GetSpellInfo(94447))
-				{
-					spellInfo = Lifebloom;
-					spellId = Lifebloom->Id;
-				}
-	}
+       case 33763: // Lifebloom
+           if (_player->HasAura(33891))
+                   if (SpellInfo const* Lifebloom = sSpellMgr->GetSpellInfo(94447))
+                {
+                    spellInfo = Lifebloom;
+                    spellId = Lifebloom->Id;
+                }
+    }
 
     // Client is resending autoshot cast opcode when other spell is casted during shoot rotation
     // Skip it to prevent "interrupt" message

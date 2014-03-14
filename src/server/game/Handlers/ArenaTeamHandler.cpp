@@ -323,7 +323,7 @@ void WorldSession::HandleArenaTeamCreate(WorldPacket & recvData)
     len = recvData.ReadBits(8);
     name = recvData.ReadString(len);
 
-	ArenaType type = ArenaTeam::GetTypeBySlot(slot);
+    ArenaType type = ArenaTeam::GetTypeBySlot(slot);
 
     sLog->outError("%u %u %u %u %u %u", iconcolor, bordercolor, type, icon, border, background);
 

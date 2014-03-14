@@ -139,8 +139,8 @@ public:
 
         void Reset()
         {
-			events.Reset();
-			summons.DespawnAll();
+            events.Reset();
+            summons.DespawnAll();
 
             if (instance)
                 instance->SetData(DATA_HALAZZIEVENT, NOT_STARTED);
@@ -178,16 +178,16 @@ public:
             EnterPhase(PHASE_LYNX);
             events.ScheduleEvent(EVENT_BERSERK, 10 * MINUTE * IN_MILLISECONDS);
 
-			_EnterCombat();
+            _EnterCombat();
         }
 
         void JustSummoned(Creature* summon)
         {
-			summons.Summon(summon);
-			summon->setActive(true);
+            summons.Summon(summon);
+            summon->setActive(true);
  
-			if (me->IsInCombat())
-			    summon->AI()->DoZoneInCombat();
+            if (me->IsInCombat())
+                summon->AI()->DoZoneInCombat();
 
             if (summon->GetEntry() == MOB_SPIRIT_LYNX)
                 LynxGUID = summon->GetGUID();
@@ -196,8 +196,8 @@ public:
         void EnterEvadeMode()
         {
             Reset();
-			me->GetMotionMaster()->MoveTargetedHome();
-			me->RemoveAllAuras();
+            me->GetMotionMaster()->MoveTargetedHome();
+            me->RemoveAllAuras();
 
             if (instance)
             {
@@ -225,7 +225,7 @@ public:
         void JustDied(Unit* /*killer*/)
         {
             Talk(YELL_DEATH);
-			summons.DespawnAll();
+            summons.DespawnAll();
 
             if (instance)
             {
@@ -393,7 +393,7 @@ public:
                             me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_ATTACK_ME, true);
                         }
                         events.ScheduleEvent(EVENT_SELECT_TARGET, urand(30000, 40000));
-	                    break;
+                        break;
 
                     case EVENT_LYNX_FRENZY:
                         DoCast(me, SPELL_LYNX_FRENZY);

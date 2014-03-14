@@ -53,7 +53,7 @@ class WorldPacket : public ByteBuffer
         void SetOpcode(Opcodes opcode) { m_opcode = opcode; }
         void Compress(z_stream_s* compressionStream);
         void Compress(z_stream_s* compressionStream, WorldPacket const* source);
-		
+
         void ReadByteMask(uint8& b)
         {
             b = ReadBit() ? 1 : 0;

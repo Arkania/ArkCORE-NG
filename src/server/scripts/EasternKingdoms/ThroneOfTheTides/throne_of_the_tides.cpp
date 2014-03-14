@@ -92,16 +92,16 @@ public:
 
     bool OnTrigger(Player* pPlayer, const AreaTriggerEntry* /*pAt*/)
     {
-		if (InstanceScript* pInstance = pPlayer->GetInstanceScript())
-		{
-			if (pInstance->GetData(DATA_LADY_NAZJAR_EVENT) != DONE
+        if (InstanceScript* pInstance = pPlayer->GetInstanceScript())
+        {
+            if (pInstance->GetData(DATA_LADY_NAZJAR_EVENT) != DONE
                 && pInstance->GetBossState(DATA_COMMANDER_ULTHOK) != DONE)
-			{
+            {
                 pInstance->SetData(DATA_LADY_NAZJAR_EVENT, DONE);
                 if (Creature* pLadyNazjarEvent = ObjectAccessor::GetCreature(*pPlayer, pInstance->GetData64(DATA_LADY_NAZJAR_EVENT)))
                     pLadyNazjarEvent->AI()->DoAction(ACTION_LADY_NAZJAR_START_EVENT);
-			}
-		}
+            }
+        }
         return true;
     }
 };

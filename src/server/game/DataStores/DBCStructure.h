@@ -1221,7 +1221,7 @@ struct ItemReforgeEntry
     uint32 Id;
     uint32 SourceStat;
     float SourceMultiplier;
-	uint32 FinalStat;
+    uint32 FinalStat;
     float FinalMultiplier;
 };
 

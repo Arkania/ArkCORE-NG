@@ -486,9 +486,9 @@ class Spell
         void CleanupTargetList();
 
         void SetSpellValue(SpellValueMod mod, int32 value);
-		
-		bool isearlyfrostaffected;
-		
+        
+        bool isearlyfrostaffected;
+        
     protected:
         bool HasGlobalCooldown() const;
         void TriggerGlobalCooldown();

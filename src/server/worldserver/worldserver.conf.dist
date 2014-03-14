@@ -398,8 +398,8 @@ PersistentCharacterCleanFlags = 0
 #
 #    PidFile
 #        Description: World daemon PID file
-#        Example:     "./worldd.pid" - (Enabled)
-#        Default:     ""             - (Disabled)
+#        Example:     "./world.pid" - (Enabled)
+#        Default:     ""            - (Disabled)
 
 PidFile = ""
 
@@ -1451,41 +1451,41 @@ AccountInstancesPerHour = 5
 
 #
 #    RealmServerInfo.IsTournament
-#		Description: Designates if the realm is a tournament one
-#		Default:	0 - Normal
-#					1 - Tournament
+#        Description: Designates if the realm is a tournament one
+#        Default:    0 - Normal
+#                    1 - Tournament
 
 RealmServerInfo.IsTournament = 0
 
 #
-#	RealmServerInfo.TrialAccountsEnabled
-#		Description: Are Trial Accounts enabled
-#		Default:	0 - Disabled
-#					1 - Enabled
+#    RealmServerInfo.TrialAccountsEnabled
+#        Description: Are Trial Accounts enabled
+#        Default:    0 - Disabled
+#                    1 - Enabled
 #
 
 RealmServerInfo.TrialAccountsEnabled = 0
 
 #
-#	RealmServerInfo.TrialMaxLevel
-#		Description: The maximum level which a player can reach with a trial account
-#		Default: 57
+#    RealmServerInfo.TrialMaxLevel
+#        Description: The maximum level which a player can reach with a trial account
+#        Default: 57
 #
 
 RealmServerInfo.TrialMaxLevel = 57
 
 #
-#	RealmServerInfo.TrialMaxMoney
-#		Description: The maximum amount of money which a player can have with a trial account. NOTE: The ammount is in copper
-#		Default: 1000000
+#    RealmServerInfo.TrialMaxMoney
+#        Description: The maximum amount of money which a player can have with a trial account. NOTE: The ammount is in copper
+#        Default: 1000000
 #
 
 RealmServerInfo.TrialMaxMoney = 1000000
 
 #
-#	RealmServerInfo.TrialActivateTime
-#		Description: The time in seconds in which the trial account must be activated in order to prevent deletion
-#		Default: 1209600 (2 weeks)
+#    RealmServerInfo.TrialActivateTime
+#        Description: The time in seconds in which the trial account must be activated in order to prevent deletion
+#        Default: 1209600 (2 weeks)
 #
 
 RealmServerInfo.TrialActivateTime = 1209600

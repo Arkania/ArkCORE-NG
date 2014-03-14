@@ -15,9 +15,9 @@ enum SlipstreamEnums
     DIR_ERROR,
 
     // Spells
-    SPELL_SLIPSTREAM_BUFF = 87740,
-    SPELL_SLIPSTREAM_PLAYER_VISUAL = 85063,
-	SPELL_SLEET_STORM_ULTIMATE = 84644,
+    SPELL_SLIPSTREAM_BUFF            = 87740,
+    SPELL_SLIPSTREAM_PLAYER_VISUAL   = 85063,
+    SPELL_SLEET_STORM_ULTIMATE       = 84644,
 };
 
 Position const SlipstreamPositions[8] =
@@ -75,12 +75,9 @@ public:
 
         void MoveInLineOfSight(Unit* who)
         {
-			
+
             if(SlipstreamPosition >= DIR_ERROR || who->GetTypeId() != TYPEID_PLAYER || !isActive)
                 return;
-				
-				
-			
 
             if(who->GetExactDist(me) <= 5.f)
             {
@@ -90,9 +87,9 @@ public:
                 // if we use the motion master only to relocate the player
                 // it will cause bugs
                 if (who->GetOrientation() != SlipstreamPositions[SlipstreamPosition].GetOrientation())
-				    who->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TURNING);
+                    who->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TURNING);
 
-				me->GetMap()->PlayerRelocation(who->ToPlayer(),SlipstreamPositions[SlipstreamPosition].GetPositionX(),SlipstreamPositions[SlipstreamPosition].GetPositionY(),SlipstreamPositions[SlipstreamPosition].GetPositionZ(), SlipstreamPositions[SlipstreamPosition].GetOrientation());
+                me->GetMap()->PlayerRelocation(who->ToPlayer(),SlipstreamPositions[SlipstreamPosition].GetPositionX(),SlipstreamPositions[SlipstreamPosition].GetPositionY(),SlipstreamPositions[SlipstreamPosition].GetPositionZ(), SlipstreamPositions[SlipstreamPosition].GetOrientation());
 
                 who->GetMotionMaster()->MoveJump(SlipstreamPositions[SlipstreamPosition].GetPositionX(),SlipstreamPositions[SlipstreamPosition].GetPositionY(),198.458481f,1,6);
             }
@@ -104,10 +101,10 @@ public:
 
             if(linkedSlipstreamObject && linkedBoss)
             {
-			
+
             }else if(isUltimate)
-                isUltimate = false;	
-			
+                isUltimate = false;
+
             if(!isUltimate != isActive)
             {
                 if(isActive)
@@ -125,7 +122,7 @@ public:
 
                 isActive = !isActive;
             }
-		}
+        }
     };
 };
 

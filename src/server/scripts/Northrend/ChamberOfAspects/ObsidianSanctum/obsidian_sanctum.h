@@ -30,7 +30,7 @@ enum eTypes
     DATA_TENEBRON               = 11,
     DATA_SHADRON                = 12,
     DATA_VESPERON               = 13,
-	DATA_PORTAL_OPEN            = 14,
+    DATA_PORTAL_OPEN            = 14,
     TWILIGHT_ACHIEVEMENTS       = 15,
 
     NPC_SARTHARION              = 28860,

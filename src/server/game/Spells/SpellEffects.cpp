@@ -355,13 +355,13 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
 
                 switch (m_spellInfo->Id)                     // better way to check unknown
                 {
-					// Meltdown
-				    case 98649:
-					case 101646:
-					case 101647:
-					case 101648:
-						damage = damage * m_caster->GetHealth() / 100;
-						break;
+                    // Meltdown
+                    case 98649:
+                    case 101646:
+                    case 101647:
+                    case 101648:
+                        damage = damage * m_caster->GetHealth() / 100;
+                        break;
                     // Flame Scyte
                     case 98474:
                     case 100212:
@@ -946,15 +946,15 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                     damage += m_caster->GetAttackTime(BASE_ATTACK) * int32(0.005f * ap + 0.01f * holy) / 1000;
                 }
 
-				// Exorcism 
-				if (m_spellInfo->Id == 879)
-				{
-					float attackPower = m_caster->GetTotalAttackPowerValue(BASE_ATTACK);
-					int32 spellPower = m_caster->SpellBaseDamageBonusDone(SpellSchoolMask(m_spellInfo->ScalingClass));
-					uint32 maxdmg = attackPower > spellPower ? (attackPower * 0.344f) : (spellPower * 0.344f);
-					damage += int32(maxdmg);
-					break;
-				}
+                // Exorcism 
+                if (m_spellInfo->Id == 879)
+                {
+                    float attackPower = m_caster->GetTotalAttackPowerValue(BASE_ATTACK);
+                    int32 spellPower = m_caster->SpellBaseDamageBonusDone(SpellSchoolMask(m_spellInfo->ScalingClass));
+                    uint32 maxdmg = attackPower > spellPower ? (attackPower * 0.344f) : (spellPower * 0.344f);
+                    damage += int32(maxdmg);
+                    break;
+                }
 
                 // Holy wrath
                 if (m_spellInfo->Id == 2812)
@@ -3118,7 +3118,8 @@ void Spell::EffectOpenLock(SpellEffIndex effIndex)
                     bg->EventPlayerClickedOnFlag(player, gameObjTarget);
                 return;
             }
-        }else if (m_spellInfo->Id == 1842 && gameObjTarget->GetGOInfo()->type == GAMEOBJECT_TYPE_TRAP && gameObjTarget->GetOwner())
+        }
+        else if (m_spellInfo->Id == 1842 && gameObjTarget->GetGOInfo()->type == GAMEOBJECT_TYPE_TRAP && gameObjTarget->GetOwner())
         {
             gameObjTarget->SetLootState(GO_JUST_DEACTIVATED);
             return;
@@ -4284,7 +4285,7 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
             }
             break;
         }
-		case SPELLFAMILY_PALADIN:
+        case SPELLFAMILY_PALADIN:
         {
             // Templar's Verdict
             if (m_spellInfo->Id == 85256)
@@ -5436,19 +5437,19 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                     // proc a spellcast
                     if (Aura* chargesAura = m_caster->GetAura(59907))
                     {
-						if (m_caster->IsSummon())
-						{
-							if (chargesAura && chargesAura->GetCharges() > 1)
-							{
-								chargesAura->SetCharges(chargesAura->GetCharges() - 1);
-								unitTarget->CastSpell(unitTarget, spell_heal, true, NULL, NULL, m_caster->ToTempSummon()->GetSummonerGUID());
-							}
-							else
-							{
-								unitTarget->CastSpell(unitTarget, spell_heal, true, NULL, NULL, m_caster->ToTempSummon()->GetSummonerGUID());
-								m_caster->ToTempSummon()->UnSummon();
-							}
-						}
+                        if (m_caster->IsSummon())
+                        {
+                            if (chargesAura && chargesAura->GetCharges() > 1)
+                            {
+                                chargesAura->SetCharges(chargesAura->GetCharges() - 1);
+                                unitTarget->CastSpell(unitTarget, spell_heal, true, NULL, NULL, m_caster->ToTempSummon()->GetSummonerGUID());
+                            }
+                            else
+                            {
+                                unitTarget->CastSpell(unitTarget, spell_heal, true, NULL, NULL, m_caster->ToTempSummon()->GetSummonerGUID());
+                                m_caster->ToTempSummon()->UnSummon();
+                            }
+                        }
                     }
 
                     return;
@@ -6507,19 +6508,19 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
 
     switch (m_spellInfo->SpellFamilyName)
     {
-	case SPELLFAMILY_GENERIC:
-		{
-			switch (m_spellInfo->Id)
-			{
-				// Meltdown
-				case 98649:
-				case 101646:
-				case 101647:
-				case 101648:
-					m_caster->CastSpell(m_caster,7,true);
-					break;
-			}
-		}
+    case SPELLFAMILY_GENERIC:
+        {
+            switch (m_spellInfo->Id)
+            {
+                // Meltdown
+                case 98649:
+                case 101646:
+                case 101647:
+                case 101648:
+                    m_caster->CastSpell(m_caster,7,true);
+                    break;
+            }
+        }
     case SPELLFAMILY_WARRIOR:
     {
       switch (m_spellInfo->Id)

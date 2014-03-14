@@ -86,8 +86,8 @@ enum Adds
     NPC_TEMPEST_WITCH       = 44404,
     NPC_HONNOR_GUARD        = 40633,
     NPC_WATERSPOUT          = 48571,
-	NPC_WATERSPOUT_H        = 49108,
-	NPC_GEYSER              = 40597,
+    NPC_WATERSPOUT_H        = 49108,
+    NPC_GEYSER              = 40597,
 };
 
 const Position summonPos[3] =
@@ -170,8 +170,8 @@ class boss_lady_nazjar : public CreatureScript
                     if (me->GetCurrentSpell(CURRENT_GENERIC_SPELL)->m_spellInfo->Id == SPELL_SHOCK_BLAST
                         || me->GetCurrentSpell(CURRENT_GENERIC_SPELL)->m_spellInfo->Id == SPELL_SHOCK_BLAST_H)
                         for (uint8 i = 0; i < 3; ++i)
-						    if (spell->Effects[i].Effect == SPELL_EFFECT_INTERRUPT_CAST)
-							    me->InterruptSpell(CURRENT_GENERIC_SPELL);
+                            if (spell->Effects[i].Effect == SPELL_EFFECT_INTERRUPT_CAST)
+                                me->InterruptSpell(CURRENT_GENERIC_SPELL);
             }
 
             void JustSummoned(Creature* summon)

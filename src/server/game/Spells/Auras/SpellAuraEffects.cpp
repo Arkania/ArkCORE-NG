@@ -6412,7 +6412,7 @@ void AuraEffect::HandlePeriodicDummyAuraTick(Unit* target, Unit* caster) const
             }
             break;
         case SPELLFAMILY_PALADIN:
-    		// Holy Radiance
+            // Holy Radiance
             if (GetId() == 82327)
                 caster->CastSpell(target, 86452, true);
 
@@ -6442,13 +6442,13 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
             {
                 switch (auraId)
                 {
-					// Widow's kiss
-				    case 99476:
-						if (target->HasAura(99506) && target->GetAura(99506)->GetStackAmount() == 10)
-							target->RemoveAura(99476);
-						else
-							target->CastSpell(target,99506,false);
-					    break;
+                    // Widow's kiss
+                    case 99476:
+                        if (target->HasAura(99506) && target->GetAura(99506)->GetStackAmount() == 10)
+                            target->RemoveAura(99476);
+                        else
+                            target->CastSpell(target,99506,false);
+                        break;
                     // Resistance is Futile
                     case 83676:
                         if (target->isMoving() && caster)
@@ -6956,7 +6956,7 @@ void AuraEffect::HandlePeriodicDamageAurasTick(Unit* target, Unit* caster) const
     }
     else
         damage = uint32(target->CountPctFromMaxHealth(damage));
-		
+
     if (m_spellInfo->Effects[m_effIndex].IsTargetingArea() || m_spellInfo->Effects[m_effIndex].IsAreaAuraEffect() || m_spellInfo->Effects[m_effIndex].IsEffect(SPELL_EFFECT_PERSISTENT_AREA_AURA))
     {
         damage = int32(float(damage) * target->GetTotalAuraMultiplierByMiscMask(SPELL_AURA_MOD_AOE_DAMAGE_AVOIDANCE, m_spellInfo->SchoolMask));

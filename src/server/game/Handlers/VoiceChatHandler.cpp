@@ -34,8 +34,8 @@
 void WorldSession::HandleVoiceSessionEnableOpcode(WorldPacket& recvData)
 {
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_VOICE_SESSION_ENABLE");
-	
-	bool VoiceEnabled, MicrophoneEnabled;
+
+    bool VoiceEnabled, MicrophoneEnabled;
 
     recvData >> VoiceEnabled;
     recvData >> MicrophoneEnabled;
@@ -45,7 +45,7 @@ void WorldSession::HandleVoiceSessionEnableOpcode(WorldPacket& recvData)
 void WorldSession::HandleChannelVoiceOnOpcode(WorldPacket& recvPacket)
 {
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_CHANNEL_VOICE_ON");
-    
+
     uint32 length = recvPacket.ReadBits(8);
     std::string channelname = recvPacket.ReadString(length);
 
@@ -57,7 +57,7 @@ void WorldSession::HandleChannelVoiceOnOpcode(WorldPacket& recvPacket)
 void WorldSession::HandleChannelVoiceOffOpcode(WorldPacket& recvPacket)
 {
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_CHANNEL_VOICE_OFF");
-    
+
     uint32 length = recvPacket.ReadBits(8);
     std::string channelname = recvPacket.ReadString(length);
 

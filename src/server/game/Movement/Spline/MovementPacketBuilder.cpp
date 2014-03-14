@@ -97,7 +97,7 @@ namespace Movement
         data << splineId;
         data << uint8(MonsterMoveStop);
     }
-	
+
     void WriteLinearPath(const Spline<int32>& spline, ByteBuffer& data)
     {
         uint32 last_idx = spline.getPointCount() - 3;
@@ -152,9 +152,9 @@ namespace Movement
 
     void PacketBuilder::WriteCreateBits(MoveSpline const& moveSpline, ByteBuffer& data)
     {
-        if (!data.WriteBit(!moveSpline.Finalized()))	
-            return;	
-			
+        if (!data.WriteBit(!moveSpline.Finalized()))
+            return;
+
         data.WriteBits(uint8(moveSpline.spline.mode()), 2);
         data.WriteBit(moveSpline.splineflags & (MoveSplineFlag::Parabolic | MoveSplineFlag::Animation));
         data.WriteBits(moveSpline.getPath().size(), 22);

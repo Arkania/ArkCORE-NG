@@ -261,13 +261,13 @@ class npc_neptulon : public CreatureScript
                         for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                         {/* 
                             if (Player* pPlayer = i->GetSource())
-								if (Group* pGroup = pPlayer->GetGroup())
+                                if (Group* pGroup = pPlayer->GetGroup())
                                     if (pPlayer->GetGuildId() && pGroup->IsGuildGroup(pPlayer->GetGuildId(), true, true))
                                     {
                                         pGroup->UpdateGuildAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, SPELL_KILL_OZUMAT, 0, 0, NULL, me);
                                         break;
                                     }
-						*/
+                        */
                         }
                     }
                     pInstance->UpdateEncounterState(ENCOUNTER_CREDIT_CAST_SPELL, SPELL_ENCOUNTER_COMPLETE, me); 
@@ -607,19 +607,19 @@ class at_tott_ozumat : public AreaTriggerScript
 
         bool OnTrigger(Player* pPlayer, const AreaTriggerEntry* /*pAt*/)
         {
-		    if (InstanceScript* pInstance = pPlayer->GetInstanceScript())
-		    {
-			    if (pInstance->GetData(DATA_NEPTULON_EVENT) != DONE
+            if (InstanceScript* pInstance = pPlayer->GetInstanceScript())
+            {
+                if (pInstance->GetData(DATA_NEPTULON_EVENT) != DONE
                     && pInstance->GetBossState(DATA_OZUMAT) != IN_PROGRESS
                     && pInstance->GetBossState(DATA_OZUMAT) != DONE)
-			    {
+                {
                     pInstance->SetData(DATA_NEPTULON_EVENT, DONE);
                     if (Creature* pNeptulon = ObjectAccessor::GetCreature(*pPlayer, pInstance->GetData64(DATA_NEPTULON)))
                     {
                         pNeptulon->AI()->DoAction(ACTION_NEPTULON_START_EVENT);
                     }
-			    }
-		    }
+                }
+            }
             return true;
         }
 };

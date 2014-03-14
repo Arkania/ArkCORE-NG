@@ -3625,7 +3625,7 @@ void SpellMgr::LoadSpellCustomAttr()
             case 101423: // Seal of Righteousness
                 spellInfo->Effects[0].RadiusEntry = sSpellRadiusStore.LookupEntry(14);   // 8yd
                 break;
-				// Holy Radiance
+                // Holy Radiance
             case 86452:
                 spellInfo->Effects[0].RadiusEntry = sSpellRadiusStore.LookupEntry(13);
                 break;
@@ -3798,31 +3798,31 @@ void SpellMgr::LoadSpellCustomAttr()
             case 88819: // Daybreak (proc)
                 spellInfo->ProcCharges = 1;
                 break;
-			case 102306:
-				spellInfo->Effects[1].RadiusEntry = sSpellRadiusStore.LookupEntry(22);   // 200yd
-				break;
-			case 98136:
-			case 98552:
-				spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(21);
-				break;
-			// Meltdown
-		    case 98649:
-			case 101646:
-			case 101647:
-			case 101648:
-				spellInfo->Effects[0].RadiusEntry = sSpellRadiusStore.LookupEntry(12);   // 100yd
-				break;
+            case 102306:
+                spellInfo->Effects[1].RadiusEntry = sSpellRadiusStore.LookupEntry(22);   // 200yd
+                break;
+            case 98136:
+            case 98552:
+                spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(21);
+                break;
+            // Meltdown
+            case 98649:
+            case 101646:
+            case 101647:
+            case 101648:
+                spellInfo->Effects[0].RadiusEntry = sSpellRadiusStore.LookupEntry(12);   // 100yd
+                break;
             // Akil'zon Electric Storm
             case 43657:
             case 97300:
-				spellInfo->Effects[1].RadiusEntry = sSpellRadiusStore.LookupEntry(12);   // 100yd
-				break;
-			case 98598:
-				spellInfo->Effects[0].RadiusEntry = sSpellRadiusStore.LookupEntry(32);   // 12yd
-				break;
-			case 98010:
-				spellInfo->Effects[1].RadiusEntry = sSpellRadiusStore.LookupEntry(11);   // 45yd
-				break;
+                spellInfo->Effects[1].RadiusEntry = sSpellRadiusStore.LookupEntry(12);   // 100yd
+                break;
+            case 98598:
+                spellInfo->Effects[0].RadiusEntry = sSpellRadiusStore.LookupEntry(32);   // 12yd
+                break;
+            case 98010:
+                spellInfo->Effects[1].RadiusEntry = sSpellRadiusStore.LookupEntry(11);   // 45yd
+                break;
             case 75323: // Reverberating Hymn
                 // Aura is refreshed at 3 seconds, and the tick should happen at the fourth.
                 spellInfo->AttributesEx8 |= SPELL_ATTR8_DONT_RESET_PERIODIC_TIMER;

@@ -16,16 +16,16 @@ enum Texts
 enum CreatureIds
 {
     MOB_HORROR = 40787,
-	MOB_SCARAB = 39440,
+    MOB_SCARAB = 39440,
 };
 
 enum Spells
 {
     SPELL_FLAME_BOLT = 77370,
     SPELL_RAGING_SMASH = 83650,
-	SPELL_EARTH_POINT = 75339,
-	SPELL_DUST_MOVE = 75546, // Effect Dust Move + damage
-	SPELL_VORTEX_DUST = 78515, // Effect Vortex + damage
+    SPELL_EARTH_POINT = 75339,
+    SPELL_DUST_MOVE = 75546, // Effect Dust Move + damage
+    SPELL_VORTEX_DUST = 78515, // Effect Vortex + damage
 };
 
 enum Phases
@@ -130,7 +130,7 @@ public:
         void JustDied(Unit* /*pKiller*/)
         {
             Talk(SAY_DEATH);
-			RemoveSummons();
+            RemoveSummons();
         }
 
         void UpdateAI(const uint32 diff)
@@ -150,7 +150,7 @@ public:
                 SummonPointTimer = urand(15000,21000);
                 me->RemoveAurasDueToSpell(SPELL_VORTEX_DUST);
                 me->RemoveAurasDueToSpell(SPELL_DUST_MOVE);
-				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
             }
 
             if (me->HealthBelowPct(50) && Phase == PHASE_NORMAL && PhaseCount == 0)
@@ -159,17 +159,17 @@ public:
                 PhaseCount++;
                 SetCombatMovement(false);
                 Phase = PHASE_WATERSPOUT;
-				me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
                 me->AddAura(SPELL_VORTEX_DUST, me);
                 me->AddAura(SPELL_DUST_MOVE, me);
                 Position pos;
                 me->GetPosition(&pos);
                 me->SummonCreature(MOB_SCARAB, pos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 1000);
                 me->SummonCreature(MOB_SCARAB, pos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 1000);
-				me->SummonCreature(MOB_SCARAB, pos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 1000);
+                me->SummonCreature(MOB_SCARAB, pos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 1000);
                 me->SummonCreature(MOB_SCARAB, pos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 1000);
                 me->SummonCreature(MOB_HORROR, pos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 1000);
-				me->SummonCreature(MOB_HORROR, pos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 1000);
+                me->SummonCreature(MOB_HORROR, pos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 1000);
                 Phase2EndTimer = 60000;
             }
 
@@ -188,8 +188,8 @@ public:
             if (SummonPointTimer <= diff && Phase == PHASE_NORMAL)
             {
                 Talk(SAY_EVENT);
-				if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, -10.0f, true))
-				DoCast(target, SPELL_EARTH_POINT);
+                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, -10.0f, true))
+                DoCast(target, SPELL_EARTH_POINT);
                 SummonPointTimer = urand(15000,21000);
             } else SummonPointTimer -= diff;
 

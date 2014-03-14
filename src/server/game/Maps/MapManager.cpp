@@ -163,12 +163,12 @@ bool MapManager::CanPlayerEnter(uint32 mapid, Player* player, bool loginCheck)
     InstanceTemplate const* instance = sObjectMgr->GetInstanceTemplate(mapid);
     if (!instance)
         return false;
-	// mb this hacky, but its best solution for here and there.
-	player->Dismount();
+    // mb this hacky, but its best solution for here and there.
+    player->Dismount();
     player->RemoveAurasByType(SPELL_AURA_MOUNTED);
     player->RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
     
-	Difficulty targetDifficulty = player->GetDifficulty(entry->IsRaid());
+    Difficulty targetDifficulty = player->GetDifficulty(entry->IsRaid());
     //The player has a heroic mode and tries to enter into instance which has no a heroic mode
     MapDifficulty const* mapDiff = GetMapDifficultyData(entry->MapID, targetDifficulty);
     if (!mapDiff)

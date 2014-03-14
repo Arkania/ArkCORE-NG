@@ -92,7 +92,7 @@ class boss_echo_of_baine : public CreatureScript
                 instance = me->GetInstanceScript();
             }
 
-			InstanceScript* instance;
+            InstanceScript* instance;
             bool introDone;
             Unit* pulverizeTarget;
             EventMap events;
@@ -112,9 +112,9 @@ class boss_echo_of_baine : public CreatureScript
                     DoCast(me, SPELL_BAINE_VIS);
             }
 
-		    void EnterEvadeMode()
-		    {
-				me->GetMotionMaster()->MoveTargetedHome();
+            void EnterEvadeMode()
+            {
+                me->GetMotionMaster()->MoveTargetedHome();
                 Reset();
 
                 me->SetHealth(me->GetMaxHealth());
@@ -124,7 +124,7 @@ class boss_echo_of_baine : public CreatureScript
                     instance->SetBossState(BOSS_ECHO_OF_BAINE, FAIL);
                     instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me); // Remove
                 }
-		    }
+            }
 
             void MoveInLineOfSight(Unit* who)
             {
@@ -146,10 +146,10 @@ class boss_echo_of_baine : public CreatureScript
                 {
                     instance->SetBossState(BOSS_ECHO_OF_BAINE, DONE);
 
-				    if (instance->GetData(DATA_FIRST_ENCOUNTER) == IN_PROGRESS)
-				        instance->SetData(DATA_FIRST_ENCOUNTER, DONE);
-				    else  
-				        instance->SetData(DATA_SECOND_ENCOUNTER, DONE);
+                    if (instance->GetData(DATA_FIRST_ENCOUNTER) == IN_PROGRESS)
+                        instance->SetData(DATA_FIRST_ENCOUNTER, DONE);
+                    else  
+                        instance->SetData(DATA_SECOND_ENCOUNTER, DONE);
 
                     instance->HandleGameObject(4001, true); // Open the doors.
                     instance->HandleGameObject(4002, true);

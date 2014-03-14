@@ -126,17 +126,17 @@ int Master::Run()
     seed1.SetRand(16 * 8);
 
     sLog->outString("%s (worldserver-daemon)", _FULLVERSION);
-	sLog->outString(" ");
-	sLog->outString(" A World of Warcraft Cataclsym 4.3.4 Emulator	");
-	sLog->outString("       _/_/              _/          _/_/_/    _/_/    _/_/_/    _/_/_/_/  ");
-	sLog->outString("    _/    _/  _/  _/_/  _/  _/    _/        _/    _/  _/    _/  _/         ");
-	sLog->outString("   _/_/_/_/  _/_/      _/_/      _/        _/    _/  _/_/_/    _/_/_/      ");
-	sLog->outString("  _/    _/  _/        _/  _/    _/        _/    _/  _/    _/  _/           ");
-	sLog->outString(" _/    _/  _/        _/    _/    _/_/_/    _/_/    _/    _/  _/_/_/_/  	NG");
-	sLog->outString(" Arkania Community (c) 2014!");
-	sLog->outString("      <http://arkania.net/>");
-	sLog->outString(" ");
-	sLog->outString("<Ctrl-C> to stop.\n");	
+    sLog->outString(" ");
+    sLog->outString(" A World of Warcraft Cataclsym 4.3.4 Emulator  ");
+    sLog->outString("       _/_/              _/          _/_/_/    _/_/    _/_/_/    _/_/_/_/  ");
+    sLog->outString("    _/    _/  _/  _/_/  _/  _/    _/        _/    _/  _/    _/  _/         ");
+    sLog->outString("   _/_/_/_/  _/_/      _/_/      _/        _/    _/  _/_/_/    _/_/_/      ");
+    sLog->outString("  _/    _/  _/        _/  _/    _/        _/    _/  _/    _/  _/           ");
+    sLog->outString(" _/    _/  _/        _/    _/    _/_/_/    _/_/    _/    _/  _/_/_/_/   NG ");
+    sLog->outString(" Arkania Community (c) 2014! ");
+    sLog->outString("      <http://arkania.net/> ");
+    sLog->outString(" ");
+    sLog->outString("<Ctrl-C> to stop.\n");
 
     /// worldserver PID file creation
     std::string pidfile = ConfigMgr::GetStringDefault("PidFile", "");

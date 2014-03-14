@@ -32,8 +32,8 @@ class instance_firelands : public InstanceMapScript
 {
     public:
         instance_firelands() : InstanceMapScript("instance_firelands", 720) { }
-		
-		InstanceScript* GetInstanceScript(InstanceMap* map) const
+
+        InstanceScript* GetInstanceScript(InstanceMap* map) const
         {
             return new instance_firelands_InstanceMapScript(map);
         }
@@ -49,17 +49,17 @@ class instance_firelands : public InstanceMapScript
             uint32 uiEncounter[ENCOUNTERS];
 
             // Creatures
-	        uint64 uiShannox;
+            uint64 uiShannox;
             uint64 uiRhyolith;
             uint64 uiBethtilac;
             uint64 uiAlysrazor;
             uint64 uiBaloroc;
             uint64 uiMajordomus;
             uint64 uiRagnarosCata;
-			uint64 uiTeamInInstance;
-			uint64 uiRageface;
+            uint64 uiTeamInInstance;
+            uint64 uiRageface;
             uint64 uiRiplimb;
-			uint64 uiShannoxSpear;
+            uint64 uiShannoxSpear;
 
             // Gobs
             uint64 BethtilacDoorGUID;
@@ -73,7 +73,7 @@ class instance_firelands : public InstanceMapScript
             for(uint8 i=0; i<ENCOUNTERS; ++i)
                 uiEncounter[i] = NOT_STARTED;
 
-	        uiShannox = 0;
+            uiShannox = 0;
             uiRhyolith = 0;
             uiBethtilac = 0;
             uiAlysrazor = 0;
@@ -85,9 +85,9 @@ class instance_firelands : public InstanceMapScript
             AlysrazorVolcanoGUID = 0;
             SulfuronWallGUID = 0;
             RagnarosPlatformGUID = 0;
-			uiRageface = 0;
-			uiRiplimb = 0;
-			uiShannoxSpear = 0;
+            uiRageface = 0;
+            uiRiplimb = 0;
+            uiShannoxSpear = 0;
         }
 
         bool IsEncounterInProgress() const
@@ -106,32 +106,32 @@ class instance_firelands : public InstanceMapScript
             switch (go->GetEntry())
             {
                 case GOB_DOOR_BETHILAC:
-                    BethtilacDoorGUID = go->GetGUID();				
+                    BethtilacDoorGUID = go->GetGUID();
                     break;
 
                 case GOB_DOOR_BALOROC:
-                    BalorocDoorGUID = go->GetGUID();				
+                    BalorocDoorGUID = go->GetGUID();
                     break;
 
                 case GOB_VOLCANO_ALYS:
-                    AlysrazorVolcanoGUID = go->GetGUID();				
+                    AlysrazorVolcanoGUID = go->GetGUID();
                     break;
 
                 case GOB_WALL_SULFURON:
-                    SulfuronWallGUID = go->GetGUID();				
+                    SulfuronWallGUID = go->GetGUID();
                     break;
 
                 case GOB_PLATFORM_RAGN:
-                    RagnarosPlatformGUID = go->GetGUID();				
+                    RagnarosPlatformGUID = go->GetGUID();
                     break;
             }
         }
 
-		void OnCreatureCreate(Creature* creature, bool /*add*/)
+        void OnCreatureCreate(Creature* creature, bool /*add*/)
         {
-			switch (creature->GetEntry())
+            switch (creature->GetEntry())
             {
-				case NPC_SHANNOX:
+                case NPC_SHANNOX:
                     uiShannox = creature->GetGUID();
                     break;
                 case NPC_RHYOLITH:
@@ -152,17 +152,17 @@ class instance_firelands : public InstanceMapScript
                 case NPC_RAGNAROS_CATA:
                     uiRagnarosCata = creature->GetGUID();
                     break;
-				case NPC_RAGEFACE:
-					uiRageface = creature->GetGUID();
-					break;
-				case NPC_RIPLIMB:
-					uiRiplimb = creature->GetGUID();
-					break;
-				case NPC_SHANNOX_SPEAR:
-					uiShannoxSpear = creature->GetGUID();
-					break;
-			}
-		}	
+                case NPC_RAGEFACE:
+                    uiRageface = creature->GetGUID();
+                    break;
+                case NPC_RIPLIMB:
+                    uiRiplimb = creature->GetGUID();
+                    break;
+                case NPC_SHANNOX_SPEAR:
+                    uiShannoxSpear = creature->GetGUID();
+                    break;
+            }
+        }    
 
         uint64 GetData64(uint32 identifier)
         {
@@ -183,35 +183,35 @@ class instance_firelands : public InstanceMapScript
                 case DATA_RAGNAROS:
                     return uiRagnarosCata;
 
-				// Npc's
-				case DATA_RAGEFACE:
-					return uiRageface;
+                // Npc's
+                case DATA_RAGEFACE:
+                    return uiRageface;
 
-				case DATA_RIPLIMB:
-					return uiRiplimb;
+                case DATA_RIPLIMB:
+                    return uiRiplimb;
 
-				case DATA_SHANNOX_SPEAR:
-					return uiShannoxSpear;
+                case DATA_SHANNOX_SPEAR:
+                    return uiShannoxSpear;
 
                 // Go's
                 case DATA_BETHTILAC_DOOR:
-                    return BethtilacDoorGUID;				
+                    return BethtilacDoorGUID;
                     break;
 
                 case DATA_BALOROC_DOOR:
-                    return BalorocDoorGUID;				
+                    return BalorocDoorGUID;
                     break;
 
                 case DATA_ALYSRAZOR_VOLCANO:
-                    return AlysrazorVolcanoGUID;				
+                    return AlysrazorVolcanoGUID;
                     break;
 
                 case DATA_SULFURON_DOOR:
-                    return SulfuronWallGUID;				
+                    return SulfuronWallGUID;
                     break;
 
                 case DATA_RAGNAROS_PLATFORM:
-                    return RagnarosPlatformGUID;				
+                    return RagnarosPlatformGUID;
                     break;
 
                 default:
@@ -221,7 +221,7 @@ class instance_firelands : public InstanceMapScript
             return NULL;
         }
 
-		void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data)
         {
             switch(type)
             {

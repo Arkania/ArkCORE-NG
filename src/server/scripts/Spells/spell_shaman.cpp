@@ -1036,7 +1036,7 @@ void AddSC_shaman_spell_scripts()
     new spell_sha_fulmination();
     new spell_sha_totemic_wrath();
     new spell_sha_thunderstorm();
-	new spell_raid_haste();
+    new spell_raid_haste();
     new spell_sha_earthquake();
     new spell_sha_mana_tide_totem();
 }

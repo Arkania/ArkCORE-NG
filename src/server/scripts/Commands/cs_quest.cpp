@@ -246,7 +246,7 @@ public:
         player->CompleteQuest(entry);
         return true;
     }
-	
+
     static bool HandleQuestReward(ChatHandler* handler, char const* args)
     {
         Player* player = handler->getSelectedPlayer();

@@ -268,10 +268,10 @@ public:
                 data << uint32(GMTICKET_RESPONSE_TICKET_DELETED);
                 player->GetSession()->SendPacket(&data);
 
-	            // Update Ticket Status and send GM survey.
-	            WorldPacket data2(SMSG_GM_TICKET_STATUS_UPDATE, 4);
-	            data2 << uint32(TICKET_ESCALATED_ASSIGNED);
-	            player->GetSession()->SendPacket(&data2);
+                // Update Ticket Status and send GM survey.
+                WorldPacket data2(SMSG_GM_TICKET_STATUS_UPDATE, 4);
+                data2 << uint32(TICKET_ESCALATED_ASSIGNED);
+                player->GetSession()->SendPacket(&data2);
             }
         }
 

@@ -28,9 +28,9 @@ enum eData
 enum eData64
 {
     DATA_GONG,
-	DATA_TUTEN_KASH,
-	DATA_GLUTTON,
-	DATA_MORDRESH_FIRE_EYE,
+    DATA_TUTEN_KASH,
+    DATA_GLUTTON,
+    DATA_MORDRESH_FIRE_EYE,
 };
 
 enum eGameObject

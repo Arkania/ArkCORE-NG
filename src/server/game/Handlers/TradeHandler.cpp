@@ -802,7 +802,7 @@ void WorldSession::HandleSetTradeItemOpcode(WorldPacket& recvPacket)
     uint8 bag;
     uint8 slot;
 
-	recvPacket >> slot;
+    recvPacket >> slot;
     recvPacket >> tradeSlot;
     recvPacket >> bag;
 

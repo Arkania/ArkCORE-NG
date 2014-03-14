@@ -653,7 +653,7 @@ void WorldSession::HandleBuyItemInSlotOpcode(WorldPacket & recvData)
         return;                                             // cheating
 
     uint8 bag = NULL_BAG;                                   // init for case invalid bagGUID
-	Item* bagItem = NULL;
+    Item* bagItem = NULL;
     // find bag slot by bag guid
     if (bagguid == _player->GetGUID())
         bag = INVENTORY_SLOT_BAG_0;

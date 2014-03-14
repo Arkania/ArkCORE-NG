@@ -299,7 +299,7 @@ public:
 
         void Reset()
         {
-			events.Reset();
+            events.Reset();
 
             if (instance)
                 instance->SetData(DATA_HEXLORDEVENT, NOT_STARTED);
@@ -411,9 +411,9 @@ public:
 
         void EnterEvadeMode()
         {
-			Reset();
-			me->GetMotionMaster()->MoveTargetedHome();
-			me->RemoveAllAuras();
+            Reset();
+            me->GetMotionMaster()->MoveTargetedHome();
+            me->RemoveAllAuras();
 
             if (instance)
             {
@@ -702,7 +702,7 @@ class boss_gazakroth : public CreatureScript
                     {
                         me->GetMotionMaster()->MoveChase(who, 20);
                         me->ToUnit()->getThreatManager().modifyThreatPercent(who, 100);
-        	            me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, true);
+                        me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, true);
                         me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_ATTACK_ME, true);
                     }
                 }

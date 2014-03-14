@@ -1011,7 +1011,7 @@ class spell_nefarian_tail_lash : public SpellScriptLoader
             return new spell_nefarian_tail_lash_SpellScript();
         }
 };
-			
+
 class spell_onyxia_lightning_discharge : public SpellScriptLoader
 {
     public:

@@ -37,7 +37,7 @@ uint32 BG_BG_HonorScoreTicks[BG_HONOR_MODE_NUM] = {
 BattlegroundBFG::BattlegroundBFG()
 {
     m_BuffChange = true;
-	BgObjects.resize(BG_BG_OBJECT_MAX);
+    BgObjects.resize(BG_BG_OBJECT_MAX);
     BgCreatures.resize(BG_BG_ALL_NODES_COUNT + 5);//+5 for aura triggers
 
     StartMessageIds[BG_STARTING_EVENT_FIRST]  = LANG_BG_BG_START_TWO_MINUTES;
@@ -52,7 +52,7 @@ BattlegroundBFG::~BattlegroundBFG()
 
 void BattlegroundBFG::PostUpdateImpl(uint32 diff)
 {
-	if (GetStatus() == STATUS_IN_PROGRESS)
+    if (GetStatus() == STATUS_IN_PROGRESS)
     {
         int team_points[BG_TEAMS_COUNT] = { 0, 0 };
 
@@ -176,7 +176,7 @@ void BattlegroundBFG::StartingEventCloseDoors()
     // Starting doors
     DoorClose(BG_BG_OBJECT_GATE_A);
     DoorClose(BG_BG_OBJECT_GATE_H);
-	SpawnBGObject(BG_BG_OBJECT_GATE_A, RESPAWN_IMMEDIATELY);
+    SpawnBGObject(BG_BG_OBJECT_GATE_A, RESPAWN_IMMEDIATELY);
     SpawnBGObject(BG_BG_OBJECT_GATE_H, RESPAWN_IMMEDIATELY);
 
     // Starting base spirit guides

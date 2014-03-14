@@ -198,18 +198,18 @@ class at_tott_commander_ulthok : public AreaTriggerScript
         bool OnTrigger(Player* pPlayer, const AreaTriggerEntry* /*pAt*/)
         {
             sLog->outError("LOADING", "ulthok");
-		    if (InstanceScript* pInstance = pPlayer->GetInstanceScript())
-		    {
-			    if (pInstance->GetData(DATA_COMMANDER_ULTHOK_EVENT) != DONE
+            if (InstanceScript* pInstance = pPlayer->GetInstanceScript())
+            {
+                if (pInstance->GetData(DATA_COMMANDER_ULTHOK_EVENT) != DONE
                     && pInstance->GetBossState(DATA_LADY_NAZJAR) != DONE)
-			    {
+                {
                     pInstance->SetData(DATA_COMMANDER_ULTHOK_EVENT, DONE);
                     if (Creature* pUlthok = ObjectAccessor::GetCreature(*pPlayer, pInstance->GetData64(DATA_COMMANDER_ULTHOK)))
                     {
                         pUlthok->AI()->DoAction(ACTION_COMMANDER_ULTHOK_START_EVENT);
                     }
-			    }
-		    }
+                }
+            }
             return true;
         }
 };

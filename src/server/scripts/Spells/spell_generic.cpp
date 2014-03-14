@@ -969,7 +969,7 @@ enum CloneWeaponSpells
     SPELL_COPY_WEAPON_3_AURA     = 69893,
 
     SPELL_COPY_OFFHAND_AURA      = 45205,
-    SPELL_COPY_OFFHAND_2_AURA    = 69896,	
+    SPELL_COPY_OFFHAND_2_AURA    = 69896,
 
     SPELL_COPY_RANGED_AURA       = 57594
 };
@@ -993,9 +993,8 @@ class spell_generic_clone_weapon : public SpellScriptLoader
 
                     uint32 spellId = uint32(GetSpellInfo()->Effects[EFFECT_0].CalcValue());
                     target->CastSpell(caster, spellId, true);
-				}
-			}
- 	
+                }
+            }
 
             void Register()
             {

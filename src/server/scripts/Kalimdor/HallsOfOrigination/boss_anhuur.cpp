@@ -335,7 +335,7 @@ class npc_anhuur_viper : public CreatureScript
                 }
                 else
                     m_uiViperDotTimer -= uiDiff;
-					
+
                 DoMeleeAttackIfReady();
             }
         };

@@ -41,19 +41,19 @@ public:
 
         void Reset()
         {
-			if (instance)
+            if (instance)
             instance->SetData(DATA_ASCENDANT_COUNCIL, NOT_STARTED);
         }
 
         void EnterCombat(Unit* /*who*/)
         {
-			if (instance)
+            if (instance)
             instance->SetData(DATA_ASCENDANT_COUNCIL, IN_PROGRESS);
         }
 
         void JustDied(Unit* /*Killer*/)
         {
-			if (instance)
+            if (instance)
             instance->SetData(DATA_ASCENDANT_COUNCIL, DONE);
         }
 

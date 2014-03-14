@@ -80,6 +80,7 @@ bool ChatHandler::HandleMuteCommand(const char* args)
 
     PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_MUTE_TIME);
         std::string muteBy = "";
+
         if (GetSession())
             muteBy = GetSession()->GetPlayerName();
         else

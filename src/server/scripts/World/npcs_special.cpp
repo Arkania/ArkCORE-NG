@@ -908,7 +908,7 @@ public:
     struct npc_garments_of_questsAI : public npc_escortAI
     {
         npc_garments_of_questsAI(Creature* creature) : npc_escortAI(creature) {Reset();
-		}
+        }
 
         uint64 CasterGUID;
 
@@ -1197,11 +1197,11 @@ public:
                     player->SEND_GOSSIP_MENU(5842, creature->GetGUID());
                 else canBuy = true;
                 break;
-			case 48510:                                          //Kall Worthaton
+            case 48510:                                          //Kall Worthaton
                 if (player->GetReputationRank(1133) != REP_EXALTED && race != RACE_GOBLIN)
                     player->SEND_GOSSIP_MENU(5840, creature->GetGUID());
                 else canBuy = true;
-                break;  				
+                break;
             case 7955:                                          //Milli Featherwhistle
                 if (player->GetReputationRank(54) != REP_EXALTED && race != RACE_GNOME)
                     player->SEND_GOSSIP_MENU(5857, creature->GetGUID());
@@ -1762,7 +1762,7 @@ public:
     struct mob_mojoAI : public ScriptedAI
     {
         mob_mojoAI(Creature* creature) : ScriptedAI(creature) {Reset();
-		}
+        }
         uint32 hearts;
         uint64 victimGUID;
         void Reset()
@@ -1867,11 +1867,11 @@ public:
             // Clone Me!
             owner->CastSpell(me, 45204, false);
 
-			if (owner->ToPlayer() && owner->ToPlayer()->GetSelectedUnit())
+            if (owner->ToPlayer() && owner->ToPlayer()->GetSelectedUnit())
                 me->AI()->AttackStart(owner->ToPlayer()->GetSelectedUnit());
         }
 
-		void EnterCombat (Unit *who)
+        void EnterCombat (Unit *who)
         {
             if (spells.empty())
                 return;
@@ -1879,9 +1879,9 @@ public:
             for (SpellVct::iterator itr = spells.begin(); itr != spells.end(); ++itr)
             {
                 if (AISpellInfo[*itr].condition == AICOND_AGGRO)
-				{
+                {
                     me->CastSpell(who, *itr, false);
-				}
+                }
                 else if (AISpellInfo[*itr].condition == AICOND_COMBAT)
                 {
                     uint32 cooldown = GetAISpellInfo(*itr)->realCooldown;
@@ -1890,7 +1890,7 @@ public:
             }
         }
 
-		void UpdateAI (const uint32 diff)
+        void UpdateAI (const uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -1919,7 +1919,7 @@ public:
                     events.ScheduleEvent(spellId, 500);
                     return;
                 }
-				DoCast(me->GetVictim(), spellId);
+                DoCast(me->GetVictim(), spellId);
                 uint32 casttime = me->GetCurrentSpellCastTime(spellId);
                 events.ScheduleEvent(spellId, (casttime ? casttime : 500) + GetAISpellInfo(spellId)->realCooldown);
             }
@@ -1976,7 +1976,7 @@ public:
                 if ((*iter)->GetAura(49206, ownerGuid))
                 {
                     me->Attack((*iter), false);
-					me->CombatStart((*iter));
+                    me->CombatStart((*iter));
                     break;
                 }
         }
@@ -2050,8 +2050,8 @@ class npc_lightwell : public CreatureScript
             npc_lightwellAI(Creature* creature) : PassiveAI(creature)
             {
                 DoCast(me, 59907, false);
-				me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-				me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
+                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
             }
 
             void EnterEvadeMode()
@@ -3136,8 +3136,8 @@ public:
 
         void BarrierChecker(Unit* who)
         {
-			if (!me->HasAura(81781))
-				DoCast(me, 81781);
+            if (!me->HasAura(81781))
+                DoCast(me, 81781);
         }
 
         void UpdateAI (const uint32 diff)
@@ -3179,8 +3179,8 @@ public:
 enum eFlameOrb
 {
     SPELL_FLAME_ORB_DAMAGE   = 82739, 
-	FLAME_ORB_DISTANCE       = 120, 
-	SPELL_FLAME_ORB_BOOM     = 83619
+    FLAME_ORB_DISTANCE       = 120, 
+    SPELL_FLAME_ORB_BOOM     = 83619
 };
 
 class npc_flame_orb: public CreatureScript
@@ -3239,8 +3239,8 @@ public:
 
             if (uiDespawnTimer <= diff)
             {
-				if (me->GetOwner()->HasAura(18459) && roll_chance_i(33) || me->GetOwner()->HasAura(18460) && roll_chance_i(66) || me->GetOwner()->HasAura(54734))
-					DoCast(me, SPELL_FLAME_ORB_BOOM);
+                if (me->GetOwner()->HasAura(18459) && roll_chance_i(33) || me->GetOwner()->HasAura(18460) && roll_chance_i(66) || me->GetOwner()->HasAura(54734))
+                    DoCast(me, SPELL_FLAME_ORB_BOOM);
 
                 me->SetVisible(false);
                 me->DisappearAndDie();
@@ -3332,12 +3332,12 @@ public:
             if (uiDamageTimer <= diff)
             {
                 if (Unit* target = me->SelectNearestTarget(20))
-				{
-					if (me->GetOwner()->HasAura(84727))
-						DoCast(target, 84721);
-					else
-						DoCast(target, 95969);
-				}
+                {
+                    if (me->GetOwner()->HasAura(84727))
+                        DoCast(target, 84721);
+                    else
+                        DoCast(target, 95969);
+                }
 
                 uiDamageTimer = 1 * IN_MILLISECONDS;
             }
@@ -3359,58 +3359,58 @@ public:
 
     struct npc_hand_of_guldanAI: public ScriptedAI
     {
-		npc_hand_of_guldanAI(Creature* creature) : ScriptedAI(creature) 
-		{
-			me->SetReactState(REACT_PASSIVE);
-			me->AttackStop();
-			me->AddAura(85526, me); // Visual aur
-			Foreboding = false;
-			FirstCasts = true;
-			Stun = true;
-		}
-		void IsSummonedBy(Unit* summoner)
-		{
-			if (summoner->HasAura(89604))
-			{
-				trigger_spell_root = 93974;
-				trigger_spell_stun = 93975;
-				Foreboding = true;
-				ForebodingTimerStun = 6000;
-			}
-			else if (summoner->HasAura(89605))
-			{
-				trigger_spell_root = 93987;
-				trigger_spell_stun = 93986;
-				Foreboding = true;
-				ForebodingTimerStun = 6000;
-			}
-		}
-
-		int32 trigger_spell_stun;
-		int32 trigger_spell_root;
-		bool FirstCasts;
-		bool Foreboding;
-		bool Stun;
-		uint64 ForebodingTimerStun;
-
-		void UpdateAI (const uint32 diff)
+        npc_hand_of_guldanAI(Creature* creature) : ScriptedAI(creature) 
         {
-			if (FirstCasts)
-			{
-				if (Foreboding)
-					me->CastSpell(me, trigger_spell_root,true);
-				me->AddAura(86000, me);
-				FirstCasts = false;
-			}
-					
-			if (ForebodingTimerStun <= diff && Foreboding && Stun)
-			{
-				Stun = false;
-				me->CastSpell(me, trigger_spell_stun, true);
-			}
-			else
-				ForebodingTimerStun -= diff;
-		}
+            me->SetReactState(REACT_PASSIVE);
+            me->AttackStop();
+            me->AddAura(85526, me); // Visual aur
+            Foreboding = false;
+            FirstCasts = true;
+            Stun = true;
+        }
+        void IsSummonedBy(Unit* summoner)
+        {
+            if (summoner->HasAura(89604))
+            {
+                trigger_spell_root = 93974;
+                trigger_spell_stun = 93975;
+                Foreboding = true;
+                ForebodingTimerStun = 6000;
+            }
+            else if (summoner->HasAura(89605))
+            {
+                trigger_spell_root = 93987;
+                trigger_spell_stun = 93986;
+                Foreboding = true;
+                ForebodingTimerStun = 6000;
+            }
+        }
+
+        int32 trigger_spell_stun;
+        int32 trigger_spell_root;
+        bool FirstCasts;
+        bool Foreboding;
+        bool Stun;
+        uint64 ForebodingTimerStun;
+
+        void UpdateAI (const uint32 diff)
+        {
+            if (FirstCasts)
+            {
+                if (Foreboding)
+                    me->CastSpell(me, trigger_spell_root,true);
+                me->AddAura(86000, me);
+                FirstCasts = false;
+            }
+                    
+            if (ForebodingTimerStun <= diff && Foreboding && Stun)
+            {
+                Stun = false;
+                me->CastSpell(me, trigger_spell_stun, true);
+            }
+            else
+                ForebodingTimerStun -= diff;
+        }
     };
 
     CreatureAI *GetAI (Creature *creature) const
@@ -3428,36 +3428,36 @@ public:
     {
         npc_doom_guardAI (Creature *c) : ScriptedAI(c) { }
 
-		uint64 DoomBoltTimer;
+        uint64 DoomBoltTimer;
 
-		void EnterCombat (Unit* /*target*/)
-		{
-			DoomBoltTimer = 3000;
-			me->AttackStop();
-		}
+        void EnterCombat (Unit* /*target*/)
+        {
+            DoomBoltTimer = 3000;
+            me->AttackStop();
+        }
 
-		void UpdateAI (const uint32 uiDiff)
+        void UpdateAI (const uint32 uiDiff)
         {
             if (!UpdateVictim())
                 return;
 
-			if (me->HasUnitState(UNIT_STATE_CASTING))
+            if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-			if (!me->IsInCombat())
-				return;
+            if (!me->IsInCombat())
+                return;
 
-		    if (DoomBoltTimer <= uiDiff)
+            if (DoomBoltTimer <= uiDiff)
             {
-				if (Unit *victim = me->GetOwner()->GetVictim())
-					me->CastSpell(victim,85692,true);
-				else if (Unit* target = me->SelectNearestTarget(40))
-					me->CastSpell(target,85692,true);
+                if (Unit *victim = me->GetOwner()->GetVictim())
+                    me->CastSpell(victim,85692,true);
+                else if (Unit* target = me->SelectNearestTarget(40))
+                    me->CastSpell(target,85692,true);
 
                 DoomBoltTimer = 3000;
             }
-			else
-				DoomBoltTimer -= uiDiff;
+            else
+                DoomBoltTimer -= uiDiff;
 
         }
     };
@@ -3498,12 +3498,12 @@ public:
 
             // Remove other ring spawned by the player
             {
-				CellCoord pair(Trinity::ComputeCellCoord(owner->GetPositionX(), owner->GetPositionY()));
+                CellCoord pair(Trinity::ComputeCellCoord(owner->GetPositionX(), owner->GetPositionY()));
                 Cell cell(pair);
                 cell.SetNoCreate();
 
                 std::list<Creature*> templist;
-				Trinity::AllCreaturesOfEntryInRange check(owner, me->GetEntry(), 6);
+                Trinity::AllCreaturesOfEntryInRange check(owner, me->GetEntry(), 6);
                 Trinity::CreatureListSearcher<Trinity::AllCreaturesOfEntryInRange> searcher(owner, templist, check);
 
                 TypeContainerVisitor<Trinity::CreatureListSearcher<Trinity::AllCreaturesOfEntryInRange>, GridTypeMapContainer> visitor(searcher);
@@ -3527,10 +3527,10 @@ public:
             if (who->IsAlive() && me->IsInRange(who, 0, 6.0f) && !who->HasAura(82691)/*<= target already frozen*/
             && !who->HasAura(91264)/*<= target is immune*/
             && me->IsWithinLOSInMap(who) && Isready)
-			{
+            {
                 me->CastSpell(who, 82691, true);
-				me->CastSpell(who, 91264, true);
-			}
+                me->CastSpell(who, 91264, true);
+            }
         }
 
         void UpdateAI (const uint32 diff)
@@ -3572,9 +3572,9 @@ public:
     struct npc_shadowy_apparitionAI: public ScriptedAI
     {
         npc_shadowy_apparitionAI (Creature* c) : ScriptedAI(c)
-		{
+        {
             me->SetReactState(REACT_AGGRESSIVE);
-			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
         }
 
         uint64 targetGuid;
@@ -3636,68 +3636,68 @@ public:
 
 enum GuardianSpellsAndEntries
 {
-	 NPC_PROTECTION_GUARDIAN         = 46490,
-	 NPC_HOLY_GUARDIAN               = 46499,
-	 NPC_RETRI_GUARDIAN              = 46506,
-	 SPELL_ANCIANET_HEALER           = 86674,
-	 SPELL_ANCIENT_GUARDIAN_VISUAL   = 86657,
-	 SPELL_ANCIENT_CRUSADER_PLAYER   = 86703,
-	 SPELL_ANCIENT_CRUSADER_GUARDIAN = 86701
+     NPC_PROTECTION_GUARDIAN         = 46490,
+     NPC_HOLY_GUARDIAN               = 46499,
+     NPC_RETRI_GUARDIAN              = 46506,
+     SPELL_ANCIANET_HEALER           = 86674,
+     SPELL_ANCIENT_GUARDIAN_VISUAL   = 86657,
+     SPELL_ANCIENT_CRUSADER_PLAYER   = 86703,
+     SPELL_ANCIENT_CRUSADER_GUARDIAN = 86701
 };
 /*
  class npc_guardian_of_ancient_kings : public CreatureScript
  {
  public:
-	 npc_guardian_of_ancient_kings() : CreatureScript("npc_guardian_of_ancient_kings") { }
+     npc_guardian_of_ancient_kings() : CreatureScript("npc_guardian_of_ancient_kings") { }
 
-	 struct npc_guardian_of_ancient_kingsAI : public ScriptedAI
-	 {
-		 npc_guardian_of_ancient_kingsAI(Creature *pCreature) : ScriptedAI(pCreature) { }
+     struct npc_guardian_of_ancient_kingsAI : public ScriptedAI
+     {
+         npc_guardian_of_ancient_kingsAI(Creature *pCreature) : ScriptedAI(pCreature) { }
 
-		 void InitializeAI()
-		 {
-			 Unit* owner = me->GetOwner();
+         void InitializeAI()
+         {
+             Unit* owner = me->GetOwner();
 
-			 if (!owner || owner->GetTypeId() != TYPEID_PLAYER)
-				 return;
+             if (!owner || owner->GetTypeId() != TYPEID_PLAYER)
+                 return;
 
-			 if (me->GetEntry() == NPC_PROTECTION_GUARDIAN)
-			 {
-				 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-				 me->SetReactState(REACT_PASSIVE);
-			 }
-			 if (me->GetEntry() == NPC_RETRI_GUARDIAN)
-				 if (Unit* owner = me->GetOwner())
-				 {
-					 owner->AddAura(SPELL_ANCIENT_CRUSADER_GUARDIAN, me);
-					 owner->AddAura(SPELL_ANCIENT_CRUSADER_PLAYER, owner);
-				 }
-			 if (me->GetEntry() == NPC_HOLY_GUARDIAN)
-				 if (Unit* owner = me->GetOwner())
-					 me->AddAura(SPELL_ANCIANET_HEALER, owner);
-		 }
+             if (me->GetEntry() == NPC_PROTECTION_GUARDIAN)
+             {
+                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+                 me->SetReactState(REACT_PASSIVE);
+             }
+             if (me->GetEntry() == NPC_RETRI_GUARDIAN)
+                 if (Unit* owner = me->GetOwner())
+                 {
+                     owner->AddAura(SPELL_ANCIENT_CRUSADER_GUARDIAN, me);
+                     owner->AddAura(SPELL_ANCIENT_CRUSADER_PLAYER, owner);
+                 }
+             if (me->GetEntry() == NPC_HOLY_GUARDIAN)
+                 if (Unit* owner = me->GetOwner())
+                     me->AddAura(SPELL_ANCIANET_HEALER, owner);
+         }
 
-		 void UpdateAI(const uint32 diff)
-		 {
-			 Unit* owner = me->GetOwner();
+         void UpdateAI(const uint32 diff)
+         {
+             Unit* owner = me->GetOwner();
 
-			 if (!UpdateVictim() || !owner)
-				 return;
+             if (!UpdateVictim() || !owner)
+                 return;
 
-			 if (me->GetEntry() == NPC_PROTECTION_GUARDIAN)
-				 if (!owner->HasAura(SPELL_ANCIENT_GUARDIAN_VISUAL))
-					 me->AddAura(SPELL_ANCIENT_GUARDIAN_VISUAL, owner);
+             if (me->GetEntry() == NPC_PROTECTION_GUARDIAN)
+                 if (!owner->HasAura(SPELL_ANCIENT_GUARDIAN_VISUAL))
+                     me->AddAura(SPELL_ANCIENT_GUARDIAN_VISUAL, owner);
 
-			 if (me->GetEntry() == NPC_RETRI_GUARDIAN) // Only the retpaladin guardian hits melee,
-				 DoMeleeAttackIfReady();  // at least is what i saw on vids.
+             if (me->GetEntry() == NPC_RETRI_GUARDIAN) // Only the retpaladin guardian hits melee,
+                 DoMeleeAttackIfReady();  // at least is what i saw on vids.
 
-		 }
-	 };
+         }
+     };
 
-	 CreatureAI* GetAI(Creature* pCreature) const
-	 {
-		 return new npc_guardian_of_ancient_kingsAI(pCreature);
-	 }
+     CreatureAI* GetAI(Creature* pCreature) const
+     {
+         return new npc_guardian_of_ancient_kingsAI(pCreature);
+     }
 };
 */
 class npc_guardian_of_ancient_kings : public CreatureScript
@@ -3712,25 +3712,25 @@ public:
 
         }
 
-		void CalculateAmountAttackPower(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
-		{
-			if (Player* owner = me->GetOwner()->ToPlayer())
-			{ 
-				float apAmount = owner->GetTotalAttackPowerValue(RANGED_ATTACK);
-				apAmount = owner->GetTotalAuraModifier(SPELL_AURA_MOD_ATTACK_POWER);
-				apAmount = (apAmount / 100) * 42.5f; //Get 1 percent * 42.5f  
-				amount += int32(apAmount);
-			}
-		}
+        void CalculateAmountAttackPower(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
+        {
+            if (Player* owner = me->GetOwner()->ToPlayer())
+            { 
+                float apAmount = owner->GetTotalAttackPowerValue(RANGED_ATTACK);
+                apAmount = owner->GetTotalAuraModifier(SPELL_AURA_MOD_ATTACK_POWER);
+                apAmount = (apAmount / 100) * 42.5f; //Get 1 percent * 42.5f  
+                amount += int32(apAmount);
+            }
+        }
 
         void Reset()
         {
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
             
             if (me->GetEntry() == 46506)
-			{
-				 me->SetReactState(REACT_AGGRESSIVE);
-			}
+            {
+                 me->SetReactState(REACT_AGGRESSIVE);
+            }
             else
                 me->SetReactState(REACT_PASSIVE);
 
@@ -3780,16 +3780,16 @@ public:
         npc_bloodwormAI (Creature *c) :
                 ScriptedAI(c)
         {
-			alive = true;
-			uiDespawnTimer = 19500;
+            alive = true;
+            uiDespawnTimer = 19500;
         }
 
-		bool alive;
+        bool alive;
         uint32 uiDespawnTimer;
 
-		void Reset()
+        void Reset()
         {
-			me->SetReactState(REACT_AGGRESSIVE);
+            me->SetReactState(REACT_AGGRESSIVE);
             // Start attacking attacker of owner on first ai update after spawn - move in line of sight may choose better target
             if (!me->GetVictim() && me->IsSummon())
                 if (Unit* Owner = me->ToTempSummon()->GetSummoner())
@@ -3816,21 +3816,21 @@ public:
         {
             if (uiDespawnTimer <= diff)
             {
-				if (me->HasAura(81277) && alive)
-				{
-					alive = false;
-					int32 amount = me->GetAura(81277)->GetStackAmount() * 10;
-					me->CastCustomSpell(me,81280,&amount,NULL,NULL,true);
-					me->DisappearAndDie();
-				}
+                if (me->HasAura(81277) && alive)
+                {
+                    alive = false;
+                    int32 amount = me->GetAura(81277)->GetStackAmount() * 10;
+                    me->CastCustomSpell(me,81280,&amount,NULL,NULL,true);
+                    me->DisappearAndDie();
+                }
             }
             else
                 uiDespawnTimer -= diff;
 
-			if (!UpdateVictim())
-				return;
+            if (!UpdateVictim())
+                return;
 
-			DoMeleeAttackIfReady();
+            DoMeleeAttackIfReady();
         }
     };
 
@@ -3850,12 +3850,12 @@ public:
         npc_dancing_rune_weaponAI (Creature *c) :
                 ScriptedAI(c)
         {
-			me->AddAura(81256,me->GetOwner());
+            me->AddAura(81256,me->GetOwner());
         }
 
-		void Reset()
+        void Reset()
         {
-			me->SetReactState(REACT_AGGRESSIVE);
+            me->SetReactState(REACT_AGGRESSIVE);
             // Start attacking attacker of owner on first ai update after spawn - move in line of sight may choose better target
             if (!me->GetVictim() && me->IsSummon())
                 if (Unit* Owner = me->ToTempSummon()->GetSummoner())
@@ -3880,10 +3880,10 @@ public:
 
         void UpdateAI (const uint32 diff)
         {
-			if (!UpdateVictim())
-				return;
+            if (!UpdateVictim())
+                return;
 
-			DoMeleeAttackIfReady();
+            DoMeleeAttackIfReady();
         }
     };
 
@@ -3926,14 +3926,14 @@ void AddSC_npcs_special()
     new npc_firework();
     new npc_spring_rabbit();
     new npc_generic_harpoon_cannon();
-	new npc_power_word_barrier();
-	new npc_flame_orb();
-	new npc_frostfire_orb();
-	new npc_hand_of_guldan();
-	new npc_doom_guard();
-	new npc_ring_of_frost();
+    new npc_power_word_barrier();
+    new npc_flame_orb();
+    new npc_frostfire_orb();
+    new npc_hand_of_guldan();
+    new npc_doom_guard();
+    new npc_ring_of_frost();
     new npc_shadowy_apparition();
-	new npc_guardian_of_ancient_kings();
-	new npc_bloodworm();
-	new npc_dancing_rune_weapon();
+    new npc_guardian_of_ancient_kings();
+    new npc_bloodworm();
+    new npc_dancing_rune_weapon();
 }

@@ -101,7 +101,7 @@ public:
             target->SendMovementSetCanFly(true);
         else if (strncmp(args, "off", 4) == 0)
             target->SendMovementSetCanFly(false);
-		
+
         handler->PSendSysMessage(LANG_COMMAND_FLYMODE_STATUS, handler->GetNameLink(target).c_str(), args);
         return true;
     }

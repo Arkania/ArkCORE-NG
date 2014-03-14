@@ -723,9 +723,9 @@ class Creature : public Unit, public GridObject<Creature>, public MapCreature
         void FarTeleportTo(Map* map, float X, float Y, float Z, float O);
 
         bool m_isTempWorldObject; //true when possessed
-		
+
         void SetSeerGUID(uint64 guid) { uiSeerGUID = guid; }
-        uint64 GetSeerGUID() const { return uiSeerGUID; }		
+        uint64 GetSeerGUID() const { return uiSeerGUID; }
 
     protected:
         bool CreateFromProto(uint32 guidlow, uint32 Entry, uint32 vehId, uint32 team, const CreatureData* data = NULL);
@@ -775,7 +775,7 @@ class Creature : public Unit, public GridObject<Creature>, public MapCreature
 
         bool IsInvisibleDueToDespawn() const;
         bool CanAlwaysSee(WorldObject const* obj) const;
-		uint64 uiSeerGUID;
+        uint64 uiSeerGUID;
     private:
         void ForcedDespawn(uint32 timeMSToDespawn = 0);
 

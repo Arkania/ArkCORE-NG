@@ -140,8 +140,8 @@ class boss_erunak_stonespeaker : public CreatureScript
                     if (me->GetCurrentSpell(CURRENT_GENERIC_SPELL)->m_spellInfo->Id == SPELL_LAVA_BOLT
                         || me->GetCurrentSpell(CURRENT_GENERIC_SPELL)->m_spellInfo->Id == SPELL_LAVA_BOLT_H)
                         for (uint8 i = 0; i < 3; ++i)
-						    if (spell->Effects[i].Effect == SPELL_EFFECT_INTERRUPT_CAST)
-							    me->InterruptSpell(CURRENT_GENERIC_SPELL);
+                            if (spell->Effects[i].Effect == SPELL_EFFECT_INTERRUPT_CAST)
+                                me->InterruptSpell(CURRENT_GENERIC_SPELL);
             }
 
             void EnterCombat(Unit* /*who*/)
@@ -319,7 +319,7 @@ class boss_mindbender_ghursha : public CreatureScript
                         events.ScheduleEvent(EVENT_UNRELENTING_AGONY, 30000);
                         break;
                     }
-                }		
+                }
                 DoMeleeAttackIfReady();
             }
 

@@ -730,7 +730,7 @@ void Battleground::YellToAll(Creature* creature, const char* text, uint32 langua
 
 void Battleground::RewardHonorToTeam(uint32 Honor, uint32 TeamID)
 {
-	Honor=Honor/10;
+    Honor=Honor/10;
     for (BattlegroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
         if (Player* player = _GetPlayerForTeam(TeamID, itr, "RewardHonorToTeam"))
             UpdatePlayerScore(player, SCORE_BONUS_HONOR, Honor);
@@ -895,9 +895,9 @@ void Battleground::EndBattleground(uint32 winner)
             if (team == winner)
             {
                 // Modify the guild reputation and xp - 62 rep on win, 27.9k guild xp. Only if group is guild group.
-			    if (Guild* guild = sGuildMgr->GetGuildById(player->GetGuildId()))
+                if (Guild* guild = sGuildMgr->GetGuildById(player->GetGuildId()))
                     if(player->GetGroup()->IsGuildGroup())
-	            {
+                {
                     uint32 guildXP = uint32(27900);
                     uint32 guildRep = uint32(guildXP / 450);
                     guild->GiveXP(guildXP, player);
@@ -907,7 +907,7 @@ void Battleground::EndBattleground(uint32 winner)
                 // update achievement BEFORE personal rating update
                 uint32 rating = player->GetArenaPersonalRating(winner_arena_team->GetSlot());
                 player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_RATED_ARENA, rating ? rating : 1);
-				player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_ARENA, GetMapId());
+                player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_ARENA, GetMapId());
                 winner_arena_team->MemberWon(player, loser_matchmaker_rating, winner_matchmaker_change);
                 player->ModifyCurrency(CURRENCY_TYPE_CONQUEST_META_ARENA, 150); // 150 arena points on win.
             }
@@ -944,9 +944,9 @@ void Battleground::EndBattleground(uint32 winner)
                 player->ModifyCurrency(CURRENCY_TYPE_CONQUEST_META_BG, BG_REWARD_WINNER_CONQUEST_LAST );
 
             // Modify the guild reputation and xp - 167 rep on win, 75k guild xp. Only if group is guild group.
-			if (Guild* guild = sGuildMgr->GetGuildById(player->GetGuildId()))
+            if (Guild* guild = sGuildMgr->GetGuildById(player->GetGuildId()))
                 if(player->GetGroup()->IsGuildGroup())
-	        {
+            {
                 uint32 guildXP = uint32(75150);
                 uint32 guildRep = uint32(guildXP / 450);
                 guild->GiveXP(guildXP, player);
@@ -1258,7 +1258,7 @@ void Battleground::AddPlayer(Player* player)
         if (GetStatus() == STATUS_WAIT_JOIN)                 // not started yet
         {
             player->CastSpell(player, SPELL_PREPARATION, true);   // reduces all mana cost of spells.
- 	
+     
             int32 countdownMaxForBGType = isArena() ? ARENA_COUNTDOWN_MAX : BATTLEGROUND_COUNTDOWN_MAX;
             WorldPacket data(SMSG_START_TIMER, 4+4+4);
             data << uint32(0); // unk

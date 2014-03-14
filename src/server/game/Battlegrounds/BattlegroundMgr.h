@@ -53,7 +53,7 @@ struct CreateBattlegroundData
     float StartMaxDist;
     uint32 scriptId;
 
-	ArenaType arenaType;
+    ArenaType arenaType;
 };
 
 class BattlegroundMgr

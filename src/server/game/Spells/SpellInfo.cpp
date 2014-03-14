@@ -974,23 +974,23 @@ float SpellEffectInfo::CalcRadius(bool positive, Unit* caster, Spell* spell) con
             return 8.0f;
           case 100734: // Alysrazor fiery tornado
             return 10.0f;
-		  case 98226: // Rhyolite indicator
-		    return 200.0f;
-		  case 97230: // Rhyolite magma line
-		    return 1.0f;
-		  case 97234: // Rhyolite magma line
-		    return 2.0f;
-		  case 98934: // Bethilac aoe damage on web
-		    return 300.0f;
-		  case 99333: // Bethilac venom rain
-		    return 500.0f;
-		  case 98471: // Bethilac burning acid
-		  case 100826:
-		  case 100827:
-		  case 100828:
-		    return 200.0f;
-		  case 99076: // Bethilac metheor
-		    return 7.0f;
+          case 98226: // Rhyolite indicator
+            return 200.0f;
+          case 97230: // Rhyolite magma line
+            return 1.0f;
+          case 97234: // Rhyolite magma line
+            return 2.0f;
+          case 98934: // Bethilac aoe damage on web
+            return 300.0f;
+          case 99333: // Bethilac venom rain
+            return 500.0f;
+          case 98471: // Bethilac burning acid
+          case 100826:
+          case 100827:
+          case 100828:
+            return 200.0f;
+          case 99076: // Bethilac metheor
+            return 7.0f;
 
           // End Time
           case 101810: // Jaina Frostbolt Volley

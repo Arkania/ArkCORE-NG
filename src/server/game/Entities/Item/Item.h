@@ -324,11 +324,11 @@ class Item : public Object
 
         bool hasQuest(uint32 quest_id) const { return GetTemplate()->StartQuest == quest_id; }
         bool hasInvolvedQuest(uint32 /*quest_id*/) const { return false; }
-		bool HasStats() const;
+        bool HasStats() const;
         bool IsPotion() const { return GetTemplate()->IsPotion(); }
         bool IsVellum() const { return GetTemplate()->IsVellum(); }
         bool IsConjuredConsumable() const { return GetTemplate()->IsConjuredConsumable(); }
-		bool IsRangedWeapon() const { return GetTemplate()->IsRangedWeapon(); }
+        bool IsRangedWeapon() const { return GetTemplate()->IsRangedWeapon(); }
 
         // Item Refund system
         void SetNotRefundable(Player* owner, bool changestate = true, SQLTransaction* trans = NULL);
@@ -351,7 +351,7 @@ class Item : public Object
         void BuildUpdate(UpdateDataMapType&);
 
         uint32 GetScriptId() const { return GetTemplate()->ScriptId; }
-		
+
         bool CanBeTransmogrified() const;
         bool CanTransmogrify() const;
         static bool CanTransmogrifyItemWithItem(Item const* transmogrified, Item const* transmogrifier);
@@ -364,11 +364,11 @@ class Item : public Object
                 return transmogrification;
             return GetEntry();
         }
-		
-		static uint32 GetSellPrice(ItemTemplate const* proto, bool& success);
-		
+
+        static uint32 GetSellPrice(ItemTemplate const* proto, bool& success);
+
         int32 GetReforgableStat(ItemModType statType) const;
-		
+
     private:
         std::string m_text;
         uint8 m_slot;

@@ -367,7 +367,7 @@ void AddSC_instance_zulfarrak();            //Zul'Farrak instance script
 void AddSC_instance_dire_maul();
 void AddSC_boss_ptah();
 void AddSC_elementaires_sdo();  // french
-void AddSC_npc_trash_sdo();		// french
+void AddSC_npc_trash_sdo();        // french
 void AddSC_instance_maraudon();
 void AddSC_boss_tuten_kash();
 void AddSC_boss_mordresh_fire_eye();
@@ -1023,22 +1023,22 @@ void AddEasternKingdomsScripts()
     AddSC_western_plaguelands();
     AddSC_westfall();
     AddSC_wetlands();
-	AddSC_boss_pit_lord_argaloth();
-	AddSC_instance_baradin_hold();
-	AddSC_boss_assembly_of_ascendents();
-	AddSC_boss_ascendant_lord_obsidius();
-	AddSC_boss_beauty();
-	AddSC_boss_corla_herald_of_twilight();
-	AddSC_boss_karsh_steelbender();
-	AddSC_boss_romogg_bonecrusher();
-	AddSC_instance_blackrock_caverns();
-	AddSC_boss_gizrul_the_slavener();
-	AddSC_boss_urok_doomhowl();
-	AddSC_boss_lord_valthalak();
-	AddSC_boss_kirtonos_the_herald();
-	AddSC_instance_the_stockade();
-	AddSC_coldridge_valley();
-	AddSC_elwynn_forest();
+    AddSC_boss_pit_lord_argaloth();
+    AddSC_instance_baradin_hold();
+    AddSC_boss_assembly_of_ascendents();
+    AddSC_boss_ascendant_lord_obsidius();
+    AddSC_boss_beauty();
+    AddSC_boss_corla_herald_of_twilight();
+    AddSC_boss_karsh_steelbender();
+    AddSC_boss_romogg_bonecrusher();
+    AddSC_instance_blackrock_caverns();
+    AddSC_boss_gizrul_the_slavener();
+    AddSC_boss_urok_doomhowl();
+    AddSC_boss_lord_valthalak();
+    AddSC_boss_kirtonos_the_herald();
+    AddSC_instance_the_stockade();
+    AddSC_coldridge_valley();
+    AddSC_elwynn_forest();
 
 
 
@@ -1128,21 +1128,21 @@ void AddKalimdorScripts()
     AddSC_instance_wailing_caverns();
     AddSC_zulfarrak();                      //Zul'Farrak generic
     AddSC_instance_zulfarrak();             //Zul'Farrak instance script
-	AddSC_instance_dire_maul();
-	AddSC_boss_ptah();
-	AddSC_elementaires_sdo();   
-	AddSC_npc_trash_sdo();
-	AddSC_instance_maraudon();
-	AddSC_boss_tuten_kash();
-	AddSC_boss_mordresh_fire_eye();
-	AddSC_boss_glutton();
-	AddSC_boss_zum_rah();
-	AddSC_zone_tolbarad_peninsula();
-	AddSC_zone_tolbarad();
-	AddSC_zone_the_maelstrom();
-	AddSC_zone_lost_isles();
-	AddSC_zone_deepholm();
-	AddSC_zone_darkmoon_island();
+    AddSC_instance_dire_maul();
+    AddSC_boss_ptah();
+    AddSC_elementaires_sdo();   
+    AddSC_npc_trash_sdo();
+    AddSC_instance_maraudon();
+    AddSC_boss_tuten_kash();
+    AddSC_boss_mordresh_fire_eye();
+    AddSC_boss_glutton();
+    AddSC_boss_zum_rah();
+    AddSC_zone_tolbarad_peninsula();
+    AddSC_zone_tolbarad();
+    AddSC_zone_the_maelstrom();
+    AddSC_zone_lost_isles();
+    AddSC_zone_deepholm();
+    AddSC_zone_darkmoon_island();
 
     // Cataclysm scripts here
     
@@ -1190,14 +1190,14 @@ void AddKalimdorScripts()
     AddSC_boss_ascendant_council();
     AddSC_boss_chogall();
     AddSC_boss_sinestra();
-	
+
     AddSC_instance_throne_of_the_tides(); // Throne of the Tides
     AddSC_throne_of_the_tides();
     AddSC_boss_lady_nazjar();
     AddSC_boss_commander_ulthok();
     AddSC_boss_erunak_stonespeaker();
     AddSC_boss_ozumat();
-	
+
     AddSC_instance_grim_batol(); // Grim Batol
     AddSC_grim_batol();
     AddSC_boss_general_umbriss();
@@ -1219,7 +1219,7 @@ void AddKalimdorScripts()
     AddSC_boss_general_husam();
     AddSC_boss_lockmaw_augh();
     AddSC_boss_high_prophet_barim();
-    AddSC_boss_siamat();	
+    AddSC_boss_siamat();
 
     //Kalimdor zones
     AddSC_ashenvale();

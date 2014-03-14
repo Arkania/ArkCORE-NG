@@ -73,7 +73,7 @@ public:
         void OnPlayerEnter(Player* pPlayer)
         {
             if (!uiTeamInInstance)
-				uiTeamInInstance = pPlayer->GetTeam();
+                uiTeamInInstance = pPlayer->GetTeam();
         }
 
         void OnCreatureCreate(Creature* pCreature)
@@ -190,17 +190,17 @@ public:
         }
 
         void OnGameObjectRemove(GameObject* pGo)
-		{
-			switch (pGo->GetEntry())
-			{
-			case GO_LADY_NAZJAR_DOOR:
-			case GO_COMMANDER_ULTHOK_DOOR:
-			case GO_ERUNAK_STONESPEAKER_DOOR:
-			case GO_OZUMAT_DOOR:
-				AddDoor(pGo, false);
-				break;
-			}
-		}
+        {
+            switch (pGo->GetEntry())
+            {
+            case GO_LADY_NAZJAR_DOOR:
+            case GO_COMMANDER_ULTHOK_DOOR:
+            case GO_ERUNAK_STONESPEAKER_DOOR:
+            case GO_OZUMAT_DOOR:
+                AddDoor(pGo, false);
+                break;
+            }
+        }
 
         void SetData(uint32 type, uint32 data)
         {
@@ -259,14 +259,14 @@ public:
 
         bool SetBossState(uint32 type, EncounterState state)
         {
-			if (!InstanceScript::SetBossState(type, state))
-				return false;
+            if (!InstanceScript::SetBossState(type, state))
+                return false;
 
-			switch (type)
-			{
-			case DATA_LADY_NAZJAR:
-				break;
-			case DATA_COMMANDER_ULTHOK:
+            switch (type)
+            {
+            case DATA_LADY_NAZJAR:
+                break;
+            case DATA_COMMANDER_ULTHOK:
                 if (state == DONE)
                 {
                     if (GameObject* pTentacleRight = instance->GetGameObject(uiTentacleRightGUID))
@@ -278,15 +278,15 @@ public:
                     if (GameObject* pInvisibleDoor2 = instance->GetGameObject(uiInvisibleDoor2GUID))
                         pInvisibleDoor2->SetPhaseMask(2, true);
                 }
-				break;
-			case DATA_MINDBENDER_GHURSHA:
-				break;
-			case DATA_OZUMAT:
+                break;
+            case DATA_MINDBENDER_GHURSHA:
+                break;
+            case DATA_OZUMAT:
                 if (state == DONE)
                     DoRespawnGameObject(uiNeptulonCache, DAY);
-				break;
+                break;
              }
-			return true;
+            return true;
         }
 
         std::string GetSaveData()
@@ -322,19 +322,19 @@ public:
             if (dataHead1 == 'T' && dataHead2 == 'o' && dataHead3 == 't' && dataHead4 == 'T')
             {
                 for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
-				{
-					uint32 tmpState;
-					loadStream >> tmpState;
-					if (tmpState == IN_PROGRESS || tmpState > SPECIAL)
-						tmpState = NOT_STARTED;
-					SetBossState(i, EncounterState(tmpState));
-				}
+                {
+                    uint32 tmpState;
+                    loadStream >> tmpState;
+                    if (tmpState == IN_PROGRESS || tmpState > SPECIAL)
+                        tmpState = NOT_STARTED;
+                    SetBossState(i, EncounterState(tmpState));
+                }
                 for (uint8 i = 0; i < 3; ++i)
                 {
                     uint32 tmpEvent;
                     loadStream >> tmpEvent;
                     if (tmpEvent == IN_PROGRESS || tmpEvent > SPECIAL)
-						tmpEvent = NOT_STARTED;
+                        tmpEvent = NOT_STARTED;
                     m_uiEvents[i] = tmpEvent;
                 }
 

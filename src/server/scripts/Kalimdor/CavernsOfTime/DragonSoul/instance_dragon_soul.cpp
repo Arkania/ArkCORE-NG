@@ -41,11 +41,11 @@ public:
         uint64 YseraGUID;
         uint64 NozdormuGUID;
         uint64 Trall_Vs_UltraxionGUID;
-		uint64 DeathwingGUID;
-		uint64 arm_tentacle_1;
-		uint64 arm_tentacle_2;
-		uint64 wing_tentacle_1;
-		uint64 wing_tentacle_2;
+        uint64 DeathwingGUID;
+        uint64 arm_tentacle_1;
+        uint64 arm_tentacle_2;
+        uint64 wing_tentacle_1;
+        uint64 wing_tentacle_2;
 
         void Initialize()
         {
@@ -130,82 +130,82 @@ public:
                 break;
             case NPC_MAELSTROM_ALEXSTRASZA: 
                 Maelstrom_alexstrasza = creature->GetGUID(); 
-				break;
-			case NPC_DEATHWING_1:
-				DeathwingGUID = creature->GetGUID();
                 break;
-			case NPC_ARM_TENTACLE_1:
-				arm_tentacle_1 = creature->GetGUID();
+            case NPC_DEATHWING_1:
+                DeathwingGUID = creature->GetGUID();
                 break;
-			case NPC_ARM_TENTACLE_2:
-				arm_tentacle_2 = creature->GetGUID();
+            case NPC_ARM_TENTACLE_1:
+                arm_tentacle_1 = creature->GetGUID();
                 break;
-			case NPC_WING_TENTACLE_1:
-				wing_tentacle_1 = creature->GetGUID();
+            case NPC_ARM_TENTACLE_2:
+                arm_tentacle_2 = creature->GetGUID();
                 break;
-			case NPC_WING_TENTACLE_2:
-				wing_tentacle_2 = creature->GetGUID();
+            case NPC_WING_TENTACLE_1:
+                wing_tentacle_1 = creature->GetGUID();
+                break;
+            case NPC_WING_TENTACLE_2:
+                wing_tentacle_2 = creature->GetGUID();
                 break;
             }
         }
 
-		void SetData(uint32 type, uint32 data)
-		{
-			switch (type)
-			{
-			case DATA_DAMAGE_DEATHWING:
-				if(data == DONE)
-					if(Creature* creature = instance->GetCreature(DeathwingGUID))
-						creature->CastSpell(creature, 106548);
-				SaveToDB();
-				break;
-			case DATA_ATTACK_DEATHWING:
-			{
-				switch (data)
-				{
-				case IN_PROGRESS:
-					if(Creature* creature = instance->GetCreature(arm_tentacle_1))
-					{
-						creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-						creature->SetVisible(true);
-					}
-					if(Creature* creature = instance->GetCreature(arm_tentacle_2))
-					{
-						creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-						creature->SetVisible(true);
-					}
-					if(Creature* creature = instance->GetCreature(wing_tentacle_1))
-					{
-						creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-						creature->SetVisible(true);
-					}
-					if(Creature* creature = instance->GetCreature(wing_tentacle_2))
-					{
-						creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-						creature->SetVisible(true);
-					}
-					break;
-				}
-				SaveToDB();
-				break;
-			}
-			default:
-				break;
-			}
-		}
+        void SetData(uint32 type, uint32 data)
+        {
+            switch (type)
+            {
+            case DATA_DAMAGE_DEATHWING:
+                if(data == DONE)
+                    if(Creature* creature = instance->GetCreature(DeathwingGUID))
+                        creature->CastSpell(creature, 106548);
+                SaveToDB();
+                break;
+            case DATA_ATTACK_DEATHWING:
+            {
+                switch (data)
+                {
+                case IN_PROGRESS:
+                    if(Creature* creature = instance->GetCreature(arm_tentacle_1))
+                    {
+                        creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                        creature->SetVisible(true);
+                    }
+                    if(Creature* creature = instance->GetCreature(arm_tentacle_2))
+                    {
+                        creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                        creature->SetVisible(true);
+                    }
+                    if(Creature* creature = instance->GetCreature(wing_tentacle_1))
+                    {
+                        creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                        creature->SetVisible(true);
+                    }
+                    if(Creature* creature = instance->GetCreature(wing_tentacle_2))
+                    {
+                        creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                        creature->SetVisible(true);
+                    }
+                    break;
+                }
+                SaveToDB();
+                break;
+            }
+            default:
+                break;
+            }
+        }
 
-		uint64 GetData64 (uint32 identifier) const
-		{
-			switch (identifier)
-			{
-				case NPC_MAELSTROM_TRALL:
-					return Maelstrom_trall;
-				case NPC_DEATHWING_1:
-					return DeathwingGUID;
-			}
+        uint64 GetData64 (uint32 identifier) const
+        {
+            switch (identifier)
+            {
+                case NPC_MAELSTROM_TRALL:
+                    return Maelstrom_trall;
+                case NPC_DEATHWING_1:
+                    return DeathwingGUID;
+            }
 
-			return 0;
-		}
+            return 0;
+        }
 
         bool SetBossState(uint32 type, EncounterState state)
         {
@@ -219,8 +219,8 @@ public:
                 case BOSS_UNSLEEPING:
                 case BOSS_HAGARA:
                 case BOSS_WARMASTER:
-				case BOSS_DEATHWING:
-					break;
+                case BOSS_DEATHWING:
+                    break;
                 case BOSS_ULTRAXION:
                     if(state == DONE)
                         if(Creature* creature = instance->GetCreature(Trall_Vs_UltraxionGUID))

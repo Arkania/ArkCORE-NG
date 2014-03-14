@@ -1234,7 +1234,7 @@ void World::LoadConfigSettings(bool reload)
 
     //Aura Livers
      m_bool_configs[CONFIG_LIVERS_AURA_ENABLE] = ConfigMgr::GetBoolDefault("Livers.Aura.Enable", true);
-	
+
     // call ScriptMgr if we're reloading the configuration
     m_bool_configs[CONFIG_WINTERGRASP_ENABLE] = ConfigMgr::GetBoolDefault("Wintergrasp.Enable", false);
     m_int_configs[CONFIG_WINTERGRASP_PLR_MAX] = ConfigMgr::GetIntDefault("Wintergrasp.PlayerMax", 100);

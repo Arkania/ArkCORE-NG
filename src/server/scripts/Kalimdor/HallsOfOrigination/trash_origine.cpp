@@ -20,45 +20,45 @@ class npc_lancelombre_du_temple : public CreatureScript
 {
 public:
        npc_lancelombre_du_temple() : CreatureScript("npc_lancelombre_du_temple") {}
-	   
-	   struct npc_lancelombre_du_templeAI : public ScriptedAI
-	   {
-	      npc_lancelombre_du_templeAI(Creature *c) : ScriptedAI(c) {}
-		  
-		  uint32 lance_de_lombre;
-		  uint32 pacte_des_tenebres;
-		  
-		  void Reset()
-		  {
-		  lance_de_lombre = 20000;
-		  pacte_des_tenebres = 25000;
-		  }
-		  
-		  void UpdateAI(const uint32 diff)
-		  {
-		    if (!UpdateVictim())
+       
+       struct npc_lancelombre_du_templeAI : public ScriptedAI
+       {
+          npc_lancelombre_du_templeAI(Creature *c) : ScriptedAI(c) {}
+          
+          uint32 lance_de_lombre;
+          uint32 pacte_des_tenebres;
+          
+          void Reset()
+          {
+          lance_de_lombre = 20000;
+          pacte_des_tenebres = 25000;
+          }
+          
+          void UpdateAI(const uint32 diff)
+          {
+            if (!UpdateVictim())
             return;
-			
-			if (lance_de_lombre<= diff)
-			{
-			DoCast(me, spell_lance_de_lombre);
-			lance_de_lombre = 20000;
-			} else lance_de_lombre -= diff;
-			
-			if (pacte_des_tenebres<= diff)
-			{
-			DoCast(me, spell_pacte_des_tenebres);
-			pacte_des_tenebres = 25000;
-			} else pacte_des_tenebres -= diff;
-			
-			DoMeleeAttackIfReady();
+            
+            if (lance_de_lombre<= diff)
+            {
+            DoCast(me, spell_lance_de_lombre);
+            lance_de_lombre = 20000;
+            } else lance_de_lombre -= diff;
+            
+            if (pacte_des_tenebres<= diff)
+            {
+            DoCast(me, spell_pacte_des_tenebres);
+            pacte_des_tenebres = 25000;
+            } else pacte_des_tenebres -= diff;
+            
+            DoMeleeAttackIfReady();
           }
        };
-	   
-	  CreatureAI* GetAI(Creature* pCreature) const
+       
+      CreatureAI* GetAI(Creature* pCreature) const
       {
            return new npc_lancelombre_du_templeAI(pCreature);
-	  }
+      }
 };
 
 /**************************
@@ -73,56 +73,56 @@ class npc_traqueur_veloce_du_temple : public CreatureScript
 {
 public:
       npc_traqueur_veloce_du_temple() : CreatureScript("npc_traqueur_veloce_du_temple") {}
-	  
-	  struct npc_traqueur_veloce_du_templeAI : public ScriptedAI
+      
+      struct npc_traqueur_veloce_du_templeAI : public ScriptedAI
       {
          npc_traqueur_veloce_du_templeAI(Creature *c) : ScriptedAI(c) {}
 
-		 uint32 fleches_multiples;
-		 uint32 tir;
-		 uint32 tir_charge;
-		 
-		 void Reset()
-		 {
-		 fleches_multiples = 12000;
-		 tir = 2500;
-		 tir_charge = 19000;
-		 }
-		 
-		 void UpdateAI(const uint32 diff)
-		 {
-		    if (!UpdateVictim())
+         uint32 fleches_multiples;
+         uint32 tir;
+         uint32 tir_charge;
+         
+         void Reset()
+         {
+         fleches_multiples = 12000;
+         tir = 2500;
+         tir_charge = 19000;
+         }
+         
+         void UpdateAI(const uint32 diff)
+         {
+            if (!UpdateVictim())
             return;
-			
-			if (fleches_multiples<= diff)
-			{
-			if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 10.0f, true))
-			DoCast(target, spell_fleches_multiples);
-			fleches_multiples = 12000;
-			} else fleches_multiples -= diff;
-			
-			if (tir<= diff)
-			{
-			DoCast(me->GetVictim(), spell_tir);
-			tir = 2500;
-			} else tir -= diff;
-			
-			if (tir_charge<= diff)
-			{
-			if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+            
+            if (fleches_multiples<= diff)
+            {
+            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 10.0f, true))
+            DoCast(target, spell_fleches_multiples);
+            fleches_multiples = 12000;
+            } else fleches_multiples -= diff;
+            
+            if (tir<= diff)
+            {
+            DoCast(me->GetVictim(), spell_tir);
+            tir = 2500;
+            } else tir -= diff;
+            
+            if (tir_charge<= diff)
+            {
+            if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
             DoCast(pTarget, spell_tir_charge);
-			tir_charge = 19000;
-			} else tir_charge -= diff;
-			
-			 DoMeleeAttackIfReady();
+            tir_charge = 19000;
+            } else tir_charge -= diff;
+            
+             DoMeleeAttackIfReady();
          }
       };
-	  
-	  CreatureAI* GetAI(Creature* pCreature) const
+      
+      CreatureAI* GetAI(Creature* pCreature) const
       {
            return new npc_traqueur_veloce_du_templeAI(pCreature);
-	  }	   
-};	  
+      }       
+};      
 
 /***************************
 **Lanceur de Runes du Temple
@@ -135,45 +135,45 @@ class npc_lanceur_de_runes_du_temple : public CreatureScript
 {
 public:
       npc_lanceur_de_runes_du_temple() : CreatureScript("npc_lanceur_de_runes_du_temple") {}
-	  
-	  struct npc_lanceur_de_runes_du_templeAI : public ScriptedAI
-	  {
-	     npc_lanceur_de_runes_du_templeAI(Creature *c) : ScriptedAI(c) {}
-		 
-		 uint32 enchainement_runique;
-		 uint32 malediction_du_lanceur_de_runes;
-		 
-		 void Reset()
-		 {
-		 enchainement_runique = 10000;
-		 malediction_du_lanceur_de_runes = 15000;
-		 }
-		 
-		 void UpdateAI(const uint32 diff)
-		 {
-		    if (!UpdateVictim())
+      
+      struct npc_lanceur_de_runes_du_templeAI : public ScriptedAI
+      {
+         npc_lanceur_de_runes_du_templeAI(Creature *c) : ScriptedAI(c) {}
+         
+         uint32 enchainement_runique;
+         uint32 malediction_du_lanceur_de_runes;
+         
+         void Reset()
+         {
+         enchainement_runique = 10000;
+         malediction_du_lanceur_de_runes = 15000;
+         }
+         
+         void UpdateAI(const uint32 diff)
+         {
+            if (!UpdateVictim())
             return;
-			
-			if (enchainement_runique<= diff)
-			{
-			DoCast(me->GetVictim(), spell_enchainement_runique);
-			enchainement_runique = 10000;
-			} else enchainement_runique -= diff;
-			
-			if (malediction_du_lanceur_de_runes<= diff)
-			{
-			DoCast(SelectTarget(SELECT_TARGET_RANDOM,0,100,true), spell_malediction_du_lanceur_de_runes);
-			malediction_du_lanceur_de_runes = 15000;
-			} else malediction_du_lanceur_de_runes -= diff;
-			
-			DoMeleeAttackIfReady();
+            
+            if (enchainement_runique<= diff)
+            {
+            DoCast(me->GetVictim(), spell_enchainement_runique);
+            enchainement_runique = 10000;
+            } else enchainement_runique -= diff;
+            
+            if (malediction_du_lanceur_de_runes<= diff)
+            {
+            DoCast(SelectTarget(SELECT_TARGET_RANDOM,0,100,true), spell_malediction_du_lanceur_de_runes);
+            malediction_du_lanceur_de_runes = 15000;
+            } else malediction_du_lanceur_de_runes -= diff;
+            
+            DoMeleeAttackIfReady();
          }
       };
-	  
-	  CreatureAI* GetAI(Creature* pCreature) const
+      
+      CreatureAI* GetAI(Creature* pCreature) const
       {
            return new npc_lanceur_de_runes_du_templeAI(pCreature);
-	  }
+      }
 };
 
 /*********************
@@ -189,63 +189,63 @@ class npc_sculptefeu_du_temple : public CreatureScript
 {
 public:
       npc_sculptefeu_du_temple() : CreatureScript("npc_sculptefeu_du_temple") {}
-	  
-	  struct npc_sculptefeu_du_templeAI : public ScriptedAI
-	  {
-	     npc_sculptefeu_du_templeAI(Creature *c) : ScriptedAI(c) {}
-		 
-		 uint32 barriere_de_la_fournaise;
-		 uint32 boule_de_feu;
-		 uint32 eruption_flamboyante;
-		 uint32 meteore;
-		 
-		 void Reset()
-		 {
-		 barriere_de_la_fournaise = 45000;
-		 boule_de_feu = 4000;
-		 eruption_flamboyante = 60000;
-		 meteore = 30000;
-		 }
-		 
-		 void UpdateAI(const uint32 diff)
-		 {
-		    if (!UpdateVictim())
+      
+      struct npc_sculptefeu_du_templeAI : public ScriptedAI
+      {
+         npc_sculptefeu_du_templeAI(Creature *c) : ScriptedAI(c) {}
+         
+         uint32 barriere_de_la_fournaise;
+         uint32 boule_de_feu;
+         uint32 eruption_flamboyante;
+         uint32 meteore;
+         
+         void Reset()
+         {
+         barriere_de_la_fournaise = 45000;
+         boule_de_feu = 4000;
+         eruption_flamboyante = 60000;
+         meteore = 30000;
+         }
+         
+         void UpdateAI(const uint32 diff)
+         {
+            if (!UpdateVictim())
             return;
-			
-			if (barriere_de_la_fournaise<= diff)
-			{
-			DoCast(me, spell_barriere_de_la_fournaise);
-			barriere_de_la_fournaise = 45000;
-			} else barriere_de_la_fournaise -= diff;
-			
-			if (boule_de_feu<= diff)
-			{
-			DoCast(me->GetVictim(), spell_boule_de_feu);
-			boule_de_feu = 4000;
-			} else boule_de_feu -= diff;
-			
-			if (eruption_flamboyante<= diff)
-			{
-			DoCast(me, spell_eruption_flamboyante);
-			eruption_flamboyante = 60000;
-			} else eruption_flamboyante -= diff;
-			
-			if (meteore<= diff)
-			{
-			if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 10.0f, true))
-			DoCast(target, spell_meteore);
-			meteore = 30000;
-			} else meteore -= diff;
-			
-			DoMeleeAttackIfReady();
+            
+            if (barriere_de_la_fournaise<= diff)
+            {
+            DoCast(me, spell_barriere_de_la_fournaise);
+            barriere_de_la_fournaise = 45000;
+            } else barriere_de_la_fournaise -= diff;
+            
+            if (boule_de_feu<= diff)
+            {
+            DoCast(me->GetVictim(), spell_boule_de_feu);
+            boule_de_feu = 4000;
+            } else boule_de_feu -= diff;
+            
+            if (eruption_flamboyante<= diff)
+            {
+            DoCast(me, spell_eruption_flamboyante);
+            eruption_flamboyante = 60000;
+            } else eruption_flamboyante -= diff;
+            
+            if (meteore<= diff)
+            {
+            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 10.0f, true))
+            DoCast(target, spell_meteore);
+            meteore = 30000;
+            } else meteore -= diff;
+            
+            DoMeleeAttackIfReady();
          }
       };
-	
-	CreatureAI* GetAI(Creature* pCreature) const
+    
+    CreatureAI* GetAI(Creature* pCreature) const
     {
            return new npc_sculptefeu_du_templeAI(pCreature);
     }
-	
+    
 };
 
 /*******************
@@ -259,46 +259,46 @@ class npc_scarabee_caustique : public CreatureScript
 {
 public:
       npc_scarabee_caustique() : CreatureScript("npc_scarabee_caustique") {}
-	  
-	  struct npc_scarabee_caustiqueAI : public ScriptedAI
-	  {
-	     npc_scarabee_caustiqueAI(Creature *c) : ScriptedAI(c) {}
-		 
-		 uint32 attaque_a_la_lame_dentelee;
-		 uint32 projection_corrosive;
-		 
-		 void Reset()
-		 {
-		 attaque_a_la_lame_dentelee = 15000;
-		 projection_corrosive = 10000;
-		 }
-		 
-		 void UpdateAI(const uint32 diff)
-		 {
-		    if (!UpdateVictim())
+      
+      struct npc_scarabee_caustiqueAI : public ScriptedAI
+      {
+         npc_scarabee_caustiqueAI(Creature *c) : ScriptedAI(c) {}
+         
+         uint32 attaque_a_la_lame_dentelee;
+         uint32 projection_corrosive;
+         
+         void Reset()
+         {
+         attaque_a_la_lame_dentelee = 15000;
+         projection_corrosive = 10000;
+         }
+         
+         void UpdateAI(const uint32 diff)
+         {
+            if (!UpdateVictim())
             return;
-			
-			if (attaque_a_la_lame_dentelee<= diff)
-			{
-			DoCast(me->GetVictim(), spell_attaque_a_la_lame_dentelee);
-			attaque_a_la_lame_dentelee = 15000;
-			} else attaque_a_la_lame_dentelee -= diff;
-			
-			if (projection_corrosive<= diff)
-			{
-			DoCast(me, spell_projection_corrosive);
-			projection_corrosive = 10000;
-			} else projection_corrosive -= diff;
-			
-			DoMeleeAttackIfReady();
+            
+            if (attaque_a_la_lame_dentelee<= diff)
+            {
+            DoCast(me->GetVictim(), spell_attaque_a_la_lame_dentelee);
+            attaque_a_la_lame_dentelee = 15000;
+            } else attaque_a_la_lame_dentelee -= diff;
+            
+            if (projection_corrosive<= diff)
+            {
+            DoCast(me, spell_projection_corrosive);
+            projection_corrosive = 10000;
+            } else projection_corrosive -= diff;
+            
+            DoMeleeAttackIfReady();
          }
       };
-	
-	CreatureAI* GetAI(Creature* pCreature) const
+    
+    CreatureAI* GetAI(Creature* pCreature) const
     {
             return new npc_scarabee_caustiqueAI(pCreature);
-	}
-	
+    }
+    
 };
 
 /******************
@@ -312,47 +312,47 @@ class npc_glisseur_venimeux : public CreatureScript
 {
 public:
       npc_glisseur_venimeux() : CreatureScript("npc_glisseur_venimeux") {}
-	  
-	  struct npc_glisseur_venimeuxAI : public ScriptedAI
-	  {
-	     npc_glisseur_venimeuxAI(Creature *c) : ScriptedAI(c) {}
-		 
-		 uint32 afflux;
-		 uint32 toxine;
-		 
-		 void Reset()
-		 {
-		 afflux = 15000;
-		 toxine = 10000;
-		 }
-		 
-		 void UpdateAI(const uint32 diff)
-		 {
-		    if (!UpdateVictim())
+      
+      struct npc_glisseur_venimeuxAI : public ScriptedAI
+      {
+         npc_glisseur_venimeuxAI(Creature *c) : ScriptedAI(c) {}
+         
+         uint32 afflux;
+         uint32 toxine;
+         
+         void Reset()
+         {
+         afflux = 15000;
+         toxine = 10000;
+         }
+         
+         void UpdateAI(const uint32 diff)
+         {
+            if (!UpdateVictim())
             return;
-			
-			if (afflux<= diff)
-			{
-			if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 10.0f, true))
-			DoCast(target, spell_afflux);
-			afflux = 15000;
-			} else afflux -= diff;
-			
-			if (toxine<= diff)
-			{
-			DoCast(me->GetVictim(), spell_toxine);
-			toxine = 10000;
-			} else toxine -= diff;
-			
-			DoMeleeAttackIfReady();
+            
+            if (afflux<= diff)
+            {
+            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 10.0f, true))
+            DoCast(target, spell_afflux);
+            afflux = 15000;
+            } else afflux -= diff;
+            
+            if (toxine<= diff)
+            {
+            DoCast(me->GetVictim(), spell_toxine);
+            toxine = 10000;
+            } else toxine -= diff;
+            
+            DoMeleeAttackIfReady();
          }
       };
-	  
-	CreatureAI* GetAI(Creature* pCreature) const
+      
+    CreatureAI* GetAI(Creature* pCreature) const
     {
            return new npc_glisseur_venimeuxAI(pCreature);
     }
-	
+    
 };
 
 /*********************
@@ -365,33 +365,33 @@ class npc_horreur_os_poussiere : public CreatureScript
 {
 public:
       npc_horreur_os_poussiere() : CreatureScript("npc_horreur_os_poussiere") {}
-	  
-	  struct npc_horreur_os_poussiereAI : public ScriptedAI
-	  {
-	     npc_horreur_os_poussiereAI(Creature *c) : ScriptedAI(c) {}
-		 
-		 uint32 choc;
-		 
-		 void Reset()
-		 {
-		 choc = 5000;
-		 }
-		 
-		 void UpdateAI(const uint32 diff)
-		 {
-		    if (!UpdateVictim())
+      
+      struct npc_horreur_os_poussiereAI : public ScriptedAI
+      {
+         npc_horreur_os_poussiereAI(Creature *c) : ScriptedAI(c) {}
+         
+         uint32 choc;
+         
+         void Reset()
+         {
+         choc = 5000;
+         }
+         
+         void UpdateAI(const uint32 diff)
+         {
+            if (!UpdateVictim())
             return;
-			
-			if (choc<= diff)
-			{
-			DoCast(me->GetVictim(), spell_choc);
-			choc = 5000;
-			} else choc -= diff;
-			
-			DoMeleeAttackIfReady();
+            
+            if (choc<= diff)
+            {
+            DoCast(me->GetVictim(), spell_choc);
+            choc = 5000;
+            } else choc -= diff;
+            
+            DoMeleeAttackIfReady();
          }
       };
-	
+    
     CreatureAI* GetAI(Creature* pCreature) const
     {
             return new npc_horreur_os_poussiereAI(pCreature);
@@ -410,47 +410,47 @@ class npc_tourmenteur_os_poussiere : public CreatureScript
 {
 public:
       npc_tourmenteur_os_poussiere() : CreatureScript("npc_tourmenteur_os_poussiere") {}
-	  
-	  struct npc_tourmenteur_os_poussiereAI : public ScriptedAI
-	  {
-	     npc_tourmenteur_os_poussiereAI(Creature *c) : ScriptedAI(c) {}
-		 
-		 uint32 trait_de_lombre;
-		 uint32 malediction_depuisement;
-		 
-		 void Reset()
-		 {
-		 trait_de_lombre = 6000;
-		 malediction_depuisement = 10000;
-		 }
-		 
-		 void UpdateAI(const uint32 diff)
-		 {
-		    if (!UpdateVictim())
+      
+      struct npc_tourmenteur_os_poussiereAI : public ScriptedAI
+      {
+         npc_tourmenteur_os_poussiereAI(Creature *c) : ScriptedAI(c) {}
+         
+         uint32 trait_de_lombre;
+         uint32 malediction_depuisement;
+         
+         void Reset()
+         {
+         trait_de_lombre = 6000;
+         malediction_depuisement = 10000;
+         }
+         
+         void UpdateAI(const uint32 diff)
+         {
+            if (!UpdateVictim())
             return;
-			
-			if (trait_de_lombre<= diff)
-			{
-			DoCast(me->GetVictim(), spell_trait_de_lombre);
-			trait_de_lombre = 6000;
-			} else trait_de_lombre -= diff;
-			
-			if (malediction_depuisement<= diff)
-			{
-			if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+            
+            if (trait_de_lombre<= diff)
+            {
+            DoCast(me->GetVictim(), spell_trait_de_lombre);
+            trait_de_lombre = 6000;
+            } else trait_de_lombre -= diff;
+            
+            if (malediction_depuisement<= diff)
+            {
+            if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
             DoCast(pTarget, spell_malediction_depuisement);
-			malediction_depuisement = 10000;
-			} else malediction_depuisement -= diff;
-			
-			DoMeleeAttackIfReady();
+            malediction_depuisement = 10000;
+            } else malediction_depuisement -= diff;
+            
+            DoMeleeAttackIfReady();
          }
       };
-	  
-	CreatureAI* GetAI(Creature* pCreature) const
+      
+    CreatureAI* GetAI(Creature* pCreature) const
     {
            return new npc_tourmenteur_os_poussiereAI(pCreature);
-	}
-	
+    }
+    
 };
 
 /******************
@@ -464,48 +464,48 @@ class npc_chercheur_du_vide : public CreatureScript
 {
 public: 
      npc_chercheur_du_vide() : CreatureScript("npc_chercheur_du_vide") {}
-	 
-	 struct npc_chercheur_du_videAI : public ScriptedAI
-	 {
-	    npc_chercheur_du_videAI(Creature *c) : ScriptedAI(c) {}
-		
-		uint32 prison_anti_magie;
-		uint32 salve_de_traits_de_lombre;
-		
-		void Reset()
-		{
-		prison_anti_magie = 30000;
-		salve_de_traits_de_lombre = 12000;
-		}
-		
-		void UpdateAI(const uint32 diff)
-		{
-		   if (!UpdateVictim())
+     
+     struct npc_chercheur_du_videAI : public ScriptedAI
+     {
+        npc_chercheur_du_videAI(Creature *c) : ScriptedAI(c) {}
+        
+        uint32 prison_anti_magie;
+        uint32 salve_de_traits_de_lombre;
+        
+        void Reset()
+        {
+        prison_anti_magie = 30000;
+        salve_de_traits_de_lombre = 12000;
+        }
+        
+        void UpdateAI(const uint32 diff)
+        {
+           if (!UpdateVictim())
            return;
-		   
-		   if (prison_anti_magie<= diff)
-		   {
-		   DoCast(SelectTarget(SELECT_TARGET_RANDOM,1,100,true), spell_prison_anti_magie);
-		   prison_anti_magie = 30000;
-		   } else prison_anti_magie -= diff;
-		   
-		   if (salve_de_traits_de_lombre<= diff)
-		   {
-		   DoCast(me, spell_salve_de_traits_de_lombre);
-		   salve_de_traits_de_lombre = 12000;
-		   } else salve_de_traits_de_lombre -= diff;
-		   
-		   DoMeleeAttackIfReady();
+           
+           if (prison_anti_magie<= diff)
+           {
+           DoCast(SelectTarget(SELECT_TARGET_RANDOM,1,100,true), spell_prison_anti_magie);
+           prison_anti_magie = 30000;
+           } else prison_anti_magie -= diff;
+           
+           if (salve_de_traits_de_lombre<= diff)
+           {
+           DoCast(me, spell_salve_de_traits_de_lombre);
+           salve_de_traits_de_lombre = 12000;
+           } else salve_de_traits_de_lombre -= diff;
+           
+           DoMeleeAttackIfReady();
         }
      };
-	
-	CreatureAI* GetAI(Creature* pCreature) const
+    
+    CreatureAI* GetAI(Creature* pCreature) const
     {
           return new npc_chercheur_du_videAI(pCreature);
-	}
-	
+    }
+    
 };
-	
+    
 /*****************
 **Seigneur du Vide
 ******************/
@@ -518,46 +518,46 @@ class npc_seigneur_du_vide : public CreatureScript
 {
 public:
       npc_seigneur_du_vide() : CreatureScript("npc_seigneur_du_vide") {}
-	  
-	  struct npc_seigneur_du_videAI : public ScriptedAI
-	  {
-	     npc_seigneur_du_videAI(Creature *c) : ScriptedAI(c) {}
-		 
-		 uint32 explosion_de_vide;
-		 uint32 salve_de_traits_de_lombre;
-		 
-		 void Reset()
-		 {
-		 explosion_de_vide = 30000;
-		 salve_de_traits_de_lombre = 16000;
-		 }
-		 
-		 void UpdateAI(const uint32 diff)
-		 {
-		    if (!UpdateVictim())
+      
+      struct npc_seigneur_du_videAI : public ScriptedAI
+      {
+         npc_seigneur_du_videAI(Creature *c) : ScriptedAI(c) {}
+         
+         uint32 explosion_de_vide;
+         uint32 salve_de_traits_de_lombre;
+         
+         void Reset()
+         {
+         explosion_de_vide = 30000;
+         salve_de_traits_de_lombre = 16000;
+         }
+         
+         void UpdateAI(const uint32 diff)
+         {
+            if (!UpdateVictim())
             return;
-			
-			if (explosion_de_vide<= diff)
-			{
-			DoCast(me, spell_explosion_de_vide);
-			explosion_de_vide = 30000;
-			} else explosion_de_vide -= diff;
-			
-			if (salve_de_traits_de_lombre<= diff)
-			{
-			DoCast(me, spell_salve_de_traits_de_lombre);
-			salve_de_traits_de_lombre = 16000;
-			} else salve_de_traits_de_lombre -= diff;
-			
-			DoMeleeAttackIfReady();
+            
+            if (explosion_de_vide<= diff)
+            {
+            DoCast(me, spell_explosion_de_vide);
+            explosion_de_vide = 30000;
+            } else explosion_de_vide -= diff;
+            
+            if (salve_de_traits_de_lombre<= diff)
+            {
+            DoCast(me, spell_salve_de_traits_de_lombre);
+            salve_de_traits_de_lombre = 16000;
+            } else salve_de_traits_de_lombre -= diff;
+            
+            DoMeleeAttackIfReady();
          }
       };
-			
-	CreatureAI* GetAI(Creature* pCreature) const
+            
+    CreatureAI* GetAI(Creature* pCreature) const
     {
            return new npc_seigneur_du_videAI(pCreature);
-	}
-	
+    }
+    
 };
 
 /******************
@@ -570,38 +570,38 @@ class npc_anomalie_spatiale : public CreatureScript
 {
 public:
      npc_anomalie_spatiale() : CreatureScript("npc_anomalie_spatiale") {}
-	 
-	 struct npc_anomalie_spatialeAI : public ScriptedAI
-	 {
-	    npc_anomalie_spatialeAI(Creature *c) : ScriptedAI(c) {}
-		
-		uint32 jaillissement_des_arcanes;
-		
-		void Reset()
-		{
-		jaillissement_des_arcanes = 15000;
-		}
-		
-		void UpdateAI(const uint32 diff)
-		{
-		     if (!UpdateVictim())
+     
+     struct npc_anomalie_spatialeAI : public ScriptedAI
+     {
+        npc_anomalie_spatialeAI(Creature *c) : ScriptedAI(c) {}
+        
+        uint32 jaillissement_des_arcanes;
+        
+        void Reset()
+        {
+        jaillissement_des_arcanes = 15000;
+        }
+        
+        void UpdateAI(const uint32 diff)
+        {
+             if (!UpdateVictim())
              return;
-			 
-			 if (jaillissement_des_arcanes<= diff)
-			 {
-			 DoCast(me, spell_jaillissement_des_arcanes);
-			 jaillissement_des_arcanes = 15000;
-			 } else jaillissement_des_arcanes -= diff;
-			 
-			  DoMeleeAttackIfReady();
+             
+             if (jaillissement_des_arcanes<= diff)
+             {
+             DoCast(me, spell_jaillissement_des_arcanes);
+             jaillissement_des_arcanes = 15000;
+             } else jaillissement_des_arcanes -= diff;
+             
+              DoMeleeAttackIfReady();
         }
      };
-	
-	CreatureAI* GetAI(Creature* pCreature) const
+    
+    CreatureAI* GetAI(Creature* pCreature) const
     {
             return new npc_anomalie_spatialeAI(pCreature);
-	}
-		
+    }
+        
 };
 
 /******************
@@ -614,39 +614,39 @@ class npc_animateur_de_flux : public CreatureScript
 {
 public:
      npc_animateur_de_flux() : CreatureScript("npc_animateur_de_flux") {}
-	 
-	 struct npc_animateur_de_fluxAI : public ScriptedAI
-	 {
-	    npc_animateur_de_fluxAI(Creature *c) : ScriptedAI(c) {}
-		
-		uint32 barrage_des_arcanes;
-		
-		void Reset()
-		{
-		barrage_des_arcanes = 8000;
-		}
-		
-		void UpdateAI(const uint32 diff)
-		{
-		   if (!UpdateVictim())
+     
+     struct npc_animateur_de_fluxAI : public ScriptedAI
+     {
+        npc_animateur_de_fluxAI(Creature *c) : ScriptedAI(c) {}
+        
+        uint32 barrage_des_arcanes;
+        
+        void Reset()
+        {
+        barrage_des_arcanes = 8000;
+        }
+        
+        void UpdateAI(const uint32 diff)
+        {
+           if (!UpdateVictim())
            return;
-		   
-		   if (barrage_des_arcanes<= diff)
-		   {
-		   if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+           
+           if (barrage_des_arcanes<= diff)
+           {
+           if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
            DoCast(pTarget, spell_barrage_des_arcanes);
-		   barrage_des_arcanes = 8000;
-		   } else barrage_des_arcanes -= diff;
-		   
-		   DoMeleeAttackIfReady();
+           barrage_des_arcanes = 8000;
+           } else barrage_des_arcanes -= diff;
+           
+           DoMeleeAttackIfReady();
         }
      };
-	 
-	CreatureAI* GetAI(Creature* pCreature) const
+     
+    CreatureAI* GetAI(Creature* pCreature) const
     {
           return new npc_animateur_de_fluxAI(pCreature);
     }
-	
+    
 };
 
 /********************
@@ -661,47 +661,47 @@ class npc_serviteur_solegrace : public CreatureScript
 {
 public :
     npc_serviteur_solegrace() : CreatureScript("npc_serviteur_solegrace") {}
-	  
-	struct npc_serviteur_solegraceAI : public ScriptedAI
-	{
-	    npc_serviteur_solegraceAI(Creature *c) : ScriptedAI(c) {}
-		  
-		uint32 dispersion_des_flammes;
-		uint32 flammes_incendiaires;
-		  
-		void Reset()
-		{
-		dispersion_des_flammes = 15000;
-		flammes_incendiaires = 10000;
-		}
-		  
-		void UpdateAI(const uint32 diff)
-		{
-		      if (!UpdateVictim())
+      
+    struct npc_serviteur_solegraceAI : public ScriptedAI
+    {
+        npc_serviteur_solegraceAI(Creature *c) : ScriptedAI(c) {}
+          
+        uint32 dispersion_des_flammes;
+        uint32 flammes_incendiaires;
+          
+        void Reset()
+        {
+        dispersion_des_flammes = 15000;
+        flammes_incendiaires = 10000;
+        }
+          
+        void UpdateAI(const uint32 diff)
+        {
+              if (!UpdateVictim())
               return;
-			  
-			  if (dispersion_des_flammes<= diff)
-			  {
-			  DoCast(me, dispersion_des_flammes);
-			  dispersion_des_flammes = 15000;
-			  } else dispersion_des_flammes -= diff;
-			  
-			  if (flammes_incendiaires<= diff)
-			  {
-			  if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+              
+              if (dispersion_des_flammes<= diff)
+              {
+              DoCast(me, dispersion_des_flammes);
+              dispersion_des_flammes = 15000;
+              } else dispersion_des_flammes -= diff;
+              
+              if (flammes_incendiaires<= diff)
+              {
+              if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
               DoCast(pTarget, spell_flammes_incendiaires);
-			  flammes_incendiaires = 10000;
-			  } else flammes_incendiaires -= diff;
-			  
-			  DoMeleeAttackIfReady();
+              flammes_incendiaires = 10000;
+              } else flammes_incendiaires -= diff;
+              
+              DoMeleeAttackIfReady();
         }
     };
-	  
-	CreatureAI* GetAI(Creature* pCreature) const
+      
+    CreatureAI* GetAI(Creature* pCreature) const
     {
         return new npc_serviteur_solegraceAI(pCreature);
-	}
-	
+    }
+    
 };
 
 /**************
@@ -717,55 +717,55 @@ class npc_fee_solegrace : public CreatureScript
 {
 public :
     npc_fee_solegrace() : CreatureScript("npc_fee_solegrace") {}
-	  
-	struct npc_fee_solegraceAI : public ScriptedAI
-	{
-	    npc_fee_solegraceAI(Creature *c) : ScriptedAI(c) {}
-		 
-		uint32 pyrogenie;
-		uint32 dispersion_des_flammes;
-		uint32 flammes_incendiaires;
-		 
-		void Reset()
-		{
-		pyrogenie = 30000;
-		dispersion_des_flammes = 20000;
-		flammes_incendiaires = 15000;
-		}
-		 
-		void UpdateAI(const uint32 diff)
-		{
-		    if (!UpdateVictim())
+      
+    struct npc_fee_solegraceAI : public ScriptedAI
+    {
+        npc_fee_solegraceAI(Creature *c) : ScriptedAI(c) {}
+         
+        uint32 pyrogenie;
+        uint32 dispersion_des_flammes;
+        uint32 flammes_incendiaires;
+         
+        void Reset()
+        {
+        pyrogenie = 30000;
+        dispersion_des_flammes = 20000;
+        flammes_incendiaires = 15000;
+        }
+         
+        void UpdateAI(const uint32 diff)
+        {
+            if (!UpdateVictim())
             return;
-			
-			if (pyrogenie<= diff)
-			{
-			DoCast(me, spell_pyrogenie);
-			pyrogenie = 30000;
-			} else pyrogenie -= diff;
-			
-			if (dispersion_des_flammes<= diff)
-			{
-			DoCast(me, dispersion_des_flammes);
-			dispersion_des_flammes = 20000;
-			} else dispersion_des_flammes -= diff;
-			  
-			if (flammes_incendiaires<= diff)
-			{
-			if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+            
+            if (pyrogenie<= diff)
+            {
+            DoCast(me, spell_pyrogenie);
+            pyrogenie = 30000;
+            } else pyrogenie -= diff;
+            
+            if (dispersion_des_flammes<= diff)
+            {
+            DoCast(me, dispersion_des_flammes);
+            dispersion_des_flammes = 20000;
+            } else dispersion_des_flammes -= diff;
+              
+            if (flammes_incendiaires<= diff)
+            {
+            if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
             DoCast(pTarget, spell_flammes_incendiaires);
-			flammes_incendiaires = 15000;
-			} else flammes_incendiaires -= diff;
-			
-			DoMeleeAttackIfReady();
+            flammes_incendiaires = 15000;
+            } else flammes_incendiaires -= diff;
+            
+            DoMeleeAttackIfReady();
         }
     };
-	 		
-	CreatureAI* GetAI(Creature* pCreature) const
+             
+    CreatureAI* GetAI(Creature* pCreature) const
     {
         return new npc_fee_solegraceAI(pCreature);
-    }			
-	
+    }            
+    
 };
 
 /*********************
@@ -781,50 +781,50 @@ class npc_petite_fee_solegrace : public CreatureScript
 public :
     npc_petite_fee_solegrace() : CreatureScript("npc_petite_fee_solegrace") {}
 
-	struct npc_petite_fee_solegraceAI : public ScriptedAI
-	{
-	    npc_petite_fee_solegraceAI(Creature *c) : ScriptedAI(c) {}
+    struct npc_petite_fee_solegraceAI : public ScriptedAI
+    {
+        npc_petite_fee_solegraceAI(Creature *c) : ScriptedAI(c) {}
 
-		uint32 pyrogenie;
-		uint32 dispersion_des_flammes;
-		uint32 flammes_incendiaires;
+        uint32 pyrogenie;
+        uint32 dispersion_des_flammes;
+        uint32 flammes_incendiaires;
 
-		void Reset()
-		{
-		pyrogenie = 30000;
-		dispersion_des_flammes = 20000;
-		flammes_incendiaires = 15000;
-		}
+        void Reset()
+        {
+        pyrogenie = 30000;
+        dispersion_des_flammes = 20000;
+        flammes_incendiaires = 15000;
+        }
 
-		void UpdateAI(const uint32 diff)
-		{
-		    if (!UpdateVictim())
+        void UpdateAI(const uint32 diff)
+        {
+            if (!UpdateVictim())
             return;
 
-			if (pyrogenie<= diff)
-			{
-			DoCast(me, spell_pyrogenie);
-			pyrogenie = 30000;
-			} else pyrogenie -= diff;
+            if (pyrogenie<= diff)
+            {
+            DoCast(me, spell_pyrogenie);
+            pyrogenie = 30000;
+            } else pyrogenie -= diff;
 
-			if (dispersion_des_flammes<= diff)
-			{
-			DoCast(me, dispersion_des_flammes);
-			dispersion_des_flammes = 20000;
-			} else dispersion_des_flammes -= diff;
+            if (dispersion_des_flammes<= diff)
+            {
+            DoCast(me, dispersion_des_flammes);
+            dispersion_des_flammes = 20000;
+            } else dispersion_des_flammes -= diff;
 
-			if (flammes_incendiaires<= diff)
-			{
-			if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+            if (flammes_incendiaires<= diff)
+            {
+            if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
             DoCast(pTarget, spell_flammes_incendiaires);
-			flammes_incendiaires = 15000;
-			} else flammes_incendiaires -= diff;
+            flammes_incendiaires = 15000;
+            } else flammes_incendiaires -= diff;
 
-			DoMeleeAttackIfReady();
+            DoMeleeAttackIfReady();
         }
     };
 
-	CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
         return new npc_petite_fee_solegraceAI(pCreature);
     }
@@ -842,46 +842,46 @@ class npc_porte_parole_solegrace : public CreatureScript
 {
 public:
       npc_porte_parole_solegrace() : CreatureScript("npc_porte_parole_solegrace") {}
-	  
-	  struct npc_porte_parole_solegraceAI : public ScriptedAI
-	  {
-	     npc_porte_parole_solegraceAI(Creature *c) : ScriptedAI(c) {}
-		 
-		 uint32 pietinement_reverberant;
-		 uint32 tempete_de_feu;
-		 
-		 void Reset()
-		 {
-		 pietinement_reverberant = 25000;
-		 tempete_de_feu = 13000;
-		 }
-		 
-		 void UpdateAI(const uint32 diff)
-		 {
-		    if (!UpdateVictim())
+      
+      struct npc_porte_parole_solegraceAI : public ScriptedAI
+      {
+         npc_porte_parole_solegraceAI(Creature *c) : ScriptedAI(c) {}
+         
+         uint32 pietinement_reverberant;
+         uint32 tempete_de_feu;
+         
+         void Reset()
+         {
+         pietinement_reverberant = 25000;
+         tempete_de_feu = 13000;
+         }
+         
+         void UpdateAI(const uint32 diff)
+         {
+            if (!UpdateVictim())
             return;
-			
-			if (pietinement_reverberant<= diff)
-			{
-			DoCast(me->GetVictim(), spell_pietinement_reverberant);
-			pietinement_reverberant = 25000;
-			} else pietinement_reverberant -= diff;
-			
-			if (tempete_de_feu<= diff)
-			{
-			DoCast(SelectTarget(SELECT_TARGET_RANDOM,1,100,true), spell_tempete_de_feu);
-			tempete_de_feu = 13000;
-			} else tempete_de_feu -= diff;
-			
-			DoMeleeAttackIfReady();
+            
+            if (pietinement_reverberant<= diff)
+            {
+            DoCast(me->GetVictim(), spell_pietinement_reverberant);
+            pietinement_reverberant = 25000;
+            } else pietinement_reverberant -= diff;
+            
+            if (tempete_de_feu<= diff)
+            {
+            DoCast(SelectTarget(SELECT_TARGET_RANDOM,1,100,true), spell_tempete_de_feu);
+            tempete_de_feu = 13000;
+            } else tempete_de_feu -= diff;
+            
+            DoMeleeAttackIfReady();
          }
       };
     
     CreatureAI* GetAI(Creature* pCreature) const
     {
             return new npc_porte_parole_solegraceAI(pCreature);
-	}
-	
+    }
+    
 };
 
 /***************************
@@ -898,55 +898,55 @@ class npc_nymphe_gardienne : public CreatureScript
 {
 public :
       npc_nymphe_gardienne() : CreatureScript("npc_nymphe_gardienne") {}
-	  
-	  struct npc_nymphe_gardienneAI : public ScriptedAI
-	  {
-	      npc_nymphe_gardienneAI(Creature *c) : ScriptedAI(c) {}
-		  
-		  uint32 tir;
-		  uint32 tir_enchevetrant;
-		  uint32 tranquillite;
-		  
-		  void Reset()
-		  {
-		  tir = 4000;
-		  tir_enchevetrant = 22000;
-		  tranquillite = 35000;
-		  }
-		  
-		  void UpdateAI(const uint32 diff)
-		  {
-		     if (!UpdateVictim())
+      
+      struct npc_nymphe_gardienneAI : public ScriptedAI
+      {
+          npc_nymphe_gardienneAI(Creature *c) : ScriptedAI(c) {}
+          
+          uint32 tir;
+          uint32 tir_enchevetrant;
+          uint32 tranquillite;
+          
+          void Reset()
+          {
+          tir = 4000;
+          tir_enchevetrant = 22000;
+          tranquillite = 35000;
+          }
+          
+          void UpdateAI(const uint32 diff)
+          {
+             if (!UpdateVictim())
              return;
-			 
-			 if (tir<= diff)
-			 {
-			 DoCast(me->GetVictim(), spell_shoot);
-			 tir = 4000;
-			 } else tir -= diff;
-			 
-			 if (tir_enchevetrant<= diff)
-			 {
-			 if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 10.0f, true))
-			 DoCast(target, spell_tir_enchevetrant);
-			 tir_enchevetrant = 22000;
-			 } else tir_enchevetrant -= diff;
-			 
-			 if (tranquillite<= diff)
-			 {
-			 DoCast(me, spell_tranquillite);
-			 tranquillite = 35000;
-			 } else tranquillite -= diff;
-			 
-			 DoMeleeAttackIfReady();
+             
+             if (tir<= diff)
+             {
+             DoCast(me->GetVictim(), spell_shoot);
+             tir = 4000;
+             } else tir -= diff;
+             
+             if (tir_enchevetrant<= diff)
+             {
+             if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 10.0f, true))
+             DoCast(target, spell_tir_enchevetrant);
+             tir_enchevetrant = 22000;
+             } else tir_enchevetrant -= diff;
+             
+             if (tranquillite<= diff)
+             {
+             DoCast(me, spell_tranquillite);
+             tranquillite = 35000;
+             } else tranquillite -= diff;
+             
+             DoMeleeAttackIfReady();
            }
       };
-	  
-	CreatureAI* GetAI(Creature* pCreature) const
+      
+    CreatureAI* GetAI(Creature* pCreature) const
     {
             return new npc_nymphe_gardienneAI(pCreature);
-	}
-	
+    }
+    
 };
 
 /**************
@@ -959,38 +959,38 @@ class npc_liane_vivante : public CreatureScript
 {
 public :
       npc_liane_vivante() : CreatureScript("npc_liane_vivante") {}
-	  
-	  struct npc_liane_vivanteAI : public ScriptedAI
-	  {
-	     npc_liane_vivanteAI(Creature *c) : ScriptedAI(c) {}
-		 
-		 uint32 souffle_de_spores;
-		 
-		 void Reset()
-		 {
-		 souffle_de_spores = 8000;
-		 }
-		 
-		 void UpdateAI(const uint32 diff)
-		 {
-	        if (!UpdateVictim())
+      
+      struct npc_liane_vivanteAI : public ScriptedAI
+      {
+         npc_liane_vivanteAI(Creature *c) : ScriptedAI(c) {}
+         
+         uint32 souffle_de_spores;
+         
+         void Reset()
+         {
+         souffle_de_spores = 8000;
+         }
+         
+         void UpdateAI(const uint32 diff)
+         {
+            if (!UpdateVictim())
             return;
 
-			if (souffle_de_spores<= diff)
-			{
-			if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+            if (souffle_de_spores<= diff)
+            {
+            if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
             DoCast(pTarget, spell_souffle_de_spores);
-			souffle_de_spores = 8000;
-			} else souffle_de_spores -= diff;
-			
-			DoMeleeAttackIfReady();
+            souffle_de_spores = 8000;
+            } else souffle_de_spores -= diff;
+            
+            DoMeleeAttackIfReady();
          }
       };
 
     CreatureAI* GetAI(Creature* pCreature) const
     {
         return new npc_liane_vivanteAI(pCreature);
-    }		   
+    }           
 
 };
 
@@ -1005,45 +1005,45 @@ class npc_spore_en_bourgeon : public CreatureScript
 {
 public :
     npc_spore_en_bourgeon() : CreatureScript("npc_spore_en_bourgeon") {}
-	  
-	struct npc_spore_en_bourgeonAI : public ScriptedAI
-	{
-	    npc_spore_en_bourgeonAI(Creature *c) : ScriptedAI(c) {}
+      
+    struct npc_spore_en_bourgeonAI : public ScriptedAI
+    {
+        npc_spore_en_bourgeonAI(Creature *c) : ScriptedAI(c) {}
 
-		uint32 nuage_de_spores;
-		uint32 spores_nauseabondes;
-		 
-		void Reset()
-		{
-			nuage_de_spores = 5000;
-			spores_nauseabondes = 10000;
-		}
-		 
-		void UpdateAI(const uint32 diff)
-		{
-		    if (!UpdateVictim())
+        uint32 nuage_de_spores;
+        uint32 spores_nauseabondes;
+         
+        void Reset()
+        {
+            nuage_de_spores = 5000;
+            spores_nauseabondes = 10000;
+        }
+         
+        void UpdateAI(const uint32 diff)
+        {
+            if (!UpdateVictim())
             return;
-			
-			if (nuage_de_spores<= diff)
-			{
-			DoCast(me, spell_nuage_de_spores);
-			nuage_de_spores = 5000;
-			} else nuage_de_spores -= diff;
-			
-			if (spores_nauseabondes<= diff)
-			{
-			DoCast(me, spell_spores_nauseabondes);
-			spores_nauseabondes = 10000;
-			} else spores_nauseabondes -= diff;
-			
-			DoMeleeAttackIfReady();
+            
+            if (nuage_de_spores<= diff)
+            {
+            DoCast(me, spell_nuage_de_spores);
+            nuage_de_spores = 5000;
+            } else nuage_de_spores -= diff;
+            
+            if (spores_nauseabondes<= diff)
+            {
+            DoCast(me, spell_spores_nauseabondes);
+            spores_nauseabondes = 10000;
+            } else spores_nauseabondes -= diff;
+            
+            DoMeleeAttackIfReady();
         }
     };
-		
-	CreatureAI* GetAI(Creature* pCreature) const
+        
+    CreatureAI* GetAI(Creature* pCreature) const
     {
         return new npc_spore_en_bourgeonAI(pCreature);
-    }		   
+    }           
 
 };
 
@@ -1051,21 +1051,21 @@ void AddSC_npc_trash_sdo()
 {
     new npc_lancelombre_du_temple();
     new npc_traqueur_veloce_du_temple();
-	new npc_lanceur_de_runes_du_temple();
-	new npc_sculptefeu_du_temple();
-	new npc_scarabee_caustique();
-	new npc_glisseur_venimeux();
-	new npc_horreur_os_poussiere();
-	new npc_tourmenteur_os_poussiere();
-	new npc_chercheur_du_vide();
-	new npc_seigneur_du_vide();
-	new npc_anomalie_spatiale();
-	new npc_animateur_de_flux();
-	new npc_serviteur_solegrace();
-	new npc_fee_solegrace();
-	new npc_petite_fee_solegrace();
-	new npc_porte_parole_solegrace();
-	new npc_nymphe_gardienne();
-	new npc_liane_vivante();
-	new npc_spore_en_bourgeon();
+    new npc_lanceur_de_runes_du_temple();
+    new npc_sculptefeu_du_temple();
+    new npc_scarabee_caustique();
+    new npc_glisseur_venimeux();
+    new npc_horreur_os_poussiere();
+    new npc_tourmenteur_os_poussiere();
+    new npc_chercheur_du_vide();
+    new npc_seigneur_du_vide();
+    new npc_anomalie_spatiale();
+    new npc_animateur_de_flux();
+    new npc_serviteur_solegrace();
+    new npc_fee_solegrace();
+    new npc_petite_fee_solegrace();
+    new npc_porte_parole_solegrace();
+    new npc_nymphe_gardienne();
+    new npc_liane_vivante();
+    new npc_spore_en_bourgeon();
 }

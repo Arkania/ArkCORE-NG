@@ -314,7 +314,7 @@ class BossAI : public ScriptedAI
         void _EnterCombat();
         void _JustDied();
         void _JustReachedHome() { me->setActive(false); }
-		void _DespawnAtEvade();
+        void _DespawnAtEvade();
 
         bool CheckInRoom()
         {

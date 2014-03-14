@@ -1210,7 +1210,7 @@ void WorldSession::BuildPartyMemberStatsChangedPacket(Player* player, WorldPacke
             *data << uint64(0);
         }
     }
-	
+
     if (mask & GROUP_UPDATE_FLAG_PHASE)
     {
         *data << uint32(8); // either 0 or 8, same unk found in SMSG_PHASESHIFT

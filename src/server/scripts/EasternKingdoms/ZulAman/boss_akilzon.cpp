@@ -103,7 +103,7 @@ public:
             instance = creature->GetInstanceScript();
             introDone = false;
         }
-		
+
         InstanceScript* instance;
         EventMap events;
         SummonList summons;
@@ -114,8 +114,8 @@ public:
 
         void Reset()
         {
-			events.Reset();
-			summons.DespawnAll();
+            events.Reset();
+            summons.DespawnAll();
 
             if (instance)
                 instance->SetData(DATA_AKILZONEVENT, NOT_STARTED);
@@ -151,16 +151,16 @@ public:
 
             events.ScheduleEvent(EVENT_BERSERK, 10 * MINUTE * IN_MILLISECONDS);
 
-			_EnterCombat();
+            _EnterCombat();
         }
 
         void JustSummoned(Creature* summon)
         {
-			summons.Summon(summon);
-			summon->setActive(true);
+            summons.Summon(summon);
+            summon->setActive(true);
  
-			if (me->IsInCombat())
-			    summon->AI()->DoZoneInCombat();
+            if (me->IsInCombat())
+                summon->AI()->DoZoneInCombat();
         }
 
         void KilledUnit(Unit* /*victim*/)
@@ -171,7 +171,7 @@ public:
         void JustDied(Unit* /*killer*/)
         {
             Talk(SAY_DEATH);
-			summons.DespawnAll();
+            summons.DespawnAll();
 
             if (instance)
             {
@@ -185,8 +185,8 @@ public:
         void EnterEvadeMode()
         {
             Reset();
-			me->GetMotionMaster()->MoveTargetedHome();
-			me->RemoveAllAuras();
+            me->GetMotionMaster()->MoveTargetedHome();
+            me->RemoveAllAuras();
 
             if (instance)
             {
@@ -289,7 +289,7 @@ public:
                         if (stormTarget)
                         {
                             stormTarget->SetUnitMovementFlags(MOVEMENTFLAG_NONE);
-				            stormTarget->SetCanFly(false);
+                            stormTarget->SetCanFly(false);
                         }
                         break;
                 }
@@ -398,15 +398,15 @@ public:
             TargetGUID = 0;
             me->SetUnitMovementFlags(MOVEMENTFLAG_DISABLE_GRAVITY);
 
-			numb = 0;
+            numb = 0;
         }
 
         void EnterCombat(Unit* /*who*/)
         {
             Map::PlayerList const& players = me->GetMap()->GetPlayers();
             for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-            	if (Player* player = itr->GetSource())
-            		++numb;
+                if (Player* player = itr->GetSource())
+                    ++numb;
         }
 
         void MovementInform(uint32, uint32)

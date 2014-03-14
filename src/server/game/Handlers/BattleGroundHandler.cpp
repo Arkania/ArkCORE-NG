@@ -443,15 +443,14 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recvData)
 
     //get GroupQueueInfo from BattlegroundQueue
     BattlegroundQueueTypeId bgQueueTypeId = _player->GetBattlegroundQueueTypeId(queueSlot);
- 	
 
-    if (bgQueueTypeId == BATTLEGROUND_QUEUE_NONE)	
+    if (bgQueueTypeId == BATTLEGROUND_QUEUE_NONE)
     {
          sLog->outError("BattlegroundHandler: invalid queueSlot (%u) received.", queueSlot);
          return;
     }
 
-	BattlegroundTypeId bgTypeId = BattlegroundMgr::BGTemplateId(bgQueueTypeId);
+    BattlegroundTypeId bgTypeId = BattlegroundMgr::BGTemplateId(bgQueueTypeId);
     BattlegroundQueue& bgQueue = sBattlegroundMgr->GetBattlegroundQueue(bgQueueTypeId);
 
     //we must use temporary variable, because GroupQueueInfo pointer can be deleted in BattlegroundQueue::RemovePlayer() function
@@ -527,8 +526,8 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recvData)
                 _player->ResurrectPlayer(1.0f);
                 _player->SpawnCorpseBones();
             }
-				// there is here like in MapManager.cpp as CanPlayerEnter. Dismounting/removing all mount an auras
-			    _player->Dismount();
+                // there is here like in MapManager.cpp as CanPlayerEnter. Dismounting/removing all mount an auras
+                _player->Dismount();
                 _player->RemoveAurasByType(SPELL_AURA_MOUNTED);
                 _player->RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
 
@@ -763,7 +762,7 @@ void WorldSession::HandleBattlemasterJoinArena(WorldPacket & recvData)
             WorldPacket data;
 
             if (err)
-			{
+            {
                 sBattlegroundMgr->BuildStatusFailedPacket(&data, bg, _player, 0, err);
                 member->GetSession()->SendPacket(&data);
                 continue;

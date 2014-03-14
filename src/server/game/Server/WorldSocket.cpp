@@ -727,7 +727,7 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
                 if (!opcodeTable[Opcodes(opcode)])
                 {
                     //sLog->outError("Opcode with no defined handler received from client: %u", new_pct->GetOpcode());
-					sLog->outString("SESSION: Received unhandled opcode 0x%.4X (%s)", new_pct->GetOpcode(), LookupOpcodeName(new_pct->GetOpcode()));
+                    sLog->outString("SESSION: Received unhandled opcode 0x%.4X (%s)", new_pct->GetOpcode(), LookupOpcodeName(new_pct->GetOpcode()));
                     return 0;
                 }
                 if (m_Session != NULL)

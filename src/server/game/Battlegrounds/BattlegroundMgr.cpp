@@ -1259,7 +1259,7 @@ void BattlegroundMgr::CreateInitialBattlegrounds()
 
         selectionWeight = fields[10].GetUInt8();
         data.scriptId = sObjectMgr->GetScriptId(fields[11].GetCString());
-	
+
         data.BattlegroundName = bl->name;
         data.MapID = bl->mapid[0];
 
@@ -1312,7 +1312,7 @@ void BattlegroundMgr::BuildBattlegroundListPacket(WorldPacket* data, uint64 guid
     uint32 count = 0;
     ByteBuffer buf;
 
-	if (Battleground* bgTemplate = sBattlegroundMgr->GetBattlegroundTemplate(bgTypeId))
+    if (Battleground* bgTemplate = sBattlegroundMgr->GetBattlegroundTemplate(bgTypeId))
     {
         // expected bracket entry
         if (PvPDifficultyEntry const* bracketEntry = GetBattlegroundBracketByLevel(bgTemplate->GetMapId(), player->getLevel()))

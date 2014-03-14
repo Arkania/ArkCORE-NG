@@ -6132,10 +6132,10 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
             {
                 if (!target)
                     return false;
-    			if (!procSpell)
-					return false;
-				if (!(procEx & PROC_EX_CRITICAL_HIT) && procSpell->Id != 596)
-					return false;
+                if (!procSpell)
+                    return false;
+                if (!(procEx & PROC_EX_CRITICAL_HIT) && procSpell->Id != 596)
+                    return false;
 
                 // Multiple effects stack, so let's try to find this aura.
                 int32 bonus = 0;
@@ -8227,15 +8227,15 @@ bool Unit::HandleAuraProc(Unit* victim, uint32 damage, Aura* triggeredByAura, Sp
 
             switch (dummySpell->Id)
             {
-				// Unholy Command
-				case 49588:
-				case 49589:
-				{
-					sLog->outString("1");
-					if (ToPlayer()->HasSpellCooldown(49576))
-						ToPlayer()->RemoveSpellCooldown(49576,true);
-					break;
-				}
+                // Unholy Command
+                case 49588:
+                case 49589:
+                {
+                    sLog->outString("1");
+                    if (ToPlayer()->HasSpellCooldown(49576))
+                        ToPlayer()->RemoveSpellCooldown(49576,true);
+                    break;
+                }
                 // Hungering Cold
                 case 49203:
                 {
@@ -8608,7 +8608,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
                     case 54841: // Thunder Capacitor
                     case 67712: // Item - Coliseum 25 Normal Caster Trinket
                     case 67758: // Item - Coliseum 25 Heroic Caster Trinket
-					case 97119: // Item - Lightning Capacitor Heroic ( FireLands)
+                    case 97119: // Item - Lightning Capacitor Heroic ( FireLands)
                     case 96887: // Item - Lightning Capacitor Normal ( FireLands)
                     {
                         if (!victim || !victim->IsAlive() || GetTypeId() != TYPEID_PLAYER)
@@ -8633,7 +8633,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
                                 stack_spell_id = 67759;
                                 trigger_spell_id = 67760;
                                 break;
-							case 97119: // Item - Lightning Capacitor Heroic( FireLands)
+                            case 97119: // Item - Lightning Capacitor Heroic( FireLands)
                                 stack_spell_id = 96890;
                                 trigger_spell_id = 96891;
                                 break;
@@ -8653,7 +8653,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
                         target = victim;
                         break;
                     }
-					// Hand of Light (Mastery Retribution Paladin)
+                    // Hand of Light (Mastery Retribution Paladin)
                     case 76672:
                     {
                         if (!victim || !procSpell || (procSpell->Id != 35395 && procSpell->Id != 53385 && procSpell->Id != 85256))
@@ -8776,21 +8776,21 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
     // Custom triggered spells
     switch (auraSpellInfo->Id)
     {
-		// Glyph of Dark Succor
-		case 96279:
-		{
-			if (!HasAura(48265) && !HasAura(48266))
-				return false;
-			break;
-		}
-		// Echo of Baine, End Time
-		case 101836:
-		case 101866:
-		{
-			if (Unit *caster = triggeredByAura->GetCaster())
-				target = caster->ToCreature() ? caster->ToCreature()->SelectVictim() : caster->GetVictim();
-			break;
-		}
+        // Glyph of Dark Succor
+        case 96279:
+        {
+            if (!HasAura(48265) && !HasAura(48266))
+                return false;
+            break;
+        }
+        // Echo of Baine, End Time
+        case 101836:
+        case 101866:
+        {
+            if (Unit *caster = triggeredByAura->GetCaster())
+                target = caster->ToCreature() ? caster->ToCreature()->SelectVictim() : caster->GetVictim();
+            break;
+        }
 
         // Victorious State
         case 32215:
@@ -9107,7 +9107,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
                     if (HasAura(88766))
                         AddAura(95774,this);
 
-				if (GetAura(88766)->GetCharges() > 7 && (HasAura(88766)))
+                if (GetAura(88766)->GetCharges() > 7 && (HasAura(88766)))
                     CastSpell(this, 95774, true);
             }
 
@@ -11011,8 +11011,8 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
 
             // Merciless Combat
             if (spellProto->Id == 45477 || spellProto->Id == 49184)
-				if (victim->HealthBelowPct(35))
-				    if (AuraEffect * aurEff = GetDummyAuraEffect(SPELLFAMILY_DEATHKNIGHT, 2656, 0))
+                if (victim->HealthBelowPct(35))
+                    if (AuraEffect * aurEff = GetDummyAuraEffect(SPELLFAMILY_DEATHKNIGHT, 2656, 0))
                         AddPctN(DoneTotalMod, aurEff->GetAmount());
             break;
     }
@@ -16017,7 +16017,7 @@ void Unit::ApplyAttackTimePercentMod(WeaponAttackType att, float val, bool apply
 
     }
 
-	if (GetTypeId() == TYPEID_PLAYER)
+    if (GetTypeId() == TYPEID_PLAYER)
     {
         // Sanctity of Battle - update hacked spellmods
         AuraEffectList const& hasteCooldownAura = GetAuraEffectsByType(SPELL_AURA_MOD_SPELL_COOLDOWN_BY_HASTE);

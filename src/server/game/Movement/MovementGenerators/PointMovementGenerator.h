@@ -32,7 +32,7 @@ class PointMovementGenerator : public MovementGeneratorMedium< T, PointMovementG
 
         void Initialize(T &);
         void Finalize(T &);
-		void Interrupt(T &);
+        void Interrupt(T &);
         void Reset(T &);
         bool Update(T &, const uint32 &);
 

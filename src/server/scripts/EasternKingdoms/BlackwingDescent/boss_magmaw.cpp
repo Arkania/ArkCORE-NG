@@ -41,7 +41,7 @@ enum NefMagmawYells
     NEF_H_AGGRO                        = 9,
     NEF_H_MAG_DEATH                    = 10,
     NEF_H_MAG_DEATH_2                  = 11,
-	NEF_H_LOW_HP                       = 12,
+    NEF_H_LOW_HP                       = 12,
     NEF_H_STARTED_C                    = 13
 };
 
@@ -320,7 +320,7 @@ public:
                     events.ScheduleEvent(EVENT_BREAK_FREE, 6000);
                     break;
 
-				default:
+                default:
                     break;
             }
         }
@@ -788,7 +788,7 @@ public:
                         events.ScheduleEvent(EVENT_FIERY_SLASH, urand(13000, 17000));
                         break;
                 }
-			}
+            }
 
             DoMeleeAttackIfReady();
         }
@@ -840,7 +840,7 @@ public:
                         DoCast(me, SPELL_IGNITION_AURA);
                         break;
                 }
-			}
+            }
         }
     };
 };
@@ -877,7 +877,7 @@ public:
                    secondChainHit = false;
                    break;
 
-				default:
+                default:
                    break;
             }
         }

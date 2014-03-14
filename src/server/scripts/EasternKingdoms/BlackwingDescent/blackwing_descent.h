@@ -17,7 +17,7 @@ enum Data
 enum Creatures
 {
     BOSS_MAGMAW                     = 41570,
-    BOSS_OMNOTRON	                = 42186,
+    BOSS_OMNOTRON                   = 42186,
     BOSS_MALORIAK                   = 41378,
     BOSS_ATRAMEDES                  = 41442,
     BOSS_CHIMAERON                  = 43296,

@@ -77,8 +77,8 @@ enum Texts
     SAY_START                                      = -1877001,
     SAY_CAST_SHOCKVAWE_1                           = -1877002,
     SAY_CAST_SHOCKVAWE_2                           = -1877003,
-	YELL_KILL_PLAYER_1                             = -1877021,
-	YELL_TREAD_LIGHTLY                             = -1877022,
+    YELL_KILL_PLAYER_1                             = -1877021,
+    YELL_TREAD_LIGHTLY                             = -1877022,
 };
 
 class boss_general_husam : public CreatureScript
@@ -157,11 +157,11 @@ public:
             lSummons.Summon(summoned);
         }
 
-		void KilledUnit(Unit* victim)
-		{
-			if (victim->GetTypeId() == TYPEID_PLAYER)
-				DoScriptText(YELL_KILL_PLAYER_1, me);
-		}
+        void KilledUnit(Unit* victim)
+        {
+            if (victim->GetTypeId() == TYPEID_PLAYER)
+                DoScriptText(YELL_KILL_PLAYER_1, me);
+        }
 
         void JustDied(Unit* /*killer*/)
         {
@@ -188,7 +188,7 @@ public:
                 switch (eventId)
                 {
                     case EVENT_COUNTDOWN_LAND_MINES:
-						DoScriptText(YELL_TREAD_LIGHTLY, me);
+                        DoScriptText(YELL_TREAD_LIGHTLY, me);
                         events.ScheduleEvent(EVENT_COUNTDOWN_LAND_MINES, 15000);
                         me->CastSpell(me, SPELL_DETONATE_TRAPS, false);
                         break;

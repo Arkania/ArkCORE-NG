@@ -345,7 +345,7 @@ namespace VMAP
         {
             fclose(model_list);
             return;
-		}
+        }
 
         uint32 name_length, displayId;
         char buff[500];

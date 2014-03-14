@@ -74,24 +74,24 @@ public:
                 switch (eventId)
                 {
                 case EVENT_FOCUSEF_ANGER:
-		            DoCast(me, SPELL_FOCUSED_ANGER);
+                    DoCast(me, SPELL_FOCUSED_ANGER);
                     events.ScheduleEvent(EVENT_FOCUSEF_ANGER, urand(60000,60000));
                     break;
 
                 case EVENT_PSYCHIC_DRAIN:
-		            DoCastVictim(SPELL_PSYCHIC_DRAIN);
+                    DoCastVictim(SPELL_PSYCHIC_DRAIN);
                     events.ScheduleEvent(EVENT_PSYCHIC_DRAIN, urand(150000,150000));
                     break;
 
                 case EVENT_DISRUPTING_SHADOWS:
-					if(Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+                    if(Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
                        DoCast(target, SPELL_DISRUPTING_SHADOWS);
                     events.ScheduleEvent(EVENT_DISRUPTING_SHADOWS, urand(40000,80000));
                     break;
                 default:
                     break;
                 }
-            }		
+            }
 
             DoMeleeAttackIfReady();
         }

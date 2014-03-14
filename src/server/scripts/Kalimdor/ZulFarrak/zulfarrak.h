@@ -35,7 +35,7 @@ enum zfPyramidPhases
 
 enum eData
 {
-	DATA_ZUM_RAH,
+    DATA_ZUM_RAH,
 };
 
 #endif

@@ -76,12 +76,12 @@ class boss_argaloth : public CreatureScript
 
             void EnterEvadeMode() // AKA Wipe.
             {
-			    me->GetMotionMaster()->MoveTargetedHome();
+                me->GetMotionMaster()->MoveTargetedHome();
                 me->SetHealth(me->GetMaxHealth());
 
                 if (me->HasAura(47008))
                     me->RemoveAura(47008);
-					
+
                 if (m_pInstance)
                    m_pInstance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me); // Remove
             }
@@ -103,7 +103,7 @@ class boss_argaloth : public CreatureScript
                 if (!UpdateVictim())
                     return;
 
-				if (me->HasUnitState(UNIT_STATE_CASTING))
+                if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
                 if (m_uiConsumingDarknessTimer <= uiDiff)
@@ -178,7 +178,7 @@ class npc_felflames : public CreatureScript
             InstanceScript* m_pInstance;
             uint32 m_uiFlamesTimer;
             bool flames;
-			
+
             void Reset()
             {
                 m_uiFlamesTimer = 100;
@@ -189,23 +189,23 @@ class npc_felflames : public CreatureScript
             {
                 m_uiFlamesTimer = 100;
                 flames = false;
-			}
-			
-			void UpdateAI(const uint32 uiDiff)
+            }
+
+            void UpdateAI(const uint32 uiDiff)
             {
                 if (!UpdateVictim())
                     return;
 
-				if (me->HasUnitState(UNIT_STATE_CASTING))
+                if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
                 if (m_uiFlamesTimer <= uiDiff && flames == false)
-				{
+                {
                     DoCast(me, SPELL_FELFLAMES);
                     flames = true;
-				}
+                }
                 else
-                    m_uiFlamesTimer -= uiDiff;				
+                    m_uiFlamesTimer -= uiDiff;
             }
         };
 };

@@ -1599,7 +1599,7 @@ void Group::BroadcastAddonMessagePacket(WorldPacket* packet, const std::string& 
     {
         Player* player = itr->GetSource();
         if (!player || (ignore != 0 && player->GetGUID() == ignore) || (ignorePlayersInBGRaid && player->GetGroup() != this))
-            continue;	
+            continue;
 
         if (WorldSession* session = player->GetSession())
             if (session && (group == -1 || itr->getSubGroup() == group))

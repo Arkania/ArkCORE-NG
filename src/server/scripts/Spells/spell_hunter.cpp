@@ -34,7 +34,7 @@ enum HunterSpells
 {
     HUNTER_SPELL_READINESS                       = 23989,
     HUNTER_SPELL_BESTIAL_WRATH                   = 19574,
-	DRAENEI_SPELL_GIFT_OF_THE_NAARU              = 59543,
+    DRAENEI_SPELL_GIFT_OF_THE_NAARU              = 59543,
     HUNTER_PET_SPELL_LAST_STAND_TRIGGERED        = 53479,
     HUNTER_PET_HEART_OF_THE_PHOENIX              = 55709,
     HUNTER_PET_HEART_OF_THE_PHOENIX_TRIGGERED    = 54114,
@@ -110,7 +110,7 @@ class spell_hun_readiness : public SpellScriptLoader
                         spellInfo->SpellFamilyName == SPELLFAMILY_HUNTER &&
                         spellInfo->Id != HUNTER_SPELL_READINESS &&
                         spellInfo->Id != HUNTER_SPELL_BESTIAL_WRATH &&
-						spellInfo->Id != DRAENEI_SPELL_GIFT_OF_THE_NAARU &&
+                        spellInfo->Id != DRAENEI_SPELL_GIFT_OF_THE_NAARU &&
                         spellInfo->GetRecoveryTime() > 0)
                         caster->RemoveSpellCooldown((itr++)->first, true);
                     else
@@ -537,11 +537,11 @@ public:
             if (!pet || pet->IsDead())
                 return SPELL_FAILED_NO_PET;
 
-			if (!pet->IsInCombat())
-				return SPELL_FAILED_INTERRUPTED_COMBAT;
+            if (!pet->IsInCombat())
+                return SPELL_FAILED_INTERRUPTED_COMBAT;
 
-			if (!pet->GetVictim())
-				return SPELL_FAILED_BAD_TARGETS;
+            if (!pet->GetVictim())
+                return SPELL_FAILED_BAD_TARGETS;
 
             if (pet->GetDistance(pet->GetVictim()) > 5.0f)
                 return SPELL_FAILED_OUT_OF_RANGE;
@@ -552,7 +552,7 @@ public:
         void HandleScriptEffect (SpellEffIndex /*effIndex*/)
         {
             if (Pet* pet = GetCaster()->ToPlayer()->GetPet())
-				pet->CastCustomSpell(pet->GetVictim(), (uint32) GetEffectValue(), 0, NULL, NULL, true, NULL, NULL, pet->GetGUID());
+                pet->CastCustomSpell(pet->GetVictim(), (uint32) GetEffectValue(), 0, NULL, NULL, true, NULL, NULL, pet->GetGUID());
         }
 
         void Register ()

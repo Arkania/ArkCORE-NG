@@ -261,14 +261,14 @@ void Quest::BuildExtraQuestInfo(WorldPacket& data, Player* player) const
         else
             data << uint32(0);
     }
-	
+
     data << uint32(GetReqItemsCount());
     for (uint8 i = 0; i < QUEST_REWARDS_COUNT; ++i)
         data << uint32(RewardItemId[i]);
     for (uint8 i = 0; i < QUEST_REWARDS_COUNT; ++i)
         data << uint32(RewardItemIdCount[i]);
     for (uint8 i = 0; i < QUEST_REWARDS_COUNT; ++i)
-	{
+    {
         if (ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(RewardItemId[i]))
             data << uint32(itemTemplate->DisplayInfoID);
         else
@@ -284,7 +284,7 @@ void Quest::BuildExtraQuestInfo(WorldPacket& data, Player* player) const
     data << uint32(GetBonusTalents());
     data << uint32(0);                                      // unk
     data << uint32(GetRewardReputationMask());
-	
+
     /* Pre cata struct, some of these unks might be the missing values in cata:
     // rewarded honor points. Multiply with 10 to satisfy client
     data << float(0);                                       // unk, honor multiplier?
@@ -305,13 +305,13 @@ void Quest::BuildExtraQuestInfo(WorldPacket& data, Player* player) const
 
     for (uint8 i = 0; i < QUEST_REPUTATIONS_COUNT; ++i)  // reward reputation override?
         data << int32(RewardFactionValueIdOverride[i]);
-		
+
     data << uint32(GetRewSpell());
     data << uint32(GetRewSpellCast());
-	
+
     for (uint8 i = 0; i < QUEST_REWARD_CURRENCY_COUNT; ++i)
         data << uint32(RewardCurrencyId[i]);
-    	
+
     for (uint8 i = 0; i < QUEST_REWARD_CURRENCY_COUNT; ++i)
         data << uint32(RewardCurrencyCount[i]);
 
@@ -350,6 +350,7 @@ uint32 Quest::CalculateHonorGain(uint8 level) const
         TeamContributionPointsEntry const* tc = sTeamContributionPointsStore.LookupEntry(level-1);
         if (!tc)
             return 0;
+
         honor = uint32(tc->value * GetRewHonorMultiplier() * 0.1000000014901161);
         honor += GetRewHonorAddition();
     }*/

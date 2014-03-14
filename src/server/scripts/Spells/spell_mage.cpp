@@ -45,7 +45,7 @@ enum MageSpells
     SPELL_MAGE_TIME_WARP                         = 80353,
     SPELL_MAGE_TEMPORAL_DISPLACEMENT             = 80354,
     SPELL_MAGE_CHILLED_R1                        = 12484,
-    SPELL_MAGE_CHILLED_R2                        = 12485	
+    SPELL_MAGE_CHILLED_R2                        = 12485    
 };
 
 enum OtherSpells
@@ -715,5 +715,5 @@ void AddSC_mage_spell_scripts()
     new spell_mage_cauterize();
     new spell_mage_time_warp();
     new spell_mage_impact();
-	new spell_mage_blizzard();
+    new spell_mage_blizzard();
 }

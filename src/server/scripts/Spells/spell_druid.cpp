@@ -41,7 +41,7 @@ enum DruidSpells
     SPELL_DRUID_FUNGAL_GROWTH_2               = 81283,
     SPELL_DRUID_WILD_MUSHROOM_SUICIDE         = 92853,
     SPELL_DRUID_WILD_MUSHROOM_DAMAGE          = 78777,
-	DRUID_FAERIE_FIRE                   	  = 91565
+    DRUID_FAERIE_FIRE                         = 91565
 };
 
 enum DruidCreatures
@@ -938,7 +938,7 @@ enum EclipseSpells
     SPELL_DRUID_SOLAR_ECLIPSE               = 48517,
     SPELL_DRUID_LUNAR_ECLIPSE               = 48518,
     TALENT_TREE_BALANCE                     = 752,
-    SPELL_DRUID_EUPHORIA_ENERGIZE        	= 81069
+    SPELL_DRUID_EUPHORIA_ENERGIZE            = 81069
 };
 
 // 69366 - Moonkin Form passive
@@ -1403,5 +1403,5 @@ void AddSC_druid_spell_scripts()
     new spell_dru_eclipse_energize();
     new spell_dru_primal_madness();
     new spell_dru_lunar_shower_energize();
-    new spell_dru_faerie_fire();	
+    new spell_dru_faerie_fire();    
 }

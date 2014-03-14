@@ -637,7 +637,7 @@ void Creature::RegenerateMana()
 
     addvalue += GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_POWER_REGEN, POWER_MANA) * CREATURE_REGEN_INTERVAL / (5 * IN_MILLISECONDS);
 
-	// Apply modifiers (if any).
+    // Apply modifiers (if any).
     AuraEffectList const& ModPowerRegenPCTAuras = GetAuraEffectsByType(SPELL_AURA_MOD_POWER_REGEN_PERCENT);
     for (AuraEffectList::const_iterator i = ModPowerRegenPCTAuras.begin(); i != ModPowerRegenPCTAuras.end(); ++i)
         if ((*i)->GetMiscValue() == POWER_MANA)
@@ -2504,7 +2504,7 @@ void Creature::SetPosition(float x, float y, float z, float o)
         sLog->outDebug(LOG_FILTER_UNITS, "Creature::SetPosition(%f, %f, %f) .. bad coordinates!", x, y, z);
         return;
     }
-	
+
     GetMap()->CreatureRelocation(ToCreature(), x, y, z, o);
     if (IsVehicle())
         GetVehicleKit()->RelocatePassengers(x, y, z, o);

@@ -24,7 +24,7 @@ enum Yells
 enum Spells
 {
     SPELL_BLADE_DANCE                        = 105784, // root and trigger. 3 times during dummy, moves to another target each time. 4 sec.x3 = 12 sec dummy.
-	SPELL_BLADE_DANCE_DUMMY                  = 105828,
+    SPELL_BLADE_DANCE_DUMMY                  = 105828,
     SPELL_SEETHING_HATE                      = 105067, // triggers every 3 sec.
     SPELL_SKEWER                             = 104936, // on tank.
     SPELL_BERSERK                            = 47008
@@ -81,12 +81,12 @@ class boss_alizabal : public CreatureScript
                 skewerorseething = true;
             }
 
-			void MoveInLineOfSight(Unit* who)
+            void MoveInLineOfSight(Unit* who)
             {
                 if (!intro && who->IsWithinDistInMap(me, 50.0f))
                 {
                     Talk(SAY_INTRO);
-					intro = true;				
+                    intro = true;
                 }
             }
             
@@ -112,10 +112,10 @@ class boss_alizabal : public CreatureScript
                    m_pInstance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me); // Remove
             }
 
-			void KilledUnit(Unit * /*victim*/)
-			{
-				Talk(SAY_KILL);
-			}
+            void KilledUnit(Unit * /*victim*/)
+            {
+                Talk(SAY_KILL);
+            }
 
             void EnterEvadeMode() // AKA Wipe.
             {
@@ -127,7 +127,7 @@ class boss_alizabal : public CreatureScript
 
                 me->GetMotionMaster()->MoveTargetedHome();
                 me->SetHealth(me->GetMaxHealth());
-				
+
                 if (m_pInstance)
                    m_pInstance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me); // Remove
             }
@@ -137,31 +137,31 @@ class boss_alizabal : public CreatureScript
                 if (!UpdateVictim())
                     return;
 
-				if (me->HasUnitState(UNIT_STATE_CASTING))
+                if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
                 if (m_uiSkewerorSeethingTimer <= uiDiff && skewerorseething == true)
-                {					
-					switch(urand(0, 1))
-					{
+                {
+                    switch(urand(0, 1))
+                    {
                         case 0:
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, NonTankTargetSelector(me)))
                         {
-						    DoCast(target, SPELL_SEETHING_HATE);
+                            DoCast(target, SPELL_SEETHING_HATE);
                             Talk(SAY_SEETHING);
                             seething = true;
                             skewerTimer = 8000;
                         }
-						break;
+                        break;
                         case 1:
                             DoCast(me->GetVictim(), SPELL_SKEWER);
                             Talk(SAY_SKEWER);
                             skewer = true;
                             seethingTimer = 8000;
                             break;
-                   	}
+                       }
 
-                    skewerorseething = false;                 					
+                    skewerorseething = false;
                 }
                 else
                     m_uiSkewerorSeethingTimer -= uiDiff;
@@ -174,12 +174,12 @@ class boss_alizabal : public CreatureScript
                 }
                 else
                     skewerTimer -= uiDiff;
-				
+
                 if (seethingTimer <= uiDiff && skewer == true)
                 {
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, NonTankTargetSelector(me)))
                     {
-						DoCast(target, SPELL_SEETHING_HATE);
+                        DoCast(target, SPELL_SEETHING_HATE);
                         Talk(SAY_SEETHING);
                         skewer = false;
                     }
@@ -207,8 +207,8 @@ class boss_alizabal : public CreatureScript
                     me->SetSpeed(MOVE_WALK, 4.0f);
                     me->SetSpeed(MOVE_RUN, 4.0f);
 
-					if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, NonTankTargetSelector(me)))
-					    me->GetMotionMaster()->MovePoint(1,target->GetPositionX(),target->GetPositionY(),target->GetPositionZ());
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, NonTankTargetSelector(me)))
+                        me->GetMotionMaster()->MovePoint(1,target->GetPositionX(),target->GetPositionY(),target->GetPositionZ());
 
                     moveTimer  = 4200;
                 }
@@ -248,7 +248,7 @@ class boss_alizabal : public CreatureScript
                     Talk(SAY_BERSERK);
 
                     m_uiBerserkTimer = 2400000; // just assuming they get over first one...heh.
-                }					
+                }
                 else
                     m_uiBerserkTimer -= uiDiff;
                     

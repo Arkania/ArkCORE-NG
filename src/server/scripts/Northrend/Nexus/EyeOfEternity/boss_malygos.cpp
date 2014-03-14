@@ -1041,18 +1041,18 @@ public:
             if (!_instance)
                 return;
 
-			if (me->IsSummon())
-				if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-				{
-					if (Creature* malygos = Unit::GetCreature(*me, _instance->GetData64(DATA_MALYGOS)))
-					{
-						summoner->CastSpell(me, SPELL_RIDE_RED_DRAGON, true);
-						float victimThreat = malygos->getThreatManager().getThreat(summoner);
-						malygos->getThreatManager().resetAllAggro();
-						malygos->AI()->AttackStart(me);
-						malygos->AddThreat(me, victimThreat);
-					}
-				}
+            if (me->IsSummon())
+                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                {
+                    if (Creature* malygos = Unit::GetCreature(*me, _instance->GetData64(DATA_MALYGOS)))
+                    {
+                        summoner->CastSpell(me, SPELL_RIDE_RED_DRAGON, true);
+                        float victimThreat = malygos->getThreatManager().getThreat(summoner);
+                        malygos->getThreatManager().resetAllAggro();
+                        malygos->AI()->AttackStart(me);
+                        malygos->AddThreat(me, victimThreat);
+                    }
+                }
         }
 
         void UpdateAI(const uint32 diff)

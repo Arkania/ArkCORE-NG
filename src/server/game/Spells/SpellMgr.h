@@ -68,7 +68,7 @@ enum SpellFamilyFlag
     // Warlock
     SPELLFAMILYFLAG_WARLOCK_LIFETAP         = 0x00040000,
 
-	// Mage
+    // Mage
     SPELLFAMILYFLAG1_MAGE_CONEOFCOLD        = 0x00000200,
 
     // Druid

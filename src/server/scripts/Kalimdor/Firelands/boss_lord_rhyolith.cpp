@@ -53,12 +53,12 @@ It looks as if Rhyolith has some inertia. When the damage done to both his feet 
 
 enum KarEvents
 {
-	EVENT_MOVE_NEXT_POS = 1,
+    EVENT_MOVE_NEXT_POS = 1,
 };
 
 enum KarSpells
 {
-	SUMMON_ELEMENTALS = 99601,
+    SUMMON_ELEMENTALS = 99601,
 };
 
 class kar_the_everburning : public CreatureScript
@@ -76,70 +76,70 @@ public:
         kar_the_everburningAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = creature->GetInstanceScript();
-			phase = 0;
-			timerElem = 1700;
-			me->SetReactState(REACT_PASSIVE);
+            phase = 0;
+            timerElem = 1700;
+            me->SetReactState(REACT_PASSIVE);
         }
 
-		EventMap events;
-		uint8 phase;
-		uint32 timerMove,timerElem;
+        EventMap events;
+        uint8 phase;
+        uint32 timerMove,timerElem;
         InstanceScript* instance;
 
         void Reset() {}
 
         void EnterCombat(Unit* /*who*/) {}
 
-		void UpdateAI(const uint32 diff)
-		{
-			if (phase == 2 && UpdateVictim())
-			{
-				events.Update(diff);
+        void UpdateAI(const uint32 diff)
+        {
+            if (phase == 2 && UpdateVictim())
+            {
+                events.Update(diff);
 
-				while (uint32 eventId = events.ExecuteEvent())
-				{
-					switch (eventId)
-					{
-						case EVENT_MOVE_NEXT_POS:
-							break;
-					}
-				}
-			}
+                while (uint32 eventId = events.ExecuteEvent())
+                {
+                    switch (eventId)
+                    {
+                        case EVENT_MOVE_NEXT_POS:
+                            break;
+                    }
+                }
+            }
 
-			if (phase == 0)
-			{
-				if (Unit* NearPlayer = me->FindNearestPlayer(5.0, true))
-				{
-					phase = 1;
-					timerMove = 7000;
-				}
+            if (phase == 0)
+            {
+                if (Unit* NearPlayer = me->FindNearestPlayer(5.0, true))
+                {
+                    phase = 1;
+                    timerMove = 7000;
+                }
 
-				if (timerElem <= diff)
-				{
-					me->CastSpell(me->GetPositionX() + urand(0,10) + urand(-10,0),me->GetPositionY() + urand(0,10) + urand(-10,0), me->GetPositionZ(),SUMMON_ELEMENTALS,true);
-					timerElem = 1200;
-				}
-				else timerElem -= diff;
-			}
+                if (timerElem <= diff)
+                {
+                    me->CastSpell(me->GetPositionX() + urand(0,10) + urand(-10,0),me->GetPositionY() + urand(0,10) + urand(-10,0), me->GetPositionZ(),SUMMON_ELEMENTALS,true);
+                    timerElem = 1200;
+                }
+                else timerElem -= diff;
+            }
 
             if (phase == 1)
-			{
-			    if (timerMove <= diff)
-			    {
-				   phase = 2;
-				   me->SetFacingTo(0.931584f);
-				   me->SetReactState(REACT_AGGRESSIVE);
-				   me->SetHomePosition(me->GetPositionX(),me->GetPositionY(),me->GetPositionZ(),me->GetOrientation());
-				   me->AI()->Reset();
-			    }
-				else timerMove -= diff;
-			}
+            {
+                if (timerMove <= diff)
+                {
+                   phase = 2;
+                   me->SetFacingTo(0.931584f);
+                   me->SetReactState(REACT_AGGRESSIVE);
+                   me->SetHomePosition(me->GetPositionX(),me->GetPositionY(),me->GetPositionZ(),me->GetOrientation());
+                   me->AI()->Reset();
+                }
+                else timerMove -= diff;
+            }
 
-			if (phase == 1)
-				me->GetMotionMaster()->MovePoint(0, -316.224f, -435.897f, 102.951f);
+            if (phase == 1)
+                me->GetMotionMaster()->MovePoint(0, -316.224f, -435.897f, 102.951f);
 
-			DoMeleeAttackIfReady();
-		}
+            DoMeleeAttackIfReady();
+        }
     };
 };
 
@@ -158,50 +158,50 @@ public:
         Unstable_PyrelordAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = creature->GetInstanceScript();
-			start = false;
-			falltimer = 5000;
+            start = false;
+            falltimer = 5000;
         }
 
-		bool start;
-		uint32 falltimer;
+        bool start;
+        uint32 falltimer;
         InstanceScript* instance;
 
         void Reset() {}
 
         void EnterCombat(Unit* /*who*/) {}
 
-		void IsSummonedBy(Unit* summoner)
+        void IsSummonedBy(Unit* summoner)
         {
-			me->SetReactState(REACT_AGGRESSIVE);
-			start = true;
+            me->SetReactState(REACT_AGGRESSIVE);
+            start = true;
         }
 
-		void UpdateAI(const uint32 diff)
-		{
-			if (!start) return;
+        void UpdateAI(const uint32 diff)
+        {
+            if (!start) return;
 
-			if (falltimer <= diff)
-		    {
-				me->GetMotionMaster()->MoveFall();
-				falltimer = 5000;
-		    }
-			else falltimer -= diff;
+            if (falltimer <= diff)
+            {
+                me->GetMotionMaster()->MoveFall();
+                falltimer = 5000;
+            }
+            else falltimer -= diff;
 
-			if (!UpdateVictim())
-				me->GetMotionMaster()->MovePoint(1,-167.431f,-307.385f,me->GetPositionZMinusOffset());
+            if (!UpdateVictim())
+                me->GetMotionMaster()->MovePoint(1,-167.431f,-307.385f,me->GetPositionZMinusOffset());
 
-		    if (!GetKar())
-				me->DespawnOrUnsummon();
+            if (!GetKar())
+                me->DespawnOrUnsummon();
 
             if (UpdateVictim())
-				DoMeleeAttackIfReady();
-		}
+                DoMeleeAttackIfReady();
+        }
 
-		
-		Creature* GetKar()
-		{
-			return me->FindNearestCreature(53616, 125.0f, true);
-		}
+        
+        Creature* GetKar()
+        {
+            return me->FindNearestCreature(53616, 125.0f, true);
+        }
     };
 };
 
@@ -241,7 +241,7 @@ enum Spells
     SPELL_OBSIDIAN_ARMOR                        = 98632,
     SPELL_CONCUSSIVE_STOMP                      = 97282,  //link w/ volcanic birth 98010 makes vulcanoes in 15y.
     SPELL_DRINK_MAGMA                           = 98034,
-	SPELL_MOLTEN_SPEW                           = 98043,
+    SPELL_MOLTEN_SPEW                           = 98043,
     SPELL_SUPERHEATED                           = 101304, //enrage 8/10 min.
     SPELL_IMMOLATION                            = 99846,
     SPELL_TURNING_FLAME                         = 98837,
@@ -251,7 +251,7 @@ enum Spells
     SPELL_THERMAL_IGNITION                      = 98135,  //summ fragment of rhyolith
     SPELL_THERMAL_IGNITION2                     = 98553,  //summ spark of rhyolith
     SPELL_VOLCANIC_BIRTH                        = 98045,  //summ volcanoes
-	SPELL_LAVA_TUBE                             = 98265,
+    SPELL_LAVA_TUBE                             = 98265,
 
     /*** Minion spells ***/
     SPELL_FUSE                                  = 99875, // liq obsidian
@@ -264,48 +264,48 @@ enum Spells
     SPELL_MAGMA_FLOW                            = 97225, // cosmetic lava
     SPELL_MOLTEN_ARMOR                          = 101157,// increase damage made by rhyolith, debuff on boss
     SPELL_LAVA_STRIKE                           = 98492,
-	SPELL_SMOKE_VOLCAN                          = 97699,
-	SPELL_VISUAL_VOLCAN                         = 98250,
-	SPELL_VOLCAN_CHECK_ACTIVE                   = 98400,
-	SPELL_LAVA_FLOW                             = 97230,
-	SPELL_LAVA_FLOW_CHECK                       = 97225
+    SPELL_SMOKE_VOLCAN                          = 97699,
+    SPELL_VISUAL_VOLCAN                         = 98250,
+    SPELL_VOLCAN_CHECK_ACTIVE                   = 98400,
+    SPELL_LAVA_FLOW                             = 97230,
+    SPELL_LAVA_FLOW_CHECK                       = 97225
 };
 
 enum Events
 {
     /*** Rhyolith ***/
-	EVENT_PHASE_1 = 1,
-	EVENT_PHASE_2,
-	EVENT_SUPERHEATED,
-	
-	// Phase 1
-	EVENT_CONCUSSIVE_STOMP,
-	EVENT_CONCUSSIVE_STOMP_VOLCAN,
-	EVENT_THERMAL_IGNITION,
-	EVENT_THERMAL_IGNITION2,
-	
+    EVENT_PHASE_1 = 1,
+    EVENT_PHASE_2,
+    EVENT_SUPERHEATED,
+    
+    // Phase 1
+    EVENT_CONCUSSIVE_STOMP,
+    EVENT_CONCUSSIVE_STOMP_VOLCAN,
+    EVENT_THERMAL_IGNITION,
+    EVENT_THERMAL_IGNITION2,
+    
     // Phase 2
-	EVENT_UNLEASHED_FLAME,
-	EVENT_IMMOLATION,
-	EVENT_CONCUSSIVE_STOMP2,
+    EVENT_UNLEASHED_FLAME,
+    EVENT_IMMOLATION,
+    EVENT_CONCUSSIVE_STOMP2,
 
     /*** Volcano ***/
     EVENT_ERRUPTION_START,
-	EVENT_ERRUPTION_END,
-	EVENT_CRATER,
-	EVENT_LAVA_STRIKE,
-	
+    EVENT_ERRUPTION_END,
+    EVENT_CRATER,
+    EVENT_LAVA_STRIKE,
+    
     /*** Crater ***/
     EVENT_ACTIVATE_CRATER,
-	EVENT_LAVA_LINE,
-	EVENT_LAVA_LINES_BLOW,
-	EVENT_DESPAWN_CRATER,
-	EVENT_CHECK_NEAR_PLAYER,
-	EVENT_DESPAWN_LINE,
-	
+    EVENT_LAVA_LINE,
+    EVENT_LAVA_LINES_BLOW,
+    EVENT_DESPAWN_CRATER,
+    EVENT_CHECK_NEAR_PLAYER,
+    EVENT_DESPAWN_LINE,
+    
     /*** Spark of Rhyolith ***/
-	EVENT_INFERNAL_RAGE,
-	EVENT_IMOLATION,
+    EVENT_INFERNAL_RAGE,
+    EVENT_IMOLATION,
 
     /*** Combat ***/
     EVENT_ZONE_COMBAT
@@ -320,13 +320,13 @@ enum Phases
 
 enum Misc
 {
-	MODEL_DEFAULT = 38414, 
-	MODEL_PHASE2  = 38594
+    MODEL_DEFAULT = 38414, 
+    MODEL_PHASE2  = 38594
 };
 
 const Position CenterPlatform[1] =
 {
-	{-368.220f, -322.986f, 100.281f, 0}
+    {-368.220f, -322.986f, 100.281f, 0}
 };
 
 // Speed
@@ -359,124 +359,124 @@ class boss_lord_rhyolith : public CreatureScript
     public:
         boss_lord_rhyolith() : CreatureScript("boss_lord_rhyolith") { }
 
-		CreatureAI* GetAI(Creature* creature) const
-		{
-		    return new boss_lord_rhyolithAI(creature);
-		}
-		
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return new boss_lord_rhyolithAI(creature);
+        }
+        
         struct boss_lord_rhyolithAI : public BossAI
         {
             boss_lord_rhyolithAI(Creature* c) : BossAI(c, DATA_LORD_RHYOLITH), vehicle(c->GetVehicleKit()), summons(me)
             {
-		        instance = me->GetInstanceScript();
-				LeftSet = false;
-				RightSet = false;
+                instance = me->GetInstanceScript();
+                LeftSet = false;
+                RightSet = false;
                 Reset();
             }
  
-			InstanceScript* instance;
-			Vehicle* vehicle;
-			Phases Phase;
-			EventMap events;
-			SummonList summons;
+            InstanceScript* instance;
+            Vehicle* vehicle;
+            Phases Phase;
+            EventMap events;
+            SummonList summons;
 
             bool phaseTwo, LeftSet, RightSet, lavaFlow, drinkMagma;
 
-			void SummonAndSetLegsInBoss()
-			{
-				if (!me || !me->IsAlive())
-					return;
+            void SummonAndSetLegsInBoss()
+            {
+                if (!me || !me->IsAlive())
+                    return;
 
-				if (GetRightLeg())
-				{
-					if (!GetRightLeg()->IsAlive())
-						GetRightLeg()->Respawn(true);
+                if (GetRightLeg())
+                {
+                    if (!GetRightLeg()->IsAlive())
+                        GetRightLeg()->Respawn(true);
 
-					if (Vehicle* pVehicle = me->GetVehicleKit())
-						if (!pVehicle->GetPassenger(1))
-						{
-							RightSet = true;
-							GetRightLeg()->EnterVehicle(me,1);
-							GetRightLeg()->ClearUnitState(UNIT_STATE_ONVEHICLE);
-						}
-				}
+                    if (Vehicle* pVehicle = me->GetVehicleKit())
+                        if (!pVehicle->GetPassenger(1))
+                        {
+                            RightSet = true;
+                            GetRightLeg()->EnterVehicle(me,1);
+                            GetRightLeg()->ClearUnitState(UNIT_STATE_ONVEHICLE);
+                        }
+                }
 
-				if (GetLeftLeg())
-				{
-					if (!GetLeftLeg()->IsAlive())
-						GetLeftLeg()->Respawn(true);
+                if (GetLeftLeg())
+                {
+                    if (!GetLeftLeg()->IsAlive())
+                        GetLeftLeg()->Respawn(true);
 
-					if (Vehicle* pVehicle = me->GetVehicleKit())
-						if (!pVehicle->GetPassenger(0))
-						{
-							LeftSet = true;
-							GetLeftLeg()->EnterVehicle(me,0);
-							GetLeftLeg()->ClearUnitState(UNIT_STATE_ONVEHICLE);
-						}
-				}
-			}
+                    if (Vehicle* pVehicle = me->GetVehicleKit())
+                        if (!pVehicle->GetPassenger(0))
+                        {
+                            LeftSet = true;
+                            GetLeftLeg()->EnterVehicle(me,0);
+                            GetLeftLeg()->ClearUnitState(UNIT_STATE_ONVEHICLE);
+                        }
+                }
+            }
 
             void Reset()
             {
-				events.Reset();
+                events.Reset();
                 Phase = PHASE_0;
-				me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                 phaseTwo = false;
-				lavaFlow = false;
-				drinkMagma = false;
+                lavaFlow = false;
+                drinkMagma = false;
                 summons.DespawnAll();
-				me->SetReactState(REACT_PASSIVE);
+                me->SetReactState(REACT_PASSIVE);
                 me->SetDisplayId(MODEL_DEFAULT);
-		        me->GetVehicleKit();
-				SummonAndSetLegsInBoss();
-				instance->SetBossState(DATA_LORD_RHYOLITH, NOT_STARTED);
-				
-				_Reset();
-	        }
+                me->GetVehicleKit();
+                SummonAndSetLegsInBoss();
+                instance->SetBossState(DATA_LORD_RHYOLITH, NOT_STARTED);
+                
+                _Reset();
+            }
 
-			void RemoveEncounterAuras()
-			{
-				Map::PlayerList const &PlayerList = me->GetMap()->GetPlayers();
-				if (!PlayerList.isEmpty())
-					for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-					{
-						if (i->GetSource()->HasAura(SPELL_ORIENTATION_BAR))
-							i->GetSource()->RemoveAura(SPELL_ORIENTATION_BAR);
-					}
-			}
+            void RemoveEncounterAuras()
+            {
+                Map::PlayerList const &PlayerList = me->GetMap()->GetPlayers();
+                if (!PlayerList.isEmpty())
+                    for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+                    {
+                        if (i->GetSource()->HasAura(SPELL_ORIENTATION_BAR))
+                            i->GetSource()->RemoveAura(SPELL_ORIENTATION_BAR);
+                    }
+            }
 
             void EnterCombat(Unit* /*who*/)
             {
-				instance->NormaliseAltPower();
+                instance->NormaliseAltPower();
                 Phase = PHASE_0;
-				events.SetPhase(PHASE_0);
+                events.SetPhase(PHASE_0);
 
-				DoCast(me, SPELL_ORIENTATION_BAR);
+                DoCast(me, SPELL_ORIENTATION_BAR);
 
-				me->SetSpeed(MOVE_RUN, speedRateLow);	
+                me->SetSpeed(MOVE_RUN, speedRateLow);    
 
-                Talk(YELL_AGGRO);			
-				instance->SetBossState(DATA_LORD_RHYOLITH,IN_PROGRESS);
+                Talk(YELL_AGGRO);            
+                instance->SetBossState(DATA_LORD_RHYOLITH,IN_PROGRESS);
 
-				Phase = PHASE_1;
-				
-				events.ScheduleEvent(EVENT_CONCUSSIVE_STOMP, 15000);
-				events.ScheduleEvent(EVENT_THERMAL_IGNITION, 18000);	
+                Phase = PHASE_1;
+                
+                events.ScheduleEvent(EVENT_CONCUSSIVE_STOMP, 15000);
+                events.ScheduleEvent(EVENT_THERMAL_IGNITION, 18000);    
 
-				if (me->GetMap()->IsHeroic())
-				    events.ScheduleEvent(EVENT_SUPERHEATED, 600000); // 10 min Enrage.
+                if (me->GetMap()->IsHeroic())
+                    events.ScheduleEvent(EVENT_SUPERHEATED, 600000); // 10 min Enrage.
                 else 
-				    events.ScheduleEvent(EVENT_SUPERHEATED, 480000); // 8 min Enrage.
+                    events.ScheduleEvent(EVENT_SUPERHEATED, 480000); // 8 min Enrage.
 
-				if (GetLeftLeg())
-					GetLeftLeg()->AI()->DoZoneInCombat();
+                if (GetLeftLeg())
+                    GetLeftLeg()->AI()->DoZoneInCombat();
 
-				if (GetRightLeg())
-					GetRightLeg()->AI()->DoZoneInCombat();
+                if (GetRightLeg())
+                    GetRightLeg()->AI()->DoZoneInCombat();
 
-				events.ScheduleEvent(EVENT_ZONE_COMBAT, 1000);
+                events.ScheduleEvent(EVENT_ZONE_COMBAT, 1000);
 
-				_EnterCombat();
+                _EnterCombat();
             }
 
             void KilledUnit(Unit* /*who*/)
@@ -484,48 +484,48 @@ class boss_lord_rhyolith : public CreatureScript
                 Talk(YELL_KILLED);
             }
 
-			void JustDied(Unit* /*killer*/)
+            void JustDied(Unit* /*killer*/)
             {
                 instance->SetBossState(DATA_LORD_RHYOLITH, DONE);
-				
+                
                 Talk(YELL_DIED);
                 summons.DespawnAll();
 
-				if (GetLeftLeg())
-					GetLeftLeg()->DisappearAndDie();
+                if (GetLeftLeg())
+                    GetLeftLeg()->DisappearAndDie();
 
-				if (GetRightLeg())
-					GetRightLeg()->DisappearAndDie();
+                if (GetRightLeg())
+                    GetRightLeg()->DisappearAndDie();
 
-				_JustDied();				
+                _JustDied();                
             }
 
             void EnterEvadeMode()
             {
                 Reset();
             
-				DespawnCreatures(53585);
+                DespawnCreatures(53585);
 
-				RemoveEncounterAuras();
+                RemoveEncounterAuras();
 
-				me->SetSpeed(MOVE_RUN,speedRateNormal);
+                me->SetSpeed(MOVE_RUN,speedRateNormal);
 
                 instance->SetBossState(DATA_LORD_RHYOLITH, FAIL);
 
                 me->GetMotionMaster()->MoveTargetedHome();
 
-				if (GetLeftLeg())
-					GetLeftLeg()->AI()->EnterEvadeMode();
+                if (GetLeftLeg())
+                    GetLeftLeg()->AI()->EnterEvadeMode();
 
-				if (GetRightLeg())
-					GetRightLeg()->AI()->EnterEvadeMode();
+                if (GetRightLeg())
+                    GetRightLeg()->AI()->EnterEvadeMode();
 
                 _EnterEvadeMode();
             }
 
             void JustSummoned(Creature *summon)
             {
-			    summons.Summon(summon);
+                summons.Summon(summon);
 
                 switch (summon->GetEntry())
                 {
@@ -556,222 +556,222 @@ class boss_lord_rhyolith : public CreatureScript
                 }
             }
 
-			void DespawnCreatures(uint32 entry)
-			{
-				std::list<Creature*> creatures;
-				   GetCreatureListWithEntryInGrid(creatures, me, entry, 1000.0f);
+            void DespawnCreatures(uint32 entry)
+            {
+                std::list<Creature*> creatures;
+                   GetCreatureListWithEntryInGrid(creatures, me, entry, 1000.0f);
 
-				if (creatures.empty())
-				   return;
+                if (creatures.empty())
+                   return;
 
-				for (std::list<Creature*>::iterator iter = creatures.begin(); iter != creatures.end(); ++iter)
-					(*iter)->DespawnOrUnsummon();
-			}
+                for (std::list<Creature*>::iterator iter = creatures.begin(); iter != creatures.end(); ++iter)
+                    (*iter)->DespawnOrUnsummon();
+            }
 
-			void SetPlayersInCombat(bool evade)
-			{
-				uint8 players = 0;
-				Map::PlayerList const &PlayerList = me->GetMap()->GetPlayers();
-				if (!PlayerList.isEmpty())
-					for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-						if (Player *player = i->GetSource())
-							if (player->IsAlive() && player->GetDistance(me) <= 150.0f)
-							{
-								++players;
-								player->SetInCombatWith(me->ToUnit());
-							}
+            void SetPlayersInCombat(bool evade)
+            {
+                uint8 players = 0;
+                Map::PlayerList const &PlayerList = me->GetMap()->GetPlayers();
+                if (!PlayerList.isEmpty())
+                    for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+                        if (Player *player = i->GetSource())
+                            if (player->IsAlive() && player->GetDistance(me) <= 150.0f)
+                            {
+                                ++players;
+                                player->SetInCombatWith(me->ToUnit());
+                            }
 
-				if (players == 0 && evade == true)
-					EnterEvadeMode();
-			}
+                if (players == 0 && evade == true)
+                    EnterEvadeMode();
+            }
 
             void UpdateAI(const uint32 diff)
             {
-				if (!RightSet || !LeftSet)
-					SummonAndSetLegsInBoss();
+                if (!RightSet || !LeftSet)
+                    SummonAndSetLegsInBoss();
 
-				if (!me->HasAura(SPELL_OBSIDIAN_ARMOR) && Phase != PHASE_2)
-				{
-					DoCast(me,SPELL_OBSIDIAN_ARMOR);
-					me->SetAuraStack(SPELL_OBSIDIAN_ARMOR, me, 80);
-				}
+                if (!me->HasAura(SPELL_OBSIDIAN_ARMOR) && Phase != PHASE_2)
+                {
+                    DoCast(me,SPELL_OBSIDIAN_ARMOR);
+                    me->SetAuraStack(SPELL_OBSIDIAN_ARMOR, me, 80);
+                }
 
-				if (me->HasAura(SPELL_OBSIDIAN_ARMOR) && Phase != PHASE_2)
-				{
-					if (GetLeftLeg() && GetLeftLeg()->IsAlive())
-					{
-						if (!GetLeftLeg()->HasAura(SPELL_OBSIDIAN_ARMOR))
-							GetLeftLeg()->CastSpell(GetLeftLeg(), SPELL_OBSIDIAN_ARMOR, true);
-						else if (GetLeftLeg()->GetAura(SPELL_OBSIDIAN_ARMOR)->GetStackAmount() != me->GetAura(SPELL_OBSIDIAN_ARMOR)->GetStackAmount())
-							GetLeftLeg()->SetAuraStack(SPELL_OBSIDIAN_ARMOR, GetLeftLeg(), me->GetAura(SPELL_OBSIDIAN_ARMOR)->GetStackAmount());
-					}
-					if (GetRightLeg() && GetRightLeg()->IsAlive())
-					{
-						if (!GetRightLeg()->HasAura(SPELL_OBSIDIAN_ARMOR))
-							GetRightLeg()->CastSpell(GetRightLeg(), SPELL_OBSIDIAN_ARMOR, true);
-						else if (GetRightLeg()->GetAura(SPELL_OBSIDIAN_ARMOR)->GetStackAmount() != me->GetAura(SPELL_OBSIDIAN_ARMOR)->GetStackAmount())
-							GetRightLeg()->SetAuraStack(SPELL_OBSIDIAN_ARMOR, GetRightLeg(), me->GetAura(SPELL_OBSIDIAN_ARMOR)->GetStackAmount());
-					}
-				}
+                if (me->HasAura(SPELL_OBSIDIAN_ARMOR) && Phase != PHASE_2)
+                {
+                    if (GetLeftLeg() && GetLeftLeg()->IsAlive())
+                    {
+                        if (!GetLeftLeg()->HasAura(SPELL_OBSIDIAN_ARMOR))
+                            GetLeftLeg()->CastSpell(GetLeftLeg(), SPELL_OBSIDIAN_ARMOR, true);
+                        else if (GetLeftLeg()->GetAura(SPELL_OBSIDIAN_ARMOR)->GetStackAmount() != me->GetAura(SPELL_OBSIDIAN_ARMOR)->GetStackAmount())
+                            GetLeftLeg()->SetAuraStack(SPELL_OBSIDIAN_ARMOR, GetLeftLeg(), me->GetAura(SPELL_OBSIDIAN_ARMOR)->GetStackAmount());
+                    }
+                    if (GetRightLeg() && GetRightLeg()->IsAlive())
+                    {
+                        if (!GetRightLeg()->HasAura(SPELL_OBSIDIAN_ARMOR))
+                            GetRightLeg()->CastSpell(GetRightLeg(), SPELL_OBSIDIAN_ARMOR, true);
+                        else if (GetRightLeg()->GetAura(SPELL_OBSIDIAN_ARMOR)->GetStackAmount() != me->GetAura(SPELL_OBSIDIAN_ARMOR)->GetStackAmount())
+                            GetRightLeg()->SetAuraStack(SPELL_OBSIDIAN_ARMOR, GetRightLeg(), me->GetAura(SPELL_OBSIDIAN_ARMOR)->GetStackAmount());
+                    }
+                }
 
-				if (!UpdateVictim())
-					if (Player* target = me->SelectNearestPlayer(70.0f))
-					{
-						if (GetLeftLeg())
-							GetLeftLeg()->AI()->DoZoneInCombat();
+                if (!UpdateVictim())
+                    if (Player* target = me->SelectNearestPlayer(70.0f))
+                    {
+                        if (GetLeftLeg())
+                            GetLeftLeg()->AI()->DoZoneInCombat();
 
-						if (GetRightLeg())
-							GetRightLeg()->AI()->DoZoneInCombat();
+                        if (GetRightLeg())
+                            GetRightLeg()->AI()->DoZoneInCombat();
 
-						me->AI()->DoZoneInCombat();
-					}
+                        me->AI()->DoZoneInCombat();
+                    }
 
                 if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
-				if (Phase == PHASE_1)
-				{
-					if (HealthBelowPct(26) && !phaseTwo)
+                if (Phase == PHASE_1)
+                {
+                    if (HealthBelowPct(26) && !phaseTwo)
                     {
-						Phase = PHASE_2;
+                        Phase = PHASE_2;
 
-						me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 
-						events.CancelEvent(EVENT_CONCUSSIVE_STOMP);
-						events.CancelEvent(EVENT_THERMAL_IGNITION);
-						events.CancelEvent(EVENT_THERMAL_IGNITION2);
-						events.CancelEvent(EVENT_CONCUSSIVE_STOMP_VOLCAN);
+                        events.CancelEvent(EVENT_CONCUSSIVE_STOMP);
+                        events.CancelEvent(EVENT_THERMAL_IGNITION);
+                        events.CancelEvent(EVENT_THERMAL_IGNITION2);
+                        events.CancelEvent(EVENT_CONCUSSIVE_STOMP_VOLCAN);
 
-						Talk(YELL_PHASE2);
+                        Talk(YELL_PHASE2);
 
-						me->SetDisplayId(MODEL_PHASE2);
-						me->SetSpeed(MOVE_RUN, speedRateNormal);
+                        me->SetDisplayId(MODEL_PHASE2);
+                        me->SetSpeed(MOVE_RUN, speedRateNormal);
 
-						me->SetReactState(REACT_AGGRESSIVE);
-						DoZoneInCombat();
+                        me->SetReactState(REACT_AGGRESSIVE);
+                        DoZoneInCombat();
 
-						me->RemoveAurasDueToSpell(SPELL_OBSIDIAN_ARMOR);
-						DespawnCreatures(53585);
-						summons.DespawnAll();
+                        me->RemoveAurasDueToSpell(SPELL_OBSIDIAN_ARMOR);
+                        DespawnCreatures(53585);
+                        summons.DespawnAll();
 
-						if (GetRightLeg())
-						{
-							GetRightLeg()->RemoveAurasDueToSpell(SPELL_OBSIDIAN_ARMOR);
-							GetRightLeg()->DisappearAndDie();
-						}
-						if (GetLeftLeg())
-						{	
-							GetLeftLeg()->RemoveAurasDueToSpell(SPELL_OBSIDIAN_ARMOR);
-							GetLeftLeg()->DisappearAndDie();
-						}
-						
-						events.ScheduleEvent(EVENT_UNLEASHED_FLAME, timerUnleashedFlame);
-						events.ScheduleEvent(EVENT_IMMOLATION, 100);
-						events.ScheduleEvent(EVENT_CONCUSSIVE_STOMP2, timerConcussiveStomp2);
-						phaseTwo = true;
+                        if (GetRightLeg())
+                        {
+                            GetRightLeg()->RemoveAurasDueToSpell(SPELL_OBSIDIAN_ARMOR);
+                            GetRightLeg()->DisappearAndDie();
+                        }
+                        if (GetLeftLeg())
+                        {    
+                            GetLeftLeg()->RemoveAurasDueToSpell(SPELL_OBSIDIAN_ARMOR);
+                            GetLeftLeg()->DisappearAndDie();
+                        }
+                        
+                        events.ScheduleEvent(EVENT_UNLEASHED_FLAME, timerUnleashedFlame);
+                        events.ScheduleEvent(EVENT_IMMOLATION, 100);
+                        events.ScheduleEvent(EVENT_CONCUSSIVE_STOMP2, timerConcussiveStomp2);
+                        phaseTwo = true;
                     }
 
-					if (me->GetPositionZ() <= 100.0f && lavaFlow == false)
-					{
-						me->MonsterTextEmote(EMOTE_MAGMA, 0, true);
-						lavaFlow = true;
-					}
+                    if (me->GetPositionZ() <= 100.0f && lavaFlow == false)
+                    {
+                        me->MonsterTextEmote(EMOTE_MAGMA, 0, true);
+                        lavaFlow = true;
+                    }
 
-					if (lavaFlow == true)
-					{
-						if (drinkMagma == false)
-						{
-							drinkMagma = true;
-							DoCast(me, SPELL_DRINK_MAGMA);
-						}
-						else
-							DoCast(me, SPELL_MOLTEN_SPEW);
-					}
+                    if (lavaFlow == true)
+                    {
+                        if (drinkMagma == false)
+                        {
+                            drinkMagma = true;
+                            DoCast(me, SPELL_DRINK_MAGMA);
+                        }
+                        else
+                            DoCast(me, SPELL_MOLTEN_SPEW);
+                    }
 
-					if (lavaFlow == false)
-					{
-						float x, y, z;
-						me->GetClosePoint(x, y, z, me->GetObjectSize() / 3);
-						me->GetMotionMaster()->MovePoint(0, x, y, z);
-					}
-				}
+                    if (lavaFlow == false)
+                    {
+                        float x, y, z;
+                        me->GetClosePoint(x, y, z, me->GetObjectSize() / 3);
+                        me->GetMotionMaster()->MovePoint(0, x, y, z);
+                    }
+                }
 
-				events.Update(diff);
+                events.Update(diff);
 
-	   			while (uint32 eventId = events.ExecuteEvent())
-				{
-					switch (eventId)
-					{				
-						case EVENT_ZONE_COMBAT:
-							SetPlayersInCombat(true);
-							events.ScheduleEvent(EVENT_ZONE_COMBAT, 1000);
-						break;
+                   while (uint32 eventId = events.ExecuteEvent())
+                {
+                    switch (eventId)
+                    {                
+                        case EVENT_ZONE_COMBAT:
+                            SetPlayersInCombat(true);
+                            events.ScheduleEvent(EVENT_ZONE_COMBAT, 1000);
+                        break;
 
-						case EVENT_SUPERHEATED:
-							me->MonsterTextEmote(EMOTE_SUPERHEATED, 0, true);
-							DoCast(me, SPELL_SUPERHEATED);
-						
-							events.ScheduleEvent(EVENT_SUPERHEATED, timerSuperheated);
-						break;
+                        case EVENT_SUPERHEATED:
+                            me->MonsterTextEmote(EMOTE_SUPERHEATED, 0, true);
+                            DoCast(me, SPELL_SUPERHEATED);
+                        
+                            events.ScheduleEvent(EVENT_SUPERHEATED, timerSuperheated);
+                        break;
 
-						case EVENT_CONCUSSIVE_STOMP:
-							DoCast(me, SPELL_CONCUSSIVE_STOMP);
-							events.ScheduleEvent(EVENT_CONCUSSIVE_STOMP_VOLCAN, 1000);
-						break;
+                        case EVENT_CONCUSSIVE_STOMP:
+                            DoCast(me, SPELL_CONCUSSIVE_STOMP);
+                            events.ScheduleEvent(EVENT_CONCUSSIVE_STOMP_VOLCAN, 1000);
+                        break;
 
-						case EVENT_CONCUSSIVE_STOMP_VOLCAN:
-							for (int32 i = 0;  i < RAID_MODE(2, 3, 2, 3); ++i)
-							{
-								Position pos;
-								me->GetRandomNearPosition(pos, urand(10,90));
-								while (pos.GetPositionZ() < 100.0f || pos.GetPositionZ() > 101.0f || me->GetDistance(pos) < 15.0f || CenterPlatform[0].GetExactDist(pos.GetPositionX(),pos.GetPositionY(),pos.GetPositionZ()) > 50.0f)
-									me->GetRandomNearPosition(pos, 90);
-								me->CastSpell(pos.GetPositionX(),pos.GetPositionY(),pos.GetPositionZ(),SPELL_VOLCANIC_BIRTH,true);
-							}
-							events.ScheduleEvent(EVENT_CONCUSSIVE_STOMP, timerConcussiveStomp);
-						break;
+                        case EVENT_CONCUSSIVE_STOMP_VOLCAN:
+                            for (int32 i = 0;  i < RAID_MODE(2, 3, 2, 3); ++i)
+                            {
+                                Position pos;
+                                me->GetRandomNearPosition(pos, urand(10,90));
+                                while (pos.GetPositionZ() < 100.0f || pos.GetPositionZ() > 101.0f || me->GetDistance(pos) < 15.0f || CenterPlatform[0].GetExactDist(pos.GetPositionX(),pos.GetPositionY(),pos.GetPositionZ()) > 50.0f)
+                                    me->GetRandomNearPosition(pos, 90);
+                                me->CastSpell(pos.GetPositionX(),pos.GetPositionY(),pos.GetPositionZ(),SPELL_VOLCANIC_BIRTH,true);
+                            }
+                            events.ScheduleEvent(EVENT_CONCUSSIVE_STOMP, timerConcussiveStomp);
+                        break;
 
-						case EVENT_THERMAL_IGNITION:
-							for (int32 i = 0;  i < RAID_MODE(5, 10, 5, 10); ++i)
-								DoCast(me, SPELL_THERMAL_IGNITION);	
-							events.ScheduleEvent(EVENT_THERMAL_IGNITION2, 33000);
-						break;
+                        case EVENT_THERMAL_IGNITION:
+                            for (int32 i = 0;  i < RAID_MODE(5, 10, 5, 10); ++i)
+                                DoCast(me, SPELL_THERMAL_IGNITION);    
+                            events.ScheduleEvent(EVENT_THERMAL_IGNITION2, 33000);
+                        break;
 
-						case EVENT_THERMAL_IGNITION2:
-							DoCast(me, SPELL_THERMAL_IGNITION2);
-							events.ScheduleEvent(EVENT_THERMAL_IGNITION, 33000);
-						break;      		
+                        case EVENT_THERMAL_IGNITION2:
+                            DoCast(me, SPELL_THERMAL_IGNITION2);
+                            events.ScheduleEvent(EVENT_THERMAL_IGNITION, 33000);
+                        break;              
 
-						case EVENT_UNLEASHED_FLAME:
-							DoCast(me, SPELL_UNLEASHED_FLAME);						
-							events.ScheduleEvent(EVENT_UNLEASHED_FLAME, timerUnleashedFlame);
-						break;
+                        case EVENT_UNLEASHED_FLAME:
+                            DoCast(me, SPELL_UNLEASHED_FLAME);                        
+                            events.ScheduleEvent(EVENT_UNLEASHED_FLAME, timerUnleashedFlame);
+                        break;
 
-						case EVENT_IMMOLATION:
-							DoCast(me, SPELL_IMMOLATION);
-						break;
+                        case EVENT_IMMOLATION:
+                            DoCast(me, SPELL_IMMOLATION);
+                        break;
 
-						case EVENT_CONCUSSIVE_STOMP2:						
-						    DoCast(me, SPELL_CONCUSSIVE_STOMP);						
-							events.ScheduleEvent(EVENT_CONCUSSIVE_STOMP2, timerConcussiveStomp2);
-						break;
-					}
-				}
+                        case EVENT_CONCUSSIVE_STOMP2:                        
+                            DoCast(me, SPELL_CONCUSSIVE_STOMP);                        
+                            events.ScheduleEvent(EVENT_CONCUSSIVE_STOMP2, timerConcussiveStomp2);
+                        break;
+                    }
+                }
 
             if (Phase == PHASE_2)
                 DoMeleeAttackIfReady();
-			}	
+            }    
 
-			Creature* GetLeftLeg()
-			{
-				return (me->FindNearestCreature(52577, 5000.0f, true) == NULL) ? me->FindNearestCreature(52577, 5000.0f, false) : me->FindNearestCreature(52577, 5000.0f, true);
-			}
+            Creature* GetLeftLeg()
+            {
+                return (me->FindNearestCreature(52577, 5000.0f, true) == NULL) ? me->FindNearestCreature(52577, 5000.0f, false) : me->FindNearestCreature(52577, 5000.0f, true);
+            }
 
-			Creature* GetRightLeg()
-			{
-				return (me->FindNearestCreature(53087, 5000.0f, true)  == NULL) ? me->FindNearestCreature(53087, 5000.0f, false) : me->FindNearestCreature(53087, 5000.0f, true);
-			}
-		};
+            Creature* GetRightLeg()
+            {
+                return (me->FindNearestCreature(53087, 5000.0f, true)  == NULL) ? me->FindNearestCreature(53087, 5000.0f, false) : me->FindNearestCreature(53087, 5000.0f, true);
+            }
+        };
 };
 
 /*######
@@ -781,84 +781,84 @@ class boss_lord_rhyolith : public CreatureScript
 class npc_left_leg : public CreatureScript
 {
 public:
-	npc_left_leg() : CreatureScript("npc_left_leg"){}
+    npc_left_leg() : CreatureScript("npc_left_leg"){}
 
-	CreatureAI* GetAI(Creature* creature) const
-	{
-		return new npc_left_legAI(creature);
-	}
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_left_legAI(creature);
+    }
 
-	struct npc_left_legAI : public ScriptedAI
-	{
-		npc_left_legAI(Creature *c) : ScriptedAI(c)
-		{
-			instance = me->GetInstanceScript();
-			me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-			Reset();
-		}
+    struct npc_left_legAI : public ScriptedAI
+    {
+        npc_left_legAI(Creature *c) : ScriptedAI(c)
+        {
+            instance = me->GetInstanceScript();
+            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            Reset();
+        }
 
-		InstanceScript* instance;
-		uint32 side;
+        InstanceScript* instance;
+        uint32 side;
 
-		void JustDied(Unit* /*killer*/) { }
+        void JustDied(Unit* /*killer*/) { }
 
-		void SetAltPowerForPlayers(int32 power)
-		{
-			Map::PlayerList const &PlayerList = me->GetMap()->GetPlayers();
-			if (!PlayerList.isEmpty())
-				for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-					if (Player *player = i->GetSource())
-						if (player->IsAlive() && GetRhyo() && player->GetDistance(GetRhyo()) <= 150.0f)
-							player->SetPower(POWER_ALTERNATE_POWER, player->GetPower(POWER_ALTERNATE_POWER) + power);
-		}
+        void SetAltPowerForPlayers(int32 power)
+        {
+            Map::PlayerList const &PlayerList = me->GetMap()->GetPlayers();
+            if (!PlayerList.isEmpty())
+                for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+                    if (Player *player = i->GetSource())
+                        if (player->IsAlive() && GetRhyo() && player->GetDistance(GetRhyo()) <= 150.0f)
+                            player->SetPower(POWER_ALTERNATE_POWER, player->GetPower(POWER_ALTERNATE_POWER) + power);
+        }
 
         void Reset()
         {
-			me->SetReactState(REACT_PASSIVE);
-			me->AddUnitTypeMask(UNIT_MASK_ACCESSORY);
-			side = 0;
+            me->SetReactState(REACT_PASSIVE);
+            me->AddUnitTypeMask(UNIT_MASK_ACCESSORY);
+            side = 0;
         }
 
-		void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/)
         {
-			me->SetInCombatWithZone();
-			if (GetRhyo() && GetRhyo()->IsAlive())
-				GetRhyo()->AI()->DoZoneInCombat();
+            me->SetInCombatWithZone();
+            if (GetRhyo() && GetRhyo()->IsAlive())
+                GetRhyo()->AI()->DoZoneInCombat();
         }
 
         void UpdateAI(const uint32 diff) { }
 
-		void DamageTaken(Unit* who, uint32& damage)
-		{
-			side += damage;
+        void DamageTaken(Unit* who, uint32& damage)
+        {
+            side += damage;
 
-		    if (side >= me->GetMaxHealth() * 0.024)
-				if (GetRhyo())
-				{
-					SetAltPowerForPlayers(float(side / (me->GetMaxHealth() * 0.024)));
-					GetRhyo()->StopMoving();
-					GetRhyo()->SetFacingTo(GetRhyo()->GetOrientation() + ((side / (me->GetMaxHealth() * 0.024)) * 0.1f));
-					side /= me->GetMaxHealth() * 0.024;
-				}
+            if (side >= me->GetMaxHealth() * 0.024)
+                if (GetRhyo())
+                {
+                    SetAltPowerForPlayers(float(side / (me->GetMaxHealth() * 0.024)));
+                    GetRhyo()->StopMoving();
+                    GetRhyo()->SetFacingTo(GetRhyo()->GetOrientation() + ((side / (me->GetMaxHealth() * 0.024)) * 0.1f));
+                    side /= me->GetMaxHealth() * 0.024;
+                }
 
-			if (damage && GetRhyo() && GetRight())
-			{
-				uint32 health = me->GetHealth() + GetRight()->GetHealth();
-				me->SetHealth(health/2);
-				GetRight()->SetHealth(health/2);
-				GetRhyo()->SetHealth(health);
-			}
-		}
+            if (damage && GetRhyo() && GetRight())
+            {
+                uint32 health = me->GetHealth() + GetRight()->GetHealth();
+                me->SetHealth(health/2);
+                GetRight()->SetHealth(health/2);
+                GetRhyo()->SetHealth(health);
+            }
+        }
 
-		Creature* GetRhyo()
-		{
-			return (me->FindNearestCreature(52558, 5000.0f, true) == NULL) ? me->FindNearestCreature(52558, 5000.0f, false) : me->FindNearestCreature(52558, 5000.0f, true);
-		}
+        Creature* GetRhyo()
+        {
+            return (me->FindNearestCreature(52558, 5000.0f, true) == NULL) ? me->FindNearestCreature(52558, 5000.0f, false) : me->FindNearestCreature(52558, 5000.0f, true);
+        }
 
-		Creature* GetRight()
-		{
-			return (me->FindNearestCreature(53087, 5000.0f, true) == NULL) ? me->FindNearestCreature(53087, 5000.0f, false) : me->FindNearestCreature(53087, 5000.0f, true);
-		}
+        Creature* GetRight()
+        {
+            return (me->FindNearestCreature(53087, 5000.0f, true) == NULL) ? me->FindNearestCreature(53087, 5000.0f, false) : me->FindNearestCreature(53087, 5000.0f, true);
+        }
 
     };
 };
@@ -866,84 +866,84 @@ public:
 class npc_right_leg : public CreatureScript
 {
 public:
-	npc_right_leg() : CreatureScript("npc_right_leg"){}
+    npc_right_leg() : CreatureScript("npc_right_leg"){}
 
-	CreatureAI* GetAI(Creature* creature) const
-	{
-		return new npc_right_legAI(creature);
-	}
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_right_legAI(creature);
+    }
 
-	struct npc_right_legAI : public ScriptedAI
-	{
-		npc_right_legAI(Creature *c) : ScriptedAI(c)
-		{
-			instance = me->GetInstanceScript();
-			me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-			Reset();
-		}
+    struct npc_right_legAI : public ScriptedAI
+    {
+        npc_right_legAI(Creature *c) : ScriptedAI(c)
+        {
+            instance = me->GetInstanceScript();
+            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            Reset();
+        }
 
-		InstanceScript* instance;
-		uint32 side;
+        InstanceScript* instance;
+        uint32 side;
 
-		void JustDied(Unit* /*killer*/) { }
+        void JustDied(Unit* /*killer*/) { }
 
-		void SetAltPowerForPlayers(int32 power)
-		{
-			Map::PlayerList const &PlayerList = me->GetMap()->GetPlayers();
-			if (!PlayerList.isEmpty())
-				for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-					if (Player *player = i->GetSource())
-						if (player->IsAlive() && GetRhyo() && player->GetDistance(GetRhyo()) <= 150.0f)
-							player->SetPower(POWER_ALTERNATE_POWER, player->GetPower(POWER_ALTERNATE_POWER) + power);
-		}
+        void SetAltPowerForPlayers(int32 power)
+        {
+            Map::PlayerList const &PlayerList = me->GetMap()->GetPlayers();
+            if (!PlayerList.isEmpty())
+                for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+                    if (Player *player = i->GetSource())
+                        if (player->IsAlive() && GetRhyo() && player->GetDistance(GetRhyo()) <= 150.0f)
+                            player->SetPower(POWER_ALTERNATE_POWER, player->GetPower(POWER_ALTERNATE_POWER) + power);
+        }
 
         void Reset()
         {
-			me->SetReactState(REACT_PASSIVE);
-			me->AddUnitTypeMask(UNIT_MASK_ACCESSORY);
-			side = 0;
+            me->SetReactState(REACT_PASSIVE);
+            me->AddUnitTypeMask(UNIT_MASK_ACCESSORY);
+            side = 0;
         }
 
-		void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/)
         {
-			me->SetInCombatWithZone();
-			if (GetRhyo() && GetRhyo()->IsAlive())
-				GetRhyo()->AI()->DoZoneInCombat();
+            me->SetInCombatWithZone();
+            if (GetRhyo() && GetRhyo()->IsAlive())
+                GetRhyo()->AI()->DoZoneInCombat();
         }
 
         void UpdateAI(const uint32 diff) { }
 
-		void DamageTaken(Unit* who, uint32& damage)
-		{
-			side += damage;
+        void DamageTaken(Unit* who, uint32& damage)
+        {
+            side += damage;
 
-		    if (side >= me->GetMaxHealth() * 0.024)
-				if (GetRhyo())
-				{
-					SetAltPowerForPlayers(float(-1*(side / (me->GetMaxHealth() * 0.024))));
-					GetRhyo()->StopMoving();
-					GetRhyo()->SetFacingTo(GetRhyo()->GetOrientation() - ((side / (me->GetMaxHealth() * 0.024)) * 0.1f));
-					side /= me->GetMaxHealth() * 0.024;
-				}
+            if (side >= me->GetMaxHealth() * 0.024)
+                if (GetRhyo())
+                {
+                    SetAltPowerForPlayers(float(-1*(side / (me->GetMaxHealth() * 0.024))));
+                    GetRhyo()->StopMoving();
+                    GetRhyo()->SetFacingTo(GetRhyo()->GetOrientation() - ((side / (me->GetMaxHealth() * 0.024)) * 0.1f));
+                    side /= me->GetMaxHealth() * 0.024;
+                }
 
-			if (damage && GetRhyo() && GetLeft())
-			{
-				int32 health = me->GetHealth() + GetLeft()->GetHealth();
-				me->SetHealth(health/2);
-				GetLeft()->SetHealth(health/2);
-				GetRhyo()->SetHealth(health);
-			}
-		}
+            if (damage && GetRhyo() && GetLeft())
+            {
+                int32 health = me->GetHealth() + GetLeft()->GetHealth();
+                me->SetHealth(health/2);
+                GetLeft()->SetHealth(health/2);
+                GetRhyo()->SetHealth(health);
+            }
+        }
 
-		Creature* GetRhyo()
-		{
-			return (me->FindNearestCreature(52558, 5000.0f, true) == NULL) ? me->FindNearestCreature(52558, 5000.0f, false) : me->FindNearestCreature(52558, 5000.0f, true);
-		}
+        Creature* GetRhyo()
+        {
+            return (me->FindNearestCreature(52558, 5000.0f, true) == NULL) ? me->FindNearestCreature(52558, 5000.0f, false) : me->FindNearestCreature(52558, 5000.0f, true);
+        }
 
-		Creature* GetLeft()
-		{
-			return (me->FindNearestCreature(52577, 5000.0f, true) == NULL) ? me->FindNearestCreature(52577, 5000.0f, false) : me->FindNearestCreature(52577, 5000.0f, true);
-		}
+        Creature* GetLeft()
+        {
+            return (me->FindNearestCreature(52577, 5000.0f, true) == NULL) ? me->FindNearestCreature(52577, 5000.0f, false) : me->FindNearestCreature(52577, 5000.0f, true);
+        }
 
     };
 };
@@ -955,120 +955,120 @@ public:
 class npc_rhyolith_volcano : public CreatureScript
 {
 public:
-	npc_rhyolith_volcano() : CreatureScript("npc_rhyolith_volcano"){}
+    npc_rhyolith_volcano() : CreatureScript("npc_rhyolith_volcano"){}
 
-	CreatureAI* GetAI(Creature* creature) const
-	{
-		return new npc_rhyolith_volcanoAI(creature);
-	}
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_rhyolith_volcanoAI(creature);
+    }
 
-	struct npc_rhyolith_volcanoAI : public ScriptedAI
-	{
-		npc_rhyolith_volcanoAI(Creature *c) : ScriptedAI(c)
-		{
-			instance = me->GetInstanceScript();
-			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
-			me->SetReactState(REACT_PASSIVE);
-			blow = false;
-		}
-
-		InstanceScript* instance;
-		EventMap events;
-		bool blow;
-
-		void JustDied(Unit* /*killer*/) {}
-		
-	    void IsSummonedBy(Unit* summoner)
+    struct npc_rhyolith_volcanoAI : public ScriptedAI
+    {
+        npc_rhyolith_volcanoAI(Creature *c) : ScriptedAI(c)
         {
-			me->AddAura(SPELL_VISUAL_VOLCAN,me);
-			me->AddAura(SPELL_SMOKE_VOLCAN,me);
+            instance = me->GetInstanceScript();
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+            me->SetReactState(REACT_PASSIVE);
+            blow = false;
+        }
 
-			std::list<Creature*> unitList;
+        InstanceScript* instance;
+        EventMap events;
+        bool blow;
+
+        void JustDied(Unit* /*killer*/) {}
+        
+        void IsSummonedBy(Unit* summoner)
+        {
+            me->AddAura(SPELL_VISUAL_VOLCAN,me);
+            me->AddAura(SPELL_SMOKE_VOLCAN,me);
+
+            std::list<Creature*> unitList;
             me->GetCreatureListWithEntryInGrid(unitList, 52582, 200.0f);
             bool activated = false;
             for (std::list<Creature*>::const_iterator itr = unitList.begin(); itr != unitList.end(); ++itr)
                 if ((*itr)->HasAura(SPELL_VOLCAN_CHECK_ACTIVE))
                     activated = true;
 
-			if (activated == false)
-			{
-				me->AddAura(SPELL_VOLCAN_CHECK_ACTIVE,me);
-				events.ScheduleEvent(EVENT_ERRUPTION_START, 1000);
-			}
+            if (activated == false)
+            {
+                me->AddAura(SPELL_VOLCAN_CHECK_ACTIVE,me);
+                events.ScheduleEvent(EVENT_ERRUPTION_START, 1000);
+            }
         }
 
         void Reset()
         {
-			events.Reset();
+            events.Reset();
         }
-		
+        
         void UpdateAI(const uint32 diff) 
         {
-			if (me->HasUnitState(UNIT_STATE_CASTING))
-				return;
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
 
-			if (blow == false && GetRhyo()) // blow ? :)))) had to redo this just for fun, see comment below.
-			{
-				GetRhyo()->AddAura(SPELL_MOLTEN_ARMOR,GetRhyo()); // GetRhyo()->GetTarget->IsBitch() ? payForBlowJob : findWhore; There, this suits the blow bool.
+            if (blow == false && GetRhyo()) // blow ? :)))) had to redo this just for fun, see comment below.
+            {
+                GetRhyo()->AddAura(SPELL_MOLTEN_ARMOR,GetRhyo()); // GetRhyo()->GetTarget->IsBitch() ? payForBlowJob : findWhore; There, this suits the blow bool.
 
-				blow = true; // !!
+                blow = true; // !!
 
-				if (Aura * aura = GetRhyo()->GetAura(SPELL_OBSIDIAN_ARMOR))
-				{
-					uint32 stack = aura->GetStackAmount() - 10;
+                if (Aura * aura = GetRhyo()->GetAura(SPELL_OBSIDIAN_ARMOR))
+                {
+                    uint32 stack = aura->GetStackAmount() - 10;
 
-					if (stack >= 0)
-					{
-						GetRhyo()->SetAuraStack(SPELL_OBSIDIAN_ARMOR, GetRhyo(), stack);
-						//GetRhyo()->SetSpeed(MOVE_RUN, GetRhyo()->GetSpeed(MOVE_RUN) + 0.1f);
-						//GetRhyo()->SetSpeed(MOVE_WALK, GetRhyo()->GetSpeed(MOVE_WALK) + 0.1f);
-					}
-				}
+                    if (stack >= 0)
+                    {
+                        GetRhyo()->SetAuraStack(SPELL_OBSIDIAN_ARMOR, GetRhyo(), stack);
+                        //GetRhyo()->SetSpeed(MOVE_RUN, GetRhyo()->GetSpeed(MOVE_RUN) + 0.1f);
+                        //GetRhyo()->SetSpeed(MOVE_WALK, GetRhyo()->GetSpeed(MOVE_WALK) + 0.1f);
+                    }
+                }
 
-				if (Creature* rhyolith = GetClosestCreatureWithEntry(me, NPC_RHYOLITH , 150.0f))	
-				{
-					rhyolith->MonsterTextEmote(EMOTE_VOLCANO, 0, true);
-					rhyolith->SummonCreature(NPC_RHYOLITH_CRATER, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0, TEMPSUMMON_CORPSE_DESPAWN);
-					me->DespawnOrUnsummon();
-				}
-			}
+                if (Creature* rhyolith = GetClosestCreatureWithEntry(me, NPC_RHYOLITH , 150.0f))    
+                {
+                    rhyolith->MonsterTextEmote(EMOTE_VOLCANO, 0, true);
+                    rhyolith->SummonCreature(NPC_RHYOLITH_CRATER, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0, TEMPSUMMON_CORPSE_DESPAWN);
+                    me->DespawnOrUnsummon();
+                }
+            }
 
-			events.Update(diff);
-			
-			while (uint32 eventId = events.ExecuteEvent())
-			{
-				switch (eventId)
-				{
-				case EVENT_ERRUPTION_START:
-					me->AddAura(SPELL_ERUPTION,me);
-					me->RemoveAurasDueToSpell(SPELL_SMOKE_VOLCAN);
-					events.ScheduleEvent(EVENT_LAVA_STRIKE, 3000);
-					events.ScheduleEvent(EVENT_ERRUPTION_END, 20000);
-				break;
+            events.Update(diff);
+            
+            while (uint32 eventId = events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_ERRUPTION_START:
+                    me->AddAura(SPELL_ERUPTION,me);
+                    me->RemoveAurasDueToSpell(SPELL_SMOKE_VOLCAN);
+                    events.ScheduleEvent(EVENT_LAVA_STRIKE, 3000);
+                    events.ScheduleEvent(EVENT_ERRUPTION_END, 20000);
+                break;
 
-				case EVENT_ERRUPTION_END:
-					me->RemoveAurasDueToSpell(SPELL_ERUPTION);
-					me->AddAura(SPELL_SMOKE_VOLCAN,me);
-				break;
+                case EVENT_ERRUPTION_END:
+                    me->RemoveAurasDueToSpell(SPELL_ERUPTION);
+                    me->AddAura(SPELL_SMOKE_VOLCAN,me);
+                break;
 
-				case EVENT_LAVA_STRIKE:
+                case EVENT_LAVA_STRIKE:
                         for (int32 i = 0;  i < RAID_MODE(3, 3, 6, 6); ++i)
-					        if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 500, true))
-							    DoCast(pTarget, SPELL_LAVA_STRIKE);
+                            if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 500, true))
+                                DoCast(pTarget, SPELL_LAVA_STRIKE);
 
-					events.ScheduleEvent(EVENT_LAVA_STRIKE, 3000);
-				break;
-				
-				default:
-				break;
-				}
-			}
+                    events.ScheduleEvent(EVENT_LAVA_STRIKE, 3000);
+                break;
+                
+                default:
+                break;
+                }
+            }
         }
 
-		Creature* GetRhyo()
-		{
-			return (me->FindNearestCreature(52558, 8.0f, true) == NULL) ? me->FindNearestCreature(52558, 8.0f, false) : me->FindNearestCreature(52558, 8.0f, true);
-		}
+        Creature* GetRhyo()
+        {
+            return (me->FindNearestCreature(52558, 8.0f, true) == NULL) ? me->FindNearestCreature(52558, 8.0f, false) : me->FindNearestCreature(52558, 8.0f, true);
+        }
             
     };
 };
@@ -1080,123 +1080,123 @@ public:
 class npc_rhyolith_crater : public CreatureScript
 {
 public:
-	npc_rhyolith_crater() : CreatureScript("npc_rhyolith_crater"){}
+    npc_rhyolith_crater() : CreatureScript("npc_rhyolith_crater"){}
 
-	CreatureAI* GetAI(Creature* creature) const
-	{
-		return new npc_rhyolith_craterAI(creature);
-	}
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_rhyolith_craterAI(creature);
+    }
 
-	struct npc_rhyolith_craterAI : public ScriptedAI
-	{
-		npc_rhyolith_craterAI(Creature *c) : ScriptedAI(c) , summons(me)
-		{
-			instance = me->GetInstanceScript();
-			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
-			me->SetReactState(REACT_PASSIVE);
-		}
+    struct npc_rhyolith_craterAI : public ScriptedAI
+    {
+        npc_rhyolith_craterAI(Creature *c) : ScriptedAI(c) , summons(me)
+        {
+            instance = me->GetInstanceScript();
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+            me->SetReactState(REACT_PASSIVE);
+        }
 
-		InstanceScript* instance;
-		EventMap events;
-		uint32 number;
-		SummonList summons;
+        InstanceScript* instance;
+        EventMap events;
+        uint32 number;
+        SummonList summons;
 
-		void JustDied(Unit* /*killer*/) {}
-		
+        void JustDied(Unit* /*killer*/) {}
+        
         void Reset()
         {
-			events.Reset();
+            events.Reset();
         }
 
         void JustSummoned(Creature *summon)
         {
-		    summons.Summon(summon);
+            summons.Summon(summon);
 
             switch (summon->GetEntry())
             {
-			    case 53585: // this hack for lava tube, because if add it to crater nothing changed(dont know why)
-					if (me->GetDistance(summon) < 0.5f)
-					{
-						summon->SetObjectScale(2.0f);
-						summon->CastSpell(summon,SPELL_LAVA_TUBE,true);
-					}
-					else
-						summon->CastSpell(summon,SPELL_LAVA_FLOW,true);
-				    break;
+                case 53585: // this hack for lava tube, because if add it to crater nothing changed(dont know why)
+                    if (me->GetDistance(summon) < 0.5f)
+                    {
+                        summon->SetObjectScale(2.0f);
+                        summon->CastSpell(summon,SPELL_LAVA_TUBE,true);
+                    }
+                    else
+                        summon->CastSpell(summon,SPELL_LAVA_FLOW,true);
+                    break;
                 default:
                     break;
             }
         }
 
-		void IsSummonedBy(Unit* summoner)
+        void IsSummonedBy(Unit* summoner)
         {
-			number = 10;
-			events.ScheduleEvent(EVENT_ACTIVATE_CRATER, urand(5000,20000));
-			DoCast(me, SPELL_MAGMA);
+            number = 10;
+            events.ScheduleEvent(EVENT_ACTIVATE_CRATER, urand(5000,20000));
+            DoCast(me, SPELL_MAGMA);
         }
 
         void UpdateAI(const uint32 diff) 
         {
-			if (me->HasUnitState(UNIT_STATE_CASTING))
-					return;
-					
-			events.Update(diff);
-					
-			while (uint32 eventId = events.ExecuteEvent())
-			{
-				switch (eventId)
-				{
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                    return;
+                    
+            events.Update(diff);
+                    
+            while (uint32 eventId = events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
 
-				case EVENT_ACTIVATE_CRATER:
-					me->SummonCreature(53585,me->GetPositionX(),me->GetPositionY(),me->GetPositionZMinusOffset());
-					events.ScheduleEvent(EVENT_LAVA_LINE, 5000);
-					events.ScheduleEvent(EVENT_LAVA_LINES_BLOW, 17000);
-					events.ScheduleEvent(EVENT_DESPAWN_CRATER, 45000);	
-					break;
+                case EVENT_ACTIVATE_CRATER:
+                    me->SummonCreature(53585,me->GetPositionX(),me->GetPositionY(),me->GetPositionZMinusOffset());
+                    events.ScheduleEvent(EVENT_LAVA_LINE, 5000);
+                    events.ScheduleEvent(EVENT_LAVA_LINES_BLOW, 17000);
+                    events.ScheduleEvent(EVENT_DESPAWN_CRATER, 45000);    
+                    break;
 
-				case EVENT_LAVA_LINE:
-					if (number <= 45)
-					{
-						me->SummonCreature(53585,me->GetPositionX(),me->GetPositionY() - float(number),me->GetPositionZMinusOffset());
-						me->SummonCreature(53585,me->GetPositionX() + float(number),me->GetPositionY(),me->GetPositionZMinusOffset());
-						me->SummonCreature(53585,me->GetPositionX(),me->GetPositionY() + float(number),me->GetPositionZMinusOffset());
-						me->SummonCreature(53585,me->GetPositionX() - float(number),me->GetPositionY(),me->GetPositionZMinusOffset());
-						me->SummonCreature(53585,me->GetPositionX() + float(number),me->GetPositionY() - float(number),me->GetPositionZMinusOffset());
-						me->SummonCreature(53585,me->GetPositionX() - float(number),me->GetPositionY() + float(number),me->GetPositionZMinusOffset());
-						number += 1;
-						events.ScheduleEvent(EVENT_LAVA_LINE, 100);
-					}
-				    break;
+                case EVENT_LAVA_LINE:
+                    if (number <= 45)
+                    {
+                        me->SummonCreature(53585,me->GetPositionX(),me->GetPositionY() - float(number),me->GetPositionZMinusOffset());
+                        me->SummonCreature(53585,me->GetPositionX() + float(number),me->GetPositionY(),me->GetPositionZMinusOffset());
+                        me->SummonCreature(53585,me->GetPositionX(),me->GetPositionY() + float(number),me->GetPositionZMinusOffset());
+                        me->SummonCreature(53585,me->GetPositionX() - float(number),me->GetPositionY(),me->GetPositionZMinusOffset());
+                        me->SummonCreature(53585,me->GetPositionX() + float(number),me->GetPositionY() - float(number),me->GetPositionZMinusOffset());
+                        me->SummonCreature(53585,me->GetPositionX() - float(number),me->GetPositionY() + float(number),me->GetPositionZMinusOffset());
+                        number += 1;
+                        events.ScheduleEvent(EVENT_LAVA_LINE, 100);
+                    }
+                    break;
 
-				case EVENT_DESPAWN_CRATER:
-					summons.DespawnAll();
-					me->DespawnOrUnsummon();
-				break;
+                case EVENT_DESPAWN_CRATER:
+                    summons.DespawnAll();
+                    me->DespawnOrUnsummon();
+                break;
 
-				case EVENT_LAVA_LINES_BLOW:
-					std::list<Creature*> creatures;
-					GetCreatureListWithEntryInGrid(creatures, me, 53585, 1000.0f);
+                case EVENT_LAVA_LINES_BLOW:
+                    std::list<Creature*> creatures;
+                    GetCreatureListWithEntryInGrid(creatures, me, 53585, 1000.0f);
 
-					if (creatures.empty())
-					   return;
+                    if (creatures.empty())
+                       return;
 
-					for (std::list<Creature*>::iterator iter = creatures.begin(); iter != creatures.end(); ++iter)
-						if ((*iter)->IsSummon() && (*iter)->ToTempSummon()->GetSummonerGUID() == me->GetGUID())
-						{
-							(*iter)->CastSpell((*iter),97234,true);
-							(*iter)->DespawnOrUnsummon(1000);
-						}
-					break;
-				}
-			}
+                    for (std::list<Creature*>::iterator iter = creatures.begin(); iter != creatures.end(); ++iter)
+                        if ((*iter)->IsSummon() && (*iter)->ToTempSummon()->GetSummonerGUID() == me->GetGUID())
+                        {
+                            (*iter)->CastSpell((*iter),97234,true);
+                            (*iter)->DespawnOrUnsummon(1000);
+                        }
+                    break;
+                }
+            }
         }
 
-		Creature* GetRhyo()
-		{
-			return (me->FindNearestCreature(52558, 5000.0f, true) == NULL) ? me->FindNearestCreature(52558, 5000.0f, false) : me->FindNearestCreature(52558, 5000.0f, true);
-		}
+        Creature* GetRhyo()
+        {
+            return (me->FindNearestCreature(52558, 5000.0f, true) == NULL) ? me->FindNearestCreature(52558, 5000.0f, false) : me->FindNearestCreature(52558, 5000.0f, true);
+        }
 
-	};
+    };
 };
 
 /*######
@@ -1206,77 +1206,77 @@ public:
 class npc_lava_line : public CreatureScript
 {
 public:
-	npc_lava_line() : CreatureScript("npc_lava_line"){}
+    npc_lava_line() : CreatureScript("npc_lava_line"){}
 
-	CreatureAI* GetAI(Creature* creature) const
-	{
-		return new npc_lava_lineAI(creature);
-	}
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_lava_lineAI(creature);
+    }
 
-	struct npc_lava_lineAI : public ScriptedAI
-	{
-		npc_lava_lineAI(Creature *c) : ScriptedAI(c)
-		{
-			instance = me->GetInstanceScript();
-			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-			me->SetReactState(REACT_PASSIVE);
-		}
+    struct npc_lava_lineAI : public ScriptedAI
+    {
+        npc_lava_lineAI(Creature *c) : ScriptedAI(c)
+        {
+            instance = me->GetInstanceScript();
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->SetReactState(REACT_PASSIVE);
+        }
 
-		InstanceScript* instance;
-		EventMap events;
+        InstanceScript* instance;
+        EventMap events;
 
-		void JustDied(Unit* /*killer*/) {}
-		
+        void JustDied(Unit* /*killer*/) {}
+        
         void Reset()
         {
-			events.Reset();
+            events.Reset();
         }
 
-		void IsSummonedBy(Unit* summoner)
+        void IsSummonedBy(Unit* summoner)
         {
-			events.ScheduleEvent(EVENT_CHECK_NEAR_PLAYER, 4000);
-			events.ScheduleEvent(EVENT_DESPAWN_LINE, 30000);
+            events.ScheduleEvent(EVENT_CHECK_NEAR_PLAYER, 4000);
+            events.ScheduleEvent(EVENT_DESPAWN_LINE, 30000);
         }
-		
+        
         void UpdateAI(const uint32 diff) 
         {
-			if (me->HasUnitState(UNIT_STATE_CASTING))
+            if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-			events.Update(diff);
-					
-			while (uint32 eventId = events.ExecuteEvent())
-			{
-				switch (eventId)
-				{
-				case EVENT_CHECK_NEAR_PLAYER:
-					if (!me->HasAura(SPELL_LAVA_TUBE))
-					{
-						if (Player* target = me->SelectNearestPlayer(0))
-						{
-							me->CastSpell(me,97234,true);
-							events.ScheduleEvent(EVENT_CHECK_NEAR_PLAYER, 2500);
-						}
-						else
-							events.ScheduleEvent(EVENT_CHECK_NEAR_PLAYER, 300);
-					}
-					break;
+            events.Update(diff);
+                    
+            while (uint32 eventId = events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_CHECK_NEAR_PLAYER:
+                    if (!me->HasAura(SPELL_LAVA_TUBE))
+                    {
+                        if (Player* target = me->SelectNearestPlayer(0))
+                        {
+                            me->CastSpell(me,97234,true);
+                            events.ScheduleEvent(EVENT_CHECK_NEAR_PLAYER, 2500);
+                        }
+                        else
+                            events.ScheduleEvent(EVENT_CHECK_NEAR_PLAYER, 300);
+                    }
+                    break;
 
-				case EVENT_DESPAWN_LINE:
-					me->DespawnOrUnsummon();
-					break;
+                case EVENT_DESPAWN_LINE:
+                    me->DespawnOrUnsummon();
+                    break;
 
-				default:
-				break;
-				}
-			}
+                default:
+                break;
+                }
+            }
         }
 
-		Creature* GetRhyo()
-		{
-			return (me->FindNearestCreature(52558, 5000.0f, true) == NULL) ? me->FindNearestCreature(52558, 5000.0f, false) : me->FindNearestCreature(52558, 5000.0f, true);
-		}
-	};
+        Creature* GetRhyo()
+        {
+            return (me->FindNearestCreature(52558, 5000.0f, true) == NULL) ? me->FindNearestCreature(52558, 5000.0f, false) : me->FindNearestCreature(52558, 5000.0f, true);
+        }
+    };
 };
 
 /*######
@@ -1286,56 +1286,56 @@ public:
 class npc_liquid_obsidian : public CreatureScript
 {
 public:
-	npc_liquid_obsidian() : CreatureScript("npc_liquid_obsidian"){}
+    npc_liquid_obsidian() : CreatureScript("npc_liquid_obsidian"){}
 
-	CreatureAI* GetAI(Creature* creature) const
-	{
-		return new npc_liquid_obsidianAI(creature);
-	}
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_liquid_obsidianAI(creature);
+    }
 
-	struct npc_liquid_obsidianAI : public ScriptedAI
-	{
-		npc_liquid_obsidianAI(Creature *c) : ScriptedAI(c)
-		{
-			instance = me->GetInstanceScript();
-		}
+    struct npc_liquid_obsidianAI : public ScriptedAI
+    {
+        npc_liquid_obsidianAI(Creature *c) : ScriptedAI(c)
+        {
+            instance = me->GetInstanceScript();
+        }
 
-		InstanceScript* instance;
+        InstanceScript* instance;
 
         void Reset() {}
-		void JustDied(Unit* /*killer*/) {}
+        void JustDied(Unit* /*killer*/) {}
 
-		void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/)
         {
-			me->SetInCombatWithZone();
+            me->SetInCombatWithZone();
             me->AttackStop();
-			me->SetReactState(REACT_PASSIVE);
+            me->SetReactState(REACT_PASSIVE);
 
-			if (Creature* rhyolith = GetClosestCreatureWithEntry(me, NPC_RHYOLITH , 100.0f))	
+            if (Creature* rhyolith = GetClosestCreatureWithEntry(me, NPC_RHYOLITH , 100.0f))    
                 me->GetMotionMaster()->MoveChase(rhyolith);
         }
 
         void UpdateAI(const uint32 diff) 
         {
-        	if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
-        		return;
+            if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
+                return;
         
-        	if (GetClosestCreatureWithEntry(me, NPC_RHYOLITH, 3.0f))
-        	{
-        		DoCast(me, SPELL_FUSE);
-                if (Creature* rhyolith = GetClosestCreatureWithEntry(me, NPC_RHYOLITH , 50.0f))	
-        		if (Aura * aura = rhyolith->GetAura(SPELL_OBSIDIAN_ARMOR))
-        		{
-        			uint32 stack = aura->GetStackAmount();
-        			uint32 stack2 = aura->GetStackAmount() + 1;
-        			rhyolith->SetAuraStack(SPELL_OBSIDIAN_ARMOR, rhyolith, stack2);
-        		
-        			if (stack == 0)
-        				return;
-        		}
+            if (GetClosestCreatureWithEntry(me, NPC_RHYOLITH, 3.0f))
+            {
+                DoCast(me, SPELL_FUSE);
+                if (Creature* rhyolith = GetClosestCreatureWithEntry(me, NPC_RHYOLITH , 50.0f))    
+                if (Aura * aura = rhyolith->GetAura(SPELL_OBSIDIAN_ARMOR))
+                {
+                    uint32 stack = aura->GetStackAmount();
+                    uint32 stack2 = aura->GetStackAmount() + 1;
+                    rhyolith->SetAuraStack(SPELL_OBSIDIAN_ARMOR, rhyolith, stack2);
+                
+                    if (stack == 0)
+                        return;
+                }
 
-        		me->DisappearAndDie();
-        	} 
+                me->DisappearAndDie();
+            } 
         }
     };
 };
@@ -1347,67 +1347,67 @@ public:
 class npc_spark_of_rhyolith : public CreatureScript
 {
 public:
-	npc_spark_of_rhyolith() : CreatureScript("npc_spark_of_rhyolith"){}
+    npc_spark_of_rhyolith() : CreatureScript("npc_spark_of_rhyolith"){}
 
-	CreatureAI* GetAI(Creature* creature) const
-	{
-		return new npc_spark_of_rhyolithAI(creature);
-	}
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_spark_of_rhyolithAI(creature);
+    }
 
-	struct npc_spark_of_rhyolithAI : public ScriptedAI
-	{
-		npc_spark_of_rhyolithAI(Creature *c) : ScriptedAI(c)
-		{
-			instance = me->GetInstanceScript();
-		}
+    struct npc_spark_of_rhyolithAI : public ScriptedAI
+    {
+        npc_spark_of_rhyolithAI(Creature *c) : ScriptedAI(c)
+        {
+            instance = me->GetInstanceScript();
+        }
 
-		InstanceScript* instance;
-		EventMap events;
+        InstanceScript* instance;
+        EventMap events;
 
-		void JustDied(Unit* /*killer*/) {}
+        void JustDied(Unit* /*killer*/) {}
 
         void Reset()
         {
-			events.Reset();
+            events.Reset();
         }
 
-		void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/)
         {
-			DoCast(me, SPELL_IMOLATION);
+            DoCast(me, SPELL_IMOLATION);
 
-			events.ScheduleEvent(EVENT_INFERNAL_RAGE, 1000);
+            events.ScheduleEvent(EVENT_INFERNAL_RAGE, 1000);
         }
 
         void UpdateAI(const uint32 diff) 
         {
-			if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
-				return;
-				
-			events.Update(diff);
-				
-			while (uint32 eventId = events.ExecuteEvent())
-			{
-				switch (eventId)
-					{
-						case EVENT_INFERNAL_RAGE:
-							DoCast(me, SPELL_INFERNAL_RAGE);
-							events.ScheduleEvent(EVENT_INFERNAL_RAGE, timerInfernalRage);
-						break;
+            if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+                
+            events.Update(diff);
+                
+            while (uint32 eventId = events.ExecuteEvent())
+            {
+                switch (eventId)
+                    {
+                        case EVENT_INFERNAL_RAGE:
+                            DoCast(me, SPELL_INFERNAL_RAGE);
+                            events.ScheduleEvent(EVENT_INFERNAL_RAGE, timerInfernalRage);
+                        break;
 
-						default:
-						break;
-					}
-			}
+                        default:
+                        break;
+                    }
+            }
 
-			DoMeleeAttackIfReady();
+            DoMeleeAttackIfReady();
         }
     };
 };
 
 void AddSC_boss_lord_rhyolith()
 {
-	new kar_the_everburning();
-	new Unstable_Pyrelord();
+    new kar_the_everburning();
+    new Unstable_Pyrelord();
     new boss_lord_rhyolith();
     new npc_left_leg();
     new npc_right_leg();
@@ -1415,5 +1415,5 @@ void AddSC_boss_lord_rhyolith()
     new npc_rhyolith_volcano();
     new npc_rhyolith_crater();
     new npc_spark_of_rhyolith();
-	new npc_lava_line();
+    new npc_lava_line();
 }

@@ -925,7 +925,7 @@ bool AuthSocket::_HandleRealmList()
         pkt << AmountOfCharacters;
         pkt << i->second.timezone;                          // realm category
         if (_expversion & POST_BC_EXP_FLAG)                 // 2.x and 3.x clients
-        pkt << uint8(0x2C);                             // unk, may be realm number/id?
+            pkt << uint8(0x2C);                             // unk, may be realm number/id?
         else
             pkt << uint8(0x0);                              // 1.12.1 and 1.12.2 clients
 

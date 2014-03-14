@@ -321,7 +321,7 @@ void WorldSession::HandleSetChannelWatch(WorldPacket& recvPacket)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "Opcode %u", recvPacket.GetOpcode());
     std::string channelname;
 
-	recvPacket >> channelname;
+    recvPacket >> channelname;
 
     if (ChannelMgr* cMgr = channelMgr(_player->GetTeam()))
     if (Channel* chn = cMgr->GetChannel(channelname, _player))

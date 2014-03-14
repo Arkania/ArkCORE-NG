@@ -538,7 +538,7 @@ void Transport::Update(uint32 p_diff)
     if (m_WayPoints.size() <= 1)
         return;
 
-	if (m_period==0) m_period=18;
+    if (m_period==0) m_period=18;
     m_timer = getMSTime() % m_period;
     while (((m_timer - m_curr->first) % m_pathTime) > ((m_next->first - m_curr->first) % m_pathTime))
     {

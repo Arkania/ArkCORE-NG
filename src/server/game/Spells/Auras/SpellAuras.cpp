@@ -1398,8 +1398,8 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     }
                 }
                 // Inquisition
-				if (m_spellInfo->Id == 84963) // Inquisition
-				{
+                if (m_spellInfo->Id == 84963) // Inquisition
+                {
                 uint32 mod = 0;
                 // Item - Paladin T11 Retribution 4P Bonus
                 if (AuraEffect* aur = GetCaster()->GetAuraEffect(90299, EFFECT_0))
@@ -1408,7 +1408,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 // Divine Purpose
                 if (target->HasAura(90174))
                     target->SetPower(POWER_HOLY_POWER, 0);
-				}
+                }
                 /*if (m_spellInfo->Id == 84963)
                 {
                     int32 duration = 4000;
