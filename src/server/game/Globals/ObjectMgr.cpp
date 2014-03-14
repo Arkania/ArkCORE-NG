@@ -373,17 +373,17 @@ void ObjectMgr::LoadCreatureTemplates()
     QueryResult result = WorldDatabase.Query("SELECT entry, difficulty_entry_1, difficulty_entry_2, difficulty_entry_3, KillCredit1, KillCredit2, modelid1, modelid2, modelid3, "
     //                                           9       10      11       12           13           14        15     16      17        18        19         20         21
                                              "modelid4, name, subname, IconName, gossip_menu_id, minlevel, maxlevel, exp, exp_unk, faction_A, faction_H, npcflag, speed_walk, "
-    //                                             22     23     24     25     26       27           28             29              30               31            32          33
-                                             "speed_run, scale, rank, mindmg, maxdmg, dmgschool, attackpower, dmg_multiplier, baseattacktime, rangeattacktime, unit_class, unit_flags, "
-    //                                             34         35         36             37             38             39          40           41              42           43
+    //                                             22     23     24     25     26       27           28             29              30               31            32          33          34
+                                             "speed_run, scale, rank, mindmg, maxdmg, dmgschool, attackpower, dmg_multiplier, baseattacktime, rangeattacktime, unit_class, unit_flags, unit_flags2, "
+    //                                             35         36         37             38             39             40          41           42              43           44
                                              "dynamicflags, family, trainer_type, trainer_spell, trainer_class, trainer_race, minrangedmg, maxrangedmg, rangedattackpower, type, "
-    //                                            44           45        46         47            48          49          50           51           52           53         54
+    //                                            45           46        47         48            49          50          51           52           53           54         55
                                              "type_flags, type_flags2, lootid, pickpocketloot, skinloot, resistance1, resistance2, resistance3, resistance4, resistance5, resistance6, "
-    //                                          55      56      57      58      59      60      61      62       63               64       65       66       67         68
+    //                                          56      57      58      59      60      61      62      63       64               65       66       67       68         69
                                              "spell1, spell2, spell3, spell4, spell5, spell6, spell7, spell8, PetSpellDataId, VehicleId, mingold, maxgold, AIName, MovementType, "
-    //                                             69          70         71         72            73            74          75           76          77          78           79          80
+    //                                             70          71         72         73            74            75          76           77          78          79           80          81
                                              "InhabitType, HoverHeight, Health_mod, Mana_mod, Mana_mod_extra, Armor_mod, RacialLeader, questItem1, questItem2, questItem3, questItem4, questItem5, "
-    //                                            81           82            83         84               85                  86          87
+    //                                            82           83            84         85               86                  87          88
                                              " questItem6, movementId, RegenHealth, equipment_id, mechanic_immune_mask, flags_extra, ScriptName "
                                              "FROM creature_template;");
 
@@ -441,51 +441,52 @@ void ObjectMgr::LoadCreatureTemplates()
         creatureTemplate.rangeattacktime   = fields[31].GetUInt32();
         creatureTemplate.unit_class        = uint32(fields[32].GetUInt8());
         creatureTemplate.unit_flags        = fields[33].GetUInt32();
-        creatureTemplate.dynamicflags      = fields[34].GetUInt32();
-        creatureTemplate.family            = uint32(fields[35].GetUInt8());
-        creatureTemplate.trainer_type      = uint32(fields[36].GetUInt8());
-        creatureTemplate.trainer_spell     = fields[37].GetUInt32();
-        creatureTemplate.trainer_class     = uint32(fields[38].GetUInt8());
-        creatureTemplate.trainer_race      = uint32(fields[39].GetUInt8());
-        creatureTemplate.minrangedmg       = fields[40].GetFloat();
-        creatureTemplate.maxrangedmg       = fields[41].GetFloat();
-        creatureTemplate.rangedattackpower = uint32(fields[42].GetUInt16());
-        creatureTemplate.type              = uint32(fields[43].GetUInt8());
-        creatureTemplate.type_flags        = fields[44].GetUInt32();
-        creatureTemplate.type_flags2       = fields[45].GetUInt32();
-        creatureTemplate.lootid            = fields[46].GetUInt32();
-        creatureTemplate.pickpocketLootId  = fields[47].GetUInt32();
-        creatureTemplate.SkinLootId        = fields[48].GetUInt32();
+        creatureTemplate.unit_flags2       = fields[34].GetUInt32();
+        creatureTemplate.dynamicflags      = fields[35].GetUInt32();
+        creatureTemplate.family            = uint32(fields[36].GetUInt8());
+        creatureTemplate.trainer_type      = uint32(fields[37].GetUInt8());
+        creatureTemplate.trainer_spell     = fields[38].GetUInt32();
+        creatureTemplate.trainer_class     = uint32(fields[39].GetUInt8());
+        creatureTemplate.trainer_race      = uint32(fields[40].GetUInt8());
+        creatureTemplate.minrangedmg       = fields[41].GetFloat();
+        creatureTemplate.maxrangedmg       = fields[42].GetFloat();
+        creatureTemplate.rangedattackpower = uint32(fields[43].GetUInt16());
+        creatureTemplate.type              = uint32(fields[44].GetUInt8());
+        creatureTemplate.type_flags        = fields[45].GetUInt32();
+        creatureTemplate.type_flags2       = fields[46].GetUInt32();
+        creatureTemplate.lootid            = fields[47].GetUInt32();
+        creatureTemplate.pickpocketLootId  = fields[48].GetUInt32();
+        creatureTemplate.SkinLootId        = fields[49].GetUInt32();
 
         for (uint8 i = SPELL_SCHOOL_HOLY; i < MAX_SPELL_SCHOOL; ++i)
-            creatureTemplate.resistance[i] = fields[49 + i - 1].GetInt16();
+            creatureTemplate.resistance[i] = fields[50 + i - 1].GetInt16();
 
         for (uint8 i = 0; i < CREATURE_MAX_SPELLS; ++i)
-            creatureTemplate.spells[i] = fields[55 + i].GetUInt32();
+            creatureTemplate.spells[i] = fields[56 + i].GetUInt32();
 
-        creatureTemplate.PetSpellDataId = fields[63].GetUInt32();
-        creatureTemplate.VehicleId      = fields[64].GetUInt32();
-        creatureTemplate.mingold        = fields[65].GetUInt32();
-        creatureTemplate.maxgold        = fields[66].GetUInt32();
-        creatureTemplate.AIName         = fields[67].GetString();
-        creatureTemplate.MovementType   = uint32(fields[68].GetUInt8());
-        creatureTemplate.InhabitType    = uint32(fields[69].GetUInt8());
-        creatureTemplate.HoverHeight    = fields[70].GetFloat();
-        creatureTemplate.ModHealth      = fields[71].GetFloat();
-        creatureTemplate.ModMana        = fields[72].GetFloat();
-        creatureTemplate.ModManaExtra   = fields[73].GetFloat();
-        creatureTemplate.ModArmor       = fields[74].GetFloat();
-        creatureTemplate.RacialLeader   = fields[75].GetBool();
+        creatureTemplate.PetSpellDataId = fields[64].GetUInt32();
+        creatureTemplate.VehicleId      = fields[65].GetUInt32();
+        creatureTemplate.mingold        = fields[66].GetUInt32();
+        creatureTemplate.maxgold        = fields[67].GetUInt32();
+        creatureTemplate.AIName         = fields[68].GetString();
+        creatureTemplate.MovementType   = uint32(fields[69].GetUInt8());
+        creatureTemplate.InhabitType    = uint32(fields[70].GetUInt8());
+        creatureTemplate.HoverHeight    = fields[71].GetFloat();
+        creatureTemplate.ModHealth      = fields[72].GetFloat();
+        creatureTemplate.ModMana        = fields[73].GetFloat();
+        creatureTemplate.ModManaExtra   = fields[74].GetFloat();
+        creatureTemplate.ModArmor       = fields[75].GetFloat();
+        creatureTemplate.RacialLeader   = fields[76].GetBool();
 
         for (uint8 i = 0; i < MAX_CREATURE_QUEST_ITEMS; ++i)
-            creatureTemplate.questItems[i] = fields[76 + i].GetUInt32();
+            creatureTemplate.questItems[i] = fields[77 + i].GetUInt32();
 
-        creatureTemplate.movementId         = fields[82].GetUInt32();
-        creatureTemplate.RegenHealth        = fields[83].GetBool();
-        creatureTemplate.equipmentId        = fields[84].GetUInt32();
-        creatureTemplate.MechanicImmuneMask = fields[85].GetUInt32();
-        creatureTemplate.flags_extra        = fields[86].GetUInt32();
-        creatureTemplate.ScriptID           = GetScriptId(fields[87].GetCString());
+        creatureTemplate.movementId         = fields[83].GetUInt32();
+        creatureTemplate.RegenHealth        = fields[84].GetBool();
+        creatureTemplate.equipmentId        = fields[85].GetUInt32();
+        creatureTemplate.MechanicImmuneMask = fields[86].GetUInt32();
+        creatureTemplate.flags_extra        = fields[87].GetUInt32();
+        creatureTemplate.ScriptID           = GetScriptId(fields[88].GetCString());
 
         ++count;
     }
@@ -2494,7 +2495,7 @@ void ObjectMgr::LoadItemTemplates()
                                              "Sheath, RandomProperty, RandomSuffix, ItemSet, Area, Map, BagFamily, TotemCategory, "
     //                                        119            120              121            122              123            124              125
                                              "SocketColor_1, SocketContent_1, SocketColor_2, SocketContent_2, SocketColor_3, SocketContent_3, SocketBonus, "
-    //                                        126				 127				128				 129       130                131        
+    //                                        126            127                  128       129                130        131
                                              "GemProperties, ArmorDamageModifier, Duration, ItemLimitCategory, HolidayId, StatScalingFactor, "
     //                                        132                     133
                                              "CurrencySubstitutionId, CurrencySubstitutionCount "
@@ -2550,8 +2551,8 @@ void ObjectMgr::LoadItemTemplates()
             }
 
             itemTemplate.ScalingStatDistribution = uint32(fields[69].GetUInt16());
-			itemTemplate.Armor   = FillItemArmor(itemTemplate.ItemLevel, itemTemplate.Class, itemTemplate.SubClass, itemTemplate.Quality,
-											  itemTemplate.InventoryType);
+            itemTemplate.Armor   = FillItemArmor(itemTemplate.ItemLevel, itemTemplate.Class, itemTemplate.SubClass, itemTemplate.Quality,
+                                              itemTemplate.InventoryType);
             // cache item damage
             FillItemDamageFields(&itemTemplate.DamageMin, &itemTemplate.DamageMax, &itemTemplate.DPS, itemTemplate.ItemLevel,
                                  itemTemplate.Class, itemTemplate.SubClass, itemTemplate.Quality, fields[71].GetUInt16(),
@@ -6187,7 +6188,7 @@ void ObjectMgr::SetHighestGuids()
     result = CharacterDatabase.Query("SELECT MAX(guid) FROM groups");
     if (result)
         sGroupMgr->SetGroupDbStoreSize((*result)[0].GetUInt32()+1);
-		
+
     result = CharacterDatabase.Query("SELECT MAX(itemId) from character_void_storage");
     if (result)
         _voidItemId = (*result)[0].GetUInt64()+1;
@@ -6844,7 +6845,7 @@ void ObjectMgr::LoadReputationOnKill()
     QueryResult result = WorldDatabase.Query("SELECT creature_id, RewOnKillRepFaction1, RewOnKillRepFaction2, "
     //   3             4             5                   6             7             8                   9
         "IsTeamAward1, MaxStanding1, RewOnKillRepValue1, IsTeamAward2, MaxStanding2, RewOnKillRepValue2, TeamDependent, "
-		"CurrencyId1,  CurrencyId2,  CurrencyId3,        CurrencyCount1, CurrencyCount2, CurrencyCount3 "
+        "CurrencyId1,  CurrencyId2,  CurrencyId3,        CurrencyCount1, CurrencyCount2, CurrencyCount3 "
         "FROM creature_onkill_reputation");
 
     if (!result)
@@ -7043,7 +7044,7 @@ void ObjectMgr::LoadReputationSpilloverTemplate()
             sLog->outErrorDb("Faction (faction.dbc) %u does not exist but is used in `reputation_spillover_template`", repTemplate.faction[3]);
             continue;
         }
-		
+
         FactionEntry const* factionEntry4 = sFactionStore.LookupEntry(repTemplate.faction[4]);
         if (repTemplate.faction[4] && !factionEntry4)
         {
@@ -7330,6 +7331,7 @@ void ObjectMgr::LoadQuestStartersAndEndersHelper(QuestRelations& map, std::strin
 void ObjectMgr::LoadGameobjectQuestStarters()
 {
     LoadQuestStartersAndEndersHelper(_goQuestRelations, "gameobject_queststarter", true, true);
+
     for (QuestRelations::iterator itr = _goQuestRelations.begin(); itr != _goQuestRelations.end(); ++itr)
     {
         GameObjectTemplate const* goInfo = GetGameObjectTemplate(itr->first);
@@ -7343,6 +7345,7 @@ void ObjectMgr::LoadGameobjectQuestStarters()
 void ObjectMgr::LoadGameobjectQuestEnders()
 {
     LoadQuestStartersAndEndersHelper(_goQuestInvolvedRelations, "gameobject_questender", false, true);
+
     for (QuestRelations::iterator itr = _goQuestInvolvedRelations.begin(); itr != _goQuestInvolvedRelations.end(); ++itr)
     {
         GameObjectTemplate const* goInfo = GetGameObjectTemplate(itr->first);
@@ -7356,6 +7359,7 @@ void ObjectMgr::LoadGameobjectQuestEnders()
 void ObjectMgr::LoadCreatureQuestStarters()
 {
     LoadQuestStartersAndEndersHelper(_creatureQuestRelations, "creature_queststarter", true, false);
+
     for (QuestRelations::iterator itr = _creatureQuestRelations.begin(); itr != _creatureQuestRelations.end(); ++itr)
     {
         CreatureTemplate const* cInfo = GetCreatureTemplate(itr->first);
@@ -7369,6 +7373,7 @@ void ObjectMgr::LoadCreatureQuestStarters()
 void ObjectMgr::LoadCreatureQuestEnders()
 {
     LoadQuestStartersAndEndersHelper(_creatureQuestInvolvedRelations, "creature_questender", false, false);
+
     for (QuestRelations::iterator itr = _creatureQuestInvolvedRelations.begin(); itr != _creatureQuestInvolvedRelations.end(); ++itr)
     {
         CreatureTemplate const* cInfo = GetCreatureTemplate(itr->first);
@@ -7840,9 +7845,9 @@ SkillRangeType GetSkillRangeType(SkillLineEntry const* pSkill, bool racial)
     switch (pSkill->categoryId)
     {
         case SKILL_CATEGORY_LANGUAGES: 
-			return SKILL_RANGE_LANGUAGE;
+            return SKILL_RANGE_LANGUAGE;
         case SKILL_CATEGORY_WEAPON:
-			return SKILL_RANGE_LEVEL;
+            return SKILL_RANGE_LEVEL;
         case SKILL_CATEGORY_ARMOR:
         case SKILL_CATEGORY_CLASS:
             if (pSkill->id != SKILL_LOCKPICKING)
