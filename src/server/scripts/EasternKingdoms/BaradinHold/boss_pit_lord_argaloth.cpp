@@ -27,9 +27,7 @@
 
 enum Boss_pit_lord_argaloth
 {
-    DATA_ARGALOTH           = 0,
-
-
+    DATA_ARGALOTH           = 0
 };
 enum Spells
 {

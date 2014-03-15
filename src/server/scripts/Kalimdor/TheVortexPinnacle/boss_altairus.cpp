@@ -28,15 +28,15 @@ enum ScriptTexts
 
 enum Spells
 {
-    SPELL_CALL_OF_WIND            = 88244,    
+    SPELL_CALL_OF_WIND            = 88244,
     SPELL_CALL_OF_WIND_DUMMY_1    = 88276,
     SPELL_CALL_OF_WIND_DUMMY_2    = 88772,
     SPELL_DOWNWIND_OF_ALTAIRUS    = 88286,
-    SPELL_UPWIND_OF_ALTAIRUS    = 88282,
-    SPELL_CHILLING_BREATH        = 88308,
-    SPELL_CHILLING_BREATH_DUMMY    = 88322,
-    SPELL_LIGHTNING_BLAST        = 88357,
-    SPELL_LIGHTNING_BLAST_DUMMY    = 88332,
+    SPELL_UPWIND_OF_ALTAIRUS      = 88282,
+    SPELL_CHILLING_BREATH         = 88308,
+    SPELL_CHILLING_BREATH_DUMMY   = 88322,
+    SPELL_LIGHTNING_BLAST         = 88357,
+    SPELL_LIGHTNING_BLAST_DUMMY   = 88332,
     SPELL_TWISTER_AURA            = 88313,
     SPELL_TWISTER_AURA_DMG        = 88314,
     
@@ -45,10 +45,10 @@ enum Spells
 enum Events
 {
     EVENT_CALL_OF_WIND            = 1,
-    EVENT_CHILLING_BREATH        = 2,
-    EVENT_LIGHTNING_BLAST        = 3,
+    EVENT_CHILLING_BREATH         = 2,
+    EVENT_LIGHTNING_BLAST         = 3,
     EVENT_CHECK_FACING            = 4,
-    EVENT_RESET_WIND            = 5,
+    EVENT_RESET_WIND              = 5,
 };
 
 enum Adds

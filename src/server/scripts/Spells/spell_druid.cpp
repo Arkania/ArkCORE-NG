@@ -1403,5 +1403,5 @@ void AddSC_druid_spell_scripts()
     new spell_dru_eclipse_energize();
     new spell_dru_primal_madness();
     new spell_dru_lunar_shower_energize();
-    new spell_dru_faerie_fire();    
+    new spell_dru_faerie_fire();
 }

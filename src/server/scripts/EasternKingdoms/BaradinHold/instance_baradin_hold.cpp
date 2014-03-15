@@ -27,7 +27,7 @@ enum Instance_baradin_hold
     BOSS_ARGALOTH           = 47120,
     BOSS_OCCUTHAR           = 52363,
     BOSS_ALIZABAL           = 55869,
-    BOSS_EncounterCount        = 3,
+    BOSS_EncounterCount     = 3,
 
     GO_ARGALOTH_DOOR        = 207619,
     GO_OCCUTHAR_DOOR        = 208953,

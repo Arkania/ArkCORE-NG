@@ -45,7 +45,7 @@ enum MageSpells
     SPELL_MAGE_TIME_WARP                         = 80353,
     SPELL_MAGE_TEMPORAL_DISPLACEMENT             = 80354,
     SPELL_MAGE_CHILLED_R1                        = 12484,
-    SPELL_MAGE_CHILLED_R2                        = 12485    
+    SPELL_MAGE_CHILLED_R2                        = 12485
 };
 
 enum OtherSpells

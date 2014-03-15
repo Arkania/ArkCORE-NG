@@ -25,7 +25,7 @@
 enum ScriptTexts
 {
     SAY_AGGRO    = 0,
-    SAY_KILL    = 1,
+    SAY_KILL     = 1,
     SAY_DEATH    = 2,
 };
 
@@ -33,25 +33,25 @@ enum Spells
 {
     SPELL_CYCLONE_SHIELD        = 86267,
     SPELL_CYCLONE_SHIELD_DMG    = 86292,
-    SPELL_CYCLONE_SHIELD_DMG_H    = 93991,
+    SPELL_CYCLONE_SHIELD_DMG_H  = 93991,
     SPELL_SUMMON_TEMPEST        = 86340,
     SPELL_STORM_EDGE            = 86309,
-    SPELL_STORM_EDGE_H            = 93992,
+    SPELL_STORM_EDGE_H          = 93992,
     SPELL_LIGHTNING_BOLT        = 86331,
-    SPELL_LIGHTNING_BOLT_H        = 93990,
+    SPELL_LIGHTNING_BOLT_H      = 93990,
 };
 
 enum Events
 {
     EVENT_LIGHTNING_BOLT    = 1,
     EVENT_STORM_EDGE        = 2,
-    EVENT_CALL_VORTEX        = 3,
-    EVENT_RESET_VORTEX        = 4,
+    EVENT_CALL_VORTEX       = 3,
+    EVENT_RESET_VORTEX      = 4,
 };
 
 enum Adds
 {
-    NPC_ERTAN_VORTEX    = 46007,
+    NPC_ERTAN_VORTEX      = 46007,
     NPC_SLIPSTREAM        = 45455,
 };
 

@@ -23,7 +23,7 @@
 enum ScriptTexts
 {
     SAY_AGGRO    = 0,
-    SAY_KILL    = 1,
+    SAY_KILL     = 1,
     SAY_SPELL    = 2,
     SAY_DEATH    = 3,
 };
@@ -31,26 +31,26 @@ enum ScriptTexts
 enum Spells
 {
     SPELL_CHAIN_LIGHTNING                    = 87622,
-    SPELL_CHAIN_LIGHTNING_H                    = 93993,
-    SPELL_UNSTABLE_GROUNDING_FIELD            = 86911,
-    SPELL_GROUNDING_FIELD_VISUAL_BEAMS        = 87517,
+    SPELL_CHAIN_LIGHTNING_H                  = 93993,
+    SPELL_UNSTABLE_GROUNDING_FIELD           = 86911,
+    SPELL_GROUNDING_FIELD_VISUAL_BEAMS       = 87517,
 
-    SPELL_SUPREMACY_OF_THE_STORM            = 86930,
+    SPELL_SUPREMACY_OF_THE_STORM             = 86930,
     
-    SPELL_SUPREMACY_OF_THE_STORM_DUMMY        = 86715,
-    SPELL_SUPREMACY_OF_THE_STORM_DMG        = 87553,
-    SPELL_SUPREMACY_OF_THE_STORM_DMG_H        = 93994,
+    SPELL_SUPREMACY_OF_THE_STORM_DUMMY       = 86715,
+    SPELL_SUPREMACY_OF_THE_STORM_DMG         = 87553,
+    SPELL_SUPREMACY_OF_THE_STORM_DMG_H       = 93994,
 
-    SPELL_SUPREMACY_OF_THE_STORM_DUMMY_1    = 87521,
-    SPELL_SUPREMACY_OF_THE_STORM_SUM        = 87518,
+    SPELL_SUPREMACY_OF_THE_STORM_DUMMY_1     = 87521,
+    SPELL_SUPREMACY_OF_THE_STORM_SUM         = 87518,
     SPELL_SUPREMACY_OF_THE_STORM_TELE        = 87328,
 
-    SPELL_STATIC_CLING                        = 87618,
+    SPELL_STATIC_CLING                       = 87618,
 };
 
 enum Events
 {
-    EVENT_FIELD                = 1,
+    EVENT_FIELD              = 1,
     EVENT_FIELD_1            = 2,
     EVENT_FIELD_2            = 3,
     EVENT_FIELD_3            = 4,
@@ -58,7 +58,7 @@ enum Events
     EVENT_FIELD_5            = 6,
     EVENT_FIELD_6            = 7,
     EVENT_CHAIN_LIGHTNING    = 8,
-    EVENT_STATIC_CLING        = 9,
+    EVENT_STATIC_CLING       = 9,
     EVENT_SUMMON_STAR        = 10,
 };
 
@@ -67,7 +67,7 @@ enum Adds
     NPC_UNSTABLE_GROUNDING_FIELD    = 46492,
     NPC_SKYFALL_STAR                = 52019,
     NPC_STORM_TARGET                = 46387,
-    NPC_GROUNDING_FIELD                = 47000,
+    NPC_GROUNDING_FIELD             = 47000,
 };
 
 const Position fieldPos[4]    =

@@ -23,38 +23,38 @@
 
 enum Creatures
 {
-    NPC_SLIPSTREAM                    = 45455,
-    NPC_SLIPSTREAM_LANDING_ZONE        = 45504,
+    NPC_SLIPSTREAM                  = 45455,
+    NPC_SLIPSTREAM_LANDING_ZONE     = 45504,
     NPC_SKYFALL_LAND                = 45981,
 
     NPC_CLOUD_PRINCE                = 45917,
     NPC_WIPPING_WIND                = 47238,
-    NPC_YOUNG_STORM_DRAGON            = 45919,
-    NPC_ARMORED_MISTRAL                = 45915,
-    NPC_EMPYREAN_ASSASSIN            = 45922,
-    NPC_EXECUTOR_OF_THE_CALIPH        = 45928,
+    NPC_YOUNG_STORM_DRAGON          = 45919,
+    NPC_ARMORED_MISTRAL             = 45915,
+    NPC_EMPYREAN_ASSASSIN           = 45922,
+    NPC_EXECUTOR_OF_THE_CALIPH      = 45928,
     NPC_GUST_SOLDIER                = 45477,
-    NPC_LURKING_TEMPEST                = 45704,
-    NPC_MINISTER_OF_AIR                = 45930,
+    NPC_LURKING_TEMPEST             = 45704,
+    NPC_MINISTER_OF_AIR             = 45930,
     NPC_SERVANT_OF_ASAAD            = 45926,
-    NPC_TEMPEST_ADEPT                = 45935,
+    NPC_TEMPEST_ADEPT               = 45935,
     NPC_TURBULENT_SQUALL            = 45924,
     NPC_HOWLING_GALE                = 45572,
-    NPC_WILD_VORTEX                    = 45912,
+    NPC_WILD_VORTEX                 = 45912,
     NPC_SKYFALL_STAR                = 45932,
-    NPC_GOLDEN_ORB                    = 51157,
-    NPC_ITESH                        = 49943,
+    NPC_GOLDEN_ORB                  = 51157,
+    NPC_ITESH                       = 49943,
 };
 
 enum Spells
 {
     //slipstream
-    SPELL_SLIPSTREAM_AURA        = 85021,
+    SPELL_SLIPSTREAM_AURA       = 85021,
     SPELL_SLIPSTREAM_VEH        = 87742,
 
     //cloud prince
-    SPELL_TYPHOON                = 88074,
-    SPELL_STARFALL                = 88073,
+    SPELL_TYPHOON               = 88074,
+    SPELL_STARFALL              = 88073,
     SPELL_STARFALL_H            = 92783,
 
     //whipping wind
@@ -63,105 +63,105 @@ enum Spells
     //young storm dragon
     SPELL_BRUTAL_STRIKES        = 88192,
     SPELL_BRUTAL_STRIKES_DMG    = 88188,
-    SPELL_BRUTAL_STRIKES_DMG_H    = 92758,
+    SPELL_BRUTAL_STRIKES_DMG_H  = 92758,
     SPELL_CHILLING_BLAST        = 88194,
-    SPELL_HEALING_WELL            = 88201,
+    SPELL_HEALING_WELL          = 88201,
 
     //armored mistral
-    SPELL_GALE_STRIKE            = 88061,
-    SPELL_RISING_WINDS            = 88057,
-    SPELL_STORM_SURGE            = 88055,
+    SPELL_GALE_STRIKE           = 88061,
+    SPELL_RISING_WINDS          = 88057,
+    SPELL_STORM_SURGE           = 88055,
 
     //empyrean assassin
-    SPELL_LETHARGIC_POISON        = 88184,
+    SPELL_LETHARGIC_POISON      = 88184,
     SPELL_VAPOR_FORM            = 88186,
 
     //executor of the caliph
-    SPELL_DEVASTATE                = 78660,
-    SPELL_RALLY                    = 87761,
-    SPELL_SHOCKWAVE                = 87759,
+    SPELL_DEVASTATE             = 78660,
+    SPELL_RALLY                 = 87761,
+    SPELL_SHOCKWAVE             = 87759,
     
     //gust soldier
-    SPELL_AIR_NOVA                = 87933,
+    SPELL_AIR_NOVA              = 87933,
     SPELL_AIR_NOVA_H            = 92753,
     SPELL_CHARGE                = 87930,
     SPELL_WIND_BLAST            = 87923,
 
     //lurking tempest
-    SPELL_LT_LIGHTNING_BOLT        = 89105,
-    SPELL_FEIGN_DEATH            = 85267,
-    SPELL_LURK                    = 85467,
+    SPELL_LT_LIGHTNING_BOLT     = 89105,
+    SPELL_FEIGN_DEATH           = 85267,
+    SPELL_LURK                  = 85467,
 
     //minister of air
     SPELL_LIGHTNING_LASH        = 87762,
-    SPELL_LIGHTNING_LASH_DUMMY    = 87765,
+    SPELL_LIGHTNING_LASH_DUMMY  = 87765,
     SPELL_LIGHTNING_LASH_DMG    = 88963,
     SPELL_LIGHTNING_NOVA        = 87768,
-    SPELL_LIGHTNING_NOVA_H        = 92780,
+    SPELL_LIGHTNING_NOVA_H      = 92780,
 
     //servant of asaad
-    SPELL_CRUSADER_STRIKE        = 87771,
-    SPELL_DIVINE_STORM            = 58112,
+    SPELL_CRUSADER_STRIKE       = 87771,
+    SPELL_DIVINE_STORM          = 58112,
     SPELL_HAND_OF_PROTECTION    = 87772,
 
     //temple adept
-    SPELL_DESPERATE_SPEED        = 87780,
-    SPELL_GREATER_HEAL            = 87779,
+    SPELL_DESPERATE_SPEED       = 87780,
+    SPELL_GREATER_HEAL          = 87779,
     SPELL_HOLY_SMITE            = 88959,
 
     //turbulent squall
     SPELL_ASPHYXIATE            = 88175,
     SPELL_CLOUDBURST            = 88170,
-    SPELL_CLOUDBURST_H            = 92760,
-    SPELL_HURRICANE                = 88171,
+    SPELL_CLOUDBURST_H          = 92760,
+    SPELL_HURRICANE             = 88171,
 
     //wild vortex
-    SPELL_WV_LIGHTNING_BOLT        = 88032,
+    SPELL_WV_LIGHTNING_BOLT     = 88032,
     SPELL_WIND_SHOCK            = 88029,
-    SPELL_CYCLONE                = 88010,
+    SPELL_CYCLONE               = 88010,
 
     //skyfall star
     SPELL_ARCANE_BARRAGE        = 87854,
-    SPELL_ARCANE_BARRAGE_H        = 92756,\
+    SPELL_ARCANE_BARRAGE_H      = 92756,
 
     //howling gale
-    SPELL_HOWLING_GALE            = 85084,
+    SPELL_HOWLING_GALE          = 85084,
     SPELL_HOWLING_GALE_1        = 85086,
     SPELL_HOWLING_GALE_2        = 85136,
     SPELL_HOWLING_GALE_3        = 85086,
-    SPELL_HOWLING_GALE_DMG        = 85159,
+    SPELL_HOWLING_GALE_DMG      = 85159,
 
 };
 
 enum Events
 {
     EVENT_ARCANE_BARRAGE        = 1,
-    EVENT_TYPHOON                = 2,
-    EVENT_STARFALL                = 3,
+    EVENT_TYPHOON               = 2,
+    EVENT_STARFALL              = 3,
     EVENT_WHW_LIGHTNING_BOLT    = 4,
     EVENT_CHILLING_BLAST        = 5,
-    EVENT_GALE_STRIKE            = 6,
-    EVENT_STORM_SURGE            = 7,
+    EVENT_GALE_STRIKE           = 6,
+    EVENT_STORM_SURGE           = 7,
     EVENT_VAPOR_FORM            = 8,
-    EVENT_DEVASTATE                = 9,
-    EVENT_SHOCKWAVE                = 10,
-    EVENT_RALLY                    = 11,
-    EVENT_AIR_NOVA                = 12,
+    EVENT_DEVASTATE             = 9,
+    EVENT_SHOCKWAVE             = 10,
+    EVENT_RALLY                 = 11,
+    EVENT_AIR_NOVA              = 12,
     EVENT_WIND_BLAST            = 13,
     EVENT_LIGHTNING_NOVA        = 14,
     EVENT_LIGHTNING_LASH        = 15,
-    EVENT_CRUSADER_STRIKE        = 16,
+    EVENT_CRUSADER_STRIKE       = 16,
     EVENT_HAND_OF_PROTECTION    = 17,
-    EVENT_DESPERATE_SPEED        = 18,
-    EVENT_GREATER_HEAL            = 19,
+    EVENT_DESPERATE_SPEED       = 18,
+    EVENT_GREATER_HEAL          = 19,
     EVENT_HOLY_SMITE            = 20,
     EVENT_ASPHYXIATE            = 21,
-    EVENT_HURRICANE                = 22,
+    EVENT_HURRICANE             = 22,
     EVENT_CLOUDBURST            = 23,
-    EVENT_CYCLONE                = 24,
+    EVENT_CYCLONE               = 24,
     EVENT_WIND_SHOCK            = 25,
-    EVENT_WV_LIGHTNING_BOLT        = 26,
-    EVENT_HOWLING_GALE            = 27,
+    EVENT_WV_LIGHTNING_BOLT     = 26,
+    EVENT_HOWLING_GALE          = 27,
 };
 
 const Position teleportPos[2] = 
