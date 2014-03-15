@@ -794,4 +794,4 @@ void WorldSession::HandleRequestCategoryCooldown(WorldPacket& /*recvPacket*/)
     }
 
     SendPacket(&data);
-} 
+}
