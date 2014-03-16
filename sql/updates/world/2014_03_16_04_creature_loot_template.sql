@@ -1,0 +1,185 @@
+
+-- Baradin Hold 
+
+-- wowhead show this npc as not known.. so i prevent crash of core and delete only the wrong loot..
+delete from creature_loot_template where item=0 and entry in(46211,49898,49621,49620,50131,50132,50133,49897,49899,49903,49904,49905);
+delete from creature_loot_template where item=0 and entry in(51101,51102,49056,49050,49047,49053,49051,49057,49054,49048,49058,49055);
+delete from creature_loot_template where item=0 and entry in(49052,49049,47775,47774,47776,49980,49986,49583,49584,49585,51105,51104);
+delete from creature_loot_template where item=0 and entry in(51106,50108,50098,50118,49619,21212);
+
+-- Argaloth 47120
+DELETE FROM creature_loot_template WHERE entry=47120 AND item IN (60245,60247,60248,60250,60255,60257,60261,60275,60278,60280,60283);
+DELETE FROM creature_loot_template WHERE entry=47120 AND item IN (60285,60288,60290,60298,60300,60305,60307,60310,60312,60314,60316);
+DELETE FROM creature_loot_template WHERE entry=47120 AND item IN (60319,60321,60324,60326,60330,60332,60340,60342,60345,60347,60350);
+DELETE FROM creature_loot_template WHERE entry=47120 AND item IN (60352,60355,60357,60361,60363,60409,60411,60414,60416,60419,60421);
+DELETE FROM creature_loot_template WHERE entry=47120 AND item IN (60424,60426,60429,60431,60434,60436,60439,60441,60443,60445,60448);
+DELETE FROM creature_loot_template WHERE entry=47120 AND item IN (60450,60453,60455,60459,60461,60463,60465,60468,60470,60473,60475);
+DELETE FROM creature_loot_template WHERE entry=47120 AND item IN (60478,60480,60505,60508,60509,60513,60516,60521,60533,60534,60536);
+DELETE FROM creature_loot_template WHERE entry=47120 AND item IN (60539,60540,60554,60555,60557,60564,60567,60580,60581,60583,60586);
+DELETE FROM creature_loot_template WHERE entry=47120 AND item IN (60587,60589,60593,60602,60604,60607,60612,60613,60626,60628,60630);
+DELETE FROM creature_loot_template WHERE entry=47120 AND item IN (60634,60636,60637,60645,60647,60649,60650,60651,60658,60659,60661);
+DELETE FROM creature_loot_template WHERE entry=47120 AND item IN (60662,60664,60668,60669,60670,60673,60776,60778,60779,60783,60786);
+DELETE FROM creature_loot_template WHERE entry=47120 AND item IN (60787,60788,60794,60799,60800,60801,60806,60807,61026,61031,61032);
+DELETE FROM creature_loot_template WHERE entry=47120 AND item IN (61033,61047);
+INSERT INTO creature_loot_template VALUES (47120,60245,3.2,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60247,4.2,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60248,3.5,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60250,3.4,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60255,1,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60257,1.2,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60261,2.2,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60275,0.9,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60278,0.8,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60280,1.3,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60283,0.9,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60285,1.1,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60288,0.9,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60290,1.2,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60298,4.6,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60300,2,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60305,3.9,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60307,3.4,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60310,2.3,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60312,1.2,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60314,0.5,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60316,0.5,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60319,0.9,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60321,1.2,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60324,1.4,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60326,1.3,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60330,2,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60332,1.1,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60340,1.7,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60342,1.5,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60345,0.9,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60347,2,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60350,1.4,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60352,1.7,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60355,0.8,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60357,0.9,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60361,1.2,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60363,1.3,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60409,5.9,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60411,6.2,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60414,3.8,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60416,3.5,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60419,6,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60421,5.9,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60424,6.9,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60426,6.3,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60429,1.9,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60431,2,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60434,1.6,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60436,1.8,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60439,2.7,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60441,1.5,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60443,3,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60445,2,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60448,2.4,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60450,2.5,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60453,2.6,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60455,1.8,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60459,6.6,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60461,7.7,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60463,6.8,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60465,6.6,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60468,3.2,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60470,4.8,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60473,3.4,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60475,2.8,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60478,4.5,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60480,6.3,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60505,0.4,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60508,0.7,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60509,0.4,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60513,1.4,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60516,0.8,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60521,0.7,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60533,0.4,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60534,1,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60536,0.6,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60539,1.1,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60540,0.9,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60554,0.8,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60555,0.8,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60557,1.2,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60564,0.9,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60567,0.5,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60580,0.9,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60581,1.3,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60583,1.2,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60586,0.9,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60587,1.2,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60589,1.1,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60593,0.9,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60602,2.9,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60604,3.4,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60607,1.2,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60612,1.3,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60613,0.9,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60626,0.5,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60628,0.5,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60630,1.3,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60634,1.2,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60636,0.9,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60637,1,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60645,1.3,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60647,1.3,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60649,1.3,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60650,1.2,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60651,1.1,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60658,0.6,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60659,0.9,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60661,0.7,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60662,1.2,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60664,1.2,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60668,1.3,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60669,0.8,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60670,1.3,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60673,1,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60776,0.9,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60778,1.8,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60779,1.2,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60783,2,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60786,0.9,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60787,1.1,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60788,1,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60794,0.5,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60799,0.9,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60800,0.9,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60801,2.3,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60806,0.8,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,60807,0.6,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,61026,1.7,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,61031,0.3,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,61032,1.4,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,61033,0.9,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (47120,61047,1.1,1,0,1,1);
+
+
+-- Vile Bat 3866
+DELETE FROM creature_loot_template where entry=3866 and mincountOrRef=-item;
+
+-- unknown 33955
+DELETE FROM creature_loot_template where entry=33955 and mincountOrRef=-33955;
+
+-- Zanzil 52053
+DELETE FROM creature_loot_template WHERE entry=52053 AND item IN (0);
+delete from creature_loot_template where entry=52053 and item between 69615 and 69619;
+INSERT INTO creature_loot_template VALUES (52053,69615,25,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (52053,69618,22,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (52053,69619,17,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (52053,69617,17,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (52053,69616,17,1,0,1,1);
+
+-- High Priestess Kilnara 52059
+DELETE FROM creature_loot_template WHERE entry=52059 AND item IN (0,68824);
+delete from creature_loot_template where entry=52059 and item between 69610 and 69614;
+INSERT INTO creature_loot_template VALUES (52059,69610,20,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (52059,69612,20,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (52059,69611,20,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (52059,69613,19,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (52059,69614,19,1,0,1,1);
+INSERT INTO creature_loot_template VALUES (52059,68824,1,1,0,1,1);
+
+
