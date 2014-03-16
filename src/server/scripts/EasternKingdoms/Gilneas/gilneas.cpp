@@ -36,102 +36,94 @@
 #include <math.h>
 
 
-enum Intro
+enum eGilneas
 {
-    // intro
-    LIAM_INTRO_1                     = 0,
-    LIAM_INTRO_2                     = 1,
-    LIAM_INTRO_3                     = 2,
-    CITIZEN_SAY_WHAT_AT_THE_ROOF     = 0, // -1977003,
-    // phase 1, merchant square
-    LIAM_RANDOM_YELL                 = 0,  // (-1977019 to -1977023)
+	// phase 1
+	NPC_PANICKED_CITIZEN_GATE						= 44086,
+	NPC_GILNEAS_CITY_GUARD_GATE						= 34864,
+	QUEST_LOCKDOWN									= 14078,
+    SPELL_SET_PHASE_02								= 59073, 
+    SPELL_GENERIC_QUEST_INVISIBILITY_DERECTION_1	= 49416,
+	// phase 2
+	NPC_RAMPAGING_WORGEN_1							= 35660,
+    NPC_RAMPAGING_WORGEN_2							= 34884,
+    NPC_GILNEAS_CITY_GUARD							= 34916,
 
-    PANICKED_CITIZEN_RANDOM_SAY      = 0,  // (-1977152 to -1977154)
-    GILNEAS_CITY_GUARD_RANDOM_SAY    = 0,  // (-1977155 to -1977157)
+	QUEST_ROYAL_ORDERS								= 14099,
+	 
+    SPELL_INVISIBILITY_DETECTION_2					= 49417,
 
-    SPELL_ENRAGE                     = 8599,
-    SPELL_SHOOT                      = 20463,
+	// old
+	SPELL_ENRAGE						= 8599,
+    SPELL_SHOOT							= 20463,
+    SPELL_CATACLYSM_TYPE_1				= 80133,
+    SPELL_CATACLYSM_TYPE_2				= 68953,
+    SPELL_CATACLYSM_TYPE_3				= 80134,
 
-    PHASE_ONE                        = 6,
+    PHASE_ONE							= 6,
+	 
+	NPC_AFFLICTED_GILNEAN				= 50471,
+    NPC_BLOODFANG_WORGEN				= 35118,
+    NPC_GILNEAN_ROYAL_GUARD				= 35232,
+    NPC_FRENZIED_STALKER				= 35627,
+    NPC_NORTHGATE_REBEL					= 41015,
+    NPC_GILNEAS_CITY_GUARD_PHASE_4		= 50474,
+    NPC_NORTHGATE_REBEL_PHASE_5			= 36057,
+    NPC_BLOODFANG_STALKER_PHASE_5		= 35229,
+    NPC_FORSAKEN_INVADER				= 34511,
+    NPC_FORSAKEN_FOOTSOLDIER			= 36236,
 
-    SPELL_DETECT_QUEST_INVIS         = 49416,
+
 };
 
-enum eAttackedCreatures
-{
-    NPC_AFFLICTED_GILNEAN            = 50471,
-    NPC_RAMPAGING_WORGEN             = 34884,
-    NPC_GILNEAS_CITY_GUARD           = 34916,
-    NPC_BLOODFANG_WORGEN             = 35118,
-    NPC_GILNEAN_ROYAL_GUARD          = 35232,
-    NPC_FRENZIED_STALKER             = 35627,
-    NPC_NORTHGATE_REBEL              = 41015,
-    NPC_GILNEAS_CITY_GUARD_PHASE_4   = 50474,
-    NPC_NORTHGATE_REBEL_PHASE_5      = 36057,
-    NPC_BLOODFANG_STALKER_PHASE_5    = 35229,
+/*######
+## phase 1
+######*/
 
-    GUARD_RANDOM_YELL                = 0,    //  -1977161 to -1977163
-};
-
-enum eDuskhavenAttackers
-{
-    NPC_FORSAKEN_INVADER             = 34511,
-    NPC_FORSAKEN_FOOTSOLDIER         = 36236,
-};
-
-enum eTremor
-{
-    SPELL_CATACLYSM_TYPE_1    = 80133,
-    SPELL_CATACLYSM_TYPE_2    = 68953,
-    SPELL_CATACLYSM_TYPE_3    = 80134,
-};
+/*######
+## communication between npc_panicked_citizen_gate  and  npc_gilneas_city_guard_gate
+######*/
 
 const uint16 PanickedCitizenRandomEmote[5] =
 {
-    EMOTE_ONESHOT_COWER,
-    EMOTE_ONESHOT_TALK,
-    EMOTE_ONESHOT_CRY,
-    EMOTE_ONESHOT_BEG,
-    EMOTE_ONESHOT_EXCLAMATION,
+    EMOTE_STATE_COWER,
+    EMOTE_STATE_TALK,
+    EMOTE_ONESHOT_CRY, 
+    EMOTE_STATE_SPELL_PRECAST, // EMOTE_ONESHOT_BEG,
+    EMOTE_STATE_EXCLAIM,
 };
 
+/*######
+## npc_panicked_citizen_gate
+######*/
 class npc_panicked_citizen_gate : public CreatureScript
 {
 public:
     npc_panicked_citizen_gate() : CreatureScript("npc_panicked_citizen_gate") { }
 
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new npc_panicked_citizen_gateAI (creature);
-    }
-
     struct npc_panicked_citizen_gateAI : public ScriptedAI
     {
-        npc_panicked_citizen_gateAI(Creature* creature) : ScriptedAI(creature)
-        {
-            uiRandomEmoteTimer = urand(1000, 60000);
-        }
-
-        uint32 uiRandomEmoteTimer;
+        npc_panicked_citizen_gateAI(Creature* creature) : ScriptedAI(creature)  { }     
 
         void UpdateAI(const uint32 diff)
-        {
-            if (uiRandomEmoteTimer <= diff)
-            {
-                uiRandomEmoteTimer = urand(10000, 60000);
-                uint8 roll = urand(0, 5);
-                me->HandleEmoteCommand(PanickedCitizenRandomEmote[roll]);
-            }
-            else
-                uiRandomEmoteTimer -= diff;
-
+        {           
             if (!UpdateVictim())
                 return;
 
             DoMeleeAttackIfReady();
         }
     };
+
+	CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_panicked_citizen_gateAI (creature);
+    }
+
 };
+
+/*######
+## npc_gilneas_city_guard_gate
+######*/
 
 class npc_gilneas_city_guard_gate : public CreatureScript
 {
@@ -145,72 +137,107 @@ public:
 
     struct npc_gilneas_city_guard_gateAI : public ScriptedAI
     {
-        npc_gilneas_city_guard_gateAI(Creature* creature) : ScriptedAI(creature)
-        {
-            uiEventTimer = urand(10000, 40000);
-            uiEventPhase = 0;
+        npc_gilneas_city_guard_gateAI(Creature* creature) : ScriptedAI(creature)  { }
+
+        uint32		_timer;
+        uint8		_phase;
+        bool		_nearGate;
+		uint8		_say;
+		uint8		_emote; 
+		Creature*	_citizen;
+
+		void Reset()
+		{
+			_timer = urand(10000, 40000);
+            _phase = 0;
 
             if (me->GetDistance2d(-1430.47f, 1345.55f) < 10.0f)
-                Event = true;
+                _nearGate = true;
             else
-                Event = false;
-        }
-
-        uint32 uiEventTimer;
-        uint8 uiEventPhase;
-        bool Event;
+                _nearGate = false;
+		}
 
         void UpdateAI(const uint32 diff)
         {
-            if (Event)
-                if (uiEventTimer <= diff)
+            if (_nearGate)
+                if (_timer <= diff)
                 {
-                    switch (uiEventPhase)
-                    {
-                        case 0:
-                            {
-                                std::list<Creature*> lCitizen;
-                                me->GetCreatureListWithEntryInGrid(lCitizen, 44086, 35.0f);
-
-                                if (!lCitizen.empty())
-                                {
-                                    uint8 roll = urand(0, lCitizen.size() - 1);
-                                    std::list<Creature*>::iterator itr = lCitizen.begin();
-                                    std::advance(itr, roll);
-                                    Creature* citizen = *itr;
-
-                                    if (citizen)
-                                    {
-                                        uiEventPhase=1;
-                                        uiEventTimer = urand(5000, 10000);
-                                        //uint8 roll = urand(0, 2);
-                                        citizen->AI()->Talk(PANICKED_CITIZEN_RANDOM_SAY, me->GetGUID());
-										
-                                        return;
-                                    }
-                                }
-
-                                uiEventTimer = urand(10000, 40000);
-                            }
-                            break;
-                        case 1:
-                            uiEventPhase=0;
-                            uiEventTimer = urand(10000, 40000);
-                            // uint8 roll = urand(0, 2);
-                            Talk(GILNEAS_CITY_GUARD_RANDOM_SAY , me->GetGUID());
-                            break;
-                    }
+                   DoWork();
                 }
                 else
-                    uiEventTimer -= diff;
+                    _timer -= diff;
 
             if (!UpdateVictim())
                 return;
 
             DoMeleeAttackIfReady();
         }
+
+		void DoWork()
+		{		
+			 switch (_phase)
+             {
+				case 0:
+                {
+					std::list<Creature*> listOfCitizen;
+                    me->GetCreatureListWithEntryInGrid(listOfCitizen, NPC_PANICKED_CITIZEN_GATE, 35.0f);
+
+                    if (!listOfCitizen.empty())
+					{
+						uint8 id = urand(0, listOfCitizen.size() - 1);
+                        std::list<Creature*>::iterator itr = listOfCitizen.begin();
+                        std::advance(itr, id);                                    
+
+                        if (_citizen = *itr)
+                        {							
+                            _timer = urand(1000,2000);
+                            _emote=urand(0, 4);  
+							_say=urand(0,2);
+							_citizen->HandleEmoteCommand(PanickedCitizenRandomEmote[_emote]);
+										
+                            return;
+                        }
+                     }                     
+					 break;
+                }
+				case 1:
+				{
+					if (_citizen)
+					{
+						_citizen->AI()->Talk(_say, me->GetGUID());									
+						_timer = urand(4000,7000);
+						_phase=2;						
+					}
+					break;
+				}			 
+				case 2:
+				{
+					if (_citizen)
+					{						
+						Talk(_say , me->GetGUID());						
+						_timer = 6000;                            
+						_phase=3;				        
+					}
+					break;
+				}
+				case 3:
+				{
+					if (_citizen)
+					{						
+						_citizen->HandleEmoteCommand(EMOTE_ONESHOT_NONE);				
+						_timer = urand(20000, 40000);                            
+						_phase=0;				        
+					}
+					break;
+				}
+            }			
+		}
     };
 };
+
+/*######
+## npc_gilnean_crow
+######*/
 
 struct Coord
 {
@@ -335,6 +362,9 @@ public:
     };
 };
 
+/*######
+## npc_prince_liam_greymane_intro
+######*/
 
 class npc_prince_liam_greymane_intro : public CreatureScript
 {
@@ -345,7 +375,7 @@ public:
     {
         if (quest->GetQuestId() == 14078)
             if (Creature* citizen = creature->FindNearestCreature(34851, 20.0f))
-             citizen->MonsterSay(CITIZEN_SAY_WHAT_AT_THE_ROOF, 0, player->GetGUID());
+             citizen->AI()->Talk(0);
 
         return true;
     }
@@ -372,15 +402,15 @@ public:
                 switch (uiSayCount)
                 {
                     case 1:
-                        Talk(LIAM_INTRO_1, me->GetGUID());
+                        Talk(0, me->GetGUID());
                         uiSayTimer = 15000;
                         break;
                     case 2:
-                        Talk(LIAM_INTRO_2, me->GetGUID());
+                        Talk(1, me->GetGUID());
                         uiSayTimer = 18000;
                         break;
                     case 3:
-                        Talk(LIAM_INTRO_3, me->GetGUID());
+                        Talk(2, me->GetGUID());
                         uiSayTimer = 25000;
                         uiSayCount = 0;
                         break;
@@ -399,15 +429,9 @@ public:
 
 };
 
-///////////
-// Quest Lockdown! 14078
-///////////
-
-enum qL
-{
-    QUEST_LOCKDOWN    = 14078,
-    SPELL_PHASE_01    = 59073, //14091
-};
+/*######
+## npc_lieutenant_walden
+######*/
 
 class npc_lieutenant_walden : public CreatureScript
 {
@@ -418,7 +442,7 @@ public:
     {
         if (quest->GetQuestId() == QUEST_LOCKDOWN)
         {
-            player->AddAura(SPELL_DETECT_QUEST_INVIS, player);
+            player->AddAura(SPELL_GENERIC_QUEST_INVISIBILITY_DERECTION_1, player);
             player->SaveToDB();
         }
 
@@ -426,15 +450,13 @@ public:
     }
 };
 
-///////////
-// Quest Royal Orders 14099
-///////////
+/*######
+## phase 2
+######*/
 
-enum qRO
-{
-    QUEST_ROYAL_ORDERS                = 14099,
-    SPELL_INVISIBILITY_DETECTION_2    = 49417,
-};
+/*######
+## npc_prince_liam_greymane_phase_1
+######*/
 
 class npc_prince_liam_greymane_phase_1 : public CreatureScript
 {
@@ -445,7 +467,7 @@ public:
     {
         if (quest->GetQuestId() ==  QUEST_ROYAL_ORDERS)
         {
-            player->RemoveAura(SPELL_DETECT_QUEST_INVIS);
+            player->RemoveAura(SPELL_GENERIC_QUEST_INVISIBILITY_DERECTION_1);
             player->CastSpell(player, SPELL_INVISIBILITY_DETECTION_2, false);
             player->SaveToDB();
         }
@@ -487,7 +509,7 @@ public:
                 uiShootTimer = 1500;
                 Unit* target = NULL;
 
-                if (target = me->FindNearestCreature(NPC_RAMPAGING_WORGEN, 40.0f))
+                if (target = me->FindNearestCreature(NPC_RAMPAGING_WORGEN_1, 40.0f))
                     if (target != me->GetVictim())
                     {
                         me->getThreatManager().modifyThreatPercent(me->GetVictim(), -100);
@@ -510,7 +532,7 @@ public:
             {
                 uiSayTimer = urand(30000, 120000);
                // uint8 id = urand(0, 4);
-                Talk(LIAM_RANDOM_YELL, me->GetGUID());
+                Talk(0, me->GetGUID());
             }
             else
                 uiSayTimer -= diff;
@@ -525,6 +547,10 @@ public:
         }
     };
 };
+
+/*######
+## npc_rampaging_worgen
+######*/
 
 class npc_rampaging_worgen : public CreatureScript
 {
@@ -556,7 +582,7 @@ public:
 
             switch(me->GetEntry())
             {
-                case NPC_RAMPAGING_WORGEN:
+                case NPC_RAMPAGING_WORGEN_2:
                     uiEnemyEntry = NPC_GILNEAS_CITY_GUARD;
                     break;
                 case NPC_BLOODFANG_WORGEN:
@@ -611,6 +637,10 @@ public:
     };
 };
 
+/*######
+## npc_gilneas_city_guard
+######*/
+
 class npc_gilneas_city_guard : public CreatureScript
 {
 public:
@@ -646,7 +676,7 @@ public:
             switch(me->GetEntry())
             {
                 case NPC_GILNEAS_CITY_GUARD:
-                    uiEnemyEntry = NPC_RAMPAGING_WORGEN;
+                    uiEnemyEntry = NPC_RAMPAGING_WORGEN_2;
                     break;
                 case NPC_GILNEAN_ROYAL_GUARD:
                     uiEnemyEntry = NPC_BLOODFANG_WORGEN;
@@ -694,7 +724,7 @@ public:
                 {
                     uiYellTimer = urand(50000, 100000);
                     uint8 roll = urand(0, 2);
-                    DoScriptText(GUARD_RANDOM_YELL - roll, me);
+                    DoScriptText(0, me);
                 }
                 else
                     uiYellTimer -= diff;
@@ -1898,7 +1928,7 @@ public:
                     escort->AddWaypoint(42, -1768.24f, 1410.2f, 19.7833f);
                     escort->AddWaypoint(43, -1772.26f, 1420.48f, 19.9029f);
                     escort->Start(true);
-                    player->CastSpell(player, SPELL_DETECT_QUEST_INVIS, false);
+                    player->CastSpell(player, SPELL_GENERIC_QUEST_INVISIBILITY_DERECTION_1, false);
                     player->EnterVehicle(horse, 0);
                     horse->EnableAI();
                 }
@@ -2321,7 +2351,7 @@ public:
         void Reset()
         {
             tEnrage    = 0;
-            tAnimate   = DELAY_ANIMATE;
+            tAnimate   = 2000;
             Miss  = false;
             willCastEnrage = urand(0, 1);
             BurningReset = 3000;
@@ -2357,7 +2387,7 @@ public:
                 {
                     me->MonsterTextEmote(-106, 0);
                     DoCast(me, SPELL_ENRAGE);
-                    tEnrage = CD_ENRAGE;
+                    tEnrage = 30000;
                 }
             }
             else tEnrage -= diff;
@@ -2381,8 +2411,8 @@ public:
             if (Miss && tAnimate <= diff)
             {
                 me->HandleEmoteCommand(EMOTE_ONESHOT_ATTACK_UNARMED);
-                me->PlayDistanceSound(SOUND_WORGEN_ATTACK);
-                tAnimate = DELAY_ANIMATE;
+                me->PlayDistanceSound(558);
+                tAnimate = 2000;
             }
             else
                 tAnimate -= diff;

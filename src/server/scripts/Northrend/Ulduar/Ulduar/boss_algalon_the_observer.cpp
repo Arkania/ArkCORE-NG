@@ -964,9 +964,9 @@ class go_celestial_planetarium_access : public GameObjectScript
 
         struct go_celestial_planetarium_accessAI : public GameObjectAI
         {
-            go_celestial_planetarium_accessAI(GameObject* go) : GameObjectAI(go)
-            {
-            }
+            go_celestial_planetarium_accessAI(GameObject* go) : GameObjectAI(go) { }
+
+			EventMap _events;
 
             bool GossipHello(Player* player)
             {
@@ -1009,7 +1009,7 @@ class go_celestial_planetarium_access : public GameObjectScript
                 return false;
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (_events.Empty())
                     return;
@@ -1025,9 +1025,7 @@ class go_celestial_planetarium_access : public GameObjectScript
                             break;
                     }
                 }
-            }
-
-            EventMap _events;
+            }            
         };
 
         GameObjectAI* GetAI(GameObject* go) const
