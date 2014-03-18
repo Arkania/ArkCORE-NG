@@ -61,6 +61,7 @@ public:
         static ChatCommand commandTable[] =
         {
             { "character",      SEC_GAMEMASTER,     true,  NULL,                                   "", characterCommandTable},
+            { "levelup",        SEC_ADMINISTRATOR,  false, &HandleLevelUpCommand,                  "", NULL },
             { NULL,             0,                  false, NULL,                                   "", NULL }
         };
         return commandTable;
@@ -219,6 +220,34 @@ public:
             sWorld->AddCharacterNameData(delInfo.lowGuid, delInfo.name, (*result)[2].GetUInt8(), (*result)[0].GetUInt8(), (*result)[1].GetUInt8(), (*result)[3].GetUInt8());
     }
 
+    static void HandleCharacterLevel(Player* player, uint64 playerGuid, uint32 oldLevel, uint32 newLevel, ChatHandler* handler)
+    {
+        if (player)
+        {
+            player->GiveLevel(newLevel);
+            player->InitTalentForLevel();
+            player->SetUInt32Value(PLAYER_XP, 0);
+
+            if (handler->needReportToTarget(player))
+            {
+                if (oldLevel == newLevel)
+                    ChatHandler(player).PSendSysMessage(LANG_YOURS_LEVEL_PROGRESS_RESET, handler->GetNameLink().c_str());
+                else if (oldLevel < newLevel)
+                    ChatHandler(player).PSendSysMessage(LANG_YOURS_LEVEL_UP, handler->GetNameLink().c_str(), newLevel);
+                else                                                // if (oldlevel > newlevel)
+                    ChatHandler(player).PSendSysMessage(LANG_YOURS_LEVEL_DOWN, handler->GetNameLink().c_str(), newLevel);
+            }
+        }
+        else
+        {
+            // Update level and reset XP, everything else will be updated at login
+            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_LEVEL);
+            stmt->setUInt8(0, uint8(newLevel));
+            stmt->setUInt32(1, GUID_LOPART(playerGuid));
+            CharacterDatabase.Execute(stmt);
+        }
+    }
+
     static bool HandleCharacterTitlesCommand(ChatHandler* handler, char const* args)
     {
         if (!*args)
@@ -327,7 +356,7 @@ public:
         if (newlevel > STRONG_MAX_LEVEL)                         // hardcoded maximum level
             newlevel = STRONG_MAX_LEVEL;
 
-        handler->HandleCharacterLevel(target, targetGuid, oldlevel, newlevel);
+        HandleCharacterLevel(target, targetGuid, oldlevel, newlevel, handler);
         if (!handler->GetSession() || handler->GetSession()->GetPlayer() != target)      // including player == NULL
         {
             std::string nameLink = handler->playerLink(targetName);
