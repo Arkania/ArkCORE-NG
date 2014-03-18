@@ -243,7 +243,7 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS]=
     &Spell::EffectNULL,                                     //170 SPELL_EFFECT_170
     &Spell::EffectNULL,                                     //171 SPELL_EFFECT_171
     &Spell::EffectNULL,                                     //172 SPELL_EFFECT_172
-    &Spell::EffectUnlockGuildTab,                           //173 SPELL_EFFECT_UNLOCK_GUILD_TAB
+    &Spell::EffectUnlockGuildVaultTab,                      //173 SPELL_EFFECT_UNLOCK_GUILD_VAULT_TAB
     &Spell::EffectNULL,                                     //174 SPELL_EFFECT_174
     &Spell::EffectUnused,                                   //175 SPELL_EFFECT_175  unused
     &Spell::EffectNULL,                                     //176 SPELL_EFFECT_176
@@ -7642,33 +7642,16 @@ void Spell::EffectRewardCurrency(SpellEffIndex effIndex)
      unitTarget->ToPlayer()->ModifyCurrency(m_spellInfo->Effects[effIndex].MiscValue, damage);
 }
 
-void Spell::EffectUnlockGuildTab(SpellEffIndex effIndex)
+void Spell::EffectUnlockGuildVaultTab(SpellEffIndex effIndex)
 {
-    // for better perfomance - need to check banktabs count
-    // and return if we has it
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT)
         return;
 
-    if (m_caster->GetTypeId() != TYPEID_PLAYER)
-        return;
-
-     Player* player = m_caster->ToPlayer();
-
-     if (!player)
-         return;
-
-     uint8 tabId = m_spellInfo->Effects[0].BasePoints;
-
-        if (!tabId)
-            return;
-
-     if (Guild* guild = sGuildMgr->GetGuildById(player->GetGuildId()))
-     {
-         if (guild->_IsLeader(player))
-            guild->HandleBuyBankTab(player->GetSession(), tabId-1);
-     }
-
+    Player* caster = m_caster->ToPlayer();
+    if (Guild* guild = caster->GetGuild())
+        guild->HandleBuyBankTab(caster->GetSession(), m_spellInfo->Effects[effIndex].BasePoints - 1);
 }
+
 
 void Spell::EffectCastButtons(SpellEffIndex effIndex)
 {
