@@ -105,7 +105,6 @@ public:
             { "cometome",           SEC_ADMINISTRATOR,      false, &HandleComeToMeCommand,              "", NULL },
             { "damage",             SEC_ADMINISTRATOR,      false, &HandleDamageCommand,                "", NULL },
             { "combatstop",         SEC_GAMEMASTER,         true,  &HandleCombatStopCommand,            "", NULL },
-            { "flusharenapoints",   SEC_ADMINISTRATOR,      false, &HandleFlushArenaPointsCommand,      "", NULL },
             { "repairitems",        SEC_GAMEMASTER,         true,  &HandleRepairitemsCommand,           "", NULL },
             { "waterwalk",          SEC_GAMEMASTER,         false, &HandleWaterwalkCommand,             "", NULL },
             { "freeze",             SEC_MODERATOR,          false, &HandleFreezeCommand,                "", NULL },
@@ -377,7 +376,7 @@ public:
             handler->PSendSysMessage(LANG_APPEARING_AT, chrNameLink.c_str());
 
             // stop flight if need
-            if (_player->isInFlight())
+            if (_player->IsInFlight())
             {
                 _player->GetMotionMaster()->MovementExpired();
                 _player->CleanupAfterTaxiFlight();
@@ -411,7 +410,7 @@ public:
                 return false;
 
             // stop flight if need
-            if (_player->isInFlight())
+            if (_player->IsInFlight())
             {
                 _player->GetMotionMaster()->MovementExpired();
                 _player->CleanupAfterTaxiFlight();
@@ -502,7 +501,7 @@ public:
                 ChatHandler(target).PSendSysMessage(LANG_SUMMONED_BY, handler->playerLink(_player->GetName()).c_str());
 
             // stop flight if need
-            if (target->isInFlight())
+            if (target->IsInFlight())
             {
                 target->GetMotionMaster()->MovementExpired();
                 target->CleanupAfterTaxiFlight();
@@ -577,7 +576,7 @@ public:
 
         for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
         {
-            Player* player = itr->getSource();
+            Player* player = itr->GetSource();
 
             if (!player || player == handler->GetSession()->GetPlayer() || !player->GetSession())
                 continue;
@@ -613,7 +612,7 @@ public:
                 ChatHandler(player).PSendSysMessage(LANG_SUMMONED_BY, handler->GetNameLink().c_str());
 
             // stop flight if need
-            if (player->isInFlight())
+            if (player->IsInFlight())
             {
                 player->GetMotionMaster()->MovementExpired();
                 player->CleanupAfterTaxiFlight();
@@ -654,7 +653,7 @@ public:
                 return false;
         }
 
-        if (target->isAlive())
+        if (target->IsAlive())
         {
             if (sWorld->getBoolConfig(CONFIG_DIE_COMMAND_MODE))
                 handler->GetSession()->GetPlayer()->Kill(target);
@@ -697,7 +696,7 @@ public:
             return false;
         }
 
-        if (player->isInFlight())
+        if (player->IsInFlight())
         {
             handler->SendSysMessage(LANG_YOU_IN_FLIGHT);
             handler->SetSentErrorMessage(true);
@@ -862,7 +861,7 @@ public:
         }
 
         // stop flight if need
-        if (target->isInFlight())
+        if (target->IsInFlight())
         {
             target->GetMotionMaster()->MovementExpired();
             target->CleanupAfterTaxiFlight();
@@ -936,21 +935,21 @@ public:
     {
         Player* player = handler->GetSession()->GetPlayer();
 
-        if (player->isInFlight())
+        if (player->IsInFlight())
         {
             handler->SendSysMessage(LANG_YOU_IN_FLIGHT);
             handler->SetSentErrorMessage(true);
             return false;
         }
 
-        if (player->isInCombat())
+        if (player->IsInCombat())
         {
             handler->SendSysMessage(LANG_YOU_IN_COMBAT);
             handler->SetSentErrorMessage(true);
             return false;
         }
 
-        if (player->isDead() || player->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))
+        if (player->IsDead() || player->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))
         {
             // if player is dead and stuck, send ghost to graveyard
             player->RepopAtGraveyard();
@@ -1792,14 +1791,14 @@ public:
         Unit* target = handler->getSelectedUnit();
         if (player->GetSelection() && target)
         {
-            if (target->GetTypeId() != TYPEID_UNIT || target->isPet())
+            if (target->GetTypeId() != TYPEID_UNIT || target->IsPet())
             {
                 handler->SendSysMessage(LANG_SELECT_CREATURE);
                 handler->SetSentErrorMessage(true);
                 return false;
             }
 
-            if (target->isDead())
+            if (target->IsDead())
                 target->ToCreature()->Respawn();
             return true;
         }
@@ -2074,7 +2073,7 @@ public:
                 return false;
         }
 
-        if (!target->isAlive())
+        if (!target->IsAlive())
             return true;
 
         char* damageStr = strtok((char*)args, " ");
@@ -2169,12 +2168,6 @@ public:
         return true;
     }
 
-    static bool HandleFlushArenaPointsCommand(ChatHandler* /*handler*/, char const* /*args*/)
-    {
-        sArenaTeamMgr->DistributeArenaPoints();
-        return true;
-    }
-
     static bool HandleRepairitemsCommand(ChatHandler* handler, char const* args)
     {
         Player* target;
@@ -2213,9 +2206,9 @@ public:
             return false;
 
         if (strncmp(args, "on", 3) == 0)
-            player->SetMovement(MOVE_WATER_WALK);               // ON
+            player->SendMovementSetWaterWalking(true);
         else if (strncmp(args, "off", 4) == 0)
-            player->SetMovement(MOVE_LAND_WALK);                // OFF
+            player->SendMovementSetWaterWalking(false);
         else
         {
             handler->SendSysMessage(LANG_USE_BOL);
@@ -2468,7 +2461,7 @@ public:
         Player* player = handler->GetSession()->GetPlayer();
         Creature* creatureTarget = handler->getSelectedCreature();
 
-        if (!creatureTarget || creatureTarget->isPet() || creatureTarget->GetTypeId() == TYPEID_PLAYER)
+        if (!creatureTarget || creatureTarget->IsPet() || creatureTarget->GetTypeId() == TYPEID_PLAYER)
         {
             handler->PSendSysMessage(LANG_SELECT_CREATURE);
             handler->SetSentErrorMessage(true);
@@ -2528,8 +2521,8 @@ public:
         // visual effect for levelup
         pet->SetUInt32Value(UNIT_FIELD_LEVEL, creatureTarget->getLevel());
 
-        player->SetMinion(pet, true);
-        pet->SavePetToDB(PET_SAVE_AS_CURRENT);
+        player->SetMinion(pet, true, PET_SLOT_UNK_SLOT);
+        pet->SavePetToDB(PET_SLOT_ACTUAL_PET_SLOT);
         player->PetSpellInitialize();
 
         return true;
@@ -2652,10 +2645,10 @@ public:
             {
                 if (Pet* pet = player->GetPet())
                 {
-                    pet->SavePetToDB(PET_SAVE_AS_CURRENT);
+                    pet->SavePetToDB(PET_SLOT_ACTUAL_PET_SLOT);
                     // not let dismiss dead pet
-                    if (pet && pet->isAlive())
-                        player->RemovePet(pet, PET_SAVE_NOT_IN_SLOT);
+                    if (pet && pet->IsAlive())
+                        player->RemovePet(pet, PET_SLOT_DELETED);
                 }
             }
 
@@ -2866,7 +2859,7 @@ public:
     {
         Player* player = handler->GetSession()->GetPlayer();
 
-        if (player->isPossessing())
+        if (player->IsPossessing())
             return false;
 
         player->StopCastingBindSight();
