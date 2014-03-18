@@ -315,15 +315,14 @@ class boss_gothik : public CreatureScript
 
             bool CheckGroupSplitted()
             {
-                bool checklife = false;
-                bool checkdead = false;
-
                 Map* map = me->GetMap();
                 if (map && map->IsDungeon())
                 {
                     Map::PlayerList const &PlayerList = map->GetPlayers();
                     if (!PlayerList.isEmpty())
                     {
+                        bool checklife = false;
+                        bool checkdead = false;
                         for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                         {
                             if (i->GetSource() && i->GetSource()->IsAlive() &&

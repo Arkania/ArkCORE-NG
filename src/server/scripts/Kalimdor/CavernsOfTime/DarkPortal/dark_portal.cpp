@@ -181,7 +181,9 @@ public:
                         SpellCorrupt_Timer = 3000;
                     else
                         SpellCorrupt_Timer = 0;
-                } else SpellCorrupt_Timer -= diff;
+                }
+                else
+                    SpellCorrupt_Timer -= diff;
             }
 
             if (Check_Timer)
@@ -291,7 +293,8 @@ public:
                 mWaveId = 0;
             else if (mPortalCount > 12)
                 mWaveId = 2;
-            else mWaveId = 1;
+            else 
+                mWaveId = 1;
 
         }
         void EnterCombat(Unit* /*who*/) {}
@@ -335,7 +338,9 @@ public:
             {
                 for (uint8 i = 0; i < 3; ++i)
                     DoSummonAtRift(entry);
-            } else DoSummonAtRift(entry);
+            }
+            else
+                DoSummonAtRift(entry);
         }
 
         void UpdateAI(const uint32 diff)

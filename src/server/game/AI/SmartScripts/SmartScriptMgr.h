@@ -1246,16 +1246,9 @@ enum SmartCastFlags
 // one line in DB is one event
 struct SmartScriptHolder
 {
-    SmartScriptHolder()
-    {
-        timer = 0;
-        active = false;
-        runOnce = false;
-        link = 0;
-        entryOrGuid = 0;
-        event_id = 0;
-        enableTimed = false;
-    }
+    SmartScriptHolder() : timer(0), active(false), runOnce(false), link(0), entryOrGuid(0),
+        event_id(0), enableTimed(false), source_type(SMART_SCRIPT_TYPE_CREATURE) {}
+
     int32 entryOrGuid;
     SmartScriptType source_type;
     uint32 event_id;

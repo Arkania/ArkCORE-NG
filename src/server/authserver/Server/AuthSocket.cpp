@@ -197,7 +197,7 @@ const AuthHandler table[] =
 Patcher PatchesCache;
 
 // Constructor - set the N and g values for SRP6
-AuthSocket::AuthSocket(RealmSocket& socket) : socket_(socket)
+AuthSocket::AuthSocket(RealmSocket& socket) : socket_(socket), pPatch(NULL)
 {
     N.SetHexStr("894B645E89E1535BBDAD5B8B290650530801B18EBFBF5E8FAB3C82872A3E9BB7");
     g.SetDword(7);
@@ -975,7 +975,7 @@ bool AuthSocket::_HandleXferResume()
 {
     sLog->outStaticDebug("Entering _HandleXferResume");
     // Check packet length and patch existence
-    if (socket().recv_len() < 9 || !pPatch)
+    if (socket().recv_len() < 9 || !pPatch) // @todo: pPatch is never used
     {
         sLog->outError("Error while resuming patch transfer (wrong packet)");
         return false;

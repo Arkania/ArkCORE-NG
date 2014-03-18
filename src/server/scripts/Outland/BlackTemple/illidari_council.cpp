@@ -300,12 +300,11 @@ public:
 
                 for (uint8 i = 0; i < 4; ++i)
                 {
-                    Unit* Member = NULL;
                     if (Council[i])
                     {
-                        Member = Unit::GetUnit(*me, Council[i]);
-                        if (Member && Member->IsAlive())
-                            CAST_CRE(Member)->AI()->AttackStart(target);
+                        Unit* member = Unit::GetUnit(*me, Council[i]);
+                        if (member && member->IsAlive())
+                            CAST_CRE(member)->AI()->AttackStart(target);
                     }
                 }
 

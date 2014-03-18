@@ -85,8 +85,8 @@ class NGrid
             , i_y(y)
             , i_cellstate(GRID_STATE_INVALID)
             , i_GridObjectDataLoaded(false)
+            , i_GridInfo(GridInfo(expiry, unload))
         {
-            i_GridInfo = GridInfo(expiry, unload);
         }
 
         GridType& GetGridType(const uint32 x, const uint32 y)

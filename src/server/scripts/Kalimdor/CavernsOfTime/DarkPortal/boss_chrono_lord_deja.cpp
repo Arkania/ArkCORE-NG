@@ -121,7 +121,9 @@ public:
             {
                 DoCast(me->GetVictim(), SPELL_ARCANE_BLAST);
                 ArcaneBlast_Timer = 15000+rand()%10000;
-            } else ArcaneBlast_Timer -= diff;
+            }
+            else
+                ArcaneBlast_Timer -= diff;
 
             //Arcane Discharge
             if (ArcaneDischarge_Timer <= diff)
@@ -129,7 +131,9 @@ public:
                 Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0);
                 DoCast(target, SPELL_ARCANE_DISCHARGE);
                 ArcaneDischarge_Timer = 20000+rand()%10000;
-            } else ArcaneDischarge_Timer -= diff;
+            }
+            else
+                ArcaneDischarge_Timer -= diff;
 
             //Time Lapse
             if (TimeLapse_Timer <= diff)
@@ -137,7 +141,9 @@ public:
                 DoScriptText(SAY_BANISH, me);
                 DoCast(me, SPELL_TIME_LAPSE);
                 TimeLapse_Timer = 15000+rand()%10000;
-            } else TimeLapse_Timer -= diff;
+            }
+            else
+                TimeLapse_Timer -= diff;
 
             if (IsHeroic())
             {
@@ -145,7 +151,9 @@ public:
                 {
                     DoCast(me, SPELL_ATTRACTION);
                     Attraction_Timer = 25000+rand()%10000;
-                } else Attraction_Timer -= diff;
+                }
+                else
+                    Attraction_Timer -= diff;
             }
 
             DoMeleeAttackIfReady();

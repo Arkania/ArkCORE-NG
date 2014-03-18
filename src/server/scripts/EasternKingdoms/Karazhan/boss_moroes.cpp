@@ -202,12 +202,11 @@ public:
         {
             for (uint8 i = 0; i < 4; ++i)
             {
-                Creature* Temp = NULL;
                 if (AddGUID[i])
                 {
-                    Temp = Creature::GetCreature((*me), AddGUID[i]);
-                    if (Temp && Temp->IsAlive())
-                        Temp->DisappearAndDie();
+                    Creature* temp = Creature::GetCreature((*me), AddGUID[i]);
+                    if (temp && temp->IsAlive())
+                        temp->DisappearAndDie();
                 }
             }
         }
@@ -216,14 +215,13 @@ public:
         {
             for (uint8 i = 0; i < 4; ++i)
             {
-                Creature* Temp = NULL;
                 if (AddGUID[i])
                 {
-                    Temp = Creature::GetCreature((*me), AddGUID[i]);
-                    if (Temp && Temp->IsAlive())
+                    Creature* temp = Creature::GetCreature((*me), AddGUID[i]);
+                    if (temp && temp->IsAlive())
                     {
-                        Temp->AI()->AttackStart(me->GetVictim());
-                        DoZoneInCombat(Temp);
+                        temp->AI()->AttackStart(me->GetVictim());
+                        DoZoneInCombat(temp);
                     } else
                         EnterEvadeMode();
                 }
@@ -251,13 +249,12 @@ public:
             {
                 for (uint8 i = 0; i < 4; ++i)
                 {
-                    Creature* Temp = NULL;
                     if (AddGUID[i])
                     {
-                        Temp = Unit::GetCreature((*me), AddGUID[i]);
-                        if (Temp && Temp->IsAlive())
-                            if (!Temp->GetVictim())
-                                Temp->AI()->AttackStart(me->GetVictim());
+                        Creature* temp = Unit::GetCreature((*me), AddGUID[i]);
+                        if (temp && temp->IsAlive())
+                            if (!temp->GetVictim())
+                                temp->AI()->AttackStart(me->GetVictim());
                     }
                 }
                 CheckAdds_Timer = 5000;
