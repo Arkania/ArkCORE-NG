@@ -888,6 +888,8 @@ Player::Player(WorldSession* session): Unit(true), m_achievementMgr(this), m_rep
     SetPendingBind(0, 0);
     _maxPersonalArenaRate = 0;
 
+    _activeCheats = CHEAT_NONE;
+
     _canUseMastery = false;
 
     memset(_voidStorageItems, NULL, VOID_STORAGE_MAX_SLOT * sizeof(VoidStorageItem*));

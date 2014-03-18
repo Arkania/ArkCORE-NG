@@ -565,6 +565,10 @@ uint32 Unit::DealDamage(Unit* victim, uint32 damage, CleanDamage const* cleanDam
     if (IsAIEnabled)
         GetAI()->DamageDealt(victim, damage, damagetype);
 
+    if (victim->GetTypeId() == TYPEID_PLAYER)
+        if (victim->ToPlayer()->GetCommandStatus(CHEAT_GOD))
+            return 0;
+
     if (damagetype == DIRECT_DAMAGE || damagetype == SPELL_DIRECT_DAMAGE)
     {
         m_damage_done[0] += damage;

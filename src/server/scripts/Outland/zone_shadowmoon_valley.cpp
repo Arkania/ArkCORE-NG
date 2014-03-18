@@ -45,6 +45,7 @@ EndContentData */
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "ScriptedEscortAI.h"
+#include "SpellScript.h"
 #include "Group.h"
 
 /*#####
@@ -1869,9 +1870,6 @@ public:
     };
 };
 
-/*#####
-#
-######*/
 enum ZuluhedChains
 {
     QUEST_ZULUHED = 10866,
