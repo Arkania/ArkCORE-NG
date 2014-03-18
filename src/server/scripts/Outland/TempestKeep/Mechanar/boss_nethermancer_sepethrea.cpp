@@ -24,7 +24,8 @@ SDComment: Need adjustments to initial summons
 SDCategory: Tempest Keep, The Mechanar
 EndScriptData */
 
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "mechanar.h"
 
 enum eSays

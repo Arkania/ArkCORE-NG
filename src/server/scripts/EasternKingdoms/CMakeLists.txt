@@ -151,8 +151,14 @@ set(scripts_STAT_SRCS
   EasternKingdoms/ScarletMonastery/boss_arcanist_doan.cpp
   EasternKingdoms/ScarletMonastery/boss_herod.cpp
   EasternKingdoms/ScarletMonastery/boss_scorn.cpp
+  EasternKingdoms/ShadowfangKeep/boss_apothecary_trio.cpp
+  EasternKingdoms/ShadowfangKeep/boss_lord_walden_c.cpp
   EasternKingdoms/ShadowfangKeep/shadowfang_keep.cpp
   EasternKingdoms/ShadowfangKeep/instance_shadowfang_keep.cpp
+  EasternKingdoms/ShadowfangKeep/boss_baron_ashbury_c.cpp
+  EasternKingdoms/ShadowfangKeep/boss_baron_silverlaine_c.cpp
+  EasternKingdoms/ShadowfangKeep/boss_commander_springvale_c.cpp
+  EasternKingdoms/ShadowfangKeep/boss_lord_godfrey_c.cpp
   EasternKingdoms/ShadowfangKeep/shadowfang_keep.h
   EasternKingdoms/BlackwingLair/boss_chromaggus.cpp
   EasternKingdoms/BlackwingLair/boss_razorgore.cpp

@@ -25,14 +25,13 @@ It looks as if Rhyolith has some inertia. When the damage done to both his feet 
 // Q : Where is + and where is -, to right or left? 
 // A : Left is +, right is -. ( Circle: lowest orientation 0.00f minus something = to right = 6.28f, highest orientation).
 
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "WorldPacket.h"
 #include "firelands.h"
 #include "SpellAuraEffects.h"  
 #include "Vehicle.h"
 #include "Unit.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "ScriptedEscortAI.h"
 #include "Cell.h"

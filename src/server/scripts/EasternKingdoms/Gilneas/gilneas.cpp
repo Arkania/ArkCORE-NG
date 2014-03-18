@@ -17,9 +17,9 @@
  */
  
  
-#include "ScriptPCH.h"
-#include "gilneas.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "gilneas.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedFollowerAI.h"
 ///#include "ScriptedVehicleEscortAI.h"
@@ -27,7 +27,6 @@
 #include "Creature.h"
 #include "CreatureAI.h"
 #include "SpellScript.h"
-#include "ScriptedCreature.h"
 #include "Object.h"
 #include "ObjectMgr.h"
 #include "SpellInfo.h"

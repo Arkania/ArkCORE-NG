@@ -9,11 +9,10 @@
 * If you find it, you are either hacking something, or very lucky (presuming someone else managed to hack it).
 */
 
-#include "ScriptPCH.h"
-#include "Vehicle.h"
-#include "Unit.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "Vehicle.h"
+#include "Unit.h"
 #include "ScriptedGossip.h"
 #include "ScriptedEscortAI.h"
 #include "Cell.h"

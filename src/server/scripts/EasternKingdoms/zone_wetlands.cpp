@@ -29,7 +29,8 @@ npc_mikhail
 npc_tapoke_slim_jahn
 EndContentData */
 
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 
 /*######

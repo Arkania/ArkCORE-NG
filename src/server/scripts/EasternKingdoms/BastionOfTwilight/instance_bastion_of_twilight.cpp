@@ -5,12 +5,11 @@
 * If you find it, you are either hacking something, or very lucky (presuming someone else managed to hack it).
 */
 
-#include "ScriptPCH.h"
-#include "bastion_of_twilight.h"
-#include "ObjectMgr.h"
 #include "ScriptMgr.h"
 #include "InstanceScript.h"
 #include "ScriptedCreature.h"
+#include "bastion_of_twilight.h"
+#include "ObjectMgr.h"
 #include "Map.h"
 #include "PoolMgr.h"
 

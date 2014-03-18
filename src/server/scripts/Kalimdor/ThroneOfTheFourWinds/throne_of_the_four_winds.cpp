@@ -1,4 +1,5 @@
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "throne_of_the_four_winds.h"
 
 enum SlipstreamEnums

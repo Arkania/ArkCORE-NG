@@ -6,7 +6,8 @@ SDCategory: Boss Warlord
 EndScriptData
 */
 
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "dragon_soul.h"
 
 enum Events

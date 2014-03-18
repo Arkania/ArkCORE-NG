@@ -6,7 +6,8 @@ SDCategory: Boss Unsleeping
 EndScriptData
 */
 
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "dragon_soul.h"
 #include "SpellScript.h"
 #include "SpellAuraEffects.h"

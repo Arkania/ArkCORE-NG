@@ -17,7 +17,8 @@
  */
  
 #include "grim_batol.h"
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 
 class instance_grim_batol : public InstanceMapScript
 {

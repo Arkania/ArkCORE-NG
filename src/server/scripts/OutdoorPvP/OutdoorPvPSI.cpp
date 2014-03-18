@@ -25,7 +25,7 @@
 #include "OutdoorPvPMgr.h"
 #include "Language.h"
 #include "World.h"
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
 
 OutdoorPvPSI::OutdoorPvPSI()
 {

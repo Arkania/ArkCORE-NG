@@ -20,7 +20,8 @@ npc_zulaman_juggernaut
 npc_zulaman_hierophant
 EndContentData */
 
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "zulaman.h"
 
 /*######

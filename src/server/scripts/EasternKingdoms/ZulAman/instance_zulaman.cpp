@@ -11,7 +11,8 @@ SDComment:
 SDCategory: Zul'Aman 4.1
 EndScriptData */
 
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "InstanceScript.h"
 #include "zulaman.h"
 
 #define MAX_ENCOUNTER  6

@@ -11,10 +11,9 @@ SDComment:
 SDCategory: Zul'Aman 5 Hc
 EndScriptData */
 
-#include "ScriptPCH.h"
-#include "ObjectMgr.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ObjectMgr.h"
 #include "SpellScript.h"
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"

@@ -24,7 +24,8 @@ SDComment: Event missing. Script for himself 99% blizzlike.
 SDCategory: Tempest Keep, The Mechanar
 EndScriptData */
 
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 
 enum eSays
 {

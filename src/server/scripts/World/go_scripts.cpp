@@ -51,7 +51,9 @@ go_large_gjalerbron_cage
 go_veil_skith_cage
 EndContentData */
 
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "ScriptedGossip.h"
 #include "ArcheologyMgr.h"
 
 /*######

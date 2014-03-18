@@ -30,7 +30,9 @@ npc_maghar_captive
 npc_creditmarker_visit_with_ancestors
 EndContentData */
 
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "ScriptedGossip.h"
 #include "ScriptedEscortAI.h"
 
 /*######

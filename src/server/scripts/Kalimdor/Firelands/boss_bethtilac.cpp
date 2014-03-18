@@ -23,7 +23,6 @@
 #include "GridNotifiersImpl.h"
 #include "CreatureTextMgr.h"
 #include "ScriptedCreature.h"
-#include "ScriptPCH.h"
 #include "ScriptedEscortAI.h"
 
 #include "firelands.h"

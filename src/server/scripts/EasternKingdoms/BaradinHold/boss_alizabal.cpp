@@ -1,7 +1,6 @@
-#include "ScriptPCH.h"
-#include "ObjectMgr.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ObjectMgr.h"
 #include "SpellScript.h"
 #include "SpellAuraEffects.h"
 #include "WorldPacket.h"

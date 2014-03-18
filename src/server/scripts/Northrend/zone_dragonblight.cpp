@@ -28,7 +28,11 @@ EndScriptData */
 npc_alexstrasza_wr_gate
 EndContentData */
 
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "ScriptedGossip.h"
+#include "SpellScript.h"
+#include "SpellAuraEffects.h"
 #include "ScriptedEscortAI.h"
 
 enum eEnums

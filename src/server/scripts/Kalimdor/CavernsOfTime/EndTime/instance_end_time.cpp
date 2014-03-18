@@ -1,4 +1,5 @@
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "InstanceScript.h"
 #include "end_time.h"
 
 #define ENCOUNTERS 3

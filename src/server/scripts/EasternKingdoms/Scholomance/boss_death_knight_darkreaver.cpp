@@ -24,7 +24,8 @@ SDComment:
 SDCategory: Scholomance
 EndScriptData */
 
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 
 class boss_death_knight_darkreaver : public CreatureScript
 {

@@ -11,13 +11,11 @@
 
 /**** The undying flames are all that remain of this sacred place. I sense much anger here... a seething rage, barely held in check. Be on your guard. VO_ET_NOZDORMU_INTRO_02 ****/
 
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "end_time.h"
 #include "Vehicle.h"
 #include "Unit.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
 #include "ScriptedEscortAI.h"
 #include "Cell.h"
 #include "CellImpl.h"

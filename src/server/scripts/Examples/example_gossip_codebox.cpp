@@ -24,7 +24,9 @@ SDComment: Show a codebox in gossip option
 SDCategory: Script Examples
 EndScriptData */
 
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "ScriptedGossip.h"
 #include <cstring>
 
 enum eEnums

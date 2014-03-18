@@ -24,7 +24,8 @@ SDComment:
 SDCategory: Blackwing Lair
 EndScriptData */
 
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 enum Say
 {
     SAY_AGGRO               = -1469000,

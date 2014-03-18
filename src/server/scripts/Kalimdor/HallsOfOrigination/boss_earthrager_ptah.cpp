@@ -1,8 +1,7 @@
 //http://www.wowhead.com/npc=40406 - This npc is summoned on the second phase, and does the camera visual.
-#include "ScriptPCH.h"
-#include "ObjectMgr.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ObjectMgr.h"
 #include "SpellScript.h"
 #include "SpellAuraEffects.h"
 #include "halls_of_origination.h"

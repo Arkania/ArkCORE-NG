@@ -20,7 +20,8 @@
  * Comment: Missing AI for Twisted Visages
  */
 
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "ahnkahet.h"
 
 enum Spells

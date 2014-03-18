@@ -24,7 +24,8 @@ SDComment: Instance Script for Karazhan to help in various encounters. TODO: Gam
 SDCategory: Karazhan
 EndScriptData */
 
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "InstanceScript.h"
 #include "karazhan.h"
 
 #define MAX_ENCOUNTER      12

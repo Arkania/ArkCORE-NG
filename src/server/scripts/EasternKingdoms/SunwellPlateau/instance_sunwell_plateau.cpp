@@ -24,7 +24,8 @@ SDComment: VERIFY SCRIPT
 SDCategory: Sunwell_Plateau
 EndScriptData */
 
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "InstanceScript.h"
 #include "sunwell_plateau.h"
 
 #define MAX_ENCOUNTER 6

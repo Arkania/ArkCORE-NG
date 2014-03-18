@@ -7,13 +7,11 @@
 * THIS particular file is NOT free software; third-party users should NOT have access to it, redistribute it or modify it. :)
 */
 
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "end_time.h"
 #include "Vehicle.h"
 #include "Unit.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
 #include "ScriptedEscortAI.h"
 #include "Cell.h"
 #include "CellImpl.h"

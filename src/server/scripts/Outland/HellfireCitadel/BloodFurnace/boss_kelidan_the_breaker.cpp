@@ -29,7 +29,9 @@ boss_kelidan_the_breaker
 mob_shadowmoon_channeler
 EndContentData */
 
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "SpellAuras.h"
 #include "blood_furnace.h"
 
 enum eKelidan
@@ -56,7 +58,9 @@ enum eKelidan
     SPELL_VORTEX                = 37370,
 
     ENTRY_KELIDAN               = 17377,
-    ENTRY_CHANNELER             = 17653
+    ENTRY_CHANNELER             = 17653,
+
+    ACTION_ACTIVATE_ADDS        = 92
 };
 
 const float ShadowmoonChannelers[5][4]=
@@ -106,6 +110,8 @@ class boss_kelidan_the_breaker : public CreatureScript
                 Firenova = false;
                 addYell = false;
                 SummonChannelers();
+                me->SetReactState(REACT_PASSIVE);
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NON_ATTACKABLE);
                 if (instance)
                     instance->SetData(TYPE_KELIDAN_THE_BREAKER_EVENT, NOT_STARTED);
             }
@@ -151,7 +157,8 @@ class boss_kelidan_the_breaker : public CreatureScript
                     if (channeler && channeler->IsAlive())
                         return;
                 }
-
+                me->SetReactState(REACT_AGGRESSIVE);
+                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NON_ATTACKABLE);
                 if (killer)
                     me->AI()->AttackStart(killer);
             }
@@ -294,16 +301,11 @@ class mob_shadowmoon_channeler : public CreatureScript
 {
     public:
 
-        mob_shadowmoon_channeler()
-            : CreatureScript("mob_shadowmoon_channeler")
-        {
-        }
+        mob_shadowmoon_channeler() : CreatureScript("mob_shadowmoon_channeler") { }
 
         struct mob_shadowmoon_channelerAI : public ScriptedAI
         {
-            mob_shadowmoon_channelerAI(Creature* creature) : ScriptedAI(creature)
-            {
-            }
+            mob_shadowmoon_channelerAI(Creature* creature) : ScriptedAI(creature){ }
 
             uint32 ShadowBolt_Timer;
             uint32 MarkOfShadow_Timer;

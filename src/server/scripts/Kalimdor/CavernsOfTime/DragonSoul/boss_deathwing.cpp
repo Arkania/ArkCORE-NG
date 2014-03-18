@@ -7,7 +7,9 @@ EndScriptData
 */
 
 
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "ScriptedGossip.h"
 #include "dragon_soul.h"
 #include "Vehicle.h"
 #include "InstanceScript.h"

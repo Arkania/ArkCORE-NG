@@ -1,5 +1,7 @@
 #include "blackwing_descent.h"
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "InstanceScript.h"
 
 #define MAX_ENCOUNTER 6
 

@@ -18,7 +18,8 @@
 
 #include "grim_batol.h"
 #include "Spell.h"
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "Vehicle.h"
 
 enum ScriptTexts

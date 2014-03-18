@@ -24,7 +24,8 @@ SDComment: Some cleanup left along with save
 SDCategory: Auchindoun, Shadow Labyrinth
 EndScriptData */
 
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "InstanceScript.h"
 #include "shadow_labyrinth.h"
 
 #define MAX_ENCOUNTER 5

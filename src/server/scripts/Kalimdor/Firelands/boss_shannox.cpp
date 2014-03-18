@@ -10,10 +10,9 @@
 * THIS particular file is NOT free software; third-party users should NOT have access to it, redistribute it or modify it. :)
 */
 
-#include "ScriptPCH.h"
-#include "ObjectMgr.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ObjectMgr.h"
 #include "SpellScript.h"
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"

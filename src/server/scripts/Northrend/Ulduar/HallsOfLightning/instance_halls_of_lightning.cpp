@@ -24,7 +24,8 @@ SDComment: All ready.
 SDCategory: Halls of Lightning
 EndScriptData */
 
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "InstanceScript.h"
 #include "halls_of_lightning.h"
 
 /* Halls of Lightning encounters:

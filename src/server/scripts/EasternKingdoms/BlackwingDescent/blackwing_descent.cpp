@@ -1,4 +1,5 @@
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "blackwing_descent.h"
 
 enum Says

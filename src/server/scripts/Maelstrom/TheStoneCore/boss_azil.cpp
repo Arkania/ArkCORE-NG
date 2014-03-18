@@ -3,7 +3,8 @@
 * THIS particular file is NOT free software; third-party users should NOT have access to it, redistribute it or modify it. :)
 */
 
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "stonecore.h"
 
 class boss_azil : public CreatureScript
