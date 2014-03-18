@@ -22,9 +22,9 @@
 
 enum ScriptTexts
 {
-    SAY_AGGRO    = 0,
+    SAY_AGGRO   = 0,
     SAY_KILL    = 1,
-    SAY_ADDS    = 4,
+    SAY_ADDS    = 4
 };
 
 enum Spells
@@ -36,33 +36,33 @@ enum Spells
     SPELL_GROUND_SIEGE_H        = 90249,
     SPELL_BLITZ                 = 74670,
     SPELL_BLITZ_H               = 90250,
-    SPELL_BLITZ_DMG                = 74675,
-    SPELL_BLITZ_DMG_H            = 90251,
+    SPELL_BLITZ_DMG             = 74675,
+    SPELL_BLITZ_DMG_H           = 90251,
     SPELL_FRENZY                = 74853,
     SPELL_CLAW_PUNCTURE         = 76507,
     SPELL_CLAW_PUNCTURE_H       = 90212,
     SPELL_MODGUD_MALICE         = 74699,
     SPELL_MODGUD_MALICE_H       = 90169,
     SPELL_MODGUD_MALICE_AURA    = 90170,
-    SPELL_MODGUD_MALADY            = 74837,
-    SPELL_MODGUD_MALADY_H        = 90179,
+    SPELL_MODGUD_MALADY         = 74837,
+    SPELL_MODGUD_MALADY_H       = 90179
 };
 
 enum Events
 {
-    EVENT_BLEEDING_WOUND     = 1,
-    EVENT_GROUND_SIEGE         = 2,
+    EVENT_BLEEDING_WOUND        = 1,
+    EVENT_GROUND_SIEGE          = 2,
     EVENT_BLITZ                 = 3,
     EVENT_CLAW_PUNCTURE         = 4,
-    EVENT_ADDS                 = 5,
+    EVENT_ADDS                  = 5
 };
 
 enum Adds
 {
     NPC_GROUND_SIEGE_STALKER    = 40030,
-    NPC_BLITZ_STALKER            = 40040,
-    NPC_MALIGNANT_TROGG            = 39984,
-    NPC_TROGG_DWELLER            = 45467,
+    NPC_BLITZ_STALKER           = 40040,
+    NPC_MALIGNANT_TROGG         = 39984,
+    NPC_TROGG_DWELLER           = 45467
 };
 
 const Position troggPos[2]=

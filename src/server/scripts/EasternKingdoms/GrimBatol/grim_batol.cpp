@@ -22,244 +22,216 @@
     
 enum Creatures
 {
-    NPC_ASCENDED_FLAMESEEKER    = 39415,
-    NPC_ASCENDED_ROCKBREAKER    = 40272,
-    NPC_FISSURE                    = 41091,
-    NPC_ASCENDED_WATERLASHER    = 40273,
-    NPC_ASCENDED_WINDWALKER        = 39414,
-    NPC_AZUREBORNE_GUARDIAN        = 39854,
-    NPC_AZUREBORNE_SEER_1        = 39855,
-    NPC_AZUREBORNE_SEER_2        = 40291,
-    NPC_AZUREBORNE_WARLORD        = 39909,
-    NPC_EMPOWERING_FLAMES        = 41045,
-    NPC_ENSLAVED_BURNING_EMBER    = 39892,
-    NPC_ENSLAVED_GRONN_BRUTE    = 40166,
-    NPC_ENSLAVED_ROCK_ELEMENTAL    = 39900,
-    NPC_ENSLAVED_THUNDER_SPIRIT    = 40269,
-    NPC_ENSLAVED_WATER_SPIRIT    = 39961,
-    NPC_FACELESS_CORRUPTOR        = 39392,
-    NPC_HOOKED_NET                = 48756,
-    NPC_NET                        = 42570,
-    NPC_TROGG_DWELLER            = 39450,
-    NPC_TWILIGHT_ARMSMASTER_1    = 40306,
-    NPC_TWILIGHT_ARMSMASTER_2    = 41073,
-    NPC_TWILIGHT_BEGUILER        = 40167,
-    npc_twilight_drake_gb_1        = 41095,
-    npc_twilight_drake_gb_2        = 39390,
-    NPC_TWILIGHT_EARTHSHAPER    = 39890,
-    NPC_TWILIGHT_ENFORCER_1        = 40448,
-    NPC_TWILIGHT_ENFORCER_2        = 39956,
-    NPC_TWILIGHT_FIRECATCHER    = 39870,
-    NPC_TWILIGHT_SHADOW_WEAVER    = 39954,
-    NPC_KHAAPHOM                = 40953,
-    NPC_TWILIGHT_STORMBREAKER    = 39962,
-    NPC_TWILIGHT_THUNDERCALLER    = 40270,
-    NPC_TWILIGHT_WAR_MAGE        = 40268,
-    NPC_TWILIGHT_WYRMCALLER        = 39873,
-    NPC_TWISTED_VISAGE            = 41040,
-
-    
-    NPC_FARSEER_THOORANU        = 50385,
-    NPC_VELASTRASZA                = 50390,
-    NPC_BALEFLAME                = 50387,
+    NPC_ASCENDED_FLAMESEEKER        = 39415,
+    NPC_ASCENDED_ROCKBREAKER        = 40272,
+    NPC_FISSURE                     = 41091,
+    NPC_ASCENDED_WATERLASHER        = 40273,
+    NPC_ASCENDED_WINDWALKER         = 39414,
+    NPC_AZUREBORNE_GUARDIAN         = 39854,
+    NPC_AZUREBORNE_SEER_1           = 39855,
+    NPC_AZUREBORNE_SEER_2           = 40291,
+    NPC_AZUREBORNE_WARLORD          = 39909,
+    NPC_EMPOWERING_FLAMES           = 41045,
+    NPC_ENSLAVED_BURNING_EMBER      = 39892,
+    NPC_ENSLAVED_GRONN_BRUTE        = 40166,
+    NPC_ENSLAVED_ROCK_ELEMENTAL     = 39900,
+    NPC_ENSLAVED_THUNDER_SPIRIT     = 40269,
+    NPC_ENSLAVED_WATER_SPIRIT       = 39961,
+    NPC_FACELESS_CORRUPTOR          = 39392,
+    NPC_HOOKED_NET                  = 48756,
+    NPC_NET                         = 42570,
+    NPC_TROGG_DWELLER               = 39450,
+    NPC_TWILIGHT_ARMSMASTER_1       = 40306,
+    NPC_TWILIGHT_ARMSMASTER_2       = 41073,
+    NPC_TWILIGHT_BEGUILER           = 40167,
+    NPC_TWILIGHT_DRAKE_GB_1         = 41095,
+    NPC_TWILIGHT_DRAKE_GB_2         = 39390,
+    NPC_TWILIGHT_EARTHSHAPER        = 39890,
+    NPC_TWILIGHT_ENFORCER_1         = 40448,
+    NPC_TWILIGHT_ENFORCER_2         = 39956,
+    NPC_TWILIGHT_FIRECATCHER        = 39870,
+    NPC_TWILIGHT_SHADOW_WEAVER      = 39954,
+    NPC_KHAAPHOM                    = 40953,
+    NPC_TWILIGHT_STORMBREAKER       = 39962,
+    NPC_TWILIGHT_THUNDERCALLER      = 40270,
+    NPC_TWILIGHT_WAR_MAGE           = 40268,
+    NPC_TWILIGHT_WYRMCALLER         = 39873,
+    NPC_TWISTED_VISAGE              = 41040,
+    NPC_FARSEER_THOORANU            = 50385,
+    NPC_VELASTRASZA                 = 50390,
+    NPC_BALEFLAME                   = 50387
 };
 
 enum Spells
 {
     //ascended flameseeker
     SPELL_CONFOUNDING_FLAMES        = 76514,
-    SPELL_ERUPTING_FIRE                = 76517,
-    SPELL_ERUPTING_FIRE_H            = 90693,
-
+    SPELL_ERUPTING_FIRE             = 76517,
+    SPELL_ERUPTING_FIRE_H           = 90693,
     //ascended rockbreaker
-    SPELL_BURNING_FISTS                = 76086,
+    SPELL_BURNING_FISTS             = 76086,
     SPELL_PETRIFIED_SKIN            = 76792,
     SPELL_ROCK_SMASH                = 76779,
     SPELL_ROCK_SMASH_DMG            = 76782,
-    SPELL_ROCK_SMASH_DMG_H            = 90862,
-    SPELL_FISSURE_TRIGGER            = 76785,
-    SPELL_FISSURE_DMG                = 76786,
-    SPELL_FISSURE_DMG_H                = 90863,
-
+    SPELL_ROCK_SMASH_DMG_H          = 90862,
+    SPELL_FISSURE_TRIGGER           = 76785,
+    SPELL_FISSURE_DMG               = 76786,
+    SPELL_FISSURE_DMG_H             = 90863,
     //ascended waterlasher
     SPELL_FOCUSED_GAYSER            = 76797,
     SPELL_ABSORB_THUNDER            = 76095,
-    SPELL_LIGHTNING_CLOUD            = 76097, 
-    SPELL_LIGHTNING_STRIKE_DMG        = 76101,
-    SPELL_WATER_SPOUT                = 76794,
-
+    SPELL_LIGHTNING_CLOUD           = 76097, 
+    SPELL_LIGHTNING_STRIKE_DMG      = 76101,
+    SPELL_WATER_SPOUT               = 76794,
     //ascended windwalker
-    SPELL_ABSORB_WATER                = 76029, 
-    SPELL_WATER_INFUSIED_BLADES        = 76036, 
-    SPELL_TSUNAMI                    = 76045,
-    SPELL_WINDWALK                    = 76557,
-
+    SPELL_ABSORB_WATER              = 76029, 
+    SPELL_WATER_INFUSIED_BLADES     = 76036, 
+    SPELL_TSUNAMI                   = 76045,
+    SPELL_WINDWALK                  = 76557,
     //azureborne guardian
-    SPELL_ARCANE_INFUSION            = 76378,
-    SPELL_ARCANE_SLASH                = 76392,
+    SPELL_ARCANE_INFUSION           = 76378,
+    SPELL_ARCANE_SLASH              = 76392,
     SPELL_ARCANE_SLASH_H            = 90660,
-    SPELL_CURSE_OF_THE_AZUREBORNE    = 76394,
-
+    SPELL_CURSE_OF_THE_AZUREBORNE   = 76394,
     //azoreborne seer
-    SPELL_TWILIGHT_BOLT                = 76369,
+    SPELL_TWILIGHT_BOLT             = 76369,
     SPELL_TWISTED_ARCANE_TRIGGER    = 79446,
     SPELL_TWISTED_ARCANE            = 76340,
-    SPELL_TWISTED_ARCANE_H            = 90844, 
-    SPELL_WARPED_TWILIGHT            = 76370,
-    SPELL_WARPED_TWILIGHT_H            = 90300,
-    SPELL_WARPED_TWILIGHT_DUMMY        = 76373,
-
+    SPELL_TWISTED_ARCANE_H          = 90844, 
+    SPELL_WARPED_TWILIGHT           = 76370,
+    SPELL_WARPED_TWILIGHT_H         = 90300,
+    SPELL_WARPED_TWILIGHT_DUMMY     = 76373,
     //azureborne warlord
-    SPELL_AZURE_BLAST                = 76620,
-    SPELL_AZURE_BLAST_H                = 90697,
+    SPELL_AZURE_BLAST               = 76620,
+    SPELL_AZURE_BLAST_H             = 90697,
     SPELL_CONJURE_TWISTED_VISAGE    = 76626,
-
     //crimsonborne guardian
     SPELL_CRIMSON_CHARGE            = 76404,
-    SPELL_CRIMSON_SHOCKWAVE            = 76409,
-    SPELL_CRIMSON_SHOCKWAVE_H        = 90312,
-
+    SPELL_CRIMSON_SHOCKWAVE         = 76409,
+    SPELL_CRIMSON_SHOCKWAVE_H       = 90312,
     //crimsonborne seer
-    SPELL_BLAZING_TWILIGHT_SHIELD    = 76314,
-    SPELL_BLAZE                        = 76327,
-    SPELL_BLAZE_H                    = 90307,
-    SPELL_CORRUPTED_FLAME            = 76332,
-    
+    SPELL_BLAZING_TWILIGHT_SHIELD   = 76314,
+    SPELL_BLAZE                     = 76327,
+    SPELL_BLAZE_H                   = 90307,
+    SPELL_CORRUPTED_FLAME           = 76332,
     //crimsonborne warlord
-    SPELL_DISARMING_BLAZE            = 76679,
-    SPELL_EMPOWERING_TWILIGHT        = 76685,
-    SPELL_EMPOWERING_TWILIGHT_AURA    = 76692,
-    SPELL_EMPOWERING_TWILIGHT_DMG    = 76693,
-    SPELL_EMPOWERING_TWILIGHT_DMG_H    = 90707,
-
+    SPELL_DISARMING_BLAZE           = 76679,
+    SPELL_EMPOWERING_TWILIGHT       = 76685,
+    SPELL_EMPOWERING_TWILIGHT_AURA  = 76692,
+    SPELL_EMPOWERING_TWILIGHT_DMG   = 76693,
+    SPELL_EMPOWERING_TWILIGHT_DMG_H = 90707,
     //enslaved burning ember
-    SPELL_FLAME_SHOCK                = 90846,
-
+    SPELL_FLAME_SHOCK               = 90846,
     //enslaved gronn brute
-    SPELL_CRUNCH_ARMOR                = 76703,
-
+    SPELL_CRUNCH_ARMOR              = 76703,
     //enslaved rock elemental
     SPELL_JAGGED_ROCK_SHIELD        = 76014,
-
     //faceless corruptor
     SPELL_SIPHON_ESSENSE            = 75755,
-
     //trogg dweller
-    SPELL_CLAW_PUNCTURE                = 76507,
-
+    SPELL_CLAW_PUNCTURE             = 76507,
     //twilight armsmaster
-    SPELL_FLURRY_OF_BLOWS            = 76729,
-    SPELL_MORTAL_STRIKE                = 76727,
-    SPELL_MORTAL_STRIKE_H            = 90526,
-
+    SPELL_FLURRY_OF_BLOWS           = 76729,
+    SPELL_MORTAL_STRIKE             = 76727,
+    SPELL_MORTAL_STRIKE_H           = 90526,
     //twilight beguiler
-    SPELL_BEGUILE                    = 90719, //target script
-    SPELL_CHAINED_MIND                = 76711,
-    SPELL_DECEITFUL_BLAST            = 76715,
-
+    SPELL_BEGUILE                   = 90719, //target script
+    SPELL_CHAINED_MIND              = 76711,
+    SPELL_DECEITFUL_BLAST           = 76715,
     //twilight drake                
-    SPELL_TWILIGHT_BREATH            = 76817,
-
+    SPELL_TWILIGHT_BREATH           = 76817,
     //twilight earthshaper
-    SPELL_EARTH_SPIKE                = 76603,
-    SPELL_EARTH_SPIKE_H                = 90487,
+    SPELL_EARTH_SPIKE               = 76603,
+    SPELL_EARTH_SPIKE_H             = 90487,
     SPELL_STONE_SKIN                = 76596,
-    SPELL_SUMMON_ROCK_ELEMENTAL        = 74552,
-
+    SPELL_SUMMON_ROCK_ELEMENTAL     = 74552,
     //twilight enforcer
-    SPELL_DIZZY                        = 76415,
-    SPELL_MEAT_GRINDER                = 76411,
+    SPELL_DIZZY                     = 76415,
+    SPELL_MEAT_GRINDER              = 76411,
     SPELL_MEAT_GRINDER_H            = 90665,
-    SPELL_MEAT_GRINDER_DMG            = 76413,
+    SPELL_MEAT_GRINDER_DMG          = 76413,
     SPELL_MEAT_GRINDER_DMG_H        = 90664,
-    SPELL_MEAT_GRINDER_TRIGGER        = 76414,
-
+    SPELL_MEAT_GRINDER_TRIGGER      = 76414,
     //twilight firecatcher
-    SPELL_MOLTEN_BLAST                = 76765,
-    SPELL_FLAME_CONDUIT                = 76766,
-    SPELL_FLAME_CONDUIT_DMG            = 76768, 
-    SPELL_FLAME_CONDUIT_DMG_H        = 90850,
-    SPELL_SUMMON_BURNING_EMBER        = 74551,
-
+    SPELL_MOLTEN_BLAST              = 76765,
+    SPELL_FLAME_CONDUIT             = 76766,
+    SPELL_FLAME_CONDUIT_DMG         = 76768, 
+    SPELL_FLAME_CONDUIT_DMG_H       = 90850,
+    SPELL_SUMMON_BURNING_EMBER      = 74551,
     //twilight shadow weaver
-    SPELL_SHADOW_BOLT                = 76416,
-    SPELL_SHADOW_WEAVE_SCRIPT        = 90673, 
+    SPELL_SHADOW_BOLT               = 76416,
+    SPELL_SHADOW_WEAVE_SCRIPT       = 90673, 
     SPELL_SHADOW_WEAVE_DUMMY        = 90674,
-    SPELL_SHADOW_WEAVE_DMG            = 90678, 
-    SPELL_SUMMON_FELHUNTER            = 76418, 
+    SPELL_SHADOW_WEAVE_DMG          = 90678, 
+    SPELL_SUMMON_FELHUNTER          = 76418, 
     SPELL_SPELL_LOCK                = 40953, //heroic?
-
     //twilight stormbreaker
     SPELL_WATER_BOLT                = 76720,
-    SPELL_WATER_SHELL                = 90522,
-    SPELL_SUMMON_WATER_SPIRIT        = 74561,
-
+    SPELL_WATER_SHELL               = 90522,
+    SPELL_SUMMON_WATER_SPIRIT       = 74561,
     //twilight thunderbreaker
-    SPELL_CHAIN_LIGHTNING            = 76578, //5m
-    SPELL_CHAIN_LIGHTNING_H            = 90856,
+    SPELL_CHAIN_LIGHTNING           = 76578, //5m
+    SPELL_CHAIN_LIGHTNING_H         = 90856,
     SPELL_OVERCHARGE                = 76579,
-    SPELL_OVERCHARGE_H                = 90858,
+    SPELL_OVERCHARGE_H              = 90858,
     SPELL_ELECTRIC_BLAST            = 82973, //+dmg
-    SPELL_ELECTRIC_BLAST_H            = 90859,
-    SPELL_SUMMON_THUNDER_SPIRIT        = 75096,
-
+    SPELL_ELECTRIC_BLAST_H          = 90859,
+    SPELL_SUMMON_THUNDER_SPIRIT     = 75096,
     //twilight war-mage
-    SPELL_FIRE_ENCHANT                = 76822,
-    SPELL_ICE_ENCHANT                = 76823,
-    SPELL_POLYMORPH                    = 76826,
-
+    SPELL_FIRE_ENCHANT              = 76822,
+    SPELL_ICE_ENCHANT               = 76823,
+    SPELL_POLYMORPH                 = 76826,
     //twilight wyrmcaller
-    SPELL_FEED_PET                    = 76816, 
+    SPELL_FEED_PET                  = 76816 
 };
 
 enum Events
 {
     EVENT_CONFOUNDING_FLAMES        = 1,
-    EVENT_ERUPTING_FIRE                = 2,
-    EVENT_BURNING_FISTS                = 3,
+    EVENT_ERUPTING_FIRE             = 2,
+    EVENT_BURNING_FISTS             = 3,
     EVENT_PETRIFIED_SKIN            = 4,
     EVENT_ROCK_SMASH                = 5,
     EVENT_FOCUSED_GAYSER            = 6,
     EVENT_ABSORB_THUNDER            = 7,
-    EVENT_WATER_SPOUT                = 8,
-    EVENT_ABSORB_WATER                = 9,
-    EVENT_ARCANE_INFUSION            = 10,
-    EVENT_CURSE_OF_THE_AZUREBORNE    = 11,
-    EVENT_TWILIGHT_BOLT                = 12,
-    EVENT_WARPED_TWILIGHT            = 13,
-    EVENT_AZURE_BLAST                = 14,
+    EVENT_WATER_SPOUT               = 8,
+    EVENT_ABSORB_WATER              = 9,
+    EVENT_ARCANE_INFUSION           = 10,
+    EVENT_CURSE_OF_THE_AZUREBORNE   = 11,
+    EVENT_TWILIGHT_BOLT             = 12,
+    EVENT_WARPED_TWILIGHT           = 13,
+    EVENT_AZURE_BLAST               = 14,
     EVENT_CONJURE_TWISTED_VISAGE    = 15,
     EVENT_CRIMSON_CHARGE            = 16,
-    EVENT_BLAZING_TWILIGHT_SHIELD    = 17,
-    EVENT_CORRUPTED_FLAME            = 18,
-    EVENT_DISARMING_BLAZE            = 19,
-    EVENT_EMPOWERING_TWILIGHT        = 20,
-    EVENT_FLAME_SHOCK                = 21,
+    EVENT_BLAZING_TWILIGHT_SHIELD   = 17,
+    EVENT_CORRUPTED_FLAME           = 18,
+    EVENT_DISARMING_BLAZE           = 19,
+    EVENT_EMPOWERING_TWILIGHT       = 20,
+    EVENT_FLAME_SHOCK               = 21,
     EVENT_JAGGED_ROCK_SHIELD        = 22,
     EVENT_SIPHON_ESSENSE            = 23,
-    EVENT_CLAW_PUNCTURE                = 24,
-    EVENT_MORTAL_STRIKE                = 25,
-    EVENT_FLURRY_OF_BLOWS            = 26,
-    EVENT_TWILIGHT_BREATH            = 27,
+    EVENT_CLAW_PUNCTURE             = 24,
+    EVENT_MORTAL_STRIKE             = 25,
+    EVENT_FLURRY_OF_BLOWS           = 26,
+    EVENT_TWILIGHT_BREATH           = 27,
     EVENT_STONE_SKIN                = 28,
-    EVENT_EARTH_SPIKE                = 29,
-    EVENT_CHAINED_MIND                = 30,
-    EVENT_DECEITFUL_BLAST            = 31,
-    EVENT_CRUNCH_ARMOR                = 32,
-    EVENT_MEAT_GRINDER                = 33,
-    EVENT_FLAME_CONDUIT                = 34,
-    EVENT_MOLTEN_BLAST                = 35,
-    EVENT_CALL_WYRM                    = 36,
-    EVENT_ENCHANT                    = 37,
-    EVENT_POLYMORPH                    = 38,
-    EVENT_FEED_PET                    = 39,
-    EVENT_SHADOW_BOLT                = 40,
-    EVENT_SHADOW_WEAVE                = 41,
+    EVENT_EARTH_SPIKE               = 29,
+    EVENT_CHAINED_MIND              = 30,
+    EVENT_DECEITFUL_BLAST           = 31,
+    EVENT_CRUNCH_ARMOR              = 32,
+    EVENT_MEAT_GRINDER              = 33,
+    EVENT_FLAME_CONDUIT             = 34,
+    EVENT_MOLTEN_BLAST              = 35,
+    EVENT_CALL_WYRM                 = 36,
+    EVENT_ENCHANT                   = 37,
+    EVENT_POLYMORPH                 = 38,
+    EVENT_FEED_PET                  = 39,
+    EVENT_SHADOW_BOLT               = 40,
+    EVENT_SHADOW_WEAVE              = 41,
     EVENT_WATER_BOLT                = 42,
-    EVENT_WATER_SHELL                = 43,
-    EVENT_CHAIN_LIGHTNING            = 44,
-    EVENT_OVERCHARGE                = 45,
-
+    EVENT_WATER_SHELL               = 43,
+    EVENT_CHAIN_LIGHTNING           = 44,
+    EVENT_OVERCHARGE                = 45
 };
 
 class npc_ascended_flameseeker : public CreatureScript
@@ -1747,7 +1719,7 @@ class npc_twilight_wyrmcaller : public CreatureScript
                     {
                     case EVENT_CALL_WYRM:
                         me->MonsterYell(SAY_CALL_WYRM, 0, 0);
-                        if (Creature* _wyrm = me->SummonCreature(npc_twilight_drake_gb_1, 
+                        if (Creature* _wyrm = me->SummonCreature(NPC_TWILIGHT_DRAKE_GB_1, 
                             me->GetPositionX(),
                             me->GetPositionY(),
                             me->GetPositionZ() + 20.0f,
@@ -1759,7 +1731,7 @@ class npc_twilight_wyrmcaller : public CreatureScript
                         events.ScheduleEvent(EVENT_FEED_PET, urand(3000, 5000));
                         break;
                     case EVENT_FEED_PET:
-                        if (Creature* _wyrm = me->FindNearestCreature(npc_twilight_drake_gb_1, 100.0f, true))
+                        if (Creature* _wyrm = me->FindNearestCreature(NPC_TWILIGHT_DRAKE_GB_1, 100.0f, true))
                             DoCast(_wyrm, SPELL_FEED_PET);
                         break;
                     }

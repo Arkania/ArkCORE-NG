@@ -22,72 +22,72 @@
 
 enum ScriptTexts
 {
-    SAY_AGGRO    = 0,
+    SAY_AGGRO   = 0,
     SAY_KILL    = 1,
-    SAY_DEATH    = 2,
+    SAY_DEATH   = 2,
     SAY_GALE    = 3,
-    SAY_ADDS    = 4,
+    SAY_ADDS    = 4
 };
 
 enum Spells
 {
-    SPELL_ENFEEBLING_BLOW            = 75789,
-    SPELL_ENFEEBLING_BLOW_H            = 91091,
-    SPELL_BINDING_SHADOWS            = 79466,
-    SPELL_BINDING_SHADOWS_H            = 91081, 
+    SPELL_ENFEEBLING_BLOW             = 75789,
+    SPELL_ENFEEBLING_BLOW_H           = 91091,
+    SPELL_BINDING_SHADOWS             = 79466,
+    SPELL_BINDING_SHADOWS_H           = 91081, 
     SPELL_BINDING_SHADOWS_AURA        = 75861,
-    SPELL_BINDING_SHADOWS_AURA_H    = 91079,
-    SPELL_SIPHON_ESSENSE            = 75755,
+    SPELL_BINDING_SHADOWS_AURA_H      = 91079,
+    SPELL_SIPHON_ESSENSE              = 75755,
     SPELL_SIPHON_ESSENSE_H            = 91028,
-    SPELL_UMBRAL_MENDING            = 75763,
+    SPELL_UMBRAL_MENDING              = 75763,
     SPELL_UMBRAL_MENDING_H            = 91040,
-    SPELL_SHADOW_GALE_SPEED_TRIGGER    = 75675,
-    SPELL_SHADOW_GALE_SPEED            = 75694,
-    SPELL_SHADOW_GALE                = 75664,
-    SPELL_SHADOW_GALE_H                = 91086,
-    SPELL_SHADOW_GALE_DMG            = 75692,
-    SPELL_SHADOW_GALE_DMG_H            = 91087,
-    SPELL_TWILIGHT_CORRUPTION        = 75520,
-    SPELL_TWILIGHT_CORRUPTION_H        = 91049,
-    SPELL_TWILIGHT_CORRUPTION_DMG    = 75566,
-    SPELL_SUMMON_TWILIGHT_HATCHLING = 91058,
-    SPELL_SPAWN_FACELESS            = 75704,
+    SPELL_SHADOW_GALE_SPEED_TRIGGER   = 75675,
+    SPELL_SHADOW_GALE_SPEED           = 75694,
+    SPELL_SHADOW_GALE                 = 75664,
+    SPELL_SHADOW_GALE_H               = 91086,
+    SPELL_SHADOW_GALE_DMG             = 75692,
+    SPELL_SHADOW_GALE_DMG_H           = 91087,
+    SPELL_TWILIGHT_CORRUPTION         = 75520,
+    SPELL_TWILIGHT_CORRUPTION_H       = 91049,
+    SPELL_TWILIGHT_CORRUPTION_DMG     = 75566,
+    SPELL_SUMMON_TWILIGHT_HATCHLING   = 91058,
+    SPELL_SPAWN_FACELESS              = 75704,
     SPELL_SPAWN_FACELESS_H            = 91072,
-    SPELL_TWILIGHT_PORTAL_VISUAL    = 95716,
-    SPELL_TWILIGHT_BLAST_TRIGGER    = 76192,
-    SPELL_TWILIGHT_BLAST_DMG        = 76194,
+    SPELL_TWILIGHT_PORTAL_VISUAL      = 95716,
+    SPELL_TWILIGHT_BLAST_TRIGGER      = 76192,
+    SPELL_TWILIGHT_BLAST_DMG          = 76194,
     SPELL_TWILIGHT_BLAST_DMG_H        = 91042,
-    SPELL_SHIELD_OF_NIGHTMARES        = 75809,
+    SPELL_SHIELD_OF_NIGHTMARES        = 75809
 };
 
 enum Adds
 {
-    NPC_FACELESS_CORRUPTOR        = 40600,
-    NPC_FACELESS_CORRUPTOR_H    = 48844,
-    NPC_FACELESS_PORTAL_STALKER = 44314,
-    NPC_ALEXSTRASZA_EGG            = 40486,
-    NPC_TWILIGHT_HATCHLING        = 39388,
-    NPC_SHADOW_GALE_STALKER        = 40567,
+    NPC_FACELESS_CORRUPTOR            = 40600,
+    NPC_FACELESS_CORRUPTOR_H          = 48844,
+    NPC_FACELESS_PORTAL_STALKER       = 44314,
+    NPC_ALEXSTRASZA_EGG               = 40486,
+    NPC_TWILIGHT_HATCHLING            = 39388,
+    NPC_SHADOW_GALE_STALKER           = 40567
 };
 
 enum Events
 {
     EVENT_ENFEEBLING_BLOW            = 1,
     EVENT_BINDING_SHADOWS            = 2,
-    EVENT_ADDS                        = 3,
-    EVENT_SIPHON_ESSENSE            = 4,
-    EVENT_UMBRAL_MENDING            = 5,
-    EVENT_REMOVE_TWILIGHT_PORTAL    = 6,
+    EVENT_ADDS                       = 3,
+    EVENT_SIPHON_ESSENSE             = 4,
+    EVENT_UMBRAL_MENDING             = 5,
+    EVENT_REMOVE_TWILIGHT_PORTAL     = 6,
     EVENT_SHADOW_GALE                = 7,
     EVENT_TWILIGHT_CORRUPTION        = 8,
-    EVENT_CORRUPTOR_MOVE            = 9,
-    EVENT_SHIELD_OF_NIGHTMARES        = 10,
+    EVENT_CORRUPTOR_MOVE             = 9,
+    EVENT_SHIELD_OF_NIGHTMARES       = 10
 };
 
 enum Points
 {
-    POINT_SHADOWGALE    = 1001,
-    POINT_EGG            = 1002,
+    POINT_SHADOWGALE     = 1001,
+    POINT_EGG            = 1002
 };
 
 const Position erudaxportalPos = {-641.515f, -827.8f, 235.5f, 3.069f};
@@ -101,7 +101,7 @@ const Position shadowgalePos[3] =
 {
     {-745.07f, -845.16f, 232.41f, 0.0f},
     {-724.05f, -823.47f, 232.41f, 0.0f},
-    {-741.81f, -819.44f, 232.41f, 0.0f},
+    {-741.81f, -819.44f, 232.41f, 0.0f}
 };
 const Position eggPos[23]    =
 {
@@ -127,7 +127,7 @@ const Position eggPos[23]    =
     {-731.53f, -770.02f, 236.14f, 0.10f},
     {-730.15f, -885.09f, 235.96f, 5.93f},
     {-717.82f, -887.81f, 233.95f, 6.05f},
-    {-751.01f, -886.38f, 234.87f, 3.27f},
+    {-751.01f, -886.38f, 234.87f, 3.27f}
 };
 
 class boss_erudax : public CreatureScript

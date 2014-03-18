@@ -1291,7 +1291,6 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                       caster->RemoveAurasDueToSpell(14751);
                   }
 
-
                 // Devouring Plague
                 if (GetId() == 2944)
                 {

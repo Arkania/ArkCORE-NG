@@ -24,68 +24,68 @@
 enum ScriptTexts
 {
     SAY_AGGRO    = 0,
-    SAY_KILL    = 1,
+    SAY_KILL     = 1,
     SAY_DEATH    = 2,
-    SAY_SHIELD    = 3,
-    SAY_MACE    = 5,
-    SAY_DUAL    = 4,
+    SAY_SHIELD   = 3,
+    SAY_MACE     = 5,
+    SAY_DUAL     = 4
 };
 
 enum Equipment
 {
-    EQUIPMENT_ID_SHIELD    = 40400, 
-    EQUIPMENT_ID_SWORD    = 65094, 
-    EQUIPMENT_ID_MACE    = 65090,  
+    EQUIPMENT_ID_SHIELD          = 40400, 
+    EQUIPMENT_ID_SWORD           = 65094, 
+    EQUIPMENT_ID_MACE            = 65090  
 };
 
 enum Spells
 {
-    SPELL_MIGHTY_STOMP            = 74984,
+    SPELL_MIGHTY_STOMP           = 74984,
     SPELL_PICK_WEAPON            = 75000,
     SPELL_DUAL_BLADES            = 74981,
-    SPELL_DUAL_BLADES_H            = 90738,
-    SPELL_ENCUMBERED            = 75007,
-    SPELL_ENCUMBERED_H            = 90729,
+    SPELL_DUAL_BLADES_H          = 90738,
+    SPELL_ENCUMBERED             = 75007,
+    SPELL_ENCUMBERED_H           = 90729,
     SPELL_IMPALING_SLAM_0        = 75057,
-    SPELL_IMPALING_SLAM            = 75056,
+    SPELL_IMPALING_SLAM          = 75056,
     SPELL_IMPALING_SLAM_H        = 90756, 
-    SPELL_DISORIENTING_ROAR        = 74976,
+    SPELL_DISORIENTING_ROAR      = 74976,
     SPELL_DISORIENTING_ROAR_H    = 90737,
-    SPELL_BURNING_SHIELD        = 90819,
-    SPELL_PERSONAL_PHALANX        = 74908,
-    SPELL_FLAMING_ARROW            = 45101,
-    SPELL_FLAMING_ARROW_VISUAL    = 74944, 
-    SPELL_CAVE_IN_DUMMY            = 74987,
+    SPELL_BURNING_SHIELD         = 90819,
+    SPELL_PERSONAL_PHALANX       = 74908,
+    SPELL_FLAMING_ARROW          = 45101,
+    SPELL_FLAMING_ARROW_VISUAL   = 74944, 
+    SPELL_CAVE_IN_DUMMY          = 74987,
     SPELL_CAVE_IN                = 74990,
     SPELL_CAVE_IN_DMG            = 74986,
-    SPELL_CAVE_IN_DMG_H            = 90722,
+    SPELL_CAVE_IN_DMG_H          = 90722,
     SPELL_FIRE_PATCH_AURA        = 90752,
-    SPELL_LAVA_PATCH_DMG        = 90754,
+    SPELL_LAVA_PATCH_DMG         = 90754
     
 };
 
 enum Adds
 {
-    NPC_CAVE_IN_STALKER    = 40228,
-    NPC_TWILIGHT_ARCHER = 40197,
-    NPC_FIRE_PATCH        = 48711,
+    NPC_CAVE_IN_STALKER          = 40228,
+    NPC_TWILIGHT_ARCHER          = 40197,
+    NPC_FIRE_PATCH               = 48711
 };
 
 enum Events
 {
-    EVENT_PICK_WEAPON        = 1,
+    EVENT_PICK_WEAPON          = 1,
     EVENT_DISORIENTING_ROAR    = 2,
     EVENT_IMPALING_SLAM        = 3,
     EVENT_FLAMING_ARROW        = 4,
     EVENT_CAVE_IN_DUMMY        = 8,
-    EVENT_CAVE_IN_DMG        = 9,
+    EVENT_CAVE_IN_DMG          = 9
 };
 
 enum Others
 {
-    ACTION_MACE            = 1,
-    ACTION_DUAL_BLADES    = 2,
-    ACTION_SHIELD        = 3,
+    ACTION_MACE                = 1,
+    ACTION_DUAL_BLADES         = 2,
+    ACTION_SHIELD              = 3
 };
 
 

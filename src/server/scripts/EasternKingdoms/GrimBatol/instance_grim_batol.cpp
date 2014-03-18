@@ -19,6 +19,7 @@
 #include "grim_batol.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "InstanceScript.h"
 
 class instance_grim_batol : public InstanceMapScript
 {
