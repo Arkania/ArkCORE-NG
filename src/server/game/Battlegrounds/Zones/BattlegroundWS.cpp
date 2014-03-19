@@ -705,8 +705,8 @@ void BattlegroundWS::Reset()
     m_FlagKeepers[BG_TEAM_HORDE]        = 0;
     m_DroppedFlagGUID[BG_TEAM_ALLIANCE] = 0;
     m_DroppedFlagGUID[BG_TEAM_HORDE]    = 0;
-    _flagState[BG_TEAM_ALLIANCE]       = BG_WS_FLAG_STATE_ON_BASE;
-    _flagState[BG_TEAM_HORDE]          = BG_WS_FLAG_STATE_ON_BASE;
+    _flagState[BG_TEAM_ALLIANCE]        = BG_WS_FLAG_STATE_ON_BASE;
+    _flagState[BG_TEAM_HORDE]           = BG_WS_FLAG_STATE_ON_BASE;
     m_TeamScores[BG_TEAM_ALLIANCE]      = 0;
     m_TeamScores[BG_TEAM_HORDE]         = 0;
     bool isBGWeekend = sBattlegroundMgr->IsBGWeekend(GetTypeID());
@@ -714,8 +714,16 @@ void BattlegroundWS::Reset()
     m_HonorWinKills = (isBGWeekend) ? 3 : 1;
     m_HonorEndKills = (isBGWeekend) ? 4 : 2;
     // For WorldState
-    _minutesElapsed                    = 0;
-    _lastFlagCaptureTeam               = 0;
+    _minutesElapsed                      = 0;
+    _lastFlagCaptureTeam                 = 0;
+    _bothFlagsKept                       = false;
+    _flagDebuffState                     = 0;
+    _flagSpellForceTimer                 = 0;
+    _lastFlagCaptureTeam                 = 0;
+    _flagsDropTimer[BG_TEAM_ALLIANCE]    = 0;
+    _flagsDropTimer[BG_TEAM_HORDE]       = 0;
+    _flagsTimer[BG_TEAM_ALLIANCE]        = 0;
+    _flagsTimer[BG_TEAM_HORDE]           = 0;
 
     /* Spirit nodes is static at this BG and then not required deleting at BG reset.
     if (BgCreatures[WS_SPIRIT_MAIN_ALLIANCE])

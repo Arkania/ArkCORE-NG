@@ -641,7 +641,7 @@ void SmartAI::SpellHitTarget(Unit* target, const SpellInfo* spellInfo)
 void SmartAI::DamageTaken(Unit* doneBy, uint32& damage)
 {
     GetScript()->ProcessEventsFor(SMART_EVENT_DAMAGED, doneBy, damage);
-    if (mInvincibilityHpLevel && (damage >= me->GetHealth() - mInvincibilityHpLevel))
+    if ((damage >= me->GetHealth() - mInvincibilityHpLevel) && (mInvincibilityHpLevel > 0))
     {
         damage = 0;
         me->SetHealth(mInvincibilityHpLevel);
