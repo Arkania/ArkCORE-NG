@@ -30,13 +30,13 @@ class Player;
 
 enum LFGenum
 {
-    LFG_TIME_ROLECHECK                           = 40*IN_MILLISECONDS,
-    LFG_TIME_BOOT                                = 2*MINUTE,
-    LFG_TIME_PROPOSAL                            = 2*MINUTE,
+    LFG_TIME_ROLECHECK                           = 45 * IN_MILLISECONDS,
+    LFG_TIME_BOOT                                = 120,
+    LFG_TIME_PROPOSAL                            = 45,
     LFG_TANKS_NEEDED                             = 1,
     LFG_HEALERS_NEEDED                           = 1,
     LFG_DPS_NEEDED                               = 3,
-    LFG_QUEUEUPDATE_INTERVAL                     = 15*IN_MILLISECONDS,
+    LFG_QUEUEUPDATE_INTERVAL                     = 15 * IN_MILLISECONDS,
     LFG_SPELL_DUNGEON_COOLDOWN                   = 71328,
     LFG_SPELL_DUNGEON_DESERTER                   = 71041,
     LFG_SPELL_LUCK_OF_THE_DRAW                   = 72221
