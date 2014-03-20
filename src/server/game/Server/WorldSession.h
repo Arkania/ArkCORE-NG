@@ -1070,8 +1070,7 @@ class WorldSession
         QueryCallback<PreparedQueryResult, CharacterCreateInfo*, true> _charCreateCallback;
         QueryCallback<PreparedQueryResult, std::string> _guildRenameCallback;
         QueryResultHolderFuture _charLoginCallback;
-
-        void HandleLoadScreenOpcode(WorldPacket& recvPacket);    
+  
     private:
         // private trade methods
         void moveItems(Item* myItems[], Item* hisItems[]);
