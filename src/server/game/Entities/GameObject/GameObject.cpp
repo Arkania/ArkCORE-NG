@@ -1623,7 +1623,9 @@ void GameObject::Use(Unit* user)
                         case 179786:                        // Warsong Flag
                             if (bg->GetTypeID(true) == BATTLEGROUND_WS)
                                 bg->EventPlayerClickedOnFlag(player, this);
-                            break;
+                            else
+                            if (bg->GetTypeID(true) == BATTLEGROUND_TP)
+                                bg->EventPlayerClickedOnFlag(player, this);
                         case 184142:                        // Netherstorm Flag
                             if (bg->GetTypeID(true) == BATTLEGROUND_EY)
                                 bg->EventPlayerClickedOnFlag(player, this);
