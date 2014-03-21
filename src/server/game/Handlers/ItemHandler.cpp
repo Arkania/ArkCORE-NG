@@ -1235,7 +1235,7 @@ void WorldSession::HandleSocketOpcode(WorldPacket& recvData)
     // Find first prismatic socket
     int32 firstPrismatic = 0;
     while (firstPrismatic < MAX_GEM_SOCKETS && itemProto->Socket[firstPrismatic].Color)
-        ++firstPrismatic;		
+        ++firstPrismatic;    	
 		
     for (int i = 0; i < MAX_GEM_SOCKETS; ++i)                //check for hack maybe
     {
@@ -1455,6 +1455,9 @@ void WorldSession::HandleItemRefund(WorldPacket &recvData)
         return;
     }
 
+   if (_player->GetLootGUID() == guid)
+        return;	
+	
     GetPlayer()->RefundItem(item);
 }
 
