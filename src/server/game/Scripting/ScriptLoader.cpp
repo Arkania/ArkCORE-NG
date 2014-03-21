@@ -256,7 +256,7 @@ void AddSC_boss_kirtonos_the_herald();
 void AddSC_instance_the_stockade();
 void AddSC_coldridge_valley();
 void AddSC_elwynn_forest();
-
+void AddSC_gilneas_city();
 
 
 //void AddSC_alterac_mountains();
@@ -1039,7 +1039,7 @@ void AddEasternKingdomsScripts()
 	AddSC_instance_the_stockade();
 	AddSC_coldridge_valley();
 	AddSC_elwynn_forest();
-
+	AddSC_gilneas_city();
 
 
 #endif
