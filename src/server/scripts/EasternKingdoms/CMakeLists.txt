@@ -253,7 +253,7 @@ set(scripts_STAT_SRCS
   EasternKingdoms/zone_eastern_plaguelands.cpp
   EasternKingdoms/zone_elwynn_forest.cpp
   EasternKingdoms/zone_coldridge_valley.cpp
-
+  EasternKingdoms/zone_gilneas.cpp
 
   
 )
