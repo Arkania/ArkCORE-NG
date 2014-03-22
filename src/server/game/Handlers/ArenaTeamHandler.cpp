@@ -310,9 +310,8 @@ void WorldSession::HandleArenaTeamCreate(WorldPacket & recvData)
 {
     sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_ARENA_TEAM_CREATE");
 
-    uint32 slot, icon, iconcolor, border, bordercolor, background, len;
+    uint32 slot, icon, iconcolor, border, bordercolor, background;
     std::string name;
-
 
     recvData >> slot;
     recvData >> iconcolor;
@@ -320,8 +319,7 @@ void WorldSession::HandleArenaTeamCreate(WorldPacket & recvData)
     recvData >> border;
     recvData >> background;
     recvData >> icon;
-    len = recvData.ReadBits(8);
-    name = recvData.ReadString(len);
+    name = recvData.ReadString(recvData.ReadBits(8));
 
 	ArenaType type = ArenaTeam::GetTypeBySlot(slot);
 
