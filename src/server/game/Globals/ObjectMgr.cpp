@@ -2515,7 +2515,7 @@ void ObjectMgr::LoadItemTemplates()
             itemTemplate.ItemId                    = itemId;
             itemTemplate.Class                     = uint32(fields[1].GetUInt8());
             itemTemplate.SubClass                  = uint32(fields[2].GetUInt8());
-            itemTemplate.SoundOverrideSubclass     = fields[3].GetInt8();
+            itemTemplate.SoundOverrideSubclass     = fields[3].GetInt32();
             itemTemplate.Name1                     = fields[4].GetString();
             itemTemplate.DisplayInfoID             = fields[5].GetUInt32();
             itemTemplate.Quality                   = uint32(fields[6].GetUInt8());
@@ -5702,8 +5702,8 @@ WorldSafeLocsEntry const* ObjectMgr::GetDefaultGraveYard(uint32 team)
 {
     enum DefaultGraveyard
     {
-        HORDE_GRAVEYARD = 10, // Crossroads
-        ALLIANCE_GRAVEYARD = 4, // Westfall
+        HORDE_GRAVEYARD    = 10, // Crossroads
+        ALLIANCE_GRAVEYARD = 4   // Westfall
     };
 
     if (team == HORDE)

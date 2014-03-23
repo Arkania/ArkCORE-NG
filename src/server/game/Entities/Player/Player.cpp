@@ -892,8 +892,8 @@ Player::Player(WorldSession* session): Unit(true), m_achievementMgr(this), m_rep
 
     _canUseMastery = false;
 
-    memset(_voidStorageItems, NULL, VOID_STORAGE_MAX_SLOT * sizeof(VoidStorageItem*));
-    memset(_CUFProfiles, NULL, MAX_CUF_PROFILES * sizeof(CUFProfile*));
+    memset(_voidStorageItems, 0, VOID_STORAGE_MAX_SLOT * sizeof(VoidStorageItem*));
+    memset(_CUFProfiles, 0, MAX_CUF_PROFILES * sizeof(CUFProfile*));
 
     _ConquestCurrencytotalWeekCap = GetCurrencyWeekCap(CURRENCY_TYPE_CONQUEST_META_ARENA) + GetCurrencyWeekCap(CURRENCY_TYPE_CONQUEST_META_BG);
 }
@@ -1009,11 +1009,8 @@ bool Player::Create(uint32 guidlow, CharacterCreateInfo* createInfo)
         SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_PVP);
         SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
     }
+
     SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_REGENERATE_POWER);
-    SetFloatValue(UNIT_MOD_CAST_SPEED, 1.0f);               // fix cast time showed in spell tooltip on client
-    SetFloatValue(UNIT_MOD_CAST_HASTE, 1.0f);
-    SetFloatValue(PLAYER_FIELD_MOD_HASTE, 1.0f);
-    SetFloatValue(PLAYER_FIELD_MOD_RANGED_HASTE, 1.0f);
     SetFloatValue(UNIT_FIELD_HOVERHEIGHT, 1.0f);            // default for players in 3.0.3
 
     SetInt32Value(PLAYER_FIELD_WATCHED_FACTION_INDEX, uint32(-1)); // -1 is default value
@@ -1634,7 +1631,7 @@ void Player::Update(uint32 p_time)
         }
     }
 
-    GetAchievementMgr().UpdateTimedAchievements(p_time);
+    m_achievementMgr.UpdateTimedAchievements(p_time);
 
     if (HasUnitState(UNIT_STATE_MELEE_ATTACKING) && !HasUnitState(UNIT_STATE_CASTING))
     {
@@ -1898,9 +1895,9 @@ void Player::setDeathState(DeathState s)
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_DEATH_AT_MAP, 1);
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_DEATH, 1);
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_DEATH_IN_DUNGEON, 1);
-        GetAchievementMgr().ResetAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BG_OBJECTIVE_CAPTURE, ACHIEVEMENT_CRITERIA_CONDITION_NO_DEATH);
-        GetAchievementMgr().ResetAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HONORABLE_KILL, ACHIEVEMENT_CRITERIA_CONDITION_NO_DEATH);
-        GetAchievementMgr().ResetAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GET_KILLING_BLOWS, ACHIEVEMENT_CRITERIA_CONDITION_NO_DEATH);
+        ResetAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BG_OBJECTIVE_CAPTURE, ACHIEVEMENT_CRITERIA_CONDITION_NO_DEATH);
+        ResetAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HONORABLE_KILL, ACHIEVEMENT_CRITERIA_CONDITION_NO_DEATH);
+        ResetAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GET_KILLING_BLOWS, ACHIEVEMENT_CRITERIA_CONDITION_NO_DEATH);
     }
 
     Unit::setDeathState(s);
@@ -3375,7 +3372,7 @@ void Player::InitStatsForLevel(bool reapplyMods)
     {
         SetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_NEG+i, 0);
         SetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS+i, 0);
-        SetFloatValue(PLAYER_FIELD_MOD_DAMAGE_DONE_PCT+i, 1.00f);
+        SetFloatValue(PLAYER_FIELD_MOD_DAMAGE_DONE_PCT+i, 1.0f);
     }
 
     SetFloatValue(PLAYER_FIELD_MOD_SPELL_POWER_PCT, 1.0f);
@@ -7456,13 +7453,16 @@ uint32 Player::GetCurrencyOnWeek(uint32 id) const
     return itr != m_currencies.end() ? itr->second.weekCount : 0;
 }
 
-void Player::ModifyCurrency(uint32 id, int32 count, bool printLog/* = true*/)
+void Player::ModifyCurrency(uint32 id, int32 count, bool printLog/* = true*/, bool ignoreMultipliers/* = false*/)
 {
     if (!count)
         return;
 
     CurrencyTypesEntry const* currency = sCurrencyTypesStore.LookupEntry(id);
     ASSERT(currency);
+
+    if (!ignoreMultipliers)
+        count *= GetTotalAuraMultiplierByMiscValue(SPELL_AURA_MOD_CURRENCY_GAIN, id);
 
     bool hasSeasonCount = false;
     uint32 oldTotalCount = 0;
@@ -7623,10 +7623,10 @@ uint32 Player::_GetCurrencyWeekCap(const CurrencyTypesEntry* currency) const
         }
     }
 
-    if (IsInWorld() && !GetSession()->PlayerLoading())
+    if (cap != currency->WeekCap && IsInWorld() && !GetSession()->PlayerLoading())
     {
        WorldPacket packet(SMSG_UPDATE_CURRENCY_WEEK_LIMIT, 8);
-       packet << uint32(cap);
+       packet << uint32(cap / ((currency->Flags & CURRENCY_FLAG_HIGH_PRECISION) ? 100 : 1));
        packet << uint32(currency->ID);
        GetSession()->SendPacket(&packet);
     }
@@ -11576,7 +11576,10 @@ InventoryResult Player::CanEquipItem(uint8 slot, uint16 &dest, Item* pItem, bool
 
             if (eslot == EQUIPMENT_SLOT_OFFHAND)
             {
-                if (type == INVTYPE_WEAPON || type == INVTYPE_WEAPONOFFHAND)
+                // Do not allow polearm to be equipped in the offhand (rare case for the only 1h polearm 41750)
+                if (type == INVTYPE_WEAPON && pProto->SubClass == ITEM_SUBCLASS_WEAPON_POLEARM)
+                    return EQUIP_ERR_2HSKILLNOTFOUND;
+                else if (type == INVTYPE_WEAPON || type == INVTYPE_WEAPONOFFHAND)
                 {
                     if (!CanDualWield())
                         return EQUIP_ERR_2HSKILLNOTFOUND;
@@ -14712,11 +14715,11 @@ void Player::PrepareQuestMenu(uint64 guid)
         //only for quests which cast teleport spells on player
         Map* _map = IsInWorld() ? GetMap() : sMapMgr->FindMap(GetMapId(), GetInstanceId());
         ASSERT(_map);
-        GameObject* pGameObject = _map->GetGameObject(guid);
-        if (pGameObject)
+        GameObject* gameObject = _map->GetGameObject(guid);
+        if (gameObject)
         {
-            objectQR  = sObjectMgr->GetGOQuestRelationBounds(pGameObject->GetEntry());
-            objectQIR = sObjectMgr->GetGOQuestInvolvedRelationBounds(pGameObject->GetEntry());
+            objectQR  = sObjectMgr->GetGOQuestRelationBounds(gameObject->GetEntry());
+            objectQIR = sObjectMgr->GetGOQuestInvolvedRelationBounds(gameObject->GetEntry());
         }
         else
             return;
@@ -14858,24 +14861,40 @@ bool Player::IsActiveQuest(uint32 quest_id) const
 Quest const* Player::GetNextQuest(uint64 guid, Quest const* quest)
 {
     QuestRelationBounds objectQR;
+    uint32 nextQuestID = quest->GetNextQuestInChain();
 
-    Creature* creature = ObjectAccessor::GetCreatureOrPetOrVehicle(*this, guid);
-    if (creature)
-        objectQR  = sObjectMgr->GetCreatureQuestRelationBounds(creature->GetEntry());
-    else
+    switch (GUID_HIPART(guid))
     {
-        //we should obtain map pointer from GetMap() in 99% of cases. Special case
-        //only for quests which cast teleport spells on player
-        Map* _map = IsInWorld() ? GetMap() : sMapMgr->FindMap(GetMapId(), GetInstanceId());
-        ASSERT(_map);
-        GameObject* pGameObject = _map->GetGameObject(guid);
-        if (pGameObject)
-            objectQR  = sObjectMgr->GetGOQuestRelationBounds(pGameObject->GetEntry());
-        else
+        case HIGHGUID_PLAYER:
+            ASSERT(quest->HasFlag(QUEST_FLAGS_AUTO_SUBMIT));
+            return sObjectMgr->GetQuestTemplate(nextQuestID);
+        case HIGHGUID_UNIT:
+        case HIGHGUID_PET:
+        case HIGHGUID_VEHICLE:
+        {
+            if (Creature* creature = ObjectAccessor::GetCreatureOrPetOrVehicle(*this, guid))
+                objectQR  = sObjectMgr->GetCreatureQuestRelationBounds(creature->GetEntry());
+            else
+                return NULL;
+            break;
+        }
+        case HIGHGUID_GAMEOBJECT:
+        {
+            //we should obtain map pointer from GetMap() in 99% of cases. Special case
+            //only for quests which cast teleport spells on player
+            Map* _map = IsInWorld() ? GetMap() : sMapMgr->FindMap(GetMapId(), GetInstanceId());
+            ASSERT(_map);
+            if (GameObject* gameObject = _map->GetGameObject(guid))
+                objectQR = sObjectMgr->GetGOQuestRelationBounds(gameObject->GetEntry());
+            else
+                return NULL;
+            break;
+        }
+        default:
             return NULL;
     }
 
-    uint32 nextQuestID = quest->GetNextQuestInChain();
+    // for unit and go state
     for (QuestRelations::const_iterator itr = objectQR.first; itr != objectQR.second; ++itr)
     {
         if (itr->second == nextQuestID)
@@ -15163,7 +15182,7 @@ void Player::AddQuest(Quest const* quest, Object* questGiver)
 
     m_QuestStatusSave[quest_id] = true;
 
-    GetAchievementMgr().StartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_QUEST, quest_id);
+    StartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_QUEST, quest_id);
 
     //starting initial quest script
     if (questGiver && quest->GetQuestStartScript() != 0)
@@ -15287,7 +15306,7 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     bool rewarded = (m_RewardedQuests.find(quest_id) != m_RewardedQuests.end());
 
     // Not give XP in case already completed once repeatable quest
-    uint32 XP = (rewarded && !quest->IsDaily() && !quest->IsWeekly() && !quest->IsSeasonal()) ? 0 : uint32(quest->XPValue(this) * sWorld->getRate(RATE_XP_QUEST));
+    uint32 XP = rewarded ? 0 : uint32(quest->XPValue(this) * sWorld->getRate(RATE_XP_QUEST));
 
     // handle SPELL_AURA_MOD_XP_QUEST_PCT auras
     Unit::AuraEffectList const& ModXPPctAuras = GetAuraEffectsByType(SPELL_AURA_MOD_XP_QUEST_PCT);
@@ -15300,15 +15319,8 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     else
         moneyRew = int32(quest->GetRewMoneyMaxLevel() * sWorld->getRate(RATE_DROP_MONEY));
 
-    // If the player has a guild, it should gain 1/4 of his experience.
-    // Also, player should get 1/450XP as reputation despite of him being at max level or not.
     if (Guild* guild = sGuildMgr->GetGuildById(GetGuildId()))
-    {
-        uint32 guildXP = uint32(quest->XPValue(this) * sWorld->getRate(RATE_XP_QUEST) * sWorld->getRate(RATE_XP_GUILD_MODIFIER));
-        uint32 guildRep = uint32(guildXP / 450);
-        guild->GiveXP(guildXP, this);
-        guild->GainReputation(GetGUID(), guildRep);
-    }
+        guild->GiveXP(uint32(quest->XPValue(this) * sWorld->getRate(RATE_XP_QUEST) * sWorld->getRate(RATE_XP_GUILD_MODIFIER)), this);
 
     // Give player extra money if GetRewOrReqMoney > 0 and get ReqMoney if negative
     if (quest->GetRewOrReqMoney())
@@ -16186,7 +16198,7 @@ void Player::KilledMonsterCredit(uint32 entry, uint64 guid)
             real_entry = killed->GetEntry();
     }
 
-    GetAchievementMgr().StartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_CREATURE, real_entry);   // MUST BE CALLED FIRST
+    StartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_CREATURE, real_entry);   // MUST BE CALLED FIRST
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE, real_entry, addkillcount, 0, guid ? GetMap()->GetCreature(guid) : NULL);
 
     for (uint8 i = 0; i < MAX_QUEST_LOG_SIZE; ++i)
@@ -18836,7 +18848,7 @@ bool Player::Satisfy(AccessRequirement const* ar, uint32 target_map, bool report
             leader = ObjectAccessor::FindPlayer(leaderGuid);
 
         if (ar->achievement)
-            if (!leader || !leader->GetAchievementMgr().HasAchieved(ar->achievement))
+            if (!leader || !leader->HasAchieved(ar->achievement))
                 missingAchievement = ar->achievement;
 
         Difficulty target_difficulty = GetDifficulty(mapEntry->IsRaid());
@@ -21437,7 +21449,7 @@ inline bool Player::_StoreOrEquipNewItem(uint32 vendorslot, uint32 item, uint8 c
         for (int i = 0; i < MAX_ITEM_EXT_COST_CURRENCIES; ++i)
         {
             if (iece->RequiredCurrency[i])
-                ModifyCurrency(iece->RequiredCurrency[i], -int32(iece->RequiredCurrencyCount[i]));
+                ModifyCurrency(iece->RequiredCurrency[i], -int32(iece->RequiredCurrencyCount[i]), true, true);
         }
     }
 
@@ -21472,11 +21484,13 @@ inline bool Player::_StoreOrEquipNewItem(uint32 vendorslot, uint32 item, uint8 c
     return true;
 }
 
+
 bool Player::BuyCurrencyFromVendorSlot(uint64 vendorGuid, uint32 vendorSlot, uint32 currency, uint32 count)
 {
+    vendorSlot += 1;
+
     // cheating attempt
-    if (count < 1) 
-        count = 1;
+    if (count < 1) count = 1;
 
     if (!IsAlive())
         return false;
@@ -21547,13 +21561,13 @@ bool Player::BuyCurrencyFromVendorSlot(uint64 vendorGuid, uint32 vendorSlot, uin
                 return false;
             }
 
-            if (!HasCurrency(iece->RequiredCurrency[i], iece->RequiredCurrencyCount[i]))
+            uint32 precision = (entry->Flags & CURRENCY_FLAG_HIGH_PRECISION) ? 100 : 1;
+
+            if (!HasCurrency(iece->RequiredCurrency[i], (iece->RequiredCurrencyCount[i] * count) / precision))
             {
                 SendEquipError(EQUIP_ERR_VENDOR_MISSING_TURNINS, NULL, NULL); // Find correct error
                 return false;
             }
-
-            ModifyCurrency(iece->RequiredCurrency[i], -int32(iece->RequiredCurrencyCount[i]), true);
         }
 
         // check for personal arena rating requirement
@@ -21570,130 +21584,10 @@ bool Player::BuyCurrencyFromVendorSlot(uint64 vendorGuid, uint32 vendorSlot, uin
         return false;
     }
 
-    ModifyCurrency(currency, crItem->maxcount, true);
+    ModifyCurrency(currency, crItem->maxcount, true, true);
+
     return true;
 }
-
-
-/*bool Player::BuyCurrencyFromVendorSlot(uint64 vendorGuid, uint32 vendorSlot, uint32 currency, uint32 count)
-{
-
-    // cheating attempt
-    if (count < 1) 
-        count = 1;
-
-    if (!IsAlive())
-        return false;
-
-    CurrencyTypesEntry const* proto = sCurrencyTypesStore.LookupEntry(currency);
-    if (!proto)
-    {
-        SendBuyError(BUY_ERR_CANT_FIND_ITEM, NULL, currency, 0);
-        return false;
-    }
-
-    Creature* creature = GetNPCIfCanInteractWith(vendorGuid, UNIT_NPC_FLAG_VENDOR);
-    if (!creature)
-    {
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: BuyCurrencyFromVendorSlot - Unit (GUID: %u) not found or you can't interact with him.", GUID_LOPART(vendorGuid));
-        SendBuyError(BUY_ERR_DISTANCE_TOO_FAR, NULL, currency, 0);
-        return false;
-    }
-
-    VendorItemData const* vItems = creature->GetVendorItems();
-    if (!vItems || vItems->Empty())
-    {
-        SendBuyError(BUY_ERR_CANT_FIND_ITEM, creature, currency, 0);
-        return false;
-    }
-
-    if (vendorSlot >= vItems->GetItemCount())
-    {
-        SendBuyError(BUY_ERR_CANT_FIND_ITEM, creature, currency, 0);
-        return false;
-    }
-
-    VendorItem const* crItem = vItems->GetItem(vendorSlot);
-    // store diff item (cheating)
-    if (!crItem || crItem->item != currency || crItem->Type != ITEM_VENDOR_TYPE_CURRENCY)
-    {
-        SendBuyError(BUY_ERR_CANT_FIND_ITEM, creature, currency, 0);
-        return false;
-    }
-
-    if (count % crItem->maxcount)
-    {
-        SendEquipError(EQUIP_ERR_CANT_BUY_QUANTITY, NULL, NULL);
-        return false;
-    }
-
-    uint32 stacks = count / crItem->maxcount;
-    ItemExtendedCostEntry const* iece = NULL;
-
-    if (crItem->ExtendedCost)
-    {
-        ItemExtendedCostEntry const* iece = sItemExtendedCostStore.LookupEntry(crItem->ExtendedCost);
-        if (!iece)
-        {
-            sLog->outError("Currency %u have wrong ExtendedCost field value %u", currency, crItem->ExtendedCost);
-            return false;
-        }
-
-        for (uint8 i = 0; i < MAX_ITEM_EXT_COST_ITEMS; ++i)
-        {
-            if (iece->RequiredItem[i] && !HasItemCount(iece->RequiredItem[i], (iece->RequiredItemCount[i] * count)))
-            {
-                SendEquipError(EQUIP_ERR_VENDOR_MISSING_TURNINS, NULL, NULL);
-                return false;
-            }
-        }
-
-        for (uint8 i = 0; i < MAX_ITEM_EXT_COST_CURRENCIES; ++i)
-        {
-            if (!iece->RequiredCurrency[i])
-                continue;
-
-            CurrencyTypesEntry const* entry = sCurrencyTypesStore.LookupEntry(iece->RequiredCurrency[i]);
-            if (!entry)
-            {
-                SendBuyError(BUY_ERR_CANT_FIND_ITEM, creature, currency, 0); // Find correct error
-                return false;
-            }
-
-            if (!HasCurrency(iece->RequiredCurrency[i], iece->RequiredCurrencyCount[i]))
-            {
-                SendEquipError(EQUIP_ERR_VENDOR_MISSING_TURNINS, NULL, NULL); // Find correct error
-                return false;
-            }
-
-            // Player has not enough currency.
-            if (GetCurrency(iece->RequiredCurrency[i]) < iece->RequiredCurrencyCount[i])
-            {
-                SendBuyError(BUY_ERR_NOT_ENOUGHT_MONEY, creature, currency, 0); // Says not enough money. Temporary till right error in.
-                return false;
-            }
-
-            ModifyCurrency(iece->RequiredCurrency[i], -int32(iece->RequiredCurrencyCount[i]));
-        }
-
-        // check for personal arena rating requirement
-        if (GetMaxPersonalArenaRatingRequirement(iece->RequiredArenaSlot) < iece->RequiredPersonalArenaRating)
-        {
-            // probably not the proper equip err
-            SendEquipError(EQUIP_ERR_CANT_EQUIP_RANK, NULL, NULL);
-            return false;
-        }
-    }
-    else // currencies have no price defined, can only be bought with ExtendedCost
-    {
-        SendBuyError(BUY_ERR_CANT_FIND_ITEM, NULL, currency, 0);
-        return false;
-    }
-
-    ModifyCurrency(currency, crItem->maxcount);
-
-    return true;
-}*/
 
 // Return true is the bought item has a max count to force refresh of window by caller
 bool Player::BuyItemFromVendorSlot(uint64 vendorguid, uint32 vendorslot, uint32 item, uint8 count, uint8 bag, uint8 slot)
@@ -25064,7 +24958,7 @@ void Player::UpdateAchievementCriteria(AchievementCriteriaTypes type, uint64 mis
 
 void Player::CompletedAchievement(AchievementEntry const* entry)
 {
-    GetAchievementMgr().CompletedAchievement(entry, this);
+    m_achievementMgr.CompletedAchievement(entry, this);
 }
 
 bool Player::LearnTalent(uint32 talentId, uint32 talentRank)
@@ -25446,11 +25340,11 @@ bool Player::canSeeSpellClickOn(Creature const* c) const
 
         ConditionList conds = sConditionMgr->GetConditionsForSpellClickEvent(c->GetEntry(), itr->second.spellId);
         ConditionSourceInfo info = ConditionSourceInfo(const_cast<Player*>(this), const_cast<Creature*>(c));
-        if (!sConditionMgr->IsObjectMeetToConditions(info, conds))
-            return false;
+        if (sConditionMgr->IsObjectMeetToConditions(info, conds))
+            return true;
     }
 
-    return true;
+    return false;
 }
 
 void Player::BuildPlayerTalentsInfoData(WorldPacket* data)
@@ -27067,7 +26961,7 @@ void Player::_LoadCurrencyPoints(PreparedQueryResult result)
         uint32 currencyID = field[0].GetUInt32();
 
         CurrencyTypesEntry const* currency = sCurrencyTypesStore.LookupEntry(currencyID);
-        if (!currencyID)
+        if (!currency)
             continue;
 
         PlayerCurrency cur;

@@ -455,7 +455,7 @@ void BattlegroundTP::EventPlayerClickedOnFlag(Player* Source, GameObject* target
         UpdateFlagState(HORDE, BG_TP_FLAG_STATE_ON_PLAYER);
         UpdateWorldState(BG_TP_FLAG_UNK_ALLIANCE, 1);
         Source->CastSpell(Source, BG_TP_SPELL_ALLIANCE_FLAG, true);
-        //Source->GetAchievementMgr().StartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_SPELL_TARGET, BG_TP_SPELL_ALLIANCE_FLAG_PICKED);
+        //Source->StartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_SPELL_TARGET, BG_TP_SPELL_ALLIANCE_FLAG_PICKED);
         if (m_FlagState[1] == BG_TP_FLAG_STATE_ON_PLAYER)
           m_BothFlagsKept = true;
     }
@@ -474,7 +474,7 @@ void BattlegroundTP::EventPlayerClickedOnFlag(Player* Source, GameObject* target
         UpdateFlagState(ALLIANCE, BG_TP_FLAG_STATE_ON_PLAYER);
         UpdateWorldState(BG_TP_FLAG_UNK_HORDE, 1);
         Source->CastSpell(Source, BG_TP_SPELL_HORDE_FLAG, true);
-        //Source->GetAchievementMgr().StartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_SPELL_TARGET, BG_TP_SPELL_HORDE_FLAG_PICKED);
+        //Source->StartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_SPELL_TARGET, BG_TP_SPELL_HORDE_FLAG_PICKED);
         if (m_FlagState[0] == BG_TP_FLAG_STATE_ON_PLAYER)
           m_BothFlagsKept = true;
     }
@@ -760,11 +760,11 @@ void BattlegroundTP::UpdatePlayerScore(Player* Source, uint32 type, uint32 value
     {
         case SCORE_FLAG_CAPTURES:                           // flags captured
             ((BattlegroundTPScore*)itr->second)->FlagCaptures += value;
-            //Source->GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BG_OBJECTIVE_CAPTURE, TP_OBJECTIVE_CAPTURE_FLAG);
+            //Source->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BG_OBJECTIVE_CAPTURE, TP_OBJECTIVE_CAPTURE_FLAG);
             break;
         case SCORE_FLAG_RETURNS:                            // flags returned
             ((BattlegroundTPScore*)itr->second)->FlagReturns += value;
-            //Source->GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BG_OBJECTIVE_CAPTURE, TP_OBJECTIVE_RETURN_FLAG);
+            //Source->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BG_OBJECTIVE_CAPTURE, TP_OBJECTIVE_RETURN_FLAG);
             break;
         default:
             Battleground::UpdatePlayerScore(Source, type, value, doAddHonor);

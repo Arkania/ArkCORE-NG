@@ -417,7 +417,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
             case SPELLFAMILY_WARRIOR:
             {
                 // Victory Rush
-                if (m_spellInfo->SpellFamilyFlags[1] & 0x100)
+                if (m_spellInfo->Id == 34428)
                 {
                      ApplyPctF(damage, m_caster->GetTotalAttackPowerValue(BASE_ATTACK));
                      m_caster->RemoveAura(32216);
@@ -2049,6 +2049,14 @@ void Spell::EffectTeleportUnits(SpellEffIndex /*effIndex*/)
             if (unitTarget->getLevel() > uiMaxSafeLevel)
             {
                 unitTarget->AddAura(60444, unitTarget); //Apply Lost! Aura
+
+                // ALLIANCE from 60323 to 60330 - HORDE from 60328 to 60335
+                uint32 spellId = 60323;
+                if (m_caster->ToPlayer()->GetTeam() == HORDE)
+                    spellId += 5;
+
+                spellId += urand(0, 7);
+                m_caster->CastSpell(m_caster, spellId, true);
                 return;
             }
             break;
@@ -2656,8 +2664,7 @@ void Spell::DoCreateItem(uint32 /*i*/, uint32 itemtype)
             pItem->SetUInt32Value(ITEM_FIELD_CREATOR, player->GetGUIDLow());
 
         // send info to the client
-        if (pItem)
-            player->SendNewItem(pItem, num_to_add, true, bgType == 0);
+        player->SendNewItem(pItem, num_to_add, true, bgType == 0);
 
         if (pProto->Quality > ITEM_QUALITY_EPIC || (pProto->Quality == ITEM_QUALITY_EPIC && pProto->ItemLevel >= MinNewsItemLevel[sWorld->getIntConfig(CONFIG_EXPANSION)]))
             if (Guild* guild = player->GetGuild())
@@ -3156,7 +3163,7 @@ void Spell::EffectOpenLock(SpellEffIndex effIndex)
 
     if (gameObjTarget)
         SendLoot(guid, LOOT_SKINNING);
-    else
+    else if (itemTarget)
         itemTarget->SetFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_UNLOCKED);
 
     // not allow use skill grow at item base open

@@ -58,20 +58,20 @@ enum ServerMessageType
     SERVER_MSG_CONTENT_READY          = 10,
     SERVER_MSG_TICKET_SERVICED_SOON   = 11,
     SERVER_MSG_WAIT_TIME_UNAVAILABLE  = 12,
-    SERVER_MSG_TICKET_WAIT_TIME       = 13,
+    SERVER_MSG_TICKET_WAIT_TIME       = 13
 };
 
 enum ShutdownMask
 {
     SHUTDOWN_MASK_RESTART = 1,
-    SHUTDOWN_MASK_IDLE    = 2,
+    SHUTDOWN_MASK_IDLE    = 2
 };
 
 enum ShutdownExitCode
 {
     SHUTDOWN_EXIT_CODE = 0,
     ERROR_EXIT_CODE    = 1,
-    RESTART_EXIT_CODE  = 2,
+    RESTART_EXIT_CODE  = 2
 };
 
 /// Timers for different object refresh rates
@@ -433,18 +433,18 @@ enum BillingPlanFlags
     SESSION_USAGE           = 0x10,
     SESSION_TIME_MIXTURE    = 0x20,
     SESSION_RESTRICTED      = 0x40,
-    SESSION_ENABLE_CAIS     = 0x80,
+    SESSION_ENABLE_CAIS     = 0x80
 };
 
 /// Type of server, this is values from second column of Cfg_Configs.dbc
 enum RealmType
 {
-    REALM_TYPE_NORMAL = 0,
-    REALM_TYPE_PVP = 1,
-    REALM_TYPE_NORMAL2 = 4,
-    REALM_TYPE_RP = 6,
-    REALM_TYPE_RPPVP = 8,
-    REALM_TYPE_FFA_PVP = 16                                 // custom, free for all pvp mode like arena PvP in all zones except rest activated places and sanctuaries
+    REALM_TYPE_NORMAL       = 0,
+    REALM_TYPE_PVP          = 1,
+    REALM_TYPE_NORMAL2      = 4,
+    REALM_TYPE_RP           = 6,
+    REALM_TYPE_RPPVP        = 8,
+    REALM_TYPE_FFA_PVP      = 16                            // custom, free for all pvp mode like arena PvP in all zones except rest activated places and sanctuaries
                                                             // replaced by REALM_PVP in realm list
 };
 

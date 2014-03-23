@@ -55,7 +55,7 @@ enum PowerType
     POWER_ORANGE_POWER_2                         = 176,
     POWER_CONSUMING_FLAME                        = 177,
     POWER_PYROCLASTIC_FRENZY                     = 178,
-    POWER_FLASHFIRE                              = 179,
+    POWER_FLASHFIRE                              = 179
 };
 
 enum VehicleFlags
@@ -67,7 +67,7 @@ enum VehicleFlags
     VEHICLE_FLAG_FULLSPEEDPITCHING               = 0x00000020,           // Sets MOVEFLAG2_FULLSPEEDPITCHING
     VEHICLE_FLAG_CUSTOM_PITCH                    = 0x00000040,           // If set use pitchMin and pitchMax from DBC, otherwise pitchMin = -pi/2, pitchMax = pi/2
     VEHICLE_FLAG_ADJUST_AIM_ANGLE                = 0x00000400,           // Lua_IsVehicleAimAngleAdjustable
-    VEHICLE_FLAG_ADJUST_AIM_POWER                = 0x00000800,           // Lua_IsVehicleAimPowerAdjustable
+    VEHICLE_FLAG_ADJUST_AIM_POWER                = 0x00000800            // Lua_IsVehicleAimPowerAdjustable
 };
 
 enum VehicleSpells

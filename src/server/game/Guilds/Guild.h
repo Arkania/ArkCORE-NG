@@ -44,14 +44,14 @@ enum GuildMisc
     GUILD_WITHDRAW_SLOT_UNLIMITED       = 0xFFFFFFFF,
     GUILD_EVENT_LOG_GUID_UNDEFINED      = 0xFFFFFFFF,
     GUILD_EXPERIENCE_UNCAPPED_LEVEL     = 20,                   ///> Hardcoded in client, starting from this level, guild daily experience gain is unlimited.
-    TAB_UNDEFINED                       = 0xFF,
+    TAB_UNDEFINED                       = 0xFF
 };
 
 enum GuildMemberData
 {
     GUILD_MEMBER_DATA_ZONEID,
     GUILD_MEMBER_DATA_ACHIEVEMENT_POINTS,
-    GUILD_MEMBER_DATA_LEVEL,
+    GUILD_MEMBER_DATA_LEVEL
 };
 
 enum GuildDefaultRanks
@@ -106,7 +106,7 @@ enum GuildCommandType
     GUILD_COMMAND_PUBLIC_NOTE           = 19,
     GUILD_COMMAND_VIEW_TAB              = 21,
     GUILD_COMMAND_MOVE_ITEM             = 22,
-    GUILD_COMMAND_REPAIR                = 25,
+    GUILD_COMMAND_REPAIR                = 25
 };
 
 enum GuildCommandError
@@ -172,7 +172,7 @@ enum GuildEvents
     GE_BANK_TEXT_CHANGED                = 23,
     // 24 - error 795
     GE_SIGNED_ON_MOBILE                 = 25,
-    GE_SIGNED_Off_MOBILE                = 26,
+    GE_SIGNED_Off_MOBILE                = 26
 };
 
 enum PetitionTurns

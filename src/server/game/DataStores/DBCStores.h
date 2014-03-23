@@ -32,9 +32,6 @@ SimpleFactionsList const* GetFactionTeamList(uint32 faction);
 char const* GetPetName(uint32 petfamily, uint32 dbclang);
 uint32 GetTalentSpellCost(uint32 spellId);
 TalentSpellPos const* GetTalentSpellPos(uint32 spellId);
-SpellEffectEntry const* GetSpellEffectEntry(uint32 spellId, uint32 effect);
-SpellReagentsEntry const* GetSpellReagentEntry(uint32 spellId, uint8 reagent);
-SpellTotemsEntry const* GetSpellTotemEntry(uint32 spellId, uint8 totem);
 
 int32 GetAreaFlagByAreaID(uint32 area_id);                  // -1 if not found
 AreaTableEntry const* GetAreaEntryByAreaID(uint32 area_id);
@@ -76,6 +73,8 @@ PvPDifficultyEntry const* GetBattlegroundBracketByLevel(uint32 mapid, uint32 lev
 PvPDifficultyEntry const* GetBattlegroundBracketById(uint32 mapid, BattlegroundBracketId id);
 
 CharStartOutfitEntry const* GetCharStartOutfitEntry(uint8 race, uint8 class_, uint8 gender); 
+
+uint32 GetPowerIndexByClass(uint32 powerType, uint32 classId);
 
 extern DBCStorage <AchievementEntry>             sAchievementStore;
 extern DBCStorage <AchievementCriteriaEntry>     sAchievementCriteriaStore;

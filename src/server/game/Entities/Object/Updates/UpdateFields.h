@@ -78,7 +78,7 @@ enum EItemFields
     ITEM_FIELD_DURABILITY                            = OBJECT_END + 0x003F, // Size: 1, Type: INT, Flags: OWNER, ITEM_OWNER
     ITEM_FIELD_MAXDURABILITY                         = OBJECT_END + 0x0040, // Size: 1, Type: INT, Flags: OWNER, ITEM_OWNER
     ITEM_FIELD_CREATE_PLAYED_TIME                    = OBJECT_END + 0x0041, // Size: 1, Type: INT, Flags: PUBLIC
-    ITEM_END                                         = OBJECT_END + 0x0042,
+    ITEM_END                                         = OBJECT_END + 0x0042
 };
 
 enum EContainerFields

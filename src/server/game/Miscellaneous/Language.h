@@ -87,7 +87,8 @@ enum TrinityStrings
     LANG_CONNECTED_PLAYERS              = 60,
     LANG_ACCOUNT_ADDON                  = 61,
     LANG_IMPROPER_VALUE                 = 62,
-    // Room for more level 0              63-99 not used
+    LANG_CANT_DO_NOW                    = 63,
+    // Room for more level 0              64-99 not used
 
     // level 1 chat
     LANG_GLOBAL_NOTIFY                  = 100,
@@ -346,7 +347,13 @@ enum TrinityStrings
     LANG_TITLE_REMOVE_RES               = 354,
     LANG_TITLE_CURRENT_RES              = 355,
     LANG_CURRENT_TITLE_RESET            = 356,
-    // Room for more level 2              357-399 not used
+    LANG_COMMAND_CHEAT_STATUS           = 357,
+    LANG_COMMAND_CHEAT_GOD              = 358,
+    LANG_COMMAND_CHEAT_CT               = 359,
+    LANG_COMMAND_CHEAT_CD               = 360,
+    LANG_COMMAND_CHEAT_POWER            = 361,
+    LANG_COMMAND_CHEAT_WW               = 362,
+    // Room for more level 2              363-399 not used
 
     // level 3 chat
     LANG_SCRIPTS_RELOADED               = 400,
@@ -1100,36 +1107,33 @@ enum TrinityStrings
     LANG_BG_SA_START_ONE_MINUTE             = 10057,
     LANG_BG_SA_START_HALF_MINUTE            = 10058,
     LANG_BG_SA_HAS_BEGUN                    = 10059,
-    LANG_BG_SA_IS_UNDER_ATTACK              = 10060, //The %s is under attack!
-    LANG_BG_SA_WAS_DESTROYED                = 10061, //The %s was destroyed!
-    LANG_BG_SA_ROUND_ONE_END                = 10062, //Round 1 - finished!
-    LANG_BG_SA_ALLIANCE_CAPTURED_RELIC      = 10063, //The Alliance captured the titan portal!
-    LANG_BG_SA_HORDE_CAPTURED_RELIC         = 10064, //The Horde captured the titan portal!
-    LANG_BG_SA_ROUND_TWO_ONE_MINUTE         = 10065, //Round 2 of the Battle for the Strand of the Ancients begins in 1 minute.
-    LANG_BG_SA_ROUND_TWO_START_HALF_MINUTE  = 10066, //Round 2 begins in 30 seconds. Prepare yourselves!
-    LANG_BG_SA_CHAMBER_BREACHED             = 10067, //The chamber has been breached! The titan relic is vulnerable!
-    LANG_BG_SA_A_GY_SOUTH                   = 10068, //The Alliance captured the South Graveyard!
-    LANG_BG_SA_A_GY_WEST                    = 10069, //The Alliance captured the West Graveyard!
-    LANG_BG_SA_A_GY_EAST                    = 10070, //The Alliance captured the East Graveyard!
-    LANG_BG_SA_H_GY_SOUTH                   = 10071, //The Horde captured the South Graveyard!
-    LANG_BG_SA_H_GY_WEST                    = 10072, //The Horde captured the West Graveyard!
-    LANG_BG_SA_H_GY_EAST                    = 10073, //The Horde captured the East Graveyard!
+    LANG_BG_SA_IS_UNDER_ATTACK              = 10060, // The %s is under attack!
+    LANG_BG_SA_WAS_DESTROYED                = 10061, // The %s was destroyed!
+    LANG_BG_SA_ROUND_ONE_END                = 10062, // Round 1 - finished!
+    LANG_BG_SA_ALLIANCE_CAPTURED_RELIC      = 10063, // The Alliance captured the titan portal!
+    LANG_BG_SA_HORDE_CAPTURED_RELIC         = 10064, // The Horde captured the titan portal!
+    LANG_BG_SA_ROUND_TWO_ONE_MINUTE         = 10065, // Round 2 of the Battle for the Strand of the Ancients begins in 1 minute.
+    LANG_BG_SA_ROUND_TWO_START_HALF_MINUTE  = 10066, // Round 2 begins in 30 seconds. Prepare yourselves!
+    LANG_BG_SA_CHAMBER_BREACHED             = 10067, // The chamber has been breached! The titan relic is vulnerable!
+    LANG_BG_SA_A_GY_SOUTH                   = 10068, // The Alliance captured the South Graveyard!
+    LANG_BG_SA_A_GY_WEST                    = 10069, // The Alliance captured the West Graveyard!
+    LANG_BG_SA_A_GY_EAST                    = 10070, // The Alliance captured the East Graveyard!
+    LANG_BG_SA_H_GY_SOUTH                   = 10071, // The Horde captured the South Graveyard!
+    LANG_BG_SA_H_GY_WEST                    = 10072, // The Horde captured the West Graveyard!
+    LANG_BG_SA_H_GY_EAST                    = 10073, // The Horde captured the East Graveyard!
 
     // Use for custom patches             11000-11999
-    LANG_AUTO_BROADCAST                 = 11000,
-    LANG_INVALID_REALMID                = 11001,
+    LANG_AUTO_BROADCAST                     = 11000,
+    LANG_INVALID_REALMID                    = 11001,
 
-    // Show Kick in world
-    LANG_COMMAND_KICKMESSAGE_WORLD = 11002,
-
-    // Show Mute in world
-    LANG_COMMAND_MUTEMESSAGE_WORLD = 11003,
+    LANG_COMMAND_KICKMESSAGE_WORLD          = 11002, // Show Kick in world
+    LANG_COMMAND_MUTEMESSAGE_WORLD          = 11003, // Show Mute in world
 
     // Show Ban in world
     LANG_BAN_CHARACTER_YOUBANNEDMESSAGE_WORLD     = 11004,
     LANG_BAN_CHARACTER_YOUPERMBANNEDMESSAGE_WORLD = 11005,
     LANG_BAN_ACCOUNT_YOUBANNEDMESSAGE_WORLD       = 11006,
-    LANG_BAN_ACCOUNT_YOUPERMBANNEDMESSAGE_WORLD   = 11007,
+    LANG_BAN_ACCOUNT_YOUPERMBANNEDMESSAGE_WORLD   = 11007
 
     // NOT RESERVED IDS                   12000-1999999999
     // `db_script_string` table index     2000000000-2000009999 (MIN_DB_SCRIPT_STRING_ID-MAX_DB_SCRIPT_STRING_ID)

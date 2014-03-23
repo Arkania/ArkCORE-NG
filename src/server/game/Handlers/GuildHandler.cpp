@@ -42,23 +42,6 @@ void WorldSession::HandleGuildQueryOpcode(WorldPacket& recvPacket)
             guild->HandleQuery(this);
 }
 
-void WorldSession::HandleGuildCreateOpcode(WorldPacket& recvPacket)
-{
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_GUILD_CREATE");
-
-    std::string name;
-    recvPacket >> name;
-
-    if (!GetPlayer()->GetGuildId())             // Player cannot be in guild
-    {
-        Guild* guild = new Guild();
-        if (guild->Create(GetPlayer(), name))
-            sGuildMgr->AddGuild(guild);
-        else
-            delete guild;
-    }
-}
-
 void WorldSession::HandleGuildInviteOpcode(WorldPacket& recvPacket)
 {
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_GUILD_INVITE");
@@ -764,7 +747,7 @@ void WorldSession::HandleGuildRewardsQueryOpcode(WorldPacket& recvPacket)
 {
     recvPacket.read_skip<uint32>(); // Unk
 
-    if (Guild* guild = sGuildMgr->GetGuildById(_player->GetGuildId()))
+    if (sGuildMgr->GetGuildById(_player->GetGuildId()))
     {
         std::vector<GuildReward> const& rewards = sGuildMgr->GetGuildRewards();
 

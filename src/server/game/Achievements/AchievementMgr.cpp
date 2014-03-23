@@ -1405,8 +1405,10 @@ void AchievementMgr<T>::UpdateAchievementCriteria(AchievementCriteriaTypes type,
                 break;
             }
             case ACHIEVEMENT_CRITERIA_TYPE_REACH_GUILD_LEVEL:
-                SetCriteriaProgress(achievementCriteria, miscValue1, referencePlayer);
+            {
+                SetCriteriaProgress(achievementCriteria, referencePlayer->GetGuildLevel(), referencePlayer, PROGRESS_SET);
                 break;
+            }
             // FIXME: not triggered in code as result, need to implement
             case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_RAID:
             case ACHIEVEMENT_CRITERIA_TYPE_PLAY_ARENA:

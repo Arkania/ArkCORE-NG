@@ -187,7 +187,7 @@ enum ItemFieldFlags
     ITEM_FLAG_UNK25         = 0x40000000, // ?
     ITEM_FLAG_UNK26         = 0x80000000, // ?
 
-    ITEM_FLAG_MAIL_TEXT_MASK = ITEM_FLAG_READABLE | ITEM_FLAG_UNK13 | ITEM_FLAG_UNK14,
+    ITEM_FLAG_MAIL_TEXT_MASK = ITEM_FLAG_READABLE | ITEM_FLAG_UNK13 | ITEM_FLAG_UNK14
 };
 
 enum ItemFlagsExtra
@@ -201,14 +201,14 @@ enum ItemFlagsExtra
     ITEM_FLAGS_EXTRA_BNET_ACCOUNT_BOUND      = 0x00020000,
     ITEM_FLAGS_EXTRA_CANNOT_BE_TRANSMOG      = 0x00200000,
     ITEM_FLAGS_EXTRA_CANNOT_TRANSMOG         = 0x00400000,
-    ITEM_FLAGS_EXTRA_CAN_TRANSMOG            = 0x00800000,
+    ITEM_FLAGS_EXTRA_CAN_TRANSMOG            = 0x00800000
 };
 
 enum ItemFlagsCustom
 {
     ITEM_FLAGS_CU_DURATION_REAL_TIME    = 0x0001,   // Item duration will tick even if player is offline
     ITEM_FLAGS_CU_IGNORE_QUEST_STATUS   = 0x0002,   // No quest status will be checked when this item drops
-    ITEM_FLAGS_CU_FOLLOW_LOOT_RULES     = 0x0004,   // Item will always follow group/master/need before greed looting rules
+    ITEM_FLAGS_CU_FOLLOW_LOOT_RULES     = 0x0004    // Item will always follow group/master/need before greed looting rules
 };
 
 enum CurrencyFlags
@@ -230,7 +230,7 @@ enum CurrencyCategory
 enum ItemVendorType
 {
     ITEM_VENDOR_TYPE_ITEM     = 1,
-    ITEM_VENDOR_TYPE_CURRENCY = 2,
+    ITEM_VENDOR_TYPE_CURRENCY = 2
 };
 
 enum BAG_FAMILY_MASK
@@ -251,7 +251,7 @@ enum BAG_FAMILY_MASK
     BAG_FAMILY_MASK_VANITY_PETS               = 0x00001000,
     BAG_FAMILY_MASK_CURRENCY_TOKENS           = 0x00002000,
     BAG_FAMILY_MASK_QUEST_ITEMS               = 0x00004000,
-    BAG_FAMILY_MASK_FISHING_SUPP              = 0x00008000,
+    BAG_FAMILY_MASK_FISHING_SUPP              = 0x00008000
 };
 
 enum SocketColor
@@ -261,7 +261,7 @@ enum SocketColor
     SOCKET_COLOR_YELLOW                         = 4,
     SOCKET_COLOR_BLUE                           = 8,
     SOCKET_COLOR_HYDRAULIC                      = 16, // not used
-    SOCKET_COLOR_COGWHEEL                       = 32,
+    SOCKET_COLOR_COGWHEEL                       = 32
 };
 
 #define SOCKET_COLOR_ALL (SOCKET_COLOR_META | SOCKET_COLOR_RED | SOCKET_COLOR_YELLOW | SOCKET_COLOR_BLUE | SOCKET_COLOR_COGWHEEL)

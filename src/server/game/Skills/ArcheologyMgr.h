@@ -40,7 +40,7 @@ enum eArcheology
     ARCHAEOLOGY_DIG_SITE_CLOSE_SURVEYBOT  = 204272,
 
     ARCHAEOLOGY_DIG_SITE_REWARD_AMMT_MIN  = 5, // Min fragments you can get.
-    ARCHAEOLOGY_DIG_SITE_REWARD_AMMT_MAX  = 9, // Max fragments you can get.
+    ARCHAEOLOGY_DIG_SITE_REWARD_AMMT_MAX  = 9  // Max fragments you can get.
 };
 
 enum eMapId
@@ -48,7 +48,7 @@ enum eMapId
     MAP_EASTERN_KINGDOMS = 0,
     MAP_KALIMDOR         = 1,
     MAP_OUTLAND          = 530,
-    MAP_NORTHREND        = 571,
+    MAP_NORTHREND        = 571
 };
 
 enum eGameObjectsEntries
@@ -61,7 +61,7 @@ enum eGameObjectsEntries
     ARCHEOLOGY_FIND_VRYKUL    = 207189,
     ARCHEOLOGY_FIND_DWARF     = 204282,
     ARCHEOLOGY_FIND_FOSSIL    = 206836,
-    ARCHEOLOGY_FIND_TOLVIR    = 207190,
+    ARCHEOLOGY_FIND_TOLVIR    = 207190
 };
 
 enum eKeyStoneEntries
@@ -74,7 +74,7 @@ enum eKeyStoneEntries
     ARCHEOLOGY_STONE_VRYKUL    = 64395,
     ARCHEOLOGY_STONE_DWARF     = 52843,
     ARCHEOLOGY_STONE_FOSSIL    = 0,
-    ARCHEOLOGY_STONE_TOLVIR    = 64397,
+    ARCHEOLOGY_STONE_TOLVIR    = 64397
 };
 
 enum eUpdateAction
@@ -82,7 +82,7 @@ enum eUpdateAction
     UPDATE_GENERATE_NEW,
     UPDATE_EXCAVATION,
     UPDATE_LOADING,
-    UPDATE_REMOVE,  
+    UPDATE_REMOVE
 };
 
 struct Artifact

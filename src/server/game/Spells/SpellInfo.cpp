@@ -335,13 +335,12 @@ SpellImplicitTargetInfo::StaticData  SpellImplicitTargetInfo::_data[TOTAL_SPELL_
     {TARGET_OBJECT_TYPE_NONE, TARGET_REFERENCE_TYPE_NONE,   TARGET_SELECT_CATEGORY_NYI,     TARGET_CHECK_DEFAULT,  TARGET_DIR_NONE},        // 127
 };
 
-SpellEffectInfo::SpellEffectInfo(SpellEntry const* spellEntry, SpellInfo const* spellInfo, uint8 effIndex)
+SpellEffectInfo::SpellEffectInfo(SpellEntry const* spellEntry, SpellInfo const* spellInfo, uint8 effIndex, SpellEffectEntry const* _effect)
 {
-    SpellEffectEntry const* _effect = spellEntry->GetSpellEffect(effIndex);
     SpellScalingEntry const* scaling = spellInfo->GetSpellScaling();
     
     _spellInfo = spellInfo;
-    _effIndex = effIndex;
+    _effIndex = _effect ? _effect->EffectIndex : effIndex;
     Effect = _effect ? _effect->Effect : 0;
     ApplyAuraName = _effect ? _effect->EffectApplyAuraName : 0;
     Amplitude = _effect ? _effect->EffectAmplitude : 0;
@@ -363,9 +362,9 @@ SpellEffectInfo::SpellEffectInfo(SpellEntry const* spellEntry, SpellInfo const* 
     TriggerSpell = _effect ? _effect->EffectTriggerSpell : 0;
     SpellClassMask = _effect ? _effect->EffectSpellClassMask : flag96(0);
     ImplicitTargetConditions = NULL;
-    ScalingMultiplier = scaling ? scaling->Multiplier[effIndex] : 0.0f;
-    DeltaScalingMultiplier = scaling ? scaling->RandomMultiplier[effIndex] : 0.0f;
-    ComboScalingMultiplier = scaling ? scaling->OtherMultiplier[effIndex] : 0.0f;
+    ScalingMultiplier = scaling ? scaling->Multiplier[_effIndex] : 0.0f;
+    DeltaScalingMultiplier = scaling ? scaling->RandomMultiplier[_effIndex] : 0.0f;
+    ComboScalingMultiplier = scaling ? scaling->OtherMultiplier[_effIndex] : 0.0f;
 }
 
 bool SpellEffectInfo::IsEffect() const
@@ -1251,7 +1250,7 @@ SpellEffectInfo::StaticData SpellEffectInfo::_data[TOTAL_SPELL_EFFECTS] =
     {EFFECT_IMPLICIT_TARGET_NONE,     TARGET_OBJECT_TYPE_UNIT}, // 182 SPELL_EFFECT_182
 };
 
-SpellInfo::SpellInfo(SpellEntry const* spellEntry)
+SpellInfo::SpellInfo(SpellEntry const* spellEntry, SpellEffectEntry const** effects)
 {
     Id = spellEntry->Id;
     Attributes = spellEntry->Attributes;
@@ -1299,7 +1298,7 @@ SpellInfo::SpellInfo(SpellEntry const* spellEntry)
 
     // SpellDifficultyEntry
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-        Effects[i] = SpellEffectInfo(spellEntry, this, i);
+        Effects[i] = SpellEffectInfo(spellEntry, this, i, effects[i]);
 
     // SpellScalingEntry
     SpellScalingEntry const* _scaling = GetSpellScaling();
@@ -1638,7 +1637,7 @@ bool SpellInfo::IsPassiveStackableWithRanks() const
 
 bool SpellInfo::IsMultiSlotAura() const
 {
-    return IsPassive() || Id == 44413;
+    return IsPassive() || Id == 40075 || Id == 44413; // No other way to make 40075 have more than 1 copy of aura
 }
 
 bool SpellInfo::IsStackableOnOneSlotWithDifferentCasters() const
@@ -3234,11 +3233,6 @@ SpellClassOptionsEntry const* SpellInfo::GetSpellClassOptions() const
 SpellCooldownsEntry const* SpellInfo::GetSpellCooldowns() const
 {
     return SpellCooldownsId ? sSpellCooldownsStore.LookupEntry(SpellCooldownsId) : NULL;
-}
-
-SpellEffectEntry const* SpellEntry::GetSpellEffect(uint32 eff) const
-{
-    return GetSpellEffectEntry(Id, eff);
 }
 
 void SpellInfo::_UnloadImplicitTargetConditionLists()

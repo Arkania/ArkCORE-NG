@@ -85,7 +85,7 @@ enum WintergraspSpells
     SPELL_ALLIANCE_CONTROLS_FACTORY_PHASE_SHIFT = 56617, // ADDS PHASE 32
 
     SPELL_HORDE_CONTROL_PHASE_SHIFT             = 55773, // ADDS PHASE 64
-    SPELL_ALLIANCE_CONTROL_PHASE_SHIFT          = 55774, // ADDS PHASE 128
+    SPELL_ALLIANCE_CONTROL_PHASE_SHIFT          = 55774  // ADDS PHASE 128
 };
 
 enum WintergraspData
@@ -98,7 +98,7 @@ enum WintergraspData
     BATTLEFIELD_WG_DATA_MAX_VEHICLE_H,
     BATTLEFIELD_WG_DATA_VEHICLE_A,
     BATTLEFIELD_WG_DATA_VEHICLE_H,
-    BATTLEFIELD_WG_DATA_MAX,
+    BATTLEFIELD_WG_DATA_MAX
 };
 
 enum WintergraspAchievements
@@ -118,7 +118,7 @@ enum WintergraspAchievements
     ACHIEVEMENTS_STONE_KEEPER_1000               = 2089, // todo
     ACHIEVEMENTS_WG_RANGER                       = 2199, // todo
     ACHIEVEMENTS_DESTRUCTION_DERBY_H             = 2476, // todo
-    ACHIEVEMENTS_WG_MASTER_H                     = 2776, // todo
+    ACHIEVEMENTS_WG_MASTER_H                     = 2776  // todo
 };
 
 enum WintergraspWorldStates
@@ -130,7 +130,7 @@ enum WintergraspWorldStates
     BATTLEFIELD_WG_WORLD_STATE_ACTIVE            = 3801,
     BATTLEFIELD_WG_WORLD_STATE_DEFENDER          = 3802,
     BATTLEFIELD_WG_WORLD_STATE_ATTACKER          = 3803,
-    BATTLEFIELD_WG_WORLD_STATE_SHOW_WORLDSTATE   = 3710,
+    BATTLEFIELD_WG_WORLD_STATE_SHOW_WORLDSTATE   = 3710
 };
 
 enum WintergraspAreaIds
@@ -141,7 +141,7 @@ enum WintergraspAreaIds
     AREA_WESTPARK_WORKSHOP          = 4611,
     AREA_EASTPARK_WORKSHOP          = 4612,
     AREA_WINTERGRASP                = 4197,
-    AREA_THE_CHILLED_QUAGMIRE       = 4589,
+    AREA_THE_CHILLED_QUAGMIRE       = 4589
 };
 
 /*#########################
@@ -168,7 +168,7 @@ enum WGGraveyardId
     BATTLEFIELD_WG_GY_KEEP,
     BATTLEFIELD_WG_GY_HORDE,
     BATTLEFIELD_WG_GY_ALLIANCE,
-    BATTLEFIELD_WG_GRAVEYARD_MAX,
+    BATTLEFIELD_WG_GRAVEYARD_MAX
 };
 
 enum WGGossipText
@@ -179,7 +179,7 @@ enum WGGossipText
     BATTLEFIELD_WG_GOSSIPTEXT_GY_SW              = -1850503,
     BATTLEFIELD_WG_GOSSIPTEXT_GY_KEEP            = -1850500,
     BATTLEFIELD_WG_GOSSIPTEXT_GY_HORDE           = -1850505,
-    BATTLEFIELD_WG_GOSSIPTEXT_GY_ALLIANCE        = -1850506,
+    BATTLEFIELD_WG_GOSSIPTEXT_GY_ALLIANCE        = -1850506
 };
 
 enum WintergraspNpcs
@@ -216,7 +216,7 @@ enum WintergraspNpcs
     NPC_WINTERGRASP_SIEGE_ENGINE_HORDE              = 32627,
     NPC_WINTERGRASP_CATAPULT                        = 27881,
     NPC_WINTERGRASP_DEMOLISHER                      = 28094,
-    NPC_WINTERGRASP_TOWER_CANNON                    = 28366,
+    NPC_WINTERGRASP_TOWER_CANNON                    = 28366
 };
 
 struct BfWGCoordGY
@@ -234,7 +234,7 @@ struct BfWGCoordGY
 uint32 const WGQuest[2][6] =
 {
     { 13186, 13181, 13222, 13538, 13177, 13179 },
-    { 13185, 13183, 13223, 13539, 13178, 13180 },
+    { 13185, 13183, 13223, 13539, 13178, 13180 }
 };
 // 7 in sql, 7 in header
 BfWGCoordGY const WGGraveYard[BATTLEFIELD_WG_GRAVEYARD_MAX] =
@@ -245,7 +245,7 @@ BfWGCoordGY const WGGraveYard[BATTLEFIELD_WG_GRAVEYARD_MAX] =
     { 4331.716f, 3235.695f, 390.251f, 0.008500f, 1334, BATTLEFIELD_WG_GY_WORKSHOP_SW, BATTLEFIELD_WG_GOSSIPTEXT_GY_SW, TEAM_NEUTRAL },
     { 5537.986f, 2897.493f, 517.057f, 4.819249f, 1285, BATTLEFIELD_WG_GY_KEEP, BATTLEFIELD_WG_GOSSIPTEXT_GY_KEEP, TEAM_NEUTRAL },
     { 5032.454f, 3711.382f, 372.468f, 3.971623f, 1331, BATTLEFIELD_WG_GY_HORDE, BATTLEFIELD_WG_GOSSIPTEXT_GY_HORDE, TEAM_HORDE },
-    { 5140.790f, 2179.120f, 390.950f, 1.972220f, 1332, BATTLEFIELD_WG_GY_ALLIANCE, BATTLEFIELD_WG_GOSSIPTEXT_GY_ALLIANCE, TEAM_ALLIANCE },
+    { 5140.790f, 2179.120f, 390.950f, 1.972220f, 1332, BATTLEFIELD_WG_GY_ALLIANCE, BATTLEFIELD_WG_GOSSIPTEXT_GY_ALLIANCE, TEAM_ALLIANCE }
 };
 
 /* ######################### *
@@ -492,7 +492,7 @@ enum WintergraspTeamControl
 {
     BATTLEFIELD_WG_TEAM_ALLIANCE,
     BATTLEFIELD_WG_TEAM_HORDE,
-    BATTLEFIELD_WG_TEAM_NEUTRAL,
+    BATTLEFIELD_WG_TEAM_NEUTRAL
 };
 
 // TODO: Handle this with creature_text ?
@@ -520,7 +520,7 @@ enum WintergraspText
     BATTLEFIELD_WG_TEXT_TOWER_NAME_E             = 12070,
     BATTLEFIELD_WG_TEXT_TOWER_NAME_W             = 12071,
     BATTLEFIELD_WG_TEXT_DEFEND_KEEP              = 12068,
-    BATTLEFIELD_WG_TEXT_WIN_KEEP                 = 12072,
+    BATTLEFIELD_WG_TEXT_WIN_KEEP                 = 12072
 };
 
 enum WintergraspGameObject
@@ -542,7 +542,7 @@ enum WintergraspGameObject
     GO_WINTERGRASP_FLAMEWATCH_TOWER              = 190358,
 
     GO_WINTERGRASP_FORTRESS_GATE                 = 190375,
-    GO_WINTERGRASP_VAULT_GATE                    = 191810,
+    GO_WINTERGRASP_VAULT_GATE                    = 191810
 };
 
 struct WintergraspObjectPositionData
@@ -798,7 +798,7 @@ const WintergraspObjectPositionData WGOutsideNPC[WG_MAX_OUTSIDE_NPC] =
     { 5088.49f, 2188.18f, 365.647f, 5.253f, 0, BATTLEFIELD_WG_NPC_TACTICAL_OFFICER_AHBRAMIS },
     { 5095.67f, 2193.28f, 365.924f, 4.939f, 0, BATTLEFIELD_WG_NPC_SIEGE_MASTER_STOUTHANDLE },
     { 5088.61f, 2167.66f, 365.689f, 0.680f, 0, BATTLEFIELD_WG_NPC_ANCHORITE_TESSA },
-    { 5080.40f, 2199.00f, 359.489f, 2.967f, 0, BATTLEFIELD_WG_NPC_SENIOR_DEMOLITIONIST_LEGOSO },
+    { 5080.40f, 2199.00f, 359.489f, 2.967f, 0, BATTLEFIELD_WG_NPC_SENIOR_DEMOLITIONIST_LEGOSO }
 };
 
 struct WintergraspTeleporterData
@@ -825,7 +825,7 @@ const WintergraspTeleporterData WGPortalDefenderData[WG_MAX_TELEPORTER] =
     { 190763, 5401.62f, 2853.66f, 418.674f, 2.6354f },
     // Vehicle teleporter
     { 192951, 5314.51f, 2703.69f, 408.550f, -0.890f },
-    { 192951, 5316.25f, 2977.04f, 408.539f, -0.820f },
+    { 192951, 5316.25f, 2977.04f, 408.539f, -0.820f }
 };
 
 // *********************************************************
@@ -1125,9 +1125,9 @@ const WGWorkshopData WorkshopsData[WG_MAX_WORKSHOP] =
     // SW
     {BATTLEFIELD_WG_WORKSHOP_SW, WORLDSTATE_WORKSHOP_SW, BATTLEFIELD_WG_TEXT_WORKSHOP_NAME_SW},
     // KEEP WEST - It can't be taken, so it doesn't have a textid
-    {BATTLEFIELD_WG_WORKSHOP_KEEP_WEST, WORLDSTATE_WORKSHOP_K_W, NULL},
+    {BATTLEFIELD_WG_WORKSHOP_KEEP_WEST, WORLDSTATE_WORKSHOP_K_W, 0},
     // KEEP EAST - It can't be taken, so it doesn't have a textid
-    {BATTLEFIELD_WG_WORKSHOP_KEEP_EAST, WORLDSTATE_WORKSHOP_K_E, NULL}
+    {BATTLEFIELD_WG_WORKSHOP_KEEP_EAST, WORLDSTATE_WORKSHOP_K_E, 0}
 };
 
 // ********************************************************************

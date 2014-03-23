@@ -221,7 +221,7 @@ enum CUFBoolOptions
     CUF_UNK_156,
     CUF_UNK_157,
 
-    CUF_BOOL_OPTIONS_COUNT,
+    CUF_BOOL_OPTIONS_COUNT
 };
 
 /// Represents a CompactUnitFrame profile
@@ -263,9 +263,12 @@ struct CUFProfile
     uint8 SortBy;
     uint8 HealthText;
 
+    // LeftAlign, TopAlight, BottomAllign (unk order)
     uint8 Unk146;
     uint8 Unk147;
     uint8 Unk148;
+
+    // LeftOffset, TopOffset and BottomOffset (unk order)
     uint16 Unk150;
     uint16 Unk152;
     uint16 Unk154;
@@ -465,7 +468,7 @@ struct Areas
 enum RuneCooldowns
 {
     RUNE_BASE_COOLDOWN  = 10000,
-    RUNE_MISS_COOLDOWN  = 0,     // cooldown applied on runes when the spell misses
+    RUNE_MISS_COOLDOWN  = 0      // cooldown applied on runes when the spell misses
 };
 
 enum RuneType
@@ -526,38 +529,38 @@ enum DrunkenState
 
 enum PlayerFlags
 {
-    PLAYER_FLAGS_GROUP_LEADER = 0x00000001,
-    PLAYER_FLAGS_AFK          = 0x00000002,
-    PLAYER_FLAGS_DND          = 0x00000004,
-    PLAYER_FLAGS_GM           = 0x00000008,
-    PLAYER_FLAGS_GHOST        = 0x00000010,
-    PLAYER_FLAGS_RESTING      = 0x00000020,
-    PLAYER_FLAGS_UNK6         = 0x00000040,
-    PLAYER_FLAGS_UNK7         = 0x00000080, // pre-3.0.3 PLAYER_FLAGS_FFA_PVP flag for FFA PVP state
-    PLAYER_FLAGS_CONTESTED_PVP = 0x00000100, // Player has been involved in a PvP combat and will be attacked by contested guards
-    PLAYER_FLAGS_IN_PVP       = 0x00000200,
-    PLAYER_FLAGS_HIDE_HELM    = 0x00000400,
-    PLAYER_FLAGS_HIDE_CLOAK   = 0x00000800,
-    PLAYER_FLAGS_PLAYED_LONG_TIME = 0x00001000, // played long time
-    PLAYER_FLAGS_PLAYED_TOO_LONG  = 0x00002000, // played too long time
-    PLAYER_FLAGS_IS_OUT_OF_BOUNDS = 0x00004000,
-    PLAYER_FLAGS_DEVELOPER    = 0x00008000, // <Dev> prefix for something?
-    PLAYER_FLAGS_UNK16        = 0x00010000, // pre-3.0.3 PLAYER_FLAGS_SANCTUARY flag for player entered sanctuary
-    PLAYER_FLAGS_TAXI_BENCHMARK = 0x00020000, // taxi benchmark mode (on/off) (2.0.1)
-    PLAYER_FLAGS_PVP_TIMER    = 0x00040000, // 3.0.2, pvp timer active (after you disable pvp manually)
-    PLAYER_FLAGS_UNK19        = 0x00080000,
-    PLAYER_FLAGS_UNK20        = 0x00100000,
-    PLAYER_FLAGS_UNK21        = 0x00200000,
-    PLAYER_FLAGS_COMMENTATOR2 = 0x00400000,
-    PLAYER_ALLOW_ONLY_ABILITY = 0x00800000, // used by bladestorm and killing spree, allowed only spells with SPELL_ATTR0_REQ_AMMO, SPELL_EFFECT_ATTACK, checked only for active player
-    PLAYER_FLAGS_UNK24        = 0x01000000, // disabled all melee ability on tab include autoattack
-    PLAYER_FLAGS_NO_XP_GAIN   = 0x02000000,
-    PLAYER_FLAGS_UNK26        = 0x04000000,
-    PLAYER_FLAGS_AUTO_DECLINE_GUILD  = 0x08000000, // Hmm guild decline auto is active?
-    PLAYER_FLAGS_GUILD_LEVEL_ENABLED = 0x10000000, // Lua_GetGuildLevelEnabled() - enables guild leveling related UI
-    PLAYER_FLAGS_VOID_UNLOCKED       = 0x20000000, // void storage
-    PLAYER_FLAGS_UNK30        = 0x40000000,
-    PLAYER_FLAGS_UNK31        = 0x80000000,
+    PLAYER_FLAGS_GROUP_LEADER           = 0x00000001,
+    PLAYER_FLAGS_AFK                    = 0x00000002,
+    PLAYER_FLAGS_DND                    = 0x00000004,
+    PLAYER_FLAGS_GM                     = 0x00000008,
+    PLAYER_FLAGS_GHOST                  = 0x00000010,
+    PLAYER_FLAGS_RESTING                = 0x00000020,
+    PLAYER_FLAGS_UNK6                   = 0x00000040,
+    PLAYER_FLAGS_UNK7                   = 0x00000080,       // pre-3.0.3 PLAYER_FLAGS_FFA_PVP flag for FFA PVP state
+    PLAYER_FLAGS_CONTESTED_PVP          = 0x00000100,       // Player has been involved in a PvP combat and will be attacked by contested guards
+    PLAYER_FLAGS_IN_PVP                 = 0x00000200,
+    PLAYER_FLAGS_HIDE_HELM              = 0x00000400,
+    PLAYER_FLAGS_HIDE_CLOAK             = 0x00000800,
+    PLAYER_FLAGS_PLAYED_LONG_TIME       = 0x00001000,       // played long time
+    PLAYER_FLAGS_PLAYED_TOO_LONG        = 0x00002000,       // played too long time
+    PLAYER_FLAGS_IS_OUT_OF_BOUNDS       = 0x00004000,
+    PLAYER_FLAGS_DEVELOPER              = 0x00008000,       // <Dev> prefix for something?
+    PLAYER_FLAGS_UNK16                  = 0x00010000,       // pre-3.0.3 PLAYER_FLAGS_SANCTUARY flag for player entered sanctuary
+    PLAYER_FLAGS_TAXI_BENCHMARK         = 0x00020000,       // taxi benchmark mode (on/off) (2.0.1)
+    PLAYER_FLAGS_PVP_TIMER              = 0x00040000,       // 3.0.2, pvp timer active (after you disable pvp manually)
+    PLAYER_FLAGS_UNK19                  = 0x00080000,
+    PLAYER_FLAGS_UNK20                  = 0x00100000,
+    PLAYER_FLAGS_UNK21                  = 0x00200000,
+    PLAYER_FLAGS_COMMENTATOR2           = 0x00400000,
+    PLAYER_ALLOW_ONLY_ABILITY           = 0x00800000,       // used by bladestorm and killing spree, allowed only spells with SPELL_ATTR0_REQ_AMMO, SPELL_EFFECT_ATTACK, checked only for active player
+    PLAYER_FLAGS_UNK24                  = 0x01000000,       // disabled all melee ability on tab include autoattack
+    PLAYER_FLAGS_NO_XP_GAIN             = 0x02000000,
+    PLAYER_FLAGS_UNK26                  = 0x04000000,
+    PLAYER_FLAGS_AUTO_DECLINE_GUILD     = 0x08000000,       // Automatically declines guild invites
+    PLAYER_FLAGS_GUILD_LEVEL_ENABLED    = 0x10000000,       // Lua_GetGuildLevelEnabled() - enables guild leveling related UI
+    PLAYER_FLAGS_VOID_UNLOCKED          = 0x20000000,       // void storage
+    PLAYER_FLAGS_UNK30                  = 0x40000000,
+    PLAYER_FLAGS_UNK31                  = 0x80000000
 };
 
 #define KNOWN_TITLES_SIZE   4
@@ -773,7 +776,7 @@ enum TradeSlots
     TRADE_SLOT_COUNT            = 7,
     TRADE_SLOT_TRADED_COUNT     = 6,
     TRADE_SLOT_NONTRADED        = 6,
-    TRADE_SLOT_INVALID          = -1,
+    TRADE_SLOT_INVALID          = -1
 };
 
 enum TransferAbortReason
@@ -795,7 +798,7 @@ enum TransferAbortReason
     TRANSFER_ABORT_REALM_ONLY                   = 0x0F,         // All players on party must be from the same realm.
     TRANSFER_ABORT_MAP_NOT_ALLOWED              = 0x10,         // Map can't be entered at this time.
     TRANSFER_ABORT_LOCKED_TO_DIFFERENT_INSTANCE = 0x12,         // 4.2.2
-    TRANSFER_ABORT_ALREADY_COMPLETED_ENCOUNTER  = 0x13,         // 4.2.2
+    TRANSFER_ABORT_ALREADY_COMPLETED_ENCOUNTER  = 0x13          // 4.2.2
 };
 
 enum InstanceResetWarningType
@@ -842,7 +845,7 @@ enum TeleportToOptions
     TELE_TO_NOT_LEAVE_TRANSPORT = 0x02,
     TELE_TO_NOT_LEAVE_COMBAT    = 0x04,
     TELE_TO_NOT_UNSUMMON_PET    = 0x08,
-    TELE_TO_SPELL               = 0x10,
+    TELE_TO_SPELL               = 0x10
 };
 
 /// Type of environmental damages
@@ -864,7 +867,7 @@ enum PlayerChatTag
     CHAT_TAG_DND        = 0x02,
     CHAT_TAG_GM         = 0x04,
     CHAT_TAG_COM        = 0x08, // Commentator
-    CHAT_TAG_DEV        = 0x10,
+    CHAT_TAG_DEV        = 0x10
 };
 
 enum PlayedTimeIndex
@@ -913,7 +916,7 @@ enum PlayerLoginQueryIndex
     PLAYER_LOGIN_QUERY_LOADVOIDSTORAGE          = 32,
     PLAYER_LOGIN_QUERY_LOADCURRENCY             = 33,
     PLAYER_LOGIN_QUERY_LOAD_CUF_PROFILES        = 34,
-    MAX_PLAYER_LOGIN_QUERY,
+    MAX_PLAYER_LOGIN_QUERY
 };
 
 enum PlayerDelayedOperations
@@ -1469,7 +1472,7 @@ class Player : public Unit, public GridObject<Player>
         uint32 GetCurrencyOnWeek(uint32 id) const;
         bool HasCurrency(uint32 id, uint32 count) const;
         void SetCurrency(uint32 id, uint32 count, bool printLog = true);
-        void ModifyCurrency(uint32 id, int32 count, bool printLog = true);
+        void ModifyCurrency(uint32 id, int32 count, bool printLog = true, bool ignoreMultipliers = false);
         void ResetCurrencyWeekCap();
 
         void ApplyEquipCooldown(Item* pItem);
@@ -2109,7 +2112,9 @@ class Player : public Unit, public GridObject<Player>
         float OCTRegenMPPerSpirit();
         float GetRatingMultiplier(CombatRating cr) const;
         float GetRatingBonusValue(CombatRating cr) const;
-        uint32 GetBaseSpellPowerBonus() {  return m_spellPowerFromIntellect + m_baseSpellPower; }
+
+        /// Returns base spellpower bonus from spellpower stat on items, without spellpower from intellect stat
+        uint32 GetBaseSpellPowerBonus() const { return m_baseSpellPower; }
         int32 GetSpellPenetrationItemMod() const { return m_spellPenetrationItemMod; }
 
         float GetExpertiseDodgeOrParryReduction(WeaponAttackType attType) const;
@@ -2774,8 +2779,6 @@ class Player : public Unit, public GridObject<Player>
         void AddRunePower(uint8 index);
         void InitRunes();
 
-        AchievementMgr<Player>& GetAchievementMgr() { return m_achievementMgr; }
-        AchievementMgr<Player> const& GetAchievementMgr() const { return m_achievementMgr; }
         void SendRespondInspectAchievements(Player* player) const;
         uint32 GetAchievementPoints() const;
         bool HasAchieved(uint32 achievementId) const;

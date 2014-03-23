@@ -126,7 +126,8 @@ public:
 
         void Reset()
         {
-            instance->SetData(DATA_PRINCEKELESETH_EVENT, NOT_STARTED);
+            if (instance)
+                instance->SetData(DATA_PRINCEKELESETH_EVENT, NOT_STARTED);
 
             events.Reset();
             events.ScheduleEvent(EVENT_SHADOWBOLT, urand(2,3)*IN_MILLISECONDS);
@@ -141,13 +142,15 @@ public:
         void EnterCombat(Unit* /*who*/)
         {
             me->SetInCombatWithZone();
-            instance->SetData(DATA_PRINCEKELESETH_EVENT, IN_PROGRESS);
+            if (instance)
+                instance->SetData(DATA_PRINCEKELESETH_EVENT, IN_PROGRESS);
             Talk(SAY_START_COMBAT);
         }
 
         void JustDied(Unit* /*killer*/)
         {
-            instance->SetData(DATA_PRINCEKELESETH_EVENT, DONE);
+            if (instance)
+                instance->SetData(DATA_PRINCEKELESETH_EVENT, DONE);
             summons.DespawnAll();
             Talk(SAY_DEATH);
         }

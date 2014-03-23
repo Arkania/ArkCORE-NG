@@ -182,6 +182,23 @@ public:
             me->RemoveAurasDueToSpell(SPELL_SUBMERGE);
         }
 
+        void MoveInLineOfSight(Unit* who)
+        {
+            if (!who)
+                return;
+
+            if (me->IsInCombat())
+                return;
+
+            if (who->GetTypeId() != TYPEID_PLAYER)
+                return;
+
+            if (me->GetDistance(who) > 50.0f)
+                return;
+
+            AttackStartNoMove(who);
+        }
+
         void EnterCombat(Unit* who)
         {
             me->AddThreat(who, 10000.0f);
@@ -413,6 +430,7 @@ public:
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 me->Yell(SUFF_SAY_RECAP, LANG_UNIVERSAL, 0);
                 DoScriptText(SUFF_SAY_RECAP, me);
+                me->SetReactState(REACT_PASSIVE);
             }
         }
 
@@ -533,6 +551,7 @@ public:
                 damage = 0;
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 DoScriptText(SUFF_SAY_RECAP, me);
+                me->SetReactState(REACT_PASSIVE);
             }
             else
             {

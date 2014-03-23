@@ -1124,7 +1124,7 @@ public:
 
         int32 amount = (uint32)atoi(args);
 
-        target->ModifyCurrency(CURRENCY_TYPE_HONOR_POINTS, amount);
+        target->ModifyCurrency(CURRENCY_TYPE_HONOR_POINTS, amount, true, true);
 
         handler->PSendSysMessage(LANG_COMMAND_MODIFY_HONOR, handler->GetNameLink(target).c_str(), target->GetCurrency(CURRENCY_TYPE_HONOR_POINTS));
 
@@ -1162,7 +1162,7 @@ public:
         return false;
     }
 
-        target->ModifyCurrency(uint32(currencyid), amount);
+        target->ModifyCurrency(uint32(currencyid), amount, true, true);
 
         handler->PSendSysMessage(LANG_COMMAND_MODIFY_HONOR, handler->GetNameLink(target).c_str(), target->GetCurrency(uint32(currencyid)));
         return true;
@@ -1353,7 +1353,7 @@ public:
 
         int32 amount = (uint32)atoi(args);
 
-        target->ModifyCurrency(CURRENCY_TYPE_CONQUEST_POINTS, amount);
+        target->ModifyCurrency(CURRENCY_TYPE_CONQUEST_POINTS, amount, true, true);
 
         handler->PSendSysMessage(LANG_COMMAND_MODIFY_ARENA, handler->GetNameLink(target).c_str(), target->GetCurrency(CURRENCY_TYPE_CONQUEST_POINTS));
 

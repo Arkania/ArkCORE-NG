@@ -1175,16 +1175,11 @@ void Creature::SelectLevel(const CreatureTemplate* cinfo)
     {
         case CLASS_WARRIOR:
             setPowerType(POWER_RAGE);
-            SetMaxPower(POWER_RAGE, 0);
-            SetPower(POWER_RAGE, 0);
             break;
         case CLASS_ROGUE:
             setPowerType(POWER_ENERGY);
-            SetMaxPower(POWER_ENERGY, 0);
-            SetPower(POWER_ENERGY, 0);
             break;
         default:
-            setPowerType(POWER_MANA);
             SetMaxPower(POWER_MANA, mana);
             SetPower(POWER_MANA, mana);
             break;
@@ -1194,15 +1189,15 @@ void Creature::SelectLevel(const CreatureTemplate* cinfo)
     SetModifierValue(UNIT_MOD_MANA, BASE_VALUE, (float)mana);
 
     //damage
-    float damagemod = 1.0f;//_GetDamageMod(rank);
+    //float damagemod = _GetDamageMod(rank);      // Set during loading templates into dmg_multiplier field
 
-    SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, cinfo->mindmg * damagemod);
-    SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, cinfo->maxdmg * damagemod);
+    SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, cinfo->mindmg);
+    SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, cinfo->maxdmg);
 
-    SetFloatValue(UNIT_FIELD_MINRANGEDDAMAGE, cinfo->minrangedmg * damagemod);
-    SetFloatValue(UNIT_FIELD_MAXRANGEDDAMAGE, cinfo->maxrangedmg * damagemod);
+    SetFloatValue(UNIT_FIELD_MINRANGEDDAMAGE, cinfo->minrangedmg);
+    SetFloatValue(UNIT_FIELD_MAXRANGEDDAMAGE, cinfo->maxrangedmg);
 
-    SetModifierValue(UNIT_MOD_ATTACK_POWER, BASE_VALUE, cinfo->attackpower * damagemod);
+    SetModifierValue(UNIT_MOD_ATTACK_POWER, BASE_VALUE, cinfo->attackpower);
 
 }
 
@@ -2507,7 +2502,7 @@ void Creature::SetPosition(float x, float y, float z, float o)
 
     GetMap()->CreatureRelocation(ToCreature(), x, y, z, o);
     if (IsVehicle())
-        GetVehicleKit()->RelocatePassengers(x, y, z, o);
+        GetVehicleKit()->RelocatePassengers();
 }
 
 bool Creature::IsDungeonBoss() const

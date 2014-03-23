@@ -396,7 +396,6 @@ void WorldSession::HandleMoveWaterWalkAck(WorldPacket& recvData)
 void WorldSession::HandleForceSpeedChangeAck(WorldPacket &recvData)
 {
     uint32 opcode = recvData.GetOpcode();
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recvd %s (%u, 0x%X) opcode", LookupOpcodeName(Opcodes(opcode)), opcode, opcode);
 
     float newspeed = 0.0f;
     MovementInfo movementInfo;

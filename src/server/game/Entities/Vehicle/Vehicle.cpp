@@ -440,7 +440,7 @@ void Vehicle::RemovePassenger(Unit* unit)
 }
 
 //! Must be called after m_base::Relocate
-void Vehicle::RelocatePassengers(float x, float y, float z, float ang)
+void Vehicle::RelocatePassengers()
 {
     ASSERT(_me->GetMap());
 
@@ -454,6 +454,7 @@ void Vehicle::RelocatePassengers(float x, float y, float z, float ang)
             float px, py, pz, po;
             passenger->m_movementInfo.t_pos.GetPosition(px, py, pz, po);
             CalculatePassengerPosition(px, py, pz, po);
+
             passenger->UpdatePosition(px, py, pz, po);
         }
     }

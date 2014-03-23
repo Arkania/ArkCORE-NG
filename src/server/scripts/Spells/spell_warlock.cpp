@@ -42,6 +42,10 @@ enum WarlockSpells
     SPELL_WARLOCK_HAUNT_HEAL                      = 48210,
     SPELL_WARLOCK_SOULSHATTER                     = 32835,
     SPELL_WARLOCK_UNSTABLE_AFFLICTION_DISPEL      = 31117,
+    SPELL_WARLOCK_IMPROVED_HEALTH_FUNNEL_R1       = 18703,
+    SPELL_WARLOCK_IMPROVED_HEALTH_FUNNEL_R2       = 18704,
+    SPELL_WARLOCK_IMPROVED_HEALTH_FUNNEL_BUFF_R1  = 60955,
+    SPELL_WARLOCK_IMPROVED_HEALTH_FUNNEL_BUFF_R2  = 60956,
 };
 
 // 710 - Banish
@@ -69,7 +73,7 @@ public:
             {
                 if (target->GetAuraEffect(SPELL_AURA_SCHOOL_IMMUNITY, SPELLFAMILY_WARLOCK, 0, 0x08000000, 0))
                 {
-                    //No need to remove old aura since its removed due to not stack by current Banish aura
+                    // No need to remove old aura since its removed due to not stack by current Banish aura
                     PreventHitDefaultEffect(EFFECT_0);
                     PreventHitDefaultEffect(EFFECT_1);
                     PreventHitDefaultEffect(EFFECT_2);
@@ -1044,6 +1048,48 @@ public:
     }
 };
 
+class spell_warl_health_funnel : public SpellScriptLoader
+{
+public:
+    spell_warl_health_funnel() : SpellScriptLoader("spell_warl_health_funnel") { }
+
+    class spell_warl_health_funnel_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_warl_health_funnel_AuraScript);
+
+        void ApplyEffect(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            Unit* caster = GetCaster();
+            if (!caster)
+                return;
+
+            Unit* target = GetTarget();
+            if (caster->HasAura(SPELL_WARLOCK_IMPROVED_HEALTH_FUNNEL_R2))
+                target->CastSpell(target, SPELL_WARLOCK_IMPROVED_HEALTH_FUNNEL_BUFF_R2, true);
+            else if (caster->HasAura(SPELL_WARLOCK_IMPROVED_HEALTH_FUNNEL_R1))
+                target->CastSpell(target, SPELL_WARLOCK_IMPROVED_HEALTH_FUNNEL_BUFF_R1, true);
+        }
+
+        void RemoveEffect(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            Unit* target = GetTarget();
+            target->RemoveAurasDueToSpell(SPELL_WARLOCK_IMPROVED_HEALTH_FUNNEL_BUFF_R1);
+            target->RemoveAurasDueToSpell(SPELL_WARLOCK_IMPROVED_HEALTH_FUNNEL_BUFF_R2);
+        }
+
+        void Register()
+        {
+            OnEffectRemove += AuraEffectRemoveFn(spell_warl_health_funnel_AuraScript::RemoveEffect, EFFECT_0, SPELL_AURA_PERIODIC_HEAL, AURA_EFFECT_HANDLE_REAL);
+            OnEffectApply += AuraEffectApplyFn(spell_warl_health_funnel_AuraScript::ApplyEffect, EFFECT_0, SPELL_AURA_PERIODIC_HEAL, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_warl_health_funnel_AuraScript();
+    }
+};
+
 void AddSC_warlock_spell_scripts()
 {
     new spell_warl_banish();
@@ -1067,4 +1113,5 @@ void AddSC_warlock_spell_scripts()
     new spell_warl_soul_burn();
     new spell_warl_soulshatter();
     new spell_warl_unstable_affliction();
+    new spell_warl_health_funnel();
 }

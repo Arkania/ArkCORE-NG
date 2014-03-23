@@ -387,7 +387,7 @@ pAuraEffectHandler AuraEffectHandler[TOTAL_AURAS]=
     &AuraEffect::HandleNULL,                                      //327 SPELL_AURA_327 No spells 4.3.4
     &AuraEffect::HandleNULL,                                      //328 SPELL_AURA_328 // Somehow checks powers - see for Eclipse (79577). NOT NEEDED.
     &AuraEffect::HandleNULL,                                      //329 SPELL_AURA_MOD_RUNE_REGEN_SPEED
-    &AuraEffect::HandleNoImmediateEffect,                         //330 SPELL_AURA_WALK_AND_CAST
+    &AuraEffect::HandleNoImmediateEffect,                         //330 SPELL_AURA_CAST_WHILE_WALKING
     &AuraEffect::HandleAuraForceWeather,                          //331 SPELL_AURA_FORCE_WEATHER // Just 93719.
     &AuraEffect::HandleNoImmediateEffect,                         //332 SPELL_AURA_OVERRIDE_ACTIONBAR_SPELLS implemented in WorldSession::HandleCastSpellOpcode
     &AuraEffect::HandleNoImmediateEffect,                         //333 SPELL_AURA_OVERRIDE_ACTIONBAR_SPELLS_2 implemented in WorldSession::HandleCastSpellOpcode
@@ -406,7 +406,7 @@ pAuraEffectHandler AuraEffectHandler[TOTAL_AURAS]=
     &AuraEffect::HandleAuraProgressBar,                           //346 SPELL_AURA_PROGRESS_BAR
     &AuraEffect::HandleNULL,                                      //347 SPELL_AURA_MOD_SPELL_COOLDOWN_BY_HASTE
     &AuraEffect::HandleNoImmediateEffect,                         //348 SPELL_AURA_DEPOSIT_BONUS_MONEY_IN_GUILD_BANK_ON_LOOT
-    &AuraEffect::HandleNULL,                                      //349 SPELL_AURA_MOD_CURRENCY_GAIN
+    &AuraEffect::HandleNoImmediateEffect,                         //349 SPELL_AURA_MOD_CURRENCY_GAIN
     &AuraEffect::HandleNULL,                                      //350 SPELL_AURA_MOD_GATHERING_ITEMS_GAINED_PERCENT
     &AuraEffect::HandleNULL,                                      //351 SPELL_AURA_351 // Survey Mastery - Archaeology (Find aditional fragments).
     &AuraEffect::HandleNULL,                                      //352 SPELL_AURA_352 // Enable switch between forms (94293 just).
@@ -804,35 +804,38 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
                 m_canBeRecalculated = false;
             }
             break;
-    case SPELL_AURA_MOD_RESISTANCE_EXCLUSIVE:
+        case SPELL_AURA_MOD_RESISTANCE_EXCLUSIVE:
         {
-        if (caster)
-        {
-            int32 resist = caster->getLevel();
-            if (resist <= 70) {
-            }
-            else if (resist > 70 && resist < 81) {
-                resist += (resist - 70) * 5;
-            }
-            else if (resist > 80 && resist <= 85) {
-                resist += ((resist - 70) * 5 + (resist - 80) * 7);
-            }
-            switch (GetId())
+            if (caster)
             {
-            case 20043: // Aspect of the Wild
-            case 8185: // Elemental Resistance
-            case 19891: // Resistance Aura
-            case 79107: // Shadow Protection
-                amount = resist;
-                break;
-            case 79060: // Mark of the Wild
-            case 79062: // Blessing of Kings
-                amount = resist / 2;
+                int32 resist = caster->getLevel();
+                if (resist <= 70) { }
+                else if (resist > 70 && resist < 81) {
+                    resist += (resist - 70) * 5;
+                }
+                else if (resist > 80 && resist <= 85) {
+                    resist += ((resist - 70) * 5 + (resist - 80) * 7);
+                }
+                switch (GetId())
+                {
+                    case 20043: // Aspect of the Wild
+                    case 8185:  // Elemental Resistance
+                    case 19891: // Resistance Aura
+                    case 79106: // Shadow Protection
+                    case 79107: // Shadow Protection
+                        amount = resist;
+                        break;
+                    case 79060: // Mark of the Wild
+                    case 79061: // Mark of the Wild
+                    case 79062: // Blessing of Kings
+                    case 79063: // Blessing of Kings
+                    case 90363: // Embrace of the Shale Spider
+                        amount = resist / 2;
+                        break;
+                }
                 break;
             }
-            break;
         }
-    }
         default:
             break;
     }
@@ -5443,7 +5446,7 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                         }
                         case 43681: // Inactive
                         {
-                            if (!target || target->GetTypeId() != TYPEID_PLAYER || aurApp->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE)
+                            if (target->GetTypeId() != TYPEID_PLAYER || aurApp->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE)
                                 return;
 
                             if (target->GetMap()->IsBattleground())

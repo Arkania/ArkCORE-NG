@@ -156,12 +156,26 @@ _hitMask(hitMask), _spell(spell), _damageInfo(damageInfo), _healInfo(healInfo)
 #ifdef _MSC_VER
 #pragma warning(disable:4355)
 #endif
-Unit::Unit(bool isWorldObject): WorldObject(isWorldObject),
-m_movedPlayer(NULL), m_lastSanctuaryTime(0), IsAIEnabled(false), NeedChangeAI(false),
-m_ControlledByPlayer(false), movespline(new Movement::MoveSpline()), i_AI(NULL),
-i_disabledAI(NULL), m_procDeep(0), m_removedAurasCount(0), i_motionMaster(this),
-m_ThreatManager(this), m_vehicle(NULL), m_vehicleKit(NULL), m_unitTypeMask(UNIT_MASK_NONE),
-m_HostileRefManager(this), m_TempSpeed(0.0f), m_AutoRepeatFirstCast(false), _lastDamagedTime(0)
+Unit::Unit(bool isWorldObject): WorldObject(isWorldObject)
+    , m_movedPlayer(NULL)
+    , m_lastSanctuaryTime(0)
+    , m_TempSpeed(0.0f)
+    , IsAIEnabled(false)
+    , NeedChangeAI(false)
+    , m_ControlledByPlayer(false)
+    , movespline(new Movement::MoveSpline())
+    , i_AI(NULL)
+    , i_disabledAI(NULL)
+    , m_AutoRepeatFirstCast(false)
+    , m_procDeep(0)
+    , m_removedAurasCount(0)
+    , i_motionMaster(this)
+    , m_ThreatManager(this)
+    , m_vehicle(NULL)
+    , m_vehicleKit(NULL)
+    , m_unitTypeMask(UNIT_MASK_NONE)
+    , m_HostileRefManager(this)
+	, _lastDamagedTime(0)
 {
 #ifdef _MSC_VER
 #pragma warning(default:4355)
@@ -255,7 +269,6 @@ m_HostileRefManager(this), m_TempSpeed(0.0f), m_AutoRepeatFirstCast(false), _las
     m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE);
 
     _focusSpell = NULL;
-    _targetLocked = false;
     _lastLiquid = NULL;
     _isWalkingBeforeCharm = false;
 
@@ -405,11 +418,6 @@ void Unit::MonsterMoveWithSpeed(float x, float y, float z, float speed)
     init.Launch();
 }
 
-enum MovementIntervals
-{
-    POSITION_UPDATE_DELAY = 400,
-};
-
 void Unit::UpdateSplineMovement(uint32 t_diff)
 {
     if (movespline->Finalized())
@@ -428,7 +436,9 @@ void Unit::UpdateSplineMovement(uint32 t_diff)
 
 void Unit::UpdateSplinePosition()
 {
-    m_movesplineTimer.Reset(POSITION_UPDATE_DELAY);
+    uint32 const positionUpdateDelay = 400;
+
+    m_movesplineTimer.Reset(positionUpdateDelay);
     Movement::Location loc = movespline->ComputePosition();
     if (GetTransGUID())
     {
@@ -441,6 +451,9 @@ void Unit::UpdateSplinePosition()
             if (TransportBase* transport = GetDirectTransport())
                 transport->CalculatePassengerPosition(loc.x, loc.y, loc.z, loc.orientation);
     }
+
+    if (HasUnitState(UNIT_STATE_CANNOT_TURN))
+        loc.orientation = GetOrientation();
 
     UpdatePosition(loc.x, loc.y, loc.z, loc.orientation);
 }
@@ -565,10 +578,6 @@ uint32 Unit::DealDamage(Unit* victim, uint32 damage, CleanDamage const* cleanDam
     if (IsAIEnabled)
         GetAI()->DamageDealt(victim, damage, damagetype);
 
-    if (victim->GetTypeId() == TYPEID_PLAYER)
-        if (victim->ToPlayer()->GetCommandStatus(CHEAT_GOD))
-            return 0;
-
     if (damagetype == DIRECT_DAMAGE || damagetype == SPELL_DIRECT_DAMAGE)
     {
         m_damage_done[0] += damage;
@@ -578,8 +587,10 @@ uint32 Unit::DealDamage(Unit* victim, uint32 damage, CleanDamage const* cleanDam
     // Signal to pets that their owner was attacked
     if (victim->GetTypeId() == TYPEID_PLAYER)
     {
-        Pet* pet = victim->ToPlayer()->GetPet();
+        if (victim->ToPlayer()->GetCommandStatus(CHEAT_GOD))
+            return 0;
 
+        Pet* pet = victim->ToPlayer()->GetPet();
         if (pet && pet->IsAlive())
             pet->AI()->OwnerDamagedBy(this);
     }
@@ -2822,7 +2833,7 @@ void Unit::_UpdateAutoRepeatSpell()
 {
     bool isAutoShot = m_currentSpells[CURRENT_AUTOREPEAT_SPELL]->m_spellInfo->Id == 75;
     // check "realtime" interrupts
-    if (IsNonMeleeSpellCasted(false, false, true, isAutoShot) && !HasAuraTypeWithAffectMask(SPELL_AURA_WALK_AND_CAST, m_currentSpells[CURRENT_AUTOREPEAT_SPELL]->m_spellInfo))
+    if (((GetTypeId() == TYPEID_PLAYER && ToPlayer()->isMoving()) || IsNonMeleeSpellCasted(false, false, true, isAutoShot)) && !HasAuraTypeWithAffectMask(SPELL_AURA_CAST_WHILE_WALKING, m_currentSpells[CURRENT_AUTOREPEAT_SPELL]->m_spellInfo))
     {
         // cancel wand shoot
         if (!isAutoShot)
@@ -3058,7 +3069,7 @@ bool Unit::CanCastWhileWalking(uint32 spell_id)
     if (!ret)
         return false;
 
-    AuraEffectList const& auras = GetAuraEffectsByType(SPELL_AURA_WALK_AND_CAST);
+    AuraEffectList const& auras = GetAuraEffectsByType(SPELL_AURA_CAST_WHILE_WALKING);
     for (Unit::AuraEffectList::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
     {
         if (*itr)
@@ -4413,7 +4424,7 @@ int32 Unit::GetTotalAuraModifierByMiscMask(AuraType auratype, uint32 misc_mask) 
         if ((*i)->GetMiscValue() & misc_mask)
             if (!sSpellMgr->AddSameEffectStackRuleSpellGroups((*i)->GetSpellInfo(), (*i)->GetAmount(), SameEffectSpellGroup))
                 modifier += (*i)->GetAmount();
-    
+
     for (std::map<SpellGroup, int32>::const_iterator itr = SameEffectSpellGroup.begin(); itr != SameEffectSpellGroup.end(); ++itr)
         modifier += itr->second;
 
@@ -11218,6 +11229,10 @@ int32 Unit::SpellBaseDamageBonusDone(SpellSchoolMask schoolMask)
 
         DoneAdvertisedBenefit += spellPower;
 
+        // Check if we are ever using mana - PaperDollFrame.lua
+        if (GetPowerIndexByClass(POWER_MANA, getClass()) != MAX_POWERS)
+            DoneAdvertisedBenefit += std::max(0, int32(GetStat(STAT_INTELLECT)) - 10);  // spellpower from intellect
+
         // Damage bonus from stats
         AuraEffectList const& mDamageDoneOfStatPercent = GetAuraEffectsByType(SPELL_AURA_MOD_SPELL_DAMAGE_OF_STAT_PERCENT);
         for (AuraEffectList::const_iterator i = mDamageDoneOfStatPercent.begin(); i != mDamageDoneOfStatPercent.end(); ++i)
@@ -11863,6 +11878,10 @@ int32 Unit::SpellBaseHealingBonusDone(SpellSchoolMask schoolMask)
     {
         // Base value
         AdvertisedBenefit += ToPlayer()->GetBaseSpellPowerBonus();
+
+        // Check if we are ever using mana - PaperDollFrame.lua
+        if (GetPowerIndexByClass(POWER_MANA, getClass()) != MAX_POWERS)
+            AdvertisedBenefit += std::max(0, int32(GetStat(STAT_INTELLECT)) - 10);  // spellpower from intellect
 
         // Healing bonus from stats
         AuraEffectList const& mHealingDoneOfStatPercent = GetAuraEffectsByType(SPELL_AURA_MOD_SPELL_HEALING_OF_STAT_PERCENT);
@@ -14534,32 +14553,6 @@ void Unit::SetMaxHealth(uint32 val)
         SetHealth(val);
 }
 
-uint32 Unit::GetPowerIndexByClass(uint32 powerId, uint32 classId) const
-{
-    ChrClassesEntry const* classEntry = sChrClassesStore.LookupEntry(classId);
-
-    ASSERT(classEntry && "Class not found");
-
-    uint32 index = 0;
-    for (uint32 i = 0; i <= sChrPowerTypesStore.GetNumRows(); ++i)
-    {
-        ChrPowerTypesEntry const* powerEntry = sChrPowerTypesStore.LookupEntry(i);
-        if (!powerEntry)
-            continue;
-
-        if (powerEntry->classId != classId)
-            continue;
-
-        if (powerEntry->power == powerId)
-            return index;
-
-        ++index;
-    }
-
-    // return invalid value - this class doesn't use this power
-    return MAX_POWERS;
-};
-
 int32 Unit::GetPower(Powers power) const
 {
     uint32 powerIndex = GetPowerIndexByClass(power, getClass());
@@ -15258,10 +15251,16 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
             continue;
         ProcTriggeredData triggerData(itr->second->GetBase());
         // Defensive procs are active on absorbs (so absorption effects are not a hindrance)
-        bool active = (damage > 0) || (procExtra & (PROC_EX_ABSORB|PROC_EX_BLOCK) && isVictim);
+        bool active = damage || (procExtra & PROC_EX_BLOCK && isVictim);
         if (isVictim)
             procExtra &= ~PROC_EX_INTERNAL_REQ_FAMILY;
+
         SpellInfo const* spellProto = itr->second->GetBase()->GetSpellInfo();
+
+        // only auras that has triggered spell should proc from fully absorbed damage
+        if (procExtra & PROC_EX_ABSORB && isVictim)
+            if (damage || spellProto->Effects[EFFECT_0].TriggerSpell || spellProto->Effects[EFFECT_1].TriggerSpell || spellProto->Effects[EFFECT_2].TriggerSpell)
+                active = true;
 
         if (!IsTriggeredAtSpellProcEvent(target, triggerData.aura, procSpell, procFlag, procExtra, attType, isVictim, active, triggerData.spellProcEvent))
             continue;
@@ -17383,7 +17382,9 @@ void Unit::RemoveCharmedBy(Unit* charmer)
 
     if (Creature* creature = ToCreature())
     {
-        creature->AI()->OnCharmed(false);
+        // Creature will restore its old AI on next update
+        if (creature->AI())
+            creature->AI()->OnCharmed(false);
 
         if (type != CHARM_TYPE_VEHICLE) // Vehicles' AI is never modified
         {
@@ -18403,19 +18404,20 @@ void Unit::JumpTo(WorldObject* obj, float speedZ)
 
 bool Unit::HandleSpellClick(Unit* clicker, int8 seatId)
 {
+    bool result = false;
     uint32 spellClickEntry = GetVehicleKit() ? GetVehicleKit()->GetCreatureEntry() : GetEntry();
     SpellClickInfoMapBounds clickPair = sObjectMgr->GetSpellClickInfoMapBounds(spellClickEntry);
     for (SpellClickInfoContainer::const_iterator itr = clickPair.first; itr != clickPair.second; ++itr)
     {
         //! First check simple relations from clicker to clickee
         if (!itr->second.IsFitToRequirements(clicker, this))
-            return false;
+            continue;
 
         //! Check database conditions
         ConditionList conds = sConditionMgr->GetConditionsForSpellClickEvent(spellClickEntry, itr->second.spellId);
         ConditionSourceInfo info = ConditionSourceInfo(clicker, this);
         if (!sConditionMgr->IsObjectMeetToConditions(info, conds))
-            return false;
+            continue;
 
         Unit* caster = (itr->second.castFlags & NPC_CLICK_CAST_CASTER_CLICKER) ? clicker : this;
         Unit* target = (itr->second.castFlags & NPC_CLICK_CAST_TARGET_CLICKER) ? clicker : this;
@@ -18441,11 +18443,11 @@ bool Unit::HandleSpellClick(Unit* clicker, int8 seatId)
             if (!valid)
             {
                 sLog->outErrorDb("Spell %u specified in npc_spellclick_spells is not a valid vehicle enter aura!", itr->second.spellId);
-                return false;
+                continue;
             }
 
             if (IsInMap(caster))
-                caster->CastCustomSpell(itr->second.spellId, SpellValueMod(SPELLVALUE_BASE_POINT0+i), seatId, target, GetVehicleKit() ? TRIGGERED_IGNORE_CASTER_MOUNTED_OR_ON_VEHICLE : TRIGGERED_NONE, NULL, NULL, origCasterGUID);
+                caster->CastCustomSpell(itr->second.spellId, SpellValueMod(SPELLVALUE_BASE_POINT0+i), seatId+1, target, GetVehicleKit() ? TRIGGERED_IGNORE_CASTER_MOUNTED_OR_ON_VEHICLE : TRIGGERED_NONE, NULL, NULL, origCasterGUID);
             else    // This can happen during Player::_LoadAuras
             {
                 int32 bp0[MAX_SPELL_EFFECTS];
@@ -18463,18 +18465,23 @@ bool Unit::HandleSpellClick(Unit* clicker, int8 seatId)
             else
                 Aura::TryRefreshStackOrCreate(spellEntry, MAX_EFFECT_MASK, this, clicker, NULL, NULL, origCasterGUID);
         }
+
+        result = true;
     }
 
-    Creature* creature = ToCreature();
-    if (creature && creature->IsAIEnabled)
-        creature->AI()->OnSpellClick(clicker);
+    if (result)
+    {
+        Creature* creature = ToCreature();
+        if (creature && creature->IsAIEnabled)
+            creature->AI()->OnSpellClick(clicker);
+    }
 
-    return true;
+    return result;
 }
 
 void Unit::EnterVehicle(Unit* base, int8 seatId)
 {
-    CastCustomSpell(VEHICLE_SPELL_RIDE_HARDCODED, SPELLVALUE_BASE_POINT0, seatId, base, TRIGGERED_IGNORE_CASTER_MOUNTED_OR_ON_VEHICLE);
+    CastCustomSpell(VEHICLE_SPELL_RIDE_HARDCODED, SPELLVALUE_BASE_POINT0, seatId+1, base, TRIGGERED_IGNORE_CASTER_MOUNTED_OR_ON_VEHICLE);
 }
 
 void Unit::_EnterVehicle(Vehicle* vehicle, int8 seatId, AuraApplication const* aurApp)
@@ -18579,9 +18586,11 @@ void Unit::_ExitVehicle(Position const* exitPosition)
 
     m_vehicle->RemovePassenger(this);
 
+    Player* player = ToPlayer();
+
     // If player is on mouted duel and exits the mount should immediatly lose the duel
-    if (GetTypeId() == TYPEID_PLAYER && ToPlayer()->duel && ToPlayer()->duel->isMounted)
-        ToPlayer()->DuelComplete(DUEL_FLED);
+    if (player && player->duel && player->duel->isMounted)
+        player->DuelComplete(DUEL_FLED);
 
     // This should be done before dismiss, because there may be some aura removal
     Vehicle* vehicle = m_vehicle;
@@ -18599,8 +18608,8 @@ void Unit::_ExitVehicle(Position const* exitPosition)
 
     AddUnitState(UNIT_STATE_MOVE);
 
-    if (GetTypeId() == TYPEID_PLAYER)
-        ToPlayer()->SetFallInformation(0, GetPositionZ());
+    if (player)
+        player->SetFallInformation(0, GetPositionZ());
     else if (HasUnitMovementFlag(MOVEMENTFLAG_ROOT))
     {
         WorldPacket data(SMSG_SPLINE_MOVE_UNROOT, 8);
@@ -18614,7 +18623,7 @@ void Unit::_ExitVehicle(Position const* exitPosition)
     init.SetTransportExit();
     init.Launch();
 
-    if (Player* player = ToPlayer())
+    if (player)
         player->ResummonPetTemporaryUnSummonedIfAny();
 
     if (vehicle->GetBase()->HasUnitTypeMask(UNIT_MASK_MINION)&& vehicle->GetBase()->GetTypeId() == TYPEID_UNIT)
@@ -18851,7 +18860,7 @@ void Unit::UpdateOrientation(float orientation)
 {
     SetOrientation(orientation);
     if (IsVehicle())
-        GetVehicleKit()->RelocatePassengers(GetPositionX(), GetPositionY(), GetPositionZ(), orientation);
+        GetVehicleKit()->RelocatePassengers();
 }
 
 //! Only server-side height update, does not broadcast to client
@@ -18859,7 +18868,7 @@ void Unit::UpdateHeight(float newZ)
 {
     Relocate(GetPositionX(), GetPositionY(), newZ);
     if (IsVehicle())
-        GetVehicleKit()->RelocatePassengers(GetPositionX(), GetPositionY(), newZ, GetOrientation());
+        GetVehicleKit()->RelocatePassengers();
 }
 
 void Unit::SendThreatListUpdate()
@@ -19286,6 +19295,34 @@ void Unit::SendMovementCanFlyChange()
 bool Unit::IsSplineEnabled() const
 {
     return movespline->Initialized();
+}
+
+void Unit::FocusTarget(Spell const* focusSpell, uint64 target)
+{
+    // already focused
+    if (_focusSpell)
+        return;
+
+    _focusSpell = focusSpell;
+    SetUInt64Value(UNIT_FIELD_TARGET, target);
+    if (focusSpell->GetSpellInfo()->AttributesEx5 & SPELL_ATTR5_DONT_TURN_DURING_CAST)
+        AddUnitState(UNIT_STATE_ROTATING);
+}
+
+void Unit::ReleaseFocus(Spell const* focusSpell)
+{
+    // focused to something else
+    if (focusSpell != _focusSpell)
+        return;
+
+    _focusSpell = NULL;
+    if (Unit* victim = GetVictim())
+        SetUInt64Value(UNIT_FIELD_TARGET, victim->GetGUID());
+    else
+        SetUInt64Value(UNIT_FIELD_TARGET, 0);
+
+    if (focusSpell->GetSpellInfo()->AttributesEx5 & SPELL_ATTR5_DONT_TURN_DURING_CAST)
+        ClearUnitState(UNIT_STATE_ROTATING);
 }
 
 uint32 Unit::GetHealingDoneInPastSecs (uint32 secs)

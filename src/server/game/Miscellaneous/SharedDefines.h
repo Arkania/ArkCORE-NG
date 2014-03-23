@@ -29,7 +29,7 @@ enum SpellEffIndex
 {
     EFFECT_0 = 0,
     EFFECT_1 = 1,
-    EFFECT_2 = 2,
+    EFFECT_2 = 2
 };
 
 // used in script definitions
@@ -130,7 +130,7 @@ enum UnitClass
     UNIT_CLASS_WARRIOR                  = 1,
     UNIT_CLASS_PALADIN                  = 2,
     UNIT_CLASS_ROGUE                    = 4,
-    UNIT_CLASS_MAGE                     = 8,
+    UNIT_CLASS_MAGE                     = 8
 };
 
 #define CLASSMASK_ALL_CREATURES ((1<<(UNIT_CLASS_WARRIOR-1)) | (1<<(UNIT_CLASS_PALADIN-1)) | (1<<(UNIT_CLASS_ROGUE-1)) | (1<<(UNIT_CLASS_MAGE-1)))
@@ -257,7 +257,7 @@ enum ItemQualities
 enum SpellCategory
 {
     SPELL_CATEGORY_FOOD             = 11,
-    SPELL_CATEGORY_DRINK            = 59,
+    SPELL_CATEGORY_DRINK            = 59
 };
 
 const uint32 ItemQualityColors[MAX_ITEM_QUALITY] =
@@ -477,7 +477,7 @@ enum SpellAttr5
     SPELL_ATTR5_SPECIAL_ITEM_CLASS_CHECK         = 0x00010000, // 16 this allows spells with EquippedItemClass to affect spells from other items if the required item is equipped
     SPELL_ATTR5_USABLE_WHILE_FEARED              = 0x00020000, // 17 usable while feared
     SPELL_ATTR5_USABLE_WHILE_CONFUSED            = 0x00040000, // 18 usable while confused
-    SPELL_ATTR5_UNK19                            = 0x00080000, // 19
+    SPELL_ATTR5_DONT_TURN_DURING_CAST            = 0x00080000, // 19 Blocks caster's turning when casting (client does not automatically turn caster's model to face UNIT_FIELD_TARGET)
     SPELL_ATTR5_UNK20                            = 0x00100000, // 20
     SPELL_ATTR5_UNK21                            = 0x00200000, // 21
     SPELL_ATTR5_UNK22                            = 0x00400000, // 22
@@ -693,7 +693,7 @@ enum SpellClickCastFlags
 {
     NPC_CLICK_CAST_CASTER_CLICKER       = 0x01,
     NPC_CLICK_CAST_TARGET_CLICKER       = 0x02,
-    NPC_CLICK_CAST_ORIG_CASTER_OWNER    = 0x04,
+    NPC_CLICK_CAST_ORIG_CASTER_OWNER    = 0x04
 };
 
 enum SheathTypes
@@ -765,7 +765,7 @@ enum TeamId
 {
     TEAM_ALLIANCE = 0,
     TEAM_HORDE,
-    TEAM_NEUTRAL,
+    TEAM_NEUTRAL
 };
 
 enum Team
@@ -777,7 +777,7 @@ enum Team
     //TEAM_HORDE_FORCES        = 892,
     //TEAM_SANCTUARY           = 936,
     //TEAM_OUTLAND             = 980,
-    TEAM_OTHER               = 0,                         // if ReputationListId > 0 && Flags != FACTION_FLAG_TEAM_HEADER
+    TEAM_OTHER               = 0                           // if ReputationListId > 0 && Flags != FACTION_FLAG_TEAM_HEADER
 };
 
 enum SpellEffects
@@ -1283,23 +1283,43 @@ enum SpellCustomErrors
     SPELL_CUSTOM_ERROR_NO_ACTIVE_ENCHANTMENT            = 102, // You have no active enchantment to unleash.
     SPELL_CUSTOM_ERROR_ENOUGH_HIGHBOURNE_SOULS          = 103, // You have bound enough Highborne souls. Return to Arcanist Valdurian.
     SPELL_CUSTOM_ERROR_ATLEAST_40YD_FROM_OIL_DRILLING   = 104, // You must be at least 40 yards away from all other Oil Drilling Rigs.
-    SPELL_CUSTOM_ERROR_ABOVE_ENSLAVED_PEARL_MINER       = 105, // You must be above the Enslaved Pearl Miner.
-    SPELL_CUSTOM_ERROR_MUST_TARGET_CORPSE_SPECIAL_1     = 106, // You must target the corpse of a Seabrush Terrapin, Scourgut Remora, or Spinescale Hammerhead.
-    SPELL_CUSTOM_ERROR_SLAGHAMMER_ALREADY_PRISONER      = 107, // Ambassador Slaghammer is already your prisoner.
-    SPELL_CUSTOM_ERROR_REQUIRE_ATTUNED_LOCATION_1       = 108, // Requires a location that is attuned with the Naz'jar Battlemaiden.
-    SPELL_CUSTOM_ERROR_NEED_TO_FREE_DRAKE_FIRST         = 109, // Free the Drake from the net first!
-    SPELL_CUSTOM_ERROR_DRAGONMAW_ALLIES_ALREADY_FOLLOW  = 110, // You already have three Dragonmaw allies following you.
-    SPELL_CUSTOM_ERROR_REQUIRE_OPPOSABLE_THUMBS         = 111, // Requires Opposable Thumbs.
-    SPELL_CUSTOM_ERROR_NOT_ENOUGH_HEALTH_2              = 112, // Not enough health
-    SPELL_CUSTOM_ERROR_ENOUGH_FORSAKEN_TROOPERS         = 113, // You already have enough Forsaken Troopers.
-    SPELL_CUSTOM_ERROR_CANNOT_JUMP_TO_BOULDER           = 114, // You cannot jump to another boulder yet.
-    SPELL_CUSTOM_ERROR_SKILL_TOO_HIGH                   = 115, // Skill too high.
-    SPELL_CUSTOM_ERROR_ALREADY_6_SURVIVORS_RESCUED      = 116, // You have already rescued 6 Survivors.
-    SPELL_CUSTOM_ERROR_MUST_FACE_SHIPS_FROM_BALLOON     = 117, // You need to be facing the ships from the rescue balloon.
-    SPELL_CUSTOM_ERROR_CANNOT_SUPERVISE_MORE_CULTISTS   = 118, // You cannot supervise more than 5 Arrested Cultists at a time.
-    SPELL_CUSTOM_ERROR_REQUIRES_LEVEL_85                = 119, // You must reach level 85 to use this portal.
-    SPELL_CUSTOM_ERROR_MUST_BE_BELOW_35_HEALTH          = 120, // Your target must be below 35% health.
-    SPELL_CUSTOM_ERROR_MUST_SELECT_TALENT_SPECIAL       = 121, // You must select a talent specialization first.
+    SPELL_CUSTOM_ERROR_ABOVE_ENSLAVED_PEARL_MINER       = 106, // You must be above the Enslaved Pearl Miner.
+    SPELL_CUSTOM_ERROR_MUST_TARGET_CORPSE_SPECIAL_1     = 107, // You must target the corpse of a Seabrush Terrapin, Scourgut Remora, or Spinescale Hammerhead.
+    SPELL_CUSTOM_ERROR_SLAGHAMMER_ALREADY_PRISONER      = 108, // Ambassador Slaghammer is already your prisoner.
+    SPELL_CUSTOM_ERROR_REQUIRE_ATTUNED_LOCATION_1       = 109, // Requires a location that is attuned with the Naz'jar Battlemaiden.
+    SPELL_CUSTOM_ERROR_NEED_TO_FREE_DRAKE_FIRST         = 110, // Free the Drake from the net first!
+    SPELL_CUSTOM_ERROR_DRAGONMAW_ALLIES_ALREADY_FOLLOW  = 111, // You already have three Dragonmaw allies following you.
+    SPELL_CUSTOM_ERROR_REQUIRE_OPPOSABLE_THUMBS         = 112, // Requires Opposable Thumbs.
+    SPELL_CUSTOM_ERROR_NOT_ENOUGH_HEALTH_2              = 113, // Not enough health
+    SPELL_CUSTOM_ERROR_ENOUGH_FORSAKEN_TROOPERS         = 114, // You already have enough Forsaken Troopers.
+    SPELL_CUSTOM_ERROR_CANNOT_JUMP_TO_BOULDER           = 115, // You cannot jump to another boulder yet.
+    SPELL_CUSTOM_ERROR_SKILL_TOO_HIGH                   = 116, // Skill too high.
+    SPELL_CUSTOM_ERROR_ALREADY_6_SURVIVORS_RESCUED      = 117, // You have already rescued 6 Survivors.
+    SPELL_CUSTOM_ERROR_MUST_FACE_SHIPS_FROM_BALLOON     = 118, // You need to be facing the ships from the rescue balloon.
+    SPELL_CUSTOM_ERROR_CANNOT_SUPERVISE_MORE_CULTISTS   = 119, // You cannot supervise more than 5 Arrested Cultists at a time.
+    SPELL_CUSTOM_ERROR_REQUIRES_LEVEL_85                = 120, // You must reach level 85 to use this portal.
+    SPELL_CUSTOM_ERROR_MUST_BE_BELOW_35_HEALTH          = 121, // Your target must be below 35% health.
+    SPELL_CUSTOM_ERROR_MUST_SELECT_TALENT_SPECIAL       = 122, // You must select a talent specialization first.
+    SPELL_CUSTOM_ERROR_TOO_WISE_AND_POWERFUL            = 123, // You are too wise and powerful to gain any benefit from that item.
+    SPELL_CUSTOM_ERROR_TOO_CLOSE_ARGENT_LIGHTWELL       = 124, // You are within 10 yards of another Argent Lightwell.
+    SPELL_CUSTOM_ERROR_NOT_WHILE_SHAPESHIFTED           = 125, // You can't do that while shapeshifted.
+    SPELL_CUSTOM_ERROR_MANA_GEM_IN_BANK                 = 126, // You already have a Mana Gem in your bank.
+    SPELL_CUSTOM_ERROR_FLAME_SHOCK_NOT_ACTIVE           = 127, // You must have at least one Flame Shock active.
+    SPELL_CUSTOM_ERROR_CANT_TRANSFORM                   = 128, // You cannot transform right now
+    SPELL_CUSTOM_ERROR_PET_MUST_BE_ATTACKING            = 129, // Your pet must be attacking a target.
+    SPELL_CUSTOM_ERROR_GNOMISH_ENGINEERING              = 130, // Requires Gnomish Engineering
+    SPELL_CUSTOM_ERROR_GOBLIN_ENGINEERING               = 131, // Requires Goblin Engineering
+    SPELL_CUSTOM_ERROR_NO_TARGET                        = 132, // You have no target.
+    SPELL_CUSTOM_ERROR_PET_OUT_OF_RANGE                 = 133, // Your Pet is out of range of the target.
+    SPELL_CUSTOM_ERROR_HOLDING_FLAG                     = 134, // You can't do that while holding the flag.
+    SPELL_CUSTOM_ERROR_TARGET_HOLDING_FLAG              = 135, // You can't do that to targets holding the flag.
+    SPELL_CUSTOM_ERROR_PORTAL_NOT_OPEN                  = 136, // The portal is not yet open. Continue helping the druids at the Sanctuary of Malorne.
+    SPELL_CUSTOM_ERROR_AGGRA_AIR_TOTEM                  = 137, // You need to be closer to Aggra's Air Totem, in the west.
+    SPELL_CUSTOM_ERROR_AGGRA_WATER_TOTEM                = 138, // You need to be closer to Aggra's Water Totem, in the north.
+    SPELL_CUSTOM_ERROR_AGGRA_EARTH_TOTEM                = 139, // You need to be closer to Aggra's Earth Totem, in the east.
+    SPELL_CUSTOM_ERROR_AGGRA_FIRE_TOTEM                 = 140, // You need to be closer to Aggra's Fire Totem, near Thrall.
+    SPELL_CUSTOM_ERROR_TARGET_HAS_STARTDUST_2           = 148, // Target is already affected by Stardust No. 2.
+    SPELL_CUSTOM_ERROR_ELEMENTIUM_GEM_CLUSTERS          = 149  // You cannot deconstruct Elementium Gem Clusters while collecting them!
 };
 
 enum StealthType
@@ -1370,7 +1390,7 @@ enum AuraStateType
     //AURA_STATE_UNKNOWN20                  = 20,           //  c  | only (45317 Suicide)
     //AURA_STATE_UNKNOWN21                  = 21,           //     | not used
     AURA_STATE_UNKNOWN22                    = 22,           // C  t| varius spells (63884, 50240)
-    AURA_STATE_HEALTH_ABOVE_75_PERCENT      = 23,           // C   |
+    AURA_STATE_HEALTH_ABOVE_75_PERCENT      = 23            // C   |
 };
 
 #define PER_CASTER_AURA_STATE_MASK (\
@@ -1683,7 +1703,7 @@ enum GameObjectFlags
     GO_FLAG_NODESPAWN       = 0x00000020,                   // never despawn, typically for doors, they just change state
     GO_FLAG_TRIGGERED       = 0x00000040,                   // typically, summoned objects. Triggered by spell or other events
     GO_FLAG_DAMAGED         = 0x00000200,
-    GO_FLAG_DESTROYED       = 0x00000400,
+    GO_FLAG_DESTROYED       = 0x00000400
 };
 
 enum GameObjectDynamicLowFlags
@@ -1691,7 +1711,7 @@ enum GameObjectDynamicLowFlags
     GO_DYNFLAG_LO_ACTIVATE          = 0x01,                 // enables interaction with GO
     GO_DYNFLAG_LO_ANIMATE           = 0x02,                 // possibly more distinct animation of GO
     GO_DYNFLAG_LO_NO_INTERACT       = 0x04,                 // appears to disable interaction (not fully verified)
-    GO_DYNFLAG_LO_SPARKLE           = 0x08,                 // makes GO sparkle
+    GO_DYNFLAG_LO_SPARKLE           = 0x08                  // makes GO sparkle
 };
 
 enum GameObjectDestructibleState
@@ -1699,7 +1719,7 @@ enum GameObjectDestructibleState
     GO_DESTRUCTIBLE_INTACT      = 0,
     GO_DESTRUCTIBLE_DAMAGED     = 1,
     GO_DESTRUCTIBLE_DESTROYED   = 2,
-    GO_DESTRUCTIBLE_REBUILDING  = 3,
+    GO_DESTRUCTIBLE_REBUILDING  = 3
 };
 
 // EmotesText.dbc
@@ -1956,7 +1976,7 @@ enum TextEmotes
     TEXT_EMOTE_LOOK                 = 449,
     TEXT_EMOTE_OBJECT               = 450,
     TEXT_EMOTE_SWEAT                = 451,
-    TEXT_EMOTE_YW                   = 453,
+    TEXT_EMOTE_YW                   = 453
 };
 
 // Emotes.dbc
@@ -2817,7 +2837,7 @@ enum CreatureTypeFlags
     CREATURE_TYPEFLAGS_UNK28            = 0x10000000,
     CREATURE_TYPEFLAGS_UNK29            = 0x20000000,
     CREATURE_TYPEFLAGS_UNK30            = 0x40000000,
-    CREATURE_TYPEFLAGS_UNK31            = 0x80000000,
+    CREATURE_TYPEFLAGS_UNK31            = 0x80000000
 };
 
 enum CreatureTypeFlags2
@@ -2829,7 +2849,7 @@ enum CreatureTypeFlags2
     CREATURE_TYPEFLAGS_2_UNK5           = 0x00000010,
     CREATURE_TYPEFLAGS_2_UNK6           = 0x00000020,
     CREATURE_TYPEFLAGS_2_UNK7           = 0x00000040,
-    CREATURE_TYPEFLAGS_2_UNK8           = 0x00000080,
+    CREATURE_TYPEFLAGS_2_UNK8           = 0x00000080
 };
 
 enum CreatureEliteType
@@ -2878,6 +2898,8 @@ enum HolidayIds
     HOLIDAY_RATED_BG_15_VS_15        = 442,
     HOLIDAY_RATED_BG_25_VS_25        = 443,
     HOLIDAY_ANNIVERSARY_7_YEARS      = 467,
+    HOLIDAY_DARKMOON_FAIRE_TEROKKAR  = 479,
+    HOLIDAY_ANNIVERSARY_8_YEARS      = 484
 };
 
 // values based at QuestInfo.dbc
@@ -2944,7 +2966,7 @@ enum QuestSort
     QUEST_SORT_CHILDRENS_WEEK      = 378,
     QUEST_SORT_FIRELANDS_INVASION  = 379,
     QUEST_SORT_ZANDALARI           = 380,
-    QUEST_SORT_ELEMENTAL_BONDS     = 381,
+    QUEST_SORT_ELEMENTAL_BONDS     = 381
 };
 
 inline uint8 ClassByQuestSort(int32 QuestSort)
@@ -3362,7 +3384,7 @@ enum AiReaction
     AI_REACTION_FRIENDLY = 1,                               // (NOT used in client packet handler)
     AI_REACTION_HOSTILE  = 2,                               // sent on every attack, triggers aggro sound (used in client packet handler)
     AI_REACTION_AFRAID   = 3,                               // seen for polymorph (when AI not in control of self?) (NOT used in client packet handler)
-    AI_REACTION_DESTROY  = 4,                               // used on object destroy (NOT used in client packet handler)
+    AI_REACTION_DESTROY  = 4                                // used on object destroy (NOT used in client packet handler)
 };
 
 // Diminishing Returns Types
@@ -3396,7 +3418,7 @@ enum DiminishingGroup
     DIMINISHING_SLEEP               = 17,
     DIMINISHING_TAUNT               = 18,
     DIMINISHING_LIMITONLY           = 19,
-    DIMINISHING_DRAGONS_BREATH      = 20,
+    DIMINISHING_DRAGONS_BREATH      = 20
 };
 
 enum SummonCategory
@@ -3406,7 +3428,7 @@ enum SummonCategory
     SUMMON_CATEGORY_PET         = 2,
     SUMMON_CATEGORY_PUPPET      = 3,
     SUMMON_CATEGORY_VEHICLE     = 4,
-    SUMMON_CATEGORY_UNK         = 5, // as of patch 3.3.5a only Bone Spike in Icecrown Citadel
+    SUMMON_CATEGORY_UNK         = 5  // as of patch 3.3.5a only Bone Spike in Icecrown Citadel
                                      // uses this category
 };
 
@@ -3425,12 +3447,12 @@ enum SummonType
     SUMMON_TYPE_VEHICLE2    = 10,
     SUMMON_TYPE_OBJECT      = 11,
     SUMMON_TYPE_UNK12       = 12,
-    SUMMON_TYPE_UNK13       = 13,
+    SUMMON_TYPE_UNK13       = 13
 };
 
 enum EventId
 {
-    EVENT_CHARGE            = 1003,
+    EVENT_CHARGE            = 1003
 };
 
 enum ResponseCodes
@@ -3622,7 +3644,7 @@ enum MailResponseResult
     MAIL_ERR_MAIL_AND_CHAT_SUSPENDED   = 17,
     MAIL_ERR_TOO_MANY_ATTACHMENTS      = 18,
     MAIL_ERR_MAIL_ATTACHMENT_INVALID   = 19,
-    MAIL_ERR_ITEM_HAS_EXPIRED          = 21,
+    MAIL_ERR_ITEM_HAS_EXPIRED          = 21
 };
 
 enum SpellFamilyNames
@@ -3721,7 +3743,7 @@ enum RemoveMethod
 {
     GROUP_REMOVEMETHOD_DEFAULT = 0,
     GROUP_REMOVEMETHOD_KICK    = 1,
-    GROUP_REMOVEMETHOD_LEAVE   = 2,
+    GROUP_REMOVEMETHOD_LEAVE   = 2
 };
 
 enum ActivateTaxiReply
