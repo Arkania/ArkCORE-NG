@@ -102,19 +102,16 @@ void ArcheologyMgr::DeleteLastAvailableArtifact(uint32 guid, uint32 digsiteId)
         switch (findCount)
         {
             case 0:
-            return;
-
+                return;
             case 1:
-            CharacterDatabase.DirectPExecute("UPDATE character_archaeology_digsites SET find1PosX = 0, find1PosY = 0 WHERE guid = %u AND siteId = %u", guid, digsiteId);
-            break;
-
+                CharacterDatabase.DirectPExecute("UPDATE character_archaeology_digsites SET find1PosX = 0, find1PosY = 0 WHERE guid = %u AND siteId = %u", guid, digsiteId);
+                break;
             case 2:
-            CharacterDatabase.DirectPExecute("UPDATE character_archaeology_digsites SET find2PosX = 0, find2PosY = 0 WHERE guid = %u AND siteId = %u", guid, digsiteId);
-            break;
-
+                CharacterDatabase.DirectPExecute("UPDATE character_archaeology_digsites SET find2PosX = 0, find2PosY = 0 WHERE guid = %u AND siteId = %u", guid, digsiteId);
+                break;
             case 3:
-            CharacterDatabase.DirectPExecute("UPDATE character_archaeology_digsites SET find3PosX = 0, find3PosY = 0 WHERE guid = %u AND siteId = %u", guid, digsiteId);
-            break;
+                CharacterDatabase.DirectPExecute("UPDATE character_archaeology_digsites SET find3PosX = 0, find3PosY = 0 WHERE guid = %u AND siteId = %u", guid, digsiteId);
+                break;
         }
     }
 }

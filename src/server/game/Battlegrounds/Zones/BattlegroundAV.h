@@ -96,7 +96,7 @@ horde:
     AV_SOUND_BOTH_TOWER_DEFEND              = 8192,
 
     AV_SOUND_ALLIANCE_CAPTAIN               = 8232, //gets called when someone attacks them and at the beginning after 3min+rand(x)*10sec (maybe buff)
-    AV_SOUND_HORDE_CAPTAIN                  = 8333,
+    AV_SOUND_HORDE_CAPTAIN                  = 8333
 
 };
 
@@ -132,10 +132,10 @@ enum BG_AV_ObjectIds
     BG_AV_OBJECTID_SNOWFALL_CANDY_PH    = 179425,
 
     //banners on top of towers:
-    BG_AV_OBJECTID_TOWER_BANNER_A  = 178927, //[PH] Alliance A1 Tower Banner BIG
-    BG_AV_OBJECTID_TOWER_BANNER_H  = 178955, //[PH] Horde H1 Tower Banner BIG
-    BG_AV_OBJECTID_TOWER_BANNER_PA = 179446, //[PH] Alliance H1 Tower Pre-Banner BIG
-    BG_AV_OBJECTID_TOWER_BANNER_PH = 179436, //[PH] Horde A1 Tower Pre-Banner BIG
+    BG_AV_OBJECTID_TOWER_BANNER_A       = 178927, //[PH] Alliance A1 Tower Banner BIG
+    BG_AV_OBJECTID_TOWER_BANNER_H       = 178955, //[PH] Horde H1 Tower Banner BIG
+    BG_AV_OBJECTID_TOWER_BANNER_PA      = 179446, //[PH] Alliance H1 Tower Pre-Banner BIG
+    BG_AV_OBJECTID_TOWER_BANNER_PH      = 179436, //[PH] Horde A1 Tower Pre-Banner BIG
 
     //Auras
     BG_AV_OBJECTID_AURA_A               = 180421,
@@ -149,11 +149,11 @@ enum BG_AV_ObjectIds
     BG_AV_OBJECTID_GATE_H               = 180424,
 
     //mine supplies
-    BG_AV_OBJECTID_MINE_N        = 178785,
-    BG_AV_OBJECTID_MINE_S       = 178784,
+    BG_AV_OBJECTID_MINE_N               = 178785,
+    BG_AV_OBJECTID_MINE_S               = 178784,
 
     BG_AV_OBJECTID_FIRE                 = 179065,
-    BG_AV_OBJECTID_SMOKE                 = 179066
+    BG_AV_OBJECTID_SMOKE                = 179066
 };
 
 enum BG_AV_Nodes
@@ -307,12 +307,12 @@ enum BG_AV_ObjectTypes
     BG_AV_OBJECT_MINE_SUPPLY_S_MIN           = 225,
     BG_AV_OBJECT_MINE_SUPPLY_S_MAX           = 236,
 
-    BG_AV_OBJECT_MAX                          = 237
+    BG_AV_OBJECT_MAX                         = 237
 };
 
 enum BG_AV_OBJECTS
 {
-    AV_OPLACE_FIRSTAID_STATION          = 0,
+    AV_OPLACE_FIRSTAID_STATION        = 0,
     AV_OPLACE_STORMPIKE_GRAVE         = 1,
     AV_OPLACE_STONEHEART_GRAVE        = 2,
     AV_OPLACE_SNOWFALL_GRAVE          = 3,
@@ -344,18 +344,18 @@ enum BG_AV_OBJECTS
     AV_OPLACE_BURN_TOWER_POINT             = 73,
     AV_OPLACE_BURN_FROSTWOLF_ETOWER        = 83,
     AV_OPLACE_BURN_FROSTWOLF_WTOWER        = 93,
-    AV_OPLACE_BURN_BUILDING_A        = 103,
-    AV_OPLACE_BURN_BUILDING_H        = 113,
-    AV_OPLACE_SNOW_1                      = 123,
-    AV_OPLACE_SNOW_2                      = 124,
-    AV_OPLACE_SNOW_3                      = 125,
-    AV_OPLACE_SNOW_4                      = 126,
-    AV_OPLACE_MINE_SUPPLY_N_MIN           = 127,
-    AV_OPLACE_MINE_SUPPLY_N_MAX           = 136,
-    AV_OPLACE_MINE_SUPPLY_S_MIN           = 137,
-    AV_OPLACE_MINE_SUPPLY_S_MAX           = 148,
+    AV_OPLACE_BURN_BUILDING_A              = 103,
+    AV_OPLACE_BURN_BUILDING_H              = 113,
+    AV_OPLACE_SNOW_1                       = 123,
+    AV_OPLACE_SNOW_2                       = 124,
+    AV_OPLACE_SNOW_3                       = 125,
+    AV_OPLACE_SNOW_4                       = 126,
+    AV_OPLACE_MINE_SUPPLY_N_MIN            = 127,
+    AV_OPLACE_MINE_SUPPLY_N_MAX            = 136,
+    AV_OPLACE_MINE_SUPPLY_S_MIN            = 137,
+    AV_OPLACE_MINE_SUPPLY_S_MAX            = 148,
 
-    AV_OPLACE_MAX                         = 149
+    AV_OPLACE_MAX                          = 149
 };
 
 const float BG_AV_ObjectPos[AV_OPLACE_MAX][4] =
@@ -1360,7 +1360,7 @@ enum BG_AV_WorldStates
     //Neutral
     //Snowfall Grave
 */
-    AV_SNOWFALL_N                   = 1966, //over aa
+    AV_SNOWFALL_N                   = 1966 //over aa
 /*
     AV_SNOWFALL_A_C                 = 1341, //over hc
     AV_SNOWFALL_A_A                 = 1343, //over ha
@@ -1440,7 +1440,6 @@ enum BG_AV_WorldStates
     AV_FROSTWOLFE_UNUSED            = 1393,
     AV_FROSTWOLFW_UNUSED            = 1392
 */
-
 };
 
 //alliance_control neutral_control horde_control

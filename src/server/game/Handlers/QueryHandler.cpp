@@ -492,7 +492,7 @@ void WorldSession::HandleQuestPOIQuery(WorldPacket& recvData)
     SendPacket(&data);
 }
 
-void WorldSession::HandleQueryNpcCompletitionRespOpcode(WorldPacket& recvData)
+void WorldSession::HandleQuestNpcQueryOpcode(WorldPacket& recvData)
 {
     uint8 unk1;
     uint32 count;
@@ -520,11 +520,11 @@ void WorldSession::HandleQueryNpcCompletitionRespOpcode(WorldPacket& recvData)
                 }
             }
         }
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recv CMSG_QUERY_COMPLETITION_NPC_RESPONSE with count : %u and questId %u ",count,questId);
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recv CMSG_QUEST_NPC_QUERY with count : %u and questId %u ",count,questId);
     }
         
 
-    WorldPacket sendData(SMSG_COMPLETION_NPC_RESPONSE,2+4+(4*count));
+    WorldPacket sendData(SMSG_QUEST_NPC_QUERY_RESPONSE, 2+4+(4*count));
 
     sendData.WriteBits<uint8>(compleatedQuests.size(),23);
     for(uint8 i = 0; i < compleatedQuests.size(); ++i)

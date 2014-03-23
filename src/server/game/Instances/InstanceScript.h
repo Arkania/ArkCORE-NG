@@ -65,7 +65,7 @@ enum EncounterState
     FAIL          = 2,
     DONE          = 3,
     SPECIAL       = 4,
-    TO_BE_DECIDED = 5,
+    TO_BE_DECIDED = 5
 };
 
 enum DoorType

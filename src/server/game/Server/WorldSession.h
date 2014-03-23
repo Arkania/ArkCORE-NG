@@ -70,7 +70,7 @@ enum AccountDataType
     GLOBAL_MACROS_CACHE             = 4,                    // 0x10 g
     PER_CHARACTER_MACROS_CACHE      = 5,                    // 0x20 p
     PER_CHARACTER_LAYOUT_CACHE      = 6,                    // 0x40 p
-    PER_CHARACTER_CHAT_CACHE        = 7,                    // 0x80 p
+    PER_CHARACTER_CHAT_CACHE        = 7                     // 0x80 p
 };
 
 #define NUM_ACCOUNT_DATA_TYPES        8
@@ -155,7 +155,7 @@ enum BFLeaveReason
     //BF_LEAVE_REASON_UNK1      = 0x00000002, (not used)
     //BF_LEAVE_REASON_UNK2      = 0x00000004, (not used)
     BF_LEAVE_REASON_EXITED    = 0x00000008,
-    BF_LEAVE_REASON_LOW_LEVEL = 0x00000010,
+    BF_LEAVE_REASON_LOW_LEVEL = 0x00000010
 };
 
 enum ChatRestrictionType
@@ -562,7 +562,7 @@ class WorldSession
 
         void HandleGameObjectQueryOpcode(WorldPacket& recvPacket);
 
-        void HandleQueryNpcCompletitionRespOpcode(WorldPacket& recvData);
+        void HandleQuestNpcQueryOpcode(WorldPacket& recvData);
 
         void HandleMoveWorldportAckOpcode(WorldPacket& recvPacket);
         void HandleMoveWorldportAckOpcode();                // for server-side calls
@@ -615,7 +615,6 @@ class WorldSession
         void HandleTurnInPetitionOpcode(WorldPacket& recvData);
 
         void HandleGuildQueryOpcode(WorldPacket& recvPacket);
-        void HandleGuildCreateOpcode(WorldPacket& recvPacket);
         void HandleGuildInviteOpcode(WorldPacket& recvPacket);
         void HandleGuildRemoveOpcode(WorldPacket& recvPacket);
         void HandleGuildAcceptOpcode(WorldPacket& recvPacket);

@@ -32,7 +32,7 @@ enum DisableType
     DISABLE_TYPE_BATTLEGROUND           = 3,
     DISABLE_TYPE_ACHIEVEMENT_CRITERIA   = 4,
     DISABLE_TYPE_OUTDOORPVP             = 5,
-    DISABLE_TYPE_VMAP                   = 6,
+    DISABLE_TYPE_VMAP                   = 6
 };
 
 enum SpellDisableTypes
@@ -44,7 +44,7 @@ enum SpellDisableTypes
     SPELL_DISABLE_MAP               = 0x10,
     SPELL_DISABLE_AREA              = 0x20,
     MAX_SPELL_DISABLE_TYPE = (  SPELL_DISABLE_PLAYER | SPELL_DISABLE_CREATURE | SPELL_DISABLE_PET |
-                                SPELL_DISABLE_DEPRECATED_SPELL | SPELL_DISABLE_MAP | SPELL_DISABLE_AREA),
+                                SPELL_DISABLE_DEPRECATED_SPELL | SPELL_DISABLE_MAP | SPELL_DISABLE_AREA)
 };
 
 enum VmapDisableTypes
@@ -52,7 +52,7 @@ enum VmapDisableTypes
     VMAP_DISABLE_AREAFLAG       = 0x1,
     VMAP_DISABLE_HEIGHT         = 0x2,
     VMAP_DISABLE_LOS            = 0x4,
-    VMAP_DISABLE_LIQUIDSTATUS   = 0x8,
+    VMAP_DISABLE_LIQUIDSTATUS   = 0x8
 };
 
 namespace DisableMgr

@@ -1783,7 +1783,7 @@ void Guild::HandleRoster(WorldSession* session /*= NULL*/)
 
     data.WriteString(m_motd);
     data << uint32(m_accountsNumber);
-    data << uint32(GetMaximumWeeklyReputation());
+    data << uint32(sWorld->getIntConfig(CONFIG_GUILD_WEEKLY_REP_CAP));
     data.AppendPackedTime(m_createdDate);
     data << uint32(0);
 
@@ -2516,7 +2516,11 @@ void Guild::HandleMemberLogout(WorldSession* session)
 void Guild::HandleDisband(WorldSession* session)
 {
     // Only leader can disband guild
-    if (_IsLeader(session->GetPlayer()))
+    if (!_IsLeader(session->GetPlayer()))
+        Guild::SendCommandResult(session, GUILD_COMMAND_INVITE, ERR_GUILD_PERMISSIONS);
+    else if (GetLevel() >= sWorld->getIntConfig(CONFIG_GUILD_UNDELETABLE_LEVEL))
+        Guild::SendCommandResult(session, GUILD_COMMAND_INVITE, ERR_GUILD_UNDELETABLE_DUE_TO_LEVEL);
+    else
     {
         Disband();
         sLog->outDebug(LOG_FILTER_GUILD, "Guild Successfully Disbanded");
@@ -2535,9 +2539,9 @@ void Guild::HandleGuildPartyRequest(WorldSession* session)
     WorldPacket data(SMSG_GUILD_PARTY_STATE_RESPONSE, 13);
     data.WriteBit(player->GetMap()->GetOwnerGuildId(player->GetTeam()) == GetId()); // Is guild group
     data.FlushBits();
-    data << float(0.f); // Guild XP multiplier
-    data << uint32(0); // Current guild members
-    data << uint32(0); // Needed guild members
+    data << float(0.f);      // Guild XP multiplier
+    data << uint32(0);       // Current guild members
+    data << uint32(0);       // Needed guild members
 
     session->SendPacket(&data);
     sLog->outDebug(LOG_FILTER_GUILD, "SMSG_GUILD_PARTY_STATE_RESPONSE [%s]", session->GetPlayerInfo().c_str());
@@ -2841,7 +2845,7 @@ SMSG_GUILD_MEMBER_DAILY_RESET // bank withdrawal reset
     data << uint64(player->GetGUID());
     session->SendPacket(&data);
 
-    data.Initialize(SMSG_GUILD_MEMBER_DAILY_RESET, 0); // tells the client to request bank withdrawal limit
+    data.Initialize(SMSG_GUILD_MEMBER_DAILY_RESET, 0);  // tells the client to request bank withdrawal limit
     session->SendPacket(&data);
 
     if (!sWorld->getBoolConfig(CONFIG_GUILD_LEVELING_ENABLED))

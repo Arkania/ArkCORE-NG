@@ -10,27 +10,7 @@
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "end_time.h"
-#include "Vehicle.h"
-#include "Unit.h"
-#include "ScriptedEscortAI.h"
-#include "Cell.h"
-#include "CellImpl.h"
-#include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
-#include "CombatAI.h"
-#include "PassiveAI.h"
-#include "ObjectMgr.h"
 #include "SpellInfo.h"
-#include "SpellScript.h"
-#include "SpellAuraEffects.h"
-#include "SpellAuras.h"
-#include "CreatureTextMgr.h"
-#include "Vehicle.h"
-#include "VehicleDefines.h"
-#include "Spell.h"
-#include "Player.h"
-#include "Map.h"
-#include "InstanceScript.h"
 
 enum Yells
 {
@@ -94,17 +74,17 @@ class boss_echo_of_tyrande : public CreatureScript
 
                 while (uint32 eventId = events.ExecuteEvent())
                 {
-                    switch (eventId)
-                    {
+                    //switch (eventId)
+                    //{
                     //    case EVENT_ROCK_SHARDS:
                     //        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
                     //            DoCast(target, SPELL_ROCK_SHARDS);
                     //        events.ScheduleEvent(EVENT_ROCK_SHARDS, 15000);
                     //        break;
 
-                        default:
-                            break;
-                    }
+                    //    default:
+                    //        break;
+                    //}
                 }
 
                 DoMeleeAttackIfReady();

@@ -91,17 +91,17 @@ class boss_murozond : public CreatureScript
 
                 while (uint32 eventId = events.ExecuteEvent())
                 {
-                    switch (eventId)
-                    {
+                    //switch (eventId)
+                    //{
                     //    case EVENT_ROCK_SHARDS:
                     //        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
                     //            DoCast(target, SPELL_ROCK_SHARDS);
                     //        events.ScheduleEvent(EVENT_ROCK_SHARDS, 15000);
                     //        break;
 
-                        default:
-                            break;
-                    }
+                    //    default:
+                    //        break;
+                    //}
                 }
 
                 DoMeleeAttackIfReady();

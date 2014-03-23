@@ -559,7 +559,7 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recvData)
             break;
         case 0:                                         // leave queue
             sLog->outError("Battleground port: Leave queue called for queueslot: %u", queueSlot);
-            if (bg->isArena() && bg->GetStatus() != STATUS_WAIT_QUEUE) // Prevent exploit.
+            if (bg->isArena() && bg->GetStatus() > STATUS_WAIT_QUEUE) // Prevent exploit.
                 return;
 
             // if player leaves rated arena match before match start, it is counted as he played but he lost

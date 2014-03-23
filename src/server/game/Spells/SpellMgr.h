@@ -39,8 +39,8 @@ enum SpellCategories
     SPELLCATEGORY_HEALTH_MANA_POTIONS = 4,
     SPELLCATEGORY_DEVOUR_MAGIC        = 12,
     SPELLCATEGORY_JUDGEMENT           = 1210,               // Judgement (seal trigger)
-    SPELLCATEGORY_FOOD             = 11,
-    SPELLCATEGORY_DRINK            = 59,
+    SPELLCATEGORY_FOOD                = 11,
+    SPELLCATEGORY_DRINK               = 59
 };
 
 //SpellFamilyFlags
@@ -89,7 +89,7 @@ enum SpellFamilyFlag
     SPELLFAMILYFLAG_DK_DEATH_COIL           = 0x00002000,
 
     // TODO: Figure out a more accurate name for the following familyflag(s)
-    SPELLFAMILYFLAG_SHAMAN_TOTEM_EFFECTS    = 0x04000000,  // Seems to be linked to most totems and some totem effects
+    SPELLFAMILYFLAG_SHAMAN_TOTEM_EFFECTS    = 0x04000000   // Seems to be linked to most totems and some totem effects
 };
 
 
@@ -100,7 +100,7 @@ enum SpellLinkedType
     SPELL_LINK_CAST     = 0,            // +: cast; -: remove
     SPELL_LINK_HIT      = 1 * 200000,
     SPELL_LINK_AURA     = 2 * 200000,   // +: aura; -: immune
-    SPELL_LINK_REMOVE   = 0,
+    SPELL_LINK_REMOVE   = 0
 };
 
 // Different spell properties
@@ -114,10 +114,11 @@ inline uint32 GetSpellRangeType(SpellRangeEntry const *range) { return (range ? 
 
 inline float GetSpellRadius(SpellEntry const *spellInfo, uint32 effectIdx, bool positive)
 {
-    SpellEffectEntry const* spellEffect = spellInfo->GetSpellEffect(SpellEffIndex(effectIdx));
-    return positive
-        ? GetSpellRadiusForFriend(sSpellRadiusStore.LookupEntry(spellEffect->EffectRadiusIndex))
-        : GetSpellRadiusForHostile(sSpellRadiusStore.LookupEntry(spellEffect->EffectRadiusIndex));
+    // @todo: New system  SpellInfo::SpellInfo(SpellEntry const* spellEntry, SpellEffectEntry const** effects)
+	//SpellEffectEntry const* spellEffect = spellInfo->GetSpellEffect(SpellEffIndex(effectIdx));
+    //return positive
+    //    ? GetSpellRadiusForFriend(sSpellRadiusStore.LookupEntry(spellEffect->EffectRadiusIndex))
+    //    : GetSpellRadiusForHostile(sSpellRadiusStore.LookupEntry(spellEffect->EffectRadiusIndex));
 }
 
 inline float GetSpellMaxRange(SpellEntry const *spellInfo, bool positive)
@@ -225,7 +226,7 @@ enum ProcFlags
                                                  | PROC_FLAG_TAKEN_SPELL_MAGIC_DMG_CLASS_POS | PROC_FLAG_TAKEN_SPELL_MAGIC_DMG_CLASS_NEG
                                                  | PROC_FLAG_TAKEN_PERIODIC | PROC_FLAG_TAKEN_DAMAGE,
 
-    REQ_SPELL_PHASE_PROC_FLAG_MASK             = SPELL_PROC_FLAG_MASK & DONE_HIT_PROC_FLAG_MASK,
+    REQ_SPELL_PHASE_PROC_FLAG_MASK             = SPELL_PROC_FLAG_MASK & DONE_HIT_PROC_FLAG_MASK
 };
 
 #define MELEE_BASED_TRIGGER_MASK (PROC_FLAG_DONE_MELEE_AUTO_ATTACK      | \
@@ -309,12 +310,12 @@ enum ProcFlagsHit
     PROC_HIT_REFLECT             = 0x0000800,
     PROC_HIT_INTERRUPT           = 0x0001000, // (not used atm)
     PROC_HIT_FULL_BLOCK          = 0x0002000,
-    PROC_HIT_MASK_ALL = 0x2FFF,
+    PROC_HIT_MASK_ALL            = 0x2FFF
 };
 
 enum ProcAttributes
 {
-    PROC_ATTR_REQ_EXP_OR_HONOR   = 0x0000010,
+    PROC_ATTR_REQ_EXP_OR_HONOR   = 0x0000010
 };
 
 struct SpellProcEventEntry
@@ -370,12 +371,12 @@ typedef UNORDERED_MAP<uint32, SpellBonusEntry>     SpellBonusMap;
 
 enum SpellGroup
 {
-    SPELL_GROUP_NONE = 0,
-    SPELL_GROUP_ELIXIR_BATTLE = 1,
-    SPELL_GROUP_ELIXIR_GUARDIAN = 2,
-    SPELL_GROUP_ELIXIR_UNSTABLE = 3,
+    SPELL_GROUP_NONE             = 0,
+    SPELL_GROUP_ELIXIR_BATTLE    = 1,
+    SPELL_GROUP_ELIXIR_GUARDIAN  = 2,
+    SPELL_GROUP_ELIXIR_UNSTABLE  = 3,
     SPELL_GROUP_ELIXIR_SHATTRATH = 4,
-    SPELL_GROUP_CORE_RANGE_MAX = 5,
+    SPELL_GROUP_CORE_RANGE_MAX   = 5
 };
 
 #define SPELL_GROUP_DB_RANGE_MIN 1000
@@ -390,10 +391,10 @@ typedef std::pair<SpellGroupSpellMap::const_iterator, SpellGroupSpellMap::const_
 
 enum SpellGroupStackRule
 {
-    SPELL_GROUP_STACK_RULE_DEFAULT = 0,
-    SPELL_GROUP_STACK_RULE_EXCLUSIVE = 1,
+    SPELL_GROUP_STACK_RULE_DEFAULT                    = 0,
+    SPELL_GROUP_STACK_RULE_EXCLUSIVE                  = 1,
     SPELL_GROUP_STACK_RULE_EXCLUSIVE_FROM_SAME_CASTER = 2,
-    SPELL_GROUP_STACK_RULE_EXCLUSIVE_SAME_EFFECT = 3,
+    SPELL_GROUP_STACK_RULE_EXCLUSIVE_SAME_EFFECT      = 3
 };
 #define SPELL_GROUP_STACK_RULE_MAX 4
 

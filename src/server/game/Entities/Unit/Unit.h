@@ -48,7 +48,7 @@ enum SpellInterruptFlags
     SPELL_INTERRUPT_FLAG_PUSH_BACK    = 0x02, // push back
     SPELL_INTERRUPT_FLAG_UNK3         = 0x04, // any info?
     SPELL_INTERRUPT_FLAG_INTERRUPT    = 0x08, // interrupt
-    SPELL_INTERRUPT_FLAG_ABORT_ON_DMG = 0x10,               // _complete_ interrupt on direct damage
+    SPELL_INTERRUPT_FLAG_ABORT_ON_DMG = 0x10  // _complete_ interrupt on direct damage
     //SPELL_INTERRUPT_UNK             = 0x20                // unk, 564 of 727 spells having this spell start with "Glyph"
 };
 
@@ -88,7 +88,7 @@ enum SpellAuraInterruptFlags
     AURA_INTERRUPT_FLAG_DIRECT_DAMAGE       = 0x01000000,   // 24   removed by any direct damage
     AURA_INTERRUPT_FLAG_LANDING             = 0x02000000,   // 25   removed by hitting the ground
 
-    AURA_INTERRUPT_FLAG_NOT_VICTIM = (AURA_INTERRUPT_FLAG_HITBYSPELL | AURA_INTERRUPT_FLAG_TAKE_DAMAGE | AURA_INTERRUPT_FLAG_DIRECT_DAMAGE),
+    AURA_INTERRUPT_FLAG_NOT_VICTIM = (AURA_INTERRUPT_FLAG_HITBYSPELL | AURA_INTERRUPT_FLAG_TAKE_DAMAGE | AURA_INTERRUPT_FLAG_DIRECT_DAMAGE)
 };
 
 enum SpellModOp
@@ -135,7 +135,7 @@ enum SpellValueMod
     SPELLVALUE_BASE_POINT2,
     SPELLVALUE_RADIUS_MOD,
     SPELLVALUE_MAX_TARGETS,
-    SPELLVALUE_AURA_STACK,
+    SPELLVALUE_AURA_STACK
 };
 
 typedef std::pair<SpellValueMod, int32>     CustomSpellValueMod;
@@ -255,7 +255,7 @@ enum UnitPVPStateFlags
 enum UnitRename
 {
     UNIT_CAN_BE_RENAMED     = 0x01,
-    UNIT_CAN_BE_ABANDONED   = 0x02,
+    UNIT_CAN_BE_ABANDONED   = 0x02
 };
 
 #define CREATURE_MAX_SPELLS     8
@@ -407,7 +407,7 @@ enum TriggerCastFlags
     TRIGGERED_IGNORE_CASTER_AURAS                   = 0x00010000,   //! Will ignore caster aura restrictions or requirements
     TRIGGERED_DISALLOW_PROC_EVENTS                  = 0x00020000,   //! Disallows proc events from triggered spell (default)
     TRIGGERED_DONT_REPORT_CAST_ERROR                = 0x00040000,   //! Will return SPELL_FAILED_DONT_REPORT in CheckCast functions
-    TRIGGERED_FULL_MASK                             = 0xFFFFFFFF,
+    TRIGGERED_FULL_MASK                             = 0xFFFFFFFF
 };
 
 enum UnitMods
@@ -474,11 +474,11 @@ enum BaseModType
 
 enum DeathState
 {
-    ALIVE       = 0,
-    JUST_DIED   = 1,
-    CORPSE      = 2,
-    DEAD        = 3,
-    JUST_RESPAWNED = 4,
+    ALIVE          = 0,
+    JUST_DIED      = 1,
+    CORPSE         = 2,
+    DEAD           = 3,
+    JUST_RESPAWNED = 4
 };
 
 enum UnitState
@@ -687,7 +687,7 @@ enum NPCFlags
     UNIT_NPC_FLAG_PLAYER_VEHICLE        = 0x02000000,       // players with mounts that have vehicle data should have it set
     UNIT_NPC_FLAG_REFORGER              = 0x08000000,       // reforging
     UNIT_NPC_FLAG_TRANSMOGRIFIER        = 0x10000000,       // transmogrification
-    UNIT_NPC_FLAG_VAULTKEEPER           = 0x20000000,       // void storage
+    UNIT_NPC_FLAG_VAULTKEEPER           = 0x20000000        // void storage
 };
 
 enum MovementFlags
@@ -743,8 +743,9 @@ enum MovementFlags
 
     //! TODO if needed: add more flags to this masks that are exclusive to players
     MOVEMENTFLAG_MASK_PLAYER_ONLY =
-        MOVEMENTFLAG_FLYING,
+        MOVEMENTFLAG_FLYING
 };
+
 enum MovementFlags2
 {
     MOVEMENTFLAG2_NONE                     = 0x00000000,
@@ -759,7 +760,7 @@ enum MovementFlags2
     MOVEMENTFLAG2_UNK10                    = 0x00000100,
     MOVEMENTFLAG2_INTERPOLATED_MOVEMENT    = 0x00000200,
     MOVEMENTFLAG2_INTERPOLATED_TURNING     = 0x00000400,
-    MOVEMENTFLAG2_INTERPOLATED_PITCHING    = 0x00000800,
+    MOVEMENTFLAG2_INTERPOLATED_PITCHING    = 0x00000800
 };
 
 enum UnitTypeMask
@@ -774,7 +775,7 @@ enum UnitTypeMask
     UNIT_MASK_PUPPET                = 0x00000040,
     UNIT_MASK_HUNTER_PET            = 0x00000080,
     UNIT_MASK_CONTROLABLE_GUARDIAN  = 0x00000100,
-    UNIT_MASK_ACCESSORY             = 0x00000200,
+    UNIT_MASK_ACCESSORY             = 0x00000200
 };
 
 namespace Movement{
@@ -788,7 +789,7 @@ enum DiminishingLevels
     DIMINISHING_LEVEL_3             = 2,
     DIMINISHING_LEVEL_IMMUNE        = 3,
     DIMINISHING_LEVEL_4             = 3,
-    DIMINISHING_LEVEL_TAUNT_IMMUNE  = 4,
+    DIMINISHING_LEVEL_TAUNT_IMMUNE  = 4
 };
 
 struct DiminishingReturn
@@ -1100,7 +1101,7 @@ enum CharmType
     CHARM_TYPE_CHARM,
     CHARM_TYPE_POSSESS,
     CHARM_TYPE_VEHICLE,
-    CHARM_TYPE_CONVERT,
+    CHARM_TYPE_CONVERT
 };
 
 typedef UnitActionBarEntry CharmSpellInfo;
@@ -1110,7 +1111,7 @@ enum ActionBarIndex
     ACTION_BAR_INDEX_START = 0,
     ACTION_BAR_INDEX_PET_SPELL_START = 3,
     ACTION_BAR_INDEX_PET_SPELL_END = 7,
-    ACTION_BAR_INDEX_END = 10,
+    ACTION_BAR_INDEX_END = 10
 };
 
 #define MAX_UNIT_ACTION_BAR_INDEX (ACTION_BAR_INDEX_END-ACTION_BAR_INDEX_START)
@@ -1210,7 +1211,7 @@ enum PlayerTotemType
     SUMMON_TYPE_TOTEM_FIRE  = 63,
     SUMMON_TYPE_TOTEM_EARTH = 81,
     SUMMON_TYPE_TOTEM_WATER = 82,
-    SUMMON_TYPE_TOTEM_AIR   = 83,
+    SUMMON_TYPE_TOTEM_AIR   = 83
 };
 
 // delay time next attack to prevent client attack animation problems
@@ -1371,8 +1372,6 @@ class Unit : public WorldObject
         // returns the change in power
         int32 ModifyPower(Powers power, int32 val);
         int32 ModifyPowerPct(Powers power, float pct, bool apply = true);
-
-        uint32 GetPowerIndexByClass(uint32 powerId, uint32 classId) const;
 
         uint32 GetAttackTime(WeaponAttackType att) const
         {
@@ -2225,34 +2224,13 @@ class Unit : public WorldObject
 
         void SetTarget(uint64 guid)
         {
-            if (!_targetLocked)
+            if (!_focusSpell)
                 SetUInt64Value(UNIT_FIELD_TARGET, guid);
         }
 
-        void FocusTarget(Spell const* focusSpell, uint64 target)
-        {
-            // already focused
-            if (_focusSpell)
-                return;
-
-            _focusSpell = focusSpell;
-            _targetLocked = true;
-            SetUInt64Value(UNIT_FIELD_TARGET, target);
-        }
-
-        void ReleaseFocus(Spell const* focusSpell)
-        {
-            // focused to something else
-            if (focusSpell != _focusSpell)
-                return;
-
-            _focusSpell = NULL;
-            _targetLocked = false;
-            if (Unit* victim = GetVictim())
-                SetUInt64Value(UNIT_FIELD_TARGET, victim->GetGUID());
-            else
-                SetUInt64Value(UNIT_FIELD_TARGET, 0);
-        }
+        // Handling caster facing during spellcast
+        void FocusTarget(Spell const* focusSpell, uint64 target);
+        void ReleaseFocus(Spell const* focusSpell);
 
         void SendGravityEnable();
         void SendGravityDisable();
@@ -2418,8 +2396,7 @@ class Unit : public WorldObject
         bool m_cleanupDone; // lock made to not add stuff after cleanup before delete
         bool m_duringRemoveFromWorld; // lock made to not add stuff after begining removing from world
 
-        Spell const* _focusSpell;
-        bool _targetLocked; // locks the target during spell cast for proper facing
+        Spell const* _focusSpell;   ///> Locks the target during spell cast for proper facing
         bool _isWalkingBeforeCharm; // Are we walking before we were charmed?
 
         time_t _lastDamagedTime; // Part of Evade mechanics

@@ -185,14 +185,6 @@ void WorldSession::HandleActivateTaxiExpressOpcode (WorldPacket & recvData)
     {
         uint32 node;
         recvData >> node;
-    	
-        if (!GetPlayer()->m_taxi.IsTaximaskNodeKnown(node) && !GetPlayer()->isTaxiCheater())
-        {
-            SendActivateTaxiReply(ERR_TAXINOTVISITED);
-            recvData.rfinish();
-            return;
-        }	
-	
         nodes.push_back(node);
     }
 
@@ -296,15 +288,6 @@ void WorldSession::HandleActivateTaxiOpcode(WorldPacket & recvData)
         return;
     }
 
-    if (!GetPlayer()->isTaxiCheater())
-    {
-        if (!GetPlayer()->m_taxi.IsTaximaskNodeKnown(nodes[0]) || !GetPlayer()->m_taxi.IsTaximaskNodeKnown(nodes[1]))
-        {
-            SendActivateTaxiReply(ERR_TAXINOTVISITED);
-            return;
-        }
-    }	
-	
     GetPlayer()->ActivateTaxiPathTo(nodes, npc);
 }
 

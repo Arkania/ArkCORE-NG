@@ -28,10 +28,10 @@ namespace Movement
 {
     enum AnimType
     {
-        ToGround = 0, // 460 = ToGround, index of AnimationData.dbc
-        FlyToFly = 1, // 461 = FlyToFly?
-        ToFly = 2, // 458 = ToFly
-        FlyToGround = 3 // 463 = FlyToGround
+        ToGround    = 0, // 460 = ToGround, index of AnimationData.dbc
+        FlyToFly    = 1, // 461 = FlyToFly?
+        ToFly       = 2, // 458 = ToFly
+        FlyToGround = 3  // 463 = FlyToGround
     };
 
     // Transforms coordinates from global to transport offsets

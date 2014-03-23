@@ -68,7 +68,7 @@ enum SpellCastTargetFlags
         | TARGET_FLAG_UNIT_ENEMY | TARGET_FLAG_UNIT_ALLY | TARGET_FLAG_UNIT_DEAD | TARGET_FLAG_UNIT_MINIPET | TARGET_FLAG_UNIT_PASSENGER,
     TARGET_FLAG_GAMEOBJECT_MASK = TARGET_FLAG_GAMEOBJECT | TARGET_FLAG_GAMEOBJECT_ITEM,
     TARGET_FLAG_CORPSE_MASK = TARGET_FLAG_CORPSE_ALLY | TARGET_FLAG_CORPSE_ENEMY,
-    TARGET_FLAG_ITEM_MASK = TARGET_FLAG_TRADE_ITEM | TARGET_FLAG_ITEM | TARGET_FLAG_GAMEOBJECT_ITEM,
+    TARGET_FLAG_ITEM_MASK = TARGET_FLAG_TRADE_ITEM | TARGET_FLAG_ITEM | TARGET_FLAG_GAMEOBJECT_ITEM
 };
 
 enum SpellTargetSelectionCategories
@@ -78,7 +78,7 @@ enum SpellTargetSelectionCategories
     TARGET_SELECT_CATEGORY_CHANNEL,
     TARGET_SELECT_CATEGORY_NEARBY,
     TARGET_SELECT_CATEGORY_CONE,
-    TARGET_SELECT_CATEGORY_AREA,
+    TARGET_SELECT_CATEGORY_AREA
 };
 
 enum SpellTargetReferenceTypes
@@ -88,7 +88,7 @@ enum SpellTargetReferenceTypes
     TARGET_REFERENCE_TYPE_TARGET,
     TARGET_REFERENCE_TYPE_LAST,
     TARGET_REFERENCE_TYPE_SRC,
-    TARGET_REFERENCE_TYPE_DEST,
+    TARGET_REFERENCE_TYPE_DEST
 };
 
 enum SpellTargetObjectTypes
@@ -104,7 +104,7 @@ enum SpellTargetObjectTypes
     TARGET_OBJECT_TYPE_CORPSE,
     // only for effect target type
     TARGET_OBJECT_TYPE_CORPSE_ENEMY,
-    TARGET_OBJECT_TYPE_CORPSE_ALLY,
+    TARGET_OBJECT_TYPE_CORPSE_ALLY
 };
 
 enum SpellTargetCheckTypes
@@ -116,7 +116,7 @@ enum SpellTargetCheckTypes
     TARGET_CHECK_PARTY,
     TARGET_CHECK_RAID,
     TARGET_CHECK_RAID_CLASS,
-    TARGET_CHECK_PASSENGER,
+    TARGET_CHECK_PASSENGER
 };
 
 enum SpellTargetDirectionTypes
@@ -131,14 +131,14 @@ enum SpellTargetDirectionTypes
     TARGET_DIR_BACK_LEFT,
     TARGET_DIR_FRONT_LEFT,
     TARGET_DIR_RANDOM,
-    TARGET_DIR_ENTRY,
+    TARGET_DIR_ENTRY
 };
 
 enum SpellEffectImplicitTargetTypes
 {
     EFFECT_IMPLICIT_TARGET_NONE = 0,
     EFFECT_IMPLICIT_TARGET_EXPLICIT,
-    EFFECT_IMPLICIT_TARGET_CASTER,
+    EFFECT_IMPLICIT_TARGET_CASTER
 };
 
 // Spell clasification
@@ -170,7 +170,7 @@ enum SpellSpecificType
     SPELL_SPECIFIC_HAND                          = 29,
     SPELL_SPECIFIC_PHASE                         = 30,
     SPELL_SPECIFIC_BANE                          = 31,
-    SPELL_SPECIFIC_LIFEBLOOM                     = 32,
+    SPELL_SPECIFIC_LIFEBLOOM                     = 32
 };
 
 enum SpellCustomAttributes
@@ -192,7 +192,7 @@ enum SpellCustomAttributes
     SPELL_ATTR0_CU_REQ_TARGET_FACING_CASTER      = 0x00010000,
     SPELL_ATTR0_CU_REQ_CASTER_BEHIND_TARGET      = 0x00020000,
 
-    SPELL_ATTR0_CU_NEGATIVE                      = SPELL_ATTR0_CU_NEGATIVE_EFF0 | SPELL_ATTR0_CU_NEGATIVE_EFF1 | SPELL_ATTR0_CU_NEGATIVE_EFF2,
+    SPELL_ATTR0_CU_NEGATIVE                      = SPELL_ATTR0_CU_NEGATIVE_EFF0 | SPELL_ATTR0_CU_NEGATIVE_EFF1 | SPELL_ATTR0_CU_NEGATIVE_EFF2
 };
 
 uint32 GetTargetFlagMask(SpellTargetObjectTypes objType);
@@ -260,7 +260,7 @@ public:
     float     ComboScalingMultiplier;
 
     SpellEffectInfo() {}
-    SpellEffectInfo(SpellEntry const* spellEntry, SpellInfo const* spellInfo, uint8 effIndex);
+    SpellEffectInfo(SpellEntry const* spellEntry, SpellInfo const* spellInfo, uint8 effIndex, SpellEffectEntry const* effect);
 
     bool IsEffect() const;
     bool IsEffect(SpellEffects effectName) const;
@@ -417,7 +417,7 @@ public:
     SpellShapeshiftEntry const* GetSpellShapeshift() const;
     SpellTotemsEntry const* GetSpellTotems() const;
 
-    SpellInfo(SpellEntry const* spellEntry);
+    SpellInfo(SpellEntry const* spellEntry, SpellEffectEntry const** effects);
     ~SpellInfo();
 
     bool HasEffect(SpellEffects effect) const;

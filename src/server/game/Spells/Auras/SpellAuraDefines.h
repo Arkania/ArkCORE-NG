@@ -48,14 +48,14 @@ enum AuraEffectHandleModes
     AURA_EFFECT_HANDLE_SEND_FOR_CLIENT_MASK = (AURA_EFFECT_HANDLE_SEND_FOR_CLIENT | AURA_EFFECT_HANDLE_REAL), // any case handler need to send packet
     AURA_EFFECT_HANDLE_CHANGE_AMOUNT_MASK = (AURA_EFFECT_HANDLE_CHANGE_AMOUNT | AURA_EFFECT_HANDLE_REAL), // any case handler applies effect depending on amount
     AURA_EFFECT_HANDLE_CHANGE_AMOUNT_SEND_FOR_CLIENT_MASK = (AURA_EFFECT_HANDLE_CHANGE_AMOUNT_MASK | AURA_EFFECT_HANDLE_SEND_FOR_CLIENT_MASK),
-    AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK = (AURA_EFFECT_HANDLE_REAPPLY | AURA_EFFECT_HANDLE_REAL),
+    AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK = (AURA_EFFECT_HANDLE_REAPPLY | AURA_EFFECT_HANDLE_REAL)
 };
 
 //m_schoolAbsorb
 enum DAMAGE_ABSORB_TYPE
 {
     ALL_DAMAGE_ABSORB       = -2,
-    ONLY_MAGIC_ABSORB       = -1,
+    ONLY_MAGIC_ABSORB       = -1
 };
 
 enum AuraType
@@ -390,7 +390,7 @@ enum AuraType
     SPELL_AURA_327                                          = 327,
     SPELL_AURA_328                                          = 328,
     SPELL_AURA_MOD_RUNE_REGEN_SPEED                         = 329,  // NYI
-    SPELL_AURA_WALK_AND_CAST                                = 330,  // Cast While Walking
+    SPELL_AURA_CAST_WHILE_WALKING                           = 330,  // Cast While Walking
     SPELL_AURA_FORCE_WEATHER                                = 331,
     SPELL_AURA_OVERRIDE_ACTIONBAR_SPELLS                    = 332,
     SPELL_AURA_OVERRIDE_ACTIONBAR_SPELLS_2                  = 333,
@@ -409,7 +409,7 @@ enum AuraType
     SPELL_AURA_PROGRESS_BAR                                 = 346,  // Atramedes, Cho'gall, Alysrazor, Rhyolith, Majordomo and many others!
     SPELL_AURA_MOD_SPELL_COOLDOWN_BY_HASTE                  = 347,  // NYI
     SPELL_AURA_DEPOSIT_BONUS_MONEY_IN_GUILD_BANK_ON_LOOT    = 348,  // NYI
-    SPELL_AURA_MOD_CURRENCY_GAIN                            = 349,  // NYI
+    SPELL_AURA_MOD_CURRENCY_GAIN                            = 349,
     SPELL_AURA_MOD_GATHERING_ITEMS_GAINED_PERCENT           = 350,  // NYI
     SPELL_AURA_351                                          = 351,
     SPELL_AURA_352                                          = 352,
@@ -437,6 +437,6 @@ enum AuraType
 enum AuraObjectType
 {
     UNIT_AURA_TYPE,
-    DYNOBJ_AURA_TYPE,
+    DYNOBJ_AURA_TYPE
 };
 #endif

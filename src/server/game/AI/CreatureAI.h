@@ -46,7 +46,7 @@ enum SelectTargetType
 
     SELECT_TARGET_SINGLE_FRIEND,                            //Only Single Friend
     SELECT_TARGET_AOE_FRIEND,                               //Only AoE Friend
-    SELECT_TARGET_ANY_FRIEND,                               //AoE or Single Friend
+    SELECT_TARGET_ANY_FRIEND                                //AoE or Single Friend
 };
 
 //Spell Effects used by SelectSpell
@@ -55,7 +55,7 @@ enum SelectEffect
     SELECT_EFFECT_DONTCARE = 0,                             //All spell effects allowed
     SELECT_EFFECT_DAMAGE,                                   //Spell does damage
     SELECT_EFFECT_HEALING,                                  //Spell does healing
-    SELECT_EFFECT_AURA,                                     //Spell applies an aura
+    SELECT_EFFECT_AURA                                      //Spell applies an aura
 };
 
 enum SCEquip
