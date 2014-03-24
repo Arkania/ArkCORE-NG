@@ -614,7 +614,7 @@ class spell_warl_unstable_affliction : public SpellScriptLoader
             void HandleDispel(DispelInfo* dispelInfo)
             {
                 if (Unit* caster = GetCaster())
-                    if (AuraEffect const* aurEff = GetEffect(EFFECT_1))
+                    if (AuraEffect const* aurEff = GetEffect(EFFECT_0))
                     {
                         int32 damage = aurEff->GetAmount() * 9;
                         // backfire damage and silence
