@@ -449,7 +449,7 @@ public:
             player->learnSpell(skillLine->spellId, false);
         }
     }
-	
+
     static bool HandleUnLearnCommand(ChatHandler* handler, char const* args)
     {
         if (!*args)

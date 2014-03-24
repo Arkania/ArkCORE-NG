@@ -827,6 +827,7 @@ class GameObject : public WorldObject, public GridObject<GameObject>
 
         std::string GetAIName() const;
         void SetDisplayId(uint32 displayid);
+        uint32 GetDisplayId() const { return GetUInt32Value(GAMEOBJECT_DISPLAYID); }
 
         void SetManualAnim(bool apply)
         {

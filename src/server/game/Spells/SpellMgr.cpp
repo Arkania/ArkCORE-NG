@@ -76,6 +76,9 @@ DiminishingGroup GetDiminishingReturnsGroupForSpell(SpellInfo const* spellproto,
             // Pet charge effects (Infernal Awakening, Demon Charge)
             if (spellproto->SpellVisual[0] == 2816 && spellproto->SpellIconID == 15)
                 return DIMINISHING_CONTROLLED_STUN;
+            // Frost Tomb
+            else if (spellproto->Id == 48400)
+                return DIMINISHING_NONE;
             // Gnaw
             else if (spellproto->Id == 47481)
                 return DIMINISHING_CONTROLLED_STUN;
@@ -2841,6 +2844,10 @@ void SpellMgr::LoadSpellCustomAttr()
             case 77493: // Mastery: Razor Claws
                 spellInfo->Effects[0].BasePoints = 25.04;
                 break;
+            case 60256:
+                //Crashes client on pressing ESC
+                spellInfo->AttributesEx4 &= ~SPELL_ATTR4_TRIGGERED;
+                break;
             case 1776: // Gouge
             case 12540:
             case 13579:
@@ -3005,6 +3012,16 @@ void SpellMgr::LoadSpellCustomAttr()
                 break;
              case 74137: // Confuse Isiset
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_REQ_TARGET_FACING_CASTER;
+                break;
+            case 42730:
+                spellInfo->Effects[EFFECT_1].TriggerSpell = 42739;
+                break;
+            case 59735:
+                spellInfo->Effects[EFFECT_1].TriggerSpell = 59736;
+                break;
+            case 52611: // Summon Skeletons
+            case 52612: // Summon Skeletons
+                spellInfo->Effects[EFFECT_0].MiscValueB = 64;
                 break;
             case 40244: // Simon Game Visual
             case 40245: // Simon Game Visual

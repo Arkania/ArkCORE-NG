@@ -198,7 +198,7 @@ void WorldSession::HandleVoidStorageTransfer(WorldPacket& recvData)
     npcGuid[1] = recvData.ReadBit();
 
     uint32 countDeposit = recvData.ReadBits(26);
-    
+
     if (countDeposit > 9)
     {
         sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleVoidStorageTransfer - Player (GUID: %u, name: %s) wants to deposit more than 9 items (%u).", player->GetGUIDLow(), player->GetName(), countDeposit);
@@ -462,7 +462,7 @@ void WorldSession::HandleVoidStorageTransfer(WorldPacket& recvData)
         data.WriteByteSeq(itemId[1]);
 
         data << uint32(depositItems[i].second); // slot
-        
+
         data.WriteByteSeq(creatorGuid[2]);
         data.WriteByteSeq(itemId[7]);
 
@@ -518,7 +518,7 @@ void WorldSession::HandleVoidSwapItem(WorldPacket& recvData)
     recvData.ReadByteSeq(npcGuid[7]);
     recvData.ReadByteSeq(npcGuid[4]);
     recvData.ReadByteSeq(itemId[7]);
-    
+
     Creature* unit = player->GetNPCIfCanInteractWith(npcGuid, UNIT_NPC_FLAG_VAULTKEEPER);
     if (!unit)
     {

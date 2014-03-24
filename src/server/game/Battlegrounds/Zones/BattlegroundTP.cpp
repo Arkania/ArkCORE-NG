@@ -597,25 +597,22 @@ void BattlegroundTP::UpdateTeamScore(uint32 team)
         UpdateWorldState(BG_TP_FLAG_CAPTURES_HORDE, GetTeamScore(team));
 }
 
-void BattlegroundTP::HandleAreaTrigger(Player* Source, uint32 Trigger)
+void BattlegroundTP::HandleAreaTrigger(Player* player, uint32 trigger)
 {
-    // this is wrong way to implement these things. On official it done by gameobject spell cast.
     if (GetStatus() != STATUS_IN_PROGRESS)
         return;
 
-    //uint32 SpellId = 0;
-    //uint64 buff_guid = 0;
-    switch(Trigger)
+    switch(trigger)
     {
         case 5904:                                          // Alliance Flag spawn
             if (m_FlagState[BG_TEAM_HORDE] && !m_FlagState[BG_TEAM_ALLIANCE])
-                if (GetHordeFlagPickerGUID() == Source->GetGUID())
-                    EventPlayerCapturedFlag(Source);
+                if (GetHordeFlagPickerGUID() == player->GetGUID())
+                    EventPlayerCapturedFlag(player);
             break;
         case 5905:                                          // Horde Flag spawn
             if (m_FlagState[BG_TEAM_ALLIANCE] && !m_FlagState[BG_TEAM_HORDE])
-                if (GetAllianceFlagPickerGUID() == Source->GetGUID())
-                    EventPlayerCapturedFlag(Source);
+                if (GetAllianceFlagPickerGUID() == player->GetGUID())
+                    EventPlayerCapturedFlag(player);
             break;
         case 5908:                                          // Horde Tower
         case 5909:                                          // Twin Peak House big
@@ -629,8 +626,7 @@ void BattlegroundTP::HandleAreaTrigger(Player* Source, uint32 Trigger)
         case 5921:                                          // Horde Start left Water channel
             break;
         default:
-            sLog->outError("WARNING: Unhandled AreaTrigger in Battleground: %u", Trigger);
-            Source->GetSession()->SendAreaTriggerMessage("Warning: Unhandled AreaTrigger in Battleground: %u", Trigger);
+            Battleground::HandleAreaTrigger(player, trigger);
             break;
     }
 

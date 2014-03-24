@@ -28,7 +28,7 @@ namespace Trinity
     {
         public:
             AutoPtr() : ACE_Strong_Bound_Ptr<Pointer, Lock>() {}
- 
+
             AutoPtr(Pointer* x)
             {
                 ACE_Strong_Bound_Ptr<Pointer, Lock>::reset(x);

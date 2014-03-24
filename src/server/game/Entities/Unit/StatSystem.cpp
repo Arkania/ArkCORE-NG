@@ -1151,15 +1151,15 @@ void Guardian::UpdateArmor()
     float bonus_armor = 0.0f;
     UnitMods unitMod = UNIT_MOD_ARMOR;
 
-// hunter pets gain 35% of owner's armor value, warlock pets gain 100% of owner's armor
-      if (IsHunterPet())
+    // hunter pets gain 35% of owner's armor value, warlock pets gain 100% of owner's armor
+    if (IsHunterPet())
         bonus_armor = float(CalculatePctN(m_owner->GetArmor(), 70));
     else if (IsPet())
         bonus_armor = m_owner->GetArmor();
 
     value  = GetModifierValue(unitMod, BASE_VALUE);
     value *= GetModifierValue(unitMod, BASE_PCT);
-    value += GetStat(STAT_AGILITY) * 2.0f;
+    //value += GetStat(STAT_AGILITY) * 2.0f;
     value += GetModifierValue(unitMod, TOTAL_VALUE) + bonus_armor;
     value *= GetModifierValue(unitMod, TOTAL_PCT);
 

@@ -95,6 +95,8 @@ bool WDTFile::init(char *map_id, unsigned int mapID)
             // global wmo instance data
             if (size)
             {
+                gnWMO = (int)size / 64;
+
                 for (int i = 0; i < gnWMO; ++i)
                 {
                     int id;

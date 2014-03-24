@@ -49,7 +49,7 @@ void ARC4::UpdateData(int len, uint8 *data)
 {
     if (!len)
          return;
-    	 
+
     int outlen = 0;
     EVP_EncryptUpdate(&m_ctx, data, &outlen, data, len);
     EVP_EncryptFinal_ex(&m_ctx, data, &outlen);

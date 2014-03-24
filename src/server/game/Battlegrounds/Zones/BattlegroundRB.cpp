@@ -57,9 +57,8 @@ void BattlegroundRB::RemovePlayer(Player* /*player*/, uint64 /*guid*/, uint32 /*
 {
 }
 
-void BattlegroundRB::HandleAreaTrigger(Player* /*Source*/, uint32 /*Trigger*/)
+void BattlegroundRB::HandleAreaTrigger(Player* /*player*/, uint32 /*trigger*/)
 {
-    // this is wrong way to implement these things. On official it done by gameobject spell cast.
     if (GetStatus() != STATUS_IN_PROGRESS)
         return;
 }

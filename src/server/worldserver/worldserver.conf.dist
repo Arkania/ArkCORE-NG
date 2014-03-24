@@ -49,7 +49,7 @@
 #
 #    RealmID
 #        Description: ID of the Realm using this config.
-#        Important:   RealmID must match the realmlist inside the realmd database.
+#        Important:   RealmID must match the realmlist inside the auth database.
 #        Default:     1
 
 RealmID = 1
@@ -174,7 +174,7 @@ Compression = 1
 #    PlayerLimit
 #        Description: Maximum number of players in the world. Excluding Mods, GMs and Admins.
 #          Important: If you want to block players and only allow Mods, GMs or Admins to join the
-#                     server, use the DB field "realmd.realmlist.allowedSecurityLevel".
+#                     server, use the DB field "auth.rrealmlist.allowedSecurityLevel".
 #            Default: 100 - (Enabled)
 #                     1+  - (Enabled)
 #                     0   - (Disabled, No limit)
@@ -391,6 +391,7 @@ CleanCharacterDB = 0
 
 PersistentCharacterCleanFlags = 0
 
+#
 ###################################################################################################
 
 ###################################################################################################
@@ -1549,7 +1550,7 @@ Warden.ClientCheckHoldOff = 30
 #
 #    Warden.ClientCheckFailAction
 #        Description: Default action being taken if a client check failed. Actions can be
-#                     overwritten for each single check via warden_action table in characters 
+#                     overwritten for each single check via warden_action table in characters
 #                     database.
 #        Default:     0 - (Disabled, Logging only)
 #                     1 - (Kick)
@@ -2312,9 +2313,9 @@ Rate.MoveSpeed = 1
 
 #
 #    Rate.InstanceResetTime
-#        Description: Multiplier for the rate between global raid/heroic instance resets 
-#                     (dbc value). Higher value increases the time between resets, 
-#                     lower value lowers the time, you need clean instance_reset in 
+#        Description: Multiplier for the rate between global raid/heroic instance resets
+#                     (dbc value). Higher value increases the time between resets,
+#                     lower value lowers the time, you need clean instance_reset in
 #                     characters db in order to let new values work.
 #        Default:     1
 
@@ -2552,53 +2553,53 @@ Battleground.Random.ResetHour = 6
 ###################################################################################################
 # BATTLEFIELD CONFIG
 #
-# Wintergrasp.Enable
-# Description: Enable the Wintergrasp battlefield.
-# Default: 0 - (Disabled)
-# 1 - (Enabled, Experimental as of still being in development)
+#     Wintergrasp.Enable
+#         Description: Enable the Wintergrasp battlefield.
+#         Default:     0 - (Disabled)
+#                      1 - (Enabled, Experimental as of still being in development)
 
 Wintergrasp.Enable = 0
 
 #
-# Wintergrasp.PlayerMax
-# Description: Maximum number of players allowed in Wintergrasp.
-# Default: 100
+#     Wintergrasp.PlayerMax
+#         Description: Maximum number of players allowed in Wintergrasp.
+#         Default:     100
 
 Wintergrasp.PlayerMax = 100
 
 #
-# Wintergrasp.PlayerMin
-# Description: Minimum number of players required for Wintergrasp.
-# Default: 0
+#     Wintergrasp.PlayerMin
+#         Description: Minimum number of players required for Wintergrasp.
+#         Default:     0
 
 Wintergrasp.PlayerMin = 0
 
 #
-# Wintergrasp.PlayerMinLvl
-# Description: Required character level for the Wintergrasp battle.
-# Default: 77
+#     Wintergrasp.PlayerMinLvl
+#         Description: Required character level for the Wintergrasp battle.
+#         Default:     77
 
 Wintergrasp.PlayerMinLvl = 77
 
 #
-# Wintergrasp.BattleTimer
-# Description: Time (in minutes) for the Wintergrasp battle to last.
-# Default: 30
+#     Wintergrasp.BattleTimer
+#         Description: Time (in minutes) for the Wintergrasp battle to last.
+#         Default:     30
 
 Wintergrasp.BattleTimer = 30
 
 #
-# Wintergrasp.NoBattleTimer
-# Description: Time (in minutes) between Wintergrasp battles.
-# Default: 150
+#     Wintergrasp.NoBattleTimer
+#         Description: Time (in minutes) between Wintergrasp battles.
+#         Default:     150
 
 Wintergrasp.NoBattleTimer = 150
 
 #
-# Wintergrasp.CrashRestartTimer
-# Description: Time (in minutes) to delay the restart of Wintergrasp if the world server
-# crashed during a running battle.
-# Default: 10
+#     Wintergrasp.CrashRestartTimer
+#         Description: Time (in minutes) to delay the restart of Wintergrasp if the world server
+#                      crashed during a running battle.
+#         Default:     10
 
 Wintergrasp.CrashRestartTimer = 10
 
@@ -2999,7 +3000,7 @@ Livers.Aura.Enable = 1
 
 ###################################################################################################
 #
-# GUILD LEVELING SETTINGS
+#  GUILD LEVELING SETTINGS
 #
 #    Guild.LevelingEnabled
 #        Description: Controls whether guild can gain levels

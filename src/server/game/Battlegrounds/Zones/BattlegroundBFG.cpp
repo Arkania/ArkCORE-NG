@@ -213,24 +213,23 @@ void BattlegroundBFG::RemovePlayer(Player * /*player*/, uint64 /*guid*/)
 
 }
 
-void BattlegroundBFG::HandleAreaTrigger(Player* Source, uint32 Trigger)
+void BattlegroundBFG::HandleAreaTrigger(Player* player, uint32 trigger)
 {
     if (GetStatus() != STATUS_IN_PROGRESS)
         return;
     //Area triggers are not handled yet!
     return;
 
-    switch(Trigger)
+    switch(trigger)
     {
         case 3866:                                          // Lighthouse
         case 3869:                                          // Watterwork
         case 3867:                                          // Mine
         case 4020:                                          // Unk1
         case 4021:                                          // Unk2
-            //break;
+			break;
         default:
-            //sLog->outError("WARNING: Unhandled AreaTrigger in Battleground: %u", Trigger);
-            //Source->GetSession()->SendAreaTriggerMessage("Warning: Unhandled AreaTrigger in Battleground: %u", Trigger);
+            Battleground::HandleAreaTrigger(player, trigger);
             break;
     }
 }

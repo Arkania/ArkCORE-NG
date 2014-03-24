@@ -613,15 +613,15 @@ int main(int argc, char ** argv)
     ReadLiquidTypeTableDBC();
 
     // extract data
-    if(success)
+    if (success)
         success = ExtractWmo();
 
     //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
     //map.dbc
-    if(success)
+    if (success)
     {
         DBCFile * dbc = new DBCFile(LocaleMpq, "DBFilesClient\\Map.dbc");
-        if(!dbc->open())
+        if (!dbc->open())
         {
             delete dbc;
             printf("FATAL ERROR: Map.dbc not found in data file.\n");
@@ -629,7 +629,7 @@ int main(int argc, char ** argv)
         }
         map_count=dbc->getRecordCount ();
         map_ids=new map_id[map_count];
-        for(unsigned int x=0;x<map_count;++x)
+        for (unsigned int x=0;x<map_count;++x)
         {
             map_ids[x].id=dbc->getRecord (x).getUInt(0);
             strcpy(map_ids[x].name,dbc->getRecord(x).getString(1));
@@ -649,7 +649,7 @@ int main(int argc, char ** argv)
     SFileCloseArchive(WorldMpq);
 
     printf("\n");
-    if(!success)
+    if (!success)
     {
         printf("ERROR: Extract %s. Work NOT complete.\n   Precise vector data=%d.\nPress any key.\n",versionString, preciseVectorData);
         getchar();

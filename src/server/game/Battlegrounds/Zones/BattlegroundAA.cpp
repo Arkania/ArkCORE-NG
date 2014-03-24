@@ -66,7 +66,7 @@ void BattlegroundAA::HandleKillPlayer(Player* player, Player* killer)
     Battleground::HandleKillPlayer(player, killer);
 }
 
-void BattlegroundAA::HandleAreaTrigger(Player* /*Source*/, uint32 /*Trigger*/)
+void BattlegroundAA::HandleAreaTrigger(Player* /*player*/, uint32 /*trigger*/)
 {
 }
 

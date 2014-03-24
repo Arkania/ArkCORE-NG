@@ -54,7 +54,7 @@ void fixnamen(char* name, size_t len)
             name[i] &= ~0x20;
     }
     //extension in lowercase
-    for(size_t i=len-3; i<len; i++)
+    for (size_t i = len - 3; i < len; i++)
         name[i] |= 0x20;
 }
 
@@ -135,10 +135,10 @@ bool ADTFile::init(uint32 map_num, uint32 tileX, uint32 tileY)
             {
                 char* buf = new char[size];
                 ADT.read(buf, size);
-                char* p=buf;
-                int t=0;
+                char* p = buf;
+                int t = 0;
                 ModelInstansName = new string[size];
-                while (p<buf+size)
+                while (p < buf + size)
                 {
                     fixnamen(p, strlen(p));
                     char* s = GetPlainName(p);
@@ -160,16 +160,15 @@ bool ADTFile::init(uint32 map_num, uint32 tileX, uint32 tileY)
             {
                 char *buf = new char[size];
                 ADT.read(buf, size);
-                char *p=buf;
+                char *p = buf;
                 int q = 0;
                 WmoInstansName = new string[size];
-                while (p<buf+size)
+                while (p < buf + size)
                 {
-                    string path(p);
-                    char* s=GetPlainName(p);
-                    fixnamen(s,strlen(s));
-                    fixname2(s,strlen(s));
-                    p=p+strlen(p)+1;
+                    char* s = GetPlainName(p);
+                    fixnamen(s, strlen(s));
+                    fixname2(s, strlen(s));
+                    p += strlen(p) + 1;
                     WmoInstansName[q++] = s;
                 }
                 delete[] buf;
