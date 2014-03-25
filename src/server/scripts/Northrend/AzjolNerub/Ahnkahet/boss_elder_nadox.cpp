@@ -23,13 +23,11 @@
 //not in db
 enum Yells
 {
-    SAY_AGGRO                                     = -1619014,
-    SAY_SLAY_1                                    = -1619015,
-    SAY_SLAY_2                                    = -1619016,
-    SAY_SLAY_3                                    = -1619017,
-    SAY_DEATH                                     = -1619018,
-    SAY_EGG_SAC_1                                 = -1619019,
-    SAY_EGG_SAC_2                                 = -1619020
+    SAY_AGGRO       = 0,
+    SAY_SLAY        = 1,
+    SAY_DEATH       = 2,
+    SAY_EGG_SAC     = 3,
+    EMOTE_HATCHES   = 4
 };
 
 enum Spells
@@ -51,8 +49,6 @@ enum Creatures
 #define ACTION_AHNKAHAR_GUARDIAN_DEAD             1
 #define DATA_RESPECT_YOUR_ELDERS                  2
 
-#define EMOTE_HATCHES                       "An Ahn'kahar Guardian hatches!"
-
 class boss_elder_nadox : public CreatureScript
 {
     public:
@@ -62,7 +58,7 @@ class boss_elder_nadox : public CreatureScript
         {
             boss_elder_nadoxAI(Creature* creature) : ScriptedAI(creature)
             {
-                instance = me->GetInstanceScript();
+                instance = creature->GetInstanceScript();
             }
 
             uint32 uiPlagueTimer;
@@ -79,16 +75,13 @@ class boss_elder_nadox : public CreatureScript
 
             void Reset()
             {
-                uiPlagueTimer = 13000;
-                uiRagueTimer = 20000;
-
+                uiPlagueTimer       = 13000;
+                uiRagueTimer        = 20000;
                 uiSwarmerSpawnTimer = 10000;
-                uiGuardSpawnTimer = 25000;
-
-                uiEnrageTimer = 5000;
-
-                bGuardSpawned = false;
-                respectYourElders = true;
+                uiGuardSpawnTimer   = 25000;
+                uiEnrageTimer       = 5000;
+                bGuardSpawned       = false;
+                respectYourElders   = true;
 
                 if (instance)
                     instance->SetData(DATA_ELDER_NADOX_EVENT, NOT_STARTED);
@@ -96,7 +89,7 @@ class boss_elder_nadox : public CreatureScript
 
             void EnterCombat(Unit* /*who*/)
             {
-                DoScriptText(SAY_DEATH, me);
+                Talk(SAY_AGGRO);
 
                 if (instance)
                     instance->SetData(DATA_ELDER_NADOX_EVENT, IN_PROGRESS);
@@ -104,12 +97,12 @@ class boss_elder_nadox : public CreatureScript
 
             void KilledUnit(Unit* /*who*/)
             {
-                DoScriptText(RAND(SAY_SLAY_1, SAY_SLAY_2, SAY_SLAY_3), me);
+                Talk(SAY_SLAY);
             }
 
             void JustDied(Unit* /*killer*/)
             {
-                DoScriptText(SAY_SLAY_3, me); //SAY_SLAY_3 on death?
+                Talk(SAY_DEATH);
 
                 if (instance)
                     instance->SetData(DATA_ELDER_NADOX_EVENT, DONE);
@@ -136,7 +129,7 @@ class boss_elder_nadox : public CreatureScript
 
                 if (uiPlagueTimer <= diff)
                 {
-                    DoCast(me->GetVictim(), SPELL_BROOD_PLAGUE);
+                    DoCastVictim(SPELL_BROOD_PLAGUE);
                     uiPlagueTimer = 15000;
                 }
                 else
@@ -161,7 +154,7 @@ class boss_elder_nadox : public CreatureScript
                     DoCast(me, SPELL_SUMMON_SWARMERS, true);
                     DoCast(me, SPELL_SUMMON_SWARMERS);
                     if (urand(1, 3) == 3) // 33% chance of dialog
-                        DoScriptText(RAND(SAY_EGG_SAC_1, SAY_EGG_SAC_2), me);
+                        Talk(SAY_EGG_SAC);
 
                     uiSwarmerSpawnTimer = 10000;
                 }
@@ -170,7 +163,7 @@ class boss_elder_nadox : public CreatureScript
 
                 if (!bGuardSpawned && uiGuardSpawnTimer <= diff)
                 {
-                    me->MonsterTextEmote(EMOTE_HATCHES, me->GetGUID(), true);
+                    Talk(EMOTE_HATCHES, me->GetGUID());
                     DoCast(me, SPELL_SUMMON_SWARM_GUARD);
                     bGuardSpawned = true;
                 }
@@ -218,7 +211,7 @@ class mob_ahnkahar_nerubian : public CreatureScript
         {
             mob_ahnkahar_nerubianAI(Creature* creature) : ScriptedAI(creature)
             {
-                instance = me->GetInstanceScript();
+                instance = creature->GetInstanceScript();
             }
 
             InstanceScript* instance;
@@ -238,9 +231,7 @@ class mob_ahnkahar_nerubian : public CreatureScript
                         Nadox->AI()->DoAction(ACTION_AHNKAHAR_GUARDIAN_DEAD);
             }
 
-            void EnterCombat(Unit* /*who*/)
-            {
-            }
+            void EnterCombat(Unit* /*who*/) {}
 
             void UpdateAI(const uint32 diff)
             {
@@ -301,9 +292,7 @@ public:
 class achievement_respect_your_elders : public AchievementCriteriaScript
 {
     public:
-        achievement_respect_your_elders() : AchievementCriteriaScript("achievement_respect_your_elders")
-        {
-        }
+        achievement_respect_your_elders() : AchievementCriteriaScript("achievement_respect_your_elders") { }
 
         bool OnCheck(Player* /*player*/, Unit* target)
         {
