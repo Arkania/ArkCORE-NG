@@ -86,7 +86,7 @@ public:
     {
         npc_panicked_citizen_phase1AI(Creature* creature) : ScriptedAI(creature)  { }     
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(const uint32 /*diff*/)
         {           
             if (!UpdateVictim())
                 return;
@@ -136,9 +136,7 @@ public:
         {
             if (_nearGate)
                 if (_timer <= diff)
-                {
-                   DoWork();
-                }
+                    DoWork();
                 else
                     _timer -= diff;
 

@@ -2620,7 +2620,7 @@ class Player : public Unit, public GridObject<Player>
         
             for (int32 i = PET_SLOT_HUNTER_FIRST; i < last_known; i++)
             {
-                if (i == 0 && slot0 == 0 || i == 1 && slot1 == 0 ||i == 2 && slot2 == 0 ||i == 3 && slot3 == 0 ||i == 4 && slot4 == 0)
+                if ((i == 0 && slot0 == 0) || (i == 1 && slot1 == 0) || (i == 2 && slot2 == 0) || (i == 3 && slot3 == 0) || (i == 4 && slot4 == 0))
                     return PetSaveMode(i);
             }
 

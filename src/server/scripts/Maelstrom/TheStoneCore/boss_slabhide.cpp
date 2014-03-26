@@ -148,7 +148,7 @@ class boss_slabhide : public CreatureScript
                 introDone = true;
             }
 
-            void JustDied(Unit* killer)
+            void JustDied(Unit* /*killer*/)
             {
                 if (instance)
                 {

@@ -112,13 +112,11 @@ inline float GetSpellMinRangeForFriend(SpellRangeEntry const *range) { return (r
 inline float GetSpellMaxRangeForFriend(SpellRangeEntry const *range) { return (range ? range->maxRangeFriend : 0); }
 inline uint32 GetSpellRangeType(SpellRangeEntry const *range) { return (range ? range->type : 0); }
 
-inline float GetSpellRadius(SpellEntry const *spellInfo, uint32 effectIdx, bool positive)
+inline float GetSpellRadius(SpellEffectEntry const *_effect, uint32 effectIdx, bool positive)
 {
-    // @todo: New system  SpellInfo::SpellInfo(SpellEntry const* spellEntry, SpellEffectEntry const** effects)
-	//SpellEffectEntry const* spellEffect = spellInfo->GetSpellEffect(SpellEffIndex(effectIdx));
-    //return positive
-    //    ? GetSpellRadiusForFriend(sSpellRadiusStore.LookupEntry(spellEffect->EffectRadiusIndex))
-    //    : GetSpellRadiusForHostile(sSpellRadiusStore.LookupEntry(spellEffect->EffectRadiusIndex));
+    return positive
+        ? GetSpellRadiusForFriend(sSpellRadiusStore.LookupEntry(_effect->EffectRadiusIndex))
+        : GetSpellRadiusForHostile(sSpellRadiusStore.LookupEntry(_effect->EffectRadiusIndex));
 }
 
 inline float GetSpellMaxRange(SpellEntry const *spellInfo, bool positive)

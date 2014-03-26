@@ -229,7 +229,7 @@ public:
 
         uint32 timerAura;
         
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* /*who*/)
         {
                 me->SetSpeed(MOVE_RUN, 0.8f);
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -267,7 +267,7 @@ class spell_ozruk_paralyze : public SpellScriptLoader
         {
             PrepareAuraScript(spell_ozruk_paralyze_AuraScript);
 
-            void OnRemove(AuraEffect const* /*aurEff* /, AuraEffectHandleModes /*mode* /)
+            void OnRemove(AuraEffect const* / *aurEff* /, AuraEffectHandleModes / *mode* /)
             {
                 switch (GetTargetApplication()->GetRemoveMode())
                 {
