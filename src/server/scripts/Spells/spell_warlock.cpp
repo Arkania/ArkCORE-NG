@@ -615,7 +615,7 @@ class spell_warl_unstable_affliction : public SpellScriptLoader
             void HandleDispel(DispelInfo* dispelInfo)
             {
                 if (Unit* caster = GetCaster())
-                    if (AuraEffect const* aurEff = GetEffect(EFFECT_0))
+                    if (AuraEffect const* aurEff = GetEffect(EFFECT_1))
                     {
                         int32 damage = aurEff->GetAmount() * 9;
                         // backfire damage and silence
@@ -669,13 +669,13 @@ public:
                 GetCaster()->RemoveAura(74434);
         }
 
-        void Register ()
+        void Register()
         {
             OnEffectRemove += AuraEffectRemoveFn(spell_warl_drain_life_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_warl_drain_life_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
         }
     };
-    AuraScript* GetAuraScript () const
+    AuraScript* GetAuraScript() const
     {
         return new spell_warl_drain_life_AuraScript();
     }
@@ -685,7 +685,7 @@ public:
 class spell_warl_soul_burn: public SpellScriptLoader
 {
 public:
-    spell_warl_soul_burn () : SpellScriptLoader("spell_warl_soul_burn") { }
+    spell_warl_soul_burn() : SpellScriptLoader("spell_warl_soul_burn") { }
     class spell_warl_soul_burn_SpellScript: public SpellScript
     {
         PrepareSpellScript(spell_warl_soul_burn_SpellScript);
@@ -696,7 +696,7 @@ public:
             return true;
         }
 
-        void HandleOnHit ()
+        void HandleOnHit()
         {
             int32 spell = 0;
             if (GetSpellInfo()->Id == 6262) // Soulburn: Healstone
@@ -711,19 +711,19 @@ public:
             GetCaster()->CastSpell(GetCaster(),spell,true);
         }
 
-        void HandleAfterHit ()
+        void HandleAfterHit()
         {
             if (GetCaster()->HasAura(74434)) 
                 GetCaster()->RemoveAura(74434);
         }
 
-        void Register ()
+        void Register()
         {
             OnHit += SpellHitFn(spell_warl_soul_burn_SpellScript::HandleOnHit);
             AfterHit += SpellHitFn(spell_warl_soul_burn_SpellScript::HandleAfterHit);
         }
     };
-    SpellScript* GetSpellScript () const
+    SpellScript* GetSpellScript() const
     {
         return new spell_warl_soul_burn_SpellScript();
     }
@@ -733,7 +733,7 @@ public:
 class spell_warl_drain_soul: public SpellScriptLoader
 {
 public:
-    spell_warl_drain_soul () : SpellScriptLoader("spell_warl_drain_soul") { }          //1120
+    spell_warl_drain_soul() : SpellScriptLoader("spell_warl_drain_soul") { }          //1120
 
     class spell_warl_drain_soul_AuraScript: public AuraScript
     {
@@ -762,14 +762,14 @@ public:
             }
         }
 
-        void Register ()
+        void Register()
         {
             OnEffectApply += AuraEffectApplyFn(spell_warl_drain_soul_AuraScript::HandleApplyEffect, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
             AfterEffectRemove += AuraEffectRemoveFn(spell_warl_drain_soul_AuraScript::AfterRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript () const
+    AuraScript* GetAuraScript() const
     {
         return new spell_warl_drain_soul_AuraScript();
     }
@@ -910,7 +910,7 @@ class spell_warl_shadowburn_soul_shards_regen : public SpellScriptLoader
         {
             PrepareAuraScript(spell_warl_shadowburn_soul_shards_regen_AuraScript);
 
-            bool Load ()
+            bool Load()
             {
                 if (GetCaster()->GetTypeId() != TYPEID_PLAYER || !GetCaster()->ToPlayer()->isHonorOrXPTarget(GetUnitOwner()))
                     return false;
@@ -948,7 +948,7 @@ class spell_warl_shadowburn_glyph : public SpellScriptLoader
         {
             PrepareSpellScript(spell_warl_shadowburn_glyph_SpellScript);
 
-            bool Load ()
+            bool Load()
             {
                 if (GetCaster()->GetTypeId() != TYPEID_PLAYER || !GetCaster()->HasAura(56229))
                     return false;
