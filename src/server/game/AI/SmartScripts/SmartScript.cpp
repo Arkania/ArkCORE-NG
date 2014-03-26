@@ -2281,18 +2281,20 @@ SmartScriptHolder SmartScript::CreateEvent(SMART_EVENT e, uint32 event_flags, ui
 
 ObjectList* SmartScript::GetTargets(SmartScriptHolder const& e, Unit* invoker /*= NULL*/)
 {
-    Unit* trigger = NULL;
+    Unit* scriptTrigger = NULL;
     if (invoker)
-        trigger = invoker;
+        scriptTrigger = invoker;
     else if (Unit* tempLastInvoker = GetLastInvoker())
-        trigger = tempLastInvoker;
+        scriptTrigger = tempLastInvoker;
+
+    WorldObject* baseObject = GetBaseObject();
 
     ObjectList* l = new ObjectList();
     switch (e.GetTargetType())
     {
         case SMART_TARGET_SELF:
-            if (GetBaseObject())
-                l->push_back(GetBaseObject());
+            if (baseObject)
+                l->push_back(baseObject);
             break;
         case SMART_TARGET_VICTIM:
             if (me && me->GetVictim())
@@ -2320,17 +2322,17 @@ ObjectList* SmartScript::GetTargets(SmartScriptHolder const& e, Unit* invoker /*
             break;
         case SMART_TARGET_NONE:
         case SMART_TARGET_ACTION_INVOKER:
-            if (trigger)
-                l->push_back(trigger);
+            if (scriptTrigger)
+                l->push_back(scriptTrigger);
             break;
         case SMART_TARGET_ACTION_INVOKER_VEHICLE:
-            if (trigger && trigger->GetVehicle() && trigger->GetVehicle()->GetBase())
-                l->push_back(trigger->GetVehicle()->GetBase());
+            if (scriptTrigger && scriptTrigger->GetVehicle() && scriptTrigger->GetVehicle()->GetBase())
+                l->push_back(scriptTrigger->GetVehicle()->GetBase());
             break;
         case SMART_TARGET_INVOKER_PARTY:
-            if (trigger)
+            if (scriptTrigger)
             {
-                if (Player* player = trigger->ToPlayer())
+                if (Player* player = scriptTrigger->ToPlayer())
                 {
                     if (Group* group = player->GetGroup())
                     {
@@ -2342,7 +2344,7 @@ ObjectList* SmartScript::GetTargets(SmartScriptHolder const& e, Unit* invoker /*
                     // this even if there is a group (thus the else-check), it will add the
                     // same player to the list twice. We don't want that to happen.
                     else
-                        l->push_back(trigger);
+                        l->push_back(scriptTrigger);
                 }
             }
             break;
@@ -2358,7 +2360,7 @@ ObjectList* SmartScript::GetTargets(SmartScriptHolder const& e, Unit* invoker /*
                 if (me && me == *itr)
                     continue;
 
-                if (((e.target.unitRange.creature && (*itr)->ToCreature()->GetEntry() == e.target.unitRange.creature) || !e.target.unitRange.creature) && GetBaseObject()->IsInRange(*itr, (float)e.target.unitRange.minDist, (float)e.target.unitRange.maxDist))
+                if (((e.target.unitRange.creature && (*itr)->ToCreature()->GetEntry() == e.target.unitRange.creature) || !e.target.unitRange.creature) && baseObject->IsInRange(*itr, (float)e.target.unitRange.minDist, (float)e.target.unitRange.maxDist))
                     l->push_back(*itr);
             }
 
@@ -2415,7 +2417,7 @@ ObjectList* SmartScript::GetTargets(SmartScriptHolder const& e, Unit* invoker /*
                 if (go && go == *itr)
                     continue;
 
-                if (((e.target.goRange.entry && IsGameObject(*itr) && (*itr)->ToGameObject()->GetEntry() == e.target.goRange.entry) || !e.target.goRange.entry) && GetBaseObject()->IsInRange((*itr), (float)e.target.goRange.minDist, (float)e.target.goRange.maxDist))
+                if (((e.target.goRange.entry && IsGameObject(*itr) && (*itr)->ToGameObject()->GetEntry() == e.target.goRange.entry) || !e.target.goRange.entry) && baseObject->IsInRange((*itr), (float)e.target.goRange.minDist, (float)e.target.goRange.maxDist))
                     l->push_back(*itr);
             }
 
@@ -2425,13 +2427,13 @@ ObjectList* SmartScript::GetTargets(SmartScriptHolder const& e, Unit* invoker /*
         case SMART_TARGET_CREATURE_GUID:
         {
             Creature* target = NULL;
-            if (!trigger && !GetBaseObject())
+            if (!scriptTrigger && !baseObject)
             {
                 sLog->outErrorDb("SMART_TARGET_CREATURE_GUID can not be used without invoker");
                 break;
             }
 
-            target = FindCreatureNear(trigger ? trigger : GetBaseObject(), e.target.unitGUID.dbGuid);
+            target = FindCreatureNear(scriptTrigger ? scriptTrigger : baseObject, e.target.unitGUID.dbGuid);
 
             if (target && (!e.target.unitGUID.entry || target->GetEntry() == e.target.unitGUID.entry))
                 l->push_back(target);
@@ -2440,13 +2442,13 @@ ObjectList* SmartScript::GetTargets(SmartScriptHolder const& e, Unit* invoker /*
         case SMART_TARGET_GAMEOBJECT_GUID:
         {
             GameObject* target = NULL;
-            if (!trigger && !GetBaseObject())
+            if (!scriptTrigger && !baseObject)
             {
                 sLog->outErrorDb("SMART_TARGET_GAMEOBJECT_GUID can not be used without invoker");
                 break;
             }
 
-            target = FindGameObjectNear(trigger ? trigger : GetBaseObject(), e.target.goGUID.dbGuid);
+            target = FindGameObjectNear(scriptTrigger ? scriptTrigger : baseObject, e.target.goGUID.dbGuid);
 
             if (target && (!e.target.goGUID.entry || target->GetEntry() == e.target.goGUID.entry))
                 l->push_back(target);
@@ -2456,9 +2458,9 @@ ObjectList* SmartScript::GetTargets(SmartScriptHolder const& e, Unit* invoker /*
         {
             // will always return a valid pointer, even if empty list
             ObjectList* units = GetWorldObjectsInDist((float)e.target.playerRange.maxDist);
-            if (!units->empty() && GetBaseObject())
+            if (!units->empty() && baseObject)
                 for (ObjectList::const_iterator itr = units->begin(); itr != units->end(); ++itr)
-                    if (IsPlayer(*itr) && GetBaseObject()->IsInRange(*itr, (float)e.target.playerRange.minDist, (float)e.target.playerRange.maxDist))
+                    if (IsPlayer(*itr) && baseObject->IsInRange(*itr, (float)e.target.playerRange.minDist, (float)e.target.playerRange.maxDist))
                         l->push_back(*itr);
 
             delete units;
@@ -2485,14 +2487,14 @@ ObjectList* SmartScript::GetTargets(SmartScriptHolder const& e, Unit* invoker /*
         }
         case SMART_TARGET_CLOSEST_CREATURE:
         {
-            Creature* target = GetClosestCreatureWithEntry(GetBaseObject(), e.target.closest.entry, (float)(e.target.closest.dist ? e.target.closest.dist : 100), e.target.closest.dead ? false : true);
+            Creature* target = GetClosestCreatureWithEntry(baseObject, e.target.closest.entry, (float)(e.target.closest.dist ? e.target.closest.dist : 100), e.target.closest.dead ? false : true);
             if (target)
                 l->push_back(target);
             break;
         }
         case SMART_TARGET_CLOSEST_GAMEOBJECT:
         {
-            GameObject* target = GetClosestGameObjectWithEntry(GetBaseObject(), e.target.closest.entry, (float)(e.target.closest.dist ? e.target.closest.dist : 100));
+            GameObject* target = GetClosestGameObjectWithEntry(baseObject, e.target.closest.entry, (float)(e.target.closest.dist ? e.target.closest.dist : 100));
             if (target)
                 l->push_back(target);
             break;
