@@ -42,7 +42,7 @@ struct MySQLConnectionInfo
     MySQLConnectionInfo() {}
     MySQLConnectionInfo(const std::string& infoString)
     {
-        Tokens tokens(infoString, ';');
+        Tokenizer tokens(infoString, ';');
 
         if (tokens.size() != 5)
             return;

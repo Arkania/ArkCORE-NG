@@ -281,7 +281,7 @@ class spell_pri_reflective_shield_trigger : public SpellScriptLoader
                 if (GetCaster())
                     if (AuraEffect* talentAurEff = target->GetAuraEffectOfRankedSpell(PRIEST_SPELL_REFLECTIVE_SHIELD_R1, EFFECT_0))
                     {
-                        int32 bp = CalculatePctN(absorbAmount, talentAurEff->GetAmount());
+                        int32 bp = CalculatePct(absorbAmount, talentAurEff->GetAmount());
                         target->CastCustomSpell(dmgInfo.GetAttacker(), PRIEST_SPELL_REFLECTIVE_SHIELD_TRIGGERED, &bp, NULL, NULL, true, NULL, aurEff);
                     }
             }
@@ -319,7 +319,7 @@ public:
                 if (AuraEffect* aurEff = caster->GetAuraEffect(SPELL_T9_HEALING_2_PIECE,EFFECT_0))
                 {
                     int32 heal = GetHitHeal();
-                    AddPctN(heal, aurEff->GetAmount());
+                    AddPct(heal, aurEff->GetAmount());
                     SetHitHeal(heal);
                 }
             }

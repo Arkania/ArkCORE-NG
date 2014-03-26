@@ -19,7 +19,7 @@
 #ifndef __BATTLEGROUNDBFG_H
 #define __BATTLEGROUNDBFG_H
 
-class Battleground;
+#include "Battleground.h"
 
 enum BG_BG_WorldStates 
 {
@@ -102,7 +102,7 @@ enum BG_BG_ObjectTypes
 
 enum BG_BG_Timers
 {
-    BG_BG_FLAG_CAPTURING_TIME = 60000,
+    BG_BG_FLAG_CAPTURING_TIME     = 60000
 };
 
 enum BG_BG_Score
@@ -123,7 +123,7 @@ enum BG_BG_BattlegroundNodes
     BG_BG_SPIRIT_ALIANCE        = 3,
     BG_BG_SPIRIT_HORDE          = 4,
 
-    BG_BG_ALL_NODES_COUNT       = 5,                        // all nodes (dynamic and static)
+    BG_BG_ALL_NODES_COUNT       = 5                         // all nodes (dynamic and static)
 };
 
 enum BG_BG_NodeStatus
@@ -201,13 +201,12 @@ struct BG_BG_BannerTimer
     uint8       teamIndex;
 };
 
-class BattlegroundBFGScore : public BattlegroundScore
+struct BattlegroundBFGScore : public BattlegroundScore
 {
-    public:
-        BattlegroundBFGScore(): BasesAssaulted(0), BasesDefended(0) {};
-        virtual ~BattlegroundBFGScore() {};
-        uint32 BasesAssaulted;
-        uint32 BasesDefended;
+    BattlegroundBFGScore(): BasesAssaulted(0), BasesDefended(0) { }
+    ~BattlegroundBFGScore() { }
+    uint32 BasesAssaulted;
+    uint32 BasesDefended;
 };
 
 class BattlegroundBFG: public Battleground {
@@ -218,22 +217,22 @@ public:
     ~BattlegroundBFG();
 
     void AddPlayer(Player* player);
-    virtual void StartingEventCloseDoors();
-    virtual void StartingEventOpenDoors();
+    void StartingEventCloseDoors();
+    void StartingEventOpenDoors();
     void RemovePlayer(Player* player, uint64 guid);
     void HandleAreaTrigger(Player* Source, uint32 Trigger);
-    virtual bool SetupBattleground();
-    virtual void Reset();
+    bool SetupBattleground();
+    void Reset();
     void EndBattleground(uint32 winner);
-    virtual WorldSafeLocsEntry const* GetClosestGraveYard(Player* player);
+    WorldSafeLocsEntry const* GetClosestGraveYard(Player* player);
 
     /* Scorekeeping */
-    virtual void UpdatePlayerScore(Player* Source, uint32 type, uint32 value, bool doAddHonor = true);
+    void UpdatePlayerScore(Player* Source, uint32 type, uint32 value, bool doAddHonor = true);
 
-    virtual void FillInitialWorldStates(WorldPacket& data);
+    void FillInitialWorldStates(WorldPacket& data);
 
     /* Nodes occupying */
-    virtual void EventPlayerClickedOnFlag(Player* source, GameObject* target_obj);
+    void EventPlayerClickedOnFlag(Player* source, GameObject* target_obj);
 
     /* achievement req. */
     bool IsAllNodesConrolledByTeam(uint32 team) const; // overwrited
@@ -241,7 +240,7 @@ public:
 
     uint32 GetPrematureWinner();
 private:
-    virtual void PostUpdateImpl(uint32 diff);
+    void PostUpdateImpl(uint32 diff);
 
     /* Gameobject spawning/despawning */
     void _CreateBanner(uint8 node, uint8 type, uint8 teamIndex, bool delay);
@@ -274,4 +273,5 @@ private:
     // need for achievements
     bool m_TeamScores500Disadvantage[BG_TEAMS_COUNT];
 };
+
 #endif

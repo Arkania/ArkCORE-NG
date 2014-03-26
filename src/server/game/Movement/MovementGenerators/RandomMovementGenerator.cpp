@@ -47,8 +47,8 @@ void RandomMovementGenerator<Creature>::SetRandomLocation(Creature& creature)
 
     const float angle = float(rand_norm()) * static_cast<float>(M_PI*2.0f);
     const float range = float(rand_norm()) * _wanderDistance;
-    const float distanceX = range * cos(angle);
-    const float distanceY = range * sin(angle);
+    const float distanceX = range * std::cos(angle);
+    const float distanceY = range * std::sin(angle);
 
     destX = respX + distanceX;
     destY = respY + distanceY;

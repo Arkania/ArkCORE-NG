@@ -19,7 +19,7 @@
 #ifndef __BATTLEGROUNDRL_H
 #define __BATTLEGROUNDRL_H
 
-class Battleground;
+#include "Battleground.h"
 
 enum BattlegroundRLObjectTypes
 {
@@ -38,14 +38,6 @@ enum BattlegroundRLObjects
     BG_RL_OBJECT_TYPE_BUFF_2    = 184664
 };
 
-class BattlegroundRLScore : public BattlegroundScore
-{
-    public:
-        BattlegroundRLScore() {};
-        virtual ~BattlegroundRLScore() {};
-        //TODO fix me
-};
-
 class BattlegroundRL : public Battleground
 {
     public:
@@ -53,11 +45,11 @@ class BattlegroundRL : public Battleground
         ~BattlegroundRL();
 
         /* inherited from BattlegroundClass */
-        virtual void AddPlayer(Player* player);
-        virtual void Reset();
-        virtual void FillInitialWorldStates(WorldPacket &d);
-        virtual void StartingEventCloseDoors();
-        virtual void StartingEventOpenDoors();
+        void AddPlayer(Player* player);
+        void Reset();
+        void FillInitialWorldStates(WorldPacket &d);
+        void StartingEventCloseDoors();
+        void StartingEventOpenDoors();
 
         void RemovePlayer(Player* player, uint64 guid, uint32 team);
         void HandleAreaTrigger(Player* Source, uint32 Trigger);

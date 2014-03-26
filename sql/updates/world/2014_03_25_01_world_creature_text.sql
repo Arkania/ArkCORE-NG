@@ -1,5 +1,5 @@
 -- Custodian of Time's Whispers for quest 10277
-DELETE FROM `script_texts` WHERE `entry` IN (-1000217,-1000218,-1000219,-1000220,-1000221,-1000222,-1000223,-1000224,-1000225,-1000226,-1000227,-1000228,-1000229,-1000230);
+-- DELETE FROM `script_texts` WHERE `entry` IN (-1000217,-1000218,-1000219,-1000220,-1000221,-1000222,-1000223,-1000224,-1000225,-1000226,-1000227,-1000228,-1000229,-1000230);
 DELETE FROM `creature_text` WHERE `entry`=20129; 
 INSERT INTO `creature_text` (`entry`, `groupid`, `id`, `text`, `type`, `language`, `probability`, `emote`, `duration`, `sound`, `comment`) VALUES 
 (20129,0,0, 'Greetings, $N. I will guide you through the cavern. Please try and keep up.',15,0,100,0,0,0, 'WHISPER_CUSTODIAN_1'),
@@ -18,7 +18,7 @@ INSERT INTO `creature_text` (`entry`, `groupid`, `id`, `text`, `type`, `language
 (20129,13,0, 'Our time is at an end $N. I would wish you luck, if such a thing existed.',15,0,100,0,0,0, 'WHISPER_CUSTODIAN_14');
 
 -- Mimiron
-DELETE FROM `script_texts` WHERE `entry` BETWEEN -1603259 AND -1603240;
+-- DELETE FROM `script_texts` WHERE `entry` BETWEEN -1603259 AND -1603240;
 DELETE FROM `creature_text` WHERE `entry`=33350;
 INSERT INTO `creature_text` (`entry`,`groupid`,`id`,`text`,`type`,`language`,`probability`,`emote`,`duration`,`sound`,`comment`) VALUES
 (33350,0,0, 'Oh, my! I wasn''t expecting company! The workshop is such a mess! How embarrassing!',14,0,100,0,0,15611, 'Mimiron SAY_AGGRO'),
@@ -43,7 +43,7 @@ INSERT INTO `creature_text` (`entry`,`groupid`,`id`,`text`,`type`,`language`,`pr
 (33350,15,0, 'Combat matrix enhanced. Behold wonderous rapidity!',14,0,100,0,0,15630, 'Mimiron SAY_YS_HELP');
 
 -- AzjolNerub/Ahnkahet/Elder Nadox
-DELETE FROM `script_texts` WHERE `entry` BETWEEN -1619020 AND -1619014;
+-- DELETE FROM `script_texts` WHERE `entry` BETWEEN -1619020 AND -1619014;
 DELETE FROM `creature_text` WHERE `entry`=29309;
 INSERT INTO `creature_text` (`entry`,`groupid`,`id`,`text`,`type`,`language`,`probability`,`emote`,`duration`,`sound`,`comment`) VALUES
 (29309,0,0, 'The secrets of the deep shall remain hidden.',14,0,100,0,0,14033, 'SAY_AGGRO'),
@@ -55,4 +55,34 @@ INSERT INTO `creature_text` (`entry`,`groupid`,`id`,`text`,`type`,`language`,`pr
 (29309,3,1, 'Shhhad ak kereeesshh chak-k-k!',14,0,100,0,0,14035, 'SAY_EGG_SAC_2'),
 (29309,4,0, 'An Ahn''kahar Guardian hatches!',16,0,100,0,0,14035, 'EMOTE_HATCHES');
 
+-- AzjolNerub/Ahnkahet/Herald Volazj
+-- DELETE FROM `script_texts` WHERE `entry` BETWEEN -1619036 AND -1619030;
+DELETE FROM `creature_text` WHERE `entry`=29311;
+INSERT INTO `creature_text` (`entry`,`groupid`,`id`,`text`,`type`,`language`,`probability`,`emote`,`duration`,`sound`,`comment`) VALUES
+(29311,0,0, 'Shgla''yos plahf mh''naus.', 14,0,100,0,0,14043, 'SAY_AGGRO_1'),
+(29311,0,1, 'They who dine on lost souls know only hunger.', 15, 0, 100, 0, 0, 14043, 'SAY_AGGRO_2'),
+(29311,1,0, 'Ywaq puul skshgn: on''ma yeh''glu zuq.', 14,0,100,0,0,14045, 'SAY_SLAY_1'),
+(29311,1,1, 'Ywaq ma phgwa''cul hnakf.',14,0,100,0,0,14046, 'SAY_SLAY_2'),
+(29311,1,2, 'Ywaq maq oou; ywaq maq ssaggh. Ywaq ma shg''fhn.',14,0,100,0,0,14047, 'SAY_SLAY_3'),
+(29311,2,0, 'Iilth vwah, uhn''agth fhssh za.', 14, 0, 100, 0, 0, 14048, 'SAY_DEATH_1'),
+(29311,2,1, 'Where one falls, many shall take its place.', 15, 0, 100, 0, 0, 14048, 'SAY_DEATH_2'),
+(29311,3,0, 'Gul''kafh an''shel. Yoq''al shn ky ywaq nuul.', 14, 0, 100, 0, 0, 14044, 'SAY_PHASE');
 
+-- AzjolNerub/Ahnkahet/Jedoga Shadowseeker
+-- DELETE FROM `script_texts` WHERE `entry` BETWEEN -1619013 AND -1619000;
+DELETE FROM `creature_text` WHERE `entry`=29310;
+INSERT INTO `creature_text` (`entry`,`groupid`,`id`,`text`,`type`,`language`,`probability`,`emote`,`duration`,`sound`,`comment`) VALUES
+(29310, 0, 0, 'These are sacred halls! Your intrusion will be met with death!', 14, 0, 100, 0, 0, 14343, 'SAY_AGGRO'),
+(29310, 1, 0, 'Who among you is devoted?', 14, 0, 100, 0, 0, 14343, 'SAY_SACRIFICE_1_1'),
+(29310, 1, 1, 'You there! Step forward!', 14, 0, 100, 0, 0, 14343, 'SAY_SACRIFICE_1_2'),
+(29310, 2, 0, 'Yogg-Saron, grant me your power!', 14, 0, 100, 0, 0, 14343, 'SAY_SACRIFICE_2_1'),
+(29310, 2, 1, 'Master, a gift for you!', 14, 0, 100, 0, 0, 14343, 'SAY_SACRIFICE_2_2'),
+(29310, 3, 0, 'Glory to Yogg-Saron!', 14, 0, 100, 0, 0, 0, 'SAY_SLAY_1'),
+(29310, 3, 1, 'You are unworthy!', 14, 0, 100, 0, 0, 0, 'SAY_SLAY_2'),
+(29310, 3, 2, 'Get up! You haven''t suffered enough.', 14, 0, 100, 0, 0, 14350, 'SAY_SLAY_3'),
+(29310, 4, 0, 'Do not expect your sacrilege... to go unpunished.', 14, 0, 100, 0, 0, 0, 'SAY_DEATH'),
+(29310, 5, 0, 'The elements themselves will rise up against the civilized world! Only the faithful will be spared!', 14, 0, 100, 0, 0, 14352, 'SAY_PREACHING_1'),
+(29310, 5, 1, 'Immortality can be yours, but only if you pledge yourself fully to Yogg-Saron!', 14, 0, 100, 0, 0, 14353, 'SAY_PREACHING_2'),
+(29310, 5, 2, 'Here, on the very borders of his domain, you will experience power you could have never imagined!', 14, 0, 100, 0, 0, 0, 'SAY_PREACHING_3'),
+(29310, 5, 3, 'You have traveled long and risked much to be here! Your devotion shall be rewarded.', 14, 0, 100, 0, 0, 0, 'SAY_PREACHING_4'),
+(29310, 5, 4, 'The faithful shall be exalted! But there is more work to be done. We will press on until all of Azeroth lies beneath his shadow!', 14, 0, 100, 0, 0, 0, 'SAY_PREACHING_5');

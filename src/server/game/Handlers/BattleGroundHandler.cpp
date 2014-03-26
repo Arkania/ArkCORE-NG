@@ -170,7 +170,7 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket & recvData)
 
         if (_player->GetBattlegroundQueueIndex(bgQueueTypeIdRandom) < PLAYER_MAX_BATTLEGROUND_QUEUES)
         {
-            //player is already in random queue
+            // player is already in random queue
             WorldPacket data;
             sBattlegroundMgr->BuildStatusFailedPacket(&data, bg, _player, 0, ERR_IN_RANDOM_BG);
             _player->GetSession()->SendPacket(&data);
@@ -179,7 +179,7 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket & recvData)
 
         if (_player->InBattlegroundQueue() && bgTypeId == BATTLEGROUND_RB)
         {
-            //player is already in queue, can't start random queue
+            // player is already in queue, can't start random queue
             WorldPacket data;
             sBattlegroundMgr->BuildStatusFailedPacket(&data, bg, _player, 0, ERR_IN_NON_RANDOM_BG);
             _player->GetSession()->SendPacket(&data);
@@ -188,7 +188,7 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket & recvData)
 
         // check if already in queue
         if (_player->GetBattlegroundQueueIndex(bgQueueTypeId) < PLAYER_MAX_BATTLEGROUND_QUEUES)
-            //player is already in this queue
+            // player is already in this queue
             return;
 
         // check if has free queue slots
@@ -228,7 +228,7 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket & recvData)
         isPremade = (grp->GetMembersCount() >= bg->GetMinPlayersPerTeam());
 
         // if we're here, then the conditions to join a bg are met. We can proceed in joining.
-        BattlegroundQueue& bgQueue = sBattlegroundMgr->m_BattlegroundQueues[bgQueueTypeId];
+        BattlegroundQueue& bgQueue = sBattlegroundMgr->GetBattlegroundQueue(bgQueueTypeId);
         GroupQueueInfo* ginfo = NULL;
         uint32 avgTime = 0;
 
@@ -285,14 +285,14 @@ void WorldSession::HandleBattlegroundPlayerPositionsOpcode(WorldPacket & /*recvD
     Player* aplr = NULL;
     Player* hplr = NULL;
 
-    if (uint64 guid = bg->GetFlagPickerGUID(BG_TEAM_ALLIANCE))
+    if (uint64 guid = bg->GetFlagPickerGUID(TEAM_ALLIANCE))
     {
         aplr = ObjectAccessor::FindPlayer(guid);
         if (aplr)
             ++acount;
     }
 
-    if (uint64 guid = bg->GetFlagPickerGUID(BG_TEAM_HORDE))
+    if (uint64 guid = bg->GetFlagPickerGUID(TEAM_HORDE))
     {
         hplr = ObjectAccessor::FindPlayer(guid);
         if (hplr)
@@ -633,7 +633,7 @@ void WorldSession::HandleBattlefieldStatusOpcode(WorldPacket & /*recvData*/)
         }
         //we are sending update to player about queue - he can be invited there!
         //get GroupQueueInfo for queue status
-        BattlegroundQueue& bgQueue = sBattlegroundMgr->m_BattlegroundQueues[bgQueueTypeId];
+        BattlegroundQueue& bgQueue = sBattlegroundMgr->GetBattlegroundQueue(bgQueueTypeId);
         GroupQueueInfo ginfo;
         if (!bgQueue.GetPlayerGroupInfoData(_player->GetGUID(), &ginfo))
             continue;
@@ -738,7 +738,7 @@ void WorldSession::HandleBattlemasterJoinArena(WorldPacket & recvData)
         if (arenaRating <= 0)
             arenaRating = 1;
 
-    BattlegroundQueue &bgQueue = sBattlegroundMgr->m_BattlegroundQueues[bgQueueTypeId];
+    BattlegroundQueue &bgQueue = sBattlegroundMgr->GetBattlegroundQueue(bgQueueTypeId);
     uint32 avgTime = 0;
     GroupQueueInfo* ginfo;
     GroupJoinBattlegroundResult err = grp->CanJoinBattlegroundQueue(bg, bgQueueTypeId, arenatype, arenatype, true, arenaslot);

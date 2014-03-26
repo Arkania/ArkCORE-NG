@@ -102,7 +102,5 @@ class ObjectRegistry
         }
     private:
         RegistryMapType i_registeredObjects;
-
 };
 #endif
-

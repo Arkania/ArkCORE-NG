@@ -641,7 +641,7 @@ void Creature::RegenerateMana()
     AuraEffectList const& ModPowerRegenPCTAuras = GetAuraEffectsByType(SPELL_AURA_MOD_POWER_REGEN_PERCENT);
     for (AuraEffectList::const_iterator i = ModPowerRegenPCTAuras.begin(); i != ModPowerRegenPCTAuras.end(); ++i)
         if ((*i)->GetMiscValue() == POWER_MANA)
-            AddPctN(addvalue, (*i)->GetAmount());
+            AddPct(addvalue, (*i)->GetAmount());
 
     ModifyPower(POWER_MANA, addvalue);
 }
@@ -676,7 +676,7 @@ void Creature::RegenerateHealth()
     // Apply modifiers (if any).
     AuraEffectList const& ModPowerRegenPCTAuras = GetAuraEffectsByType(SPELL_AURA_MOD_HEALTH_REGEN_PERCENT);
     for (AuraEffectList::const_iterator i = ModPowerRegenPCTAuras.begin(); i != ModPowerRegenPCTAuras.end(); ++i)
-        AddPctN(addvalue, (*i)->GetAmount());
+        AddPct(addvalue, (*i)->GetAmount());
 
     addvalue += GetTotalAuraModifier(SPELL_AURA_MOD_REGEN) * CREATURE_REGEN_INTERVAL  / (5 * IN_MILLISECONDS);
 

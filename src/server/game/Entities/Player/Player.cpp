@@ -184,10 +184,10 @@ void PlayerTaxi::InitTaxiNodesForLevel(uint32 race, uint32 chrClass, uint8 level
 
 void PlayerTaxi::LoadTaxiMask(const char* data)
 {
-    Tokens tokens(data, ' ');
+    Tokenizer tokens(data, ' ');
 
     uint8 index;
-    Tokens::iterator iter;
+    Tokenizer::const_iterator iter;
     for (iter = tokens.begin(), index = 0;
         (index < TaxiMaskSize) && (iter != tokens.end()); ++iter, ++index)
     {
@@ -215,9 +215,9 @@ bool PlayerTaxi::LoadTaxiDestinationsFromString(const std::string& values, uint3
 {
     ClearTaxiDestinations();
 
-    Tokens tokens(values, ' ');
+    Tokenizer tokens(values, ' ');
 
-    for (Tokens::iterator iter = tokens.begin(); iter != tokens.end(); ++iter)
+    for (Tokenizer::const_iterator iter = tokens.begin(); iter != tokens.end(); ++iter)
     {
         uint32 node = uint32(atol(*iter));
         AddTaxiDestination(node);
@@ -514,7 +514,7 @@ inline void KillRewarder::_RewardXP(Player* player, float rate)
         // 4.2.2. Apply auras modifying rewarded XP (SPELL_AURA_MOD_XP_PCT).
         Unit::AuraEffectList const& auras = player->GetAuraEffectsByType(SPELL_AURA_MOD_XP_PCT);
         for (Unit::AuraEffectList::const_iterator i = auras.begin(); i != auras.end(); ++i)
-            AddPctN(xp, (*i)->GetAmount());
+            AddPct(xp, (*i)->GetAmount());
 
         // 4.2.3. Give XP to player.
         player->GiveXP(xp, _victim, _groupRate);
@@ -1339,7 +1339,7 @@ int32 Player::getMaxTimer(MirrorTimerType timer)
             int32 UnderWaterTime = 3 * MINUTE * IN_MILLISECONDS;
             AuraEffectList const& mModWaterBreathing = GetAuraEffectsByType(SPELL_AURA_MOD_WATER_BREATHING);
             for (AuraEffectList::const_iterator i = mModWaterBreathing.begin(); i != mModWaterBreathing.end(); ++i)
-                AddPctN(UnderWaterTime, (*i)->GetAmount());
+                AddPct(UnderWaterTime, (*i)->GetAmount());
             return UnderWaterTime;
         }
         break;
@@ -1943,7 +1943,7 @@ bool Player::BuildEnumData(PreparedQueryResult result, ByteBuffer* dataBuffer, B
     ObjectGuid guildGuid = MAKE_NEW_GUID(guildId, 0, guildId ? uint32(HIGHGUID_GUILD) : 0);
     uint32 playerFlags = fields[14].GetUInt32();
     uint32 atLoginFlags = fields[15].GetUInt16();
-    Tokens equipment(fields[19].GetString(), ' ');
+    Tokenizer equipment(fields[19].GetString(), ' ');
     uint8 slot = fields[21].GetUInt8();
 
     uint32 charFlags = 0;
@@ -2619,9 +2619,9 @@ void Player::Regenerate(Powers power)
                 ManaIncreaseRate = sWorld->getRate(RATE_POWER_MANA) * (2.066f - (getLevel() * 0.066f));
 
             if (IsInCombat()) // Trinity Updates Mana in intervals of 2s, which is correct
-                addvalue += GetFloatValue(UNIT_FIELD_POWER_REGEN_INTERRUPTED_FLAT_MODIFIER) *  ManaIncreaseRate * ((0.001f * m_regenTimer) + CalculatePctF(0.001f, spellHaste));
+                addvalue += GetFloatValue(UNIT_FIELD_POWER_REGEN_INTERRUPTED_FLAT_MODIFIER) *  ManaIncreaseRate * ((0.001f * m_regenTimer) + CalculatePct(0.001f, spellHaste));
             else
-                addvalue += GetFloatValue(UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER) *  ManaIncreaseRate * ((0.001f * m_regenTimer) + CalculatePctF(0.001f, spellHaste));
+                addvalue += GetFloatValue(UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER) *  ManaIncreaseRate * ((0.001f * m_regenTimer) + CalculatePct(0.001f, spellHaste));
 
             break;
         }
@@ -2635,7 +2635,7 @@ void Player::Regenerate(Powers power)
             break;
         }
         case POWER_FOCUS:
-            addvalue += (6.0f + CalculatePctF(6.0f, rangedHaste)) * sWorld->getRate(RATE_POWER_FOCUS);
+            addvalue += (6.0f + CalculatePct(6.0f, rangedHaste)) * sWorld->getRate(RATE_POWER_FOCUS);
             break;
         case POWER_HOLY_POWER:                                          // Regenerate holy power
         {
@@ -2644,7 +2644,7 @@ void Player::Regenerate(Powers power)
         }
         break;
         case POWER_ENERGY:                                              // Regenerate energy (rogue)
-            addvalue += ((0.01f * m_regenTimer) + CalculatePctF(0.01f, meleeHaste)) * sWorld->getRate(RATE_POWER_ENERGY);
+            addvalue += ((0.01f * m_regenTimer) + CalculatePct(0.01f, meleeHaste)) * sWorld->getRate(RATE_POWER_ENERGY);
             break;
         case POWER_RUNIC_POWER:
         {
@@ -2668,7 +2668,7 @@ void Player::Regenerate(Powers power)
         AuraEffectList const& ModPowerRegenPCTAuras = GetAuraEffectsByType(SPELL_AURA_MOD_POWER_REGEN_PERCENT);
         for (AuraEffectList::const_iterator i = ModPowerRegenPCTAuras.begin(); i != ModPowerRegenPCTAuras.end(); ++i)
             if (Powers((*i)->GetMiscValue()) == power)
-                AddPctN(addvalue, (*i)->GetAmount());
+                AddPct(addvalue, (*i)->GetAmount());
 
         // Butchery requires combat for this effect
             if (power != POWER_RUNIC_POWER || IsInCombat())
@@ -2750,12 +2750,12 @@ void Player::RegenerateHealth()
 
             AuraEffectList const& mModHealthRegenPct = GetAuraEffectsByType(SPELL_AURA_MOD_HEALTH_REGEN_PERCENT);
             for (AuraEffectList::const_iterator i = mModHealthRegenPct.begin(); i != mModHealthRegenPct.end(); ++i)
-                AddPctN(addvalue, (*i)->GetAmount());
+                AddPct(addvalue, (*i)->GetAmount());
 
             addvalue += GetTotalAuraModifier(SPELL_AURA_MOD_REGEN) * 2 * IN_MILLISECONDS / (5 * IN_MILLISECONDS);
         }
         else if (HasAuraType(SPELL_AURA_MOD_REGEN_DURING_COMBAT))
-            ApplyPctN(addvalue, GetTotalAuraModifier(SPELL_AURA_MOD_REGEN_DURING_COMBAT));
+            ApplyPct(addvalue, GetTotalAuraModifier(SPELL_AURA_MOD_REGEN_DURING_COMBAT));
 
         if (!IsStandState())
             addvalue *= 1.5f;
@@ -5662,8 +5662,8 @@ void Player::RepopAtGraveyard()
         ClosestGrave = bg->GetClosestGraveYard(this);
     else
     {
-        if (sBattlefieldMgr->GetBattlefieldToZoneId(GetZoneId()))
-            ClosestGrave = sBattlefieldMgr->GetBattlefieldToZoneId(GetZoneId())->GetClosestGraveYard(this);
+        if (Battlefield* bf = sBattlefieldMgr->GetBattlefieldToZoneId(GetZoneId()))
+            ClosestGrave = bf->GetClosestGraveYard(this);
         else
             ClosestGrave = sObjectMgr->GetClosestGraveYard(GetPositionX(), GetPositionY(), GetPositionZ(), GetMapId(), GetTeam());
     }
@@ -6064,7 +6064,7 @@ void Player::UpdateRating(CombatRating cr)
     AuraEffectList const& modRatingFromStat = GetAuraEffectsByType(SPELL_AURA_MOD_RATING_FROM_STAT);
     for (AuraEffectList::const_iterator i = modRatingFromStat.begin(); i != modRatingFromStat.end(); ++i)
         if ((*i)->GetMiscValue() & (1<<cr))
-            amount += int32(CalculatePctN(GetStat(Stats((*i)->GetMiscValueB())), (*i)->GetAmount()));
+            amount += int32(CalculatePct(GetStat(Stats((*i)->GetMiscValueB())), (*i)->GetAmount()));
     if (amount < 0)
         amount = 0;
     SetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + cr, uint32(amount));
@@ -7332,7 +7332,7 @@ bool Player::RewardHonor(Unit* victim, uint32 groupsize, int32 honor, bool pvpto
             honor_f /= groupsize;
 
         // apply honor multiplier from aura (not stacking-get highest)
-        AddPctN(honor_f, GetMaxPositiveAuraModifier(SPELL_AURA_MOD_HONOR_GAIN_PCT));
+        AddPct(honor_f, GetMaxPositiveAuraModifier(SPELL_AURA_MOD_HONOR_GAIN_PCT));
     }
 
     honor_f *= sWorld->getRate(RATE_HONOR);
@@ -9027,7 +9027,7 @@ void Player::RemovedInsignia(Player* looterPlr)
     }
 
     // We have to convert player corpse to bones, not to be able to resurrect there
-    // SpawnCorpseBones isn't handy, 'cos it saves player while he in BG
+    // SpawnCorpseBones isn't handy, 'std::cos it saves player while he in BG
     Corpse* bones = sObjectAccessor->ConvertCorpseForPlayer(GetGUID(), true);
     if (!bones)
         return;
@@ -15334,7 +15334,7 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     // handle SPELL_AURA_MOD_XP_QUEST_PCT auras
     Unit::AuraEffectList const& ModXPPctAuras = GetAuraEffectsByType(SPELL_AURA_MOD_XP_QUEST_PCT);
     for (Unit::AuraEffectList::const_iterator i = ModXPPctAuras.begin(); i != ModXPPctAuras.end(); ++i)
-        AddPctN(XP, (*i)->GetAmount());
+        AddPct(XP, (*i)->GetAmount());
 
     int32 moneyRew = 0;
     if (getLevel() < sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
@@ -16912,7 +16912,7 @@ void Player::SetHomebind(WorldLocation const& loc, uint32 areaId)
     CharacterDatabase.Execute(stmt);
 }
 
-uint32 Player::GetUInt32ValueFromArray(Tokens const& data, uint16 index)
+uint32 Player::GetUInt32ValueFromArray(Tokenizer const& data, uint16 index)
 {
     if (index >= data.size())
         return 0;
@@ -16920,7 +16920,7 @@ uint32 Player::GetUInt32ValueFromArray(Tokens const& data, uint16 index)
     return (uint32)atoi(data[index]);
 }
 
-float Player::GetFloatValueFromArray(Tokens const& data, uint16 index)
+float Player::GetFloatValueFromArray(Tokenizer const& data, uint16 index)
 {
     float result;
     uint32 temp = Player::GetUInt32ValueFromArray(data, index);
@@ -17521,7 +17521,7 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
         SetUInt32Value(UNIT_FIELD_POWER1 + loadedPowers, 0);
 
     // must be after loading spells and talents
-    Tokens talentTrees(fields[26].GetString(), ' ', MAX_TALENT_SPECS);
+    Tokenizer talentTrees(fields[26].GetString(), ' ', MAX_TALENT_SPECS);
     for (uint8 i = 0; i < MAX_TALENT_SPECS; ++i)
     {
         if (i >= talentTrees.size())
@@ -18077,9 +18077,9 @@ Item* Player::_LoadItem(SQLTransaction& trans, uint32 zoneId, uint32 timeDiff, F
                 if (PreparedQueryResult result = CharacterDatabase.Query(stmt))
                 {
                     std::string strGUID = (*result)[0].GetString();
-                    Tokens GUIDlist(strGUID, ' ');
+                    Tokenizer GUIDlist(strGUID, ' ');
                     AllowedLooterSet looters;
-                    for (Tokens::iterator itr = GUIDlist.begin(); itr != GUIDlist.end(); ++itr)
+                    for (Tokenizer::const_iterator itr = GUIDlist.begin(); itr != GUIDlist.end(); ++itr)
                         looters.insert(atol(*itr));
 
                     if (looters.size() > 1 && item->GetTemplate()->GetMaxStackSize() == 1 && item->IsSoulBound())
@@ -20049,7 +20049,7 @@ void Player::SavePositionInDB(uint32 mapid, float x, float y, float z, float o, 
     CharacterDatabase.Execute(stmt);
 }
 
-void Player::SetUInt32ValueInArray(Tokens& tokens, uint16 index, uint32 value)
+void Player::SetUInt32ValueInArray(Tokenizer& tokens, uint16 index, uint32 value)
 {
     char buf[11];
     snprintf(buf, 11, "%u", value);
@@ -21752,7 +21752,7 @@ bool Player::BuyItemFromVendorSlot(uint64 vendorguid, uint32 vendorslot, uint32 
         price = uint32(floor(price * GetReputationPriceDiscount(creature)));
 
         if (int32 priceMod = GetTotalAuraModifier(SPELL_AURA_MOD_VENDOR_ITEMS_PRICES))
-            price -= CalculatePctN(price, priceMod);
+            price -= CalculatePct(price, priceMod);
 
         if (!HasEnoughMoney(uint64(price)))
         {

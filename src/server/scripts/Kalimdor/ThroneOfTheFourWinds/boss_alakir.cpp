@@ -40,7 +40,7 @@ class npc_tornado_moving : public CreatureScript
                 GetCreatureListWithEntryInGrid(tornados, me, me->GetEntry(), 40.0f);
 
                 if (!tornados.empty() && tornados.size() < 4)
-                    //me->SummonCreature(me->GetEntry(),me->GetPositionX() - (cos(me->GetOrientation())*2),me->GetPositionY() - (sin(me->GetOrientation())*2),me->GetPositionZ());
+                    //me->SummonCreature(me->GetEntry(),me->GetPositionX() - (std::cos(me->GetOrientation())*2),me->GetPositionY() - (std::sin(me->GetOrientation())*2),me->GetPositionZ());
 
                 if (me->GetEntry() == 48854)
                     MoveSide = true; // west

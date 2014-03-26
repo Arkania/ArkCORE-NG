@@ -1227,8 +1227,8 @@ public:
 
         void GetNearPoint2D(float src_x, float src_y, float &dst_x, float &dst_y, float distance2d, float absAngle) const
         {
-            dst_x = src_x + distance2d * cos(absAngle);
-            dst_y = src_y + distance2d * sin(absAngle);
+            dst_x = src_x + distance2d * std::cos(absAngle);
+            dst_y = src_y + distance2d * std::sin(absAngle);
 
             Trinity::NormalizeMapCoord(dst_x);
             Trinity::NormalizeMapCoord(dst_y);
@@ -5195,8 +5195,8 @@ public:
                 float angle = itr->follow_angle;
                 float dist = itr->follow_dist;
 
-                float dx = x - cos(angle + pathangle) * dist;
-                float dy = y - sin(angle + pathangle) * dist;
+                float dx = x - std::cos(angle + pathangle) * dist;
+                float dy = y - std::sin(angle + pathangle) * dist;
                 float dz = z;
 
                 Trinity::NormalizeMapCoord(dx);

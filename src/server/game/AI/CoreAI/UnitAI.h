@@ -21,8 +21,9 @@
 #define TRINITY_UNITAI_H
 
 #include "Define.h"
-#include <list>
 #include "Unit.h"
+#include "Containers.h"
+#include <list>
 
 class Unit;
 class Player;

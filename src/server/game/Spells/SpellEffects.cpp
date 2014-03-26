@@ -419,7 +419,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                 // Victory Rush
                 if (m_spellInfo->Id == 34428)
                 {
-                     ApplyPctF(damage, m_caster->GetTotalAttackPowerValue(BASE_ATTACK));
+                     ApplyPct(damage, m_caster->GetTotalAttackPowerValue(BASE_ATTACK));
                      m_caster->RemoveAura(32216);
                 }
                 // Shockwave
@@ -627,7 +627,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                     back_damage = unitTarget->SpellDamageBonusTaken(m_caster, m_spellInfo, (uint32)back_damage, SPELL_DIRECT_DAMAGE);
                     // Pain and Suffering reduces damage
                     if (AuraEffect* aurEff = m_caster->GetDummyAuraEffect(SPELLFAMILY_PRIEST, 2874, 0))
-                        AddPctN(back_damage, -aurEff->GetAmount());
+                        AddPct(back_damage, -aurEff->GetAmount());
 
                     if (back_damage < int32(unitTarget->GetHealth()))
                         m_caster->CastCustomSpell(m_caster, 32409, &back_damage, 0, 0, true);
@@ -659,7 +659,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                     // converts each extra point of energy ( up to 25 energy ) into additional damage
                     int32 energy = -(m_caster->ModifyPower(POWER_ENERGY, -25));
                     // 25 energy = 100% more damage
-                    AddPctN(damage, energy * 4);
+                    AddPct(damage, energy * 4);
                     // AP coefficient
                     damage += int32(m_caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.109f * m_caster->ToPlayer()->GetComboPoints());
 
@@ -1575,7 +1575,7 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
 
                     // Improved Death Strike
                     if (AuraEffect const * aurEff = m_caster->GetDummyAuraEffect(SPELLFAMILY_DEATHKNIGHT, 2751, EFFECT_2))
-                        AddPctN(heal, aurEff->GetAmount());
+                        AddPct(heal, aurEff->GetAmount());
 
                     if (heal > int32(m_caster->GetMaxHealth()) * 0.3) // Make an upper limit of 30% hp the spell can heal, it can never go above that, even glyphed.
                         heal = int32(m_caster->GetMaxHealth() * 0.3);
@@ -1585,7 +1585,7 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                     if (AuraEffect const* aurEff = m_caster->GetAuraEffect(77513, EFFECT_1))     // Blood Shield Mastery Blood
                     if (m_caster->HasAura(48263))
                     {
-                        int32 shield = CalculatePctN(heal, 50);
+                        int32 shield = CalculatePct(heal, 50);
                         if (m_caster->HasAura(77535, m_caster->GetGUID()))
                             shield += m_caster->GetAura(77535, m_caster->GetGUID())->GetEffect(EFFECT_0)->GetAmount();
 
@@ -2003,8 +2003,8 @@ void Spell::EffectJumpDest(SpellEffIndex effIndex)
     // Jump on 16yards, this only on demon leap
     if (m_spellInfo->Effects[effIndex].TargetA.GetTarget() == TARGET_UNIT_CASTER)
     {
-        x = m_caster->GetPositionX() + cos(m_caster->GetOrientation()) * 8;
-        y = m_caster->GetPositionY() + sin(m_caster->GetOrientation()) * 8;
+        x = m_caster->GetPositionX() + std::cos(m_caster->GetOrientation()) * 8;
+        y = m_caster->GetPositionY() + std::sin(m_caster->GetOrientation()) * 8;
     }
     CalculateJumpSpeeds(effIndex, m_caster->GetExactDist2d(x, y), speedXY, speedZ);
     m_caster->GetMotionMaster()->MoveJump(x, y, z, speedXY, speedZ);
@@ -2329,8 +2329,8 @@ void Spell::EffectPowerBurn(SpellEffIndex effIndex)
     // burn x% of target's mana, up to maximum of 2x% of caster's mana (Mana Burn)
     if (m_spellInfo->Id == 8129)
     {
-        int32 maxDamage = int32(CalculatePctN(m_caster->GetMaxPower(powerType), damage * 2));
-        damage = int32(CalculatePctN(unitTarget->GetMaxPower(powerType), damage));
+        int32 maxDamage = int32(CalculatePct(m_caster->GetMaxPower(powerType), damage * 2));
+        damage = int32(CalculatePct(unitTarget->GetMaxPower(powerType), damage));
         damage = std::min(damage, maxDamage);
     }
 
@@ -2383,7 +2383,7 @@ void Spell::EffectHeal(SpellEffIndex /*effIndex*/)
         {
             if (Player* player = m_caster->ToPlayer())
                 if (player->HasSkill(SKILL_ENGINEERING))
-                    AddPctN(addhealth, 25);
+                    AddPct(addhealth, 25);
         }
         // Earth Shield
         else if (m_caster && m_caster->GetTypeId()==TYPEID_PLAYER && m_spellInfo->Id == 379)
@@ -2392,7 +2392,7 @@ void Spell::EffectHeal(SpellEffIndex /*effIndex*/)
             addhealth += m_caster->SpellHealingBonusDone(unitTarget, m_spellInfo, addhealth, HEAL);
             // Glyph of Earth Shield
             if (m_caster->HasAura(63279))
-                AddPctN(addhealth, 20);
+                AddPct(addhealth, 20);
         }
         // Swiftmend - consumes Regrowth or Rejuvenation
         else if (m_spellInfo->TargetAuraState == AURA_STATE_SWIFTMEND && unitTarget->HasAuraState(AURA_STATE_SWIFTMEND, m_spellInfo, m_caster))
@@ -2464,7 +2464,7 @@ void Spell::EffectHeal(SpellEffIndex /*effIndex*/)
         if (m_caster->GetOwner() && m_spellInfo->Id == 52042)
         {
             if (AuraEffect* aurEff = m_caster->GetOwner()->GetDummyAuraEffect(SPELLFAMILY_SHAMAN, 2011, 0))
-                AddPctN(addhealth, aurEff->GetAmount());
+                AddPct(addhealth, aurEff->GetAmount());
         }
 
         // Echo of Light
@@ -2906,7 +2906,7 @@ void Spell::EffectEnergize(SpellEffIndex effIndex)
         {
             if (Player* player = m_caster->ToPlayer())
                 if (player->HasSkill(SKILL_ENGINEERING))
-                    AddPctN(damage, 25);
+                    AddPct(damage, 25);
             break;
         }
         // Increase Sound - To be used in Tests.
@@ -3011,7 +3011,7 @@ void Spell::EffectEnergizePct(SpellEffIndex effIndex)
     if (maxPower == 0)
         return;
 
-    uint32 gain = CalculatePctN(maxPower, damage);
+    uint32 gain = CalculatePct(maxPower, damage);
     m_caster->EnergizeBySpell(unitTarget, m_spellInfo->Id, gain, power);
 }
 
@@ -4438,7 +4438,7 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
             else if (m_spellInfo->SpellFamilyFlags[0] & 0x00008800 && unitTarget->HasAuraState(AURA_STATE_BLEEDING))
             {
                 if (AuraEffect const* rendAndTear = m_caster->GetDummyAuraEffect(SPELLFAMILY_DRUID, 2859, 0))
-                    AddPctN(totalDamagePercentMod, rendAndTear->GetAmount());
+                    AddPct(totalDamagePercentMod, rendAndTear->GetAmount());
             }
             break;
         }
@@ -4540,8 +4540,8 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                 float bonusPct = m_spellInfo->Effects[EFFECT_2].CalcValue(m_caster) * unitTarget->GetDiseasesByCaster(m_caster->GetGUID()) / 2.0f;
                 // Death Knight T8 Melee 4P Bonus
                 if (AuraEffect const* aurEff = m_caster->GetAuraEffect(64736, EFFECT_0))
-                    AddPctF(bonusPct, aurEff->GetAmount());
-                AddPctF(totalDamagePercentMod, bonusPct);
+                    AddPct(bonusPct, aurEff->GetAmount());
+                AddPct(totalDamagePercentMod, bonusPct);
                 break;
             }
             // Obliterate (12.5% more damage per disease)
@@ -4550,14 +4550,14 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                 float bonusPct = m_spellInfo->Effects[EFFECT_2].CalcValue(m_caster) * unitTarget->GetDiseasesByCaster(m_caster->GetGUID(), false) / 2.0f;
                 // Death Knight T8 Melee 4P Bonus
                 if (AuraEffect const* aurEff = m_caster->GetAuraEffect(64736, EFFECT_0))
-                    AddPctF(bonusPct, aurEff->GetAmount());
-                AddPctF(totalDamagePercentMod, bonusPct);
+                    AddPct(bonusPct, aurEff->GetAmount());
+                AddPct(totalDamagePercentMod, bonusPct);
                 break;
             }
             // Blood-Caked Strike - Blood-Caked Blade
             if (m_spellInfo->SpellIconID == 1736)
             {
-                AddPctF(totalDamagePercentMod, unitTarget->GetDiseasesByCaster(m_caster->GetGUID()) * 12.5f);
+                AddPct(totalDamagePercentMod, unitTarget->GetDiseasesByCaster(m_caster->GetGUID()) * 12.5f);
                 break;
             }
             // Heart Strike
@@ -4566,9 +4566,9 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                 float bonusPct = m_spellInfo->Effects[EFFECT_2].CalcValue(m_caster) * unitTarget->GetDiseasesByCaster(m_caster->GetGUID());
                 // Death Knight T8 Melee 4P Bonus
                 if (AuraEffect const* aurEff = m_caster->GetAuraEffect(64736, EFFECT_0))
-                    AddPctF(bonusPct, aurEff->GetAmount());
+                    AddPct(bonusPct, aurEff->GetAmount());
 
-                AddPctF(totalDamagePercentMod, bonusPct);
+                AddPct(totalDamagePercentMod, bonusPct);
                 break;
             }
 
@@ -4576,7 +4576,7 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                if (m_spellInfo->Id == 49143 || m_spellInfo->Id == 49020)
                    if (unitTarget->HealthBelowPct(35))
                        if (AuraEffect * aurEff = m_caster->GetDummyAuraEffect(SPELLFAMILY_DEATHKNIGHT, 2656, 0))
-                           AddPctF(totalDamagePercentMod, aurEff->GetAmount());
+                           AddPct(totalDamagePercentMod, aurEff->GetAmount());
             break;
         }
     }
@@ -4596,7 +4596,7 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                 normalized = true;
                 break;
             case SPELL_EFFECT_WEAPON_PERCENT_DAMAGE:
-                ApplyPctN(weaponDamagePercentMod, CalculateDamage(j, unitTarget));
+                ApplyPct(weaponDamagePercentMod, CalculateDamage(j, unitTarget));
                 break;
             default:
                 break;                                      // not weapon damage effect, just skip
@@ -4831,36 +4831,10 @@ void Spell::EffectSummonObjectWild(SpellEffIndex effIndex)
     // Wild object not have owner and check clickable by players
     map->AddToMap(pGameObj);
 
-    if (pGameObj->GetGoType() == GAMEOBJECT_TYPE_FLAGDROP && m_caster->GetTypeId() == TYPEID_PLAYER)
-    {
-        Player* player = m_caster->ToPlayer();
-        Battleground* bg = player->GetBattleground();
-
-        switch (pGameObj->GetMapId())
-        {
-            case 489:                                       //WS
-            {
-                if (bg && bg->GetTypeID(true) == BATTLEGROUND_WS && bg->GetStatus() == STATUS_IN_PROGRESS)
-                {
-                    uint32 team = ALLIANCE;
-
-                    if (player->GetTeam() == team)
-                        team = HORDE;
-
-                    ((BattlegroundWS*)bg)->SetDroppedFlagGUID(pGameObj->GetGUID(), team);
-                }
-                break;
-            }
-            case 566:                                       //EY
-            {
-                if (bg && bg->GetTypeID(true) == BATTLEGROUND_EY && bg->GetStatus() == STATUS_IN_PROGRESS)
-                {
-                    ((BattlegroundEY*)bg)->SetDroppedFlagGUID(pGameObj->GetGUID());
-                }
-                break;
-            }
-        }
-    }
+    if (pGameObj->GetGoType() == GAMEOBJECT_TYPE_FLAGDROP)
+        if (Player* player = m_caster->ToPlayer())
+            if (Battleground* bg = player->GetBattleground())
+                bg->SetDroppedFlagGUID(pGameObj->GetGUID(), player->GetTeam() == ALLIANCE ? TEAM_HORDE: TEAM_ALLIANCE);
 
     if (uint32 linkedEntry = pGameObj->GetGOInfo()->GetLinkedGameObjectEntry())
     {
@@ -6326,7 +6300,7 @@ void Spell::EffectResurrect(SpellEffIndex effIndex)
         return;
 
     uint32 health = target->CountPctFromMaxHealth(damage);
-    uint32 mana   = CalculatePctN(target->GetMaxPower(POWER_MANA), damage);
+    uint32 mana   = CalculatePct(target->GetMaxPower(POWER_MANA), damage);
 
     ExecuteLogEffectResurrect(effIndex, target);
 
@@ -6476,7 +6450,7 @@ void Spell::EffectSelfResurrect(SpellEffIndex effIndex)
     {
         health = m_caster->CountPctFromMaxHealth(damage);
         if (m_caster->GetMaxPower(POWER_MANA) > 0)
-            mana = CalculatePctN(m_caster->GetMaxPower(POWER_MANA), damage);
+            mana = CalculatePct(m_caster->GetMaxPower(POWER_MANA), damage);
     }
 
     Player* player = m_caster->ToPlayer();
@@ -6840,12 +6814,12 @@ void Spell::EffectDestroyAllTotems(SpellEffIndex /*effIndex*/)
             if (spellInfo)
             {
                 mana += spellInfo->ManaCost;
-                mana += int32(CalculatePctU(m_caster->GetCreateMana(), spellInfo->ManaCostPercentage));
+                mana += int32(CalculatePct(m_caster->GetCreateMana(), spellInfo->ManaCostPercentage));
             }
             totem->ToTotem()->UnSummon();
         }
     }
-    ApplyPctN(mana, damage);
+    ApplyPct(mana, damage);
     if (mana)
         m_caster->CastCustomSpell(m_caster, 39104, &mana, NULL, NULL, true);
 }

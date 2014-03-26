@@ -998,7 +998,7 @@ public:
 
             if (timerMove <= diff) // move forward
             {
-                me->GetMotionMaster()->MovePoint(0, me->GetPositionX() + cos(me->GetOrientation()) * 35, me->GetPositionY() + sin(me->GetOrientation()) * 35, 58.0f);
+                me->GetMotionMaster()->MovePoint(0, me->GetPositionX() + std::cos(me->GetOrientation()) * 35, me->GetPositionY() + std::sin(me->GetOrientation()) * 35, 58.0f);
             } else timerMove -= diff;
 
             if (timerDespawn <= diff) // move forward

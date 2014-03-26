@@ -17,7 +17,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Battleground.h"
 #include "BattlegroundBE.h"
 #include "Language.h"
 #include "Object.h"
@@ -66,10 +65,7 @@ void BattlegroundBE::StartingEventOpenDoors()
 void BattlegroundBE::AddPlayer(Player* player)
 {
     Battleground::AddPlayer(player);
-    //create score and add it to map, default values are set in constructor
-    BattlegroundBEScore* sc = new BattlegroundBEScore;
-
-    PlayerScores[player->GetGUID()] = sc;
+    PlayerScores[player->GetGUID()] = new BattlegroundScore;
 
     UpdateArenaWorldState();
 }
@@ -163,18 +159,3 @@ void BattlegroundBE::UpdatePlayerScore(Player* Source, uint32 type, uint32 value
     Battleground::UpdatePlayerScore(Source, type, value, doAddHonor);
 
 }
-
-/*
-21:45:46 id:231310 [S2C] SMSG_INIT_WORLD_STATES (706 = 0x02C2) len: 86
-0000: 32 02 00 00 76 0e 00 00 00 00 00 00 09 00 f3 09  |  2...v...........
-0010: 00 00 01 00 00 00 f1 09 00 00 01 00 00 00 f0 09  |  ................
-0020: 00 00 02 00 00 00 d4 08 00 00 00 00 00 00 d8 08  |  ................
-0030: 00 00 00 00 00 00 d7 08 00 00 00 00 00 00 d6 08  |  ................
-0040: 00 00 00 00 00 00 d5 08 00 00 00 00 00 00 d3 08  |  ................
-0050: 00 00 00 00 00 00                                |  ......
-
-spell 32724 - Gold Team
-spell 32725 - Green Team
-35774 Gold Team
-35775 Green Team
-*/

@@ -71,7 +71,7 @@ class spell_dk_anti_magic_shell_raid : public SpellScriptLoader
 
             void Absorb(AuraEffect* /*aurEff*/, DamageInfo & dmgInfo, uint32 & absorbAmount)
             {
-                 absorbAmount = CalculatePctN(dmgInfo.GetDamage(), absorbPct);
+                 absorbAmount = CalculatePct(dmgInfo.GetDamage(), absorbPct);
             }
 
             void Register()
@@ -125,7 +125,7 @@ class spell_dk_anti_magic_shell_self : public SpellScriptLoader
 
             void Absorb(AuraEffect* /*aurEff*/, DamageInfo & dmgInfo, uint32 & absorbAmount)
             {
-                absorbAmount = std::min(CalculatePctN(dmgInfo.GetDamage(), absorbPct), GetTarget()->CountPctFromMaxHealth(hpPct));
+                absorbAmount = std::min(CalculatePct(dmgInfo.GetDamage(), absorbPct), GetTarget()->CountPctFromMaxHealth(hpPct));
             }
 
             void Trigger(AuraEffect* aurEff, DamageInfo & /*dmgInfo*/, uint32 & absorbAmount)
@@ -186,7 +186,7 @@ class spell_dk_anti_magic_zone : public SpellScriptLoader
 
             void Absorb(AuraEffect* /*aurEff*/, DamageInfo & dmgInfo, uint32 & absorbAmount)
             {
-                 absorbAmount = CalculatePctN(dmgInfo.GetDamage(), absorbPct);
+                 absorbAmount = CalculatePct(dmgInfo.GetDamage(), absorbPct);
             }
 
             void Register()
@@ -422,14 +422,14 @@ class spell_dk_scourge_strike : public SpellScriptLoader
 
                     // Death Knight T8 Melee 4P Bonus
                     if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_DK_ITEM_T8_MELEE_4P_BONUS, EFFECT_0))
-                        AddPctN(multiplier, aurEff->GetAmount());
+                        AddPct(multiplier, aurEff->GetAmount());
 
                     // Second part is also dependent on the increasing damage effects
                     Unit::AuraEffectList const& damageAuras = caster->GetAuraEffectsByType(SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
                     for (Unit::AuraEffectList::const_iterator i = damageAuras.begin(); i != damageAuras.end(); ++i)
                     {
                         if (((*i)->GetMiscValue() & shadowPart->GetSchoolMask()) || ((*i)->GetMiscValue() & SPELL_SCHOOL_MASK_NORMAL))
-                            AddPctN(multiplier, (*i)->GetAmount());
+                            AddPct(multiplier, (*i)->GetAmount());
                     }
                     caster->ToPlayer()->ApplySpellMod(DK_SPELL_SCOURGE_STRIKE_TRIGGERED, SPELLMOD_DAMAGE, multiplier);
                 }
@@ -443,7 +443,7 @@ class spell_dk_scourge_strike : public SpellScriptLoader
                     int32 bp = GetHitDamage() * multiplier;
 
                     if (AuraEffect* aurEff = caster->GetAuraEffectOfRankedSpell(DK_SPELL_BLACK_ICE_R1, EFFECT_0))
-                        AddPctN(bp, aurEff->GetAmount());
+                        AddPct(bp, aurEff->GetAmount());
 
                     caster->CastCustomSpell(unitTarget, DK_SPELL_SCOURGE_STRIKE_TRIGGERED, &bp, NULL, NULL, true);
                 }
@@ -490,7 +490,7 @@ class spell_dk_spell_deflection : public SpellScriptLoader
             {
                 // You have a chance equal to your Parry chance
                 if ((dmgInfo.GetDamageType() == SPELL_DIRECT_DAMAGE) && roll_chance_f(GetTarget()->GetUnitParryChance()))
-                    absorbAmount = CalculatePctN(dmgInfo.GetDamage(), absorbPct);
+                    absorbAmount = CalculatePct(dmgInfo.GetDamage(), absorbPct);
             }
 
             void Register()
@@ -600,7 +600,7 @@ class spell_dk_will_of_the_necropolis : public SpellScriptLoader
 
                 // Damage that would take you below [effect0] health or taken while you are at [effect0]
                 if (remainingHp < minHp)
-                    absorbAmount = CalculatePctN(dmgInfo.GetDamage(), absorbPct);
+                    absorbAmount = CalculatePct(dmgInfo.GetDamage(), absorbPct);
             }
 
             void Register()

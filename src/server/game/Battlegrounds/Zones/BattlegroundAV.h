@@ -20,7 +20,7 @@
 #ifndef __BATTLEGROUNDAV_H
 #define __BATTLEGROUNDAV_H
 
-class Battleground;
+#include "Battleground.h"
 
 #define LANG_BG_AV_A_CAPTAIN_BUFF       "Begone. Uncouth scum! The Alliance shall prevail in Alterac Valley!"
 #define LANG_BG_AV_H_CAPTAIN_BUFF       "Now is the time to attack! For the Horde!"
@@ -97,7 +97,6 @@ horde:
 
     AV_SOUND_ALLIANCE_CAPTAIN               = 8232, //gets called when someone attacks them and at the beginning after 3min+rand(x)*10sec (maybe buff)
     AV_SOUND_HORDE_CAPTAIN                  = 8333
-
 };
 
 enum BG_AV_OTHER_VALUES
@@ -987,7 +986,6 @@ const float BG_AV_CreaturePos[AV_CPLACE_MAX][4] =
 
 enum BG_AV_CreatureIds
 {
-
     AV_NPC_A_TOWERDEFENSE  = 0,     // stormpike bowman
     AV_NPC_A_GRAVEDEFENSE0 = 1,     // stormpike Defender
     AV_NPC_A_GRAVEDEFENSE1 = 2,     // seasoned defender
@@ -1039,7 +1037,6 @@ enum BG_AV_CreatureIds
     AV_NPC_S_MINE_H_4      = 46,
     AV_NPC_HERALD          = 47,
     AV_NPC_INFO_MAX        = 48
-
 };
 
 //entry, team, minlevel, maxlevel
@@ -1101,7 +1098,6 @@ const uint32 BG_AV_CreatureInfo[AV_NPC_INFO_MAX][4] =
     {13089, 67, 54, 55}, //guard
     {13088, 67, 58, 58},
     {14848, 67, 58, 58} //Herald
-
 };
 
 //x, y, z, o, static_creature_info-id
@@ -1231,7 +1227,6 @@ const float BG_AV_StaticCreaturePos[AV_STATICCPLACE_MAX][5] =
     {773.651f, -497.482f, 99.0408f, 2.11185f, 46 }, //14284 - Stormpike Battleguard
     {949.1f, -506.913f, 95.4237f, 3.31613f, 46 }, //14284 - Stormpike Battleguard
     {-1370.9f, -219.793f, 98.4258f, 5.04381f, 47}, //drek thar
-
 };
 
 const uint32 BG_AV_StaticCreatureInfo[51][4] =
@@ -1531,18 +1526,17 @@ struct BG_AV_NodeInfo
 
 inline BG_AV_Nodes &operator++(BG_AV_Nodes &i){ return i = BG_AV_Nodes(i + 1); }
 
-class BattlegroundAVScore : public BattlegroundScore
+struct BattlegroundAVScore : public BattlegroundScore
 {
-    public:
-        BattlegroundAVScore() : GraveyardsAssaulted(0), GraveyardsDefended(0), TowersAssaulted(0), TowersDefended(0), MinesCaptured(0), LeadersKilled(0), SecondaryObjectives(0) {};
-        virtual ~BattlegroundAVScore() {};
-        uint32 GraveyardsAssaulted;
-        uint32 GraveyardsDefended;
-        uint32 TowersAssaulted;
-        uint32 TowersDefended;
-        uint32 MinesCaptured;
-        uint32 LeadersKilled;
-        uint32 SecondaryObjectives;
+    BattlegroundAVScore() : GraveyardsAssaulted(0), GraveyardsDefended(0), TowersAssaulted(0), TowersDefended(0), MinesCaptured(0), LeadersKilled(0), SecondaryObjectives(0) { }
+    ~BattlegroundAVScore() { }
+    uint32 GraveyardsAssaulted;
+    uint32 GraveyardsDefended;
+    uint32 TowersAssaulted;
+    uint32 TowersDefended;
+    uint32 MinesCaptured;
+    uint32 LeadersKilled;
+    uint32 SecondaryObjectives;
 };
 
 class BattlegroundAV : public Battleground
@@ -1552,21 +1546,21 @@ class BattlegroundAV : public Battleground
         ~BattlegroundAV();
 
         /* inherited from BattlegroundClass */
-        virtual void AddPlayer(Player* player);
-        virtual void StartingEventCloseDoors();
-        virtual void StartingEventOpenDoors();
+        void AddPlayer(Player* player);
+        void StartingEventCloseDoors();
+        void StartingEventOpenDoors();
 
         void RemovePlayer(Player* player, uint64 guid, uint32 team);
         void HandleAreaTrigger(Player* Source, uint32 Trigger);
         bool SetupBattleground();
-        virtual void ResetBGSubclass();
+        void ResetBGSubclass();
 
         /*general stuff*/
         void UpdateScore(uint16 team, int16 points);
         void UpdatePlayerScore(Player* Source, uint32 type, uint32 value, bool doAddHonor = true);
 
         /*handlestuff*/ //these are functions which get called from extern
-        virtual void EventPlayerClickedOnFlag(Player* source, GameObject* target_obj);
+        void EventPlayerClickedOnFlag(Player* source, GameObject* target_obj);
         void HandleKillPlayer(Player* player, Player* killer);
         void HandleKillUnit(Creature* unit, Player* killer);
         void HandleQuestComplete(uint32 questid, Player* player);
@@ -1574,7 +1568,7 @@ class BattlegroundAV : public Battleground
 
         void EndBattleground(uint32 winner);
 
-        virtual WorldSafeLocsEntry const* GetClosestGraveYard(Player* player);
+        WorldSafeLocsEntry const* GetClosestGraveYard(Player* player);
 
         /* achievement req. */
         bool IsBothMinesControlledByTeam(uint32 team) const;
@@ -1582,7 +1576,7 @@ class BattlegroundAV : public Battleground
         uint32 GetPrematureWinner();
 
     private:
-        virtual void PostUpdateImpl(uint32 diff);
+        void PostUpdateImpl(uint32 diff);
 
         /* Nodes occupying */
         void EventPlayerAssaultsPoint(Player* player, uint32 object);
@@ -1630,8 +1624,6 @@ class BattlegroundAV : public Battleground
 
         uint8 m_MaxLevel; //TODO remove this when battleground-getmaxlevel() returns something usefull
         bool m_IsInformedNearVictory[2];
-
 };
 
 #endif
-

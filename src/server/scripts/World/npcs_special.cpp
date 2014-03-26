@@ -2020,8 +2020,8 @@ public:
             me->AddUnitMovementFlag(MOVEMENTFLAG_CAN_FLY|MOVEMENTFLAG_ASCENDING|MOVEMENTFLAG_FLYING);
             me->SetSpeed(MOVE_FLIGHT, 0.75f, true);
             me->SetSpeed(MOVE_RUN, 0.75f, true);
-            float x = me->GetPositionX() + 20 * cos(me->GetOrientation());
-            float y = me->GetPositionY() + 20 * sin(me->GetOrientation());
+            float x = me->GetPositionX() + 20 * std::cos(me->GetOrientation());
+            float y = me->GetPositionY() + 20 * std::sin(me->GetOrientation());
             float z = me->GetPositionZ() + 40;
             me->GetMotionMaster()->Clear(false);
             me->GetMotionMaster()->MovePoint(0, x, y, z);
@@ -3208,8 +3208,8 @@ public:
             o = me->GetOrientation();
             me->NearTeleportTo(x, y, z, o, true);
             angle = me->GetOwner()->GetAngle(me);
-            newx = me->GetPositionX() + FLAME_ORB_DISTANCE / 2 * cos(angle);
-            newy = me->GetPositionY() + FLAME_ORB_DISTANCE / 2 * sin(angle);
+            newx = me->GetPositionX() + FLAME_ORB_DISTANCE / 2 * std::cos(angle);
+            newy = me->GetPositionY() + FLAME_ORB_DISTANCE / 2 * std::sin(angle);
             CombatCheck = false;
         }
 
@@ -3292,8 +3292,8 @@ public:
             o = me->GetOrientation();
             me->NearTeleportTo(x, y, z, o, true);
             angle = me->GetOwner()->GetAngle(me);
-            newx = me->GetPositionX() + FLAME_ORB_DISTANCE / 2 * cos(angle);
-            newy = me->GetPositionY() + FLAME_ORB_DISTANCE / 2 * sin(angle);
+            newx = me->GetPositionX() + FLAME_ORB_DISTANCE / 2 * std::cos(angle);
+            newy = me->GetPositionY() + FLAME_ORB_DISTANCE / 2 * std::sin(angle);
             CombatCheck = false;
         }
 

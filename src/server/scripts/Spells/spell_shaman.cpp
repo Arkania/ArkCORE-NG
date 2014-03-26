@@ -375,7 +375,7 @@ class spell_sha_healing_stream_totem : public SpellScriptLoader
 
                             // Soothing Rains
                             if (AuraEffect* dummy = owner->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_SHAMAN, ICON_ID_SOOTHING_RAIN, EFFECT_0))
-                                AddPctN(damage, dummy->GetAmount());
+                                AddPct(damage, dummy->GetAmount());
 
                             damage = int32(target->SpellHealingBonusTaken(owner, triggeringSpell, damage, HEAL));
                         }
@@ -437,7 +437,7 @@ class spell_sha_chain_heal : public SpellScriptLoader
                 // Riptide increases the Chain Heal effect by 25%
                 if (riptide)
                 {
-                    uint32 bonus = CalculatePctN(GetHitHeal(), amount);
+                    uint32 bonus = CalculatePct(GetHitHeal(), amount);
                     SetHitHeal(GetHitHeal() + bonus);
                 }
             }
@@ -723,12 +723,12 @@ class spell_sha_spirit_link : public SpellScriptLoader
 
                 if (curPct < m_healthPct)
                 {
-                    dmg = CalculatePctN(GetHitUnit()->GetMaxHealth(), m_healthPct) - GetHitUnit()->GetHealth(); 
+                    dmg = CalculatePct(GetHitUnit()->GetMaxHealth(), m_healthPct) - GetHitUnit()->GetHealth(); 
                     GetCaster()->CastCustomSpell(GetHitUnit(), SHAMAN_SPELL_SPIRIT_LINK_DAMAGE, 0, &dmg, 0, true);
                 }
                 else if (curPct > m_healthPct)
                 {
-                    dmg = GetHitUnit()->GetHealth() - CalculatePctN(GetHitUnit()->GetMaxHealth(), m_healthPct);
+                    dmg = GetHitUnit()->GetHealth() - CalculatePct(GetHitUnit()->GetMaxHealth(), m_healthPct);
                     GetCaster()->CastCustomSpell(GetHitUnit(), SHAMAN_SPELL_SPIRIT_LINK_DAMAGE, &dmg, 0, 0, true);
                 }
             }

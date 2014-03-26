@@ -462,7 +462,7 @@ public:
                         // Cast Magma Rupture when Ripclimb is Death
                         DoCastVictim(SPELL_MAGMA_RUPTURE_SHANNOX);
                         me->LoadEquipment(0, true);
-                        me->SummonCreature(NPC_SHANNOX_SPEAR,me->GetPositionX()-(cos(float(me->GetOrientation()))+6),me->GetPositionY()-(sin(float(me->GetOrientation()))+6),me->GetPositionZ());
+                        me->SummonCreature(NPC_SHANNOX_SPEAR,me->GetPositionX()-(std::cos(float(me->GetOrientation()))+6),me->GetPositionY()-(std::sin(float(me->GetOrientation()))+6),me->GetPositionZ());
                         events.ScheduleEvent(EVENT_SUMMON_SPEAR, 4000);
                         events.ScheduleEvent(EVENT_HURL_SPEAR_OR_MAGMA_RUPTURE, 42000);
                     }
@@ -1018,10 +1018,10 @@ public:
             for(float r = 0; r <= 30; r = r+10)
                 for(float x = 0; x <= r*2; x = x + 2)
                 {
-                    GetShannox()->CastSpell(me->GetPositionX()+ cos(x)*r,me->GetPositionY()+ sin(x)*r,
+                    GetShannox()->CastSpell(me->GetPositionX()+ std::cos(x)*r,me->GetPositionY()+ std::sin(x)*r,
                         me->GetPositionZ(),SPELL_MAGMA_RUPTURE_VISUAL,true);
 
-                    GetShannox()->CastSpell(me->GetPositionX()-cos(x)*r,me->GetPositionY()-sin(x)*r,
+                    GetShannox()->CastSpell(me->GetPositionX()-std::cos(x)*r,me->GetPositionY()-std::sin(x)*r,
                         me->GetPositionZ(),SPELL_MAGMA_RUPTURE_VISUAL,true);
                 }
         }

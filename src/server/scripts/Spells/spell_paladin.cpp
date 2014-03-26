@@ -100,7 +100,7 @@ class spell_pal_ardent_defender : public SpellScriptLoader
                 }
                 else
                 {
-                    absorbAmount = CalculatePctN(dmgInfo.GetDamage(), absorbPct);
+                    absorbAmount = CalculatePct(dmgInfo.GetDamage(), absorbPct);
                 }
             }
 

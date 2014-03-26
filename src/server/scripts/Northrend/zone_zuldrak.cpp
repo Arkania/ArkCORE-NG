@@ -1333,7 +1333,7 @@ public:
                         case 2:
                             // walk forward
                             me->SetWalk(true);
-                            me->GetMotionMaster()->MovePoint(0, me->GetPositionX() + (cos(m_heading) * 10), me->GetPositionY() + (sin(m_heading) * 10), me->GetPositionZ());
+                            me->GetMotionMaster()->MovePoint(0, me->GetPositionX() + (std::cos(m_heading) * 10), me->GetPositionY() + (std::sin(m_heading) * 10), me->GetPositionZ());
                             m_uiTimer = 5000;
                             m_uiPhase = 3;
                             break;

@@ -17,8 +17,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "DatabaseEnv.h"
 #include "AccountMgr.h"
+#include "DatabaseEnv.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
 #include "Util.h"
@@ -275,10 +275,7 @@ std::string CalculateShaPassHash(std::string& name, std::string& password)
     sha.UpdateData(password);
     sha.Finalize();
 
-    std::string encoded;
-    hexEncodeByteArray(sha.GetDigest(), sha.GetLength(), encoded);
-
-    return encoded;
+    return ByteArrayToHexStr(sha.GetDigest(), sha.GetLength());
 }
 
 bool IsPlayerAccount(uint32 gmlevel)

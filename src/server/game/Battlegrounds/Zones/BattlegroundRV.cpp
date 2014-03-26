@@ -17,7 +17,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Battleground.h"
 #include "BattlegroundRV.h"
 #include "ObjectAccessor.h"
 #include "Language.h"
@@ -33,17 +32,13 @@ BattlegroundRV::BattlegroundRV()
     StartDelayTimes[BG_STARTING_EVENT_SECOND] = BG_START_DELAY_30S;
     StartDelayTimes[BG_STARTING_EVENT_THIRD]  = BG_START_DELAY_15S;
     StartDelayTimes[BG_STARTING_EVENT_FOURTH] = BG_START_DELAY_NONE;
-    // we must set messageIds
     StartMessageIds[BG_STARTING_EVENT_FIRST]  = LANG_ARENA_ONE_MINUTE;
     StartMessageIds[BG_STARTING_EVENT_SECOND] = LANG_ARENA_THIRTY_SECONDS;
     StartMessageIds[BG_STARTING_EVENT_THIRD]  = LANG_ARENA_FIFTEEN_SECONDS;
     StartMessageIds[BG_STARTING_EVENT_FOURTH] = LANG_ARENA_HAS_BEGUN;
 }
 
-BattlegroundRV::~BattlegroundRV()
-{
-
-}
+BattlegroundRV::~BattlegroundRV() { }
 
 void BattlegroundRV::PostUpdateImpl(uint32 diff)
 {
@@ -99,10 +94,7 @@ void BattlegroundRV::StartingEventOpenDoors()
 void BattlegroundRV::AddPlayer(Player* player)
 {
     Battleground::AddPlayer(player);
-    //create score and add it to map, default values are set in constructor
-    BattlegroundRVScore* sc = new BattlegroundRVScore;
-
-    PlayerScores[player->GetGUID()] = sc;
+    PlayerScores[player->GetGUID()] = new BattlegroundScore;
 
     UpdateWorldState(BG_RV_WORLD_STATE_A, GetAlivePlayersCountByTeam(ALLIANCE));
     UpdateWorldState(BG_RV_WORLD_STATE_H, GetAlivePlayersCountByTeam(HORDE));

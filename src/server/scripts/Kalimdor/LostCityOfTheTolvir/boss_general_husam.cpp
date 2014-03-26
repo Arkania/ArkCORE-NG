@@ -219,8 +219,8 @@ public:
 
                             for (int i = 0; i < 4; ++i)
                             {
-                                _x = x + 3.0f * cos(o);
-                                _y = y + 3.0f * sin(o);
+                                _x = x + 3.0f * std::cos(o);
+                                _y = y + 3.0f * std::sin(o);
                                 me->SummonCreature(44711, _x, _y, z, o);
                                 o += M_PI / 2;
                             }

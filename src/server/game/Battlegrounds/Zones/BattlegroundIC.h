@@ -20,7 +20,7 @@
 #ifndef __BATTLEGROUNDIC_H
 #define __BATTLEGROUNDIC_H
 
-class Battleground;
+#include "Battleground.h"
 
 const uint32 BG_IC_Factions[2] =
 {
@@ -31,18 +31,18 @@ const uint32 BG_IC_Factions[2] =
 enum creaturesIC
 {
     NPC_HIGH_COMMANDER_HALFORD_WYRMBANE = 34924, // Alliance Boss
-    NPC_OVERLORD_AGMAR = 34922, // Horde Boss
-    NPC_KOR_KRON_GUARD = 34918, // horde guard
-    NPC_SEVEN_TH_LEGION_INFANTRY = 34919, // alliance guard
-    NPC_KEEP_CANNON  = 34944,
-    NPC_DEMOLISHER = 34775,
-    NPC_SIEGE_ENGINE_H = 35069,
-    NPC_SIEGE_ENGINE_A = 34776,
-    NPC_GLAIVE_THROWER_A = 34802,
-    NPC_GLAIVE_THROWER_H = 35273,
-    NPC_CATAPULT = 34793,
-    NPC_HORDE_GUNSHIP_CANNON = 34935,
-    NPC_ALLIANCE_GUNSHIP_CANNON = 34929
+    NPC_OVERLORD_AGMAR                  = 34922, // Horde Boss
+    NPC_KOR_KRON_GUARD                  = 34918, // horde guard
+    NPC_SEVEN_TH_LEGION_INFANTRY        = 34919, // alliance guard
+    NPC_KEEP_CANNON                     = 34944,
+    NPC_DEMOLISHER                      = 34775,
+    NPC_SIEGE_ENGINE_H                  = 35069,
+    NPC_SIEGE_ENGINE_A                  = 34776,
+    NPC_GLAIVE_THROWER_A                = 34802,
+    NPC_GLAIVE_THROWER_H                = 35273,
+    NPC_CATAPULT                        = 34793,
+    NPC_HORDE_GUNSHIP_CANNON            = 34935,
+    NPC_ALLIANCE_GUNSHIP_CANNON         = 34929
 };
 
 enum gameobjectsIC
@@ -186,12 +186,12 @@ enum gameobjectsIC
 
 enum Times
 {
-    WORKSHOP_UPDATE_TIME = 180000, // 3 minutes
-    DOCKS_UPDATE_TIME = 180000, // not sure if it is 3 minutes
-    IC_RESOURCE_TIME = 45000, // not sure, need more research
-    CLOSE_DOORS_TIME = 20000,
+    WORKSHOP_UPDATE_TIME     = 180000, // 3 minutes
+    DOCKS_UPDATE_TIME        = 180000, // not sure if it is 3 minutes
+    IC_RESOURCE_TIME         = 45000, // not sure, need more research
+    CLOSE_DOORS_TIME         = 20000,
     BANNER_STATE_CHANGE_TIME = 60000,
-    TRANSPORT_PERIOD_TIME = 120000
+    TRANSPORT_PERIOD_TIME    = 120000
 };
 
 enum Actions
@@ -655,18 +655,15 @@ const Position workshopBombs[2] =
 
 enum Spells
 {
-    SPELL_OIL_REFINERY      = 68719,
-    SPELL_QUARRY            = 68720,
-
-    SPELL_PARACHUTE = 66656,
-    SPELL_SLOW_FALL = 12438,
-
-    SPELL_DESTROYED_VEHICLE_ACHIEVEMENT = 68357,
-
-    SPELL_DRIVING_CREDIT_DEMOLISHER = 68365,
-    SPELL_DRIVING_CREDIT_GLAIVE = 68363,
-    SPELL_DRIVING_CREDIT_SIEGE = 68364,
-    SPELL_DRIVING_CREDIT_CATAPULT = 68362
+    SPELL_OIL_REFINERY                     = 68719,
+    SPELL_QUARRY                           = 68720,
+    SPELL_PARACHUTE                        = 66656,
+    SPELL_SLOW_FALL                        = 12438,
+    SPELL_DESTROYED_VEHICLE_ACHIEVEMENT    = 68357,
+    SPELL_DRIVING_CREDIT_DEMOLISHER        = 68365,
+    SPELL_DRIVING_CREDIT_GLAIVE            = 68363,
+    SPELL_DRIVING_CREDIT_SIEGE             = 68364,
+    SPELL_DRIVING_CREDIT_CATAPULT          = 68362
 };
 
 enum BG_IC_Objectives
@@ -694,47 +691,47 @@ enum ICWorldStates
     BG_IC_GATE_WEST_A_WS_OPEN       = 4324,
     BG_IC_GATE_EAST_A_WS_OPEN       = 4325,
 
-    BG_IC_DOCKS_UNCONTROLLED = 4301,
-    BG_IC_DOCKS_CONFLICT_A = 4305,
-    BG_IC_DOCKS_CONFLICT_H = 4302,
-    BG_IC_DOCKS_CONTROLLED_A = 4304,
-    BG_IC_DOCKS_CONTROLLED_H = 4303,
+    BG_IC_DOCKS_UNCONTROLLED        = 4301,
+    BG_IC_DOCKS_CONFLICT_A          = 4305,
+    BG_IC_DOCKS_CONFLICT_H          = 4302,
+    BG_IC_DOCKS_CONTROLLED_A        = 4304,
+    BG_IC_DOCKS_CONTROLLED_H        = 4303,
 
-    BG_IC_HANGAR_UNCONTROLLED = 4296,
-    BG_IC_HANGAR_CONFLICT_A = 4300,
-    BG_IC_HANGAR_CONFLICT_H = 4297,
-    BG_IC_HANGAR_CONTROLLED_A = 4299,
-    BG_IC_HANGAR_CONTROLLED_H = 4298,
+    BG_IC_HANGAR_UNCONTROLLED       = 4296,
+    BG_IC_HANGAR_CONFLICT_A         = 4300,
+    BG_IC_HANGAR_CONFLICT_H         = 4297,
+    BG_IC_HANGAR_CONTROLLED_A       = 4299,
+    BG_IC_HANGAR_CONTROLLED_H       = 4298,
 
-    BG_IC_QUARRY_UNCONTROLLED = 4306,
-    BG_IC_QUARRY_CONFLICT_A = 4310,
-    BG_IC_QUARRY_CONFLICT_H = 4307,
-    BG_IC_QUARRY_CONTROLLED_A = 4309,
-    BG_IC_QUARRY_CONTROLLED_H = 4308,
+    BG_IC_QUARRY_UNCONTROLLED       = 4306,
+    BG_IC_QUARRY_CONFLICT_A         = 4310,
+    BG_IC_QUARRY_CONFLICT_H         = 4307,
+    BG_IC_QUARRY_CONTROLLED_A       = 4309,
+    BG_IC_QUARRY_CONTROLLED_H       = 4308,
 
-    BG_IC_REFINERY_UNCONTROLLED = 4311,
-    BG_IC_REFINERY_CONFLICT_A = 4315,
-    BG_IC_REFINERY_CONFLICT_H = 4312,
-    BG_IC_REFINERY_CONTROLLED_A = 4314,
-    BG_IC_REFINERY_CONTROLLED_H = 4313,
+    BG_IC_REFINERY_UNCONTROLLED     = 4311,
+    BG_IC_REFINERY_CONFLICT_A       = 4315,
+    BG_IC_REFINERY_CONFLICT_H       = 4312,
+    BG_IC_REFINERY_CONTROLLED_A     = 4314,
+    BG_IC_REFINERY_CONTROLLED_H     = 4313,
 
-    BG_IC_WORKSHOP_UNCONTROLLED = 4294,
-    BG_IC_WORKSHOP_CONFLICT_A = 4228,
-    BG_IC_WORKSHOP_CONFLICT_H = 4293,
-    BG_IC_WORKSHOP_CONTROLLED_A = 4229,
-    BG_IC_WORKSHOP_CONTROLLED_H = 4230,
+    BG_IC_WORKSHOP_UNCONTROLLED     = 4294,
+    BG_IC_WORKSHOP_CONFLICT_A       = 4228,
+    BG_IC_WORKSHOP_CONFLICT_H       = 4293,
+    BG_IC_WORKSHOP_CONTROLLED_A     = 4229,
+    BG_IC_WORKSHOP_CONTROLLED_H     = 4230,
 
     BG_IC_ALLIANCE_KEEP_UNCONTROLLED = 4341,
-    BG_IC_ALLIANCE_KEEP_CONFLICT_A = 4342,
-    BG_IC_ALLIANCE_KEEP_CONFLICT_H = 4343,
+    BG_IC_ALLIANCE_KEEP_CONFLICT_A   = 4342,
+    BG_IC_ALLIANCE_KEEP_CONFLICT_H   = 4343,
     BG_IC_ALLIANCE_KEEP_CONTROLLED_A = 4339,
     BG_IC_ALLIANCE_KEEP_CONTROLLED_H = 4340,
 
-    BG_IC_HORDE_KEEP_UNCONTROLLED = 4346,
-    BG_IC_HORDE_KEEP_CONFLICT_A = 4347,
-    BG_IC_HORDE_KEEP_CONFLICT_H = 4348,
-    BG_IC_HORDE_KEEP_CONTROLLED_A = 4344,
-    BG_IC_HORDE_KEEP_CONTROLLED_H = 4345
+    BG_IC_HORDE_KEEP_UNCONTROLLED   = 4346,
+    BG_IC_HORDE_KEEP_CONFLICT_A     = 4347,
+    BG_IC_HORDE_KEEP_CONFLICT_H     = 4348,
+    BG_IC_HORDE_KEEP_CONTROLLED_A   = 4344,
+    BG_IC_HORDE_KEEP_CONTROLLED_H   = 4345
 };
 
 enum BG_IC_GateState
@@ -848,13 +845,12 @@ enum HonorRewards
     WINNER_HONOR_AMOUNT = 500
 };
 
-class BattlegroundICScore : public BattlegroundScore
+struct BattlegroundICScore : public BattlegroundScore
 {
-    public:
-        BattlegroundICScore() : BasesAssaulted(0), BasesDefended(0) {};
-        virtual ~BattlegroundICScore() {};
-        uint32 BasesAssaulted;
-        uint32 BasesDefended;
+    BattlegroundICScore() : BasesAssaulted(0), BasesDefended(0) { }
+    ~BattlegroundICScore() { }
+    uint32 BasesAssaulted;
+    uint32 BasesDefended;
 };
 
 class BattlegroundIC : public Battleground
@@ -864,10 +860,10 @@ class BattlegroundIC : public Battleground
         ~BattlegroundIC();
 
         /* inherited from BattlegroundClass */
-        virtual void AddPlayer(Player* player);
-        virtual void StartingEventCloseDoors();
-        virtual void StartingEventOpenDoors();
-        virtual void PostUpdateImpl(uint32 diff);
+        void AddPlayer(Player* player);
+        void StartingEventCloseDoors();
+        void StartingEventOpenDoors();
+        void PostUpdateImpl(uint32 diff);
 
         void RemovePlayer(Player* player, uint64 guid, uint32 team);
         void HandleAreaTrigger(Player* Source, uint32 Trigger);
@@ -881,7 +877,7 @@ class BattlegroundIC : public Battleground
         void EventPlayerDamagedGO(Player* /*player*/, GameObject* go, uint32 eventType);
         void DestroyGate(Player* player, GameObject* go);
 
-        virtual WorldSafeLocsEntry const* GetClosestGraveYard(Player* player);
+        WorldSafeLocsEntry const* GetClosestGraveYard(Player* player);
 
         /* Scorekeeping */
         void UpdatePlayerScore(Player* Source, uint32 type, uint32 value, bool doAddHonor = true);
@@ -890,11 +886,11 @@ class BattlegroundIC : public Battleground
 
         void DoAction(uint32 action, uint64 var);
 
-        virtual void HandlePlayerResurrect(Player* player);
+        void HandlePlayerResurrect(Player* player);
 
-        uint32 GetNodeState(uint8 nodeType) { return (uint8)nodePoint[nodeType].nodeState; }
+        uint32 GetNodeState(uint8 nodeType) const { return (uint8)nodePoint[nodeType].nodeState; }
 
-        virtual bool IsAllNodesConrolledByTeam(uint32 team) const;  // overwrited
+        bool IsAllNodesConrolledByTeam(uint32 team) const;  // overwrited
     private:
         uint32 closeFortressDoorsTimer;
         bool doorsClosed;
@@ -960,4 +956,5 @@ class BattlegroundIC : public Battleground
         Transport* CreateTransport(uint32 goEntry, uint32 period);
         void SendTransportInit(Player* player);
 };
+
 #endif
