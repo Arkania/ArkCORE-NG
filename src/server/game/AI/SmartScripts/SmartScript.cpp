@@ -1028,8 +1028,16 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             if (!IsSmart())
                 break;
 
-            CAST_AI(SmartAI, me->AI())->SetDespawnTime(e.action.forceDespawn.delay + 1);//next tick
-            CAST_AI(SmartAI, me->AI())->StartDespawn();
+            // The AI is only updated if the creature is alive
+            if (me->IsAlive())
+            {
+                CAST_AI(SmartAI, me->AI())->SetDespawnTime(e.action.forceDespawn.delay + 1); // Next tick
+                CAST_AI(SmartAI, me->AI())->StartDespawn();
+            }
+            // Otherwise we call the despawn directly
+            else
+                me->DespawnOrUnsummon(e.action.forceDespawn.delay);
+
             break;
         }
         case SMART_ACTION_SET_INGAME_PHASE_MASK:
