@@ -23,7 +23,6 @@
 #include "Creature.h"
 #include "CreatureAI.h"
 #include "Unit.h"
-#include "ConditionMgr.h"
 #include "Spell.h"
 
 #include "SmartScript.h"
@@ -199,7 +198,7 @@ class SmartAI : public CreatureAI
 
         void RemoveAuras();
 
-        void OnSpellClick(Unit* clicker);
+        void OnSpellClick(Unit* clicker, bool& result);
 
     private:
         uint32 mFollowCreditType;

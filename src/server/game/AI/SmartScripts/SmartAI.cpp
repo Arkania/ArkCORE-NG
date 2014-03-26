@@ -28,9 +28,8 @@
 #include "InstanceScript.h"
 #include "ScriptedCreature.h"
 #include "Group.h"
-
 #include "SmartAI.h"
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
 
 SmartAI::SmartAI(Creature* c) : CreatureAI(c)
 {
@@ -673,9 +672,7 @@ void SmartAI::SummonedCreatureDespawn(Creature* unit)
     GetScript()->ProcessEventsFor(SMART_EVENT_SUMMON_DESPAWNED, unit);
 }
 
-void SmartAI::UpdateAIWhileCharmed(const uint32 /*diff*/)
-{
-}
+void SmartAI::UpdateAIWhileCharmed(const uint32 /*diff*/) { }
 
 void SmartAI::CorpseRemoved(uint32& respawnDelay)
 {
@@ -759,9 +756,7 @@ void SmartAI::sGossipSelect(Player* player, uint32 sender, uint32 action)
     GetScript()->ProcessEventsFor(SMART_EVENT_GOSSIP_SELECT, player, sender, action);
 }
 
-void SmartAI::sGossipSelectCode(Player* /*player*/, uint32 /*sender*/, uint32 /*action*/, const char* /*code*/)
-{
-}
+void SmartAI::sGossipSelectCode(Player* /*player*/, uint32 /*sender*/, uint32 /*action*/, const char* /*code*/) { }
 
 void SmartAI::sQuestAccept(Player* player, Quest const* quest)
 {
@@ -830,8 +825,11 @@ void SmartAI::sOnGameEvent(bool start, uint16 eventId)
     GetScript()->ProcessEventsFor(start ? SMART_EVENT_GAME_EVENT_START : SMART_EVENT_GAME_EVENT_END, NULL, eventId);
 }
 
-void SmartAI::OnSpellClick(Unit* clicker)
+void SmartAI::OnSpellClick(Unit* clicker, bool& result)
 {
+    if (!result)
+        return;
+
     GetScript()->ProcessEventsFor(SMART_EVENT_ON_SPELLCLICK, clicker);
 }
 
