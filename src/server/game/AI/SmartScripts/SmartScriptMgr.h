@@ -996,7 +996,8 @@ enum SMARTAI_TARGETS
     SMART_TARGET_ACTION_INVOKER_VEHICLE         = 22,   // Unit's vehicle who caused this Event to occur
     SMART_TARGET_OWNER_OR_SUMMONER              = 23,   // Unit's owner or summoner
     SMART_TARGET_THREAT_LIST                    = 24,   // All units on creature's threat list
-    SMART_TARGET_END                            = 25
+    SMART_TARGET_CLOSEST_ENEMY                  = 25,   // maxDist
+    SMART_TARGET_END                            = 26
 };
 
 struct SmartTarget
@@ -1077,6 +1078,11 @@ struct SmartTarget
             uint32 dist;
             uint32 dead;
         } closest;
+
+        struct
+        {
+            uint32 maxDist;
+        } closestAttackable;
 
         struct
         {
