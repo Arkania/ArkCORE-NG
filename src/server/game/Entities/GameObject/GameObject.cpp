@@ -221,8 +221,7 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map* map, uint32 phaseMa
     SetName(goinfo->name);
 
     SetDisplayId(goinfo->displayId);
-    // this fix some core crashes, but possible have other side : disabling DynLOS.
-    // m_model = GameObjectModel::Create(*this);
+
     // GAMEOBJECT_BYTES_1, index at 0, 1, 2 and 3
     SetGoType(GameobjectTypes(goinfo->type));
     SetGoState(go_state);

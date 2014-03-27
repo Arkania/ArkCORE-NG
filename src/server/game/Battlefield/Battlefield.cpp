@@ -34,7 +34,6 @@
 
 Battlefield::Battlefield()
 {
-
     m_Timer = 0;
     m_IsEnabled = true;
     m_isActive = false;

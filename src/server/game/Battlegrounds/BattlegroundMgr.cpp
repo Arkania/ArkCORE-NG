@@ -180,11 +180,11 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket *data, Battlegro
             data->WriteByteSeq(guidBytes1[6]);
             data->WriteByteSeq(guidBytes1[7]);
             data->WriteByteSeq(guidBytes1[2]);
-            *data << uint32(1); // not queue slot, some form of counter.
+            *data << uint32(1);                         // not queue slot, some form of counter.
             data->WriteByteSeq(guidBytes1[3]);
             data->WriteByteSeq(guidBytes1[1]);
-            *data << uint32(QueueSlot); // Queue slot
-            *data << uint32(Time1);
+            *data << uint32(QueueSlot);                 // Queue slot
+            *data << uint32(Time1);                     // Join Time
             data->WriteByteSeq(guidBytes1[0]);
             data->WriteByteSeq(guidBytes1[4]);
             break;
@@ -492,7 +492,7 @@ void BattlegroundMgr::BuildPvpLogDataPacket(WorldPacket* data, Battleground* bg)
 
         if (!isArena) // Unk 3 prolly is (bg)
         {
-            buff << uint32(itr2->second->BonusHonor);
+            buff << uint32(itr2->second->BonusHonor / 100);
             buff << uint32(itr2->second->Deaths);
             buff << uint32(itr2->second->HonorableKills);
         }
@@ -1084,6 +1084,7 @@ bool BattlegroundMgr::CreateBattleground(CreateBattlegroundData& data)
     bg->SetStartMaxDist(data.StartMaxDist);
     bg->SetLevelRange(data.LevelMin, data.LevelMax);
     bg->SetScriptId(data.scriptId);
+    bg->SetGuid(MAKE_NEW_GUID(data.bgTypeId, 0, HIGHGUID_TYPE_BATTLEGROUND));
 
     AddBattleground(bg);
 
