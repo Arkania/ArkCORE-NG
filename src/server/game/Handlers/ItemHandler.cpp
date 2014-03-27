@@ -1497,7 +1497,7 @@ void WorldSession::HandleTransmogrifyItems(WorldPacket& recvData)
     // Read data
     uint32 count = recvData.ReadBits(22);
 
-    if (count < EQUIPMENT_SLOT_START || count >= EQUIPMENT_SLOT_END)
+    if (count >= EQUIPMENT_SLOT_END)
     {
         sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleTransmogrifyItems - Player (GUID: %u, name: %s) sent a wrong count (%u) when transmogrifying items.", player->GetGUIDLow(), player->GetName(), count);
         recvData.rfinish();
@@ -1569,7 +1569,7 @@ void WorldSession::HandleTransmogrifyItems(WorldPacket& recvData)
     for (uint8 i = 0; i < count; ++i)
     {
         // slot of the transmogrified item
-        if (slots[i] < EQUIPMENT_SLOT_START || slots[i] >= EQUIPMENT_SLOT_END)
+        if (slots[i] >= EQUIPMENT_SLOT_END)
         {
             sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleTransmogrifyItems - Player (GUID: %u, name: %s) tried to transmogrify an item (lowguid: %u) with a wrong slot (%u) when transmogrifying items.", player->GetGUIDLow(), player->GetName(), GUID_LOPART(itemGuids[i]), slots[i]);
             return;

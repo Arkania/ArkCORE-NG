@@ -1371,6 +1371,7 @@ class Player : public Unit, public GridObject<Player>
         Pet* GetPet() const;
         Pet* SummonPet(uint32 entry, float x, float y, float z, float ang, PetType petType, uint32 despwtime, PetSaveMode slotID);
         void RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent = false);
+
         PhaseMgr& GetPhaseMgr() { return phaseMgr; }
 
         void Say(const std::string& text, const uint32 language);

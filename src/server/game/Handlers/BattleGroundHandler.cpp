@@ -590,7 +590,7 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recvData)
     }
 }
 
-void WorldSession::HandleBattlefieldLeaveOpcode(WorldPacket& recvData)
+void WorldSession::HandleBattlefieldLeaveOpcode(WorldPacket&  /*recvData*/)
 {
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recvd CMSG_BATTLEFIELD_LEAVE Message");
 
@@ -772,7 +772,7 @@ void WorldSession::HandleBattlemasterJoinArena(WorldPacket & recvData)
         // add to queue
         uint32 queueSlot = member->AddBattlegroundQueueId(bgQueueTypeId);
 
-        WorldPacket data; // send status packet (in queue)
+        // send status packet (in queue)
         sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, member, queueSlot, STATUS_WAIT_QUEUE, avgTime, ginfo->JoinTime, arenatype);
         member->GetSession()->SendPacket(&data);
 

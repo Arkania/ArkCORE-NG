@@ -665,10 +665,10 @@ void BattlegroundMgr::BuildPvpLogDataPacket(WorldPacket* data, Battleground* bg)
             if (ArenaTeam* at = sArenaTeamMgr->GetArenaTeamById(bg->GetArenaTeamIdByIndex(i)))
                 data->WriteString(at->GetName());
 
-     *data << uint8(bg->GetPlayersCountByTeam(HORDE));
+    *data << uint8(bg->GetPlayersCountByTeam(HORDE));
 
     if (bg->GetStatus() == STATUS_WAIT_LEAVE)
-        *data << uint8(bg->GetWinner() == ALLIANCE); // who win
+        *data << uint8(bg->GetWinner()); // who win
   
     *data << uint8(bg->GetPlayersCountByTeam(ALLIANCE));
 }
@@ -1084,7 +1084,6 @@ bool BattlegroundMgr::CreateBattleground(CreateBattlegroundData& data)
     bg->SetStartMaxDist(data.StartMaxDist);
     bg->SetLevelRange(data.LevelMin, data.LevelMax);
     bg->SetScriptId(data.scriptId);
-    bg->SetGuid(MAKE_NEW_GUID(data.bgTypeId, 0, HIGHGUID_TYPE_BATTLEGROUND));
 
     AddBattleground(bg);
 

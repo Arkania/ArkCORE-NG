@@ -1048,6 +1048,7 @@ public:
 };
 
 // 755 - Health Funnel
+/// Updated 4.3.4
 class spell_warl_health_funnel : public SpellScriptLoader
 {
 public:
