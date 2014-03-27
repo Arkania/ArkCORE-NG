@@ -2124,9 +2124,11 @@ public:
         void SpellHit(Unit* caster, const SpellInfo* spell)
         {
             if (caster->GetTypeId() == TYPEID_PLAYER)
+            {
                 //           paladin           warrior            rogue                  hunter             shaman                  warlock              mage       (priest health smartAI or column RequiredSpellCast1)
                 if (spell->Id == 20271 || spell->Id == 100 || spell->Id == 2098 || spell->Id == 56641 || spell->Id == 73899 || spell->Id == 348 || spell->Id == 5143)
                     caster->ToPlayer()->KilledMonsterCredit(44175, 0);
+            }
         }
 
         void DamageTaken(Unit* /*doneBy*/, uint32& damage)
