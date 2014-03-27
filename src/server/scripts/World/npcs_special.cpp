@@ -2081,7 +2081,7 @@ class npc_lightwell : public CreatureScript
         }
 };
 
-enum eTrainingDummy
+enum TrainingDummy
 {
     NPC_ADVANCED_TARGET_DUMMY                  = 2674,
     NPC_TARGET_DUMMY                           = 2673
@@ -2092,10 +2092,11 @@ class npc_training_dummy : public CreatureScript
 public:
     npc_training_dummy() : CreatureScript("npc_training_dummy") { }
 
-    struct npc_training_dummyAI : Scripted_NoMovementAI
+    struct npc_training_dummyAI : ScriptedAI
     {
-        npc_training_dummyAI(Creature* creature) : Scripted_NoMovementAI(creature)
+        npc_training_dummyAI(Creature* creature) : ScriptedAI(creature)
         {
+            SetCombatMovement(false);
             entry = creature->GetEntry();
         }
 
@@ -2120,16 +2121,18 @@ public:
             Reset();
         }
 
+        void SpellHit(Unit* caster, const SpellInfo* spell)
+        {
+            if (caster->GetTypeId() == TYPEID_PLAYER)
+                //           paladin           warrior            rogue                  hunter             shaman                  warlock              mage       (priest health smartAI or column RequiredSpellCast1)
+                if (spell->Id == 20271 || spell->Id == 100 || spell->Id == 2098 || spell->Id == 56641 || spell->Id == 73899 || spell->Id == 348 || spell->Id == 5143)
+                    caster->ToPlayer()->KilledMonsterCredit(44175, 0);
+        }
+
         void DamageTaken(Unit* /*doneBy*/, uint32& damage)
         {
             resetTimer = 5000;
             damage = 0;
-        }
-
-        void EnterCombat(Unit* /*who*/)
-        {
-            if (entry != NPC_ADVANCED_TARGET_DUMMY && entry != NPC_TARGET_DUMMY)
-                return;
         }
 
         void UpdateAI(const uint32 diff)
@@ -2159,7 +2162,8 @@ public:
                     despawnTimer -= diff;
             }
         }
-        void MoveInLineOfSight(Unit* /*who*/){return;}
+
+        void MoveInLineOfSight(Unit* /*who*/) { }
     };
 
     CreatureAI* GetAI(Creature* creature) const
