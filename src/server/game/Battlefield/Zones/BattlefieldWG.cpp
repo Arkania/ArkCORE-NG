@@ -536,12 +536,12 @@ void BattlefieldWG::OnCreatureCreate(Creature* creature)
             case NPC_WINTERGRASP_CATAPULT:
             case NPC_WINTERGRASP_DEMOLISHER:
             {
-                if (!creature->ToTempSummon()->GetSummonerGUID() || !sObjectAccessor->FindPlayer(creature->ToTempSummon()->GetSummonerGUID()))
+                if (!creature->ToTempSummon() || !creature->ToTempSummon()->GetSummonerGUID() || !sObjectAccessor->FindPlayer(creature->ToTempSummon()->GetSummonerGUID()))
                 {
-                    creature->setDeathState(DEAD);
-                    creature->RemoveFromWorld();
+                    creature->DespawnOrUnsummon();
                     return;
                 }
+
                 Player* creator = sObjectAccessor->FindPlayer(creature->ToTempSummon()->GetSummonerGUID());
                 TeamId team = creator->GetTeamId();
 

@@ -476,12 +476,12 @@ public:
             }
             else if (map->IsDungeon())
             {
-                Map* map = target->GetMap();
+                Map* destMap = target->GetMap();
 
-                if (map->Instanceable() && map->GetInstanceId() != map->GetInstanceId())
+                if (destMap->Instanceable() && destMap->GetInstanceId() != map->GetInstanceId())
                     target->UnbindInstance(map->GetInstanceId(), target->GetDungeonDifficulty(), true);
 
-                // we are in instance, and can summon only player in our group with us as lead
+                // we are in an instance, and can only summon players in our group with us as leader
                 if (!handler->GetSession()->GetPlayer()->GetGroup() || !target->GetGroup() ||
                     (target->GetGroup()->GetLeaderGUID() != handler->GetSession()->GetPlayer()->GetGUID()) ||
                     (handler->GetSession()->GetPlayer()->GetGroup()->GetLeaderGUID() != handler->GetSession()->GetPlayer()->GetGUID()))
@@ -2562,7 +2562,7 @@ public:
                 {
                     pet->SavePetToDB(PET_SLOT_ACTUAL_PET_SLOT);
                     // not let dismiss dead pet
-                    if (pet && pet->IsAlive())
+                    if (pet->IsAlive())
                         player->RemovePet(pet, PET_SLOT_DELETED);
                 }
             }

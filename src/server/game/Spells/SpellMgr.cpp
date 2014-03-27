@@ -653,7 +653,7 @@ SpellSpellGroupMapBounds SpellMgr::GetSpellSpellGroupMapBounds(uint32 spell_id) 
     return SpellSpellGroupMapBounds(mSpellSpellGroup.lower_bound(spell_id), mSpellSpellGroup.upper_bound(spell_id));
 }
 
-uint32 SpellMgr::IsSpellMemberOfSpellGroup(uint32 spellid, SpellGroup groupid) const
+bool SpellMgr::IsSpellMemberOfSpellGroup(uint32 spellid, SpellGroup groupid) const
 {
     SpellSpellGroupMapBounds spellGroup = GetSpellSpellGroupMapBounds(spellid);
     for (SpellSpellGroupMap::const_iterator itr = spellGroup.first; itr != spellGroup.second; ++itr)
@@ -3190,7 +3190,7 @@ void SpellMgr::LoadSpellCustomAttr()
             case 44401: // Missile Barrage
                 spellInfo->ProcCharges = 1;
                 break;
-            //case 44544: // Fingers of Frost
+            // case 44544: // Fingers of Frost
             //    spellInfo->Effects[0].SpellClassMask = flag96(685904631, 1151048, 0);
             //    break;
              case 28200: // Ascendance (Talisman of Ascendance trinket)
@@ -3285,7 +3285,7 @@ void SpellMgr::LoadSpellCustomAttr()
                        // ULDUAR SPELLS
             //
             case 62374: // Pursued (Flame Leviathan)
-                spellInfo->Effects[0].RadiusEntry = sSpellRadiusStore.LookupEntry(28);   // 50000yd
+                spellInfo->Effects[0].RadiusEntry = sSpellRadiusStore.LookupEntry(28); // 50000yd
                 break;
             case 63342: // Focused Eyebeam Summon Trigger (Kologarn)
                 spellInfo->MaxAffectedTargets = 1;
@@ -3331,7 +3331,7 @@ void SpellMgr::LoadSpellCustomAttr()
                 break;
             case 62311: // Cosmic Smash (Algalon the Observer)
             case 64596: // Cosmic Smash (Algalon the Observer)
-                spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(6);  // 100yd
+                spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(6); // 100yd
                 break;
             // ENDOF ULDUAR SPELLS
             //
@@ -3389,7 +3389,7 @@ void SpellMgr::LoadSpellCustomAttr()
                 spellInfo->Effects[2].Effect = 0;
                 break;
             case 70460: // Coldflame Jets (Traps after Saurfang)
-                spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(1);   // 10 seconds
+                spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(1); // 10 seconds
                 break;
             case 71412: // Green Ooze Summon (Professor Putricide)
             case 71415: // Orange Ooze Summon (Professor Putricide)
@@ -3412,7 +3412,7 @@ void SpellMgr::LoadSpellCustomAttr()
             case 72464: // Mutated Plague (Professor Putricide)
             case 72506: // Mutated Plague (Professor Putricide)
             case 72507: // Mutated Plague (Professor Putricide)
-                spellInfo->Effects[0].RadiusEntry =  sSpellRadiusStore.LookupEntry(28);   // 50000yd
+                spellInfo->Effects[0].RadiusEntry =  sSpellRadiusStore.LookupEntry(28); // 50000yd
                 break;
             case 70911: // Unbound Plague (Professor Putricide) (needs target selection script)
             case 72854: // Unbound Plague (Professor Putricide) (needs target selection script)
@@ -3423,7 +3423,7 @@ void SpellMgr::LoadSpellCustomAttr()
             case 71518: // Unholy Infusion Quest Credit (Professor Putricide)
             case 72934: // Blood Infusion Quest Credit (Blood-Queen Lana'thel)
             case 72289: // Frost Infusion Quest Credit (Sindragosa)
-                spellInfo->Effects[0].RadiusEntry =  sSpellRadiusStore.LookupEntry(28);   // another missing radius
+                spellInfo->Effects[0].RadiusEntry =  sSpellRadiusStore.LookupEntry(28); // another missing radius
                 break;
             case 71708: // Empowered Flare (Blood Prince Council)
             case 72785: // Empowered Flare (Blood Prince Council)
@@ -3472,23 +3472,23 @@ void SpellMgr::LoadSpellCustomAttr()
             case 73708: // Defile
             case 73709: // Defile
             case 73710: // Defile
-                spellInfo->Effects[0].RadiusEntry =  sSpellRadiusStore.LookupEntry(33);   // 200yd
-                spellInfo->Effects[1].RadiusEntry =  sSpellRadiusStore.LookupEntry(33);   // 200yd
+                spellInfo->Effects[0].RadiusEntry =  sSpellRadiusStore.LookupEntry(33); // 200yd
+                spellInfo->Effects[1].RadiusEntry =  sSpellRadiusStore.LookupEntry(33); // 200yd
                 break;
             case 69030: // Val'kyr Target Search
-                spellInfo->Effects[0].RadiusEntry =  sSpellRadiusStore.LookupEntry(31);   // 200yd
-                spellInfo->Effects[1].RadiusEntry =  sSpellRadiusStore.LookupEntry(31);   // 200yd
+                spellInfo->Effects[0].RadiusEntry =  sSpellRadiusStore.LookupEntry(31); // 200yd
+                spellInfo->Effects[1].RadiusEntry =  sSpellRadiusStore.LookupEntry(31); // 200yd
                 break;
             case 69198: // Raging Spirit Visual
-                spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(13);             // 50000yd
+                spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(13); // 50000yd
                 break;
             case 73654: // Harvest Souls
             case 74295: // Harvest Souls
             case 74296: // Harvest Souls
             case 74297: // Harvest Souls
-                spellInfo->Effects[0].RadiusEntry =  sSpellRadiusStore.LookupEntry(28);   // 50000yd
-                spellInfo->Effects[1].RadiusEntry =  sSpellRadiusStore.LookupEntry(28);   // 50000yd
-                spellInfo->Effects[2].RadiusEntry =  sSpellRadiusStore.LookupEntry(28);   // 50000yd
+                spellInfo->Effects[0].RadiusEntry =  sSpellRadiusStore.LookupEntry(28); // 50000yd
+                spellInfo->Effects[1].RadiusEntry =  sSpellRadiusStore.LookupEntry(28); // 50000yd
+                spellInfo->Effects[2].RadiusEntry =  sSpellRadiusStore.LookupEntry(28); // 50000yd
                 break;
             case 73655: // Harvest Soul
                 spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_DONE_BONUS;
@@ -3557,6 +3557,29 @@ void SpellMgr::LoadSpellCustomAttr()
             case 72405: // Broken Frostmourne
                 spellInfo->Effects[1].RadiusEntry =  sSpellRadiusStore.LookupEntry(22);   // 200yd
                 break;
+            // ENDOF ICECROWN CITADEL SPELLS
+            //
+            // RUBY SANCTUM SPELLS
+            //
+            case 74799: // Soul Consumption
+                spellInfo->Effects[EFFECT_1].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_12_YARDS);
+                break;
+            case 74769: // Twilight Cutter
+            case 77844: // Twilight Cutter
+            case 77845: // Twilight Cutter
+            case 77846: // Twilight Cutter
+                spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_100_YARDS); // 100yd
+                break;
+            case 75509: // Twilight Mending
+                spellInfo->AttributesEx6 |= SPELL_ATTR6_CAN_TARGET_INVISIBLE;
+                spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+                break;
+            case 75888: // Awaken Flames
+            case 75889: // Awaken Flames
+                spellInfo->AttributesEx |= SPELL_ATTR1_CANT_TARGET_SELF;
+                break;
+            // ENDOF RUBY SANCTUM SPELLS
+            //
             case 40055: // Introspection
             case 40165: // Introspection
             case 40166: // Introspection
@@ -3567,8 +3590,13 @@ void SpellMgr::LoadSpellCustomAttr()
                 spellInfo->ManaCost = 0;
                 spellInfo->ManaPerSecond = 0;
                 break;
-            // ENDOF ICECROWN CITADEL SPELLS
-            //
+            // OCULUS SPELLS
+            // The spells below are here, because their effect 1 is giving warning, because the triggered spell is not found in dbc and is missing from encounter sniff.
+            case 49462: // Call Ruby Drake
+            case 49461: // Call Amber Drake
+            case 49345: // Call Emerald Drake
+                spellInfo->Effects[EFFECT_1].Effect = 0;
+                break;
             case 27243: // Seed of corruption
                 spellInfo->Effects[1].BasePoints = 2033;
                 break;
@@ -4098,6 +4126,6 @@ void SpellMgr::LoadDbcDataCorrections()
     properties->Type = SUMMON_TYPE_TOTEM;
     }
    
-    sLog->outString(">> Loading spell dbc data corrections  in %u ms", GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString(">> Loaded spell dbc data corrections  in %u ms", GetMSTimeDiffToNow(oldMSTime));
     sLog->outString();
 }

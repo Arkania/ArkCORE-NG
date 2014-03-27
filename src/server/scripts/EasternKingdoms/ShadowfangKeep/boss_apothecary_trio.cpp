@@ -111,14 +111,15 @@ class npc_apothecary_hummel : public CreatureScript
             return true;
         }*/
 
-        //bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*opt*/)
         bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
         {
-            //if (quest->GetQuestId() == 14488)
-            // if (action == GOSSIP_ACTION_INFO_DEF + 1)
+            player->PlayerTalkClass->ClearMenus();
+            if (action == GOSSIP_ACTION_INFO_DEF)
+            {
+                player->CLOSE_GOSSIP_MENU();
                 creature->AI()->DoAction(START_INTRO);
+            }
 
-            player->CLOSE_GOSSIP_MENU();
             return true;
         }
 

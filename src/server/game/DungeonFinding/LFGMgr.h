@@ -42,6 +42,14 @@ enum LFGenum
     LFG_SPELL_LUCK_OF_THE_DRAW                   = 72221
 };
 
+enum LfgFlags
+{
+    LFG_FLAG_UNK1                                = 0x1,
+    LFG_FLAG_UNK2                                = 0x2,
+    LFG_FLAG_SEASONAL                            = 0x4,
+    LFG_FLAG_UNK3                                = 0x8
+};
+
 /// Determines the type of instance
 enum LfgType
 {
@@ -145,6 +153,7 @@ typedef std::map<uint32, LfgPlayerBoot*> LfgPlayerBootMap;
 typedef std::map<uint64, LfgGroupData> LfgGroupDataMap;
 typedef std::map<uint64, LfgPlayerData> LfgPlayerDataMap;
 typedef std::map<uint32, LFGDungeonEntry const*> LfgDungeonsMap;
+typedef std::map<uint32, Position> LfgEntrancePositionMap;
 
 // Data needed by SMSG_LFG_JOIN_RESULT
 struct LfgJoinResultData
@@ -281,12 +290,15 @@ class LFGMgr
         void UpdateProposal(uint32 proposalId, uint64 guid, bool accept);
 
         // Teleportation
+        void LoadEntrancePositions();
         void TeleportPlayer(Player* player, bool out, bool fromOpcode = false);
 
         // Vote kick
         void InitBoot(Group* grp, uint64 kguid, uint64 vguid, std::string reason);
         void UpdateBoot(Player* player, bool accept);
         void OfferContinue(Group* grp);
+
+        HolidayIds GetDungeonSeason(uint32 dungeonId);
 
         void InitializeLockedDungeons(Player* player);
 
@@ -352,6 +364,7 @@ class LFGMgr
         uint32 m_NumWaitTimeHealer;                        ///< Num of players used to calc healers wait time
         uint32 m_NumWaitTimeDps;                           ///< Num of players used to calc dps wait time
         LfgDungeonMap m_CachedDungeonMap;                  ///< Stores all dungeons by groupType
+        LfgEntrancePositionMap m_entrancePositions;        ///< Stores special entrance positions
         // Reward System
         LfgRewardMap m_RewardMap;                          ///< Stores rewards for random dungeons
         // Queue

@@ -55,12 +55,14 @@ EndContentData */
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "ArcheologyMgr.h"
+#include "GameObjectAI.h"
+#include "Spell.h"
 
 /*######
 ## go_cat_figurine
 ######*/
 
-enum eCatFigurine
+enum CatFigurine
 {
     SPELL_SUMMON_GHOST_SABER    = 5968,
 };
@@ -180,7 +182,7 @@ public:
 ## go_gilded_brazier (Paladin First Trail quest (9678))
 ######*/
 
-enum eGildedBrazier
+enum GildedBrazier
 {
     NPC_STILLBLADE  = 17716,
 };
@@ -284,7 +286,7 @@ public:
 ## go_ethereum_prison
 ######*/
 
-enum eEthereumPrison
+enum EthereumPrison
 {
     SPELL_REP_LC        = 39456,
     SPELL_REP_SHAT      = 39457,
@@ -369,7 +371,7 @@ public:
 ## go_resonite_cask
 ######*/
 
-enum eResoniteCask
+enum ResoniteCask
 {
     NPC_GOGGEROC    = 11920
 };
@@ -412,7 +414,7 @@ public:
 ## go_shrine_of_the_birds
 ######*/
 
-enum eShrineOfTheBirds
+enum ShrineOfTheBirds
 {
     NPC_HAWK_GUARD      = 22992,
     NPC_EAGLE_GUARD     = 22993,
@@ -458,7 +460,7 @@ public:
 ## go_southfury_moonstone
 ######*/
 
-enum eSouthfury
+enum Southfury
 {
     NPC_RIZZLE                  = 23002,
     SPELL_BLACKJACK             = 39865, //stuns player
@@ -486,7 +488,7 @@ public:
 ## go_tele_to_dalaran_crystal
 ######*/
 
-enum eDalaranCrystal
+enum DalaranCrystal
 {
     QUEST_LEARN_LEAVE_RETURN    = 12790,
     QUEST_TELE_CRYSTAL_FLAG     = 12845
@@ -538,7 +540,7 @@ public:
 #define GOSSIP_FEL_CRYSTALFORGE_ITEM_5 "Purchase 5 Unstable Flask of the Beast for the cost of 50 Apexis Shards"
 #define GOSSIP_FEL_CRYSTALFORGE_ITEM_RETURN "Use the fel crystalforge to make another purchase."
 
-enum eFelCrystalforge
+enum FelCrystalforge
 {
     SPELL_CREATE_1_FLASK_OF_BEAST   = 40964,
     SPELL_CREATE_5_FLASK_OF_BEAST   = 40965,
@@ -597,7 +599,7 @@ public:
 #define GOSSIP_BASHIR_CRYSTALFORGE_ITEM_5 "Purchase 5 Unstable Flask of the Sorcerer for the cost of 50 Apexis Shards"
 #define GOSSIP_BASHIR_CRYSTALFORGE_ITEM_RETURN "Use the bashir crystalforge to make another purchase."
 
-enum eBashirCrystalforge
+enum BashirCrystalforge
 {
     SPELL_CREATE_1_FLASK_OF_SORCERER   = 40968,
     SPELL_CREATE_5_FLASK_OF_SORCERER   = 40970,
@@ -650,7 +652,7 @@ public:
 ## matrix_punchograph
 ######*/
 
-enum eMatrixPunchograph
+enum MatrixPunchograph
 {
     ITEM_WHITE_PUNCH_CARD = 9279,
     ITEM_YELLOW_PUNCH_CARD = 9280,
@@ -715,7 +717,7 @@ public:
 ## go_scourge_cage
 ######*/
 
-enum eScourgeCage
+enum ScourgeCage
 {
     NPC_SCOURGE_PRISONER = 25610
 };
@@ -742,7 +744,7 @@ public:
 ## go_arcane_prison
 ######*/
 
-enum eArcanePrison
+enum ArcanePrison
 {
     QUEST_PRISON_BREAK                  = 11587,
     SPELL_ARCANE_PRISONER_KILL_CREDIT   = 45456
@@ -789,7 +791,7 @@ public:
 ## go_jotunheim_cage
 ######*/
 
-enum eJotunheimCage
+enum JotunheimCage
 {
     NPC_EBON_BLADE_PRISONER_HUMAN   = 30186,
     NPC_EBON_BLADE_PRISONER_NE      = 30194,
@@ -844,7 +846,7 @@ public:
     }
 };
 
-enum eTableTheka
+enum TableTheka
 {
     GOSSIP_TABLE_THEKA = 1653,
 
@@ -871,7 +873,7 @@ public:
 ## go_inconspicuous_landmark
 ######*/
 
-enum eInconspicuousLandmark
+enum InconspicuousLandmark
 {
     SPELL_SUMMON_PIRATES_TREASURE_AND_TRIGGER_MOB    = 11462,
     ITEM_CUERGOS_KEY                                 = 9275,
@@ -897,7 +899,7 @@ public:
 ## go_ethereal_teleport_pad
 ######*/
 
-enum eEtherealTeleportPad
+enum EtherealTeleportPad
 {
     NPC_IMAGE_WIND_TRADER               = 20518,
     ITEM_TELEPORTER_POWER_PACK          = 28969,
@@ -923,24 +925,105 @@ public:
 ## go_soulwell
 ######*/
 
+enum SoulWellData
+{
+    GO_SOUL_WELL_R1                     = 181621,
+    GO_SOUL_WELL_R2                     = 193169,
+
+    SPELL_IMPROVED_HEALTH_STONE_R1      = 18692,
+    SPELL_IMPROVED_HEALTH_STONE_R2      = 18693,
+
+    SPELL_CREATE_MASTER_HEALTH_STONE_R0 = 34130,
+    SPELL_CREATE_MASTER_HEALTH_STONE_R1 = 34149,
+    SPELL_CREATE_MASTER_HEALTH_STONE_R2 = 34150,
+
+    SPELL_CREATE_FEL_HEALTH_STONE_R0    = 58890,
+    SPELL_CREATE_FEL_HEALTH_STONE_R1    = 58896,
+    SPELL_CREATE_FEL_HEALTH_STONE_R2    = 58898,
+};
+
 class go_soulwell : public GameObjectScript
 {
-public:
-    go_soulwell() : GameObjectScript("go_soulwell") { }
+    public:
+        go_soulwell() : GameObjectScript("go_soulwell") {}
 
-    bool OnGossipHello(Player* player, GameObject* go)
-    {
-        Unit* caster = go->GetOwner();
-        if (!caster || caster->GetTypeId() != TYPEID_PLAYER)
-            return true;
+        struct go_soulwellAI : public GameObjectAI
+        {
+            go_soulwellAI(GameObject* go) : GameObjectAI(go)
+            {
+                _stoneSpell = 0;
+                _stoneId = 0;
+                switch (go->GetEntry())
+                {
+                    case GO_SOUL_WELL_R1:
+                        _stoneSpell = SPELL_CREATE_MASTER_HEALTH_STONE_R0;
+                        if (Unit* owner = go->GetOwner())
+                        {
+                            if (owner->HasAura(SPELL_IMPROVED_HEALTH_STONE_R1))
+                                _stoneSpell = SPELL_CREATE_MASTER_HEALTH_STONE_R1;
+                            else if (owner->HasAura(SPELL_CREATE_MASTER_HEALTH_STONE_R2))
+                                _stoneSpell = SPELL_CREATE_MASTER_HEALTH_STONE_R2;
+                        }
+                        break;
+                    case GO_SOUL_WELL_R2:
+                        _stoneSpell = SPELL_CREATE_FEL_HEALTH_STONE_R0;
+                        if (Unit* owner = go->GetOwner())
+                        {
+                            if (owner->HasAura(SPELL_IMPROVED_HEALTH_STONE_R1))
+                                _stoneSpell = SPELL_CREATE_FEL_HEALTH_STONE_R1;
+                            else if (owner->HasAura(SPELL_CREATE_MASTER_HEALTH_STONE_R2))
+                                _stoneSpell = SPELL_CREATE_FEL_HEALTH_STONE_R2;
+                        }
+                        break;
+                }
+                if (_stoneSpell == 0) // Should never happen
+                    return;
 
-        if (!player->IsInSameRaidWith(static_cast<Player*>(caster)))
-            return true;
+                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(_stoneSpell);
+                if (!spellInfo)
+                    return;
 
-        go->AddUse();
-        player->CastSpell(player, 34130, true);
-        return true;
-    }
+                _stoneId = spellInfo->Effects[EFFECT_0].ItemType;
+            }
+
+            /// Due to the fact that this GameObject triggers CMSG_GAMEOBJECT_USE
+            /// _and_ CMSG_GAMEOBJECT_REPORT_USE, this GossipHello hook is called
+            /// twice. The script's handling is fine as it won't remove two charges
+            /// on the well. We have to find how to segregate REPORT_USE and USE.
+            bool GossipHello(Player* player)
+            {
+                Unit* owner = go->GetOwner();
+                if (_stoneSpell == 0 || _stoneId == 0)
+                    return true;
+
+                if (!owner || owner->GetTypeId() != TYPEID_PLAYER || !player->IsInSameRaidWith(owner->ToPlayer()))
+                    return true;
+
+                // Don't try to add a stone if we already have one.
+                if (player->HasItemCount(_stoneId, 1))
+                {
+                    if (SpellInfo const* spell = sSpellMgr->GetSpellInfo(_stoneSpell))
+                        Spell::SendCastResult(player, spell, 0, SPELL_FAILED_TOO_MANY_OF_ITEM);
+                    return true;
+                }
+
+                owner->CastSpell(player, _stoneSpell, true);
+                // Item has to actually be created to remove a charge on the well.
+                if (player->HasItemCount(_stoneId, 1))
+                    go->AddUse();
+
+                return false;
+            }
+
+        private:
+            uint32 _stoneSpell;
+            uint32 _stoneId;
+        };
+
+        GameObjectAI* GetAI(GameObject* go) const
+        {
+            return new go_soulwellAI(go);
+        }
 };
 
 /*######
@@ -948,7 +1031,7 @@ public:
 ## go_dragonflayer_cage
 ######*/
 
-enum ePrisonersOfWyrmskull
+enum PrisonersOfWyrmskull
 {
     QUEST_PRISONERS_OF_WYRMSKULL                  = 11255,
     NPC_PRISONER_PRIEST                           = 24086,
@@ -998,7 +1081,7 @@ public:
 ## go_tadpole_cage
 ######*/
 
-enum eTadpoles
+enum Tadpoles
 {
     QUEST_OH_NOES_THE_TADPOLES                    = 11560,
     NPC_WINTERFIN_TADPOLE                         = 25201
@@ -1033,7 +1116,7 @@ public:
 #define GOSSIP_USE_OUTHOUSE "Use the outhouse."
 #define GO_ANDERHOLS_SLIDER_CIDER_NOT_FOUND "Quest item Anderhol's Slider Cider not found."
 
-enum eAmberpineOuthouse
+enum AmberpineOuthouse
 {
     ITEM_ANDERHOLS_SLIDER_CIDER     = 37247,
     NPC_OUTHOUSE_BUNNY              = 27326,
@@ -1095,7 +1178,7 @@ public:
 ## go_hive_pod
 ######*/
 
-enum eHives
+enum Hives
 {
     QUEST_HIVE_IN_THE_TOWER                       = 9544,
     NPC_HIVE_AMBUSHER                             = 13301
@@ -1262,7 +1345,7 @@ public:
 ## go_midsummer_bonfire
 ######*/
 
-enum eMidsummerBonfire
+enum MidsummerBonfire
 {
     STAMP_OUT_BONFIRE_QUEST_COMPLETE    = 45458,
 };
