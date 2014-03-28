@@ -397,13 +397,13 @@ pAuraEffectHandler AuraEffectHandler[TOTAL_AURAS]=
     &AuraEffect::HandleNoImmediateEffect,                         //337 SPELL_AURA_MOD_VENDOR_ITEMS_PRICES
     &AuraEffect::HandleNoImmediateEffect,                         //338 SPELL_AURA_MOD_DURABILITY_LOSS
     &AuraEffect::HandleNULL,                                      //339 SPELL_AURA_INCREASE_SKILL_GAIN_CHANCE
-    &AuraEffect::HandleNULL,                                      //340 SPELL_AURA_340 // Increase Ressurection Health (83950 just).
+    &AuraEffect::HandleNULL,                                      //340 SPELL_AURA_MOD_RESURRECTED_HEALTH_BY_GUILD_MEMBER // Increase Ressurection Health (83950 just).
     &AuraEffect::HandleNULL,                                      //341 SPELL_AURA_MOD_SPELL_CATEGORY_COOLDOWN // Modifies cooldown of all spells using affected category. - ex.: Archaeology (92682).
     &AuraEffect::HandleModMeleeRangedSpeedPct,                    //342 SPELL_AURA_MOD_MELEE_RANGED_HASTE_2
     &AuraEffect::HandleNULL,                                      //343 SPELL_AURA_343 // Increase damage dealt to target by % (79140).
     &AuraEffect::HandleNoImmediateEffect,                         //344 SPELL_AURA_MOD_AUTOATTACK_DAMAGE
     &AuraEffect::HandleNoImmediateEffect,                         //345 SPELL_AURA_BYPASS_ARMOR_FOR_CASTER
-    &AuraEffect::HandleAuraProgressBar,                           //346 SPELL_AURA_PROGRESS_BAR
+    &AuraEffect::HandleAuraProgressBar,                           //346 SPELL_AURA_ENABLE_ALT_POWER
     &AuraEffect::HandleNULL,                                      //347 SPELL_AURA_MOD_SPELL_COOLDOWN_BY_HASTE
     &AuraEffect::HandleNoImmediateEffect,                         //348 SPELL_AURA_DEPOSIT_BONUS_MONEY_IN_GUILD_BANK_ON_LOOT
     &AuraEffect::HandleNoImmediateEffect,                         //349 SPELL_AURA_MOD_CURRENCY_GAIN
@@ -414,20 +414,20 @@ pAuraEffectHandler AuraEffectHandler[TOTAL_AURAS]=
     &AuraEffect::HandleNULL,                                      //353 SPELL_AURA_354 // Increase healing based on power amount (77226 just).
     &AuraEffect::HandleNULL,                                      //354 SPELL_AURA_355 No spells 4.3.4
     &AuraEffect::HandleNULL,                                      //356 SPELL_AURA_356 // Increase damage based on power amount (76547 just).
-    &AuraEffect::HandleNULL,                                      //357 SPELL_AURA_357 // Related to Unit Frames (97982 just).
+    &AuraEffect::HandleNULL,                                      //357 SPELL_AURA_ENABLE_BOSS1_UNIT_FRAME // Related to Unit Frames (97982 just).
     &AuraEffect::HandleNULL,                                      //358 SPELL_AURA_358 // Worgen transformation activation (68992,87840).
     &AuraEffect::HandleNULL,                                      //359 SPELL_AURA_359 // Just 99263 - Healing done to targets affected by certain spell increased by %.
-    &AuraEffect::HandleNULL,                                      //360 SPELL_AURA_360 // Just 99107 - it duplicates the harmful spell (% chance) on dealing damage.
-    &AuraEffect::HandleNULL,                                      //361 SPELL_AURA_361 // Deal damage based on target health? (Decimation/Inferno blade Baleroc (99405) + 106728.
+    &AuraEffect::HandleNULL,                                      //360 SPELL_AURA_PROC_TRIGGER_SPELL_COPY // Just 99107 - it duplicates the harmful spell (% chance) on dealing damage.
+    &AuraEffect::HandleNULL,                                      //361 SPELL_AURA_PROC_TRIGGER_SPELL_2 // Deal damage based on target health? (Decimation/Inferno blade Baleroc (99405) + 106728.
     &AuraEffect::HandleNULL,                                      //362 SPELL_AURA_362 No spells 4.3.4
-    &AuraEffect::HandleNULL,                                      //363 SPELL_AURA_363 // Throw stuff back (101601 just).
+    &AuraEffect::HandleNULL,                                      //363 SPELL_AURA_MOD_NEXT_SPELL // Throw stuff back (101601 just).
     &AuraEffect::HandleNULL,                                      //364 SPELL_AURA_364 No spells 4.3.4
-    &AuraEffect::HandleNULL,                                      //365 SPELL_AURA_365 No spells 4.3.4
-    &AuraEffect::HandleModSpellDamagePercentFromAttackPower,      //366 SPELL_AURA_366 // Power ratio connected (30814 - Your spell power is now equal to 55% of your attack power).
+    &AuraEffect::HandleNULL,                                      //365 SPELL_AURA_MAX_FAR_CLIP_PLANE No spells 4.3.4
+    &AuraEffect::HandleModSpellDamagePercentFromAttackPower,      //366 SPELL_AURA_OVERRIDE_SPELL_POWER_BY_AP_PCT // Power ratio connected (30814 - Your spell power is now equal to 55% of your attack power).
     &AuraEffect::HandleNULL,                                      //367 SPELL_AURA_367 No spells 4.3.4
     &AuraEffect::HandleNULL,                                      //368 SPELL_AURA_368 No spells 4.3.4
-    &AuraEffect::HandleNULL,                                      //369 SPELL_AURA_369 Just 101871, not important.
-    &AuraEffect::HandleNULL,                                      //370 SPELL_AURA_370 Only 106786.
+    &AuraEffect::HandleNULL,                                      //369 SPELL_AURA_ENABLE_POWER_BAR_TIMER Just 101871, not important.
+    &AuraEffect::HandleNULL,                                      //370 SPELL_AURA_SET_FAIR_FAR_CLIP Only 106786.
 };
 
 AuraEffect::AuraEffect(Aura* base, uint8 effIndex, int32 *baseAmount, Unit* caster):

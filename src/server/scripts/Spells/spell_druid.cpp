@@ -938,7 +938,6 @@ enum EclipseSpells
     SPELL_DRUID_SOLAR_ECLIPSE_MARKER        = 67483, // Will make the yellow arrow on eclipse bar point to the yellow side (solar)
     SPELL_DRUID_SOLAR_ECLIPSE               = 48517,
     SPELL_DRUID_LUNAR_ECLIPSE               = 48518,
-    TALENT_TREE_BALANCE                     = 752,
     SPELL_DRUID_EUPHORIA_ENERGIZE            = 81069
 };
 

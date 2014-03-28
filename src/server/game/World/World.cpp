@@ -1501,15 +1501,6 @@ void World::SetInitialWorldSettings()
     sLog->outString("Loading Vehicle Accessories...");
     sObjectMgr->LoadVehicleAccessories();                       // must be after LoadCreatureTemplates() and LoadNPCSpellClickSpells()
 
-    sLog->outString("Loading Dungeon boss data...");
-    sObjectMgr->LoadInstanceEncounters();
-
-    sLog->outString("Loading LFG rewards...");
-    sLFGMgr->LoadRewards();
-
-    sLog->outString("Loading LFG entrance positions...");
-    sLFGMgr->LoadEntrancePositions();
-
     sLog->outString("Loading SpellArea Data...");                // must be after quest load
     sSpellMgr->LoadSpellAreas();
 
@@ -1527,6 +1518,15 @@ void World::SetInitialWorldSettings()
 
     sLog->outString("Loading AreaTrigger script names...");
     sObjectMgr->LoadAreaTriggerScripts();
+
+    sLog->outString("Loading LFG entrance positions...");
+    sLFGMgr->LoadLFGDungeons();
+
+    sLog->outString("Loading Dungeon boss data...");
+    sObjectMgr->LoadInstanceEncounters();
+
+    sLog->outString("Loading LFG rewards...");
+    sLFGMgr->LoadRewards();
 
     sLog->outString("Loading Graveyard-zone links...");
     sObjectMgr->LoadGraveyardZones();

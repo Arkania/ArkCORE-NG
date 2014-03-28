@@ -1029,14 +1029,29 @@ enum TrinityStrings
     LANG_MAIL_RECEIVER_REQ              = 6612,
 
     // Used for GM Announcements
-    LANG_GM_BROADCAST                    = 6613,
-    LANG_GM_NOTIFY                       = 6614,
-    LANG_GM_ANNOUNCE_COLOR               = 6615,
+    LANG_GM_BROADCAST                   = 6613,
+    LANG_GM_NOTIFY                      = 6614,
+    LANG_GM_ANNOUNCE_COLOR              = 6615,
 
-    LANG_GM_SILENCE                      = 6616,              // "Silence is ON for %s" - Spell 1852
+    LANG_GM_SILENCE                     = 6616,              // "Silence is ON for %s" - Spell 1852
 
-    LANG_WORLD_CLOSED                    = 7523,
-    LANG_WORLD_OPENED                    = 7524,
+    LANG_WORLD_CLOSED                   = 7523,
+    LANG_WORLD_OPENED                   = 7524,
+
+    LANG_LFG_STATE_NONE                 = 9986,
+    LANG_LFG_STATE_ROLECHECK            = 9987,
+    LANG_LFG_STATE_QUEUED               = 9988,
+    LANG_LFG_STATE_PROPOSAL             = 9989,
+    LANG_LFG_STATE_BOOT                 = 9990,
+    LANG_LFG_STATE_DUNGEON              = 9991,
+    LANG_LFG_STATE_FINISHED_DUNGEON     = 9992,
+    LANG_LFG_STATE_RAIDBROWSER          = 9993,
+    LANG_LFG_ROLE_TANK                  = 9994,
+    LANG_LFG_ROLE_HEALER                = 9995,
+    LANG_LFG_ROLE_DAMAGE                = 9996,
+    LANG_LFG_ROLE_LEADER                = 9997,
+    LANG_LFG_ROLE_NONE                  = 9998,
+    LANG_LFG_ERROR                      = 9999,
 
     // Use for not-in-offcial-sources patches
     //                                    10000-10999

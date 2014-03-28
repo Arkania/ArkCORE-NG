@@ -187,7 +187,7 @@ enum Opcodes
     CMSG_DISMISS_CRITTER                              = 0x4227,
     CMSG_DUEL_ACCEPTED                                = 0x2136,
     CMSG_DUEL_CANCELLED                               = 0x6624,
-    CMSG_DUNGEON_FINDER_GET_SYSTEM_INFO               = 0x0412,
+   // CMSG_LFG_LOCK_INFO_REQUEST                        = 0x0412,
     CMSG_EJECT_PASSENGER                              = 0x6927,
     CMSG_EMOTE                                        = 0x4C26,
     CMSG_ENABLETAXI                                   = 0x0C16,
