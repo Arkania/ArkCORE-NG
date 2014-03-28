@@ -1,4 +1,4 @@
-/*Copyright (C) 2014 Arkania Project.
+/*Copyright (C) 2008-2014 Arkania Project.
 *
 * Script 99% done. 1% = Testing live.
 *
@@ -113,7 +113,7 @@ class boss_ozruk : public CreatureScript
                 }
             }
 
-            void JustDied(Unit* killer)
+            void JustDied(Unit* /*killer*/)
             {
                 if (instance)
                 {
@@ -184,7 +184,7 @@ class boss_ozruk : public CreatureScript
                                 break;
                                 
                             case EVENT_PARALYZE_DAMAGE:
-                                if (Unit* target = me->GetVictim())
+                                if (me->GetVictim())
                                 {
                                     std::list<HostileReference*> t_list = me->getThreatManager().getThreatList();
                                     for (std::list<HostileReference*>::const_iterator itr = t_list.begin(); itr!= t_list.end(); ++itr)

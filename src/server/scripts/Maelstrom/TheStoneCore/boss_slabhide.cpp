@@ -183,7 +183,7 @@ class boss_slabhide : public CreatureScript
 
             void UpdateAI(const uint32 diff)
             {
-                if (!UpdateVictim() && inCombat || me->HasUnitState(UNIT_STATE_CASTING))
+                if ((!UpdateVictim() && inCombat) || me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
                 if (m_introTimer <= diff && !introFinished)

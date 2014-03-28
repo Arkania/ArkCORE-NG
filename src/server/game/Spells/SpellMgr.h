@@ -112,7 +112,7 @@ inline float GetSpellMinRangeForFriend(SpellRangeEntry const *range) { return (r
 inline float GetSpellMaxRangeForFriend(SpellRangeEntry const *range) { return (range ? range->maxRangeFriend : 0); }
 inline uint32 GetSpellRangeType(SpellRangeEntry const *range) { return (range ? range->type : 0); }
 
-inline float GetSpellRadius(SpellEffectEntry const *_effect, uint32 effectIdx, bool positive)
+inline float GetSpellRadius(SpellEffectEntry const *_effect, bool positive)
 {
     return positive
         ? GetSpellRadiusForFriend(sSpellRadiusStore.LookupEntry(_effect->EffectRadiusIndex))

@@ -7630,7 +7630,7 @@ void Spell::EffectRemoveAura(SpellEffIndex effIndex)
     unitTarget->RemoveAurasDueToSpell(m_spellInfo->Effects[effIndex].TriggerSpell);
 }
 
-void Spell::EffectDamageFromMaxHealthPCT(SpellEffIndex effIndex)
+void Spell::EffectDamageFromMaxHealthPCT(SpellEffIndex /*effIndex*/)
 {
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
         return;
