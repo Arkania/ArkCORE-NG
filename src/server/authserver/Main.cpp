@@ -90,7 +90,7 @@ extern int main(int argc, char **argv)
         {
             if (++c >= argc)
             {
-                sLog->outError("Runtime-Error: -c option requires an input argument");
+                sLog->outError("Runtime-Error: -c option requires an input argument\n");
                 usage(argv[0]);
                 return 1;
             }
@@ -102,8 +102,8 @@ extern int main(int argc, char **argv)
 
     if (!ConfigMgr::Load(cfg_file))
     {
-        sLog->outError("Invalid or missing configuration file : %s", cfg_file);
-        sLog->outError("Verify that the file exists and has \'[authserver]\' written in the top of the file!");
+        sLog->outError("Invalid or missing configuration file : %s\n", cfg_file);
+        sLog->outError("Verify that the file exists and has \'[authserver]\' written in the top of the file!\n");
         return 1;
     }
     sLog->Initialize();

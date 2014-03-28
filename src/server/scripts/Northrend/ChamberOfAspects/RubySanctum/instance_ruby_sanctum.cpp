@@ -40,19 +40,19 @@ class instance_ruby_sanctum : public InstanceMapScript
             {
                 SetBossNumber(EncounterCount);
                 LoadDoorData(doorData);
-                BaltharusTheWarbornGUID = 0;
-                GeneralZarithrianGUID   = 0;
-                SavianaRagefireGUID     = 0;
-                HalionGUID              = 0;
+                BaltharusTheWarbornGUID  = 0;
+                GeneralZarithrianGUID    = 0;
+                SavianaRagefireGUID      = 0;
+                HalionGUID               = 0;
                 TwilightHalionGUID       = 0;
                 OrbCarrierGUID           = 0;
                 OrbRotationFocusGUID     = 0;
-                HalionControllerGUID    = 0;
+                HalionControllerGUID     = 0;
                 CrystalChannelTargetGUID = 0;
-                XerestraszaGUID         = 0;
-                BaltharusSharedHealth   = 0;
-                FlameWallsGUID          = 0;
-                FlameRingGUID           = 0;
+                XerestraszaGUID          = 0;
+                BaltharusSharedHealth    = 0;
+                FlameWallsGUID           = 0;
+                FlameRingGUID            = 0;
 
                 memset(ZarithrianSpawnStalkerGUID, 0, 2 * sizeof(uint64));
                 memset(BurningTreeGUID, 0, 4*sizeof(uint64));

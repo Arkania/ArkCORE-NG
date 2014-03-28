@@ -1038,6 +1038,12 @@ enum TrinityStrings
     LANG_WORLD_CLOSED                   = 7523,
     LANG_WORLD_OPENED                   = 7524,
 
+    LANG_LFG_PLAYER_INFO                = 9980,
+    LANG_LFG_GROUP_INFO                 = 9981,
+    LANG_LFG_NOT_IN_GROUP               = 9982,
+    LANG_LFG_CLEAN                      = 9983,
+    LANG_LFG_OPTIONS                    = 9984,
+    LANG_LFG_OPTIONS_CHANGED            = 9985,
     LANG_LFG_STATE_NONE                 = 9986,
     LANG_LFG_STATE_ROLECHECK            = 9987,
     LANG_LFG_STATE_QUEUED               = 9988,
