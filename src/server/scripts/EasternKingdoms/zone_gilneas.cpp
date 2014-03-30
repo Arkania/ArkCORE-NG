@@ -37,7 +37,7 @@ EndScriptData */
 
 enum eGilneas
 {
-    NPC_PANICKED_CITIZEN_PHASE1						= 34851,
+	NPC_PANICKED_CITIZEN_PHASE1						= 34851,
 	NPC_GILNEAS_CITY_GUARD_PHASE1					= 34864,
 	NPC_PANICKED_CITIZEN_GATE_PHASE1				= 44086,
 
@@ -239,7 +239,7 @@ public:
 
     struct npc_prince_liam_greymane_phase1AI : public ScriptedAI
     {
-        npc_prince_liam_greymane_phase1AI(Creature creature) : ScriptedAI(creature) {}
+        npc_prince_liam_greymane_phase1AI(Creature* creature) : ScriptedAI(creature) {}
 
         uint32 uiSayTimer;
         uint8 uiSayCount;
@@ -318,7 +318,7 @@ public:
 
     struct npc_rampaging_worgen_phase2AI : public ScriptedAI
     {
-        npc_rampaging_worgen_phase2AI(Creature creature) : ScriptedAI(creature) {_fightWithPrinceLiam=false; _prince_liam=NULL;}
+        npc_rampaging_worgen_phase2AI(Creature* creature) : ScriptedAI(creature) {_fightWithPrinceLiam=false; _prince_liam=NULL;}
 
 	public:
 		bool		_fightWithPrinceLiam;
@@ -405,7 +405,7 @@ public:
 
     struct npc_gilneas_city_guard_phase2AI : public Scripted_NoMovementAI
     {
-        npc_gilneas_city_guard_phase2AI(Creature creature) : Scripted_NoMovementAI(creature) { }
+        npc_gilneas_city_guard_phase2AI(Creature* creature) : Scripted_NoMovementAI(creature) { }
 
 		uint32 _timer;   
 
@@ -487,7 +487,7 @@ public:
  
     struct npc_prince_liam_greymane_phase2AI : public ScriptedAI // Scripted_NoMovementAI
     {
-        npc_prince_liam_greymane_phase2AI(Creature creature) : ScriptedAI(creature) { }
+        npc_prince_liam_greymane_phase2AI(Creature* creature) : ScriptedAI(creature) { }
 
 		uint32	_timer;
 		uint32	_phase;
@@ -569,7 +569,7 @@ public:
 
     struct npc_frightened_citizen_j_phase2AI : public npc_escortAI
     {
-        npc_frightened_citizen_j_phase2AI(Creature creature) : npc_escortAI(creature) { }
+        npc_frightened_citizen_j_phase2AI(Creature *c) : npc_escortAI(c) { }
 
         uint32  _timer;
         bool	_pause;
@@ -624,7 +624,7 @@ public:
 
     struct npc_frightened_citizen_cw_phase2AI : public npc_escortAI
     {
-        npc_frightened_citizen_cw_phase2AI(Creature creature) : npc_escortAI(creature) { }
+        npc_frightened_citizen_cw_phase2AI(Creature *c) : npc_escortAI(c) { }
 
         uint32  _timer;
         bool	_pause;	
@@ -831,7 +831,7 @@ public:
 
     struct npc_bloodfang_worgen_phase4AI : public ScriptedAI
     {
-        npc_bloodfang_worgen_phase4AI(Creature creature) : ScriptedAI(creature) {}
+        npc_bloodfang_worgen_phase4AI(Creature *c) : ScriptedAI(c) {}
 	
 		uint32		_timer;		
 		
