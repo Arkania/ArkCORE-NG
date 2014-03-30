@@ -97,9 +97,9 @@ public:
         }
     };
 
-       CreatureAI* GetAI(Creature* pCreature) const  
+       CreatureAI* GetAI(Creature* creature) const  
     {
-        return new npc_rockjaw_invaderAI (pCreature);
+        return new npc_rockjaw_invaderAI (creature);
     }
 };
 
@@ -143,9 +143,9 @@ public:
         }
     };
 
-       CreatureAI* GetAI(Creature* pCreature) const  
+       CreatureAI* GetAI(Creature* creature) const  
     {
-        return new npc_coldridge_defenderAI (pCreature);
+        return new npc_coldridge_defenderAI (creature);
     }
 };
 
@@ -324,9 +324,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* pCreature) const  
+    CreatureAI* GetAI(Creature* creature) const  
     {
-        return new npc_soothsayer_shikalaAI (pCreature);
+        return new npc_soothsayer_shikalaAI (creature);
     }
 };
 
@@ -430,9 +430,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* pCreature) const  
+    CreatureAI* GetAI(Creature* creature) const  
     {
-        return new npc_soothsayer_rikkariAI (pCreature);
+        return new npc_soothsayer_rikkariAI (creature);
     }
 };
 
@@ -536,9 +536,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* pCreature) const  
+    CreatureAI* GetAI(Creature* creature) const  
     {
-        return new npc_soothsayer_mirimkoaAI (pCreature);
+        return new npc_soothsayer_mirimkoaAI (creature);
     }
 };
 

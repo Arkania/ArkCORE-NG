@@ -381,7 +381,7 @@ public:
 
     struct npc_prince_liam_greymane_introAI : public ScriptedAI
     {
-        npc_prince_liam_greymane_introAI(Creature *c) : ScriptedAI(c) {}
+        npc_prince_liam_greymane_introAI(Creature* creature) : ScriptedAI(creature) {}
 
         uint32 uiSayTimer;
         uint8 uiSayCount;
@@ -479,9 +479,9 @@ public:
         return new npc_prince_liam_greymane_phase_1AI (creature);
     }
 
-    struct npc_prince_liam_greymane_phase_1AI : public Scripted_NoMovementAI
+    struct npc_prince_liam_greymane_phase_1AI : public ScriptedAI
     {
-        npc_prince_liam_greymane_phase_1AI(Creature *c) : Scripted_NoMovementAI(c)
+        npc_prince_liam_greymane_phase_1AI(Creature* creature) : ScriptedAI(creature)
         {
             SetCombatMovement(false);
             me->_ReactDistance = 10.0f;
@@ -563,7 +563,7 @@ public:
 
     struct npc_rampaging_worgenAI : public ScriptedAI
     {
-        npc_rampaging_worgenAI(Creature *c) : ScriptedAI(c) {}
+        npc_rampaging_worgenAI(Creature* creature) : ScriptedAI(creature) {}
 
         uint32 uiEnemyEntry;
         bool enrage;
@@ -650,9 +650,9 @@ public:
         return new npc_gilneas_city_guardAI (creature);
     }
 
-    struct npc_gilneas_city_guardAI : public Scripted_NoMovementAI
+    struct npc_gilneas_city_guardAI : public ScriptedAI
     {
-        npc_gilneas_city_guardAI(Creature *c) : Scripted_NoMovementAI(c)
+        npc_gilneas_city_guardAI(Creature* creature) : ScriptedAI(creature)
         {
             uiEmoteState = me->GetUInt32Value(UNIT_NPC_EMOTESTATE);
         }
@@ -802,7 +802,7 @@ public:
 
     struct npc_qems_citizenAI : public npc_escortAI
     {
-        npc_qems_citizenAI(Creature *c) : npc_escortAI(c)
+        npc_qems_citizenAI(Creature* creature) : npc_escortAI(creature)
         {
             me->SetReactState(REACT_PASSIVE);
             uiEventTimer = 1000;
@@ -1198,9 +1198,9 @@ public:
         return new npc_lord_darius_crowleyAI (creature);
     }
 
-    struct npc_lord_darius_crowleyAI : public Scripted_NoMovementAI
+    struct npc_lord_darius_crowleyAI : public ScriptedAI
     {
-        npc_lord_darius_crowleyAI(Creature* c) : Scripted_NoMovementAI(c)
+        npc_lord_darius_crowleyAI(Creature* creature) : ScriptedAI(creature)
         {
             Event = false;
             uiEventTimer = 120000;
@@ -3841,9 +3841,9 @@ public:
         return new npc_lucius_the_cruelAI (creature);
     }
 
-    struct npc_lucius_the_cruelAI : public Scripted_NoMovementAI
+    struct npc_lucius_the_cruelAI : public ScriptedAI
     {
-        npc_lucius_the_cruelAI(Creature* creature) : Scripted_NoMovementAI(creature)
+        npc_lucius_the_cruelAI(Creature* creature) : ScriptedAI(creature)
         {
             SetCombatMovement(false);
             Catch = false;
@@ -10107,9 +10107,9 @@ public:
         return new npc_prince_liam_greymane_dhAI (creature);
     }
 
-    struct npc_prince_liam_greymane_dhAI : public Scripted_NoMovementAI
+    struct npc_prince_liam_greymane_dhAI : public ScriptedAI
     {
-        npc_prince_liam_greymane_dhAI(Creature *c) : Scripted_NoMovementAI(c)
+        npc_prince_liam_greymane_dhAI(Creature* creature) : ScriptedAI(creature)
         {
             SetCombatMovement(false);
         }
@@ -10187,9 +10187,9 @@ public:
         return new npc_duskhaven_watchmanAI (creature);
     }
 
-    struct npc_duskhaven_watchmanAI : public Scripted_NoMovementAI
+    struct npc_duskhaven_watchmanAI : public ScriptedAI
     {
-        npc_duskhaven_watchmanAI(Creature* creature) : Scripted_NoMovementAI(creature)
+        npc_duskhaven_watchmanAI(Creature* creature) : ScriptedAI(creature)
         {
             SetCombatMovement(false);
         }
@@ -10436,9 +10436,9 @@ public:
         return new npc_dark_ranger_thyalaAI (creature);
     }
 
-    struct npc_dark_ranger_thyalaAI : public Scripted_NoMovementAI
+    struct npc_dark_ranger_thyalaAI : public ScriptedAI
     {
-        npc_dark_ranger_thyalaAI(Creature* creature) : Scripted_NoMovementAI(creature)
+        npc_dark_ranger_thyalaAI(Creature* creature) : ScriptedAI(creature)
         {
             SetCombatMovement(false);
         }
@@ -10648,9 +10648,9 @@ public:
         return new npc_hayward_brotherAI (creature);
     }
 
-    struct npc_hayward_brotherAI : public Scripted_NoMovementAI
+    struct npc_hayward_brotherAI : public ScriptedAI
     {
-        npc_hayward_brotherAI(Creature* creature) : Scripted_NoMovementAI(creature)
+        npc_hayward_brotherAI(Creature* creature) : ScriptedAI(creature)
         {
             SetCombatMovement(false);
         }
@@ -11201,9 +11201,9 @@ public:
         return new npc_myriam_spellwakerAI (creature);
     }
 
-    struct npc_myriam_spellwakerAI : public Scripted_NoMovementAI
+    struct npc_myriam_spellwakerAI : public ScriptedAI
     {
-        npc_myriam_spellwakerAI(Creature* creature) : Scripted_NoMovementAI(creature)
+        npc_myriam_spellwakerAI(Creature* creature) : ScriptedAI(creature)
         {
             uiBoltTimer = 2000;
             SetCombatMovement(false);

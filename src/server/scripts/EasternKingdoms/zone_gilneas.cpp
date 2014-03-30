@@ -239,7 +239,7 @@ public:
 
     struct npc_prince_liam_greymane_phase1AI : public ScriptedAI
     {
-        npc_prince_liam_greymane_phase1AI(Creature *c) : ScriptedAI(c) {}
+        npc_prince_liam_greymane_phase1AI(Creature* creature) : ScriptedAI(creature) {}
 
         uint32 uiSayTimer;
         uint8 uiSayCount;
@@ -318,7 +318,7 @@ public:
 
     struct npc_rampaging_worgen_phase2AI : public ScriptedAI
     {
-        npc_rampaging_worgen_phase2AI(Creature *c) : ScriptedAI(c) {_fightWithPrinceLiam=false; _prince_liam=NULL;}
+        npc_rampaging_worgen_phase2AI(Creature* creature) : ScriptedAI(creature) {_fightWithPrinceLiam=false; _prince_liam=NULL;}
 
 	public:
 		bool		_fightWithPrinceLiam;
@@ -403,9 +403,9 @@ class npc_gilneas_city_guard_phase2 : public CreatureScript
 public:
     npc_gilneas_city_guard_phase2() : CreatureScript("npc_gilneas_city_guard_phase2") { }
 
-    struct npc_gilneas_city_guard_phase2AI : public Scripted_NoMovementAI
+    struct npc_gilneas_city_guard_phase2AI : public ScriptedAI
     {
-        npc_gilneas_city_guard_phase2AI(Creature *c) : Scripted_NoMovementAI(c) { }
+        npc_gilneas_city_guard_phase2AI(Creature* creature) : ScriptedAI(creature) { }
 
 		uint32 _timer;   
 
@@ -485,9 +485,9 @@ public:
         return true;
     }
  
-    struct npc_prince_liam_greymane_phase2AI : public ScriptedAI // Scripted_NoMovementAI
+    struct npc_prince_liam_greymane_phase2AI : public ScriptedAI // ScriptedAI
     {
-        npc_prince_liam_greymane_phase2AI(Creature *c) : ScriptedAI(c) { }
+        npc_prince_liam_greymane_phase2AI(Creature* creature) : ScriptedAI(creature) { }
 
 		uint32	_timer;
 		uint32	_phase;
@@ -969,9 +969,9 @@ public:
         return true;
     }
  
-    struct npc_lord_darius_crowley_phase4AI : public Scripted_NoMovementAI
+    struct npc_lord_darius_crowley_phase4AI : public ScriptedAI
     {
-        npc_lord_darius_crowley_phase4AI(Creature* creature) : Scripted_NoMovementAI(creature)  
+        npc_lord_darius_crowley_phase4AI(Creature* creature) : ScriptedAI(creature)  
 		{ 
 			_eventTimer=0; _phase=0; _timer=0; _count=0; _wave=0;
 		}     

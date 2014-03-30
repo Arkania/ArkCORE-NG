@@ -121,9 +121,9 @@ public:
         }
     };
 
-       CreatureAI* GetAI(Creature* pCreature) const
+       CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_blackrock_battle_worgAI (pCreature);
+        return new npc_blackrock_battle_worgAI (creature);
     }
 };
 
@@ -190,9 +190,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_stormwind_infantryAI (pCreature);
+        return new npc_stormwind_infantryAI (creature);
     }
 };
 
@@ -272,9 +272,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_blackrock_spyAI (pCreature);
+        return new npc_blackrock_spyAI (creature);
     }
 };
 
@@ -309,9 +309,9 @@ public:
         }
     };
 
-     CreatureAI* GetAI(Creature* pCreature) const
+     CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_goblin_assassinAI (pCreature);
+        return new npc_goblin_assassinAI (creature);
     }
 };
 
@@ -431,7 +431,7 @@ public:
     
     struct npc_injured_soldier_dummyAI : public ScriptedAI
     {
-        npc_injured_soldier_dummyAI(Creature *pCreature) : ScriptedAI(pCreature) { }
+        npc_injured_soldier_dummyAI(Creature *creature) : ScriptedAI(creature) { }
 
         uint32 phase;
         uint32 timer;
@@ -480,9 +480,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_injured_soldier_dummyAI (pCreature);
+        return new npc_injured_soldier_dummyAI (creature);
     }
 };
 
@@ -537,9 +537,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_brother_paxtonAI (pCreature);
+        return new npc_brother_paxtonAI (creature);
     }
 };
 
@@ -553,9 +553,9 @@ class npc_henze_faulk : public CreatureScript
 public:
     npc_henze_faulk() : CreatureScript("npc_henze_faulk") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_henze_faulkAI (pCreature);
+        return new npc_henze_faulkAI (creature);
     }
 
     struct npc_henze_faulkAI : public ScriptedAI
