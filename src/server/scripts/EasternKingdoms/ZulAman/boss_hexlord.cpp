@@ -963,19 +963,19 @@ class boss_koragg : public CreatureScript
 };
 
 // Bloodworms DK
-class mob_hexlord_bloodworm : public CreatureScript
+class npc_hexlord_bloodworm : public CreatureScript
 {
 public:
-    mob_hexlord_bloodworm() : CreatureScript("mob_hexlord_bloodworm") { }
+    npc_hexlord_bloodworm() : CreatureScript("npc_hexlord_bloodworm") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_hexlord_bloodwormAI(creature);
+        return new npc_hexlord_bloodwormAI(creature);
     }
 
-    struct mob_hexlord_bloodwormAI : public ScriptedAI
+    struct npc_hexlord_bloodwormAI : public ScriptedAI
     {
-        mob_hexlord_bloodwormAI(Creature* creature) : ScriptedAI(creature)
+        npc_hexlord_bloodwormAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = creature->GetInstanceScript();
             if (Creature* hexLord = creature->FindNearestCreature(24239, 100.0f, true))
@@ -1042,6 +1042,6 @@ void AddSC_boss_hex_lord_malacrass()
     new boss_fenstalker();
     new boss_koragg();
     new boss_alyson_antille();
-    new mob_hexlord_bloodworm();
+    new npc_hexlord_bloodworm();
     new spell_hexlord_unstable_affliction();
 }

@@ -148,19 +148,19 @@ public:
 
 };
 
-class mob_webwrap : public CreatureScript
+class npc_webwrap : public CreatureScript
 {
 public:
-    mob_webwrap() : CreatureScript("mob_webwrap") { }
+    npc_webwrap() : CreatureScript("npc_webwrap") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_webwrapAI (creature);
+        return new npc_webwrapAI (creature);
     }
 
-    struct mob_webwrapAI : public NullCreatureAI
+    struct npc_webwrapAI : public NullCreatureAI
     {
-        mob_webwrapAI(Creature* creature) : NullCreatureAI(creature), victimGUID(0) {}
+        npc_webwrapAI(Creature* creature) : NullCreatureAI(creature), victimGUID(0) {}
 
         uint64 victimGUID;
 
@@ -185,5 +185,5 @@ public:
 void AddSC_boss_maexxna()
 {
     new boss_maexxna();
-    new mob_webwrap();
+    new npc_webwrap();
 }

@@ -26,7 +26,7 @@ EndScriptData */
 
 /* ContentData
 boss_kelidan_the_breaker
-mob_shadowmoon_channeler
+npc_shadowmoon_channeler
 EndContentData */
 
 #include "ScriptPCH.h"
@@ -278,7 +278,7 @@ class boss_kelidan_the_breaker : public CreatureScript
 };
 
 /*######
-## mob_shadowmoon_channeler
+## npc_shadowmoon_channeler
 ######*/
 
 enum eShadowmoon
@@ -290,18 +290,18 @@ enum eShadowmoon
     SPELL_CHANNELING        = 39123
 };
 
-class mob_shadowmoon_channeler : public CreatureScript
+class npc_shadowmoon_channeler : public CreatureScript
 {
     public:
 
-        mob_shadowmoon_channeler()
+        npc_shadowmoon_channeler() : CreatureScript("npc_shadowmoon_channeler") { }
             : CreatureScript("mob_shadowmoon_channeler")
         {
         }
 
-        struct mob_shadowmoon_channelerAI : public ScriptedAI
+        struct npc_shadowmoon_channelerAI : public ScriptedAI
         {
-            mob_shadowmoon_channelerAI(Creature* creature) : ScriptedAI(creature)
+            npc_shadowmoon_channelerAI(Creature* creature) : ScriptedAI(creature){ }
             {
             }
 
@@ -376,13 +376,13 @@ class mob_shadowmoon_channeler : public CreatureScript
 
         CreatureAI* GetAI(Creature* creature) const
         {
-            return new mob_shadowmoon_channelerAI(creature);
+            return new npc_shadowmoon_channelerAI(creature);
         }
 };
 
 void AddSC_boss_kelidan_the_breaker()
 {
     new boss_kelidan_the_breaker();
-    new mob_shadowmoon_channeler();
+    new npc_shadowmoon_channeler();
 }
 

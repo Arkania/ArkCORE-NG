@@ -395,19 +395,19 @@ public:
 };
 
 //AI for Kil'jaeden Event Controller
-class mob_kiljaeden_controller : public CreatureScript
+class npc_kiljaeden_controller : public CreatureScript
 {
 public:
-    mob_kiljaeden_controller() : CreatureScript("mob_kiljaeden_controller") { }
+    npc_kiljaeden_controller() : CreatureScript("npc_kiljaeden_controller") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_kiljaeden_controllerAI (creature);
+        return new npc_kiljaeden_controllerAI (creature);
     }
 
-    struct mob_kiljaeden_controllerAI : public Scripted_NoMovementAI
+    struct npc_kiljaeden_controllerAI : public Scripted_NoMovementAI
     {
-        mob_kiljaeden_controllerAI(Creature* creature) : Scripted_NoMovementAI(creature), summons(me)
+        npc_kiljaeden_controllerAI(Creature* creature) : Scripted_NoMovementAI(creature), summons(me)
         {
             instance = creature->GetInstanceScript();
         }
@@ -636,7 +636,7 @@ public:
             if (instance)
             {
                 if (Creature* pControl = Unit::GetCreature(*me, instance->GetData64(DATA_KILJAEDEN_CONTROLLER)))
-                    CAST_AI(mob_kiljaeden_controller::mob_kiljaeden_controllerAI, pControl->AI())->Reset();
+                    CAST_AI(npc_kiljaeden_controller::npc_kiljaeden_controllerAI, pControl->AI())->Reset();
             }
         }
 
@@ -904,19 +904,19 @@ public:
 };
 
 //AI for Hand of the Deceiver
-class mob_hand_of_the_deceiver : public CreatureScript
+class npc_hand_of_the_deceiver : public CreatureScript
 {
 public:
-    mob_hand_of_the_deceiver() : CreatureScript("mob_hand_of_the_deceiver") { }
+    npc_hand_of_the_deceiver() : CreatureScript("npc_hand_of_the_deceiver") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_hand_of_the_deceiverAI (creature);
+        return new npc_hand_of_the_deceiverAI (creature);
     }
 
-    struct mob_hand_of_the_deceiverAI : public ScriptedAI
+    struct npc_hand_of_the_deceiverAI : public ScriptedAI
     {
-        mob_hand_of_the_deceiverAI(Creature* creature) : ScriptedAI(creature)
+        npc_hand_of_the_deceiverAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = creature->GetInstanceScript();
         }
@@ -958,7 +958,7 @@ public:
                 return;
 
             if (Creature* pControl = Unit::GetCreature(*me, instance->GetData64(DATA_KILJAEDEN_CONTROLLER)))
-                ++(CAST_AI(mob_kiljaeden_controller::mob_kiljaeden_controllerAI, pControl->AI())->deceiverDeathCount);
+                ++(CAST_AI(npc_kiljaeden_controller::npc_kiljaeden_controllerAI, pControl->AI())->deceiverDeathCount);
         }
 
         void UpdateAI(const uint32 diff)
@@ -1005,19 +1005,19 @@ public:
 };
 
 //AI for Felfire Portal
-class mob_felfire_portal : public CreatureScript
+class npc_felfire_portal : public CreatureScript
 {
 public:
-    mob_felfire_portal() : CreatureScript("mob_felfire_portal") { }
+    npc_felfire_portal() : CreatureScript("npc_felfire_portal") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_felfire_portalAI (creature);
+        return new npc_felfire_portalAI (creature);
     }
 
-    struct mob_felfire_portalAI : public Scripted_NoMovementAI
+    struct npc_felfire_portalAI : public Scripted_NoMovementAI
     {
-        mob_felfire_portalAI(Creature* creature) : Scripted_NoMovementAI(creature) {}
+        npc_felfire_portalAI(Creature* creature) : Scripted_NoMovementAI(creature) {}
 
         uint32 uiSpawnFiendTimer;
 
@@ -1050,19 +1050,19 @@ public:
 };
 
 //AI for Felfire Fiend
-class mob_volatile_felfire_fiend : public CreatureScript
+class npc_volatile_felfire_fiend : public CreatureScript
 {
 public:
-    mob_volatile_felfire_fiend() : CreatureScript("mob_volatile_felfire_fiend") { }
+    npc_volatile_felfire_fiend() : CreatureScript("npc_volatile_felfire_fiend") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_volatile_felfire_fiendAI (creature);
+        return new npc_volatile_felfire_fiendAI (creature);
     }
 
-    struct mob_volatile_felfire_fiendAI : public ScriptedAI
+    struct npc_volatile_felfire_fiendAI : public ScriptedAI
     {
-        mob_volatile_felfire_fiendAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_volatile_felfire_fiendAI(Creature* creature) : ScriptedAI(creature) {}
 
         uint32 uiExplodeTimer;
 
@@ -1108,19 +1108,19 @@ public:
 };
 
 //AI for Armageddon target
-class mob_armageddon : public CreatureScript
+class npc_armageddon : public CreatureScript
 {
 public:
-    mob_armageddon() : CreatureScript("mob_armageddon") { }
+    npc_armageddon() : CreatureScript("npc_armageddon") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_armageddonAI (creature);
+        return new npc_armageddonAI (creature);
     }
 
-    struct mob_armageddonAI : public Scripted_NoMovementAI
+    struct npc_armageddonAI : public Scripted_NoMovementAI
     {
-        mob_armageddonAI(Creature* creature) : Scripted_NoMovementAI(creature) {}
+        npc_armageddonAI(Creature* creature) : Scripted_NoMovementAI(creature) {}
 
         uint8 spell;
         uint32 uiTimer;
@@ -1163,19 +1163,19 @@ public:
 };
 
 //AI for Shield Orbs
-class mob_shield_orb : public CreatureScript
+class npc_shield_orb : public CreatureScript
 {
 public:
-    mob_shield_orb() : CreatureScript("mob_shield_orb") { }
+    npc_shield_orb() : CreatureScript("npc_shield_orb") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_shield_orbAI (creature);
+        return new npc_shield_orbAI (creature);
     }
 
-    struct mob_shield_orbAI : public ScriptedAI
+    struct npc_shield_orbAI : public ScriptedAI
     {
-        mob_shield_orbAI(Creature* creature) : ScriptedAI(creature)
+        npc_shield_orbAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = creature->GetInstanceScript();
         }
@@ -1251,19 +1251,19 @@ public:
 };
 
 //AI for Sinister Reflection
-class mob_sinster_reflection : public CreatureScript
+class npc_sinster_reflection : public CreatureScript
 {
 public:
-    mob_sinster_reflection() : CreatureScript("mob_sinster_reflection") { }
+    npc_sinster_reflection() : CreatureScript("npc_sinster_reflection") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_sinster_reflectionAI (creature);
+        return new npc_sinster_reflectionAI (creature);
     }
 
-    struct mob_sinster_reflectionAI : public ScriptedAI
+    struct npc_sinster_reflectionAI : public ScriptedAI
     {
-        mob_sinster_reflectionAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_sinster_reflectionAI(Creature* creature) : ScriptedAI(creature) {}
 
         uint8 victimClass;
         uint32 uiTimer[3];
@@ -1425,11 +1425,11 @@ void AddSC_boss_kiljaeden()
     new go_orb_of_the_blue_flight();
     new boss_kalecgos_kj();
     new boss_kiljaeden();
-    new mob_kiljaeden_controller();
-    new mob_hand_of_the_deceiver();
-    new mob_felfire_portal();
-    new mob_volatile_felfire_fiend();
-    new mob_armageddon();
-    new mob_shield_orb();
-    new mob_sinster_reflection();
+    new npc_kiljaeden_controller();
+    new npc_hand_of_the_deceiver();
+    new npc_felfire_portal();
+    new npc_volatile_felfire_fiend();
+    new npc_armageddon();
+    new npc_shield_orb();
+    new npc_sinster_reflection();
 }

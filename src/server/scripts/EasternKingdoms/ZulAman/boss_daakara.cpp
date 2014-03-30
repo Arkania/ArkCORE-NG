@@ -582,14 +582,14 @@ public:
     }
 };
 
-class mob_daakara_vortex : public CreatureScript
+class npc_daakara_vortex : public CreatureScript
 {
 public:
-    mob_daakara_vortex() : CreatureScript("mob_daakara_vortex") { }
+    npc_daakara_vortex() : CreatureScript("npc_daakara_vortex") { }
 
-    struct mob_daakara_vortexAI : public ScriptedAI
+    struct npc_daakara_vortexAI : public ScriptedAI
     {
-        mob_daakara_vortexAI(Creature* creature) : ScriptedAI(creature)
+        npc_daakara_vortexAI(Creature* creature) : ScriptedAI(creature)
         {
             DoCast(creature, SPELL_CYCLONE_VISUAL);
             DoCast(creature, SPELL_CYCLONE_PASSIVE);
@@ -615,12 +615,12 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_daakara_vortexAI(creature);
+        return new npc_daakara_vortexAI(creature);
     }
 };
 
 void AddSC_boss_daakara()
 {
     new boss_daakara();
-    new mob_daakara_vortex();
+    new npc_daakara_vortex();
 }

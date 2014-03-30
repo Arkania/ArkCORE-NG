@@ -506,14 +506,14 @@ class boss_gothik : public CreatureScript
         }
 };
 
-class mob_gothik_minion : public CreatureScript
+class npc_gothik_minion : public CreatureScript
 {
     public:
-        mob_gothik_minion() : CreatureScript("mob_gothik_minion") { }
+        npc_gothik_minion() : CreatureScript("npc_gothik_minion") { }
 
-        struct mob_gothik_minionAI : public CombatAI
+        struct npc_gothik_minionAI : public CombatAI
         {
-            mob_gothik_minionAI(Creature* creature) : CombatAI(creature)
+            npc_gothik_minionAI(Creature* creature) : CombatAI(creature)
             {
                 liveSide = IN_LIVE_SIDE(me);
             }
@@ -590,7 +590,7 @@ class mob_gothik_minion : public CreatureScript
 
         CreatureAI* GetAI(Creature* creature) const
         {
-            return new mob_gothik_minionAI(creature);
+            return new npc_gothik_minionAI(creature);
         }
 };
 
@@ -623,6 +623,6 @@ class spell_gothik_shadow_bolt_volley : public SpellScriptLoader
 void AddSC_boss_gothik()
 {
     new boss_gothik();
-    new mob_gothik_minion();
+    new npc_gothik_minion();
     new spell_gothik_shadow_bolt_volley();
 }

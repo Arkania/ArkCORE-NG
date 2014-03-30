@@ -161,14 +161,14 @@ public:
     }
 };
 
-class mob_amanitar_mushrooms : public CreatureScript
+class npc_amanitar_mushrooms : public CreatureScript
 {
 public:
-    mob_amanitar_mushrooms() : CreatureScript("mob_amanitar_mushrooms") { }
+    npc_amanitar_mushrooms() : CreatureScript("npc_amanitar_mushrooms") { }
 
-    struct mob_amanitar_mushroomsAI : public Scripted_NoMovementAI
+    struct npc_amanitar_mushroomsAI : public Scripted_NoMovementAI
     {
-        mob_amanitar_mushroomsAI(Creature* creature) : Scripted_NoMovementAI(creature) {}
+        npc_amanitar_mushroomsAI(Creature* creature) : Scripted_NoMovementAI(creature) {}
 
         uint32 uiAuraTimer;
         uint32 uiDeathTimer;
@@ -218,12 +218,12 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_amanitar_mushroomsAI(creature);
+        return new npc_amanitar_mushroomsAI(creature);
     }
 };
 
 void AddSC_boss_amanitar()
 {
     new boss_amanitar;
-    new mob_amanitar_mushrooms;
+    new npc_amanitar_mushrooms();
 }

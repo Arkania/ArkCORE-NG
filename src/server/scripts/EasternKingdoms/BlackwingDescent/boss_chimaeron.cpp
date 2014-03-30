@@ -328,10 +328,10 @@ public:
     };
 };
 
-class mob_finkle_einhorn : public CreatureScript
+class npc_finkle_einhorn : public CreatureScript
 {
 public:
-    mob_finkle_einhorn() : CreatureScript("mob_finkle_einhorn") { }
+    npc_finkle_einhorn() : CreatureScript("npc_finkle_einhorn") { }
 
     bool OnGossipHello(Player* pPlayer, Creature* creature)
     {
@@ -379,12 +379,12 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_finkle_einhornAI(creature);
+        return new npc_finkle_einhornAI(creature);
     }
 
-    struct mob_finkle_einhornAI : public ScriptedAI
+    struct npc_finkle_einhornAI : public ScriptedAI
     {
-        mob_finkle_einhornAI(Creature* creature) : ScriptedAI(creature)
+        npc_finkle_einhornAI(Creature* creature) : ScriptedAI(creature)
         {
             canFree = false;
             timer = 1000;
@@ -435,19 +435,19 @@ public:
     };
 };
 
-class mob_bile_o_tron : public CreatureScript
+class npc_bile_o_tron : public CreatureScript
 {
 public:
-    mob_bile_o_tron() : CreatureScript("mob_bile_o_tron") { }
+    npc_bile_o_tron() : CreatureScript("npc_bile_o_tron") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_bile_o_tronAI (creature);
+        return new npc_bile_o_tronAI (creature);
     }
 
-    struct mob_bile_o_tronAI : public ScriptedAI
+    struct npc_bile_o_tronAI : public ScriptedAI
     {
-        mob_bile_o_tronAI(Creature* creature) : ScriptedAI(creature), waypoint(7), uiSystemFailureTimer(0), activated(false)
+        npc_bile_o_tronAI(Creature* creature) : ScriptedAI(creature), waypoint(7), uiSystemFailureTimer(0), activated(false)
         {
             instance = creature->GetInstanceScript();
             creature->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
@@ -602,7 +602,7 @@ public:
 void AddSC_boss_chimaeron()
 {
     new boss_chimaeron();
-    new mob_finkle_einhorn();
-    new mob_bile_o_tron();
+    new npc_finkle_einhorn();
+    new npc_bile_o_tron();
     new spell_finkles_mixture();
 }

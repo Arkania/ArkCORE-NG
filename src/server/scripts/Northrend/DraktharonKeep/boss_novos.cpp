@@ -254,14 +254,14 @@ enum CrystalHandlerSpells
     H_SPELL_FLASH_OF_DARKNESS                     = 59004
 };
 
-class mob_crystal_handler : public CreatureScript
+class npc_crystal_handler : public CreatureScript
 {
 public:
-    mob_crystal_handler() : CreatureScript("mob_crystal_handler") { }
+    npc_crystal_handler() : CreatureScript("npc_crystal_handler") { }
 
-    struct mob_crystal_handlerAI : public ScriptedAI
+    struct npc_crystal_handlerAI : public ScriptedAI
     {
-        mob_crystal_handlerAI(Creature* creature) : ScriptedAI(creature)
+        npc_crystal_handlerAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = creature->GetInstanceScript();
         }
@@ -307,18 +307,18 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_crystal_handlerAI(creature);
+        return new npc_crystal_handlerAI(creature);
     }
 };
 
-class mob_novos_minion : public CreatureScript
+class npc_novos_minion : public CreatureScript
 {
 public:
-    mob_novos_minion() : CreatureScript("mob_novos_minion") { }
+    npc_novos_minion() : CreatureScript("npc_novos_minion") { }
 
-    struct mob_novos_minionAI : public ScriptedAI
+    struct npc_novos_minionAI : public ScriptedAI
     {
-        mob_novos_minionAI(Creature* creature) : ScriptedAI(creature)
+        npc_novos_minionAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = creature->GetInstanceScript();
         }
@@ -340,7 +340,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_novos_minionAI(creature);
+        return new npc_novos_minionAI(creature);
     }
 };
 
@@ -367,7 +367,7 @@ class achievement_oh_novos : public AchievementCriteriaScript
 void AddSC_boss_novos()
 {
     new boss_novos();
-    new mob_crystal_handler();
-    new mob_novos_minion();
+    new npc_crystal_handler();
+    new npc_novos_minion();
     new achievement_oh_novos();
 }

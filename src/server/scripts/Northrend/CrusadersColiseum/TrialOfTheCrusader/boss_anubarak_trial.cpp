@@ -418,19 +418,19 @@ public:
 
 };
 
-class mob_swarm_scarab : public CreatureScript
+class npc_swarm_scarab : public CreatureScript
 {
 public:
-    mob_swarm_scarab() : CreatureScript("mob_swarm_scarab") { }
+    npc_swarm_scarab() : CreatureScript("npc_swarm_scarab") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_swarm_scarabAI(creature);
+        return new npc_swarm_scarabAI(creature);
     };
 
-    struct mob_swarm_scarabAI : public ScriptedAI
+    struct npc_swarm_scarabAI : public ScriptedAI
     {
-        mob_swarm_scarabAI(Creature* creature) : ScriptedAI(creature)
+        npc_swarm_scarabAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = creature->GetInstanceScript();
         }
@@ -485,19 +485,19 @@ public:
 
 };
 
-class mob_nerubian_burrower : public CreatureScript
+class npc_nerubian_burrower : public CreatureScript
 {
 public:
-    mob_nerubian_burrower() : CreatureScript("mob_nerubian_burrower") { }
+    npc_nerubian_burrower() : CreatureScript("npc_nerubian_burrower") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_nerubian_burrowerAI(creature);
+        return new npc_nerubian_burrowerAI(creature);
     };
 
-    struct mob_nerubian_burrowerAI : public ScriptedAI
+    struct npc_nerubian_burrowerAI : public ScriptedAI
     {
-        mob_nerubian_burrowerAI(Creature* creature) : ScriptedAI(creature)
+        npc_nerubian_burrowerAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = creature->GetInstanceScript();
         }
@@ -562,14 +562,14 @@ public:
 
 };
 
-class mob_frost_sphere : public CreatureScript
+class npc_frost_sphere : public CreatureScript
 {
     public:
-        mob_frost_sphere() : CreatureScript("mob_frost_sphere") { }
+        npc_frost_sphere() : CreatureScript("npc_frost_sphere") { }
 
-        struct mob_frost_sphereAI : public ScriptedAI
+        struct npc_frost_sphereAI : public ScriptedAI
         {
-            mob_frost_sphereAI(Creature* creature) : ScriptedAI(creature)
+            npc_frost_sphereAI(Creature* creature) : ScriptedAI(creature)
             {
             }
 
@@ -627,23 +627,23 @@ class mob_frost_sphere : public CreatureScript
 
         CreatureAI* GetAI(Creature* creature) const
         {
-            return new mob_frost_sphereAI(creature);
+            return new npc_frost_sphereAI(creature);
         };
 };
 
-class mob_anubarak_spike : public CreatureScript
+class npc_anubarak_spike : public CreatureScript
 {
 public:
-    mob_anubarak_spike() : CreatureScript("mob_anubarak_spike") { }
+    npc_anubarak_spike() : CreatureScript("npc_anubarak_spike") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_anubarak_spikeAI(creature);
+        return new npc_anubarak_spikeAI(creature);
     };
 
-    struct mob_anubarak_spikeAI : public ScriptedAI
+    struct npc_anubarak_spikeAI : public ScriptedAI
     {
-        mob_anubarak_spikeAI(Creature* creature) : ScriptedAI(creature)
+        npc_anubarak_spikeAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = creature->GetInstanceScript();
         }
@@ -723,8 +723,8 @@ public:
 void AddSC_boss_anubarak_trial()
 {
     new boss_anubarak_trial();
-    new mob_swarm_scarab();
-    new mob_nerubian_burrower();
-    new mob_anubarak_spike();
-    new mob_frost_sphere();
+    new npc_swarm_scarab();
+    new npc_nerubian_burrower();
+    new npc_anubarak_spike();
+    new npc_frost_sphere();
 }

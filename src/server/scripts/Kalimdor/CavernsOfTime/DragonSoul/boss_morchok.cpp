@@ -172,19 +172,19 @@ public:
     };
 };
 
-class mob_kohcrom : public CreatureScript
+class npc_kohcrom : public CreatureScript
 {
 public:
-    mob_kohcrom() : CreatureScript("mob_kohcrom") { }
+    npc_kohcrom() : CreatureScript("npc_kohcrom") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return GetDragonSoulAI<mob_kohcromAI>(creature);
+        return GetDragonSoulAI<npc_kohcromAI>(creature);
     }
 
-    struct mob_kohcromAI: public ScriptedAI
+    struct npc_kohcromAI: public ScriptedAI
     {
-        mob_kohcromAI(Creature* creature) : ScriptedAI(creature)
+        npc_kohcromAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = creature->GetInstanceScript();
         }
@@ -253,5 +253,5 @@ public:
 void AddSC_boss_morchok()
 {
     new boss_morchok();
-    new mob_kohcrom();
+    new npc_kohcrom();
 }

@@ -722,21 +722,21 @@ public:
 /*********************
 ** NPC Twilight Whelp (47265) - Phase 1 Adds.
 **********************/
-class npc_twilight_whelp : public CreatureScript 
+class npc_twilight_whelp_phas1 : public CreatureScript 
 {
 public:
 
-    npc_twilight_whelp() : CreatureScript("npc_twilight_whelp") {}
+    npc_twilight_whelp_phas1() : CreatureScript("npc_twilight_whelp_phas1") {}
 
     CreatureAI* GetAI(Creature* creature) const 
     {
-        return new npc_twilight_whelpAI(creature);
+        return new npc_twilight_whelp_phas1AI(creature);
     }
 
-    struct npc_twilight_whelpAI : public ScriptedAI 
+    struct npc_twilight_whelp_phas1AI : public ScriptedAI 
     {
 
-        npc_twilight_whelpAI(Creature * creature) : ScriptedAI(creature) 
+        npc_twilight_whelp_phas1AI(Creature * creature) : ScriptedAI(creature) 
         {
             instance = creature->GetInstanceScript();
         }
@@ -1432,7 +1432,7 @@ void AddSC_boss_sinestra()
     new npc_twilight_essence();
     new npc_twilight_slicer();
     new npc_twilight_drake();
-    new npc_twilight_whelp();
+    new npc_twilight_whelp_phas1();
 	new npc_twilight_spite();
 	new npc_calen();
 	new npc_controller();

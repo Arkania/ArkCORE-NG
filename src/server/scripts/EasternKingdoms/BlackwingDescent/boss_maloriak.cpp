@@ -675,19 +675,19 @@ public:
     };
 };
 
-class mob_flash_freeze_maloriak : public CreatureScript
+class npc_flash_freeze_maloriak : public CreatureScript
 {
 public:
-    mob_flash_freeze_maloriak() : CreatureScript("mob_flash_freeze_maloriak") { }
+    npc_flash_freeze_maloriak() : CreatureScript("npc_flash_freeze_maloriak") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_flash_freeze_maloriakAI (creature);
+        return new npc_flash_freeze_maloriakAI (creature);
     }
 
-    struct mob_flash_freeze_maloriakAI : public ScriptedAI
+    struct npc_flash_freeze_maloriakAI : public ScriptedAI
     {
-        mob_flash_freeze_maloriakAI(Creature* creature) : ScriptedAI(creature) { }
+        npc_flash_freeze_maloriakAI(Creature* creature) : ScriptedAI(creature) { }
 
         Unit* target;
         uint32 timerChecktarget;
@@ -805,7 +805,7 @@ public:
 void AddSC_boss_maloriak()
 {
     new boss_maloriak();
-    new mob_flash_freeze_maloriak();
+    new npc_flash_freeze_maloriak();
     new spell_release_abberations();
     new spell_release_all_abberations();
 }

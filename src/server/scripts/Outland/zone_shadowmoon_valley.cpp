@@ -25,8 +25,8 @@ SDCategory: Shadowmoon Valley
 EndScriptData */
 
 /* ContentData
-mob_mature_netherwing_drake
-mob_enslaved_netherwing_drake
+npc_mature_netherwing_drake
+npc_enslaved_netherwing_drake
 npc_drake_dealer_hurlunk
 npcs_flanis_swiftwing_and_kagrosh
 npc_murkblood_overseer
@@ -34,8 +34,8 @@ npc_karynaku
 npc_oronok_tornheart
 npc_overlord_morghor
 npc_earthmender_wilda
-mob_torloth_the_magnificent
-mob_illidari_spawn
+npc_torloth_the_magnificent
+npc_illidari_spawn
 npc_lord_illidan_stormrage
 go_crystal_prison
 npc_enraged_spirit
@@ -46,7 +46,7 @@ EndContentData */
 #include "Group.h"
 
 /*#####
-# mob_mature_netherwing_drake
+# npc_mature_netherwing_drake
 #####*/
 
 enum eMatureNetherwing
@@ -64,19 +64,19 @@ enum eMatureNetherwing
     NPC_EVENT_PINGER            = 22131
 };
 
-class mob_mature_netherwing_drake : public CreatureScript
+class npc_mature_netherwing_drake : public CreatureScript
 {
 public:
-    mob_mature_netherwing_drake() : CreatureScript("mob_mature_netherwing_drake") { }
+    npc_mature_netherwing_drake() : CreatureScript("npc_mature_netherwing_drake") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_mature_netherwing_drakeAI(creature);
+        return new npc_mature_netherwing_drakeAI(creature);
     }
 
-    struct mob_mature_netherwing_drakeAI : public ScriptedAI
+    struct npc_mature_netherwing_drakeAI : public ScriptedAI
     {
-        mob_mature_netherwing_drakeAI(Creature* creature) : ScriptedAI(creature) { }
+        npc_mature_netherwing_drakeAI(Creature* creature) : ScriptedAI(creature) { }
 
         uint64 uiPlayerGUID;
 
@@ -183,7 +183,7 @@ public:
 };
 
 /*###
-# mob_enslaved_netherwing_drake
+# npc_enslaved_netherwing_drake
 ####*/
 
 #define FACTION_DEFAULT     62
@@ -195,19 +195,19 @@ public:
 #define CREATURE_DRAGONMAW_SUBJUGATOR   21718
 #define CREATURE_ESCAPE_DUMMY           22317
 
-class mob_enslaved_netherwing_drake : public CreatureScript
+class npc_enslaved_netherwing_drake : public CreatureScript
 {
 public:
-    mob_enslaved_netherwing_drake() : CreatureScript("mob_enslaved_netherwing_drake") { }
+    npc_enslaved_netherwing_drake() : CreatureScript("npc_enslaved_netherwing_drake") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_enslaved_netherwing_drakeAI(creature);
+        return new npc_enslaved_netherwing_drakeAI(creature);
     }
 
-    struct mob_enslaved_netherwing_drakeAI : public ScriptedAI
+    struct npc_enslaved_netherwing_drakeAI : public ScriptedAI
     {
-        mob_enslaved_netherwing_drakeAI(Creature* creature) : ScriptedAI(creature)
+        npc_enslaved_netherwing_drakeAI(Creature* creature) : ScriptedAI(creature)
         {
             PlayerGUID = 0;
             Tapped = false;
@@ -323,22 +323,22 @@ public:
 };
 
 /*#####
-# mob_dragonmaw_peon
+# npc_dragonmaw_peon
 #####*/
 
-class mob_dragonmaw_peon : public CreatureScript
+class npc_dragonmaw_peon : public CreatureScript
 {
 public:
-    mob_dragonmaw_peon() : CreatureScript("mob_dragonmaw_peon") { }
+    npc_dragonmaw_peon() : CreatureScript("npc_dragonmaw_peon") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_dragonmaw_peonAI(creature);
+        return new npc_dragonmaw_peonAI(creature);
     }
 
-    struct mob_dragonmaw_peonAI : public ScriptedAI
+    struct npc_dragonmaw_peonAI : public ScriptedAI
     {
-        mob_dragonmaw_peonAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_dragonmaw_peonAI(Creature* creature) : ScriptedAI(creature) {}
 
         uint64 PlayerGUID;
         bool Tapped;
@@ -1139,8 +1139,8 @@ public:
 
 /* ContentData
 Battle of the crimson watch - creatures, gameobjects and defines
-mob_illidari_spawn : Adds that are summoned in the Crimson Watch battle.
-mob_torloth_the_magnificent : Final Creature that players have to face before quest is completed
+npc_illidari_spawn : Adds that are summoned in the Crimson Watch battle.
+npc_torloth_the_magnificent : Final Creature that players have to face before quest is completed
 npc_lord_illidan_stormrage : Creature that controls the event.
 go_crystal_prison : GameObject that begins the event and hands out quest
 EndContentData */
@@ -1230,22 +1230,22 @@ static SpawnSpells SpawnCast[]=
 };
 
 /*######
-# mob_torloth_the_magnificent
+# npc_torloth_the_magnificent
 #####*/
 
-class mob_torloth_the_magnificent : public CreatureScript
+class npc_torloth_the_magnificent : public CreatureScript
 {
 public:
-    mob_torloth_the_magnificent() : CreatureScript("mob_torloth_the_magnificent") { }
+    npc_torloth_the_magnificent() : CreatureScript("npc_torloth_the_magnificent") { }
 
     CreatureAI* GetAI(Creature* c) const
     {
-        return new mob_torloth_the_magnificentAI(c);
+        return new npc_torloth_the_magnificentAI(c);
     }
 
-    struct mob_torloth_the_magnificentAI : public ScriptedAI
+    struct npc_torloth_the_magnificentAI : public ScriptedAI
     {
-        mob_torloth_the_magnificentAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_torloth_the_magnificentAI(Creature* creature) : ScriptedAI(creature) {}
 
         uint32 AnimationTimer, SpellTimer1, SpellTimer2, SpellTimer3;
 
@@ -1535,22 +1535,22 @@ public:
 };
 
 /*######
-# mob_illidari_spawn
+# npc_illidari_spawn
 ######*/
 
-class mob_illidari_spawn : public CreatureScript
+class npc_illidari_spawn : public CreatureScript
 {
 public:
-    mob_illidari_spawn() : CreatureScript("mob_illidari_spawn") { }
+    npc_illidari_spawn() : CreatureScript("npc_illidari_spawn") { }
 
     CreatureAI* GetAI(Creature* c) const
     {
-        return new mob_illidari_spawnAI(c);
+        return new npc_illidari_spawnAI(c);
     }
 
-    struct mob_illidari_spawnAI : public ScriptedAI
+    struct npc_illidari_spawnAI : public ScriptedAI
     {
-        mob_illidari_spawnAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_illidari_spawnAI(Creature* creature) : ScriptedAI(creature) {}
 
         uint64 LordIllidanGUID;
         uint32 SpellTimer1, SpellTimer2, SpellTimer3;
@@ -1704,14 +1704,14 @@ void npc_lord_illidan_stormrage::npc_lord_illidan_stormrageAI::SummonNextWave()
                         Spawn->GetMotionMaster()->MovePoint(0, x, y, z);
                     }
                 }
-                CAST_AI(mob_illidari_spawn::mob_illidari_spawnAI, Spawn->AI())->LordIllidanGUID = me->GetGUID();
+                CAST_AI(npc_illidari_spawn::npc_illidari_spawnAI, Spawn->AI())->LordIllidanGUID = me->GetGUID();
             }
 
             if (WavesInfo[WaveCount].CreatureId == 22076) // Torloth
             {
-                CAST_AI(mob_torloth_the_magnificent::mob_torloth_the_magnificentAI, Spawn->AI())->LordIllidanGUID = me->GetGUID();
+                CAST_AI(npc_torloth_the_magnificent::npc_torloth_the_magnificentAI, Spawn->AI())->LordIllidanGUID = me->GetGUID();
                 if (PlayerGUID)
-                    CAST_AI(mob_torloth_the_magnificent::mob_torloth_the_magnificentAI, Spawn->AI())->AggroTargetGUID = PlayerGUID;
+                    CAST_AI(npc_torloth_the_magnificent::npc_torloth_the_magnificentAI, Spawn->AI())->AggroTargetGUID = PlayerGUID;
             }
         }
     }
@@ -1873,9 +1873,9 @@ public:
 
 void AddSC_shadowmoon_valley()
 {
-    new mob_mature_netherwing_drake();
-    new mob_enslaved_netherwing_drake();
-    new mob_dragonmaw_peon();
+    new npc_mature_netherwing_drake();
+    new npc_enslaved_netherwing_drake();
+    new npc_dragonmaw_peon();
     new npc_drake_dealer_hurlunk();
     new npcs_flanis_swiftwing_and_kagrosh();
     new npc_murkblood_overseer();
@@ -1885,7 +1885,7 @@ void AddSC_shadowmoon_valley()
     new npc_earthmender_wilda();
     new npc_lord_illidan_stormrage();
     new go_crystal_prison();
-    new mob_illidari_spawn();
-    new mob_torloth_the_magnificent();
+    new npc_illidari_spawn();
+    new npc_torloth_the_magnificent();
     new npc_enraged_spirit();
 }

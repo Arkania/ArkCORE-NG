@@ -357,19 +357,19 @@ public:
      };
 };
 
-class mob_coilfang_ambusher : public CreatureScript
+class npc_coilfang_ambusher : public CreatureScript
 {
 public:
-    mob_coilfang_ambusher() : CreatureScript("mob_coilfang_ambusher") { }
+    npc_coilfang_ambusher() : CreatureScript("npc_coilfang_ambusher") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_coilfang_ambusherAI (creature);
+        return new npc_coilfang_ambusherAI (creature);
     }
 
-    struct mob_coilfang_ambusherAI : public Scripted_NoMovementAI
+    struct npc_coilfang_ambusherAI : public Scripted_NoMovementAI
     {
-        mob_coilfang_ambusherAI(Creature* creature) : Scripted_NoMovementAI(creature)
+        npc_coilfang_ambusherAI(Creature* creature) : Scripted_NoMovementAI(creature)
         {
         }
 
@@ -441,6 +441,6 @@ class go_strange_pool : public GameObjectScript
 void AddSC_boss_the_lurker_below()
 {
     new boss_the_lurker_below();
-    new mob_coilfang_ambusher();
+    new npc_coilfang_ambusher();
     new go_strange_pool();
 }

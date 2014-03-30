@@ -186,14 +186,14 @@ class boss_anomalus : public CreatureScript
         }
 };
 
-class mob_chaotic_rift : public CreatureScript
+class npc_chaotic_rift : public CreatureScript
 {
     public:
-        mob_chaotic_rift() : CreatureScript("mob_chaotic_rift") { }
+        npc_chaotic_rift() : CreatureScript("npc_chaotic_rift") { }
 
-        struct mob_chaotic_riftAI : public Scripted_NoMovementAI
+        struct npc_chaotic_riftAI : public Scripted_NoMovementAI
         {
-            mob_chaotic_riftAI(Creature* creature) : Scripted_NoMovementAI(creature)
+            npc_chaotic_riftAI(Creature* creature) : Scripted_NoMovementAI(creature)
             {
                 instance = me->GetInstanceScript();
             }
@@ -251,7 +251,7 @@ class mob_chaotic_rift : public CreatureScript
 
         CreatureAI* GetAI(Creature* creature) const
         {
-            return new mob_chaotic_riftAI(creature);
+            return new npc_chaotic_riftAI(creature);
         }
 };
 
@@ -278,6 +278,6 @@ class achievement_chaos_theory : public AchievementCriteriaScript
 void AddSC_boss_anomalus()
 {
     new boss_anomalus();
-    new mob_chaotic_rift();
+    new npc_chaotic_rift();
     new achievement_chaos_theory();
 }

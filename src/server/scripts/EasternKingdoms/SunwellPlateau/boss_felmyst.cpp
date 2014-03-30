@@ -511,19 +511,19 @@ public:
 
 };
 
-class mob_felmyst_vapor : public CreatureScript
+class npc_felmyst_vapor : public CreatureScript
 {
 public:
-    mob_felmyst_vapor() : CreatureScript("mob_felmyst_vapor") { }
+    npc_felmyst_vapor() : CreatureScript("npc_felmyst_vapor") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_felmyst_vaporAI(creature);
+        return new npc_felmyst_vaporAI(creature);
     }
 
-    struct mob_felmyst_vaporAI : public ScriptedAI
+    struct npc_felmyst_vaporAI : public ScriptedAI
     {
-        mob_felmyst_vaporAI(Creature* creature) : ScriptedAI(creature)
+        npc_felmyst_vaporAI(Creature* creature) : ScriptedAI(creature)
         {
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             me->SetSpeed(MOVE_RUN, 0.8f);
@@ -544,19 +544,19 @@ public:
 
 };
 
-class mob_felmyst_trail : public CreatureScript
+class npc_felmyst_trail : public CreatureScript
 {
 public:
-    mob_felmyst_trail() : CreatureScript("mob_felmyst_trail") { }
+    npc_felmyst_trail() : CreatureScript("npc_felmyst_trail") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_felmyst_trailAI(creature);
+        return new npc_felmyst_trailAI(creature);
     }
 
-    struct mob_felmyst_trailAI : public ScriptedAI
+    struct npc_felmyst_trailAI : public ScriptedAI
     {
-        mob_felmyst_trailAI(Creature* creature) : ScriptedAI(creature)
+        npc_felmyst_trailAI(Creature* creature) : ScriptedAI(creature)
         {
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             DoCast(me, SPELL_TRAIL_TRIGGER, true);
@@ -575,6 +575,6 @@ public:
 void AddSC_boss_felmyst()
 {
     new boss_felmyst();
-    new mob_felmyst_vapor();
-    new mob_felmyst_trail();
+    new npc_felmyst_vapor();
+    new npc_felmyst_trail();
 }

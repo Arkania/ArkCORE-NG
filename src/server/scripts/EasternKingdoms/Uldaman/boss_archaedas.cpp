@@ -214,7 +214,7 @@ class boss_archaedas : public CreatureScript
 };
 
 /* ScriptData
-SDName: mob_archaedas_minions
+SDName: npc_archaedas_minions
 SD%Complete: 100
 SDComment: These mobs are initially frozen until Archaedas awakens them
 one at a time.
@@ -222,18 +222,18 @@ EndScriptData */
 
 #define SPELL_ARCHAEDAS_AWAKEN  10347
 
-class mob_archaedas_minions : public CreatureScript
+class npc_archaedas_minions : public CreatureScript
 {
     public:
 
-        mob_archaedas_minions()
-            : CreatureScript("mob_archaedas_minions")
+        npc_archaedas_minions()
+            : CreatureScript("npc_archaedas_minions")
         {
         }
 
-        struct mob_archaedas_minionsAI : public ScriptedAI
+        struct npc_archaedas_minionsAI : public ScriptedAI
         {
-            mob_archaedas_minionsAI(Creature* creature) : ScriptedAI(creature)
+            npc_archaedas_minionsAI(Creature* creature) : ScriptedAI(creature)
             {
                 instance = me->GetInstanceScript();
             }
@@ -308,12 +308,12 @@ class mob_archaedas_minions : public CreatureScript
 
         CreatureAI* GetAI(Creature* creature) const
         {
-            return new mob_archaedas_minionsAI(creature);
+            return new npc_archaedas_minionsAI(creature);
         }
 };
 
 /* ScriptData
-SDName: mob_stonekeepers
+SDName: npc_stonekeepers
 SD%Complete: 100
 SDComment: After activating the altar of the keepers, the stone keepers will
 wake up one by one.
@@ -321,18 +321,18 @@ EndScriptData */
 
 #define SPELL_SELF_DESTRUCT 9874
 
-class mob_stonekeepers : public CreatureScript
+class npc_stonekeepers : public CreatureScript
 {
     public:
 
-        mob_stonekeepers()
-            : CreatureScript("mob_stonekeepers")
+        npc_stonekeepers()
+            : CreatureScript("npc_stonekeepers")
         {
         }
 
-        struct mob_stonekeepersAI : public ScriptedAI
+        struct npc_stonekeepersAI : public ScriptedAI
         {
-            mob_stonekeepersAI(Creature* creature) : ScriptedAI(creature)
+            npc_stonekeepersAI(Creature* creature) : ScriptedAI(creature)
             {
                 instance = me->GetInstanceScript();
             }
@@ -373,7 +373,7 @@ class mob_stonekeepers : public CreatureScript
 
         CreatureAI* GetAI(Creature* creature) const
         {
-            return new mob_stonekeepersAI(creature);
+            return new npc_stonekeepersAI(creature);
         }
 };
 
@@ -444,8 +444,8 @@ class go_altar_of_the_keepers : public GameObjectScript
 void AddSC_boss_archaedas()
 {
     new boss_archaedas();
-    new mob_archaedas_minions();
-    new mob_stonekeepers();
+    new npc_archaedas_minions();
+    new npc_stonekeepers();
     new go_altar_of_archaedas();
     new go_altar_of_the_keepers();
 }

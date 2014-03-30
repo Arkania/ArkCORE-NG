@@ -343,19 +343,19 @@ public:
 };
 
 // Spirit of the Lynx.
-class mob_halazzi_lynx : public CreatureScript
+class npc_halazzi_lynx : public CreatureScript
 {
 public:
-   mob_halazzi_lynx() : CreatureScript("mob_halazzi_lynx") { }
+   npc_halazzi_lynx() : CreatureScript("npc_halazzi_lynx") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_halazzi_lynxAI(creature);
+        return new npc_halazzi_lynxAI(creature);
     }
 
-    struct mob_halazzi_lynxAI : public ScriptedAI
+    struct npc_halazzi_lynxAI : public ScriptedAI
     {
-        mob_halazzi_lynxAI(Creature* creature) : ScriptedAI(creature)
+        npc_halazzi_lynxAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = creature->GetInstanceScript();
             DoCast(creature, SPELL_SPIRIT_VISUAL);
@@ -415,5 +415,5 @@ public:
 void AddSC_boss_halazzi()
 {
     new boss_halazzi();
-    new mob_halazzi_lynx();
+    new npc_halazzi_lynx();
 }

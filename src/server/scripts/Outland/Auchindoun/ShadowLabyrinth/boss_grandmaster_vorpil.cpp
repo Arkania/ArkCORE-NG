@@ -63,19 +63,19 @@ float VoidPortalCoords[5][3] =
     {-261.4533f, -297.3298f, 17.1f}
 };
 
-class mob_voidtraveler : public CreatureScript
+class npc_voidtraveler : public CreatureScript
 {
 public:
-    mob_voidtraveler() : CreatureScript("mob_voidtraveler") { }
+    npc_voidtraveler() : CreatureScript("npc_voidtraveler") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_voidtravelerAI (creature);
+        return new npc_voidtravelerAI (creature);
     }
 
-    struct mob_voidtravelerAI : public ScriptedAI
+    struct npc_voidtravelerAI : public ScriptedAI
     {
-        mob_voidtravelerAI(Creature* creature) : ScriptedAI(creature)
+        npc_voidtravelerAI(Creature* creature) : ScriptedAI(creature)
         {
         }
 
@@ -226,7 +226,7 @@ public:
         void JustSummoned(Creature* summoned)
         {
             if (summoned && summoned->GetEntry() == MOB_VOID_TRAVELER)
-                CAST_AI(mob_voidtraveler::mob_voidtravelerAI, summoned->AI())->VorpilGUID = me->GetGUID();
+                CAST_AI(npc_voidtraveler::npc_voidtravelerAI, summoned->AI())->VorpilGUID = me->GetGUID();
         }
 
         void KilledUnit(Unit* /*victim*/)
@@ -320,5 +320,5 @@ public:
 void AddSC_boss_grandmaster_vorpil()
 {
     new boss_grandmaster_vorpil();
-    new mob_voidtraveler();
+    new npc_voidtraveler();
 }

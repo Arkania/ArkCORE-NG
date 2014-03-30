@@ -336,7 +336,7 @@ public:
     };
 };
 
-// mob_phalanx
+// npc_phalanx
 enum PhalanxSpells
 {
     SPELL_THUNDERCLAP                   = 8732,
@@ -344,19 +344,19 @@ enum PhalanxSpells
     SPELL_MIGHTYBLOW                    = 14099
 };
 
-class mob_phalanx : public CreatureScript
+class npc_phalanx : public CreatureScript
 {
 public:
-    mob_phalanx() : CreatureScript("mob_phalanx") { }
+    npc_phalanx() : CreatureScript("npc_phalanx") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_phalanxAI (creature);
+        return new npc_phalanxAI (creature);
     }
 
-    struct mob_phalanxAI : public ScriptedAI
+    struct npc_phalanxAI : public ScriptedAI
     {
-        mob_phalanxAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_phalanxAI(Creature* creature) : ScriptedAI(creature) {}
 
         uint32 ThunderClap_Timer;
         uint32 FireballVolley_Timer;
@@ -1325,7 +1325,7 @@ void AddSC_blackrock_depths()
     new go_shadowforge_brazier();
     new at_ring_of_law();
     new npc_grimstone();
-    new mob_phalanx();
+    new npc_phalanx();
     new npc_kharan_mighthammer();
     new npc_lokhtos_darkbargainer();
     new npc_rocknot();
