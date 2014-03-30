@@ -150,8 +150,8 @@ class npc_professor_phizzlethorpe : public CreatureScript
             if (quest->GetQuestId() == QUEST_GOGGLE_BOGGLE)
             {
                 creature->AI()->Talk(SAY_PROGRESS_1, player->GetGUID());
-                if (npc_escortAI* pEscortAI = CAST_AI(npc_professor_phizzlethorpeAI, (creature->AI())))
-                    pEscortAI->Start(false, false, player->GetGUID(), quest);
+                if (npc_escortAI* EscortAI = CAST_AI(npc_professor_phizzlethorpeAI, (creature->AI())))
+                    EscortAI->Start(false, false, player->GetGUID(), quest);
 
                 creature->setFaction(42);
             }
