@@ -546,19 +546,19 @@ public:
 
 // Ground phase
 
-class mob_sonar_pulse : public CreatureScript // 41546
+class npc_sonar_pulse : public CreatureScript // 41546
 {
 public:
-    mob_sonar_pulse() : CreatureScript("mob_sonar_pulse") { }
+    npc_sonar_pulse() : CreatureScript("npc_sonar_pulse") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_sonar_pulseAI (creature);
+        return new npc_sonar_pulseAI (creature);
     }
 
-    struct mob_sonar_pulseAI : public ScriptedAI
+    struct npc_sonar_pulseAI : public ScriptedAI
     {
-        mob_sonar_pulseAI(Creature* creature) : ScriptedAI(creature)
+        npc_sonar_pulseAI(Creature* creature) : ScriptedAI(creature)
         {
             timerMove = 1000;
             timerDespawn = 20000;
@@ -591,19 +591,19 @@ public:
     };
 };
 
-class mob_searing_flame : public CreatureScript // 41807
+class npc_searing_flame : public CreatureScript // 41807
 {
 public:
-    mob_searing_flame() : CreatureScript("mob_searing_flame") { }
+    npc_searing_flame() : CreatureScript("npc_searing_flame") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_searing_flameAI (creature);
+        return new npc_searing_flameAI (creature);
     }
 
-    struct mob_searing_flameAI : public ScriptedAI
+    struct npc_searing_flameAI : public ScriptedAI
     {
-        mob_searing_flameAI(Creature* creature) : ScriptedAI(creature)
+        npc_searing_flameAI(Creature* creature) : ScriptedAI(creature)
         {
             timerDespawn = 7500;
             timerPeriodic = 1500;
@@ -629,19 +629,19 @@ public:
 };
 
 
-class mob_obnoxious_fiend : public CreatureScript // 49740
+class npc_obnoxious_fiend : public CreatureScript // 49740
 {
 public:
-    mob_obnoxious_fiend() : CreatureScript("mob_obnoxious_fiend") { }
+    npc_obnoxious_fiend() : CreatureScript("npc_obnoxious_fiend") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_obnoxious_fiendAI (creature);
+        return new npc_obnoxious_fiendAI (creature);
     }
 
-    struct mob_obnoxious_fiendAI : public ScriptedAI
+    struct npc_obnoxious_fiendAI : public ScriptedAI
     {
-        mob_obnoxious_fiendAI(Creature* creature) : ScriptedAI(creature) 
+        npc_obnoxious_fiendAI(Creature* creature) : ScriptedAI(creature) 
         {
             DoCast(me, SPELL_PHASESHIFT);
             timerCast = 10000;
@@ -669,19 +669,19 @@ public:
 
 // Air phase
 
-class mob_roaring_flame_target : public CreatureScript // 42121
+class npc_roaring_flame_target : public CreatureScript // 42121
 {
 public:
-    mob_roaring_flame_target() : CreatureScript("mob_roaring_flame_target") { }
+    npc_roaring_flame_target() : CreatureScript("npc_roaring_flame_target") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_roaring_flame_targetAI (creature);
+        return new npc_roaring_flame_targetAI (creature);
     }
 
-    struct mob_roaring_flame_targetAI : public ScriptedAI
+    struct npc_roaring_flame_targetAI : public ScriptedAI
     {
-        mob_roaring_flame_targetAI(Creature* creature) : ScriptedAI(creature)
+        npc_roaring_flame_targetAI(Creature* creature) : ScriptedAI(creature)
         {
             timerSummonFlame = 500;
             timerDespawn = 30000;
@@ -706,19 +706,19 @@ public:
     };
 };
 
-class mob_roaring_flame : public CreatureScript // 42001
+class npc_roaring_flame : public CreatureScript // 42001
 {
 public:
-    mob_roaring_flame() : CreatureScript("mob_roaring_flame") { }
+    npc_roaring_flame() : CreatureScript("npc_roaring_flame") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_roaring_flameAI (creature);
+        return new npc_roaring_flameAI (creature);
     }
 
-    struct mob_roaring_flameAI : public ScriptedAI
+    struct npc_roaring_flameAI : public ScriptedAI
     {
-        mob_roaring_flameAI(Creature* creature) : ScriptedAI(creature)
+        npc_roaring_flameAI(Creature* creature) : ScriptedAI(creature)
         {
             timerDespawn = 30000;
             timerPeriodic = 1000;
@@ -744,10 +744,10 @@ public:
 };
 
 // Gongs
-class mob_atramedes_gong : public CreatureScript // 42949
+class npc_atramedes_gong : public CreatureScript // 42949
 {
 public:
-    mob_atramedes_gong() : CreatureScript("mob_atramedes_gong") 
+    npc_atramedes_gong() : CreatureScript("npc_atramedes_gong") 
     { 
     }
 
@@ -790,12 +790,12 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_atramedes_gongAI (creature);
+        return new npc_atramedes_gongAI (creature);
     }
 
-    struct mob_atramedes_gongAI : public ScriptedAI
+    struct npc_atramedes_gongAI : public ScriptedAI
     {
-        mob_atramedes_gongAI(Creature* creature) : ScriptedAI(creature){ }
+        npc_atramedes_gongAI(Creature* creature) : ScriptedAI(creature){ }
 
         void UpdateAI(const uint32 diff)
         { 
@@ -815,14 +815,14 @@ uint16 const times[16] =
     5000, 8000, 5000, 7500, 3000, 8000, 9000, 5000
 };
 
-class mob_maloriak_atramedes_event : public CreatureScript
+class npc_maloriak_atramedes_event : public CreatureScript
 {
 public:
-    mob_maloriak_atramedes_event() : CreatureScript("mob_maloriak_atramedes_event") { }
+    npc_maloriak_atramedes_event() : CreatureScript("npc_maloriak_atramedes_event") { }
 
-    struct mob_maloriak_atramedes_eventAI : public ScriptedAI
+    struct npc_maloriak_atramedes_eventAI : public ScriptedAI
     {
-        mob_maloriak_atramedes_eventAI(Creature* creature) : ScriptedAI(creature)
+        npc_maloriak_atramedes_eventAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = creature->GetInstanceScript();     
         }
@@ -946,7 +946,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_maloriak_atramedes_eventAI(creature);
+        return new npc_maloriak_atramedes_eventAI(creature);
     }
 };
 
@@ -984,13 +984,13 @@ class spell_atramedes_sonic_breath : public SpellScriptLoader
 void AddSC_boss_atramedes()
 {
     new boss_atramedes();
-    new mob_sonar_pulse();
-    new mob_atramedes_gong();
-    new mob_roaring_flame();
-    new mob_roaring_flame_target();
-    new mob_searing_flame();
-    new mob_obnoxious_fiend();
+    new npc_sonar_pulse();
+    new npc_atramedes_gong();
+    new npc_roaring_flame();
+    new npc_roaring_flame_target();
+    new npc_searing_flame();
+    new npc_obnoxious_fiend();
 
-    new mob_maloriak_atramedes_event();
+    new npc_maloriak_atramedes_event();
     new spell_atramedes_sonic_breath();
 }

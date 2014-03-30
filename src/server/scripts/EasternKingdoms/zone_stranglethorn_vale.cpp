@@ -25,29 +25,29 @@ SDCategory: Stranglethorn Vale
 EndScriptData */
 
 /* ContentData
-mob_yenniku
+npc_yenniku
 EndContentData */
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 
 /*######
-## mob_yenniku
+## npc_yenniku
 ######*/
 
-class mob_yenniku : public CreatureScript
+class npc_yenniku : public CreatureScript
 {
 public:
-    mob_yenniku() : CreatureScript("mob_yenniku") { }
+    npc_yenniku() : CreatureScript("npc_yenniku") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_yennikuAI (creature);
+        return new npc_yennikuAI (creature);
     }
 
-    struct mob_yennikuAI : public ScriptedAI
+    struct npc_yennikuAI : public ScriptedAI
     {
-        mob_yennikuAI(Creature* creature) : ScriptedAI(creature)
+        npc_yennikuAI(Creature* creature) : ScriptedAI(creature)
         {
             bReset = false;
         }
@@ -124,5 +124,5 @@ public:
 
 void AddSC_stranglethorn_vale()
 {
-    new mob_yenniku();
+    new npc_yenniku();
 }

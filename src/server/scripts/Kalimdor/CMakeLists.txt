@@ -91,7 +91,7 @@ set(scripts_STAT_SRCS
   Kalimdor/TempleOfAhnQiraj/boss_fankriss.cpp
   Kalimdor/TempleOfAhnQiraj/boss_huhuran.cpp
   Kalimdor/TempleOfAhnQiraj/instance_temple_of_ahnqiraj.cpp
-  Kalimdor/TempleOfAhnQiraj/mob_anubisath_sentinel.cpp
+  Kalimdor/TempleOfAhnQiraj/npc_anubisath_sentinel.cpp
   Kalimdor/TempleOfAhnQiraj/boss_viscidus.cpp
   Kalimdor/TempleOfAhnQiraj/boss_twinemperors.cpp
   Kalimdor/TempleOfAhnQiraj/boss_sartura.cpp

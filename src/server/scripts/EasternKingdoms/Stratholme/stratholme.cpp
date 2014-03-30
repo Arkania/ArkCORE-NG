@@ -26,8 +26,8 @@ EndScriptData */
 
 /* ContentData
 go_gauntlet_gate
-mob_freed_soul
-mob_restless_soul
+npc_freed_soul
+npc_restless_soul
 mobs_spectral_ghostly_citizen
 EndContentData */
 
@@ -80,7 +80,7 @@ public:
 };
 
 /*######
-## mob_freed_soul
+## npc_freed_soul
 ######*/
 
 //Possibly more of these quotes around.
@@ -89,19 +89,19 @@ public:
 #define SAY_ZAPPED2 -1329002
 #define SAY_ZAPPED3 -1329003
 
-class mob_freed_soul : public CreatureScript
+class npc_freed_soul : public CreatureScript
 {
 public:
-    mob_freed_soul() : CreatureScript("mob_freed_soul") { }
+    npc_freed_soul() : CreatureScript("npc_freed_soul") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_freed_soulAI (creature);
+        return new npc_freed_soulAI (creature);
     }
 
-    struct mob_freed_soulAI : public ScriptedAI
+    struct npc_freed_soulAI : public ScriptedAI
     {
-        mob_freed_soulAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_freed_soulAI(Creature* creature) : ScriptedAI(creature) {}
 
         void Reset()
         {
@@ -114,7 +114,7 @@ public:
 };
 
 /*######
-## mob_restless_soul
+## npc_restless_soul
 ######*/
 
 #define SPELL_EGAN_BLASTER  17368
@@ -123,19 +123,19 @@ public:
 #define ENTRY_RESTLESS      11122
 #define ENTRY_FREED         11136
 
-class mob_restless_soul : public CreatureScript
+class npc_restless_soul : public CreatureScript
 {
 public:
-    mob_restless_soul() : CreatureScript("mob_restless_soul") { }
+    npc_restless_soul() : CreatureScript("npc_restless_soul") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_restless_soulAI (creature);
+        return new npc_restless_soulAI (creature);
     }
 
-    struct mob_restless_soulAI : public ScriptedAI
+    struct npc_restless_soulAI : public ScriptedAI
     {
-        mob_restless_soulAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_restless_soulAI(Creature* creature) : ScriptedAI(creature) {}
 
         uint64 Tagger;
         uint32 Die_Timer;
@@ -291,7 +291,7 @@ public:
 void AddSC_stratholme()
 {
     new go_gauntlet_gate();
-    new mob_freed_soul();
-    new mob_restless_soul();
+    new npc_freed_soul();
+    new npc_restless_soul();
     new mobs_spectral_ghostly_citizen();
 }

@@ -287,19 +287,19 @@ enum RavenousSpells
     SPELL_TERRIFYING_ROAR                       = 48144
 };
 
-class mob_ravenous_furbolg : public CreatureScript
+class npc_ravenous_furbolg : public CreatureScript
 {
 public:
-    mob_ravenous_furbolg() : CreatureScript("mob_ravenous_furbolg") { }
+    npc_ravenous_furbolg() : CreatureScript("npc_ravenous_furbolg") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_ravenous_furbolgAI (creature);
+        return new npc_ravenous_furbolgAI (creature);
     }
 
-    struct mob_ravenous_furbolgAI : public ScriptedAI
+    struct npc_ravenous_furbolgAI : public ScriptedAI
     {
-        mob_ravenous_furbolgAI(Creature* creature) : ScriptedAI(creature)
+        npc_ravenous_furbolgAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = creature->GetInstanceScript();
         }
@@ -400,19 +400,19 @@ enum FrenziedSpells
     SPELL_ENRAGE_2                              = 48142
 };
 
-class mob_frenzied_worgen : public CreatureScript
+class npc_frenzied_worgen : public CreatureScript
 {
 public:
-    mob_frenzied_worgen() : CreatureScript("mob_frenzied_worgen") { }
+    npc_frenzied_worgen() : CreatureScript("npc_frenzied_worgen") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_frenzied_worgenAI (creature);
+        return new npc_frenzied_worgenAI (creature);
     }
 
-    struct mob_frenzied_worgenAI : public ScriptedAI
+    struct npc_frenzied_worgenAI : public ScriptedAI
     {
-        mob_frenzied_worgenAI(Creature* creature) : ScriptedAI(creature)
+        npc_frenzied_worgenAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = creature->GetInstanceScript();
         }
@@ -516,19 +516,19 @@ enum FerociousSpells
     SPELL_STOMP                                 = 48131
 };
 
-class mob_ferocious_rhino : public CreatureScript
+class npc_ferocious_rhino : public CreatureScript
 {
 public:
-    mob_ferocious_rhino() : CreatureScript("mob_ferocious_rhino") { }
+    npc_ferocious_rhino() : CreatureScript("npc_ferocious_rhino") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_ferocious_rhinoAI (creature);
+        return new npc_ferocious_rhinoAI (creature);
     }
 
-    struct mob_ferocious_rhinoAI : public ScriptedAI
+    struct npc_ferocious_rhinoAI : public ScriptedAI
     {
-        mob_ferocious_rhinoAI(Creature* creature) : ScriptedAI(creature)
+        npc_ferocious_rhinoAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = creature->GetInstanceScript();
         }
@@ -636,19 +636,19 @@ enum MassiveAdds
   CREATURE_JORMUNGAR_WORM                     = 27228
 };
 
-class mob_massive_jormungar : public CreatureScript
+class npc_massive_jormungar : public CreatureScript
 {
 public:
-    mob_massive_jormungar() : CreatureScript("mob_massive_jormungar") { }
+    npc_massive_jormungar() : CreatureScript("npc_massive_jormungar") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_massive_jormungarAI (creature);
+        return new npc_massive_jormungarAI (creature);
     }
 
-    struct mob_massive_jormungarAI : public ScriptedAI
+    struct npc_massive_jormungarAI : public ScriptedAI
     {
-        mob_massive_jormungarAI(Creature* creature) : ScriptedAI(creature)
+        npc_massive_jormungarAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = creature->GetInstanceScript();
         }
@@ -742,19 +742,19 @@ public:
 
 };
 
-class mob_palehoof_orb : public CreatureScript
+class npc_palehoof_orb : public CreatureScript
 {
 public:
-    mob_palehoof_orb() : CreatureScript("mob_palehoof_orb") { }
+    npc_palehoof_orb() : CreatureScript("npc_palehoof_orb") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_palehoof_orbAI (creature);
+        return new npc_palehoof_orbAI (creature);
     }
 
-    struct mob_palehoof_orbAI : public ScriptedAI
+    struct npc_palehoof_orbAI : public ScriptedAI
     {
-        mob_palehoof_orbAI(Creature* creature) : ScriptedAI(creature)
+        npc_palehoof_orbAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = creature->GetInstanceScript();
         }
@@ -857,10 +857,10 @@ public:
 void AddSC_boss_palehoof()
 {
     new boss_palehoof();
-    new mob_ravenous_furbolg();
-    new mob_frenzied_worgen();
-    new mob_ferocious_rhino();
-    new mob_massive_jormungar();
-    new mob_palehoof_orb();
+    new npc_ravenous_furbolg();
+    new npc_frenzied_worgen();
+    new npc_ferocious_rhino();
+    new npc_massive_jormungar();
+    new npc_palehoof_orb();
     new go_palehoof_sphere();
 }

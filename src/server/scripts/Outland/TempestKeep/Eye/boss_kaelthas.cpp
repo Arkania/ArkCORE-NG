@@ -1401,17 +1401,17 @@ class boss_master_engineer_telonicus : public CreatureScript
 };
 
 //Flame Strike AI
-class mob_kael_flamestrike : public CreatureScript
+class npc_kael_flamestrike : public CreatureScript
 {
     public:
 
-        mob_kael_flamestrike()
-            : CreatureScript("mob_kael_flamestrike")
+        npc_kael_flamestrike()
+            : CreatureScript("npc_kael_flamestrike")
         {
         }
-        struct mob_kael_flamestrikeAI : public Scripted_NoMovementAI
+        struct npc_kael_flamestrikeAI : public Scripted_NoMovementAI
         {
-            mob_kael_flamestrikeAI(Creature* creature) : Scripted_NoMovementAI(creature) {}
+            npc_kael_flamestrikeAI(Creature* creature) : Scripted_NoMovementAI(creature) {}
 
             uint32 Timer;
             bool Casting;
@@ -1460,22 +1460,22 @@ class mob_kael_flamestrike : public CreatureScript
 
         CreatureAI* GetAI(Creature* creature) const
         {
-            return new mob_kael_flamestrikeAI(creature);
+            return new npc_kael_flamestrikeAI(creature);
         }
 };
 
 //Phoenix AI
-class mob_phoenix_tk : public CreatureScript
+class npc_phoenix_tk : public CreatureScript
 {
     public:
 
-        mob_phoenix_tk()
-            : CreatureScript("mob_phoenix_tk")
+        npc_phoenix_tk()
+            : CreatureScript("npc_phoenix_tk")
         {
         }
-        struct mob_phoenix_tkAI : public ScriptedAI
+        struct npc_phoenix_tkAI : public ScriptedAI
         {
-            mob_phoenix_tkAI(Creature* creature) : ScriptedAI(creature) {}
+            npc_phoenix_tkAI(Creature* creature) : ScriptedAI(creature) {}
 
             uint32 Cycle_Timer;
 
@@ -1514,22 +1514,22 @@ class mob_phoenix_tk : public CreatureScript
 
         CreatureAI* GetAI(Creature* creature) const
         {
-            return new mob_phoenix_tkAI(creature);
+            return new npc_phoenix_tkAI(creature);
         }
 };
 
 //Phoenix Egg AI
-class mob_phoenix_egg_tk : public CreatureScript
+class npc_phoenix_egg_tk : public CreatureScript
 {
     public:
 
-        mob_phoenix_egg_tk()
-            : CreatureScript("mob_phoenix_egg_tk")
+        npc_phoenix_egg_tk()
+            : CreatureScript("npc_phoenix_egg_tk")
         {
         }
-        struct mob_phoenix_egg_tkAI : public ScriptedAI
+        struct npc_phoenix_egg_tkAI : public ScriptedAI
         {
-            mob_phoenix_egg_tkAI(Creature* creature) : ScriptedAI(creature) {}
+            npc_phoenix_egg_tkAI(Creature* creature) : ScriptedAI(creature) {}
 
             uint32 Rebirth_Timer;
 
@@ -1575,7 +1575,7 @@ class mob_phoenix_egg_tk : public CreatureScript
 
         CreatureAI* GetAI(Creature* creature) const
         {
-            return new mob_phoenix_egg_tkAI(creature);
+            return new npc_phoenix_egg_tkAI(creature);
         }
 };
 
@@ -1586,7 +1586,7 @@ void AddSC_boss_kaelthas()
     new boss_lord_sanguinar();
     new boss_grand_astromancer_capernian();
     new boss_master_engineer_telonicus();
-    new mob_kael_flamestrike();
-    new mob_phoenix_tk();
-    new mob_phoenix_egg_tk();
+    new npc_kael_flamestrike();
+    new npc_phoenix_tk();
+    new npc_phoenix_egg_tk();
 }

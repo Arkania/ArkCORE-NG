@@ -100,18 +100,18 @@ enum eSpells
 
 typedef std::map<uint64, uint64> CubeMap;
 
-class mob_abyssal : public CreatureScript
+class npc_abyssal : public CreatureScript
 {
     public:
 
-        mob_abyssal()
-            : CreatureScript("mob_abyssal")
+        npc_abyssal()
+            : CreatureScript("npc_abyssal")
         {
         }
 
-        struct mob_abyssalAI : public ScriptedAI
+        struct npc_abyssalAI : public ScriptedAI
         {
-            mob_abyssalAI(Creature* creature) : ScriptedAI(creature)
+            npc_abyssalAI(Creature* creature) : ScriptedAI(creature)
             {
                 trigger = 0;
                 Despawn_Timer = 60000;
@@ -202,7 +202,7 @@ class mob_abyssal : public CreatureScript
 
         CreatureAI* GetAI(Creature* creature) const
         {
-            return new mob_abyssalAI(creature);
+            return new npc_abyssalAI(creature);
         }
 };
 
@@ -421,7 +421,7 @@ class boss_magtheridon : public CreatureScript
                         Creature* summon = me->SummonCreature(MOB_ABYSSAL, x, y, z, 0, TEMPSUMMON_CORPSE_DESPAWN, 0);
                         if (summon)
                         {
-                            CAST_AI(mob_abyssal::mob_abyssalAI, summon->AI())->SetTrigger(2);
+                            CAST_AI(npc_abyssal::npc_abyssalAI, summon->AI())->SetTrigger(2);
                             DoCast(summon, SPELL_BLAZE_TARGET, true);
                             summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                         }
@@ -454,7 +454,7 @@ class boss_magtheridon : public CreatureScript
                             target->GetPosition(x, y, z);
                             Creature* summon = me->SummonCreature(MOB_ABYSSAL, x, y, z, 0, TEMPSUMMON_CORPSE_DESPAWN, 0);
                             if (summon)
-                                CAST_AI(mob_abyssal::mob_abyssalAI, summon->AI())->SetTrigger(1);
+                                CAST_AI(npc_abyssal::npc_abyssalAI, summon->AI())->SetTrigger(1);
                         }
                         Debris_Timer = 10000;
                     }
@@ -472,18 +472,18 @@ class boss_magtheridon : public CreatureScript
         }
 };
 
-class mob_hellfire_channeler : public CreatureScript
+class npc_hellfire_channeler : public CreatureScript
 {
     public:
 
-        mob_hellfire_channeler()
-            : CreatureScript("mob_hellfire_channeler")
+        npc_hellfire_channeler()
+            : CreatureScript("npc_hellfire_channeler")
         {
         }
 
-        struct mob_hellfire_channelerAI : public ScriptedAI
+        struct npc_hellfire_channelerAI : public ScriptedAI
         {
-            mob_hellfire_channelerAI(Creature* creature) : ScriptedAI(creature)
+            npc_hellfire_channelerAI(Creature* creature) : ScriptedAI(creature)
             {
                 instance = creature->GetInstanceScript();
             }
@@ -587,7 +587,7 @@ class mob_hellfire_channeler : public CreatureScript
 
         CreatureAI* GetAI(Creature* creature) const
         {
-            return new mob_hellfire_channelerAI(creature);
+            return new npc_hellfire_channelerAI(creature);
         }
 };
 
@@ -627,8 +627,8 @@ public:
 void AddSC_boss_magtheridon()
 {
     new boss_magtheridon();
-    new mob_hellfire_channeler();
-    new mob_abyssal();
+    new npc_hellfire_channeler();
+    new npc_abyssal();
     new go_manticron_cube();
 }
 

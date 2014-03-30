@@ -224,19 +224,19 @@ public:
 
 };
 
-class mob_crystal_spike : public CreatureScript
+class npc_crystal_spike : public CreatureScript
 {
 public:
-    mob_crystal_spike() : CreatureScript("mob_crystal_spike") { }
+    npc_crystal_spike() : CreatureScript("npc_crystal_spike") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_crystal_spikeAI (creature);
+        return new npc_crystal_spikeAI (creature);
     }
 
-    struct mob_crystal_spikeAI : public Scripted_NoMovementAI
+    struct npc_crystal_spikeAI : public Scripted_NoMovementAI
     {
-        mob_crystal_spikeAI(Creature* creature) : Scripted_NoMovementAI(creature)
+        npc_crystal_spikeAI(Creature* creature) : Scripted_NoMovementAI(creature)
         {
         }
 
@@ -267,19 +267,19 @@ public:
 
 };
 
-class mob_crystalline_tangler : public CreatureScript
+class npc_crystalline_tangler : public CreatureScript
 {
 public:
-    mob_crystalline_tangler() : CreatureScript("mob_crystalline_tangler") { }
+    npc_crystalline_tangler() : CreatureScript("npc_crystalline_tangler") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_crystalline_tanglerAI (creature);
+        return new npc_crystalline_tanglerAI (creature);
     }
 
-    struct mob_crystalline_tanglerAI : public ScriptedAI
+    struct npc_crystalline_tanglerAI : public ScriptedAI
     {
-        mob_crystalline_tanglerAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_crystalline_tanglerAI(Creature* creature) : ScriptedAI(creature) {}
 
         uint32 uiRootsTimer;
 
@@ -306,6 +306,6 @@ public:
 void AddSC_boss_ormorok()
 {
     new boss_ormorok();
-    new mob_crystal_spike();
-    new mob_crystalline_tangler();
+    new npc_crystal_spike();
+    new npc_crystalline_tangler();
 }

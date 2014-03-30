@@ -516,14 +516,14 @@ public:
 #define ESSENCE_REMOVE 0
 #define ESSENCE_APPLY 1
 
-class mob_essence_of_twin : public CreatureScript
+class npc_essence_of_twin : public CreatureScript
 {
     public:
-        mob_essence_of_twin() : CreatureScript("mob_essence_of_twin") { }
+        npc_essence_of_twin() : CreatureScript("npc_essence_of_twin") { }
 
-        struct mob_essence_of_twinAI : public ScriptedAI
+        struct npc_essence_of_twinAI : public ScriptedAI
         {
-            mob_essence_of_twinAI(Creature* creature) : ScriptedAI(creature) { }
+            npc_essence_of_twinAI(Creature* creature) : ScriptedAI(creature) { }
 
             uint32 GetData(uint32 data)
             {
@@ -546,7 +546,7 @@ class mob_essence_of_twin : public CreatureScript
 
         CreatureAI* GetAI(Creature* creature) const
         {
-            return new mob_essence_of_twinAI(creature);
+            return new npc_essence_of_twinAI(creature);
         };
 
         bool OnGossipHello(Player* player, Creature* creature)
@@ -558,9 +558,9 @@ class mob_essence_of_twin : public CreatureScript
         }
 };
 
-struct mob_unleashed_ballAI : public ScriptedAI
+struct npc_unleashed_ballAI : public ScriptedAI
 {
-    mob_unleashed_ballAI(Creature* creature) : ScriptedAI(creature)
+    npc_unleashed_ballAI(Creature* creature) : ScriptedAI(creature)
     {
         instance = creature->GetInstanceScript();
     }
@@ -610,19 +610,19 @@ struct mob_unleashed_ballAI : public ScriptedAI
     }
 };
 
-class mob_unleashed_dark : public CreatureScript
+class npc_unleashed_dark : public CreatureScript
 {
 public:
-    mob_unleashed_dark() : CreatureScript("mob_unleashed_dark") { }
+    npc_unleashed_dark() : CreatureScript("npc_unleashed_dark") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_unleashed_darkAI(creature);
+        return new npc_unleashed_darkAI(creature);
     }
 
-    struct mob_unleashed_darkAI : public mob_unleashed_ballAI
+    struct npc_unleashed_darkAI : public npc_unleashed_ballAI
     {
-        mob_unleashed_darkAI(Creature* creature) : mob_unleashed_ballAI(creature) {}
+        npc_unleashed_darkAI(Creature* creature) : npc_unleashed_ballAI(creature) {}
 
         void UpdateAI(const uint32 uiDiff)
         {
@@ -651,19 +651,19 @@ public:
 
 };
 
-class mob_unleashed_light : public CreatureScript
+class npc_unleashed_light : public CreatureScript
 {
 public:
-    mob_unleashed_light() : CreatureScript("mob_unleashed_light") { }
+    npc_unleashed_light() : CreatureScript("npc_unleashed_light") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_unleashed_lightAI(creature);
+        return new npc_unleashed_lightAI(creature);
     }
 
-    struct mob_unleashed_lightAI : public mob_unleashed_ballAI
+    struct npc_unleashed_lightAI : public npc_unleashed_ballAI
     {
-        mob_unleashed_lightAI(Creature* creature) : mob_unleashed_ballAI(creature) {}
+        npc_unleashed_lightAI(Creature* creature) : npc_unleashed_ballAI(creature) {}
 
         void UpdateAI(const uint32 uiDiff)
         {
@@ -692,19 +692,19 @@ public:
 
 };
 
-class mob_bullet_controller : public CreatureScript
+class npc_bullet_controller : public CreatureScript
 {
 public:
-    mob_bullet_controller() : CreatureScript("mob_bullet_controller") { }
+    npc_bullet_controller() : CreatureScript("npc_bullet_controller") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_bullet_controllerAI(creature);
+        return new npc_bullet_controllerAI(creature);
     }
 
-    struct mob_bullet_controllerAI : public Scripted_NoMovementAI
+    struct npc_bullet_controllerAI : public Scripted_NoMovementAI
     {
-        mob_bullet_controllerAI(Creature* creature) : Scripted_NoMovementAI(creature)
+        npc_bullet_controllerAI(Creature* creature) : Scripted_NoMovementAI(creature)
         {
             Reset();
         }
@@ -882,10 +882,10 @@ void AddSC_boss_twin_valkyr()
 {
     new boss_fjola();
     new boss_eydis();
-    new mob_unleashed_light();
-    new mob_unleashed_dark();
-    new mob_essence_of_twin();
-    new mob_bullet_controller();
+    new npc_unleashed_light();
+    new npc_unleashed_dark();
+    new npc_essence_of_twin();
+    new npc_bullet_controller();
     new spell_powering_up();
     new spell_valkyr_essences();
     new spell_power_of_the_twins();

@@ -561,19 +561,19 @@ public:
     };
 };
 
-class mob_janalai_firebomb : public CreatureScript
+class npc_janalai_firebomb : public CreatureScript
 {
 public:
-    mob_janalai_firebomb() : CreatureScript("mob_janalai_firebomb") { }
+    npc_janalai_firebomb() : CreatureScript("npc_janalai_firebomb") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_janalai_firebombAI(creature);
+        return new npc_janalai_firebombAI(creature);
     }
 
-    struct mob_janalai_firebombAI : public ScriptedAI
+    struct npc_janalai_firebombAI : public ScriptedAI
     {
-        mob_janalai_firebombAI(Creature* creature) : ScriptedAI(creature)
+        npc_janalai_firebombAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = creature->GetInstanceScript();
             creature->SetReactState(REACT_PASSIVE);
@@ -585,19 +585,19 @@ public:
     };
 };
 
-class mob_janalai_hatcher : public CreatureScript
+class npc_janalai_hatcher : public CreatureScript
 {
 public:
-    mob_janalai_hatcher() : CreatureScript("mob_janalai_hatcher") { }
+    npc_janalai_hatcher() : CreatureScript("npc_janalai_hatcher") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_janalai_hatcherAI(creature);
+        return new npc_janalai_hatcherAI(creature);
     }
 
-    struct mob_janalai_hatcherAI : public ScriptedAI
+    struct npc_janalai_hatcherAI : public ScriptedAI
     {
-        mob_janalai_hatcherAI(Creature* creature) : ScriptedAI(creature)
+        npc_janalai_hatcherAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = creature->GetInstanceScript();
         }
@@ -669,19 +669,19 @@ public:
     };
 };
 
-class mob_janalai_hatchling : public CreatureScript
+class npc_janalai_hatchling : public CreatureScript
 {
 public:
-    mob_janalai_hatchling() : CreatureScript("mob_janalai_hatchling") { }
+    npc_janalai_hatchling() : CreatureScript("npc_janalai_hatchling") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_janalai_hatchlingAI(creature);
+        return new npc_janalai_hatchlingAI(creature);
     }
 
-    struct mob_janalai_hatchlingAI : public ScriptedAI
+    struct npc_janalai_hatchlingAI : public ScriptedAI
     {
-        mob_janalai_hatchlingAI(Creature* creature) : ScriptedAI(creature)
+        npc_janalai_hatchlingAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = creature->GetInstanceScript();
         }
@@ -721,19 +721,19 @@ public:
     };
 };
 
-class mob_janalai_egg : public CreatureScript
+class npc_janalai_egg : public CreatureScript
 {
 public:
-    mob_janalai_egg(): CreatureScript("mob_janalai_egg") {}
+    npc_janalai_egg(): CreatureScript("npc_janalai_egg") {}
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_janalai_eggAI(creature);
+        return new npc_janalai_eggAI(creature);
     }
 
-    struct mob_janalai_eggAI : public ScriptedAI
+    struct npc_janalai_eggAI : public ScriptedAI
     {
-        mob_janalai_eggAI(Creature* creature) : ScriptedAI(creature){}
+        npc_janalai_eggAI(Creature* creature) : ScriptedAI(creature){}
 
         void Reset() {}
         void EnterCombat(Unit* /*who*/) {}
@@ -745,8 +745,8 @@ public:
 void AddSC_boss_janalai()
 {
     new boss_janalai();
-    new mob_janalai_firebomb();
-    new mob_janalai_hatcher();
-    new mob_janalai_hatchling();
-    new mob_janalai_egg();
+    new npc_janalai_firebomb();
+    new npc_janalai_hatcher();
+    new npc_janalai_hatchling();
+    new npc_janalai_egg();
 }

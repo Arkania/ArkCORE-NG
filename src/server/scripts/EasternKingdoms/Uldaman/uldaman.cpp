@@ -25,7 +25,7 @@ SDCategory: Uldaman
 EndScriptData */
 
 /* ContentData
-mob_jadespine_basilisk
+npc_jadespine_basilisk
 npc_lore_keeper_of_norgannon
 go_keystone_chamber
 at_map_chamber
@@ -36,7 +36,7 @@ EndContentData */
 #include "uldaman.h"
 
 /*######
-## mob_jadespine_basilisk
+## npc_jadespine_basilisk
 ######*/
 
 enum eSpells
@@ -44,18 +44,18 @@ enum eSpells
     SPELL_CRYSTALLINE_SLUMBER   = 3636,
 };
 
-class mob_jadespine_basilisk : public CreatureScript
+class npc_jadespine_basilisk : public CreatureScript
 {
     public:
 
-        mob_jadespine_basilisk()
-            : CreatureScript("mob_jadespine_basilisk")
+        npc_jadespine_basilisk()
+            : CreatureScript("npc_jadespine_basilisk")
         {
         }
 
-        struct mob_jadespine_basiliskAI : public ScriptedAI
+        struct npc_jadespine_basiliskAI : public ScriptedAI
         {
-            mob_jadespine_basiliskAI(Creature* creature) : ScriptedAI(creature) {}
+            npc_jadespine_basiliskAI(Creature* creature) : ScriptedAI(creature) {}
 
             uint32 uiCslumberTimer;
 
@@ -99,7 +99,7 @@ class mob_jadespine_basilisk : public CreatureScript
 
         CreatureAI* GetAI(Creature* creature) const
         {
-            return new mob_jadespine_basiliskAI(creature);
+            return new npc_jadespine_basiliskAI(creature);
         }
 };
 
@@ -147,7 +147,7 @@ class AreaTrigger_at_map_chamber : public AreaTriggerScript
 
 void AddSC_uldaman()
 {
-    new mob_jadespine_basilisk();
+    new npc_jadespine_basilisk();
     new go_keystone_chamber();
     new AreaTrigger_at_map_chamber();
 }

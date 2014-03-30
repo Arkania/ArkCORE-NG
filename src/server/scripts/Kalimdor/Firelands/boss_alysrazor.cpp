@@ -382,14 +382,14 @@ enum Events
     EVENT_SUMMON_TALON           = 51
 };
 
-class mob_molten_feather : public CreatureScript // 53089
+class npc_molten_feather : public CreatureScript // 53089
 {
 public:
-    mob_molten_feather() : CreatureScript("mob_molten_feather") { }
+    npc_molten_feather() : CreatureScript("npc_molten_feather") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_molten_featherAI(creature);
+        return new npc_molten_featherAI(creature);
     }
 
     bool OnGossipHello(Player* player, Creature* creature)
@@ -403,28 +403,28 @@ public:
         return true;
     }
 
-    struct mob_molten_featherAI : public ScriptedAI
+    struct npc_molten_featherAI : public ScriptedAI
     {
-        mob_molten_featherAI(Creature* creature) : ScriptedAI(creature)
+        npc_molten_featherAI(Creature* creature) : ScriptedAI(creature)
         { 
             DoCast(me, SPELL_COSMETIC);
         }    
     };
 };
 
-class mob_incendiary_cloud : public CreatureScript // 53541
+class npc_incendiary_cloud : public CreatureScript // 53541
 {
 public:
-    mob_incendiary_cloud() : CreatureScript("mob_incendiary_cloud") { }
+    npc_incendiary_cloud() : CreatureScript("npc_incendiary_cloud") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_incendiary_cloudAI(creature);
+        return new npc_incendiary_cloudAI(creature);
     }
 
-    struct mob_incendiary_cloudAI : public ScriptedAI
+    struct npc_incendiary_cloudAI : public ScriptedAI
     {
-        mob_incendiary_cloudAI(Creature* creature) : ScriptedAI(creature)
+        npc_incendiary_cloudAI(Creature* creature) : ScriptedAI(creature)
         { 
             creature->SetDisplayId(11686);
         }
@@ -446,19 +446,19 @@ public:
     };
 };
 
-class mob_blazing_power : public CreatureScript // 53554
+class npc_blazing_power : public CreatureScript // 53554
 {
 public:
-    mob_blazing_power() : CreatureScript("mob_blazing_power") { }
+    npc_blazing_power() : CreatureScript("npc_blazing_power") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_blazing_powerAI(creature);
+        return new npc_blazing_powerAI(creature);
     }
 
-    struct mob_blazing_powerAI : public ScriptedAI
+    struct npc_blazing_powerAI : public ScriptedAI
     {
-        mob_blazing_powerAI(Creature* creature) : ScriptedAI(creature)
+        npc_blazing_powerAI(Creature* creature) : ScriptedAI(creature)
         { 
             creature->SetDisplayId(11686);
         }
@@ -2015,14 +2015,14 @@ class spell_hatchling_debuff : public SpellScriptLoader
 
 void AddSC_boss_alysrazor()
 {
-    new mob_molten_feather();
-    new mob_incendiary_cloud();
+    new npc_molten_feather();
+    new npc_incendiary_cloud();
     new boss_alysrazor();
     new npc_alysrazor_volcano();
     new npc_fier_tornado();
     new spell_molthen_feater();
     new spell_molthen();
-    new mob_blazing_power();
+    new npc_blazing_power();
     new npc_plumb_lava_worm();
     new npc_blazing_broodmother();
     new npc_molten_egg();

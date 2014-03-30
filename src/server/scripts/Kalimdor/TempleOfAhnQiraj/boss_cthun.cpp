@@ -926,10 +926,10 @@ public:
 
 };
 
-class mob_eye_tentacle : public CreatureScript
+class npc_eye_tentacle : public CreatureScript
 {
 public:
-    mob_eye_tentacle() : CreatureScript("mob_eye_tentacle") { }
+    npc_eye_tentacle() : CreatureScript("npc_eye_tentacle") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
@@ -999,10 +999,10 @@ public:
 
 };
 
-class mob_claw_tentacle : public CreatureScript
+class npc_claw_tentacle : public CreatureScript
 {
 public:
-    mob_claw_tentacle() : CreatureScript("mob_claw_tentacle") { }
+    npc_claw_tentacle() : CreatureScript("npc_claw_tentacle") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
@@ -1109,10 +1109,10 @@ public:
 
 };
 
-class mob_giant_claw_tentacle : public CreatureScript
+class npc_giant_claw_tentacle : public CreatureScript
 {
 public:
-    mob_giant_claw_tentacle() : CreatureScript("mob_giant_claw_tentacle") { }
+    npc_giant_claw_tentacle() : CreatureScript("npc_giant_claw_tentacle") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
@@ -1228,10 +1228,10 @@ public:
 
 };
 
-class mob_giant_eye_tentacle : public CreatureScript
+class npc_giant_eye_tentacle : public CreatureScript
 {
 public:
-    mob_giant_eye_tentacle() : CreatureScript("mob_giant_eye_tentacle") { }
+    npc_giant_eye_tentacle() : CreatureScript("npc_giant_eye_tentacle") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
@@ -1292,10 +1292,10 @@ public:
 
 };
 
-class mob_giant_flesh_tentacle : public CreatureScript
+class npc_giant_flesh_tentacle : public CreatureScript
 {
 public:
-    mob_giant_flesh_tentacle() : CreatureScript("mob_giant_flesh_tentacle") { }
+    npc_giant_flesh_tentacle() : CreatureScript("npc_giant_flesh_tentacle") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
@@ -1326,9 +1326,9 @@ void AddSC_boss_cthun()
 {
     new boss_eye_of_cthun();
     new boss_cthun();
-    new mob_eye_tentacle();
-    new mob_claw_tentacle();
-    new mob_giant_claw_tentacle();
-    new mob_giant_eye_tentacle();
-    new mob_giant_flesh_tentacle();
+    new npc_eye_tentacle();
+    new npc_claw_tentacle();
+    new npc_giant_claw_tentacle();
+    new npc_giant_eye_tentacle();
+    new npc_giant_flesh_tentacle();
 }

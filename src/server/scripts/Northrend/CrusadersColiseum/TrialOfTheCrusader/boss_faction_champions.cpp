@@ -468,19 +468,19 @@ enum eDruidSpells
     SPELL_NATURE_GRASP      = 66071, //1 min cd, self buff
 };
 
-class mob_toc_druid : public CreatureScript
+class npc_toc_druid : public CreatureScript
 {
 public:
-    mob_toc_druid() : CreatureScript("mob_toc_druid") { }
+    npc_toc_druid() : CreatureScript("npc_toc_druid") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_toc_druidAI (creature);
+        return new npc_toc_druidAI (creature);
     }
 
-    struct mob_toc_druidAI : public boss_faction_championsAI
+    struct npc_toc_druidAI : public boss_faction_championsAI
     {
-        mob_toc_druidAI(Creature* creature) : boss_faction_championsAI(creature, AI_HEALER) {}
+        npc_toc_druidAI(Creature* creature) : boss_faction_championsAI(creature, AI_HEALER) {}
 
         uint32 m_uiNatureGraspTimer;
         uint32 m_uiTranquilityTimer;
@@ -565,19 +565,19 @@ enum eShamanSpells
     AURA_SATED                  = 57724,
 };
 
-class mob_toc_shaman : public CreatureScript
+class npc_toc_shaman : public CreatureScript
 {
 public:
-    mob_toc_shaman() : CreatureScript("mob_toc_shaman") { }
+    npc_toc_shaman() : CreatureScript("npc_toc_shaman") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_toc_shamanAI (creature);
+        return new npc_toc_shamanAI (creature);
     }
 
-    struct mob_toc_shamanAI : public boss_faction_championsAI
+    struct npc_toc_shamanAI : public boss_faction_championsAI
     {
-        mob_toc_shamanAI(Creature* creature) : boss_faction_championsAI(creature, AI_HEALER) {}
+        npc_toc_shamanAI(Creature* creature) : boss_faction_championsAI(creature, AI_HEALER) {}
 
         uint32 m_uiHeroismOrBloodlustTimer;
         uint32 m_uiHexTimer;
@@ -659,19 +659,19 @@ enum ePaladinSpells
     SPELL_HAMMER_OF_JUSTICE   = 66613,
 };
 
-class mob_toc_paladin : public CreatureScript
+class npc_toc_paladin : public CreatureScript
 {
 public:
-    mob_toc_paladin() : CreatureScript("mob_toc_paladin") { }
+    npc_toc_paladin() : CreatureScript("npc_toc_paladin") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_toc_paladinAI (creature);
+        return new npc_toc_paladinAI (creature);
     }
 
-    struct mob_toc_paladinAI : public boss_faction_championsAI
+    struct npc_toc_paladinAI : public boss_faction_championsAI
     {
-        mob_toc_paladinAI(Creature* creature) : boss_faction_championsAI(creature, AI_HEALER) {}
+        npc_toc_paladinAI(Creature* creature) : boss_faction_championsAI(creature, AI_HEALER) {}
 
         uint32 m_uiBubbleTimer;
         uint32 m_uiHandOfProtectionTimer;
@@ -767,19 +767,19 @@ enum ePriestSpells
     SPELL_MANA_BURN         = 66100,
 };
 
-class mob_toc_priest : public CreatureScript
+class npc_toc_priest : public CreatureScript
 {
 public:
-    mob_toc_priest() : CreatureScript("mob_toc_priest") { }
+    npc_toc_priest() : CreatureScript("npc_toc_priest") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_toc_priestAI (creature);
+        return new npc_toc_priestAI (creature);
     }
 
-    struct mob_toc_priestAI : public boss_faction_championsAI
+    struct npc_toc_priestAI : public boss_faction_championsAI
     {
-        mob_toc_priestAI(Creature* creature) : boss_faction_championsAI(creature, AI_HEALER) {}
+        npc_toc_priestAI(Creature* creature) : boss_faction_championsAI(creature, AI_HEALER) {}
 
         uint32 m_uiPsychicScreamTimer;
         uint32 m_uiCommonTimer;
@@ -849,19 +849,19 @@ enum eShadowPriestSpells
     SPELL_SHADOWFORM        = 16592,
 };
 
-class mob_toc_shadow_priest : public CreatureScript
+class npc_toc_shadow_priest : public CreatureScript
 {
 public:
-    mob_toc_shadow_priest() : CreatureScript("mob_toc_shadow_priest") { }
+    npc_toc_shadow_priest() : CreatureScript("npc_toc_shadow_priest") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_toc_shadow_priestAI (creature);
+        return new npc_toc_shadow_priestAI (creature);
     }
 
-    struct mob_toc_shadow_priestAI : public boss_faction_championsAI
+    struct npc_toc_shadow_priestAI : public boss_faction_championsAI
     {
-        mob_toc_shadow_priestAI(Creature* creature) : boss_faction_championsAI(creature, AI_RANGED) {}
+        npc_toc_shadow_priestAI(Creature* creature) : boss_faction_championsAI(creature, AI_RANGED) {}
 
         uint32 m_uiPsychicScreamTimer;
         uint32 m_uiDispersionTimer;
@@ -963,19 +963,19 @@ enum WarlockSpells
     SPELL_SUMMON_FELHUNTER           = 67514,
 };
 
-class mob_toc_warlock : public CreatureScript
+class npc_toc_warlock : public CreatureScript
 {
 public:
-    mob_toc_warlock() : CreatureScript("mob_toc_warlock") { }
+    npc_toc_warlock() : CreatureScript("npc_toc_warlock") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_toc_warlockAI (creature);
+        return new npc_toc_warlockAI (creature);
     }
 
-    struct mob_toc_warlockAI : public boss_faction_championsAI
+    struct npc_toc_warlockAI : public boss_faction_championsAI
     {
-        mob_toc_warlockAI(Creature* creature) : boss_faction_championsAI(creature, AI_RANGED), Summons(me) {}
+        npc_toc_warlockAI(Creature* creature) : boss_faction_championsAI(creature, AI_RANGED), Summons(me) {}
 
         SummonList Summons;
 
@@ -1071,19 +1071,19 @@ enum eMageSpells
     SPELL_POLYMORPH         = 65801, //15s
 };
 
-class mob_toc_mage : public CreatureScript
+class npc_toc_mage : public CreatureScript
 {
 public:
-    mob_toc_mage() : CreatureScript("mob_toc_mage") { }
+    npc_toc_mage() : CreatureScript("npc_toc_mage") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_toc_mageAI (creature);
+        return new npc_toc_mageAI (creature);
     }
 
-    struct mob_toc_mageAI : public boss_faction_championsAI
+    struct npc_toc_mageAI : public boss_faction_championsAI
     {
-        mob_toc_mageAI(Creature* creature) : boss_faction_championsAI(creature, AI_RANGED) {}
+        npc_toc_mageAI(Creature* creature) : boss_faction_championsAI(creature, AI_RANGED) {}
 
         uint32 m_uiCounterspellTimer;
         uint32 m_uiBlinkTimer;
@@ -1175,19 +1175,19 @@ enum eHunterSpells
     SPELL_CALL_PET          = 67777,
 };
 
-class mob_toc_hunter : public CreatureScript
+class npc_toc_hunter : public CreatureScript
 {
 public:
-    mob_toc_hunter() : CreatureScript("mob_toc_hunter") { }
+    npc_toc_hunter() : CreatureScript("npc_toc_hunter") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_toc_hunterAI (creature);
+        return new npc_toc_hunterAI (creature);
     }
 
-    struct mob_toc_hunterAI : public boss_faction_championsAI
+    struct npc_toc_hunterAI : public boss_faction_championsAI
     {
-        mob_toc_hunterAI(Creature* creature) : boss_faction_championsAI(creature, AI_RANGED), Summons(me) {}
+        npc_toc_hunterAI(Creature* creature) : boss_faction_championsAI(creature, AI_RANGED), Summons(me) {}
 
         SummonList Summons;
 
@@ -1292,19 +1292,19 @@ enum eBoomkinSpells
     SPELL_WRATH             = 65862,
 };
 
-class mob_toc_boomkin : public CreatureScript
+class npc_toc_boomkin : public CreatureScript
 {
 public:
-    mob_toc_boomkin() : CreatureScript("mob_toc_boomkin") { }
+    npc_toc_boomkin() : CreatureScript("npc_toc_boomkin") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_toc_boomkinAI (creature);
+        return new npc_toc_boomkinAI (creature);
     }
 
-    struct mob_toc_boomkinAI : public boss_faction_championsAI
+    struct npc_toc_boomkinAI : public boss_faction_championsAI
     {
-        mob_toc_boomkinAI(Creature* creature) : boss_faction_championsAI(creature, AI_RANGED) {}
+        npc_toc_boomkinAI(Creature* creature) : boss_faction_championsAI(creature, AI_RANGED) {}
 
         uint32 m_uiBarkskinTimer;
         uint32 m_uiCycloneTimer;
@@ -1397,19 +1397,19 @@ enum eWarriorSpells
     SPELL_RETALIATION           = 65932,
 };
 
-class mob_toc_warrior : public CreatureScript
+class npc_toc_warrior : public CreatureScript
 {
 public:
-    mob_toc_warrior() : CreatureScript("mob_toc_warrior") { }
+    npc_toc_warrior() : CreatureScript("npc_toc_warrior") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_toc_warriorAI (creature);
+        return new npc_toc_warriorAI (creature);
     }
 
-    struct mob_toc_warriorAI : public boss_faction_championsAI
+    struct npc_toc_warriorAI : public boss_faction_championsAI
     {
-        mob_toc_warriorAI(Creature* creature) : boss_faction_championsAI(creature, AI_MELEE) {}
+        npc_toc_warriorAI(Creature* creature) : boss_faction_championsAI(creature, AI_MELEE) {}
 
         uint32 m_uiBladestormTimer;
         uint32 m_uiIntimidatingShoutTimer;
@@ -1512,19 +1512,19 @@ enum eDeathKnightSpells
     SPELL_STRANGULATE         = 66018, //2min
 };
 
-class mob_toc_dk : public CreatureScript
+class npc_toc_dk : public CreatureScript
 {
 public:
-    mob_toc_dk() : CreatureScript("mob_toc_dk") { }
+    npc_toc_dk() : CreatureScript("npc_toc_dk") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_toc_dkAI (creature);
+        return new npc_toc_dkAI (creature);
     }
 
-    struct mob_toc_dkAI : public boss_faction_championsAI
+    struct npc_toc_dkAI : public boss_faction_championsAI
     {
-        mob_toc_dkAI(Creature* creature) : boss_faction_championsAI(creature, AI_MELEE) {}
+        npc_toc_dkAI(Creature* creature) : boss_faction_championsAI(creature, AI_MELEE) {}
 
         uint32 m_uiIceboundFortitudeTimer;
         uint32 m_uiChainsOfIceTimer;
@@ -1615,19 +1615,19 @@ enum eRogueSpells
     SPELL_EVISCERATE            = 65957,
 };
 
-class mob_toc_rogue : public CreatureScript
+class npc_toc_rogue : public CreatureScript
 {
 public:
-    mob_toc_rogue() : CreatureScript("mob_toc_rogue") { }
+    npc_toc_rogue() : CreatureScript("npc_toc_rogue") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_toc_rogueAI (creature);
+        return new npc_toc_rogueAI (creature);
     }
 
-    struct mob_toc_rogueAI : public boss_faction_championsAI
+    struct npc_toc_rogueAI : public boss_faction_championsAI
     {
-        mob_toc_rogueAI(Creature* creature) : boss_faction_championsAI(creature, AI_MELEE) {}
+        npc_toc_rogueAI(Creature* creature) : boss_faction_championsAI(creature, AI_MELEE) {}
 
         uint32 m_uiFanOfKnivesTimer;
         uint32 m_uiHemorrhageTimer;
@@ -1715,19 +1715,19 @@ enum eEnhShamanSpells
     SPELL_STORMSTRIKE       = 65970,
 };
 
-class mob_toc_enh_shaman : public CreatureScript
+class npc_toc_enh_shaman : public CreatureScript
 {
 public:
-    mob_toc_enh_shaman() : CreatureScript("mob_toc_enh_shaman") { }
+    npc_toc_enh_shaman() : CreatureScript("npc_toc_enh_shaman") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_toc_enh_shamanAI (creature);
+        return new npc_toc_enh_shamanAI (creature);
     }
 
-    struct mob_toc_enh_shamanAI : public boss_faction_championsAI
+    struct npc_toc_enh_shamanAI : public boss_faction_championsAI
     {
-        mob_toc_enh_shamanAI(Creature* creature) : boss_faction_championsAI(creature, AI_MELEE), Summons(me) {}
+        npc_toc_enh_shamanAI(Creature* creature) : boss_faction_championsAI(creature, AI_MELEE), Summons(me) {}
 
         SummonList Summons;
 
@@ -1850,19 +1850,19 @@ enum eRetroPaladinSpells
     SPELL_SEAL_OF_COMMAND       = 66004, //no cd
 };
 
-class mob_toc_retro_paladin : public CreatureScript
+class npc_toc_retro_paladin : public CreatureScript
 {
 public:
-    mob_toc_retro_paladin() : CreatureScript("mob_toc_retro_paladin") { }
+    npc_toc_retro_paladin() : CreatureScript("npc_toc_retro_paladin") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_toc_retro_paladinAI (creature);
+        return new npc_toc_retro_paladinAI (creature);
     }
 
-    struct mob_toc_retro_paladinAI : public boss_faction_championsAI
+    struct npc_toc_retro_paladinAI : public boss_faction_championsAI
     {
-        mob_toc_retro_paladinAI(Creature* creature) : boss_faction_championsAI(creature, AI_MELEE) {}
+        npc_toc_retro_paladinAI(Creature* creature) : boss_faction_championsAI(creature, AI_MELEE) {}
 
         uint32 m_uiRepeteanceTimer;
         uint32 m_uiCrusaderStrikeTimer;
@@ -1944,19 +1944,19 @@ enum eWarlockPetSpells
     SPELL_SPELL_LOCK  = 67519,
 };
 
-class mob_toc_pet_warlock : public CreatureScript
+class npc_toc_pet_warlock : public CreatureScript
 {
 public:
-    mob_toc_pet_warlock() : CreatureScript("mob_toc_pet_warlock") { }
+    npc_toc_pet_warlock() : CreatureScript("npc_toc_pet_warlock") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_toc_pet_warlockAI (creature);
+        return new npc_toc_pet_warlockAI (creature);
     }
 
-    struct mob_toc_pet_warlockAI : public boss_faction_championsAI
+    struct npc_toc_pet_warlockAI : public boss_faction_championsAI
     {
-        mob_toc_pet_warlockAI(Creature* creature) : boss_faction_championsAI(creature, AI_PET) {}
+        npc_toc_pet_warlockAI(Creature* creature) : boss_faction_championsAI(creature, AI_PET) {}
 
         uint32 m_uiDevourMagicTimer;
         uint32 m_uiSpellLockTimer;
@@ -1996,19 +1996,19 @@ enum eHunterPetSpells
     SPELL_CLAW  = 67793,
 };
 
-class mob_toc_pet_hunter : public CreatureScript
+class npc_toc_pet_hunter : public CreatureScript
 {
 public:
-    mob_toc_pet_hunter() : CreatureScript("mob_toc_pet_hunter") { }
+    npc_toc_pet_hunter() : CreatureScript("npc_toc_pet_hunter") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_toc_pet_hunterAI (creature);
+        return new npc_toc_pet_hunterAI (creature);
     }
 
-    struct mob_toc_pet_hunterAI : public boss_faction_championsAI
+    struct npc_toc_pet_hunterAI : public boss_faction_championsAI
     {
-        mob_toc_pet_hunterAI(Creature* creature) : boss_faction_championsAI(creature, AI_PET) {}
+        npc_toc_pet_hunterAI(Creature* creature) : boss_faction_championsAI(creature, AI_PET) {}
 
         uint32 m_uiClawTimer;
 
@@ -2071,21 +2071,21 @@ class spell_faction_champion_warl_unstable_affliction : public SpellScriptLoader
 void AddSC_boss_faction_champions()
 {
     new boss_toc_champion_controller();
-    new mob_toc_druid();
-    new mob_toc_shaman();
-    new mob_toc_paladin();
-    new mob_toc_priest();
-    new mob_toc_shadow_priest();
-    new mob_toc_mage();
-    new mob_toc_warlock();
-    new mob_toc_hunter();
-    new mob_toc_boomkin();
-    new mob_toc_warrior();
-    new mob_toc_dk();
-    new mob_toc_rogue();
-    new mob_toc_enh_shaman();
-    new mob_toc_retro_paladin();
-    new mob_toc_pet_warlock();
-    new mob_toc_pet_hunter();
+    new npc_toc_druid();
+    new npc_toc_shaman();
+    new npc_toc_paladin();
+    new npc_toc_priest();
+    new npc_toc_shadow_priest();
+    new npc_toc_mage();
+    new npc_toc_warlock();
+    new npc_toc_hunter();
+    new npc_toc_boomkin();
+    new npc_toc_warrior();
+    new npc_toc_dk();
+    new npc_toc_rogue();
+    new npc_toc_enh_shaman();
+    new npc_toc_retro_paladin();
+    new npc_toc_pet_warlock();
+    new npc_toc_pet_hunter();
     new spell_faction_champion_warl_unstable_affliction();
 }

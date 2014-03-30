@@ -291,19 +291,19 @@ enum eSpells
     SPELL_INGVAR_TRANSFORM                      = 42796
 };
 
-class mob_annhylde_the_caller : public CreatureScript
+class npc_annhylde_the_caller : public CreatureScript
 {
 public:
-    mob_annhylde_the_caller() : CreatureScript("mob_annhylde_the_caller") { }
+    npc_annhylde_the_caller() : CreatureScript("npc_annhylde_the_caller") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_annhylde_the_callerAI (creature);
+        return new npc_annhylde_the_callerAI (creature);
     }
 
-    struct mob_annhylde_the_callerAI : public ScriptedAI
+    struct npc_annhylde_the_callerAI : public ScriptedAI
     {
-        mob_annhylde_the_callerAI(Creature* creature) : ScriptedAI(creature)
+        npc_annhylde_the_callerAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = creature->GetInstanceScript();
         }
@@ -407,19 +407,19 @@ enum eShadowAxe
     POINT_TARGET                                = 28
 };
 
-class mob_ingvar_throw_dummy : public CreatureScript
+class npc_ingvar_throw_dummy : public CreatureScript
 {
 public:
-    mob_ingvar_throw_dummy() : CreatureScript("mob_ingvar_throw_dummy") { }
+    npc_ingvar_throw_dummy() : CreatureScript("npc_ingvar_throw_dummy") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_ingvar_throw_dummyAI (creature);
+        return new npc_ingvar_throw_dummyAI (creature);
     }
 
-    struct mob_ingvar_throw_dummyAI : public ScriptedAI
+    struct npc_ingvar_throw_dummyAI : public ScriptedAI
     {
-        mob_ingvar_throw_dummyAI(Creature* creature) : ScriptedAI(creature)
+        npc_ingvar_throw_dummyAI(Creature* creature) : ScriptedAI(creature)
         {
         }
 
@@ -458,6 +458,6 @@ public:
 void AddSC_boss_ingvar_the_plunderer()
 {
     new boss_ingvar_the_plunderer();
-    new mob_annhylde_the_caller();
-    new mob_ingvar_throw_dummy();
+    new npc_annhylde_the_caller();
+    new npc_ingvar_throw_dummy();
 }

@@ -49,16 +49,16 @@ enum Creatures
     NPC_WEST_FROSTWOLF_WARMASTER                  = 14777
 };
 
-class mob_av_marshal_or_warmaster : public CreatureScript
+class npc_av_marshal_or_warmaster : public CreatureScript
 {
     public:
 
-        mob_av_marshal_or_warmaster()
-            : CreatureScript("mob_av_marshal_or_warmaster") {}
+        npc_av_marshal_or_warmaster()
+            : CreatureScript("npc_av_marshal_or_warmaster") {}
 
-        struct mob_av_marshal_or_warmasterAI : public ScriptedAI
+        struct npc_av_marshal_or_warmasterAI : public ScriptedAI
         {
-            mob_av_marshal_or_warmasterAI(Creature* creature) : ScriptedAI(creature) {}
+            npc_av_marshal_or_warmasterAI(Creature* creature) : ScriptedAI(creature) {}
 
             uint32 ChargeTimer;
             uint32 CleaveTimer;
@@ -176,11 +176,11 @@ class mob_av_marshal_or_warmaster : public CreatureScript
 
         CreatureAI* GetAI(Creature* creature) const
         {
-            return new mob_av_marshal_or_warmasterAI(creature);
+            return new npc_av_marshal_or_warmasterAI(creature);
         }
 };
 
 void AddSC_alterac_valley()
 {
-    new mob_av_marshal_or_warmaster();
+    new npc_av_marshal_or_warmaster();
 }

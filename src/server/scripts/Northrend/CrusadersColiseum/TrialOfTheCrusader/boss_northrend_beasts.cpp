@@ -251,19 +251,19 @@ public:
 
 };
 
-class mob_snobold_vassal : public CreatureScript
+class npc_snobold_vassal : public CreatureScript
 {
 public:
-    mob_snobold_vassal() : CreatureScript("mob_snobold_vassal") { }
+    npc_snobold_vassal() : CreatureScript("npc_snobold_vassal") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_snobold_vassalAI(creature);
+        return new npc_snobold_vassalAI(creature);
     }
 
-    struct mob_snobold_vassalAI : public ScriptedAI
+    struct npc_snobold_vassalAI : public ScriptedAI
     {
-        mob_snobold_vassalAI(Creature* creature) : ScriptedAI(creature)
+        npc_snobold_vassalAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = creature->GetInstanceScript();
             if (instance)
@@ -711,19 +711,19 @@ public:
     }
 };
 
-class mob_slime_pool : public CreatureScript
+class npc_slime_pool : public CreatureScript
 {
 public:
-    mob_slime_pool() : CreatureScript("mob_slime_pool") { }
+    npc_slime_pool() : CreatureScript("npc_slime_pool") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_slime_poolAI(creature);
+        return new npc_slime_poolAI(creature);
     }
 
-    struct mob_slime_poolAI : public ScriptedAI
+    struct npc_slime_poolAI : public ScriptedAI
     {
-        mob_slime_poolAI(Creature* creature) : ScriptedAI(creature)
+        npc_slime_poolAI(Creature* creature) : ScriptedAI(creature)
         {
         }
 
@@ -1001,9 +1001,9 @@ public:
 void AddSC_boss_northrend_beasts()
 {
     new boss_gormok();
-    new mob_snobold_vassal();
+    new npc_snobold_vassal();
     new boss_acidmaw();
     new boss_dreadscale();
-    new mob_slime_pool();
+    new npc_slime_pool();
     new boss_icehowl();
 }

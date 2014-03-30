@@ -70,19 +70,19 @@ EndScriptData */
 #define SAY_FREE                -1548019
 #define SAY_DEATH               -1548020
 
-class mob_inner_demon : public CreatureScript
+class npc_inner_demon : public CreatureScript
 {
 public:
-    mob_inner_demon() : CreatureScript("mob_inner_demon") { }
+    npc_inner_demon() : CreatureScript("npc_inner_demon") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_inner_demonAI (creature);
+        return new npc_inner_demonAI (creature);
     }
 
-    struct mob_inner_demonAI : public ScriptedAI
+    struct npc_inner_demonAI : public ScriptedAI
     {
-        mob_inner_demonAI(Creature* creature) : ScriptedAI(creature)
+        npc_inner_demonAI(Creature* creature) : ScriptedAI(creature)
         {
             victimGUID = 0;
         }
@@ -680,19 +680,19 @@ public:
     };
 };
 
-class mob_greyheart_spellbinder : public CreatureScript
+class npc_greyheart_spellbinder : public CreatureScript
 {
 public:
-    mob_greyheart_spellbinder() : CreatureScript("mob_greyheart_spellbinder") { }
+    npc_greyheart_spellbinder() : CreatureScript("npc_greyheart_spellbinder") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_greyheart_spellbinderAI (creature);
+        return new npc_greyheart_spellbinderAI (creature);
     }
 
-    struct mob_greyheart_spellbinderAI : public ScriptedAI
+    struct npc_greyheart_spellbinderAI : public ScriptedAI
     {
-        mob_greyheart_spellbinderAI(Creature* creature) : ScriptedAI(creature)
+        npc_greyheart_spellbinderAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = creature->GetInstanceScript();
             leotherasGUID = 0;
@@ -820,6 +820,6 @@ void AddSC_boss_leotheras_the_blind()
 {
     new boss_leotheras_the_blind();
     new boss_leotheras_the_blind_demonform();
-    new mob_greyheart_spellbinder();
-    new mob_inner_demon();
+    new npc_greyheart_spellbinder();
+    new npc_inner_demon();
 }
