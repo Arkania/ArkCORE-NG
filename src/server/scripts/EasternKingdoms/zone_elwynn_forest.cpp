@@ -93,7 +93,7 @@ public:
 
     struct npc_blackrock_battle_worgAI : public ScriptedAI
     {
-        npc_blackrock_battle_worgAI(Creature creature) : ScriptedAI(creature) {}
+        npc_blackrock_battle_worgAI(Creature *c) : ScriptedAI(c) {}
 
         uint32 Attack1HTimer;        	
 
@@ -140,7 +140,7 @@ public:
 
     struct npc_stormwind_infantryAI : public ScriptedAI
     {
-        npc_stormwind_infantryAI(Creature creature) : ScriptedAI(creature) {}
+        npc_stormwind_infantryAI(Creature *c) : ScriptedAI(c) {}
 
         uint32 uiSayTimer;
         uint32 Attack1HTimer;
@@ -209,7 +209,7 @@ public:
 	
     struct npc_blackrock_spyAI : public ScriptedAI
     {		
-        npc_blackrock_spyAI(Creature creature) : ScriptedAI(creature) {}
+        npc_blackrock_spyAI(Creature *c) : ScriptedAI(c) {}
        	
 		uint32 Phase;
 		uint32 Emote;
@@ -291,7 +291,7 @@ public:
 
     struct npc_goblin_assassinAI : public ScriptedAI
     {
-        npc_goblin_assassinAI(Creature creature) : ScriptedAI(creature)
+        npc_goblin_assassinAI(Creature *c) : ScriptedAI(c)
         {
             if (!me->IsInCombat() && !me->HasAura(SPELL_SPYING))
                 DoCast(SPELL_SNEAKING);
@@ -433,7 +433,7 @@ public:
 	
     struct npc_injured_soldier_dummyAI : public ScriptedAI
     {
-        npc_injured_soldier_dummyAI(Creature creature) : ScriptedAI(creature) { }
+        npc_injured_soldier_dummyAI(Creature *creature) : ScriptedAI(creature) { }
 		  
 		uint32 phase;
 		uint32 timer;
@@ -482,7 +482,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* pCreature) const  
+    CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_injured_soldier_dummyAI (creature);
     }
@@ -499,7 +499,7 @@ public:
 
     struct npc_brother_paxtonAI : public ScriptedAI
     {
-        npc_brother_paxtonAI(Creature creature) : ScriptedAI(creature)
+        npc_brother_paxtonAI(Creature *c) : ScriptedAI(c)
         {
             me->GetMotionMaster()->MovePath(951, true);
 			// if (!me->HasAura(SPELL_REVIVE)) DoCast(me, SPELL_REVIVE);
@@ -569,7 +569,7 @@ public:
         uint32 lifeTimer;
         bool spellHit;
 
-        npc_henze_faulkAI(Creature creature) : ScriptedAI(creature) {}
+        npc_henze_faulkAI(Creature *c) : ScriptedAI(c) {}
 
         void Reset()  
         {
