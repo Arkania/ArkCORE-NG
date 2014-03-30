@@ -381,7 +381,7 @@ void AddSC_zone_the_maelstrom();
 void AddSC_zone_lost_isles();
 void AddSC_zone_deepholm();
 void AddSC_zone_darkmoon_island();
-
+void AddSC_zone_echo_isles();
 
 // Cataclysm scripts here
     //Firelands
@@ -1146,6 +1146,7 @@ void AddKalimdorScripts()
 	AddSC_zone_lost_isles();
 	AddSC_zone_deepholm();
 	AddSC_zone_darkmoon_island();
+	AddSC_zone_echo_isles();
 
     // Cataclysm scripts here
     
