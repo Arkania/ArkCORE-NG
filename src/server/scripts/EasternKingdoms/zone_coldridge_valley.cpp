@@ -68,7 +68,7 @@ public:
 
     struct npc_rockjaw_invaderAI : public ScriptedAI
     {
-        npc_rockjaw_invaderAI(Creature *c) : ScriptedAI(c) {}
+        npc_rockjaw_invaderAI(Creature сreature) : ScriptedAI(сreature) {}
 
         uint32 Attack1HTimer;            
 
@@ -97,9 +97,9 @@ public:
         }
     };
 
-       CreatureAI* GetAI(Creature* pCreature) const  
+       CreatureAI* GetAI(Creature* сreature) const  
     {
-        return new npc_rockjaw_invaderAI (pCreature);
+        return new npc_rockjaw_invaderAI (сreature);
     }
 };
 
@@ -114,7 +114,7 @@ public:
 
     struct npc_coldridge_defenderAI : public ScriptedAI
     {
-        npc_coldridge_defenderAI(Creature *c) : ScriptedAI(c) {}
+        npc_coldridge_defenderAI(Creature creature) : ScriptedAI(creature) {}
 
         uint32 Attack1HTimer;            
 
@@ -143,9 +143,9 @@ public:
         }
     };
 
-       CreatureAI* GetAI(Creature* pCreature) const  
+       CreatureAI* GetAI(Creature* creature) const  
     {
-        return new npc_coldridge_defenderAI (pCreature);
+        return new npc_coldridge_defenderAI (creature);
     }
 };
 
@@ -235,7 +235,7 @@ public:
 
     struct npc_soothsayer_shikalaAI : public ScriptedAI
     {
-        npc_soothsayer_shikalaAI(Creature *c) : ScriptedAI(c) {}
+        npc_soothsayer_shikalaAI(Creature creature) : ScriptedAI(creature) {}
 
         uint32 timer;  
         uint32 phase;
@@ -324,9 +324,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* pCreature) const  
+    CreatureAI* GetAI(Creature* creature) const  
     {
-        return new npc_soothsayer_shikalaAI (pCreature);
+        return new npc_soothsayer_shikalaAI (creature);
     }
 };
 
@@ -341,7 +341,7 @@ public:
 
     struct npc_soothsayer_rikkariAI : public ScriptedAI
     {
-        npc_soothsayer_rikkariAI(Creature *c) : ScriptedAI(c) {}
+        npc_soothsayer_rikkariAI(Creature сreature) : ScriptedAI(сreature) {}
 
         uint32 timer;  
         uint32 phase;
@@ -430,9 +430,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* pCreature) const  
+    CreatureAI* GetAI(Creature* сreature) const  
     {
-        return new npc_soothsayer_rikkariAI (pCreature);
+        return new npc_soothsayer_rikkariAI (creature);
     }
 };
 
@@ -447,7 +447,7 @@ public:
 
     struct npc_soothsayer_mirimkoaAI : public ScriptedAI
     {
-        npc_soothsayer_mirimkoaAI(Creature *c) : ScriptedAI(c) {}
+        npc_soothsayer_mirimkoaAI(Creature сreature) : ScriptedAI(сreature) {}
 
         uint32 timer;  
         uint32 phase;
@@ -536,9 +536,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* pCreature) const  
+    CreatureAI* GetAI(Creature* creature) const  
     {
-        return new npc_soothsayer_mirimkoaAI (pCreature);
+        return new npc_soothsayer_mirimkoaAI (creature);
     }
 };
 
