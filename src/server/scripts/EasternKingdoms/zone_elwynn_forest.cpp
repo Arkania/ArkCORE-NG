@@ -93,7 +93,7 @@ public:
 
     struct npc_blackrock_battle_worgAI : public ScriptedAI
     {
-        npc_blackrock_battle_worgAI(Creature *c) : ScriptedAI(c) {}
+        npc_blackrock_battle_worgAI(Creature creature) : ScriptedAI(creature) {}
 
         uint32 Attack1HTimer;        	
 
@@ -123,9 +123,9 @@ public:
         }
     };
 
-	   CreatureAI* GetAI(Creature* pCreature) const  
+       CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_blackrock_battle_worgAI (pCreature);
+        return new npc_blackrock_battle_worgAI (creature);
     }
 };
 
@@ -140,7 +140,7 @@ public:
 
     struct npc_stormwind_infantryAI : public ScriptedAI
     {
-        npc_stormwind_infantryAI(Creature *c) : ScriptedAI(c) {}
+        npc_stormwind_infantryAI(Creature creature) : ScriptedAI(creature) {}
 
         uint32 uiSayTimer;
         uint32 Attack1HTimer;
@@ -192,9 +192,9 @@ public:
 		}
     };
 
-	CreatureAI* GetAI(Creature* pCreature) const  
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_stormwind_infantryAI (pCreature);
+        return new npc_stormwind_infantryAI (creature);
     }
 };
 
@@ -209,7 +209,7 @@ public:
 	
     struct npc_blackrock_spyAI : public ScriptedAI
     {		
-		npc_blackrock_spyAI(Creature *c) : ScriptedAI(c) {}
+        npc_blackrock_spyAI(Creature creature) : ScriptedAI(creature) {}
        	
 		uint32 Phase;
 		uint32 Emote;
@@ -274,9 +274,9 @@ public:
 		}
     };
 
-	CreatureAI* GetAI(Creature* pCreature) const  
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_blackrock_spyAI (pCreature);
+        return new npc_blackrock_spyAI (creature);
     }
 };
 
@@ -291,7 +291,7 @@ public:
 
     struct npc_goblin_assassinAI : public ScriptedAI
     {
-        npc_goblin_assassinAI(Creature *c) : ScriptedAI(c)
+        npc_goblin_assassinAI(Creature creature) : ScriptedAI(creature)
         {
             if (!me->IsInCombat() && !me->HasAura(SPELL_SPYING))
                 DoCast(SPELL_SNEAKING);
@@ -311,9 +311,9 @@ public:
         }
     };
 
-	 CreatureAI* GetAI(Creature* pCreature) const  
+     CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_goblin_assassinAI (pCreature);
+        return new npc_goblin_assassinAI (creature);
     }
 };
 
@@ -433,7 +433,7 @@ public:
 	
     struct npc_injured_soldier_dummyAI : public ScriptedAI
     {
-        npc_injured_soldier_dummyAI(Creature *pCreature) : ScriptedAI(pCreature) {}
+        npc_injured_soldier_dummyAI(Creature creature) : ScriptedAI(creature) { }
 		  
 		uint32 phase;
 		uint32 timer;
@@ -484,7 +484,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const  
     {
-        return new npc_injured_soldier_dummyAI (pCreature);
+        return new npc_injured_soldier_dummyAI (creature);
     }
 };
 
@@ -499,7 +499,7 @@ public:
 
     struct npc_brother_paxtonAI : public ScriptedAI
     {
-        npc_brother_paxtonAI(Creature *c) : ScriptedAI(c)
+        npc_brother_paxtonAI(Creature creature) : ScriptedAI(creature)
         {
             me->GetMotionMaster()->MovePath(951, true);
 			// if (!me->HasAura(SPELL_REVIVE)) DoCast(me, SPELL_REVIVE);
@@ -539,9 +539,9 @@ public:
 		}		
     };
 
-	CreatureAI* GetAI(Creature* pCreature) const  
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_brother_paxtonAI (pCreature);
+        return new npc_brother_paxtonAI (creature);
     }
 };
 
@@ -559,9 +559,9 @@ class npc_henze_faulk : public CreatureScript
 public:
     npc_henze_faulk() : CreatureScript("npc_henze_faulk") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const  
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_henze_faulkAI (pCreature);
+        return new npc_henze_faulkAI (creature);
     }
 
     struct npc_henze_faulkAI : public ScriptedAI
@@ -569,7 +569,7 @@ public:
         uint32 lifeTimer;
         bool spellHit;
 
-        npc_henze_faulkAI(Creature *c) : ScriptedAI(c) {}
+        npc_henze_faulkAI(Creature creature) : ScriptedAI(creature) {}
 
         void Reset()  
         {
