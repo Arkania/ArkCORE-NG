@@ -99,6 +99,7 @@ enum Opcodes
     CMSG_BUYBACK_ITEM                                 = 0x6C17,
     CMSG_BUY_BANK_SLOT                                = 0x0425,
     CMSG_BUY_ITEM                                     = 0x0736,
+    CMSG_BUY_STABLE_SLOT                              = 0x1273,
     CMSG_CALENDAR_ADD_EVENT                           = 0x0726,
     CMSG_CALENDAR_ARENA_TEAM                          = 0x0204,
     CMSG_CALENDAR_COMPLAIN                            = 0x4C36,
@@ -187,7 +188,6 @@ enum Opcodes
     CMSG_DISMISS_CRITTER                              = 0x4227,
     CMSG_DUEL_ACCEPTED                                = 0x2136,
     CMSG_DUEL_CANCELLED                               = 0x6624,
-   // CMSG_LFG_LOCK_INFO_REQUEST                        = 0x0412,
     CMSG_EJECT_PASSENGER                              = 0x6927,
     CMSG_EMOTE                                        = 0x4C26,
     CMSG_ENABLETAXI                                   = 0x0C16,
@@ -201,6 +201,9 @@ enum Opcodes
     CMSG_GAMEOBJECT_QUERY                             = 0x4017,
     CMSG_GAMEOBJ_REPORT_USE                           = 0x4827,
     CMSG_GAMEOBJ_USE                                  = 0x4E17,
+    CMSG_GAMESPEED_SET                                = 0x0000,
+    CMSG_GAMETIME_SET                                 = 0x0000,
+    CMSG_GETDEATHBINDZONE                             = 0x0000,
     CMSG_GET_MAIL_LIST                                = 0x4D37,
     CMSG_GET_MIRRORIMAGE_DATA                         = 0x0C25,
     CMSG_GHOST                                        = 0x0000,
@@ -297,6 +300,7 @@ enum Opcodes
     CMSG_LFG_LEAVE                                    = 0x2433,
     CMSG_LFG_LFR_JOIN                                 = 0x0531,
     CMSG_LFG_LFR_LEAVE                                = 0x0500,
+    CMSG_LFG_LOCK_INFO_REQUEST                        = 0x0412,
     CMSG_LFG_PARTY_LOCK_INFO_REQUEST                  = 0x0000,
     CMSG_LFG_PROPOSAL_RESULT                          = 0x0403,
     CMSG_LFG_SET_BOOT_VOTE                            = 0x04B3,
@@ -367,7 +371,7 @@ enum Opcodes
     CMSG_MOVE_FORCE_WALK_SPEED_CHANGE_ACK             = 0x7210,
     CMSG_MOVE_GRAVITY_DISABLE_ACK                     = 0x3118,
     CMSG_MOVE_GRAVITY_ENABLE_ACK                      = 0x700A,
-    CMSG_MOVE_HOVER_ACK                               = 0x3318, // 4.3.4 15595
+    CMSG_MOVE_HOVER_ACK                               = 0x3318,
     CMSG_MOVE_KNOCK_BACK_ACK                          = 0x721C,
     CMSG_MOVE_NOT_ACTIVE_MOVER                        = 0x7A1A,
     CMSG_MOVE_SET_CAN_FLY                             = 0x720E,
@@ -480,6 +484,8 @@ enum Opcodes
     CMSG_ROLE_POLL_BEGIN                              = 0x0430,
     CMSG_SAVE_CUF_PROFILES                            = 0x730E,
     CMSG_SAVE_PLAYER                                  = 0x0000,
+    CMSG_SEARCH_LFG_JOIN                              = 0x0000,
+    CMSG_SEARCH_LFG_LEAVE                             = 0x0000,
     CMSG_SELF_RES                                     = 0x6115,
     CMSG_SELL_ITEM                                    = 0x4E15,
     CMSG_SEND_MAIL                                    = 0x0523,
@@ -502,6 +508,7 @@ enum Opcodes
     CMSG_SET_FACTION_CHEAT                            = 0x0000,
     CMSG_SET_FACTION_INACTIVE                         = 0x0E37,
     CMSG_SET_GUILD_BANK_TEXT                          = 0x3023,
+    CMSG_SET_LFG_COMMENT                              = 0x0000,
     CMSG_SET_PET_SLOT                                 = 0x3A04,
     CMSG_SET_PLAYER_DECLINED_NAMES                    = 0x6316,
     CMSG_SET_PREFERED_CEMETERY                        = 0x311E,
@@ -523,6 +530,9 @@ enum Opcodes
     CMSG_SPELLCLICK                                   = 0x0805,
     CMSG_SPIRIT_HEALER_ACTIVATE                       = 0x2E26,
     CMSG_SPLIT_ITEM                                   = 0x0F17,
+    CMSG_STABLE_PET                                   = 0x1271,
+    CMSG_STABLE_REVIVE_PET                            = 0x1275,
+    CMSG_STABLE_SWAP_PET                              = 0x1276,
     CMSG_STANDSTATECHANGE                             = 0x0535,
     CMSG_START_QUEST                                  = 0x0000,
     CMSG_STOP_DANCE                                   = 0x2907,
@@ -535,6 +545,8 @@ enum Opcodes
     CMSG_SWAP_INV_ITEM                                = 0x2614,
     CMSG_SWAP_ITEM                                    = 0x6326,
     CMSG_SYNC_DANCE                                   = 0x0036,
+    CMSG_TAXICLEARALLNODES                            = 0x0000,
+    CMSG_TAXIENABLEALLNODES                           = 0x0000,
     CMSG_TAXINODE_STATUS_QUERY                        = 0x2F25,
     CMSG_TAXIQUERYAVAILABLENODES                      = 0x6C06,
     CMSG_TAXISHOWNODES                                = 0x0000,
@@ -557,6 +569,7 @@ enum Opcodes
     CMSG_UNLEARN_SKILL                                = 0x6106,
     CMSG_UNLEARN_SPECIALIZATION                       = 0x3210,
     CMSG_UNREGISTER_ALL_ADDON_PREFIXES                = 0x3D54,
+    CMSG_UNSTABLE_PET                                 = 0x1272,
     CMSG_UPDATE_ACCOUNT_DATA                          = 0x4736,
     CMSG_UPDATE_MISSILE_TRAJECTORY                    = 0x781E,
     CMSG_UPDATE_PROJECTILE_POSITION                   = 0x0E24,
@@ -585,13 +598,7 @@ enum Opcodes
     MSG_GM_SHOWLABEL                                  = 0x0000,
     MSG_GM_SUMMON                                     = 0x0000,
     MSG_INSPECT_ARENA_TEAMS                           = 0x2704,
-    MSG_LIST_STABLED_PETS                             = 0x0834, // hope this works (4.3.4)
-    CMSG_STABLE_PET                                   = 0x1271, // hope this works (4.3.4)
-    CMSG_UNSTABLE_PET                                 = 0x1272, // hope this works (4.3.4)
-    CMSG_BUY_STABLE_SLOT                              = 0x1273, // hope this works (4.3.4)
-    SMSG_STABLE_RESULT                                = 0x2204, // hope this works (4.3.4)
-    CMSG_STABLE_REVIVE_PET                            = 0x1275, // hope this works (4.3.4)
-    CMSG_STABLE_SWAP_PET                              = 0x1276, // hope this works (4.3.4)
+    MSG_LIST_STABLED_PETS                             = 0x0834,
     MSG_MINIMAP_PING                                  = 0x6635,
     MSG_MOVE_CHARM_TELEPORT_CHEAT                     = 0x7A08,
     MSG_MOVE_FALL_LAND                                = 0x380A,
@@ -631,13 +638,18 @@ enum Opcodes
     MSG_MOVE_STOP_STRAFE                              = 0x3002,
     MSG_MOVE_STOP_SWIM                                = 0x3802,
     MSG_MOVE_STOP_TURN                                = 0x331E,
+    //MSG_MOVE_TELEPORT                                 = 0x55A0,
+    //MSG_MOVE_TELEPORT_ACK                             = 0x390C,
     MSG_MOVE_TELEPORT_CHEAT                           = 0x3A10,
     MSG_MOVE_TIME_SKIPPED                             = 0x19B3,
     MSG_MOVE_TOGGLE_COLLISION_CHEAT                   = 0x7B04,
     MSG_MOVE_TOGGLE_FALL_LOGGING                      = 0x0000,
     MSG_MOVE_TOGGLE_LOGGING                           = 0x0000,
     MSG_MOVE_UPDATE_CAN_FLY                           = 0x0000,
+    //MSG_MOVE_UPDATE_FLIGHT_SPEED                      = 0x30B1,
     MSG_MOVE_UPDATE_MOUSE                             = 0x0000,
+    //MSG_MOVE_UPDATE_RUN_SPEED                         = 0x14A6,
+    //MSG_MOVE_UPDATE_TELEPORT                          = 0x50B2,
     MSG_MOVE_WATER_WALK                               = 0x0000,
     MSG_MOVE_WORLDPORT_ACK                            = 0x2411,
     MSG_NOTIFY_PARTY_SQUELCH                          = 0x4D06,
@@ -782,8 +794,8 @@ enum Opcodes
     SMSG_CHAT_WRONG_FACTION                           = 0x6724,
     SMSG_CHECK_FOR_BOTS                               = 0x0000,
     SMSG_CLEAR_BOSS_EMOTES                            = 0x19A3,
-    SMSG_CLEAR_COOLDOWNS                              = 0x59B4,
     SMSG_CLEAR_COOLDOWN                               = 0x0627,
+    SMSG_CLEAR_COOLDOWNS                              = 0x59B4,
     SMSG_CLEAR_FAR_SIGHT_IMMEDIATE                    = 0x2A04,
     SMSG_CLEAR_TARGET                                 = 0x4B26,
     SMSG_CLIENTCACHE_VERSION                          = 0x2734,
@@ -966,6 +978,7 @@ enum Opcodes
     SMSG_INSPECT_RATED_BG_STATS                       = 0x19A5,
     SMSG_INSPECT_RESULTS_UPDATE                       = 0x0C14,
     SMSG_INSPECT_TALENT                               = 0x4014,
+    SMSG_INSTANCE_DIFFICULTY                          = 0x0000,
     SMSG_INSTANCE_LOCK_WARNING_QUERY                  = 0x4F17,
     SMSG_INSTANCE_RESET                               = 0x6F05,
     SMSG_INSTANCE_RESET_FAILED                        = 0x4725,
@@ -994,6 +1007,7 @@ enum Opcodes
     SMSG_LFG_DISABLED                                 = 0x0815,
     SMSG_LFG_JOIN_RESULT                              = 0x38B6,
     SMSG_LFG_OFFER_CONTINUE                           = 0x6B27,
+    SMSG_LFG_OPEN_FROM_GOSSIP                         = 0x0000,
     SMSG_LFG_PARTY_INFO                               = 0x2325,
     SMSG_LFG_PLAYER_INFO                              = 0x4B36,
     SMSG_LFG_PLAYER_REWARD                            = 0x6834,
@@ -1240,12 +1254,16 @@ enum Opcodes
     SMSG_SERVER_INFO_RESPONSE                         = 0x74B5,
     SMSG_SERVER_MESSAGE                               = 0x6C04,
     SMSG_SERVER_PERF                                  = 0x74B6,
+    SMSG_SETUP_RESEARCH_HISTORY                       = 0x0000,
+    SMSG_SET_AI_ANIM_KIT                              = 0x0000,
     SMSG_SET_DF_FAST_LAUNCH_RESULT                    = 0x35B6,
     SMSG_SET_FACTION_ATWAR                            = 0x4216,
     SMSG_SET_FACTION_STANDING                         = 0x0126,
     SMSG_SET_FACTION_VISIBLE                          = 0x2525,
     SMSG_SET_FLAT_SPELL_MODIFIER                      = 0x2834,
     SMSG_SET_FORCED_REACTIONS                         = 0x4615,
+    SMSG_SET_MELEE_ANIM_KIT                           = 0x0000,
+    SMSG_SET_MOVEMENT_ANIM_KIT                        = 0x0000,
     SMSG_SET_PCT_SPELL_MODIFIER                       = 0x0224,
     SMSG_SET_PHASE_SHIFT                              = 0x70A0,
     SMSG_SET_PLAYER_DECLINED_NAMES_RESULT             = 0x2B25,
@@ -1306,6 +1324,7 @@ enum Opcodes
     SMSG_SPLINE_MOVE_UNSET_FLYING                     = 0x58A6,
     SMSG_SPLINE_MOVE_UNSET_HOVER                      = 0x7DA5,
     SMSG_SPLINE_MOVE_WATER_WALK                       = 0x50A2,
+    SMSG_STABLE_RESULT                                = 0x2204,
     SMSG_STANDSTATE_UPDATE                            = 0x6F04,
     SMSG_START_MIRROR_TIMER                           = 0x6824,
     SMSG_START_TIMER                                  = 0x59A5,
@@ -1416,32 +1435,75 @@ typedef void(WorldSession::*pOpcodeHandler)(WorldPacket& recvPacket);
 struct OpcodeHandler
 {
     OpcodeHandler() {}
-    OpcodeHandler(char const* _name, char const* _compressedName, SessionStatus _status, PacketProcessing _processing, pOpcodeHandler _handler)
-        : name(_name), compressedName(_compressedName), status(_status), packetProcessing(_processing), handler(_handler) {}
+    OpcodeHandler(char const* _name, SessionStatus _status, PacketProcessing _processing, pOpcodeHandler _handler)
+        : Name(_name), Status(_status), ProcessingPlace(_processing), Handler(_handler) {}
 
-    char const* name;
-    char const* compressedName;
-    SessionStatus status;
-    PacketProcessing packetProcessing;
-    pOpcodeHandler handler;
+    char const* Name;
+    SessionStatus Status;
+    PacketProcessing ProcessingPlace;
+    pOpcodeHandler Handler;
 };
 
-extern OpcodeHandler* opcodeTable[NUM_OPCODE_HANDLERS];
+class OpcodeTable
+{
+    public:
+        OpcodeTable()
+        {
+            memset(_internalTable, 0, sizeof(_internalTable));
+        }
+
+        ~OpcodeTable()
+        {
+            for (uint16 i = 0; i < NUM_OPCODE_HANDLERS; ++i)
+                delete _internalTable[i];
+        }
+
+        void Initialize();
+
+        OpcodeHandler const* operator[](uint32 index) const
+        {
+            return _internalTable[index];
+        }
+
+    private:
+        template<bool isInValidRange, bool isNonZero>
+        void ValidateAndSetOpcode(uint16 opcode, char const* name, SessionStatus status, PacketProcessing processing, pOpcodeHandler handler);
+
+        // Prevent copying this structure
+        OpcodeTable(OpcodeTable const&);
+        OpcodeTable& operator=(OpcodeTable const&);
+
+        OpcodeHandler* _internalTable[NUM_OPCODE_HANDLERS];
+};
+
+extern OpcodeTable opcodeTable;
+
 void InitOpcodes();
 
 /// Lookup opcode name for human understandable logging
-inline const char* LookupOpcodeName(Opcodes id)
+inline std::string GetOpcodeNameForLogging(Opcodes id)
 {
+    uint32 opcode = uint32(id);
+    std::ostringstream ss;
+    ss << '[';
+
     if (id < UNKNOWN_OPCODE)
     {
-        bool isCompressed = uint32(id) & COMPRESSED_OPCODE_MASK;
-        if (OpcodeHandler* handler = opcodeTable[uint32(id) & 0x7FFF])
-            return isCompressed ? handler->compressedName : handler->name;
-
-        return "UNKNOWN OPCODE";
+        if (OpcodeHandler const* handler = opcodeTable[uint32(id) & 0x7FFF])
+        {
+            ss << handler->Name;
+            if (opcode & COMPRESSED_OPCODE_MASK)
+                ss << "_COMPRESSED";
+        }
+        else
+            ss << "UNKNOWN OPCODE";
     }
+    else
+        ss << "INVALID OPCODE";
 
-    return "INVALID OPCODE";
+    ss << " 0x" << std::hex << std::uppercase << opcode << std::nouppercase << " (" << std::dec << opcode << ")]";
+    return ss.str();
 }
+
 #endif
 /// @}

@@ -35,9 +35,9 @@
 #define PET_XP_FACTOR 0.05f
 
 Pet::Pet(Player* owner, PetType type) : Guardian(NULL, owner, true),
-m_usedTalentCount(0), m_removed(false), m_owner(owner),
-m_petType(type), m_duration(0),
-m_auraRaidUpdateMask(0), m_loading(false), m_declinedname(NULL)
+    m_usedTalentCount(0), m_removed(false), m_owner(owner),
+    m_petType(type), m_duration(0),
+    m_auraRaidUpdateMask(0), m_loading(false), m_declinedname(NULL)
 {
     m_unitTypeMask |= UNIT_MASK_PET;
     if (type == HUNTER_PET)
@@ -78,7 +78,6 @@ void Pet::AddToWorld()
         GetCharmInfo()->SetIsFollowing(false);
         GetCharmInfo()->SetIsReturning(false);
     }
-
 }
 
 void Pet::RemoveFromWorld()
@@ -496,7 +495,7 @@ void Pet::SavePetToDB(PetSaveMode mode)
         for (uint32 i = ACTION_BAR_INDEX_START; i < ACTION_BAR_INDEX_END; ++i)
         {
             ss << uint32(m_charmInfo->GetActionBarEntry(i)->GetType()) << ' '
-                << uint32(m_charmInfo->GetActionBarEntry(i)->GetAction()) << ' ';
+               << uint32(m_charmInfo->GetActionBarEntry(i)->GetAction()) << ' ';
         };
 
         ss  << "', "
@@ -626,7 +625,7 @@ void Pet::Update(uint32 diff)
             {
                 if (owner->GetPetGUID() != GetGUID())
                 {
-                    sLog->outError("Pet %u is not pet of owner %s, removed", GetEntry(), m_owner->GetName());
+                    sLog->outError("Pet %u is not pet of owner %s, removed", GetEntry(), m_owner->GetName().c_str());
                     Remove(PET_SLOT_ACTUAL_PET_SLOT);
                     return;
                 }

@@ -909,7 +909,7 @@ void AchievementMgr<T>::SendAchievementEarned(AchievementEntry const* achievemen
     if (achievement->flags & (ACHIEVEMENT_FLAG_REALM_FIRST_KILL | ACHIEVEMENT_FLAG_REALM_FIRST_REACH))
     {
         // broadcast realm first reached
-        WorldPacket data(SMSG_SERVER_FIRST_ACHIEVEMENT, strlen(GetOwner()->GetName()) + 1 + 8 + 4 + 4);
+        WorldPacket data(SMSG_SERVER_FIRST_ACHIEVEMENT, GetOwner()->GetName().size() + 1 + 8 + 4 + 4);
         data << GetOwner()->GetName();
         data << uint64(GetOwner()->GetGUID());
         data << uint32(achievement->ID);
@@ -1097,7 +1097,7 @@ void AchievementMgr<T>::UpdateAchievementCriteria(AchievementCriteriaTypes type,
     if (referencePlayer->isGameMaster())
     {
         sLog->outDebug(LOG_FILTER_ACHIEVEMENTSYS, "UpdateAchievementCriteria: [Player %s GM mode on] %s, %s (%u), " UI64FMTD ", " UI64FMTD ", " UI64FMTD
-            , referencePlayer->GetName(), GetLogNameForGuid(GetOwner()->GetGUID()), AchievementGlobalMgr::GetCriteriaTypeString(type), type, miscValue1, miscValue2, miscValue3);
+            , referencePlayer->GetName().c_str(), GetLogNameForGuid(GetOwner()->GetGUID()), AchievementGlobalMgr::GetCriteriaTypeString(type), type, miscValue1, miscValue2, miscValue3);
         return;
     }
 
@@ -1863,7 +1863,7 @@ void AchievementMgr<Player>::CompletedAchievement(AchievementEntry const* achiev
         SendAchievementEarned(achievement);
 
     sLog->outString("AchievementMgr::CompletedAchievement(%u). Player: %s (%u)",
-        achievement->ID, GetOwner()->GetName(), GetOwner()->GetGUIDLow());
+        achievement->ID, GetOwner()->GetName().c_str(), GetOwner()->GetGUIDLow());
 
     CompletedAchievementData& ca = m_completedAchievements[achievement->ID];
     ca.date = time(NULL);
@@ -2748,7 +2748,7 @@ bool AchievementMgr<T>::AdditionalRequirementsSatisfied(AchievementCriteriaEntry
                     return false;
 
                 // So tiny hack to prevent crash by calling .empty without existing index
-                if (!(reqValue >= 0 && reqValue < TOTAL_AURAS))
+                if (!/*(reqValue >= 0 && */reqValue < TOTAL_AURAS/*)*/)
                     return false;
                 
                 if (!unit || !unit->HasAuraType(AuraType(reqValue)))

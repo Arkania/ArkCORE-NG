@@ -395,7 +395,7 @@ public:
 
             if (phase == PHASE_GROUND) // Ground phase
             {
-                std::list<HostileReference*>& m_threatlist = me->getThreatManager().getThreatList();
+                ThreatContainer::StorageType const &threatlist = me->getThreatManager().getThreatList();
 
                 while (uint32 eventId = events.ExecuteEvent())
                 {
@@ -417,8 +417,8 @@ public:
 
                         case EVENT_MODULATION:
                             DoCast(me, SPELL_MODULATION);
-                            for (std::list<HostileReference*>::const_iterator i = m_threatlist.begin(); i!= m_threatlist.end(); ++i)
-                                if (Unit* unit = Unit::GetUnit(*me, (*i)->getUnitGuid()))
+                            for (ThreatContainer::StorageType::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
+                                if (Unit* unit = Unit::GetUnit(*me, (*itr)->getUnitGuid()))
                                     unit->SetPower(POWER_ALTERNATE_POWER, unit->GetPower(POWER_ALTERNATE_POWER) + 7);
 
                             events.ScheduleEvent(EVENT_MODULATION, 20000);
@@ -478,7 +478,7 @@ public:
             else if (phase == PHASE_FLIGHT) // Air phase
             {
                 std::list<Unit*> targets;
-                std::list<HostileReference*>& m_threatlist = me->getThreatManager().getThreatList();
+                ThreatContainer::StorageType const &m_threatlist = me->getThreatManager().getThreatList();
 
                 // if has vertigo, remove all roaring flame npc's wait 8 sec then get player who rang gong.
                 if (me->HasAura(SPELL_VERTIGO))
@@ -489,7 +489,7 @@ public:
                     switch (eventId)
                     {
                         case EVENT_ROARING_FLAME_SUMMON:
-                            for (std::list<HostileReference*>::const_iterator i = m_threatlist.begin(); i!= m_threatlist.end(); ++i)
+                            for (ThreatContainer::StorageType::const_iterator i = m_threatlist.begin(); i != m_threatlist.end(); ++i)
                             {
                                 Unit* unit = Unit::GetUnit(*me, (*i)->getUnitGuid());
                                 if (unit && unit->HasAura(SPELL_NOISY)) // You rang? :)

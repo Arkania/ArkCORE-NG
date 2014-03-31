@@ -1,10 +1,11 @@
-/*Copyright (C) 2014 Arkania Project.
-*
-* Script 99% done. 1% = Testing live.
-*
-* THIS particular file is NOT free software; third-party users should NOT have access to it, redistribute it or modify it. :)
-* We need to think up a better copyright than this. Who's your third party on the net dude, dude? Should NOT? Er must nicht!
-*/
+/*
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ *
+ * THIS particular file is NOT free software; third-party users should 
+ * NOT have access to it, redistribute it or modify it.
+ * We need to think up a better copyright than this. Who's your third party
+ * on the net dude, dude? Should NOT? Er must nicht!
+ */
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"

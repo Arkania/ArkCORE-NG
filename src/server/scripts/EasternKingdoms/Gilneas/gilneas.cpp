@@ -10458,11 +10458,10 @@ public:
             if (me->GetHealth() > damage)
                 return;
 
-            std::list<HostileReference*> tList = me->getThreatManager().getThreatList();
+            ThreatContainer::StorageType const & ThreatList = me->getThreatManager().getThreatList();
 
-            if (!tList.empty())
-
-                for (std::list<HostileReference*>::const_iterator itr = tList.begin(); itr != tList.end(); ++itr)
+            if (!ThreatList.empty())
+                for (ThreatContainer::StorageType::const_iterator itr = ThreatList.begin(); itr != ThreatList.end(); ++itr)
                     if (Unit* target = Unit::GetUnit(*me, (*itr)->getUnitGuid()))
                         if (Player* player = target->ToPlayer())
                             player->KilledMonsterCredit(NPC_DARK_RANGER_THYALA, 0);

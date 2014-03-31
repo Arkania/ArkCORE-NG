@@ -734,7 +734,8 @@ void AddSC_shadowmoon_valley();
 void AddSC_shattrath_city();
 void AddSC_terokkar_forest();
 void AddSC_zangarmarsh();
-
+// Events
+void AddSC_event_childrens_week();
 // Maelstrom
 void AddSC_kezan();
 // StoneCore
@@ -1164,7 +1165,7 @@ void AddKalimdorScripts()
     AddSC_zone_lost_isles();
     AddSC_zone_deepholm();
     AddSC_zone_darkmoon_island();
-	AddSC_zone_echo_isles();
+    AddSC_zone_echo_isles();
 
     // Cataclysm scripts here
     
@@ -1541,6 +1542,13 @@ void AddMaelstromScripts()
   AddSC_boss_azil();
   AddSC_stonecore();
   AddSC_instance_stonecore();
+#endif
+}
+
+void AddEventScripts()
+{
+#ifdef SCRIPTS
+    AddSC_event_childrens_week();
 #endif
 }
 

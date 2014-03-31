@@ -596,7 +596,7 @@ public:
             return true;
         }
 
-        void CalculateOvertime(AuraEffect const* aurEff, int32& amount, bool& canBeRecalculated)
+        void CalculateOvertime(AuraEffect const* /*aurEff*/, int32& amount, bool& canBeRecalculated)
         {
             if (AuraEffect const* longWord = GetCaster()->GetDummyAuraEffect(SPELLFAMILY_PALADIN, 4127, 1))
             {

@@ -37,7 +37,7 @@ public:
         static ChatCommand titlesSetCommandTable[] =
         {
             { "mask",           SEC_GAMEMASTER,     false, &HandleTitlesSetMaskCommand,        "", NULL },
-            { NULL,             0,                  false, NULL,                               "", NULL }
+            { NULL,             SEC_PLAYER,         false, NULL,                               "", NULL }
         };
         static ChatCommand titlesCommandTable[] =
         {
@@ -45,17 +45,17 @@ public:
             { "current",        SEC_GAMEMASTER,     false, &HandleTitlesCurrentCommand,        "", NULL },
             { "remove",         SEC_GAMEMASTER,     false, &HandleTitlesRemoveCommand,         "", NULL },
             { "set",            SEC_GAMEMASTER,     false, NULL,              "", titlesSetCommandTable },
-            { NULL,             0,                  false, NULL,                               "", NULL }
+            { NULL,             SEC_PLAYER,         false, NULL,                               "", NULL }
         };
         static ChatCommand commandTable[] =
         {
             { "titles",         SEC_GAMEMASTER,     false, NULL,                 "", titlesCommandTable },
-            { NULL,             0,                  false, NULL,                               "", NULL }
+            { NULL,             SEC_PLAYER,         false, NULL,                               "", NULL }
         };
         return commandTable;
     }
 
-    static bool HandleTitlesCurrentCommand(ChatHandler* handler, const char* args)
+    static bool HandleTitlesCurrentCommand(ChatHandler* handler, char const* args)
     {
         // number or [name] Shift-click form |color|Htitle:title_id|h[name]|h|r
         char* id_p = handler->extractKeyFromLink((char*)args, "Htitle");
@@ -100,7 +100,7 @@ public:
         return true;
     }
 
-    static bool HandleTitlesAddCommand(ChatHandler* handler, const char* args)
+    static bool HandleTitlesAddCommand(ChatHandler* handler, char const* args)
     {
         // number or [name] Shift-click form |color|Htitle:title_id|h[name]|h|r
         char* id_p = handler->extractKeyFromLink((char*)args, "Htitle");
@@ -137,9 +137,8 @@ public:
 
         std::string tNameLink = handler->GetNameLink(target);
 
-        char const* targetName = target->GetName();
         char titleNameStr[80];
-        snprintf(titleNameStr, 80, titleInfo->name, targetName);
+        snprintf(titleNameStr, 80, titleInfo->name, target->GetName().c_str());
 
         target->SetTitle(titleInfo);
         handler->PSendSysMessage(LANG_TITLE_ADD_RES, id, titleNameStr, tNameLink.c_str());
@@ -147,7 +146,7 @@ public:
         return true;
     }
 
-    static bool HandleTitlesRemoveCommand(ChatHandler* handler, const char* args)
+    static bool HandleTitlesRemoveCommand(ChatHandler* handler, char const* args)
     {
         // number or [name] Shift-click form |color|Htitle:title_id|h[name]|h|r
         char* id_p = handler->extractKeyFromLink((char*)args, "Htitle");
@@ -186,9 +185,8 @@ public:
 
         std::string tNameLink = handler->GetNameLink(target);
 
-        char const* targetName = target->GetName();
         char titleNameStr[80];
-        snprintf(titleNameStr, 80, titleInfo->name, targetName);
+        snprintf(titleNameStr, 80, titleInfo->name, target->GetName().c_str());
 
         handler->PSendSysMessage(LANG_TITLE_REMOVE_RES, id, titleNameStr, tNameLink.c_str());
 
@@ -202,7 +200,7 @@ public:
     }
 
     //Edit Player KnownTitles
-    static bool HandleTitlesSetMaskCommand(ChatHandler* handler, const char* args)
+    static bool HandleTitlesSetMaskCommand(ChatHandler* handler, char const* args)
     {
         if (!*args)
             return false;

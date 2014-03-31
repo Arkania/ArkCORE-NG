@@ -25,7 +25,6 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include "DatabaseEnv.h"
-
 #include "CellImpl.h"
 #include "Chat.h"
 #include "ChannelMgr.h"
@@ -89,7 +88,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             type = CHAT_MSG_RAID_WARNING;
             break;
         default:
-            sLog->outDetail("HandleMessagechatOpcode : Unknown chat opcode (%u)", recvData.GetOpcode());
+            sLog->outError("HandleMessagechatOpcode : Unknown chat opcode (%u)", recvData.GetOpcode());
             recvData.hexlike();
             return;
     }
@@ -166,7 +165,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                     break;
                 default:
                     sLog->outError("Player %s (GUID: %u) sent a chatmessage with an invalid language/message type combination", 
-                                                         GetPlayer()->GetName(), GetPlayer()->GetGUIDLow());
+                                                         GetPlayer()->GetName().c_str(), GetPlayer()->GetGUIDLow());
             
                     recvData.rfinish();
                     return;
@@ -225,7 +224,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 
     if (sender->HasAura(1852) && type != CHAT_MSG_WHISPER)
     {
-        SendNotification(GetTrinityString(LANG_GM_SILENCE), sender->GetName());
+        SendNotification(GetTrinityString(LANG_GM_SILENCE), sender->GetName().c_str());
         recvData.rfinish();
         return;
     }
@@ -284,7 +283,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 
             if (sWorld->getIntConfig(CONFIG_CHAT_STRICT_LINK_CHECKING_SEVERITY) && !ChatHandler(this).isValidChatMessage(msg.c_str()))
             {
-                sLog->outError("Player %s (GUID: %u) sent a chatmessage with an invalid link: %s", GetPlayer()->GetName(),
+                sLog->outError("Player %s (GUID: %u) sent a chatmessage with an invalid link: %s", GetPlayer()->GetName().c_str(),
                     GetPlayer()->GetGUIDLow(), msg.c_str());
 
                 if (sWorld->getIntConfig(CONFIG_CHAT_STRICT_LINK_CHECKING_KICK))
@@ -328,7 +327,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 break;
             }
 
-            Player* receiver = sObjectAccessor->FindPlayerByName(to.c_str());
+            Player* receiver = sObjectAccessor->FindPlayerByName(to);
             bool senderIsPlayer = AccountMgr::IsPlayerAccount(GetSecurity());
             bool receiverIsPlayer = AccountMgr::IsPlayerAccount(receiver ? receiver->GetSession()->GetSecurity() : SEC_PLAYER);
             if (!receiver || (senderIsPlayer && !receiverIsPlayer && !receiver->isAcceptWhispers() && !receiver->IsInWhisperWhiteList(sender->GetGUID())))
@@ -346,7 +345,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 
             if (GetPlayer()->HasAura(1852) && !receiver->isGameMaster())
             {
-                SendNotification(GetTrinityString(LANG_GM_SILENCE), GetPlayer()->GetName());
+                SendNotification(GetTrinityString(LANG_GM_SILENCE), GetPlayer()->GetName().c_str());
                 return;
             }
 
@@ -463,13 +462,11 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 }
             }
 
-            if (ChannelMgr* cMgr = channelMgr(_player->GetTeam()))
+            if (ChannelMgr* cMgr = ChannelMgr::forTeam(_player->GetTeam()))
             {
-
                 if (Channel* chn = cMgr->GetChannel(channel, _player))
                 {
                     sScriptMgr->OnPlayerChat(_player, type, lang, msg, chn);
-
                     chn->Say(_player->GetGUID(), msg.c_str(), lang);
                 }
             }
@@ -542,7 +539,7 @@ void WorldSession::HandleAddonMessagechatOpcode(WorldPacket& recvData)
             type = CHAT_MSG_WHISPER;
             break;
         default:
-            sLog->outDetail("HandleAddonMessagechatOpcode: Unknown addon chat opcode (%u)", recvData.GetOpcode());
+            sLog->outError("HandleAddonMessagechatOpcode: Unknown addon chat opcode (%u)", recvData.GetOpcode());
             recvData.hexlike();
             return;
     }
@@ -654,7 +651,7 @@ void WorldSession::HandleAddonMessagechatOpcode(WorldPacket& recvData)
     }
 }
 
-void WorldSession::HandleEmoteOpcode(WorldPacket & recvData)
+void WorldSession::HandleEmoteOpcode(WorldPacket& recvData)
 {
     if (!GetPlayer()->IsAlive() || GetPlayer()->HasUnitState(UNIT_STATE_DIED))
         return;
@@ -675,18 +672,18 @@ namespace Trinity
 
             void operator()(WorldPacket& data, LocaleConstant loc_idx)
             {
-                char const* nam = i_target ? i_target->GetNameForLocaleIdx(loc_idx) : NULL;
-                uint32 namlen = (nam ? strlen(nam) : 0) + 1;
+                std::string const name(i_target ? i_target->GetNameForLocaleIdx(loc_idx) : "");
+                uint32 namlen = name.size();
 
-                data.Initialize(SMSG_TEXT_EMOTE, (20+namlen));
+                data.Initialize(SMSG_TEXT_EMOTE, 20 + namlen);
                 data << i_player.GetGUID();
-                data << (uint32)i_text_emote;
-                data << i_emote_num;
-                data << (uint32)namlen;
+                data << uint32(i_text_emote);
+                data << uint32(i_emote_num);
+                data << uint32(namlen);
                 if (namlen > 1)
-                    data.append(nam, namlen);
+                    data << name;
                 else
-                    data << (uint8)0x00;
+                    data << uint8(0x00);
             }
 
         private:
@@ -697,7 +694,7 @@ namespace Trinity
     };
 }                                                           // namespace Trinity
 
-void WorldSession::HandleTextEmoteOpcode(WorldPacket & recvData)
+void WorldSession::HandleTextEmoteOpcode(WorldPacket& recvData)
 {
     if (!GetPlayer()->IsAlive())
         return;
@@ -783,7 +780,7 @@ void WorldSession::HandleChatIgnoredOpcode(WorldPacket& recvData)
         return;
 
     WorldPacket data;
-    ChatHandler::FillMessageData(&data, this, CHAT_MSG_IGNORED, LANG_UNIVERSAL, NULL, GetPlayer()->GetGUID(), GetPlayer()->GetName(), NULL);
+    ChatHandler::FillMessageData(&data, this, CHAT_MSG_IGNORED, LANG_UNIVERSAL, NULL, GetPlayer()->GetGUID(), GetPlayer()->GetName().c_str(), NULL);
     player->GetSession()->SendPacket(&data);
 }
 
@@ -792,14 +789,14 @@ void WorldSession::HandleChannelDeclineInvite(WorldPacket &recvPacket)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "Opcode %u", recvPacket.GetOpcode());
 }
 
-void WorldSession::SendPlayerNotFoundNotice(std::string name)
+void WorldSession::SendPlayerNotFoundNotice(std::string const& name)
 {
     WorldPacket data(SMSG_CHAT_PLAYER_NOT_FOUND, name.size()+1);
     data << name;
     SendPacket(&data);
 }
 
-void WorldSession::SendPlayerAmbiguousNotice(std::string name)
+void WorldSession::SendPlayerAmbiguousNotice(std::string const& name)
 {
     WorldPacket data(SMSG_CHAT_PLAYER_AMBIGUOUS, name.size()+1);
     data << name;

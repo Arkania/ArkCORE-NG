@@ -157,12 +157,12 @@ class UnitAI
         // predicate shall extend std::unary_function<Unit*, bool>
         template <class PREDICATE> Unit* SelectTarget(SelectAggroTarget targetType, uint32 position, PREDICATE const& predicate)
         {
-            const std::list<HostileReference*>& threatlist = me->getThreatManager().getThreatList();
+            ThreatContainer::StorageType const& threatlist = me->getThreatManager().getThreatList();
             if (position >= threatlist.size())
                 return NULL;
 
             std::list<Unit*> targetList;
-            for (std::list<HostileReference*>::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
+            for (ThreatContainer::StorageType::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
                 if (predicate((*itr)->GetTarget()))
                     targetList.push_back((*itr)->GetTarget());
 
@@ -207,11 +207,11 @@ class UnitAI
         // predicate shall extend std::unary_function<Unit*, bool>
         template <class PREDICATE> void SelectTargetList(std::list<Unit*>& targetList, PREDICATE const& predicate, uint32 maxTargets, SelectAggroTarget targetType)
         {
-            std::list<HostileReference*> const& threatlist = me->getThreatManager().getThreatList();
+            ThreatContainer::StorageType const& threatlist = me->getThreatManager().getThreatList();
             if (threatlist.empty())
                 return;
 
-            for (std::list<HostileReference*>::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
+            for (ThreatContainer::StorageType::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
                 if (predicate((*itr)->GetTarget()))
                     targetList.push_back((*itr)->GetTarget());
 

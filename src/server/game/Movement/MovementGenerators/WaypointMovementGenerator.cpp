@@ -42,7 +42,7 @@ void WaypointMovementGenerator<Creature>::LoadPath(Creature &creature)
     if (!i_path)
     {
         // No movement found for entry
-        sLog->outErrorDb("WaypointMovementGenerator::LoadPath: creature %s (Entry: %u GUID: %u) doesn't have waypoint path id: %u", creature.GetName(), creature.GetEntry(), creature.GetGUIDLow(), path_id);
+        sLog->outErrorDb("WaypointMovementGenerator::LoadPath: creature %s (Entry: %u GUID: %u) doesn't have waypoint path id: %u", creature.GetName().c_str(), creature.GetEntry(), creature.GetGUIDLow(), path_id);
         return;
     }
 
@@ -286,7 +286,7 @@ void FlightPathMovementGenerator::DoEventIfAny(Player& player, TaxiPathNodeEntry
 {
     if (uint32 eventid = departure ? node.departureEventID : node.arrivalEventID)
     {
-        sLog->outDebug(LOG_FILTER_MAPSCRIPTS, "Taxi %s event %u of node %u of path %u for player %s", departure ? "departure" : "arrival", eventid, node.index, node.path, player.GetName());
+        sLog->outDebug(LOG_FILTER_MAPSCRIPTS, "Taxi %s event %u of node %u of path %u for player %s", departure ? "departure" : "arrival", eventid, node.index, node.path, player.GetName().c_str());
         player.GetMap()->ScriptsStart(sEventScripts, eventid, &player, &player);
     }
 }

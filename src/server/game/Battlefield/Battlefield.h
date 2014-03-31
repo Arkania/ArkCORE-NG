@@ -73,7 +73,7 @@ class BfGraveyard;
 
 typedef std::set<uint64> GuidSet;
 typedef std::vector<BfGraveyard*> GraveyardVect;
-typedef std::map<uint64, uint32> PlayerTimerMap;
+typedef std::map<uint64, time_t> PlayerTimerMap;
 
 class BfCapturePoint
 {
@@ -316,7 +316,7 @@ class Battlefield : public ZoneScript
         /// Called when a player enter in battlefield zone
         virtual void OnPlayerEnterZone(Player* /*player*/) {};
 
-        WorldPacket BuildWarningAnnPacket(std::string msg);
+        WorldPacket BuildWarningAnnPacket(std::string const& msg);
         void SendWarningToAllInZone(uint32 entry);
         //void SendWarningToAllInWar(int32 entry, ...); -- UNUSED
         void SendWarningToPlayer(Player* player, uint32 entry);

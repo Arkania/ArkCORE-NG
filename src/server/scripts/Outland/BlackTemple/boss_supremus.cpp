@@ -79,7 +79,6 @@ public:
             me->CastSpell(me, SPELL_MOLTEN_FLAME, true);
         }
     };
-
 };
 
 class boss_supremus : public CreatureScript
@@ -184,9 +183,9 @@ public:
             uint32 health = 0;
             Unit* target = NULL;
 
-            std::list<HostileReference*>& m_threatlist = me->getThreatManager().getThreatList();
-            std::list<HostileReference*>::const_iterator i = m_threatlist.begin();
-            for (i = m_threatlist.begin(); i!= m_threatlist.end(); ++i)
+            ThreatContainer::StorageType const &threatlist = me->getThreatManager().getThreatList();
+            ThreatContainer::StorageType::const_iterator i = threatlist.begin();
+            for (i = threatlist.begin(); i != threatlist.end(); ++i)
             {
                 Unit* unit = Unit::GetUnit(*me, (*i)->getUnitGuid());
                 if (unit && me->IsWithinMeleeRange(unit))
@@ -259,7 +258,6 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 class npc_volcano : public CreatureScript
@@ -306,7 +304,6 @@ public:
         }
 
     };
-
 };
 
 void AddSC_boss_supremus()

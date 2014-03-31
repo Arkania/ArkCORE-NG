@@ -143,9 +143,9 @@ void PlayerMenu::SendGossipMenu(uint32 titleTextId, uint64 objectGUID) const
 
     data << uint32(_questMenu.GetMenuItemCount());      // max count 0x20
 
-    for (uint32 iI = 0; iI < _questMenu.GetMenuItemCount(); ++iI)
+    for (uint8 i = 0; i < _questMenu.GetMenuItemCount(); ++i)
     {
-        QuestMenuItem const& item = _questMenu.GetItem(iI);
+        QuestMenuItem const& item = _questMenu.GetItem(i);
         uint32 questID = item.QuestId;
         Quest const* quest = sObjectMgr->GetQuestTemplate(questID);
 
@@ -156,7 +156,7 @@ void PlayerMenu::SendGossipMenu(uint32 titleTextId, uint64 objectGUID) const
         data << uint8(0);                               // 3.3.3 changes icon: blue question or yellow exclamation
         std::string title = quest->GetTitle();
 
-        int locale = _session->GetSessionDbLocaleIndex();
+        int32 locale = _session->GetSessionDbLocaleIndex();
         if (locale >= 0)
             if (QuestLocale const* localeData = sObjectMgr->GetQuestLocale(questID))
                 ObjectMgr::GetLocaleString(localeData->Title, locale, title);
@@ -263,10 +263,10 @@ void PlayerMenu::SendQuestGiverQuestList(QEmote eEmote, const std::string& Title
         {
             std::string title = quest->GetTitle();
 
-            int loc_idx = _session->GetSessionDbLocaleIndex();
-            if (loc_idx >= 0)
-                if (QuestLocale const* ql = sObjectMgr->GetQuestLocale(questID))
-                    ObjectMgr::GetLocaleString(ql->Title, loc_idx, title);
+            int32 locale = _session->GetSessionDbLocaleIndex();
+            if (locale >= 0)
+                if (QuestLocale const* localeData = sObjectMgr->GetQuestLocale(questID))
+                    ObjectMgr::GetLocaleString(localeData->Title, locale, title);
 
             data << uint32(questID);
             data << uint32(qmi.QuestIcon);
@@ -366,7 +366,7 @@ void PlayerMenu::SendQuestQueryResponse(Quest const* quest) const
     std::string questTurnTargetName = quest->GetQuestTurnTargetName();
 
     std::string questObjectiveText[QUEST_OBJECTIVES_COUNT];
-    for (uint32 i = 0; i < QUEST_OBJECTIVES_COUNT; ++i)
+    for (uint8 i = 0; i < QUEST_OBJECTIVES_COUNT; ++i)
         questObjectiveText[i] = quest->ObjectiveText[i];
 
     int32 locale = _session->GetSessionDbLocaleIndex();
@@ -384,7 +384,7 @@ void PlayerMenu::SendQuestQueryResponse(Quest const* quest) const
             ObjectMgr::GetLocaleString(localeData->QuestTurnTextWindow, locale, questTurnTextWindow);
             ObjectMgr::GetLocaleString(localeData->QuestTurnTargetName, locale, questTurnTargetName);
 
-            for (int i = 0; i < QUEST_OBJECTIVES_COUNT; ++i)
+            for (uint8 i = 0; i < QUEST_OBJECTIVES_COUNT; ++i)
                 ObjectMgr::GetLocaleString(localeData->ObjectiveText[i], locale, questObjectiveText[i]);
         }
     }
@@ -436,38 +436,38 @@ void PlayerMenu::SendQuestQueryResponse(Quest const* quest) const
 
     if (quest->HasFlag(QUEST_FLAGS_HIDDEN_REWARDS))
     {
-        for (uint32 i = 0; i < QUEST_REWARDS_COUNT; ++i)
+        for (uint8 i = 0; i < QUEST_REWARDS_COUNT; ++i)
             data << uint32(0) << uint32(0);
-        for (uint32 i = 0; i < QUEST_REWARD_CHOICES_COUNT; ++i)
+        for (uint8 i = 0; i < QUEST_REWARD_CHOICES_COUNT; ++i)
             data << uint32(0) << uint32(0);
     }
     else
     {
-        for (uint32 i = 0; i < QUEST_REWARDS_COUNT; ++i)
+        for (uint8 i = 0; i < QUEST_REWARDS_COUNT; ++i)
         {
             data << uint32(quest->RewardItemId[i]);
             data << uint32(quest->RewardItemIdCount[i]);
         }
-        for (uint32 i = 0; i < QUEST_REWARD_CHOICES_COUNT; ++i)
+        for (uint8 i = 0; i < QUEST_REWARD_CHOICES_COUNT; ++i)
         {
             data << uint32(quest->RewardChoiceItemId[i]);
             data << uint32(quest->RewardChoiceItemCount[i]);
         }
     }
 
-    for (uint32 i = 0; i < QUEST_REPUTATIONS_COUNT; ++i)        // reward factions ids
+    for (uint8 i = 0; i < QUEST_REPUTATIONS_COUNT; ++i)        // reward factions ids
         data << uint32(quest->RewardFactionId[i]);
 
-    for (uint32 i = 0; i < QUEST_REPUTATIONS_COUNT; ++i)        // columnid+1 QuestFactionReward.dbc?
+    for (uint8 i = 0; i < QUEST_REPUTATIONS_COUNT; ++i)        // columnid+1 QuestFactionReward.dbc?
         data << int32(quest->RewardFactionValueId[i]);
 
-    for (uint32 i = 0; i < QUEST_REPUTATIONS_COUNT; ++i)           // unknown usage
+    for (uint8 i = 0; i < QUEST_REPUTATIONS_COUNT; ++i)        // unknown usage
         data << int32(quest->RewardFactionValueIdOverride[i]);
 
-    data << quest->GetPointMapId();
-    data << quest->GetPointX();
-    data << quest->GetPointY();
-    data << quest->GetPointOpt();
+    data << uint32(quest->GetPointMapId());
+    data << float(quest->GetPointX());
+    data << float(quest->GetPointY());
+    data << uint32(quest->GetPointOpt());
 
     data << questTitle;
     data << questObjectives;
@@ -475,7 +475,7 @@ void PlayerMenu::SendQuestQueryResponse(Quest const* quest) const
     data << questEndText;
     data << questCompletedText;
 
-    for (uint32 i = 0; i < QUEST_OBJECTIVES_COUNT; ++i)
+    for (uint8 i = 0; i < QUEST_OBJECTIVES_COUNT; ++i)
     {
         if (quest->RequiredNpcOrGo[i] < 0)
             data << uint32((quest->RequiredNpcOrGo[i] * (-1)) | 0x80000000);    // client expects gameobject template id in form (id|0x80000000)
@@ -487,7 +487,7 @@ void PlayerMenu::SendQuestQueryResponse(Quest const* quest) const
         data << uint32(quest->RequiredSourceItemCount[i]);
     }
 
-    for (uint32 i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; ++i)
+    for (uint8 i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; ++i)
     {
         data << uint32(quest->RequiredItemId[i]);
         data << uint32(quest->RequiredItemCount[i]);
@@ -530,7 +530,7 @@ void PlayerMenu::SendQuestGiverOfferReward(Quest const* quest, uint64 npcGUID, b
     std::string questTurnTextWindow = quest->GetQuestTurnTextWindow();
     std::string questTurnTargetName = quest->GetQuestTurnTargetName();
 
-    int locale = _session->GetSessionDbLocaleIndex();
+    int32 locale = _session->GetSessionDbLocaleIndex();
     if (locale >= 0)
     {
         if (QuestLocale const* localeData = sObjectMgr->GetQuestLocale(quest->GetQuestId()))

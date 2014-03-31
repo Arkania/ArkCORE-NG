@@ -511,7 +511,6 @@ public:
             } else HammerOfJustice_Timer -= diff;
         }
     };
-
 };
 
 class boss_lady_catriona_von_indi : public CreatureScript
@@ -582,7 +581,6 @@ public:
             } else DispelMagic_Timer -= diff;
         }
     };
-
 };
 
 class boss_lady_keira_berrybuck : public CreatureScript
@@ -657,7 +655,6 @@ public:
             } else Cleanse_Timer -= diff;
         }
     };
-
 };
 
 class boss_lord_robin_daris : public CreatureScript
@@ -714,7 +711,6 @@ public:
             } else WhirlWind_Timer -= diff;
         }
     };
-
 };
 
 class boss_lord_crispin_ference : public CreatureScript
@@ -779,7 +775,6 @@ public:
             } else ShieldWall_Timer -= diff;
         }
     };
-
 };
 
 void AddSC_boss_moroes()

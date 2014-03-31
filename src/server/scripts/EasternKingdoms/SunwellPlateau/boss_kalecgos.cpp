@@ -305,11 +305,20 @@ public:
 
                 if (SpectralBlastTimer <= diff)
                 {
-                    std::list<HostileReference*> &m_threatlist = me->getThreatManager().getThreatList();
+                    ThreatContainer::StorageType const& m_threatlist = me->getThreatManager().getThreatList();
                     std::list<Unit*> targetList;
-                    for (std::list<HostileReference*>::const_iterator itr = m_threatlist.begin(); itr!= m_threatlist.end(); ++itr)
-                        if ((*itr)->GetTarget() && (*itr)->GetTarget()->GetTypeId() == TYPEID_PLAYER && (*itr)->GetTarget()->GetGUID() != me->GetVictim()->GetGUID() && !(*itr)->GetTarget()->HasAura(AURA_SPECTRAL_EXHAUSTION) && (*itr)->GetTarget()->GetPositionZ() > me->GetPositionZ()-5)
-                            targetList.push_back((*itr)->GetTarget());
+                    for (ThreatContainer::StorageType::const_iterator itr = m_threatlist.begin(); itr!= m_threatlist.end(); ++itr)
+                    {
+                        Unit* target = (*itr)->GetTarget();
+                        if (target
+                                && target->GetTypeId() == TYPEID_PLAYER
+                                && target->GetGUID() != me->GetVictim()->GetGUID()
+                                && target->GetPositionZ() > me->GetPositionZ() - 5
+                                && !target->HasAura(AURA_SPECTRAL_EXHAUSTION))
+                        {
+                            targetList.push_back(target);
+                        }
+                    }
                     if (targetList.empty())
                     {
                         SpectralBlastTimer = 1000;
@@ -432,7 +441,6 @@ public:
             }
         }
     };
-
 };
 
 class boss_kalec : public CreatureScript
@@ -534,7 +542,6 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 class kalecgos_teleporter : public GameObjectScript
@@ -562,7 +569,6 @@ public:
             player->CastSpell(player, SPELL_TELEPORT_SPECTRAL, true);
         return true;
     }
-
 };
 
 class boss_sathrovarr : public CreatureScript
@@ -762,15 +768,12 @@ public:
 
             if (ResetThreat <= diff)
             {
-                for (std::list<HostileReference*>::const_iterator itr = me->getThreatManager().getThreatList().begin(); itr != me->getThreatManager().getThreatList().end(); ++itr)
+                ThreatContainer::StorageType threatlist = me->getThreatManager().getThreatList();
+                for (ThreatContainer::StorageType::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
                 {
                     if (Unit* unit = Unit::GetUnit(*me, (*itr)->getUnitGuid()))
-                    {
-                        if (unit->GetPositionZ() > me->GetPositionZ()+5)
-                        {
+                        if (unit->GetPositionZ() > me->GetPositionZ() + 5)
                             me->getThreatManager().modifyThreatPercent(unit, -100);
-                        }
-                    }
                 }
                 ResetThreat = 1000;
             } else ResetThreat -= diff;
@@ -800,7 +803,6 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 void AddSC_boss_kalecgos()

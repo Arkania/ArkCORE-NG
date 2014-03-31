@@ -21,7 +21,6 @@
 #define DEF_MAGISTERS_TERRACE_H
 
 #define ERROR_INST_DATA      "TSCR Error: Instance Data not set properly for Magister's Terrace instance (map 585). Encounters will be buggy."
-#endif
 
 enum Data
 {
@@ -48,3 +47,5 @@ enum Data
 
     DATA_ESCAPE_ORB             = 16
 };
+
+#endif

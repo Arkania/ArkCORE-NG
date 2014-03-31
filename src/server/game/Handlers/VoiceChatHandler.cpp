@@ -42,39 +42,39 @@ void WorldSession::HandleVoiceSessionEnableOpcode(WorldPacket& recvData)
 // Something lacking here.
 }
 
-void WorldSession::HandleChannelVoiceOnOpcode(WorldPacket& recvPacket)
+void WorldSession::HandleChannelVoiceOnOpcode(WorldPacket& recvData)
 {
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_CHANNEL_VOICE_ON");
 
-    uint32 length = recvPacket.ReadBits(8);
-    std::string channelname = recvPacket.ReadString(length);
+    uint32 length = recvData.ReadBits(8);
+    std::string channelname = recvData.ReadString(length);
 
-    if (ChannelMgr* cMgr = channelMgr(_player->GetTeam()))
+    if (ChannelMgr* cMgr = ChannelMgr::forTeam(_player->GetTeam()))
         if (Channel* chn = cMgr->GetChannel(channelname, _player))
-            chn->MakeVoiceOn(&recvPacket, _player->GetGUID());
+            chn->MakeVoiceOn(&recvData, _player->GetGUID());
 }
 
-void WorldSession::HandleChannelVoiceOffOpcode(WorldPacket& recvPacket)
+void WorldSession::HandleChannelVoiceOffOpcode(WorldPacket& recvData)
 {
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_CHANNEL_VOICE_OFF");
 
-    uint32 length = recvPacket.ReadBits(8);
-    std::string channelname = recvPacket.ReadString(length);
+    uint32 length = recvData.ReadBits(8);
+    std::string channelname = recvData.ReadString(length);
 
-    if (ChannelMgr* cMgr = channelMgr(_player->GetTeam()))
+    if (ChannelMgr* cMgr = ChannelMgr::forTeam(_player->GetTeam()))
         if (Channel* chn = cMgr->GetChannel(channelname, _player))
-            chn->MakeVoiceOff(&recvPacket, _player->GetGUID());
+            chn->MakeVoiceOff(&recvData, _player->GetGUID());
 }
 
-void WorldSession::HandleSetActiveVoiceChannel(WorldPacket& recvPacket)
+void WorldSession::HandleSetActiveVoiceChannel(WorldPacket& recvData)
 {
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_SET_ACTIVE_VOICE_CHANNEL");
 
     uint32 channelId;
     std::string channelname;
 
-    recvPacket >> channelId;
-    uint32 length = recvPacket.ReadBits(8);
-    channelname = recvPacket.ReadString(length);
+    recvData >> channelId;
+    uint32 length = recvData.ReadBits(8);
+    channelname = recvData.ReadString(length);
 }
 

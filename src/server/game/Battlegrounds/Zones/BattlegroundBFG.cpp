@@ -418,7 +418,7 @@ void BattlegroundBFG::EventPlayerClickedOnFlag(Player* source, GameObject* /*tar
 
     if (node == BG_BG_DYNAMIC_NODES_COUNT)
     {
-        sLog->outString("Player %s (GUID: %u) in Battle for Gilneas fired EventPlayerClickedOnFlag() but isnt near of any flag",source->GetName(),source->GetGUIDLow());
+        sLog->outString("Player %s (GUID: %u) in Battle for Gilneas fired EventPlayerClickedOnFlag() but isnt near of any flag", source->GetName().c_str(), source->GetGUIDLow());
         // this means our player isn't close to any of banners - maybe cheater ??
         return;
     }

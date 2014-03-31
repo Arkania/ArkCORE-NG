@@ -130,7 +130,6 @@ public:
             } else CheckTimer -= diff;
         }
     };
-
 };
 
 /* This script is merely a placeholder for the Doomfire that triggers Doomfire spell. It will
@@ -221,7 +220,6 @@ public:
             } else ChangeTargetTimer -= diff;
         }
     };
-
 };
 
 /* Finally, Archimonde's script. His script isn't extremely complex, most are simply spells on timers.
@@ -316,8 +314,8 @@ public:
         {
             Talk(SAY_SLAY);
 
-            if (victim && (victim->GetTypeId() == TYPEID_PLAYER))
-                GainSoulCharge(CAST_PLR(victim));
+            if (victim && victim->GetTypeId() == TYPEID_PLAYER)
+                GainSoulCharge(victim->ToPlayer());
         }
 
         void GainSoulCharge(Player* victim)
@@ -361,13 +359,13 @@ public:
             if (victim && me->IsWithinDistInMap(victim, me->GetAttackDistance(victim)))
                 return false;
 
-            std::list<HostileReference*>& m_threatlist = me->getThreatManager().getThreatList();
-            if (m_threatlist.empty())
+            ThreatContainer::StorageType const &threatlist = me->getThreatManager().getThreatList();
+            if (threatlist.empty())
                 return false;
 
             std::list<Unit*> targets;
-            std::list<HostileReference*>::const_iterator itr = m_threatlist.begin();
-            for (; itr != m_threatlist.end(); ++itr)
+            ThreatContainer::StorageType::const_iterator itr = threatlist.begin();
+            for (; itr != threatlist.end(); ++itr)
             {
                 Unit* unit = Unit::GetUnit(*me, (*itr)->getUnitGuid());
                 if (unit && unit->IsAlive())
@@ -638,13 +636,8 @@ public:
 
             DoMeleeAttackIfReady();
         }
-
-        void WaypointReached(uint32 /*waypointId*/)
-        {
-
-        }
+        void WaypointReached(uint32 /*waypointId*/) { }
     };
-
 };
 
 void AddSC_boss_archimonde()

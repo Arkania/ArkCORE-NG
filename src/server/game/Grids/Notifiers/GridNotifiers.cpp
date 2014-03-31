@@ -82,18 +82,22 @@ void VisibleChangesNotifier::Visit(PlayerMapType &m)
 
         iter->GetSource()->UpdateVisibilityOf(&i_object);
 
-        if (!iter->GetSource()->GetSharedVisionList().empty())
+        if (iter->GetSource()->HasSharedVision())
+        {
             for (SharedVisionList::const_iterator i = iter->GetSource()->GetSharedVisionList().begin();
                 i != iter->GetSource()->GetSharedVisionList().end(); ++i)
+            {
                 if ((*i)->m_seer == iter->GetSource())
                     (*i)->UpdateVisibilityOf(&i_object);
+            }
+        }
     }
 }
 
 void VisibleChangesNotifier::Visit(CreatureMapType &m)
 {
     for (CreatureMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
-        if (!iter->GetSource()->GetSharedVisionList().empty())
+        if (iter->GetSource()->HasSharedVision())
             for (SharedVisionList::const_iterator i = iter->GetSource()->GetSharedVisionList().begin();
                 i != iter->GetSource()->GetSharedVisionList().end(); ++i)
                 if ((*i)->m_seer == iter->GetSource())
@@ -155,7 +159,7 @@ void PlayerRelocationNotifier::Visit(CreatureMapType &m)
 
 void CreatureRelocationNotifier::Visit(PlayerMapType &m)
 {
-    for (PlayerMapType::iterator iter=m.begin(); iter != m.end(); ++iter)
+    for (PlayerMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
     {
         Player* player = iter->GetSource();
 
@@ -171,7 +175,7 @@ void CreatureRelocationNotifier::Visit(CreatureMapType &m)
     if (!i_creature.IsAlive())
         return;
 
-    for (CreatureMapType::iterator iter=m.begin(); iter != m.end(); ++iter)
+    for (CreatureMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
     {
         Creature* c = iter->GetSource();
         CreatureUnitRelocationWorker(&i_creature, c);
@@ -250,7 +254,7 @@ void MessageDistDeliverer::Visit(PlayerMapType &m)
             continue;
 
         // Send packet to all who are sharing the player's vision
-        if (!target->GetSharedVisionList().empty())
+        if (target->HasSharedVision())
         {
             SharedVisionList::const_iterator i = target->GetSharedVisionList().begin();
             for (; i != target->GetSharedVisionList().end(); ++i)
@@ -275,7 +279,7 @@ void MessageDistDeliverer::Visit(CreatureMapType &m)
             continue;
 
         // Send packet to all who are sharing the creature's vision
-        if (!target->GetSharedVisionList().empty())
+        if (target->HasSharedVision())
         {
             SharedVisionList::const_iterator i = target->GetSharedVisionList().begin();
             for (; i != target->GetSharedVisionList().end(); ++i)

@@ -368,7 +368,6 @@ public:
             }
         }
     };
-
 };
 
 class go_orb_of_the_blue_flight : public GameObjectScript
@@ -392,7 +391,6 @@ public:
         }
         return true;
     }
-
 };
 
 //AI for Kil'jaeden Event Controller
@@ -493,7 +491,6 @@ public:
             }
         }
     };
-
 };
 
 //AI for Kil'jaeden
@@ -901,7 +898,6 @@ public:
             }
         }
     };
-
 };
 
 //AI for Hand of the Deceiver
@@ -988,8 +984,8 @@ public:
             {
                 if (Creature* pPortal = DoSpawnCreature(CREATURE_FELFIRE_PORTAL, 0, 0, 0, 0, TEMPSUMMON_TIMED_DESPAWN, 20000))
                 {
-                    std::list<HostileReference*>::iterator itr;
-                    for (itr = me->getThreatManager().getThreatList().begin(); itr != me->getThreatManager().getThreatList().end(); ++itr)
+                    ThreatContainer::StorageType const &threatlist = me->getThreatManager().getThreatList();
+                    for (ThreatContainer::StorageType::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
                     {
                         Unit* unit = Unit::GetUnit(*me, (*itr)->getUnitGuid());
                         if (unit)
@@ -1002,7 +998,6 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 //AI for Felfire Portal
@@ -1047,7 +1042,6 @@ public:
             } else uiSpawnFiendTimer -= diff;
         }
     };
-
 };
 
 //AI for Felfire Fiend
@@ -1105,7 +1099,6 @@ public:
             }
         }
     };
-
 };
 
 //AI for Armageddon target
@@ -1160,7 +1153,6 @@ public:
             } else uiTimer -=diff;
         }
     };
-
 };
 
 //AI for Shield Orbs
@@ -1248,7 +1240,6 @@ public:
             bPointReached = true;
         }
     };
-
 };
 
 //AI for Sinister Reflection
@@ -1311,7 +1302,8 @@ public:
                 }
             }
 
-            switch (victimClass) {
+            switch (victimClass)
+            {
                 case CLASS_DRUID:
                     if (uiTimer[1] <= diff)
                     {
@@ -1412,13 +1404,12 @@ public:
                     }
                     DoMeleeAttackIfReady();
                     break;
-                }
-                sLog->outDebug(LOG_FILTER_TSCR, "Sinister-Timer");
-                for (uint8 i = 0; i < 3; ++i)
-                    uiTimer[i] -= diff;
             }
+            sLog->outDebug(LOG_FILTER_TSCR, "Sinister-Timer");
+            for (uint8 i = 0; i < 3; ++i)
+                uiTimer[i] -= diff;
+        }
     };
-
 };
 
 void AddSC_boss_kiljaeden()

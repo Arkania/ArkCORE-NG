@@ -80,7 +80,7 @@ bool Corpse::Create(uint32 guidlow, Player* owner)
     if (!IsPositionValid())
     {
         sLog->outError("Corpse (guidlow %d, owner %s) not created. Suggested coordinates isn't valid (X: %f Y: %f)",
-            guidlow, owner->GetName(), owner->GetPositionX(), owner->GetPositionY());
+            guidlow, owner->GetName().c_str(), owner->GetPositionX(), owner->GetPositionY());
         return false;
     }
 

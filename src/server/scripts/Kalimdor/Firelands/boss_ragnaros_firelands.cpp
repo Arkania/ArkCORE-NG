@@ -632,11 +632,11 @@ class boss_ragnaros_firelands : public CreatureScript
                         case EVENT_RAGE_OF_RAGNAROS:
                             if (!IsHeroic()) // Only on normal.
                             {
-                                std::list<HostileReference*>& m_threatlist = me->getThreatManager().getThreatList();
+                                ThreatContainer::StorageType const & threatList = me->getThreatManager().getThreatList();
 
-                                for (std::list<HostileReference*>::const_iterator i = m_threatlist.begin(); i!= m_threatlist.end(); ++i)
+                                for (ThreatContainer::StorageType::const_iterator itr = threatList.begin(); itr != threatList.end(); ++itr)
                                 {
-                                    if (Unit* unit = Unit::GetUnit(*me, (*i)->getUnitGuid()))
+                                    if (Unit* unit = Unit::GetUnit(*me, (*itr)->getUnitGuid()))
                                         if (unit->GetTypeId() == TYPEID_PLAYER)
                                             if(Player* player = unit->ToPlayer())
                                                 if (player->hasQuest(QUEST_HEART_FLAME))

@@ -125,9 +125,9 @@ class boss_occuthar : public CreatureScript
                 {
                        std::list<Unit*> targetList;
                        {
-                       const std::list<HostileReference*>& threatlist = me->getThreatManager().getThreatList();
-                         for (std::list<HostileReference*>::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
-                             if ((*itr)->GetTarget()->GetTypeId() == TYPEID_PLAYER)
+                        ThreatContainer::StorageType const &threatlist = me->getThreatManager().getThreatList();
+                        for (ThreatContainer::StorageType::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
+                            if ((*itr)->GetTarget()->GetTypeId() == TYPEID_PLAYER)
                                 targetList.push_back((*itr)->GetTarget());
                         }
 

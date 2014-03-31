@@ -296,7 +296,7 @@ void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPacket& recvData)
 
     if (reward >= QUEST_REWARD_CHOICES_COUNT)
     {
-        sLog->outError("Error in CMSG_QUESTGIVER_CHOOSE_REWARD: player %s (guid %d) tried to get invalid reward (%u) (probably packet hacking)", _player->GetName(), _player->GetGUIDLow(), reward);
+        sLog->outError("Error in CMSG_QUESTGIVER_CHOOSE_REWARD: player %s (guid %d) tried to get invalid reward (%u) (probably packet hacking)", _player->GetName().c_str(), _player->GetGUIDLow(), reward);
         return;
     }
 
@@ -323,7 +323,7 @@ void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPacket& recvData)
         (_player->GetQuestStatus(questId) != QUEST_STATUS_COMPLETE && !quest->IsAutoComplete()))
     {
         sLog->outError("HACK ALERT: Player %s (guid: %u) is trying to complete quest (id: %u) but he has no right to do it!",
-                        _player->GetName(), _player->GetGUIDLow(), questId);
+                        _player->GetName().c_str(), _player->GetGUIDLow(), questId);
         return;
     }
 
@@ -533,14 +533,14 @@ void WorldSession::HandleQuestgiverCompleteQuest(WorldPacket& recvData)
         if (autoCompleteMode && !quest->HasFlag(QUEST_FLAGS_AUTO_SUBMIT))
         {
             sLog->outError("Possible hacking attempt: Player %s [playerGuid: %u] tried to complete questId [entry: %u] by auto-submit flag for quest witch not suport it.",
-                          _player->GetName(), _player->GetGUIDLow(), questId);
+                          _player->GetName().c_str(), _player->GetGUIDLow(), questId);
             return;
         }
 
         if (!_player->CanSeeStartQuest(quest) && _player->GetQuestStatus(questId) == QUEST_STATUS_NONE)
         {
             sLog->outError("Possible hacking attempt: Player %s [playerGuid: %u] tried to complete questId [entry: %u] without being in possession of the questId!",
-                          _player->GetName(), _player->GetGUIDLow(), questId);
+                          _player->GetName().c_str(), _player->GetGUIDLow(), questId);
             return;
         }
         // TODO: need a virtual function

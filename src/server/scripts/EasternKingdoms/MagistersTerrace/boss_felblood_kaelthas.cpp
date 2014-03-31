@@ -190,20 +190,20 @@ public:
             ScriptedAI::MoveInLineOfSight(who);
         }
 
-        void SetThreatList(Creature* SummonedUnit)
+        void SetThreatList(Creature* summonedUnit)
         {
-            if (!SummonedUnit)
+            if (!summonedUnit)
                 return;
 
-            std::list<HostileReference*>& m_threatlist = me->getThreatManager().getThreatList();
-            std::list<HostileReference*>::const_iterator i = m_threatlist.begin();
-            for (i = m_threatlist.begin(); i != m_threatlist.end(); ++i)
+            ThreatContainer::StorageType const &threatlist = me->getThreatManager().getThreatList();
+            ThreatContainer::StorageType::const_iterator i = threatlist.begin();
+            for (i = threatlist.begin(); i != threatlist.end(); ++i)
             {
                 Unit* unit = Unit::GetUnit(*me, (*i)->getUnitGuid());
                 if (unit && unit->IsAlive())
                 {
                     float threat = me->getThreatManager().getThreat(unit);
-                    SummonedUnit->AddThreat(unit, threat);
+                    summonedUnit->AddThreat(unit, threat);
                 }
             }
         }
@@ -213,9 +213,9 @@ public:
             float x = KaelLocations[0][0];
             float y = KaelLocations[0][1];
             me->SetPosition(x, y, LOCATION_Z, 0.0f);
-            //me->SendMonsterMove(x, y, LOCATION_Z, 0, 0, 0); // causes some issues...
-            std::list<HostileReference*>::const_iterator i = me->getThreatManager().getThreatList().begin();
-            for (i = me->getThreatManager().getThreatList().begin(); i!= me->getThreatManager().getThreatList().end(); ++i)
+            ThreatContainer::StorageType threatlist = me->getThreatManager().getThreatList();
+            ThreatContainer::StorageType::const_iterator i = threatlist.begin();
+            for (i = threatlist.begin(); i != threatlist.end(); ++i)
             {
                 Unit* unit = Unit::GetUnit(*me, (*i)->getUnitGuid());
                 if (unit && (unit->GetTypeId() == TYPEID_PLAYER))
@@ -226,8 +226,9 @@ public:
 
         void CastGravityLapseKnockUp()
         {
-            std::list<HostileReference*>::const_iterator i = me->getThreatManager().getThreatList().begin();
-            for (i = me->getThreatManager().getThreatList().begin(); i!= me->getThreatManager().getThreatList().end(); ++i)
+            ThreatContainer::StorageType threatlist = me->getThreatManager().getThreatList();
+            ThreatContainer::StorageType::const_iterator i = threatlist.begin();
+            for (i = threatlist.begin(); i != threatlist.end(); ++i)
             {
                 Unit* unit = Unit::GetUnit(*me, (*i)->getUnitGuid());
                 if (unit && (unit->GetTypeId() == TYPEID_PLAYER))
@@ -238,8 +239,9 @@ public:
 
         void CastGravityLapseFly()                              // Use Fly Packet hack for now as players can't cast "fly" spells unless in map 530. Has to be done a while after they get knocked into the air...
         {
-            std::list<HostileReference*>::const_iterator i = me->getThreatManager().getThreatList().begin();
-            for (i = me->getThreatManager().getThreatList().begin(); i!= me->getThreatManager().getThreatList().end(); ++i)
+            ThreatContainer::StorageType threatlist = me->getThreatManager().getThreatList();
+            ThreatContainer::StorageType::const_iterator i = threatlist.begin();
+            for (i = threatlist.begin(); i != threatlist.end(); ++i)
             {
                 Unit* unit = Unit::GetUnit(*me, (*i)->getUnitGuid());
                 if (unit && (unit->GetTypeId() == TYPEID_PLAYER))
@@ -257,8 +259,9 @@ public:
 
         void RemoveGravityLapse()
         {
-            std::list<HostileReference*>::const_iterator i = me->getThreatManager().getThreatList().begin();
-            for (i = me->getThreatManager().getThreatList().begin(); i!= me->getThreatManager().getThreatList().end(); ++i)
+            ThreatContainer::StorageType threatlist = me->getThreatManager().getThreatList();
+            ThreatContainer::StorageType::const_iterator i = threatlist.begin();
+            for (i = threatlist.begin(); i != threatlist.end(); ++i)
             {
                 Unit* unit = Unit::GetUnit(*me, (*i)->getUnitGuid());
                 if (unit && (unit->GetTypeId() == TYPEID_PLAYER))
@@ -305,7 +308,6 @@ public:
 
                     if (PhoenixTimer <= diff)
                     {
-
                         Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1);
 
                         uint8 random = urand(1, 2);
@@ -414,7 +416,6 @@ public:
 
                                 DoCast(me, SPELL_GRAVITY_LAPSE_CHANNEL);
                                 break;
-
                             case 4:
                                 me->InterruptNonMeleeSpells(false);
                                 DoScriptText(SAY_TIRED, me);
@@ -430,7 +431,6 @@ public:
             }
         }
     };
-
 };
 
 class npc_felkael_flamestrike : public CreatureScript
@@ -472,7 +472,6 @@ public:
             } else FlameStrikeTimer -= diff;
         }
     };
-
 };
 
 class npc_felkael_phoenix : public CreatureScript
@@ -521,7 +520,6 @@ public:
             {
                 damage = 0;
                 return;
-
             }
             //Don't really die in all phases of Kael'Thas
             if (instance && instance->GetData(DATA_KAELTHAS_EVENT) == 0)
@@ -543,9 +541,7 @@ public:
                 me->GetMotionMaster()->Clear();
                 me->GetMotionMaster()->MoveIdle();
                 me->SetStandState(UNIT_STAND_STATE_DEAD);
-
            }
-
         }
 
         void JustDied(Unit* /*killer*/)
@@ -555,7 +551,6 @@ public:
 
         void UpdateAI(const uint32 diff)
         {
-
             //If we are fake death, we cast revbirth and after that we kill the phoenix to spawn the egg.
             if (FakeDeath)
             {
@@ -567,7 +562,6 @@ public:
 
                 if (Rebirth)
                 {
-
                     if (Death_Timer <= diff)
                     {
                         me->SummonCreature(CREATURE_PHOENIX_EGG, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 45000);
@@ -575,7 +569,6 @@ public:
                         Rebirth = false;
                     } else Death_Timer -= diff;
                 }
-
             }
 
             if (!UpdateVictim())
@@ -592,7 +585,6 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 class npc_felkael_phoenix_egg : public CreatureScript
@@ -626,10 +618,8 @@ public:
                 me->SummonCreature(CREATURE_PHOENIX, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 60000);
                 me->Kill(me);
             } else HatchTimer -= diff;
-
         }
     };
-
 };
 
 class npc_arcane_sphere : public CreatureScript
@@ -686,7 +676,6 @@ public:
             } else ChangeTargetTimer -= diff;
         }
     };
-
 };
 
 void AddSC_boss_felblood_kaelthas()

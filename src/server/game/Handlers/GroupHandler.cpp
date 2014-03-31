@@ -61,7 +61,7 @@ void WorldSession::SendPartyResult(PartyOperation operation, const std::string& 
     SendPacket(&data);
 }
 
-void WorldSession::HandleRequestJoinUpdates(WorldPacket & recvData)
+void WorldSession::HandleRequestJoinUpdates(WorldPacket& /*recvData*/)
 {
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_GROUP_REQUEST_JOIN_UPDATES ");
 
@@ -142,7 +142,7 @@ void WorldSession::HandleGroupInviteOpcode(WorldPacket & recvData)
         return;
     }
 
-    Player* player = sObjectAccessor->FindPlayerByName(memberName.c_str());
+    Player* player = sObjectAccessor->FindPlayerByName(memberName);
 
     // no player
     if (!player)
@@ -216,7 +216,7 @@ void WorldSession::HandleGroupInviteOpcode(WorldPacket & recvData)
 
             data.WriteBit(invitedGuid[4]);
 
-            data.WriteBits(strlen(GetPlayer()->GetName()), 7); // Inviter name length
+            data.WriteBits(GetPlayer()->GetName().size(), 7); // Inviter name length
 
             data.WriteBits(0, 24); // Count 2
 
@@ -318,7 +318,7 @@ void WorldSession::HandleGroupInviteOpcode(WorldPacket & recvData)
 
     data.WriteBit(invitedGuid[4]);
 
-    data.WriteBits(strlen(GetPlayer()->GetName()), 7); // Inviter name length
+    data.WriteBits(GetPlayer()->GetName().size(), 7); // Inviter name length
 
     data.WriteBits(0, 24); // Count 2
 
@@ -412,7 +412,7 @@ void WorldSession::HandleGroupInviteResponseOpcode(WorldPacket& recvData)
 
         if (group->GetLeaderGUID() == GetPlayer()->GetGUID())
         {
-            sLog->outError("HandleGroupAcceptOpcode: player %s(%d) tried to accept an invite to his own group", GetPlayer()->GetName(), GetPlayer()->GetGUIDLow());
+            sLog->outError("HandleGroupAcceptOpcode: player %s(%d) tried to accept an invite to his own group", GetPlayer()->GetName().c_str(), GetPlayer()->GetGUIDLow());
             return;
         }
 
@@ -460,7 +460,7 @@ void WorldSession::HandleGroupInviteResponseOpcode(WorldPacket& recvData)
             return;
 
         // report
-        WorldPacket data(SMSG_GROUP_DECLINE, strlen(GetPlayer()->GetName()));
+        WorldPacket data(SMSG_GROUP_DECLINE, GetPlayer()->GetName().size());
         data << GetPlayer()->GetName();
         leader->GetSession()->SendPacket(&data);
     }
@@ -478,7 +478,8 @@ void WorldSession::HandleGroupUninviteGuidOpcode(WorldPacket& recvData)
     //can't uninvite yourself
     if (guid == GetPlayer()->GetGUID())
     {
-        sLog->outError("WorldSession::HandleGroupUninviteGuidOpcode: leader %s(%d) tried to uninvite himself from the group.", GetPlayer()->GetName(), GetPlayer()->GetGUIDLow());
+        sLog->outError("WorldSession::HandleGroupUninviteGuidOpcode: leader %s(%d) tried to uninvite himself from the group.",
+            GetPlayer()->GetName().c_str(), GetPlayer()->GetGUIDLow());
         return;
     }
 
@@ -528,7 +529,8 @@ void WorldSession::HandleGroupUninviteOpcode(WorldPacket & recvData)
     // can't uninvite yourself
     if (GetPlayer()->GetName() == membername)
     {
-        sLog->outError("WorldSession::HandleGroupUninviteOpcode: leader %s(%d) tried to uninvite himself from the group.", GetPlayer()->GetName(), GetPlayer()->GetGUIDLow());
+        sLog->outError("WorldSession::HandleGroupUninviteOpcode: leader %s(%d) tried to uninvite himself from the group.",
+            GetPlayer()->GetName().c_str(), GetPlayer()->GetGUIDLow());
         return;
     }
 
@@ -861,7 +863,7 @@ void WorldSession::HandleGroupChangeSubGroupOpcode(WorldPacket& recvData)
     if (!group->HasFreeSlotSubGroup(groupNr))
         return;
 
-    Player* movedPlayer = sObjectAccessor->FindPlayerByName(name.c_str());
+    Player* movedPlayer = sObjectAccessor->FindPlayerByName(name);
     uint64 guid;
 
     if (movedPlayer)
@@ -1376,7 +1378,7 @@ void WorldSession::HandleOptOutOfLootOpcode(WorldPacket& recvData)
     GetPlayer()->SetPassOnGroupLoot(passOnLoot);
 }
 
-void WorldSession::SendGroupCancel(std::string unkString)
+void WorldSession::SendGroupCancel(std::string const& unkString)
 {
     WorldPacket data(SMSG_GROUP_CANCEL,unkString.length());
 

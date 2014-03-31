@@ -955,4 +955,3 @@ void BattlegroundSA::SendTransportsRemove(Player* player)
         player->GetSession()->SendPacket(&packet);
     }
 }
-

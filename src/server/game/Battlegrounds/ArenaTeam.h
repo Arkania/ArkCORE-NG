@@ -122,7 +122,7 @@ class ArenaTeam
         ArenaTeam();
         ~ArenaTeam();
 
-        bool Create(uint64 captainGuid, uint8 type, std::string teamName, uint32 backgroundColor, uint8 emblemStyle, uint32 emblemColor, uint8 borderStyle, uint32 borderColor);
+        bool Create(uint64 captainGuid, uint8 type, std::string const& teamName, uint32 backgroundColor, uint8 emblemStyle, uint32 emblemColor, uint8 borderStyle, uint32 borderColor);
         void Disband(WorldSession* session);
 
         typedef std::list<ArenaTeamMember> MemberList;
@@ -133,7 +133,7 @@ class ArenaTeam
         static uint8 GetSlotByType(uint32 type);
         static ArenaType GetTypeBySlot(uint8 slot);
         uint64 GetCaptain() const  { return CaptainGuid; }
-        std::string GetName() const       { return TeamName; }
+        std::string const& GetName() const     { return TeamName; }
         const ArenaTeamStats& GetStats() const { return Stats; }
 
         uint32 GetRating() const          { return Stats.Rating; }
@@ -153,7 +153,7 @@ class ArenaTeam
         bool IsMember(uint64 guid) const;
 
         ArenaTeamMember* GetMember(uint64 guid);
-        ArenaTeamMember* GetMember(const std::string& name);
+        ArenaTeamMember* GetMember(std::string const& name);
 
         bool IsFighting() const;
 
@@ -163,7 +163,7 @@ class ArenaTeam
         void SaveToDB();
 
         void BroadcastPacket(WorldPacket* packet);
-        void BroadcastEvent(ArenaTeamEvents event, uint64 guid, uint8 strCount, std::string str1, std::string str2, std::string str3);
+        void BroadcastEvent(ArenaTeamEvents event, uint64 guid, uint8 strCount, std::string const& str1, std::string const& str2, std::string const& str3);
         void NotifyStatsChanged();
 
         void MassInviteToEvent(WorldSession* session);

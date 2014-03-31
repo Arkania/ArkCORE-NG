@@ -92,7 +92,7 @@ void WorldSession::HandleArenaTeamInviteOpcode(WorldPacket & recvData)
         if (!normalizePlayerName(invitedName))
             return;
 
-        player = sObjectAccessor->FindPlayerByName(invitedName.c_str());
+        player = sObjectAccessor->FindPlayerByName(invitedName);
     }
 
     if (!player)
@@ -143,7 +143,7 @@ void WorldSession::HandleArenaTeamInviteOpcode(WorldPacket & recvData)
         return;
     }
 
-    sLog->outDebug(LOG_FILTER_BATTLEGROUND, "Player %s Invited %s to Join his ArenaTeam", GetPlayer()->GetName(), invitedName.c_str());
+    sLog->outDebug(LOG_FILTER_BATTLEGROUND, "Player %s Invited %s to Join his ArenaTeam", GetPlayer()->GetName().c_str(), invitedName.c_str());
 
     player->SetArenaTeamIdInvited(arenaTeam->GetId());
 

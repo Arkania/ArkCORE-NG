@@ -122,13 +122,12 @@ public:
 
             if (instance)
             {
-                Unit* Temp =  Unit::GetUnit(*me, instance->GetData64(DATA_ALYTHESS));
-                if (Temp)
+                if (Creature *temp =  Unit::GetCreature(*me, instance->GetData64(DATA_ALYTHESS)))
                 {
-                    if (Temp->IsDead())
-                        CAST_CRE(Temp)->Respawn();
-                    else if (Temp->GetVictim())
-                        me->getThreatManager().addThreat(Temp->GetVictim(), 0.0f);
+                    if (temp->IsDead())
+                        temp->Respawn();
+                    else if (temp->GetVictim())
+                        me->getThreatManager().addThreat(temp->GetVictim(), 0.0f);
                 }
             }
 
@@ -154,9 +153,9 @@ public:
 
             if (instance)
             {
-                Unit* Temp =  Unit::GetUnit(*me, instance->GetData64(DATA_ALYTHESS));
-                if (Temp && Temp->IsAlive() && !(Temp->GetVictim()))
-                    CAST_CRE(Temp)->AI()->AttackStart(who);
+                Creature *temp = Unit::GetCreature(*me, instance->GetData64(DATA_ALYTHESS));
+                if (temp && temp->IsAlive() && !temp->GetVictim())
+                    temp->AI()->AttackStart(who);
             }
 
             if (instance)
@@ -342,7 +341,6 @@ public:
             }
         }
     };
-
 };
 
 class boss_alythess : public CreatureScript
@@ -384,13 +382,12 @@ public:
 
             if (instance)
             {
-                Unit* Temp =  Unit::GetUnit(*me, instance->GetData64(DATA_SACROLASH));
-                if (Temp)
+                if (Creature *temp = Unit::GetCreature((*me), instance->GetData64(DATA_SACROLASH)))
                 {
-                    if (Temp->IsDead())
-                        CAST_CRE(Temp)->Respawn();
-                    else if (Temp->GetVictim())
-                        me->getThreatManager().addThreat(Temp->GetVictim(), 0.0f);
+                    if (temp->IsDead())
+                        temp->Respawn();
+                    else if (temp->GetVictim())
+                        me->getThreatManager().addThreat(temp->GetVictim(), 0.0f);
                 }
             }
 
@@ -417,9 +414,9 @@ public:
 
             if (instance)
             {
-                Unit* Temp =  Unit::GetUnit(*me, instance->GetData64(DATA_SACROLASH));
-                if (Temp && Temp->IsAlive() && !(Temp->GetVictim()))
-                    CAST_CRE(Temp)->AI()->AttackStart(who);
+                Creature *temp = Unit::GetCreature(*me, instance->GetData64(DATA_SACROLASH));
+                if (temp && temp->IsAlive() && !temp->GetVictim())
+                    temp->AI()->AttackStart(who);
             }
 
             if (instance)
@@ -481,7 +478,6 @@ public:
         {
             switch (spell->Id)
             {
-
             case SPELL_BLAZE:
                 target->CastSpell(target, SPELL_BLAZE_SUMMON, true);
             case SPELL_CONFLAGRATION:
@@ -671,7 +667,6 @@ public:
             } else EnrageTimer -= diff;
         }
     };
-
 };
 
 class npc_shadow_image : public CreatureScript
@@ -706,7 +701,6 @@ public:
         {
             switch (spell->Id)
             {
-
             case SPELL_SHADOW_FURY:
             case SPELL_DARK_STRIKE:
                 if (!target->HasAura(SPELL_DARK_FLAME))
@@ -753,7 +747,6 @@ public:
             } else DarkstrikeTimer -= diff;
         }
     };
-
 };
 
 void AddSC_boss_eredar_twins()

@@ -55,6 +55,7 @@ class LfgGroupData
         LfgState GetState() const;
         LfgState GetOldState() const;
         LfgGuidSet const& GetPlayers() const;
+        uint8 GetPlayerCount() const;
         uint64 GetLeader() const;
 
         // Dungeon
