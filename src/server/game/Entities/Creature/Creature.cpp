@@ -2518,9 +2518,10 @@ bool Creature::SetWalk(bool enable)
         return false;
 
     ObjectGuid guid = GetGUID();
+    WorldPacket data;
     if (enable)
     {
-        WorldPacket data(SMSG_SPLINE_MOVE_SET_WALK_MODE, 9);
+        data.Initialize(SMSG_SPLINE_MOVE_SET_WALK_MODE, 9);
         data.WriteBit(guid[7]);
         data.WriteBit(guid[6]);
         data.WriteBit(guid[5]);
@@ -2529,7 +2530,7 @@ bool Creature::SetWalk(bool enable)
         data.WriteBit(guid[4]);
         data.WriteBit(guid[2]);
         data.WriteBit(guid[0]);
-        data.FlushBits();
+
         data.WriteByteSeq(guid[4]);
         data.WriteByteSeq(guid[2]);
         data.WriteByteSeq(guid[1]);
@@ -2538,11 +2539,10 @@ bool Creature::SetWalk(bool enable)
         data.WriteByteSeq(guid[0]);
         data.WriteByteSeq(guid[7]);
         data.WriteByteSeq(guid[3]);
-        SendMessageToSet(&data, false);
     }
     else
     {
-        WorldPacket data(SMSG_SPLINE_MOVE_SET_RUN_MODE, 9);
+        data.Initialize(SMSG_SPLINE_MOVE_SET_RUN_MODE, 9);
         data.WriteBit(guid[5]);
         data.WriteBit(guid[6]);
         data.WriteBit(guid[3]);
@@ -2551,7 +2551,7 @@ bool Creature::SetWalk(bool enable)
         data.WriteBit(guid[0]);
         data.WriteBit(guid[4]);
         data.WriteBit(guid[1]);
-        data.FlushBits();
+
         data.WriteByteSeq(guid[7]);
         data.WriteByteSeq(guid[0]);
         data.WriteByteSeq(guid[4]);
@@ -2560,9 +2560,9 @@ bool Creature::SetWalk(bool enable)
         data.WriteByteSeq(guid[1]);
         data.WriteByteSeq(guid[2]);
         data.WriteByteSeq(guid[3]);
-        SendMessageToSet(&data, false);
     }
 
+    SendMessageToSet(&data, false);
     return true;
 }
 
@@ -2577,9 +2577,10 @@ bool Creature::SetDisableGravity(bool disable, bool packetOnly/*=false*/)
         return true;
 
     ObjectGuid guid = GetGUID();
+    WorldPacket data;
     if (disable)
     {
-        WorldPacket data(SMSG_SPLINE_MOVE_GRAVITY_DISABLE, 9);
+        data.Initialize(SMSG_SPLINE_MOVE_GRAVITY_DISABLE, 9);
         data.WriteBit(guid[7]);
         data.WriteBit(guid[3]);
         data.WriteBit(guid[4]);
@@ -2588,7 +2589,7 @@ bool Creature::SetDisableGravity(bool disable, bool packetOnly/*=false*/)
         data.WriteBit(guid[1]);
         data.WriteBit(guid[0]);
         data.WriteBit(guid[6]);
-        data.FlushBits();
+
         data.WriteByteSeq(guid[7]);
         data.WriteByteSeq(guid[1]);
         data.WriteByteSeq(guid[3]);
@@ -2597,11 +2598,10 @@ bool Creature::SetDisableGravity(bool disable, bool packetOnly/*=false*/)
         data.WriteByteSeq(guid[2]);
         data.WriteByteSeq(guid[5]);
         data.WriteByteSeq(guid[0]);
-        SendMessageToSet(&data, false);
     }
     else
     {
-        WorldPacket data(SMSG_SPLINE_MOVE_GRAVITY_ENABLE, 9);
+        data.Initialize(SMSG_SPLINE_MOVE_GRAVITY_ENABLE, 9);
         data.WriteBit(guid[5]);
         data.WriteBit(guid[4]);
         data.WriteBit(guid[7]);
@@ -2610,7 +2610,7 @@ bool Creature::SetDisableGravity(bool disable, bool packetOnly/*=false*/)
         data.WriteBit(guid[6]);
         data.WriteBit(guid[2]);
         data.WriteBit(guid[0]);
-        data.FlushBits();
+
         data.WriteByteSeq(guid[7]);
         data.WriteByteSeq(guid[3]);
         data.WriteByteSeq(guid[4]);
@@ -2619,9 +2619,9 @@ bool Creature::SetDisableGravity(bool disable, bool packetOnly/*=false*/)
         data.WriteByteSeq(guid[6]);
         data.WriteByteSeq(guid[0]);
         data.WriteByteSeq(guid[5]);
-        SendMessageToSet(&data, false);
     }
 
+    SendMessageToSet(&data, false);
     return true;
 }
 
@@ -2641,9 +2641,10 @@ bool Creature::SetHover(bool enable)
 
     //! Not always a packet is sent
     ObjectGuid guid = GetGUID();
+    WorldPacket data;
     if (enable)
     {
-        WorldPacket data(SMSG_SPLINE_MOVE_SET_HOVER, 9);
+        data.Initialize(SMSG_SPLINE_MOVE_SET_HOVER, 9);
         data.WriteBit(guid[3]);
         data.WriteBit(guid[7]);
         data.WriteBit(guid[0]);
@@ -2652,7 +2653,7 @@ bool Creature::SetHover(bool enable)
         data.WriteBit(guid[6]);
         data.WriteBit(guid[2]);
         data.WriteBit(guid[5]);
-        data.FlushBits();
+
         data.WriteByteSeq(guid[2]);
         data.WriteByteSeq(guid[4]);
         data.WriteByteSeq(guid[3]);
@@ -2661,11 +2662,10 @@ bool Creature::SetHover(bool enable)
         data.WriteByteSeq(guid[0]);
         data.WriteByteSeq(guid[5]);
         data.WriteByteSeq(guid[6]);
-        SendMessageToSet(&data, false);
     }
     else
     {
-        WorldPacket data(SMSG_SPLINE_MOVE_UNSET_HOVER, 9);
+        data.Initialize(SMSG_SPLINE_MOVE_UNSET_HOVER, 9);
         data.WriteBit(guid[6]);
         data.WriteBit(guid[7]);
         data.WriteBit(guid[4]);
@@ -2674,7 +2674,7 @@ bool Creature::SetHover(bool enable)
         data.WriteBit(guid[1]);
         data.WriteBit(guid[5]);
         data.WriteBit(guid[2]);
-        data.FlushBits();
+
         data.WriteByteSeq(guid[4]);
         data.WriteByteSeq(guid[5]);
         data.WriteByteSeq(guid[3]);
@@ -2683,8 +2683,8 @@ bool Creature::SetHover(bool enable)
         data.WriteByteSeq(guid[7]);
         data.WriteByteSeq(guid[6]);
         data.WriteByteSeq(guid[1]);
-        SendMessageToSet(&data, false);
     }
 
+    SendMessageToSet(&data, false);
     return true;
 }

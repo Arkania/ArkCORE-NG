@@ -26840,9 +26840,7 @@ void Player::SendMovementSetWaterWalking(bool apply)
         data.WriteByteSeq(guid[0]);
         data.WriteByteSeq(guid[5]);
         data.WriteByteSeq(guid[2]);
-
         data << uint32(++m_movementInfo.movementCounter);          //! movement counter
-
         data.WriteByteSeq(guid[7]);
         data.WriteByteSeq(guid[3]);
         data.WriteByteSeq(guid[4]);
@@ -26869,7 +26867,6 @@ void Player::SendMovementSetWaterWalking(bool apply)
         data.WriteByteSeq(guid[0]);
         data.WriteByteSeq(guid[3]);
         data.WriteByteSeq(guid[2]);
-
         data << uint32(++m_movementInfo.movementCounter);          //! movement counter
     }
     SendDirectMessage(&data);
@@ -26895,9 +26892,7 @@ void Player::SendMovementSetFeatherFall(bool apply)
         data.WriteByteSeq(guid[5]);
         data.WriteByteSeq(guid[7]);
         data.WriteByteSeq(guid[2]);
-
         data << uint32(++m_movementInfo.movementCounter);          //! movement counter
-
         data.WriteByteSeq(guid[0]);
         data.WriteByteSeq(guid[3]);
         data.WriteByteSeq(guid[4]);
