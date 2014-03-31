@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -36,8 +36,8 @@ EndContentData */
 
 enum eMulgore
 {
-	NPC_FLEDGLING_BRAVE				= 36942,
-	NPC_BRISTLEBACK_INVADER			= 36943,
+    NPC_FLEDGLING_BRAVE             = 36942,
+    NPC_BRISTLEBACK_INVADER         = 36943
 };
 
 /*######
@@ -67,7 +67,6 @@ public:
 
         if (!player->GetQuestRewardStatus(770))
             player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_SW, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-			 
 
         player->SEND_GOSSIP_MENU(522, creature->GetGUID());
 
@@ -219,38 +218,37 @@ public:
 
     struct npc_bristleback_invaderAI : public ScriptedAI
     {
-        npc_bristleback_invaderAI(Creature *c) : ScriptedAI(c) {}
+        npc_bristleback_invaderAI(Creature *c) : ScriptedAI(c) { }
 
-        uint32 _timer;            
+        uint32 _timer;
 
-        void Reset()  
+        void Reset()
         {
-            _timer = urand(1800,2200);                       
+            _timer = urand(1800,2200);
         }
 
-        void UpdateAI(const uint32 diff) 
-        {                        
+        void UpdateAI(const uint32 diff)
+        {
             if (!UpdateVictim())
             {
-				if (_timer <= diff)
-				{
-					if (Creature* brave = me->FindNearestCreature (NPC_FLEDGLING_BRAVE, 3.0f)) 
-					{                   
+                if (_timer <= diff)
+                {
+                    if (Creature* brave = me->FindNearestCreature (NPC_FLEDGLING_BRAVE, 3.0f))
+                    {
                         me->SetFacingTo (me->GetAngle(brave));
                         me->HandleEmoteCommand(EMOTE_ONESHOT_ATTACK1H);
                         _timer = urand(1800,2200);
-                    }                    
-                } 
-				else 
-					_timer -= diff;
+                    }
+                }
+                else 
+                    _timer -= diff;
             } 
-			else 
+            else 
                 DoMeleeAttackIfReady();
-            
         }
     };
 
-       CreatureAI* GetAI(Creature* pCreature) const  
+       CreatureAI* GetAI(Creature* pCreature) const
     {
         return new npc_bristleback_invaderAI (pCreature);
     }
@@ -267,51 +265,46 @@ public:
 
     struct npc_fledgling_braveAI : public ScriptedAI
     {
-        npc_fledgling_braveAI(Creature *c) : ScriptedAI(c) {}
+        npc_fledgling_braveAI(Creature *c) : ScriptedAI(c) { }
 
-        uint32 _timer;            
+        uint32 _timer;
 
-        void Reset()  
+        void Reset()
         {
-            _timer = urand(1800,2200);                       
+            _timer = urand(1800,2200);
         }
 
-        void UpdateAI(const uint32 diff) 
-        {                        
+        void UpdateAI(const uint32 diff)
+        {
             if (!UpdateVictim())
             {
-				if (_timer <= diff)
+                if (_timer <= diff)
                 {
-					if (Creature* invader = me->FindNearestCreature (NPC_BRISTLEBACK_INVADER, 3.0f)) 
-					{                   
+                    if (Creature* invader = me->FindNearestCreature (NPC_BRISTLEBACK_INVADER, 3.0f))
+                    {
                         me->SetFacingTo (me->GetAngle(invader));
                         me->HandleEmoteCommand(EMOTE_ONESHOT_ATTACK1H);
                         _timer = urand(1800,2200);
-                    }                   
+                    }
                 } 
-				else 
-					_timer -= diff;
+                else 
+                    _timer -= diff;
             } 
-			else 
+            else 
                 DoMeleeAttackIfReady();
-            
         }
     };
 
-       CreatureAI* GetAI(Creature* pCreature) const  
+       CreatureAI* GetAI(Creature* pCreature) const
     {
         return new npc_fledgling_braveAI (pCreature);
     }
 };
 
-
-
-
 void AddSC_mulgore()
 {
     new npc_skorn_whitecloud();
     new npc_kyle_frenzied();
-	new npc_fledgling_brave();
-	new npc_bristleback_invader();
-
+    new npc_fledgling_brave();
+    new npc_bristleback_invader();
 }

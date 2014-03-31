@@ -1,11 +1,12 @@
-/*Copyright (C) 2014 Arkania Project.
-*
-* Script 99% done. TODO:
-*
-* - Live Testing needed.
-*
-* THIS particular file is NOT free software; third-party users should NOT have access to it, redistribute it or modify it. :)
-*/
+/*
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ *
+ * Script 99% done. TODO:
+ * - Live Testing needed.
+ *
+ * THIS particular file is NOT free software; third-party users 
+ * should NOT have access to it, redistribute it or modify it. :)
+ */
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"

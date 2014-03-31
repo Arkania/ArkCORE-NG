@@ -1,4 +1,12 @@
 /*
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ *
+ * This file is NOT free software. Third-party users can NOT redistribute 
+ * it or modify it. If you find it, you are either hacking something, or very 
+ * lucky (presuming someone else managed to hack it).
+ */
+
+/*
 SDName: Boss Lord Walden
 SD%Complete: 98%
 SDComment: Just need to fix SPELL_TOXIC_COAGULANT_SLOW/SPELL_TOXIC_COAGULANT_FIRE removing while moving/staying.

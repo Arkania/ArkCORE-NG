@@ -1,11 +1,7 @@
-
 /*
- *
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
- *
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- *
- * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -66,7 +62,7 @@ enum Northshire
     SAY_ASSASSIN_COMBAT         = 0,
     SAY_INJURED_SOLDIER         = 0,
     SAY_HEAL                    = 0,
-   
+
     SPELL_REVIVE              = 93799,
     SPELL_RENEW               = 93094,
     SPELL_PRAYER_OF_HEALING   = 93091,
@@ -77,7 +73,7 @@ enum Northshire
     SPELL_SNEAKING            = 93046,
     SPELL_SPYGLASS            = 80676,
     SPELL_RENEWEDLIFE         = 93097,
-    SPELL_CONVERSATIONS_TRIGGER_01 = 84076,
+    SPELL_CONVERSATIONS_TRIGGER_01 = 84076
 };
 
 /*######
@@ -101,7 +97,7 @@ public:
         }
 
         void UpdateAI(const uint32 diff) 
-        {                        
+        {
             if (!UpdateVictim())
             {
                 if (Creature* infantry = me->FindNearestCreature (NPC_STORMWIND_INFANTRY, 3.0f))
@@ -138,14 +134,14 @@ public:
 
     struct npc_stormwind_infantryAI : public ScriptedAI
     {
-        npc_stormwind_infantryAI(Creature *c) : ScriptedAI(c) {}
+        npc_stormwind_infantryAI(Creature *c) : ScriptedAI(c) { }
 
         uint32 uiSayTimer;
         uint32 Attack1HTimer;
 
         void Reset()
         {
-            uiSayTimer = urand(    10000, 300000);
+            uiSayTimer = urand(10000, 300000);
             Attack1HTimer = urand(1800,2200);
         }
 
@@ -155,7 +151,7 @@ public:
             {
                 Creature* worg;
                 Creature* paxton;
-                if ( worg = me->FindNearestCreature (NPC_BLACKROCK_BATTLE_WORG, 3.0f) )
+                if (worg = me->FindNearestCreature(NPC_BLACKROCK_BATTLE_WORG, 3.0f))
                 {
                     me->SetFacingTo (me->GetAngle(worg));
                     if (!worg->IsAttackingPlayer())
@@ -207,16 +203,16 @@ public:
 
     struct npc_blackrock_spyAI : public ScriptedAI
     {
-        npc_blackrock_spyAI(Creature *c) : ScriptedAI(c) {}
+        npc_blackrock_spyAI(Creature *c) : ScriptedAI(c) { }
 
         uint32 Phase;
         uint32 Emote;
         uint32 Aura;
         uint32 Timer;
-        
+
         void Reset()
             { CreateNewPhase(); }
-       
+
         void EnterCombat(Unit* /*who*/)
         { 
             Talk(0);
@@ -225,7 +221,7 @@ public:
         void UpdateAI(const uint32 diff)
         {
             if (!UpdateVictim())
-            {                    
+            {
                 if (Timer <= diff)
                     CreateNewPhase();
                 else
@@ -255,7 +251,7 @@ public:
                     me->HandleEmoteCommand(EMOTE_STATE_READY2H);
                     break;
                 case 1: // sneaking and spying
-                    me->HandleEmoteCommand(EMOTE_STATE_NONE);                    
+                    me->HandleEmoteCommand(EMOTE_STATE_NONE);
                     if (me->HasAura(SPELL_SPYGLASS)) me->RemoveAurasDueToSpell(SPELL_SPYGLASS);
                     if (!me->HasAura(SPELL_SNEAKING)) DoCast(me, SPELL_SNEAKING);
                     if (!me->HasAura(SPELL_SPYING)) DoCast(me, SPELL_SPYING);
@@ -383,7 +379,7 @@ public:
                 isHealed=true;
             }
         }
-        
+
         void UpdateAI(const uint32 diff)
         {
 
@@ -408,7 +404,7 @@ public:
                         break;
                     }
                 }
-            }    
+            }
             else 
                 timer -= diff;
         }
@@ -468,7 +464,7 @@ public:
                     case 3:
                     {
                         Creature* McBride = me->FindNearestCreature (NPC_MARSHAL_MC_BRIDE,300.0f,true);
-                        me->GetMotionMaster()->MovePoint(0, McBride->GetPositionX(), McBride->GetPositionY(), McBride->GetPositionZ() );
+                        me->GetMotionMaster()->MovePoint(0, McBride->GetPositionX(), McBride->GetPositionY(), McBride->GetPositionZ());
                         timer=10000;
                         break;
                     }
@@ -476,7 +472,6 @@ public:
             }
              else 
                 timer -= diff;
-
         }
     };
 
@@ -509,7 +504,8 @@ public:
         void SpellHit(Unit * Hitter, SpellInfo const* spell)
         {
             if (!Hitter || isHealingNow) return;
-            if (Hitter->GetEntry() != NPC_STORMWIND_INFANTRY || spell->Id != SPELL_CONVERSATIONS_TRIGGER_01) return;
+            if (Hitter->GetEntry() != NPC_STORMWIND_INFANTRY || spell->Id != SPELL_CONVERSATIONS_TRIGGER_01)
+                return;
 
             me->CastSpell(Hitter,SPELL_PRAYER_OF_HEALING);
             me->SetFacingTo (me->GetAngle(Hitter));
@@ -517,7 +513,7 @@ public:
             isHealingNow=true;
         }
 
-        void UpdateAI(const uint32 diff) 
+        void UpdateAI(const uint32 diff)
         {
             if (isHealingNow)
             {
@@ -526,10 +522,10 @@ public:
                     // me->GetMotionMaster()->MovePath (951,true);
                     isHealingNow=false;
                 }
-                else 
+                else
                     timer -= diff;
             }
-            
+
             if (!UpdateVictim())
                return;
 
@@ -548,6 +544,7 @@ public:
 /*######
 ## npc_henze_faulk
 ######*/
+
 class npc_henze_faulk : public CreatureScript
 {
 public:
@@ -573,13 +570,8 @@ public:
             spellHit = false;
         }
 
-        void EnterCombat(Unit * /*who*/)
-        {
-        }
-
-        void MoveInLineOfSight(Unit * /*who*/)
-        {
-        }
+        void EnterCombat(Unit * /*who*/) { }
+        void MoveInLineOfSight(Unit * /*who*/) { }
 
         void UpdateAI(const uint32 diff)
         {
@@ -609,7 +601,6 @@ public:
         }
     };
 };
-
 
 void AddSC_elwynn_forest()
 {

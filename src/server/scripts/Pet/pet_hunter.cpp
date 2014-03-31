@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>  
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -55,7 +55,7 @@ class npc_pet_hunter_snake_trap : public CreatureScript
         {
             npc_pet_hunter_snake_trapAI(Creature* creature) : ScriptedAI(creature) { }
 
-            void EnterCombat(Unit* /*who*/)  { }
+            void EnterCombat(Unit* /*who*/) { }
 
             void Reset() 
             {
@@ -74,8 +74,8 @@ class npc_pet_hunter_snake_trap : public CreatureScript
                 // Start attacking attacker of owner on first ai update after spawn - move in line of sight may choose better target
                 if (!me->GetVictim() && me->IsSummon())
                     if (Unit* Owner = me->ToTempSummon()->GetSummoner())
-//uncomment  FIXME                      if (Owner->getAttackerForHelper())
-     //and this                       AttackStart(Owner->getAttackerForHelper());
+                //uncomment  FIXME    if (Owner->getAttackerForHelper())
+                //and this                AttackStart(Owner->getAttackerForHelper());
 
                 if (!_isViper)
                     DoCast(me, SPELL_HUNTER_DEADLY_POISON_PASSIVE, true);
@@ -84,7 +84,7 @@ class npc_pet_hunter_snake_trap : public CreatureScript
             // Redefined for random target selection:
             void MoveInLineOfSight(Unit* who) 
             {
-				// FIXME
+               // FIXME
                /* if (!me->GetVictim() && me->CanCreatureAttack(who))
                 {
                     if (me->GetDistanceZ(who) > CREATURE_Z_ATTACK_RANGE)

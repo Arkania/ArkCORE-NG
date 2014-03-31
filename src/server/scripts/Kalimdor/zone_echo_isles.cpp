@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -23,8 +23,8 @@
 
 enum eZoneEchoIsle
 {
-	NPC_NOVICE_DARKSPEAR_WARRIOR		= 38268,
-	NPC_TIKI_TARGET						= 38038,
+    NPC_NOVICE_DARKSPEAR_WARRIOR           = 38268,
+    NPC_TIKI_TARGET                        = 38038
 };
 
 /*######
@@ -38,20 +38,20 @@ public:
 
     struct npc_novice_darkspear_warriorAI : public ScriptedAI
     {
-        npc_novice_darkspear_warriorAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_novice_darkspear_warriorAI(Creature* creature) : ScriptedAI(creature) { }
 
-        uint32 _timer;            
+        uint32 _timer;
 
-        void Reset()  
+        void Reset()
         {
-            _timer = urand(1800,2200);                       
+            _timer = urand(1800,2200);
         }
 
         void UpdateAI(const uint32 diff) 
-        {                        
+        {
             if (!UpdateVictim())
             {
-                if (Creature* tiki = me->FindNearestCreature (NPC_TIKI_TARGET, 3.0f)) 
+                if (Creature* tiki = me->FindNearestCreature (NPC_TIKI_TARGET, 3.0f))
                 {
                     if (_timer <= diff)
                     {
@@ -60,24 +60,22 @@ public:
                         _timer = urand(1800,2200);
                     }
                     else 
-						_timer -= diff;
+                        _timer -= diff;
                 }
-            } else 
+            }
+            else 
                 DoMeleeAttackIfReady();
             
         }
     };
 
-       CreatureAI* GetAI(Creature* creature) const  
+       CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_novice_darkspear_warriorAI (creature);
     }
 };
 
-
-
-
 void AddSC_zone_echo_isles()
 {
-	new npc_novice_darkspear_warrior();
+    new npc_novice_darkspear_warrior();
 }

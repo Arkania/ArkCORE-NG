@@ -1,8 +1,9 @@
-/*Copyright (C) 2014 Arkania Project.
-*
-*
-* THIS particular file is NOT free software; third-party users should NOT have access to it, redistribute it or modify it. :)
-*/
+/*
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ *
+ * THIS particular file is NOT free software; third-party users 
+ * should NOT have access to it, redistribute it or modify it. :)
+ */
 
 #include "ScriptedGossip.h"
 #include "ScriptMgr.h"

@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -37,42 +37,40 @@
 
 enum eGilneas
 {
-	// phase 1
-	NPC_PANICKED_CITIZEN_GATE						= 44086,
-	NPC_GILNEAS_CITY_GUARD_GATE						= 34864,
-	QUEST_LOCKDOWN									= 14078,
-    SPELL_SET_PHASE_02								= 59073, 
-    SPELL_GENERIC_QUEST_INVISIBILITY_DERECTION_1	= 49416,
-	// phase 2
-	NPC_RAMPAGING_WORGEN_1							= 35660,
-    NPC_RAMPAGING_WORGEN_2							= 34884,
-    NPC_GILNEAS_CITY_GUARD							= 34916,
+    // phase 1
+    NPC_PANICKED_CITIZEN_GATE                       = 44086,
+    NPC_GILNEAS_CITY_GUARD_GATE                     = 34864,
+    QUEST_LOCKDOWN                                  = 14078,
+    SPELL_SET_PHASE_02                              = 59073, 
+    SPELL_GENERIC_QUEST_INVISIBILITY_DERECTION_1    = 49416,
+    // phase 2
+    NPC_RAMPAGING_WORGEN_1                          = 35660,
+    NPC_RAMPAGING_WORGEN_2                          = 34884,
+    NPC_GILNEAS_CITY_GUARD                          = 34916,
 
-	QUEST_ROYAL_ORDERS								= 14099,
-	 
-    SPELL_INVISIBILITY_DETECTION_2					= 49417,
+    QUEST_ROYAL_ORDERS                              = 14099,
 
-	// old
-	SPELL_ENRAGE						= 8599,
-    SPELL_SHOOT							= 20463,
-    SPELL_CATACLYSM_TYPE_1				= 80133,
-    SPELL_CATACLYSM_TYPE_2				= 68953,
-    SPELL_CATACLYSM_TYPE_3				= 80134,
+    SPELL_INVISIBILITY_DETECTION_2                  = 49417,
 
-    PHASE_ONE							= 6,
-	 
-	NPC_AFFLICTED_GILNEAN				= 50471,
-    NPC_BLOODFANG_WORGEN				= 35118,
-    NPC_GILNEAN_ROYAL_GUARD				= 35232,
-    NPC_FRENZIED_STALKER				= 35627,
-    NPC_NORTHGATE_REBEL					= 41015,
-    NPC_GILNEAS_CITY_GUARD_PHASE_4		= 50474,
-    NPC_NORTHGATE_REBEL_PHASE_5			= 36057,
-    NPC_BLOODFANG_STALKER_PHASE_5		= 35229,
-    NPC_FORSAKEN_INVADER				= 34511,
-    NPC_FORSAKEN_FOOTSOLDIER			= 36236,
+    // old
+    SPELL_ENRAGE                          = 8599,
+    SPELL_SHOOT                           = 20463,
+    SPELL_CATACLYSM_TYPE_1                = 80133,
+    SPELL_CATACLYSM_TYPE_2                = 68953,
+    SPELL_CATACLYSM_TYPE_3                = 80134,
 
+    PHASE_ONE                             = 6,
 
+    NPC_AFFLICTED_GILNEAN                 = 50471,
+    NPC_BLOODFANG_WORGEN                  = 35118,
+    NPC_GILNEAN_ROYAL_GUARD               = 35232,
+    NPC_FRENZIED_STALKER                  = 35627,
+    NPC_NORTHGATE_REBEL                   = 41015,
+    NPC_GILNEAS_CITY_GUARD_PHASE_4        = 50474,
+    NPC_NORTHGATE_REBEL_PHASE_5           = 36057,
+    NPC_BLOODFANG_STALKER_PHASE_5         = 35229,
+    NPC_FORSAKEN_INVADER                  = 34511,
+    NPC_FORSAKEN_FOOTSOLDIER              = 36236
 };
 
 /*######
@@ -102,10 +100,10 @@ public:
 
     struct npc_panicked_citizen_gateAI : public ScriptedAI
     {
-        npc_panicked_citizen_gateAI(Creature* creature) : ScriptedAI(creature)  { }     
+        npc_panicked_citizen_gateAI(Creature* creature) : ScriptedAI(creature)  { }
 
         void UpdateAI(const uint32 diff)
-        {           
+        {
             if (!UpdateVictim())
                 return;
 
@@ -113,7 +111,7 @@ public:
         }
     };
 
-	CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_panicked_citizen_gateAI (creature);
     }
@@ -136,25 +134,25 @@ public:
 
     struct npc_gilneas_city_guard_gateAI : public ScriptedAI
     {
-        npc_gilneas_city_guard_gateAI(Creature* creature) : ScriptedAI(creature)  { }
+        npc_gilneas_city_guard_gateAI(Creature* creature) : ScriptedAI(creature) { }
 
-        uint32		_timer;
-        uint8		_phase;
-        bool		_nearGate;
-		uint8		_say;
-		uint8		_emote; 
-		Creature*	_citizen;
+        uint32       _timer;
+        uint8        _phase;
+        bool         _nearGate;
+        uint8        _say;
+        uint8        _emote;
+        Creature*    _citizen;
 
-		void Reset()
-		{
-			_timer = urand(10000, 40000);
+        void Reset()
+        {
+            _timer = urand(10000, 40000);
             _phase = 0;
 
             if (me->GetDistance2d(-1430.47f, 1345.55f) < 10.0f)
                 _nearGate = true;
             else
                 _nearGate = false;
-		}
+        }
 
         void UpdateAI(const uint32 diff)
         {
@@ -172,65 +170,65 @@ public:
             DoMeleeAttackIfReady();
         }
 
-		void DoWork()
-		{		
-			 switch (_phase)
+        void DoWork()
+        {
+             switch (_phase)
              {
-				case 0:
+                case 0:
                 {
-					std::list<Creature*> listOfCitizen;
+                    std::list<Creature*> listOfCitizen;
                     me->GetCreatureListWithEntryInGrid(listOfCitizen, NPC_PANICKED_CITIZEN_GATE, 35.0f);
 
                     if (!listOfCitizen.empty())
-					{
-						uint8 id = urand(0, listOfCitizen.size() - 1);
+                    {
+                        uint8 id = urand(0, listOfCitizen.size() - 1);
                         std::list<Creature*>::iterator itr = listOfCitizen.begin();
                         std::advance(itr, id);                                    
 
                         if (_citizen = *itr)
-                        {							
+                        {                            
                             _timer = urand(1000,2000);
                             _emote=urand(0, 4);  
-							_say=urand(0,2);
-							_citizen->HandleEmoteCommand(PanickedCitizenRandomEmote[_emote]);
-							_phase=1;
+                            _say=urand(0,2);
+                            _citizen->HandleEmoteCommand(PanickedCitizenRandomEmote[_emote]);
+                            _phase=1;
                             return;
                         }
-                     }                     
-					 break;
+                     }
+                     break;
                 }
-				case 1:
-				{
-					if (_citizen)
-					{
-						_citizen->AI()->Talk(_say, me->GetGUID());									
-						_timer = urand(4000,7000);
-						_phase=2;						
-					}
-					break;
-				}			 
-				case 2:
-				{
-					if (_citizen)
-					{						
-						Talk(_say , me->GetGUID());						
-						_timer = 6000;                            
-						_phase=3;				        
-					}
-					break;
-				}
-				case 3:
-				{
-					if (_citizen)
-					{						
-						_citizen->HandleEmoteCommand(EMOTE_ONESHOT_NONE);				
-						_timer = urand(20000, 40000);                            
-						_phase=0;				        
-					}
-					break;
-				}
-            }			
-		}
+                case 1:
+                {
+                    if (_citizen)
+                    {
+                        _citizen->AI()->Talk(_say, me->GetGUID());
+                        _timer = urand(4000,7000);
+                        _phase=2;
+                    }
+                    break;
+                }
+                case 2:
+                {
+                    if (_citizen)
+                    {
+                        Talk(_say , me->GetGUID());
+                        _timer = 6000;
+                        _phase=3;
+                    }
+                    break;
+                }
+                case 3:
+                {
+                    if (_citizen)
+                    {
+                        _citizen->HandleEmoteCommand(EMOTE_ONESHOT_NONE);
+                        _timer = urand(20000, 40000);
+                        _phase=0;
+                    }
+                    break;
+                }
+            }
+        }
     };
 };
 
@@ -266,7 +264,6 @@ const CrowFlyPosition CrowFlyPos[12]=
     {{-1775.46f, 2380.44f, 51.9086f},{-1767.75f, 2385.99f, 55.8622f}},
     {{-1650.79f, 2507.28f, 109.893f},{-1645.28f, 2506.02f, 115.819f}},
 };
-
 
 class npc_gilnean_crow : public CreatureScript
 {
@@ -344,7 +341,7 @@ public:
             me->DespawnOrUnsummon();
         }
 
-        void WaypointReached(uint32 point) {}
+        void WaypointReached(uint32 point) { }
 
         void MoveInLineOfSight(Unit* who)
         {
@@ -424,8 +421,6 @@ public:
     {
         return new npc_prince_liam_greymane_introAI (creature);
     }
-
-
 };
 
 /*######
@@ -537,10 +532,12 @@ public:
                 uiSayTimer -= diff;
 
             if (me->GetVictim()->GetTypeId() == TYPEID_UNIT)
+            {
                 if (me->GetVictim()->GetHealthPct() < 90)
                     miss = true;
                 else
                     miss = false;
+            }
 
             DoMeleeAttackIfReady();
         }
@@ -563,7 +560,7 @@ public:
 
     struct npc_rampaging_worgenAI : public ScriptedAI
     {
-        npc_rampaging_worgenAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_rampaging_worgenAI(Creature* creature) : ScriptedAI(creature) { }
 
         uint32 uiEnemyEntry;
         bool enrage;
@@ -626,10 +623,12 @@ public:
             }
 
             if (me->GetVictim()->GetTypeId() == TYPEID_UNIT)
+            {
                 if (me->GetVictim()->GetHealthPct() < 90)
                     miss = true;
                 else
                     miss = false;
+            }
 
             DoMeleeAttackIfReady();
         }

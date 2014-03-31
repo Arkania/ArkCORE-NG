@@ -1,3 +1,10 @@
+/*
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ *
+ * THIS particular file is NOT free software; third-party users 
+ * should NOT have access to it, redistribute it or modify it. :)
+ */
+
 #include "ScriptMgr.h"
 #include "InstanceScript.h"
 #include "end_time.h"

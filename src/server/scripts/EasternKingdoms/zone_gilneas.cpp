@@ -83,7 +83,7 @@ public:
 
     struct npc_panicked_citizen_phase1AI : public ScriptedAI
     {
-        npc_panicked_citizen_phase1AI(Creature* creature) : ScriptedAI(creature)  { }
+        npc_panicked_citizen_phase1AI(Creature* creature) : ScriptedAI(creature) { }
 
         void UpdateAI(const uint32 /*diff*/)
         {           
@@ -112,7 +112,7 @@ public:
 
     struct npc_gilneas_city_guard_phase1AI : public ScriptedAI
     {
-        npc_gilneas_city_guard_phase1AI(Creature* creature) : ScriptedAI(creature)  { }
+        npc_gilneas_city_guard_phase1AI(Creature* creature) : ScriptedAI(creature) { }
 
         uint32      _timer;
         uint8       _phase;
@@ -178,7 +178,7 @@ public:
                 {
                     if (_citizen)
                     {
-                        _citizen->AI()->Talk(_say, me->GetGUID());                                    
+                        _citizen->AI()->Talk(_say, me->GetGUID());
                         _timer = urand(4000,7000);
                         _phase=2;
                     }
@@ -629,7 +629,7 @@ public:
                     if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                         if (Player* player = summoner->ToPlayer())
                         {
-                            player->KilledMonsterCredit(NPC_GILNEAS_EVACUATION_FACING_MARKER, 0);                            
+                            player->KilledMonsterCredit(NPC_GILNEAS_EVACUATION_FACING_MARKER, 0);
                             SetEscortPaused(true);
                             _pause = true;
                             _timer=1000;

@@ -1,12 +1,13 @@
-/*Copyright (C) 2014 Arkania Project.
-*
-* Script done: 95%. ToDo: 
-*
-* - Script remaining spells. See each boss notes on ToDo.
-*
-* This file is NOT free software. Third-party users can NOT redistribute it or modify it :). 
-* If you find it, you are either hacking something, or very lucky (presuming someone else managed to hack it).
-*/
+/*
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ *
+ * Script done: 95%. ToDo: 
+ * - Script remaining spells. See each boss notes on ToDo.
+ *
+ * This file is NOT free software. Third-party users can NOT redistribute 
+ * it or modify it. If you find it, you are either hacking something, or very 
+ * lucky (presuming someone else managed to hack it).
+ */
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"

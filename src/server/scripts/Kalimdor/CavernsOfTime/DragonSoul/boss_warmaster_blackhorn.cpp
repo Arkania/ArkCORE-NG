@@ -1,3 +1,11 @@
+/*
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ *
+ * This file is NOT free software. Third-party users can NOT redistribute 
+ * it or modify it. If you find it, you are either hacking something, or very 
+ * lucky (presuming someone else managed to hack it).
+ */
+
 /* ScriptData
 SDName: boss_warmaster_blackhorm
 SD%Complete: 40%
@@ -5,7 +13,6 @@ SDComment:
 SDCategory: Boss Warmaster Blackhorm
 EndScriptData
 */
-
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"

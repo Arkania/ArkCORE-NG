@@ -1,3 +1,10 @@
+/*
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ *
+ * This file is NOT free software. Third-party users can NOT redistribute 
+ * it or modify it. If you find it, you are either hacking something, or very 
+ * lucky (presuming someone else managed to hack it).
+ */
 
 #ifndef DEF_BLACKWING_DESCENT_H
 #define DEF_BLACKWING_DESCENT_H

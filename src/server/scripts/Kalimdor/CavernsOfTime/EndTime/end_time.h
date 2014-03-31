@@ -1,3 +1,10 @@
+/*
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ *
+ * THIS particular file is NOT free software; third-party users 
+ * should NOT have access to it, redistribute it or modify it. :)
+ */
+
 #ifndef DEF_TIME_END_H
 #define DEF_TIME_END_H
 

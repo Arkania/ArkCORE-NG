@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -221,9 +221,9 @@ public:
 
         void EnterCombat(Unit* /*who*/)
         {
-            DoCast(me, SPELL_EARTHBIND_TOTEM, false);    		
+            DoCast(me, SPELL_EARTHBIND_TOTEM, false);
         }
-		
+
         void JustDied(Unit* /*killer*/)
         {
             if (!HasEscortState(STATE_ESCORT_ESCORTING))
@@ -234,7 +234,7 @@ public:
                 if (player->GetQuestStatus(QUEST_TOTEM_KARDASH_H) != QUEST_STATUS_COMPLETE)
                     player->FailQuest(QUEST_TOTEM_KARDASH_H);
             }
-        }		
+        }
 
         void WaypointReached(uint32 waypointId)
         {
@@ -536,7 +536,7 @@ public:
             if (npc_kurenai_captiveAI* EscortAI = dynamic_cast<npc_kurenai_captiveAI*>(creature->AI()))
             {
                 creature->SetStandState(UNIT_STAND_STATE_STAND);
-				creature->setFaction(231);
+                creature->setFaction(231);
                 EscortAI->Start(true, false, player->GetGUID(), quest);
                 DoScriptText(SAY_KUR_START, creature);
 
@@ -650,7 +650,7 @@ public:
         void UpdateAI(const uint32 diff)
         {
             npc_escortAI::UpdateAI(diff);
-			
+
             if (!UpdateVictim())
                 return;
 

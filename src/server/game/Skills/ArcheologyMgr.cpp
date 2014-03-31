@@ -1,13 +1,15 @@
 /*
- * Copyright (C) 2014 Arkania Project.
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  *
- * This program is not free software. You may not redistribute it or modify it.
+ * This program is not free software. You may not redistribute 
+ * it or modify it.
  *
  * TODO:
  *
  * - Fix wrong/missing db digsite artifact positions.
  * - Implement currency loot (needed for the gameobjects).
- * - Figure a way to deal with that idiotic switch construction, which determines the id of the gameobject to spawn ;)
+ * - Figure a way to deal with that idiotic switch construction, 
+ * which determines the id of the gameobject to spawn ;)
  *
  * Done : 99%. ToDo : Above.
  */

@@ -1,7 +1,8 @@
 /*
- * Copyright (C) 2014 Arkania Project.
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  *
- * This program is not free software. You may not redistribute it or modify it.
+ * This program is not free software. You may not redistribute
+ * it or modify it.
  */
 
 #ifndef __TRINITY_ARCHEOLOGY_MGR_H

@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -139,7 +139,7 @@ public:
 
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
-				
+
             while (uint32 eventId = events.ExecuteEvent())
             {
                 switch (eventId)

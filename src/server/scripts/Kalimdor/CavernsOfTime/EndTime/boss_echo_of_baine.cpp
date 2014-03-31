@@ -1,13 +1,15 @@
-/*Copyright (C) 2014 Arkania Project.
-*
-* Script 85% done. TODO:
-*
-* - Throw back totem mechanic?
-* - Nozdormu tele say.
-* - Live Testing needed.
-*
-* THIS particular file is NOT free software; third-party users should NOT have access to it, redistribute it or modify it. :)
-*/
+/*
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ *
+ * Script 85% done. TODO:
+ *
+ * - Throw back totem mechanic?
+ * - Nozdormu tele say.
+ * - Live Testing needed.
+ *
+ * THIS particular file is NOT free software; third-party users 
+ * should NOT have access to it, redistribute it or modify it. :)
+ */
 
 /**** The undying flames are all that remain of this sacred place. I sense much anger here... a seething rage, barely held in check. Be on your guard. VO_ET_NOZDORMU_INTRO_02 ****/
 
