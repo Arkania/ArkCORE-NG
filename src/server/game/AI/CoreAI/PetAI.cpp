@@ -134,10 +134,9 @@ void PetAI::UpdateAI(const uint32 diff)
         else
             HandleReturnMovement();
     }
-    // if comment this - no crash in http://ru.wowhead.com/spell=34433
-    //
-//    else if (owner && !me->HasUnitState(UNIT_STATE_FOLLOW)) // no charm info and no victim
-//                    HandleReturnMovement();
+    // if comment this - no crash in http://ru.wowhead.com/spell=34433 - fixed
+    else if (owner && !me->HasUnitState(UNIT_STATE_FOLLOW)) // no charm info and no victim
+        me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, me->GetFollowAngle());
 
     if (!me->GetCharmInfo())
         return;
