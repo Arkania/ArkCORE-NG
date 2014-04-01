@@ -194,7 +194,7 @@ public:
 ## npc_darkspear_jailor
 ######*/
 
-class npc_darkspear_jailor : public CreatureScript
+/*class npc_darkspear_jailor : public CreatureScript
 {
 public:
     npc_darkspear_jailor() : CreatureScript("npc_darkspear_jailor") { }
@@ -204,7 +204,7 @@ public:
 
 		return true;
 	}   
-};
+};*/
 
 /*######
 ## npc_captive_spitescale_scout
@@ -223,6 +223,6 @@ void AddSC_zone_echo_isles()
 	new npc_novice_darkspear_warrior();
 	new npc_docile_island_boar();
 	new npc_wildmane_cat();
-	new npc_darkspear_jailor();
+	// new npc_darkspear_jailor();
 	new npc_captive_spitescale_scout();
 };
