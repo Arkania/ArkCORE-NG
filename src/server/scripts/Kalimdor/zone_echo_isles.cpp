@@ -25,6 +25,13 @@ enum eZoneEchoIsle
 {
     NPC_NOVICE_DARKSPEAR_WARRIOR           = 38268,
     NPC_TIKI_TARGET                        = 38038
+	NPC_DOCILE_ISLAND_BOAR				= 38141,
+	NPC_WILDMANE_CAT					= 38046,
+
+	SPELL_LEAPING_RUSH					= 75002,
+	SPELL_SWIPE							= 31279,
+	SPELL_WILD_POUNCE					= 71232,
+
 };
 
 /*######
@@ -75,7 +82,113 @@ public:
     }
 };
 
+/*######
+## npc_docile_island_boar
+######*/
+
+class npc_docile_island_boar : public CreatureScript
+{
+public:
+    npc_docile_island_boar() : CreatureScript("npc_docile_island_boar") { }
+
+    struct npc_docile_island_boarAI : public ScriptedAI
+    {
+        npc_docile_island_boarAI(Creature* creature) : ScriptedAI(creature) {}
+         
+	    void UpdateAI(const uint32 diff) 
+        {                        
+            if (!UpdateVictim())
+				return;
+            else 
+                DoMeleeAttackIfReady();            
+        }		
+    };
+
+    CreatureAI* GetAI(Creature* creature) const  
+    {
+        return new npc_docile_island_boarAI (creature);
+    }
+};
+
+/*######
+## npc_wildmane_cat
+######*/
+
+class npc_wildmane_cat : public CreatureScript
+{
+public:
+    npc_wildmane_cat() : CreatureScript("npc_wildmane_cat") { }
+
+    struct npc_wildmane_catAI : public ScriptedAI
+    {
+        npc_wildmane_catAI(Creature* creature) : ScriptedAI(creature) {_timer = urand(10000,60000); _phase=0;}
+
+        uint32 _timer;
+		uint32 _phase;
+		Creature* _boar;
+
+        void UpdateAI(const uint32 diff) 
+        {                        
+            if (!UpdateVictim())
+				if (_timer <= diff)
+					DoWork(); 
+				else 
+					_timer -= diff;
+            else 
+                DoMeleeAttackIfReady();            
+        }
+
+		void MovementInform(uint32 type, uint32 id)  
+		{ 
+			if (id != 33) 
+				return;
+			
+			me->GetMotionMaster()->MoveIdle();
+			// ToDo: correct is SPELL_WILD_POUNCE for hold the boar down and giv cat sound
+			// me->CastSpell(_boar, SPELL_WILD_POUNCE, false);					
+			_boar->DespawnOrUnsummon(2000); 
+			_phase=2;
+			_timer=5000;			
+		}
+
+		void DoWork()
+		{				
+			switch (_phase)
+			{
+				case 0:
+					if (_boar = me->FindNearestCreature(NPC_DOCILE_ISLAND_BOAR,10.0f))
+					{											
+						_phase=1; 
+						_timer = 10000;						
+						// ToDo: Correct is SPELL_LEAPING_RUSH for jumping to boar
+						// me->CastSpell(_boar, SPELL_LEAPING_RUSH, true);
+						me->GetMotionMaster()->MoveJump(_boar->GetPositionX(), _boar->GetPositionY(), _boar->GetPositionZ(), 25.0f ,10.0f, 33);																		
+						_boar->DealDamage(_boar, _boar->GetHealth()); // kill the boar
+					}
+					else
+						_timer = 60000; // urand(60000,200000);
+					break;				
+				case 1:					
+					_phase=0; _timer=0;	
+					break;
+				case 2:
+					me->GetMotionMaster()->MoveRandom(10.0f);
+					_phase=0; _timer=0;
+					break;
+			}						 
+		}
+    };
+
+       CreatureAI* GetAI(Creature* creature) const  
+    {
+        return new npc_wildmane_catAI (creature);
+    }
+};
+
 void AddSC_zone_echo_isles()
 {
     new npc_novice_darkspear_warrior();
+	new npc_docile_island_boar();
+	new npc_wildmane_cat();
+
 }
