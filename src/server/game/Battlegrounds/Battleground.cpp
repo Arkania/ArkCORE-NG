@@ -901,14 +901,14 @@ void Battleground::EndBattleground(uint32 winner)
             if (team == winner)
             {
                 // Modify the guild reputation and xp - 62 rep on win, 27.9k guild xp. Only if group is guild group.
-                if (Guild* guild = sGuildMgr->GetGuildById(player->GetGuildId()))
+               /* if (Guild* guild = sGuildMgr->GetGuildById(player->GetGuildId()))
                     if(player->GetGroup()->IsGuildGroup())
                     {
                         uint32 guildXP = uint32(27900);
                         uint32 guildRep = uint32(guildXP / 450);
                         guild->GiveXP(guildXP, player);
                         guild->GainReputation(player->GetGUID(), guildRep);
-                    }
+                    }*/
 
                 // update achievement BEFORE personal rating update
                 uint32 rating = player->GetArenaPersonalRating(winnerArenaTeam->GetSlot());
@@ -950,14 +950,14 @@ void Battleground::EndBattleground(uint32 winner)
                 player->ModifyCurrency(CURRENCY_TYPE_CONQUEST_META_BG, BG_REWARD_WINNER_CONQUEST_LAST );
 
             // Modify the guild reputation and xp - 167 rep on win, 75k guild xp. Only if group is guild group.
-            if (Guild* guild = sGuildMgr->GetGuildById(player->GetGuildId()))
+            /*if (Guild* guild = sGuildMgr->GetGuildById(player->GetGuildId()))
                 if(player->GetGroup()->IsGuildGroup())
                 {
                     uint32 guildXP = uint32(75150);
                     uint32 guildRep = uint32(guildXP / 450);
                     guild->GiveXP(guildXP, player);
                     guild->GainReputation(player->GetGUID(), guildRep);
-                }
+                }*/
 
             player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_BG, 1);
             if (!guildAwarded)
@@ -968,7 +968,7 @@ void Battleground::EndBattleground(uint32 winner)
                     {
                         guild->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_BG, 1, 0, 0, NULL, player);
                         if (isArena() && isRated() && winnerArenaTeam && loserArenaTeam && winnerArenaTeam != loserArenaTeam)
-                            guild->GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_RATED_ARENA, std::max<uint32>(winnerArenaTeam->GetRating(), 1), 0, NULL, player);
+                            guild->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_RATED_ARENA, std::max<uint32>(winnerArenaTeam->GetRating(), 1), 0, 0, NULL, player);
                     }
             }
         }

@@ -377,13 +377,15 @@ private:
             m_rankId(rankId),
             m_achievementPoints(0),
             m_totalActivity(0),
-            m_weekActivity(0)
+            m_weekActivity(0),
+            m_totalReputation(0),
+            m_weekReputation(0)
         {
             memset(m_bankWithdraw, 0, (GUILD_BANK_MAX_TABS + 1) * sizeof(int32));
         }
 
         void SetStats(Player* player);
-        void SetStats(std::string const& name, uint8 level, uint8 _class, uint32 zoneId, uint32 accountId);
+        void SetStats(std::string const& name, uint8 level, uint8 _class, uint32 zoneId, uint32 accountId, uint32 reputation);
         bool CheckStats() const;
 
         void SetPublicNote(std::string const& publicNote);
@@ -391,6 +393,7 @@ private:
         void SetZoneId(uint32 id) { m_zoneId = id; }
         void SetAchievementPoints(uint32 val) { m_achievementPoints = val; }
         void SetLevel(uint8 var) { m_level = var; }
+        void AddReputation(uint32& reputation);
         void AddActivity(uint64 activity);
 
         void AddFlag(uint8 var) { m_flags |= var; }
@@ -414,6 +417,9 @@ private:
         uint32 GetAchievementPoints() const { return m_achievementPoints; }
         uint64 GetTotalActivity() const { return m_totalActivity; }
         uint64 GetWeekActivity() const { return m_weekActivity; }
+        uint32 GetTotalReputation() const { return m_totalReputation; }
+        uint32 GetWeekReputation() const { return m_weekReputation; }
+
         bool IsOnline() { return (m_flags & GUILDMEMBER_STATUS_ONLINE); }
 
         void ChangeRank(uint8 newRank);
@@ -449,6 +455,8 @@ private:
         uint32 m_achievementPoints;
         uint64 m_totalActivity;
         uint64 m_weekActivity;
+        uint32 m_totalReputation;
+        uint32 m_weekReputation;
     };
 
     // Base class for event entries
@@ -869,7 +877,6 @@ public:
     void SendBankTabText(WorldSession* session, uint8 tabId) const;
     void SendPermissions(WorldSession* session) const;
     void SendMoneyInfo(WorldSession* session) const;
-    void SendGuildReputationWeeklyCap(WorldSession* session) const;
     void SendLoginInfo(WorldSession* session);
     void SendNewsUpdate(WorldSession* session);
     void SendUpdateRoster(std::set<Player*> players);
@@ -924,7 +931,7 @@ public:
     AchievementMgr<Guild> const& GetAchievementMgr() const { return m_achievementMgr; }
 
     // Guild Reputation
-    uint32 GetCharacterReputationGuild(uint32 guid);
+    /*uint32 GetCharacterReputationGuild(uint32 guid);
     uint32 GetCharacterReputationGuildRep(uint32 guid);
     time_t GetCharacterReputationGuildTime(uint32 guid);
     void GainReputation(uint64 guidid, uint32 rep);
@@ -935,14 +942,14 @@ public:
     void UpdateCharacterReputationGuildRep(uint32 wk_rep, uint32 guid);
     void UpdateCharacterTotalReputationGuildRep(uint32 total_rep, uint32 guid);
     uint32 GetCharacterTotalReputationGuildRep(uint32 guid);
-    uint32 GetMaximumWeeklyReputation() const { return sWorld->getIntConfig(CONFIG_GUILD_WEEKLY_REP_CAP); }
+    uint32 GetMaximumWeeklyReputation() const { return sWorld->getIntConfig(CONFIG_GUILD_WEEKLY_REP_CAP); }*/
 
     // Guild leveling
     uint8 GetLevel() const { return _level; }
     void GiveXP(uint32 xp, Player* source = NULL);
     uint64 GetExperience() const { return _experience; }
     uint64 GetTodayExperience() const { return _todayExperience; }
-    void ResetDailyExperience(); // Reset cap.
+
     void AddGuildNews(uint8 type, uint64 guid, uint32 flags, uint32 value);
 
     void MoveRank(uint32 rankId, uint8 direction);
@@ -1066,6 +1073,7 @@ private:
 
     void _SendBankContentUpdate(MoveItemData* pSrc, MoveItemData* pDest) const;
     void _SendBankContentUpdate(uint8 tabId, SlotIds slots) const;
+    void SendGuildReputationWeeklyCap(WorldSession* session, uint32 reputation) const;
     void SendGuildRanksUpdate(uint64 setterGuid, uint64 targetGuid, uint32 rank);
 
     void _BroadcastEvent(GuildEvents guildEvent, uint64 guid, const char* param1 = NULL, const char* param2 = NULL, const char* param3 = NULL) const;

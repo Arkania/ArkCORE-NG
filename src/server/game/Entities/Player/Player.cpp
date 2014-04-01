@@ -519,7 +519,7 @@ inline void KillRewarder::_RewardXP(Player* player, float rate)
         // 4.2.3. Calculate expansion penalty
         if (_victim->GetTypeId() == TYPEID_UNIT && player->getLevel() >= GetMaxLevelForExpansion(_victim->ToCreature()->GetCreatureTemplate()->expansion))
             xp = CalculatePct(xp, 10); // Players get only 10% xp for killing creatures of lower expansion levels than himself
-        
+
         // 4.2.4. Give XP to player.
         player->GiveXP(xp, _victim, _groupRate);
         if (Pet* pet = player->GetPet())
@@ -567,13 +567,13 @@ void KillRewarder::_RewardPlayer(Player* player, bool isDungeon)
             _RewardXP(player, rate);
         if (!_isBattleGround)
         {
-            CreatureTemplate const* cinfo = sObjectMgr->GetCreatureTemplate(_victim->GetEntry());
+           // CreatureTemplate const* cinfo = sObjectMgr->GetCreatureTemplate(_victim->GetEntry());
 
             // If killer is in dungeon then all members receive full reputation at kill.
             _RewardReputation(player, isDungeon ? 1.0f : rate);
             _RewardKillCredit(player);
             // Reward Guild reputation
-            if (player->GetGuildId() != 0 && _victim->GetTypeId() == TYPEID_UNIT && (cinfo->ModHealth > 1000000 && cinfo->maxlevel < 85 || _victim->ToCreature()->isWorldBoss()) && player->GetGroup() && player->GetGroup()->IsGuildGroup()) // should use _victim->ToCreature()->IsDungeonBoss() but does not work.
+         /*   if (player->GetGuildId() != 0 && _victim->GetTypeId() == TYPEID_UNIT && (cinfo->ModHealth > 1000000 && cinfo->maxlevel < 85 || _victim->ToCreature()->isWorldBoss()) && player->GetGroup() && player->GetGroup()->IsGuildGroup()) // should use _victim->ToCreature()->IsDungeonBoss() but does not work.
             {
                 if (Guild* guild = sGuildMgr->GetGuildById(player->GetGuildId()))
                 {
@@ -594,7 +594,7 @@ void KillRewarder::_RewardPlayer(Player* player, bool isDungeon)
                         guildRep = 1;
                     guild->GiveXP(guildXP, player);
                     guild->GainReputation(player->GetGUID(), guildRep);
-                }
+                }*/
         }
     }
 }
@@ -6117,6 +6117,7 @@ void Player::UpdateRating(CombatRating cr)
         case CR_HIT_TAKEN_RANGED:
         case CR_HIT_TAKEN_SPELL:                            // Implemented in Unit::MagicSpellHitResult
         case CR_CRIT_TAKEN_MELEE:                           // Implemented in Unit::RollMeleeOutcomeAgainst (only for chance to crit)
+        case CR_RESILIENCE_PLAYER_DAMAGE_TAKEN:
         case CR_CRIT_TAKEN_SPELL:                           // Implemented in Unit::SpellCriticalBonus (only for chance to crit)
         case CR_HASTE_MELEE:                                // Implemented in Player::ApplyRatingMod
         case CR_HASTE_RANGED:
@@ -6404,7 +6405,7 @@ void Player::UpdateSkillsForLevel()
         uint16 field = itr->second.pos / 2;
         uint8 offset = itr->second.pos & 1; // itr->second.pos % 2
 
-        uint16 val = GetUInt16Value(PLAYER_SKILL_RANK_0 + field, offset);
+        //uint16 val = GetUInt16Value(PLAYER_SKILL_RANK_0 + field, offset);
         uint16 max = GetUInt16Value(PLAYER_SKILL_MAX_RANK_0 + field, offset);
 
         // update only level dependent max skill values
@@ -24975,7 +24976,6 @@ void Player::UpdateAchievementCriteria(AchievementCriteriaTypes type, uint64 mis
     guild->UpdateAchievementCriteria(type, miscValue1, miscValue2, miscValue3, unit, this);
 }
 
-
 void Player::CompletedAchievement(AchievementEntry const* entry)
 {
     m_achievementMgr.CompletedAchievement(entry, this);
@@ -26700,19 +26700,51 @@ void Player::SendMovementSetCanFly(bool apply)
 
     if (apply)
     {
-        data.WriteGuidMask(guid, guidMaskSetFly, 8);
+        data.Initialize(SMSG_MOVE_SET_CAN_FLY, 1 + 8 + 4);
+        data.WriteBit(guid[1]);
+        data.WriteBit(guid[6]);
+        data.WriteBit(guid[5]);
+        data.WriteBit(guid[0]);
+        data.WriteBit(guid[7]);
+        data.WriteBit(guid[4]);
+        data.WriteBit(guid[2]);
+        data.WriteBit(guid[3]);
 
-        data.WriteGuidBytes(guid, guidBytesSetFly, 2, 0);
-        data << uint32(sWorld->GetGameTime());
-        data.WriteGuidBytes(guid, guidBytesSetFly, 6, 2);
+        data.WriteByteSeq(guid[6]);
+        data.WriteByteSeq(guid[3]);
+
+        data << uint32(0);          //! movement counter
+
+        data.WriteByteSeq(guid[2]);
+        data.WriteByteSeq(guid[1]);
+        data.WriteByteSeq(guid[4]);
+        data.WriteByteSeq(guid[7]);
+        data.WriteByteSeq(guid[0]);
+        data.WriteByteSeq(guid[5]);
     }
     else
     {
-        data.WriteGuidMask(guid, guidMaskUnsetFly, 8);
+        data.Initialize(SMSG_MOVE_UNSET_CAN_FLY, 1 + 8 + 4);
+        data.WriteBit(guid[1]);
+        data.WriteBit(guid[4]);
+        data.WriteBit(guid[2]);
+        data.WriteBit(guid[5]);
+        data.WriteBit(guid[0]);
+        data.WriteBit(guid[3]);
+        data.WriteBit(guid[6]);
+        data.WriteBit(guid[7]);
 
-        data.WriteGuidBytes(guid, guidBytesUnsetFly, 2, 0);
-        data << uint32(sWorld->GetGameTime());
-        data.WriteGuidBytes(guid, guidBytesUnsetFly, 6, 2);
+        data.WriteByteSeq(guid[4]);
+        data.WriteByteSeq(guid[6]);
+
+        data << uint32(0);          //! movement counter
+
+        data.WriteByteSeq(guid[1]);
+        data.WriteByteSeq(guid[0]);
+        data.WriteByteSeq(guid[2]);
+        data.WriteByteSeq(guid[3]);
+        data.WriteByteSeq(guid[5]);
+        data.WriteByteSeq(guid[7]);
     }
 
     SendDirectMessage(&data);

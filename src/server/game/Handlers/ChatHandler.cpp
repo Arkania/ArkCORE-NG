@@ -152,21 +152,21 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                     {
                         std::string msg = "";
                         recvData >> msg;
-            
+
                         if (msg.empty())
                             return;
-            
+
                         sScriptMgr->OnPlayerChat(sender, uint32(CHAT_MSG_ADDON), lang, msg);
                     }
-            
+
                     // Disabled addon channel?
                     if (!sWorld->getBoolConfig(CONFIG_ADDON_CHANNEL))
                         return;
                     break;
                 default:
-                    sLog->outError("Player %s (GUID: %u) sent a chatmessage with an invalid language/message type combination", 
-                                                         GetPlayer()->GetName().c_str(), GetPlayer()->GetGUIDLow());
-            
+                    sLog->outError("Player %s (GUID: %u) sent a chatmessage with an invalid language/message type combination",
+                        GetPlayer()->GetName().c_str(), GetPlayer()->GetGUIDLow());
+
                     recvData.rfinish();
                     return;
             }

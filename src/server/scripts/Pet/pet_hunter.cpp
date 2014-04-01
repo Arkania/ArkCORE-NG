@@ -72,17 +72,18 @@ class npc_pet_hunter_snake_trap : public CreatureScript
                 //me->SetStatFloatValue(UNIT_FIELD_RANGED_ATTACK_POWER, float(Info->attackpower));
 
                 // Start attacking attacker of owner on first ai update after spawn - move in line of sight may choose better target
-                if (!me->GetVictim() && me->IsSummon())
-                    if (Unit* Owner = me->ToTempSummon()->GetSummoner())
-                //uncomment  FIXME    if (Owner->getAttackerForHelper())
-                //and this                AttackStart(Owner->getAttackerForHelper());
+                // uncomment FIXME and this 
+				/*if (!me->GetVictim() && me->IsSummon())
+                    if (Unit* owner = me->ToTempSummon()->GetSummoner())
+                        if (owner->getAttackerForHelper())
+                            AttackStart(owner->getAttackerForHelper());*/
 
                 if (!_isViper)
                     DoCast(me, SPELL_HUNTER_DEADLY_POISON_PASSIVE, true);
             }
 
             // Redefined for random target selection:
-            void MoveInLineOfSight(Unit* who) 
+            void MoveInLineOfSight(Unit* /*who*/) 
             {
                // FIXME
                /* if (!me->GetVictim() && me->CanCreatureAttack(who))

@@ -20,6 +20,7 @@
 #include "MoveSpline.h"
 #include <sstream>
 #include "Log.h"
+#include "Creature.h"
 
 namespace Movement{
 
@@ -203,12 +204,12 @@ MoveSpline::MoveSpline() : m_Id(0), time_passed(0),
 
 /// ============================================================================================
 
-bool MoveSplineInitArgs::Validate() const
+bool MoveSplineInitArgs::Validate(Unit* unit) const
 {
 #define CHECK(exp) \
     if (!(exp))\
     {\
-        sLog->outError("MoveSplineInitArgs::Validate: expression '%s' failed", #exp);\
+        sLog->outError("MoveSplineInitArgs::Validate: expression '%s' failed for GUID: %u", #exp, unit->GetTypeId() == TYPEID_PLAYER ? unit->GetGUIDLow() : unit->ToCreature()->GetDBTableGUIDLow());\
         return false;\
     }
     CHECK(path.size() > 1);

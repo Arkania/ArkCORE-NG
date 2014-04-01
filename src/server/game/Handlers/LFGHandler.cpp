@@ -268,10 +268,10 @@ void WorldSession::HandleLfgPartyLockInfoRequestOpcode(WorldPacket&  /*recvData*
     SendPacket(&data);
 }
 
-void WorldSession::HandleLfrJoinOpcode(WorldPacket& recv_data)
+void WorldSession::HandleLfrJoinOpcode(WorldPacket& recvData)
 {
     uint32 entry;                                          // Raid id to search
-    recv_data >> entry;
+    recvData >> entry;
     sLog->outDebug(LOG_FILTER_LFG, "CMSG_LFG_LFR_JOIN [" UI64FMTD "] dungeon entry: %u", GetPlayer()->GetGUID(), entry);
     //SendLfrUpdateListOpcode(entry);
 }

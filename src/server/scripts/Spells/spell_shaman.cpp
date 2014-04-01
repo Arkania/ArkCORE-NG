@@ -51,7 +51,7 @@ enum ShamanSpells
     SHAMAN_LAVA_FLOWS_R1                   = 51480,
     SHAMAN_LAVA_FLOWS_TRIGGERED_R1         = 65264,
     SHAMAN_SPELL_ANCESTRAL_AWAKENING_PROC  = 52752,
-    
+
     ICON_ID_SOOTHING_RAIN                  = 2011,
     SPELL_HEALING_STREAM_TOTEM_HEAL        = 52042,
 
@@ -69,7 +69,7 @@ enum ShamanSpells
     SHAMAN_TOTEM_SPELL_TOTEMIC_WRATH       = 77746,
     SHAMAN_TOTEM_SPELL_TOTEMIC_WRATH_AURA  = 77747,
 
-    SHAMAN_SPELL_THUNDERSTORM_SLOW         = 100955,
+    SHAMAN_SPELL_THUNDERSTORM_SLOW         = 100955
 };
 
 enum RaidHasteSpellsBuffsAndDebuffs
@@ -84,7 +84,7 @@ enum RaidHasteSpellsBuffsAndDebuffs
     HASTE_DEBUFF_TEMPORAL_DISPLACEMENT  = 80354,
 
     HASTE_BUFF_ANCIENT_HYSTERIA         = 90355,
-    HASTE_DEBUFF_INSANITY               = 95809,
+    HASTE_DEBUFF_INSANITY               = 95809
 };
 
 // 1535 Fire Nova

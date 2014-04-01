@@ -114,19 +114,6 @@ uint32 GuildMgr::GetXPForGuildLevel(uint8 level) const
     return 0;
 }
 
-void GuildMgr::ResetExperienceCaps()
-{
-    CharacterDatabase.Execute(CharacterDatabase.GetPreparedStatement(CHAR_UPD_GUILD_RESET_TODAY_EXPERIENCE));
-
-    for (GuildContainer::iterator itr = GuildStore.begin(); itr != GuildStore.end(); ++itr)
-        itr->second->ResetDailyExperience();
-}
-
-void GuildMgr::ResetReputationCaps()
-{
-    /// @TODO: Implement
-}
-
 void GuildMgr::LoadGuilds()
 {
     // 1. Load all guilds
@@ -159,6 +146,7 @@ void GuildMgr::LoadGuilds()
                     delete guild;
                     continue;
                 }
+
                 AddGuild(guild);
 
                 ++count;
@@ -215,7 +203,7 @@ void GuildMgr::LoadGuilds()
         CharacterDatabase.DirectExecute("DELETE gm FROM guild_member gm LEFT JOIN guild g ON gm.guildId = g.guildId WHERE g.guildId IS NULL");
         CharacterDatabase.DirectExecute("DELETE gm FROM guild_member_withdraw gm LEFT JOIN guild_member g ON gm.guid = g.guid WHERE g.guid IS NULL");
 
-                                                             // 0          1       2      3       4      5       6        7       8       9      10
+                                                //           0           1        2     3      4        5       6       7       8       9       10
         QueryResult result = CharacterDatabase.Query("SELECT gm.guildid, gm.guid, rank, pnote, offnote, w.tab0, w.tab1, w.tab2, w.tab3, w.tab4, w.tab5, "
                                                      // 11     12       13       14       15       16      17       18          19
                                                      "w.tab6, w.tab7, w.money, c.name, c.level, c.class, c.zone, c.account, c.logout_time "
@@ -257,7 +245,7 @@ void GuildMgr::LoadGuilds()
         // Delete orphaned guild bank right entries before loading the valid ones
         CharacterDatabase.DirectExecute("DELETE gbr FROM guild_bank_right gbr LEFT JOIN guild g ON gbr.guildId = g.guildId WHERE g.guildId IS NULL");
 
-                                                     //       0        1      2    3        4
+                                                     //      0        1      2    3        4
         QueryResult result = CharacterDatabase.Query("SELECT guildid, TabId, rid, gbright, SlotPerDay FROM guild_bank_right ORDER BY guildid ASC, TabId ASC");
 
         if (!result)

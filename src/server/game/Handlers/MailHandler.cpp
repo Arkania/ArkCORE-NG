@@ -648,7 +648,7 @@ void WorldSession::HandleGetMailList(WorldPacket& recvData)
             case MAIL_GAMEOBJECT:
             case MAIL_AUCTION:
             case MAIL_CALENDAR:
-                data << uint32((*itr)->sender);            // creature/gameobject entry, auction id, calendar event id?
+                data << uint32((*itr)->sender);             // creature/gameobject entry, auction id, calendar event id?
                 break;
         }
 

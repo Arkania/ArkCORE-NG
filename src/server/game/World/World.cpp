@@ -2009,18 +2009,17 @@ void World::Update(uint32 diff)
     {
         ResetDailyQuests();
         m_NextDailyQuestReset += DAY;
-        sGuildMgr->ResetExperienceCaps();
+       // sGuildMgr->ResetExperienceCaps();
     }
 
     if (m_gameTime > m_NextWeeklyQuestReset)
     {
         ResetWeeklyQuests();
-        sGuildMgr->ResetReputationCaps();
+        //sGuildMgr->ResetReputationCaps();
     }
 
-    if (m_gameTime > m_NextWeeklyGuildReputationReset)
-        ResetWeeklyGuildReputation();
-
+    //if (m_gameTime > m_NextWeeklyGuildReputationReset)
+     //   ResetWeeklyGuildReputation();
     if (m_gameTime > m_NextRandomBGReset)
         ResetRandomBG();
 

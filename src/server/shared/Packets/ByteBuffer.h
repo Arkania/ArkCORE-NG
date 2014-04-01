@@ -25,8 +25,6 @@
 #include "Log.h"
 #include "Utilities/ByteConverter.h"
 
-
-
 class ByteBufferException
 {
     public:
@@ -53,8 +51,10 @@ class ByteBufferPositionException : public ByteBufferException
     protected:
         void PrintError() const
         {
-            sLog->outError("Attempted to %s value with size: "SIZEFMTD" in ByteBuffer (pos: " SIZEFMTD " size: "SIZEFMTD") " ,
-                (_add ? "put" : "get"), ValueSize, Pos, Size);
+            ACE_Stack_Trace trace;
+
+            sLog->outError("Attempted to %s value with size: "SIZEFMTD" in ByteBuffer (pos: " SIZEFMTD " size: "SIZEFMTD")\n[Stack trace: %s]" ,
+                (_add ? "put" : "get"), ValueSize, Pos, Size, trace.c_str());
         }
 
     private:
@@ -73,50 +73,11 @@ class ByteBufferSourceException : public ByteBufferException
     protected:
         void PrintError() const
         {
-            sLog->outError("Attempted to put a %s in ByteBuffer (pos: "SIZEFMTD" size: "SIZEFMTD")",
-                (ValueSize > 0 ? "NULL-pointer" : "zero-sized value"), Pos, Size);
+            ACE_Stack_Trace trace;
+
+            sLog->outError("Attempted to put a %s in ByteBuffer (pos: "SIZEFMTD" size: "SIZEFMTD")\n[Stack trace: %s]",
+                (ValueSize > 0 ? "NULL-pointer" : "zero-sized value"), Pos, Size, trace.c_str());
         }
-};
-
-class BitStream
-{
-    public:
-        BitStream(): _rpos(0), _wpos(0) {}
-
-        BitStream(uint32 val, size_t len): _rpos(0), _wpos(0)
-        {
-            WriteBits(val, len);
-        }
-
-        BitStream(BitStream const& bs) : _rpos(bs._rpos), _wpos(bs._wpos), _data(bs._data) {}
-
-        void Clear();
-        uint8 GetBit(uint32 bit);
-        uint8 ReadBit();
-        void WriteBit(uint32 bit);
-        template <typename T> void WriteBits(T value, size_t bits);
-        bool Empty();
-        void Reverse();
-        void Print();
-
-        size_t GetLength() { return _data.size(); }
-        uint32 GetReadPosition() { return _rpos; }
-        uint32 GetWritePosition() { return _wpos; }
-        void SetReadPos(uint32 pos) { _rpos = pos; }
-
-        uint8 const& operator[](uint32 const pos) const
-        {
-            return _data[pos];
-        }
-
-        uint8& operator[] (uint32 const pos)
-        {
-            return _data[pos];
-        }
-
-    private:
-        std::vector<uint8> _data;
-        uint32 _rpos, _wpos;
 };
 
 class ByteBuffer
@@ -145,8 +106,6 @@ class ByteBuffer
         {
             _storage.clear();
             _rpos = _wpos = 0;
-            _curbitval = 0;
-            _bitpos = 8;
         }
 
         template <typename T> void append(T value)
@@ -166,12 +125,7 @@ class ByteBuffer
             _bitpos = 8;
         }
 
-        void ResetBitReader()
-        {
-            _bitpos = 8;
-        }
-
-        template <typename T> bool WriteBit(T bit)
+        bool WriteBit(uint32 bit)
         {
             --_bitpos;
             if (bit)
@@ -192,8 +146,8 @@ class ByteBuffer
             ++_bitpos;
             if (_bitpos > 7)
             {
-                _curbitval = read<uint8>();
                 _bitpos = 0;
+                _curbitval = read<uint8>();
             }
 
             return ((_curbitval >> (7-_bitpos)) & 1) != 0;
@@ -215,26 +169,6 @@ class ByteBuffer
             return value;
         }
 
-        uint64 ReadGuid(uint8* mask, uint8* bytes)
-        {
-            uint8 guidMask[8];
-            uint8 guidBytes[8];
-
-            for (int i = 0; i < 8; i++)
-                guidMask[i] = ReadBit();
-
-            for (uint8 i = 0; i < 8; i++)
-                if (guidMask[i])
-                    guidBytes[i] = uint8(read<uint8>() ^ 1);
-
-            uint64 guid = guidBytes[0];
-            for (int i = 0; i < 8; ++i)
-                if (guidBytes[i])
-                    guid += ((uint64)guidBytes[i]) << (i * 8);
-
-            return guid;
-        }
-
         // Reads a byte (if needed) in-place
         void ReadByteSeq(uint8& b)
         {
@@ -246,31 +180,6 @@ class ByteBuffer
         {
             if (b != 0)
                 append<uint8>(b ^ 1);
-        }
-
-        BitStream ReadBitStream(uint32 len)
-        {
-            BitStream b;
-            for (uint32 i = 0; i < len; ++i)
-                b.WriteBit(ReadBit());
-            return b;
-        }
-
-        void WriteGuidMask(uint64 guid, uint8* maskOrder, uint8 maskCount, uint8 maskPos = 0)
-        {
-            uint8* guidByte = ((uint8*)&guid);
-
-            for (uint8 i = 0; i < maskCount; i++)
-                WriteBit(guidByte[maskOrder[i + maskPos]]);
-        }
-
-        void WriteGuidBytes(uint64 guid, uint8* byteOrder, uint8 byteCount, uint8 bytePos)
-        {
-            uint8* guidByte = ((uint8*)&guid);
-
-            for (uint8 i = 0; i < byteCount; i++)
-                if (guidByte[byteOrder[i + bytePos]])
-                    (*this) << uint8(guidByte[byteOrder[i + bytePos]] ^ 1);
         }
 
         template <typename T> void put(size_t pos, T value)
@@ -518,7 +427,6 @@ class ByteBuffer
 
         void read_skip(size_t skip)
         {
-            ResetBitReader();
             if (_rpos + skip > size())
                 throw ByteBufferPositionException(false, _rpos, skip, size());
             _rpos += skip;
@@ -526,7 +434,6 @@ class ByteBuffer
 
         template <typename T> T read()
         {
-            ResetBitReader();
             T r = read<T>(_rpos);
             _rpos += sizeof(T);
             return r;
@@ -551,7 +458,6 @@ class ByteBuffer
 
         void readPackGUID(uint64& guid)
         {
-            ResetBitReader();
             if (rpos() + 1 > size())
                 throw ByteBufferPositionException(false, _rpos, 1, size());
 
@@ -574,62 +480,6 @@ class ByteBuffer
             }
         }
 
-        uint8 ReadUInt8()
-        {
-            uint8 u = 0;
-            (*this) >> u;
-            return u;
-        }
-
-        uint16 ReadUInt16()
-        {
-            uint16 u = 0;
-            (*this) >> u;
-            return u;
-        }
-
-        uint32 ReadUInt32()
-        {
-            uint32 u = 0;
-            (*this) >> u;
-            return u;
-        }
-
-        uint64 ReadUInt64()
-        {
-            uint64 u = 0;
-            (*this) >> u;
-            return u;
-        }
-
-        int8 ReadInt8()
-        {
-            int8 u = 0;
-            (*this) >> u;
-            return u;
-        }
-
-        int16 ReadInt16()
-        {
-            int16 u = 0;
-            (*this) >> u;
-            return u;
-        }
-
-        int32 ReadInt32()
-        {
-            uint32 u = 0;
-            (*this) >> u;
-            return u;
-        }
-
-        int64 ReadInt64()
-        {
-            int64 u = 0;
-            (*this) >> u;
-            return u;
-        }
-
         std::string ReadString(uint32 length)
         {
             if (!length)
@@ -640,20 +490,6 @@ class ByteBuffer
             std::string retval = buffer;
             delete[] buffer;
             return retval;
-        }
-
-        bool ReadBoolean()
-        {
-            uint8 b = 0;
-            (*this) >> b;
-            return b > 0 ? true : false;
-        }
-
-        float ReadSingle()
-        {
-            float f = 0;
-            (*this) >> f;
-            return f;
         }
 
         //! Method for writing strings that have their length sent separately in packet
@@ -784,79 +620,65 @@ class ByteBuffer
 
         void print_storage() const
         {
-            if (!sLog->IsOutDebug())                          // optimize disabled debug output
+            if (!sLog->IsOutDebug()) // optimize disabled debug output
                 return;
 
-            sLog->outDebug(LOG_FILTER_NETWORKIO, "STORAGE_SIZE: %lu", (unsigned long)size() );
+            std::ostringstream o;
+            o << "STORAGE_SIZE: " << size();
             for (uint32 i = 0; i < size(); ++i)
-                sLog->outDebugInLine("%u - ", read<uint8>(i) );
-            sLog->outDebug(LOG_FILTER_NETWORKIO, " ");
+                o << read<uint8>(i) << " - ";
+            o << " ";
+
+            sLog->outDebugInLine("%s", o.str().c_str());
         }
 
         void textlike() const
         {
-            if (!sLog->IsOutDebug())                          // optimize disabled debug output
+            if (!sLog->IsOutDebug()) // optimize disabled debug output
                 return;
 
-            sLog->outDebug(LOG_FILTER_NETWORKIO, "STORAGE_SIZE: %lu", (unsigned long)size() );
+            std::ostringstream o;
+            o << "STORAGE_SIZE: " << size();
             for (uint32 i = 0; i < size(); ++i)
-                sLog->outDebugInLine("%c", read<uint8>(i) );
-            sLog->outDebug(LOG_FILTER_NETWORKIO, " ");
+            {
+                char buf[1];
+                snprintf(buf, 1, "%c", read<uint8>(i));
+                o << buf;
+            }
+            o << " ";
+            sLog->outDebugInLine("%s", o.str().c_str());
         }
 
         void hexlike() const
         {
-            if (!sLog->IsOutDebug())                          // optimize disabled debug output
+            if (!sLog->IsOutDebug()) // optimize disabled debug output
                 return;
 
             uint32 j = 1, k = 1;
-            sLog->outDebug(LOG_FILTER_NETWORKIO, "STORAGE_SIZE: %lu", (unsigned long)size() );
+
+            std::ostringstream o;
+            o << "STORAGE_SIZE: " << size();
 
             for (uint32 i = 0; i < size(); ++i)
             {
+                char buf[3];
+                snprintf(buf, 1, "%2X ", read<uint8>(i));
                 if ((i == (j * 8)) && ((i != (k * 16))))
                 {
-                    if (read<uint8>(i) < 0x10)
-                    {
-                        sLog->outDebugInLine("| 0%X ", read<uint8>(i) );
-                    }
-                    else
-                    {
-                        sLog->outDebugInLine("| %X ", read<uint8>(i) );
-                    }
+                    o << "| ";
                     ++j;
                 }
                 else if (i == (k * 16))
                 {
-                    if (read<uint8>(i) < 0x10)
-                    {
-                        sLog->outDebugInLine("\n");
-
-                        sLog->outDebugInLine("0%X ", read<uint8>(i) );
-                    }
-                    else
-                    {
-                        sLog->outDebugInLine("\n");
-
-                        sLog->outDebugInLine("%X ", read<uint8>(i) );
-                    }
-
+                    o << "\n";
                     ++k;
                     ++j;
                 }
-                else
-                {
-                    if (read<uint8>(i) < 0x10)
-                    {
-                        sLog->outDebugInLine("0%X ", read<uint8>(i) );
-                    }
-                    else
-                    {
-                        sLog->outDebugInLine("%X ", read<uint8>(i) );
-                    }
-                }
+
+                o << buf;
             }
-            sLog->outDebugInLine("\n");
+            o << " ";
+            sLog->outDebugInLine("%s", o.str().c_str());
         }
 
     protected:
@@ -970,43 +792,5 @@ inline void ByteBuffer::read_skip<std::string>()
     read_skip<char*>();
 }
 
-class BitConverter
-{
-    public:
-        static uint8 ToUInt8(ByteBuffer const& buff, size_t start = 0)
-        {
-            return buff.read<uint8>(start);
-        }
-
-        static uint16 ToUInt16(ByteBuffer const& buff, size_t start = 0)
-        {
-            return buff.read<uint16>(start);
-        }
-
-        static uint32 ToUInt32(ByteBuffer const& buff, size_t start = 0)
-        {
-            return buff.read<uint32>(start);
-        }
-
-        static uint64 ToUInt64(ByteBuffer const& buff, size_t start = 0)
-        {
-            return buff.read<uint64>(start);
-        }
-
-        static int16 ToInt16(ByteBuffer const& buff, size_t start = 0)
-        {
-            return buff.read<int16>(start);
-        }
-
-        static int32 ToInt32(ByteBuffer const& buff, size_t start = 0)
-        {
-            return buff.read<int32>(start);
-        }
-
-        static int64 ToInt64(ByteBuffer const& buff, size_t start = 0)
-        {
-            return buff.read<int64>(start);
-        }
-};
-
 #endif
+

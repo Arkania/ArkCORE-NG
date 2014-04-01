@@ -354,11 +354,6 @@ enum Texts
     SAY_EYE_UNDER_CONTROL = 2,
 };
 
-static Position Center[]=
-{
-    {2346.550049f, -5694.430176f, 426.029999f, 0.0f},
-};
-
 class npc_eye_of_acherus : public CreatureScript
 {
 public:

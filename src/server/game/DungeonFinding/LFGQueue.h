@@ -43,7 +43,7 @@ struct LfgCompatibilityData
         compatibility(_compatibility), roles(_roles) { }
 
     LfgCompatibility compatibility;
-    LfgRolesMap roles;    
+    LfgRolesMap roles;
 };
 
 /// Stores player or group queue info
