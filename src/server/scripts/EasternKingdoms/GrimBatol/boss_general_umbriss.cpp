@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -77,14 +77,14 @@ class boss_general_umbriss : public CreatureScript
 
         boss_general_umbriss() : CreatureScript("boss_general_umbriss"){}
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new boss_general_umbrissAI(pCreature);
+            return new boss_general_umbrissAI(creature);
         }
 
         struct boss_general_umbrissAI : public ScriptedAI
         {
-            boss_general_umbrissAI(Creature *c) : ScriptedAI(c), summons(me)
+            boss_general_umbrissAI(Creature* creature) : ScriptedAI(creature), summons(me)
             {
                 me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
@@ -97,10 +97,10 @@ class boss_general_umbriss : public CreatureScript
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
-                pInstance = c->GetInstanceScript();
+                instance = creature->GetInstanceScript();
             }
 
-            InstanceScript* pInstance;
+            InstanceScript* instance;
 
             EventMap events;
             SummonList summons;
@@ -108,18 +108,18 @@ class boss_general_umbriss : public CreatureScript
 
             void Reset()
             {
-                if (!pInstance)
+                if (!instance)
                     return;
 
                 bEnrage = false;
                 summons.DespawnAll();
                 events.Reset();
-                pInstance->SetData(DATA_GENERAL_UMBRISS, NOT_STARTED);
+                instance->SetData(DATA_GENERAL_UMBRISS, NOT_STARTED);
             }
 
-            void EnterCombat(Unit* pWho)
+            void EnterCombat(Unit* who)
             {
-                if (!pInstance)
+                if (!instance)
                     return;
 
                 events.ScheduleEvent(EVENT_ADDS, 30000);
@@ -127,16 +127,16 @@ class boss_general_umbriss : public CreatureScript
                 events.ScheduleEvent(EVENT_BLEEDING_WOUND, 5000);
                 events.ScheduleEvent(EVENT_BLITZ, 23000);
                 Talk(SAY_AGGRO);
-                pInstance->SetData(DATA_GENERAL_UMBRISS, IN_PROGRESS);
+                instance->SetData(DATA_GENERAL_UMBRISS, IN_PROGRESS);
             }
 
-            void JustDied(Unit* pKiller)
+            void JustDied(Unit* killer)
             {
-                if (!pInstance)
+                if (!instance)
                     return;
                 
                 summons.DespawnAll();
-                pInstance->SetData(DATA_GENERAL_UMBRISS, DONE);
+                instance->SetData(DATA_GENERAL_UMBRISS, DONE);
             }
 
             void KilledUnit(Unit* /*victim*/)
@@ -162,9 +162,9 @@ class boss_general_umbriss : public CreatureScript
                 summons.Despawn(summon);
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(const uint32 diff)
             {
-                if (!pInstance || !UpdateVictim())
+                if (!instance || !UpdateVictim())
                     return;
 
                 if (me->GetDistance(me->GetHomePosition()) > 60.0f)
@@ -180,7 +180,7 @@ class boss_general_umbriss : public CreatureScript
                     return;
                 }
 
-                events.Update(uiDiff);
+                events.Update(diff);
 
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
@@ -241,14 +241,14 @@ class npc_malignant_trogg : public CreatureScript
 
         npc_malignant_trogg() : CreatureScript("npc_malignant_trogg"){}
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_malignant_troggAI(pCreature);
+            return new npc_malignant_troggAI(creature);
         }
 
         struct npc_malignant_troggAI : public ScriptedAI
         {
-            npc_malignant_troggAI(Creature *c) : ScriptedAI(c)
+            npc_malignant_troggAI(Creature* creature) : ScriptedAI(creature)
             {
             }
 
@@ -271,12 +271,12 @@ class npc_malignant_trogg : public CreatureScript
                     DoCast(me, SPELL_MODGUD_MALICE_AURA, true);
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(const uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
 
-                events.Update(uiDiff);
+                events.Update(diff);
 
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
@@ -302,14 +302,14 @@ class npc_umbriss_trogg_dweller : public CreatureScript
 
         npc_umbriss_trogg_dweller() : CreatureScript("npc_umbriss_trogg_dweller"){}
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_umbriss_trogg_dwellerAI(pCreature);
+            return new npc_umbriss_trogg_dwellerAI(creature);
         }
 
         struct npc_umbriss_trogg_dwellerAI : public ScriptedAI
         {
-            npc_umbriss_trogg_dwellerAI(Creature *c) : ScriptedAI(c)
+            npc_umbriss_trogg_dwellerAI(Creature* creature) : ScriptedAI(creature)
             {
             }
             
@@ -320,12 +320,12 @@ class npc_umbriss_trogg_dweller : public CreatureScript
                 events.ScheduleEvent(EVENT_CLAW_PUNCTURE, 5000);
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(const uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
 
-                events.Update(uiDiff);
+                events.Update(diff);
 
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;

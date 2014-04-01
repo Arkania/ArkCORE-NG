@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -26,14 +26,14 @@ class instance_grim_batol : public InstanceMapScript
 public:
     instance_grim_batol() : InstanceMapScript("instance_grim_batol", 670) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* pMap) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const
     {
-        return new instance_grim_batol_InstanceMapScript(pMap);
+        return new instance_grim_batol_InstanceMapScript(map);
     }
 
     struct instance_grim_batol_InstanceMapScript : public InstanceScript
     {
-        instance_grim_batol_InstanceMapScript(Map* pMap) : InstanceScript(pMap)
+        instance_grim_batol_InstanceMapScript(Map* map) : InstanceScript(map)
         {
             SetBossNumber(MAX_ENCOUNTER);
         }

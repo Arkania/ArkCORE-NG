@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -240,14 +240,14 @@ class npc_ascended_flameseeker : public CreatureScript
 
         npc_ascended_flameseeker() : CreatureScript("npc_ascended_flameseeker"){}
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_ascended_flameseekerAI(pCreature);
+            return new npc_ascended_flameseekerAI(creature);
         }
 
         struct npc_ascended_flameseekerAI : public ScriptedAI
         {
-            npc_ascended_flameseekerAI(Creature *c) : ScriptedAI(c)
+            npc_ascended_flameseekerAI(Creature* creature) : ScriptedAI(creature)
             {
             }
             
@@ -264,12 +264,12 @@ class npc_ascended_flameseeker : public CreatureScript
                 events.ScheduleEvent(EVENT_ERUPTING_FIRE, urand(7000, 12000));
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(const uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
 
-                events.Update(uiDiff);
+                events.Update(diff);
 
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
@@ -301,14 +301,14 @@ class npc_ascended_rockbreaker : public CreatureScript
 
         npc_ascended_rockbreaker() : CreatureScript("npc_ascended_rockbreaker"){}
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_ascended_rockbreakerAI(pCreature);
+            return new npc_ascended_rockbreakerAI(creature);
         }
 
         struct npc_ascended_rockbreakerAI : public ScriptedAI
         {
-            npc_ascended_rockbreakerAI(Creature *c) : ScriptedAI(c)
+            npc_ascended_rockbreakerAI(Creature* creature) : ScriptedAI(creature)
             {
             }
             
@@ -327,12 +327,12 @@ class npc_ascended_rockbreaker : public CreatureScript
                 events.ScheduleEvent(EVENT_ROCK_SMASH, urand(8000, 12000));
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(const uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
 
-                events.Update(uiDiff);
+                events.Update(diff);
 
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
@@ -367,14 +367,14 @@ class npc_ascended_waterlasher : public CreatureScript
 
         npc_ascended_waterlasher() : CreatureScript("npc_ascended_waterlasher"){}
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_ascended_waterlasherAI(pCreature);
+            return new npc_ascended_waterlasherAI(creature);
         }
 
         struct npc_ascended_waterlasherAI : public ScriptedAI
         {
-            npc_ascended_waterlasherAI(Creature *c) : ScriptedAI(c)
+            npc_ascended_waterlasherAI(Creature* creature) : ScriptedAI(creature)
             {
             }
             
@@ -392,12 +392,12 @@ class npc_ascended_waterlasher : public CreatureScript
                 events.ScheduleEvent(EVENT_WATER_SPOUT, urand(3000, 10000));
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(const uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
 
-                events.Update(uiDiff);
+                events.Update(diff);
 
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
@@ -431,14 +431,14 @@ class npc_ascended_windwalker: public CreatureScript
 
         npc_ascended_windwalker() : CreatureScript("npc_ascended_windwalker"){}
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_ascended_windwalkerAI(pCreature);
+            return new npc_ascended_windwalkerAI(creature);
         }
 
         struct npc_ascended_windwalkerAI : public ScriptedAI
         {
-            npc_ascended_windwalkerAI(Creature *c) : ScriptedAI(c)
+            npc_ascended_windwalkerAI(Creature* creature) : ScriptedAI(creature)
             {
             }
             
@@ -454,12 +454,12 @@ class npc_ascended_windwalker: public CreatureScript
                 events.ScheduleEvent(EVENT_ABSORB_WATER, urand(25000, 30000));
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(const uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
 
-                events.Update(uiDiff);
+                events.Update(diff);
 
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
@@ -485,14 +485,14 @@ class npc_azureborne_guardian: public CreatureScript
 
         npc_azureborne_guardian() : CreatureScript("npc_azureborne_guardian"){}
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_azureborne_guardianAI(pCreature);
+            return new npc_azureborne_guardianAI(creature);
         }
 
         struct npc_azureborne_guardianAI : public ScriptedAI
         {
-            npc_azureborne_guardianAI(Creature *c) : ScriptedAI(c)
+            npc_azureborne_guardianAI(Creature* creature) : ScriptedAI(creature)
             {
             }
             
@@ -509,12 +509,12 @@ class npc_azureborne_guardian: public CreatureScript
                 events.ScheduleEvent(EVENT_CURSE_OF_THE_AZUREBORNE, urand(6000, 7000));
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(const uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
 
-                events.Update(uiDiff);
+                events.Update(diff);
 
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
@@ -545,14 +545,14 @@ class npc_azureborne_seer: public CreatureScript
 
         npc_azureborne_seer() : CreatureScript("npc_azureborne_seer"){}
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_azureborne_seerAI(pCreature);
+            return new npc_azureborne_seerAI(creature);
         }
 
         struct npc_azureborne_seerAI : public ScriptedAI
         {
-            npc_azureborne_seerAI(Creature *c) : ScriptedAI(c)
+            npc_azureborne_seerAI(Creature* creature) : ScriptedAI(creature)
             {
             }
             
@@ -569,7 +569,7 @@ class npc_azureborne_seer: public CreatureScript
                 events.ScheduleEvent(EVENT_TWILIGHT_BOLT, urand(1000, 2000));
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(const uint32 diff)
             {
                 if (!me->HasAura(SPELL_TWISTED_ARCANE_TRIGGER) &&
                     !me->HasAura(SPELL_TWISTED_ARCANE) &&
@@ -582,7 +582,7 @@ class npc_azureborne_seer: public CreatureScript
                 if (!UpdateVictim())
                     return;
 
-                events.Update(uiDiff);
+                events.Update(diff);
 
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
@@ -612,14 +612,14 @@ class npc_azureborne_warlord: public CreatureScript
 
         npc_azureborne_warlord() : CreatureScript("npc_azureborne_warlord"){}
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_azureborne_warlordAI(pCreature);
+            return new npc_azureborne_warlordAI(creature);
         }
 
         struct npc_azureborne_warlordAI : public ScriptedAI
         {
-            npc_azureborne_warlordAI(Creature *c) : ScriptedAI(c)
+            npc_azureborne_warlordAI(Creature* creature) : ScriptedAI(creature)
             {
             }
             
@@ -636,12 +636,12 @@ class npc_azureborne_warlord: public CreatureScript
                 events.ScheduleEvent(EVENT_CONJURE_TWISTED_VISAGE, urand(7000, 12000));
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(const uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
 
-                events.Update(uiDiff);
+                events.Update(diff);
 
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
@@ -671,14 +671,14 @@ class npc_crimsonborne_guardian: public CreatureScript
 
         npc_crimsonborne_guardian() : CreatureScript("npc_crimsonborne_guardian"){}
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_crimsonborne_guardianAI(pCreature);
+            return new npc_crimsonborne_guardianAI(creature);
         }
 
         struct npc_crimsonborne_guardianAI : public ScriptedAI
         {
-            npc_crimsonborne_guardianAI(Creature *c) : ScriptedAI(c)
+            npc_crimsonborne_guardianAI(Creature* creature) : ScriptedAI(creature)
             {
             }
             
@@ -694,12 +694,12 @@ class npc_crimsonborne_guardian: public CreatureScript
                 events.ScheduleEvent(EVENT_CRIMSON_CHARGE, urand(3000, 5000));
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(const uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
 
-                events.Update(uiDiff);
+                events.Update(diff);
 
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
@@ -726,14 +726,14 @@ class npc_crimsonborne_seer: public CreatureScript
 
         npc_crimsonborne_seer() : CreatureScript("npc_crimsonborne_seer"){}
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_crimsonborne_seerAI(pCreature);
+            return new npc_crimsonborne_seerAI(creature);
         }
 
         struct npc_crimsonborne_seerAI : public ScriptedAI
         {
-            npc_crimsonborne_seerAI(Creature *c) : ScriptedAI(c)
+            npc_crimsonborne_seerAI(Creature* creature) : ScriptedAI(creature)
             {
             }
             
@@ -750,12 +750,12 @@ class npc_crimsonborne_seer: public CreatureScript
                 events.ScheduleEvent(EVENT_CORRUPTED_FLAME, urand(6000, 10000));
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(const uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
 
-                events.Update(uiDiff);
+                events.Update(diff);
 
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
@@ -786,14 +786,14 @@ class npc_crimsonborne_warlord: public CreatureScript
 
         npc_crimsonborne_warlord() : CreatureScript("npc_crimsonborne_warlord"){}
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_crimsonborne_warlordAI(pCreature);
+            return new npc_crimsonborne_warlordAI(creature);
         }
 
         struct npc_crimsonborne_warlordAI : public ScriptedAI
         {
-            npc_crimsonborne_warlordAI(Creature *c) : ScriptedAI(c)
+            npc_crimsonborne_warlordAI(Creature* creature) : ScriptedAI(creature)
             {
             }
             
@@ -810,12 +810,12 @@ class npc_crimsonborne_warlord: public CreatureScript
                 events.ScheduleEvent(EVENT_EMPOWERING_TWILIGHT, urand(9000, 12000));
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(const uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
 
-                events.Update(uiDiff);
+                events.Update(diff);
 
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
@@ -845,14 +845,14 @@ class npc_enslaved_burning_ember: public CreatureScript
 
         npc_enslaved_burning_ember() : CreatureScript("npc_enslaved_burning_ember"){}
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_enslaved_burning_emberAI(pCreature);
+            return new npc_enslaved_burning_emberAI(creature);
         }
 
         struct npc_enslaved_burning_emberAI : public ScriptedAI
         {
-            npc_enslaved_burning_emberAI(Creature *c) : ScriptedAI(c)
+            npc_enslaved_burning_emberAI(Creature* creature) : ScriptedAI(creature)
             {
             }
             
@@ -868,12 +868,12 @@ class npc_enslaved_burning_ember: public CreatureScript
                 events.ScheduleEvent(EVENT_FLAME_SHOCK, urand(3000, 4000));
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(const uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
 
-                events.Update(uiDiff);
+                events.Update(diff);
 
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
@@ -900,14 +900,14 @@ class npc_enslaved_rock_elemental: public CreatureScript
 
         npc_enslaved_rock_elemental() : CreatureScript("npc_enslaved_rock_elemental"){}
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_enslaved_rock_elementalAI(pCreature);
+            return new npc_enslaved_rock_elementalAI(creature);
         }
 
         struct npc_enslaved_rock_elementalAI : public ScriptedAI
         {
-            npc_enslaved_rock_elementalAI(Creature *c) : ScriptedAI(c)
+            npc_enslaved_rock_elementalAI(Creature* creature) : ScriptedAI(creature)
             {
             }
             
@@ -923,12 +923,12 @@ class npc_enslaved_rock_elemental: public CreatureScript
                 events.ScheduleEvent(EVENT_JAGGED_ROCK_SHIELD, 10000);
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(const uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
 
-                events.Update(uiDiff);
+                events.Update(diff);
 
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
@@ -954,14 +954,14 @@ class npc_enslaved_gronn_brute: public CreatureScript
 
         npc_enslaved_gronn_brute() : CreatureScript("npc_enslaved_gronn_brute"){}
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_enslaved_gronn_bruteAI(pCreature);
+            return new npc_enslaved_gronn_bruteAI(creature);
         }
 
         struct npc_enslaved_gronn_bruteAI : public ScriptedAI
         {
-            npc_enslaved_gronn_bruteAI(Creature *c) : ScriptedAI(c)
+            npc_enslaved_gronn_bruteAI(Creature* creature) : ScriptedAI(creature)
             {
             }
             
@@ -977,12 +977,12 @@ class npc_enslaved_gronn_brute: public CreatureScript
                 events.ScheduleEvent(EVENT_CRUNCH_ARMOR, urand(2000, 4000));
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(const uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
 
-                events.Update(uiDiff);
+                events.Update(diff);
 
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
@@ -1008,9 +1008,9 @@ class npc_faceless_corruptor : public CreatureScript
 
         npc_faceless_corruptor() : CreatureScript("npc_faceless_corruptor"){}
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_faceless_corruptorAI(pCreature);
+            return new npc_faceless_corruptorAI(creature);
         }
 
         struct npc_faceless_corruptorAI : public ScriptedAI
@@ -1074,14 +1074,14 @@ class npc_trogg_dweller : public CreatureScript
 
         npc_trogg_dweller() : CreatureScript("npc_trogg_dweller"){}
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_trogg_dwellerAI(pCreature);
+            return new npc_trogg_dwellerAI(creature);
         }
 
         struct npc_trogg_dwellerAI : public ScriptedAI
         {
-            npc_trogg_dwellerAI(Creature *c) : ScriptedAI(c)
+            npc_trogg_dwellerAI(Creature* creature) : ScriptedAI(creature)
             {
             }
             
@@ -1097,13 +1097,13 @@ class npc_trogg_dweller : public CreatureScript
                 events.ScheduleEvent(EVENT_CLAW_PUNCTURE, urand(5000, 7000));
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(const uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
 
 
-                events.Update(uiDiff);
+                events.Update(diff);
 
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
@@ -1129,9 +1129,9 @@ class npc_twilight_armsmaster : public CreatureScript
 
         npc_twilight_armsmaster() : CreatureScript("npc_twilight_armsmaster"){}
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_twilight_armsmasterAI(pCreature);
+            return new npc_twilight_armsmasterAI(creature);
         }
 
         struct npc_twilight_armsmasterAI : public ScriptedAI
@@ -1188,9 +1188,9 @@ class npc_twilight_beguiler : public CreatureScript
 
         npc_twilight_beguiler() : CreatureScript("npc_twilight_beguiler"){}
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_twilight_beguilerAI(pCreature);
+            return new npc_twilight_beguilerAI(creature);
         }
 
         struct npc_twilight_beguilerAI : public ScriptedAI
@@ -1251,9 +1251,9 @@ class npc_twilight_drake_gb : public CreatureScript
 
         npc_twilight_drake_gb() : CreatureScript("npc_twilight_drake_gb"){}
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_twilight_drake_gbAI(pCreature);
+            return new npc_twilight_drake_gbAI(creature);
         }
 
         struct npc_twilight_drake_gbAI : public ScriptedAI
@@ -1305,9 +1305,9 @@ class npc_twilight_earthshaper : public CreatureScript
 
         npc_twilight_earthshaper() : CreatureScript("npc_twilight_earthshaper"){}
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_twilight_earthshaperAI(pCreature);
+            return new npc_twilight_earthshaperAI(creature);
         }
 
         struct npc_twilight_earthshaperAI : public ScriptedAI
@@ -1366,9 +1366,9 @@ class npc_twilight_enforcer : public CreatureScript
 
         npc_twilight_enforcer() : CreatureScript("npc_twilight_enforcer"){}
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_twilight_enforcerAI(pCreature);
+            return new npc_twilight_enforcerAI(creature);
         }
 
         struct npc_twilight_enforcerAI : public ScriptedAI
@@ -1421,9 +1421,9 @@ class npc_twilight_firecatcher : public CreatureScript
 
         npc_twilight_firecatcher() : CreatureScript("npc_twilight_firecatcher"){}
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_twilight_firecatcherAI(pCreature);
+            return new npc_twilight_firecatcherAI(creature);
         }
 
         struct npc_twilight_firecatcherAI : public ScriptedAI
@@ -1482,9 +1482,9 @@ class npc_twilight_shadow_weaver : public CreatureScript
 
         npc_twilight_shadow_weaver() : CreatureScript("npc_twilight_shadow_weaver"){}
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_twilight_shadow_weaverAI(pCreature);
+            return new npc_twilight_shadow_weaverAI(creature);
         }
 
         struct npc_twilight_shadow_weaverAI : public ScriptedAI
@@ -1544,9 +1544,9 @@ class npc_twilight_stormbreaker : public CreatureScript
 
         npc_twilight_stormbreaker() : CreatureScript("npc_twilight_stormbreaker"){}
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_twilight_stormbreakerAI(pCreature);
+            return new npc_twilight_stormbreakerAI(creature);
         }
 
         struct npc_twilight_stormbreakerAI : public ScriptedAI
@@ -1605,9 +1605,9 @@ class npc_twilight_thundercaller : public CreatureScript
 
         npc_twilight_thundercaller() : CreatureScript("npc_twilight_thundercaller"){}
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_twilight_thundercallerAI(pCreature);
+            return new npc_twilight_thundercallerAI(creature);
         }
 
         struct npc_twilight_thundercallerAI : public ScriptedAI
@@ -1668,9 +1668,9 @@ class npc_twilight_wyrmcaller : public CreatureScript
 
         npc_twilight_wyrmcaller() : CreatureScript("npc_twilight_wyrmcaller"){}
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_twilight_wyrmcallerAI(pCreature);
+            return new npc_twilight_wyrmcallerAI(creature);
         }
 
         struct npc_twilight_wyrmcallerAI : public ScriptedAI
@@ -1747,9 +1747,9 @@ class npc_twilight_war_mage : public CreatureScript
 
         npc_twilight_war_mage() : CreatureScript("npc_twilight_war_mage"){}
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_twilight_war_mageAI(pCreature);
+            return new npc_twilight_war_mageAI(creature);
         }
 
         struct npc_twilight_war_mageAI : public ScriptedAI
@@ -1806,14 +1806,14 @@ class npc_ascended_rockbreaker_fissure : public CreatureScript
 
         npc_ascended_rockbreaker_fissure() : CreatureScript("npc_ascended_rockbreaker_fissure"){}
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_ascended_rockbreaker_fissureAI(pCreature);
+            return new npc_ascended_rockbreaker_fissureAI(creature);
         }
 
-        struct npc_ascended_rockbreaker_fissureAI : public Scripted_NoMovementAI
+        struct npc_ascended_rockbreaker_fissureAI : public ScriptedAI
         {
-            npc_ascended_rockbreaker_fissureAI(Creature *c) : Scripted_NoMovementAI(c)
+            npc_ascended_rockbreaker_fissureAI(Creature* creature) : ScriptedAI(creature)
             {
                 SetCombatMovement(false);
                 me->SetReactState(REACT_PASSIVE);
@@ -1824,7 +1824,7 @@ class npc_ascended_rockbreaker_fissure : public CreatureScript
                 DoCast(me, SPELL_FISSURE_TRIGGER);
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(const uint32 diff)
             {
             }
         };
@@ -1836,14 +1836,14 @@ class npc_crimsonborne_warlord_empowering_flames : public CreatureScript
 
         npc_crimsonborne_warlord_empowering_flames() : CreatureScript("npc_crimsonborne_warlord_empowering_flames"){}
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_crimsonborne_warlord_empowering_flamesAI(pCreature);
+            return new npc_crimsonborne_warlord_empowering_flamesAI(creature);
         }
 
-        struct npc_crimsonborne_warlord_empowering_flamesAI : public Scripted_NoMovementAI
+        struct npc_crimsonborne_warlord_empowering_flamesAI : public ScriptedAI
         {
-            npc_crimsonborne_warlord_empowering_flamesAI(Creature *c) : Scripted_NoMovementAI(c)
+            npc_crimsonborne_warlord_empowering_flamesAI(Creature* creature) : ScriptedAI(creature)
             {
                 SetCombatMovement(false);
                 me->SetReactState(REACT_PASSIVE);
@@ -1854,7 +1854,7 @@ class npc_crimsonborne_warlord_empowering_flames : public CreatureScript
                 DoCast(me, SPELL_EMPOWERING_TWILIGHT_AURA);
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(const uint32 diff)
             {
             }
         };

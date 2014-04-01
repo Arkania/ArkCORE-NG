@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -155,10 +155,10 @@ class boss_erudax : public CreatureScript
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
-                pInstance = creature->GetInstanceScript();
+                instance = creature->GetInstanceScript();
             }
 
-            InstanceScript* pInstance;
+            InstanceScript* instance;
             EventMap events;
             SummonList summons;
             Creature* FacelessPortalStalker;
@@ -170,8 +170,8 @@ class boss_erudax : public CreatureScript
                 for (uint8 i = 0; i < 13; i++)
                     me->SummonCreature(NPC_ALEXSTRASZA_EGG, eggPos[i]);
                 events.Reset();
-                if (pInstance)
-                    pInstance->SetData(DATA_ERUDAX, NOT_STARTED);
+                if (instance)
+                    instance->SetData(DATA_ERUDAX, NOT_STARTED);
             }
 
             void JustSummoned(Creature* summon)
@@ -195,16 +195,16 @@ class boss_erudax : public CreatureScript
                 events.ScheduleEvent(EVENT_SHADOW_GALE, urand(25000, 26000));
                 events.ScheduleEvent(EVENT_ENFEEBLING_BLOW, urand(4000, 6000));
                 events.ScheduleEvent(EVENT_BINDING_SHADOWS, urand(9000, 11000));
-                if (pInstance)
-                    pInstance->SetData(DATA_ERUDAX, IN_PROGRESS);
+                if (instance)
+                    instance->SetData(DATA_ERUDAX, IN_PROGRESS);
             }
             
             void JustDied(Unit* killer)
             {
                 Talk(SAY_DEATH);
                 summons.DespawnAll();
-                if (pInstance)
-                    pInstance->SetData(DATA_ERUDAX, DONE);
+                if (instance)
+                    instance->SetData(DATA_ERUDAX, DONE);
             }
 
             void KilledUnit(Unit* victim)
@@ -282,9 +282,9 @@ class npc_erudax_faceless_corruptor : public CreatureScript
 
         npc_erudax_faceless_corruptor() : CreatureScript("npc_erudax_faceless_corruptor"){}
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_erudax_faceless_corruptorAI(pCreature);
+            return new npc_erudax_faceless_corruptorAI(creature);
         }
 
         struct npc_erudax_faceless_corruptorAI : public ScriptedAI
@@ -302,10 +302,10 @@ class npc_erudax_faceless_corruptor : public CreatureScript
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
-                pInstance = creature->GetInstanceScript();
+                instance = creature->GetInstanceScript();
             }
             
-            InstanceScript* pInstance;
+            InstanceScript* instance;
             EventMap events;
 
             void Reset()
@@ -325,7 +325,7 @@ class npc_erudax_faceless_corruptor : public CreatureScript
 
             void UpdateAI(const uint32 diff)
             {
-                if (!pInstance || !UpdateVictim())
+                if (!instance || !UpdateVictim())
                     return;
 
                 events.Update(diff);
@@ -338,7 +338,7 @@ class npc_erudax_faceless_corruptor : public CreatureScript
                     switch (eventId)
                     {
                     case EVENT_UMBRAL_MENDING:
-                        if (Creature* erudax = Unit::GetCreature(*me, pInstance->GetData64(DATA_ERUDAX)))
+                        if (Creature* erudax = Unit::GetCreature(*me, instance->GetData64(DATA_ERUDAX)))
                             DoCast(erudax, SPELL_UMBRAL_MENDING);
                         events.ScheduleEvent(EVENT_UMBRAL_MENDING, urand(15000, 20000));
                         break;
@@ -369,10 +369,10 @@ public:
         npc_alexstrasza_eggAI(Creature* creature) : Scripted_NoMovementAI(creature)
         {
             me->SetReactState(REACT_PASSIVE);
-            pInstance = creature->GetInstanceScript();
+            instance = creature->GetInstanceScript();
         }
 
-        InstanceScript* pInstance;
+        InstanceScript* instance;
 
         void JustDied(Unit* killer)
         {
@@ -381,11 +381,11 @@ public:
 
         void JustSummoned(Creature* summon)
         {
-            if (!pInstance)
+            if (!instance)
                 return;
 
             if (summon->GetEntry() == NPC_TWILIGHT_HATCHLING)
-                if (Creature* _erudax = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_ERUDAX)))
+                if (Creature* _erudax = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_ERUDAX)))
                     if (Unit* target = _erudax->AI()->SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
                         summon->AI()->AttackStart(target);
         }
@@ -431,10 +431,10 @@ public:
         npc_erudax_twilight_hatchlingAI(Creature* creature) : Scripted_NoMovementAI(creature)
         {
             SetCombatMovement(false);
-            pInstance = creature->GetInstanceScript();
+            instance = creature->GetInstanceScript();
         }
 
-        InstanceScript* pInstance;
+        InstanceScript* instance;
 
         void Reset()
         {
@@ -453,10 +453,10 @@ public:
 
         void UpdateAI(const uint32 diff)
         {
-            if (!pInstance)
+            if (!instance)
                 return;
 
-            if (pInstance->GetData(DATA_ERUDAX) != IN_PROGRESS)
+            if (instance->GetData(DATA_ERUDAX) != IN_PROGRESS)
                 me->DespawnOrUnsummon();
         }
     };
