@@ -9976,9 +9976,6 @@ bool Unit::AttackStop()
 
     SendMeleeAttackStop(victim);
 
-    if (GetTypeId() == TYPEID_PLAYER)
-        HandleEmoteCommand(EMOTE_STATE_NONE);
-
     return true;
 }
 

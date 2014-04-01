@@ -415,7 +415,7 @@ pAuraEffectHandler AuraEffectHandler[TOTAL_AURAS]=
     &AuraEffect::HandleNULL,                                      //354 SPELL_AURA_355 No spells 4.3.4
     &AuraEffect::HandleNULL,                                      //356 SPELL_AURA_356 // Increase damage based on power amount (76547 just).
     &AuraEffect::HandleNULL,                                      //357 SPELL_AURA_ENABLE_BOSS1_UNIT_FRAME // Related to Unit Frames (97982 just).
-    &AuraEffect::HandleNULL,                                      //358 SPELL_AURA_358 // Worgen transformation activation (68992,87840).
+    &AuraEffect::HandleNULL,                                      //358 SPELL_AURA_WORGEN_ALTERED_FORM // Worgen transformation activation (68992,87840).
     &AuraEffect::HandleNULL,                                      //359 SPELL_AURA_359 // Just 99263 - Healing done to targets affected by certain spell increased by %.
     &AuraEffect::HandleNULL,                                      //360 SPELL_AURA_PROC_TRIGGER_SPELL_COPY // Just 99107 - it duplicates the harmful spell (% chance) on dealing damage.
     &AuraEffect::HandleNULL,                                      //361 SPELL_AURA_PROC_TRIGGER_SPELL_2 // Deal damage based on target health? (Decimation/Inferno blade Baleroc (99405) + 106728.

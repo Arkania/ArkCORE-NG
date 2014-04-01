@@ -3764,6 +3764,12 @@ enum ActivateTaxiReply
     ERR_TAXINOTSTANDING             = 12
 };
 
+enum ProfessionUI
+{
+    MAX_PRIMARY_PROFESSIONS = 2,
+    MAX_SECONDARY_SKILLS = 5
+}
+
 #define VOID_STORAGE_UNLOCK       100*GOLD
 #define VOID_STORAGE_STORE_ITEM   25*GOLD
 #define VOID_STORAGE_MAX_DEPOSIT  9
