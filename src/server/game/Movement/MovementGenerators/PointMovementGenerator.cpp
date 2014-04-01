@@ -28,7 +28,7 @@
 
 //----- Point Movement Generator
 template<class T>
-void PointMovementGenerator<T>::Initialize(T &unit)
+void PointMovementGenerator<T>::DoInitialize(T &unit)
 {
     if (!unit.IsStopped())
         unit.StopMoving();
@@ -44,7 +44,7 @@ void PointMovementGenerator<T>::Initialize(T &unit)
 
 template<class T>
 
-void PointMovementGenerator<T>::Finalize(T &unit)
+void PointMovementGenerator<T>::DoFinalize(T &unit)
 {
     unit.ClearUnitState(UNIT_STATE_ROAMING|UNIT_STATE_ROAMING_MOVE);
 
@@ -53,13 +53,13 @@ void PointMovementGenerator<T>::Finalize(T &unit)
 }
 
 template<class T>
-void PointMovementGenerator<T>::Interrupt(T &unit)
+void PointMovementGenerator<T>::DoInterrupt(T &unit)
 {
     unit.ClearUnitState(UNIT_STATE_ROAMING | UNIT_STATE_ROAMING_MOVE);
 }
 
 template<class T>
-void PointMovementGenerator<T>::Reset(T &unit)
+void PointMovementGenerator<T>::DoReset(T &unit)
 {
     if (!unit.IsStopped())
         unit.StopMoving();
@@ -68,7 +68,7 @@ void PointMovementGenerator<T>::Reset(T &unit)
 }
 
 template<class T>
-bool PointMovementGenerator<T>::Update(T &unit, uint32 const& diff)
+bool PointMovementGenerator<T>::DoUpdate(T &unit, uint32 const& diff)
 {
     if (unit.HasUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED))
     {
@@ -91,14 +91,14 @@ template <> void PointMovementGenerator<Creature>::MovementInform(Creature &unit
         unit.AI()->MovementInform(POINT_MOTION_TYPE, id);
 }
 
-template void PointMovementGenerator<Player>::Initialize(Player&);
-template void PointMovementGenerator<Creature>::Initialize(Creature&);
-template void PointMovementGenerator<Player>::Finalize(Player&);
-template void PointMovementGenerator<Creature>::Finalize(Creature&);
-template void PointMovementGenerator<Player>::Reset(Player&);
-template void PointMovementGenerator<Creature>::Reset(Creature&);
-template bool PointMovementGenerator<Player>::Update(Player &, const uint32 &);
-template bool PointMovementGenerator<Creature>::Update(Creature&, const uint32 &);
+template void PointMovementGenerator<Player>::DoInitialize(Player&);
+template void PointMovementGenerator<Creature>::DoInitialize(Creature&);
+template void PointMovementGenerator<Player>::DoFinalize(Player&);
+template void PointMovementGenerator<Creature>::DoFinalize(Creature&);
+template void PointMovementGenerator<Player>::DoReset(Player&);
+template void PointMovementGenerator<Creature>::DoReset(Creature&);
+template bool PointMovementGenerator<Player>::DoUpdate(Player &, const uint32 &);
+template bool PointMovementGenerator<Creature>::DoUpdate(Creature&, const uint32 &);
 
 void AssistanceMovementGenerator::Finalize(Unit &unit)
 {

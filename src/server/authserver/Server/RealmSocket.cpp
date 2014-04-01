@@ -80,7 +80,7 @@ int RealmSocket::open(void * arg)
     return 0;
 }
 
-int RealmSocket::close(int)
+int RealmSocket::close(u_long)
 {
     shutdown();
 

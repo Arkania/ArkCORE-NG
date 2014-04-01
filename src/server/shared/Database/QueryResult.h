@@ -24,7 +24,6 @@
 #include <ace/Thread_Mutex.h>
 
 #include "Field.h"
-#include "Log.h"
 
 #ifdef _WIN32
   #include <winsock2.h>
