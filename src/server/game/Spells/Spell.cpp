@@ -798,7 +798,7 @@ void Spell::SelectSpellTargets()
         {
             float dist = m_caster->GetDistance(*m_targets.GetDstPos());
 
-            if (!(m_spellInfo->AttributesEx9 & SPELL_ATTR9_UNK4)) // SPELL_ATTR9_SPECIAL_DELAY_CALCULATION for spell missile delay.
+            if (!(m_spellInfo->AttributesEx9 & SPELL_ATTR9_SPECIAL_DELAY_CALCULATION)) // SPELL_ATTR9_SPECIAL_DELAY_CALCULATION for spell missile delay.
                 m_delayMoment = uint64(floor(dist / m_spellInfo->Speed * 1000.0f));
             else
                 m_delayMoment = uint64(m_spellInfo->Speed * 1000.0f);
@@ -2303,7 +2303,7 @@ void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /*=
         if (dist < 5.0f)
             dist = 5.0f;
 
-        if (!(m_spellInfo->AttributesEx9 & SPELL_ATTR9_UNK4))
+        if (!(m_spellInfo->AttributesEx9 & SPELL_ATTR9_SPECIAL_DELAY_CALCULATION))
             targetInfo.timeDelay = uint64(floor(dist / m_spellInfo->Speed * 1000.0f));
         else
             targetInfo.timeDelay = uint64(m_spellInfo->Speed * 1000.0f);
@@ -2386,7 +2386,7 @@ void Spell::AddGOTarget(GameObject* go, uint32 effectMask)
         if (dist < 5.0f)
             dist = 5.0f;
 
-        if (!(m_spellInfo->AttributesEx9 & SPELL_ATTR9_UNK4))
+        if (!(m_spellInfo->AttributesEx9 & SPELL_ATTR9_SPECIAL_DELAY_CALCULATION))
             target.timeDelay = uint64(floor(dist / m_spellInfo->Speed * 1000.0f));
         else
             target.timeDelay = uint64(m_spellInfo->Speed * 1000.0f);

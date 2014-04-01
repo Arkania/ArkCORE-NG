@@ -1406,7 +1406,7 @@ public:
             }
         }
 
-        /*void ApplyEffect(AuraEffect const* /* aurEff , AuraEffectHandleModes /*mode)
+        /*void ApplyEffect(AuraEffect const* / *aurEff* /, AuraEffectHandleModes / *mode* /)
         {
             if (Unit* pet = GetUnitOwner())
                 if (_tempHealth)
@@ -1416,7 +1416,7 @@ public:
                 }
         }
 
-        void RemoveEffect(AuraEffect const* /* aurEff , AuraEffectHandleModes /*mode)
+        void RemoveEffect(AuraEffect const* / *aurEff* / , AuraEffectHandleModes / *mode* /)
         {
             if (Unit* pet = GetUnitOwner())
                 _tempHealth = pet->GetHealth();

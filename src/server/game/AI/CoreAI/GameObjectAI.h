@@ -31,22 +31,22 @@ class GameObjectAI
     protected:
         GameObject* const go;
     public:
-        explicit GameObjectAI(GameObject* g) : go(g) {}
+        explicit GameObjectAI(GameObject* g) : go(g) { }
         virtual ~GameObjectAI() {}
 
-        virtual void UpdateAI(uint32 /*diff*/) {}
+        virtual void UpdateAI(uint32 /*diff*/) { }
 
         virtual void InitializeAI() { Reset(); }
 
-        virtual void Reset() {};
+        virtual void Reset() { }
 
-        virtual void IsSummonedBy(Unit* /*summoner*/, GameObject* /*go*/) {}
+        virtual void IsSummonedBy(Unit* /*summoner*/, GameObject* /*go*/) { }
 
         static int Permissible(GameObject const* go);
 
         // Pass parameters between AI
-        virtual void DoAction(const int32 /*param = 0 */) {}
-        virtual void SetGUID(const uint64& /*guid*/, int32 /*id = 0 */) {}
+        virtual void DoAction(const int32 /*param = 0 */) { }
+        virtual void SetGUID(uint64 /*guid*/, int32 /*id = 0 */) { }
         virtual uint64 GetGUID(int32 /*id = 0 */) { return 0; }
 
         virtual bool GossipHello(Player* /*player*/) { return false; }

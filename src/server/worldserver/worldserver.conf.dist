@@ -1096,6 +1096,20 @@ MaxHonorPoints = 40000
 StartHonorPoints = 0
 
 #
+#    MaxJusticePoints
+#        Description: Maximum justice points a character can have.
+#        Default:     400000
+
+MaxJusticePoints = 400000
+
+#
+#    StartJusticePoints
+#        Description: Amount of justice points that characters have after creation.
+#        Default:     0
+
+StartJusticePoints = 0
+
+#
 #    Currency.ResetInterval
 #        How often should currency week count reset (days)
 #        Default: 7 (weekly)
