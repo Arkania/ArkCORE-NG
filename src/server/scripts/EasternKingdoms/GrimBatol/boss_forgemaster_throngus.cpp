@@ -125,37 +125,37 @@ class boss_forgemaster_throngus : public CreatureScript
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
-                pInstance = creature->GetInstanceScript();
+                instance = creature->GetInstanceScript();
             }
 
-            InstanceScript* pInstance;
+            InstanceScript* instance;
             EventMap events;
             uint32 uiLastWeapon;
 
             void Reset()
             {
-                if (!pInstance)
+                if (!instance)
                     return;
 
                 SetEquipmentSlots(false, 0, 0, 0);
                 events.Reset();
-                if (pInstance)
-                    pInstance->SetData(DATA_FORGEMASTER_THRONGUS, NOT_STARTED);
+                if (instance)
+                    instance->SetData(DATA_FORGEMASTER_THRONGUS, NOT_STARTED);
             }
 
             void EnterCombat(Unit* who)
             {
                 Talk(SAY_AGGRO);
                 events.ScheduleEvent(EVENT_PICK_WEAPON, 10000);
-                if (pInstance)
-                    pInstance->SetData(DATA_FORGEMASTER_THRONGUS, IN_PROGRESS);
+                if (instance)
+                    instance->SetData(DATA_FORGEMASTER_THRONGUS, IN_PROGRESS);
             }
             
             void JustDied(Unit* killer)
             {
                 Talk(SAY_DEATH);
-                if (pInstance)
-                    pInstance->SetData(DATA_FORGEMASTER_THRONGUS, DONE);
+                if (instance)
+                    instance->SetData(DATA_FORGEMASTER_THRONGUS, DONE);
             }
 
             void KilledUnit(Unit* victim)
@@ -240,14 +240,14 @@ class npc_throngus_fire_patch : public CreatureScript
 
         npc_throngus_fire_patch() : CreatureScript("npc_throngus_fire_patch"){}
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_throngus_fire_patchAI(pCreature);
+            return new npc_throngus_fire_patchAI(creature);
         }
 
-        struct npc_throngus_fire_patchAI : public Scripted_NoMovementAI
+        struct npc_throngus_fire_patchAI : public ScriptedAI
         {
-            npc_throngus_fire_patchAI(Creature *c) : Scripted_NoMovementAI(c)
+            npc_throngus_fire_patchAI(Creature* creature) : ScriptedAI(creature)
             {
             }
             

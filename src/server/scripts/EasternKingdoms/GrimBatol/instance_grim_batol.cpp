@@ -24,14 +24,14 @@ class instance_grim_batol : public InstanceMapScript
 public:
     instance_grim_batol() : InstanceMapScript("instance_grim_batol", 670) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* pMap) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const
     {
-        return new instance_grim_batol_InstanceMapScript(pMap);
+        return new instance_grim_batol_InstanceMapScript(map);
     }
 
     struct instance_grim_batol_InstanceMapScript : public InstanceScript
     {
-        instance_grim_batol_InstanceMapScript(Map* pMap) : InstanceScript(pMap)
+        instance_grim_batol_InstanceMapScript(Map* map) : InstanceScript(map)
         {
             SetBossNumber(MAX_ENCOUNTER);
         }

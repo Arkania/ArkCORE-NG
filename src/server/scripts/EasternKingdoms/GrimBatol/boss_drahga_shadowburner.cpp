@@ -104,10 +104,10 @@ class boss_drahga_shadowburner : public CreatureScript
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
-                pInstance = creature->GetInstanceScript();
+                instance = creature->GetInstanceScript();
             }
 
-            InstanceScript* pInstance;
+            InstanceScript* instance;
             EventMap events;
             SummonList summons;
             uint8 stage;
@@ -118,8 +118,8 @@ class boss_drahga_shadowburner : public CreatureScript
                 summons.DespawnAll();
                 events.Reset();
                 stage = 0;
-                if (pInstance)
-                    pInstance->SetData(DATA_DRAHGA_SHADOWBURNER, NOT_STARTED);
+                if (instance)
+                    instance->SetData(DATA_DRAHGA_SHADOWBURNER, NOT_STARTED);
             }
 
             void SpellHit(Unit* caster, SpellInfo const* spell)
@@ -153,16 +153,16 @@ class boss_drahga_shadowburner : public CreatureScript
                 Talk(SAY_AGGRO);
                 events.ScheduleEvent(EVENT_BURNING_SHADOWBOLT, urand(2000, 5000));
                 events.ScheduleEvent(EVENT_INVOCATION_OF_FLAME, 10000);
-                if (pInstance)
-                    pInstance->SetData(DATA_DRAHGA_SHADOWBURNER, IN_PROGRESS);
+                if (instance)
+                    instance->SetData(DATA_DRAHGA_SHADOWBURNER, IN_PROGRESS);
             }
             
             void JustDied(Unit* killer)
             {
                 Talk(SAY_DEATH);
                 summons.DespawnAll();
-                if (pInstance)
-                    pInstance->SetData(DATA_DRAHGA_SHADOWBURNER, DONE);
+                if (instance)
+                    instance->SetData(DATA_DRAHGA_SHADOWBURNER, DONE);
             }
 
             void KilledUnit(Unit* victim)
@@ -254,10 +254,10 @@ class npc_drahga_valiona : public CreatureScript
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
-                pInstance = creature->GetInstanceScript();
+                instance = creature->GetInstanceScript();
             }
 
-            InstanceScript* pInstance;
+            InstanceScript* instance;
             EventMap events;
             SummonList summons;
             uint8 stage;
@@ -325,7 +325,7 @@ class npc_drahga_valiona : public CreatureScript
                         me->GetVehicleKit()->RemoveAllPassengers();
                     me->SetCanFly(true);
                     me->GetMotionMaster()->MovePoint(1002, drahgavalionaPos[0]);
-                    if (Creature* drahga = Unit::GetCreature(*me, pInstance->GetData64(DATA_DRAHGA_SHADOWBURNER)))
+                    if (Creature* drahga = Unit::GetCreature(*me, instance->GetData64(DATA_DRAHGA_SHADOWBURNER)))
                         drahga->RemoveAurasDueToSpell(SPELL_TWILIGHT_PROTECTION);
                     Talk(SAY_LEAVE);
                     return;
@@ -370,26 +370,26 @@ class npc_invocation_of_flame_stalker : public CreatureScript
 
         npc_invocation_of_flame_stalker() : CreatureScript("npc_invocation_of_flame_stalker"){}
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_invocation_of_flame_stalkerAI(pCreature);
+            return new npc_invocation_of_flame_stalkerAI(creature);
         }
 
         struct npc_invocation_of_flame_stalkerAI : public ScriptedAI
         {
-            npc_invocation_of_flame_stalkerAI(Creature *c) : ScriptedAI(c)
+            npc_invocation_of_flame_stalkerAI(Creature* creature) : ScriptedAI(creature)
             {
-                pInstance = c->GetInstanceScript();
+                instance = creature->GetInstanceScript();
             }
             
-            InstanceScript* pInstance;
+            InstanceScript* instance;
             
             void JustSummoned(Creature* summon)
             {
                 switch (summon->GetEntry())
                 {
                 case NPC_INVOKED_FLAMING_SPIRIT:
-                    if (Creature* drahga = Unit::GetCreature(*me, pInstance->GetData64(DATA_DRAHGA_SHADOWBURNER)))
+                    if (Creature* drahga = Unit::GetCreature(*me, instance->GetData64(DATA_DRAHGA_SHADOWBURNER)))
                         if (Unit* target = drahga->GetAI()->SelectTarget(SELECT_TARGET_RANDOM))
                             summon->AI()->AttackStart(target);
                     break;
@@ -409,23 +409,23 @@ class npc_invoked_flaming_spirit : public CreatureScript
 
         npc_invoked_flaming_spirit() : CreatureScript("npc_invoked_flaming_spirit"){}
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_invoked_flaming_spiritAI(pCreature);
+            return new npc_invoked_flaming_spiritAI(creature);
         }
 
         struct npc_invoked_flaming_spiritAI : public ScriptedAI
         {
-            npc_invoked_flaming_spiritAI(Creature *c) : ScriptedAI(c)
+            npc_invoked_flaming_spiritAI(Creature* creature) : ScriptedAI(creature)
             {
                 me->SetSpeed(MOVE_RUN, 0.8f);
                 me->SetSpeed(MOVE_WALK, 0.8f);
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FEAR, true);
                 me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, true);
-                pInstance = c->GetInstanceScript();
+                instance = creature->GetInstanceScript();
             }
             
-            InstanceScript* pInstance;
+            InstanceScript* instance;
 
             void Reset()
             {
@@ -439,10 +439,10 @@ class npc_invoked_flaming_spirit : public CreatureScript
 
             void UpdateAI(const uint32 diff)
             {
-                if (!pInstance)
+                if (!instance)
                     return;
 
-                if (pInstance->GetData(DATA_DRAHGA_SHADOWBURNER) != IN_PROGRESS)
+                if (instance->GetData(DATA_DRAHGA_SHADOWBURNER) != IN_PROGRESS)
                     me->DespawnOrUnsummon();
 
                 DoMeleeAttackIfReady();
@@ -456,14 +456,14 @@ class npc_seeping_twilight : public CreatureScript
 
         npc_seeping_twilight() : CreatureScript("npc_seeping_twilight"){}
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_seeping_twilightAI(pCreature);
+            return new npc_seeping_twilightAI(creature);
         }
 
         struct npc_seeping_twilightAI : public ScriptedAI
         {
-            npc_seeping_twilightAI(Creature *c) : ScriptedAI(c)
+            npc_seeping_twilightAI(Creature* creature) : ScriptedAI(creature)
             {
             }
 
