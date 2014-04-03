@@ -98,7 +98,7 @@ public:
                         owner->CastSpell(owner, GLYPH_OF_SHADOWFIEND_MANA, true);
         }
 
-        void UpdateAI(uint32 /*diff*/) 
+        void UpdateAI(const uint32 /*diff*/) 
         {
             if (!UpdateVictim())
                 return;

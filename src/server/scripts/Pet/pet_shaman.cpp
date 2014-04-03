@@ -59,7 +59,7 @@ class npc_pet_shaman_earth_elemental : public CreatureScript
                 me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_NATURE, true);
             }
 
-            void UpdateAI(uint32 diff) 
+            void UpdateAI(const uint32 diff) 
             {
                 if (!UpdateVictim())
                     return;
@@ -103,7 +103,7 @@ class npc_pet_shaman_fire_elemental : public CreatureScript
                 me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FIRE, true);
             }
 
-            void UpdateAI(uint32 diff) 
+            void UpdateAI(const uint32 diff) 
             {
                 if (!UpdateVictim())
                     return;
