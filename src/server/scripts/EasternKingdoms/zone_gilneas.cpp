@@ -311,6 +311,7 @@ public:
 
 /*######
 ## npc_rampaging_worgen_phase2
+## ToDo: The fight with Prince Liam is not realy finish.. 
 ######*/
 
 class npc_rampaging_worgen_phase2 : public CreatureScript
@@ -320,58 +321,53 @@ public:
 
     struct npc_rampaging_worgen_phase2AI : public ScriptedAI
     {
-        npc_rampaging_worgen_phase2AI(Creature* creature) : ScriptedAI(creature) {_fightWithPrinceLiam=false; _prince_liam=NULL;}
+        npc_rampaging_worgen_phase2AI(Creature* creature) : ScriptedAI(creature) {_fightWithPrinceLiam=false; _liam=NULL;}
 
 	public:
 		bool		_fightWithPrinceLiam;
 		uint32		_timer;
-		Creature*	_prince_liam;
+		Creature*	_liam;
 		
         void Reset()
-        {		
-			//printf("Trigger reset \n");
+        {					
 			_timer = urand(1800,2200); 
         }
        
 		void StartFightWithPrinceLiam(Creature* liam)
-		{			
-			_prince_liam=liam;
+		{				
+			_liam=liam;
 			_fightWithPrinceLiam=true;
 			Position pos;			
-			liam->GetNearPosition(pos, 1.5f, me->GetAngle(liam));
-			me->GetMotionMaster()->MovePoint(0, pos);			
+			liam->GetNearPosition(pos, 1.5f, 0.0f);
+			me->GetMotionMaster()->MovePoint(1005, pos);
+			me->setFaction(2179);
 		}
 		
         void UpdateAI(const uint32 diff)
         {
             if (!UpdateVictim())
                if(_fightWithPrinceLiam)
-				   DoFightWithPrinceLiam(diff);
+				   return;
 			   else
 				   DoShowFight(diff);
 			else
 				DoMeleeAttackIfReady();
         }
 
-		void DoFightWithPrinceLiam(uint32 diff)
-		{
-			if (Creature* prince = me->FindNearestCreature (NPC_PRINCE_LIAM_GREYMANE_PHASE2, 3.0f)) 
-             {
-				if (_timer <= diff)
-				{
-					// ToDo: fight with prinz liam.. 
-					me->SetReactState(REACT_AGGRESSIVE);
-					me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-					if (me->IsSummon())
-						if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-						{
-							me->CombatStart(summoner);
-							me->AddThreat(summoner, 100500);
-						}														
-				}
-				else 
-					_timer -= diff;
-			}			
+		void AttackStart(Unit* who) 
+		{ 			
+			me->SetReactState(REACT_AGGRESSIVE);
+			me->SetInCombatWith(who);
+			who->SetInCombatWith(me);
+			me->AddThreat(who, 100500);
+		}
+
+		void MovementInform(uint32 type, uint32 id) 
+		{ 
+			if (id=1005)
+			{				
+				me->CombatStart(_liam);	
+			}		
 		}
 
 		void DoShowFight(uint32 diff)
