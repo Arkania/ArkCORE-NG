@@ -311,14 +311,14 @@ class boss_ragnaros : public CreatureScript
         }
 };
 
-class npc_son_of_flame : public CreatureScript
+class npc_son_of_flame2 : public CreatureScript
 {
     public:
-        npc_son_of_flame() : CreatureScript("npc_SonOfFlame") { }
+        npc_son_of_flame2() : CreatureScript("npc_son_of_flame2") { }
 
-        struct npc_son_of_flameAI : public ScriptedAI //didnt work correctly in EAI for me...
+        struct npc_son_of_flame2AI : public ScriptedAI //didnt work correctly in EAI for me...
         {
-            npc_son_of_flameAI(Creature* creature) : ScriptedAI(creature)
+            npc_son_of_flame2AI(Creature* creature) : ScriptedAI(creature)
             {
                 instance = me->GetInstanceScript();
             }
@@ -343,12 +343,12 @@ class npc_son_of_flame : public CreatureScript
 
         CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_son_of_flameAI(creature);
+            return new npc_son_of_flame2AI(creature);
         }
 };
 
 void AddSC_boss_ragnaros()
 {
     new boss_ragnaros();
-    new npc_son_of_flame();
+    new npc_son_of_flame2();
 }
