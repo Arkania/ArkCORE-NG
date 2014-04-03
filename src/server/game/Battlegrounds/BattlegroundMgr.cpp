@@ -1205,6 +1205,14 @@ void BattlegroundMgr::BuildBattlegroundListPacket(WorldPacket* data, uint64 guid
     if (!player)
         return;
 
+    BattlegroundDataContainer::iterator it = bgDataStore.find(bgTypeId);
+    if (it == bgDataStore.end())
+        return;
+
+    PvPDifficultyEntry const* bracketEntry = GetBattlegroundBracketByLevel(it->second.m_Battlegrounds.begin()->second->GetMapId(), player->getLevel());
+    if (!bracketEntry)
+        return;
+
     uint32 winner_conquest = !player->GetRandomWinner() ? BG_REWARD_WINNER_CONQUEST_FIRST : BG_REWARD_WINNER_CONQUEST_LAST;
     uint32 winner_honor = !player->GetRandomWinner() ? BG_REWARD_WINNER_HONOR_FIRST : BG_REWARD_WINNER_HONOR_LAST;
     uint32 loser_honor = !player->GetRandomWinner() ? BG_REWARD_LOSER_HONOR_FIRST : BG_REWARD_LOSER_HONOR_LAST;
@@ -1212,15 +1220,15 @@ void BattlegroundMgr::BuildBattlegroundListPacket(WorldPacket* data, uint64 guid
     ObjectGuid guidBytes = guid;
 
     data->Initialize(SMSG_BATTLEFIELD_LIST);
-    *data << uint32(winner_conquest);                       // Winner Conquest Reward or Random Winner Conquest Reward
-    *data << uint32(winner_conquest);                       // Winner Conquest Reward or Random Winner Conquest Reward
-    *data << uint32(loser_honor);                           // Loser Honor Reward or Random Loser Honor Reward
-    *data << uint32(bgTypeId);                              // battleground id
-    *data << uint32(loser_honor);                           // Loser Honor Reward or Random Loser Honor Reward
-    *data << uint32(winner_honor);                          // Winner Honor Reward or Random Winner Honor Reward
-    *data << uint32(winner_honor);                          // Winner Honor Reward or Random Winner Honor Reward
-    *data << uint8(0);                                      // max level
-    *data << uint8(0);                                      // min level
+    *data << uint32(winner_conquest)                        // Winner Conquest Reward or Random Winner Conquest Reward
+          << uint32(winner_conquest)                        // Winner Conquest Reward or Random Winner Conquest Reward
+          << uint32(loser_honor)                            // Loser Honor Reward or Random Loser Honor Reward
+          << uint32(bgTypeId)                               // battleground id
+          << uint32(loser_honor)                            // Loser Honor Reward or Random Loser Honor Reward
+          << uint32(winner_honor)                           // Winner Honor Reward or Random Winner Honor Reward
+          << uint32(winner_honor)                           // Winner Honor Reward or Random Winner Honor Reward
+          << uint8(bracketEntry->maxLevel)                  // max level
+          << uint8(bracketEntry->minLevel);                 // min level
 
     data->WriteBit(guidBytes[0]);
     data->WriteBit(guidBytes[1]);
@@ -1228,34 +1236,17 @@ void BattlegroundMgr::BuildBattlegroundListPacket(WorldPacket* data, uint64 guid
     data->WriteBit(0);                                      // unk
     data->WriteBit(0);                                      // unk
 
-    uint32 count = 0;
-    ByteBuffer buf;
-
-    BattlegroundDataContainer::iterator it = bgDataStore.find(bgTypeId);
-    if (it != bgDataStore.end())
-    {
-        // expected bracket entry
-        if (PvPDifficultyEntry const* bracketEntry = GetBattlegroundBracketByLevel(it->second.m_Battlegrounds.begin()->second->GetMapId(), player->getLevel()))
-        {
-            BattlegroundBracketId bracketId = bracketEntry->GetBracketId();
-            BattlegroundClientIdsContainer& clientIds = it->second.m_ClientBattlegroundIds[bracketId];
-            for (BattlegroundClientIdsContainer::const_iterator itr = clientIds.begin(); itr != clientIds.end(); ++itr)
-            {
-                *data << uint32(*itr);
-                ++count;
-            }
-        }
-    }
-
-    data->WriteBits(count, 24);                                 // placeholder
+    data->FlushBits();
+    size_t count_pos = data->bitwpos();
+    data->WriteBits(0, 24);                                 // placeholder
 
     data->WriteBit(guidBytes[6]);
     data->WriteBit(guidBytes[4]);
     data->WriteBit(guidBytes[2]);
     data->WriteBit(guidBytes[3]);
-    data->WriteBit(1);                                      // unk TRUE.
+    data->WriteBit(0);                                      // unk
     data->WriteBit(guidBytes[5]);
-    data->WriteBit(1);                                      // signals EVENT_PVPQUEUE_ANYWHERE_SHOW if set. TRUE.
+    data->WriteBit(0);                                      // unk
 
     data->FlushBits();
 
@@ -1263,8 +1254,17 @@ void BattlegroundMgr::BuildBattlegroundListPacket(WorldPacket* data, uint64 guid
     data->WriteByteSeq(guidBytes[1]);
     data->WriteByteSeq(guidBytes[7]);
     data->WriteByteSeq(guidBytes[5]);
-    if (count)
-        data->append(buf);
+
+    uint32 count = 0;
+    BattlegroundBracketId bracketId = bracketEntry->GetBracketId();
+    BattlegroundClientIdsContainer& clientIds = it->second.m_ClientBattlegroundIds[bracketId];
+    for (BattlegroundClientIdsContainer::const_iterator itr = clientIds.begin(); itr != clientIds.end(); ++itr)
+    {
+        *data << uint32(*itr);
+        ++count;
+    }
+    data->PutBits(count_pos, count, 24);                    // bg instance count
+
     data->WriteByteSeq(guidBytes[0]);
     data->WriteByteSeq(guidBytes[2]);
     data->WriteByteSeq(guidBytes[4]);
@@ -1311,16 +1311,12 @@ BattlegroundQueueTypeId BattlegroundMgr::BGQueueTypeId(BattlegroundTypeId bgType
 {
     switch (bgTypeId)
     {
-        case BATTLEGROUND_WS:
-            return BATTLEGROUND_QUEUE_WS;
         case BATTLEGROUND_AB:
             return BATTLEGROUND_QUEUE_AB;
         case BATTLEGROUND_AV:
             return BATTLEGROUND_QUEUE_AV;
         case BATTLEGROUND_EY:
             return BATTLEGROUND_QUEUE_EY;
-        case BATTLEGROUND_SA:
-            return BATTLEGROUND_QUEUE_SA;
         case BATTLEGROUND_IC:
             return BATTLEGROUND_QUEUE_IC;
         case BATTLEGROUND_TP:
@@ -1329,11 +1325,15 @@ BattlegroundQueueTypeId BattlegroundMgr::BGQueueTypeId(BattlegroundTypeId bgType
             return BATTLEGROUND_QUEUE_BFG;
         case BATTLEGROUND_RB:
             return BATTLEGROUND_QUEUE_RB;
+        case BATTLEGROUND_SA:
+            return BATTLEGROUND_QUEUE_SA;
+        case BATTLEGROUND_WS:
+            return BATTLEGROUND_QUEUE_WS;
         case BATTLEGROUND_AA:
-        case BATTLEGROUND_NA:
-        case BATTLEGROUND_RL:
         case BATTLEGROUND_BE:
         case BATTLEGROUND_DS:
+        case BATTLEGROUND_NA:
+        case BATTLEGROUND_RL:
         case BATTLEGROUND_RV:
             switch (arenaType)
             {

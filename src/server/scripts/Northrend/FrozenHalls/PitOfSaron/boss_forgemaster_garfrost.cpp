@@ -49,16 +49,6 @@ enum Spells
 #define SPELL_PERMAFROST_HELPER RAID_MODE<uint32>(68786, 70336)
 #define SPELL_FORGE_BLADE_HELPER RAID_MODE<uint32>(68774, 70334)
 
-enum Events
-{
-    EVENT_THROW_SARONITE    = 1,
-    EVENT_CHILLING_WAVE     = 2,
-    EVENT_DEEP_FREEZE       = 3,
-    EVENT_JUMP              = 4,
-    EVENT_FORGING           = 5,
-    EVENT_RESUME_ATTACK     = 6,
-};
-
 enum Phases
 {
     PHASE_ONE           = 1,
@@ -76,6 +66,16 @@ enum MiscData
     EQUIP_ID_MACE               = 49344,
     ACHIEV_DOESNT_GO_TO_ELEVEN  = 0,
     POINT_FORGE                 = 0,
+};
+
+enum Events
+{
+    EVENT_THROW_SARONITE    = 1,
+    EVENT_CHILLING_WAVE     = 2,
+    EVENT_DEEP_FREEZE       = 3,
+    EVENT_FORGE_JUMP        = 4,
+    EVENT_FORGING           = 5,
+    EVENT_RESUME_ATTACK     = 6,
 };
 
 Position const northForgePos = {722.5643f, -234.1615f, 527.182f, 2.16421f};
@@ -144,7 +144,7 @@ class boss_garfrost : public CreatureScript
                     Talk(SAY_PHASE2);
                     events.DelayEvents(8000);
                     DoCast(me, SPELL_THUNDERING_STOMP);
-                    events.ScheduleEvent(EVENT_JUMP, 1500);
+                    events.ScheduleEvent(EVENT_FORGE_JUMP, 1500);
                     return;
                 }
 
@@ -154,7 +154,7 @@ class boss_garfrost : public CreatureScript
                     Talk(SAY_PHASE3);
                     events.DelayEvents(8000);
                     DoCast(me, SPELL_THUNDERING_STOMP);
-                    events.ScheduleEvent(EVENT_JUMP, 1500);
+                    events.ScheduleEvent(EVENT_FORGE_JUMP, 1500);
                     return;
                 }
             }

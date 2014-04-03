@@ -23,6 +23,7 @@
 #include "SpellScript.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
+#include "PassiveAI.h"
 
 //
 //  Emerald Dragon NPCs and IDs (kept here for reference)
@@ -92,14 +93,12 @@ struct emerald_dragonAI : public WorldBossAI
 {
     emerald_dragonAI(Creature* creature) : WorldBossAI(creature)
     {
-//        me->m_CombatDistance = 12.0f;
-//        me->m_SightDistance  = 60.0f;
     }
 
     void Reset()
     {
-        _Reset();
-        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE|UNIT_FLAG_NON_ATTACKABLE);
+        WorldBossAI::Reset();
+        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
         me->SetReactState(REACT_AGGRESSIVE);
         DoCast(me, SPELL_MARK_OF_NATURE_AURA, true);
         events.ScheduleEvent(EVENT_TAIL_SWEEP, 4000);
@@ -110,7 +109,8 @@ struct emerald_dragonAI : public WorldBossAI
     // Target killed during encounter, mark them as suspectible for Aura Of Nature
     void KilledUnit(Unit* who)
     {
-        who->CastSpell(who, SPELL_MARK_OF_NATURE, true);
+        if (who->GetTypeId() == TYPEID_PLAYER)
+            who->CastSpell(who, SPELL_MARK_OF_NATURE, true);
     }
 
     // Execute and reschedule base events shared between all Emerald Dragons
@@ -217,109 +217,6 @@ class npc_dream_fog : public CreatureScript
 };
 
 /*
- * --- Spell: Dream Fog
- */
-
-class DreamFogTargetSelector
-{
-    public:
-        DreamFogTargetSelector() { }
-
-        bool operator()(WorldObject* object) const
-        {
-            return object->ToUnit() && object->ToUnit()->HasAura(SPELL_SLEEP);
-        }
-};
-
-class spell_dream_fog_sleep : public SpellScriptLoader
-{
-    public:
-        spell_dream_fog_sleep() : SpellScriptLoader("spell_dream_fog_sleep") { }
-
-        class spell_dream_fog_sleep_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_dream_fog_sleep_SpellScript);
-
-            void FilterTargets(std::list<WorldObject*>& unitList)
-            {
-                unitList.remove_if(DreamFogTargetSelector());
-            }
-
-            void Register()
-            {
-                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_dream_fog_sleep_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_DEST_AREA_ENEMY);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_dream_fog_sleep_SpellScript();
-        }
-};
-
-/*
- * --- Spell: Mark of Nature
- */
-
-class MarkOfNatureTargetSelector
-{
-    public:
-        MarkOfNatureTargetSelector() { }
-
-        bool operator()(WorldObject* object) const
-        {
-            if (Unit* unit = object->ToUnit())
-                // return anyone that isn't tagged or already under the influence of Aura of Nature
-                return !(unit->HasAura(SPELL_MARK_OF_NATURE) && !unit->HasAura(SPELL_AURA_OF_NATURE));
-            return true;
-        }
-};
-
-class spell_mark_of_nature : public SpellScriptLoader
-{
-    public:
-        spell_mark_of_nature() : SpellScriptLoader("spell_mark_of_nature") { }
-
-        class spell_mark_of_nature_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_mark_of_nature_SpellScript);
-
-            bool Validate(SpellInfo const* /*spellInfo*/)
-            {
-                if (!sSpellMgr->GetSpellInfo(SPELL_MARK_OF_NATURE))
-                    return false;
-                if (!sSpellMgr->GetSpellInfo(SPELL_AURA_OF_NATURE))
-                    return false;
-                return true;
-            }
-
-            void FilterTargets(std::list<WorldObject*>& targets)
-            {
-                targets.remove_if(MarkOfNatureTargetSelector());
-            }
-
-            void HandleEffect(SpellEffIndex effIndex)
-            {
-                PreventHitDefaultEffect(effIndex);
-
-                if (GetHitUnit())
-                    GetHitUnit()->CastSpell(GetHitUnit(), SPELL_AURA_OF_NATURE, true);
-            }
-
-            void Register()
-            {
-                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_mark_of_nature_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-                OnEffectHitTarget += SpellEffectFn(spell_mark_of_nature_SpellScript::HandleEffect, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_mark_of_nature_SpellScript();
-        }
-};
-
-/*
  * ---
  * --- Dragonspecific scripts and handling: YSONDRE
  * ---
@@ -356,7 +253,6 @@ class boss_ysondre : public CreatureScript
             void Reset()
             {
                 _stage = 1;
-                _Reset();
                 emerald_dragonAI::Reset();
                 events.ScheduleEvent(EVENT_LIGHTNING_WAVE, 12000);
             }
@@ -395,7 +291,7 @@ class boss_ysondre : public CreatureScript
             }
 
         private:
-            uint8   _stage;
+            uint8 _stage;
         };
 
         CreatureAI* GetAI(Creature* creature) const
@@ -410,22 +306,25 @@ class boss_ysondre : public CreatureScript
  * ---
  *
  * TODO:
- * - NPC helper for spirit shades(?)
- *   - Spirit shade NPC moves towards Lethon and heals him if close enough (each shade heals for 15000 HP)
  * - Spell: Shadow bolt whirl casts needs custom handling (spellscript)
  */
 
 enum LethonTexts
 {
     SAY_LETHON_AGGRO                = 0,
-    SAY_LETHON_DRAW_SPIRIT          = 1,
+    SAY_LETHON_DRAW_SPIRIT          = 1
 };
 
 enum LethonSpells
 {
     SPELL_DRAW_SPIRIT               = 24811,
     SPELL_SHADOW_BOLT_WHIRL         = 24834,
-    SPELL_SPIRIT_SHADE_VISUAL       = 24908,
+    SPELL_DARK_OFFERING             = 24804
+};
+
+enum LethonCreatures
+{
+    NPC_SPIRIT_SHADE                = 15261
 };
 
 class boss_lethon : public CreatureScript
@@ -442,7 +341,6 @@ class boss_lethon : public CreatureScript
             void Reset()
             {
                 _stage = 1;
-                _Reset();
                 emerald_dragonAI::Reset();
                 events.ScheduleEvent(EVENT_SHADOW_BOLT_WHIRL, 10000);
             }
@@ -463,12 +361,22 @@ class boss_lethon : public CreatureScript
                 }
             }
 
+            void SpellHitTarget(Unit* target, SpellInfo const* spell)
+            {
+                if (spell->Id == SPELL_DRAW_SPIRIT && target->GetTypeId() == TYPEID_PLAYER)
+                {
+                    Position targetPos;
+                    target->GetPosition(&targetPos);
+                    me->GetMap()->SummonCreature(NPC_SPIRIT_SHADE, targetPos, NULL, 50000, (Unit*)this);
+                }
+            }
+
             void ExecuteEvent(uint32 const eventId)
             {
                 switch (eventId)
                 {
                     case EVENT_SHADOW_BOLT_WHIRL:
-                        DoCast(me, SPELL_SHADOW_BOLT_WHIRL, true);
+                        me->CastSpell((Unit*)NULL, SPELL_SHADOW_BOLT_WHIRL, false);
                         events.ScheduleEvent(EVENT_SHADOW_BOLT_WHIRL, urand(15000, 30000));
                         break;
                     default:
@@ -478,12 +386,48 @@ class boss_lethon : public CreatureScript
             }
 
         private:
-            uint8   _stage;
+            uint8 _stage;
         };
 
         CreatureAI* GetAI(Creature* creature) const
         {
             return new boss_lethonAI(creature);
+        }
+};
+
+class npc_spirit_shade : public CreatureScript
+{
+    public:
+        npc_spirit_shade() : CreatureScript("npc_spirit_shade") { }
+
+        struct npc_spirit_shadeAI : public PassiveAI
+        {
+            npc_spirit_shadeAI(Creature* creature) : PassiveAI(creature), _summonerGuid(0)
+            {
+            }
+
+            void IsSummonedBy(Unit* summoner)
+            {
+                _summonerGuid = summoner->GetGUID();
+                me->GetMotionMaster()->MoveFollow(summoner, 0.0f, 0.0f);
+            }
+
+            void MovementInform(uint32 moveType, uint32 data)
+            {
+                if (moveType == FOLLOW_MOTION_TYPE && data == _summonerGuid)
+                {
+                    me->CastSpell((Unit*)NULL, SPELL_DARK_OFFERING, false);
+                    me->DespawnOrUnsummon(1000);
+                }
+            }
+
+        private:
+            uint64 _summonerGuid;
+        };
+
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return new npc_spirit_shadeAI(creature);
         }
 };
 
@@ -520,7 +464,6 @@ class boss_emeriss : public CreatureScript
             void Reset()
             {
                 _stage = 1;
-                _Reset();
                 emerald_dragonAI::Reset();
                 events.ScheduleEvent(EVENT_VOLATILE_INFECTION, 12000);
             }
@@ -563,7 +506,7 @@ class boss_emeriss : public CreatureScript
             }
 
         private:
-            uint8   _stage;
+            uint8 _stage;
         };
 
         CreatureAI* GetAI(Creature* creature) const
@@ -608,10 +551,6 @@ class boss_taerar : public CreatureScript
         {
             boss_taerarAI(Creature* creature) : emerald_dragonAI(creature)
             {
-                _stage = 1;
-                _shades = 0;
-                _banished = false;
-                _banishedTimer = 0;
             }
 
             void Reset()
@@ -623,7 +562,6 @@ class boss_taerar : public CreatureScript
                 _banished = false;
                 _banishedTimer = 0;
 
-                _Reset();
                 emerald_dragonAI::Reset();
                 events.ScheduleEvent(EVENT_ARCANE_BLAST, 12000);
                 events.ScheduleEvent(EVENT_BELLOWING_ROAR, 30000);
@@ -656,11 +594,11 @@ class boss_taerar : public CreatureScript
 
                     uint32 count = sizeof(TaerarShadeSpells) / sizeof(uint32);
                     for (uint32 i = 0; i < count; ++i)
-                        DoCastVictim(TaerarShadeSpells[i], true);
+                        DoCast(me->GetVictim(), TaerarShadeSpells[i], true);
                     _shades += count;
 
                     DoCast(SPELL_SHADE);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE|UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
                     me->SetReactState(REACT_PASSIVE);
 
                     ++_stage;
@@ -697,7 +635,7 @@ class boss_taerar : public CreatureScript
                     {
                         _banished = false;
 
-                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE|UNIT_FLAG_NON_ATTACKABLE);
+                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
                         me->RemoveAurasDueToSpell(SPELL_SHADE);
                         me->SetReactState(REACT_AGGRESSIVE);
                     }
@@ -715,10 +653,10 @@ class boss_taerar : public CreatureScript
             }
 
         private:
-            bool    _banished;                              // used for shades activation testing
-            uint32  _banishedTimer;                         // counter for banishment timeout
-            uint8   _shades;                                // keep track of how many shades are dead
-            uint8   _stage;                                 // check which "shade phase" we're at (75-50-25 percentage counters)
+            bool   _banished;                              // used for shades activation testing
+            uint32 _banishedTimer;                         // counter for banishment timeout
+            uint8  _shades;                                // keep track of how many shades are dead
+            uint8  _stage;                                 // check which "shade phase" we're at (75-50-25 percentage counters)
         };
 
         CreatureAI* GetAI(Creature* creature) const
@@ -727,18 +665,122 @@ class boss_taerar : public CreatureScript
         }
 };
 
+/*
+ * --- Spell: Dream Fog
+ */
+
+class DreamFogTargetSelector
+{
+    public:
+        DreamFogTargetSelector() { }
+
+        bool operator()(WorldObject* object)
+        {
+            if (Unit* unit = object->ToUnit())
+                return unit->HasAura(SPELL_SLEEP);
+            return true;
+        }
+};
+
+class spell_dream_fog_sleep : public SpellScriptLoader
+{
+    public:
+        spell_dream_fog_sleep() : SpellScriptLoader("spell_dream_fog_sleep") { }
+
+        class spell_dream_fog_sleep_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_dream_fog_sleep_SpellScript);
+
+            void FilterTargets(std::list<WorldObject*>& targets)
+            {
+                targets.remove_if(DreamFogTargetSelector());
+            }
+
+            void Register()
+            {
+                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_dream_fog_sleep_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_DEST_AREA_ENEMY);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_dream_fog_sleep_SpellScript();
+        }
+};
+
+/*
+ * --- Spell: Mark of Nature
+ */
+
+class MarkOfNatureTargetSelector
+{
+    public:
+        MarkOfNatureTargetSelector() { }
+
+        bool operator()(WorldObject* object)
+        {
+            // return those not tagged or already under the influence of Aura of Nature
+            if (Unit* unit = object->ToUnit())
+                return !(unit->HasAura(SPELL_MARK_OF_NATURE) && !unit->HasAura(SPELL_AURA_OF_NATURE));
+            return true;
+        }
+};
+
+class spell_mark_of_nature : public SpellScriptLoader
+{
+    public:
+        spell_mark_of_nature() : SpellScriptLoader("spell_mark_of_nature") { }
+
+        class spell_mark_of_nature_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_mark_of_nature_SpellScript);
+
+            bool Validate(SpellInfo const* /*spellInfo*/)
+            {
+                if (!sSpellMgr->GetSpellInfo(SPELL_MARK_OF_NATURE))
+                    return false;
+                if (!sSpellMgr->GetSpellInfo(SPELL_AURA_OF_NATURE))
+                    return false;
+                return true;
+            }
+
+            void FilterTargets(std::list<WorldObject*>& targets)
+            {
+                targets.remove_if(MarkOfNatureTargetSelector());
+            }
+
+            void HandleEffect(SpellEffIndex effIndex)
+            {
+                PreventHitDefaultEffect(effIndex);
+                GetHitUnit()->CastSpell(GetHitUnit(), SPELL_AURA_OF_NATURE, true);
+            }
+
+            void Register()
+            {
+                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_mark_of_nature_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+                OnEffectHitTarget += SpellEffectFn(spell_mark_of_nature_SpellScript::HandleEffect, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_mark_of_nature_SpellScript();
+        }
+};
+
 void AddSC_emerald_dragons()
 {
     // helper NPC scripts
     new npc_dream_fog();
-
-    // dragon spellscripts
-    new spell_dream_fog_sleep();
-    new spell_mark_of_nature();
+    new npc_spirit_shade();
 
     // dragons
     new boss_ysondre();
     new boss_taerar();
     new boss_emeriss();
     new boss_lethon();
+
+    // dragon spellscripts
+    new spell_dream_fog_sleep();
+    new spell_mark_of_nature();
 };
