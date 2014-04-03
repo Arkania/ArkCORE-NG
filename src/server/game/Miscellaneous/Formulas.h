@@ -39,7 +39,8 @@ namespace Trinity
         {
             return uint32(ceil(hk_honor_at_level_f(level, multiplier)));
         }
-    }
+    } // namespace Trinity::Honor
+
     namespace XP
     {
         inline uint8 GetGrayLevel(uint8 pl_level)
@@ -242,7 +243,7 @@ namespace Trinity
             // WowWiki: Battleground ratings receive a bonus of 22.2% to the cap they generate, plus 1 for corrections.
             return uint32((ConquestRatingCalculator(rate) * 1.222f) + 0.5f);
         }
-    }
-}
+    } // namespace Trinity::XP
+} // namespace Trinity
 
 #endif

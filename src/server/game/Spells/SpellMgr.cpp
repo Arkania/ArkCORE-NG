@@ -1280,6 +1280,7 @@ void SpellMgr::LoadSpellRanks()
             mSpellInfoMap[addedSpell]->ChainEntry = &mSpellChains[addedSpell];
             prevRank = addedSpell;
             ++itr;
+
             if (itr == rankChain.end())
             {
                 mSpellChains[addedSpell].next = NULL;
