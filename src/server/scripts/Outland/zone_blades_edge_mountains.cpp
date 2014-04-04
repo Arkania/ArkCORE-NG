@@ -45,20 +45,137 @@ bool     obelisk_one, obelisk_two, obelisk_three, obelisk_four, obelisk_five;
 #define LEGION_OBELISK_FOUR          185197
 #define LEGION_OBELISK_FIVE          185198
 
+#define GOSSIP_HELLO_ON		"Overseer, I am here to negotiate on behalf of the Cenarion Expedition."
+#define GOSSIP_HELLO_STE    "Yes... yes, it's me."
+#define GOSSIP_SELECT_STE   "Yes elder. Tell me more of the book."
+
+
+enum Zone_Blades_Edge_Mountains
+{
+	NPC_OGRE_BRUTE                              = 19995,
+	NPC_BLOODMAUL_BRUTEBANE_STOUT_TRIGGER		= 21241, 
+	NPC_NETHER_WHELP							= 20021,
+	NPC_PROTO_NETHER_DRAKE						= 21821,
+	NPC_ADOLESCENT_NETHER_DRAKE					= 21817,
+    NPC_MATURE_NETHER_DRAKE						= 21820,
+    NPC_NIHIL_THE_BANISHED						= 21823,
+	NPC_GOR_GRIMGUT								= 21319,
+    NPC_SIMON_BUNNY								= 22923,
+    NPC_APEXIS_GUARDIAN							= 22275,
+        
+    GO_KEG                                      = 184315,
+    GO_APEXIS_RELIC								= 185890,
+    GO_APEXIS_MONUMENT							= 185944,
+    GO_AURA_BLUE								= 185872,
+    GO_AURA_GREEN								= 185873,
+    GO_AURA_RED									= 185874,
+    GO_AURA_YELLOW								= 185875,
+    GO_BLUE_CLUSTER_DISPLAY						= 7369,
+    GO_GREEN_CLUSTER_DISPLAY					= 7371,
+    GO_RED_CLUSTER_DISPLAY						= 7373,
+    GO_YELLOW_CLUSTER_DISPLAY					= 7375,
+    GO_BLUE_CLUSTER_DISPLAY_LARGE				= 7364,
+    GO_GREEN_CLUSTER_DISPLAY_LARGE				= 7365,
+    GO_RED_CLUSTER_DISPLAY_LARGE				= 7366,
+    GO_YELLOW_CLUSTER_DISPLAY_LARGE				= 7367,
+
+	ITEM_APEXIS_SHARD							= 32569,
+
+    QUEST_GETTING_THE_BLADESPIRE_TANKED         = 10512,
+    QUEST_BLADESPIRE_KEGGER                     = 10545,
+	QUEST_A_TIME_FOR_NEGOTIATION				= 10682,
+	QUEST_THUNDERSPIKE							= 10526,
+	QUEST_CRYSTALS								= 11025,
+
+	SPELL_T_PHASE_MODULATOR						= 37573,
+    SPELL_ARCANE_BLAST							= 38881,
+    SPELL_MANA_BURN								= 38884,
+    SPELL_INTANGIBLE_PRESENCE					= 36513,
+	SPELL_LASHHAN_CHANNEL						= 36904,
+	SPELL_DISPELLING_ANALYSIS					= 37028,
+    SPELL_TAKE_REAGENTS_SOLO					= 41145,
+    SPELL_TAKE_REAGENTS_GROUP					= 41146,
+    SPELL_PRE_GAME_BLUE							= 40176,
+    SPELL_PRE_GAME_GREEN						= 40177,
+    SPELL_PRE_GAME_RED							= 40178,
+    SPELL_PRE_GAME_YELLOW						= 40179,
+    SPELL_VISUAL_BLUE							= 40244,
+    SPELL_VISUAL_GREEN							= 40245,
+    SPELL_VISUAL_RED							= 40246,
+    SPELL_VISUAL_YELLOW							= 40247,
+    SPELL_AUDIBLE_GAME_TICK						= 40391,
+    SPELL_VISUAL_START_PLAYER_LEVEL				= 40436,
+    SPELL_VISUAL_START_AI_LEVEL					= 40387,
+    SPELL_BAD_PRESS_TRIGGER						= 41241,
+    SPELL_BAD_PRESS_DAMAGE						= 40065,
+    SPELL_REWARD_BUFF_1							= 40310,
+    SPELL_REWARD_BUFF_2							= 40311,
+    SPELL_REWARD_BUFF_3							= 40312,
+
+	GOSSIP_TEXT_ID								= 10948,
+
+	SOUND_BLUE									= 11588,
+    SOUND_GREEN									= 11589,
+    SOUND_RED									= 11590,
+    SOUND_YELLOW								= 11591,
+    SOUND_DISABLE_NODE							= 11758,
+
+};
+
+enum eSay
+{
+	SAY_NIHIL_1                 = -1000169, //signed for 5955
+    SAY_NIHIL_2                 = -1000170, //signed for 5955
+    SAY_NIHIL_3                 = -1000171, //signed for 5955
+    SAY_NIHIL_4                 = -1000172, //signed for 20021, used by 20021, 21817, 21820, 21821, 21823
+    SAY_NIHIL_INTERRUPT         = -1000173, //signed for 20021, used by 20021, 21817, 21820, 21821, 21823
+	SAY_SPELL_INFLUENCE			= -1000174,
+};
+
+/*######
+## npc_bloodmaul_brutebane
+######*/
+
+class npc_bloodmaul_brutebane : public CreatureScript
+{
+public:
+    npc_bloodmaul_brutebane() : CreatureScript("npc_bloodmaul_brutebane") { }
+
+    struct npc_bloodmaul_brutebaneAI : public ScriptedAI
+    {
+        npc_bloodmaul_brutebaneAI(Creature* creature) : ScriptedAI(creature)
+        {
+           if (Creature* Ogre = me->FindNearestCreature(NPC_OGRE_BRUTE, 50, true))
+           {
+               Ogre->SetReactState(REACT_DEFENSIVE);
+               Ogre->GetMotionMaster()->MovePoint(1, me->GetPositionX()-1, me->GetPositionY()+1, me->GetPositionZ());
+           }
+        }
+
+        uint64 OgreGUID;
+
+        void Reset() 
+        {
+            OgreGUID = 0;
+        }
+
+        void UpdateAI(const uint32 /*diff*/)  { }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const 
+    {
+        return new npc_bloodmaul_brutebaneAI(creature);
+    }
+};
+
 /*######
 ## mobs_bladespire_ogre
 ######*/
 
-//TODO: add support for quest 10512 + Creature abilities
 class mobs_bladespire_ogre : public CreatureScript
 {
 public:
     mobs_bladespire_ogre() : CreatureScript("mobs_bladespire_ogre") { }
-
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new mobs_bladespire_ogreAI (creature);
-    }
 
     struct mobs_bladespire_ogreAI : public ScriptedAI
     {
@@ -74,32 +191,16 @@ public:
             DoMeleeAttackIfReady();
         }
     };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new mobs_bladespire_ogreAI (creature);
+    }
 };
 
 /*######
 ## mobs_nether_drake
 ######*/
-
-enum eNetherdrake
-{
-    SAY_NIHIL_1                 = -1000169, //signed for 5955
-    SAY_NIHIL_2                 = -1000170, //signed for 5955
-    SAY_NIHIL_3                 = -1000171, //signed for 5955
-    SAY_NIHIL_4                 = -1000172, //signed for 20021, used by 20021, 21817, 21820, 21821, 21823
-    SAY_NIHIL_INTERRUPT         = -1000173, //signed for 20021, used by 20021, 21817, 21820, 21821, 21823
-
-    ENTRY_WHELP                 = 20021,
-    ENTRY_PROTO                 = 21821,
-    ENTRY_ADOLE                 = 21817,
-    ENTRY_MATUR                 = 21820,
-    ENTRY_NIHIL                 = 21823,
-
-    SPELL_T_PHASE_MODULATOR     = 37573,
-
-    SPELL_ARCANE_BLAST          = 38881,
-    SPELL_MANA_BURN             = 38884,
-    SPELL_INTANGIBLE_PRESENCE   = 36513
-};
 
 class mobs_nether_drake : public CreatureScript
 {
@@ -162,14 +263,14 @@ public:
         {
             if (spell->Id == SPELL_T_PHASE_MODULATOR && caster->GetTypeId() == TYPEID_PLAYER)
             {
-                const uint32 entry_list[4] = {ENTRY_PROTO, ENTRY_ADOLE, ENTRY_MATUR, ENTRY_NIHIL};
+                const uint32 entry_list[4] = {NPC_PROTO_NETHER_DRAKE, NPC_ADOLESCENT_NETHER_DRAKE, NPC_MATURE_NETHER_DRAKE, NPC_NIHIL_THE_BANISHED};
                 int cid = rand()%(4-1);
 
                 if (entry_list[cid] == me->GetEntry())
                     ++cid;
 
                 //we are nihil, so say before transform
-                if (me->GetEntry() == ENTRY_NIHIL)
+                if (me->GetEntry() == NPC_NIHIL_THE_BANISHED)
                 {
                     DoScriptText(SAY_NIHIL_INTERRUPT, me);
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -178,7 +279,7 @@ public:
 
                 if (me->UpdateEntry(entry_list[cid]))
                 {
-                    if (entry_list[cid] == ENTRY_NIHIL)
+                    if (entry_list[cid] == NPC_NIHIL_THE_BANISHED)
                     {
                         EnterEvadeMode();
                         me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -259,12 +360,6 @@ public:
 ## npc_daranelle
 ######*/
 
-enum eDaranelle
-{
-    SAY_SPELL_INFLUENCE     = -1000174,
-    SPELL_LASHHAN_CHANNEL   = 36904
-};
-
 class npc_daranelle : public CreatureScript
 {
 public:
@@ -291,7 +386,7 @@ public:
                 {
                     DoScriptText(SAY_SPELL_INFLUENCE, me, who);
                     //TODO: Move the below to updateAI and run if this statement == true
-                    DoCast(who, 37028, true);
+                    DoCast(who, SPELL_DISPELLING_ANALYSIS, true);
                 }
             }
 
@@ -303,8 +398,6 @@ public:
 /*######
 ## npc_overseer_nuaar
 ######*/
-
-#define GOSSIP_HELLO_ON "Overseer, I am here to negotiate on behalf of the Cenarion Expedition."
 
 class npc_overseer_nuaar : public CreatureScript
 {
@@ -324,7 +417,7 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature)
     {
-        if (player->GetQuestStatus(10682) == QUEST_STATUS_INCOMPLETE)
+        if (player->GetQuestStatus(QUEST_A_TIME_FOR_NEGOTIATION) == QUEST_STATUS_INCOMPLETE)
             player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_HELLO_ON, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
 
         player->SEND_GOSSIP_MENU(10532, creature->GetGUID());
@@ -336,9 +429,6 @@ public:
 /*######
 ## npc_saikkal_the_elder
 ######*/
-
-#define GOSSIP_HELLO_STE    "Yes... yes, it's me."
-#define GOSSIP_SELECT_STE   "Yes elder. Tell me more of the book."
 
 class npc_saikkal_the_elder : public CreatureScript
 {
@@ -422,51 +512,6 @@ public:
 };
 
 /*######
-## npc_bloodmaul_brutebane
-######*/
-
-enum eBloodmaul
-{
-    NPC_OGRE_BRUTE                              = 19995,
-    NPC_QUEST_CREDIT                            = 21241,
-    GO_KEG                                      = 184315,
-    QUEST_GETTING_THE_BLADESPIRE_TANKED         = 10512,
-    QUEST_BLADESPIRE_KEGGER                     = 10545,
-};
-
-class npc_bloodmaul_brutebane : public CreatureScript
-{
-public:
-    npc_bloodmaul_brutebane() : CreatureScript("npc_bloodmaul_brutebane") { }
-
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new npc_bloodmaul_brutebaneAI(creature);
-    }
-
-    struct npc_bloodmaul_brutebaneAI : public ScriptedAI
-    {
-        npc_bloodmaul_brutebaneAI(Creature* creature) : ScriptedAI(creature)
-        {
-           if (Creature* Ogre = me->FindNearestCreature(NPC_OGRE_BRUTE, 50, true))
-           {
-               Ogre->SetReactState(REACT_DEFENSIVE);
-               Ogre->GetMotionMaster()->MovePoint(1, me->GetPositionX()-1, me->GetPositionY()+1, me->GetPositionZ());
-           }
-        }
-
-        uint64 OgreGUID;
-
-        void Reset()
-        {
-            OgreGUID = 0;
-        }
-
-        void UpdateAI(const uint32 /*uiDiff*/) {}
-    };
-};
-
-/*######
 ## npc_ogre_brute
 ######*/
 
@@ -474,11 +519,6 @@ class npc_ogre_brute : public CreatureScript
 {
 public:
     npc_ogre_brute() : CreatureScript("npc_ogre_brute") { }
-
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new npc_ogre_bruteAI(creature);
-    }
 
     struct npc_ogre_bruteAI : public ScriptedAI
     {
@@ -516,7 +556,7 @@ public:
                 me->HandleEmote(7);
                 me->SetReactState(REACT_AGGRESSIVE);
                 me->GetMotionMaster()->MoveTargetedHome();
-                Creature* Credit = me->FindNearestCreature(NPC_QUEST_CREDIT, 50, true);
+                Creature* Credit = me->FindNearestCreature(NPC_BLOODMAUL_BRUTEBANE_STOUT_TRIGGER, 50, true);
                 if (player && Credit)
                     player->KilledMonster(Credit->GetCreatureTemplate(), Credit->GetGUID());
             }
@@ -529,17 +569,16 @@ public:
             DoMeleeAttackIfReady();
         }
     };
+
+	CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_ogre_bruteAI(creature);
+    }
 };
 
 /*######
 ## go_thunderspike
 ######*/
-
-enum TheThunderspike
-{
-    NPC_GOR_GRIMGUT     = 21319,
-    QUEST_THUNDERSPIKE  = 10526,
-};
 
 class go_thunderspike : public GameObjectScript
 {
@@ -556,52 +595,10 @@ class go_thunderspike : public GameObjectScript
         }
 };
 
-enum SimonGame
-{
-    NPC_SIMON_BUNNY                 = 22923,
-    NPC_APEXIS_GUARDIAN             = 22275,
-
-    GO_APEXIS_RELIC                 = 185890,
-    GO_APEXIS_MONUMENT              = 185944,
-    GO_AURA_BLUE                    = 185872,
-    GO_AURA_GREEN                   = 185873,
-    GO_AURA_RED                     = 185874,
-    GO_AURA_YELLOW                  = 185875,
-
-    GO_BLUE_CLUSTER_DISPLAY         = 7369,
-    GO_GREEN_CLUSTER_DISPLAY        = 7371,
-    GO_RED_CLUSTER_DISPLAY          = 7373,
-    GO_YELLOW_CLUSTER_DISPLAY       = 7375,
-    GO_BLUE_CLUSTER_DISPLAY_LARGE   = 7364,
-    GO_GREEN_CLUSTER_DISPLAY_LARGE  = 7365,
-    GO_RED_CLUSTER_DISPLAY_LARGE    = 7366,
-    GO_YELLOW_CLUSTER_DISPLAY_LARGE = 7367,
-
-    SPELL_PRE_GAME_BLUE             = 40176,
-    SPELL_PRE_GAME_GREEN            = 40177,
-    SPELL_PRE_GAME_RED              = 40178,
-    SPELL_PRE_GAME_YELLOW           = 40179,
-    SPELL_VISUAL_BLUE               = 40244,
-    SPELL_VISUAL_GREEN              = 40245,
-    SPELL_VISUAL_RED                = 40246,
-    SPELL_VISUAL_YELLOW             = 40247,
-
-    SOUND_BLUE                      = 11588,
-    SOUND_GREEN                     = 11589,
-    SOUND_RED                       = 11590,
-    SOUND_YELLOW                    = 11591,
-    SOUND_DISABLE_NODE              = 11758,
-
-    SPELL_AUDIBLE_GAME_TICK         = 40391,
-    SPELL_VISUAL_START_PLAYER_LEVEL = 40436,
-    SPELL_VISUAL_START_AI_LEVEL     = 40387,
-
-    SPELL_BAD_PRESS_TRIGGER         = 41241,
-    SPELL_BAD_PRESS_DAMAGE          = 40065,
-    SPELL_REWARD_BUFF_1             = 40310,
-    SPELL_REWARD_BUFF_2             = 40311,
-    SPELL_REWARD_BUFF_3             = 40312,
-};
+/*######
+## npc_simon_bunny
+## ToDo: we need to play this
+######*/
 
 enum SimonEvents
 {
@@ -1095,16 +1092,6 @@ class go_simon_cluster : public GameObjectScript
         }
 };
 
-enum ApexisRelic
-{
-    QUEST_CRYSTALS            = 11025,
-    GOSSIP_TEXT_ID            = 10948,
-
-    ITEM_APEXIS_SHARD         = 32569,
-    SPELL_TAKE_REAGENTS_SOLO  = 41145,
-    SPELL_TAKE_REAGENTS_GROUP = 41146,
-};
-
 class go_apexis_relic : public GameObjectScript
 {
     public:
@@ -1134,6 +1121,7 @@ class go_apexis_relic : public GameObjectScript
         }
 };
 
+
 void AddSC_blades_edge_mountains()
 {
     new mobs_bladespire_ogre();
@@ -1148,4 +1136,5 @@ void AddSC_blades_edge_mountains()
     new npc_simon_bunny();
     new go_simon_cluster();
     new go_apexis_relic();
+
 }
