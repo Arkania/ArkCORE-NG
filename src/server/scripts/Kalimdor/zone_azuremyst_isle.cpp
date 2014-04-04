@@ -41,25 +41,45 @@ EndContentData */
 #include "CellImpl.h"
 #include "GridNotifiers.h"
 
+enum Azuremyst_Isle
+{
+	NPC_DRAENEI_SURVIVOR				= 16483,
+	NPC_NESTLEWOOD_OWLKIN				= 16518,
+	NPC_DEATH_RAVAGER					= 17556,
+	NPC_STILLPINE_CAPITIVE              = 17375,
+	NPC_SPARK_OVERGRIND					= 17243,
+	NPC_MAGWIN							= 17312,
+	NPC_STILLPINE_CAPTIVE				= 17375,
+
+	GO_BRISTELIMB_CAGE                  = 181714,
+
+	QUEST_INOCULATION					= 9303,
+	QUEST_A_CRY_FOR_SAY_HELP			= 9528,
+	QUEST_STRENGTH_ONE					= 9582,
+	QUEST_THE_PROPHECY_OF_AKIDA         = 9544,
+	QUEST_GNOMERCY						= 9537,
+
+	SPELL_INOCULATE_NESTLEWOOD_OWLKIN	= 29528,
+	SPELL_IRRIDATION					= 35046,
+    SPELL_STUNNED						= 28630,
+	SPELL_DYNAMITE						= 7978,
+	SPELL_REND							= 13443,
+    SPELL_ENRAGING_BITE					= 30736,
+
+	FACTION_HOSTILE						= 14,
+
+	AREA_COVE							= 3579,
+    AREA_ISLE							= 3639,      
+
+	POINT_INIT                          = 1,
+    EVENT_DESPAWN                       = 1,
+};
+
+#define GOSSIP_FIGHT "Traitor! You will be brought to justice!"
+
 /*######
 ## npc_draenei_survivor
 ######*/
-
-enum draeneiSurvivor
-{
-    SAY_HEAL1           = -1000176,
-    SAY_HEAL2           = -1000177,
-    SAY_HEAL3           = -1000178,
-    SAY_HEAL4           = -1000179,
-
-    SAY_HELP1           = -1000180,
-    SAY_HELP2           = -1000181,
-    SAY_HELP3           = -1000182,
-    SAY_HELP4           = -1000183,
-
-    SPELL_IRRIDATION    = 35046,
-    SPELL_STUNNED       = 28630
-};
 
 class npc_draenei_survivor : public CreatureScript
 {
@@ -106,10 +126,8 @@ public:
         void MoveInLineOfSight(Unit* who)
         {
             if (CanSayHelp && who->GetTypeId() == TYPEID_PLAYER && me->IsFriendlyTo(who) && me->IsWithinDistInMap(who, 25.0f))
-            {
-                //Random switch between 4 texts
-                DoScriptText(RAND(SAY_HELP1, SAY_HELP2, SAY_HELP3, SAY_HELP4), me, who);
-
+            {                
+				Talk(1); // DoScriptText(RAND(SAY_HELP1, SAY_HELP2, SAY_HELP3, SAY_HELP4), me, who);
                 SayHelpTimer = 20000;
                 CanSayHelp = false;
             }
@@ -121,11 +139,8 @@ public:
             {
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
                 me->SetStandState(UNIT_STAND_STATE_STAND);
-
                 DoCast(me, SPELL_STUNNED, true);
-
                 pCaster = Caster->GetGUID();
-
                 SayThanksTimer = 5000;
             }
         }
@@ -140,9 +155,8 @@ public:
 
                     if (Player* player = Unit::GetPlayer(*me, pCaster))
                     {
-                        DoScriptText(RAND(SAY_HEAL1, SAY_HEAL2, SAY_HEAL3, SAY_HEAL4), me, player);
-
-                        player->TalkedToCreature(me->GetEntry(), me->GetGUID());
+                        Talk(0); // DoScriptText(RAND(SAY_HEAL1, SAY_HEAL2, SAY_HEAL3, SAY_HEAL4), me, player);
+                        player->TalkedToCreature(me->GetEntry(), me->GetGUID()); // ?? gpn39f ask: what is this
                     }
 
                     me->GetMotionMaster()->Clear();
@@ -178,21 +192,6 @@ public:
 /*######
 ## npc_engineer_spark_overgrind
 ######*/
-
-enum Overgrind
-{
-    SAY_TEXT        = -1000184,
-    SAY_EMOTE       = -1000185,
-    ATTACK_YELL     = -1000186,
-
-    AREA_COVE       = 3579,
-    AREA_ISLE       = 3639,
-    QUEST_GNOMERCY  = 9537,
-    FACTION_HOSTILE = 14,
-    SPELL_DYNAMITE  = 7978
-};
-
-#define GOSSIP_FIGHT "Traitor! You will be brought to justice!"
 
 class npc_engineer_spark_overgrind : public CreatureScript
 {
@@ -257,7 +256,7 @@ public:
 
         void EnterCombat(Unit* who)
         {
-            DoScriptText(ATTACK_YELL, me, who);
+			Talk(2); // DoScriptText(ATTACK_YELL, me, who);
         }
 
         void UpdateAI(const uint32 diff)
@@ -266,8 +265,8 @@ public:
             {
                 if (EmoteTimer <= diff)
                 {
-                    DoScriptText(SAY_TEXT, me);
-                    DoScriptText(SAY_EMOTE, me);
+					Talk(12); // DoScriptText(SAY_TEXT, me);                    
+					Talk(1);  // DoScriptText(SAY_EMOTE, me);  // SAY_EMOTE = -1000185,
                     EmoteTimer = urand(120000, 150000);
                 } else EmoteTimer -= diff;
             }
@@ -336,18 +335,6 @@ public:
 ## npc_magwin
 ######*/
 
-enum Magwin
-{
-    SAY_START                   = -1000111,
-    SAY_AGGRO                   = -1000112,
-    SAY_PROGRESS                = -1000113,
-    SAY_END1                    = -1000114,
-    SAY_END2                    = -1000115,
-    EMOTE_HUG                   = -1000116,
-
-    QUEST_A_CRY_FOR_SAY_HELP    = 9528
-};
-
 class npc_magwin : public CreatureScript
 {
 public:
@@ -380,17 +367,17 @@ public:
                 switch (waypointId)
                 {
                     case 0:
-                        DoScriptText(SAY_START, me, player);
+                        Talk(0); // DoScriptText(SAY_START, me, player);
                         break;
                     case 17:
-                        DoScriptText(SAY_PROGRESS, me, player);
+                        Talk(2); // DoScriptText(SAY_PROGRESS, me, player);
                         break;
                     case 28:
-                        DoScriptText(SAY_END1, me, player);
+                        Talk(3); // DoScriptText(SAY_END1, me, player);
                         break;
                     case 29:
-                        DoScriptText(EMOTE_HUG, me, player);
-                        DoScriptText(SAY_END2, me, player);
+                        Talk(5); // DoScriptText(EMOTE_HUG, me, player);
+                        Talk(4); // DoScriptText(SAY_END2, me, player);
                         player->GroupEventHappens(QUEST_A_CRY_FOR_SAY_HELP, me);
                         break;
                 }
@@ -399,7 +386,7 @@ public:
 
         void EnterCombat(Unit* who)
         {
-            DoScriptText(SAY_AGGRO, me, who);
+            Talk(1); // DoScriptText(SAY_AGGRO, me, who);
         }
 
         void Reset() {}
@@ -407,15 +394,9 @@ public:
 
 };
 
-enum RavegerCage
-{
-    NPC_DEATH_RAVAGER       = 17556,
-
-    SPELL_REND              = 13443,
-    SPELL_ENRAGING_BITE     = 30736,
-
-    QUEST_STRENGTH_ONE      = 9582
-};
+/*######
+## go_ravager_cage
+######*/
 
 class go_ravager_cage : public GameObjectScript
 {
@@ -436,6 +417,10 @@ public:
         return true;
     }
 };
+
+/*######
+## npc_death_ravager
+######*/
 
 class npc_death_ravager : public CreatureScript
 {
@@ -492,28 +477,18 @@ public:
 ## Quest: The Prophecy of Akida
 ########*/
 
-enum BristlelimbCage
-{
-    QUEST_THE_PROPHECY_OF_AKIDA         = 9544,
-    NPC_STILLPINE_CAPITIVE              = 17375,
-    GO_BRISTELIMB_CAGE                  = 181714,
+/*######
+## npc_stillpine_captive
+######*/
 
-    CAPITIVE_SAY_1                      = -1000474,
-    CAPITIVE_SAY_2                      = -1000475,
-    CAPITIVE_SAY_3                      = -1000476,
-
-    POINT_INIT                          = 1,
-    EVENT_DESPAWN                       = 1,
-};
-
-class npc_stillpine_capitive : public CreatureScript
+class npc_stillpine_captive : public CreatureScript
 {
     public:
-        npc_stillpine_capitive() : CreatureScript("npc_stillpine_capitive") { }
+        npc_stillpine_captive() : CreatureScript("npc_stillpine_captive") { }
 
-        struct npc_stillpine_capitiveAI : public ScriptedAI
+        struct npc_stillpine_captiveAI : public ScriptedAI
         {
-            npc_stillpine_capitiveAI(Creature* creature) : ScriptedAI(creature)
+            npc_stillpine_captiveAI(Creature* creature) : ScriptedAI(creature)
             {
             }
 
@@ -533,7 +508,7 @@ class npc_stillpine_capitive : public CreatureScript
             {
                 if (owner)
                 {
-                    DoScriptText(RAND(CAPITIVE_SAY_1, CAPITIVE_SAY_2, CAPITIVE_SAY_3), me, owner);
+                    Talk(0); // DoScriptText(RAND(CAPITIVE_SAY_1, CAPITIVE_SAY_2, CAPITIVE_SAY_3), me, owner);
                     _player = owner;
                 }
                 Position pos;
@@ -572,9 +547,13 @@ class npc_stillpine_capitive : public CreatureScript
 
         CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_stillpine_capitiveAI(creature);
+            return new npc_stillpine_captiveAI(creature);
         }
 };
+
+/*######
+## go_bristlelimb_cage
+######*/
 
 class go_bristlelimb_cage : public GameObjectScript
 {
@@ -588,11 +567,48 @@ class go_bristlelimb_cage : public GameObjectScript
                 if (Creature* capitive = go->FindNearestCreature(NPC_STILLPINE_CAPITIVE, 5.0f, true))
                 {
                     go->ResetDoorOrButton();
-                    CAST_AI(npc_stillpine_capitive::npc_stillpine_capitiveAI, capitive->AI())->StartMoving(player);
+                    CAST_AI(npc_stillpine_captive::npc_stillpine_captiveAI, capitive->AI())->StartMoving(player);
                     return false;
                 }
             }
             return true;
+        }
+};
+
+/*######
+## npc_nestlewood_owlkin
+######*/
+
+class npc_nestlewood_owlkin : public CreatureScript
+{
+    public:
+        npc_nestlewood_owlkin() : CreatureScript("npc_nestlewood_owlkin") { }
+
+        struct npc_nestlewood_owlkinAI : public ScriptedAI
+        {
+            npc_nestlewood_owlkinAI(Creature* creature) : ScriptedAI(creature) { }
+
+			void SpellHit(Unit * Hitter, SpellInfo const* spell) 
+			{		
+				Player* player = Hitter->ToPlayer();
+
+				if (!player)
+					return;				
+
+				if (spell->Id == SPELL_INOCULATE_NESTLEWOOD_OWLKIN )
+				{
+					if (player->GetQuestStatus(QUEST_INOCULATION) == QUEST_STATUS_INCOMPLETE) 
+					{						
+						player->KilledMonsterCredit(NPC_NESTLEWOOD_OWLKIN, NULL);
+						me->DespawnOrUnsummon(0);
+					}									
+				}
+			}                               
+        };
+
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return new npc_nestlewood_owlkinAI(creature);
         }
 };
 
@@ -604,6 +620,7 @@ void AddSC_azuremyst_isle()
     new npc_magwin();
     new npc_death_ravager();
     new go_ravager_cage();
-    new npc_stillpine_capitive();
+    new npc_stillpine_captive();
     new go_bristlelimb_cage();
+	new npc_nestlewood_owlkin();
 }
