@@ -1240,7 +1240,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_torloth_the_magnificentAI(c);
+        return new npc_torloth_the_magnificentAI(creature);
     }
 
     struct npc_torloth_the_magnificentAI : public ScriptedAI
