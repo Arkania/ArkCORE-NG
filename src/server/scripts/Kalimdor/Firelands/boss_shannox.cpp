@@ -1051,7 +1051,7 @@ public:
         return new npc_immolation_trapAI(creature);
     }
 
-    struct npc_immolation_trapAI : public Scripted_NoMovementAI
+    struct npc_immolation_trapAI : public ScriptedAI
     {
         npc_immolation_trapAI(Creature* creature) : ScriptedAI(creature)
         {
@@ -1146,7 +1146,7 @@ public:
         return new npc_crystal_trapAI(creature);
     }
 
-    struct npc_crystal_trapAI : public Scripted_NoMovementAI
+    struct npc_crystal_trapAI : public ScriptedAI
     {
         npc_crystal_trapAI(Creature* creature) : ScriptedAI(creature)
         {
