@@ -360,7 +360,7 @@ class npc_mana_void : public CreatureScript
                             events.Reset();
                         }
 
-                        void JustDied(Unit* /*pKiller*/)
+                        void JustDied(Unit* /*killer*/)
                         {
                             DoCast(me, SPELL_MANA_DIFFUSION, true);
                             me->DespawnOrUnsummon(5000);
