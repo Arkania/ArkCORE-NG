@@ -126,10 +126,10 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* pkiller)
+        void JustDied(Unit* killer)
         {
             instance->SetBossState(BOSS_WARMASTER, DONE);
-	    pkiller->SummonCreature(NPC_TRAVEL_TO_THE_MAELSTROM, 13405.485f, -12131.544f, 150.971f, 6.213f, TEMPSUMMON_CORPSE_DESPAWN, 600000);
+        killer->SummonCreature(NPC_TRAVEL_TO_THE_MAELSTROM, 13405.485f, -12131.544f, 150.971f, 6.213f, TEMPSUMMON_CORPSE_DESPAWN, 600000);
             _JustDied();
         }
     };
