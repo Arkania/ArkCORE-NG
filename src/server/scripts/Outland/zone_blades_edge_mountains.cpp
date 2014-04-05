@@ -86,6 +86,7 @@ enum Zone_Blades_Edge_Mountains
 	QUEST_A_TIME_FOR_NEGOTIATION				= 10682,
 	QUEST_THUNDERSPIKE							= 10526,
 	QUEST_CRYSTALS								= 11025,
+	QUEST_INTO_THE_SOULGRINDER                  = 11000,
 
 	SPELL_T_PHASE_MODULATOR						= 37573,
     SPELL_ARCANE_BLAST							= 38881,
@@ -111,6 +112,9 @@ enum Zone_Blades_Edge_Mountains
     SPELL_REWARD_BUFF_1							= 40310,
     SPELL_REWARD_BUFF_2							= 40311,
     SPELL_REWARD_BUFF_3							= 40312,
+	SPELL_CLEAVE                                = 15496,
+    SPELL_DEBILITATING_STRIKE                   = 37577,
+    SPELL_ENRAGE                                = 8599,
 
 	GOSSIP_TEXT_ID								= 10948,
 
@@ -120,16 +124,11 @@ enum Zone_Blades_Edge_Mountains
     SOUND_YELLOW								= 11591,
     SOUND_DISABLE_NODE							= 11758,
 
-};
-
-enum eSay
-{
-	SAY_NIHIL_1                 = -1000169, //signed for 5955
-    SAY_NIHIL_2                 = -1000170, //signed for 5955
-    SAY_NIHIL_3                 = -1000171, //signed for 5955
-    SAY_NIHIL_4                 = -1000172, //signed for 20021, used by 20021, 21817, 21820, 21821, 21823
-    SAY_NIHIL_INTERRUPT         = -1000173, //signed for 20021, used by 20021, 21817, 21820, 21821, 21823
-	SAY_SPELL_INFLUENCE			= -1000174,
+	EVENT_CLEAVE                                = 1,
+    EVENT_DEBILITATING_STRIKE                   = 2,
+    SAY_AGGRO                                   = 0,
+    SAY_DEATH                                   = 1,
+    SAY_ENRAGE                                  = 2,
 };
 
 /*######
@@ -167,6 +166,121 @@ public:
         return new npc_bloodmaul_brutebaneAI(creature);
     }
 };
+
+/*######
+## npc_bloodmaul_brute
+######*/
+
+class npc_bloodmaul_brute : public CreatureScript
+{
+public:
+    npc_bloodmaul_brute() : CreatureScript("npc_bloodmaul_brute") { }
+
+    struct npc_bloodmaul_bruteAI : public ScriptedAI
+    {
+        npc_bloodmaul_bruteAI(Creature* creature) : ScriptedAI(creature)
+        {
+            hp30 = false;
+        }
+
+        void Reset() 
+        {
+            PlayerGUID = 0;
+            hp30 = false;
+        }
+
+        void EnterCombat(Unit* /*who*/) 
+        {
+            if (urand (0, 100) < 35)
+                Talk(SAY_AGGRO);
+
+            events.ScheduleEvent(EVENT_CLEAVE, urand(9000,12000));
+            events.ScheduleEvent(EVENT_DEBILITATING_STRIKE, 15000);
+        }
+
+        void JustDied(Unit* killer) 
+        {
+            if (killer->GetTypeId() == TYPEID_PLAYER)
+                if (killer->ToPlayer()->GetQuestRewardStatus(QUEST_INTO_THE_SOULGRINDER))
+                    Talk(SAY_DEATH);
+        }
+
+        void MoveInLineOfSight(Unit* who) 
+        {
+            if (!who || (!who->IsAlive()))
+                return;
+
+            if (me->IsWithinDistInMap(who, 50.0f))
+            {
+                if (who->GetTypeId() == TYPEID_PLAYER)
+                    if (who->ToPlayer()->GetQuestStatus(QUEST_GETTING_THE_BLADESPIRE_TANKED) == QUEST_STATUS_INCOMPLETE
+                        || who->ToPlayer()->GetQuestStatus(QUEST_BLADESPIRE_KEGGER) == QUEST_STATUS_INCOMPLETE)
+                        PlayerGUID = who->GetGUID();
+            }
+        }
+
+        void MovementInform(uint32 /*type*/, uint32 id) 
+        {
+            if (id == 1)
+            {
+                if (GameObject* Keg = me->FindNearestGameObject(GO_KEG, 20))
+                    Keg->Delete();
+
+                me->HandleEmoteCommand(7);
+                me->SetReactState(REACT_AGGRESSIVE);
+                me->GetMotionMaster()->MoveTargetedHome();
+
+                Player* player = ObjectAccessor::GetPlayer(*me, PlayerGUID);
+                Creature* Credit = me->FindNearestCreature(NPC_BLOODMAUL_BRUTEBANE_STOUT_TRIGGER, 50, true);
+                if (player && Credit)
+                    player->KilledMonster(Credit->GetCreatureTemplate(), Credit->GetGUID());
+            }
+        }
+
+        void UpdateAI(const uint32 diff) 
+        {
+            if (!UpdateVictim())
+                return;
+
+            events.Update(diff);
+
+            while (uint32 eventId = events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                    case EVENT_CLEAVE:
+                        DoCast(me, SPELL_CLEAVE);
+                        events.ScheduleEvent(EVENT_CLEAVE, urand(9000,12000));
+                        break;
+                    case EVENT_DEBILITATING_STRIKE:
+                        DoCastVictim(SPELL_DEBILITATING_STRIKE);
+                        events.ScheduleEvent(EVENT_DEBILITATING_STRIKE, urand(18000,22000));
+                        break;
+                }
+            }
+
+            if (!hp30 && HealthBelowPct(30))
+            {
+                hp30 = true;
+                Talk(SAY_ENRAGE);
+                DoCast(me, SPELL_ENRAGE);
+            }
+
+            DoMeleeAttackIfReady();
+        }
+
+        private:
+            EventMap events;
+            uint64 PlayerGUID;
+            bool hp30;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const 
+    {
+        return new npc_bloodmaul_bruteAI(creature);
+    }
+};
+
 
 /*######
 ## mobs_bladespire_ogre
@@ -272,7 +386,7 @@ public:
                 //we are nihil, so say before transform
                 if (me->GetEntry() == NPC_NIHIL_THE_BANISHED)
                 {
-                    DoScriptText(SAY_NIHIL_INTERRUPT, me);
+                    Talk(0);  // DoScriptText(SAY_NIHIL_INTERRUPT, me);
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     IsNihil = false;
                 }
@@ -299,19 +413,19 @@ public:
                     switch (NihilSpeech_Phase)
                     {
                         case 0:
-                            DoScriptText(SAY_NIHIL_1, me);
+                            Talk(1);  // DoScriptText(SAY_NIHIL_1, me);
                             ++NihilSpeech_Phase;
                             break;
                         case 1:
-                            DoScriptText(SAY_NIHIL_2, me);
+                            Talk(2);  // DoScriptText(SAY_NIHIL_2, me);
                             ++NihilSpeech_Phase;
                             break;
                         case 2:
-                            DoScriptText(SAY_NIHIL_3, me);
+                            Talk(3);  // DoScriptText(SAY_NIHIL_3, me);
                             ++NihilSpeech_Phase;
                             break;
                         case 3:
-                            DoScriptText(SAY_NIHIL_4, me);
+                            Talk(4);  // DoScriptText(SAY_NIHIL_4, me);
                             ++NihilSpeech_Phase;
                             break;
                         case 4:
@@ -384,7 +498,7 @@ public:
             {
                 if (who->HasAura(SPELL_LASHHAN_CHANNEL) && me->IsWithinDistInMap(who, 10.0f))
                 {
-                    DoScriptText(SAY_SPELL_INFLUENCE, me, who);
+                    Talk(0);  // DoScriptText(SAY_SPELL_INFLUENCE, me, who);
                     //TODO: Move the below to updateAI and run if this statement == true
                     DoCast(who, SPELL_DISPELLING_ANALYSIS, true);
                 }
@@ -512,7 +626,8 @@ public:
 };
 
 /*######
-## npc_ogre_brute
+## npc_ogre_brute.. 
+## ToDo: this is same as npc_bloodmaul_brute.. find best script and kill other script..
 ######*/
 
 class npc_ogre_brute : public CreatureScript
@@ -597,7 +712,6 @@ class go_thunderspike : public GameObjectScript
 
 /*######
 ## npc_simon_bunny
-## ToDo: we need to play this
 ######*/
 
 enum SimonEvents
@@ -1121,6 +1235,105 @@ class go_apexis_relic : public GameObjectScript
         }
 };
 
+/*######
+## npc_oscillating_frequency_scanner_master_bunny used for quest 10594 "Gauging the Resonant Frequency"
+######*/
+
+enum ScannerMasterBunny
+{
+    NPC_OSCILLATING_FREQUENCY_SCANNER_TOP_BUNNY = 21759,
+    GO_OSCILLATING_FREQUENCY_SCANNER            = 184926,
+    SPELL_OSCILLATION_FIELD                     = 37408,
+    QUEST_GAUGING_THE_RESONANT_FREQUENCY        = 10594
+};
+
+class npc_oscillating_frequency_scanner_master_bunny : public CreatureScript
+{
+public:
+    npc_oscillating_frequency_scanner_master_bunny() : CreatureScript("npc_oscillating_frequency_scanner_master_bunny") { }
+
+    struct npc_oscillating_frequency_scanner_master_bunnyAI : public ScriptedAI
+    {
+        npc_oscillating_frequency_scanner_master_bunnyAI(Creature* creature) : ScriptedAI(creature)
+        {
+            playerGuid = 0;
+            timer = 500;
+        }
+
+        void Reset() 
+        {
+            if (GetClosestCreatureWithEntry(me, NPC_OSCILLATING_FREQUENCY_SCANNER_TOP_BUNNY, 25.0f))
+                me->DespawnOrUnsummon();
+            else
+            {
+                // Spell 37392 does not exist in dbc, manually spawning
+                me->SummonCreature(NPC_OSCILLATING_FREQUENCY_SCANNER_TOP_BUNNY, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 0.5f, me->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 50000);
+                me->SummonGameObject(GO_OSCILLATING_FREQUENCY_SCANNER, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation(), 0, 0, 0, 0, 50000);
+                me->DespawnOrUnsummon(50000);
+            }
+
+            timer = 500;
+        }
+
+        void IsSummonedBy(Unit* summoner) 
+        {
+            if (summoner->isType(TYPEMASK_PLAYER))
+                playerGuid = summoner->GetGUID();
+        }
+
+        void UpdateAI(const uint32 diff) 
+        {
+            if (timer <= diff)
+            {
+                if (Player* player = ObjectAccessor::GetPlayer(*me, playerGuid))
+                    DoCast(player, SPELL_OSCILLATION_FIELD);
+
+                timer = 3000;
+            }
+            else
+                timer -= diff;
+        }
+
+        private:
+            uint64 playerGuid;
+            uint32 timer;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const 
+    {
+        return new npc_oscillating_frequency_scanner_master_bunnyAI(creature);
+    }
+};
+
+class spell_oscillating_field : public SpellScriptLoader
+{
+    public:
+        spell_oscillating_field() : SpellScriptLoader("spell_oscillating_field") { }
+
+        class spell_oscillating_field_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_oscillating_field_SpellScript);
+
+            void HandleEffect(SpellEffIndex /*effIndex*/)
+            {
+                if (Player* player = GetHitPlayer())
+                    if (player->GetAuraCount(SPELL_OSCILLATION_FIELD) == 5 && player->GetQuestStatus(QUEST_GAUGING_THE_RESONANT_FREQUENCY) == QUEST_STATUS_INCOMPLETE)
+                        player->CompleteQuest(QUEST_GAUGING_THE_RESONANT_FREQUENCY);
+            }
+
+            void Register() 
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_oscillating_field_SpellScript::HandleEffect, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
+            }
+        };
+
+        SpellScript* GetSpellScript() const 
+        {
+            return new spell_oscillating_field_SpellScript();
+        }
+};
+
+
 
 void AddSC_blades_edge_mountains()
 {
@@ -1136,5 +1349,6 @@ void AddSC_blades_edge_mountains()
     new npc_simon_bunny();
     new go_simon_cluster();
     new go_apexis_relic();
-
+	new npc_oscillating_frequency_scanner_master_bunny();
+    new spell_oscillating_field();
 }
