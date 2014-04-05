@@ -25,13 +25,14 @@ It looks as if Rhyolith has some inertia. When the damage done to both his feet 
 // Q : Where is + and where is -, to right or left? 
 // A : Left is +, right is -. ( Circle: lowest orientation 0.00f minus something = to right = 6.28f, highest orientation).
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
+#include "ScriptPCH.h"
 #include "WorldPacket.h"
 #include "firelands.h"
 #include "SpellAuraEffects.h"  
 #include "Vehicle.h"
 #include "Unit.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "ScriptedEscortAI.h"
 #include "Cell.h"
@@ -365,7 +366,7 @@ class boss_lord_rhyolith : public CreatureScript
         
         struct boss_lord_rhyolithAI : public BossAI
         {
-            boss_lord_rhyolithAI(Creature* скуфегку) : BossAI(скуфегку, DATA_LORD_RHYOLITH), vehicle(creature->GetVehicleKit()), summons(me)
+            boss_lord_rhyolithAI(Creature* creature) : BossAI(creature, DATA_LORD_RHYOLITH), vehicle(creature->GetVehicleKit()), summons(me)
             {
                 instance = me->GetInstanceScript();
                 LeftSet = false;
@@ -522,7 +523,7 @@ class boss_lord_rhyolith : public CreatureScript
                 _EnterEvadeMode();
             }
 
-            void JustSummoned(Creature* summon)
+            void JustSummoned(Creature *summon)
             {
                 summons.Summon(summon);
 
@@ -573,7 +574,7 @@ class boss_lord_rhyolith : public CreatureScript
                 Map::PlayerList const &PlayerList = me->GetMap()->GetPlayers();
                 if (!PlayerList.isEmpty())
                     for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-                        if (Player* player = i->GetSource())
+                        if (Player *player = i->GetSource())
                             if (player->IsAlive() && player->GetDistance(me) <= 150.0f)
                             {
                                 ++players;
@@ -789,7 +790,7 @@ public:
 
     struct npc_left_legAI : public ScriptedAI
     {
-        npc_left_legAI(Creature* creature) : ScriptedAI(creature)
+        npc_left_legAI(Creature *c) : ScriptedAI(c)
         {
             instance = me->GetInstanceScript();
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -806,7 +807,7 @@ public:
             Map::PlayerList const &PlayerList = me->GetMap()->GetPlayers();
             if (!PlayerList.isEmpty())
                 for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-                    if (Player* player = i->GetSource())
+                    if (Player *player = i->GetSource())
                         if (player->IsAlive() && GetRhyo() && player->GetDistance(GetRhyo()) <= 150.0f)
                             player->SetPower(POWER_ALTERNATE_POWER, player->GetPower(POWER_ALTERNATE_POWER) + power);
         }
@@ -874,7 +875,7 @@ public:
 
     struct npc_right_legAI : public ScriptedAI
     {
-        npc_right_legAI(Creature* creature) : ScriptedAI(creature)
+        npc_right_legAI(Creature *c) : ScriptedAI(c)
         {
             instance = me->GetInstanceScript();
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -891,7 +892,7 @@ public:
             Map::PlayerList const &PlayerList = me->GetMap()->GetPlayers();
             if (!PlayerList.isEmpty())
                 for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-                    if (Player* player = i->GetSource())
+                    if (Player *player = i->GetSource())
                         if (player->IsAlive() && GetRhyo() && player->GetDistance(GetRhyo()) <= 150.0f)
                             player->SetPower(POWER_ALTERNATE_POWER, player->GetPower(POWER_ALTERNATE_POWER) + power);
         }
@@ -963,7 +964,7 @@ public:
 
     struct npc_rhyolith_volcanoAI : public ScriptedAI
     {
-        npc_rhyolith_volcanoAI(Creature* creature) : ScriptedAI(creature)
+        npc_rhyolith_volcanoAI(Creature *c) : ScriptedAI(c)
         {
             instance = me->GetInstanceScript();
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
@@ -1088,7 +1089,7 @@ public:
 
     struct npc_rhyolith_craterAI : public ScriptedAI
     {
-        npc_rhyolith_craterAI(Creature* creature) : ScriptedAI(creature) , summons(me)
+        npc_rhyolith_craterAI(Creature *c) : ScriptedAI(c) , summons(me)
         {
             instance = me->GetInstanceScript();
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
@@ -1214,7 +1215,7 @@ public:
 
     struct npc_lava_lineAI : public ScriptedAI
     {
-        npc_lava_lineAI(Creature* creature) : ScriptedAI(creature)
+        npc_lava_lineAI(Creature *c) : ScriptedAI(c)
         {
             instance = me->GetInstanceScript();
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -1294,7 +1295,7 @@ public:
 
     struct npc_liquid_obsidianAI : public ScriptedAI
     {
-        npc_liquid_obsidianAI(Creature* creature) : ScriptedAI(creature)
+        npc_liquid_obsidianAI(Creature *c) : ScriptedAI(c)
         {
             instance = me->GetInstanceScript();
         }
@@ -1355,7 +1356,7 @@ public:
 
     struct npc_spark_of_rhyolithAI : public ScriptedAI
     {
-        npc_spark_of_rhyolithAI(Creature* creature) : ScriptedAI(creature)
+        npc_spark_of_rhyolithAI(Creature *c) : ScriptedAI(c)
         {
             instance = me->GetInstanceScript();
         }
