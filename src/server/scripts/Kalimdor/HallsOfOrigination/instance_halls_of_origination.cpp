@@ -83,30 +83,30 @@ public:
             return false;
         }
 
-        void OnCreatureCreate(Creature* pCreature, bool)
+        void OnCreatureCreate(Creature* creature, bool)
         {
-            switch(pCreature->GetEntry())
+            switch(creature->GetEntry())
             {
                 case BOSS_TEMPLE_GUARDIAN_ANHUUR:
-                    uiTempleGuardianAnhuur = pCreature->GetGUID();
+                    uiTempleGuardianAnhuur = creature->GetGUID();
                     break;
                 case BOSS_EARTHRAGER_PTAH:
-                    uiEarthragerPtah = pCreature->GetGUID();
+                    uiEarthragerPtah = creature->GetGUID();
                     break;
                 case BOSS_ANRAPHET:
-                    uiAnraphet = pCreature->GetGUID();
+                    uiAnraphet = creature->GetGUID();
                     break;
                 case BOSS_ISISET:
-                    uiIsiset = pCreature->GetGUID();
+                    uiIsiset = creature->GetGUID();
                     break;
                 case BOSS_AMMUNAE:
-                    uiAmmunae = pCreature->GetGUID();
+                    uiAmmunae = creature->GetGUID();
                     break;
                 case BOSS_SETESH:
-                    uiSetesh = pCreature->GetGUID();
+                    uiSetesh = creature->GetGUID();
                     break;
                 case BOSS_RAJH:
-                    uiRajh = pCreature->GetGUID();
+                    uiRajh = creature->GetGUID();
                     break;
             }
         }
@@ -124,9 +124,9 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 identifier)
+        uint64 GetData64(uint32 id) const
         {
-            switch(identifier)
+            switch(id)
             {
                 case DATA_TEMPLE_GUARDIAN_ANHUUR:
                     return uiTempleGuardianAnhuur;
