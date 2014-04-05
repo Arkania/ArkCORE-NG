@@ -1023,7 +1023,7 @@ public:
     {
         npc_fiery_tornadoAI(Creature* creature) : npc_escortAI(creature)
 		{
-			c->SetDisplayId(11686);
+            creature->SetDisplayId(11686);
 		}
 
 		uint32 numb;
