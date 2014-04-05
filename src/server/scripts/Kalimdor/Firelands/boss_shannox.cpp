@@ -24,6 +24,7 @@
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "CreatureTextMgr.h"
+
 #include "firelands.h"
 
 enum Shannox_Yells
@@ -199,7 +200,7 @@ public:
 
     struct boss_shannoxAI : public BossAI
     {
-        boss_shannoxAI(Creature* c) : BossAI(c, DATA_SHANNOX)
+        boss_shannoxAI(Creature* creature) : BossAI(creature, DATA_SHANNOX)
         {
             instance = me->GetInstanceScript();
             introSpeechDone = false;
@@ -233,7 +234,7 @@ public:
             }
         }
 
-        uint32 GetData (uint32 id) const
+        uint32 GetData (uint32 id)
         {
             switch (id)
             {
@@ -305,7 +306,7 @@ public:
                 summon->AI()->DoZoneInCombat();
         }
 
-        void KilledUnit(Unit * /*victim*/)
+        void KilledUnit(Unit* /*victim*/)
         {
             DoScriptText(RAND(SAY_ON_KILL_ONE, SAY_ON_KILL_TWO), me);
         }
@@ -323,7 +324,7 @@ public:
             }
         }
 
-        void JustDied(Unit * /*victim*/)
+        void JustDied(Unit* /*victim*/)
         {
             DoScriptText(SAY_ON_DEAD, me);
 
@@ -424,7 +425,7 @@ public:
                     break;
 
                 case EVENT_HURL_SPEAR:
-                    if (Creature *fakeSpear = me->FindNearestCreature(NPC_FAKE_SHANNOX_SPEAR, 5000.0f, true))
+                    if (Creature* fakeSpear = me->FindNearestCreature(NPC_FAKE_SHANNOX_SPEAR, 5000.0f, true))
                     {
                         DoCast(fakeSpear,SPELL_HURL_SPEAR);
                         events.ScheduleEvent(EVENT_HURL_SPEAR_2, 1000);
@@ -432,7 +433,7 @@ public:
                     break;
 
                 case EVENT_HURL_SPEAR_2:
-                    if (Creature *fakeSpear = me->FindNearestCreature(NPC_FAKE_SHANNOX_SPEAR, 5000.0f, true))
+                    if (Creature* fakeSpear = me->FindNearestCreature(NPC_FAKE_SHANNOX_SPEAR, 5000.0f, true))
                     {
                         // Shifts the Event back if Shannox has not the Spear yet
                         me->LoadEquipment(0, true);
@@ -474,7 +475,7 @@ public:
 
                             me->SummonCreature(NPC_FAKE_SHANNOX_SPEAR,GetRiplimb()->GetPositionX()+irand(-30,30),GetRiplimb()->GetPositionY()+irand(-30,30),GetRiplimb()->GetPositionZ());
 
-                            if (Creature *fakeSpear = me->FindNearestCreature(NPC_FAKE_SHANNOX_SPEAR, 5000.0f, true))
+                            if (Creature* fakeSpear = me->FindNearestCreature(NPC_FAKE_SHANNOX_SPEAR, 5000.0f, true))
                                 events.ScheduleEvent(EVENT_HURL_SPEAR, 2000);
 
                             uiPhase = PHASE_SPEAR_ON_THE_GROUND;
@@ -583,7 +584,7 @@ public:
 
     struct npc_ragefaceAI : public ScriptedAI
     {
-        npc_ragefaceAI(Creature *c) : ScriptedAI(c)
+        npc_ragefaceAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = me->GetInstanceScript();
 
@@ -602,9 +603,9 @@ public:
             prisonStartAttack = false;
         }
 
-        void KilledUnit(Unit * /*victim*/) {}
+        void KilledUnit(Unit* /*victim*/) {}
 
-        void JustDied(Unit * /*victim*/)
+        void JustDied(Unit* /*victim*/)
         {
             if (GetShannox())
             {
@@ -614,7 +615,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit * /*who*/)
+        void EnterCombat(Unit* /*who*/)
         {
             // Not tauntable.
             me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, true);
@@ -631,7 +632,7 @@ public:
         void SelectNewTarget()
         {
             if (!me->HasAura(CRYSTAL_PRISON_EFFECT))
-                if (Unit *shallTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 500, true))
+                if (Unit* shallTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 500, true))
                 {
                     me->getThreatManager().resetAllAggro();
                     me->AddThreat(shallTarget, 500.0f);
@@ -658,7 +659,7 @@ public:
             if (me->GetVictim())
                 if(!me->HasAura(RAID_MODE(SPELL_FACE_RAGE_10N, SPELL_FACE_RAGE_25N,SPELL_FACE_RAGE_10H, SPELL_FACE_RAGE_25H)) && me->GetVictim()->HasAura(SPELL_FACE_RAGE) && !me->HasAura(CRYSTAL_PRISON_EFFECT))
                 {
-                    if (Unit *RageTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 500.0f, true, SPELL_RAGE))
+                    if (Unit* RageTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 500.0f, true, SPELL_RAGE))
                     {
                         me->getThreatManager().resetAllAggro();
                         me->AddThreat(RageTarget, 500.0f);
@@ -710,7 +711,7 @@ public:
                     break;
 
                 case EVENT_PRISON_DOG_ATTACK_RAGEFACE:
-                    if (Creature *prison = me->FindNearestCreature(NPC_CRYSTAL_PRISON, 50.0f, true))
+                    if (Creature* prison = me->FindNearestCreature(NPC_CRYSTAL_PRISON, 50.0f, true))
                     {
                         int32 dmg = prison->GetMaxHealth() * 0.20;
                         me->DealDamage(prison,dmg);
@@ -725,7 +726,7 @@ public:
             }
 
             if (me->HasAura(CRYSTAL_PRISON_EFFECT) && !prisonStartAttack)
-                if (Creature *prison = me->FindNearestCreature(NPC_CRYSTAL_PRISON, 50.0f, true))
+                if (Creature* prison = me->FindNearestCreature(NPC_CRYSTAL_PRISON, 50.0f, true))
                 {
                     events.ScheduleEvent(EVENT_PRISON_DOG_ATTACK_RAGEFACE, 1000);
                     prisonStartAttack = true;
@@ -782,7 +783,7 @@ public:
 
     struct npc_riplimbAI : public ScriptedAI
     {
-        npc_riplimbAI(Creature *c) : ScriptedAI(c), vehicle(c->GetVehicleKit())
+        npc_riplimbAI(Creature* creature) : ScriptedAI(creature), vehicle(creature->GetVehicleKit())
         {
             instance = me->GetInstanceScript();
 
@@ -804,9 +805,9 @@ public:
             firstLimbRip = false;
         }
 
-        void KilledUnit(Unit * /*victim*/) {}
+        void KilledUnit(Unit* /*victim*/) {}
 
-        void JustDied(Unit * /*victim*/)
+        void JustDied(Unit* /*victim*/)
         {
             if (GetShannox())
             {
@@ -822,7 +823,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit * who)
+        void EnterCombat(Unit* who)
         {
             prisonStartAttack = false;
             inTakingSpearPhase = false;
@@ -875,7 +876,7 @@ public:
                     break;
 
                 case EVENT_PRISON_DOG_ATTACK_RIPLIMB:
-                    if (Creature *prison = me->FindNearestCreature(NPC_CRYSTAL_PRISON, 50.0f, true))
+                    if (Creature* prison = me->FindNearestCreature(NPC_CRYSTAL_PRISON, 50.0f, true))
                     {
                         int32 dmg = prison->GetMaxHealth() * 0.10;
                         me->DealDamage(prison,dmg);
@@ -890,7 +891,7 @@ public:
             }
 
             if (me->HasAura(CRYSTAL_PRISON_EFFECT) && !prisonStartAttack)
-                if (Creature *prison = me->FindNearestCreature(NPC_CRYSTAL_PRISON, 50.0f, true))
+                if (Creature* prison = me->FindNearestCreature(NPC_CRYSTAL_PRISON, 50.0f, true))
                 {
                     events.ScheduleEvent(EVENT_PRISON_DOG_ATTACK_RIPLIMB, 1000);
                     prisonStartAttack = true;
@@ -966,7 +967,7 @@ public:
 
     struct npc_shannox_fake_spearAI : public ScriptedAI
     {
-        npc_shannox_fake_spearAI(Creature *c) : ScriptedAI(c)
+        npc_shannox_fake_spearAI(Creature* creature) : ScriptedAI(creature)
         {
             me->SetReactState(REACT_PASSIVE);
             me->AddAura(RED_TARGET_AUR,me);
@@ -995,7 +996,7 @@ public:
 
     struct npc_shannox_spearAI : public ScriptedAI
     {
-        npc_shannox_spearAI(Creature *c) : ScriptedAI(c)
+        npc_shannox_spearAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = me->GetInstanceScript();
             me->AddAura(SPEAR_VISIBLE_ON_GROUND,me);
@@ -1007,9 +1008,9 @@ public:
 
         void Reset() {}
 
-        void JustDied(Unit * /*victim*/) {}
+        void JustDied(Unit* /*victim*/) {}
 
-        void EnterCombat(Unit * /*who*/)
+        void EnterCombat(Unit* /*who*/)
         {
             DoCast(SPELL_MAGMA_FLARE);
 
@@ -1052,7 +1053,7 @@ public:
 
     struct npc_immolation_trapAI : public Scripted_NoMovementAI
     {
-        npc_immolation_trapAI(Creature *c) : Scripted_NoMovementAI(c)
+        npc_immolation_trapAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = me->GetInstanceScript();
             tempTarget = NULL;
@@ -1065,14 +1066,14 @@ public:
         EventMap events;
         Unit* tempTarget;
 
-        void JustDied(Unit * /*victim*/) {}
+        void JustDied(Unit* /*victim*/) {}
 
         void Reset()
         {
             events.Reset();
         }
 
-        void EnterCombat(Unit * /*who*/)
+        void EnterCombat(Unit* /*who*/)
         {
             events.ScheduleEvent(EVENT_IMMOLATION_TRAP_TRIGGER, 2000);
         }
@@ -1147,7 +1148,7 @@ public:
 
     struct npc_crystal_trapAI : public Scripted_NoMovementAI
     {
-        npc_crystal_trapAI(Creature *c) : Scripted_NoMovementAI(c)
+        npc_crystal_trapAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = me->GetInstanceScript();
             tempTarget = NULL;
@@ -1162,14 +1163,14 @@ public:
         Unit* tempTarget;
         Creature* myPrison;
 
-        void JustDied(Unit * /*victim*/) {}
+        void JustDied(Unit* /*victim*/) {}
 
         void Reset()
         {
             events.Reset();
         }
 
-        void EnterCombat(Unit * /*who*/)
+        void EnterCombat(Unit* /*who*/)
         {
             events.ScheduleEvent(EVENT_CRYSTAL_TRAP_TRIGGER, 2000); //  The trap arms after 2 seconds.
         }

@@ -133,7 +133,7 @@ public:
 
     struct boss_balorocAI : public BossAI
     {
-        boss_balorocAI(Creature *c) : BossAI(c, DATA_BALOROC)
+        boss_balorocAI(Creature* creature) : BossAI(creature, DATA_BALOROC)
         {
             instance = me->GetInstanceScript();
         }
