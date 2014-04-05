@@ -35,24 +35,24 @@ class boss_alizabal : public CreatureScript
     public:
         boss_alizabal() : CreatureScript("boss_alizabal") {}
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new boss_alizabalAI(pCreature);
+            return new boss_alizabalAI(creature);
         }
             
         struct boss_alizabalAI : public ScriptedAI
         {
-            boss_alizabalAI(Creature* pCreature) : ScriptedAI(pCreature)
+            boss_alizabalAI(Creature* creature) : ScriptedAI(creature)
             {
-                m_pInstance = pCreature->GetInstanceScript();
+                instance = creature->GetInstanceScript();
             }
 
-            InstanceScript* m_pInstance;
-            uint32 m_uiBladeDanceTimer;
-            uint32 m_uiSkewerTimer;
-            uint32 m_uiSeethingHateTimer;
-            uint32 m_uiBerserkTimer;
-            uint32 m_uiSkewerorSeethingTimer;
+            InstanceScript* instance;
+            uint32 BladeDanceTimer;
+            uint32 SkewerTimer;
+            uint32 SeethingHateTimer;
+            uint32 BerserkTimer;
+            uint32 SkewerorSeethingTimer;
             uint32 skewerTimer;
             uint32 seethingTimer;
             uint32 moveTimer;
@@ -62,8 +62,8 @@ class boss_alizabal : public CreatureScript
 
             void Reset()
             {
-                if (m_pInstance)
-                   m_pInstance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me); // Remove
+                if (instance)
+                   instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me); // Remove
 
                  if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == POINT_MOTION_TYPE)
                      me->GetMotionMaster()->MovementExpired();
@@ -72,9 +72,9 @@ class boss_alizabal : public CreatureScript
                     me->RemoveAura(47008);
 
                 Talk(SAY_RESET);
-                m_uiSkewerorSeethingTimer = urand(6000, 8000);   // 8 sec after blade dance.
-                m_uiBladeDanceTimer       = urand(25000, 40000);  // then 60 sec.
-                m_uiBerserkTimer          = 300000; // 5 min.
+                SkewerorSeethingTimer = urand(6000, 8000);   // 8 sec after blade dance.
+                BladeDanceTimer       = urand(25000, 40000);  // then 60 sec.
+                BerserkTimer          = 300000; // 5 min.
 
                 bladedance = false;
                 intro      = false;
@@ -92,13 +92,13 @@ class boss_alizabal : public CreatureScript
             
             void EnterCombat(Unit* who)
             {
-                if (m_pInstance)
-                   m_pInstance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me); // Add
+                if (instance)
+                   instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me); // Add
 
                 Talk(SAY_AGGRO);
-                m_uiSkewerorSeethingTimer = urand(6000, 8000);  // 8 sec after blade dance.
-                m_uiBladeDanceTimer       = urand(25000, 40000);  // then 60 sec.
-                m_uiBerserkTimer          = 300000; // 5 min.
+                SkewerorSeethingTimer = urand(6000, 8000);  // 8 sec after blade dance.
+                BladeDanceTimer       = urand(25000, 40000);  // then 60 sec.
+                BerserkTimer          = 300000; // 5 min.
 
                 bladedance = false;
                 skewerorseething = true;
@@ -108,8 +108,8 @@ class boss_alizabal : public CreatureScript
             {
                Talk(SAY_DIED);
 
-                if (m_pInstance)
-                   m_pInstance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me); // Remove
+                if (instance)
+                   instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me); // Remove
             }
 
 			void KilledUnit(Unit * /*victim*/)
@@ -128,11 +128,11 @@ class boss_alizabal : public CreatureScript
                 me->GetMotionMaster()->MoveTargetedHome();
                 me->SetHealth(me->GetMaxHealth());
 				
-                if (m_pInstance)
-                   m_pInstance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me); // Remove
+                if (instance)
+                   instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me); // Remove
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(const uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -140,7 +140,7 @@ class boss_alizabal : public CreatureScript
 				if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
-                if (m_uiSkewerorSeethingTimer <= uiDiff && skewerorseething == true)
+                if (SkewerorSeethingTimer <= diff && skewerorseething == true)
                 {					
 					switch(urand(0, 1))
 					{
@@ -164,18 +164,18 @@ class boss_alizabal : public CreatureScript
                     skewerorseething = false;                 					
                 }
                 else
-                    m_uiSkewerorSeethingTimer -= uiDiff;
+                    SkewerorSeethingTimer -= diff;
 
-                if (skewerTimer <= uiDiff && seething == true)
+                if (skewerTimer <= diff && seething == true)
                 {
                     DoCast(me->GetVictim(), SPELL_SKEWER);
                     Talk(SAY_SKEWER);
                     seething = false;
                 }
                 else
-                    skewerTimer -= uiDiff;
+                    skewerTimer -= diff;
 				
-                if (seethingTimer <= uiDiff && skewer == true)
+                if (seethingTimer <= diff && skewer == true)
                 {
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, NonTankTargetSelector(me)))
                     {
@@ -185,9 +185,9 @@ class boss_alizabal : public CreatureScript
                     }
                 }
                 else
-                    seethingTimer -= uiDiff;
+                    seethingTimer -= diff;
 
-                if (m_uiBladeDanceTimer <= uiDiff)
+                if (BladeDanceTimer <= diff)
                 {
                     DoScriptText(SAY_BLADES, me);
                     Talk(SAY_DANCE);
@@ -197,12 +197,12 @@ class boss_alizabal : public CreatureScript
                     removeDanceTimer = 13000;
                     danceTimer = 400;
 
-                    m_uiBladeDanceTimer = 60000;
+                    BladeDanceTimer = 60000;
                 }
                 else
-                    m_uiBladeDanceTimer -= uiDiff;
+                    BladeDanceTimer -= diff;
 
-                if (moveTimer <= uiDiff && bladedance == true)
+                if (moveTimer <= diff && bladedance == true)
                 {
                     me->SetSpeed(MOVE_WALK, 4.0f);
                     me->SetSpeed(MOVE_RUN, 4.0f);
@@ -213,17 +213,17 @@ class boss_alizabal : public CreatureScript
                     moveTimer  = 4200;
                 }
                 else
-                    moveTimer -= uiDiff;
+                    moveTimer -= diff;
 
-                if (danceTimer <= uiDiff && bladedance == true)
+                if (danceTimer <= diff && bladedance == true)
                 {
                     danceTimer = 4300;
                     DoCast(me, SPELL_BLADE_DANCE);
                 }
                 else
-                    danceTimer -= uiDiff;
+                    danceTimer -= diff;
 
-                if (removeDanceTimer <= uiDiff && bladedance == true)
+                if (removeDanceTimer <= diff && bladedance == true)
                 {
                     if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == POINT_MOTION_TYPE)
                         me->GetMotionMaster()->MovementExpired();
@@ -237,20 +237,20 @@ class boss_alizabal : public CreatureScript
                     me->RemoveAura(SPELL_BLADE_DANCE_DUMMY);
                     bladedance = false;
                     skewerorseething = true;
-                    m_uiSkewerorSeethingTimer = 8000;
+                    SkewerorSeethingTimer = 8000;
                 }
                 else
-                    removeDanceTimer -= uiDiff;
+                    removeDanceTimer -= diff;
 
-                if (m_uiBerserkTimer <= uiDiff)
+                if (BerserkTimer <= diff)
                 {
                     DoCast(me, SPELL_BERSERK);
                     Talk(SAY_BERSERK);
 
-                    m_uiBerserkTimer = 2400000; // just assuming they get over first one...heh.
+                    BerserkTimer = 2400000; // just assuming they get over first one...heh.
                 }					
                 else
-                    m_uiBerserkTimer -= uiDiff;
+                    BerserkTimer -= diff;
                     
                 DoMeleeAttackIfReady();
             }

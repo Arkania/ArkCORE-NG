@@ -26,55 +26,55 @@ class boss_occuthar : public CreatureScript
     public:
         boss_occuthar() : CreatureScript("boss_occuthar") {}
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new boss_occutharAI(pCreature);
+            return new boss_occutharAI(creature);
         }
             
         struct boss_occutharAI : public ScriptedAI
         {
-            boss_occutharAI(Creature* pCreature) : ScriptedAI(pCreature), summons(me)
+            boss_occutharAI(Creature* creature) : ScriptedAI(creature), summons(me)
             {
-                m_pInstance = pCreature->GetInstanceScript();
+                instance = creature->GetInstanceScript();
             }
 
-            InstanceScript* m_pInstance;
-            uint32 m_uiSearingShadowsTimer;
-            uint32 m_uiFocusedFireTimer;
+            InstanceScript* instance;
+            uint32 SearingShadowsTimer;
+            uint32 FocusedFireTimer;
             uint32 focusTimer;
-            uint32 m_uiEyesOfOccutharTimer;
-            uint32 m_uiEyesTimer;
-            uint32 m_uiBerserkTimer;
+            uint32 EyesOfOccutharTimer;
+            uint32 EyesTimer;
+            uint32 BerserkTimer;
             SummonList summons;
             bool eyes, focus;
 
             void Reset()
             {
-                if (m_pInstance)
-                   m_pInstance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me); // Remove
+                if (instance)
+                   instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me); // Remove
 
                 summons.DespawnAll();
 
                 if (me->HasAura(47008))
                     me->RemoveAura(47008);
 
-                m_uiSearingShadowsTimer  = 20000;
-                m_uiFocusedFireTimer     = 15000;
-                m_uiEyesOfOccutharTimer  = 7000;
-                m_uiBerserkTimer         = 300000;
+                SearingShadowsTimer  = 20000;
+                FocusedFireTimer     = 15000;
+                EyesOfOccutharTimer  = 7000;
+                BerserkTimer         = 300000;
                 eyes = false;
                 focus = false;
             }
 
             void EnterCombat(Unit* pWho)
             {
-                if (m_pInstance)
-                   m_pInstance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me); // Add
+                if (instance)
+                   instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me); // Add
 
-                m_uiSearingShadowsTimer  = 20000;
-                m_uiFocusedFireTimer     = 15000;
-                m_uiEyesOfOccutharTimer  = 7000;
-                m_uiBerserkTimer         = 300000;
+                SearingShadowsTimer  = 20000;
+                FocusedFireTimer     = 15000;
+                EyesOfOccutharTimer  = 7000;
+                BerserkTimer         = 300000;
                 eyes = false;
                 focus = false;
             }
@@ -87,14 +87,14 @@ class boss_occuthar : public CreatureScript
                 if (me->HasAura(47008))
                     me->RemoveAura(47008);
 					
-                if (m_pInstance)
-                   m_pInstance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me); // Remove
+                if (instance)
+                   instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me); // Remove
             }
 
             void JustDied(Unit* killer)
             {
-                if (m_pInstance)
-                   m_pInstance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me); // Remove
+                if (instance)
+                   instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me); // Remove
             }
 
             void JustSummoned(Creature* summon)
@@ -103,7 +103,7 @@ class boss_occuthar : public CreatureScript
                 DoZoneInCombat(summon);
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(const uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -111,18 +111,18 @@ class boss_occuthar : public CreatureScript
 				if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
-                if (m_uiEyesOfOccutharTimer <= uiDiff)
+                if (EyesOfOccutharTimer <= diff)
                 {
                     DoCast(me, SPELL_EYES_OF_OCCUTHAR);
-                    m_uiEyesTimer = 2100;
+                    EyesTimer = 2100;
                     eyes = true;
 
-                    m_uiEyesOfOccutharTimer = urand(55000, 65000);
+                    EyesOfOccutharTimer = urand(55000, 65000);
                 }
                 else
-                    m_uiEyesOfOccutharTimer -= uiDiff;
+                    EyesOfOccutharTimer -= diff;
 
-                if (m_uiEyesTimer <= uiDiff && eyes == true)
+                if (EyesTimer <= diff && eyes == true)
                 {
 					   std::list<Unit*> targetList;
                        {
@@ -138,33 +138,33 @@ class boss_occuthar : public CreatureScript
                             me->SummonCreature(56369, (*itr)->GetPositionX(), (*itr)->GetPositionY(), (*itr)->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 10400);
                         }
 
-                    m_uiFocusedFireTimer += 8000;
+                    FocusedFireTimer += 8000;
                     eyes = false;
                 }
                 else
-                    m_uiEyesTimer -= uiDiff;
+                    EyesTimer -= diff;
 
-                if (m_uiSearingShadowsTimer <= uiDiff)
+                if (SearingShadowsTimer <= diff)
                 {
                     DoCast(me->GetVictim(), SPELL_SEARING_SHADOWS);
-                    m_uiSearingShadowsTimer = 20000;
+                    SearingShadowsTimer = 20000;
                 }
                 else
-                    m_uiSearingShadowsTimer -= uiDiff;
+                    SearingShadowsTimer -= diff;
 
-                if (m_uiFocusedFireTimer <= uiDiff)
+                if (FocusedFireTimer <= diff)
                 {
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, NonTankTargetSelector(me)))
                     DoCast(target, SPELL_FOCUSED_FIRE_SUMMON);
 
-                    m_uiFocusedFireTimer = 15000;					
+                    FocusedFireTimer = 15000;
 					focusTimer = 200;
                     focus = true;
                 }
                 else
-                    m_uiFocusedFireTimer -= uiDiff;
+                    FocusedFireTimer -= diff;
 
-                if (focusTimer <= uiDiff && focus == true)
+                if (focusTimer <= diff && focus == true)
                 {
                     if (Creature* focus = me->FindNearestCreature(52369, 500.f))
                     DoCast(focus, SPELL_FOCUSED_FIRE);
@@ -172,12 +172,12 @@ class boss_occuthar : public CreatureScript
                     focus = false;
                 }
                 else
-                    focusTimer -= uiDiff;
+                    focusTimer -= diff;
 
-                if (m_uiBerserkTimer <= uiDiff)
+                if (BerserkTimer <= diff)
                     DoCast(me, SPELL_BERSERK);
                 else
-                    m_uiBerserkTimer -= uiDiff;
+                    BerserkTimer -= diff;
                     
                 DoMeleeAttackIfReady();
             }
@@ -189,36 +189,36 @@ class npc_occuthar_eye : public CreatureScript
     public:
         npc_occuthar_eye() : CreatureScript("npc_occuthar_eye") {}
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_occuthar_eyeAI(pCreature);
+            return new npc_occuthar_eyeAI(creature);
         }
             
         struct npc_occuthar_eyeAI : public ScriptedAI
         {
-            npc_occuthar_eyeAI(Creature* pCreature) : ScriptedAI(pCreature)
+            npc_occuthar_eyeAI(Creature* creature) : ScriptedAI(creature)
             {
-                m_pInstance = pCreature->GetInstanceScript();
+                instance = creature->GetInstanceScript();
             }
 
-            InstanceScript* m_pInstance;
-            uint32 m_uiGazeTimer;
-            uint32 m_uiExplodeTimer;
+            InstanceScript* instance;
+            uint32 GazeTimer;
+            uint32 ExplodeTimer;
             bool gaze;
 
             void Reset()
             {
                 gaze = true;
-                m_uiGazeTimer = 100;
+                GazeTimer = 100;
             }
 
-            void EnterCombat(Unit* pWho)
+            void EnterCombat(Unit* who)
             {
                 gaze = true;
-                m_uiGazeTimer = 100;
+                GazeTimer = 100;
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(const uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -226,20 +226,20 @@ class npc_occuthar_eye : public CreatureScript
 				if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
-                if (m_uiGazeTimer <= uiDiff && gaze == true)
+                if (GazeTimer <= diff && gaze == true)
                 {
                     if (Unit* target = me->FindNearestPlayer(10.0f, true))
 					{
                         DoCast(target, SPELL_GAZE_OF_OCCUTHAR);
                         DoCast(target, 68985);
 					}
-                    m_uiExplodeTimer = 10100;
+                    ExplodeTimer = 10100;
                     gaze = false;
                 }
                 else
-                    m_uiGazeTimer -= uiDiff;
+                    GazeTimer -= diff;
 
-                if (m_uiExplodeTimer <= uiDiff)
+                if (ExplodeTimer <= diff)
                 {
                     DoCast(me, SPELL_EYE_EXPLODE);
                     me->DespawnOrUnsummon(100);
