@@ -128,7 +128,7 @@ class boss_majordomus : public CreatureScript
  
 	struct boss_majordomusAI : public BossAI
 	{
-		boss_majordomusAI(Creature* c) : BossAI(c, DATA_MAJORDOMUS)
+        boss_majordomusAI(Creature* creature) : BossAI(creature, DATA_MAJORDOMUS)
 		{
 			instance = me->GetInstanceScript();
 			introDone = false;
@@ -199,7 +199,7 @@ class boss_majordomus : public CreatureScript
 			summon->AI()->DoZoneInCombat();
 		}
  
-		void JustDied(Unit * /*victim*/)
+        void JustDied(Unit* /*victim*/)
 		{
 			if (instance)
 			{
@@ -441,7 +441,7 @@ class npc_spirit_of_the_flame : public CreatureScript //52593 npc
  
 	struct npc_spirit_of_the_flameAI : public ScriptedAI
 	{
-		npc_spirit_of_the_flameAI(Creature *c) : ScriptedAI(c){}
+        npc_spirit_of_the_flameAI(Creature* creature) : ScriptedAI(creature){}
  
         EventMap events;
 
@@ -456,7 +456,7 @@ class npc_spirit_of_the_flame : public CreatureScript //52593 npc
 			me->SetByteValue(UNIT_FIELD_BYTES_0, 3, POWER_ENERGY);
 		}
  
-		void JustDied(Unit * /*victim*/) { }
+        void JustDied(Unit* /*victim*/) { }
  
 		void EnterCombat(Unit* who)
 		{
@@ -504,7 +504,7 @@ class npc_burning_orb : public CreatureScript //53216
  
 	struct npc_burning_orbAI : public ScriptedAI
 	{
-		npc_burning_orbAI(Creature *c) : ScriptedAI(c){}
+        npc_burning_orbAI(Creature* creature) : ScriptedAI(creature){}
  
 		EventMap events;
 
@@ -518,7 +518,7 @@ class npc_burning_orb : public CreatureScript //53216
 			me->AddAura(SPELL_BURNING_ORBS_VISUAL, me);
 		}
  
-		void JustDied(Unit * /*victim*/) { }
+        void JustDied(Unit* /*victim*/) { }
  
 		void EnterCombat(Unit* who)
 		{

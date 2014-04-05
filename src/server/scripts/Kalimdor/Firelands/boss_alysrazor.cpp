@@ -857,7 +857,7 @@ public:
 
     struct npc_blazing_talonAI : public npc_escortAI
     {
-        npc_blazing_talonAI(Creature* c) : npc_escortAI(c) { }
+        npc_blazing_talonAI(Creature* creature) : npc_escortAI(creature) { }
 
 		EventMap events;
 		uint8 waypoint;
@@ -1021,7 +1021,7 @@ public:
 
     struct npc_fiery_tornadoAI : public npc_escortAI
     {
-        npc_fiery_tornadoAI(Creature* c) : npc_escortAI(c)
+        npc_fiery_tornadoAI(Creature* creature) : npc_escortAI(creature)
 		{
 			c->SetDisplayId(11686);
 		}
