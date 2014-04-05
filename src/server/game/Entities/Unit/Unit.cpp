@@ -9029,7 +9029,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
             CastSpell(this, 96171, true); // next rune tap wont cost runes
 
             if (cooldown)
-            ToPlayer()->AddSpellCooldown(96171, NULL, time(NULL) + cooldown);
+            ToPlayer()->AddSpellCooldown(96171, 0, time(NULL) + cooldown);
 
             break;
         }
