@@ -523,7 +523,7 @@ class boss_lord_rhyolith : public CreatureScript
                 _EnterEvadeMode();
             }
 
-            void JustSummoned(Creature *summon)
+            void JustSummoned(Creature* summon)
             {
                 summons.Summon(summon);
 
@@ -790,7 +790,7 @@ public:
 
     struct npc_left_legAI : public ScriptedAI
     {
-        npc_left_legAI(Creature *c) : ScriptedAI(c)
+        npc_left_legAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = me->GetInstanceScript();
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -807,7 +807,7 @@ public:
             Map::PlayerList const &PlayerList = me->GetMap()->GetPlayers();
             if (!PlayerList.isEmpty())
                 for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-                    if (Player *player = i->GetSource())
+                    if (Player* player = i->GetSource())
                         if (player->IsAlive() && GetRhyo() && player->GetDistance(GetRhyo()) <= 150.0f)
                             player->SetPower(POWER_ALTERNATE_POWER, player->GetPower(POWER_ALTERNATE_POWER) + power);
         }
@@ -875,7 +875,7 @@ public:
 
     struct npc_right_legAI : public ScriptedAI
     {
-        npc_right_legAI(Creature *c) : ScriptedAI(c)
+        npc_right_legAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = me->GetInstanceScript();
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -892,7 +892,7 @@ public:
             Map::PlayerList const &PlayerList = me->GetMap()->GetPlayers();
             if (!PlayerList.isEmpty())
                 for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-                    if (Player *player = i->GetSource())
+                    if (Player* player = i->GetSource())
                         if (player->IsAlive() && GetRhyo() && player->GetDistance(GetRhyo()) <= 150.0f)
                             player->SetPower(POWER_ALTERNATE_POWER, player->GetPower(POWER_ALTERNATE_POWER) + power);
         }
@@ -964,7 +964,7 @@ public:
 
     struct npc_rhyolith_volcanoAI : public ScriptedAI
     {
-        npc_rhyolith_volcanoAI(Creature *c) : ScriptedAI(c)
+        npc_rhyolith_volcanoAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = me->GetInstanceScript();
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
@@ -1013,7 +1013,7 @@ public:
 
                 blow = true; // !!
 
-                if (Aura * aura = GetRhyo()->GetAura(SPELL_OBSIDIAN_ARMOR))
+                if (Aura* aura = GetRhyo()->GetAura(SPELL_OBSIDIAN_ARMOR))
                 {
                     uint32 stack = aura->GetStackAmount() - 10;
 
@@ -1053,8 +1053,8 @@ public:
 
                 case EVENT_LAVA_STRIKE:
                         for (int32 i = 0;  i < RAID_MODE(3, 3, 6, 6); ++i)
-                            if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 500, true))
-                                DoCast(pTarget, SPELL_LAVA_STRIKE);
+                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 500, true))
+                                DoCast(target, SPELL_LAVA_STRIKE);
 
                     events.ScheduleEvent(EVENT_LAVA_STRIKE, 3000);
                 break;
@@ -1089,7 +1089,7 @@ public:
 
     struct npc_rhyolith_craterAI : public ScriptedAI
     {
-        npc_rhyolith_craterAI(Creature *c) : ScriptedAI(c) , summons(me)
+        npc_rhyolith_craterAI(Creature* creature) : ScriptedAI(creature) , summons(me)
         {
             instance = me->GetInstanceScript();
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
@@ -1108,7 +1108,7 @@ public:
             events.Reset();
         }
 
-        void JustSummoned(Creature *summon)
+        void JustSummoned(Creature* summon)
         {
             summons.Summon(summon);
 
@@ -1215,7 +1215,7 @@ public:
 
     struct npc_lava_lineAI : public ScriptedAI
     {
-        npc_lava_lineAI(Creature *c) : ScriptedAI(c)
+        npc_lava_lineAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = me->GetInstanceScript();
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -1295,7 +1295,7 @@ public:
 
     struct npc_liquid_obsidianAI : public ScriptedAI
     {
-        npc_liquid_obsidianAI(Creature *c) : ScriptedAI(c)
+        npc_liquid_obsidianAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = me->GetInstanceScript();
         }
@@ -1324,7 +1324,7 @@ public:
             {
                 DoCast(me, SPELL_FUSE);
                 if (Creature* rhyolith = GetClosestCreatureWithEntry(me, NPC_RHYOLITH , 50.0f))    
-                if (Aura * aura = rhyolith->GetAura(SPELL_OBSIDIAN_ARMOR))
+                if (Aura* aura = rhyolith->GetAura(SPELL_OBSIDIAN_ARMOR))
                 {
                     uint32 stack = aura->GetStackAmount();
                     uint32 stack2 = aura->GetStackAmount() + 1;
@@ -1356,7 +1356,7 @@ public:
 
     struct npc_spark_of_rhyolithAI : public ScriptedAI
     {
-        npc_spark_of_rhyolithAI(Creature *c) : ScriptedAI(c)
+        npc_spark_of_rhyolithAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = me->GetInstanceScript();
         }
