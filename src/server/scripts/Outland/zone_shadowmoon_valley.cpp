@@ -102,14 +102,14 @@ public:
             CastTimer = 5000;
         }
 
-        void SpellHit(Unit* pCaster, SpellInfo const* spell)
+        void SpellHit(Unit* caster, SpellInfo const* spell)
         {
             if (bCanEat || bIsEating)
                 return;
 
-            if (pCaster->GetTypeId() == TYPEID_PLAYER && spell->Id == SPELL_PLACE_CARCASS && !me->HasAura(SPELL_JUST_EATEN))
+            if (caster->GetTypeId() == TYPEID_PLAYER && spell->Id == SPELL_PLACE_CARCASS && !me->HasAura(SPELL_JUST_EATEN))
             {
-                uiPlayerGUID = pCaster->GetGUID();
+                uiPlayerGUID = caster->GetGUID();
                 bCanEat = true;
             }
         }
@@ -1234,7 +1234,7 @@ class npc_torloth_the_magnificent : public CreatureScript
 public:
     npc_torloth_the_magnificent() : CreatureScript("npc_torloth_the_magnificent") { }
 
-    CreatureAI* GetAI(Creature* c) const
+    CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_torloth_the_magnificentAI(c);
     }
@@ -1394,9 +1394,9 @@ class npc_lord_illidan_stormrage : public CreatureScript
 public:
     npc_lord_illidan_stormrage() : CreatureScript("npc_lord_illidan_stormrage") { }
 
-    CreatureAI* GetAI(Creature* c) const
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_lord_illidan_stormrageAI(c);
+        return new npc_lord_illidan_stormrageAI(creature);
     }
 
     struct npc_lord_illidan_stormrageAI : public ScriptedAI
@@ -1539,9 +1539,9 @@ class npc_illidari_spawn : public CreatureScript
 public:
     npc_illidari_spawn() : CreatureScript("npc_illidari_spawn") { }
 
-    CreatureAI* GetAI(Creature* c) const
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_illidari_spawnAI(c);
+        return new npc_illidari_spawnAI(creature);
     }
 
     struct npc_illidari_spawnAI : public ScriptedAI
