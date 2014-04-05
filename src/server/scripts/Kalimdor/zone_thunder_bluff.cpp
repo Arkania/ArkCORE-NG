@@ -27,6 +27,7 @@ EndScriptData */
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
+#include "Player.h"
 
 /*#####
 # npc_cairne_bloodhoof

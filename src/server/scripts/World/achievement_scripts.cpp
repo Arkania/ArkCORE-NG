@@ -17,13 +17,14 @@
  */
 
 #include "ScriptMgr.h"
-
 #include "BattlegroundAB.h"
 #include "BattlegroundWS.h"
 #include "BattlegroundIC.h"
 #include "BattlegroundSA.h"
 #include "BattlegroundAV.h"
 #include "Vehicle.h"
+#include "Player.h"
+#include "Creature.h"
 
 class achievement_resilient_victory : public AchievementCriteriaScript
 {

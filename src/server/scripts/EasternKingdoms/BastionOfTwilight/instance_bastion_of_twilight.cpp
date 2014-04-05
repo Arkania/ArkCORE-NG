@@ -158,7 +158,7 @@ class instance_bastion_of_twilight : public InstanceMapScript
                     data_phase = data;
             }
 
-            uint32 GetData(uint32 type)
+            uint32 GetData(uint32 type) const
             {
                 if (type == DATA_AC_PHASE)
                     return data_phase;
@@ -166,7 +166,7 @@ class instance_bastion_of_twilight : public InstanceMapScript
                 return Encounter[type];
             }
 
-            uint64 GetData64(uint32 type)
+            uint64 GetData64(uint32 type) const
             {
                 switch (type)
                 {

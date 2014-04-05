@@ -29,7 +29,7 @@ EndScriptData */
 #include "GridNotifiersImpl.h"
 #include "CreatureTextMgr.h"
 #include "Weather.h"
-
+#include "Player.h"
 #include "zulaman.h"
 
 enum Yells

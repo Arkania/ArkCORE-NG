@@ -28,6 +28,7 @@ EndScriptData */
 #include "ScriptedCreature.h"
 #include "the_eye.h"
 #include "WorldPacket.h"
+#include "Opcodes.h"
 
 enum eEnums
 {

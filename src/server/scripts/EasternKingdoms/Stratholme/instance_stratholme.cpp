@@ -28,6 +28,7 @@ EndScriptData */
 #include "ScriptedCreature.h"
 #include "InstanceScript.h"
 #include "stratholme.h"
+#include "Player.h"
 
 #define GO_SERVICE_ENTRANCE     175368
 #define GO_GAUNTLET_GATE1       175357
@@ -402,7 +403,7 @@ class instance_stratholme : public InstanceMapScript
                 OUT_LOAD_INST_DATA_COMPLETE;
             }
 
-            uint32 GetData(uint32 type)
+            uint32 GetData(uint32 type) const
             {
                   switch (type)
                   {
@@ -426,7 +427,7 @@ class instance_stratholme : public InstanceMapScript
                   return 0;
             }
 
-            uint64 GetData64(uint32 data)
+            uint64 GetData64(uint32 data) const
             {
                 switch (data)
                 {

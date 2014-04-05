@@ -34,6 +34,7 @@ EndContentData */
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "uldaman.h"
+#include "Player.h"
 
 /*######
 ## npc_jadespine_basilisk

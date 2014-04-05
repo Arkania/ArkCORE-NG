@@ -24,6 +24,8 @@ EndContentData */
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "zulaman.h"
+#include "Player.h"
+#include "SpellInfo.h"
 
 /*######
 ## npc_zulaman_voljin

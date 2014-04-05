@@ -31,6 +31,9 @@ EndContentData */
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "Player.h"
+#include "Pet.h"
+#include "SpellInfo.h"
 
 /*######
 ## npc_converted_sentry

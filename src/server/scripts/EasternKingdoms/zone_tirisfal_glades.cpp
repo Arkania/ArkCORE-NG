@@ -29,7 +29,7 @@ EndContentData */
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-
+#include "Player.h"
 
 void AddSC_tirisfal_glades()
 {

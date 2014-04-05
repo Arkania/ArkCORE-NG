@@ -165,9 +165,8 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* /*victim*/)
         {
-
             Talk(SAY_SLAY);
         }
 

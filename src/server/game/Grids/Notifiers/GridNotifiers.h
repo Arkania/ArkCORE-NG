@@ -32,6 +32,7 @@
 #include "Unit.h"
 #include "CreatureAI.h"
 #include "Spell.h"
+#include "WorldSession.h"
 
 class Player;
 //class Map;

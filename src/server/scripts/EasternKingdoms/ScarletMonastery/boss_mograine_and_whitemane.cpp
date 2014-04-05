@@ -27,6 +27,7 @@ EndScriptData */
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "scarlet_monastery.h"
+#include "SpellInfo.h"
 
 enum Says
 {

@@ -24,7 +24,6 @@
 #include "CreatureTextMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
-
 #include "firelands.h"
 
 #define ACHIEVMENT_DFA_CRITERIA      1
@@ -251,7 +250,7 @@ public:
             _EnterEvadeMode();
         }
 
-        uint32 GetData(uint32 type)
+        uint32 GetData(uint32 type) const
         {
             if (type == ACHIEVMENT_DFA_CRITERIA)
                 return AchievementChecker ? 1 : 0;

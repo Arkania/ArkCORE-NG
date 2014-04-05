@@ -29,6 +29,7 @@ EndScriptData */
 #include "hyjal.h"
 #include "SpellAuras.h"
 #include "hyjal_trash.h"
+#include "Player.h"
 
 enum Texts
 {

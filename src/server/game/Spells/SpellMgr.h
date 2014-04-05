@@ -24,8 +24,16 @@
 
 #include <ace/Singleton.h>
 #include "Common.h"
+#include "DBCStores.h"
+#include "DBCStructure.h"
 #include "SharedDefines.h"
+#include "UnorderedMap.h"
 #include "Unit.h"
+#include "Util.h"
+
+#include <map>
+#include <set>
+#include <vector>
 
 class SpellInfo;
 class Player;

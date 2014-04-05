@@ -22,6 +22,7 @@
 #include "SpellAuraEffects.h"
 #include "ulduar.h"
 #include "Vehicle.h"
+#include "Player.h"
 
 /* ScriptData
 SDName: boss_kologarn

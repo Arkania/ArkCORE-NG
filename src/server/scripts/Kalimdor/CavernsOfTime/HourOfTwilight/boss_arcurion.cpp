@@ -116,10 +116,10 @@ public:
     }
 };
 
-Position const ThrallPoint1     = {4927.879f, 288.885f, 96.859f};
-Position const ThrallPoint2     = {4926.836f, 260.515f, 97.087f};
-Position const ThrallPoint3     = {4901.766f, 217.124f, 99.228f};
-Position const ThrallPoint4     = {4878.831f, 180.001f, 99.175f};
+Position const ThrallPoint1     = {4927.879f, 288.885f, 96.859f, 0.0f};
+Position const ThrallPoint2     = {4926.836f, 260.515f, 97.087f, 0.0f};
+Position const ThrallPoint3     = {4901.766f, 217.124f, 99.228f, 0.0f};
+Position const ThrallPoint4     = {4878.831f, 180.001f, 99.175f, 0.0f};
 
 const Position Gauntlet1[] =
 {
@@ -147,7 +147,7 @@ public:
         return true;
     }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 uiSender, uint32 uiAction)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 /*uiAction*/)
     {
         player->PlayerTalkClass->ClearMenus();
         player->CLOSE_GOSSIP_MENU();
@@ -226,7 +226,7 @@ public:
             }
         }
 
-        void MovementInform(uint32 type, uint32 pointId)
+        void MovementInform(uint32 /*type*/, uint32 pointId)
         {
             switch (pointId)
             {
@@ -305,7 +305,7 @@ public:
             events.Reset();
         }
 
-        void IsSummonedBy(Unit* summoner)
+        void IsSummonedBy(Unit* /*summoner*/)
         {
             Reset();
         }
@@ -315,7 +315,7 @@ public:
             events.ScheduleEvent(EVENT_THROW_ICE, urand(5000, 10000));
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(const uint32 /*diff*/)
         {
             if (!UpdateVictim())
                 return;
@@ -373,7 +373,7 @@ public:
             events.ScheduleEvent(EVENT_DRILL, urand(5000, 10000));
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(const uint32 /*diff*/)
         {
             if (!UpdateVictim())
                 return;

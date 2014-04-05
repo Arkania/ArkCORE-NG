@@ -42,7 +42,6 @@ EndContentData */
 #include "ScriptedEscortAI.h"
 #include "Player.h"
 
-
 enum Northshire
 {
     NPC_BROTHER_PAXTON          = 951,

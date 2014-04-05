@@ -199,7 +199,7 @@ public:
                        case EVENT_MANA_VOID:
                        if (me->HasAura(SPELL_COBALT_BLOOD_OF_SHUMA))
                        {
-                           if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+                           if (SelectTarget(SELECT_TARGET_RANDOM))
                                me->SummonCreature(NPC_MANA_VOID, SummonMvPositions[urand(0,5)], TEMPSUMMON_MANUAL_DESPAWN);
                                events.ScheduleEvent(EVENT_MANA_VOID, urand(3500,20000));
                         }
@@ -210,7 +210,7 @@ public:
                         case EVENT_FORGOTTEN_ONE:
                         if (me->HasAura(SPELL_BLACK_BLOOD_OF_SHUMA))
                         {
-                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+                            if (SelectTarget(SELECT_TARGET_RANDOM))
                                 me->SummonCreature(NPC_FORGOTTEN_ONE, me->GetPositionX()+5, me->GetPositionY()+5, me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 60000);
                                 events.ScheduleEvent(EVENT_FORGOTTEN_ONE, urand(5000,30000));
                         }
@@ -263,74 +263,74 @@ class npc_blood : public CreatureScript
     public:
         npc_blood() : CreatureScript("npc_blood") { }
 
-                CreatureAI* GetAI(Creature* creature) const
-                {
-                    return GetDragonSoulAI<npc_bloodAI>(creature);
-                }
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return GetDragonSoulAI<npc_bloodAI>(creature);
+    }
 
-                struct npc_bloodAI : public ScriptedAI
-                {
-                    npc_bloodAI(Creature* creature) : ScriptedAI(creature)
-                    {
-                            instance = creature->GetInstanceScript();
-                    }
+    struct npc_bloodAI : public ScriptedAI
+    {
+        npc_bloodAI(Creature* creature) : ScriptedAI(creature)
+        {
+            instance = creature->GetInstanceScript();
+        }
 
-                        InstanceScript* instance;
-                        EventMap events;
+        InstanceScript* instance;
+        EventMap events;
 
-                        bool blood;
+        bool blood;
 
-                        void Reset()
-                        {
-                                me->SetInCombatWithZone();
-                                //me->AddAura(SPELL_FUSING_VAPORS, me);
-                                me->SetSpeed(MOVE_RUN, 0.5f);
-                                blood = true;
+        void Reset()
+        {
+            me->SetInCombatWithZone();
+            //me->AddAura(SPELL_FUSING_VAPORS, me);
+            me->SetSpeed(MOVE_RUN, 0.5f);
+            blood = true;
 
-                                events.Reset();
-                        }
+            events.Reset();
+        }
 
-                        void UpdateAI(const uint32 diff)
+        void UpdateAI(const uint32 /*diff*/)
+        {
+            if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            if (Creature* u = me->FindNearestCreature(NPC_UNSLEEPING, 100.0f, true))
             {
-                if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
-                    return;
+                me->GetMotionMaster()->MovePoint(0, u->GetPositionX(), u->GetPositionY(), u->GetPositionZ());
 
-                                if (Creature* u = me->FindNearestCreature(NPC_UNSLEEPING, 100.0f, true))
-                                {
-                                        me->GetMotionMaster()->MovePoint(0, u->GetPositionX(), u->GetPositionY(), u->GetPositionZ());
+                if (blood == true && me->FindNearestCreature(NPC_UNSLEEPING, 1.5f, true))
+                {
+                    blood = false;
+                    if (me->GetEntry() == NPC_BLACK_BLOOD)
+                        u->CastSpell(u, SPELL_BLACK_BLOOD_OF_SHUMA);
 
-                                    if (blood == true && me->FindNearestCreature(NPC_UNSLEEPING, 1.5f, true))
-                                    {
-                                            blood = false;
-                                            if (me->GetEntry() == NPC_BLACK_BLOOD)
-                                                u->CastSpell(u, SPELL_BLACK_BLOOD_OF_SHUMA);
+                    if (me->GetEntry() == NPC_COBLAT_BLOOD)
+                        u->CastSpell(u, SPELL_COBALT_BLOOD_OF_SHUMA);
 
-                                            if (me->GetEntry() == NPC_COBLAT_BLOOD)
-                                                u->CastSpell(u, SPELL_COBALT_BLOOD_OF_SHUMA);
+                    if (me->GetEntry() == NPC_CRIMSON_BLOOD)
+                        u->CastSpell(u, SPELL_CRIMSON_BLOOD_OF_SHUMA);
 
-                                            if (me->GetEntry() == NPC_CRIMSON_BLOOD)
-                                                u->CastSpell(u, SPELL_CRIMSON_BLOOD_OF_SHUMA);
+                    if (me->GetEntry() == NPC_GLOWING_BLOOD)
+                        u->CastSpell(u, SPELL_GLOWING_BLOOD_OF_SHUMA);
 
-                                            if (me->GetEntry() == NPC_GLOWING_BLOOD)
-                                                u->CastSpell(u, SPELL_GLOWING_BLOOD_OF_SHUMA);
+                    if (me->GetEntry() == NPC_ACIDIC_BLOOD)
+                        u->CastSpell(u, SPELL_ACIDIC_BLOOD_OF_SHUMA);
 
-                                            if (me->GetEntry() == NPC_ACIDIC_BLOOD)
-                                                u->CastSpell(u, SPELL_ACIDIC_BLOOD_OF_SHUMA);
+                    if (me->GetEntry() == NPC_SHADOWED_BLOOD)
+                        u->CastSpell(u, SPELL_SHADOWED_BLOOD_OF_SHUMA);
 
-                                            if (me->GetEntry() == NPC_SHADOWED_BLOOD)
-                                                u->CastSpell(u, SPELL_SHADOWED_BLOOD_OF_SHUMA);
+                    me->Kill(me);
+                    me->DespawnOrUnsummon(5000);
+                }
+            }
+        }
 
-                                           me->Kill(me);
-                                           me->DespawnOrUnsummon(5000);
-                                        }
-                                }
-                        }
-
-                        void JustDied(Unit* /*pKiller*/)
-                        {
-                                me->DespawnOrUnsummon(5000);
-                        }
-                };
+        void JustDied(Unit* /*killer*/)
+        {
+            me->DespawnOrUnsummon(5000);
+        }
+    };
 };
 
 class npc_mana_void : public CreatureScript

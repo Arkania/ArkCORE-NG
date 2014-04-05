@@ -29,7 +29,6 @@
 
 #include "GridDefines.h"
 #include "Object.h"
-#include "Player.h"
 
 #include <set>
 
@@ -117,11 +116,7 @@ class ObjectAccessor
         }
 
         // Player may be not in world while in ObjectAccessor
-        static Player* GetObjectInWorld(uint64 guid, Player* /*typeSpecifier*/)
-        {
-            Player* player = HashMapHolder<Player>::Find(guid);
-            return player && player->IsInWorld() ? player : NULL;
-        }
+        static Player* GetObjectInWorld(uint64 guid, Player* /*typeSpecifier*/);
 
         static Unit* GetObjectInWorld(uint64 guid, Unit* /*typeSpecifier*/)
         {

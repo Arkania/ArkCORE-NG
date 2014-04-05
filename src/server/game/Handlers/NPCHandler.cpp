@@ -32,6 +32,7 @@
 #include "ObjectAccessor.h"
 #include "Creature.h"
 #include "Pet.h"
+#include "ReputationMgr.h"
 #include "BattlegroundMgr.h"
 #include "Battleground.h"
 #include "ScriptMgr.h"

@@ -25,6 +25,7 @@
 #include "AccountMgr.h"
 #include "firelands.h"
 #include"ScriptPCH.h"
+#include "Player.h"
 
 #define ENCOUNTERS 7
 
@@ -164,7 +165,7 @@ class instance_firelands : public InstanceMapScript
             }
         }    
 
-        uint64 GetData64(uint32 identifier)
+        uint64 GetData64(uint32 identifier) const
         {
             switch (identifier)
             {
@@ -266,7 +267,7 @@ class instance_firelands : public InstanceMapScript
                 SaveToDB();
         }
 
-        uint32 GetData(uint32 type)
+        uint32 GetData(uint32 type) const
         {
             return uiEncounter[type];
         }

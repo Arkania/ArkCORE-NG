@@ -22,6 +22,7 @@
  * Scriptnames of files in this file should be prefixed with "spell_hun_".
  */
 
+#include "Pet.h"
 #include "ScriptMgr.h"
 #include "Cell.h"
 #include "CellImpl.h"

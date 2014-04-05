@@ -310,10 +310,8 @@ class npc_maelstrom_trall : public CreatureScript
 
         bool OnGossipHello(Player* player, Creature* creature)
         {
-             if (InstanceScript* instance = creature->GetInstanceScript())
-             {
+             if (creature->GetInstanceScript())
                  player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, TRALL_MENU, GOSSIP_SENDER_MAIN, 10);
-             }
 
              player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
              return true;
@@ -364,7 +362,7 @@ class Teleportation_to_the_platforms : public CreatureScript
              return true;
         }
 
-        bool OnGossipSelect(Player *player, Creature *creature, uint32 sender, uint32 uiAction)
+        bool OnGossipSelect(Player* player, Creature* /*creature*/, uint32 sender, uint32 uiAction)
         {
             if (sender == GOSSIP_SENDER_MAIN)
             {
@@ -589,7 +587,7 @@ class npc_wing_tentacle_one : public CreatureScript
                 }
             }
 
-            void JustDied(Unit* killer)
+            void JustDied(Unit* /*killer*/)
             {
                 instance->SetData(DATA_DAMAGE_DEATHWING, DONE);
             }
@@ -657,7 +655,7 @@ class npc_wing_tentacle_two : public CreatureScript
                 }
             }
 
-            void JustDied(Unit* killer)
+            void JustDied(Unit* /*killer*/)
             {
                 instance->SetData(DATA_DAMAGE_DEATHWING, DONE);
             }

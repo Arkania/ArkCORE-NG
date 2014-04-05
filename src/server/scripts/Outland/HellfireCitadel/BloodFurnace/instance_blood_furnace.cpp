@@ -173,7 +173,7 @@ class instance_blood_furnace : public InstanceMapScript
                     PrisonCell8GUID = go->GetGUID();
             }
 
-            uint64 GetData64(uint32 data)
+            uint64 GetData64(uint32 data) const
             {
                 switch (data)
                 {
@@ -228,7 +228,7 @@ class instance_blood_furnace : public InstanceMapScript
                 }
             }
 
-            uint32 GetData(uint32 type)
+            uint32 GetData(uint32 type) const
             {
                 switch (type)
                 {

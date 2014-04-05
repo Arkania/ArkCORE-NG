@@ -20,6 +20,8 @@
 #include "ScriptedCreature.h"
 #include "InstanceScript.h"
 #include "ulduar.h"
+#include "Player.h"
+#include "WorldPacket.h"
 
 static DoorData const doorData[] =
 {
@@ -655,7 +657,7 @@ class instance_ulduar : public InstanceMapScript
             {
             }
 
-            uint64 GetData64(uint32 data)
+            uint64 GetData64(uint32 data) const
             {
                 switch (data)
                 {
@@ -741,7 +743,7 @@ class instance_ulduar : public InstanceMapScript
                 return 0;
             }
 
-            uint32 GetData(uint32 type)
+            uint32 GetData(uint32 type) const
             {
                 switch (type)
                 {

@@ -17,16 +17,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
+#include "ConditionMgr.h"
+#include "AchievementMgr.h"
+#include "GameEventMgr.h"
+#include "InstanceScript.h"
+#include "ObjectMgr.h"
 #include "Player.h"
+#include "ReputationMgr.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "SpellAuras.h"
 #include "SpellMgr.h"
-#include "GameEventMgr.h"
-#include "ObjectMgr.h"
-#include "InstanceScript.h"
-#include "ConditionMgr.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "Spell.h"
 
 // Checks if object meets the condition
@@ -700,7 +701,7 @@ ConditionList ConditionMgr::GetConditionsForPhaseDefinition(uint32 zone, uint32 
         if (i != (*itr).second.end())
         {
             cond = (*i).second;
-            sLog->outDebug(LOG_FILTER_CONDITIONSYS, "GetConditionsForPhaseDefinition: found conditions for zone %u entry %u spell %u", zone, entry);
+            sLog->outDebug(LOG_FILTER_CONDITIONSYS, "GetConditionsForPhaseDefinition: found conditions for zone %u entry %u", zone, entry);
         }
     }
 

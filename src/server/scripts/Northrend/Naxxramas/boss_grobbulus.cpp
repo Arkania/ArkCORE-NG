@@ -19,6 +19,7 @@
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "naxxramas.h"
+#include "SpellInfo.h"
 
 #define SPELL_BOMBARD_SLIME         28280
 

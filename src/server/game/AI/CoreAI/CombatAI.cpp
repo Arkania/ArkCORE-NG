@@ -22,6 +22,7 @@
 #include "SpellInfo.h"
 #include "Vehicle.h"
 #include "ObjectAccessor.h"
+#include "Player.h"
 
 int AggressorAI::Permissible(const Creature* creature)
 {

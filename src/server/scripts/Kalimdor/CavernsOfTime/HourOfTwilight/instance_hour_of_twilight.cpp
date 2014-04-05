@@ -60,7 +60,6 @@ public:
                     break;
             }
         }
-
 /*
         void OnGameObjectCreate(GameObject* go)
         {
@@ -77,7 +76,6 @@ public:
             }
         }
 */
-
         bool SetBossState(uint32 data, EncounterState state)
         {
             if (!InstanceScript::SetBossState(data, state))
@@ -86,7 +84,7 @@ public:
             return true;
         }
 
-        uint64 GetData64(uint32 data)
+        uint64 GetData64(uint32 data) const
         {
             switch (data)
             {

@@ -27,6 +27,7 @@
 #include "DBCStores.h"
 #include "World.h"
 #include "GameObjectAI.h"
+#include "Player.h"
 
 void MapManager::LoadTransports()
 {

@@ -15,11 +15,11 @@
  * You should have received a copy of the GNU General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
- 
- 
+
 #include "lost_city_of_the_tolvir.h"
 #include "ScriptMgr.h"
 #include "InstanceScript.h"
+#include "Player.h"
 
 enum eScriptText
 {

@@ -19,6 +19,7 @@
 
 #include "AccountMgr.h"
 #include "AchievementMgr.h"
+#include "Battleground.h"
 #include "CalendarMgr.h"
 #include "Chat.h"
 #include "Config.h"
@@ -26,12 +27,12 @@
 #include "Guild.h"
 #include "GuildFinderMgr.h"
 #include "GuildMgr.h"
+#include "InstanceScript.h"
 #include "Language.h"
 #include "Log.h"
 #include "ScriptMgr.h"
 #include "SocialMgr.h"
 #include "Opcodes.h"
-#include "InstanceScript.h"
 
 #define MAX_GUILD_BANK_TAB_TEXT_LEN 500
 #define EMBLEM_PRICE 10 * GOLD

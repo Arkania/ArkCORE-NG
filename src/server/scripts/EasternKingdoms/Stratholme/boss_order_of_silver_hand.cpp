@@ -27,6 +27,7 @@ EndScriptData */
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "stratholme.h"
+#include "Player.h"
 
 /*#####
 # Additional:

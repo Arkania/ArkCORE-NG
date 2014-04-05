@@ -28,6 +28,8 @@ EndScriptData */
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
+#include "Player.h"
+#include "WorldSession.h"
 
 void AddSC_feralas()
 {

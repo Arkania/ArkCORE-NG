@@ -31,6 +31,7 @@ EndContentData */
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedFollowerAI.h"
+#include "Player.h"
 
 /*####
 # npc_mist

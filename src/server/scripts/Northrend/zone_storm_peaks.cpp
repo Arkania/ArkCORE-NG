@@ -24,6 +24,8 @@
 #include "SpellAuraEffects.h"
 #include "Vehicle.h"
 #include "CombatAI.h"
+#include "Player.h"
+#include "WorldSession.h"
 
 /*######
 ## npc_agnetta_tyrsdottar

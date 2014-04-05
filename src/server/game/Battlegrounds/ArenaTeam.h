@@ -41,6 +41,7 @@ enum ArenaTeamCommandTypes
 
 enum ArenaTeamCommandErrors
 {
+    ERR_ARENA_TEAM_CREATED                  = 0x00,
     ERR_ARENA_TEAM_INTERNAL                 = 0x01,
     ERR_ALREADY_IN_ARENA_TEAM               = 0x02,
     ERR_ALREADY_IN_ARENA_TEAM_S             = 0x03,

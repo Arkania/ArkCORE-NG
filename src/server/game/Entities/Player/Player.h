@@ -20,34 +20,31 @@
 #ifndef _PLAYER_H
 #define _PLAYER_H
 
-#include <bitset>
-#include "AchievementMgr.h"
 #include "ArcheologyMgr.h"
 #include "Battleground.h"
-#include "Bag.h"
-#include "Common.h"
-#include "DatabaseEnv.h"
-#include "DBCEnums.h"
+#include "DBCStores.h"
 #include "GroupReference.h"
-#include "ItemPrototype.h"
 #include "Item.h"
 #include "MapReference.h"
-#include "NPCHandler.h"
 #include "Pet.h"
-#include "QuestDef.h"
-#include "ReputationMgr.h"
-#include "Unit.h"
-#include "Util.h"                                           // for Tokenizer typedef
-#include "WorldSession.h"
 #include "PhaseMgr.h"
+#include "QuestDef.h"
 #include "SpellMgr.h"
+#include "Unit.h"
 
-#include<string>
-#include<vector>
+#include <string>
+#include <vector>
 
+struct CreatureTemplate;
 struct Mail;
 struct ItemExtendedCostEntry;
+struct TrainerSpell;
+struct VendorItem;
+
+template<class T> class AchievementMgr;
+class ReputationMgr;
 class Channel;
+class CharacterCreateInfo;
 class Creature;
 class DynamicObject;
 class Group;
@@ -410,9 +407,7 @@ typedef std::list<PlayerCreateInfoAction> PlayerCreateInfoActions;
 struct PlayerInfo
 {
                                                             // existence checked by displayId != 0
-    PlayerInfo() : displayId_m(0), displayId_f(0), levelInfo(NULL)
-    {
-    }
+    PlayerInfo() : displayId_m(0), displayId_f(0), levelInfo(NULL) { }
 
     uint32 mapId;
     uint32 areaId;
@@ -830,13 +825,6 @@ enum RestType
     REST_TYPE_IN_CITY   = 2
 };
 
-enum DuelCompleteType
-{
-    DUEL_INTERRUPTED = 0,
-    DUEL_WON         = 1,
-    DUEL_FLED        = 2
-};
-
 enum TeleportToOptions
 {
     TELE_TO_GM_MODE             = 0x01,
@@ -940,17 +928,6 @@ struct InstancePlayerBind
        that aren't already permanently bound when they are inside when a boss is killed
        or when they enter an instance that the group leader is permanently bound to. */
     InstancePlayerBind() : save(NULL), perm(false) {}
-};
-
-enum DungeonStatusFlag
-{
-    DUNGEON_STATUSFLAG_NORMAL = 0x01,
-    DUNGEON_STATUSFLAG_HEROIC = 0x02,
-
-    RAID_STATUSFLAG_10MAN_NORMAL = 0x01,
-    RAID_STATUSFLAG_25MAN_NORMAL = 0x02,
-    RAID_STATUSFLAG_10MAN_HEROIC = 0x04,
-    RAID_STATUSFLAG_25MAN_HEROIC = 0x08
 };
 
 struct AccessRequirement
@@ -1369,7 +1346,7 @@ class Player : public Unit, public GridObject<Player>
         void UpdateInnerTime (time_t time) { time_inn_enter = time; }
 
         Pet* GetPet() const;
-        Pet* SummonPet(uint32 entry, float x, float y, float z, float ang, PetType petType, uint32 despwtime, PetSaveMode slotID);
+        Pet* SummonPet(uint32 entry, float x, float y, float z, float ang, PetType petType, uint32 despwtime);
         void RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent = false);
 
         PhaseMgr& GetPhaseMgr() { return phaseMgr; }
@@ -1705,7 +1682,7 @@ class Player : public Unit, public GridObject<Player>
         /*********************************************************/
 
         bool LoadFromDB(uint32 guid, SQLQueryHolder *holder);
-        bool isBeingLoaded() const { return GetSession()->PlayerLoading();}
+        bool isBeingLoaded() const;
 
         void Initialize(uint32 guid);
         static uint32 GetUInt32ValueFromArray(Tokenizer const& data, uint16 index);
@@ -2252,11 +2229,11 @@ class Player : public Unit, public GridObject<Player>
         uint8 GetGrantableLevels() { return m_grantableLevels; }
         void SetGrantableLevels(uint8 val) { m_grantableLevels = val; }
 
-        ArcheologyMgr&       GetArcheologyMgr()       { return m_archeologyMgr; }
-        ArcheologyMgr const& GetArcheologyMgr() const { return m_archeologyMgr; }
+        ArcheologyMgr&       GetArcheologyMgr()       { return *m_archeologyMgr; }
+        ArcheologyMgr const& GetArcheologyMgr() const { return *m_archeologyMgr; }
 
-        ReputationMgr&       GetReputationMgr()       { return m_reputationMgr; }
-        ReputationMgr const& GetReputationMgr() const { return m_reputationMgr; }
+        ReputationMgr&       GetReputationMgr()       { return *m_reputationMgr; }
+        ReputationMgr const& GetReputationMgr() const { return *m_reputationMgr; }
         ReputationRank GetReputationRank(uint32 faction_id) const;
         void RewardReputation(Unit* victim, float rate);
         void RewardReputation(Quest const* quest);
@@ -2702,12 +2679,7 @@ class Player : public Unit, public GridObject<Player>
         static void ConvertInstancesToGroup(Player* player, Group* group, bool switchLeader);
         bool Satisfy(AccessRequirement const* ar, uint32 target_map, bool report = false);
         bool CheckInstanceLoginValid();
-        bool CheckInstanceCount(uint32 instanceId) const
-        {
-            if (_instanceResetTimes.size() < sWorld->getIntConfig(CONFIG_MAX_INSTANCES_PER_HOUR))
-                return true;
-            return _instanceResetTimes.find(instanceId) != _instanceResetTimes.end();
-        }
+        bool CheckInstanceCount(uint32 instanceId) const;
 
         void AddInstanceEnterTime(uint32 instanceId, time_t enterTime)
         {
@@ -3201,9 +3173,9 @@ class Player : public Unit, public GridObject<Player>
         uint32 m_temporaryUnsummonedPetNumber;
         uint32 m_oldpetspell;
 
-        AchievementMgr<Player> m_achievementMgr;
-        ArcheologyMgr  m_archeologyMgr;
-        ReputationMgr  m_reputationMgr;
+        AchievementMgr<Player>* m_achievementMgr;
+        ArcheologyMgr*  m_archeologyMgr;
+        ReputationMgr*  m_reputationMgr;
 
         SpellCooldowns m_spellCooldowns;
         SpellCooldownToRemove m_spellCooldownToRemove;

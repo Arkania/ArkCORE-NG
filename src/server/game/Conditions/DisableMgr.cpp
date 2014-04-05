@@ -18,10 +18,12 @@
  */
 
 #include "DisableMgr.h"
+#include "AchievementMgr.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvP.h"
 #include "SpellMgr.h"
 #include "VMapManager2.h"
+#include "Player.h"
 
 namespace DisableMgr
 {

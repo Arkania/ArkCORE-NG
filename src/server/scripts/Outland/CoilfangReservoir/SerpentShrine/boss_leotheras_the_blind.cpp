@@ -27,6 +27,7 @@ EndScriptData */
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "serpent_shrine.h"
+#include "Player.h"
 
 // --- Spells used by Leotheras The Blind
 #define SPELL_WHIRLWIND         37640
@@ -104,7 +105,7 @@ public:
                 victimGUID = guid;
         }
 
-        uint64 GetGUID(int32 id/* = 0 */)
+        uint64 GetGUID(int32 id/* = 0 */) const
         {
             if (id == INNER_DEMON_VICTIM)
                 return victimGUID;

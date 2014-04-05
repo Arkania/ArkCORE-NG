@@ -46,7 +46,9 @@ EndContentData */
 #include "ScriptedGossip.h"
 #include "ScriptedEscortAI.h"
 #include "SpellScript.h"
+#include "Player.h"
 #include "Group.h"
+#include "WorldSession.h"
 
 /*#####
 # npc_mature_netherwing_drake

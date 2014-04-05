@@ -24,7 +24,6 @@
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "CreatureTextMgr.h"
-
 #include "firelands.h"
 
 enum Shannox_Yells
@@ -234,7 +233,7 @@ public:
             }
         }
 
-        uint32 GetData (uint32 id)
+        uint32 GetData (uint32 id) const
         {
             switch (id)
             {

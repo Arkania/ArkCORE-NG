@@ -15,8 +15,7 @@
  * You should have received a copy of the GNU General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
- 
- 
+
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "gilneas.h"
@@ -33,7 +32,7 @@
 #include "Vehicle.h"
 #include "Language.h"
 #include <math.h>
-
+#include "Player.h"
 
 enum eGilneas
 {

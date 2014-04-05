@@ -20,14 +20,13 @@ EndScriptData */
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
 #include "MapManager.h"
-#include "Spell.h"
 #include "Vehicle.h"
 #include "Cell.h"
 #include "CellImpl.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "CreatureTextMgr.h"
-
+#include "SpellInfo.h"
 #include "zulaman.h"
 
 enum Yells

@@ -198,7 +198,7 @@ public:
             me->GetMotionMaster()->MoveChase(me->GetVictim());
         }
 
-        uint32 GetData(uint32 type)
+        uint32 GetData(uint32 type) const
         {
             if (type == DATA_DEHYDRATION)
                 return dehydration ? 1 : 0;

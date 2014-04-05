@@ -22,6 +22,7 @@
  * Scriptnames of files in this file should be prefixed with "spell_dru_".
  */
 
+#include "Player.h"
 #include "ScriptMgr.h"
 #include "SpellScript.h"
 #include "SpellAuraEffects.h"

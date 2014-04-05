@@ -23,6 +23,7 @@
 #include "Player.h"
 #include "GuildMgr.h"
 #include "ObjectAccessor.h"
+#include "Opcodes.h"
 
 CalendarInvite::~CalendarInvite()
 {
@@ -186,7 +187,7 @@ void CalendarMgr::RemoveEvent(uint64 eventId, uint64 remover)
     _events.erase(calendarEvent);
 }
 
-void CalendarMgr::RemoveInvite(uint64 inviteId, uint64 eventId, uint64 remover)
+void CalendarMgr::RemoveInvite(uint64 inviteId, uint64 eventId, uint64 /*remover*/)
 {
     CalendarEvent* calendarEvent = GetEvent(eventId);
 

@@ -15,11 +15,11 @@
  * You should have received a copy of the GNU General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
- 
- 
+
 #include "ScriptMgr.h"
 #include "InstanceScript.h"
 #include "the_vortex_pinnacle.h"
+#include "Player.h"
 
 #define ENCOUNTERS 3
 
@@ -81,7 +81,7 @@ public:
             
         }
 
-        uint64 GetData64(uint32 identifier)
+        uint64 GetData64(uint32 identifier) const
         {
             switch(identifier)
             {
@@ -114,7 +114,7 @@ public:
              SaveToDB();
         }
 
-        uint32 GetData(uint32 type)
+        uint32 GetData(uint32 type) const
         {
             switch(type)
             {

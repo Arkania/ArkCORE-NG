@@ -23,6 +23,7 @@
 #include "GridNotifiers.h"
 #include "ObjectAccessor.h"
 #include "SharedDefines.h"
+#include "Opcodes.h"
 
 struct CreatureTextEntry
 {

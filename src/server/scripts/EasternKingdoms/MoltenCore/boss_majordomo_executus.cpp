@@ -29,6 +29,7 @@ EndScriptData */
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "molten_core.h"
+#include "Player.h"
 
 enum Texts
 {

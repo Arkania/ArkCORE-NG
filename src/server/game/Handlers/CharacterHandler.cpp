@@ -17,36 +17,37 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AccountMgr.h"
+#include "ArenaTeam.h"
+#include "ArenaTeamMgr.h"
+#include "Battleground.h"
+#include "CalendarMgr.h"
+#include "Chat.h"
 #include "Common.h"
+#include "DatabaseEnv.h"
+#include "Group.h"
+#include "Guild.h"
+#include "GuildFinderMgr.h"
+#include "GuildMgr.h"
+#include "Language.h"
+#include "LFGMgr.h"
+#include "Log.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
-#include "ArenaTeamMgr.h"
-#include "GuildMgr.h"
-#include "GuildFinderMgr.h"
+#include "Opcodes.h"
+#include "Pet.h"
+#include "PlayerDump.h"
+#include "Player.h"
+#include "ReputationMgr.h"
+#include "ScriptMgr.h"
+#include "SharedDefines.h"
+#include "SocialMgr.h"
 #include "SystemConfig.h"
+#include "UpdateMask.h"
+#include "Util.h"
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "DatabaseEnv.h"
-#include "ArenaTeam.h"
-#include "Chat.h"
-#include "Group.h"
-#include "Guild.h"
-#include "Language.h"
-#include "Log.h"
-#include "Opcodes.h"
-#include "Player.h"
-#include "PlayerDump.h"
-#include "SharedDefines.h"
-#include "SocialMgr.h"
-#include "UpdateMask.h"
-#include "Util.h"
-#include "ScriptMgr.h"
-#include "Battleground.h"
-#include "AccountMgr.h"
-#include "DBCStores.h"
-#include "LFGMgr.h"
-#include "CalendarMgr.h"
 
 class LoginQueryHolder : public SQLQueryHolder
 {
@@ -893,7 +894,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
 
     Player* pCurrChar = new Player(this);
      // for send server info and strings (config)
-    ChatHandler chH = ChatHandler(pCurrChar);
+    ChatHandler chH = ChatHandler(pCurrChar->GetSession());
 
     // "GetAccountId() == db stored account id" checked in LoadFromDB (prevent login not own character using cheating tools)
     if (!pCurrChar->LoadFromDB(GUID_LOPART(playerGuid), holder))

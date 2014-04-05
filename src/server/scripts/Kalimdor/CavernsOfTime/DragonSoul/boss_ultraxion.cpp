@@ -170,16 +170,14 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void KilledUnit(Unit* victim)
-        {
-        }
+        void KilledUnit(Unit* /*victim*/) { }
 
-        void JustDied(Unit* pKiller)
+        void JustDied(Unit* killer)
         {
             instance->SetBossState(BOSS_ULTRAXION, DONE);
             instance->SetBossState(DATA_PORTALS_ON_OFF, DONE);
             instance->SetBossState(DATA_TRALL_VS_ULTRAXION, FAIL);
-        pKiller->SummonGameObject(RAID_MODE(GO_ULTRAXION_LOOT_10N, GO_ULTRAXION_LOOT_25N, GO_ULTRAXION_LOOT_10H, GO_ULTRAXION_LOOT_25H), -1753.63f,  -2370.01f, 340.845f, 0.0f, 0.0f, 0.0f, -0.66913f, 0.743145f, 100000);
+            killer->SummonGameObject(RAID_MODE(GO_ULTRAXION_LOOT_10N, GO_ULTRAXION_LOOT_25N, GO_ULTRAXION_LOOT_10H, GO_ULTRAXION_LOOT_25H), -1753.63f,  -2370.01f, 340.845f, 0.0f, 0.0f, 0.0f, -0.66913f, 0.743145f, 100000);
             _JustDied();
         }
 
@@ -259,7 +257,7 @@ class npc_nozdormu : public CreatureScript
              return true;
         }
 
-        bool OnGossipSelect(Player *player, Creature *creature, uint32 sender, uint32 uiAction)
+        bool OnGossipSelect(Player* player, Creature* /*creature*/, uint32 sender, uint32 uiAction)
         {
             if (sender == GOSSIP_SENDER_MAIN)
             {
@@ -301,7 +299,7 @@ class npc_ysera : public CreatureScript
              return true;
         }
 
-        bool OnGossipSelect(Player *player, Creature *creature, uint32 sender, uint32 uiAction)
+        bool OnGossipSelect(Player* player, Creature* /*creature*/, uint32 sender, uint32 uiAction)
         {
             if (sender == GOSSIP_SENDER_MAIN)
             {
@@ -343,7 +341,7 @@ class npc_alexstrasza : public CreatureScript
              return true;
         }
 
-        bool OnGossipSelect(Player *player, Creature *creature, uint32 sender, uint32 uiAction)
+        bool OnGossipSelect(Player* player, Creature* /*creature*/, uint32 sender, uint32 uiAction)
         {
             if (sender == GOSSIP_SENDER_MAIN)
             {
@@ -385,7 +383,7 @@ class npc_aspect_of_magic : public CreatureScript
              return true;
         }
 
-        bool OnGossipSelect(Player *player, Creature *creature, uint32 sender, uint32 uiAction)
+        bool OnGossipSelect(Player* player, Creature* /*creature*/, uint32 sender, uint32 uiAction)
         {
             if (sender == GOSSIP_SENDER_MAIN)
             {

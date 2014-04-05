@@ -55,7 +55,7 @@ class SummonList : public std::list<uint64>
 
         void DoZoneInCombat(uint32 entry = 0);
         void RemoveNotExisting();
-        bool HasEntry(uint32 entry);
+        bool HasEntry(uint32 entry) const;
     private:
         Creature* me;
 };

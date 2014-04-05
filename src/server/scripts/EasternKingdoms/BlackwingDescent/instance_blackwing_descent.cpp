@@ -212,7 +212,7 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 identifier)
+        uint64 GetData64(uint32 identifier) const
         {
             switch(identifier)
             {
@@ -285,7 +285,7 @@ public:
             return NULL;
         }
 
-        uint32 GetData(uint32 type)
+        uint32 GetData(uint32 type) const
         {
             return Encounter[type];
         }

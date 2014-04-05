@@ -30,7 +30,7 @@
 
 #include "WorldSocket.h"
 #include "Common.h"
-
+#include "Player.h"
 #include "Util.h"
 #include "World.h"
 #include "WorldPacket.h"
