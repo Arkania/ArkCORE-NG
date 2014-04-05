@@ -713,9 +713,9 @@ public:
 
     };
 
-	CreatureAI* GetAI(Creature* pCreature) const  
+	CreatureAI* GetAI(Creature* creature) const  
     {
-        return new npc_bolyun_1AI (pCreature);
+        return new npc_bolyun_1AI (creature);
     }
 };
 
@@ -730,7 +730,7 @@ public:
 
 	 struct npc_bolyun_2AI : public ScriptedAI
     {
-        npc_bolyun_2AI(Creature *c) : ScriptedAI(c) {}
+        npc_bolyun_2AI(Creature* creature) : ScriptedAI(creature) {}
 
 		uint32 VisibleStatus; // 0=unknown 1=visible 2=invisible
 
@@ -778,9 +778,9 @@ public:
 
     };
 
-	CreatureAI* GetAI(Creature* pCreature) const  
+	CreatureAI* GetAI(Creature* creature) const  
     {
-        return new npc_bolyun_2AI (pCreature);
+        return new npc_bolyun_2AI (creature);
     }
 };
 
@@ -795,7 +795,7 @@ public:
 
     struct npc_big_baobobAI : public ScriptedAI
     {
-        npc_big_baobobAI(Creature *c) : ScriptedAI(c) {}		
+        npc_big_baobobAI(Creature* creature) : ScriptedAI(creature) {}		
 
 		uint32	_timer_check_for_player;
 		uint32	_timer_for_spawn_invaders;
@@ -890,9 +890,9 @@ public:
 		}
     };
 
-	CreatureAI* GetAI(Creature* pCreature) const  
+	CreatureAI* GetAI(Creature* creature) const  
     {
-        return new npc_big_baobobAI (pCreature);
+        return new npc_big_baobobAI (creature);
     }
 };
 
@@ -907,7 +907,7 @@ public:
 
     struct npc_astranaar_burning_fire_bunnyAI : public ScriptedAI
     {
-        npc_astranaar_burning_fire_bunnyAI(Creature *c) : ScriptedAI(c) {}		
+        npc_astranaar_burning_fire_bunnyAI(Creature* creature) : ScriptedAI(creature) {}		
 
 		uint32	_timer_check_for_player;
 		uint32  _timer;
@@ -1003,9 +1003,9 @@ public:
 		}
     };
 
-	CreatureAI* GetAI(Creature* pCreature) const  
+	CreatureAI* GetAI(Creature* creature) const  
     {
-        return new npc_astranaar_burning_fire_bunnyAI (pCreature);
+        return new npc_astranaar_burning_fire_bunnyAI (creature);
     }
 };
 
