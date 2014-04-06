@@ -258,17 +258,15 @@ void WorldSession::HandleQuestgiverQueryQuestOpcode(WorldPacket& recvData)
         if (!_player->CanTakeQuest(quest, true))
             return;
 
-        if (quest->IsAutoAccept() && _player->CanAddQuest(quest, true))
-        {
-            _player->AddQuest(quest, object);
-            if (_player->CanCompleteQuest(questId))
-                _player->CompleteQuest(questId);
-        }
+        if (quest->IsAutoAccept() && _player->CanAddQuest(quest, true))       
+             _player->AddQuestAndCheckCompletion(quest, object);       
 
         if (quest->HasFlag(QUEST_FLAGS_AUTOCOMPLETE))
             _player->PlayerTalkClass->SendQuestGiverRequestItems(quest, object->GetGUID(), _player->CanCompleteQuest(quest->GetQuestId()), true);
         else
             _player->PlayerTalkClass->SendQuestGiverQuestDetails(quest, object->GetGUID(), true);
+
+
 
         if (_player)
             _player->SaveToDB(); // Save player.
@@ -393,6 +391,10 @@ void WorldSession::HandleQuestgiverRequestRewardOpcode(WorldPacket & recvData)
 
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_QUESTGIVER_REQUEST_REWARD npc = %u, quest = %u", uint32(GUID_LOPART(guid)), questId);
 
+    Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
+    if (!quest)
+        return;
+
     Object* object = ObjectAccessor::GetObjectByTypeMask(*_player, guid, TYPEMASK_UNIT|TYPEMASK_GAMEOBJECT);
     if (!object || !object->hasInvolvedQuest(questId))
         return;
@@ -406,9 +408,11 @@ void WorldSession::HandleQuestgiverRequestRewardOpcode(WorldPacket & recvData)
 
     if (_player->GetQuestStatus(questId) != QUEST_STATUS_COMPLETE)
         return;
+   
+    _player->PlayerTalkClass->SendQuestGiverOfferReward(quest, guid, true);
 
-    if (Quest const* quest = sObjectMgr->GetQuestTemplate(questId))
-        _player->PlayerTalkClass->SendQuestGiverOfferReward(quest, guid, true);
+     if (Creature* creature = object->ToCreature())
+        sScriptMgr->OnQuestComplete(_player, creature, quest);
 
     if (_player)
         _player->SaveToDB(); // Save player.
@@ -517,12 +521,13 @@ void WorldSession::HandleQuestgiverCompleteQuest(WorldPacket& recvData)
 
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_QUESTGIVER_COMPLETE_QUEST npc = %u, questId = %u", uint32(GUID_LOPART(playerGuid)), questId);
 
+    Object* object = ObjectAccessor::GetObjectByTypeMask(*_player, playerGuid, TYPEMASK_UNIT|TYPEMASK_GAMEOBJECT);        
+    if (!object || !object->hasInvolvedQuest(questId))
+        return;
+
     if (autoCompleteMode == 0)
     {
-        Object* object = ObjectAccessor::GetObjectByTypeMask(*_player, playerGuid, TYPEMASK_UNIT|TYPEMASK_GAMEOBJECT);
-        if (!object || !object->hasInvolvedQuest(questId))
-            return;
-
+       
         // some kind of WPE protection
         if (!_player->CanInteractWithQuestGiver(object))
             return;
@@ -563,6 +568,9 @@ void WorldSession::HandleQuestgiverCompleteQuest(WorldPacket& recvData)
             else                                            // no items required
                 _player->PlayerTalkClass->SendQuestGiverOfferReward(quest, playerGuid, !autoCompleteMode);
         }
+
+        if (Creature* creature = object->ToCreature())
+            sScriptMgr->OnQuestComplete(_player, creature, quest);
 
         if (_player)
             _player->SaveToDB(); // Save player.
