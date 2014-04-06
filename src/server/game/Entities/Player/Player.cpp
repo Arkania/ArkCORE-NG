@@ -23,7 +23,7 @@
 #include "Log.h"
 #include "Opcodes.h"
 #include "SpellMgr.h"
-#include "World.h"
+#include "GameObjectAI.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include "UpdateMask.h"
@@ -15057,6 +15057,53 @@ bool Player::CanRewardQuest(Quest const* quest, bool msg)
         return false;
 
     return true;
+}
+
+void Player::AddQuestAndCheckCompletion(Quest const* quest, Object* questGiver)
+{
+    AddQuest(quest, questGiver);
+
+    if (CanCompleteQuest(quest->GetQuestId()))
+        CompleteQuest(quest->GetQuestId());
+
+    if (!questGiver)
+        return;
+
+    switch (questGiver->GetTypeId())
+    {
+        case TYPEID_UNIT:
+            sScriptMgr->OnQuestAccept(this, (questGiver->ToCreature()), quest);
+            questGiver->ToCreature()->AI()->sQuestAccept(this, quest);
+            break;
+        case TYPEID_ITEM:
+        case TYPEID_CONTAINER:
+        {
+            Item* item = (Item*)questGiver;
+            sScriptMgr->OnQuestAccept(this, item, quest);
+
+            // destroy not required for quest finish quest starting item
+            bool destroyItem = true;
+            for (int i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; ++i)
+            {
+                if (quest->RequiredItemId[i] == item->GetEntry() && item->GetTemplate()->MaxCount > 0)
+                {
+                    destroyItem = false;
+                    break;
+                }
+            }
+
+            if (destroyItem)
+                DestroyItem(item->GetBagSlot(), item->GetSlot(), true);
+
+            break;
+        }
+        case TYPEID_GAMEOBJECT:
+            sScriptMgr->OnQuestAccept(this, questGiver->ToGameObject(), quest);            
+            questGiver->ToGameObject()->AI()->QuestAccept(this, quest);            
+            break;
+        default:
+            break;
+    }
 }
 
 bool Player::CanRewardQuest(Quest const* quest, uint32 reward, bool msg)
