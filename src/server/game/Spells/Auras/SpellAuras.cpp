@@ -1255,7 +1255,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                             if (pet->HasAura(19615))
                             {
                                 int32 bp = pet->GetAura(19615)->GetStackAmount() * 3;
-                                int32 bp2 = 4;
+                                // int32 bp2 = 4;
                                 caster->GetAura(82692)->GetEffect(EFFECT_0)->SetAmount(bp);
                                 caster->CastCustomSpell(pet,83468,&bp,NULL,NULL,true);
                                 pet->RemoveAurasDueToSpell(19615);
@@ -1341,7 +1341,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 // Phantasm
                 if (GetId() == 586)
                 {
-                    if (target->HasAura(47569) && roll_chance_i(50) || target->HasAura(47570))
+                    if ((target->HasAura(47569) && roll_chance_i(50)) || target->HasAura(47570))
                         target->RemoveMovementImpairingAuras();
                 }
                 break;
@@ -1483,7 +1483,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
         
         // Pursuit of Justice
         if (GetSpellInfo()->GetAllEffectsMechanicMask() & ((1<<MECHANIC_ROOT)|(1<<MECHANIC_STUN) |(1<<MECHANIC_FEAR)))
-            if (target->HasAura(26022) && roll_chance_i(50) || target->HasAura(26023))
+            if ((target->HasAura(26022) && roll_chance_i(50)) || target->HasAura(26023))
                 target->CastSpell(target,89024,true);
 
     }
@@ -1825,7 +1825,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
             {
                 if (apply)
                 {
-                    if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_DRUID, 197, 0))
+                    if (caster->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_DRUID, 197, 0))
                     {
                         if (!target->GetAuraEffect(8936, 1))
                             ++caster->NatureBounty;
@@ -1849,7 +1849,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
             case 50334: // Primal Madness
             case 5217:
             {
-                if (AuraEffect const * aurEff = target->GetAuraEffect(SPELL_AURA_PROC_TRIGGER_SPELL_WITH_VALUE, SPELLFAMILY_DRUID, 1181, 0))
+                if (target->GetAuraEffect(SPELL_AURA_PROC_TRIGGER_SPELL_WITH_VALUE, SPELLFAMILY_DRUID, 1181, 0))
                 {
                     if (apply)
                     {
@@ -2072,7 +2072,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 {
                     if (apply)
                     {
-                        if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_MAGE, 2128, 0))
+                        if (caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_MAGE, 2128, 0))
                             if (target->GetDoTsByCaster(caster->GetGUID()) == 0)
                                 ++caster->PyromaniacCount;
                     }

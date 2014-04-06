@@ -1731,7 +1731,7 @@ void AuraEffect::HandleShapeshiftBoosts(Unit* target, bool apply) const
         case FORM_CAT:
         {
             //Heart of the wild - cat
-            if (AuraEffect const * aurEff = target->GetAuraEffect(SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE, SPELLFAMILY_GENERIC, 240, 0))
+            if (target->GetAuraEffect(SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE, SPELLFAMILY_GENERIC, 240, 0))
             {
                 if (apply)
                 {
@@ -4133,7 +4133,7 @@ void AuraEffect::HandleModBaseResistance(AuraApplication const* aurApp, uint8 mo
     }
 }
 
-void AuraEffect::HandleMastery(AuraApplication const* aurApp, uint8 mode, bool apply) const
+void AuraEffect::HandleMastery(AuraApplication const* aurApp, uint8 mode, bool /*apply*/) const
 {
     if (!(mode & AURA_EFFECT_HANDLE_REAL))
         return;
@@ -4145,13 +4145,14 @@ void AuraEffect::HandleMastery(AuraApplication const* aurApp, uint8 mode, bool a
     target->UpdateMastery();
 }
 
-void AuraEffect::HandleAuraProgressBar(AuraApplication const* aurApp, uint8 mode, bool apply) const
+void AuraEffect::HandleAuraProgressBar(AuraApplication const* aurApp, uint8 /*mode*/, bool apply) const
 {
+    // if (!(mode & AURA_EFFECT_HANDLE_REAL))
+    //    return;
+
     Unit* target = aurApp->GetTarget();
-
-    Unit* caster = GetCaster();
-
-    Aura const* aura = GetBase();
+    // Unit* caster = GetCaster();
+    // Aura const* aura = GetBase();
 
     if (!target)
         return;
