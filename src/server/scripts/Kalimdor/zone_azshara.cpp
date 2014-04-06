@@ -24,9 +24,6 @@ SDComment: Quest support:
 SDCategory: Azshara
 EndScriptData */
 
-/* ContentData
-EndContentData */
-
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"

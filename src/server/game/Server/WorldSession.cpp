@@ -284,6 +284,9 @@ void WorldSession::LogUnexpectedOpcode(WorldPacket* packet, const char* status, 
 /// Logging helper for unexpected opcodes
 void WorldSession::LogUnprocessedTail(WorldPacket* packet)
 {
+    if (!sLog->IsOutDebug() || packet->rpos() >= packet->wpos())
+        return;
+
     sLog->outError("Unprocessed tail data (read stop at %u from %u) Opcode %s from %s",
         uint32(packet->rpos()), uint32(packet->wpos()), GetOpcodeNameForLogging(packet->GetOpcode()).c_str(), GetPlayerInfo().c_str());
     packet->print_storage();
@@ -345,8 +348,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                     {
                         sScriptMgr->OnPacketReceive(m_Socket, WorldPacket(*packet));
                         (this->*opHandle->Handler)(*packet);
-                        if (sLog->IsOutDebug() && packet->rpos() < packet->wpos())
-                            LogUnprocessedTail(packet);
+                        LogUnprocessedTail(packet);
                     }
                     // lag can cause STATUS_LOGGEDIN opcodes to arrive after the player started a transfer
                     break;
@@ -359,8 +361,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                         // not expected _player or must checked in packet hanlder
                         sScriptMgr->OnPacketReceive(m_Socket, WorldPacket(*packet));
                         (this->*opHandle->Handler)(*packet);
-                        if (sLog->IsOutDebug() && packet->rpos() < packet->wpos())
-                            LogUnprocessedTail(packet);
+                        LogUnprocessedTail(packet);
                     }
                     break;
                 case STATUS_TRANSFER:
@@ -372,8 +373,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                     {
                         sScriptMgr->OnPacketReceive(m_Socket, WorldPacket(*packet));
                         (this->*opHandle->Handler)(*packet);
-                        if (sLog->IsOutDebug() && packet->rpos() < packet->wpos())
-                            LogUnprocessedTail(packet);
+                        LogUnprocessedTail(packet);
                     }
                     break;
                 case STATUS_AUTHED:
@@ -391,8 +391,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
 
                     sScriptMgr->OnPacketReceive(m_Socket, WorldPacket(*packet));
                     (this->*opHandle->Handler)(*packet);
-                    if (sLog->IsOutDebug() && packet->rpos() < packet->wpos())
-                        LogUnprocessedTail(packet);
+                    LogUnprocessedTail(packet);
                     break;
                 case STATUS_NEVER:
                         sLog->outError("Received not allowed opcode %s from %s", GetOpcodeNameForLogging(packet->GetOpcode()).c_str()

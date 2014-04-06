@@ -31,7 +31,7 @@ EndScriptData */
 
 enum Texts
 {
-    EMOTE_LOWHP             = -1409002,
+    EMOTE_LOWHP             = 0
 };
 
 enum Spells
@@ -150,7 +150,7 @@ class npc_core_rager : public CreatureScript
                     if (pGolemagg->IsAlive())
                     {
                         me->AddAura(SPELL_GOLEMAGG_TRUST, me);
-                        DoScriptText(EMOTE_LOWHP, me);
+                        Talk(EMOTE_LOWHP);
                         me->SetFullHealth();
                     }
                 }

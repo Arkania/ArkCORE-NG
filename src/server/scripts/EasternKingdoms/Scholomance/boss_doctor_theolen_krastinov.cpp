@@ -30,6 +30,7 @@ EndScriptData */
 
 enum eEnums
 {
+    EMOTE_FRENZY_KILL           = 0,
     SPELL_REND                  = 16509,
     SPELL_BACKHAND              = 18103,
     SPELL_FRENZY                = 8269
@@ -104,7 +105,7 @@ public:
                 if (m_uiFrenzy_Timer <= uiDiff)
                 {
                     DoCast(me, SPELL_FRENZY);
-                    DoScriptText(EMOTE_GENERIC_FRENZY_KILL, me);
+                    Talk(EMOTE_FRENZY_KILL);
 
                     m_uiFrenzy_Timer = 120000;
                 }
