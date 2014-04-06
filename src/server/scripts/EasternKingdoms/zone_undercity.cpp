@@ -42,8 +42,8 @@ EndContentData */
 enum Sylvanas
 {
     QUEST_JOURNEY_TO_UNDERCITY  = 9180,
-    SAY_LAMENT_END              = -1000196,
-    EMOTE_LAMENT_END            = -1000197,
+    EMOTE_LAMENT_END            = 0,
+    SAY_LAMENT_END              = 1,
 
     SOUND_CREDIT                = 10896,
     ENTRY_HIGHBORNE_LAMENTER    = 21628,
@@ -154,8 +154,8 @@ public:
                     LamentEventTimer = 2000;
                     if (!me->HasAura(SPELL_SYLVANAS_CAST))
                     {
-                        DoScriptText(SAY_LAMENT_END, me);
-                        DoScriptText(EMOTE_LAMENT_END, me);
+                        Talk(SAY_LAMENT_END);
+                        Talk(EMOTE_LAMENT_END);
                         LamentEvent = false;
                     }
                 } else LamentEventTimer -= diff;

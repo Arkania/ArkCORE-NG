@@ -29,8 +29,8 @@ EndScriptData */
 
 enum eEnums
 {
-    SAY_AGGRO                   = -1189019,
-    SAY_SPECIALAE               = -1189020,
+    SAY_AGGRO                   = 0,
+    SAY_SPECIALAE               = 1,
 
     SPELL_POLYMORPH             = 13323,
     SPELL_AOESILENCE            = 8988,
@@ -70,7 +70,7 @@ public:
 
         void EnterCombat(Unit* /*who*/)
         {
-            DoScriptText(SAY_AGGRO, me);
+            Talk(SAY_AGGRO);
         }
 
         void UpdateAI(const uint32 diff)
@@ -94,7 +94,7 @@ public:
                 if (me->IsNonMeleeSpellCasted(false))
                     return;
 
-                DoScriptText(SAY_SPECIALAE, me);
+                Talk(SAY_SPECIALAE);
                 DoCast(me, SPELL_ARCANEBUBBLE);
 
                 bCanDetonate = true;

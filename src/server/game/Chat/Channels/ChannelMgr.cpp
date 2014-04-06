@@ -37,6 +37,7 @@ ChannelMgr* ChannelMgr::forTeam(uint32 team)
 
     if (team == ALLIANCE)
         return ACE_Singleton<AllianceChannelMgr, ACE_Null_Mutex>::instance();
+
     if (team == HORDE)
         return ACE_Singleton<HordeChannelMgr, ACE_Null_Mutex>::instance();
 
@@ -80,8 +81,8 @@ Channel* ChannelMgr::GetChannel(std::string const& name, Player* player, bool pk
 
         return NULL;
     }
-    else
-        return i->second;
+
+    return i->second;
 }
 
 void ChannelMgr::LeftChannel(std::string const& name)

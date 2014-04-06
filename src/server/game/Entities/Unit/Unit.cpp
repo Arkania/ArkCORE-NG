@@ -17,11 +17,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Unit.h"
+#include "Common.h"
 #include "Battlefield.h"
 #include "BattlefieldMgr.h"
 #include "Battleground.h"
 #include "CellImpl.h"
-#include "Common.h"
 #include "ConditionMgr.h"
 #include "CreatureAI.h"
 #include "CreatureAIImpl.h"
@@ -55,7 +56,6 @@
 #include "TemporarySummon.h"
 #include "Totem.h"
 #include "Transport.h"
-#include "Unit.h"
 #include "UpdateFieldFlags.h"
 #include "Util.h"
 #include "Vehicle.h"

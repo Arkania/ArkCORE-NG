@@ -39,11 +39,11 @@ EndContentData */
 
 enum eOOX
 {
-    SAY_OOX_START           = -1000287,
-    SAY_OOX_AGGRO1          = -1000288,
-    SAY_OOX_AGGRO2          = -1000289,
-    SAY_OOX_AMBUSH          = -1000290,
-    SAY_OOX_END             = -1000292,
+    SAY_OOX_START           = 0,
+    SAY_OOX_AGGRO           = 1,
+    SAY_OOX_AMBUSH          = 3,
+    SAY_OOX_AMBUSH_REPLY    = 4,
+    SAY_OOX_END             = 5,
 
     QUEST_RESQUE_OOX_09     = 836,
 
@@ -70,7 +70,7 @@ public:
             else if (player->GetTeam() == HORDE)
                 creature->setFaction(FACTION_ESCORTEE_H);
 
-            DoScriptText(SAY_OOX_START, creature, player);
+            creature->AI()->Talk(SAY_OOX_START, player->GetGUID());
 
             if (npc_00x09hlAI* pEscortAI = CAST_AI(npc_00x09hl::npc_00x09hlAI, creature->AI()))
                 pEscortAI->Start(false, false, player->GetGUID(), quest);
@@ -94,13 +94,13 @@ public:
             switch (waypointId)
             {
                 case 26:
-                    DoScriptText(SAY_OOX_AMBUSH, me);
+                    Talk(SAY_OOX_AMBUSH);
                     break;
                 case 43:
-                    DoScriptText(SAY_OOX_AMBUSH, me);
+                    Talk(SAY_OOX_AMBUSH);
                     break;
                 case 64:
-                    DoScriptText(SAY_OOX_END, me);
+                    Talk(SAY_OOX_END);
                     if (Player* player = GetPlayerForEscort())
                         player->GroupEventHappens(QUEST_RESQUE_OOX_09, me);
                     break;
@@ -137,10 +137,7 @@ public:
             if (who->GetEntry() == NPC_MARAUDING_OWL || who->GetEntry() == NPC_VILE_AMBUSHER)
                 return;
 
-            if (rand()%1)
-                DoScriptText(SAY_OOX_AGGRO1, me);
-            else
-                DoScriptText(SAY_OOX_AGGRO2, me);
+            Talk(SAY_OOX_AGGRO);
         }
 
         void JustSummoned(Creature* summoned)

@@ -30,15 +30,11 @@ EndScriptData */
 
 enum Says
 {
-    SAY_AGGRO                   = -1189000,
-    SAY_WHIRLWIND               = -1189001,
-    SAY_ENRAGE                  = -1189002,
-    SAY_KILL                    = -1189003
-};
-
-enum Emotes
-{
-    EMOTE_ENRAGE                = -1189004
+    SAY_AGGRO                   = 0,
+    SAY_WHIRLWIND               = 1,
+    SAY_ENRAGE                  = 2,
+    SAY_KILL                    = 3,
+    EMOTE_ENRAGE                = 4
 };
 
 enum Spells
@@ -83,13 +79,13 @@ public:
 
         void EnterCombat(Unit* /*who*/)
         {
-            DoScriptText(SAY_AGGRO, me);
+            Talk(SAY_AGGRO);
             DoCast(me, SPELL_RUSHINGCHARGE);
         }
 
          void KilledUnit(Unit* /*victim*/)
          {
-             DoScriptText(SAY_KILL, me);
+             Talk(SAY_KILL);
          }
 
          void JustDied(Unit* /*killer*/)
@@ -106,8 +102,8 @@ public:
             //If we are <30% hp goes Enraged
             if (!Enrage && !HealthAbovePct(30) && !me->IsNonMeleeSpellCasted(false))
             {
-                DoScriptText(EMOTE_ENRAGE, me);
-                DoScriptText(SAY_ENRAGE, me);
+                Talk(EMOTE_ENRAGE);
+                Talk(SAY_ENRAGE);
                 DoCast(me, SPELL_FRENZY);
                 Enrage = true;
             }
@@ -123,7 +119,7 @@ public:
             // Whirlwind_Timer
             if (Whirlwind_Timer <= diff)
             {
-                DoScriptText(SAY_WHIRLWIND, me);
+                Talk(SAY_WHIRLWIND);
                 DoCast(me->GetVictim(), SPELL_WHIRLWIND);
                 Whirlwind_Timer = 30000;
             }

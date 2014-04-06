@@ -795,7 +795,7 @@ class spell_warl_nether_protection : public SpellScriptLoader
                 return false;
             }
 
-            void OnAbsorb(AuraEffect* aurEff, DamageInfo& dmgInfo, uint32& absorbAmount)
+            void OnAbsorb(AuraEffect* /*aurEff*/, DamageInfo& dmgInfo, uint32& /*absorbAmount*/)
             {
                 if (!dmgInfo.GetSpellInfo())
                     return;

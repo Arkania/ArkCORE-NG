@@ -43,7 +43,7 @@ class instance_trial_of_the_crusader : public InstanceMapScript
                 ResilienceWillFixItTimer = 0;
                 SnoboldCount = 0;
                 MistressOfPainCount = 0;
-                TributeToImmortalityElegible = true;
+                TributeToImmortalityEligible = true;
                 NeedSave = false;
 
                 TirionFordringGUID = 0;
@@ -463,8 +463,8 @@ class instance_trial_of_the_crusader : public InstanceMapScript
                         else if (data == DECREASE)
                             --MistressOfPainCount;
                         break;
-                    case DATA_TRIBUTE_TO_IMMORTALITY_ELEGIBLE:
-                        TributeToImmortalityElegible = false;
+                    case DATA_TRIBUTE_TO_IMMORTALITY_ELIGIBLE:
+                        TributeToImmortalityEligible = false;
                         break;
                     default:
                         break;
@@ -723,7 +723,7 @@ class instance_trial_of_the_crusader : public InstanceMapScript
                         return TrialCounter == 50;
                     case A_TRIBUTE_TO_IMMORTALITY_HORDE:
                     case A_TRIBUTE_TO_IMMORTALITY_ALLIANCE:
-                        return TrialCounter == 50 && TributeToImmortalityElegible;
+                        return TrialCounter == 50 && TributeToImmortalityEligible;
                     case A_TRIBUTE_TO_DEDICATED_INSANITY:
                         return false/*uiGrandCrusaderAttemptsLeft == 50 && !bHasAtAnyStagePlayerEquippedTooGoodItem*/;
                     default:
@@ -770,7 +770,7 @@ class instance_trial_of_the_crusader : public InstanceMapScript
                 uint32 ResilienceWillFixItTimer;
                 uint8  SnoboldCount;
                 uint8  MistressOfPainCount;
-                bool   TributeToImmortalityElegible;
+                bool   TributeToImmortalityEligible;
         };
 
         InstanceScript* GetInstanceScript(InstanceMap* map) const

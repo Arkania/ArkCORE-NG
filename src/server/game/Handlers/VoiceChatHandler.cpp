@@ -47,11 +47,11 @@ void WorldSession::HandleChannelVoiceOnOpcode(WorldPacket& recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_CHANNEL_VOICE_ON");
 
     uint32 length = recvData.ReadBits(8);
-    std::string channelname = recvData.ReadString(length);
+    std::string channelName = recvData.ReadString(length);
 
-    if (ChannelMgr* cMgr = ChannelMgr::forTeam(_player->GetTeam()))
-        if (Channel* chn = cMgr->GetChannel(channelname, _player))
-            chn->MakeVoiceOn(&recvData, _player->GetGUID());
+    if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeam()))
+        if (Channel* channel = cMgr->GetChannel(channelName, GetPlayer()))
+            channel->MakeVoiceOn(&recvData, GetPlayer()->GetGUID());
 }
 
 void WorldSession::HandleChannelVoiceOffOpcode(WorldPacket& recvData)
@@ -59,11 +59,11 @@ void WorldSession::HandleChannelVoiceOffOpcode(WorldPacket& recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_CHANNEL_VOICE_OFF");
 
     uint32 length = recvData.ReadBits(8);
-    std::string channelname = recvData.ReadString(length);
+    std::string channelName = recvData.ReadString(length);
 
-    if (ChannelMgr* cMgr = ChannelMgr::forTeam(_player->GetTeam()))
-        if (Channel* chn = cMgr->GetChannel(channelname, _player))
-            chn->MakeVoiceOff(&recvData, _player->GetGUID());
+    if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeam()))
+        if (Channel* channel = cMgr->GetChannel(channelName, GetPlayer()))
+            channel->MakeVoiceOff(&recvData, GetPlayer()->GetGUID());
 }
 
 void WorldSession::HandleSetActiveVoiceChannel(WorldPacket& recvData)
@@ -71,10 +71,10 @@ void WorldSession::HandleSetActiveVoiceChannel(WorldPacket& recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_SET_ACTIVE_VOICE_CHANNEL");
 
     uint32 channelId;
-    std::string channelname;
+    std::string channelName;
 
     recvData >> channelId;
     uint32 length = recvData.ReadBits(8);
-    channelname = recvData.ReadString(length);
+    channelName = recvData.ReadString(length);
 }
 
