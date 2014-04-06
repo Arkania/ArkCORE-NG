@@ -819,6 +819,10 @@ class WorldSession
         void HandleBattlegroundStateQuery(WorldPacket& recvData);
         void HandleBattlemasterJoinArena(WorldPacket& recvData);
         void HandleReportPvPAFK(WorldPacket& recvData);
+        void HandleRequestRatedBgInfo(WorldPacket& recvData);
+        void HandleRequestPvpOptions(WorldPacket& recvData);
+        void HandleRequestPvpReward(WorldPacket& recvData);
+        void HandleRequestRatedBgStats(WorldPacket& recvData);
 
         void HandleWardenDataOpcode(WorldPacket& recvData);
         void HandleWorldTeleportOpcode(WorldPacket& recvData);
@@ -847,11 +851,7 @@ class WorldSession
         void HandleBfQueueInviteResponse(WorldPacket& recvData);
         void HandleBfEntryInviteResponse(WorldPacket& recvData);
         void HandleBfExitRequest(WorldPacket& recvData);
-        void RequestPvpOptionsEnabled(WorldPacket& recvData);
         void SendPvPOptionsEnable();
-        void HandleRequestPvPRewardsOpcode(WorldPacket& recvData);
-        void HandleRequestRatedBGStatsOpcode(WorldPacket& recvData);
-        void HandleRequestRatedBgInfo(WorldPacket& recvData);
 
         // Cemetery
         void HandleSetPreferedCemetery(WorldPacket& recvData);

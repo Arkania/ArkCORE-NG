@@ -795,67 +795,78 @@ void World::LoadConfigSettings(bool reload)
         m_int_configs[CONFIG_START_PLAYER_MONEY] = 0x7FFFFFFF-1;
     }
 
-    m_int_configs[CONFIG_MAX_HONOR_POINTS] = ConfigMgr::GetIntDefault("MaxHonorPoints", 40000);
-    if (int32(m_int_configs[CONFIG_MAX_HONOR_POINTS]) < 0)
-    {
-        sLog->outError("MaxHonorPoints (%i) can't be negative. Set to default 40000.", m_int_configs[CONFIG_MAX_HONOR_POINTS]);
-        m_int_configs[CONFIG_MAX_HONOR_POINTS] = 40000;
-    }
-
-    m_int_configs[CONFIG_START_HONOR_POINTS] = ConfigMgr::GetIntDefault("StartHonorPoints", 0);
-    if (int32(m_int_configs[CONFIG_START_HONOR_POINTS]) < 0)
-    {
-        sLog->outError("StartHonorPoints (%i) must be in range 0..MaxHonorPoints(%u). Set to %u.",
-            m_int_configs[CONFIG_START_HONOR_POINTS], m_int_configs[CONFIG_MAX_HONOR_POINTS], 0);
-        m_int_configs[CONFIG_START_HONOR_POINTS] = 0;
-    }
-    else if (m_int_configs[CONFIG_START_HONOR_POINTS] > m_int_configs[CONFIG_MAX_HONOR_POINTS])
-    {
-        sLog->outError("StartHonorPoints (%i) must be in range 0..MaxHonorPoints(%u). Set to %u.",
-            m_int_configs[CONFIG_START_HONOR_POINTS], m_int_configs[CONFIG_MAX_HONOR_POINTS], m_int_configs[CONFIG_MAX_HONOR_POINTS]);
-        m_int_configs[CONFIG_START_HONOR_POINTS] = m_int_configs[CONFIG_MAX_HONOR_POINTS];
-    }
-
-    m_int_configs[CONFIG_MAX_JUSTICE_POINTS] = ConfigMgr::GetIntDefault("MaxJusticePoints", 400000);
-    if (int32(m_int_configs[CONFIG_MAX_JUSTICE_POINTS]) < 0)
-    {
-        sLog->outError("MaxJusticePoints (%i) can't be negative. Set to 0.", m_int_configs[CONFIG_MAX_JUSTICE_POINTS]);
-        m_int_configs[CONFIG_MAX_JUSTICE_POINTS] = 0;
-    }
-
-    m_int_configs[CONFIG_START_JUSTICE_POINTS] = ConfigMgr::GetIntDefault("StartJusticePoints", 0);
-    if (int32(m_int_configs[CONFIG_START_JUSTICE_POINTS]) < 0)
-    {
-        sLog->outError("StartJusticePoints (%i) must be in range 0..MaxJusticePoints(%u). Set to %u.",
-            m_int_configs[CONFIG_START_JUSTICE_POINTS], m_int_configs[CONFIG_MAX_JUSTICE_POINTS], 0);
-        m_int_configs[CONFIG_START_JUSTICE_POINTS] = 0;
-    }
-    else if (m_int_configs[CONFIG_START_JUSTICE_POINTS] > m_int_configs[CONFIG_MAX_JUSTICE_POINTS])
-    {
-        sLog->outError("StartJusticePoints (%i) must be in range 0..MaxJusticePoints(%u). Set to %u.",
-            m_int_configs[CONFIG_START_JUSTICE_POINTS], m_int_configs[CONFIG_MAX_JUSTICE_POINTS], m_int_configs[CONFIG_MAX_JUSTICE_POINTS]);
-        m_int_configs[CONFIG_START_JUSTICE_POINTS] = m_int_configs[CONFIG_MAX_JUSTICE_POINTS];
-    }
-
-    m_int_configs[CONFIG_CURRENCY_RESET_HOUR] = ConfigMgr::GetIntDefault("Currency.ResetHour", 6);
+   m_int_configs[CONFIG_CURRENCY_RESET_HOUR] = ConfigMgr::GetIntDefault("Currency.ResetHour", 3);
     if (m_int_configs[CONFIG_CURRENCY_RESET_HOUR] > 23)
     {
         sLog->outError("Currency.ResetHour (%i) can't be load. Set to 6.", m_int_configs[CONFIG_CURRENCY_RESET_HOUR]);
-        m_int_configs[CONFIG_CURRENCY_RESET_HOUR] = 6;
+        m_int_configs[CONFIG_CURRENCY_RESET_HOUR] = 3;
     }
-
     m_int_configs[CONFIG_CURRENCY_RESET_DAY] = ConfigMgr::GetIntDefault("Currency.ResetDay", 3);
     if (m_int_configs[CONFIG_CURRENCY_RESET_DAY] > 6)
     {
         sLog->outError("Currency.ResetDay (%i) can't be load. Set to 3.", m_int_configs[CONFIG_CURRENCY_RESET_DAY]);
         m_int_configs[CONFIG_CURRENCY_RESET_DAY] = 3;
     }
-
     m_int_configs[CONFIG_CURRENCY_RESET_INTERVAL] = ConfigMgr::GetIntDefault("Currency.ResetInterval", 7);
     if (int32(m_int_configs[CONFIG_CURRENCY_RESET_INTERVAL]) <= 0)
     {
         sLog->outError("Currency.ResetInterval (%i) must be > 0, set to default 7.", m_int_configs[CONFIG_CURRENCY_RESET_INTERVAL]);
         m_int_configs[CONFIG_CURRENCY_RESET_INTERVAL] = 7;
+    }
+
+    m_int_configs[CONFIG_CURRENCY_START_HONOR_POINTS] = ConfigMgr::GetIntDefault("Currency.StartHonorPoints", 0);
+    if (int32(m_int_configs[CONFIG_CURRENCY_START_HONOR_POINTS]) < 0)
+    {
+        sLog->outError("Currency.StartHonorPoints (%i) must be >= 0, set to default 0.", m_int_configs[CONFIG_CURRENCY_START_HONOR_POINTS]);
+        m_int_configs[CONFIG_CURRENCY_START_HONOR_POINTS] = 0;
+    }
+    m_int_configs[CONFIG_CURRENCY_MAX_HONOR_POINTS] = ConfigMgr::GetIntDefault("Currency.MaxHonorPoints", 40000);
+    if (int32(m_int_configs[CONFIG_CURRENCY_MAX_HONOR_POINTS]) < 0)
+    {
+        sLog->outError("Currency.MaxHonorPoints (%i) can't be negative. Set to 0.", m_int_configs[CONFIG_CURRENCY_MAX_HONOR_POINTS]);
+        m_int_configs[CONFIG_CURRENCY_MAX_HONOR_POINTS] = 0;
+    }
+
+    m_int_configs[CONFIG_CURRENCY_START_CONQUEST_POINTS] = ConfigMgr::GetIntDefault("Currency.StartConquestPoints", 0);
+    if (int32(m_int_configs[CONFIG_CURRENCY_START_CONQUEST_POINTS]) < 0)
+    {
+        sLog->outError("Currency.StartConquestPoints (%i) must be >= 0, set to default 0.", m_int_configs[CONFIG_CURRENCY_START_CONQUEST_POINTS]);
+        m_int_configs[CONFIG_CURRENCY_START_CONQUEST_POINTS] = 0;
+    }
+    m_int_configs[CONFIG_CURRENCY_CONQUEST_POINTS_WEEK_CAP] = ConfigMgr::GetIntDefault("Currency.ConquestPointsWeekCap", 1650);
+    if (int32(m_int_configs[CONFIG_CURRENCY_CONQUEST_POINTS_WEEK_CAP]) <= 0)
+    {
+        sLog->outError("Currency.ConquestPointsWeekCap (%i) must be > 0, set to default 1650.", m_int_configs[CONFIG_CURRENCY_CONQUEST_POINTS_WEEK_CAP]);
+        m_int_configs[CONFIG_CURRENCY_CONQUEST_POINTS_WEEK_CAP] = 1650;
+    }
+    m_int_configs[CONFIG_CURRENCY_CONQUEST_POINTS_WEEK_CAP] *= 100;     //precision mod
+
+    m_int_configs[CONFIG_CURRENCY_CONQUEST_POINTS_ARENA_REWARD] = ConfigMgr::GetIntDefault("Currency.ConquestPointsArenaReward", 150);
+    if (int32(m_int_configs[CONFIG_CURRENCY_CONQUEST_POINTS_ARENA_REWARD]) <= 0)
+    {
+        sLog->outError("Currency.ConquestPointsArenaReward (%i) must be > 0, set to default 180.", m_int_configs[CONFIG_CURRENCY_CONQUEST_POINTS_ARENA_REWARD]);
+        m_int_configs[CONFIG_CURRENCY_CONQUEST_POINTS_ARENA_REWARD] = 150;
+    }
+    m_int_configs[CONFIG_CURRENCY_CONQUEST_POINTS_ARENA_REWARD] *= 100;     //precision mod
+
+    m_int_configs[CONFIG_CURRENCY_START_JUSTICE_POINTS] = ConfigMgr::GetIntDefault("StartJusticePoints", 0);
+    if (int32(m_int_configs[CONFIG_CURRENCY_START_JUSTICE_POINTS]) < 0)
+    {
+        sLog->outError("StartJusticePoints (%i) must be in range 0..MaxJusticePoints(%u). Set to %u.",
+            m_int_configs[CONFIG_CURRENCY_START_JUSTICE_POINTS], m_int_configs[CONFIG_CURRENCY_MAX_JUSTICE_POINTS], 0);
+        m_int_configs[CONFIG_CURRENCY_START_JUSTICE_POINTS] = 0;
+    }
+    else if (m_int_configs[CONFIG_CURRENCY_START_JUSTICE_POINTS] > m_int_configs[CONFIG_CURRENCY_MAX_JUSTICE_POINTS])
+    {
+        sLog->outError("StartJusticePoints (%i) must be in range 0..MaxJusticePoints(%u). Set to %u.",
+            m_int_configs[CONFIG_CURRENCY_START_JUSTICE_POINTS], m_int_configs[CONFIG_CURRENCY_MAX_JUSTICE_POINTS], m_int_configs[CONFIG_CURRENCY_MAX_JUSTICE_POINTS]);
+        m_int_configs[CONFIG_CURRENCY_START_JUSTICE_POINTS] = m_int_configs[CONFIG_CURRENCY_MAX_JUSTICE_POINTS];
+    }
+    m_int_configs[CONFIG_CURRENCY_MAX_JUSTICE_POINTS] = ConfigMgr::GetIntDefault("MaxJusticePoints", 400000);
+    if (int32(m_int_configs[CONFIG_CURRENCY_MAX_JUSTICE_POINTS]) < 0)
+    {
+        sLog->outError("MaxJusticePoints (%i) can't be negative. Set to 0.", m_int_configs[CONFIG_CURRENCY_MAX_JUSTICE_POINTS]);
+        m_int_configs[CONFIG_CURRENCY_MAX_JUSTICE_POINTS] = 0;
     }
 
     m_int_configs[CONFIG_MAX_RECRUIT_A_FRIEND_BONUS_PLAYER_LEVEL] = ConfigMgr::GetIntDefault("RecruitAFriend.MaxLevel", 60);

@@ -1442,9 +1442,10 @@ class Player : public Unit, public GridObject<Player>
         void DeleteRefundReference(uint32 it);
 
         void SendCurrencies() const;
-        uint32 GetCurrency(uint32 id) const;
-        uint32 GetCurrencyOnWeek(uint32 id) const;
+        uint32 GetCurrency(uint32 id, bool precision) const;
+        uint32 GetCurrencyOnWeek(uint32 id, bool precision) const;
         bool HasCurrency(uint32 id, uint32 count) const;
+        /// initialize currency count for custom initialization at create character
         void SetCurrency(uint32 id, uint32 count, bool printLog = true);
         void ModifyCurrency(uint32 id, int32 count, bool printLog = true, bool ignoreMultipliers = false);
         void ResetCurrencyWeekCap();
@@ -2035,9 +2036,6 @@ class Player : public Unit, public GridObject<Player>
         void SetArenaTeamIdInvited(uint32 ArenaTeamId) { m_ArenaTeamIdInvited = ArenaTeamId; }
         uint32 GetArenaTeamIdInvited() { return m_ArenaTeamIdInvited; }
 
-        uint32 GetRBGPersonalRating() const { return GetUInt32Value(PLAYER_FIELD_BATTLEGROUND_RATING); }
-        void SetRBGPersonalRating(uint32 rating) { SetUInt32Value(PLAYER_FIELD_BATTLEGROUND_RATING,rating); }
-
         Difficulty GetDifficulty(bool isRaid) const { return isRaid ? m_raidDifficulty : m_dungeonDifficulty; }
         Difficulty GetDungeonDifficulty() const { return m_dungeonDifficulty; }
         Difficulty GetRaidDifficulty() const { return m_raidDifficulty; }
@@ -2248,7 +2246,8 @@ class Player : public Unit, public GridObject<Player>
         // TODO: Properly implement correncies as of Cataclysm
         void UpdateHonorFields();
         bool RewardHonor(Unit* victim, uint32 groupsize, int32 honor = -1, bool pvptoken = false);
-        void SendPvPRewards();
+        /// send conquest currency points and their cap week/arena
+        void SendPvpRewards() const;
         void SendRatedBGStats();
 
         uint32 GetMaxPersonalArenaRatingRequirement(uint32 minarenaslot) const;
@@ -2979,10 +2978,16 @@ class Player : public Unit, public GridObject<Player>
         Item* m_items[PLAYER_SLOTS_COUNT];
         uint32 m_currentBuybackSlot;
 
-        PlayerCurrenciesMap m_currencies;
+        PlayerCurrenciesMap _currencyStorage;
         /// return week cap by currency id
-        uint32 GetCurrencyWeekCap(uint32 id) const;
-        /// set currency week cap
+        uint32 GetCurrencyWeekCap(uint32 id, bool usePrecision) const;
+
+        /**
+          * @name   _GetCurrencyWeekCap
+          * @brief  return week cap for selected currency
+
+          * @param  currency CurrencyTypesEntry witch should get week cap
+        */
         uint32 _GetCurrencyWeekCap(const CurrencyTypesEntry* currency) const;
 
         VoidStorageItem* _voidStorageItems[VOID_STORAGE_MAX_SLOT];
@@ -3190,12 +3195,12 @@ class Player : public Unit, public GridObject<Player>
         InstanceTimeMap _instanceResetTimes;
         uint32 _pendingBindId;
         uint32 _pendingBindTimer;
-        uint32 _maxPersonalArenaRate;
-        uint32 _ConquestCurrencytotalWeekCap;
 
         bool _canUseMastery;
 
         uint32 _activeCheats;
+        uint32 _maxPersonalArenaRate;
+        uint32 _ConquestCurrencyTotalWeekCap;
 
         PhaseMgr phaseMgr;
 };

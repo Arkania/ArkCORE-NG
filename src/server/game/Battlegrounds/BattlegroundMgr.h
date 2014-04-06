@@ -126,7 +126,6 @@ class BattlegroundMgr
 
         uint32 GetMaxRatingDifference() const;
         uint32 GetRatingDiscardTimer()  const;
-        void InitAutomaticArenaPointDistribution();
         void LoadBattleMastersEntry();
         BattlegroundTypeId GetBattleMasterBG(uint32 entry) const
         {

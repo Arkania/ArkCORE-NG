@@ -224,7 +224,7 @@ namespace Trinity
             sScriptMgr->OnGroupRateCalculation(rate, count, isRaid);
             return rate;
         }
-    }
+    } // namespace Trinity::XP
 
     namespace Currency
     {
@@ -244,7 +244,7 @@ namespace Trinity
             // WowWiki: Battleground ratings receive a bonus of 22.2% to the cap they generate, plus 1 for corrections.
             return uint32((ConquestRatingCalculator(rate) * 1.222f) + 0.5f);
         }
-    } // namespace Trinity::XP
+    } // namespace Trinity::Currency
 } // namespace Trinity
 
 #endif

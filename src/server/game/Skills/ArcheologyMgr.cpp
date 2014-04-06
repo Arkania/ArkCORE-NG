@@ -930,7 +930,7 @@ void ArcheologyMgr::CompleteArtifact(uint32 artId, uint32 spellId, ByteBuffer &d
         int32 bp0 = int32(numberOfStones);
 
         if (currencyId != 0)
-            if (m_player->GetCurrency(currencyId) >= rp->RequiredFragments - currencySale)
+            if (m_player->GetCurrency(currencyId, true) >= rp->RequiredFragments - currencySale)
             {
                 m_player->CastCustomSpell(m_player, rp->ProjectSpell, &bp0, NULL, NULL, false);
                 // Save to completed projects.
