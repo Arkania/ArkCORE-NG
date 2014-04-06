@@ -417,7 +417,7 @@ uint32 Battleground::GetPrematureWinner()
         winner = ALLIANCE;
     else if (GetPlayersCountByTeam(HORDE) >= GetMinPlayersPerTeam())
         winner = HORDE;
-        
+
     return winner;
 }
 
@@ -479,7 +479,7 @@ inline void Battleground::_ProcessJoin(uint32 diff)
     if (m_CountdownTimer >= 10000)
     {
         uint32 countdownMaxForBGType = isArena() ? ARENA_COUNTDOWN_MAX : BATTLEGROUND_COUNTDOWN_MAX;
-        
+
         WorldPacket data(SMSG_START_TIMER, 4+4+4);
         data << uint32(0); // unk
         data << uint32(countdownMaxForBGType - (GetElapsedTime() / 1000));
@@ -947,12 +947,12 @@ void Battleground::EndBattleground(uint32 winner)
                 UpdatePlayerScore(player, SCORE_BONUS_HONOR, GetBonusHonorFromKill(winner_kills));
                 if (!player->GetRandomWinner())
                 {
-                    // 100cp awarded for the first rated battleground won each day 
+                    // 100cp awarded for the first rated battleground won each day
                     player->ModifyCurrency(CURRENCY_TYPE_CONQUEST_META_BG, BG_REWARD_WINNER_CONQUEST_FIRST);
                     player->SetRandomWinner(true);
                 }
             }
-            else // 50cp awarded for each non-rated battleground won 
+            else // 50cp awarded for each non-rated battleground won
                 player->ModifyCurrency(CURRENCY_TYPE_CONQUEST_META_BG, BG_REWARD_WINNER_CONQUEST_LAST );
 
             // Modify the guild reputation and xp - 167 rep on win, 75k guild xp. Only if group is guild group.
@@ -1873,7 +1873,7 @@ void Battleground::HandleKillPlayer(Player* victim, Player* killer)
     // Don't reward credit for killing ourselves, like fall damage of hellfire
     if (victim && killer && killer == victim)
         return;
-	
+
     // Add +1 deaths
     UpdatePlayerScore(victim, SCORE_DEATHS, 1);
     // Add +1 kills to group and +1 killing_blows to killer

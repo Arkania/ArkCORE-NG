@@ -945,6 +945,6 @@ uint32 BattlegroundEY::GetPrematureWinner()
         return ALLIANCE;
     else if (GetTeamScore(TEAM_HORDE) > GetTeamScore(TEAM_ALLIANCE))
         return HORDE;
-        
+
     return Battleground::GetPrematureWinner();
 }

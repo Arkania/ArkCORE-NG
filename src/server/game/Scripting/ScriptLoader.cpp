@@ -1060,9 +1060,7 @@ void AddEasternKingdomsScripts()
     AddSC_instance_the_stockade();
     AddSC_coldridge_valley();
     AddSC_elwynn_forest();
-	AddSC_gilneas_city();
-
-
+    AddSC_gilneas_city();
 #endif
 }
 

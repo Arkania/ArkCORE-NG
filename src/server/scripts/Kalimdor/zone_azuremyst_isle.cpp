@@ -44,35 +44,35 @@ EndContentData */
 
 enum Azuremyst_Isle
 {
-	NPC_DRAENEI_SURVIVOR				= 16483,
-	NPC_NESTLEWOOD_OWLKIN				= 16518,
-	NPC_DEATH_RAVAGER					= 17556,
-	NPC_STILLPINE_CAPITIVE              = 17375,
-	NPC_SPARK_OVERGRIND					= 17243,
-	NPC_MAGWIN							= 17312,
-	NPC_STILLPINE_CAPTIVE				= 17375,
+    NPC_DRAENEI_SURVIVOR                = 16483,
+    NPC_NESTLEWOOD_OWLKIN               = 16518,
+    NPC_DEATH_RAVAGER                   = 17556,
+    NPC_STILLPINE_CAPITIVE              = 17375,
+    NPC_SPARK_OVERGRIND                 = 17243,
+    NPC_MAGWIN                          = 17312,
+    NPC_STILLPINE_CAPTIVE               = 17375,
 
-	GO_BRISTELIMB_CAGE                  = 181714,
+    GO_BRISTELIMB_CAGE                  = 181714,
 
-	QUEST_INOCULATION					= 9303,
-	QUEST_A_CRY_FOR_SAY_HELP			= 9528,
-	QUEST_STRENGTH_ONE					= 9582,
-	QUEST_THE_PROPHECY_OF_AKIDA         = 9544,
-	QUEST_GNOMERCY						= 9537,
+    QUEST_INOCULATION                   = 9303,
+    QUEST_A_CRY_FOR_SAY_HELP            = 9528,
+    QUEST_STRENGTH_ONE                  = 9582,
+    QUEST_THE_PROPHECY_OF_AKIDA         = 9544,
+    QUEST_GNOMERCY                      = 9537,
 
-	SPELL_INOCULATE_NESTLEWOOD_OWLKIN	= 29528,
-	SPELL_IRRIDATION					= 35046,
-    SPELL_STUNNED						= 28630,
-	SPELL_DYNAMITE						= 7978,
-	SPELL_REND							= 13443,
-    SPELL_ENRAGING_BITE					= 30736,
+    SPELL_INOCULATE_NESTLEWOOD_OWLKIN   = 29528,
+    SPELL_IRRIDATION                    = 35046,
+    SPELL_STUNNED                       = 28630,
+    SPELL_DYNAMITE                      = 7978,
+    SPELL_REND                          = 13443,
+    SPELL_ENRAGING_BITE                 = 30736,
 
-	FACTION_HOSTILE						= 14,
+    FACTION_HOSTILE                     = 14,
 
-	AREA_COVE							= 3579,
-    AREA_ISLE							= 3639,      
+    AREA_COVE                           = 3579,
+    AREA_ISLE                           = 3639,
 
-	POINT_INIT                          = 1,
+    POINT_INIT                          = 1,
     EVENT_DESPAWN                       = 1,
 };
 
@@ -128,7 +128,7 @@ public:
         {
             if (CanSayHelp && who->GetTypeId() == TYPEID_PLAYER && me->IsFriendlyTo(who) && me->IsWithinDistInMap(who, 25.0f))
             {                
-				Talk(1); // DoScriptText(RAND(SAY_HELP1, SAY_HELP2, SAY_HELP3, SAY_HELP4), me, who);
+                Talk(1); // DoScriptText(RAND(SAY_HELP1, SAY_HELP2, SAY_HELP3, SAY_HELP4), me, who);
                 SayHelpTimer = 20000;
                 CanSayHelp = false;
             }
@@ -257,7 +257,7 @@ public:
 
         void EnterCombat(Unit* who)
         {
-			Talk(2); // DoScriptText(ATTACK_YELL, me, who);
+            Talk(2); // DoScriptText(ATTACK_YELL, me, who);
         }
 
         void UpdateAI(const uint32 diff)
@@ -266,8 +266,8 @@ public:
             {
                 if (EmoteTimer <= diff)
                 {
-					Talk(12); // DoScriptText(SAY_TEXT, me);                    
-					Talk(1);  // DoScriptText(SAY_EMOTE, me);  // SAY_EMOTE = -1000185,
+                    Talk(12); // DoScriptText(SAY_TEXT, me);
+                    Talk(1);  // DoScriptText(SAY_EMOTE, me);  // SAY_EMOTE = -1000185,
                     EmoteTimer = urand(120000, 150000);
                 } else EmoteTimer -= diff;
             }
@@ -589,22 +589,22 @@ class npc_nestlewood_owlkin : public CreatureScript
         {
             npc_nestlewood_owlkinAI(Creature* creature) : ScriptedAI(creature) { }
 
-			void SpellHit(Unit * Hitter, SpellInfo const* spell) 
-			{		
-				Player* player = Hitter->ToPlayer();
+            void SpellHit(Unit * Hitter, SpellInfo const* spell) 
+            {
+                Player* player = Hitter->ToPlayer();
 
-				if (!player)
-					return;				
+                if (!player)
+                    return;
 
-				if (spell->Id == SPELL_INOCULATE_NESTLEWOOD_OWLKIN )
-				{
-					if (player->GetQuestStatus(QUEST_INOCULATION) == QUEST_STATUS_INCOMPLETE) 
-					{						
-						player->KilledMonsterCredit(NPC_NESTLEWOOD_OWLKIN, NULL);
-						me->DespawnOrUnsummon(0);
-					}									
-				}
-			}                               
+                if (spell->Id == SPELL_INOCULATE_NESTLEWOOD_OWLKIN )
+                {
+                    if (player->GetQuestStatus(QUEST_INOCULATION) == QUEST_STATUS_INCOMPLETE)
+                    {
+                        player->KilledMonsterCredit(NPC_NESTLEWOOD_OWLKIN, NULL);
+                        me->DespawnOrUnsummon(0);
+                    }
+                }
+            }
         };
 
         CreatureAI* GetAI(Creature* creature) const
@@ -623,5 +623,5 @@ void AddSC_azuremyst_isle()
     new go_ravager_cage();
     new npc_stillpine_captive();
     new go_bristlelimb_cage();
-	new npc_nestlewood_owlkin();
+    new npc_nestlewood_owlkin();
 }

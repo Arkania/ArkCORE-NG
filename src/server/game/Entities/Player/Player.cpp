@@ -892,7 +892,7 @@ Player::Player(WorldSession* session): Unit(true), phaseMgr(this)
     SetPendingBind(0, 0);
 
     _activeCheats = CHEAT_NONE;
-    _maxPersonalArenaRate = 0;	
+    _maxPersonalArenaRate = 0;
     _ConquestCurrencyTotalWeekCap = GetCurrencyWeekCap(CURRENCY_TYPE_CONQUEST_META_ARENA, true) + GetCurrencyWeekCap(CURRENCY_TYPE_CONQUEST_META_BG, true);
 
     _canUseMastery = false;
@@ -7614,11 +7614,11 @@ uint32 Player::GetCurrencyWeekCap(uint32 id, bool usePrecision) const
     CurrencyTypesEntry const* entry = sCurrencyTypesStore.LookupEntry(id);
     if (!entry)
         return 0;
-    
+
     uint32 cap = _GetCurrencyWeekCap(entry);
     if(usePrecision && entry->Flags & CURRENCY_FLAG_HIGH_PRECISION)
         cap /= 100;
-    
+
     return cap;
 }
 

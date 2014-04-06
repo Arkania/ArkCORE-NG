@@ -28,8 +28,8 @@ enum eZoneEchoIsle
     NPC_TIKI_TARGET                     = 38038,
     NPC_DOCILE_ISLAND_BOAR              = 38141,
     NPC_WILDMANE_CAT                    = 38046,
-	NPC_DARKSPEAR_JAILOR				= 39062,
-	NPC_CAPTIVE_SPIESCALE_SCOUT			= 38142,
+    NPC_DARKSPEAR_JAILOR                = 39062,
+    NPC_CAPTIVE_SPIESCALE_SCOUT         = 38142,
 
     SPELL_LEAPING_RUSH                  = 75002,
     SPELL_SWIPE                         = 31279,
@@ -196,11 +196,11 @@ public:
 public:
     npc_darkspear_jailor() : CreatureScript("npc_darkspear_jailor") { }
 
-   	bool OnGossipHello(Player* player, Creature* creature) 
-	{
+    bool OnGossipHello(Player* player, Creature* creature) 
+    {
 
-		return true;
-	}   
+        return true;
+    }
 };*/
 
 /*######
@@ -220,6 +220,6 @@ void AddSC_zone_echo_isles()
     new npc_novice_darkspear_warrior();
     new npc_docile_island_boar();
     new npc_wildmane_cat();
-	// new npc_darkspear_jailor();
-	new npc_captive_spitescale_scout();
+    // new npc_darkspear_jailor();
+    new npc_captive_spitescale_scout();
 };

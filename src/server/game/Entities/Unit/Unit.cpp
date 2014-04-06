@@ -176,7 +176,7 @@ Unit::Unit(bool isWorldObject): WorldObject(isWorldObject)
     , m_vehicleKit(NULL)
     , m_unitTypeMask(UNIT_MASK_NONE)
     , m_HostileRefManager(this)
-	, _lastDamagedTime(0)
+    , _lastDamagedTime(0)
 {
 #ifdef _MSC_VER
 #pragma warning(default:4355)
@@ -6914,7 +6914,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
 
                 if (triggered_spell_id && beaconTarget)
                 {
-					Player* caster = ToPlayer();
+                    Player* caster = ToPlayer();
                     int32 percent = 0;
                     switch (procSpell->Id)
                     {

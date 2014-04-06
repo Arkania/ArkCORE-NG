@@ -541,7 +541,7 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recvData)
             _player->SpawnCorpseBones();
         }
 
-		// there is here like in MapManager.cpp as CanPlayerEnter. Dismounting/removing all mount an auras
+        // there is here like in MapManager.cpp as CanPlayerEnter. Dismounting/removing all mount an auras
         _player->Dismount();
         _player->RemoveAurasByType(SPELL_AURA_MOUNTED);
         _player->RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);

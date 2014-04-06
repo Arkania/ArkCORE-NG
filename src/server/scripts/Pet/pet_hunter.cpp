@@ -73,7 +73,7 @@ class npc_pet_hunter_snake_trap : public CreatureScript
 
                 // Start attacking attacker of owner on first ai update after spawn - move in line of sight may choose better target
                 // uncomment FIXME and this 
-				/*if (!me->GetVictim() && me->IsSummon())
+                /*if (!me->GetVictim() && me->IsSummon())
                     if (Unit* owner = me->ToTempSummon()->GetSummoner())
                         if (owner->getAttackerForHelper())
                             AttackStart(owner->getAttackerForHelper());*/

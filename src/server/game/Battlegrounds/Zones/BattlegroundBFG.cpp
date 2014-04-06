@@ -209,7 +209,6 @@ void BattlegroundBFG::AddPlayer(Player* player)
 
 void BattlegroundBFG::RemovePlayer(Player* /*player*/, uint64 /*guid*/, uint32 /*team*/)
 {
-
 }
 
 void BattlegroundBFG::HandleAreaTrigger(Player* player, uint32 trigger)
@@ -226,7 +225,7 @@ void BattlegroundBFG::HandleAreaTrigger(Player* player, uint32 trigger)
         case 3867:                                          // Mine
         case 4020:                                          // Unk1
         case 4021:                                          // Unk2
-			break;
+            break;
         default:
             Battleground::HandleAreaTrigger(player, trigger);
             break;
@@ -234,7 +233,7 @@ void BattlegroundBFG::HandleAreaTrigger(Player* player, uint32 trigger)
 }
 
 /*  type: 0-neutral, 1-contested, 3-occupied
-    teamIndex: 0-ally, 1-horde                        */
+    teamIndex: 0-ally, 1-horde              */
 void BattlegroundBFG::_CreateBanner(uint8 node, uint8 type, uint8 teamIndex, bool delay)
 {
     // Just put it into the queue
@@ -274,7 +273,7 @@ int32 BattlegroundBFG::_GetNodeNameId(uint8 node)
     switch (node)
     {
         case BG_BG_NODE_WATERWORKS: return LANG_BG_BG_NODE_WATERWORKS;
-        case BG_BG_NODE_LIGHTHOUSE:      return LANG_BG_BG_NODE_LIGHTHOUSE;
+        case BG_BG_NODE_LIGHTHOUSE: return LANG_BG_BG_NODE_LIGHTHOUSE;
         case BG_BG_NODE_MINE:       return LANG_BG_BG_NODE_MINE;
         default:
             ASSERT(0);
@@ -543,7 +542,7 @@ bool BattlegroundBFG::SetupBattleground()
             || !AddObject(BG_BG_OBJECT_AURA_ALLY + 8*i,BG_BG_OBJECTID_AURA_A,BG_BG_NodePositions[i][0],BG_BG_NodePositions[i][1],BG_BG_NodePositions[i][2],BG_BG_NodePositions[i][3], 0, 0, std::sin(BG_BG_NodePositions[i][3]/2), std::cos(BG_BG_NodePositions[i][3]/2),RESPAWN_ONE_DAY)
             || !AddObject(BG_BG_OBJECT_AURA_HORDE + 8*i,BG_BG_OBJECTID_AURA_H,BG_BG_NodePositions[i][0],BG_BG_NodePositions[i][1],BG_BG_NodePositions[i][2],BG_BG_NodePositions[i][3], 0, 0, std::sin(BG_BG_NodePositions[i][3]/2), std::cos(BG_BG_NodePositions[i][3]/2),RESPAWN_ONE_DAY)
             || !AddObject(BG_BG_OBJECT_AURA_CONTESTED + 8*i,BG_BG_OBJECTID_AURA_C,BG_BG_NodePositions[i][0],BG_BG_NodePositions[i][1],BG_BG_NodePositions[i][2],BG_BG_NodePositions[i][3], 0, 0, std::sin(BG_BG_NodePositions[i][3]/2), std::cos(BG_BG_NodePositions[i][3]/2),RESPAWN_ONE_DAY)
-)
+            )
         {
             sLog->outErrorDb("BatteGroundBG: Failed to spawn some object Battleground not created!");
             return false;
@@ -697,12 +696,12 @@ uint32 BattlegroundBFG::GetPrematureWinner()
             ++ally;
         else if (m_Nodes[i] == BG_BG_NODE_STATUS_HORDE_OCCUPIED)
             ++horde;
-    
+
     if (ally > horde)
         return ALLIANCE;
     else if (horde > ally)
         return HORDE;
-    
+
     // If the values are equal, fall back to the original result (based on number of players on each team)
     return Battleground::GetPrematureWinner();
 } 

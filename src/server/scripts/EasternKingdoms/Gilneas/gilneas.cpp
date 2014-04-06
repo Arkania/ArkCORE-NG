@@ -40,7 +40,7 @@ enum eGilneas
     NPC_PANICKED_CITIZEN_GATE                       = 44086,
     NPC_GILNEAS_CITY_GUARD_GATE                     = 34864,
     QUEST_LOCKDOWN                                  = 14078,
-    SPELL_SET_PHASE_02                              = 59073, 
+    SPELL_SET_PHASE_02                              = 59073,
     SPELL_GENERIC_QUEST_INVISIBILITY_DERECTION_1    = 49416,
     // phase 2
     NPC_RAMPAGING_WORGEN_1                          = 35660,
@@ -114,7 +114,6 @@ public:
     {
         return new npc_panicked_citizen_gateAI (creature);
     }
-
 };
 
 /*######
