@@ -45,16 +45,16 @@ enum Stinky
 {
     QUEST_STINKYS_ESCAPE_H                       = 1270,
     QUEST_STINKYS_ESCAPE_A                       = 1222,
-    SAY_QUEST_ACCEPTED                           = -1000507,
-    SAY_STAY_1                                   = -1000508,
-    SAY_STAY_2                                   = -1000509,
-    SAY_STAY_3                                   = -1000510,
-    SAY_STAY_4                                   = -1000511,
-    SAY_STAY_5                                   = -1000512,
-    SAY_STAY_6                                   = -1000513,
-    SAY_QUEST_COMPLETE                           = -1000514,
-    SAY_ATTACKED_1                               = -1000515,
-    EMOTE_DISAPPEAR                              = -1000516
+    SAY_QUEST_ACCEPTED                           = 0,
+    SAY_STAY_1                                   = 1,
+    SAY_STAY_2                                   = 2,
+    SAY_STAY_3                                   = 3,
+    SAY_STAY_4                                   = 4,
+    SAY_STAY_5                                   = 5,
+    SAY_STAY_6                                   = 6,
+    SAY_QUEST_COMPLETE                           = 7,
+    SAY_ATTACKED_1                               = 8,
+    EMOTE_DISAPPEAR                              = 9
 };
 
 class npc_stinky : public CreatureScript
@@ -75,7 +75,7 @@ public:
              {
                  creature->setFaction(FACTION_ESCORT_N_NEUTRAL_ACTIVE);
                  creature->SetStandState(UNIT_STAND_STATE_STAND);
-                 DoScriptText(SAY_QUEST_ACCEPTED, creature);
+                 creature->AI()->Talk(SAY_QUEST_ACCEPTED);
                  pEscortAI->Start(false, false, player->GetGUID());
              }
          }
@@ -95,29 +95,29 @@ public:
             switch (waypointId)
             {
                 case 7:
-                    DoScriptText(SAY_STAY_1, me, player);
+                    Talk(SAY_STAY_1, player->GetGUID());
                     break;
                 case 11:
-                    DoScriptText(SAY_STAY_2, me, player);
+                    Talk(SAY_STAY_2, player->GetGUID());
                     break;
                 case 25:
-                    DoScriptText(SAY_STAY_3, me, player);
+                    Talk(SAY_STAY_3, player->GetGUID());
                     break;
                 case 26:
-                    DoScriptText(SAY_STAY_4, me, player);
+                    Talk(SAY_STAY_4, player->GetGUID());
                     break;
                 case 27:
-                    DoScriptText(SAY_STAY_5, me, player);
+                    Talk(SAY_STAY_5, player->GetGUID());
                     break;
                 case 28:
-                    DoScriptText(SAY_STAY_6, me, player);
+                    Talk(SAY_STAY_6, player->GetGUID());
                     me->SetStandState(UNIT_STAND_STATE_KNEEL);
                     break;
                 case 29:
                     me->SetStandState(UNIT_STAND_STATE_STAND);
                     break;
                 case 37:
-                    DoScriptText(SAY_QUEST_COMPLETE, me, player);
+                    Talk(SAY_QUEST_COMPLETE, player->GetGUID());
                     me->SetSpeed(MOVE_RUN, 1.2f, true);
                     me->SetWalk(false);
                     if (player->GetQuestStatus(QUEST_STINKYS_ESCAPE_H))
@@ -126,14 +126,14 @@ public:
                         player->GroupEventHappens(QUEST_STINKYS_ESCAPE_A, me);
                     break;
                 case 39:
-                    DoScriptText(EMOTE_DISAPPEAR, me);
+                    Talk(EMOTE_DISAPPEAR);
                     break;
             }
         }
 
         void EnterCombat(Unit* who)
         {
-            DoScriptText(SAY_ATTACKED_1, me, who);
+            Talk(SAY_ATTACKED_1, who->GetGUID());
         }
 
         void Reset() {}

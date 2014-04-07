@@ -30,12 +30,11 @@ EndScriptData */
 
 enum eEnums
 {
-    SAY_ENTER                   = -1269006,
-    SAY_AGGRO                   = -1269007,
-    SAY_BANISH                  = -1269008,
-    SAY_SLAY1                   = -1269009,
-    SAY_SLAY2                   = -1269010,
-    SAY_DEATH                   = -1269011,
+    SAY_ENTER                   = 0,
+    SAY_AGGRO                   = 1,
+    SAY_BANISH                  = 2,
+    SAY_SLAY                    = 3,
+    SAY_DEATH                   = 4,
 
     SPELL_ARCANE_BLAST          = 31457,
     H_SPELL_ARCANE_BLAST        = 38538,
@@ -79,7 +78,7 @@ public:
 
         void EnterCombat(Unit* /*who*/)
         {
-            DoScriptText(SAY_AGGRO, me);
+            Talk(SAY_AGGRO);
         }
 
         void MoveInLineOfSight(Unit* who)
@@ -89,7 +88,7 @@ public:
             {
                 if (me->IsWithinDistInMap(who, 20.0f))
                 {
-                    DoScriptText(SAY_BANISH, me);
+                    Talk(SAY_BANISH);
                     me->DealDamage(who, who->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
                 }
             }
@@ -99,12 +98,12 @@ public:
 
         void KilledUnit(Unit* /*victim*/)
         {
-            DoScriptText(RAND(SAY_SLAY1, SAY_SLAY2), me);
+            Talk(SAY_SLAY);
         }
 
         void JustDied(Unit* /*killer*/)
         {
-            DoScriptText(SAY_DEATH, me);
+            Talk(SAY_DEATH);
 
             if (instance)
                 instance->SetData(TYPE_RIFT, SPECIAL);
@@ -138,7 +137,7 @@ public:
             //Time Lapse
             if (TimeLapse_Timer <= diff)
             {
-                DoScriptText(SAY_BANISH, me);
+                Talk(SAY_BANISH);
                 DoCast(me, SPELL_TIME_LAPSE);
                 TimeLapse_Timer = 15000+rand()%10000;
             }

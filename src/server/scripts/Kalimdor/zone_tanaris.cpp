@@ -222,13 +222,11 @@ public:
 
 enum Npc00X17
 {
-    //texts are signed for 7806
-    SAY_OOX_START           = -1000287,
-    SAY_OOX_AGGRO1          = -1000288,
-    SAY_OOX_AGGRO2          = -1000289,
-    SAY_OOX_AMBUSH          = -1000290,
-    SAY_OOX17_AMBUSH_REPLY  = -1000291,
-    SAY_OOX_END             = -1000292,
+    SAY_OOX_START           = 0,
+    SAY_OOX_AGGRO           = 1,
+    SAY_OOX_AMBUSH          = 2,
+    SAY_OOX17_AMBUSH_REPLY  = 0,
+    SAY_OOX_END             = 3,
 
     Q_OOX17                 = 648,
     SPAWN_FIRST             = 7803,
@@ -249,7 +247,7 @@ public:
             creature->SetFullHealth();
             creature->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
             creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-            DoScriptText(SAY_OOX_START, creature);
+            creature->AI()->Talk(SAY_OOX_START);
 
             if (npc_escortAI* pEscortAI = CAST_AI(npc_OOX17::npc_OOX17AI, creature->AI()))
                 pEscortAI->Start(true, false, player->GetGUID());
@@ -276,18 +274,18 @@ public:
                         me->SummonCreature(SPAWN_FIRST, -8350.96f, -4445.79f, 10.10f, 6.20f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
                         me->SummonCreature(SPAWN_FIRST, -8355.96f, -4447.79f, 10.10f, 6.27f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
                         me->SummonCreature(SPAWN_FIRST, -8353.96f, -4442.79f, 10.10f, 6.08f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
-                        DoScriptText(SAY_OOX_AMBUSH, me);
+                        Talk(SAY_OOX_AMBUSH);
                         break;
                     case 56:
                         me->SummonCreature(SPAWN_SECOND_1, -7510.07f, -4795.50f, 9.35f, 6.06f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
                         me->SummonCreature(SPAWN_SECOND_2, -7515.07f, -4797.50f, 9.35f, 6.22f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
                         me->SummonCreature(SPAWN_SECOND_2, -7518.07f, -4792.50f, 9.35f, 6.22f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
-                        DoScriptText(SAY_OOX_AMBUSH, me);
-                        if (Unit* scoff = me->FindNearestCreature(SPAWN_SECOND_2, 30))
-                            DoScriptText(SAY_OOX17_AMBUSH_REPLY, scoff);
+                        Talk(SAY_OOX_AMBUSH);
+                        if (Creature* scoff = me->FindNearestCreature(SPAWN_SECOND_2, 30))
+                            scoff->AI()->Talk(SAY_OOX17_AMBUSH_REPLY);
                         break;
                     case 86:
-                        DoScriptText(SAY_OOX_END, me);
+                        Talk(SAY_OOX_END);
                         player->GroupEventHappens(Q_OOX17, me);
                         break;
                 }
@@ -298,7 +296,7 @@ public:
 
         void EnterCombat(Unit* /*who*/)
         {
-            DoScriptText(RAND(SAY_OOX_AGGRO1, SAY_OOX_AGGRO2), me);
+            Talk(SAY_OOX_AGGRO);
         }
 
         void JustSummoned(Creature* summoned)

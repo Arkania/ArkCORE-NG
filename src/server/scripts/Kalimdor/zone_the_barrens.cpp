@@ -41,14 +41,14 @@ EndContentData */
 
 enum Wizzlecrank
 {
-    SAY_START           = -1000298,
-    SAY_STARTUP1        = -1000299,
-    SAY_STARTUP2        = -1000300,
-    SAY_MERCENARY       = -1000301,
-    SAY_PROGRESS_1      = -1000302,
-    SAY_PROGRESS_2      = -1000303,
-    SAY_PROGRESS_3      = -1000304,
-    SAY_END             = -1000305,
+    SAY_MERCENARY       = 0,
+    SAY_START           = 0,
+    SAY_STARTUP1        = 1,
+    SAY_STARTUP2        = 2,
+    SAY_PROGRESS_1      = 3,
+    SAY_PROGRESS_2      = 4,
+    SAY_PROGRESS_3      = 5,
+    SAY_END             = 6,
 
     QUEST_ESCAPE        = 863,
     FACTION_RATCHET     = 637,
@@ -92,7 +92,7 @@ public:
             switch (waypointId)
             {
                 case 0:
-                    DoScriptText(SAY_STARTUP1, me);
+                    Talk(SAY_STARTUP1);
                     break;
                 case 9:
                     SetRun(false);
@@ -100,7 +100,7 @@ public:
                 case 17:
                     if (Creature* temp = me->SummonCreature(NPC_MERCENARY, 1128.489f, -3037.611f, 92.701f, 1.472f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 120000))
                     {
-                        DoScriptText(SAY_MERCENARY, temp);
+                        temp->AI()->Talk(SAY_MERCENARY);
                         me->SummonCreature(NPC_MERCENARY, 1160.172f, -2980.168f, 97.313f, 3.690f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 120000);
                     }
                     break;
@@ -120,10 +120,10 @@ public:
             switch (PointId)
             {
                 case 9:
-                    DoScriptText(SAY_STARTUP2, me, player);
+                    Talk(SAY_STARTUP2, player->GetGUID());
                     break;
                 case 18:
-                    DoScriptText(SAY_PROGRESS_1, me, player);
+                    Talk(SAY_PROGRESS_1, player->GetGUID());
                     SetRun();
                     break;
             }
@@ -149,13 +149,13 @@ public:
                         switch (PostEventCount)
                         {
                             case 0:
-                                DoScriptText(SAY_PROGRESS_2, me);
+                                Talk(SAY_PROGRESS_2);
                                 break;
                             case 1:
-                                DoScriptText(SAY_PROGRESS_3, me);
+                                Talk(SAY_PROGRESS_3);
                                 break;
                             case 2:
-                                DoScriptText(SAY_END, me);
+                                Talk(SAY_END);
                                 break;
                             case 3:
                                 if (Player* player = GetPlayerForEscort())

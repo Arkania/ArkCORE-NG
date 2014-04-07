@@ -30,19 +30,18 @@ EndScriptData */
 #include "Group.h"
 #include "Player.h"
 
-#define SAY_AGGRO1                  -1531000
-#define SAY_AGGRO2                  -1531001
-#define SAY_AGGRO3                  -1531002
-#define SAY_SLAY1                   -1531003
-#define SAY_SLAY2                   -1531004
-#define SAY_SLAY3                   -1531005
-#define SAY_SPLIT                   -1531006
-#define SAY_DEATH                   -1531007
-
-#define SPELL_ARCANE_EXPLOSION      25679
-#define SPELL_EARTH_SHOCK           26194
-#define SPELL_TRUE_FULFILLMENT      785
-#define SPELL_BLINK                 28391
+enum Skeram
+{
+    SAY_AGGRO                   = 0,
+    SAY_SLAY                    = 1,
+    SAY_SPLIT                   = 2,
+    SAY_DEATH                   = 3,
+    
+    SPELL_ARCANE_EXPLOSION      = 25679,
+    SPELL_EARTH_SHOCK           = 26194,
+    SPELL_TRUE_FULFILLMENT      = 785,
+    SPELL_BLINK                 = 28391
+};
 
 class ov_mycoordinates
 {
@@ -105,20 +104,20 @@ public:
 
         void KilledUnit(Unit* /*victim*/)
         {
-            DoScriptText(RAND(SAY_SLAY1, SAY_SLAY2, SAY_SLAY3), me);
+            Talk(SAY_SLAY);
         }
 
         void JustDied(Unit* /*killer*/)
         {
             if (!IsImage)
-                DoScriptText(SAY_DEATH, me);
+                Talk(SAY_DEATH);
         }
 
         void EnterCombat(Unit* /*who*/)
         {
             if (IsImage || Images75)
                 return;
-            DoScriptText(RAND(SAY_AGGRO1, SAY_AGGRO2, SAY_AGGRO3), me);
+            Talk(SAY_AGGRO);
         }
 
         void UpdateAI(const uint32 diff)

@@ -128,7 +128,7 @@ public:
         {
             if (CanSayHelp && who->GetTypeId() == TYPEID_PLAYER && me->IsFriendlyTo(who) && me->IsWithinDistInMap(who, 25.0f))
             {                
-                Talk(1); // DoScriptText(RAND(SAY_HELP1, SAY_HELP2, SAY_HELP3, SAY_HELP4), me, who);
+                Talk(1, who->GetGUID());
                 SayHelpTimer = 20000;
                 CanSayHelp = false;
             }
@@ -156,7 +156,7 @@ public:
 
                     if (Player* player = Unit::GetPlayer(*me, pCaster))
                     {
-                        Talk(0); // DoScriptText(RAND(SAY_HEAL1, SAY_HEAL2, SAY_HEAL3, SAY_HEAL4), me, player);
+                        Talk(0, player->GetGUID());
                         player->TalkedToCreature(me->GetEntry(), me->GetGUID()); // ?? gpn39f ask: what is this
                     }
 
@@ -257,7 +257,7 @@ public:
 
         void EnterCombat(Unit* who)
         {
-            Talk(2); // DoScriptText(ATTACK_YELL, me, who);
+            Talk(2, who->GetGUID());
         }
 
         void UpdateAI(const uint32 diff)
@@ -368,17 +368,17 @@ public:
                 switch (waypointId)
                 {
                     case 0:
-                        Talk(0); // DoScriptText(SAY_START, me, player);
+                        Talk(0, player->GetGUID());
                         break;
                     case 17:
-                        Talk(2); // DoScriptText(SAY_PROGRESS, me, player);
+                        Talk(2, player->GetGUID());
                         break;
                     case 28:
-                        Talk(3); // DoScriptText(SAY_END1, me, player);
+                        Talk(3, player->GetGUID());
                         break;
                     case 29:
-                        Talk(5); // DoScriptText(EMOTE_HUG, me, player);
-                        Talk(4); // DoScriptText(SAY_END2, me, player);
+                        Talk(5, player->GetGUID());
+                        Talk(4, player->GetGUID());
                         player->GroupEventHappens(QUEST_A_CRY_FOR_SAY_HELP, me);
                         break;
                 }
@@ -387,7 +387,7 @@ public:
 
         void EnterCombat(Unit* who)
         {
-            Talk(1); // DoScriptText(SAY_AGGRO, me, who);
+            Talk(1, who->GetGUID());
         }
 
         void Reset() {}
@@ -489,9 +489,7 @@ class npc_stillpine_captive : public CreatureScript
 
         struct npc_stillpine_captiveAI : public ScriptedAI
         {
-            npc_stillpine_captiveAI(Creature* creature) : ScriptedAI(creature)
-            {
-            }
+            npc_stillpine_captiveAI(Creature* creature) : ScriptedAI(creature) { }
 
             void Reset()
             {
@@ -509,7 +507,7 @@ class npc_stillpine_captive : public CreatureScript
             {
                 if (owner)
                 {
-                    Talk(0); // DoScriptText(RAND(CAPITIVE_SAY_1, CAPITIVE_SAY_2, CAPITIVE_SAY_3), me, owner);
+                    Talk(0, owner->GetGUID());
                     _player = owner;
                 }
                 Position pos;

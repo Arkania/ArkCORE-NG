@@ -497,6 +497,7 @@ enum WorldStates
 {
     WS_WEEKLY_QUEST_RESET_TIME          = 20002,                      // Next weekly reset time
     WS_BG_DAILY_RESET_TIME              = 20003,                      // Next daily BG reset time
+    WS_MONTHLY_QUEST_RESET_TIME         = 20004,                      // Next monthly reset time
     WS_GUILD_DAILY_RESET_TIME           = 20006,                      // Next guild cap reset time
     WS_WEEKLY_REP_RESET_TIME            = 20007                       // Next guild reputation week reset time
 };
@@ -775,12 +776,14 @@ class World
 
         void InitDailyQuestResetTime();
         void InitWeeklyQuestResetTime();
+        void InitMonthlyQuestResetTime();
         void InitWeeklyGuildReputationResetTime();
         void InitRandomBGResetTime();
         void InitGuildResetTime();
         void InitCurrencyResetTime();
         void ResetDailyQuests();
         void ResetWeeklyQuests();
+        void ResetMonthlyQuests();
         void ResetWeeklyGuildReputation();
         void ResetRandomBG();
         void ResetGuildCap();
@@ -844,6 +847,7 @@ class World
         // scheduled reset times
         time_t m_NextDailyQuestReset;
         time_t m_NextWeeklyQuestReset;
+        time_t m_NextMonthlyQuestReset;
         time_t m_NextRandomBGReset;
         time_t m_NextDailyXPReset;
         time_t m_NextHourlyXPReset;

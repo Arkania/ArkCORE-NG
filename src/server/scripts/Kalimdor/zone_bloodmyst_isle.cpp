@@ -159,7 +159,7 @@ enum Stillpine
     NPC_PRINCESS_STILLPINE                        = 17682,
     GO_PRINCESS_STILLPINES_CAGE                   = 181928,
     SPELL_OPENING_PRINCESS_STILLPINE_CREDIT       = 31003,
-    SAY_DIRECTION                                 = -1800074
+    SAY_DIRECTION                                 = 0
 };
 
 class go_princess_stillpines_cage : public GameObjectScript
@@ -192,7 +192,7 @@ public:
         {
             if (type == POINT_MOTION_TYPE && id == 1)
             {
-                DoScriptText(SAY_DIRECTION, me);
+                Talk(SAY_DIRECTION);
                 me->DespawnOrUnsummon();
             }
         }
