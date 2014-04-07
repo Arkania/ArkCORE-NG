@@ -112,7 +112,7 @@ public:
                 for (std::list<uint64>::const_iterator itr = Crystals.begin(); itr != Crystals.end(); ++itr)
                 {
                     //Unit* unit = Unit::GetUnit(*me, FelCrystals[i]);
-                    if (Creature *creature = Unit::GetCreature(*me, *itr))
+                    if (Creature* creature = Unit::GetCreature(*me, *itr))
                     {
                         if (!creature->IsAlive())
                             creature->Respawn();      // Let the core handle setting death state, etc.

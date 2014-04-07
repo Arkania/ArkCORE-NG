@@ -200,8 +200,9 @@ void ReputationMgr::SendState(FactionState const* faction)
 
 void ReputationMgr::SendInitialReputations()
 {
-    WorldPacket data(SMSG_INITIALIZE_FACTIONS, (4+256*5));
-    data << uint32(256);    // count
+    uint16 count = 256;
+    WorldPacket data(SMSG_INITIALIZE_FACTIONS, 4 + count * 5);
+    data << uint32(count);
 
     RepListID a = 0;
 
@@ -224,10 +225,10 @@ void ReputationMgr::SendInitialReputations()
     }
 
     // fill in absent fields
-    for (; a != 256; ++a)
+    for (; a != count; ++a)
     {
-        data << uint8  (0x00);
-        data << uint32 (0x00000000);
+        data << uint8(0);
+        data << uint32(0);
     }
 
     _player->SendDirectMessage(&data);

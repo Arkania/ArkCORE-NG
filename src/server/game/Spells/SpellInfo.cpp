@@ -1006,7 +1006,6 @@ float SpellEffectInfo::CalcRadius(bool positive, Unit* caster, Spell* spell) con
             return 25.0f;
           case 103785: // Morchok Black Blood.
             return 150.0f;
-            
           default:
             return 0.0f;
           break;
@@ -1014,13 +1013,13 @@ float SpellEffectInfo::CalcRadius(bool positive, Unit* caster, Spell* spell) con
     }
 
     float radius;
-    if(positive)
-        radius = RadiusEntry->radiusFriend;
+    if (positive)
+        radius = RadiusEntry->RadiusMax;
     else
-        radius = RadiusEntry->radiusHostile;
+        radius = RadiusEntry->RadiusMin;
     if (caster)
-    if (Player* modOwner = caster->GetSpellModOwner())
-        modOwner->ApplySpellMod(_spellInfo->Id, SPELLMOD_RADIUS, radius, spell);
+        if (Player* modOwner = caster->GetSpellModOwner())
+            modOwner->ApplySpellMod(_spellInfo->Id, SPELLMOD_RADIUS, radius, spell);
 
     return radius;
 }

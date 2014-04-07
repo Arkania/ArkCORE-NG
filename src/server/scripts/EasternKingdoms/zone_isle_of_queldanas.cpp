@@ -39,10 +39,12 @@ EndContentData */
 ## npc_converted_sentry
 ######*/
 
-#define SAY_CONVERTED_1         -1000188
-#define SAY_CONVERTED_2         -1000189
+enum ConvertedSentry
+{
+    SAY_CONVERTED           = 0,
 
-#define SPELL_CONVERT_CREDIT    45009
+    SPELL_CONVERT_CREDIT    = 45009
+};
 
 class npc_converted_sentry : public CreatureScript
 {
@@ -77,10 +79,7 @@ public:
                 if (Timer <= diff)
                 {
                     uint32 i = urand(1, 2);
-                    if (i == 1)
-                        DoScriptText(SAY_CONVERTED_1, me);
-                    else
-                        DoScriptText(SAY_CONVERTED_2, me);
+                    Talk(SAY_CONVERTED);
 
                     DoCast(me, SPELL_CONVERT_CREDIT);
                     if (me->IsPet())

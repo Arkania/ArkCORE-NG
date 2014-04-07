@@ -26775,14 +26775,6 @@ VoidStorageItem* Player::GetVoidStorageItem(uint64 id, uint8& slot) const
     return NULL;
 }
 
-bool Player::SetHover(bool enable)
-{
-    if (!Unit::SetHover(enable))
-        return false;
-
-    return true;
-}
-
 void Player::SendMovementSetCanFly(bool apply)
 {
     WorldPacket data(apply ? SMSG_MOVE_SET_CAN_FLY : SMSG_MOVE_UNSET_CAN_FLY, 12);

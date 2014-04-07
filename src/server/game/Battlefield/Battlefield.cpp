@@ -994,9 +994,9 @@ bool BfCapturePoint::SetCapturePointData(GameObject* capturePoint)
     return true;
 }
 
-GameObject* BfCapturePoint::GetCapturePointGo() 
-{ 
-    return m_Bf->GetGameObject(m_capturePointGUID); 
+GameObject* BfCapturePoint::GetCapturePointGo()
+{
+    return m_Bf->GetGameObject(m_capturePointGUID);
 }
 
 bool BfCapturePoint::DelCapturePoint()

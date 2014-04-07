@@ -354,7 +354,7 @@ void WorldSession::HandleMoveSetCanFlyAckOpcode(WorldPacket& recvData)
     _player->m_mover->m_movementInfo.flags = movementInfo.GetMovementFlags();
 }
 
-void WorldSession::HandleMoveKnockBackAck(WorldPacket & recvData)
+void WorldSession::HandleMoveKnockBackAck(WorldPacket& recvData)
 {
     sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_MOVE_KNOCK_BACK_ACK");
 

@@ -112,8 +112,8 @@ enum SpellLinkedType
 };
 
 // Different spell properties
-inline float GetSpellRadiusForHostile(SpellRadiusEntry const *radius) { return (radius ? radius->radiusHostile : 0); }
-inline float GetSpellRadiusForFriend(SpellRadiusEntry const *radius) { return (radius ? radius->radiusFriend : 0); }
+inline float GetSpellRadiusForHostile(SpellRadiusEntry const *radius) { return (radius ? radius->RadiusMin : 0); }
+inline float GetSpellRadiusForFriend(SpellRadiusEntry const *radius) { return (radius ? radius->RadiusMax : 0); }
 inline float GetSpellMinRangeForHostile(SpellRangeEntry const *range) { return (range ? range->minRangeHostile : 0); }
 inline float GetSpellMaxRangeForHostile(SpellRangeEntry const *range) { return (range ? range->maxRangeHostile : 0); }
 inline float GetSpellMinRangeForFriend(SpellRangeEntry const *range) { return (range ? range->minRangeFriend : 0); }

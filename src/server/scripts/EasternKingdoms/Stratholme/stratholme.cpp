@@ -85,11 +85,10 @@ public:
 ## npc_freed_soul
 ######*/
 
-//Possibly more of these quotes around.
-#define SAY_ZAPPED0 -1329000
-#define SAY_ZAPPED1 -1329001
-#define SAY_ZAPPED2 -1329002
-#define SAY_ZAPPED3 -1329003
+enum FreedSoul
+{
+    SAY_ZAPPED = 0
+};
 
 class npc_freed_soul : public CreatureScript
 {
@@ -107,7 +106,7 @@ public:
 
         void Reset()
         {
-            DoScriptText(RAND(SAY_ZAPPED0, SAY_ZAPPED1, SAY_ZAPPED2, SAY_ZAPPED3), me);
+            Talk(SAY_ZAPPED);
         }
 
         void EnterCombat(Unit* /*who*/) {}

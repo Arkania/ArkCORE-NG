@@ -18,6 +18,7 @@
  */
 
 #include "Common.h"
+#include "AchievementMgr.h"
 #include "CharacterDatabaseCleaner.h"
 #include "World.h"
 #include "Database/DatabaseEnv.h"

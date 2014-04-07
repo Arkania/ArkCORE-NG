@@ -32,7 +32,7 @@ class LfgPlayerData
 
         // General
         void SetState(LfgState state);
-        void ClearState();
+        void RestoreState();
         void SetLockedDungeons(LfgLockMap const& lock);
         void SetTeam(uint8 team);
         void SetGroup(uint64 group);
@@ -57,7 +57,7 @@ class LfgPlayerData
     private:
         // General
         LfgState m_State;                                  ///< State if group in LFG
-        LfgState m_OldState;                               ///< Old State
+        LfgState m_OldState;                               ///< Old State - Used to restore state after failed Rolecheck/Proposal
         // Player
         LfgLockMap m_LockedDungeons;                       ///< Dungeons player can't do and reason
         uint8 m_Team;                                      ///< Player team - determines the queue to join
