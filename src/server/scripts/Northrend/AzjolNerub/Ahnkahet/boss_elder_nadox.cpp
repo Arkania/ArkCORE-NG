@@ -202,19 +202,20 @@ class boss_elder_nadox : public CreatureScript
         }
 };
 
-class npc_ahnkahar_nerubian : public CreatureScript
+enum AddSpells
 {
     SPELL_SPRINT                                  = 56354,
     SPELL_GUARDIAN_AURA                           = 56151
 };
 
+class npc_ahnkahar_nerubian : public CreatureScript
 {
     public:
         npc_ahnkahar_nerubian() : CreatureScript("npc_ahnkahar_nerubian") { }
 
         struct npc_ahnkahar_nerubianAI : public ScriptedAI
         {
-            npc_ahnkahar_nerubianAI(Creature* creature) : ScriptedAI(creature) { }
+            npc_ahnkahar_nerubianAI(Creature* creature) : ScriptedAI(creature)
             {
                 instance = me->GetInstanceScript();
             }

@@ -509,8 +509,8 @@ void WorldSession::HandleQuestgiverCompleteQuest(WorldPacket& recvData)
 {
     uint32 questId;
     uint64 playerGuid;
-    int8 unkByte;
-    recvData >> playerGuid >> questId >> unkByte;
+    bool autoCompleteMode; 
+    recvData >> playerGuid >> questId >> autoCompleteMode;
 
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_QUESTGIVER_COMPLETE_QUEST npc = %u, questId = %u", uint32(GUID_LOPART(playerGuid)), questId);
 
@@ -521,9 +521,10 @@ void WorldSession::HandleQuestgiverCompleteQuest(WorldPacket& recvData)
     if (autoCompleteMode == 0)
     {
        
-    // some kind of WPE protection
-    if (!_player->CanInteractWithQuestGiver(object))
-        return;
+        // some kind of WPE protection
+        if (!_player->CanInteractWithQuestGiver(object))
+            return;
+    }
 
     if (Quest const* quest = sObjectMgr->GetQuestTemplate(questId))
     {
@@ -551,7 +552,7 @@ void WorldSession::HandleQuestgiverCompleteQuest(WorldPacket& recvData)
             if (quest->GetReqItemsCount())                  // some items required
                 _player->PlayerTalkClass->SendQuestGiverRequestItems(quest, playerGuid, _player->CanRewardQuest(quest, false), false);
             else                                            // no items required
-                _player->PlayerTalkClass->SendQuestGiverOfferReward(quest, playerGuid, true);
+                _player->PlayerTalkClass->SendQuestGiverOfferReward(quest, playerGuid, !autoCompleteMode);
         }
 
         if (Creature* creature = object->ToCreature())

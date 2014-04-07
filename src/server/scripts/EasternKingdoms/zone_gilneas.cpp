@@ -414,7 +414,7 @@ public:
 
     struct npc_gilneas_city_guard_phase2AI : public ScriptedAI
     {
-        npc_gilneas_city_guard_phase2AI(Creature* creature) : Scripted_NoMovementAI(creature) { }
+        npc_gilneas_city_guard_phase2AI(Creature* creature) : ScriptedAI(creature) { }
 
 		uint32 _timer;   
 

@@ -18398,6 +18398,7 @@ void Unit::JumpTo(WorldObject* obj, float speedZ)
 
 bool Unit::HandleSpellClick(Unit* clicker, int8 seatId)
 {
+    bool result = false;
     uint32 spellClickEntry = GetVehicleKit() ? GetVehicleKit()->GetCreatureEntry() : GetEntry();
     SpellClickInfoMapBounds clickPair = sObjectMgr->GetSpellClickInfoMapBounds(spellClickEntry);
     for (SpellClickInfoContainer::const_iterator itr = clickPair.first; itr != clickPair.second; ++itr)
@@ -18458,13 +18459,14 @@ bool Unit::HandleSpellClick(Unit* clicker, int8 seatId)
             else
                 Aura::TryRefreshStackOrCreate(spellEntry, MAX_EFFECT_MASK, this, clicker, NULL, NULL, origCasterGUID);
         }
+        result = true;
     }
 
     Creature* creature = ToCreature();
     if (creature && creature->IsAIEnabled)
-        creature->AI()->OnSpellClick(clicker);
+        creature->AI()->OnSpellClick(clicker, result);
 
-    return true;
+    return result;
 }
 
 void Unit::EnterVehicle(Unit* base, int8 seatId)

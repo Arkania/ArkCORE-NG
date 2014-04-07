@@ -158,7 +158,7 @@ enum SMART_EVENT
     SMART_EVENT_ON_SPELLCLICK            = 73,      // clicker (unit)
     SMART_EVENT_FRIENDLY_HEALTH_PCT      = 74,      // minHpPct, maxHpPct, repeatMin, repeatMax
 
-    SMART_EVENT_END                      = 74,
+    SMART_EVENT_END                      = 75,
 };
 
 struct SmartEvent

@@ -23,6 +23,7 @@
 #include "Log.h"
 #include "Opcodes.h"
 #include "SpellMgr.h"
+#include "World.h"
 #include "GameObjectAI.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
