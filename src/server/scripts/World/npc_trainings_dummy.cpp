@@ -101,7 +101,7 @@ public:
 						{
 							if (Hitter->getRace()==RACE_TROLL)
 							{
-								// if (spell->Id==122) player->KilledMonsterCredit (44175);
+								if (spell->Id==122) player->KilledMonsterCredit (44175);
 								if (spell->Id==133) player->KilledMonsterCredit (44175);
 								if (spell->Id==2136) player->KilledMonsterCredit (44175);
 							}
@@ -116,6 +116,7 @@ public:
 				case CLASS_WARLOCK:
 					{
 						if (spell->Id==172) player->KilledMonsterCredit (44175);
+                        if (spell->Id==2098) player->KilledMonsterCredit (44175);
 						break;
 					}
 				case CLASS_DRUID:

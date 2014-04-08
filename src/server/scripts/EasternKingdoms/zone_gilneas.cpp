@@ -250,40 +250,65 @@ public:
     {
         npc_prince_liam_greymane_phase1AI(Creature* creature) : ScriptedAI(creature) {}
 
-        uint32 uiSayTimer;
-        uint8 uiSayCount;
+        uint32  _timer;        
+        uint8   _phase;
 
         void Reset()
         {
-            uiSayTimer = 1000;
-            uiSayCount = 0;
+            _timer = 1000;            
+            _phase=0;
         }
 
         void UpdateAI(const uint32 diff)
         {
-            if (uiSayTimer <= diff)
-            {
-                ++uiSayCount;
+            Player* player = me->FindNearestPlayer(30,true);
 
-                switch (uiSayCount)
-                {
+            if (_timer <= diff)
+                DoWork(player);
+            else
+                _timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+
+        }
+         
+
+        void DoWork(Player* player)
+        {
+            _timer=5000;
+            switch(_phase)
+            {
+                case 0:
+                    if (player)
+                    { 
+                        _phase=1; 
+                        _timer=75000;                    
+                    }
+                    break;
                 case 1:
-                    Talk(0, me->GetGUID());
-                    uiSayTimer = 15000;
+                     Talk(0);
+                    _timer = 15000;
+                    _phase=2;
                     break;
                 case 2:
-                    Talk(1, me->GetGUID());
-                    uiSayTimer = 18000;
+                     Talk(1);
+                    _timer = 18000;
+                    _phase=3;
                     break;
                 case 3:
-                    Talk(2, me->GetGUID());
-                    uiSayTimer = 25000;
-                    uiSayCount = 0;
+                     Talk(2);
+                    _timer = 25000;
+                    _phase=4;
                     break;
-                }
+                case 4:
+                    _timer = 30000;
+                    _phase=1;
+                    if (!player)
+                        _phase=0;
             }
-            else
-                uiSayTimer -= diff;
         }
     };
 
@@ -336,12 +361,14 @@ public:
 
 	public:
 		bool		_fightWithPrinceLiam;
+        bool        _enrage;
 		uint32		_timer;
 		Creature*	_liam;
 		
         void Reset()
         {					
 			_timer = urand(1800,2200); 
+            _enrage = false;
         }
        
 		void StartFightWithPrinceLiam(Creature* liam)
@@ -350,50 +377,49 @@ public:
 			_fightWithPrinceLiam=true;
 			Position pos;			
 			liam->GetNearPosition(pos, 1.5f, 0.0f);
-			me->GetMotionMaster()->MovePoint(1005, pos);
-			me->setFaction(2179);
+			me->GetMotionMaster()->MovePoint(1005, pos);			
 		}
 		
+        void MovementInform(uint32 /*type*/, uint32 id) 
+		{ 
+			if (id=1005)
+			{								
+                me->setFaction(2179);
+                me->CombatStart(_liam);
+			}		
+		}
+
+        void DamageTaken(Unit* /*pDone_by*/, uint32& /*uiDamage*/) 
+        { 
+            if (me->GetHealthPct() < 30 && !_enrage)
+            { 
+                me->CastSpell(me,SPELL_ENRAGE);
+                _enrage = true;
+            }
+        }
+
         void UpdateAI(const uint32 diff)
-        {
+        {            
             if (!UpdateVictim())
-                if(_fightWithPrinceLiam)
-                    return;
-                else
-                    DoShowFight(diff);
+                DoShowFight(diff);
 			else
 				DoMeleeAttackIfReady();
         }
 
-		void AttackStart(Unit* who) 
-		{ 			
-			me->SetReactState(REACT_AGGRESSIVE);
-			me->SetInCombatWith(who);
-			who->SetInCombatWith(me);
-			me->AddThreat(who, 100500);
-		}
-
-		void MovementInform(uint32 type, uint32 id) 
-		{ 
-			if (id=1005)
-			{				
-				me->CombatStart(_liam);	
-			}		
-		}
-
 		void DoShowFight(uint32 diff)
 		{			
-            if (Creature* guard = me->FindNearestCreature (NPC_GILNEAS_CITY_GUARD_PHASE2, 3.0f))
-            {
+           
 				if (_timer <= diff)
 				{
-					me->SetFacingTo (me->GetAngle(guard));
-					me->HandleEmoteCommand(EMOTE_ONESHOT_ATTACK1H);
-					_timer = urand(1800,2200);
+                    if (Creature* guard = me->FindNearestCreature (NPC_GILNEAS_CITY_GUARD_PHASE2, 3.0f))
+                    {
+					    me->SetFacingTo (me->GetAngle(guard));
+					    me->HandleEmoteCommand(EMOTE_ONESHOT_ATTACK1H);	                       
+                    }
+                    _timer = urand(1500,2500);
 				}
                 else
-					_timer -= diff;
-			}
+					_timer -= diff;			
 		}
     };
 

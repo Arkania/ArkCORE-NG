@@ -1956,8 +1956,8 @@ public:
             if (uiRandomYellTimer <= diff)
             {
                 uiRandomYellTimer = urand(15000, 35000);
-                uint8 roll = urand(0, 2);
-                DoScriptText(GREYMANE_RANDOM_YELL - roll, me);
+                // uint8 roll = urand(0, 2);
+                Talk(0); // DoScriptText(GREYMANE_RANDOM_YELL - roll, me);
             }
             else
                 uiRandomYellTimer -= diff;
