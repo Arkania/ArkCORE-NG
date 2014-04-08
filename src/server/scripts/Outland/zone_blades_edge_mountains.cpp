@@ -500,7 +500,7 @@ public:
             {
                 if (who->HasAura(SPELL_LASHHAN_CHANNEL) && me->IsWithinDistInMap(who, 10.0f))
                 {
-                    Talk(0);  // DoScriptText(SAY_SPELL_INFLUENCE, me, who);
+                    Talk(0, who->GetGUID());  // DoScriptText(SAY_SPELL_INFLUENCE, me, who);
                     //TODO: Move the below to updateAI and run if this statement == true
                     DoCast(who, SPELL_DISPELLING_ANALYSIS, true);
                 }

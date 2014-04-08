@@ -31,37 +31,33 @@ EndScriptData */
 enum eEnums
 {
     // Yell
-    SAY_AGGRO = -1548030,
-    SAY_SUMMON1 = -1548031,
-    SAY_SUMMON2 = -1548032,
-    SAY_SUMMON_BUBL1 = -1548033,
-    SAY_SUMMON_BUBL2 = -1548034,
-    SAY_SLAY1 = -1548035,
-    SAY_SLAY2 = -1548036,
-    SAY_SLAY3 = -1548037,
-    SAY_DEATH = -1548038,
+    SAY_AGGRO                       = 0,
+    SAY_SUMMON                      = 1,
+    SAY_SUMMON_BUBL                 = 2,
+    SAY_SLAY                        = 3,
+    SAY_DEATH                       = 4,
     // Emotes
-    EMOTE_WATERY_GRAVE = -1548039,
-    EMOTE_EARTHQUAKE = -1548040,
-    EMOTE_WATERY_GLOBULES = -1548041,
+    EMOTE_WATERY_GRAVE              = 5,
+    EMOTE_EARTHQUAKE                = 6,
+    EMOTE_WATERY_GLOBULES           = 7,
     // Spells
-    SPELL_TIDAL_WAVE = 37730,
-    SPELL_WATERY_GRAVE = 38049,
-    SPELL_EARTHQUAKE = 37764,
-    SPELL_WATERY_GRAVE_EXPLOSION = 37852,
+    SPELL_TIDAL_WAVE                = 37730,
+    SPELL_WATERY_GRAVE              = 38049,
+    SPELL_EARTHQUAKE                = 37764,
+    SPELL_WATERY_GRAVE_EXPLOSION    = 37852,
 
-    SPELL_WATERY_GRAVE_1 = 38023,
-    SPELL_WATERY_GRAVE_2 = 38024,
-    SPELL_WATERY_GRAVE_3 = 38025,
-    SPELL_WATERY_GRAVE_4 = 37850,
+    SPELL_WATERY_GRAVE_1            = 38023,
+    SPELL_WATERY_GRAVE_2            = 38024,
+    SPELL_WATERY_GRAVE_3            = 38025,
+    SPELL_WATERY_GRAVE_4            = 37850,
 
-    SPELL_SUMMON_WATER_GLOBULE_1 = 37854,
-    SPELL_SUMMON_WATER_GLOBULE_2 = 37858,
-    SPELL_SUMMON_WATER_GLOBULE_3 = 37860,
-    SPELL_SUMMON_WATER_GLOBULE_4 = 37861,
+    SPELL_SUMMON_WATER_GLOBULE_1    = 37854,
+    SPELL_SUMMON_WATER_GLOBULE_2    = 37858,
+    SPELL_SUMMON_WATER_GLOBULE_3    = 37860,
+    SPELL_SUMMON_WATER_GLOBULE_4    = 37861,
     // Creatures
-    NPC_WATER_GLOBULE = 21913,
-    NPC_TIDEWALKER_LURKER = 21920,
+    NPC_WATER_GLOBULE               = 21913,
+    NPC_TIDEWALKER_LURKER           = 21920
 };
 
 float MurlocCords[10][4] =
@@ -131,7 +127,7 @@ public:
 
         void StartEvent()
         {
-            DoScriptText(SAY_AGGRO, me);
+            Talk(SAY_AGGRO);
 
             if (instance)
                 instance->SetData(DATA_MOROGRIMTIDEWALKEREVENT, IN_PROGRESS);
@@ -139,12 +135,12 @@ public:
 
         void KilledUnit(Unit* /*victim*/)
         {
-            DoScriptText(RAND(SAY_SLAY1, SAY_SLAY2, SAY_SLAY3), me);
+            Talk(SAY_SLAY);
         }
 
         void JustDied(Unit* /*killer*/)
         {
-            DoScriptText(SAY_DEATH, me);
+            Talk(SAY_DEATH);
 
             if (instance)
                 instance->SetData(DATA_MOROGRIMTIDEWALKEREVENT, DONE);
@@ -185,7 +181,7 @@ public:
                 }
                 else
                 {
-                    DoScriptText(RAND(SAY_SUMMON1, SAY_SUMMON2), me);
+                    Talk(SAY_SUMMON);
 
                     for (uint8 i = 0; i < 10; ++i)
                     {
@@ -194,7 +190,7 @@ public:
                         if (target && Murloc)
                             Murloc->AI()->AttackStart(target);
                     }
-                    DoScriptText(EMOTE_EARTHQUAKE, me);
+                    Talk(EMOTE_EARTHQUAKE);
                     Earthquake = false;
                     Earthquake_Timer = 40000+rand()%5000;
                 }
@@ -236,9 +232,9 @@ public:
                         }
                     }
 
-                    DoScriptText(RAND(SAY_SUMMON_BUBL1, SAY_SUMMON_BUBL2), me);
+                    Talk(SAY_SUMMON_BUBL);
 
-                    DoScriptText(EMOTE_WATERY_GRAVE, me);
+                    Talk(EMOTE_WATERY_GRAVE);
                     WateryGrave_Timer = 30000;
                 } else WateryGrave_Timer -= diff;
 
@@ -272,7 +268,7 @@ public:
                             pGlobuleTarget->CastSpell(pGlobuleTarget, globulespell[g], true);
                         }
                     }
-                    DoScriptText(EMOTE_WATERY_GLOBULES, me);
+                    Talk(EMOTE_WATERY_GLOBULES);
                     WateryGlobules_Timer = 25000;
                 } else WateryGlobules_Timer -= diff;
             }

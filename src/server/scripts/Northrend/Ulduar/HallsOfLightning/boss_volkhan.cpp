@@ -24,14 +24,13 @@ SDComment: Event should be pretty close minus a few visual flaws
 SDCategory: Halls of Lightning
 EndScriptData */
 
-#include "AchievementMgr.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "halls_of_lightning.h"
 #include "Player.h"
 #include "SpellInfo.h"
 
-enum eEnums
+enum Enums
 {
     SAY_AGGRO                               = 0,
     SAY_FORGE                               = 1,
@@ -64,7 +63,7 @@ enum eEnums
 
     MAX_GOLEM                               = 2,
 
-    ACHIEVEMENT_SHATTER_RESISTANT            = 2042
+    DATA_SHATTER_RESISTANT                  = 2042
 };
 
 /*######
@@ -154,21 +153,6 @@ public:
 
             if (instance)
                 instance->SetData(TYPE_VOLKHAN, DONE);
-
-            if (IsHeroic() && GolemsShattered < 5)
-            {
-                AchievementEntry const* AchievShatterResistant = sAchievementMgr->GetAchievement(ACHIEVEMENT_SHATTER_RESISTANT);
-                if (AchievShatterResistant)
-                {
-                    Map* map = me->GetMap();
-                    if (map && map->IsDungeon())
-                    {
-                        Map::PlayerList const &players = map->GetPlayers();
-                        for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                            itr->GetSource()->CompletedAchievement(AchievShatterResistant);
-                    }
-                }
-            }
         }
 
         void KilledUnit(Unit* /*victim*/)
@@ -233,6 +217,14 @@ public:
                 me->SetOrientation(2.29f);
                 m_uiSummonPhase = 3;
             }
+        }
+
+        uint32 GetData(uint32 data) const
+        {
+            if (data == DATA_SHATTER_RESISTANT)
+                return GolemsShattered;
+
+            return 0;
         }
 
         void UpdateAI(const uint32 uiDiff)
@@ -463,8 +455,20 @@ public:
     };
 };
 
+class achievement_shatter_resistant : public AchievementCriteriaScript
+{
+    public:
+        achievement_shatter_resistant() : AchievementCriteriaScript("achievement_shatter_resistant") { }
+
+        bool OnCheck(Player* /*source*/, Unit* target)
+        {
+            return target && target->GetAI()->GetData(DATA_SHATTER_RESISTANT) < 5;
+        }
+};
+
 void AddSC_boss_volkhan()
 {
     new boss_volkhan();
     new npc_molten_golem();
+    new achievement_shatter_resistant();
 }

@@ -39,10 +39,10 @@ enum Adds
 
 enum Yells
 {
-    SAY_AGGRO                                     = -1576010,
-    SAY_DEATH                                     = -1576011,
-    SAY_RIFT                                      = -1576012,
-    SAY_SHIELD                                    = -1576013
+    SAY_AGGRO                                     = 0,
+    SAY_DEATH                                     = 1,
+    SAY_RIFT                                      = 2,
+    SAY_SHIELD                                    = 3
 };
 
 enum RiftSpells
@@ -97,7 +97,7 @@ class boss_anomalus : public CreatureScript
 
             void EnterCombat(Unit* /*who*/)
             {
-                DoScriptText(SAY_AGGRO, me);
+                Talk(SAY_AGGRO);
 
                 if (instance)
                     instance->SetData(DATA_ANOMALUS_EVENT, IN_PROGRESS);
@@ -105,7 +105,7 @@ class boss_anomalus : public CreatureScript
 
             void JustDied(Unit* /*killer*/)
             {
-                DoScriptText(SAY_DEATH, me);
+                Talk(SAY_DEATH);
 
                 if (instance)
                     instance->SetData(DATA_ANOMALUS_EVENT, DONE);
@@ -156,7 +156,7 @@ class boss_anomalus : public CreatureScript
                 if ((Phase == 0) && HealthBelowPct(50))
                 {
                     Phase = 1;
-                    DoScriptText(SAY_SHIELD, me);
+                    Talk(SAY_SHIELD);
                     DoCast(me, SPELL_RIFT_SHIELD);
                     if (Creature* Rift = me->SummonCreature(MOB_CHAOTIC_RIFT, RiftLocation[urand(0, 5)], TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 1000))
                     {
@@ -164,7 +164,7 @@ class boss_anomalus : public CreatureScript
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
                             Rift->AI()->AttackStart(target);
                         uiChaoticRiftGUID = Rift->GetGUID();
-                        DoScriptText(SAY_RIFT, me);
+                        Talk(SAY_RIFT);
                     }
                 }
 

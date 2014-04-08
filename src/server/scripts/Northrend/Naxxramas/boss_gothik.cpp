@@ -25,10 +25,10 @@
 
 enum Yells
 {
-    SAY_SPEECH                  = -1533040,
-    SAY_KILL                    = -1533041,
-    SAY_DEATH                   = -1533042,
-    SAY_TELEPORT                = -1533043
+    SAY_SPEECH                  = 0,
+    SAY_KILL                    = 1,
+    SAY_DEATH                   = 2,
+    SAY_TELEPORT                = 3
 };
 
 //Gothik
@@ -210,7 +210,7 @@ class boss_gothik : public CreatureScript
                 waveCount = 0;
                 events.ScheduleEvent(EVENT_SUMMON, 30000);
                 DoTeleportTo(PosPlatform);
-                DoScriptText(SAY_SPEECH, me);
+                Talk(SAY_SPEECH);
                 if (instance)
                     instance->SetData(DATA_GOTHIK_GATE, GO_STATE_READY);
             }
@@ -240,7 +240,7 @@ class boss_gothik : public CreatureScript
             void KilledUnit(Unit* /*victim*/)
             {
                 if (!(rand()%5))
-                    DoScriptText(SAY_KILL, me);
+                    Talk(SAY_KILL);
             }
 
             void JustDied(Unit* /*killer*/)
@@ -248,7 +248,7 @@ class boss_gothik : public CreatureScript
                 LiveTriggerGUID.clear();
                 DeadTriggerGUID.clear();
                 _JustDied();
-                DoScriptText(SAY_DEATH, me);
+                Talk(SAY_DEATH);
                 if (instance)
                     instance->SetData(DATA_GOTHIK_GATE, GO_STATE_ACTIVE);
             }
@@ -453,7 +453,7 @@ class boss_gothik : public CreatureScript
                             else
                             {
                                 phaseTwo = true;
-                                DoScriptText(SAY_TELEPORT, me);
+                                Talk(SAY_TELEPORT);
                                 DoTeleportTo(PosGroundLiveSide);
                                 me->SetReactState(REACT_AGGRESSIVE);
                                 DummyEntryCheckPredicate pred;

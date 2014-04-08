@@ -35,16 +35,13 @@ enum Spells
 
 enum Yells
 {
-    SAY_AGGRO                                   = -1608000,
-    SAY_SLAY_1                                  = -1608001,
-    SAY_SLAY_2                                  = -1608002,
-    SAY_SLAY_3                                  = -1608003,
-    SAY_DEATH                                   = -1608004,
-    SAY_SPAWN                                   = -1608005,
-    SAY_DISRUPTION                              = -1608006,
-    SAY_BREATH_ATTACK                           = -1608007,
-    SAY_SPECIAL_ATTACK_1                        = -1608008,
-    SAY_SPECIAL_ATTACK_2                        = -1608009
+    SAY_AGGRO                                   = 0,
+    SAY_SLAY                                    = 1,
+    SAY_DEATH                                   = 2,
+    SAY_SPAWN                                   = 3,
+    SAY_DISRUPTION                              = 4,
+    SAY_BREATH_ATTACK                           = 5,
+    SAY_SPECIAL_ATTACK                          = 6
 };
 
 class boss_cyanigosa : public CreatureScript
@@ -85,7 +82,7 @@ public:
 
         void EnterCombat(Unit* /*who*/)
         {
-            DoScriptText(SAY_AGGRO, me);
+            Talk(SAY_AGGRO);
 
             if (instance)
                 instance->SetData(DATA_CYANIGOSA_EVENT, IN_PROGRESS);
@@ -145,7 +142,7 @@ public:
 
         void JustDied(Unit* /*killer*/)
         {
-            DoScriptText(SAY_DEATH, me);
+            Talk(SAY_DEATH);
 
             if (instance)
                 instance->SetData(DATA_CYANIGOSA_EVENT, DONE);
@@ -155,7 +152,7 @@ public:
         {
             if (victim == me)
                 return;
-            DoScriptText(RAND(SAY_SLAY_1, SAY_SLAY_2, SAY_SLAY_3), me);
+            Talk(SAY_SLAY);
         }
     };
 

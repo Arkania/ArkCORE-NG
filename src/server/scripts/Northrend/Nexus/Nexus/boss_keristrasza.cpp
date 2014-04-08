@@ -41,11 +41,11 @@ enum Spells
 enum Yells
 {
     //Yell
-    SAY_AGGRO                                     = -1576040,
-    SAY_SLAY                                      = -1576041,
-    SAY_ENRAGE                                    = -1576042,
-    SAY_DEATH                                     = -1576043,
-    SAY_CRYSTAL_NOVA                              = -1576044
+    SAY_AGGRO                                     = 0,
+    SAY_SLAY                                      = 1,
+    SAY_ENRAGE                                    = 2,
+    SAY_DEATH                                     = 3,
+    SAY_CRYSTAL_NOVA                              = 4
 };
 
 enum Misc
@@ -101,7 +101,7 @@ public:
 
         void EnterCombat(Unit* /*who*/)
         {
-            DoScriptText(SAY_AGGRO, me);
+            Talk(SAY_AGGRO);
             DoCastAOE(SPELL_INTENSE_COLD);
 
             if (instance)
@@ -110,7 +110,7 @@ public:
 
         void JustDied(Unit* /*killer*/)
         {
-            DoScriptText(SAY_DEATH, me);
+            Talk(SAY_DEATH);
 
             if (instance)
                 instance->SetData(DATA_KERISTRASZA_EVENT, DONE);
@@ -118,7 +118,7 @@ public:
 
         void KilledUnit(Unit* /*victim*/)
         {
-            DoScriptText(SAY_SLAY, me);
+            Talk(SAY_SLAY);
         }
 
         bool CheckContainmentSpheres(bool remove_prison = false)
@@ -175,7 +175,7 @@ public:
 
             if (!bEnrage && HealthBelowPct(25))
             {
-                DoScriptText(SAY_ENRAGE, me);
+                Talk(SAY_ENRAGE);
                 DoCast(me, SPELL_ENRAGE);
                 bEnrage = true;
             }
@@ -194,7 +194,7 @@ public:
 
             if (uiCrystalChainsCrystalizeTimer <= diff)
             {
-                DoScriptText(SAY_CRYSTAL_NOVA, me);
+                Talk(SAY_CRYSTAL_NOVA);
                 if (IsHeroic())
                     DoCast(me, SPELL_CRYSTALIZE);
                 else if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
