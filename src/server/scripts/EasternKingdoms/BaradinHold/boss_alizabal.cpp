@@ -24,8 +24,7 @@ enum Yells
   SAY_BERSERK  = 6, // I hate you all!
   SAY_RESET    = 7, // I hate incompetent raiders.
   SAY_INTRO    = 8, // How I hate this place. My captors may be long dead.. but don't think I won't take it out on you, miserable treasure hunters!
-
-  SAY_BLADES   = -1900027  // Announce raid for Blade Dance.
+  SAY_BLADES   = 9  // Announce raid for Blade Dance.
 };
 
 enum Spells
@@ -196,7 +195,7 @@ class boss_alizabal : public CreatureScript
 
                 if (BladeDanceTimer <= diff)
                 {
-                    DoScriptText(SAY_BLADES, me);
+                    Talk(SAY_BLADES);
                     Talk(SAY_DANCE);
                     DoCast(me, SPELL_BLADE_DANCE_DUMMY);
                     bladedance = true;

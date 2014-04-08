@@ -3103,6 +3103,7 @@ void SpellMgr::LoadSpellCustomAttr()
             case 39365: // Thundering Storm
             case 41071: // Raise Dead (HACK)
             case 52124: // Sky Darkener Assault
+            case 53096: // Quetz'lun's Judgment
             case 42442: // Vengeance Landing Cannonfire
             case 45863: // Cosmetic - Incinerate to Random Target
             case 25425: // Shoot

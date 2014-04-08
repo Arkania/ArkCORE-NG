@@ -62,7 +62,6 @@ enum Spells
     SPELL_MASSACRE                      = 82848,
     SPELL_FEUD                          = 88872,
     SPELL_BREAK                         = 82881,
-
     SPELL_MORTALITY                     = 82934,
     SPELL_MORTALITY_RAID_DEBUFF         = 82890,
 
@@ -72,20 +71,19 @@ enum Spells
     SPELL_SYSTEM_FAILURE                = 88853,
     SPELL_REROUTE_POWER                 = 88861,
 
-   // Nefarian
-   SPELL_MOCKING_SHADOWS                = 91307
+    // Nefarian
+    SPELL_MOCKING_SHADOWS               = 91307
 };
 
 enum ScriptTexts
 {
-    SAY_MASSACRE                    = -1900028, // announce - Chimaeron prepares to massacre his foes!
-
+    SAY_MASSACRE                    = 0, // announce - Chimaeron prepares to massacre his foes!
     // Finkle
-    SAY_INTRO                       = -1851023,
-    SAY_SYSTEM_FAILURE              = -1851026,
-    SAY_DEATH                       = -1851027,
-    SAY_F_OUTRO                     = -1851028,
-    SAY_P2                          = -1851029
+    SAY_INTRO                       = 1,
+    SAY_SYSTEM_FAILURE              = 2,
+    SAY_DEATH                       = 3,
+    SAY_F_OUTRO                     = 4,
+    SAY_P2                          = 5
 };
 
 Position const BilePositions[6] =
@@ -207,7 +205,7 @@ public:
                 }
 
                 if (Creature* finkle_einhorn = me->FindNearestCreature(NPC_FINKLE_EINHORN, 150.0f, true))
-                    DoScriptText(SAY_P2, finkle_einhorn);
+                    finkle_einhorn->AI()->Talk(SAY_P2);
 
                 events.CancelEvent(EVENT_MASSACRE);
                 events.CancelEvent(EVENT_BREAK);
@@ -323,7 +321,7 @@ public:
             }
 
             if (Creature* finkle_einhorn = me->FindNearestCreature(NPC_FINKLE_EINHORN, 150.0f, true))
-                DoScriptText(SAY_DEATH, finkle_einhorn);
+                finkle_einhorn->AI()->Talk(SAY_DEATH);
 
             _JustDied();
         }
@@ -412,7 +410,7 @@ public:
                 {
                     if (target->GetDistance(me) < 85.0f  && me->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
                     {
-                        DoScriptText(SAY_INTRO, me);
+                        Talk(SAY_INTRO);
                         timer = 25000;
                     } else
                         timer = 1000;
@@ -427,7 +425,7 @@ public:
                 if (Creature* bilotron = me->FindNearestCreature(NPC_BILE_O_TRON, 150.0f, true))
                     bilotron->SetVisible(false);
 
-                DoScriptText(SAY_F_OUTRO, me);
+                Talk(SAY_F_OUTRO);
                 me->GetMotionMaster()->MovePoint(1, -110.295f, 41.662f, 72.657f);
                 me->DespawnOrUnsummon(30000);
                 canFree = false;
@@ -532,7 +530,7 @@ public:
                         return;
                 
                     if (Creature* finkle_einhorn = me->FindNearestCreature(NPC_FINKLE_EINHORN, 150.0f, true))
-                        DoScriptText(SAY_SYSTEM_FAILURE, finkle_einhorn);
+                        finkle_einhorn->AI()->Talk(SAY_SYSTEM_FAILURE);
                 
                     me->RemoveAllAuras();
                     DoCast(me,SPELL_REROUTE_POWER, true);

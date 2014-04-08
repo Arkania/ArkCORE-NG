@@ -1,7 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
- * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -20,6 +19,19 @@
 #ifndef DEF_MECHANAR_H
 #define DEF_MECHANAR_H
 
-#define DATA_NETHERMANCER_EVENT 1
+enum DataTypes
+{
+    DATA_GATEWATCHER_GYROKILL           = 0,
+    DATA_IRON_HAND                      = 1,
+    DATA_MECHANOLORD_CAPACITUS          = 2,
+    DATA_NETHERMANCER_SEPRETHREA        = 3,
+    DATA_PATHALEON_THE_CALCULATOR       = 4
+};
+
+enum Misc
+{
+    MAX_ENCOUNTER                       = 5
+};
+
 #endif
 

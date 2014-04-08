@@ -28,143 +28,125 @@ EndScriptData */
 #include "ScriptedCreature.h"
 #include "mechanar.h"
 
-enum eSays
+enum Says
 {
-    SAY_AGGRO                      = -1554013,
-    SAY_SUMMON                     = -1554014,
-    SAY_DRAGONS_BREATH_1           = -1554015,
-    SAY_DRAGONS_BREATH_2           = -1554016,
-    SAY_SLAY1                      = -1554017,
-    SAY_SLAY2                      = -1554018,
-    SAY_DEATH                      = -1554019,
+    SAY_AGGRO                      = 0,
+    SAY_SUMMON                     = 1,
+    SAY_DRAGONS_BREATH             = 2,
+    SAY_SLAY                       = 3,
+    SAY_DEATH                      = 4
 };
 
 enum eSpells
 {
-    SPELL_SUMMON_RAGIN_FLAMES      = 35275,
+    SPELL_SUMMON_RAGIN_FLAMES      = 35275, // Not scripted
     SPELL_FROST_ATTACK             = 35263,
     SPELL_ARCANE_BLAST             = 35314,
     SPELL_DRAGONS_BREATH           = 35250,
     SPELL_KNOCKBACK                = 37317,
     SPELL_SOLARBURN                = 35267,
-    H_SPELL_SUMMON_RAGIN_FLAMES    = 39084,
-    SPELL_INFERNO                  = 35268,
-    H_SPELL_INFERNO                = 39346,
-    SPELL_FIRE_TAIL                = 35278,
+    H_SPELL_SUMMON_RAGIN_FLAMES    = 39084, // Not scripted
+    SPELL_INFERNO                  = 35268, // Not scripted
+    H_SPELL_INFERNO                = 39346, // Not scripted
+    SPELL_FIRE_TAIL                = 35278  // Not scripted
+};
+
+enum Events
+{
+    EVENT_FROST_ATTACK             = 0,
+    EVENT_ARCANE_BLAST             = 1,
+    EVENT_DRAGONS_BREATH           = 2,
+    EVENT_KNOCKBACK                = 3,
+    EVENT_SOLARBURN                = 4
 };
 
 class boss_nethermancer_sepethrea : public CreatureScript
 {
-    public:
+    public: boss_nethermancer_sepethrea(): CreatureScript("boss_nethermancer_sepethrea") {}
 
-        boss_nethermancer_sepethrea()
-            : CreatureScript("boss_nethermancer_sepethrea")
+        struct boss_nethermancer_sepethreaAI : public BossAI
         {
-        }
-        struct boss_nethermancer_sepethreaAI : public ScriptedAI
-        {
-            boss_nethermancer_sepethreaAI(Creature* creature) : ScriptedAI(creature)
+            boss_nethermancer_sepethreaAI(Creature* creature) : BossAI(creature,DATA_NETHERMANCER_SEPRETHREA)
             {
                 instance = creature->GetInstanceScript();
             }
 
             InstanceScript* instance;
 
-            uint32 frost_attack_Timer;
-            uint32 arcane_blast_Timer;
-            uint32 dragons_breath_Timer;
-            uint32 knockback_Timer;
-            uint32 solarburn_Timer;
-
             void Reset()
             {
-                frost_attack_Timer = urand(7000, 10000);
-                arcane_blast_Timer = urand(12000, 18000);
-                dragons_breath_Timer = urand(18000, 22000);
-                knockback_Timer = urand(22000, 28000);
-                solarburn_Timer = 30000;
-
                 if (instance)
-                    instance->SetData(DATA_NETHERMANCER_EVENT, NOT_STARTED);
+                    instance->SetData(DATA_NETHERMANCER_SEPRETHREA, NOT_STARTED);
             }
 
             void EnterCombat(Unit* who)
             {
                 if (instance)
-                    instance->SetData(DATA_NETHERMANCER_EVENT, IN_PROGRESS);
+                    instance->SetData(DATA_NETHERMANCER_SEPRETHREA, IN_PROGRESS);
 
-                DoScriptText(SAY_AGGRO, me);
+                events.ScheduleEvent(EVENT_FROST_ATTACK, urand(7000, 10000));
+                events.ScheduleEvent(EVENT_ARCANE_BLAST, urand(12000, 18000));
+                events.ScheduleEvent(EVENT_DRAGONS_BREATH, urand(18000, 22000));
+                events.ScheduleEvent(EVENT_KNOCKBACK, urand(22000, 28000));
+                events.ScheduleEvent(EVENT_SOLARBURN, 30000);
+
+                Talk(SAY_AGGRO);
                 DoCast(who, SPELL_SUMMON_RAGIN_FLAMES);
-                DoScriptText(SAY_SUMMON, me);
+                Talk(SAY_SUMMON);
             }
 
             void KilledUnit(Unit* /*victim*/)
             {
-                DoScriptText(RAND(SAY_SLAY1, SAY_SLAY2), me);
+                Talk(SAY_SLAY);
             }
 
             void JustDied(Unit* /*killer*/)
             {
-                DoScriptText(SAY_DEATH, me);
+                Talk(SAY_DEATH);
                 if (instance)
-                    instance->SetData(DATA_NETHERMANCER_EVENT, DONE);
+                    instance->SetData(DATA_NETHERMANCER_SEPRETHREA, DONE);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 const diff)
             {
-                //Return since we have no target
                 if (!UpdateVictim())
                     return;
 
-                //Frost Attack
-                if (frost_attack_Timer <= diff)
-                {
-                    DoCast(me->GetVictim(), SPELL_FROST_ATTACK);
+                events.Update(diff);
 
-                    frost_attack_Timer = urand(7000, 10000);
-                }
-                else
-                    frost_attack_Timer -= diff;
+                if (me->HasUnitState(UNIT_STATE_CASTING))
+                    return;
 
-                //Arcane Blast
-                if (arcane_blast_Timer <= diff)
+                while (uint32 eventId = events.ExecuteEvent())
                 {
-                    DoCast(me->GetVictim(), SPELL_ARCANE_BLAST);
-                    arcane_blast_Timer = 15000;
-                }
-                else
-                    arcane_blast_Timer -= diff;
-                //Dragons Breath
-                if (dragons_breath_Timer <= diff)
-                {
-                    DoCast(me->GetVictim(), SPELL_DRAGONS_BREATH);
+                    switch (eventId)
                     {
-                        if (rand()%2)
-                            return;
-                        DoScriptText(RAND(SAY_DRAGONS_BREATH_1, SAY_DRAGONS_BREATH_2), me);
+                        case EVENT_FROST_ATTACK:
+                            DoCastVictim(SPELL_FROST_ATTACK, true);
+                            events.ScheduleEvent(EVENT_FROST_ATTACK, urand(7000, 10000));
+                            break;
+                        case EVENT_ARCANE_BLAST:
+                            DoCastVictim(SPELL_ARCANE_BLAST, true);
+                            events.ScheduleEvent(EVENT_ARCANE_BLAST, 15000);
+                            break;
+                        case EVENT_DRAGONS_BREATH:
+                            DoCastVictim(SPELL_DRAGONS_BREATH, true);
+                            events.ScheduleEvent(EVENT_DRAGONS_BREATH, urand(12000, 22000));
+                            if (roll_chance_i(50))
+                                Talk(SAY_DRAGONS_BREATH);
+                            break;
+                        case EVENT_KNOCKBACK:
+                            DoCastVictim(SPELL_KNOCKBACK, true);
+                            events.ScheduleEvent(EVENT_KNOCKBACK, urand(15000, 25000));
+                            break;
+                        case EVENT_SOLARBURN:
+                            DoCastVictim(SPELL_SOLARBURN, true);
+                            events.ScheduleEvent(EVENT_SOLARBURN, 30000);
+                            break;
+                        default:
+                            break;
                     }
-                    dragons_breath_Timer = urand(12000, 22000);
                 }
-                else
-                    dragons_breath_Timer -= diff;
-
-                //Knockback
-                if (knockback_Timer <= diff)
-                {
-                    DoCast(me->GetVictim(), SPELL_KNOCKBACK);
-                    knockback_Timer = urand(15000, 25000);
-                }
-                else
-                    knockback_Timer -= diff;
-
-                //Solarburn
-                if (solarburn_Timer <= diff)
-                {
-                    DoCast(me->GetVictim(), SPELL_SOLARBURN);
-                    solarburn_Timer = 30000;
-                }
-                else
-                    solarburn_Timer -= diff;
 
                 DoMeleeAttackIfReady();
             }
@@ -220,7 +202,7 @@ class npc_ragin_flames : public CreatureScript
                     {
                         if (instance)
                         {
-                            if (instance->GetData(DATA_NETHERMANCER_EVENT) != IN_PROGRESS)
+                            if (instance->GetData(DATA_NETHERMANCER_SEPRETHREA) != IN_PROGRESS)
                             {
                                 //remove
                                 me->setDeathState(JUST_DIED);

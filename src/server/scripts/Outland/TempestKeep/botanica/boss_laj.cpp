@@ -43,7 +43,7 @@ enum eSpells
 };
 enum eOthers
 {
-    EMOTE_SUMMON               = -1553006,
+    EMOTE_SUMMON               = 0,
     MODEL_DEFAULT              = 13109,
     MODEL_ARCANE               = 14213,
     MODEL_FIRE                 = 13110,
@@ -176,7 +176,7 @@ class boss_laj : public CreatureScript
                 {
                     if (Summon_Timer <= diff)
                     {
-                        DoScriptText(EMOTE_SUMMON, me);
+                        Talk(EMOTE_SUMMON);
                         DoSummons();
                         Summon_Timer = 2500;
                     }

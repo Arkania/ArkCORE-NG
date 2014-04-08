@@ -35,16 +35,13 @@ EndContentData */
 
 enum eSays
 {
-    SAY_INTRO              = -1552000,
-    SAY_AGGRO              = -1552001,
-    SAY_KILL_1             = -1552002,
-    SAY_KILL_2             = -1552003,
-    SAY_MIND_1             = -1552004,
-    SAY_MIND_2             = -1552005,
-    SAY_FEAR_1             = -1552006,
-    SAY_FEAR_2             = -1552007,
-    SAY_IMAGE              = -1552008,
-    SAY_DEATH              = -1552009,
+    SAY_INTRO              = 0,
+    SAY_AGGRO              = 1,
+    SAY_KILL               = 2,
+    SAY_MIND               = 3,
+    SAY_FEAR               = 4,
+    SAY_IMAGE              = 5,
+    SAY_DEATH              = 6
 };
 
 enum eSpells
@@ -116,7 +113,7 @@ class boss_harbinger_skyriss : public CreatureScript
 
             void JustDied(Unit* /*killer*/)
             {
-                DoScriptText(SAY_DEATH, me);
+                Talk(SAY_DEATH);
                 if (instance)
                     instance->SetData(TYPE_HARBINGERSKYRISS, DONE);
             }
@@ -140,7 +137,7 @@ class boss_harbinger_skyriss : public CreatureScript
                 if (victim->GetEntry() == 21436)
                     return;
 
-                DoScriptText(RAND(SAY_KILL_1, SAY_KILL_2), me);
+                Talk(SAY_KILL);
             }
 
             void DoSplit(uint32 val)
@@ -148,7 +145,7 @@ class boss_harbinger_skyriss : public CreatureScript
                 if (me->IsNonMeleeSpellCasted(false))
                     me->InterruptNonMeleeSpells(false);
 
-                DoScriptText(SAY_IMAGE, me);
+                Talk(SAY_IMAGE);
 
                 if (val == 66)
                     DoCast(me, SPELL_66_ILLUSION);
@@ -168,13 +165,13 @@ class boss_harbinger_skyriss : public CreatureScript
                         switch (Intro_Phase)
                         {
                         case 1:
-                            DoScriptText(SAY_INTRO, me);
+                            Talk(SAY_INTRO);
                             instance->HandleGameObject(instance->GetData64(DATA_SPHERE_SHIELD), true);
                             ++Intro_Phase;
                             Intro_Timer = 25000;
                             break;
                         case 2:
-                            DoScriptText(SAY_AGGRO, me);
+                            Talk(SAY_AGGRO);
                             if (Unit* mellic = Unit::GetUnit(*me, instance->GetData64(DATA_MELLICHAR)))
                             {
                                 //should have a better way to do this. possibly spell exist.
@@ -225,7 +222,7 @@ class boss_harbinger_skyriss : public CreatureScript
                     if (me->IsNonMeleeSpellCasted(false))
                         return;
 
-                    DoScriptText(RAND(SAY_FEAR_1, SAY_FEAR_2), me);
+                    Talk(SAY_FEAR);
 
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1))
                         DoCast(target, SPELL_FEAR);
@@ -242,7 +239,7 @@ class boss_harbinger_skyriss : public CreatureScript
                     if (me->IsNonMeleeSpellCasted(false))
                         return;
 
-                    DoScriptText(RAND(SAY_MIND_1, SAY_MIND_2), me);
+                    Talk(SAY_MIND);
 
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1))
                         DoCast(target, SPELL_DOMINATION);

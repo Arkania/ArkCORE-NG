@@ -209,7 +209,7 @@ public:
 
         void DoSplit(int atPercent /* 75 50 25 */)
         {
-            DoScriptText(SAY_SPLIT, me);
+            Talk(SAY_SPLIT);
 
             ov_mycoordinates *place1 = new ov_mycoordinates(-8340.782227f, 2083.814453f, 125.648788f, 0);
             ov_mycoordinates *place2 = new ov_mycoordinates(-8341.546875f, 2118.504639f, 133.058151f, 0);
