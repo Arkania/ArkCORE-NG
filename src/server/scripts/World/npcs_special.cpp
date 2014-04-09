@@ -3447,7 +3447,7 @@ public:
 			if (!me->IsInCombat())
 				return;
 
-		    if (DoomBoltTimer <= uiDiff)
+		    if (DoomBoltTimer <= diff)
             {
 				if (Unit *victim = me->GetOwner()->GetVictim())
 					me->CastSpell(victim,85692,true);
@@ -3457,7 +3457,7 @@ public:
                 DoomBoltTimer = 3000;
             }
 			else
-				DoomBoltTimer -= uiDiff;
+				DoomBoltTimer -= diff;
 
         }
     };
