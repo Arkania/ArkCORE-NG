@@ -104,9 +104,11 @@ struct npc_escortAI : public ScriptedAI
         bool GetAttack() { return m_bIsActiveAttacker; }//used in EnterEvadeMode override
         void SetCanAttack(bool attack) { m_bIsActiveAttacker = attack; }
         uint64 GetEventStarterGUID() { return m_uiPlayerGUID; }
+        void SetSpeedXY(float speed){ speedXY = speed; }
+        void SetSpeedZ(float speed){ speedZ = speed; } 		
 
     protected:
-        Player* GetPlayerForEscort() { return ObjectAccessor::GetPlayer(*me, m_uiPlayerGUID); }
+        Player* GetPlayerForEscort() { return (Player*)Unit::GetUnit(*me, m_uiPlayerGUID); }
 
     private:
         bool AssistPlayerInCombat(Unit* who);
@@ -121,6 +123,8 @@ struct npc_escortAI : public ScriptedAI
         uint32 m_uiPlayerCheckTimer;
         uint32 m_uiEscortState;
         float MaxPlayerDistance;
+        float speedXY;
+        float speedZ;		
 
         Quest const* m_pQuestForEscort;                     //generally passed in Start() when regular escort script.
 

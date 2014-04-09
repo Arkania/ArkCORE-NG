@@ -330,7 +330,7 @@ public:
 
         void EnterCombat(Unit* /*who*/) {}
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             // Reset flags after a certain time has passed so that the next player has to start the 'event' again
             if (me->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER))
@@ -430,7 +430,7 @@ public:
             me->SendMessageToSet(&data, true);*/
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!Active)
             {
@@ -675,7 +675,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff);
+        void UpdateAI(uint32 diff);
 
         void EnterCombat(Unit* /*who*/){}
     };
@@ -784,7 +784,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 /*diff*/)
+        void UpdateAI(uint32 /*diff*/)
         {
             //lower HP on every world tick makes it a useful counter, not officlone though
             if (me->IsAlive() && me->GetHealth() > 6)
@@ -1048,7 +1048,7 @@ public:
 
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (CanRun && !me->IsInCombat())
             {
@@ -1120,7 +1120,7 @@ public:
         {
         }
 
-        void UpdateAI(const uint32 /*diff*/)
+        void UpdateAI(uint32 /*diff*/)
         {
             if (!UpdateVictim())
                 return;
@@ -1537,7 +1537,7 @@ public:
         void AttackStart(Unit* /*who*/) { }
         void MoveInLineOfSight(Unit* /*who*/) { }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (ExplosionTimer <= diff)
             {
@@ -1696,7 +1696,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -1775,7 +1775,7 @@ public:
 
         void EnterCombat(Unit* /*who*/){}
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (me->HasAura(20372))
             {
@@ -1890,7 +1890,7 @@ public:
             }
         }
 
-		void UpdateAI (const uint32 diff)
+		void UpdateAI (uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -2020,7 +2020,7 @@ public:
             despawnTimer = 4 * IN_MILLISECONDS;
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (despawnTimer > 0)
             {
@@ -2122,7 +2122,7 @@ public:
                 return;
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -2194,7 +2194,7 @@ public:
                         owner->CastSpell(owner, GLYPH_OF_SHADOWFIEND_MANA, true);
         }
 
-        void UpdateAI(const uint32 /*diff*/)
+        void UpdateAI(uint32 /*diff*/)
         {
             if (!UpdateVictim())
                 return;
@@ -2237,7 +2237,7 @@ public:
             me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FIRE, true);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -2301,7 +2301,7 @@ public:
             me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_NATURE, true);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -3038,7 +3038,7 @@ public:
                 owner->CastSpell(owner, SPELL_SPRING_FLING, true);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (inLove)
             {
@@ -3140,7 +3140,7 @@ public:
 				DoCast(me, 81781);
         }
 
-        void UpdateAI (const uint32 diff)
+        void UpdateAI (uint32 diff)
         {
             if (cron <= diff)
             {
@@ -3229,7 +3229,7 @@ public:
             me->GetMotionMaster()->MovePoint(0, newx, newy, z);
         }
 
-        void UpdateAI (const uint32 diff)
+        void UpdateAI (uint32 diff)
         {
             if (!me->IsInCombat() && CombatCheck == false)
             {
@@ -3313,7 +3313,7 @@ public:
             me->GetMotionMaster()->MovePoint(0, newx, newy, z);
         }
 
-        void UpdateAI (const uint32 diff)
+        void UpdateAI (uint32 diff)
         {
             if (!me->IsInCombat() && CombatCheck == false)
             {
@@ -3393,7 +3393,7 @@ public:
 		bool Stun;
 		uint64 ForebodingTimerStun;
 
-		void UpdateAI (const uint32 diff)
+		void UpdateAI (uint32 diff)
         {
 			if (FirstCasts)
 			{
@@ -3436,7 +3436,7 @@ public:
 			me->AttackStop();
 		}
 
-		void UpdateAI (const uint32 uiDiff)
+		void UpdateAI (uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -3533,7 +3533,7 @@ public:
 			}
         }
 
-        void UpdateAI (const uint32 diff)
+        void UpdateAI (uint32 diff)
         {
             if (timer <= diff)
             {
@@ -3608,7 +3608,7 @@ public:
             }
         }
 
-        void UpdateAI (const uint32 diff)
+        void UpdateAI (uint32 diff)
         {
             if (!UpdateVictim())
             {
@@ -3677,7 +3677,7 @@ enum GuardianSpellsAndEntries
 					 me->AddAura(SPELL_ANCIANET_HEALER, owner);
 		 }
 
-		 void UpdateAI(const uint32 diff)
+		 void UpdateAI(uint32 diff)
 		 {
 			 Unit* owner = me->GetOwner();
 
@@ -3751,7 +3751,7 @@ public:
              }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -3812,7 +3812,7 @@ public:
             }
         }
 
-        void UpdateAI (const uint32 diff)
+        void UpdateAI (uint32 diff)
         {
             if (uiDespawnTimer <= diff)
             {
@@ -3878,7 +3878,7 @@ public:
             }
         }
 
-        void UpdateAI (const uint32 diff)
+        void UpdateAI (uint32 diff)
         {
 			if (!UpdateVictim())
 				return;
