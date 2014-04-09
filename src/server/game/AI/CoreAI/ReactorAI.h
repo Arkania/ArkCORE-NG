@@ -32,7 +32,7 @@ class ReactorAI : public CreatureAI
 
         void MoveInLineOfSight(Unit*);
 
-        void UpdateAI(const uint32);
+        void UpdateAI(uint32);
         static int Permissible(const Creature*);
 };
 #endif

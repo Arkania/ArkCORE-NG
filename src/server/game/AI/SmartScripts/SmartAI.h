@@ -112,7 +112,7 @@ class SmartAI : public CreatureAI
         void HealReceived(Unit* doneBy, uint32& addhealth);
 
         // Called at World update tick
-        void UpdateAI(const uint32 diff);
+        void UpdateAI(uint32 diff);
 
         // Called at text emote receive from player
         void ReceiveEmote(Player* player, uint32 textEmote);

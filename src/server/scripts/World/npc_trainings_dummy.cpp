@@ -128,7 +128,7 @@ public:
 			}
         }
 
-		 void UpdateAI(const uint32 diff) 
+		 void UpdateAI(uint32 diff) 
          {
 			if (_spell_is_on_work)
 			{

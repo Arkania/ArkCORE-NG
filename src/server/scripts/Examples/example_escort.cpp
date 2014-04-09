@@ -133,29 +133,29 @@ class example_escort : public CreatureScript
                     DoScriptText(SAY_DEATH_3, me);
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(uint32 diff)
             {
                 //Must update npc_escortAI
-                npc_escortAI::UpdateAI(uiDiff);
+                npc_escortAI::UpdateAI(diff);
 
                 //Combat check
                 if (me->GetVictim())
                 {
-                    if (m_uiDeathCoilTimer <= uiDiff)
+                    if (m_uiDeathCoilTimer <= diff)
                     {
                         DoScriptText(SAY_SPELL, me);
                         DoCast(me->GetVictim(), SPELL_DEATH_COIL, false);
                         m_uiDeathCoilTimer = 4000;
                     }
                     else
-                        m_uiDeathCoilTimer -= uiDiff;
+                        m_uiDeathCoilTimer -= diff;
                 }
                 else
                 {
                     //Out of combat but being escorted
                     if (HasEscortState(STATE_ESCORT_ESCORTING))
                     {
-                        if (m_uiChatTimer <= uiDiff)
+                        if (m_uiChatTimer <= diff)
                         {
                             if (me->HasAura(SPELL_ELIXIR_OF_FORTITUDE, 0))
                             {
@@ -171,7 +171,7 @@ class example_escort : public CreatureScript
                             m_uiChatTimer = 12000;
                         }
                         else
-                            m_uiChatTimer -= uiDiff;
+                            m_uiChatTimer -= diff;
                     }
                 }
             }
