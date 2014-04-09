@@ -105,7 +105,7 @@ public:
     {
         npc_panicked_citizen_gateAI(Creature* creature) : ScriptedAI(creature)  { }     
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {           
             if (!UpdateVictim())
                 return;
@@ -157,7 +157,7 @@ public:
                 _nearGate = false;
 		}
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (_nearGate)
                 if (_timer <= diff)
@@ -355,7 +355,7 @@ public:
                         FlyAway();
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             npc_escortAI::UpdateAI(diff);
         }
@@ -393,7 +393,7 @@ public:
             uiSayCount = 0;
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (uiSayTimer <= diff)
             {
@@ -499,7 +499,7 @@ public:
             miss = false;
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -615,7 +615,7 @@ public:
             me->AddThreat(attacker, 10005000);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -714,7 +714,7 @@ public:
                 AttackStart(target);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -839,7 +839,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             npc_escortAI::UpdateAI(diff);
 
@@ -893,7 +893,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             npc_escortAI::UpdateAI(diff);
 
@@ -1043,7 +1043,7 @@ public:
 
         std::list<Psc> lPlayerList;
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (lPlayerList.empty())
                 return;
@@ -1149,7 +1149,7 @@ public:
                 StartAttack();
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             npc_escortAI::UpdateAI(diff);
 
@@ -1293,7 +1293,7 @@ public:
                 }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (Event)
             {
@@ -1393,7 +1393,7 @@ public:
                 me->Kill(me);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (Event)
                 if (uiEventTimer <= diff)
@@ -1477,7 +1477,7 @@ public:
 
         uint32 uiRandomSpeachTimer;
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (uiRandomSpeachTimer <= diff)
             {
@@ -1566,7 +1566,7 @@ public:
             me->SetFlag(UNIT_FIELD_FLAGS,UNIT_FLAG_NON_ATTACKABLE);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -1597,7 +1597,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -1652,7 +1652,7 @@ public:
                 StartAttack(caster);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -1747,7 +1747,7 @@ public:
                             me->DespawnOrUnsummon();
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
         }
     };
@@ -1857,7 +1857,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             npc_escortAI::UpdateAI(diff);
         }
@@ -1951,7 +1951,7 @@ public:
 
         uint32 uiRandomYellTimer;
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (uiRandomYellTimer <= diff)
             {
@@ -2012,7 +2012,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (Event)
                 if (uiEventTimer <= diff)
@@ -2142,7 +2142,7 @@ public:
                     ++itr;
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (lPlayerList.empty())
                 return;
@@ -2293,7 +2293,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             npc_escortAI::UpdateAI(diff);
 
@@ -2358,7 +2358,7 @@ public:
             Burning = false;
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if(me->HasAura(SPELL_THROW_TORCH))
             {
@@ -2476,7 +2476,7 @@ public:
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             npc_escortAI::UpdateAI(diff);
         }
@@ -2780,7 +2780,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (Event)
             {
@@ -3144,7 +3144,7 @@ public:
             me->AddThreat(attacker, 10005000);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (shoot)
                 if (uiShootTimer <= diff)
@@ -3253,7 +3253,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (respawn)
                 if (uiRespawnTimer <= diff)
@@ -3448,7 +3448,7 @@ public:
                     door->UseDoorOrButton();
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             npc_escortAI::UpdateAI(diff);
 
@@ -3511,7 +3511,7 @@ public:
                     door->UseDoorOrButton();
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             npc_escortAI::UpdateAI(diff);
 
@@ -3574,7 +3574,7 @@ public:
                     door->UseDoorOrButton();
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             npc_escortAI::UpdateAI(diff);
 
@@ -3700,7 +3700,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (despawn)
                 if (uiDespawnTimer <= diff)
@@ -3761,7 +3761,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -3825,7 +3825,7 @@ public:
                         }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             npc_escortAI::UpdateAI(diff);
         }
@@ -3897,7 +3897,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (Catch)
                 if (uiCatchTimer <= diff)
@@ -3996,7 +3996,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (Despawn)
                 if (uiDespawnTimer <= diff)
@@ -4125,7 +4125,7 @@ public:
                 lSummons.push_back(summoned);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (despawn)
                 if (uiDespawnTimer <= diff)
@@ -4269,7 +4269,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             npc_escortAI::UpdateAI(diff);
         }
@@ -4496,7 +4496,7 @@ public:
             me->EnableAI();
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (Event)
                 if (uiEventTimer <= diff)
@@ -4740,7 +4740,7 @@ public:
                     }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (Event)
                 if (uiEventTimer <= diff)
@@ -4847,7 +4847,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (despawn)
                 if (uiDespawnTimer <= diff)
@@ -4935,7 +4935,7 @@ public:
                 }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -5069,7 +5069,7 @@ public:
         {
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             npc_escortAI::UpdateAI(diff);
 
@@ -5266,7 +5266,7 @@ public:
                     uiKorothGUID = koroth->GetGUID();
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             npc_escortAI::UpdateAI(diff);
 
@@ -5342,7 +5342,7 @@ public:
             lPlayerList.push_back(new_player);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!lPlayerList.empty())
                 for (std::list<Psc_qiao>::iterator itr = lPlayerList.begin(); itr != lPlayerList.end(); )
@@ -5417,7 +5417,7 @@ public:
                 me->GetMotionMaster()->MoveTargetedHome();
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (Event)
                 if (uiEventTimer <=  diff)
@@ -5472,7 +5472,7 @@ public:
     {
         npc_koroth_the_hillbreakerAI(Creature* creature) : ScriptedAI(creature){}
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -5535,7 +5535,7 @@ public:
                 }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -5587,7 +5587,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -5714,7 +5714,7 @@ public:
                 me->SetFlag(UNIT_FIELD_FLAGS,UNIT_FLAG_NON_ATTACKABLE);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             npc_escortAI::UpdateAI(diff);
         }
@@ -5798,7 +5798,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (Event)
                 if (uiEventTimer <= diff)
@@ -5985,7 +5985,7 @@ public:
                     me->SetFacingToObject(crowley);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             npc_escortAI::UpdateAI(diff);
         }
@@ -6030,7 +6030,7 @@ public:
                     me->SetFacingToObject(crowley);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (say)
                 if (uiSayTimer <= diff)
@@ -6124,7 +6124,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             npc_escortAI::UpdateAI(diff);
 
@@ -6291,7 +6291,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             npc_escortAI::UpdateAI(diff);
 
@@ -6442,7 +6442,7 @@ public:
                 start = false;
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (Event)
                 if (uiEventTimer <= diff)
@@ -7505,7 +7505,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             npc_escortAI::UpdateAI(diff);
 
@@ -7817,7 +7817,7 @@ public:
                         }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             npc_escortAI::UpdateAI(diff);
 
@@ -7926,7 +7926,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             npc_escortAI::UpdateAI(diff);
 
@@ -8050,7 +8050,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             npc_escortAI::UpdateAI(diff);
 
@@ -8117,7 +8117,7 @@ public:
                         CAST_AI(npc_prince_liam_greymane_tbfgc::npc_prince_liam_greymane_tbfgcAI, liam->AI())->KilledBoss();
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             npc_escortAI::UpdateAI(diff);
 
@@ -8175,7 +8175,7 @@ public:
                         }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             npc_escortAI::UpdateAI(diff);
         }
@@ -8243,7 +8243,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             npc_escortAI::UpdateAI(diff);
 
@@ -8334,7 +8334,7 @@ public:
                 damage = 0;
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             npc_escortAI::UpdateAI(diff);
 
@@ -8454,7 +8454,7 @@ public:
                                 SetEscortPaused(true);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             npc_escortAI::UpdateAI(diff);
         }
@@ -8531,7 +8531,7 @@ public:
             return NULL;
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             npc_escortAI::UpdateAI(diff);
 
@@ -8659,7 +8659,7 @@ public:
         {
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (sylvanas && can_attack)
                 if (uiSylvanasTimer <= diff)
@@ -8733,7 +8733,7 @@ public:
                 }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -8796,7 +8796,7 @@ public:
             me->EnableAI();
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
         }
     };
@@ -9200,7 +9200,7 @@ public:
             me->DespawnOrUnsummon(5000);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             npc_escortAI::UpdateAI(diff);
 
@@ -9390,7 +9390,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             npc_escortAI::UpdateAI(diff);
         }
@@ -9422,7 +9422,7 @@ public:
                 SetEscortPaused(true);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             npc_escortAI::UpdateAI(diff);
         }
@@ -9454,7 +9454,7 @@ public:
                 SetEscortPaused(true);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             npc_escortAI::UpdateAI(diff);
         }
@@ -9512,7 +9512,7 @@ public:
         {
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             npc_escortAI::UpdateAI(diff);
         }
@@ -9728,7 +9728,7 @@ public:
             me->DespawnOrUnsummon(500);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (Despawn)
             {
@@ -10127,7 +10127,7 @@ public:
                 AttackStart(target);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -10301,7 +10301,7 @@ public:
             return;
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (uiFindEnemyTimer <= diff)
             {
@@ -10393,7 +10393,7 @@ public:
             me->AddThreat(attacker, 10005000);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -10486,7 +10486,7 @@ public:
                     }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -10537,7 +10537,7 @@ public:
             uiTaunt = 1000;
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -10746,7 +10746,7 @@ public:
             return;
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (uiFindEnemyTimer <= diff)
             {
@@ -10822,7 +10822,7 @@ public:
             uiCastTimer = 500;
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (CanCast)
                 if (uiCastTimer <= diff)
@@ -10881,7 +10881,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -10931,7 +10931,7 @@ public:
                         player->CastSpell(player, uiSpellId, false);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (uiTremorTimerFirst <= diff)
             {
@@ -11212,7 +11212,7 @@ public:
 
         uint32 uiBoltTimer;
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -11275,7 +11275,7 @@ public:
 
         bool miss;
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
