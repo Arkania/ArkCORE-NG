@@ -175,7 +175,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (currentPhase != PHASE_GORTOK_PALEHOOF)
                 return;
@@ -326,7 +326,7 @@ public:
                 }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             //Return since we have no target
             if (!UpdateVictim())
@@ -439,7 +439,7 @@ public:
                 }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             //Return since we have no target
             if (!UpdateVictim())
@@ -555,7 +555,7 @@ public:
                 }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             //Return since we have no target
             if (!UpdateVictim())
@@ -675,7 +675,7 @@ public:
                 }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             //Return since we have no target
             if (!UpdateVictim())
@@ -772,7 +772,7 @@ public:
             me->SetSpeed(MOVE_FLIGHT, 0.5f);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (currentPhase == PHASE_NONE)
                 return;

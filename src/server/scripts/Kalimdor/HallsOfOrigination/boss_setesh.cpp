@@ -122,7 +122,7 @@ class boss_setesh : public CreatureScript
                    m_pInstance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me); // Remove
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(uint32 uiDiff)
             {
                 if (!UpdateVictim())
                     return;
@@ -239,7 +239,7 @@ class npc_portal : public CreatureScript
                 summons.push_back(summon->GetGUID());
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(uint32 uiDiff)
             {
                 if (!UpdateVictim())
                     return;
@@ -307,7 +307,7 @@ class npc_sentinel : public CreatureScript
                     me->AddAura(SPELL_VOID_BARRIER, me);
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(uint32 uiDiff)
             {
                 if (!UpdateVictim())
                     return;
@@ -346,7 +346,7 @@ class npc_seeker : public CreatureScript
                 m_uiPrisonTimer = 5000;
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(uint32 uiDiff)
             {
                 if (!UpdateVictim())
                     return;
@@ -396,7 +396,7 @@ class npc_seed_of_chaos : public CreatureScript
                 m_uiCheckTimer = 1000;
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
 
                 if (!UpdateVictim())
@@ -450,7 +450,7 @@ class npc_reign_of_chaos : public CreatureScript
                 m_uiNovaTimer = urand(1000, 7000);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
 
                 if (!UpdateVictim())

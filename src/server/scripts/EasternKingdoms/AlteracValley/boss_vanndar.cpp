@@ -70,7 +70,7 @@ public:
             DoScriptText(RAND(YELL_RESPAWN1, YELL_RESPAWN2), me);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;

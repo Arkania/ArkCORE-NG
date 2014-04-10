@@ -67,7 +67,7 @@ class npc_jadespine_basilisk : public CreatureScript
             {
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(uint32 uiDiff)
             {
                 //Return since we have no target
                 if (!UpdateVictim())

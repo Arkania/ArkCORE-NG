@@ -90,7 +90,7 @@ public:
 
         void EnterCombat(Unit* /*who*/) {}
 
-		void UpdateAI(const uint32 diff)
+		void UpdateAI(uint32 diff)
 		{
 			if (phase == 2 && UpdateVictim())
 			{
@@ -176,7 +176,7 @@ public:
 			start = true;
         }
 
-		void UpdateAI(const uint32 diff)
+		void UpdateAI(uint32 diff)
 		{
 			if (!start) return;
 
@@ -585,7 +585,7 @@ class boss_lord_rhyolith : public CreatureScript
 					EnterEvadeMode();
 			}
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
 				if (!RightSet || !LeftSet)
 					SummonAndSetLegsInBoss();
@@ -826,7 +826,7 @@ public:
 				GetRhyo()->AI()->DoZoneInCombat();
         }
 
-        void UpdateAI(const uint32 diff) { }
+        void UpdateAI(uint32 diff) { }
 
 		void DamageTaken(Unit* who, uint32& damage)
 		{
@@ -911,7 +911,7 @@ public:
 				GetRhyo()->AI()->DoZoneInCombat();
         }
 
-        void UpdateAI(const uint32 diff) { }
+        void UpdateAI(uint32 diff) { }
 
 		void DamageTaken(Unit* who, uint32& damage)
 		{
@@ -1002,7 +1002,7 @@ public:
 			events.Reset();
         }
 		
-        void UpdateAI(const uint32 diff) 
+        void UpdateAI(uint32 diff) 
         {
 			if (me->HasUnitState(UNIT_STATE_CASTING))
 				return;
@@ -1135,7 +1135,7 @@ public:
 			DoCast(me, SPELL_MAGMA);
         }
 
-        void UpdateAI(const uint32 diff) 
+        void UpdateAI(uint32 diff) 
         {
 			if (me->HasUnitState(UNIT_STATE_CASTING))
 					return;
@@ -1238,7 +1238,7 @@ public:
 			events.ScheduleEvent(EVENT_DESPAWN_LINE, 30000);
         }
 		
-        void UpdateAI(const uint32 diff) 
+        void UpdateAI(uint32 diff) 
         {
 			if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
@@ -1315,7 +1315,7 @@ public:
                 me->GetMotionMaster()->MoveChase(rhyolith);
         }
 
-        void UpdateAI(const uint32 diff) 
+        void UpdateAI(uint32 diff) 
         {
         	if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
         		return;
@@ -1378,7 +1378,7 @@ public:
 			events.ScheduleEvent(EVENT_INFERNAL_RAGE, 1000);
         }
 
-        void UpdateAI(const uint32 diff) 
+        void UpdateAI(uint32 diff) 
         {
 			if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
 				return;

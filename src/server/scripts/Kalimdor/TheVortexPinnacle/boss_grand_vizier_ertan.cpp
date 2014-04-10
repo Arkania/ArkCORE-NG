@@ -149,7 +149,7 @@ class boss_grand_vizier_ertan : public CreatureScript
 				pInstance->SetData(DATA_GRAND_VIZIER_ERTAN, DONE);
 			}
 			
-			void UpdateAI(const uint32 diff)
+			void UpdateAI(uint32 diff)
 			{
 				if (!pInstance || !UpdateVictim())
 					return;
@@ -240,7 +240,7 @@ class npc_ertan_vortex : public CreatureScript
                 uiDespawnTimer = 3000;
 			}
 
-			void UpdateAI(const uint32 diff)
+			void UpdateAI(uint32 diff)
 			{
                 if (!pInstance)
                     return;

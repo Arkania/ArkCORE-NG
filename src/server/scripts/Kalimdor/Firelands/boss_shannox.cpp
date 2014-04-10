@@ -376,7 +376,7 @@ public:
 			_EnterCombat();
 		}
 
-		void UpdateAI(const uint32 diff)
+		void UpdateAI(uint32 diff)
 		{
 			if (!me->GetVictim()) {}
 
@@ -655,7 +655,7 @@ public:
             }
         }
 
-		void UpdateAI(const uint32 diff)
+		void UpdateAI(uint32 diff)
 		{
 			if (me->GetVictim())
 				if(!me->HasAura(RAID_MODE(SPELL_FACE_RAGE_10N, SPELL_FACE_RAGE_25N,SPELL_FACE_RAGE_10H, SPELL_FACE_RAGE_25H)) && me->GetVictim()->HasAura(SPELL_FACE_RAGE) && !me->HasAura(CRYSTAL_PRISON_EFFECT))
@@ -835,7 +835,7 @@ public:
 			events.ScheduleEvent(EVENT_LIMB_RIP, 12000); //TODO Find out the correct Time
 		}
 
-		void UpdateAI(const uint32 diff)
+		void UpdateAI(uint32 diff)
 		{
 			if (!me->GetVictim()) {}
 
@@ -1027,7 +1027,7 @@ public:
 				}
 		}
 
-		void UpdateAI(const uint32 diff)
+		void UpdateAI(uint32 diff)
 		{
 			if (!UpdateVictim())
 				return;
@@ -1079,7 +1079,7 @@ public:
 			events.ScheduleEvent(EVENT_IMMOLATION_TRAP_TRIGGER, 2000);
 		}
 
-		void UpdateAI(const uint32 diff)
+		void UpdateAI(uint32 diff)
 		{
 			events.Update(diff);
 
@@ -1176,7 +1176,7 @@ public:
 			events.ScheduleEvent(EVENT_CRYSTAL_TRAP_TRIGGER, 2000); //  The trap arms after 2 seconds.
 		}
 
-		void UpdateAI(const uint32 diff)
+		void UpdateAI(uint32 diff)
 		{
 
 			events.Update(diff);

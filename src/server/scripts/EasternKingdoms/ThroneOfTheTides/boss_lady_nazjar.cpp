@@ -258,7 +258,7 @@ class boss_lady_nazjar : public CreatureScript
                 events.RescheduleEvent(EVENT_SHOCK_BLAST, urand(6000,12000));
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -365,7 +365,7 @@ class npc_lady_nazjar_honnor_guard : public CreatureScript
                 events.ScheduleEvent(EVENT_START_ATTACK, 2000);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -425,7 +425,7 @@ class npc_lady_nazjar_tempest_witch : public CreatureScript
                 events.ScheduleEvent(EVENT_START_ATTACK, 2000);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -492,7 +492,7 @@ class npc_lady_nazjar_waterspout : public CreatureScript
                 }
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (bHit)
                     return;
@@ -537,7 +537,7 @@ class npc_lady_nazjar_geyser : public CreatureScript
                 DoCast(me, SPELL_GEYSER_VISUAL, true);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (uiErruptTimer <= diff && !bErrupt)
                 {

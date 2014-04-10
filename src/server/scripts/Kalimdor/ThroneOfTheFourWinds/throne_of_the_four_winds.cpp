@@ -98,7 +98,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             // The Slipstreams are Deactivated before each Ultimate ability
 

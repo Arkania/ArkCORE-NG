@@ -211,7 +211,7 @@ class boss_erudax : public CreatureScript
                 Talk(SAY_KILL);                
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -322,7 +322,7 @@ class npc_erudax_faceless_corruptor : public CreatureScript
                 me->DespawnOrUnsummon();
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!instance || !UpdateVictim())
                     return;
@@ -450,7 +450,7 @@ public:
             DoCast(me, SPELL_TWILIGHT_BLAST_TRIGGER);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!instance)
                 return;

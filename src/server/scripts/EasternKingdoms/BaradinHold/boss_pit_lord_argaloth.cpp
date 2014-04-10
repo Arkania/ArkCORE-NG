@@ -86,7 +86,7 @@ class boss_pit_lord_argaloth : public CreatureScript
                 instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
             }
 
-            void UpdateAI(const uint32 diff) 
+            void UpdateAI(uint32 diff) 
             {
                 if (!UpdateVictim())
                     return;

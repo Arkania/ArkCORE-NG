@@ -48,7 +48,7 @@ class npc_tornado_moving : public CreatureScript
 					MoveSide = false; // east
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
 				if (GetAlakir() && GetAlakir()->IsAlive())
 				{

@@ -103,7 +103,7 @@ class boss_occuthar : public CreatureScript
                 DoZoneInCombat(summon);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -218,7 +218,7 @@ class npc_occuthar_eye : public CreatureScript
                 GazeTimer = 100;
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;

@@ -231,7 +231,7 @@ class boss_majordomus : public CreatureScript
 			_EnterCombat();
 		}
 			
-		void UpdateAI(const uint32 diff)
+		void UpdateAI(uint32 diff)
 		{
             if (!UpdateVictim() && phase != PHASE_NONE || me->HasUnitState(UNIT_STATE_CASTING))
 				return;
@@ -463,7 +463,7 @@ class npc_spirit_of_the_flame : public CreatureScript //52593 npc
             events.ScheduleEvent(EVENT_JUMP_TARGET, 100);
 		}
  
-		void UpdateAI(const uint32 diff)
+		void UpdateAI(uint32 diff)
 		{
 			if (!UpdateVictim())
 				return;
@@ -529,7 +529,7 @@ class npc_burning_orb : public CreatureScript //53216
 			events.ScheduleEvent(EVENT_ORB_DAMAGE, 3500);
 		}
  
-		void UpdateAI(const uint32 diff)
+		void UpdateAI(uint32 diff)
 		{
             if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
 				return;

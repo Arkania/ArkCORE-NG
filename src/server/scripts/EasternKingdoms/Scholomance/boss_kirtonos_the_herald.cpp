@@ -142,7 +142,7 @@ class boss_kirtonos_the_herald : public CreatureScript
                 }
             }
 
-            void UpdateAI(const uint32 diff) 
+            void UpdateAI(uint32 diff) 
             {
                 events.Update(diff);
 

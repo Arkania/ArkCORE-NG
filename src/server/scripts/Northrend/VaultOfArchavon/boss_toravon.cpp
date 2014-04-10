@@ -74,7 +74,7 @@ class boss_toravon : public CreatureScript
                 _EnterCombat();
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -142,7 +142,7 @@ class npc_frost_warder : public CreatureScript
                 events.ScheduleEvent(EVENT_FROST_BLAST, 5000);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -196,7 +196,7 @@ public:
             DoZoneInCombat();
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!done)
             {
@@ -246,7 +246,7 @@ class npc_frozen_orb_stalker : public CreatureScript
                 spawned = false;
             }
 
-            void UpdateAI(const uint32 /*diff*/)
+            void UpdateAI(uint32 /*diff*/)
             {
                 if (spawned)
                     return;

@@ -147,7 +147,7 @@ class boss_anraphet : public CreatureScript
                 summons.push_back(summon->GetGUID());
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(uint32 uiDiff)
             {
                 if (!UpdateVictim())
                     return;
@@ -274,7 +274,7 @@ class npc_beam : public CreatureScript
             {
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(uint32 uiDiff)
             {
                 if (!UpdateVictim())
                     return;

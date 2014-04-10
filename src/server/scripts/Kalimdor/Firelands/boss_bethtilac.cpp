@@ -282,7 +282,7 @@ public:
             }
 		}
 
-		void UpdateAI(const uint32 diff)
+		void UpdateAI(uint32 diff)
 		{
             if (!UpdateVictim())
                 return;
@@ -528,7 +528,7 @@ public:
 			me->GetMotionMaster()->MovePoint(POINT_SPINNER_MEDIATE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()-15);
 		}
 
-		void UpdateAI(const uint32 diff)
+		void UpdateAI(uint32 diff)
 		{
 		    if (!UpdateVictim())
 				return;
@@ -661,7 +661,7 @@ public:
 			}
 		}
 
-		void UpdateAI(const uint32 diff)
+		void UpdateAI(uint32 diff)
 		{
 			if (!UpdateVictim())
                 return;
@@ -803,7 +803,7 @@ public:
 		{
 		}
 
-		void UpdateAI(const uint32 diff)
+		void UpdateAI(uint32 diff)
 		{
 			if (me->HasUnitState(UNIT_STATE_CASTING))
 				return;
@@ -918,7 +918,7 @@ public:
 			me->GetMotionMaster()->MoveChase(player);
 		}
 
-		void UpdateAI(const uint32 diff)
+		void UpdateAI(uint32 diff)
 		{
 			if (!UpdateVictim())
                     return;
@@ -975,7 +975,7 @@ public:
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 		}
 
-		void UpdateAI(const uint32 diff)
+		void UpdateAI(uint32 diff)
 		{
 			if (me->HasUnitState(UNIT_STATE_CASTING))
 				return;
@@ -1068,7 +1068,7 @@ public:
 		{
 		}
 
-		void UpdateAI(const uint32 diff)
+		void UpdateAI(uint32 diff)
 		{
 			if (me->HasUnitState(UNIT_STATE_CASTING) || !seated)
 				return;

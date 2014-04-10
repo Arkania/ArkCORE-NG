@@ -236,7 +236,7 @@ public:
                 instance->SetData(DATA_RELIQUARYOFSOULSEVENT, DONE);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!Phase)
                 return;
@@ -457,7 +457,7 @@ public:
             me->AddThreat(target, 1000000);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (me->IsInCombat())
             {
@@ -562,7 +562,7 @@ public:
             DoScriptText(RAND(DESI_SAY_SLAY1, DESI_SAY_SLAY2, DESI_SAY_SLAY3), me);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -654,7 +654,7 @@ public:
             DoScriptText(RAND(ANGER_SAY_SLAY1, ANGER_SAY_SLAY2), me);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             //Return since we have no target
             if (!UpdateVictim())

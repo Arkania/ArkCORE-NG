@@ -115,7 +115,7 @@ class boss_ragnaros : public CreatureScript
                     DoScriptText(SAY_KILL, me);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (_introState != 2)
                 {
@@ -328,7 +328,7 @@ class npc_son_of_flame2 : public CreatureScript
                     instance->SetData(DATA_RAGNAROS_ADDS, 1);
             }
 
-            void UpdateAI(const uint32 /*diff*/)
+            void UpdateAI(uint32 /*diff*/)
             {
                 if (!UpdateVictim())
                     return;

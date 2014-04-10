@@ -397,7 +397,7 @@ public:
             Talk(RAND(SAY_KILL_1, SAY_KILL_2, SAY_KILL_3, SAY_KILL_4));
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING) || !phase)
                 return;
@@ -563,7 +563,7 @@ public:
             me->DespawnOrUnsummon(25000);
         }
 
-        void UpdateAI(const uint32 diff) {}
+        void UpdateAI(uint32 diff) {}
     };
 };
 
@@ -612,7 +612,7 @@ public:
             events.ScheduleEvent(EVENT_SUMMON_FLAME_LORD, 5500);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             events.Update(diff);
 
@@ -675,7 +675,7 @@ public:
             events.ScheduleEvent(EVENT_SUMMON_SHADOW_LORD, 5500);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             events.Update(diff);
 
@@ -724,7 +724,7 @@ public:
             events.ScheduleEvent(EVENT_DEBILITATING_BEAM, 1000);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             events.Update(diff);
 
@@ -780,7 +780,7 @@ public:
             events.ScheduleEvent(EVENT_MELEE_INCR_CORRUPTION, 2100);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             events.Update(diff);
 
@@ -853,7 +853,7 @@ public:
             events.ScheduleEvent(EVENT_CORRUPTING_CRASH, urand(11000, 17000));
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (me->HealthBelowPct(6) && !dead) // Make them look dead.
             {
@@ -1366,7 +1366,7 @@ public:
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         }
 
-        void UpdateAI(const uint32 diff) 
+        void UpdateAI(uint32 diff) 
         {
             if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                 return;

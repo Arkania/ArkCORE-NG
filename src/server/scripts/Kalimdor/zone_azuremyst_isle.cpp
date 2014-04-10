@@ -145,7 +145,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (SayThanksTimer)
             {
@@ -259,7 +259,7 @@ public:
 			Talk(2); // DoScriptText(ATTACK_YELL, me, who);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!me->IsInCombat() && !IsTreeEvent)
             {
@@ -326,7 +326,7 @@ public:
 
         void MoveInLineOfSight(Unit* /*who*/) {}
 
-        void UpdateAI(const uint32 /*diff*/) {}
+        void UpdateAI(uint32 /*diff*/) {}
     };
 
 };
@@ -448,7 +448,7 @@ public:
             me->SetReactState(REACT_PASSIVE);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -528,7 +528,7 @@ class npc_stillpine_captive : public CreatureScript
                 _events.ScheduleEvent(EVENT_DESPAWN, 3500);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!_movementComplete)
                     return;

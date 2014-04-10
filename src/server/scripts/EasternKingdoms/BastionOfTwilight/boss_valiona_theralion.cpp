@@ -483,7 +483,7 @@ public:
                 theralion->SetHealth(theralion->GetHealth() - damage);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING) || !phase)
                 return;
@@ -844,7 +844,7 @@ public:
                 valiona->SetHealth(valiona->GetHealth() - damage);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                 return;
@@ -1027,7 +1027,7 @@ public:
             events.ScheduleEvent(EVENT_DESPAWN, 12000);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             events.Update(diff);
 
@@ -1071,7 +1071,7 @@ public:
             events.ScheduleEvent(EVENT_DESPAWN, 45000); // Last 45 sec.
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             events.Update(diff);
 
@@ -1120,7 +1120,7 @@ public:
             summons.DespawnAll();
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             events.Update(diff);
 
@@ -1173,7 +1173,7 @@ public:
             events.ScheduleEvent(EVENT_TWILIGHT_RIFT, 100);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
@@ -1221,7 +1221,7 @@ public:
             events.ScheduleEvent(EVENT_UNSTABLE_TWILIGHT, 1000);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
@@ -1274,7 +1274,7 @@ public:
             events.ScheduleEvent(EVENT_DESPAWN, 10000);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
@@ -1321,7 +1321,7 @@ public:
             events.ScheduleEvent(EVENT_COLLAPSING_PORTAL, 60000);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;

@@ -287,7 +287,7 @@ public:
             bCanDown = true;
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!instance)
                 return;
@@ -458,7 +458,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (instance && bCheckTimer <= diff)
             {
@@ -553,7 +553,7 @@ public:
         void AttackStart(Unit* /*victim*/) {}
         void MoveInLineOfSight(Unit* /*who*/) {}
 
-        void UpdateAI(const uint32 /*diff*/)
+        void UpdateAI(uint32 /*diff*/)
         {
             if (!instance)
                 return;

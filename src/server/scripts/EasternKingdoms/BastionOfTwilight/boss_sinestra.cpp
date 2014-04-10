@@ -455,7 +455,7 @@ public:
             Talk(RAND(SAY_KILL_1, SAY_KILL_2));
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING) || !phase)
                 return;
@@ -639,7 +639,7 @@ public:
 			events.ScheduleEvent(EVENT_INCREASE, 15000);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             events.Update(diff);
 
@@ -692,7 +692,7 @@ public:
 			}
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
 			if (Creature* essence = me->FindNearestCreature(NPC_TWILIGHT_ESSENCE, 4.0f, true)) // Eat that essence
             {
@@ -768,7 +768,7 @@ public:
                 damage = me->GetHealth() - 1;
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
 		    if (me->HealthBelowPct(3) && !Revived) // Buli knows a better way... me I can't remember what I know
             {
@@ -859,7 +859,7 @@ public:
             events.ScheduleEvent(EVENT_UNLEASE_ESSENCE, 3000);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             events.Update(diff);
 
@@ -926,7 +926,7 @@ public:
 			events.ScheduleEvent(EVENT_DESPAWN, 8000);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             events.Update(diff);
 
@@ -999,7 +999,7 @@ public:
 			Talk(SAY_ENTRANCE);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             events.Update(diff);
 
@@ -1097,7 +1097,7 @@ public:
 			talkcount = 0;
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             events.Update(diff);
 

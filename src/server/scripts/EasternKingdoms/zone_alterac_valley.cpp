@@ -87,7 +87,7 @@ class npc_av_marshal_or_warmaster : public CreatureScript
                 Reset();
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!bHasAura)
                 {

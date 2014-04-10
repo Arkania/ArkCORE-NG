@@ -163,7 +163,7 @@ class npc_abyssal : public CreatureScript
                     ScriptedAI::MoveInLineOfSight(who);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (trigger)
                 {
@@ -351,7 +351,7 @@ class boss_magtheridon : public CreatureScript
                 DoScriptText(SAY_FREED, me);
            }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!me->IsInCombat())
                 {
@@ -540,7 +540,7 @@ class npc_hellfire_channeler : public CreatureScript
                     instance->SetData(DATA_CHANNELER_EVENT, DONE);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;

@@ -220,7 +220,7 @@ public:
             DoCast(TeleportSpells[instance->GetData(DATA_UROM_PLATAFORM)]);
         }
 
-        void UpdateAI(const uint32 uiDiff)
+        void UpdateAI(uint32 uiDiff)
         {
             //Return since we have no target
             if (!UpdateVictim())

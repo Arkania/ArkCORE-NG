@@ -188,7 +188,7 @@ class boss_echo_of_jaina : public CreatureScript
                 events.ScheduleEvent(EVENT_FLARECORE, urand(14000, 17000));
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                     return;
@@ -286,7 +286,7 @@ class npc_flarecore : public CreatureScript
                 events.ScheduleEvent(EVENT_EXPLODE, 10000);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                     return;

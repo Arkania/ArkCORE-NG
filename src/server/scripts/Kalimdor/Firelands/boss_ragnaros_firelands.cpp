@@ -550,7 +550,7 @@ class boss_ragnaros_firelands : public CreatureScript
                 }
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                     return;
@@ -1054,7 +1054,7 @@ class npc_sulfuras_smash_trigger : public CreatureScript // 53266
 
             void EnterCombat(Unit* who) {}
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {        
                 if (m_uiSummonTimer <= diff)
                 {
@@ -1132,7 +1132,7 @@ class npc_sulfuras_smash : public CreatureScript // 53268
             Creature* wave;
             uint32 m_uiDespawnTimer;
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 events.Update(diff);
 
@@ -1187,7 +1187,7 @@ class npc_magma_trap : public CreatureScript
             uint32 m_uiDespawnTimer;
             uint32 m_uiCheckTimer;
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (m_uiCheckTimer <= diff)
                 {
@@ -1241,7 +1241,7 @@ class npc_splitting_blow : public CreatureScript
             InstanceScript* instance;
             uint32 m_uiDespawnTimer;
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {       
                 if (m_uiDespawnTimer <= diff)
                 {
@@ -1283,7 +1283,7 @@ class npc_sulfuras : public CreatureScript
             InstanceScript* instance;
             uint32 m_uiDespawnTimer;
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -1339,7 +1339,7 @@ class npc_son_of_flame : public CreatureScript
                     }
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {            
                 if (HealthBelowPct(50))
                     me->RemoveAurasDueToSpell(SPELL_BURNING_SPEED);    
@@ -1405,7 +1405,7 @@ class npc_molten_seed : public CreatureScript
             uint32 m_uiDespawnTimer;
             uint32 m_uiMoltenInfernoTimer;
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (m_uiMoltenInfernoTimer <= diff)
                 {
@@ -1449,7 +1449,7 @@ class npc_lava_scion : public CreatureScript
             InstanceScript* instance;
             uint32 m_uiBlazingHeatTimer;
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                     return;              
@@ -1499,7 +1499,7 @@ class npc_molten_elemental : public CreatureScript
             InstanceScript* instance;
             uint32 m_uiMoltenPowerCheckTimer;
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                     return;
@@ -1545,7 +1545,7 @@ class npc_engulfing_flames : public CreatureScript
             InstanceScript* instance;
             uint32 m_uiDespawnTimer;
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {           
                 if (m_uiDespawnTimer <= diff)
                 {
@@ -1582,7 +1582,7 @@ class npc_dreadflame : public CreatureScript
             uint32 m_uiDreadTimer;
             uint32 m_uiCheckDeluge;
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {             
                 if (m_uiCheckDeluge <= diff)
                 {
@@ -1660,7 +1660,7 @@ class npc_living_meteor : public CreatureScript
                 DoCast(me, SPELL_COMBUSTION);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (m_uiRangeCheckTimer <= diff)
                 {
@@ -1744,7 +1744,7 @@ class npc_entrapping_roots : public CreatureScript
                 me->SetReactState(REACT_PASSIVE);
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(uint32 uiDiff)
             {
                 if (searchragnaros <= uiDiff)
                 {
@@ -1784,7 +1784,7 @@ class npc_cloudburst : public CreatureScript
             InstanceScript* instance;
             uint8 _cloudburstCounter;
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(uint32 uiDiff)
             {
                 _cloudburstCounter = RAID_MODE<uint8>(1, 1, 1, 3);
 
@@ -1824,7 +1824,7 @@ class npc_breathoffrost : public CreatureScript
 
             InstanceScript* instance;
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(uint32 uiDiff)
             {
                 if (Player* player = me->FindNearestPlayer(6.0f, true))
                     if (player->IsWithinDistInMap(me, 6.0f))
@@ -1875,7 +1875,7 @@ class npc_malfurion : public CreatureScript
             }
 
             
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(uint32 uiDiff)
             {
                 if (m_uiCloudTimer <= uiDiff)
                 {
@@ -1924,7 +1924,7 @@ class npc_cenarius : public CreatureScript
             m_uiFrostyTimer = 12000;
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(uint32 uiDiff)
             {
                 if (m_uiFrostyTimer <= uiDiff)
                 {
@@ -1973,7 +1973,7 @@ class npc_heartofragnaros : public CreatureScript
             {            
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(uint32 uiDiff)
             {
                 Player* player=me->FindNearestPlayer(6.0f, true);
                 if (player)
@@ -2031,7 +2031,7 @@ class npc_hamuul : public CreatureScript
             }
 
             
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(uint32 uiDiff)
             {
                 if (m_uiRootTimer <= uiDiff)
                 {

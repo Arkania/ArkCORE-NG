@@ -160,7 +160,7 @@ class boss_altairus : public CreatureScript
 					return false;
 			}
 
-			void UpdateAI(const uint32 diff)
+			void UpdateAI(uint32 diff)
 			{
 				if (!pInstance || !UpdateVictim())
 					return;
@@ -250,7 +250,7 @@ class npc_air_current : public CreatureScript
 				//DoCast(me, SPELL_CALL_OF_WIND);
 			}
 
-			void UpdateAI(const uint32 diff)
+			void UpdateAI(uint32 diff)
 			{
 			}
 	 };
@@ -276,7 +276,7 @@ class npc_air_current : public CreatureScript
 				DoCast(me, SPELL_TWISTER_AURA);
 			}
 
-			void UpdateAI(const uint32 diff)
+			void UpdateAI(uint32 diff)
 			{
 			}
 	 };

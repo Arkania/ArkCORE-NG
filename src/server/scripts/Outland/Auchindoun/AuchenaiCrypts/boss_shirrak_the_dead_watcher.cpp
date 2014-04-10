@@ -90,7 +90,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             //Inhibitmagic_Timer
             if (Inhibitmagic_Timer <= diff)
@@ -187,7 +187,7 @@ public:
         void EnterCombat(Unit* /*who*/)
         { }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             //Return since we have no target
             if (!UpdateVictim())

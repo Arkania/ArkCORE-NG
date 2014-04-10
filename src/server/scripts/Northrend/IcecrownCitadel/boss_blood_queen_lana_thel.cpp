@@ -322,7 +322,7 @@ class boss_blood_queen_lana_thel : public CreatureScript
                 }
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim() || !CheckInRoom())
                     return;

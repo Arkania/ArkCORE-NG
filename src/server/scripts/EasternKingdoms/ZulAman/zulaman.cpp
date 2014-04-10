@@ -189,7 +189,7 @@ public:
             bool activated, Starting;
             EventMap events;
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!activated)
                     return;
@@ -395,7 +395,7 @@ class npc_zulaman_hostage : public CreatureScript
                     player->SendLoot(me->GetGUID(), LOOT_CORPSE);
             }
 
-            void UpdateAI(const uint32 /*diff*/)
+            void UpdateAI(uint32 /*diff*/)
             {
                 if (IsLoot)
                     DoCast(me, 7, false);
@@ -487,7 +487,7 @@ class npc_zulaman_archon : public CreatureScript
                 events.ScheduleEvent(EVENT_SIGIL_OF_FROST, 8000);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                     return;
@@ -584,7 +584,7 @@ class npc_zulaman_juggernaut : public CreatureScript
 
             void EnterCombat(Unit* /*who*/) { }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                     return;
@@ -696,7 +696,7 @@ class npc_zulaman_hierophant : public CreatureScript
                 }
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim() && me->IsInCombat() || me->HasUnitState(UNIT_STATE_CASTING))
                     return;

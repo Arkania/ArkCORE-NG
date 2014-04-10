@@ -314,7 +314,7 @@ public:
             Reset();
         }
 
-        void UpdateAI(const uint32 /*uiDiff*/)
+        void UpdateAI(uint32 /*diff*/)
         {
             if (!UpdateVictim())
                 return;
@@ -413,7 +413,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 uiDiff)
+        void UpdateAI(uint32 uiDiff)
         {
             npc_escortAI::UpdateAI(uiDiff);
 
@@ -493,7 +493,7 @@ public:
             sayStep = 0;
         }
 
-        void UpdateAI(const uint32 uiDiff)
+        void UpdateAI(uint32 uiDiff)
         {
             if (!sayStep)
                 return;

@@ -619,7 +619,7 @@ public:
                 npc_escortAI::EnterEvadeMode();
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             npc_escortAI::UpdateAI(diff);
 
@@ -1680,7 +1680,7 @@ public:
         npc_the_lich_king_tirion_dawnAI(Creature* creature) : ScriptedAI(creature) { Reset(); }
         void Reset() {}
         void AttackStart(Unit* /*who*/) {} // very sample, just don't make them aggreesive
-        void UpdateAI(const uint32 /*diff*/) {}
+        void UpdateAI(uint32 /*diff*/) {}
         void JustDied(Unit* /*killer*/) {}
     };
 

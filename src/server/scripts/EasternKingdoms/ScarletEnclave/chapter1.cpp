@@ -172,7 +172,7 @@ public:
             DoScriptText(say_event_start[rand()%8], me, target);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             switch (phase)
             {
@@ -401,7 +401,7 @@ public:
                charmer->RemoveAurasDueToSpell(51852);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (me->IsCharmed())
             {
@@ -584,7 +584,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 uiDiff)
+        void UpdateAI(uint32 uiDiff)
         {
             if (!UpdateVictim())
             {
@@ -661,7 +661,7 @@ public:
             TargetGUID = 0;
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!Intro || !TargetGUID)
                 return;
@@ -928,7 +928,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 /*diff*/)
+        void UpdateAI(uint32 /*diff*/)
         {
             if (!me->IsInCombat())
             {
@@ -1128,7 +1128,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (IntroPhase)
             {

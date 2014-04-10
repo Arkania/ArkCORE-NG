@@ -267,7 +267,7 @@ struct generic_halionAI : public BossAI
         }
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 diff)
     {
         if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
             return;
@@ -389,7 +389,7 @@ class boss_halion : public CreatureScript
                 }
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (events.GetPhaseMask() & PHASE_TWO_MASK)
                     return;
@@ -683,7 +683,7 @@ class npc_halion_controller : public CreatureScript
                 }
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 // The IsInCombat() check is needed because that check should be false when Halion is
                 // not engaged, while it would return true without as UpdateVictim() checks for
@@ -912,7 +912,7 @@ class npc_orb_carrier : public CreatureScript
                 ASSERT(creature->GetVehicleKit());
             }
 
-            void UpdateAI(const uint32 /*diff*/)
+            void UpdateAI(uint32 /*diff*/)
             {
                 /// According to sniffs this spell is cast every 1 or 2 seconds.
                 /// However, refreshing it looks bad, so just cast the spell if
@@ -1027,7 +1027,7 @@ class npc_meteor_strike_initial : public CreatureScript
                 }
             }
 
-            void UpdateAI(const uint32 /*diff*/) { }
+            void UpdateAI(uint32 /*diff*/) { }
             void EnterEvadeMode() { }
         private:
             InstanceScript* _instance;
@@ -1071,7 +1071,7 @@ class npc_meteor_strike : public CreatureScript
                     controller->AI()->JustSummoned(me);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (_spawnCount > 5)
                     return;
@@ -1164,7 +1164,7 @@ class npc_combustion_consumption : public CreatureScript
                 summoner->CastCustomSpell(_explosionSpell, SPELLVALUE_BASE_POINT0, damage, summoner);
             }
 
-            void UpdateAI(const uint32 /*diff*/) { }
+            void UpdateAI(uint32 /*diff*/) { }
 
         private:
             InstanceScript* _instance;
@@ -1243,7 +1243,7 @@ class npc_living_ember : public CreatureScript
                 me->DespawnOrUnsummon(1);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                     return;

@@ -460,7 +460,7 @@ class npc_highlord_tirion_fordring_lh : public CreatureScript
                 }
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (_damnedKills != 2)
                     return;
@@ -611,7 +611,7 @@ class npc_rotting_frost_giant : public CreatureScript
                 _events.Reset();
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -683,7 +683,7 @@ class npc_frost_freeze_trap : public CreatureScript
                 }
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 _events.Update(diff);
 
@@ -876,7 +876,7 @@ class boss_sister_svalna : public CreatureScript
                 }
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim() && !_isEventInProgress)
                     return;
@@ -1355,7 +1355,7 @@ class npc_captain_arnath : public CreatureScript
                     Events.ScheduleEvent(EVENT_ARNATH_DOMINATE_MIND, urand(22000, 27000));
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -1436,7 +1436,7 @@ class npc_captain_brandon : public CreatureScript
                     Events.ScheduleEvent(EVENT_BRANDON_HAMMER_OF_BETRAYAL, urand(25000, 30000));
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -1504,7 +1504,7 @@ class npc_captain_grondel : public CreatureScript
                     Events.ScheduleEvent(EVENT_GRONDEL_CONFLAGRATION, urand(12000, 17000));
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -1569,7 +1569,7 @@ class npc_captain_rupert : public CreatureScript
                 Events.ScheduleEvent(EVENT_RUPERT_ROCKET_LAUNCH, urand(10000, 15000));
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -1654,7 +1654,7 @@ class npc_impaling_spear : public CreatureScript
                 _vehicleCheckTimer = 500;
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (_vehicleCheckTimer <= diff)
                 {
@@ -1695,7 +1695,7 @@ class npc_arthas_teleport_visual : public CreatureScript
                     _events.ScheduleEvent(EVENT_SOUL_MISSILE, urand(1000, 6000));
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (_events.Empty())
                     return;

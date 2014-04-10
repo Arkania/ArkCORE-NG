@@ -120,7 +120,7 @@ class boss_pathaleon_the_calculator : public CreatureScript
                 summons.Despawn(summon);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 //Return since we have no target
                 if (!UpdateVictim())
@@ -227,7 +227,7 @@ class npc_nether_wraith : public CreatureScript
 
             void EnterCombat(Unit* /*who*/) {}
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;

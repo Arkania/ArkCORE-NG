@@ -115,7 +115,7 @@ public:
             damage = 0;
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (CheckTimer <= diff)
             {
@@ -201,7 +201,7 @@ public:
             damage = 0;
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (ChangeTargetTimer <= diff)
             {
@@ -467,7 +467,7 @@ public:
                 SoulChargeTimer = urand(2000, 30000);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!me->IsInCombat())
             {

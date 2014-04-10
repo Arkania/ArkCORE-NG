@@ -121,7 +121,7 @@ public:
         void EnterCombat(Unit* /*who*/) {}
         void MoveInLineOfSight(Unit* /*who*/) {}
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (HellfireTimer)
             {
@@ -387,7 +387,7 @@ public:
             DoScriptText(RAND(SAY_SUMMON1, SAY_SUMMON2), me);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;

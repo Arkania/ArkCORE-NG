@@ -315,7 +315,7 @@ struct boss_twin_baseAI : public ScriptedAI
         me->UpdateDamagePhysical(mode ? OFF_ATTACK : BASE_ATTACK);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 uiDiff)
     {
         if (!instance || !UpdateVictim())
             return;
@@ -616,7 +616,7 @@ public:
     {
         npc_unleashed_darkAI(Creature* creature) : npc_unleashed_ballAI(creature) {}
 
-        void UpdateAI(const uint32 uiDiff)
+        void UpdateAI(uint32 uiDiff)
         {
             if (m_uiRangeCheckTimer < uiDiff)
             {
@@ -657,7 +657,7 @@ public:
     {
         npc_unleashed_lightAI(Creature* creature) : npc_unleashed_ballAI(creature) {}
 
-        void UpdateAI(const uint32 uiDiff)
+        void UpdateAI(uint32 uiDiff)
         {
             if (m_uiRangeCheckTimer < uiDiff)
             {
@@ -706,7 +706,7 @@ public:
             DoCastAOE(SPELL_CONTROLLER_PERIODIC);
         }
 
-        void UpdateAI(const uint32 /*uiDiff*/)
+        void UpdateAI(uint32 /*diff*/)
         {
             UpdateVictim();
         }

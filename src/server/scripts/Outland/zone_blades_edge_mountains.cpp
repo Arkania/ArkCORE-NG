@@ -158,7 +158,7 @@ public:
             OgreGUID = 0;
         }
 
-        void UpdateAI(const uint32 /*diff*/)  { }
+        void UpdateAI(uint32 /*diff*/)  { }
     };
 
     CreatureAI* GetAI(Creature* creature) const 
@@ -237,7 +237,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff) 
+        void UpdateAI(uint32 diff) 
         {
             if (!UpdateVictim())
                 return;
@@ -297,7 +297,7 @@ public:
 
         void Reset() { }
 
-        void UpdateAI(const uint32 /*uiDiff*/)
+        void UpdateAI(uint32 /*diff*/)
         {
             if (!UpdateVictim())
                 return;
@@ -404,7 +404,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (IsNihil)
             {
@@ -677,7 +677,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 /*diff*/)
+        void UpdateAI(uint32 /*diff*/)
         {
             if (!UpdateVictim())
                 return;
@@ -759,7 +759,7 @@ class npc_simon_bunny : public CreatureScript
             EventMap _events;
             std::list<uint8> colorSequence, playableSequence, playerSequence;
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 _events.Update(diff);
 
@@ -1281,7 +1281,7 @@ public:
                 playerGuid = summoner->GetGUID();
         }
 
-        void UpdateAI(const uint32 diff) 
+        void UpdateAI(uint32 diff) 
         {
             if (timer <= diff)
             {

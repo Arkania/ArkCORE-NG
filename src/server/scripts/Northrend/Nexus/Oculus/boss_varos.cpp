@@ -94,7 +94,7 @@ public:
             return coreEnergizeOrientation;
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             //Return since we have no target
             if (!UpdateVictim())
@@ -185,7 +185,7 @@ class npc_azure_ring_captain : public CreatureScript
                 }
             }
 
-            void UpdateAI(const uint32 /*diff*/)
+            void UpdateAI(uint32 /*diff*/)
             {
                 if (!UpdateVictim())
                     return;

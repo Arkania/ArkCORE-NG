@@ -378,7 +378,7 @@ public:
             Talk(RAND(SAY_KILL_1, SAY_KILL_2));
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                 return;
@@ -573,7 +573,7 @@ public:
         uint32 timerMove;
         uint32 timerDespawn;
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (timerMove <= diff) // move forward
             {
@@ -614,7 +614,7 @@ public:
         uint32 timerPeriodic;
         uint32 timerDespawn;
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (timerPeriodic <= diff)
             {
@@ -652,7 +652,7 @@ public:
         uint32 timerRemoveAura;
         uint32 timerCast;
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (timerCast <= diff)
             {
@@ -691,7 +691,7 @@ public:
         uint32 timerSummonFlame;
         uint32 timerDespawn;
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (timerSummonFlame <= diff)
             {
@@ -729,7 +729,7 @@ public:
         uint32 timerPeriodic;
         uint32 timerDespawn;
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (timerPeriodic <= diff)
             {
@@ -798,7 +798,7 @@ public:
     {
         npc_atramedes_gongAI(Creature* creature) : ScriptedAI(creature){ }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         { 
             // Don't use gongs out of combat
             if (Creature* atramedes = me->FindNearestCreature(BOSS_ATRAMEDES, 200.0f))
@@ -865,7 +865,7 @@ public:
                  (*iter)->DespawnOrUnsummon();
         }
 
-        void UpdateAI(const uint32 diff) 
+        void UpdateAI(uint32 diff) 
         {
             if (timer <= diff)
             {

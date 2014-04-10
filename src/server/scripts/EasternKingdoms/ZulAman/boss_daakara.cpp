@@ -349,7 +349,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                 return;
@@ -605,7 +605,7 @@ public:
                 DoCast(caster, SPELL_ZAP_DAMAGE, true);
         }
 
-        void UpdateAI(const uint32 /*diff*/)
+        void UpdateAI(uint32 /*diff*/)
         {
             // if the vortex reach the target, it change his target to another player (not used, they move on sweeping winds!).
             // if (me->IsWithinMeleeRange(me->GetVictim()))

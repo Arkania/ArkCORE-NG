@@ -264,7 +264,7 @@ public:
             RaidWiped = false;
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             npc_escortAI::UpdateAI(diff);
 
@@ -615,7 +615,7 @@ public:
 
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
 
             if (YellTimer <= diff)

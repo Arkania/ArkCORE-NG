@@ -275,7 +275,7 @@ public:
                     m_aSphereGUID[i] = summoned->GetGUID();
         }
 
-        void UpdateAI(const uint32 uiDiff)
+        void UpdateAI(uint32 uiDiff)
         {
             if (!UpdateVictim())
                 return;
@@ -467,7 +467,7 @@ public:
             DoCast(killer, RAID_MODE(SPELL_TRAITOR_KING_10, SPELL_TRAITOR_KING_25));
         }
 
-        void UpdateAI(const uint32 uiDiff)
+        void UpdateAI(uint32 uiDiff)
         {
             if (!UpdateVictim())
                 return;
@@ -530,7 +530,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 uiDiff)
+        void UpdateAI(uint32 uiDiff)
         {
             if (!UpdateVictim())
                 return;
@@ -680,7 +680,7 @@ public:
             uiDamage = 0;
         }
 
-        void UpdateAI(const uint32 uiDiff)
+        void UpdateAI(uint32 uiDiff)
         {
             Unit* target = Unit::GetPlayer(*me, m_uiTargetGUID);
             if (!target || !target->IsAlive() || !target->HasAura(SPELL_MARK))

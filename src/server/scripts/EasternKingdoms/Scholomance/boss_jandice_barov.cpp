@@ -71,7 +71,7 @@ public:
                 Illusion->AI()->AttackStart(victim);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (Invisible && Invisible_Timer <= diff)
             {
@@ -181,7 +181,7 @@ public:
         {
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             //Return since we have no target
             if (!UpdateVictim())

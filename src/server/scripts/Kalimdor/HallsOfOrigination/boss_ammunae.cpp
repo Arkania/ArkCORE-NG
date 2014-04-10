@@ -155,7 +155,7 @@ class boss_ammunae : public CreatureScript
                 summons.push_back(summon->GetGUID());
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(uint32 uiDiff)
             {
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
@@ -402,7 +402,7 @@ class npc_seedling : public CreatureScript
                 i--;
             }
             
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(uint32 uiDiff)
             {
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
@@ -443,7 +443,7 @@ class npc_blossom : public CreatureScript
                 m_uiThornSlashTimer = urand(5000, 10000);
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(uint32 uiDiff)
             {
                 if (!UpdateVictim())
                     return;
@@ -495,7 +495,7 @@ class npc_spore : public CreatureScript
                 me->SummonCreature(40585, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 300000);
             }
             
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(uint32 uiDiff)
             {
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;

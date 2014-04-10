@@ -200,7 +200,7 @@ class npc_lady_nazjar_event : public CreatureScript
                 }
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if(!pInstance)
                     return;

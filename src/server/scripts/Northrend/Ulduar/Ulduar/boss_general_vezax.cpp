@@ -134,7 +134,7 @@ class boss_general_vezax : public CreatureScript
                 events.ScheduleEvent(EVENT_BERSERK, 600000);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -332,7 +332,7 @@ class boss_saronite_animus : public CreatureScript
                     Vezax->AI()->DoAction(ACTION_ANIMUS_DIE);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -391,7 +391,7 @@ class npc_saronite_vapors : public CreatureScript
                 events.ScheduleEvent(EVENT_RANDOM_MOVE, urand(5000, 7500));
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 events.Update(diff);
 

@@ -109,7 +109,7 @@ class boss_nethermancer_sepethrea : public CreatureScript
                     instance->SetData(DATA_NETHERMANCER_EVENT, DONE);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 //Return since we have no target
                 if (!UpdateVictim())
@@ -212,7 +212,7 @@ class npc_ragin_flames : public CreatureScript
                 {
                 }
 
-                void UpdateAI(const uint32 diff)
+                void UpdateAI(uint32 diff)
                 {
                     //Check_Timer
                     if (Check_Timer <= diff)

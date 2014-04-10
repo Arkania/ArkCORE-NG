@@ -91,7 +91,7 @@ class npc_warp_splinter_treant : public CreatureScript
 
             void MoveInLineOfSight(Unit* /*who*/) {}
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                 {
@@ -191,7 +191,7 @@ class boss_warp_splinter : public CreatureScript
                 DoScriptText(RAND(SAY_SUMMON_1, SAY_SUMMON_2), me);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;

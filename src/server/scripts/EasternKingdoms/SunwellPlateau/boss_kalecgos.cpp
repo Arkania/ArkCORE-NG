@@ -203,7 +203,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (TalkTimer)
             {
@@ -483,7 +483,7 @@ public:
                 damage *= 3;
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!me->HasAura(AURA_SPECTRAL_INVISIBILITY))
                 me->CastSpell(me, AURA_SPECTRAL_INVISIBILITY, true);
@@ -706,7 +706,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!me->HasAura(AURA_SPECTRAL_INVISIBILITY))
                 me->CastSpell(me, AURA_SPECTRAL_INVISIBILITY, true);

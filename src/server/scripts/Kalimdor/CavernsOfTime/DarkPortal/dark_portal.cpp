@@ -162,7 +162,7 @@ public:
             DoScriptText(SAY_DEATH, me);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!instance)
                 return;
@@ -336,7 +336,7 @@ public:
             } else DoSummonAtRift(entry);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!instance)
                 return;

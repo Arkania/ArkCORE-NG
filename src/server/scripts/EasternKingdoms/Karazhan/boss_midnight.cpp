@@ -103,7 +103,7 @@ public:
                 pMidnight->Kill(pMidnight);
         }
 
-        void UpdateAI(const uint32 diff);
+        void UpdateAI(uint32 diff);
 
         void SpellHit(Unit* /*source*/, const SpellInfo* spell)
         {
@@ -153,7 +153,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;

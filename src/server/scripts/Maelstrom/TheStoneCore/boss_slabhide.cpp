@@ -183,7 +183,7 @@ class boss_slabhide : public CreatureScript
                 events.ScheduleEvent(EVENT_AIR_PHASE, 20000, PHASE_GROUND);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim() && inCombat || me->HasUnitState(UNIT_STATE_CASTING))
                     return;
@@ -317,7 +317,7 @@ public:
         uint32 timerImpact;
         bool vis;
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (timerAura <= diff)
             {

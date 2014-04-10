@@ -175,7 +175,7 @@ class npc_winterfin_playmate : public CreatureScript
                         }
             }
 
-            void UpdateAI(const uint32 diff) 
+            void UpdateAI(uint32 diff) 
             {
                 if (!phase)
                     return;
@@ -274,7 +274,7 @@ class npc_snowfall_glade_playmate : public CreatureScript
                         }
             }
 
-            void UpdateAI(const uint32 diff) 
+            void UpdateAI(uint32 diff) 
             {
                 if (!phase)
                     return;
@@ -375,7 +375,7 @@ class npc_the_biggest_tree : public CreatureScript
                         }
             }
 
-            void UpdateAI(const uint32 diff) 
+            void UpdateAI(uint32 diff) 
             {
                 if (!phase)
                     return;
@@ -462,7 +462,7 @@ class npc_high_oracle_soo_roo : public CreatureScript
                         }
             }
 
-            void UpdateAI(const uint32 diff) 
+            void UpdateAI(uint32 diff) 
             {
                 if (!phase)
                     return;
@@ -551,7 +551,7 @@ class npc_elder_kekek : public CreatureScript
                         }
             }
 
-            void UpdateAI(const uint32 diff) 
+            void UpdateAI(uint32 diff) 
             {
                 if (!phase)
                     return;
@@ -640,7 +640,7 @@ class npc_the_etymidian : public CreatureScript
                         }
             }
 
-            void UpdateAI(const uint32 diff) 
+            void UpdateAI(uint32 diff) 
             {
                 if (!phase)
                     return;
@@ -762,7 +762,7 @@ class npc_alexstraza_the_lifebinder : public CreatureScript
                     }
             }
 
-            void UpdateAI(const uint32 diff) 
+            void UpdateAI(uint32 diff) 
             {
                 if (!phase)
                     return;

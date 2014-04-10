@@ -365,7 +365,7 @@ struct dummy_dragonAI : public ScriptedAI
             }
     }
 
-    void UpdateAI(const uint32 diff) 
+    void UpdateAI(uint32 diff) 
     {
         events.Update(diff);
 
@@ -429,7 +429,7 @@ public:
             events.ScheduleEvent(EVENT_HATCH_EGGS, 30000);
         }
 
-        void UpdateAI(const uint32 diff) 
+        void UpdateAI(uint32 diff) 
         {
             // if no target, update dummy and return
             if (!UpdateVictim())
@@ -497,7 +497,7 @@ public:
             events.ScheduleEvent(EVENT_ACOLYTE_SHADRON, 60000);
         }
 
-        void UpdateAI(const uint32 diff) 
+        void UpdateAI(uint32 diff) 
         {
             // if no target, update dummy and return
             if (!UpdateVictim())
@@ -568,7 +568,7 @@ public:
             events.ScheduleEvent(EVENT_ACOLYTE_VESPERON, 60000);
         }
 
-        void UpdateAI(const uint32 diff) 
+        void UpdateAI(uint32 diff) 
         {
             // if no target, update dummy and return
             if (!UpdateVictim())
@@ -681,7 +681,7 @@ class npc_acolyte_of_shadron : public CreatureScript
                         debuffTarget->RemoveAurasDueToSpell(SPELL_GIFT_OF_TWILIGTH_SHA);
             }
 
-            void UpdateAI(const uint32 /*diff*/) 
+            void UpdateAI(uint32 /*diff*/) 
             {
                 if (!UpdateVictim())
                     return;
@@ -765,7 +765,7 @@ class npc_acolyte_of_vesperon : public CreatureScript
                 instance->DoRemoveAurasDueToSpellOnPlayers(58835); // Components of spell Twilight Torment
             }
 
-            void UpdateAI(const uint32 /*diff*/) 
+            void UpdateAI(uint32 /*diff*/) 
             {
                 if (!UpdateVictim())
                     return;
@@ -828,7 +828,7 @@ public:
             who->SetInCombatWithZone();
         }
 
-        void UpdateAI(const uint32 diff) 
+        void UpdateAI(uint32 diff) 
         {
             events.Update(diff);
 
@@ -883,7 +883,7 @@ public:
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
         }
 
-        void UpdateAI(const uint32 diff) 
+        void UpdateAI(uint32 diff) 
         {
             events.Update(diff);
 
@@ -943,7 +943,7 @@ public:
             events.ScheduleEvent(EVENT_VOID_BLAST, 5000);
         }
 
-        void UpdateAI(const uint32 diff) 
+        void UpdateAI(uint32 diff) 
         {
             events.Update(diff);
 
@@ -996,7 +996,7 @@ public:
             events.ScheduleEvent(EVENT_FADE_ARMOR, 1000);
         }
 
-        void UpdateAI(const uint32 diff) 
+        void UpdateAI(uint32 diff) 
         {
             if (!UpdateVictim())
                 return;

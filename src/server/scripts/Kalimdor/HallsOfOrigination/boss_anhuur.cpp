@@ -258,7 +258,7 @@ class boss_anhuur : public CreatureScript
                 }
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim() && !me->HasAura(SPELL_SHIELD_OF_LIGHT) || me->HasUnitState(UNIT_STATE_CASTING))
                     return;
@@ -323,7 +323,7 @@ class npc_anhuur_viper : public CreatureScript
             InstanceScript* instance;
             uint32 m_uiViperDotTimer;
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(uint32 uiDiff)
             {
                 if (!UpdateVictim())
                     return;

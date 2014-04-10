@@ -208,7 +208,7 @@ public:
             map->SendToPlayers(&data);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                 return;
@@ -339,7 +339,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (EagleSwoop_Timer <= diff)
                 EagleSwoop_Timer = 0;
@@ -424,7 +424,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (arrived && numb > 1)
             {

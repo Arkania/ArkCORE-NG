@@ -248,7 +248,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (Phase == IDLE)
                 return;
@@ -477,7 +477,7 @@ public:
                     DoCast(me, SPELL_SHADOWS_IN_THE_DARK);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
@@ -599,7 +599,7 @@ class npc_scourge_hulk : public CreatureScript
                     killedByRitualStrike = true;
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;

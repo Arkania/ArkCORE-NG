@@ -154,7 +154,7 @@ public:
                 IsMovingToLunch = false;
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (EventActive)
             {
@@ -228,7 +228,7 @@ public:
             _timer = urand(1800,2200);                       
         }
 
-        void UpdateAI(const uint32 diff) 
+        void UpdateAI(uint32 diff) 
         {                        
             if (!UpdateVictim())
             {
@@ -276,7 +276,7 @@ public:
             _timer = urand(1800,2200);                       
         }
 
-        void UpdateAI(const uint32 diff) 
+        void UpdateAI(uint32 diff) 
         {                        
             if (!UpdateVictim())
             {

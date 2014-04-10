@@ -58,7 +58,7 @@ class npc_ymirjar_flamebearer : public CreatureScript
                 _events.ScheduleEvent(EVENT_TACTICAL_BLINK, 15000);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -123,7 +123,7 @@ class npc_iceborn_protodrake : public CreatureScript
                 _vehicle->RemoveAllPassengers();
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -176,7 +176,7 @@ class npc_geist_ambusher : public CreatureScript
                     DoCast(who, SPELL_LEAPING_FACE_MAUL);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;

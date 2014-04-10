@@ -437,7 +437,7 @@ public:
 			timer = 10000;
         }
 
-		void UpdateAI(const uint32 diff)
+		void UpdateAI(uint32 diff)
 		{
 			if (timer <= diff)
 				me->DespawnOrUnsummon();
@@ -472,7 +472,7 @@ public:
 			timer = 10000;
 		}
 
-		void UpdateAI(const uint32 diff)
+		void UpdateAI(uint32 diff)
 		{
 			me->GetMotionMaster()->MovePoint(0,me->GetPositionX(),me->GetPositionY(),me->GetPositionZ());
 
@@ -515,7 +515,7 @@ public:
 			timerAur = 2000;
         }
 
-		void UpdateAI(const uint32 diff)
+		void UpdateAI(uint32 diff)
         {
             if (!started || me->HasUnitState(UNIT_STATE_CASTING))
                 return;
@@ -561,7 +561,7 @@ public:
 			}
 		}
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
 			if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
 				return;
@@ -638,7 +638,7 @@ public:
 			castTimer = timerAur + 4000;
 		}
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
 			if (!started)
 				return;
@@ -720,7 +720,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
 			npc_escortAI::UpdateAI(diff);
         }
@@ -790,7 +790,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
 			npc_escortAI::UpdateAI(diff);
 
@@ -912,7 +912,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
 			npc_escortAI::UpdateAI(diff);
 
@@ -985,7 +985,7 @@ public:
 			timerDespawn = 20000;
 		}
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
 			if (!started)
 				return;
@@ -1217,7 +1217,7 @@ public:
 				InitWaypoints();
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
 			npc_escortAI::UpdateAI(diff);
         }
@@ -1253,7 +1253,7 @@ public:
 			started = true;
 		}
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
 			if (!started)
 				return;
@@ -1439,7 +1439,7 @@ public:
 			events.CancelEvent(EVENT_MOVE_TORNADOS_4);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                 return;
@@ -1865,7 +1865,7 @@ public:
 			needSummon = true;
         }
 
-		void UpdateAI(const uint32 diff)
+		void UpdateAI(uint32 diff)
         {
 			if (!started)
 				return;

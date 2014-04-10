@@ -395,7 +395,7 @@ class boss_freya : public CreatureScript
                 return 0;
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -733,7 +733,7 @@ class boss_elder_brightleaf : public CreatureScript
                     DoScriptText(SAY_BRIGHTLEAF_AGGRO, me);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim() || me->HasAura(SPELL_DRAINED_OF_POWER))
                     return;
@@ -866,7 +866,7 @@ class boss_elder_stonebark : public CreatureScript
                 }
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim() || me->HasAura(SPELL_DRAINED_OF_POWER))
                     return;
@@ -979,7 +979,7 @@ class boss_elder_ironbranch : public CreatureScript
                     DoScriptText(SAY_IRONBRANCH_AGGRO, me);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim() || me->HasAura(SPELL_DRAINED_OF_POWER))
                     return;
@@ -1060,7 +1060,7 @@ class npc_detonating_lasher : public CreatureScript
                 changeTargetTimer = 7500;
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -1119,7 +1119,7 @@ class npc_ancient_water_spirit : public CreatureScript
                 tidalWaveTimer = 10000;
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -1180,7 +1180,7 @@ class npc_storm_lasher : public CreatureScript
                 stormboltTimer = 5000;
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -1241,7 +1241,7 @@ class npc_snaplasher : public CreatureScript
                     waveCount = CAST_AI(boss_freya::boss_freyaAI, Freya->AI())->trioWaveCount;
             }
 
-            void UpdateAI(const uint32 /*diff*/)
+            void UpdateAI(uint32 /*diff*/)
             {
                 if (!UpdateVictim())
                     return;
@@ -1306,7 +1306,7 @@ class npc_ancient_conservator : public CreatureScript
                 DoCast(who, SPELL_CONSERVATOR_GRIP, true);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -1381,7 +1381,7 @@ class npc_healthy_spore : public CreatureScript
                 lifeTimer = urand(22000, 30000);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (lifeTimer <= diff)
                 {
@@ -1418,7 +1418,7 @@ class npc_eonars_gift : public CreatureScript
                 DoCast(me, SPELL_EONAR_VISUAL, true);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (lifeBindersGiftTimer <= diff)
                 {
@@ -1454,7 +1454,7 @@ class npc_nature_bomb : public CreatureScript
                 DoCast(SPELL_OBJECT_BOMB);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (bombTimer <= diff)
                 {
@@ -1497,7 +1497,7 @@ class npc_unstable_sun_beam : public CreatureScript
                 me->SetReactState(REACT_PASSIVE);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (despawnTimer <= diff)
                 {

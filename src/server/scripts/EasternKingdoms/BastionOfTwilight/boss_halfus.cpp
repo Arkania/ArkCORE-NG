@@ -426,7 +426,7 @@ class boss_halfus : public CreatureScript
                 }
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(uint32 uiDiff)
             {
                 if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                     return;
@@ -558,7 +558,7 @@ class npc_proto_behemoth : public CreatureScript
                 events.ScheduleEvent(EVENT_FIREBALL, 16000);
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(uint32 uiDiff)
             {
                 if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                     return;
@@ -686,7 +686,7 @@ public:
                 Halfus->AddAura(SPELL_DRAGONS_VENGEANCE, Halfus);
         }
 
-        void UpdateAI (const uint32 uiDiff)
+        void UpdateAI(uint32 uiDiff)
         {
             if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                 return;
@@ -698,7 +698,7 @@ public:
         }
     };
 
-    bool OnGossipHello (Player* pPlayer, Creature* creature)
+    bool OnGossipHello(Player* pPlayer, Creature* creature)
     {
         if (!creature->HasAura(SPELL_UNRESPONSIVE_DRAGON))
         if (Creature* Halfus = creature->FindNearestCreature(NPC_HALFUS_WORMBREAKER, 500.0f, true))
@@ -806,7 +806,7 @@ public:
 
         void JustDied(Unit* /*killer*/) {}
 
-        void UpdateAI(const uint32 diff) 
+        void UpdateAI(uint32 diff) 
         {
             DoMeleeAttackIfReady();
         }

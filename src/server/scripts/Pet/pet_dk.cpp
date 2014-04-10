@@ -108,7 +108,7 @@ class npc_pet_dk_ebon_gargoyle : public CreatureScript
                 _despawnTimer = 4 * IN_MILLISECONDS;
             }
 
-            void UpdateAI(const uint32 diff) 
+            void UpdateAI(uint32 diff) 
             {
                 if (_despawnTimer > 0)
                 {

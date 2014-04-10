@@ -91,7 +91,7 @@ class boss_loatheb : public CreatureScript
                 return uint32(_sporeLoserData);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;

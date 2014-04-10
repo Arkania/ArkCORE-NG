@@ -119,7 +119,7 @@ class npc_defiant_troll : public CreatureScript
             }
         }
  
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {       
             if (work == true)
             {
@@ -260,7 +260,7 @@ class npc_tiki_target : public CreatureScript
                     DoCast(me, RAND(SPELL_TIKI_TARGET_VISUAL_1, SPELL_TIKI_TARGET_VISUAL_2, SPELL_TIKI_TARGET_VISUAL_3));
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (me->HealthBelowPct(30))
                     DoCast(me, SPELL_TIKI_TARGET_VISUAL_DIE);
@@ -315,7 +315,7 @@ public:
 				Starting = false;
             }
 
-			void UpdateAI(const uint32 diff)
+			void UpdateAI(uint32 diff)
 			{
 				if (!activated)
 					return;

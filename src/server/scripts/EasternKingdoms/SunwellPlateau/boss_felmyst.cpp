@@ -401,7 +401,7 @@ public:
             ++uiFlightCount;
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
             {
@@ -534,7 +534,7 @@ public:
             DoZoneInCombat();
             //DoCast(me, SPELL_VAPOR_FORCE, true); core bug
         }
-        void UpdateAI(const uint32 /*diff*/)
+        void UpdateAI(uint32 /*diff*/)
         {
             if (!me->GetVictim())
                 if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
@@ -567,7 +567,7 @@ public:
         void EnterCombat(Unit* /*who*/) {}
         void AttackStart(Unit* /*who*/) {}
         void MoveInLineOfSight(Unit* /*who*/) {}
-        void UpdateAI(const uint32 /*diff*/) {}
+        void UpdateAI(uint32 /*diff*/) {}
     };
 
 };

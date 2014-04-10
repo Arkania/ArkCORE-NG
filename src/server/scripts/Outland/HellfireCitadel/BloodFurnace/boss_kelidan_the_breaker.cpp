@@ -198,7 +198,7 @@ class boss_kelidan_the_breaker : public CreatureScript
                 instance->HandleGameObject(instance->GetData64(DATA_DOOR6), true);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                 {
@@ -328,7 +328,7 @@ class npc_shadowmoon_channeler : public CreatureScript
                    CAST_AI(boss_kelidan_the_breaker::boss_kelidan_the_breakerAI, Kelidan->AI())->ChannelerDied(killer);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                 {

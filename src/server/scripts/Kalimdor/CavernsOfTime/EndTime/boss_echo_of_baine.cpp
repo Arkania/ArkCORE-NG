@@ -180,7 +180,7 @@ class boss_echo_of_baine : public CreatureScript
                 events.ScheduleEvent(EVENT_THROW_TOTEM, 25000);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                     return;

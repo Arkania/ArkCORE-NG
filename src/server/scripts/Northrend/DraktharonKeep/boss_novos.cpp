@@ -142,7 +142,7 @@ public:
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             switch (Phase)
             {
@@ -281,7 +281,7 @@ public:
                 CAST_AI(boss_novos::boss_novosAI, pNovos->AI())->RemoveCrystal();
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;

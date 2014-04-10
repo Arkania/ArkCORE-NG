@@ -219,7 +219,7 @@ public:
             DoZoneInCombat();
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             //Only if not incombat check if the event is started
             if (!me->IsInCombat() && instance && instance->GetData(DATA_MAULGAREVENT))
@@ -379,7 +379,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             //Only if not incombat check if the event is started
             if (!me->IsInCombat() && instance && instance->GetData(DATA_MAULGAREVENT))
@@ -494,7 +494,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             //Only if not incombat check if the event is started
             if (!me->IsInCombat() && instance && instance->GetData(DATA_MAULGAREVENT))
@@ -614,7 +614,7 @@ public:
             }
         }
 
-         void UpdateAI(const uint32 diff)
+         void UpdateAI(uint32 diff)
         {
             //Only if not incombat check if the event is started
             if (!me->IsInCombat() && instance && instance->GetData(DATA_MAULGAREVENT))
@@ -724,7 +724,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             //Only if not incombat check if the event is started
             if (!me->IsInCombat() && instance && instance->GetData(DATA_MAULGAREVENT))

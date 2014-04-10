@@ -210,7 +210,7 @@ public:
         uint8 activateTron;
         bool eventActive;
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if(me->HasAura(SPELL_INACTIVE))
                 me->RemoveAura(SPELL_INACTIVE);
@@ -627,7 +627,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (isFirstTron)
                 if (Creature* omnotron = me->FindNearestCreature(BOSS_OMNOTRON, 100.0f, true))
@@ -865,7 +865,7 @@ public:
             HasTarget = false;
         }
 
-        void UpdateAI(const uint32 uiDiff)
+        void UpdateAI(uint32 uiDiff)
         {
             if (HasTarget)
                 me->GetMotionMaster()->MoveChase(myTarget);
@@ -948,7 +948,7 @@ public:
             me->SetReactState(REACT_PASSIVE);
         }
 
-        void UpdateAI(const uint32 uiDiff)
+        void UpdateAI(uint32 uiDiff)
         {
             if(uiDespawn <= uiDiff)
             {
@@ -988,7 +988,7 @@ public:
             me->SetReactState(REACT_PASSIVE);
         }
 
-        void UpdateAI(const uint32 uiDiff)
+        void UpdateAI(uint32 uiDiff)
         {
             if(uiDespawn <= uiDiff)
             {

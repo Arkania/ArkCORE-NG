@@ -97,7 +97,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (uiSpeech_counter)
             {
@@ -293,7 +293,7 @@ public:
                 me->SummonCreature(NPC_CRIMSON_ACOLYTE, 1642.329f, -6045.818f, 127.583f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000);
         }
 
-        void UpdateAI(const uint32 uiDiff)
+        void UpdateAI(uint32 uiDiff)
         {
             npc_escortAI::UpdateAI(uiDiff);
 
@@ -411,7 +411,7 @@ public:
                 uiStage = 2;
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (uiStage && !me->IsInCombat())
             {
@@ -496,7 +496,7 @@ public:
             DoCast(who, SPELL_VALROTH_SMITE);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (uiRenew_timer <= diff)
             {
@@ -694,7 +694,7 @@ public:
                 PlayerGUID = who->GetGUID();
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (PlayerGUID && !me->GetVictim() && me->IsAlive())
             {

@@ -160,7 +160,7 @@ public:
         void EnterCombat(Unit* /*who*/) {}
         void Reset() {}
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             npc_escortAI::UpdateAI(diff);
         }

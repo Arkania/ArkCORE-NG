@@ -34,7 +34,7 @@ public:
 		  pacte_des_tenebres = 25000;
 		  }
 		  
-		  void UpdateAI(const uint32 diff)
+		  void UpdateAI(uint32 diff)
 		  {
 		    if (!UpdateVictim())
             return;
@@ -89,7 +89,7 @@ public:
 		 tir_charge = 19000;
 		 }
 		 
-		 void UpdateAI(const uint32 diff)
+		 void UpdateAI(uint32 diff)
 		 {
 		    if (!UpdateVictim())
             return;
@@ -149,7 +149,7 @@ public:
 		 malediction_du_lanceur_de_runes = 15000;
 		 }
 		 
-		 void UpdateAI(const uint32 diff)
+		 void UpdateAI(uint32 diff)
 		 {
 		    if (!UpdateVictim())
             return;
@@ -207,7 +207,7 @@ public:
 		 meteore = 30000;
 		 }
 		 
-		 void UpdateAI(const uint32 diff)
+		 void UpdateAI(uint32 diff)
 		 {
 		    if (!UpdateVictim())
             return;
@@ -273,7 +273,7 @@ public:
 		 projection_corrosive = 10000;
 		 }
 		 
-		 void UpdateAI(const uint32 diff)
+		 void UpdateAI(uint32 diff)
 		 {
 		    if (!UpdateVictim())
             return;
@@ -326,7 +326,7 @@ public:
 		 toxine = 10000;
 		 }
 		 
-		 void UpdateAI(const uint32 diff)
+		 void UpdateAI(uint32 diff)
 		 {
 		    if (!UpdateVictim())
             return;
@@ -377,7 +377,7 @@ public:
 		 choc = 5000;
 		 }
 		 
-		 void UpdateAI(const uint32 diff)
+		 void UpdateAI(uint32 diff)
 		 {
 		    if (!UpdateVictim())
             return;
@@ -424,7 +424,7 @@ public:
 		 malediction_depuisement = 10000;
 		 }
 		 
-		 void UpdateAI(const uint32 diff)
+		 void UpdateAI(uint32 diff)
 		 {
 		    if (!UpdateVictim())
             return;
@@ -478,7 +478,7 @@ public:
 		salve_de_traits_de_lombre = 12000;
 		}
 		
-		void UpdateAI(const uint32 diff)
+		void UpdateAI(uint32 diff)
 		{
 		   if (!UpdateVictim())
            return;
@@ -532,7 +532,7 @@ public:
 		 salve_de_traits_de_lombre = 16000;
 		 }
 		 
-		 void UpdateAI(const uint32 diff)
+		 void UpdateAI(uint32 diff)
 		 {
 		    if (!UpdateVictim())
             return;
@@ -582,7 +582,7 @@ public:
 		jaillissement_des_arcanes = 15000;
 		}
 		
-		void UpdateAI(const uint32 diff)
+		void UpdateAI(uint32 diff)
 		{
 		     if (!UpdateVictim())
              return;
@@ -626,7 +626,7 @@ public:
 		barrage_des_arcanes = 8000;
 		}
 		
-		void UpdateAI(const uint32 diff)
+		void UpdateAI(uint32 diff)
 		{
 		   if (!UpdateVictim())
            return;
@@ -675,7 +675,7 @@ public :
 		flammes_incendiaires = 10000;
 		}
 		  
-		void UpdateAI(const uint32 diff)
+		void UpdateAI(uint32 diff)
 		{
 		      if (!UpdateVictim())
               return;
@@ -733,7 +733,7 @@ public :
 		flammes_incendiaires = 15000;
 		}
 		 
-		void UpdateAI(const uint32 diff)
+		void UpdateAI(uint32 diff)
 		{
 		    if (!UpdateVictim())
             return;
@@ -796,7 +796,7 @@ public :
 		flammes_incendiaires = 15000;
 		}
 
-		void UpdateAI(const uint32 diff)
+		void UpdateAI(uint32 diff)
 		{
 		    if (!UpdateVictim())
             return;
@@ -856,7 +856,7 @@ public:
 		 tempete_de_feu = 13000;
 		 }
 		 
-		 void UpdateAI(const uint32 diff)
+		 void UpdateAI(uint32 diff)
 		 {
 		    if (!UpdateVictim())
             return;
@@ -914,7 +914,7 @@ public :
 		  tranquillite = 35000;
 		  }
 		  
-		  void UpdateAI(const uint32 diff)
+		  void UpdateAI(uint32 diff)
 		  {
 		     if (!UpdateVictim())
              return;
@@ -971,7 +971,7 @@ public :
 		 souffle_de_spores = 8000;
 		 }
 		 
-		 void UpdateAI(const uint32 diff)
+		 void UpdateAI(uint32 diff)
 		 {
 	        if (!UpdateVictim())
             return;
@@ -1019,7 +1019,7 @@ public :
 			spores_nauseabondes = 10000;
 		}
 		 
-		void UpdateAI(const uint32 diff)
+		void UpdateAI(uint32 diff)
 		{
 		    if (!UpdateVictim())
             return;

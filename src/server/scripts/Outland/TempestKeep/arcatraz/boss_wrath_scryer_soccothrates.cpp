@@ -143,7 +143,7 @@ class boss_wrath_scryer_soccothrates : public CreatureScript
                 }
             }
 
-            void UpdateAI(const uint32 diff) 
+            void UpdateAI(uint32 diff) 
             {
                 if (!UpdateVictim())
                 {

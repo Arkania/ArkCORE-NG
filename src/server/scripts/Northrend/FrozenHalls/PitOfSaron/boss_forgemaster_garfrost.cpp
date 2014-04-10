@@ -189,7 +189,7 @@ class boss_garfrost : public CreatureScript
                 return _permafrostStack;
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;

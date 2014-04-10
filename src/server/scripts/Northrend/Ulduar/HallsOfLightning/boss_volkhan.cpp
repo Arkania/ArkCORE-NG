@@ -231,7 +231,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 uiDiff)
+        void UpdateAI(uint32 uiDiff)
         {
             if (!UpdateVictim())
                 return;
@@ -432,7 +432,7 @@ public:
                     me->DespawnOrUnsummon();
         }
 
-        void UpdateAI(const uint32 uiDiff)
+        void UpdateAI(uint32 uiDiff)
         {
             // Return since we have no target or if we are frozen
             if (!UpdateVictim() || m_bIsFrozen)

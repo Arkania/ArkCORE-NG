@@ -77,7 +77,7 @@ public:
             Attack1HTimer = urand(1800,2200);           			
         }
 
-        void UpdateAI(const uint32 diff) 
+        void UpdateAI(uint32 diff) 
         {						
             if (!UpdateVictim())
 			{
@@ -123,7 +123,7 @@ public:
             Attack1HTimer = urand(1800,2200);           			
         }
 
-        void UpdateAI(const uint32 diff) 
+        void UpdateAI(uint32 diff) 
         {						
             if (!UpdateVictim())
 			{
@@ -203,7 +203,7 @@ public:
             }
         }
 		
-		void UpdateAI(const uint32 diff) 
+		void UpdateAI(uint32 diff) 
         {   
 
 			if (!isHealed) return;
@@ -266,7 +266,7 @@ public:
 			}                
         }
 
-        void UpdateAI(const uint32 diff) 
+        void UpdateAI(uint32 diff) 
         {						
             if (!UpdateVictim())
 			{
@@ -372,7 +372,7 @@ public:
 			}                
         }
 
-        void UpdateAI(const uint32 diff) 
+        void UpdateAI(uint32 diff) 
         {						
             if (!UpdateVictim())
 			{
@@ -478,7 +478,7 @@ public:
 			}                
         }
 
-        void UpdateAI(const uint32 diff) 
+        void UpdateAI(uint32 diff) 
         {						
             if (!UpdateVictim())
 			{

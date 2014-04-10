@@ -422,7 +422,7 @@ class boss_deathbringer_saurfang : public CreatureScript
                         bloodPower->RecalculateAmountOfEffects();
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim() && !(events.GetPhaseMask() & PHASE_INTRO_MASK))
                     return;
@@ -710,7 +710,7 @@ class npc_high_overlord_saurfang_icc : public CreatureScript
                 }
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 _events.Update(diff);
                 while (uint32 eventId = _events.ExecuteEvent())
@@ -890,7 +890,7 @@ class npc_muradin_bronzebeard_icc : public CreatureScript
                 }
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 _events.Update(diff);
                 while (uint32 eventId = _events.ExecuteEvent())

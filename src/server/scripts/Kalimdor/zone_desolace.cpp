@@ -148,7 +148,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             //timer should always be == 0 unless we already updated entry of creature. Then not expect this updated to ever be in combat.
             if (DespawnTimer && DespawnTimer <= diff)

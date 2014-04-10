@@ -71,7 +71,7 @@ class boss_rokmar_the_crackler : public CreatureScript
 
             void KilledUnit(Unit* /*victim*/)  { }
 
-            void UpdateAI(const uint32 diff) 
+            void UpdateAI(uint32 diff) 
             {
                 if (!UpdateVictim())
                     return;

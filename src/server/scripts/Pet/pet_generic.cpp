@@ -51,7 +51,7 @@ class npc_pet_gen_mojo : public CreatureScript
             }
 
             void EnterCombat(Unit* /*who*/)  { }
-            void UpdateAI(const uint32 /*diff*/)  { }
+            void UpdateAI(uint32 /*diff*/)  { }
 
             void ReceiveEmote(Player* player, uint32 emote) 
             {

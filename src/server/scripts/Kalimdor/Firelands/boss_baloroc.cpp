@@ -242,7 +242,7 @@ public:
             _EnterEvadeMode();
         }
 
-		void UpdateAI(const uint32 diff)
+		void UpdateAI(uint32 diff)
 		{
 			if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
 				return;
@@ -346,7 +346,7 @@ public:
 			events.ScheduleEvent(EVENT_CHECK_RANGE, 4000);		
 		}
 
-		void UpdateAI(const uint32 diff)
+		void UpdateAI(uint32 diff)
 		{
 			events.Update(diff);
 

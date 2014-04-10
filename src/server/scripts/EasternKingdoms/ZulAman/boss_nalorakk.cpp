@@ -268,7 +268,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim() && inCombat || me->HasUnitState(UNIT_STATE_CASTING))
                 return;

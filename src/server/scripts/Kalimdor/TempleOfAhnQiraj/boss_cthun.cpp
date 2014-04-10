@@ -247,7 +247,7 @@ public:
                         Spawned->AI()->AttackStart(target);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             //Check if we have a target
             if (!UpdateVictim())
@@ -598,7 +598,7 @@ public:
             return (*j);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             //Check if we have a target
             if (!UpdateVictim())
@@ -970,7 +970,7 @@ public:
             DoZoneInCombat();
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             //Check if we have a target
             if (!UpdateVictim())
@@ -1045,7 +1045,7 @@ public:
             DoZoneInCombat();
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             //Check if we have a target
             if (!UpdateVictim())
@@ -1157,7 +1157,7 @@ public:
             DoZoneInCombat();
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             //Check if we have a target
             if (!UpdateVictim())
@@ -1270,7 +1270,7 @@ public:
             DoZoneInCombat();
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             //Check if we have a target
             if (!UpdateVictim())

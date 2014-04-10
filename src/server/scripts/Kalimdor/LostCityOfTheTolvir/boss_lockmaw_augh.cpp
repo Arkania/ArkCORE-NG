@@ -204,7 +204,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -333,7 +333,7 @@ public:
                 instance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_CREATURE, 43658);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -389,7 +389,7 @@ public:
                 DoScriptText(AUGH_SAY_INTRO_1, me);
         }
 
-        void UpdateAI(const uint32 /*diff*/)
+        void UpdateAI(uint32 /*diff*/)
         {
             if (!UpdateVictim())
                 return;
@@ -444,7 +444,7 @@ public:
         uint32 uiEventTimer;
         uint8 uiPhase;
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -511,7 +511,7 @@ public:
         uint32 uiEventTimer;
         uint8 uiPhase;
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -584,7 +584,7 @@ public:
         uint32 uiEventTimer;
         uint8 uiPhase;
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -721,7 +721,7 @@ public:
             events.ScheduleEvent(EVENT_SAY_AAA, urand(15000, 35000));
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (Intro)
             {

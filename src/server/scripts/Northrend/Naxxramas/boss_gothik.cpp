@@ -395,7 +395,7 @@ class boss_gothik : public CreatureScript
                 }
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim() || !CheckInRoom())
                     return;
@@ -576,7 +576,7 @@ class npc_gothik_minion : public CreatureScript
                 Reset();
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (gateClose && (!isOnSameSide(me) || (me->GetVictim() && !isOnSameSide(me->GetVictim()))))
                 {

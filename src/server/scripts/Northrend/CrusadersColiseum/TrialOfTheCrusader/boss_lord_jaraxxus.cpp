@@ -177,7 +177,7 @@ public:
             DoScriptText(SAY_AGGRO, me);
         }
 
-        void UpdateAI(const uint32 uiDiff)
+        void UpdateAI(uint32 uiDiff)
         {
             if (!UpdateVictim())
                 return;
@@ -268,7 +268,7 @@ public:
             DoCast(SPELL_LEGION_FLAME_EFFECT);
         }
 
-        void UpdateAI(const uint32 /*uiDiff*/)
+        void UpdateAI(uint32 /*diff*/)
         {
             UpdateVictim();
         }
@@ -364,7 +364,7 @@ public:
                 DoCastAOE(SPELL_FEL_INFERNO); //66517
         }*/
 
-        void UpdateAI(const uint32 uiDiff)
+        void UpdateAI(uint32 uiDiff)
         {
             if (!UpdateVictim())
                 return;
@@ -479,7 +479,7 @@ public:
                 instance->SetData(DATA_MISTRESS_OF_PAIN_COUNT, DECREASE);
         }
 
-        void UpdateAI(const uint32 uiDiff)
+        void UpdateAI(uint32 uiDiff)
         {
             if (instance && instance->GetData(TYPE_JARAXXUS) != IN_PROGRESS)
             {

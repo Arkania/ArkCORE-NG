@@ -482,7 +482,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -749,7 +749,7 @@ public:
             _summonTimer = urand(5, 7)*IN_MILLISECONDS;
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!me->HasAura(SPELL_PORTAL_VISUAL_CLOSED) &&
                 !me->HasAura(SPELL_PORTAL_OPENED))
@@ -825,7 +825,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 /*diff*/)
+        void UpdateAI(uint32 /*diff*/)
         {
             if (!_instance)
                 return;
@@ -1000,7 +1000,7 @@ public:
             DoCast(me, SPELL_ARCANE_OVERLOAD, false);
         }
 
-        void UpdateAI(const uint32 /*diff*/)
+        void UpdateAI(uint32 /*diff*/)
         {
             // we dont do melee damage!
         }
@@ -1055,7 +1055,7 @@ public:
 				}
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!_entered)
             {
@@ -1103,7 +1103,7 @@ public:
             _events.ScheduleEvent(EVENT_YELL_1, 0);
         }
 
-        void UpdateAI(const uint32 /*diff*/)
+        void UpdateAI(uint32 /*diff*/)
         {
             while (uint32 eventId = _events.ExecuteEvent())
             {

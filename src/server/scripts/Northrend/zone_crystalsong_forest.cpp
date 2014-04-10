@@ -59,7 +59,7 @@ public:
             uiTargetGUID = 0;
         }
 
-        void UpdateAI(const uint32 /*uiDiff*/)
+        void UpdateAI(uint32 /*diff*/)
         {
             if (me->IsNonMeleeSpellCasted(false))
                 return;

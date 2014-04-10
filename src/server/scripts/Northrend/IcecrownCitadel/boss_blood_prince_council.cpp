@@ -282,7 +282,7 @@ class boss_blood_council_controller : public CreatureScript
                 }
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -522,7 +522,7 @@ class boss_prince_keleseth_icc : public CreatureScript
                 return true;
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim() || !CheckRoom())
                     return;
@@ -740,7 +740,7 @@ class boss_prince_taldaram_icc : public CreatureScript
                 return true;
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim() || !CheckRoom())
                     return;
@@ -978,7 +978,7 @@ class boss_prince_valanar_icc : public CreatureScript
                 return true;
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim() || !CheckRoom())
                     return;
@@ -1090,7 +1090,7 @@ class npc_blood_queen_lana_thel : public CreatureScript
                     me->SetVisible(false);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!_events.GetPhaseMask())
                     return;
@@ -1189,7 +1189,7 @@ class npc_ball_of_flame : public CreatureScript
                     _instance->SetData(DATA_ORB_WHISPERER_ACHIEVEMENT, uint32(false));
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!_despawnTimer)
                     return;
@@ -1248,7 +1248,7 @@ class npc_kinetic_bomb : public CreatureScript
                 }
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 _events.Update(diff);
 
@@ -1328,7 +1328,7 @@ class npc_dark_nucleus : public CreatureScript
                 me->AddThreat(attacker, 500000000.0f);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;

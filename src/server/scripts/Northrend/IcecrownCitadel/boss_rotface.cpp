@@ -162,7 +162,7 @@ class boss_rotface : public CreatureScript
                 // don't enter combat
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim() || !CheckInRoom())
                     return;
@@ -239,7 +239,7 @@ class npc_little_ooze : public CreatureScript
                 me->DespawnOrUnsummon();
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -302,7 +302,7 @@ class npc_big_ooze : public CreatureScript
                     events.CancelEvent(EVENT_STICKY_OOZE);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -377,7 +377,7 @@ class npc_precious_icc : public CreatureScript
                         rotface->AI()->Talk(SAY_PRECIOUS_DIES);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;

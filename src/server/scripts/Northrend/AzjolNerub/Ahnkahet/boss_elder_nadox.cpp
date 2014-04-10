@@ -128,7 +128,7 @@ class boss_elder_nadox : public CreatureScript
                 return 0;
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -241,7 +241,7 @@ class npc_ahnkahar_nerubian : public CreatureScript
             {
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -288,7 +288,7 @@ public:
         void EnterCombat(Unit* /*who*/) {}
         void AttackStart(Unit* /*victim*/) {}
         void MoveInLineOfSight(Unit* /*who*/) {}
-        void UpdateAI(const uint32 /*diff*/) {}
+        void UpdateAI(uint32 /*diff*/) {}
     };
 
     CreatureAI* GetAI(Creature* creature) const

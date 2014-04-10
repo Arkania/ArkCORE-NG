@@ -274,7 +274,7 @@ class boss_lich_king_toc : public CreatureScript
                 }
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(uint32 uiDiff)
             {
                 if (!instance)
                     return;
@@ -411,7 +411,7 @@ class npc_fizzlebang_toc : public CreatureScript
                 Summons.Summon(summoned);
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(uint32 uiDiff)
             {
                 if (!instance)
                     return;
@@ -539,7 +539,7 @@ class npc_tirion_toc : public CreatureScript
 
             void AttackStart(Unit* /*who*/) {}
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(uint32 uiDiff)
             {
                 if (!instance)
                     return;
@@ -838,7 +838,7 @@ class npc_garrosh_toc : public CreatureScript
 
             void AttackStart(Unit* /*who*/) {}
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(uint32 uiDiff)
             {
                 if (!instance)
                     return;
@@ -919,7 +919,7 @@ class npc_varian_toc : public CreatureScript
 
             void AttackStart(Unit* /*who*/) {}
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(uint32 uiDiff)
             {
                 if (!instance)
                     return;

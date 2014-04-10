@@ -130,7 +130,7 @@ class boss_rajh : public CreatureScript
                    m_pInstance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me); // Remove
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(uint32 uiDiff)
             {
                 if (!UpdateVictim())
                     return;
@@ -270,7 +270,7 @@ class npc_winds : public CreatureScript
                 DoCast(me, SPELL_WINDS_VISUAL);
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(uint32 uiDiff)
             {
                 if (!UpdateVictim())
                     return;
@@ -326,7 +326,7 @@ class npc_sun_orb : public CreatureScript
                 m_uiExplode_timer = 3000;
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                  if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
@@ -378,7 +378,7 @@ class npc_inferno_leap : public CreatureScript
                 m_uiCheckTimer = 500;
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -436,7 +436,7 @@ class npc_solar_wind : public CreatureScript
             {
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                  if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;

@@ -163,7 +163,7 @@ class boss_forgemaster_throngus : public CreatureScript
                 Talk(SAY_KILL);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -257,7 +257,7 @@ class npc_throngus_fire_patch : public CreatureScript
                 DoCast(me, SPELL_FIRE_PATCH_AURA);
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(uint32 uiDiff)
             {
                 
             }

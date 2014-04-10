@@ -161,7 +161,7 @@ class boss_isiset : public CreatureScript
                 pSummon->AI()->DoZoneInCombat();
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -468,7 +468,7 @@ class npc_celestial_familiar : public CreatureScript
                 me->RemoveCorpse(false);
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(uint32 uiDiff)
             {
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
@@ -520,7 +520,7 @@ class npc_veil_sky : public CreatureScript
                 m_uiVeilSkyTimer = 2000;
             }
             
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(uint32 uiDiff)
             {
                 if (!UpdateVictim())
                     return;
@@ -574,7 +574,7 @@ class npc_celestial_call : public CreatureScript
                 m_uiBarrageTimer = 1000;
             }
             
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(uint32 uiDiff)
             {
                 if (!UpdateVictim())
                     return;
@@ -626,7 +626,7 @@ class npc_astral_rain : public CreatureScript
                 m_uiAstralRainTimer = 2000;
             }
             
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(uint32 uiDiff)
             {
                 if (!UpdateVictim())
                     return;

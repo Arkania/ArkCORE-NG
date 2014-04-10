@@ -228,7 +228,7 @@ class boss_earthrager_ptah : public CreatureScript
                 DoZoneInCombat();
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                    return;
@@ -330,7 +330,7 @@ class npc_horror : public CreatureScript
                 m_uiSmashTimer = urand(5000, 10000);
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(uint32 uiDiff)
             {
                 if (!UpdateVictim())
                     return;
@@ -376,7 +376,7 @@ class npc_quicksand : public CreatureScript
             {
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(uint32 uiDiff)
             {
                 if (!UpdateVictim())
                     return;
@@ -425,7 +425,7 @@ class npc_sandstorm : public CreatureScript
                 DoCast(me, SPELL_VORTEX_VISUAL);            
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(uint32 uiDiff)
             {
                 if (!UpdateVictim())
                     return;

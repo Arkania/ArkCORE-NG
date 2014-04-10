@@ -30,7 +30,7 @@ public:
 			 cisaille_de_vent = 10000;
 			}
 			
-			void UpdateAI(const uint32 diff)
+			void UpdateAI(uint32 diff)
 			{
 			if (!UpdateVictim())
             return;
@@ -78,7 +78,7 @@ public:
 			  inferno_dechaine = 25000;
 			  }
 			  
-			  void UpdateAI(const uint32 diff)
+			  void UpdateAI(uint32 diff)
 			  {
 			  if (!UpdateVictim())
               return;
@@ -125,7 +125,7 @@ public:
 				vague_de_roche = 20000;
 			}
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
 			{
 				if (!UpdateVictim())
 				return;

@@ -75,7 +75,7 @@ class boss_archavon : public CreatureScript
             }
 
             // Below UpdateAI may need review/debug.
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -155,7 +155,7 @@ class npc_archavon_warder : public CreatureScript
                 DoZoneInCombat();
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;

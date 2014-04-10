@@ -248,7 +248,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             events.Update(diff);
 
@@ -314,7 +314,7 @@ public:
             events.ScheduleEvent(EVENT_THROW_ICE, urand(5000, 10000));
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -372,7 +372,7 @@ public:
             events.ScheduleEvent(EVENT_DRILL, urand(5000, 10000));
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;

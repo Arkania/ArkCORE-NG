@@ -402,7 +402,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                 return;
@@ -582,7 +582,7 @@ public:
 
         InstanceScript* instance;
 
-        void UpdateAI(const uint32 /*diff*/) {}
+        void UpdateAI(uint32 /*diff*/) {}
     };
 };
 
@@ -639,7 +639,7 @@ public:
                 WaitTimer = 1;
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!instance || !(instance->GetData(DATA_JANALAIEVENT) == IN_PROGRESS))
             {
@@ -706,7 +706,7 @@ public:
 
         void EnterCombat(Unit* /*who*/) {/*DoZoneInCombat();*/}
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -738,7 +738,7 @@ public:
 
         void Reset() {}
         void EnterCombat(Unit* /*who*/) {}
-        void UpdateAI(const uint32 diff) {}
+        void UpdateAI(uint32 diff) {}
         void MoveInLineOfSight(Unit* who) {}
     };
 };
