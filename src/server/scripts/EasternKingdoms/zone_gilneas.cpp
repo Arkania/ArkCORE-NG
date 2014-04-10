@@ -382,7 +382,7 @@ public:
 		
         void MovementInform(uint32 /*type*/, uint32 id) 
 		{ 
-			if (id=1005)
+			if (_fightWithPrinceLiam && id==1005)
 			{								
                 me->setFaction(2179);
                 me->CombatStart(_liam);
