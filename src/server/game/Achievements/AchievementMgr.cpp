@@ -730,7 +730,7 @@ void AchievementMgr<Player>::LoadFromDB(PreparedQueryResult achievementResult, P
         {
             Field* fields = criteriaResult->Fetch();
             uint32 id = fields[0].GetUInt16();
-            uint64 counter = fields[1].GetUInt64();
+            uint64 counter = fields[1].GetUInt32();
             time_t date = time_t(fields[2].GetUInt32());
 
             AchievementCriteriaEntry const* criteria = sAchievementMgr->GetAchievementCriteria(id);

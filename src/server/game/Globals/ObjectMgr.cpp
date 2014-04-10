@@ -1553,7 +1553,7 @@ void ObjectMgr::LoadCreatures()
         data.curmana        = fields[13].GetUInt32();
         data.movementType   = fields[14].GetUInt8();
         data.spawnMask      = fields[15].GetUInt8();
-        data.phaseMask      = fields[16].GetUInt16();
+        data.phaseMask      = fields[16].GetUInt32();
         int16 gameEvent     = fields[17].GetInt8();
         uint32 PoolId       = fields[18].GetUInt32();
         data.npcflag        = fields[19].GetUInt32();
@@ -1913,7 +1913,7 @@ void ObjectMgr::LoadGameobjects()
         if (data.spawnMask & ~spawnMasks[data.mapid])
             sLog->outErrorDb("Table `gameobject` has gameobject (GUID: %u Entry: %u) that has wrong spawn mask %u including not supported difficulty modes for map (Id: %u), skip", guid, data.id, data.spawnMask, data.mapid);
 
-        data.phaseMask      = fields[15].GetUInt16();
+        data.phaseMask      = fields[15].GetUInt32();
         int16 gameEvent     = fields[16].GetInt8();
         uint32 PoolId        = fields[17].GetUInt32();
 
@@ -6870,9 +6870,9 @@ void ObjectMgr::LoadReputationOnKill()
         repOnKill.ReputationMaxCap2    = fields[7].GetUInt8();
         repOnKill.RepValue2            = fields[8].GetInt32();
         repOnKill.TeamDependent        = fields[9].GetUInt8();
-        repOnKill.currencyid1          = fields[10].GetUInt32();
-        repOnKill.currencyid2          = fields[11].GetUInt32();
-        repOnKill.currencyid3          = fields[12].GetUInt32();
+        repOnKill.currencyid1          = fields[10].GetUInt16();
+        repOnKill.currencyid2          = fields[11].GetUInt16();
+        repOnKill.currencyid3          = fields[12].GetUInt16();
         repOnKill.currencycount1       = fields[13].GetInt32();
         repOnKill.currencycount2       = fields[14].GetInt32();
         repOnKill.currencycount3       = fields[15].GetInt32();
@@ -8691,8 +8691,8 @@ void ObjectMgr::LoadCreatureClassLevelStats()
         for (uint8 i = 0; i < MAX_CREATURE_BASE_HP; ++i)
             stats.BaseHealth[i] = fields[i + 2].GetUInt32();
 
-        stats.BaseMana = fields[6].GetUInt32();
-        stats.BaseArmor = fields[7].GetUInt32();
+        stats.BaseMana = fields[6].GetUInt16();
+        stats.BaseArmor = fields[7].GetUInt16();
 
         if (!Class || ((1 << (Class - 1)) & CLASSMASK_ALL_CREATURES) == 0)
             sLog->outErrorDb("Creature base stats for level %u has invalid class %u", Level, Class);
@@ -9045,11 +9045,11 @@ void ObjectMgr::LoadPhaseDefinitions()
         PhaseDefinition PhaseDefinition;
 
         PhaseDefinition.zoneId = fields[0].GetUInt32();
-        PhaseDefinition.entry = fields[1].GetUInt32();
-        PhaseDefinition.phasemask = fields[2].GetUInt32();
-        PhaseDefinition.phaseId = fields[3].GetUInt32();
-        PhaseDefinition.terrainswapmap = fields[4].GetUInt32();
-        PhaseDefinition.flags = fields[5].GetUInt32();
+        PhaseDefinition.entry = fields[1].GetUInt16();
+        PhaseDefinition.phasemask = fields[2].GetUInt64();
+        PhaseDefinition.phaseId = fields[3].GetUInt16();
+        PhaseDefinition.terrainswapmap = fields[4].GetUInt16();
+        PhaseDefinition.flags = fields[5].GetUInt8();
 
         // Checks
         if ((PhaseDefinition.flags & PHASE_FLAG_OVERWRITE_EXISTING) && (PhaseDefinition.flags & PHASE_FLAG_NEGATE_PHASE))

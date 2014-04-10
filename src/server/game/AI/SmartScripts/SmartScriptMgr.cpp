@@ -186,12 +186,12 @@ void SmartAIMgr::LoadSmartAIFromDB()
         }
 
         temp.source_type = source_type;
-        temp.event_id = fields[2].GetUInt32();
-        temp.link = fields[3].GetUInt32();
+        temp.event_id = fields[2].GetUInt16();
+        temp.link = fields[3].GetUInt16();
         temp.event.type = (SMART_EVENT)fields[4].GetUInt8();
-        temp.event.event_phase_mask = fields[5].GetUInt32();
-        temp.event.event_chance = fields[6].GetUInt32();
-        temp.event.event_flags = fields[7].GetUInt32();
+        temp.event.event_phase_mask = fields[5].GetUInt8();
+        temp.event.event_chance = fields[6].GetUInt8();
+        temp.event.event_flags = fields[7].GetUInt8();
 
         temp.event.raw.param1 = fields[8].GetUInt32();
         temp.event.raw.param2 = fields[9].GetUInt32();
