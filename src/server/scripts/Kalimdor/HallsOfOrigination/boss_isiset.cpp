@@ -26,7 +26,7 @@ enum Yells
     SAY_SUPERNOVA  = 1,
     SAY_KILL       = 2,
     SAY_DEATH      = 3,
-    SAY_SPLIT      = -1900026,
+    SAY_SPLIT      = 4
 };
 
 enum Spells
@@ -85,18 +85,18 @@ class boss_isiset : public CreatureScript
 
             bool AstralRain, VeilOfSky, CelestialCall;
 
-            void EnterCombat(Unit *who)
+            void EnterCombat(Unit* /*who*/)
             {
                 Talk(SAY_AGGRO);
                 pInstance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me);
             }
 
-            void KilledUnit(Unit* victim)
+            void KilledUnit(Unit* /*victim*/)
             {
                 Talk(SAY_KILL);
             }
 
-            void JustDied(Unit* killer)
+            void JustDied(Unit* /*killer*/)
             {
                 Talk(SAY_DEATH);
                 RemoveSummons();
@@ -184,7 +184,7 @@ class boss_isiset : public CreatureScript
                 if ((me->GetHealth() * 100 / me->GetMaxHealth() <= 66) && Phase == 0)
                 {
                     me->SetPhaseMask(3, true);
-                    DoScriptText(SAY_SPLIT, me);
+                    Talk(SAY_SPLIT);
                     Phase = 1;
                     me->SetReactState(REACT_PASSIVE);
                     Phased = true;
@@ -200,7 +200,7 @@ class boss_isiset : public CreatureScript
 
                 if ((me->GetHealth() * 100 / me->GetMaxHealth() <= 33) && Phase == 1)
                 {
-                    DoScriptText(SAY_SPLIT, me);
+                    Talk(SAY_SPLIT);
                     Phase = 2;
                     me->SetReactState(REACT_PASSIVE);
                     Phased = true;
@@ -454,20 +454,20 @@ class npc_celestial_familiar : public CreatureScript
                 m_uiBarrageTimer = 1000;
             }
 
-            void EnterCombat(Unit* pWho)
+            void EnterCombat(Unit* /*who*/)
             {
                 me->SetDisplayId(25347);
                 me->AddAura(SPELL_FAMILIAR_VISUAL, me);
                 m_uiBarrageTimer = 1000;
             }
 
-            void JustDied(Unit* killer)
+            void JustDied(Unit* /*killer*/)
             {
                 me->RemoveAura(SPELL_FAMILIAR_VISUAL);
                 me->RemoveCorpse(false);
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(const uint32 diff)
             {
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
@@ -475,13 +475,13 @@ class npc_celestial_familiar : public CreatureScript
                 if (!UpdateVictim())
                     return;
 
-                if (m_uiBarrageTimer <= uiDiff)
+                if (m_uiBarrageTimer <= diff)
                 {
                     DoCast(me->GetVictim(), IsHeroic() ? SPELL_ARCANE_BARRAGE_H : SPELL_ARCANE_BARRAGE);
                     m_uiBarrageTimer = urand(2000, 3000);
                 }
                 else
-                    m_uiBarrageTimer -= uiDiff;
+                    m_uiBarrageTimer -= diff;
             }
         };
 };
@@ -514,12 +514,12 @@ class npc_veil_sky : public CreatureScript
                 m_uiVeilSkyTimer = 2000;
             }
 
-            void EnterCombat(Unit* pWho)
+            void EnterCombat(Unit* /*who*/)
             {
                 m_uiVeilSkyTimer = 2000;
             }
             
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(const uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -527,13 +527,13 @@ class npc_veil_sky : public CreatureScript
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
-                if (m_uiVeilSkyTimer <= uiDiff)
+                if (m_uiVeilSkyTimer <= diff)
                 {
                     DoCast(me, IsHeroic() ? SPELL_VEIL_SKY_H : SPELL_VEIL_SKY);
                     m_uiVeilSkyTimer = 60000;
                 }
                 else
-                    m_uiVeilSkyTimer -= uiDiff;
+                    m_uiVeilSkyTimer -= diff;
 
                 DoMeleeAttackIfReady();
             }
@@ -568,7 +568,7 @@ class npc_celestial_call : public CreatureScript
                 m_uiBarrageTimer = 1000;
             }
 
-            void EnterCombat(Unit* pWho)
+            void EnterCombat(Unit* /*who*/)
             {
                 m_uiBarrageTimer = 1000;
             }
@@ -620,7 +620,7 @@ class npc_astral_rain : public CreatureScript
                 m_uiAstralRainTimer = 2000;
             }
 
-            void EnterCombat(Unit* pWho)
+            void EnterCombat(Unit* /*who*/)
             {
                 m_uiAstralRainTimer = 2000;
             }

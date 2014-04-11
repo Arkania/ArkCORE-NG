@@ -15,14 +15,14 @@
  * You should have received a copy of the GNU General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
 #include "lost_city_of_the_tolvir.h"
 #include "Vehicle.h"
 
-enum eSpells
+enum Spells
 {
     SPELL_FIFTY_LASHINGS                       = 82506,
     SPELL_PLAGUE_OF_AGES                       = 82622,
@@ -53,7 +53,7 @@ enum eSpells
     SPELL_BLAZE_OF_THE_HEAVENS_VISUAL          = 91179,
     SPELL_BLAZE_OF_THE_HEAVENS_TRANSFORM       = 95276,
     SPELL_BLAZE_OF_THE_HEAVENS_PERIODIC        = 95248,
-    SPELL_BLAZE_OF_THE_HEAVENS_SUMMON_FIRE     = 91189,
+    SPELL_BLAZE_OF_THE_HEAVENS_SUMMON_FIRE     = 91189
 };
 
 enum eCreatures
@@ -61,25 +61,24 @@ enum eCreatures
     NPC_BLAZE_OF_THE_HEAVENS_SUMMONER          = 48904,
     NPC_REPENTANCE_MIRROR                      = 43817,
     NPC_WAIL_OF_DARKNESS                       = 43926,
-    NPC_SOUL_FRAGMENT                          = 43934,
+    NPC_SOUL_FRAGMENT                          = 43934
 };
 
-enum eActions
+enum Actions
 {
     ACTION_REPENTANCE_START                    = 1,
-    ACTION_REPENTANCE_DONE                     = 2,
+    ACTION_REPENTANCE_DONE                     = 2
 };
 
-enum eTexts
+enum Texts
 {
-    SAY_START                                  = -1877004,
-    SAY_KNEEL_DOWN                             = -1877005,
-    SAY_DEATH                                  = -1877006,
-    SAY_KILL_PLAYER_1                          = -1877023,
-    SAY_KILL_PLAYER_2                          = -1877024,
+    SAY_AGGRO                                  = 0,
+    SAY_KILL_PLAYER                            = 1,
+    SAY_KNEEL_DOWN                             = 2,
+    SAY_DEATH                                  = 3
 };
 
-enum ePhases
+enum Phases
 {
     // Barim
     PHASE_BARIM                                = 1,
@@ -91,7 +90,7 @@ enum ePhases
     PHASE_EGG_MASK                             = 1 << PHASE_EGG,
 };
 
-enum eEvents
+enum Events
 {
     // Barim
     EVENT_REPENTANCE                           = 1,
@@ -103,12 +102,12 @@ enum eEvents
     EVENT_SOUL_SEVER                           = 1,
     EVENT_WAIL_OF_DARKNESS                     = 2,
     // Blaze
-    EVENT_SUMMON_BLAZE_OF_THE_HEAVENS_GROUND   = 1,
+    EVENT_SUMMON_BLAZE_OF_THE_HEAVENS_GROUND   = 1
 };
 
-enum eModels
+enum Models
 {
-    INVISIBLE_CREATURE_MODEL                   = 11686,
+    INVISIBLE_CREATURE_MODEL                   = 11686
 };
 
 class boss_high_prophet_barim : public CreatureScript
@@ -161,7 +160,7 @@ public:
                     if (Creature* blaze = Unit::GetCreature(*me, instance->GetData64(DATA_BLAZE)))
                         blaze->AI()->DoAction(ACTION_REPENTANCE_START);
 
-                DoScriptText(SAY_KNEEL_DOWN, me);
+                Talk(SAY_KNEEL_DOWN);
                 me->CastSpell(me, SPELL_REPENTANCE_START, false);
                 events.ScheduleEvent(EVENT_REPENTANCE, 1500, 0, PHASE_REPENTANCE);
                 return;
@@ -190,7 +189,7 @@ public:
 
         void JustDied(Unit* /*killer*/)
         {
-            DoScriptText(SAY_DEATH, me);
+            Talk(SAY_DEATH);
             events.Reset();
             lSummons.DespawnAll();
 
@@ -210,7 +209,7 @@ public:
             if (IsHeroic())
                 events.ScheduleEvent(EVENT_SUMMON_BLAZE_OF_THE_HEAVENS, 3000);
 
-            DoScriptText(SAY_START, me);
+            Talk(SAY_AGGRO);
             events.SetPhase(PHASE_BARIM);
             events.ScheduleEvent(EVENT_FIFTY_LASHINGS, 5000, 0, PHASE_BARIM);
             events.ScheduleEvent(EVENT_HEAVENS_FURY, 5000, 0, PHASE_BARIM);
@@ -220,7 +219,7 @@ public:
         void KilledUnit(Unit* victim)
         {
             if (victim->GetTypeId() == TYPEID_PLAYER)
-                DoScriptText(RAND(SAY_KILL_PLAYER_1, SAY_KILL_PLAYER_2), me);
+                Talk(SAY_KILL_PLAYER);
         }
 
         void DamageTaken(Unit* /*done_by*/, uint32 & /*damage*/)
@@ -951,7 +950,7 @@ public:
                 }
         }*/
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(const uint32 /*diff*/)
         {
             //DoUpdate(diff);
         }

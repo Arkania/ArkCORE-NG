@@ -47,33 +47,31 @@
 
 enum Yells
 {
-    SAY_AGGRO                           = -1900000,
-    SAY_DEATH                           = -1900001,
-    SAY_KILL_1                          = -1900006,
-    SAY_KILL_2                          = -1900007,
-    SAY_KILL_3                          = -1900013,
-    SAY_ENRAGE_TEXT                     = -1900009,
-    SAY_INTERMISSION2                   = -1900004,
-    SAY_INTERMISSION1                   = -1900003,
-    SAY_PHASE_2                         = -1900010,
-    SAY_PHASE_3                         = -1900008,
-    SAY_PURGE                           = -1900014,
-    SAY_DEATH_H                         = -1900002,
-    SAY_SULFURAS_SMASH                  = -1900005,
-    SAY_PHASE_HEROIC_TEXT               = -1900011,
-    SAY_ENGULFING_FLAMES_TEXT           = -1900012,
+    SAY_AGGRO                           = 0,
+    SAY_DEATH                           = 1,
+    SAY_KILL                            = 2,
+    SAY_ENRAGE_TEXT                     = 3,
+    SAY_INTERMISSION2                   = 4,
+    SAY_INTERMISSION1                   = 5,
+    SAY_PHASE_2                         = 6,
+    SAY_PHASE_3                         = 7,
+    SAY_PURGE                           = 8,
+    SAY_DEATH_H                         = 9,
+    SAY_SULFURAS_SMASH                  = 10,
+    SAY_PHASE_HEROIC_TEXT               = 11,
+    SAY_ENGULFING_FLAMES_TEXT           = 12,
 
-// boss raid announces
-    SAY_ENRAGE                          = -1900015,
-    SAY_SMASH                           = -1900016,
-    SAY_SPLITTING                       = -1900017,
-    SAY_SONS                            = -1900018,
-    SAY_NEW_PHASE                       = -1900019,
-    SAY_ENGULFING                       = -1900020,
-    SAY_WORLD                           = -1900021,
-    SAY_METEOR                          = -1900022,
-    SAY_HEROIC_PHASE                    = -1900023,
-    SAY_AID                             = -1900024,
+    // boss raid announces
+    SAY_ENRAGE                          = 13,
+    SAY_SMASH                           = 14,
+    SAY_SPLITTING                       = 15,
+    SAY_SONS                            = 16,
+    SAY_NEW_PHASE                       = 17,
+    SAY_ENGULFING                       = 18,
+    SAY_WORLD                           = 19,
+    SAY_METEOR                          = 20,
+    SAY_HEROIC_PHASE                    = 21,
+    SAY_AID                             = 22,
 };
 
 enum Spells
@@ -430,7 +428,7 @@ class boss_ragnaros_firelands : public CreatureScript
             {
                 if (!introDone && who->IsWithinDistInMap(me, 30.0f))
                 {
-                    DoScriptText(SAY_AGGRO, me);
+                    Talk(SAY_AGGRO);
                     introDone = true;
                     me->AddAura(SPELL_BASE_VISUAL, me);
                     me->SetByteValue(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_HOVER);
@@ -440,13 +438,13 @@ class boss_ragnaros_firelands : public CreatureScript
 
             void KilledUnit(Unit * /*victim*/)
             {
-                DoScriptText(RAND(SAY_KILL_1, SAY_KILL_2, SAY_KILL_3), me);
+                Talk(SAY_KILL);
             }
 
             void JustDied(Unit * /*victim*/)
             {
                 if (IsHeroic())
-                    DoScriptText(SAY_DEATH_H, me);
+                    Talk(SAY_DEATH_H);
 
                 if (HeartCheck)
                     me->SummonCreature(NPC_HEART_OF_RAGNAROS, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation(), TEMPSUMMON_CORPSE_DESPAWN, 1000);
@@ -556,21 +554,21 @@ class boss_ragnaros_firelands : public CreatureScript
 
                 if (HealthBelowPct(71) && !intermission1)
                 {
-                    DoScriptText(SAY_INTERMISSION1, me);
+                    Talk(SAY_INTERMISSION1);
                     events.ScheduleEvent(EVENT_INTERMISSION_1, 1000);
                     intermission1 = true;
                 }
 
                 if (HealthBelowPct(41) && !intermission2)
                 {
-                    DoScriptText(SAY_INTERMISSION2, me);
+                    Talk(SAY_INTERMISSION2);
                     events.ScheduleEvent(EVENT_INTERMISSION_2, 1000);
                     intermission2 = true;
                 }
 
                 if (HealthBelowPct(11) && !IsHeroic() && !died)
                 {
-                    DoScriptText(SAY_DEATH, me);
+                    Talk(SAY_DEATH);
 
                     me->AttackStop();
                     me->CastStop();
@@ -596,8 +594,8 @@ class boss_ragnaros_firelands : public CreatureScript
                 }
                 else if (HealthBelowPct(11) && IsHeroic() && !heroicPhase)
                 {
-                    DoScriptText(SAY_PHASE_HEROIC_TEXT, me);
-                    DoScriptText(SAY_HEROIC_PHASE, me);
+                    Talk(SAY_PHASE_HEROIC_TEXT);
+                    Talk(SAY_HEROIC_PHASE);
                     events.ScheduleEvent(EVENT_PHASE_FOUR, 1000);
                     heroicPhase = true;
                 }
@@ -619,7 +617,7 @@ class boss_ragnaros_firelands : public CreatureScript
                         /**** STAGE 1 : By Fire Be Purged! ****/
 
                         case EVENT_PHASE_ONE:
-                            DoScriptText(SAY_PURGE, me);
+                            Talk(SAY_PURGE);
                             DoCast(me, SPELL_BURNING_WOUND);
                             events.ScheduleEvent(EVENT_SULFURAS_SMASH, 30000);
                             events.ScheduleEvent(EVENT_WRATH_OF_RAGNAROS, urand(4500, 6000));
@@ -652,7 +650,7 @@ class boss_ragnaros_firelands : public CreatureScript
 
                         case EVENT_SULFURAS_SMASH:
                             {
-                                DoScriptText(SAY_SULFURAS_SMASH, me);
+                                Talk(SAY_SULFURAS_SMASH);
                                 me->GetMotionMaster()->Clear();
                                 me->AttackStop();
                                 float x, y, z;
@@ -665,7 +663,7 @@ class boss_ragnaros_firelands : public CreatureScript
                             break;
 
                         case EVENT_SUL_SMASH:
-                            DoScriptText(SAY_SMASH, me);
+                            Talk(SAY_SMASH);
                             me->SetFacingToObject(smash);
                             DoCast(me, SPELL_SULFURAS_SMASH_RAG_SELF);
                             if (Unit* target = SelectTarget(SELECT_TARGET_NEAREST, 0, 80.0f, true)) 
@@ -702,7 +700,7 @@ class boss_ragnaros_firelands : public CreatureScript
                                 else // Killing tank softly with his song.
                                 {
                                     inMeleeRange = false;
-                                    DoScriptText(SAY_ENRAGE, me);
+                                    Talk(SAY_ENRAGE);
                                     DoCast(target, SPELL_MAGMA_BLAST);
                                 }
                             }
@@ -717,7 +715,7 @@ class boss_ragnaros_firelands : public CreatureScript
                             me->GetMotionMaster()->Clear();
                             me->AttackStop();
                             me->SetReactState(REACT_PASSIVE);
-                            DoScriptText(SAY_SPLITTING, me);
+                            Talk(SAY_SPLITTING);
 
                             switch (urand(0, 2))
                             {
@@ -778,7 +776,7 @@ class boss_ragnaros_firelands : public CreatureScript
 
                         case EVENT_PHASE_TWO:
                         {
-                            DoScriptText(SAY_PHASE_2, me);
+                            Talk(SAY_PHASE_2);
                             Movement::MoveSplineInit init(*me);
                             init.SetOrientationFixed(false);
                             init.Launch();
@@ -786,7 +784,7 @@ class boss_ragnaros_firelands : public CreatureScript
                             me->RemoveAurasDueToSpell(SPELL_SUBMERGE);
                             me->AddAura(SPELL_BASE_VISUAL, me);
                             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                            DoScriptText(SAY_NEW_PHASE, me);
+                            Talk(SAY_NEW_PHASE);
                             if (Unit* target = SelectTarget(SELECT_TARGET_NEAREST, 0, 80.0f, true)) 
                                 me->AI()->AttackStart(target);
 
@@ -821,8 +819,8 @@ class boss_ragnaros_firelands : public CreatureScript
                             break;
 
                         case EVENT_ENFULGING_FLAMES:
-                                DoScriptText(SAY_ENGULFING, me);
-                                DoScriptText(SAY_ENGULFING_FLAMES_TEXT, me);
+                                Talk(SAY_ENGULFING);
+                                Talk(SAY_ENGULFING_FLAMES_TEXT);
                                 DoCast(me, SPELL_ENGULFING_FLAMES);
 
                                 switch (urand(0, 2))
@@ -848,7 +846,7 @@ class boss_ragnaros_firelands : public CreatureScript
 
                         case EVENT_WORLD_FLAMES1:
                             DoCast(me, SPELL_WORLD_IN_FLAMES);
-                            DoScriptText(SAY_WORLD, me);
+                            Talk(SAY_WORLD);
 
                             for (uint32 i = 0; i < ENGULFING_FLAME_COUNT; ++i)
                                 me->SummonCreature(NPC_ENGULFING_FLAMES, EngulfingPos[i], TEMPSUMMON_CORPSE_DESPAWN, 1000);
@@ -876,7 +874,7 @@ class boss_ragnaros_firelands : public CreatureScript
                             me->GetMotionMaster()->Clear();
                             me->AttackStop();
                             me->SetReactState(REACT_PASSIVE);
-                            DoScriptText(SAY_SPLITTING, me);
+                            Talk(SAY_SPLITTING);
 
                             switch (urand(0, 2))
                             {
@@ -939,7 +937,7 @@ class boss_ragnaros_firelands : public CreatureScript
 
                         case EVENT_PHASE_THREE:
                         {
-                            DoScriptText(SAY_PHASE_3, me);
+                            Talk(SAY_PHASE_3);
                             Movement::MoveSplineInit init(*me);
                             init.SetOrientationFixed(false);
                             init.Launch();
@@ -947,7 +945,7 @@ class boss_ragnaros_firelands : public CreatureScript
                             me->RemoveAurasDueToSpell(SPELL_SUBMERGE);
                             me->AddAura(SPELL_BASE_VISUAL, me);
                             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                            DoScriptText(SAY_NEW_PHASE, me);
+                            Talk(SAY_NEW_PHASE);
                             if (Unit* target = SelectTarget(SELECT_TARGET_NEAREST, 0, 80.0f, true)) 
                                 me->AI()->AttackStart(target);
                             phase3 = true;
@@ -976,8 +974,8 @@ class boss_ragnaros_firelands : public CreatureScript
                         /**** STAGE 4 : The True Power of the Firelord! ****/
 
                         case EVENT_PHASE_FOUR:
-                            DoScriptText(SAY_AID, me);
-                            DoScriptText(SAY_PHASE_HEROIC_TEXT, me);
+                            Talk(SAY_AID);
+                            Talk(SAY_PHASE_HEROIC_TEXT);
                             me->RemoveAurasDueToSpell(SPELL_BASE_VISUAL);
                             me->SetHealth(me->GetMaxHealth() / 2);
                             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
@@ -1271,7 +1269,7 @@ class npc_sulfuras : public CreatureScript
                 instance = creature->GetInstanceScript();
                 creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE|UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
                 creature->AddAura(SPELL_SULFURAS_AURA, creature);
-                DoScriptText(SAY_SONS, creature);
+                creature->AI()->Talk(SAY_SONS);
                 creature->SetReactState(REACT_PASSIVE);
                 Movement::MoveSplineInit init(*creature);
                 init.SetOrientationFixed(true);

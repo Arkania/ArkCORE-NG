@@ -261,7 +261,7 @@ public:
                         events.ScheduleEvent(EVENT_INTRO_H2_1, 0);
                     break;
 
-            // A2 Intro Events
+                // A2 Intro Events
                 case EVENT_INTRO_A2_1:
                      Talk(SAY_JAINA_INTRO_3);
                     events.ScheduleEvent(EVENT_INTRO_A2_2, 5000);

@@ -101,7 +101,7 @@ public:
     {
         npc_panicked_citizen_gateAI(Creature* creature) : ScriptedAI(creature)  { }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(const uint32 /*diff*/)
         {
             if (!UpdateVictim())
                 return;
@@ -155,12 +155,14 @@ public:
         void UpdateAI(const uint32 diff)
         {
             if (_nearGate)
+            {
                 if (_timer <= diff)
                 {
                    DoWork();
                 }
                 else
                     _timer -= diff;
+            }
 
             if (!UpdateVictim())
                 return;
@@ -179,11 +181,10 @@ public:
 
                     if (!listOfCitizen.empty())
                     {
-                        uint8 id = urand(0, listOfCitizen.size() - 1);
                         std::list<Creature*>::iterator itr = listOfCitizen.begin();
-                        std::advance(itr, id);                                    
+                        std::advance(itr, urand(0, (listOfCitizen.size() - 1)));
 
-                        if (_citizen = *itr)
+                        if (Creature* _citizen = *itr)
                         {                            
                             _timer = urand(1000,2000);
                             _emote=urand(0, 4);  
@@ -199,7 +200,7 @@ public:
                 {
                     if (_citizen)
                     {
-                        _citizen->AI()->Talk(_say, me->GetGUID());
+                        _citizen->AI()->Talk(_say);
                         _timer = urand(4000,7000);
                         _phase=2;
                     }
@@ -209,7 +210,7 @@ public:
                 {
                     if (_citizen)
                     {
-                        Talk(_say , me->GetGUID());
+                        Talk(_say);
                         _timer = 6000;
                         _phase=3;
                     }
@@ -339,7 +340,7 @@ public:
             me->DespawnOrUnsummon();
         }
 
-        void WaypointReached(uint32 point) { }
+        void WaypointReached(uint32 /*point*/) { }
 
         void MoveInLineOfSight(Unit* who)
         {
@@ -365,7 +366,7 @@ class npc_prince_liam_greymane_intro : public CreatureScript
 public:
     npc_prince_liam_greymane_intro() : CreatureScript("npc_prince_liam_greymane_intro") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* /*player*/, Creature* creature, Quest const* quest)
     {
         if (quest->GetQuestId() == 14078)
             if (Creature* citizen = creature->FindNearestCreature(34851, 20.0f))
@@ -396,15 +397,15 @@ public:
                 switch (uiSayCount)
                 {
                     case 1:
-                        Talk(0, me->GetGUID());
+                        Talk(0);
                         uiSayTimer = 15000;
                         break;
                     case 2:
-                        Talk(1, me->GetGUID());
+                        Talk(1);
                         uiSayTimer = 18000;
                         break;
                     case 3:
-                        Talk(2, me->GetGUID());
+                        Talk(2);
                         uiSayTimer = 25000;
                         uiSayCount = 0;
                         break;
@@ -430,7 +431,7 @@ class npc_lieutenant_walden : public CreatureScript
 public:
     npc_lieutenant_walden() : CreatureScript("npc_lieutenant_walden") { }
 
-    bool OnQuestComplete(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestComplete(Player* player, Creature* /*creature*/, Quest const* quest)
     {
         if (quest->GetQuestId() == QUEST_LOCKDOWN)
         {
@@ -455,7 +456,7 @@ class npc_prince_liam_greymane_phase_1 : public CreatureScript
 public:
     npc_prince_liam_greymane_phase_1() : CreatureScript("npc_prince_liam_greymane_phase_1") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest)
+    bool OnQuestAccept(Player* player, Creature* /*creature*/, const Quest* quest)
     {
         if (quest->GetQuestId() ==  QUEST_ROYAL_ORDERS)
         {
@@ -499,16 +500,14 @@ public:
             if (uiShootTimer <= diff)
             {
                 uiShootTimer = 1500;
-                Unit* target = NULL;
 
-                if (target = me->FindNearestCreature(NPC_RAMPAGING_WORGEN_1, 40.0f))
+                if (Unit* target = me->FindNearestCreature(NPC_RAMPAGING_WORGEN_1, 40.0f))
                     if (target != me->GetVictim())
                     {
                         me->getThreatManager().modifyThreatPercent(me->GetVictim(), -100);
                         me->CombatStart(target);
                         me->AddThreat(target, 1000);
                     }
-
                 if (!me->IsWithinMeleeRange(me->GetVictim(), 0.0f))
                 {
                     me->Attack(me->GetVictim(), false);
@@ -524,7 +523,7 @@ public:
             {
                 uiSayTimer = urand(30000, 120000);
                // uint8 id = urand(0, 4);
-                Talk(0, me->GetGUID());
+                Talk(0);
             }
             else
                 uiSayTimer -= diff;
@@ -598,7 +597,7 @@ public:
 
             Unit* victim = NULL;
 
-            if (victim = me->GetVictim())
+            if (me->GetVictim())
                 if (victim->GetTypeId() == TYPEID_PLAYER)
                     return;
 
@@ -609,7 +608,7 @@ public:
             me->AddThreat(attacker, 10005000);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(const uint32 /*diff*/)
         {
             if (!UpdateVictim())
                 return;
@@ -715,30 +714,21 @@ public:
             if (!UpdateVictim())
                 return;
 
-            if (CanSay)
-                if (uiYellTimer <= diff)
-                {
-                    uiYellTimer = urand(50000, 100000);
-                    uint8 roll = urand(0, 2);
-                    DoScriptText(0, me);
-                }
-                else
-                    uiYellTimer -= diff;
-
             if (me->GetVictim()->GetTypeId() == TYPEID_UNIT)
+            {
                 if (me->GetVictim()->GetHealthPct() < 90)
                     miss = true;
                 else
                     miss = false;
+            }
 
             if (uiShootTimer <= diff)
             {
                 uiShootTimer = 2500;
-                Unit* target = NULL;
 
                 if (!me->IsWithinMeleeRange(me->GetVictim(), 0.0f))
                     if (uiEnemyEntry)
-                        if (target = me->FindNearestCreature(uiEnemyEntry, 40.0f))
+                        if (Unit* target = me->FindNearestCreature(uiEnemyEntry, 40.0f))
                             if (target != me->GetVictim())
                             {
                                 me->getThreatManager().modifyThreatPercent(me->GetVictim(), -100);
@@ -783,8 +773,8 @@ enum qEMS
     NPC_CW_CITIZEN               = 35836,
     NPC_QEMS_KILL_CREDIT         = 35830,
 
-    NPC_J_CITIZEN_RANDOM_SAY     = -1977004, // (-1977004 to -1977011)
-    NPC_CW_CITIZEN_RANDOM_SAY    = -1977012, // (-1977012 to -1977018)
+    NPC_J_CITIZEN_RANDOM_SAY     = 0,
+    NPC_CW_CITIZEN_RANDOM_SAY    = 0,
 
     SPELL_CW_WORGEN_ENRAGE       = 56646,
 
@@ -823,13 +813,11 @@ public:
 
                 if (me->GetEntry() == NPC_J_CITIZEN)
                 {
-                    uint8 roll = urand(0, 7);
-                    DoScriptText(NPC_J_CITIZEN_RANDOM_SAY - roll, me);
+                    Talk(NPC_J_CITIZEN_RANDOM_SAY);
                 }
                 else
                 {
-                    uint8 roll = urand(0, 6);
-                    DoScriptText(NPC_CW_CITIZEN_RANDOM_SAY - roll, me);
+                    Talk(NPC_CW_CITIZEN_RANDOM_SAY);
                     me->HandleEmoteCommand(EMOTE_ONESHOT_COWER);
                 }
             }
@@ -840,6 +828,7 @@ public:
             npc_escortAI::UpdateAI(diff);
 
             if (pause)
+            {
                 if (uiEventTimer <= diff)
                 {
                     pause = false;
@@ -847,6 +836,7 @@ public:
                 }
                 else
                     uiEventTimer -= diff;
+            }
         }
     };
 
@@ -882,10 +872,12 @@ public:
                 me->SetReactState(REACT_AGGRESSIVE);
                 me->RemoveFlag(UNIT_FIELD_FLAGS,UNIT_FLAG_NON_ATTACKABLE);
                 if (me->IsSummon())
+                {
                     if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                         AttackStart(summoner);
                     else
                         me->DespawnOrUnsummon();
+                }
             }
         }
 
@@ -894,6 +886,7 @@ public:
             npc_escortAI::UpdateAI(diff);
 
             if (pause)
+            {
                 if (uiPauseTimer <= diff)
                 {
                     pause = false;
@@ -901,6 +894,7 @@ public:
                 }
                 else
                     uiPauseTimer -= diff;
+            }
 
             if (!UpdateVictim())
                 return;
@@ -998,8 +992,8 @@ enum eQOD
     NPC_LORD_GODFREY_QOD              = 35115,
     NPC_KING_GENN_GREYMANE_QOD        = 35112,
 
-    NPC_LORD_GODFREY_QOD_SAY          = -1977024,
-    NPC_KING_GENN_GREYMANE_QOD_SAY    = -1977025,
+    NPC_LORD_GODFREY_QOD_SAY          = 0,
+    NPC_KING_GENN_GREYMANE_QOD_SAY    = 0,
 };
 
 struct Psc
@@ -1021,9 +1015,9 @@ public:
     bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
     {
         if (quest->GetQuestId() == QUEST_OLD_DIVISIONS)
-            if (Creature* godfrey = creature->FindNearestCreature(NPC_LORD_GODFREY_QOD, 20.0f))
+            if (creature->FindNearestCreature(NPC_LORD_GODFREY_QOD, 20.0f))
             {
-                DoScriptText(NPC_LORD_GODFREY_QOD_SAY, player);
+                creature->AI()->Talk(NPC_LORD_GODFREY_QOD_SAY, player->GetGUID());
                 Psc new_psc;
                 new_psc.uiPersonalTimer = 5000;
                 new_psc.uiPlayerGUID = player->GetGUID();
@@ -1048,7 +1042,7 @@ public:
                 if ((*itr).uiPersonalTimer <= diff)
                 {
                     if (Player* player = Unit::GetPlayer(*me, (*itr).uiPlayerGUID))
-                        DoScriptText(NPC_KING_GENN_GREYMANE_QOD_SAY, player);
+                        Talk(NPC_KING_GENN_GREYMANE_QOD_SAY, player->GetGUID());
 
                     itr = lPlayerList.erase(itr);
                 }
@@ -1345,8 +1339,8 @@ enum qTRLA
     NPC_LORNA_CROWLEY               = 35378,
     NPC_JOSIAH_AVERY_WORGEN         = 35370,
 
-    RANDOM_JOSIAH_YELL              = -1977063,     // -1977063 to -1977068
-    SAY_WORGEN_BITE                 = -1977069,
+    RANDOM_JOSIAH_YELL              = 0,
+    SAY_WORGEN_BITE                 = 1,
 
     SPELL_ZONE_SPECIFIC_01          = 59073,
     SPELL_WORGEN_BITE               = 72870,
@@ -1392,9 +1386,10 @@ public:
         void UpdateAI(const uint32 diff)
         {
             if (Event)
+            {
                 if (uiEventTimer <= diff)
                 {
-                    if (Creature* lorna = me->FindNearestCreature(NPC_LORNA_CROWLEY, 30.0f))
+                    if (Creature* creature = me->FindNearestCreature(NPC_LORNA_CROWLEY, 30.0f))
                         switch (uiPase)
                         {
                             case 1:
@@ -1403,24 +1398,25 @@ public:
                                 if (Player* player = Unit::GetPlayer(*me, uiPlayerGUID))
                                 {
                                     float x, y, z;
-                                    lorna->GetPosition(x, y, z);
+                                    creature->GetPosition(x, y, z);
                                     me->CastSpell(player, 91074, false);
                                     player->GetMotionMaster()->MoveJump(x, y, z, 25.0f, 5.0f);
-                                    lorna->Whisper(SAY_WORGEN_BITE, player->GetGUID(), true);
+                                    creature->Whisper(SAY_WORGEN_BITE, player->GetGUID(), true);
                                 }
                                 break;
                             case 2:
                                 Event = false;
                                 uiEventTimer = 1000;
                                 float x, y, z;
-                                lorna->GetPosition(x, y, z);
+                                creature->GetPosition(x, y, z);
                                 me->GetMotionMaster()->MoveJump(x, y, z, 25.0f, 10.0f);
-                                lorna->CastSpell(me, 7105, false);
+                                creature->CastSpell(me, 7105, false);
                                 break;
                         }
                 }
                 else
                     uiEventTimer -= diff;
+            }
 
             if (!UpdateVictim())
                 return;
@@ -1478,7 +1474,6 @@ public:
             if (uiRandomSpeachTimer <= diff)
             {
                 uiRandomSpeachTimer = urand(5000, 15000);
-                uint8 roll = urand(0, 5);
                 Map::PlayerList const &PlList = me->GetMap()->GetPlayers();
 
                 if (PlList.isEmpty())
@@ -1492,7 +1487,7 @@ public:
                         if (uiPhase == player->GetPhaseMask())
                             if (me->GetDistance(player) < 35.0f)
                                 if (abs(z - player->GetPositionZ()) < 5.0f)
-                                    DoScriptText(RANDOM_JOSIAH_YELL - roll, player);
+                                    Talk(RANDOM_JOSIAH_YELL, player->GetGUID());
             }
             else
                 uiRandomSpeachTimer -= diff;
@@ -1528,7 +1523,7 @@ class npc_lorna_crowley_qfs : public CreatureScript
 public:
     npc_lorna_crowley_qfs() : CreatureScript("npc_lorna_crowley_qfs") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* /*creature*/, Quest const* quest)
     {
         if (quest->GetQuestId() == QUEST_FROM_THE_SHADOWS)
         {
@@ -1562,7 +1557,7 @@ public:
             me->SetFlag(UNIT_FIELD_FLAGS,UNIT_FLAG_NON_ATTACKABLE);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(const uint32 /*diff*/)
         {
             if (!UpdateVictim())
                 return;
@@ -1593,7 +1588,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(const uint32 /*diff*/)
         {
             if (!UpdateVictim())
                 return;
@@ -1636,7 +1631,7 @@ public:
             me->AddThreat(who, 100500);
         }
 
-        void DamageTaken(Unit* attacker, uint32 &damage)
+        void DamageTaken(Unit* attacker, uint32 &/*damage*/)
         {
             if (me->HasReactState(REACT_PASSIVE))
                 StartAttack(attacker);
@@ -1648,7 +1643,7 @@ public:
                 StartAttack(caster);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(const uint32 /*diff*/)
         {
             if (!UpdateVictim())
                 return;
@@ -1737,13 +1732,15 @@ public:
             if (me->IsSummon())
                 if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                     if (Vehicle* vehicle = summoner->GetVehicle())
+                    {
                         if (vehicle->HasEmptySeat(1))
                             me->EnterVehicle(vehicle->GetBase(), 1);
                         else
                             me->DespawnOrUnsummon();
+                    }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(const uint32 /*diff*/)
         {
         }
     };
@@ -1764,7 +1761,7 @@ public:
 
         bool AranasIsSave;
 
-        void PassengerBoarded(Unit* who, int8 seatId, bool apply)
+        void PassengerBoarded(Unit* /*who*/, int8 seatId, bool apply)
         {
             if (!apply)
                 return;
@@ -1790,7 +1787,7 @@ public:
                 case 17:
                     if (Unit* passenger = me->GetVehicleKit()->GetPassenger(0))
                     {
-                        if (Creature* aranas = passenger->FindNearestCreature(NPC_KRENNAN_ARANAS, 50.0f))
+                        if (passenger->FindNearestCreature(NPC_KRENNAN_ARANAS, 50.0f))
                             if (Vehicle* vehicle = me->GetVehicleKit())
                                 if (Unit* passenger = vehicle->GetPassenger(0))
                                     if (Player* player = passenger->ToPlayer())
@@ -1810,7 +1807,7 @@ public:
                 case 40:
                     if (Vehicle* vehicle = me->GetVehicleKit())
                         if (Unit* passenger = vehicle->GetPassenger(0))
-                            if (Player* player = passenger->ToPlayer())
+                            if (passenger->ToPlayer())
                             {
                                 std::list<Creature*> lGuards;
                                 me->GetCreatureListWithEntryInGrid(lGuards, NPC_GUARD_QSKA, 90.0f);
@@ -1834,7 +1831,7 @@ public:
                                 player->KilledMonsterCredit(NPC_QSKA_KILL_CREDIT, 0);
 
                                 if (Unit* passenger_2 = vehicle->GetPassenger(1))
-                                    if (Creature* aranas = passenger_2->ToCreature())
+                                    if (passenger_2->ToCreature())
                                         DoScriptText(ARANAS_THANK, player);
                             }
                     break;
@@ -2011,6 +2008,7 @@ public:
         void UpdateAI(const uint32 diff)
         {
             if (Event)
+            {
                 if (uiEventTimer <= diff)
                 {
                     ++uiPhase;
@@ -2041,6 +2039,7 @@ public:
                 }
                 else
                     uiEventTimer -= diff;
+            }
 
             if (!UpdateVictim())
                 return;
@@ -2055,7 +2054,7 @@ class npc_lord_godfrey_qska : public CreatureScript
 public:
     npc_lord_godfrey_qska() : CreatureScript("npc_lord_godfrey_qska") { }
 
-    bool OnQuestComplete(Player* player, Creature* creature, const Quest* quest)
+    bool OnQuestComplete(Player* player, Creature* /*creature*/, const Quest* quest)
     {
         if (quest->GetQuestId() == QUEST_SAVE_KRENNAN_ARANAS)
         {
@@ -2154,22 +2153,22 @@ public:
                         {
                             case 1:
                                 (*itr).uiPersonalTimer = 7000;
-                                if (Creature* crowley = me->FindNearestCreature(NPC_LORD_CROWLEY_QTR, 30.0f))
+                                if (me->FindNearestCreature(NPC_LORD_CROWLEY_QTR, 30.0f))
                                     DoScriptText(CROWLEY_SAY_NEED, player);
                                 break;
                             case 2:
                                 (*itr).uiPersonalTimer = 4000;
-                                if (Creature* liam = me->FindNearestCreature(NPC_PRINCE_LIAM_QTR, 30.0f))
+                                if (me->FindNearestCreature(NPC_PRINCE_LIAM_QTR, 30.0f))
                                     DoScriptText(LIAM_SAY_STAY, player);
                                 break;
                             case 3:
                                 (*itr).uiPersonalTimer = 9000;
-                                if (Creature* crowley = me->FindNearestCreature(NPC_LORD_CROWLEY_QTR, 30.0f))
+                                if (me->FindNearestCreature(NPC_LORD_CROWLEY_QTR, 30.0f))
                                     DoScriptText(CROWLEY_SAY_NO_CHANCE, player);
                                 break;
                             case 4:
                                 (*itr).uiPersonalTimer = 8000;
-                                if (Creature* crowley = me->FindNearestCreature(NPC_LORD_CROWLEY_QTR, 30.0f))
+                                if (me->FindNearestCreature(NPC_LORD_CROWLEY_QTR, 30.0f))
                                     DoScriptText(CROWLEY_SAY_MY_MEN, player);
                                 break;
                             case 5:
@@ -2501,9 +2500,9 @@ class spell_summon_crowley_horse : public SpellScriptLoader
                 if (!player)
                     return;
 
-                Vehicle* vehicle = NULL;
+                //Vehicle* vehicle = NULL;
                 Creature* horse = NULL;
-                Creature* crowley = NULL;
+                //Creature* crowley = NULL;
                 horse = player->SummonCreature(NPC_CROWLEYS_HORSE, -1737.68f, 1655.11f, 20.56283f, 1.64061f);
 
                 if (!horse)
@@ -2517,18 +2516,18 @@ class spell_summon_crowley_horse : public SpellScriptLoader
                     //if (Creature* crowley = player->SummonCreature(35230, x, y, z))
                     //    crowley->EnterVehicle(horse, 1, true);
 
-      //              if (Vehicle* pVehicle = horse->GetVehicleKit())
-      //                  if (!pVehicle->GetPassenger(0))
+                    //if (Vehicle* pVehicle = horse->GetVehicleKit())
+                    //    if (!pVehicle->GetPassenger(0))
                         //{
                         //    player->Rio_EnterVehicle(pVehicle, 0);
                         //    player->ClearUnitState(UNIT_STATE_ONVEHICLE);
                         //}
-      //                  if (Vehicle* pVehicle = horse->GetVehicleKit())
-      //                      if (!pVehicle->GetPassenger(1))
-      //                      {
-      //                          crowley->Rio_EnterVehicle(pVehicle, 1);
-      //                          crowley->ClearUnitState(UNIT_STATE_ONVEHICLE);
-      //                      }
+                    //if (Vehicle* pVehicle = horse->GetVehicleKit())
+                    //     if (!pVehicle->GetPassenger(1))
+                    //     {
+                    //         crowley->Rio_EnterVehicle(pVehicle, 1);
+                    //         crowley->ClearUnitState(UNIT_STATE_ONVEHICLE);
+                    //     }
                     player->RemoveAura(SPELL_INVISIBILITY_DETECTION_2);
                     horse->EnableAI();
                     escort->AddWaypoint(0, -1737.09f,1663.36f,20.4791f);
@@ -2671,7 +2670,7 @@ class npc_lord_darius_crowley_qls : public CreatureScript
 public:
     npc_lord_darius_crowley_qls() : CreatureScript("npc_lord_darius_crowley_qls") { }
 
-    bool OnQuestComplete(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestComplete(Player* player, Creature* /*creature*/, Quest const* quest)
     {
         if (quest->GetQuestId() == QUEST_LAST_STAND)
         {
@@ -2924,7 +2923,7 @@ class spell_curse_of_the_worgen_invis : public SpellScriptLoader
     {
         PrepareAuraScript(spell_curse_of_the_worgen_invis_AuraScript);
 
-        void ApplyEffect(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+        void ApplyEffect(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             PreventDefaultAction();
 
@@ -2968,7 +2967,7 @@ class go_crate_of_mandrake_essence : public GameObjectScript
 public:
     go_crate_of_mandrake_essence() : GameObjectScript("go_crate_of_mandrake_essence"){}
 
-    bool OnQuestComplete(Player* player, GameObject* go, Quest const* quest)
+    bool OnQuestComplete(Player* player, GameObject* /*go*/, Quest const* quest)
     {
         if (quest->GetQuestId() == QUEST_IN_NEED_OF_INGR)
             player->SendCinematicStart(CINEMATIC_FORSAKEN);
@@ -2997,7 +2996,7 @@ class npc_slain_watchman : public CreatureScript
 public:
     npc_slain_watchman() : CreatureScript("npc_slain_watchman") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* /*creature*/, Quest const* quest)
     {
         if (quest->GetQuestId() == QUEST_INVASION)
         {
@@ -3021,7 +3020,7 @@ class npc_gwen_armstead_qi : public CreatureScript
 public:
     npc_gwen_armstead_qi() : CreatureScript("npc_gwen_armstead_qi") { }
 
-    bool OnQuestComplete(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestComplete(Player* player, Creature* /*creature*/, Quest const* quest)
     {
         if (quest->GetQuestId() == QUEST_INVASION)
         {
@@ -3052,8 +3051,6 @@ enum qYCTEA
     SPELL_EXPLOSION_BONE_TYPE_ONE         = 42267,
     SPELL_EXPLOSION_BONE_TYPE_TWO         = 42274,
 };
-
-static float LiamPosition[3] = {-1920.43f,2308.94f,40.301f};
 
 class npc_horrid_abomination : public CreatureScript
 {
@@ -3129,7 +3126,7 @@ public:
 
             Unit* victim = NULL;
 
-            if (victim = me->GetVictim())
+            if (Unit* victim = me->GetVictim())
                 if (victim->GetTypeId() == TYPEID_PLAYER)
                     return;
 
@@ -3143,6 +3140,7 @@ public:
         void UpdateAI(const uint32 diff)
         {
             if (shoot)
+            {
                 if (uiShootTimer <= diff)
                 {
                     shoot = false;
@@ -3157,6 +3155,7 @@ public:
                 }
                 else
                     uiShootTimer -= diff;
+            }
 
             if (!UpdateVictim())
                 return;
@@ -3252,6 +3251,7 @@ public:
         void UpdateAI(const uint32 diff)
         {
             if (respawn)
+            {
                 if (uiRespawnTimer <= diff)
                 {
                     respawn = false;
@@ -3260,8 +3260,10 @@ public:
                 }
                 else
                     uiRespawnTimer -= diff;
+            }
 
             if (CanCast)
+            {
                 if (uiCastTimer <= diff)
                 {
                     uiCastTimer = urand(5000, 20000);
@@ -3272,8 +3274,10 @@ public:
                 }
                 else
                     uiCastTimer -= diff;
+            }
 
             if (jump)
+            {
                 if (uiJumpTimer <= diff)
                 {
                     jump = false;
@@ -3290,6 +3294,7 @@ public:
                 }
                 else
                     uiJumpTimer -= diff;
+            }
 
             if (!UpdateVictim())
                 return;
@@ -3328,7 +3333,7 @@ class spell_launch_qtbs : public SpellScriptLoader
         {
             PrepareSpellScript(spell_launch_qtbs_SpellScript)
 
-            void Function(SpellEffIndex effIndex)
+            void Function(SpellEffIndex /*effIndex*/)
             {
                 Unit* caster = GetCaster();
                 bool CheckCast = false;
@@ -3449,6 +3454,7 @@ public:
             npc_escortAI::UpdateAI(diff);
 
             if (Event)
+            {
                 if (uiEventTimer <= diff)
                 {
                     Event = false;
@@ -3462,6 +3468,7 @@ public:
                 }
                 else
                     uiEventTimer -= diff;
+            }
         }
     };
 };
@@ -3512,6 +3519,7 @@ public:
             npc_escortAI::UpdateAI(diff);
 
             if (Event)
+            {
                 if (uiEventTimer <= diff)
                 {
                     Event = false;
@@ -3525,6 +3533,7 @@ public:
                 }
                 else
                     uiEventTimer -= diff;
+            }
         }
     };
 };
@@ -3575,6 +3584,7 @@ public:
             npc_escortAI::UpdateAI(diff);
 
             if (Event)
+            {
                 if (uiEventTimer <= diff)
                 {
                     Event = false;
@@ -3588,6 +3598,7 @@ public:
                 }
                 else
                     uiEventTimer -= diff;
+            }
         }
     };
 };
@@ -3597,7 +3608,7 @@ class npc_lord_godfrey_qatls : public CreatureScript
 public:
     npc_lord_godfrey_qatls() : CreatureScript("npc_lord_godfrey_qatls") { }
 
-    bool OnQuestComplete(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestComplete(Player* player, Creature* /*creature*/, Quest const* quest)
     {
         if (quest->GetQuestId() == 14396)
         {
@@ -3699,6 +3710,7 @@ public:
         void UpdateAI(const uint32 diff)
         {
             if (despawn)
+            {
                 if (uiDespawnTimer <= diff)
                 {
                     if (GameObject* go = me->FindNearestGameObject(GO_SPARKLES, 10.0f))
@@ -3711,6 +3723,7 @@ public:
                 }
                 else
                     uiDespawnTimer -= diff;
+            }
         }
     };
 };
@@ -3757,7 +3770,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(const uint32 /*diff*/)
         {
             if (!UpdateVictim())
                 return;
@@ -3896,6 +3909,7 @@ public:
         void UpdateAI(const uint32 diff)
         {
             if (Catch)
+            {
                 if (uiCatchTimer <= diff)
                 {
                     Catch = false;
@@ -3908,8 +3922,10 @@ public:
                 }
                 else
                     uiCatchTimer -= diff;
+            }
 
             if (Summon)
+            {
                 if (uiSummonTimer <= diff)
                 {
                     Summon = false;
@@ -3932,6 +3948,7 @@ public:
                 }
                 else
                     uiSummonTimer -= diff;
+            }
 
             if (!UpdateVictim())
                 return;
@@ -3995,6 +4012,7 @@ public:
         void UpdateAI(const uint32 diff)
         {
             if (Despawn)
+            {
                 if (uiDespawnTimer <= diff)
                 {
                     uiDespawnTimer = 500;
@@ -4003,6 +4021,7 @@ public:
                 }
                 else
                     uiDespawnTimer -= diff;
+            }
         }
     };
 };
@@ -4054,7 +4073,7 @@ public:
             me->EnableAI();
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell)
+        void SpellHit(Unit* /*caster*/, const SpellInfo* spell)
         {
             if (spell->Id == SPELL_ROPE_IN_HORSE)
                 me->DespawnOrUnsummon();
@@ -4080,7 +4099,7 @@ public:
                 uiDespawnTimer = 10000;
                 despawn = true;
 
-                if (Creature* lorna = me->FindNearestCreature(36457, 30.0f))
+                if (me->FindNearestCreature(36457, 30.0f))
                 {
                     if (lSummons.empty())
                         return;
@@ -4124,6 +4143,7 @@ public:
         void UpdateAI(const uint32 diff)
         {
             if (despawn)
+            {
                 if (uiDespawnTimer <= diff)
                 {
                     despawn = false;
@@ -4132,6 +4152,7 @@ public:
                 }
                 else
                     uiDespawnTimer -= diff;
+            }
         }
     };
 };
@@ -4277,7 +4298,7 @@ class npc_gwen_armstead : public CreatureScript
 public:
     npc_gwen_armstead() : CreatureScript("npc_gwen_armstead") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* /*creature*/, Quest const* quest)
     {
         if (quest->GetQuestId() == QUEST_TO_GREYMANE_MANOR)
             player->SetPhaseMask(0x01, true);
@@ -4331,7 +4352,7 @@ class npc_king_genn_greymane_c3 : public CreatureScript
 public:
     npc_king_genn_greymane_c3() : CreatureScript("npc_king_genn_greymane_c3") { }
 
-    bool OnQuestComplete(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestComplete(Player* player, Creature* /*creature*/, Quest const* quest)
     {
         if (quest->GetQuestId() == QUEST_THE_KINGS_OBSERVATORY)
         {
@@ -4346,7 +4367,7 @@ public:
         return true;
     }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* /*creature*/, Quest const* quest)
     {
         if (quest->GetQuestId() == QUEST_EXODUS)
         {
@@ -4495,6 +4516,7 @@ public:
         void UpdateAI(const uint32 diff)
         {
             if (Event)
+            {
                 if (uiEventTimer <= diff)
                 {
                     Event = false;
@@ -4535,6 +4557,7 @@ public:
                 }
                 else
                     uiEventTimer -= diff;
+            }
         }
     };
 };
@@ -4592,7 +4615,7 @@ public:
                     Event = true;
                     GetCreatureListWithEntryInGrid(OrgeList, me, NPC_QE_OGRE_AMBUSHER, 50.0f);
                     if (Unit* carriage = me->GetVehicleKit()->GetPassenger(2))
-                        if (Unit* lorna = carriage->GetVehicleKit()->GetPassenger(6))
+                        if (carriage->GetVehicleKit()->GetPassenger(6))
                             if (Unit* passenger = carriage->GetVehicleKit()->GetPassenger(0))
                                 if (Player* player = passenger->ToPlayer())
                                     DoScriptText(LORNA_YELL_CARRIAGE, player);
@@ -4739,6 +4762,7 @@ public:
         void UpdateAI(const uint32 diff)
         {
             if (Event)
+            {
                 if (uiEventTimer <= diff)
                 {
                     switch (uiEventPhase)
@@ -4761,6 +4785,7 @@ public:
                 }
                 else
                     uiEventTimer -= diff;
+            }
 
             npc_escortAI::UpdateAI(diff);
         }
@@ -4846,6 +4871,7 @@ public:
         void UpdateAI(const uint32 diff)
         {
             if (despawn)
+            {
                 if (uiDespawnTimer <= diff)
                 {
                     despawn = false;
@@ -4855,15 +4881,18 @@ public:
                 }
                 else
                     uiDespawnTimer -= diff;
+            }
 
             if (!UpdateVictim())
                 return;
 
             if (me->GetVictim()->GetTypeId() == TYPEID_UNIT)
+            {
                 if (me->GetVictim()->GetHealthPct() < 90)
                     miss = true;
                 else
                     miss = false;
+            }
 
             DoMeleeAttackIfReady();
         }
@@ -4907,7 +4936,7 @@ public:
 
             Unit* victim = NULL;
 
-            if (victim = me->GetVictim())
+            if (Unit* victim = me->GetVictim())
                 if (victim->GetTypeId() == TYPEID_PLAYER)
                     return;
 
@@ -4931,16 +4960,18 @@ public:
                 }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(const uint32 /*diff*/)
         {
             if (!UpdateVictim())
                 return;
 
             if (me->GetVictim()->GetTypeId() == TYPEID_UNIT)
+            {
                 if (me->GetVictim()->GetHealthPct() < 90)
                     miss = true;
                 else
                     miss = false;
+            }
 
             DoMeleeAttackIfReady();
         }
@@ -5061,9 +5092,7 @@ public:
                                 DoScriptText(KOROTH_YELL_MY_BANNER, player/*, true*/);
                 }
         }
-        void WaypointReached(uint32 point)
-        {
-        }
+        void WaypointReached(uint32 /*point*/) { }
 
         void UpdateAI(const uint32 diff)
         {
@@ -5120,7 +5149,7 @@ public:
         std::list<sSoldier> lSoldiers;
         uint64 uiKorothGUID;
 
-        void JustDied(Unit* who)
+        void JustDied(Unit* /*who*/)
         {
             me->DespawnOrUnsummon(15000);
 
@@ -5325,7 +5354,7 @@ public:
             new_player.uiPhase = 0;
             Creature* capitan = NULL;
 
-            if (capitan = player->SummonCreature(NPC_CAPTAIN_ASTHER_QIAO, -2120.19f, 1833.06f, 30.1510f,  3.87363f))
+            if (Creature* capitan = player->SummonCreature(NPC_CAPTAIN_ASTHER_QIAO, -2120.19f, 1833.06f, 30.1510f,  3.87363f))
             {
                 capitan->SetSeerGUID(player->GetGUID());
                 capitan->SetVisible(false);
@@ -5342,6 +5371,7 @@ public:
         {
             if (!lPlayerList.empty())
                 for (std::list<Psc_qiao>::iterator itr = lPlayerList.begin(); itr != lPlayerList.end(); )
+                {
                     if (itr->uiEventTimer <= diff)
                     {
                         ++itr->uiPhase;
@@ -5363,7 +5393,7 @@ public:
                                     me->CastSpell(me, SPELL_PUSH_BANNER/*, false*/);
                                     break;
                                 case 4:
-                                    if (Creature* capitan = Unit::GetCreature(*me, itr->uiCapitanGUID))
+                                    if (Unit::GetCreature(*me, itr->uiCapitanGUID))
                                         DoScriptText(CAPITAN_YELL_WILL_ORDER, player/*, true*/);
                                     itr = lPlayerList.erase(itr);
                                     break;
@@ -5374,6 +5404,7 @@ public:
                         itr->uiEventTimer -= diff;
                         ++itr;
                     }
+                }
 
             if (!UpdateVictim())
                 return;
@@ -5416,6 +5447,7 @@ public:
         void UpdateAI(const uint32 diff)
         {
             if (Event)
+            {
                 if (uiEventTimer <=  diff)
                 {
                     Event = false;
@@ -5424,6 +5456,7 @@ public:
                 }
                 else
                     uiEventTimer -= diff;
+            }
 
             if (!UpdateVictim())
                 return;
@@ -5468,7 +5501,7 @@ public:
     {
         npc_koroth_the_hillbreakerAI(Creature* creature) : ScriptedAI(creature){}
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(const uint32 /*diff*/)
         {
             if (!UpdateVictim())
                 return;
@@ -5531,7 +5564,7 @@ public:
                 }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(const uint32 /*diff*/)
         {
             if (!UpdateVictim())
                 return;
@@ -5589,6 +5622,7 @@ public:
                 return;
 
             if (shot)
+            {
                 if (uiShotTimer <= diff)
                 {
                     uiShotTimer = 2000;
@@ -5596,6 +5630,7 @@ public:
                 }
                 else
                     uiShotTimer -= diff;
+            }
 
             DoMeleeAttackIfReady();
         }
@@ -5797,6 +5832,7 @@ public:
         void UpdateAI(const uint32 diff)
         {
             if (Event)
+            {
                 if (uiEventTimer <= diff)
                 {
                     Event = false;
@@ -5806,6 +5842,7 @@ public:
                 }
                 else
                     uiEventTimer -= diff;
+            }
 
             if (!UpdateVictim())
                 return;
@@ -5930,7 +5967,7 @@ public:
                         player->CastedCreatureOrGO(go->GetEntry(), go->GetGUID(), 0);
                         SummonPersonalTrigger(player, go);
 
-                        if (Creature* lyros = go->FindNearestCreature(NPC_LYROS_SWIFTWIND, 30.0f))
+                        if (go->FindNearestCreature(NPC_LYROS_SWIFTWIND, 30.0f))
                             DoScriptText(LYROS_SAY_WELL_OF_FURY, player);
                     }
                     break;
@@ -5940,7 +5977,7 @@ public:
                         player->CastedCreatureOrGO(go->GetEntry(), go->GetGUID(), 0);
                         SummonPersonalTrigger(player, go);
 
-                        if (Creature* vassandra = go->FindNearestCreature(37873, 30.0f))
+                        if (go->FindNearestCreature(37873, 30.0f))
                             DoScriptText(VASSANDRA_SAY_WELL_OF_TRANQUILITY, player);
                     }
                     break;
@@ -5950,7 +5987,7 @@ public:
                         player->CastedCreatureOrGO(go->GetEntry(), go->GetGUID(), 0);
                         SummonPersonalTrigger(player, go);
 
-                        if (Creature* talran = go->FindNearestCreature(36814, 30.0f))
+                        if (go->FindNearestCreature(36814, 30.0f))
                             DoScriptText(TALRAN_SAY_WELL_OF_BALANCE, player);
                     }
                     break;
@@ -6029,17 +6066,19 @@ public:
         void UpdateAI(const uint32 diff)
         {
             if (say)
+            {
                 if (uiSayTimer <= diff)
                 {
                     say = false;
 
-                    if (Creature* crowley = me->FindNearestCreature(NPC_LORD_DARIUS_CROWLEY_QNHNB, 30.0f))
+                    if (me->FindNearestCreature(NPC_LORD_DARIUS_CROWLEY_QNHNB, 30.0f))
                         if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                             if (Player* player = summoner->ToPlayer())
                                 DoScriptText(CROWLEY_YELL_LORNA , player);
                 }
                 else
                     uiSayTimer -= diff;
+            }
 
             npc_escortAI::UpdateAI(diff);
         }
@@ -6125,6 +6164,7 @@ public:
             npc_escortAI::UpdateAI(diff);
 
             if (Event)
+            {
                 if (uiEventTimer <= diff)
                 {
                     ++uiPhase;
@@ -6143,7 +6183,7 @@ public:
                                     break;
                                 case 2:
                                     uiEventTimer= 8000;
-                                    if (Creature* crowley = me->FindNearestCreature(NPC_LORD_DARIUS_CROWLEY_QNHNB, 30.0f))
+                                    if (me->FindNearestCreature(NPC_LORD_DARIUS_CROWLEY_QNHNB, 30.0f))
                                         DoScriptText(CROWLEY_YELL_FROG, player);
                                     break;
                                 case 3:
@@ -6153,7 +6193,7 @@ public:
                                     break;
                                 case 4:
                                     uiEventTimer= 2000;
-                                    if (Creature* godfrey = Unit::GetCreature(*me, uiGodfreyGUID))
+                                    if (Unit::GetCreature(*me, uiGodfreyGUID))
                                         DoScriptText(GODFREY_YELL_CANT_BE, player);
                                     break;
                                 case 5:
@@ -6180,6 +6220,7 @@ public:
                 }
                 else
                     uiEventTimer -= diff;
+            }
         }
     };
 };
@@ -6193,7 +6234,7 @@ class spell_worgen_combat_transform_fx : public SpellScriptLoader
         {
             PrepareSpellScript(spell_worgen_combat_transform_fx_SpellScript)
 
-            void Transform(SpellEffIndex effIndex)
+            void Transform(SpellEffIndex /*effIndex*/)
             {
                 Unit* target = GetCaster();
 
@@ -6292,6 +6333,7 @@ public:
             npc_escortAI::UpdateAI(diff);
 
             if (InPosition)
+            {
                 if (uiSpeachTimer <= diff)
                 {
                     ++uiSpeachId;
@@ -6303,7 +6345,7 @@ public:
                                 {
                                     case 1:
                                         uiSpeachTimer = 7000;
-                                        if (Creature* crowley = me->FindNearestCreature(NPC_LORD_DARIUS_CROWLEY_QAOD, 30.0f))
+                                        if (me->FindNearestCreature(NPC_LORD_DARIUS_CROWLEY_QAOD, 30.0f))
                                             DoScriptText(CROWLEY_SAY_IMMEDIATELY, player);
                                         break;
                                     case 2:
@@ -6317,6 +6359,7 @@ public:
                 }
                 else
                     uiSpeachTimer -= diff;
+            }
         }
     };
 };
@@ -6326,7 +6369,7 @@ class npc_lord_darius_crowley_qaod : public CreatureScript
 public:
     npc_lord_darius_crowley_qaod() : CreatureScript("npc_lord_darius_crowley_qaod") { }
 
-    bool OnQuestComplete(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestComplete(Player* player, Creature* /*creature*/, Quest const* quest)
     {
         if (quest->GetQuestId() == QUEST_AT_OUR_DOORSTEP)
             if (Creature* tobias = player->SummonCreature(NPC_TOBIAS_MISTMANTLE_QAOD, -2079.345f, 1327.531f, -83.0644f))
@@ -6382,7 +6425,7 @@ class npc_krennan_aranas_qbatr : public CreatureScript
 public:
     npc_krennan_aranas_qbatr() : CreatureScript("npc_krennan_aranas_qbatr") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* /*creature*/, Quest const* quest)
     {
         if (quest->GetQuestId() == QUEST_BETRAYAL_AT_TEMPESTS_REACH)
         {
@@ -6441,6 +6484,7 @@ public:
         void UpdateAI(const uint32 diff)
         {
             if (Event)
+            {
                 if (uiEventTimer <= diff)
                     switch (uiPhase)
                     {
@@ -6460,6 +6504,7 @@ public:
                     }
                 else
                     uiEventTimer -= diff;
+            }
 
             npc_escortAI::UpdateAI(diff);
         }
@@ -6993,7 +7038,7 @@ public:
             }
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell)
+        void SpellHit(Unit* /*caster*/, const SpellInfo* spell)
         {
             if (spell->Id == SPELL_SHOOT_LIAM)
             {
@@ -7460,7 +7505,7 @@ public:
                         militia->GetNearPoint2D(x, y, j * 2, o + M_PI);
 
                         if (Creature* new_militia = me->SummonCreature(NPC_GILNEAN_MILITIA, x, y, z, o))
-                            if (npc_escortAI* npc = CAST_AI(npc_escortAI, new_militia->AI()))
+                            if (CAST_AI(npc_escortAI, new_militia->AI()))
                                 ThirdWave.push_back(new_militia->GetGUID());
                     }
                 }
@@ -7475,10 +7520,12 @@ public:
                     SetEscortPaused(true);
                     SetFacingToLiam();
                     if (uiBattlePhase == PHASE_MERCHANT_SQUARE)
+                    {
                         if (uiDeadBossCount <= 0)
                             Event = true;
                         else
                             EscortFinished = true;
+                    }
                     break;
                 case 44:
                     DoScriptText(LIAM_BATTLE_BATTLE_3, me);
@@ -7506,6 +7553,7 @@ public:
             npc_escortAI::UpdateAI(diff);
 
             if (!Finish && Fail)
+            {
                 if (uiFailTimer <= diff)
                 {
                     Fail = false;
@@ -7514,6 +7562,7 @@ public:
                 }
                 else
                     uiFailTimer -= diff;
+            }
 
             if (EscortFinished)
                 if (uiDeadBossCount <= 0)
@@ -7525,6 +7574,7 @@ public:
                 }
 
             if (Event)
+            {
                 if (uiEventTimer <= diff)
                     switch (uiBattlePhase)
                     {
@@ -7634,6 +7684,7 @@ public:
                     }
                 else
                     uiEventTimer -= diff;
+            }
 
             if (Finish)
             {
@@ -7656,7 +7707,7 @@ public:
                             {
                                 SetRun(true);
                                 DoScriptText(LIAM_BATTLE_DEATH_1, me);
-                                float x, y, z = greymane->GetPositionZ();
+                                float x, y;
                                 greymane->GetNearPoint2D(x, y, 0.5f, greymane->GetOrientation());
                                 if (Creature* sylvanas = Unit::GetCreature(*me, uiSylvanasGUID))
                                     DoStartMovement(sylvanas, 1.0f);
@@ -7773,7 +7824,7 @@ public:
                 uiPausePoint = value;
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell)
+        void SpellHit(Unit* /*caster*/, const SpellInfo* spell)
         {
             if (spell->Id == SPELL_BANSHEE_QUEENS_WAIL)
             {
@@ -7884,7 +7935,7 @@ public:
             me->AddAura(SPELL_ARCANE_INTELLECT, me);
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell)
+        void SpellHit(Unit* /*caster*/, const SpellInfo* spell)
         {
             if (spell->Id == SPELL_BANSHEE_QUEENS_WAIL)
             {
@@ -7981,7 +8032,7 @@ public:
         uint32 uiFlashHealTimer;
         uint32 uiHolyNovaTimer;
 
-        void SpellHit(Unit* caster, const SpellInfo* spell)
+        void SpellHit(Unit* /*caster*/, const SpellInfo* spell)
         {
             if (spell->Id == SPELL_BANSHEE_QUEENS_WAIL)
             {
@@ -8101,7 +8152,7 @@ public:
         uint32 uiKnockbackTimer;
         uint32 uiShootTimer;
 
-        void WaypointReached(uint32 point)
+        void WaypointReached(uint32 /*point*/)
         {
         }
 
@@ -8207,7 +8258,7 @@ public:
                 damage = 0;
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell)
+        void SpellHit(Unit* /*caster*/, const SpellInfo* spell)
         {
             if (spell->Id == SPELL_BANSHEE_QUEENS_WAIL)
             {
@@ -8303,7 +8354,7 @@ public:
             }
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell)
+        void SpellHit(Unit* /*caster*/, const SpellInfo* spell)
         {
             if (spell->Id == SPELL_BANSHEE_QUEENS_WAIL)
             {
@@ -8338,6 +8389,7 @@ public:
                 return;
 
             if (gorerot)
+            {
                 if (uiJumpTimer <= diff)
                 {
                     jump = true;
@@ -8348,8 +8400,10 @@ public:
                 }
                 else
                     uiJumpTimer -= diff;
+            }
 
             if (jump)
+            {
                 if (uiFeralLeapTimer <= diff)
                 {
                     jump = false;
@@ -8367,6 +8421,7 @@ public:
                 }
                 else
                     uiFeralLeapTimer -= diff;
+            }
 
             if (!jump)
             {
@@ -8390,7 +8445,7 @@ public:
                 {
                     uiInterceptTimer = 11000;
 
-                    if (Unit* target = me->GetVictim())
+                    if (me->GetVictim())
                     {
                         if (me->GetVictim() && me->IsInRange(me->GetVictim(), 8.0f, 25.0f, false))
                             DoCast(me->GetVictim(), SPELL_INTERCEPT);
@@ -8631,7 +8686,7 @@ public:
         bool sylvanas;
         bool can_attack;
 
-        void SpellHit(Unit* caster, const SpellInfo* spell)
+        void SpellHit(Unit* /*caster*/, const SpellInfo* spell)
         {
             if (spell->Id == SPELL_BANSHEE_QUEENS_WAIL)
             {
@@ -8651,13 +8706,14 @@ public:
                 can_attack = true;
         }
 
-        void WaypointReached(uint32 point)
+        void WaypointReached(uint32 /*point*/)
         {
         }
 
         void UpdateAI(const uint32 diff)
         {
             if (sylvanas && can_attack)
+            {
                 if (uiSylvanasTimer <= diff)
                 {
                     if (Creature* Sylvanas = me->FindNearestCreature(NPC_LADY_SYLVANAS_WINDRUNNER_TBFGC, 50.0f))
@@ -8685,6 +8741,7 @@ public:
                 }
                 else
                     uiSylvanasTimer -= diff;
+            }
 
             npc_escortAI::UpdateAI(diff);
         }
@@ -8792,7 +8849,7 @@ public:
             me->EnableAI();
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(const uint32 /*diff*/)
         {
         }
     };
@@ -8809,7 +8866,7 @@ public:
     {
         if (quest->GetQuestId() == QUEST_THE_BATTLE_FOR_GILNEAS_CITY)
         {
-            if (Creature* aranas = creature->FindNearestCreature(NPC_KRENNAN_ARANAS_TBFGC, 35.0f))
+            if (creature->FindNearestCreature(NPC_KRENNAN_ARANAS_TBFGC, 35.0f))
                 DoScriptText(TIME_TO_START_BATTLE, player);
 
             player->SaveToDB();
@@ -9235,6 +9292,7 @@ public:
                     }
 
             if (Event)
+            {
                 if (uiEventTimer <= diff)
                 {
                     ++uiPhase;
@@ -9255,7 +9313,7 @@ public:
                                 break;
                             case 3:
                                 uiEventTimer = 8000;
-                                if (Creature* general = me->FindNearestCreature(NPC_FORSAKEN_GENERAL_QTHFS, 50.0f))
+                                if (me->FindNearestCreature(NPC_FORSAKEN_GENERAL_QTHFS, 50.0f))
                                     DoScriptText(FORSAKEN_GENERAL_YELL, player/*, true*/);
                                 break;
                             case 4:
@@ -9283,27 +9341,27 @@ public:
                                 break;
                             case 7:
                                 uiEventTimer = 6000;
-                                if (Creature* sylvanas = Unit::GetCreature(*me, uiSylvanasGUID))
+                                if (Unit::GetCreature(*me, uiSylvanasGUID))
                                     DoScriptText(SYLVANAS_SAY_ASSURE, player);
                                 break;
                             case 8:
                                 uiEventTimer = 10000;
-                                if (Creature* warhowl = Unit::GetCreature(*me, uiWarhowlGUID))
+                                if (Unit::GetCreature(*me, uiWarhowlGUID))
                                     DoScriptText(WARHOWL_SAY_PLAGUE, player);
                                 break;
                             case 9:
                                 uiEventTimer = 12000;
-                                if (Creature* sylvanas = Unit::GetCreature(*me, uiSylvanasGUID))
+                                if (Unit::GetCreature(*me, uiSylvanasGUID))
                                     DoScriptText(SYLVANAS_SAY_TONE, player);
                                 break;
                             case 10:
                                 uiEventTimer = 7000;
-                                if (Creature* warhowl = Unit::GetCreature(*me, uiWarhowlGUID))
+                                if (Unit::GetCreature(*me, uiWarhowlGUID))
                                     DoScriptText(WARHOWL_SAY_GOOD_BY, player);
                                 break;
                             case 11:
                                 uiEventTimer = 12000;
-                                if (Creature* sylvanas = Unit::GetCreature(*me, uiSylvanasGUID))
+                                if (Unit::GetCreature(*me, uiSylvanasGUID))
                                     DoScriptText(SYLVANAS_SAY_GO_WITH_HONOR, player);
                                 if (Creature* warhowl = Unit::GetCreature(*me, uiWarhowlGUID))
                                     if (npc_escortAI* escort = CAST_AI(npc_escortAI, warhowl->AI()))
@@ -9314,19 +9372,18 @@ public:
                                 break;
                             case 12:
                                 uiEventTimer = 9000;
-                                if (Creature* crenshaw = Unit::GetCreature(*me, uiCrenshawGUID))
+                                if (Unit::GetCreature(*me, uiCrenshawGUID))
                                     DoScriptText(CRENSHAW_SAY_ORDER, player);
                                 break;
                             case 13:
                                 uiEventTimer = 12000;
-                                if (Creature* sylvanas = Unit::GetCreature(*me, uiSylvanasGUID))
+                                if (Unit::GetCreature(*me, uiSylvanasGUID))
                                     DoScriptText(SYLVANAS_SAY_WHAT_QUESTION, player);
                                 break;
                             case 14:
                                 uiEventTimer = 7000;
-                                CheckSwim = false;
                                 player->CompleteQuest(QUEST_THE_HUNT_FOR_SYLVANAS);
-                                if (Creature* crenshaw = Unit::GetCreature(*me, uiCrenshawGUID))
+                                if (Unit::GetCreature(*me, uiCrenshawGUID))
                                     DoScriptText(CRENSHAW_AS_YOU_WISH, player);
                                 if (Creature* sylvanas = Unit::GetCreature(*me, uiSylvanasGUID))
                                     if (npc_escortAI* escort = CAST_AI(npc_escortAI, sylvanas->AI()))
@@ -9343,6 +9400,7 @@ public:
                 }
                 else
                     uiEventTimer -= diff;
+            }
         }
     };
 };
@@ -9504,7 +9562,7 @@ public:
             me->DespawnOrUnsummon();
         }
 
-        void WaypointReached(uint32 point)
+        void WaypointReached(uint32 /*point*/)
         {
         }
 
@@ -9737,6 +9795,7 @@ public:
             }
 
             if (Event)
+            {
                 if (uiEventTimer <= diff)
                 {
                     ++uiPhase;
@@ -9770,7 +9829,7 @@ public:
                                     break;
                                 case 4:
                                     uiEventTimer = 9000;
-                                    if (Creature* lorna = Unit::GetCreature(*me, uiLornaGUID))
+                                    if (Unit::GetCreature(*me, uiLornaGUID))
                                         DoScriptText(LORNA_SAY_QPB, player);
                                     break;
                                 case 5:
@@ -9798,6 +9857,7 @@ public:
                 }
                 else
                     uiEventTimer -= diff;
+            }
         }
     };
 };
@@ -10129,18 +10189,19 @@ public:
                 return;
 
             if (me->GetVictim()->GetTypeId() == TYPEID_UNIT)
+            {
                 if (me->GetVictim()->GetHealthPct() < 90)
                     miss = true;
                 else
                     miss = false;
+            }
 
             if (uiShootTimer <= diff)
             {
                 uiShootTimer = 1500;
-                Unit* target = NULL;
 
                 if (!me->IsWithinMeleeRange(me->GetVictim(), 0.0f))
-                    if (target = me->FindNearestCreature(NPC_FORSAKEN_INVADER, 40.0f))
+                    if (Unit* target = me->FindNearestCreature(NPC_FORSAKEN_INVADER, 40.0f))
                         if (target != me->GetVictim())
                         {
                             me->getThreatManager().modifyThreatPercent(me->GetVictim(), -100);
@@ -10215,7 +10276,7 @@ public:
         {
             Creature* target = NULL;
 
-            if (target = me->FindNearestCreature(NPC_FORSAKEN_FOOTSOLDIER, 40.0f))
+            if (Creature* target = me->FindNearestCreature(NPC_FORSAKEN_FOOTSOLDIER, 40.0f))
             {
                 if (target != me->GetVictim())
                 {
@@ -10285,7 +10346,7 @@ public:
                 target->GetPosition(t_x, t_y);
                 me->GetNearPoint(me, x, y, z, me->GetObjectSize(), 0.0f, me->GetAngle(t_x, t_y));
                 float currentGroundLevel = me->GetBaseMap()->GetHeight(x, y, MAX_HEIGHT);
-                float curr_angle = me->GetAngle(x, y);
+                me->GetAngle(x, y);
 
                 if (z > currentGroundLevel)
                     z = currentGroundLevel;
@@ -10316,10 +10377,12 @@ public:
                 return;
 
             if (me->GetVictim()->GetTypeId() == TYPEID_UNIT)
+            {
                 if (me->GetVictim()->GetHealthPct() < 90)
                     miss = true;
                 else
                     miss = false;
+            }
 
             if (uiShootTimer <= diff)
             {
@@ -10378,7 +10441,7 @@ public:
 
             Unit* victim = NULL;
 
-            if (victim = me->GetVictim())
+            if (Unit* victim = me->GetVictim())
                 if (victim->GetTypeId() == TYPEID_PLAYER)
                     return;
 
@@ -10389,16 +10452,18 @@ public:
             me->AddThreat(attacker, 10005000);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(const uint32 /*diff*/)
         {
             if (!UpdateVictim())
                 return;
 
             if (me->GetVictim()->GetTypeId() == TYPEID_UNIT)
+            {
                 if (me->GetVictim()->GetHealthPct() < 90)
                     miss = true;
                 else
                     miss = false;
+            }
 
             DoMeleeAttackIfReady();
         }
@@ -10450,7 +10515,7 @@ public:
             uiKnockbackTimer = urand(2000, 5000);
         }
 
-        void DamageTaken(Unit* attacker, uint32 &damage)
+        void DamageTaken(Unit* /*attacker*/, uint32 &damage)
         {
             if (me->GetHealth() > damage)
                 return;
@@ -10718,7 +10783,7 @@ public:
                 target->GetPosition(t_x, t_y);
                 me->GetNearPoint(me, x, y, z, me->GetObjectSize(), 0.0f, me->GetAngle(t_x, t_y));
                 float currentGroundLevel = me->GetBaseMap()->GetHeight(x, y, MAX_HEIGHT);
-                float curr_angle = me->GetAngle(x, y);
+                me->GetAngle(x, y);
 
                 if (z > currentGroundLevel)
                     z = currentGroundLevel;
@@ -10761,10 +10826,12 @@ public:
 
             if (me->GetVictim())
                 if (me->GetVictim()->GetTypeId() == TYPEID_UNIT)
+                {
                     if (me->GetVictim()->GetHealthPct() < 90)
                         miss = true;
                     else
                         miss = false;
+                }
 
             DoMeleeAttackIfReady();
         }
@@ -10820,6 +10887,7 @@ public:
         void UpdateAI(const uint32 diff)
         {
             if (CanCast)
+            {
                 if (uiCastTimer <= diff)
                 {
                     uiCastTimer = urand(2000, 7000);
@@ -10830,6 +10898,7 @@ public:
                 }
                 else
                     uiCastTimer -= diff;
+            }
 
             if (!UpdateVictim())
                 return;
@@ -11011,7 +11080,7 @@ public:
         return false;
     }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* /*creature*/, Quest const* quest)
     {
         if (quest->GetQuestId() == QUEST_STEADY_SHOT)
             DoScriptText(HUNTSMAN_BLAKE_SAY_1, player);
@@ -11019,7 +11088,7 @@ public:
         return true;
     }
 
-    bool OnQuestComplete(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestComplete(Player* player, Creature* /*creature*/, Quest const* quest)
     {
         if (quest->GetQuestId() == QUEST_STEADY_SHOT)
             DoScriptText(HUNTSMAN_BLAKE_SAY_2, player);
@@ -11033,7 +11102,7 @@ class npc_vitus_darkwalker : public CreatureScript
 public:
     npc_vitus_darkwalker() : CreatureScript("npc_vitus_darkwalker") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* /*creature*/, Quest const* quest)
     {
         if (quest->GetQuestId() == QUEST_IMMOLATE)
             DoScriptText(VITUS_DARKWALKER_SAY_1, player);
@@ -11041,7 +11110,7 @@ public:
         return true;
     }
 
-    bool OnQuestComplete(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestComplete(Player* player, Creature* /*creature*/, Quest const* quest)
     {
         if (quest->GetQuestId() == QUEST_IMMOLATE)
             DoScriptText(VITUS_DARKWALKER_SAY_2, player);
@@ -11066,7 +11135,7 @@ class npc_loren_the_fence : public CreatureScript
 public:
     npc_loren_the_fence() : CreatureScript("npc_loren_the_fence") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* /*creature*/, Quest const* quest)
     {
         if (quest->GetQuestId() == QUEST_EVISCERATE)
             DoScriptText(LOREN_THE_FENCE_SAY_1, player);
@@ -11074,7 +11143,7 @@ public:
         return true;
     }
 
-    bool OnQuestComplete(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestComplete(Player* player, Creature* /*creature*/, Quest const* quest)
     {
         if (quest->GetQuestId() == QUEST_EVISCERATE)
             DoScriptText(LOREN_THE_FENCE_SAY_2, player);
@@ -11099,7 +11168,7 @@ class npc_sister_almyra : public CreatureScript
 public:
     npc_sister_almyra() : CreatureScript("npc_sister_almyra") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* /*creature*/, Quest const* quest)
     {
         if (quest->GetQuestId() == QUEST_FLASH_HEAL)
             DoScriptText(SISTER_ALMYRA_SAY_1, player);
@@ -11107,7 +11176,7 @@ public:
         return true;
     }
 
-    bool OnQuestComplete(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestComplete(Player* player, Creature* /*creature*/, Quest const* quest)
     {
         if (quest->GetQuestId() == QUEST_FLASH_HEAL)
             DoScriptText(SISTER_ALMYRA_SAY_2, player);
@@ -11132,7 +11201,7 @@ class npc_celestine_of_the_harves : public CreatureScript
 public:
     npc_celestine_of_the_harves() : CreatureScript("npc_celestine_of_the_harves") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* /*creature*/, Quest const* quest)
     {
         if (quest->GetQuestId() == QUEST_A_REJUVENATING_TOUCH)
             DoScriptText(CELESTINE_OF_THE_HARVES_SAY_1, player);
@@ -11140,7 +11209,7 @@ public:
         return true;
     }
 
-    bool OnQuestComplete(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestComplete(Player* player, Creature* /*creature*/, Quest const* quest)
     {
         if (quest->GetQuestId() == QUEST_A_REJUVENATING_TOUCH)
             DoScriptText(CELESTINE_OF_THE_HARVES_SAY_2, player);
@@ -11165,7 +11234,7 @@ class npc_myriam_spellwaker : public CreatureScript
 public:
     npc_myriam_spellwaker() : CreatureScript("npc_myriam_spellwaker") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* /*creature*/, Quest const* quest)
     {
         if (quest->GetQuestId() == QUEST_ARCANE_MISSILES)
             DoScriptText(MYRIAM_SPELLWAKER_SAY_1, player);
@@ -11173,7 +11242,7 @@ public:
         return true;
     }
 
-    bool OnQuestComplete(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestComplete(Player* player, Creature* /*creature*/, Quest const* quest)
     {
         if (quest->GetQuestId() == QUEST_ARCANE_MISSILES)
             DoScriptText(MYRIAM_SPELLWAKER_SAY_2, player);
@@ -11228,7 +11297,7 @@ class npc_sergeant_cleese : public CreatureScript
 public:
     npc_sergeant_cleese() : CreatureScript("npc_sergeant_cleese") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* /*creature*/, Quest const* quest)
     {
         if (quest->GetQuestId() == QUEST_CHARGE)
             DoScriptText(SERGEANT_CLEESE_SAY_1, player);
@@ -11236,7 +11305,7 @@ public:
         return true;
     }
 
-    bool OnQuestComplete(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestComplete(Player* player, Creature* /*creature*/, Quest const* quest)
     {
         if (quest->GetQuestId() == QUEST_CHARGE)
             DoScriptText(SERGEANT_CLEESE_SAY_2, player);
@@ -11270,16 +11339,18 @@ public:
 
         bool miss;
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(const uint32 /*diff*/)
         {
             if (!UpdateVictim())
                 return;
 
             if (me->GetVictim()->GetTypeId() == TYPEID_UNIT)
+            {
                 if (me->GetVictim()->GetHealthPct() < 90)
                     miss = true;
                 else
                     miss = false;
+            }
 
             DoMeleeAttackIfReady();
         }
@@ -11291,7 +11362,7 @@ class npc_admiral_nightwind : public CreatureScript
 public:
     npc_admiral_nightwind() : CreatureScript("npc_admiral_nightwind") { }
 
-    bool OnQuestComplete(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestComplete(Player* player, Creature* /*creature*/, Quest const* quest)
     {
         if (quest->GetQuestId() == 14434)
         {

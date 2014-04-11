@@ -15,13 +15,12 @@
  * You should have received a copy of the GNU General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
- 
- 
+
 #include "lost_city_of_the_tolvir.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 
-enum eSpells
+enum Spells
 {
     // Lockmaw
     SPELL_DUST_FLAIL                    = 81642,
@@ -41,39 +40,35 @@ enum eSpells
     SPELL_SUMMON_CROCOLISK              = 84242,
     SPELL_SUMMON_AUGH_DRAGONS_BREATH    = 84805,
     SPELL_SUMMON_AUGH_WHITLWIND         = 84808,
-    SPELL_SUMMON_AUGH_BLOW_DART         = 84809,
+    SPELL_SUMMON_AUGH_BLOW_DART         = 84809
 };
 
 enum eCreatures
 {
     NPC_FRENZIED_CROCOLISK              = 43658,
-    NPC_DUST_FLAIL                      = 43655,
+    NPC_DUST_FLAIL                      = 43655
 };
 
-enum eTexts
+enum Texts
 {
-    AUGH_SAY_INTRO_1                    = -1877007,
-    AUGH_SAY_INTRO_2                    = -1877008,
-    LOCKMAW_EMOTE_FRENZI                = -1877009,
-    AUGH_EMOTE_KILL_CROCK               = -1877014,
-    AUGH_SAY_HOW_YOU_KILL_CROCK         = -1877015,
-    AUGH_SAY_AUGH_SMART                 = -1877016,
-    AUGH_SAY_AUGH_BOSS                  = -1877017,
-    AUGH_SAY_AUGH_STEAL                 = -1877018,
-    AUGH_SAY_AUGH_BAD                   = -1877019,
-    AUGH_SAY_AAA                        = -1877020,
+    SAY_AGGRO                           = 0,
+    SAY_EMOTE_CROCK                     = 1,
+    SAY_AAA                             = 2,
+    SAY_AUGH_STEAL                      = 3,
+    SAY_HOW_YOU_KILL_CROCK              = 4,
+    SAY_AUGH_SMART                      = 5,
 };
 
-enum ePhases
+enum Phases
 {
     AUGH_PHASE_NONE                     = 0,
     AUGH_PHASE_ACTIVE                   = 1,
     AUGH_PHASE_STEALTHED                = 2,
     AUGH_PHASE_DISMOUNTED               = 3,
-    AUGH_PHASE_DESPAWNED                = 4,
+    AUGH_PHASE_DESPAWNED                = 4
 };
 
-enum eEvents
+enum Events
 {
     // Vicious Croc
     EVENT_VICIOUS_CROC_UPDATE_THREAT    = 1,
@@ -89,17 +84,17 @@ enum eEvents
     EVENT_BLOW_DART                     = 9,
     EVENT_DRAGONS_BREATH                = 10,
     EVENT_SMOKE_BOMB                    = 11,
-    EVENT_SAY_AAA                       = 12,
+    EVENT_SAY_AAA                       = 12
 };
 
-enum eActions
+enum Actions
 {
-    ACTION_LOCKMAW_IS_DONE              = 1,
+    ACTION_LOCKMAW_IS_DONE              = 1
 };
 
-enum ePoins
+enum Poins
 {
-    POINT_AUGH_BATTLE_POSITION          = 1,
+    POINT_AUGH_BATTLE_POSITION          = 1
 };
 
 const Position AughPos = {-11068.9f, -1668.37f, 0.74569f, 0.74265f};
@@ -147,7 +142,7 @@ public:
                 instance->SetData(DATA_LOCKMAW, NOT_STARTED);
         }
 
-        void EnterCombat(Unit* /*pWho*/)
+        void EnterCombat(Unit* /*who*/)
         {
             if (instance)
                 instance->SetData(DATA_LOCKMAW, IN_PROGRESS);
@@ -171,7 +166,7 @@ public:
             lSummons.Summon(summoned);
         }
 
-        void JustDied(Unit* /*Killer*/)
+        void JustDied(Unit* /*killer*/)
         {
             lSummons.DespawnAll();
             events.Reset();
@@ -214,7 +209,7 @@ public:
             {
                 Rage = true;
                 DoCast(SPELL_VENOMOUS_RAGE);
-                DoScriptText(LOCKMAW_EMOTE_FRENZI, me);
+                // Talk(LOCKMAW_EMOTE_FRENZI);
             }
 
             events.Update(diff);
@@ -326,7 +321,7 @@ public:
                 }
         }
 
-        void JustDied(Unit* /*Killer*/)
+        void JustDied(Unit* /*killer*/)
         {
             InstanceScript* instance = me->GetInstanceScript();
 
@@ -384,10 +379,10 @@ public:
         InstanceScript* instance;
         bool Active;
 
-        void EnterCombat(Unit* /*pWho*/)
+        void EnterCombat(Unit* /*who*/)
         {
             if (Active)
-                DoScriptText(AUGH_SAY_INTRO_1, me);
+                Talk(SAY_AGGRO);
         }
 
         void UpdateAI(const uint32 /*diff*/)
@@ -404,7 +399,6 @@ public:
                     me->CombatStop();
                     me->SetControlled(true, UNIT_STATE_ROOT);
                     me->CastSpell(me, SPELL_SMOKE_BOMB, false);
-                    DoScriptText(AUGH_SAY_INTRO_2, me);
                     me->DespawnOrUnsummon(2000);
                 }
 
@@ -692,7 +686,7 @@ public:
             {
                 uiIntroPhase = 0;
                 Intro = true;
-                DoScriptText(AUGH_EMOTE_KILL_CROCK, me);
+                Talk(SAY_EMOTE_CROCK);
                 me->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
                 me->SetVisible(true);
                 me->SetHomePosition(AughPos);
@@ -732,17 +726,15 @@ public:
                     {
                         case 0:
                             uiIntroTimer = 5000;
-                            DoScriptText(AUGH_SAY_HOW_YOU_KILL_CROCK, me);
+                            Talk(SAY_HOW_YOU_KILL_CROCK);
                             break;
                         case 1:
-                            DoScriptText(AUGH_SAY_AUGH_SMART, me);
+                            Talk(SAY_AUGH_SMART);
                             uiIntroTimer = 9000;
                             break;
                         case 2:
                             {
-                                DoScriptText(AUGH_SAY_AUGH_BOSS, me);
                                 uiIntroTimer = 5000;
-
                                 if (IsHeroic())
                                 {
                                     me->SetReactState(REACT_AGGRESSIVE);
@@ -751,11 +743,11 @@ public:
                             }
                             break;
                         case 3:
-                            DoScriptText(AUGH_SAY_AUGH_STEAL, me);
+                            Talk(SAY_AUGH_STEAL);
                             uiIntroTimer = 7000;
                             break;
                         case 4:
-                            DoScriptText(AUGH_SAY_AUGH_BAD, me);
+                            // Talk(SAY_AUGH_BAD);
                             Intro = false;
                             break;
                     }
@@ -805,7 +797,7 @@ public:
                         events.ScheduleEvent(EVENT_SMOKE_BOMB, urand(7000, 15000));
                         break;
                     case EVENT_SAY_AAA:
-                        DoScriptText(AUGH_SAY_AAA, me);
+                        Talk(SAY_AAA);
                         events.ScheduleEvent(EVENT_SAY_AAA, urand(15000, 35000));
                         break;
                 }

@@ -23,7 +23,7 @@
 
 enum eScriptText
 {
-    YELL_FREE                    = -1877010,
+    YELL_FREE                    = 0
 };
 
 class instance_lost_city_of_the_tolvir : public InstanceMapScript
@@ -94,7 +94,7 @@ class instance_lost_city_of_the_tolvir : public InstanceMapScript
                         SiamatFree();
 
                         if (Creature* siamat = instance->GetCreature(uiSiamatGUID))
-                            DoScriptText(YELL_FREE, siamat);
+                            siamat->AI()->Talk(YELL_FREE);
                     }
                     else
                         uiUpdateTimer -= diff;

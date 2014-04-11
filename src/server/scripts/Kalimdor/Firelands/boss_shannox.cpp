@@ -1,14 +1,15 @@
-/*Copyright (C) 2014 Arkania Project (Script Coded by Naios, completed by Hellground).
-*
-* Script 90% done. TODO:
-*
-* - Shannox controller to spawn shannox after a number of trash was killed.
-* - Bucket List positions.
-*
-* - Live Testing needed.
-*
-* THIS particular file is NOT free software; third-party users should NOT have access to it, redistribute it or modify it. :)
-*/
+/*
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * (Script Coded by Naios, completed by Hellground).
+ *
+ * Script 90% done. TODO:
+ * - Shannox controller to spawn shannox after a number of trash was killed.
+ * - Bucket List positions.
+ * - Live Testing needed.
+ *
+ * THIS particular file is NOT free software; third-party users should NOT 
+ * have access to it, redistribute it or modify it. :)
+ */
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
@@ -24,25 +25,22 @@
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "CreatureTextMgr.h"
-
 #include "firelands.h"
 
 enum Shannox_Yells
 {
-    SAY_AGGRO                   = -1999971,
-    EMOTE_SOFT_ENRAGE           = -1999972,
-    SAY_ON_DOGS_FALL            = -1999973,
-    SAY_ON_DEAD                 = -1999974,
-    SAY_DOG_FOOD                = -1999975,
-    SAY_FETCH_SUPPER            = -1999976,
-    SAY_GO_FOR_THROAT           = -1999977,
-    SAY_BURN_ONE                = -1999978,
-    SAY_ON_KILL_ONE             = -1999979,
-    SAY_RIPLIMB                 = -1999980,
-    SAY_ON_KILL_TWO             = -1999981,
-    SAY_BURN_TWO                = -1999982,
-    SAY_INTRO_SPECH_PART_ONE    = -1999983,
-    SAY_INTRO_SPECH_PART_TWO    = -1999984
+    SAY_AGGRO                   = 0,
+    EMOTE_SOFT_ENRAGE           = 1,
+    SAY_ON_DOGS_FALL            = 2,
+    SAY_ON_DEAD                 = 3,
+    SAY_DOG_FOOD                = 4, // not realized
+    SAY_FETCH_SUPPER            = 5,
+    SAY_GO_FOR_THROAT           = 6,
+    SAY_BURN                    = 7,
+    SAY_ON_KILL                 = 8,
+    SAY_RIPLIMB                 = 9,
+    SAY_INTRO_SPECH_PART_ONE    = 10,
+    SAY_INTRO_SPECH_PART_TWO    = 11
 };
 
 enum ePhases
@@ -57,7 +55,7 @@ enum ePhases
 
 enum Actions
 {
-    ACTION_SAY_RIPLIMB, //Shannox yell when Riplimb bites someone.
+    ACTION_SAY_RIPLIMB,                    // Shannox yell when Riplimb bites someone.
     ACTION_START_EVENT_TO_RESPAWN_RIPLIMB, // Used by Riplimb when he dies to start Shannox respawn event.
 };
 
@@ -68,14 +66,11 @@ enum Spells
     SPELL_ARCTIC_SLASH_25N      = 101201,
     SPELL_ARCTIC_SLASH_10H      = 101202,
     SPELL_ARCTIC_SLASH_25H      = 101203,
-
     SPELL_BERSERK               = 47008,
-
     SPELL_CALL_SPEAR            = 100663,
     SPELL_HURL_SPEAR            = 100002, // Dummy Effect & Damage.
-    SPELL_HURL_SPEAR_SUMMON     = 99978,  //Summons Spear of Shannox.
+    SPELL_HURL_SPEAR_SUMMON     = 99978,  // Summons Spear of Shannox.
     SPELL_MAGMA_RUPTURE_SHANNOX = 99840,
-
     SPELL_FRENZY_SHANNOX        = 100522,
 
     // Riplimb
@@ -85,7 +80,6 @@ enum Spells
     // Rageface
     SPELL_FACE_RAGE             = 99947,
     SPELL_RAGE                  = 100415,
-
     SPELL_FACE_RAGE_10N         = 100129, // Buff to remove damage aura.
     SPELL_FACE_RAGE_25N         = 101212,
     SPELL_FACE_RAGE_10H         = 101213,
@@ -94,7 +88,6 @@ enum Spells
     // Both Dogs
     SPELL_FRENZIED_DEVOLUTION   = 100064,
     SPELL_FEEDING_FRENZY_H      = 100655,
-
     SPELL_WARY_10N              = 100167, // Buff when the Dog goes into a Trap.
     SPELL_WARY_25N              = 101215,
     SPELL_WARY_10H              = 101216,
@@ -115,7 +108,6 @@ enum Spells
     SPELL_SUMMON_CRYSTAL_PRISON = 99836,
     CRYSTAL_PRISON_EFFECT       = 99837,
     SPELL_SUMMON_IMOLATION_TRAP = 99839,
-
     SPELL_IMMOLATION_TRAP_10N   = 99838, 
     SPELL_IMMOLATION_TRAP_25N   = 101208,
     SPELL_IMMOLATION_TRAP_10H   = 101209,
@@ -157,7 +149,6 @@ enum Events
     EVENT_RIPLIMB_RESET_SHANNOX_YELL  = 18,
     EVENT_SHANNOX_RESET_INTRO_YELL    = 19,
     EVENT_SHANNOX_SEC_INTRO_YELL      = 20,
-
     EVENT_PRISON_DOG_ATTACK_RAGEFACE  = 21,
     EVENT_PRISON_DOG_ATTACK_RIPLIMB   = 22,
 
@@ -234,9 +225,9 @@ public:
             }
         }
 
-        uint32 GetData (uint32 id)
+        uint32 GetData (uint32 type) const
         {
-            switch (id)
+            switch (type)
             {
             case DATA_PHASE:
                 return uiPhase;
@@ -308,7 +299,7 @@ public:
 
         void KilledUnit(Unit* /*victim*/)
         {
-            DoScriptText(RAND(SAY_ON_KILL_ONE, SAY_ON_KILL_TWO), me);
+            Talk(SAY_ON_KILL);
         }
 
         void DoAction(const int32 action)
@@ -316,7 +307,7 @@ public:
             switch(action)
             {
             case ACTION_SAY_RIPLIMB:
-                DoScriptText(SAY_RIPLIMB,me);
+                Talk(SAY_RIPLIMB);
                 break;
             case ACTION_START_EVENT_TO_RESPAWN_RIPLIMB:
                 events.ScheduleEvent(EVENT_RIPLIMB_RESPAWN_H, 30000);
@@ -326,7 +317,7 @@ public:
 
         void JustDied(Unit* /*victim*/)
         {
-            DoScriptText(SAY_ON_DEAD, me);
+            Talk(SAY_ON_DEAD);
 
             summons.DespawnAll();
 
@@ -347,9 +338,9 @@ public:
             _JustDied();
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* /*who*/)
         {
-            DoScriptText(SAY_AGGRO, me, who);
+            Talk(SAY_AGGRO);
 
             // Not tauntable.
             me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, true);
@@ -382,7 +373,7 @@ public:
             if( (!introSpeechDone) && (!me->IsInCombat()) )
             {
                 introSpeechDone = true;
-                DoScriptText(SAY_INTRO_SPECH_PART_ONE,me);
+                Talk(SAY_INTRO_SPECH_PART_ONE);
                 events.ScheduleEvent(EVENT_SHANNOX_SEC_INTRO_YELL, 6500);
                 events.ScheduleEvent(EVENT_SHANNOX_RESET_INTRO_YELL, 180000); // 1:15 Min
             }
@@ -411,7 +402,7 @@ public:
                     break;
 
                 case EVENT_SHANNOX_SEC_INTRO_YELL:
-                    DoScriptText(SAY_INTRO_SPECH_PART_TWO,me);
+                    Talk(SAY_INTRO_SPECH_PART_TWO);
                     break;
 
                 case EVENT_ARCING_SLASH:
@@ -475,14 +466,13 @@ public:
 
                             me->SummonCreature(NPC_FAKE_SHANNOX_SPEAR,GetRiplimb()->GetPositionX()+irand(-30,30),GetRiplimb()->GetPositionY()+irand(-30,30),GetRiplimb()->GetPositionZ());
 
-                            if (Creature* fakeSpear = me->FindNearestCreature(NPC_FAKE_SHANNOX_SPEAR, 5000.0f, true))
+                            if (me->FindNearestCreature(NPC_FAKE_SHANNOX_SPEAR, 5000.0f, true))
                                 events.ScheduleEvent(EVENT_HURL_SPEAR, 2000);
 
                             uiPhase = PHASE_SPEAR_ON_THE_GROUND;
                             //DoCast(SPELL_HURL_SPEAR_DUMMY_SCRIPT);
 
-                            DoScriptText(RAND(SAY_BURN_ONE,SAY_BURN_TWO),me);
-
+                            Talk(SAY_BURN);
                         }
                         else
                             events.ScheduleEvent(EVENT_HURL_SPEAR_OR_MAGMA_RUPTURE, 10000);
@@ -498,7 +488,7 @@ public:
                 case EVENT_RIPLIMB_RESPAWN_H:
                     if (GetRiplimb())
                     {
-                        DoScriptText(SAY_FETCH_SUPPER, me);
+                        Talk(SAY_FETCH_SUPPER);
                         GetRiplimb()->Respawn();
                         DoZoneInCombat(GetRiplimb());
                     }
@@ -610,8 +600,8 @@ public:
             if (GetShannox())
             {
                 GetShannox()->HasAura(SPELL_FRENZY_SHANNOX) ? GetShannox()->GetAura(SPELL_FRENZY_SHANNOX)->SetStackAmount(2) : DoCast(GetShannox(),SPELL_FRENZY_SHANNOX);
-                GetShannox()->MonsterTextEmote(SAY_ON_DOGS_FALL, 0, true);
-                GetShannox()->MonsterTextEmote(EMOTE_SOFT_ENRAGE, 0, true);
+                GetShannox()->AI()->Talk(SAY_ON_DOGS_FALL);
+                GetShannox()->AI()->Talk(EMOTE_SOFT_ENRAGE);
             }
         }
 
@@ -645,7 +635,7 @@ public:
                 }
         }
 
-        void DamageTaken(Unit* who, uint32& damage)
+        void DamageTaken(Unit* /*who*/, uint32& damage)
         {
             if (damage >= 40000 && me->HasAura(RAID_MODE(SPELL_FACE_RAGE_10N, SPELL_FACE_RAGE_25N,SPELL_FACE_RAGE_10H, SPELL_FACE_RAGE_25H)))
             {
@@ -726,7 +716,7 @@ public:
             }
 
             if (me->HasAura(CRYSTAL_PRISON_EFFECT) && !prisonStartAttack)
-                if (Creature* prison = me->FindNearestCreature(NPC_CRYSTAL_PRISON, 50.0f, true))
+                if (me->FindNearestCreature(NPC_CRYSTAL_PRISON, 50.0f, true))
                 {
                     events.ScheduleEvent(EVENT_PRISON_DOG_ATTACK_RAGEFACE, 1000);
                     prisonStartAttack = true;
@@ -823,7 +813,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* /*who*/)
         {
             prisonStartAttack = false;
             inTakingSpearPhase = false;
@@ -858,7 +848,7 @@ public:
                     if(GetShannox() && !firstLimbRip)
                     {
                         firstLimbRip = true;
-                        DoScriptText(SAY_GO_FOR_THROAT, GetShannox());
+                        GetShannox()->AI()->Talk(SAY_GO_FOR_THROAT);
                         events.ScheduleEvent(EVENT_RIPLIMB_RESET_SHANNOX_YELL, 45000); // Resets Yell after 45s
                     }
 
@@ -891,7 +881,7 @@ public:
             }
 
             if (me->HasAura(CRYSTAL_PRISON_EFFECT) && !prisonStartAttack)
-                if (Creature* prison = me->FindNearestCreature(NPC_CRYSTAL_PRISON, 50.0f, true))
+                if (me->FindNearestCreature(NPC_CRYSTAL_PRISON, 50.0f, true))
                 {
                     events.ScheduleEvent(EVENT_PRISON_DOG_ATTACK_RIPLIMB, 1000);
                     prisonStartAttack = true;
@@ -1026,7 +1016,7 @@ public:
                 }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(const uint32 /*diff*/)
         {
             if (!UpdateVictim())
                 return;

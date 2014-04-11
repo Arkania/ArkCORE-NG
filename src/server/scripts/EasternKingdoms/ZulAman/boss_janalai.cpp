@@ -6,7 +6,6 @@
  * lucky (presuming someone else managed to hack it).
  */
 
-
 /* ScriptData
 SDName: Boss_Janalai 4.1
 SD%Complete: 100
@@ -29,21 +28,18 @@ EndScriptData */
 #include "GridNotifiersImpl.h"
 #include "CreatureTextMgr.h"
 #include "Weather.h"
-
 #include "zulaman.h"
 
 enum Yells
 {
-    SAY_AGGRO                   = -1568000,
-    SAY_FIRE_BOMBS              = -1568001,
-    SAY_SUMMON_HATCHER          = -1568002,
-    SAY_ALL_EGGS                = -1568003,
-    SAY_BERSERK                 = -1568004,
-    SAY_SLAY_1                  = -1568005,
-    SAY_SLAY_2                  = -1568006,
-    SAY_DEATH                   = -1568007,
-    SAY_EVENT_STRANGERS         = -1568008,
-    SAY_EVENT_FRIENDS           = -1568009
+    SAY_AGGRO                   = 0,
+    SAY_FIRE_BOMBS              = 1,
+    SAY_SUMMON_HATCHER          = 2,
+    SAY_ALL_EGGS                = 3,
+    SAY_BERSERK                 = 4,
+    SAY_SLAY                    = 5,
+    SAY_DEATH                   = 6,
+    SAY_EVENT_COME              = 7
 };
 
 enum Spells
@@ -192,7 +188,7 @@ public:
         {
             if (!introDone && me->IsWithinDistInMap(who, 30) && who->GetTypeId() == TYPEID_PLAYER)
             {
-                DoScriptText(RAND(SAY_EVENT_STRANGERS, SAY_EVENT_FRIENDS), me);
+                Talk(SAY_EVENT_COME);
                 introDone = true;
             }
         }
@@ -209,7 +205,7 @@ public:
 
         void JustDied(Unit* /*killer*/)
         {
-            DoScriptText(SAY_DEATH, me);
+            Talk(SAY_DEATH);
 
             if (instance)
             {
@@ -249,12 +245,12 @@ public:
 
         void KilledUnit(Unit* /*victim*/)
         {
-            DoScriptText(RAND(SAY_SLAY_1, SAY_SLAY_2), me);
+            Talk(SAY_SLAY);
         }
 
         void EnterCombat(Unit* /*who*/)
         {
-            DoScriptText(SAY_AGGRO, me);
+            Talk(SAY_AGGRO);
 
             if (instance)
             {
@@ -440,7 +436,7 @@ public:
                 }
                 else
                 {
-                    DoScriptText(SAY_BERSERK, me);
+                    Talk(SAY_BERSERK);
                     DoCast(me, SPELL_BERSERK, true);
                     EnrageTimer = 300000;
                 }
@@ -448,7 +444,7 @@ public:
 
             if (BombTimer <= diff)
             {
-                DoScriptText(SAY_FIRE_BOMBS, me);
+                Talk(SAY_FIRE_BOMBS);
 
                 std::list<GameObject*> doorList;
                 me->GetGameObjectListWithEntryInGrid(doorList, JINALAI_FIRE_DOOR, 50.0f);
@@ -484,7 +480,7 @@ public:
 
             if (HealthBelowPct(35) && EggNumber > 0)
             {
-                DoScriptText(SAY_ALL_EGGS, me);
+                Talk(SAY_ALL_EGGS);
 
                 me->AttackStop();
                 me->GetMotionMaster()->Clear();
@@ -499,7 +495,7 @@ public:
             {
                 if (EggNumber > 0)
                 {
-                    DoScriptText(SAY_SUMMON_HATCHER, me);
+                    Talk(SAY_SUMMON_HATCHER);
                     me->SummonCreature(MOB_AMANI_HATCHER, hatcherway[0][0][0], hatcherway[0][0][1], hatcherway[0][0][2], 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
                     me->SummonCreature(MOB_AMANI_HATCHER, hatcherway[1][0][0], hatcherway[1][0][1], hatcherway[1][0][2], 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
                 }

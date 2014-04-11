@@ -15,8 +15,7 @@
  * You should have received a copy of the GNU General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
- 
- 
+
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "lost_city_of_the_tolvir.h"
@@ -74,12 +73,11 @@ enum ePhases
 
 enum Texts
 {
-    SAY_FINISH                                     = -1877000,
-    SAY_START                                      = -1877001,
-    SAY_CAST_SHOCKVAWE_1                           = -1877002,
-    SAY_CAST_SHOCKVAWE_2                           = -1877003,
-    YELL_KILL_PLAYER_1                             = -1877021,
-    YELL_TREAD_LIGHTLY                             = -1877022,
+    SAY_AGGRO                                      = 0,
+    SAY_TREAD_LIGHTLY                              = 1,
+    SAY_CAST_SHOCKVAWE                             = 2,
+    SAY_DEATH                                      = 3,
+    YELL_KILL_PLAYER                               = 4
 };
 
 class boss_general_husam : public CreatureScript
@@ -130,7 +128,7 @@ public:
             if (instance)
                 instance->SetData(DATA_GENERAL_HUSAM, IN_PROGRESS);
 
-            DoScriptText(SAY_START, me);
+            Talk(SAY_AGGRO);
             events.ScheduleEvent(EVENT_SUMMON_LAND_MINES, 3000);
             // To do: fix client crash
             //events.ScheduleEvent(EVENT_SUMMON_SHOCKWAVE, urand(12000, 17000));
@@ -161,7 +159,7 @@ public:
         void KilledUnit(Unit* victim)
         {
             if (victim->GetTypeId() == TYPEID_PLAYER)
-                DoScriptText(YELL_KILL_PLAYER_1, me);
+                Talk(YELL_KILL_PLAYER);
         }
 
         void JustDied(Unit* /*killer*/)
@@ -169,7 +167,7 @@ public:
             if (instance)
                 instance->SetData(DATA_GENERAL_HUSAM, DONE);
 
-            DoScriptText(SAY_FINISH, me);
+            Talk(SAY_DEATH);
             lSummons.DespawnAll();
             events.Reset();
         }
@@ -189,7 +187,7 @@ public:
                 switch (eventId)
                 {
                     case EVENT_COUNTDOWN_LAND_MINES:
-                        DoScriptText(YELL_TREAD_LIGHTLY, me);
+                        Talk(SAY_TREAD_LIGHTLY);
                         events.ScheduleEvent(EVENT_COUNTDOWN_LAND_MINES, 15000);
                         me->CastSpell(me, SPELL_DETONATE_TRAPS, false);
                         break;
@@ -211,8 +209,7 @@ public:
                         {
                             me->SetReactState(REACT_PASSIVE);
                             me->AttackStop();
-                            DoScriptText(SAY_CAST_SHOCKVAWE_1, me);
-                            DoScriptText(SAY_CAST_SHOCKVAWE_2, me);
+                            Talk(SAY_CAST_SHOCKVAWE);
 
                             float _x, _y, x, y, z, o;
                             me->GetPosition(x, y, z, o);
@@ -283,7 +280,7 @@ public:
             uiCountdownTimer = urand(20000, 35000);
             me->SetInCombatWithZone();
         }
-        
+
         uint32 uiActivationTimer;
         uint32 uiCountdownTimer;
         uint32 uiDespawnTimer;
@@ -321,7 +318,7 @@ public:
                 StartCountDown();
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell, uint32 /*hitCount*/)
+        void SpellHitTarget(Unit* target, const SpellInfo* spell)
         {
             if (spell->Id == 83112)
             {

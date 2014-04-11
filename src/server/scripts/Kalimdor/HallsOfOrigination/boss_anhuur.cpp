@@ -1,8 +1,10 @@
-/*Copyright (C) 2014 Arkania Project.
-*
-* This file is NOT free software. Third-party users can NOT redistribute it or modify it :). 
-* If you find it, you are either hacking something, or very lucky (presuming someone else managed to hack it).
-*/
+/*
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ *
+ * This file is NOT free software. Third-party users can NOT redistribute 
+ * it or modify it. If you find it, you are either hacking something, or very 
+ * lucky (presuming someone else managed to hack it).
+ */
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
@@ -19,7 +21,6 @@
 #include "GridNotifiersImpl.h"
 #include "CreatureTextMgr.h"
 #include "Weather.h"
-
 #include "halls_of_origination.h"
 
 enum Yells
@@ -28,7 +29,7 @@ enum Yells
     SAY_BEACON =   1,
     SAY_KILL   =   2,
     SAY_DEATH  =   3,
-    SAY_ANNOUNCE = -1900025
+    SAY_ANNOUNCE = 4
 };
 
 enum Spells
@@ -187,7 +188,7 @@ class boss_anhuur : public CreatureScript
 
                 PhaseCount++;
                 Talk(SAY_BEACON);
-                DoScriptText(SAY_ANNOUNCE, me);
+                Talk(SAY_ANNOUNCE);
 
                 Phase = PHASE_SHIELD;
 
@@ -200,7 +201,7 @@ class boss_anhuur : public CreatureScript
 
             void KilledUnit(Unit* /*Killed*/)
             {
-                Talk (SAY_KILL);
+                Talk(SAY_KILL);
             }
 
             void JustDied(Unit* /*Kill*/)

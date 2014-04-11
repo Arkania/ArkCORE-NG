@@ -841,18 +841,16 @@ void WorldSession::HandleGuildSetGuildMaster(WorldPacket& recvPacket)
 
 void WorldSession::HandleGuildSwitchRank(WorldPacket& recvPacket)
 {
-    uint32 rank;
+    uint32 rankId;
     bool direction;                 // if its true, then the rank rises, if no, it goes down
 
-    recvPacket >> rank;
+    recvPacket >> rankId;
     direction = recvPacket.ReadBit();
 
-    Guild* pGuild = GetPlayer()->GetGuild();
+    Guild* guild = GetPlayer()->GetGuild();
 
-    if(pGuild)
-    {
-        pGuild->MoveRank(rank,direction);
-    }
+    if(guild)
+        guild->MoveRank(rankId, direction);
 }
 
 void WorldSession::HandleGuildAchievementMembers(WorldPacket& recvPacket)
