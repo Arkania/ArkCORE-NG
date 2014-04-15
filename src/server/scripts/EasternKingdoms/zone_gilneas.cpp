@@ -57,12 +57,17 @@ enum eGilneas
     NPC_TOBIAS_MISTMANTLE_PHASE4                   = 35124,
     NPC_WORGEN_RUNT_PHASE4                         = 35456,
 
+    NPC_JOSIAH_AVERY_HUMAN_PHASE4                  = 35369,
+    NPC_JOSIAH_AVERY_WORGEN_PHASE8                 = 35370,
+    NPC_LORNA_CROWLEY_PHASE8                       = 35378,
+
     QUEST_LOCKDOWN                                 = 14078,
     QUEST_SOMETHINGS_AMISS                         = 14091,
     QUEST_ALL_HELL_BREAKS_LOOSE                    = 14093,
     QUEST_EVACUATE_THE_MERCHANT_SQUARE             = 14098,
     QUEST_ROYAL_ORDERS                             = 14099,
     QUEST_BY_THE_SKIN_OF_HIS_TEETH                 = 14154,
+    QUEST_THE_REBEL_LORD_ARSENAL                   = 14159,
 
     SPELL_INVISIBILITY_DETECTION_2                 = 49417,
     SPELL_GENERIC_QUEST_INVISIBILITY_DERECTION_1   = 49416,

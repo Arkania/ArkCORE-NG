@@ -266,7 +266,7 @@ void WorldSession::HandleQuestgiverQueryQuestOpcode(WorldPacket& recvData)
         else
             _player->PlayerTalkClass->SendQuestGiverQuestDetails(quest, object->GetGUID(), true);
 
-
+        sScriptMgr->OnQuestSelect(_player, (object->ToCreature()), quest);
 
         if (_player)
             _player->SaveToDB(); // Save player.
@@ -768,7 +768,7 @@ void WorldSession::HandleQuestgiverStatusMultipleQuery(WorldPacket& /*recvPacket
             if (!questgiver->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER))
                 continue;
             questStatus = sScriptMgr->GetDialogStatus(_player, questgiver);
-            if (questStatus > 6)
+            if (questStatus > QUEST_STATUS_REWARDED)
                 questStatus = getDialogStatus(_player, questgiver, defstatus);
 
             data << uint64(questgiver->GetGUID());
@@ -783,7 +783,7 @@ void WorldSession::HandleQuestgiverStatusMultipleQuery(WorldPacket& /*recvPacket
             if (questgiver->GetGoType() != GAMEOBJECT_TYPE_QUESTGIVER)
                 continue;
             questStatus = sScriptMgr->GetDialogStatus(_player, questgiver);
-            if (questStatus > 6)
+            if (questStatus > QUEST_STATUS_REWARDED)
                 questStatus = getDialogStatus(_player, questgiver, defstatus);
 
             data << uint64(questgiver->GetGUID());
