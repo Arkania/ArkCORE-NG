@@ -7667,30 +7667,13 @@ void Spell::EffectRewardCurrency(SpellEffIndex effIndex)
 
 void Spell::EffectUnlockGuildTab(SpellEffIndex effIndex)
 {
-    // for better perfomance - need to check banktabs count
-    // and return if we has it
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT)
         return;
 
-    if (m_caster->GetTypeId() != TYPEID_PLAYER)
-        return;
-
-     Player* player = m_caster->ToPlayer();
-
-     if (!player)
-         return;
-
-     uint8 tabId = m_spellInfo->Effects[0].BasePoints;
-
-        if (!tabId)
-            return;
-
-     if (Guild* guild = sGuildMgr->GetGuildById(player->GetGuildId()))
-     {
-         if (guild->_IsLeader(player))
-            guild->HandleBuyBankTab(player->GetSession(), tabId-1);
-     }
-
+    // Safety checks done in Spell::CheckCast
+    Player* caster = m_caster->ToPlayer();
+    if (Guild* guild = caster->GetGuild())
+        guild->HandleBuyBankTab(caster->GetSession(), m_spellInfo->Effects[effIndex].BasePoints - 1); // Bank tabs start at zero internally
 }
 
 void Spell::EffectCastButtons(SpellEffIndex effIndex)
