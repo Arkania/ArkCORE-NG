@@ -266,7 +266,21 @@ void WorldSession::HandleQuestgiverQueryQuestOpcode(WorldPacket& recvData)
         else
             _player->PlayerTalkClass->SendQuestGiverQuestDetails(quest, object->GetGUID(), true);
 
-        sScriptMgr->OnQuestSelect(_player, (object->ToCreature()), quest);
+        switch (object->GetTypeId())
+            {
+                case TYPEID_UNIT:
+                    sScriptMgr->OnQuestSelect(_player, (object->ToCreature()), quest);
+                    (object->ToCreature())->AI()->sQuestSelect(_player,quest);                   
+                    break;
+                case TYPEID_ITEM:
+                    break;
+                case TYPEID_CONTAINER:               
+                    break;               
+                case TYPEID_GAMEOBJECT:
+                    break;
+                default:
+                    break;
+            }
 
         if (_player)
             _player->SaveToDB(); // Save player.
