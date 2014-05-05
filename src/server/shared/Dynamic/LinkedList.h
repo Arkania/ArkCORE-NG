@@ -34,8 +34,8 @@ class LinkedListElement
         LinkedListElement* iNext;
         LinkedListElement* iPrev;
     public:
-        LinkedListElement(): iNext(NULL), iPrev(NULL) {}
-        ~LinkedListElement() { delink(); }
+        LinkedListElement() : iNext(NULL), iPrev(NULL) { }
+        virtual ~LinkedListElement() { delink(); }
 
         bool hasNext() const { return(iNext && iNext->iNext != NULL); }
         bool hasPrev() const { return(iPrev && iPrev->iPrev != NULL); }
@@ -74,6 +74,10 @@ class LinkedListElement
             iNext->iPrev = pElem;
             iNext = pElem;
         }
+
+    private:
+        LinkedListElement(LinkedListElement const&);
+        LinkedListElement& operator=(LinkedListElement const&);
 };
 
 //============================================
@@ -84,6 +88,7 @@ class LinkedListHead
         LinkedListElement iFirst;
         LinkedListElement iLast;
         uint32 iSize;
+
     public:
         LinkedListHead(): iSize(0)
         {
@@ -92,6 +97,8 @@ class LinkedListHead
             iFirst.iNext = &iLast;
             iLast.iPrev = &iFirst;
         }
+
+        virtual ~LinkedListHead() { }
 
         bool isEmpty() const { return(!iFirst.iNext->isInList()); }
 
@@ -240,6 +247,10 @@ class LinkedListHead
         };
 
         typedef Iterator<LinkedListElement> iterator;
+
+    private:
+        LinkedListHead(LinkedListHead const&);
+        LinkedListHead& operator=(LinkedListHead const&);
 };
 
 //============================================

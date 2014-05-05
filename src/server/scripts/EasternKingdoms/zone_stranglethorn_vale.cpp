@@ -42,9 +42,9 @@ class npc_yenniku : public CreatureScript
 public:
     npc_yenniku() : CreatureScript("npc_yenniku") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new npc_yennikuAI (creature);
+        return new npc_yennikuAI(creature);
     }
 
     struct npc_yennikuAI : public ScriptedAI
@@ -57,18 +57,20 @@ public:
         uint32 Reset_Timer;
         bool bReset;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             Reset_Timer = 0;
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_NONE);
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell)
+        void SpellHit(Unit* caster, const SpellInfo* spell) OVERRIDE
         {
-            if (caster->GetTypeId() == TYPEID_PLAYER)
+            if (bReset || spell->Id != 3607)
+                return;
+
+            if (Player* player = caster->ToPlayer())
             {
-                                                                //Yenniku's Release
-                if (!bReset && CAST_PLR(caster)->GetQuestStatus(592) == QUEST_STATUS_INCOMPLETE && spell->Id == 3607)
+                if (player->GetQuestStatus(592) == QUEST_STATUS_INCOMPLETE) //Yenniku's Release
                 {
                     me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_STUN);
                     me->CombatStop();                   //stop combat
@@ -79,12 +81,11 @@ public:
                     Reset_Timer = 60000;
                 }
             }
-            return;
         }
 
-        void EnterCombat(Unit* /*who*/) {}
+        void EnterCombat(Unit* /*who*/) OVERRIDE { }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (bReset)
             {
@@ -95,14 +96,14 @@ public:
                     me->setFaction(28);                     //troll, bloodscalp
                     return;
                 }
-                else Reset_Timer -= diff;
+
+                Reset_Timer -= diff;
 
                 if (me->IsInCombat() && me->GetVictim())
                 {
-                    if (me->GetVictim()->GetTypeId() == TYPEID_PLAYER)
+                    if (Player* player = me->EnsureVictim()->ToPlayer())
                     {
-                        Unit* victim = me->GetVictim();
-                        if (CAST_PLR(victim)->GetTeam() == HORDE)
+                        if (player->GetTeam() == HORDE)
                         {
                             me->CombatStop();
                             me->DeleteThreatList();

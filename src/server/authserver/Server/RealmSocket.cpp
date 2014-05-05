@@ -24,15 +24,13 @@
 #include "RealmSocket.h"
 #include "Log.h"
 
-#ifndef MSG_NOSIGNAL
-#define MSG_NOSIGNAL 0
-#endif
-
-RealmSocket::Session::Session(void) {}
+RealmSocket::Session::Session(void) { }
 
 RealmSocket::Session::~Session(void) { }
 
-RealmSocket::RealmSocket(void) : input_buffer_(4096), session_(NULL), _remoteAddress()
+RealmSocket::RealmSocket(void) :
+    input_buffer_(4096), session_(NULL),
+    _remoteAddress(), _remotePort(0)
 {
     reference_counting_policy().value(ACE_Event_Handler::Reference_Counting_Policy::ENABLED);
 
@@ -48,8 +46,7 @@ RealmSocket::~RealmSocket(void)
     // delete RealmSocketObject must never be called from our code.
     closing_ = true;
 
-    if (session_)
-        delete session_;
+    delete session_;
 
     peer().close();
 }
@@ -60,7 +57,7 @@ int RealmSocket::open(void * arg)
 
     if (peer().get_remote_addr(addr) == -1)
     {
-        sLog->outError("Error %s while opening realm socket!", ACE_OS::strerror(errno));
+        TC_LOG_ERROR("server.authserver", "Error %s while opening realm socket!", ACE_OS::strerror(errno));
         return -1;
     }
 
@@ -139,7 +136,11 @@ ssize_t RealmSocket::noblk_send(ACE_Message_Block &message_block)
         return -1;
 
     // Try to send the message directly.
+#ifdef MSG_NOSIGNAL
     ssize_t n = peer().send(message_block.rd_ptr(), len, MSG_NOSIGNAL);
+#else
+    ssize_t n = peer().send(message_block.rd_ptr(), len);
+#endif // MSG_NOSIGNAL
 
     if (n < 0)
     {
@@ -285,8 +286,7 @@ int RealmSocket::handle_input(ACE_HANDLE)
 
 void RealmSocket::set_session(Session* session)
 {
-    if (session_ != NULL)
-        delete session_;
+    delete session_;
 
     session_ = session;
 }

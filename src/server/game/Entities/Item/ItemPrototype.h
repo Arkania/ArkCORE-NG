@@ -108,10 +108,8 @@ enum ItemBondingType
 
 #define MAX_BIND_TYPE                             6
 
-/* TODO
-    // need to know cases when using item is not allowed in shapeshift
-    ITEM_PROTO_FLAG_USABLE_WHEN_SHAPESHIFTED    = 0x00800000, // Item can be used in shapeshift forms
-*/
+/* /// @todo: Requiring actual cases in which using (an) item isn't allowed while shapeshifted. Else, this flag would need an implementation.
+    ITEM_PROTO_FLAG_USABLE_WHEN_SHAPESHIFTED    = 0x00800000, // Item can be used in shapeshift forms */
 
 enum ItemProtoFlags
 {
@@ -148,9 +146,6 @@ enum ItemProtoFlags
     ITEM_PROTO_FLAG_UNK11                       = 0x40000000, // ?
     ITEM_PROTO_FLAG_BOP_TRADEABLE               = 0x80000000  // bound item that can be traded
 };
-
-/* TODO
-*/
 
 enum ItemFieldFlags
 {
@@ -217,20 +212,20 @@ enum CurrencyFlags
     // ...
     CURRENCY_FLAG_HIGH_PRECISION     = 0x08,
     // ...
-    CURRENCY_FLAG_COUNT_SEASON_TOTAL = 0x80
+    CURRENCY_FLAG_COUNT_SEASON_TOTAL = 0x80,
 };
 
 enum CurrencyCategory
 {
     // ...
-    CURRENCY_CATEGORY_META_CONQUEST = 89
+    CURRENCY_CATEGORY_META_CONQUEST = 89,
     // ...
 };
 
 enum ItemVendorType
 {
     ITEM_VENDOR_TYPE_ITEM     = 1,
-    ITEM_VENDOR_TYPE_CURRENCY = 2
+    ITEM_VENDOR_TYPE_CURRENCY = 2,
 };
 
 enum BAG_FAMILY_MASK
@@ -410,6 +405,7 @@ enum ItemSubclassArmor
     ITEM_SUBCLASS_ARMOR_LEATHER                 = 2,
     ITEM_SUBCLASS_ARMOR_MAIL                    = 3,
     ITEM_SUBCLASS_ARMOR_PLATE                   = 4,
+    //ITEM_SUBCLASS_ARMOR_BUCKLER                 = 5, // OBSOLETE
     ITEM_SUBCLASS_ARMOR_SHIELD                  = 6,
     //ITEM_SUBCLASS_ARMOR_LIBRAM                  = 7,
     //ITEM_SUBCLASS_ARMOR_IDOL                    = 8,
@@ -454,7 +450,7 @@ enum ItemSubclassTradeGoods
     ITEM_SUBCLASS_TRADE_GOODS_OTHER             = 11,
     ITEM_SUBCLASS_ENCHANTING                    = 12,
     ITEM_SUBCLASS_MATERIAL                      = 13,
-    ITEM_SUBCLASS_ENCHANTMENT                   = 14,
+    ITEM_SUBCLASS_ENCHANTMENT                   = 14
 };
 
 #define MAX_ITEM_SUBCLASS_TRADE_GOODS             15
@@ -537,7 +533,7 @@ enum ItemSubclassJunk
     ITEM_SUBCLASS_JUNK_UNK12                    = 12, // 1 item (37677)
 };
 
-#define MAX_ITEM_SUBCLASS_JUNK                   13
+#define MAX_ITEM_SUBCLASS_JUNK                    13
 
 enum ItemSubclassGlyph
 {
@@ -617,6 +613,13 @@ struct _Socket
     uint32 Content;
 };
 
+// GCC have alternative #pragma pack() syntax and old gcc version not support pack(pop), also any gcc version not support it at some platform
+#if defined(__GNUC__)
+#pragma pack()
+#else
+#pragma pack(pop)
+#endif
+
 #define MAX_ITEM_PROTO_DAMAGES 2                            // changed in 3.1.0
 #define MAX_ITEM_PROTO_SOCKETS 3
 #define MAX_ITEM_PROTO_SPELLS  5
@@ -627,7 +630,7 @@ struct ItemTemplate
     uint32 ItemId;
     uint32 Class;                                           // id from ItemClass.dbc
     uint32 SubClass;                                        // id from ItemSubClass.dbc
-    int32  SoundOverrideSubclass;
+    int32  SoundOverrideSubclass;                           // < 0: id from ItemSubClass.dbc, used to override weapon sound from actual SubClass
     std::string Name1;
     uint32 DisplayInfoID;                                   // id from ItemDisplayInfo.dbc
     uint32 Quality;
@@ -774,10 +777,4 @@ struct ItemLocale
     StringVector Description;
 };
 
-// GCC have alternative #pragma pack() syntax and old gcc version not support pack(pop), also any gcc version not support it at some platform
-#if defined(__GNUC__)
-#pragma pack()
-#else
-#pragma pack(pop)
-#endif
 #endif

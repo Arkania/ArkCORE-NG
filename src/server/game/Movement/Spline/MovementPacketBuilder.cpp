@@ -73,7 +73,7 @@ namespace Movement
 
         // add fake Enter_Cycle flag - needed for client-side cyclic movement (client will erase first spline vertex after first cycle done)
         splineflags.enter_cycle = move_spline.isCyclic();
-        data << uint32(splineflags & ~MoveSplineFlag::Mask_No_Monster_Move);
+        data << uint32(splineflags & uint32(~MoveSplineFlag::Mask_No_Monster_Move));
 
         if (splineflags.animation)
         {
@@ -98,10 +98,10 @@ namespace Movement
         data << uint8(MonsterMoveStop);
     }
 
-    void WriteLinearPath(const Spline<int32>& spline, ByteBuffer& data)
+    void WriteLinearPath(Spline<int32> const& spline, ByteBuffer& data)
     {
         uint32 last_idx = spline.getPointCount() - 3;
-        const Vector3 * real_path = &spline.getPoint(1);
+        Vector3 const* real_path = &spline.getPoint(1);
 
         data << last_idx;
         data << real_path[last_idx];   // destination
@@ -118,14 +118,14 @@ namespace Movement
         }
     }
 
-    void WriteCatmullRomPath(const Spline<int32>& spline, ByteBuffer& data)
+    void WriteUncompressedPath(Spline<int32> const& spline, ByteBuffer& data)
     {
         uint32 count = spline.getPointCount() - 3;
         data << count;
         data.append<Vector3>(&spline.getPoint(2), count);
     }
 
-    void WriteCatmullRomCyclicPath(const Spline<int32>& spline, ByteBuffer& data)
+    void WriteUncompressedCyclicPath(Spline<int32> const& spline, ByteBuffer& data)
     {
         uint32 count = spline.getPointCount() - 3;
         data << uint32(count + 1);
@@ -137,14 +137,14 @@ namespace Movement
     {
         WriteCommonMonsterMovePart(move_spline, data);
 
-        const Spline<int32>& spline = move_spline.spline;
+        Spline<int32> const& spline = move_spline.spline;
         MoveSplineFlag splineflags = move_spline.splineflags;
         if (splineflags & MoveSplineFlag::UncompressedPath)
         {
-            if (splineflags.cyclic)
-                WriteCatmullRomCyclicPath(spline, data);
+            if (!splineflags.cyclic)
+                WriteUncompressedPath(spline, data);
             else
-                WriteCatmullRomPath(spline, data);
+                WriteUncompressedCyclicPath(spline, data);
         }
         else
             WriteLinearPath(spline, data);
@@ -193,7 +193,7 @@ namespace Movement
     {
         if (!moveSpline.Finalized())
         {
-            MoveSplineFlag splineFlags = moveSpline.splineflags;
+            MoveSplineFlag const& splineFlags = moveSpline.splineflags;
 
             if ((splineFlags & MoveSplineFlag::Parabolic) && moveSpline.effect_start_time < moveSpline.Duration())
                 data << moveSpline.vertical_acceleration;   // added in 3.1

@@ -3,18 +3,19 @@
  * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
 #ifndef TRINITYSERVER_MOVESPLINEFLAG_H
@@ -28,7 +29,7 @@ namespace Movement
 #if defined( __GNUC__ )
 #pragma pack(1)
 #else
-#pragma pack(push,1)
+#pragma pack(push, 1)
 #endif
 
     class MoveSplineFlag
@@ -105,13 +106,14 @@ namespace Movement
 
         void EnableAnimation(uint8 anim) { raw() = (raw() & ~(Mask_Animations | Falling | Parabolic | FallingSlow)) | Animation | (anim & Mask_Animations); }
         void EnableParabolic() { raw() = (raw() & ~(Mask_Animations | Falling | Animation | FallingSlow)) | Parabolic; }
-        void EnableFalling() { raw() = (raw() & ~(Mask_Animations | Parabolic | Animation)) | Falling; }
-        void EnableCatmullRom() { raw() = (raw() & ~SmoothGroundPath) | Catmullrom | UncompressedPath; }
+        void EnableFlying() { raw() = (raw() & ~(Falling)) | Flying; }
+        void EnableFalling() { raw() = (raw() & ~(Mask_Animations | Parabolic | Animation | Flying)) | Falling; }
+        void EnableCatmullRom() { raw() = (raw() & ~SmoothGroundPath) | Catmullrom; }
         void EnableFacingPoint() { raw() = (raw() & ~Mask_Final_Facing) | Final_Point; }
         void EnableFacingAngle() { raw() = (raw() & ~Mask_Final_Facing) | Final_Angle; }
         void EnableFacingTarget() { raw() = (raw() & ~Mask_Final_Facing) | Final_Target; }
-        void EnableTransportEnter() { raw() = (raw() & ~(TransportExit | SmoothGroundPath)) | TransportEnter; }
-        void EnableTransportExit() { raw() = (raw() & ~(TransportEnter | SmoothGroundPath)) | TransportExit; }
+        void EnableTransportEnter() { raw() = (raw() & ~TransportExit) | TransportEnter; }
+        void EnableTransportExit() { raw() = (raw() & ~TransportEnter) | TransportExit; }
 
         uint8 animId             : 3;
         bool unknown0            : 1;

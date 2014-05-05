@@ -1,7 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
- * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -17,23 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Moonglade
-SD%Complete: 0
-SDComment: Quest support:
-SDCategory: Moonglade
-EndScriptData */
-
-/* ContentData
-npc_omen
-EndContentData */
-
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
 #include "Player.h"
 #include "SpellInfo.h"
+#include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
+#include "Cell.h"
+#include "CellImpl.h"
 
 /*####
 # npc_omen
@@ -71,7 +63,7 @@ public:
 
         EventMap events;
 
-        void MovementInform(uint32 type, uint32 pointId)
+        void MovementInform(uint32 type, uint32 pointId) OVERRIDE
         {
             if (type != POINT_MOTION_TYPE)
                 return;
@@ -85,19 +77,19 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*attacker*/)
+        void EnterCombat(Unit* /*attacker*/) OVERRIDE
         {
             events.Reset();
             events.ScheduleEvent(EVENT_CAST_CLEAVE, urand(3000, 5000));
             events.ScheduleEvent(EVENT_CAST_STARFALL, urand(8000, 10000));
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) OVERRIDE
         {
             DoCast(SPELL_OMEN_SUMMON_SPOTLIGHT);
         }
 
-        void SpellHit(Unit* /*caster*/, const SpellInfo* spell)
+        void SpellHit(Unit* /*caster*/, const SpellInfo* spell) OVERRIDE
         {
             if (spell->Id == SPELL_ELUNE_CANDLE)
             {
@@ -108,7 +100,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (!UpdateVictim())
                 return;
@@ -132,7 +124,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
         return new npc_omenAI(creature);
     }
@@ -145,17 +137,17 @@ public:
 
     struct npc_giant_spotlightAI : public ScriptedAI
     {
-        npc_giant_spotlightAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_giant_spotlightAI(Creature* creature) : ScriptedAI(creature) { }
 
         EventMap events;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             events.Reset();
             events.ScheduleEvent(EVENT_DESPAWN, 5*MINUTE*IN_MILLISECONDS);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             events.Update(diff);
 
@@ -175,7 +167,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
         return new npc_giant_spotlightAI(creature);
     }

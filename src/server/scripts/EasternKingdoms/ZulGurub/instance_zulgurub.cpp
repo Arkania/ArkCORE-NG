@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -53,7 +54,7 @@ class instance_zulgurub : public InstanceMapScript
                 jindoTiggerGUID     = 0;
             }
 
-            void OnCreatureCreate(Creature* creature)
+            void OnCreatureCreate(Creature* creature) OVERRIDE
             {
                 switch (creature->GetEntry())
                 {
@@ -92,7 +93,7 @@ class instance_zulgurub : public InstanceMapScript
                 }
             }
 
-            void OnGameObjectCreate(GameObject* go)
+            void OnGameObjectCreate(GameObject* go) OVERRIDE
             {
                 switch (go->GetEntry())
                 {
@@ -108,7 +109,7 @@ class instance_zulgurub : public InstanceMapScript
                 }
             }
 
-            void OnGameObjectRemove(GameObject* go)
+            void OnGameObjectRemove(GameObject* go) OVERRIDE
             {
                 switch (go->GetEntry())
                 {
@@ -124,7 +125,7 @@ class instance_zulgurub : public InstanceMapScript
                 }
             }
 
-            bool SetBossState(uint32 type, EncounterState state)
+            bool SetBossState(uint32 type, EncounterState state) OVERRIDE
             {
                 if (!InstanceScript::SetBossState(type, state))
                     return false;
@@ -149,37 +150,24 @@ class instance_zulgurub : public InstanceMapScript
             }
 
             /*
-            void SetData(uint32 type, uint32 data)
+            void SetData(uint32 type, uint32 data) OVERRIDE
             {
                 switch (type)
                 {
                 }
+            }
+
+            uint32 GetData(uint32 type) const OVERRIDE
+            {
+                switch (type)
+                {
+                }
+
+                return 0;
             }
             */
 
-            uint32 GetData(uint32 type) const
-            {
-                switch (type)
-                {
-                    case DATA_VENOXIS: return GetBossState(DATA_VENOXIS);
-                    case DATA_MANDOKIR: return GetBossState(DATA_MANDOKIR);
-                    case DATA_KILNARA: return GetBossState(DATA_KILNARA);
-                    case DATA_ZANZIL: return GetBossState(DATA_ZANZIL);
-                    case DATA_JINDO: return GetBossState(DATA_JINDO);
-                    case DATA_HAZZARAH: return GetBossState(DATA_HAZZARAH);
-                    case DATA_RENATAKI: return GetBossState(DATA_RENATAKI);
-                    case DATA_WUSHOOLAY: return GetBossState(DATA_WUSHOOLAY);
-                    case DATA_GRILEK: return GetBossState(DATA_GRILEK);
-                        break;
-                    default:
-                        break;
-                }
-            
-                return 0;
-            }
-
-
-            uint64 GetData64(uint32 type) const
+            uint64 GetData64(uint32 type) const OVERRIDE
             {
                 switch (type)
                 {
@@ -210,7 +198,7 @@ class instance_zulgurub : public InstanceMapScript
                 return 0;
             }
 
-            std::string GetSaveData()
+            std::string GetSaveData() OVERRIDE
             {
                 OUT_SAVE_INST_DATA;
 
@@ -221,7 +209,7 @@ class instance_zulgurub : public InstanceMapScript
                 return saveStream.str();
             }
 
-            void Load(char const* str)
+            void Load(char const* str) OVERRIDE
             {
                 if (!str)
                 {
@@ -267,7 +255,7 @@ class instance_zulgurub : public InstanceMapScript
              uint64 jindoTiggerGUID;
         };
 
-        InstanceScript* GetInstanceScript(InstanceMap* map) const
+        InstanceScript* GetInstanceScript(InstanceMap* map) const OVERRIDE
         {
             return new instance_zulgurub_InstanceMapScript(map);
         }

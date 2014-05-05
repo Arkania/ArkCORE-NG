@@ -36,27 +36,27 @@ class go_commandscript : public CommandScript
 public:
     go_commandscript() : CommandScript("go_commandscript") { }
 
-    ChatCommand* GetCommands() const
+    ChatCommand* GetCommands() const OVERRIDE
     {
         static ChatCommand goCommandTable[] =
         {
-            { "creature",       SEC_MODERATOR,      false, &HandleGoCreatureCommand,          "", NULL },
-            { "graveyard",      SEC_MODERATOR,      false, &HandleGoGraveyardCommand,         "", NULL },
-            { "grid",           SEC_MODERATOR,      false, &HandleGoGridCommand,              "", NULL },
-            { "object",         SEC_MODERATOR,      false, &HandleGoObjectCommand,            "", NULL },
-            { "taxinode",       SEC_MODERATOR,      false, &HandleGoTaxinodeCommand,          "", NULL },
-            { "trigger",        SEC_MODERATOR,      false, &HandleGoTriggerCommand,           "", NULL },
-            { "zonexy",         SEC_MODERATOR,      false, &HandleGoZoneXYCommand,            "", NULL },
-            { "xyz",            SEC_MODERATOR,      false, &HandleGoXYZCommand,               "", NULL },
-            { "ticket",         SEC_MODERATOR,      false, &HandleGoTicketCommand,            "", NULL },
-            { "",               SEC_MODERATOR,      false, &HandleGoXYZCommand,               "", NULL },
-            { NULL,             0,                  false, NULL,                              "", NULL }
+            { "creature",  rbac::RBAC_PERM_COMMAND_GO_CREATURE,  false, &HandleGoCreatureCommand,  "", NULL },
+            { "graveyard", rbac::RBAC_PERM_COMMAND_GO_GRAVEYARD, false, &HandleGoGraveyardCommand, "", NULL },
+            { "grid",      rbac::RBAC_PERM_COMMAND_GO_GRID,      false, &HandleGoGridCommand,      "", NULL },
+            { "object",    rbac::RBAC_PERM_COMMAND_GO_OBJECT,    false, &HandleGoObjectCommand,    "", NULL },
+            { "taxinode",  rbac::RBAC_PERM_COMMAND_GO_TAXINODE,  false, &HandleGoTaxinodeCommand,  "", NULL },
+            { "trigger",   rbac::RBAC_PERM_COMMAND_GO_TRIGGER,   false, &HandleGoTriggerCommand,   "", NULL },
+            { "zonexy",    rbac::RBAC_PERM_COMMAND_GO_ZONEXY,    false, &HandleGoZoneXYCommand,    "", NULL },
+            { "xyz",       rbac::RBAC_PERM_COMMAND_GO_XYZ,       false, &HandleGoXYZCommand,       "", NULL },
+            { "ticket",    rbac::RBAC_PERM_COMMAND_GO_TICKET,    false, &HandleGoTicketCommand,    "", NULL },
+            { "",          rbac::RBAC_PERM_COMMAND_GO,           false, &HandleGoXYZCommand,       "", NULL },
+            { NULL,        0,                              false, NULL,                      "", NULL }
         };
 
         static ChatCommand commandTable[] =
         {
-            { "go",             SEC_MODERATOR,      false, NULL,                     "", goCommandTable },
-            { NULL,             0,                  false, NULL,                               "", NULL }
+            { "go", rbac::RBAC_PERM_COMMAND_GO, false, NULL, "", goCommandTable },
+            { NULL, 0,                    false, NULL, "", NULL }
         };
         return commandTable;
     }
@@ -113,7 +113,7 @@ public:
             {
                 std::string name = param1;
                 WorldDatabase.EscapeString(name);
-                whereClause << ", creature_template WHERE creature.id = creature_template.entry AND creature_template.name "_LIKE_" '" << name << '\'';
+                whereClause << ", creature_template WHERE creature.id = creature_template.entry AND creature_template.name " _LIKE_" '" << name << '\'';
             }
             else
                 whereClause <<  "WHERE guid = '" << guid << '\'';
@@ -442,6 +442,7 @@ public:
 
         // update to parent zone if exist (client map show only zones without parents)
         AreaTableEntry const* zoneEntry = areaEntry->zone ? GetAreaEntryByAreaID(areaEntry->zone) : areaEntry;
+        ASSERT(zoneEntry);
 
         Map const* map = sMapMgr->CreateBaseMap(zoneEntry->mapid);
 

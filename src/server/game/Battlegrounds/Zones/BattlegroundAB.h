@@ -271,10 +271,10 @@ class BattlegroundAB : public Battleground
         void EventPlayerClickedOnFlag(Player* source, GameObject* target_obj);
 
         /* achievement req. */
-        bool IsAllNodesConrolledByTeam(uint32 team) const;  // overwrited
-        bool IsTeamScores500Disadvantage(uint32 team) const { return m_TeamScores500Disadvantage[GetTeamIndexByTeamId(team)]; }
-        uint32 GetPrematureWinner();
+        bool IsAllNodesControlledByTeam(uint32 team) const;
+        bool CheckAchievementCriteriaMeet(uint32 /*criteriaId*/, Player const* /*player*/, Unit const* /*target*/ = NULL, uint32 /*miscvalue1*/ = 0);
 
+        uint32 GetPrematureWinner();
     private:
         void PostUpdateImpl(uint32 diff);
         /* Gameobject spawning/despawning */
@@ -283,7 +283,7 @@ class BattlegroundAB : public Battleground
         void _SendNodeUpdate(uint8 node);
 
         /* Creature spawning/despawning */
-        // TODO: working, scripted peons spawning
+        /// @todo working, scripted peons spawning
         void _NodeOccupied(uint8 node, Team team);
         void _NodeDeOccupied(uint8 node);
 

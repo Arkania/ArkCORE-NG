@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -45,7 +45,7 @@ class npc_pet_pri_lightwell : public CreatureScript
                 DoCast(me, SPELL_PRIEST_LIGHTWELL_CHARGES, false);
             }
 
-            void EnterEvadeMode() 
+            void EnterEvadeMode() OVERRIDE
             {
                 if (!me->IsAlive())
                     return;
@@ -56,65 +56,38 @@ class npc_pet_pri_lightwell : public CreatureScript
             }
         };
 
-        CreatureAI* GetAI(Creature* creature) const 
+        CreatureAI* GetAI(Creature* creature) const OVERRIDE
         {
             return new npc_pet_pri_lightwellAI(creature);
         }
 };
 
-/*######
-# npc_shadowfiend
-######*/
-
-enum Shadowfiend
+class npc_pet_pri_shadowfiend : public CreatureScript
 {
-    MANA_LEECH                       = 28305,
-    GLYPH_OF_SHADOWFIEND_MANA        = 58227,
-    GLYPH_OF_SHADOWFIEND             = 58228
-};
+    public:
+        npc_pet_pri_shadowfiend() : CreatureScript("npc_pet_pri_shadowfiend") { }
 
-class npc_shadowfiend : public CreatureScript
-{
-public:
-    npc_shadowfiend() : CreatureScript("npc_shadowfiend") { }
-
-    struct npc_shadowfiendAI : public ScriptedAI
-    {
-        npc_shadowfiendAI(Creature* creature) : ScriptedAI(creature) {}
-
-        void Reset() 
+        struct npc_pet_pri_shadowfiendAI : public PetAI
         {
-            if (me->IsSummon())
-                if (Unit* owner = me->ToTempSummon()->GetSummoner())
-                    if (Unit* pet = owner->GetGuardianPet())
-                        pet->CastSpell(pet, MANA_LEECH, true);
-        }
- 
-        void DamageTaken(Unit* /*killer*/, uint32& damage) 
+            npc_pet_pri_shadowfiendAI(Creature* creature) : PetAI(creature) { }
+
+            void JustDied(Unit* /*killer*/) OVERRIDE
+            {
+                if (me->IsSummon())
+                    if (Unit* owner = me->ToTempSummon()->GetSummoner())
+                        if (owner->HasAura(SPELL_PRIEST_GLYPH_OF_SHADOWFIEND))
+                            owner->CastSpell(owner, SPELL_PRIEST_GLYPH_OF_SHADOWFIEND_MANA, true);
+            }
+        };
+
+        CreatureAI* GetAI(Creature* creature) const OVERRIDE
         {
-            if (me->IsSummon())
-                if (Unit* owner = me->ToTempSummon()->GetSummoner())
-                    if (owner->HasAura(GLYPH_OF_SHADOWFIEND) && damage >= me->GetHealth())
-                        owner->CastSpell(owner, GLYPH_OF_SHADOWFIEND_MANA, true);
+            return new npc_pet_pri_shadowfiendAI(creature);
         }
-
-        void UpdateAI(const uint32 /*diff*/) 
-        {
-            if (!UpdateVictim())
-                return;
-
-            DoMeleeAttackIfReady();
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const 
-    {
-        return new npc_shadowfiendAI(creature);
-    }
 };
 
 void AddSC_priest_pet_scripts()
 {
     new npc_pet_pri_lightwell();
-    new npc_shadowfiend();
+    new npc_pet_pri_shadowfiend();
 }

@@ -24,6 +24,7 @@
 #include "SharedDefines.h"
 #include "ObjectMgr.h"
 #include "SpellInfo.h"
+#include "PathGenerator.h"
 
 class Unit;
 class Player;
@@ -87,6 +88,9 @@ struct SpellDestination
     SpellDestination(Position const& pos);
     SpellDestination(WorldObject const& wObj);
 
+    void Relocate(Position const& pos);
+    void RelocateOffset(Position const& offset);
+
     WorldLocation _position;
     uint64 _transportGUID;
     Position _transportOffset;
@@ -141,8 +145,10 @@ class SpellCastTargets
         void SetDst(float x, float y, float z, float orientation, uint32 mapId = MAPID_INVALID);
         void SetDst(Position const& pos);
         void SetDst(WorldObject const& wObj);
+        void SetDst(SpellDestination const& spellDest);
         void SetDst(SpellCastTargets const& spellTargets);
         void ModDst(Position const& pos);
+        void ModDst(SpellDestination const& spellDest);
         void RemoveDst();
 
         bool HasSrc() const { return GetTargetMask() & TARGET_FLAG_SOURCE_LOCATION; }
@@ -209,7 +215,7 @@ enum SpellEffectHandleMode
 
 class Spell
 {
-    friend void Unit::SetCurrentCastedSpell(Spell* pSpell);
+    friend void Unit::SetCurrentCastSpell(Spell* pSpell);
     friend class SpellScript;
     public:
 
@@ -301,7 +307,7 @@ class Spell
         void EffectKnockBack(SpellEffIndex effIndex);
         void EffectPullTowards(SpellEffIndex effIndex);
         void EffectDispelMechanic(SpellEffIndex effIndex);
-        void EffectSummonDeadPet(SpellEffIndex effIndex);
+        void EffectResurrectPet(SpellEffIndex effIndex);
         void EffectDestroyAllTotems(SpellEffIndex effIndex);
         void EffectDurabilityDamage(SpellEffIndex effIndex);
         void EffectSkill(SpellEffIndex effIndex);
@@ -318,6 +324,7 @@ class Spell
         void EffectEnergizePct(SpellEffIndex effIndex);
         void EffectTriggerRitualOfSummoning(SpellEffIndex effIndex);
         void EffectSummonRaFFriend(SpellEffIndex effIndex);
+        void EffectUnlockGuildVaultTab(SpellEffIndex effIndex);
         void EffectKillCreditPersonal(SpellEffIndex effIndex);
         void EffectKillCredit(SpellEffIndex effIndex);
         void EffectQuestFail(SpellEffIndex effIndex);
@@ -334,13 +341,14 @@ class Spell
         void EffectPlayMusic(SpellEffIndex effIndex);
         void EffectSpecCount(SpellEffIndex effIndex);
         void EffectActivateSpec(SpellEffIndex effIndex);
-        void EffectPlayerNotification(SpellEffIndex effIndex);
+        void EffectPlaySound(SpellEffIndex effIndex);
         void EffectRemoveAura(SpellEffIndex effIndex);
         void EffectDamageFromMaxHealthPCT(SpellEffIndex effIndex);
-        void EffectRewardCurrency(SpellEffIndex effIndex);
-        void EffectUnlockGuildVaultTab(SpellEffIndex effIndex);
         void EffectCastButtons(SpellEffIndex effIndex);
         void EffectRechargeManaGem(SpellEffIndex effIndex);
+        void EffectGiveCurrency(SpellEffIndex effIndex);
+        void EffectResurrectWithAura(SpellEffIndex effIndex);
+        void EffectCreateAreaTrigger(SpellEffIndex effIndex);
 
         typedef std::set<Aura*> UsedSpellMods;
 
@@ -362,7 +370,7 @@ class Spell
         void SelectImplicitCasterObjectTargets(SpellEffIndex effIndex, SpellImplicitTargetInfo const& targetType);
         void SelectImplicitTargetObjectTargets(SpellEffIndex effIndex, SpellImplicitTargetInfo const& targetType);
         void SelectImplicitChainTargets(SpellEffIndex effIndex, SpellImplicitTargetInfo const& targetType, WorldObject* target, uint32 effMask);
-        void SelectImplicitTrajTargets();
+        void SelectImplicitTrajTargets(SpellEffIndex effIndex);
 
         void SelectEffectTypeImplicitTargets(uint8 effIndex);
 
@@ -372,6 +380,8 @@ class Spell
         WorldObject* SearchNearbyTarget(float range, SpellTargetObjectTypes objectType, SpellTargetCheckTypes selectionType, ConditionList* condList = NULL);
         void SearchAreaTargets(std::list<WorldObject*>& targets, float range, Position const* position, Unit* referer, SpellTargetObjectTypes objectType, SpellTargetCheckTypes selectionType, ConditionList* condList);
         void SearchChainTargets(std::list<WorldObject*>& targets, uint32 chainTargets, WorldObject* target, SpellTargetObjectTypes objectType, SpellTargetCheckTypes selectType, ConditionList* condList, bool isChainHeal);
+
+        GameObject* SearchSpellFocus();
 
         void prepare(SpellCastTargets const* targets, AuraEffect const* triggeredByAura = NULL);
         void cancel();
@@ -418,8 +428,9 @@ class Spell
         void CheckSrc() { if (!m_targets.HasSrc()) m_targets.SetSrc(*m_caster); }
         void CheckDst() { if (!m_targets.HasDst()) m_targets.SetDst(*m_caster); }
 
-        static void SendCastResult(Player* caster, SpellInfo const* spellInfo, uint8 cast_count, SpellCastResult result, SpellCustomErrors customError = SPELL_CUSTOM_ERROR_NONE);
+        static void SendCastResult(Player* caster, SpellInfo const* spellInfo, uint8 cast_count, SpellCastResult result, SpellCustomErrors customError = SPELL_CUSTOM_ERROR_NONE, Opcodes opcode = SMSG_CAST_FAILED);
         void SendCastResult(SpellCastResult result);
+        void SendPetCastResult(SpellCastResult result);
         void SendSpellStart();
         void SendSpellGo();
         void SendSpellCooldown();
@@ -439,9 +450,9 @@ class Spell
         void SendChannelStart(uint32 duration);
         void SendResurrectRequest(Player* target);
 
+        void HandleHolyPower(Player* caster);
         void HandleEffects(Unit* pUnitTarget, Item* pItemTarget, GameObject* pGOTarget, uint32 i, SpellEffectHandleMode mode);
         void HandleThreatSpells();
-        void HandleHolyPower(Player* caster);
 
         SpellInfo const* const m_spellInfo;
         Item* m_CastItem;
@@ -555,7 +566,7 @@ class Spell
         GameObject* focusObject;
 
         // Damage and healing in effects need just calculate
-        int32 m_damage;           // Damge   in effects count here
+        int32 m_damage;           // Damage  in effects count here
         int32 m_healing;          // Healing in effects count here
 
         // ******************************************
@@ -637,8 +648,10 @@ class Spell
         void CallScriptBeforeHitHandlers();
         void CallScriptOnHitHandlers();
         void CallScriptAfterHitHandlers();
-        void CallScriptObjectAreaTargetSelectHandlers(std::list<WorldObject*>& targets, SpellEffIndex effIndex);
-        void CallScriptObjectTargetSelectHandlers(WorldObject*& target, SpellEffIndex effIndex);
+        void CallScriptObjectAreaTargetSelectHandlers(std::list<WorldObject*>& targets, SpellEffIndex effIndex, SpellImplicitTargetInfo const& targetType);
+        void CallScriptObjectTargetSelectHandlers(WorldObject*& target, SpellEffIndex effIndex, SpellImplicitTargetInfo const& targetType);
+        void CallScriptDestinationTargetSelectHandlers(SpellDestination& target, SpellEffIndex effIndex, SpellImplicitTargetInfo const& targetType);
+        bool CheckScriptEffectImplicitTargets(uint32 effIndex, uint32 effIndexToCheck);
         std::list<SpellScript*> m_loadedScripts;
 
         struct HitTriggerSpell
@@ -673,6 +686,7 @@ class Spell
 
         bool m_skipCheck;
         uint8 m_auraScaleMask;
+        PathGenerator m_preGeneratedPath;
 
         ByteBuffer * m_effectExecuteData[MAX_SPELL_EFFECTS];
 
@@ -683,6 +697,9 @@ class Spell
         double rand_norm()                      { return m_caster->GetMap()->mtRand.randExc(); }
         double rand_chance()                    { return m_caster->GetMap()->mtRand.randExc(100.0); }
 #endif
+
+        Spell(Spell const& right) DELETE_MEMBER;
+        Spell& operator=(Spell const& right) DELETE_MEMBER;
 };
 
 namespace Trinity

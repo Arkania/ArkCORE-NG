@@ -34,25 +34,25 @@ class titles_commandscript : public CommandScript
 public:
     titles_commandscript() : CommandScript("titles_commandscript") { }
 
-    ChatCommand* GetCommands() const
+    ChatCommand* GetCommands() const OVERRIDE
     {
         static ChatCommand titlesSetCommandTable[] =
         {
-            { "mask",           SEC_GAMEMASTER,     false, &HandleTitlesSetMaskCommand,        "", NULL },
-            { NULL,             SEC_PLAYER,         false, NULL,                               "", NULL }
+            { "mask", rbac::RBAC_PERM_COMMAND_TITLES_SET_MASK, false, &HandleTitlesSetMaskCommand, "", NULL },
+            { NULL,   0,                                 false, NULL,                        "", NULL }
         };
         static ChatCommand titlesCommandTable[] =
         {
-            { "add",            SEC_GAMEMASTER,     false, &HandleTitlesAddCommand,            "", NULL },
-            { "current",        SEC_GAMEMASTER,     false, &HandleTitlesCurrentCommand,        "", NULL },
-            { "remove",         SEC_GAMEMASTER,     false, &HandleTitlesRemoveCommand,         "", NULL },
-            { "set",            SEC_GAMEMASTER,     false, NULL,              "", titlesSetCommandTable },
-            { NULL,             SEC_PLAYER,         false, NULL,                               "", NULL }
+            { "add",     rbac::RBAC_PERM_COMMAND_TITLES_ADD,     false, &HandleTitlesAddCommand,     "", NULL },
+            { "current", rbac::RBAC_PERM_COMMAND_TITLES_CURRENT, false, &HandleTitlesCurrentCommand, "", NULL },
+            { "remove",  rbac::RBAC_PERM_COMMAND_TITLES_REMOVE,  false, &HandleTitlesRemoveCommand,  "", NULL },
+            { "set",     rbac::RBAC_PERM_COMMAND_TITLES_SET,     false, NULL,       "", titlesSetCommandTable },
+            { NULL,      0,                                false, NULL,                        "", NULL }
         };
         static ChatCommand commandTable[] =
         {
-            { "titles",         SEC_GAMEMASTER,     false, NULL,                 "", titlesCommandTable },
-            { NULL,             SEC_PLAYER,         false, NULL,                               "", NULL }
+            { "titles", rbac::RBAC_PERM_COMMAND_TITLES, false, NULL, "", titlesCommandTable },
+            { NULL,     0,                        false, NULL, "", NULL }
         };
         return commandTable;
     }
@@ -97,8 +97,7 @@ public:
         target->SetTitle(titleInfo);                            // to be sure that title now known
         target->SetUInt32Value(PLAYER_CHOSEN_TITLE, titleInfo->bit_index);
 
-        handler->PSendSysMessage(LANG_TITLE_CURRENT_RES, id, titleInfo->name, tNameLink.c_str());
-
+        handler->PSendSysMessage(LANG_TITLE_CURRENT_RES, id, target->getGender() == GENDER_MALE ? titleInfo->nameMale : titleInfo->nameFemale, tNameLink.c_str());
         return true;
     }
 
@@ -140,7 +139,7 @@ public:
         std::string tNameLink = handler->GetNameLink(target);
 
         char titleNameStr[80];
-        snprintf(titleNameStr, 80, titleInfo->name, target->GetName().c_str());
+        snprintf(titleNameStr, 80, target->getGender() == GENDER_MALE ? titleInfo->nameMale : titleInfo->nameFemale, target->GetName().c_str());
 
         target->SetTitle(titleInfo);
         handler->PSendSysMessage(LANG_TITLE_ADD_RES, id, titleNameStr, tNameLink.c_str());
@@ -188,7 +187,7 @@ public:
         std::string tNameLink = handler->GetNameLink(target);
 
         char titleNameStr[80];
-        snprintf(titleNameStr, 80, titleInfo->name, target->GetName().c_str());
+        snprintf(titleNameStr, 80, target->getGender() == GENDER_MALE ? titleInfo->nameMale : titleInfo->nameFemale, target->GetName().c_str());
 
         handler->PSendSysMessage(LANG_TITLE_REMOVE_RES, id, titleNameStr, tNameLink.c_str());
 

@@ -43,20 +43,20 @@ enum CairneBloodhoof
 };
 
 #define GOSSIP_HCB "I know this is rather silly but a young ward who is a bit shy would like your hoofprint."
-//TODO: verify abilities/timers
+/// @todo verify abilities/timers
 class npc_cairne_bloodhoof : public CreatureScript
 {
 public:
     npc_cairne_bloodhoof() : CreatureScript("npc_cairne_bloodhoof") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
         return new npc_cairne_bloodhoofAI (creature);
     }
 
     struct npc_cairne_bloodhoofAI : public ScriptedAI
     {
-        npc_cairne_bloodhoofAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_cairne_bloodhoofAI(Creature* creature) : ScriptedAI(creature) { }
 
         uint32 BerserkerChargeTimer;
         uint32 CleaveTimer;
@@ -64,7 +64,7 @@ public:
         uint32 ThunderclapTimer;
         uint32 UppercutTimer;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             BerserkerChargeTimer = 30000;
             CleaveTimer = 5000;
@@ -73,42 +73,41 @@ public:
             UppercutTimer = 10000;
         }
 
-        void EnterCombat(Unit* /*who*/) {}
+        void EnterCombat(Unit* /*who*/) OVERRIDE { }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (!UpdateVictim())
                 return;
 
             if (BerserkerChargeTimer <= diff)
             {
-                Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0);
-                if (target)
+                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
                     DoCast(target, SPELL_BERSERKER_CHARGE);
                 BerserkerChargeTimer = 25000;
             } else BerserkerChargeTimer -= diff;
 
             if (UppercutTimer <= diff)
             {
-                DoCast(me->GetVictim(), SPELL_UPPERCUT);
+                DoCastVictim(SPELL_UPPERCUT);
                 UppercutTimer = 20000;
             } else UppercutTimer -= diff;
 
             if (ThunderclapTimer <= diff)
             {
-                DoCast(me->GetVictim(), SPELL_THUNDERCLAP);
+                DoCastVictim(SPELL_THUNDERCLAP);
                 ThunderclapTimer = 15000;
             } else ThunderclapTimer -= diff;
 
             if (MortalStrikeTimer <= diff)
             {
-                DoCast(me->GetVictim(), SPELL_MORTAL_STRIKE);
+                DoCastVictim(SPELL_MORTAL_STRIKE);
                 MortalStrikeTimer = 15000;
             } else MortalStrikeTimer -= diff;
 
             if (CleaveTimer <= diff)
             {
-                DoCast(me->GetVictim(), SPELL_CLEAVE);
+                DoCastVictim(SPELL_CLEAVE);
                 CleaveTimer = 7000;
             } else CleaveTimer -= diff;
 

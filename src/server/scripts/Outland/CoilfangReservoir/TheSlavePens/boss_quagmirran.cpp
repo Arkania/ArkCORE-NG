@@ -52,17 +52,17 @@ class boss_quagmirran : public CreatureScript
         {
             boss_quagmirranAI(Creature* creature) : BossAI(creature, DATA_QUAGMIRRAN) { }
 
-            void Reset() 
+            void Reset() OVERRIDE
             {
                 _Reset();
             }
 
-            void JustDied(Unit* /*killer*/) 
+            void JustDied(Unit* /*killer*/) OVERRIDE
             {
                 _JustDied();
             }
 
-            void EnterCombat(Unit* /*who*/) 
+            void EnterCombat(Unit* /*who*/) OVERRIDE
             {
                 _EnterCombat();
                 events.ScheduleEvent(EVENT_ACID_SPRAY, 25000);
@@ -71,9 +71,9 @@ class boss_quagmirran : public CreatureScript
                 events.ScheduleEvent(EVENT_POISON_BOLT_VOLLEY, 31000);
             }
 
-            void KilledUnit(Unit* /*victim*/)  { }
+            void KilledUnit(Unit* /*victim*/) OVERRIDE { }
 
-            void UpdateAI(const uint32 diff) 
+            void UpdateAI(uint32 diff) OVERRIDE
             {
                 if (!UpdateVictim())
                     return;
@@ -113,7 +113,7 @@ class boss_quagmirran : public CreatureScript
             }
         };
 
-        CreatureAI* GetAI(Creature* creature) const 
+        CreatureAI* GetAI(Creature* creature) const OVERRIDE
         {
             return new boss_quagmirranAI(creature);
         }

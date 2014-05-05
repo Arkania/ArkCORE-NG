@@ -27,16 +27,19 @@ EndScriptData */
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 
-enum eEnums
+enum Yells
 {
     SAY_AGGRO                   = 0,
-    SAY_SPECIALAE               = 1,
+    SAY_SPECIALAE               = 1
+};
 
+enum Spells
+{
     SPELL_POLYMORPH             = 13323,
     SPELL_AOESILENCE            = 8988,
     SPELL_ARCANEEXPLOSION       = 9433,
     SPELL_FIREAOE               = 9435,
-    SPELL_ARCANEBUBBLE          = 9438,
+    SPELL_ARCANEBUBBLE          = 9438
 };
 
 class boss_arcanist_doan : public CreatureScript
@@ -44,14 +47,14 @@ class boss_arcanist_doan : public CreatureScript
 public:
     boss_arcanist_doan() : CreatureScript("boss_arcanist_doan") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new boss_arcanist_doanAI (creature);
+        return new boss_arcanist_doanAI(creature);
     }
 
     struct boss_arcanist_doanAI : public ScriptedAI
     {
-        boss_arcanist_doanAI(Creature* creature) : ScriptedAI(creature) {}
+        boss_arcanist_doanAI(Creature* creature) : ScriptedAI(creature) { }
 
         uint32 Polymorph_Timer;
         uint32 AoESilence_Timer;
@@ -59,7 +62,7 @@ public:
         bool bCanDetonate;
         bool bShielded;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             Polymorph_Timer = 20000;
             AoESilence_Timer = 15000;
@@ -68,12 +71,12 @@ public:
             bShielded = false;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) OVERRIDE
         {
             Talk(SAY_AGGRO);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (!UpdateVictim())
                 return;
@@ -91,7 +94,7 @@ public:
             if (!bShielded && !HealthAbovePct(50))
             {
                 //wait if we already casting
-                if (me->IsNonMeleeSpellCasted(false))
+                if (me->IsNonMeleeSpellCast(false))
                     return;
 
                 Talk(SAY_SPECIALAE);
@@ -113,7 +116,7 @@ public:
             //AoESilence_Timer
             if (AoESilence_Timer <= diff)
             {
-                DoCast(me->GetVictim(), SPELL_AOESILENCE);
+                DoCastVictim(SPELL_AOESILENCE);
                 AoESilence_Timer = urand(15000, 20000);
             }
             else AoESilence_Timer -= diff;
@@ -121,7 +124,7 @@ public:
             //ArcaneExplosion_Timer
             if (ArcaneExplosion_Timer <= diff)
             {
-                DoCast(me->GetVictim(), SPELL_ARCANEEXPLOSION);
+                DoCastVictim(SPELL_ARCANEEXPLOSION);
                 ArcaneExplosion_Timer = 8000;
             }
             else ArcaneExplosion_Timer -= diff;

@@ -225,7 +225,7 @@ class ThreatManager
 
         HostileReference* getCurrentVictim() const { return iCurrentVictim; }
 
-        Unit* getOwner() const { return iOwner; }
+        Unit* GetOwner() const { return iOwner; }
 
         Unit* getHostilTarget();
 
@@ -250,7 +250,7 @@ class ThreatManager
             {
                 HostileReference* ref = (*itr);
 
-                if (predicate(ref->GetTarget()))
+                if (predicate(ref->getTarget()))
                 {
                     ref->setThreat(0);
                     setDirty(true);
@@ -282,7 +282,7 @@ namespace Trinity
     class ThreatOrderPred
     {
         public:
-            ThreatOrderPred(bool ascending = false) : m_ascending(ascending) {}
+            ThreatOrderPred(bool ascending = false) : m_ascending(ascending) { }
             bool operator() (HostileReference const* a, HostileReference const* b) const
             {
                 return m_ascending ? a->getThreat() < b->getThreat() : a->getThreat() > b->getThreat();

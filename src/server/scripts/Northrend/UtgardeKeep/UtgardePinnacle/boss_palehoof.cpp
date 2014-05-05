@@ -24,6 +24,7 @@ SDComment:
 SDCategory:
 Script Data End */
 
+#include <algorithm>
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "utgarde_pinnacle.h"
@@ -55,22 +56,17 @@ enum Yells
 
 enum Creatures
 {
-    MOB_STASIS_CONTROLLER                       = 26688
+    NPC_STASIS_CONTROLLER                       = 26688
 };
 
-struct Locations
+Position const moveLocs[] =
 {
-    float x, y, z;
-};
-
-struct Locations moveLocs[]=
-{
-    {261.6f, -449.3f, 109.5f},
-    {263.3f, -454.0f, 109.5f},
-    {291.5f, -450.4f, 109.5f},
-    {291.5f, -454.0f, 109.5f},
-    {310.0f, -453.4f, 109.5f},
-    {238.6f, -460.7f, 109.5f}
+    { 261.6f, -449.3f, 109.5f, 0.0f },
+    { 263.3f, -454.0f, 109.5f, 0.0f },
+    { 291.5f, -450.4f, 109.5f, 0.0f },
+    { 291.5f, -454.0f, 109.5f, 0.0f },
+    { 310.0f, -453.4f, 109.5f, 0.0f },
+    { 238.6f, -460.7f, 109.5f, 0.0f }
 };
 
 enum Phase
@@ -83,21 +79,20 @@ enum Phase
     PHASE_NONE
 };
 
+enum Misc
+{
+    ACTION_NEXT_PHASE,
+};
+
 class boss_palehoof : public CreatureScript
 {
 public:
     boss_palehoof() : CreatureScript("boss_palehoof") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    struct boss_palehoofAI : public BossAI
     {
-        return new boss_palehoofAI (creature);
-    }
-
-    struct boss_palehoofAI : public ScriptedAI
-    {
-        boss_palehoofAI(Creature* creature) : ScriptedAI(creature)
+        boss_palehoofAI(Creature* creature) : BossAI(creature, DATA_GORTOK_PALEHOOF)
         {
-            instance = creature->GetInstanceScript();
         }
 
         uint32 uiArcingSmashTimer;
@@ -106,59 +101,47 @@ public:
         uint32 uiWaitingTimer;
         Phase currentPhase;
         uint8 AddCount;
-        bool DoneAdds[4];
+        Phase Sequence[4];
 
-        InstanceScript* instance;
-
-        void Reset()
+        void Reset() OVERRIDE
         {
+            _Reset();
+
+            /// There is a good reason to store them like this, we are going to shuffle the order.
+            for (uint32 i = PHASE_FRENZIED_WORGEN; i < PHASE_GORTOK_PALEHOOF; ++i)
+                Sequence[i] = Phase(i);
+
+            /// This ensures a random order and only executes each phase once.
+            std::random_shuffle(Sequence, Sequence + PHASE_GORTOK_PALEHOOF);
+
             uiArcingSmashTimer = 15000;
             uiImpaleTimer = 12000;
             uiWhiteringRoarTimer = 10000;
 
             me->GetMotionMaster()->MoveTargetedHome();
 
-            for (uint32 i = 0; i < 4; i++)
-                DoneAdds[i] = false;
             AddCount = 0;
 
             currentPhase = PHASE_NONE;
 
-            if (instance)
+            for (uint8 i = DATA_FRENZIED_WORGEN; i <= DATA_FEROCIOUS_RHINO; ++i)
+                if (Creature* temp = ObjectAccessor::GetCreature(*me, instance->GetData64(i)))
+                    if (!temp->IsAlive())
+                        temp->Respawn();
+
+            if (GameObject* go = ObjectAccessor::GetGameObject(*me, instance->GetData64(DATA_GORTOK_PALEHOOF_SPHERE)))
             {
-                instance->SetData(DATA_GORTOK_PALEHOOF_EVENT, NOT_STARTED);
-
-                Creature* temp = Unit::GetCreature((*me), instance->GetData64(DATA_MOB_FRENZIED_WORGEN));
-                if (temp && !temp->IsAlive())
-                    temp->Respawn();
-
-                temp = Unit::GetCreature((*me), instance->GetData64(DATA_MOB_FEROCIOUS_RHINO));
-                if (temp && !temp->IsAlive())
-                    temp->Respawn();
-
-                temp = Unit::GetCreature((*me), instance->GetData64(DATA_MOB_MASSIVE_JORMUNGAR));
-                if (temp && !temp->IsAlive())
-                    temp->Respawn();
-
-                temp = Unit::GetCreature((*me), instance->GetData64(DATA_MOB_RAVENOUS_FURBOLG));
-                if (temp && !temp->IsAlive())
-                    temp->Respawn();
-
-                GameObject* go = instance->instance->GetGameObject(instance->GetData64(DATA_GORTOK_PALEHOOF_SPHERE));
-                if (go)
-                {
-                    go->SetGoState(GO_STATE_READY);
-                    go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
-                }
+                go->SetGoState(GO_STATE_READY);
+                go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
             }
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) OVERRIDE
         {
             Talk(SAY_AGGRO);
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) OVERRIDE
         {
             if (!who)
                 return;
@@ -175,18 +158,13 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (currentPhase != PHASE_GORTOK_PALEHOOF)
                 return;
 
-            //Return since we have no target
             if (!UpdateVictim())
                 return;
-
-            Creature* temp = Unit::GetCreature((*me), instance ? instance->GetData64(DATA_MOB_ORB) : 0);
-            if (temp && temp->IsAlive())
-                temp->DisappearAndDie();
 
             if (uiArcingSmashTimer <= diff)
             {
@@ -210,64 +188,46 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) OVERRIDE
         {
+            _JustDied();
             //Talk(SAY_DEATH);
-            if (instance)
-                instance->SetData(DATA_GORTOK_PALEHOOF_EVENT, DONE);
-            Creature* temp = Unit::GetCreature((*me), instance ? instance->GetData64(DATA_MOB_ORB) : 0);
-            if (temp && temp->IsAlive())
-                temp->DisappearAndDie();
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit* who) OVERRIDE
         {
-            Talk(SAY_SLAY);
+            if (who->GetTypeId() == TYPEID_PLAYER)
+                Talk(SAY_SLAY);
         }
 
-        void NextPhase()
+        void DoAction(int32 actionId) OVERRIDE
         {
+            if (actionId != ACTION_NEXT_PHASE)
+                return;
+
             if (currentPhase == PHASE_NONE)
             {
-                instance->SetData(DATA_GORTOK_PALEHOOF_EVENT, IN_PROGRESS);
-                me->SummonCreature(MOB_STASIS_CONTROLLER, moveLocs[5].x, moveLocs[5].y, moveLocs[5].z, 0, TEMPSUMMON_CORPSE_DESPAWN);
+                instance->SetBossState(DATA_GORTOK_PALEHOOF, IN_PROGRESS);
+
+                if (Creature* orb = me->SummonCreature(NPC_STASIS_CONTROLLER, moveLocs[5], TEMPSUMMON_CORPSE_DESPAWN))
+                    orb->CastSpell(me, SPELL_ORB_VISUAL, true);
             }
+
             Phase move = PHASE_NONE;
             if (AddCount >= DUNGEON_MODE(2, 4))
                 move = PHASE_GORTOK_PALEHOOF;
             else
-            {
-                //select random not yet defeated add
-                uint8 next = urand(0, 3);
-                for (uint8 i = 0; i < 16; i++)
-                {
-                    if (!DoneAdds[i % 4])
-                    {
-                        if (next == 0)
-                        {
-                            move = (Phase)(i % 4);
-                            break;
-                        }
-                        else if (next > 0)
-                            --next;
-                    }
-                }
-                ++AddCount;
-                DoneAdds[move] = true;
-                move = (Phase)(move % 4);
-            }
-            //send orb to summon spot
-            Creature* pOrb = Unit::GetCreature((*me), instance ? instance->GetData64(DATA_MOB_ORB) : 0);
-            if (pOrb && pOrb->IsAlive())
-            {
-                if (currentPhase == PHASE_NONE)
-                    pOrb->CastSpell(me, SPELL_ORB_VISUAL, true);
-                pOrb->GetMotionMaster()->MovePoint(move, moveLocs[move].x, moveLocs[move].y, moveLocs[move].z);
-            }
+                move = Sequence[AddCount++];
+
+            // send orb to summon spot
+            if (Creature* orb = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_GORTOK_ORB)))
+                if (orb->IsAlive())
+                    orb->GetMotionMaster()->MovePoint(move, moveLocs[move]);
+
             currentPhase = move;
         }
 
-        void JustReachedHome()
+        void JustReachedHome() OVERRIDE
         {
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE|UNIT_FLAG_NOT_ATTACKABLE_1|UNIT_FLAG_IMMUNE_TO_PC);
             me->SetStandState(UNIT_STAND_STATE_STAND);
@@ -275,6 +235,10 @@ public:
         }
     };
 
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
+    {
+        return GetUtgardePinnacleAI<boss_palehoofAI>(creature);
+    }
 };
 
 //ravenous furbolg's spells
@@ -291,9 +255,9 @@ class npc_ravenous_furbolg : public CreatureScript
 public:
     npc_ravenous_furbolg() : CreatureScript("npc_ravenous_furbolg") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new npc_ravenous_furbolgAI (creature);
+        return GetInstanceAI<npc_ravenous_furbolgAI>(creature);
     }
 
     struct npc_ravenous_furbolgAI : public ScriptedAI
@@ -309,7 +273,7 @@ public:
 
         InstanceScript* instance;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             uiChainLightingTimer = 5000;
             uiCrazedTimer = 10000;
@@ -317,16 +281,15 @@ public:
 
             me->GetMotionMaster()->MoveTargetedHome();
 
-            if (instance)
-                if (instance->GetData(DATA_GORTOK_PALEHOOF_EVENT) == IN_PROGRESS)
-                {
-                    Creature* pPalehoof = Unit::GetCreature((*me), instance ? instance->GetData64(DATA_GORTOK_PALEHOOF) : 0);
-                    if (pPalehoof && pPalehoof->IsAlive())
-                        CAST_AI(boss_palehoof::boss_palehoofAI, pPalehoof->AI())->Reset();
-                }
+            if (instance->GetBossState(DATA_GORTOK_PALEHOOF) == IN_PROGRESS)
+            {
+                Creature* palehoof = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_GORTOK_PALEHOOF));
+                if (palehoof && palehoof->IsAlive())
+                    palehoof->AI()->Reset();
+            }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             //Return since we have no target
             if (!UpdateVictim())
@@ -334,7 +297,7 @@ public:
 
             if (uiChainLightingTimer <= diff)
             {
-                DoCast(me->GetVictim(), SPELL_CHAIN_LIGHTING);
+                DoCastVictim(SPELL_CHAIN_LIGHTING);
                 uiChainLightingTimer = 5000 + rand() % 5000;
             } else uiChainLightingTimer -=  diff;
 
@@ -353,7 +316,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) OVERRIDE
         {
             if (!who)
                 return;
@@ -370,17 +333,13 @@ public:
             }
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) OVERRIDE
         {
-            if (instance)
-            {
-                Creature* pPalehoof = Unit::GetCreature((*me), instance ? instance->GetData64(DATA_GORTOK_PALEHOOF) : 0);
-                if (pPalehoof)
-                    CAST_AI(boss_palehoof::boss_palehoofAI, pPalehoof->AI())->NextPhase();
-            }
+            if (Creature* palehoof = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_GORTOK_PALEHOOF)))
+                palehoof->AI()->DoAction(ACTION_NEXT_PHASE);
         }
 
-        void JustReachedHome()
+        void JustReachedHome() OVERRIDE
         {
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_IMMUNE_TO_PC);
             me->SetStandState(UNIT_STAND_STATE_STAND);
@@ -404,9 +363,9 @@ class npc_frenzied_worgen : public CreatureScript
 public:
     npc_frenzied_worgen() : CreatureScript("npc_frenzied_worgen") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new npc_frenzied_worgenAI (creature);
+        return GetInstanceAI<npc_frenzied_worgenAI>(creature);
     }
 
     struct npc_frenzied_worgenAI : public ScriptedAI
@@ -422,7 +381,7 @@ public:
 
         InstanceScript* instance;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             uiMortalWoundTimer = 5000;
             uiEnrage1Timer = 15000;
@@ -430,16 +389,15 @@ public:
 
             me->GetMotionMaster()->MoveTargetedHome();
 
-            if (instance)
-                if (instance->GetData(DATA_GORTOK_PALEHOOF_EVENT) == IN_PROGRESS)
-                {
-                    Creature* pPalehoof = Unit::GetCreature((*me), instance ? instance->GetData64(DATA_GORTOK_PALEHOOF) : 0);
-                    if (pPalehoof && pPalehoof->IsAlive())
-                        CAST_AI(boss_palehoof::boss_palehoofAI, pPalehoof->AI())->Reset();
-                }
+            if (instance->GetBossState(DATA_GORTOK_PALEHOOF) == IN_PROGRESS)
+            {
+                Creature* palehoof = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_GORTOK_PALEHOOF));
+                if (palehoof && palehoof->IsAlive())
+                    palehoof->AI()->Reset();
+            }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             //Return since we have no target
             if (!UpdateVictim())
@@ -447,7 +405,7 @@ public:
 
             if (uiMortalWoundTimer <= diff)
             {
-                DoCast(me->GetVictim(), SPELL_MORTAL_WOUND);
+                DoCastVictim(SPELL_MORTAL_WOUND);
                 uiMortalWoundTimer = 3000 + rand() % 4000;
             } else uiMortalWoundTimer -= diff;
 
@@ -466,7 +424,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) OVERRIDE
         {
             if (!who)
                 return;
@@ -481,21 +439,16 @@ public:
                 who->SetInCombatWith(me);
                 DoStartMovement(who);
             }
-            if (instance)
-                instance->SetData(DATA_GORTOK_PALEHOOF_EVENT, IN_PROGRESS);
+            instance->SetBossState(DATA_GORTOK_PALEHOOF, IN_PROGRESS);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) OVERRIDE
         {
-            if (instance)
-            {
-                Creature* pPalehoof = Unit::GetCreature((*me), instance->GetData64(DATA_GORTOK_PALEHOOF));
-                if (pPalehoof)
-                    CAST_AI(boss_palehoof::boss_palehoofAI, pPalehoof->AI())->NextPhase();
-            }
+            if (Creature* palehoof = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_GORTOK_PALEHOOF)))
+                palehoof->AI()->DoAction(ACTION_NEXT_PHASE);
         }
 
-        void JustReachedHome()
+        void JustReachedHome() OVERRIDE
         {
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_IMMUNE_TO_PC);
             me->SetStandState(UNIT_STAND_STATE_STAND);
@@ -520,9 +473,9 @@ class npc_ferocious_rhino : public CreatureScript
 public:
     npc_ferocious_rhino() : CreatureScript("npc_ferocious_rhino") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new npc_ferocious_rhinoAI (creature);
+        return GetInstanceAI<npc_ferocious_rhinoAI>(creature);
     }
 
     struct npc_ferocious_rhinoAI : public ScriptedAI
@@ -538,7 +491,7 @@ public:
 
         InstanceScript* instance;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             uiStompTimer = 10000;
             uiGoreTimer = 15000;
@@ -546,16 +499,15 @@ public:
 
             me->GetMotionMaster()->MoveTargetedHome();
 
-            if (instance)
-                if (instance->GetData(DATA_GORTOK_PALEHOOF_EVENT) == IN_PROGRESS)
-                {
-                    Creature* pPalehoof = Unit::GetCreature((*me), instance ? instance->GetData64(DATA_GORTOK_PALEHOOF) : 0);
-                    if (pPalehoof && pPalehoof->IsAlive())
-                        CAST_AI(boss_palehoof::boss_palehoofAI, pPalehoof->AI())->Reset();
-                }
+            if (instance->GetBossState(DATA_GORTOK_PALEHOOF) == IN_PROGRESS)
+            {
+                Creature* palehoof = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_GORTOK_PALEHOOF));
+                if (palehoof && palehoof->IsAlive())
+                    palehoof->AI()->Reset();
+            }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             //Return since we have no target
             if (!UpdateVictim())
@@ -563,13 +515,13 @@ public:
 
             if (uiStompTimer <= diff)
             {
-                DoCast(me->GetVictim(), SPELL_STOMP);
+                DoCastVictim(SPELL_STOMP);
                 uiStompTimer = 8000 + rand() % 4000;
             } else uiStompTimer -= diff;
 
             if (uiGoreTimer <= diff)
             {
-                DoCast(me->GetVictim(), SPELL_GORE);
+                DoCastVictim(SPELL_GORE);
                 uiGoreTimer = 13000 + rand() % 4000;
             } else uiGoreTimer -= diff;
 
@@ -583,7 +535,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) OVERRIDE
         {
             if (!who)
                 return;
@@ -600,17 +552,13 @@ public:
             }
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) OVERRIDE
         {
-            if (instance)
-            {
-                Creature* pPalehoof = Unit::GetCreature((*me), instance ? instance->GetData64(DATA_GORTOK_PALEHOOF) : 0);
-                if (pPalehoof)
-                    CAST_AI(boss_palehoof::boss_palehoofAI, pPalehoof->AI())->NextPhase();
-            }
+            if (Creature* palehoof = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_GORTOK_PALEHOOF)))
+                palehoof->AI()->DoAction(ACTION_NEXT_PHASE);
         }
 
-        void JustReachedHome()
+        void JustReachedHome() OVERRIDE
         {
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_IMMUNE_TO_PC);
             me->SetStandState(UNIT_STAND_STATE_STAND);
@@ -640,9 +588,9 @@ class npc_massive_jormungar : public CreatureScript
 public:
     npc_massive_jormungar() : CreatureScript("npc_massive_jormungar") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new npc_massive_jormungarAI (creature);
+        return GetInstanceAI<npc_massive_jormungarAI>(creature);
     }
 
     struct npc_massive_jormungarAI : public ScriptedAI
@@ -658,7 +606,7 @@ public:
 
         InstanceScript* instance;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             uiAcidSpitTimer = 3000;
             uiAcidSplatterTimer = 12000;
@@ -666,16 +614,15 @@ public:
 
             me->GetMotionMaster()->MoveTargetedHome();
 
-            if (instance)
-                if (instance->GetData(DATA_GORTOK_PALEHOOF_EVENT) == IN_PROGRESS)
-                {
-                    Creature* pPalehoof = Unit::GetCreature((*me), instance ? instance->GetData64(DATA_GORTOK_PALEHOOF) : 0);
-                    if (pPalehoof && pPalehoof->IsAlive())
-                        CAST_AI(boss_palehoof::boss_palehoofAI, pPalehoof->AI())->Reset();
-                }
+            if (instance->GetBossState(DATA_GORTOK_PALEHOOF) == IN_PROGRESS)
+            {
+                Creature* palehoof = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_GORTOK_PALEHOOF));
+                if (palehoof && palehoof->IsAlive())
+                    palehoof->AI()->Reset();
+            }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             //Return since we have no target
             if (!UpdateVictim())
@@ -704,7 +651,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) OVERRIDE
         {
             if (!who)
                 return;
@@ -721,17 +668,13 @@ public:
             }
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) OVERRIDE
         {
-            if (instance)
-            {
-                Creature* pPalehoof = Unit::GetCreature((*me), instance ? instance->GetData64(DATA_GORTOK_PALEHOOF) : 0);
-                if (pPalehoof)
-                    CAST_AI(boss_palehoof::boss_palehoofAI, pPalehoof->AI())->NextPhase();
-            }
+            if (Creature* palehoof = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_GORTOK_PALEHOOF)))
+                palehoof->AI()->DoAction(ACTION_NEXT_PHASE);
         }
 
-        void JustReachedHome()
+        void JustReachedHome() OVERRIDE
         {
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_IMMUNE_TO_PC);
             me->SetStandState(UNIT_STAND_STATE_STAND);
@@ -746,9 +689,9 @@ class npc_palehoof_orb : public CreatureScript
 public:
     npc_palehoof_orb() : CreatureScript("npc_palehoof_orb") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new npc_palehoof_orbAI (creature);
+        return GetInstanceAI<npc_palehoof_orbAI>(creature);
     }
 
     struct npc_palehoof_orbAI : public ScriptedAI
@@ -762,7 +705,7 @@ public:
         uint32 SummonTimer;
         Phase currentPhase;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             currentPhase = PHASE_NONE;
             SummonTimer = 5000;
@@ -772,59 +715,83 @@ public:
             me->SetSpeed(MOVE_FLIGHT, 0.5f);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (currentPhase == PHASE_NONE)
                 return;
 
             if (SummonTimer <= diff)
             {
-                if (currentPhase<5&&currentPhase >= 0)
+                uint8 nextBossId = 0;
+                switch (currentPhase)
                 {
-                   Creature* pNext = NULL;
-                   switch (currentPhase)
-                   {
-                        case PHASE_FRENZIED_WORGEN: pNext = Unit::GetCreature((*me), instance ? instance->GetData64(DATA_MOB_FRENZIED_WORGEN) : 0); break;
-                        case PHASE_RAVENOUS_FURLBORG: pNext = Unit::GetCreature((*me), instance ? instance->GetData64(DATA_MOB_RAVENOUS_FURBOLG) : 0); break;
-                        case PHASE_MASSIVE_JORMUNGAR: pNext = Unit::GetCreature((*me), instance ? instance->GetData64(DATA_MOB_MASSIVE_JORMUNGAR) : 0); break;
-                        case PHASE_FEROCIOUS_RHINO: pNext = Unit::GetCreature((*me), instance ? instance->GetData64(DATA_MOB_FEROCIOUS_RHINO) : 0); break;
-                        case PHASE_GORTOK_PALEHOOF: pNext = Unit::GetCreature((*me), instance ? instance->GetData64(DATA_GORTOK_PALEHOOF) : 0); break;
-                        default: break;
-                   }
-
-                   if (pNext)
-                   {
-                        pNext->RemoveAurasDueToSpell(SPELL_FREEZE);
-                        pNext->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_IMMUNE_TO_PC);
-                        pNext->SetStandState(UNIT_STAND_STATE_STAND);
-                        pNext->SetInCombatWithZone();
-                        pNext->Attack(pNext->SelectNearestTarget(100), true);
-
-                   }
-                   currentPhase = PHASE_NONE;
+                    case PHASE_FRENZIED_WORGEN:
+                        nextBossId = DATA_FRENZIED_WORGEN;
+                        break;
+                    case PHASE_RAVENOUS_FURLBORG:
+                        nextBossId = DATA_RAVENOUS_FURBOLG;
+                        break;
+                    case PHASE_MASSIVE_JORMUNGAR:
+                        nextBossId = DATA_MASSIVE_JORMUNGAR;
+                        break;
+                    case PHASE_FEROCIOUS_RHINO:
+                        nextBossId = DATA_FEROCIOUS_RHINO;
+                        break;
+                    case PHASE_GORTOK_PALEHOOF:
+                        nextBossId = DATA_GORTOK_PALEHOOF;
+                        break;
+                    default:
+                        return;
                 }
-            } else SummonTimer -= diff;
+
+                if (Creature* nextBoss = ObjectAccessor::GetCreature(*me, instance->GetData64(nextBossId)))
+                {
+                    nextBoss->RemoveAurasDueToSpell(SPELL_FREEZE);
+                    nextBoss->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_IMMUNE_TO_PC);
+                    nextBoss->SetStandState(UNIT_STAND_STATE_STAND);
+                    nextBoss->SetInCombatWithZone();
+                    nextBoss->Attack(nextBoss->SelectNearestTarget(100), true);
+                }
+                currentPhase = PHASE_NONE;
+
+                if (nextBossId == DATA_GORTOK_PALEHOOF)
+                    me->DespawnOrUnsummon();
+            }
+            else
+                SummonTimer -= diff;
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) OVERRIDE
         {
             if (type != POINT_MOTION_TYPE)
                 return;
-            if (id > 4)
-                return;
-            Creature* pNext = NULL;
+
+            uint8 nextBossId = 0;
             switch (id)
             {
-                case PHASE_FRENZIED_WORGEN: pNext = Unit::GetCreature((*me), instance ? instance->GetData64(DATA_MOB_FRENZIED_WORGEN) : 0); break;
-                case PHASE_RAVENOUS_FURLBORG: pNext = Unit::GetCreature((*me), instance ? instance->GetData64(DATA_MOB_RAVENOUS_FURBOLG) : 0); break;
-                case PHASE_MASSIVE_JORMUNGAR: pNext = Unit::GetCreature((*me), instance ? instance->GetData64(DATA_MOB_MASSIVE_JORMUNGAR) : 0); break;
-                case PHASE_FEROCIOUS_RHINO: pNext = Unit::GetCreature((*me), instance ? instance->GetData64(DATA_MOB_FEROCIOUS_RHINO) : 0); break;
-                case PHASE_GORTOK_PALEHOOF: pNext = Unit::GetCreature((*me), instance ? instance->GetData64(DATA_GORTOK_PALEHOOF) : 0); break;
-                default: break;
+                case PHASE_FRENZIED_WORGEN:
+                    nextBossId = DATA_FRENZIED_WORGEN;
+                    break;
+                case PHASE_RAVENOUS_FURLBORG:
+                    nextBossId = DATA_RAVENOUS_FURBOLG;
+                    break;
+                case PHASE_MASSIVE_JORMUNGAR:
+                    nextBossId = DATA_MASSIVE_JORMUNGAR;
+                    break;
+                case PHASE_FEROCIOUS_RHINO:
+                    nextBossId = DATA_FEROCIOUS_RHINO;
+                    break;
+                case PHASE_GORTOK_PALEHOOF:
+                    nextBossId = DATA_GORTOK_PALEHOOF;
+                    break;
+                default:
+                    return;
             }
-            if (pNext)
-                DoCast(pNext, SPELL_ORB_CHANNEL, false);
-            currentPhase = (Phase)id;
+
+            if (Creature* nextBoss = ObjectAccessor::GetCreature(*me, instance->GetData64(nextBossId)))
+                DoCast(nextBoss, SPELL_ORB_CHANNEL, false);
+
+            currentPhase = Phase(id);
             SummonTimer = 5000;
         }
     };
@@ -833,23 +800,25 @@ public:
 
 class go_palehoof_sphere : public GameObjectScript
 {
-public:
-    go_palehoof_sphere() : GameObjectScript("go_palehoof_sphere") { }
+    public:
+        go_palehoof_sphere() : GameObjectScript("go_palehoof_sphere") { }
 
-    bool OnGossipHello(Player* /*player*/, GameObject* go)
-    {
-        InstanceScript* instance = go->GetInstanceScript();
-
-        Creature* pPalehoof = Unit::GetCreature(*go, instance ? instance->GetData64(DATA_GORTOK_PALEHOOF) : 0);
-        if (pPalehoof && pPalehoof->IsAlive())
+        bool OnGossipHello(Player* /*player*/, GameObject* go) OVERRIDE
         {
-            go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
-            go->SetGoState(GO_STATE_ACTIVE);
+            InstanceScript* instance = go->GetInstanceScript();
+            if (!instance)
+                return false;
 
-            CAST_AI(boss_palehoof::boss_palehoofAI, pPalehoof->AI())->NextPhase();
+            Creature* palehoof = ObjectAccessor::GetCreature(*go, instance->GetData64(DATA_GORTOK_PALEHOOF));
+            if (palehoof && palehoof->IsAlive())
+            {
+                go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                go->SetGoState(GO_STATE_ACTIVE);
+
+                palehoof->AI()->DoAction(ACTION_NEXT_PHASE);
+            }
+            return true;
         }
-        return true;
-    }
 
 };
 

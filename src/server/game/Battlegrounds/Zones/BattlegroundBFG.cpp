@@ -27,17 +27,33 @@
 #include "World.h"
 #include "WorldPacket.h"
 
-// these variables aren't used outside of this file, so declare them only here
-uint32 BG_BG_HonorScoreTicks[BG_HONOR_MODE_NUM] = {
-    330, // normal honor
-    200  // holiday
-};
-
 BattlegroundBFG::BattlegroundBFG()
 {
+    m_IsInformedNearVictory = false;
     m_BuffChange = true;
     BgObjects.resize(BG_BG_OBJECT_MAX);
     BgCreatures.resize(BG_BG_ALL_NODES_COUNT + 5);//+5 for aura triggers
+
+    for (uint8 i = 0; i < BG_BG_DYNAMIC_NODES_COUNT; ++i)
+    {
+        m_Nodes[i] = 0;
+        m_prevNodes[i] = 0;
+        m_NodeTimers[i] = 0;
+        m_BannerTimers[i].timer = 0;
+        m_BannerTimers[i].type = 0;
+        m_BannerTimers[i].teamIndex = 0;
+    }
+
+    for (uint8 i = 0; i < BG_TEAMS_COUNT; ++i)
+    {
+        m_lastTick[i] = 0;
+        m_HonorScoreTics[i] = 0;
+        m_ReputationScoreTics[i] = 0;
+        m_TeamScores500Disadvantage[i] = false;
+    }
+
+    m_HonorTics = 0;
+    m_ReputationTics = 0;
 
     StartMessageIds[BG_STARTING_EVENT_FIRST]  = LANG_BG_BG_START_TWO_MINUTES;
     StartMessageIds[BG_STARTING_EVENT_SECOND] = LANG_BG_BG_START_ONE_MINUTE;
@@ -45,9 +61,7 @@ BattlegroundBFG::BattlegroundBFG()
     StartMessageIds[BG_STARTING_EVENT_FOURTH] = LANG_BG_BG_HAS_BEGUN;
 }
 
-BattlegroundBFG::~BattlegroundBFG()
-{
-}
+BattlegroundBFG::~BattlegroundBFG() { }
 
 void BattlegroundBFG::PostUpdateImpl(uint32 diff)
 {
@@ -115,23 +129,28 @@ void BattlegroundBFG::PostUpdateImpl(uint32 diff)
             int points = team_points[team];
             if (!points)
                 continue;
+
             m_lastTick[team] += diff;
+
             if (m_lastTick[team] > BG_BG_TickIntervals[points])
             {
                 m_lastTick[team] -= BG_BG_TickIntervals[points];
                 m_TeamScores[team] += BG_BG_TickPoints[points];
                 m_HonorScoreTics[team] += BG_BG_TickPoints[points];
                 m_ReputationScoreTics[team] += BG_BG_TickPoints[points];
+
                 if (m_ReputationScoreTics[team] >= m_ReputationTics)
                 {
                     (team == TEAM_ALLIANCE) ? RewardReputationToTeam(509, 10, ALLIANCE) : RewardReputationToTeam(510, 10, HORDE);
                     m_ReputationScoreTics[team] -= m_ReputationTics;
                 }
+
                 if (m_HonorScoreTics[team] >= m_HonorTics)
                 {
                     RewardHonorToTeam(GetBonusHonorFromKill(1), (team == TEAM_ALLIANCE) ? ALLIANCE : HORDE);
                     m_HonorScoreTics[team] -= m_HonorTics;
                 }
+
                 if (!m_IsInformedNearVictory && m_TeamScores[team] > BG_BG_WARNING_NEAR_VICTORY_SCORE)
                 {
                     if (team == TEAM_ALLIANCE)
@@ -144,9 +163,10 @@ void BattlegroundBFG::PostUpdateImpl(uint32 diff)
 
                 if (m_TeamScores[team] > BG_BG_MAX_TEAM_SCORE)
                     m_TeamScores[team] = BG_BG_MAX_TEAM_SCORE;
+
                 if (team == TEAM_ALLIANCE)
                     UpdateWorldState(BG_BG_OP_RESOURCES_ALLY, m_TeamScores[team]);
-                if (team == TEAM_HORDE)
+                else if (team == TEAM_HORDE)
                     UpdateWorldState(BG_BG_OP_RESOURCES_HORDE, m_TeamScores[team]);
                 // update achievement flags
                 // we increased m_TeamScores[team] so we just need to check if it is 500 more than other teams resources
@@ -159,7 +179,7 @@ void BattlegroundBFG::PostUpdateImpl(uint32 diff)
         // Test win condition
         if (m_TeamScores[TEAM_ALLIANCE] >= BG_BG_MAX_TEAM_SCORE)
             EndBattleground(ALLIANCE);
-        if (m_TeamScores[TEAM_HORDE] >= BG_BG_MAX_TEAM_SCORE)
+        else if (m_TeamScores[TEAM_HORDE] >= BG_BG_MAX_TEAM_SCORE)
             EndBattleground(HORDE);
     }
 }
@@ -342,20 +362,19 @@ void BattlegroundBFG::_SendNodeUpdate(uint8 node)
 void BattlegroundBFG::_NodeOccupied(uint8 node,Team team)
 {
     if (!AddSpiritGuide(node, BG_BG_SpiritGuidePos[node][0], BG_BG_SpiritGuidePos[node][1], BG_BG_SpiritGuidePos[node][2], BG_BG_SpiritGuidePos[node][3], team))
-        sLog->outError("Failed to spawn spirit guide! point: %u, team: %u,", node, team);
+        TC_LOG_ERROR("bg.battleground", "Failed to spawn spirit guide! point: %u, team: %u,", node, team);
+
+    if (node >= BG_BG_DYNAMIC_NODES_COUNT)//only dynamic nodes, no start points
+        return;
 
     uint8 capturedNodes = 0;
     for (uint8 i = 0; i < BG_BG_DYNAMIC_NODES_COUNT; ++i)
-    {
-        if (m_Nodes[node] == GetTeamIndexByTeamId(team) + BG_BG_NODE_TYPE_OCCUPIED && !m_NodeTimers[i])
+        if (m_Nodes[i] == GetTeamIndexByTeamId(team) + BG_BG_NODE_TYPE_OCCUPIED && !m_NodeTimers[i])
             ++capturedNodes;
-    }
 
-    if(node >= BG_BG_DYNAMIC_NODES_COUNT)//only dynamic nodes, no start points
-        return;
-    Creature* trigger = GetBGCreature(node+5);//0-6 spirit guides
+    Creature* trigger = BgCreatures[node+7] ? GetBGCreature(node+7) : NULL;//0-6 spirit guides
     if (!trigger)
-       trigger = AddCreature(WORLD_TRIGGER,node+5,team,BG_BG_NodePositions[node][0],BG_BG_NodePositions[node][1],BG_BG_NodePositions[node][2],BG_BG_NodePositions[node][3]);
+       trigger = AddCreature(WORLD_TRIGGER, node+7, team, BG_BG_NodePositions[node][0], BG_BG_NodePositions[node][1], BG_BG_NodePositions[node][2], BG_BG_NodePositions[node][3]);
 
     //add bonus honor aura trigger creature when node is accupied
     //cast bonus aura (+50% honor in 25yards)
@@ -376,27 +395,9 @@ void BattlegroundBFG::_NodeDeOccupied(uint8 node)
     if(node < BG_BG_DYNAMIC_NODES_COUNT)//only dynamic nodes, no start points
         DelCreature(node+7);//NULL checks are in DelCreature! 0-6 spirit guides
 
-    // Those who are waiting to resurrect at this node are taken to the closest own node's graveyard
-    std::vector<uint64> ghost_list = m_ReviveQueue[BgCreatures[node]];
-    if (!ghost_list.empty())
-    {
-        WorldSafeLocsEntry const* ClosestGrave = NULL;
-        for (std::vector<uint64>::const_iterator itr = ghost_list.begin(); itr != ghost_list.end(); ++itr)
-        {
-            Player* player = ObjectAccessor::FindPlayer(*itr);
-            if (!player)
-                continue;
+    RelocateDeadPlayers(BgCreatures[node]);
 
-            if (!ClosestGrave)                              // cache
-                ClosestGrave = GetClosestGraveYard(player);
-
-            if (ClosestGrave)
-                player->TeleportTo(GetMapId(), ClosestGrave->x, ClosestGrave->y, ClosestGrave->z, player->GetOrientation());
-        }
-    }
-
-    if (BgCreatures[node])
-        DelCreature(node);
+    DelCreature(node);
 
     // buff object isn't despawned
 }
@@ -417,7 +418,6 @@ void BattlegroundBFG::EventPlayerClickedOnFlag(Player* source, GameObject* /*tar
 
     if (node == BG_BG_DYNAMIC_NODES_COUNT)
     {
-        sLog->outString("Player %s (GUID: %u) in Battle for Gilneas fired EventPlayerClickedOnFlag() but isnt near of any flag", source->GetName().c_str(), source->GetGUIDLow());
         // this means our player isn't close to any of banners - maybe cheater ??
         return;
     }
@@ -544,7 +544,7 @@ bool BattlegroundBFG::SetupBattleground()
             || !AddObject(BG_BG_OBJECT_AURA_CONTESTED + 8*i,BG_BG_OBJECTID_AURA_C,BG_BG_NodePositions[i][0],BG_BG_NodePositions[i][1],BG_BG_NodePositions[i][2],BG_BG_NodePositions[i][3], 0, 0, std::sin(BG_BG_NodePositions[i][3]/2), std::cos(BG_BG_NodePositions[i][3]/2),RESPAWN_ONE_DAY)
             )
         {
-            sLog->outErrorDb("BatteGroundBG: Failed to spawn some object Battleground not created!");
+            TC_LOG_ERROR("sql.sql", "BatteGroundBG: Failed to spawn some object Battleground not created!");
             return false;
         }
     }
@@ -552,7 +552,7 @@ bool BattlegroundBFG::SetupBattleground()
         || !AddObject(BG_BG_OBJECT_GATE_H,BG_BG_OBJECTID_GATE_H,BG_BG_DoorPositions[1][0],BG_BG_DoorPositions[1][1],BG_BG_DoorPositions[1][2],BG_BG_DoorPositions[1][3],BG_BG_DoorPositions[1][4],BG_BG_DoorPositions[1][5],BG_BG_DoorPositions[1][6],BG_BG_DoorPositions[1][7],RESPAWN_IMMEDIATELY)
 )
     {
-        sLog->outErrorDb("BatteGroundBG: Failed to spawn door object Battleground not created!");
+        TC_LOG_ERROR("sql.sql", "BatteGroundBG: Failed to spawn door object Battleground not created!");
         return false;
     }
     //buffs
@@ -562,7 +562,7 @@ bool BattlegroundBFG::SetupBattleground()
             || !AddObject(BG_BG_OBJECT_SPEEDBUFF_LIGHTHOUSE + 3 * i + 1, Buff_Entries[1], BG_BG_BuffPositions[i][0], BG_BG_BuffPositions[i][1], BG_BG_BuffPositions[i][2], BG_BG_BuffPositions[i][3], 0, 0, std::sin(BG_BG_BuffPositions[i][3]/2), std::cos(BG_BG_BuffPositions[i][3]/2), RESPAWN_ONE_DAY)
             || !AddObject(BG_BG_OBJECT_SPEEDBUFF_LIGHTHOUSE + 3 * i + 2, Buff_Entries[2], BG_BG_BuffPositions[i][0], BG_BG_BuffPositions[i][1], BG_BG_BuffPositions[i][2], BG_BG_BuffPositions[i][3], 0, 0, std::sin(BG_BG_BuffPositions[i][3]/2), std::cos(BG_BG_BuffPositions[i][3]/2), RESPAWN_ONE_DAY)
             )
-            sLog->outErrorDb("BatteGroundBG: Failed to spawn buff object!");
+            TC_LOG_ERROR("sql.sql", "BatteGroundBG: Failed to spawn buff object!");
     }
 
     return true;
@@ -676,7 +676,7 @@ void BattlegroundBFG::UpdatePlayerScore(Player *Source, uint32 type, uint32 valu
     }
 }
 
-bool BattlegroundBFG::IsAllNodesConrolledByTeam(uint32 team) const
+bool BattlegroundBFG::IsAllNodesControlledByTeam(uint32 team) const
 {
     uint32 count = 0;
     for (int i = 0; i < BG_BG_DYNAMIC_NODES_COUNT; ++i)
@@ -685,6 +685,17 @@ bool BattlegroundBFG::IsAllNodesConrolledByTeam(uint32 team) const
             ++count;
 
     return count == BG_BG_DYNAMIC_NODES_COUNT;
+}
+
+bool BattlegroundBFG::CheckAchievementCriteriaMeet(uint32 criteriaId, Player const* player, Unit const* target, uint32 miscvalue)
+{
+    switch (criteriaId)
+    {
+        case BG_CRITERIA_CHECK_RESILIENT_VICTORY:
+            return m_TeamScores500Disadvantage[GetTeamIndexByTeamId(player->GetTeam())];
+    }
+
+    return Battleground::CheckAchievementCriteriaMeet(criteriaId, player, target, miscvalue);
 }
 
 uint32 BattlegroundBFG::GetPrematureWinner()
@@ -704,4 +715,4 @@ uint32 BattlegroundBFG::GetPrematureWinner()
 
     // If the values are equal, fall back to the original result (based on number of players on each team)
     return Battleground::GetPrematureWinner();
-} 
+}

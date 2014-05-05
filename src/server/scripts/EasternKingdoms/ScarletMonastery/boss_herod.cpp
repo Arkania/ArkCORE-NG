@@ -56,51 +56,51 @@ class boss_herod : public CreatureScript
 public:
     boss_herod() : CreatureScript("boss_herod") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
         return new boss_herodAI(creature);
     }
 
     struct boss_herodAI : public ScriptedAI
     {
-        boss_herodAI(Creature* creature) : ScriptedAI(creature) {}
+        boss_herodAI(Creature* creature) : ScriptedAI(creature) { }
 
         bool Enrage;
 
         uint32 Cleave_Timer;
         uint32 Whirlwind_Timer;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             Enrage = false;
             Cleave_Timer = 12000;
             Whirlwind_Timer = 60000;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) OVERRIDE
         {
             Talk(SAY_AGGRO);
             DoCast(me, SPELL_RUSHINGCHARGE);
         }
 
-         void KilledUnit(Unit* /*victim*/)
+         void KilledUnit(Unit* /*victim*/) OVERRIDE
          {
              Talk(SAY_KILL);
          }
 
-         void JustDied(Unit* /*killer*/)
+         void JustDied(Unit* /*killer*/) OVERRIDE
          {
              for (uint8 i = 0; i < 20; ++i)
                  me->SummonCreature(ENTRY_SCARLET_TRAINEE, 1939.18f, -431.58f, 17.09f, 6.22f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000);
          }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (!UpdateVictim())
                 return;
 
             //If we are <30% hp goes Enraged
-            if (!Enrage && !HealthAbovePct(30) && !me->IsNonMeleeSpellCasted(false))
+            if (!Enrage && !HealthAbovePct(30) && !me->IsNonMeleeSpellCast(false))
             {
                 Talk(EMOTE_ENRAGE);
                 Talk(SAY_ENRAGE);
@@ -111,7 +111,7 @@ public:
             //Cleave_Timer
             if (Cleave_Timer <= diff)
             {
-                DoCast(me->GetVictim(), SPELL_CLEAVE);
+                DoCastVictim(SPELL_CLEAVE);
                 Cleave_Timer = 12000;
             }
             else Cleave_Timer -= diff;
@@ -120,7 +120,7 @@ public:
             if (Whirlwind_Timer <= diff)
             {
                 Talk(SAY_WHIRLWIND);
-                DoCast(me->GetVictim(), SPELL_WHIRLWIND);
+                DoCastVictim(SPELL_WHIRLWIND);
                 Whirlwind_Timer = 30000;
             }
             else Whirlwind_Timer -= diff;
@@ -135,7 +135,7 @@ class npc_scarlet_trainee : public CreatureScript
 public:
     npc_scarlet_trainee() : CreatureScript("npc_scarlet_trainee") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
         return new npc_scarlet_traineeAI(creature);
     }
@@ -149,11 +149,11 @@ public:
 
         uint32 Start_Timer;
 
-        void Reset() {}
-        void WaypointReached(uint32 /*waypointId*/) {}
-        void EnterCombat(Unit* /*who*/) {}
+        void Reset() OVERRIDE { }
+        void WaypointReached(uint32 /*waypointId*/) OVERRIDE { }
+        void EnterCombat(Unit* /*who*/) OVERRIDE { }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (Start_Timer)
             {

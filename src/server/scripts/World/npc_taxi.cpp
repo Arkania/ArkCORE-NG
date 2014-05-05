@@ -55,8 +55,6 @@ EndScriptData
 #define GOSSIP_TORASTRASZA1     "I would like to see Lord Of Afrasastrasz, in the middle of the temple."
 #define GOSSIP_TORASTRASZA2     "Yes, Please. I would like to return to the ground floor of the temple."
 #define GOSSIP_CRIMSONWING      "<Ride the gryphons to Survey Alcaz Island>"
-#define GOSSIP_THRICESTAR1      "Do you think I could take a ride on one of those flying machines?"
-#define GOSSIP_THRICESTAR2      "Kara, I need to be flown out the Dens of Dying to find Bixie."
 #define GOSSIP_WILLIAMKEILAR1   "Take me to Northpass Tower."
 #define GOSSIP_WILLIAMKEILAR2   "Take me to Eastwall Tower."
 #define GOSSIP_WILLIAMKEILAR3   "Take me to Crown Guard Tower."
@@ -66,7 +64,7 @@ class npc_taxi : public CreatureScript
 public:
     npc_taxi() : CreatureScript("npc_taxi") { }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) OVERRIDE
     {
         if (creature->IsQuestGiver())
             player->PrepareQuestMenu(creature->GetGUID());
@@ -164,15 +162,7 @@ public:
             if (player->GetQuestStatus(11142) == QUEST_STATUS_INCOMPLETE)
                 player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_CRIMSONWING, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+25);
             break;
-        case 26602:
-            if (creature->IsTaxi())
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TAXI, GOSSIP_THRICESTAR1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 26);
-
-            if (player->GetQuestStatus(11692) == QUEST_STATUS_COMPLETE)
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_THRICESTAR2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 27);
-            break;
         case 17209:
-            player->SetTaxiCheater(true);
             player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_WILLIAMKEILAR1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 28);
             player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_WILLIAMKEILAR2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 29);
             player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_WILLIAMKEILAR3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 30);
@@ -183,7 +173,7 @@ public:
         return true;
     }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) OVERRIDE
     {
         player->PlayerTalkClass->ClearMenus();
         switch (action)
@@ -300,21 +290,14 @@ public:
             player->CastSpell(player, 42295, true);
             break;
         case GOSSIP_ACTION_INFO_DEF + 26:
-            player->GetSession()->SendTaxiMenu(creature);
-            break;
-        case GOSSIP_ACTION_INFO_DEF + 27:
-            player->CLOSE_GOSSIP_MENU();
-            player->CastSpell(player, 51446, false);
-            break;
-        case GOSSIP_ACTION_INFO_DEF + 28:
             player->CLOSE_GOSSIP_MENU();
             player->ActivateTaxiPathTo(494);
             break;
-        case GOSSIP_ACTION_INFO_DEF + 29:
+        case GOSSIP_ACTION_INFO_DEF + 27:
             player->CLOSE_GOSSIP_MENU();
             player->ActivateTaxiPathTo(495);
             break;
-        case GOSSIP_ACTION_INFO_DEF + 30:
+        case GOSSIP_ACTION_INFO_DEF + 28:
             player->CLOSE_GOSSIP_MENU();
             player->ActivateTaxiPathTo(496);
             break;

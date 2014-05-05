@@ -43,14 +43,14 @@ enum AuctionError
     ERR_AUCTION_HIGHER_BID          = 5,
     ERR_AUCTION_BID_INCREMENT       = 7,
     ERR_AUCTION_BID_OWN             = 10,
-    ERR_RESTRICTED_ACCOUNT          = 13,
+    ERR_AUCTION_RESTRICTED_ACCOUNT  = 13
 };
 
 enum AuctionAction
 {
-    AUCTION_SELL_ITEM = 0,
-    AUCTION_CANCEL = 1,
-    AUCTION_PLACE_BID = 2
+    AUCTION_SELL_ITEM   = 0,
+    AUCTION_CANCEL      = 1,
+    AUCTION_PLACE_BID   = 2
 };
 
 enum MailAuctionAnswers
@@ -100,8 +100,6 @@ struct AuctionEntry
 class AuctionHouseObject
 {
   public:
-    // Initialize storage
-    AuctionHouseObject() { next = AuctionsMap.begin(); }
     ~AuctionHouseObject()
     {
         for (AuctionEntryMap::iterator itr = AuctionsMap.begin(); itr != AuctionsMap.end(); ++itr)
@@ -136,9 +134,6 @@ class AuctionHouseObject
 
   private:
     AuctionEntryMap AuctionsMap;
-
-    // storage for "next" auction item for next Update()
-    AuctionEntryMap::const_iterator next;
 };
 
 class AuctionHouseMgr

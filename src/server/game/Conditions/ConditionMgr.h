@@ -47,18 +47,18 @@ enum ConditionTypes
     CONDITION_DRUNKENSTATE          = 10,                   // DrunkenState     0,             0                  true if player is drunk enough
     CONDITION_WORLD_STATE           = 11,                   // index            value          0                  true if world has the value for the index
     CONDITION_ACTIVE_EVENT          = 12,                   // event_id         0              0                  true if event is active
-    CONDITION_INSTANCE_DATA         = 13,                   // entry            data           0                  true if data is set in current instance
+    CONDITION_INSTANCE_INFO         = 13,                   // entry            data           type               true if the instance info defined by type (enum InstanceInfo) equals data.
     CONDITION_QUEST_NONE            = 14,                   // quest_id         0              0                  true if doesn't have quest saved
     CONDITION_CLASS                 = 15,                   // class            0              0                  true if player's class is equal to class
     CONDITION_RACE                  = 16,                   // race             0              0                  true if player's race is equal to race
     CONDITION_ACHIEVEMENT           = 17,                   // achievement_id   0              0                  true if achievement is complete
     CONDITION_TITLE                 = 18,                   // title id         0              0                  true if player has title
-    CONDITION_SPAWNMASK             = 19,                   // spawnMask        0              0
+    CONDITION_SPAWNMASK             = 19,                   // spawnMask        0              0                  true if in spawnMask
     CONDITION_GENDER                = 20,                   // gender           0              0                  true if player's gender is equal to gender
-    CONDITION_UNUSED_21             = 21,                   //
+    CONDITION_UNIT_STATE            = 21,                   // unitState        0              0                  true if unit has unitState
     CONDITION_MAPID                 = 22,                   // map_id           0              0                  true if in map_id
     CONDITION_AREAID                = 23,                   // area_id          0              0                  true if in area_id
-    CONDITION_UNUSED_24             = 24,                   //
+    CONDITION_CREATURE_TYPE         = 24,                   // cinfo.type       0              0                  true if creature_template.type = value1
     CONDITION_SPELL                 = 25,                   // spell_id         0              0                  true if player has learned spell
     CONDITION_PHASEMASK             = 26,                   // phasemask        0              0                  true if object is in phasemask
     CONDITION_LEVEL                 = 27,                   // level            ComparisonType 0                  true if unit's level is equal to param1 (param2 can modify the statement)
@@ -129,18 +129,9 @@ enum ConditionSourceType
     CONDITION_SOURCE_TYPE_VEHICLE_SPELL                  = 21,
     CONDITION_SOURCE_TYPE_SMART_EVENT                    = 22,
     CONDITION_SOURCE_TYPE_NPC_VENDOR                     = 23,
-    CONDITION_SOURCE_TYPE_PHASE_DEFINITION               = 24,
-    CONDITION_SOURCE_TYPE_MAX                            = 25  // MAX
-};
-
-enum ComparisionType
-{
-    COMP_TYPE_EQ = 0,
-    COMP_TYPE_HIGH,
-    COMP_TYPE_LOW,
-    COMP_TYPE_HIGH_EQ,
-    COMP_TYPE_LOW_EQ,
-    COMP_TYPE_MAX
+    CONDITION_SOURCE_TYPE_SPELL_PROC                     = 24,
+    CONDITION_SOURCE_TYPE_PHASE_DEFINITION               = 25, // only 4.3.4
+    CONDITION_SOURCE_TYPE_MAX                            = 26  // MAX
 };
 
 enum RelationType
@@ -154,7 +145,14 @@ enum RelationType
     RELATION_MAX
 };
 
-enum
+enum InstanceInfo
+{
+    INSTANCE_INFO_DATA = 0,
+    INSTANCE_INFO_DATA64,
+    INSTANCE_INFO_BOSS_STATE
+};
+
+enum MaxConditionTargets
 {
     MAX_CONDITION_TARGETS = 3
 };
@@ -195,6 +193,7 @@ struct Condition
         SourceType         = CONDITION_SOURCE_TYPE_NONE;
         SourceGroup        = 0;
         SourceEntry        = 0;
+        SourceId           = 0;
         ElseGroup          = 0;
         ConditionType      = CONDITION_NONE;
         ConditionTarget    = 0;
@@ -247,7 +246,7 @@ class ConditionMgr
         ConditionList GetConditionsForSpellClickEvent(uint32 creatureId, uint32 spellId);
         ConditionList GetConditionsForSmartEvent(int32 entryOrGuid, uint32 eventId, uint32 sourceType);
         ConditionList GetConditionsForVehicleSpell(uint32 creatureId, uint32 spellId);
-        ConditionList GetConditionsForPhaseDefinition(uint32 zone, uint32 entry);
+        ConditionList const* GetConditionsForPhaseDefinition(uint32 zone, uint32 entry);
         ConditionList GetConditionsForNpcVendorEvent(uint32 creatureId, uint32 itemId);
 
     private:
@@ -269,27 +268,6 @@ class ConditionMgr
         SmartEventConditionContainer      SmartEventConditionStore;
         PhaseDefinitionConditionContainer PhaseDefinitionsConditionStore;
 };
-
-template <class T> bool CompareValues(ComparisionType type,  T val1, T val2)
-{
-    switch (type)
-    {
-        case COMP_TYPE_EQ:
-            return val1 == val2;
-        case COMP_TYPE_HIGH:
-            return val1 > val2;
-        case COMP_TYPE_LOW:
-            return val1 < val2;
-        case COMP_TYPE_HIGH_EQ:
-            return val1 >= val2;
-        case COMP_TYPE_LOW_EQ:
-            return val1 <= val2;
-        default:
-            // incorrect parameter
-            ASSERT(false);
-            return false;
-    }
-}
 
 #define sConditionMgr ACE_Singleton<ConditionMgr, ACE_Null_Mutex>::instance()
 

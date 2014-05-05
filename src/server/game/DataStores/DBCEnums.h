@@ -33,12 +33,11 @@ enum LevelLimit
 
     // Server side limitation. Base at used code requirements.
     // also see MAX_LEVEL and GT_MAX_LEVEL define
-    STRONG_MAX_LEVEL = 255
-}; 
+    STRONG_MAX_LEVEL = 255,
+};
 
 enum BattlegroundBracketId                                  // bracketId for level ranges
 {
-    BG_BRACKET_ID_TEMPLATE       = -1,                      // used to mark bg as template
     BG_BRACKET_ID_FIRST          = 0,
     BG_BRACKET_ID_LAST           = 15
 };
@@ -63,28 +62,28 @@ enum AchievementFaction
 
 enum AchievementFlags
 {
-    ACHIEVEMENT_FLAG_COUNTER                = 0x00000001,    // Just count statistic (never stop and complete)
-    ACHIEVEMENT_FLAG_HIDDEN                 = 0x00000002,    // Not sent to client - internal use only
-    ACHIEVEMENT_FLAG_PLAY_NO_VISUAL         = 0x00000004,    // Client does not play achievement earned visual
-    ACHIEVEMENT_FLAG_SUMM                   = 0x00000008,    // Use summ criteria value from all reqirements (and calculate max value)
-    ACHIEVEMENT_FLAG_MAX_USED               = 0x00000010,    // Show max criteria (and calculate max value ??)
-    ACHIEVEMENT_FLAG_REQ_COUNT              = 0x00000020,    // Use not zero req count (and calculate max value)
-    ACHIEVEMENT_FLAG_AVERAGE                = 0x00000040,    // Show as average value (value / time_in_days) depend from other flag (by def use last criteria value)
-    ACHIEVEMENT_FLAG_BAR                    = 0x00000080,    // Show as progress bar (value / max vale) depend from other flag (by def use last criteria value)
-    ACHIEVEMENT_FLAG_REALM_FIRST_REACH      = 0x00000100,    //
-    ACHIEVEMENT_FLAG_REALM_FIRST_KILL       = 0x00000200,    //
-    ACHIEVEMENT_FLAG_UNK3                   = 0x00000400,    // ACHIEVEMENT_FLAG_HIDE_NAME_IN_TIE
-    ACHIEVEMENT_FLAG_REALM_FIRST_GUILD      = 0x00000800,    // first guild on realm done something
-    ACHIEVEMENT_FLAG_SHOW_IN_GUILD_NEWS     = 0x00001000,    // Shows in guild news
-    ACHIEVEMENT_FLAG_SHOW_IN_GUILD_HEADER   = 0x00002000,    // Shows in guild news header
-    ACHIEVEMENT_FLAG_GUILD                  = 0x00004000,    //
-    ACHIEVEMENT_FLAG_SHOW_GUILD_MEMBERS     = 0x00008000,    //
-    ACHIEVEMENT_FLAG_SHOW_CRITERIA_MEMBERS  = 0x00010000     //
+    ACHIEVEMENT_FLAG_COUNTER               = 0x00000001,    // Just count statistic (never stop and complete)
+    ACHIEVEMENT_FLAG_HIDDEN                = 0x00000002,    // Not sent to client - internal use only
+    ACHIEVEMENT_FLAG_PLAY_NO_VISUAL        = 0x00000004,    // Client does not play achievement earned visual
+    ACHIEVEMENT_FLAG_SUMM                  = 0x00000008,    // Use summ criteria value from all requirements (and calculate max value)
+    ACHIEVEMENT_FLAG_MAX_USED              = 0x00000010,    // Show max criteria (and calculate max value ??)
+    ACHIEVEMENT_FLAG_REQ_COUNT             = 0x00000020,    // Use not zero req count (and calculate max value)
+    ACHIEVEMENT_FLAG_AVERAGE               = 0x00000040,    // Show as average value (value / time_in_days) depend from other flag (by def use last criteria value)
+    ACHIEVEMENT_FLAG_BAR                   = 0x00000080,    // Show as progress bar (value / max vale) depend from other flag (by def use last criteria value)
+    ACHIEVEMENT_FLAG_REALM_FIRST_REACH     = 0x00000100,    //
+    ACHIEVEMENT_FLAG_REALM_FIRST_KILL      = 0x00000200,    //
+    ACHIEVEMENT_FLAG_UNK3                  = 0x00000400,    // ACHIEVEMENT_FLAG_HIDE_NAME_IN_TIE
+    ACHIEVEMENT_FLAG_REALM_FIRST_GUILD     = 0x00000800,    // first guild on realm done something
+    ACHIEVEMENT_FLAG_SHOW_IN_GUILD_NEWS    = 0x00001000,    // Shows in guild news
+    ACHIEVEMENT_FLAG_SHOW_IN_GUILD_HEADER  = 0x00002000,    // Shows in guild news header
+    ACHIEVEMENT_FLAG_GUILD                 = 0x00004000,    //
+    ACHIEVEMENT_FLAG_SHOW_GUILD_MEMBERS    = 0x00008000,    //
+    ACHIEVEMENT_FLAG_SHOW_CRITERIA_MEMBERS = 0x00010000     //
 };
 
 enum AchievementCriteriaLimits
 {
-    MAX_CRITERIA_REQUIREMENTS = 2,
+    MAX_CRITERIA_REQUIREMENTS          = 2,
     MAX_ADDITIONAL_CRITERIA_CONDITIONS = 3
 };
 
@@ -146,16 +145,16 @@ enum AchievementCriteriaAdditionalCondition
     ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_GUILD_REPUTATION            = 62, // NYI
     ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_RATED_BATTLEGROUND          = 63, // NYI
     ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_PROJECT_RARITY              = 65,
-    ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_PROJECT_RACE                = 66
+    ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_PROJECT_RACE                = 66,
 };
 
 enum AchievementCriteriaFlags
 {
     ACHIEVEMENT_CRITERIA_FLAG_SHOW_PROGRESS_BAR = 0x00000001,         // Show progress as bar
     ACHIEVEMENT_CRITERIA_FLAG_HIDDEN            = 0x00000002,         // Not show criteria in client
-    ACHIEVEMENT_CRITERIA_FLAG_UNK3              = 0x00000004,         // BG related??
-    ACHIEVEMENT_CRITERIA_FLAG_UNK4              = 0x00000008,         //
-    ACHIEVEMENT_CRITERIA_FLAG_UNK5              = 0x00000010,         // not used
+    ACHIEVEMENT_CRITERIA_FLAG_FAIL_ACHIEVEMENT  = 0x00000004,         // BG related??
+    ACHIEVEMENT_CRITERIA_FLAG_RESET_ON_START    = 0x00000008,         //
+    ACHIEVEMENT_CRITERIA_FLAG_IS_DATE           = 0x00000010,         // not used
     ACHIEVEMENT_CRITERIA_FLAG_MONEY_COUNTER     = 0x00000020          // Displays counter as money
 };
 
@@ -218,13 +217,13 @@ enum AchievementCriteriaTypes
     ACHIEVEMENT_CRITERIA_TYPE_GAIN_EXALTED_REPUTATION       = 47,
     ACHIEVEMENT_CRITERIA_TYPE_VISIT_BARBER_SHOP             = 48,
     ACHIEVEMENT_CRITERIA_TYPE_EQUIP_EPIC_ITEM               = 49,
-    ACHIEVEMENT_CRITERIA_TYPE_ROLL_NEED_ON_LOOT             = 50, // TODO: itemlevel is mentioned in text but not present in dbc
+    ACHIEVEMENT_CRITERIA_TYPE_ROLL_NEED_ON_LOOT             = 50, /// @todo itemlevel is mentioned in text but not present in dbc
     ACHIEVEMENT_CRITERIA_TYPE_ROLL_GREED_ON_LOOT            = 51,
     ACHIEVEMENT_CRITERIA_TYPE_HK_CLASS                      = 52,
     ACHIEVEMENT_CRITERIA_TYPE_HK_RACE                       = 53,
     ACHIEVEMENT_CRITERIA_TYPE_DO_EMOTE                      = 54,
     ACHIEVEMENT_CRITERIA_TYPE_HEALING_DONE                  = 55,
-    ACHIEVEMENT_CRITERIA_TYPE_GET_KILLING_BLOWS             = 56, // TODO: in some cases map not present, and in some cases need do without die
+    ACHIEVEMENT_CRITERIA_TYPE_GET_KILLING_BLOWS             = 56, /// @todo in some cases map not present, and in some cases need do without die
     ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM                    = 57,
     ACHIEVEMENT_CRITERIA_TYPE_MONEY_FROM_VENDORS            = 59,
     ACHIEVEMENT_CRITERIA_TYPE_GOLD_SPENT_FOR_TALENTS        = 60,
@@ -238,7 +237,8 @@ enum AchievementCriteriaTypes
     ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2              = 69,
     ACHIEVEMENT_CRITERIA_TYPE_SPECIAL_PVP_KILL              = 70,
     ACHIEVEMENT_CRITERIA_TYPE_FISH_IN_GAMEOBJECT            = 72,
-    ACHIEVEMENT_CRITERIA_TYPE_EARNED_PVP_TITLE              = 74, // TODO: title id is not mentioned in dbc
+    /// @todo 73: Achievements 1515, 1241, 1103 (Name: Mal'Ganis)
+    ACHIEVEMENT_CRITERIA_TYPE_ON_LOGIN                      = 74,
     ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILLLINE_SPELLS        = 75,
     ACHIEVEMENT_CRITERIA_TYPE_WIN_DUEL                      = 76,
     ACHIEVEMENT_CRITERIA_TYPE_LOSE_DUEL                     = 77,
@@ -259,13 +259,13 @@ enum AchievementCriteriaTypes
     ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_HIT_DEALT             = 101,
     ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_HIT_RECEIVED          = 102,
     ACHIEVEMENT_CRITERIA_TYPE_TOTAL_DAMAGE_RECEIVED         = 103,
-    ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_HEAL_CASTED           = 104,
+    ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_HEAL_CAST             = 104,
     ACHIEVEMENT_CRITERIA_TYPE_TOTAL_HEALING_RECEIVED        = 105,
     ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_HEALING_RECEIVED      = 106,
     ACHIEVEMENT_CRITERIA_TYPE_QUEST_ABANDONED               = 107,
     ACHIEVEMENT_CRITERIA_TYPE_FLIGHT_PATHS_TAKEN            = 108,
     ACHIEVEMENT_CRITERIA_TYPE_LOOT_TYPE                     = 109,
-    ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2                   = 110, // TODO: target entry is missing
+    ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2                   = 110, /// @todo target entry is missing
     ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILL_LINE              = 112,
     ACHIEVEMENT_CRITERIA_TYPE_EARN_HONORABLE_KILL           = 113,
     ACHIEVEMENT_CRITERIA_TYPE_ACCEPTED_SUMMONINGS           = 114,
@@ -291,36 +291,36 @@ enum AchievementCriteriaTypes
 
 enum AreaFlags
 {
-    AREA_FLAG_SNOW             = 0x00000001,                // snow (only Dun Morogh, Naxxramas, Razorfen Downs and Winterspring)
-    AREA_FLAG_UNK1             = 0x00000002,                // Razorfen Downs, Naxxramas and Acherus: The Ebon Hold (3.3.5a)
-    AREA_FLAG_UNK2             = 0x00000004,                // Only used for areas on map 571 (development before)
-    AREA_FLAG_SLAVE_CAPITAL    = 0x00000008,                // city and city subsones
-    AREA_FLAG_UNK3             = 0x00000010,                // can't find common meaning
-    AREA_FLAG_SLAVE_CAPITAL2   = 0x00000020,                // slave capital city flag?
-    AREA_FLAG_ALLOW_DUELS      = 0x00000040,                // allow to duel here
-    AREA_FLAG_ARENA            = 0x00000080,                // arena, both instanced and world arenas
-    AREA_FLAG_CAPITAL          = 0x00000100,                // main capital city flag
-    AREA_FLAG_CITY             = 0x00000200,                // only for one zone named "City" (where it located?)
-    AREA_FLAG_OUTLAND          = 0x00000400,                // expansion zones? (only Eye of the Storm not have this flag, but have 0x00004000 flag)
-    AREA_FLAG_SANCTUARY        = 0x00000800,                // sanctuary area (PvP disabled)
-    AREA_FLAG_NEED_FLY         = 0x00001000,                // Respawn alive at the graveyard without corpse
-    AREA_FLAG_UNUSED1          = 0x00002000,                // Unused in 3.3.5a
-    AREA_FLAG_OUTLAND2         = 0x00004000,                // expansion zones? (only Circle of Blood Arena not have this flag, but have 0x00000400 flag)
-    AREA_FLAG_OUTDOOR_PVP      = 0x00008000,                // pvp objective area? (Death's Door also has this flag although it's no pvp object area)
-    AREA_FLAG_ARENA_INSTANCE   = 0x00010000,                // used by instanced arenas only
-    AREA_FLAG_UNUSED2          = 0x00020000,                // Unused in 3.3.5a
-    AREA_FLAG_CONTESTED_AREA   = 0x00040000,                // On PvP servers these areas are considered contested, even though the zone it is contained in is a Horde/Alliance territory.
-    AREA_FLAG_UNK6             = 0x00080000,                // Valgarde and Acherus: The Ebon Hold
-    AREA_FLAG_LOWLEVEL         = 0x00100000,                // used for some starting areas with area_level <= 15
-    AREA_FLAG_TOWN             = 0x00200000,                // small towns with Inn
-    AREA_FLAG_UNK7             = 0x00400000,                // Warsong Hold, Acherus: The Ebon Hold, New Agamand Inn, Vengeance Landing Inn, Sunreaver Pavilion (Something to do with team?)
-    AREA_FLAG_UNK8             = 0x00800000,                // Valgarde, Acherus: The Ebon Hold, Westguard Inn, Silver Covenant Pavilion (Something to do with team?)
-    AREA_FLAG_WINTERGRASP      = 0x01000000,                // Wintergrasp and it's subzones
-    AREA_FLAG_INSIDE           = 0x02000000,                // used for determinating spell related inside/outside questions in Map::IsOutdoors
-    AREA_FLAG_OUTSIDE          = 0x04000000,                // used for determinating spell related inside/outside questions in Map::IsOutdoors
-    AREA_FLAG_WINTERGRASP_2    = 0x08000000,                // Can Hearth And Resurrect From Area
-    AREA_FLAG_NO_FLY_ZONE      = 0x20000000,                // Marks zones where you cannot fly
-    AREA_FLAG_UNK9             = 0x40000000
+    AREA_FLAG_SNOW                  = 0x00000001,                // snow (only Dun Morogh, Naxxramas, Razorfen Downs and Winterspring)
+    AREA_FLAG_UNK1                  = 0x00000002,                // Razorfen Downs, Naxxramas and Acherus: The Ebon Hold (3.3.5a)
+    AREA_FLAG_UNK2                  = 0x00000004,                // Only used for areas on map 571 (development before)
+    AREA_FLAG_SLAVE_CAPITAL         = 0x00000008,                // city and city subsones
+    AREA_FLAG_UNK3                  = 0x00000010,                // can't find common meaning
+    AREA_FLAG_SLAVE_CAPITAL2        = 0x00000020,                // slave capital city flag?
+    AREA_FLAG_ALLOW_DUELS           = 0x00000040,                // allow to duel here
+    AREA_FLAG_ARENA                 = 0x00000080,                // arena, both instanced and world arenas
+    AREA_FLAG_CAPITAL               = 0x00000100,                // main capital city flag
+    AREA_FLAG_CITY                  = 0x00000200,                // only for one zone named "City" (where it located?)
+    AREA_FLAG_OUTLAND               = 0x00000400,                // expansion zones? (only Eye of the Storm not have this flag, but have 0x00004000 flag)
+    AREA_FLAG_SANCTUARY             = 0x00000800,                // sanctuary area (PvP disabled)
+    AREA_FLAG_NEED_FLY              = 0x00001000,                // Respawn alive at the graveyard without corpse
+    AREA_FLAG_UNUSED1               = 0x00002000,                // Unused in 3.3.5a
+    AREA_FLAG_OUTLAND2              = 0x00004000,                // expansion zones? (only Circle of Blood Arena not have this flag, but have 0x00000400 flag)
+    AREA_FLAG_OUTDOOR_PVP           = 0x00008000,                // pvp objective area? (Death's Door also has this flag although it's no pvp object area)
+    AREA_FLAG_ARENA_INSTANCE        = 0x00010000,                // used by instanced arenas only
+    AREA_FLAG_UNUSED2               = 0x00020000,                // Unused in 3.3.5a
+    AREA_FLAG_CONTESTED_AREA        = 0x00040000,                // On PvP servers these areas are considered contested, even though the zone it is contained in is a Horde/Alliance territory.
+    AREA_FLAG_UNK6                  = 0x00080000,                // Valgarde and Acherus: The Ebon Hold
+    AREA_FLAG_LOWLEVEL              = 0x00100000,                // used for some starting areas with area_level <= 15
+    AREA_FLAG_TOWN                  = 0x00200000,                // small towns with Inn
+    AREA_FLAG_REST_ZONE_HORDE       = 0x00400000,                // Warsong Hold, Acherus: The Ebon Hold, New Agamand Inn, Vengeance Landing Inn, Sunreaver Pavilion (Something to do with team?)
+    AREA_FLAG_REST_ZONE_ALLIANCE    = 0x00800000,                // Valgarde, Acherus: The Ebon Hold, Westguard Inn, Silver Covenant Pavilion (Something to do with team?)
+    AREA_FLAG_WINTERGRASP           = 0x01000000,                // Wintergrasp and it's subzones
+    AREA_FLAG_INSIDE                = 0x02000000,                // used for determinating spell related inside/outside questions in Map::IsOutdoors
+    AREA_FLAG_OUTSIDE               = 0x04000000,                // used for determinating spell related inside/outside questions in Map::IsOutdoors
+    AREA_FLAG_WINTERGRASP_2         = 0x08000000,                // Can Hearth And Resurrect From Area
+    AREA_FLAG_NO_FLY_ZONE           = 0x20000000,                // Marks zones where you cannot fly
+    AREA_FLAG_UNK9                  = 0x40000000
 };
 
 enum Difficulty
@@ -387,6 +387,11 @@ enum MapTypes                                               // Lua_IsInInstance
     MAP_ARENA           = 4                                 // arena
 };
 
+enum MapFlags
+{
+    MAP_FLAG_DYNAMIC_DIFFICULTY = 0x100
+};
+
 enum AbilytyLearnType
 {
     ABILITY_LEARNED_ON_GET_PROFESSION_SKILL     = 1,
@@ -406,6 +411,16 @@ enum ItemEnchantmentType
     ITEM_ENCHANTMENT_TYPE_PRISMATIC_SOCKET = 8
 };
 
+enum ItemExtendedCostFlags
+{
+    ITEM_EXT_COST_FLAG_REQUIRE_GUILD                = 0x01,
+    ITEM_EXT_COST_CURRENCY_REQ_IS_SEASON_EARNED_1   = 0x02,
+    ITEM_EXT_COST_CURRENCY_REQ_IS_SEASON_EARNED_2   = 0x04,
+    ITEM_EXT_COST_CURRENCY_REQ_IS_SEASON_EARNED_3   = 0x08,
+    ITEM_EXT_COST_CURRENCY_REQ_IS_SEASON_EARNED_4   = 0x10,
+    ITEM_EXT_COST_CURRENCY_REQ_IS_SEASON_EARNED_5   = 0x20,
+};
+
 enum ItemLimitCategoryMode
 {
     ITEM_LIMIT_CATEGORY_MODE_HAVE       = 0,                      // limit applied to amount items in inventory/bank
@@ -415,7 +430,14 @@ enum ItemLimitCategoryMode
 enum MountFlags
 {
     MOUNT_FLAG_CAN_PITCH                = 0x4,                    // client checks MOVEMENTFLAG2_FULL_SPEED_PITCHING
-    MOUNT_FLAG_CAN_SWIM                 = 0x8                     // client checks MOVEMENTFLAG_SWIMMING
+    MOUNT_FLAG_CAN_SWIM                 = 0x8,                    // client checks MOVEMENTFLAG_SWIMMING
+};
+
+enum SpellCategoryFlags
+{
+    SPELL_CATEGORY_FLAG_COOLDOWN_SCALES_WITH_WEAPON_SPEED   = 0x01, // unused
+    SPELL_CATEGORY_FLAG_COOLDOWN_STARTS_ON_EVENT            = 0x04,
+    SPELL_CATEGORY_FLAG_COOLDOWN_EXPIRES_AT_MIDNIGHT        = 0x08
 };
 
 enum TotemCategoryType
@@ -487,29 +509,38 @@ enum SummonPropFlags
 
 enum VehicleSeatFlags
 {
-    VEHICLE_SEAT_FLAG_HAS_LOWER_ANIM_FOR_ENTER   = 0x00000001,
-    VEHICLE_SEAT_FLAG_HAS_LOWER_ANIM_FOR_RIDE    = 0x00000002,
-    VEHICLE_SEAT_FLAG_SHOULD_USE_VEH_SEAT_EXIT_ANIM_ON_VOLUNTARY_EXIT = 0x00000008,
-    VEHICLE_SEAT_FLAG_HIDE_PASSENGER             = 0x00000200,           // Passenger is hidden
-    VEHICLE_SEAT_FLAG_ALLOW_TURNING              = 0x00000400,           // needed for CGCamera__SyncFreeLookFacing
-    VEHICLE_SEAT_FLAG_CAN_CONTROL                = 0x00000800,           // Lua_UnitInVehicleControlSeat
-    VEHICLE_SEAT_FLAG_CAN_CAST_MOUNT_SPELL       = 0x00001000,           // Can cast spells with SPELL_AURA_MOUNTED from seat (possibly 4.x only, 0 seats on 3.3.5a)
-    VEHICLE_SEAT_FLAG_UNCONTROLLED               = 0x00002000,           // can override !& VEHICLE_SEAT_FLAG_CAN_ENTER_OR_EXIT
-    VEHICLE_SEAT_FLAG_CAN_ATTACK                 = 0x00004000,           // Can attack, cast spells and use items from vehicle
-    VEHICLE_SEAT_FLAG_SHOULD_USE_VEH_SEAT_EXIT_ANIMN_ON_FORCED_EXIT = 0x00008000,
-    VEHICLE_SEAT_FLAG_UNK17                      = 0x00010000,
-    VEHICLE_SEAT_FLAG_UNK18                      = 0x00020000,           // Needs research and support (28 vehicles): Allow entering vehicles while keeping specific permanent(?) auras that impose visuals (states like beeing under freeze/stun mechanic, emote state animations).
-    VEHICLE_SEAT_FLAG_HAS_VEH_EXIT_ANIM_VOLUNTARY_EXIT = 0x00040000,
-    VEHICLE_SEAT_FLAG_HAS_VEH_EXIT_ANIM_FORCED_EXIT = 0x00080000,
-    VEHICLE_SEAT_FLAG_REC_HAS_VEHICLE_ENTER_ANIM = 0x00400000,
-    VEHICLE_SEAT_FLAG_ENABLE_VEHICLE_ZOOM        = 0x01000000,
-    VEHICLE_SEAT_FLAG_CAN_ENTER_OR_EXIT          = 0x02000000,           // Lua_CanExitVehicle - can enter and exit at free will
-    VEHICLE_SEAT_FLAG_CAN_SWITCH                 = 0x04000000,           // Lua_CanSwitchVehicleSeats
+    VEHICLE_SEAT_FLAG_HAS_LOWER_ANIM_FOR_ENTER                         = 0x00000001,
+    VEHICLE_SEAT_FLAG_HAS_LOWER_ANIM_FOR_RIDE                          = 0x00000002,
+    VEHICLE_SEAT_FLAG_UNK3                                             = 0x00000004,
+    VEHICLE_SEAT_FLAG_SHOULD_USE_VEH_SEAT_EXIT_ANIM_ON_VOLUNTARY_EXIT  = 0x00000008,
+    VEHICLE_SEAT_FLAG_UNK5                                             = 0x00000010,
+    VEHICLE_SEAT_FLAG_UNK6                                             = 0x00000020,
+    VEHICLE_SEAT_FLAG_UNK7                                             = 0x00000040,
+    VEHICLE_SEAT_FLAG_UNK8                                             = 0x00000080,
+    VEHICLE_SEAT_FLAG_UNK9                                             = 0x00000100,
+    VEHICLE_SEAT_FLAG_HIDE_PASSENGER                                   = 0x00000200, // Passenger is hidden
+    VEHICLE_SEAT_FLAG_ALLOW_TURNING                                    = 0x00000400, // needed for CGCamera__SyncFreeLookFacing
+    VEHICLE_SEAT_FLAG_CAN_CONTROL                                      = 0x00000800, // Lua_UnitInVehicleControlSeat
+    VEHICLE_SEAT_FLAG_CAN_CAST_MOUNT_SPELL                             = 0x00001000, // Can cast spells with SPELL_AURA_MOUNTED from seat (possibly 4.x only, 0 seats on 3.3.5a)
+    VEHICLE_SEAT_FLAG_UNCONTROLLED                                     = 0x00002000, // can override !& VEHICLE_SEAT_FLAG_CAN_ENTER_OR_EXIT
+    VEHICLE_SEAT_FLAG_CAN_ATTACK                                       = 0x00004000, // Can attack, cast spells and use items from vehicle
+    VEHICLE_SEAT_FLAG_SHOULD_USE_VEH_SEAT_EXIT_ANIM_ON_FORCED_EXIT     = 0x00008000,
+    VEHICLE_SEAT_FLAG_UNK17                                            = 0x00010000,
+    VEHICLE_SEAT_FLAG_UNK18                                            = 0x00020000, // Needs research and support (28 vehicles): Allow entering vehicles while keeping specific permanent(?) auras that impose visuals (states like beeing under freeze/stun mechanic, emote state animations).
+    VEHICLE_SEAT_FLAG_HAS_VEH_EXIT_ANIM_VOLUNTARY_EXIT                 = 0x00040000,
+    VEHICLE_SEAT_FLAG_HAS_VEH_EXIT_ANIM_FORCED_EXIT                    = 0x00080000,
+    VEHICLE_SEAT_FLAG_PASSENGER_NOT_SELECTABLE                         = 0x00100000,
+    VEHICLE_SEAT_FLAG_UNK22                                            = 0x00200000,
+    VEHICLE_SEAT_FLAG_REC_HAS_VEHICLE_ENTER_ANIM                       = 0x00400000,
+    VEHICLE_SEAT_FLAG_IS_USING_VEHICLE_CONTROLS                        = 0x00800000, // Lua_IsUsingVehicleControls
+    VEHICLE_SEAT_FLAG_ENABLE_VEHICLE_ZOOM                              = 0x01000000,
+    VEHICLE_SEAT_FLAG_CAN_ENTER_OR_EXIT                                = 0x02000000, // Lua_CanExitVehicle - can enter and exit at free will
+    VEHICLE_SEAT_FLAG_CAN_SWITCH                                       = 0x04000000, // Lua_CanSwitchVehicleSeats
     VEHICLE_SEAT_FLAG_HAS_START_WARITING_FOR_VEH_TRANSITION_ANIM_ENTER = 0x08000000,
-    VEHICLE_SEAT_FLAG_HAS_START_WARITING_FOR_VEH_TRANSITION_ANIM_EXIT = 0x10000000,
-    VEHICLE_SEAT_FLAG_CAN_CAST                   = 0x20000000,           // Lua_UnitHasVehicleUI
-    VEHICLE_SEAT_FLAG_UNK2                       = 0x40000000,           // checked in conjunction with 0x800 in CastSpell2
-    VEHICLE_SEAT_FLAG_ALLOWS_INTERACTION         = 0x80000000
+    VEHICLE_SEAT_FLAG_HAS_START_WARITING_FOR_VEH_TRANSITION_ANIM_EXIT  = 0x10000000,
+    VEHICLE_SEAT_FLAG_CAN_CAST                                         = 0x20000000, // Lua_UnitHasVehicleUI
+    VEHICLE_SEAT_FLAG_UNK2                                             = 0x40000000, // checked in conjunction with 0x800 in CastSpell2
+    VEHICLE_SEAT_FLAG_ALLOWS_INTERACTION                               = 0x80000000
 };
 
 enum VehicleSeatFlagsB
@@ -543,7 +574,7 @@ enum CurrencyTypes
     CURRENCY_TYPE_JUSTICE_POINTS        = 395,
     CURRENCY_TYPE_VALOR_POINTS          = 396,
     CURRENCY_TYPE_CONQUEST_META_ARENA   = 483,
-    CURRENCY_TYPE_CONQUEST_META_BG      = 484,
+    CURRENCY_TYPE_CONQUEST_META_RBG     = 484,
 
     // Archaeology.
     CURRENCY_TYPE_DWARF_FRAGMENT        = 384,

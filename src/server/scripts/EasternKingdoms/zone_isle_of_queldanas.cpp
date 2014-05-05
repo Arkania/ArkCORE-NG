@@ -38,7 +38,6 @@ EndContentData */
 /*######
 ## npc_converted_sentry
 ######*/
-
 enum ConvertedSentry
 {
     SAY_CONVERTED           = 0,
@@ -51,34 +50,34 @@ class npc_converted_sentry : public CreatureScript
 public:
     npc_converted_sentry() : CreatureScript("npc_converted_sentry") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new npc_converted_sentryAI (creature);
+        return new npc_converted_sentryAI(creature);
     }
 
     struct npc_converted_sentryAI : public ScriptedAI
     {
-        npc_converted_sentryAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_converted_sentryAI(Creature* creature) : ScriptedAI(creature) { }
 
         bool Credit;
         uint32 Timer;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             Credit = false;
             Timer = 2500;
         }
 
-        void MoveInLineOfSight(Unit* /*who*/) {}
-        void EnterCombat(Unit* /*who*/) {}
+        void MoveInLineOfSight(Unit* /*who*/) OVERRIDE { }
 
-        void UpdateAI(const uint32 diff)
+        void EnterCombat(Unit* /*who*/) OVERRIDE { }
+
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (!Credit)
             {
                 if (Timer <= diff)
                 {
-                    uint32 i = urand(1, 2);
                     Talk(SAY_CONVERTED);
 
                     DoCast(me, SPELL_CONVERT_CREDIT);
@@ -105,41 +104,31 @@ class npc_greengill_slave : public CreatureScript
 public:
     npc_greengill_slave() : CreatureScript("npc_greengill_slave") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
         return new npc_greengill_slaveAI(creature);
     }
 
     struct npc_greengill_slaveAI : public ScriptedAI
     {
-        npc_greengill_slaveAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_greengill_slaveAI(Creature* creature) : ScriptedAI(creature) { }
 
-        uint64 PlayerGUID;
+        void EnterCombat(Unit* /*who*/) OVERRIDE { }
 
-        void EnterCombat(Unit* /*who*/){}
-
-        void Reset()
+        void SpellHit(Unit* caster, SpellInfo const* spellInfo) OVERRIDE
         {
-        PlayerGUID = 0;
-        }
-
-        void SpellHit(Unit* caster, const SpellInfo* spell)
-        {
-            if (!caster)
+            Player* player = caster->ToPlayer();
+            if (!player)
                 return;
 
-            if (caster->GetTypeId() == TYPEID_PLAYER && spell->Id == ORB && !me->HasAura(ENRAGE))
+            if (spellInfo->Id == ORB && !me->HasAura(ENRAGE))
             {
-                PlayerGUID = caster->GetGUID();
-                if (PlayerGUID)
-                {
-                    Player* player = Unit::GetPlayer(*me, PlayerGUID);
-                    if (player && player->GetQuestStatus(QUESTG) == QUEST_STATUS_INCOMPLETE)
-                        DoCast(player, 45110, true);
-                }
+                if (player->GetQuestStatus(QUESTG) == QUEST_STATUS_INCOMPLETE)
+                    DoCast(player, 45110, true);
+
                 DoCast(me, ENRAGE);
-                Unit* Myrmidon = me->FindNearestCreature(DM, 70);
-                if (Myrmidon)
+
+                if (Creature* Myrmidon = me->FindNearestCreature(DM, 70))
                 {
                     me->AddThreat(Myrmidon, 100000.0f);
                     AttackStart(Myrmidon);
@@ -147,7 +136,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 /*diff*/)
+        void UpdateAI(uint32 /*diff*/) OVERRIDE
         {
             DoMeleeAttackIfReady();
         }

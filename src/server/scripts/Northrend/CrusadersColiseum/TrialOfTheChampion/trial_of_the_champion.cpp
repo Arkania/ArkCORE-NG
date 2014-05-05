@@ -131,7 +131,7 @@ public:
                 uiPhase = uiPhaseStep;
         }
 
-        void SetData(uint32 uiType, uint32 /*uiData*/)
+        void SetData(uint32 uiType, uint32 /*uiData*/) OVERRIDE
         {
             switch (uiType)
             {
@@ -186,16 +186,13 @@ public:
             }
         }
 
-        void MovementInform(uint32 uiType, uint32 uiPointId)
+        void MovementInform(uint32 uiType, uint32 uiPointId) OVERRIDE
         {
             if (uiType != POINT_MOTION_TYPE)
                 return;
 
             if (uiPointId == 1)
-            {
-                me->SetOrientation(ORIENTATION);
-                me->SendMovementFlagUpdate();
-            }
+                me->SetFacingTo(ORIENTATION);
         }
 
         void DoSummonGrandChampion(uint32 uiBoss)
@@ -240,11 +237,8 @@ public:
                         if (Vehicle* pVehicle = pBoss->GetVehicleKit())
                             if (Unit* unit = pVehicle->GetPassenger(0))
                                 uiGrandChampionBoss1 = unit->GetGUID();
-                        if (instance)
-                        {
-                            instance->SetData64(DATA_GRAND_CHAMPION_VEHICLE_1, uiVehicle1GUID);
-                            instance->SetData64(DATA_GRAND_CHAMPION_1, uiGrandChampionBoss1);
-                        }
+                        instance->SetData64(DATA_GRAND_CHAMPION_VEHICLE_1, uiVehicle1GUID);
+                        instance->SetData64(DATA_GRAND_CHAMPION_1, uiGrandChampionBoss1);
                         pBoss->AI()->SetData(1, 0);
                         break;
                     }
@@ -255,11 +249,8 @@ public:
                         if (Vehicle* pVehicle = pBoss->GetVehicleKit())
                             if (Unit* unit = pVehicle->GetPassenger(0))
                                 uiGrandChampionBoss2 = unit->GetGUID();
-                        if (instance)
-                        {
-                            instance->SetData64(DATA_GRAND_CHAMPION_VEHICLE_2, uiVehicle2GUID);
-                            instance->SetData64(DATA_GRAND_CHAMPION_2, uiGrandChampionBoss2);
-                        }
+                        instance->SetData64(DATA_GRAND_CHAMPION_VEHICLE_2, uiVehicle2GUID);
+                        instance->SetData64(DATA_GRAND_CHAMPION_2, uiGrandChampionBoss2);
                         pBoss->AI()->SetData(2, 0);
                         break;
                     }
@@ -270,11 +261,8 @@ public:
                         if (Vehicle* pVehicle = pBoss->GetVehicleKit())
                             if (Unit* unit = pVehicle->GetPassenger(0))
                                 uiGrandChampionBoss3 = unit->GetGUID();
-                        if (instance)
-                        {
-                            instance->SetData64(DATA_GRAND_CHAMPION_VEHICLE_3, uiVehicle3GUID);
-                            instance->SetData64(DATA_GRAND_CHAMPION_3, uiGrandChampionBoss3);
-                        }
+                        instance->SetData64(DATA_GRAND_CHAMPION_VEHICLE_3, uiVehicle3GUID);
+                        instance->SetData64(DATA_GRAND_CHAMPION_3, uiGrandChampionBoss3);
                         pBoss->AI()->SetData(3, 0);
                         break;
                     }
@@ -363,9 +351,6 @@ public:
 
         void StartEncounter()
         {
-            if (!instance)
-                return;
-
             me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
 
             if (instance->GetData(BOSS_BLACK_KNIGHT) == NOT_STARTED)
@@ -373,7 +358,7 @@ public:
                 if (instance->GetData(BOSS_ARGENT_CHALLENGE_E) == NOT_STARTED && instance->GetData(BOSS_ARGENT_CHALLENGE_P) == NOT_STARTED)
                 {
                     if (instance->GetData(BOSS_GRAND_CHAMPIONS) == NOT_STARTED)
-                        me->AI()->SetData(DATA_START, 0);
+                        SetData(DATA_START, 0);
 
                     if (instance->GetData(BOSS_GRAND_CHAMPIONS) == DONE)
                         DoStartArgentChampionEncounter();
@@ -397,7 +382,7 @@ public:
             {
                 if (Player* player = i->GetSource())
                 {
-                    if (player->isGameMaster())
+                    if (player->IsGameMaster())
                         continue;
 
                     if (player->IsAlive())
@@ -413,7 +398,7 @@ public:
             }
         }
 
-       void UpdateAI(const uint32 uiDiff)
+       void UpdateAI(uint32 uiDiff) OVERRIDE
         {
             ScriptedAI::UpdateAI(uiDiff);
 
@@ -445,16 +430,16 @@ public:
                 return;
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) OVERRIDE
         {
-            if (instance && instance->GetData(BOSS_GRAND_CHAMPIONS) == NOT_STARTED)
+            if (instance->GetData(BOSS_GRAND_CHAMPIONS) == NOT_STARTED)
             {
                 summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                 summon->SetReactState(REACT_PASSIVE);
             }
         }
 
-        void SummonedCreatureDespawn(Creature* summon)
+        void SummonedCreatureDespawn(Creature* summon) OVERRIDE
         {
             switch (summon->GetEntry())
             {
@@ -468,18 +453,18 @@ public:
                 case VEHICLE_ORGRIMMAR_WOLF:
                 case VEHICLE_SILVERMOON_HAWKSTRIDER:
                 case VEHICLE_DARKSPEAR_RAPTOR:
-                    me->AI()->SetData(DATA_LESSER_CHAMPIONS_DEFEATED, 0);
+                    SetData(DATA_LESSER_CHAMPIONS_DEFEATED, 0);
                     break;
             }
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new npc_announcer_toc5AI(creature);
+        return GetInstanceAI<npc_announcer_toc5AI>(creature);
     }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) OVERRIDE
     {
         InstanceScript* instance = creature->GetInstanceScript();
 
@@ -504,7 +489,7 @@ public:
         return true;
     }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) OVERRIDE
     {
         player->PlayerTalkClass->ClearMenus();
         if (action == GOSSIP_ACTION_INFO_DEF+1)

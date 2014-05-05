@@ -38,14 +38,14 @@ class boss_noxxion : public CreatureScript
 public:
     boss_noxxion() : CreatureScript("boss_noxxion") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new boss_noxxionAI (creature);
+        return new boss_noxxionAI(creature);
     }
 
     struct boss_noxxionAI : public ScriptedAI
     {
-        boss_noxxionAI(Creature* creature) : ScriptedAI(creature) {}
+        boss_noxxionAI(Creature* creature) : ScriptedAI(creature) { }
 
         uint32 ToxicVolleyTimer;
         uint32 UppercutTimer;
@@ -53,7 +53,7 @@ public:
         uint32 InvisibleTimer;
         bool Invisible;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             ToxicVolleyTimer = 7000;
             UppercutTimer = 16000;
@@ -62,7 +62,7 @@ public:
             Invisible = false;
         }
 
-        void EnterCombat(Unit* /*who*/) {}
+        void EnterCombat(Unit* /*who*/) OVERRIDE { }
 
         void SummonAdds(Unit* victim)
         {
@@ -70,7 +70,7 @@ public:
                 Add->AI()->AttackStart(victim);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (Invisible && InvisibleTimer <= diff)
             {

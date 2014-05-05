@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "ScriptMgr.h"
 #include "OutdoorPvPNA.h"
 #include "Player.h"
 #include "ObjectMgr.h"
@@ -23,11 +24,11 @@
 #include "WorldPacket.h"
 #include "Language.h"
 #include "World.h"
-#include "ScriptMgr.h"
 
 OutdoorPvPNA::OutdoorPvPNA()
 {
     m_TypeId = OUTDOOR_PVP_NA;
+    m_obj = NULL;
 }
 
 void OutdoorPvPNA::HandleKillImpl(Player* player, Unit* killed)
@@ -215,10 +216,8 @@ bool OutdoorPvPNA::SetupOutdoorPvP()
 
     // halaa
     m_obj = new OPvPCapturePointNA(this);
-    if (!m_obj)
-        return false;
-    AddCapturePoint(m_obj);
 
+    AddCapturePoint(m_obj);
     return true;
 }
 
@@ -669,7 +668,7 @@ class OutdoorPvP_nagrand : public OutdoorPvPScript
         {
         }
 
-        OutdoorPvP* GetOutdoorPvP() const
+        OutdoorPvP* GetOutdoorPvP() const OVERRIDE
         {
             return new OutdoorPvPNA();
         }

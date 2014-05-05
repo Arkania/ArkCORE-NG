@@ -31,7 +31,7 @@ namespace Trinity
     {
         inline float hk_honor_at_level_f(uint8 level, float multiplier = 1.0f)
         {
-            float honor = multiplier * 4.5f; // OLD: multiplier * level * 1.55f; // 4.3: 4.5 Honor points per kill divided among all friendly players in range/group.
+             float honor = multiplier * 4.5f; // OLD: multiplier * level * 1.55f; // 4.3: 4.5 Honor points per kill divided among all friendly players in range/group.
             sScriptMgr->OnHonorCalculation(honor, level, multiplier);
             return honor;
         }
@@ -133,7 +133,7 @@ namespace Trinity
                     nBaseExp = 1878;
                     break;
                 default:
-                    sLog->outError("BaseGain: Unsupported content level %u", content);
+                    TC_LOG_ERROR("misc", "BaseGain: Unsupported content level %u", content);
                     nBaseExp = 45;
                     break;
             }
@@ -230,13 +230,13 @@ namespace Trinity
     {
         inline uint32 ConquestRatingCalculator(uint32 rate)
         {
-           if (rate <= 1500)
-               return 1350; // Default conquest points
-           else if (rate > 3000)
-               rate = 3000;
+            if (rate <= 1500)
+                return 1350; // Default conquest points
+            else if (rate > 3000)
+                rate = 3000;
 
-           // http://www.arenajunkies.com/topic/179536-conquest-point-cap-vs-personal-rating-chart/page__st__60#entry3085246
-           return uint32(1.4326 * ((1511.26 / (1 + 1639.28 / exp(0.00412 * rate))) + 850.15));
+            // http://www.arenajunkies.com/topic/179536-conquest-point-cap-vs-personal-rating-chart/page__st__60#entry3085246
+            return uint32(1.4326 * ((1511.26 / (1 + 1639.28 / exp(0.00412 * rate))) + 850.15));
         }
 
         inline uint32 BgConquestRatingCalculator(uint32 rate)

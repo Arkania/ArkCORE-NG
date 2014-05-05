@@ -54,7 +54,7 @@ struct npc_escortAI : public ScriptedAI
 {
     public:
         explicit npc_escortAI(Creature* creature);
-        ~npc_escortAI() {}
+        ~npc_escortAI() { }
 
         // CreatureAI functions
         void AttackStart(Unit* who);
@@ -69,7 +69,7 @@ struct npc_escortAI : public ScriptedAI
 
         void EnterEvadeMode();
 
-        void UpdateAI(uint32 const diff);                   //the "internal" update, calls UpdateEscortAI()
+        void UpdateAI(uint32 diff);                   //the "internal" update, calls UpdateEscortAI()
         virtual void UpdateEscortAI(uint32 const diff);     //used when it's needed to add code in update (abilities, scripted events, etc)
 
         void MovementInform(uint32, uint32);
@@ -87,7 +87,7 @@ struct npc_escortAI : public ScriptedAI
         bool GetWaypointPosition(uint32 pointId, float& x, float& y, float& z);
 
         virtual void WaypointReached(uint32 pointId) = 0;
-        virtual void WaypointStart(uint32 /*pointId*/) {}
+        virtual void WaypointStart(uint32 /*pointId*/) { }
 
         void Start(bool isActiveAttacker = true, bool run = false, uint64 playerGUID = 0, Quest const* quest = NULL, bool instantRespawn = false, bool canLoopPath = false, bool resetWaypoints = true);
 
@@ -105,11 +105,9 @@ struct npc_escortAI : public ScriptedAI
         bool GetAttack() { return m_bIsActiveAttacker; }//used in EnterEvadeMode override
         void SetCanAttack(bool attack) { m_bIsActiveAttacker = attack; }
         uint64 GetEventStarterGUID() { return m_uiPlayerGUID; }
-        void SetSpeedXY(float speed){ speedXY = speed; }
-        void SetSpeedZ(float speed){ speedZ = speed; }
 
     protected:
-        Player* GetPlayerForEscort() { return (Player*)Unit::GetUnit(*me, m_uiPlayerGUID); }
+        Player* GetPlayerForEscort() { return ObjectAccessor::GetPlayer(*me, m_uiPlayerGUID); }
 
     private:
         bool AssistPlayerInCombat(Unit* who);
@@ -124,8 +122,6 @@ struct npc_escortAI : public ScriptedAI
         uint32 m_uiPlayerCheckTimer;
         uint32 m_uiEscortState;
         float MaxPlayerDistance;
-        float speedXY;
-        float speedZ;
 
         Quest const* m_pQuestForEscort;                     //generally passed in Start() when regular escort script.
 
@@ -142,4 +138,3 @@ struct npc_escortAI : public ScriptedAI
         bool HasImmuneToNPCFlags;
 };
 #endif
-

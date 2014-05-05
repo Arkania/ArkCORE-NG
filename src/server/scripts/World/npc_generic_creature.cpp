@@ -37,26 +37,26 @@ public:
 
     struct generic_creatureAI : public ScriptedAI
     {
-        generic_creatureAI(Creature* creature) : ScriptedAI(creature) {}
+        generic_creatureAI(Creature* creature) : ScriptedAI(creature) { }
 
         uint32 GlobalCooldown;      //This variable acts like the global cooldown that players have (1.5 seconds)
         uint32 BuffTimer;           //This variable keeps track of buffs
         bool IsSelfRooted;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             GlobalCooldown = 0;
             BuffTimer = 0;          //Rebuff as soon as we can
             IsSelfRooted = false;
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) OVERRIDE
         {
             if (!me->IsWithinMeleeRange(who))
                 IsSelfRooted = true;
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             //Always decrease our global cooldown first
             if (GlobalCooldown > diff)
@@ -94,7 +94,7 @@ public:
             if (me->IsWithinMeleeRange(me->GetVictim()))
             {
                 //Make sure our attack is ready and we arn't currently casting
-                if (me->isAttackReady() && !me->IsNonMeleeSpellCasted(false))
+                if (me->isAttackReady() && !me->IsNonMeleeSpellCast(false))
                 {
                     bool Healing = false;
                     SpellInfo const* info = NULL;
@@ -125,7 +125,7 @@ public:
             else
             {
                 //Only run this code if we arn't already casting
-                if (!me->IsNonMeleeSpellCasted(false))
+                if (!me->IsNonMeleeSpellCast(false))
                 {
                     bool Healing = false;
                     SpellInfo const* info = NULL;
@@ -164,7 +164,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
         return new generic_creatureAI(creature);
     }
@@ -187,7 +187,7 @@ public:
         uint32 timer, interval;
         const SpellInfo* spell;
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (timer <= diff)
             {
@@ -200,7 +200,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
         return new trigger_periodicAI(creature);
     }
@@ -213,15 +213,15 @@ public:
 
     struct trigger_deathAI : public NullCreatureAI
     {
-        trigger_deathAI(Creature* creature) : NullCreatureAI(creature) {}
-        void JustDied(Unit* killer)
+        trigger_deathAI(Creature* creature) : NullCreatureAI(creature) { }
+        void JustDied(Unit* killer) OVERRIDE
         {
             if (me->m_spells[0])
                 me->CastSpell(killer, me->m_spells[0], true);
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
         return new trigger_deathAI(creature);
     }

@@ -50,7 +50,10 @@ enum Events
     EVENT_FRENZY    = 3
 };
 
-#define DATA_FRENZY_DISPELS 1
+enum Misc
+{
+    DATA_FRENZY_DISPELS         = 1
+};
 
 class boss_faerlina : public CreatureScript
 {
@@ -65,7 +68,7 @@ class boss_faerlina : public CreatureScript
             }
 
 
-            void EnterCombat(Unit* /*who*/)
+            void EnterCombat(Unit* /*who*/) OVERRIDE
             {
                 _EnterCombat();
                 Talk(SAY_AGGRO);
@@ -74,14 +77,15 @@ class boss_faerlina : public CreatureScript
                 events.ScheduleEvent(EVENT_FRENZY, urand(60000, 80000));
             }
 
-            void Reset()
+            void Reset() OVERRIDE
             {
                 _Reset();
                 _delayFrenzy = false;
                 _frenzyDispels = 0;
             }
 
-            void MoveInLineOfSight(Unit* who)
+            void MoveInLineOfSight(Unit* who) OVERRIDE
+
             {
                 if (!_introDone && who->GetTypeId() == TYPEID_PLAYER)
                 {
@@ -92,30 +96,30 @@ class boss_faerlina : public CreatureScript
                 BossAI::MoveInLineOfSight(who);
             }
 
-            void KilledUnit(Unit* /*victim*/)
+            void KilledUnit(Unit* /*victim*/) OVERRIDE
             {
                 if (!urand(0, 2))
                     Talk(SAY_SLAY);
             }
 
-            void JustDied(Unit* /*killer*/)
+            void JustDied(Unit* /*killer*/) OVERRIDE
             {
                 _JustDied();
                 Talk(SAY_DEATH);
             }
 
-            void SpellHit(Unit* caster, SpellInfo const* spell)
+            void SpellHit(Unit* caster, SpellInfo const* spell) OVERRIDE
             {
                 if (spell->Id == SPELL_WIDOWS_EMBRACE || spell->Id == H_SPELL_WIDOWS_EMBRACE)
                 {
-                    // TODO : Add Text
+                    /// @todo Add Text
                     ++_frenzyDispels;
                     _delayFrenzy = true;
                     me->Kill(caster);
                 }
             }
 
-            uint32 GetData(uint32 type) const
+            uint32 GetData(uint32 type) const OVERRIDE
             {
                 if (type == DATA_FRENZY_DISPELS)
                     return _frenzyDispels;
@@ -123,7 +127,7 @@ class boss_faerlina : public CreatureScript
                 return 0;
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff) OVERRIDE
             {
                 if (!UpdateVictim())
                     return;
@@ -154,7 +158,7 @@ class boss_faerlina : public CreatureScript
                             events.ScheduleEvent(EVENT_FIRE, urand(6000, 18000));
                             break;
                         case EVENT_FRENZY:
-                            // TODO : Add Text
+                            /// @todo Add Text
                             if (!me->HasAura(SPELL_WIDOWS_EMBRACE_HELPER))
                                 DoCast(me, RAID_MODE(SPELL_FRENZY, H_SPELL_FRENZY));
                             else
@@ -174,7 +178,7 @@ class boss_faerlina : public CreatureScript
             bool _delayFrenzy;
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const OVERRIDE
         {
             return new boss_faerlinaAI(creature);
         }
@@ -192,7 +196,7 @@ class npc_faerlina_add : public CreatureScript
             {
             }
 
-            void Reset()
+            void Reset() OVERRIDE
             {
                 if (GetDifficulty() == RAID_DIFFICULTY_10MAN_NORMAL) {
                     me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_BIND, true);
@@ -200,7 +204,7 @@ class npc_faerlina_add : public CreatureScript
                 }
             }
 
-            void JustDied(Unit* /*killer*/)
+            void JustDied(Unit* /*killer*/) OVERRIDE
             {
                 if (_instance && GetDifficulty() == RAID_DIFFICULTY_10MAN_NORMAL)
                     if (Creature* faerlina = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_FAERLINA)))
@@ -211,9 +215,9 @@ class npc_faerlina_add : public CreatureScript
             InstanceScript* const _instance;
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const OVERRIDE
         {
-            return new npc_faerlina_addAI(creature);
+            return GetInstanceAI<npc_faerlina_addAI>(creature);
         }
 };
 
@@ -222,7 +226,7 @@ class achievement_momma_said_knock_you_out : public AchievementCriteriaScript
     public:
         achievement_momma_said_knock_you_out() : AchievementCriteriaScript("achievement_momma_said_knock_you_out") { }
 
-        bool OnCheck(Player* /*source*/, Unit* target)
+        bool OnCheck(Player* /*source*/, Unit* target) OVERRIDE
         {
             return target && !target->GetAI()->GetData(DATA_FRENZY_DISPELS);
         }

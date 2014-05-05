@@ -40,21 +40,21 @@ class boss_scorn : public CreatureScript
 public:
     boss_scorn() : CreatureScript("boss_scorn") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new boss_scornAI (creature);
+        return new boss_scornAI(creature);
     }
 
     struct boss_scornAI : public ScriptedAI
     {
-        boss_scornAI(Creature* creature) : ScriptedAI(creature) {}
+        boss_scornAI(Creature* creature) : ScriptedAI(creature) { }
 
         uint32 LichSlap_Timer;
         uint32 FrostboltVolley_Timer;
         uint32 MindFlay_Timer;
         uint32 FrostNova_Timer;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             LichSlap_Timer = 45000;
             FrostboltVolley_Timer = 30000;
@@ -62,9 +62,9 @@ public:
             FrostNova_Timer = 30000;
         }
 
-        void EnterCombat(Unit* /*who*/) {}
+        void EnterCombat(Unit* /*who*/) OVERRIDE { }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (!UpdateVictim())
                 return;
@@ -72,7 +72,7 @@ public:
             //LichSlap_Timer
             if (LichSlap_Timer <= diff)
             {
-                DoCast(me->GetVictim(), SPELL_LICHSLAP);
+                DoCastVictim(SPELL_LICHSLAP);
                 LichSlap_Timer = 45000;
             }
             else LichSlap_Timer -= diff;
@@ -80,7 +80,7 @@ public:
             //FrostboltVolley_Timer
             if (FrostboltVolley_Timer <= diff)
             {
-                DoCast(me->GetVictim(), SPELL_FROSTBOLTVOLLEY);
+                DoCastVictim(SPELL_FROSTBOLTVOLLEY);
                 FrostboltVolley_Timer = 20000;
             }
             else FrostboltVolley_Timer -= diff;
@@ -88,7 +88,7 @@ public:
             //MindFlay_Timer
             if (MindFlay_Timer <= diff)
             {
-                DoCast(me->GetVictim(), SPELL_MINDFLAY);
+                DoCastVictim(SPELL_MINDFLAY);
                 MindFlay_Timer = 20000;
             }
             else MindFlay_Timer -= diff;
@@ -96,7 +96,7 @@ public:
             //FrostNova_Timer
             if (FrostNova_Timer <= diff)
             {
-                DoCast(me->GetVictim(), SPELL_FROSTNOVA);
+                DoCastVictim(SPELL_FROSTNOVA);
                 FrostNova_Timer = 15000;
             }
             else FrostNova_Timer -= diff;

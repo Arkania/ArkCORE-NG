@@ -34,6 +34,7 @@
 void WorldSession::SendTradeStatus(TradeStatus status)
 {
     ObjectGuid guid;
+
     WorldPacket data(SMSG_TRADE_STATUS, 4+8);
     data.WriteBit(0); // unk bit, usually 0
     data.WriteBits(status, 5);
@@ -60,6 +61,7 @@ void WorldSession::SendTradeStatus(TradeStatus status)
             data.WriteByteSeq(guid[7]);
             data.WriteByteSeq(guid[6]);
             data.WriteByteSeq(guid[5]);
+            data.FlushBits();
             break;
         case TRADE_STATUS_OPEN_WINDOW:
             data.FlushBits();
@@ -91,12 +93,12 @@ void WorldSession::SendTradeStatus(TradeStatus status)
 
 void WorldSession::HandleIgnoreTradeOpcode(WorldPacket& /*recvPacket*/)
 {
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Ignore Trade %u", _player->GetGUIDLow());
+    TC_LOG_DEBUG("network", "WORLD: Ignore Trade %u", _player->GetGUIDLow());
 }
 
 void WorldSession::HandleBusyTradeOpcode(WorldPacket& /*recvPacket*/)
 {
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Busy Trade %u", _player->GetGUIDLow());
+    TC_LOG_DEBUG("network", "WORLD: Busy Trade %u", _player->GetGUIDLow());
 }
 
 void WorldSession::SendUpdateTrade(bool trader_data /*= true*/)
@@ -238,8 +240,8 @@ void WorldSession::moveItems(Item* myItems[], Item* hisItems[])
             if (myItems[i])
             {
                 // logging
-                sLog->outDebug(LOG_FILTER_NETWORKIO, "partner storing: %u", myItems[i]->GetGUIDLow());
-                if (!AccountMgr::IsPlayerAccount(_player->GetSession()->GetSecurity()) && sWorld->getBoolConfig(CONFIG_GM_LOG_TRADE))
+                TC_LOG_DEBUG("network", "partner storing: %u", myItems[i]->GetGUIDLow());
+                if (HasPermission(rbac::RBAC_PERM_LOG_GM_TRADE))
                 {
                     sLog->outCommand(_player->GetSession()->GetAccountId(), "GM %s (Account: %u) trade: %s (Entry: %d Count: %u) to player: %s (Account: %u)",
                         _player->GetName().c_str(), _player->GetSession()->GetAccountId(),
@@ -256,8 +258,8 @@ void WorldSession::moveItems(Item* myItems[], Item* hisItems[])
             if (hisItems[i])
             {
                 // logging
-                sLog->outDebug(LOG_FILTER_NETWORKIO, "player storing: %u", hisItems[i]->GetGUIDLow());
-                if (!AccountMgr::IsPlayerAccount(trader->GetSession()->GetSecurity()) && sWorld->getBoolConfig(CONFIG_GM_LOG_TRADE))
+                TC_LOG_DEBUG("network", "player storing: %u", hisItems[i]->GetGUIDLow());
+                if (HasPermission(rbac::RBAC_PERM_LOG_GM_TRADE))
                 {
                     sLog->outCommand(trader->GetSession()->GetAccountId(), "GM %s (Account: %u) trade: %s (Entry: %d Count: %u) to player: %s (Account: %u)",
                         trader->GetName().c_str(), trader->GetSession()->GetAccountId(),
@@ -279,21 +281,21 @@ void WorldSession::moveItems(Item* myItems[], Item* hisItems[])
             if (myItems[i])
             {
                 if (!traderCanTrade)
-                    sLog->outError("trader can't store item: %u", myItems[i]->GetGUIDLow());
+                    TC_LOG_ERROR("network", "trader can't store item: %u", myItems[i]->GetGUIDLow());
                 if (_player->CanStoreItem(NULL_BAG, NULL_SLOT, playerDst, myItems[i], false) == EQUIP_ERR_OK)
                     _player->MoveItemToInventory(playerDst, myItems[i], true, true);
                 else
-                    sLog->outError("player can't take item back: %u", myItems[i]->GetGUIDLow());
+                    TC_LOG_ERROR("network", "player can't take item back: %u", myItems[i]->GetGUIDLow());
             }
             // return the already removed items to the original owner
             if (hisItems[i])
             {
                 if (!playerCanTrade)
-                    sLog->outError("player can't store item: %u", hisItems[i]->GetGUIDLow());
+                    TC_LOG_ERROR("network", "player can't store item: %u", hisItems[i]->GetGUIDLow());
                 if (trader->CanStoreItem(NULL_BAG, NULL_SLOT, traderDst, hisItems[i], false) == EQUIP_ERR_OK)
                     trader->MoveItemToInventory(traderDst, hisItems[i], true, true);
                 else
-                    sLog->outError("trader can't take item back: %u", hisItems[i]->GetGUIDLow());
+                    TC_LOG_ERROR("network", "trader can't take item back: %u", hisItems[i]->GetGUIDLow());
             }
         }
     }
@@ -311,7 +313,7 @@ static void setAcceptTradeMode(TradeData* myTrade, TradeData* hisTrade, Item* *m
     {
         if (Item* item = myTrade->GetItem(TradeSlots(i)))
         {
-            sLog->outStaticDebug("player trade item %u bag: %u slot: %u", item->GetGUIDLow(), item->GetBagSlot(), item->GetSlot());
+            TC_LOG_DEBUG("network", "player trade item %u bag: %u slot: %u", item->GetGUIDLow(), item->GetBagSlot(), item->GetSlot());
             //Can return NULL
             myItems[i] = item;
             myItems[i]->SetInTrade();
@@ -319,7 +321,7 @@ static void setAcceptTradeMode(TradeData* myTrade, TradeData* hisTrade, Item* *m
 
         if (Item* item = hisTrade->GetItem(TradeSlots(i)))
         {
-            sLog->outStaticDebug("partner trade item %u bag: %u slot: %u", item->GetGUIDLow(), item->GetBagSlot(), item->GetSlot());
+            TC_LOG_DEBUG("network", "partner trade item %u bag: %u slot: %u", item->GetGUIDLow(), item->GetBagSlot(), item->GetSlot());
             hisItems[i] = item;
             hisItems[i]->SetInTrade();
         }
@@ -381,6 +383,20 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& recvPacket)
         return;
     }
 
+    if (_player->GetMoney() >= uint64(MAX_MONEY_AMOUNT) - his_trade->GetMoney())
+    {
+        _player->SendEquipError(EQUIP_ERR_TOO_MUCH_GOLD, NULL, NULL);
+        my_trade->SetAccepted(false, true);
+        return;
+    }
+
+    if (trader->GetMoney() >= uint64(MAX_MONEY_AMOUNT) - my_trade->GetMoney())
+    {
+        trader->SendEquipError(EQUIP_ERR_TOO_MUCH_GOLD, NULL, NULL);
+        his_trade->SetAccepted(false, true);
+        return;
+    }
+
     // not accept if some items now can't be trade (cheating)
     for (uint8 i = 0; i < TRADE_SLOT_TRADED_COUNT; ++i)
     {
@@ -391,6 +407,7 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& recvPacket)
                 SendTradeStatus(TRADE_STATUS_TRADE_CANCELED);
                 return;
             }
+
             if (item->IsBindedNotWith(trader))
             {
                 SendTradeStatus(TRADE_STATUS_NOT_ELIGIBLE);
@@ -425,7 +442,7 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& recvPacket)
         Spell* his_spell = NULL;
         SpellCastTargets his_targets;
 
-        // not accept if spell can't be casted now (cheating)
+        // not accept if spell can't be cast now (cheating)
         if (uint32 my_spell_id = my_trade->GetSpell())
         {
             SpellInfo const* spellEntry = sSpellMgr->GetSpellInfo(my_spell_id);
@@ -460,7 +477,7 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& recvPacket)
             }
         }
 
-        // not accept if spell can't be casted now (cheating)
+        // not accept if spell can't be cast now (cheating)
         if (uint32 his_spell_id = his_trade->GetSpell())
         {
             SpellInfo const* spellEntry = sSpellMgr->GetSpellInfo(his_spell_id);
@@ -547,16 +564,17 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& recvPacket)
         moveItems(myItems, hisItems);
 
         // logging money
-        if (sWorld->getBoolConfig(CONFIG_GM_LOG_TRADE))
+        if (HasPermission(rbac::RBAC_PERM_LOG_GM_TRADE))
         {
-            if (!AccountMgr::IsPlayerAccount(_player->GetSession()->GetSecurity()) && my_trade->GetMoney() > 0)
+            if (my_trade->GetMoney() > 0)
             {
                 sLog->outCommand(_player->GetSession()->GetAccountId(), "GM %s (Account: %u) give money (Amount: " UI64FMTD ") to player: %s (Account: %u)",
                     _player->GetName().c_str(), _player->GetSession()->GetAccountId(),
                     my_trade->GetMoney(),
                     trader->GetName().c_str(), trader->GetSession()->GetAccountId());
             }
-            if (!AccountMgr::IsPlayerAccount(trader->GetSession()->GetSecurity()) && his_trade->GetMoney() > 0)
+
+            if (his_trade->GetMoney() > 0)
             {
                 sLog->outCommand(trader->GetSession()->GetAccountId(), "GM %s (Account: %u) give money (Amount: " UI64FMTD ") to player: %s (Account: %u)",
                     trader->GetName().c_str(), trader->GetSession()->GetAccountId(),

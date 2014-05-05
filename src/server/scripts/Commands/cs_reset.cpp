@@ -36,23 +36,23 @@ class reset_commandscript : public CommandScript
 public:
     reset_commandscript() : CommandScript("reset_commandscript") { }
 
-    ChatCommand* GetCommands() const
+    ChatCommand* GetCommands() const OVERRIDE
     {
         static ChatCommand resetCommandTable[] =
         {
-            { "achievements",   SEC_ADMINISTRATOR,  true,  &HandleResetAchievementsCommand,     "", NULL },
-            { "honor",          SEC_ADMINISTRATOR,  true,  &HandleResetHonorCommand,            "", NULL },
-            { "level",          SEC_ADMINISTRATOR,  true,  &HandleResetLevelCommand,            "", NULL },
-            { "spells",         SEC_ADMINISTRATOR,  true,  &HandleResetSpellsCommand,           "", NULL },
-            { "stats",          SEC_ADMINISTRATOR,  true,  &HandleResetStatsCommand,            "", NULL },
-            { "talents",        SEC_ADMINISTRATOR,  true,  &HandleResetTalentsCommand,          "", NULL },
-            { "all",            SEC_ADMINISTRATOR,  true,  &HandleResetAllCommand,              "", NULL },
-            { NULL,             0,                  false, NULL,                                "", NULL }
+            { "achievements", rbac::RBAC_PERM_COMMAND_RESET_ACHIEVEMENTS, true, &HandleResetAchievementsCommand, "", NULL },
+            { "honor",        rbac::RBAC_PERM_COMMAND_RESET_HONOR,        true, &HandleResetHonorCommand,        "", NULL },
+            { "level",        rbac::RBAC_PERM_COMMAND_RESET_LEVEL,        true, &HandleResetLevelCommand,        "", NULL },
+            { "spells",       rbac::RBAC_PERM_COMMAND_RESET_SPELLS,       true, &HandleResetSpellsCommand,       "", NULL },
+            { "stats",        rbac::RBAC_PERM_COMMAND_RESET_STATS,        true, &HandleResetStatsCommand,        "", NULL },
+            { "talents",      rbac::RBAC_PERM_COMMAND_RESET_TALENTS,      true, &HandleResetTalentsCommand,      "", NULL },
+            { "all",          rbac::RBAC_PERM_COMMAND_RESET_ALL,          true, &HandleResetAllCommand,          "", NULL },
+            { NULL,           0,                                   false, NULL,                            "", NULL }
         };
         static ChatCommand commandTable[] =
         {
-            { "reset",          SEC_ADMINISTRATOR,  true, NULL,                                 "", resetCommandTable },
-            { NULL,             0,                  false, NULL,                                "", NULL }
+            { "reset", rbac::RBAC_PERM_COMMAND_RESET, true, NULL, "", resetCommandTable },
+            { NULL,    0,                      false, NULL, "", NULL }
         };
         return commandTable;
     }
@@ -78,7 +78,6 @@ public:
         if (!handler->extractPlayerTarget((char*)args, &target))
             return false;
 
-        target->SetCurrency(CURRENCY_TYPE_HONOR_POINTS, 0);
         target->SetUInt32Value(PLAYER_FIELD_KILLS, 0);
         target->SetUInt32Value(PLAYER_FIELD_LIFETIME_HONORABLE_KILLS, 0);
         target->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EARN_HONORABLE_KILL);
@@ -91,7 +90,7 @@ public:
         ChrClassesEntry const* classEntry = sChrClassesStore.LookupEntry(player->getClass());
         if (!classEntry)
         {
-            sLog->outError("Class %u not found in DBC (Wrong DBC files?)", player->getClass());
+            TC_LOG_ERROR("misc", "Class %u not found in DBC (Wrong DBC files?)", player->getClass());
             return false;
         }
 
@@ -100,9 +99,6 @@ public:
         // reset m_form if no aura
         if (!player->HasAuraType(SPELL_AURA_MOD_SHAPESHIFT))
             player->SetShapeshiftForm(FORM_NONE);
-
-        player->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, DEFAULT_WORLD_OBJECT_SIZE);
-        player->SetFloatValue(UNIT_FIELD_COMBATREACH, DEFAULT_COMBAT_REACH);
 
         player->setFactionForRace(player->getRace());
 
@@ -118,8 +114,6 @@ public:
 
         //-1 is default value
         player->SetUInt32Value(PLAYER_FIELD_WATCHED_FACTION_INDEX, uint32(-1));
-
-        //player->SetUInt32Value(PLAYER_FIELD_BYTES, 0xEEE00000);
         return true;
     }
 

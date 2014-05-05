@@ -206,7 +206,7 @@ class OPvPCapturePointZM_GraveYard : public OPvPCapturePoint
 
         bool Update(uint32 diff);
 
-        void ChangeState() {}
+        void ChangeState() { }
 
         void FillInitialWorldStates(WorldPacket & data);
 
@@ -268,5 +268,5 @@ class OutdoorPvPZM : public OutdoorPvP
         uint32 m_HordeTowersControlled;
 };
 
-// todo: flag carrier death/leave/mount/activitychange should give back the gossip options
+/// @todo flag carrier death/leave/mount/activitychange should give back the gossip options
 #endif

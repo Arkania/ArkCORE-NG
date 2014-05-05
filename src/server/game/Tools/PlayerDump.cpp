@@ -44,7 +44,6 @@ static DumpTable dumpTables[DUMP_TABLE_COUNT] =
     { "character_cuf_profiles",           DTT_CHAR_TABLE },
     { "character_declinedname",           DTT_CHAR_TABLE },
     { "character_equipmentsets",          DTT_EQSET_TABLE},
-    { "character_gifts",                  DTT_ITEM_GIFT  },
     { "character_glyphs",                 DTT_CHAR_TABLE },
     { "character_homebind",               DTT_CHAR_TABLE },
     { "character_inventory",              DTT_INVENTORY  },
@@ -58,12 +57,13 @@ static DumpTable dumpTables[DUMP_TABLE_COUNT] =
     { "character_spell",                  DTT_CHAR_TABLE },
     { "character_spell_cooldown",         DTT_CHAR_TABLE },
     { "character_talent",                 DTT_CHAR_TABLE },
-    { "item_instance",                    DTT_ITEM       },
     { "mail",                             DTT_MAIL       },
-    { "mail_items",                       DTT_MAIL_ITEM  },
-    { "pet_aura",                         DTT_PET_TABLE  },
-    { "pet_spell",                        DTT_PET_TABLE  },
-    { "pet_spell_cooldown",               DTT_PET_TABLE  },
+    { "mail_items",                       DTT_MAIL_ITEM  }, // must be after mail
+    { "pet_aura",                         DTT_PET_TABLE  }, // must be after character_pet
+    { "pet_spell",                        DTT_PET_TABLE  }, // must be after character_pet
+    { "pet_spell_cooldown",               DTT_PET_TABLE  }, // must be after character_pet
+    { "item_instance",                    DTT_ITEM       }, // must be after character_inventory and mail_items
+    { "character_gifts",                  DTT_ITEM_GIFT  }, // must be after item_instance
 };
 
 // Low level functions
@@ -326,7 +326,7 @@ bool PlayerDumpWriter::DumpTable(std::string& dump, uint32 guid, char const*tabl
                 {
                     if (result->GetFieldCount() <= 64)          // avoid crashes on next check
                     {
-                        sLog->outCrash("PlayerDumpWriter::DumpTable - Trying to access non-existing or wrong positioned field (`deleteInfos_Account`) in `characters` table.");
+                        TC_LOG_FATAL("misc", "PlayerDumpWriter::DumpTable - Trying to access non-existing or wrong positioned field (`deleteInfos_Account`) in `characters` table.");
                         return false;
                     }
 
@@ -358,8 +358,8 @@ bool PlayerDumpWriter::GetDump(uint32 guid, std::string &dump)
         if (!DumpTable(dump, guid, dumpTables[i].name, dumpTables[i].name, dumpTables[i].type))
             return false;
 
-    // TODO: Add instance/group..
-    // TODO: Add a dump level option to skip some non-important tables
+    /// @todo Add instance/group..
+    /// @todo Add a dump level option to skip some non-important tables
 
     return true;
 }
@@ -413,7 +413,6 @@ DumpReturn PlayerDumpReader::LoadDump(std::string const& file, uint32 account, s
     if (!fin)
         return DUMP_FILE_OPEN_ERROR;
 
-    QueryResult result = QueryResult(NULL);
     char newguid[20], chraccount[20], newpetid[20], currpetid[20], lastpetid[20];
 
     // make sure the same guid doesn't already exist and is safe to use
@@ -505,7 +504,7 @@ DumpReturn PlayerDumpReader::LoadDump(std::string const& file, uint32 account, s
         std::string tn = gettablename(line);
         if (tn.empty())
         {
-            sLog->outError("LoadPlayerDump: Can't extract table name from line: '%s'!", line.c_str());
+            TC_LOG_ERROR("misc", "LoadPlayerDump: Can't extract table name from line: '%s'!", line.c_str());
             ROLLBACK(DUMP_FILE_BROKEN);
         }
 
@@ -522,7 +521,7 @@ DumpReturn PlayerDumpReader::LoadDump(std::string const& file, uint32 account, s
 
         if (i == DUMP_TABLE_COUNT)
         {
-            sLog->outError("LoadPlayerDump: Unknown table: '%s'!", tn.c_str());
+            TC_LOG_ERROR("misc", "LoadPlayerDump: Unknown table: '%s'!", tn.c_str());
             ROLLBACK(DUMP_FILE_BROKEN);
         }
 
@@ -672,7 +671,7 @@ DumpReturn PlayerDumpReader::LoadDump(std::string const& file, uint32 account, s
                 break;
             }
             default:
-                sLog->outError("Unknown dump table type: %u", type);
+                TC_LOG_ERROR("misc", "Unknown dump table type: %u", type);
                 break;
         }
 

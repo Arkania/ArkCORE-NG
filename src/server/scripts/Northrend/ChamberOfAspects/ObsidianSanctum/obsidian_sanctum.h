@@ -16,28 +16,40 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef DEF_OBSIDIAN_SANCTUM_H
-#define DEF_OBSIDIAN_SANCTUM_H
+#ifndef OBSIDIAN_SANCTUM_H_
+#define OBSIDIAN_SANCTUM_H_
 
-enum eTypes
+#define OSScriptName "instance_obsidian_sanctum"
+
+uint32 const EncounterCount = 5;
+
+enum DataTypes
 {
-    TYPE_SARTHARION_EVENT       = 1,
-    TYPE_TENEBRON_PREKILLED     = 2,
-    TYPE_SHADRON_PREKILLED      = 3,
-    TYPE_VESPERON_PREKILLED     = 4,
+    DATA_SARTHARION             = 0,
+    DATA_TENEBRON               = 1,
+    DATA_SHADRON                = 2,
+    DATA_VESPERON               = 3,
+    DATA_PORTAL_OPEN            = 4,
+    TWILIGHT_ACHIEVEMENTS       = 5
+};
 
-    DATA_SARTHARION             = 10,
-    DATA_TENEBRON               = 11,
-    DATA_SHADRON                = 12,
-    DATA_VESPERON               = 13,
-    DATA_PORTAL_OPEN            = 14,
-    TWILIGHT_ACHIEVEMENTS       = 15,
-
+enum CreaturesIds
+{
     NPC_SARTHARION              = 28860,
     NPC_TENEBRON                = 30452,
     NPC_SHADRON                 = 30451,
-    NPC_VESPERON                = 30449,
-    GO_TWILIGHT_PORTAL          = 193988,
+    NPC_VESPERON                = 30449
 };
 
-#endif
+enum GameObjectIds
+{
+    GO_TWILIGHT_PORTAL          = 193988
+};
+
+template<class AI>
+AI* GetObsidianSanctumAI(Creature* creature)
+{
+    return GetInstanceAI<AI>(creature, OSScriptName);
+}
+
+#endif // OBSIDIAN_SANCTUM_H_

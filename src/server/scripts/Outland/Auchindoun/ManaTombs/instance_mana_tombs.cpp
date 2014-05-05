@@ -33,7 +33,7 @@ class instance_mana_tombs : public InstanceMapScript
             }
         };
 
-        InstanceScript* GetInstanceScript(InstanceMap* map) const 
+        InstanceScript* GetInstanceScript(InstanceMap* map) const OVERRIDE
         {
             return new instance_mana_tombs_InstanceMapScript(map);
         }

@@ -47,7 +47,7 @@ enum AuthResult
     WOW_FAIL_GAME_ACCOUNT_LOCKED                 = 0x18,
     WOW_FAIL_UNLOCKABLE_LOCK                     = 0x19,
     WOW_FAIL_CONVERSION_REQUIRED                 = 0x20,
-    WOW_FAIL_DISCONNECTED                        = 0xFF,
+    WOW_FAIL_DISCONNECTED                        = 0xFF
 };
 
 enum LoginResult
@@ -68,7 +68,7 @@ enum LoginResult
     LOGIN_FAILED4                                = 0x0D,
     LOGIN_CONNECTED                              = 0x0E,
     LOGIN_PARENTALCONTROL                        = 0x0F,
-    LOGIN_LOCKED_ENFORCED                        = 0x10,
+    LOGIN_LOCKED_ENFORCED                        = 0x10
 };
 
 enum ExpansionFlags

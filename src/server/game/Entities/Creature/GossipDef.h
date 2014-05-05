@@ -26,7 +26,7 @@
 
 class WorldSession;
 
-#define GOSSIP_MAX_MENU_ITEMS 64                            // client supported items unknown, but provided number must be enough
+#define GOSSIP_MAX_MENU_ITEMS               32
 #define DEFAULT_GOSSIP_MESSAGE              0xffffff
 
 enum Gossip_Option
@@ -164,9 +164,14 @@ class GossipMenu
         ~GossipMenu();
 
         void AddMenuItem(int32 menuItemId, uint8 icon, std::string const& message, uint32 sender, uint32 action, std::string const& boxMessage, uint32 boxMoney, bool coded = false);
+        void AddMenuItem(uint32 menuId, uint32 menuItemId, uint32 sender, uint32 action);
 
         void SetMenuId(uint32 menu_id) { _menuId = menu_id; }
         uint32 GetMenuId() const { return _menuId; }
+        void SetSenderGUID(uint64 guid) { _senderGUID = guid; }
+        uint64 GetSenderGUID() const { return _senderGUID; }
+        void SetLocale(LocaleConstant locale) { _locale = locale; }
+        LocaleConstant GetLocale() const { return _locale; }
 
         void AddGossipMenuItemData(uint32 menuItemId, uint32 gossipActionMenuId, uint32 gossipActionPoi);
 
@@ -213,6 +218,8 @@ class GossipMenu
         GossipMenuItemContainer _menuItems;
         GossipMenuItemDataContainer _menuItemData;
         uint32 _menuId;
+        uint64 _senderGUID;
+        LocaleConstant _locale;
 };
 
 class QuestMenu
@@ -261,8 +268,8 @@ class PlayerMenu
         uint32 GetGossipOptionAction(uint32 selection) const { return _gossipMenu.GetMenuItemAction(selection); }
         bool IsGossipOptionCoded(uint32 selection) const { return _gossipMenu.IsMenuItemCoded(selection); }
 
-        void SendGossipMenu(uint32 titleTextId, uint64 objectGUID) const;
-        void SendCloseGossip() const;
+        void SendGossipMenu(uint32 titleTextId, uint64 objectGUID);
+        void SendCloseGossip();
         void SendPointOfInterest(uint32 poiId) const;
 
         /*********************************************************/
@@ -270,13 +277,15 @@ class PlayerMenu
         /*********************************************************/
         void SendQuestGiverStatus(uint32 questStatus, uint64 npcGUID) const;
 
-        void SendQuestGiverQuestList(QEmote eEmote, const std::string& Title, uint64 npcGUID);
+        void SendQuestGiverQuestList(QEmote const& eEmote, const std::string& Title, uint64 npcGUID);
 
         void SendQuestQueryResponse(Quest const* quest) const;
         void SendQuestGiverQuestDetails(Quest const* quest, uint64 npcGUID, bool activateAccept) const;
 
         void SendQuestGiverOfferReward(Quest const* quest, uint64 npcGUID, bool enableNext) const;
         void SendQuestGiverRequestItems(Quest const* quest, uint64 npcGUID, bool canComplete, bool closeOnCancel) const;
+
+        static void AddQuestLevelToTitle(std::string &title, int32 level);
 
     private:
         GossipMenu _gossipMenu;

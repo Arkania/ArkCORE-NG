@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 #ifndef TRINITY_CREATUREAIFACTORY_H
 #define TRINITY_CREATUREAIFACTORY_H
 
@@ -26,13 +27,13 @@
 
 struct SelectableAI : public FactoryHolder<CreatureAI>, public Permissible<Creature>
 {
-    SelectableAI(const char* id) : FactoryHolder<CreatureAI>(id) {}
+    SelectableAI(const char* id) : FactoryHolder<CreatureAI>(id) { }
 };
 
 template<class REAL_AI>
 struct CreatureAIFactory : public SelectableAI
 {
-    CreatureAIFactory(const char* name) : SelectableAI(name) {}
+    CreatureAIFactory(const char* name) : SelectableAI(name) { }
 
     CreatureAI* Create(void*) const;
 
@@ -54,13 +55,13 @@ typedef FactoryHolder<CreatureAI>::FactoryHolderRepository CreatureAIRepository;
 //GO
 struct SelectableGameObjectAI : public FactoryHolder<GameObjectAI>, public Permissible<GameObject>
 {
-    SelectableGameObjectAI(const char* id) : FactoryHolder<GameObjectAI>(id) {}
+    SelectableGameObjectAI(const char* id) : FactoryHolder<GameObjectAI>(id) { }
 };
 
 template<class REAL_GO_AI>
 struct GameObjectAIFactory : public SelectableGameObjectAI
 {
-    GameObjectAIFactory(const char* name) : SelectableGameObjectAI(name) {}
+    GameObjectAIFactory(const char* name) : SelectableGameObjectAI(name) { }
 
     GameObjectAI* Create(void*) const;
 

@@ -80,12 +80,12 @@ class npc_disciple_of_naralex : public CreatureScript
 public:
     npc_disciple_of_naralex() : CreatureScript("npc_disciple_of_naralex") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new npc_disciple_of_naralexAI(creature);
+        return GetInstanceAI<npc_disciple_of_naralexAI>(creature);
     }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) OVERRIDE
     {
         player->PlayerTalkClass->ClearMenus();
         InstanceScript* instance = creature->GetInstanceScript();
@@ -107,7 +107,7 @@ public:
         return true;
     }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) OVERRIDE
     {
         InstanceScript* instance = creature->GetInstanceScript();
 
@@ -151,11 +151,8 @@ public:
         uint32 eventProgress;
         InstanceScript* instance;
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) OVERRIDE
         {
-            if (!instance)
-                return;
-
             switch (waypointId)
             {
                 case 4:
@@ -183,39 +180,34 @@ public:
             }
         }
 
-        void Reset()
+        void Reset() OVERRIDE
         {
 
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) OVERRIDE
         {
-            Talk(SAY_ATTACKED, who->GetGUID());
+            Talk(SAY_ATTACKED, who);
         }
 
-        void JustDied(Unit* /*slayer*/)
+        void JustDied(Unit* /*slayer*/) OVERRIDE
         {
-            if (instance)
-            {
-                instance->SetData(TYPE_NARALEX_EVENT, FAIL);
-                instance->SetData(TYPE_NARALEX_PART1, FAIL);
-                instance->SetData(TYPE_NARALEX_PART2, FAIL);
-                instance->SetData(TYPE_NARALEX_PART3, FAIL);
-            }
+            instance->SetData(TYPE_NARALEX_EVENT, FAIL);
+            instance->SetData(TYPE_NARALEX_PART1, FAIL);
+            instance->SetData(TYPE_NARALEX_PART2, FAIL);
+            instance->SetData(TYPE_NARALEX_PART3, FAIL);
         }
 
-        void JustSummoned(Creature* summoned)
+        void JustSummoned(Creature* summoned) OVERRIDE
         {
              summoned->AI()->AttackStart(me);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (currentEvent != TYPE_NARALEX_PART3)
                 npc_escortAI::UpdateAI(diff);
 
-            if (!instance)
-                return;
             if (eventTimer <= diff)
             {
                 eventTimer = 0;

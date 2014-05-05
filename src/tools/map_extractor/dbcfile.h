@@ -1,3 +1,22 @@
+/*
+ * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation; either version 2 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #ifndef DBCFILE_H
 #define DBCFILE_H
 #include <cassert>
@@ -38,22 +57,22 @@ class DBCFile
                 float getFloat(size_t field) const
                 {
                     assert(field < file._fieldCount);
-                    return *reinterpret_cast<float*>(offset+field*4);
+                    return *reinterpret_cast<float*>(offset + field * 4);
                 }
 
                 unsigned int getUInt(size_t field) const
                 {
                     assert(field < file._fieldCount);
-                    return *reinterpret_cast<unsigned int*>(offset+field*4);
+                    return *reinterpret_cast<unsigned int*>(offset + field * 4);
                 }
 
                 int getInt(size_t field) const
                 {
                     assert(field < file._fieldCount);
-                    return *reinterpret_cast<int*>(offset+field*4);
+                    return *reinterpret_cast<int*>(offset + field * 4);
                 }
 
-                const char *getString(size_t field) const
+                char const* getString(size_t field) const
                 {
                     assert(field < file._fieldCount);
                     size_t stringOffset = getUInt(field);
@@ -62,43 +81,48 @@ class DBCFile
                 }
 
             private:
-                Record(DBCFile &file, unsigned char *offset): file(file), offset(offset) {}
-                unsigned char *offset;
-                DBCFile &file;
+                Record(DBCFile& file, unsigned char* offset): file(file), offset(offset) {}
+                DBCFile& file;
+                unsigned char* offset;
 
                 friend class DBCFile;
                 friend class DBCFile::Iterator;
+
+				Record& operator=(Record const& right);
         };
         /** Iterator that iterates over records
         */
         class Iterator
         {
             public:
-                Iterator(DBCFile &file, unsigned char *offset) : record(file, offset) { }
+                Iterator(DBCFile &file, unsigned char* offset) : record(file, offset) { }
 
                 /// Advance (prefix only)
-                Iterator & operator++()
+                Iterator& operator++()
                 {
                     record.offset += record.file._recordSize;
                     return *this;
                 }
 
                 /// Return address of current instance
-                Record const & operator*() const { return record; }
-                const Record* operator->() const { return &record; }
+                Record const& operator*() const { return record; }
+                Record const* operator->() const { return &record; }
 
                 /// Comparison
-                bool operator==(const Iterator &b) const
+                bool operator==(Iterator const& b) const
                 {
                     return record.offset == b.record.offset;
                 }
 
-                bool operator!=(const Iterator &b) const
+                bool operator!=(Iterator const& b) const
                 {
                     return record.offset != b.record.offset;
                 }
+
             private:
                 Record record;
+
+				Iterator& operator=(Iterator const& right);
         };
 
         // Get record by id
@@ -118,7 +142,7 @@ class DBCFile
         size_t _recordCount;
         size_t _fieldCount;
         size_t _stringSize;
-        unsigned char *_data;
+        unsigned char* _data;
         unsigned char* _stringTable;
 };
 

@@ -28,25 +28,31 @@ EndScriptData */
 #include "InstanceScript.h"
 #include "sunken_temple.h"
 
-#define GO_ATALAI_STATUE1 148830
-#define GO_ATALAI_STATUE2 148831
-#define GO_ATALAI_STATUE3 148832
-#define GO_ATALAI_STATUE4 148833
-#define GO_ATALAI_STATUE5 148834
-#define GO_ATALAI_STATUE6 148835
-#define GO_ATALAI_IDOL 148836
+enum Gameobject
+{
+    GO_ATALAI_STATUE1           = 148830,
+    GO_ATALAI_STATUE2           = 148831,
+    GO_ATALAI_STATUE3           = 148832,
+    GO_ATALAI_STATUE4           = 148833,
+    GO_ATALAI_STATUE5           = 148834,
+    GO_ATALAI_STATUE6           = 148835,
+    GO_ATALAI_IDOL              = 148836,
+    GO_ATALAI_LIGHT1            = 148883,
+    GO_ATALAI_LIGHT2            = 148937
 
-#define GO_ATALAI_LIGHT1 148883
-#define GO_ATALAI_LIGHT2 148937
+};
 
-#define NPC_MALFURION_STORMRAGE 15362
+enum CreatureIds
+{
+    NPC_MALFURION_STORMRAGE     = 15362
+};
 
 class instance_sunken_temple : public InstanceMapScript
 {
 public:
     instance_sunken_temple() : InstanceMapScript("instance_sunken_temple", 109) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const OVERRIDE
     {
         return new instance_sunken_temple_InstanceMapScript(map);
     }
@@ -74,7 +80,7 @@ public:
         bool s5;
         bool s6;
 
-        void Initialize()
+        void Initialize() OVERRIDE
         {
             GOAtalaiStatue1 = 0;
             GOAtalaiStatue2 = 0;
@@ -94,7 +100,7 @@ public:
             s6 = false;
         }
 
-        void OnGameObjectCreate(GameObject* go)
+        void OnGameObjectCreate(GameObject* go) OVERRIDE
         {
             switch (go->GetEntry())
             {
@@ -188,13 +194,13 @@ public:
          }
          */
 
-         void SetData(uint32 type, uint32 data)
+         void SetData(uint32 type, uint32 data) OVERRIDE
          {
             if (type == EVENT_STATE)
                 State = data;
          }
 
-         uint32 GetData(uint32 type) const
+         uint32 GetData(uint32 type) const OVERRIDE
          {
             if (type == EVENT_STATE)
                 return State;

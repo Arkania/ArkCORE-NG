@@ -32,7 +32,7 @@ class instance_the_slave_pens : public InstanceMapScript
 public:
     instance_the_slave_pens() : InstanceMapScript(SPScriptName, 547) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const 
+    InstanceScript* GetInstanceScript(InstanceMap* map) const OVERRIDE
     {
         return new instance_the_slave_pens_InstanceMapScript(map);
     }

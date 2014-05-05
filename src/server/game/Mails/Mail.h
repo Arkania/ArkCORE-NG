@@ -58,8 +58,9 @@ enum MailStationery
     MAIL_STATIONERY_DEFAULT = 41,
     MAIL_STATIONERY_GM      = 61,
     MAIL_STATIONERY_AUCTION = 62,
-    MAIL_STATIONERY_VAL     = 64,
-    MAIL_STATIONERY_CHR     = 65
+    MAIL_STATIONERY_VAL     = 64,                           // Valentine
+    MAIL_STATIONERY_CHR     = 65,                           // Christmas
+    MAIL_STATIONERY_ORP     = 67                            // Orphan
 };
 
 enum MailState
@@ -102,7 +103,7 @@ class MailSender
 class MailReceiver
 {
     public:                                                 // Constructors
-        explicit MailReceiver(uint32 receiver_lowguid) : m_receiver(NULL), m_receiver_lowguid(receiver_lowguid) {}
+        explicit MailReceiver(uint32 receiver_lowguid) : m_receiver(NULL), m_receiver_lowguid(receiver_lowguid) { }
         MailReceiver(Player* receiver);
         MailReceiver(Player* receiver, uint32 receiver_lowguid);
     public:                                                 // Accessors
@@ -120,9 +121,9 @@ class MailDraft
     public:                                                 // Constructors
         explicit MailDraft(uint16 mailTemplateId, bool need_items = true)
             : m_mailTemplateId(mailTemplateId), m_mailTemplateItemsNeed(need_items), m_money(0), m_COD(0)
-        {}
+        { }
         MailDraft(std::string const& subject, std::string const& body)
-            : m_mailTemplateId(0), m_mailTemplateItemsNeed(false), m_subject(subject), m_body(body), m_money(0), m_COD(0) {}
+            : m_mailTemplateId(0), m_mailTemplateItemsNeed(false), m_subject(subject), m_body(body), m_money(0), m_COD(0) { }
     public:                                                 // Accessors
         uint16 GetMailTemplateId() const { return m_mailTemplateId; }
         std::string const& GetSubject() const { return m_subject; }

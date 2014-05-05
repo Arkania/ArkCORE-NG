@@ -21,6 +21,9 @@
 
 #include "LFG.h"
 
+namespace lfg
+{
+
 enum LfgCompatibility
 {
     LFG_COMPATIBILITY_PENDING,
@@ -53,7 +56,7 @@ struct LfgQueueData
         healers(LFG_HEALERS_NEEDED), dps(LFG_DPS_NEEDED)
         { }
 
-    LfgQueueData(time_t _joinTime, const LfgDungeonSet &_dungeons, LfgRolesMap const& _roles):
+    LfgQueueData(time_t _joinTime, LfgDungeonSet const& _dungeons, LfgRolesMap const& _roles):
         joinTime(_joinTime), tanks(LFG_TANKS_NEEDED), healers(LFG_HEALERS_NEEDED),
         dps(LFG_DPS_NEEDED), dungeons(_dungeons), roles(_roles)
         { }
@@ -69,7 +72,7 @@ struct LfgQueueData
 
 struct LfgWaitTime
 {
-    LfgWaitTime(): time(-1), number(0) {}
+    LfgWaitTime(): time(-1), number(0) { }
     int32 time;                                            ///< Wait time
     uint32 number;                                         ///< Number of people used to get that wait time
 };
@@ -88,7 +91,7 @@ class LFGQueue
         // Add/Remove from queue
         void AddToQueue(uint64 guid);
         void RemoveFromQueue(uint64 guid);
-        void AddQueueData(uint64 guid, time_t joinTime, const LfgDungeonSet &dungeons, const LfgRolesMap &rolesMap);
+        void AddQueueData(uint64 guid, time_t joinTime, LfgDungeonSet const& dungeons, LfgRolesMap const& rolesMap);
         void RemoveQueueData(uint64 guid);
 
         // Update Timers (when proposal success)
@@ -98,8 +101,8 @@ class LFGQueue
         void UpdateWaitTimeDps(int32 waitTime, uint32 dungeonId);
 
         // Update Queue timers
-        void UpdateQueueTimers(time_t currTime);
-        time_t GetJoinTime(uint64 guid);
+        void UpdateQueueTimers(uint8 queueId, time_t currTime);
+        time_t GetJoinTime(uint64 guid) const;
 
         // Find new group
         uint8 FindGroups();
@@ -140,5 +143,7 @@ class LFGQueue
         LfgGuidList currentQueueStore;                     ///< Ordered list. Used to find groups
         LfgGuidList newToQueueStore;                       ///< New groups to add to queue
 };
+
+} // namespace lfg
 
 #endif

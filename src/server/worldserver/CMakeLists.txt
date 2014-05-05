@@ -31,14 +31,20 @@ set(worldserver_SRCS
 if( WIN32 )
   set(worldserver_SRCS
     ${worldserver_SRCS}
-    ${sources_Debugging}
-    worldserver.rc
+    ${sources_windows_Debugging}
   )
+  if ( MSVC )
+    set(worldserver_SRCS
+      ${worldserver_SRCS}
+      worldserver.rc
+    )
+  endif()
 endif()
 
 include_directories(
   ${CMAKE_BINARY_DIR}
   ${CMAKE_SOURCE_DIR}/dep/g3dlite/include
+  ${CMAKE_SOURCE_DIR}/dep/recastnavigation/Detour
   ${CMAKE_SOURCE_DIR}/dep/gsoap
   ${CMAKE_SOURCE_DIR}/dep/sockets/include
   ${CMAKE_SOURCE_DIR}/dep/SFMT
@@ -78,6 +84,7 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/src/server/game/DataStores
   ${CMAKE_SOURCE_DIR}/src/server/game/DungeonFinding
   ${CMAKE_SOURCE_DIR}/src/server/game/Entities
+  ${CMAKE_SOURCE_DIR}/src/server/game/Entities/AreaTrigger
   ${CMAKE_SOURCE_DIR}/src/server/game/Entities/Creature
   ${CMAKE_SOURCE_DIR}/src/server/game/Entities/Corpse
   ${CMAKE_SOURCE_DIR}/src/server/game/Entities/DynamicObject
@@ -107,6 +114,7 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/src/server/game/Miscellaneous
   ${CMAKE_SOURCE_DIR}/src/server/game/Movement
   ${CMAKE_SOURCE_DIR}/src/server/game/Movement/MovementGenerators
+  ${CMAKE_SOURCE_DIR}/src/server/game/Movement/Spline
   ${CMAKE_SOURCE_DIR}/src/server/game/Movement/Waypoints
   ${CMAKE_SOURCE_DIR}/src/server/game/OutdoorPvP
   ${CMAKE_SOURCE_DIR}/src/server/game/Pools
@@ -162,6 +170,7 @@ target_link_libraries(worldserver
   collision
   g3dlib
   gsoap
+  Detour
   ${JEMALLOC_LIBRARY}
   ${READLINE_LIBRARY}
   ${TERMCAP_LIBRARY}
@@ -169,18 +178,26 @@ target_link_libraries(worldserver
   ${MYSQL_LIBRARY}
   ${OPENSSL_LIBRARIES}
   ${ZLIB_LIBRARIES}
+  ${CMAKE_THREAD_LIBS_INIT}
 )
 
 if( WIN32 )
-  add_custom_command(TARGET worldserver
-    POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/worldserver.conf.dist ${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/
-  )
+  if ( MSVC )
+    add_custom_command(TARGET worldserver
+      POST_BUILD
+      COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/worldserver.conf.dist ${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/
+    )
+  elseif ( MINGW )
+    add_custom_command(TARGET worldserver
+      POST_BUILD
+      COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/worldserver.conf.dist ${CMAKE_BINARY_DIR}/bin/
+    )
+  endif()
 endif()
 
 if( UNIX )
   install(TARGETS worldserver DESTINATION bin)
-  install(FILES worldserver.conf.dist DESTINATION etc)
+  install(FILES worldserver.conf.dist DESTINATION ${CONF_DIR})
 elseif( WIN32 )
   install(TARGETS worldserver DESTINATION "${CMAKE_INSTALL_PREFIX}")
   install(FILES worldserver.conf.dist DESTINATION "${CMAKE_INSTALL_PREFIX}")

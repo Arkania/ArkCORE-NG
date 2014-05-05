@@ -34,8 +34,8 @@ class FactoryHolder
         friend class ACE_Singleton<FactoryHolderRegistry, ACE_Null_Mutex>;
         typedef ACE_Singleton<FactoryHolderRegistry, ACE_Null_Mutex> FactoryHolderRepository;
 
-        FactoryHolder(Key k) : i_key(k) {}
-        virtual ~FactoryHolder() {}
+        FactoryHolder(Key k) : i_key(k) { }
+        virtual ~FactoryHolder() { }
         inline Key key() const { return i_key; }
 
         void RegisterSelf(void) { FactoryHolderRepository::instance()->InsertItem(this, i_key); }
@@ -55,7 +55,7 @@ template<class T>
 class Permissible
 {
     public:
-        virtual ~Permissible() {}
+        virtual ~Permissible() { }
         virtual int Permit(const T *) const = 0;
 };
 #endif

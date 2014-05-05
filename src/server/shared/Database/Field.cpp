@@ -23,6 +23,7 @@ Field::Field()
     data.value = NULL;
     data.type = MYSQL_TYPE_NULL;
     data.length = 0;
+    data.raw = false;
 }
 
 Field::~Field()
@@ -35,7 +36,7 @@ void Field::SetByteValue(const void* newValue, const size_t newSize, enum_field_
     if (data.value)
         CleanUp();
 
-    // This value stores raw bytes that have to be explicitly casted later
+    // This value stores raw bytes that have to be explicitly cast later
     if (newValue)
     {
         data.value = new char[newSize];

@@ -20,7 +20,7 @@
 SDName: Boss mal_ganis
 SDAuthor: Tartalo
 SD%Complete: 80
-SDComment: TODO: Intro & outro
+SDComment: @todo Intro & outro
 SDCategory:
 Script Data End */
 
@@ -65,9 +65,9 @@ class boss_mal_ganis : public CreatureScript
 public:
     boss_mal_ganis() : CreatureScript("boss_mal_ganis") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new boss_mal_ganisAI (creature);
+        return GetInstanceAI<boss_mal_ganisAI>(creature);
     }
 
     struct boss_mal_ganisAI : public ScriptedAI
@@ -92,7 +92,7 @@ public:
 
         InstanceScript* instance;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
              bYelled = false;
              bYelled2 = false;
@@ -103,24 +103,22 @@ public:
              uiSleepTimer = urand(15000, 20000);
              uiOutroTimer = 1000;
 
-             if (instance)
-                 instance->SetData(DATA_MAL_GANIS_EVENT, NOT_STARTED);
+             instance->SetData(DATA_MAL_GANIS_EVENT, NOT_STARTED);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) OVERRIDE
         {
             Talk(SAY_AGGRO);
-            if (instance)
-                instance->SetData(DATA_MAL_GANIS_EVENT, IN_PROGRESS);
+            instance->SetData(DATA_MAL_GANIS_EVENT, IN_PROGRESS);
         }
 
-        void DamageTaken(Unit* done_by, uint32 &damage)
+        void DamageTaken(Unit* done_by, uint32 &damage) OVERRIDE
         {
             if (damage >= me->GetHealth() && done_by != me)
                 damage = me->GetHealth()-1;
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             switch (Phase)
             {
@@ -150,13 +148,12 @@ public:
                         return;
                     }
 
-                    if (Creature* pArthas = me->GetCreature(*me, instance ? instance->GetData64(DATA_ARTHAS) : 0))
-                        if (pArthas->IsDead())
+                    if (Creature* pArthas = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_ARTHAS)))
+                        if (pArthas->isDead())
                         {
                             EnterEvadeMode();
                             me->DisappearAndDie();
-                            if (instance)
-                                instance->SetData(DATA_MAL_GANIS_EVENT, FAIL);
+                            instance->SetData(DATA_MAL_GANIS_EVENT, FAIL);
                         }
 
                     if (uiCarrionSwarmTimer < diff)
@@ -200,8 +197,8 @@ public:
                                 uiOutroTimer = 8000;
                                 break;
                             case 2:
-                                me->SetTarget(instance ? instance->GetData64(DATA_ARTHAS) : 0);
-                                me->HandleEmote(29);
+                                me->SetTarget(instance->GetData64(DATA_ARTHAS));
+                                me->HandleEmoteCommand(29);
                                 Talk(SAY_ESCAPE_SPEECH_2);
                                 ++uiOutroStep;
                                 uiOutroTimer = 9000;
@@ -212,7 +209,7 @@ public:
                                 uiOutroTimer = 16000;
                                 break;
                             case 4:
-                                me->HandleEmote(33);
+                                me->HandleEmoteCommand(33);
                                 ++uiOutroStep;
                                 uiOutroTimer = 500;
                                 break;
@@ -227,20 +224,17 @@ public:
             }
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) OVERRIDE
         {
-            if (instance)
-            {
-                instance->SetData(DATA_MAL_GANIS_EVENT, DONE);
-                DoCastAOE(SPELL_MAL_GANIS_KILL_CREDIT);
-                // give achievement credit and LFG rewards to players. criteria use spell 58630 which doesn't exist, but it was created in spell_dbc
-                DoCastAOE(SPELL_KILL_CREDIT);
-            }
+            instance->SetData(DATA_MAL_GANIS_EVENT, DONE);
+            DoCastAOE(SPELL_MAL_GANIS_KILL_CREDIT);
+            // give achievement credit and LFG rewards to players. criteria use spell 58630 which doesn't exist, but it was created in spell_dbc
+            DoCastAOE(SPELL_KILL_CREDIT);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) OVERRIDE
         {
-            if (victim == me)
+            if (victim->GetTypeId() != TYPEID_PLAYER)
                 return;
 
             Talk(SAY_SLAY);

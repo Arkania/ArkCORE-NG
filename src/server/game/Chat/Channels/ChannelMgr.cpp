@@ -26,8 +26,6 @@ ChannelMgr::~ChannelMgr()
 {
     for (ChannelMap::iterator itr = channels.begin(); itr != channels.end(); ++itr)
         delete itr->second;
-
-    channels.clear();
 }
 
 ChannelMgr* ChannelMgr::forTeam(uint32 team)
@@ -47,7 +45,9 @@ ChannelMgr* ChannelMgr::forTeam(uint32 team)
 Channel* ChannelMgr::GetJoinChannel(std::string const& name, uint32 channelId)
 {
     std::wstring wname;
-    Utf8toWStr(name, wname);
+    if (!Utf8toWStr(name, wname))
+        return NULL;
+
     wstrToLower(wname);
 
     ChannelMap::const_iterator i = channels.find(wname);
@@ -65,7 +65,9 @@ Channel* ChannelMgr::GetJoinChannel(std::string const& name, uint32 channelId)
 Channel* ChannelMgr::GetChannel(std::string const& name, Player* player, bool pkt)
 {
     std::wstring wname;
-    Utf8toWStr(name, wname);
+    if (!Utf8toWStr(name, wname))
+        return NULL;
+
     wstrToLower(wname);
 
     ChannelMap::const_iterator i = channels.find(wname);
@@ -88,7 +90,9 @@ Channel* ChannelMgr::GetChannel(std::string const& name, Player* player, bool pk
 void ChannelMgr::LeftChannel(std::string const& name)
 {
     std::wstring wname;
-    Utf8toWStr(name, wname);
+    if (!Utf8toWStr(name, wname))
+        return;
+
     wstrToLower(wname);
 
     ChannelMap::const_iterator i = channels.find(wname);
@@ -98,7 +102,7 @@ void ChannelMgr::LeftChannel(std::string const& name)
 
     Channel* channel = i->second;
 
-    if (channel->GetNumPlayers() == 0 && !channel->IsConstant())
+    if (!channel->GetNumPlayers() && !channel->IsConstant())
     {
         channels.erase(wname);
         delete channel;
@@ -107,6 +111,6 @@ void ChannelMgr::LeftChannel(std::string const& name)
 
 void ChannelMgr::MakeNotOnPacket(WorldPacket* data, std::string const& name)
 {
-    data->Initialize(SMSG_CHANNEL_NOTIFY, (1+10));  // we guess size
-    (*data) << (uint8)0x05 << name;
+    data->Initialize(SMSG_CHANNEL_NOTIFY, 1 + name.size());
+    (*data) << uint8(5) << name;
 }

@@ -26,8 +26,8 @@ class WorldDatabaseConnection : public MySQLConnection
 {
     public:
         //- Constructors for sync and async connections
-        WorldDatabaseConnection(MySQLConnectionInfo& connInfo) : MySQLConnection(connInfo) {}
-        WorldDatabaseConnection(ACE_Activation_Queue* q, MySQLConnectionInfo& connInfo) : MySQLConnection(q, connInfo) {}
+        WorldDatabaseConnection(MySQLConnectionInfo& connInfo) : MySQLConnection(connInfo) { }
+        WorldDatabaseConnection(ACE_Activation_Queue* q, MySQLConnectionInfo& connInfo) : MySQLConnection(q, connInfo) { }
 
         //- Loads database type specific prepared statements
         void DoPrepareStatements();
@@ -81,7 +81,7 @@ enum WorldDatabaseStatements
     WORLD_SEL_WAYPOINT_DATA_MAX_POINT,
     WORLD_SEL_WAYPOINT_DATA_BY_POS,
     WORLD_SEL_WAYPOINT_DATA_WPGUID_BY_ID,
-    WOLRD_SEL_WAYPOINT_DATA_ACTION,
+    WORLD_SEL_WAYPOINT_DATA_ACTION,
     WORLD_SEL_WAYPOINT_SCRIPTS_MAX_ID,
     WORLD_UPD_CREATURE_ADDON_PATH,
     WORLD_INS_CREATURE_ADDON,
@@ -95,25 +95,24 @@ enum WorldDatabaseStatements
     WORLD_UPD_WAYPOINT_SCRIPT_Z,
     WORLD_UPD_WAYPOINT_SCRIPT_O,
     WORLD_SEL_WAYPOINT_SCRIPT_ID_BY_GUID,
-    WORLD_DEL_CREATURE,
-    WORLD_INS_CREATURE_TRANSPORT,
     WORLD_REPLACE_CREATURE_ADDON_EMOTE,
-    WORLD_UPD_CREATURE_TRANSPORT_EMOTE,
+    WORLD_DEL_CREATURE,
     WORLD_SEL_COMMANDS,
     WORLD_SEL_CREATURE_TEMPLATE,
     WORLD_SEL_WAYPOINT_SCRIPT_BY_ID,
-    WORLD_SEL_IP2NATION_COUNTRY,
     WORLD_SEL_ITEM_TEMPLATE_BY_NAME,
     WORLD_SEL_CREATURE_BY_ID,
     WORLD_SEL_GAMEOBJECT_NEAREST,
+    WORLD_SEL_CREATURE_NEAREST,
     WORLD_SEL_GAMEOBJECT_TARGET,
-    WORLD_SEL_DISABLES,
-    WORLD_INS_DISABLES,
-    WORLD_DEL_DISABLES,
     WORLD_INS_CREATURE,
     WORLD_DEL_GAME_EVENT_CREATURE,
     WORLD_DEL_GAME_EVENT_MODEL_EQUIP,
     WORLD_INS_GAMEOBJECT,
+    WORLD_SEL_DISABLES,
+    WORLD_INS_DISABLES,
+    WORLD_DEL_DISABLES,
+    WORLD_SEL_REQ_XP,
     WORLD_SEL_GRAVEYARDS,
     WORLD_SEL_DIGSITE_INFO,
     WORLD_SEL_DIGSITE_POS,

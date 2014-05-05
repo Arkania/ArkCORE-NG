@@ -34,27 +34,27 @@ class cheat_commandscript : public CommandScript
 public:
     cheat_commandscript() : CommandScript("cheat_commandscript") { }
 
-    ChatCommand* GetCommands() const
+    ChatCommand* GetCommands() const OVERRIDE
     {
 
         static ChatCommand cheatCommandTable[] =
         {
-            { "god",            SEC_GAMEMASTER,     false, &HandleGodModeCheatCommand,         "", NULL },
-            { "casttime",       SEC_GAMEMASTER,     false, &HandleCasttimeCheatCommand,        "", NULL },
-            { "cooldown",       SEC_GAMEMASTER,     false, &HandleCoolDownCheatCommand,        "", NULL },
-            { "power",          SEC_GAMEMASTER,     false, &HandlePowerCheatCommand,           "", NULL },
-            { "waterwalk",      SEC_GAMEMASTER,     false, &HandleWaterWalkCheatCommand,       "", NULL },
-            { "status",         SEC_GAMEMASTER,     false, &HandleCheatStatusCommand,          "", NULL },
-            { "taxi",           SEC_GAMEMASTER,     false, &HandleTaxiCheatCommand,            "", NULL },
-            { "explore",        SEC_GAMEMASTER,     false, &HandleExploreCheatCommand,         "", NULL },
-            { NULL,             0,                  false, NULL,                               "", NULL }
+            { "god",            rbac::RBAC_PERM_COMMAND_CHEAT_GOD,       false, &HandleGodModeCheatCommand,   "", NULL },
+            { "casttime",       rbac::RBAC_PERM_COMMAND_CHEAT_CASTTIME,  false, &HandleCasttimeCheatCommand,  "", NULL },
+            { "cooldown",       rbac::RBAC_PERM_COMMAND_CHEAT_COOLDOWN,  false, &HandleCoolDownCheatCommand,  "", NULL },
+            { "power",          rbac::RBAC_PERM_COMMAND_CHEAT_POWER,     false, &HandlePowerCheatCommand,     "", NULL },
+            { "waterwalk",      rbac::RBAC_PERM_COMMAND_CHEAT_WATERWALK, false, &HandleWaterWalkCheatCommand, "", NULL },
+            { "status",         rbac::RBAC_PERM_COMMAND_CHEAT_STATUS,    false, &HandleCheatStatusCommand,    "", NULL },
+            { "taxi",           rbac::RBAC_PERM_COMMAND_CHEAT_TAXI,      false, &HandleTaxiCheatCommand,      "", NULL },
+            { "explore",        rbac::RBAC_PERM_COMMAND_CHEAT_EXPLORE,   false, &HandleExploreCheatCommand,   "", NULL },
+            { NULL,             0,                                 false, NULL,                         "", NULL }
 
         };
 
         static ChatCommand commandTable[] =
         {
-            { "cheat",          SEC_GAMEMASTER,     false, NULL,                  "", cheatCommandTable },
-            { NULL,             0,                  false, NULL,                               "", NULL }
+            { "cheat",          rbac::RBAC_PERM_COMMAND_CHEAT, false, NULL, "", cheatCommandTable },
+            { NULL,             0,                       false, NULL, "", NULL }
         };
         return commandTable;
     }
@@ -186,10 +186,11 @@ public:
 
         std::string argstr = (char*)args;
 
+        Player* target = handler->GetSession()->GetPlayer();
         if (!*args)
         {
-            argstr = (handler->GetSession()->GetPlayer()->GetCommandStatus(CHEAT_WATERWALK)) ? "off" : "on";
-            if (handler->GetSession()->GetPlayer()->GetCommandStatus(CHEAT_WATERWALK))
+            argstr = (target->GetCommandStatus(CHEAT_WATERWALK)) ? "off" : "on";
+            if (target->GetCommandStatus(CHEAT_WATERWALK))
                 argstr = "off";
             else
                 argstr = "on";
@@ -197,15 +198,15 @@ public:
 
         if (argstr == "off")
         {
-            handler->GetSession()->GetPlayer()->SetCommandStatusOff(CHEAT_WATERWALK);
-            handler->GetSession()->GetPlayer()->SendMovementSetWaterWalking(false);               // OFF
+            target->SetCommandStatusOff(CHEAT_WATERWALK);
+            target->SetWaterWalking(false);
             handler->SendSysMessage("Waterwalking is OFF. You can't walk on water.");
             return true;
         }
         else if (argstr == "on")
         {
-            handler->GetSession()->GetPlayer()->SetCommandStatusOn(CHEAT_WATERWALK);
-            handler->GetSession()->GetPlayer()->SendMovementSetWaterWalking(true);              // ON
+            target->SetCommandStatusOn(CHEAT_WATERWALK);
+            target->SetWaterWalking(true);
             handler->SendSysMessage("Waterwalking is ON. You can walk on water.");
             return true;
         }
@@ -236,7 +237,7 @@ public:
             chr->SetTaxiCheater(true);
             handler->PSendSysMessage(LANG_YOU_GIVE_TAXIS, handler->GetNameLink(chr).c_str());
             if (handler->needReportToTarget(chr))
-                 ChatHandler(chr->GetSession()).PSendSysMessage(LANG_YOURS_TAXIS_ADDED, handler->GetNameLink().c_str());
+                ChatHandler(chr->GetSession()).PSendSysMessage(LANG_YOURS_TAXIS_ADDED, handler->GetNameLink().c_str());
             return true;
         }
 
@@ -245,7 +246,7 @@ public:
             chr->SetTaxiCheater(false);
             handler->PSendSysMessage(LANG_YOU_REMOVE_TAXIS, handler->GetNameLink(chr).c_str());
             if (handler->needReportToTarget(chr))
-                 ChatHandler(chr->GetSession()).PSendSysMessage(LANG_YOURS_TAXIS_REMOVED, handler->GetNameLink().c_str());
+                ChatHandler(chr->GetSession()).PSendSysMessage(LANG_YOURS_TAXIS_REMOVED, handler->GetNameLink().c_str());
 
             return true;
         }
@@ -274,13 +275,13 @@ public:
         {
             handler->PSendSysMessage(LANG_YOU_SET_EXPLORE_ALL, handler->GetNameLink(chr).c_str());
             if (handler->needReportToTarget(chr))
-                ChatHandler(chr->GetSession()).PSendSysMessage(LANG_YOURS_EXPLORE_SET_ALL, handler->GetNameLink().c_str());
+            ChatHandler(chr->GetSession()).PSendSysMessage(LANG_YOURS_EXPLORE_SET_ALL, handler->GetNameLink().c_str());
         }
         else
         {
             handler->PSendSysMessage(LANG_YOU_SET_EXPLORE_NOTHING, handler->GetNameLink(chr).c_str());
             if (handler->needReportToTarget(chr))
-                 ChatHandler(chr->GetSession()).PSendSysMessage(LANG_YOURS_EXPLORE_SET_NOTHING, handler->GetNameLink().c_str());
+                ChatHandler(chr->GetSession()).PSendSysMessage(LANG_YOURS_EXPLORE_SET_NOTHING, handler->GetNameLink().c_str());
         }
 
         for (uint8 i = 0; i < PLAYER_EXPLORED_ZONES_SIZE; ++i)

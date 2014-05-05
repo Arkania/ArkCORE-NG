@@ -30,7 +30,7 @@ EndScriptData */
 #include "Player.h"
 #include "SpellInfo.h"
 
-enum eSays
+enum Yells
 {
     SAY_TAUNT                  = 0,
     SAY_FREED                  = 1,
@@ -41,22 +41,22 @@ enum eSays
     SAY_DEATH                  = 6
 };
 
-enum eEmotes
+enum Emotes
 {
     EMOTE_BERSERK              = 7,
     EMOTE_BLASTNOVA            = 8,
     EMOTE_BEGIN                = 9
 };
 
-enum eCreatures
+enum Creatures
 {
-    MOB_MAGTHERIDON    = 17257,
-    MOB_ROOM           = 17516,
-    MOB_CHANNELLER     = 17256,
-    MOB_ABYSSAL        = 17454,
+    NPC_MAGTHERIDON    = 17257,
+    NPC_ROOM           = 17516,
+    NPC_CHANNELLER     = 17256,
+    NPC_ABYSSAL        = 17454,
 };
 
-enum eSpells
+enum Spells
 {
     SPELL_BLASTNOVA            = 30616,
     SPELL_CLEAVE               = 30619,
@@ -72,7 +72,7 @@ enum eSpells
     SPELL_SHADOW_CAGE          = 30168,
     SPELL_SHADOW_GRASP         = 30410,
     SPELL_SHADOW_GRASP_VISUAL  = 30166,
-    SPELL_MIND_EXHAUSTION      = 44032, //Casted by the cubes when channeling ends
+    SPELL_MIND_EXHAUSTION      = 44032, //Cast by the cubes when channeling ends
     SPELL_SHADOW_CAGE_C        = 30205,
     SPELL_SHADOW_GRASP_C       = 30207,
     SPELL_SHADOW_BOLT_VOLLEY   = 30510,
@@ -109,12 +109,12 @@ class npc_abyssal : public CreatureScript
             uint32 Despawn_Timer;
             uint32 trigger;
 
-            void Reset()
+            void Reset() OVERRIDE
             {
                 FireBlast_Timer = 6000;
             }
 
-            void SpellHit(Unit*, const SpellInfo* spell)
+            void SpellHit(Unit*, const SpellInfo* spell) OVERRIDE
             {
                 if (trigger == 2 && spell->Id == SPELL_BLAZE_TARGET)
                 {
@@ -137,22 +137,23 @@ class npc_abyssal : public CreatureScript
                 }
             }
 
-            void EnterCombat(Unit* /*who*/)
+            void EnterCombat(Unit* /*who*/) OVERRIDE
             {
                 DoZoneInCombat();
             }
-            void AttackStart(Unit* who)
+            void AttackStart(Unit* who) OVERRIDE
             {
                 if (!trigger)
                     ScriptedAI::AttackStart(who);
             }
-            void MoveInLineOfSight(Unit* who)
+            void MoveInLineOfSight(Unit* who) OVERRIDE
+
             {
                 if (!trigger)
                     ScriptedAI::MoveInLineOfSight(who);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff) OVERRIDE
             {
                 if (trigger)
                 {
@@ -179,7 +180,7 @@ class npc_abyssal : public CreatureScript
 
                 if (FireBlast_Timer <= diff)
                 {
-                    DoCast(me->GetVictim(), SPELL_FIRE_BLAST);
+                    DoCastVictim(SPELL_FIRE_BLAST);
                     FireBlast_Timer = 5000+rand()%10000;
                 }
                 else FireBlast_Timer -= diff;
@@ -188,7 +189,7 @@ class npc_abyssal : public CreatureScript
             }
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const OVERRIDE
         {
             return new npc_abyssalAI(creature);
         }
@@ -227,7 +228,7 @@ class boss_magtheridon : public CreatureScript
             bool Phase3;
             bool NeedCheckCube;
 
-            void Reset()
+            void Reset() OVERRIDE
             {
                 Berserk_Timer = 1320000;
                 Quake_Timer = 40000;
@@ -247,13 +248,10 @@ class boss_magtheridon : public CreatureScript
                 DoCast(me, SPELL_SHADOW_CAGE_C, true);
             }
 
-            void JustReachedHome()
+            void JustReachedHome() OVERRIDE
             {
-                if (instance)
-                {
-                    instance->SetData(DATA_MAGTHERIDON_EVENT, NOT_STARTED);
-                    instance->SetData(DATA_COLLAPSE, false);
-                }
+                instance->SetData(DATA_MAGTHERIDON_EVENT, NOT_STARTED);
+                instance->SetData(DATA_COLLAPSE, false);
             }
 
             void SetClicker(uint64 cubeGUID, uint64 clickerGUID)
@@ -307,31 +305,30 @@ class boss_magtheridon : public CreatureScript
                     NeedCheckCube = false;
             }
 
-            void KilledUnit(Unit* /*victim*/)
+            void KilledUnit(Unit* /*victim*/) OVERRIDE
             {
                 Talk(SAY_PLAYER_KILLED);
             }
 
-            void JustDied(Unit* /*killer*/)
+            void JustDied(Unit* /*killer*/) OVERRIDE
             {
-                if (instance)
-                    instance->SetData(DATA_MAGTHERIDON_EVENT, DONE);
+                instance->SetData(DATA_MAGTHERIDON_EVENT, DONE);
 
                 Talk(SAY_DEATH);
             }
 
-            void MoveInLineOfSight(Unit* /*who*/) {}
+            void MoveInLineOfSight(Unit* /*who*/) OVERRIDE { }
 
-            void AttackStart(Unit* who)
+
+            void AttackStart(Unit* who) OVERRIDE
             {
                 if (!me->HasUnitState(UNIT_STATE_STUNNED))
                     ScriptedAI::AttackStart(who);
             }
 
-            void EnterCombat(Unit* /*who*/)
+            void EnterCombat(Unit* /*who*/) OVERRIDE
             {
-                if (instance)
-                    instance->SetData(DATA_MAGTHERIDON_EVENT, IN_PROGRESS);
+                instance->SetData(DATA_MAGTHERIDON_EVENT, IN_PROGRESS);
                 DoZoneInCombat();
 
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -340,7 +337,7 @@ class boss_magtheridon : public CreatureScript
                 Talk(SAY_FREED);
            }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff) OVERRIDE
             {
                 if (!me->IsInCombat())
                 {
@@ -369,7 +366,7 @@ class boss_magtheridon : public CreatureScript
 
                 if (Cleave_Timer <= diff)
                 {
-                    DoCast(me->GetVictim(), SPELL_CLEAVE);
+                    DoCastVictim(SPELL_CLEAVE);
                     Cleave_Timer = 10000;
                 }
                 else
@@ -391,7 +388,7 @@ class boss_magtheridon : public CreatureScript
                 if (Quake_Timer <= diff)
                 {
                     // to avoid blastnova interruption
-                    if (!me->IsNonMeleeSpellCasted(false))
+                    if (!me->IsNonMeleeSpellCast(false))
                     {
                         DoCast(me, SPELL_QUAKE_TRIGGER, true);
                         Quake_Timer = 50000;
@@ -406,7 +403,7 @@ class boss_magtheridon : public CreatureScript
                     {
                         float x, y, z;
                         target->GetPosition(x, y, z);
-                        Creature* summon = me->SummonCreature(MOB_ABYSSAL, x, y, z, 0, TEMPSUMMON_CORPSE_DESPAWN, 0);
+                        Creature* summon = me->SummonCreature(NPC_ABYSSAL, x, y, z, 0, TEMPSUMMON_CORPSE_DESPAWN, 0);
                         if (summon)
                         {
                             CAST_AI(npc_abyssal::npc_abyssalAI, summon->AI())->SetTrigger(2);
@@ -420,7 +417,7 @@ class boss_magtheridon : public CreatureScript
                     Blaze_Timer -= diff;
 
                 if (!Phase3 && HealthBelowPct(30)
-                    && !me->IsNonMeleeSpellCasted(false) // blast nova
+                    && !me->IsNonMeleeSpellCast(false) // blast nova
                     && !me->HasUnitState(UNIT_STATE_STUNNED)) // shadow cage and earthquake
                 {
                     Phase3 = true;
@@ -428,8 +425,7 @@ class boss_magtheridon : public CreatureScript
                     DoCast(me, SPELL_CAMERA_SHAKE, true);
                     DoCast(me, SPELL_DEBRIS_KNOCKDOWN, true);
 
-                    if (instance)
-                        instance->SetData(DATA_COLLAPSE, true);
+                    instance->SetData(DATA_COLLAPSE, true);
                 }
 
                 if (Phase3)
@@ -440,7 +436,7 @@ class boss_magtheridon : public CreatureScript
                         {
                             float x, y, z;
                             target->GetPosition(x, y, z);
-                            Creature* summon = me->SummonCreature(MOB_ABYSSAL, x, y, z, 0, TEMPSUMMON_CORPSE_DESPAWN, 0);
+                            Creature* summon = me->SummonCreature(NPC_ABYSSAL, x, y, z, 0, TEMPSUMMON_CORPSE_DESPAWN, 0);
                             if (summon)
                                 CAST_AI(npc_abyssal::npc_abyssalAI, summon->AI())->SetTrigger(1);
                         }
@@ -454,9 +450,9 @@ class boss_magtheridon : public CreatureScript
             }
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const OVERRIDE
         {
-            return new boss_magtheridonAI(creature);
+            return GetInstanceAI<boss_magtheridonAI>(creature);
         }
 };
 
@@ -485,7 +481,7 @@ class npc_hellfire_channeler : public CreatureScript
 
             uint32 Check_Timer;
 
-            void Reset()
+            void Reset() OVERRIDE
             {
                 ShadowBoltVolley_Timer = urand(8000, 10000);
                 DarkMending_Timer = 10000;
@@ -495,41 +491,38 @@ class npc_hellfire_channeler : public CreatureScript
                 Check_Timer = 5000;
             }
 
-            void EnterCombat(Unit* /*who*/)
+            void EnterCombat(Unit* /*who*/) OVERRIDE
             {
-                if (instance)
-                    instance->SetData(DATA_CHANNELER_EVENT, IN_PROGRESS);
+                instance->SetData(DATA_CHANNELER_EVENT, IN_PROGRESS);
 
                 me->InterruptNonMeleeSpells(false);
                 DoZoneInCombat();
             }
 
-            void JustReachedHome()
+            void JustReachedHome() OVERRIDE
             {
-                if (instance)
-                    instance->SetData(DATA_CHANNELER_EVENT, NOT_STARTED);
+                instance->SetData(DATA_CHANNELER_EVENT, NOT_STARTED);
 
                 DoCast(me, SPELL_SHADOW_GRASP_C, false);
             }
 
-            void JustSummoned(Creature* summon)
+            void JustSummoned(Creature* summon) OVERRIDE
             {
                 summon->AI()->AttackStart(me->GetVictim());
             }
 
-            void DamageTaken(Unit*, uint32 &damage)
+            void DamageTaken(Unit*, uint32 &damage) OVERRIDE
             {
                 if (damage >= me->GetHealth())
                     DoCast(me, SPELL_SOUL_TRANSFER, true);
             }
 
-            void JustDied(Unit* /*killer*/)
+            void JustDied(Unit* /*killer*/) OVERRIDE
             {
-                if (instance)
-                    instance->SetData(DATA_CHANNELER_EVENT, DONE);
+                instance->SetData(DATA_CHANNELER_EVENT, DONE);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff) OVERRIDE
             {
                 if (!UpdateVictim())
                     return;
@@ -573,9 +566,9 @@ class npc_hellfire_channeler : public CreatureScript
             }
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const OVERRIDE
         {
-            return new npc_hellfire_channelerAI(creature);
+            return GetInstanceAI<npc_hellfire_channelerAI>(creature);
         }
 };
 
@@ -587,7 +580,7 @@ public:
     {
     }
 
-    bool OnGossipHello(Player* player, GameObject* go)
+    bool OnGossipHello(Player* player, GameObject* go) OVERRIDE
     {
         InstanceScript* instance = go->GetInstanceScript();
 

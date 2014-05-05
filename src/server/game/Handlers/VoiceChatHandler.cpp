@@ -22,29 +22,21 @@
 #include "WorldSession.h"
 #include "Opcodes.h"
 #include "Log.h"
-#include "ChannelMgr.h"
-#include "Channel.h"
-#include "Chat.h"
-#include "ObjectMgr.h"
-#include "SocialMgr.h"
-#include "World.h"
-#include "DatabaseEnv.h"
-#include "AccountMgr.h"
 
 void WorldSession::HandleVoiceSessionEnableOpcode(WorldPacket& recvData)
 {
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_VOICE_SESSION_ENABLE");
+    TC_LOG_DEBUG("network", "WORLD: CMSG_VOICE_SESSION_ENABLE");
 
     bool VoiceEnabled, MicrophoneEnabled;
 
     recvData >> VoiceEnabled;
     recvData >> MicrophoneEnabled;
-// Something lacking here.
+    // Something lacking here.
 }
 
 void WorldSession::HandleChannelVoiceOnOpcode(WorldPacket& recvData)
 {
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_CHANNEL_VOICE_ON");
+    TC_LOG_DEBUG("network", "WORLD: CMSG_CHANNEL_VOICE_ON");
 
     uint32 length = recvData.ReadBits(8);
     std::string channelName = recvData.ReadString(length);
@@ -56,7 +48,7 @@ void WorldSession::HandleChannelVoiceOnOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleChannelVoiceOffOpcode(WorldPacket& recvData)
 {
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_CHANNEL_VOICE_OFF");
+    TC_LOG_DEBUG("network", "WORLD: CMSG_CHANNEL_VOICE_OFF");
 
     uint32 length = recvData.ReadBits(8);
     std::string channelName = recvData.ReadString(length);
@@ -68,7 +60,7 @@ void WorldSession::HandleChannelVoiceOffOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleSetActiveVoiceChannel(WorldPacket& recvData)
 {
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_SET_ACTIVE_VOICE_CHANNEL");
+    TC_LOG_DEBUG("network", "WORLD: CMSG_SET_ACTIVE_VOICE_CHANNEL");
 
     uint32 channelId;
     std::string channelName;

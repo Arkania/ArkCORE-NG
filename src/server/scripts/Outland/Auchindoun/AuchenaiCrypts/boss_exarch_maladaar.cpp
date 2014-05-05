@@ -33,39 +33,51 @@ EndContentData */
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 
-#define SPELL_MOONFIRE          37328
-#define SPELL_FIREBALL          37329
-#define SPELL_MIND_FLAY         37330
-#define SPELL_HEMORRHAGE        37331
-#define SPELL_FROSTSHOCK        37332
-#define SPELL_CURSE_OF_AGONY    37334
-#define SPELL_MORTAL_STRIKE     37335
-#define SPELL_FREEZING_TRAP     37368
-#define SPELL_HAMMER_OF_JUSTICE 37369
+enum Spells
+{
+    SPELL_MOONFIRE              = 37328,
+    SPELL_FIREBALL              = 37329,
+    SPELL_MIND_FLAY             = 37330,
+    SPELL_HEMORRHAGE            = 37331,
+    SPELL_FROSTSHOCK            = 37332,
+    SPELL_CURSE_OF_AGONY        = 37334,
+    SPELL_MORTAL_STRIKE         = 37335,
+    SPELL_FREEZING_TRAP         = 37368,
+    SPELL_HAMMER_OF_JUSTICE     = 37369,
+
+    // Avatar of Martyred
+    SPELL_AV_MORTAL_STRIKE      = 16856,
+    SPELL_AV_SUNDER_ARMOR       = 16145
+};
 
 class npc_stolen_soul : public CreatureScript
 {
 public:
     npc_stolen_soul() : CreatureScript("npc_stolen_soul") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new npc_stolen_soulAI (creature);
+        return new npc_stolen_soulAI(creature);
     }
 
     struct npc_stolen_soulAI : public ScriptedAI
     {
-        npc_stolen_soulAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_stolen_soulAI(Creature* creature) : ScriptedAI(creature)
+        {
+            myClass = CLASS_NONE;
+            Class_Timer = 1000;
+        }
 
         uint8 myClass;
         uint32 Class_Timer;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
+            myClass = CLASS_NONE;
             Class_Timer = 1000;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) OVERRIDE
         { }
 
         void SetMyClass(uint8 myclass)
@@ -73,7 +85,7 @@ public:
             myClass = myclass;
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (!UpdateVictim())
                 return;
@@ -83,39 +95,39 @@ public:
                 switch (myClass)
                 {
                     case CLASS_WARRIOR:
-                        DoCast(me->GetVictim(), SPELL_MORTAL_STRIKE);
+                        DoCastVictim(SPELL_MORTAL_STRIKE);
                         Class_Timer = 6000;
                         break;
                     case CLASS_PALADIN:
-                        DoCast(me->GetVictim(), SPELL_HAMMER_OF_JUSTICE);
+                        DoCastVictim(SPELL_HAMMER_OF_JUSTICE);
                         Class_Timer = 6000;
                         break;
                     case CLASS_HUNTER:
-                        DoCast(me->GetVictim(), SPELL_FREEZING_TRAP);
+                        DoCastVictim(SPELL_FREEZING_TRAP);
                         Class_Timer = 20000;
                         break;
                     case CLASS_ROGUE:
-                        DoCast(me->GetVictim(), SPELL_HEMORRHAGE);
+                        DoCastVictim(SPELL_HEMORRHAGE);
                         Class_Timer = 10000;
                         break;
                     case CLASS_PRIEST:
-                        DoCast(me->GetVictim(), SPELL_MIND_FLAY);
+                        DoCastVictim(SPELL_MIND_FLAY);
                         Class_Timer = 5000;
                         break;
                     case CLASS_SHAMAN:
-                        DoCast(me->GetVictim(), SPELL_FROSTSHOCK);
+                        DoCastVictim(SPELL_FROSTSHOCK);
                         Class_Timer = 8000;
                         break;
                     case CLASS_MAGE:
-                        DoCast(me->GetVictim(), SPELL_FIREBALL);
+                        DoCastVictim(SPELL_FIREBALL);
                         Class_Timer = 5000;
                         break;
                     case CLASS_WARLOCK:
-                        DoCast(me->GetVictim(), SPELL_CURSE_OF_AGONY);
+                        DoCastVictim(SPELL_CURSE_OF_AGONY);
                         Class_Timer = 20000;
                         break;
                     case CLASS_DRUID:
-                        DoCast(me->GetVictim(), SPELL_MOONFIRE);
+                        DoCastVictim(SPELL_MOONFIRE);
                         Class_Timer = 10000;
                         break;
                 }
@@ -150,9 +162,9 @@ class boss_exarch_maladaar : public CreatureScript
 public:
     boss_exarch_maladaar() : CreatureScript("boss_exarch_maladaar") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new boss_exarch_maladaarAI (creature);
+        return new boss_exarch_maladaarAI(creature);
     }
 
     struct boss_exarch_maladaarAI : public ScriptedAI
@@ -173,7 +185,7 @@ public:
         bool HasTaunted;
         bool Avatar_summoned;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             soulmodel = 0;
             soulholder = 0;
@@ -186,7 +198,8 @@ public:
             Avatar_summoned = false;
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) OVERRIDE
+
         {
             if (!HasTaunted && me->IsWithinDistInMap(who, 150.0f))
             {
@@ -197,12 +210,12 @@ public:
             ScriptedAI::MoveInLineOfSight(who);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) OVERRIDE
         {
             Talk(SAY_AGGRO);
         }
 
-        void JustSummoned(Creature* summoned)
+        void JustSummoned(Creature* summoned) OVERRIDE
         {
             if (summoned->GetEntry() == ENTRY_STOLEN_SOUL)
             {
@@ -220,7 +233,7 @@ public:
             }
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit* /*victim*/) OVERRIDE
         {
             if (rand()%2)
                 return;
@@ -228,21 +241,21 @@ public:
             Talk(SAY_SLAY);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) OVERRIDE
         {
             Talk(SAY_DEATH);
             //When Exarch Maladar is defeated D'ore appear.
             me->SummonCreature(19412, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 600000);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (!UpdateVictim())
                 return;
 
             if (!Avatar_summoned && HealthBelowPct(25))
             {
-                if (me->IsNonMeleeSpellCasted(false))
+                if (me->IsNonMeleeSpellCast(false))
                     me->InterruptNonMeleeSpells(true);
 
                 Talk(SAY_SUMMON);
@@ -258,7 +271,7 @@ public:
                 {
                     if (target->GetTypeId() == TYPEID_PLAYER)
                     {
-                        if (me->IsNonMeleeSpellCasted(false))
+                        if (me->IsNonMeleeSpellCast(false))
                             me->InterruptNonMeleeSpells(true);
 
                         Talk(SAY_ROAR);
@@ -295,42 +308,39 @@ public:
 
 };
 
-#define SPELL_AV_MORTAL_STRIKE          16856
-#define SPELL_AV_SUNDER_ARMOR           16145
-
 class npc_avatar_of_martyred : public CreatureScript
 {
 public:
     npc_avatar_of_martyred() : CreatureScript("npc_avatar_of_martyred") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new npc_avatar_of_martyredAI (creature);
+        return new npc_avatar_of_martyredAI(creature);
     }
 
     struct npc_avatar_of_martyredAI : public ScriptedAI
     {
-        npc_avatar_of_martyredAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_avatar_of_martyredAI(Creature* creature) : ScriptedAI(creature) { }
 
         uint32 Mortal_Strike_timer;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             Mortal_Strike_timer = 10000;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) OVERRIDE
         {
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (!UpdateVictim())
                 return;
 
             if (Mortal_Strike_timer <= diff)
             {
-                DoCast(me->GetVictim(), SPELL_AV_MORTAL_STRIKE);
+                DoCastVictim(SPELL_AV_MORTAL_STRIKE);
                 Mortal_Strike_timer = urand(10, 30) * 1000;
             } else Mortal_Strike_timer -= diff;
 

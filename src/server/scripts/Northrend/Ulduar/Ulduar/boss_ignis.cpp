@@ -122,7 +122,7 @@ class boss_ignis : public CreatureScript
                 ASSERT(_vehicle);
             }
 
-            void Reset()
+            void Reset() OVERRIDE
             {
                 _Reset();
                 if (_vehicle)
@@ -131,7 +131,7 @@ class boss_ignis : public CreatureScript
                 instance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEVEMENT_IGNIS_START_EVENT);
             }
 
-            void EnterCombat(Unit* /*who*/)
+            void EnterCombat(Unit* /*who*/) OVERRIDE
             {
                 _EnterCombat();
                 Talk(SAY_AGGRO);
@@ -147,13 +147,13 @@ class boss_ignis : public CreatureScript
                 instance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEVEMENT_IGNIS_START_EVENT);
             }
 
-            void JustDied(Unit* /*killer*/)
+            void JustDied(Unit* /*killer*/) OVERRIDE
             {
                 _JustDied();
                 Talk(SAY_DEATH);
             }
 
-            uint32 GetData(uint32 type) const
+            uint32 GetData(uint32 type) const OVERRIDE
             {
                 if (type == DATA_SHATTERED)
                     return _shattered ? 1 : 0;
@@ -161,13 +161,13 @@ class boss_ignis : public CreatureScript
                 return 0;
             }
 
-            void KilledUnit(Unit* who)
+            void KilledUnit(Unit* who) OVERRIDE
             {
                 if (who->GetTypeId() == TYPEID_PLAYER)
                     Talk(SAY_SLAY);
             }
 
-            void JustSummoned(Creature* summon)
+            void JustSummoned(Creature* summon) OVERRIDE
             {
                 if (summon->GetEntry() == NPC_IRON_CONSTRUCT)
                 {
@@ -181,7 +181,7 @@ class boss_ignis : public CreatureScript
                 summons.Summon(summon);
             }
 
-            void DoAction(const int32 action)
+            void DoAction(int32 action) OVERRIDE
             {
                 if (action != ACTION_REMOVE_BUFF)
                     return;
@@ -194,7 +194,7 @@ class boss_ignis : public CreatureScript
                 _firstConstructKill = secondKill;
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff) OVERRIDE
             {
                 if (!UpdateVictim())
                     return;
@@ -209,7 +209,7 @@ class boss_ignis : public CreatureScript
                     switch (eventId)
                     {
                         case EVENT_JET:
-                            me->MonsterTextEmote(EMOTE_JETS, 0, true);
+                            Talk(EMOTE_JETS);
                             DoCast(me, SPELL_FLAME_JETS);
                             events.ScheduleEvent(EVENT_JET, urand(35000, 40000));
                             break;
@@ -284,7 +284,7 @@ class boss_ignis : public CreatureScript
 
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const OVERRIDE
         {
             return GetUlduarAI<boss_ignis_AI>(creature);
         }
@@ -302,12 +302,12 @@ class npc_iron_construct : public CreatureScript
                 creature->SetReactState(REACT_PASSIVE);
             }
 
-            void Reset()
+            void Reset() OVERRIDE
             {
                 _brittled = false;
             }
 
-            void DamageTaken(Unit* /*attacker*/, uint32& damage)
+            void DamageTaken(Unit* /*attacker*/, uint32& damage) OVERRIDE
             {
                 if (me->HasAura(SPELL_BRITTLE) && damage >= 5000)
                 {
@@ -320,7 +320,7 @@ class npc_iron_construct : public CreatureScript
                 }
             }
 
-            void UpdateAI(const uint32 /*uiDiff*/)
+            void UpdateAI(uint32 /*uiDiff*/) OVERRIDE
             {
                 if (!UpdateVictim())
                     return;
@@ -351,7 +351,7 @@ class npc_iron_construct : public CreatureScript
             bool _brittled;
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const OVERRIDE
         {
             return GetUlduarAI<npc_iron_constructAI>(creature);
         }
@@ -370,7 +370,8 @@ class npc_scorch_ground : public CreatureScript
                 creature->SetDisplayId(16925); //model 2 in db cannot overwrite wdb fields
             }
 
-            void MoveInLineOfSight(Unit* who)
+            void MoveInLineOfSight(Unit* who) OVERRIDE
+
             {
                 if (!_heat)
                 {
@@ -385,7 +386,7 @@ class npc_scorch_ground : public CreatureScript
                 }
             }
 
-            void Reset()
+            void Reset() OVERRIDE
             {
                 _heat = false;
                 DoCast(me, SPELL_GROUND);
@@ -393,7 +394,7 @@ class npc_scorch_ground : public CreatureScript
                 _heatTimer = 0;
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(uint32 uiDiff) OVERRIDE
             {
                 if (_heat)
                 {
@@ -417,7 +418,7 @@ class npc_scorch_ground : public CreatureScript
             bool _heat;
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const OVERRIDE
         {
             return GetUlduarAI<npc_scorch_groundAI>(creature);
         }
@@ -432,11 +433,10 @@ class spell_ignis_slag_pot : public SpellScriptLoader
         {
             PrepareAuraScript(spell_ignis_slag_pot_AuraScript);
 
-            bool Validate(SpellInfo const* /*spellEntry*/)
+            bool Validate(SpellInfo const* /*spellInfo*/) OVERRIDE
             {
-                if (!sSpellMgr->GetSpellInfo(SPELL_SLAG_POT_DAMAGE))
-                    return false;
-                if (!sSpellMgr->GetSpellInfo(SPELL_SLAG_IMBUED))
+                if (!sSpellMgr->GetSpellInfo(SPELL_SLAG_POT_DAMAGE)
+                    || !sSpellMgr->GetSpellInfo(SPELL_SLAG_IMBUED))
                     return false;
                 return true;
             }
@@ -457,14 +457,14 @@ class spell_ignis_slag_pot : public SpellScriptLoader
                     GetTarget()->CastSpell(GetTarget(), SPELL_SLAG_IMBUED, true);
             }
 
-            void Register()
+            void Register() OVERRIDE
             {
                 OnEffectPeriodic += AuraEffectPeriodicFn(spell_ignis_slag_pot_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
                 AfterEffectRemove += AuraEffectRemoveFn(spell_ignis_slag_pot_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
             }
         };
 
-        AuraScript* GetAuraScript() const
+        AuraScript* GetAuraScript() const OVERRIDE
         {
             return new spell_ignis_slag_pot_AuraScript();
         }
@@ -475,7 +475,7 @@ class achievement_ignis_shattered : public AchievementCriteriaScript
     public:
         achievement_ignis_shattered() : AchievementCriteriaScript("achievement_ignis_shattered") { }
 
-        bool OnCheck(Player* /*source*/, Unit* target)
+        bool OnCheck(Player* /*source*/, Unit* target) OVERRIDE
         {
             if (target && target->IsAIEnabled)
                 return target->GetAI()->GetData(DATA_SHATTERED);

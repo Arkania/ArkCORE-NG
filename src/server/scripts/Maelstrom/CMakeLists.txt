@@ -1,5 +1,3 @@
-# Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
-#
 # This file is free software; as a special exception the author gives
 # unlimited permission to copy and/or distribute it, with or without
 # modifications, as long as this notice is preserved.
@@ -17,7 +15,6 @@ set(scripts_STAT_SRCS
   Maelstrom/TheStoneCore/stonecore.h
   Maelstrom/TheStoneCore/stonecore.cpp
   Maelstrom/TheStoneCore/instance_stonecore.cpp
-
   Maelstrom/zone_kezan.cpp
   Maelstrom/zone_darkmoon_island.cpp
   Maelstrom/zone_deepholm.cpp
@@ -27,4 +24,4 @@ set(scripts_STAT_SRCS
   Maelstrom/zone_tolbarad_peninsula.cpp
 )
 
-message("  -> Prepared: Maelstrom")
+message("  -> Prepared: The Maelstrom")

@@ -43,7 +43,7 @@ class OutdoorPvPMgr
 
     private:
         OutdoorPvPMgr();
-        ~OutdoorPvPMgr() {};
+        ~OutdoorPvPMgr() { };
 
     public:
         // create outdoor pvp events

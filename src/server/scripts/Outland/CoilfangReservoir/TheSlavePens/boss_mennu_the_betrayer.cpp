@@ -61,18 +61,18 @@ class boss_mennu_the_betrayer : public CreatureScript
         {
             boss_mennu_the_betrayerAI(Creature* creature) : BossAI(creature, DATA_MENNU_THE_BETRAYER) { }
 
-            void Reset() 
+            void Reset() OVERRIDE
             {
                 _Reset();
             }
 
-            void JustDied(Unit* /*killer*/) 
+            void JustDied(Unit* /*killer*/) OVERRIDE
             {
                 _JustDied();
                 Talk(SAY_DEATH);
             }
 
-            void EnterCombat(Unit* /*who*/) 
+            void EnterCombat(Unit* /*who*/) OVERRIDE
             {
                 _EnterCombat();
                 events.ScheduleEvent(EVENT_TAINTED_STONESKIN_TOTEM, 30000);
@@ -83,12 +83,12 @@ class boss_mennu_the_betrayer : public CreatureScript
                 Talk(SAY_AGGRO);
             }
 
-            void KilledUnit(Unit* /*victim*/) 
+            void KilledUnit(Unit* /*victim*/) OVERRIDE
             {
                 Talk(SAY_SLAY);
             }
 
-            void UpdateAI(const uint32 diff) 
+            void UpdateAI(uint32 diff) OVERRIDE
             {
                 if (!UpdateVictim())
                     return;
@@ -130,7 +130,7 @@ class boss_mennu_the_betrayer : public CreatureScript
             }
         };
 
-        CreatureAI* GetAI(Creature* creature) const 
+        CreatureAI* GetAI(Creature* creature) const OVERRIDE
         {
             return new boss_mennu_the_betrayerAI(creature);
         }

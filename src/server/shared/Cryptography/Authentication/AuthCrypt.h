@@ -28,7 +28,6 @@ class AuthCrypt
 {
     public:
         AuthCrypt();
-        ~AuthCrypt();
 
         void Init(BigNumber* K);
         void DecryptRecv(uint8 *, size_t);

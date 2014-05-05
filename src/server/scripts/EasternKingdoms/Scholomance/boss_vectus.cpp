@@ -27,13 +27,17 @@ EndScriptData */
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 
-enum eEnums
+enum Emotes
 {
-    EMOTE_FRENZY_KILL            = 0,
+    EMOTE_FRENZY_KILL            = 0
+};
+
+enum Spells
+{
     SPELL_FLAMESTRIKE            = 18399,
     SPELL_BLAST_WAVE             = 16046,
     SPELL_FIRESHIELD             = 19626,
-    SPELL_FRENZY                 = 8269 //28371,
+    SPELL_FRENZY                 = 8269  // 28371
 };
 
 class boss_vectus : public CreatureScript
@@ -41,27 +45,27 @@ class boss_vectus : public CreatureScript
 public:
     boss_vectus() : CreatureScript("boss_vectus") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new boss_vectusAI (creature);
+        return new boss_vectusAI(creature);
     }
 
     struct boss_vectusAI : public ScriptedAI
     {
-        boss_vectusAI(Creature* creature) : ScriptedAI(creature) {}
+        boss_vectusAI(Creature* creature) : ScriptedAI(creature) { }
 
         uint32 m_uiFireShield_Timer;
         uint32 m_uiBlastWave_Timer;
         uint32 m_uiFrenzy_Timer;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             m_uiFireShield_Timer = 2000;
             m_uiBlastWave_Timer = 14000;
             m_uiFrenzy_Timer = 0;
         }
 
-        void UpdateAI(const uint32 uiDiff)
+        void UpdateAI(uint32 uiDiff) OVERRIDE
         {
             if (!UpdateVictim())
                 return;
@@ -78,7 +82,7 @@ public:
             //BlastWave_Timer
             if (m_uiBlastWave_Timer <= uiDiff)
             {
-                DoCast(me->GetVictim(), SPELL_BLAST_WAVE);
+                DoCastVictim(SPELL_BLAST_WAVE);
                 m_uiBlastWave_Timer = 12000;
             }
             else

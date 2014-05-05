@@ -43,7 +43,7 @@ public:
     {
         boss_tuten_kashAI(Creature* creature) : BossAI(creature, DATA_TUTEN_KASH) { }
 
-        void Reset() 
+        void Reset() OVERRIDE
         {
             _Reset();
             if (!me->HasAura(SPELL_THRASH))
@@ -52,19 +52,19 @@ public:
                 DoCast(me, SPELL_VIRULENT_POISON);
         }
 
-        void EnterCombat(Unit* /*who*/) 
+        void EnterCombat(Unit* /*who*/) OVERRIDE
         {
             _EnterCombat();
             events.ScheduleEvent(EVENT_WEB_SPRAY, urand(3000, 5000));
             events.ScheduleEvent(EVENT_CURSE_OF_TUTENKASH, urand(9000, 14000));
         }
 
-        void JustDied(Unit* /*killer*/) 
+        void JustDied(Unit* /*killer*/) OVERRIDE
         {
             _JustDied();
         }
 
-        void UpdateAI(const uint32 diff) 
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (!UpdateVictim())
                 return;
@@ -96,7 +96,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const 
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
         return new boss_tuten_kashAI(creature);
     }

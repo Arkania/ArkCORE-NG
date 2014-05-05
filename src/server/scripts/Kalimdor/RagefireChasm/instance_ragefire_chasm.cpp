@@ -31,7 +31,7 @@ class instance_ragefire_chasm : public InstanceMapScript
 public:
     instance_ragefire_chasm() : InstanceMapScript("instance_ragefire_chasm", 389) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const 
+    InstanceScript* GetInstanceScript(InstanceMap* map) const OVERRIDE
     {
         return new instance_ragefire_chasm_InstanceMapScript(map);
     }

@@ -36,7 +36,8 @@ enum Sartura
     SPELL_WHIRLWIND     = 26083,
     SPELL_ENRAGE        = 28747,            //Not sure if right ID.
     SPELL_ENRAGEHARD    = 28798,
-    //Guard Spell
+
+//Guard Spell
     SPELL_WHIRLWINDADD  = 26038,
     SPELL_KNOCKBACK     = 26027
 };
@@ -46,14 +47,14 @@ class boss_sartura : public CreatureScript
 public:
     boss_sartura() : CreatureScript("boss_sartura") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new boss_sarturaAI (creature);
+        return new boss_sarturaAI(creature);
     }
 
     struct boss_sarturaAI : public ScriptedAI
     {
-        boss_sarturaAI(Creature* creature) : ScriptedAI(creature) {}
+        boss_sarturaAI(Creature* creature) : ScriptedAI(creature) { }
 
         uint32 WhirlWind_Timer;
         uint32 WhirlWindRandom_Timer;
@@ -67,7 +68,7 @@ public:
         bool WhirlWind;
         bool AggroReset;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             WhirlWind_Timer = 30000;
             WhirlWindRandom_Timer = urand(3000, 7000);
@@ -83,22 +84,22 @@ public:
 
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) OVERRIDE
         {
             Talk(SAY_AGGRO);
         }
 
-         void JustDied(Unit* /*killer*/)
+         void JustDied(Unit* /*killer*/) OVERRIDE
          {
-            Talk(SAY_DEATH);
+             Talk(SAY_DEATH);
          }
 
-         void KilledUnit(Unit* /*victim*/)
+         void KilledUnit(Unit* /*victim*/) OVERRIDE
          {
-            Talk(SAY_SLAY);
+             Talk(SAY_SLAY);
          }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             //Return since we have no target
             if (!UpdateVictim())
@@ -160,7 +161,7 @@ public:
                 //If she is 20% enrage
                 if (!Enraged)
                 {
-                    if (!HealthAbovePct(20) && !me->IsNonMeleeSpellCasted(false))
+                    if (!HealthAbovePct(20) && !me->IsNonMeleeSpellCast(false))
                     {
                         DoCast(me, SPELL_ENRAGE);
                         Enraged = true;
@@ -189,14 +190,14 @@ class npc_sartura_royal_guard : public CreatureScript
 public:
     npc_sartura_royal_guard() : CreatureScript("npc_sartura_royal_guard") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new npc_sartura_royal_guardAI (creature);
+        return new npc_sartura_royal_guardAI(creature);
     }
 
     struct npc_sartura_royal_guardAI : public ScriptedAI
     {
-        npc_sartura_royal_guardAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_sartura_royal_guardAI(Creature* creature) : ScriptedAI(creature) { }
 
         uint32 WhirlWind_Timer;
         uint32 WhirlWindRandom_Timer;
@@ -208,7 +209,7 @@ public:
         bool WhirlWind;
         bool AggroReset;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             WhirlWind_Timer = 30000;
             WhirlWindRandom_Timer = urand(3000, 7000);
@@ -221,11 +222,11 @@ public:
             AggroReset = false;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) OVERRIDE
         {
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             //Return since we have no target
             if (!UpdateVictim())

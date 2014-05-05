@@ -50,4 +50,5 @@ public:
 };
 
 } // namespace Trinity
+
 #endif

@@ -1,20 +1,19 @@
 /*
- * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
- */
+* Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
+*
+* This program is free software; you can redistribute it and/or modify it
+* under the terms of the GNU General Public License as published by the
+* Free Software Foundation; either version 2 of the License, or (at your
+* option) any later version.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+* FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+* more details.
+*
+* You should have received a copy of the GNU General Public License along
+* with this program. If not, see <http://www.gnu.org/licenses/>.
+*/
 
 /*
 Name: Boss_Zum_Rah
@@ -62,7 +61,7 @@ public:
     {
         boss_zum_rahAI(Creature* creature) : BossAI(creature, DATA_ZUM_RAH) { }
 
-        void Reset() 
+        void Reset() OVERRIDE
         {
             me->setFaction(ZUMRAH_FRIENDLY_FACTION); // areatrigger sets faction to enemy
             _ward80 = false;
@@ -70,24 +69,24 @@ public:
             _heal30 = false;
         }
 
-        void EnterCombat(Unit* /*who*/) 
+        void EnterCombat(Unit* /*who*/) OVERRIDE
         {
             Talk(SAY_SANCT_INVADE);
             events.ScheduleEvent(EVENT_SHADOW_BOLT, 1000);
             events.ScheduleEvent(EVENT_SHADOWBOLT_VOLLEY, 10000);
         }
 
-        void JustDied(Unit* /*killer*/) 
+        void JustDied(Unit* /*killer*/) OVERRIDE
         {
             instance->SetData(DATA_ZUM_RAH, DONE);
         }
 
-        void KilledUnit(Unit* /*victim*/) 
+        void KilledUnit(Unit* /*victim*/) OVERRIDE
         {
             Talk(SAY_KILL);
         }
 
-        void UpdateAI(const uint32 diff) 
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (!UpdateVictim())
                 return;
@@ -148,7 +147,7 @@ public:
 
     };
 
-    CreatureAI* GetAI(Creature* creature) const 
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
         return GetInstanceAI<boss_zum_rahAI>(creature);
     }

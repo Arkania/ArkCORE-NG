@@ -38,11 +38,19 @@ EndContentData */
 ## npc_kalecgos
 ######*/
 
-enum eEnums
+enum Spells
 {
     SPELL_TRANSFORM_TO_KAEL     = 44670,
-    SPELL_ORB_KILL_CREDIT       = 46307,
-    NPC_KAEL                    = 24848,                    //human form entry
+    SPELL_ORB_KILL_CREDIT       = 46307
+};
+
+enum Creatures
+{
+    NPC_KAEL                    = 24848 //human form entry
+};
+
+enum Misc
+{
     POINT_ID_LAND               = 1
 };
 
@@ -61,7 +69,7 @@ class npc_kalecgos : public CreatureScript
 public:
     npc_kalecgos() : CreatureScript("npc_kalecgos") { }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) OVERRIDE
     {
         player->PlayerTalkClass->ClearMenus();
         switch (action)
@@ -90,7 +98,7 @@ public:
         return true;
     }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) OVERRIDE
     {
         if (creature->IsQuestGiver())
             player->PrepareQuestMenu(creature->GetGUID());
@@ -101,18 +109,18 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
         return new npc_kalecgosAI(creature);
     }
 
     struct npc_kalecgosAI : public ScriptedAI
     {
-        npc_kalecgosAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_kalecgosAI(Creature* creature) : ScriptedAI(creature) { }
 
         uint32 m_uiTransformTimer;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             m_uiTransformTimer = 0;
 
@@ -121,7 +129,7 @@ public:
                 me->GetMotionMaster()->MovePoint(POINT_ID_LAND, afKaelLandPoint[0], afKaelLandPoint[1], afKaelLandPoint[2]);
         }
 
-        void MovementInform(uint32 uiType, uint32 uiPointId)
+        void MovementInform(uint32 uiType, uint32 uiPointId) OVERRIDE
         {
             if (uiType != POINT_MOTION_TYPE)
                 return;
@@ -155,7 +163,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 uiDiff)
+        void UpdateAI(uint32 uiDiff) OVERRIDE
         {
             if (m_uiTransformTimer)
             {

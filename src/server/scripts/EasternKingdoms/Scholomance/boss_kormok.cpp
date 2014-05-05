@@ -27,22 +27,25 @@ EndScriptData */
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 
-#define SPELL_SHADOWBOLTVOLLEY      20741
-#define SPELL_BONESHIELD            27688
+enum Spells
+{
+    SPELL_SHADOWBOLTVOLLEY      = 20741,
+    SPELL_BONESHIELD            = 27688
+};
 
 class boss_kormok : public CreatureScript
 {
 public:
     boss_kormok() : CreatureScript("boss_kormok") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new boss_kormokAI (creature);
+        return new boss_kormokAI(creature);
     }
 
     struct boss_kormokAI : public ScriptedAI
     {
-        boss_kormokAI(Creature* creature) : ScriptedAI(creature) {}
+        boss_kormokAI(Creature* creature) : ScriptedAI(creature) { }
 
         uint32 ShadowVolley_Timer;
         uint32 BoneShield_Timer;
@@ -50,7 +53,7 @@ public:
         uint32 Mage_Timer;
         bool Mages;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             ShadowVolley_Timer = 10000;
             BoneShield_Timer = 2000;
@@ -59,7 +62,7 @@ public:
             Mages = false;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) OVERRIDE
         {
         }
 
@@ -75,7 +78,7 @@ public:
                 SummonedMage->AI()->AttackStart(victim);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (!UpdateVictim())
                 return;
@@ -83,14 +86,14 @@ public:
             //ShadowVolley_Timer
             if (ShadowVolley_Timer <= diff)
             {
-                DoCast(me->GetVictim(), SPELL_SHADOWBOLTVOLLEY);
+                DoCastVictim(SPELL_SHADOWBOLTVOLLEY);
                 ShadowVolley_Timer = 15000;
             } else ShadowVolley_Timer -= diff;
 
             //BoneShield_Timer
             if (BoneShield_Timer <= diff)
             {
-                DoCast(me->GetVictim(), SPELL_BONESHIELD);
+                DoCastVictim(SPELL_BONESHIELD);
                 BoneShield_Timer = 45000;
             } else BoneShield_Timer -= diff;
 

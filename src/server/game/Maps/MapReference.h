@@ -29,21 +29,21 @@ class MapReference : public Reference<Map, Player>
         void targetObjectBuildLink()
         {
             // called from link()
-            GetTarget()->m_mapRefManager.insertFirst(this);
-            GetTarget()->m_mapRefManager.incSize();
+            getTarget()->m_mapRefManager.insertFirst(this);
+            getTarget()->m_mapRefManager.incSize();
         }
         void targetObjectDestroyLink()
         {
             // called from unlink()
-            if (isValid()) GetTarget()->m_mapRefManager.decSize();
+            if (isValid()) getTarget()->m_mapRefManager.decSize();
         }
         void sourceObjectDestroyLink()
         {
             // called from invalidate()
-            GetTarget()->m_mapRefManager.decSize();
+            getTarget()->m_mapRefManager.decSize();
         }
     public:
-        MapReference() : Reference<Map, Player>() {}
+        MapReference() : Reference<Map, Player>() { }
         ~MapReference() { unlink(); }
         MapReference* next() { return (MapReference*)Reference<Map, Player>::next(); }
         MapReference const* next() const { return (MapReference const*)Reference<Map, Player>::next(); }

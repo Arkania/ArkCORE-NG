@@ -36,9 +36,9 @@ class boss_eck : public CreatureScript
 public:
     boss_eck() : CreatureScript("boss_eck") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new boss_eckAI (creature);
+        return GetInstanceAI<boss_eckAI>(creature);
     }
 
     struct boss_eckAI : public ScriptedAI
@@ -57,7 +57,7 @@ public:
 
         InstanceScript* instance;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             uiBerserkTimer = urand(60*IN_MILLISECONDS, 90*IN_MILLISECONDS); //60-90 secs according to wowwiki
             uiBiteTimer = 5*IN_MILLISECONDS;
@@ -66,17 +66,15 @@ public:
 
             bBerserk = false;
 
-            if (instance)
-                instance->SetData(DATA_ECK_THE_FEROCIOUS_EVENT, NOT_STARTED);
+            instance->SetData(DATA_ECK_THE_FEROCIOUS_EVENT, NOT_STARTED);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) OVERRIDE
         {
-            if (instance)
-                instance->SetData(DATA_ECK_THE_FEROCIOUS_EVENT, IN_PROGRESS);
+            instance->SetData(DATA_ECK_THE_FEROCIOUS_EVENT, IN_PROGRESS);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             //Return since we have no target
             if (!UpdateVictim())
@@ -84,13 +82,13 @@ public:
 
             if (uiBiteTimer <= diff)
             {
-                DoCast(me->GetVictim(), SPELL_ECK_BITE);
+                DoCastVictim(SPELL_ECK_BITE);
                 uiBiteTimer = urand(8*IN_MILLISECONDS, 12*IN_MILLISECONDS);
             } else uiBiteTimer -= diff;
 
             if (uiSpitTimer <= diff)
             {
-                DoCast(me->GetVictim(), SPELL_ECK_SPIT);
+                DoCastVictim(SPELL_ECK_SPIT);
                 uiSpitTimer = urand(6*IN_MILLISECONDS, 14*IN_MILLISECONDS);
             } else uiSpitTimer -= diff;
 
@@ -126,10 +124,9 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) OVERRIDE
         {
-            if (instance)
-                instance->SetData(DATA_ECK_THE_FEROCIOUS_EVENT, DONE);
+            instance->SetData(DATA_ECK_THE_FEROCIOUS_EVENT, DONE);
         }
     };
 
@@ -140,9 +137,9 @@ class npc_ruins_dweller : public CreatureScript
 public:
     npc_ruins_dweller() : CreatureScript("npc_ruins_dweller") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new npc_ruins_dwellerAI (creature);
+        return GetInstanceAI<npc_ruins_dwellerAI>(creature);
     }
 
     struct npc_ruins_dwellerAI : public ScriptedAI
@@ -154,14 +151,11 @@ public:
 
         InstanceScript* instance;
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) OVERRIDE
         {
-            if (instance)
-            {
-                instance->SetData64(DATA_RUIN_DWELLER_DIED, me->GetGUID());
-                if (instance->GetData(DATA_ALIVE_RUIN_DWELLERS) == 0)
-                    me->SummonCreature(CREATURE_ECK, EckSpawnPoint, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 300*IN_MILLISECONDS);
-            }
+            instance->SetData64(DATA_RUIN_DWELLER_DIED, me->GetGUID());
+            if (instance->GetData(DATA_ALIVE_RUIN_DWELLERS) == 0)
+                me->SummonCreature(CREATURE_ECK, EckSpawnPoint, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 300*IN_MILLISECONDS);
         }
     };
 

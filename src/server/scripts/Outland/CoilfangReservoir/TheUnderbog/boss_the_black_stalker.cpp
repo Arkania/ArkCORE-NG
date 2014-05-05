@@ -27,24 +27,30 @@ EndScriptData */
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 
-#define SPELL_LEVITATE             31704
-#define SPELL_SUSPENSION           31719
-#define SPELL_LEVITATION_PULSE     31701
-#define SPELL_MAGNETIC_PULL        31705
-#define SPELL_CHAIN_LIGHTNING      31717
-#define SPELL_STATIC_CHARGE        31715
-#define SPELL_SUMMON_SPORE_STRIDER 38755
+enum Spells
+{
+    SPELL_LEVITATE              = 31704,
+    SPELL_SUSPENSION            = 31719,
+    SPELL_LEVITATION_PULSE      = 31701,
+    SPELL_MAGNETIC_PULL         = 31705,
+    SPELL_CHAIN_LIGHTNING       = 31717,
+    SPELL_STATIC_CHARGE         = 31715,
+    SPELL_SUMMON_SPORE_STRIDER  = 38755
+};
 
-#define ENTRY_SPORE_STRIDER        22299
+enum CreatureIdS
+{
+    ENTRY_SPORE_STRIDER         = 22299
+};
 
 class boss_the_black_stalker : public CreatureScript
 {
 public:
     boss_the_black_stalker() : CreatureScript("boss_the_black_stalker") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new boss_the_black_stalkerAI (creature);
+        return new boss_the_black_stalkerAI(creature);
     }
 
     struct boss_the_black_stalkerAI : public ScriptedAI
@@ -63,7 +69,7 @@ public:
         uint32 check_Timer;
         std::list<uint64> Striders;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             Levitate_Timer = 12000;
             ChainLightning_Timer = 6000;
@@ -75,9 +81,9 @@ public:
             Striders.clear();
         }
 
-        void EnterCombat(Unit* /*who*/) {}
+        void EnterCombat(Unit* /*who*/) OVERRIDE { }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) OVERRIDE
         {
             if (summon && summon->GetEntry() == ENTRY_SPORE_STRIDER)
             {
@@ -90,14 +96,14 @@ public:
             }
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) OVERRIDE
         {
             for (std::list<uint64>::const_iterator i = Striders.begin(); i != Striders.end(); ++i)
                 if (Creature* strider = Unit::GetCreature(*me, *i))
                     strider->DisappearAndDie();
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (!UpdateVictim())
                 return;

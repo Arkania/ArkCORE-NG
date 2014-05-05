@@ -45,14 +45,14 @@ class boss_huhuran : public CreatureScript
 public:
     boss_huhuran() : CreatureScript("boss_huhuran") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new boss_huhuranAI (creature);
+        return new boss_huhuranAI(creature);
     }
 
     struct boss_huhuranAI : public ScriptedAI
     {
-        boss_huhuranAI(Creature* creature) : ScriptedAI(creature) {}
+        boss_huhuranAI(Creature* creature) : ScriptedAI(creature) { }
 
         uint32 Frenzy_Timer;
         uint32 Wyvern_Timer;
@@ -64,7 +64,7 @@ public:
         bool Frenzy;
         bool Berserk;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             Frenzy_Timer = urand(25000, 35000);
             Wyvern_Timer = urand(18000, 28000);
@@ -77,11 +77,11 @@ public:
             Berserk = false;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) OVERRIDE
         {
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             //Return since we have no target
             if (!UpdateVictim())
@@ -108,14 +108,14 @@ public:
             //Spit Timer
             if (Spit_Timer <= diff)
             {
-                DoCast(me->GetVictim(), SPELL_ACIDSPIT);
+                DoCastVictim(SPELL_ACIDSPIT);
                 Spit_Timer = urand(5000, 10000);
             } else Spit_Timer -= diff;
 
             //NoxiousPoison_Timer
             if (NoxiousPoison_Timer <= diff)
             {
-                DoCast(me->GetVictim(), SPELL_NOXIOUSPOISON);
+                DoCastVictim(SPELL_NOXIOUSPOISON);
                 NoxiousPoison_Timer = urand(12000, 24000);
             } else NoxiousPoison_Timer -= diff;
 
@@ -124,7 +124,7 @@ public:
             {
                 if (PoisonBolt_Timer <= diff)
                 {
-                    DoCast(me->GetVictim(), SPELL_POISONBOLT);
+                    DoCastVictim(SPELL_POISONBOLT);
                     PoisonBolt_Timer = 3000;
                 } else PoisonBolt_Timer -= diff;
             }

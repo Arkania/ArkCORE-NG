@@ -177,12 +177,12 @@ class BattlegroundTP : public Battleground
         bool IsForceTimerDone;
 
         /* Battleground Events */
-        void EventPlayerDroppedFlag(Player* Source);
-        void EventPlayerClickedOnFlag(Player* Source, GameObject* target_obj);
-        void EventPlayerCapturedFlag(Player* Source);
+        void EventPlayerDroppedFlag(Player* player);
+        void EventPlayerClickedOnFlag(Player* player, GameObject* target_obj);
+        void EventPlayerCapturedFlag(Player* player);
 
         void RemovePlayer(Player* player, uint64 guid, uint32 team);
-        void HandleAreaTrigger(Player* Source, uint32 Trigger);
+        void HandleAreaTrigger(Player* player, uint32 trigger);
         void HandleKillPlayer(Player* player, Player* killer);
         bool SetupBattleground();
         void Reset();
@@ -192,7 +192,7 @@ class BattlegroundTP : public Battleground
         void UpdateFlagState(uint32 team, uint32 value);
         void SetLastFlagCapture(uint32 team)                { m_LastFlagCaptureTeam = team; }
         void UpdateTeamScore(uint32 team);
-        void UpdatePlayerScore(Player* Source, uint32 type, uint32 value, bool doAddHonor = true);
+        void UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor = true);
         void SetDroppedFlagGUID(uint64 guid, int32 team = -1)
         {
             if (team == TEAM_ALLIANCE || team == TEAM_HORDE)
@@ -207,6 +207,10 @@ class BattlegroundTP : public Battleground
         void RemovePoint(uint32 TeamID, uint32 Points = 1)  { m_TeamScores[GetTeamIndexByTeamId(TeamID)] -= Points; }
 
         uint32 GetPrematureWinner();
+
+        /* Achievements*/
+        bool CheckAchievementCriteriaMeet(uint32 criteriaId, Player const* source, Unit const* target = NULL, uint32 miscvalue1 = 0);
+
     private:
         void PostUpdateImpl(uint32 diff);
 

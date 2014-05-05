@@ -128,8 +128,8 @@ class AuraEffect
         }
         //  visibility & phases
         void HandleModInvisibilityDetect(AuraApplication const* aurApp, uint8 mode, bool apply) const;
-        void HandleModInvisibility(AuraApplication const* aurApp, uint8 mode, bool apply) const;
         void HandleModCamouflage(AuraApplication const * aurApp, uint8 mode, bool apply) const;
+        void HandleModInvisibility(AuraApplication const* aurApp, uint8 mode, bool apply) const;
         void HandleModStealth(AuraApplication const* aurApp, uint8 mode, bool apply) const;
         void HandleModStealthLevel(AuraApplication const* aurApp, uint8 mode, bool apply) const;
         void HandleModStealthDetect(AuraApplication const* aurApp, uint8 mode, bool apply) const;
@@ -213,8 +213,8 @@ class AuraEffect
         void HandleModSpellHealingPercentFromStat(AuraApplication const* aurApp, uint8 mode, bool apply) const;
         void HandleModSpellDamagePercentFromAttackPower(AuraApplication const* aurApp, uint8 mode, bool apply) const;
         void HandleModSpellHealingPercentFromAttackPower(AuraApplication const* aurApp, uint8 mode, bool apply) const;
-        void HandleAuraModSpellPowerPercent (AuraApplication const * aurApp, uint8 mode, bool apply) const;
-        void HandleModHealingDone (AuraApplication const * aurApp, uint8 mode, bool apply) const;
+        void HandleModHealingDone(AuraApplication const* aurApp, uint8 mode, bool apply) const;
+        void HandleAuraModSpellPowerPercent(AuraApplication const * aurApp, uint8 mode, bool apply) const;
         void HandleModTotalPercentStat(AuraApplication const* aurApp, uint8 mode, bool apply) const;
         void HandleAuraModResistenceOfStatPercent(AuraApplication const* aurApp, uint8 mode, bool apply) const;
         void HandleAuraModExpertise(AuraApplication const* aurApp, uint8 mode, bool apply) const;
@@ -281,11 +281,11 @@ class AuraEffect
         void HandleAuraOpenStable(AuraApplication const* aurApp, uint8 mode, bool apply) const;
         void HandleAuraModFakeInebriation(AuraApplication const* aurApp, uint8 mode, bool apply) const;
         void HandleAuraOverrideSpells(AuraApplication const* aurApp, uint8 mode, bool apply) const;
-        void HandleMastery(AuraApplication const* aurApp, uint8 mode, bool apply) const;
         void HandleAuraSetVehicle(AuraApplication const* aurApp, uint8 mode, bool apply) const;
         void HandlePreventResurrection(AuraApplication const* aurApp, uint8 mode, bool apply) const;
-        void HandleAuraProgressBar(AuraApplication const* aurApp, uint8 mode, bool apply) const;
+        void HandleMastery(AuraApplication const* aurApp, uint8 mode, bool apply) const;
         void HandleAuraForceWeather(AuraApplication const* aurApp, uint8 mode, bool apply) const;
+        void HandleEnableAltPower(AuraApplication const* aurApp, uint8 mode, bool apply) const;
 
         // aura effect periodic tick handlers
         void HandlePeriodicDummyAuraTick(Unit* target, Unit* caster) const;
@@ -323,11 +323,11 @@ namespace Trinity
                 // Wards
                 if ((spellProtoA->SpellFamilyName == SPELLFAMILY_MAGE) ||
                     (spellProtoA->SpellFamilyName == SPELLFAMILY_WARLOCK))
-                    if (spellProtoA->Category == 56)
+                    if (spellProtoA->GetCategory() == 56)
                         return true;
                 if ((spellProtoB->SpellFamilyName == SPELLFAMILY_MAGE) ||
                     (spellProtoB->SpellFamilyName == SPELLFAMILY_WARLOCK))
-                    if (spellProtoB->Category == 56)
+                    if (spellProtoB->GetCategory() == 56)
                         return false;
 
                 // Sacred Shield
@@ -349,9 +349,9 @@ namespace Trinity
                     return false;
 
                 // Ice Barrier
-                if (spellProtoA->Category == 471)
+                if (spellProtoA->GetCategory() == 471)
                     return true;
-                if (spellProtoB->Category == 471)
+                if (spellProtoB->GetCategory() == 471)
                     return false;
 
                 // Sacrifice

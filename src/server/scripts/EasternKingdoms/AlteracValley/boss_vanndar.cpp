@@ -43,7 +43,7 @@ public:
 
     struct boss_vanndarAI : public ScriptedAI
     {
-        boss_vanndarAI(Creature* creature) : ScriptedAI(creature) {}
+        boss_vanndarAI(Creature* creature) : ScriptedAI(creature) { }
 
         uint32 AvatarTimer;
         uint32 ThunderclapTimer;
@@ -51,7 +51,7 @@ public:
         uint32 ResetTimer;
         uint32 YellTimer;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             AvatarTimer        = 3 * IN_MILLISECONDS;
             ThunderclapTimer   = 4 * IN_MILLISECONDS;
@@ -60,31 +60,31 @@ public:
             YellTimer = urand(20 * IN_MILLISECONDS, 30 * IN_MILLISECONDS);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) OVERRIDE
         {
             Talk(YELL_AGGRO);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (!UpdateVictim())
                 return;
 
             if (AvatarTimer <= diff)
             {
-                DoCast(me->GetVictim(), SPELL_AVATAR);
+                DoCastVictim(SPELL_AVATAR);
                 AvatarTimer =  urand(15 * IN_MILLISECONDS, 20 * IN_MILLISECONDS);
             } else AvatarTimer -= diff;
 
             if (ThunderclapTimer <= diff)
             {
-                DoCast(me->GetVictim(), SPELL_THUNDERCLAP);
+                DoCastVictim(SPELL_THUNDERCLAP);
                 ThunderclapTimer = urand(5 * IN_MILLISECONDS, 15 * IN_MILLISECONDS);
             } else ThunderclapTimer -= diff;
 
             if (StormboltTimer <= diff)
             {
-                DoCast(me->GetVictim(), SPELL_STORMBOLT);
+                DoCastVictim(SPELL_STORMBOLT);
                 StormboltTimer = urand(10 * IN_MILLISECONDS, 25 * IN_MILLISECONDS);
             } else StormboltTimer -= diff;
 
@@ -109,7 +109,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
         return new boss_vanndarAI(creature);
     }

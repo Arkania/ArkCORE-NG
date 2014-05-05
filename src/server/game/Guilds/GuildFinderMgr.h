@@ -238,7 +238,7 @@ class GuildFinderMgr
          */
         void RemoveMembershipRequest(uint32 playerId, uint32 guildId);
 
-        /// wipes everything related to a guild. Used when that guild is disbanded
+        /// Wipes everything related to a guild. Used when that guild is disbanded
         void DeleteGuild(uint32 guildId);
 
         /**

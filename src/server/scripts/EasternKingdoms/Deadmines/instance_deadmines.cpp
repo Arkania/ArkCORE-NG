@@ -58,7 +58,7 @@ class instance_deadmines : public InstanceMapScript
 
         struct instance_deadmines_InstanceMapScript : public InstanceScript
         {
-            instance_deadmines_InstanceMapScript(Map* map) : InstanceScript(map) {}
+            instance_deadmines_InstanceMapScript(Map* map) : InstanceScript(map) { }
 
             uint64 FactoryDoorGUID;
             uint64 IronCladDoorGUID;
@@ -73,7 +73,7 @@ class instance_deadmines : public InstanceMapScript
             uint32 PiratesDelay_Timer;
             uint64 uiSmiteChestGUID;
 
-            void Initialize()
+            void Initialize() OVERRIDE
             {
                 FactoryDoorGUID = 0;
                 IronCladDoorGUID = 0;
@@ -87,7 +87,7 @@ class instance_deadmines : public InstanceMapScript
                 uiSmiteChestGUID = 0;
             }
 
-            virtual void Update(uint32 diff)
+            virtual void Update(uint32 diff) OVERRIDE
             {
                 if (!IronCladDoorGUID || !DefiasCannonGUID || !DoorLeverGUID)
                     return;
@@ -102,7 +102,7 @@ class instance_deadmines : public InstanceMapScript
                         CannonBlast_Timer = DATA_CANNON_BLAST_TIMER;
                         // it's a hack - Mr. Smite should do that but his too far away
                         pIronCladDoor->SetName("Mr. Smite");
-                        pIronCladDoor->MonsterYell(SAY_MR_SMITE_ALARM1, LANG_UNIVERSAL, 0);
+                        pIronCladDoor->MonsterYell(SAY_MR_SMITE_ALARM1, LANG_UNIVERSAL, NULL);
                         DoPlaySound(pIronCladDoor, SOUND_MR_SMITE_ALARM1);
                         State = CANNON_BLAST_INITIATED;
                         break;
@@ -114,7 +114,7 @@ class instance_deadmines : public InstanceMapScript
                             ShootCannon();
                             BlastOutDoor();
                             LeverStucked();
-                            pIronCladDoor->MonsterYell(SAY_MR_SMITE_ALARM2, LANG_UNIVERSAL, 0);
+                            pIronCladDoor->MonsterYell(SAY_MR_SMITE_ALARM2, LANG_UNIVERSAL, NULL);
                             DoPlaySound(pIronCladDoor, SOUND_MR_SMITE_ALARM2);
                             State = PIRATES_ATTACK;
                         } else CannonBlast_Timer -= diff;
@@ -189,7 +189,7 @@ class instance_deadmines : public InstanceMapScript
                     pDoorLever->SetUInt32Value(GAMEOBJECT_FLAGS, 4);
             }
 
-            void OnGameObjectCreate(GameObject* go)
+            void OnGameObjectCreate(GameObject* go) OVERRIDE
             {
                 switch (go->GetEntry())
                 {
@@ -201,7 +201,7 @@ class instance_deadmines : public InstanceMapScript
                 }
             }
 
-            void SetData(uint32 type, uint32 data)
+            void SetData(uint32 type, uint32 data) OVERRIDE
             {
                 switch (type)
                 {
@@ -217,7 +217,7 @@ class instance_deadmines : public InstanceMapScript
                 }
             }
 
-            uint32 GetData(uint32 type) const
+            uint32 GetData(uint32 type) const OVERRIDE
             {
                 switch (type)
                 {
@@ -228,7 +228,7 @@ class instance_deadmines : public InstanceMapScript
                 return 0;
             }
 
-            uint64 GetData64(uint32 data) const
+            uint64 GetData64(uint32 data) const OVERRIDE
             {
                 switch (data)
                 {
@@ -241,22 +241,14 @@ class instance_deadmines : public InstanceMapScript
 
             void DoPlaySound(GameObject* unit, uint32 sound)
             {
-                WorldPacket data;
-                data.SetOpcode(SMSG_PLAY_SOUND);
+                WorldPacket data(SMSG_PLAY_SOUND, 4);
                 data << uint32(sound);
-                unit->SendMessageToSet(&data, false);
-            }
-
-            void DoPlaySoundCreature(Unit* unit, uint32 sound)
-            {
-                WorldPacket data;
-                data.SetOpcode(SMSG_PLAY_SOUND);
-                data << uint32(sound);
+                data << uint64(unit->GetGUID());
                 unit->SendMessageToSet(&data, false);
             }
         };
 
-        InstanceScript* GetInstanceScript(InstanceMap* map) const
+        InstanceScript* GetInstanceScript(InstanceMap* map) const OVERRIDE
         {
             return new instance_deadmines_InstanceMapScript(map);
         }

@@ -24,7 +24,7 @@
 
 void WorldSession::HandleGrantLevel(WorldPacket& recvData)
 {
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_GRANT_LEVEL");
+    TC_LOG_DEBUG("network", "WORLD: CMSG_GRANT_LEVEL");
 
     uint64 guid;
     recvData.readPackGUID(guid);
@@ -49,7 +49,8 @@ void WorldSession::HandleGrantLevel(WorldPacket& recvData)
     else if (target->GetGroup() != _player->GetGroup())
         error = ERR_REFER_A_FRIEND_NOT_IN_GROUP;
 
-    if (error) {
+    if (error)
+    {
         WorldPacket data(SMSG_REFER_A_FRIEND_FAILURE, 24);
         data << uint32(error);
         if (error == ERR_REFER_A_FRIEND_NOT_IN_GROUP)
@@ -66,7 +67,7 @@ void WorldSession::HandleGrantLevel(WorldPacket& recvData)
 
 void WorldSession::HandleAcceptGrantLevel(WorldPacket& recvData)
 {
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_ACCEPT_LEVEL_GRANT");
+    TC_LOG_DEBUG("network", "WORLD: CMSG_ACCEPT_LEVEL_GRANT");
 
     uint64 guid;
     recvData.readPackGUID(guid);

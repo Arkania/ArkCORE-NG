@@ -10,6 +10,9 @@
 
 set(scripts_STAT_SRCS
   ${scripts_STAT_SRCS}
+  Northrend/zone_wintergrasp.cpp
+  Northrend/zone_isle_of_conquest.cpp
+  Northrend/zone_storm_peaks.cpp
   Northrend/Ulduar/HallsOfLightning/instance_halls_of_lightning.cpp
   Northrend/Ulduar/HallsOfLightning/boss_bjarngrim.cpp
   Northrend/Ulduar/HallsOfLightning/halls_of_lightning.h
@@ -23,7 +26,7 @@ set(scripts_STAT_SRCS
   Northrend/Ulduar/Ulduar/boss_algalon_the_observer.cpp
   Northrend/Ulduar/Ulduar/instance_ulduar.cpp
   Northrend/Ulduar/Ulduar/boss_auriaya.cpp
-  Northrend/Ulduar/Ulduar/boss_yoggsaron.cpp
+  Northrend/Ulduar/Ulduar/boss_yogg_saron.cpp
   Northrend/Ulduar/Ulduar/boss_hodir.cpp
   Northrend/Ulduar/Ulduar/boss_assembly_of_iron.cpp
   Northrend/Ulduar/Ulduar/boss_flame_leviathan.cpp
@@ -115,17 +118,19 @@ set(scripts_STAT_SRCS
   Northrend/Naxxramas/instance_naxxramas.cpp
   Northrend/Naxxramas/boss_grobbulus.cpp
   Northrend/Naxxramas/boss_noth.cpp
+  Northrend/zone_crystalsong_forest.cpp
   Northrend/VaultOfArchavon/boss_archavon.cpp
   Northrend/VaultOfArchavon/boss_koralon.cpp
   Northrend/VaultOfArchavon/vault_of_archavon.h
   Northrend/VaultOfArchavon/instance_vault_of_archavon.cpp
   Northrend/VaultOfArchavon/boss_emalon.cpp
   Northrend/VaultOfArchavon/boss_toravon.cpp
-  Northrend/UtgardeKeep/UtgardePinnacle/boss_palehoof.cpp
+  Northrend/zone_sholazar_basin.cpp
   Northrend/UtgardeKeep/UtgardePinnacle/boss_svala.cpp
-  Northrend/UtgardeKeep/UtgardePinnacle/instance_pinnacle.cpp
-  Northrend/UtgardeKeep/UtgardePinnacle/boss_ymiron.cpp
+  Northrend/UtgardeKeep/UtgardePinnacle/boss_palehoof.cpp
   Northrend/UtgardeKeep/UtgardePinnacle/boss_skadi.cpp
+  Northrend/UtgardeKeep/UtgardePinnacle/boss_ymiron.cpp
+  Northrend/UtgardeKeep/UtgardePinnacle/instance_utgarde_pinnacle.cpp
   Northrend/UtgardeKeep/UtgardePinnacle/utgarde_pinnacle.h
   Northrend/UtgardeKeep/UtgardeKeep/boss_ingvar_the_plunderer.cpp
   Northrend/UtgardeKeep/UtgardeKeep/boss_skarvald_dalronn.cpp
@@ -133,6 +138,8 @@ set(scripts_STAT_SRCS
   Northrend/UtgardeKeep/UtgardeKeep/instance_utgarde_keep.cpp
   Northrend/UtgardeKeep/UtgardeKeep/boss_keleseth.cpp
   Northrend/UtgardeKeep/UtgardeKeep/utgarde_keep.cpp
+  Northrend/zone_dragonblight.cpp
+  Northrend/zone_grizzly_hills.cpp
   Northrend/AzjolNerub/AzjolNerub/azjol_nerub.h
   Northrend/AzjolNerub/AzjolNerub/instance_azjol_nerub.cpp
   Northrend/AzjolNerub/AzjolNerub/boss_krikthir_the_gatewatcher.cpp
@@ -161,6 +168,7 @@ set(scripts_STAT_SRCS
   Northrend/IcecrownCitadel/icecrown_citadel_teleport.cpp
   Northrend/IcecrownCitadel/boss_lord_marrowgar.cpp
   Northrend/IcecrownCitadel/boss_lady_deathwhisper.cpp
+  Northrend/IcecrownCitadel/boss_icecrown_gunship_battle.cpp
   Northrend/IcecrownCitadel/boss_deathbringer_saurfang.cpp
   Northrend/IcecrownCitadel/boss_festergut.cpp
   Northrend/IcecrownCitadel/boss_rotface.cpp
@@ -170,6 +178,8 @@ set(scripts_STAT_SRCS
   Northrend/IcecrownCitadel/boss_valithria_dreamwalker.cpp
   Northrend/IcecrownCitadel/boss_sindragosa.cpp
   Northrend/IcecrownCitadel/boss_the_lich_king.cpp
+  Northrend/zone_zuldrak.cpp
+  Northrend/zone_icecrown.cpp
   Northrend/Gundrak/boss_slad_ran.cpp
   Northrend/Gundrak/instance_gundrak.cpp
   Northrend/Gundrak/boss_drakkari_colossus.cpp
@@ -177,26 +187,15 @@ set(scripts_STAT_SRCS
   Northrend/Gundrak/boss_gal_darah.cpp
   Northrend/Gundrak/boss_moorabi.cpp
   Northrend/Gundrak/boss_eck.cpp
+  Northrend/zone_borean_tundra.cpp
+  Northrend/zone_howling_fjord.cpp
+  Northrend/zone_dalaran.cpp
   Northrend/DraktharonKeep/boss_trollgore.cpp
   Northrend/DraktharonKeep/instance_drak_tharon_keep.cpp
   Northrend/DraktharonKeep/boss_novos.cpp
   Northrend/DraktharonKeep/drak_tharon_keep.h
   Northrend/DraktharonKeep/boss_tharon_ja.cpp
-  Northrend/DraktharonKeep/boss_dred.cpp
-
-  Northrend/zone_wintergrasp.cpp
-  Northrend/zone_isle_of_conquest.cpp
-  Northrend/zone_storm_peaks.cpp
-  Northrend/zone_crystalsong_forest.cpp
-  Northrend/zone_sholazar_basin.cpp
-  Northrend/zone_dragonblight.cpp
-  Northrend/zone_grizzly_hills.cpp
-  Northrend/zone_zuldrak.cpp
-  Northrend/zone_icecrown.cpp
-  Northrend/zone_borean_tundra.cpp
-  Northrend/zone_howling_fjord.cpp
-  Northrend/zone_dalaran.cpp
-  
+  Northrend/DraktharonKeep/boss_king_dred.cpp
 )
 
 message("  -> Prepared: Northrend")

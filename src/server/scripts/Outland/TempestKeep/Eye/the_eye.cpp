@@ -32,7 +32,7 @@ EndContentData */
 #include "ScriptedCreature.h"
 #include "the_eye.h"
 
-enum eSpells
+enum Spells
 {
     SPELL_COUNTERCHARGE    = 35035,
     SPELL_KNOCKAWAY        = 22893,
@@ -48,22 +48,22 @@ class npc_crystalcore_devastator : public CreatureScript
         }
         struct npc_crystalcore_devastatorAI : public ScriptedAI
         {
-            npc_crystalcore_devastatorAI(Creature* creature) : ScriptedAI(creature) {}
+            npc_crystalcore_devastatorAI(Creature* creature) : ScriptedAI(creature) { }
 
             uint32 Knockaway_Timer;
             uint32 Countercharge_Timer;
 
-            void Reset()
+            void Reset() OVERRIDE
             {
                 Countercharge_Timer = 9000;
                 Knockaway_Timer = 25000;
             }
 
-            void EnterCombat(Unit* /*who*/)
+            void EnterCombat(Unit* /*who*/) OVERRIDE
             {
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff) OVERRIDE
             {
                 if (!UpdateVictim())
                     return;
@@ -72,7 +72,7 @@ class npc_crystalcore_devastator : public CreatureScript
                 //Knockaway_Timer
                 if (Knockaway_Timer <= diff)
                 {
-                    DoCast(me->GetVictim(), SPELL_KNOCKAWAY, true);
+                    DoCastVictim(SPELL_KNOCKAWAY, true);
 
                     // current aggro target is knocked away pick new target
                     Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 0);
@@ -101,7 +101,7 @@ class npc_crystalcore_devastator : public CreatureScript
             }
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const OVERRIDE
         {
             return new npc_crystalcore_devastatorAI(creature);
         }

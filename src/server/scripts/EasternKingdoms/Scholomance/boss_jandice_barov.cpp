@@ -27,25 +27,28 @@ EndScriptData */
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 
-#define SPELL_CURSEOFBLOOD          24673
-//#define SPELL_ILLUSION              17773
+enum Spells
+{
+    SPELL_CURSEOFBLOOD          = 24673,
+    //SPELL_ILLUSION              = 17773,
 
-//Spells of Illusion of Jandice Barov
-#define SPELL_CLEAVE                15584
+    // Spells of Illusion of Jandice Barov
+    SPELL_CLEAVE                = 15284
+};
 
 class boss_jandice_barov : public CreatureScript
 {
 public:
     boss_jandice_barov() : CreatureScript("boss_jandice_barov") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new boss_jandicebarovAI (creature);
+        return new boss_jandicebarovAI(creature);
     }
 
     struct boss_jandicebarovAI : public ScriptedAI
     {
-        boss_jandicebarovAI(Creature* creature) : ScriptedAI(creature) {}
+        boss_jandicebarovAI(Creature* creature) : ScriptedAI(creature) { }
 
         uint32 CurseOfBlood_Timer;
         uint32 Illusion_Timer;
@@ -53,16 +56,15 @@ public:
         uint32 Invisible_Timer;
         bool Invisible;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             CurseOfBlood_Timer = 15000;
             Illusion_Timer = 30000;
             Invisible_Timer = 3000;                             //Too much too low?
-
             Invisible = false;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) OVERRIDE
         {
         }
 
@@ -72,7 +74,7 @@ public:
                 Illusion->AI()->AttackStart(victim);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (Invisible && Invisible_Timer <= diff)
             {
@@ -96,7 +98,7 @@ public:
             if (CurseOfBlood_Timer <= diff)
             {
                 //Cast
-                DoCast(me->GetVictim(), SPELL_CURSEOFBLOOD);
+                DoCastVictim(SPELL_CURSEOFBLOOD);
 
                 //45 seconds
                 CurseOfBlood_Timer = 30000;
@@ -132,7 +134,7 @@ public:
             //            if (Illusion_Timer <= diff)
             //            {
             //                  //Cast
-            //                DoCast(me->GetVictim(), SPELL_ILLUSION);
+            //                DoCastVictim(SPELL_ILLUSION);
             //
             //                  //3 Illusion will be summoned
             //                  if (Illusioncounter < 3)
@@ -161,28 +163,28 @@ class npc_illusionofjandicebarov : public CreatureScript
 public:
     npc_illusionofjandicebarov() : CreatureScript("npc_illusionofjandicebarov") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new npc_illusionofjandicebarovAI (creature);
+        return new npc_illusionofjandicebarovAI(creature);
     }
 
     struct npc_illusionofjandicebarovAI : public ScriptedAI
     {
-        npc_illusionofjandicebarovAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_illusionofjandicebarovAI(Creature* creature) : ScriptedAI(creature) { }
 
         uint32 Cleave_Timer;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             Cleave_Timer = urand(2000, 8000);
             me->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_MAGIC, true);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) OVERRIDE
         {
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             //Return since we have no target
             if (!UpdateVictim())
@@ -192,7 +194,7 @@ public:
             if (Cleave_Timer <= diff)
             {
                 //Cast
-                DoCast(me->GetVictim(), SPELL_CLEAVE);
+                DoCastVictim(SPELL_CLEAVE);
 
                 //5-8 seconds
                 Cleave_Timer = urand(5000, 8000);

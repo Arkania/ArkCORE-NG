@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "ScriptMgr.h"
 #include "OutdoorPvPSI.h"
 #include "WorldPacket.h"
 #include "Player.h"
@@ -26,7 +27,6 @@
 #include "ReputationMgr.h"
 #include "Language.h"
 #include "World.h"
-#include "ScriptMgr.h"
 
 OutdoorPvPSI::OutdoorPvPSI()
 {
@@ -245,7 +245,7 @@ class OutdoorPvP_silithus : public OutdoorPvPScript
         {
         }
 
-        OutdoorPvP* GetOutdoorPvP() const
+        OutdoorPvP* GetOutdoorPvP() const OVERRIDE
         {
             return new OutdoorPvPSI();
         }

@@ -79,10 +79,10 @@ class CreatureAI : public UnitAI
         Creature* DoSummonFlyer(uint32 entry, WorldObject* obj, float flightZ, float radius = 5.0f, uint32 despawnTime = 30000, TempSummonType summonType = TEMPSUMMON_CORPSE_TIMED_DESPAWN);
 
     public:
-        void Talk(uint8 id, uint64 WhisperGuid = 0);
-        explicit CreatureAI(Creature* creature) : UnitAI(creature), me(creature), m_MoveInLineOfSight_locked(false) {}
+        void Talk(uint8 id, WorldObject const* whisperTarget = NULL);
+        explicit CreatureAI(Creature* creature) : UnitAI(creature), me(creature), m_MoveInLineOfSight_locked(false) { }
 
-        virtual ~CreatureAI() {}
+        virtual ~CreatureAI() { }
 
         /// == Reactions At =================================
 
@@ -96,61 +96,61 @@ class CreatureAI : public UnitAI
         virtual void EnterEvadeMode();
 
         // Called for reaction at enter to combat if not in combat yet (enemy can be NULL)
-        virtual void EnterCombat(Unit* /*victim*/) {}
+        virtual void EnterCombat(Unit* /*victim*/) { }
 
         // Called when the creature is killed
-        virtual void JustDied(Unit* /*killer*/) {}
+        virtual void JustDied(Unit* /*killer*/) { }
 
         // Called when the creature kills a unit
-        virtual void KilledUnit(Unit* /*victim*/) {}
+        virtual void KilledUnit(Unit* /*victim*/) { }
 
         // Called when the creature summon successfully other creature
-        virtual void JustSummoned(Creature* /*summon*/) {}
-        virtual void IsSummonedBy(Unit* /*summoner*/) {}
+        virtual void JustSummoned(Creature* /*summon*/) { }
+        virtual void IsSummonedBy(Unit* /*summoner*/) { }
 
-        virtual void SummonedCreatureDespawn(Creature* /*summon*/) {}
-        virtual void SummonedCreatureDies(Creature* /*summon*/, Unit* /*killer*/) {}
+        virtual void SummonedCreatureDespawn(Creature* /*summon*/) { }
+        virtual void SummonedCreatureDies(Creature* /*summon*/, Unit* /*killer*/) { }
 
         // Called when hit by a spell
-        virtual void SpellHit(Unit* /*caster*/, SpellInfo const* /*spell*/) {}
+        virtual void SpellHit(Unit* /*caster*/, SpellInfo const* /*spell*/) { }
 
         // Called when spell hits a target
-        virtual void SpellHitTarget(Unit* /*target*/, SpellInfo const* /*spell*/) {}
+        virtual void SpellHitTarget(Unit* /*target*/, SpellInfo const* /*spell*/) { }
 
         // Called when the creature is target of hostile action: swing, hostile spell landed, fear/etc)
-        void AttackedBy(Unit* attacker);
+        virtual void AttackedBy(Unit* /*attacker*/) { }
         virtual bool IsEscorted() { return false; }
 
         // Called when creature is spawned or respawned (for reseting variables)
         virtual void JustRespawned() { Reset(); }
 
         // Called at waypoint reached or point movement finished
-        virtual void MovementInform(uint32 /*type*/, uint32 /*id*/) {}
+        virtual void MovementInform(uint32 /*type*/, uint32 /*id*/) { }
 
         void OnCharmed(bool apply);
 
         // Called at reaching home after evade
-        virtual void JustReachedHome() {}
+        virtual void JustReachedHome() { }
 
         void DoZoneInCombat(Creature* creature = NULL, float maxRangeToNearestTarget = 50.0f);
 
         // Called at text emote receive from player
-        virtual void ReceiveEmote(Player* /*player*/, uint32 /*emoteId*/) {}
+        virtual void ReceiveEmote(Player* /*player*/, uint32 /*emoteId*/) { }
 
         // Called when owner takes damage
-        virtual void OwnerDamagedBy(Unit* /*attacker*/) {}
+        virtual void OwnerAttackedBy(Unit* /*attacker*/) { }
 
         // Called when owner attacks something
-        virtual void OwnerAttacked(Unit* /*target*/) {}
+        virtual void OwnerAttacked(Unit* /*target*/) { }
 
         /// == Triggered Actions Requested ==================
 
         // Called when creature attack expected (if creature can and no have current victim)
         // Note: for reaction at hostile action must be called AttackedBy function.
-        //virtual void AttackStart(Unit*) {}
+        //virtual void AttackStart(Unit*) { }
 
         // Called at World update tick
-        //virtual void UpdateAI(const uint32 /*diff*/) {}
+        //virtual void UpdateAI(const uint32 /*diff*/) { }
 
         /// == State checks =================================
 
@@ -158,17 +158,17 @@ class CreatureAI : public UnitAI
         //virtual bool IsVisible(Unit*) const { return false; }
 
         // called when the corpse of this creature gets removed
-        virtual void CorpseRemoved(uint32& /*respawnDelay*/) {}
+        virtual void CorpseRemoved(uint32& /*respawnDelay*/) { }
 
         // Called when victim entered water and creature can not enter water
-        //virtual bool canReachByRangeAttack(Unit*) { return false; }
+        //virtual bool CanReachByRangeAttack(Unit*) { return false; }
 
         /// == Fields =======================================
 
         // Pointer to controlled by AI creature
         //Creature* const me;
 
-        virtual void PassengerBoarded(Unit* /*passenger*/, int8 /*seatId*/, bool /*apply*/) {}
+        virtual void PassengerBoarded(Unit* /*passenger*/, int8 /*seatId*/, bool /*apply*/) { }
 
         virtual void OnSpellClick(Unit* /*clicker*/, bool& /*result*/) { }
 

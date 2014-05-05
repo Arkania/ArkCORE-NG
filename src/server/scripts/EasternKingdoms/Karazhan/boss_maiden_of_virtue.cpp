@@ -46,14 +46,14 @@ class boss_maiden_of_virtue : public CreatureScript
 public:
     boss_maiden_of_virtue() : CreatureScript("boss_maiden_of_virtue") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new boss_maiden_of_virtueAI (creature);
+        return new boss_maiden_of_virtueAI(creature);
     }
 
     struct boss_maiden_of_virtueAI : public ScriptedAI
     {
-        boss_maiden_of_virtueAI(Creature* creature) : ScriptedAI(creature) {}
+        boss_maiden_of_virtueAI(Creature* creature) : ScriptedAI(creature) { }
 
         uint32 Repentance_Timer;
         uint32 Holyfire_Timer;
@@ -63,7 +63,7 @@ public:
 
         bool Enraged;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             Repentance_Timer    = 25000+(rand()%15000);
             Holyfire_Timer      = 8000+(rand()%17000);
@@ -74,23 +74,23 @@ public:
             Enraged = false;
         }
 
-        void KilledUnit(Unit* /*Victim*/)
+        void KilledUnit(Unit* /*Victim*/) OVERRIDE
         {
             if (urand(0, 1) == 0)
                 Talk(SAY_SLAY);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) OVERRIDE
         {
             Talk(SAY_DEATH);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) OVERRIDE
         {
             Talk(SAY_AGGRO);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (!UpdateVictim())
                 return;
@@ -109,7 +109,7 @@ public:
 
             if (Repentance_Timer <= diff)
             {
-                DoCast(me->GetVictim(), SPELL_REPENTANCE);
+                DoCastVictim(SPELL_REPENTANCE);
                 Talk(SAY_REPENTANCE);
 
                 Repentance_Timer = urand(25000, 35000);        //A little randomness on that spell

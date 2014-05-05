@@ -26,8 +26,8 @@ class LoginDatabaseConnection : public MySQLConnection
 {
     public:
         //- Constructors for sync and async connections
-        LoginDatabaseConnection(MySQLConnectionInfo& connInfo) : MySQLConnection(connInfo) {}
-        LoginDatabaseConnection(ACE_Activation_Queue* q, MySQLConnectionInfo& connInfo) : MySQLConnection(q, connInfo) {}
+        LoginDatabaseConnection(MySQLConnectionInfo& connInfo) : MySQLConnection(connInfo) { }
+        LoginDatabaseConnection(ACE_Activation_Queue* q, MySQLConnectionInfo& connInfo) : MySQLConnection(q, connInfo) { }
 
         //- Loads database type specific prepared statements
         void DoPrepareStatements();
@@ -57,6 +57,7 @@ enum LoginDatabaseStatements
     LOGIN_UPD_VS,
     LOGIN_UPD_LOGONPROOF,
     LOGIN_SEL_LOGONCHALLENGE,
+    LOGIN_SEL_LOGON_COUNTRY,
     LOGIN_UPD_FAILEDLOGINS,
     LOGIN_SEL_FAILEDLOGINS,
     LOGIN_SEL_ACCOUNT_ID_BY_NAME,
@@ -80,9 +81,12 @@ enum LoginDatabaseStatements
     LOGIN_INS_REALM_CHARACTERS_INIT,
     LOGIN_UPD_EXPANSION,
     LOGIN_UPD_ACCOUNT_LOCK,
+    LOGIN_UPD_ACCOUNT_LOCK_CONTRY,
     LOGIN_INS_LOG,
     LOGIN_UPD_USERNAME,
     LOGIN_UPD_PASSWORD,
+    LOGIN_UPD_EMAIL,
+    LOGIN_UPD_REG_EMAIL,
     LOGIN_UPD_MUTE_TIME,
     LOGIN_UPD_MUTE_TIME_LOGIN,
     LOGIN_UPD_LAST_IP,
@@ -110,7 +114,14 @@ enum LoginDatabaseStatements
     LOGIN_SEL_REALMLIST_SECURITY_LEVEL,
     LOGIN_DEL_ACCOUNT,
     LOGIN_SEL_TRIAL_DATA,
+    LOGIN_SEL_IP2NATION_COUNTRY,
+    LOGIN_SEL_AUTOBROADCAST,
+    LOGIN_GET_EMAIL_BY_ID,
 
+    LOGIN_SEL_ACCOUNT_ACCESS_BY_ID,
+    LOGIN_SEL_RBAC_ACCOUNT_PERMISSIONS,
+    LOGIN_INS_RBAC_ACCOUNT_PERMISSION,
+    LOGIN_DEL_RBAC_ACCOUNT_PERMISSION,
     MAX_LOGINDATABASE_STATEMENTS
 };
 

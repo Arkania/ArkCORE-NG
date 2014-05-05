@@ -89,8 +89,8 @@ class BattlegroundQueue
         typedef std::map<uint64, PlayerQueueInfo> QueuedPlayersMap;
         QueuedPlayersMap m_QueuedPlayers;
 
-        //we need constant add to begin and constant remove / add from the end, therefore deque suits our problem well
-        typedef std::deque<GroupQueueInfo*> GroupsQueueType;
+        //do NOT use deque because deque.erase() invalidates ALL iterators
+        typedef std::list<GroupQueueInfo*> GroupsQueueType;
 
         /*
         This two dimensional array is used to store All queued groups
@@ -107,7 +107,7 @@ class BattlegroundQueue
         class SelectionPool
         {
         public:
-            SelectionPool(): PlayerCount(0) {};
+            SelectionPool(): PlayerCount(0) { };
             void Init();
             bool AddGroup(GroupQueueInfo* ginfo, uint32 desiredCount);
             bool KickGroup(uint32 size);
@@ -164,9 +164,9 @@ class BGQueueRemoveEvent : public BasicEvent
     public:
         BGQueueRemoveEvent(uint64 pl_guid, uint32 bgInstanceGUID, BattlegroundTypeId BgTypeId, BattlegroundQueueTypeId bgQueueTypeId, uint32 removeTime)
             : m_PlayerGuid(pl_guid), m_BgInstanceGUID(bgInstanceGUID), m_RemoveTime(removeTime), m_BgTypeId(BgTypeId), m_BgQueueTypeId(bgQueueTypeId)
-        {}
+        { }
 
-        virtual ~BGQueueRemoveEvent() {}
+        virtual ~BGQueueRemoveEvent() { }
 
         virtual bool Execute(uint64 e_time, uint32 p_time);
         virtual void Abort(uint64 e_time);

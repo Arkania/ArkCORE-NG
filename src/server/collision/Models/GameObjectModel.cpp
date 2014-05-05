@@ -35,12 +35,10 @@ using G3D::Vector3;
 using G3D::Ray;
 using G3D::AABox;
 
-#ifndef NO_CORE_FUNCS
-
 struct GameobjectModelData
 {
     GameobjectModelData(const std::string& name_, const AABox& box) :
-        bound(box), name(name_) {}
+        bound(box), name(name_) { }
 
     AABox bound;
     std::string name;
@@ -51,11 +49,14 @@ ModelList model_list;
 
 void LoadGameObjectModelList()
 {
+#ifndef NO_CORE_FUNCS
     uint32 oldMSTime = getMSTime();
+#endif
+
     FILE* model_list_file = fopen((sWorld->GetDataPath() + "vmaps/" + VMAP::GAMEOBJECT_MODELS).c_str(), "rb");
     if (!model_list_file)
     {
-        sLog->outError("Unable to open '%s' file.", VMAP::GAMEOBJECT_MODELS);
+        VMAP_ERROR_LOG("misc", "Unable to open '%s' file.", VMAP::GAMEOBJECT_MODELS);
         return;
     }
 
@@ -74,19 +75,18 @@ void LoadGameObjectModelList()
             || fread(&v1, sizeof(Vector3), 1, model_list_file) != 1
             || fread(&v2, sizeof(Vector3), 1, model_list_file) != 1)
         {
-            sLog->outError("File '%s' seems to be corrupted!", VMAP::GAMEOBJECT_MODELS);
+            VMAP_ERROR_LOG("misc", "File '%s' seems to be corrupted!", VMAP::GAMEOBJECT_MODELS);
             break;
         }
 
         model_list.insert
         (
-            ModelList::value_type( displayId, GameobjectModelData(std::string(buff,name_length),AABox(v1,v2)) )
+            ModelList::value_type( displayId, GameobjectModelData(std::string(buff, name_length), AABox(v1, v2)) )
         );
     }
 
     fclose(model_list_file);
-    sLog->outString(">> Loaded %u GameObject models in %u ms", uint32(model_list.size()), GetMSTimeDiffToNow(oldMSTime));
-    sLog->outString();
+    VMAP_INFO_LOG("server.loading", ">> Loaded %u GameObject models in %u ms", uint32(model_list.size()), GetMSTimeDiffToNow(oldMSTime));
 }
 
 GameObjectModel::~GameObjectModel()
@@ -105,7 +105,7 @@ bool GameObjectModel::initialize(const GameObject& go, const GameObjectDisplayIn
     // ignore models with no bounds
     if (mdl_box == G3D::AABox::zero())
     {
-        sLog->outError("GameObject model %s has zero bounds, loading skipped", it->second.name.c_str());
+        VMAP_ERROR_LOG("misc", "GameObject model %s has zero bounds, loading skipped", it->second.name.c_str());
         return false;
     }
 
@@ -120,7 +120,7 @@ bool GameObjectModel::initialize(const GameObject& go, const GameObjectDisplayIn
     //ID = 0;
     iPos = Vector3(go.GetPositionX(), go.GetPositionY(), go.GetPositionZ());
     phasemask = go.GetPhaseMask();
-    iScale = go.GetFloatValue(OBJECT_FIELD_SCALE_X);
+    iScale = go.GetObjectScale();
     iInvScale = 1.f / iScale;
 
     G3D::Matrix3 iRotation = G3D::Matrix3::fromEulerAnglesZYX(go.GetOrientation(), 0, 0);
@@ -131,17 +131,13 @@ bool GameObjectModel::initialize(const GameObject& go, const GameObjectDisplayIn
     for (int i = 0; i < 8; ++i)
         rotated_bounds.merge(iRotation * mdl_box.corner(i));
 
-    this->iBound = rotated_bounds + iPos;
+    iBound = rotated_bounds + iPos;
 #ifdef SPAWN_CORNERS
     // test:
     for (int i = 0; i < 8; ++i)
     {
         Vector3 pos(iBound.corner(i));
-        if (Creature* c = const_cast<GameObject&>(go).SummonCreature(24440, pos.x, pos.y, pos.z, 0, TEMPSUMMON_MANUAL_DESPAWN))
-        {
-            c->setFaction(35);
-            c->SetFloatValue(OBJECT_FIELD_SCALE_X, 0.1f);
-        }
+        go.SummonCreature(1, pos.x, pos.y, pos.z, 0, TEMPSUMMON_MANUAL_DESPAWN);
     }
 #endif
 
@@ -186,4 +182,42 @@ bool GameObjectModel::intersectRay(const G3D::Ray& ray, float& MaxDist, bool Sto
     return hit;
 }
 
+bool GameObjectModel::Relocate(const GameObject& go)
+{
+    if (!iModel)
+        return false;
+
+    ModelList::const_iterator it = model_list.find(go.GetDisplayId());
+    if (it == model_list.end())
+        return false;
+
+    G3D::AABox mdl_box(it->second.bound);
+    // ignore models with no bounds
+    if (mdl_box == G3D::AABox::zero())
+    {
+        VMAP_ERROR_LOG("misc", "GameObject model %s has zero bounds, loading skipped", it->second.name.c_str());
+        return false;
+    }
+
+    iPos = Vector3(go.GetPositionX(), go.GetPositionY(), go.GetPositionZ());
+
+    G3D::Matrix3 iRotation = G3D::Matrix3::fromEulerAnglesZYX(go.GetOrientation(), 0, 0);
+    iInvRot = iRotation.inverse();
+    // transform bounding box:
+    mdl_box = AABox(mdl_box.low() * iScale, mdl_box.high() * iScale);
+    AABox rotated_bounds;
+    for (int i = 0; i < 8; ++i)
+        rotated_bounds.merge(iRotation * mdl_box.corner(i));
+
+    iBound = rotated_bounds + iPos;
+#ifdef SPAWN_CORNERS
+    // test:
+    for (int i = 0; i < 8; ++i)
+    {
+        Vector3 pos(iBound.corner(i));
+        go.SummonCreature(1, pos.x, pos.y, pos.z, 0, TEMPSUMMON_MANUAL_DESPAWN);
+    }
 #endif
+
+    return true;
+}

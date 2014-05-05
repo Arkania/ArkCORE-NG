@@ -24,6 +24,10 @@
 #include "ObjectAccessor.h"
 #include "Player.h"
 
+/////////////////
+// AggressorAI
+/////////////////
+
 int AggressorAI::Permissible(const Creature* creature)
 {
     // have some hostile factions, it will be selected by IsHostileTo check at MoveInLineOfSight
@@ -33,7 +37,7 @@ int AggressorAI::Permissible(const Creature* creature)
     return PERMIT_BASE_NO;
 }
 
-void AggressorAI::UpdateAI(const uint32 /*diff*/)
+void AggressorAI::UpdateAI(uint32 /*diff*/)
 {
     if (!UpdateVictim())
         return;
@@ -41,26 +45,9 @@ void AggressorAI::UpdateAI(const uint32 /*diff*/)
     DoMeleeAttackIfReady();
 }
 
-// some day we will delete these useless things
-int CombatAI::Permissible(const Creature* /*creature*/)
-{
-    return PERMIT_BASE_NO;
-}
-
-int ArcherAI::Permissible(const Creature* /*creature*/)
-{
-    return PERMIT_BASE_NO;
-}
-
-int TurretAI::Permissible(const Creature* /*creature*/)
-{
-    return PERMIT_BASE_NO;
-}
-
-int VehicleAI::Permissible(const Creature* /*creature*/)
-{
-    return PERMIT_BASE_NO;
-}
+/////////////////
+// CombatAI
+/////////////////
 
 void CombatAI::InitializeAI()
 {
@@ -94,7 +81,7 @@ void CombatAI::EnterCombat(Unit* who)
     }
 }
 
-void CombatAI::UpdateAI(const uint32 diff)
+void CombatAI::UpdateAI(uint32 diff)
 {
     if (!UpdateVictim())
         return;
@@ -113,13 +100,13 @@ void CombatAI::UpdateAI(const uint32 diff)
         DoMeleeAttackIfReady();
 }
 
-void CombatAI::SpellInterrupted(uint32 spellId, uint32 unTimeMs) 
+void CombatAI::SpellInterrupted(uint32 spellId, uint32 unTimeMs)
 {
     events.RescheduleEvent(spellId, unTimeMs);
 }
 
 /////////////////
-//CasterAI
+// CasterAI
 /////////////////
 
 void CasterAI::InitializeAI()
@@ -158,14 +145,14 @@ void CasterAI::EnterCombat(Unit* who)
     }
 }
 
-void CasterAI::UpdateAI(const uint32 diff)
+void CasterAI::UpdateAI(uint32 diff)
 {
     if (!UpdateVictim())
         return;
 
     events.Update(diff);
 
-    if (me->GetVictim()->HasBreakableByDamageCrowdControlAura(me))
+    if (me->GetVictim() && me->EnsureVictim()->HasBreakableByDamageCrowdControlAura(me))
     {
         me->InterruptNonMeleeSpells(false);
         return;
@@ -183,13 +170,13 @@ void CasterAI::UpdateAI(const uint32 diff)
 }
 
 //////////////
-//ArcherAI
+// ArcherAI
 //////////////
 
 ArcherAI::ArcherAI(Creature* c) : CreatureAI(c)
 {
     if (!me->m_spells[0])
-        sLog->outError("ArcherAI set for creature (entry = %u) with spell1=0. AI will do nothing", me->GetEntry());
+        TC_LOG_ERROR("misc", "ArcherAI set for creature (entry = %u) with spell1=0. AI will do nothing", me->GetEntry());
 
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(me->m_spells[0]);
     m_minRange = spellInfo ? spellInfo->GetMinRange(false) : 0;
@@ -220,7 +207,7 @@ void ArcherAI::AttackStart(Unit* who)
         me->GetMotionMaster()->MoveIdle();
 }
 
-void ArcherAI::UpdateAI(const uint32 /*diff*/)
+void ArcherAI::UpdateAI(uint32 /*diff*/)
 {
     if (!UpdateVictim())
         return;
@@ -232,13 +219,13 @@ void ArcherAI::UpdateAI(const uint32 /*diff*/)
 }
 
 //////////////
-//TurretAI
+// TurretAI
 //////////////
 
 TurretAI::TurretAI(Creature* c) : CreatureAI(c)
 {
     if (!me->m_spells[0])
-        sLog->outError("TurretAI set for creature (entry = %u) with spell1=0. AI will do nothing", me->GetEntry());
+        TC_LOG_ERROR("misc", "TurretAI set for creature (entry = %u) with spell1=0. AI will do nothing", me->GetEntry());
 
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(me->m_spells[0]);
     m_minRange = spellInfo ? spellInfo->GetMinRange(false) : 0;
@@ -248,7 +235,7 @@ TurretAI::TurretAI(Creature* c) : CreatureAI(c)
 
 bool TurretAI::CanAIAttack(const Unit* /*who*/) const
 {
-    // TODO: use one function to replace it
+    /// @todo use one function to replace it
     if (!me->IsWithinCombatRange(me->GetVictim(), me->m_CombatDistance)
         || (m_minRange && me->IsWithinCombatRange(me->GetVictim(), m_minRange)))
         return false;
@@ -261,7 +248,7 @@ void TurretAI::AttackStart(Unit* who)
         me->Attack(who, false);
 }
 
-void TurretAI::UpdateAI(const uint32 /*diff*/)
+void TurretAI::UpdateAI(uint32 /*diff*/)
 {
     if (!UpdateVictim())
         return;
@@ -270,18 +257,18 @@ void TurretAI::UpdateAI(const uint32 /*diff*/)
 }
 
 //////////////
-//VehicleAI
+// VehicleAI
 //////////////
 
-VehicleAI::VehicleAI(Creature* c) : CreatureAI(c), m_vehicle(c->GetVehicleKit()), m_IsVehicleInUse(false), m_ConditionsTimer(VEHICLE_CONDITION_CHECK_TIME)
+VehicleAI::VehicleAI(Creature* creature) : CreatureAI(creature), m_ConditionsTimer(VEHICLE_CONDITION_CHECK_TIME)
 {
     LoadConditions();
     m_DoDismiss = false;
     m_DismissTimer = VEHICLE_DISMISS_TIME;
 }
 
-//NOTE: VehicleAI::UpdateAI runs even while the vehicle is mounted
-void VehicleAI::UpdateAI(const uint32 diff)
+// NOTE: VehicleAI::UpdateAI runs even while the vehicle is mounted
+void VehicleAI::UpdateAI(uint32 diff)
 {
     CheckConditions(diff);
 
@@ -290,57 +277,54 @@ void VehicleAI::UpdateAI(const uint32 diff)
         if (m_DismissTimer < diff)
         {
             m_DoDismiss = false;
-            me->SetVisible(false);
             me->DespawnOrUnsummon();
-        }else m_DismissTimer -= diff;
+        }
+        else
+            m_DismissTimer -= diff;
     }
-}
-
-void VehicleAI::Reset()
-{
-    me->SetVisible(true);
 }
 
 void VehicleAI::OnCharmed(bool apply)
 {
-    if (m_IsVehicleInUse && !apply && !conditions.empty())//was used and has conditions
+    if (!me->GetVehicleKit()->IsVehicleInUse() && !apply && !conditions.empty()) // was used and has conditions
     {
-        m_DoDismiss = true;//needs reset
-        me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_PLAYER_VEHICLE);
-        me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
+        m_DoDismiss = true; // needs reset
     }
     else if (apply)
-        m_DoDismiss = false;//in use again
-    m_DismissTimer = VEHICLE_DISMISS_TIME;//reset timer
-    m_IsVehicleInUse = apply;
+        m_DoDismiss = false; // in use again
+
+    m_DismissTimer = VEHICLE_DISMISS_TIME; // reset timer
 }
 
 void VehicleAI::LoadConditions()
 {
     conditions = sConditionMgr->GetConditionsForNotGroupedEntry(CONDITION_SOURCE_TYPE_CREATURE_TEMPLATE_VEHICLE, me->GetEntry());
     if (!conditions.empty())
-        sLog->outDebug(LOG_FILTER_CONDITIONSYS, "VehicleAI::LoadConditions: loaded %u conditions", uint32(conditions.size()));
+        TC_LOG_DEBUG("condition", "VehicleAI::LoadConditions: loaded %u conditions", uint32(conditions.size()));
 }
 
-void VehicleAI::CheckConditions(const uint32 diff)
+void VehicleAI::CheckConditions(uint32 diff)
 {
     if (m_ConditionsTimer < diff)
     {
         if (!conditions.empty())
         {
-            for (SeatMap::iterator itr = m_vehicle->Seats.begin(); itr != m_vehicle->Seats.end(); ++itr)
-                if (Unit* passenger = ObjectAccessor::GetUnit(*m_vehicle->GetBase(), itr->second.Passenger))
-                {
-                    if (Player* player = passenger->ToPlayer())
+            if (Vehicle* vehicleKit = me->GetVehicleKit())
+                for (SeatMap::iterator itr = vehicleKit->Seats.begin(); itr != vehicleKit->Seats.end(); ++itr)
+                    if (Unit* passenger = ObjectAccessor::GetUnit(*me, itr->second.Passenger.Guid))
                     {
-                        if (!sConditionMgr->IsObjectMeetToConditions(player, me, conditions))
+                        if (Player* player = passenger->ToPlayer())
                         {
-                            player->ExitVehicle();
-                            return;//check other pessanger in next tick
+                            if (!sConditionMgr->IsObjectMeetToConditions(player, me, conditions))
+                            {
+                                player->ExitVehicle();
+                                return; // check other pessanger in next tick
+                            }
                         }
                     }
-                }
         }
         m_ConditionsTimer = VEHICLE_CONDITION_CHECK_TIME;
-    } else m_ConditionsTimer -= diff;
+    }
+    else
+        m_ConditionsTimer -= diff;
 }

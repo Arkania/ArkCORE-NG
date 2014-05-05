@@ -34,7 +34,7 @@ enum DynamicObjectType
     DYNAMIC_OBJECT_RAID_MARKER      = 0x3
 };
 
-class DynamicObject : public WorldObject, public GridObject<DynamicObject>
+class DynamicObject : public WorldObject, public GridObject<DynamicObject>, public MapObject
 {
     public:
         DynamicObject(bool isWorldObject);
@@ -42,6 +42,8 @@ class DynamicObject : public WorldObject, public GridObject<DynamicObject>
 
         void AddToWorld();
         void RemoveFromWorld();
+
+        void CleanupsBeforeDelete(bool finalCleanup = true) OVERRIDE;
 
         bool CreateDynamicObject(uint32 guidlow, Unit* caster, SpellInfo const* spell, Position const& pos, float radius, DynamicObjectType type);
         void Update(uint32 p_time);
@@ -60,12 +62,6 @@ class DynamicObject : public WorldObject, public GridObject<DynamicObject>
         uint32 GetSpellId() const {  return GetUInt32Value(DYNAMICOBJECT_SPELLID); }
         uint64 GetCasterGUID() const { return GetUInt64Value(DYNAMICOBJECT_CASTER); }
         float GetRadius() const { return GetFloatValue(DYNAMICOBJECT_RADIUS); }
-
-        void Say(int32 textId, uint32 language, uint64 targetGuid) { MonsterSay(textId, language, targetGuid); }
-        void Yell(int32 textId, uint32 language, uint64 targetGuid) { MonsterYell(textId, language, targetGuid); }
-        void TextEmote(int32 textId, uint64 targetGuid) { MonsterTextEmote(textId, targetGuid); }
-        void Whisper(int32 textId, uint64 receiver) { MonsterWhisper(textId, receiver); }
-        void YellToZone(int32 textId, uint32 language, uint64 targetGuid) { MonsterYellToZone(textId, language, targetGuid); }
 
     protected:
         Aura* _aura;

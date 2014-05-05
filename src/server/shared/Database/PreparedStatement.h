@@ -56,7 +56,8 @@ enum PreparedStatementValueType
     TYPE_I64,
     TYPE_FLOAT,
     TYPE_DOUBLE,
-    TYPE_STRING
+    TYPE_STRING,
+    TYPE_NULL
 };
 
 struct PreparedStatementData
@@ -92,6 +93,7 @@ class PreparedStatement
         void setFloat(const uint8 index, const float value);
         void setDouble(const uint8 index, const double value);
         void setString(const uint8 index, const std::string& value);
+        void setNull(const uint8 index);
 
     protected:
         void BindParameters();
@@ -100,6 +102,9 @@ class PreparedStatement
         MySQLPreparedStatement* m_stmt;
         uint32 m_index;
         std::vector<PreparedStatementData> statement_data;    //- Buffer of parameters, not tied to MySQL in any way yet
+
+        PreparedStatement(PreparedStatement const& right) DELETE_MEMBER;
+        PreparedStatement& operator=(PreparedStatement const& right) DELETE_MEMBER;
 };
 
 //- Class of which the instances are unique per MySQLConnection
@@ -126,6 +131,7 @@ class MySQLPreparedStatement
         void setFloat(const uint8 index, const float value);
         void setDouble(const uint8 index, const double value);
         void setString(const uint8 index, const char* value);
+        void setNull(const uint8 index);
 
     protected:
         MYSQL_STMT* GetSTMT() { return m_Mstmt; }
@@ -133,7 +139,7 @@ class MySQLPreparedStatement
         PreparedStatement* m_stmt;
         void ClearParameters();
         bool CheckValidIndex(uint8 index);
-        std::string getQueryString(const char *query);
+        std::string getQueryString(std::string const& sqlPattern) const;
 
     private:
         void setValue(MYSQL_BIND* param, enum_field_types type, const void* value, uint32 len, bool isUnsigned);
@@ -143,6 +149,9 @@ class MySQLPreparedStatement
         uint32 m_paramCount;
         std::vector<bool> m_paramsSet;
         MYSQL_BIND* m_bind;
+
+        MySQLPreparedStatement(MySQLPreparedStatement const& right) DELETE_MEMBER;
+        MySQLPreparedStatement& operator=(MySQLPreparedStatement const& right) DELETE_MEMBER;
 };
 
 typedef ACE_Future<PreparedQueryResult> PreparedQueryResultFuture;

@@ -23,12 +23,11 @@
 // For static or at-server-startup loaded spell data
 
 #include <ace/Singleton.h>
-#include "Common.h"
+
 #include "DBCStores.h"
 #include "DBCStructure.h"
 #include "SharedDefines.h"
 #include "UnorderedMap.h"
-#include "Unit.h"
 #include "Util.h"
 
 #include <map>
@@ -59,45 +58,43 @@ enum SpellFamilyFlag
     // SPELLFAMILYFLAG2 = SpellFamilyFlags[2]
 
     // Rogue
-    SPELLFAMILYFLAG_ROGUE_VANISH            = 0x00000800,
-    SPELLFAMILYFLAG_ROGUE_VAN_EVAS_SPRINT   = 0x00000860,    // Vanish, Evasion, Sprint
-    SPELLFAMILYFLAG1_ROGUE_COLDB_SHADOWSTEP = 0x00000240,    // Cold Blood, Shadowstep
-    SPELLFAMILYFLAG_ROGUE_KICK              = 0x00000010,   // Kick
-    SPELLFAMILYFLAG1_ROGUE_DISMANTLE        = 0x00100000,   // Dismantle
-    SPELLFAMILYFLAG_ROGUE_BLADE_FLURRY      = 0x40000000,   // Blade Flurry
-    SPELLFAMILYFLAG1_ROGUE_BLADE_FLURRY     = 0x00000800,   // Blade Flurry
+    SPELLFAMILYFLAG0_ROGUE_VANISH               = 0x00000800,
+    SPELLFAMILYFLAG0_ROGUE_VAN_SPRINT           = 0x00000840, // Vanish, Sprint
+    SPELLFAMILYFLAG1_ROGUE_SHADOWSTEP           = 0x00000200, // Shadowstep
+    SPELLFAMILYFLAG0_ROGUE_KICK                 = 0x00000010, // Kick
+    SPELLFAMILYFLAG1_ROGUE_DISMANTLE_SMOKE_BOMB = 0x80100000, // Dismantle, Smoke Bomb
 
     // Warrior
-    SPELLFAMILYFLAG_WARRIOR_CHARGE          = 0x00000001,
-    SPELLFAMILYFLAG_WARRIOR_SLAM            = 0x00200000,
-    SPELLFAMILYFLAG_WARRIOR_EXECUTE         = 0x20000000,
-    SPELLFAMILYFLAG_WARRIOR_CONCUSSION_BLOW = 0x04000000,
+    SPELLFAMILYFLAG_WARRIOR_CHARGE              = 0x00000001,
+    SPELLFAMILYFLAG_WARRIOR_SLAM                = 0x00200000,
+    SPELLFAMILYFLAG_WARRIOR_EXECUTE             = 0x20000000,
+    SPELLFAMILYFLAG_WARRIOR_CONCUSSION_BLOW     = 0x04000000,
 
     // Warlock
-    SPELLFAMILYFLAG_WARLOCK_LIFETAP         = 0x00040000,
+    SPELLFAMILYFLAG_WARLOCK_LIFETAP             = 0x00040000,
 
     // Mage
-    SPELLFAMILYFLAG1_MAGE_CONEOFCOLD        = 0x00000200,
+    SPELLFAMILYFLAG1_MAGE_CONEOFCOLD            = 0x00000200,
 
     // Druid
-    SPELLFAMILYFLAG2_DRUID_STARFALL         = 0x00000100,
+    SPELLFAMILYFLAG2_DRUID_STARFALL             = 0x00000100,
 
     // Paladin
-    SPELLFAMILYFLAG1_PALADIN_DIVINESTORM    = 0x00020000,
+    SPELLFAMILYFLAG1_PALADIN_DIVINESTORM        = 0x00020000,
 
     // Shaman
-    SPELLFAMILYFLAG_SHAMAN_FROST_SHOCK      = 0x80000000,
-    SPELLFAMILYFLAG_SHAMAN_HEALING_STREAM   = 0x00002000,
-    SPELLFAMILYFLAG_SHAMAN_MANA_SPRING      = 0x00004000,
-    SPELLFAMILYFLAG2_SHAMAN_LAVA_LASH       = 0x00000004,
-    SPELLFAMILYFLAG_SHAMAN_FIRE_NOVA        = 0x28000000,
+    SPELLFAMILYFLAG_SHAMAN_FROST_SHOCK          = 0x80000000,
+    SPELLFAMILYFLAG_SHAMAN_HEALING_STREAM       = 0x00002000,
+    SPELLFAMILYFLAG_SHAMAN_MANA_SPRING          = 0x00004000,
+    SPELLFAMILYFLAG2_SHAMAN_LAVA_LASH           = 0x00000004,
+    SPELLFAMILYFLAG_SHAMAN_FIRE_NOVA            = 0x28000000,
 
     // Deathknight
-    SPELLFAMILYFLAG_DK_DEATH_STRIKE         = 0x00000010,
-    SPELLFAMILYFLAG_DK_DEATH_COIL           = 0x00002000,
+    SPELLFAMILYFLAG_DK_DEATH_STRIKE             = 0x00000010,
+    SPELLFAMILYFLAG_DK_DEATH_COIL               = 0x00002000,
 
-    // TODO: Figure out a more accurate name for the following familyflag(s)
-    SPELLFAMILYFLAG_SHAMAN_TOTEM_EFFECTS    = 0x04000000   // Seems to be linked to most totems and some totem effects
+    /// @todo Figure out a more accurate name for the following familyflag(s)
+    SPELLFAMILYFLAG_SHAMAN_TOTEM_EFFECTS        = 0x04000000  // Seems to be linked to most totems and some totem effects
 };
 
 
@@ -402,6 +399,7 @@ enum SpellGroupStackRule
     SPELL_GROUP_STACK_RULE_EXCLUSIVE_FROM_SAME_CASTER = 2,
     SPELL_GROUP_STACK_RULE_EXCLUSIVE_SAME_EFFECT      = 3
 };
+
 #define SPELL_GROUP_STACK_RULE_MAX 4
 
 typedef std::map<SpellGroup, SpellGroupStackRule> SpellGroupStackMap;
@@ -424,6 +422,8 @@ struct SpellTargetPosition
     float  target_Z;
     float  target_Orientation;
 };
+
+typedef std::map<std::pair<uint32 /*spell_id*/, SpellEffIndex /*effIndex*/>, SpellTargetPosition> SpellTargetPositionMap;
 
 // Enum with EffectRadiusIndex and their actual radius
 enum EffectRadiusIndex
@@ -487,8 +487,6 @@ enum EffectRadiusIndex
     EFFECT_RADIUS_80_YARDS_2    = 65
 };
 
-typedef UNORDERED_MAP<uint32, SpellTargetPosition> SpellTargetPositionMap;
-
 // Spell pet auras
 class PetAura
 {
@@ -496,10 +494,7 @@ class PetAura
         typedef UNORDERED_MAP<uint32, uint32> PetAuraMap;
 
     public:
-        PetAura() : removeOnChangePet(false), damage(0)
-        {
-            auras.clear();
-        }
+        PetAura() : removeOnChangePet(false), damage(0) { }
 
         PetAura(uint32 petEntry, uint32 aura, bool _removeOnChangePet, int _damage) :
         removeOnChangePet(_removeOnChangePet), damage(_damage)
@@ -686,8 +681,6 @@ class SpellMgr
         SpellRequiredMapBounds GetSpellsRequiredForSpellBounds(uint32 spell_id) const;
         SpellsRequiringSpellMapBounds GetSpellsRequiringSpellBounds(uint32 spell_id) const;
         bool IsSpellRequiringSpell(uint32 spellid, uint32 req_spellid) const;
-        const SpellsRequiringSpellMap GetSpellsRequiringSpell();
-        uint32 GetSpellRequired(uint32 spell_id) const;
 
         // Spell learning
         SpellLearnSkillNode const* GetSpellLearnSkill(uint32 spell_id) const;
@@ -696,7 +689,7 @@ class SpellMgr
         bool IsSpellLearnToSpell(uint32 spell_id1, uint32 spell_id2) const;
 
         // Spell target coordinates
-        SpellTargetPosition const* GetSpellTargetPosition(uint32 spell_id) const;
+        SpellTargetPosition const* GetSpellTargetPosition(uint32 spell_id, SpellEffIndex effIndex) const;
 
         // Spell Groups table
         SpellSpellGroupMapBounds GetSpellSpellGroupMapBounds(uint32 spell_id) const;
@@ -712,11 +705,11 @@ class SpellMgr
 
         // Spell proc event table
         SpellProcEventEntry const* GetSpellProcEvent(uint32 spellId) const;
-        bool IsSpellProcEventCanTriggeredBy(SpellProcEventEntry const* spellProcEvent, uint32 EventProcFlag, SpellInfo const* procSpell, uint32 procFlags, uint32 procExtra, bool active);
+        bool IsSpellProcEventCanTriggeredBy(SpellProcEventEntry const* spellProcEvent, uint32 EventProcFlag, SpellInfo const* procSpell, uint32 procFlags, uint32 procExtra, bool active) const;
 
         // Spell proc table
         SpellProcEntry const* GetSpellProcEntry(uint32 spellId) const;
-        bool CanSpellTriggerProcOnEvent(SpellProcEntry const& procEntry, ProcEventInfo& eventInfo);
+        bool CanSpellTriggerProcOnEvent(SpellProcEntry const& procEntry, ProcEventInfo& eventInfo) const;
 
         // Spell bonus data table
         SpellBonusEntry const* GetSpellBonusData(uint32 spellId) const;
@@ -726,7 +719,7 @@ class SpellMgr
 
         SkillLineAbilityMapBounds GetSkillLineAbilityMapBounds(uint32 spell_id) const;
 
-        PetAura const* GetPetAura(uint32 spell_id, uint8 eff);
+        PetAura const* GetPetAura(uint32 spell_id, uint8 eff) const;
 
         SpellEnchantProcEntry const* GetSpellEnchantProcEvent(uint32 enchId) const;
         bool IsArenaAllowedEnchancment(uint32 ench_id) const;
@@ -745,12 +738,25 @@ class SpellMgr
 
         // SpellInfo object management
         SpellInfo const* GetSpellInfo(uint32 spellId) const { return spellId < GetSpellInfoStoreSize() ?  mSpellInfoMap[spellId] : NULL; }
+        // Use this only with 100% valid spellIds
+        SpellInfo const* EnsureSpellInfo(uint32 spellId) const
+        {
+            ASSERT(spellId < GetSpellInfoStoreSize());
+            SpellInfo const* spellInfo = mSpellInfoMap[spellId];
+            ASSERT(spellInfo);
+            return spellInfo;
+        }
         uint32 GetSpellInfoStoreSize() const { return mSpellInfoMap.size(); }
+
+    private:
+        SpellInfo* _GetSpellInfo(uint32 spellId) { return spellId < GetSpellInfoStoreSize() ?  mSpellInfoMap[spellId] : NULL; }
 
     // Modifiers
     public:
 
         // Loading data at server startup
+        void UnloadSpellInfoChains();
+        void LoadSpellTalentRanks();
         void LoadSpellRanks();
         void LoadSpellRequired();
         void LoadSpellLearnSkills();
@@ -773,8 +779,8 @@ class SpellMgr
         void LoadSpellInfoStore();
         void UnloadSpellInfoStore();
         void UnloadSpellInfoImplicitTargetConditionLists();
-        void LoadSpellCustomAttr();
-        void LoadDbcDataCorrections();
+        void LoadSpellInfoCustomAttributes();
+        void LoadSpellInfoCorrections();
 
     private:
         SpellDifficultySearcherMap mSpellDifficultySearcherMap;

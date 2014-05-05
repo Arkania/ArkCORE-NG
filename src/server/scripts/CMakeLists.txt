@@ -9,6 +9,7 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 # Enable precompiled headers when using the GCC compiler.
+
 if (USE_SCRIPTPCH)
   set(scripts_STAT_PCH_HDR PrecompiledHeaders/ScriptPCH.h)
   set(scripts_STAT_PCH_SRC PrecompiledHeaders/ScriptPCH.cpp)
@@ -46,6 +47,8 @@ message("")
 
 include_directories(
   ${CMAKE_BINARY_DIR}
+  ${CMAKE_SOURCE_DIR}/dep/recastnavigation/Detour
+  ${CMAKE_SOURCE_DIR}/dep/recastnavigation/Recast
   ${CMAKE_SOURCE_DIR}/dep/g3dlite/include
   ${CMAKE_SOURCE_DIR}/dep/SFMT
   ${CMAKE_SOURCE_DIR}/dep/zlib
@@ -86,6 +89,7 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/src/server/game/Combat
   ${CMAKE_SOURCE_DIR}/src/server/game/DataStores
   ${CMAKE_SOURCE_DIR}/src/server/game/DungeonFinding
+  ${CMAKE_SOURCE_DIR}/src/server/game/Entities/AreaTrigger
   ${CMAKE_SOURCE_DIR}/src/server/game/Entities/Corpse
   ${CMAKE_SOURCE_DIR}/src/server/game/Entities/Creature
   ${CMAKE_SOURCE_DIR}/src/server/game/Entities/DynamicObject

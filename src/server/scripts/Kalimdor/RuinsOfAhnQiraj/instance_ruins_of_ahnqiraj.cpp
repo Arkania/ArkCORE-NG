@@ -23,7 +23,7 @@
 class instance_ruins_of_ahnqiraj : public InstanceMapScript
 {
     public:
-        instance_ruins_of_ahnqiraj() : InstanceMapScript("instance_ruins_of_ahnqiraj", 509) {}
+        instance_ruins_of_ahnqiraj() : InstanceMapScript("instance_ruins_of_ahnqiraj", 509) { }
 
         struct instance_ruins_of_ahnqiraj_InstanceMapScript : public InstanceScript
         {
@@ -37,9 +37,10 @@ class instance_ruins_of_ahnqiraj : public InstanceMapScript
                 _buruGUID       = 0;
                 _ayamissGUID    = 0;
                 _ossirianGUID   = 0;
+                _paralyzedGUID  = 0;
             }
 
-            void OnCreatureCreate(Creature* creature)
+            void OnCreatureCreate(Creature* creature) OVERRIDE
             {
                 switch (creature->GetEntry())
                 {
@@ -72,7 +73,13 @@ class instance_ruins_of_ahnqiraj : public InstanceMapScript
                 return true;
             }
 
-            uint64 GetData64(uint32 type) const
+            void SetData64(uint32 type, uint64 data) OVERRIDE
+            {
+                if (type == DATA_PARALYZED)
+                    _paralyzedGUID = data;
+            }
+
+            uint64 GetData64(uint32 type) const OVERRIDE
             {
                 switch (type)
                 {
@@ -88,12 +95,14 @@ class instance_ruins_of_ahnqiraj : public InstanceMapScript
                         return _ayamissGUID;
                     case DATA_OSSIRIAN:
                         return _ossirianGUID;
+                    case DATA_PARALYZED:
+                        return _paralyzedGUID;
                 }
 
                 return 0;
             }
 
-            std::string GetSaveData()
+            std::string GetSaveData() OVERRIDE
             {
                 OUT_SAVE_INST_DATA;
 
@@ -143,9 +152,10 @@ class instance_ruins_of_ahnqiraj : public InstanceMapScript
             uint64 _buruGUID;
             uint64 _ayamissGUID;
             uint64 _ossirianGUID;
+            uint64 _paralyzedGUID;
         };
 
-        InstanceScript* GetInstanceScript(InstanceMap* map) const
+        InstanceScript* GetInstanceScript(InstanceMap* map) const OVERRIDE
         {
             return new instance_ruins_of_ahnqiraj_InstanceMapScript(map);
         }

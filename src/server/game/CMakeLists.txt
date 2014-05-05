@@ -102,6 +102,8 @@ set(game_STAT_SRCS
 
 include_directories(
   ${CMAKE_BINARY_DIR}
+  ${CMAKE_SOURCE_DIR}/dep/recastnavigation/Detour
+  ${CMAKE_SOURCE_DIR}/dep/recastnavigation/Recast
   ${CMAKE_SOURCE_DIR}/dep/g3dlite/include
   ${CMAKE_SOURCE_DIR}/dep/SFMT
   ${CMAKE_SOURCE_DIR}/dep/zlib
@@ -138,12 +140,12 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/Calendar
   ${CMAKE_CURRENT_SOURCE_DIR}/Chat
   ${CMAKE_CURRENT_SOURCE_DIR}/Chat/Channels
-  ${CMAKE_CURRENT_SOURCE_DIR}/Chat/Commands
   ${CMAKE_CURRENT_SOURCE_DIR}/Combat
   ${CMAKE_CURRENT_SOURCE_DIR}/Conditions
   ${CMAKE_CURRENT_SOURCE_DIR}/DataStores
   ${CMAKE_CURRENT_SOURCE_DIR}/DungeonFinding
   ${CMAKE_CURRENT_SOURCE_DIR}/Entities
+  ${CMAKE_CURRENT_SOURCE_DIR}/Entities/AreaTrigger
   ${CMAKE_CURRENT_SOURCE_DIR}/Entities/Creature
   ${CMAKE_CURRENT_SOURCE_DIR}/Entities/Corpse
   ${CMAKE_CURRENT_SOURCE_DIR}/Entities/DynamicObject

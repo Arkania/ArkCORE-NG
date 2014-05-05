@@ -46,19 +46,22 @@ enum Curator
     SPELL_BERSERK                   = 26662,
 };
 
+
+
+
 class boss_curator : public CreatureScript
 {
 public:
     boss_curator() : CreatureScript("boss_curator") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new boss_curatorAI (creature);
+        return new boss_curatorAI(creature);
     }
 
     struct boss_curatorAI : public ScriptedAI
     {
-        boss_curatorAI(Creature* creature) : ScriptedAI(creature) {}
+        boss_curatorAI(Creature* creature) : ScriptedAI(creature) { }
 
         uint32 AddTimer;
         uint32 HatefulBoltTimer;
@@ -67,7 +70,7 @@ public:
         bool Enraged;
         bool Evocating;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             AddTimer = 10000;
             HatefulBoltTimer = 15000;                           //This time may be wrong
@@ -78,22 +81,22 @@ public:
             me->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_ARCANE, true);
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit* /*victim*/) OVERRIDE
         {
             Talk(SAY_KILL);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) OVERRIDE
         {
             Talk(SAY_DEATH);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) OVERRIDE
         {
             Talk(SAY_AGGRO);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (!UpdateVictim())
                 return;
@@ -163,7 +166,9 @@ public:
                         else
                         {
                             if (urand(0, 1) == 0)
+                            {
                                 Talk(SAY_SUMMON);
+                            }
                         }
                     }
 
@@ -187,8 +192,7 @@ public:
 
                 if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 1))
                     DoCast(target, SPELL_HATEFUL_BOLT);
-            } 
-            else HatefulBoltTimer -= diff;
+            } else HatefulBoltTimer -= diff;
 
             DoMeleeAttackIfReady();
         }

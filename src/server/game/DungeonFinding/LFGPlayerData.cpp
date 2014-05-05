@@ -18,13 +18,14 @@
 
 #include "LFGPlayerData.h"
 
+namespace lfg
+{
+
 LfgPlayerData::LfgPlayerData(): m_State(LFG_STATE_NONE), m_OldState(LFG_STATE_NONE),
     m_Team(0), m_Group(0), m_Roles(0), m_Comment("")
-{}
+{ }
 
-LfgPlayerData::~LfgPlayerData()
-{
-}
+LfgPlayerData::~LfgPlayerData() { }
 
 void LfgPlayerData::SetState(LfgState state)
 {
@@ -52,11 +53,6 @@ void LfgPlayerData::RestoreState()
         m_Roles = 0;
     }
     m_State = m_OldState;
-}
-
-void LfgPlayerData::SetLockedDungeons(LfgLockMap const& lockStatus)
-{
-    m_LockedDungeons = lockStatus;
 }
 
 void LfgPlayerData::SetTeam(uint8 team)
@@ -94,11 +90,6 @@ LfgState LfgPlayerData::GetOldState() const
     return m_OldState;
 }
 
-const LfgLockMap& LfgPlayerData::GetLockedDungeons() const
-{
-    return m_LockedDungeons;
-}
-
 uint8 LfgPlayerData::GetTeam() const
 {
     return m_Team;
@@ -114,12 +105,14 @@ uint8 LfgPlayerData::GetRoles() const
     return m_Roles;
 }
 
-const std::string& LfgPlayerData::GetComment() const
+std::string const& LfgPlayerData::GetComment() const
 {
     return m_Comment;
 }
 
-const LfgDungeonSet& LfgPlayerData::GetSelectedDungeons() const
+LfgDungeonSet const& LfgPlayerData::GetSelectedDungeons() const
 {
     return m_SelectedDungeons;
 }
+
+} // namespace lfg

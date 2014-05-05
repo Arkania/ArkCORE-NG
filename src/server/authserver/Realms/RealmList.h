@@ -61,13 +61,13 @@ public:
     typedef std::map<std::string, Realm> RealmMap;
 
     RealmList();
-    ~RealmList() {}
+    ~RealmList() { }
 
     void Initialize(uint32 updateInterval);
 
     void UpdateIfNeed();
 
-    void AddRealm(Realm NewRealm) {m_realms[NewRealm.name] = NewRealm;}
+    void AddRealm(const Realm& NewRealm) { m_realms[NewRealm.name] = NewRealm; }
 
     RealmMap::const_iterator begin() const { return m_realms.begin(); }
     RealmMap::const_iterator end() const { return m_realms.end(); }

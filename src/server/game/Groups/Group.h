@@ -124,7 +124,7 @@ enum GroupUpdateFlags
     GROUP_UPDATE_FULL = GROUP_UPDATE_FLAG_STATUS | GROUP_UPDATE_FLAG_CUR_HP | GROUP_UPDATE_FLAG_MAX_HP |
                         GROUP_UPDATE_FLAG_POWER_TYPE | GROUP_UPDATE_FLAG_CUR_POWER | GROUP_UPDATE_FLAG_MAX_POWER |
                         GROUP_UPDATE_FLAG_LEVEL | GROUP_UPDATE_FLAG_ZONE | GROUP_UPDATE_FLAG_POSITION |
-                        GROUP_UPDATE_FLAG_AURAS | GROUP_UPDATE_PET | GROUP_UPDATE_FLAG_PHASE  // all known flags, except UNK100 and VEHICLE_SEAT
+                        GROUP_UPDATE_FLAG_AURAS | GROUP_UPDATE_PET | GROUP_UPDATE_FLAG_PHASE // all known flags, except UNK100 and VEHICLE_SEAT
 };
 
 class Roll : public LootValidatorRef
@@ -157,11 +157,11 @@ struct InstanceGroupBind
     bool perm;
     /* permanent InstanceGroupBinds exist if the leader has a permanent
        PlayerInstanceBind for the same instance. */
-    InstanceGroupBind() : save(NULL), perm(false) {}
+    InstanceGroupBind() : save(NULL), perm(false) { }
 };
 
 /** request member stats checken **/
-/** todo: uninvite people that not accepted invite **/
+/// @todo uninvite people that not accepted invite
 class Group
 {
     public:
@@ -200,6 +200,7 @@ class Group
         void   ChangeLeader(uint64 guid);
         void   SetLootMethod(LootMethod method);
         void   SetLooterGuid(uint64 guid);
+        void   SetMasterLooterGuid(uint64 guid);
         void   UpdateLooterGuid(WorldObject* pLootedObject, bool ifneed = false);
         void   SetLootThreshold(ItemQualities threshold);
         void   Disband(bool hideDestroy=false);
@@ -219,6 +220,7 @@ class Group
         const char * GetLeaderName() const;
         LootMethod GetLootMethod() const;
         uint64 GetLooterGuid() const;
+        uint64 GetMasterLooterGuid() const;
         ItemQualities GetLootThreshold() const;
 
         uint32 GetDbStoreId() const { return m_dbStoreId; };
@@ -311,6 +313,7 @@ class Group
         InstanceGroupBind* GetBoundInstance(Player* player);
         InstanceGroupBind* GetBoundInstance(Map* aMap);
         InstanceGroupBind* GetBoundInstance(MapEntry const* mapEntry);
+        InstanceGroupBind* GetBoundInstance(Difficulty difficulty, uint32 mapId);
         BoundInstancesMap& GetBoundInstances(Difficulty difficulty);
 
         // FG: evil hacks
@@ -341,6 +344,7 @@ class Group
         LootMethod          m_lootMethod;
         ItemQualities       m_lootThreshold;
         uint64              m_looterGuid;
+        uint64              m_masterLooterGuid;
         Rolls               RollId;
         BoundInstancesMap   m_boundInstances[MAX_DIFFICULTY];
         uint8*              m_subGroupsCounts;

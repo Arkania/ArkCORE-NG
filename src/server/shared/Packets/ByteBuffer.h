@@ -20,64 +20,48 @@
 #ifndef _BYTEBUFFER_H
 #define _BYTEBUFFER_H
 
-#include "Common.h"
-#include "Debugging/Errors.h"
-#include "Log.h"
-#include "Utilities/ByteConverter.h"
+#include "Define.h"
+#include "Errors.h"
+#include "ByteConverter.h"
 
-class ByteBufferException
+#include <ace/OS_NS_time.h>
+#include <exception>
+#include <list>
+#include <map>
+#include <string>
+#include <vector>
+#include <cstring>
+#include <time.h>
+
+// Root of ByteBuffer exception hierarchy
+class ByteBufferException : public std::exception
 {
-    public:
-        ByteBufferException(size_t pos, size_t size, size_t valueSize)
-            : Pos(pos), Size(size), ValueSize(valueSize)
-        {
-        }
+public:
+    ~ByteBufferException() throw() { }
 
-    protected:
-        size_t Pos;
-        size_t Size;
-        size_t ValueSize;
+    char const* what() const throw() { return msg_.c_str(); }
+
+protected:
+    std::string & message() throw() { return msg_; }
+
+private:
+    std::string msg_;
 };
 
 class ByteBufferPositionException : public ByteBufferException
 {
-    public:
-        ByteBufferPositionException(bool add, size_t pos, size_t size, size_t valueSize)
-        : ByteBufferException(pos, size, valueSize), _add(add)
-        {
-            PrintError();
-        }
+public:
+    ByteBufferPositionException(bool add, size_t pos, size_t size, size_t valueSize);
 
-    protected:
-        void PrintError() const
-        {
-            ACE_Stack_Trace trace;
-
-            sLog->outError("Attempted to %s value with size: "SIZEFMTD" in ByteBuffer (pos: " SIZEFMTD " size: "SIZEFMTD")\n[Stack trace: %s]" ,
-                (_add ? "put" : "get"), ValueSize, Pos, Size, trace.c_str());
-        }
-
-    private:
-        bool _add;
+    ~ByteBufferPositionException() throw() { }
 };
 
 class ByteBufferSourceException : public ByteBufferException
 {
-    public:
-        ByteBufferSourceException(size_t pos, size_t size, size_t valueSize)
-        : ByteBufferException(pos, size, valueSize)
-        {
-            PrintError();
-        }
+public:
+    ByteBufferSourceException(size_t pos, size_t size, size_t valueSize);
 
-    protected:
-        void PrintError() const
-        {
-            ACE_Stack_Trace trace;
-
-            sLog->outError("Attempted to put a %s in ByteBuffer (pos: "SIZEFMTD" size: "SIZEFMTD")\n[Stack trace: %s]",
-                (ValueSize > 0 ? "NULL-pointer" : "zero-sized value"), Pos, Size, trace.c_str());
-        }
+    ~ByteBufferSourceException() throw() { }
 };
 
 class ByteBuffer
@@ -101,6 +85,8 @@ class ByteBuffer
             _bitpos(buf._bitpos), _curbitval(buf._curbitval), _storage(buf._storage)
         {
         }
+
+        virtual ~ByteBuffer() { }
 
         void clear()
         {
@@ -452,7 +438,7 @@ class ByteBuffer
         {
             if (_rpos  + len > size())
                throw ByteBufferPositionException(false, _rpos, len, size());
-            memcpy(dest, &_storage[_rpos], len);
+            std::memcpy(dest, &_storage[_rpos], len);
             _rpos += len;
         }
 
@@ -484,8 +470,7 @@ class ByteBuffer
         {
             if (!length)
                 return std::string();
-            char* buffer = new char[length + 1];
-            memset(buffer, 0, length + 1);
+            char* buffer = new char[length + 1]();
             read((uint8*)buffer, length);
             std::string retval = buffer;
             delete[] buffer;
@@ -503,8 +488,7 @@ class ByteBuffer
         uint32 ReadPackedTime()
         {
             uint32 packedDate = read<uint32>();
-            tm lt;
-            memset(&lt, 0, sizeof(lt));
+            tm lt = tm();
 
             lt.tm_min = packedDate & 0x3F;
             lt.tm_hour = (packedDate >> 6) & 0x1F;
@@ -521,6 +505,8 @@ class ByteBuffer
             time = ReadPackedTime();
             return *this;
         }
+
+        uint8 * contents() { return &_storage[0]; }
 
         const uint8 *contents() const { return &_storage[0]; }
 
@@ -562,7 +548,7 @@ class ByteBuffer
 
             if (_storage.size() < _wpos + cnt)
                 _storage.resize(_wpos + cnt);
-            memcpy(&_storage[_wpos], src, cnt);
+            std::memcpy(&_storage[_wpos], src, cnt);
             _wpos += cnt;
         }
 
@@ -603,8 +589,9 @@ class ByteBuffer
 
         void AppendPackedTime(time_t time)
         {
-            tm* lt = localtime(&time);
-            append<uint32>((lt->tm_year - 100) << 24 | lt->tm_mon  << 20 | (lt->tm_mday - 1) << 14 | lt->tm_wday << 11 | lt->tm_hour << 6 | lt->tm_min);
+            tm lt;
+            ACE_OS::localtime_r(&time, &lt);
+            append<uint32>((lt.tm_year - 100) << 24 | lt.tm_mon  << 20 | (lt.tm_mday - 1) << 14 | lt.tm_wday << 11 | lt.tm_hour << 6 | lt.tm_min);
         }
 
         void put(size_t pos, const uint8 *src, size_t cnt)
@@ -615,71 +602,14 @@ class ByteBuffer
             if (!src)
                 throw ByteBufferSourceException(_wpos, size(), cnt);
 
-            memcpy(&_storage[pos], src, cnt);
+            std::memcpy(&_storage[pos], src, cnt);
         }
 
-        void print_storage() const
-        {
-            if (!sLog->IsOutDebug()) // optimize disabled debug output
-                return;
+        void print_storage() const;
 
-            std::ostringstream o;
-            o << "STORAGE_SIZE: " << size();
-            for (uint32 i = 0; i < size(); ++i)
-                o << read<uint8>(i) << " - ";
-            o << " ";
+        void textlike() const;
 
-            sLog->outDebugInLine("%s", o.str().c_str());
-        }
-
-        void textlike() const
-        {
-            if (!sLog->IsOutDebug()) // optimize disabled debug output
-                return;
-
-            std::ostringstream o;
-            o << "STORAGE_SIZE: " << size();
-            for (uint32 i = 0; i < size(); ++i)
-            {
-                char buf[1];
-                snprintf(buf, 1, "%c", read<uint8>(i));
-                o << buf;
-            }
-            o << " ";
-            sLog->outDebugInLine("%s", o.str().c_str());
-        }
-
-        void hexlike() const
-        {
-            if (!sLog->IsOutDebug()) // optimize disabled debug output
-                return;
-
-            uint32 j = 1, k = 1;
-
-            std::ostringstream o;
-            o << "STORAGE_SIZE: " << size();
-
-            for (uint32 i = 0; i < size(); ++i)
-            {
-                char buf[3];
-                snprintf(buf, 1, "%2X ", read<uint8>(i));
-                if ((i == (j * 8)) && ((i != (k * 16))))
-                {
-                    o << "| ";
-                    ++j;
-                }
-                else if (i == (k * 16))
-                {
-                    o << "\n";
-                    ++k;
-                    ++j;
-                }
-
-                o << buf;
-            }
-            o << " ";
-            sLog->outDebugInLine("%s", o.str().c_str());
-        }
+        void hexlike() const;
 
     protected:
         size_t _rpos, _wpos, _bitpos;
@@ -766,6 +696,7 @@ inline ByteBuffer &operator>>(ByteBuffer &b, std::map<K, V> &m)
     return b;
 }
 
+/// @todo Make a ByteBuffer.cpp and move all this inlining to it.
 template<> inline std::string ByteBuffer::read<std::string>()
 {
     std::string tmp;

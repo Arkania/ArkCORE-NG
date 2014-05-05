@@ -78,7 +78,7 @@ enum EItemFields
     ITEM_FIELD_DURABILITY                            = OBJECT_END + 0x003F, // Size: 1, Type: INT, Flags: OWNER, ITEM_OWNER
     ITEM_FIELD_MAXDURABILITY                         = OBJECT_END + 0x0040, // Size: 1, Type: INT, Flags: OWNER, ITEM_OWNER
     ITEM_FIELD_CREATE_PLAYED_TIME                    = OBJECT_END + 0x0041, // Size: 1, Type: INT, Flags: PUBLIC
-    ITEM_END                                         = OBJECT_END + 0x0042
+    ITEM_END                                         = OBJECT_END + 0x0042,
 };
 
 enum EContainerFields
@@ -436,6 +436,7 @@ enum EPlayerFields
     PLAYER_CHOSEN_TITLE                              = UNIT_END + 0x012B, // Size: 1, Type: INT, Flags: PUBLIC
     PLAYER_FAKE_INEBRIATION                          = UNIT_END + 0x012C, // Size: 1, Type: INT, Flags: PUBLIC
     PLAYER_FIELD_PAD_0                               = UNIT_END + 0x012D, // Size: 1, Type: INT, Flags: NONE
+    PLAYER_END_NOT_SELF                              = UNIT_END + 0x012E,
 
     PLAYER_FIELD_INV_SLOT_HEAD                       = UNIT_END + 0x012E, // Size: 46, Type: LONG, Flags: PRIVATE
     PLAYER_FIELD_PACK_SLOT_1                         = UNIT_END + 0x015C, // Size: 32, Type: LONG, Flags: PRIVATE
@@ -562,5 +563,4 @@ enum EAreaTriggerFields
     AREATRIGGER_END                                  = OBJECT_END + 0x0006
 };
 
-#define PLAYER_END_NOT_SELF PLAYER_FIELD_INV_SLOT_HEAD
 #endif // _UPDATEFIELDS_H

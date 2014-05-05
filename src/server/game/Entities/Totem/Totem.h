@@ -29,14 +29,18 @@ enum TotemType
     TOTEM_STATUE     = 2 // copied straight from MaNGOS, may need more implementation to work
 };
 // Some Totems cast spells that are not in creature DB
-#define SENTRY_TOTEM_SPELLID  6495
-#define SENTRY_TOTEM_ENTRY    3968
+enum TotemSpells
+{
+    // Totemic Wrath
+    SPELL_TOTEMIC_WRATH_TALENT  = 77746,
+    SPELL_TOTEMIC_WRATH         = 77747
+};
 
 class Totem : public Minion
 {
     public:
         Totem(SummonPropertiesEntry const* properties, Unit* owner);
-        virtual ~Totem() {}
+        virtual ~Totem() { }
         void Update(uint32 time);
         void InitStats(uint32 duration);
         void InitSummon();
@@ -48,12 +52,12 @@ class Totem : public Minion
 
         bool UpdateStats(Stats /*stat*/) { return true; }
         bool UpdateAllStats() { return true; }
-        void UpdateResistances(uint32 /*school*/) {}
-        void UpdateArmor() {}
-        void UpdateMaxHealth() {}
-        void UpdateMaxPower(Powers /*power*/) {}
-        void UpdateAttackPowerAndDamage(bool /*ranged*/) {}
-        void UpdateDamagePhysical(WeaponAttackType /*attType*/) {}
+        void UpdateResistances(uint32 /*school*/) { }
+        void UpdateArmor() { }
+        void UpdateMaxHealth() { }
+        void UpdateMaxPower(Powers /*power*/) { }
+        void UpdateAttackPowerAndDamage(bool /*ranged*/) { }
+        void UpdateDamagePhysical(WeaponAttackType /*attType*/) OVERRIDE { }
 
         bool IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index) const;
 

@@ -41,21 +41,26 @@ enum Says
     SAY_DEATH                   = 6
 };
 
+
 enum Spells
 {
     // Phase 1 spells
     SPELL_FIREBALL_NORMAL         = 44189,                 // Deals 2700-3300 damage at current target
     SPELL_FIREBALL_HEROIC         = 46164,                 //       4950-6050
+
     SPELL_PHOENIX                 = 44194,                 // Summons a phoenix (Doesn't work?)
     SPELL_PHOENIX_BURN            = 44197,                 // A spell Phoenix uses to damage everything around
     SPELL_REBIRTH_DMG             = 44196,                 // DMG if a Phoenix rebirth happen
+
     SPELL_FLAMESTRIKE1_NORMAL     = 44190,                 // Damage part
     SPELL_FLAMESTRIKE1_HEROIC     = 46163,                 // Heroic damage part
     SPELL_FLAMESTRIKE2            = 44191,                 // Flamestrike indicator before the damage
     SPELL_FLAMESTRIKE3            = 44192,                 // Summons the trigger + animation (projectile)
+
     SPELL_SHOCK_BARRIER           = 46165,                 // Heroic only; 10k damage shield, followed by Pyroblast
     SPELL_PYROBLAST               = 36819,                 // Heroic only; 45-55k fire damage
-    // Phase 2 spells
+
+// Phase 2 spells
     SPELL_GRAVITY_LAPSE_INITIAL   = 44224,                 // Cast at the beginning of every Gravity Lapse
     SPELL_GRAVITY_LAPSE_CHANNEL   = 44251,                 // Channeled; blue beam animation to every enemy in range
     SPELL_TELEPORT_CENTER         = 44218,                 // Should teleport people to the center. Requires DB entry in spell_target_position.
@@ -64,6 +69,8 @@ enum Spells
     SPELL_ARCANE_SPHERE_PASSIVE   = 44263,                 // Passive auras on Arcane Spheres
     SPELL_POWER_FEEDBACK          = 44233                 // Stuns him, making him take 50% more damage for 10 seconds. Cast after Gravity Lapse
 };
+
+
 
 enum Creatures
 {
@@ -88,9 +95,9 @@ class boss_felblood_kaelthas : public CreatureScript
 public:
     boss_felblood_kaelthas() : CreatureScript("boss_felblood_kaelthas") { }
 
-    CreatureAI* GetAI(Creature* c) const
+    CreatureAI* GetAI(Creature* c) const OVERRIDE
     {
-        return new boss_felblood_kaelthasAI(c);
+        return GetInstanceAI<boss_felblood_kaelthasAI>(c);
     }
 
     struct boss_felblood_kaelthasAI : public ScriptedAI
@@ -126,9 +133,9 @@ public:
         // 1 = Fireball; Summon Phoenix; Flamestrike
         // 2 = Gravity Lapses
 
-        void Reset()
+        void Reset() OVERRIDE
         {
-            // TODO: Timers
+            /// @todo Timers
             FireballTimer = 0;
             PhoenixTimer = 10000;
             FlameStrikeTimer = 25000;
@@ -144,16 +151,12 @@ public:
 
             Phase = 0;
 
-            if (instance)
-                instance->SetData(DATA_KAELTHAS_EVENT, NOT_STARTED);
+            instance->SetData(DATA_KAELTHAS_EVENT, NOT_STARTED);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) OVERRIDE
         {
             Talk(SAY_DEATH);
-
-            if (!instance)
-                return;
 
             instance->SetData(DATA_KAELTHAS_EVENT, DONE);
 
@@ -162,21 +165,19 @@ public:
                 escapeOrb->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
         }
 
-        void DamageTaken(Unit* /*done_by*/, uint32 &damage)
+        void DamageTaken(Unit* /*done_by*/, uint32 &damage) OVERRIDE
         {
             if (damage > me->GetHealth())
                 RemoveGravityLapse(); // Remove Gravity Lapse so that players fall to ground if they kill him when in air.
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) OVERRIDE
         {
-            if (!instance)
-                return;
-
             instance->SetData(DATA_KAELTHAS_EVENT, IN_PROGRESS);
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) OVERRIDE
+
         {
             if (!HasTaunted && me->IsWithinDistInMap(who, 40.0f))
             {
@@ -274,7 +275,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             //Return since we have no target
             if (!UpdateVictim())
@@ -292,14 +293,14 @@ public:
                             me->InterruptSpell(CURRENT_CHANNELED_SPELL);
                             me->InterruptSpell(CURRENT_GENERIC_SPELL);
                             DoCast(me, SPELL_SHOCK_BARRIER, true);
-                            DoCast(me->GetVictim(), SPELL_PYROBLAST);
+                            DoCastVictim(SPELL_PYROBLAST);
                             PyroblastTimer = 60000;
                         } else PyroblastTimer -= diff;
                     }
 
                     if (FireballTimer <= diff)
                     {
-                        DoCast(me->GetVictim(), SPELL_FIREBALL_NORMAL);
+                        DoCastVictim(SPELL_FIREBALL_NORMAL);
                         FireballTimer = urand(2000, 6000);
                     } else FireballTimer -= diff;
 
@@ -364,8 +365,7 @@ public:
                                     Talk(SAY_GRAVITY_LAPSE);
                                     FirstGravityLapse = false;
 
-                                    if (instance)
-                                        instance->SetData(DATA_KAELTHAS_STATUES, 1);
+                                    instance->SetData(DATA_KAELTHAS_STATUES, 1);
                                 }
                                 else
                                     Talk(SAY_RECAST_GRAVITY);
@@ -404,11 +404,11 @@ public:
                                         Orb->AddThreat(target, 1000000.0f);
                                         Orb->AI()->AttackStart(target);
                                     }
-
                                 }
 
                                 DoCast(me, SPELL_GRAVITY_LAPSE_CHANNEL);
                                 break;
+
                             case 4:
                                 me->InterruptNonMeleeSpells(false);
                                 Talk(SAY_TIRED);
@@ -431,7 +431,7 @@ class npc_felkael_flamestrike : public CreatureScript
 public:
     npc_felkael_flamestrike() : CreatureScript("npc_felkael_flamestrike") { }
 
-    CreatureAI* GetAI(Creature* c) const
+    CreatureAI* GetAI(Creature* c) const OVERRIDE
     {
         return new npc_felkael_flamestrikeAI(c);
     }
@@ -444,7 +444,7 @@ public:
 
         uint32 FlameStrikeTimer;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             FlameStrikeTimer = 5000;
 
@@ -454,9 +454,10 @@ public:
             DoCast(me, SPELL_FLAMESTRIKE2, true);
         }
 
-        void EnterCombat(Unit* /*who*/) {}
-        void MoveInLineOfSight(Unit* /*who*/) {}
-        void UpdateAI(const uint32 diff)
+        void EnterCombat(Unit* /*who*/) OVERRIDE { }
+        void MoveInLineOfSight(Unit* /*who*/) OVERRIDE { }
+
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (FlameStrikeTimer <= diff)
             {
@@ -472,9 +473,9 @@ class npc_felkael_phoenix : public CreatureScript
 public:
     npc_felkael_phoenix() : CreatureScript("npc_felkael_phoenix") { }
 
-    CreatureAI* GetAI(Creature* c) const
+    CreatureAI* GetAI(Creature* c) const OVERRIDE
     {
-        return new npc_felkael_phoenixAI(c);
+        return GetInstanceAI<npc_felkael_phoenixAI>(c);
     }
 
     struct npc_felkael_phoenixAI : public ScriptedAI
@@ -490,7 +491,7 @@ public:
         bool Rebirth;
         bool FakeDeath;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE + UNIT_FLAG_NON_ATTACKABLE);
             me->SetDisableGravity(true);
@@ -501,9 +502,9 @@ public:
             FakeDeath = false;
         }
 
-        void EnterCombat(Unit* /*who*/) {}
+        void EnterCombat(Unit* /*who*/) OVERRIDE { }
 
-        void DamageTaken(Unit* /*killer*/, uint32 &damage)
+        void DamageTaken(Unit* /*killer*/, uint32 &damage) OVERRIDE
         {
             if (damage < me->GetHealth())
                 return;
@@ -515,7 +516,7 @@ public:
                 return;
             }
             //Don't really die in all phases of Kael'Thas
-            if (instance && instance->GetData(DATA_KAELTHAS_EVENT) == 0)
+            if (instance->GetData(DATA_KAELTHAS_EVENT) == 0)
             {
                 //prevent death
                 damage = 0;
@@ -537,12 +538,12 @@ public:
            }
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) OVERRIDE
         {
             me->SummonCreature(CREATURE_PHOENIX_EGG, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 45000);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             //If we are fake death, we cast revbirth and after that we kill the phoenix to spawn the egg.
             if (FakeDeath)
@@ -585,26 +586,27 @@ class npc_felkael_phoenix_egg : public CreatureScript
 public:
     npc_felkael_phoenix_egg() : CreatureScript("npc_felkael_phoenix_egg") { }
 
-    CreatureAI* GetAI(Creature* c) const
+    CreatureAI* GetAI(Creature* c) const OVERRIDE
     {
         return new npc_felkael_phoenix_eggAI(c);
     }
 
     struct npc_felkael_phoenix_eggAI : public ScriptedAI
     {
-        npc_felkael_phoenix_eggAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_felkael_phoenix_eggAI(Creature* creature) : ScriptedAI(creature) { }
 
         uint32 HatchTimer;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             HatchTimer = 10000;
         }
 
-        void EnterCombat(Unit* /*who*/) {}
-        void MoveInLineOfSight(Unit* /*who*/) {}
+        void EnterCombat(Unit* /*who*/) OVERRIDE { }
+        void MoveInLineOfSight(Unit* /*who*/) OVERRIDE { }
 
-        void UpdateAI(const uint32 diff)
+
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (HatchTimer <= diff)
             {
@@ -620,7 +622,7 @@ class npc_arcane_sphere : public CreatureScript
 public:
     npc_arcane_sphere() : CreatureScript("npc_arcane_sphere") { }
 
-    CreatureAI* GetAI(Creature* c) const
+    CreatureAI* GetAI(Creature* c) const OVERRIDE
     {
         return new npc_arcane_sphereAI(c);
     }
@@ -632,7 +634,7 @@ public:
         uint32 DespawnTimer;
         uint32 ChangeTargetTimer;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             DespawnTimer = 30000;
             ChangeTargetTimer = urand(6000, 12000);
@@ -643,9 +645,9 @@ public:
             DoCast(me, SPELL_ARCANE_SPHERE_PASSIVE, true);
         }
 
-        void EnterCombat(Unit* /*who*/) {}
+        void EnterCombat(Unit* /*who*/) OVERRIDE { }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (DespawnTimer <= diff)
                 me->Kill(me);

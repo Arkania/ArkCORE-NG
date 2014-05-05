@@ -21,7 +21,7 @@
 #define _REFERENCE_H
 
 #include "Dynamic/LinkedList.h"
-#include <assert.h>
+#include "Errors.h" // for ASSERT
 
 //=====================================================
 
@@ -41,12 +41,12 @@ template <class TO, class FROM> class Reference : public LinkedListElement
         virtual void sourceObjectDestroyLink() = 0;
     public:
         Reference() { iRefTo = NULL; iRefFrom = NULL; }
-        virtual ~Reference() {}
+        virtual ~Reference() { }
 
         // Create new link
         void link(TO* toObj, FROM* fromObj)
         {
-            assert(fromObj);                                // fromObj MUST not be NULL
+            ASSERT(fromObj);                                // fromObj MUST not be NULL
             if (isValid())
                 unlink();
             if (toObj != NULL)
@@ -92,9 +92,13 @@ template <class TO, class FROM> class Reference : public LinkedListElement
         Reference<TO, FROM> const* nocheck_prev() const { return((Reference<TO, FROM> const*) LinkedListElement::nocheck_prev()); }
 
         TO* operator ->() const { return iRefTo; }
-        TO* GetTarget() const { return iRefTo; }
+        TO* getTarget() const { return iRefTo; }
 
         FROM* GetSource() const { return iRefFrom; }
+
+    private:
+        Reference(Reference const&);
+        Reference& operator=(Reference const&);
 };
 
 //=====================================================

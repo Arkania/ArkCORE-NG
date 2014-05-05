@@ -73,7 +73,7 @@ enum Spells
     SPELL_BERSERK                               = 32965,
 };
 
-enum eEnums
+enum Factions
 {
     // any other constants
     FACTION_WORGEN                              = 24
@@ -95,7 +95,7 @@ class example_creature : public CreatureScript
         {
             // *** HANDLED FUNCTION ***
             //This is the constructor, called only once when the Creature is first created
-            example_creatureAI(Creature* creature) : ScriptedAI(creature) {}
+            example_creatureAI(Creature* creature) : ScriptedAI(creature) { }
 
             // *** CUSTOM VARIABLES ****
             //These variables are for use only by this individual script.
@@ -112,7 +112,7 @@ class example_creature : public CreatureScript
 
             // *** HANDLED FUNCTION ***
             //This is called after spawn and whenever the core decides we need to evade
-            void Reset()
+            void Reset() OVERRIDE
             {
                 m_uiPhase = 1;                                      // Start in phase 1
                 m_uiPhaseTimer = 60000;                             // 60 seconds
@@ -126,32 +126,32 @@ class example_creature : public CreatureScript
 
             // *** HANDLED FUNCTION ***
             // Enter Combat called once per combat
-            void EnterCombat(Unit* who)
+            void EnterCombat(Unit* who) OVERRIDE
             {
                 //Say some stuff
-                Talk(SAY_AGGRO, who->GetGUID());
+                Talk(SAY_AGGRO, who);
             }
 
             // *** HANDLED FUNCTION ***
             // Attack Start is called when victim change (including at start of combat)
             // By default, attack who and start movement toward the victim.
-            //void AttackStart(Unit* who)
+            //void AttackStart(Unit* who) OVERRIDE
             //{
             //    ScriptedAI::AttackStart(who);
             //}
 
             // *** HANDLED FUNCTION ***
             // Called when going out of combat. Reset is called just after.
-            void EnterEvadeMode()
+            void EnterEvadeMode() OVERRIDE
             {
                 Talk(SAY_EVADE);
             }
 
             // *** HANDLED FUNCTION ***
             //Our Receive emote function
-            void ReceiveEmote(Player* /*player*/, uint32 uiTextEmote)
+            void ReceiveEmote(Player* /*player*/, uint32 uiTextEmote) OVERRIDE
             {
-                me->HandleEmote(uiTextEmote);
+                me->HandleEmoteCommand(uiTextEmote);
 
                 switch (uiTextEmote)
                 {
@@ -166,7 +166,7 @@ class example_creature : public CreatureScript
 
             // *** HANDLED FUNCTION ***
             //Update AI is called Every single map update (roughly once every 50ms if a player is within the grid)
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(uint32 uiDiff) OVERRIDE
             {
                 //Out of combat timers
                 if (!me->GetVictim())
@@ -201,9 +201,9 @@ class example_creature : public CreatureScript
                 {
                     //Cast spell one on our current target.
                     if (rand()%50 > 10)
-                        DoCast(me->GetVictim(), SPELL_ONE_ALT);
+                        DoCastVictim(SPELL_ONE_ALT);
                     else if (me->IsWithinDist(me->GetVictim(), 25.0f))
-                        DoCast(me->GetVictim(), SPELL_ONE);
+                        DoCastVictim(SPELL_ONE);
 
                     m_uiSpell1Timer = 5000;
                 }
@@ -214,7 +214,7 @@ class example_creature : public CreatureScript
                 if (m_uiSpell2Timer <= uiDiff)
                 {
                     //Cast spell two on our current target.
-                    DoCast(me->GetVictim(), SPELL_TWO);
+                    DoCastVictim(SPELL_TWO);
                     m_uiSpell2Timer = 37000;
                 }
                 else
@@ -227,7 +227,7 @@ class example_creature : public CreatureScript
                     if (m_uiSpell3Timer <= uiDiff)
                     {
                         //Cast spell one on our current target.
-                        DoCast(me->GetVictim(), SPELL_THREE);
+                        DoCastVictim(SPELL_THREE);
 
                         m_uiSpell3Timer = 19000;
                     }
@@ -237,8 +237,8 @@ class example_creature : public CreatureScript
                     if (m_uiBeserkTimer <= uiDiff)
                     {
                         //Say our line then cast uber death spell
-                        Talk(SAY_BERSERK, me->GetVictim() ? me->GetVictim()->GetGUID() : 0);
-                        DoCast(me->GetVictim(), SPELL_BERSERK);
+                        Talk(SAY_BERSERK, me->GetVictim());
+                        DoCastVictim(SPELL_BERSERK);
 
                         //Cast our beserk spell agian in 12 seconds if we didn't kill everyone
                         m_uiBeserkTimer = 12000;
@@ -263,12 +263,12 @@ class example_creature : public CreatureScript
             }
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const OVERRIDE
         {
             return new example_creatureAI(creature);
         }
 
-        bool OnGossipHello(Player* player, Creature* creature)
+        bool OnGossipHello(Player* player, Creature* creature) OVERRIDE
         {
             player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
             player->SEND_GOSSIP_MENU(907, creature->GetGUID());
@@ -276,7 +276,7 @@ class example_creature : public CreatureScript
             return true;
         }
 
-        bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
+        bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) OVERRIDE
         {
             player->PlayerTalkClass->ClearMenus();
             if (action == GOSSIP_ACTION_INFO_DEF+1)

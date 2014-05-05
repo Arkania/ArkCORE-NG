@@ -60,7 +60,7 @@ class MySQLConnection;
 class SQLOperation : public ACE_Method_Request
 {
     public:
-        SQLOperation(): m_conn(NULL) {};
+        SQLOperation(): m_conn(NULL) { }
         virtual int call()
         {
             Execute();
@@ -70,6 +70,10 @@ class SQLOperation : public ACE_Method_Request
         virtual void SetConnection(MySQLConnection* con) { m_conn = con; }
 
         MySQLConnection* m_conn;
+
+    private:
+        SQLOperation(SQLOperation const& right) DELETE_MEMBER;
+        SQLOperation& operator=(SQLOperation const& right) DELETE_MEMBER;
 };
 
 #endif

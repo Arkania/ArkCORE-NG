@@ -3,18 +3,19 @@
  * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
 #include "Spline.h"
@@ -60,7 +61,7 @@ SplineBase::InitMethtod SplineBase::initializers[SplineBase::ModesEnd] =
 
 using G3D::Matrix4;
 static const Matrix4 s_catmullRomCoeffs(
-    -0.5f, 1.5f,-1.5f, 0.5f,
+    -0.5f, 1.5f, -1.5f, 0.5f,
     1.f, -2.5f, 2.f, -0.5f,
     -0.5f, 0.f,  0.5f, 0.f,
     0.f,  1.f,  0.f,  0.f);
@@ -157,7 +158,7 @@ float SplineBase::SegLengthLinear(index_type index) const
     return (points[index] - points[index+1]).length();
 }
 
-float SplineBase::SegLengthCatmullRom( index_type index ) const
+float SplineBase::SegLengthCatmullRom(index_type index) const
 {
     ASSERT(index >= index_lo && index < index_hi);
 
@@ -223,7 +224,7 @@ void SplineBase::InitLinear(const Vector3* controls, index_type count, bool cycl
 
     points.resize(real_size);
 
-    memcpy(&points[0],controls, sizeof(Vector3) * count);
+    memcpy(&points[0], controls, sizeof(Vector3) * count);
 
     // first and last two indexes are space for special 'virtual points'
     // these points are required for proper C_Evaluate and C_Evaluate_Derivative methtod work
@@ -245,7 +246,7 @@ void SplineBase::InitCatmullRom(const Vector3* controls, index_type count, bool 
     int lo_index = 1;
     int high_index = lo_index + count - 1;
 
-    memcpy(&points[lo_index],controls, sizeof(Vector3) * count);
+    memcpy(&points[lo_index], controls, sizeof(Vector3) * count);
 
     // first and last two indexes are space for special 'virtual points'
     // these points are required for proper C_Evaluate and C_Evaluate_Derivative methtod work
@@ -275,7 +276,7 @@ void SplineBase::InitBezier3(const Vector3* controls, index_type count, bool /*c
     index_type t = c / 3u;
 
     points.resize(c);
-    memcpy(&points[0],controls, sizeof(Vector3) * c);
+    memcpy(&points[0], controls, sizeof(Vector3) * c);
 
     index_lo = 0;
     index_hi = t-1;

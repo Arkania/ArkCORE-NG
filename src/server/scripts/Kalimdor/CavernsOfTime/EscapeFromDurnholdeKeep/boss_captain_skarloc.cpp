@@ -53,9 +53,9 @@ class boss_captain_skarloc : public CreatureScript
 public:
     boss_captain_skarloc() : CreatureScript("boss_captain_skarloc") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new boss_captain_skarlocAI (creature);
+        return GetInstanceAI<boss_captain_skarlocAI>(creature);
     }
 
     struct boss_captain_skarlocAI : public ScriptedAI
@@ -74,7 +74,7 @@ public:
         uint32 DevotionAura_Timer;
         uint32 Consecration_Timer;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             Holy_Light_Timer = urand(20000, 30000);
             Cleanse_Timer = 10000;
@@ -84,27 +84,27 @@ public:
             Consecration_Timer = 8000;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) OVERRIDE
         {
             //This is not correct. Should taunt Thrall before engage in combat
             Talk(SAY_TAUNT1);
             Talk(SAY_TAUNT2);
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit* /*victim*/) OVERRIDE
         {
             Talk(SAY_SLAY);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) OVERRIDE
         {
             Talk(SAY_DEATH);
 
-            if (instance && instance->GetData(TYPE_THRALL_EVENT) == IN_PROGRESS)
+            if (instance->GetData(TYPE_THRALL_EVENT) == IN_PROGRESS)
                 instance->SetData(TYPE_THRALL_PART1, DONE);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             //Return since we have no target
             if (!UpdateVictim())
@@ -127,7 +127,7 @@ public:
             //Hammer of Justice
             if (HammerOfJustice_Timer <= diff)
             {
-                DoCast(me->GetVictim(), SPELL_HAMMER_OF_JUSTICE);
+                DoCastVictim(SPELL_HAMMER_OF_JUSTICE);
                 HammerOfJustice_Timer = 60000;
             } else HammerOfJustice_Timer -= diff;
 
@@ -148,7 +148,7 @@ public:
             //Consecration
             if (Consecration_Timer <= diff)
             {
-                //DoCast(me->GetVictim(), SPELL_CONSECRATION);
+                //DoCastVictim(SPELL_CONSECRATION);
                 Consecration_Timer = urand(5000, 10000);
             } else Consecration_Timer -= diff;
 

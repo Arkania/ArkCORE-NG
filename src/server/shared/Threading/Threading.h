@@ -31,7 +31,7 @@ namespace ACE_Based
     class Runnable
     {
         public:
-            virtual ~Runnable() {}
+            virtual ~Runnable() { }
             virtual void run() = 0;
 
             void incReference() { ++m_refs; }
@@ -101,7 +101,7 @@ namespace ACE_Based
             typedef ACE_TSS<Thread> ThreadStorage;
             //global object - container for Thread class representation of every thread
             static ThreadStorage m_ThreadStorage;
-            //use this object to determine current OS thread priority values mapped to enum Priority{}
+            //use this object to determine current OS thread priority values mapped to enum Priority{ }
             static ThreadPriority m_TpEnum;
     };
 

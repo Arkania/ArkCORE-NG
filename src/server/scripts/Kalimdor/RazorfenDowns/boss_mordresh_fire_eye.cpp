@@ -53,13 +53,13 @@ public:
     {
         boss_mordresh_fire_eyeAI(Creature* creature) : BossAI(creature, DATA_MORDRESH_FIRE_EYE) { }
 
-        void Reset() 
+        void Reset() OVERRIDE
         {
             _Reset();
             events.ScheduleEvent(EVENT_OOC_1, 10000);
         }
 
-        void EnterCombat(Unit* /*who*/) 
+        void EnterCombat(Unit* /*who*/) OVERRIDE
         {
             _EnterCombat();
             events.Reset();
@@ -68,12 +68,12 @@ public:
             events.ScheduleEvent(EVENT_FIRE_NOVA, urand(8000, 12000));
         }
 
-        void JustDied(Unit* /*killer*/) 
+        void JustDied(Unit* /*killer*/) OVERRIDE
         {
             _JustDied();
         }
 
-        void UpdateAI(const uint32 diff) 
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             events.Update(diff);
 
@@ -125,7 +125,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const 
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
         return new boss_mordresh_fire_eyeAI(creature);
     }

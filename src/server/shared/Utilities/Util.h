@@ -21,12 +21,13 @@
 #define _UTIL_H
 
 #include "Define.h"
+#include "Errors.h"
 
-#include <ace/INET_Addr.h>
 #include <algorithm>
-#include <list>
 #include <string>
 #include <vector>
+#include <list>
+#include <ace/INET_Addr.h>
 
 // Searcher for map of structs
 template<typename T, class S> struct Finder
@@ -41,7 +42,7 @@ template<typename T, class S> struct Finder
 class Tokenizer
 {
 public:
-    typedef std::vector<char const *> StorageType;
+    typedef std::vector<char const*> StorageType;
 
     typedef StorageType::size_type size_type;
 
@@ -90,13 +91,13 @@ float frand(float min, float max);
 /* Return a random double from 0.0 to 1.0 (exclusive). Floats support only 7 valid decimal digits.
  * A double supports up to 15 valid decimal digits and is used internally (RAND32_MAX has 10 digits).
  * With an FPU, there is usually no difference in performance between float and double.
- */
+*/
 double rand_norm(void);
 
 /* Return a random double from 0.0 to 99.9999999999999. Floats support only 7 valid decimal digits.
  * A double supports up to 15 valid decimal digits and is used internally (RAND32_MAX has 10 digits).
  * With an FPU, there is usually no difference in performance between float and double.
- */
+*/
 double rand_chance(void);
 
 /* Return true if a random roll fits in the specified chance (range 0-100). */
@@ -109,22 +110,6 @@ inline bool roll_chance_f(float chance)
 inline bool roll_chance_i(int chance)
 {
     return chance > irand(0, 99);
-}
-
-inline void ApplyModUInt32Var(uint32& var, int32 val, bool apply)
-{
-    int32 cur = var;
-    cur += (apply ? val : -val);
-    if (cur < 0)
-        cur = 0;
-    var = cur;
-}
-
-inline void ApplyModFloatVar(float& var, float  val, bool apply)
-{
-    var += (apply ? val : -val);
-    if (var < 0)
-        var = 0;
 }
 
 inline void ApplyPercentModFloatVar(float& var, float val, bool apply)
@@ -190,7 +175,7 @@ inline bool isExtendedLatinCharacter(wchar_t wchar)
         return true;
     if (wchar >= 0x00C0 && wchar <= 0x00D6)                  // LATIN CAPITAL LETTER A WITH GRAVE - LATIN CAPITAL LETTER O WITH DIAERESIS
         return true;
-    if (wchar >= 0x00D8 && wchar <= 0x00DF)                  // LATIN CAPITAL LETTER O WITH STROKE - LATIN CAPITAL LETTER THORN
+    if (wchar >= 0x00D8 && wchar <= 0x00DE)                  // LATIN CAPITAL LETTER O WITH STROKE - LATIN CAPITAL LETTER THORN
         return true;
     if (wchar == 0x00DF)                                     // LATIN SMALL LETTER SHARP S
         return true;
@@ -259,7 +244,7 @@ inline bool isNumericOrSpace(wchar_t wchar)
     return isNumeric(wchar) || wchar == L' ';
 }
 
-inline bool isBasicLatinString(std::wstring wstr, bool numericOrSpace)
+inline bool isBasicLatinString(const std::wstring &wstr, bool numericOrSpace)
 {
     for (size_t i = 0; i < wstr.size(); ++i)
         if (!isBasicLatinCharacter(wstr[i]) && (!numericOrSpace || !isNumericOrSpace(wstr[i])))
@@ -267,7 +252,7 @@ inline bool isBasicLatinString(std::wstring wstr, bool numericOrSpace)
     return true;
 }
 
-inline bool isExtendedLatinString(std::wstring wstr, bool numericOrSpace)
+inline bool isExtendedLatinString(const std::wstring &wstr, bool numericOrSpace)
 {
     for (size_t i = 0; i < wstr.size(); ++i)
         if (!isExtendedLatinCharacter(wstr[i]) && (!numericOrSpace || !isNumericOrSpace(wstr[i])))
@@ -275,7 +260,7 @@ inline bool isExtendedLatinString(std::wstring wstr, bool numericOrSpace)
     return true;
 }
 
-inline bool isCyrillicString(std::wstring wstr, bool numericOrSpace)
+inline bool isCyrillicString(const std::wstring &wstr, bool numericOrSpace)
 {
     for (size_t i = 0; i < wstr.size(); ++i)
         if (!isCyrillicCharacter(wstr[i]) && (!numericOrSpace || !isNumericOrSpace(wstr[i])))
@@ -283,7 +268,7 @@ inline bool isCyrillicString(std::wstring wstr, bool numericOrSpace)
     return true;
 }
 
-inline bool isEastAsianString(std::wstring wstr, bool numericOrSpace)
+inline bool isEastAsianString(const std::wstring &wstr, bool numericOrSpace)
 {
     for (size_t i = 0; i < wstr.size(); ++i)
         if (!isEastAsianCharacter(wstr[i]) && (!numericOrSpace || !isNumericOrSpace(wstr[i])))
@@ -548,5 +533,37 @@ public:
         return part[el];
     }
 };
+
+enum ComparisionType
+{
+    COMP_TYPE_EQ = 0,
+    COMP_TYPE_HIGH,
+    COMP_TYPE_LOW,
+    COMP_TYPE_HIGH_EQ,
+    COMP_TYPE_LOW_EQ,
+    COMP_TYPE_MAX
+};
+
+template <class T>
+bool CompareValues(ComparisionType type, T val1, T val2)
+{
+    switch (type)
+    {
+        case COMP_TYPE_EQ:
+            return val1 == val2;
+        case COMP_TYPE_HIGH:
+            return val1 > val2;
+        case COMP_TYPE_LOW:
+            return val1 < val2;
+        case COMP_TYPE_HIGH_EQ:
+            return val1 >= val2;
+        case COMP_TYPE_LOW_EQ:
+            return val1 <= val2;
+        default:
+            // incorrect parameter
+            ASSERT(false);
+            return false;
+    }
+}
 
 #endif

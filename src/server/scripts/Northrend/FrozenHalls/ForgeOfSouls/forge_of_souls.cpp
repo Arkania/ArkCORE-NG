@@ -60,7 +60,7 @@ enum Yells
     SAY_SYLVANAS_INTRO_6                        = 5,
 };
 
-enum eSylvanas
+enum Misc
 {
     GOSSIP_SPEECHINTRO                           = 13525,
     ACTION_INTRO,
@@ -90,13 +90,13 @@ public:
         EventMap events;
         Phase phase;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             events.Reset();
             phase = PHASE_NORMAL;
         }
 
-        void DoAction(const int32 actionId)
+        void DoAction(int32 actionId) OVERRIDE
         {
             switch (actionId)
             {
@@ -110,13 +110,10 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (phase == PHASE_INTRO)
             {
-                if (!instance)
-                    return;
-
                 events.Update(diff);
                 switch (events.ExecuteEvent())
                 {
@@ -162,7 +159,7 @@ public:
         }
     };
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) OVERRIDE
     {
         if (creature->IsQuestGiver())
             player->PrepareQuestMenu(creature->GetGUID());
@@ -176,7 +173,7 @@ public:
         return true;
     }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) OVERRIDE
     {
         player->PlayerTalkClass->ClearMenus();
         switch (action)
@@ -192,9 +189,9 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new npc_sylvanas_fosAI(creature);
+        return GetInstanceAI<npc_sylvanas_fosAI>(creature);
     }
 };
 
@@ -216,13 +213,13 @@ public:
         EventMap events;
         Phase phase;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             events.Reset();
             phase = PHASE_NORMAL;
         }
 
-        void DoAction(const int32 actionId)
+        void DoAction(int32 actionId) OVERRIDE
         {
             switch (actionId)
             {
@@ -236,13 +233,10 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (phase == PHASE_INTRO)
             {
-                if (!instance)
-                    return;
-
                 events.Update(diff);
                 switch (events.ExecuteEvent())
                 {
@@ -299,7 +293,7 @@ public:
         }
     };
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) OVERRIDE
     {
         if (creature->IsQuestGiver())
             player->PrepareQuestMenu(creature->GetGUID());
@@ -313,7 +307,7 @@ public:
         return true;
     }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) OVERRIDE
     {
         player->PlayerTalkClass->ClearMenus();
         switch (action)
@@ -329,9 +323,9 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new npc_jaina_fosAI(creature);
+        return GetInstanceAI<npc_jaina_fosAI>(creature);
     }
 };
 

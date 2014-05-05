@@ -26,7 +26,6 @@ EndScriptData */
 
 /* ContentData
 npc_jadespine_basilisk
-npc_lore_keeper_of_norgannon
 go_keystone_chamber
 at_map_chamber
 EndContentData */
@@ -40,7 +39,7 @@ EndContentData */
 ## npc_jadespine_basilisk
 ######*/
 
-enum eSpells
+enum Spells
 {
     SPELL_CRYSTALLINE_SLUMBER   = 3636,
 };
@@ -56,20 +55,20 @@ class npc_jadespine_basilisk : public CreatureScript
 
         struct npc_jadespine_basiliskAI : public ScriptedAI
         {
-            npc_jadespine_basiliskAI(Creature* creature) : ScriptedAI(creature) {}
+            npc_jadespine_basiliskAI(Creature* creature) : ScriptedAI(creature) { }
 
             uint32 uiCslumberTimer;
 
-            void Reset()
+            void Reset() OVERRIDE
             {
                 uiCslumberTimer = 2000;
             }
 
-            void EnterCombat(Unit* /*who*/)
+            void EnterCombat(Unit* /*who*/) OVERRIDE
             {
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(uint32 uiDiff) OVERRIDE
             {
                 //Return since we have no target
                 if (!UpdateVictim())
@@ -98,7 +97,7 @@ class npc_jadespine_basilisk : public CreatureScript
             }
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const OVERRIDE
         {
             return new npc_jadespine_basiliskAI(creature);
         }
@@ -113,7 +112,7 @@ class go_keystone_chamber : public GameObjectScript
 public:
     go_keystone_chamber() : GameObjectScript("go_keystone_chamber") { }
 
-    bool OnGossipHello(Player* /*player*/, GameObject* go)
+    bool OnGossipHello(Player* /*player*/, GameObject* go) OVERRIDE
     {
         if (InstanceScript* instance = go->GetInstanceScript())
             instance->SetData(DATA_IRONAYA_SEAL, IN_PROGRESS); //door animation and save state.
@@ -137,7 +136,7 @@ class AreaTrigger_at_map_chamber : public AreaTriggerScript
         {
         }
 
-        bool OnTrigger(Player* player, AreaTriggerEntry const* /*trigger*/)
+        bool OnTrigger(Player* player, AreaTriggerEntry const* /*trigger*/) OVERRIDE
         {
             if (player->GetQuestStatus(QUEST_HIDDEN_CHAMBER) == QUEST_STATUS_INCOMPLETE)
                 player->AreaExploredOrEventHappens(QUEST_HIDDEN_CHAMBER);

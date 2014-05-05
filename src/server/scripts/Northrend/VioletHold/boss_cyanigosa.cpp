@@ -49,9 +49,9 @@ class boss_cyanigosa : public CreatureScript
 public:
     boss_cyanigosa() : CreatureScript("boss_cyanigosa") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new boss_cyanigosaAI (creature);
+        return GetInstanceAI<boss_cyanigosaAI>(creature);
     }
 
     struct boss_cyanigosaAI : public ScriptedAI
@@ -69,30 +69,29 @@ public:
 
         InstanceScript* instance;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             uiArcaneVacuumTimer = 10000;
             uiBlizzardTimer = 15000;
             uiManaDestructionTimer = 30000;
             uiTailSweepTimer = 20000;
             uiUncontrollableEnergyTimer = 25000;
-            if (instance)
-                instance->SetData(DATA_CYANIGOSA_EVENT, NOT_STARTED);
+            instance->SetData(DATA_CYANIGOSA_EVENT, NOT_STARTED);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) OVERRIDE
         {
             Talk(SAY_AGGRO);
 
-            if (instance)
-                instance->SetData(DATA_CYANIGOSA_EVENT, IN_PROGRESS);
+            instance->SetData(DATA_CYANIGOSA_EVENT, IN_PROGRESS);
         }
 
-        void MoveInLineOfSight(Unit* /*who*/) {}
+        void MoveInLineOfSight(Unit* /*who*/) OVERRIDE { }
 
-        void UpdateAI(const uint32 diff)
+
+        void UpdateAI(uint32 diff) OVERRIDE
         {
-            if (instance && instance->GetData(DATA_REMOVE_NPC) == 1)
+            if (instance->GetData(DATA_REMOVE_NPC) == 1)
             {
                 me->DespawnOrUnsummon();
                 instance->SetData(DATA_REMOVE_NPC, 0);
@@ -140,18 +139,18 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) OVERRIDE
         {
             Talk(SAY_DEATH);
 
-            if (instance)
-                instance->SetData(DATA_CYANIGOSA_EVENT, DONE);
+            instance->SetData(DATA_CYANIGOSA_EVENT, DONE);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) OVERRIDE
         {
-            if (victim == me)
+            if (victim->GetTypeId() != TYPEID_PLAYER)
                 return;
+
             Talk(SAY_SLAY);
         }
     };
@@ -165,7 +164,7 @@ class achievement_defenseless : public AchievementCriteriaScript
         {
         }
 
-        bool OnCheck(Player* /*player*/, Unit* target)
+        bool OnCheck(Player* /*player*/, Unit* target) OVERRIDE
         {
             if (!target)
                 return false;

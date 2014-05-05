@@ -24,16 +24,13 @@ SDComment:
 SDCategory: Shadowfang Keep
 EndScriptData */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "InstanceScript.h"
 #include "shadowfang_keep.h"
 #include "TemporarySummon.h"
 
-enum Apothecary
-{
-    ACTION_SPAWN_CRAZED         = 3
-};
+#define MAX_ENCOUNTER              4
 
 enum Yells
 {
@@ -75,7 +72,7 @@ class instance_shadowfang_keep : public InstanceMapScript
 public:
     instance_shadowfang_keep() : InstanceMapScript("instance_shadowfang_keep", 33) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const OVERRIDE
     {
         return new instance_shadowfang_keep_InstanceMapScript(map);
     }
@@ -95,21 +92,10 @@ public:
         uint64 DoorSorcererGUID;
         uint64 DoorArugalGUID;
 
-        uint64 fryeGUID;
-        uint64 hummelGUID;
-        uint64 baxterGUID;
-        uint32 spawnCrazedTimer;
-
-        uint64 LordWaldenGUID;
-        uint64 uiBaronAshbury;
-        uint64 uiBaronSilverlaine;
-        uint64 uiCommanderSpringvale;
-        uint64 uiLordGodfrey;
-
         uint8 uiPhase;
         uint16 uiTimer;
 
-        void Initialize()
+        void Initialize() OVERRIDE
         {
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
 
@@ -121,39 +107,21 @@ public:
             DoorSorcererGUID = 0;
             DoorArugalGUID = 0;
 
-            fryeGUID = 0;
-            hummelGUID = 0;
-            baxterGUID = 0;
-
-            LordWaldenGUID = 0;
-            uiBaronAshbury = 0;
-            uiBaronSilverlaine = 0;
-            uiCommanderSpringvale = 0;
-            uiLordGodfrey = 0;
-
             uiPhase = 0;
             uiTimer = 0;
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) OVERRIDE
         {
             switch (creature->GetEntry())
             {
                 case NPC_ASH: uiAshGUID = creature->GetGUID(); break;
                 case NPC_ADA: uiAdaGUID = creature->GetGUID(); break;
                 case NPC_ARCHMAGE_ARUGAL: uiArchmageArugalGUID = creature->GetGUID(); break;
-                case NPC_FRYE: fryeGUID = creature->GetGUID(); break;
-                case NPC_HUMMEL: hummelGUID = creature->GetGUID(); break;
-                case NPC_BAXTER: baxterGUID = creature->GetGUID(); break;
-                case BOSS_BARON_ASHBURY: uiBaronAshbury = creature->GetGUID();        break;
-                case BOSS_BARON_SILVERLAINE: uiBaronSilverlaine = creature->GetGUID();    break;
-                case BOSS_COMMANDER_SPRINGVALE: uiCommanderSpringvale = creature->GetGUID(); break;
-                case BOSS_LORD_GODFREY: uiLordGodfrey = creature->GetGUID();         break;
-                case BOSS_LORD_WALDEN: LordWaldenGUID = creature->GetGUID(); break;
             }
         }
 
-        void OnGameObjectCreate(GameObject* go)
+        void OnGameObjectCreate(GameObject* go) OVERRIDE
         {
             switch (go->GetEntry())
             {
@@ -187,7 +155,7 @@ public:
             }
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) OVERRIDE
         {
             switch (type)
             {
@@ -201,34 +169,23 @@ public:
                         DoSpeech();
                     m_auiEncounter[1] = data;
                     break;
-                case DATA_LORD_WALDEN_EVENT:
-                    if (data == DONE)
-                        DoUseDoorOrButton(DoorSorcererGUID);
+                case TYPE_FENRUS:
+                    switch (data)
+                    {
+                        case DONE:
+                            uiTimer = 1000;
+                            uiPhase = 1;
+                            break;
+                        case 7:
+                            DoUseDoorOrButton(DoorSorcererGUID);
+                            break;
+                    }
                     m_auiEncounter[2] = data;
                     break;
                 case TYPE_NANDOS:
                     if (data == DONE)
                         DoUseDoorOrButton(DoorArugalGUID);
                     m_auiEncounter[3] = data;
-                    break;
-                case TYPE_CROWN:
-                    if (data == NOT_STARTED)
-                        spawnCrazedTimer = urand(7000, 14000);
-                    m_auiEncounter[4] = data;
-                    break;
-                case DATA_BARON_ASHBURY_EVENT:
-                    m_auiEncounter[5] = data;
-                    break;
-                case DATA_BARON_SILVERLAINE_EVENT:
-                    m_auiEncounter[6] = data;
-                    break;
-                case DATA_COMMANDER_SPRINGVALE_EVENT:
-                    m_auiEncounter[7] = data;
-                    break;
-                case DATA_LORD_GODFREY_EVENT:
-                    m_auiEncounter[8] = data;
-                    break;
-                default:
                     break;
             }
 
@@ -237,7 +194,7 @@ public:
                 OUT_SAVE_INST_DATA;
 
                 std::ostringstream saveStream;
-                saveStream << m_auiEncounter[0] << ' ' << m_auiEncounter[1] << ' ' << m_auiEncounter[2] << ' ' << m_auiEncounter[3] << ' ' << m_auiEncounter[4] << ' ' << m_auiEncounter[5] << ' ' << m_auiEncounter[6] << ' ' << m_auiEncounter[7] << ' ' << m_auiEncounter[8];
+                saveStream << m_auiEncounter[0] << ' ' << m_auiEncounter[1] << ' ' << m_auiEncounter[2] << ' ' << m_auiEncounter[3];
 
                 str_data = saveStream.str();
 
@@ -246,7 +203,7 @@ public:
             }
         }
 
-        uint32 GetData(uint32 type) const
+        uint32 GetData(uint32 type) const OVERRIDE
         {
             switch (type)
             {
@@ -254,47 +211,20 @@ public:
                     return m_auiEncounter[0];
                 case TYPE_RETHILGORE:
                     return m_auiEncounter[1];
-                case DATA_LORD_WALDEN_EVENT:
+                case TYPE_FENRUS:
                     return m_auiEncounter[2];
                 case TYPE_NANDOS:
                     return m_auiEncounter[3];
-                case TYPE_CROWN:
-                    return m_auiEncounter[4];
-                case DATA_BARON_ASHBURY_EVENT:
-                    return m_auiEncounter[5];
-                case DATA_BARON_SILVERLAINE_EVENT:
-                    return m_auiEncounter[6];
-                case DATA_COMMANDER_SPRINGVALE_EVENT:
-                    return m_auiEncounter[7];
-                case DATA_LORD_GODFREY_EVENT:
-                    return m_auiEncounter[8];
             }
             return 0;
         }
 
-        uint64 GetData64(uint32 id) const
-        {
-            switch(id)
-            {
-                case DATA_DOOR:   return DoorCourtyardGUID;
-                case DATA_FRYE:   return fryeGUID;
-                case DATA_HUMMEL: return hummelGUID;
-                case DATA_BAXTER: return baxterGUID;
-                case DATA_LORD_WALDEN: return LordWaldenGUID;
-                case DATA_BARON_ASHBURY: return uiBaronAshbury;
-                case DATA_BARON_SILVERLAINE: return uiBaronSilverlaine;
-                case DATA_COMMANDER_SPRINGVALE: return uiCommanderSpringvale;
-                case DATA_LORD_GODFREY: return uiLordGodfrey;
-            }
-            return 0;
-        }
-
-        std::string GetSaveData()
+        std::string GetSaveData() OVERRIDE
         {
             return str_data;
         }
 
-        void Load(const char* in)
+        void Load(const char* in) OVERRIDE
         {
             if (!in)
             {
@@ -305,7 +235,7 @@ public:
             OUT_LOAD_INST_DATA(in);
 
             std::istringstream loadStream(in);
-            loadStream >> m_auiEncounter[0] >> m_auiEncounter[1] >> m_auiEncounter[2] >> m_auiEncounter[3] >> m_auiEncounter[4] >> m_auiEncounter[5] >> m_auiEncounter[6] >> m_auiEncounter[7] >> m_auiEncounter[8];
+            loadStream >> m_auiEncounter[0] >> m_auiEncounter[1] >> m_auiEncounter[2] >> m_auiEncounter[3];
 
             for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
             {
@@ -318,18 +248,6 @@ public:
 
         void Update(uint32 uiDiff)
         {
-            if (GetData(TYPE_CROWN) == IN_PROGRESS)
-            {
-                if (spawnCrazedTimer <= uiDiff)
-                {
-                    if (Creature* hummel = instance->GetCreature(hummelGUID))
-                        hummel->AI()->DoAction(ACTION_SPAWN_CRAZED);
-                    spawnCrazedTimer = urand(2000, 5000);
-                }
-                else
-                    spawnCrazedTimer -= uiDiff;
-            }
-
             if (GetData(TYPE_FENRUS) != DONE)
                 return;
 

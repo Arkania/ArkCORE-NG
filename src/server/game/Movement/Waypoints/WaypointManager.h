@@ -28,9 +28,9 @@ struct WaypointData
 {
     uint32 id;
     float x, y, z, orientation;
-    bool run;
     uint32 delay;
     uint32 event_id;
+    bool run;
     uint8 event_chance;
 };
 
@@ -69,4 +69,3 @@ class WaypointMgr
 #define sWaypointMgr ACE_Singleton<WaypointMgr, ACE_Null_Mutex>::instance()
 
 #endif
-

@@ -29,8 +29,13 @@
 class BasicEvent
 {
     public:
-        BasicEvent() { to_Abort = false; }
-        virtual ~BasicEvent() {}                            // override destructor to perform some actions on event removal
+        BasicEvent()
+        {
+            to_Abort = false;
+            m_addTime = 0;
+            m_execTime = 0;
+        }
+        virtual ~BasicEvent() { }                           // override destructor to perform some actions on event removal
 
         // this method executes when the event is triggered
         // return false if event does not want to be deleted
@@ -39,7 +44,7 @@ class BasicEvent
 
         virtual bool IsDeletable() const { return true; }   // this event can be safely deleted
 
-        virtual void Abort(uint64 /*e_time*/) {}            // this method executes when the event is aborted
+        virtual void Abort(uint64 /*e_time*/) { }           // this method executes when the event is aborted
 
         bool to_Abort;                                      // set by externals when the event is aborted, aborted events don't execute
         // and get Abort call when deleted

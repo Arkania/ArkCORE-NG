@@ -30,7 +30,7 @@ enum Texts
     SAY_INTRO               = 1,
     SAY_AGGRO               = 2,
     SAY_SLAY                = 3,
-    SAY_DEATH               = 4,
+    SAY_DEATH               = 4
 };
 
 enum Spells
@@ -41,12 +41,12 @@ enum Spells
     SPELL_SUPREME           = 25176,
     SPELL_SUMMON            = 20477,
     SPELL_SAND_STORM        = 25160,
-    SPELL_SUMMON_CRYSTAL    = 25192,
+    SPELL_SUMMON_CRYSTAL    = 25192
 };
 
 enum Actions
 {
-    ACTION_TRIGGER_WEAKNESS = 1,
+    ACTION_TRIGGER_WEAKNESS = 1
 };
 
 enum Events
@@ -75,7 +75,7 @@ Position CrystalCoordinates[NUM_CRYSTALS] =
 };
 
 float RoomRadius = 165.0f;
-uint8 const NUM_TORNADOS = 5; // TODO: This number is completly random!
+uint8 const NUM_TORNADOS = 5; /// @todo This number is completly random!
 uint8 const NUM_WEAKNESS = 5;
 uint32 const SpellWeakness[NUM_WEAKNESS] = { 25177, 25178, 25180, 25181, 25183 };
 Position const RoomCenter = { -9343.041992f, 1923.278198f, 85.555984f, 0.0 };
@@ -90,7 +90,6 @@ class boss_ossirian : public CreatureScript
             boss_ossirianAI(Creature* creature) : BossAI(creature, DATA_OSSIRIAN)
             {
                 SaidIntro = false;
-                Reset();
             }
 
             uint64 TriggerGUID;
@@ -98,7 +97,7 @@ class boss_ossirian : public CreatureScript
             uint8 CrystalIterator;
             bool SaidIntro;
 
-            void Reset()
+            void Reset() OVERRIDE
             {
                 _Reset();
                 CrystalIterator = 0;
@@ -106,7 +105,7 @@ class boss_ossirian : public CreatureScript
                 CrystalGUID = 0;
             }
 
-            void SpellHit(Unit* caster, SpellInfo const* spell)
+            void SpellHit(Unit* caster, SpellInfo const* spell) OVERRIDE
             {
                 for (uint8 i = 0; i < NUM_WEAKNESS; ++i)
                 {
@@ -119,19 +118,15 @@ class boss_ossirian : public CreatureScript
                 }
             }
 
-            void DoAction(const int32 action)
+            void DoAction(int32 action) OVERRIDE
             {
                 if (action == ACTION_TRIGGER_WEAKNESS)
-                {
                     if (Creature* Trigger = me->GetMap()->GetCreature(TriggerGUID))
-                    {
                         if (!Trigger->HasUnitState(UNIT_STATE_CASTING))
                             Trigger->CastSpell(Trigger, SpellWeakness[urand(0, 4)], false);
-                    }
-                }
             }
 
-            void EnterCombat(Unit* /*who*/)
+            void EnterCombat(Unit* /*who*/) OVERRIDE
             {
                 _EnterCombat();
                 events.Reset();
@@ -142,41 +137,37 @@ class boss_ossirian : public CreatureScript
                 DoCast(me, SPELL_SUPREME);
                 Talk(SAY_AGGRO);
 
-                if (instance)
+                Map* map = me->GetMap();
+                if (!map->IsDungeon())
+                    return;
+
+                WorldPacket data(SMSG_WEATHER, (4+4+4));
+                data << uint32(WEATHER_STATE_HEAVY_SANDSTORM) << float(1) << uint8(0);
+                map->SendToPlayers(&data);
+
+                for (uint8 i = 0; i < NUM_TORNADOS; ++i)
                 {
-                    Map* map = me->GetMap();
-                    if (!map->IsDungeon())
-                        return;
-
-                    WorldPacket data(SMSG_WEATHER, (4+4+4));
-                    data << uint32(WEATHER_STATE_HEAVY_SANDSTORM) << float(1) << uint8(0);
-                    map->SendToPlayers(&data);
-
-                    for (uint8 i = 0; i < NUM_TORNADOS; ++i)
-                    {
-                        Position Point;
-                        me->GetRandomPoint(RoomCenter, RoomRadius, Point);
-                        if (Creature* Tornado = me->GetMap()->SummonCreature(NPC_SAND_VORTEX, Point))
-                            Tornado->CastSpell(Tornado, SPELL_SAND_STORM, true);
-                    }
-
-                    SpawnNextCrystal();
+                    Position Point = me->GetRandomPoint(RoomCenter, RoomRadius);
+                    if (Creature* Tornado = me->GetMap()->SummonCreature(NPC_SAND_VORTEX, Point))
+                        Tornado->CastSpell(Tornado, SPELL_SAND_STORM, true);
                 }
+
+                SpawnNextCrystal();
             }
 
-            void KilledUnit(Unit* /*victim*/)
+            void KilledUnit(Unit* /*victim*/) OVERRIDE
             {
                 Talk(SAY_SLAY);
             }
 
-            void EnterEvadeMode()
+            void EnterEvadeMode() OVERRIDE
             {
                 Cleanup();
                 summons.DespawnAll();
-                ScriptedAI::EnterEvadeMode();
+                BossAI::EnterEvadeMode();
             }
 
-            void JustDied(Unit* /*killer*/)
+            void JustDied(Unit* /*killer*/) OVERRIDE
             {
                 Cleanup();
                 _JustDied();
@@ -200,7 +191,7 @@ class boss_ossirian : public CreatureScript
                                                        CrystalCoordinates[CrystalIterator].GetPositionX(),
                                                        CrystalCoordinates[CrystalIterator].GetPositionY(),
                                                        CrystalCoordinates[CrystalIterator].GetPositionZ(),
-                                                       0, 0, 0, 0, 0, -1))
+                                                       0, 0, 0, 0, 0, uint32(-1)))
                     {
                         CrystalGUID = Crystal->GetGUID();
                         ++CrystalIterator;
@@ -208,16 +199,18 @@ class boss_ossirian : public CreatureScript
                 }
             }
 
-            void MoveInLineOfSight(Unit* /*who*/)
+            void MoveInLineOfSight(Unit* who) OVERRIDE
+
             {
                 if (!SaidIntro)
                 {
                     Talk(SAY_INTRO);
                     SaidIntro = true;
                 }
+                BossAI::MoveInLineOfSight(who);
             }
 
-            void UpdateAI(uint32 const diff)
+            void UpdateAI(uint32 diff) OVERRIDE
             {
                 if (!UpdateVictim())
                     return;
@@ -226,7 +219,7 @@ class boss_ossirian : public CreatureScript
 
                 // No kiting!
                 if (me->GetDistance(me->GetVictim()) > 60.00f && me->GetDistance(me->GetVictim()) < 120.00f)
-                    DoCast(me->GetVictim(), SPELL_SUMMON);
+                    DoCastVictim(SPELL_SUMMON);
 
                 bool ApplySupreme = true;
 
@@ -259,7 +252,7 @@ class boss_ossirian : public CreatureScript
                             events.ScheduleEvent(EVENT_SILENCE, urand(20000, 30000));
                             break;
                         case EVENT_CYCLONE:
-                            DoCast(me->GetVictim(), SPELL_CYCLONE);
+                            DoCastVictim(SPELL_CYCLONE);
                             events.ScheduleEvent(EVENT_CYCLONE, 20000);
                             break;
                         case EVENT_STOMP:
@@ -275,9 +268,9 @@ class boss_ossirian : public CreatureScript
             }
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const OVERRIDE
         {
-            return new boss_ossirianAI (creature);
+            return GetInstanceAI<boss_ossirianAI>(creature);
         }
 };
 
@@ -286,7 +279,7 @@ class go_ossirian_crystal : public GameObjectScript
     public:
         go_ossirian_crystal() : GameObjectScript("go_ossirian_crystal") { }
 
-        bool OnGossipHello(Player* player, GameObject* /*go*/)
+        bool OnGossipHello(Player* player, GameObject* /*go*/) OVERRIDE
         {
             InstanceScript* Instance = player->GetInstanceScript();
             if (!Instance)

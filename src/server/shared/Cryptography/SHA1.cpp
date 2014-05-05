@@ -24,6 +24,7 @@
 SHA1Hash::SHA1Hash()
 {
     SHA1_Init(&mC);
+    memset(mDigest, 0, SHA_DIGEST_LENGTH * sizeof(uint8));
 }
 
 SHA1Hash::~SHA1Hash()
@@ -50,7 +51,7 @@ void SHA1Hash::UpdateBigNumbers(BigNumber* bn0, ...)
     bn = bn0;
     while (bn)
     {
-        UpdateData(bn->AsByteArray(), bn->GetNumBytes());
+        UpdateData(bn->AsByteArray().get(), bn->GetNumBytes());
         bn = va_arg(v, BigNumber*);
     }
     va_end(v);

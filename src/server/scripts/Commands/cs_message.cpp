@@ -28,6 +28,7 @@ EndScriptData */
 #include "ChannelMgr.h"
 #include "Language.h"
 #include "Player.h"
+#include "ObjectMgr.h"
 
 class message_commandscript : public CommandScript
 {
@@ -38,25 +39,25 @@ public:
     {
         static ChatCommand channelSetCommandTable[] =
         {
-            { "ownership",      SEC_ADMINISTRATOR,  false,  &HandleChannelSetOwnership,         "", NULL },
-            { NULL,             0,                  false,  NULL,                               "", NULL }
+            { "ownership", rbac::RBAC_PERM_COMMAND_CHANNEL_SET_OWNERSHIP, false, &HandleChannelSetOwnership, "", NULL },
+            { NULL,        0,                                       false, NULL,                       "", NULL }
         };
         static ChatCommand channelCommandTable[] =
         {
-            { "set",            SEC_ADMINISTRATOR,  true,   NULL,                               "", channelSetCommandTable },
-            { NULL,             0,                  false,  NULL,                               "", NULL }
+            { "set", rbac::RBAC_PERM_COMMAND_CHANNEL_SET, true, NULL, "", channelSetCommandTable },
+            { NULL,  0,                            false, NULL, "", NULL }
         };
         static ChatCommand commandTable[] =
         {
-            { "channel",        SEC_ADMINISTRATOR,  true,   NULL,                               "", channelCommandTable  },
-            { "nameannounce",   SEC_MODERATOR,      true,   &HandleNameAnnounceCommand,         "", NULL },
-            { "gmnameannounce", SEC_MODERATOR,      true,   &HandleGMNameAnnounceCommand,       "", NULL },
-            { "announce",       SEC_MODERATOR,      true,   &HandleAnnounceCommand,             "", NULL },
-            { "gmannounce",     SEC_MODERATOR,      true,   &HandleGMAnnounceCommand,           "", NULL },
-            { "notify",         SEC_MODERATOR,      true,   &HandleNotifyCommand,               "", NULL },
-            { "gmnotify",       SEC_MODERATOR,      true,   &HandleGMNotifyCommand,             "", NULL },
-            { "whispers",       SEC_MODERATOR,      false,  &HandleWhispersCommand,             "", NULL },
-            { NULL,             0,                  false,  NULL,                               "", NULL }
+            { "channel",        rbac::RBAC_PERM_COMMAND_CHANNEL,        true, NULL,                         "", channelCommandTable  },
+            { "nameannounce",   rbac::RBAC_PERM_COMMAND_NAMEANNOUNCE,   true, &HandleNameAnnounceCommand,   "", NULL },
+            { "gmnameannounce", rbac::RBAC_PERM_COMMAND_GMNAMEANNOUNCE, true, &HandleGMNameAnnounceCommand, "", NULL },
+            { "announce",       rbac::RBAC_PERM_COMMAND_ANNOUNCE,       true, &HandleAnnounceCommand,       "", NULL },
+            { "gmannounce",     rbac::RBAC_PERM_COMMAND_GMANNOUNCE,     true, &HandleGMAnnounceCommand,     "", NULL },
+            { "notify",         rbac::RBAC_PERM_COMMAND_NOTIFY,         true, &HandleNotifyCommand,         "", NULL },
+            { "gmnotify",       rbac::RBAC_PERM_COMMAND_GMNOTIFY,       true, &HandleGMNotifyCommand,       "", NULL },
+            { "whispers",       rbac::RBAC_PERM_COMMAND_WHISPERS,      false, &HandleWhispersCommand,       "", NULL },
+            { NULL,             0,                               false, NULL,                         "", NULL }
         };
         return commandTable;
     }
@@ -187,7 +188,7 @@ public:
             return true;
         }
 
-        std::string argStr = (char*)args;
+        std::string argStr = strtok((char*)args, " ");
         // whisper on
         if (argStr == "on")
         {
@@ -206,6 +207,25 @@ public:
             return true;
         }
 
+        if (argStr == "remove")
+        {
+            std::string name = strtok(NULL, " ");
+            if (normalizePlayerName(name))
+            {
+                if (Player* player = sObjectAccessor->FindPlayerByName(name))
+                {
+                    handler->GetSession()->GetPlayer()->RemoveFromWhisperWhiteList(player->GetGUID());
+                    handler->PSendSysMessage(LANG_COMMAND_WHISPEROFFPLAYER, name.c_str());
+                    return true;
+                }
+                else
+                {
+                    handler->PSendSysMessage(LANG_PLAYER_NOT_FOUND, name.c_str());
+                    handler->SetSentErrorMessage(true);
+                    return false;
+                }
+            }
+        }
         handler->SendSysMessage(LANG_USE_BOL);
         handler->SetSentErrorMessage(true);
         return false;

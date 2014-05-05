@@ -26,6 +26,7 @@
 #include "ScriptedCreature.h"
 #include "trial_of_the_crusader.h"
 #include "SpellScript.h"
+#include "SpellAuraEffects.h"
 #include <limits>
 
 enum Yells
@@ -54,54 +55,54 @@ enum Summons
 
 enum BossSpells
 {
-    SPELL_FREEZE_SLASH      = 66012,
-    SPELL_PENETRATING_COLD  = 66013,
-    SPELL_LEECHING_SWARM    = 66118,
-    SPELL_LEECHING_HEAL     = 66125,
-    SPELL_LEECHING_DAMAGE   = 66240,
-    SPELL_MARK              = 67574,
-    SPELL_SPIKE_CALL        = 66169,
-    SPELL_SUBMERGE_ANUBARAK = 65981,
-    SPELL_CLEAR_ALL_DEBUFFS = 34098,
-    SPELL_EMERGE_ANUBARAK   = 65982,
-    SPELL_SUMMON_BEATLES    = 66339,
-    SPELL_SUMMON_BURROWER   = 66332,
+    SPELL_FREEZE_SLASH          = 66012,
+    SPELL_PENETRATING_COLD      = 66013,
+    SPELL_LEECHING_SWARM        = 66118,
+    SPELL_LEECHING_SWARM_HEAL   = 66125,
+    SPELL_LEECHING_SWARM_DMG    = 66240,
+    SPELL_MARK                  = 67574,
+    SPELL_SPIKE_CALL            = 66169,
+    SPELL_SUBMERGE_ANUBARAK     = 65981,
+    SPELL_CLEAR_ALL_DEBUFFS     = 34098,
+    SPELL_EMERGE_ANUBARAK       = 65982,
+    SPELL_SUMMON_BEATLES        = 66339,
+    SPELL_SUMMON_BURROWER       = 66332,
 
     // Burrow
-    SPELL_CHURNING_GROUND   = 66969,
+    SPELL_CHURNING_GROUND       = 66969,
 
     // Scarab
-    SPELL_DETERMINATION     = 66092,
-    SPELL_ACID_MANDIBLE     = 65774, //Passive - Triggered
+    SPELL_DETERMINATION         = 66092,
+    SPELL_ACID_MANDIBLE         = 65774, //Passive - Triggered
 
     // Burrower
-    SPELL_SPIDER_FRENZY     = 66128,
-    SPELL_EXPOSE_WEAKNESS   = 67720, //Passive - Triggered
-    SPELL_SHADOW_STRIKE     = 66134,
-    SPELL_SUBMERGE_EFFECT   = 68394,
-    SPELL_AWAKENED          = 66311,
-    SPELL_EMERGE_EFFECT     = 65982,
+    SPELL_SPIDER_FRENZY         = 66128,
+    SPELL_EXPOSE_WEAKNESS       = 67720, //Passive - Triggered
+    SPELL_SHADOW_STRIKE         = 66134,
+    SPELL_SUBMERGE_EFFECT       = 68394,
+    SPELL_AWAKENED              = 66311,
+    SPELL_EMERGE_EFFECT         = 65982,
 
-    SPELL_PERSISTENT_DIRT   = 68048,
+    SPELL_PERSISTENT_DIRT       = 68048,
 
-    SUMMON_SCARAB           = NPC_SCARAB,
-    SUMMON_FROSTSPHERE      = NPC_FROST_SPHERE,
-    SPELL_BERSERK           = 26662,
+    SUMMON_SCARAB               = NPC_SCARAB,
+    SUMMON_FROSTSPHERE          = NPC_FROST_SPHERE,
+    SPELL_BERSERK               = 26662,
 
     //Frost Sphere
-    SPELL_FROST_SPHERE      = 67539,
-    SPELL_PERMAFROST        = 66193,
-    SPELL_PERMAFROST_VISUAL = 65882,
-    SPELL_PERMAFROST_MODEL  = 66185,
+    SPELL_FROST_SPHERE          = 67539,
+    SPELL_PERMAFROST            = 66193,
+    SPELL_PERMAFROST_VISUAL     = 65882,
+    SPELL_PERMAFROST_MODEL      = 66185,
 
     //Spike
-    SPELL_SUMMON_SPIKE      = 66169,
-    SPELL_SPIKE_SPEED1      = 65920,
-    SPELL_SPIKE_TRAIL       = 65921,
-    SPELL_SPIKE_SPEED2      = 65922,
-    SPELL_SPIKE_SPEED3      = 65923,
-    SPELL_SPIKE_FAIL        = 66181,
-    SPELL_SPIKE_TELE        = 66170
+    SPELL_SUMMON_SPIKE          = 66169,
+    SPELL_SPIKE_SPEED1          = 65920,
+    SPELL_SPIKE_TRAIL           = 65921,
+    SPELL_SPIKE_SPEED2          = 65922,
+    SPELL_SPIKE_SPEED3          = 65923,
+    SPELL_SPIKE_FAIL            = 66181,
+    SPELL_SPIKE_TELE            = 66170
 };
 
 #define SPELL_PERMAFROST_HELPER RAID_MODE<uint32>(66193, 67855, 67856, 67857)
@@ -154,9 +155,7 @@ enum Phases
 {
     // Anub'arak
     PHASE_MELEE                 = 1,
-    PHASE_SUBMERGED             = 2,
-
-    PHASE_MASK_MELEE            = 1 << PHASE_MELEE
+    PHASE_SUBMERGED             = 2
 };
 
 class boss_anubarak_trial : public CreatureScript
@@ -170,7 +169,7 @@ class boss_anubarak_trial : public CreatureScript
             {
             }
 
-            void Reset()
+            void Reset() OVERRIDE
             {
                 _Reset();
                 events.SetPhase(PHASE_MELEE);
@@ -198,17 +197,17 @@ class boss_anubarak_trial : public CreatureScript
                 _burrowGUID.clear();
             }
 
-            void KilledUnit(Unit* who)
+            void KilledUnit(Unit* who) OVERRIDE
             {
                 if (who->GetTypeId() == TYPEID_PLAYER)
                 {
                     Talk(SAY_KILL_PLAYER);
-                    if (instance)
-                        instance->SetData(DATA_TRIBUTE_TO_IMMORTALITY_ELIGIBLE, 0);
+                    instance->SetData(DATA_TRIBUTE_TO_IMMORTALITY_ELIGIBLE, 0);
                 }
             }
 
-            void MoveInLineOfSight(Unit* /*who*/)
+            void MoveInLineOfSight(Unit* /*who*/) OVERRIDE
+
             {
                 if (!_intro)
                 {
@@ -217,10 +216,9 @@ class boss_anubarak_trial : public CreatureScript
                 }
             }
 
-            void JustReachedHome()
+            void JustReachedHome() OVERRIDE
             {
-                if (instance)
-                    instance->SetBossState(BOSS_ANUBARAK, FAIL);
+                instance->SetBossState(BOSS_ANUBARAK, FAIL);
                 //Summon Scarab Swarms neutral at random places
                 for (int i = 0; i < 10; i++)
                     if (Creature* temp = me->SummonCreature(NPC_SCARAB, AnubarakLoc[1].GetPositionX()+urand(0, 50)-25, AnubarakLoc[1].GetPositionY()+urand(0, 50)-25, AnubarakLoc[1].GetPositionZ()))
@@ -230,7 +228,7 @@ class boss_anubarak_trial : public CreatureScript
                     }
             }
 
-            void JustDied(Unit* /*killer*/)
+            void JustDied(Unit* /*killer*/) OVERRIDE
             {
                 _JustDied();
                 Talk(SAY_DEATH);
@@ -244,9 +242,8 @@ class boss_anubarak_trial : public CreatureScript
                         (*itr)->DespawnOrUnsummon();
             }
 
-            void JustSummoned(Creature* summoned)
+            void JustSummoned(Creature* summoned) OVERRIDE
             {
-                Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true);
                 switch (summoned->GetEntry())
                 {
                     case NPC_BURROW:
@@ -256,9 +253,12 @@ class boss_anubarak_trial : public CreatureScript
                         summoned->SetDisplayId(summoned->GetCreatureTemplate()->Modelid2);
                         break;
                     case NPC_SPIKE:
-                        summoned->CombatStart(target);
                         summoned->SetDisplayId(summoned->GetCreatureTemplate()->Modelid1);
-                        Talk(EMOTE_SPIKE, target->GetGUID());
+                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                        {
+                            summoned->CombatStart(target);
+                            Talk(EMOTE_SPIKE, target);
+                        }
                         break;
                     default:
                         break;
@@ -266,7 +266,7 @@ class boss_anubarak_trial : public CreatureScript
                 summons.Summon(summoned);
             }
 
-            void EnterCombat(Unit* /*who*/)
+            void EnterCombat(Unit* /*who*/) OVERRIDE
             {
                 _EnterCombat();
                 Talk(SAY_AGGRO);
@@ -286,7 +286,7 @@ class boss_anubarak_trial : public CreatureScript
                         _sphereGUID[i] = summoned->GetGUID();
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff) OVERRIDE
             {
                 if (!UpdateVictim())
                     return;
@@ -403,7 +403,7 @@ class boss_anubarak_trial : public CreatureScript
 
                 }
 
-                if (HealthBelowPct(30) && events.GetPhaseMask() & PHASE_MASK_MELEE && !_reachedPhase3)
+                if (HealthBelowPct(30) && events.IsInPhase(PHASE_MELEE) && !_reachedPhase3)
                 {
                     _reachedPhase3 = true;
                     DoCastAOE(SPELL_LEECHING_SWARM);
@@ -411,7 +411,7 @@ class boss_anubarak_trial : public CreatureScript
                     Talk(SAY_LEECHING_SWARM);
                 }
 
-                if (events.GetPhaseMask() & PHASE_MASK_MELEE)
+                if (events.IsInPhase(PHASE_MELEE))
                     DoMeleeAttackIfReady();
             }
 
@@ -420,13 +420,11 @@ class boss_anubarak_trial : public CreatureScript
                 uint64 _sphereGUID[6];
                 bool _intro;
                 bool _reachedPhase3;
-                uint32 _frostSphereTimer;
-                uint32 _berserkTimer;
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const OVERRIDE
         {
-            return new boss_anubarak_trialAI(creature);
+            return GetInstanceAI<boss_anubarak_trialAI>(creature);
         };
 };
 
@@ -442,7 +440,7 @@ class npc_swarm_scarab : public CreatureScript
                 _instance = creature->GetInstanceScript();
             }
 
-            void Reset()
+            void Reset() OVERRIDE
             {
                 me->SetCorpseDelay(0);
                 _determinationTimer = urand(5*IN_MILLISECONDS, 60*IN_MILLISECONDS);
@@ -453,7 +451,7 @@ class npc_swarm_scarab : public CreatureScript
                         Anubarak->AI()->JustSummoned(me);
             }
 
-            void DoAction(const int32 actionId)
+            void DoAction(int32 actionId) OVERRIDE
             {
                 switch (actionId)
                 {
@@ -466,14 +464,14 @@ class npc_swarm_scarab : public CreatureScript
                 }
             }
 
-            void JustDied(Unit* killer)
+            void JustDied(Unit* killer) OVERRIDE
             {
                 DoCast(killer, RAID_MODE(SPELL_TRAITOR_KING_10, SPELL_TRAITOR_KING_25));
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff) OVERRIDE
             {
-                if (_instance && _instance->GetBossState(BOSS_ANUBARAK) != IN_PROGRESS)
+                if (_instance->GetBossState(BOSS_ANUBARAK) != IN_PROGRESS)
                     me->DisappearAndDie();
 
                 if (!UpdateVictim())
@@ -496,9 +494,9 @@ class npc_swarm_scarab : public CreatureScript
                 uint32 _determinationTimer;
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const OVERRIDE
         {
-            return new npc_swarm_scarabAI(creature);
+            return GetInstanceAI<npc_swarm_scarabAI>(creature);
         };
 };
 
@@ -514,7 +512,7 @@ class npc_nerubian_burrower : public CreatureScript
                 _instance = creature->GetInstanceScript();
             }
 
-            void Reset()
+            void Reset() OVERRIDE
             {
                 me->SetCorpseDelay(10);
                 _submergeTimer = 30*IN_MILLISECONDS;
@@ -527,7 +525,7 @@ class npc_nerubian_burrower : public CreatureScript
                         Anubarak->AI()->JustSummoned(me);
             }
 
-            void DoAction(const int32 actionId)
+            void DoAction(int32 actionId) OVERRIDE
             {
                 switch (actionId)
                 {
@@ -541,9 +539,9 @@ class npc_nerubian_burrower : public CreatureScript
                 }
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff) OVERRIDE
             {
-                if (_instance && _instance->GetBossState(BOSS_ANUBARAK) != IN_PROGRESS)
+                if (_instance->GetBossState(BOSS_ANUBARAK) != IN_PROGRESS)
                     me->DisappearAndDie();
 
                 if (!UpdateVictim() && !me->HasAura(SPELL_SUBMERGE_EFFECT))
@@ -580,14 +578,13 @@ class npc_nerubian_burrower : public CreatureScript
 
             private:
                 uint32 _submergeTimer;
-                Phases _phase;
                 EventMap _events;
                 InstanceScript* _instance;
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const OVERRIDE
         {
-            return new npc_nerubian_burrowerAI(creature);
+            return GetInstanceAI<npc_nerubian_burrowerAI>(creature);
         };
 };
 
@@ -602,7 +599,7 @@ class npc_frost_sphere : public CreatureScript
             {
             }
 
-            void Reset()
+            void Reset() OVERRIDE
             {
                 me->SetReactState(REACT_PASSIVE);
                 DoCast(SPELL_FROST_SPHERE);
@@ -610,7 +607,7 @@ class npc_frost_sphere : public CreatureScript
                 me->GetMotionMaster()->MoveRandom(20.0f);
             }
 
-            void DamageTaken(Unit* /*who*/, uint32& damage)
+            void DamageTaken(Unit* /*who*/, uint32& damage) OVERRIDE
             {
                 if (me->GetHealth() <= damage)
                 {
@@ -638,7 +635,7 @@ class npc_frost_sphere : public CreatureScript
                 }
             }
 
-            void MovementInform(uint32 type, uint32 pointId)
+            void MovementInform(uint32 type, uint32 pointId) OVERRIDE
             {
                 if (type != EFFECT_MOTION_TYPE)
                     return;
@@ -658,7 +655,7 @@ class npc_frost_sphere : public CreatureScript
             }
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const OVERRIDE
         {
             return new npc_frost_sphereAI(creature);
         };
@@ -675,7 +672,7 @@ class npc_anubarak_spike : public CreatureScript
             {
             }
 
-            void Reset()
+            void Reset() OVERRIDE
             {
                 _phase = PHASE_NO_MOVEMENT;
                 _phaseSwitchTimer = 1;
@@ -683,26 +680,26 @@ class npc_anubarak_spike : public CreatureScript
                 me->SetInCombatWithZone();
             }
 
-            bool CanAIAttack(Unit const* victim) const
+            bool CanAIAttack(Unit const* victim) const OVERRIDE
             {
                 return victim->GetTypeId() == TYPEID_PLAYER;
             }
 
-            void EnterCombat(Unit* who)
+            void EnterCombat(Unit* who) OVERRIDE
             {
                 if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
                 {
                     StartChase(target);
-                    Talk(EMOTE_SPIKE, who->GetGUID());
+                    Talk(EMOTE_SPIKE, who);
                 }
             }
 
-            void DamageTaken(Unit* /*who*/, uint32& uiDamage)
+            void DamageTaken(Unit* /*who*/, uint32& uiDamage) OVERRIDE
             {
                 uiDamage = 0;
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff) OVERRIDE
             {
                 if (!UpdateVictim())
                 {
@@ -723,7 +720,7 @@ class npc_anubarak_spike : public CreatureScript
                                 if (Unit* target2 = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
                                 {
                                     StartChase(target2);
-                                    Talk(EMOTE_SPIKE, target2->GetGUID());
+                                    Talk(EMOTE_SPIKE, target2);
                                 }
                                 _phaseSwitchTimer = 7*IN_MILLISECONDS;
                                 return;
@@ -746,7 +743,8 @@ class npc_anubarak_spike : public CreatureScript
                 }
             }
 
-            void MoveInLineOfSight(Unit* pWho)
+            void MoveInLineOfSight(Unit* pWho) OVERRIDE
+
             {
                 if (!pWho)
                     return;
@@ -805,7 +803,7 @@ class npc_anubarak_spike : public CreatureScript
                 PursuingSpikesPhases _phase;
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const OVERRIDE
         {
             return new npc_anubarak_spikeAI(creature);
         };
@@ -830,15 +828,58 @@ class spell_impale : public SpellScriptLoader
                     SetHitDamage(0);
             }
 
-            void Register()
+            void Register() OVERRIDE
             {
                 OnEffectHitTarget += SpellEffectFn(spell_impale_SpellScript::HandleDamageCalc, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
             }
         };
 
-        SpellScript* GetSpellScript() const
+        SpellScript* GetSpellScript() const OVERRIDE
         {
             return new spell_impale_SpellScript();
+        }
+};
+
+class spell_anubarak_leeching_swarm : public SpellScriptLoader
+{
+    public:
+        spell_anubarak_leeching_swarm() : SpellScriptLoader("spell_anubarak_leeching_swarm") { }
+
+        class spell_anubarak_leeching_swarm_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_anubarak_leeching_swarm_AuraScript);
+
+            bool Validate(SpellInfo const* /*spell*/) OVERRIDE
+            {
+                if (!sSpellMgr->GetSpellInfo(SPELL_LEECHING_SWARM_DMG) || !sSpellMgr->GetSpellInfo(SPELL_LEECHING_SWARM_HEAL))
+                    return false;
+                return true;
+            }
+
+            void HandleEffectPeriodic(AuraEffect const* aurEff)
+            {
+                Unit* caster = GetCaster();
+                if (Unit* target = GetTarget())
+                {
+                    int32 lifeLeeched = target->CountPctFromCurHealth(aurEff->GetAmount());
+                    if (lifeLeeched < 250)
+                        lifeLeeched = 250;
+                    // Damage
+                    caster->CastCustomSpell(target, SPELL_LEECHING_SWARM_DMG, &lifeLeeched, 0, 0, false);
+                    // Heal
+                    caster->CastCustomSpell(caster, SPELL_LEECHING_SWARM_HEAL, &lifeLeeched, 0, 0, false);
+                }
+            }
+
+            void Register() OVERRIDE
+            {
+                OnEffectPeriodic += AuraEffectPeriodicFn(spell_anubarak_leeching_swarm_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+            }
+        };
+
+        AuraScript* GetAuraScript() const OVERRIDE
+        {
+            return new spell_anubarak_leeching_swarm_AuraScript();
         }
 };
 
@@ -851,4 +892,5 @@ void AddSC_boss_anubarak_trial()
     new npc_frost_sphere();
 
     new spell_impale();
+    new spell_anubarak_leeching_swarm();
 }

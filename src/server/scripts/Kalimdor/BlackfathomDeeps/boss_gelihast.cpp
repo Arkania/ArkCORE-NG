@@ -30,9 +30,9 @@ class boss_gelihast : public CreatureScript
 public:
     boss_gelihast() : CreatureScript("boss_gelihast") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new boss_gelihastAI (creature);
+        return GetInstanceAI<boss_gelihastAI>(creature);
     }
 
     struct boss_gelihastAI : public ScriptedAI
@@ -46,26 +46,23 @@ public:
 
         InstanceScript* instance;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             netTimer = urand(2000, 4000);
-            if (instance)
-                instance->SetData(TYPE_GELIHAST, NOT_STARTED);
+            instance->SetData(TYPE_GELIHAST, NOT_STARTED);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) OVERRIDE
         {
-            if (instance)
-                instance->SetData(TYPE_GELIHAST, IN_PROGRESS);
+            instance->SetData(TYPE_GELIHAST, IN_PROGRESS);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) OVERRIDE
         {
-            if (instance)
-                instance->SetData(TYPE_GELIHAST, DONE);
+            instance->SetData(TYPE_GELIHAST, DONE);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (!UpdateVictim())
                 return;

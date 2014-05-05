@@ -61,14 +61,9 @@ class instance_magisters_terrace : public InstanceMapScript
 public:
     instance_magisters_terrace() : InstanceMapScript("instance_magisters_terrace", 585) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
-    {
-        return new instance_magisters_terrace_InstanceMapScript(map);
-    }
-
     struct instance_magisters_terrace_InstanceMapScript : public InstanceScript
     {
-        instance_magisters_terrace_InstanceMapScript(Map* map) : InstanceScript(map) {}
+        instance_magisters_terrace_InstanceMapScript(Map* map) : InstanceScript(map) { }
 
         uint32 Encounter[MAX_ENCOUNTER];
         uint32 DelrissaDeathCount;
@@ -87,7 +82,7 @@ public:
         uint32 StatuesState;
         uint8 felCristalIndex;
 
-        void Initialize()
+        void Initialize() OVERRIDE
         {
             memset(&Encounter, 0, sizeof(Encounter));
 
@@ -109,7 +104,7 @@ public:
             felCristalIndex = 0;
         }
 
-        bool IsEncounterInProgress() const
+        bool IsEncounterInProgress() const OVERRIDE
         {
             for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
                 if (Encounter[i] == IN_PROGRESS)
@@ -189,7 +184,7 @@ public:
             SaveToDB();
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) OVERRIDE
         {
             switch (creature->GetEntry())
             {
@@ -205,7 +200,7 @@ public:
             }
         }
 
-        void OnGameObjectCreate(GameObject* go)
+        void OnGameObjectCreate(GameObject* go) OVERRIDE
         {
             switch (go->GetEntry())
             {
@@ -236,7 +231,7 @@ public:
             }
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() OVERRIDE
         {
             OUT_SAVE_INST_DATA;
 
@@ -247,7 +242,7 @@ public:
             return saveStream.str();
         }
 
-        void Load(const char* str)
+        void Load(const char* str) OVERRIDE
         {
             if (!str)
             {
@@ -278,28 +273,29 @@ public:
         {
             switch (identifier)
             {
-                case DATA_SELIN:                
+                case DATA_SELIN:
                     return SelinGUID;
-                case DATA_DELRISSA:             
+                case DATA_DELRISSA:
                     return DelrissaGUID;
-                case DATA_VEXALLUS_DOOR:        
+                case DATA_VEXALLUS_DOOR:
                     return VexallusDoorGUID;
-                case DATA_DELRISSA_DOOR:        
+                case DATA_DELRISSA_DOOR:
                     return DelrissaDoorGUID;
-                case DATA_KAEL_DOOR:            
+                case DATA_KAEL_DOOR:
                     return KaelDoorGUID;
-                case DATA_KAEL_STATUE_LEFT:     
+                case DATA_KAEL_STATUE_LEFT:
                     return KaelStatue[0];
-                case DATA_KAEL_STATUE_RIGHT:    
+                case DATA_KAEL_STATUE_RIGHT:
                     return KaelStatue[1];
-                case DATA_ESCAPE_ORB:           
+                case DATA_ESCAPE_ORB:
                     return EscapeOrbGUID;
                 case DATA_FEL_CRYSTAL:
                     if (FelCrystals.size() < felCristalIndex)
                     {
-                        sLog->outError("TSCR: Magisters Terrace: No Fel Crystals loaded in Inst Data");
+                        TC_LOG_ERROR("scripts", "Magisters Terrace: No Fel Crystals loaded in Inst Data");
                         return 0;
                     }
+
                     return FelCrystals.at(felCristalIndex);
             }
             return 0;
@@ -311,6 +307,11 @@ public:
                 felCristalIndex = value;
         }
     };
+
+    InstanceScript* GetInstanceScript(InstanceMap* map) const OVERRIDE
+    {
+        return new instance_magisters_terrace_InstanceMapScript(map);
+    }
 };
 
 void AddSC_instance_magisters_terrace()

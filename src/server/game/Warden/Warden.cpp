@@ -31,8 +31,12 @@
 #include "Warden.h"
 #include "AccountMgr.h"
 
-Warden::Warden() : _inputCrypto(16), _outputCrypto(16), _checkTimer(10000/*10 sec*/), _clientResponseTimer(0), _dataSent(false), _initialized(false)
+Warden::Warden() : _session(NULL), _inputCrypto(16), _outputCrypto(16), _checkTimer(10000/*10 sec*/), _clientResponseTimer(0),
+                   _dataSent(false), _previousTimestamp(0), _module(NULL), _initialized(false)
 {
+    memset(_inputKey, 0, sizeof(_inputKey));
+    memset(_outputKey, 0, sizeof(_outputKey));
+    memset(_seed, 0, sizeof(_seed));
 }
 
 Warden::~Warden()
@@ -45,7 +49,7 @@ Warden::~Warden()
 
 void Warden::SendModuleToClient()
 {
-    sLog->outDebug(LOG_FILTER_WARDEN, "Send module to client");
+    TC_LOG_DEBUG("warden", "Send module to client");
 
     // Create packet structure
     WardenModuleTransfer packet;
@@ -72,7 +76,7 @@ void Warden::SendModuleToClient()
 
 void Warden::RequestModule()
 {
-    sLog->outDebug(LOG_FILTER_WARDEN, "Request module");
+    TC_LOG_DEBUG("warden", "Request module");
 
     // Create packet structure
     WardenModuleUse request;
@@ -108,7 +112,7 @@ void Warden::Update()
                 // Kick player if client response delays more than set in config
                 if (_clientResponseTimer > maxClientResponseDelay * IN_MILLISECONDS)
                 {
-                    sLog->outWarden("WARDEN: %s (latency: %u, IP: %s) exceeded Warden module response delay for more than %s - disconnecting client",
+                    TC_LOG_WARN("warden", "%s (latency: %u, IP: %s) exceeded Warden module response delay for more than %s - disconnecting client",
                                    _session->GetPlayerInfo().c_str(), _session->GetLatency(), _session->GetRemoteAddress().c_str(), secsToTimeString(maxClientResponseDelay, true).c_str());
                     _session->KickPlayer();
                 }
@@ -144,12 +148,12 @@ bool Warden::IsValidCheckSum(uint32 checksum, const uint8* data, const uint16 le
 
     if (checksum != newChecksum)
     {
-        sLog->outDebug(LOG_FILTER_WARDEN, "CHECKSUM IS NOT VALID");
+        TC_LOG_DEBUG("warden", "CHECKSUM IS NOT VALID");
         return false;
     }
     else
     {
-        sLog->outDebug(LOG_FILTER_WARDEN, "CHECKSUM IS VALID");
+        TC_LOG_DEBUG("warden", "CHECKSUM IS VALID");
         return true;
     }
 }
@@ -222,10 +226,13 @@ std::string Warden::Penalty(WardenCheck* check /*= NULL*/)
 
 void WorldSession::HandleWardenDataOpcode(WorldPacket& recvData)
 {
-    _warden->DecryptData(const_cast<uint8*>(recvData.contents()), recvData.size());
+    if (!_warden)
+        return;
+
+    _warden->DecryptData(recvData.contents(), recvData.size());
     uint8 opcode;
     recvData >> opcode;
-    sLog->outDebug(LOG_FILTER_WARDEN, "Got packet, opcode %02X, size %u", opcode, uint32(recvData.size()));
+    TC_LOG_DEBUG("warden", "Got packet, opcode %02X, size %u", opcode, uint32(recvData.size()));
     recvData.hexlike();
 
     switch (opcode)
@@ -240,17 +247,17 @@ void WorldSession::HandleWardenDataOpcode(WorldPacket& recvData)
             _warden->HandleData(recvData);
             break;
         case WARDEN_CMSG_MEM_CHECKS_RESULT:
-            sLog->outDebug(LOG_FILTER_WARDEN, "NYI WARDEN_CMSG_MEM_CHECKS_RESULT received!");
+            TC_LOG_DEBUG("warden", "NYI WARDEN_CMSG_MEM_CHECKS_RESULT received!");
             break;
         case WARDEN_CMSG_HASH_RESULT:
             _warden->HandleHashResult(recvData);
             _warden->InitializeModule();
             break;
         case WARDEN_CMSG_MODULE_FAILED:
-            sLog->outDebug(LOG_FILTER_WARDEN, "NYI WARDEN_CMSG_MODULE_FAILED received!");
+            TC_LOG_DEBUG("warden", "NYI WARDEN_CMSG_MODULE_FAILED received!");
             break;
         default:
-            sLog->outDebug(LOG_FILTER_WARDEN, "Got unknown warden opcode %02X of size %u.", opcode, uint32(recvData.size() - 1));
+            TC_LOG_DEBUG("warden", "Got unknown warden opcode %02X of size %u.", opcode, uint32(recvData.size() - 1));
             break;
     }
 }

@@ -32,9 +32,7 @@ int GuardAI::Permissible(Creature const* creature)
     return PERMIT_BASE_NO;
 }
 
-GuardAI::GuardAI(Creature* creature) : ScriptedAI(creature)
-{
-}
+GuardAI::GuardAI(Creature* creature) : ScriptedAI(creature) { }
 
 bool GuardAI::CanSeeAlways(WorldObject const* obj)
 {
@@ -59,7 +57,7 @@ void GuardAI::EnterEvadeMode()
         return;
     }
 
-    sLog->outDebug(LOG_FILTER_UNITS, "Guard entry: %u enters evade mode.", me->GetEntry());
+    TC_LOG_DEBUG("entities.unit", "Guard entry: %u enters evade mode.", me->GetEntry());
 
     me->RemoveAllAuras();
     me->DeleteThreatList();

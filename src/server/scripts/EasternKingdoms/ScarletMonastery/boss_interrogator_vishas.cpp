@@ -47,9 +47,9 @@ class boss_interrogator_vishas : public CreatureScript
 public:
     boss_interrogator_vishas() : CreatureScript("boss_interrogator_vishas") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new boss_interrogator_vishasAI (creature);
+        return GetInstanceAI<boss_interrogator_vishasAI>(creature);
     }
 
     struct boss_interrogator_vishasAI : public ScriptedAI
@@ -65,32 +65,31 @@ public:
         bool Yell60;
         uint32 ShadowWordPain_Timer;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             ShadowWordPain_Timer = 5000;
+            Yell60 = false;
+            Yell30 = false;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) OVERRIDE
         {
             Talk(SAY_AGGRO);
         }
 
-        void KilledUnit(Unit* /*Victim*/)
+        void KilledUnit(Unit* /*Victim*/) OVERRIDE
         {
             Talk(SAY_KILL);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) OVERRIDE
         {
-            if (!instance)
-                return;
-
             //Any other Actions to do with vorrel? setStandState?
             if (Creature* vorrel = Creature::GetCreature(*me, instance->GetData64(DATA_VORREL)))
                 vorrel->AI()->Talk(SAY_TRIGGER_VORREL);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (!UpdateVictim())
                 return;
@@ -111,7 +110,7 @@ public:
             //ShadowWordPain_Timer
             if (ShadowWordPain_Timer <= diff)
             {
-                DoCast(me->GetVictim(), SPELL_SHADOWWORDPAIN);
+                DoCastVictim(SPELL_SHADOWWORDPAIN);
                 ShadowWordPain_Timer = urand(5000, 15000);
             }
             else ShadowWordPain_Timer -= diff;

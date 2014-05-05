@@ -25,7 +25,6 @@ SDCategory: Mulgore
 EndScriptData */
 
 /* ContentData
-npc_skorn_whitecloud
 npc_kyle_frenzied
 EndContentData */
 
@@ -34,47 +33,6 @@ EndContentData */
 #include "ScriptedGossip.h"
 #include "Player.h"
 #include "SpellInfo.h"
-
-enum eMulgore
-{
-    NPC_FLEDGLING_BRAVE             = 36942,
-    NPC_BRISTLEBACK_INVADER         = 36943
-};
-
-/*######
-# npc_skorn_whitecloud
-######*/
-
-#define GOSSIP_SW "Tell me a story, Skorn."
-
-class npc_skorn_whitecloud : public CreatureScript
-{
-public:
-    npc_skorn_whitecloud() : CreatureScript("npc_skorn_whitecloud") { }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
-    {
-        player->PlayerTalkClass->ClearMenus();
-        if (action == GOSSIP_ACTION_INFO_DEF)
-            player->SEND_GOSSIP_MENU(523, creature->GetGUID());
-
-        return true;
-    }
-
-    bool OnGossipHello(Player* player, Creature* creature)
-    {
-        if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
-
-        if (!player->GetQuestRewardStatus(770))
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_SW, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-
-        player->SEND_GOSSIP_MENU(522, creature->GetGUID());
-
-        return true;
-    }
-
-};
 
 /*#####
 # npc_kyle_frenzied
@@ -97,14 +55,14 @@ class npc_kyle_frenzied : public CreatureScript
 public:
     npc_kyle_frenzied() : CreatureScript("npc_kyle_frenzied") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
         return new npc_kyle_frenziedAI (creature);
     }
 
     struct npc_kyle_frenziedAI : public ScriptedAI
     {
-        npc_kyle_frenziedAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_kyle_frenziedAI(Creature* creature) : ScriptedAI(creature) { }
 
         bool EventActive;
         bool IsMovingToLunch;
@@ -112,7 +70,7 @@ public:
         uint32 EventTimer;
         uint8 EventPhase;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             EventActive = false;
             IsMovingToLunch = false;
@@ -144,16 +102,16 @@ public:
             }
         }
 
-        void MovementInform(uint32 Type, uint32 PointId)
+        void MovementInform(uint32 type, uint32 pointId) OVERRIDE
         {
-            if (Type != POINT_MOTION_TYPE || !EventActive)
+            if (type != POINT_MOTION_TYPE || !EventActive)
                 return;
 
-            if (PointId == POINT_ID)
+            if (pointId == POINT_ID)
                 IsMovingToLunch = false;
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (EventActive)
             {
@@ -168,7 +126,7 @@ public:
                     switch (EventPhase)
                     {
                         case 1:
-                            if (Unit* unit = Unit::GetUnit(*me, PlayerGUID))
+                            if (Unit* unit = ObjectAccessor::GetUnit(*me, PlayerGUID))
                             {
                                 if (GameObject* go = unit->GetGameObject(SPELL_LUNCH))
                                 {
@@ -182,7 +140,7 @@ public:
                             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_USE_STANDING);
                             break;
                         case 3:
-                            if (Player* unit = Unit::GetPlayer(*me, PlayerGUID))
+                            if (Player* unit = ObjectAccessor::GetPlayer(*me, PlayerGUID))
                                 unit->TalkedToCreature(me->GetEntry(), me->GetGUID());
 
                             me->UpdateEntry(NPC_KYLE_FRIENDLY);
@@ -207,104 +165,7 @@ public:
 
 };
 
-/*######
-## npc_bristleback_invader
-######*/
-
-class npc_bristleback_invader : public CreatureScript
-{
-public:
-    npc_bristleback_invader() : CreatureScript("npc_bristleback_invader") { }
-
-    struct npc_bristleback_invaderAI : public ScriptedAI
-    {
-        npc_bristleback_invaderAI(Creature *c) : ScriptedAI(c) { }
-
-        uint32 _timer;
-
-        void Reset()
-        {
-            _timer = urand(1800,2200);
-        }
-
-        void UpdateAI(const uint32 diff)
-        {
-            if (!UpdateVictim())
-            {
-                if (_timer <= diff)
-                {
-                    if (Creature* brave = me->FindNearestCreature (NPC_FLEDGLING_BRAVE, 3.0f))
-                    {
-                        me->SetFacingTo (me->GetAngle(brave));
-                        me->HandleEmoteCommand(EMOTE_ONESHOT_ATTACK1H);
-                        _timer = urand(1800,2200);
-                    }
-                }
-                else 
-                    _timer -= diff;
-            } 
-            else 
-                DoMeleeAttackIfReady();
-        }
-    };
-
-       CreatureAI* GetAI(Creature* pCreature) const
-    {
-        return new npc_bristleback_invaderAI (pCreature);
-    }
-};
-
-/*######
-## npc_fledgling_brave
-######*/
-
-class npc_fledgling_brave : public CreatureScript
-{
-public:
-    npc_fledgling_brave() : CreatureScript("npc_fledgling_brave") { }
-
-    struct npc_fledgling_braveAI : public ScriptedAI
-    {
-        npc_fledgling_braveAI(Creature *c) : ScriptedAI(c) { }
-
-        uint32 _timer;
-
-        void Reset()
-        {
-            _timer = urand(1800,2200);
-        }
-
-        void UpdateAI(const uint32 diff)
-        {
-            if (!UpdateVictim())
-            {
-                if (_timer <= diff)
-                {
-                    if (Creature* invader = me->FindNearestCreature (NPC_BRISTLEBACK_INVADER, 3.0f))
-                    {
-                        me->SetFacingTo (me->GetAngle(invader));
-                        me->HandleEmoteCommand(EMOTE_ONESHOT_ATTACK1H);
-                        _timer = urand(1800,2200);
-                    }
-                } 
-                else 
-                    _timer -= diff;
-            } 
-            else 
-                DoMeleeAttackIfReady();
-        }
-    };
-
-       CreatureAI* GetAI(Creature* pCreature) const
-    {
-        return new npc_fledgling_braveAI (pCreature);
-    }
-};
-
 void AddSC_mulgore()
 {
-    new npc_skorn_whitecloud();
     new npc_kyle_frenzied();
-    new npc_fledgling_brave();
-    new npc_bristleback_invader();
 }

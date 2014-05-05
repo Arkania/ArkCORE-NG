@@ -29,4 +29,3 @@ MovementGeneratorFactory<MOVEMENT_GEN>::Create(void * /*data*/) const
     return (new MOVEMENT_GEN());
 }
 #endif
-

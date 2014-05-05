@@ -36,26 +36,28 @@ struct TSpellSummary
 
 void SummonList::DoZoneInCombat(uint32 entry)
 {
-    for (iterator i = begin(); i != end();)
+    for (StorageType::iterator i = storage_.begin(); i != storage_.end();)
     {
         Creature* summon = Unit::GetCreature(*me, *i);
         ++i;
         if (summon && summon->IsAIEnabled
-            && (!entry || summon->GetEntry() == entry))
+                && (!entry || summon->GetEntry() == entry))
+        {
             summon->AI()->DoZoneInCombat();
+        }
     }
 }
 
 void SummonList::DespawnEntry(uint32 entry)
 {
-    for (iterator i = begin(); i != end();)
+    for (StorageType::iterator i = storage_.begin(); i != storage_.end();)
     {
         Creature* summon = Unit::GetCreature(*me, *i);
         if (!summon)
-            erase(i++);
+            i = storage_.erase(i);
         else if (summon->GetEntry() == entry)
         {
-            erase(i++);
+            i = storage_.erase(i);
             summon->DespawnOrUnsummon();
         }
         else
@@ -65,33 +67,29 @@ void SummonList::DespawnEntry(uint32 entry)
 
 void SummonList::DespawnAll()
 {
-    while (!empty())
+    while (!storage_.empty())
     {
-        Creature* summon = Unit::GetCreature(*me, *begin());
-        if (!summon)
-            erase(begin());
-        else
-        {
-            erase(begin());
+        Creature* summon = Unit::GetCreature(*me, storage_.front());
+        storage_.pop_front();
+        if (summon)
             summon->DespawnOrUnsummon();
-        }
     }
 }
 
 void SummonList::RemoveNotExisting()
 {
-    for (iterator i = begin(); i != end();)
+    for (StorageType::iterator i = storage_.begin(); i != storage_.end();)
     {
         if (Unit::GetCreature(*me, *i))
             ++i;
         else
-            erase(i++);
+            i = storage_.erase(i);
     }
 }
 
 bool SummonList::HasEntry(uint32 entry) const
 {
-    for (const_iterator i = begin(); i != end(); ++i)
+    for (StorageType::const_iterator i = storage_.begin(); i != storage_.end(); ++i)
     {
         Creature* summon = Unit::GetCreature(*me, *i);
         if (summon && summon->GetEntry() == entry)
@@ -116,7 +114,7 @@ void ScriptedAI::AttackStartNoMove(Unit* who)
     if (!who)
         return;
 
-    if (me->Attack(who, false))
+    if (me->Attack(who, true))
         DoStartNoMovement(who);
 }
 
@@ -126,9 +124,9 @@ void ScriptedAI::AttackStart(Unit* who)
         CreatureAI::AttackStart(who);
     else
         AttackStartNoMove(who);
-} 
+}
 
-void ScriptedAI::UpdateAI(uint32 const /*diff*/)
+void ScriptedAI::UpdateAI(uint32 /*diff*/)
 {
     //Check if we have a current target
     if (!UpdateVictim())
@@ -159,7 +157,7 @@ void ScriptedAI::DoStopAttack()
 
 void ScriptedAI::DoCastSpell(Unit* target, SpellInfo const* spellInfo, bool triggered)
 {
-    if (!target || me->IsNonMeleeSpellCasted(false))
+    if (!target || me->IsNonMeleeSpellCast(false))
         return;
 
     me->StopMoving();
@@ -173,7 +171,7 @@ void ScriptedAI::DoPlaySoundToSet(WorldObject* source, uint32 soundId)
 
     if (!sSoundEntriesStore.LookupEntry(soundId))
     {
-        sLog->outError("TSCR: Invalid soundId %u used in DoPlaySoundToSet (Source: TypeId %u, GUID %u)", soundId, source->GetTypeId(), source->GetGUIDLow());
+        TC_LOG_ERROR("scripts", "Invalid soundId %u used in DoPlaySoundToSet (Source: TypeId %u, GUID %u)", soundId, source->GetTypeId(), source->GetGUIDLow());
         return;
     }
 
@@ -266,7 +264,7 @@ void ScriptedAI::DoResetThreat()
 {
     if (!me->CanHaveThreatList() || me->getThreatManager().isThreatListEmpty())
     {
-        sLog->outError("TSCR: DoResetThreat called for creature that either cannot have threat list or has empty threat list (me entry = %d)", me->GetEntry());
+        TC_LOG_ERROR("scripts", "DoResetThreat called for creature that either cannot have threat list or has empty threat list (me entry = %d)", me->GetEntry());
         return;
     }
 
@@ -314,7 +312,7 @@ void ScriptedAI::DoTeleportPlayer(Unit* unit, float x, float y, float z, float o
     if (Player* player = unit->ToPlayer())
         player->TeleportTo(unit->GetMapId(), x, y, z, o, TELE_TO_NOT_LEAVE_COMBAT);
     else
-        sLog->outError("TSCR: Creature " UI64FMTD " (Entry: %u) Tried to teleport non-player unit (Type: %u GUID: " UI64FMTD ") to x: %f y:%f z: %f o: %f. Aborted.", 
+        TC_LOG_ERROR("scripts", "Creature " UI64FMTD " (Entry: %u) Tried to teleport non-player unit (Type: %u GUID: " UI64FMTD ") to x: %f y:%f z: %f o: %f. Aborted.",
             me->GetGUID(), me->GetEntry(), unit->GetTypeId(), unit->GetGUID(), x, y, z, o);
 }
 
@@ -382,9 +380,7 @@ void ScriptedAI::SetEquipmentSlots(bool loadDefault, int32 mainHand /*= EQUIP_NO
 {
     if (loadDefault)
     {
-        if (CreatureTemplate const* creatureInfo = sObjectMgr->GetCreatureTemplate(me->GetEntry()))
-            me->LoadEquipment(creatureInfo->equipmentId, true);
-
+        me->LoadEquipment(me->GetOriginalEquipmentId(), true);
         return;
     }
 
@@ -403,7 +399,7 @@ void ScriptedAI::SetCombatMovement(bool allowMovement)
     _isCombatMovementAllowed = allowMovement;
 }
 
-enum eNPCs
+enum NPCs
 {
     NPC_BROODLORD   = 12017,
     NPC_VOID_REAVER = 19516,
@@ -449,7 +445,7 @@ bool ScriptedAI::EnterEvadeIfOutOfCombatArea(uint32 const diff)
                 return false;
             break;
         default: // For most of creatures that certain area is their home area.
-            sLog->outDetail("TSCR: EnterEvadeIfOutOfCombatArea used for creature entry %u, but does not have any definition. Using the default one.", me->GetEntry());
+            TC_LOG_INFO("misc", "TSCR: EnterEvadeIfOutOfCombatArea used for creature entry %u, but does not have any definition. Using the default one.", me->GetEntry());
             uint32 homeAreaId = me->GetMap()->GetAreaId(me->GetHomePosition().GetPositionX(), me->GetHomePosition().GetPositionY(), me->GetHomePosition().GetPositionZ());
             if (me->GetAreaId() == homeAreaId)
                 return false;
@@ -459,23 +455,12 @@ bool ScriptedAI::EnterEvadeIfOutOfCombatArea(uint32 const diff)
     return true;
 }
 
-void Scripted_NoMovementAI::AttackStart(Unit* target)
-{
-    if (!target)
-        return;
-
-    if (me->Attack(target, true))
-        DoStartNoMovement(target);
-}
-
 // BossAI - for instanced bosses
 BossAI::BossAI(Creature* creature, uint32 bossId) : ScriptedAI(creature),
     instance(creature->GetInstanceScript()),
     summons(creature),
     _boundary(instance ? instance->GetBossBoundary(bossId) : NULL),
-    _bossId(bossId)
-{
-}
+    _bossId(bossId) { }
 
 void BossAI::_Reset()
 {
@@ -499,16 +484,15 @@ void BossAI::_JustDied()
         instance->SaveToDB();
     }
 
-    /*
-     Award Points
-     For 4.3.4 version:
-     BurningCrusadeRaid     = 10  JusticePoints / boss
-     LichKingHeroics        = 16  JusticePoints / boss
-     LichKingRaid           = 23  JusticePoints / boss
-     CataclysmHeroics       = 75  JusticePoints / boss
-     CataclysmRaid 10man    = 75  ValorPoints   / boss
-     CataclysmRaid 10man    = 105 ValorPoints   / boss
-     */
+    /**
+    * For 4.3.4 version: Award Points
+    * BurningCrusadeRaid     = 10  JusticePoints / boss
+    * LichKingHeroics        = 16  JusticePoints / boss
+    * LichKingRaid           = 23  JusticePoints / boss
+    * CataclysmHeroics       = 75  JusticePoints / boss
+    * CataclysmRaid 10man    = 75  ValorPoints   / boss
+    * CataclysmRaid 10man    = 105 ValorPoints   / boss
+    */
     if (Map* map = instance->instance)
     {
         Map::PlayerList const &PlayerList = map->GetPlayers();
@@ -559,7 +543,7 @@ void BossAI::TeleportCheaters()
 
     ThreatContainer::StorageType threatList = me->getThreatManager().getThreatList();
     for (ThreatContainer::StorageType::const_iterator itr = threatList.begin(); itr != threatList.end(); ++itr)
-        if (Unit* target = (*itr)->GetTarget())
+        if (Unit* target = (*itr)->getTarget())
             if (target->GetTypeId() == TYPEID_PLAYER && !CheckBoundary(target))
                 target->NearTeleportTo(x, y, z, 0);
 }
@@ -574,35 +558,35 @@ bool BossAI::CheckBoundary(Unit* who)
         switch (itr->first)
         {
             case BOUNDARY_N:
-                if (me->GetPositionX() > itr->second)
+                if (who->GetPositionX() > itr->second)
                     return false;
                 break;
             case BOUNDARY_S:
-                if (me->GetPositionX() < itr->second)
+                if (who->GetPositionX() < itr->second)
                     return false;
                 break;
             case BOUNDARY_E:
-                if (me->GetPositionY() < itr->second)
+                if (who->GetPositionY() < itr->second)
                     return false;
                 break;
             case BOUNDARY_W:
-                if (me->GetPositionY() > itr->second)
+                if (who->GetPositionY() > itr->second)
                     return false;
                 break;
             case BOUNDARY_NW:
-                if (me->GetPositionX() + me->GetPositionY() > itr->second)
+                if (who->GetPositionX() + who->GetPositionY() > itr->second)
                     return false;
                 break;
             case BOUNDARY_SE:
-                if (me->GetPositionX() + me->GetPositionY() < itr->second)
+                if (who->GetPositionX() + who->GetPositionY() < itr->second)
                     return false;
                 break;
             case BOUNDARY_NE:
-                if (me->GetPositionX() - me->GetPositionY() > itr->second)
+                if (who->GetPositionX() - who->GetPositionY() > itr->second)
                     return false;
                 break;
             case BOUNDARY_SW:
-                if (me->GetPositionX() - me->GetPositionY() < itr->second)
+                if (who->GetPositionX() - who->GetPositionY() < itr->second)
                     return false;
                 break;
             default:
@@ -625,7 +609,7 @@ void BossAI::SummonedCreatureDespawn(Creature* summon)
     summons.Despawn(summon);
 }
 
-void BossAI::UpdateAI(uint32 const diff)
+void BossAI::UpdateAI(uint32 diff)
 {
     if (!UpdateVictim())
         return;
@@ -659,9 +643,7 @@ void BossAI::_DespawnAtEvade()
 
 WorldBossAI::WorldBossAI(Creature* creature) :
     ScriptedAI(creature),
-    summons(creature)
-{
-}
+    summons(creature) { }
 
 void WorldBossAI::_Reset()
 {
@@ -698,7 +680,7 @@ void WorldBossAI::SummonedCreatureDespawn(Creature* summon)
     summons.Despawn(summon);
 }
 
-void WorldBossAI::UpdateAI(uint32 const diff)
+void WorldBossAI::UpdateAI(uint32 diff)
 {
     if (!UpdateVictim())
         return;

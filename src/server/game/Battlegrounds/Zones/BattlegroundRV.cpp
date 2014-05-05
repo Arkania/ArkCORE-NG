@@ -17,6 +17,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Battleground.h"
 #include "BattlegroundRV.h"
 #include "ObjectAccessor.h"
 #include "Language.h"
@@ -27,6 +28,10 @@
 BattlegroundRV::BattlegroundRV()
 {
     BgObjects.resize(BG_RV_OBJECT_MAX);
+
+    Timer = 0;
+    State = 0;
+    PillarCollision = false;
 
     StartDelayTimes[BG_STARTING_EVENT_FIRST]  = BG_START_DELAY_1M;
     StartDelayTimes[BG_STARTING_EVENT_SECOND] = BG_START_DELAY_30S;
@@ -73,15 +78,16 @@ void BattlegroundRV::PostUpdateImpl(uint32 diff)
         setTimer(getTimer() - diff);
 }
 
-void BattlegroundRV::StartingEventCloseDoors()
-{
-}
+void BattlegroundRV::StartingEventCloseDoors() { }
 
 void BattlegroundRV::StartingEventOpenDoors()
 {
     // Buff respawn
     SpawnBGObject(BG_RV_OBJECT_BUFF_1, 90);
     SpawnBGObject(BG_RV_OBJECT_BUFF_2, 90);
+    // Elevators
+    DoorOpen(BG_RV_OBJECT_ELEVATOR_1);
+    DoorOpen(BG_RV_OBJECT_ELEVATOR_2);
 
     setState(BG_RV_STATE_OPEN_FENCES);
     setTimer(BG_RV_FIRST_TIMER);
@@ -118,7 +124,7 @@ void BattlegroundRV::HandleKillPlayer(Player* player, Player* killer)
 
     if (!killer)
     {
-        sLog->outError("BattlegroundRV: Killer player not found");
+        TC_LOG_ERROR("bg.battleground", "BattlegroundRV: Killer player not found");
         return;
     }
 
@@ -128,12 +134,6 @@ void BattlegroundRV::HandleKillPlayer(Player* player, Player* killer)
     UpdateWorldState(BG_RV_WORLD_STATE_H, GetAlivePlayersCountByTeam(HORDE));
 
     CheckArenaWinConditions();
-}
-
-bool BattlegroundRV::HandlePlayerUnderMap(Player* player)
-{
-    player->TeleportTo(GetMapId(), 763.5f, -284, 28.276f, 2.422f);
-    return true;
 }
 
 void BattlegroundRV::HandleAreaTrigger(Player* player, uint32 trigger)
@@ -170,8 +170,11 @@ void BattlegroundRV::Reset()
 
 bool BattlegroundRV::SetupBattleground()
 {
+    // elevators
+    if (!AddObject(BG_RV_OBJECT_ELEVATOR_1, BG_RV_OBJECT_TYPE_ELEVATOR_1, 763.536377f, -294.535767f, 0.505383f, 3.141593f, 0, 0, 0, RESPAWN_IMMEDIATELY)
+        || !AddObject(BG_RV_OBJECT_ELEVATOR_2, BG_RV_OBJECT_TYPE_ELEVATOR_2, 763.506348f, -273.873352f, 0.505383f, 0.000000f, 0, 0, 0, RESPAWN_IMMEDIATELY)
     // buffs
-    if (!AddObject(BG_RV_OBJECT_BUFF_1, BG_RV_OBJECT_TYPE_BUFF_1, 735.551819f, -284.794678f, 28.276682f, 0.034906f, 0, 0, 0, RESPAWN_IMMEDIATELY)
+        || !AddObject(BG_RV_OBJECT_BUFF_1, BG_RV_OBJECT_TYPE_BUFF_1, 735.551819f, -284.794678f, 28.276682f, 0.034906f, 0, 0, 0, RESPAWN_IMMEDIATELY)
         || !AddObject(BG_RV_OBJECT_BUFF_2, BG_RV_OBJECT_TYPE_BUFF_2, 791.224487f, -284.794464f, 28.276682f, 2.600535f, 0, 0, 0, RESPAWN_IMMEDIATELY)
     // fire
         || !AddObject(BG_RV_OBJECT_FIRE_1, BG_RV_OBJECT_TYPE_FIRE_1, 743.543457f, -283.799469f, 28.286655f, 3.141593f, 0, 0, 0, RESPAWN_IMMEDIATELY)
@@ -198,7 +201,7 @@ bool BattlegroundRV::SetupBattleground()
 
 )
     {
-        sLog->outErrorDb("BatteGroundRV: Failed to spawn some object!");
+        TC_LOG_ERROR("sql.sql", "BatteGroundRV: Failed to spawn some object!");
         return false;
     }
     return true;
@@ -214,7 +217,7 @@ void BattlegroundRV::TogglePillarCollision()
         apply ? DoorOpen(i) : DoorClose(i);
 
     for (uint8 i = BG_RV_OBJECT_PILAR_2; i <= BG_RV_OBJECT_PULLEY_2; ++i)
-        apply ? DoorClose(i) : DoorOpen(i); 
+        apply ? DoorClose(i) : DoorOpen(i);
 
     for (uint8 i = BG_RV_OBJECT_PILAR_1; i <= BG_RV_OBJECT_PILAR_COLLISION_4; ++i)
     {
@@ -236,6 +239,6 @@ void BattlegroundRV::TogglePillarCollision()
                     gob->SendUpdateToPlayer(player);
         }
     }
-    
+
     SetPillarCollision(!apply);
 }

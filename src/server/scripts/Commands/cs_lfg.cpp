@@ -29,12 +29,12 @@ void GetPlayerInfo(ChatHandler* handler, Player* player)
         return;
 
     uint64 guid = player->GetGUID();
-    LfgDungeonSet dungeons = sLFGMgr->GetSelectedDungeons(guid);
+    lfg::LfgDungeonSet dungeons = sLFGMgr->GetSelectedDungeons(guid);
 
-    std::string const& state = sLFGMgr->GetStateString(sLFGMgr->GetState(guid));
+    std::string const& state = lfg::GetStateString(sLFGMgr->GetState(guid));
     handler->PSendSysMessage(LANG_LFG_PLAYER_INFO, player->GetName().c_str(),
-        state.c_str(), uint8(dungeons.size()), sLFGMgr->ConcatenateDungeons(dungeons).c_str(),
-        sLFGMgr->GetRolesString(sLFGMgr->GetRoles(guid)).c_str(), sLFGMgr->GetComment(guid).c_str());
+        state.c_str(), uint8(dungeons.size()), lfg::ConcatenateDungeons(dungeons).c_str(),
+        lfg::GetRolesString(sLFGMgr->GetRoles(guid)).c_str(), sLFGMgr->GetComment(guid).c_str());
 }
 
 class lfg_commandscript : public CommandScript
@@ -42,22 +42,22 @@ class lfg_commandscript : public CommandScript
 public:
     lfg_commandscript() : CommandScript("lfg_commandscript") { }
 
-    ChatCommand* GetCommands() const
+    ChatCommand* GetCommands() const OVERRIDE
     {
         static ChatCommand lfgCommandTable[] =
         {
-            {  "player",     SEC_GAMEMASTER, false, &HandleLfgPlayerInfoCommand, "", NULL },
-            {   "group",     SEC_GAMEMASTER, false,  &HandleLfgGroupInfoCommand, "", NULL },
-            {   "queue",     SEC_GAMEMASTER, false,  &HandleLfgQueueInfoCommand, "", NULL },
-            {   "clean",  SEC_ADMINISTRATOR, false,      &HandleLfgCleanCommand, "", NULL },
-            { "options",  SEC_ADMINISTRATOR, false,    &HandleLfgOptionsCommand, "", NULL },
-            {      NULL,         SEC_PLAYER, false,                        NULL, "", NULL }
+            {  "player", rbac::RBAC_PERM_COMMAND_LFG_PLAYER,  false, &HandleLfgPlayerInfoCommand, "", NULL },
+            {   "group", rbac::RBAC_PERM_COMMAND_LFG_GROUP,   false, &HandleLfgGroupInfoCommand,  "", NULL },
+            {   "queue", rbac::RBAC_PERM_COMMAND_LFG_QUEUE,   false, &HandleLfgQueueInfoCommand,  "", NULL },
+            {   "clean", rbac::RBAC_PERM_COMMAND_LFG_CLEAN,   false, &HandleLfgCleanCommand,      "", NULL },
+            { "options", rbac::RBAC_PERM_COMMAND_LFG_OPTIONS, false, &HandleLfgOptionsCommand,    "", NULL },
+            {      NULL, 0, false,                       NULL, "", NULL }
         };
 
         static ChatCommand commandTable[] =
         {
-            {       "lfg",   SEC_GAMEMASTER, false,                        NULL, "", lfgCommandTable },
-            {  NULL,             SEC_PLAYER, false,                        NULL, "", NULL }
+            { "lfg", rbac::RBAC_PERM_COMMAND_LFG, false, NULL, "", lfgCommandTable },
+            {  NULL,                     0, false, NULL, "", NULL }
         };
         return commandTable;
     }
@@ -88,7 +88,7 @@ public:
         }
 
         uint64 guid = grp->GetGUID();
-        std::string const& state = sLFGMgr->GetStateString(sLFGMgr->GetState(guid));
+        std::string const& state = lfg::GetStateString(sLFGMgr->GetState(guid));
         handler->PSendSysMessage(LANG_LFG_GROUP_INFO, grp->isLFGGroup(),
             state.c_str(), sLFGMgr->GetDungeon(guid));
 

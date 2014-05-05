@@ -20,7 +20,7 @@
 /* ScriptData
 SDName: Loch_Modan
 SD%Complete: 0
-SDComment: 
+SDComment:
 SDCategory: Loch Modan
 EndScriptData */
 

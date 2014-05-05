@@ -44,7 +44,7 @@ EndContentData */
 ######*/
 
 //used by 20209, 20417, 20418, 20440, signed for 20209
-enum eManaforgeConsoleData
+enum ManaforgeConsoleData
 {
     EMOTE_START                 = 0,
     EMOTE_60                    = 1,
@@ -75,14 +75,14 @@ class npc_manaforge_control_console : public CreatureScript
 public:
     npc_manaforge_control_console() : CreatureScript("npc_manaforge_control_console") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new npc_manaforge_control_consoleAI (creature);
+        return new npc_manaforge_control_consoleAI(creature);
     }
 
     struct npc_manaforge_control_consoleAI : public ScriptedAI
     {
-        npc_manaforge_control_consoleAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_manaforge_control_consoleAI(Creature* creature) : ScriptedAI(creature) { }
 
         uint32 Event_Timer;
         uint32 Wave_Timer;
@@ -92,7 +92,7 @@ public:
         uint64 goConsole;
         Creature* add;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             Event_Timer = 3000;
             Wave_Timer = 0;
@@ -103,9 +103,9 @@ public:
             add = NULL;
         }
 
-        void EnterCombat(Unit* /*who*/) {}
+        void EnterCombat(Unit* /*who*/) OVERRIDE { }
 
-        /*void SpellHit(Unit* caster, const SpellInfo* spell)
+        /*void SpellHit(Unit* caster, const SpellInfo* spell) OVERRIDE
         {
             //we have no way of telling the Creature was hit by spell -> got aura applied after 10-12 seconds
             //then no way for the mobs to actually stop the shutdown as intended.
@@ -113,42 +113,39 @@ public:
                 DoSay("Silence! I kill you!", LANG_UNIVERSAL, NULL);
         }*/
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) OVERRIDE
         {
             Talk(EMOTE_ABORT);
 
             if (someplayer)
             {
-                Unit* p = Unit::GetUnit(*me, someplayer);
-                if (p && p->GetTypeId() == TYPEID_PLAYER)
+                if (Player* player = ObjectAccessor::GetPlayer(*me, someplayer))
                 {
                     switch (me->GetEntry())
                     {
                         case ENTRY_BNAAR_C_CONSOLE:
-                            CAST_PLR(p)->FailQuest(10299);
-                            CAST_PLR(p)->FailQuest(10329);
+                            player->FailQuest(10299);
+                            player->FailQuest(10329);
                             break;
                         case ENTRY_CORUU_C_CONSOLE:
-                            CAST_PLR(p)->FailQuest(10321);
-                            CAST_PLR(p)->FailQuest(10330);
+                            player->FailQuest(10321);
+                            player->FailQuest(10330);
                             break;
                         case ENTRY_DURO_C_CONSOLE:
-                            CAST_PLR(p)->FailQuest(10322);
-                            CAST_PLR(p)->FailQuest(10338);
+                            player->FailQuest(10322);
+                            player->FailQuest(10338);
                             break;
                         case ENTRY_ARA_C_CONSOLE:
-                            CAST_PLR(p)->FailQuest(10323);
-                            CAST_PLR(p)->FailQuest(10365);
+                            player->FailQuest(10323);
+                            player->FailQuest(10365);
                             break;
                     }
                 }
             }
 
             if (goConsole)
-            {
                 if (GameObject* go = GameObject::GetGameObject(*me, goConsole))
                     go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE);
-            }
         }
 
         void DoWaveSpawnForCreature(Creature* creature)
@@ -238,7 +235,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (Event_Timer <= diff)
             {
@@ -248,8 +245,8 @@ public:
                         if (someplayer)
                         {
                             Unit* u = Unit::GetUnit(*me, someplayer);
-                            if (u && u->GetTypeId() == TYPEID_PLAYER) 
-                                Talk(EMOTE_START, u->GetGUID());
+                            if (u && u->GetTypeId() == TYPEID_PLAYER)
+                                Talk(EMOTE_START, u);
                         }
                         Event_Timer = 60000;
                         Wave = true;
@@ -276,27 +273,30 @@ public:
                         Talk(EMOTE_COMPLETE);
                         if (someplayer)
                         {
-                            Unit* u = Unit::GetUnit(*me, someplayer);
-                            if (u && u->GetTypeId() == TYPEID_PLAYER)
-                                CAST_PLR(u)->KilledMonsterCredit(me->GetEntry(), me->GetGUID());
+                            if (Player* player = ObjectAccessor::GetPlayer(*me, someplayer))
+                                player->KilledMonsterCredit(me->GetEntry(), me->GetGUID());
                             DoCast(me, SPELL_DISABLE_VISUAL);
                         }
+
                         if (goConsole)
-                        {
                             if (GameObject* go = GameObject::GetGameObject(*me, goConsole))
                                 go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE);
-                        }
+
                         ++Phase;
                         break;
                 }
-            } else Event_Timer -= diff;
+            }
+            else
+                Event_Timer -= diff;
 
             if (Wave)
             {
                 if (Wave_Timer <= diff)
                 {
                     DoWaveSpawnForCreature(me);
-                } else Wave_Timer -= diff;
+                }
+                else
+                    Wave_Timer -= diff;
             }
         }
     };
@@ -306,13 +306,13 @@ public:
 ## go_manaforge_control_console
 ######*/
 
-//TODO: clean up this workaround when Trinity adds support to do it properly (with gossip selections instead of instant summon)
+/// @todo clean up this workaround when Trinity adds support to do it properly (with gossip selections instead of instant summon)
 class go_manaforge_control_console : public GameObjectScript
 {
 public:
     go_manaforge_control_console() : GameObjectScript("go_manaforge_control_console") { }
 
-    bool OnGossipHello(Player* player, GameObject* go)
+    bool OnGossipHello(Player* player, GameObject* go) OVERRIDE
     {
         if (go->GetGoType() == GAMEOBJECT_TYPE_QUESTGIVER)
         {
@@ -361,7 +361,7 @@ public:
 ######*/
 
 // The Speech of Dawnforge, Ardonis & Pathaleon
-enum eCommanderDawnforgeData
+enum CommanderDawnforgeData
 {
     SAY_COMMANDER_DAWNFORGE_1       = 0,
     SAY_COMMANDER_DAWNFORGE_2       = 1,
@@ -394,14 +394,14 @@ class npc_commander_dawnforge : public CreatureScript
 public:
     npc_commander_dawnforge() : CreatureScript("npc_commander_dawnforge") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
         return new npc_commander_dawnforgeAI(creature);
     }
 
     struct npc_commander_dawnforgeAI : public ScriptedAI
     {
-        npc_commander_dawnforgeAI(Creature* creature) : ScriptedAI(creature) { Reset(); }
+        npc_commander_dawnforgeAI(Creature* creature) : ScriptedAI(creature) { }
 
         uint64 PlayerGUID;
         uint64 ardonisGUID;
@@ -412,10 +412,7 @@ public:
         uint32 Phase_Timer;
         bool isEvent;
 
-        float angle_dawnforge;
-        float angle_ardonis;
-
-        void Reset()
+        void Reset() OVERRIDE
         {
             PlayerGUID = 0;
             ardonisGUID = 0;
@@ -427,9 +424,9 @@ public:
             isEvent = false;
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) OVERRIDE { }
 
-        void JustSummoned(Creature* summoned)
+        void JustSummoned(Creature* summoned) OVERRIDE
         {
             pathaleonGUID = summoned->GetGUID();
         }
@@ -437,23 +434,17 @@ public:
         // Emote Ardonis and Pathaleon
         void Turn_to_Pathaleons_Image()
         {
-            Creature* ardonis = Unit::GetCreature(*me, ardonisGUID);
-            Creature* pathaleon = Unit::GetCreature(*me, pathaleonGUID);
-            Player* player = Unit::GetPlayer(*me, PlayerGUID);
+            Creature* ardonis = ObjectAccessor::GetCreature(*me, ardonisGUID);
+            Creature* pathaleon = ObjectAccessor::GetCreature(*me, pathaleonGUID);
 
-            if (!ardonis || !pathaleon || !player)
+            if (!ardonis || !pathaleon)
                 return;
 
-            //Calculate the angle to Pathaleon
-            angle_dawnforge = me->GetAngle(pathaleon->GetPositionX(), pathaleon->GetPositionY());
-            angle_ardonis = ardonis->GetAngle(pathaleon->GetPositionX(), pathaleon->GetPositionY());
+            // Turn Dawnforge
+            me->SetFacingToObject(pathaleon);
 
-            //Turn Dawnforge and update
-            me->SetOrientation(angle_dawnforge);
-            me->SendUpdateToPlayer(player);
-            //Turn Ardonis and update
-            ardonis->SetOrientation(angle_ardonis);
-            ardonis->SendUpdateToPlayer(player);
+            // Turn Ardonis
+            ardonis->SetFacingToObject(pathaleon);
 
             //Set them to kneel
             me->SetStandState(UNIT_STAND_STATE_KNEEL);
@@ -463,22 +454,13 @@ public:
         //Set them back to each other
         void Turn_to_eachother()
         {
-            if (Unit* ardonis = Unit::GetUnit(*me, ardonisGUID))
+            if (Unit* ardonis = ObjectAccessor::GetUnit(*me, ardonisGUID))
             {
-                Player* player = Unit::GetPlayer(*me, PlayerGUID);
+                // Turn Dawnforge
+                me->SetFacingToObject(ardonis);
 
-                if (!player)
-                    return;
-
-                angle_dawnforge = me->GetAngle(ardonis->GetPositionX(), ardonis->GetPositionY());
-                angle_ardonis = ardonis->GetAngle(me->GetPositionX(), me->GetPositionY());
-
-                //Turn Dawnforge and update
-                me->SetOrientation(angle_dawnforge);
-                me->SendUpdateToPlayer(player);
-                //Turn Ardonis and update
-                ardonis->SetOrientation(angle_ardonis);
-                ardonis->SendUpdateToPlayer(player);
+                // Turn Ardonis
+                ardonis->SetFacingToObject(me);
 
                 //Set state
                 me->SetStandState(UNIT_STAND_STATE_STAND);
@@ -503,11 +485,11 @@ public:
                 return true;
             }
 
-            sLog->outDebug(LOG_FILTER_TSCR, "TSCR: npc_commander_dawnforge event already in progress, need to wait.");
+            TC_LOG_DEBUG("scripts", "npc_commander_dawnforge event already in progress, need to wait.");
             return false;
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             //Is event even running?
             if (!isEvent)
@@ -520,9 +502,9 @@ public:
                 return;
             }
 
-            Creature* ardonis = Creature::GetCreature(*me, ardonisGUID);
-            Creature* pathaleon = Creature::GetCreature(*me, pathaleonGUID);
-            Player* player = Unit::GetPlayer(*me, PlayerGUID);
+            Creature* ardonis = ObjectAccessor::GetCreature(*me, ardonisGUID);
+            Creature* pathaleon = ObjectAccessor::GetCreature(*me, pathaleonGUID);
+            Player* player = ObjectAccessor::GetPlayer(*me, PlayerGUID);
 
             if (!ardonis || !player)
             {
@@ -645,7 +627,7 @@ class at_commander_dawnforge : public AreaTriggerScript
 public:
     at_commander_dawnforge() : AreaTriggerScript("at_commander_dawnforge") { }
 
-    bool OnTrigger(Player* player, const AreaTriggerEntry* /*at*/)
+    bool OnTrigger(Player* player, const AreaTriggerEntry* /*at*/) OVERRIDE
     {
         //if player lost aura or not have at all, we should not try start event.
         if (!player->HasAura(SPELL_SUNFURY_DISGUISE))
@@ -667,7 +649,7 @@ public:
 /*######
 ## npc_professor_dabiri
 ######*/
-enum eProfessorDabiriData
+enum ProfessorDabiriData
 {
     SPELL_PHASE_DISTRUPTOR  = 35780,
 
@@ -684,11 +666,11 @@ class npc_professor_dabiri : public CreatureScript
 public:
     npc_professor_dabiri() : CreatureScript("npc_professor_dabiri") { }
 
-    //OnQuestAccept: 
+    //OnQuestAccept:
     //if (quest->GetQuestId() == QUEST_DIMENSIUS)
-        //creature->AI()->Talk(WHISPER_DABIRI, player->GetGUID());
+        //creature->AI()->Talk(WHISPER_DABIRI, player);
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) OVERRIDE
     {
         player->PlayerTalkClass->ClearMenus();
         if (action == GOSSIP_ACTION_INFO_DEF+1)
@@ -700,7 +682,7 @@ public:
         return true;
     }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) OVERRIDE
     {
         if (creature->IsQuestGiver())
             player->PrepareQuestMenu(creature->GetGUID());
@@ -718,7 +700,7 @@ public:
 ## npc_phase_hunter
 ######*/
 
-enum ePhaseHunterData
+enum PhaseHunterData
 {
     QUEST_RECHARGING_THE_BATTERIES  = 10190,
 
@@ -740,26 +722,33 @@ class npc_phase_hunter : public CreatureScript
 public:
     npc_phase_hunter() : CreatureScript("npc_phase_hunter") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new npc_phase_hunterAI (creature);
+        return new npc_phase_hunterAI(creature);
     }
 
     struct npc_phase_hunterAI : public ScriptedAI
     {
-        npc_phase_hunterAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_phase_hunterAI(Creature* creature) : ScriptedAI(creature)
+        {
+            Weak = false;
+            Materialize = false;
+            Drained = false;
+            WeakPercent = 25;
+            PlayerGUID = 0;
+            ManaBurnTimer = 5000;
+        }
 
         bool Weak;
         bool Materialize;
         bool Drained;
         uint8 WeakPercent;
 
-        Player* player;
         uint64 PlayerGUID;
 
         uint32 ManaBurnTimer;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             Weak = false;
             Materialize = false;
@@ -774,18 +763,18 @@ public:
                 me->UpdateEntry(NPC_PHASE_HUNTER_ENTRY);
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) OVERRIDE
         {
             if (who->GetTypeId() == TYPEID_PLAYER)
                 PlayerGUID = who->GetGUID();
         }
 
-        //void SpellHit(Unit* /*caster*/, const SpellInfo* /*spell*/)
+        //void SpellHit(Unit* /*caster*/, const SpellInfo* /*spell*/) OVERRIDE
         //{
         //    DoCast(me, SPELL_DE_MATERIALIZE);
         //}
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (!Materialize)
             {
@@ -822,7 +811,7 @@ public:
                     ManaBurnTimer = 3500;
             } else ManaBurnTimer -= diff;
 
-            if (Player* player = Unit::GetPlayer(*me, PlayerGUID)) // start: support for quest 10190
+            if (Player* player = ObjectAccessor::GetPlayer(*me, PlayerGUID)) // start: support for quest 10190
             {
                 if (!Weak && HealthBelowPct(WeakPercent)
                     && player->GetQuestStatus(QUEST_RECHARGING_THE_BATTERIES) == QUEST_STATUS_INCOMPLETE)
@@ -851,7 +840,7 @@ public:
 /*######
 ## npc_bessy
 ######*/
-enum eBessyData
+enum BessyData
 {
     Q_ALMABTRIEB    = 10337,
     N_THADELL       = 20464,
@@ -866,7 +855,7 @@ class npc_bessy : public CreatureScript
 public:
     npc_bessy() : CreatureScript("npc_bessy") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) OVERRIDE
     {
         if (quest->GetQuestId() == Q_ALMABTRIEB)
         {
@@ -877,22 +866,22 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
         return new npc_bessyAI(creature);
     }
 
     struct npc_bessyAI : public npc_escortAI
     {
-        npc_bessyAI(Creature* creature) : npc_escortAI(creature) {}
+        npc_bessyAI(Creature* creature) : npc_escortAI(creature) { }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) OVERRIDE
         {
             if (Player* player = GetPlayerForEscort())
                 player->FailQuest(Q_ALMABTRIEB);
         }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) OVERRIDE
         {
             Player* player = GetPlayerForEscort();
             if (!player)
@@ -916,17 +905,17 @@ public:
                     break;
                 case 13:
                     if (me->FindNearestCreature(N_THADELL, 30))
-                        Talk(SAY_THADELL_2, player->GetGUID());
+                        Talk(SAY_THADELL_2, player);
                     break;
             }
         }
 
-        void JustSummoned(Creature* summoned)
+        void JustSummoned(Creature* summoned) OVERRIDE
         {
             summoned->AI()->AttackStart(me);
         }
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             me->RestoreFaction();
         }
@@ -937,10 +926,10 @@ public:
 ## npc_maxx_a_million
 ######*/
 
-enum
+enum MaxxAMillion
 {
-    QUEST_MARK_V_IS_ALIVE = 10191,
-    GO_DRAENEI_MACHINE = 183771
+    QUEST_MARK_V_IS_ALIVE   = 10191,
+    GO_DRAENEI_MACHINE      = 183771
 };
 
 class npc_maxx_a_million_escort : public CreatureScript
@@ -948,25 +937,25 @@ class npc_maxx_a_million_escort : public CreatureScript
 public:
     npc_maxx_a_million_escort() : CreatureScript("npc_maxx_a_million_escort") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
         return new npc_maxx_a_million_escortAI(creature);
     }
 
     struct npc_maxx_a_million_escortAI : public npc_escortAI
     {
-        npc_maxx_a_million_escortAI(Creature* creature) : npc_escortAI(creature) {}
+        npc_maxx_a_million_escortAI(Creature* creature) : npc_escortAI(creature) { }
 
         bool bTake;
         uint32 uiTakeTimer;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             bTake=false;
             uiTakeTimer=3000;
         }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) OVERRIDE
         {
             Player* player = GetPlayerForEscort();
             if (!player)
@@ -981,7 +970,7 @@ public:
                     if (GetClosestGameObjectWithEntry(me, GO_DRAENEI_MACHINE, INTERACTION_DISTANCE))
                     {
                         // take the GO -> animation
-                        me->HandleEmote(EMOTE_STATE_LOOT);
+                        me->HandleEmoteCommand(EMOTE_STATE_LOOT);
                         SetEscortPaused(true);
                         bTake=true;
                     }
@@ -992,13 +981,13 @@ public:
             }
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) OVERRIDE
         {
             if (Player* player = GetPlayerForEscort())
                 player->FailQuest(QUEST_MARK_V_IS_ALIVE);
         }
 
-        void UpdateAI(const uint32 uiDiff)
+        void UpdateAI(uint32 uiDiff) OVERRIDE
         {
             npc_escortAI::UpdateAI(uiDiff);
 
@@ -1006,7 +995,7 @@ public:
             {
                 if (uiTakeTimer < uiDiff)
                 {
-                    me->HandleEmote(EMOTE_STATE_NONE);
+                    me->HandleEmoteCommand(EMOTE_STATE_NONE);
                     if (GameObject* go = GetClosestGameObjectWithEntry(me, GO_DRAENEI_MACHINE, INTERACTION_DISTANCE))
                     {
                         SetEscortPaused(false);
@@ -1022,7 +1011,7 @@ public:
         }
     };
 
-    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest) OVERRIDE
     {
         if (quest->GetQuestId() == QUEST_MARK_V_IS_ALIVE)
         {
@@ -1051,14 +1040,12 @@ class go_captain_tyralius_prison : public GameObjectScript
     public:
         go_captain_tyralius_prison() : GameObjectScript("go_captain_tyralius_prison") { }
 
-        bool OnGossipHello(Player* player, GameObject* go)
+        bool OnGossipHello(Player* player, GameObject* go) OVERRIDE
         {
+            go->UseDoorOrButton();
             if (Creature* tyralius = go->FindNearestCreature(NPC_CAPTAIN_TYRALIUS, 1.0f))
             {
-                go->UseDoorOrButton();
-
                 player->KilledMonsterCredit(NPC_CAPTAIN_TYRALIUS, 0);
-
                 tyralius->AI()->Talk(SAY_FREE);
                 tyralius->DespawnOrUnsummon(8000);
             }

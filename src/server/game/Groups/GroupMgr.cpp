@@ -49,7 +49,7 @@ uint32 GroupMgr::GenerateNewGroupDbStoreId()
 
     if (newStorageId == NextGroupDbStoreId)
     {
-        sLog->outError("Group storage ID overflow!! Can't continue, shutting down server. ");
+        TC_LOG_ERROR("misc", "Group storage ID overflow!! Can't continue, shutting down server. ");
         World::StopNow(ERROR_EXIT_CODE);
     }
 
@@ -87,7 +87,7 @@ uint32 GroupMgr::GenerateGroupId()
 {
     if (NextGroupId >= 0xFFFFFFFE)
     {
-        sLog->outError("Group guid overflow!! Can't continue, shutting down server. ");
+        TC_LOG_ERROR("misc", "Group guid overflow!! Can't continue, shutting down server. ");
         World::StopNow(ERROR_EXIT_CODE);
     }
     return NextGroupId++;
@@ -124,12 +124,11 @@ void GroupMgr::LoadGroups()
 
         //                                                        0              1           2             3                 4      5          6      7         8       9
         QueryResult result = CharacterDatabase.Query("SELECT g.leaderGuid, g.lootMethod, g.looterGuid, g.lootThreshold, g.icon1, g.icon2, g.icon3, g.icon4, g.icon5, g.icon6"
-            //  10         11          12         13              14            15         16           17
-            ", g.icon7, g.icon8, g.groupType, g.difficulty, g.raiddifficulty, g.guid, lfg.dungeon, lfg.state FROM groups g LEFT JOIN lfg_data lfg ON lfg.guid = g.guid ORDER BY g.guid ASC");
+            //  10         11          12         13              14                  15            16        17          18
+            ", g.icon7, g.icon8, g.groupType, g.difficulty, g.raiddifficulty, g.masterLooterGuid, g.guid, lfg.dungeon, lfg.state FROM groups g LEFT JOIN lfg_data lfg ON lfg.guid = g.guid ORDER BY g.guid ASC");
         if (!result)
         {
-            sLog->outString(">> Loaded 0 group definitions. DB table `groups` is empty!");
-            sLog->outString();
+            TC_LOG_INFO("server.loading", ">> Loaded 0 group definitions. DB table `groups` is empty!");
             return;
         }
 
@@ -154,11 +153,10 @@ void GroupMgr::LoadGroups()
         }
         while (result->NextRow());
 
-        sLog->outString(">> Loaded %u group definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-        sLog->outString();
+        TC_LOG_INFO("server.loading", ">> Loaded %u group definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
     }
 
-    sLog->outString("Loading Group members...");
+    TC_LOG_INFO("server.loading", "Loading Group members...");
     {
         uint32 oldMSTime = getMSTime();
 
@@ -172,8 +170,7 @@ void GroupMgr::LoadGroups()
         QueryResult result = CharacterDatabase.Query("SELECT guid, memberGuid, memberFlags, subgroup, roles FROM group_member ORDER BY guid");
         if (!result)
         {
-            sLog->outString(">> Loaded 0 group members. DB table `group_member` is empty!");
-            sLog->outString();
+            TC_LOG_INFO("server.loading", ">> Loaded 0 group members. DB table `group_member` is empty!");
             return;
         }
 
@@ -187,17 +184,16 @@ void GroupMgr::LoadGroups()
             if (group)
                 group->LoadMemberFromDB(fields[1].GetUInt32(), fields[2].GetUInt8(), fields[3].GetUInt8(), fields[4].GetUInt8());
             else
-                sLog->outError("GroupMgr::LoadGroups: Consistency failed, can't find group (storage id: %u)", fields[0].GetUInt32());
+                TC_LOG_ERROR("misc", "GroupMgr::LoadGroups: Consistency failed, can't find group (storage id: %u)", fields[0].GetUInt32());
 
             ++count;
         }
         while (result->NextRow());
 
-        sLog->outString(">> Loaded %u group members in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-        sLog->outString();
+        TC_LOG_INFO("server.loading", ">> Loaded %u group members in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
     }
 
-    sLog->outString("Loading Group instance saves...");
+    TC_LOG_INFO("server.loading", "Loading Group instance saves...");
     {
         uint32 oldMSTime = getMSTime();
         //                                                   0           1        2              3             4             5            6
@@ -206,8 +202,7 @@ void GroupMgr::LoadGroups()
             "LEFT JOIN character_instance ci LEFT JOIN groups g ON g.leaderGuid = ci.guid ON ci.instance = gi.instance AND ci.permanent = 1 GROUP BY gi.instance ORDER BY gi.guid");
         if (!result)
         {
-            sLog->outString(">> Loaded 0 group-instance saves. DB table `group_instance` is empty!");
-            sLog->outString();
+            TC_LOG_INFO("server.loading", ">> Loaded 0 group-instance saves. DB table `group_instance` is empty!");
             return;
         }
 
@@ -221,14 +216,14 @@ void GroupMgr::LoadGroups()
             MapEntry const* mapEntry = sMapStore.LookupEntry(fields[1].GetUInt16());
             if (!mapEntry || !mapEntry->IsDungeon())
             {
-                sLog->outErrorDb("Incorrect entry in group_instance table : no dungeon map %d", fields[1].GetUInt16());
+                TC_LOG_ERROR("sql.sql", "Incorrect entry in group_instance table : no dungeon map %d", fields[1].GetUInt16());
                 continue;
             }
 
             uint32 diff = fields[4].GetUInt8();
             if (diff >= uint32(mapEntry->IsRaid() ? MAX_RAID_DIFFICULTY : MAX_DUNGEON_DIFFICULTY))
             {
-                sLog->outErrorDb("Wrong dungeon difficulty use in group_instance table: %d", diff + 1);
+                TC_LOG_ERROR("sql.sql", "Wrong dungeon difficulty use in group_instance table: %d", diff + 1);
                 diff = 0;                                   // default for both difficaly types
             }
 
@@ -238,7 +233,6 @@ void GroupMgr::LoadGroups()
         }
         while (result->NextRow());
 
-        sLog->outString(">> Loaded %u group-instance saves in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-        sLog->outString();
+        TC_LOG_INFO("server.loading", ">> Loaded %u group-instance saves in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
     }
 }

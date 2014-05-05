@@ -1,19 +1,20 @@
 /*
+ * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation; either version 2 of the License, or (at your
+ * option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #define _CRT_SECURE_NO_DEPRECATE
@@ -77,8 +78,19 @@ uint32 const Builds[] = {13164, 13205, 13287, 13329, 13596, 13623, 13914, 14007,
 #define LAST_DBC_IN_DATA_BUILD 13623    // after this build mpqs with dbc are back to locale folder
 #define NEW_BASE_SET_BUILD  15211
 
-char* const Locales[] = {"enGB", "enUS", "deDE", "esES", "frFR", "koKR", "zhCN", "zhTW", "enCN", "enTW", "esMX", "ruRU"};
-TCHAR* const LocalesT[] =
+#define LOCALES_COUNT 12
+
+char const* Locales[LOCALES_COUNT] =
+{
+    "enGB", "enUS",
+    "deDE", "esES",
+    "frFR", "koKR",
+    "zhCN", "zhTW",
+    "enCN", "enTW",
+    "esMX", "ruRU"
+};
+
+TCHAR const* LocalesT[LOCALES_COUNT] =
 {
     _T("enGB"), _T("enUS"),
     _T("deDE"), _T("esES"),
@@ -87,8 +99,6 @@ TCHAR* const LocalesT[] =
     _T("enCN"), _T("enTW"),
     _T("esMX"), _T("ruRU"),
 };
-
-#define LOCALES_COUNT 12
 
 typedef struct
 {
@@ -117,10 +127,14 @@ bool LoadLocaleMPQFile(int locale)
     if (!SFileOpenArchive(buff, 0, MPQ_OPEN_READ_ONLY, &LocaleMpq))
     {
         if (GetLastError() != ERROR_PATH_NOT_FOUND)
+        {
+            _tprintf(_T("Loading %s locale MPQs\n"), LocalesT[locale]);
             _tprintf(_T("Cannot open archive %s\n"), buff);
+        }
         return false;
     }
 
+    _tprintf(_T("Loading %s locale MPQs\n"), LocalesT[locale]);
     char const* prefix = NULL;
     for (int i = 0; Builds[i] && Builds[i] <= CONF_TargetBuild; ++i)
     {
@@ -149,6 +163,7 @@ bool LoadLocaleMPQFile(int locale)
         }
     }
 
+    printf("\n");
     return true;
 }
 
@@ -156,6 +171,7 @@ void LoadCommonMPQFiles(uint32 build)
 {
     TCHAR filename[512];
     _stprintf(filename, _T("%sworld.MPQ"), input_path);
+    _tprintf(_T("Loading common MPQ files\n"));
     if (!SFileOpenArchive(filename, 0, MPQ_OPEN_READ_ONLY, &WorldMpq))
     {
         if (GetLastError() != ERROR_PATH_NOT_FOUND)
@@ -178,29 +194,7 @@ void LoadCommonMPQFiles(uint32 build)
                 _tprintf(_T("Not found %s\n"), filename);
         }
         else
-        {
             _tprintf(_T("Loaded %s\n"), filename);
-
-            bool found = false;
-            int count = 0;
-            SFILE_FIND_DATA data;
-            HANDLE find = SFileFindFirstFile(WorldMpq, "*.*", &data, NULL);
-            if (find != NULL)
-            {
-                do
-                {
-                    ++count;
-                    if (data.dwFileFlags & MPQ_FILE_PATCH_FILE)
-                    {
-                        found = true;
-                        break;
-                    }
-                }
-                while (SFileFindNextFile(find, &data));
-            }
-            SFileFindClose(find);
-            printf("Scanned %d files, found patch = %d\n", count, found);
-        }
     }
 
     char const* prefix = NULL;
@@ -232,32 +226,10 @@ void LoadCommonMPQFiles(uint32 build)
             continue;
         }
         else
-        {
             _tprintf(_T("Loaded %s\n"), filename);
-
-
-            bool found = false;
-            int count = 0;
-            SFILE_FIND_DATA data;
-            HANDLE find = SFileFindFirstFile(WorldMpq, "*.*", &data, NULL);
-            if (find != NULL)
-            {
-                do
-                {
-                    ++count;
-                    if (data.dwFileFlags & MPQ_FILE_PATCH_FILE)
-                    {
-                        found = true;
-                        break;
-                    }
-                }
-                while (SFileFindNextFile(find, &data));
-            }
-            SFileFindClose(find);
-            printf("Scanned %d files, found patch = %d\n", count, found);
-        }
     }
 
+    printf("\n");
 }
 
 
@@ -338,22 +310,22 @@ bool ExtractSingleWmo(std::string& fname)
     char szLocalFile[1024];
     const char * plain_name = GetPlainName(fname.c_str());
     sprintf(szLocalFile, "%s/%s", szWorkDirWmo, plain_name);
-    fixnamen(szLocalFile,strlen(szLocalFile));
+    FixNameCase(szLocalFile,strlen(szLocalFile));
 
     if (FileExists(szLocalFile))
         return true;
 
     int p = 0;
-    //Select root wmo files
+    // Select root wmo files
     char const* rchr = strrchr(plain_name, '_');
-    if(rchr != NULL)
+    if (rchr != NULL)
     {
         char cpy[4];
-        strncpy((char*)cpy, rchr, 4);
+        memcpy(cpy, rchr, 4);
         for (int i = 0; i < 4; ++i)
         {
             int m = cpy[i];
-            if(isdigit(m))
+            if (isdigit(m))
                 p++;
         }
     }
@@ -389,7 +361,7 @@ bool ExtractSingleWmo(std::string& fname)
             sprintf(groupFileName, "%s_%03u.wmo", temp, i);
             //printf("Trying to open groupfile %s\n",groupFileName);
 
-            string s = groupFileName;
+            std::string s = groupFileName;
             WMOGroup fgroup(s);
             if(!fgroup.open())
             {
@@ -453,36 +425,6 @@ void getGamePath()
 #endif
 }
 
-bool scan_patches(char* scanmatch, std::vector<std::string>& pArchiveNames)
-{
-    int i;
-    char path[512];
-
-    for (i = 1; i <= 99; i++)
-    {
-        if (i != 1)
-        {
-            sprintf(path, "%s-%d.MPQ", scanmatch, i);
-        }
-        else
-        {
-            sprintf(path, "%s.MPQ", scanmatch);
-        }
-#ifdef __linux__
-        if(FILE* h = fopen64(path, "rb"))
-#else
-        if(FILE* h = fopen(path, "rb"))
-#endif
-        {
-            fclose(h);
-            //matches.push_back(path);
-            pArchiveNames.push_back(path);
-        }
-    }
-
-    return(true);
-}
-
 bool processArgv(int argc, char ** argv, const char *versionString)
 {
     bool result = true;
@@ -501,7 +443,7 @@ bool processArgv(int argc, char ** argv, const char *versionString)
             {
                 hasInputPathParam = true;
                 strcpy(input_path, argv[i+1]);
-                if (input_path[strlen(input_path) - 1] != '\\' || input_path[strlen(input_path) - 1] != '/')
+                if (input_path[strlen(input_path) - 1] != '\\' && input_path[strlen(input_path) - 1] != '/')
                     strcat(input_path, "/");
                 ++i;
             }
@@ -537,7 +479,7 @@ bool processArgv(int argc, char ** argv, const char *versionString)
         printf("   -s : (default) small size (data size optimization), ~500MB less vmap data.\n");
         printf("   -l : large size, ~500MB more vmap data. (might contain more details)\n");
         printf("   -d <path>: Path to the vector data source folder.\n");
-        printf("   -b : target build (default %u)", CONF_TargetBuild);
+        printf("   -b : target build (default %u)\n", CONF_TargetBuild);
         printf("   -? : This message.\n");
     }
 
@@ -577,24 +519,21 @@ int main(int argc, char ** argv)
             printf("Your output directory seems to be polluted, please use an empty directory!\n");
             printf("<press return to exit>");
             char garbage[2];
-            scanf("%c", garbage);
-            return 1;
+            return scanf("%c", garbage);
         }
     }
 
-    printf("Extract %s. Beginning work ....\n",versionString);
+    printf("Extract %s. Beginning work ....\n\n",versionString);
     //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
     // Create the working directory
     if (mkdir(szWorkDirWmo
-#ifdef __linux__
+#if defined(__linux__) || defined(__APPLE__)
                     , 0711
 #endif
                     ))
             success = (errno == EEXIST);
 
     LoadCommonMPQFiles(CONF_TargetBuild);
-
-    int FirstLocale = -1;
 
     for (int i = 0; i < LOCALES_COUNT; ++i)
     {
@@ -606,7 +545,7 @@ int main(int argc, char ** argv)
             continue;
         }
 
-        printf("Detected and using locale locale: %s\n", Locales[i]);
+        printf("Detected and using locale: %s\n", Locales[i]);
         break;
     }
 
@@ -641,7 +580,7 @@ int main(int argc, char ** argv)
         ParsMapFiles();
         delete [] map_ids;
         //nError = ERROR_SUCCESS;
-        // Extract models, listed in DameObjectDisplayInfo.dbc
+        // Extract models, listed in GameObjectDisplayInfo.dbc
         ExtractGameobjectModels();
     }
 

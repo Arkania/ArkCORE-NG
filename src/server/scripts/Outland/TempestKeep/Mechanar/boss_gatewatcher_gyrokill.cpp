@@ -1,7 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
- * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -18,9 +17,9 @@
  */
 
 /* ScriptData
-SDName: Boss_Gatewatcher_Gyrokill
-SD%Complete: 0
-SDComment: Place Holder
+SDName: boss_gatewatcher_gyrokill
+SD%Complete: 99%
+SDComment:
 SDCategory: Tempest Keep, The Mechanar
 EndScriptData */
 
@@ -61,13 +60,13 @@ class boss_gatewatcher_gyrokill : public CreatureScript
         {
             boss_gatewatcher_gyrokillAI(Creature* creature) : BossAI(creature, DATA_GATEWATCHER_GYROKILL) { }
 
-            void JustDied(Unit* /*killer*/)
+            void JustDied(Unit* /*killer*/) OVERRIDE
             {
                 _JustDied();
                 Talk(SAY_DEATH);
             }
 
-            void EnterCombat(Unit* /*who*/)
+            void EnterCombat(Unit* /*who*/) OVERRIDE
             {
                 _EnterCombat();
                 events.ScheduleEvent(EVENT_STREAM_OF_MACHINE_FLUID, 10000);
@@ -76,12 +75,12 @@ class boss_gatewatcher_gyrokill : public CreatureScript
                 Talk(SAY_AGGRO);
             }
 
-            void KilledUnit(Unit* /*victim*/)
+            void KilledUnit(Unit* /*victim*/) OVERRIDE
             {
                 Talk(SAY_SLAY);
             }
 
-            void UpdateAI(uint32 diff)
+            void UpdateAI(uint32 diff) OVERRIDE
             {
                 if (!UpdateVictim())
                     return;
@@ -117,7 +116,7 @@ class boss_gatewatcher_gyrokill : public CreatureScript
             }
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const OVERRIDE
         {
             return new boss_gatewatcher_gyrokillAI(creature);
         }

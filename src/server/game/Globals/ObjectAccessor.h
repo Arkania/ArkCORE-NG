@@ -41,6 +41,7 @@ class WorldObject;
 class Vehicle;
 class Map;
 class WorldRunnable;
+class Transport;
 
 template <class T>
 class HashMapHolder
@@ -75,7 +76,7 @@ class HashMapHolder
 
     private:
         //Non instanceable only static
-        HashMapHolder() {}
+        HashMapHolder() { }
 
         static LockType i_lock;
         static MapType m_objectMap;
@@ -91,7 +92,7 @@ class ObjectAccessor
         ObjectAccessor& operator=(const ObjectAccessor&);
 
     public:
-        // TODO: override these template functions for each holder type and add assertions
+        /// @todo: Override these template functions for each holder type and add assertions
 
         template<class T> static T* GetObjectInOrOutOfWorld(uint64 guid, T* /*typeSpecifier*/)
         {
@@ -139,41 +140,16 @@ class ObjectAccessor
             return NULL;
         }
 
-        template<class T> static T* GetObjectInWorld(uint32 mapid, float x, float y, uint64 guid, T* /*fake*/)
-        {
-            T* obj = HashMapHolder<T>::Find(guid);
-            if (!obj || obj->GetMapId() != mapid)
-                return NULL;
-
-            CellCoord p = Trinity::ComputeCellCoord(x, y);
-            if (!p.IsCoordValid())
-            {
-                sLog->outError("ObjectAccessor::GetObjectInWorld: invalid coordinates supplied X:%f Y:%f grid cell [%u:%u]", x, y, p.x_coord, p.y_coord);
-                return NULL;
-            }
-
-            CellCoord q = Trinity::ComputeCellCoord(obj->GetPositionX(), obj->GetPositionY());
-            if (!q.IsCoordValid())
-            {
-                sLog->outError("ObjectAccessor::GetObjecInWorld: object (GUID: %u TypeId: %u) has invalid coordinates X:%f Y:%f grid cell [%u:%u]", obj->GetGUIDLow(), obj->GetTypeId(), obj->GetPositionX(), obj->GetPositionY(), q.x_coord, q.y_coord);
-                return NULL;
-            }
-
-            int32 dx = int32(p.x_coord) - int32(q.x_coord);
-            int32 dy = int32(p.y_coord) - int32(q.y_coord);
-
-            if (dx > -2 && dx < 2 && dy > -2 && dy < 2)
-                return obj;
-            else
-                return NULL;
-        }
+        template<class T> static T* GetObjectInWorld(uint32 mapid, float x, float y, uint64 guid, T* /*fake*/);
 
         // these functions return objects only if in map of specified object
         static WorldObject* GetWorldObject(WorldObject const&, uint64);
         static Object* GetObjectByTypeMask(WorldObject const&, uint64, uint32 typemask);
         static Corpse* GetCorpse(WorldObject const& u, uint64 guid);
         static GameObject* GetGameObject(WorldObject const& u, uint64 guid);
+        static Transport* GetTransport(WorldObject const& u, uint64 guid);
         static DynamicObject* GetDynamicObject(WorldObject const& u, uint64 guid);
+        static AreaTrigger* GetAreaTrigger(WorldObject const& u, uint64 guid);
         static Unit* GetUnit(WorldObject const&, uint64 guid);
         static Creature* GetCreature(WorldObject const& u, uint64 guid);
         static Pet* GetPet(WorldObject const&, uint64 guid);

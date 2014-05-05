@@ -36,12 +36,15 @@ HostileRefManager::~HostileRefManager()
 
 void HostileRefManager::threatAssist(Unit* victim, float baseThreat, SpellInfo const* threatSpell)
 {
+    if (getSize() == 0)
+        return;
+
     HostileReference* ref = getFirst();
     float threat = ThreatCalcHelper::calcThreat(victim, iOwner, baseThreat, (threatSpell ? threatSpell->GetSchoolMask() : SPELL_SCHOOL_MASK_NORMAL), threatSpell);
     threat /= getSize();
     while (ref)
     {
-        if (ThreatCalcHelper::isValidProcess(victim, ref->GetSource()->getOwner(), threatSpell))
+        if (ThreatCalcHelper::isValidProcess(victim, ref->GetSource()->GetOwner(), threatSpell))
             ref->GetSource()->doAddThreat(victim, threat);
 
         ref = ref->next();
@@ -131,7 +134,7 @@ void HostileRefManager::deleteReferencesForFaction(uint32 faction)
     while (ref)
     {
         HostileReference* nextRef = ref->next();
-        if (ref->GetSource()->getOwner()->getFactionTemplateEntry()->faction == faction)
+        if (ref->GetSource()->GetOwner()->GetFactionTemplateEntry()->faction == faction)
         {
             ref->removeReference();
             delete ref;
@@ -149,7 +152,7 @@ void HostileRefManager::deleteReference(Unit* creature)
     while (ref)
     {
         HostileReference* nextRef = ref->next();
-        if (ref->GetSource()->getOwner() == creature)
+        if (ref->GetSource()->GetOwner() == creature)
         {
             ref->removeReference();
             delete ref;
@@ -168,7 +171,7 @@ void HostileRefManager::setOnlineOfflineState(Unit* creature, bool isOnline)
     while (ref)
     {
         HostileReference* nextRef = ref->next();
-        if (ref->GetSource()->getOwner() == creature)
+        if (ref->GetSource()->GetOwner() == creature)
         {
             ref->setOnlineOfflineState(isOnline);
             break;
@@ -185,7 +188,7 @@ void HostileRefManager::UpdateVisibility()
     while (ref)
     {
         HostileReference* nextRef = ref->next();
-        if (!ref->GetSource()->getOwner()->canSeeOrDetect(getOwner()))
+        if (!ref->GetSource()->GetOwner()->CanSeeOrDetect(GetOwner()))
         {
             nextRef = ref->next();
             ref->removeReference();

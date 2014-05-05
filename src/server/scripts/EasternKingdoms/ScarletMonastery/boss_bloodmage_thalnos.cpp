@@ -27,12 +27,15 @@ EndScriptData */
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 
-enum eEnums
+enum Yells
 {
     SAY_AGGRO               = 0,
     SAY_HEALTH              = 1,
-    SAY_KILL                = 2,
+    SAY_KILL                = 2
+};
 
+enum Spells
+{
     SPELL_FLAMESHOCK        = 8053,
     SPELL_SHADOWBOLT        = 1106,
     SPELL_FLAMESPIKE        = 8814,
@@ -44,14 +47,14 @@ class boss_bloodmage_thalnos : public CreatureScript
 public:
     boss_bloodmage_thalnos() : CreatureScript("boss_bloodmage_thalnos") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new boss_bloodmage_thalnosAI (creature);
+        return new boss_bloodmage_thalnosAI(creature);
     }
 
     struct boss_bloodmage_thalnosAI : public ScriptedAI
     {
-        boss_bloodmage_thalnosAI(Creature* creature) : ScriptedAI(creature) {}
+        boss_bloodmage_thalnosAI(Creature* creature) : ScriptedAI(creature) { }
 
         bool HpYell;
         uint32 FlameShock_Timer;
@@ -59,7 +62,7 @@ public:
         uint32 FlameSpike_Timer;
         uint32 FireNova_Timer;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             HpYell = false;
             FlameShock_Timer = 10000;
@@ -68,17 +71,17 @@ public:
             FireNova_Timer = 40000;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) OVERRIDE
         {
             Talk(SAY_AGGRO);
         }
 
-        void KilledUnit(Unit* /*Victim*/)
+        void KilledUnit(Unit* /*Victim*/) OVERRIDE
         {
             Talk(SAY_KILL);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (!UpdateVictim())
                 return;
@@ -93,7 +96,7 @@ public:
             //FlameShock_Timer
             if (FlameShock_Timer <= diff)
             {
-                DoCast(me->GetVictim(), SPELL_FLAMESHOCK);
+                DoCastVictim(SPELL_FLAMESHOCK);
                 FlameShock_Timer = urand(10000, 15000);
             }
             else FlameShock_Timer -= diff;
@@ -101,7 +104,7 @@ public:
             //FlameSpike_Timer
             if (FlameSpike_Timer <= diff)
             {
-                DoCast(me->GetVictim(), SPELL_FLAMESPIKE);
+                DoCastVictim(SPELL_FLAMESPIKE);
                 FlameSpike_Timer = 30000;
             }
             else FlameSpike_Timer -= diff;
@@ -109,7 +112,7 @@ public:
             //FireNova_Timer
             if (FireNova_Timer <= diff)
             {
-                DoCast(me->GetVictim(), SPELL_FIRENOVA);
+                DoCastVictim(SPELL_FIRENOVA);
                 FireNova_Timer = 40000;
             }
             else FireNova_Timer -= diff;
@@ -117,7 +120,7 @@ public:
             //ShadowBolt_Timer
             if (ShadowBolt_Timer <= diff)
             {
-                DoCast(me->GetVictim(), SPELL_SHADOWBOLT);
+                DoCastVictim(SPELL_SHADOWBOLT);
                 ShadowBolt_Timer = 2000;
             }
             else ShadowBolt_Timer -= diff;

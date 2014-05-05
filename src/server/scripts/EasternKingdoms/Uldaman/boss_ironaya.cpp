@@ -46,34 +46,34 @@ class boss_ironaya : public CreatureScript
 
         struct boss_ironayaAI : public ScriptedAI
         {
-            boss_ironayaAI(Creature* creature) : ScriptedAI(creature) {}
+            boss_ironayaAI(Creature* creature) : ScriptedAI(creature) { }
 
             uint32 uiArcingTimer;
-            bool bHasCastedWstomp;
-            bool bHasCastedKnockaway;
+            bool bHasCastWstomp;
+            bool bHasCastKnockaway;
 
-            void Reset()
+            void Reset() OVERRIDE
             {
                 uiArcingTimer = 3000;
-                bHasCastedKnockaway = false;
-                bHasCastedWstomp = false;
+                bHasCastKnockaway = false;
+                bHasCastWstomp = false;
             }
 
-            void EnterCombat(Unit* /*who*/)
+            void EnterCombat(Unit* /*who*/) OVERRIDE
             {
                 Talk(SAY_AGGRO);
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(uint32 uiDiff) OVERRIDE
             {
                 //Return since we have no target
                 if (!UpdateVictim())
                     return;
 
                 //If we are <50% hp do knockaway ONCE
-                if (!bHasCastedKnockaway && HealthBelowPct(50))
+                if (!bHasCastKnockaway && HealthBelowPct(50))
                 {
-                    DoCast(me->GetVictim(), SPELL_KNOCKAWAY, true);
+                    DoCastVictim(SPELL_KNOCKAWAY, true);
 
                     // current aggro target is knocked away pick new target
                     Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 0);
@@ -85,7 +85,7 @@ class boss_ironaya : public CreatureScript
                         me->TauntApply(target);
 
                     //Shouldn't cast this agian
-                    bHasCastedKnockaway = true;
+                    bHasCastKnockaway = true;
                 }
 
                 //uiArcingTimer
@@ -95,17 +95,17 @@ class boss_ironaya : public CreatureScript
                     uiArcingTimer = 13000;
                 } else uiArcingTimer -= uiDiff;
 
-                if (!bHasCastedWstomp && HealthBelowPct(25))
+                if (!bHasCastWstomp && HealthBelowPct(25))
                 {
                     DoCast(me, SPELL_WSTOMP);
-                    bHasCastedWstomp = true;
+                    bHasCastWstomp = true;
                 }
 
                 DoMeleeAttackIfReady();
             }
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const OVERRIDE
         {
             return new boss_ironayaAI(creature);
         }

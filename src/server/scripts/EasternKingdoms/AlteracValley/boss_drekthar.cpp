@@ -46,7 +46,7 @@ public:
 
     struct boss_drektharAI : public ScriptedAI
     {
-        boss_drektharAI(Creature* creature) : ScriptedAI(creature) {}
+        boss_drektharAI(Creature* creature) : ScriptedAI(creature) { }
 
         uint32 WhirlwindTimer;
         uint32 Whirlwind2Timer;
@@ -55,7 +55,7 @@ public:
         uint32 YellTimer;
         uint32 ResetTimer;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             WhirlwindTimer    = urand(1 * IN_MILLISECONDS, 20 * IN_MILLISECONDS);
             Whirlwind2Timer   = urand(1 * IN_MILLISECONDS, 20 * IN_MILLISECONDS);
@@ -65,43 +65,43 @@ public:
             YellTimer         = urand(20 * IN_MILLISECONDS, 30 * IN_MILLISECONDS); //20 to 30 seconds
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) OVERRIDE
         {
             Talk(YELL_AGGRO);
         }
 
-        void JustRespawned()
+        void JustRespawned() OVERRIDE
         {
             Reset();
             Talk(YELL_RESPAWN);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (!UpdateVictim())
                 return;
 
             if (WhirlwindTimer <= diff)
             {
-                DoCast(me->GetVictim(), SPELL_WHIRLWIND);
+                DoCastVictim(SPELL_WHIRLWIND);
                 WhirlwindTimer =  urand(8 * IN_MILLISECONDS, 18 * IN_MILLISECONDS);
             } else WhirlwindTimer -= diff;
 
             if (Whirlwind2Timer <= diff)
             {
-                DoCast(me->GetVictim(), SPELL_WHIRLWIND2);
+                DoCastVictim(SPELL_WHIRLWIND2);
                 Whirlwind2Timer = urand(7 * IN_MILLISECONDS, 25 * IN_MILLISECONDS);
             } else Whirlwind2Timer -= diff;
 
             if (KnockdownTimer <= diff)
             {
-                DoCast(me->GetVictim(), SPELL_KNOCKDOWN);
+                DoCastVictim(SPELL_KNOCKDOWN);
                 KnockdownTimer = urand(10 * IN_MILLISECONDS, 15 * IN_MILLISECONDS);
             } else KnockdownTimer -= diff;
 
             if (FrenzyTimer <= diff)
             {
-                DoCast(me->GetVictim(), SPELL_FRENZY);
+                DoCastVictim(SPELL_FRENZY);
                 FrenzyTimer = urand(20 * IN_MILLISECONDS, 30 * IN_MILLISECONDS);
             } else FrenzyTimer -= diff;
 
@@ -126,7 +126,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
         return new boss_drektharAI(creature);
     }

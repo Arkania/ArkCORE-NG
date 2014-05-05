@@ -276,7 +276,7 @@ class npc_highlord_darion_mograine : public CreatureScript
 public:
     npc_highlord_darion_mograine() : CreatureScript("npc_highlord_darion_mograine") { }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) OVERRIDE
     {
         player->PlayerTalkClass->ClearMenus();
         switch (action)
@@ -290,7 +290,7 @@ public:
         return true;
     }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) OVERRIDE
     {
         if (creature->IsQuestGiver())
             player->PrepareQuestMenu(creature->GetGUID());
@@ -303,7 +303,7 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
         return new npc_highlord_darion_mograineAI(creature);
     }
@@ -312,6 +312,23 @@ public:
     {
         npc_highlord_darion_mograineAI(Creature* creature) : npc_escortAI(creature)
         {
+            uiTirionGUID = 0;
+            uiKorfaxGUID = 0;
+            uiMaxwellGUID = 0;
+            uiEligorGUID = 0;
+            uiRayneGUID = 0;
+            uiKoltiraGUID = 0;
+            uiOrbazGUID = 0;
+            uiThassarianGUID = 0;
+            uiLichKingGUID = 0;
+
+            memset(uiDefenderGUID, 0, sizeof(uiDefenderGUID));
+            memset(uiEarthshatterGUID, 0, sizeof(uiEarthshatterGUID));
+            memset(uiAbominationGUID, 0, sizeof(uiAbominationGUID));
+            memset(uiBehemothGUID, 0, sizeof(uiBehemothGUID));
+            memset(uiGhoulGUID, 0, sizeof(uiGhoulGUID));
+            memset(uiWarriorGUID, 0, sizeof(uiWarriorGUID));
+
             Reset();
         }
 
@@ -354,7 +371,7 @@ public:
         uint64 uiGhoulGUID[ENCOUNTER_GHOUL_NUMBER];
         uint64 uiWarriorGUID[ENCOUNTER_WARRIOR_NUMBER];
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             if (!HasEscortState(STATE_ESCORT_ESCORTING))
             {
@@ -454,7 +471,7 @@ public:
             }
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) OVERRIDE
         {
             if (!who)
                 return;
@@ -471,7 +488,8 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) OVERRIDE
+
         {
             if (!who)
                 return;
@@ -486,7 +504,7 @@ public:
             SetEscortPaused(bOnHold);
         }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) OVERRIDE
         {
             switch (waypointId)
             {
@@ -584,7 +602,7 @@ public:
                     break;
                 case 6:
                     SetHoldState(true);
-                    me->HandleEmote(EMOTE_ONESHOT_SPECIALATTACK1H);
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_SPECIALATTACK1H);
                     JumpToNextStep(1000);
                     break;
                 case 7:
@@ -601,13 +619,13 @@ public:
             }
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() OVERRIDE
         {
             if (!bIsBattle)//do not reset self if we are in battle
                 npc_escortAI::EnterEvadeMode();
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             npc_escortAI::UpdateAI(diff);
 
@@ -937,7 +955,7 @@ public:
                         case 35: // Lich king counterattacks
                             if (Creature* temp = Unit::GetCreature(*me, uiLichKingGUID))
                             {
-                                temp->HandleEmote(EMOTE_ONESHOT_KICK);
+                                temp->HandleEmoteCommand(EMOTE_ONESHOT_KICK);
                                 temp->AI()->Talk(SAY_LIGHT_OF_DAWN46);
                             }
                             me->SetSpeed(MOVE_RUN, 6.0f);
@@ -1028,7 +1046,7 @@ public:
                                     temp->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_ATTACK_UNARMED);
                                     temp->SetWalk(false);
                                     temp->SetSpeed(MOVE_RUN, 2.0f);
-                                    temp->HandleEmote(EMOTE_STATE_ATTACK_UNARMED);
+                                    temp->HandleEmoteCommand(EMOTE_STATE_ATTACK_UNARMED);
                                     temp->GetMotionMaster()->MovePoint(0, fLichPositionX, fLichPositionY, fLichPositionZ);
                                 }
                                 if (Creature* temp = Unit::GetCreature(*me, uiEligorGUID))
@@ -1127,7 +1145,7 @@ public:
                                 if (temp->HasAura(SPELL_REBIRTH_OF_THE_ASHBRINGER, 0))
                                     temp->RemoveAurasDueToSpell(SPELL_REBIRTH_OF_THE_ASHBRINGER);
                                 temp->CastSpell(temp, 41542, false); // workarounds, light expoded, makes it cool
-                                temp->HandleEmote(EMOTE_ONESHOT_ROAR);
+                                temp->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
                             }
                             if (Creature* temp = Unit::GetCreature(*me, uiLichKingGUID))
                                 temp->InterruptNonMeleeSpells(false);
@@ -1344,25 +1362,25 @@ public:
 
                 if (uiDeath_strike <= diff)
                 {
-                    DoCast(me->GetVictim(), SPELL_DEATH_STRIKE);
+                    DoCastVictim(SPELL_DEATH_STRIKE);
                     uiDeath_strike = urand(5000, 10000);
                 } else uiDeath_strike -= diff;
 
                 if (uiDeath_embrace <= diff)
                 {
-                    DoCast(me->GetVictim(), SPELL_DEATH_EMBRACE);
+                    DoCastVictim(SPELL_DEATH_EMBRACE);
                     uiDeath_embrace = urand(5000, 10000);
                 } else uiDeath_embrace -= diff;
 
                 if (uiIcy_touch <= diff)
                 {
-                    DoCast(me->GetVictim(), SPELL_ICY_TOUCH1);
+                    DoCastVictim(SPELL_ICY_TOUCH1);
                     uiIcy_touch = urand(5000, 10000);
                 } else uiIcy_touch -= diff;
 
                 if (uiUnholy_blight <= diff)
                 {
-                    DoCast(me->GetVictim(), SPELL_UNHOLY_BLIGHT);
+                    DoCastVictim(SPELL_UNHOLY_BLIGHT);
                     uiUnholy_blight = urand(5000, 10000);
                 } else uiUnholy_blight -= diff;
 
@@ -1653,18 +1671,18 @@ class npc_the_lich_king_tirion_dawn : public CreatureScript
 public:
     npc_the_lich_king_tirion_dawn() : CreatureScript("npc_the_lich_king_tirion_dawn") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new npc_the_lich_king_tirion_dawnAI (creature);
+        return new npc_the_lich_king_tirion_dawnAI(creature);
     }
 
     struct npc_the_lich_king_tirion_dawnAI : public ScriptedAI
     {
         npc_the_lich_king_tirion_dawnAI(Creature* creature) : ScriptedAI(creature) { Reset(); }
-        void Reset() {}
-        void AttackStart(Unit* /*who*/) {} // very sample, just don't make them aggreesive
-        void UpdateAI(const uint32 /*diff*/) {}
-        void JustDied(Unit* /*killer*/) {}
+        void Reset() OVERRIDE { }
+        void AttackStart(Unit* /*who*/) { } // very sample, just don't make them aggreesive OVERRIDE
+        void UpdateAI(uint32 /*diff*/) OVERRIDE { }
+        void JustDied(Unit* /*killer*/) OVERRIDE { }
     };
 
 };

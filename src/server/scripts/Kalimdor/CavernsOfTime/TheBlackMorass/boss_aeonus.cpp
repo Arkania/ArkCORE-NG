@@ -60,9 +60,9 @@ public:
     {
         boss_aeonusAI(Creature* creature) : BossAI(creature, TYPE_AEONUS) { }
 
-        void Reset()  { }
+        void Reset() OVERRIDE { }
 
-        void EnterCombat(Unit* /*who*/) 
+        void EnterCombat(Unit* /*who*/) OVERRIDE
         {
             events.ScheduleEvent(EVENT_SANDBREATH, urand(15000, 30000));
             events.ScheduleEvent(EVENT_TIMESTOP, urand(10000, 15000));
@@ -71,7 +71,7 @@ public:
             Talk(SAY_AGGRO);
         }
 
-        void MoveInLineOfSight(Unit* who) 
+        void MoveInLineOfSight(Unit* who) OVERRIDE
 
         {
             //Despawn Time Keeper
@@ -87,7 +87,7 @@ public:
             ScriptedAI::MoveInLineOfSight(who);
         }
 
-        void JustDied(Unit* /*killer*/) 
+        void JustDied(Unit* /*killer*/) OVERRIDE
         {
             Talk(SAY_DEATH);
 
@@ -95,13 +95,13 @@ public:
             instance->SetData(TYPE_MEDIVH, DONE); // FIXME: later should be removed
         }
 
-        void KilledUnit(Unit* who) 
+        void KilledUnit(Unit* who) OVERRIDE
         {
             if (who->GetTypeId() == TYPEID_PLAYER)
                 Talk(SAY_SLAY);
         }
 
-        void UpdateAI(const uint32 diff) 
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             //Return since we have no target
             if (!UpdateVictim())
@@ -137,7 +137,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const 
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
         return GetInstanceAI<boss_aeonusAI>(creature);
     }

@@ -23,7 +23,7 @@
 
 enum Yells
 {
-    // Jin'do the Godbreaker 
+    // Jin'do the Godbreaker
     SAY_INTRO                   = 0,
     SAY_AGGRO                   = 1,
     EMOTE_SHADOWS_OF_HAKKAR     = 2, // ID - 97172 Shadows of Hakkar
@@ -58,22 +58,22 @@ class boss_jindo_the_godbreaker : public CreatureScript
         {
             boss_jindo_the_godbreakerAI(Creature* creature) : BossAI(creature, DATA_JINDO) { }
 
-            void Reset()
+            void Reset() OVERRIDE
             {
                 _Reset();
             }
 
-            void EnterCombat(Unit* /*who*/)
+            void EnterCombat(Unit* /*who*/) OVERRIDE
             {
                 _EnterCombat();
                 Talk(SAY_AGGRO);
             }
 
-            void JustDied(Unit* /*killer*/)
+            void JustDied(Unit* /*killer*/) OVERRIDE
             {
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff) OVERRIDE
             {
                 if (!UpdateVictim())
                     return;
@@ -97,7 +97,7 @@ class boss_jindo_the_godbreaker : public CreatureScript
             }
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const OVERRIDE
         {
             return GetZulGurubAI<boss_jindo_the_godbreakerAI>(creature);
         }

@@ -63,7 +63,7 @@ class DBCFileLoader
                 }
 
             private:
-                Record(DBCFileLoader &file_, unsigned char *offset_): offset(offset_), file(file_) {}
+                Record(DBCFileLoader &file_, unsigned char *offset_): offset(offset_), file(file_) { }
                 unsigned char *offset;
                 DBCFileLoader &file;
 
@@ -92,5 +92,8 @@ class DBCFileLoader
         uint32 *fieldsOffset;
         unsigned char *data;
         unsigned char *stringTable;
+
+        DBCFileLoader(DBCFileLoader const& right) DELETE_MEMBER;
+        DBCFileLoader& operator=(DBCFileLoader const& right) DELETE_MEMBER;
 };
 #endif

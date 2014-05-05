@@ -32,6 +32,7 @@ EndScriptData */
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "GossipDef.h"
+#include "Transport.h"
 #include "Language.h"
 
 #include <fstream>
@@ -41,65 +42,66 @@ class debug_commandscript : public CommandScript
 public:
     debug_commandscript() : CommandScript("debug_commandscript") { }
 
-    ChatCommand* GetCommands() const
+    ChatCommand* GetCommands() const OVERRIDE
     {
         static ChatCommand debugPlayCommandTable[] =
         {
-            { "cinematic",      SEC_MODERATOR,      false, &HandleDebugPlayCinematicCommand,   "", NULL },
-            { "movie",          SEC_MODERATOR,      false, &HandleDebugPlayMovieCommand,       "", NULL },
-            { "sound",          SEC_MODERATOR,      false, &HandleDebugPlaySoundCommand,       "", NULL },
-            { NULL,             SEC_PLAYER,         false, NULL,                               "", NULL }
+            { "cinematic",     rbac::RBAC_PERM_COMMAND_DEBUG_PLAY_CINEMATIC, false, &HandleDebugPlayCinematicCommand,   "", NULL },
+            { "movie",         rbac::RBAC_PERM_COMMAND_DEBUG_PLAY_MOVIE,     false, &HandleDebugPlayMovieCommand,       "", NULL },
+            { "sound",         rbac::RBAC_PERM_COMMAND_DEBUG_PLAY_SOUND,     false, &HandleDebugPlaySoundCommand,       "", NULL },
+            { NULL,            0,                                      false, NULL,                               "", NULL }
         };
         static ChatCommand debugSendCommandTable[] =
         {
-            { "buyerror",       SEC_ADMINISTRATOR,  false, &HandleDebugSendBuyErrorCommand,       "", NULL },
-            { "channelnotify",  SEC_ADMINISTRATOR,  false, &HandleDebugSendChannelNotifyCommand,  "", NULL },
-            { "chatmmessage",   SEC_ADMINISTRATOR,  false, &HandleDebugSendChatMsgCommand,        "", NULL },
-            { "equiperror",     SEC_ADMINISTRATOR,  false, &HandleDebugSendEquipErrorCommand,     "", NULL },
-            { "largepacket",    SEC_ADMINISTRATOR,  false, &HandleDebugSendLargePacketCommand,    "", NULL },
-            { "opcode",         SEC_ADMINISTRATOR,  false, &HandleDebugSendOpcodeCommand,         "", NULL },
-            { "qpartymsg",      SEC_ADMINISTRATOR,  false, &HandleDebugSendQuestPartyMsgCommand,  "", NULL },
-            { "qinvalidmsg",    SEC_ADMINISTRATOR,  false, &HandleDebugSendQuestInvalidMsgCommand, "", NULL },
-            { "sellerror",      SEC_ADMINISTRATOR,  false, &HandleDebugSendSellErrorCommand,      "", NULL },
-            { "setphaseshift",  SEC_ADMINISTRATOR,  false, &HandleDebugSendSetPhaseShiftCommand,  "", NULL },
-            { "spellfail",      SEC_ADMINISTRATOR,  false, &HandleDebugSendSpellFailCommand,      "", NULL },
-            { NULL,             SEC_PLAYER,         false, NULL,                                  "", NULL }
+            { "buyerror",      rbac::RBAC_PERM_COMMAND_DEBUG_SEND_BUYERROR,      false, &HandleDebugSendBuyErrorCommand,        "", NULL },
+            { "channelnotify", rbac::RBAC_PERM_COMMAND_DEBUG_SEND_CHANNELNOTIFY, false, &HandleDebugSendChannelNotifyCommand,   "", NULL },
+            { "chatmessage",   rbac::RBAC_PERM_COMMAND_DEBUG_SEND_CHATMESSAGE,   false, &HandleDebugSendChatMsgCommand,         "", NULL },
+            { "equiperror",    rbac::RBAC_PERM_COMMAND_DEBUG_SEND_EQUIPERROR,    false, &HandleDebugSendEquipErrorCommand,      "", NULL },
+            { "largepacket",   rbac::RBAC_PERM_COMMAND_DEBUG_SEND_LARGEPACKET,   false, &HandleDebugSendLargePacketCommand,     "", NULL },
+            { "opcode",        rbac::RBAC_PERM_COMMAND_DEBUG_SEND_OPCODE,        false, &HandleDebugSendOpcodeCommand,          "", NULL },
+            { "qpartymsg",     rbac::RBAC_PERM_COMMAND_DEBUG_SEND_QPARTYMSG,     false, &HandleDebugSendQuestPartyMsgCommand,   "", NULL },
+            { "qinvalidmsg",   rbac::RBAC_PERM_COMMAND_DEBUG_SEND_QINVALIDMSG,   false, &HandleDebugSendQuestInvalidMsgCommand, "", NULL },
+            { "sellerror",     rbac::RBAC_PERM_COMMAND_DEBUG_SEND_SELLERROR,     false, &HandleDebugSendSellErrorCommand,       "", NULL },
+            { "setphaseshift", rbac::RBAC_PERM_COMMAND_DEBUG_SEND_SETPHASESHIFT, false, &HandleDebugSendSetPhaseShiftCommand,   "", NULL },
+            { "spellfail",     rbac::RBAC_PERM_COMMAND_DEBUG_SEND_SPELLFAIL,     false, &HandleDebugSendSpellFailCommand,       "", NULL },
+            { NULL,            0,                                          false, NULL,                                   "", NULL }
         };
         static ChatCommand debugCommandTable[] =
         {
-            { "setbit",         SEC_ADMINISTRATOR,  false, &HandleDebugSet32BitCommand,        "", NULL },
-            { "threat",         SEC_ADMINISTRATOR,  false, &HandleDebugThreatListCommand,      "", NULL },
-            { "hostil",         SEC_ADMINISTRATOR,  false, &HandleDebugHostileRefListCommand,  "", NULL },
-            { "anim",           SEC_GAMEMASTER,     false, &HandleDebugAnimCommand,            "", NULL },
-            { "arena",          SEC_ADMINISTRATOR,  false, &HandleDebugArenaCommand,           "", NULL },
-            { "bg",             SEC_ADMINISTRATOR,  false, &HandleDebugBattlegroundCommand,    "", NULL },
-            { "getitemstate",   SEC_ADMINISTRATOR,  false, &HandleDebugGetItemStateCommand,    "", NULL },
-            { "lootrecipient",  SEC_GAMEMASTER,     false, &HandleDebugGetLootRecipientCommand, "", NULL },
-            { "getvalue",       SEC_ADMINISTRATOR,  false, &HandleDebugGetValueCommand,        "", NULL },
-            { "getitemvalue",   SEC_ADMINISTRATOR,  false, &HandleDebugGetItemValueCommand,    "", NULL },
-            { "Mod32Value",     SEC_ADMINISTRATOR,  false, &HandleDebugMod32ValueCommand,      "", NULL },
-            { "play",           SEC_MODERATOR,      false, NULL,              "", debugPlayCommandTable },
-            { "send",           SEC_ADMINISTRATOR,  false, NULL,              "", debugSendCommandTable },
-            { "setaurastate",   SEC_ADMINISTRATOR,  false, &HandleDebugSetAuraStateCommand,    "", NULL },
-            { "setitemvalue",   SEC_ADMINISTRATOR,  false, &HandleDebugSetItemValueCommand,    "", NULL },
-            { "setvalue",       SEC_ADMINISTRATOR,  false, &HandleDebugSetValueCommand,        "", NULL },
-            { "spawnvehicle",   SEC_ADMINISTRATOR,  false, &HandleDebugSpawnVehicleCommand,    "", NULL },
-            { "setvid",         SEC_ADMINISTRATOR,  false, &HandleDebugSetVehicleIdCommand,    "", NULL },
-            { "entervehicle",   SEC_ADMINISTRATOR,  false, &HandleDebugEnterVehicleCommand,    "", NULL },
-            { "uws",            SEC_ADMINISTRATOR,  false, &HandleDebugUpdateWorldStateCommand, "", NULL },
-            { "update",         SEC_ADMINISTRATOR,  false, &HandleDebugUpdateCommand,          "", NULL },
-            { "itemexpire",     SEC_ADMINISTRATOR,  false, &HandleDebugItemExpireCommand,      "", NULL },
-            { "areatriggers",   SEC_ADMINISTRATOR,  false, &HandleDebugAreaTriggersCommand,    "", NULL },
-            { "los",            SEC_MODERATOR,      false, &HandleDebugLoSCommand,             "", NULL },
-            { "moveflags",      SEC_ADMINISTRATOR,  false, &HandleDebugMoveflagsCommand,       "", NULL },
-            { "phase",          SEC_MODERATOR,      false, &HandleDebugPhaseCommand,           "", NULL },
-            { NULL,             SEC_PLAYER,         false, NULL,                               "", NULL }
+            { "setbit",        rbac::RBAC_PERM_COMMAND_DEBUG_SETBIT,        false, &HandleDebugSet32BitCommand,         "", NULL },
+            { "threat",        rbac::RBAC_PERM_COMMAND_DEBUG_THREAT,        false, &HandleDebugThreatListCommand,       "", NULL },
+            { "hostil",        rbac::RBAC_PERM_COMMAND_DEBUG_HOSTIL,        false, &HandleDebugHostileRefListCommand,   "", NULL },
+            { "anim",          rbac::RBAC_PERM_COMMAND_DEBUG_ANIM,          false, &HandleDebugAnimCommand,             "", NULL },
+            { "arena",         rbac::RBAC_PERM_COMMAND_DEBUG_ARENA,         false, &HandleDebugArenaCommand,            "", NULL },
+            { "bg",            rbac::RBAC_PERM_COMMAND_DEBUG_BG,            false, &HandleDebugBattlegroundCommand,     "", NULL },
+            { "getitemstate",  rbac::RBAC_PERM_COMMAND_DEBUG_GETITEMSTATE,  false, &HandleDebugGetItemStateCommand,     "", NULL },
+            { "lootrecipient", rbac::RBAC_PERM_COMMAND_DEBUG_LOOTRECIPIENT, false, &HandleDebugGetLootRecipientCommand, "", NULL },
+            { "getvalue",      rbac::RBAC_PERM_COMMAND_DEBUG_GETVALUE,      false, &HandleDebugGetValueCommand,         "", NULL },
+            { "getitemvalue",  rbac::RBAC_PERM_COMMAND_DEBUG_GETITEMVALUE,  false, &HandleDebugGetItemValueCommand,     "", NULL },
+            { "Mod32Value",    rbac::RBAC_PERM_COMMAND_DEBUG_MOD32VALUE,    false, &HandleDebugMod32ValueCommand,       "", NULL },
+            { "play",          rbac::RBAC_PERM_COMMAND_DEBUG_PLAY,          false, NULL,              "", debugPlayCommandTable },
+            { "send",          rbac::RBAC_PERM_COMMAND_DEBUG_SEND,          false, NULL,              "", debugSendCommandTable },
+            { "setaurastate",  rbac::RBAC_PERM_COMMAND_DEBUG_SETAURASTATE,  false, &HandleDebugSetAuraStateCommand,     "", NULL },
+            { "setitemvalue",  rbac::RBAC_PERM_COMMAND_DEBUG_SETITEMVALUE,  false, &HandleDebugSetItemValueCommand,     "", NULL },
+            { "setvalue",      rbac::RBAC_PERM_COMMAND_DEBUG_SETVALUE,      false, &HandleDebugSetValueCommand,         "", NULL },
+            { "spawnvehicle",  rbac::RBAC_PERM_COMMAND_DEBUG_SPAWNVEHICLE,  false, &HandleDebugSpawnVehicleCommand,     "", NULL },
+            { "setvid",        rbac::RBAC_PERM_COMMAND_DEBUG_SETVID,        false, &HandleDebugSetVehicleIdCommand,     "", NULL },
+            { "entervehicle",  rbac::RBAC_PERM_COMMAND_DEBUG_ENTERVEHICLE,  false, &HandleDebugEnterVehicleCommand,     "", NULL },
+            { "uws",           rbac::RBAC_PERM_COMMAND_DEBUG_UWS,           false, &HandleDebugUpdateWorldStateCommand, "", NULL },
+            { "update",        rbac::RBAC_PERM_COMMAND_DEBUG_UPDATE,        false, &HandleDebugUpdateCommand,           "", NULL },
+            { "itemexpire",    rbac::RBAC_PERM_COMMAND_DEBUG_ITEMEXPIRE,    false, &HandleDebugItemExpireCommand,       "", NULL },
+            { "areatriggers",  rbac::RBAC_PERM_COMMAND_DEBUG_AREATRIGGERS,  false, &HandleDebugAreaTriggersCommand,     "", NULL },
+            { "los",           rbac::RBAC_PERM_COMMAND_DEBUG_LOS,           false, &HandleDebugLoSCommand,              "", NULL },
+            { "moveflags",     rbac::RBAC_PERM_COMMAND_DEBUG_MOVEFLAGS,     false, &HandleDebugMoveflagsCommand,        "", NULL },
+            { "transport",     rbac::RBAC_PERM_COMMAND_DEBUG_TRANSPORT,     false, &HandleDebugTransportCommand,        "", NULL },
+            { "phase",         rbac::RBAC_PERM_COMMAND_DEBUG_PHASE,         false, &HandleDebugPhaseCommand,            "", NULL },
+            { NULL,            0,                                     false, NULL,                                "", NULL }
         };
         static ChatCommand commandTable[] =
         {
-            { "debug",          SEC_MODERATOR,      true,  NULL,                  "", debugCommandTable },
-            { "wpgps",          SEC_ADMINISTRATOR,  false, &HandleWPGPSCommand,                "", NULL },
-            { NULL,             SEC_PLAYER,         false, NULL,                  "",              NULL }
+            { "debug",         rbac::RBAC_PERM_COMMAND_DEBUG,   true,  NULL,               "", debugCommandTable },
+            { "wpgps",         rbac::RBAC_PERM_COMMAND_WPGPS,  false, &HandleWPGPSCommand, "", NULL },
+            { NULL,            0,                        false, NULL,                "", NULL }
         };
         return commandTable;
     }
@@ -181,7 +183,7 @@ public:
             return false;
         }
 
-        if (handler->GetSession()->GetPlayer()->GetSelection())
+        if (handler->GetSession()->GetPlayer()->GetTarget())
             unit->PlayDistanceSound(soundId, handler->GetSession()->GetPlayer());
         else
             unit->PlayDirectSound(soundId, handler->GetSession()->GetPlayer());
@@ -260,13 +262,13 @@ public:
         if (!unit || (unit->GetTypeId() != TYPEID_PLAYER))
             player = handler->GetSession()->GetPlayer();
         else
-            player = (Player*)unit;
+            player = unit->ToPlayer();
 
         if (!unit)
             unit = player;
 
         std::ifstream ifs("opcode.txt");
-        if (ifs.bad())
+        if (ifs.fail())
             return false;
 
         // remove comments from file
@@ -413,11 +415,11 @@ public:
             }
             else
             {
-                sLog->outError("Sending opcode that has unknown type '%s'", type.c_str());
+                TC_LOG_ERROR("misc", "Sending opcode that has unknown type '%s'", type.c_str());
                 break;
             }
         }
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "Sending opcode %u", data.GetOpcode());
+        TC_LOG_DEBUG("network", "Sending opcode %u", data.GetOpcode());
         data.hexlike();
         player->GetSession()->SendPacket(&data, true);
         handler->PSendSysMessage(LANG_COMMAND_OPCODESENT, data.GetOpcode(), unit->GetName().c_str());
@@ -481,7 +483,7 @@ public:
         char const* msg = "testtest";
         uint8 type = atoi(args);
         WorldPacket data;
-        ChatHandler::FillMessageData(&data, handler->GetSession(), type, 0, "chan", handler->GetSession()->GetPlayer()->GetGUID(), msg, handler->GetSession()->GetPlayer());
+        ChatHandler::BuildChatPacket(data, ChatMsg(type), LANG_UNIVERSAL, handler->GetSession()->GetPlayer(), handler->GetSession()->GetPlayer(), msg, 0, "chan");
         handler->GetSession()->SendPacket(&data);
         return true;
     }
@@ -507,7 +509,7 @@ public:
 
     static bool HandleDebugSendQuestInvalidMsgCommand(ChatHandler* handler, char const* args)
     {
-        uint32 msg = atol((char*)args);
+        QuestFailedReason msg = static_cast<QuestFailedReason>(atol((char*)args));
         handler->GetSession()->GetPlayer()->SendCanTakeQuestResponse(msg);
         return true;
     }
@@ -807,7 +809,7 @@ public:
         handler->PSendSysMessage("Threat list of %s (guid %u)", target->GetName().c_str(), target->GetGUIDLow());
         for (itr = threatList.begin(); itr != threatList.end(); ++itr)
         {
-            Unit* unit = (*itr)->GetTarget();
+            Unit* unit = (*itr)->getTarget();
             if (!unit)
                 continue;
             ++count;
@@ -827,7 +829,7 @@ public:
         handler->PSendSysMessage("Hostil reference list of %s (guid %u)", target->GetName().c_str(), target->GetGUIDLow());
         while (ref)
         {
-            if (Unit* unit = ref->GetSource()->getOwner())
+            if (Unit* unit = ref->GetSource()->GetOwner())
             {
                 ++count;
                 handler->PSendSysMessage("   %u.   %s   (guid %u)  - threat %f", count, unit->GetName().c_str(), unit->GetGUIDLow(), ref->getThreat());
@@ -923,7 +925,7 @@ public:
         if (!ve)
             return false;
 
-        Creature* v = new Creature;
+        Creature* v = new Creature();
 
         Map* map = handler->GetSession()->GetPlayer()->GetMap();
 
@@ -1058,7 +1060,7 @@ public:
             return false;
 
         uint32 animId = atoi((char*)args);
-        handler->GetSession()->GetPlayer()->HandleEmote(animId);
+        handler->GetSession()->GetPlayer()->HandleEmoteCommand(animId);
         return true;
     }
 
@@ -1135,13 +1137,13 @@ public:
         if (isInt32)
         {
             uint32 value = (uint32)atoi(y);
-            target->SetUInt32Value(opcode , value);
+            target->SetUInt32Value(opcode, value);
             handler->PSendSysMessage(LANG_SET_UINT_FIELD, GUID_LOPART(guid), opcode, value);
         }
         else
         {
             float value = (float)atof(y);
-            target->SetFloatValue(opcode , value);
+            target->SetFloatValue(opcode, value);
             handler->PSendSysMessage(LANG_SET_FLOAT_FIELD, GUID_LOPART(guid), opcode, value);
         }
 
@@ -1326,13 +1328,23 @@ public:
             uint32 moveFlags = (uint32)atoi(mask1);
             target->SetUnitMovementFlags(moveFlags);
 
+            /// @fixme: port master's HandleDebugMoveflagsCommand; flags need different handling
+
             if (mask2)
             {
                 uint32 moveFlagsExtra = uint32(atoi(mask2));
                 target->SetExtraUnitMovementFlags(moveFlagsExtra);
             }
 
-            target->SendMovementFlagUpdate();
+            if (target->GetTypeId() != TYPEID_PLAYER)
+                target->DestroyForNearbyPlayers();  // Force new SMSG_UPDATE_OBJECT:CreateObject
+            else
+            {
+                WorldPacket data(SMSG_PLAYER_MOVE);
+                target->WriteMovementInfo(data);
+                target->SendMessageToSet(&data, true);
+            }
+
             handler->PSendSysMessage(LANG_MOVEFLAGS_SET, target->GetUnitMovementFlags(), target->GetExtraUnitMovementFlags());
         }
 
@@ -1343,9 +1355,35 @@ public:
     {
         Player* player = handler->GetSession()->GetPlayer();
 
-        sLog->outSQLDev("(@PATH, XX, %.3f, %.3f, %.5f, 0, 0, 0, 100, 0),", player->GetPositionX(), player->GetPositionY(), player->GetPositionZ());
+        TC_LOG_INFO("sql.dev", "(@PATH, XX, %.3f, %.3f, %.5f, 0, 0, 0, 100, 0),", player->GetPositionX(), player->GetPositionY(), player->GetPositionZ());
 
         handler->PSendSysMessage("Waypoint SQL written to SQL Developer log");
+        return true;
+    }
+
+    static bool HandleDebugTransportCommand(ChatHandler* handler, char const* args)
+    {
+        Transport* transport = handler->GetSession()->GetPlayer()->GetTransport();
+        if (!transport)
+            return false;
+
+        bool start = false;
+        if (!stricmp(args, "stop"))
+            transport->EnableMovement(false);
+        else if (!stricmp(args, "start"))
+        {
+            transport->EnableMovement(true);
+            start = true;
+        }
+        else
+        {
+            Position pos = transport->GetPosition();
+            handler->PSendSysMessage("Transport %s is %s", transport->GetName().c_str(), transport->GetGoState() == GO_STATE_READY ? "stopped" : "moving");
+            handler->PSendSysMessage("Transport position: %s", pos.ToString().c_str());
+            return true;
+        }
+
+        handler->PSendSysMessage("Transport %s %s", transport->GetName().c_str(), start ? "started" : "stopped");
         return true;
     }
 
@@ -1353,7 +1391,7 @@ public:
     {
         Unit* unit = handler->getSelectedUnit();
         Player* player = handler->GetSession()->GetPlayer();
-        if(unit && unit->GetTypeId() == TYPEID_PLAYER)
+        if (unit && unit->GetTypeId() == TYPEID_PLAYER)
             player = unit->ToPlayer();
 
         player->GetPhaseMgr().SendDebugReportToPlayer(handler->GetSession()->GetPlayer());

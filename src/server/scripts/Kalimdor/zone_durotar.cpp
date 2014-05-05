@@ -28,7 +28,7 @@
 
 enum LazyPeonYells
 {
-    SAY_SPELL_HIT       = 0
+    SAY_SPELL_HIT                                 = 0
 };
 
 enum LazyPeon
@@ -44,21 +44,21 @@ class npc_lazy_peon : public CreatureScript
 public:
     npc_lazy_peon() : CreatureScript("npc_lazy_peon") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
         return new npc_lazy_peonAI(creature);
     }
 
     struct npc_lazy_peonAI : public ScriptedAI
     {
-        npc_lazy_peonAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_lazy_peonAI(Creature* creature) : ScriptedAI(creature) { }
 
         uint64 PlayerGUID;
 
         uint32 RebuffTimer;
         bool work;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             PlayerGUID = 0;
             RebuffTimer = 0;
@@ -73,28 +73,31 @@ public:
 
         void SpellHit(Unit* caster, const SpellInfo* spell)
         {
-            if (spell->Id == SPELL_AWAKEN_PEON && caster->GetTypeId() == TYPEID_PLAYER
-                && CAST_PLR(caster)->GetQuestStatus(QUEST_LAZY_PEONS) == QUEST_STATUS_INCOMPLETE)
+            if (spell->Id != SPELL_AWAKEN_PEON)
+                return;
+
+            Player* player = caster->ToPlayer();
+            if (player && player->GetQuestStatus(QUEST_LAZY_PEONS) == QUEST_STATUS_INCOMPLETE)
             {
-                caster->ToPlayer()->KilledMonsterCredit(me->GetEntry(), me->GetGUID());
-                Talk(SAY_SPELL_HIT, caster->GetGUID());
+                player->KilledMonsterCredit(me->GetEntry(), me->GetGUID());
+                Talk(SAY_SPELL_HIT, caster);
                 me->RemoveAllAuras();
                 if (GameObject* Lumberpile = me->FindNearestGameObject(GO_LUMBERPILE, 20))
                     me->GetMotionMaster()->MovePoint(1, Lumberpile->GetPositionX()-1, Lumberpile->GetPositionY(), Lumberpile->GetPositionZ());
             }
         }
 
-        void UpdateAI(const uint32 Diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (work == true)
-                me->HandleEmote(EMOTE_ONESHOT_WORK_CHOPWOOD);
-            if (RebuffTimer <= Diff)
+                me->HandleEmoteCommand(EMOTE_ONESHOT_WORK_CHOPWOOD);
+            if (RebuffTimer <= diff)
             {
                 DoCast(me, SPELL_BUFF_SLEEP);
                 RebuffTimer = 300000; //Rebuff agian in 5 minutes
             }
             else
-                RebuffTimer -= Diff;
+                RebuffTimer -= diff;
             if (!UpdateVictim())
                 return;
             DoMeleeAttackIfReady();
@@ -117,13 +120,13 @@ enum VoodooSpells
 class spell_voodoo : public SpellScriptLoader
 {
     public:
-        spell_voodoo() : SpellScriptLoader("spell_voodoo") {}
+        spell_voodoo() : SpellScriptLoader("spell_voodoo") { }
 
         class spell_voodoo_SpellScript : public SpellScript
         {
             PrepareSpellScript(spell_voodoo_SpellScript);
 
-            bool Validate(SpellInfo const* /*spell*/)
+            bool Validate(SpellInfo const* /*spellInfo*/) OVERRIDE
             {
                 if (!sSpellMgr->GetSpellInfo(SPELL_BREW) || !sSpellMgr->GetSpellInfo(SPELL_GHOSTLY) ||
                     !sSpellMgr->GetSpellInfo(SPELL_HEX1) || !sSpellMgr->GetSpellInfo(SPELL_HEX2) ||
@@ -140,13 +143,13 @@ class spell_voodoo : public SpellScriptLoader
                     GetCaster()->CastSpell(target, spellid, false);
             }
 
-            void Register()
+            void Register() OVERRIDE
             {
                 OnEffectHitTarget += SpellEffectFn(spell_voodoo_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
             }
         };
 
-        SpellScript* GetSpellScript() const
+        SpellScript* GetSpellScript() const OVERRIDE
         {
             return new spell_voodoo_SpellScript();
         }

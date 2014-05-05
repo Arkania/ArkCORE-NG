@@ -54,7 +54,7 @@ namespace VMAP
     class ManagedModel
     {
         public:
-            ManagedModel() : iModel(0), iRefCount(0) {}
+            ManagedModel() : iModel(0), iRefCount(0) { }
             void setModel(WorldModel* model) { iModel = model; }
             WorldModel* getModel() { return iModel; }
             void incRefCount() { ++iRefCount; }
@@ -113,6 +113,8 @@ namespace VMAP
                 return getMapFileName(mapId);
             }
             virtual bool existsMap(const char* basePath, unsigned int mapId, int x, int y);
+        public:
+            void getInstanceMapTree(InstanceTreeMap &instanceMapTree);
     };
 }
 

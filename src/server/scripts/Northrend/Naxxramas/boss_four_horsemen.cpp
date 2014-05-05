@@ -63,7 +63,7 @@ const Position WaypointPositions[12] =
     {2517.8f, -2896.6f, 241.28f, 2.315f},
 };
 
-const uint32 MOB_HORSEMEN[]     =   {16064, 16065, 30549, 16063};
+const uint32 NPC_HORSEMEN[]     =   {16064, 16065, 30549, 16063};
 const uint32 SPELL_MARK[]       =   {28832, 28833, 28834, 28835};
 #define SPELL_PRIMARY(i)            RAID_MODE(SPELL_PRIMARY_N[i], SPELL_PRIMARY_H[i])
 const uint32 SPELL_PRIMARY_N[]  =   {28884, 28863, 28882, 28883};
@@ -88,9 +88,9 @@ class boss_four_horsemen : public CreatureScript
 public:
     boss_four_horsemen() : CreatureScript("boss_four_horsemen") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new boss_four_horsemenAI (creature);
+        return GetInstanceAI<boss_four_horsemenAI>(creature);
     }
 
     struct boss_four_horsemenAI : public BossAI
@@ -99,7 +99,7 @@ public:
         {
             id = Horsemen(0);
             for (uint8 i = 0; i < 4; ++i)
-                if (me->GetEntry() == MOB_HORSEMEN[i])
+                if (me->GetEntry() == NPC_HORSEMEN[i])
                     id = Horsemen(i);
             caster = (id == HORSEMEN_LADY || id == HORSEMEN_SIR);
             encounterActionReset = false;
@@ -117,13 +117,12 @@ public:
         bool encounterActionReset;
         bool doDelayPunish;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             if (!encounterActionReset)
                 DoEncounteraction(NULL, false, true, false);
 
-            if (instance)
-                instance->SetData(DATA_HORSEMEN0 + id, NOT_STARTED);
+            instance->SetData(DATA_HORSEMEN0 + id, NOT_STARTED);
 
             me->SetReactState(REACT_AGGRESSIVE);
             uiEventStarterGUID = 0;
@@ -140,9 +139,6 @@ public:
 
         bool DoEncounteraction(Unit* who, bool attack, bool reset, bool checkAllDead)
         {
-            if (!instance)
-                return false;
-
             Creature* Thane = Unit::GetCreature(*me, instance->GetData64(DATA_THANE));
             Creature* Lady = Unit::GetCreature(*me, instance->GetData64(DATA_LADY));
             Creature* Baron = Unit::GetCreature(*me, instance->GetData64(DATA_BARON));
@@ -221,7 +217,7 @@ public:
             }
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) OVERRIDE
         {
             if (type != POINT_MOTION_TYPE)
                 return;
@@ -264,14 +260,15 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) OVERRIDE
+
         {
             BossAI::MoveInLineOfSight(who);
             if (caster)
                 SelectNearestTarget(who);
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) OVERRIDE
         {
             if (!movementCompleted && !movementStarted)
             {
@@ -290,21 +287,20 @@ public:
             }
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit* /*victim*/) OVERRIDE
         {
             if (!(rand()%5))
                 Talk(SAY_SLAY);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) OVERRIDE
         {
             events.Reset();
             summons.DespawnAll();
 
-            if (instance)
-                instance->SetData(DATA_HORSEMEN0 + id, DONE);
+            instance->SetData(DATA_HORSEMEN0 + id, DONE);
 
-            if (instance && DoEncounteraction(NULL, false, false, true))
+            if (DoEncounteraction(NULL, false, false, true))
             {
                 instance->SetBossState(BOSS_HORSEMEN, DONE);
                 instance->SaveToDB();
@@ -317,7 +313,7 @@ public:
             Talk(SAY_DEATH);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) OVERRIDE
         {
             _EnterCombat();
             Talk(SAY_AGGRO);
@@ -327,7 +323,7 @@ public:
             events.ScheduleEvent(EVENT_BERSERK, 15*100*1000);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (nextWP && movementStarted && !movementCompleted && !nextMovementStarted)
             {
@@ -363,7 +359,7 @@ public:
                                 DoCast(target, SPELL_PRIMARY(id));
                         }
                         else
-                            DoCast(me->GetVictim(), SPELL_PRIMARY(id));
+                            DoCastVictim(SPELL_PRIMARY(id));
 
                         events.ScheduleEvent(EVENT_CAST, 15000);
                         break;
@@ -436,13 +432,13 @@ class spell_four_horsemen_mark : public SpellScriptLoader
                 }
             }
 
-            void Register()
+            void Register() OVERRIDE
             {
                 AfterEffectApply += AuraEffectApplyFn(spell_four_horsemen_mark_AuraScript::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
             }
         };
 
-        AuraScript* GetAuraScript() const
+        AuraScript* GetAuraScript() const OVERRIDE
         {
             return new spell_four_horsemen_mark_AuraScript();
         }

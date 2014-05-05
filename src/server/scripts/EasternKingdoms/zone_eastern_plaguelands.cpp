@@ -25,7 +25,7 @@ SDCategory: Eastern Plaguelands
 EndScriptData */
 
 /* ContentData
-mobs_ghoul_flayer
+npc_ghoul_flayer
 npc_augustus_the_touched
 npc_darrowshire_spirit
 npc_tirion_fordring
@@ -37,29 +37,29 @@ EndContentData */
 #include "Player.h"
 #include "WorldSession.h"
 
-class mobs_ghoul_flayer : public CreatureScript
+class npc_ghoul_flayer : public CreatureScript
 {
 public:
-    mobs_ghoul_flayer() : CreatureScript("mobs_ghoul_flayer") { }
+    npc_ghoul_flayer() : CreatureScript("npc_ghoul_flayer") { }
 
-    struct mobs_ghoul_flayerAI : public ScriptedAI
+    struct npc_ghoul_flayerAI : public ScriptedAI
     {
-        mobs_ghoul_flayerAI(Creature* creature) : ScriptedAI(creature) { }
+        npc_ghoul_flayerAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void Reset() {}
+        void Reset() OVERRIDE { }
 
-        void EnterCombat(Unit* /*who*/) {}
+        void EnterCombat(Unit* /*who*/) OVERRIDE { }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* killer) OVERRIDE
         {
             if (killer->GetTypeId() == TYPEID_PLAYER)
                 me->SummonCreature(11064, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 60000);
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new mobs_ghoul_flayerAI (creature);
+        return new npc_ghoul_flayerAI(creature);
     }
 };
 
@@ -72,7 +72,7 @@ class npc_augustus_the_touched : public CreatureScript
 public:
     npc_augustus_the_touched() : CreatureScript("npc_augustus_the_touched") { }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) OVERRIDE
     {
         player->PlayerTalkClass->ClearMenus();
         if (action == GOSSIP_ACTION_TRADE)
@@ -80,7 +80,7 @@ public:
         return true;
     }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) OVERRIDE
     {
         if (creature->IsQuestGiver())
             player->PrepareQuestMenu(creature->GetGUID());
@@ -97,14 +97,17 @@ public:
 ## npc_darrowshire_spirit
 ######*/
 
-#define SPELL_SPIRIT_SPAWNIN    17321
+enum DarrowshireSpirit
+{
+    SPELL_SPIRIT_SPAWNIN    = 17321
+};
 
 class npc_darrowshire_spirit : public CreatureScript
 {
 public:
     npc_darrowshire_spirit() : CreatureScript("npc_darrowshire_spirit") { }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) OVERRIDE
     {
         player->SEND_GOSSIP_MENU(3873, creature->GetGUID());
         player->TalkedToCreature(creature->GetEntry(), creature->GetGUID());
@@ -112,22 +115,22 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new npc_darrowshire_spiritAI (creature);
+        return new npc_darrowshire_spiritAI(creature);
     }
 
     struct npc_darrowshire_spiritAI : public ScriptedAI
     {
-        npc_darrowshire_spiritAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_darrowshire_spiritAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             DoCast(me, SPELL_SPIRIT_SPAWNIN);
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         }
 
-        void EnterCombat(Unit* /*who*/) {}
+        void EnterCombat(Unit* /*who*/) OVERRIDE { }
     };
 };
 
@@ -145,7 +148,7 @@ class npc_tirion_fordring : public CreatureScript
 public:
     npc_tirion_fordring() : CreatureScript("npc_tirion_fordring") { }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) OVERRIDE
     {
         player->PlayerTalkClass->ClearMenus();
         switch (action)
@@ -170,7 +173,7 @@ public:
         return true;
     }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) OVERRIDE
     {
         if (creature->IsQuestGiver())
             player->PrepareQuestMenu(creature->GetGUID());
@@ -186,7 +189,7 @@ public:
 
 void AddSC_eastern_plaguelands()
 {
-    new mobs_ghoul_flayer();
+    new npc_ghoul_flayer();
     new npc_augustus_the_touched();
     new npc_darrowshire_spirit();
     new npc_tirion_fordring();

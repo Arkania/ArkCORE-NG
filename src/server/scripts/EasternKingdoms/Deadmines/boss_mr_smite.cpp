@@ -26,7 +26,7 @@ EndScriptData */
 #include "ScriptedCreature.h"
 #include "deadmines.h"
 
-enum eSpels
+enum Spels
 {
     SPELL_TRASH             = 3391,
     SPELL_SMITE_STOMP       = 6432,
@@ -36,7 +36,7 @@ enum eSpels
     EQUIP_SWORD             = 5191,
     EQUIP_MACE              = 7230,
 
-    SAY_AGGRO               = 0
+    SAY_AGGRO               = 0,
 };
 
 class boss_mr_smite : public CreatureScript
@@ -44,9 +44,9 @@ class boss_mr_smite : public CreatureScript
 public:
     boss_mr_smite() : CreatureScript("boss_mr_smite") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new boss_mr_smiteAI (creature);
+        return GetInstanceAI<boss_mr_smiteAI>(creature);
     }
 
     struct boss_mr_smiteAI : public ScriptedAI
@@ -67,7 +67,7 @@ public:
         uint32 uiPhase;
         uint32 uiTimer;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             uiTrashTimer = urand(5000, 9000);
             uiSlamTimer = 9000;
@@ -81,7 +81,7 @@ public:
             SetEquipmentSlots(false, EQUIP_SWORD, EQUIP_UNEQUIP, EQUIP_NO_CHANGE);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) OVERRIDE
         {
            Talk(SAY_AGGRO);
         }
@@ -95,7 +95,7 @@ public:
                 return true;
         }
 
-        void UpdateAI(const uint32 uiDiff)
+        void UpdateAI(uint32 uiDiff) OVERRIDE
         {
             if (!UpdateVictim())
                 return;
@@ -111,7 +111,7 @@ public:
             if (uiSlamTimer <= uiDiff)
             {
                 if (bCheckChances())
-                    DoCast(me->GetVictim(), SPELL_SMITE_SLAM);
+                    DoCastVictim(SPELL_SMITE_SLAM);
                 uiSlamTimer = 11000;
             } else uiSlamTimer -= uiDiff;
 
@@ -128,12 +128,11 @@ public:
                 ++uiHealth;
                 DoCastAOE(SPELL_SMITE_STOMP, false);
                 SetCombatMovement(false);
-                if (instance)
-                    if (GameObject* go = GameObject::GetGameObject(*me, instance->GetData64(DATA_SMITE_CHEST)))
-                    {
-                        me->GetMotionMaster()->Clear();
-                        me->GetMotionMaster()->MovePoint(1, go->GetPositionX() - 3.0f, go->GetPositionY(), go->GetPositionZ());
-                    }
+                if (GameObject* go = GameObject::GetGameObject(*me, instance->GetData64(DATA_SMITE_CHEST)))
+                {
+                    me->GetMotionMaster()->Clear();
+                    me->GetMotionMaster()->MovePoint(1, go->GetPositionX() - 3.0f, go->GetPositionY(), go->GetPositionZ());
+                }
             }
 
             if (uiPhase)
@@ -143,7 +142,7 @@ public:
                     switch (uiPhase)
                     {
                         case 1:
-                            me->HandleEmote(EMOTE_STATE_KNEEL); //dosen't work?
+                            me->HandleEmoteCommand(EMOTE_STATE_KNEEL); //dosen't work?
                             uiTimer = 1000;
                             uiPhase = 2;
                             break;
@@ -167,7 +166,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void MovementInform(uint32 uiType, uint32 /*uiId*/)
+        void MovementInform(uint32 uiType, uint32 /*uiId*/) OVERRIDE
         {
             if (uiType != POINT_MOTION_TYPE)
                 return;

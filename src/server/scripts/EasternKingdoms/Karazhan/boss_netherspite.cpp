@@ -44,6 +44,7 @@ enum Netherspite
     SPELL_NETHERSPITE_ROAR      = 38684,
 };
 
+
 const float PortalCoord[3][3] =
 {
     {-11195.353516f, -1613.237183f, 278.237258f}, // Left side
@@ -69,9 +70,9 @@ class boss_netherspite : public CreatureScript
 public:
     boss_netherspite() : CreatureScript("boss_netherspite") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new boss_netherspiteAI(creature);
+        return GetInstanceAI<boss_netherspiteAI>(creature);
     }
 
     struct boss_netherspiteAI : public ScriptedAI
@@ -127,7 +128,7 @@ public:
             return sqrt((xa-xb)*(xa-xb) + (ya-yb)*(ya-yb));
         }
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             Berserk = false;
             NetherInfusionTimer = 540000;
@@ -172,7 +173,7 @@ public:
             for (int j=0; j<3; ++j) // j = color
                 if (Creature* portal = Unit::GetCreature(*me, PortalGUID[j]))
                 {
-                    // the one who's been casted upon before
+                    // the one who's been cast upon before
                     Unit* current = Unit::GetUnit(*portal, BeamTarget[j]);
                     // temporary store for the best suitable beam reciever
                     Unit* target = me;
@@ -247,29 +248,29 @@ public:
             PortalPhase = false;
             Talk(EMOTE_PHASE_BANISH);
 
-            for (int i=0; i<3; ++i)
+            for (uint8 i = 0; i < 3; ++i)
                 me->RemoveAurasDueToSpell(NetherBuff[i]);
         }
 
         void HandleDoors(bool open) // Massive Door switcher
         {
-            if (GameObject* Door = GameObject::GetGameObject(*me, instance ? instance->GetData64(DATA_GO_MASSIVE_DOOR) : 0))
+            if (GameObject* Door = ObjectAccessor::GetGameObject(*me, instance->GetData64(DATA_GO_MASSIVE_DOOR) ))
                 Door->SetGoState(open ? GO_STATE_ACTIVE : GO_STATE_READY);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) OVERRIDE
         {
             HandleDoors(false);
             SwitchToPortalPhase();
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) OVERRIDE
         {
             HandleDoors(true);
             DestroyPortals();
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (!UpdateVictim())
                 return;
@@ -308,7 +309,7 @@ public:
 
                 if (PhaseTimer <= diff)
                 {
-                    if (!me->IsNonMeleeSpellCasted(false))
+                    if (!me->IsNonMeleeSpellCast(false))
                     {
                         SwitchToBanishPhase();
                         return;
@@ -327,7 +328,7 @@ public:
 
                 if (PhaseTimer <= diff)
                 {
-                    if (!me->IsNonMeleeSpellCasted(false))
+                    if (!me->IsNonMeleeSpellCast(false))
                     {
                         SwitchToPortalPhase();
                         return;

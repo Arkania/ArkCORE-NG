@@ -20,7 +20,7 @@
 /* ScriptData
 SDName: Instance_Karazhan
 SD%Complete: 70
-SDComment: Instance Script for Karazhan to help in various encounters. TODO: GameObject visibility for Opera event.
+SDComment: Instance Script for Karazhan to help in various encounters. @todo GameObject visibility for Opera event.
 SDCategory: Karazhan
 EndScriptData */
 
@@ -50,14 +50,14 @@ class instance_karazhan : public InstanceMapScript
 public:
     instance_karazhan() : InstanceMapScript("instance_karazhan", 532) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const OVERRIDE
     {
         return new instance_karazhan_InstanceMapScript(map);
     }
 
     struct instance_karazhan_InstanceMapScript : public InstanceScript
     {
-        instance_karazhan_InstanceMapScript(Map* map) : InstanceScript(map) {}
+        instance_karazhan_InstanceMapScript(Map* map) : InstanceScript(map) { }
 
         uint32 m_auiEncounter[MAX_ENCOUNTER];
         std::string strSaveData;
@@ -81,7 +81,7 @@ public:
         uint64 ImageGUID;
         uint64 DustCoveredChest;
 
-        void Initialize()
+        void Initialize() OVERRIDE
         {
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
 
@@ -109,7 +109,7 @@ public:
             DustCoveredChest    = 0;
         }
 
-        bool IsEncounterInProgress() const
+        bool IsEncounterInProgress() const OVERRIDE
         {
             for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
                 if (m_auiEncounter[i] == IN_PROGRESS)
@@ -118,7 +118,7 @@ public:
             return false;
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) OVERRIDE
         {
             switch (creature->GetEntry())
             {
@@ -128,7 +128,7 @@ public:
             }
         }
 
-        void SetData(uint32 type, uint32 uiData)
+        void SetData(uint32 type, uint32 uiData) OVERRIDE
         {
             switch (type)
             {
@@ -183,7 +183,7 @@ public:
             }
         }
 
-         void SetData64(uint32 identifier, uint64 data)
+         void SetData64(uint32 identifier, uint64 data) OVERRIDE
          {
              switch (identifier)
              {
@@ -191,7 +191,7 @@ public:
              }
          }
 
-        void OnGameObjectCreate(GameObject* go)
+        void OnGameObjectCreate(GameObject* go) OVERRIDE
         {
             switch (go->GetEntry())
             {
@@ -225,7 +225,7 @@ public:
 
             switch (m_uiOperaEvent)
             {
-                //TODO: Set Object visibilities for Opera based on performance
+                /// @todo Set Object visibilities for Opera based on performance
                 case EVENT_OZ:
                     break;
 
@@ -237,12 +237,12 @@ public:
             }
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() OVERRIDE
         {
             return strSaveData;
         }
 
-        uint32 GetData(uint32 uiData) const
+        uint32 GetData(uint32 uiData) const OVERRIDE
         {
             switch (uiData)
             {
@@ -265,7 +265,7 @@ public:
             return 0;
         }
 
-        uint64 GetData64(uint32 uiData) const
+        uint64 GetData64(uint32 uiData) const OVERRIDE
         {
             switch (uiData)
             {

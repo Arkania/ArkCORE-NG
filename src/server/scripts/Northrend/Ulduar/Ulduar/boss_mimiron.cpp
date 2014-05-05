@@ -17,6 +17,7 @@
  */
 
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellScript.h"
 #include "ulduar.h"
 
@@ -98,13 +99,13 @@ class spell_ulduar_proximity_mines : public SpellScriptLoader
                     GetCaster()->CastSpell(GetCaster(), SPELL_TRIGGER_MISSILE, true);
             }
 
-            void Register()
+            void Register() OVERRIDE
             {
                 OnEffectHitTarget += SpellEffectFn(spell_ulduar_proximity_minesSpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
             }
         };
 
-        SpellScript* GetSpellScript() const
+        SpellScript* GetSpellScript() const OVERRIDE
         {
             return new spell_ulduar_proximity_minesSpellScript();
         }

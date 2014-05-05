@@ -57,11 +57,6 @@ class boss_krystallus : public CreatureScript
 public:
     boss_krystallus() : CreatureScript("boss_krystallus") { }
 
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new boss_krystallusAI (creature);
-    }
-
     struct boss_krystallusAI : public ScriptedAI
     {
         boss_krystallusAI(Creature* creature) : ScriptedAI(creature)
@@ -79,7 +74,7 @@ public:
 
         InstanceScript* instance;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             bIsSlam = false;
 
@@ -89,18 +84,16 @@ public:
             uiStompTimer = urand(20000, 29000);
             uiShatterTimer = 0;
 
-            if (instance)
-                instance->SetData(DATA_KRYSTALLUS_EVENT, NOT_STARTED);
+            instance->SetBossState(DATA_KRYSTALLUS, NOT_STARTED);
         }
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) OVERRIDE
         {
             Talk(SAY_AGGRO);
 
-            if (instance)
-                instance->SetData(DATA_KRYSTALLUS_EVENT, IN_PROGRESS);
+            instance->SetBossState(DATA_KRYSTALLUS, IN_PROGRESS);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             //Return since we have no target
             if (!UpdateVictim())
@@ -145,27 +138,27 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) OVERRIDE
         {
             Talk(SAY_DEATH);
 
-            if (instance)
-                instance->SetData(DATA_KRYSTALLUS_EVENT, DONE);
+            instance->SetBossState(DATA_KRYSTALLUS, DONE);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) OVERRIDE
         {
-            if (victim == me)
+            if (victim->GetTypeId() != TYPEID_PLAYER)
                 return;
+
             Talk(SAY_KILL);
         }
 
-        void SpellHitTarget(Unit* /*target*/, const SpellInfo* pSpell)
+        void SpellHitTarget(Unit* /*target*/, const SpellInfo* pSpell) OVERRIDE
         {
             //this part should be in the core
             if (pSpell->Id == SPELL_SHATTER || pSpell->Id == H_SPELL_SHATTER)
             {
-                // todo: we need eventmap to kill this stuff
+                /// @todo we need eventmap to kill this stuff
                 //clear this, if we are still performing
                 if (bIsSlam)
                 {
@@ -182,6 +175,10 @@ public:
         }
     };
 
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
+    {
+        return GetHallsOfStoneAI<boss_krystallusAI>(creature);
+    }
 };
 
 class spell_krystallus_shatter : public SpellScriptLoader
@@ -202,13 +199,13 @@ class spell_krystallus_shatter : public SpellScriptLoader
                 }
             }
 
-            void Register()
+            void Register() OVERRIDE
             {
                 OnEffectHitTarget += SpellEffectFn(spell_krystallus_shatter_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
             }
         };
 
-        SpellScript* GetSpellScript() const
+        SpellScript* GetSpellScript() const OVERRIDE
         {
             return new spell_krystallus_shatter_SpellScript();
         }
@@ -237,13 +234,13 @@ class spell_krystallus_shatter_effect : public SpellScriptLoader
                     SetHitDamage(int32(GetHitDamage() * ((radius - distance) / radius)));
             }
 
-            void Register()
+            void Register() OVERRIDE
             {
                 OnHit += SpellHitFn(spell_krystallus_shatter_effect_SpellScript::CalculateDamage);
             }
         };
 
-        SpellScript* GetSpellScript() const
+        SpellScript* GetSpellScript() const OVERRIDE
         {
             return new spell_krystallus_shatter_effect_SpellScript();
         }

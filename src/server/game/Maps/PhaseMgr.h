@@ -100,11 +100,13 @@ struct PhaseData
     void AddPhaseDefinition(PhaseDefinition const* phaseDefinition);
     bool HasActiveDefinitions() const { return !activePhaseDefinitions.empty(); }
 
-    void AddAuraInfo(uint32 const spellId, PhaseInfo phaseInfo);
-    uint32 RemoveAuraInfo(uint32 const spellId);
+    void AddAuraInfo(uint32 spellId, PhaseInfo const& phaseInfo);
+    uint32 RemoveAuraInfo(uint32 spellId);
 
     void SendPhaseMaskToPlayer();
     void SendPhaseshiftToPlayer();
+
+    void GetActivePhases(std::set<uint32>& phases) const;
 
 private:
     Player* player;
@@ -114,6 +116,7 @@ private:
 
 struct PhaseUpdateData
 {
+    PhaseUpdateData(): _conditionTypeFlags(0), _questId(0) { }
     void AddConditionType(ConditionTypes const conditionType) { _conditionTypeFlags |= (1 << conditionType); }
     void AddQuestUpdate(uint32 const questId);
 
@@ -144,23 +147,25 @@ public:
     void UnRegisterPhasingAuraEffect(AuraEffect const* auraEffect);
 
     // Update flags (delayed phasing)
-    void AddUpdateFlag(PhaseUpdateFlag const updateFlag) { _UpdateFlags |= updateFlag; }
-    void RemoveUpdateFlag(PhaseUpdateFlag const updateFlag);
+    void AddUpdateFlag(PhaseUpdateFlag updateFlag) { _UpdateFlags |= updateFlag; }
+    void RemoveUpdateFlag(PhaseUpdateFlag updateFlag);
 
     // Needed for modify phase command
-    void SetCustomPhase(uint32 const phaseMask);
+    void SetCustomPhase(uint32 phaseMask);
 
     // Debug
     void SendDebugReportToPlayer(Player* const debugger);
 
-    static bool IsConditionTypeSupported(ConditionTypes const conditionType);
+    static bool IsConditionTypeSupported(ConditionTypes conditionType);
+
+    void GetActivePhases(std::set<uint32>& phases) const;
 
 private:
     void Recalculate();
 
     inline bool CheckDefinition(PhaseDefinition const* phaseDefinition);
 
-    bool NeedsPhaseUpdateWithData(PhaseUpdateData const updateData) const;
+    bool NeedsPhaseUpdateWithData(PhaseUpdateData const& updateData) const;
 
     inline bool IsUpdateInProgress() const { return (_UpdateFlags & PHASE_UPDATE_FLAG_ZONE_UPDATE) || (_UpdateFlags & PHASE_UPDATE_FLAG_AREA_UPDATE); }
 

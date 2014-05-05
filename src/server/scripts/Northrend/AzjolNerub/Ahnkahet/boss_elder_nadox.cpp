@@ -18,9 +18,9 @@
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "SpellScript.h"
 #include "ahnkahet.h"
 
-//not in db
 enum Yells
 {
     SAY_AGGRO       = 0,
@@ -42,12 +42,6 @@ enum Spells
     SPELL_GUARDIAN_AURA         = 56151
 };
 
-enum Creatures
-{
-    NPC_AHNKAHAR_SWARMER        = 30178,
-    NPC_AHNKAHAR_GUARDIAN       = 30176
-};
-
 enum Events
 {
     EVENT_PLAGUE = 1,
@@ -63,61 +57,39 @@ class boss_elder_nadox : public CreatureScript
     public:
         boss_elder_nadox() : CreatureScript("boss_elder_nadox") { }
 
-        struct boss_elder_nadoxAI : public ScriptedAI
+        struct boss_elder_nadoxAI : public BossAI
         {
-            boss_elder_nadoxAI(Creature* creature) : ScriptedAI(creature), summons(me)
+            boss_elder_nadoxAI(Creature* creature) : BossAI(creature, DATA_ELDER_NADOX) { }
+
+            void Reset() OVERRIDE
             {
-                instance = creature->GetInstanceScript();
-            }
-
-            bool GuardianDied;
-            uint8 AmountHealthModifier;
-            InstanceScript* instance;
-            SummonList summons;
-            EventMap events;
-
-            void Reset()
-            {
-                events.Reset();
-                summons.DespawnAll();
-
+                _Reset();
                 AmountHealthModifier = 1;
                 GuardianDied = false;
-
-                if (instance)
-                    instance->SetData(DATA_ELDER_NADOX_EVENT, NOT_STARTED);
             }
 
-            void EnterCombat(Unit* /*who*/)
+            void EnterCombat(Unit* /*who*/) OVERRIDE
             {
+                _EnterCombat();
                 Talk(SAY_AGGRO);
 
-                if (instance)
-                    instance->SetData(DATA_ELDER_NADOX_EVENT, IN_PROGRESS);
-
-                events.ScheduleEvent(EVENT_PLAGUE, 13*IN_MILLISECONDS);
-                events.ScheduleEvent(EVENT_SUMMON_SWARMER, 10*IN_MILLISECONDS);
+                events.ScheduleEvent(EVENT_PLAGUE, 13 * IN_MILLISECONDS);
+                events.ScheduleEvent(EVENT_SUMMON_SWARMER, 10 * IN_MILLISECONDS);
 
                 if (IsHeroic())
                 {
-                    events.ScheduleEvent(EVENT_RAGE, 12*IN_MILLISECONDS);
-                    events.ScheduleEvent(EVENT_CHECK_ENRAGE, 5*IN_MILLISECONDS);
+                    events.ScheduleEvent(EVENT_RAGE, 12 * IN_MILLISECONDS);
+                    events.ScheduleEvent(EVENT_CHECK_ENRAGE, 5 * IN_MILLISECONDS);
                 }
             }
 
-            void JustSummoned(Creature* summon)
-            {
-                summons.Summon(summon);
-                summon->AI()->DoZoneInCombat();
-            }
-
-            void SummonedCreatureDies(Creature* summon, Unit* /*killer*/)
+            void SummonedCreatureDies(Creature* summon, Unit* /*killer*/) OVERRIDE
             {
                 if (summon->GetEntry() == NPC_AHNKAHAR_GUARDIAN)
                     GuardianDied = true;
             }
 
-            uint32 GetData(uint32 type) const
+            uint32 GetData(uint32 type) const OVERRIDE
             {
                 if (type == DATA_RESPECT_YOUR_ELDERS)
                     return !GuardianDied ? 1 : 0;
@@ -125,22 +97,19 @@ class boss_elder_nadox : public CreatureScript
                 return 0;
             }
 
-            void KilledUnit(Unit* /*victim*/)
+            void KilledUnit(Unit* who) OVERRIDE
             {
-                Talk(SAY_SLAY);
+                if (who->GetTypeId() == TYPEID_PLAYER)
+                    Talk(SAY_SLAY);
             }
 
-            void JustDied(Unit* /*killer*/)
+            void JustDied(Unit* /*killer*/) OVERRIDE
             {
+                _JustDied();
                 Talk(SAY_DEATH);
-
-                summons.DespawnAll();
-
-                if (instance)
-                    instance->SetData(DATA_ELDER_NADOX_EVENT, DONE);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff) OVERRIDE
             {
                 if (!UpdateVictim())
                     return;
@@ -152,45 +121,49 @@ class boss_elder_nadox : public CreatureScript
                     switch (eventId)
                     {
                         case EVENT_PLAGUE:
-                            DoCast(SelectTarget(SELECT_TARGET_RANDOM,0, 100, true),SPELL_BROOD_PLAGUE,true);
-                            events.ScheduleEvent(EVENT_PLAGUE, 15*IN_MILLISECONDS);
+                            DoCast(SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true), SPELL_BROOD_PLAGUE, true);
+                            events.ScheduleEvent(EVENT_PLAGUE, 15 * IN_MILLISECONDS);
                             break;
                         case EVENT_RAGE:
                             DoCast(H_SPELL_BROOD_RAGE);
-                            events.ScheduleEvent(EVENT_RAGE, urand(10*IN_MILLISECONDS, 50*IN_MILLISECONDS));
+                            events.ScheduleEvent(EVENT_RAGE, urand(10 * IN_MILLISECONDS, 50 * IN_MILLISECONDS));
                             break;
                         case EVENT_SUMMON_SWARMER:
                             DoCast(me, SPELL_SUMMON_SWARMERS);
                             if (urand(1, 3) == 3) // 33% chance of dialog
                                 Talk(SAY_EGG_SAC);
-                            events.ScheduleEvent(EVENT_SUMMON_SWARMER, 10*IN_MILLISECONDS);
+                            events.ScheduleEvent(EVENT_SUMMON_SWARMER, 10 * IN_MILLISECONDS);
                             break;
                         case EVENT_CHECK_ENRAGE:
                             if (me->HasAura(SPELL_ENRAGE))
                                 return;
                             if (me->GetPositionZ() < 24.0f)
                                 DoCast(me, SPELL_ENRAGE, true);
-                            events.ScheduleEvent(EVENT_CHECK_ENRAGE, 5*IN_MILLISECONDS);
+                            events.ScheduleEvent(EVENT_CHECK_ENRAGE, 5 * IN_MILLISECONDS);
                             break;
                         default:
                             break;
                     }
                 }
 
-                if (me->HealthBelowPct(100 - AmountHealthModifier * 25))
+                if (me->HealthBelowPct(100 - AmountHealthModifier* 25))
                 {
-                    Talk(EMOTE_HATCHES, me->GetGUID());
+                    Talk(EMOTE_HATCHES, me);
                     DoCast(me, SPELL_SUMMON_SWARM_GUARD);
                     ++AmountHealthModifier;
                 }
 
                 DoMeleeAttackIfReady();
             }
+
+        private:
+            bool GuardianDied;
+            uint8 AmountHealthModifier;
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const OVERRIDE
         {
-            return new boss_elder_nadoxAI(creature);
+            return GetAhnKahetAI<boss_elder_nadoxAI>(creature);
         }
 };
 
@@ -205,21 +178,21 @@ class npc_ahnkahar_nerubian : public CreatureScript
 
             EventMap events;
 
-            void Reset()
+            void Reset() OVERRIDE
             {
                 if (me->GetEntry() == NPC_AHNKAHAR_GUARDIAN)
                     DoCast(me, SPELL_GUARDIAN_AURA, true);
 
-                events.ScheduleEvent(EVENT_SPRINT, 13*IN_MILLISECONDS);
+                events.ScheduleEvent(EVENT_SPRINT, 13 * IN_MILLISECONDS);
             }
 
-            void JustDied(Unit* /*killer*/)
+            void JustDied(Unit* /*killer*/) OVERRIDE
             {
                 if (me->GetEntry() == NPC_AHNKAHAR_GUARDIAN)
                     me->RemoveAurasDueToSpell(SPELL_GUARDIAN_AURA);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff) OVERRIDE
             {
                 if (!UpdateVictim())
                     return;
@@ -233,17 +206,17 @@ class npc_ahnkahar_nerubian : public CreatureScript
                 {
                     switch (eventId)
                     {
-                        case EVENT_SPRINT:
-                            DoCast(me, SPELL_SPRINT);
-                            events.ScheduleEvent(EVENT_SPRINT, 20*IN_MILLISECONDS);
-                            break;
+                    case EVENT_SPRINT:
+                        DoCast(me, SPELL_SPRINT);
+                        events.ScheduleEvent(EVENT_SPRINT, 20 * IN_MILLISECONDS);
+                        break;
                     }
                 }
                 DoMeleeAttackIfReady();
             }
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const OVERRIDE
         {
             return new npc_ahnkahar_nerubianAI(creature);
         }
@@ -255,22 +228,22 @@ class npc_nadox_eggs : public CreatureScript
 public:
     npc_nadox_eggs() : CreatureScript("npc_nadox_eggs") { }
 
-    struct npc_nadox_eggsAI : public Scripted_NoMovementAI
+    struct npc_nadox_eggsAI : public ScriptedAI
     {
-        npc_nadox_eggsAI(Creature* creature) : Scripted_NoMovementAI(creature)
+        npc_nadox_eggsAI(Creature* creature) : ScriptedAI(creature)
         {
             creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
-            creature->UpdateAllStats();
         }
 
-        void Reset() {}
-        void EnterCombat(Unit* /*who*/) {}
-        void AttackStart(Unit* /*victim*/) {}
-        void MoveInLineOfSight(Unit* /*who*/) {}
-        void UpdateAI(const uint32 /*diff*/) {}
+        void Reset() OVERRIDE { }
+        void EnterCombat(Unit* /*who*/) OVERRIDE { }
+        void AttackStart(Unit* /*victim*/) OVERRIDE { }
+        void MoveInLineOfSight(Unit* /*who*/) OVERRIDE { }
+
+        void UpdateAI(uint32 /*diff*/) OVERRIDE { }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
         return new npc_nadox_eggsAI(creature);
     }
@@ -299,17 +272,17 @@ public:
 
         void FilterTargets(std::list<WorldObject*>& targets)
         {
-            targets.remove_if(GuardianCheck());
+            targets.remove_if (GuardianCheck());
         }
 
-        void Register()
+        void Register() OVERRIDE
         {
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_elder_nadox_guardian_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ALLY);
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_elder_nadox_guardian_SpellScript::FilterTargets, EFFECT_1, TARGET_UNIT_SRC_AREA_ALLY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const OVERRIDE
     {
         return new spell_elder_nadox_guardian_SpellScript();
     }
@@ -318,9 +291,9 @@ public:
 class achievement_respect_your_elders : public AchievementCriteriaScript
 {
 public:
-    achievement_respect_your_elders() : AchievementCriteriaScript("achievement_respect_your_elders") {}
+    achievement_respect_your_elders() : AchievementCriteriaScript("achievement_respect_your_elders") { }
 
-    bool OnCheck(Player* /*player*/, Unit* target)
+    bool OnCheck(Player* /*player*/, Unit* target) OVERRIDE
     {
         if (!target)
             return false;

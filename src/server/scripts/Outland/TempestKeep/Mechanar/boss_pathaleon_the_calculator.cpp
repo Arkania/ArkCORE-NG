@@ -55,88 +55,64 @@ enum Spells
 
 enum Events
 {
-    EVENT_SUMMON                   = 0,
-    EVENT_MANA_TAP                 = 1,
-    EVENT_ARCANE_TORRENT           = 2,
-    EVENT_DOMINATION               = 3,
-    EVENT_ARCANE_EXPLOSION         = 4
+    EVENT_SUMMON                   = 1,
+    EVENT_MANA_TAP                 = 2,
+    EVENT_ARCANE_TORRENT           = 3,
+    EVENT_DOMINATION               = 4,
+    EVENT_ARCANE_EXPLOSION         = 5
+};
+
+enum Creatures
+{
+    NPC_NETHER_WRAITH               = 21062
 };
 
 class boss_pathaleon_the_calculator : public CreatureScript
 {
-    public: boss_pathaleon_the_calculator(): CreatureScript("boss_pathaleon_the_calculator") {}
+    public:
+        boss_pathaleon_the_calculator(): CreatureScript("boss_pathaleon_the_calculator") { }
 
         struct boss_pathaleon_the_calculatorAI : public BossAI
         {
-            boss_pathaleon_the_calculatorAI(Creature* creature) : BossAI(creature,DATA_PATHALEON_THE_CALCULATOR), summons(me) {}
+            boss_pathaleon_the_calculatorAI(Creature* creature) : BossAI(creature, DATA_PATHALEON_THE_CALCULATOR) { }
 
-            SummonList summons;
-            bool Enraged;
-            uint32 Counter;
-
-            void Reset()
+            void EnterCombat(Unit* /*who*/) OVERRIDE
             {
-                if (instance)
-                    instance->SetData(DATA_PATHALEON_THE_CALCULATOR, NOT_STARTED);
-
-                Enraged = false;
-                Counter = 0;
-                summons.DespawnAll();
-            }
-
-            void EnterCombat(Unit* /*who*/)
-            {
-                if (instance)
-                    instance->SetData(DATA_PATHALEON_THE_CALCULATOR, IN_PROGRESS);
-
+                _EnterCombat();
                 events.ScheduleEvent(EVENT_SUMMON, 30000);
                 events.ScheduleEvent(EVENT_MANA_TAP, urand(12000, 20000));
                 events.ScheduleEvent(EVENT_ARCANE_TORRENT, urand(16000, 25000));
                 events.ScheduleEvent(EVENT_DOMINATION, urand(25000, 40000));
-                if (IsHeroic())
-                    events.ScheduleEvent(EVENT_ARCANE_EXPLOSION, urand(8000, 13000));
-
+                events.ScheduleEvent(EVENT_ARCANE_EXPLOSION, urand(8000, 13000));
                 Talk(SAY_AGGRO);
             }
 
-            void KilledUnit(Unit* /*victim*/)
+            void KilledUnit(Unit* /*victim*/) OVERRIDE
             {
                 Talk(SAY_SLAY);
             }
 
-            void JustDied(Unit* /*killer*/)
+            void JustDied(Unit* /*killer*/) OVERRIDE
             {
+                _JustDied();
                 Talk(SAY_DEATH);
-
-                summons.DespawnAll();
-
-                if (instance)
-                    instance->SetData(DATA_PATHALEON_THE_CALCULATOR, DONE);
             }
 
-            void JustSummoned(Creature* summon)
+            void DamageTaken(Unit* /*attacker*/, uint32& damage) OVERRIDE
             {
-                summons.Summon(summon);
+                if (me->HealthBelowPctDamaged(20, damage) && !me->HasAura(SPELL_FRENZY))
+                {
+                    DoCast(me, SPELL_FRENZY);
+                    Talk(SAY_ENRAGE);
+                }
             }
 
-            void SummonedCreatureDespawn(Creature* summon)
-            {
-                summons.Despawn(summon);
-            }
-
-            void UpdateAI(uint32 const diff)
+            void UpdateAI(uint32 diff) OVERRIDE
             {
                 if (!UpdateVictim())
                     return;
 
                 events.Update(diff);
-
-                if (!Enraged && HealthBelowPct(21))
-                {
-                    DoCast(me, SPELL_FRENZY);
-                    Talk(SAY_ENRAGE);
-                    Enraged = true;
-                }
 
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
@@ -148,10 +124,11 @@ class boss_pathaleon_the_calculator : public CreatureScript
                         case EVENT_SUMMON:
                             for (uint8 i = 0; i < 3; ++i)
                             {
-                                Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0);
-                                Creature* Wraith = me->SummonCreature(21062, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
-                                if (target && Wraith)
-                                    Wraith->AI()->AttackStart(target);
+                                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                                {
+                                    if (Creature* Wraith = me->SummonCreature(NPC_NETHER_WRAITH, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000))
+                                        Wraith->AI()->AttackStart(target);
+                                }
                             }
                             Talk(SAY_SUMMON);
                             events.ScheduleEvent(EVENT_SUMMON, urand(30000, 45000));
@@ -182,31 +159,28 @@ class boss_pathaleon_the_calculator : public CreatureScript
             }
         };
 
-            CreatureAI* GetAI(Creature* creature) const
-            {
-                return new boss_pathaleon_the_calculatorAI (creature);
-            }
+        CreatureAI* GetAI(Creature* creature) const OVERRIDE
+        {
+            return new boss_pathaleon_the_calculatorAI(creature);
+        }
 };
 
 class npc_nether_wraith : public CreatureScript
 {
     public:
 
-        npc_nether_wraith()
-            : CreatureScript("npc_nether_wraith")
-        {
-        }
+        npc_nether_wraith() : CreatureScript("npc_nether_wraith") { }
 
         struct npc_nether_wraithAI : public ScriptedAI
         {
-            npc_nether_wraithAI(Creature* creature) : ScriptedAI(creature) {}
+            npc_nether_wraithAI(Creature* creature) : ScriptedAI(creature) { }
 
             uint32 ArcaneMissiles_Timer;
             uint32 Detonation_Timer;
             uint32 Die_Timer;
             bool Detonation;
 
-            void Reset()
+            void Reset() OVERRIDE
             {
                 ArcaneMissiles_Timer = urand(1000, 4000);
                 Detonation_Timer = 20000;
@@ -214,9 +188,9 @@ class npc_nether_wraith : public CreatureScript
                 Detonation = false;
             }
 
-            void EnterCombat(Unit* /*who*/) {}
+            void EnterCombat(Unit* /*who*/) OVERRIDE { }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff) OVERRIDE
             {
                 if (!UpdateVictim())
                     return;
@@ -226,7 +200,7 @@ class npc_nether_wraith : public CreatureScript
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1))
                         DoCast(target, SPELL_ARCANE_MISSILES);
                     else
-                        DoCast(me->GetVictim(), SPELL_ARCANE_MISSILES);
+                        DoCastVictim(SPELL_ARCANE_MISSILES);
                     ArcaneMissiles_Timer = urand(5000, 10000);
                 }
                 else
@@ -257,9 +231,9 @@ class npc_nether_wraith : public CreatureScript
             }
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const OVERRIDE
         {
-            return new npc_nether_wraithAI (creature);
+            return new npc_nether_wraithAI(creature);
         }
 };
 

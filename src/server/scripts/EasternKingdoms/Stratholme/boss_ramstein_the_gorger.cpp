@@ -28,19 +28,25 @@ EndScriptData */
 #include "ScriptedCreature.h"
 #include "stratholme.h"
 
-#define SPELL_TRAMPLE       5568
-#define SPELL_KNOCKOUT    17307
+enum Spells
+{
+    SPELL_TRAMPLE           = 5568,
+    SPELL_KNOCKOUT          = 17307
+};
 
- #define C_MINDLESS_UNDEAD   11030
+enum CreatureId
+{
+    NPC_MINDLESS_UNDEAD     = 11030
+};
 
 class boss_ramstein_the_gorger : public CreatureScript
 {
 public:
     boss_ramstein_the_gorger() : CreatureScript("boss_ramstein_the_gorger") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new boss_ramstein_the_gorgerAI (creature);
+        return GetInstanceAI<boss_ramstein_the_gorgerAI>(creature);
     }
 
     struct boss_ramstein_the_gorgerAI : public ScriptedAI
@@ -55,29 +61,28 @@ public:
         uint32 Trample_Timer;
         uint32 Knockout_Timer;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             Trample_Timer = 3000;
             Knockout_Timer = 12000;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) OVERRIDE
         {
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) OVERRIDE
         {
             for (uint8 i = 0; i < 30; ++i)
             {
-                if (Creature* mob = me->SummonCreature(C_MINDLESS_UNDEAD, 3969.35f+irand(-10, 10), -3391.87f+irand(-10, 10), 119.11f, 5.91f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 1800000))
+                if (Creature* mob = me->SummonCreature(NPC_MINDLESS_UNDEAD, 3969.35f+irand(-10, 10), -3391.87f+irand(-10, 10), 119.11f, 5.91f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 1800000))
                     mob->AI()->AttackStart(me->SelectNearestTarget(100.0f));
             }
 
-            if (instance)
-                instance->SetData(TYPE_RAMSTEIN, DONE);
+            instance->SetData(TYPE_RAMSTEIN, DONE);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             //Return since we have no target
             if (!UpdateVictim())
@@ -93,7 +98,7 @@ public:
             //Knockout
             if (Knockout_Timer <= diff)
             {
-                DoCast(me->GetVictim(), SPELL_KNOCKOUT);
+                DoCastVictim(SPELL_KNOCKOUT);
                 Knockout_Timer = 10000;
             } else Knockout_Timer -= diff;
 

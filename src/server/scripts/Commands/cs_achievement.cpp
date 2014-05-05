@@ -34,17 +34,17 @@ class achievement_commandscript : public CommandScript
 public:
     achievement_commandscript() : CommandScript("achievement_commandscript") { }
 
-    ChatCommand* GetCommands() const
+    ChatCommand* GetCommands() const OVERRIDE
     {
         static ChatCommand achievementCommandTable[] =
         {
-            { "add",            SEC_ADMINISTRATOR,  false,  &HandleAchievementAddCommand,      "", NULL },
-            { NULL,             0,                  false,  NULL,                              "", NULL }
+            { "add", rbac::RBAC_PERM_COMMAND_ACHIEVEMENT_ADD, false, &HandleAchievementAddCommand, "", NULL },
+            { NULL, 0, false, NULL, "", NULL }
         };
         static ChatCommand commandTable[] =
         {
-            { "achievement",    SEC_ADMINISTRATOR,  false, NULL,            "", achievementCommandTable },
-            { NULL,             0,                  false, NULL,                               "", NULL }
+            { "achievement", rbac::RBAC_PERM_COMMAND_ACHIEVEMENT,  false, NULL, "", achievementCommandTable },
+            { NULL, 0, false, NULL, "", NULL }
         };
         return commandTable;
     }

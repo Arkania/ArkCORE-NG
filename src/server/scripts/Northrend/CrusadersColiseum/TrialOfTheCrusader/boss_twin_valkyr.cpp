@@ -146,7 +146,7 @@ struct boss_twin_baseAI : public BossAI
     {
     }
 
-    void Reset()
+    void Reset() OVERRIDE
     {
         me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
         me->SetReactState(REACT_PASSIVE);
@@ -164,16 +164,15 @@ struct boss_twin_baseAI : public BossAI
         summons.DespawnAll();
     }
 
-    void JustReachedHome()
+    void JustReachedHome() OVERRIDE
     {
-        if (instance)
-            instance->SetBossState(BOSS_VALKIRIES, FAIL);
+        instance->SetBossState(BOSS_VALKIRIES, FAIL);
 
         summons.DespawnAll();
         me->DespawnOrUnsummon();
     }
 
-    void MovementInform(uint32 uiType, uint32 uiId)
+    void MovementInform(uint32 uiType, uint32 uiId) OVERRIDE
     {
         if (uiType != POINT_MOTION_TYPE)
             return;
@@ -189,22 +188,21 @@ struct boss_twin_baseAI : public BossAI
         }
     }
 
-    void KilledUnit(Unit* who)
+    void KilledUnit(Unit* who) OVERRIDE
     {
         if (who->GetTypeId() == TYPEID_PLAYER)
         {
             Talk(SAY_KILL_PLAYER);
-            if (instance)
-                instance->SetData(DATA_TRIBUTE_TO_IMMORTALITY_ELIGIBLE, 0);
+            instance->SetData(DATA_TRIBUTE_TO_IMMORTALITY_ELIGIBLE, 0);
         }
     }
 
-    void JustSummoned(Creature* summoned)
+    void JustSummoned(Creature* summoned) OVERRIDE
     {
         summons.Summon(summoned);
     }
 
-    void SummonedCreatureDespawn(Creature* summoned)
+    void SummonedCreatureDespawn(Creature* summoned) OVERRIDE
     {
         switch (summoned->GetEntry())
         {
@@ -225,24 +223,21 @@ struct boss_twin_baseAI : public BossAI
         summons.Despawn(summoned);
     }
 
-    void JustDied(Unit* /*killer*/)
+    void JustDied(Unit* /*killer*/) OVERRIDE
     {
         Talk(SAY_DEATH);
-        if (instance)
+        if (Creature* pSister = GetSister())
         {
-            if (Creature* pSister = GetSister())
+            if (!pSister->IsAlive())
             {
-                if (!pSister->IsAlive())
-                {
-                    me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
-                    pSister->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
-                    _JustDied();
-                }
-                else
-                {
-                    me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
-                    instance->SetBossState(BOSS_VALKIRIES, SPECIAL);
-                }
+                me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
+                pSister->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
+                _JustDied();
+            }
+            else
+            {
+                me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
+                instance->SetBossState(BOSS_VALKIRIES, SPECIAL);
             }
         }
         summons.DespawnAll();
@@ -254,24 +249,21 @@ struct boss_twin_baseAI : public BossAI
         return Unit::GetCreature((*me), instance->GetData64(SisterNpcId));
     }
 
-    void EnterCombat(Unit* /*who*/)
+    void EnterCombat(Unit* /*who*/) OVERRIDE
     {
         me->SetInCombatWithZone();
-        if (instance)
+        if (Creature* pSister = GetSister())
         {
-            if (Creature* pSister = GetSister())
-            {
-                me->AddAura(MyEmphatySpellId, pSister);
-                pSister->SetInCombatWithZone();
-            }
-            instance->SetBossState(BOSS_VALKIRIES, IN_PROGRESS);
+            me->AddAura(MyEmphatySpellId, pSister);
+            pSister->SetInCombatWithZone();
         }
+        instance->SetBossState(BOSS_VALKIRIES, IN_PROGRESS);
 
         Talk(SAY_AGGRO);
         DoCast(me, SurgeSpellId);
     }
 
-    void DoAction(const int32 action)
+    void DoAction(int32 action) OVERRIDE
     {
         switch (action)
         {
@@ -290,10 +282,9 @@ struct boss_twin_baseAI : public BossAI
     {
         SetEquipmentSlots(false, Weapon, mode ? Weapon : int32(EQUIP_UNEQUIP), EQUIP_UNEQUIP);
         me->SetCanDualWield(mode);
-        me->UpdateDamagePhysical(mode ? OFF_ATTACK : BASE_ATTACK);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 diff) OVERRIDE
     {
         if (!instance || !UpdateVictim())
             return;
@@ -404,7 +395,7 @@ class boss_fjola : public CreatureScript
             {
             }
 
-            void Reset()
+            void Reset() OVERRIDE
             {
                 SetEquipmentSlots(false, EQUIP_MAIN_1, EQUIP_UNEQUIP, EQUIP_NO_CHANGE);
                 Stage = 0;
@@ -421,38 +412,35 @@ class boss_fjola : public CreatureScript
                 TouchSpellId = SPELL_LIGHT_TOUCH;
                 SpikeSpellId = SPELL_LIGHT_TWIN_SPIKE;
 
-                if (instance)
-                    instance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT,  EVENT_START_TWINS_FIGHT);
+                instance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT,  EVENT_START_TWINS_FIGHT);
                 boss_twin_baseAI::Reset();
             }
 
-            void EnterCombat(Unit* who)
+            void EnterCombat(Unit* who) OVERRIDE
             {
-                if (instance)
-                    instance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT,  EVENT_START_TWINS_FIGHT);
+                instance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT,  EVENT_START_TWINS_FIGHT);
 
                 me->SummonCreature(NPC_BULLET_CONTROLLER, ToCCommonLoc[1].GetPositionX(), ToCCommonLoc[1].GetPositionY(), ToCCommonLoc[1].GetPositionZ(), 0.0f, TEMPSUMMON_MANUAL_DESPAWN);
                 boss_twin_baseAI::EnterCombat(who);
             }
 
-            void EnterEvadeMode()
+            void EnterEvadeMode() OVERRIDE
             {
                 instance->DoUseDoorOrButton(instance->GetData64(GO_MAIN_GATE_DOOR));
                 boss_twin_baseAI::EnterEvadeMode();
             }
 
-            void JustReachedHome()
+            void JustReachedHome() OVERRIDE
             {
-                if (instance)
-                    instance->DoUseDoorOrButton(instance->GetData64(GO_MAIN_GATE_DOOR));
+                instance->DoUseDoorOrButton(instance->GetData64(GO_MAIN_GATE_DOOR));
 
                 boss_twin_baseAI::JustReachedHome();
             }
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const OVERRIDE
         {
-            return new boss_fjolaAI(creature);
+            return GetInstanceAI<boss_fjolaAI>(creature);
         }
 };
 
@@ -463,9 +451,9 @@ class boss_eydis : public CreatureScript
 
         struct boss_eydisAI : public boss_twin_baseAI
         {
-            boss_eydisAI(Creature* creature) : boss_twin_baseAI(creature) {}
+            boss_eydisAI(Creature* creature) : boss_twin_baseAI(creature) { }
 
-            void Reset()
+            void Reset() OVERRIDE
             {
                 SetEquipmentSlots(false, EQUIP_MAIN_2, EQUIP_UNEQUIP, EQUIP_NO_CHANGE);
                 Stage = 1;
@@ -485,9 +473,9 @@ class boss_eydis : public CreatureScript
             }
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const OVERRIDE
         {
-            return new boss_eydisAI(creature);
+            return GetInstanceAI<boss_eydisAI>(creature);
         }
 };
 
@@ -500,7 +488,7 @@ class npc_essence_of_twin : public CreatureScript
         {
             npc_essence_of_twinAI(Creature* creature) : ScriptedAI(creature) { }
 
-            uint32 GetData(uint32 data) const
+            uint32 GetData(uint32 data) const OVERRIDE
             {
                 uint32 spellReturned = 0;
                 switch (me->GetEntry())
@@ -519,12 +507,12 @@ class npc_essence_of_twin : public CreatureScript
             }
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const OVERRIDE
         {
             return new npc_essence_of_twinAI(creature);
         };
 
-        bool OnGossipHello(Player* player, Creature* creature)
+        bool OnGossipHello(Player* player, Creature* creature) OVERRIDE
         {
             player->RemoveAurasDueToSpell(creature->GetAI()->GetData(ESSENCE_REMOVE));
             player->CastSpell(player, creature->GetAI()->GetData(ESSENCE_APPLY), true);
@@ -553,7 +541,7 @@ struct npc_unleashed_ballAI : public ScriptedAI
         me->GetMotionMaster()->MovePoint(0, x, y, me->GetPositionZ());
     }
 
-    void Reset()
+    void Reset() OVERRIDE
     {
         me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
         me->SetReactState(REACT_PASSIVE);
@@ -564,7 +552,7 @@ struct npc_unleashed_ballAI : public ScriptedAI
         RangeCheckTimer = 0.5*IN_MILLISECONDS;
     }
 
-    void MovementInform(uint32 uiType, uint32 uiId)
+    void MovementInform(uint32 uiType, uint32 uiId) OVERRIDE
     {
         if (uiType != POINT_MOTION_TYPE)
             return;
@@ -593,9 +581,9 @@ class npc_unleashed_dark : public CreatureScript
 
         struct npc_unleashed_darkAI : public npc_unleashed_ballAI
         {
-            npc_unleashed_darkAI(Creature* creature) : npc_unleashed_ballAI(creature) {}
+            npc_unleashed_darkAI(Creature* creature) : npc_unleashed_ballAI(creature) { }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff) OVERRIDE
             {
                 if (RangeCheckTimer < diff)
                 {
@@ -612,7 +600,7 @@ class npc_unleashed_dark : public CreatureScript
             }
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const OVERRIDE
         {
             return new npc_unleashed_darkAI(creature);
         }
@@ -625,9 +613,9 @@ class npc_unleashed_light : public CreatureScript
 
         struct npc_unleashed_lightAI : public npc_unleashed_ballAI
         {
-            npc_unleashed_lightAI(Creature* creature) : npc_unleashed_ballAI(creature) {}
+            npc_unleashed_lightAI(Creature* creature) : npc_unleashed_ballAI(creature) { }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff) OVERRIDE
             {
                 if (RangeCheckTimer < diff)
                 {
@@ -644,7 +632,7 @@ class npc_unleashed_light : public CreatureScript
             }
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const OVERRIDE
         {
             return new npc_unleashed_lightAI(creature);
         }
@@ -655,25 +643,25 @@ class npc_bullet_controller : public CreatureScript
     public:
         npc_bullet_controller() : CreatureScript("npc_bullet_controller") { }
 
-        struct npc_bullet_controllerAI : public Scripted_NoMovementAI
+        struct npc_bullet_controllerAI : public ScriptedAI
         {
-            npc_bullet_controllerAI(Creature* creature) : Scripted_NoMovementAI(creature)
+            npc_bullet_controllerAI(Creature* creature) : ScriptedAI(creature)
             {
-                Reset();
+                SetCombatMovement(false);
             }
 
-            void Reset()
+            void Reset() OVERRIDE
             {
                 DoCastAOE(SPELL_CONTROLLER_PERIODIC);
             }
 
-            void UpdateAI(const uint32 /*diff*/)
+            void UpdateAI(uint32 /*diff*/) OVERRIDE
             {
                 UpdateVictim();
             }
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const OVERRIDE
         {
             return new npc_bullet_controllerAI(creature);
         }
@@ -692,7 +680,7 @@ class spell_powering_up : public SpellScriptLoader
             uint32 spellId;
             uint32 poweringUp;
 
-            bool Load()
+            bool Load() OVERRIDE
             {
                 spellId = sSpellMgr->GetSpellIdForDifficulty(SPELL_SURGE_OF_SPEED, GetCaster());
                 if (!sSpellMgr->GetSpellInfo(spellId))
@@ -725,13 +713,13 @@ class spell_powering_up : public SpellScriptLoader
                 }
             }
 
-            void Register()
+            void Register() OVERRIDE
             {
                 OnEffectHitTarget += SpellEffectFn(spell_powering_up_SpellScript::HandleScriptEffect, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
             }
         };
 
-        SpellScript* GetSpellScript() const
+        SpellScript* GetSpellScript() const OVERRIDE
         {
             return new spell_powering_up_SpellScript();
         }
@@ -748,7 +736,7 @@ class spell_valkyr_essences : public SpellScriptLoader
 
             uint32 spellId;
 
-            bool Load()
+            bool Load() OVERRIDE
             {
                 spellId = sSpellMgr->GetSpellIdForDifficulty(SPELL_SURGE_OF_SPEED, GetCaster());
                 if (!sSpellMgr->GetSpellInfo(spellId))
@@ -820,13 +808,13 @@ class spell_valkyr_essences : public SpellScriptLoader
                 }
             }
 
-            void Register()
+            void Register() OVERRIDE
             {
                 OnEffectAbsorb += AuraEffectAbsorbFn(spell_valkyr_essences_AuraScript::Absorb, EFFECT_0);
             }
         };
 
-        AuraScript* GetAuraScript() const
+        AuraScript* GetAuraScript() const OVERRIDE
         {
             return new spell_valkyr_essences_AuraScript();
         }
@@ -841,7 +829,7 @@ class spell_power_of_the_twins : public SpellScriptLoader
         {
             PrepareAuraScript(spell_power_of_the_twins_AuraScript);
 
-            bool Load()
+            bool Load() OVERRIDE
             {
                 return GetCaster()->GetTypeId() == TYPEID_UNIT;
             }
@@ -864,7 +852,7 @@ class spell_power_of_the_twins : public SpellScriptLoader
                 }
             }
 
-            void Register()
+            void Register() OVERRIDE
             {
                 AfterEffectApply += AuraEffectApplyFn(spell_power_of_the_twins_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_DONE, AURA_EFFECT_HANDLE_REAL);
                 AfterEffectRemove += AuraEffectRemoveFn(spell_power_of_the_twins_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_DONE, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
@@ -872,7 +860,7 @@ class spell_power_of_the_twins : public SpellScriptLoader
             }
         };
 
-        AuraScript* GetAuraScript() const
+        AuraScript* GetAuraScript() const OVERRIDE
         {
             return new spell_power_of_the_twins_AuraScript();
         }

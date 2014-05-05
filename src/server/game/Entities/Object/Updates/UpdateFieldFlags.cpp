@@ -91,8 +91,8 @@ uint32 ItemUpdateFieldFlags[CONTAINER_END] =
     UF_FLAG_PUBLIC,                                         // ITEM_FIELD_ENCHANTMENT_15_3
     UF_FLAG_PUBLIC,                                         // ITEM_FIELD_PROPERTY_SEED
     UF_FLAG_PUBLIC,                                         // ITEM_FIELD_RANDOM_PROPERTIES_ID
-    UF_FLAG_PUBLIC,                                         // ITEM_FIELD_DURABILITY
-    UF_FLAG_PUBLIC,                                         // ITEM_FIELD_MAXDURABILITY
+    UF_FLAG_OWNER | UF_FLAG_ITEM_OWNER,                     // ITEM_FIELD_DURABILITY
+    UF_FLAG_OWNER | UF_FLAG_ITEM_OWNER,                     // ITEM_FIELD_MAXDURABILITY
     UF_FLAG_PUBLIC,                                         // ITEM_FIELD_CREATE_PLAYED_TIME
     UF_FLAG_PUBLIC,                                         // CONTAINER_FIELD_NUM_SLOTS
     UF_FLAG_NONE,                                           // CONTAINER_ALIGN_PAD

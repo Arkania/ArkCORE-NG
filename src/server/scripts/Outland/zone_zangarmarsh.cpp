@@ -70,14 +70,14 @@ class npcs_ashyen_and_keleth : public CreatureScript
 public:
     npcs_ashyen_and_keleth() : CreatureScript("npcs_ashyen_and_keleth") { }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) OVERRIDE
     {
         if (player->GetReputationRank(942) > REP_NEUTRAL)
         {
             if (creature->GetEntry() == NPC_ASHYEN)
                 player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_BLESS_ASH, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
 
-            if (creature->GetEntry() == NPC_ASHYEN)
+            if (creature->GetEntry() == NPC_KELETH)
                 player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_BLESS_KEL, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
         }
         player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
@@ -85,7 +85,7 @@ public:
         return true;
     }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) OVERRIDE
     {
         player->PlayerTalkClass->ClearMenus();
         if (action == GOSSIP_ACTION_INFO_DEF+1)
@@ -162,7 +162,7 @@ public:
 
 #define GOSSIP_COOSH            "You owe Sim'salabim money. Hand them over or die!"
 
-enum eCooshhooosh
+enum Cooshhooosh
 {
     SPELL_LIGHTNING_BOLT    = 9532,
     QUEST_CRACK_SKULLS      = 10009,
@@ -184,23 +184,23 @@ public:
         uint32 m_uiNormFaction;
         uint32 LightningBolt_Timer;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             LightningBolt_Timer = 2000;
             if (me->getFaction() != m_uiNormFaction)
                 me->setFaction(m_uiNormFaction);
         }
 
-        void EnterCombat(Unit* /*who*/) {}
+        void EnterCombat(Unit* /*who*/) OVERRIDE { }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (!UpdateVictim())
                 return;
 
             if (LightningBolt_Timer <= diff)
             {
-                DoCast(me->GetVictim(), SPELL_LIGHTNING_BOLT);
+                DoCastVictim(SPELL_LIGHTNING_BOLT);
                 LightningBolt_Timer = 5000;
             } else LightningBolt_Timer -= diff;
 
@@ -208,12 +208,12 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new npc_cooshcooshAI (creature);
+        return new npc_cooshcooshAI(creature);
     }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) OVERRIDE
     {
         if (player->GetQuestStatus(QUEST_CRACK_SKULLS) == QUEST_STATUS_INCOMPLETE)
             player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_COOSH, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
@@ -222,7 +222,7 @@ public:
         return true;
     }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) OVERRIDE
     {
         player->PlayerTalkClass->ClearMenus();
         if (action == GOSSIP_ACTION_INFO_DEF)
@@ -248,7 +248,7 @@ class npc_elder_kuruti : public CreatureScript
 public:
     npc_elder_kuruti() : CreatureScript("npc_elder_kuruti") { }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) OVERRIDE
     {
         if (player->GetQuestStatus(9803) == QUEST_STATUS_INCOMPLETE)
             player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_KUR1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
@@ -258,7 +258,7 @@ public:
         return true;
     }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) OVERRIDE
     {
         player->PlayerTalkClass->ClearMenus();
         switch (action)
@@ -301,7 +301,7 @@ class npc_mortog_steamhead : public CreatureScript
 public:
     npc_mortog_steamhead() : CreatureScript("npc_mortog_steamhead") { }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) OVERRIDE
     {
         if (creature->IsVendor() && player->GetReputationRank(942) == REP_EXALTED)
             player->ADD_GOSSIP_ITEM(GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
@@ -311,7 +311,7 @@ public:
         return true;
     }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) OVERRIDE
     {
         player->PlayerTalkClass->ClearMenus();
         if (action == GOSSIP_ACTION_TRADE)
@@ -324,7 +324,7 @@ public:
 ## npc_kayra_longmane
 ######*/
 
-enum eKayra
+enum Kayra
 {
     SAY_START           = 0,
     SAY_AMBUSH1         = 1,
@@ -343,11 +343,11 @@ public:
 
     struct npc_kayra_longmaneAI : public npc_escortAI
     {
-        npc_kayra_longmaneAI(Creature* creature) : npc_escortAI(creature) {}
+        npc_kayra_longmaneAI(Creature* creature) : npc_escortAI(creature) { }
 
-        void Reset() { }
+        void Reset() OVERRIDE { }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) OVERRIDE
         {
             Player* player = GetPlayerForEscort();
             if (!player)
@@ -356,16 +356,16 @@ public:
             switch (waypointId)
             {
                 case 4:
-                    Talk(SAY_AMBUSH1, player->GetGUID());
+                    Talk(SAY_AMBUSH1, player);
                     DoSpawnCreature(NPC_SLAVEBINDER, -10.0f, -5.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
                     DoSpawnCreature(NPC_SLAVEBINDER, -8.0f, 5.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
                     break;
                 case 5:
-                    Talk(SAY_PROGRESS, player->GetGUID());
+                    Talk(SAY_PROGRESS, player);
                     SetRun();
                     break;
                 case 16:
-                    Talk(SAY_AMBUSH2, player->GetGUID());
+                    Talk(SAY_AMBUSH2, player);
                     DoSpawnCreature(NPC_SLAVEBINDER, -10.0f, -5.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
                     DoSpawnCreature(NPC_SLAVEBINDER, -8.0f, 5.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
                     break;
@@ -373,18 +373,18 @@ public:
                     SetRun(false);
                     break;
                 case 25:
-                    Talk(SAY_END, player->GetGUID());
+                    Talk(SAY_END, player);
                     player->GroupEventHappens(QUEST_ESCAPE_FROM, me);
                     break;
             }
         }
     };
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) OVERRIDE
     {
         if (quest->GetQuestId() == QUEST_ESCAPE_FROM)
         {
-            creature->AI()->Talk(SAY_START, player->GetGUID());
+            creature->AI()->Talk(SAY_START, player);
 
             if (npc_escortAI* pEscortAI = CAST_AI(npc_kayra_longmane::npc_kayra_longmaneAI, creature->AI()))
                 pEscortAI->Start(false, false, player->GetGUID());
@@ -392,7 +392,7 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
         return new npc_kayra_longmaneAI(creature);
     }
@@ -405,7 +405,7 @@ public:
 #define GOSSIP_TIMOTHY_DANIELS_ITEM1    "Specialist, eh? Just what kind of specialist are you, anyway?"
 #define GOSSIP_TEXT_BROWSE_POISONS      "Let me browse your reagents and poison supplies."
 
-enum eTimothy
+enum Timothy
 {
     GOSSIP_TEXTID_TIMOTHY_DANIELS1      = 9239
 };
@@ -415,7 +415,7 @@ class npc_timothy_daniels : public CreatureScript
 public:
     npc_timothy_daniels() : CreatureScript("npc_timothy_daniels") { }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) OVERRIDE
     {
         if (creature->IsQuestGiver())
             player->PrepareQuestMenu(creature->GetGUID());
@@ -428,7 +428,7 @@ public:
         return true;
     }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) OVERRIDE
     {
         player->PlayerTalkClass->ClearMenus();
         switch (action)

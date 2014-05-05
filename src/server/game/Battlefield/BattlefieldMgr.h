@@ -1,7 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -21,13 +20,10 @@
 #define BATTLEFIELD_MGR_H_
 
 #include "Battlefield.h"
-#include "ace/Singleton.h"
+#include <ace/Singleton.h>
 
 class Player;
-class GameObject;
-class Creature;
 class ZoneScript;
-struct GossipMenuItems;
 
 class BattlefieldQueue
 {
@@ -52,55 +48,49 @@ class BattlefieldQueue
 // class to handle player enter / leave / areatrigger / GO use events
 class BattlefieldMgr
 {
-  public:
-    // ctor
-    BattlefieldMgr();
-    // dtor
-    ~BattlefieldMgr();
+    public:
+        // ctor
+        BattlefieldMgr();
+        // dtor
+        ~BattlefieldMgr();
 
-    // create battlefield events
-    void InitBattlefield();
-    // called when a player enters an battlefield area
-    void HandlePlayerEnterZone(Player * player, uint32 areaflag);
-    // called when player leaves an battlefield area
-    void HandlePlayerLeaveZone(Player * player, uint32 areaflag);
-    // called when player resurrects
-    void HandlePlayerResurrects(Player * player, uint32 areaflag);
-    // return assigned battlefield
-    Battlefield* GetBattlefieldToZoneId(uint32 zoneid);
-    Battlefield* GetBattlefieldByBattleId(uint32 battleid);
-    Battlefield* GetBattlefieldByGUID(uint64 guid);
+        // create battlefield events
+        void InitBattlefield();
 
-    BattlefieldQueue* GetQueueForBattlefield(uint64 guid) { return m_queueMap[guid]; }
+        // called when a player enters an battlefield area
+        void HandlePlayerEnterZone(Player* player, uint32 zoneId);
+        // called when player leaves an battlefield area
+        void HandlePlayerLeaveZone(Player* player, uint32 zoneId);
 
-    ZoneScript* GetZoneScript(uint32 zoneId);
+        // return assigned battlefield
+        Battlefield* GetBattlefieldToZoneId(uint32 zoneId);
+        Battlefield* GetBattlefieldByBattleId(uint32 battleId);
+        Battlefield* GetBattlefieldByGUID(uint64 guid);
 
-    void AddZone(uint32 zoneid, Battlefield * handle);
+        BattlefieldQueue* GetQueueForBattlefield(uint64 guid) { return _queueMap[guid]; }
 
-    void Update(uint32 diff);
+        ZoneScript* GetZoneScript(uint32 zoneId);
 
-    void HandleGossipOption(Player * player, uint64 guid, uint32 gossipid);
+        void AddZone(uint32 zoneId, Battlefield* bf);
 
-    bool CanTalkTo(Player * player, Creature * creature, GossipMenuItems gso);
+        void Update(uint32 diff);
 
-    void HandleDropFlag(Player * player, uint32 spellId);
-
-    typedef std::vector < Battlefield * >BattlefieldSet;
-    typedef std::map < uint32 /* zoneid */ , Battlefield * >BattlefieldMap;
-    typedef std::map < uint64, BattlefieldQueue* > BattlefieldQueueMap;
-  private:
-    // contains all initiated battlefield events
-    // used when initing / cleaning up
-    BattlefieldSet m_BattlefieldSet;
-    // maps the zone ids to an battlefield event
-    // used in player event handling
-    BattlefieldMap m_BattlefieldMap;
-    // A holder for the queue objects
-    BattlefieldQueueMap m_queueMap;
-    // update interval
-    uint32 m_UpdateTimer;
+    private:
+        typedef std::vector<Battlefield*> BattlefieldSet;
+        typedef std::map<uint32 /*zoneId*/, Battlefield*> BattlefieldMap;
+        typedef std::map < uint64, BattlefieldQueue* > BattlefieldQueueMap;
+        // contains all initiated battlefield events
+        // used when initing / cleaning up
+        BattlefieldSet _battlefieldSet;
+        // maps the zone ids to an battlefield event
+        // used in player event handling
+        BattlefieldMap _battlefieldMap;
+        // A holder for the queue objects
+        BattlefieldQueueMap _queueMap;
+        // update interval
+        uint32 _updateTimer;
 };
 
 #define sBattlefieldMgr ACE_Singleton<BattlefieldMgr, ACE_Null_Mutex>::instance()
 
-#endif
+#endif // BATTLEFIELD_MGR_H_
