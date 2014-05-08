@@ -116,11 +116,10 @@ class boss_drahga_shadowburner : public CreatureScript
                 summons.DespawnAll();
                 events.Reset();
                 stage = 0;
-                if (instance)
-                    instance->SetData(DATA_DRAHGA_SHADOWBURNER, NOT_STARTED);
+                instance->SetData(DATA_DRAHGA_SHADOWBURNER, NOT_STARTED);
             }
 
-            void SpellHit(Unit* caster, SpellInfo const* spell)
+            void SpellHit(Unit* /*caster*/, SpellInfo const* spell)
             {
                 if (me->GetCurrentSpell(CURRENT_GENERIC_SPELL))
                     if ((me->GetCurrentSpell(CURRENT_GENERIC_SPELL)->m_spellInfo->Id == SPELL_BURNING_SHADOWBOLT) ||
@@ -135,7 +134,7 @@ class boss_drahga_shadowburner : public CreatureScript
                 summons.Summon(summon);
             }
 
-            void DamageTaken(Unit* attacker, uint32 &damage)
+            void DamageTaken(Unit* /*attacker*/, uint32 &damage)
             {
                 if (me->GetVehicle())
                     damage = 0;
@@ -146,24 +145,22 @@ class boss_drahga_shadowburner : public CreatureScript
                 summons.Despawn(summon);
             }
 
-            void EnterCombat(Unit* who)
+            void EnterCombat(Unit* /*who*/)
             {
                 Talk(SAY_AGGRO);
                 events.ScheduleEvent(EVENT_BURNING_SHADOWBOLT, urand(2000, 5000));
                 events.ScheduleEvent(EVENT_INVOCATION_OF_FLAME, 10000);
-                if (instance)
-                    instance->SetData(DATA_DRAHGA_SHADOWBURNER, IN_PROGRESS);
+                instance->SetData(DATA_DRAHGA_SHADOWBURNER, IN_PROGRESS);
             }
             
-            void JustDied(Unit* killer)
+            void JustDied(Unit* /*killer*/)
             {
                 Talk(SAY_DEATH);
                 summons.DespawnAll();
-                if (instance)
-                    instance->SetData(DATA_DRAHGA_SHADOWBURNER, DONE);
+                instance->SetData(DATA_DRAHGA_SHADOWBURNER, DONE);
             }
 
-            void KilledUnit(Unit* victim)
+            void KilledUnit(Unit* /*victim*/)
             {                
                 Talk(SAY_KILL);
             }
@@ -277,7 +274,7 @@ class npc_drahga_valiona : public CreatureScript
                 summons.Despawn(summon);
             }
 
-            void EnterCombat(Unit* who)
+            void EnterCombat(Unit* /*who*/)
             {
                 events.ScheduleEvent(EVENT_VALIONAS_FLAME, urand(10000, 15000));
                 events.ScheduleEvent(EVENT_SHREDDING_SWIPE, urand(8000, 10000));
@@ -430,12 +427,12 @@ class npc_invoked_flaming_spirit : public CreatureScript
                 DoCast(me, SPELL_INVOKED_FLAME);
             }
 
-            void JustDied(Unit* target)
+            void JustDied(Unit* /*target*/)
             {
                 me->DespawnOrUnsummon();
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 /*diff*/)
             {
                 if (!instance)
                     return;

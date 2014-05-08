@@ -307,7 +307,6 @@ public:
                     {
                         head->SetHealth(me->GetHealth());
                         head->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
-                        head->ClearUnitState(UNIT_STATE_ONVEHICLE);
 
                         me->CastSpell(head, SPELL_POINT_OF_VULNERABILITY, true);
                         head->CastSpell(head, SPELL_POINT_OF_VULNERABILITY2, true);
@@ -329,7 +328,7 @@ public:
 
         void UpdateAI(const uint32 diff)
         {
-            if (!UpdateVictim() && !isInManglePhase || me->HasUnitState(UNIT_STATE_CASTING))
+            if (!(UpdateVictim() && isInManglePhase) || me->HasUnitState(UNIT_STATE_CASTING))
                 return; 
 
             if(me->GetMap()->IsHeroic())
@@ -460,8 +459,6 @@ public:
                                 pincer2->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
                                 pincer1->setFaction(35);
                                 pincer2->setFaction(35);
-                                pincer1->ClearUnitState(UNIT_STATE_ONVEHICLE);
-                                pincer2->ClearUnitState(UNIT_STATE_ONVEHICLE);
                             }
                         }
                         break;
@@ -479,8 +476,8 @@ public:
                                 pincer2->GetVehicleKit()->RemoveAllPassengers();
                                 pincer1->setFaction(14);
                                 pincer2->setFaction(14);
-                                pincer1->AddUnitState(UNIT_STATE_ONVEHICLE);
-                                pincer2->AddUnitState(UNIT_STATE_ONVEHICLE);
+                                pincer1->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                                pincer2->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                             }
 
                             if (sTar)
@@ -512,9 +509,8 @@ public:
                         // Leave Head Phase
                         if (Unit* head = vehicle->GetPassenger(0)) 
                         {
-                            head->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                            head->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                             head->RemoveAllAuras();
-                            head->AddUnitState(UNIT_STATE_ONVEHICLE);
                             me->RemoveAura(SPELL_POINT_OF_VULNERABILITY2);
                             head->RemoveAura(SPELL_POINT_OF_VULNERABILITY);
                             head->RemoveAura(SPELL_POINT_OF_VULNERABILITY2);
@@ -605,7 +601,7 @@ public:
             _JustDied();
         }
 
-        void DamageTaken(Unit* who, uint32& damage)
+        void DamageTaken(Unit* /*who*/, uint32& damage)
         {
             if(me->HasReactState(REACT_PASSIVE) || me->HasReactState(REACT_DEFENSIVE))
                 me->SetReactState(REACT_AGGRESSIVE);
@@ -934,7 +930,7 @@ public:
     {
         PrepareSpellScript(spell_magmaw_massive_crashSpellScript);
 
-        bool Validate(SpellEntry const * spellEntry)
+        bool Validate(SpellInfo const* /*spellEntry*/)
         {
             return true;
         }
@@ -944,7 +940,7 @@ public:
             return true;
         }
 
-        void HandleDummy(SpellEffIndex effIndex)
+        void HandleDummy(SpellEffIndex /*effIndex*/)
         {
             if (Unit* caster = GetCaster())
                 caster->CastSpell(caster, SPELL_MASSIVE_CRASH_DAMAGE, true);

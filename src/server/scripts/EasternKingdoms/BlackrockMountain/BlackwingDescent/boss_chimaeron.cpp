@@ -6,7 +6,6 @@
  * lucky (presuming someone else managed to hack it).
  */
 
-
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "blackwing_descent.h"
@@ -290,7 +289,7 @@ public:
                 DoMeleeAttackIfReady();
         }
 
-        void DamageTaken(Unit* who, uint32& damage)
+        void DamageTaken(Unit* /*who*/, uint32& /*damage*/)
         {
             if(me->HasReactState(REACT_PASSIVE))
             {
@@ -340,7 +339,7 @@ public:
         return true;
     }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 uiSender, uint32 uiAction)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 uiAction)
     {
         player->PlayerTalkClass->ClearMenus();
 
@@ -363,7 +362,7 @@ public:
                 player->SEND_GOSSIP_MENU(66670, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+5:
-                if(InstanceScript* instance = creature->GetInstanceScript())
+                if(creature->GetInstanceScript())
                 {
                     if(Creature* bilotron = creature->FindNearestCreature(NPC_BILE_O_TRON, 100.0f, true))
                     {
@@ -510,8 +509,7 @@ public:
 
         void DoAction(const int32 action)
         {
-
-            Map::PlayerList const &PlayerList = me->GetMap()->GetPlayers();
+            // Map::PlayerList const &PlayerList = me->GetMap()->GetPlayers();
 
             switch(action)
             {
@@ -569,7 +567,7 @@ public:
     {
         PrepareAuraScript(spell_finkles_mixture_AuraScript);
 
-        void Absorb(AuraEffect* aurEff, DamageInfo & dmgInfo, uint32 & absorbAmount)
+        void Absorb(AuraEffect* /*aurEff*/, DamageInfo & dmgInfo, uint32 & absorbAmount)
         {
             Unit * caster = GetCaster();
 

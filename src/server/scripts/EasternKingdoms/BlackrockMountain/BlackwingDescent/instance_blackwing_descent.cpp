@@ -115,7 +115,7 @@ public:
             return false;
         }
 
-        void OnCreatureCreate(Creature* creature, bool /*add*/)
+        void OnCreatureCreate(Creature* creature)
         {
             switch (creature->GetEntry())
             {
@@ -187,13 +187,13 @@ public:
             }
         }
 
-        void OnGameObjectCreate(GameObject* go, bool /*add*/)
+        void OnGameObjectCreate(GameObject* go)
         {
             switch(go->GetEntry())
             {
             case GOB_DOOR_PRE_BOSSES:
                 gobPreBossDoor = go->GetGUID();
-                HandleGameObject(NULL, (GetData(DATA_MAGMAW)==DONE) && (GetData(DATA_OMNOTRON_DEFENSE_SYSTEM)==DONE), go);
+                HandleGameObject(0, (GetData(DATA_MAGMAW)==DONE) && (GetData(DATA_OMNOTRON_DEFENSE_SYSTEM)==DONE), go);
                 break;
 
             case GOB_MALORIAKS_CAULDRON:
@@ -202,7 +202,7 @@ public:
 
             case GOB_DOOR_ATRAMEDES:
                 gobAtramedesBossDoor = go->GetGUID();
-                HandleGameObject(NULL, (GetData(DATA_MALORIAK)==DONE) && (GetData(DATA_CHIMAERON)==DONE), go);
+                HandleGameObject(0, (GetData(DATA_MALORIAK)==DONE) && (GetData(DATA_CHIMAERON)==DONE), go);
                 break;
 
             case GOB_ONYXIA_PLATFORM:
@@ -282,7 +282,7 @@ public:
 
             }
 
-            return NULL;
+            return 0;
         }
 
         uint32 GetData(uint32 type) const

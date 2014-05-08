@@ -682,7 +682,7 @@ void BattlegroundSA::DemolisherStartState(bool start)
     }
 }
 
-void BattlegroundSA::DestroyGate(Player* player, GameObject* go)
+void BattlegroundSA::DestroyGate(Player* /*player*/, GameObject* /*go*/)
 {
 }
 

@@ -28,6 +28,7 @@
 #include "GridNotifiersImpl.h"
 #include "Language.h"
 #include "Player.h"
+#include "GameObject.h"
 #include "SpellMgr.h"
 #include "DisableMgr.h"
 #include "ScriptMgr.h"
@@ -35,7 +36,6 @@
 #include "Map.h"
 
 /****************************** INTERNAL *******************************/
-
 void ArcheologyMgr::Initialize()
 {
     m_completedProjects.clear(); 
@@ -687,12 +687,13 @@ uint32 ArcheologyMgr::GenerateRandomDigSite(uint32 MapId) // For generating a di
         return 0; // Map Id is invalid!
 
     uint8 level = m_player->getLevel();
+
     if (level < 20)
-            return 0; // You don't have required level!
+        return 0; // You don't have required level!
 
     uint16 skill_now = m_player->GetSkillValue(SKILL_ARCHAEOLOGY);
 
-    uint16 levelToSelect;
+    int16 levelToSelect = 0;
     uint32 site = 0;
 
     if (level >= 20 && level <= 30) // Levels 20 - 30
@@ -740,7 +741,7 @@ void ArcheologyMgr::GenerateResearchProject(uint32 branchId, bool force, uint32 
 {
     if (m_researchProject[branchId] != 0 && !force)
     {
-        sLog->outString("Project not generated, m_researchProject[%u] is not 0", branchId);
+        TC_LOG_INFO("server.loading", "Project not generated, m_researchProject[%u] is not 0", branchId);
         return;
     }
 
@@ -805,7 +806,7 @@ void ArcheologyMgr::GenerateResearchProject(uint32 branchId, bool force, uint32 
 
     if (projectList.size() == 0)
     {
-      sLog->outString("Project list size is 0!");
+      TC_LOG_INFO("server.loading", "Project list size is 0!");
       return;
     }
 
@@ -868,7 +869,7 @@ void ArcheologyMgr::GenerateSavedArtifacts()
     }
 }
 
-void ArcheologyMgr::CompleteArtifact(uint32 artId, uint32 spellId, ByteBuffer &data)
+void ArcheologyMgr::CompleteArtifact(uint32 artId, uint32 /*spellId*/, ByteBuffer &data)
 {
     uint32 target_mask, unk1, unk2, numberOfStones;
     data >> target_mask >> unk1 >> unk2 >> numberOfStones;

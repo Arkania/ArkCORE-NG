@@ -185,6 +185,8 @@ class Channel
         void DeVoice(uint64 guid1, uint64 guid2);
         void JoinNotify(uint64 guid);                                           // invisible notify
         void LeaveNotify(uint64 guid);                                          // invisible notify
+        void MakeVoiceOn(WorldPacket* data, uint64 guid);                       //+ 0x22
+        void MakeVoiceOff(WorldPacket* data, uint64 guid);                      //+ 0x23
         void SetOwnership(bool ownership) { _ownership = ownership; };
         static void CleanOldChannelsInDB();
 
@@ -224,8 +226,6 @@ class Channel
         void MakeThrottled(WorldPacket* data);                                  //? 0x1F
         void MakeNotInArea(WorldPacket* data);                                  //? 0x20
         void MakeNotInLfg(WorldPacket* data);                                   //? 0x21
-        void MakeVoiceOn(WorldPacket* data, uint64 guid);                       //+ 0x22
-        void MakeVoiceOff(WorldPacket* data, uint64 guid);                      //+ 0x23
 
         void SendToAll(WorldPacket* data, uint64 guid = 0);
         void SendToAllButOne(WorldPacket* data, uint64 who);

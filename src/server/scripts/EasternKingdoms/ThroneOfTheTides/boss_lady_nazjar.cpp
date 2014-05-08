@@ -135,7 +135,7 @@ class boss_lady_nazjar : public CreatureScript
             {
                 if (!instance || static_cast<InstanceMap*>(me->GetMap())->GetScriptId() != sObjectMgr->GetScriptId(TotTScriptName))
                     me->IsAIEnabled = false;
-                else if (!me->IsDead())
+                else if (!me->isDead())
                     Reset();
             }
 
@@ -149,7 +149,7 @@ class boss_lady_nazjar : public CreatureScript
                 events.Reset();
             }
 
-            void SummonedCreatureDies(Creature* summon, Unit* killer)
+            void SummonedCreatureDies(Creature* summon, Unit* /*killer*/)
             {
                 switch(summon->GetEntry())
                 {
@@ -165,7 +165,7 @@ class boss_lady_nazjar : public CreatureScript
                 Talk(SAY_KILL);
             }
 
-            void SpellHit(Unit* caster, SpellInfo const* spell)
+            void SpellHit(Unit* /*caster*/, SpellInfo const* spell)
             {
                 if (me->GetCurrentSpell(CURRENT_GENERIC_SPELL))
                     if (me->GetCurrentSpell(CURRENT_GENERIC_SPELL)->m_spellInfo->Id == SPELL_SHOCK_BLAST
@@ -412,9 +412,9 @@ class npc_lady_nazjar_tempest_witch : public CreatureScript
             return new npc_lady_nazjar_tempest_witchAI (creature);
         }
 
-        struct npc_lady_nazjar_tempest_witchAI : public Scripted_NoMovementAI
+        struct npc_lady_nazjar_tempest_witchAI : public ScriptedAI
         {
-            npc_lady_nazjar_tempest_witchAI(Creature* creature) : Scripted_NoMovementAI(creature)
+            npc_lady_nazjar_tempest_witchAI(Creature* creature) : ScriptedAI(creature)
             {
                 me->SetReactState(REACT_PASSIVE);
             }
@@ -493,7 +493,7 @@ class npc_lady_nazjar_waterspout : public CreatureScript
                 }
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 /*diff*/)
             {
                 if (bHit)
                     return;
@@ -519,9 +519,9 @@ class npc_lady_nazjar_geyser : public CreatureScript
             return new npc_lady_nazjar_geyserAI (pCreature);
         }
 
-        struct npc_lady_nazjar_geyserAI : public Scripted_NoMovementAI
+        struct npc_lady_nazjar_geyserAI : public ScriptedAI
         {
-            npc_lady_nazjar_geyserAI(Creature* creature) : Scripted_NoMovementAI(creature)
+            npc_lady_nazjar_geyserAI(Creature* creature) : ScriptedAI(creature)
             {
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);

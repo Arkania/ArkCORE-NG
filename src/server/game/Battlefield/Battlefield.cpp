@@ -386,7 +386,7 @@ void Battlefield::PlayerAcceptInviteToQueue(Player* player)
     // Add player in queue
     m_PlayersInQueue[player->GetTeamId()].insert(player->GetGUID());
     // Send notification
-    player->GetSession()->SendBfQueueInviteResponse(m_Guid, m_ZoneId);
+    player->GetSession()->SendBfQueueInviteResponse(m_Guid, m_Guid, m_ZoneId);
 }
 
 // Called in WorldSession::HandleBfExitRequest

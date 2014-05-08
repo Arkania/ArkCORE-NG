@@ -46,13 +46,15 @@ class boss_echo_of_tyrande : public CreatureScript
                     instance->SetBossState(BOSS_ECHO_OF_TYRANDE, NOT_STARTED);
             }
 
-            void JustDied(Unit* killer)
+            void JustDied(Unit* /*killer*/)
             {
                 if (instance)
-                 if (instance->GetData(DATA_FIRST_ENCOUNTER) == IN_PROGRESS)
-                  instance->SetData(DATA_FIRST_ENCOUNTER, DONE);
-                 else  
-                  instance->SetData(DATA_SECOND_ENCOUNTER, DONE);
+				{
+                    if (instance->GetData(DATA_FIRST_ENCOUNTER) == IN_PROGRESS)
+                        instance->SetData(DATA_FIRST_ENCOUNTER, DONE);
+                    else
+                        instance->SetData(DATA_SECOND_ENCOUNTER, DONE);
+				}
             }
 
             void EnterCombat(Unit* /*who*/)
@@ -73,7 +75,7 @@ class boss_echo_of_tyrande : public CreatureScript
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
-                while (uint32 eventId = events.ExecuteEvent())
+                while (/*uint32 eventId = */events.ExecuteEvent())
                 {
                     //switch (eventId)
                     //{

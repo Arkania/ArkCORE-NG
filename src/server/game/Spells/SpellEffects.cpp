@@ -667,14 +667,8 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                     // AP coefficient
                     damage += int32(m_caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.109f * m_caster->ToPlayer()->GetComboPoints());
 
-                    if (m_caster->HasAura(80318) && roll_chance_i(50) || m_caster->HasAura(80319))
+                    if ((m_caster->HasAura(80318) && roll_chance_i(50)) || m_caster->HasAura(80319))
                         m_caster->CastSpell(unitTarget,80863,true);
-                }
-                // Shred increase damage by Razor Claws Mastery.
-                else if (m_spellInfo->Id == 5221)
-                {
-                    if (m_caster->HasAura(77493))
-                        damage += int32((damage / 4) + (damage * (0.0313f *  m_caster->ToPlayer()->GetMasteryPoints())));
                 }
                 // Starfire
                 else if (m_spellInfo->SpellFamilyFlags[0] & 0x00000004)
@@ -683,7 +677,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                         m_caster->SetEclipsePower(int32(m_caster->GetEclipsePower() + 20));
 
                     //Euphoria
-                    if (m_caster->HasAura(81061) && roll_chance_i(12) || m_caster->HasAura(81062) && roll_chance_i(24))
+                    if ((m_caster->HasAura(81061) && roll_chance_i(12)) || (m_caster->HasAura(81062) && roll_chance_i(24)))
                         if (!m_caster->HasAura(48518) && !m_caster->HasAura(48517))
                             m_caster->SetEclipsePower(int32(m_caster->GetEclipsePower() + 20));
                 }
@@ -699,7 +693,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                             damage = int32(damage*(100.0f+aurEff->GetAmount())/100.0f);
 
                     //Euphoria
-                    if (m_caster->HasAura(81061) && roll_chance_i(12) || m_caster->HasAura(81062) && roll_chance_i(24))
+                    if ((m_caster->HasAura(81061) && roll_chance_i(12)) || (m_caster->HasAura(81062) && roll_chance_i(24)))
                         if (!m_caster->HasAura(48518) && !m_caster->HasAura(48517))
                             m_caster->SetEclipsePower(int32(m_caster->GetEclipsePower() -13));
                 }
@@ -781,7 +775,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                     }
                 }
                 // Eviscerate
-                else if (m_spellInfo->Id == 2098 || m_spellInfo->Id == 32645 && m_caster->GetTypeId() == TYPEID_PLAYER)
+                else if (m_spellInfo->Id == 2098 || (m_spellInfo->Id == 32645 && m_caster->GetTypeId() == TYPEID_PLAYER))
                 {
                     if (Player* player = m_caster->ToPlayer())
                     {
@@ -900,7 +894,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                 if (m_spellInfo->Id == 33395)
                 {
                     if (Unit* owner = m_caster->GetOwner())
-                        if (owner->HasAura(86259) && roll_chance_i(33) || (owner->HasAura(86260) && roll_chance_i(67)) || (owner->HasAura(86314)))
+                        if ((owner->HasAura(86259) && roll_chance_i(33)) || (owner->HasAura(86260) && roll_chance_i(67)) || (owner->HasAura(86314)))
                             //Gives your Water Elemental's Freeze spell a % chance to grant 2 charges of Fingers of Frost.
                             owner->SetAuraStack(44544, owner, 2);
                 }
@@ -1003,9 +997,8 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
         return;
     if (!unitTarget && !gameObjTarget && !itemTarget)
         return;
-    uint32 spell_id = 0;
+
     int32 bp = 0;
-    bool triggered = true;
     SpellCastTargets targets;
 
     // selection by spell family
@@ -1067,7 +1060,7 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
             break;
         case SPELLFAMILY_PALADIN:
             // Judgement (seal trigger)
-            if (m_spellInfo->Category == SPELLCATEGORY_JUDGEMENT)
+            if (m_spellInfo->GetCategory() == SPELLCATEGORY_JUDGEMENT)
             {
                 if (!unitTarget || !unitTarget->IsAlive())
                     return;
@@ -1160,7 +1153,7 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                         ihit->effectMask &= ~(1<<1);
 
                     // not empty (checked), copy
-                    Unit::AttackerSet attackers = unitTarget->GetAttackers();
+                    Unit::AttackerSet attackers = unitTarget->getAttackers();
 
                     // remove invalid attackers
                     for (Unit::AttackerSet::iterator aItr = attackers.begin(); aItr != attackers.end();)
@@ -1187,7 +1180,7 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
             // Life Tap
             if ((m_spellInfo->SpellFamilyFlags[0] & SPELLFAMILYFLAG_WARLOCK_LIFETAP) && m_caster->ToPlayer())
             {
-                float spFactor = 0.0f;
+                /*float spFactor = 0.0f;
                 switch (m_spellInfo->Id)
                 {
                     case 11689:
@@ -1197,7 +1190,7 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                     case 57946:
                         spFactor = 0.5f;
                         break;
-                }
+                }*/
 
                 int32 damage = int32(unitTarget->GetMaxHealth() * 0.15);
                 int32 mana = int32(damage * 1.2);
@@ -1243,7 +1236,7 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
             // Brutal Impact
             if (m_spellInfo->Id == 80965 || m_spellInfo->Id == 80964)
             {
-                if (AuraEffect *aurEff = m_caster->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_DRUID, 473, 0))
+                if (m_caster->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_DRUID, 473, 0))
                     m_caster->CastSpell(unitTarget, 82365, true);
             }
             // Starfall
@@ -1580,18 +1573,18 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
 
                     m_caster->CastCustomSpell(m_caster, 45470, &heal, NULL, NULL, true);
 
-                    if (AuraEffect const* aurEff = m_caster->GetAuraEffect(77513, EFFECT_1))     // Blood Shield Mastery Blood
-                    if (m_caster->HasAura(48263))
-                    {
-                        int32 shield = CalculatePct(heal, 50);
-                        if (m_caster->HasAura(77535, m_caster->GetGUID()))
-                            shield += m_caster->GetAura(77535, m_caster->GetGUID())->GetEffect(EFFECT_0)->GetAmount();
+                    if (m_caster->GetAuraEffect(77513, EFFECT_1))     // Blood Shield Mastery Blood
+                        if (m_caster->HasAura(48263))
+                        {
+                            int32 shield = CalculatePct(heal, 50);
+                            if (m_caster->HasAura(77535, m_caster->GetGUID()))
+                                shield += m_caster->GetAura(77535, m_caster->GetGUID())->GetEffect(EFFECT_0)->GetAmount();
 
-                        if (shield > int32(m_caster->GetMaxHealth())) // Make an upper limit of 100% hp the spell can absorb (blizz).
-                            shield = int32(m_caster->GetMaxHealth());
+                            if (shield > int32(m_caster->GetMaxHealth())) // Make an upper limit of 100% hp the spell can absorb (blizz).
+                                shield = int32(m_caster->GetMaxHealth());
 
-                        m_caster->CastCustomSpell(m_caster, 77535, &shield, NULL, NULL, true);
-                    }
+                            m_caster->CastCustomSpell(m_caster, 77535, &shield, NULL, NULL, true);
+                        }
 
                     m_caster->ResetDamageDoneInPastSecs(5);
                     break;
@@ -2401,7 +2394,7 @@ void Spell::EffectHeal(SpellEffIndex /*effIndex*/)
 
         //Deep Healing
         if (m_caster->getClass() == CLASS_SHAMAN)
-            if (AuraEffect * DeppHeal = m_caster->GetAuraEffect(77226,0,m_caster->GetGUID()))
+            if (m_caster->GetAuraEffect(77226,0,m_caster->GetGUID()))
             {
                 uint32 mod = (100 - unitTarget->GetHealthPct()) / 20;
                 mod = mod * m_caster->GetAura(77226)->GetEffect(0)->GetAmount() / 2;
@@ -3978,7 +3971,7 @@ void Spell::EffectTameCreature(SpellEffIndex /*effIndex*/)
     pet->SetUInt32Value(UNIT_FIELD_LEVEL, level);
 
     // caster have pet now
-   m_caster->SetMinion(pet, true, m_caster->GetTypeId() == TYPEID_PLAYER ? m_caster->ToPlayer()->getSlotForNewPet() : PET_SLOT_UNK_SLOT);
+    m_caster->SetMinion(pet, true);
 
     pet->InitTalentForLevel();
 
@@ -4269,21 +4262,7 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                         totalDamagePercentMod *= (unitTarget->GetAura(77661)->GetStackAmount() * aurEff->GetAmount() + 100) / 100;
                         unitTarget->RemoveAurasDueToSpell(77661);
                     }
-
-                    if (unitTarget->HasAura(8050))
-                    {
-                        uint8 MaxTargets = 0;
-                        UnitList targets;
-                        Trinity::AnyUnfriendlyAttackableVisibleUnitInObjectRangeCheck u_check(m_caster, 12);
-                        Trinity::UnitListSearcher<Trinity::AnyUnfriendlyAttackableVisibleUnitInObjectRangeCheck> searcher(m_caster, targets, u_check);
-                        m_caster->VisitNearbyObject(12, searcher);
-                        for (UnitList::iterator iter = targets.begin(); iter != targets.end(); ++iter)
-                            if (MaxTargets <= 4)
-                            {
-                                m_caster->AddAura(8050,(*iter));
-                                ++MaxTargets;
-                            }
-                    }
+                    // if (unitTarget->HasAura(8050)
                 }
 
                 // 40% more damage if has flame enchant
@@ -4378,7 +4357,7 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
 
             // Marked for Death
             if (m_spellInfo->Id == 3044 || m_spellInfo->Id == 53209)
-                if (m_caster->HasAura(53241) && roll_chance_i(50) || m_caster->HasAura(53243))
+                if ((m_caster->HasAura(53241) && roll_chance_i(50)) || m_caster->HasAura(53243))
                     m_caster->CastSpell(unitTarget,88691,true);
 
             // Focus regen
@@ -4820,7 +4799,7 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                 case 97993:
                 case 97985:
                 {
-                    if (m_caster->HasAura(17002) && roll_chance_i(50) || m_caster->HasAura(24866))
+                    if ((m_caster->HasAura(17002) && roll_chance_i(50)) || m_caster->HasAura(24866))
                         unitTarget->RemoveMovementImpairingAuras();
                 }
                 //Blood in the water
@@ -5808,6 +5787,7 @@ void Spell::EffectDisEnchant(SpellEffIndex /*effIndex*/)
     {
         caster->UpdateCraftSkill(m_spellInfo->Id);
         caster->SendLoot(itemTarget->GetGUID(), LOOT_DISENCHANTING);
+        caster->SendDisenchantCredit(itemTarget); // Here he gets the SMSG?
     }
 
     // item will be removed at disenchanting end
@@ -7084,7 +7064,7 @@ void Spell::EffectCreateTamedPet(SpellEffIndex effIndex)
     pet->GetMap()->AddToMap(pet->ToCreature());
 
     // unitTarget has pet now
-    unitTarget->SetMinion(pet, true, unitTarget->ToPlayer()->getSlotForNewPet());
+    unitTarget->SetMinion(pet, true);
 
     pet->InitTalentForLevel();
 

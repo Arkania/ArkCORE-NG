@@ -737,7 +737,7 @@ public:
     {
         PrepareSpellScript(spell_release_abberationsSpellScript);
 
-        bool Validate(SpellEntry const * spellEntry)
+        bool Validate(SpellInfo const* /*spellEntry*/)
         {
             return true;
         }
@@ -747,7 +747,7 @@ public:
             return true;
         }
 
-        void HandleDummy(SpellEffIndex effIndex)
+        void HandleDummy(SpellEffIndex /*effIndex*/)
         {
             if(Unit* caster = GetCaster())
                     for (uint8 i = 0; i<=2; i++)
@@ -775,7 +775,7 @@ public:
     {
         PrepareSpellScript(spell_release_all_abberationsSpellScript);
 
-        bool Validate(SpellEntry const * spellEntry)
+        bool Validate(SpellInfo const* /*spellEntry*/)
         {
             return true;
         }
@@ -785,7 +785,7 @@ public:
             return true;
         }
 
-        void HandleDummy(SpellEffIndex effIndex)
+        void HandleDummy(SpellEffIndex /*effIndex*/)
         {
             if(Unit* caster = GetCaster())
                 for (uint8 i = 0; i < 2; i++)

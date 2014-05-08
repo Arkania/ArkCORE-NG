@@ -15,7 +15,6 @@
 
 #include "Common.h"
 #include "DatabaseEnv.h"
-#include "Player.h"
 #include "DBCEnums.h"
 #include "DBCStores.h"
 #include "WorldSession.h"
@@ -23,7 +22,6 @@
 #include "Language.h"
 #include "DBCStructure.h"
 #include "QueryResult.h"
-#include "GameObject.h"
 
 const float  ARCHAEOLOGY_DIG_SITE_RADIUS     = 150.0f; // Digsite radius - distance check between finds.
 const float  ARCHAEOLOGY_DIG_SITE_FAR_DIST   = 150.0f; // Far from find.
@@ -113,8 +111,8 @@ class GameObject;
 class ArcheologyMgr
 {
     public:
-        explicit ArcheologyMgr(Player* owner) : m_player(owner) {}
-        ~ArcheologyMgr() {}
+        explicit ArcheologyMgr(Player* owner) : m_player(owner) { }
+        ~ArcheologyMgr() { }
 
         // Internals.
         void Initialize();

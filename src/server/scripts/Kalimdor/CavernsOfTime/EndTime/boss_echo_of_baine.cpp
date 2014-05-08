@@ -138,7 +138,7 @@ class boss_echo_of_baine : public CreatureScript
                 introDone = true;
             }
 
-            void JustDied(Unit* killer)
+            void JustDied(Unit* /*killer*/)
             {
                 Talk(SAY_DEATH);
 

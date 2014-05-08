@@ -128,14 +128,14 @@ class boss_erunak_stonespeaker : public CreatureScript
                         me->setFaction(35);
             }
 
-            void KilledUnit(Unit* victim)
+            void KilledUnit(Unit* /*victim*/)
             {
                 if (pInstance)
                     if (Creature* pGhursha = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_MINDBENDER_GHURSHA)))
                         pGhursha->AI()->Talk(SAY_KILL);
             }
 
-            void SpellHit(Unit* caster, SpellInfo const* spell)
+            void SpellHit(Unit* /*caster*/, SpellInfo const* spell)
             {
                 if (me->GetCurrentSpell(CURRENT_GENERIC_SPELL))
                     if (me->GetCurrentSpell(CURRENT_GENERIC_SPELL)->m_spellInfo->Id == SPELL_LAVA_BOLT
@@ -251,7 +251,7 @@ class boss_mindbender_ghursha : public CreatureScript
             {
                 if (!instance || static_cast<InstanceMap*>(me->GetMap())->GetScriptId() != sObjectMgr->GetScriptId(TotTScriptName))
                     me->IsAIEnabled = false;
-                else if (!me->IsDead())
+                else if (!me->isDead())
                     Reset();
             }
 
@@ -324,7 +324,7 @@ class boss_mindbender_ghursha : public CreatureScript
                 DoMeleeAttackIfReady();
             }
 
-            void KilledUnit(Unit* victim)
+            void KilledUnit(Unit* /*victim*/)
             {
                 Talk(SAY_KILL);
             }
@@ -352,9 +352,9 @@ class npc_erunak_earth_shards : public CreatureScript
             return new npc_erunak_earth_shardsAI(pCreature);
         }
 
-        struct npc_erunak_earth_shardsAI : public Scripted_NoMovementAI
+        struct npc_erunak_earth_shardsAI : public ScriptedAI
         {
-            npc_erunak_earth_shardsAI(Creature* pCreature) : Scripted_NoMovementAI(pCreature)
+            npc_erunak_earth_shardsAI(Creature* pCreature) : ScriptedAI(pCreature)
             {
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -372,9 +372,7 @@ class npc_erunak_earth_shards : public CreatureScript
             void UpdateAI(const uint32 diff)
             {
                 if (uiDespawnTimer <= diff)
-                {
                     me->DespawnOrUnsummon();
-                }
                 else
                     uiDespawnTimer -= diff;
             }
@@ -391,9 +389,9 @@ class npc_ghursha_mind_fog : public CreatureScript
             return new npc_ghursha_mind_fogAI (pCreature);
         }
 
-        struct npc_ghursha_mind_fogAI : public Scripted_NoMovementAI
+        struct npc_ghursha_mind_fogAI : public ScriptedAI
         {
-            npc_ghursha_mind_fogAI(Creature* pCreature) : Scripted_NoMovementAI(pCreature)
+            npc_ghursha_mind_fogAI(Creature* pCreature) : ScriptedAI(pCreature)
             {
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -406,9 +404,7 @@ class npc_ghursha_mind_fog : public CreatureScript
                 DoCast(me, SPELL_MIND_FOG_VISUAL, true);
             }
 
-            void UpdateAI(const uint32 diff)
-            {
-            }
+            void UpdateAI(uint32 /*diff*/) { }
         };
 };
 

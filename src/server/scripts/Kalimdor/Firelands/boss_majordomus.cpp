@@ -214,7 +214,7 @@ class boss_majordomus : public CreatureScript
             _JustDied();
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* /*who*/)
         {
             if(instance)
             {
@@ -230,9 +230,9 @@ class boss_majordomus : public CreatureScript
             _EnterCombat();
         }
             
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
-            if (!UpdateVictim() && phase != PHASE_NONE || me->HasUnitState(UNIT_STATE_CASTING))
+            if (!(UpdateVictim() && phase == PHASE_NONE) || me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
             if (phase == PHASE_SCORPION && me->GetPower(POWER_ENERGY) == 100)
@@ -444,7 +444,7 @@ class npc_spirit_of_the_flame : public CreatureScript //52593 npc
  
         EventMap events;
 
-        void IsSummonedBy(Unit* summoner)
+        void IsSummonedBy(Unit* /*summoner*/)
         {
             DoZoneInCombat();
         }
@@ -457,7 +457,7 @@ class npc_spirit_of_the_flame : public CreatureScript //52593 npc
  
         void JustDied(Unit* /*victim*/) { }
  
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* /*who*/)
         {
             events.ScheduleEvent(EVENT_JUMP_TARGET, 100);
         }
@@ -507,11 +507,9 @@ class npc_burning_orb : public CreatureScript //53216
  
         EventMap events;
 
-        void Reset()
-        {
-        }
+        void Reset() { }
  
-        void IsSummonedBy(Unit* summoner)
+        void IsSummonedBy(Unit* /*summoner*/)
         {
             DoZoneInCombat();
             me->AddAura(SPELL_BURNING_ORBS_VISUAL, me);
@@ -519,7 +517,7 @@ class npc_burning_orb : public CreatureScript //53216
  
         void JustDied(Unit* /*victim*/) { }
  
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* /*who*/)
         {
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -528,7 +526,7 @@ class npc_burning_orb : public CreatureScript //53216
             events.ScheduleEvent(EVENT_ORB_DAMAGE, 3500);
         }
  
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                 return;
@@ -574,7 +572,7 @@ class spell_searing_seeds : public SpellScriptLoader
                     GetUnitOwner()->GetAura(SPELL_SEARING_SEEDS)->SetDuration(duration*IN_MILLISECONDS);
             }
 
-            void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 AuraRemoveMode removeMode = GetTargetApplication()->GetRemoveMode();
                 if (removeMode != AURA_REMOVE_BY_EXPIRE)

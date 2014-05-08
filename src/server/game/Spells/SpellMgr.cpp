@@ -28,6 +28,7 @@
 #include "Chat.h"
 #include "Spell.h"
 #include "BattlegroundMgr.h"
+#include "CreatureAI.h"
 #include "MapManager.h"
 #include "BattlefieldWG.h"
 #include "BattlefieldMgr.h"
@@ -3724,9 +3725,6 @@ void SpellMgr::LoadSpellInfoCorrections()
             case 24314: // Threatening Gaze
                 spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CAST | AURA_INTERRUPT_FLAG_MOVE | AURA_INTERRUPT_FLAG_JUMP;
                 break;
-            case 5420: // Tree of Life (Passive)
-                spellInfo->Stances = 1 << (FORM_TREE - 1);
-                break;
             case 49376: // Feral Charge (Cat Form)
                 spellInfo->AttributesEx3 &= ~SPELL_ATTR3_CANT_TRIGGER_PROC;
                 break;
@@ -4020,9 +4018,6 @@ void SpellMgr::LoadSpellInfoCorrections()
                 spellInfo->AttributesEx4 = 0;
                 spellInfo->AttributesEx8 = 0;
                 break;
-            case 88819: // Daybreak (proc)
-                spellInfo->ProcCharges = 1;
-                break;
             case 102306:
                 spellInfo->Effects[EFFECT_1].RadiusEntry = sSpellRadiusStore.LookupEntry(22);   // 200yd
                 break;
@@ -4048,100 +4043,6 @@ void SpellMgr::LoadSpellInfoCorrections()
             case 98010:
                 spellInfo->Effects[EFFECT_1].RadiusEntry = sSpellRadiusStore.LookupEntry(11);   // 45yd
                 break;
-            case 75323: // Reverberating Hymn
-                // Aura is refreshed at 3 seconds, and the tick should happen at the fourth.
-                spellInfo->AttributesEx8 |= SPELL_ATTR8_DONT_RESET_PERIODIC_TIMER;
-                break;
-            default:
-                break;
-        }
-
-        switch (spellInfo->SpellFamilyName)
-        {
-            case SPELLFAMILY_WARRIOR:
-                // Shout
-                if (spellInfo->SpellFamilyFlags[0] & 0x20000 || spellInfo->SpellFamilyFlags[1] & 0x20)
-                    spellInfo->AttributesCu |= SPELL_ATTR0_CU_AURA_CC;
-                break;
-            case SPELLFAMILY_DRUID:
-                // Roar
-                if (spellInfo->SpellFamilyFlags[0] & 0x8)
-                    spellInfo->AttributesCu |= SPELL_ATTR0_CU_AURA_CC;
-                break;
-                // Rake
-                if (spellInfo->Id == 1822)
-                    spellInfo->AttributesCu |= SPELL_ATTR0_CU_IGNORE_ARMOR;
-                    break;
-            case SPELLFAMILY_WARLOCK:
-                // Soul harvest
-                if (spellInfo->Id == 79268)
-                    spellInfo->Effects[0].Amplitude = 3000;
-                // Nether ward
-                if (spellInfo->Id == 687 || spellInfo->Id == 28176)
-                    spellInfo->Effects[2].BasePoints = 6229;
-                // Legion Strike
-                if (spellInfo->Id == 30213)
-                    spellInfo->Effects[1].RadiusEntry = sSpellRadiusStore.LookupEntry(29);
-                // Hellfire
-                if (spellInfo->Id == 5857)
-                    spellInfo->Effects[0].RadiusEntry = sSpellRadiusStore.LookupEntry(13);
-                break;
-            default:
-                break;
-        }
-    }
-
-    for (uint32 i = 0; i < sTalentTabStore.GetNumRows(); ++i)
-    {
-        TalentTabEntry const* talentTab = sTalentTabStore.LookupEntry(i);
-        if (!talentTab)
-            continue;
-
-        spellInfo = mSpellInfoMap[talentTab->MasterySpellId[0]];
-        if (spellInfo)
-            spellInfo->AttributesEx8 |= SPELL_ATTR8_AURA_SEND_AMOUNT;
-
-        spellInfo = mSpellInfoMap[talentTab->MasterySpellId[1]];
-        if (spellInfo)
-            spellInfo->AttributesEx8 |= SPELL_ATTR8_AURA_SEND_AMOUNT;
-    }
-
-    CreatureAI::FillAISpellInfo();
-
-    TC_LOG_INFO("server.loading", ">> Loaded SpellInfo corrections in %u ms", GetMSTimeDiffToNow(oldMSTime));
-}
-
-void SpellMgr::LoadDbcDataCorrections()
-{
-   uint32 oldMSTime = getMSTime();
-
-    SpellInfo* spellInfo = NULL;
-    
-    for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)
-    {
-        spellInfo = (SpellInfo*)sSpellStore.LookupEntry(i);
-        if (!spellInfo)
-            continue;
-
-        for (uint8 j = 0; j < MAX_SPELL_EFFECTS; ++j)
-        {
-            switch (spellInfo->Effects[j].Effect)
-            {
-                case SPELL_EFFECT_CHARGE:
-                case SPELL_EFFECT_CHARGE_DEST:
-                case SPELL_EFFECT_JUMP:
-                case SPELL_EFFECT_JUMP_DEST:
-                case SPELL_EFFECT_LEAP_BACK:
-                    if (!spellInfo->Speed && !spellInfo->SpellFamilyName)
-                        spellInfo->Speed = SPEED_CHARGE;
-                    break;
-            }
-        }
-        if (spellInfo->ActiveIconID == 2158)  // flight
-            spellInfo->Attributes |= SPELL_ATTR0_PASSIVE;
-
-        switch (spellInfo->Id)
-        {
             case 8494: // Mana Shield (rank 2)
                 // because of bug in dbc
                 spellInfo->ProcChance = 0;
@@ -4172,9 +4073,6 @@ void SpellMgr::LoadDbcDataCorrections()
             case 19465: // Improved Stings (Rank 2)
                 spellInfo->Effects[EFFECT_2].TargetA = TARGET_UNIT_CASTER;
                 break;
-            case 30421: // Nether Portal - Perseverence
-                spellInfo->Effects[2].BasePoints += 30000;
-                break;
             case 16834: // Natural shapeshifter
             case 16835:
                 spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(21);
@@ -4186,24 +4084,9 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->SpellFamilyFlags[2] = 0x10;
                 spellInfo->Effects[1].ApplyAuraName = SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN;
                 break;
-            case 27892: // To Anchor 1
-            case 27928: // To Anchor 1
-            case 27935: // To Anchor 1
-            case 27915: // Anchor to Skulls
-            case 27931: // Anchor to Skulls
-            case 27937: // Anchor to Skulls
-                spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(6); // 100 y
-                break;
             case 57994: // Wind Shear - improper data for EFFECT_1 in 3.3.5 DBC, but is correct in 4.x
                 spellInfo->Effects[EFFECT_1].Effect = SPELL_EFFECT_MODIFY_THREAT_PERCENT;
                 spellInfo->Effects[EFFECT_1].BasePoints = -6; // -5%
-                break;
-            case 63675: // Improved Devouring Plague
-                spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_DONE_BONUS;
-                break;
-            case 8145: // Tremor Totem (instant pulse)
-            case 6474: // Earthbind Totem (instant pulse)
-                spellInfo->AttributesEx5 |= SPELL_ATTR5_START_PERIODIC_AT_APPLY;
                 break;
             case 52109: // Flametongue Totem rank 1 (Aura)
             case 52110: // Flametongue Totem rank 2 (Aura)
@@ -4249,17 +4132,45 @@ void SpellMgr::LoadDbcDataCorrections()
             case 82928: // Aimed Shot! - Master Marksman
                 spellInfo->CastTimeEntry = sSpellCastTimesStore.LookupEntry(1);
                 break;
-        case 12355: // Impact Range
-            spellInfo->Effects[1].RadiusEntry = sSpellRadiusStore.LookupEntry(32);
-            break;
-        case 87426: // Summon Shadowy Apparition
-            spellInfo->Effects[0].BasePoints = 1;
+            case 12355: // Impact Range
+                spellInfo->Effects[1].RadiusEntry = sSpellRadiusStore.LookupEntry(32);
+                break;
+            case 87426: // Summon Shadowy Apparition
+                spellInfo->Effects[0].BasePoints = 1;
             default:
                 break;
         }
 
         switch (spellInfo->SpellFamilyName)
         {
+            case SPELLFAMILY_WARRIOR:
+                // Shout
+                if (spellInfo->SpellFamilyFlags[0] & 0x20000 || spellInfo->SpellFamilyFlags[1] & 0x20)
+                    spellInfo->AttributesCu |= SPELL_ATTR0_CU_AURA_CC;
+                break;
+            case SPELLFAMILY_DRUID:
+                // Roar
+                if (spellInfo->SpellFamilyFlags[0] & 0x8)
+                    spellInfo->AttributesCu |= SPELL_ATTR0_CU_AURA_CC;
+                break;
+                // Rake
+                if (spellInfo->Id == 1822)
+                    spellInfo->AttributesCu |= SPELL_ATTR0_CU_IGNORE_ARMOR;
+                    break;
+            case SPELLFAMILY_WARLOCK:
+                // Soul harvest
+                if (spellInfo->Id == 79268)
+                    spellInfo->Effects[0].Amplitude = 3000;
+                // Nether ward
+                if (spellInfo->Id == 687 || spellInfo->Id == 28176)
+                    spellInfo->Effects[2].BasePoints = 6229;
+                // Legion Strike
+                if (spellInfo->Id == 30213)
+                    spellInfo->Effects[1].RadiusEntry = sSpellRadiusStore.LookupEntry(29);
+                // Hellfire
+                if (spellInfo->Id == 5857)
+                    spellInfo->Effects[0].RadiusEntry = sSpellRadiusStore.LookupEntry(13);
+                break;
             case SPELLFAMILY_PALADIN:
                 // Seals of the Pure should affect Seal of Righteousness
                 if (spellInfo->SpellIconID == 25 && spellInfo->Attributes & SPELL_ATTR0_PASSIVE)
@@ -4270,13 +4181,27 @@ void SpellMgr::LoadDbcDataCorrections()
                 if (spellInfo->SpellIconID == 2721 && spellInfo->SpellFamilyFlags[0] & 0x2)
                     spellInfo->SpellFamilyFlags[0] |= 0x40;
                 break;
+            default:
+                break;
         }
     }
 
-    if (SummonPropertiesEntry* properties = const_cast<SummonPropertiesEntry*>(sSummonPropertiesStore.LookupEntry(121)))
-        properties->Type = SUMMON_TYPE_TOTEM;
-    if (SummonPropertiesEntry* properties = const_cast<SummonPropertiesEntry*>(sSummonPropertiesStore.LookupEntry(647))) // 52893
-        properties->Type = SUMMON_TYPE_TOTEM;
+    for (uint32 i = 0; i < sTalentTabStore.GetNumRows(); ++i)
+    {
+        TalentTabEntry const* talentTab = sTalentTabStore.LookupEntry(i);
+        if (!talentTab)
+            continue;
 
-    TC_LOG_INFO("server.loading", ">> Loaded spell dbc data corrections  in %u ms", GetMSTimeDiffToNow(oldMSTime));
+        spellInfo = mSpellInfoMap[talentTab->MasterySpellId[0]];
+        if (spellInfo)
+            spellInfo->AttributesEx8 |= SPELL_ATTR8_AURA_SEND_AMOUNT;
+
+        spellInfo = mSpellInfoMap[talentTab->MasterySpellId[1]];
+        if (spellInfo)
+            spellInfo->AttributesEx8 |= SPELL_ATTR8_AURA_SEND_AMOUNT;
+    }
+
+    CreatureAI::FillAISpellInfo();
+
+    TC_LOG_INFO("server.loading", ">> Loaded SpellInfo corrections in %u ms", GetMSTimeDiffToNow(oldMSTime));
 }

@@ -129,23 +129,11 @@ bool Player::UpdateStats(Stats stat)
     }
 
     if (stat == STAT_STRENGTH)
-    {
         UpdateAttackPowerAndDamage(false);
-        if (HasAuraTypeWithMiscvalue(SPELL_AURA_MOD_RANGED_ATTACK_POWER_OF_STAT_PERCENT, stat))
-            UpdateAttackPowerAndDamage(true);
-    }
     else if (stat == STAT_AGILITY)
     {
         UpdateAttackPowerAndDamage(false);
         UpdateAttackPowerAndDamage(true);
-    }
-    else
-    {
-        // Need update (exist AP from stat auras)
-        if (HasAuraTypeWithMiscvalue(SPELL_AURA_MOD_ATTACK_POWER_OF_STAT_PERCENT, stat))
-            UpdateAttackPowerAndDamage(false);
-        if (HasAuraTypeWithMiscvalue(SPELL_AURA_MOD_RANGED_ATTACK_POWER_OF_STAT_PERCENT, stat))
-            UpdateAttackPowerAndDamage(true);
     }
 
     UpdateSpellDamageAndHealingBonus();
@@ -328,6 +316,9 @@ void Player::UpdateAttackPowerAndDamage(bool ranged)
     UnitMods unitMod_neg = ranged ? UNIT_MOD_ATTACK_POWER_RANGED_NEG : UNIT_MOD_ATTACK_POWER_NEG;
 
     uint16 index = UNIT_FIELD_ATTACK_POWER;
+    uint16 index_mod_pos = UNIT_FIELD_ATTACK_POWER_MOD_POS;
+    uint16 index_mod_neg = UNIT_FIELD_ATTACK_POWER_MOD_NEG;
+    uint16 index_mult = UNIT_FIELD_ATTACK_POWER_MULTIPLIER;
 
     if (ranged)
     {
@@ -385,6 +376,7 @@ void Player::UpdateAttackPowerAndDamage(bool ranged)
             else
                 attPowerMod_neg -= attPowerMod;
         }
+    }
 
     float attPowerMultiplier = (GetModifierValue(unitMod_pos, TOTAL_PCT) + (1 - GetModifierValue(unitMod_neg, TOTAL_PCT))) - 1.0f;
     
@@ -938,10 +930,10 @@ void Creature::UpdateAttackPowerAndDamage(bool ranged)
     float attPowerMod_neg = GetModifierValue(unitMod_neg, TOTAL_VALUE);
     float attPowerMultiplier = (GetModifierValue(unitMod_pos, TOTAL_PCT) + (1 - GetModifierValue(unitMod_neg, TOTAL_PCT))) - 1.0f;
 
-    SetInt32Value(index, (uint32) base_attPower);          //UNIT_FIELD_(RANGED)_ATTACK_POWER field
-    SetInt32Value(index_mod_pos, (uint32) attPowerMod_pos);          //UNIT_FIELD_(RANGED)_ATTACK_POWER_MODS field
-    SetInt32Value(index_mod_neg, (uint32) attPowerMod_neg);          //UNIT_FIELD_(RANGED)_ATTACK_POWER_MODS field
-    SetFloatValue(indexMulti, attackPowerMultiplier);   // UNIT_FIELD_(RANGED)_ATTACK_POWER_MULTIPLIER
+    SetInt32Value(index, (uint32) base_attPower);           //UNIT_FIELD_(RANGED)_ATTACK_POWER field
+    SetInt32Value(index_mod_pos, (uint32) attPowerMod_pos); //UNIT_FIELD_(RANGED)_ATTACK_POWER_MODS field
+    SetInt32Value(index_mod_neg, (uint32) attPowerMod_neg); //UNIT_FIELD_(RANGED)_ATTACK_POWER_MODS field
+    SetFloatValue(indexMulti, attPowerMultiplier);          // UNIT_FIELD_(RANGED)_ATTACK_POWER_MULTIPLIER
 
     // automatically update weapon damage after attack power modification
     if (ranged)

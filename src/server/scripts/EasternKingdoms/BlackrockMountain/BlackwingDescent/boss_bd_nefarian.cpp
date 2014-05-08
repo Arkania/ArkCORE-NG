@@ -256,7 +256,7 @@ public:
             _Reset();
         }
 
-        void IsSummonedBy(Unit* summoner)
+        void IsSummonedBy(Unit* /*summoner*/)
         {
             DoZoneInCombat();
             if(Creature* Onyxia = me->FindNearestCreature(NPC_ONYXIA, 150.0f, true))
@@ -312,7 +312,7 @@ public:
             Talk(SAY_KILL-urand(0,1));
         }
 
-        void DamageTaken(Unit* who, uint32& damage)
+        void DamageTaken(Unit* /*who*/, uint32& damage)
         {
             if(me->HealthBelowPctDamaged(90, damage) || me->HealthBelowPctDamaged(80, damage)  || me->HealthBelowPctDamaged(70, damage) || me->HealthBelowPctDamaged(60, damage) ||
             me->HealthBelowPctDamaged(50, damage) || me->HealthBelowPctDamaged(40, damage)  || me->HealthBelowPctDamaged(30, damage) || me->HealthBelowPctDamaged(20, damage) || me->HealthBelowPctDamaged(10, damage))
@@ -470,7 +470,6 @@ public:
                     case EVENT_INTRO:
                         me->HandleEmote(EMOTE_ONESHOT_LIFTOFF);
                         me->SetDisableGravity(true);
-                        me->SendMovementFlagUpdate();
                         me->SetByteFlag(UNIT_FIELD_BYTES_1, 3, 0x02);
                         me->GetMotionMaster()->MovePoint(1, -126.518f, -233.342f, 36.358f); // Position on top of raid.
                         break;
@@ -493,7 +492,6 @@ public:
                         me->HandleEmote(EMOTE_ONESHOT_LAND);
                         me->RemoveByteFlag(UNIT_FIELD_BYTES_1, 3, 0x02);
                         me->SetDisableGravity(false);
-                        me->SendMovementFlagUpdate();
                         EnterPhaseGround();
                         me->GetMotionMaster()->MoveChase(me->GetVictim());
                         me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -519,7 +517,6 @@ public:
                         me->HandleEmote(EMOTE_ONESHOT_LIFTOFF);
                         me->SetByteFlag(UNIT_FIELD_BYTES_1, 3, 0x02);
                         me->SetDisableGravity(true);
-                        me->SendMovementFlagUpdate();
                         events.ScheduleEvent(EVENT_FLIGHT, 1500);
                         events.ScheduleEvent(EVENT_AIR, 2000);
                         break;
@@ -547,7 +544,6 @@ public:
                     case EVENT_LAND:
                         me->HandleEmote(EMOTE_ONESHOT_LAND);
                         me->SetDisableGravity(false);
-                        me->SendMovementFlagUpdate();
                         me->RemoveByteFlag(UNIT_FIELD_BYTES_1, 3, 0x02);
                         events.ScheduleEvent(EVENT_RETURN, 1000);
                         events.ScheduleEvent(EVENT_GROUND, 1500);
@@ -790,7 +786,7 @@ public:
             }
         }
 
-        void DamageTaken(Unit* /*who*/, uint32& damage)
+        void DamageTaken(Unit* /*who*/, uint32& /*damage*/)
         {
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
@@ -880,7 +876,7 @@ public:
             me->SetReactState(REACT_PASSIVE);           
         }
 
-        void UpdateAI(const uint32 diff) { }
+        void UpdateAI(uint32 /*diff*/) { }
 
         void JustDied(Unit* /*killer*/) { }
     };
@@ -951,7 +947,7 @@ public:
         uint32 timerCheckskeleton;
         uint32 timerDespawn;
 
-        void IsSummonedBy(Unit* summoner)
+        void IsSummonedBy(Unit* /*summoner*/)
         {
             timerCheckskeleton = 100;
             timerDespawn = 6100;

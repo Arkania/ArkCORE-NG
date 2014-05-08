@@ -1,25 +1,26 @@
-/*Copyright (C) 2011 Buli (they call him that from Playground Bully - but he is older now so they changed it to PlayBoy - PlayBoy Buli)
-* Copyright (C) 2011 Skylord - The other Alpha Male in Heaven.
-* 
-* If you have found this script on the internet feel free to use it as I can do fuck to stop you.
-* But do leave an email to thank me, telling me where you found so I can fist fuck the anal wart that put it there.
-*
-******** Script 80 % done. **********
-*
-* ToDo:
-* - Heroic Visuals need some research.
-* - Finish Heroic part.
-*
-* Issues:
-* Issue 1: heroic part implemented 80% - platform destroy todo - summons sunshine and a black baby jesus on a unicorn - have no clue if spells are cast properly.
-* Issue 2: not blizzlike execution: Dreadflames should cast a dreadflame spell that spawns dreadflame spawns (Dawg !) and spawns become the dreadflame... 
-* rather than dreadflame spawn becoming dreadflame from the targeted stalker, but overall it has the same result. So I don't care.
-* Issue 3: Visuals - for what malfurion does at first.
-* Issue 4: Proper Dialogue Sequence for cenarius and malfurion
-* Issue 5: This script... IS NOT LONG ENOUGH!
-*
-* This file is NOT free software; Third-party users can NOT redistribute it or modify it. :)
-*/
+/*
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * (start by PlayBoy Buli)
+ * 
+ * If you have found this script on the internet feel free to use it as I can do fuck to stop you.
+ * But do leave an email to thank me, telling me where you found so I can fist fuck the anal wart that put it there.
+ *
+ * Script 80 % done.
+ *
+ * ToDo:
+ * - Heroic Visuals need some research.
+ * - Finish Heroic part.
+ *
+ * Issues:
+ * Issue 1: heroic part implemented 80% - platform destroy todo - summons sunshine and a black baby jesus on a unicorn - have no clue if spells are cast properly.
+ * Issue 2: not blizzlike execution: Dreadflames should cast a dreadflame spell that spawns dreadflame spawns (Dawg !) and spawns become the dreadflame... 
+ * rather than dreadflame spawn becoming dreadflame from the targeted stalker, but overall it has the same result. So I don't care.
+ * Issue 3: Visuals - for what malfurion does at first.
+ * Issue 4: Proper Dialogue Sequence for cenarius and malfurion
+ * Issue 5: This script... IS NOT LONG ENOUGH!
+ *
+ * This file is NOT free software; Third-party users can NOT redistribute it or modify it. :)
+ */
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
@@ -461,7 +462,7 @@ class boss_ragnaros_firelands : public CreatureScript
                 _JustDied();
             }
 
-            void EnterCombat(Unit* who)
+            void EnterCombat(Unit* /*who*/)
             {
                 me->setActive(true);
 
@@ -488,7 +489,7 @@ class boss_ragnaros_firelands : public CreatureScript
                         me->SetFlag(UNIT_FIELD_FLAGS_2, 0x20);
                         me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
                         me->SetDisableGravity(true);
-                        Movement::MoveSplineInit init(*me);
+                        Movement::MoveSplineInit init(me);
                         init.SetOrientationFixed(true);
                         init.Launch();
                         break;
@@ -725,7 +726,7 @@ class boss_ragnaros_firelands : public CreatureScript
                                     for (uint32 x = 0; x < 8; ++x)
                                         me->SummonCreature(NPC_SON_OF_FLAME, HammerEastSummons[x], TEMPSUMMON_TIMED_DESPAWN, 57500);
                                     me->SetFacingToObject(splitting);
-                                    Movement::MoveSplineInit init(*me);
+                                    Movement::MoveSplineInit init(me);
                                     init.SetOrientationFixed(true);
                                     init.Launch();
                                     DoCast(me, SPELL_SPLITTING_BLOW_NORTH);
@@ -738,7 +739,7 @@ class boss_ragnaros_firelands : public CreatureScript
                                     for (uint32 x = 0; x < 8; ++x)
                                         me->SummonCreature(NPC_SON_OF_FLAME, HammerMiddleSummons[x], TEMPSUMMON_TIMED_DESPAWN, 57500);
                                     me->SetFacingToObject(splitting);
-                                    Movement::MoveSplineInit init(*me);
+                                    Movement::MoveSplineInit init(me);
                                     init.SetOrientationFixed(true);
                                     init.Launch();
                                     DoCast(me, SPELL_SPLITTING_BLOW_MID);
@@ -751,7 +752,7 @@ class boss_ragnaros_firelands : public CreatureScript
                                     for (uint32 x = 0; x < 8; ++x)
                                         me->SummonCreature(NPC_SON_OF_FLAME, HammerWestSummons[x], TEMPSUMMON_TIMED_DESPAWN, 57500);
                                     me->SetFacingToObject(splitting);
-                                    Movement::MoveSplineInit init(*me);
+                                    Movement::MoveSplineInit init(me);
                                     init.SetOrientationFixed(true);
                                     init.Launch();
                                     DoCast(me, SPELL_SPLITTING_BLOW_SOUTH);
@@ -777,7 +778,7 @@ class boss_ragnaros_firelands : public CreatureScript
                         case EVENT_PHASE_TWO:
                         {
                             Talk(SAY_PHASE_2);
-                            Movement::MoveSplineInit init(*me);
+                            Movement::MoveSplineInit init(me);
                             init.SetOrientationFixed(false);
                             init.Launch();
                             me->RemoveAurasDueToSpell(SPELL_DISABLE_ANIM);
@@ -884,7 +885,7 @@ class boss_ragnaros_firelands : public CreatureScript
                                     for (uint32 x = 0; x < 8; ++x)
                                         me->SummonCreature(NPC_SON_OF_FLAME, HammerEastSummons[x], TEMPSUMMON_TIMED_DESPAWN, 57500);
                                     me->SetFacingToObject(splitting);
-                                    Movement::MoveSplineInit init(*me);
+                                    Movement::MoveSplineInit init(me);
                                     init.SetOrientationFixed(true);
                                     init.Launch();
                                     DoCast(me, SPELL_SPLITTING_BLOW_NORTH);
@@ -897,7 +898,7 @@ class boss_ragnaros_firelands : public CreatureScript
                                     for (uint32 x = 0; x < 8; ++x)
                                         me->SummonCreature(NPC_SON_OF_FLAME, HammerMiddleSummons[x], TEMPSUMMON_TIMED_DESPAWN, 57500);
                                     me->SetFacingToObject(splitting);
-                                    Movement::MoveSplineInit init(*me);
+                                    Movement::MoveSplineInit init(me);
                                     init.SetOrientationFixed(true);
                                     init.Launch();
                                     DoCast(me, SPELL_SPLITTING_BLOW_MID);
@@ -910,7 +911,7 @@ class boss_ragnaros_firelands : public CreatureScript
                                     for (uint32 x = 0; x < 8; ++x)
                                         me->SummonCreature(NPC_SON_OF_FLAME, HammerWestSummons[x], TEMPSUMMON_TIMED_DESPAWN, 57500);
                                     me->SetFacingToObject(splitting);
-                                    Movement::MoveSplineInit init(*me);
+                                    Movement::MoveSplineInit init(me);
                                     init.SetOrientationFixed(true);
                                     init.Launch();
                                     DoCast(me, SPELL_SPLITTING_BLOW_SOUTH);
@@ -938,7 +939,7 @@ class boss_ragnaros_firelands : public CreatureScript
                         case EVENT_PHASE_THREE:
                         {
                             Talk(SAY_PHASE_3);
-                            Movement::MoveSplineInit init(*me);
+                            Movement::MoveSplineInit init(me);
                             init.SetOrientationFixed(false);
                             init.Launch();
                             me->RemoveAurasDueToSpell(SPELL_DISABLE_ANIM);
@@ -1036,7 +1037,7 @@ class npc_sulfuras_smash_trigger : public CreatureScript // 53266
                 creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE|UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
                 creature->AddAura(SPELL_SULFURAS_SMASH_VISUAL, creature);
                 creature->SetReactState(REACT_PASSIVE);
-                Movement::MoveSplineInit init(*creature);
+                Movement::MoveSplineInit init(creature);
                 init.SetOrientationFixed(true);
                 init.Launch();
                 m_uiSummonTimer  = 100;
@@ -1049,7 +1050,7 @@ class npc_sulfuras_smash_trigger : public CreatureScript // 53266
             uint32 m_uiDamageTimer; // Damage.
             uint32 m_uiDespawnTimer;
 
-            void EnterCombat(Unit* who) {}
+            void EnterCombat(Unit* /*who*/) { }
 
             void UpdateAI(const uint32 diff)
             {        
@@ -1059,7 +1060,7 @@ class npc_sulfuras_smash_trigger : public CreatureScript // 53266
                     {
                         smash1->SetReactState(REACT_PASSIVE);
                         smash1->SetFacingTo(3.22f);
-                        Movement::MoveSplineInit init(*smash1);
+                        Movement::MoveSplineInit init(smash1);
                         init.SetOrientationFixed(true);
                         init.Launch();
                     }
@@ -1067,7 +1068,7 @@ class npc_sulfuras_smash_trigger : public CreatureScript // 53266
                     {
                         smash2->SetReactState(REACT_PASSIVE);
                         smash2->SetFacingTo(1.49f);
-                        Movement::MoveSplineInit init(*smash2);
+                        Movement::MoveSplineInit init(smash2);
                         init.SetOrientationFixed(true);
                         init.Launch();
                     }
@@ -1075,7 +1076,7 @@ class npc_sulfuras_smash_trigger : public CreatureScript // 53266
                     {
                         smash3->SetReactState(REACT_PASSIVE);
                         smash3->SetFacingTo(4.89f);
-                        Movement::MoveSplineInit init(*smash3);
+                        Movement::MoveSplineInit init(smash3);
                         init.SetOrientationFixed(true);
                         init.Launch();
                     }
@@ -1173,7 +1174,7 @@ class npc_magma_trap : public CreatureScript
                 creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE|UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
                 creature->AddAura(SPELL_MAGMA_TRAP_VISUAL, creature);
                 creature->SetReactState(REACT_PASSIVE);
-                Movement::MoveSplineInit init(*creature);
+                Movement::MoveSplineInit init(creature);
                 init.SetOrientationFixed(true);
                 init.Launch();
                 m_uiDespawnTimer = 70000;
@@ -1229,7 +1230,7 @@ class npc_splitting_blow : public CreatureScript
                 instance = creature->GetInstanceScript();
                 creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE|UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
                 creature->SetReactState(REACT_PASSIVE);
-                Movement::MoveSplineInit init(*creature);
+                Movement::MoveSplineInit init(creature);
                 init.SetOrientationFixed(true);
                 init.Launch();
                 m_uiDespawnTimer = 8000;
@@ -1271,7 +1272,7 @@ class npc_sulfuras : public CreatureScript
                 creature->AddAura(SPELL_SULFURAS_AURA, creature);
                 creature->AI()->Talk(SAY_SONS);
                 creature->SetReactState(REACT_PASSIVE);
-                Movement::MoveSplineInit init(*creature);
+                Movement::MoveSplineInit init(creature);
                 init.SetOrientationFixed(true);
                 init.Launch();
                 m_uiDespawnTimer = 44900;
@@ -1324,7 +1325,7 @@ class npc_son_of_flame : public CreatureScript
             uint32 m_uiEmergeTimer;
             uint32 m_uiSulfurasCheckTimer;
 
-            void DamageTaken(Unit* /*who*/, uint32& damage)
+            void DamageTaken(Unit* /*who*/, uint32& /*damage*/)
             {
                 if (me->HasAura(SPELL_BURNING_SPEED))
                     if (Aura * aura = me->GetAura(SPELL_BURNING_SPEED))
@@ -1390,7 +1391,7 @@ class npc_molten_seed : public CreatureScript
                 instance = creature->GetInstanceScript();
                 creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE|UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
                 creature->SetReactState(REACT_PASSIVE);
-                Movement::MoveSplineInit init(*creature);
+                Movement::MoveSplineInit init(creature);
                 init.SetOrientationFixed(true);
                 init.Launch();
                 m_uiMoltenInfernoTimer = 10000;
@@ -1533,7 +1534,7 @@ class npc_engulfing_flames : public CreatureScript
                 creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE|UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
                 creature->CastSpell(creature, SPELL_ENGULFING_FLAMES_DAMAGE, false);
                 creature->SetReactState(REACT_PASSIVE);
-                Movement::MoveSplineInit init(*creature);
+                Movement::MoveSplineInit init(creature);
                 init.SetOrientationFixed(true);
                 init.Launch();
                 m_uiDespawnTimer = 4000;
@@ -1652,7 +1653,7 @@ class npc_living_meteor : public CreatureScript
             uint32 m_uiTargetChangeTimer;
             uint32 m_uiLavalogedCheckTimer;
 
-            void DamageTaken(Unit* /*who*/, uint32& damage)
+            void DamageTaken(Unit* /*who*/, uint32& /*damage*/)
             {
                 DoCast(me, SPELL_COMBUSTION);
             }
@@ -1781,7 +1782,7 @@ class npc_cloudburst : public CreatureScript
             InstanceScript* instance;
             uint8 _cloudburstCounter;
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(uint32 /*diff*/)
             {
                 _cloudburstCounter = RAID_MODE<uint8>(1, 1, 1, 3);
 
@@ -1821,7 +1822,7 @@ class npc_breathoffrost : public CreatureScript
 
             InstanceScript* instance;
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(uint32 /*diff*/)
             {
                 if (Player* player = me->FindNearestPlayer(6.0f, true))
                     if (player->IsWithinDistInMap(me, 6.0f))
@@ -1866,11 +1867,10 @@ class npc_malfurion : public CreatureScript
                 me->SetReactState(REACT_PASSIVE);
             }
 
-            void EnterCombat(Unit* pWho)
+            void EnterCombat(Unit* /*who*/)
             {            
-            m_uiCloudTimer = 9000;
+                m_uiCloudTimer = 9000;
             }
-
             
             void UpdateAI(const uint32 uiDiff)
             {
@@ -1916,9 +1916,9 @@ class npc_cenarius : public CreatureScript
                 me->SetReactState(REACT_PASSIVE);
             }
 
-            void EnterCombat(Unit* pWho)
+            void EnterCombat(Unit* /*who*/)
             {            
-            m_uiFrostyTimer = 12000;
+                m_uiFrostyTimer = 12000;
             }
 
             void UpdateAI(const uint32 uiDiff)
@@ -1966,11 +1966,9 @@ class npc_heartofragnaros : public CreatureScript
                 m_uiHeartBeat = 1000;//timer is here if you need it so just copy paste. To remove if script works without it.
             }
 
-            void EnterCombat(Unit* pWho)
-            {            
-            }
+            void EnterCombat(Unit* /*who*/) { }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(uint32 /*diff*/)
             {
                 Player* player=me->FindNearestPlayer(6.0f, true);
                 if (player)
@@ -2022,9 +2020,9 @@ class npc_hamuul : public CreatureScript
                 me->SetReactState(REACT_PASSIVE);
             }
 
-            void EnterCombat(Unit* pWho)
+            void EnterCombat(Unit* /*who*/)
             {            
-            m_uiRootTimer = 9000;
+                m_uiRootTimer = 9000;
             }
 
             

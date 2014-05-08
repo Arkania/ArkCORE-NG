@@ -71,6 +71,7 @@ class PreparedResultSet
 
         bool NextRow();
         uint64 GetRowCount() const { return m_rowCount; }
+        uint64 GetRowPosition() const { return m_rowPosition; }
         uint32 GetFieldCount() const { return m_fieldCount; }
 
         Field* Fetch() const

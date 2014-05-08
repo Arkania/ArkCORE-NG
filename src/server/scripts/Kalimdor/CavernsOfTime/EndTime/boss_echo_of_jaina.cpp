@@ -127,7 +127,7 @@ class boss_echo_of_jaina : public CreatureScript
                 }
             }
 
-            void JustDied(Unit* killer)
+            void JustDied(Unit* /*killer*/)
             {
                 Talk(SAY_DEATH);
 

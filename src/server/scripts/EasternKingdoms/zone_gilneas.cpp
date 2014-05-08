@@ -141,13 +141,15 @@ public:
                 _nearGate = true;
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (_nearGate)
+            {
                 if (_timer <= diff)
                     DoWork();
                 else
                     _timer -= diff;
+            }
 
             if (!UpdateVictim())
                 return;
@@ -170,7 +172,7 @@ public:
                         std::list<Creature*>::iterator itr = listOfCitizen.begin();
                         std::advance(itr, id);
 
-                        if (_citizen = *itr)
+                        if (Creature* _citizen = *itr)
                         {
                             _timer = urand(1000,2000);
                             _emote=urand(0, 4);
@@ -186,7 +188,7 @@ public:
                 {
                     if (_citizen)
                     {
-                        _citizen->AI()->Talk(_say, me->GetGUID());
+                        _citizen->AI()->Talk(_say);
                         _timer = urand(4000,7000);
                         _phase=2;
                     }
@@ -196,7 +198,7 @@ public:
                 {
                     if (_citizen)
                     {
-                        Talk(_say , me->GetGUID());
+                        Talk(_say);
                         _timer = 6000;
                         _phase=3;
                     }
@@ -231,7 +233,7 @@ class npc_prince_liam_greymane_phase1 : public CreatureScript
 public:
     npc_prince_liam_greymane_phase1() : CreatureScript("npc_prince_liam_greymane_phase1") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* /*player*/, Creature* creature, Quest const* quest)
     {
         if (quest->GetQuestId() == QUEST_LOCKDOWN)
             if (Creature* citizen = creature->FindNearestCreature(NPC_PANICKED_CITIZEN_PHASE1, 20.0f))
@@ -262,15 +264,15 @@ public:
                 switch (uiSayCount)
                 {
                 case 1:
-                    Talk(0, me->GetGUID());
+                    Talk(0);
                     uiSayTimer = 15000;
                     break;
                 case 2:
-                    Talk(1, me->GetGUID());
+                    Talk(1);
                     uiSayTimer = 18000;
                     break;
                 case 3:
-                    Talk(2, me->GetGUID());
+                    Talk(2);
                     uiSayTimer = 25000;
                     uiSayCount = 0;
                     break;
@@ -296,7 +298,7 @@ class npc_lieutenant_walden_phase1 : public CreatureScript
 public:
     npc_lieutenant_walden_phase1() : CreatureScript("npc_lieutenant_walden_phase1") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* /*creature*/, Quest const* quest)
     {
         if (quest->GetQuestId() == QUEST_SOMETHINGS_AMISS)
         {
@@ -340,8 +342,7 @@ public:
         {
             _liam=liam;
             _fightWithPrinceLiam=true;
-            Position pos;
-            liam->GetNearPosition(pos, 1.5f, 0.0f);
+            Position pos = liam->GetNearPosition(1.5f, 0.0f);
             me->GetMotionMaster()->MovePoint(1005, pos);
             me->setFaction(2179);
         }
@@ -365,9 +366,9 @@ public:
             me->AddThreat(who, 100500);
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 /*type*/, uint32 id)
         {
-            if (id=1005)
+            if (id == 1005)
             {
                 me->CombatStart(_liam);
             }
@@ -474,7 +475,7 @@ public:
         return false;
     }
 
-    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest)
+    bool OnQuestAccept(Player* player, Creature* /*creature*/, const Quest* quest)
     {
         if (quest->GetQuestId() == QUEST_ROYAL_ORDERS)
         {
@@ -539,14 +540,14 @@ public:
             if (_worgen)
             {
                 if (_worgen->IsAlive()) return;
-                if (_worgen->IsDead())
+                if (_worgen->isDead())
                 {
                     _worgen->DespawnOrUnsummon();
                     _worgen=NULL;
                     return;
                 }
             }
-            if (_worgen = me->SummonCreature(NPC_RAMPAGING_WORGEN_PHASE2, -1474.3f, 1396.6f, 35.556f, 0.27f, TEMPSUMMON_TIMED_DESPAWN, 20000))
+            if (Creature* _worgen = me->SummonCreature(NPC_RAMPAGING_WORGEN_PHASE2, -1474.3f, 1396.6f, 35.556f, 0.27f, TEMPSUMMON_TIMED_DESPAWN, 20000))
             {
                 CAST_AI(npc_rampaging_worgen_phase2::npc_rampaging_worgen_phase2AI, _worgen->AI())->StartFightWithPrinceLiam(me);
             }
@@ -599,6 +600,7 @@ public:
             npc_escortAI::UpdateAI(diff);
 
             if (_pause)
+            {
                 if (_timer <= diff)
                 {
                     _pause = false;
@@ -606,6 +608,7 @@ public:
                 }
                 else
                     _timer -= diff;
+            }
         }
     };
 
@@ -654,6 +657,7 @@ public:
             npc_escortAI::UpdateAI(diff);
 
             if (_pause)
+            {
                 if (_timer <= diff)
                 {
                     _pause = false;
@@ -661,6 +665,7 @@ public:
                 }
                 else
                     _timer -= diff;
+            }
         }
     };
 
@@ -700,10 +705,12 @@ public:
                 me->SetReactState(REACT_AGGRESSIVE);
                 me->RemoveFlag(UNIT_FIELD_FLAGS,UNIT_FLAG_NON_ATTACKABLE);
                 if (me->IsSummon())
+                {
                     if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                         AttackStart(summoner);
                     else
                         me->DespawnOrUnsummon();
+                }
             }
         }
 
@@ -712,6 +719,7 @@ public:
             npc_escortAI::UpdateAI(diff);
 
             if (pause)
+            {
                 if (uiPauseTimer <= diff)
                 {
                     pause = false;
@@ -719,6 +727,7 @@ public:
                 }
                 else
                     uiPauseTimer -= diff;
+            }
 
             if (!UpdateVictim())
                 return;
@@ -891,7 +900,7 @@ public:
     {
         npc_gwen_armstead_phase4AI(Creature* creature) : ScriptedAI(creature) { }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 /*diff*/)
         {
             if (!UpdateVictim())
                 return;
@@ -919,7 +928,7 @@ public:
     {
         npc_tobias_mistmantle_phase4AI(Creature* creature) : ScriptedAI(creature) { }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 /*diff*/)
         {
             if (!UpdateVictim())
                 return;

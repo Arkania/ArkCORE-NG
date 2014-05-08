@@ -159,8 +159,7 @@ public:
             if (SummonAddsTimer <= diff)
             {
                 Talk(SAY_SUMMON_ADDS);
-                Position pos;
-                me->GetPosition(&pos);
+                Position pos = me->GetPosition();
                 me->SummonCreature(NPC_TORMENTED_OFFICER, pos, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000);
                 me->SummonCreature(NPC_WAILING_GUARDSMAN, pos, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000);
                 SummonAddsTimer = 40000;

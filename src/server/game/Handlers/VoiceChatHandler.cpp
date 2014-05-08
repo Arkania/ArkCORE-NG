@@ -18,10 +18,17 @@
  */
 
 #include "Common.h"
+#include "Player.h"
+#include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include "Opcodes.h"
 #include "Log.h"
+#include "ChannelMgr.h"
+#include "Channel.h"
+#include "Chat.h"
+#include "ObjectMgr.h"
+#include "SocialMgr.h"
 
 void WorldSession::HandleVoiceSessionEnableOpcode(WorldPacket& recvData)
 {

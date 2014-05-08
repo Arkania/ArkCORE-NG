@@ -922,6 +922,7 @@ public:
     // Bank
     void SwapItems(Player* player, uint8 tabId, uint8 slotId, uint8 destTabId, uint8 destSlotId, uint32 splitedAmount);
     void SwapItemsWithInventory(Player* player, bool toChar, uint8 tabId, uint8 slotId, uint8 playerBag, uint8 playerSlotId, uint32 splitedAmount);
+    void AddMoneyToBank(uint64 money) { m_bankMoney += money; }
 
     // Bank tabs
     void SetBankTabText(uint8 tabId, std::string const& text);
@@ -931,7 +932,7 @@ public:
 
     // Guild leveling
     uint8 GetLevel() const { return _level; }
-    void GiveXP(uint32 xp, Player* source);
+    void GiveXP(uint32 xp, Player* source = NULL);
     uint64 GetExperience() const { return _experience; }
     uint64 GetTodayExperience() const { return _todayExperience; }
 

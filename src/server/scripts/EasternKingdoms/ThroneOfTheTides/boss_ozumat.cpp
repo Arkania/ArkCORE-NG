@@ -144,7 +144,7 @@ class npc_neptulon : public CreatureScript
             return true;
         }
 
-        bool OnGossipSelect(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
+        bool OnGossipSelect(Player* pPlayer, Creature* pCreature, uint32 /*uiSender*/, uint32 /*uiAction*/)
         {
             if (InstanceScript* pInstance = pCreature->GetInstanceScript())
             {
@@ -218,7 +218,7 @@ class npc_neptulon : public CreatureScript
                 summons.Summon(summon);
             }
 
-            void SummonedCreatureDies(Creature* pCreature, Unit* pKiller)
+            void SummonedCreatureDies(Creature* pCreature, Unit* /*pKiller*/)
             {
                 summons.Despawn(pCreature);
                 if (pCreature->GetEntry() == NPC_VICIOUS_MINDLASHER)
@@ -277,7 +277,7 @@ class npc_neptulon : public CreatureScript
                 EnterEvadeMode();
             }
 
-            void DamageTaken(Unit* pAttacker, uint32 &damage)
+            void DamageTaken(Unit* /*pAttacker*/, uint32 &damage)
             {
                 if (damage >= me->GetHealth())
                 {
@@ -424,7 +424,7 @@ class npc_vicious_mindslasher : public CreatureScript
                 events.Reset();
             }
 
-            void EnterCombat(Unit* who)
+            void EnterCombat(Unit* /*who*/)
             {
                 events.ScheduleEvent(EVENT_BRAIN_SPIKE, urand(6000, 10000));
                 if (IsHeroic())
@@ -432,7 +432,7 @@ class npc_vicious_mindslasher : public CreatureScript
                 events.ScheduleEvent(EVENT_SHADOW_BOLT, 2000);
             }
 
-            void KilledUnit(Unit* victim)
+            void KilledUnit(Unit* /*victim*/)
             {
                 if (pInstance)
                     if (Creature* pNeptulon = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_NEPTULON)))
@@ -497,14 +497,14 @@ class npc_unyielding_behemoth : public CreatureScript
                 events.Reset();
             }
 
-            void KilledUnit(Unit* victim)
+            void KilledUnit(Unit* /*victim*/)
             {
                 if (pInstance)
                     if (Creature* pNeptulon = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_NEPTULON)))
                         pNeptulon->AI()->Talk(SAY_KILL);
             }
 
-            void EnterCombat(Unit* who)
+            void EnterCombat(Unit* /*who*/)
             {
                 events.ScheduleEvent(EVENT_BLIGHT_SPRAY, urand(8000, 12000));
             }
@@ -560,14 +560,9 @@ class npc_faceless_sapper : public CreatureScript
                 me->SetReactState(REACT_PASSIVE);
             }
 
-            void Reset()
-            {
+            void Reset() { }
 
-            }
-
-            void UpdateAI(const uint32 diff)
-            {   
-            }
+            void UpdateAI(uint32 /*diff*/) { }
         };
 };
 
@@ -581,9 +576,9 @@ class npc_blight_of_ozumat : public CreatureScript
             return new npc_blight_of_ozumatAI (pCreature);
         }
 
-        struct npc_blight_of_ozumatAI : public Scripted_NoMovementAI
+        struct npc_blight_of_ozumatAI : public ScriptedAI
         {
-            npc_blight_of_ozumatAI(Creature* creature) : Scripted_NoMovementAI(creature)
+            npc_blight_of_ozumatAI(Creature* creature) : ScriptedAI(creature)
             {
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -595,9 +590,7 @@ class npc_blight_of_ozumat : public CreatureScript
                 DoCast(me, SPELL_BLIGHT_OF_OZUMAT_AURA);
             }
 
-            void UpdateAI(const uint32 diff)
-            {
-            }
+            void UpdateAI(uint32 /*diff*/) { }
         };
 };
 

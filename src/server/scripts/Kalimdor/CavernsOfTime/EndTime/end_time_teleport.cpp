@@ -91,7 +91,7 @@ class end_time_teleport : public GameObjectScript
         bool OnGossipSelect(Player* player, GameObject* /*go*/, uint32 /*sender*/, uint32 action)
         {
             //player->PlayerTalkClass->ClearMenus();
-            if (!player->GetAttackers().empty())
+            if (!player->getAttackers().empty())
                 return false;
 
             switch (action)

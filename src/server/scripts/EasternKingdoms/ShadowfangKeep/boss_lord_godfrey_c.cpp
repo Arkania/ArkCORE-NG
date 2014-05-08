@@ -107,8 +107,7 @@ public:
             if (SummonGhoulsTimer <= diff)
             {
                 DoCast(me,SPELL_SUMMON_GHOULS);
-                Position pos;
-                me->GetPosition(&pos);
+                Position pos = me->GetPosition();
                 for(uint32 i = 0; i<3; i++) // Hack.
                     me->SummonCreature(NPC_BLOODTHIRSTY_GHOUL, pos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 4000);
                 PistolBarrageTimer = 500;

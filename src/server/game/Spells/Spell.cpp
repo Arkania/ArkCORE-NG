@@ -967,7 +967,7 @@ void Spell::SelectImplicitChannelTargets(SpellEffIndex effIndex, SpellImplicitTa
                         if (player->HasAura(79505))
                         {
                             WorldObject* target = ObjectAccessor::GetUnit(*m_caster, player->GetGUID());
-                            CallScriptObjectTargetSelectHandlers(target, effIndex);
+                            CallScriptObjectTargetSelectHandlers(target, effIndex, targetType);
                             if (target && target->ToUnit())
                                 AddUnitTarget(target->ToUnit(), 1 << effIndex);
                             else
@@ -980,7 +980,7 @@ void Spell::SelectImplicitChannelTargets(SpellEffIndex effIndex, SpellImplicitTa
                 if (Creature* alysrazor = m_caster->FindNearestCreature(52530, 5000.0f))
                 {
                     WorldObject* target = ObjectAccessor::GetUnit(*m_caster, alysrazor->GetGUID());
-                    CallScriptObjectTargetSelectHandlers(target, effIndex);
+                    CallScriptObjectTargetSelectHandlers(target, effIndex, targetType);
                     // unit target may be no longer avalible - teleported out of map for example
                     if (target && target->ToUnit())
                         AddUnitTarget(target->ToUnit(), 1 << effIndex);
@@ -991,7 +991,7 @@ void Spell::SelectImplicitChannelTargets(SpellEffIndex effIndex, SpellImplicitTa
             else
             {
                 WorldObject* target = ObjectAccessor::GetUnit(*m_caster, channeledSpell->m_targets.GetUnitTargetGUID());
-                CallScriptObjectTargetSelectHandlers(target, effIndex);
+                CallScriptObjectTargetSelectHandlers(target, effIndex, targetType);
                 // unit target may be no longer avalible - teleported out of map for example
                 if (target && target->ToUnit())
                     AddUnitTarget(target->ToUnit(), 1 << effIndex);
@@ -1152,14 +1152,7 @@ void Spell::SelectImplicitConeTargets(SpellEffIndex effIndex, SpellImplicitTarge
         {
             // Other special target selection goes here
             if (uint32 maxTargets = m_spellValue->MaxAffectedTargets)
-            {
-                Unit::AuraEffectList const& Auras = m_caster->GetAuraEffectsByType(SPELL_AURA_MOD_MAX_AFFECTED_TARGETS);
-                for (Unit::AuraEffectList::const_iterator j = Auras.begin(); j != Auras.end(); ++j)
-                    if ((*j)->IsAffectingSpell(m_spellInfo))
-                        maxTargets += (*j)->GetAmount();
-
                 Trinity::Containers::RandomResizeList(targets, maxTargets);
-            }
 
             for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
             {
@@ -1235,14 +1228,7 @@ void Spell::SelectImplicitAreaTargets(SpellEffIndex effIndex, SpellImplicitTarge
     {
         // Other special target selection goes here
         if (uint32 maxTargets = m_spellValue->MaxAffectedTargets)
-        {
-            Unit::AuraEffectList const& Auras = m_caster->GetAuraEffectsByType(SPELL_AURA_MOD_MAX_AFFECTED_TARGETS);
-            for (Unit::AuraEffectList::const_iterator j = Auras.begin(); j != Auras.end(); ++j)
-                if ((*j)->IsAffectingSpell(m_spellInfo))
-                    maxTargets += (*j)->GetAmount();
-
-            Trinity::Containers::RandomResizeList(unitTargets, maxTargets);
-        }
+            Trinity::Containers::RandomResizeList(targets, maxTargets);
 
         for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
         {
@@ -3446,7 +3432,7 @@ void Spell::_handle_finish_phase()
         {
             if (m_spellInfo->Id != 8647)
                 m_caster->m_movedPlayer->ClearComboPoints();
-            else if (!(m_caster->HasAura(14169)) || m_caster->HasAura(14168) && roll_chance_i(50)) // Improved Expose Armor
+            else if (!(m_caster->HasAura(14169)) || (m_caster->HasAura(14168) && roll_chance_i(50))) // Improved Expose Armor
                 m_caster->m_movedPlayer->ClearComboPoints();
         }
 
@@ -4729,7 +4715,6 @@ SpellCastResult Spell::CheckCast(bool strict)
         if (Target != m_caster && !Target->IsFriendlyTo(m_caster))
         {
             int SpellSteal = 0;
-            bool Continue = false;
             Unit::AuraMap const& auras = Target->GetOwnedAuras();
             for (Unit::AuraMap::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
             {
@@ -5110,21 +5095,13 @@ SpellCastResult Spell::CheckCast(bool strict)
                     if (!m_targets.GetUnitTarget() || m_targets.GetUnitTarget()->GetTypeId() == TYPEID_PLAYER)
                         return SPELL_FAILED_BAD_IMPLICIT_TARGETS;
 
-                    // Check if there are to many so that you don't get mixed with pets
-                    // being there from the begining
-                    if (m_caster->ToPlayer()->getSlotForNewPet() == PET_SLOT_FULL_LIST)
-                    {
-                        //m_caster->ToPlayer()->SendToManyPets(m_caster->ToPlayer());
-                        return SPELL_FAILED_NO_ACTIONS;          // i havent found the right error message to use so this need to be changed
-                    }
-
                     Creature* target = m_targets.GetUnitTarget()->ToCreature();
 
                     if (target->getLevel() > m_caster->getLevel())
                         return SPELL_FAILED_HIGHLEVEL;
 
                     // use SMSG_PET_TAME_FAILURE?
-                    if (!target->GetCreatureTemplate()->isTameable(m_caster->ToPlayer()->CanTameExoticPets()))
+                    if (!target->GetCreatureTemplate()->IsTameable(m_caster->ToPlayer()->CanTameExoticPets()))
                         return SPELL_FAILED_BAD_TARGETS;
 
                     if (m_caster->GetPetGUID())
@@ -6057,7 +6034,7 @@ SpellCastResult Spell::CheckItems()
                     }
 
                     Powers power = Powers(m_spellInfo->Effects[i].MiscValue);
-                    if (uint32(m_targets.GetUnitTarget()->GetPower(power)) == m_targets.GetUnitTarget()->GetMaxPower(power))
+                    if (uint32(m_targets.GetUnitTarget()->GetPower(power)) == uint32(m_targets.GetUnitTarget()->GetMaxPower(power)))
                     {
                         failReason = SPELL_FAILED_ALREADY_AT_FULL_POWER;
                         continue;

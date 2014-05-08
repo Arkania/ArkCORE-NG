@@ -6533,53 +6533,6 @@ void ObjectMgr::LoadGameObjectTemplate()
                     CheckGOLinkedTrapId(&got, got.goober.linkedTrapId, 12);
                 break;
             }
-            case GAMEOBJECT_TYPE_TRANSPORT:                 // 11
-            {
-                TransportAnimationsByEntry::const_iterator itr = sTransportAnimationsByEntry.find(entry);
-                if (itr == sTransportAnimationsByEntry.end())
-                {
-                    TC_LOG_ERROR("sql.sql", "Gameobject (Entry: %u GoType: %u) is transport by does not have entries in TransportAnimation.dbc! Gameobject is obsolete.",
-                        entry, got.type);
-                    break;
-                }
-
-                if (uint32 frame = got.transport.startFrame)
-                {
-                    if (itr->second.find(frame) == itr->second.end())
-                    {
-                        TC_LOG_ERROR("sql.sql", "Gameobject (Entry: %u GoType: %u) has data0=%u but this frame is not in TransportAnimation.dbc!",
-                            entry, got.type, frame);
-                    }
-                }
-
-                if (uint32 frame = got.transport.nextFrame1)
-                {
-                    if (itr->second.find(frame) == itr->second.end())
-                    {
-                        TC_LOG_ERROR("sql.sql", "Gameobject (Entry: %u GoType: %u) has data6=%u but this frame is not in TransportAnimation.dbc!",
-                            entry, got.type, frame);
-                    }
-                }
-
-                if (uint32 frame = got.transport.nextFrame2)
-                {
-                    if (itr->second.find(frame) == itr->second.end())
-                    {
-                        TC_LOG_ERROR("sql.sql", "Gameobject (Entry: %u GoType: %u) has data8=%u but this frame is not in TransportAnimation.dbc!",
-                            entry, got.type, frame);
-                    }
-                }
-
-                if (uint32 frame = got.transport.nextFrame3)
-                {
-                    if (itr->second.find(frame) == itr->second.end())
-                    {
-                        TC_LOG_ERROR("sql.sql", "Gameobject (Entry: %u GoType: %u) has data10=%u but this frame is not in TransportAnimation.dbc!",
-                            entry, got.type, frame);
-                    }
-                }
-                break;
-            }
             case GAMEOBJECT_TYPE_AREADAMAGE:                //12
             {
                 if (got.areadamage.lockId)
@@ -7724,7 +7677,7 @@ bool ObjectMgr::LoadTrinityStrings(const char* table, int32 min_value, int32 max
 
     if (!result)
     {
-        if (min_value == MIN_TRINITY_STRING_ID)              // error only in case internal strings
+        if (min_value == MIN_ARKCORE_STRING_ID)              // error only in case internal strings
             TC_LOG_ERROR("server.loading", ">> Loaded 0 trinity strings. DB table `%s` is empty. Cannot continue.", table);
         else
             TC_LOG_INFO("server.loading", ">> Loaded 0 string templates. DB table `%s` is empty.", table);
@@ -7766,7 +7719,7 @@ bool ObjectMgr::LoadTrinityStrings(const char* table, int32 min_value, int32 max
             AddLocaleString(fields[i + 1].GetString(), LocaleConstant(i), data.Content);
     } while (result->NextRow());
 
-    if (min_value == MIN_TRINITY_STRING_ID)
+    if (min_value == MIN_ARKCORE_STRING_ID)
         TC_LOG_INFO("server.loading", ">> Loaded %u Trinity strings from table %s in %u ms", count, table, GetMSTimeDiffToNow(oldMSTime));
     else
         TC_LOG_INFO("server.loading", ">> Loaded %u string templates from %s in %u ms", count, table, GetMSTimeDiffToNow(oldMSTime));

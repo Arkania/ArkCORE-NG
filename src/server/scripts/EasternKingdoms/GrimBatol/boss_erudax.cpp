@@ -188,7 +188,7 @@ class boss_erudax : public CreatureScript
                 summons.Despawn(summon);
             }
 
-            void EnterCombat(Unit* who)
+            void EnterCombat(Unit* /*who*/)
             {
                 Talk(SAY_AGGRO);
                 FacelessPortalStalker = me->SummonCreature(NPC_FACELESS_PORTAL_STALKER, erudaxportalPos,TEMPSUMMON_MANUAL_DESPAWN);
@@ -199,7 +199,7 @@ class boss_erudax : public CreatureScript
                     instance->SetData(DATA_ERUDAX, IN_PROGRESS);
             }
             
-            void JustDied(Unit* killer)
+            void JustDied(Unit* /*killer*/)
             {
                 Talk(SAY_DEATH);
                 summons.DespawnAll();
@@ -207,7 +207,7 @@ class boss_erudax : public CreatureScript
                     instance->SetData(DATA_ERUDAX, DONE);
             }
 
-            void KilledUnit(Unit* victim)
+            void KilledUnit(Unit* /*victim*/)
             {
                 Talk(SAY_KILL);                
             }
@@ -234,7 +234,7 @@ class boss_erudax : public CreatureScript
                     {
                     case EVENT_SHADOW_GALE:
                         Talk(SAY_GALE);
-                        if (ShadowGaleTrigger = me->SummonCreature(NPC_SHADOW_GALE_STALKER, shadowgalePos[urand(0, 2)]))
+                        if (Creature* ShadowGaleTrigger = me->SummonCreature(NPC_SHADOW_GALE_STALKER, shadowgalePos[urand(0, 2)]))
                             ShadowGaleTrigger->CastSpell(ShadowGaleTrigger, SPELL_SHADOW_GALE_SPEED_TRIGGER, false);
                         //132 error
                         //DoCast(me, SPELL_SHADOW_GALE);
@@ -312,13 +312,13 @@ class npc_erudax_faceless_corruptor : public CreatureScript
             {
             }
 
-            void EnterCombat(Unit* attacker)
+            void EnterCombat(Unit* /*attacker*/)
             {
                 events.ScheduleEvent(EVENT_UMBRAL_MENDING, urand(15000, 20000));
                 events.ScheduleEvent(EVENT_SIPHON_ESSENSE, urand(5000, 7000));
             }
 
-            void JustDied(Unit* killer)
+            void JustDied(Unit* /*killer*/)
             {
                 me->DespawnOrUnsummon();
             }
@@ -364,9 +364,9 @@ public:
         return new npc_alexstrasza_eggAI (creature);
     }
 
-    struct npc_alexstrasza_eggAI : public Scripted_NoMovementAI
+    struct npc_alexstrasza_eggAI : public ScriptedAI
     {
-        npc_alexstrasza_eggAI(Creature* creature) : Scripted_NoMovementAI(creature)
+        npc_alexstrasza_eggAI(Creature* creature) : ScriptedAI(creature)
         {
             me->SetReactState(REACT_PASSIVE);
             instance = creature->GetInstanceScript();
@@ -374,7 +374,7 @@ public:
 
         InstanceScript* instance;
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* /*killer*/)
         {
             DoCast(me, SPELL_SUMMON_TWILIGHT_HATCHLING, true);
         }
@@ -402,9 +402,9 @@ public:
         return new npc_shadow_gale_stalkerAI (creature);
     }
 
-    struct npc_shadow_gale_stalkerAI : public Scripted_NoMovementAI
+    struct npc_shadow_gale_stalkerAI : public ScriptedAI
     {
-        npc_shadow_gale_stalkerAI(Creature* creature) : Scripted_NoMovementAI(creature)
+        npc_shadow_gale_stalkerAI(Creature* creature) : ScriptedAI(creature)
         {
             me->SetReactState(REACT_PASSIVE);
         }
@@ -426,9 +426,9 @@ public:
         return new npc_erudax_twilight_hatchlingAI (creature);
     }
 
-    struct npc_erudax_twilight_hatchlingAI : public Scripted_NoMovementAI
+    struct npc_erudax_twilight_hatchlingAI : public ScriptedAI
     {
-        npc_erudax_twilight_hatchlingAI(Creature* creature) : Scripted_NoMovementAI(creature)
+        npc_erudax_twilight_hatchlingAI(Creature* creature) : ScriptedAI(creature)
         {
             SetCombatMovement(false);
             instance = creature->GetInstanceScript();
@@ -441,17 +441,17 @@ public:
             me->SetCanFly(true);
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* /*killer*/)
         {
             me->DespawnOrUnsummon();
         }
 
-        void IsSummonedBy(Unit* owner)
+        void IsSummonedBy(Unit* /*owner*/)
         {
             DoCast(me, SPELL_TWILIGHT_BLAST_TRIGGER);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 /*diff*/)
         {
             if (!instance)
                 return;

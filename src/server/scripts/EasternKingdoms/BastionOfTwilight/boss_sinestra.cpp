@@ -47,19 +47,16 @@ enum Yells
     SAY_KILL_1     = 2,  // My brood will feed on your bones!
     SAY_KILL_2     = 3,  // Powerless...
     SAY_SPECIAL_1  = 4,  // The energy infused within my clutch is mine to reclaim!
-    SAY_SPECIAL_2  = 5,  // SUFFER!
-    SAY_SPECIAL_3  = 6,  // FEEL MY HATRED!
-    SAY_PHASE_2    = 7,  // I tire of this. Do you see this clutch amidst which you stand? I have nurtured the spark within them, but that life-force is and always will be mine. Behold, power beyond your comprehension!
-    SAY_PHASE_3    = 8,  // Enough! Drawing upon this source will set us back months. You should feel honored to be worthy of its expenditure. Now... die!
-    SAY_FIGHT_W    = 9,  // You mistake this for weakness? Fool! 
-    SAY_FIGHT_N    = 10, // This will be your tomb as well as theirs!
-    SAY_FIGHT_L    = 11, // My brood will feast upon your essence!
-    SAY_DEATH      = 12, // Deathwing! I have fallen.... The brood... is lost.
-    SAY_DRAKE      = 13, // Come forth, children of Twilight!
-    SAY_SPITECALL  = 14, // YOUR MOTHER CALLS!
-
-    /**  Warnings   **/
-    SAY_SLICER     = 15, // Twilight Slicers are active!
+    SAY_SPECIAL_2  = 5,  // SUFFER! / FEEL MY HATRED!
+    SAY_PHASE_2    = 6,  // I tire of this. Do you see this clutch amidst which you stand? I have nurtured the spark within them, but that life-force is and always will be mine. Behold, power beyond your comprehension!
+    SAY_PHASE_3    = 7,  // Enough! Drawing upon this source will set us back months. You should feel honored to be worthy of its expenditure. Now... die!
+    SAY_FIGHT_W    = 8,  // You mistake this for weakness? Fool! 
+    SAY_FIGHT_N    = 9,  // This will be your tomb as well as theirs!
+    SAY_FIGHT_L    = 10, // My brood will feast upon your essence!
+    SAY_DEATH      = 11, // Deathwing! I have fallen.... The brood... is lost.
+    SAY_DRAKE      = 12, // Come forth, children of Twilight!
+    SAY_SPITECALL  = 13, // YOUR MOTHER CALLS!
+    SAY_SLICER     = 14  // Twilight Slicers are active!
 };
 
 enum CalenYells
@@ -479,7 +476,7 @@ public:
                            break;
 
                         case EVENT_WRACK:
-                            Talk(SAY_SPECIAL_2, SAY_SPECIAL_3);
+                            Talk(SAY_SPECIAL_2);
                             SelectTargetList(targets, NonTankTargetSelector(me), RAID_MODE(1, 1, 1, 2), SELECT_TARGET_RANDOM);
                             if (!targets.empty())
                                 for (std::list<Unit*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
@@ -947,7 +944,7 @@ public:
                         }
                     
                     case EVENT_DESPAWN:
-                        if(Creature* orb = me->FindNearestCreature(NPC_SHADOW_ORB, 4.0f, true))
+                        if(me->FindNearestCreature(NPC_SHADOW_ORB, 4.0f, true))
                         {
                             me->DisappearAndDie();
                             events.ScheduleEvent(EVENT_DESPAWN, 1000);
@@ -1385,7 +1382,7 @@ class spell_wrack : public SpellScriptLoader // 89421
                 target = GetTarget();
             }
 
-            void HandleAfterDispel(DispelInfo* dispelInfo)
+            void HandleAfterDispel(DispelInfo* /*dispelInfo*/)
             {
                 Unit* caster = GetCaster();
 

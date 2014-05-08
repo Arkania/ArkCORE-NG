@@ -15,12 +15,10 @@
  * You should have received a copy of the GNU General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
- 
- 
-#include"ScriptPCH.h"
+
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include"the_vortex_pinnacle.h"
-
-
 
 enum ScriptTexts
 {
@@ -76,9 +74,9 @@ class boss_grand_vizier_ertan : public CreatureScript
         {
             return new boss_grand_vizier_ertanAI(pCreature);
         }
-        struct boss_grand_vizier_ertanAI : public Scripted_NoMovementAI
+        struct boss_grand_vizier_ertanAI : public ScriptedAI
         {
-            boss_grand_vizier_ertanAI(Creature* pCreature) : Scripted_NoMovementAI(pCreature), summons(me)
+            boss_grand_vizier_ertanAI(Creature* pCreature) : ScriptedAI(pCreature), Summons(me)
             {
                 me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
@@ -96,7 +94,7 @@ class boss_grand_vizier_ertan : public CreatureScript
 
             InstanceScript *pInstance;
             EventMap events;
-            SummonList summons;
+            SummonList Summons;
             Creature* _vortexes[8];
             float _distance;
     
@@ -125,22 +123,22 @@ class boss_grand_vizier_ertan : public CreatureScript
                 pInstance->SetData(DATA_GRAND_VIZIER_ERTAN, IN_PROGRESS);
             }    
 
-            void KilledUnit(Unit* who)
+            void KilledUnit(Unit* /*who*/)
             {
                 Talk(SAY_KILL);                
             }
 
             void JustSummoned(Creature* summon)
             {
-                summons.Summon(summon);
+                Summons.Summon(summon);
             }
 
             void SummonedCreatureDespawn(Creature* summon)
             {
-                summons.Despawn(summon);
+                Summons.Despawn(summon);
             }
 
-            void JustDied(Unit* pWho)
+            void JustDied(Unit* /*who*/)
             {
                 if (!pInstance)
                     return;
@@ -154,6 +152,7 @@ class boss_grand_vizier_ertan : public CreatureScript
                 if (!pInstance || !UpdateVictim())
                     return;
 
+                Summons.DespawnAll();
                 events.Update(diff);
 
                 while (uint32 eventId = events.ExecuteEvent())
@@ -171,9 +170,8 @@ class boss_grand_vizier_ertan : public CreatureScript
                             if (_vortexes[i])
                             {
                                 float _angle;
-                                Position _pos;
                                 _angle = me->GetAngle(_vortexes[i]->GetPositionX(), _vortexes[i]->GetPositionY());
-                                me->GetNearPosition(_pos, 5.0f, _angle);
+                                Position _pos = me->GetNearPosition(5.0f, _angle);
                                 _vortexes[i]->GetMotionMaster()->MovementExpired(false);
                                 _vortexes[i]->GetMotionMaster()->MovePoint(1, _pos);
                             }
@@ -223,9 +221,9 @@ class npc_ertan_vortex : public CreatureScript
         {
             return new npc_ertan_vortexAI(pCreature);
         }
-        struct npc_ertan_vortexAI : public Scripted_NoMovementAI
+        struct npc_ertan_vortexAI : public ScriptedAI
         {
-            npc_ertan_vortexAI(Creature* pCreature) : Scripted_NoMovementAI(pCreature)
+            npc_ertan_vortexAI(Creature* pCreature) : ScriptedAI(pCreature)
             {
                 pInstance = pCreature->GetInstanceScript();
             }
@@ -262,6 +260,3 @@ void AddSC_boss_grand_vizier_ertan()
     new boss_grand_vizier_ertan();
     new npc_ertan_vortex();
 }
-
-
-

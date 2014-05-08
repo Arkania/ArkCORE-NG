@@ -45,7 +45,7 @@ public:
 
     struct npc_slipstream_raidAI : public ScriptedAI
     {
-        npc_slipstream_raidAI(Creature* creature) : ScriptedAI(creature), isActive(true), linkedSlipstreamObject(NULL), linkedBoss(NULL), isUltimate(NULL)
+        npc_slipstream_raidAI(Creature* creature) : ScriptedAI(creature), isUltimate(NULL), isActive(true), linkedSlipstreamObject(NULL), linkedBoss(NULL) 
         {
             creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NOT_SELECTABLE);
 
@@ -96,27 +96,23 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 /*diff*/)
         {
             // The Slipstreams are Deactivated before each Ultimate ability
-
-            if(linkedSlipstreamObject && linkedBoss)
-            {
-
-            }else if(isUltimate)
+            if(isUltimate)
                 isUltimate = false;
 
             if(!isUltimate != isActive)
             {
                 if(isActive)
-                { // Activate Slipstream
-
+                {
+                    // Activate Slipstream
                     if(linkedSlipstreamObject)
                         linkedSlipstreamObject->SetPhaseMask(PHASEMASK_NORMAL,true);
-
-                }else
-                { // Deactivate Slipstream
-
+                }
+                else
+                {
+                    // Deactivate Slipstream
                     if(linkedSlipstreamObject)
                         linkedSlipstreamObject->SetPhaseMask(2,true);
                 }

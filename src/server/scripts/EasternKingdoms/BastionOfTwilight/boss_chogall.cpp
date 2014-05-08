@@ -563,7 +563,7 @@ public:
             me->DespawnOrUnsummon(25000);
         }
 
-        void UpdateAI(const uint32 diff) {}
+        void UpdateAI(uint32 /*diff*/) { }
     };
 };
 
@@ -574,7 +574,7 @@ class npc_fire_portal : public CreatureScript
 {
 public:
 
-    npc_fire_portal() : CreatureScript("npc_fire_portal") {}
+    npc_fire_portal() : CreatureScript("npc_fire_portal") { }
 
     CreatureAI* GetAI(Creature* creature) const 
     {
@@ -910,10 +910,11 @@ public:
     {
         PrepareSpellScript(spell_summon_adherentsSpellScript);
 
-        bool Validate (SpellEntry const * spellEntry)
+        bool Validate (SpellInfo const* spellEntry)
         {
-            if (!sSpellStore.LookupEntry(spellEntry->Id))
+            if (!sSpellMgr->GetSpellInfo(spellEntry->Id))
                 return false;
+
             return true;
         }
 
@@ -922,7 +923,7 @@ public:
             return true;
         }
 
-        void EffectScriptEffect(SpellEffIndex effIndex)
+        void EffectScriptEffect(SpellEffIndex /*effIndex*/)
         {
             if (GetCaster()->GetMap()->IsHeroic() && GetCaster()->GetMap()->Is25ManRaid()) // Summon 2
             {
@@ -966,10 +967,11 @@ public:
     {
         PrepareSpellScript(spell_fester_bloodSpellScript);
 
-        bool Validate (SpellEntry const * spellEntry)
+        bool Validate (SpellInfo const* spellEntry)
         {
-            if (!sSpellStore.LookupEntry(spellEntry->Id))
+            if (!sSpellMgr->GetSpellInfo(spellEntry->Id))
                 return false;
+
             return true;
         }
 
@@ -978,7 +980,7 @@ public:
             return true;
         }
 
-        void EffectScriptEffect(SpellEffIndex effIndex)
+        void EffectScriptEffect(SpellEffIndex /*effIndex*/)
         {
             std::list<Creature*> adherents;
             GetCaster()->GetCreatureListWithEntryInGrid(adherents, NPC_CORRUPTING_ADHERENT, 300.0f);
@@ -1016,10 +1018,11 @@ public:
     {
         PrepareSpellScript(spell_depravitySpellScript);
 
-        bool Validate (SpellEntry const * spellEntry)
+        bool Validate (SpellInfo const* spellEntry)
         {
-            if (!sSpellStore.LookupEntry(spellEntry->Id))
+            if (!sSpellMgr->GetSpellInfo(spellEntry->Id))
                 return false;
+
             return true;
         }
 
@@ -1028,7 +1031,7 @@ public:
             return true;
         }
 
-        void EffectScriptEffect(SpellEffIndex effIndex)
+        void EffectScriptEffect(SpellEffIndex /*effIndex*/)
         {
             if (!GetHitUnit())
                 return;
@@ -1058,10 +1061,11 @@ public:
     {
         PrepareSpellScript(spell_corrupting_crashSpellScript);
 
-        bool Validate (SpellEntry const * spellEntry)
+        bool Validate (SpellInfo const* spellEntry)
         {
-            if (!sSpellStore.LookupEntry(spellEntry->Id))
+            if (!sSpellMgr->GetSpellInfo(spellEntry->Id))
                 return false;
+
             return true;
         }
 
@@ -1070,7 +1074,7 @@ public:
             return true;
         }
 
-        void EffectScriptEffect(SpellEffIndex effIndex)
+        void EffectScriptEffect(SpellEffIndex /*effIndex*/)
         {
             if (!GetHitUnit())
                 return;
@@ -1100,10 +1104,11 @@ public:
     {
         PrepareSpellScript(spell_sprayed_corruptionSpellScript);
 
-        bool Validate (SpellEntry const * spellEntry)
+        bool Validate (SpellInfo const* spellEntry)
         {
-            if (!sSpellStore.LookupEntry(spellEntry->Id))
+            if (!sSpellMgr->GetSpellInfo(spellEntry->Id))
                 return false;
+
             return true;
         }
 
@@ -1112,7 +1117,7 @@ public:
             return true;
         }
 
-        void EffectScriptEffect(SpellEffIndex effIndex)
+        void EffectScriptEffect(SpellEffIndex /*effIndex*/)
         {
             if (!GetHitUnit())
                 return;
@@ -1142,10 +1147,11 @@ public:
     {
         PrepareSpellScript(spell_spilled_blood_of_the_old_godSpellScript);
 
-        bool Validate (SpellEntry const * spellEntry)
+        bool Validate (SpellInfo const* spellEntry)
         {
-            if (!sSpellStore.LookupEntry(spellEntry->Id))
+            if (!sSpellMgr->GetSpellInfo(spellEntry->Id))
                 return false;
+
             return true;
         }
 
@@ -1154,7 +1160,7 @@ public:
             return true;
         }
 
-        void EffectScriptEffect(SpellEffIndex effIndex)
+        void EffectScriptEffect(SpellEffIndex /*effIndex*/)
         {
             if (!GetHitUnit())
                 return;
@@ -1213,10 +1219,11 @@ public:
     {
         PrepareSpellScript(spell_corruption_old_godSpellScript);
 
-        bool Validate (SpellEntry const * spellEntry)
+        bool Validate (SpellInfo const* spellEntry)
         {
-            if (!sSpellStore.LookupEntry(spellEntry->Id))
+            if (!sSpellMgr->GetSpellInfo(spellEntry->Id))
                 return false;
+
             return true;
         }
 
@@ -1234,7 +1241,7 @@ public:
                 SetHitDamage(int32(GetHitDamage() + (((GetHitDamage() / 100) * 3) * GetHitUnit()->GetPower(POWER_ALTERNATE_POWER)))); // Damage plus 3% for each 1 Corruption.
         }
 
-        void EffectScriptEffect(SpellEffIndex effIndex)
+        void EffectScriptEffect(SpellEffIndex /*effIndex*/)
         {
             if (!GetHitUnit())
                 return;
@@ -1267,10 +1274,11 @@ public:
     {
         PrepareSpellScript(spell_corruption_acceleratedSpellScript);
 
-        bool Validate (SpellEntry const * spellEntry)
+        bool Validate (SpellInfo const* spellEntry)
         {
-            if (!sSpellStore.LookupEntry(spellEntry->Id))
+            if (!sSpellMgr->GetSpellInfo(spellEntry->Id))
                 return false;
+
             return true;
         }
 
@@ -1279,7 +1287,7 @@ public:
             return true;
         }
 
-        void EffectScriptEffect(SpellEffIndex effIndex)
+        void EffectScriptEffect(SpellEffIndex /*effIndex*/)
         {
             GetCaster()->SetPower(POWER_ALTERNATE_POWER, GetCaster()->GetPower(POWER_ALTERNATE_POWER) + 2);
         }
@@ -1306,10 +1314,11 @@ public:
     {
         PrepareSpellScript(spell_corruption_sicknessSpellScript);
 
-        bool Validate (SpellEntry const * spellEntry)
+        bool Validate (SpellInfo const* spellEntry)
         {
-            if (!sSpellStore.LookupEntry(spellEntry->Id))
+            if (!sSpellMgr->GetSpellInfo(spellEntry->Id))
                 return false;
+
             return true;
         }
 
@@ -1318,7 +1327,7 @@ public:
             return true;
         }
 
-        void EffectScriptEffect(SpellEffIndex effIndex)
+        void EffectScriptEffect(SpellEffIndex /*effIndex*/)
         {
             GetCaster()->SetPower(POWER_ALTERNATE_POWER, GetCaster()->GetPower(POWER_ALTERNATE_POWER) + 5);
         }

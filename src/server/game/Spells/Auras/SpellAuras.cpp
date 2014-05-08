@@ -24,6 +24,7 @@
 #include "ObjectMgr.h"
 #include "SpellMgr.h"
 #include "Player.h"
+#include "Pet.h"
 #include "Unit.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
@@ -1327,18 +1328,22 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     break;
                 // Prayer of Mending
                 if (GetId() == 41635)
+				{
                     if (caster->HasAura(14751))
                     {
                         caster->CastSpell(caster, 81206, true); // Chakra: Sanctuary
                         caster->RemoveAurasDueToSpell(14751);
                     }
+				}
                 // Mind spike
                 else if (GetId() == 87178)
+				{
                     if (caster->HasAura(14751))
                     {
                         caster->CastSpell(caster, 81209, true); // Chakra: Chastise
                         caster->RemoveAurasDueToSpell(14751);
                     }
+				}
                 // Devouring Plague
                 else if (GetId() == 2944)
                 {
@@ -1448,7 +1453,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 // Inquisition
                 if (m_spellInfo->Id == 84963) // Inquisition
                 {
-                    uint32 mod = 0;
+                    int32 mod = 0;
                     // Item - Paladin T11 Retribution 4P Bonus
                     if (AuraEffect* aur = GetCaster()->GetAuraEffect(90299, EFFECT_0))
                         mod = aur->GetAmount() / 10;
@@ -1928,7 +1933,8 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     else if (AuraEffect * auraEff = target->GetAuraEffectOfRankedSpell(1178, 0)) // armor reduction implemented here
                     {
                         int32 value = auraEff->GetAmount();
-                        int32 mod;
+                        int32 mod = value / 100 * mod;
+
                         switch (auraEff->GetId())
                         {
                             case 1178:
@@ -1938,7 +1944,6 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                                 mod = 16;
                                 break;
                         }
-                        mod = value / 100 * mod;
                         value = value + (apply ? -mod : mod);
                         auraEff->ChangeAmount(value);
                     }

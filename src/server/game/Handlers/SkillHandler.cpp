@@ -18,6 +18,7 @@
  */
 
 #include "Common.h"
+#include "ArcheologyMgr.h"
 #include "DatabaseEnv.h"
 #include "Log.h"
 #include "ObjectAccessor.h"

@@ -738,8 +738,6 @@ void WorldSession::HandleTextEmoteOpcode(WorldPacket& recvData)
     if (!textEmote)
         return;
 
-    uint32 emote_anim = em->textid;
-
     EmotesEntry const* emote = sEmotesStore.LookupEntry(textEmote->textid);
     if (emote && !emote->UnitStandState)
     {

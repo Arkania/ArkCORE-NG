@@ -1169,8 +1169,8 @@ void WorldSession::HandleFeatherFallAck(WorldPacket& recvData)
 void WorldSession::HandleMoveUnRootAck(WorldPacket& recvData)
 {
     // no used
-   // recvData.rfinish();                       // prevent warnings spam
-
+   recvData.rfinish();                       // prevent warnings spam
+/*
     uint64 guid;
     recvData >> guid;
 
@@ -1189,13 +1189,14 @@ void WorldSession::HandleMoveUnRootAck(WorldPacket& recvData)
     movementInfo.guid = guid;
     ReadMovementInfo(recvData, &movementInfo);
     recvData.read_skip<float>();                           // unk2
+*/
 }
 
 void WorldSession::HandleMoveRootAck(WorldPacket& recvData)
 {
     // no used
-    //recvData.rfinish();                       // prevent warnings spam
-
+    recvData.rfinish();                       // prevent warnings spam
+/*
     uint64 guid;
     recvData >> guid;
 
@@ -1212,6 +1213,7 @@ void WorldSession::HandleMoveRootAck(WorldPacket& recvData)
 
     MovementInfo movementInfo;
     ReadMovementInfo(recvData, &movementInfo);
+*/
 }
 
 void WorldSession::HandleSetActionBarToggles(WorldPacket& recvData)
@@ -2306,7 +2308,7 @@ void WorldSession::SendStreamingMovie()
 
     data.WriteBits(count, 25);
 
-    for(uint8 i = 0; i < 0; ++i)
+    for(unsigned i = 0; i < 0; ++i)    /// @todo warning
     {
         data << uint16(0);          //File Data ID
     }

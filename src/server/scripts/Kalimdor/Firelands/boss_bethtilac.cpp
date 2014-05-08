@@ -1,12 +1,15 @@
-/*Copyright (C) 2012 starting framework wrote by Naios. 95% written by Buli. Idk what is written by Buli or Naios, but its completed by Hellground and Apocalipsyz.
-*
-* Script 90% done. TODO:
-* - Move drones to bethtilac and siphon at 0% fire energy.
-* - Achievements would be nice, not a priority now.
-* - Testing needed.
-*
-* This file is NOT free software; third-party users can NOT redistribute it or modify it. :)
-*/
+/*
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * (starting framework wrote by Naios).
+ *
+ * Script 90% done. TODO:
+ * - Move drones to bethtilac and siphon at 0% fire energy.
+ * - Achievements would be nice, not a priority now.
+ * - Testing needed.
+ *
+ * This file is NOT free software; third-party users can 
+ * NOT redistribute it or modify it. :)
+ */
 
 #include "ObjectMgr.h"
 #include "ScriptMgr.h"
@@ -30,102 +33,78 @@
 
 enum Spells
 {
-    // Beth'tilac
-    SPELL_NO_REGEN = 78725,     ///98623(98153) вот это визуальна€ ленточка паутины  98149  визуальна€ аура стойки + 97196 for top
-    // Phase 1
-    SPELL_EMBER_FLARE = 98934, // phase 2 also
-    SPELL_METEOR_FALL = 99073,
-    SPELL_METEOR_BURN = 99071,
-    SPELL_CONSUME = 100634,
-    SPELL_SMOLDERING_DEVASTATION = 99052, 
-
-    SPELL_VENOM_RAIN  = 99333,
-    SPELL_DRONE_DRAIN = 99411, //спеллскрипт замутить
-    SPELL_WEB_SILK    = 100048, //когда игрок стоит на паутине, на него триггеритс€ эта аура
-
-    // Phase 2
-    SPELL_FRENZY = 99497,
-    SPELL_THE_WIDOWS_KISS = 99476,
-
-    // Ciderweb Spinner
-    SPELL_BURNING_ACID = 98471,
-    SPELL_FIERY_WEB_SPIN_H = 99615, // aura e 99822 link with 97202 needed maybe, triggers it.
-
-    // Cinderweb Drone consume and burning acid
-    SPELL_BOILING_SPLATTER = 99463,
-    SPELL_FIXATE = 49026,  // вроде бы 99559 99526
-
-    //Cinderweb Spiderling
-    SPELL_SEEPING_VENOM = 97079,
-
-    // Engorged Broodling  53745 heroic only.
-    SPELL_VOLATILE_BURST_H = 99990,
-
-    // Web Rip
-    SPELL_METEOR_BURN_DUMMY = 99146,
+    SPELL_NO_REGEN               = 78725, // 98623(98153) вот это визуальна€ ленточка паутины  98149  визуальна€ аура стойки + 97196 for top
+    SPELL_EMBER_FLARE            = 98934,
+    SPELL_METEOR_FALL            = 99073,
+    SPELL_METEOR_BURN            = 99071,
+    SPELL_CONSUME                = 100634,
+    SPELL_SMOLDERING_DEVASTATION = 99052,
+    SPELL_VENOM_RAIN             = 99333,
+    SPELL_DRONE_DRAIN            = 99411, //спеллскрипт замутить
+    SPELL_WEB_SILK               = 100048, //когда игрок стоит на паутине, на него триггеритс€ эта аура
+    SPELL_FRENZY                 = 99497,
+    SPELL_THE_WIDOWS_KISS        = 99476,
+    SPELL_BURNING_ACID           = 98471, // Ciderweb Spinner
+    SPELL_FIERY_WEB_SPIN_H       = 99615, // aura e 99822 link with 97202 needed maybe, triggers it.
+    SPELL_BOILING_SPLATTER       = 99463, // Cinderweb Drone consume and burning acid
+    SPELL_FIXATE                 = 49026, // вроде бы 99559 99526
+    SPELL_SEEPING_VENOM          = 97079, //Cinderweb Spiderling
+    SPELL_VOLATILE_BURST_H       = 99990, // Engorged Broodling  53745 heroic only.
+    SPELL_METEOR_BURN_DUMMY      = 99146, // Web Rip
 };
 
 enum Points // how the hell do you find these?
 {
-    POINT_UP              = 1,
-    POINT_DOWN            = 2,
-    POINT_SPINNER_MEDIATE = 3,
+    POINT_UP                     = 1,
+    POINT_DOWN                   = 2,
+    POINT_SPINNER_MEDIATE        = 3,
 };
 
-static const Position upPos            = {67.888f, 387.82f, 111.767f, 3.682f};
-static const Position downPos          = {67.888f, 387.82f, 74.042f, 3.682f};
+static const Position upPos      = {67.888f, 387.82f, 111.767f, 3.682f};
+static const Position downPos    = {67.888f, 387.82f, 74.042f, 3.682f};
 bool AchievementChecker;
 
 enum Events
 {
     // Beth'tilac
-    EVENT_SUMMON_CINDERWEB_SPINNER = 1,
-    EVENT_SUMMON_CINDERWEB_DRONE = 2,
-    EVENT_SUMMON_CINDERWEB_SPIDERLING = 3,
-    EVENT_SUMMON_ENGORGED_BROODLING = 4,
-    EVENT_ENERGY_DRAIN = 5,
-    EVENT_SMOLDERING_DEVASTATION = 6,
-    EVENT_PHASE_LOWER = 7,
-    EVENT_PHASE_UPPER = 8,
-    EVENT_EMBER_FLARE = 9,
-    EVENT_METEOR_FALL = 10,
-    EVENT_CONSUME_SPIDERLING = 11,
-
-    EVENT_FRENZY = 12,
-    EVENT_WIDOWS_KISS = 13,
-
+    EVENT_SUMMON_CINDERWEB_SPINNER     = 1,
+    EVENT_SUMMON_CINDERWEB_DRONE       = 2,
+    EVENT_SUMMON_CINDERWEB_SPIDERLING  = 3,
+    EVENT_SUMMON_ENGORGED_BROODLING    = 4,
+    EVENT_ENERGY_DRAIN                 = 5,
+    EVENT_SMOLDERING_DEVASTATION       = 6,
+    EVENT_PHASE_LOWER                  = 7,
+    EVENT_PHASE_UPPER                  = 8,
+    EVENT_EMBER_FLARE                  = 9,
+    EVENT_METEOR_FALL                  = 10,
+    EVENT_CONSUME_SPIDERLING           = 11,
+    EVENT_FRENZY                       = 12,
+    EVENT_WIDOWS_KISS                  = 13,
     // Spinner
-    EVENT_FIERY_WEB_SPIN = 14,
-    EVENT_SPINNER_BURNING_ACID = 15,
-
+    EVENT_FIERY_WEB_SPIN               = 14,
+    EVENT_SPINNER_BURNING_ACID         = 15,
     // Drone
-    EVENT_DRONE_BURNING_ACID = 16,
-    EVENT_CONSUME = 17,
-    EVENT_BOILING_SPLATTER = 18,
-    EVENT_FIXATE = 19,
-    EVENT_ENERGY_DRAIN_DRONE = 20,
-    EVENT_MOVE_TO_WEB  = 21,
-    EVENT_DRAIN_ENERGY = 22,
-
+    EVENT_DRONE_BURNING_ACID           = 16,
+    EVENT_CONSUME                      = 17,
+    EVENT_BOILING_SPLATTER             = 18,
+    EVENT_FIXATE                       = 19,
+    EVENT_ENERGY_DRAIN_DRONE           = 20,
+    EVENT_MOVE_TO_WEB                  = 21,
+    EVENT_DRAIN_ENERGY                 = 22,
     // Spiderling
-    EVENT_CHECK_PLAYER_SEEPING_VENOM = 23,
-
+    EVENT_CHECK_PLAYER_SEEPING_VENOM   = 23,
     // Engorged Broodling
-    EVENT_CHECK_PLAYER_RANGE = 24,
-
+    EVENT_CHECK_PLAYER_RANGE           = 24,
     // Web Rip 53450 id
-    EVENT_METEOR_DUMMY = 25,
-
+    EVENT_METEOR_DUMMY                 = 25,
     // Misc
-    EVENT_ATTACK_START = 26,
-    EVENT_SPINNER_MOVE_DOWN = 27,
-    EVENT_CHECK_UPPER       = 28,
-    EVENT_LITTLE_CHECK_TARGET = 29,
-
-    EVENT_MOVING_LIFT        = 30,
-
+    EVENT_ATTACK_START                 = 26,
+    EVENT_SPINNER_MOVE_DOWN            = 27,
+    EVENT_CHECK_UPPER                  = 28,
+    EVENT_LITTLE_CHECK_TARGET          = 29,
+    EVENT_MOVING_LIFT                  = 30,
     // event group
-    EVENT_GROUP_UP_PHASE          = 1,
+    EVENT_GROUP_UP_PHASE               = 1,
 };
 
 enum Achievement
@@ -165,7 +144,6 @@ Position const SpinderlingsPos[5] =
     {78.570f, 355.845f, 74.200f, 0}    // дальн€€ права€
 };
 
-
 /**** Beth'tilac ****/
 
 class boss_bethtilac : public CreatureScript
@@ -187,7 +165,7 @@ public:
 
         void InitializeAI()
         {
-          if(!me->IsDead())
+          if(!me->isDead())
             Reset();
         }
 
@@ -258,7 +236,7 @@ public:
             return 0;
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* /*who*/)
         {
             if (instance)
             {
@@ -271,7 +249,7 @@ public:
             me->setActive(true);
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* /*killer*/)
         {
             if (instance)
             {
@@ -294,66 +272,66 @@ public:
             {
                 switch (eventId)
                 {
-                case EVENT_ENERGY_DRAIN:
-                    if(me->GetPower(POWER_ENERGY) == 0)
-                    {
-                        DoCast(me, SPELL_SMOLDERING_DEVASTATION);
-                        me->SetPower(POWER_ENERGY, 100);
-                        Devastion++;
-                        if(Devastion == 3)
+                    case EVENT_ENERGY_DRAIN:
+                        if(me->GetPower(POWER_ENERGY) == 0)
                         {
-                            events.CancelEvent(EVENT_ENERGY_DRAIN);
-                            events.ScheduleEvent(EVENT_PHASE_LOWER, 9100); // 8 сек каста+0.1 подумать
-                            break;
+                            DoCast(me, SPELL_SMOLDERING_DEVASTATION);
+                            me->SetPower(POWER_ENERGY, 100);
+                            Devastion++;
+                            if(Devastion == 3)
+                            {
+                                events.CancelEvent(EVENT_ENERGY_DRAIN);
+                                events.ScheduleEvent(EVENT_PHASE_LOWER, 9100); // 8 сек каста+0.1 подумать
+                                break;
+                            }
                         }
-                    }
-                    else
-                        me->SetPower(POWER_ENERGY, (me->GetPower(POWER_ENERGY)-1));
+                        else
+                            me->SetPower(POWER_ENERGY, (me->GetPower(POWER_ENERGY)-1));
 
-                events.ScheduleEvent(EVENT_ENERGY_DRAIN, 1000, EVENT_GROUP_UP_PHASE);
-                break;
-                case EVENT_EMBER_FLARE:
-                    DoCast(me, SPELL_EMBER_FLARE);
-                events.ScheduleEvent(EVENT_EMBER_FLARE, urand(10000,15000));
-                break;
-                case EVENT_METEOR_FALL:
-                    if (Unit *target = SelectTarget(SELECT_TARGET_RANDOM, 0, 20.0f, true))
-                    {
-                        DoCast(target, SPELL_METEOR_FALL);
-                        events.ScheduleEvent(EVENT_METEOR_FALL, urand(20000,30000));
-                    }
-                    else
-                        events.ScheduleEvent(EVENT_METEOR_FALL, 5000);
-                break;
-                case EVENT_PHASE_UPPER:
-                    me->GetMotionMaster()->MovePoint(POINT_UP, upPos);
-                    me->SetReactState(REACT_PASSIVE);
-                    me->SetPower(POWER_ENERGY, 100);
-                    DoCast(me, SPELL_NO_REGEN);
-                    events.ScheduleEvent(EVENT_ENERGY_DRAIN, 3000, EVENT_GROUP_UP_PHASE);
-                    events.ScheduleEvent(EVENT_SUMMON_CINDERWEB_SPINNER, 15000, EVENT_GROUP_UP_PHASE);
-                    events.ScheduleEvent(EVENT_SUMMON_CINDERWEB_DRONE, 30000, EVENT_GROUP_UP_PHASE);
-                    events.ScheduleEvent(EVENT_SUMMON_CINDERWEB_SPIDERLING, 30000, EVENT_GROUP_UP_PHASE);
-                    events.ScheduleEvent(EVENT_SMOLDERING_DEVASTATION, 101000, EVENT_GROUP_UP_PHASE);
-                    events.ScheduleEvent(EVENT_PHASE_LOWER, 312000);
-                    events.ScheduleEvent(EVENT_CHECK_UPPER, 5000);
-                    if (me->GetMap()->IsHeroic())
-                    events.ScheduleEvent(EVENT_SUMMON_ENGORGED_BROODLING, 45000, EVENT_GROUP_UP_PHASE);
-                break;
-                case EVENT_PHASE_LOWER:
-                    events.CancelEvent(EVENT_SUMMON_CINDERWEB_SPINNER);
-                    events.CancelEvent(EVENT_SUMMON_CINDERWEB_DRONE);
-                    events.CancelEvent(EVENT_SUMMON_CINDERWEB_SPIDERLING);
-                    events.CancelEvent(EVENT_SUMMON_ENGORGED_BROODLING);
-                    events.CancelEvent(EVENT_SMOLDERING_DEVASTATION);
-                    events.CancelEvent(EVENT_CHECK_UPPER);
-                    events.CancelEvent(EVENT_METEOR_FALL);
-                    me->GetMotionMaster()->MovePoint(POINT_DOWN, downPos);
-                    me->SetPower(POWER_ENERGY, 0);
-                    events.ScheduleEvent(EVENT_ATTACK_START, 12000);
-                    events.ScheduleEvent(EVENT_FRENZY, 13000);
-                    events.ScheduleEvent(EVENT_WIDOWS_KISS, 15000);
-                break;
+                    events.ScheduleEvent(EVENT_ENERGY_DRAIN, 1000, EVENT_GROUP_UP_PHASE);
+                    break;
+                    case EVENT_EMBER_FLARE:
+                        DoCast(me, SPELL_EMBER_FLARE);
+                    events.ScheduleEvent(EVENT_EMBER_FLARE, urand(10000,15000));
+                    break;
+                    case EVENT_METEOR_FALL:
+                        if (Unit *target = SelectTarget(SELECT_TARGET_RANDOM, 0, 20.0f, true))
+                        {
+                            DoCast(target, SPELL_METEOR_FALL);
+                            events.ScheduleEvent(EVENT_METEOR_FALL, urand(20000,30000));
+                        }
+                        else
+                            events.ScheduleEvent(EVENT_METEOR_FALL, 5000);
+                    break;
+                    case EVENT_PHASE_UPPER:
+                        me->GetMotionMaster()->MovePoint(POINT_UP, upPos);
+                        me->SetReactState(REACT_PASSIVE);
+                        me->SetPower(POWER_ENERGY, 100);
+                        DoCast(me, SPELL_NO_REGEN);
+                        events.ScheduleEvent(EVENT_ENERGY_DRAIN, 3000, EVENT_GROUP_UP_PHASE);
+                        events.ScheduleEvent(EVENT_SUMMON_CINDERWEB_SPINNER, 15000, EVENT_GROUP_UP_PHASE);
+                        events.ScheduleEvent(EVENT_SUMMON_CINDERWEB_DRONE, 30000, EVENT_GROUP_UP_PHASE);
+                        events.ScheduleEvent(EVENT_SUMMON_CINDERWEB_SPIDERLING, 30000, EVENT_GROUP_UP_PHASE);
+                        events.ScheduleEvent(EVENT_SMOLDERING_DEVASTATION, 101000, EVENT_GROUP_UP_PHASE);
+                        events.ScheduleEvent(EVENT_PHASE_LOWER, 312000);
+                        events.ScheduleEvent(EVENT_CHECK_UPPER, 5000);
+                        if (me->GetMap()->IsHeroic())
+                        events.ScheduleEvent(EVENT_SUMMON_ENGORGED_BROODLING, 45000, EVENT_GROUP_UP_PHASE);
+                    break;
+                    case EVENT_PHASE_LOWER:
+                        events.CancelEvent(EVENT_SUMMON_CINDERWEB_SPINNER);
+                        events.CancelEvent(EVENT_SUMMON_CINDERWEB_DRONE);
+                        events.CancelEvent(EVENT_SUMMON_CINDERWEB_SPIDERLING);
+                        events.CancelEvent(EVENT_SUMMON_ENGORGED_BROODLING);
+                        events.CancelEvent(EVENT_SMOLDERING_DEVASTATION);
+                        events.CancelEvent(EVENT_CHECK_UPPER);
+                        events.CancelEvent(EVENT_METEOR_FALL);
+                        me->GetMotionMaster()->MovePoint(POINT_DOWN, downPos);
+                        me->SetPower(POWER_ENERGY, 0);
+                        events.ScheduleEvent(EVENT_ATTACK_START, 12000);
+                        events.ScheduleEvent(EVENT_FRENZY, 13000);
+                        events.ScheduleEvent(EVENT_WIDOWS_KISS, 15000);
+                    break;
                     case EVENT_SUMMON_CINDERWEB_SPINNER:
                         for(int i=0; i<5; i++)
                         me->SummonCreature(NPC_LIFT_CONTROLLER,CinderwebSummonPos[i].GetPositionX() ,CinderwebSummonPos[i].GetPositionY(),CinderwebSummonPos[i].GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 120000);
@@ -468,7 +446,7 @@ public:
 
         void InitializeAI()
         {
-            if (!me->IsDead())
+            if (!me->isDead())
                 Reset();
         }
 
@@ -507,9 +485,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* who)
-        {
-        }
+        void EnterCombat(Unit* /*who*/) { }
 
         void JustDied(Unit* /*killer*/)
         {
@@ -591,19 +567,17 @@ public:
         }
 
         bool SummonLift;
-        Unit *Lift;
+        Unit *lift;
 
         void InitializeAI()
         {
-            if (!me->IsDead())
+            if (!me->isDead())
                 Reset();
 
             SummonLift = true;
         }
 
-        void JustDied(Unit* /*killer*/)
-        {
-        }
+        void JustDied(Unit* /*killer*/) { }
 
         void Reset()
         {
@@ -626,13 +600,13 @@ public:
                 events.ScheduleEvent(EVENT_FIXATE, 100);
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* /*who*/)
         {
             DoCast(me, SPELL_NO_REGEN);
             me->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
         }
         
-        void DamageTaken(Unit* attacker, uint32& damage)
+        void DamageTaken(Unit* /*attacker*/, uint32& damage)
         {
             if(damage > me->GetMaxHealth())
             {
@@ -654,8 +628,7 @@ public:
                 me->SetDisableGravity(true);
                 me->AddUnitState(MOVEMENTFLAG_SWIMMING);
                 me->SetUInt32Value(UNIT_FIELD_BYTES_1, 50331648);
-                if (Lift = summon)
-                    events.ScheduleEvent(EVENT_MOVE_TO_WEB, 1000);
+                events.ScheduleEvent(EVENT_MOVE_TO_WEB, 1000);
             }
         }
 
@@ -673,78 +646,78 @@ public:
             {
                 switch (eventId)
                 {
-                case EVENT_MOVE_TO_WEB:
-                    if (Lift)
-                    {
-                        if (me->GetDistance(Lift) <= 2.0f)
+                    case EVENT_MOVE_TO_WEB:
+                        if (lift)
                         {
-                            me->RemoveAurasDueToSpell(98623);
-                            me->SetCanFly(false);
-                            me->SetDisableGravity(false);
-                            me->RemoveUnitMovementFlag(MOVEMENTFLAG_SWIMMING);
-                            me->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
-                            events.ScheduleEvent(EVENT_DRAIN_ENERGY, 2000);
+                            if (me->GetDistance(lift) <= 2.0f)
+                            {
+                                me->RemoveAurasDueToSpell(98623);
+                                me->SetCanFly(false);
+                                me->SetDisableGravity(false);
+                                me->RemoveUnitMovementFlag(MOVEMENTFLAG_SWIMMING);
+                                me->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
+                                events.ScheduleEvent(EVENT_DRAIN_ENERGY, 2000);
+                            }
+                            else
+                            {
+                                me->GetMotionMaster()->MovePoint(0, lift->GetPositionX(), lift->GetPositionY(), lift->GetPositionZ());
+                                events.ScheduleEvent(EVENT_MOVE_TO_WEB, 2000);
+                            }
                         }
+                        break;
+                    case EVENT_DRAIN_ENERGY:
+                        if (GetBethi())
+                        {
+                            GetBethi()->SetPower(POWER_ENERGY, (GetBethi()->GetPower(POWER_ENERGY) - 85) > 0 ? (GetBethi()->GetPower(POWER_ENERGY) - 85) : 0);
+                            me->SetPower(POWER_ENERGY, 85);
+                            me->SetReactState(REACT_AGGRESSIVE);
+                            if (Unit *player = me->SelectNearestPlayer(100.0f))
+                            {
+                                me->Attack(player,true);
+                                me->GetMotionMaster()->MoveChase(player);
+                            }
+                        }
+                        break;
+                    case EVENT_DRONE_BURNING_ACID:
+                        DoCast(SelectTarget(SELECT_TARGET_RANDOM, 0, 500, true), SPELL_BURNING_ACID);
+                        events.ScheduleEvent(EVENT_DRONE_BURNING_ACID, urand(15000,35000));
+                        break;
+                    case EVENT_ENERGY_DRAIN_DRONE:
+                        if(me->GetPower(POWER_ENERGY) > 0)
+                            me->SetPower(POWER_ENERGY, (me->GetPower(POWER_ENERGY)-1));
                         else
+                        if(me->GetPower(POWER_ENERGY) == 0)
                         {
-                            me->GetMotionMaster()->MovePoint(0,Lift->GetPositionX(),Lift->GetPositionY(),Lift->GetPositionZ());
-                            events.ScheduleEvent(EVENT_MOVE_TO_WEB, 2000);
-                        }
-                    }
-                break;
-                case EVENT_DRAIN_ENERGY:
-                    if (GetBethi())
-                    {
-                        GetBethi()->SetPower(POWER_ENERGY, (GetBethi()->GetPower(POWER_ENERGY) - 85) > 0 ? (GetBethi()->GetPower(POWER_ENERGY) - 85) : 0);
-                        me->SetPower(POWER_ENERGY, 85);
-                        me->SetReactState(REACT_AGGRESSIVE);
-                        if (Unit *player = me->SelectNearestPlayer(100.0f))
-                        {
-                            me->Attack(player,true);
-                            me->GetMotionMaster()->MoveChase(player);
-                        }
-                    }
-                break;
-                case EVENT_DRONE_BURNING_ACID:
-                    DoCast(SelectTarget(SELECT_TARGET_RANDOM, 0, 500, true), SPELL_BURNING_ACID);
-                    events.ScheduleEvent(EVENT_DRONE_BURNING_ACID, urand(15000,35000));
-                break;
-                case EVENT_ENERGY_DRAIN_DRONE:
-                    if(me->GetPower(POWER_ENERGY) > 0)
-                        me->SetPower(POWER_ENERGY, (me->GetPower(POWER_ENERGY)-1));
-                    else
-                    if(me->GetPower(POWER_ENERGY) == 0)
-                    {
-                        if (GetBethi() && me->GetDistance(GetBethi()) <= 50.0f && SummonLift)
-                        {
-                            me->SummonCreature(NPC_LIFT_CONTROLLER, DronePosition[urand(0,3)], TEMPSUMMON_TIMED_DESPAWN, 60000);
+                            if (GetBethi() && me->GetDistance(GetBethi()) <= 50.0f && SummonLift)
+                            {
+                                me->SummonCreature(NPC_LIFT_CONTROLLER, DronePosition[urand(0,3)], TEMPSUMMON_TIMED_DESPAWN, 60000);
 
-                            SummonLift = false;
+                                SummonLift = false;
+                            }
+                            else if (GetBethi() && SummonLift)
+                                me->GetMotionMaster()->MovePoint(0, GetBethi()->GetPositionX(), GetBethi()->GetPositionY(), me->GetPositionZ());
                         }
-                        else if (GetBethi() && SummonLift)
-                            me->GetMotionMaster()->MovePoint(0, GetBethi()->GetPositionX(), GetBethi()->GetPositionY(), me->GetPositionZ());
-                    }
-                    events.ScheduleEvent(EVENT_ENERGY_DRAIN_DRONE, 1000);
-                break;
-                case EVENT_BOILING_SPLATTER:
-                    DoCast(SelectTarget(SELECT_TARGET_RANDOM, 0, 500, true), SPELL_BOILING_SPLATTER);
-                    events.ScheduleEvent(EVENT_BOILING_SPLATTER, urand(25000,35000));
-                break;
-                case EVENT_CONSUME:
-                    if (Creature* spiderling = me->FindNearestCreature(NPC_CINDERWEB_SPIDERLING, 5.0f, true))
-                    {
-                        me->AddAura(SPELL_CONSUME, me);
-                        spiderling->DespawnOrUnsummon();
-                    }
-                    events.ScheduleEvent(EVENT_CONSUME, 1000);
-                break;
-                case EVENT_FIXATE:
-                    if (Unit* victim = SelectTarget(SELECT_TARGET_RANDOM, 0, 500, true))
+                        events.ScheduleEvent(EVENT_ENERGY_DRAIN_DRONE, 1000);
+                        break;
+                    case EVENT_BOILING_SPLATTER:
+                        DoCast(SelectTarget(SELECT_TARGET_RANDOM, 0, 500, true), SPELL_BOILING_SPLATTER);
+                        events.ScheduleEvent(EVENT_BOILING_SPLATTER, urand(25000,35000));
+                        break;
+                    case EVENT_CONSUME:
+                        if (Creature* spiderling = me->FindNearestCreature(NPC_CINDERWEB_SPIDERLING, 5.0f, true))
                         {
-                        DoCast(victim, SPELL_FIXATE);
-                        me->GetMotionMaster()->MoveChase(victim);
+                            me->AddAura(SPELL_CONSUME, me);
+                            spiderling->DespawnOrUnsummon();
                         }
-                break;
+                        events.ScheduleEvent(EVENT_CONSUME, 1000);
+                        break;
+                    case EVENT_FIXATE:
+                        if (Unit* victim = SelectTarget(SELECT_TARGET_RANDOM, 0, 500, true))
+                            {
+                            DoCast(victim, SPELL_FIXATE);
+                            me->GetMotionMaster()->MoveChase(victim);
+                            }
+                        break;
                 }
             }
             DoMeleeAttackIfReady();
@@ -780,7 +753,7 @@ public:
 
         void InitializeAI()
         {
-            if (!me->IsDead())
+            if (!me->isDead())
                 Reset();
         }
         bool Founded;
@@ -790,18 +763,16 @@ public:
         {
         }
 
-        void IsSummonedBy(Unit* summoner)
+        void IsSummonedBy(Unit* /*summoner*/)
         {
             NeedKick = true;
             events.ScheduleEvent(EVENT_LITTLE_CHECK_TARGET, 1000);
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
         }
 
-        void EnterCombat(Unit* who)
-        {
-        }
+        void EnterCombat(Unit* /*who*/) { }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
@@ -814,10 +785,9 @@ public:
                 {
                     case EVENT_CHECK_PLAYER_SEEPING_VENOM:
                         if (Unit* target = me->FindNearestPlayer(5.0f, true))
-                          DoCast(target, SPELL_SEEPING_VENOM);
-                    events.ScheduleEvent(EVENT_CHECK_PLAYER_SEEPING_VENOM, 3000);
-                    break;
-                    
+                            DoCast(target, SPELL_SEEPING_VENOM);
+                        events.ScheduleEvent(EVENT_CHECK_PLAYER_SEEPING_VENOM, 3000);
+                        break;
                     case EVENT_LITTLE_CHECK_TARGET:
                         {
                             std::list<Creature*> creatures;
@@ -826,7 +796,7 @@ public:
 
                             if (creatures.empty())
                             {
-                                sLog->outChar("Started attack player before list check");
+                                TC_LOG_INFO("entities.player.character", "Started attack player before list check");
                                 if(Unit* target = me->FindNearestPlayer(400.0f, true))
                                 {
                                     if(NeedKick)
@@ -859,7 +829,7 @@ public:
                             {
                                 if(Unit* target = me->FindNearestPlayer(400.0f, true))
                                 {
-                                    sLog->outChar("Started attack player after list check");
+                                    TC_LOG_INFO("entities.player.character", "Started attack player after list check");
                                     me->SetReactState(REACT_AGGRESSIVE);
                                     if(NeedKick)
                                     {
@@ -872,7 +842,7 @@ public:
                             }
                             events.ScheduleEvent(EVENT_LITTLE_CHECK_TARGET, 3000);
                         }
-                    break;
+                        break;
                 }
             }
         }
@@ -891,17 +861,13 @@ public:
 class npc_engorged_broodling : public CreatureScript //насосавшийс€ пиздюк. только героик
 {
 public:
-    npc_engorged_broodling() : CreatureScript("npc_engorged_broodling"){}
+    npc_engorged_broodling() : CreatureScript("npc_engorged_broodling"){ }
 
     struct npc_engorged_broodlingAI : public ScriptedAI
     {
-        npc_engorged_broodlingAI(Creature* creature) : ScriptedAI(creature)
-        {
-        }
+        npc_engorged_broodlingAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void JustDied(Unit* /*killer*/)
-        {
-        }
+        void JustDied(Unit* /*killer*/) { }
 
         void Reset()
         {
@@ -930,14 +896,14 @@ public:
             {
                 switch (eventId)
                 {
-                case EVENT_CHECK_PLAYER_RANGE:
-                    if (Unit* target = me->FindNearestPlayer(5.0f, true))
-                    {
-                        DoCast(me, SPELL_VOLATILE_BURST_H);
-                        me->DisappearAndDie();
-                    }
-                    events.ScheduleEvent(EVENT_CHECK_PLAYER_RANGE, 1000);
-                break;
+                    case EVENT_CHECK_PLAYER_RANGE:
+                        if (me->FindNearestPlayer(5.0f, true))
+                        {
+                            DoCast(me, SPELL_VOLATILE_BURST_H);
+                            me->DisappearAndDie();
+                        }
+                        events.ScheduleEvent(EVENT_CHECK_PLAYER_RANGE, 1000);
+                    break;
                 }
             }
         }
@@ -954,19 +920,15 @@ public:
 class npc_web_rip : public CreatureScript
 {
 public:
-    npc_web_rip() : CreatureScript("npc_web_rip"){}
+    npc_web_rip() : CreatureScript("npc_web_rip") { }
 
-    struct npc_web_ripAI : public Scripted_NoMovementAI
+    struct npc_web_ripAI : public ScriptedAI
     {
-        npc_web_ripAI(Creature* creature) : Scripted_NoMovementAI(creature)
-        {
-        }
+        npc_web_ripAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void JustDied(Unit* /*killer*/)
-        {
-        }
+        void JustDied(Unit* /*killer*/) { }
 
-        void IsSummonedBy(Unit* summoner)
+        void IsSummonedBy(Unit* /*summoner*/)
         {
             events.ScheduleEvent(EVENT_METEOR_DUMMY, 100);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -984,27 +946,27 @@ public:
             {
                 switch (eventId)
                 {
-                case EVENT_METEOR_DUMMY:
-                    DoCast(SPELL_METEOR_BURN);
+                    case EVENT_METEOR_DUMMY:
+                        DoCast(SPELL_METEOR_BURN);
 
-                    std::list<Player*> TargetList;
-                    Map::PlayerList const& Players = me->GetMap()->GetPlayers();
-                    for (Map::PlayerList::const_iterator itr = Players.begin(); itr != Players.end(); ++itr)
-                    {
-                        if (Player* player = itr->GetSource())
+                        std::list<Player*> TargetList;
+                        Map::PlayerList const& Players = me->GetMap()->GetPlayers();
+                        for (Map::PlayerList::const_iterator itr = Players.begin(); itr != Players.end(); ++itr)
                         {
-                            if(player->GetDistance(me) <= 6.0f)
-                                TargetList.push_back(player);
-                            else
-                                continue;
+                            if (Player* player = itr->GetSource())
+                            {
+                                if(player->GetDistance(me) <= 6.0f)
+                                    TargetList.push_back(player);
+                                else
+                                    continue;
+                            }
                         }
-                    }
-                    if(!TargetList.empty())
-                        for(std::list<Player*>::const_iterator itr = TargetList.begin(); itr != TargetList.end(); ++itr)
-                            (*itr)->TeleportTo(me->GetMapId(),me->GetPositionX(),me->GetPositionY(),me->GetPositionZ() - 5.0f,(*itr)->GetOrientation());
+                        if(!TargetList.empty())
+                            for(std::list<Player*>::const_iterator itr = TargetList.begin(); itr != TargetList.end(); ++itr)
+                                (*itr)->TeleportTo(me->GetMapId(),me->GetPositionX(),me->GetPositionY(),me->GetPositionZ() - 5.0f,(*itr)->GetOrientation());
 
-                    events.ScheduleEvent(EVENT_METEOR_DUMMY, 2500);
-                break;
+                        events.ScheduleEvent(EVENT_METEOR_DUMMY, 2500);
+                    break;
                 }
             }
         }
@@ -1025,9 +987,7 @@ public:
 
     struct npc_web_filamentAI : public ScriptedAI
     {
-        npc_web_filamentAI(Creature* creature) : ScriptedAI(creature), vehicle(creature->GetVehicleKit())
-        {
-        }
+        npc_web_filamentAI(Creature* creature) : ScriptedAI(creature), vehicle(creature->GetVehicleKit()) { }
 
         Vehicle* vehicle;
         bool seated;
@@ -1039,7 +999,7 @@ public:
             summoner->CastSpell(me,98623,true);
         }
 
-        void PassengerBoarded(Unit* who, int8 seatId, bool apply)
+        void PassengerBoarded(Unit* who, int8 /*seatId*/, bool apply)
         {
            // if (!me->GetVehicle())
             //    return;
@@ -1058,13 +1018,9 @@ public:
             }
         }
 
-        void JustDied(Unit* /*killer*/)
-        {
-        }
+        void JustDied(Unit* /*killer*/) { }
 
-        void EnterCombat(Unit* who)
-        {
-        }
+        void EnterCombat(Unit* /*who*/) { }
 
         void UpdateAI(const uint32 diff)
         {
@@ -1077,15 +1033,15 @@ public:
             {
                 switch (eventId)
                 {
-                case EVENT_MOVING_LIFT:
-                    if(Unit* lifthandler = me->ToTempSummon()->GetSummoner())
-                    {
-                        if (lifthandler->GetVehicleKit())
-                            lifthandler->GetVehicleKit()->RemoveAllPassengers();
-                        lifthandler->ToCreature()->DespawnOrUnsummon();
-                        me->DespawnOrUnsummon();
-                    }
-                break;
+                    case EVENT_MOVING_LIFT:
+                        if(Unit* lifthandler = me->ToTempSummon()->GetSummoner())
+                        {
+                            if (lifthandler->GetVehicleKit())
+                                lifthandler->GetVehicleKit()->RemoveAllPassengers();
+                            lifthandler->ToCreature()->DespawnOrUnsummon();
+                            me->DespawnOrUnsummon();
+                        }
+                    break;
                 }
             }
         }
@@ -1102,17 +1058,13 @@ public:
 class npc_lift_controller : public CreatureScript
 {
 public:
-    npc_lift_controller() : CreatureScript("npc_lift_controller"){}
+    npc_lift_controller() : CreatureScript("npc_lift_controller") { }
 
     struct npc_lift_controllerAI : public ScriptedAI
     {
-        npc_lift_controllerAI(Creature* creature) : ScriptedAI(creature)
-        {
-        }
+        npc_lift_controllerAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void Reset()
-        {
-        }
+        void Reset() { }
 
         void IsSummonedBy(Unit* summoner)
         {

@@ -89,7 +89,7 @@ public:
                 CurserVeilTimer = urand(18000,22000);
             } else CurserVeilTimer -= diff;
 
-            if (me->HealthBelowPct(76) && Phase == 0 || me->HealthBelowPct(51) && Phase == 1 || me->HealthBelowPct(26) && Phase == 2)
+            if ((me->HealthBelowPct(76) && Phase == 0) || (me->HealthBelowPct(51) && Phase == 1) || (me->HealthBelowPct(26) && Phase == 2))
             {
                 Phase++;
                 DoCast(me, SPELL_SUMMON_WORGEN_SPIRIT);

@@ -15,11 +15,10 @@
  * You should have received a copy of the GNU General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
- 
- 
-#include"ScriptPCH.h"
-#include"the_vortex_pinnacle.h"
 
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include"the_vortex_pinnacle.h"
 
 enum ScriptTexts
 {
@@ -132,7 +131,7 @@ class boss_altairus : public CreatureScript
                 summons.Despawn(summon);
             }
 
-            void JustDied(Unit* pWho)
+            void JustDied(Unit* /*who*/)
             {
                 if (!pInstance)
                     return;
@@ -235,9 +234,9 @@ class npc_air_current : public CreatureScript
         {
             return new npc_air_currentAI(pCreature);
         }
-        struct npc_air_currentAI : public Scripted_NoMovementAI
+        struct npc_air_currentAI : public ScriptedAI
         {
-            npc_air_currentAI(Creature* pCreature) : Scripted_NoMovementAI(pCreature)
+            npc_air_currentAI(Creature* pCreature) : ScriptedAI(pCreature)
             {
                 me->SetReactState(REACT_PASSIVE);
             }
@@ -250,9 +249,7 @@ class npc_air_current : public CreatureScript
                 //DoCast(me, SPELL_CALL_OF_WIND);
             }
 
-            void UpdateAI(const uint32 diff)
-            {
-            }
+            void UpdateAI(uint32 /*diff*/) { }
      };
 };
 

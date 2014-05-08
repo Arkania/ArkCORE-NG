@@ -48,7 +48,7 @@ class npc_containment_unit : public CreatureScript
                 RepellentRayTimer = 10000;
             }
 
-            void EnterCombat(Unit* who)
+            void EnterCombat(Unit* /*who*/)
             {
                 RepellentRayTimer = 10000;
             }
@@ -100,7 +100,7 @@ class npc_disciple_of_hate : public CreatureScript
                 WhirlingBladesTimer = urand(5000, 15000);
             }
 
-            void EnterCombat(Unit* who)
+            void EnterCombat(Unit* /*who*/)
             {
                 WhirlingBladesTimer = urand(5000, 15000);
                 RunThroughTimer = urand(2000, 4000);
@@ -161,7 +161,7 @@ class npc_eye_of_occuthar : public CreatureScript
                 GazeTimer = 1000;
             }
 
-            void EnterCombat(Unit* who)
+            void EnterCombat(Unit* /*who*/)
             {
                 GazeTimer = 1000;
             }

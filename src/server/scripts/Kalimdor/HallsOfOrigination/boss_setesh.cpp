@@ -38,7 +38,7 @@ enum Texts
     SAY_REIGN      = 1,
 };
 
-enum Creatures
+enum Npc
 {
     NPC_PORTAL                               = 41055,
     NPC_VOID_SENTINEL                        = 41208,
@@ -59,7 +59,7 @@ class boss_setesh : public CreatureScript
             
         struct boss_seteshAI : public ScriptedAI
         {
-            boss_seteshAI(Creature* pCreature) : ScriptedAI(pCreature), summons(me)
+            boss_seteshAI(Creature* pCreature) : ScriptedAI(pCreature)
             {
                 m_pInstance = pCreature->GetInstanceScript();
             }
@@ -70,12 +70,12 @@ class boss_setesh : public CreatureScript
             uint32 m_uiShadowCrashTimer;
             uint32 m_uiSeedofChaosTimer;
             uint32 m_uiReignofChaosTimer;
-            SummonList summons;
+            std::list<uint64> summons;
 
             void Reset()
             {
                 m_pInstance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me); // Remove
-                summons.DespawnAll();
+                summons.clear();
                 m_uiChaosBoltTimer = 1000;
                 m_uiPortalTimer = 10000;
                 m_uiShadowCrashTimer = 7000;
@@ -83,7 +83,7 @@ class boss_setesh : public CreatureScript
                 m_uiSeedofChaosTimer = IsHeroic() ? 6000 : 9000;
             }
 
-            void EnterCombat(Unit* pWho)
+            void EnterCombat(Unit* /*who*/)
             {
                 m_pInstance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me);
                 m_uiChaosBoltTimer = 1000;
@@ -94,14 +94,14 @@ class boss_setesh : public CreatureScript
                 Talk(SAY_AGGRO);
             }
 
-            void KilledUnit(Unit * /*victim*/)
+            void KilledUnit(Unit* /*victim*/)
             {
                 Talk(SAY_KILL);
             }
             
-            void JustDied(Unit* killer)
+            void JustDied(Unit* /*killer*/)
             {
-                summons.DespawnAll();
+                summons.clear();
                 Talk(SAY_DEATH);
                 m_pInstance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me); // Remove
             }
@@ -121,7 +121,7 @@ class boss_setesh : public CreatureScript
                    m_pInstance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me); // Remove
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(uint32 uiDiff)
             {
                 if (!UpdateVictim())
                     return;
@@ -203,7 +203,7 @@ class npc_portal : public CreatureScript
             
         struct npc_portalAI : public ScriptedAI
         {
-            npc_portalAI(Creature* pCreature) : ScriptedAI(pCreature), summons(me)
+            npc_portalAI(Creature* pCreature) : ScriptedAI(pCreature)
             {
                 m_pInstance = pCreature->GetInstanceScript();
             }
@@ -212,17 +212,17 @@ class npc_portal : public CreatureScript
             uint32 m_uiSentinelTimer;
             uint32 m_uiWurmsTimer;
             uint32 m_uiSeekerTimer;
-            SummonList summons;
+            std::list<uint64> summons;
             
             void Reset()
             {
-                summons.DespawnAll();
+                summons.clear();
                 m_uiSentinelTimer = 5000;
                 m_uiWurmsTimer = IsHeroic() ? 12000 : 15000;
                 m_uiSeekerTimer = IsHeroic() ? 20000 : 26000;
             }
 
-            void EnterCombat(Unit* pWho)
+            void EnterCombat(Unit* /*who*/)
             {
                 DoCast(me, SPELL_PORTAL_VISUAL1);
                 DoCast(me, SPELL_PORTAL_VISUAL2);
@@ -238,7 +238,7 @@ class npc_portal : public CreatureScript
                 summons.push_back(summon->GetGUID());
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(uint32 uiDiff)
             {
                 if (!UpdateVictim())
                     return;
@@ -300,13 +300,13 @@ class npc_sentinel : public CreatureScript
                     me->AddAura(SPELL_VOID_BARRIER, me);
             }
 
-            void EnterCombat(Unit* pWho)
+            void EnterCombat(Unit* /*who*/)
             {
                 if(IsHeroic())
                     me->AddAura(SPELL_VOID_BARRIER, me);
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(uint32 /*diff*/)
             {
                 if (!UpdateVictim())
                     return;
@@ -340,7 +340,7 @@ class npc_seeker : public CreatureScript
                 m_uiPrisonTimer = 5000;
             }
 
-            void EnterCombat(Unit* pWho)
+            void EnterCombat(Unit* /*who*/)
             {
                 m_uiPrisonTimer = 5000;
             }
@@ -443,7 +443,7 @@ class npc_reign_of_chaos : public CreatureScript
             InstanceScript* pInstance;
             uint32 m_uiNovaTimer;
 
-            void EnterCombat(Unit * /*who*/)
+            void EnterCombat(Unit* /*who*/)
             {
                 me->AddAura(SPELL_REIGN_OF_CHAOS_AURA, me);
                 m_uiNovaTimer = urand(1000, 7000);

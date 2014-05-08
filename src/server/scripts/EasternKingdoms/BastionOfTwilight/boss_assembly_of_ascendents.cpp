@@ -57,7 +57,7 @@ public:
             instance->SetData(DATA_ASCENDANT_COUNCIL, DONE);
         }
 
-        void UpdateAI(const uint32 Diff)
+        void UpdateAI(uint32 /*diff*/)
         {
             if (!UpdateVictim())
                 return;

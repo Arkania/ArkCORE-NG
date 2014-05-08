@@ -2378,7 +2378,7 @@ public:
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         }
 
-        void BarrierChecker(Unit* who)
+        void BarrierChecker(Unit* /*who*/)
         {
             if (!me->HasAura(81781))
                 DoCast(me, 81781);
@@ -2483,7 +2483,7 @@ public:
 
             if (uiDespawnTimer <= diff)
             {
-                if (me->GetOwner()->HasAura(18459) && roll_chance_i(33) || me->GetOwner()->HasAura(18460) && roll_chance_i(66) || me->GetOwner()->HasAura(54734))
+                if ((me->GetOwner()->HasAura(18459) && roll_chance_i(33)) || (me->GetOwner()->HasAura(18460) && roll_chance_i(66)) || me->GetOwner()->HasAura(54734))
                     DoCast(me, SPELL_FLAME_ORB_BOOM);
 
                 me->SetVisible(false);
@@ -2814,7 +2814,7 @@ public:
 
     struct npc_shadowy_apparitionAI: public ScriptedAI
     {
-        npc_shadowy_apparitionAI (Creature* c) : ScriptedAI(c)
+        npc_shadowy_apparitionAI (Creature* creature) : ScriptedAI(creature)
         {
             me->SetReactState(REACT_AGGRESSIVE);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
@@ -2851,16 +2851,16 @@ public:
             }
         }
 
-        void UpdateAI (const uint32 diff)
+        void UpdateAI (const uint32 /*diff*/)
         {
             if (!UpdateVictim())
             {
-                Unit * owner = me->GetOwner();
+                Unit* owner = me->GetOwner();
 
                 if (!owner)
                     return;
 
-                if (Unit* target = owner->GetAttackerForHelper())
+                if (Unit* target = owner->getAttackerForHelper())
                 {
                     me->Attack(target, false);
                     me->AddThreat(target, 100.0f);
@@ -2888,59 +2888,58 @@ enum GuardianSpellsAndEntries
      SPELL_ANCIENT_CRUSADER_GUARDIAN = 86701
 };
 /*
- class npc_guardian_of_ancient_kings : public CreatureScript
- {
- public:
-     npc_guardian_of_ancient_kings() : CreatureScript("npc_guardian_of_ancient_kings") { }
+class npc_guardian_of_ancient_kings : public CreatureScript
+{
+public:
+    npc_guardian_of_ancient_kings() : CreatureScript("npc_guardian_of_ancient_kings") { }
 
-     struct npc_guardian_of_ancient_kingsAI : public ScriptedAI
-     {
-         npc_guardian_of_ancient_kingsAI(Creature *pCreature) : ScriptedAI(pCreature) { }
+    struct npc_guardian_of_ancient_kingsAI : public ScriptedAI
+    {
+        npc_guardian_of_ancient_kingsAI(Creature *pCreature) : ScriptedAI(pCreature) { }
 
-         void InitializeAI()
-         {
-             Unit* owner = me->GetOwner();
+        void InitializeAI()
+        {
+            Unit* owner = me->GetOwner();
 
-             if (!owner || owner->GetTypeId() != TYPEID_PLAYER)
-                 return;
-
-             if (me->GetEntry() == NPC_PROTECTION_GUARDIAN)
-             {
-                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-                 me->SetReactState(REACT_PASSIVE);
-             }
-             if (me->GetEntry() == NPC_RETRI_GUARDIAN)
-                 if (Unit* owner = me->GetOwner())
-                 {
-                     owner->AddAura(SPELL_ANCIENT_CRUSADER_GUARDIAN, me);
-                     owner->AddAura(SPELL_ANCIENT_CRUSADER_PLAYER, owner);
-                 }
-             if (me->GetEntry() == NPC_HOLY_GUARDIAN)
-                 if (Unit* owner = me->GetOwner())
-                     me->AddAura(SPELL_ANCIANET_HEALER, owner);
-         }
-
-         void UpdateAI(const uint32 diff)
-         {
-             Unit* owner = me->GetOwner();
-
-             if (!UpdateVictim() || !owner)
-                 return;
+            if (!owner || owner->GetTypeId() != TYPEID_PLAYER)
+                return;
 
              if (me->GetEntry() == NPC_PROTECTION_GUARDIAN)
-                 if (!owner->HasAura(SPELL_ANCIENT_GUARDIAN_VISUAL))
-                     me->AddAura(SPELL_ANCIENT_GUARDIAN_VISUAL, owner);
+            {
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+                me->SetReactState(REACT_PASSIVE);
+            }
+            if (me->GetEntry() == NPC_RETRI_GUARDIAN)
+                if (Unit* owner = me->GetOwner())
+                {
+                    owner->AddAura(SPELL_ANCIENT_CRUSADER_GUARDIAN, me);
+                    owner->AddAura(SPELL_ANCIENT_CRUSADER_PLAYER, owner);
+                }
+            if (me->GetEntry() == NPC_HOLY_GUARDIAN)
+                if (Unit* owner = me->GetOwner())
+                    me->AddAura(SPELL_ANCIANET_HEALER, owner);
+        }
 
-             if (me->GetEntry() == NPC_RETRI_GUARDIAN) // Only the retpaladin guardian hits melee,
-                 DoMeleeAttackIfReady();  // at least is what i saw on vids.
+        void UpdateAI(const uint32 diff)
+        {
+            Unit* owner = me->GetOwner();
 
-         }
-     };
+            if (!UpdateVictim() || !owner)
+                return;
 
-     CreatureAI* GetAI(Creature* pCreature) const
-     {
-         return new npc_guardian_of_ancient_kingsAI(pCreature);
-     }
+            if (me->GetEntry() == NPC_PROTECTION_GUARDIAN)
+                if (!owner->HasAura(SPELL_ANCIENT_GUARDIAN_VISUAL))
+                    me->AddAura(SPELL_ANCIENT_GUARDIAN_VISUAL, owner);
+
+            if (me->GetEntry() == NPC_RETRI_GUARDIAN) // Only the retpaladin guardian hits melee,
+                DoMeleeAttackIfReady();  // at least is what i saw on vids.
+        }
+    };
+
+    CreatureAI* GetAI(Creature* pCreature) const
+    {
+        return new npc_guardian_of_ancient_kingsAI(pCreature);
+    }
 };
 */
 class npc_guardian_of_ancient_kings : public CreatureScript
@@ -2991,7 +2990,7 @@ public:
              }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(const uint32 /*diff*/)
         {
             if (!UpdateVictim())
                 return;
@@ -3032,14 +3031,14 @@ public:
             // Start attacking attacker of owner on first ai update after spawn - move in line of sight may choose better target
             if (!me->GetVictim() && me->IsSummon())
                 if (Unit* Owner = me->ToTempSummon()->GetSummoner())
-                    if (Owner->GetAttackerForHelper())
-                        AttackStart(Owner->GetAttackerForHelper());
+                    if (Owner->getAttackerForHelper())
+                        AttackStart(Owner->getAttackerForHelper());
         }
 
         //Redefined for random target selection:
         void MoveInLineOfSight(Unit* who)
         {
-            if (!me->GetVictim() && me->canCreatureAttack(who))
+            if (!me->GetVictim() && me->CanCreatureAttack(who))
             {
                 if (me->GetDistanceZ(who) > CREATURE_Z_ATTACK_RANGE)
                     return;
@@ -3096,15 +3095,15 @@ public:
             me->SetReactState(REACT_AGGRESSIVE);
             // Start attacking attacker of owner on first ai update after spawn - move in line of sight may choose better target
             if (!me->GetVictim() && me->IsSummon())
-                if (Unit* Owner = me->ToTempSummon()->GetSummoner())
-                    if (Owner->GetAttackerForHelper())
-                        AttackStart(Owner->GetAttackerForHelper());
+                if (Unit* owner = me->ToTempSummon()->GetSummoner())
+                    if (owner->getAttackerForHelper())
+                        AttackStart(owner->getAttackerForHelper());
         }
 
         //Redefined for random target selection:
         void MoveInLineOfSight(Unit* who)
         {
-            if (!me->GetVictim() && me->canCreatureAttack(who))
+            if (!me->GetVictim() && me->CanCreatureAttack(who))
             {
                 if (me->GetDistanceZ(who) > CREATURE_Z_ATTACK_RANGE)
                     return;
@@ -3116,7 +3115,7 @@ public:
             }
         }
 
-        void UpdateAI (const uint32 diff)
+        void UpdateAI (const uint32 /*diff*/)
         {
             if (!UpdateVictim())
                 return;

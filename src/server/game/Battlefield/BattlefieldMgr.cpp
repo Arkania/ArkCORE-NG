@@ -101,7 +101,7 @@ void BattlefieldMgr::InitBattlefield()
     {
         _battlefieldSet.push_back(wg);
         BattlefieldQueue* wgQueue = new BattlefieldQueue(wg->GetBattleId());
-        m_queueMap[wg->GetGUID()] = wgQueue;
+        _queueMap[wg->GetGUID()] = wgQueue;
         TC_LOG_INFO("bg.battlefield", "Battlefield: Wintergrasp successfully initiated.");
     }
 

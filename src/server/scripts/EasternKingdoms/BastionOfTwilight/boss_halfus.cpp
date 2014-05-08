@@ -154,7 +154,7 @@ class boss_halfus : public CreatureScript
 
             void InitializeAI()
             {
-              if(!me->IsDead())
+              if(!me->isDead())
                 Reset();
             }
 
@@ -176,7 +176,7 @@ class boss_halfus : public CreatureScript
                 _EnterEvadeMode();
             }
 
-            void JustDied(Unit* killer)
+            void JustDied(Unit* /*killer*/)
             {
                 Talk(SAY_DIE);
                 summons.DespawnAll();
@@ -331,7 +331,7 @@ class boss_halfus : public CreatureScript
                 Creature* netherScion  = me->FindNearestCreature(NPC_NETHER_SCION, 500.0f, true);
                 Creature* stormRider   = me->FindNearestCreature(NPC_STORM_RIDER, 500.0f, true);
                 Creature* timeRider    = me->FindNearestCreature(NPC_TIME_RIDER, 500.0f, true);
-                Creature* orphanWhelp  = me->FindNearestCreature(NPC_ORPHANED_WHELP, 500.0f, true);
+                //Creature* orphanWhelp  = me->FindNearestCreature(NPC_ORPHANED_WHELP, 500.0f, true);
 
                 if (!me->GetMap()->IsHeroic()) // 10 possible combinations, 3 drakes randomly selected available.
                 {
@@ -427,7 +427,7 @@ class boss_halfus : public CreatureScript
                 }
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(uint32 uiDiff)
             {
                 if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                     return;
@@ -559,7 +559,7 @@ class npc_proto_behemoth : public CreatureScript
                 events.ScheduleEvent(EVENT_FIREBALL, 16000);
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(uint32 uiDiff)
             {
                 if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                     return;
@@ -655,7 +655,7 @@ public:
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         }
 
-        void EnterCombat(Unit* pWho)
+        void EnterCombat(Unit* /*who*/)
         {
             Creature* Halfus = me->FindNearestCreature(NPC_HALFUS_WORMBREAKER, 500.0f, true);
 
@@ -687,7 +687,7 @@ public:
                 Halfus->AddAura(SPELL_DRAGONS_VENGEANCE, Halfus);
         }
 
-        void UpdateAI (const uint32 uiDiff)
+        void UpdateAI (uint32 /*diff*/)
         {
             if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                 return;
@@ -805,9 +805,9 @@ public:
             me->GetMotionMaster()->MoveTargetedHome();
         }
 
-        void JustDied(Unit* /*killer*/) {}
+        void JustDied(Unit* /*killer*/) { }
 
-        void UpdateAI(const uint32 diff) 
+        void UpdateAI(uint32 /*diff*/) 
         {
             DoMeleeAttackIfReady();
         }
@@ -823,7 +823,7 @@ public:
     {
         PrepareSpellScript(spell_proto_fireballSpellScript);
 
-        bool Validate(SpellEntry const * spellEntry)
+        bool Validate(SpellInfo const* /*spellInfo*/)
         {
             return true;
         }
@@ -833,7 +833,7 @@ public:
             return true;
         }
 
-        void HandleDummy(SpellEffIndex effIndex)
+        void HandleDummy(SpellEffIndex /*effIndex*/)
         {
             if (GetCaster()->HasAura(SPELL_TIME_DILATION))
             {
@@ -868,7 +868,7 @@ public:
     {
         PrepareSpellScript(spell_proto_fireball_barrageSpellScript);
 
-        bool Validate(SpellEntry const * spellEntry)
+        bool Validate(SpellInfo const* /*spellInfo*/)
         {
             return true;
         }
@@ -878,7 +878,7 @@ public:
             return true;
         }
 
-        void HandleDummy(SpellEffIndex effIndex)
+        void HandleDummy(SpellEffIndex /*effIndex*/)
         {
             GetCaster()->CastSpell(GetCaster()->GetVictim(), SPELL_FIREBALL_BARRAGE_DAMAGE_TD, false);
         }

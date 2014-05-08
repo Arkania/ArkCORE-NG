@@ -39,7 +39,7 @@ class npc_tornado_moving : public CreatureScript
                 std::list<Creature*> tornados;
                 GetCreatureListWithEntryInGrid(tornados, me, me->GetEntry(), 40.0f);
 
-                if (!tornados.empty() && tornados.size() < 4)
+                //if (!tornados.empty() && tornados.size() < 4)
                     //me->SummonCreature(me->GetEntry(),me->GetPositionX() - (std::cos(me->GetOrientation())*2),me->GetPositionY() - (std::sin(me->GetOrientation())*2),me->GetPositionZ());
 
                 if (me->GetEntry() == 48854)
@@ -48,7 +48,7 @@ class npc_tornado_moving : public CreatureScript
                     MoveSide = false; // east
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 /*diff*/)
             {
                 if (GetAlakir() && GetAlakir()->IsAlive())
                 {

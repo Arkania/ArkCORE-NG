@@ -108,7 +108,7 @@ public:
 
             if (phase == 0)
             {
-                if (Unit* NearPlayer = me->FindNearestPlayer(5.0, true))
+                if (me->FindNearestPlayer(5.0, true))
                 {
                     phase = 1;
                     timerMove = 7000;
@@ -166,17 +166,17 @@ public:
         uint32 falltimer;
         InstanceScript* instance;
 
-        void Reset() {}
+        void Reset() { }
 
-        void EnterCombat(Unit* /*who*/) {}
+        void EnterCombat(Unit* /*who*/) { }
 
-        void IsSummonedBy(Unit* summoner)
+        void IsSummonedBy(Unit* /*summoner*/)
         {
             me->SetReactState(REACT_AGGRESSIVE);
             start = true;
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!start) return;
 
@@ -204,7 +204,6 @@ public:
         }
     };
 };
-
 
 enum Yells
 {
@@ -330,7 +329,6 @@ const Position CenterPlatform[1] =
 };
 
 // Speed
-
 const float speedRateLow         = 0.2f;
 const float speedRateNormal      = 1.0f;
 
@@ -397,7 +395,7 @@ class boss_lord_rhyolith : public CreatureScript
                         {
                             RightSet = true;
                             GetRightLeg()->EnterVehicle(me,1);
-                            GetRightLeg()->ClearUnitState(UNIT_STATE_ONVEHICLE);
+                            GetLeftLeg()->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                         }
                 }
 
@@ -411,7 +409,7 @@ class boss_lord_rhyolith : public CreatureScript
                         {
                             LeftSet = true;
                             GetLeftLeg()->EnterVehicle(me,0);
-                            GetLeftLeg()->ClearUnitState(UNIT_STATE_ONVEHICLE);
+                            GetLeftLeg()->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                         }
                 }
             }
@@ -615,7 +613,7 @@ class boss_lord_rhyolith : public CreatureScript
                 }
 
                 if (!UpdateVictim())
-                    if (Player* target = me->SelectNearestPlayer(70.0f))
+                    if (me->SelectNearestPlayer(70.0f))
                     {
                         if (GetLeftLeg())
                             GetLeftLeg()->AI()->DoZoneInCombat();
@@ -722,10 +720,9 @@ class boss_lord_rhyolith : public CreatureScript
                         case EVENT_CONCUSSIVE_STOMP_VOLCAN:
                             for (int32 i = 0;  i < RAID_MODE(2, 3, 2, 3); ++i)
                             {
-                                Position pos;
-                                me->GetRandomNearPosition(pos, urand(10,90));
+                                Position pos = me->GetRandomNearPosition(urand(10,90));
                                 while (pos.GetPositionZ() < 100.0f || pos.GetPositionZ() > 101.0f || me->GetDistance(pos) < 15.0f || CenterPlatform[0].GetExactDist(pos.GetPositionX(),pos.GetPositionY(),pos.GetPositionZ()) > 50.0f)
-                                    me->GetRandomNearPosition(pos, 90);
+                                    me->GetRandomNearPosition(90);
                                 me->CastSpell(pos.GetPositionX(),pos.GetPositionY(),pos.GetPositionZ(),SPELL_VOLCANIC_BIRTH,true);
                             }
                             events.ScheduleEvent(EVENT_CONCUSSIVE_STOMP, timerConcussiveStomp);
@@ -826,9 +823,9 @@ public:
                 GetRhyo()->AI()->DoZoneInCombat();
         }
 
-        void UpdateAI(const uint32 diff) { }
+        void UpdateAI(uint32 /*diff*/) { }
 
-        void DamageTaken(Unit* who, uint32& damage)
+        void DamageTaken(Unit* /*who*/, uint32& damage)
         {
             side += damage;
 
@@ -911,9 +908,9 @@ public:
                 GetRhyo()->AI()->DoZoneInCombat();
         }
 
-        void UpdateAI(const uint32 diff) { }
+        void UpdateAI(uint32 /*diff*/) { }
 
-        void DamageTaken(Unit* who, uint32& damage)
+        void DamageTaken(Unit* /*who*/, uint32& damage)
         {
             side += damage;
 
@@ -976,9 +973,9 @@ public:
         EventMap events;
         bool blow;
 
-        void JustDied(Unit* /*killer*/) {}
+        void JustDied(Unit* /*killer*/) { }
         
-        void IsSummonedBy(Unit* summoner)
+        void IsSummonedBy(Unit* /*summoner*/)
         {
             me->AddAura(SPELL_VISUAL_VOLCAN,me);
             me->AddAura(SPELL_SMOKE_VOLCAN,me);
@@ -1002,7 +999,7 @@ public:
             events.Reset();
         }
         
-        void UpdateAI(const uint32 diff) 
+        void UpdateAI(uint32 diff) 
         {
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
@@ -1011,13 +1008,13 @@ public:
             {
                 GetRhyo()->AddAura(SPELL_MOLTEN_ARMOR,GetRhyo()); // GetRhyo()->GetTarget->IsBitch() ? payForBlowJob : findWhore; There, this suits the blow bool.
 
-                blow = true; // !!
+                blow = true;
 
                 if (Aura* aura = GetRhyo()->GetAura(SPELL_OBSIDIAN_ARMOR))
                 {
-                    uint32 stack = aura->GetStackAmount() - 10;
+                    int32 stack = aura->GetStackAmount() - 10;
 
-                    if (stack >= 0)
+                    if (stack >= 0) /// @todo warning: comparison of unsigned expression >= 0 is always true
                     {
                         GetRhyo()->SetAuraStack(SPELL_OBSIDIAN_ARMOR, GetRhyo(), stack);
                         //GetRhyo()->SetSpeed(MOVE_RUN, GetRhyo()->GetSpeed(MOVE_RUN) + 0.1f);
@@ -1128,7 +1125,7 @@ public:
             }
         }
 
-        void IsSummonedBy(Unit* summoner)
+        void IsSummonedBy(Unit* /*summoner*/)
         {
             number = 10;
             events.ScheduleEvent(EVENT_ACTIVATE_CRATER, urand(5000,20000));
@@ -1232,7 +1229,7 @@ public:
             events.Reset();
         }
 
-        void IsSummonedBy(Unit* summoner)
+        void IsSummonedBy(Unit* /*summoner*/)
         {
             events.ScheduleEvent(EVENT_CHECK_NEAR_PLAYER, 4000);
             events.ScheduleEvent(EVENT_DESPAWN_LINE, 30000);
@@ -1252,7 +1249,7 @@ public:
                 case EVENT_CHECK_NEAR_PLAYER:
                     if (!me->HasAura(SPELL_LAVA_TUBE))
                     {
-                        if (Player* target = me->SelectNearestPlayer(0))
+                        if (me->SelectNearestPlayer(0))
                         {
                             me->CastSpell(me,97234,true);
                             events.ScheduleEvent(EVENT_CHECK_NEAR_PLAYER, 2500);
@@ -1315,7 +1312,7 @@ public:
                 me->GetMotionMaster()->MoveChase(rhyolith);
         }
 
-        void UpdateAI(const uint32 diff) 
+        void UpdateAI(uint32 /*diff*/) 
         {
             if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                 return;

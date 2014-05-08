@@ -141,7 +141,7 @@ public:
         InstanceScript* instance;
         EventMap events;
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* /*who*/)
         {
             events.ScheduleEvent(EVENT_DECIMATION_BLADE, 30000);
             events.ScheduleEvent(EVENT_BLAZE_OF_GLORY, 5000);
@@ -336,7 +336,7 @@ public:
 
         EventMap events;
 
-        void IsSummonedBy(Unit* summoner)
+        void IsSummonedBy(Unit* /*summoner*/)
         {
             DoZoneInCombat();
 
@@ -450,7 +450,7 @@ class spell_baloroc_countdown_dmg : public SpellScriptLoader
                 return true;
             }
             
-            void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/) // All-raid damage, 8-sec tick at time expire.
+            void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/) // All-raid damage, 8-sec tick at time expire.
             {
                 SpellInfo const* damageSpell = sSpellMgr->GetSpellInfo(SPELL_COUNTDOWN_DAMAGE);
                 int32 damage = damageSpell->Effects[EFFECT_0].CalcValue();

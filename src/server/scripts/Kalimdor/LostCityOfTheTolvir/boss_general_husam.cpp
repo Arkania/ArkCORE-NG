@@ -147,10 +147,7 @@ public:
                 summoned->GetPosition(x, y, z);
                 
                 if (Creature* mine = me->SummonCreature(44796, x, y, z))
-                {
                     mine->EnterVehicle(summoned);
-                    mine->ClearUnitState(UNIT_STATE_ONVEHICLE);
-                }
             }
 
             lSummons.Summon(summoned);

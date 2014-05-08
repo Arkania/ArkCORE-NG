@@ -371,7 +371,7 @@ void Object::BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
     data->WriteBit(0);
     data->WriteBit(flags & UPDATEFLAG_GO_TRANSPORT_POSITION);
     data->WriteBit(flags & UPDATEFLAG_STATIONARY_POSITION);
-    data->WriteBit(flags & UPDATEFLAG_UNK5);
+    data->WriteBit(flags & UPDATEFLAG_TRANSPORT_ARR);
     data->WriteBit(0);
     data->WriteBit(flags & UPDATEFLAG_TRANSPORT);
 
@@ -600,7 +600,7 @@ void Object::BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
     if (flags & UPDATEFLAG_ROTATION)
         *data << uint64(ToGameObject()->GetRotation());
 
-    if (flags & UPDATEFLAG_UNK5)
+    if (flags & UPDATEFLAG_TRANSPORT_ARR)
     {
         *data << float(0.0f);
         *data << float(0.0f);
@@ -2533,6 +2533,15 @@ GameObject* WorldObject::FindNearestGameObjectOfType(GameobjectTypes type, float
     Trinity::GameObjectLastSearcher<Trinity::NearestGameObjectTypeInObjectRangeCheck> searcher(this, go, checker);
     VisitNearbyGridObject(range, searcher);
     return go;
+}
+
+Player* WorldObject::FindNearestPlayer(float range, bool alive)
+{
+    Player* player = NULL;
+    Trinity::AnyPlayerInObjectRangeCheck checker(this, GetVisibilityRange(), alive);
+    Trinity::PlayerSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(this, player, checker);
+    VisitNearbyWorldObject(range, searcher);
+    return player;
 }
 
 void WorldObject::GetGameObjectListWithEntryInGrid(std::list<GameObject*>& gameobjectList, uint32 entry, float maxSearchRange) const

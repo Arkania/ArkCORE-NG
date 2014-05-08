@@ -20,6 +20,7 @@
 #include "Player.h"
 #include "AccountMgr.h"
 #include "AchievementMgr.h"
+#include "ArcheologyMgr.h"
 #include "ArenaTeam.h"
 #include "ArenaTeamMgr.h"
 #include "Battlefield.h"
@@ -9431,6 +9432,13 @@ void Player::SendNotifyLootItemRemoved(uint8 lootSlot)
     GetSession()->SendPacket(&data);
 }
 
+void Player::SendNotifyCurrencyLootRemoved(uint8 lootSlot)
+{
+    WorldPacket data(SMSG_CURRENCY_LOOT_REMOVED, 1);
+    data << uint8(lootSlot);
+    GetSession()->SendPacket(&data);
+}
+
 void Player::SendUpdateWorldState(uint32 Field, uint32 Value)
 {
     WorldPacket data(SMSG_UPDATE_WORLD_STATE, 4+4+1);
@@ -12065,7 +12073,7 @@ InventoryResult Player::CanRollForItemInLFG(ItemTemplate const* proto, WorldObje
     if (proto->Class == ITEM_CLASS_WEAPON && GetSkillValue(item_weapon_skills[proto->SubClass]) == 0)
         return EQUIP_ERR_PROFICIENCY_NEEDED;
 
-    if (proto->Class == ITEM_CLASS_ARMOR && proto->SubClass > ITEM_SUBCLASS_ARMOR_MISCELLANEOUS && proto->SubClass < ITEM_SUBCLASS_ARMOR_BUCKLER && proto->InventoryType != INVTYPE_CLOAK)
+    if (proto->Class == ITEM_CLASS_ARMOR && proto->SubClass > ITEM_SUBCLASS_ARMOR_MISCELLANEOUS/* && proto->SubClass < ITEM_SUBCLASS_ARMOR_BUCKLER*/ && proto->InventoryType != INVTYPE_CLOAK)
     {
         if (_class == CLASS_WARRIOR || _class == CLASS_PALADIN || _class == CLASS_DEATH_KNIGHT)
         {
@@ -23539,38 +23547,6 @@ void Player::SetGroup(Group* group, int8 subgroup)
     UpdateObjectVisibility(false);
 }
 
-void Player::SetMover(Unit* target)
-{
-    m_mover->m_movedPlayer = NULL;
-    m_mover = target;
-    m_mover->m_movedPlayer = this;
-
-    ObjectGuid guid = target ? target->GetGUID() : 0;
-
-    WorldPacket data(SMSG_MOVE_SET_ACTIVE_MOVER, 9);
-    data.WriteBit(guid[5]);
-    data.WriteBit(guid[7]);
-    data.WriteBit(guid[3]);
-    data.WriteBit(guid[6]);
-    data.WriteBit(guid[0]);
-    data.WriteBit(guid[4]);
-    data.WriteBit(guid[1]);
-    data.WriteBit(guid[2]);
-
-    data.FlushBits();
-
-    data.WriteByteSeq(guid[6]);
-    data.WriteByteSeq(guid[2]);
-    data.WriteByteSeq(guid[3]);
-    data.WriteByteSeq(guid[0]);
-    data.WriteByteSeq(guid[5]);
-    data.WriteByteSeq(guid[7]);
-    data.WriteByteSeq(guid[1]);
-    data.WriteByteSeq(guid[4]);
-
-    SendDirectMessage(&data);
-}
-
 void Player::SendInitialPacketsBeforeAddToMap()
 {
     /// Pass 'this' as argument because we're not stored in ObjectAccessor yet
@@ -27752,21 +27728,6 @@ std::string Player::GetCoordsMapAreaAndZoneString()
     std::ostringstream str;
     str << Position::ToString() << " " << GetMapAreaAndZoneString();
     return str.str();
-}
-
-
-void Player::SendPvpRewards() const
-{
-    // Placeholder (Null CMSG packet).
-    WorldPacket packet(SMSG_REQUEST_PVP_REWARDS_RESPONSE, 6 * 4);
-    packet << GetCurrencyWeekCap(CURRENCY_TYPE_CONQUEST_POINTS, true);
-    packet << GetCurrencyOnWeek(CURRENCY_TYPE_CONQUEST_POINTS, true);
-    packet << GetCurrencyWeekCap(CURRENCY_TYPE_CONQUEST_META_ARENA, true);
-    packet << GetCurrencyOnWeek(CURRENCY_TYPE_CONQUEST_META_ARENA, true);
-    packet << GetCurrencyOnWeek(CURRENCY_TYPE_CONQUEST_META_BG, true);
-    packet << GetCurrencyWeekCap(CURRENCY_TYPE_CONQUEST_POINTS, true);
-    packet << GetCurrencyWeekCap(CURRENCY_TYPE_CONQUEST_META_BG, true);
-    GetSession()->SendPacket(&packet);
 }
 
 void Player::SendRatedBGStats()

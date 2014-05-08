@@ -1824,9 +1824,7 @@ class npc_ascended_rockbreaker_fissure : public CreatureScript
                 DoCast(me, SPELL_FISSURE_TRIGGER);
             }
 
-            void UpdateAI(const uint32 diff)
-            {
-            }
+            void UpdateAI(uint32 /*diff*/) { }
         };
 };
 
@@ -1854,9 +1852,7 @@ class npc_crimsonborne_warlord_empowering_flames : public CreatureScript
                 DoCast(me, SPELL_EMPOWERING_TWILIGHT_AURA);
             }
 
-            void UpdateAI(const uint32 diff)
-            {
-            }
+            void UpdateAI(uint32 /*diff*/) { }
         };
 };
 
@@ -1869,7 +1865,7 @@ class spell_twilight_enforcer_meat_grinder : public SpellScriptLoader
         {
             PrepareAuraScript(spell_twilight_enforcer_meat_grinder_AuraScript);
 
-            void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 if (!GetCaster())
                     return;

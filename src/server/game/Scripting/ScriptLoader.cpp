@@ -399,6 +399,7 @@ void AddSC_boss_setesh();
 void AddSC_boss_temple_guardian_anhuur();
 void AddSC_elementaires_sdo();
 void AddSC_npc_trash_sdo();
+void AddSC_instance_halls_of_origination();
 void AddSC_instance_dire_maul();             //Dire Maul
 void AddSC_lost_city_of_the_tolvir();        //Lost City of the Tol'Vir
 void AddSC_boss_general_husam();

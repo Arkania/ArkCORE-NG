@@ -592,6 +592,68 @@ void WorldSession::SendStableResult(uint8 res)
     SendPacket(&data);
 }
 
+void WorldSession::HandleSetPetSlot(WorldPacket& recvPacket) // Come stable your pet! :)
+{
+    uint8 petSlot;
+    uint32 petNumber;
+    ObjectGuid guid;
+
+    recvPacket >> petNumber >> petSlot;
+
+    guid[3] = recvPacket.ReadBit();
+    guid[2] = recvPacket.ReadBit();
+    guid[0] = recvPacket.ReadBit();
+    guid[7] = recvPacket.ReadBit();
+    guid[5] = recvPacket.ReadBit();
+    guid[6] = recvPacket.ReadBit();
+    guid[1] = recvPacket.ReadBit();
+    guid[4] = recvPacket.ReadBit();
+
+    recvPacket.ReadByteSeq(guid[5]);
+    recvPacket.ReadByteSeq(guid[3]);
+    recvPacket.ReadByteSeq(guid[1]);
+    recvPacket.ReadByteSeq(guid[7]);
+    recvPacket.ReadByteSeq(guid[4]);
+    recvPacket.ReadByteSeq(guid[0]);
+    recvPacket.ReadByteSeq(guid[6]);
+    recvPacket.ReadByteSeq(guid[2]);
+
+    TC_LOG_DEBUG("network", "CMSG_SET_PET_SLOT with guid : " UI64FMTD " and pet slot : %u and pet number : %u", (uint64)guid, petSlot, petNumber);
+
+    if (!GetPlayer()->IsAlive())
+    {
+        SendStableResult(STABLE_ERR_STABLE);
+        return;
+    }
+
+    if (!CheckStableMaster(guid))
+    {
+        SendStableResult(STABLE_ERR_STABLE);
+        return;
+    }
+
+    // remove fake death
+    if (GetPlayer()->HasUnitState(UNIT_STATE_DIED))
+        GetPlayer()->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
+
+    Pet* pet = _player->GetPet();
+
+    // can't place in stable dead pet
+    if (!pet || !pet->IsAlive() || pet->getPetType() != HUNTER_PET)
+    {
+        SendStableResult(STABLE_ERR_STABLE);
+        return;
+    }
+
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PET_SLOTS);
+
+    stmt->setUInt32(0, _player->GetGUIDLow());
+    stmt->setUInt8(1, PET_SAVE_FIRST_STABLE_SLOT);
+    stmt->setUInt8(2, PET_SAVE_LAST_STABLE_SLOT);
+
+    _stablePetCallback = CharacterDatabase.AsyncQuery(stmt);
+}
+/*
 void WorldSession::HandleStablePet(WorldPacket& recvData)
 {
     TC_LOG_DEBUG("network", "WORLD: Recv CMSG_STABLE_PET");
@@ -632,7 +694,7 @@ void WorldSession::HandleStablePet(WorldPacket& recvData)
 
     _stablePetCallback = CharacterDatabase.AsyncQuery(stmt);
 }
-
+*/
 void WorldSession::HandleStablePetCallback(PreparedQueryResult result)
 {
     if (!GetPlayer())

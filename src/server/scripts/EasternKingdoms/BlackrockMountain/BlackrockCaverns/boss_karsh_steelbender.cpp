@@ -40,9 +40,9 @@ public:
 
         void Reset() {}
 
-        void EnterCombat(Unit* /*who*/) {}
+        void EnterCombat(Unit* /*who*/) { }
 
-        void UpdateAI(const uint32 Diff)
+        void UpdateAI(uint32 /*diff*/)
         {
             if (!UpdateVictim())
                 return;

@@ -1107,12 +1107,12 @@ void WorldSession::ProcessQueryCallbacks()
     }
 
     //- HandleStablePet
-    if (_stablePetCallback.ready())
+    /*if (_stablePetCallback.ready())
     {
         _stablePetCallback.get(result);
         HandleStablePetCallback(result);
         _stablePetCallback.cancel();
-    }
+    }*/
 
     //- HandleUnstablePet
     if (_unstablePetCallback.IsReady())

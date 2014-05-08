@@ -201,7 +201,7 @@ class npc_lady_nazjar_event : public CreatureScript
                 }
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 /*diff*/)
             {
                 if(!pInstance)
                     return;
@@ -223,7 +223,7 @@ public:
 
     bool OnGossipHello(Player* /*player*/, GameObject* go)
     {
-        if(InstanceScript* instance = go->GetInstanceScript())
+        if(go->GetInstanceScript())
         {
             Map::PlayerList const &PlayerList = go->GetMap()->GetPlayers();
 

@@ -84,7 +84,7 @@ class boss_commander_ulthok : public CreatureScript
             {
                 if (!instance || static_cast<InstanceMap*>(me->GetMap())->GetScriptId() != sObjectMgr->GetScriptId(TotTScriptName))
                     me->IsAIEnabled = false;
-                else if (!me->IsDead())
+                else if (!me->isDead())
                     Reset();
             }
 
@@ -116,7 +116,7 @@ class boss_commander_ulthok : public CreatureScript
                 instance->SetBossState(DATA_COMMANDER_ULTHOK, IN_PROGRESS);
             }
 
-            void JustDied(Unit* pKiller)
+            void JustDied(Unit* /*killer*/)
             {
                 _JustDied();
             }
@@ -171,9 +171,9 @@ class npc_ulthok_dark_fissure : public CreatureScript
             return new npc_ulthok_dark_fissureAI (pCreature);
         }
 
-        struct npc_ulthok_dark_fissureAI : public Scripted_NoMovementAI
+        struct npc_ulthok_dark_fissureAI : public ScriptedAI
         {
-            npc_ulthok_dark_fissureAI(Creature* creature) : Scripted_NoMovementAI(creature)
+            npc_ulthok_dark_fissureAI(Creature* creature) : ScriptedAI(creature)
             {
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -182,12 +182,10 @@ class npc_ulthok_dark_fissure : public CreatureScript
 
             void Reset()
             {
-                DoCast(me, IsHeroic()? SPELL_DARK_FISSURE_AURA_H: SPELL_DARK_FISSURE_AURA, true);
+                DoCast(me, IsHeroic() ? SPELL_DARK_FISSURE_AURA_H : SPELL_DARK_FISSURE_AURA, true);
             }
 
-            void UpdateAI(const uint32 diff)
-            {
-            }
+            void UpdateAI(uint32 /*diff*/) { }
         };
 };
 
@@ -198,7 +196,7 @@ class at_tott_commander_ulthok : public AreaTriggerScript
 
         bool OnTrigger(Player* pPlayer, const AreaTriggerEntry* /*pAt*/)
         {
-            sLog->outError("LOADING", "ulthok");
+            TC_LOG_ERROR("misc", "LOADING: ulthok");
             if (InstanceScript* pInstance = pPlayer->GetInstanceScript())
             {
                 if (pInstance->GetData(DATA_COMMANDER_ULTHOK_EVENT) != DONE

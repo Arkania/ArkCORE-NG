@@ -1,6 +1,6 @@
-/*Copyright (C) 2014 Arkania Project.
-*
-*/
+/*
+ * Copyright (C) 2014 Arkania Project.
+ */
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
@@ -304,7 +304,7 @@ public:
             }
         }
     
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* /*who*/)
         {
             me->SetPower(POWER_ENERGY,0);
             if (instance)
@@ -471,7 +471,7 @@ public:
             DoMeleeAttackIfReady();
         }
     
-        void JustDied(Unit* killer)
+        void JustDied(Unit* /*killer*/)
         {
             Talk(SAY_ANSHAL_DEATH);
             if (instance)
@@ -543,7 +543,7 @@ public:
                 instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me); // Remove
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* /*who*/)
         {
             me->SetPower(POWER_ENERGY,0);
             if (instance)
@@ -699,7 +699,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* /*killer*/)
         {
             Talk(SAY_NEZIR_DEATH);
                 if (instance)
@@ -764,7 +764,7 @@ public:
                 instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me); // Remove
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* /*who*/)
         {
             me->SetPower(POWER_ENERGY,0);
             if(instance)
@@ -929,7 +929,7 @@ public:
             }
         }
         
-        void JustDied(Unit* killer)
+        void JustDied(Unit* /*killer*/)
             {
                 Talk(SAY_ROHASH_DEATH);
                 if (instance)

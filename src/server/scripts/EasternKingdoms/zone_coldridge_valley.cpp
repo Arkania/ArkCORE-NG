@@ -165,7 +165,7 @@ public:
         if (player->GetQuestStatus(QUEST_AID_FOR_THE_WOUNDED) == QUEST_STATUS_INCOMPLETE)
         {              
             creature->CastSpell(creature, SPELL_HEAL_WOUNDED_MOUNTAINEER, false);
-            player->KilledMonsterCredit(NPC_WOUNDED_COLDRIDGE_MOUNTAINEER_KILL_CREDIT, NULL);
+            player->KilledMonsterCredit(NPC_WOUNDED_COLDRIDGE_MOUNTAINEER_KILL_CREDIT, 0);
         }
         return true;
     }
@@ -295,7 +295,7 @@ public:
                             }
                         case 4:
                             {                                                                                                                                                        
-                                player->KilledMonsterCredit(NPC_TROLLING_FOR_INFORMATION_KILL_CREDIT_BUNNY_SE, NULL);    
+                                player->KilledMonsterCredit(NPC_TROLLING_FOR_INFORMATION_KILL_CREDIT_BUNNY_SE, 0);    
                                 timer=120000; phase++; // cooldown
                                 break;
                             }
@@ -401,7 +401,7 @@ public:
                             }
                         case 4:
                             {                                                                                                                                                                
-                                player->KilledMonsterCredit(NPC_TROLLING_FOR_INFORMATION_KILL_CREDIT_BUNNY_SW, NULL);    
+                                player->KilledMonsterCredit(NPC_TROLLING_FOR_INFORMATION_KILL_CREDIT_BUNNY_SW, 0);    
                                 timer=120000; phase++; // cooldown                                                                                                          
                                 break;
                             }
@@ -507,7 +507,7 @@ public:
                             }
                         case 4:
                             {                                                                                                                                                                        
-                                player->KilledMonsterCredit(NPC_TROLLING_FOR_INFORMATION_KILL_CREDIT_BUNNY_W, NULL);    
+                                player->KilledMonsterCredit(NPC_TROLLING_FOR_INFORMATION_KILL_CREDIT_BUNNY_W, 0);    
                                 timer=120000; phase++; // cooldown                                                                                      
                                 break;
                             }

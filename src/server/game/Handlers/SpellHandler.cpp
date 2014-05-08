@@ -30,8 +30,10 @@
 #include "Totem.h"
 #include "TemporarySummon.h"
 #include "SpellAuras.h"
+#include "ArcheologyMgr.h"
 #include "CreatureAI.h"
 #include "ScriptMgr.h"
+#include "SpellInfo.h"
 #include "GameObjectAI.h"
 #include "SpellAuraEffects.h"
 #include "Player.h"
@@ -376,22 +378,32 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
         caster = _player;
     }
 
-    if (caster->GetTypeId() == TYPEID_PLAYER && !caster->ToPlayer()->HasActiveSpell(spellId) && !(spellId == 101603 && caster->ToPlayer()->HasAura(101601)))
+    if (caster->GetTypeId() == TYPEID_PLAYER && !caster->ToPlayer()->HasActiveSpell(spellId))
     {
-        // Archeology craft artifacts
-        if (caster->ToPlayer()->HasSkill(SKILL_ARCHAEOLOGY))
-            for (uint32 i = 9; i < sResearchProjectStore.GetNumRows(); i++)
-                if (ResearchProjectEntry* rp = sResearchProjectStore.LookupRow(i))
-                    if (rp->ProjectSpell == spellId)
-                    {
-                       caster->ToPlayer()->GetArcheologyMgr().CompleteArtifact(rp->ID, rp->ProjectSpell, recvPacket);
-                       recvPacket.rfinish();
-                       return;
-                    }
-
         // not have spell in spellbook
         recvPacket.rfinish(); // prevent spam at ignore packet
         return;
+    }
+
+    if (mover->GetTypeId() == TYPEID_PLAYER)
+    {
+        // not have spell in spellbook or spell passive and not casted by client
+        if ((!mover->ToPlayer()->HasActiveSpell(spellId) && !(spellId == 101603 && mover->ToPlayer()->HasAura(101601))) || spellInfo->IsPassive())
+        {
+            // Archeology craft artifacts
+            if (mover->ToPlayer()->HasSkill(SKILL_ARCHAEOLOGY))
+                for (uint32 i = 9; i < sResearchProjectStore.GetNumRows(); i++)
+                    if (ResearchProjectEntry const* rp = sResearchProjectStore.LookupRow(i))
+                        if (rp->ProjectSpell == spellId)
+                        {
+                           mover->ToPlayer()->GetArcheologyMgr().CompleteArtifact(rp->ID, rp->ProjectSpell, recvPacket);
+                           recvPacket.rfinish();
+                           return;
+                        }
+
+            recvPacket.rfinish(); // prevent spam at ignore packet
+            return;
+        }
     }
 
     Unit::AuraEffectList swaps = mover->GetAuraEffectsByType(SPELL_AURA_OVERRIDE_ACTIONBAR_SPELLS);

@@ -1878,7 +1878,7 @@ struct SpellEntry
     uint32  SpellShapeshiftId;                              // 44       SpellShapeshift.dbc
     uint32  SpellTargetRestrictionsId;                      // 45       SpellTargetRestrictions.dbc
     uint32  SpellTotemsId;                                  // 46       SpellTotems.dbc
-    //uint32 ResearchProject;                               // 47       ResearchProject.dbc
+    uint32  ResearchProject;                                // 47       ResearchProject.dbc
 };
 
 // ResearchBranch.dbc

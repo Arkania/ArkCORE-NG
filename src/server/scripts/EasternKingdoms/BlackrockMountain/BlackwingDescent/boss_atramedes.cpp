@@ -450,7 +450,6 @@ public:
                             Talk(SAY_AIR_PHASE);
                             me->HandleEmote(EMOTE_ONESHOT_LIFTOFF);
                             me->SetDisableGravity(true);
-                            me->SendMovementFlagUpdate();
                             events.ScheduleEvent(EVENT_FLIGHT, 1500);
                             events.ScheduleEvent(EVENT_AIR, 2000);
                             return;
@@ -522,7 +521,6 @@ public:
                         case EVENT_LAND:
                             me->HandleEmote(EMOTE_ONESHOT_LAND);
                             me->SetDisableGravity(false);
-                            me->SendMovementFlagUpdate();
                             events.ScheduleEvent(EVENT_RETURN, 1000);
                             events.ScheduleEvent(EVENT_GROUND, 1500);
                             return;
@@ -798,14 +796,16 @@ public:
     {
         npc_atramedes_gongAI(Creature* creature) : ScriptedAI(creature){ }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 /*diff*/)
         { 
             // Don't use gongs out of combat
             if (Creature* atramedes = me->FindNearestCreature(BOSS_ATRAMEDES, 200.0f))
+            {
                 if (!atramedes->IsInCombat())
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 else
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            }
         }
     };
 };

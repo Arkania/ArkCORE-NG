@@ -651,7 +651,7 @@ class npc_crazed_apothecary : public CreatureScript
         {
             npc_crazed_apothecaryAI(Creature* creature) : ScriptedAI(creature) { }
 
-            void MovementInform(uint32 type, uint32 id)
+            void MovementInform(uint32 type, uint32 /*id*/)
             {
                 if (type != POINT_MOTION_TYPE)
                     return;

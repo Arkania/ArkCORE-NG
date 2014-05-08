@@ -20,7 +20,6 @@
 #ifndef _PLAYER_H
 #define _PLAYER_H
 
-#include "ArcheologyMgr.h"
 #include "DBCStores.h"
 #include "GroupReference.h"
 #include "MapReference.h"
@@ -45,6 +44,7 @@ struct VendorItem;
 
 template<class T> class AchievementMgr;
 class ReputationMgr;
+class ArcheologyMgr;
 class Channel;
 class CharacterCreateInfo;
 class Creature;
@@ -1421,6 +1421,7 @@ class Player : public Unit, public GridObject<Player>
         void SendCurrencies() const;
         /// send conquest currency points and their cap week/arena
         void SendPvpRewards() const;
+        void SendRatedBGStats();
         /// return count of currency witch has plr
         uint32 GetCurrency(uint32 id, bool usePrecision) const;
         /// return count of currency gaind on current week
@@ -1500,6 +1501,7 @@ class Player : public Unit, public GridObject<Player>
         void UpdateSkillEnchantments(uint16 skill_id, uint16 curr_value, uint16 new_value);
         void SendEnchantmentDurations();
         void BuildEnchantmentsInfoData(WorldPacket* data);
+        void SendDisenchantCredit(Item* item);
         void AddItemDurations(Item* item);
         void RemoveItemDurations(Item* item);
         void SendItemDurations();
@@ -2030,6 +2032,7 @@ class Player : public Unit, public GridObject<Player>
         void BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target) const;
         void DestroyForPlayer(Player* target, bool onDeath = false) const;
         void SendLogXPGain(uint32 GivenXP, Unit* victim, uint32 BonusXP, bool recruitAFriend = false, float group_rate=1.0f);
+        void XPGainAborted();
 
         // notifiers
         void SendAttackSwingCantAttack();
@@ -2222,6 +2225,7 @@ class Player : public Unit, public GridObject<Player>
         void SendLoot(uint64 guid, LootType loot_type);
         void SendLootRelease(uint64 guid);
         void SendNotifyLootItemRemoved(uint8 lootSlot);
+        void SendNotifyCurrencyLootRemoved(uint8 lootSlot);
         void SendNotifyLootMoneyRemoved();
 
         /*********************************************************/

@@ -398,7 +398,7 @@ public:
                 instance->SetData(DATA_ASCENDANT_COUNCIL, FAIL);
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* /*who*/)
         {
             //DoCast(me, SPELL_PACIFY_SELF);
             started = false;
@@ -600,7 +600,7 @@ class boss_feludius : public CreatureScript
             {
                 if (!instance)
                     me->IsAIEnabled = false;
-                else if (!me->IsDead())
+                else if (!me->isDead())
                     Reset();
             }
 
@@ -812,7 +812,7 @@ class boss_ignacious : public CreatureScript
             {
                 if (!instance)
                     me->IsAIEnabled = false;
-                else if (!me->IsDead())
+                else if (!me->isDead())
                     Reset();
             }
 
@@ -1063,7 +1063,7 @@ class boss_arion : public CreatureScript
             {
                 if (!instance)
                     me->IsAIEnabled = false;
-                else if (!me->IsDead())
+                else if (!me->isDead())
                     Reset();
             }
 
@@ -1290,7 +1290,7 @@ class boss_terrastra : public CreatureScript
             {
                 if (!instance)
                     me->IsAIEnabled = false;
-                else if (!me->IsDead())
+                else if (!me->isDead())
                     Reset();
             }
 
@@ -1491,7 +1491,7 @@ class boss_monstrosity : public CreatureScript
             {
                 if (!instance)
                     me->IsAIEnabled = false;
-                else if (!me->IsDead())
+                else if (!me->isDead())
                     Reset();
             }
 
@@ -1813,9 +1813,9 @@ class npc_terrastra_gravitywell : public CreatureScript // 44824
 
             InstanceScript* instance;
 
-            void Reset() {}
+            void Reset() { }
 
-            void UpdateAI(const uint32 diff) {}
+            void UpdateAI(uint32 /*diff*/) { }
         };
 };
 
@@ -2046,7 +2046,7 @@ public:
     {
         PrepareSpellScript(spell_feludius_waterbombSpellScript);
 
-        bool Validate(SpellEntry const * spellEntry)
+        bool Validate(SpellInfo const* /*spellEntry*/)
         {
             return true;
         }
@@ -2056,7 +2056,7 @@ public:
             return true;
         }
 
-        void HandleDummy(SpellEffIndex effIndex)
+        void HandleDummy(SpellEffIndex /*effIndex*/)
         {
             std::list<Unit*> targets;
             GetCaster()->GetAI()->SelectTargetList(targets, GetCaster()->GetInstanceScript()->instance->Is25ManRaid() ? 5 : 2, SELECT_TARGET_RANDOM, 150.0f, true);
@@ -2103,7 +2103,7 @@ public:
                 SetHitDamage(10000);
         }
 
-        void EffectScriptEffect(SpellEffIndex effIndex)
+        void EffectScriptEffect(SpellEffIndex /*effIndex*/)
         {
             if (GetHitUnit()->HasAura(SPELL_WATERLOGGED))
                 GetCaster()->AddAura(SPELL_FROZEN, GetHitUnit()); // Special info.
@@ -2132,7 +2132,7 @@ public:
     {
         PrepareSpellScript(spell_arion_disperseSpellScript);
 
-        void EffectScriptEffect(SpellEffIndex effIndex)
+        void EffectScriptEffect(SpellEffIndex /*effIndex*/)
         {
                 GetCaster()->CastSpell(GetHitUnit(), SPELL_DISPERSE_TELEPORT, true); // Teleport.
         }

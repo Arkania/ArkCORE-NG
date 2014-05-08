@@ -148,12 +148,10 @@ public:
         {
             if (!UpdateVictim())
             {
-                Creature* worg;
-                Creature* paxton;
-                if (worg = me->FindNearestCreature(NPC_BLACKROCK_BATTLE_WORG, 3.0f))
+                if (Creature* worg = me->FindNearestCreature(NPC_BLACKROCK_BATTLE_WORG, 3.0f))
                 {
                     me->SetFacingTo (me->GetAngle(worg));
-                    if (!worg->IsAttackingPlayer())
+                    if (!worg->isAttackingPlayer())
                     {
                         if (Attack1HTimer <= diff)
                         {
@@ -162,7 +160,7 @@ public:
                         }
                         else Attack1HTimer -= diff;
 
-                        if (paxton = me->FindNearestCreature (NPC_BROTHER_PAXTON,25.0f))
+                        if (Creature* paxton = me->FindNearestCreature (NPC_BROTHER_PAXTON,25.0f))
                         {
                         
                             if (uiSayTimer <= diff)
@@ -290,12 +288,12 @@ public:
                 DoCast(SPELL_SNEAKING);
         }
 
-        void EnterCombat(Unit * who)
+        void EnterCombat(Unit * /*who*/)
         {
             Talk(0);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 /*diff*/)
         {
             if (!UpdateVictim())
                 return;
@@ -329,7 +327,7 @@ public:
         if (IsHealingQuestActiv(player))
         {
             creature->CastSpell(creature, SPELL_RENEWEDLIFE, false);
-            player->KilledMonsterCredit(creature->GetEntry(), NULL);
+            player->KilledMonsterCredit(creature->GetEntry(), 0);
         }
         return true;
     }
@@ -371,12 +369,10 @@ public:
             timer=1000;
         }
 
-        void SpellHit(Unit * Hitter, SpellInfo const* spell)
+        void SpellHit(Unit* /*hitter*/, SpellInfo const* spell)
         {
             if (spell->Id == SPELL_RENEWEDLIFE)
-            {
                 isHealed=true;
-            }
         }
 
         void UpdateAI(const uint32 diff)

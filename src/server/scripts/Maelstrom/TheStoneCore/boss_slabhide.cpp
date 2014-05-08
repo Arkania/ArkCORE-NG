@@ -212,7 +212,6 @@ class boss_slabhide : public CreatureScript
                             case EVENT_AIR_PHASE:
                                 me->HandleEmote(EMOTE_ONESHOT_LIFTOFF);
                                 me->SetDisableGravity(true);
-                                me->SendMovementFlagUpdate();
                                 events.ScheduleEvent(EVENT_FLIGHT, 2000);
                                 return;
                                 
@@ -257,7 +256,6 @@ class boss_slabhide : public CreatureScript
                             case EVENT_LAND:
                                 me->HandleEmote(EMOTE_ONESHOT_LAND);
                                 me->SetDisableGravity(false);
-                                me->SendMovementFlagUpdate();
                                 if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 200.0f, true))
                                     me->GetMotionMaster()->MoveChase(target);
                                 events.ScheduleEvent(EVENT_GROUND, 2000);

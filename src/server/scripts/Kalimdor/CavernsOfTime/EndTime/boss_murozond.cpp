@@ -66,7 +66,7 @@ class boss_murozond : public CreatureScript
                     instance->SetData(DATA_LAST_ENCOUNTER, NOT_STARTED);
             }
 
-            void JustDied(Unit* killer)
+            void JustDied(Unit* /*killer*/)
             {
                 if (instance)
                     instance->SetData(DATA_LAST_ENCOUNTER, DONE);
@@ -90,7 +90,7 @@ class boss_murozond : public CreatureScript
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
-                while (uint32 eventId = events.ExecuteEvent())
+                while (/*uint32 eventId = */events.ExecuteEvent())
                 {
                     //switch (eventId)
                     //{

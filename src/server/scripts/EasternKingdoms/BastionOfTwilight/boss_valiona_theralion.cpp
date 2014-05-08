@@ -500,27 +500,22 @@ public:
                         case EVENT_BERSERK:
                             DoCast(me, SPELL_BERSERK);
                             break;
-
                         case EVENT_LIFTOFF:
                             me->HandleEmote(EMOTE_ONESHOT_LIFTOFF);
                             me->SetDisableGravity(true);
-                            me->SendMovementFlagUpdate();
                             if (Creature* Theralion = me->FindNearestCreature(NPC_THERALION_BOT, 500.0f, true))
                                 Theralion->AI()->DoAction(ACTION_THERALION_LAND);
                             events.ScheduleEvent(EVENT_FLIGHT, 1500);
                             events.ScheduleEvent(EVENT_AIR, 2000);
                             break;
-
                         case EVENT_FLIGHT:
                             me->SetReactState(REACT_PASSIVE);
                             me->AttackStop();
                             me->GetMotionMaster()->MovePoint(1, -741.065f, -684.987f, me->GetPositionZ() + 25.0f);
                             break;
-
                         case EVENT_AIR:
                             EnterPhaseAir();
                             break;
-
                         case EVENT_BLACKOUT:
                             if (!castBlackout)
                                 castBlackout = true;
@@ -532,12 +527,10 @@ public:
                             }
                             events.ScheduleEvent(EVENT_BLACKOUT, 40000, PHASE_GROUND);
                             break;
-
                         case EVENT_DEVOURING_FLAMES:
                             DoCast(me, SPELL_DEVOURING_FLAMES);
                             events.ScheduleEvent(EVENT_DEVOURING_FLAMES, 40000, PHASE_GROUND);
                             break;
-
                         case EVENT_TWILIGHT_SHIFT:
                             if (!me->GetVictim()->HasAura(SPELL_TWILIGHT_SHIFT))
                                 DoCast(me->GetVictim(), SPELL_TWILIGHT_SHIFT);
@@ -577,23 +570,19 @@ public:
                             events.CancelEvent(EVENT_BREATH_DUMMY); // Cancel the breaths.
                             me->HandleEmote(EMOTE_ONESHOT_LAND);
                             me->SetDisableGravity(false);
-                            me->SendMovementFlagUpdate();
                             if (Creature* Theralion = me->FindNearestCreature(NPC_THERALION_BOT, 500.0f, true))
                                 Theralion->AI()->DoAction(ACTION_THERALION_TAKEOFF);
                             events.ScheduleEvent(EVENT_RETURN, 1000);
                             events.ScheduleEvent(EVENT_GROUND, 1500);
                             break;
-
                         case EVENT_RETURN:
                             me->SetReactState(REACT_PASSIVE);
                             me->AttackStop();
                             me->GetMotionMaster()->MovePoint(1, -741.065f, -684.987f, me->GetPositionZ() - 25.0f);
                             break;
-
                         case EVENT_GROUND:
                             EnterPhaseGround();
                             break;
-
                         case EVENT_TWILIGHT_METEOR:
                              if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 200.0f, true))
                             {
@@ -604,7 +593,6 @@ public:
                             events.ScheduleEvent(EVENT_TWILIGHT_METEOR, 6100, PHASE_FLIGHT);
                             events.ScheduleEvent(EVENT_SEND_TWILIGHT, 6100, PHASE_FLIGHT);
                             break;
-
                         case EVENT_SEND_TWILIGHT:
                             if (meteorTarget)
                             {
@@ -615,7 +603,6 @@ public:
                                     me->AddAura(SPELL_TWILIGHT_ZONE_AUR, meteorTarget); // Twilight Realm damage debuff.
                             }
                             break;
-
                         case EVENT_DEEP_BREATH:
                             Talk(SAY_VA_DB);
                             me->SetSpeed(MOVE_WALK, 2.7f, true);
@@ -625,53 +612,44 @@ public:
                             me->GetMotionMaster()->MovePoint(1, -723.525f, -769.260f, me->GetPositionZ());
                             events.ScheduleEvent(EVENT_BREATH_1, 10000, PHASE_FLIGHT);
                             break;
-
                         case EVENT_BREATH_1:
                             me->GetMotionMaster()->MovePoint(1, -725.077f, -613.762f, me->GetPositionZ());
                             events.ScheduleEvent(EVENT_BREATH_DUMMY, 3000, PHASE_FLIGHT); // lasts 3 sec.
                             events.ScheduleEvent(EVENT_SUMMON_MOBS_1, 11000, PHASE_FLIGHT); // lasts 3 sec.
                             events.ScheduleEvent(EVENT_MOVE_BREATH_1, 13000, PHASE_FLIGHT); // must move in 13000 long side-side.
                             break;
-
                         case EVENT_SUMMON_MOBS_1:
                             for(int i=1; i<31; i++)
                             me->SummonCreature(NPC_TWILIGHT_FLAME,TwilFlamePos[i].GetPositionX()
                                 ,TwilFlamePos[i].GetPositionY(),TwilFlamePos[i].GetPositionZ(),TEMPSUMMON_CORPSE_DESPAWN);
                             break;
-
                         case EVENT_MOVE_BREATH_1:
                             me->GetMotionMaster()->MovePoint(1, -740.447f, -612.804f, me->GetPositionZ());
                             events.ScheduleEvent(EVENT_BREATH_2, 2000, PHASE_FLIGHT);
                             break;
-
                         case EVENT_BREATH_2:
                             me->GetMotionMaster()->MovePoint(1, -738.849f, -769.072f, me->GetPositionZ());
                             events.ScheduleEvent(EVENT_SUMMON_MOBS_2, 11000, PHASE_FLIGHT); // lasts 3 sec.
                             events.ScheduleEvent(EVENT_MOVE_BREATH_2, 13000, PHASE_FLIGHT); // must move in 13000 long side-side.
                             break;
-
                         case EVENT_SUMMON_MOBS_2:
                             for(int i=31; i<61; i++)
                             me->SummonCreature(NPC_TWILIGHT_FLAME,TwilFlamePos[i].GetPositionX()
                                 ,TwilFlamePos[i].GetPositionY(),TwilFlamePos[i].GetPositionZ(),TEMPSUMMON_CORPSE_DESPAWN);
                             break;
-
                         case EVENT_MOVE_BREATH_2:
                             me->GetMotionMaster()->MovePoint(1, -757.691f, -766.305f, me->GetPositionZ());
                             events.ScheduleEvent(EVENT_BREATH_3, 2000, PHASE_FLIGHT);
                             break;
-
                         case EVENT_BREATH_3:
                             me->GetMotionMaster()->MovePoint(1, -763.181f, -626.995f, me->GetPositionZ());
                             events.ScheduleEvent(EVENT_SUMMON_MOBS_3, 11000, PHASE_FLIGHT); // lasts 3 sec.
                             break;
-
                         case EVENT_SUMMON_MOBS_3:
                             for(int i=61; i<91; i++)
                             me->SummonCreature(NPC_TWILIGHT_FLAME,TwilFlamePos[i].GetPositionX()
                                 ,TwilFlamePos[i].GetPositionY(),TwilFlamePos[i].GetPositionZ(),TEMPSUMMON_CORPSE_DESPAWN);
                             break;
-
                         case EVENT_BREATH_DUMMY:
                             DoCast(me, SPELL_DEEP_BREATH_DUMMY);
                             events.ScheduleEvent(EVENT_BREATH_DUMMY, 3000, PHASE_FLIGHT);
@@ -680,8 +658,6 @@ public:
                 }
             }
         }
-
-    private:
     };
 };
 
@@ -868,7 +844,6 @@ public:
                         case EVENT_LIFTOFF:
                             me->HandleEmote(EMOTE_ONESHOT_LIFTOFF);
                             me->SetDisableGravity(true);
-                            me->SendMovementFlagUpdate();
                             events.ScheduleEvent(EVENT_FLIGHT, 1500);
                             events.ScheduleEvent(EVENT_AIR, 2000);
                             break;
@@ -940,7 +915,6 @@ public:
                             Talk(SAY_TH_LAND);
                             me->HandleEmote(EMOTE_ONESHOT_LAND);
                             me->SetDisableGravity(false);
-                            me->SendMovementFlagUpdate();
                             events.ScheduleEvent(EVENT_RETURN, 1000);
                             events.ScheduleEvent(EVENT_GROUND, 1500);
                             break;
@@ -1391,10 +1365,11 @@ public:
     {
         PrepareSpellScript(spell_dazzling_destructionSpellScript);
 
-        bool Validate (SpellEntry const * spellEntry)
+        bool Validate (SpellInfo const* spellEntry)
         {
-            if (!sSpellStore.LookupEntry(spellEntry->Id))
+            if (!sSpellMgr->GetSpellInfo(spellEntry->Id))
                 return false;
+
             return true;
         }
 
@@ -1403,7 +1378,7 @@ public:
             return true;
         }
 
-        void HandleDummy (SpellEffIndex effIndex)
+        void HandleDummy (SpellEffIndex /*effIndex*/)
         {
             std::list<Creature*> creatures;
             GetCaster()->GetCreatureListWithEntryInGrid(creatures, NPC_DAZZ_DESTRUCTION_STALKER, 1000.0f);
@@ -1437,10 +1412,11 @@ public:
     {
         PrepareSpellScript(spell_dazzling_missileSpellScript);
 
-        bool Validate (SpellEntry const * spellEntry)
+        bool Validate (SpellInfo const* spellEntry)
         {
-            if (!sSpellStore.LookupEntry(spellEntry->Id))
+            if (!sSpellMgr->GetSpellInfo(spellEntry->Id))
                 return false;
+
             return true;
         }
 
@@ -1449,7 +1425,7 @@ public:
             return true;
         }
 
-        void EffectScriptEffect(SpellEffIndex effIndex)
+        void EffectScriptEffect(SpellEffIndex /*effIndex*/)
         {
             GetCaster()->AddAura(SPELL_TWILIGHT_ZONE, GetHitUnit()); // Send target to Twilight Realm.
             GetCaster()->AddAura(SPELL_TWILIGHT_REALM, GetHitUnit()); // Send target to Twilight Realm.

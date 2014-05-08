@@ -98,58 +98,62 @@ class instance_bastion_of_twilight : public InstanceMapScript
                 return false;
             }
 
-            void OnCreatureCreate(Creature* pCreature, bool /*add*/)
+            void OnCreatureCreate(Creature* creature)
             {
-                switch (pCreature->GetEntry())
+                switch (creature->GetEntry())
                 {
                     case NPC_HALFUS_WORMBREAKER:
-                        halfus = pCreature->GetGUID();
+                        halfus = creature->GetGUID();
                         break;
                     case NPC_VALIONA_BOT:
-                        valiona = pCreature->GetGUID();
+                        valiona = creature->GetGUID();
                         break;
                     case NPC_THERALION_BOT:
-                        theralion = pCreature->GetGUID();
+                        theralion = creature->GetGUID();
                         break;
                     case NPC_ASCENDANT_COUNCIL:
-                        ascendantcouncil = pCreature->GetGUID();
+                        ascendantcouncil = creature->GetGUID();
                         break;
                     case NPC_FELUDIUS:
-                        feludius = pCreature->GetGUID();
+                        feludius = creature->GetGUID();
                         break;
                     case NPC_IGNACIOUS:
-                        ignacious = pCreature->GetGUID();
+                        ignacious = creature->GetGUID();
                         break;
                     case NPC_ARION:
-                        arion = pCreature->GetGUID();
+                        arion = creature->GetGUID();
                         break;
                     case NPC_TERRASTRA:
-                        terrastra = pCreature->GetGUID();
+                        terrastra = creature->GetGUID();
                         break;
                     case NPC_ELEMENTIUM_MONSTROSITY:
-                        monstrosity = pCreature->GetGUID();
+                        monstrosity = creature->GetGUID();
                         break;
                     case NPC_CHOGALL:
-                        chogall = pCreature->GetGUID();
+                        chogall = creature->GetGUID();
                         break;
                     case NPC_SINESTRA:
-                        sinestra = pCreature->GetGUID();
+                        sinestra = creature->GetGUID();
                         break;
                     case NPC_CHOGALL_HALFUS:
-                        chogallHalfus = pCreature->GetGUID();
+                        chogallHalfus = creature->GetGUID();
                         break;
                     case NPC_CHOGALL_DRAGONS:
-                        chogallValiona = pCreature->GetGUID();
+                        chogallValiona = creature->GetGUID();
                         break;
                     case NPC_CHOGALL_COUNCIL:
-                        chogallCouncil = pCreature->GetGUID();
+                        chogallCouncil = creature->GetGUID();
                         break;
                 }
             }
 
-            void OnGameObjectCreate(GameObject* go, bool /*add*/)
+            void OnGameObjectCreate(GameObject* go)
             {
-                /*switch(go->GetEntry()) { }*/
+                switch(go->GetEntry())
+                {
+                    default:
+                        break;
+                }
             }
 
             void SetData(uint32 type, uint32 data)
@@ -214,7 +218,7 @@ class instance_bastion_of_twilight : public InstanceMapScript
                         break;
                 }
 
-                return NULL;
+                return 0;
             }
 
             bool SetBossState(uint32 data, EncounterState state) 

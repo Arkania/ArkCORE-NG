@@ -21,6 +21,7 @@
 #include "SpellMgr.h"
 #include "Spell.h"
 #include "DBCStores.h"
+#include "DBCStructure.h"
 #include "ConditionMgr.h"
 #include "Player.h"
 #include "Battleground.h"

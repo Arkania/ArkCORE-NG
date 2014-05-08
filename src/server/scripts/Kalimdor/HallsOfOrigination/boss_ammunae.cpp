@@ -55,7 +55,7 @@ class boss_ammunae : public CreatureScript
             
         struct boss_ammunaeAI : public ScriptedAI
         {
-            boss_ammunaeAI(Creature* pCreature) : ScriptedAI(pCreature), summons(me)
+            boss_ammunaeAI(Creature* pCreature) : ScriptedAI(pCreature)
             {
                 ASSERT(pCreature->GetVehicleKit()); // we dont actually use it, just check if exists
                 m_pInstance = pCreature->GetInstanceScript();
@@ -73,7 +73,7 @@ class boss_ammunae : public CreatureScript
             uint32 m_uiLife_Drain3_Timer;
             uint32 m_uiLife_Drain4_Timer;
             uint32 m_uiLife_Drain5_Timer;
-            SummonList summons;
+            std::list<uint64> summons;
             Creature* seedling[10];
             Creature* blossom[10];
 
@@ -81,7 +81,7 @@ class boss_ammunae : public CreatureScript
             {
                 m_pInstance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me); // Remove
                 DoCast(me, SPELL_NO_REGEN);
-                summons.DespawnAll();
+                summons.clear();
                 me->SetPower(POWER_ENERGY, 0);
                 me->SetMaxPower(POWER_ENERGY, 100);
                 m_uiWitherTimer = 5000;
@@ -102,7 +102,7 @@ class boss_ammunae : public CreatureScript
                 }
             }
 
-            void EnterCombat(Unit* pWho)
+            void EnterCombat(Unit* /*who*/)
             {
                 m_pInstance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me);
                 DoCast(me, SPELL_NO_REGEN);
@@ -127,14 +127,14 @@ class boss_ammunae : public CreatureScript
                 Talk(SAY_AGGRO);
             }
 
-            void KilledUnit(Unit* /*Killed*/)
+            void KilledUnit(Unit* /*killed*/)
             {
                 Talk(SAY_KILL);
             }
 
-            void JustDied(Unit* killer)
+            void JustDied(Unit* /*killer*/)
             {
-                summons.DespawnAll();
+                summons.clear();
                 i = 0;
                 Talk(SAY_DEATH);
                 m_pInstance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me); // Remove
@@ -388,20 +388,20 @@ class npc_seedling : public CreatureScript
                 DoCast(me, SPELL_ENERGIZING_GROWTH);
             }
 
-            void EnterCombat(Unit* pWho)
+            void EnterCombat(Unit* /*who*/)
             {
                 DoCast(me, SPELL_VISUAL_ENERGIZE);
                 DoCast(me, SPELL_ENERGIZING_GROWTH);
             }
 
-            void JustDied(Unit* /*Killer*/)
+            void JustDied(Unit* /*killer*/)
             {
                 me->RemoveAura(SPELL_ENERGIZING_GROWTH);
                 me->RemoveAura(SPELL_VISUAL_ENERGIZE);
                 i--;
             }
             
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(const uint32 /*diff*/)
             {
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
@@ -437,7 +437,7 @@ class npc_blossom : public CreatureScript
                 m_uiThornSlashTimer = urand(5000, 10000);
             }
 
-            void EnterCombat(Unit* pWho)
+            void EnterCombat(Unit* /*who*/)
             {
                 m_uiThornSlashTimer = urand(5000, 10000);
             }
@@ -465,7 +465,7 @@ class npc_blossom : public CreatureScript
 class npc_spore : public CreatureScript
 {
     public:
-        npc_spore() : CreatureScript("npc_spore") {}
+        npc_spore() : CreatureScript("npc_spore") { }
 
         CreatureAI* GetAI(Creature* pCreature) const
         {
@@ -481,20 +481,16 @@ class npc_spore : public CreatureScript
 
             InstanceScript* m_pInstance;
 
-            void Reset()
-            {
-            }
+            void Reset() { }
 
-            void EnterCombat(Unit* pWho)
-            {
-            }
+            void EnterCombat(Unit* /*who*/) { }
 
-            void JustDied(Unit* /*Killer*/)
+            void JustDied(Unit* /*killer*/)
             {
                 me->SummonCreature(40585, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 300000);
             }
             
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(uint32 /*diff*/)
             {
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;

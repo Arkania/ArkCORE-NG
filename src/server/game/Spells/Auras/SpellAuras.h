@@ -35,6 +35,7 @@ class Aura;
 class DynamicObject;
 class AuraScript;
 class ProcInfo;
+class Pet;
 
 // update aura target map every 500 ms instead of every update - reduce amount of grid searcher calls
 #define UPDATE_TARGET_MAP_INTERVAL 500

@@ -191,8 +191,7 @@ class boss_isiset : public CreatureScript
                     AstralRain = true;
                     VeilOfSky = true;
                     CelestialCall = true;
-                    Position pos;
-                    me->GetPosition(&pos);
+                    Position pos = me->GetPosition();
                     me->SummonCreature(39720, pos, TEMPSUMMON_CORPSE_DESPAWN, 1000);
                     me->SummonCreature(39721, pos, TEMPSUMMON_CORPSE_DESPAWN, 1000);
                     me->SummonCreature(39722, pos, TEMPSUMMON_CORPSE_DESPAWN, 1000);
@@ -204,8 +203,7 @@ class boss_isiset : public CreatureScript
                     Phase = 2;
                     me->SetReactState(REACT_PASSIVE);
                     Phased = true;
-                    Position pos;
-                    me->GetPosition(&pos);
+                    Position pos = me->GetPosition();
                     if (AstralRain == false) // Make other two visible again.
                     {
                         me->SummonCreature(39721, pos, TEMPSUMMON_CORPSE_DESPAWN, 1000);

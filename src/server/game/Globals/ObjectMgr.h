@@ -940,6 +940,11 @@ class ObjectMgr
             return _creatureQuestInvolvedRelations.equal_range(creature_entry);
         }
 
+        QuestRelations* GetCreatureQuestInvolvedRelations()
+        {
+            return &_creatureQuestInvolvedRelations;
+        }
+
         void LoadEventScripts();
         void LoadSpellScripts();
         void LoadWaypointScripts();
@@ -949,8 +954,8 @@ class ObjectMgr
 
         void LoadBroadcastTexts();
         void LoadBroadcastTextLocales();
-        bool LoadArkcoreStrings(char const* table, int32 min_value, int32 max_value);
-        bool LoadArkcoreStrings() { return LoadArkcoreStrings("arkcore_string", MIN_ARKCORE_STRING_ID, MAX_ARKCORE_STRING_ID); }
+        bool LoadTrinityStrings(char const* table, int32 min_value, int32 max_value);
+        bool LoadTrinityStrings() { return LoadTrinityStrings("arkcore_string", MIN_ARKCORE_STRING_ID, MAX_ARKCORE_STRING_ID); }
         void LoadDbScriptStrings();
         void LoadCreatureClassLevelStats();
         void LoadCreatureLocales();

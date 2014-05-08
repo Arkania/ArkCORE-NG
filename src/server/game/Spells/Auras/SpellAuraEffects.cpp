@@ -42,6 +42,7 @@
 #include "WeatherMgr.h"
 #include "Pet.h"
 #include "ReputationMgr.h"
+#include "ArcheologyMgr.h"
 
 class Aura;
 //
@@ -2670,7 +2671,6 @@ void AuraEffect::HandleAuraMounted(AuraApplication const* aurApp, uint8 mode, bo
         return;
 
     Unit* target = aurApp->GetTarget();
-    Player* player = target->ToPlayer();
 
     if (apply)
     {
@@ -3894,7 +3894,6 @@ void AuraEffect::HandleAuraModSpellPowerPercent(AuraApplication const* aurApp, u
         return;
 
     Unit* target = aurApp->GetTarget();
-    BaseModType modType = PCT_MOD;
 
     if (target && target->GetTypeId() == TYPEID_PLAYER)
         if (Player* player = target->ToPlayer())
@@ -7066,7 +7065,7 @@ void AuraEffect::HandleEnableAltPower(AuraApplication const* aurApp, uint8 mode,
         target->SetMaxPower(POWER_ALTERNATE_POWER, 0);
 }
 
-void AuraEffect::HandleInterfereTarget(AuraApplication const* aurApp, uint8 mode, bool apply) const
+void AuraEffect::HandleInterfereTarget(AuraApplication const* /*aurApp*/, uint8 /*mode*/, bool apply) const
 {
     Unit* caster = GetCaster();
 

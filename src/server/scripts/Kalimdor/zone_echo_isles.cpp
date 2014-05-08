@@ -158,7 +158,7 @@ public:
             switch (_phase)
             {
                 case 0:
-                    if (_boar = me->FindNearestCreature(NPC_DOCILE_ISLAND_BOAR, 10.0f))
+                    if (Creature* _boar = me->FindNearestCreature(NPC_DOCILE_ISLAND_BOAR, 10.0f))
                     {
                         _phase=1;
                         _timer = 10000;

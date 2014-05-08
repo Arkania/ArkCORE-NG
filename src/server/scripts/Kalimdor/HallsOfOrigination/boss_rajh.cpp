@@ -46,7 +46,7 @@ enum Texts
     SAY_BLESSING   = 1,
 };
 
-enum Creatures
+enum Npc
 {
     NPC_WINDS                                = 39634,
     NPC_SUN_ORB                              = 40835,
@@ -94,7 +94,7 @@ class boss_rajh : public CreatureScript
                 blessing = false;
             }
 
-            void EnterCombat(Unit* pWho)
+            void EnterCombat(Unit* /*who*/)
             {
                 m_pInstance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me);
                 DoCast(me, SPELL_NO_REGEN);
@@ -114,7 +114,7 @@ class boss_rajh : public CreatureScript
                 Talk(SAY_KILL);
             }
 
-            void JustDied(Unit* killer)
+            void JustDied(Unit* /*killer*/)
             {
                 Talk(SAY_DEATH);
                 m_pInstance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me); // Remove
@@ -262,7 +262,7 @@ class npc_winds : public CreatureScript
                 DoCast(me, SPELL_WINDS_VISUAL);
             }
 
-            void EnterCombat(Unit* pWho)
+            void EnterCombat(Unit* /*who*/)
             {
                 DoCast(me, SPELL_SOLAR_WINDS_PERIODIC);
                 m_uiDamageTimer = IsHeroic() ? 1000 : 1500;
@@ -427,20 +427,15 @@ class npc_solar_wind : public CreatureScript
 
             InstanceScript* pInstance;
 
-            void Reset()
-            {
-            }
+            void Reset() { }
             
-            void EnterCombat(Unit * /*who*/)
-            {
-            }
+            void EnterCombat(Unit* /*who*/) { }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 /*diff*/)
             {
-                 if (me->HasUnitState(UNIT_STATE_CASTING))
+                if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
             }
-
         };
 
         CreatureAI* GetAI(Creature* creature) const

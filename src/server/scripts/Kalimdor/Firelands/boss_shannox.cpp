@@ -131,27 +131,21 @@ enum Events
     EVENT_LIMB_RIP                    = 10,
     EVENT_RIPLIMB_RESPAWN_H           = 11,
     EVENT_TAKING_SPEAR_DELAY          = 12,
-
     //Rageface
     EVENT_FACE_RAGE                   = 13, // Every 31s
     EVENT_CHANGE_TARGET               = 14,
-
     // Trigger for the Crystal Trap
     EVENT_CRYSTAL_TRAP_TRIGGER        = 15,
-
     // Trigger for the Immolation Trap
     EVENT_IMMOLATION_TRAP_TRIGGER     = 16,
-
     // Trigger for self Dispawn (Crystal Prison)
     EVENT_CRYSTAL_PRISON_DESPAWN      = 17,
-
     // Event trigger to reset Yells infight
     EVENT_RIPLIMB_RESET_SHANNOX_YELL  = 18,
     EVENT_SHANNOX_RESET_INTRO_YELL    = 19,
     EVENT_SHANNOX_SEC_INTRO_YELL      = 20,
     EVENT_PRISON_DOG_ATTACK_RAGEFACE  = 21,
     EVENT_PRISON_DOG_ATTACK_RIPLIMB   = 22,
-
     // Misc
     EVENT_UPDATE_MOTION               = 23
 };
@@ -174,9 +168,6 @@ const float walkRiplimbAngle     = 6;
 
 // If the Distance between Shannox & Dogs > This Value, all 3 get the Seperation Buff
 const float maxDistanceBetweenShannoxAndDogs = 110;
-
-// The equipment Template of Shannox Spear
-const int ShannoxSpearEquipmentTemplate      = 53000;
 
 /**** Shannox ****/
 class boss_shannox : public CreatureScript
@@ -271,7 +262,8 @@ public:
             else
                 me->SummonCreature(NPC_RAGEFACE, me->GetPositionX()+5 , me->GetPositionY()+5, me->GetPositionZ(), TEMPSUMMON_MANUAL_DESPAWN);
 
-            me->LoadEquipment(ShannoxSpearEquipmentTemplate);
+            /// @todo me->SetDisplayId(???);
+            me->LoadEquipment(); // reseting equipment
             
             _Reset();
         }
@@ -436,7 +428,7 @@ public:
                     break;
 
                 case EVENT_DESPAWN_SPEAR:
-                    me->LoadEquipment(ShannoxSpearEquipmentTemplate);
+                    me->LoadEquipment();
                     DespawnCreatures(NPC_SHANNOX_SPEAR, 5000.0f);
                     break;
 
@@ -448,7 +440,7 @@ public:
                     break;
 
                 case EVENT_HURL_SPEAR_OR_MAGMA_RUPTURE:
-                    if(GetRiplimb() && GetRiplimb()->IsDead())
+                    if(GetRiplimb() && GetRiplimb()->isDead())
                     { 
                         // Cast Magma Rupture when Ripclimb is Death
                         DoCastVictim(SPELL_MAGMA_RUPTURE_SHANNOX);
@@ -502,13 +494,13 @@ public:
             if (!UpdateVictim())
                 return;
 
-            if(((GetRiplimb() && GetRiplimb()->GetDistance2d(me) >= maxDistanceBetweenShannoxAndDogs && GetRiplimb()->IsAlive()) || (GetRageface() && GetRageface()->GetDistance2d(me) >= maxDistanceBetweenShannoxAndDogs) && GetRageface() ->IsAlive()) && (!me->HasAura(SPELL_SEPERATION_ANXIETY)))
+            if(((GetRiplimb() && GetRiplimb()->GetDistance2d(me) >= maxDistanceBetweenShannoxAndDogs && GetRiplimb()->IsAlive()) || (GetRageface() && GetRageface()->GetDistance2d(me) >= maxDistanceBetweenShannoxAndDogs && GetRageface()->IsAlive())) && (!me->HasAura(SPELL_SEPERATION_ANXIETY)))
                 DoCast(me, SPELL_SEPERATION_ANXIETY);
 
             if (uiPhase == PHASE_RIPLIMB_BRINGS_SPEER && GetRiplimb() && GetRiplimb()->GetDistance(me) <= 1)
             {
                 uiPhase = PHASE_SHANNOX_HAS_SPEER;
-                me->LoadEquipment(ShannoxSpearEquipmentTemplate);
+                me->LoadEquipment();
 
                 DespawnCreatures(NPC_SHANNOX_SPEAR, 5000.0f);
 
@@ -1222,7 +1214,7 @@ public:
                 }
             }    
 
-            if(myPrison && myPrison->IsDead())
+            if(myPrison && myPrison->isDead())
             {
                 myPrison->DisappearAndDie();
                 tempTarget->RemoveAurasDueToSpell(CRYSTAL_PRISON_EFFECT);

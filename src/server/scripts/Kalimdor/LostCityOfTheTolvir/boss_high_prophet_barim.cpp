@@ -784,9 +784,9 @@ public:
         return new npc_soul_fragmentAI (creature);
     }
 
-    struct npc_soul_fragmentAI : public Scripted_NoMovementAI
+    struct npc_soul_fragmentAI : public ScriptedAI
     {
-        npc_soul_fragmentAI(Creature* creature) : Scripted_NoMovementAI(creature)
+        npc_soul_fragmentAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = creature->GetInstanceScript();
             me->SetReactState(REACT_PASSIVE);

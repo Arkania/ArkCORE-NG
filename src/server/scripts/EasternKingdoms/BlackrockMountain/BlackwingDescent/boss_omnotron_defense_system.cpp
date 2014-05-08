@@ -6,7 +6,6 @@
  * lucky (presuming someone else managed to hack it).
  */
 
-
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "blackwing_descent.h"
@@ -196,27 +195,25 @@ public:
 
     struct boss_omnotronAI : public ScriptedAI
     {
-        boss_omnotronAI(Creature* creature) : ScriptedAI(creature), eventActive(false), intialized(false)
+        boss_omnotronAI(Creature* creature) : ScriptedAI(creature), _eventActive(false), _intialized(false)
         {
             instance = creature->GetInstanceScript();
         }
 
         InstanceScript* instance;
         EventMap events;
-        bool intialized;
+        bool _eventActive;
+        bool _intialized;
         bool isEncounterDone;
-
-        Creature* trons[4];
-
         uint8 activateTron;
-        bool eventActive;
+        Creature* trons[4];
 
         void UpdateAI(const uint32 diff)
         {
             if(me->HasAura(SPELL_INACTIVE))
                 me->RemoveAura(SPELL_INACTIVE);
 
-            if(!intialized)
+            if(!_intialized)
             {
                 trons[0] = me->FindNearestCreature(NPC_MAGMATRON, 150.0f, true);
                 trons[1] = me->FindNearestCreature(NPC_ELECTRON, 150.0f, true);
@@ -229,12 +226,12 @@ public:
 
                 me->SetMaxHealth(trons[0]->GetMaxHealth());
 
-                eventActive = true;
-                intialized = true;
+                _eventActive = true;
+                _intialized = true;
                 DoAction(ACTION_OMNOTRON_RESET);
             }
 
-            if (intialized == true)
+            if (_intialized == true)
             {
                 if (!me->FindNearestCreature(NPC_MAGMATRON, 150.0f, true) || !me->FindNearestCreature(NPC_ELECTRON, 150.0f, true) || !me->FindNearestCreature(NPC_ARCANOTRON, 150.0f, true) || !me->FindNearestCreature(NPC_TOXITRON, 150.0f, true)) // if any of the trons are dead
                     DoAction(ACTION_OMNNOTRON_EVENT_FINISHED); // Finish event.
@@ -284,7 +281,7 @@ public:
                 if (instance)
                     instance->SetBossState(DATA_OMNOTRON_DEFENSE_SYSTEM, IN_PROGRESS);
 
-                eventActive = true;
+                _eventActive = true;
                 me->SetInCombatWithZone();
                 if(me->GetMap()->IsHeroic())
                     me->SummonCreature(NPC_NEFARIAN_HELPER_HEROIC,-302.121f, -349.35f, 220.48f, 4.682203f,TEMPSUMMON_MANUAL_DESPAWN);
@@ -299,13 +296,13 @@ public:
             case ACTION_OMNOTRON_RESET:
                 // Resets Encounter
 
-                if(eventActive)
+                if(_eventActive)
                 {
                     me->SetFullHealth();
                     me->RemoveAllAuras();
                     me->CombatStop(false);
                     me->DeleteThreatList();
-                    eventActive = false;
+                    _eventActive = false;
 
                     DespawnMinions();
                     events.Reset();
@@ -316,7 +313,6 @@ public:
                     instance->SetBossState(DATA_OMNOTRON_DEFENSE_SYSTEM, FAIL);
                 }
                 break;
-
             case ACTION_OMNNOTRON_EVENT_FINISHED:
 
                 DespawnMinions();
@@ -325,9 +321,8 @@ public:
                     instance->SetBossState(DATA_OMNOTRON_DEFENSE_SYSTEM, DONE);
 
                 events.Reset();
-                eventActive = false;
+                _eventActive = false;
                 break;
-
             default:
                 break;
             }
@@ -440,7 +435,7 @@ public:
         Position homePosition;
         Creature* omnotron;
 
-        void EnterCombat(Unit * who)
+        void EnterCombat(Unit * /*who*/)
         {
             if(isFirstTron)
             {
@@ -477,7 +472,7 @@ public:
             instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me); // Remove
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 /*type*/, uint32 id)
         {
             if (id > 3)
                 return;
@@ -527,7 +522,7 @@ public:
         void DoAction(const int32 action)
         {
             events.Reset();
-            Creature* omnotron = me->FindNearestCreature(BOSS_OMNOTRON, 100.0f, true);
+            me->FindNearestCreature(BOSS_OMNOTRON, 100.0f, true);
 
             switch(action)
             {

@@ -158,12 +158,12 @@ class boss_asaad : public CreatureScript
                 summons.Despawn(summon);
             }
 
-            void KilledUnit(Unit* killer)
+            void KilledUnit(Unit* /*killer*/)
             {
                 Talk(SAY_KILL);
             }
 
-            void JustDied(Unit* pWho)
+            void JustDied(Unit* /*who*/)
             {
                 if (!pInstance)
                     return;
@@ -173,7 +173,6 @@ class boss_asaad : public CreatureScript
                 Talk(SAY_DEATH);
                 pInstance->SetData(DATA_ASAAD, DONE);
             }
-            
 
             void UpdateAI(const uint32 diff)
             {
@@ -211,19 +210,19 @@ class boss_asaad : public CreatureScript
                         events.DelayEvents(30000);
                         me->AttackStop();
                         me->SetReactState(REACT_PASSIVE);
-                        if (_field1 = me->SummonCreature(NPC_UNSTABLE_GROUNDING_FIELD, fieldPos[0]))
+                        if (Creature* _field1 = me->SummonCreature(NPC_UNSTABLE_GROUNDING_FIELD, fieldPos[0]))
                             DoCast(_field1, SPELL_UNSTABLE_GROUNDING_FIELD);
                         events.ScheduleEvent(EVENT_FIELD_4, 20000);
                         events.ScheduleEvent(EVENT_FIELD_1, 6000); 
                         break;
                     case EVENT_FIELD_1:
-                        if (_field2 = me->SummonCreature(NPC_UNSTABLE_GROUNDING_FIELD, fieldPos[1]))
+                        if (Creature* _field2 = me->SummonCreature(NPC_UNSTABLE_GROUNDING_FIELD, fieldPos[1]))
                             if (_field1)
                                 _field1->CastSpell(_field2, SPELL_UNSTABLE_GROUNDING_FIELD, true);
                         events.ScheduleEvent(EVENT_FIELD_2, 6000);
                         break;
                     case EVENT_FIELD_2:
-                        if (_field3 = me->SummonCreature(NPC_UNSTABLE_GROUNDING_FIELD, fieldPos[2]))
+                        if (Creature* _field3 = me->SummonCreature(NPC_UNSTABLE_GROUNDING_FIELD, fieldPos[2]))
                             if (_field2)
                                 _field2->CastSpell(_field3, SPELL_UNSTABLE_GROUNDING_FIELD, true);
                         events.ScheduleEvent(EVENT_FIELD_3, 6000);
@@ -274,20 +273,16 @@ class npc_unstable_grounding_field : public CreatureScript
         {
             return new npc_unstable_grounding_fieldAI(pCreature);
         }
-        struct npc_unstable_grounding_fieldAI : public Scripted_NoMovementAI
+        struct npc_unstable_grounding_fieldAI : public ScriptedAI
         {
-            npc_unstable_grounding_fieldAI(Creature* pCreature) : Scripted_NoMovementAI(pCreature)
+            npc_unstable_grounding_fieldAI(Creature* pCreature) : ScriptedAI(pCreature)
             {
                 me->SetReactState(REACT_PASSIVE);
             }
 
-            void Reset()
-            {
-            }
+            void Reset() { }
 
-            void UpdateAI(const uint32 diff)
-            {
-            }
+            void UpdateAI(uint32 /*diff*/) { }
      };
 };
 
@@ -329,6 +324,3 @@ void AddSC_boss_asaad()
     new npc_unstable_grounding_field();
     new spell_asaad_supremacy_of_the_storm();
 }
-
-
-

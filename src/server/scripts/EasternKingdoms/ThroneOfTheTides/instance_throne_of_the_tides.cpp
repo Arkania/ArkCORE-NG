@@ -97,17 +97,10 @@ public:
                 break;
             case NPC_COMMANDER_ULTHOK:
                 uiCommanderUlthokGUID = pCreature->GetGUID();
-                sLog->outError("LOADING", "ulthok1");
                 if (GetData(DATA_COMMANDER_ULTHOK_EVENT) == DONE)
-                {
-                    sLog->outError("LOADING", "ulthok2");
                     pCreature->SetPhaseMask(PHASEMASK_NORMAL, true);
-                }
                 else
-                {
-                    sLog->outError("LOADING", "ulthok3");
                     pCreature->SetPhaseMask(2, true);
-                }
                 break;
             case NPC_ERUNAK_STONESPEAKER:
                 uiErunakStonespeakerGUID = pCreature->GetGUID();
@@ -207,14 +200,14 @@ public:
         {
             switch (type)
             {
-            case DATA_LADY_NAZJAR_EVENT:
-                m_uiEvents[0] = data;
-                break;
-            case DATA_COMMANDER_ULTHOK_EVENT:
-                m_uiEvents[1] = data;
-                break;
-            case DATA_NEPTULON_EVENT:
-                m_uiEvents[2] = data;
+                case DATA_LADY_NAZJAR_EVENT:
+                    m_uiEvents[0] = data;
+                    break;
+                case DATA_COMMANDER_ULTHOK_EVENT:
+                    m_uiEvents[1] = data;
+                    break;
+                case DATA_NEPTULON_EVENT:
+                    m_uiEvents[2] = data;
             }
             if (data == DONE)
                 SaveToDB();
@@ -224,12 +217,12 @@ public:
         {
             switch (type)
             {
-            case DATA_LADY_NAZJAR_EVENT:
-                return m_uiEvents[0];
-            case DATA_COMMANDER_ULTHOK_EVENT:
-                return m_uiEvents[1];
-            case DATA_NEPTULON_EVENT:
-                return m_uiEvents[2];
+                case DATA_LADY_NAZJAR_EVENT:
+                    return m_uiEvents[0];
+                case DATA_COMMANDER_ULTHOK_EVENT:
+                    return m_uiEvents[1];
+                case DATA_NEPTULON_EVENT:
+                    return m_uiEvents[2];
             }
             return 0;
         }

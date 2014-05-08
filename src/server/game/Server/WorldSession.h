@@ -650,7 +650,7 @@ class WorldSession
         void HandleNpcTextQueryOpcode(WorldPacket& recvPacket);
         void HandleBinderActivateOpcode(WorldPacket& recvPacket);
         void HandleListStabledPetsOpcode(WorldPacket& recvPacket);
-        void HandleStablePet(WorldPacket& recvPacket);
+        void HandleSetPetSlot(WorldPacket& recvPacket);
         void HandleStablePetCallback(PreparedQueryResult result);
         void HandleUnstablePet(WorldPacket& recvPacket);
         void HandleUnstablePetCallback(PreparedQueryResult result, uint32 petId);
@@ -843,8 +843,8 @@ class WorldSession
 
         // Battlefield
         void SendBfInvitePlayerToWar(uint64 guid, uint32 zoneId, uint32 time);
-        void SendBfInvitePlayerToQueue(uint64 guid);
-        void SendBfQueueInviteResponse(uint64 guid, uint32 zoneId, bool canQueue = true, bool full = false);
+        void SendBfInvitePlayerToQueue(uint64 guid, bool battleHasBegun);
+        void SendBfQueueInviteResponse(uint64 battlefieldGuid, uint64 queueGuid, uint32 zoneId, bool canQueue = true, bool full = false, bool battleHasBegun = false);
         void SendBfEntered(uint64 guid);
         void SendBfLeaveMessage(uint64 guid, BFLeaveReason reason = BF_LEAVE_REASON_EXITED);
         void SendBfExitRequest(uint64 playerGuid, uint32 zoneId);

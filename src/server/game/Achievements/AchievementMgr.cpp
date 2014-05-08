@@ -2732,7 +2732,7 @@ bool AchievementMgr<T>::AdditionalRequirementsSatisfied(AchievementCriteriaEntry
                     return false;
 
                 // So tiny hack to prevent crash by calling .empty without existing index
-                if (!(reqValue >= 0) && !(reqValue < TOTAL_AURAS))
+                if (!(reqValue < TOTAL_AURAS))
                     return false;
 
                 if (!unit || !unit->HasAuraType(AuraType(reqValue)))
