@@ -1,5 +1,5 @@
 ################################################
-# ArkCORE Core World Server configuration file #
+# ArkCORE World Server configuration file      #
 ################################################
 [worldserver]
 
@@ -979,7 +979,7 @@ BeepAtStart = 1
 #        Description: Message of the Day, displayed at login.
 #                     Use '@' for a newline and be sure to escape special characters.
 #        Example:     "Welcome to John\'s Server@This server runs on Trinity Core."
-#        Default:     "Welcome to a Trinity Core server."
+#        Default:     "Welcome to a ArkCORE server."
 
 Motd = "Welcome to a Trinity Core server."
 
@@ -2209,9 +2209,9 @@ Arena.QueueAnnouncer.Enable = 0
 #
 #    Arena.ArenaSeason.ID
 #        Description: Current arena season id shown in clients.
-#        Default:     8
+#        Default:     11
 
-Arena.ArenaSeason.ID = 8
+Arena.ArenaSeason.ID = 11
 
 #
 #    Arena.ArenaSeason.InProgress

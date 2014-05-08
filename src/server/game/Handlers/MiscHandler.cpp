@@ -2308,7 +2308,7 @@ void WorldSession::SendStreamingMovie()
 
     data.WriteBits(count, 25);
 
-    for(unsigned i = 0; i < 0; ++i)    /// @todo warning
+    for(int8 i = 0; i < 0; ++i)
     {
         data << uint16(0);          //File Data ID
     }

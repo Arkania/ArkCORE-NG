@@ -1453,11 +1453,6 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 // Inquisition
                 if (m_spellInfo->Id == 84963) // Inquisition
                 {
-                    int32 mod = 0;
-                    // Item - Paladin T11 Retribution 4P Bonus
-                    if (AuraEffect* aur = GetCaster()->GetAuraEffect(90299, EFFECT_0))
-                        mod = aur->GetAmount() / 10;
-
                     // Divine Purpose
                     if (target->HasAura(90174))
                         target->SetPower(POWER_HOLY_POWER, 0);
@@ -1933,7 +1928,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     else if (AuraEffect * auraEff = target->GetAuraEffectOfRankedSpell(1178, 0)) // armor reduction implemented here
                     {
                         int32 value = auraEff->GetAmount();
-                        int32 mod = value / 100 * mod;
+                        int32 mod = 0;
 
                         switch (auraEff->GetId())
                         {
@@ -1944,6 +1939,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                                 mod = 16;
                                 break;
                         }
+                        mod = value / 100 * mod;
                         value = value + (apply ? -mod : mod);
                         auraEff->ChangeAmount(value);
                     }
