@@ -1,4 +1,4 @@
-# Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
+# Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
 #
 # This file is free software; as a special exception the author gives
 # unlimited permission to copy and/or distribute it, with or without
@@ -10,7 +10,6 @@
 
 # NOTE: Do not use glob here, it would include files we don't want
 set(ace_STAT_SRCS
-  PrecompiledHeaders/WinAcePCH.cpp
   ACE.cpp
   ACE_crc32.cpp
   ACE_crc_ccitt.cpp
@@ -340,6 +339,10 @@ add_library(ace SHARED
   ${ace_STAT_SRCS}
   ${ace_PCH_SRC}
 )
+
+if (MINGW) # GCC ignores "#prama comment"
+  target_link_libraries(ace ws2_32 iphlpapi netapi32 mswsock)
+endif()
 
 # Generate precompiled header
 if( USE_COREPCH )
