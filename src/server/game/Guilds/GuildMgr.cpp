@@ -449,13 +449,13 @@ void GuildMgr::LoadGuilds()
     }
 
     // 11. Load challengesMgr
-    TC_LOG_INFO("misc", "Loading challenges...");
+    /*TC_LOG_INFO("misc", "Loading challenges...");
     {
         for (GuildContainer::const_iterator itr = GuildStore.begin(); itr != GuildStore.end(); ++itr)
         {
             itr->second->GetChallengesMgr()->LoadFromDB();
         }
-    }
+    }*/
 
     // 12. Validate loaded guild data
     TC_LOG_INFO("misc", "Validating data of loaded guilds...");

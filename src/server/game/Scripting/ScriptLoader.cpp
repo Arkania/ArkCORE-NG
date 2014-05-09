@@ -936,8 +936,6 @@ void AddEasternKingdomsScripts()
     AddSC_boss_occuthar();
     AddSC_boss_pit_lord_argaloth();
     AddSC_boss_argaloth();
-    AddSC_boss_alizabal();
-    AddSC_boss_occuthar();
     AddSC_bh_trash();
     AddSC_instance_baradin_hold();
     AddSC_boss_assembly_of_ascendents();    //Bastion of Twilight
@@ -1225,7 +1223,6 @@ void AddKalimdorScripts()
     AddSC_boss_ammunae();                   //Halls Of Origination
     //AddSC_boss_anhuur();
     AddSC_boss_temple_guardian_anhuur();
-    AddSC_boss_earthrager_ptah();
     AddSC_boss_anraphet();
     AddSC_boss_earthrager_ptah();
     AddSC_boss_isiset();

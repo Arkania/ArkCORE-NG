@@ -277,19 +277,19 @@ public:
 };
 
 // Millhouse Manastorm AI
-class npc_millhouse_manastorm : public CreatureScript
+class npc_millhouse_manastorm_sc : public CreatureScript
 {
 public:
-    npc_millhouse_manastorm() : CreatureScript("npc_millhouse_manastorm") { }
+    npc_millhouse_manastorm_sc() : CreatureScript("npc_millhouse_manastorm_sc") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_millhouse_manastormAI(creature);
+        return new npc_millhouse_manastorm_scAI(creature);
     }
 
-    struct npc_millhouse_manastormAI : public ScriptedAI
+    struct npc_millhouse_manastorm_scAI : public ScriptedAI
     {
-        npc_millhouse_manastormAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_millhouse_manastorm_scAI(Creature* creature) : ScriptedAI(creature) {}
 
         EventMap events;
 
@@ -357,6 +357,6 @@ void AddSC_stonecore()
 {
     new npc_crystalspawn_giant();
     new npc_impp();
-    new npc_millhouse_manastorm();
+    new npc_millhouse_manastorm_sc();
     new npc_rock_borer;
 }
