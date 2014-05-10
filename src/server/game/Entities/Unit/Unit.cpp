@@ -1941,7 +1941,7 @@ void Unit::AttackerStateUpdate (Unit* victim, WeaponAttackType attType, bool ext
                 return;
             }
 
-			AuraEffectList const& _TotalAuraList = GetAuraEffectsByType(SPELL_AURA_MOD_AUTOATTACK_DAMAGE);
+            AuraEffectList const& _TotalAuraList = GetAuraEffectsByType(SPELL_AURA_MOD_AUTOATTACK_DAMAGE);
             for (AuraEffectList::const_iterator i = _TotalAuraList.begin(); i != _TotalAuraList.end(); ++i)
             {
                 if ((*i)->GetId() == 81330 || (*i)->GetId() == 81332 || (*i)->GetId() == 81333)
@@ -5855,7 +5855,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     triggered_spell_id = 26170;
                     break;
                 }
-				// Atonement
+                // Atonement
                 case 14523:
                 case 81749:
                 {
@@ -16526,7 +16526,7 @@ uint32 Unit::GetCombatRatingDamageReduction(CombatRating cr, float rate, float c
     float percent = GetCombatRatingReduction(cr) * rate;
 
     if (percent > cap)
-	    percent = cap;
+        percent = cap;
 
     return uint32 (percent * damage / 100.0f);
 }
@@ -17246,7 +17246,7 @@ void Unit::_ExitVehicle(Position const* exitPosition)
         // If for other reason we as minion are exiting the vehicle (ejected, master dismounted) - unsummon
         else if (IsSummon() && ToTempSummon())
             ToTempSummon()->DisappearAndDie();
-	  /*  else
+      /*  else
             ToTempSummon()->UnSummon(2000); // Approximation*/
     }
 }

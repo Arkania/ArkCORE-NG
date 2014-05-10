@@ -1265,7 +1265,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     {
                         // Reset cooldown on Fire Blast
                         caster->ToPlayer()->RemoveSpellCooldown(2136, true);
-						break;
+                        break;
                     }
                     default:
                         break;
@@ -1328,22 +1328,22 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     break;
                 // Prayer of Mending
                 if (GetId() == 41635)
-				{
+                {
                     if (caster->HasAura(14751))
                     {
                         caster->CastSpell(caster, 81206, true); // Chakra: Sanctuary
                         caster->RemoveAurasDueToSpell(14751);
                     }
-				}
+                }
                 // Mind spike
                 else if (GetId() == 87178)
-				{
+                {
                     if (caster->HasAura(14751))
                     {
                         caster->CastSpell(caster, 81209, true); // Chakra: Chastise
                         caster->RemoveAurasDueToSpell(14751);
                     }
-				}
+                }
                 // Devouring Plague
                 else if (GetId() == 2944)
                 {

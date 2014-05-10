@@ -2654,7 +2654,7 @@ void ObjectMgr::LoadItemTemplates()
             itemTemplate.ScalingStatDistribution = uint32(fields[69].GetUInt16());
 
             itemTemplate.Armor   = FillItemArmor(itemTemplate.ItemLevel, itemTemplate.Class,
-			                                     itemTemplate.SubClass, itemTemplate.Quality,
+                                                 itemTemplate.SubClass, itemTemplate.Quality,
                                                  itemTemplate.InventoryType);
             // cache item damage
             FillItemDamageFields(&itemTemplate.DamageMin, &itemTemplate.DamageMax, &itemTemplate.DPS, itemTemplate.ItemLevel,
