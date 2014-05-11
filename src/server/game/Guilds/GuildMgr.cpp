@@ -449,13 +449,13 @@ void GuildMgr::LoadGuilds()
     }
 
     // 11. Load challengesMgr
-    /*TC_LOG_INFO("misc", "Loading challenges...");
+    TC_LOG_INFO("misc", "Loading challenges...");
     {
         for (GuildContainer::const_iterator itr = GuildStore.begin(); itr != GuildStore.end(); ++itr)
         {
             itr->second->GetChallengesMgr()->LoadFromDB();
         }
-    }*/
+    }
 
     // 12. Validate loaded guild data
     TC_LOG_INFO("misc", "Validating data of loaded guilds...");
@@ -483,7 +483,7 @@ void GuildMgr::LoadGuildXpForLevel()
         GuildXPperLevel[level] = 0;
 
     //                                                 0         1
-    QueryResult result  = WorldDatabase.Query("SELECT lvl, xp_for_next_level FROM guild_xp_for_level");
+    QueryResult result = WorldDatabase.Query("SELECT lvl, xp_for_next_level FROM guild_xp_for_level");
 
     if (!result)
     {

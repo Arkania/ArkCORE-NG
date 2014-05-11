@@ -785,7 +785,7 @@ public:
     class ChallengesMgr
     {
         public:
-            ChallengesMgr(Guild* pGuild);
+            ChallengesMgr(Guild* guild);
             ~ChallengesMgr();
 
             void LoadFromDB();

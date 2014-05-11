@@ -1156,15 +1156,12 @@ InventoryResult Guild::BankMoveItemData::CanStore(Item* pItem, bool swap)
     return EQUIP_ERR_BANK_FULL;
 }
 
-Guild::ChallengesMgr::ChallengesMgr(Guild* pGuild)
+Guild::ChallengesMgr::ChallengesMgr(Guild* guild)
 {
-    m_owner = pGuild;
+    m_owner = guild;
 }
 
-Guild::ChallengesMgr::~ChallengesMgr()
-{
-
-}
+Guild::ChallengesMgr::~ChallengesMgr() { }
 
 void Guild::ChallengesMgr::LoadFromDB()
 {
@@ -1456,6 +1453,7 @@ Guild::Guild():
     _todayExperience(0)
 {
     memset(&m_bankEventLog, 0, (GUILD_BANK_MAX_TABS + 1) * sizeof(LogHolder*));
+    m_challengesMgr = new ChallengesMgr(this);
 }
 
 Guild::~Guild()
@@ -1468,8 +1466,11 @@ Guild::~Guild()
     m_eventLog = NULL;
     delete m_newsLog;
     m_newsLog = NULL;
-    delete m_challengesMgr;
-    m_challengesMgr = NULL;
+    if(m_challengesMgr)
+    {
+        delete m_challengesMgr;
+        m_challengesMgr = NULL;
+    }
 
     for (uint8 tabId = 0; tabId <= GUILD_BANK_MAX_TABS; ++tabId)
     {

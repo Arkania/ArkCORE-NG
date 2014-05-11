@@ -983,7 +983,7 @@ void Battleground::EndBattleground(uint32 winner)
         }
 
         if(Guild* guild = player->GetGuild())
-            guild->GetChallengesMgr()->CheckBattlegroundChallenge(this,m_BgRaids[player->GetTeam()]);
+            guild->GetChallengesMgr()->CheckBattlegroundChallenge(this, m_BgRaids[player->GetTeam()]);
 
         player->ResetAllPowers();
         player->CombatStopWithPets(true);
