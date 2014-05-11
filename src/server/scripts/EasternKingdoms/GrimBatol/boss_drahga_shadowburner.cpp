@@ -116,7 +116,8 @@ class boss_drahga_shadowburner : public CreatureScript
                 summons.DespawnAll();
                 events.Reset();
                 stage = 0;
-                instance->SetData(DATA_DRAHGA_SHADOWBURNER, NOT_STARTED);
+                if (instance)
+                    instance->SetData(DATA_DRAHGA_SHADOWBURNER, NOT_STARTED);
             }
 
             void SpellHit(Unit* /*caster*/, SpellInfo const* spell)
@@ -150,14 +151,16 @@ class boss_drahga_shadowburner : public CreatureScript
                 Talk(SAY_AGGRO);
                 events.ScheduleEvent(EVENT_BURNING_SHADOWBOLT, urand(2000, 5000));
                 events.ScheduleEvent(EVENT_INVOCATION_OF_FLAME, 10000);
-                instance->SetData(DATA_DRAHGA_SHADOWBURNER, IN_PROGRESS);
+                if (instance)
+                    instance->SetData(DATA_DRAHGA_SHADOWBURNER, IN_PROGRESS);
             }
             
             void JustDied(Unit* /*killer*/)
             {
                 Talk(SAY_DEATH);
                 summons.DespawnAll();
-                instance->SetData(DATA_DRAHGA_SHADOWBURNER, DONE);
+                if (instance)
+                    instance->SetData(DATA_DRAHGA_SHADOWBURNER, DONE);
             }
 
             void KilledUnit(Unit* /*victim*/)
