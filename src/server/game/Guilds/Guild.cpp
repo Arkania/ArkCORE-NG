@@ -1357,6 +1357,8 @@ uint32 Guild::ChallengesMgr::GetRewardQuantity(uint8 rewardType,uint32 challenge
     uint32 challengeId = 0;
     uint32 rewardResult = 0;
 
+    if (m_challenges.begin() == m_challenges.end()) return 0;
+
     for(Challenges::iterator itr = m_challenges.begin(); itr != m_challenges.end();++itr)
     {
         if(itr->second.typeId == challengeType)
@@ -1691,6 +1693,43 @@ void Guild::OnPlayerStatusChange(Player* player, uint32 flag, bool state)
             member->AddFlag(flag);
         else member->RemFlag(flag);
     }
+}
+
+bool Guild::SetName(std::string const& name)
+{
+    if (m_name == name || name.empty() || name.length() > 24 || sObjectMgr->IsReservedName(name) || !ObjectMgr::IsValidCharterName(name))
+        return false;
+
+    m_name = name;
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GUILD_NAME);
+    stmt->setString(0, m_name);
+    stmt->setUInt32(1, GetId());
+    CharacterDatabase.Execute(stmt);
+
+    ObjectGuid guid = GetGUID();
+    WorldPacket data(SMSG_GUILD_RENAMED, 24 + 8 + 1);
+    data.WriteBit(guid[5]);
+    data.WriteBits(name.length(), 8);
+    data.WriteBit(guid[4]);
+    data.WriteBit(guid[0]);
+    data.WriteBit(guid[6]);
+    data.WriteBit(guid[3]);
+    data.WriteBit(guid[1]);
+    data.WriteBit(guid[7]);
+    data.WriteBit(guid[2]);
+
+    data.WriteByteSeq(guid[3]);
+    data.WriteByteSeq(guid[2]);
+    data.WriteByteSeq(guid[7]);
+    data.WriteByteSeq(guid[1]);
+    data.WriteByteSeq(guid[0]);
+    data.WriteByteSeq(guid[6]);
+    data.WriteString(name);
+    data.WriteByteSeq(guid[4]);
+    data.WriteByteSeq(guid[5]);
+
+    BroadcastPacket(&data);
+    return true;
 }
 
 void Guild::HandleRoster(WorldSession* session /*= NULL*/)

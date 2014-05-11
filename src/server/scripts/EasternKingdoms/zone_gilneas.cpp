@@ -74,10 +74,13 @@ enum eGilneas
     SPELL_ENRAGE                                   = 56646,
     SPELL_SET_PHASE_02                             = 59073, // set phase 2
     SPELL_SET_PHASE_04                             = 59074, // set phase 4
-    SPELL_SET_PHASE_08                             = 59087, // set phase 8
+    // SPELL_SET_PHASE_08                             = 67853, // 59087, // set phase 8  // all wrong zone
 
     SPELL_GILNEAS_PRISON_PERIODIC_FORCECAST        = 66914,
-
+    SPELL_PULL_TO                                  = 67357, // not work
+    SPELL_WORGEN_BITE                              = 72870, // set gilneas phase 4 to
+    SPELL_INFECTED_BITE                            = 72872, // set gilneas phase 8 to
+    SPELL_FAKE_SHOT                                = 7105,
 
 };
 
@@ -1056,6 +1059,15 @@ public:
         uint32  _wave;
         Player* _player;
 
+        void AttackStart(Unit* target)
+        {
+            if (!target)
+                return;
+
+            if (me->Attack(target, true))
+                DoStartNoMovement(target); // prepare for no move on attack
+        }
+
 		void StartWorgenFight(Player* player)
 		{						
 			_eventTimer=120000;				
@@ -1186,6 +1198,167 @@ public:
 
 };
 
+/*######
+## npc_josiah_avery_worgen_phase8
+######*/
+
+class npc_josiah_avery_worgen_phase8 : public CreatureScript
+{
+public:
+    npc_josiah_avery_worgen_phase8() : CreatureScript("npc_josiah_avery_worgen_phase8") { }
+
+    struct npc_josiah_avery_worgen_phase8AI : public ScriptedAI
+    {
+        npc_josiah_avery_worgen_phase8AI(Creature* creature) : ScriptedAI(creature)
+        {
+            uiEventTimer = 500;
+            uiPase = 1;
+            uiPlayerGUID = 0;
+            me->SetReactState(REACT_PASSIVE);
+
+            if (me->IsSummon())
+                Event = true;
+            else
+                Event = false;
+        }
+
+        uint64 uiPlayerGUID;
+        uint32 uiEventTimer;
+        uint8 uiPase;
+        bool Event;
+
+        void SpellHit(Unit* /*caster*/, const SpellInfo* spell)
+        {
+            if (spell->Id == SPELL_FAKE_SHOT)
+                me->Kill(me);
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+            if (Event)
+                if (uiEventTimer <= diff)
+                {
+                    if (Creature* lorna = me->FindNearestCreature(NPC_LORNA_CROWLEY_PHASE8, 30.0f))
+                        switch (uiPase)
+                        {
+                            case 1:
+                                ++uiPase;
+                                uiEventTimer = 1000;
+                                if (Player* player = Unit::GetPlayer(*me, uiPlayerGUID))
+                                {
+                                    float x, y, z;
+                                    lorna->GetPosition(x, y, z);
+                                    me->CastSpell(player, 91074, false); // unknown spell on wowhead
+                                    player->GetMotionMaster()->MoveJump(x, y, z, 25.0f, 5.0f);
+                                    player->CastSpell(player, SPELL_INFECTED_BITE, true);
+                                }
+                                break;
+                            case 2:
+                                Event = false;
+                                uiEventTimer = 1000;
+                                float x, y, z;
+                                lorna->GetPosition(x, y, z);
+                                me->GetMotionMaster()->MoveJump(x, y, z, 25.0f, 10.0f);
+                                lorna->CastSpell(me, SPELL_FAKE_SHOT, false);
+                                break;
+                        }
+                }
+                else
+                    uiEventTimer -= diff;
+
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+    };
+    
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_josiah_avery_worgen_phase8AI (creature);
+    }
+};
+
+/*######
+## npc_josiah_avery_human_phase4
+######*/
+
+class npc_josiah_avery_human_phase4 : public CreatureScript
+{
+public:
+    npc_josiah_avery_human_phase4() : CreatureScript("npc_josiah_avery_human_phase4") { }
+
+    bool OnQuestComplete(Player* player, Creature* creature, const Quest* quest)
+    {
+        if (quest->GetQuestId() == QUEST_THE_REBEL_LORD_ARSENAL)
+        {
+            player->RemoveAura(SPELL_SET_PHASE_02);
+            player->RemoveAura(SPELL_INVISIBILITY_DETECTION_2);
+            player->CastSpell(player, SPELL_WORGEN_BITE, true);
+            float p_x, p_y;
+            player->GetPosition(p_x, p_y);
+            float x, y, z, o = creature->GetAngle(p_x, p_y);
+            creature->GetPosition(x, y, z);
+            player->SaveToDB();
+
+            if (Creature* josiah = player->SummonCreature(NPC_JOSIAH_AVERY_WORGEN_PHASE8, x, y, z, o, TEMPSUMMON_CORPSE_DESPAWN, 10000))
+            {
+                CAST_AI(npc_josiah_avery_worgen_phase8::npc_josiah_avery_worgen_phase8AI, josiah->AI())->uiPlayerGUID = player->GetGUID();
+                josiah->SetSeerGUID(player->GetGUID());
+                josiah->SetVisible(false);
+            }
+        }
+
+        return true;
+    }
+
+    struct npc_josiah_avery_human_phase4AI : public ScriptedAI
+    {
+        npc_josiah_avery_human_phase4AI(Creature* creature) : ScriptedAI(creature)
+        {
+            uiRandomSpeachTimer = urand(5000, 15000);
+        }
+
+        uint32 uiRandomSpeachTimer;
+
+        void UpdateAI(uint32 diff)
+        {
+            if (uiRandomSpeachTimer <= diff)
+            {
+                uiRandomSpeachTimer = urand(5000, 15000);
+                uint8 roll = urand(0, 5);
+                Map::PlayerList const &PlList = me->GetMap()->GetPlayers();
+
+                if (PlList.isEmpty())
+                    return;
+
+                float z = me->GetPositionZ();
+                uint32 uiPhase = me->GetPhaseMask();
+
+                for (Map::PlayerList::const_iterator i = PlList.begin(); i != PlList.end(); ++i)
+                    if (Player* player = i->GetSource())
+                        if (uiPhase == player->GetPhaseMask())
+                            if (me->GetDistance(player) < 35.0f)
+                                if (abs(z - player->GetPositionZ()) < 5.0f)
+                                   Talk(0, player->GetGUID());
+            }
+            else
+                uiRandomSpeachTimer -= diff;
+
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+    };
+    
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_josiah_avery_human_phase4AI (creature);
+    }
+};
+
+
 
 void AddSC_gilneas_city()
 {
@@ -1207,5 +1380,8 @@ void AddSC_gilneas_city()
 	new npc_tobias_mistmantle_phase4();
 	new npc_worgen_runt_phase4();
 	new npc_lord_darius_crowley_phase4();
+
+    new npc_josiah_avery_worgen_phase8();
+    new npc_josiah_avery_human_phase4();
 
 };

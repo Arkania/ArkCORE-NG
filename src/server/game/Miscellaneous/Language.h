@@ -89,6 +89,9 @@ enum TrinityStrings
     LANG_IMPROPER_VALUE                 = 62,
     // Room for more level 0              63-99 not used
 
+    LANG_GUILD_RENAME_ALREADY_EXISTS    = 96,
+    LANG_GUILD_RENAME_DONE              = 97,
+
     // level 1 chat
     LANG_GLOBAL_NOTIFY                  = 100,
     LANG_MAP_POSITION                   = 101,
@@ -1030,7 +1033,7 @@ enum TrinityStrings
 
     LANG_WORLD_CLOSED                    = 7523,
     LANG_WORLD_OPENED                    = 7524,
-
+    
     // Use for not-in-offcial-sources patches
     //                                    10000-10999
     // opvp hp
