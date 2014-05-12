@@ -147,7 +147,7 @@ class boss_grand_vizier_ertan : public CreatureScript
                 pInstance->SetData(DATA_GRAND_VIZIER_ERTAN, DONE);
             }
             
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!pInstance || !UpdateVictim())
                     return;
@@ -162,7 +162,7 @@ class boss_grand_vizier_ertan : public CreatureScript
                     case EVENT_LIGHTNING_BOLT:
                         if (me->HasUnitState(UNIT_STATE_CASTING))
                             return;
-                        DoCast(me->GetVictim(), SPELL_LIGHTNING_BOLT);
+                        DoCastVictim(SPELL_LIGHTNING_BOLT);
                         events.ScheduleEvent(EVENT_LIGHTNING_BOLT, 2000);
                         break;
                     case EVENT_CALL_VORTEX:
@@ -238,7 +238,7 @@ class npc_ertan_vortex : public CreatureScript
                 uiDespawnTimer = 3000;
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!pInstance)
                     return;

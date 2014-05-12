@@ -371,7 +371,7 @@ public:
             Talk(SAY_ANSHAL_KILL);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING) || !instance)
                 return;
@@ -595,7 +595,7 @@ public:
             Talk(SAY_NEZIR_KILL);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING) || !instance)
                 return;
@@ -816,7 +816,7 @@ public:
             Talk(SAY_ROHASH_KILL);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING) || !instance)
                 return;
@@ -962,7 +962,7 @@ public:
 
         uint32 TargetSelectTimer;
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (TargetSelectTimer <= diff)
             {
@@ -997,7 +997,7 @@ public:
 
         uint32 CreeperSummonTimer;
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (CreeperSummonTimer <= diff)
             {
@@ -1039,7 +1039,7 @@ class npc_hurricane : public CreatureScript
                 grabbedPlayer = guid;
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;

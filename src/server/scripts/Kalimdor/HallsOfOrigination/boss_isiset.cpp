@@ -160,7 +160,7 @@ class boss_isiset : public CreatureScript
                 pSummon->AI()->DoZoneInCombat();
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -388,7 +388,7 @@ class boss_isiset : public CreatureScript
                 if (SupernovaTimer <= diff && Phased == false)
                 {
                     Talk(SAY_SUPERNOVA);
-                    DoCast(me->GetVictim(), SPELL_SUPERNOVA);
+                    DoCastVictim(SPELL_SUPERNOVA);
                     SupernovaTimer = urand(25000, 35000);
                 } else SupernovaTimer -= diff;
 
@@ -465,7 +465,7 @@ class npc_celestial_familiar : public CreatureScript
                 me->RemoveCorpse(false);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
@@ -475,7 +475,7 @@ class npc_celestial_familiar : public CreatureScript
 
                 if (m_uiBarrageTimer <= diff)
                 {
-                    DoCast(me->GetVictim(), IsHeroic() ? SPELL_ARCANE_BARRAGE_H : SPELL_ARCANE_BARRAGE);
+                    DoCastVictim(IsHeroic() ? SPELL_ARCANE_BARRAGE_H : SPELL_ARCANE_BARRAGE);
                     m_uiBarrageTimer = urand(2000, 3000);
                 }
                 else
@@ -517,7 +517,7 @@ class npc_veil_sky : public CreatureScript
                 m_uiVeilSkyTimer = 2000;
             }
             
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -571,7 +571,7 @@ class npc_celestial_call : public CreatureScript
                 m_uiBarrageTimer = 1000;
             }
             
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(uint32 uiDiff)
             {
                 if (!UpdateVictim())
                     return;
@@ -581,7 +581,7 @@ class npc_celestial_call : public CreatureScript
 
                 if (m_uiBarrageTimer <= uiDiff)
                 {
-                    DoCast(me->GetVictim(), IsHeroic() ? SPELL_ARCANE_BARRAGE_H : SPELL_ARCANE_BARRAGE);
+                    DoCastVictim(IsHeroic() ? SPELL_ARCANE_BARRAGE_H : SPELL_ARCANE_BARRAGE);
                     m_uiBarrageTimer = 2000;
                 }
                 else
@@ -623,7 +623,7 @@ class npc_astral_rain : public CreatureScript
                 m_uiAstralRainTimer = 2000;
             }
             
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(uint32 uiDiff)
             {
                 if (!UpdateVictim())
                     return;

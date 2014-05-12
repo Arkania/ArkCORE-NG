@@ -65,7 +65,7 @@ class boss_echo_of_tyrande : public CreatureScript
               //  events.ScheduleEvent(EVENT_ROCK_SHARDS, 15000);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;

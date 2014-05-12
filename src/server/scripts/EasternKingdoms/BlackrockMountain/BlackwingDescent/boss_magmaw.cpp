@@ -326,7 +326,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!(UpdateVictim() && isInManglePhase) || me->HasUnitState(UNIT_STATE_CASTING))
                 return; 
@@ -758,7 +758,7 @@ public:
             events.ScheduleEvent(EVENT_FIERY_SLASH, 7000);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                 return;
@@ -782,7 +782,7 @@ public:
                         break;
 
                     case EVENT_FIERY_SLASH:
-                        DoCast(me->GetVictim(), SPELL_FIERY_SLASH);
+                        DoCastVictim(SPELL_FIERY_SLASH);
                         events.ScheduleEvent(EVENT_FIERY_SLASH, urand(13000, 17000));
                         break;
                 }
@@ -818,7 +818,7 @@ public:
             events.ScheduleEvent(EVENT_IGNITION_VISUAL, 100);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             events.Update(diff);
 

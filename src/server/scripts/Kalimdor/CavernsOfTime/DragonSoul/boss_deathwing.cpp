@@ -158,7 +158,7 @@ public:
             _EnterCombat();
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                  return;
@@ -429,7 +429,7 @@ class npc_arm_tentacle_one : public CreatureScript
                 instance->SetData(DATA_DAMAGE_DEATHWING, IN_PROGRESS);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                     return;
@@ -496,7 +496,7 @@ class npc_arm_tentacle_two : public CreatureScript
                 instance->SetData(DATA_DAMAGE_DEATHWING, IN_PROGRESS);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                     return;
@@ -563,7 +563,7 @@ class npc_wing_tentacle_one : public CreatureScript
                 instance->SetData(DATA_DAMAGE_DEATHWING, IN_PROGRESS);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                     return;
@@ -631,7 +631,7 @@ class npc_wing_tentacle_two : public CreatureScript
                 instance->SetData(DATA_DAMAGE_DEATHWING, IN_PROGRESS);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                     return;

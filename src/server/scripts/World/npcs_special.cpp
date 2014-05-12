@@ -2920,7 +2920,7 @@ public:
                     me->AddAura(SPELL_ANCIANET_HEALER, owner);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             Unit* owner = me->GetOwner();
 
@@ -2990,7 +2990,7 @@ public:
              }
         }
 
-        void UpdateAI(const uint32 /*diff*/)
+        void UpdateAI(uint32 /*diff*/)
         {
             if (!UpdateVictim())
                 return;

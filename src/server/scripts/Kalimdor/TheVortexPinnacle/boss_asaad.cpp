@@ -174,7 +174,7 @@ class boss_asaad : public CreatureScript
                 pInstance->SetData(DATA_ASAAD, DONE);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!pInstance || !UpdateVictim())
                     return;

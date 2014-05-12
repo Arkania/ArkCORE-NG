@@ -135,7 +135,7 @@ public:
             _EnterCombat();
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                 return;
@@ -290,7 +290,7 @@ class npc_blood : public CreatureScript
             events.Reset();
         }
 
-        void UpdateAI(const uint32 /*diff*/)
+        void UpdateAI(uint32 /*diff*/)
         {
             if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                 return;
@@ -399,7 +399,7 @@ class npc_forgotten_one : public CreatureScript
                         events.ScheduleEvent(EVENT_PSYCHIC_SLICE, urand(5000,15000));
             }
 
-               void UpdateAI(const uint32 diff)
+               void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                     return;

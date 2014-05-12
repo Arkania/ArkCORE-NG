@@ -287,7 +287,7 @@ class npc_neptulon : public CreatureScript
                 }
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!bActive)
                     return;
@@ -439,7 +439,7 @@ class npc_vicious_mindslasher : public CreatureScript
                         pNeptulon->AI()->Talk(SAY_KILL);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -458,11 +458,11 @@ class npc_vicious_mindslasher : public CreatureScript
                         events.ScheduleEvent(EVENT_BRAIN_SPIKE, urand(15000, 20000));
                         break;
                     case EVENT_VEIL_OF_SHADOW:
-                        DoCast(me->GetVictim(), SPELL_VEIL_OF_SHADOW);
+                        DoCastVictim(SPELL_VEIL_OF_SHADOW);
                         events.ScheduleEvent(EVENT_VEIL_OF_SHADOW, urand(13000, 20000));
                         break;
                     case EVENT_SHADOW_BOLT:
-                        DoCast(me->GetVictim(), SPELL_SHADOW_BOLT);
+                        DoCastVictim(SPELL_SHADOW_BOLT);
                         events.ScheduleEvent(EVENT_SHADOW_BOLT, 2000);
                         break;
                     }
@@ -509,7 +509,7 @@ class npc_unyielding_behemoth : public CreatureScript
                 events.ScheduleEvent(EVENT_BLIGHT_SPRAY, urand(8000, 12000));
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;

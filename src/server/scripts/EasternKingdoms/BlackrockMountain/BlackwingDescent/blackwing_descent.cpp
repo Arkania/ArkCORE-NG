@@ -68,7 +68,7 @@ public:
         uint32 timer;
         bool introSaid;
 
-        void UpdateAI(const uint32 diff) 
+        void UpdateAI(uint32 diff) 
         {
             if (timer <= diff)
             {

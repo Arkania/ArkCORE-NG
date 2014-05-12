@@ -187,7 +187,7 @@ class boss_echo_of_jaina : public CreatureScript
                 events.ScheduleEvent(EVENT_FLARECORE, urand(14000, 17000));
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                     return;
@@ -199,7 +199,7 @@ class boss_echo_of_jaina : public CreatureScript
                     switch (eventId)
                     {
                         case EVENT_PYROBLAST:
-                            DoCast(me->GetVictim(), SPELL_PYROBLAST);
+                            DoCastVictim(SPELL_PYROBLAST);
                             events.ScheduleEvent(EVENT_PYROBLAST, urand(3500, 4500));
                             break;
 
@@ -285,7 +285,7 @@ class npc_flarecore : public CreatureScript
                 events.ScheduleEvent(EVENT_EXPLODE, 10000);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                     return;

@@ -95,7 +95,7 @@ public:
             Attack1HTimer = urand(1800,2200);
         }
 
-        void UpdateAI(const uint32 diff) 
+        void UpdateAI(uint32 diff) 
         {
             if (!UpdateVictim())
             {
@@ -144,7 +144,7 @@ public:
             Attack1HTimer = urand(1800,2200);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
             {
@@ -215,7 +215,7 @@ public:
             Talk(0);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
             {
@@ -375,7 +375,7 @@ public:
                 isHealed=true;
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
 
             if (!isHealed) return;
@@ -433,7 +433,7 @@ public:
             timer=1000;
         }
 
-        void UpdateAI(const uint32 diff) 
+        void UpdateAI(uint32 diff) 
         {
             if (!me->IsAlive()) return;
 
@@ -508,7 +508,7 @@ public:
             isHealingNow=true;
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (isHealingNow)
             {
@@ -568,7 +568,7 @@ public:
         void EnterCombat(Unit * /*who*/) { }
         void MoveInLineOfSight(Unit * /*who*/) { }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (me->IsStandState())
             {

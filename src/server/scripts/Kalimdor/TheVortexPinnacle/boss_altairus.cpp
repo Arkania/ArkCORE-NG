@@ -159,7 +159,7 @@ class boss_altairus : public CreatureScript
                     return false;
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!pInstance || !UpdateVictim())
                     return;
@@ -172,7 +172,7 @@ class boss_altairus : public CreatureScript
                 if (me->GetVictim())
                     if (me->GetVictim()->GetDistance2d(me->GetHomePosition().GetPositionX(), me->GetHomePosition().GetPositionY()) > 55.0f)
                     {
-                        DoCast(me->GetVictim(), SPELL_LIGHTNING_BLAST);
+                        DoCastVictim(SPELL_LIGHTNING_BLAST);
                         return;
                     }
 
@@ -273,7 +273,7 @@ class npc_air_current : public CreatureScript
                 DoCast(me, SPELL_TWISTER_AURA);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
             }
      };

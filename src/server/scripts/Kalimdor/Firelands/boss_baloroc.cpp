@@ -242,7 +242,7 @@ public:
             _EnterEvadeMode();
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                 return;
@@ -262,7 +262,7 @@ public:
                     break;
                 
                 case EVENT_BLAZE_OF_GLORY:
-                    DoCast(me->GetVictim(), SPELL_BLAZE_OF_GLORY);
+                    DoCastVictim(SPELL_BLAZE_OF_GLORY);
                     DoCast(me, SPELL_INCENDIARY_SOUL);
                     
                     events.ScheduleEvent(EVENT_BLAZE_OF_GLORY, 20000);
@@ -346,7 +346,7 @@ public:
             events.ScheduleEvent(EVENT_CHECK_RANGE, 4000);        
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             events.Update(diff);
 

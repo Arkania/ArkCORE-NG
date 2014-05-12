@@ -166,7 +166,7 @@ class boss_erunak_stonespeaker : public CreatureScript
                 summons.Despawn(summon);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -200,7 +200,7 @@ class boss_erunak_stonespeaker : public CreatureScript
                         events.ScheduleEvent(EVENT_EARTH_SHARDS, 20000);
                         break;
                     case EVENT_EMBERSTRIKE:
-                        DoCast(me->GetVictim(), SPELL_EMBERSTRIKE);
+                        DoCastVictim(SPELL_EMBERSTRIKE);
                         events.ScheduleEvent(EVENT_EMBERSTRIKE, 11000);
                         break;
                     case EVENT_LAVA_BOLT:
@@ -289,7 +289,7 @@ class boss_mindbender_ghursha : public CreatureScript
                 instance->SetBossState(DATA_MINDBENDER_GHURSHA, IN_PROGRESS);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -369,7 +369,7 @@ class npc_erunak_earth_shards : public CreatureScript
                 DoCast(me, SPELL_EARTH_SHARDS_AURA);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (uiDespawnTimer <= diff)
                     me->DespawnOrUnsummon();

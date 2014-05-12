@@ -450,7 +450,7 @@ public:
             Talk(RAND(SAY_KILL_1, SAY_KILL_2));
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING) || !phase)
                 return;
@@ -485,7 +485,7 @@ public:
                             break;
 
                         case EVENT_FLAME_BREATH:
-                            DoCast(me->GetVictim(), SPELL_FLAME_BREATH);
+                            DoCastVictim(SPELL_FLAME_BREATH);
                             events.ScheduleEvent(EVENT_FLAME_BREATH, 28000, PHASE_ONE);
                             break;
 
@@ -634,7 +634,7 @@ public:
             events.ScheduleEvent(EVENT_INCREASE, 15000);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             events.Update(diff);
 
@@ -687,7 +687,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (Creature* essence = me->FindNearestCreature(NPC_TWILIGHT_ESSENCE, 4.0f, true)) // Eat that essence
             {
@@ -763,7 +763,7 @@ public:
                 damage = me->GetHealth() - 1;
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (me->HealthBelowPct(3) && !Revived) // Buli knows a better way... me I can't remember what I know
             {
@@ -806,7 +806,7 @@ public:
                 switch (eventId)
                 {
                     case EVENT_SPIT:
-                        DoCast(me->GetVictim(), SPELL_TWI_SPIT);
+                        DoCastVictim(SPELL_TWI_SPIT);
                         events.ScheduleEvent(EVENT_SPIT, urand(9000, 12000));
                     break;
                 }
@@ -854,7 +854,7 @@ public:
             events.ScheduleEvent(EVENT_UNLEASE_ESSENCE, 3000);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             events.Update(diff);
 
@@ -921,7 +921,7 @@ public:
             events.ScheduleEvent(EVENT_DESPAWN, 8000);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             events.Update(diff);
 
@@ -994,7 +994,7 @@ public:
             Talk(SAY_ENTRANCE);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             events.Update(diff);
 
@@ -1092,7 +1092,7 @@ public:
             talkcount = 0;
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             events.Update(diff);
 

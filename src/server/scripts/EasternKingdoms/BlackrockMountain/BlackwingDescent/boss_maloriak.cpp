@@ -234,7 +234,7 @@ public:
             events.ScheduleEvent(EVENT_BERSERK, me->GetMap()->IsHeroic() ? 720000 : 420000);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                 return;
@@ -705,7 +705,7 @@ public:
             me->AddAura(SPELL_FLASH_FREEZE_VISUAL, me);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (timerChecktarget <= diff)
             {

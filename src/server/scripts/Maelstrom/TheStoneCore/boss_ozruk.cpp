@@ -143,7 +143,7 @@ class boss_ozruk : public CreatureScript
                 events.ScheduleEvent(EVENT_ELEM_SPIKE, 12000);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                     return;
@@ -243,7 +243,7 @@ public:
                 me->DespawnOrUnsummon(6000);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (timerAura <= diff)
             {

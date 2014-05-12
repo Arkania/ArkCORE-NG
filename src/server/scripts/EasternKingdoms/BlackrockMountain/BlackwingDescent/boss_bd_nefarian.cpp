@@ -401,7 +401,7 @@ public:
             //}
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                 return;
@@ -645,7 +645,7 @@ public:
             me->DespawnOrUnsummon(100);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -743,7 +743,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             //if(instance->GetBossState(BOSS_CHIMAERON) == DONE)
             //    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -826,7 +826,7 @@ public:
             DoCast(me, SPELL_EMPOWER);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -906,7 +906,7 @@ public:
         uint32 timerDespawn;
         uint32 timerSpawn;
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (timerMove <= diff) // move forward
             {
@@ -954,7 +954,7 @@ public:
             me->AddAura(SPELL_FIREBRUSH_AURA, me);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (timerCheckskeleton <= diff)
             {

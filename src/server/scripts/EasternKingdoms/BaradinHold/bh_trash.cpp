@@ -53,7 +53,7 @@ class npc_containment_unit : public CreatureScript
                 RepellentRayTimer = 10000;
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -106,7 +106,7 @@ class npc_disciple_of_hate : public CreatureScript
                 RunThroughTimer = urand(2000, 4000);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -124,7 +124,7 @@ class npc_disciple_of_hate : public CreatureScript
 
                 if (RunThroughTimer <= diff)
                 {
-                    DoCast(me->GetVictim(), SPELL_RUN_THROUGH);
+                    DoCastVictim(SPELL_RUN_THROUGH);
                     RunThroughTimer = urand(9000, 12000);
                 }
                 else
@@ -166,7 +166,7 @@ class npc_eye_of_occuthar : public CreatureScript
                 GazeTimer = 1000;
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;

@@ -345,7 +345,7 @@ class npc_seeker : public CreatureScript
                 m_uiPrisonTimer = 5000;
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(uint32 uiDiff)
             {
                 if (!UpdateVictim())
                     return;
@@ -355,7 +355,7 @@ class npc_seeker : public CreatureScript
 
                 if (m_uiPrisonTimer <= uiDiff)
                 {
-                    DoCast(me->GetVictim(), SPELL_MAGIC_PRISON);
+                    DoCastVictim(SPELL_MAGIC_PRISON);
                     m_uiPrisonTimer = 31000;
                 }
                 else
@@ -395,7 +395,7 @@ class npc_seed_of_chaos : public CreatureScript
                 m_uiCheckTimer = 1000;
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
 
                 if (!UpdateVictim())
@@ -449,7 +449,7 @@ class npc_reign_of_chaos : public CreatureScript
                 m_uiNovaTimer = urand(1000, 7000);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
 
                 if (!UpdateVictim())

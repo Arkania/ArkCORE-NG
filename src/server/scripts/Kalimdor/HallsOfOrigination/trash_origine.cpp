@@ -34,7 +34,7 @@ public:
           pacte_des_tenebres = 25000;
           }
           
-          void UpdateAI(const uint32 diff)
+          void UpdateAI(uint32 diff)
           {
             if (!UpdateVictim())
             return;
@@ -89,7 +89,7 @@ public:
          tir_charge = 19000;
          }
          
-         void UpdateAI(const uint32 diff)
+         void UpdateAI(uint32 diff)
          {
             if (!UpdateVictim())
             return;
@@ -103,7 +103,7 @@ public:
             
             if (tir<= diff)
             {
-            DoCast(me->GetVictim(), spell_tir);
+            DoCastVictim(spell_tir);
             tir = 2500;
             } else tir -= diff;
             
@@ -149,14 +149,14 @@ public:
          malediction_du_lanceur_de_runes = 15000;
          }
          
-         void UpdateAI(const uint32 diff)
+         void UpdateAI(uint32 diff)
          {
             if (!UpdateVictim())
             return;
             
             if (enchainement_runique<= diff)
             {
-            DoCast(me->GetVictim(), spell_enchainement_runique);
+            DoCastVictim(spell_enchainement_runique);
             enchainement_runique = 10000;
             } else enchainement_runique -= diff;
             
@@ -207,7 +207,7 @@ public:
          meteore = 30000;
          }
          
-         void UpdateAI(const uint32 diff)
+         void UpdateAI(uint32 diff)
          {
             if (!UpdateVictim())
             return;
@@ -220,7 +220,7 @@ public:
             
             if (boule_de_feu<= diff)
             {
-            DoCast(me->GetVictim(), spell_boule_de_feu);
+            DoCastVictim(spell_boule_de_feu);
             boule_de_feu = 4000;
             } else boule_de_feu -= diff;
             
@@ -273,14 +273,14 @@ public:
          projection_corrosive = 10000;
          }
          
-         void UpdateAI(const uint32 diff)
+         void UpdateAI(uint32 diff)
          {
             if (!UpdateVictim())
             return;
             
             if (attaque_a_la_lame_dentelee<= diff)
             {
-            DoCast(me->GetVictim(), spell_attaque_a_la_lame_dentelee);
+            DoCastVictim(spell_attaque_a_la_lame_dentelee);
             attaque_a_la_lame_dentelee = 15000;
             } else attaque_a_la_lame_dentelee -= diff;
             
@@ -326,7 +326,7 @@ public:
          toxine = 10000;
          }
          
-         void UpdateAI(const uint32 diff)
+         void UpdateAI(uint32 diff)
          {
             if (!UpdateVictim())
             return;
@@ -340,7 +340,7 @@ public:
             
             if (toxine<= diff)
             {
-            DoCast(me->GetVictim(), spell_toxine);
+            DoCastVictim(spell_toxine);
             toxine = 10000;
             } else toxine -= diff;
             
@@ -377,14 +377,14 @@ public:
          choc = 5000;
          }
          
-         void UpdateAI(const uint32 diff)
+         void UpdateAI(uint32 diff)
          {
             if (!UpdateVictim())
             return;
             
             if (choc<= diff)
             {
-            DoCast(me->GetVictim(), spell_choc);
+            DoCastVictim(spell_choc);
             choc = 5000;
             } else choc -= diff;
             
@@ -424,14 +424,14 @@ public:
          malediction_depuisement = 10000;
          }
          
-         void UpdateAI(const uint32 diff)
+         void UpdateAI(uint32 diff)
          {
             if (!UpdateVictim())
             return;
             
             if (trait_de_lombre<= diff)
             {
-            DoCast(me->GetVictim(), spell_trait_de_lombre);
+            DoCastVictim(spell_trait_de_lombre);
             trait_de_lombre = 6000;
             } else trait_de_lombre -= diff;
             
@@ -478,7 +478,7 @@ public:
         salve_de_traits_de_lombre = 12000;
         }
         
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
            if (!UpdateVictim())
            return;
@@ -532,7 +532,7 @@ public:
          salve_de_traits_de_lombre = 16000;
          }
          
-         void UpdateAI(const uint32 diff)
+         void UpdateAI(uint32 diff)
          {
             if (!UpdateVictim())
             return;
@@ -582,7 +582,7 @@ public:
         jaillissement_des_arcanes = 15000;
         }
         
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
              if (!UpdateVictim())
              return;
@@ -626,7 +626,7 @@ public:
         barrage_des_arcanes = 8000;
         }
         
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
            if (!UpdateVictim())
            return;
@@ -675,7 +675,7 @@ public :
         flammes_incendiaires = 10000;
         }
           
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
               if (!UpdateVictim())
               return;
@@ -733,7 +733,7 @@ public :
         flammes_incendiaires = 15000;
         }
          
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
             return;
@@ -796,7 +796,7 @@ public :
         flammes_incendiaires = 15000;
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
             return;
@@ -856,14 +856,14 @@ public:
          tempete_de_feu = 13000;
          }
          
-         void UpdateAI(const uint32 diff)
+         void UpdateAI(uint32 diff)
          {
             if (!UpdateVictim())
             return;
             
             if (pietinement_reverberant<= diff)
             {
-            DoCast(me->GetVictim(), spell_pietinement_reverberant);
+            DoCastVictim(spell_pietinement_reverberant);
             pietinement_reverberant = 25000;
             } else pietinement_reverberant -= diff;
             
@@ -914,14 +914,14 @@ public :
           tranquillite = 35000;
           }
           
-          void UpdateAI(const uint32 diff)
+          void UpdateAI(uint32 diff)
           {
              if (!UpdateVictim())
              return;
              
              if (tir<= diff)
              {
-             DoCast(me->GetVictim(), spell_shoot);
+             DoCastVictim(spell_shoot);
              tir = 4000;
              } else tir -= diff;
              
@@ -971,7 +971,7 @@ public :
          souffle_de_spores = 8000;
          }
          
-         void UpdateAI(const uint32 diff)
+         void UpdateAI(uint32 diff)
          {
             if (!UpdateVictim())
             return;
@@ -1019,7 +1019,7 @@ public :
             spores_nauseabondes = 10000;
         }
          
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
             return;

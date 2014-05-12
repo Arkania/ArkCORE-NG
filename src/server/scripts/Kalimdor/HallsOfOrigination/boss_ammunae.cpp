@@ -154,7 +154,7 @@ class boss_ammunae : public CreatureScript
                 summons.push_back(summon->GetGUID());
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(uint32 uiDiff)
             {
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
@@ -401,7 +401,7 @@ class npc_seedling : public CreatureScript
                 i--;
             }
             
-            void UpdateAI(const uint32 /*diff*/)
+            void UpdateAI(uint32 /*diff*/)
             {
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
@@ -442,7 +442,7 @@ class npc_blossom : public CreatureScript
                 m_uiThornSlashTimer = urand(5000, 10000);
             }
 
-            void UpdateAI(const uint32 uiDiff)
+            void UpdateAI(uint32 uiDiff)
             {
                 if (!UpdateVictim())
                     return;
@@ -452,7 +452,7 @@ class npc_blossom : public CreatureScript
                     
                 if (m_uiThornSlashTimer <= uiDiff)
                 {
-                    DoCast(me->GetVictim(), IsHeroic() ? SPELL_THORN_SLASH_H : SPELL_THORN_SLASH);
+                    DoCastVictim(IsHeroic() ? SPELL_THORN_SLASH_H : SPELL_THORN_SLASH);
                     m_uiThornSlashTimer = urand(15000, 20000);
                 }
                 else

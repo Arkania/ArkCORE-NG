@@ -162,7 +162,7 @@ class boss_general_umbriss : public CreatureScript
                 summons.Despawn(summon);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!instance || !UpdateVictim())
                     return;
@@ -190,7 +190,7 @@ class boss_general_umbriss : public CreatureScript
                     switch(eventId)
                     {
                     case EVENT_BLEEDING_WOUND:
-                        DoCast(me->GetVictim(), SPELL_BLEEDING_WOUND);
+                        DoCastVictim(SPELL_BLEEDING_WOUND);
                         events.ScheduleEvent(EVENT_BLEEDING_WOUND, 25000);
                         break;
                     case EVENT_GROUND_SIEGE:
@@ -271,7 +271,7 @@ class npc_malignant_trogg : public CreatureScript
                     DoCast(me, SPELL_MODGUD_MALICE_AURA, true);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -286,7 +286,7 @@ class npc_malignant_trogg : public CreatureScript
                     switch(eventId)
                     {
                     case EVENT_CLAW_PUNCTURE:
-                        DoCast(me->GetVictim(), SPELL_CLAW_PUNCTURE);
+                        DoCastVictim(SPELL_CLAW_PUNCTURE);
                         events.ScheduleEvent(EVENT_CLAW_PUNCTURE, urand(5000, 10000));
                         break;
                     }
@@ -320,7 +320,7 @@ class npc_umbriss_trogg_dweller : public CreatureScript
                 events.ScheduleEvent(EVENT_CLAW_PUNCTURE, 5000);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -335,7 +335,7 @@ class npc_umbriss_trogg_dweller : public CreatureScript
                     switch(eventId)
                     {
                     case EVENT_CLAW_PUNCTURE:
-                        DoCast(me->GetVictim(), SPELL_CLAW_PUNCTURE);
+                        DoCastVictim(SPELL_CLAW_PUNCTURE);
                         events.ScheduleEvent(EVENT_CLAW_PUNCTURE, urand(5000, 10000));
                         break;
                     }

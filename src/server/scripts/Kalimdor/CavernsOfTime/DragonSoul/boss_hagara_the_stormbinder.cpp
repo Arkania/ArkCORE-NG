@@ -107,7 +107,7 @@ public:
             instance->SetBossState(DATA_PORTALS_ON_OFF, IN_PROGRESS);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -308,7 +308,7 @@ class npc_ice_wave : public CreatureScript
                 me->AddAura(105265, me);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -368,7 +368,7 @@ class npc_crystal_conductor : public CreatureScript
                 events.ScheduleEvent(EVENT_CAST_CRYSTAL, urand(5000,10000));
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;

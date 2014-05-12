@@ -56,7 +56,7 @@ public:
             _timer = urand(1800,2200);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
             {
@@ -97,7 +97,7 @@ public:
     {
         npc_docile_island_boarAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void UpdateAI(const uint32 /*diff*/)
+        void UpdateAI(uint32 /*diff*/)
         {
             if (!UpdateVictim())
                 return;
@@ -129,7 +129,7 @@ public:
         uint32 _phase;
         Creature* _boar;
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 if (_timer <= diff)

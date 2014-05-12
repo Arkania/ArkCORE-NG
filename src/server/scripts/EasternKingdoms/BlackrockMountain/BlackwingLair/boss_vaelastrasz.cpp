@@ -178,7 +178,7 @@ public:
                         //Only cast if we are behind
                         /*if (!me->HasInArc(M_PI, me->GetVictim()))
                         {
-                        DoCast(me->GetVictim(), SPELL_TAILSWIPE);
+                        DoCastVictim(SPELL_TAILSWIPE);
                         }*/
                         events.ScheduleEvent(EVENT_TAILSWIPE, 15000);
                         break;

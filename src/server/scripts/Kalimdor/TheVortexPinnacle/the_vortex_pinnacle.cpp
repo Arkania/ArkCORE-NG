@@ -267,7 +267,7 @@ class npc_skyfall_star : public CreatureScript
                 events.ScheduleEvent(EVENT_ARCANE_BARRAGE, urand(5000, 6000));
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -320,7 +320,7 @@ class npc_cloud_prince : public CreatureScript
                 events.ScheduleEvent(EVENT_STARFALL, urand(7000, 15000));
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -378,7 +378,7 @@ class npc_whipping_wind : public CreatureScript
                 events.ScheduleEvent(EVENT_WHW_LIGHTNING_BOLT, 2000);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -393,7 +393,7 @@ class npc_whipping_wind : public CreatureScript
                     switch (eventId)
                     {
                     case EVENT_WHW_LIGHTNING_BOLT:
-                        DoCast(me->GetVictim(), SPELL_WHW_LIGHTNING_BOLT);
+                        DoCastVictim(SPELL_WHW_LIGHTNING_BOLT);
                         events.ScheduleEvent(EVENT_WHW_LIGHTNING_BOLT, 2000);
                         break;
                     }
@@ -444,7 +444,7 @@ class npc_young_storm_dragon : public CreatureScript
                 events.ScheduleEvent(EVENT_CHILLING_BLAST, urand(12000, 15000));
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -459,7 +459,7 @@ class npc_young_storm_dragon : public CreatureScript
                     switch (eventId)
                     {
                     case EVENT_CHILLING_BLAST:
-                        DoCast(me->GetVictim(), SPELL_CHILLING_BLAST);
+                        DoCastVictim(SPELL_CHILLING_BLAST);
                         events.ScheduleEvent(EVENT_CHILLING_BLAST, urand(15000, 18000));
                         break;
                     }
@@ -499,7 +499,7 @@ class npc_armored_mistral : public CreatureScript
                 events.ScheduleEvent(EVENT_STORM_SURGE, urand(10000, 15000));    
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -557,7 +557,7 @@ class npc_empyrean_assassin : public CreatureScript
                 events.ScheduleEvent(EVENT_VAPOR_FORM, urand(15000, 20000));    
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -612,7 +612,7 @@ class npc_executor_of_the_caliph : public CreatureScript
                 events.ScheduleEvent(EVENT_SHOCKWAVE, urand(12000, 20000));
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -635,7 +635,7 @@ class npc_executor_of_the_caliph : public CreatureScript
                         events.ScheduleEvent(EVENT_SHOCKWAVE, urand(16000, 30000));
                         break;
                     case EVENT_DEVASTATE:
-                        DoCast(me->GetVictim(), SPELL_DEVASTATE);
+                        DoCastVictim(SPELL_DEVASTATE);
                         events.ScheduleEvent(EVENT_DEVASTATE, urand(15000, 18000));
                         break;
                     }
@@ -675,7 +675,7 @@ class npc_gust_soldier : public CreatureScript
                 events.ScheduleEvent(EVENT_WIND_BLAST, urand(6000, 8000));
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -694,7 +694,7 @@ class npc_gust_soldier : public CreatureScript
                         events.ScheduleEvent(EVENT_AIR_NOVA, urand(10000, 15000));
                         break;
                     case EVENT_WIND_BLAST:
-                        DoCast(me->GetVictim(), SPELL_WIND_BLAST);
+                        DoCastVictim(SPELL_WIND_BLAST);
                         events.ScheduleEvent(EVENT_WIND_BLAST, urand(6000, 8000));
                         break;
                     }
@@ -778,7 +778,7 @@ class npc_howling_gale : public CreatureScript
                 me->RemoveAurasDueToSpell(SPELL_HOWLING_GALE);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 
                 if (bCombat)
@@ -846,7 +846,7 @@ class npc_minister_of_air : public CreatureScript
 
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -905,7 +905,7 @@ class npc_servant_of_asaad : public CreatureScript
                 events.ScheduleEvent(EVENT_HAND_OF_PROTECTION, urand(10000, 15000));
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -920,7 +920,7 @@ class npc_servant_of_asaad : public CreatureScript
                     switch (eventId)
                     {
                     case EVENT_CRUSADER_STRIKE:
-                        DoCast(me->GetVictim(), SPELL_CRUSADER_STRIKE);
+                        DoCastVictim(SPELL_CRUSADER_STRIKE);
                         events.ScheduleEvent(EVENT_CRUSADER_STRIKE, urand(8000, 12000));
                         break;
                     case EVENT_HAND_OF_PROTECTION:
@@ -964,7 +964,7 @@ class npc_temple_adept : public CreatureScript
                 events.ScheduleEvent(EVENT_DESPERATE_SPEED, urand(10000, 15000));
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -979,7 +979,7 @@ class npc_temple_adept : public CreatureScript
                     switch (eventId)
                     {
                     case EVENT_HOLY_SMITE:
-                        DoCast(me->GetVictim(), SPELL_HOLY_SMITE);
+                        DoCastVictim(SPELL_HOLY_SMITE);
                         events.ScheduleEvent(EVENT_HOLY_SMITE, urand(5000, 6000));
                         break;
                     case EVENT_DESPERATE_SPEED:
@@ -1045,7 +1045,7 @@ class npc_turbulent_squall : public CreatureScript
                 events.ScheduleEvent(EVENT_CLOUDBURST, urand(5000, 30000));
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -1111,7 +1111,7 @@ class npc_wild_vortex : public CreatureScript
                 events.ScheduleEvent(EVENT_CYCLONE, urand(5000, 15000));
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -1136,7 +1136,7 @@ class npc_wild_vortex : public CreatureScript
                         events.ScheduleEvent(EVENT_WIND_SHOCK, urand(10000, 20000));
                         break;
                     case EVENT_WV_LIGHTNING_BOLT:
-                        DoCast(me->GetVictim(), SPELL_WV_LIGHTNING_BOLT);
+                        DoCastVictim(SPELL_WV_LIGHTNING_BOLT);
                         events.ScheduleEvent(EVENT_WV_LIGHTNING_BOLT, 3000);
                         break;
                     }

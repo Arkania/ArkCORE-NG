@@ -378,7 +378,7 @@ public:
             Talk(RAND(SAY_KILL_1, SAY_KILL_2));
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                 return;
@@ -571,7 +571,7 @@ public:
         uint32 timerMove;
         uint32 timerDespawn;
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (timerMove <= diff) // move forward
             {
@@ -612,7 +612,7 @@ public:
         uint32 timerPeriodic;
         uint32 timerDespawn;
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (timerPeriodic <= diff)
             {
@@ -650,11 +650,11 @@ public:
         uint32 timerRemoveAura;
         uint32 timerCast;
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (timerCast <= diff)
             {
-                DoCast(me->GetVictim(), SPELL_OBNOXIOUS);
+                DoCastVictim(SPELL_OBNOXIOUS);
                 timerCast = 3000;
             } else timerCast -= diff;
 
@@ -689,7 +689,7 @@ public:
         uint32 timerSummonFlame;
         uint32 timerDespawn;
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (timerSummonFlame <= diff)
             {
@@ -727,7 +727,7 @@ public:
         uint32 timerPeriodic;
         uint32 timerDespawn;
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (timerPeriodic <= diff)
             {
@@ -865,7 +865,7 @@ public:
                  (*iter)->DespawnOrUnsummon();
         }
 
-        void UpdateAI(const uint32 diff) 
+        void UpdateAI(uint32 diff) 
         {
             if (timer <= diff)
             {

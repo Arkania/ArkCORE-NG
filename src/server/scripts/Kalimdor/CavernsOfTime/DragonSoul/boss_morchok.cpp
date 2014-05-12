@@ -97,7 +97,7 @@ public:
             _EnterCombat();
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                 return;
@@ -213,7 +213,7 @@ public:
             events.ScheduleEvent(EVENT_BLACK_BLOOD_OF_THE_EARTH, 400000);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                 return;

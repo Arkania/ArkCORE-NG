@@ -142,7 +142,7 @@ public:
             events.ScheduleEvent(EVENT_QUAKE, 5000 + rand()%5000);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -157,7 +157,7 @@ public:
                 switch (eventId)
                 {
                     case EVENT_QUAKE:
-                        DoCast(me->GetVictim(), SPELL_QUAKE);
+                        DoCastVictim(SPELL_QUAKE);
                         events.RescheduleEvent(EVENT_QUAKE, 5000 + rand()%5000);
                         return;
                 }
@@ -195,7 +195,7 @@ public:
             events.ScheduleEvent(EVENT_FELL_FIREBALL, 1000);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -249,7 +249,7 @@ public:
             events.ScheduleEvent(EVENT_ROCK_BORE, 1000);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -307,7 +307,7 @@ public:
             events.ScheduleEvent(EVENT_SHADOWFURY, 5000 + rand()%15000);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -327,7 +327,7 @@ public:
                         events.RescheduleEvent(EVENT_MILL_FEAR, 10000);
                         return;
                     case EVENT_SHADOW_BOLT:
-                        DoCast(me->GetVictim(), SPELL_SHADOW_BOLT);
+                        DoCastVictim(SPELL_SHADOW_BOLT);
                         events.RescheduleEvent(EVENT_SHADOWBOLT, 1000);
                         return;
                     case EVENT_FROSTBOLT_VOLLEY:

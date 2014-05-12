@@ -259,7 +259,7 @@ class boss_lady_nazjar : public CreatureScript
                 events.RescheduleEvent(EVENT_SHOCK_BLAST, urand(6000,12000));
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -328,7 +328,7 @@ class boss_lady_nazjar : public CreatureScript
                             events.ScheduleEvent(EVENT_FUNGAL_SPORES, urand(15000,18000));
                             break;
                         case EVENT_SHOCK_BLAST:
-                            DoCast(me->GetVictim(), SPELL_SHOCK_BLAST);
+                            DoCastVictim(SPELL_SHOCK_BLAST);
                             events.ScheduleEvent(EVENT_SHOCK_BLAST, urand(12000,14000));
                             break;
                         }
@@ -366,7 +366,7 @@ class npc_lady_nazjar_honnor_guard : public CreatureScript
                 events.ScheduleEvent(EVENT_START_ATTACK, 2000);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -426,7 +426,7 @@ class npc_lady_nazjar_tempest_witch : public CreatureScript
                 events.ScheduleEvent(EVENT_START_ATTACK, 2000);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -451,7 +451,7 @@ class npc_lady_nazjar_tempest_witch : public CreatureScript
                         events.ScheduleEvent(EVENT_LIGHTNING_SURGE, urand(10000, 15000));
                         break;
                     case EVENT_CHAIN_LIGHTNING:
-                        DoCast(me->GetVictim(), SPELL_CHAIN_LIGHTNING);
+                        DoCastVictim(SPELL_CHAIN_LIGHTNING);
                         events.ScheduleEvent(EVENT_CHAIN_LIGHTNING, 2000);
                         break;
                     }
@@ -538,7 +538,7 @@ class npc_lady_nazjar_geyser : public CreatureScript
                 DoCast(me, SPELL_GEYSER_VISUAL, true);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (uiErruptTimer <= diff && !bErrupt)
                 {

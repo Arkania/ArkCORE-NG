@@ -443,7 +443,7 @@ public:
                     playr->AddAura(SPELL_ELEMENTAL_STASIS, playr); // Trap all players while Monstrosity spawns.
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!instance)
                 return;
@@ -723,7 +723,7 @@ class boss_feludius : public CreatureScript
                 _JustDied();
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING) || !phase)
                     return;
@@ -947,7 +947,7 @@ class boss_ignacious : public CreatureScript
                 _JustDied();
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING) || !phase)
                     return;
@@ -1168,7 +1168,7 @@ class boss_arion : public CreatureScript
                 _JustDied();
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING) || !phase)
                     return;
@@ -1229,7 +1229,7 @@ class boss_arion : public CreatureScript
                             break;
 
                         case EVENT_LIGHTNING_BLAST:
-                            DoCast(me->GetVictim(), SPELL_LIGHTNING_BLAST);
+                            DoCastVictim(SPELL_LIGHTNING_BLAST);
                             break;
 
                         case EVENT_THUNDERSHOCK:
@@ -1401,7 +1401,7 @@ class boss_terrastra : public CreatureScript
                 _JustDied();
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING) || !phase)
                     return;
@@ -1594,7 +1594,7 @@ class boss_monstrosity : public CreatureScript
                     controller->SetHealth(controller->GetHealth() - damage);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                     return;
@@ -1717,7 +1717,7 @@ class npc_feludius_waterbomb : public CreatureScript // 44201
                 events.ScheduleEvent(EVENT_WATER_BOMB_EXPLODE, 100);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
@@ -1766,7 +1766,7 @@ class npc_arion_callwinds : public CreatureScript // 44747
                 events.ScheduleEvent(EVENT_CHECK_WINDS_PLAYER, 1000);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
@@ -1846,7 +1846,7 @@ class npc_monstrosity_liquid_ice : public CreatureScript // 45452
                 events.ScheduleEvent(EVENT_LIQUID_ICE_GROW, 3000);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
@@ -1896,7 +1896,7 @@ class npc_monstrosity_lava_seed : public CreatureScript // 48538
                 events.ScheduleEvent(EVENT_SEED_EXPLODE, 4000);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
@@ -1947,7 +1947,7 @@ class npc_ignacious_flame_strike : public CreatureScript // 49432
                 events.ScheduleEvent(EVENT_FLAME_STRIKE_DAMAGE, 5000);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
@@ -1998,7 +1998,7 @@ class npc_feludius_frozen_orb : public CreatureScript // 49518
                 events.ScheduleEvent(EVENT_FROZEN_DESPAWN, 35000);
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
