@@ -69,8 +69,8 @@ enum eGilneas
     QUEST_BY_THE_SKIN_OF_HIS_TEETH                 = 14154,
     QUEST_THE_REBEL_LORD_ARSENAL                   = 14159,
 
-    SPELL_INVISIBILITY_DETECTION_2                 = 49417,
     SPELL_GENERIC_QUEST_INVISIBILITY_DERECTION_1   = 49416,
+    SPELL_GENERIC_QUEST_INVISIBILITY_DETECTION_2   = 49417,
     SPELL_ENRAGE                                   = 56646,
     SPELL_SET_PHASE_02                             = 59073, // set phase 2
     SPELL_SET_PHASE_04                             = 59074, // set phase 4
@@ -521,7 +521,7 @@ public:
         if (quest->GetQuestId() == QUEST_ROYAL_ORDERS)
         {
             player->RemoveAura(SPELL_GENERIC_QUEST_INVISIBILITY_DERECTION_1);
-            player->AddAura(SPELL_INVISIBILITY_DETECTION_2, player);
+            player->AddAura(SPELL_GENERIC_QUEST_INVISIBILITY_DETECTION_2, player);
             player->CastSpell(player, SPELL_SET_PHASE_04, false);
             player->SaveToDB();
         }
@@ -1209,23 +1209,26 @@ public:
 
     struct npc_josiah_avery_worgen_phase8AI : public ScriptedAI
     {
-        npc_josiah_avery_worgen_phase8AI(Creature* creature) : ScriptedAI(creature)
-        {
-            uiEventTimer = 500;
-            uiPase = 1;
-            uiPlayerGUID = 0;
-            me->SetReactState(REACT_PASSIVE);
+        npc_josiah_avery_worgen_phase8AI(Creature* creature) : ScriptedAI(creature) { }
 
-            if (me->IsSummon())
-                Event = true;
-            else
-                Event = false;
+        Player* _player;
+        uint32  _timer;
+        uint8   _phase;
+        
+        void Reset()
+        {
+            _player=NULL;
+            _timer=0;
+            _phase=0;
         }
 
-        uint64 uiPlayerGUID;
-        uint32 uiEventTimer;
-        uint8 uiPase;
-        bool Event;
+        void StartAnim(Player* player)
+        {
+            _player=player;
+            _phase=1;
+            _timer=1000;
+            me->SetPhaseMask(8, true);
+        }
 
         void SpellHit(Unit* /*caster*/, const SpellInfo* spell)
         {
@@ -1234,37 +1237,38 @@ public:
         }
 
         void UpdateAI(uint32 diff)
-        {
-            if (Event)
-                if (uiEventTimer <= diff)
-                {
+        {           
+                if (_timer <= diff)
+                {                    
                     if (Creature* lorna = me->FindNearestCreature(NPC_LORNA_CROWLEY_PHASE8, 30.0f))
-                        switch (uiPase)
+                    {
+                        switch (_phase)
                         {
                             case 1:
-                                ++uiPase;
-                                uiEventTimer = 1000;
-                                if (Player* player = Unit::GetPlayer(*me, uiPlayerGUID))
-                                {
+                                _phase=2;                                
+                                _timer = 1000;
+                                if (_player)
+                                {   
                                     float x, y, z;
                                     lorna->GetPosition(x, y, z);
-                                    me->CastSpell(player, 91074, false); // unknown spell on wowhead
-                                    player->GetMotionMaster()->MoveJump(x, y, z, 25.0f, 5.0f);
-                                    player->CastSpell(player, SPELL_INFECTED_BITE, true);
+                                    me->CastSpell(_player, 91074, true); // unknown spell on wowhead                                    
+                                    _player->RemoveAura(SPELL_WORGEN_BITE);
+                                    _player->CastSpell(_player, SPELL_INFECTED_BITE, true);
+                                    _player->GetMotionMaster()->MoveJump(x, y, z, 25.0f, 5.0f);
+                                    _player->SaveToDB();
+                                    _player->SetPhaseMask(8, true);
                                 }
                                 break;
-                            case 2:
-                                Event = false;
-                                uiEventTimer = 1000;
-                                float x, y, z;
-                                lorna->GetPosition(x, y, z);
-                                me->GetMotionMaster()->MoveJump(x, y, z, 25.0f, 10.0f);
+                            case 2:     
+                                _phase=0;
+                                _player->SetFacingTo (me->GetAngle(_player->GetPositionX(), _player->GetPositionY()));
                                 lorna->CastSpell(me, SPELL_FAKE_SHOT, false);
                                 break;
                         }
+                    } 
                 }
                 else
-                    uiEventTimer -= diff;
+                    _timer -= diff;
 
             if (!UpdateVictim())
                 return;
@@ -1291,25 +1295,30 @@ public:
     bool OnQuestComplete(Player* player, Creature* creature, const Quest* quest)
     {
         if (quest->GetQuestId() == QUEST_THE_REBEL_LORD_ARSENAL)
+        {           
+            player->CastSpell(player, SPELL_WORGEN_BITE, true);           
+        }
+        return true;
+    }
+
+    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 opt) 
+    {
+        if (quest->GetQuestId() == QUEST_THE_REBEL_LORD_ARSENAL)
         {
             player->RemoveAura(SPELL_SET_PHASE_02);
-            player->RemoveAura(SPELL_INVISIBILITY_DETECTION_2);
-            player->CastSpell(player, SPELL_WORGEN_BITE, true);
+            player->RemoveAura(SPELL_SET_PHASE_04);
+            player->RemoveAura(SPELL_GENERIC_QUEST_INVISIBILITY_DETECTION_2);            
             float p_x, p_y;
             player->GetPosition(p_x, p_y);
             float x, y, z, o = creature->GetAngle(p_x, p_y);
             creature->GetPosition(x, y, z);
-            player->SaveToDB();
-
-            if (Creature* josiah = player->SummonCreature(NPC_JOSIAH_AVERY_WORGEN_PHASE8, x, y, z, o, TEMPSUMMON_CORPSE_DESPAWN, 10000))
-            {
-                CAST_AI(npc_josiah_avery_worgen_phase8::npc_josiah_avery_worgen_phase8AI, josiah->AI())->uiPlayerGUID = player->GetGUID();
-                josiah->SetSeerGUID(player->GetGUID());
-                josiah->SetVisible(false);
+            player->SetPhaseMask(8, true);
+            if (Creature* josiah = player->SummonCreature(NPC_JOSIAH_AVERY_WORGEN_PHASE8, x, y, z, o, TEMPSUMMON_TIMED_DESPAWN, 10000))
+            {        
+                CAST_AI(npc_josiah_avery_worgen_phase8::npc_josiah_avery_worgen_phase8AI, josiah->AI())->StartAnim(player);                
             }
         }
-
-        return true;
+        return true; 
     }
 
     struct npc_josiah_avery_human_phase4AI : public ScriptedAI
