@@ -16014,7 +16014,7 @@ void Player::SetQuestStatus(uint32 quest_id, QuestStatus status)
     UpdateForQuestWorldObjects();
 }
 
-void Player::RemoveActiveQuest(uint32 quest_id)
+void Player::RemoveActiveQuest(uint32 quest_id, bool update /*=true*/)
 {
     QuestStatusMap::iterator itr = m_QuestStatus.find(quest_id);
     if (itr != m_QuestStatus.end())
@@ -16025,12 +16025,14 @@ void Player::RemoveActiveQuest(uint32 quest_id)
         PhaseUpdateData phaseUdateData;
         phaseUdateData.AddQuestUpdate(quest_id);
 
-        phaseMgr.NotifyConditionChanged(phaseUdateData);
-        return;
+        phaseMgr.NotifyConditionChanged(phaseUdateData);        
     }
+
+    if (update)
+        SendQuestUpdate(quest_id);
 }
 
-void Player::RemoveRewardedQuest(uint32 quest_id)
+void Player::RemoveRewardedQuest(uint32 quest_id, bool update /*=true*/)
 {
     RewardedQuestSet::iterator rewItr = m_RewardedQuests.find(quest_id);
     if (rewItr != m_RewardedQuests.end())
@@ -16043,7 +16045,40 @@ void Player::RemoveRewardedQuest(uint32 quest_id)
 
         phaseMgr.NotifyConditionChanged(phaseUdateData);
     }
+
+    if (update)
+        SendQuestUpdate(quest_id);
 }
+
+void Player::SendQuestUpdate(uint32 questId)
+{
+    uint32 zone = 0, area = 0;
+
+    SpellAreaForQuestMapBounds saBounds = sSpellMgr->GetSpellAreaForQuestMapBounds(questId, false);
+    if (saBounds.first != saBounds.second)
+    {
+        GetZoneAndAreaId(zone, area);
+
+        for (SpellAreaForAreaMap::const_iterator itr = saBounds.first; itr != saBounds.second; ++itr)
+            if (itr->second->autocast && itr->second->IsFitToRequirements(this, zone, area))
+                if (!HasAura(itr->second->spellId))
+                    CastSpell(this, itr->second->spellId, true);
+    }
+
+    saBounds = sSpellMgr->GetSpellAreaForQuestEndMapBounds(questId);
+    if (saBounds.first != saBounds.second)
+    {
+        if (!zone || !area)
+            GetZoneAndAreaId(zone, area);
+
+        for (SpellAreaForAreaMap::const_iterator itr = saBounds.first; itr != saBounds.second; ++itr)
+            if (!itr->second->IsFitToRequirements(this, zone, area))
+                RemoveAurasDueToSpell(itr->second->spellId);
+    }
+
+    UpdateForQuestWorldObjects();
+}
+
 
 // not used in Trinity, but used in scripting code
 uint16 Player::GetReqKillOrCastCurrentCount(uint32 quest_id, int32 entry)
