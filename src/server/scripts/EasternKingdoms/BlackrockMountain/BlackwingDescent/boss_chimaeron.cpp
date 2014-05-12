@@ -561,7 +561,7 @@ public:
 class spell_finkles_mixture : public SpellScriptLoader
 {
 public:
-    spell_finkles_mixture() : SpellScriptLoader("spell_finkles_mixture") {}
+    spell_finkles_mixture() : SpellScriptLoader("spell_finkles_mixture") { }
 
     class spell_finkles_mixture_AuraScript : public AuraScript
     {

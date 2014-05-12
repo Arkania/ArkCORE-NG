@@ -46,7 +46,7 @@ enum ScriptTexts
 class boss_ammunae : public CreatureScript
 {
     public:
-        boss_ammunae() : CreatureScript("boss_ammunae") {}
+        boss_ammunae() : CreatureScript("boss_ammunae") { }
 
         CreatureAI* GetAI(Creature* pCreature) const
         {
@@ -366,7 +366,7 @@ class boss_ammunae : public CreatureScript
 class npc_seedling : public CreatureScript
 {
     public:
-        npc_seedling() : CreatureScript("npc_seedling") {}
+        npc_seedling() : CreatureScript("npc_seedling") { }
 
         CreatureAI* GetAI(Creature* pCreature) const
         {
@@ -415,7 +415,7 @@ class npc_seedling : public CreatureScript
 class npc_blossom : public CreatureScript
 {
     public:
-        npc_blossom() : CreatureScript("npc_blossom") {}
+        npc_blossom() : CreatureScript("npc_blossom") { }
 
         CreatureAI* GetAI(Creature* pCreature) const
         {

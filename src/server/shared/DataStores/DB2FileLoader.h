@@ -63,7 +63,7 @@ class DB2FileLoader
         }
 
     private:
-        Record(DB2FileLoader &file_, unsigned char *offset_): offset(offset_), file(file_) {}
+        Record(DB2FileLoader &file_, unsigned char *offset_): offset(offset_), file(file_) { }
         unsigned char *offset;
         DB2FileLoader &file;
 

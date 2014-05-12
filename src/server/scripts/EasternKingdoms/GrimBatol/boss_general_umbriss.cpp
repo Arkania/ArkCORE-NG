@@ -75,7 +75,7 @@ class boss_general_umbriss : public CreatureScript
 {
     public:
 
-        boss_general_umbriss() : CreatureScript("boss_general_umbriss"){}
+        boss_general_umbriss() : CreatureScript("boss_general_umbriss"){ }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -239,7 +239,7 @@ class npc_malignant_trogg : public CreatureScript
 {
     public:
 
-        npc_malignant_trogg() : CreatureScript("npc_malignant_trogg"){}
+        npc_malignant_trogg() : CreatureScript("npc_malignant_trogg"){ }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -300,7 +300,7 @@ class npc_umbriss_trogg_dweller : public CreatureScript
 {
     public:
 
-        npc_umbriss_trogg_dweller() : CreatureScript("npc_umbriss_trogg_dweller"){}
+        npc_umbriss_trogg_dweller() : CreatureScript("npc_umbriss_trogg_dweller"){ }
 
         CreatureAI* GetAI(Creature* creature) const
         {

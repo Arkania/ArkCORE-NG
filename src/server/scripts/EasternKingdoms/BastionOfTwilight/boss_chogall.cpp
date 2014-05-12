@@ -540,7 +540,7 @@ class npc_blaze_chogall : public CreatureScript
 {
 public:
 
-    npc_blaze_chogall() : CreatureScript("npc_blaze_chogall") {}
+    npc_blaze_chogall() : CreatureScript("npc_blaze_chogall") { }
 
     CreatureAI* GetAI(Creature* creature) const 
     {
@@ -637,7 +637,7 @@ class npc_shadow_portal : public CreatureScript
 {
 public:
 
-    npc_shadow_portal() : CreatureScript("npc_shadow_portal") {}
+    npc_shadow_portal() : CreatureScript("npc_shadow_portal") { }
 
     CreatureAI* GetAI(Creature* creature) const 
     {
@@ -700,7 +700,7 @@ class npc_darkened_creation : public CreatureScript
 {
 public:
 
-    npc_darkened_creation() : CreatureScript("npc_darkened_creation") {}
+    npc_darkened_creation() : CreatureScript("npc_darkened_creation") { }
 
     CreatureAI* GetAI(Creature* creature) const 
     {
@@ -750,7 +750,7 @@ class npc_blood_old_god : public CreatureScript
 {
 public:
 
-    npc_blood_old_god() : CreatureScript("npc_blood_old_god") {}
+    npc_blood_old_god() : CreatureScript("npc_blood_old_god") { }
 
     CreatureAI* GetAI(Creature* creature) const 
     {
@@ -827,7 +827,7 @@ class npc_corrupting_adherent : public CreatureScript
 {
 public:
 
-    npc_corrupting_adherent() : CreatureScript("npc_corrupting_adherent") {}
+    npc_corrupting_adherent() : CreatureScript("npc_corrupting_adherent") { }
 
     CreatureAI* GetAI(Creature* creature) const 
     {
@@ -1351,7 +1351,7 @@ class npc_malformation_chogall : public CreatureScript
 {
 public:
 
-    npc_malformation_chogall() : CreatureScript("npc_malformation_chogall") {}
+    npc_malformation_chogall() : CreatureScript("npc_malformation_chogall") { }
 
     CreatureAI* GetAI(Creature* creature) const 
     {

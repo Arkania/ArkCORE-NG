@@ -65,7 +65,7 @@ public:
 
     struct npc_rockjaw_invaderAI : public ScriptedAI
     {
-        npc_rockjaw_invaderAI(Creature *c) : ScriptedAI(c) {}
+        npc_rockjaw_invaderAI(Creature *c) : ScriptedAI(c) { }
 
         uint32 Attack1HTimer;            
 
@@ -111,7 +111,7 @@ public:
 
     struct npc_coldridge_defenderAI : public ScriptedAI
     {
-        npc_coldridge_defenderAI(Creature *c) : ScriptedAI(c) {}
+        npc_coldridge_defenderAI(Creature *c) : ScriptedAI(c) { }
 
         uint32 Attack1HTimer;            
 
@@ -232,7 +232,7 @@ public:
 
     struct npc_soothsayer_shikalaAI : public ScriptedAI
     {
-        npc_soothsayer_shikalaAI(Creature *c) : ScriptedAI(c) {}
+        npc_soothsayer_shikalaAI(Creature *c) : ScriptedAI(c) { }
 
         uint32 timer;  
         uint32 phase;
@@ -338,7 +338,7 @@ public:
 
     struct npc_soothsayer_rikkariAI : public ScriptedAI
     {
-        npc_soothsayer_rikkariAI(Creature *c) : ScriptedAI(c) {}
+        npc_soothsayer_rikkariAI(Creature *c) : ScriptedAI(c) { }
 
         uint32 timer;  
         uint32 phase;
@@ -444,7 +444,7 @@ public:
 
     struct npc_soothsayer_mirimkoaAI : public ScriptedAI
     {
-        npc_soothsayer_mirimkoaAI(Creature *c) : ScriptedAI(c) {}
+        npc_soothsayer_mirimkoaAI(Creature *c) : ScriptedAI(c) { }
 
         uint32 timer;  
         uint32 phase;

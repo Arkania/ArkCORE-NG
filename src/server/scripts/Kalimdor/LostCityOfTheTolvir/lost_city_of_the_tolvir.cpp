@@ -127,7 +127,7 @@ public:
 
     struct npc_pygmy_brute_tvAI : public ScriptedAI
     {
-        npc_pygmy_brute_tvAI(Creature* creature) : ScriptedAI(creature){}
+        npc_pygmy_brute_tvAI(Creature* creature) : ScriptedAI(creature){ }
 
         uint32 uiSummonTimer;
         uint32 uiImpaleTimer;

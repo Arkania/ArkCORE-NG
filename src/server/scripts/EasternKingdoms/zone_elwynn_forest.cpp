@@ -86,7 +86,7 @@ public:
 
     struct npc_blackrock_battle_worgAI : public ScriptedAI
     {
-        npc_blackrock_battle_worgAI(Creature *c) : ScriptedAI(c) {}
+        npc_blackrock_battle_worgAI(Creature *c) : ScriptedAI(c) { }
 
         uint32 Attack1HTimer;
 
@@ -555,7 +555,7 @@ public:
         uint32 lifeTimer;
         bool spellHit;
 
-        npc_henze_faulkAI(Creature *c) : ScriptedAI(c) {}
+        npc_henze_faulkAI(Creature *c) : ScriptedAI(c) { }
 
         void Reset()
         {

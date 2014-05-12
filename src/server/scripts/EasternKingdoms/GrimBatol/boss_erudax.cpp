@@ -280,7 +280,7 @@ class npc_erudax_faceless_corruptor : public CreatureScript
 {
     public:
 
-        npc_erudax_faceless_corruptor() : CreatureScript("npc_erudax_faceless_corruptor"){}
+        npc_erudax_faceless_corruptor() : CreatureScript("npc_erudax_faceless_corruptor"){ }
 
         CreatureAI* GetAI(Creature* creature) const
         {

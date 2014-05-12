@@ -173,7 +173,7 @@ const float maxDistanceBetweenShannoxAndDogs = 110;
 class boss_shannox : public CreatureScript
 {
 public:
-    boss_shannox() : CreatureScript("boss_shannox"){}
+    boss_shannox() : CreatureScript("boss_shannox"){ }
 
     CreatureAI* GetAI(Creature* creature) const
     {
@@ -360,7 +360,7 @@ public:
 
         void UpdateAI(uint32 diff)
         {
-            if (!me->GetVictim()) {}
+            if (!me->GetVictim()) { }
 
             if( (!introSpeechDone) && (!me->IsInCombat()) )
             {
@@ -557,7 +557,7 @@ public:
 class npc_rageface : public CreatureScript
 {
 public:
-    npc_rageface() : CreatureScript("npc_rageface"){}
+    npc_rageface() : CreatureScript("npc_rageface"){ }
 
     CreatureAI* GetAI(Creature* creature) const
     {
@@ -585,7 +585,7 @@ public:
             prisonStartAttack = false;
         }
 
-        void KilledUnit(Unit* /*victim*/) {}
+        void KilledUnit(Unit* /*victim*/) { }
 
         void JustDied(Unit* /*victim*/)
         {
@@ -756,7 +756,7 @@ public:
 class npc_riplimb : public CreatureScript
 {
 public:
-    npc_riplimb() : CreatureScript("npc_riplimb"){}
+    npc_riplimb() : CreatureScript("npc_riplimb"){ }
 
     CreatureAI* GetAI(Creature* creature) const
     {
@@ -787,7 +787,7 @@ public:
             firstLimbRip = false;
         }
 
-        void KilledUnit(Unit* /*victim*/) {}
+        void KilledUnit(Unit* /*victim*/) { }
 
         void JustDied(Unit* /*victim*/)
         {
@@ -818,7 +818,7 @@ public:
 
         void UpdateAI(uint32 diff)
         {
-            if (!me->GetVictim()) {}
+            if (!me->GetVictim()) { }
 
             if(GetShannox() && !me->IsInCombat())
             {
@@ -940,7 +940,7 @@ public:
 class npc_shannox_fake_spear : public CreatureScript
 {
 public:
-    npc_shannox_fake_spear() : CreatureScript("npc_shannox_fake_spear"){}
+    npc_shannox_fake_spear() : CreatureScript("npc_shannox_fake_spear"){ }
 
     CreatureAI* GetAI(Creature* creature) const
     {
@@ -969,7 +969,7 @@ public:
 class npc_shannox_spear : public CreatureScript
 {
 public:
-    npc_shannox_spear() : CreatureScript("npc_shannox_spear"){}
+    npc_shannox_spear() : CreatureScript("npc_shannox_spear"){ }
 
     CreatureAI* GetAI(Creature* creature) const
     {
@@ -988,9 +988,9 @@ public:
 
         InstanceScript* instance;
 
-        void Reset() {}
+        void Reset() { }
 
-        void JustDied(Unit* /*victim*/) {}
+        void JustDied(Unit* /*victim*/) { }
 
         void EnterCombat(Unit* /*who*/)
         {
@@ -1026,7 +1026,7 @@ public:
 class npc_immolation_trap : public CreatureScript
 {
 public:
-    npc_immolation_trap() : CreatureScript("npc_immolation_trap"){}
+    npc_immolation_trap() : CreatureScript("npc_immolation_trap"){ }
 
     CreatureAI* GetAI(Creature* creature) const
     {
@@ -1048,7 +1048,7 @@ public:
         EventMap events;
         Unit* tempTarget;
 
-        void JustDied(Unit* /*victim*/) {}
+        void JustDied(Unit* /*victim*/) { }
 
         void Reset()
         {
@@ -1121,7 +1121,7 @@ public:
 class npc_crystal_trap : public CreatureScript
 {
 public:
-    npc_crystal_trap() : CreatureScript("npc_crystal_trap"){}
+    npc_crystal_trap() : CreatureScript("npc_crystal_trap"){ }
 
     CreatureAI* GetAI(Creature* creature) const
     {
@@ -1145,7 +1145,7 @@ public:
         Unit* tempTarget;
         Creature* myPrison;
 
-        void JustDied(Unit* /*victim*/) {}
+        void JustDied(Unit* /*victim*/) { }
 
         void Reset()
         {
@@ -1249,7 +1249,7 @@ public:
 class achievement_bucket_list : public AchievementCriteriaScript
 {
 public:
-    achievement_bucket_list() : AchievementCriteriaScript("achievement_bucket_list") {}
+    achievement_bucket_list() : AchievementCriteriaScript("achievement_bucket_list") { }
 
     bool OnCheck(Player* /*player*/, Unit* target)
     {

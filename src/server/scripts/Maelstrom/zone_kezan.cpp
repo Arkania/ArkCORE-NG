@@ -91,7 +91,7 @@ class npc_tiki_target : public CreatureScript
 
         struct npc_tiki_targetAI : public ScriptedAI
         {
-            npc_tiki_targetAI(Creature* creature) : ScriptedAI(creature) {}
+            npc_tiki_targetAI(Creature* creature) : ScriptedAI(creature) { }
 
             void Reset()
             {
@@ -116,7 +116,7 @@ class npc_tiki_target : public CreatureScript
 class npc_darkspear_jailor : public CreatureScript
 {
 public:
-    npc_darkspear_jailor() : CreatureScript("npc_darkspear_jailor"){}
+    npc_darkspear_jailor() : CreatureScript("npc_darkspear_jailor"){ }
 
         bool OnGossipHello(Player* pPlayer, Creature* creature)
         {
@@ -147,7 +147,7 @@ public:
 
         struct npc_darkspear_jailorAI : public ScriptedAI
         {
-            npc_darkspear_jailorAI(Creature* creature) : ScriptedAI(creature) {}
+            npc_darkspear_jailorAI(Creature* creature) : ScriptedAI(creature) { }
 
             InstanceScript* instance;
             bool activated;

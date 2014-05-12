@@ -12,4 +12,4 @@
 #include "ScriptedCreature.h"
 #include "bastion_of_twilight.h"
 
-void AddSC_bastion_of_twilight() {}
+void AddSC_bastion_of_twilight() { }

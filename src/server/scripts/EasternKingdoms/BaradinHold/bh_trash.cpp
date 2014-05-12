@@ -26,7 +26,7 @@ enum Spells
 class npc_containment_unit : public CreatureScript
 {
     public:
-        npc_containment_unit() : CreatureScript("npc_containment_unit") {}
+        npc_containment_unit() : CreatureScript("npc_containment_unit") { }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -77,7 +77,7 @@ class npc_containment_unit : public CreatureScript
 class npc_disciple_of_hate : public CreatureScript
 {
     public:
-        npc_disciple_of_hate() : CreatureScript("npc_disciple_of_hate") {}
+        npc_disciple_of_hate() : CreatureScript("npc_disciple_of_hate") { }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -138,7 +138,7 @@ class npc_disciple_of_hate : public CreatureScript
 class npc_eye_of_occuthar : public CreatureScript
 {
     public:
-        npc_eye_of_occuthar() : CreatureScript("npc_eye_of_occuthar") {}
+        npc_eye_of_occuthar() : CreatureScript("npc_eye_of_occuthar") { }
 
         CreatureAI* GetAI(Creature* creature) const
         {

@@ -377,7 +377,7 @@ public:
 
     struct npc_prince_liam_greymane_introAI : public ScriptedAI
     {
-        npc_prince_liam_greymane_introAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_prince_liam_greymane_introAI(Creature* creature) : ScriptedAI(creature) { }
 
         uint32 uiSayTimer;
         uint8 uiSayCount;
@@ -785,7 +785,7 @@ enum qEMS
 class npc_qems_citizen : public CreatureScript
 {
 public:
-    npc_qems_citizen() : CreatureScript("npc_qems_citizen") {}
+    npc_qems_citizen() : CreatureScript("npc_qems_citizen") { }
 
     struct npc_qems_citizenAI : public npc_escortAI
     {
@@ -849,7 +849,7 @@ public:
 class npc_qems_worgen : public CreatureScript
 {
 public:
-    npc_qems_worgen() : CreatureScript("npc_qems_worgen") {}
+    npc_qems_worgen() : CreatureScript("npc_qems_worgen") { }
 
     struct npc_qems_worgenAI : public npc_escortAI
     {
@@ -1028,7 +1028,7 @@ public:
 
     struct npc_king_genn_greymane_qodAI : public ScriptedAI
     {
-        npc_king_genn_greymane_qodAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_king_genn_greymane_qodAI(Creature* creature) : ScriptedAI(creature) { }
 
         std::list<Psc> lPlayerList;
 
@@ -1100,7 +1100,7 @@ enum eQPR
 class npc_worgen_attacker : public CreatureScript
 {
 public:
-    npc_worgen_attacker() : CreatureScript("npc_worgen_attacker") {}
+    npc_worgen_attacker() : CreatureScript("npc_worgen_attacker") { }
 
     struct npc_worgen_attackerAI : public npc_escortAI
     {
@@ -1608,7 +1608,7 @@ public:
 
     struct npc_bloodfang_lurkerAI : public ScriptedAI
     {
-        npc_bloodfang_lurkerAI(Creature* creature) : ScriptedAI(creature){}
+        npc_bloodfang_lurkerAI(Creature* creature) : ScriptedAI(creature){ }
 
         bool enrage;
         bool frenzy;
@@ -1747,7 +1747,7 @@ public:
 class npc_vehicle_genn_horse : public CreatureScript
 {
 public:
-    npc_vehicle_genn_horse() : CreatureScript("npc_vehicle_genn_horse") {}
+    npc_vehicle_genn_horse() : CreatureScript("npc_vehicle_genn_horse") { }
 
     struct npc_vehicle_genn_horseAI : public npc_escortAI
     {
@@ -2241,7 +2241,7 @@ const float SecondRoundWP[90][3]=
 class npc_crowley_horse : public CreatureScript
 {
 public:
-    npc_crowley_horse() : CreatureScript("npc_crowley_horse") {}
+    npc_crowley_horse() : CreatureScript("npc_crowley_horse") { }
 
     struct npc_crowley_horseAI : public npc_escortAI
     {
@@ -2333,7 +2333,7 @@ public:
 
     struct npc_bloodfang_stalkerAI : public ScriptedAI
     {
-        npc_bloodfang_stalkerAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_bloodfang_stalkerAI(Creature* creature) : ScriptedAI(creature) { }
 
         Player* player;
         uint32 tEnrage;
@@ -2444,7 +2444,7 @@ public:
 class npc_crowley_horse_second_round : public CreatureScript
 {
 public:
-    npc_crowley_horse_second_round() : CreatureScript("npc_crowley_horse_second_round") {}
+    npc_crowley_horse_second_round() : CreatureScript("npc_crowley_horse_second_round") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
@@ -2963,7 +2963,7 @@ enum qINI
 class go_crate_of_mandrake_essence : public GameObjectScript
 {
 public:
-    go_crate_of_mandrake_essence() : GameObjectScript("go_crate_of_mandrake_essence"){}
+    go_crate_of_mandrake_essence() : GameObjectScript("go_crate_of_mandrake_essence"){ }
 
     bool OnQuestComplete(Player* player, GameObject* /*go*/, Quest const* quest)
     {
@@ -3471,7 +3471,7 @@ public:
 class npc_ashley : public CreatureScript
 {
 public:
-    npc_ashley() : CreatureScript("npc_ashley") {}
+    npc_ashley() : CreatureScript("npc_ashley") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
@@ -3536,7 +3536,7 @@ public:
 class npc_cynthia : public CreatureScript
 {
 public:
-    npc_cynthia() : CreatureScript("npc_cynthia") {}
+    npc_cynthia() : CreatureScript("npc_cynthia") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
@@ -3638,7 +3638,7 @@ enum qGFB
 class npc_drowning_watchman : public CreatureScript
 {
 public:
-    npc_drowning_watchman() : CreatureScript("npc_drowning_watchman") {}
+    npc_drowning_watchman() : CreatureScript("npc_drowning_watchman") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
@@ -3735,7 +3735,7 @@ public:
 
     struct npc_prince_liam_greymaneAI : public ScriptedAI
     {
-        npc_prince_liam_greymaneAI(Creature* creature) : ScriptedAI(creature){}
+        npc_prince_liam_greymaneAI(Creature* creature) : ScriptedAI(creature){ }
 
         void MoveInLineOfSight(Unit* who)
         {
@@ -3801,7 +3801,7 @@ enum qGC
 class npc_wahl : public CreatureScript
 {
 public:
-    npc_wahl() : CreatureScript("npc_wahl") {}
+    npc_wahl() : CreatureScript("npc_wahl") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
@@ -4235,7 +4235,7 @@ enum qTGM
 class npc_swift_mountain_horse : public CreatureScript
 {
 public:
-    npc_swift_mountain_horse() : CreatureScript("npc_swift_mountain_horse") {}
+    npc_swift_mountain_horse() : CreatureScript("npc_swift_mountain_horse") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
@@ -4561,7 +4561,7 @@ public:
 class npc_stagecoach_harness : public CreatureScript
 {
 public:
-    npc_stagecoach_harness() : CreatureScript("npc_stagecoach_harness") {}
+    npc_stagecoach_harness() : CreatureScript("npc_stagecoach_harness") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
@@ -4907,7 +4907,7 @@ public:
 
     struct npc_swamp_crocoliskAI : public ScriptedAI
     {
-        npc_swamp_crocoliskAI(Creature* creature) : ScriptedAI(creature){}
+        npc_swamp_crocoliskAI(Creature* creature) : ScriptedAI(creature){ }
 
         bool miss;
 
@@ -5413,7 +5413,7 @@ public:
 class npc_koroth_the_hillbreaker_qiao : public CreatureScript
 {
 public:
-    npc_koroth_the_hillbreaker_qiao() : CreatureScript("npc_koroth_the_hillbreaker_qiao") {}
+    npc_koroth_the_hillbreaker_qiao() : CreatureScript("npc_koroth_the_hillbreaker_qiao") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
@@ -5465,7 +5465,7 @@ public:
 class go_koroth_banner : public GameObjectScript
 {
 public:
-    go_koroth_banner() : GameObjectScript("go_koroth_banner") {}
+    go_koroth_banner() : GameObjectScript("go_koroth_banner") { }
 
     bool OnGossipHello(Player* player, GameObject* go)
     {
@@ -5495,7 +5495,7 @@ public:
 
     struct npc_koroth_the_hillbreakerAI : public ScriptedAI
     {
-        npc_koroth_the_hillbreakerAI(Creature* creature) : ScriptedAI(creature){}
+        npc_koroth_the_hillbreakerAI(Creature* creature) : ScriptedAI(creature){ }
 
         void UpdateAI(uint32 /*diff*/)
         {
@@ -5539,7 +5539,7 @@ public:
 
     struct npc_dark_scout_summonerAI : public ScriptedAI
     {
-        npc_dark_scout_summonerAI(Creature* creature) : ScriptedAI(creature){}
+        npc_dark_scout_summonerAI(Creature* creature) : ScriptedAI(creature){ }
 
         void MoveInLineOfSight(Unit* who)
         {
@@ -5571,7 +5571,7 @@ public:
 class npc_dark_scout : public CreatureScript
 {
 public:
-    npc_dark_scout() : CreatureScript("npc_dark_scout") {}
+    npc_dark_scout() : CreatureScript("npc_dark_scout") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
@@ -5709,7 +5709,7 @@ static float WorgensBackPos[8][3] =
 class npc_taldoren_tracker : public CreatureScript
 {
 public:
-    npc_taldoren_tracker() : CreatureScript("npc_taldoren_tracker") {}
+    npc_taldoren_tracker() : CreatureScript("npc_taldoren_tracker") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
@@ -5932,7 +5932,7 @@ enum qNHNB
 class go_qnhnb_well : public GameObjectScript
 {
 public:
-    go_qnhnb_well() : GameObjectScript("go_qnhnb_well"){}
+    go_qnhnb_well() : GameObjectScript("go_qnhnb_well"){ }
 
     void SummonPersonalTrigger(Player* player, GameObject* go)
     {
@@ -5994,7 +5994,7 @@ public:
 class npc_lord_godfrey_qnhnb : public CreatureScript
 {
 public:
-    npc_lord_godfrey_qnhnb() : CreatureScript("npc_lord_godfrey_qnhnb") {}
+    npc_lord_godfrey_qnhnb() : CreatureScript("npc_lord_godfrey_qnhnb") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
@@ -6003,7 +6003,7 @@ public:
 
     struct npc_lord_godfrey_qnhnbAI : public npc_escortAI
     {
-        npc_lord_godfrey_qnhnbAI(Creature* creature) : npc_escortAI(creature) {}
+        npc_lord_godfrey_qnhnbAI(Creature* creature) : npc_escortAI(creature) { }
 
         void WaypointReached(uint32 point)
         {
@@ -6022,7 +6022,7 @@ public:
 class npc_lorna_crowley_qnhnb : public CreatureScript
 {
 public:
-    npc_lorna_crowley_qnhnb() : CreatureScript("npc_lorna_crowley_qnhnb") {}
+    npc_lorna_crowley_qnhnb() : CreatureScript("npc_lorna_crowley_qnhnb") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
@@ -6082,7 +6082,7 @@ public:
 class npc_king_genn_greymane_qnhnb : public CreatureScript
 {
 public:
-    npc_king_genn_greymane_qnhnb() : CreatureScript("npc_king_genn_greymane_qnhnb") {}
+    npc_king_genn_greymane_qnhnb() : CreatureScript("npc_king_genn_greymane_qnhnb") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
@@ -6434,7 +6434,7 @@ public:
 class npc_lord_godfrey_qbatr : public CreatureScript
 {
 public:
-    npc_lord_godfrey_qbatr() : CreatureScript("npc_lord_godfrey_qbatr") {}
+    npc_lord_godfrey_qbatr() : CreatureScript("npc_lord_godfrey_qbatr") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
@@ -6542,7 +6542,7 @@ enum qLD
 class go_ball_and_chain_qld : public GameObjectScript
 {
 public:
-    go_ball_and_chain_qld() : GameObjectScript("go_ball_and_chain_qld"){}
+    go_ball_and_chain_qld() : GameObjectScript("go_ball_and_chain_qld"){ }
 
     bool OnGossipHello(Player* player, GameObject* go)
     {
@@ -6880,7 +6880,7 @@ enum qTBFGC
 class npc_prince_liam_greymane_tbfgc : public CreatureScript
 {
 public:
-    npc_prince_liam_greymane_tbfgc() : CreatureScript("npc_prince_liam_greymane_tbfgc") {}
+    npc_prince_liam_greymane_tbfgc() : CreatureScript("npc_prince_liam_greymane_tbfgc") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
@@ -7786,7 +7786,7 @@ public:
 class npc_gilnean_militia_tbfgc : public CreatureScript
 {
 public:
-    npc_gilnean_militia_tbfgc() : CreatureScript("npc_gilnean_militia_tbfgc") {}
+    npc_gilnean_militia_tbfgc() : CreatureScript("npc_gilnean_militia_tbfgc") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
@@ -7899,7 +7899,7 @@ public:
 class npc_myriam_spellwaker_tbfgc : public CreatureScript
 {
 public:
-    npc_myriam_spellwaker_tbfgc() : CreatureScript("npc_myriam_spellwaker_tbfgc"){}
+    npc_myriam_spellwaker_tbfgc() : CreatureScript("npc_myriam_spellwaker_tbfgc"){ }
 
     CreatureAI* GetAI(Creature* creature) const
     {
@@ -8004,7 +8004,7 @@ public:
 class npc_sister_almyra_tbfgc : public CreatureScript
 {
 public:
-    npc_sister_almyra_tbfgc() : CreatureScript("npc_sister_almyra_tbfgc") {}
+    npc_sister_almyra_tbfgc() : CreatureScript("npc_sister_almyra_tbfgc") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
@@ -8125,7 +8125,7 @@ public:
 class npc_dark_ranger_elite_tbfgc : public CreatureScript
 {
 public:
-    npc_dark_ranger_elite_tbfgc() : CreatureScript("npc_dark_ranger_elite_tbfgc") {}
+    npc_dark_ranger_elite_tbfgc() : CreatureScript("npc_dark_ranger_elite_tbfgc") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
@@ -8187,7 +8187,7 @@ public:
 class npc_emberstone_cannon : public CreatureScript
 {
 public:
-    npc_emberstone_cannon() : CreatureScript("npc_emberstone_cannon") {}
+    npc_emberstone_cannon() : CreatureScript("npc_emberstone_cannon") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
@@ -8226,7 +8226,7 @@ public:
 class npc_lorna_crowley_tbfgc : public CreatureScript
 {
 public:
-    npc_lorna_crowley_tbfgc() : CreatureScript("npc_lorna_crowley_tbfgc") {}
+    npc_lorna_crowley_tbfgc() : CreatureScript("npc_lorna_crowley_tbfgc") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
@@ -8305,7 +8305,7 @@ public:
 class npc_lord_darius_crowley_tbfgc : public CreatureScript
 {
 public:
-    npc_lord_darius_crowley_tbfgc() : CreatureScript("npc_lord_darius_crowley_tbfgc") {}
+    npc_lord_darius_crowley_tbfgc() : CreatureScript("npc_lord_darius_crowley_tbfgc") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
@@ -8455,7 +8455,7 @@ public:
 class worgen_warrior_tbfgc : public CreatureScript
 {
 public:
-    worgen_warrior_tbfgc() : CreatureScript("worgen_warrior_tbfgc") {}
+    worgen_warrior_tbfgc() : CreatureScript("worgen_warrior_tbfgc") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
@@ -8649,7 +8649,7 @@ public:
 class npc_king_genn_greymane_tbfgc : public CreatureScript
 {
 public:
-    npc_king_genn_greymane_tbfgc() : CreatureScript("npc_king_genn_greymane_tbfgc") {}
+    npc_king_genn_greymane_tbfgc() : CreatureScript("npc_king_genn_greymane_tbfgc") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
@@ -9140,7 +9140,7 @@ public:
 class npc_tobias_mistmantle_qthfs : public CreatureScript
 {
 public:
-    npc_tobias_mistmantle_qthfs() : CreatureScript("npc_tobias_mistmantle_qthfs") {}
+    npc_tobias_mistmantle_qthfs() : CreatureScript("npc_tobias_mistmantle_qthfs") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
@@ -9402,7 +9402,7 @@ public:
 class npc_lady_sylvanas_qthfs : public CreatureScript
 {
 public:
-    npc_lady_sylvanas_qthfs() : CreatureScript("npc_lady_sylvanas_qthfs") {}
+    npc_lady_sylvanas_qthfs() : CreatureScript("npc_lady_sylvanas_qthfs") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
@@ -9448,7 +9448,7 @@ public:
 class npc_general_warhowl_qthfs : public CreatureScript
 {
 public:
-    npc_general_warhowl_qthfs() : CreatureScript("npc_general_warhowl_qthfs"){}
+    npc_general_warhowl_qthfs() : CreatureScript("npc_general_warhowl_qthfs"){ }
 
     CreatureAI* GetAI(Creature* creature) const
     {
@@ -9480,7 +9480,7 @@ public:
 class npc_high_executor_crenshaw_qthfs : public CreatureScript
 {
 public:
-    npc_high_executor_crenshaw_qthfs() : CreatureScript("npc_high_executor_crenshaw_qthfs") {}
+    npc_high_executor_crenshaw_qthfs() : CreatureScript("npc_high_executor_crenshaw_qthfs") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
@@ -9537,7 +9537,7 @@ const float BatWP[25][3]=
 class npc_captured_riding_bat : public CreatureScript
 {
 public:
-    npc_captured_riding_bat() : CreatureScript("npc_captured_riding_bat") {}
+    npc_captured_riding_bat() : CreatureScript("npc_captured_riding_bat") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
@@ -9645,7 +9645,7 @@ enum qPB
 class npc_gilneas_funeral_camera : public CreatureScript
 {
 public:
-    npc_gilneas_funeral_camera() : CreatureScript("npc_gilneas_funeral_camera") {}
+    npc_gilneas_funeral_camera() : CreatureScript("npc_gilneas_funeral_camera") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
@@ -10578,7 +10578,7 @@ public:
 
     struct npc_attack_mastiffAI : public ScriptedAI
     {
-        npc_attack_mastiffAI(Creature* creature) : ScriptedAI(creature){}
+        npc_attack_mastiffAI(Creature* creature) : ScriptedAI(creature){ }
 
         uint32 uiDemoralizingRoarTimer;
         uint32 uiLeapTimer;

@@ -2088,7 +2088,7 @@ namespace Trinity
         public:
             MonsterCustomChatBuilder(WorldObject const* obj, ChatMsg msgtype, const char* text, uint32 language, WorldObject const* target)
                 : i_object(obj), i_msgtype(msgtype), i_text(text), i_language(Language(language)), i_target(target)
-            {}
+            { }
             void operator()(WorldPacket& data, LocaleConstant loc_idx)
             {
                 ChatHandler::BuildChatPacket(data, i_msgtype, i_language, i_object, i_target, i_text, 0, "", loc_idx);

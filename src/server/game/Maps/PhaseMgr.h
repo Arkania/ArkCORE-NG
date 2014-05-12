@@ -73,7 +73,7 @@ typedef UNORDERED_MAP<uint32 /*spellId*/, SpellPhaseInfo> SpellPhaseStore;
 
 struct PhaseInfo
 {
-    PhaseInfo() : phasemask(0), terrainswapmap(0), phaseId(0) {}
+    PhaseInfo() : phasemask(0), terrainswapmap(0), phaseId(0) { }
 
     uint32 phasemask;
     uint32 terrainswapmap;
@@ -87,7 +87,7 @@ typedef UNORDERED_MAP<uint32 /*spellId*/, PhaseInfo> PhaseInfoContainer;
 
 struct PhaseData
 {
-    PhaseData(Player* _player) : _PhasemaskThroughDefinitions(0), _PhasemaskThroughAuras(0), _CustomPhasemask(0), player(_player) {}
+    PhaseData(Player* _player) : _PhasemaskThroughDefinitions(0), _PhasemaskThroughAuras(0), _CustomPhasemask(0), player(_player) { }
 
     uint32 _PhasemaskThroughDefinitions;
     uint32 _PhasemaskThroughAuras;
@@ -131,7 +131,7 @@ class PhaseMgr
 {
 public:
     PhaseMgr(Player* _player);
-    ~PhaseMgr() {}
+    ~PhaseMgr() { }
 
     uint32 GetCurrentPhasemask() { return phaseData.GetCurrentPhasemask(); };
     inline uint32 GetPhaseMaskForSpawn() { return phaseData.GetCurrentPhasemask(); }

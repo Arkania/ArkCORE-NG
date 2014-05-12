@@ -203,32 +203,32 @@ class instance_firelands : public InstanceMapScript
                 {
                     case DATA_SHANNOX:
                         uiEncounter[0] = data;
-                        if(data == DONE) {};
+                        if(data == DONE) { };
                         break;
                     case DATA_BETHTILAC:
                         uiEncounter[1] = data;
                         HandleGameObject(BethtilacDoorGUID, data != IN_PROGRESS);
-                        if(data == DONE) {};
+                        if(data == DONE) { };
                         break;
                     case DATA_LORD_RHYOLITH:
                         uiEncounter[2] = data;
-                        if(data == DONE) {};
+                        if(data == DONE) { };
                         break;
                     case DATA_ALYSRAZAR:
                         uiEncounter[3] = data;
-                        if(data == DONE) {};
+                        if(data == DONE) { };
                         break;
                     case DATA_BALOROC:
                         uiEncounter[4] = data;
-                        if(data == DONE) {};
+                        if(data == DONE) { };
                         break;
                     case DATA_MAJORDOMUS:
                         uiEncounter[5] = data;
-                        if(data == DONE) {};
+                        if(data == DONE) { };
                         break;
                     case DATA_RAGNAROS:
                         uiEncounter[6] = data;
-                        if(data == DONE) {};
+                        if(data == DONE) { };
                         break;
                 }
 

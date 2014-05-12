@@ -149,7 +149,7 @@ Position const SpinderlingsPos[5] =
 class boss_bethtilac : public CreatureScript
 {
 public:
-    boss_bethtilac() : CreatureScript("boss_bethtilac"){}
+    boss_bethtilac() : CreatureScript("boss_bethtilac"){ }
 
     struct boss_bethtilacAI : public ScriptedAI
     {
@@ -434,7 +434,7 @@ typedef boss_bethtilac::boss_bethtilacAI BethtilacAI;
 class npc_cinderweb_spinner : public CreatureScript  // свисающий пиздюк
 {
 public:
-    npc_cinderweb_spinner() : CreatureScript("npc_cinderweb_spinner"){}
+    npc_cinderweb_spinner() : CreatureScript("npc_cinderweb_spinner"){ }
 
     struct npc_cinderweb_spinnerAI : public ScriptedAI
     {
@@ -558,7 +558,7 @@ public:
 class npc_cinderweb_drone : public CreatureScript   // большой пиздюк
 {
 public:
-    npc_cinderweb_drone() : CreatureScript("npc_cinderweb_drone"){}
+    npc_cinderweb_drone() : CreatureScript("npc_cinderweb_drone"){ }
 
     struct npc_cinderweb_droneAI : public ScriptedAI
     {
@@ -743,7 +743,7 @@ public:
 class npc_cinderweb_spiderling : public CreatureScript //пиздючченыш
 {
 public:
-    npc_cinderweb_spiderling() : CreatureScript("npc_cinderweb_spiderling"){}
+    npc_cinderweb_spiderling() : CreatureScript("npc_cinderweb_spiderling"){ }
 
     struct npc_cinderweb_spiderlingAI : public ScriptedAI
     {
@@ -983,7 +983,7 @@ public:
 class npc_web_filament : public CreatureScript
 {
 public:
-    npc_web_filament() : CreatureScript("npc_web_filament"){}
+    npc_web_filament() : CreatureScript("npc_web_filament"){ }
 
     struct npc_web_filamentAI : public ScriptedAI
     {

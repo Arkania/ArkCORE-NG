@@ -17,11 +17,11 @@
 class npc_gardien_dair: public CreatureScript
 {
 public:
-       npc_gardien_dair() : CreatureScript("npc_gardien_dair") {}
+       npc_gardien_dair() : CreatureScript("npc_gardien_dair") { }
  
        struct npc_gardien_dairAI : public ScriptedAI
        {
-            npc_gardien_dairAI(Creature * pCreature) : ScriptedAI(pCreature) {}
+            npc_gardien_dairAI(Creature * pCreature) : ScriptedAI(pCreature) { }
             
             uint32 cisaille_de_vent;
             
@@ -63,11 +63,11 @@ public:
 class npc_gardien_de_flammes: public CreatureScript
 {
 public:
-       npc_gardien_de_flammes() : CreatureScript("npc_gardien_de_flammes") {}
+       npc_gardien_de_flammes() : CreatureScript("npc_gardien_de_flammes") { }
        
        struct npc_gardien_de_flammesAI : public ScriptedAI
        {
-              npc_gardien_de_flammesAI(Creature * pCreature) : ScriptedAI(pCreature) {}
+              npc_gardien_de_flammesAI(Creature * pCreature) : ScriptedAI(pCreature) { }
               
               uint32 eruption_de_lave;
               uint32 inferno_dechaine;
@@ -110,11 +110,11 @@ public:
 class npc_gardien_de_terre: public CreatureScript
 {
 public:
-    npc_gardien_de_terre() : CreatureScript("npc_gardien_de_terre") {}
+    npc_gardien_de_terre() : CreatureScript("npc_gardien_de_terre") { }
 
         struct npc_gardien_de_terreAI : public ScriptedAI
         {    
-         npc_gardien_de_terreAI(Creature * pCreature) : ScriptedAI(pCreature) {}
+         npc_gardien_de_terreAI(Creature * pCreature) : ScriptedAI(pCreature) { }
 
             uint32 empaler;
             uint32 vague_de_roche;

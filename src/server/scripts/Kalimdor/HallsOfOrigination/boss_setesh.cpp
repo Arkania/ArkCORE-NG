@@ -50,7 +50,7 @@ enum Npc
 class boss_setesh : public CreatureScript
 {
     public:
-        boss_setesh() : CreatureScript("boss_setesh") {}
+        boss_setesh() : CreatureScript("boss_setesh") { }
 
         CreatureAI* GetAI(Creature* pCreature) const
         {
@@ -194,7 +194,7 @@ class boss_setesh : public CreatureScript
 class npc_portal : public CreatureScript
 {
     public:
-        npc_portal() : CreatureScript("npc_portal") {}
+        npc_portal() : CreatureScript("npc_portal") { }
 
         CreatureAI* GetAI(Creature* pCreature) const
         {
@@ -278,7 +278,7 @@ class npc_portal : public CreatureScript
 class npc_sentinel : public CreatureScript
 {
     public:
-        npc_sentinel() : CreatureScript("npc_sentinel") {}
+        npc_sentinel() : CreatureScript("npc_sentinel") { }
 
         CreatureAI* GetAI(Creature* pCreature) const
         {
@@ -318,7 +318,7 @@ class npc_sentinel : public CreatureScript
 class npc_seeker : public CreatureScript
 {
     public:
-        npc_seeker() : CreatureScript("npc_seeker") {}
+        npc_seeker() : CreatureScript("npc_seeker") { }
 
         CreatureAI* GetAI(Creature* pCreature) const
         {

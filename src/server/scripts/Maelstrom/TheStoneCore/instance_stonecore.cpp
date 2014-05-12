@@ -25,7 +25,7 @@ public:
 
     struct instance_stonecore_InstanceMapScript : public InstanceScript
     {
-        instance_stonecore_InstanceMapScript(Map* map) : InstanceScript(map) {};
+        instance_stonecore_InstanceMapScript(Map* map) : InstanceScript(map) { };
 
         uint64 Corborus;
         uint64 Slabhide;

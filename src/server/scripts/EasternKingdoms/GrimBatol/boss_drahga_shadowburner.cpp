@@ -366,7 +366,7 @@ class npc_invocation_of_flame_stalker : public CreatureScript
 {
     public:
 
-        npc_invocation_of_flame_stalker() : CreatureScript("npc_invocation_of_flame_stalker"){}
+        npc_invocation_of_flame_stalker() : CreatureScript("npc_invocation_of_flame_stalker"){ }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -405,7 +405,7 @@ class npc_invoked_flaming_spirit : public CreatureScript
 {
     public:
 
-        npc_invoked_flaming_spirit() : CreatureScript("npc_invoked_flaming_spirit"){}
+        npc_invoked_flaming_spirit() : CreatureScript("npc_invoked_flaming_spirit"){ }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -452,7 +452,7 @@ class npc_seeping_twilight : public CreatureScript
 {
     public:
 
-        npc_seeping_twilight() : CreatureScript("npc_seeping_twilight"){}
+        npc_seeping_twilight() : CreatureScript("npc_seeping_twilight"){ }
 
         CreatureAI* GetAI(Creature* creature) const
         {

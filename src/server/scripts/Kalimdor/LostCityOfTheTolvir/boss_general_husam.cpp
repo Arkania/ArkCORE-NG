@@ -484,7 +484,7 @@ public:
 
     struct npc_bad_intentios_targetAI : public ScriptedAI
     {
-        npc_bad_intentios_targetAI(Creature* creature) : ScriptedAI(creature){}
+        npc_bad_intentios_targetAI(Creature* creature) : ScriptedAI(creature){ }
 
         uint32 uiExitTimer;
         bool Passenger;

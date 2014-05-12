@@ -1022,7 +1022,7 @@ class boss_ragnaros_firelands : public CreatureScript
 class npc_sulfuras_smash_trigger : public CreatureScript // 53266
 {
     public:
-        npc_sulfuras_smash_trigger() : CreatureScript("npc_sulfuras_smash_trigger") {}
+        npc_sulfuras_smash_trigger() : CreatureScript("npc_sulfuras_smash_trigger") { }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -1107,7 +1107,7 @@ class npc_sulfuras_smash_trigger : public CreatureScript // 53266
 class npc_sulfuras_smash : public CreatureScript // 53268
 {
     public:
-        npc_sulfuras_smash() : CreatureScript("npc_sulfuras_smash") {}
+        npc_sulfuras_smash() : CreatureScript("npc_sulfuras_smash") { }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -1159,7 +1159,7 @@ class npc_sulfuras_smash : public CreatureScript // 53268
 class npc_magma_trap : public CreatureScript
 {
     public:
-        npc_magma_trap() : CreatureScript("npc_magma_trap") {}
+        npc_magma_trap() : CreatureScript("npc_magma_trap") { }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -1216,7 +1216,7 @@ class npc_magma_trap : public CreatureScript
 class npc_splitting_blow : public CreatureScript
 {
     public:
-        npc_splitting_blow() : CreatureScript("npc_splitting_blow") {}
+        npc_splitting_blow() : CreatureScript("npc_splitting_blow") { }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -1256,7 +1256,7 @@ class npc_splitting_blow : public CreatureScript
 class npc_sulfuras : public CreatureScript
 {
     public:
-        npc_sulfuras() : CreatureScript("npc_sulfuras") {}
+        npc_sulfuras() : CreatureScript("npc_sulfuras") { }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -1300,7 +1300,7 @@ class npc_sulfuras : public CreatureScript
 class npc_son_of_flame : public CreatureScript
 {
     public:
-        npc_son_of_flame() : CreatureScript("npc_son_of_flame") {}
+        npc_son_of_flame() : CreatureScript("npc_son_of_flame") { }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -1377,7 +1377,7 @@ class npc_son_of_flame : public CreatureScript
 class npc_molten_seed : public CreatureScript
 {
     public:
-        npc_molten_seed() : CreatureScript("npc_molten_seed") {}
+        npc_molten_seed() : CreatureScript("npc_molten_seed") { }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -1429,7 +1429,7 @@ class npc_molten_seed : public CreatureScript
 class npc_lava_scion : public CreatureScript
 {
     public:
-        npc_lava_scion() : CreatureScript("npc_lava_scion") {}
+        npc_lava_scion() : CreatureScript("npc_lava_scion") { }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -1469,7 +1469,7 @@ class npc_lava_scion : public CreatureScript
 class npc_molten_elemental : public CreatureScript
 {
     public:
-        npc_molten_elemental() : CreatureScript("npc_molten_elemental") {}
+        npc_molten_elemental() : CreatureScript("npc_molten_elemental") { }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -1519,7 +1519,7 @@ class npc_molten_elemental : public CreatureScript
 class npc_engulfing_flames : public CreatureScript
 {
     public:
-        npc_engulfing_flames() : CreatureScript("npc_engulfing_flames") {}
+        npc_engulfing_flames() : CreatureScript("npc_engulfing_flames") { }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -1558,7 +1558,7 @@ class npc_engulfing_flames : public CreatureScript
 class npc_dreadflame : public CreatureScript
 {
     public:
-        npc_dreadflame() : CreatureScript("npc_dreadflame") {}
+        npc_dreadflame() : CreatureScript("npc_dreadflame") { }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -1613,7 +1613,7 @@ class npc_dreadflame : public CreatureScript
 class npc_living_meteor : public CreatureScript
 {
     public:
-        npc_living_meteor() : CreatureScript("npc_living_meteor") {}
+        npc_living_meteor() : CreatureScript("npc_living_meteor") { }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -1713,7 +1713,7 @@ class npc_living_meteor : public CreatureScript
 class npc_entrapping_roots : public CreatureScript
 {
     public:
-        npc_entrapping_roots() : CreatureScript("npc_entrapping_roots") {}
+        npc_entrapping_roots() : CreatureScript("npc_entrapping_roots") { }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -1761,7 +1761,7 @@ class npc_entrapping_roots : public CreatureScript
 class npc_cloudburst : public CreatureScript
 {
     public:
-        npc_cloudburst() : CreatureScript("npc_cloudburst") {}
+        npc_cloudburst() : CreatureScript("npc_cloudburst") { }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -1803,7 +1803,7 @@ class npc_cloudburst : public CreatureScript
 class npc_breathoffrost : public CreatureScript
 {
     public:
-        npc_breathoffrost() : CreatureScript("npc_breathoffrost") {}
+        npc_breathoffrost() : CreatureScript("npc_breathoffrost") { }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -1841,7 +1841,7 @@ class npc_breathoffrost : public CreatureScript
 class npc_malfurion : public CreatureScript
 {
     public:
-        npc_malfurion() : CreatureScript("npc_malfurion") {}
+        npc_malfurion() : CreatureScript("npc_malfurion") { }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -1890,7 +1890,7 @@ class npc_malfurion : public CreatureScript
 class npc_cenarius : public CreatureScript
 {
     public:
-        npc_cenarius() : CreatureScript("npc_cenarius") {}
+        npc_cenarius() : CreatureScript("npc_cenarius") { }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -1939,7 +1939,7 @@ class npc_cenarius : public CreatureScript
 class npc_heartofragnaros : public CreatureScript
 {
     public:
-        npc_heartofragnaros() : CreatureScript("npc_heartofragnaros") {}
+        npc_heartofragnaros() : CreatureScript("npc_heartofragnaros") { }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -1994,7 +1994,7 @@ class npc_heartofragnaros : public CreatureScript
 class npc_hamuul : public CreatureScript
 {
     public:
-        npc_hamuul() : CreatureScript("npc_hamuul") {}
+        npc_hamuul() : CreatureScript("npc_hamuul") { }
 
         CreatureAI* GetAI(Creature* creature) const
         {

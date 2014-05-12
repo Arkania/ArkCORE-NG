@@ -606,7 +606,7 @@ class npc_twilight_essence : public CreatureScript
 {
 public:
 
-    npc_twilight_essence() : CreatureScript("npc_twilight_essence") {}
+    npc_twilight_essence() : CreatureScript("npc_twilight_essence") { }
 
     CreatureAI* GetAI(Creature* creature) const 
     {
@@ -659,7 +659,7 @@ class npc_twilight_drake : public CreatureScript
 {
 public:
 
-    npc_twilight_drake() : CreatureScript("npc_twilight_drake") {}
+    npc_twilight_drake() : CreatureScript("npc_twilight_drake") { }
 
     CreatureAI* GetAI(Creature* creature) const 
     {
@@ -721,7 +721,7 @@ class npc_twilight_whelp_phas1 : public CreatureScript
 {
 public:
 
-    npc_twilight_whelp_phas1() : CreatureScript("npc_twilight_whelp_phas1") {}
+    npc_twilight_whelp_phas1() : CreatureScript("npc_twilight_whelp_phas1") { }
 
     CreatureAI* GetAI(Creature* creature) const 
     {
@@ -755,7 +755,7 @@ public:
             events.ScheduleEvent(EVENT_SPIT, 4000);
         }
 
-        void JustDied(Unit* /*killer*/) {}
+        void JustDied(Unit* /*killer*/) { }
 
         void DamageTaken(Unit* /*who*/, uint32& damage)
         {
@@ -824,7 +824,7 @@ class npc_twilight_spite : public CreatureScript
 {
 public:
 
-    npc_twilight_spite() : CreatureScript("npc_twilight_spite") {}
+    npc_twilight_spite() : CreatureScript("npc_twilight_spite") { }
 
     CreatureAI* GetAI(Creature* creature) const 
     {
@@ -893,7 +893,7 @@ class npc_twilight_slicer : public CreatureScript
 {
 public:
 
-    npc_twilight_slicer() : CreatureScript("npc_twilight_slicer") {}
+    npc_twilight_slicer() : CreatureScript("npc_twilight_slicer") { }
 
     CreatureAI* GetAI(Creature* creature) const 
     {
@@ -963,7 +963,7 @@ class npc_calen : public CreatureScript
 {
 public:
 
-    npc_calen() : CreatureScript("npc_calen") {}
+    npc_calen() : CreatureScript("npc_calen") { }
 
     CreatureAI* GetAI(Creature* creature) const 
     {
@@ -1062,7 +1062,7 @@ class npc_controller : public CreatureScript
 {
 public:
 
-    npc_controller() : CreatureScript("npc_controller") {}
+    npc_controller() : CreatureScript("npc_controller") { }
 
     CreatureAI* GetAI(Creature* creature) const 
     {
@@ -1239,7 +1239,7 @@ class spell_sinestra_barrier : public SpellScriptLoader
 class ExactDistanceCheck
 {
     public:
-        ExactDistanceCheck(Unit* source, float dist) : _source(source), _dist(dist) {}
+        ExactDistanceCheck(Unit* source, float dist) : _source(source), _dist(dist) { }
 
         bool operator()(WorldObject* unit) const
         {
@@ -1282,7 +1282,7 @@ class spell_twilight_essence : public SpellScriptLoader
 class TwilightSlicerSelector
 {
     public:
-        TwilightSlicerSelector(Unit* caster, Unit* cutterCaster) : _caster(caster), _slicerActive(cutterCaster) {}
+        TwilightSlicerSelector(Unit* caster, Unit* cutterCaster) : _caster(caster), _slicerActive(cutterCaster) { }
 
         bool operator()(WorldObject* unit)
         {

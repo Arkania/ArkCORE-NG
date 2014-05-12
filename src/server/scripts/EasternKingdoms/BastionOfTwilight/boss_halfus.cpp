@@ -110,7 +110,7 @@ enum Creatures
 class boss_halfus : public CreatureScript
 {
     public:
-        boss_halfus() : CreatureScript("boss_halfus") {}
+        boss_halfus() : CreatureScript("boss_halfus") { }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -504,7 +504,7 @@ class boss_halfus : public CreatureScript
 class npc_proto_behemoth : public CreatureScript
 {
     public:
-        npc_proto_behemoth() : CreatureScript("npc_proto_behemoth") {}
+        npc_proto_behemoth() : CreatureScript("npc_proto_behemoth") { }
 
         CreatureAI* GetAI(Creature* creature) const
         {

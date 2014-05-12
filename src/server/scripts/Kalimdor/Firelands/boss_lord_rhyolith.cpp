@@ -86,9 +86,9 @@ public:
         uint32 timerMove,timerElem;
         InstanceScript* instance;
 
-        void Reset() {}
+        void Reset() { }
 
-        void EnterCombat(Unit* /*who*/) {}
+        void EnterCombat(Unit* /*who*/) { }
 
         void UpdateAI(uint32 diff)
         {
@@ -778,7 +778,7 @@ class boss_lord_rhyolith : public CreatureScript
 class npc_left_leg : public CreatureScript
 {
 public:
-    npc_left_leg() : CreatureScript("npc_left_leg"){}
+    npc_left_leg() : CreatureScript("npc_left_leg"){ }
 
     CreatureAI* GetAI(Creature* creature) const
     {
@@ -863,7 +863,7 @@ public:
 class npc_right_leg : public CreatureScript
 {
 public:
-    npc_right_leg() : CreatureScript("npc_right_leg"){}
+    npc_right_leg() : CreatureScript("npc_right_leg"){ }
 
     CreatureAI* GetAI(Creature* creature) const
     {
@@ -952,7 +952,7 @@ public:
 class npc_rhyolith_volcano : public CreatureScript
 {
 public:
-    npc_rhyolith_volcano() : CreatureScript("npc_rhyolith_volcano"){}
+    npc_rhyolith_volcano() : CreatureScript("npc_rhyolith_volcano"){ }
 
     CreatureAI* GetAI(Creature* creature) const
     {
@@ -1077,7 +1077,7 @@ public:
 class npc_rhyolith_crater : public CreatureScript
 {
 public:
-    npc_rhyolith_crater() : CreatureScript("npc_rhyolith_crater"){}
+    npc_rhyolith_crater() : CreatureScript("npc_rhyolith_crater"){ }
 
     CreatureAI* GetAI(Creature* creature) const
     {
@@ -1098,7 +1098,7 @@ public:
         uint32 number;
         SummonList summons;
 
-        void JustDied(Unit* /*killer*/) {}
+        void JustDied(Unit* /*killer*/) { }
         
         void Reset()
         {
@@ -1203,7 +1203,7 @@ public:
 class npc_lava_line : public CreatureScript
 {
 public:
-    npc_lava_line() : CreatureScript("npc_lava_line"){}
+    npc_lava_line() : CreatureScript("npc_lava_line"){ }
 
     CreatureAI* GetAI(Creature* creature) const
     {
@@ -1222,7 +1222,7 @@ public:
         InstanceScript* instance;
         EventMap events;
 
-        void JustDied(Unit* /*killer*/) {}
+        void JustDied(Unit* /*killer*/) { }
         
         void Reset()
         {
@@ -1283,7 +1283,7 @@ public:
 class npc_liquid_obsidian : public CreatureScript
 {
 public:
-    npc_liquid_obsidian() : CreatureScript("npc_liquid_obsidian"){}
+    npc_liquid_obsidian() : CreatureScript("npc_liquid_obsidian"){ }
 
     CreatureAI* GetAI(Creature* creature) const
     {
@@ -1299,8 +1299,8 @@ public:
 
         InstanceScript* instance;
 
-        void Reset() {}
-        void JustDied(Unit* /*killer*/) {}
+        void Reset() { }
+        void JustDied(Unit* /*killer*/) { }
 
         void EnterCombat(Unit* /*who*/)
         {
@@ -1344,7 +1344,7 @@ public:
 class npc_spark_of_rhyolith : public CreatureScript
 {
 public:
-    npc_spark_of_rhyolith() : CreatureScript("npc_spark_of_rhyolith"){}
+    npc_spark_of_rhyolith() : CreatureScript("npc_spark_of_rhyolith"){ }
 
     CreatureAI* GetAI(Creature* creature) const
     {
@@ -1361,7 +1361,7 @@ public:
         InstanceScript* instance;
         EventMap events;
 
-        void JustDied(Unit* /*killer*/) {}
+        void JustDied(Unit* /*killer*/) { }
 
         void Reset()
         {

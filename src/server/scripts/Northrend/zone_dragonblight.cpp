@@ -147,7 +147,7 @@ Position const PosTalkLocations[6] =
 
 class npc_commander_eligor_dawnbringer : public CreatureScript
 {
-    public: npc_commander_eligor_dawnbringer() : CreatureScript("npc_commander_eligor_dawnbringer") {}
+    public: npc_commander_eligor_dawnbringer() : CreatureScript("npc_commander_eligor_dawnbringer") { }
 
         struct npc_commander_eligor_dawnbringerAI : public ScriptedAI
         {
@@ -649,7 +649,7 @@ enum TorturerLeCraft
 
 class npc_torturer_lecraft : public CreatureScript
 {
-    public: npc_torturer_lecraft() : CreatureScript("npc_torturer_lecraft") {}
+    public: npc_torturer_lecraft() : CreatureScript("npc_torturer_lecraft") { }
 
         struct npc_torturer_lecraftAI : public ScriptedAI
         {

@@ -11,7 +11,7 @@ public:
 
     struct instance_throne_of_the_four_winds_InstanceMapScript: public InstanceScript
     {
-        instance_throne_of_the_four_winds_InstanceMapScript(InstanceMap* map) : InstanceScript(map) {}
+        instance_throne_of_the_four_winds_InstanceMapScript(InstanceMap* map) : InstanceScript(map) { }
 
         uint32 Encounter[ENCOUNTERS];
 

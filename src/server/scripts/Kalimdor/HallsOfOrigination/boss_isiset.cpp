@@ -430,7 +430,7 @@ class spell_isiset_supernova : public SpellScriptLoader
 class npc_celestial_familiar : public CreatureScript
 {
     public:
-        npc_celestial_familiar() : CreatureScript("npc_celestial_familiar") {}
+        npc_celestial_familiar() : CreatureScript("npc_celestial_familiar") { }
 
         CreatureAI* GetAI(Creature* pCreature) const
         {
@@ -487,7 +487,7 @@ class npc_celestial_familiar : public CreatureScript
 class npc_veil_sky : public CreatureScript
 {
     public:
-        npc_veil_sky() : CreatureScript("npc_veil_sky") {}
+        npc_veil_sky() : CreatureScript("npc_veil_sky") { }
 
         CreatureAI* GetAI(Creature* pCreature) const
         {
@@ -541,7 +541,7 @@ class npc_veil_sky : public CreatureScript
 class npc_celestial_call : public CreatureScript
 {
     public:
-        npc_celestial_call() : CreatureScript("npc_celestial_call") {}
+        npc_celestial_call() : CreatureScript("npc_celestial_call") { }
 
         CreatureAI* GetAI(Creature* pCreature) const
         {
@@ -593,7 +593,7 @@ class npc_celestial_call : public CreatureScript
 class npc_astral_rain : public CreatureScript
 {
     public:
-        npc_astral_rain() : CreatureScript("npc_astral_rain") {}
+        npc_astral_rain() : CreatureScript("npc_astral_rain") { }
 
         CreatureAI* GetAI(Creature* pCreature) const
         {

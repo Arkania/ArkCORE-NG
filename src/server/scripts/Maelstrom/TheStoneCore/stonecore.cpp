@@ -181,7 +181,7 @@ public:
 
     struct npc_imppAI : public ScriptedAI
     {
-        npc_imppAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_imppAI(Creature* creature) : ScriptedAI(creature) { }
 
         EventMap events;
 
@@ -235,7 +235,7 @@ public:
 
     struct npc_rock_borerAI : public ScriptedAI
     {
-        npc_rock_borerAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_rock_borerAI(Creature* creature) : ScriptedAI(creature) { }
 
         EventMap events;
 
@@ -289,7 +289,7 @@ public:
 
     struct npc_millhouse_manastorm_scAI : public ScriptedAI
     {
-        npc_millhouse_manastorm_scAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_millhouse_manastorm_scAI(Creature* creature) : ScriptedAI(creature) { }
 
         EventMap events;
 

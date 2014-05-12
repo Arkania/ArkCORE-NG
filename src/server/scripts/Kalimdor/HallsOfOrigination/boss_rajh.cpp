@@ -57,7 +57,7 @@ enum Npc
 class boss_rajh : public CreatureScript
 {
     public:
-        boss_rajh() : CreatureScript("boss_rajh") {}
+        boss_rajh() : CreatureScript("boss_rajh") { }
 
         CreatureAI* GetAI(Creature* pCreature) const
         {
@@ -230,7 +230,7 @@ class boss_rajh : public CreatureScript
 class npc_winds : public CreatureScript
 {
     public:
-        npc_winds() : CreatureScript("npc_winds") {}
+        npc_winds() : CreatureScript("npc_winds") { }
 
         CreatureAI* GetAI(Creature* pCreature) const
         {

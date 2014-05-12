@@ -244,7 +244,7 @@ public:
 
     struct npc_prince_liam_greymane_phase1AI : public ScriptedAI
     {
-        npc_prince_liam_greymane_phase1AI(Creature* creature) : ScriptedAI(creature) {}
+        npc_prince_liam_greymane_phase1AI(Creature* creature) : ScriptedAI(creature) { }
 
         uint32 uiSayTimer;
         uint8 uiSayCount;
@@ -568,7 +568,7 @@ public:
 class npc_frightened_citizen_j_phase2 : public CreatureScript
 {
 public:
-    npc_frightened_citizen_j_phase2() : CreatureScript("npc_frightened_citizen_j_phase2") {}
+    npc_frightened_citizen_j_phase2() : CreatureScript("npc_frightened_citizen_j_phase2") { }
 
     struct npc_frightened_citizen_j_phase2AI : public npc_escortAI
     {
@@ -625,7 +625,7 @@ public:
 class npc_frightened_citizen_cw_phase2 : public CreatureScript
 {
 public:
-    npc_frightened_citizen_cw_phase2() : CreatureScript("npc_frightened_citizen_cw_phase2") {}
+    npc_frightened_citizen_cw_phase2() : CreatureScript("npc_frightened_citizen_cw_phase2") { }
 
     struct npc_frightened_citizen_cw_phase2AI : public npc_escortAI
     {
@@ -682,7 +682,7 @@ public:
 class npc_rampaging_worgen_cw_phase2 : public CreatureScript
 {
 public:
-    npc_rampaging_worgen_cw_phase2() : CreatureScript("npc_rampaging_worgen_cw_phase2") {}
+    npc_rampaging_worgen_cw_phase2() : CreatureScript("npc_rampaging_worgen_cw_phase2") { }
 
     struct npc_rampaging_worgen_cw_phase2AI : public npc_escortAI
     {
@@ -846,7 +846,7 @@ public:
 
     struct npc_bloodfang_worgen_phase4AI : public ScriptedAI
     {
-        npc_bloodfang_worgen_phase4AI(Creature *c) : ScriptedAI(c) {}
+        npc_bloodfang_worgen_phase4AI(Creature *c) : ScriptedAI(c) { }
 
         uint32 _timer;
 

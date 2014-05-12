@@ -239,7 +239,7 @@ class npc_throngus_fire_patch : public CreatureScript
 {
     public:
 
-        npc_throngus_fire_patch() : CreatureScript("npc_throngus_fire_patch"){}
+        npc_throngus_fire_patch() : CreatureScript("npc_throngus_fire_patch"){ }
 
         CreatureAI* GetAI(Creature* creature) const
         {

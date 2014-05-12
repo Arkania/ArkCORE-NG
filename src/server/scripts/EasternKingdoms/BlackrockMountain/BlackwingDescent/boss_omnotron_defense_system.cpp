@@ -849,7 +849,7 @@ public:
 
     struct npc_poison_bombAI : public ScriptedAI
     {
-        npc_poison_bombAI(Creature * pCreature) : ScriptedAI(pCreature) {}
+        npc_poison_bombAI(Creature * pCreature) : ScriptedAI(pCreature) { }
 
         uint32 uiFixate;
         bool HasTarget;
@@ -901,7 +901,7 @@ public:
 
     struct npc_poison_puddleAI : public ScriptedAI
     {
-        npc_poison_puddleAI(Creature * pCreature) : ScriptedAI(pCreature) {}
+        npc_poison_puddleAI(Creature * pCreature) : ScriptedAI(pCreature) { }
 
         void IsSummonedBy(Unit* /*who*/)
         {
@@ -924,7 +924,7 @@ public:
 
     struct npc_chemical_cloudAI : public ScriptedAI
     {
-        npc_chemical_cloudAI(Creature * pCreature) : ScriptedAI(pCreature) {}
+        npc_chemical_cloudAI(Creature * pCreature) : ScriptedAI(pCreature) { }
 
         uint32 uiDespawn;
 
@@ -966,7 +966,7 @@ public:
 
     struct npc_power_generatorAI : public ScriptedAI
     {
-        npc_power_generatorAI(Creature * pCreature) : ScriptedAI(pCreature) {}
+        npc_power_generatorAI(Creature * pCreature) : ScriptedAI(pCreature) { }
 
         uint32 uiDespawn;
 

@@ -116,7 +116,7 @@ const Position teleporterPos[2] =
 class npc_throne_of_the_tides_teleporter : public CreatureScript
 {
     public:
-        npc_throne_of_the_tides_teleporter() : CreatureScript("npc_throne_of_the_tides_teleporter"){}
+        npc_throne_of_the_tides_teleporter() : CreatureScript("npc_throne_of_the_tides_teleporter"){ }
 
         bool OnGossipHello(Player* pPlayer, Creature* pCreature)
         {

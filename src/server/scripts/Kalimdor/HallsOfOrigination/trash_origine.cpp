@@ -19,11 +19,11 @@
 class npc_lancelombre_du_temple : public CreatureScript
 {
 public:
-       npc_lancelombre_du_temple() : CreatureScript("npc_lancelombre_du_temple") {}
+       npc_lancelombre_du_temple() : CreatureScript("npc_lancelombre_du_temple") { }
        
        struct npc_lancelombre_du_templeAI : public ScriptedAI
        {
-          npc_lancelombre_du_templeAI(Creature *c) : ScriptedAI(c) {}
+          npc_lancelombre_du_templeAI(Creature *c) : ScriptedAI(c) { }
           
           uint32 lance_de_lombre;
           uint32 pacte_des_tenebres;
@@ -72,11 +72,11 @@ public:
 class npc_traqueur_veloce_du_temple : public CreatureScript
 {
 public:
-      npc_traqueur_veloce_du_temple() : CreatureScript("npc_traqueur_veloce_du_temple") {}
+      npc_traqueur_veloce_du_temple() : CreatureScript("npc_traqueur_veloce_du_temple") { }
       
       struct npc_traqueur_veloce_du_templeAI : public ScriptedAI
       {
-         npc_traqueur_veloce_du_templeAI(Creature *c) : ScriptedAI(c) {}
+         npc_traqueur_veloce_du_templeAI(Creature *c) : ScriptedAI(c) { }
 
          uint32 fleches_multiples;
          uint32 tir;
@@ -134,11 +134,11 @@ public:
 class npc_lanceur_de_runes_du_temple : public CreatureScript
 {
 public:
-      npc_lanceur_de_runes_du_temple() : CreatureScript("npc_lanceur_de_runes_du_temple") {}
+      npc_lanceur_de_runes_du_temple() : CreatureScript("npc_lanceur_de_runes_du_temple") { }
       
       struct npc_lanceur_de_runes_du_templeAI : public ScriptedAI
       {
-         npc_lanceur_de_runes_du_templeAI(Creature *c) : ScriptedAI(c) {}
+         npc_lanceur_de_runes_du_templeAI(Creature *c) : ScriptedAI(c) { }
          
          uint32 enchainement_runique;
          uint32 malediction_du_lanceur_de_runes;
@@ -188,11 +188,11 @@ public:
 class npc_sculptefeu_du_temple : public CreatureScript
 {
 public:
-      npc_sculptefeu_du_temple() : CreatureScript("npc_sculptefeu_du_temple") {}
+      npc_sculptefeu_du_temple() : CreatureScript("npc_sculptefeu_du_temple") { }
       
       struct npc_sculptefeu_du_templeAI : public ScriptedAI
       {
-         npc_sculptefeu_du_templeAI(Creature *c) : ScriptedAI(c) {}
+         npc_sculptefeu_du_templeAI(Creature *c) : ScriptedAI(c) { }
          
          uint32 barriere_de_la_fournaise;
          uint32 boule_de_feu;
@@ -258,11 +258,11 @@ public:
 class npc_scarabee_caustique : public CreatureScript
 {
 public:
-      npc_scarabee_caustique() : CreatureScript("npc_scarabee_caustique") {}
+      npc_scarabee_caustique() : CreatureScript("npc_scarabee_caustique") { }
       
       struct npc_scarabee_caustiqueAI : public ScriptedAI
       {
-         npc_scarabee_caustiqueAI(Creature *c) : ScriptedAI(c) {}
+         npc_scarabee_caustiqueAI(Creature *c) : ScriptedAI(c) { }
          
          uint32 attaque_a_la_lame_dentelee;
          uint32 projection_corrosive;
@@ -311,11 +311,11 @@ public:
 class npc_glisseur_venimeux : public CreatureScript
 {
 public:
-      npc_glisseur_venimeux() : CreatureScript("npc_glisseur_venimeux") {}
+      npc_glisseur_venimeux() : CreatureScript("npc_glisseur_venimeux") { }
       
       struct npc_glisseur_venimeuxAI : public ScriptedAI
       {
-         npc_glisseur_venimeuxAI(Creature *c) : ScriptedAI(c) {}
+         npc_glisseur_venimeuxAI(Creature *c) : ScriptedAI(c) { }
          
          uint32 afflux;
          uint32 toxine;
@@ -364,11 +364,11 @@ public:
 class npc_horreur_os_poussiere : public CreatureScript
 {
 public:
-      npc_horreur_os_poussiere() : CreatureScript("npc_horreur_os_poussiere") {}
+      npc_horreur_os_poussiere() : CreatureScript("npc_horreur_os_poussiere") { }
       
       struct npc_horreur_os_poussiereAI : public ScriptedAI
       {
-         npc_horreur_os_poussiereAI(Creature *c) : ScriptedAI(c) {}
+         npc_horreur_os_poussiereAI(Creature *c) : ScriptedAI(c) { }
          
          uint32 choc;
          
@@ -409,11 +409,11 @@ public:
 class npc_tourmenteur_os_poussiere : public CreatureScript
 {
 public:
-      npc_tourmenteur_os_poussiere() : CreatureScript("npc_tourmenteur_os_poussiere") {}
+      npc_tourmenteur_os_poussiere() : CreatureScript("npc_tourmenteur_os_poussiere") { }
       
       struct npc_tourmenteur_os_poussiereAI : public ScriptedAI
       {
-         npc_tourmenteur_os_poussiereAI(Creature *c) : ScriptedAI(c) {}
+         npc_tourmenteur_os_poussiereAI(Creature *c) : ScriptedAI(c) { }
          
          uint32 trait_de_lombre;
          uint32 malediction_depuisement;
@@ -463,11 +463,11 @@ public:
 class npc_chercheur_du_vide : public CreatureScript
 {
 public: 
-     npc_chercheur_du_vide() : CreatureScript("npc_chercheur_du_vide") {}
+     npc_chercheur_du_vide() : CreatureScript("npc_chercheur_du_vide") { }
      
      struct npc_chercheur_du_videAI : public ScriptedAI
      {
-        npc_chercheur_du_videAI(Creature *c) : ScriptedAI(c) {}
+        npc_chercheur_du_videAI(Creature *c) : ScriptedAI(c) { }
         
         uint32 prison_anti_magie;
         uint32 salve_de_traits_de_lombre;
@@ -517,11 +517,11 @@ public:
 class npc_seigneur_du_vide : public CreatureScript
 {
 public:
-      npc_seigneur_du_vide() : CreatureScript("npc_seigneur_du_vide") {}
+      npc_seigneur_du_vide() : CreatureScript("npc_seigneur_du_vide") { }
       
       struct npc_seigneur_du_videAI : public ScriptedAI
       {
-         npc_seigneur_du_videAI(Creature *c) : ScriptedAI(c) {}
+         npc_seigneur_du_videAI(Creature *c) : ScriptedAI(c) { }
          
          uint32 explosion_de_vide;
          uint32 salve_de_traits_de_lombre;
@@ -569,11 +569,11 @@ public:
 class npc_anomalie_spatiale : public CreatureScript
 {
 public:
-     npc_anomalie_spatiale() : CreatureScript("npc_anomalie_spatiale") {}
+     npc_anomalie_spatiale() : CreatureScript("npc_anomalie_spatiale") { }
      
      struct npc_anomalie_spatialeAI : public ScriptedAI
      {
-        npc_anomalie_spatialeAI(Creature *c) : ScriptedAI(c) {}
+        npc_anomalie_spatialeAI(Creature *c) : ScriptedAI(c) { }
         
         uint32 jaillissement_des_arcanes;
         
@@ -613,11 +613,11 @@ public:
 class npc_animateur_de_flux : public CreatureScript
 {
 public:
-     npc_animateur_de_flux() : CreatureScript("npc_animateur_de_flux") {}
+     npc_animateur_de_flux() : CreatureScript("npc_animateur_de_flux") { }
      
      struct npc_animateur_de_fluxAI : public ScriptedAI
      {
-        npc_animateur_de_fluxAI(Creature *c) : ScriptedAI(c) {}
+        npc_animateur_de_fluxAI(Creature *c) : ScriptedAI(c) { }
         
         uint32 barrage_des_arcanes;
         
@@ -660,11 +660,11 @@ public:
 class npc_serviteur_solegrace : public CreatureScript
 {
 public :
-    npc_serviteur_solegrace() : CreatureScript("npc_serviteur_solegrace") {}
+    npc_serviteur_solegrace() : CreatureScript("npc_serviteur_solegrace") { }
       
     struct npc_serviteur_solegraceAI : public ScriptedAI
     {
-        npc_serviteur_solegraceAI(Creature *c) : ScriptedAI(c) {}
+        npc_serviteur_solegraceAI(Creature *c) : ScriptedAI(c) { }
           
         uint32 dispersion_des_flammes;
         uint32 flammes_incendiaires;
@@ -716,11 +716,11 @@ public :
 class npc_fee_solegrace : public CreatureScript
 {
 public :
-    npc_fee_solegrace() : CreatureScript("npc_fee_solegrace") {}
+    npc_fee_solegrace() : CreatureScript("npc_fee_solegrace") { }
       
     struct npc_fee_solegraceAI : public ScriptedAI
     {
-        npc_fee_solegraceAI(Creature *c) : ScriptedAI(c) {}
+        npc_fee_solegraceAI(Creature *c) : ScriptedAI(c) { }
          
         uint32 pyrogenie;
         uint32 dispersion_des_flammes;
@@ -779,11 +779,11 @@ public :
 class npc_petite_fee_solegrace : public CreatureScript
 {
 public :
-    npc_petite_fee_solegrace() : CreatureScript("npc_petite_fee_solegrace") {}
+    npc_petite_fee_solegrace() : CreatureScript("npc_petite_fee_solegrace") { }
 
     struct npc_petite_fee_solegraceAI : public ScriptedAI
     {
-        npc_petite_fee_solegraceAI(Creature *c) : ScriptedAI(c) {}
+        npc_petite_fee_solegraceAI(Creature *c) : ScriptedAI(c) { }
 
         uint32 pyrogenie;
         uint32 dispersion_des_flammes;
@@ -841,11 +841,11 @@ public :
 class npc_porte_parole_solegrace : public CreatureScript
 {
 public:
-      npc_porte_parole_solegrace() : CreatureScript("npc_porte_parole_solegrace") {}
+      npc_porte_parole_solegrace() : CreatureScript("npc_porte_parole_solegrace") { }
       
       struct npc_porte_parole_solegraceAI : public ScriptedAI
       {
-         npc_porte_parole_solegraceAI(Creature *c) : ScriptedAI(c) {}
+         npc_porte_parole_solegraceAI(Creature *c) : ScriptedAI(c) { }
          
          uint32 pietinement_reverberant;
          uint32 tempete_de_feu;
@@ -897,11 +897,11 @@ public:
 class npc_nymphe_gardienne : public CreatureScript
 {
 public :
-      npc_nymphe_gardienne() : CreatureScript("npc_nymphe_gardienne") {}
+      npc_nymphe_gardienne() : CreatureScript("npc_nymphe_gardienne") { }
       
       struct npc_nymphe_gardienneAI : public ScriptedAI
       {
-          npc_nymphe_gardienneAI(Creature *c) : ScriptedAI(c) {}
+          npc_nymphe_gardienneAI(Creature *c) : ScriptedAI(c) { }
           
           uint32 tir;
           uint32 tir_enchevetrant;
@@ -958,11 +958,11 @@ public :
 class npc_liane_vivante : public CreatureScript
 {
 public :
-      npc_liane_vivante() : CreatureScript("npc_liane_vivante") {}
+      npc_liane_vivante() : CreatureScript("npc_liane_vivante") { }
       
       struct npc_liane_vivanteAI : public ScriptedAI
       {
-         npc_liane_vivanteAI(Creature *c) : ScriptedAI(c) {}
+         npc_liane_vivanteAI(Creature *c) : ScriptedAI(c) { }
          
          uint32 souffle_de_spores;
          
@@ -1004,11 +1004,11 @@ public :
 class npc_spore_en_bourgeon : public CreatureScript
 {
 public :
-    npc_spore_en_bourgeon() : CreatureScript("npc_spore_en_bourgeon") {}
+    npc_spore_en_bourgeon() : CreatureScript("npc_spore_en_bourgeon") { }
       
     struct npc_spore_en_bourgeonAI : public ScriptedAI
     {
-        npc_spore_en_bourgeonAI(Creature *c) : ScriptedAI(c) {}
+        npc_spore_en_bourgeonAI(Creature *c) : ScriptedAI(c) { }
 
         uint32 nuage_de_spores;
         uint32 spores_nauseabondes;

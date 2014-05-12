@@ -1695,7 +1695,7 @@ class boss_monstrosity : public CreatureScript
 class npc_feludius_waterbomb : public CreatureScript // 44201
 {
     public:
-        npc_feludius_waterbomb() : CreatureScript("npc_feludius_waterbomb") {}
+        npc_feludius_waterbomb() : CreatureScript("npc_feludius_waterbomb") { }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -1741,7 +1741,7 @@ class npc_feludius_waterbomb : public CreatureScript // 44201
 class npc_arion_callwinds : public CreatureScript // 44747
 {
     public:
-        npc_arion_callwinds() : CreatureScript("npc_arion_callwinds") {}
+        npc_arion_callwinds() : CreatureScript("npc_arion_callwinds") { }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -1792,7 +1792,7 @@ class npc_arion_callwinds : public CreatureScript // 44747
 class npc_terrastra_gravitywell : public CreatureScript // 44824
 {
     public:
-        npc_terrastra_gravitywell() : CreatureScript("npc_terrastra_gravitywell") {}
+        npc_terrastra_gravitywell() : CreatureScript("npc_terrastra_gravitywell") { }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -1822,7 +1822,7 @@ class npc_terrastra_gravitywell : public CreatureScript // 44824
 class npc_monstrosity_liquid_ice : public CreatureScript // 45452
 {
     public:
-        npc_monstrosity_liquid_ice() : CreatureScript("npc_monstrosity_liquid_ice") {}
+        npc_monstrosity_liquid_ice() : CreatureScript("npc_monstrosity_liquid_ice") { }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -1872,7 +1872,7 @@ class npc_monstrosity_liquid_ice : public CreatureScript // 45452
 class npc_monstrosity_lava_seed : public CreatureScript // 48538
 {
     public:
-        npc_monstrosity_lava_seed() : CreatureScript("npc_monstrosity_lava_seed") {}
+        npc_monstrosity_lava_seed() : CreatureScript("npc_monstrosity_lava_seed") { }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -1923,7 +1923,7 @@ class npc_monstrosity_lava_seed : public CreatureScript // 48538
 class npc_ignacious_flame_strike : public CreatureScript // 49432
 {
     public:
-        npc_ignacious_flame_strike() : CreatureScript("npc_ignacious_flame_strike") {}
+        npc_ignacious_flame_strike() : CreatureScript("npc_ignacious_flame_strike") { }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -1971,7 +1971,7 @@ class npc_ignacious_flame_strike : public CreatureScript // 49432
 class npc_feludius_frozen_orb : public CreatureScript // 49518
 {
     public:
-        npc_feludius_frozen_orb() : CreatureScript("npc_feludius_frozen_orb") {}
+        npc_feludius_frozen_orb() : CreatureScript("npc_feludius_frozen_orb") { }
 
         CreatureAI* GetAI(Creature* creature) const
         {
