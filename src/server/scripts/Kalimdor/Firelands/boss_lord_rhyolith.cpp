@@ -61,19 +61,19 @@ enum KarSpells
     SUMMON_ELEMENTALS = 99601,
 };
 
-class kar_the_everburning : public CreatureScript
+class npc_kar_the_everburning : public CreatureScript
 {
 public:
-    kar_the_everburning() : CreatureScript("kar_the_everburning") { }
+    npc_kar_the_everburning() : CreatureScript("npc_kar_the_everburning") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new kar_the_everburningAI (creature);
+        return new npc_kar_the_everburningAI (creature);
     }
 
-    struct kar_the_everburningAI : public ScriptedAI
+    struct npc_kar_the_everburningAI : public ScriptedAI
     {
-        kar_the_everburningAI(Creature* creature) : ScriptedAI(creature)
+        npc_kar_the_everburningAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = creature->GetInstanceScript();
             phase = 0;
@@ -143,19 +143,19 @@ public:
     };
 };
 
-class Unstable_Pyrelord : public CreatureScript
+class npc_unstable_pyrelord : public CreatureScript
 {
 public:
-    Unstable_Pyrelord() : CreatureScript("Unstable_Pyrelord") { }
+    npc_unstable_pyrelord() : CreatureScript("npc_unstable_pyrelord") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new Unstable_PyrelordAI (creature);
+        return new npc_unstable_pyrelordAI (creature);
     }
 
-    struct Unstable_PyrelordAI : public ScriptedAI
+    struct npc_unstable_pyrelordAI : public ScriptedAI
     {
-        Unstable_PyrelordAI(Creature* creature) : ScriptedAI(creature)
+        npc_unstable_pyrelordAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = creature->GetInstanceScript();
             start = false;
@@ -1403,8 +1403,8 @@ public:
 
 void AddSC_boss_lord_rhyolith()
 {
-    new kar_the_everburning();
-    new Unstable_Pyrelord();
+    new npc_kar_the_everburning();
+    new npc_unstable_pyrelord();
     new boss_lord_rhyolith();
     new npc_left_leg();
     new npc_right_leg();
