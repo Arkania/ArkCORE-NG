@@ -33,6 +33,8 @@ EndScriptData */
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "Player.h"
+#include "SpellScript.h"
+#include "SpellAuraEffects.h"
 
 
 enum eGilneas
@@ -60,7 +62,20 @@ enum eGilneas
     NPC_JOSIAH_AVERY_HUMAN_PHASE4                  = 35369,
     NPC_JOSIAH_AVERY_WORGEN_PHASE8                 = 35370,
     NPC_LORNA_CROWLEY_PHASE8                       = 35378,
+    NPC_GILNEAS_MASTIFF_PHASE8                     = 35631,
+    NPC_BLOODFANG_LURKER_PHASE8                    = 35463,
+    NPC_GILNEAS_CITY_GUARD_PHASE8                  = 50474,
 
+    NPC_GENN_HORSE                                 = 35905,
+    NPC_KRENNAN_ARANAS                             = 35753,
+    NPC_KRENNAN_ARANAS_SAVE                        = 35907,
+    NPC_LORD_GOLDFREY                              = 35906,
+    NPC_QSKA_KILL_CREDIT                           = 35753,
+    NPC_GUARD_QSKA                                 = 35509,
+    NPC_WORGEN_QSKA                                = 35505,
+    NPC_COMMANDEERED_CANNON                        = 35914,
+    NPC_BLOODFANG_RIPPER_QSKA                      = 35916,
+    
     QUEST_LOCKDOWN                                 = 14078,
     QUEST_SOMETHINGS_AMISS                         = 14091,
     QUEST_ALL_HELL_BREAKS_LOOSE                    = 14093,
@@ -68,6 +83,10 @@ enum eGilneas
     QUEST_ROYAL_ORDERS                             = 14099,
     QUEST_BY_THE_SKIN_OF_HIS_TEETH                 = 14154,
     QUEST_THE_REBEL_LORD_ARSENAL                   = 14159,
+    QUEST_FROM_THE_SHADOWS                         = 14204,
+    QUEST_SAVE_KRENNAN_ARANAS                      = 14293,
+
+    ITEM_GILNEAN_MASTIFF_COLLAR                    = 48707,
 
     SPELL_GENERIC_QUEST_INVISIBILITY_DERECTION_1   = 49416,
     SPELL_GENERIC_QUEST_INVISIBILITY_DETECTION_2   = 49417,
@@ -78,9 +97,21 @@ enum eGilneas
 
     SPELL_GILNEAS_PRISON_PERIODIC_FORCECAST        = 66914,
     SPELL_PULL_TO                                  = 67357, // not work
-    SPELL_WORGEN_BITE                              = 72870, // set gilneas phase 4 to
-    SPELL_INFECTED_BITE                            = 72872, // set gilneas phase 8 to
+    SPELL_WORGEN_BITE                              = 72870, // gilneas phase 4 aura
+    SPELL_INFECTED_BITE                            = 72872, // gilneas phase 8 aura
     SPELL_FAKE_SHOT                                = 7105,
+
+    SPELL_ATTACK_LURKER                            = 67805,
+    SPELL_SUMMON_MASTIFF                           = 67807,
+
+    SPELL_SHADOWSTALKER_STEALTH                    = 5916,
+    SPELL_LURKER_ENRAGE                            = 8599,
+    SPELL_UNDYING_FRENZY_INSTANT                   = 80514,
+    SPELL_UNDYING_FRENZY_CHANNELED                 = 80515,
+
+    SPELL_CANNON_FIRE                              = 68235,
+    SPELL_SHOOT_QSKA                               = 48424,
+    SPELL_CANNON_CAMERA                            = 93522,
 
 };
 
@@ -450,11 +481,20 @@ public:
     {
         npc_gilneas_city_guard_phase2AI(Creature* creature) : ScriptedAI(creature) { }
 
-		uint32 _timer;   
+		uint32 _timer;
+        uint32 _health;
 
         void Reset()
         {
-            _timer = urand(1800,2200);       
+            _timer = urand(1800,2200);
+            _health = urand(65,95);
+        }
+
+        void DamageTaken(Unit* attacker, uint32 &damage)
+        {
+            if (attacker->GetEntry() == NPC_BLOODFANG_WORGEN_PHASE4)
+                if (me->HealthBelowPct(_health))
+                    damage = 0;
         }
 
         void UpdateAI(uint32 diff)
@@ -881,14 +921,21 @@ public:
     {
         npc_bloodfang_worgen_phase4AI(Creature *c) : ScriptedAI(c) {}
 	
-        uint32 _timer;
+        uint32  _timer;
+        uint32  _health;
 		
         void Reset()
         {		
-            //printf("Trigger reset \n");
-			_timer = urand(1800,2200); 
+			_timer = urand(1800,2200);
+            _health = urand(65,95);
         }
        
+        void DamageTaken(Unit* attacker, uint32 &damage)
+        {
+            if (attacker->GetEntry() == NPC_GILNEAS_CITY_GUARD_PHASE2)
+                if (me->HealthBelowPct(_health))
+                    damage = 0;
+        }
 
         void UpdateAI(uint32 diff)
         {
@@ -1088,7 +1135,7 @@ public:
 					SummonWorgen();					
 				}
 				else
-					_timer -= diff;				
+					_timer -= diff;
 
 				if (_eventTimer <= diff)
 					EndOfEvent();
@@ -1103,7 +1150,7 @@ public:
         }
 
 		void SummonWorgen()
-		{																
+		{
 			_count++;
 			if (_count > 2 && _eventTimer > 30000)
 			{
@@ -1142,10 +1189,10 @@ public:
             me->GetCreatureListWithEntryInGrid(listOfWorgen, NPC_WORGEN_RUNT_PHASE4, 35.0f);
 
             for (std::list<Creature*>::const_iterator itr = listOfWorgen.begin(); itr != listOfWorgen.end(); ++itr )
-			{				
+			{
                 if ((*itr)->IsAlive())
-					(*itr)->DisappearAndDie();			
-			}			          
+					(*itr)->DisappearAndDie();
+			}
 		}
 
 		float RandomFloat(float min, float max)
@@ -1170,8 +1217,8 @@ public:
 					npc_escort->AddWaypoint (1, -1671.9f + x, 1448.4f + y, 52.52f);
 					npc_escort->AddWaypoint (2, -1676.3f + x, 1444.5f + y, 52.29f);
 					npc_escort->Start(false, true);
-				}												
-			}			
+				}
+			}
 		}
 		void SummonWorgenPosB()
 		{
@@ -1245,15 +1292,15 @@ public:
                         switch (_phase)
                         {
                             case 1:
-                                _phase=2;                                
+                                _phase=2;
                                 _timer = 1000;
                                 if (_player)
                                 {   
                                     float x, y, z;
                                     lorna->GetPosition(x, y, z);
-                                    me->CastSpell(_player, 91074, true); // unknown spell on wowhead                                    
+                                    DoCast(_player, 91074, true); // unknown spell on wowhead
                                     _player->RemoveAura(SPELL_WORGEN_BITE);
-                                    _player->CastSpell(_player, SPELL_INFECTED_BITE, true);
+                                    _player->CastSpell(me, SPELL_INFECTED_BITE, true);
                                     _player->GetMotionMaster()->MoveJump(x, y, z, 25.0f, 5.0f);
                                     _player->SaveToDB();
                                     _player->SetPhaseMask(8, true);
@@ -1295,8 +1342,8 @@ public:
     bool OnQuestComplete(Player* player, Creature* creature, const Quest* quest)
     {
         if (quest->GetQuestId() == QUEST_THE_REBEL_LORD_ARSENAL)
-        {           
-            player->CastSpell(player, SPELL_WORGEN_BITE, true);           
+        {
+            player->CastSpell(player, SPELL_WORGEN_BITE, false);
         }
         return true;
     }
@@ -1307,7 +1354,7 @@ public:
         {
             player->RemoveAura(SPELL_SET_PHASE_02);
             player->RemoveAura(SPELL_SET_PHASE_04);
-            player->RemoveAura(SPELL_GENERIC_QUEST_INVISIBILITY_DETECTION_2);            
+            player->RemoveAura(SPELL_GENERIC_QUEST_INVISIBILITY_DETECTION_2);  
             float p_x, p_y;
             player->GetPosition(p_x, p_y);
             float x, y, z, o = creature->GetAngle(p_x, p_y);
@@ -1315,7 +1362,7 @@ public:
             player->SetPhaseMask(8, true);
             if (Creature* josiah = player->SummonCreature(NPC_JOSIAH_AVERY_WORGEN_PHASE8, x, y, z, o, TEMPSUMMON_TIMED_DESPAWN, 10000))
             {        
-                CAST_AI(npc_josiah_avery_worgen_phase8::npc_josiah_avery_worgen_phase8AI, josiah->AI())->StartAnim(player);                
+                CAST_AI(npc_josiah_avery_worgen_phase8::npc_josiah_avery_worgen_phase8AI, josiah->AI())->StartAnim(player);
             }
         }
         return true; 
@@ -1367,6 +1414,229 @@ public:
     }
 };
 
+/*######
+## npc_lorna_crowley_phase8
+######*/
+
+class npc_lorna_crowley_phase8 : public CreatureScript
+{
+public:
+    npc_lorna_crowley_phase8() : CreatureScript("npc_lorna_crowley_phase8") { }
+
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    {
+        if (quest->GetQuestId() == QUEST_FROM_THE_SHADOWS)
+        {
+            if (Pet* pet = player->GetPet()) // first remove all normal pets, as for hunter and warlock
+                pet->UnSummon();
+            
+            Creature* mastiff = player->GetPartyMember(NPC_GILNEAS_MASTIFF_PHASE8);
+            if (!mastiff)
+                player->CastSpell(player, SPELL_SUMMON_MASTIFF, false);
+
+            creature->AI()->Talk(0);
+        }
+        return true;
+    }
+
+    bool OnQuestComplete(Player* player, Creature* creature, const Quest* quest)
+    {
+        if (quest->GetQuestId() == QUEST_FROM_THE_SHADOWS)
+            if (Creature* mastiff = player->GetPartyMember(NPC_GILNEAS_MASTIFF_PHASE8))
+                mastiff->DespawnOrUnsummon();
+        
+        return true;
+    }
+
+    struct npc_lorna_crowley_phase8AI : public ScriptedAI
+    {
+        npc_lorna_crowley_phase8AI(Creature* creature) : ScriptedAI(creature)
+        {
+            me->SetReactState(REACT_PASSIVE);
+            me->SetFlag(UNIT_FIELD_FLAGS,UNIT_FLAG_NON_ATTACKABLE);
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+            if (!UpdateVictim())
+                return;
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_lorna_crowley_phase8AI (creature);
+    }
+};
+
+/*######
+## npc_gilneas_mastiff_phase8
+######*/
+
+class npc_gilneas_mastiff_phase8 : public CreatureScript
+{
+public:
+    npc_gilneas_mastiff_phase8() : CreatureScript("npc_gilneas_mastiff_phase8") { }
+
+    struct npc_gilneas_mastiff_phase8AI : public ScriptedAI
+    {
+        npc_gilneas_mastiff_phase8AI(Creature* creature) : ScriptedAI(creature)
+        {
+            if (CharmInfo* charm = me->GetCharmInfo())
+            {                
+                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_ATTACK_LURKER);
+                charm->InitEmptyActionBar(true);
+                // ToDo: the spell is shown in bar, but has no effect
+                charm->AddSpellToActionBar(spellInfo, ACT_ENABLED);
+                me->SetReactState(REACT_DEFENSIVE);
+            }
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_gilneas_mastiff_phase8AI(creature);
+    }
+};
+
+/*######
+## npc_bloodfang_lurker_phase8
+######*/
+
+class npc_bloodfang_lurker_phase8 : public CreatureScript
+{
+public:
+    npc_bloodfang_lurker_phase8() : CreatureScript("npc_bloodfang_lurker_phase8") { }
+
+    struct npc_bloodfang_lurker_phase8AI : public ScriptedAI
+    {
+        npc_bloodfang_lurker_phase8AI(Creature* creature) : ScriptedAI(creature){}
+
+        bool    _enrage;
+        bool    _frenzy;
+        uint32  _health;
+
+        void Reset()
+        {
+            _enrage = false;
+            _frenzy = false;
+            DoCast(SPELL_SHADOWSTALKER_STEALTH);
+            me->SetReactState(REACT_PASSIVE);
+            _health = urand(65,95);
+        }
+
+        void StartAttack(Unit* who)
+        {
+            me->SetReactState(REACT_AGGRESSIVE);
+            me->SetInCombatWith(who);
+            who->SetInCombatWith(me);
+            me->AddThreat(who, 100500);
+        }
+
+        void DamageTaken(Unit* attacker, uint32 &damage)
+        {
+            if (attacker->GetEntry() == NPC_GILNEAS_CITY_GUARD_PHASE8)
+                if (me->HealthBelowPct(_health))
+                    damage = 0;
+
+            if (me->HasReactState(REACT_PASSIVE))
+                StartAttack(attacker);
+
+            if (!_frenzy && me->HealthBelowPct(45))
+            {
+                _frenzy = true;
+                DoCast(SPELL_UNDYING_FRENZY_CHANNELED);
+            }
+            else if (!_enrage && me->HealthBelowPct(30))
+            {
+                _enrage = true;
+                DoCast(SPELL_ENRAGE);
+            }
+        }
+
+        void SpellHit(Unit* caster, const SpellInfo* spell)
+        {
+            if (spell->Id == SPELL_ATTACK_LURKER)
+                StartAttack(caster);
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+            if (!UpdateVictim())
+                return;
+
+			DoMeleeAttackIfReady();
+        }      
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_bloodfang_lurker_phase8AI (creature);
+    }
+};
+
+/*######
+## npc_gilneas_city_guard_phase8
+######*/
+
+class npc_gilneas_city_guard_phase8 : public CreatureScript
+{
+public:
+    npc_gilneas_city_guard_phase8() : CreatureScript("npc_gilneas_city_guard_phase8") { }
+
+    struct npc_gilneas_city_guard_phase8AI : public ScriptedAI
+    {
+        npc_gilneas_city_guard_phase8AI(Creature* creature) : ScriptedAI(creature) { }
+
+        uint32  _health;
+
+        void Reset()
+        {
+            me->SetReactState(REACT_PASSIVE);
+            _health = urand(65,95);
+        }
+
+        void StartAttack(Unit* who)
+        {
+            me->SetReactState(REACT_AGGRESSIVE);
+            me->SetInCombatWith(who);
+            who->SetInCombatWith(me);
+            me->AddThreat(who, 100500);
+        }
+
+        void DamageTaken(Unit* attacker, uint32 &damage)
+        {
+            if (attacker->GetEntry() == NPC_BLOODFANG_LURKER_PHASE8) 
+                if (me->HealthBelowPct(_health))
+                    damage = 0;
+
+            if (me->HasReactState(REACT_PASSIVE))
+                StartAttack(attacker);
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+            if (!UpdateVictim())
+               return;
+			
+			DoMeleeAttackIfReady();
+        }		
+    };
+
+	CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_gilneas_city_guard_phase8AI (creature);
+    }
+};
+
 
 
 void AddSC_gilneas_city()
@@ -1392,5 +1662,10 @@ void AddSC_gilneas_city()
 
     new npc_josiah_avery_worgen_phase8();
     new npc_josiah_avery_human_phase4();
+    new npc_lorna_crowley_phase8();
+    new npc_gilneas_mastiff_phase8();
+    new npc_bloodfang_lurker_phase8();
+    new npc_gilneas_city_guard_phase8();
+
 
 };

@@ -10068,6 +10068,18 @@ void Player::ResetPetTalents()
 /***                    STORAGE SYSTEM                 ***/
 /*********************************************************/
 
+Creature* Player::GetPartyMember(uint32 entry)
+{
+    std::list<Unit*> pm_list;      
+    (this)->GetPartyMembers(pm_list);
+    for (std::list<Unit*>::const_iterator itr = pm_list.begin(); itr != pm_list.end(); ++itr )
+        if (Creature* creature = (*itr)->ToCreature())
+            if (creature->GetEntry() == entry)
+                return creature;
+
+    return NULL;
+}
+
 void Player::SetVirtualItemSlot(uint8 i, Item* item)
 {
     ASSERT(i < 3);

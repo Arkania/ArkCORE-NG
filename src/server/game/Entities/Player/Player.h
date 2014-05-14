@@ -1368,6 +1368,7 @@ class Player : public Unit, public GridObject<Player>
         /***                    STORAGE SYSTEM                 ***/
         /*********************************************************/
 
+        Creature* GetPartyMember(uint32 entry);
         void SetVirtualItemSlot(uint8 i, Item* item);
         void SetSheath(SheathState sheathed);             // overwrite Unit version
         uint8 FindEquipSlot(ItemTemplate const* proto, uint32 slot, bool swap) const;
