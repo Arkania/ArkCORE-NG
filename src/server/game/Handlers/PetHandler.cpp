@@ -336,7 +336,14 @@ void WorldSession::HandlePetActionHelper(Unit* pet, uint64 guid1, uint32 spellid
 
             // do not cast not learned spells
             if (!pet->HasSpell(spellid) || spellInfo->IsPassive())
-                return;
+            {
+                // gilneas specials : SPELL_ATTACK_LURKER
+                if (!spellid == 67805)
+                {
+                    sLog->outError("WORLD: PET has not learned spell id %i ", spellid);
+                    return;
+                }
+            }
 
             //  Clear the flags as if owner clicked 'attack'. AI will reset them
             //  after AttackStart, even if spell failed

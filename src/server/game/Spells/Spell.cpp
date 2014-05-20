@@ -4881,7 +4881,6 @@ enum GilneasValues
 {
     NPC_KRENNAN_ARANAS                  = 35753,    
     SPELL_RESCUE_KRENNAN_ARANAS         = 68219,
-    SPELL_ATTACK_LURKER                 = 67805,
 };
 
 SpellCastResult Spell::CheckCast(bool strict)
@@ -4896,11 +4895,7 @@ SpellCastResult Spell::CheckCast(bool strict)
     if (m_spellInfo->Id == SPELL_RESCUE_KRENNAN_ARANAS)
         if (Creature* creature = this->GetOriginalCaster()->GetVehicle()->GetPassenger(0)->ToPlayer()->FindNearestCreature(NPC_KRENNAN_ARANAS, 5.0f, true))
             return SPELL_CAST_OK;
-    
-    // gilneas specials
-    if (m_spellInfo->Id == SPELL_ATTACK_LURKER)
-        return SPELL_CAST_OK;
-
+      
     if (m_spellInfo->Id == 30449 && Target)          // Spellsteal Check
     {
         if (Target != m_caster && !Target->IsFriendlyTo(m_caster))

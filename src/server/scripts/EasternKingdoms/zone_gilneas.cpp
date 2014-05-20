@@ -1495,7 +1495,7 @@ public:
             {                
                 SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_ATTACK_LURKER);
                 charm->InitEmptyActionBar(true);
-                // ToDo: the spell is shown in bar, but has no effect
+                // ToDo: the spell is shown in bar, but has wrong effect
                 charm->AddSpellToActionBar(spellInfo, ACT_ENABLED);
                 me->SetReactState(REACT_DEFENSIVE);
             }
