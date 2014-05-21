@@ -1,6 +1,6 @@
 
-update creature_template set AIName="", Scriptname="npc_king_glenn_greymane_phase8" where entry=35550;
-update creature_template set AIName="", Scriptname="npc_vehicle_glenn_greymane_horse_phase8" where entry=35905;
+update creature_template set AIName="", Scriptname="npc_king_genn_greymane_phase8" where entry=35550;
+update creature_template set AIName="", Scriptname="npc_vehicle_genn_greymane_horse_phase8" where entry=35905;
 update creature_template set AIName="", Scriptname="npc_krennan_aranas_phase8" where entry=35753; 
 update creature_template set AIName="", Scriptname="npc_krennan_aranas_saved_phase8" where entry=35907;
 update creature_template set AIName="", Scriptname="npc_cannon_camera_phase8" where entry=50420;

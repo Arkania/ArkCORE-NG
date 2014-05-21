@@ -66,7 +66,7 @@ enum eGilneas
     NPC_BLOODFANG_LURKER_PHASE8                    = 35463,
     NPC_GILNEAS_CITY_GUARD_PHASE8                  = 50474,
 
-    NPC_GENN_HORSE_PHASE8                          = 35905,
+    NPC_GENN_GREYMANE_HORSE_PHASE8                 = 35905,
     NPC_KRENNAN_ARANAS_PHASE8                      = 35753,
     NPC_KRENNAN_ARANAS_SAVE_PHASE8                 = 35907,
     NPC_LORD_GOLDFREY_PHASE8                       = 35906,    
@@ -1432,6 +1432,18 @@ class npc_lorna_crowley_phase8 : public CreatureScript
 public:
     npc_lorna_crowley_phase8() : CreatureScript("npc_lorna_crowley_phase8") { }
 
+    bool OnGossipHello(Player* player, Creature* creature) 
+	{ 		
+		if (player->GetMap()->GetId() != 654)
+        {
+            player->TeleportTo(654, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetOrientation());
+            player->PlayerTalkClass->SendCloseGossip();
+            return true;
+        }
+		return false; 	
+	}
+
+
     bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
     {
         if (quest->GetQuestId() == QUEST_FROM_THE_SHADOWS)
@@ -1714,32 +1726,34 @@ public:
 ## npc_vehicle_genn_horse_phase8
 ######*/
 
-class npc_vehicle_glenn_greymane_horse_phase8 : public CreatureScript
+class npc_vehicle_genn_greymane_horse_phase8 : public CreatureScript
 {
 public:
-    npc_vehicle_glenn_greymane_horse_phase8() : CreatureScript("npc_vehicle_glenn_greymane_horse_phase8") {}
+    npc_vehicle_genn_greymane_horse_phase8() : CreatureScript("npc_vehicle_genn_greymane_horse_phase8") {}
 
-    struct npc_vehicle_glenn_greymane_horse_phase8AI : public npc_escortAI
+    struct npc_vehicle_genn_greymane_horse_phase8AI : public npc_escortAI
     {
-        npc_vehicle_glenn_greymane_horse_phase8AI(Creature* creature) : npc_escortAI(creature)
+        npc_vehicle_genn_greymane_horse_phase8AI(Creature* creature) : npc_escortAI(creature)
         {
             creature->SetReactState(REACT_PASSIVE);
-            AranasIsSave = false;
+            _AranasIsSave = false;
+            _timer = 250;
+            _phase = 0;
         }
 
-        bool          AranasIsSave;
-        Player*       _player;
-        Quest const*  _quest;
-
-
+        bool                    _AranasIsSave;
+        Player*                 _player;
+        Quest const*            _quest; 
+        uint32                  _timer;
+        uint32                  _phase;
 
         void StartAnim(Player* player, Creature* creature, Quest const* quest)
         {
             _player=player; _quest=quest;                       
             AddWaypoint(1, -1799.37f, 1400.21f, 19.8951f);
             AddWaypoint(2, -1798.23f, 1396.9f, 19.8993f);
-            AddWaypoint(3, -1795.03f, 1388.01f, 19.8898f);
-            AddWaypoint(4, -1790.16f, 1378.7f, 19.8016f);
+            AddWaypoint(3, -1796.41f, 1386.91f, 19.8898f);
+            AddWaypoint(4, -1793.45f, 1377.24f, 19.8016f);
             AddWaypoint(5, -1786.41f, 1372.97f, 19.8406f);
             AddWaypoint(6, -1779.72f, 1364.88f, 19.8131f);
             AddWaypoint(7, -1774.43f, 1359.87f, 19.7021f);
@@ -1775,12 +1789,13 @@ public:
             AddWaypoint(37, -1746.23f, 1375.8f, 19.9817f);
             AddWaypoint(38, -1751.06f, 1380.53f, 19.8424f);
             AddWaypoint(39, -1754.97f, 1386.34f, 19.8474f);
-            AddWaypoint(40, -1760.77f, 1394.37f, 19.9282f);
-            AddWaypoint(41, -1765.11f, 1402.07f, 19.8816f);
-            AddWaypoint(42, -1768.24f, 1410.2f, 19.7833f);
-            AddWaypoint(43, -1772.26f, 1420.48f, 19.9029f);
+            AddWaypoint(40, -1759.47f, 1388.32f, 19.983f);
+            AddWaypoint(41, -1768.25f, 1401.19f, 19.664f);
+            AddWaypoint(42, -1772.44f, 1409.95f, 19.782f);
+            AddWaypoint(43, -1774.75f, 1420.71f, 19.783f);
             AddWaypoint(44, -1776.26f, 1430.48f, 19.9029f);
             SetDespawnAtEnd(true);
+
             //player->CastSpell(player, SPELL_GENERIC_QUEST_INVISIBILITY_DETECTION_1, false);
             player->EnterVehicle(me, 0);
             me->EnableAI();
@@ -1794,13 +1809,14 @@ public:
             if (seatId == 0)
             {
                 me->m_ControlledByPlayer=false;               
-                Start(true, true);                
+                Start(true, true);  
+                _phase=1;
             }
             else if (seatId == 1)
             {
                 SetEscortPaused(false);
-                AranasIsSave = true;
-                me->m_ControlledByPlayer=false;
+                _AranasIsSave = true;
+                me->m_ControlledByPlayer=false;                
             }
         }
 
@@ -1808,6 +1824,10 @@ public:
         {
             switch(point)
             {
+                case 2:
+                     if (Creature* cannon = me->FindNearestCreature(NPC_COMMANDEERED_CANNON_PHASE8, 40.0f))
+                                cannon->CastSpell(cannon, SPELL_CANNON_FIRE, false);
+                     break;
                 case 17:
                     if (Unit* passenger = me->GetVehicleKit()->GetPassenger(0))
                     {
@@ -1821,12 +1841,19 @@ public:
                     }
                     break;
                 case 18:
-                    if (!AranasIsSave)
+                    if (!_AranasIsSave)
                     {
                         SetEscortPaused(true);
                         me->m_ControlledByPlayer=true;
                     }
                     break;
+                case 19:
+                    if (Vehicle* vehicle = me->GetVehicleKit())
+                        if (Unit* passenger = vehicle->GetPassenger(0))
+                            if (Player* player = passenger->ToPlayer())
+                                player->KilledMonsterCredit(NPC_KRENNAN_ARANAS_SAVE_PHASE8, 0);
+                    _phase=2;
+                    break;               
                 case 40:
                     if (Vehicle* vehicle = me->GetVehicleKit())
                         if (Unit* passenger = vehicle->GetPassenger(0))
@@ -1845,14 +1872,17 @@ public:
                 case 41:
                     me->SetFlag(UNIT_FIELD_FLAGS,UNIT_FLAG_NON_ATTACKABLE);
                     me->CombatStop();
+                                   
+                    if (Creature* cannon = me->FindNearestCreature(NPC_COMMANDEERED_CANNON_PHASE8, 40.0f))
+                        cannon->CastSpell(cannon, SPELL_CANNON_FIRE, false);
+                    
                     break;
                 case 42:
                     if (Vehicle* vehicle = me->GetVehicleKit())
                         if (Unit* passenger = vehicle->GetPassenger(0))
                             if (Player* player = passenger->ToPlayer())
                             {
-                                player->KilledMonsterCredit(NPC_KRENNAN_ARANAS_SAVE_PHASE8, 0);
-
+                                
                                 if (Unit* passenger_2 = vehicle->GetPassenger(1))
                                     if (Creature* aranas = passenger_2->ToCreature())
                                         aranas->AI()->Talk(0, player->GetGUID()); // DoScriptText(ARANAS_THANK, player);
@@ -1868,7 +1898,7 @@ public:
                         vehicle->RemoveAllPassengers();
                     }
 
-                    me->DespawnOrUnsummon();
+                    me->DespawnOrUnsummon(3000);
                     break;
             }
         }
@@ -1876,23 +1906,46 @@ public:
         void UpdateAI(uint32 diff)
         {
             npc_escortAI::UpdateAI(diff);
+
+            if (_timer <= diff)
+            {                
+                _timer = 500;
+                switch (_phase)
+                {
+                case 0:
+                    break;
+                case 1:                    
+                    if (Creature* worgen = _player->SummonCreature(NPC_BLOODFANG_RIPPER_QSKA_PHASE8, frand(-1744.0f ,-1715.0f), frand(1270.0f, 1344.0f), 19.99f , frand(1.0f, 5.0f), TEMPSUMMON_TIMED_DESPAWN, 30000))
+                    {
+                        worgen->SetWalk(false);
+                        worgen->SetSpeed(MOVE_RUN, frand(0.8f, 1.2f), true);
+                        worgen->GetMotionMaster()->MovePoint(1, -1764.51f + frand(-3.0f, 3.0f), 1398.57f + frand(-3.0f, 3.0f), 19.64f);
+                    }
+                    break;
+                case 2:
+                    break;
+                }
+                
+            }
+            else
+                _timer -= diff;
         }
     };
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_vehicle_glenn_greymane_horse_phase8AI(creature);
+        return new npc_vehicle_genn_greymane_horse_phase8AI(creature);
     }
 };
 
 /*######
-## npc_king_glenn_greymane_phase8
+## npc_king_genn_greymane_phase8
 ######*/
 
-class npc_king_glenn_greymane_phase8 : public CreatureScript
+class npc_king_genn_greymane_phase8 : public CreatureScript
 {
 public:
-    npc_king_glenn_greymane_phase8() : CreatureScript("npc_king_glenn_greymane_phase8") { }
+    npc_king_genn_greymane_phase8() : CreatureScript("npc_king_genn_greymane_phase8") { }
 
     bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
     {
@@ -1901,16 +1954,16 @@ public:
             float x, y;
             creature->GetNearPoint2D(x, y, 2.0f, player->GetOrientation() + M_PI / 2);
              
-            if (Creature* horse = player->SummonCreature(NPC_GENN_HORSE_PHASE8, x, y, creature->GetPositionZ(), creature->GetOrientation()))
-                CAST_AI(npc_vehicle_glenn_greymane_horse_phase8::npc_vehicle_glenn_greymane_horse_phase8AI, horse->AI())->StartAnim(player, creature, quest);                
+            if (Creature* horse = player->SummonCreature(NPC_GENN_GREYMANE_HORSE_PHASE8, x, y, creature->GetPositionZ(), creature->GetOrientation()))
+                CAST_AI(npc_vehicle_genn_greymane_horse_phase8::npc_vehicle_genn_greymane_horse_phase8AI, horse->AI())->StartAnim(player, creature, quest);          
         }
 
         return true;
     }
 
-    struct npc_king_glenn_greymane_phase8AI : public ScriptedAI
+    struct npc_king_genn_greymane_phase8AI : public ScriptedAI
     {
-        npc_king_glenn_greymane_phase8AI(Creature* creature) : ScriptedAI(creature)
+        npc_king_genn_greymane_phase8AI(Creature* creature) : ScriptedAI(creature)
         {
             uiRandomYellTimer = urand(15000, 35000);
         }
@@ -1920,9 +1973,12 @@ public:
         void UpdateAI(uint32 diff)
         {
             if (uiRandomYellTimer <= diff)
-            {
+            {                
                 uiRandomYellTimer = urand(15000, 35000);                
                 Talk(0); 
+
+                if (Creature* cannon = me->FindNearestCreature(NPC_COMMANDEERED_CANNON_PHASE8, 40.0f))
+                    cannon->CastSpell(cannon, SPELL_CANNON_FIRE, false);
             }
             else
                 uiRandomYellTimer -= diff;
@@ -1936,110 +1992,49 @@ public:
     
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_king_glenn_greymane_phase8AI (creature);
+        return new npc_king_genn_greymane_phase8AI (creature);
     }
 };
 
 /*######
-## npc_cannon_camera_phase8
+## npc_commandeered_cannon_phase8
 ######*/
 
-class npc_cannon_camera_phase8 : public CreatureScript
+class npc_commandeered_cannon_phase8 : public CreatureScript
 {
 public:
-    npc_cannon_camera_phase8() : CreatureScript("npc_cannon_camera_phase8") { }
-
-    struct npc_cannon_camera_phase8AI : public ScriptedAI
+    npc_commandeered_cannon_phase8() : CreatureScript("npc_commandeered_cannon_phase8") { }
+  
+    struct npc_commandeered_cannon_phase8AI : public ScriptedAI
     {
-        npc_cannon_camera_phase8AI(Creature* creature) : ScriptedAI(creature)
+        npc_commandeered_cannon_phase8AI(Creature* creature) : ScriptedAI(creature)
         {
-            uiEventTimer = 1000;
-            uiPhase = 0;
-            Event = false;
-            lSummons.clear();
+            _timer = 2000;
         }
 
-        std::list<Creature*> lSummons;
-        uint32 uiEventTimer;
-        uint8 uiPhase;
-        bool Event;
-                
-        void PassengerBoarded(Unit* /*who*/, int8 /*seatId*/, bool apply)
+        uint32 _timer;
+       
+        void AttackStart(Unit* target)
         {
-            if (apply)
-                Event = true;
-            else
-            {
-                if (Creature* cannon = me->FindNearestCreature(NPC_COMMANDEERED_CANNON_PHASE8, 40.0f))
-                    cannon->CastSpell(cannon, SPELL_CANNON_FIRE, false);
-
-                for (std::list<Creature*>::iterator itr = lSummons.begin(); itr != lSummons.end(); ++itr)
-                    if ((*itr)->IsAlive())
-                        (*itr)->Kill(*itr);
-
-                lSummons.clear();
-            }
+            DoStartNoMovement(target);
         }
 
         void UpdateAI(uint32 diff)
         {
-            if (Event)
-                if (uiEventTimer <= diff)
-                {
-                    ++uiPhase;
-
-                    switch (uiPhase)
-                    {
-                        case 1:
-                            uiEventTimer = 1500;
-                            SummonWorgen(-1715.219f, 1352.839f, 19.8645f, 2.72649f);
-                            SummonWorgen(-1721.182f, 1350.429f, 19.8656f, 2.48614f);
-                            SummonWorgen(-1746.523f, 1361.108f, 19.8681f, 1.85957f);
-                            SummonWorgen(-1724.385f, 1348.462f, 19.6781f, 2.10692f);
-                            SummonWorgen(-1734.542f, 1344.554f, 19.8769f, 1.65637f);
-                            SummonWorgen(-1732.773f, 1367.837f, 19.9010f, 1.10063f);
-                            SummonWorgen(-1744.358f, 1363.382f, 19.8996f, 2.06127f);
-                            SummonWorgen(-1719.358f, 1357.512f, 19.7791f, 2.91488f);
-                            SummonWorgen(-1728.276f, 1353.201f, 19.6823f, 2.25370f);
-                            SummonWorgen(-1726.747f, 1364.599f, 19.9263f, 2.71766f);
-                            SummonWorgen(-1737.693f, 1352.986f, 19.8711f, 1.96818f);
-                            SummonWorgen(-1734.391f, 1359.887f, 19.9064f, 2.48052f);
-                            SummonWorgen(-1730.286f, 1390.384f, 20.7707f, 4.35712f);                           
-                            break;
-                        case 2:
-                            uiEventTimer = 2000;
-                            if (Creature* cannon = me->FindNearestCreature(NPC_COMMANDEERED_CANNON_PHASE8, 40.0f))
-                                cannon->CastSpell(cannon, SPELL_CANNON_FIRE, false);
-                            break;
-                        case 3:
-                            Event = false;
-                            if (Creature* cannon = me->FindNearestCreature(NPC_COMMANDEERED_CANNON_PHASE8, 40.0f))
-                                cannon->CastSpell(cannon, SPELL_CANNON_FIRE, false);
-                            break;
-                    }
-                }
-                else
-                    uiEventTimer -= diff;
-
-            if (!UpdateVictim())
-                return;
-
-            DoMeleeAttackIfReady();
-        }
-
-        void SummonWorgen(float x, float y, float z, float o)
-        {
-            if (Creature* worgen = me->SummonCreature(NPC_BLOODFANG_RIPPER_QSKA_PHASE8, x, y, z, o))
-            {
-                lSummons.push_back(worgen);
-                worgen->GetMotionMaster()->MovePoint(0, -1751.874f + irand(-3, 3), 1377.457f + irand(-3, 3), 19.930f);
+            if (_timer <= diff)
+            {                
+                _timer = 2000;                               
+                if (Creature* worgen = me->FindNearestCreature(NPC_BLOODFANG_RIPPER_QSKA_PHASE8, 20.0f))
+                    me->CastSpell(me, SPELL_CANNON_FIRE, false);
             }
+            else
+                _timer -= diff;
         }
     };
-
+    
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_cannon_camera_phase8AI(creature);
+        return new npc_commandeered_cannon_phase8AI (creature);
     }
 };
 
@@ -2052,14 +2047,25 @@ class npc_lord_godfrey_phase8 : public CreatureScript
 public:
     npc_lord_godfrey_phase8() : CreatureScript("npc_lord_godfrey_phase8") { }
 
+    bool OnGossipHello(Player* player, Creature* creature) 
+	{ 		
+		if (player->GetMap()->GetId() != 638 && player->GetQuestStatus(QUEST_SAVE_KRENNAN_ARANAS) == QUEST_STATUS_COMPLETE)
+        {           
+            player->TeleportTo(638, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetOrientation());
+            player->PlayerTalkClass->SendCloseGossip();
+            return true;
+        }
+		return false; 	
+	}
+
     bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 opt)
     {
         if (quest->GetQuestId() == QUEST_SAVE_KRENNAN_ARANAS)
         {
-            creature->AI()->Talk(0,player->GetGUID()); //  DoScriptText(GOLDFREY_SAY_ARANAS_WITH_US, player);            
-            player->CastSpell(player, SPELL_CANNON_CAMERA, false);
-            player->CastSpell(player, SPELL_GENERIC_QUEST_INVISIBILITY_DETECTION_2, false);
-            player->SaveToDB();
+            creature->AI()->Talk(0,player->GetGUID()); //  DoScriptText(GOLDFREY_SAY_ARANAS_WITH_US, player); 
+            // player->CastSpell(player, SPELL_CANNON_CAMERA, false);
+            // player->CastSpell(player, SPELL_GENERIC_QUEST_INVISIBILITY_DETECTION_2, false);
+            // player->SaveToDB();
         }
 
         return true;
@@ -2097,9 +2103,9 @@ void AddSC_gilneas_city()
 
     new npc_krennan_aranas_phase8();
     new npc_krennan_aranas_saved_phase8();
-    new npc_vehicle_glenn_greymane_horse_phase8();
-    new npc_king_glenn_greymane_phase8();
-    new npc_cannon_camera_phase8();
+    new npc_vehicle_genn_greymane_horse_phase8();
+    new npc_commandeered_cannon_phase8();
+    new npc_king_genn_greymane_phase8();
     new npc_lord_godfrey_phase8();
 
 };

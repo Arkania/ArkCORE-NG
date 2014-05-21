@@ -338,7 +338,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, uint64 guid1, uint32 spellid
             if (!pet->HasSpell(spellid) || spellInfo->IsPassive())
             {
                 // gilneas specials : SPELL_ATTACK_LURKER
-                if (!spellid == 67805)
+                if (spellid != 67805)
                 {
                     sLog->outError("WORLD: PET has not learned spell id %i ", spellid);
                     return;
