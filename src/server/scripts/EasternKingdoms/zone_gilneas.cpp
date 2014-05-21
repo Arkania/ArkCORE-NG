@@ -75,6 +75,9 @@ enum eGilneas
     NPC_COMMANDEERED_CANNON_PHASE8                 = 35914,
     NPC_BLOODFANG_RIPPER_QSKA_PHASE8               = 35916,
     NPC_GILNEAS_CANNON_CAMERA_PHASE8               = 50420,
+
+    NPC_SISTER_ALMYRA                              = 44468,
+    NPC_CELESTINE_OF_THE_HARVEST                   = 44459,
     
     QUEST_LOCKDOWN                                 = 14078,
     QUEST_SOMETHINGS_AMISS                         = 14091,
@@ -114,7 +117,10 @@ enum eGilneas
     SPELL_SHOOT_QSKA                               = 48424,
     SPELL_CANNON_CAMERA                            = 93522,
     SPELL_FORECAST_CANNON_CAMERA                   = 93555,
-    SPELL_CROWLEY_SUMMON_INITIALIZE                = 67002,    
+    SPELL_CROWLEY_SUMMON_INITIALIZE                = 67002,
+
+    SPELL_POWER_WORD_FORTITUDE                     = 74973,
+    SPELL_MARK_OF_THE_WILD                         = 79833,
 
 };
 
@@ -2072,6 +2078,121 @@ public:
     }
 };
 
+/*######
+## npc_sister_almyra_phase8
+######*/
+
+class npc_sister_almyra_phase8 : public CreatureScript
+{
+public:
+    npc_sister_almyra_phase8() : CreatureScript("npc_sister_almyra_phase8") { }
+
+     struct npc_sister_almyra_phase8AI : public ScriptedAI
+    {
+        npc_sister_almyra_phase8AI(Creature* creature) : ScriptedAI(creature)
+        {
+            _timer = 1000;
+        }
+
+        uint32 _timer;
+       
+       
+
+        void UpdateAI(uint32 diff)
+        {
+            if (!UpdateVictim())
+            {
+                if (_timer <= diff)
+                {
+                    _timer = 1000;
+                    DoWork();
+                }
+                else
+                    _timer -= diff;
+                }
+            else
+                DoMeleeAttackIfReady();
+        }
+
+        void DoWork()
+        {
+            std::list<Player*> PlayerList = me->FindNearestPlayers(15.0f);
+            for (std::list<Player*>::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
+            {
+				if (Player* player = *itr)
+                {	
+					if (!player->HasAura(SPELL_POWER_WORD_FORTITUDE))
+                        me->CastSpell(player, SPELL_POWER_WORD_FORTITUDE, false);
+				}
+			}
+        }
+    };
+    
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_sister_almyra_phase8AI (creature);
+    }
+};
+
+/*######
+## npc_celestine_of_the_harvest_phase8
+######*/
+
+class npc_celestine_of_the_harvest_phase8 : public CreatureScript
+{
+public:
+    npc_celestine_of_the_harvest_phase8() : CreatureScript("npc_celestine_of_the_harvest_phase8") { }
+
+     struct npc_celestine_of_the_harvest_phase8AI : public ScriptedAI
+    {
+        npc_celestine_of_the_harvest_phase8AI(Creature* creature) : ScriptedAI(creature)
+        {
+            _timer = 1000;
+        }
+
+        uint32 _timer;
+       
+       
+
+        void UpdateAI(uint32 diff)
+        {
+            if (!UpdateVictim())
+            {
+                if (_timer <= diff)
+                {
+                    _timer = 1000;
+                    DoWork();
+                }
+                else
+                    _timer -= diff;
+                }
+            else
+                DoMeleeAttackIfReady();
+        }
+
+        void DoWork()
+        {
+            std::list<Player*> PlayerList = me->FindNearestPlayers(15.0f);
+            for (std::list<Player*>::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
+            {
+				if (Player* player = *itr)
+                {	
+					if (!player->HasAura(SPELL_MARK_OF_THE_WILD))
+                        me->CastSpell(player, SPELL_MARK_OF_THE_WILD, false);
+				}
+			}
+        }
+    };
+    
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_celestine_of_the_harvest_phase8AI (creature);
+    }
+};
+
+
+
+
 
 void AddSC_gilneas_city()
 {
@@ -2107,5 +2228,8 @@ void AddSC_gilneas_city()
     new npc_commandeered_cannon_phase8();
     new npc_king_genn_greymane_phase8();
     new npc_lord_godfrey_phase8();
+
+    new npc_sister_almyra_phase8();
+    new npc_celestine_of_the_harvest_phase8();
 
 };
