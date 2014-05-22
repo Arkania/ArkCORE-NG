@@ -76,8 +76,10 @@ enum eGilneas
     NPC_BLOODFANG_RIPPER_QSKA_PHASE8               = 35916,
     NPC_GILNEAS_CANNON_CAMERA_PHASE8               = 50420,
 
-    NPC_SISTER_ALMYRA                              = 44468,
-    NPC_CELESTINE_OF_THE_HARVEST                   = 44459,
+    NPC_SISTER_ALMYRA_PHASE8                       = 44468,
+    NPC_CELESTINE_OF_THE_HARVEST_PHASE8            = 44459,
+    NPC_LORD_DARIUS_CROWLEY_PHASE8                 = 35552,
+    NPC_KING_GENN_GREYMANE2_PHASE8                 = 35911,
     
     QUEST_LOCKDOWN                                 = 14078,
     QUEST_SOMETHINGS_AMISS                         = 14091,
@@ -1430,6 +1432,10 @@ public:
 };
 
 /*######
+## phase 8
+######*/
+
+/*######
 ## npc_lorna_crowley_phase8
 ######*/
 
@@ -2190,6 +2196,158 @@ public:
     }
 };
 
+/*######
+## npc_lord_darius_crowley_phase8
+######*/
+
+class npc_lord_darius_crowley_phase8 : public CreatureScript
+{
+public:
+    npc_lord_darius_crowley_phase8() : CreatureScript("npc_lord_darius_crowley_phase8") { }
+
+     struct npc_lord_darius_crowley_phase8AI : public ScriptedAI
+    {
+        npc_lord_darius_crowley_phase8AI(Creature* creature) : ScriptedAI(creature)
+        {
+            _timer = 1000;
+        }
+
+        uint32 _timer;
+       
+       
+
+        void UpdateAI(uint32 diff)
+        {
+            if (!UpdateVictim())
+            {
+                if (_timer <= diff)
+                {
+                    _timer = 1000;
+                   
+                }
+                else
+                    _timer -= diff;
+                }
+            else
+                DoMeleeAttackIfReady();
+        }
+
+       
+    };
+    
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_lord_darius_crowley_phase8AI (creature);
+    }
+};
+
+/*######
+## npc_king_genn_greymane2_phase8
+######*/
+
+class npc_king_genn_greymane2_phase8 : public CreatureScript
+{
+public:
+    npc_king_genn_greymane2_phase8() : CreatureScript("npc_king_genn_greymane2_phase8") { }
+
+     struct npc_king_genn_greymane2_phase8AI : public ScriptedAI
+    {
+        npc_king_genn_greymane2_phase8AI(Creature* creature) : ScriptedAI(creature)
+        {
+            _timer = 1000;
+            _talkTimer = 1000;
+            _talkPhase = 0;
+        }
+
+        uint32  _timer;
+        uint32  _talkTimer;
+        uint32  _talkPhase;
+       
+
+        void UpdateAI(uint32 diff)
+        {
+            if (!UpdateVictim())
+            {
+                if (_timer <= diff)
+                {
+                    _timer = 1000;
+                    
+                }
+                else
+                    _timer -= diff;
+
+                if (_talkTimer <= diff)
+                {
+                    _talkTimer = 1000;
+                    DoTalk();
+                }
+                else
+                    _talkTimer -= diff;
+            }
+            else
+                DoMeleeAttackIfReady();
+        }
+
+        void DoTalk()
+        {
+            switch (_talkPhase)
+            {
+            case 0:
+                if (me->IsPlayerInRange(15.0))
+                    _talkPhase += 1;
+                break;
+            case 1:
+                Talk(1);
+                _talkPhase += 1;
+                _talkTimer=10000;
+                break;
+            case 2:
+                if (Creature* darius = me->FindNearestCreature(NPC_LORD_DARIUS_CROWLEY_PHASE8,25.0f))                
+                    darius->AI()->Talk(1);
+
+                _talkPhase += 1;
+                _talkTimer=10000;
+                break;
+            case 3:
+                if (Creature* darius = me->FindNearestCreature(NPC_LORD_DARIUS_CROWLEY_PHASE8,25.0f))                
+                    darius->AI()->Talk(2);
+
+                _talkPhase += 1;
+                _talkTimer=10000;
+                break;
+            case 4:
+                Talk(2);
+                _talkPhase += 1;
+                _talkTimer=10000;
+                break;
+            case 5:
+                Talk(0);
+                _talkPhase += 1;
+                _talkTimer=10000;
+                break;
+            case 6:
+                 if (Creature* darius = me->FindNearestCreature(NPC_LORD_DARIUS_CROWLEY_PHASE8,25.0f))                
+                    darius->AI()->Talk(0);
+
+                _talkPhase += 1;
+                _talkTimer=10000;
+                break;
+            case 7:
+                _talkPhase += 1;
+                _talkTimer=30000;
+                break;
+            case 8:
+                _talkPhase = 0;
+                break;
+            }
+        }
+    };
+    
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_king_genn_greymane2_phase8AI (creature);
+    }
+};
 
 
 
@@ -2231,5 +2389,7 @@ void AddSC_gilneas_city()
 
     new npc_sister_almyra_phase8();
     new npc_celestine_of_the_harvest_phase8();
+    new npc_lord_darius_crowley_phase8();
+    new npc_king_genn_greymane2_phase8();
 
 };

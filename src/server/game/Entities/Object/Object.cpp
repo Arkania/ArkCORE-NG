@@ -2816,6 +2816,14 @@ std::list<Player*> WorldObject::FindNearestPlayers(float range)
     return PlayerList;
 }
 
+bool WorldObject::IsPlayerInRange(float range)
+{
+    if (Player* player = FindNearestPlayer(range, true))
+        return true;
+
+    return false;
+}
+
 void WorldObject::GetGameObjectListWithEntryInGrid(std::list<GameObject*>& gameobjectList, uint32 entry, float maxSearchRange) const
 {
     CellCoord pair(Trinity::ComputeCellCoord(this->GetPositionX(), this->GetPositionY()));
