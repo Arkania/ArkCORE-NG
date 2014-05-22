@@ -5930,8 +5930,6 @@ void Spell::EffectSummonObject(SpellEffIndex effIndex)
     Map* map = m_caster->GetMap();
     if (m_spellInfo->Id == 80451)
     {
-        delete go;
-        return;
         if (!go->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_GAMEOBJECT), go_id, map,
             m_caster->GetPhaseMask(), x, y, z, m_caster->ToPlayer()->GetArcheologyMgr().SetNearestFindOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 0, GO_STATE_READY))
         {

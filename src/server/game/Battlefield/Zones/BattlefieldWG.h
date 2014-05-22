@@ -1544,8 +1544,8 @@ struct WintergraspWorkshopData
     uint32 m_WorldState;
     uint32 m_TeamControl;                                   // Team witch control the workshop
     GuidSet m_CreatureOnPoint[2];                           // Contain all Creature associate to this point
-    GuidSet m_GameObjectOnPoint[2];                     // Contain all Gameobject associate to this point
-    uint32 m_NameId;                                        // Id of trinity_string witch contain name of this node, using for alert message
+    GuidSet m_GameObjectOnPoint[2];                         // Contain all Gameobject associate to this point
+    uint32 m_NameId;                                        // Id of arkcore_string witch contain name of this node, using for alert message
 
     WintergraspWorkshopData(BattlefieldWG* WG)
     {

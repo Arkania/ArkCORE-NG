@@ -31,7 +31,7 @@ namespace Trinity
     {
         inline float hk_honor_at_level_f(uint8 level, float multiplier = 1.0f)
         {
-             float honor = multiplier * 4.5f; // OLD: multiplier * level * 1.55f; // 4.3: 4.5 Honor points per kill divided among all friendly players in range/group.
+            float honor = multiplier * 4.5f; // OLD: multiplier * level * 1.55f; // 4.3: 4.5 Honor points per kill divided among all friendly players in range/group.
             sScriptMgr->OnHonorCalculation(honor, level, multiplier);
             return honor;
         }

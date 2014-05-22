@@ -130,8 +130,6 @@ void WorldSession::HandleSetPrimaryTree(WorldPacket& recvPacket)
 
 void WorldSession::HandleArcheologyRequestHistory(WorldPacket& /*recvPacket*/)
 {
-    TC_LOG_DEBUG("network", "SMSG_RESEARCH_SETUP_HISTORY");
-
     //empty handler, we must send SMSG_RESEARCH_SETUP_HISTORY. We still need to implement time of completion and a completion counter for proj id.
     WorldPacket data(SMSG_RESEARCH_SETUP_HISTORY);
 

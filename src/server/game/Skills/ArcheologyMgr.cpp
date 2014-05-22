@@ -177,7 +177,6 @@ uint32 ArcheologyMgr::OnSurveyBotActivated()
             case 1:
                 dist = m_player->GetDistance2d(iter->second.artifacts[0].positionX, iter->second.artifacts[0].positionY);
                 break;
-    
             case 2:
                 if (m_player->GetDistance2d(iter->second.artifacts[1].positionX, iter->second.artifacts[1].positionY) < m_player->GetDistance2d(iter->second.artifacts[0].positionX, iter->second.artifacts[0].positionY))
                 {
@@ -187,7 +186,6 @@ uint32 ArcheologyMgr::OnSurveyBotActivated()
                 else
                     dist = m_player->GetDistance2d(iter->second.artifacts[0].positionX, iter->second.artifacts[0].positionY);
                 break;
-    
             case 3:
                 if (m_player->GetDistance2d(iter->second.artifacts[2].positionX, iter->second.artifacts[2].positionY) < m_player->GetDistance2d(iter->second.artifacts[1].positionX, iter->second.artifacts[1].positionY))
                 {
@@ -208,20 +206,17 @@ uint32 ArcheologyMgr::OnSurveyBotActivated()
                     dist = m_player->GetDistance2d(iter->second.artifacts[0].positionX, iter->second.artifacts[0].positionY);
                 break;
         }
-    
+
         if (dist <= ARCHAEOLOGY_DIG_SITE_FAR_DIST && dist > ARCHAEOLOGY_DIG_SITE_MED_DIST) // Red 80-50y
             return ARCHAEOLOGY_DIG_SITE_FAR_SURVEYBOT;
-    
         else if (dist <= ARCHAEOLOGY_DIG_SITE_MED_DIST && dist > ARCHAEOLOGY_DIG_SITE_CLOSE_DIST) // Yellow 50-20y
             return ARCHAEOLOGY_DIG_SITE_MEDIUM_SURVEYBOT;
-    
         else if (dist <= ARCHAEOLOGY_DIG_SITE_CLOSE_DIST && dist > ARCHAEOLOGY_DIG_SITE_FIND_DIST) // Green 20-5y
             return ARCHAEOLOGY_DIG_SITE_CLOSE_SURVEYBOT;
-    
         else if (dist <= ARCHAEOLOGY_DIG_SITE_FIND_DIST) // Found it!
         {
             m_player->ModifyCurrency(iter->second.artifacts[artifactPos].loot_currency_type, urand(5, 9)); // Add a random number of 5-9 fragments to the player : 4.3 Archaeology change.
-    
+
             // Advance Archaeology skill. - done from gather skill in player.cpp on open container.
             //m_player->SetSkill(SKILL_ARCHAEOLOGY, m_player->GetSkillStep(SKILL_ARCHAEOLOGY), m_player->GetSkillValue(SKILL_ARCHAEOLOGY) + 1, m_player->GetPureMaxSkillValue(SKILL_ARCHAEOLOGY));
 
@@ -252,14 +247,12 @@ uint32 ArcheologyMgr::SetNearestFindOrientation() // must bind this to show same
             case 1:
                 return m_player->GetAngle(iter->second.artifacts[0].positionX, iter->second.artifacts[0].positionY);
                 break;
-
             case 2:
                 if (m_player->GetDistance2d(iter->second.artifacts[1].positionX, iter->second.artifacts[1].positionY) < m_player->GetDistance2d(iter->second.artifacts[0].positionX, iter->second.artifacts[0].positionY))
                     return m_player->GetAngle(iter->second.artifacts[1].positionX, iter->second.artifacts[1].positionY);
                 else
                     return m_player->GetAngle(iter->second.artifacts[0].positionX, iter->second.artifacts[0].positionY);
                 break;
-
             case 3:
                 if (m_player->GetDistance2d(iter->second.artifacts[2].positionX, iter->second.artifacts[2].positionY) < m_player->GetDistance2d(iter->second.artifacts[1].positionX, iter->second.artifacts[1].positionY))
                     return m_player->GetAngle(iter->second.artifacts[2].positionX, iter->second.artifacts[2].positionY);
@@ -402,7 +395,7 @@ void ArcheologyMgr::_updateDigsite(uint32 digSiteId,uint8 action, bool updateCli
                                         newDigSite.artifacts[counter].loot_currency_type = CURRENCY_TYPE_DRAENEI_FRAGMENT;
                                     }
                                     break;
-                                
+
                                 case 571: // Northrend Fragments (Vrykul, Nerubian, Troll, Night Elf currency).
                                     if (newDigSite.entry == 429 || newDigSite.entry == 431 || newDigSite.entry == 433 || newDigSite.entry == 435 || newDigSite.entry == 443) // Troll fragments.
                                     {
@@ -425,7 +418,7 @@ void ArcheologyMgr::_updateDigsite(uint32 digSiteId,uint8 action, bool updateCli
                                         newDigSite.artifacts[counter].loot_currency_type = CURRENCY_TYPE_VRYKUL_FRAGMENT;
                                     }
                                     break;
-                                
+
                                 case 0: //Eastern Kingdoms Fragments (Night Elf, Fossil, Nerubian, Troll, Dwarf currency).
                                     if (newDigSite.entry == 18 || newDigSite.entry == 23 || newDigSite.entry == 24 || newDigSite.entry == 25 || newDigSite.entry == 26 || newDigSite.entry == 27 || newDigSite.entry == 152 || newDigSite.entry == 217 || newDigSite.entry == 223 || newDigSite.entry == 225 || newDigSite.entry == 227 || newDigSite.entry == 229 || newDigSite.entry == 231 || newDigSite.entry == 233 || newDigSite.entry == 235 || newDigSite.entry == 239 || newDigSite.entry == 241 || newDigSite.entry == 243 || newDigSite.entry == 245) // Troll fragments.
                                     {
@@ -453,7 +446,7 @@ void ArcheologyMgr::_updateDigsite(uint32 digSiteId,uint8 action, bool updateCli
                                         newDigSite.artifacts[counter].loot_currency_type = CURRENCY_TYPE_FOSSIL_FRAGMENT;
                                     }
                                     break;
-                                
+
                                 case 1: //Kalimdor Fragments (Night Elf, Fossil, Tol'vir, Troll, Dwarf currency).
                                     if (newDigSite.entry == 315 || newDigSite.entry == 317 || newDigSite.entry == 319 || newDigSite.entry == 321) // Troll fragments.
                                     {
@@ -527,7 +520,7 @@ void ArcheologyMgr::_updateDigsite(uint32 digSiteId,uint8 action, bool updateCli
                                 newDigSite.artifacts[counter].loot_currency_type = CURRENCY_TYPE_DRAENEI_FRAGMENT;
                             }
                             break;
-                        
+
                         case 571: // Northrend Fragments (Vrykul, Nerubian, Troll, Night Elf currency).
                             if (newDigSite.entry == 429 || newDigSite.entry == 431 || newDigSite.entry == 433 || newDigSite.entry == 435 || newDigSite.entry == 443) // Troll fragments.
                             {
@@ -550,7 +543,7 @@ void ArcheologyMgr::_updateDigsite(uint32 digSiteId,uint8 action, bool updateCli
                                 newDigSite.artifacts[counter].loot_currency_type = CURRENCY_TYPE_VRYKUL_FRAGMENT;
                             }
                             break;
-                        
+
                         case 0: //Eastern Kingdoms Fragments (Night Elf, Fossil, Nerubian, Troll, Dwarf currency).
                             if (newDigSite.entry == 18 || newDigSite.entry == 23 || newDigSite.entry == 24 || newDigSite.entry == 25 || newDigSite.entry == 26 || newDigSite.entry == 27 || newDigSite.entry == 152 || newDigSite.entry == 217 || newDigSite.entry == 223 || newDigSite.entry == 225 || newDigSite.entry == 227 || newDigSite.entry == 229 || newDigSite.entry == 231 || newDigSite.entry == 233 || newDigSite.entry == 235 || newDigSite.entry == 239 || newDigSite.entry == 241 || newDigSite.entry == 243 || newDigSite.entry == 245) // Troll fragments.
                             {
@@ -578,7 +571,7 @@ void ArcheologyMgr::_updateDigsite(uint32 digSiteId,uint8 action, bool updateCli
                                 newDigSite.artifacts[counter].loot_currency_type = CURRENCY_TYPE_FOSSIL_FRAGMENT;
                             }
                             break;
-                        
+
                         case 1: //Kalimdor Fragments (Night Elf, Fossil, Tol'vir, Troll, Dwarf currency).
                             if (newDigSite.entry == 315 || newDigSite.entry == 317 || newDigSite.entry == 319 || newDigSite.entry == 321) // Troll fragments.
                             {
