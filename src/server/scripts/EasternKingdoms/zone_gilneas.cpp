@@ -39,90 +39,107 @@ EndScriptData */
 
 enum eGilneas
 {
-    NPC_PANICKED_CITIZEN_PHASE1                    = 34851,
-    NPC_GILNEAS_CITY_GUARD_PHASE1                  = 34864,
-    NPC_PANICKED_CITIZEN_GATE_PHASE1               = 44086,
-    NPC_PRINCE_LIAM_GREYMANE_PHASE1                = 34850,
-    NPC_LIEUTNANT_WALDEN_PHASE1                    = 34863,
+    NPC_PANICKED_CITIZEN_PHASE1                     = 34851,
+    NPC_GILNEAS_CITY_GUARD_PHASE1                   = 34864,
+    NPC_PANICKED_CITIZEN_GATE_PHASE1                = 44086,
+    NPC_PRINCE_LIAM_GREYMANE_PHASE1                 = 34850,
+    NPC_LIEUTNANT_WALDEN_PHASE1                     = 34863,
 
-    NPC_RAMPAGING_WORGEN_CW_PHASE2                 = 34884,
-    NPC_PRINCE_LIAM_GREYMANE_PHASE2                = 34913,
-    NPC_GILNEAS_CITY_GUARD_PHASE2                  = 34916,
-    NPC_FRIGHTENED_CITIZEN_J_PHASE2                = 34981,
-    NPC_RAMPAGING_WORGEN_PHASE2                    = 35660,
-    NPC_GILNEAS_EVACUATION_FACING_MARKER           = 35830,
-    NPC_FRIGHTENED_CITIZEN_CW_PHASE2               = 35836,
+    NPC_RAMPAGING_WORGEN_CW_PHASE2                  = 34884,
+    NPC_PRINCE_LIAM_GREYMANE_PHASE2                 = 34913,
+    NPC_GILNEAS_CITY_GUARD_PHASE2                   = 34916,
+    NPC_FRIGHTENED_CITIZEN_J_PHASE2                 = 34981,
+    NPC_RAMPAGING_WORGEN_PHASE2                     = 35660,
+    NPC_GILNEAS_EVACUATION_FACING_MARKER            = 35830,
+    NPC_FRIGHTENED_CITIZEN_CW_PHASE2                = 35836,
 
-    NPC_GWEN_ARMSTEAD_PHASE4                       = 35840,
-    NPC_LORD_DARIUS_CROWLEY_PHASE4                 = 35077,
-    NPC_BLOODFANG_WORGEN_PHASE4                    = 35118,
-    NPC_TOBIAS_MISTMANTLE_PHASE4                   = 35124,
-    NPC_WORGEN_RUNT_PHASE4                         = 35456,
+    NPC_GWEN_ARMSTEAD_PHASE4                        = 35840,
+    NPC_LORD_DARIUS_CROWLEY_PHASE4                  = 35077,
+    NPC_BLOODFANG_WORGEN_PHASE4                     = 35118,
+    NPC_TOBIAS_MISTMANTLE_PHASE4                    = 35124,
+    NPC_WORGEN_RUNT_PHASE4                          = 35456,
 
-    NPC_JOSIAH_AVERY_HUMAN_PHASE4                  = 35369,
-    NPC_JOSIAH_AVERY_WORGEN_PHASE8                 = 35370,
-    NPC_LORNA_CROWLEY_PHASE8                       = 35378,
-    NPC_GILNEAS_MASTIFF_PHASE8                     = 35631,
-    NPC_BLOODFANG_LURKER_PHASE8                    = 35463,
-    NPC_GILNEAS_CITY_GUARD_PHASE8                  = 50474,
+    NPC_JOSIAH_AVERY_HUMAN_PHASE4                   = 35369,
+    NPC_JOSIAH_AVERY_WORGEN_PHASE8                  = 35370,
+    NPC_LORNA_CROWLEY_PHASE8                        = 35378,
+    NPC_GILNEAS_MASTIFF_PHASE8                      = 35631,
+    NPC_BLOODFANG_LURKER_PHASE8                     = 35463,
+    NPC_GILNEAS_CITY_GUARD_PHASE8                   = 50474,
 
-    NPC_GENN_GREYMANE_HORSE_PHASE8                 = 35905,
-    NPC_KRENNAN_ARANAS_PHASE8                      = 35753,
-    NPC_KRENNAN_ARANAS_SAVE_PHASE8                 = 35907,
-    NPC_LORD_GOLDFREY_PHASE8                       = 35906,    
-    NPC_GUARD_QSKA_PHASE8                          = 35509,
-    NPC_WORGEN_QSKA_PHASE8                         = 35505,
-    NPC_COMMANDEERED_CANNON_PHASE8                 = 35914,
-    NPC_BLOODFANG_RIPPER_QSKA_PHASE8               = 35916,
-    NPC_GILNEAS_CANNON_CAMERA_PHASE8               = 50420,
+    NPC_GENN_GREYMANE_HORSE_PHASE8                  = 35905,
+    NPC_KRENNAN_ARANAS_PHASE8                       = 35753,
+    NPC_KRENNAN_ARANAS_SAVE_PHASE8                  = 35907,
+    NPC_LORD_GOLDFREY_PHASE8                        = 35906,
+    NPC_GUARD_QSKA_PHASE8                           = 35509,
+    NPC_WORGEN_QSKA_PHASE8                          = 35505,
+    NPC_COMMANDEERED_CANNON_PHASE8                  = 35914,
+    NPC_BLOODFANG_RIPPER_QSKA_PHASE8                = 35916,
+    NPC_GILNEAS_CANNON_CAMERA_PHASE8                = 50420,
 
-    NPC_SISTER_ALMYRA_PHASE8                       = 44468,
-    NPC_CELESTINE_OF_THE_HARVEST_PHASE8            = 44459,
-    NPC_LORD_DARIUS_CROWLEY_PHASE8                 = 35552,
-    NPC_KING_GENN_GREYMANE2_PHASE8                 = 35911,
+    NPC_SISTER_ALMYRA_PHASE8                        = 44468,
+    NPC_CELESTINE_OF_THE_HARVEST_PHASE8             = 44459,
+    NPC_PRINCE_LIAM_GREYMANE_PHASE8                 = 35551,
+    NPC_LORD_DARIUS_CROWLEY_PHASE8                  = 35552,
+    NPC_KING_GENN_GREYMANE2_PHASE8                  = 35911,    
+    NPC_CROWLEYS_HORSE_PHASE8                       = 44427,
+    NPC_CROWLEYS_HORSE1R_PHASE8                     = 44428,
+    NPC_CROWLEYS_HORSE2R_PHASE8                     = 35231,
+    NPC_LORD_DARIUS_CROWLEY_SUMMON_PHASE8           = 35230,
+    NPC_BLOODFANG_STALKER_PHASE8                    = 35229,
+    NPC_BLOODFANG_STALKER_CREDIT                    = 35582,
+    NPC_NORTHGATE_REBEL_PHASE8                      = 36057,
     
-    QUEST_LOCKDOWN                                 = 14078,
-    QUEST_SOMETHINGS_AMISS                         = 14091,
-    QUEST_ALL_HELL_BREAKS_LOOSE                    = 14093,
-    QUEST_EVACUATE_THE_MERCHANT_SQUARE             = 14098,
-    QUEST_ROYAL_ORDERS                             = 14099,
-    QUEST_BY_THE_SKIN_OF_HIS_TEETH                 = 14154,
-    QUEST_THE_REBEL_LORD_ARSENAL                   = 14159,
-    QUEST_FROM_THE_SHADOWS                         = 14204,
-    QUEST_SAVE_KRENNAN_ARANAS                      = 14293,
+    QUEST_LOCKDOWN                                  = 14078,
+    QUEST_SOMETHINGS_AMISS                          = 14091,
+    QUEST_ALL_HELL_BREAKS_LOOSE                     = 14093,
+    QUEST_EVACUATE_THE_MERCHANT_SQUARE              = 14098,
+    QUEST_ROYAL_ORDERS                              = 14099,
+    QUEST_BY_THE_SKIN_OF_HIS_TEETH                  = 14154,
+    QUEST_THE_REBEL_LORD_ARSENAL                    = 14159,
+    QUEST_FROM_THE_SHADOWS                          = 14204,
+    QUEST_SAVE_KRENNAN_ARANAS                       = 14293,
+    QUEST_SACRIFICES                                = 14212,
 
-    ITEM_GILNEAN_MASTIFF_COLLAR                    = 48707,
+    ITEM_GILNEAN_MASTIFF_COLLAR                     = 48707,
 
-    SPELL_GENERIC_QUEST_INVISIBILITY_DETECTION_1   = 49416,
-    SPELL_GENERIC_QUEST_INVISIBILITY_DETECTION_2   = 49417,
-    SPELL_ENRAGE                                   = 56646,
-    SPELL_SET_PHASE_02                             = 59073, // set phase 2
-    SPELL_SET_PHASE_04                             = 59074, // set phase 4
-    // SPELL_SET_PHASE_08                             = 67853, // 59087, // set phase 8  // all wrong zone
+    SPELL_GENERIC_QUEST_INVISIBILITY_DETECTION_1    = 49416,
+    SPELL_GENERIC_QUEST_INVISIBILITY_DETECTION_2    = 49417,
+    SPELL_ENRAGE                                    = 56646,
+    SPELL_SET_PHASE_02                              = 59073, // set phase 2
+    SPELL_SET_PHASE_04                              = 59074, // set phase 4
+    // SPELL_SET_PHASE_08                           = 67853, // 59087, // set phase 8  // giv all wrong zone
 
-    SPELL_GILNEAS_PRISON_PERIODIC_FORCECAST        = 66914,
-    SPELL_PULL_TO                                  = 67357, // not work
-    SPELL_WORGEN_BITE                              = 72870, // gilneas phase 4 aura
-    SPELL_INFECTED_BITE                            = 72872, // gilneas phase 8 aura
-    SPELL_FAKE_SHOT                                = 7105,
+    SPELL_GILNEAS_PRISON_PERIODIC_FORCECAST         = 66914,
+    SPELL_PULL_TO                                   = 67357, // not work
+    SPELL_WORGEN_BITE                               = 72870, // after new loading: stored as gilneas phase 4 aura
+    SPELL_INFECTED_BITE                             = 72872, // after new loading: stored as gilneas phase 8 aura
+    SPELL_FAKE_SHOT                                 = 7105,
 
-    SPELL_ATTACK_LURKER                            = 67805,
-    SPELL_SUMMON_MASTIFF                           = 67807,
+    SPELL_ATTACK_LURKER                             = 67805,
+    SPELL_SUMMON_MASTIFF                            = 67807,
 
-    SPELL_SHADOWSTALKER_STEALTH                    = 5916,
-    SPELL_LURKER_ENRAGE                            = 8599,
-    SPELL_UNDYING_FRENZY_INSTANT                   = 80514,
-    SPELL_UNDYING_FRENZY_CHANNELED                 = 80515,
+    SPELL_SHADOWSTALKER_STEALTH                     = 5916,
+    SPELL_LURKER_ENRAGE                             = 8599,
+    SPELL_UNDYING_FRENZY_INSTANT                    = 80514,
+    SPELL_UNDYING_FRENZY_CHANNELED                  = 80515,
 
-    SPELL_RESCUE_KRENNAN                           = 68219,
-    SPELL_CANNON_FIRE                              = 68235,
-    SPELL_SHOOT_QSKA                               = 48424,
-    SPELL_CANNON_CAMERA                            = 93522,
-    SPELL_FORECAST_CANNON_CAMERA                   = 93555,
-    SPELL_CROWLEY_SUMMON_INITIALIZE                = 67002,
+    SPELL_RESCUE_KRENNAN                            = 68219,
+    SPELL_CANNON_FIRE                               = 68235,
+    SPELL_SHOOT_QSKA                                = 48424,
+    SPELL_CANNON_CAMERA                             = 93522,
+    SPELL_FORECAST_CANNON_CAMERA                    = 93555,
+    SPELL_CROWLEY_SUMMON_INITIALIZE                 = 67002,
 
-    SPELL_POWER_WORD_FORTITUDE                     = 74973,
-    SPELL_MARK_OF_THE_WILD                         = 79833,
+    SPELL_POWER_WORD_FORTITUDE                      = 74973,
+    SPELL_MARK_OF_THE_WILD                          = 79833,
+
+    SPELL_THROW_TORCH                               = 67063, // only used by horse 44429 other horses in this quest using 67472 or nothing..
+    SPELL_FIRE_BOMB                                 = 67472, // on wowhead is unknown (fire bomb) but uses for horse 44427 and 35231
+    SPELL_SUMMON_CROWLEYS_HORSE_1R                  = 82992, // horse 44428 is summoned and caster enter seat 0, GetAvailableSeatCount returns 1
+    SPELL_SUMMON_CROWLEYS_HORSE_2R                  = 67001, // horse 35231 is summoned and caster enter seat 0, GetAvailableSeatCount returns 0
+    SPELL_FORCE_CAST_SUMMON_CROWLEYS_HORSE          = 67766, // horse 35231 is summoned and caster enter seat 0, GetAvailableSeatCount returns 0
+    SPELL_CROWLEY_FORCE_SUMMON                      = 67004, // crawley is summoned as guard for player 35230
+
 
 };
 
@@ -2084,6 +2101,8 @@ public:
     }
 };
 
+// ++++++++++++++++++++++++++++++++++++++++++++ QUEST_TIME_TO_REGROUP 14294
+
 /*######
 ## npc_sister_almyra_phase8
 ######*/
@@ -2125,11 +2144,9 @@ public:
             std::list<Player*> PlayerList = me->FindNearestPlayers(15.0f);
             for (std::list<Player*>::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
             {
-				if (Player* player = *itr)
-                {	
+				if (Player* player = *itr)	
 					if (!player->HasAura(SPELL_POWER_WORD_FORTITUDE))
                         me->CastSpell(player, SPELL_POWER_WORD_FORTITUDE, false);
-				}
 			}
         }
     };
@@ -2182,10 +2199,8 @@ public:
             for (std::list<Player*>::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
             {
 				if (Player* player = *itr)
-                {	
 					if (!player->HasAura(SPELL_MARK_OF_THE_WILD))
                         me->CastSpell(player, SPELL_MARK_OF_THE_WILD, false);
-				}
 			}
         }
     };
@@ -2193,51 +2208,6 @@ public:
     CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_celestine_of_the_harvest_phase8AI (creature);
-    }
-};
-
-/*######
-## npc_lord_darius_crowley_phase8
-######*/
-
-class npc_lord_darius_crowley_phase8 : public CreatureScript
-{
-public:
-    npc_lord_darius_crowley_phase8() : CreatureScript("npc_lord_darius_crowley_phase8") { }
-
-     struct npc_lord_darius_crowley_phase8AI : public ScriptedAI
-    {
-        npc_lord_darius_crowley_phase8AI(Creature* creature) : ScriptedAI(creature)
-        {
-            _timer = 1000;
-        }
-
-        uint32 _timer;
-       
-       
-
-        void UpdateAI(uint32 diff)
-        {
-            if (!UpdateVictim())
-            {
-                if (_timer <= diff)
-                {
-                    _timer = 1000;
-                   
-                }
-                else
-                    _timer -= diff;
-                }
-            else
-                DoMeleeAttackIfReady();
-        }
-
-       
-    };
-    
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new npc_lord_darius_crowley_phase8AI (creature);
     }
 };
 
@@ -2271,7 +2241,12 @@ public:
                 if (_timer <= diff)
                 {
                     _timer = 1000;
-                    
+                    if (!me->IsPlayerInRange(15.0))
+                    {
+                        _talkPhase = 0;
+                        _talkTimer = 1000;
+                    }
+                     
                 }
                 else
                     _timer -= diff;
@@ -2294,49 +2269,49 @@ public:
             {
             case 0:
                 if (me->IsPlayerInRange(15.0))
-                    _talkPhase += 1;
-                break;
+                    if (Creature* liam = me->FindNearestCreature(NPC_PRINCE_LIAM_GREYMANE_PHASE8, 25.0f))
+                    {
+                        liam->AI()->Talk(0);
+                        _talkPhase += 1;
+                        _talkTimer = 8000;
+                    }
+                break;           
             case 1:
-                Talk(1);
-                _talkPhase += 1;
-                _talkTimer=10000;
-                break;
-            case 2:
                 if (Creature* darius = me->FindNearestCreature(NPC_LORD_DARIUS_CROWLEY_PHASE8,25.0f))                
                     darius->AI()->Talk(1);
 
                 _talkPhase += 1;
                 _talkTimer=10000;
                 break;
-            case 3:
+            case 2:
                 if (Creature* darius = me->FindNearestCreature(NPC_LORD_DARIUS_CROWLEY_PHASE8,25.0f))                
                     darius->AI()->Talk(2);
 
                 _talkPhase += 1;
                 _talkTimer=10000;
                 break;
-            case 4:
+            case 3:
                 Talk(2);
                 _talkPhase += 1;
                 _talkTimer=10000;
                 break;
-            case 5:
+            case 4:
                 Talk(0);
                 _talkPhase += 1;
                 _talkTimer=10000;
                 break;
-            case 6:
+            case 5:
                  if (Creature* darius = me->FindNearestCreature(NPC_LORD_DARIUS_CROWLEY_PHASE8,25.0f))                
                     darius->AI()->Talk(0);
 
                 _talkPhase += 1;
                 _talkTimer=10000;
                 break;
-            case 7:
+            case 6:
                 _talkPhase += 1;
-                _talkTimer=30000;
+                _talkTimer=300000;
                 break;
-            case 8:
+            case 7:
                 _talkPhase = 0;
                 break;
             }
@@ -2349,7 +2324,469 @@ public:
     }
 };
 
+// ++++++++++++++++++++++++++++++++++++++++++++ QUEST_SACRIFICES 14212
 
+/*######
+## npc_crowley_horse_phase8
+######*/
+
+class npc_crowley_horse_phase8 : public CreatureScript
+{
+public:
+    npc_crowley_horse_phase8() : CreatureScript("npc_crowley_horse_phase8") {}
+
+    struct npc_crowley_horse_phase8AI : public npc_escortAI
+    {
+        npc_crowley_horse_phase8AI(Creature* creature) : npc_escortAI(creature) { }
+
+        uint32      _timer;
+        Player*     _player;
+        Creature*   _creature;
+
+        void JustSummoned(Creature* summon)
+        {
+            // ToDo
+        }
+
+        void PassengerBoarded(Unit* who, int8 seatId, bool apply)
+        {
+            if (!apply)
+                return;
+
+            if (seatId == 0)
+            {
+                // ToDo
+            }
+        }
+
+        void WaypointReached(uint32 point)
+        {
+            // ToDo
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+            npc_escortAI::UpdateAI(diff);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_crowley_horse_phase8AI(creature);
+    }
+};
+
+/*######
+## npc_crowley_horse_1round_phase8
+######*/
+
+class npc_crowley_horse_1round_phase8 : public CreatureScript
+{
+public:
+    npc_crowley_horse_1round_phase8() : CreatureScript("npc_crowley_horse_1round_phase8") {}
+
+    struct npc_crowley_horse_1round_phase8AI : public npc_escortAI
+    {
+        npc_crowley_horse_1round_phase8AI(Creature* creature) : npc_escortAI(creature)
+        {
+            _timer = urand(15000, 25000);
+            me->SetReactState(REACT_PASSIVE);
+
+            AddWaypoint(0, -1737.09f, 1663.36f, 20.4791f);
+            AddWaypoint(1, -1722.70f, 1677.69f, 20.3930f, 0);
+            AddWaypoint(2, -1700.89f, 1653.31f, 20.4907f);
+            AddWaypoint(3, -1672.69f, 1664.77f, 20.4884f);
+            AddWaypoint(4, -1667.30f, 1651.55f, 20.4884f);
+            AddWaypoint(5, -1666.10f, 1626.02f, 20.4884f);
+            AddWaypoint(6, -1680.09f, 1601.27f, 20.4869f);
+            AddWaypoint(7, -1688.33f, 1591.46f, 20.4869f);
+            AddWaypoint(8, -1733.32f, 1592.11f, 20.4869f);
+            AddWaypoint(9, -1713.33f, 1633.47f, 20.4869f);
+            AddWaypoint(10, -1709.09f, 1690.63f, 20.1549f);
+            AddWaypoint(11, -1678.91f, 1704.73f, 20.4792f);
+            AddWaypoint(12, -1631.35f, 1710.25f, 20.4881f);
+            AddWaypoint(13, -1613.85f, 1710.41f, 22.6797f);
+            AddWaypoint(14, -1590.98f, 1710.63f, 20.4849f);
+            AddWaypoint(15, -1569.10f, 1709.55f, 20.4848f, 0);
+            AddWaypoint(16, -1553.84f, 1701.86f, 20.4862f);
+            AddWaypoint(17, -1542.33f, 1639.14f, 21.1955f);
+            AddWaypoint(18, -1518.09f, 1615.94f, 20.4865f);
+            AddWaypoint(19, -1475.35f, 1626.09f, 20.4865f);
+            AddWaypoint(20, -1439.23f, 1625.94f, 20.4865f);
+            AddWaypoint(21, -1424.39f, 1608.56f, 20.4867f);
+            AddWaypoint(22, -1415.99f, 1581.91f, 20.4835f);
+            AddWaypoint(23, -1430.42f, 1549.91f, 20.7399f);
+            AddWaypoint(24, -1440.54f, 1538.35f, 20.4858f);
+            AddWaypoint(25, -1473.94f, 1536.39f, 20.4857f);
+            AddWaypoint(26, -1505.65f, 1567.46f, 20.4857f);
+            AddWaypoint(27, -1519.51f, 1571.06f, 26.5095f);
+            AddWaypoint(28, -1531.39f, 1581.60f, 26.5376f);
+            AddWaypoint(29, -1540.11f, 1575.89f, 29.209f);
+            SetSpeedZ(18.0f);
+            me->EnableAI();
+            me->m_ControlledByPlayer = false;
+            
+        }
+
+        uint32      _timer;
+        Player*     _player;
+        Creature*   _guardCrowley;
+
+        void StartAnim(Player* player, Creature* guardCrowley)
+        {
+            _player = player;
+            _guardCrowley = guardCrowley;
+           
+            // this is broken.. player can't mount the horse, no free seats avaible
+            if (_player)           
+                _player->EnterVehicle(me, 1);            
+        }
+
+
+        void PassengerBoarded(Unit* who, int8 seatId, bool apply)
+        {
+            if (!apply)
+                return;
+
+            if (seatId == 0)
+            {
+                // printf("Trigger 1R Passenger 0 A\n");
+            }
+            if (seatId == 1)
+            {
+                // printf("Trigger 1R Passenger 1 \n");
+                // maybe first jump over the wall 
+                Start(true); // start first round
+            }
+        }
+
+        void WaypointReached(uint32 point)
+        {
+            // ToDo
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+            npc_escortAI::UpdateAI(diff);
+
+            if (_timer <= diff)
+            {
+                _timer = urand(10000, 20000);                
+            }
+            else
+                _timer -= diff;
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_crowley_horse_1round_phase8AI(creature);
+    }
+};
+
+/*######
+## npc_lord_darius_crowley_summon_phase8
+######*/
+
+class npc_lord_darius_crowley_summon_phase8 : public CreatureScript
+{
+public:
+    npc_lord_darius_crowley_summon_phase8() : CreatureScript("npc_lord_darius_crowley_summon_phase8") { }
+
+    struct npc_lord_darius_crowley_summon_phase8AI : public ScriptedAI
+    {
+        npc_lord_darius_crowley_summon_phase8AI(Creature* creature) : ScriptedAI(creature)
+        {
+            _player = NULL;
+            _timer = 500;
+        }
+
+        uint32      _timer;
+        Player*     _player;
+        Creature*   _guardCrowley;
+
+        void StartAnim(Player* player, Creature* guardCrowley)
+        {
+            _player = player;
+            _guardCrowley = guardCrowley;
+            me->CastSpell(me, SPELL_SUMMON_CROWLEYS_HORSE_1R); // caster is mount the horse,  
+        }
+
+        void JustSummoned(Creature* summon)
+        {
+            //  start step 3 in script animation
+            CAST_AI(npc_crowley_horse_1round_phase8::npc_crowley_horse_1round_phase8AI, summon->AI())->StartAnim(_player, summon);
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+
+            if (_timer <= diff)
+            {
+
+            }
+            else
+                _timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_lord_darius_crowley_summon_phase8AI(creature);
+    }
+};
+
+/*######
+## npc_lord_darius_crowley_phase8
+######*/
+
+class npc_lord_darius_crowley_phase8 : public CreatureScript
+{
+public:
+	npc_lord_darius_crowley_phase8() : CreatureScript("npc_lord_darius_crowley_phase8") { }
+
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    {
+        if (quest->GetQuestId() == QUEST_SACRIFICES)
+        {
+            // Video on YouTube show, only after accept the quest, you can click to mount the horse of crowley.
+            // if click to mount, then horse for 1 round is spawned, crawley is mounting seat 0 
+            // script should now mount player to seat 1, but the horse has no free seats.. 
+            
+            // i disable the animation while player can't mount the horse.. 
+            //CAST_AI(npc_lord_darius_crowley_phase8AI, creature->AI())->StartAnim(player);           
+
+            // teleport to cathedrale so quest can go on..
+            player->KilledMonsterCredit(NPC_BLOODFANG_STALKER_CREDIT, 0);
+            player->TeleportTo(638, -1535.03f, 1578.63f, 27.55f, 4.023f);
+        }
+        return true;
+    }
+
+	struct npc_lord_darius_crowley_phase8AI : public ScriptedAI
+	{
+        npc_lord_darius_crowley_phase8AI(Creature* creature) : ScriptedAI(creature) { }
+
+        Player*     _player;
+        
+        void StartAnim(Player* player)
+        {
+            _player = player;
+            me->CastSpell(me, SPELL_CROWLEY_FORCE_SUMMON); // crawley is spawned as guard for player
+        }
+
+        void JustSummoned(Creature* summon)
+        {
+            // start next step in script animation
+            CAST_AI(npc_lord_darius_crowley_summon_phase8::npc_lord_darius_crowley_summon_phase8AI, summon->AI())->StartAnim(_player, summon);
+        }
+
+		void UpdateAI(uint32 diff)
+		{
+            if (!UpdateVictim())
+                return;
+			
+            DoMeleeAttackIfReady();
+		}
+	};
+
+	CreatureAI* GetAI(Creature* creature) const
+	{
+		return new npc_lord_darius_crowley_phase8AI(creature);
+	}
+};
+
+/*######
+## npc_crowley_horse_2round_phase8
+## only prepared.. player can't mount the horse
+######*/
+
+class npc_crowley_horse_2round_phase8 : public CreatureScript
+{
+public:
+    npc_crowley_horse_2round_phase8() : CreatureScript("npc_crowley_horse_2round_phase8") {}
+
+    struct npc_crowley_horse_2round_phase8AI : public npc_escortAI
+    {
+        npc_crowley_horse_2round_phase8AI(Creature* creature) : npc_escortAI(creature)
+        {
+            _timer = urand(15000, 25000);
+            me->SetReactState(REACT_PASSIVE);
+            // ToDo add waypoints for second round
+        }
+
+        uint32      _timer;
+        Player*     _player;
+        Creature*   _creature;
+
+        void JustSummoned(Creature* summon)
+        {
+            // ToDo
+        }
+
+        void PassengerBoarded(Unit* who, int8 seatId, bool apply)
+        {
+            if (!apply)
+                return;
+
+            if (seatId == 0)
+            {
+                printf("Trigger 2R Passenger 0 \n");
+            }
+            if (seatId == 1)
+            {
+                printf("Trigger 2R Passenger 1 \n");
+            }
+        }
+
+        void WaypointReached(uint32 point)
+        {
+            // ToDo
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+            npc_escortAI::UpdateAI(diff);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_crowley_horse_2round_phase8AI(creature);
+    }
+};
+
+/*######
+## npc_bloodfang_stalker_phase8
+## ToDo this script is taken 1:1 from old gilneas.cpp.. check it, if horse running
+######*/
+
+class npc_bloodfang_stalker_phase8 : public CreatureScript
+{
+public:
+    npc_bloodfang_stalker_phase8() : CreatureScript("npc_bloodfang_stalker_phase8") { }
+
+    struct npc_bloodfang_stalker_phase8AI : public ScriptedAI
+    {
+        npc_bloodfang_stalker_phase8AI(Creature* creature) : ScriptedAI(creature) {}
+
+        Player* player;
+        uint32 tEnrage;
+        uint32 tAnimate;
+        uint32 BurningReset;
+        bool Miss, willCastEnrage, Burning;
+
+        void Reset()
+        {
+            tEnrage = 0;
+            tAnimate = 2000;
+            Miss = false;
+            willCastEnrage = urand(0, 1);
+            BurningReset = 3000;
+            Burning = false;
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+            if (me->HasAura(SPELL_THROW_TORCH))
+            {
+                Burning = true;
+            }
+            else
+                Burning = false;
+
+            if (Burning && BurningReset <= diff)
+            {
+                me->RemoveAllAuras();
+                BurningReset = 5000;
+                Burning = false;
+            }
+            else
+                BurningReset -= diff;
+
+            if (!UpdateVictim())
+            {
+                return;
+            }
+
+            if (tEnrage <= diff && willCastEnrage)
+            {
+                if (me->GetHealthPct() <= 30)
+                {
+                    me->MonsterTextEmote(-106, 0);
+                    DoCast(me, SPELL_ENRAGE);
+                    tEnrage = 30000;
+                }
+            }
+            else tEnrage -= diff;
+
+            if (me->GetVictim()->GetTypeId() == TYPEID_PLAYER)
+            {
+                Miss = false;
+            }
+            else if (me->GetVictim()->IsPet())
+            {
+                Miss = false;
+            }
+            else if (me->GetVictim()->GetEntry() == 36057)
+            {
+                if (me->GetVictim()->GetHealthPct() < 90)
+                {
+                    Miss = true;
+                }
+            }
+
+            if (Miss && tAnimate <= diff)
+            {
+                me->HandleEmoteCommand(EMOTE_ONESHOT_ATTACK_UNARMED);
+                me->PlayDistanceSound(558);
+                tAnimate = 2000;
+            }
+            else
+                tAnimate -= diff;
+
+            if (!Miss)
+            {
+                DoMeleeAttackIfReady();
+            }
+        }
+
+        void SpellHit(Unit* caster, const SpellInfo* spell)
+        {
+            Creature *horse = me->FindNearestCreature(NPC_CROWLEYS_HORSE1R_PHASE8, 100, true);
+            if (horse && spell->Id == SPELL_THROW_TORCH)
+            {
+                Burning = true;
+
+                if (me->GetVictim()->GetTypeId() == TYPEID_PLAYER)
+                {
+                    me->getThreatManager().resetAllAggro();
+                    horse->AddThreat(me, 1.0f);
+                    me->AddThreat(horse, 1.0f);
+                    me->AI()->AttackStart(horse);
+                }
+
+                if (caster->GetTypeId() == TYPEID_PLAYER && caster->ToPlayer()->GetQuestStatus(QUEST_SACRIFICES) == QUEST_STATUS_INCOMPLETE)
+                {
+                    caster->ToPlayer()->KilledMonsterCredit(35582, 0);
+                }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_bloodfang_stalker_phase8AI(creature);
+    }
+
+};
+
+// ++++++++++++++++++++++++++++++++++++++++++++
 
 
 void AddSC_gilneas_city()
@@ -2389,7 +2826,13 @@ void AddSC_gilneas_city()
 
     new npc_sister_almyra_phase8();
     new npc_celestine_of_the_harvest_phase8();
-    new npc_lord_darius_crowley_phase8();
     new npc_king_genn_greymane2_phase8();
+
+    new npc_lord_darius_crowley_phase8();
+    new npc_lord_darius_crowley_summon_phase8();
+    new npc_crowley_horse_phase8();
+    new npc_crowley_horse_1round_phase8();
+    new npc_crowley_horse_2round_phase8();
+    new npc_bloodfang_stalker_phase8();
 
 };
