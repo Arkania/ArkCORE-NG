@@ -106,19 +106,19 @@ insert into creature_loot_template values(42178,59220,14,1,0,1,1);
 insert into creature_loot_template values(42178,63540,6,1,0,1,1);
 
 -- Chimaeron 43296
-delete from creature_loot_template where entry=42178 and item in (0,59224,59313,59314,59221,59311,59355,59223,59234,59451,59225,59310,59233);
-insert into creature_loot_template values(41378,59224,21,1,0,1,1);
-insert into creature_loot_template values(41378,59313,17,1,0,1,1);
-insert into creature_loot_template values(41378,59314,17,1,0,1,1);
-insert into creature_loot_template values(41378,59221,17,1,0,1,1);
-insert into creature_loot_template values(41378,59311,16,1,0,1,1);
-insert into creature_loot_template values(41378,59355,16,1,0,1,1);
-insert into creature_loot_template values(41378,59223,16,1,0,1,1);
-insert into creature_loot_template values(41378,59234,16,1,0,1,1);
-insert into creature_loot_template values(41378,59451,16,1,0,1,1);
-insert into creature_loot_template values(41378,59225,16,1,0,1,1);
-insert into creature_loot_template values(41378,59310,15,1,0,1,1);
-insert into creature_loot_template values(41378,59233,10,1,0,1,1);
+delete from creature_loot_template where entry=43296 and item in (0,59224,59313,59314,59221,59311,59355,59223,59234,59451,59225,59310,59233);
+insert into creature_loot_template values(43296,59224,21,1,0,1,1);
+insert into creature_loot_template values(43296,59313,17,1,0,1,1);
+insert into creature_loot_template values(43296,59314,17,1,0,1,1);
+insert into creature_loot_template values(43296,59221,17,1,0,1,1);
+insert into creature_loot_template values(43296,59311,16,1,0,1,1);
+insert into creature_loot_template values(43296,59355,16,1,0,1,1);
+insert into creature_loot_template values(43296,59223,16,1,0,1,1);
+insert into creature_loot_template values(43296,59234,16,1,0,1,1);
+insert into creature_loot_template values(43296,59451,16,1,0,1,1);
+insert into creature_loot_template values(43296,59225,16,1,0,1,1);
+insert into creature_loot_template values(43296,59310,15,1,0,1,1);
+insert into creature_loot_template values(43296,59233,10,1,0,1,1);
 
 -- Magmaw 41570
 delete from creature_loot_template where entry=41570 and item in (0,59328,59329,59331,59332,59333,59334,59335,59336,59340,59341,59452,59492);
