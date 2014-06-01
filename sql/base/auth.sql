@@ -28,6 +28,8 @@ CREATE TABLE `account` (
   `locked` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `last_login` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   `online` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `on_trial` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `trial_end` int(10) unsigned NOT NULL DEFAULT '1',
   `expansion` tinyint(3) unsigned NOT NULL DEFAULT '3',
   `mutetime` bigint(20) NOT NULL DEFAULT '0',
   `mutereason` VARCHAR(255) NOT NULL DEFAULT '',
