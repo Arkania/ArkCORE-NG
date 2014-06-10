@@ -81,10 +81,11 @@ enum eGilneas
     NPC_PRINCE_LIAM_GREYMANE_PHASE8                 = 35551,
     NPC_LORD_DARIUS_CROWLEY_PHASE8                  = 35552,
     NPC_KING_GENN_GREYMANE2_PHASE8                  = 35911,    
-    NPC_CROWLEYS_HORSE_PHASE8                       = 44427,
-    NPC_CROWLEYS_HORSE1R_PHASE8                     = 44428,
-    NPC_CROWLEYS_HORSE2R_PHASE8                     = 35231,
-    NPC_LORD_DARIUS_CROWLEY_SUMMON_PHASE8           = 35230,
+    NPC_CROWLEYS_HORSE_PHASE8                       = 44427, // standing near darius crowley
+    NPC_CROWLEYS_HORSE2_PHASE8                      = 44429, // standing near tobias mistmantle
+    NPC_CROWLEYS_HORSE1R_PHASE8                     = 44428, // spawned by spell
+    NPC_CROWLEYS_HORSE2R_PHASE8                     = 35231, // spawned by spell
+    NPC_LORD_DARIUS_CROWLEY_SUMMON_PHASE8           = 35230, // sitting on horse on seat 1, player on seat 2
     NPC_BLOODFANG_STALKER_PHASE8                    = 35229,
     NPC_BLOODFANG_STALKER_CREDIT                    = 35582,
     NPC_NORTHGATE_REBEL_PHASE8                      = 36057,
@@ -2786,8 +2787,393 @@ public:
 
 };
 
-// ++++++++++++++++++++++++++++++++++++++++++++
+// ++++++++++++++++++++++++++++++++++++++++++++ QUEST_BY_BLOOD_AND_ASH 14218
 
+enum e14218
+{
+    QUEST_BY_BLOOD_AND_ASH = 14218,
+
+    NPC_TOBIAS_MISTMANTLE_PHASE8 = 35618,
+    NPC_NORTHGATE_REBEL1_PHASE8 = 41015, // in front of cathedrale
+    NPC_NORTHGATE_REBEL2_PHASE8 = 36057, // on cannon and inside cathedrale
+
+    NPC_BLOODFANG_STALKER1_PHASE8 = 35229, // random movement, are involved in showfight with northgate_rebel
+    NPC_BLOODFANG_STALKER2_PHASE8 = 51277, // spawned by script, running to cannon
+    NPC_FRENZIED_STALKER_PHASE1024 = 35627,
+
+    NPC_REBEL_CANNON = 35317,
+
+    NPC_LOARD_DARIUS_CROWLEY_PHASE8 = 35566,
+
+    SPELL_SHOOT = 6660,
+    SPELL_MULTI_SHOT = 21390,
+    SPELL_CLEAVE = 15496,
+    SPELL_DEMORALIZING_SHOUT = 61044,
+    SPELL_REBEL_CANNON = 67279,
+};
+
+/*######
+## npc_bloodfang_stalker1_phase8
+######*/
+
+class npc_bloodfang_stalker1_phase8 : public CreatureScript
+{
+public:
+    npc_bloodfang_stalker1_phase8() : CreatureScript("npc_bloodfang_stalker1_phase8") { }
+
+    struct npc_bloodfang_stalker1_phase8AI : public ScriptedAI
+    {
+        npc_bloodfang_stalker1_phase8AI(Creature* creature) : ScriptedAI(creature){}
+
+        bool    _enrage;
+        uint32  _enrageCooldownTimer;
+        uint32  _health;
+
+        void Reset()
+        {
+            _enrage = false;
+            _enrageCooldownTimer = 0;
+            _health = urand(55, 85);
+        }
+
+        void DamageTaken(Unit* attacker, uint32 &damage)
+        {
+            if (attacker->GetEntry() == NPC_NORTHGATE_REBEL1_PHASE8)
+                if (me->HealthBelowPct(29))
+                    damage = 0;
+
+            if (!_enrage && me->HealthBelowPct(30))
+            {
+                _enrage = true;
+                _enrageCooldownTimer = urand(100000, 150000);
+                DoCast(SPELL_ENRAGE);
+            }
+        }
+     
+        void UpdateAI(uint32 diff)
+        {
+            if (_enrageCooldownTimer <= diff)
+                _enrage = false;
+            else
+                _enrageCooldownTimer -= diff;
+
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_bloodfang_stalker1_phase8AI(creature);
+    }
+};
+
+/*######
+## npc_northgate_rebel1_phase8
+######*/
+
+class npc_northgate_rebel1_phase8 : public CreatureScript
+{
+public:
+    npc_northgate_rebel1_phase8() : CreatureScript("npc_northgate_rebel1_phase8") { }
+
+    struct npc_northgate_rebel1_phase8AI : public ScriptedAI
+    {
+        npc_northgate_rebel1_phase8AI(Creature* creature) : ScriptedAI(creature) { }
+
+        uint32  _health;
+
+        void Reset()
+        {
+            _health = urand(55, 85);
+        }
+
+        void DamageTaken(Unit* attacker, uint32 &damage)
+        {
+            if (attacker->GetEntry() == NPC_BLOODFANG_STALKER1_PHASE8 || attacker->GetEntry() == NPC_FRENZIED_STALKER_PHASE1024)
+                if (me->HealthBelowPct(_health))
+                    damage = 0;
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_northgate_rebel1_phase8AI(creature);
+    }
+};
+
+/*######
+## npc_northgate_rebel2_phase8
+######*/
+
+class npc_northgate_rebel2_phase8 : public CreatureScript
+{
+public:
+    npc_northgate_rebel2_phase8() : CreatureScript("npc_northgate_rebel2_phase8") { }
+
+    struct npc_northgate_rebel2_phase8AI : public ScriptedAI
+    {
+        npc_northgate_rebel2_phase8AI(Creature* creature) : ScriptedAI(creature) { }
+
+        uint32  _health;
+        uint32  _coolDownTimer;
+        uint32  _timer;
+        bool    _isNearDarius;
+
+        void Reset()
+        {
+            _health = urand(55, 85);            
+            _coolDownTimer = 0;
+            _timer = 1000;
+            _isNearDarius = false;
+            if (Creature* darius = me->FindNearestCreature(NPC_LOARD_DARIUS_CROWLEY_PHASE8, 5.0f))
+            {
+                _isNearDarius = true;
+                me->SetReactState(REACT_PASSIVE);
+            }
+        }
+
+        void DamageTaken(Unit* attacker, uint32 &damage)
+        {
+            if (attacker->GetEntry() == NPC_BLOODFANG_STALKER1_PHASE8 || attacker->GetEntry() == NPC_FRENZIED_STALKER_PHASE1024)
+                if (me->HealthBelowPct(_health))
+                    damage = 0;
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+            if (!UpdateVictim())
+            {                
+                if (_coolDownTimer <= diff)
+                    DoWork();
+                else
+                    _coolDownTimer -= diff;
+            }
+            else
+                DoMeleeAttackIfReady();
+        }
+
+        void DoWork()
+        {
+            _coolDownTimer = 1000;
+            if (Creature* worgen = me->FindNearestCreature(NPC_BLOODFANG_STALKER1_PHASE8, 3.0f))
+            {
+                switch (urand(0, 1))
+                {
+                case 0:
+                    me->CastSpell(worgen, SPELL_CLEAVE);
+                    break;
+                case 1:
+                    me->CastSpell(worgen, SPELL_DEMORALIZING_SHOUT);
+                    break;
+                }
+                _coolDownTimer = urand(100000, 150000);
+            } 
+            else if (Creature* worgen = me->FindNearestCreature(NPC_BLOODFANG_STALKER1_PHASE8, 25.0f))
+            {
+                switch (urand(0, 1))
+                {
+                case 0:
+                    me->CastSpell(worgen, SPELL_SHOOT);
+                    break;
+                case 1:
+                    me->CastSpell(worgen, SPELL_MULTI_SHOT);
+                    break;
+                }
+                _coolDownTimer = urand(100000, 150000);
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_northgate_rebel2_phase8AI(creature);
+    }
+};
+
+/*######
+## npc_rebel_cannon_phase8
+ToDo: disable moving by player
+######*/
+
+class npc_rebel_cannon_phase8 : public CreatureScript
+{
+public:
+    npc_rebel_cannon_phase8() : CreatureScript("npc_rebel_cannon_phase8") { }
+
+    struct npc_rebel_cannon_phase8AI : public ScriptedAI
+    {
+        npc_rebel_cannon_phase8AI(Creature* creature) : ScriptedAI(creature) { }
+
+        void UpdateAI(uint32 diff)
+        {
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_rebel_cannon_phase8AI(creature);
+    }
+};
+
+// ++++++++++++++++++++++++++++++++++++++++++++ QUEST_NEVER_SURRENDER_SOMETIMES_RETREAT 14221
+
+enum e14221
+{
+    QUEST_NEVER_SURRENDER_SOMETIMES_RETREAT = 14221,   
+};
+
+// ++++++++++++++++++++++++++++++++++++++++++++ QUEST_LAST_STAND 14222
+
+enum e14222
+{
+    QUEST_LAST_STAND = 14222,
+
+    SPELL_HIDEOUS_BITE_WOUND = 76642, // replace infected bite, (removed on quest 14222 reward), Apply Aura Phase 1024   
+    SPELL_TRANSFORMING = 72794, // on reward quest
+};
+
+/*######
+## npc_lord_darius_crowley_14222_phase8
+######*/
+
+class npc_lord_darius_crowley_14222_phase8 : public CreatureScript
+{
+public:
+    npc_lord_darius_crowley_14222_phase8() : CreatureScript("npc_lord_darius_crowley_14222_phase8") { }
+
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    {
+        if (quest->GetQuestId() == QUEST_LAST_STAND)
+        {
+            player->RemoveAura(SPELL_INFECTED_BITE);
+            player->CastSpell(player, SPELL_HIDEOUS_BITE_WOUND);
+            player->SetPhaseMask(1024, true);            
+        }
+        return true;
+    }
+
+    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 opt) 
+    { 
+        if (quest->GetQuestId() == QUEST_LAST_STAND)
+        {         
+            player->RemoveAura(SPELL_HIDEOUS_BITE_WOUND);
+
+            player->CastSpell(player, SPELL_TRANSFORMING, true); // ToDo: the core show not the 2 movies..
+                       
+            WorldLocation loc;
+            loc.m_mapId = 654;
+            loc.m_positionX = -1818.4f;
+            loc.m_positionY = 2294.25f;
+            loc.m_positionZ = 42.2135f;
+            player->SetHomebind(loc, 4786);
+            player->AddAura(SPELL_SET_PHASE_02, player);
+            player->SaveToDB();
+        }
+        return false; 
+    }
+
+    struct npc_lord_darius_crowley_14222_phase8AI : public ScriptedAI
+    {
+        npc_lord_darius_crowley_14222_phase8AI(Creature* creature) : ScriptedAI(creature) { }
+       
+        void UpdateAI(uint32 diff)
+        {
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_lord_darius_crowley_14222_phase8AI(creature);
+    }
+};
+
+/*######
+## npc_frenzied_stalker_phase1024
+######*/
+
+class npc_frenzied_stalker_phase1024 : public CreatureScript
+{
+public:
+    npc_frenzied_stalker_phase1024() : CreatureScript("npc_frenzied_stalker_phase1024") { }
+
+    struct npc_frenzied_stalker_phase1024AI : public ScriptedAI
+    {
+        npc_frenzied_stalker_phase1024AI(Creature* creature) : ScriptedAI(creature){}
+
+        bool    _enrage;
+        uint32  _enrageCooldownTimer;
+        uint32  _health;
+
+        void Reset()
+        {
+            _enrage = false;
+            _enrageCooldownTimer = 0;
+            _health = urand(55, 85);
+        }
+
+        void DamageTaken(Unit* attacker, uint32 &damage)
+        {
+            if (attacker->GetEntry() == NPC_NORTHGATE_REBEL1_PHASE8 || attacker->GetEntry() == NPC_NORTHGATE_REBEL2_PHASE8)
+                if (me->HealthBelowPct(29))
+                    damage = 0;
+
+            if (!_enrage && me->HealthBelowPct(30))
+            {
+                _enrage = true;
+                _enrageCooldownTimer = urand(100000, 150000);
+                DoCast(SPELL_ENRAGE);
+            }
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+            if (_enrageCooldownTimer <= diff)
+                _enrage = false;
+            else
+                _enrageCooldownTimer -= diff;
+
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_frenzied_stalker_phase1024AI(creature);
+    }
+};
+
+
+// ++++++++++++++++++++++++++++++++++++++++++++ QUEST_LAST_CHANCE_AT_HUMANITY  14375 -- first quest in duskhaven
+
+enum e14375
+{
+    QUEST_LAST_CHANCE_AT_HUMANITY = 14375,
+
+    NPC_LORD_GODFREY_PHASE2 = 36330,
+    NPC_KING_GENN_GREYMANE_PHASE2 = 36332,
+};
 
 void AddSC_gilneas_city()
 {
@@ -2835,4 +3221,10 @@ void AddSC_gilneas_city()
     new npc_crowley_horse_2round_phase8();
     new npc_bloodfang_stalker_phase8();
 
+    new npc_bloodfang_stalker1_phase8();    
+    new npc_northgate_rebel1_phase8();
+    new npc_northgate_rebel2_phase8();
+    new npc_rebel_cannon_phase8();
+    new npc_lord_darius_crowley_14222_phase8();
+    new npc_frenzied_stalker_phase1024();
 };
