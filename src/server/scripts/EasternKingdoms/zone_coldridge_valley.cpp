@@ -42,6 +42,7 @@ enum zone_coldridge_valley
 	NPC_WOUNDED_COLDRIDGE_MOUNTAINEER_KILL_CREDIT		= 37079,
 	NPC_WOUNDED_COLDRIDGE_MOUNTAINEER					= 37080,
 	NPC_COLDRIDGE_DEFENDER								= 37177,
+    NPC_ROCKJAW_SCAVENGER                               = 37105,
 	NPC_SOOTHSAYER_SHIKALA								= 37108,
 	NPC_SOOTHSAYER_RIKKARI  							= 37173,
 	NPC_SOOTHSAYER_MIRIMKOA								= 37174,
@@ -50,10 +51,13 @@ enum zone_coldridge_valley
 	NPC_TROLLING_FOR_INFORMATION_KILL_CREDIT_BUNNY_W	= 37111,
 
 	SPELL_HEAL_WOUNDED_MOUNTAINEER						= 69855,
+    SPELL_THROW_PRICELESS_ARTIFACT                      = 69897,
 
 	QUEST_AID_FOR_THE_WOUNDED							= 24471,
 	QUEST_TROLLING_FOR_INFORMATION						= 24489,
+    QUEST_MAKE_HAY_WHILE_THE_SUN_SHINES                 = 24486,
 
+    ITEM_PRICELESS_ROCKJAW_ARTIFACT                     = 49751,
 
 };
 
@@ -151,6 +155,7 @@ public:
 
 /*######
 ## npc_wounded_coldridge_mountaineer
+## ToDo:  spell is wrong implemented in core
 ######*/
 
 class npc_wounded_coldridge_mountaineer : public CreatureScript
@@ -177,41 +182,48 @@ public:
     {
 		npc_wounded_coldridge_mountaineerAI(Creature *creature) : ScriptedAI(creature) 
 		{
-			isHealed=false; phase=3;
+            timer = 0; phase = 0;
 		} 
-		
-		bool isHealed;
+				
 		uint32 phase;
 		uint32 timer;
 				
-		void Reset()  
-		{ 
-			isHealed=false;
-			phase=0;
-			timer=1000;
-		}
-		
-		// ToDo
-	    void SpellHit(Unit * Hitter, SpellInfo const* spell) 
-        {
-			printf("zauber ist eingetroffen %d \n", spell->Id );
-            if (spell->Id == SPELL_HEAL_WOUNDED_MOUNTAINEER )
-            {
-				isHealed=true;
-				DoCast(Hitter, NPC_WOUNDED_COLDRIDGE_MOUNTAINEER_KILL_CREDIT);
-				printf("Jo, ich wurde geheilt \n");
-            }
+	    void SpellHit(Unit* Hitter, SpellInfo const* spell) 
+        {	
+            if (Player* player = Hitter->ToPlayer())
+                if (player->GetQuestStatus(QUEST_AID_FOR_THE_WOUNDED) == QUEST_STATUS_INCOMPLETE)
+                    if (me->GetDistance(player) < 5.0f)
+                        if (spell->Id == SPELL_HEAL_WOUNDED_MOUNTAINEER)
+                        {
+                            phase = 1;
+                            timer = 1000;
+                            DoCast(Hitter, NPC_WOUNDED_COLDRIDGE_MOUNTAINEER_KILL_CREDIT);				                
+                        }
         }
-		
+
 		void UpdateAI(uint32 diff) 
         {   
-
-			if (!isHealed) return;
-
 			if (timer <= diff)	
 			{
-			
-
+                switch (phase)
+                {
+                case 1:
+                    Talk(0);
+                    timer = 5000;
+                    phase = 2;
+                    break;
+                case 2:
+                    Position pos;
+                    me->GetNearPosition(pos, 25.0f, me->GetFollowAngle());
+                    me->GetMotionMaster()->MovePoint(0, pos);
+                    timer = 10000;
+                    phase = 3;
+                    break;
+                case 3:
+                    me->DisappearAndDie();
+                    phase = 0;
+                    break;
+                }               
 			}	
 			else 
 				timer -= diff;	
@@ -221,6 +233,55 @@ public:
 	CreatureAI* GetAI(Creature* creature) const  
     {
         return new npc_wounded_coldridge_mountaineerAI (creature);
+    }
+};
+
+/*######
+## npc_rockjaw_scavenger
+######*/
+
+class npc_rockjaw_scavenger : public CreatureScript
+{
+public:
+    npc_rockjaw_scavenger() : CreatureScript("npc_rockjaw_scavenger") { }
+
+    struct npc_rockjaw_scavengerAI : public ScriptedAI
+    {
+        npc_rockjaw_scavengerAI(Creature *creature) : ScriptedAI(creature)  
+        { 
+            _hasCasted = false;
+        }
+       
+        bool _hasCasted;
+
+        void DamageTaken(Unit* Hitter, uint32& Damage)
+        {
+            if (Player* player = Hitter->ToPlayer())
+                if (player->GetQuestStatus(QUEST_MAKE_HAY_WHILE_THE_SUN_SHINES) == QUEST_STATUS_INCOMPLETE)
+                    if (!_hasCasted)
+                        if (me->GetDistance(player) >= 5.0f && me->GetDistance(player) <= 15.0f)
+                            switch (urand(0, 3))
+                            {
+                            case 2:
+                                me->CastSpell(player, SPELL_THROW_PRICELESS_ARTIFACT, true);
+                                player->AddItem(ITEM_PRICELESS_ROCKJAW_ARTIFACT, 1);
+                                _hasCasted = true;
+                            }
+        
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();           
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_rockjaw_scavengerAI(creature);
     }
 };
 
@@ -554,6 +615,6 @@ void AddSC_coldridge_valley()
 	new npc_soothsayer_shikala(); 
 	new npc_soothsayer_rikkari();
 	new npc_soothsayer_mirimkoa();
-
+    new npc_rockjaw_scavenger();
 }
 
