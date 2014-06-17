@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -32,21 +32,21 @@ class GridReference : public Reference<GridRefManager<OBJECT>, OBJECT>
         void targetObjectBuildLink()
         {
             // called from link()
-            this->GetTarget()->insertFirst(this);
-            this->GetTarget()->incSize();
+            this->getTarget()->insertFirst(this);
+            this->getTarget()->incSize();
         }
         void targetObjectDestroyLink()
         {
             // called from unlink()
-            if (this->isValid()) this->GetTarget()->decSize();
+            if (this->isValid()) this->getTarget()->decSize();
         }
         void sourceObjectDestroyLink()
         {
             // called from invalidate()
-            this->GetTarget()->decSize();
+            this->getTarget()->decSize();
         }
     public:
-        GridReference() : Reference<GridRefManager<OBJECT>, OBJECT>() {}
+        GridReference() : Reference<GridRefManager<OBJECT>, OBJECT>() { }
         ~GridReference() { this->unlink(); }
         GridReference* next() { return (GridReference*)Reference<GridRefManager<OBJECT>, OBJECT>::next(); }
 };

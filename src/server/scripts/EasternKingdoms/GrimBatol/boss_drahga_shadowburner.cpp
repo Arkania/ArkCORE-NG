@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -18,64 +18,62 @@
 
 #include "grim_batol.h"
 #include "Spell.h"
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "Vehicle.h"
 
 enum ScriptTexts
 {
     //drahga
     SAY_AGGRO    = 0,
-    SAY_KILL    = 2,
+    SAY_KILL     = 2,
     SAY_DEATH    = 3,
-    SAY_ADDS    = 4,
-    SAY_VALIONA    = 5,
-
+    SAY_ADDS     = 4,
+    SAY_VALIONA  = 5,
     //valiona
     SAY_ENTER    = 0,
-    SAY_LEAVE    = 1,
+    SAY_LEAVE    = 1
 };
 
 enum Spells
 {
-    SPELL_BURNING_SHADOWBOLT    = 75245,
+    SPELL_BURNING_SHADOWBOLT      = 75245,
     SPELL_BURNING_SHADOWBOLT_H    = 90915,
-    SPELL_INVOCATION_OF_FLAME    = 75222,
-    SPELL_FLAMING_FIXATE        = 82850,
-    SPELL_INVOKED_FLAME            = 75235,
-    SPELL_SUPERNOVA                = 75238,
-    SPELL_SUPERNOVA_H            = 90972,
-    SPELL_TWILIGHT_PROTECTION    = 76303,
-    SPELL_TWILIGHT_SHIFT        = 75328,
-    SPELL_SHREDDING_SWIPE        = 75271,
-    SPELL_SHREDDING_SWIPE_H        = 40365,
-    SPELL_SEEPING_TWILIGHT_DUMMY= 75318,
+    SPELL_INVOCATION_OF_FLAME     = 75222,
+    SPELL_FLAMING_FIXATE          = 82850,
+    SPELL_INVOKED_FLAME           = 75235,
+    SPELL_SUPERNOVA               = 75238,
+    SPELL_SUPERNOVA_H             = 90972,
+    SPELL_TWILIGHT_PROTECTION     = 76303,
+    SPELL_TWILIGHT_SHIFT          = 75328,
+    SPELL_SHREDDING_SWIPE         = 75271,
+    SPELL_SHREDDING_SWIPE_H       = 40365,
+    SPELL_SEEPING_TWILIGHT_DUMMY  = 75318,
     SPELL_SEEPING_TWILIGHT        = 75274,
-    SPELL_SEEPING_TWILIGHT_H    = 90965,
+    SPELL_SEEPING_TWILIGHT_H      = 90965,
     SPELL_SEEPING_TWILIGHT_DMG    = 75317,
-    SPELL_SEEPING_TWILIGHT_DMG_H= 90964,
-    SPELL_VALIONAS_FLAME        = 75321,
+    SPELL_SEEPING_TWILIGHT_DMG_H  = 90964,
+    SPELL_VALIONAS_FLAME          = 75321,
     SPELL_VALIONAS_FLAME_H        = 90973,
-    SPELL_DEVOURING_FLAMES        = 90950,
-    
-    
+    SPELL_DEVOURING_FLAMES        = 90950
 };
 
 enum Adds
 {
-    NPC_INVOCATION_OF_FLAME_STALKER    = 40355,
-    NPC_INVOKED_FLAMING_SPIRIT        = 40357,
-    NPC_VALIONA                        = 40320,
-    NPC_SEEPING_TWILIGHT            = 40365,
-    NPC_DEVOURING_FLAMES            = 48798,
+    NPC_INVOCATION_OF_FLAME_STALKER  = 40355,
+    NPC_INVOKED_FLAMING_SPIRIT       = 40357,
+    NPC_VALIONA                      = 40320,
+    NPC_SEEPING_TWILIGHT             = 40365,
+    NPC_DEVOURING_FLAMES             = 48798
 };
 
 enum Events
 {
-    EVENT_BURNING_SHADOWBOLT    = 1,
+    EVENT_BURNING_SHADOWBOLT     = 1,
     EVENT_INVOCATION_OF_FLAME    = 2,
-    EVENT_SELECT_TARGET            = 3,
-    EVENT_VALIONAS_FLAME        = 4,
-    EVENT_SHREDDING_SWIPE        = 5,
+    EVENT_SELECT_TARGET          = 3,
+    EVENT_VALIONAS_FLAME         = 4,
+    EVENT_SHREDDING_SWIPE        = 5
 };
 
 const Position drahgavalionaPos[2] =
@@ -122,7 +120,7 @@ class boss_drahga_shadowburner : public CreatureScript
                     instance->SetData(DATA_DRAHGA_SHADOWBURNER, NOT_STARTED);
             }
 
-            void SpellHit(Unit* caster, SpellInfo const* spell)
+            void SpellHit(Unit* /*caster*/, SpellInfo const* spell)
             {
                 if (me->GetCurrentSpell(CURRENT_GENERIC_SPELL))
                     if ((me->GetCurrentSpell(CURRENT_GENERIC_SPELL)->m_spellInfo->Id == SPELL_BURNING_SHADOWBOLT) ||
@@ -137,7 +135,7 @@ class boss_drahga_shadowburner : public CreatureScript
                 summons.Summon(summon);
             }
 
-            void DamageTaken(Unit* attacker, uint32 &damage)
+            void DamageTaken(Unit* /*attacker*/, uint32 &damage)
             {
                 if (me->GetVehicle())
                     damage = 0;
@@ -148,7 +146,7 @@ class boss_drahga_shadowburner : public CreatureScript
                 summons.Despawn(summon);
             }
 
-            void EnterCombat(Unit* who)
+            void EnterCombat(Unit* /*who*/)
             {
                 Talk(SAY_AGGRO);
                 events.ScheduleEvent(EVENT_BURNING_SHADOWBOLT, urand(2000, 5000));
@@ -157,7 +155,7 @@ class boss_drahga_shadowburner : public CreatureScript
                     instance->SetData(DATA_DRAHGA_SHADOWBURNER, IN_PROGRESS);
             }
             
-            void JustDied(Unit* killer)
+            void JustDied(Unit* /*killer*/)
             {
                 Talk(SAY_DEATH);
                 summons.DespawnAll();
@@ -165,7 +163,7 @@ class boss_drahga_shadowburner : public CreatureScript
                     instance->SetData(DATA_DRAHGA_SHADOWBURNER, DONE);
             }
 
-            void KilledUnit(Unit* victim)
+            void KilledUnit(Unit* /*victim*/)
             {                
                 Talk(SAY_KILL);
             }
@@ -279,7 +277,7 @@ class npc_drahga_valiona : public CreatureScript
                 summons.Despawn(summon);
             }
 
-            void EnterCombat(Unit* who)
+            void EnterCombat(Unit* /*who*/)
             {
                 events.ScheduleEvent(EVENT_VALIONAS_FLAME, urand(10000, 15000));
                 events.ScheduleEvent(EVENT_SHREDDING_SWIPE, urand(8000, 10000));
@@ -348,7 +346,7 @@ class npc_drahga_valiona : public CreatureScript
                         events.ScheduleEvent(EVENT_VALIONAS_FLAME, urand(15000, 22000));
                         break;
                     case EVENT_SHREDDING_SWIPE:
-                        DoCast(me->GetVictim(), SPELL_SHREDDING_SWIPE);
+                        DoCastVictim(SPELL_SHREDDING_SWIPE);
                         events.ScheduleEvent(EVENT_SHREDDING_SWIPE, urand(20000, 22000));
                         break;
                     }
@@ -368,7 +366,7 @@ class npc_invocation_of_flame_stalker : public CreatureScript
 {
     public:
 
-        npc_invocation_of_flame_stalker() : CreatureScript("npc_invocation_of_flame_stalker"){}
+        npc_invocation_of_flame_stalker() : CreatureScript("npc_invocation_of_flame_stalker"){ }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -407,7 +405,7 @@ class npc_invoked_flaming_spirit : public CreatureScript
 {
     public:
 
-        npc_invoked_flaming_spirit() : CreatureScript("npc_invoked_flaming_spirit"){}
+        npc_invoked_flaming_spirit() : CreatureScript("npc_invoked_flaming_spirit"){ }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -432,12 +430,12 @@ class npc_invoked_flaming_spirit : public CreatureScript
                 DoCast(me, SPELL_INVOKED_FLAME);
             }
 
-            void JustDied(Unit* target)
+            void JustDied(Unit* /*target*/)
             {
                 me->DespawnOrUnsummon();
             }
 
-            void UpdateAI(uint32 diff)
+            void UpdateAI(uint32 /*diff*/)
             {
                 if (!instance)
                     return;
@@ -454,7 +452,7 @@ class npc_seeping_twilight : public CreatureScript
 {
     public:
 
-        npc_seeping_twilight() : CreatureScript("npc_seeping_twilight"){}
+        npc_seeping_twilight() : CreatureScript("npc_seeping_twilight"){ }
 
         CreatureAI* GetAI(Creature* creature) const
         {

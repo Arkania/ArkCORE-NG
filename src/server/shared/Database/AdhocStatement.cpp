@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -43,13 +43,13 @@ bool BasicStatementTask::Execute()
     if (m_has_result)
     {
         ResultSet* result = m_conn->Query(m_sql);
-        if (!result || !result->GetRowCount())
+        if (!result || !result->GetRowCount() || !result->NextRow())
         {
             delete result;
             m_result.set(QueryResult(NULL));
             return false;
         }
-        result->NextRow();
+
         m_result.set(QueryResult(result));
         return true;
     }

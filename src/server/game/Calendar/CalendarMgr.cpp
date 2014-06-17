@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -23,6 +23,7 @@
 #include "Player.h"
 #include "GuildMgr.h"
 #include "ObjectAccessor.h"
+#include "Opcodes.h"
 
 CalendarInvite::~CalendarInvite()
 {
@@ -34,9 +35,7 @@ CalendarEvent::~CalendarEvent()
     sCalendarMgr->FreeEventId(_eventId);
 }
 
-CalendarMgr::CalendarMgr()
-{
-}
+CalendarMgr::CalendarMgr() : _maxEventId(0), _maxInviteId(0) { }
 
 CalendarMgr::~CalendarMgr()
 {
@@ -74,7 +73,7 @@ void CalendarMgr::LoadFromDB()
             if (flags & CALENDAR_FLAG_GUILD_EVENT || flags & CALENDAR_FLAG_WITHOUT_INVITES)
                 guildId = Player::GetGuildIdFromDB(creatorGUID);
 
-            CalendarEvent* calendarEvent = new CalendarEvent(eventId, creatorGUID , guildId, type, dungeonId, time_t(eventTime), flags, time_t(timezoneTime), title, description);
+            CalendarEvent* calendarEvent = new CalendarEvent(eventId, creatorGUID, guildId, type, dungeonId, time_t(eventTime), flags, time_t(timezoneTime), title, description);
             _events.insert(calendarEvent);
 
             _maxEventId = std::max(_maxEventId, eventId);
@@ -83,7 +82,7 @@ void CalendarMgr::LoadFromDB()
         }
         while (result->NextRow());
 
-    sLog->outString(">> Loaded %u calendar events", count);
+    TC_LOG_INFO("server.loading", ">> Loaded %u calendar events", count);
     count = 0;
 
     //                                                       0   1      2        3       4       5           6     7
@@ -110,7 +109,7 @@ void CalendarMgr::LoadFromDB()
         }
         while (result->NextRow());
 
-    sLog->outString(">> Loaded %u calendar invites", count);
+    TC_LOG_INFO("server.loading", ">> Loaded %u calendar invites", count);
 
     for (uint64 i = 1; i < _maxEventId; ++i)
         if (!GetEvent(i))
@@ -159,20 +158,20 @@ void CalendarMgr::RemoveEvent(uint64 eventId, uint64 remover)
     PreparedStatement* stmt;
     MailDraft mail(calendarEvent->BuildCalendarMailSubject(remover), calendarEvent->BuildCalendarMailBody());
 
-    CalendarInviteStore::iterator itr = _invites[eventId].begin();
-    while (itr != _invites[eventId].end())
+    CalendarInviteStore& eventInvites = _invites[eventId];
+    for (size_t i = 0; i < eventInvites.size(); ++i)
     {
+        CalendarInvite* invite = eventInvites[i];
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CALENDAR_INVITE);
-        stmt->setUInt64(0, (*itr)->GetInviteId());
+        stmt->setUInt64(0, invite->GetInviteId());
         trans->Append(stmt);
 
         // guild events only? check invite status here?
         // When an event is deleted, all invited (accepted/declined? - verify) guildies are notified via in-game mail. (wowwiki)
-        if (remover && (*itr)->GetInviteeGUID() != remover)
-            mail.SendMailTo(trans, MailReceiver((*itr)->GetInviteeGUID()), calendarEvent, MAIL_CHECK_MASK_COPIED);
+        if (remover && invite->GetInviteeGUID() != remover)
+            mail.SendMailTo(trans, MailReceiver(invite->GetInviteeGUID()), calendarEvent, MAIL_CHECK_MASK_COPIED);
 
-        delete *itr;
-        _invites[eventId].erase(itr);
+        delete invite;
     }
 
     _invites.erase(eventId);
@@ -186,7 +185,7 @@ void CalendarMgr::RemoveEvent(uint64 eventId, uint64 remover)
     _events.erase(calendarEvent);
 }
 
-void CalendarMgr::RemoveInvite(uint64 inviteId, uint64 eventId, uint64 remover)
+void CalendarMgr::RemoveInvite(uint64 inviteId, uint64 eventId, uint64 /*remover*/)
 {
     CalendarEvent* calendarEvent = GetEvent(eventId);
 
@@ -284,7 +283,7 @@ CalendarEvent* CalendarMgr::GetEvent(uint64 eventId) const
         if ((*itr)->GetEventId() == eventId)
             return *itr;
 
-    sLog->outDebug(LOG_FILTER_TSCR, "CalendarMgr::GetEvent: [" UI64FMTD "] not found!", eventId);
+    TC_LOG_DEBUG("calendar", "CalendarMgr::GetEvent: [" UI64FMTD "] not found!", eventId);
     return NULL;
 }
 
@@ -295,7 +294,7 @@ CalendarInvite* CalendarMgr::GetInvite(uint64 inviteId) const
             if ((*itr2)->GetInviteId() == inviteId)
                 return *itr2;
 
-    sLog->outDebug(LOG_FILTER_TSCR, "CalendarMgr::GetInvite: [" UI64FMTD "] not found!", inviteId);
+    TC_LOG_DEBUG("calendar", "CalendarMgr::GetInvite: [" UI64FMTD "] not found!", inviteId);
     return NULL;
 }
 
@@ -314,7 +313,7 @@ uint64 CalendarMgr::GetFreeEventId()
 
     uint64 eventId = _freeEventIds.front();
     _freeEventIds.pop_front();
-    return eventId; 
+    return eventId;
 }
 
 void CalendarMgr::FreeInviteId(uint64 id)
@@ -342,7 +341,8 @@ CalendarEventStore CalendarMgr::GetPlayerEvents(uint64 guid)
     for (CalendarEventInviteStore::const_iterator itr = _invites.begin(); itr != _invites.end(); ++itr)
         for (CalendarInviteStore::const_iterator itr2 = itr->second.begin(); itr2 != itr->second.end(); ++itr2)
             if ((*itr2)->GetInviteeGUID() == guid)
-                events.insert(GetEvent(itr->first));
+                if (CalendarEvent* event = GetEvent(itr->first)) // NULL check added as attempt to fix #11512
+                    events.insert(event);
 
     if (Player* player = ObjectAccessor::FindPlayer(guid))
         for (CalendarEventStore::const_iterator itr = _events.begin(); itr != _events.end(); ++itr)
@@ -561,6 +561,7 @@ void CalendarMgr::SendCalendarEvent(uint64 guid, CalendarEvent const& calendarEv
     data << uint32(calendarEvent.GetFlags());
     data.AppendPackedTime(calendarEvent.GetEventTime());
     data.AppendPackedTime(calendarEvent.GetTimeZoneTime());
+
     Guild* guild = sGuildMgr->GetGuildById(calendarEvent.GetGuildId());
     data << uint64(guild ? guild->GetGUID() : 0);
 

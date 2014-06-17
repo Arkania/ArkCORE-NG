@@ -1,79 +1,115 @@
 /*
- * Copyright (C) 2008-2011 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
- * Copyright (C) 2010-2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation; either version 2 of the License, or (at your
+ * option) any later version.
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 #include "ByteBuffer.h"
+#include "Common.h"
+#include "Log.h"
 
-void BitStream::Clear()
+#include <ace/Stack_Trace.h>
+#include <sstream>
+
+ByteBufferPositionException::ByteBufferPositionException(bool add, size_t pos,
+                                                         size_t size, size_t valueSize)
 {
-    _data.clear();
-    _rpos = _wpos = 0;
+    std::ostringstream ss;
+    ACE_Stack_Trace trace;
+
+    ss << "Attempted to " << (add ? "put" : "get") << " value with size: "
+       << valueSize << " in ByteBuffer (pos: " << pos << " size: " << size
+       << ")\n\n" << trace.c_str();
+
+    message().assign(ss.str());
 }
 
-uint8 BitStream::GetBit(uint32 bit)
+ByteBufferSourceException::ByteBufferSourceException(size_t pos, size_t size,
+                                                     size_t valueSize)
 {
-    ASSERT(_data.size() > bit);
-    return _data[bit];
+    std::ostringstream ss;
+    ACE_Stack_Trace trace;
+
+    ss << "Attempted to put a "
+       << (valueSize > 0 ? "NULL-pointer" : "zero-sized value")
+       << " in ByteBuffer (pos: " << pos << " size: " << size << ")\n\n"
+       << trace.c_str();
+
+    message().assign(ss.str());
 }
 
-uint8 BitStream::ReadBit()
+void ByteBuffer::print_storage() const
 {
-    ASSERT(_data.size() < _rpos);
-    uint8 b = _data[_rpos];
-    ++_rpos;
-    return b;
-}
-
-void BitStream::WriteBit(uint32 bit)
-{
-    _data.push_back(bit ? uint8(1) : uint8(0));
-    ++_wpos;
-}
-
-template <typename T> void BitStream::WriteBits(T value, size_t bits)
-{
-    for (int32 i = bits-1; i >= 0; --i)
-        WriteBit((value >> i) & 1);
-}
-
-bool BitStream::Empty()
-{
-    return _data.empty();
-}
-
-void BitStream::Reverse()
-{
-    uint32 len = GetLength();
-    std::vector<uint8> b = _data;
-    Clear();
-
-    for(uint32 i = len; i > 0; --i)
-        WriteBit(b[i-1]);
-}
-
-void BitStream::Print()
-{
-    if (!sLog->IsOutDebug())
+    if (!sLog->ShouldLog("network", LOG_LEVEL_TRACE)) // optimize disabled trace output
         return;
-    std::stringstream ss;
-    ss << "BitStream: ";
-    for (uint32 i = 0; i < GetLength(); ++i)
-        ss << uint32(GetBit(i)) << " ";
 
-    sLog->outDebug(LOG_FILTER_NETWORKIO,ss.str().c_str());
+    std::ostringstream o;
+    o << "STORAGE_SIZE: " << size();
+    for (uint32 i = 0; i < size(); ++i)
+        o << read<uint8>(i) << " - ";
+    o << " ";
+
+    TC_LOG_TRACE("network", "%s", o.str().c_str());
+}
+
+void ByteBuffer::textlike() const
+{
+    if (!sLog->ShouldLog("network", LOG_LEVEL_TRACE)) // optimize disabled trace output
+        return;
+
+    std::ostringstream o;
+    o << "STORAGE_SIZE: " << size();
+    for (uint32 i = 0; i < size(); ++i)
+    {
+        char buf[1];
+        snprintf(buf, 1, "%c", read<uint8>(i));
+        o << buf;
+    }
+    o << " ";
+    TC_LOG_TRACE("network", "%s", o.str().c_str());
+}
+
+void ByteBuffer::hexlike() const
+{
+    if (!sLog->ShouldLog("network", LOG_LEVEL_TRACE)) // optimize disabled trace output
+        return;
+
+    uint32 j = 1, k = 1;
+
+    std::ostringstream o;
+    o << "STORAGE_SIZE: " << size();
+
+    for (uint32 i = 0; i < size(); ++i)
+    {
+        char buf[3];
+        snprintf(buf, 1, "%2X ", read<uint8>(i));
+        if ((i == (j * 8)) && ((i != (k * 16))))
+        {
+            o << "| ";
+            ++j;
+        }
+        else if (i == (k * 16))
+        {
+            o << "\n";
+            ++k;
+            ++j;
+        }
+
+        o << buf;
+    }
+    o << " ";
+    TC_LOG_TRACE("network", "%s", o.str().c_str());
 }

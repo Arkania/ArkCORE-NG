@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -24,22 +24,22 @@ enum Npcs
     NPC_GENERAL_UMBRISS              = 39625,
     NPC_FORGEMASTER_THRONGUS         = 40177,
     NPC_DRAHGA_SHADOWBURNER          = 40319,
-    NPC_ERUDAX                       = 40484,
+    NPC_ERUDAX                       = 40484
 };
 
 enum Data
 {
-    DATA_GENERAL_UMBRISS        = 0,
-    DATA_FORGEMASTER_THRONGUS   = 1,
-    DATA_DRAHGA_SHADOWBURNER    = 2,
-    DATA_ERUDAX                    = 3,
+    DATA_GENERAL_UMBRISS             = 0,
+    DATA_FORGEMASTER_THRONGUS        = 1,
+    DATA_DRAHGA_SHADOWBURNER         = 2,
+    DATA_ERUDAX                      = 3
 };
 
 #define MAX_ENCOUNTER 4
 
 enum Achievements
 {
-    ACHIEV_UMBRAGE_FOR_UMBRISS      = 5297,
+    ACHIEV_UMBRAGE_FOR_UMBRISS       = 5297
 };
 
 #endif

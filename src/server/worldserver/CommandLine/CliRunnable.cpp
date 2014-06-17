@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -40,7 +40,7 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 
-char * command_finder(const char* text, int state)
+char* command_finder(const char* text, int state)
 {
     static int idx, len;
     const char* ret;
@@ -71,19 +71,18 @@ char * command_finder(const char* text, int state)
     return ((char*)NULL);
 }
 
-char ** cli_completion(const char * text, int start, int /*end*/)
+char** cli_completion(const char* text, int start, int /*end*/)
 {
-    char ** matches;
-    matches = (char**)NULL;
+    char** matches = NULL;
 
-    if (start == 0)
-        matches = rl_completion_matches((char*)text, &command_finder);
-    else
+    if (start)
         rl_bind_key('\t', rl_abort);
-    return (matches);
+    else
+        matches = rl_completion_matches((char*)text, &command_finder);
+    return matches;
 }
 
-int cli_hook_func(void)
+int cli_hook_func()
 {
        if (World::IsStopped())
            rl_done = 1;
@@ -136,13 +135,13 @@ int kb_hit_return()
 void CliRunnable::run()
 {
     ///- Display the list of available CLI functions then beep
-    //sLog->outString("");
+    //TC_LOG_INFO("server.worldserver", "");
 #if PLATFORM != PLATFORM_WINDOWS
     rl_attempted_completion_function = cli_completion;
     rl_event_hook = cli_hook_func;
 #endif
 
-    if (ConfigMgr::GetBoolDefault("BeepAtStart", true))
+    if (sConfigMgr->GetBoolDefault("BeepAtStart", true))
         printf("\a");                                       // \a = Alert
 
     // print this here the first time
@@ -177,6 +176,8 @@ void CliRunnable::run()
             {
 #if PLATFORM == PLATFORM_WINDOWS
                 printf("ArkCORE>");
+#else
+                free(command_str);
 #endif
                 continue;
             }
@@ -186,6 +187,8 @@ void CliRunnable::run()
             {
 #if PLATFORM == PLATFORM_WINDOWS
                 printf("ArkCORE>");
+#else
+                free(command_str);
 #endif
                 continue;
             }
@@ -194,6 +197,7 @@ void CliRunnable::run()
             sWorld->QueueCliCommand(new CliCommandHolder(NULL, command.c_str(), &utf8print, &commandFinished));
 #if PLATFORM != PLATFORM_WINDOWS
             add_history(command.c_str());
+            free(command_str);
 #endif
         }
         else if (feof(stdin))

@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -35,12 +35,13 @@ class ObjectGridLoader
     public:
         ObjectGridLoader(NGridType &grid, Map* map, const Cell &cell)
             : i_cell(cell), i_grid(grid), i_map(map), i_gameObjects(0), i_creatures(0), i_corpses (0)
-            {}
+            { }
 
         void Visit(GameObjectMapType &m);
         void Visit(CreatureMapType &m);
-        void Visit(CorpseMapType &) const {}
-        void Visit(DynamicObjectMapType&) const {}
+        void Visit(CorpseMapType &) const { }
+        void Visit(DynamicObjectMapType&) const { }
+        void Visit(AreaTriggerMapType &) const { }
 
         void LoadN(void);
 
@@ -60,7 +61,7 @@ class ObjectGridStoper
 {
     public:
         void Visit(CreatureMapType &m);
-        template<class T> void Visit(GridRefManager<T> &) {}
+        template<class T> void Visit(GridRefManager<T> &) { }
 };
 
 //Move the foreign creatures back to respawn positions before unloading the NGrid
@@ -68,7 +69,8 @@ class ObjectGridEvacuator
 {
     public:
         void Visit(CreatureMapType &m);
-        template<class T> void Visit(GridRefManager<T> &) {}
+        void Visit(GameObjectMapType &m);
+        template<class T> void Visit(GridRefManager<T> &) { }
 };
 
 //Clean up and remove from world

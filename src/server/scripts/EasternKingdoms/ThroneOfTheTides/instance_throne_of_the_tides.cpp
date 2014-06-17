@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
  
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "InstanceScript.h"
 #include "throne_of_the_tides.h"
 
 #define MAX_ENCOUNTER 4
@@ -73,7 +74,7 @@ public:
         void OnPlayerEnter(Player* pPlayer)
         {
             if (!uiTeamInInstance)
-				uiTeamInInstance = pPlayer->GetTeam();
+                uiTeamInInstance = pPlayer->GetTeam();
         }
 
         void OnCreatureCreate(Creature* pCreature)
@@ -96,17 +97,10 @@ public:
                 break;
             case NPC_COMMANDER_ULTHOK:
                 uiCommanderUlthokGUID = pCreature->GetGUID();
-                sLog->outError("LOADING", "ulthok1");
                 if (GetData(DATA_COMMANDER_ULTHOK_EVENT) == DONE)
-                {
-                    sLog->outError("LOADING", "ulthok2");
                     pCreature->SetPhaseMask(PHASEMASK_NORMAL, true);
-                }
                 else
-                {
-                    sLog->outError("LOADING", "ulthok3");
                     pCreature->SetPhaseMask(2, true);
-                }
                 break;
             case NPC_ERUNAK_STONESPEAKER:
                 uiErunakStonespeakerGUID = pCreature->GetGUID();
@@ -190,50 +184,50 @@ public:
         }
 
         void OnGameObjectRemove(GameObject* pGo)
-		{
-			switch (pGo->GetEntry())
-			{
-			case GO_LADY_NAZJAR_DOOR:
-			case GO_COMMANDER_ULTHOK_DOOR:
-			case GO_ERUNAK_STONESPEAKER_DOOR:
-			case GO_OZUMAT_DOOR:
-				AddDoor(pGo, false);
-				break;
-			}
-		}
+        {
+            switch (pGo->GetEntry())
+            {
+            case GO_LADY_NAZJAR_DOOR:
+            case GO_COMMANDER_ULTHOK_DOOR:
+            case GO_ERUNAK_STONESPEAKER_DOOR:
+            case GO_OZUMAT_DOOR:
+                AddDoor(pGo, false);
+                break;
+            }
+        }
 
         void SetData(uint32 type, uint32 data)
         {
             switch (type)
             {
-            case DATA_LADY_NAZJAR_EVENT:
-                m_uiEvents[0] = data;
-                break;
-            case DATA_COMMANDER_ULTHOK_EVENT:
-                m_uiEvents[1] = data;
-                break;
-            case DATA_NEPTULON_EVENT:
-                m_uiEvents[2] = data;
+                case DATA_LADY_NAZJAR_EVENT:
+                    m_uiEvents[0] = data;
+                    break;
+                case DATA_COMMANDER_ULTHOK_EVENT:
+                    m_uiEvents[1] = data;
+                    break;
+                case DATA_NEPTULON_EVENT:
+                    m_uiEvents[2] = data;
             }
             if (data == DONE)
                 SaveToDB();
         }
 
-        uint32 GetData(uint32 type)
+        uint32 GetData(uint32 type) const
         {
             switch (type)
             {
-            case DATA_LADY_NAZJAR_EVENT:
-                return m_uiEvents[0];
-            case DATA_COMMANDER_ULTHOK_EVENT:
-                return m_uiEvents[1];
-            case DATA_NEPTULON_EVENT:
-                return m_uiEvents[2];
+                case DATA_LADY_NAZJAR_EVENT:
+                    return m_uiEvents[0];
+                case DATA_COMMANDER_ULTHOK_EVENT:
+                    return m_uiEvents[1];
+                case DATA_NEPTULON_EVENT:
+                    return m_uiEvents[2];
             }
             return 0;
         }
 
-        uint64 GetData64(uint32 type)
+        uint64 GetData64(uint32 type) const
         {
             switch(type)
             {
@@ -259,14 +253,14 @@ public:
 
         bool SetBossState(uint32 type, EncounterState state)
         {
-			if (!InstanceScript::SetBossState(type, state))
-				return false;
+            if (!InstanceScript::SetBossState(type, state))
+                return false;
 
-			switch (type)
-			{
-			case DATA_LADY_NAZJAR:
-				break;
-			case DATA_COMMANDER_ULTHOK:
+            switch (type)
+            {
+            case DATA_LADY_NAZJAR:
+                break;
+            case DATA_COMMANDER_ULTHOK:
                 if (state == DONE)
                 {
                     if (GameObject* pTentacleRight = instance->GetGameObject(uiTentacleRightGUID))
@@ -278,15 +272,15 @@ public:
                     if (GameObject* pInvisibleDoor2 = instance->GetGameObject(uiInvisibleDoor2GUID))
                         pInvisibleDoor2->SetPhaseMask(2, true);
                 }
-				break;
-			case DATA_MINDBENDER_GHURSHA:
-				break;
-			case DATA_OZUMAT:
+                break;
+            case DATA_MINDBENDER_GHURSHA:
+                break;
+            case DATA_OZUMAT:
                 if (state == DONE)
                     DoRespawnGameObject(uiNeptulonCache, DAY);
-				break;
+                break;
              }
-			return true;
+            return true;
         }
 
         std::string GetSaveData()
@@ -322,19 +316,19 @@ public:
             if (dataHead1 == 'T' && dataHead2 == 'o' && dataHead3 == 't' && dataHead4 == 'T')
             {
                 for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
-				{
-					uint32 tmpState;
-					loadStream >> tmpState;
-					if (tmpState == IN_PROGRESS || tmpState > SPECIAL)
-						tmpState = NOT_STARTED;
-					SetBossState(i, EncounterState(tmpState));
-				}
+                {
+                    uint32 tmpState;
+                    loadStream >> tmpState;
+                    if (tmpState == IN_PROGRESS || tmpState > SPECIAL)
+                        tmpState = NOT_STARTED;
+                    SetBossState(i, EncounterState(tmpState));
+                }
                 for (uint8 i = 0; i < 3; ++i)
                 {
                     uint32 tmpEvent;
                     loadStream >> tmpEvent;
                     if (tmpEvent == IN_PROGRESS || tmpEvent > SPECIAL)
-						tmpEvent = NOT_STARTED;
+                        tmpEvent = NOT_STARTED;
                     m_uiEvents[i] = tmpEvent;
                 }
 

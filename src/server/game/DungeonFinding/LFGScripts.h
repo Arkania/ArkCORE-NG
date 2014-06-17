@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -22,10 +22,13 @@
 
 #include "Common.h"
 #include "SharedDefines.h"
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
 
 class Player;
 class Group;
+
+namespace lfg
+{
 
 class LFGPlayerScript : public PlayerScript
 {
@@ -33,10 +36,9 @@ class LFGPlayerScript : public PlayerScript
         LFGPlayerScript();
 
         // Player Hooks
-        void OnLevelChanged(Player* player, uint8 oldLevel);
         void OnLogout(Player* player);
         void OnLogin(Player* player);
-        void OnBindToInstance(Player* player, Difficulty difficulty, uint32 mapId, bool permanent);
+        void OnMapChanged(Player* player);
 };
 
 class LFGGroupScript : public GroupScript
@@ -51,3 +53,5 @@ class LFGGroupScript : public GroupScript
         void OnChangeLeader(Group* group, uint64 newLeaderGuid, uint64 oldLeaderGuid);
         void OnInviteMember(Group* group, uint64 guid);
 };
+
+} // namespace lfg

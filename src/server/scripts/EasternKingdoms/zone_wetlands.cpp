@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -29,14 +29,16 @@ npc_mikhail
 npc_tapoke_slim_jahn
 EndContentData */
 
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
+#include "Player.h"
 
 /*######
 ## npc_tapoke_slim_jahn
 ######*/
 
-enum eTapokeSlim
+enum TapokeSlim
 {
     QUEST_MISSING_DIPLO_PT11    = 1249,
     FACTION_ENEMY               = 168,
@@ -51,7 +53,7 @@ class npc_tapoke_slim_jahn : public CreatureScript
 public:
     npc_tapoke_slim_jahn() : CreatureScript("npc_tapoke_slim_jahn") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
         return new npc_tapoke_slim_jahnAI(creature);
     }
@@ -60,15 +62,15 @@ public:
     {
         npc_tapoke_slim_jahnAI(Creature* creature) : npc_escortAI(creature) { }
 
-        bool m_bFriendSummoned;
+        bool IsFriendSummoned;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             if (!HasEscortState(STATE_ESCORT_ESCORTING))
-                m_bFriendSummoned = false;
+                IsFriendSummoned = false;
         }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) OVERRIDE
         {
             switch (waypointId)
             {
@@ -81,26 +83,24 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) OVERRIDE
         {
-            Player* player = GetPlayerForEscort();
-
-            if (HasEscortState(STATE_ESCORT_ESCORTING) && !m_bFriendSummoned && player)
+            if (HasEscortState(STATE_ESCORT_ESCORTING) && !IsFriendSummoned && GetPlayerForEscort())
             {
                 for (uint8 i = 0; i < 3; ++i)
                     DoCast(me, SPELL_CALL_FRIENDS, true);
 
-                m_bFriendSummoned = true;
+                IsFriendSummoned = true;
             }
         }
 
-        void JustSummoned(Creature* summoned)
+        void JustSummoned(Creature* summoned) OVERRIDE
         {
             if (Player* player = GetPlayerForEscort())
                 summoned->AI()->AttackStart(player);
         }
 
-        void AttackedBy(Unit* pAttacker)
+        void AttackedBy(Unit* pAttacker) OVERRIDE
         {
             if (me->GetVictim())
                 return;
@@ -111,14 +111,13 @@ public:
             AttackStart(pAttacker);
         }
 
-        void DamageTaken(Unit* /*pDoneBy*/, uint32& uiDamage)
+        void DamageTaken(Unit* /*pDoneBy*/, uint32& uiDamage) OVERRIDE
         {
             if (HealthBelowPct(20))
             {
                 if (Player* player = GetPlayerForEscort())
                 {
-                    if (player->GetTypeId() == TYPEID_PLAYER)
-                        CAST_PLR(player)->GroupEventHappens(QUEST_MISSING_DIPLO_PT11, me);
+                    player->GroupEventHappens(QUEST_MISSING_DIPLO_PT11, me);
 
                     uiDamage = 0;
 
@@ -143,7 +142,7 @@ class npc_mikhail : public CreatureScript
 public:
     npc_mikhail() : CreatureScript("npc_mikhail") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest) OVERRIDE
     {
         if (quest->GetQuestId() == QUEST_MISSING_DIPLO_PT11)
         {

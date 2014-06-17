@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "azjol_nerub.h"
 
 enum Spells
@@ -25,10 +26,8 @@ enum Spells
     SPELL_SUMMON_CARRION_BEETLES                  = 53521,
     SPELL_LEECHING_SWARM                          = 53467,
     SPELL_POUND                                   = 53472,
-    SPELL_POUND_H                                 = 59433,
     SPELL_SUBMERGE                                = 53421,
     SPELL_IMPALE_DMG                              = 53454,
-    SPELL_IMPALE_DMG_H                            = 59446,
     SPELL_IMPALE_SHAKEGROUND                      = 53455,
     SPELL_IMPALE_SPIKE                            = 53539,   //this is not the correct visual effect
     //SPELL_IMPALE_TARGET                           = 53458,
@@ -46,20 +45,15 @@ enum Creatures
 // not in db
 enum Yells
 {
-    SAY_INTRO                                     = -1601010,
-    SAY_AGGRO                                     = -1601000,
-    SAY_SLAY_1                                    = -1601001,
-    SAY_SLAY_2                                    = -1601002,
-    SAY_SLAY_3                                    = -1601003,
-    SAY_LOCUST_1                                  = -1601005,
-    SAY_LOCUST_2                                  = -1601006,
-    SAY_LOCUST_3                                  = -1601007,
-    SAY_SUBMERGE_1                                = -1601008,
-    SAY_SUBMERGE_2                                = -1601009,
-    SAY_DEATH                                     = -1601004
+    SAY_AGGRO                                     = 0,
+    SAY_SLAY                                      = 1,
+    SAY_DEATH                                     = 2,
+    SAY_LOCUST                                    = 3,
+    SAY_SUBMERGE                                  = 4,
+    SAY_INTRO                                     = 5
 };
 
-enum
+enum Misc
 {
     ACHIEV_TIMED_START_EVENT                      = 20381,
 };
@@ -120,7 +114,7 @@ public:
 
         SummonList Summons;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             CarrionBeetlesTimer = 8*IN_MILLISECONDS;
             LeechingSwarmTimer = 20*IN_MILLISECONDS;
@@ -137,17 +131,13 @@ public:
 
             Summons.DespawnAll();
 
-            if (instance)
-            {
-                instance->SetData(DATA_ANUBARAK_EVENT, NOT_STARTED);
-                instance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT);
-            }
+            instance->SetBossState(DATA_ANUBARAK, NOT_STARTED);
+            instance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT);
         }
 
         Creature* DoSummonImpaleTarget(Unit* target)
         {
-            Position targetPos;
-            target->GetPosition(&targetPos);
+            Position targetPos = target->GetPosition();
 
             if (TempSummon* impaleTarget = me->SummonCreature(CREATURE_IMPALE_TARGET, targetPos, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 6*IN_MILLISECONDS))
             {
@@ -161,21 +151,19 @@ public:
             return NULL;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) OVERRIDE
         {
-            DoScriptText(SAY_AGGRO, me);
+            Talk(SAY_AGGRO);
             DelayTimer = 0;
-            if (instance)
-                instance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT);
+            instance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT);
         }
 
         void DelayEventStart()
         {
-            if (instance)
-                instance->SetData(DATA_ANUBARAK_EVENT, IN_PROGRESS);
+            instance->SetBossState(DATA_ANUBARAK, IN_PROGRESS);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (!UpdateVictim())
                 return;
@@ -211,7 +199,7 @@ public:
                         break;
                     case IMPALE_PHASE_DMG:
                         if (Creature* impaleTarget = Unit::GetCreature(*me, ImpaleTarget))
-                            me->CastSpell(impaleTarget, DUNGEON_MODE(SPELL_IMPALE_DMG, SPELL_IMPALE_DMG_H), true);
+                            me->CastSpell(impaleTarget, SPELL_IMPALE_DMG, true);
                         ImpalePhase = IMPALE_PHASE_TARGET;
                         ImpaleTimer = 9*IN_MILLISECONDS;
                         break;
@@ -307,7 +295,7 @@ public:
                 if (Channeling == true)
                 {
                     for (uint8 i = 0; i < 8; ++i)
-                    DoCast(me->GetVictim(), SPELL_SUMMON_CARRION_BEETLES, true);
+                    DoCastVictim(SPELL_SUMMON_CARRION_BEETLES, true);
                     Channeling = false;
                 }
                 else if (CarrionBeetlesTimer <= diff)
@@ -328,7 +316,7 @@ public:
                     if (Unit* target = me->GetVictim())
                     {
                         if (Creature* pImpaleTarget = DoSummonImpaleTarget(target))
-                            me->CastSpell(pImpaleTarget, DUNGEON_MODE(SPELL_POUND, SPELL_POUND_H), false);
+                            me->CastSpell(pImpaleTarget, SPELL_POUND, false);
                     }
                     PoundTimer = 16500;
                 } else PoundTimer -= diff;
@@ -338,34 +326,34 @@ public:
             }
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) OVERRIDE
         {
-            DoScriptText(SAY_DEATH, me);
+            Talk(SAY_DEATH);
             Summons.DespawnAll();
-            if (instance)
-                instance->SetData(DATA_ANUBARAK_EVENT, DONE);
+            instance->SetBossState(DATA_ANUBARAK, DONE);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) OVERRIDE
         {
-            if (victim == me)
+            if (victim->GetTypeId() != TYPEID_PLAYER)
                 return;
-            DoScriptText(RAND(SAY_SLAY_1, SAY_SLAY_2, SAY_SLAY_3), me);
+
+            Talk(SAY_SLAY);
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) OVERRIDE
         {
             Summons.Summon(summon);
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new boss_anub_arakAI(creature);
+        return GetInstanceAI<boss_anub_arakAI>(creature);
     }
 };
 
 void AddSC_boss_anub_arak()
 {
-    new boss_anub_arak;
+    new boss_anub_arak();
 }

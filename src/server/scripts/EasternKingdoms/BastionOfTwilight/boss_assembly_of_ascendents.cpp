@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2011-2012 Project SkyFire <http://www.projectskyfire.org/>
- * Copyright (C) 2010-2011 MigCore <http://wow-mig.ru/>
- * Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -41,23 +41,23 @@ public:
 
         void Reset()
         {
-			if (instance)
+            if (instance)
             instance->SetData(DATA_ASCENDANT_COUNCIL, NOT_STARTED);
         }
 
         void EnterCombat(Unit* /*who*/)
         {
-			if (instance)
+            if (instance)
             instance->SetData(DATA_ASCENDANT_COUNCIL, IN_PROGRESS);
         }
 
         void JustDied(Unit* /*Killer*/)
         {
-			if (instance)
+            if (instance)
             instance->SetData(DATA_ASCENDANT_COUNCIL, DONE);
         }
 
-        void UpdateAI(uint32 Diff)
+        void UpdateAI(uint32 /*diff*/)
         {
             if (!UpdateVictim())
                 return;

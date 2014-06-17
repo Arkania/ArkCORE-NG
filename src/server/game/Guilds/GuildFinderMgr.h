@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -71,11 +71,11 @@ struct MembershipRequest
         }
 
         MembershipRequest(uint32 playerGUID, uint32 guildId, uint32 availability, uint32 classRoles, uint32 interests, std::string& comment, time_t submitTime) :
-            _playerGUID(playerGUID), _guildId(guildId), _availability(availability), _classRoles(classRoles),
-            _interests(interests), _time(submitTime), _comment(comment) {}
-        
-        MembershipRequest() : _playerGUID(0), _guildId(0), _availability(0), _classRoles(0),
-            _interests(0), _time(time(NULL)) {}
+            _comment(comment), _guildId(guildId), _playerGUID(playerGUID), _availability(availability),
+            _classRoles(classRoles), _interests(interests), _time(submitTime)  { }
+
+        MembershipRequest() : _guildId(0), _playerGUID(0), _availability(0), _classRoles(0),
+            _interests(0), _time(time(NULL)) { }
 
         uint32 GetGuildId() const      { return _guildId; }
         uint32 GetPlayerGUID() const   { return _playerGUID; }
@@ -161,18 +161,18 @@ struct LFGuildPlayer
 struct LFGuildSettings : public LFGuildPlayer
 {
     public:
-        LFGuildSettings() : LFGuildPlayer(), _listed(false), _team(TEAM_ALLIANCE) {}
+        LFGuildSettings() : LFGuildPlayer(), _listed(false), _team(TEAM_ALLIANCE) { }
 
-        LFGuildSettings(bool listed, TeamId team) : LFGuildPlayer(), _listed(listed), _team(team) {}
+        LFGuildSettings(bool listed, TeamId team) : LFGuildPlayer(), _listed(listed), _team(team) { }
 
-        LFGuildSettings(bool listed, TeamId team, uint32 guid, uint8 role, uint8 availability, uint8 interests, uint8 level) : _listed(listed),
-            LFGuildPlayer(guid, role, availability, interests, level), _team(team) {}
+        LFGuildSettings(bool listed, TeamId team, uint32 guid, uint8 role, uint8 availability, uint8 interests, uint8 level) :
+            LFGuildPlayer(guid, role, availability, interests, level), _listed(listed), _team(team) { }
 
-        LFGuildSettings(bool listed, TeamId team, uint32 guid, uint8 role, uint8 availability, uint8 interests, uint8 level, std::string& comment) : _listed(listed),
-            LFGuildPlayer(guid, role, availability, interests, level, comment), _team(team) {}
+        LFGuildSettings(bool listed, TeamId team, uint32 guid, uint8 role, uint8 availability, uint8 interests, uint8 level, std::string& comment) :
+            LFGuildPlayer(guid, role, availability, interests, level, comment), _listed(listed), _team(team) { }
 
-        LFGuildSettings(LFGuildSettings const& settings) : _listed(settings.IsListed()), _team(settings.GetTeam()),
-            LFGuildPlayer(settings) {}
+        LFGuildSettings(LFGuildSettings const& settings) :
+            LFGuildPlayer(settings), _listed(settings.IsListed()), _team(settings.GetTeam()) { }
 
 
         bool IsListed() const      { return _listed; }
@@ -180,8 +180,8 @@ struct LFGuildSettings : public LFGuildPlayer
 
         TeamId GetTeam() const     { return _team; }
     private:
-        TeamId _team;
         bool _listed;
+        TeamId _team;
 };
 
 typedef std::map<uint32 /* guildGuid */, LFGuildSettings> LFGuildStore;
@@ -238,9 +238,9 @@ class GuildFinderMgr
          */
         void RemoveMembershipRequest(uint32 playerId, uint32 guildId);
 
-        /// wipes everything related to a guild. Used when that guild is disbanded
+        /// Wipes everything related to a guild. Used when that guild is disbanded
         void DeleteGuild(uint32 guildId);
-        
+
         /**
          * @brief Returns a set of membership requests for a guild
          * @param guildGuid The guild's database guid.
@@ -265,7 +265,7 @@ class GuildFinderMgr
 
         /// Counts the amount of pending membership requests, given the player's db guid.
         uint8 CountRequestsFromPlayer(uint32 playerId);
- 
+
         void SendApplicantListUpdate(Guild& guild);
         void SendMembershipRequestListUpdate(Player& player);
 };

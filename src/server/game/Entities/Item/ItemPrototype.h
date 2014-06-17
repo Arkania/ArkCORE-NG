@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -108,10 +108,8 @@ enum ItemBondingType
 
 #define MAX_BIND_TYPE                             6
 
-/* TODO
-    // need to know cases when using item is not allowed in shapeshift
-    ITEM_PROTO_FLAG_USABLE_WHEN_SHAPESHIFTED    = 0x00800000, // Item can be used in shapeshift forms
-*/
+/* /// @todo: Requiring actual cases in which using (an) item isn't allowed while shapeshifted. Else, this flag would need an implementation.
+    ITEM_PROTO_FLAG_USABLE_WHEN_SHAPESHIFTED    = 0x00800000, // Item can be used in shapeshift forms */
 
 enum ItemProtoFlags
 {
@@ -149,9 +147,6 @@ enum ItemProtoFlags
     ITEM_PROTO_FLAG_BOP_TRADEABLE               = 0x80000000  // bound item that can be traded
 };
 
-/* TODO
-*/
-
 enum ItemFieldFlags
 {
     ITEM_FLAG_SOULBOUND     = 0x00000001, // Item is soulbound and cannot be traded <<--
@@ -187,7 +182,7 @@ enum ItemFieldFlags
     ITEM_FLAG_UNK25         = 0x40000000, // ?
     ITEM_FLAG_UNK26         = 0x80000000, // ?
 
-    ITEM_FLAG_MAIL_TEXT_MASK = ITEM_FLAG_READABLE | ITEM_FLAG_UNK13 | ITEM_FLAG_UNK14,
+    ITEM_FLAG_MAIL_TEXT_MASK = ITEM_FLAG_READABLE | ITEM_FLAG_UNK13 | ITEM_FLAG_UNK14
 };
 
 enum ItemFlagsExtra
@@ -197,25 +192,25 @@ enum ItemFlagsExtra
     ITEM_FLAGS_EXTRA_EXT_COST_REQUIRES_GOLD  = 0x00000004, // when item uses extended cost, gold is also required
     ITEM_FLAGS_EXTRA_NEED_ROLL_DISABLED      = 0x00000100,
     ITEM_FLAGS_EXTRA_CASTER_WEAPON           = 0x00000200,
-	ITEM_FLAGS_EXTRA_HAS_NORMAL_PRICE        = 0x00004000,
+    ITEM_FLAGS_EXTRA_HAS_NORMAL_PRICE        = 0x00004000,
     ITEM_FLAGS_EXTRA_BNET_ACCOUNT_BOUND      = 0x00020000,
     ITEM_FLAGS_EXTRA_CANNOT_BE_TRANSMOG      = 0x00200000,
     ITEM_FLAGS_EXTRA_CANNOT_TRANSMOG         = 0x00400000,
-    ITEM_FLAGS_EXTRA_CAN_TRANSMOG            = 0x00800000,
+    ITEM_FLAGS_EXTRA_CAN_TRANSMOG            = 0x00800000
 };
 
 enum ItemFlagsCustom
 {
     ITEM_FLAGS_CU_DURATION_REAL_TIME    = 0x0001,   // Item duration will tick even if player is offline
     ITEM_FLAGS_CU_IGNORE_QUEST_STATUS   = 0x0002,   // No quest status will be checked when this item drops
-    ITEM_FLAGS_CU_FOLLOW_LOOT_RULES     = 0x0004,   // Item will always follow group/master/need before greed looting rules
+    ITEM_FLAGS_CU_FOLLOW_LOOT_RULES     = 0x0004    // Item will always follow group/master/need before greed looting rules
 };
 
 enum CurrencyFlags
 {
-    CURRENCY_FLAG_TRADEABLE      = 0x01,
+    CURRENCY_FLAG_TRADEABLE          = 0x01,
     // ...
-    CURRENCY_FLAG_HIGH_PRECISION = 0x08,
+    CURRENCY_FLAG_HIGH_PRECISION     = 0x08,
     // ...
     CURRENCY_FLAG_COUNT_SEASON_TOTAL = 0x80,
 };
@@ -251,7 +246,7 @@ enum BAG_FAMILY_MASK
     BAG_FAMILY_MASK_VANITY_PETS               = 0x00001000,
     BAG_FAMILY_MASK_CURRENCY_TOKENS           = 0x00002000,
     BAG_FAMILY_MASK_QUEST_ITEMS               = 0x00004000,
-    BAG_FAMILY_MASK_FISHING_SUPP              = 0x00008000,
+    BAG_FAMILY_MASK_FISHING_SUPP              = 0x00008000
 };
 
 enum SocketColor
@@ -261,7 +256,7 @@ enum SocketColor
     SOCKET_COLOR_YELLOW                         = 4,
     SOCKET_COLOR_BLUE                           = 8,
     SOCKET_COLOR_HYDRAULIC                      = 16, // not used
-    SOCKET_COLOR_COGWHEEL                       = 32,
+    SOCKET_COLOR_COGWHEEL                       = 32
 };
 
 #define SOCKET_COLOR_ALL (SOCKET_COLOR_META | SOCKET_COLOR_RED | SOCKET_COLOR_YELLOW | SOCKET_COLOR_BLUE | SOCKET_COLOR_COGWHEEL)
@@ -410,6 +405,7 @@ enum ItemSubclassArmor
     ITEM_SUBCLASS_ARMOR_LEATHER                 = 2,
     ITEM_SUBCLASS_ARMOR_MAIL                    = 3,
     ITEM_SUBCLASS_ARMOR_PLATE                   = 4,
+    //ITEM_SUBCLASS_ARMOR_BUCKLER                 = 5, // OBSOLETE
     ITEM_SUBCLASS_ARMOR_SHIELD                  = 6,
     //ITEM_SUBCLASS_ARMOR_LIBRAM                  = 7,
     //ITEM_SUBCLASS_ARMOR_IDOL                    = 8,
@@ -454,7 +450,7 @@ enum ItemSubclassTradeGoods
     ITEM_SUBCLASS_TRADE_GOODS_OTHER             = 11,
     ITEM_SUBCLASS_ENCHANTING                    = 12,
     ITEM_SUBCLASS_MATERIAL                      = 13,
-    ITEM_SUBCLASS_ENCHANTMENT                   = 14,
+    ITEM_SUBCLASS_ENCHANTMENT                   = 14
 };
 
 #define MAX_ITEM_SUBCLASS_TRADE_GOODS             15
@@ -537,7 +533,7 @@ enum ItemSubclassJunk
     ITEM_SUBCLASS_JUNK_UNK12                    = 12, // 1 item (37677)
 };
 
-#define MAX_ITEM_SUBCLASS_JUNK                   13
+#define MAX_ITEM_SUBCLASS_JUNK                    13
 
 enum ItemSubclassGlyph
 {
@@ -617,6 +613,13 @@ struct _Socket
     uint32 Content;
 };
 
+// GCC have alternative #pragma pack() syntax and old gcc version not support pack(pop), also any gcc version not support it at some platform
+#if defined(__GNUC__)
+#pragma pack()
+#else
+#pragma pack(pop)
+#endif
+
 #define MAX_ITEM_PROTO_DAMAGES 2                            // changed in 3.1.0
 #define MAX_ITEM_PROTO_SOCKETS 3
 #define MAX_ITEM_PROTO_SPELLS  5
@@ -627,7 +630,7 @@ struct ItemTemplate
     uint32 ItemId;
     uint32 Class;                                           // id from ItemClass.dbc
     uint32 SubClass;                                        // id from ItemSubClass.dbc
-    int32  SoundOverrideSubclass;
+    int32  SoundOverrideSubclass;                           // < 0: id from ItemSubClass.dbc, used to override weapon sound from actual SubClass
     std::string Name1;
     uint32 DisplayInfoID;                                   // id from ItemDisplayInfo.dbc
     uint32 Quality;
@@ -728,7 +731,7 @@ struct ItemTemplate
     {
         return (Stackable == 2147483647 || Stackable <= 0) ? uint32(0x7FFFFFFF-1) : uint32(Stackable);
     }
-	
+
     float GetItemLevelIncludingQuality() const
     {
         float itemLevel = (float)ItemLevel;
@@ -755,7 +758,7 @@ struct ItemTemplate
     bool IsPotion() const { return Class == ITEM_CLASS_CONSUMABLE && SubClass == ITEM_SUBCLASS_POTION; }
     bool IsVellum() const { return Class == ITEM_CLASS_TRADE_GOODS && SubClass == ITEM_SUBCLASS_ENCHANTMENT; }
     bool IsConjuredConsumable() const { return Class == ITEM_CLASS_CONSUMABLE && (Flags & ITEM_PROTO_FLAG_CONJURED); }
-	
+
     bool IsRangedWeapon() const
     {
         return Class == ITEM_CLASS_WEAPON ||
@@ -774,10 +777,4 @@ struct ItemLocale
     StringVector Description;
 };
 
-// GCC have alternative #pragma pack() syntax and old gcc version not support pack(pop), also any gcc version not support it at some platform
-#if defined(__GNUC__)
-#pragma pack()
-#else
-#pragma pack(pop)
-#endif
 #endif

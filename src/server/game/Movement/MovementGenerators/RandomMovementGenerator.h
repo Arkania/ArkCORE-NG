@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -26,21 +26,18 @@ template<class T>
 class RandomMovementGenerator : public MovementGeneratorMedium< T, RandomMovementGenerator<T> >
 {
     public:
-        RandomMovementGenerator(float spawnDist = 0.0f) : _nextMoveTime(0), _wanderDistance(spawnDist) {}
+        RandomMovementGenerator(float spawn_dist = 0.0f) : i_nextMoveTime(0), wander_distance(spawn_dist) { }
 
-        void SetRandomLocation(T &);
-        void Initialize(T &);
-        void Finalize(T &);
-        void Reset(T &);
-        void Interrupt(T &);
-        bool Update(T &, const uint32);
-        bool GetResetPosition(T&, float& x, float& y, float& z);
+        void _setRandomLocation(T*);
+        void DoInitialize(T*);
+        void DoFinalize(T*);
+        void DoReset(T*);
+        bool DoUpdate(T*, const uint32);
+        bool GetResetPos(T*, float& x, float& y, float& z);
         MovementGeneratorType GetMovementGeneratorType() { return RANDOM_MOTION_TYPE; }
     private:
-        TimeTrackerSmall _nextMoveTime;
+        TimeTrackerSmall i_nextMoveTime;
 
-        uint32 _nextMove;
-        float _wanderDistance;
+        float wander_distance;
 };
 #endif
-

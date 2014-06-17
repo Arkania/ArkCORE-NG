@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -18,16 +18,18 @@
  */
 
 #include "Common.h"
+#include "ArcheologyMgr.h"
 #include "DatabaseEnv.h"
-#include "Opcodes.h"
 #include "Log.h"
+#include "ObjectAccessor.h"
+#include "Opcodes.h"
 #include "Player.h"
+#include "Pet.h"
+#include "UpdateMask.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "ObjectAccessor.h"
-#include "UpdateMask.h"
 
-void WorldSession::HandleLearnTalentOpcode(WorldPacket & recvData)
+void WorldSession::HandleLearnTalentOpcode(WorldPacket& recvData)
 {
     uint32 talentId, requestedRank;
     recvData >> talentId >> requestedRank;
@@ -38,7 +40,7 @@ void WorldSession::HandleLearnTalentOpcode(WorldPacket & recvData)
 
 void WorldSession::HandleLearnPreviewTalents(WorldPacket& recvPacket)
 {
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_LEARN_PREVIEW_TALENTS");
+    TC_LOG_DEBUG("network", "CMSG_LEARN_PREVIEW_TALENTS");
 
     int32 tabPage;
     uint32 talentsCount;
@@ -77,16 +79,19 @@ void WorldSession::HandleLearnPreviewTalents(WorldPacket& recvPacket)
 
 void WorldSession::HandleTalentWipeConfirmOpcode(WorldPacket& recvData)
 {
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "MSG_TALENT_WIPE_CONFIRM");
+    TC_LOG_DEBUG("network", "MSG_TALENT_WIPE_CONFIRM");
     uint64 guid;
     recvData >> guid;
 
     Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_TRAINER);
     if (!unit)
     {
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleTalentWipeConfirmOpcode - Unit (GUID: %u) not found or you can't interact with him.", uint32(GUID_LOPART(guid)));
+        TC_LOG_DEBUG("network", "WORLD: HandleTalentWipeConfirmOpcode - Unit (GUID: %u) not found or you can't interact with him.", uint32(GUID_LOPART(guid)));
         return;
     }
+
+    if (!unit->isCanTrainingAndResetTalentsOf(_player))
+        return;
 
     // remove fake death
     if (GetPlayer()->HasUnitState(UNIT_STATE_DIED))
@@ -121,10 +126,9 @@ void WorldSession::HandleSetPrimaryTree(WorldPacket& recvPacket)
     uint32 talentTabId;
 
     recvPacket >> talentTabId;
-
 }
 
-void WorldSession::HandleArcheologyRequestHistory(WorldPacket& recvPacket)
+void WorldSession::HandleArcheologyRequestHistory(WorldPacket& /*recvPacket*/)
 {
     //empty handler, we must send SMSG_RESEARCH_SETUP_HISTORY. We still need to implement time of completion and a completion counter for proj id.
     WorldPacket data(SMSG_RESEARCH_SETUP_HISTORY);

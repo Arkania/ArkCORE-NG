@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2011-2012 EnturionEMU <http://www.Enturion.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -15,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "stonecore.h"
 
 /***************************************TRASH SPELLS*************************************/
@@ -155,7 +157,7 @@ public:
                 switch (eventId)
                 {
                     case EVENT_QUAKE:
-                        DoCast(me->GetVictim(), SPELL_QUAKE);
+                        DoCastVictim(SPELL_QUAKE);
                         events.RescheduleEvent(EVENT_QUAKE, 5000 + rand()%5000);
                         return;
                 }
@@ -179,7 +181,7 @@ public:
 
     struct npc_imppAI : public ScriptedAI
     {
-        npc_imppAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_imppAI(Creature* creature) : ScriptedAI(creature) { }
 
         EventMap events;
 
@@ -233,7 +235,7 @@ public:
 
     struct npc_rock_borerAI : public ScriptedAI
     {
-        npc_rock_borerAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_rock_borerAI(Creature* creature) : ScriptedAI(creature) { }
 
         EventMap events;
 
@@ -275,19 +277,19 @@ public:
 };
 
 // Millhouse Manastorm AI
-class npc_millhouse_manastorm : public CreatureScript
+class npc_millhouse_manastorm_sc : public CreatureScript
 {
 public:
-    npc_millhouse_manastorm() : CreatureScript("npc_millhouse_manastorm") { }
+    npc_millhouse_manastorm_sc() : CreatureScript("npc_millhouse_manastorm_sc") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_millhouse_manastormAI(creature);
+        return new npc_millhouse_manastorm_scAI(creature);
     }
 
-    struct npc_millhouse_manastormAI : public ScriptedAI
+    struct npc_millhouse_manastorm_scAI : public ScriptedAI
     {
-        npc_millhouse_manastormAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_millhouse_manastorm_scAI(Creature* creature) : ScriptedAI(creature) { }
 
         EventMap events;
 
@@ -325,7 +327,7 @@ public:
                         events.RescheduleEvent(EVENT_MILL_FEAR, 10000);
                         return;
                     case EVENT_SHADOW_BOLT:
-                        DoCast(me->GetVictim(), SPELL_SHADOW_BOLT);
+                        DoCastVictim(SPELL_SHADOW_BOLT);
                         events.RescheduleEvent(EVENT_SHADOWBOLT, 1000);
                         return;
                     case EVENT_FROSTBOLT_VOLLEY:
@@ -355,6 +357,6 @@ void AddSC_stonecore()
 {
     new npc_crystalspawn_giant();
     new npc_impp();
-    new npc_millhouse_manastorm();
+    new npc_millhouse_manastorm_sc();
     new npc_rock_borer;
 }

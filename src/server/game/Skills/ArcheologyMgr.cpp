@@ -1,13 +1,15 @@
 /*
- * Copyright (C) 2014 Arkania Project.
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  *
- * This program is not free software. You may not redistribute it or modify it.
+ * This program is not free software. You may not redistribute 
+ * it or modify it.
  *
  * TODO:
  *
  * - Fix wrong/missing db digsite artifact positions.
  * - Implement currency loot (needed for the gameobjects).
- * - Figure a way to deal with that idiotic switch construction, which determines the id of the gameobject to spawn ;)
+ * - Figure a way to deal with that idiotic switch construction, 
+ * which determines the id of the gameobject to spawn ;)
  *
  * Done : 99%. ToDo : Above.
  */
@@ -26,6 +28,7 @@
 #include "GridNotifiersImpl.h"
 #include "Language.h"
 #include "Player.h"
+#include "GameObject.h"
 #include "SpellMgr.h"
 #include "DisableMgr.h"
 #include "ScriptMgr.h"
@@ -33,7 +36,6 @@
 #include "Map.h"
 
 /****************************** INTERNAL *******************************/
-
 void ArcheologyMgr::Initialize()
 {
     m_completedProjects.clear(); 
@@ -102,19 +104,16 @@ void ArcheologyMgr::DeleteLastAvailableArtifact(uint32 guid, uint32 digsiteId)
         switch (findCount)
         {
             case 0:
-            return;
-
+                return;
             case 1:
-            CharacterDatabase.DirectPExecute("UPDATE character_archaeology_digsites SET find1PosX = 0, find1PosY = 0 WHERE guid = %u AND siteId = %u", guid, digsiteId);
-            break;
-
+                CharacterDatabase.DirectPExecute("UPDATE character_archaeology_digsites SET find1PosX = 0, find1PosY = 0 WHERE guid = %u AND siteId = %u", guid, digsiteId);
+                break;
             case 2:
-            CharacterDatabase.DirectPExecute("UPDATE character_archaeology_digsites SET find2PosX = 0, find2PosY = 0 WHERE guid = %u AND siteId = %u", guid, digsiteId);
-            break;
-
+                CharacterDatabase.DirectPExecute("UPDATE character_archaeology_digsites SET find2PosX = 0, find2PosY = 0 WHERE guid = %u AND siteId = %u", guid, digsiteId);
+                break;
             case 3:
-            CharacterDatabase.DirectPExecute("UPDATE character_archaeology_digsites SET find3PosX = 0, find3PosY = 0 WHERE guid = %u AND siteId = %u", guid, digsiteId);
-            break;
+                CharacterDatabase.DirectPExecute("UPDATE character_archaeology_digsites SET find3PosX = 0, find3PosY = 0 WHERE guid = %u AND siteId = %u", guid, digsiteId);
+                break;
         }
     }
 }
@@ -141,7 +140,7 @@ void ArcheologyMgr::SaveDigsitesToDB()
                 stmt->setFloat(5+(i*2),itr->second.artifacts[i].positionY);
             }
 
-            trans->Append(stmt);			
+            trans->Append(stmt);
         }
     }
     CharacterDatabase.CommitTransaction(trans);
@@ -178,7 +177,6 @@ uint32 ArcheologyMgr::OnSurveyBotActivated()
             case 1:
                 dist = m_player->GetDistance2d(iter->second.artifacts[0].positionX, iter->second.artifacts[0].positionY);
                 break;
-    
             case 2:
                 if (m_player->GetDistance2d(iter->second.artifacts[1].positionX, iter->second.artifacts[1].positionY) < m_player->GetDistance2d(iter->second.artifacts[0].positionX, iter->second.artifacts[0].positionY))
                 {
@@ -188,7 +186,6 @@ uint32 ArcheologyMgr::OnSurveyBotActivated()
                 else
                     dist = m_player->GetDistance2d(iter->second.artifacts[0].positionX, iter->second.artifacts[0].positionY);
                 break;
-    
             case 3:
                 if (m_player->GetDistance2d(iter->second.artifacts[2].positionX, iter->second.artifacts[2].positionY) < m_player->GetDistance2d(iter->second.artifacts[1].positionX, iter->second.artifacts[1].positionY))
                 {
@@ -209,20 +206,17 @@ uint32 ArcheologyMgr::OnSurveyBotActivated()
                     dist = m_player->GetDistance2d(iter->second.artifacts[0].positionX, iter->second.artifacts[0].positionY);
                 break;
         }
-    
+
         if (dist <= ARCHAEOLOGY_DIG_SITE_FAR_DIST && dist > ARCHAEOLOGY_DIG_SITE_MED_DIST) // Red 80-50y
             return ARCHAEOLOGY_DIG_SITE_FAR_SURVEYBOT;
-    
         else if (dist <= ARCHAEOLOGY_DIG_SITE_MED_DIST && dist > ARCHAEOLOGY_DIG_SITE_CLOSE_DIST) // Yellow 50-20y
             return ARCHAEOLOGY_DIG_SITE_MEDIUM_SURVEYBOT;
-    
         else if (dist <= ARCHAEOLOGY_DIG_SITE_CLOSE_DIST && dist > ARCHAEOLOGY_DIG_SITE_FIND_DIST) // Green 20-5y
             return ARCHAEOLOGY_DIG_SITE_CLOSE_SURVEYBOT;
-    
         else if (dist <= ARCHAEOLOGY_DIG_SITE_FIND_DIST) // Found it!
         {
             m_player->ModifyCurrency(iter->second.artifacts[artifactPos].loot_currency_type, urand(5, 9)); // Add a random number of 5-9 fragments to the player : 4.3 Archaeology change.
-    
+
             // Advance Archaeology skill. - done from gather skill in player.cpp on open container.
             //m_player->SetSkill(SKILL_ARCHAEOLOGY, m_player->GetSkillStep(SKILL_ARCHAEOLOGY), m_player->GetSkillValue(SKILL_ARCHAEOLOGY) + 1, m_player->GetPureMaxSkillValue(SKILL_ARCHAEOLOGY));
 
@@ -253,14 +247,12 @@ uint32 ArcheologyMgr::SetNearestFindOrientation() // must bind this to show same
             case 1:
                 return m_player->GetAngle(iter->second.artifacts[0].positionX, iter->second.artifacts[0].positionY);
                 break;
-
             case 2:
                 if (m_player->GetDistance2d(iter->second.artifacts[1].positionX, iter->second.artifacts[1].positionY) < m_player->GetDistance2d(iter->second.artifacts[0].positionX, iter->second.artifacts[0].positionY))
                     return m_player->GetAngle(iter->second.artifacts[1].positionX, iter->second.artifacts[1].positionY);
                 else
                     return m_player->GetAngle(iter->second.artifacts[0].positionX, iter->second.artifacts[0].positionY);
                 break;
-
             case 3:
                 if (m_player->GetDistance2d(iter->second.artifacts[2].positionX, iter->second.artifacts[2].positionY) < m_player->GetDistance2d(iter->second.artifacts[1].positionX, iter->second.artifacts[1].positionY))
                     return m_player->GetAngle(iter->second.artifacts[2].positionX, iter->second.artifacts[2].positionY);
@@ -403,7 +395,7 @@ void ArcheologyMgr::_updateDigsite(uint32 digSiteId,uint8 action, bool updateCli
                                         newDigSite.artifacts[counter].loot_currency_type = CURRENCY_TYPE_DRAENEI_FRAGMENT;
                                     }
                                     break;
-                                
+
                                 case 571: // Northrend Fragments (Vrykul, Nerubian, Troll, Night Elf currency).
                                     if (newDigSite.entry == 429 || newDigSite.entry == 431 || newDigSite.entry == 433 || newDigSite.entry == 435 || newDigSite.entry == 443) // Troll fragments.
                                     {
@@ -426,7 +418,7 @@ void ArcheologyMgr::_updateDigsite(uint32 digSiteId,uint8 action, bool updateCli
                                         newDigSite.artifacts[counter].loot_currency_type = CURRENCY_TYPE_VRYKUL_FRAGMENT;
                                     }
                                     break;
-                                
+
                                 case 0: //Eastern Kingdoms Fragments (Night Elf, Fossil, Nerubian, Troll, Dwarf currency).
                                     if (newDigSite.entry == 18 || newDigSite.entry == 23 || newDigSite.entry == 24 || newDigSite.entry == 25 || newDigSite.entry == 26 || newDigSite.entry == 27 || newDigSite.entry == 152 || newDigSite.entry == 217 || newDigSite.entry == 223 || newDigSite.entry == 225 || newDigSite.entry == 227 || newDigSite.entry == 229 || newDigSite.entry == 231 || newDigSite.entry == 233 || newDigSite.entry == 235 || newDigSite.entry == 239 || newDigSite.entry == 241 || newDigSite.entry == 243 || newDigSite.entry == 245) // Troll fragments.
                                     {
@@ -454,7 +446,7 @@ void ArcheologyMgr::_updateDigsite(uint32 digSiteId,uint8 action, bool updateCli
                                         newDigSite.artifacts[counter].loot_currency_type = CURRENCY_TYPE_FOSSIL_FRAGMENT;
                                     }
                                     break;
-                                
+
                                 case 1: //Kalimdor Fragments (Night Elf, Fossil, Tol'vir, Troll, Dwarf currency).
                                     if (newDigSite.entry == 315 || newDigSite.entry == 317 || newDigSite.entry == 319 || newDigSite.entry == 321) // Troll fragments.
                                     {
@@ -528,7 +520,7 @@ void ArcheologyMgr::_updateDigsite(uint32 digSiteId,uint8 action, bool updateCli
                                 newDigSite.artifacts[counter].loot_currency_type = CURRENCY_TYPE_DRAENEI_FRAGMENT;
                             }
                             break;
-                        
+
                         case 571: // Northrend Fragments (Vrykul, Nerubian, Troll, Night Elf currency).
                             if (newDigSite.entry == 429 || newDigSite.entry == 431 || newDigSite.entry == 433 || newDigSite.entry == 435 || newDigSite.entry == 443) // Troll fragments.
                             {
@@ -551,7 +543,7 @@ void ArcheologyMgr::_updateDigsite(uint32 digSiteId,uint8 action, bool updateCli
                                 newDigSite.artifacts[counter].loot_currency_type = CURRENCY_TYPE_VRYKUL_FRAGMENT;
                             }
                             break;
-                        
+
                         case 0: //Eastern Kingdoms Fragments (Night Elf, Fossil, Nerubian, Troll, Dwarf currency).
                             if (newDigSite.entry == 18 || newDigSite.entry == 23 || newDigSite.entry == 24 || newDigSite.entry == 25 || newDigSite.entry == 26 || newDigSite.entry == 27 || newDigSite.entry == 152 || newDigSite.entry == 217 || newDigSite.entry == 223 || newDigSite.entry == 225 || newDigSite.entry == 227 || newDigSite.entry == 229 || newDigSite.entry == 231 || newDigSite.entry == 233 || newDigSite.entry == 235 || newDigSite.entry == 239 || newDigSite.entry == 241 || newDigSite.entry == 243 || newDigSite.entry == 245) // Troll fragments.
                             {
@@ -579,7 +571,7 @@ void ArcheologyMgr::_updateDigsite(uint32 digSiteId,uint8 action, bool updateCli
                                 newDigSite.artifacts[counter].loot_currency_type = CURRENCY_TYPE_FOSSIL_FRAGMENT;
                             }
                             break;
-                        
+
                         case 1: //Kalimdor Fragments (Night Elf, Fossil, Tol'vir, Troll, Dwarf currency).
                             if (newDigSite.entry == 315 || newDigSite.entry == 317 || newDigSite.entry == 319 || newDigSite.entry == 321) // Troll fragments.
                             {
@@ -688,12 +680,13 @@ uint32 ArcheologyMgr::GenerateRandomDigSite(uint32 MapId) // For generating a di
         return 0; // Map Id is invalid!
 
     uint8 level = m_player->getLevel();
+
     if (level < 20)
-            return 0; // You don't have required level!
+        return 0; // You don't have required level!
 
     uint16 skill_now = m_player->GetSkillValue(SKILL_ARCHAEOLOGY);
 
-    uint16 levelToSelect;
+    int16 levelToSelect = 0;
     uint32 site = 0;
 
     if (level >= 20 && level <= 30) // Levels 20 - 30
@@ -716,7 +709,7 @@ uint32 ArcheologyMgr::GenerateRandomDigSite(uint32 MapId) // For generating a di
 
     stmt->setUInt16(0, levelToSelect);
     stmt->setUInt16(1, MapId);
-	
+
     PreparedQueryResult result = WorldDatabase.Query(stmt);
 
     if(result && result->GetRowCount() > 0)
@@ -741,7 +734,7 @@ void ArcheologyMgr::GenerateResearchProject(uint32 branchId, bool force, uint32 
 {
     if (m_researchProject[branchId] != 0 && !force)
     {
-        sLog->outString("Project not generated, m_researchProject[%u] is not 0", branchId);
+        TC_LOG_INFO("server.loading", "Project not generated, m_researchProject[%u] is not 0", branchId);
         return;
     }
 
@@ -806,7 +799,7 @@ void ArcheologyMgr::GenerateResearchProject(uint32 branchId, bool force, uint32 
 
     if (projectList.size() == 0)
     {
-      sLog->outString("Project list size is 0!");
+      TC_LOG_INFO("server.loading", "Project list size is 0!");
       return;
     }
 
@@ -869,7 +862,7 @@ void ArcheologyMgr::GenerateSavedArtifacts()
     }
 }
 
-void ArcheologyMgr::CompleteArtifact(uint32 artId, uint32 spellId, ByteBuffer &data)
+void ArcheologyMgr::CompleteArtifact(uint32 artId, uint32 /*spellId*/, ByteBuffer &data)
 {
     uint32 target_mask, unk1, unk2, numberOfStones;
     data >> target_mask >> unk1 >> unk2 >> numberOfStones;
@@ -931,7 +924,7 @@ void ArcheologyMgr::CompleteArtifact(uint32 artId, uint32 spellId, ByteBuffer &d
         int32 bp0 = int32(numberOfStones);
 
         if (currencyId != 0)
-            if (m_player->GetCurrency(currencyId) >= rp->RequiredFragments - currencySale)
+            if (m_player->GetCurrency(currencyId, true) >= rp->RequiredFragments - currencySale)
             {
                 m_player->CastCustomSpell(m_player, rp->ProjectSpell, &bp0, NULL, NULL, false);
                 // Save to completed projects.
@@ -1055,11 +1048,11 @@ uint32 ArcheologyMgr::GetCompletedProjectsTime(uint32 guid, uint32 projectId)
     stmt->setUInt32(1, projectId);
     PreparedQueryResult result = CharacterDatabase.Query(stmt);
     if (result) //load
-	{
+    {
         Field* fields = result->Fetch();
         uint32 complete_time = fields[0].GetUInt32();
         return complete_time;
-	}
+    }
     else
         return 0;
 }

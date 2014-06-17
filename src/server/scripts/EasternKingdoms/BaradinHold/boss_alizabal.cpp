@@ -1,263 +1,271 @@
-#include "ScriptPCH.h"
-#include "ObjectMgr.h"
+/*
+ * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation; either version 2 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "SpellScript.h"
-#include "SpellAuraEffects.h"
-#include "WorldPacket.h"
+#include "Player.h"
+#include "ObjectAccessor.h"
+#include "baradin_hold.h"
 
-enum Yells
+enum Texts
 {
-  SAY_AGGRO    = 0, // I hate adventurers!
-  SAY_DIED     = 1, // I hate... every.. one of you!
-  SAY_KILL     = 2, // I didn't hate that.
-  SAY_SEETHING = 3, // My hate will consume you!
-  SAY_SKEWER   = 4, // Feel my hatred!
-  SAY_DANCE    = 5, // I hate standing still!
-  SAY_BERSERK  = 6, // I hate you all!
-  SAY_RESET    = 7, // I hate incompetent raiders.
-  SAY_INTRO    = 8, // How I hate this place. My captors may be long dead.. but don't think I won't take it out on you, miserable treasure hunters!
-
-  SAY_BLADES   = -1900027  // Announce raid for Blade Dance.
+    SAY_INTRO               = 1,
+    SAY_AGGRO               = 2,
+    SAY_HATE                = 3,
+    SAY_SKEWER              = 4,
+    SAY_SKEWER_ANNOUNCE     = 5,
+    SAY_BLADE_STORM         = 6,
+    SAY_SLAY                = 10,
+    SAY_DEATH               = 12
 };
 
 enum Spells
 {
-    SPELL_BLADE_DANCE                        = 105784, // root and trigger. 3 times during dummy, moves to another target each time. 4 sec.x3 = 12 sec dummy.
-	SPELL_BLADE_DANCE_DUMMY                  = 105828,
-    SPELL_SEETHING_HATE                      = 105067, // triggers every 3 sec.
-    SPELL_SKEWER                             = 104936, // on tank.
-    SPELL_BERSERK                            = 47008
+    SPELL_BLADE_DANCE       = 105784,
+    SPELL_BLADE_DANCE_DUMMY = 105828,
+    SPELL_SEETHING_HATE     = 105067,
+    SPELL_SKEWER            = 104936,
+    SPELL_BERSERK           = 47008
+};
+
+enum Actions
+{
+    ACTION_INTRO            = 1
+};
+
+    enum Points
+{
+    POINT_STORM             = 1
+};
+
+enum Events
+{
+    EVENT_RANDOM_CAST       = 1,
+    EVENT_STOP_STORM        = 2,
+    EVENT_MOVE_STORM        = 3,
+    EVENT_CAST_STORM        = 4
+};
+
+class at_alizabal_intro : public AreaTriggerScript
+{
+    public:
+        at_alizabal_intro() : AreaTriggerScript("at_alizabal_intro") { }
+
+        bool OnTrigger(Player* player, AreaTriggerEntry const* /*areaTrigger*/)
+        {
+            if (InstanceScript* instance = player->GetInstanceScript())
+                if (Creature* alizabal = ObjectAccessor::GetCreature(*player, instance->GetData64(DATA_ALIZABAL)))
+                    alizabal->AI()->DoAction(ACTION_INTRO);
+            return true;
+        }
 };
 
 class boss_alizabal : public CreatureScript
 {
     public:
-        boss_alizabal() : CreatureScript("boss_alizabal") {}
+        boss_alizabal() : CreatureScript("boss_alizabal") { }
 
-        CreatureAI* GetAI(Creature* creature) const
+        struct boss_alizabalAI : public BossAI
         {
-            return new boss_alizabalAI(creature);
-        }
-            
-        struct boss_alizabalAI : public ScriptedAI
-        {
-            boss_alizabalAI(Creature* creature) : ScriptedAI(creature)
+            boss_alizabalAI(Creature* creature) : BossAI(creature, DATA_ALIZABAL)
             {
-                instance = creature->GetInstanceScript();
+                _intro = false;
             }
 
-            InstanceScript* instance;
-            uint32 BladeDanceTimer;
-            uint32 SkewerTimer;
-            uint32 SeethingHateTimer;
-            uint32 BerserkTimer;
-            uint32 SkewerorSeethingTimer;
-            uint32 skewerTimer;
-            uint32 seethingTimer;
-            uint32 moveTimer;
-            uint32 danceTimer;
-            uint32 removeDanceTimer;
-            bool bladedance, skewerorseething, seething, skewer, intro;
-
-            void Reset()
+            void Reset() OVERRIDE
             {
-                if (instance)
-                   instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me); // Remove
-
-                 if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == POINT_MOTION_TYPE)
-                     me->GetMotionMaster()->MovementExpired();
-
-                if (me->HasAura(47008))
-                    me->RemoveAura(47008);
-
-                Talk(SAY_RESET);
-                SkewerorSeethingTimer = urand(6000, 8000);   // 8 sec after blade dance.
-                BladeDanceTimer       = urand(25000, 40000);  // then 60 sec.
-                BerserkTimer          = 300000; // 5 min.
-
-                bladedance = false;
-                intro      = false;
-                skewerorseething = true;
+                _Reset();
+                _hate = false;
+                _skewer = false;
             }
 
-			void MoveInLineOfSight(Unit* who)
+            void EnterCombat(Unit* /*who*/) OVERRIDE
             {
-                if (!intro && who->IsWithinDistInMap(me, 50.0f))
+                _EnterCombat();
+                Talk(SAY_AGGRO);
+                instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me);
+                events.ScheduleEvent(EVENT_RANDOM_CAST, 10000);
+            }
+
+            void JustDied(Unit* /*killer*/) OVERRIDE
+            {
+                _JustDied();
+                Talk(SAY_DEATH);
+                instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
+            }
+
+            void KilledUnit(Unit* who) OVERRIDE
+            {
+                if (who->GetTypeId() == TYPEID_PLAYER)
+                    Talk(SAY_SLAY);
+            }
+
+            void EnterEvadeMode() OVERRIDE
+            {
+                instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
+                me->GetMotionMaster()->MoveTargetedHome();
+                _DespawnAtEvade();
+            }
+
+            void DoAction(int32 action) OVERRIDE
+            {
+                switch (action)
                 {
-                    Talk(SAY_INTRO);
-					intro = true;				
+                    case ACTION_INTRO:
+                        if (!_intro)
+                        {
+                            Talk(SAY_INTRO);
+                            _intro = true;
+                        }
+                        break;
                 }
             }
-            
-            void EnterCombat(Unit* who)
+
+            void MovementInform(uint32 /*type*/, uint32 pointId) OVERRIDE
             {
-                if (instance)
-                   instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me); // Add
-
-                Talk(SAY_AGGRO);
-                SkewerorSeethingTimer = urand(6000, 8000);  // 8 sec after blade dance.
-                BladeDanceTimer       = urand(25000, 40000);  // then 60 sec.
-                BerserkTimer          = 300000; // 5 min.
-
-                bladedance = false;
-                skewerorseething = true;
+                switch (pointId)
+                {
+                    case POINT_STORM:
+                        events.ScheduleEvent(EVENT_CAST_STORM, 1);
+                        break;
+                }
             }
 
-            void JustDied(Unit* killer)
-            {
-               Talk(SAY_DIED);
-
-                if (instance)
-                   instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me); // Remove
-            }
-
-			void KilledUnit(Unit * /*victim*/)
-			{
-				Talk(SAY_KILL);
-			}
-
-            void EnterEvadeMode() // AKA Wipe.
-            {
-                if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == POINT_MOTION_TYPE)
-                    me->GetMotionMaster()->MovementExpired();
-
-                if (me->HasAura(47008))
-                    me->RemoveAura(47008);
-
-                me->GetMotionMaster()->MoveTargetedHome();
-                me->SetHealth(me->GetMaxHealth());
-				
-                if (instance)
-                   instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me); // Remove
-            }
-
-            void UpdateAI(uint32 diff)
+            void UpdateAI(uint32 diff) OVERRIDE
             {
                 if (!UpdateVictim())
                     return;
 
-				if (me->HasUnitState(UNIT_STATE_CASTING))
-                    return;
+                events.Update(diff);
 
-                if (SkewerorSeethingTimer <= diff && skewerorseething == true)
-                {					
-					switch(urand(0, 1))
-					{
-                        case 0:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, NonTankTargetSelector(me)))
-                        {
-						    DoCast(target, SPELL_SEETHING_HATE);
-                            Talk(SAY_SEETHING);
-                            seething = true;
-                            skewerTimer = 8000;
-                        }
-						break;
-                        case 1:
-                            DoCast(me->GetVictim(), SPELL_SKEWER);
-                            Talk(SAY_SKEWER);
-                            skewer = true;
-                            seethingTimer = 8000;
-                            break;
-                   	}
-
-                    skewerorseething = false;                 					
-                }
-                else
-                    SkewerorSeethingTimer -= diff;
-
-                if (skewerTimer <= diff && seething == true)
+                while (uint32 eventId = events.ExecuteEvent())
                 {
-                    DoCast(me->GetVictim(), SPELL_SKEWER);
-                    Talk(SAY_SKEWER);
-                    seething = false;
-                }
-                else
-                    skewerTimer -= diff;
-				
-                if (seethingTimer <= diff && skewer == true)
-                {
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, NonTankTargetSelector(me)))
+                    switch (eventId)
                     {
-						DoCast(target, SPELL_SEETHING_HATE);
-                        Talk(SAY_SEETHING);
-                        skewer = false;
+                        case EVENT_RANDOM_CAST:
+                            switch (urand(0, 1))
+                            {
+                                case 0:
+                                    if (!_skewer)
+                                    {
+                                        if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 0))
+                                        {
+                                            DoCast(target, SPELL_SKEWER, true);
+                                            Talk(SAY_SKEWER);
+                                            Talk(SAY_SKEWER_ANNOUNCE, target);
+                                        }
+                                        _skewer = true;
+                                        events.ScheduleEvent(EVENT_RANDOM_CAST, urand(7000, 10000));
+                                    }
+                                    else if (!_hate)
+                                    {
+                                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, NonTankTargetSelector(me)))
+                                        {
+                                            DoCast(target, SPELL_SEETHING_HATE, true);
+                                            Talk(SAY_HATE);
+                                        }
+                                        _hate = true;
+                                        events.ScheduleEvent(EVENT_RANDOM_CAST, urand(7000, 10000));
+                                    }
+                                    else if (_hate && _skewer)
+                                    {
+                                        Talk(SAY_BLADE_STORM);
+                                        DoCastAOE(SPELL_BLADE_DANCE_DUMMY);
+                                        DoCastAOE(SPELL_BLADE_DANCE);
+                                        events.ScheduleEvent(EVENT_RANDOM_CAST, 21000);
+                                        events.ScheduleEvent(EVENT_MOVE_STORM, 4050);
+                                        events.ScheduleEvent(EVENT_STOP_STORM, 13000);
+                                    }
+                                    break;
+                                case 1:
+                                    if (!_hate)
+                                    {
+                                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, NonTankTargetSelector(me)))
+                                        {
+                                            DoCast(target, SPELL_SEETHING_HATE, true);
+                                            Talk(SAY_HATE);
+                                        }
+                                        _hate = true;
+                                        events.ScheduleEvent(EVENT_RANDOM_CAST, urand(7000, 10000));
+                                    }
+                                    else if (!_skewer)
+                                    {
+                                        if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 0))
+                                        {
+                                            DoCast(target, SPELL_SKEWER, true);
+                                            Talk(SAY_SKEWER);
+                                            Talk(SAY_SKEWER_ANNOUNCE, target);
+                                        }
+                                        _skewer = true;
+                                        events.ScheduleEvent(EVENT_RANDOM_CAST, urand(7000, 10000));
+                                    }
+                                    else if (_hate && _skewer)
+                                    {
+                                        Talk(SAY_BLADE_STORM);
+                                        DoCastAOE(SPELL_BLADE_DANCE_DUMMY);
+                                        DoCastAOE(SPELL_BLADE_DANCE);
+                                        events.ScheduleEvent(EVENT_RANDOM_CAST, 21000);
+                                        events.ScheduleEvent(EVENT_MOVE_STORM, 4050);
+                                        events.ScheduleEvent(EVENT_STOP_STORM, 13000);
+                                    }
+                                    break;
+                            }
+                            break;
+                        case EVENT_MOVE_STORM:
+                            me->SetSpeed(MOVE_RUN, 4.0f);
+                            me->SetSpeed(MOVE_WALK, 4.0f);
+                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, NonTankTargetSelector(me)))
+                                me->GetMotionMaster()->MovePoint(POINT_STORM, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ());
+                            events.ScheduleEvent(EVENT_MOVE_STORM, 4050);
+                            break;
+                        case EVENT_STOP_STORM:
+                            me->RemoveAura(SPELL_BLADE_DANCE);
+                            me->RemoveAura(SPELL_BLADE_DANCE_DUMMY);
+                            me->SetSpeed(MOVE_WALK, 1.0f);
+                            me->SetSpeed(MOVE_RUN, 1.14f);
+                            me->GetMotionMaster()->MoveChase(me->GetVictim());
+                            _hate = false;
+                            _skewer = false;
+                            break;
+                        case EVENT_CAST_STORM:
+                            DoCastAOE(SPELL_BLADE_DANCE);
+                            break;
                     }
                 }
-                else
-                    seethingTimer -= diff;
 
-                if (BladeDanceTimer <= diff)
-                {
-                    DoScriptText(SAY_BLADES, me);
-                    Talk(SAY_DANCE);
-                    DoCast(me, SPELL_BLADE_DANCE_DUMMY);
-                    bladedance = true;
-                    moveTimer= 100;
-                    removeDanceTimer = 13000;
-                    danceTimer = 400;
-
-                    BladeDanceTimer = 60000;
-                }
-                else
-                    BladeDanceTimer -= diff;
-
-                if (moveTimer <= diff && bladedance == true)
-                {
-                    me->SetSpeed(MOVE_WALK, 4.0f);
-                    me->SetSpeed(MOVE_RUN, 4.0f);
-
-					if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, NonTankTargetSelector(me)))
-					    me->GetMotionMaster()->MovePoint(1,target->GetPositionX(),target->GetPositionY(),target->GetPositionZ());
-
-                    moveTimer  = 4200;
-                }
-                else
-                    moveTimer -= diff;
-
-                if (danceTimer <= diff && bladedance == true)
-                {
-                    danceTimer = 4300;
-                    DoCast(me, SPELL_BLADE_DANCE);
-                }
-                else
-                    danceTimer -= diff;
-
-                if (removeDanceTimer <= diff && bladedance == true)
-                {
-                    if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == POINT_MOTION_TYPE)
-                        me->GetMotionMaster()->MovementExpired();
-
-                    me->GetMotionMaster()->MoveChase(me->GetVictim());
-
-                    me->SetSpeed(MOVE_WALK, 1.0f);
-                    me->SetSpeed(MOVE_RUN, 1.14f);
-
-                    me->RemoveAura(SPELL_BLADE_DANCE);
-                    me->RemoveAura(SPELL_BLADE_DANCE_DUMMY);
-                    bladedance = false;
-                    skewerorseething = true;
-                    SkewerorSeethingTimer = 8000;
-                }
-                else
-                    removeDanceTimer -= diff;
-
-                if (BerserkTimer <= diff)
-                {
-                    DoCast(me, SPELL_BERSERK);
-                    Talk(SAY_BERSERK);
-
-                    BerserkTimer = 2400000; // just assuming they get over first one...heh.
-                }					
-                else
-                    BerserkTimer -= diff;
-                    
                 DoMeleeAttackIfReady();
             }
+
+        private:
+            bool _intro;
+            bool _hate;
+            bool _skewer;
+
         };
+
+        CreatureAI* GetAI(Creature* creature) const OVERRIDE
+        {
+            return GetBaradinHoldAI<boss_alizabalAI>(creature);
+        }
 };
 
 void AddSC_boss_alizabal()
 {
     new boss_alizabal();
+    new at_alizabal_intro();
 }

@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
  
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "Spell.h"
 #include "throne_of_the_tides.h"
 
@@ -127,21 +128,21 @@ class boss_erunak_stonespeaker : public CreatureScript
                         me->setFaction(35);
             }
 
-            void KilledUnit(Unit* victim)
+            void KilledUnit(Unit* /*victim*/)
             {
                 if (pInstance)
                     if (Creature* pGhursha = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_MINDBENDER_GHURSHA)))
                         pGhursha->AI()->Talk(SAY_KILL);
             }
 
-            void SpellHit(Unit* caster, SpellInfo const* spell)
+            void SpellHit(Unit* /*caster*/, SpellInfo const* spell)
             {
                 if (me->GetCurrentSpell(CURRENT_GENERIC_SPELL))
                     if (me->GetCurrentSpell(CURRENT_GENERIC_SPELL)->m_spellInfo->Id == SPELL_LAVA_BOLT
                         || me->GetCurrentSpell(CURRENT_GENERIC_SPELL)->m_spellInfo->Id == SPELL_LAVA_BOLT_H)
                         for (uint8 i = 0; i < 3; ++i)
-						    if (spell->Effects[i].Effect == SPELL_EFFECT_INTERRUPT_CAST)
-							    me->InterruptSpell(CURRENT_GENERIC_SPELL);
+                            if (spell->Effects[i].Effect == SPELL_EFFECT_INTERRUPT_CAST)
+                                me->InterruptSpell(CURRENT_GENERIC_SPELL);
             }
 
             void EnterCombat(Unit* /*who*/)
@@ -199,7 +200,7 @@ class boss_erunak_stonespeaker : public CreatureScript
                         events.ScheduleEvent(EVENT_EARTH_SHARDS, 20000);
                         break;
                     case EVENT_EMBERSTRIKE:
-                        DoCast(me->GetVictim(), SPELL_EMBERSTRIKE);
+                        DoCastVictim(SPELL_EMBERSTRIKE);
                         events.ScheduleEvent(EVENT_EMBERSTRIKE, 11000);
                         break;
                     case EVENT_LAVA_BOLT:
@@ -250,7 +251,7 @@ class boss_mindbender_ghursha : public CreatureScript
             {
                 if (!instance || static_cast<InstanceMap*>(me->GetMap())->GetScriptId() != sObjectMgr->GetScriptId(TotTScriptName))
                     me->IsAIEnabled = false;
-                else if (!me->IsDead())
+                else if (!me->isDead())
                     Reset();
             }
 
@@ -319,11 +320,11 @@ class boss_mindbender_ghursha : public CreatureScript
                         events.ScheduleEvent(EVENT_UNRELENTING_AGONY, 30000);
                         break;
                     }
-                }		
+                }
                 DoMeleeAttackIfReady();
             }
 
-            void KilledUnit(Unit* victim)
+            void KilledUnit(Unit* /*victim*/)
             {
                 Talk(SAY_KILL);
             }
@@ -351,9 +352,9 @@ class npc_erunak_earth_shards : public CreatureScript
             return new npc_erunak_earth_shardsAI(pCreature);
         }
 
-        struct npc_erunak_earth_shardsAI : public Scripted_NoMovementAI
+        struct npc_erunak_earth_shardsAI : public ScriptedAI
         {
-            npc_erunak_earth_shardsAI(Creature* pCreature) : Scripted_NoMovementAI(pCreature)
+            npc_erunak_earth_shardsAI(Creature* pCreature) : ScriptedAI(pCreature)
             {
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -371,9 +372,7 @@ class npc_erunak_earth_shards : public CreatureScript
             void UpdateAI(uint32 diff)
             {
                 if (uiDespawnTimer <= diff)
-                {
                     me->DespawnOrUnsummon();
-                }
                 else
                     uiDespawnTimer -= diff;
             }
@@ -390,9 +389,9 @@ class npc_ghursha_mind_fog : public CreatureScript
             return new npc_ghursha_mind_fogAI (pCreature);
         }
 
-        struct npc_ghursha_mind_fogAI : public Scripted_NoMovementAI
+        struct npc_ghursha_mind_fogAI : public ScriptedAI
         {
-            npc_ghursha_mind_fogAI(Creature* pCreature) : Scripted_NoMovementAI(pCreature)
+            npc_ghursha_mind_fogAI(Creature* pCreature) : ScriptedAI(pCreature)
             {
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -405,9 +404,7 @@ class npc_ghursha_mind_fog : public CreatureScript
                 DoCast(me, SPELL_MIND_FOG_VISUAL, true);
             }
 
-            void UpdateAI(uint32 diff)
-            {
-            }
+            void UpdateAI(uint32 /*diff*/) { }
         };
 };
 

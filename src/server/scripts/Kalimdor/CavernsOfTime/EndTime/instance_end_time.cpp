@@ -1,7 +1,16 @@
-#include "ScriptPCH.h"
-#include "end_time.h"
+/*
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ *
+ * THIS particular file is NOT free software; third-party users 
+ * should NOT have access to it, redistribute it or modify it. :)
+ */
 
-#define ENCOUNTERS 3
+#include "ScriptMgr.h"
+#include "InstanceScript.h"
+#include "end_time.h"
+#include "Player.h"
+
+#define ENCOUNTERS 4
 
 class instance_end_time : public InstanceMapScript
 {
@@ -59,34 +68,34 @@ public:
             data << uint32(WORLDSTATE_FRAGMENTS_COLLECTED) << uint32(FragmentsCollected);
         }
 
-        void OnCreatureCreate(Creature* pCreature, bool)
+        void OnCreatureCreate(Creature* creature)
         {
-            switch(pCreature->GetEntry())
+            switch(creature->GetEntry())
             {
                 case NPC_ECHO_OF_JAINA:
-                    uiEchoOfJaina = pCreature->GetGUID();
+                    uiEchoOfJaina = creature->GetGUID();
                     break;
                 case NPC_ECHO_OF_BAINE:
-                    uiEchoOfBaine = pCreature->GetGUID();
+                    uiEchoOfBaine = creature->GetGUID();
                     break;
                 case NPC_ECHO_OF_SYLVANAS:
-                    uiEchoOfSylvanas = pCreature->GetGUID();
+                    uiEchoOfSylvanas = creature->GetGUID();
                     break;
                 case NPC_ECHO_OF_TYRANDE:
-                    uiEchoOfTyrande = pCreature->GetGUID();
+                    uiEchoOfTyrande = creature->GetGUID();
                     break;
                 case NPC_MUROZOND:
-                    uiMurozond = pCreature->GetGUID();
+                    uiMurozond = creature->GetGUID();
                     break;
 
             }
         }
 
-        void OnGameObjectCreate(GameObject* go)
+        void OnGameObjectCreate(GameObject* /*go*/)
         {
         }
 
-        uint64 GetData64(uint32 identifier)
+        uint64 GetData64(uint32 identifier) const
         {
             switch(identifier)
             {
@@ -108,18 +117,15 @@ public:
         {
             switch(type)
             {
-			    case DATA_FIRST_ENCOUNTER:
-			        uiEncounter[1] = data;
-			        break;
-
-			    case DATA_SECOND_ENCOUNTER:
-			        uiEncounter[2] = data;
-			        break;
-
-			    case DATA_LAST_ENCOUNTER:
-			        uiEncounter[3] = data;
-			        break;
-
+                case DATA_FIRST_ENCOUNTER:
+                    uiEncounter[1] = data;
+                    break;
+                case DATA_SECOND_ENCOUNTER:
+                    uiEncounter[2] = data;
+                    break;
+                case DATA_LAST_ENCOUNTER:
+                    uiEncounter[3] = data;
+                    break;
                 case DATA_JAINA_PICKED_STATE:
                     switch (data)
                     {
@@ -131,14 +137,14 @@ public:
                             break;
                     }
                     JainaPickedState = data;
-			        break;
+                    break;
             }
          
             if (data == DONE)
                 SaveToDB();
         }
 
-        uint32 GetData(uint32 type)
+        uint32 GetData(uint32 type) const
         {
             switch(type)
             {

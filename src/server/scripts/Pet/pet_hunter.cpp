@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>  
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -23,16 +23,6 @@
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "Common.h"
-#include "CreatureAIImpl.h"
-#include "Player.h"
-#include "Creature.h"
-#include "Spell.h"
-#include "CreatureAI.h"
-#include "Pet.h"
-#include "CreatureGroups.h"
-#include "PetAI.h"
-
 
 enum HunterSpells
 {
@@ -55,9 +45,9 @@ class npc_pet_hunter_snake_trap : public CreatureScript
         {
             npc_pet_hunter_snake_trapAI(Creature* creature) : ScriptedAI(creature) { }
 
-            void EnterCombat(Unit* /*who*/)  { }
+            void EnterCombat(Unit* /*who*/) OVERRIDE { }
 
-            void Reset() 
+            void Reset() OVERRIDE
             {
                 _spellTimer = 0;
 
@@ -74,18 +64,16 @@ class npc_pet_hunter_snake_trap : public CreatureScript
                 // Start attacking attacker of owner on first ai update after spawn - move in line of sight may choose better target
                 if (!me->GetVictim() && me->IsSummon())
                     if (Unit* Owner = me->ToTempSummon()->GetSummoner())
-//uncomment  FIXME                      if (Owner->getAttackerForHelper())
-     //and this                       AttackStart(Owner->getAttackerForHelper());
-
+                        if (Owner->getAttackerForHelper())
+                            AttackStart(Owner->getAttackerForHelper());
                 if (!_isViper)
                     DoCast(me, SPELL_HUNTER_DEADLY_POISON_PASSIVE, true);
             }
 
             // Redefined for random target selection:
-            void MoveInLineOfSight(Unit* who) 
+            void MoveInLineOfSight(Unit* who) OVERRIDE
             {
-				// FIXME
-               /* if (!me->GetVictim() && me->CanCreatureAttack(who))
+                if (!me->GetVictim() && me->CanCreatureAttack(who))
                 {
                     if (me->GetDistanceZ(who) > CREATURE_Z_ATTACK_RANGE)
                         return;
@@ -100,15 +88,15 @@ class npc_pet_hunter_snake_trap : public CreatureScript
                             AttackStart(who);
                         }
                     }
-                }*/
+                }
             }
 
-            void UpdateAI(uint32 diff) 
+            void UpdateAI(uint32 diff) OVERRIDE
             {
-                if (!UpdateVictim())
+                if (!UpdateVictim() || !me->GetVictim())
                     return;
 
-                if (me->GetVictim()->HasBreakableByDamageCrowdControlAura(me))
+                if (me->EnsureVictim()->HasBreakableByDamageCrowdControlAura(me))
                 {
                     me->InterruptNonMeleeSpells(false);
                     return;
@@ -136,7 +124,7 @@ class npc_pet_hunter_snake_trap : public CreatureScript
             uint32 _spellTimer;
         };
 
-        CreatureAI* GetAI(Creature* creature) const 
+        CreatureAI* GetAI(Creature* creature) const OVERRIDE
         {
             return new npc_pet_hunter_snake_trapAI(creature);
         }

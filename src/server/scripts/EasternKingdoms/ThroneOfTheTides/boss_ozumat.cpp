@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
  
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "throne_of_the_tides.h"
 #include "Group.h"
 
@@ -143,7 +144,7 @@ class npc_neptulon : public CreatureScript
             return true;
         }
 
-        bool OnGossipSelect(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
+        bool OnGossipSelect(Player* pPlayer, Creature* pCreature, uint32 /*uiSender*/, uint32 /*uiAction*/)
         {
             if (InstanceScript* pInstance = pCreature->GetInstanceScript())
             {
@@ -217,7 +218,7 @@ class npc_neptulon : public CreatureScript
                 summons.Summon(summon);
             }
 
-            void SummonedCreatureDies(Creature* pCreature, Unit* pKiller)
+            void SummonedCreatureDies(Creature* pCreature, Unit* /*pKiller*/)
             {
                 summons.Despawn(pCreature);
                 if (pCreature->GetEntry() == NPC_VICIOUS_MINDLASHER)
@@ -261,13 +262,13 @@ class npc_neptulon : public CreatureScript
                         for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                         {/* 
                             if (Player* pPlayer = i->GetSource())
-								if (Group* pGroup = pPlayer->GetGroup())
+                                if (Group* pGroup = pPlayer->GetGroup())
                                     if (pPlayer->GetGuildId() && pGroup->IsGuildGroup(pPlayer->GetGuildId(), true, true))
                                     {
                                         pGroup->UpdateGuildAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, SPELL_KILL_OZUMAT, 0, 0, NULL, me);
                                         break;
                                     }
-						*/
+                        */
                         }
                     }
                     pInstance->UpdateEncounterState(ENCOUNTER_CREDIT_CAST_SPELL, SPELL_ENCOUNTER_COMPLETE, me); 
@@ -276,7 +277,7 @@ class npc_neptulon : public CreatureScript
                 EnterEvadeMode();
             }
 
-            void DamageTaken(Unit* pAttacker, uint32 &damage)
+            void DamageTaken(Unit* /*pAttacker*/, uint32 &damage)
             {
                 if (damage >= me->GetHealth())
                 {
@@ -423,7 +424,7 @@ class npc_vicious_mindslasher : public CreatureScript
                 events.Reset();
             }
 
-            void EnterCombat(Unit* who)
+            void EnterCombat(Unit* /*who*/)
             {
                 events.ScheduleEvent(EVENT_BRAIN_SPIKE, urand(6000, 10000));
                 if (IsHeroic())
@@ -431,7 +432,7 @@ class npc_vicious_mindslasher : public CreatureScript
                 events.ScheduleEvent(EVENT_SHADOW_BOLT, 2000);
             }
 
-            void KilledUnit(Unit* victim)
+            void KilledUnit(Unit* /*victim*/)
             {
                 if (pInstance)
                     if (Creature* pNeptulon = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_NEPTULON)))
@@ -457,11 +458,11 @@ class npc_vicious_mindslasher : public CreatureScript
                         events.ScheduleEvent(EVENT_BRAIN_SPIKE, urand(15000, 20000));
                         break;
                     case EVENT_VEIL_OF_SHADOW:
-                        DoCast(me->GetVictim(), SPELL_VEIL_OF_SHADOW);
+                        DoCastVictim(SPELL_VEIL_OF_SHADOW);
                         events.ScheduleEvent(EVENT_VEIL_OF_SHADOW, urand(13000, 20000));
                         break;
                     case EVENT_SHADOW_BOLT:
-                        DoCast(me->GetVictim(), SPELL_SHADOW_BOLT);
+                        DoCastVictim(SPELL_SHADOW_BOLT);
                         events.ScheduleEvent(EVENT_SHADOW_BOLT, 2000);
                         break;
                     }
@@ -496,14 +497,14 @@ class npc_unyielding_behemoth : public CreatureScript
                 events.Reset();
             }
 
-            void KilledUnit(Unit* victim)
+            void KilledUnit(Unit* /*victim*/)
             {
                 if (pInstance)
                     if (Creature* pNeptulon = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_NEPTULON)))
                         pNeptulon->AI()->Talk(SAY_KILL);
             }
 
-            void EnterCombat(Unit* who)
+            void EnterCombat(Unit* /*who*/)
             {
                 events.ScheduleEvent(EVENT_BLIGHT_SPRAY, urand(8000, 12000));
             }
@@ -559,14 +560,9 @@ class npc_faceless_sapper : public CreatureScript
                 me->SetReactState(REACT_PASSIVE);
             }
 
-            void Reset()
-            {
+            void Reset() { }
 
-            }
-
-            void UpdateAI(uint32 diff)
-            {   
-            }
+            void UpdateAI(uint32 /*diff*/) { }
         };
 };
 
@@ -580,9 +576,9 @@ class npc_blight_of_ozumat : public CreatureScript
             return new npc_blight_of_ozumatAI (pCreature);
         }
 
-        struct npc_blight_of_ozumatAI : public Scripted_NoMovementAI
+        struct npc_blight_of_ozumatAI : public ScriptedAI
         {
-            npc_blight_of_ozumatAI(Creature* creature) : Scripted_NoMovementAI(creature)
+            npc_blight_of_ozumatAI(Creature* creature) : ScriptedAI(creature)
             {
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -594,9 +590,7 @@ class npc_blight_of_ozumat : public CreatureScript
                 DoCast(me, SPELL_BLIGHT_OF_OZUMAT_AURA);
             }
 
-            void UpdateAI(uint32 diff)
-            {
-            }
+            void UpdateAI(uint32 /*diff*/) { }
         };
 };
 
@@ -607,19 +601,19 @@ class at_tott_ozumat : public AreaTriggerScript
 
         bool OnTrigger(Player* pPlayer, const AreaTriggerEntry* /*pAt*/)
         {
-		    if (InstanceScript* pInstance = pPlayer->GetInstanceScript())
-		    {
-			    if (pInstance->GetData(DATA_NEPTULON_EVENT) != DONE
+            if (InstanceScript* pInstance = pPlayer->GetInstanceScript())
+            {
+                if (pInstance->GetData(DATA_NEPTULON_EVENT) != DONE
                     && pInstance->GetBossState(DATA_OZUMAT) != IN_PROGRESS
                     && pInstance->GetBossState(DATA_OZUMAT) != DONE)
-			    {
+                {
                     pInstance->SetData(DATA_NEPTULON_EVENT, DONE);
                     if (Creature* pNeptulon = ObjectAccessor::GetCreature(*pPlayer, pInstance->GetData64(DATA_NEPTULON)))
                     {
                         pNeptulon->AI()->DoAction(ACTION_NEPTULON_START_EVENT);
                     }
-			    }
-		    }
+                }
+            }
             return true;
         }
 };

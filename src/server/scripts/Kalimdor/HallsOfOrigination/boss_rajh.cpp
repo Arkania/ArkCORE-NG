@@ -1,7 +1,6 @@
-#include "ScriptPCH.h"
-#include "ObjectMgr.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ObjectMgr.h"
 #include "SpellScript.h"
 #include "SpellAuraEffects.h"
 #include "halls_of_origination.h"
@@ -47,7 +46,7 @@ enum Texts
     SAY_BLESSING   = 1,
 };
 
-enum Creatures
+enum Npc
 {
     NPC_WINDS                                = 39634,
     NPC_SUN_ORB                              = 40835,
@@ -58,7 +57,7 @@ enum Creatures
 class boss_rajh : public CreatureScript
 {
     public:
-        boss_rajh() : CreatureScript("boss_rajh") {}
+        boss_rajh() : CreatureScript("boss_rajh") { }
 
         CreatureAI* GetAI(Creature* pCreature) const
         {
@@ -95,7 +94,7 @@ class boss_rajh : public CreatureScript
                 blessing = false;
             }
 
-            void EnterCombat(Unit* pWho)
+            void EnterCombat(Unit* /*who*/)
             {
                 m_pInstance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me);
                 DoCast(me, SPELL_NO_REGEN);
@@ -115,7 +114,7 @@ class boss_rajh : public CreatureScript
                 Talk(SAY_KILL);
             }
 
-            void JustDied(Unit* killer)
+            void JustDied(Unit* /*killer*/)
             {
                 Talk(SAY_DEATH);
                 m_pInstance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me); // Remove
@@ -199,7 +198,7 @@ class boss_rajh : public CreatureScript
 
                 if (leap_timer <= uiDiff && leap == true)
                 {                
-                    DoCast(me->GetVictim(), SPELL_INFERNO_LEAP);
+                    DoCastVictim(SPELL_INFERNO_LEAP);
                     leap = false;
                 } else leap_timer -= uiDiff;
 
@@ -231,7 +230,7 @@ class boss_rajh : public CreatureScript
 class npc_winds : public CreatureScript
 {
     public:
-        npc_winds() : CreatureScript("npc_winds") {}
+        npc_winds() : CreatureScript("npc_winds") { }
 
         CreatureAI* GetAI(Creature* pCreature) const
         {
@@ -263,7 +262,7 @@ class npc_winds : public CreatureScript
                 DoCast(me, SPELL_WINDS_VISUAL);
             }
 
-            void EnterCombat(Unit* pWho)
+            void EnterCombat(Unit* /*who*/)
             {
                 DoCast(me, SPELL_SOLAR_WINDS_PERIODIC);
                 m_uiDamageTimer = IsHeroic() ? 1000 : 1500;
@@ -428,20 +427,15 @@ class npc_solar_wind : public CreatureScript
 
             InstanceScript* pInstance;
 
-            void Reset()
-            {
-            }
+            void Reset() { }
             
-            void EnterCombat(Unit * /*who*/)
-            {
-            }
+            void EnterCombat(Unit* /*who*/) { }
 
-            void UpdateAI(uint32 diff)
+            void UpdateAI(uint32 /*diff*/)
             {
-                 if (me->HasUnitState(UNIT_STATE_CASTING))
+                if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
             }
-
         };
 
         CreatureAI* GetAI(Creature* creature) const

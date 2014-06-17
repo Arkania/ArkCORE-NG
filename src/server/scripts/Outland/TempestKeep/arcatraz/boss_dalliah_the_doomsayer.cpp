@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -59,15 +60,20 @@ class boss_dalliah_the_doomsayer : public CreatureScript
 
         struct boss_dalliah_the_doomsayerAI : public BossAI
         {
-            boss_dalliah_the_doomsayerAI(Creature* creature) : BossAI(creature, DATA_DALLIAH) { }
-
-            void Reset() 
+            boss_dalliah_the_doomsayerAI(Creature* creature) : BossAI(creature, DATA_DALLIAH)
             {
-                _Reset();
+                soccothratesTaunt = false;
                 soccothratesDeath = false;
             }
 
-            void JustDied(Unit* /*killer*/) 
+            void Reset() OVERRIDE
+            {
+                _Reset();
+                soccothratesTaunt = false;
+                soccothratesDeath = false;
+            }
+
+            void JustDied(Unit* /*killer*/) OVERRIDE
             {
                 _JustDied();
                 Talk(SAY_DEATH);
@@ -77,7 +83,7 @@ class boss_dalliah_the_doomsayer : public CreatureScript
                         soccothrates->AI()->SetData(1, 1);
             }
 
-            void EnterCombat(Unit* /*who*/) 
+            void EnterCombat(Unit* /*who*/) OVERRIDE
             {
                 _EnterCombat();
                 events.ScheduleEvent(EVENT_GIFT_OF_THE_DOOMSAYER, urand(1000, 4000));
@@ -88,12 +94,12 @@ class boss_dalliah_the_doomsayer : public CreatureScript
                 Talk(SAY_AGGRO);
             }
 
-            void KilledUnit(Unit* /*victim*/) 
+            void KilledUnit(Unit* /*victim*/) OVERRIDE
             {
                 Talk(SAY_SLAY);
             }
 
-            void SetData(uint32 /*type*/, uint32 data) 
+            void SetData(uint32 /*type*/, uint32 data) OVERRIDE
             {
                 switch (data)
                 {
@@ -106,7 +112,7 @@ class boss_dalliah_the_doomsayer : public CreatureScript
                 }
             }
 
-            void UpdateAI(uint32 diff) 
+            void UpdateAI(uint32 diff) OVERRIDE
             {
                 if (!UpdateVictim())
                 {
@@ -182,9 +188,9 @@ class boss_dalliah_the_doomsayer : public CreatureScript
             bool soccothratesDeath;
         };
 
-        CreatureAI* GetAI(Creature* creature) const 
+        CreatureAI* GetAI(Creature* creature) const OVERRIDE
         {
-            return GetInstanceAI<boss_dalliah_the_doomsayerAI>(creature);
+            return GetArcatrazAI<boss_dalliah_the_doomsayerAI>(creature);
         }
 };
 

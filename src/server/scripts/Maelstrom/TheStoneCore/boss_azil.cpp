@@ -1,9 +1,14 @@
-/*Copyright (C) 2014 Arkania Project.
-*
-* THIS particular file is NOT free software; third-party users should NOT have access to it, redistribute it or modify it. :)
-*/
+/*
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ *
+ * THIS particular file is NOT free software; third-party users should 
+ * NOT have access to it, redistribute it or modify it.
+ * We need to think up a better copyright than this. Who's your third party
+ * on the net dude, dude? Should NOT? Er must nicht!
+ */
 
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "stonecore.h"
 
 class boss_azil : public CreatureScript
@@ -25,11 +30,11 @@ public:
 
         InstanceScript* instance;
 
-        void Reset() {}
+        void Reset() { }
 
-        void EnterCombat(Unit* /*who*/) {}
+        void EnterCombat(Unit* /*who*/) { }
 
-        void UpdateAI(uint32 Diff)
+        void UpdateAI(uint32 /*diff*/)
         {
             if (!UpdateVictim())
                 return;

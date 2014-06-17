@@ -1,4 +1,6 @@
 /*
+ * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -81,7 +83,7 @@ template<typename length_type> void Spline<length_type>::initLengths()
     index_type i = index_lo;
     length_type length = 0;
     lengths.resize(index_hi+1);
-    while(i < index_hi )
+    while (i < index_hi)
     {
         length += SegLength(i);
         lengths[++i] = length;

@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 #ifndef TRINITY_CREATUREAIFACTORY_H
 #define TRINITY_CREATUREAIFACTORY_H
 
@@ -26,13 +27,13 @@
 
 struct SelectableAI : public FactoryHolder<CreatureAI>, public Permissible<Creature>
 {
-    SelectableAI(const char* id) : FactoryHolder<CreatureAI>(id) {}
+    SelectableAI(const char* id) : FactoryHolder<CreatureAI>(id) { }
 };
 
 template<class REAL_AI>
 struct CreatureAIFactory : public SelectableAI
 {
-    CreatureAIFactory(const char* name) : SelectableAI(name) {}
+    CreatureAIFactory(const char* name) : SelectableAI(name) { }
 
     CreatureAI* Create(void*) const;
 
@@ -54,13 +55,13 @@ typedef FactoryHolder<CreatureAI>::FactoryHolderRepository CreatureAIRepository;
 //GO
 struct SelectableGameObjectAI : public FactoryHolder<GameObjectAI>, public Permissible<GameObject>
 {
-    SelectableGameObjectAI(const char* id) : FactoryHolder<GameObjectAI>(id) {}
+    SelectableGameObjectAI(const char* id) : FactoryHolder<GameObjectAI>(id) { }
 };
 
 template<class REAL_GO_AI>
 struct GameObjectAIFactory : public SelectableGameObjectAI
 {
-    GameObjectAIFactory(const char* name) : SelectableGameObjectAI(name) {}
+    GameObjectAIFactory(const char* name) : SelectableGameObjectAI(name) { }
 
     GameObjectAI* Create(void*) const;
 

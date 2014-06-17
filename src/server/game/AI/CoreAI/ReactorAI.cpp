@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -24,10 +24,7 @@
 #include "ObjectAccessor.h"
 #include "CreatureAIImpl.h"
 
-#define REACTOR_VISIBLE_RANGE (26.46f)
-
-int
-ReactorAI::Permissible(const Creature* creature)
+int ReactorAI::Permissible(const Creature* creature)
 {
     if (creature->IsCivilian() || creature->IsNeutralToAll())
         return PERMIT_BASE_REACTIVE;
@@ -35,24 +32,10 @@ ReactorAI::Permissible(const Creature* creature)
     return PERMIT_BASE_NO;
 }
 
-void
-ReactorAI::MoveInLineOfSight(Unit*)
+void ReactorAI::UpdateAI(uint32 /*diff*/)
 {
-}
-
-void
-ReactorAI::UpdateAI(const uint32 /*time_diff*/)
-{
-    // update i_victimGuid if me->GetVictim() !=0 and changed
     if (!UpdateVictim())
         return;
 
-    if (me->isAttackReady())
-    {
-        if (me->IsWithinMeleeRange(me->GetVictim()))
-        {
-            me->AttackerStateUpdate(me->GetVictim());
-            me->resetAttackTimer();
-        }
-    }
+    DoMeleeAttackIfReady();
 }

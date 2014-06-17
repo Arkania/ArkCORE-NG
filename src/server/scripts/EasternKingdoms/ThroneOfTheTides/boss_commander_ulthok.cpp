@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
  
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "throne_of_the_tides.h"
 
 enum Spells
@@ -83,7 +84,7 @@ class boss_commander_ulthok : public CreatureScript
             {
                 if (!instance || static_cast<InstanceMap*>(me->GetMap())->GetScriptId() != sObjectMgr->GetScriptId(TotTScriptName))
                     me->IsAIEnabled = false;
-                else if (!me->IsDead())
+                else if (!me->isDead())
                     Reset();
             }
 
@@ -115,7 +116,7 @@ class boss_commander_ulthok : public CreatureScript
                 instance->SetBossState(DATA_COMMANDER_ULTHOK, IN_PROGRESS);
             }
 
-            void JustDied(Unit* pKiller)
+            void JustDied(Unit* /*killer*/)
             {
                 _JustDied();
             }
@@ -170,9 +171,9 @@ class npc_ulthok_dark_fissure : public CreatureScript
             return new npc_ulthok_dark_fissureAI (pCreature);
         }
 
-        struct npc_ulthok_dark_fissureAI : public Scripted_NoMovementAI
+        struct npc_ulthok_dark_fissureAI : public ScriptedAI
         {
-            npc_ulthok_dark_fissureAI(Creature* creature) : Scripted_NoMovementAI(creature)
+            npc_ulthok_dark_fissureAI(Creature* creature) : ScriptedAI(creature)
             {
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -181,12 +182,10 @@ class npc_ulthok_dark_fissure : public CreatureScript
 
             void Reset()
             {
-                DoCast(me, IsHeroic()? SPELL_DARK_FISSURE_AURA_H: SPELL_DARK_FISSURE_AURA, true);
+                DoCast(me, IsHeroic() ? SPELL_DARK_FISSURE_AURA_H : SPELL_DARK_FISSURE_AURA, true);
             }
 
-            void UpdateAI(uint32 diff)
-            {
-            }
+            void UpdateAI(uint32 /*diff*/) { }
         };
 };
 
@@ -197,19 +196,19 @@ class at_tott_commander_ulthok : public AreaTriggerScript
 
         bool OnTrigger(Player* pPlayer, const AreaTriggerEntry* /*pAt*/)
         {
-            sLog->outError("LOADING", "ulthok");
-		    if (InstanceScript* pInstance = pPlayer->GetInstanceScript())
-		    {
-			    if (pInstance->GetData(DATA_COMMANDER_ULTHOK_EVENT) != DONE
+            TC_LOG_ERROR("misc", "LOADING: ulthok");
+            if (InstanceScript* pInstance = pPlayer->GetInstanceScript())
+            {
+                if (pInstance->GetData(DATA_COMMANDER_ULTHOK_EVENT) != DONE
                     && pInstance->GetBossState(DATA_LADY_NAZJAR) != DONE)
-			    {
+                {
                     pInstance->SetData(DATA_COMMANDER_ULTHOK_EVENT, DONE);
                     if (Creature* pUlthok = ObjectAccessor::GetCreature(*pPlayer, pInstance->GetData64(DATA_COMMANDER_ULTHOK)))
                     {
                         pUlthok->AI()->DoAction(ACTION_COMMANDER_ULTHOK_START_EVENT);
                     }
-			    }
-		    }
+                }
+            }
             return true;
         }
 };

@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -35,7 +35,7 @@ namespace AuthHelper
         {16769, 5, 2, 0, ' '},
         {16357, 5, 1, 0, 'a'},
         {16309, 5, 1, 0, ' '},
-        {16135, 5, 0, 5, 'b'}, 
+        {16135, 5, 0, 5, 'b'},
         {15595, 4, 3, 4, ' '},
         {14545, 4, 2, 2, ' '},
         {13623, 4, 0, 6, 'a'},

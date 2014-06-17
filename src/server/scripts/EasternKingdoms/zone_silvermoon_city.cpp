@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -28,14 +28,17 @@ EndScriptData */
 npc_blood_knight_stillblade
 EndContentData */
 
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "Player.h"
+#include "SpellInfo.h"
 
 /*#######
 # npc_blood_knight_stillblade
 #######*/
 enum eStillbladeData
 {
-    SAY_HEAL                    = -1000193,
+    SAY_HEAL                    = 0,
 
     QUEST_REDEEMING_THE_DEAD    = 9685,
     SPELL_SHIMMERING_VESSEL     = 31225,
@@ -54,7 +57,7 @@ public:
 
     struct npc_blood_knight_stillbladeAI : public ScriptedAI
     {
-        npc_blood_knight_stillbladeAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_blood_knight_stillbladeAI(Creature* creature) : ScriptedAI(creature) { }
 
         uint32 lifeTimer;
         bool spellHit;
@@ -86,17 +89,20 @@ public:
             }
         }
 
-        void SpellHit(Unit* Hitter, const SpellInfo* Spellkind)
+        void SpellHit(Unit* hitter, const SpellInfo* spellkind)
         {
-            if ((Spellkind->Id == SPELL_SHIMMERING_VESSEL) && !spellHit &&
-                (Hitter->GetTypeId() == TYPEID_PLAYER) && (CAST_PLR(Hitter)->IsActiveQuest(QUEST_REDEEMING_THE_DEAD)))
+            if (spellHit)
+                return;
+
+            Player* player = hitter->ToPlayer();
+            if (spellkind->Id == SPELL_SHIMMERING_VESSEL && (player && player->IsActiveQuest(QUEST_REDEEMING_THE_DEAD)))
             {
-                CAST_PLR(Hitter)->AreaExploredOrEventHappens(QUEST_REDEEMING_THE_DEAD);
+                player->AreaExploredOrEventHappens(QUEST_REDEEMING_THE_DEAD);
                 DoCast(me, SPELL_REVIVE_SELF);
                 me->SetStandState(UNIT_STAND_STATE_STAND);
                 me->SetUInt32Value(UNIT_DYNAMIC_FLAGS, 0);
                 //me->RemoveAllAuras();
-                DoScriptText(SAY_HEAL, me);
+                Talk(SAY_HEAL);
                 spellHit = true;
             }
         }

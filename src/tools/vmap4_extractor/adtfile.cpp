@@ -1,19 +1,20 @@
 /*
+ * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation; either version 2 of the License, or (at your
+ * option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "vmapexport.h"
@@ -26,7 +27,7 @@
 #define snprintf _snprintf
 #endif
 
-const char * GetPlainName(const char * FileName)
+char const* GetPlainName(char const* FileName)
 {
     const char * szTemp;
 
@@ -35,7 +36,7 @@ const char * GetPlainName(const char * FileName)
     return FileName;
 }
 
-char * GetPlainName(char * FileName)
+char* GetPlainName(char* FileName)
 {
     char * szTemp;
 
@@ -44,43 +45,42 @@ char * GetPlainName(char * FileName)
     return FileName;
 }
 
-void fixnamen(char *name, size_t len)
+void FixNameCase(char* name, size_t len)
 {
-    for (size_t i=0; i<len-3; i++)
-    {
-        if (i>0 && name[i]>='A' && name[i]<='Z' && isalpha(name[i-1]))
-        {
-            name[i] |= 0x20;
-        } else if ((i==0 || !isalpha(name[i-1])) && name[i]>='a' && name[i]<='z')
-        {
-            name[i] &= ~0x20;
-        }
-    }
+    char* ptr = name + len - 1;
+
     //extension in lowercase
-    for(size_t i=len-3; i<len; i++)
-        name[i] |= 0x20;
+    for (; *ptr != '.'; --ptr)
+        *ptr |= 0x20;
+
+    for (; ptr >= name; --ptr)
+    {
+        if (ptr > name && *ptr >= 'A' && *ptr <= 'Z' && isalpha(*(ptr - 1)))
+            *ptr |= 0x20;
+        else if ((ptr == name || !isalpha(*(ptr - 1))) && *ptr >= 'a' && *ptr <= 'z')
+            *ptr &= ~0x20;
+    }
 }
 
-void fixname2(char *name, size_t len)
+void FixNameSpaces(char* name, size_t len)
 {
     for (size_t i=0; i<len-3; i++)
     {
         if(name[i] == ' ')
-        name[i] = '_';
+            name[i] = '_';
     }
 }
 
-char * GetExtension(char * FileName)
+char* GetExtension(char* FileName)
 {
-    char * szTemp;
-    if((szTemp = strrchr(FileName, '.')) != NULL)
+    if (char* szTemp = strrchr(FileName, '.'))
         return szTemp;
     return NULL;
 }
 
 extern HANDLE WorldMpq;
 
-ADTFile::ADTFile(char* filename): ADT(WorldMpq, filename)
+ADTFile::ADTFile(char* filename) : ADT(WorldMpq, filename, false)
 {
     Adtfilename.append(filename);
 }
@@ -101,7 +101,7 @@ bool ADTFile::init(uint32 map_num, uint32 tileX, uint32 tileY)
     xMap = TempMapNumber.substr(TempMapNumber.find("_")+1,(TempMapNumber.find_last_of("_")-1) - (TempMapNumber.find("_")));
     yMap = TempMapNumber.substr(TempMapNumber.find_last_of("_")+1,(TempMapNumber.length()) - (TempMapNumber.find_last_of("_")));
     Adtfilename.erase((Adtfilename.length()-xMap.length()-yMap.length()-2), (xMap.length()+yMap.length()+2));
-    string AdtMapNumber = xMap + ' ' + yMap + ' ' + GetPlainName((char*)Adtfilename.c_str());
+    //string AdtMapNumber = xMap + ' ' + yMap + ' ' + GetPlainName((char*)Adtfilename.c_str());
     //printf("Processing map %s...\n", AdtMapNumber.c_str());
     //printf("MapNumber = %s\n", TempMapNumber.c_str());
     //printf("xMap = %s\n", xMap.c_str());
@@ -136,23 +136,24 @@ bool ADTFile::init(uint32 map_num, uint32 tileX, uint32 tileY)
         {
             if (size)
             {
-                char *buf = new char[size];
+                char* buf = new char[size];
                 ADT.read(buf, size);
-                char *p=buf;
-                int t=0;
-                ModelInstansName = new string[size];
-                while (p<buf+size)
+                char* p = buf;
+                int t = 0;
+                ModelInstanceNames = new std::string[size];
+                while (p < buf + size)
                 {
-                    fixnamen(p,strlen(p));
+                    std::string path(p);
+
                     char* s = GetPlainName(p);
-                    fixname2(s,strlen(s));
+                    FixNameCase(s, strlen(s));
+                    FixNameSpaces(s, strlen(s));
 
-                    ModelInstansName[t++] = s;
+                    ModelInstanceNames[t++] = s;
 
-                    string path(p);
                     ExtractSingleModel(path);
 
-                    p = p+strlen(p)+1;
+                    p += strlen(p) + 1;
                 }
                 delete[] buf;
             }
@@ -161,19 +162,20 @@ bool ADTFile::init(uint32 map_num, uint32 tileX, uint32 tileY)
         {
             if (size)
             {
-                char *buf = new char[size];
+                char* buf = new char[size];
                 ADT.read(buf, size);
-                char *p=buf;
+                char* p = buf;
                 int q = 0;
-                WmoInstansName = new string[size];
-                while (p<buf+size)
+                WmoInstanceNames = new std::string[size];
+                while (p < buf + size)
                 {
-                    string path(p);
-                    char* s=GetPlainName(p);
-                    fixnamen(s,strlen(s));
-                    fixname2(s,strlen(s));
-                    p=p+strlen(p)+1;
-                    WmoInstansName[q++] = s;
+                    char* s = GetPlainName(p);
+                    FixNameCase(s, strlen(s));
+                    FixNameSpaces(s, strlen(s));
+
+                    WmoInstanceNames[q++] = s;
+
+                    p += strlen(p) + 1;
                 }
                 delete[] buf;
             }
@@ -188,9 +190,10 @@ bool ADTFile::init(uint32 map_num, uint32 tileX, uint32 tileY)
                 {
                     uint32 id;
                     ADT.read(&id, 4);
-                    ModelInstance inst(ADT,ModelInstansName[id].c_str(), map_num, tileX, tileY, dirfile);
+                    ModelInstance inst(ADT, ModelInstanceNames[id].c_str(), map_num, tileX, tileY, dirfile);
                 }
-                delete[] ModelInstansName;
+                delete[] ModelInstanceNames;
+                ModelInstanceNames = NULL;
             }
         }
         else if (!strcmp(fourcc,"MODF"))
@@ -202,14 +205,18 @@ bool ADTFile::init(uint32 map_num, uint32 tileX, uint32 tileY)
                 {
                     uint32 id;
                     ADT.read(&id, 4);
-                    WMOInstance inst(ADT,WmoInstansName[id].c_str(), map_num, tileX, tileY, dirfile);
+                    WMOInstance inst(ADT, WmoInstanceNames[id].c_str(), map_num, tileX, tileY, dirfile);
                 }
-                delete[] WmoInstansName;
+
+                delete[] WmoInstanceNames;
+                WmoInstanceNames = NULL;
             }
         }
+
         //======================
         ADT.seek(nextpos);
     }
+
     ADT.close();
     fclose(dirfile);
     return true;

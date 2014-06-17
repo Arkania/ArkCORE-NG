@@ -1,18 +1,17 @@
-/*Copyright (C) 2014 Arkania Project.
-*
-* Script 99% done. 1% = Testing live.
-*
-* THIS particular file is NOT free software; third-party users should NOT have access to it, redistribute it or modify it. :)
-* We need to think up a better copyright than this. Who's your third party on the net dude, dude? Should NOT? Er must nicht!
-*/
+/*
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ *
+ * THIS particular file is NOT free software; third-party users should 
+ * NOT have access to it, redistribute it or modify it.
+ * We need to think up a better copyright than this. Who's your third party
+ * on the net dude, dude? Should NOT? Er must nicht!
+ */
 
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "stonecore.h"
 #include "Vehicle.h"
 #include "Unit.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
 #include "ScriptedEscortAI.h"
 #include "Cell.h"
 #include "CellImpl.h"
@@ -150,7 +149,7 @@ class boss_slabhide : public CreatureScript
                 introDone = true;
             }
 
-            void JustDied(Unit* killer)
+            void JustDied(Unit* /*killer*/)
             {
                 if (instance)
                 {
@@ -185,7 +184,7 @@ class boss_slabhide : public CreatureScript
 
             void UpdateAI(uint32 diff)
             {
-                if (!UpdateVictim() && inCombat || me->HasUnitState(UNIT_STATE_CASTING))
+                if ((!UpdateVictim() && inCombat) || me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
                 if (m_introTimer <= diff && !introFinished)
@@ -213,7 +212,6 @@ class boss_slabhide : public CreatureScript
                             case EVENT_AIR_PHASE:
                                 me->HandleEmote(EMOTE_ONESHOT_LIFTOFF);
                                 me->SetDisableGravity(true);
-                                me->SendMovementFlagUpdate();
                                 events.ScheduleEvent(EVENT_FLIGHT, 2000);
                                 return;
                                 
@@ -258,7 +256,6 @@ class boss_slabhide : public CreatureScript
                             case EVENT_LAND:
                                 me->HandleEmote(EMOTE_ONESHOT_LAND);
                                 me->SetDisableGravity(false);
-                                me->SendMovementFlagUpdate();
                                 if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 200.0f, true))
                                     me->GetMotionMaster()->MoveChase(target);
                                 events.ScheduleEvent(EVENT_GROUND, 2000);

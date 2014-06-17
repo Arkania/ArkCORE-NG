@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -23,6 +23,7 @@
 #include "World.h"
 #include "SharedDefines.h"
 #include "ScriptMgr.h"
+#include "Player.h"
 
 namespace Trinity
 {
@@ -39,7 +40,8 @@ namespace Trinity
         {
             return uint32(ceil(hk_honor_at_level_f(level, multiplier)));
         }
-    }
+    } // namespace Trinity::Honor
+
     namespace XP
     {
         inline uint8 GetGrayLevel(uint8 pl_level)
@@ -131,7 +133,7 @@ namespace Trinity
                     nBaseExp = 1878;
                     break;
                 default:
-                    sLog->outError("BaseGain: Unsupported content level %u", content);
+                    TC_LOG_ERROR("misc", "BaseGain: Unsupported content level %u", content);
                     nBaseExp = 45;
                     break;
             }
@@ -222,19 +224,19 @@ namespace Trinity
             sScriptMgr->OnGroupRateCalculation(rate, count, isRaid);
             return rate;
         }
-    }
+    } // namespace Trinity::XP
 
     namespace Currency
     {
         inline uint32 ConquestRatingCalculator(uint32 rate)
         {
-           if (rate <= 1500)
-               return 1350; // Default conquest points
-           else if (rate > 3000)
-               rate = 3000;
+            if (rate <= 1500)
+                return 1350; // Default conquest points
+            else if (rate > 3000)
+                rate = 3000;
 
-           // http://www.arenajunkies.com/topic/179536-conquest-point-cap-vs-personal-rating-chart/page__st__60#entry3085246
-           return uint32(1.4326 * ((1511.26 / (1 + 1639.28 / exp(0.00412 * rate))) + 850.15));
+            // http://www.arenajunkies.com/topic/179536-conquest-point-cap-vs-personal-rating-chart/page__st__60#entry3085246
+            return uint32(1.4326 * ((1511.26 / (1 + 1639.28 / exp(0.00412 * rate))) + 850.15));
         }
 
         inline uint32 BgConquestRatingCalculator(uint32 rate)
@@ -242,7 +244,7 @@ namespace Trinity
             // WowWiki: Battleground ratings receive a bonus of 22.2% to the cap they generate, plus 1 for corrections.
             return uint32((ConquestRatingCalculator(rate) * 1.222f) + 0.5f);
         }
-    }
-}
+    } // namespace Trinity::Currency
+} // namespace Trinity
 
 #endif

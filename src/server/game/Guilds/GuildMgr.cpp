@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -18,7 +18,6 @@
 
 #include "Common.h"
 #include "GuildMgr.h"
-
 
 GuildMgr::GuildMgr() : NextGuildId(1)
 { }
@@ -49,7 +48,7 @@ uint32 GuildMgr::GenerateGuildId()
 {
     if (NextGuildId >= 0xFFFFFFFE)
     {
-        sLog->outError("Guild ids overflow!! Can't continue, shutting down server. ");
+        TC_LOG_ERROR("guild", "Guild ids overflow!! Can't continue, shutting down server. ");
         World::StopNow(ERROR_EXIT_CODE);
     }
     return NextGuildId++;
@@ -114,23 +113,10 @@ uint32 GuildMgr::GetXPForGuildLevel(uint8 level) const
     return 0;
 }
 
-void GuildMgr::ResetExperienceCaps()
-{
-    CharacterDatabase.Execute(CharacterDatabase.GetPreparedStatement(CHAR_UPD_GUILD_RESET_TODAY_EXPERIENCE));
-
-    for (GuildContainer::iterator itr = GuildStore.begin(); itr != GuildStore.end(); ++itr)
-        itr->second->ResetDailyExperience();
-}
-
-void GuildMgr::ResetReputationCaps()
-{
-    /// @TODO: Implement
-}
-
 void GuildMgr::LoadGuilds()
 {
     // 1. Load all guilds
-    sLog->outString("Loading guilds definitions...");
+    TC_LOG_INFO("server.loading", "Loading guilds definitions...");
     {
         uint32 oldMSTime = getMSTime();
 
@@ -142,8 +128,7 @@ void GuildMgr::LoadGuilds()
 
         if (!result)
         {
-            sLog->outString(">> Loaded 0 guild definitions. DB table `guild` is empty.");
-            sLog->outString();
+            TC_LOG_INFO("server.loading", ">> Loaded 0 guild definitions. DB table `guild` is empty.");
             return;
         }
         else
@@ -159,19 +144,19 @@ void GuildMgr::LoadGuilds()
                     delete guild;
                     continue;
                 }
+
                 AddGuild(guild);
 
                 ++count;
             }
             while (result->NextRow());
 
-            sLog->outString(">> Loaded %u guild definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-            sLog->outString();
+            TC_LOG_INFO("server.loading", ">> Loaded %u guild definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
         }
     }
 
     // 2. Load all guild ranks
-    sLog->outString("Loading guild ranks...");
+    TC_LOG_INFO("server.loading", "Loading guild ranks...");
     {
         uint32 oldMSTime = getMSTime();
 
@@ -183,8 +168,7 @@ void GuildMgr::LoadGuilds()
 
         if (!result)
         {
-            sLog->outString(">> Loaded 0 guild ranks. DB table `guild_rank` is empty.");
-            sLog->outString();
+            TC_LOG_INFO("server.loading", ">> Loaded 0 guild ranks. DB table `guild_rank` is empty.");
         }
         else
         {
@@ -201,13 +185,12 @@ void GuildMgr::LoadGuilds()
             }
             while (result->NextRow());
 
-            sLog->outString(">> Loaded %u guild ranks in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-            sLog->outString();
+            TC_LOG_INFO("server.loading", ">> Loaded %u guild ranks in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
         }
     }
 
     // 3. Load all guild members
-    sLog->outString("Loading guild members...");
+    TC_LOG_INFO("server.loading", "Loading guild members...");
     {
         uint32 oldMSTime = getMSTime();
 
@@ -215,19 +198,16 @@ void GuildMgr::LoadGuilds()
         CharacterDatabase.DirectExecute("DELETE gm FROM guild_member gm LEFT JOIN guild g ON gm.guildId = g.guildId WHERE g.guildId IS NULL");
         CharacterDatabase.DirectExecute("DELETE gm FROM guild_member_withdraw gm LEFT JOIN guild_member g ON gm.guid = g.guid WHERE g.guid IS NULL");
 
-                                                             // 0          1       2      3       4      5       6        7       8       9      10
+                                                //           0           1        2     3      4        5       6       7       8       9       10
         QueryResult result = CharacterDatabase.Query("SELECT gm.guildid, gm.guid, rank, pnote, offnote, w.tab0, w.tab1, w.tab2, w.tab3, w.tab4, w.tab5, "
-                                                     // 11     12       13       14       15       16      17       18          19
+                                                //    11      12      13       14      15       16       17      18         19
                                                      "w.tab6, w.tab7, w.money, c.name, c.level, c.class, c.zone, c.account, c.logout_time "
                                                      "FROM guild_member gm "
                                                      "LEFT JOIN guild_member_withdraw w ON gm.guid = w.guid "
                                                      "LEFT JOIN characters c ON c.guid = gm.guid ORDER BY gm.guildid ASC");
 
         if (!result)
-        {
-            sLog->outString(">> Loaded 0 guild members. DB table `guild_member` is empty.");
-            sLog->outString();
-        }
+            TC_LOG_INFO("server.loading", ">> Loaded 0 guild members. DB table `guild_member` is empty.");
         else
         {
             uint32 count = 0;
@@ -244,26 +224,24 @@ void GuildMgr::LoadGuilds()
             }
             while (result->NextRow());
 
-            sLog->outString(">> Loaded %u guild members int %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-            sLog->outString();
+            TC_LOG_INFO("server.loading", ">> Loaded %u guild members in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
         }
     }
 
     // 4. Load all guild bank tab rights
-    sLog->outString("Loading bank tab rights...");
+    TC_LOG_INFO("server.loading", "Loading bank tab rights...");
     {
         uint32 oldMSTime = getMSTime();
 
         // Delete orphaned guild bank right entries before loading the valid ones
         CharacterDatabase.DirectExecute("DELETE gbr FROM guild_bank_right gbr LEFT JOIN guild g ON gbr.guildId = g.guildId WHERE g.guildId IS NULL");
 
-                                                     //       0        1      2    3        4
+                                                     //      0        1      2    3        4
         QueryResult result = CharacterDatabase.Query("SELECT guildid, TabId, rid, gbright, SlotPerDay FROM guild_bank_right ORDER BY guildid ASC, TabId ASC");
 
         if (!result)
         {
-            sLog->outString(">> Loaded 0 guild bank tab rights. DB table `guild_bank_right` is empty.");
-            sLog->outString();
+            TC_LOG_INFO("server.loading", ">> Loaded 0 guild bank tab rights. DB table `guild_bank_right` is empty.");
         }
         else
         {
@@ -280,13 +258,12 @@ void GuildMgr::LoadGuilds()
             }
             while (result->NextRow());
 
-            sLog->outString(">> Loaded %u bank tab rights in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-            sLog->outString();
+            TC_LOG_INFO("server.loading", ">> Loaded %u bank tab rights in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
         }
     }
 
     // 5. Load all event logs
-    sLog->outString("Loading guild event logs...");
+    TC_LOG_INFO("server.loading", "Loading guild event logs...");
     {
         uint32 oldMSTime = getMSTime();
 
@@ -297,8 +274,7 @@ void GuildMgr::LoadGuilds()
 
         if (!result)
         {
-            sLog->outString(">> Loaded 0 guild event logs. DB table `guild_eventlog` is empty.");
-            sLog->outString();
+            TC_LOG_INFO("server.loading", ">> Loaded 0 guild event logs. DB table `guild_eventlog` is empty.");
         }
         else
         {
@@ -315,13 +291,12 @@ void GuildMgr::LoadGuilds()
             }
             while (result->NextRow());
 
-            sLog->outString(">> Loaded %u guild event logs in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-            sLog->outString();
+            TC_LOG_INFO("server.loading", ">> Loaded %u guild event logs in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
         }
     }
 
     // 6. Load all bank event logs
-    sLog->outString("Loading guild bank event logs...");
+    TC_LOG_INFO("server.loading", "Loading guild bank event logs...");
     {
         uint32 oldMSTime = getMSTime();
 
@@ -333,8 +308,7 @@ void GuildMgr::LoadGuilds()
 
         if (!result)
         {
-            sLog->outString(">> Loaded 0 guild bank event logs. DB table `guild_bank_eventlog` is empty.");
-            sLog->outString();
+            TC_LOG_INFO("server.loading", ">> Loaded 0 guild bank event logs. DB table `guild_bank_eventlog` is empty.");
         }
         else
         {
@@ -351,26 +325,22 @@ void GuildMgr::LoadGuilds()
             }
             while (result->NextRow());
 
-            sLog->outString(">> Loaded %u guild bank event logs in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-            sLog->outString();
+            TC_LOG_INFO("server.loading", ">> Loaded %u guild bank event logs in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
         }
     }
 
     // 7. Load all news event logs
-    sLog->outString("Loading Guild News...");
+    TC_LOG_INFO("server.loading", "Loading Guild News...");
     {
         uint32 oldMSTime = getMSTime();
 
         CharacterDatabase.DirectPExecute("DELETE FROM guild_newslog WHERE LogGuid > %u", sWorld->getIntConfig(CONFIG_GUILD_NEWS_LOG_COUNT));
 
-                                                     //       0         1         2          3         4      5        6
+                                                     //      0        1        2          3           4      5      6
         QueryResult result = CharacterDatabase.Query("SELECT guildid, LogGuid, EventType, PlayerGuid, Flags, Value, Timestamp FROM guild_newslog ORDER BY TimeStamp DESC, LogGuid DESC");
 
         if (!result)
-        {
-            sLog->outString(">> Loaded 0 guild news logs. DB table `guild_newslog` is empty.");
-            sLog->outString();
-        }
+            TC_LOG_INFO("server.loading", ">> Loaded 0 guild event logs. DB table `guild_newslog` is empty.");
         else
         {
             uint32 count = 0;
@@ -386,13 +356,13 @@ void GuildMgr::LoadGuilds()
             }
             while (result->NextRow());
 
-            sLog->outString(">> Loaded %u guild news logs in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-            sLog->outString();
+            TC_LOG_INFO("server.loading", ">> Loaded %u guild new logs in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
         }
     }
 
+
     // 8. Load all guild bank tabs
-    sLog->outString("Loading guild bank tabs...");
+    TC_LOG_INFO("server.loading", "Loading guild bank tabs...");
     {
         uint32 oldMSTime = getMSTime();
 
@@ -404,8 +374,7 @@ void GuildMgr::LoadGuilds()
 
         if (!result)
         {
-            sLog->outString(">> Loaded 0 guild bank tabs. DB table `guild_bank_tab` is empty.");
-            sLog->outString();
+            TC_LOG_INFO("server.loading", ">> Loaded 0 guild bank tabs. DB table `guild_bank_tab` is empty.");
         }
         else
         {
@@ -422,13 +391,12 @@ void GuildMgr::LoadGuilds()
             }
             while (result->NextRow());
 
-            sLog->outString(">> Loaded %u guild bank tabs in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-            sLog->outString();
+            TC_LOG_INFO("server.loading", ">> Loaded %u guild bank tabs in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
         }
     }
 
     // 9. Fill all guild bank tabs
-    sLog->outString("Filling bank tabs with items...");
+    TC_LOG_INFO("guild", "Filling bank tabs with items...");
     {
         uint32 oldMSTime = getMSTime();
 
@@ -442,8 +410,7 @@ void GuildMgr::LoadGuilds()
 
         if (!result)
         {
-            sLog->outString(">> Loaded 0 guild bank tab items. DB table `guild_bank_item` or `item_instance` is empty.");
-            sLog->outString();
+            TC_LOG_INFO("server.loading", ">> Loaded 0 guild bank tab items. DB table `guild_bank_item` or `item_instance` is empty.");
         }
         else
         {
@@ -460,8 +427,7 @@ void GuildMgr::LoadGuilds()
             }
             while (result->NextRow());
 
-            sLog->outString(">> Loaded %u guild bank tab items in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-            sLog->outString();
+            TC_LOG_INFO("server.loading", ">> Loaded %u guild bank tab items in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
         }
     }
 
@@ -474,7 +440,6 @@ void GuildMgr::LoadGuilds()
             PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_GUILD_ACHIEVEMENT);
             stmt->setUInt32(0, itr->first);
             achievementResult = CharacterDatabase.Query(stmt);
-
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_GUILD_ACHIEVEMENT_CRITERIA);
             stmt->setUInt32(0, itr->first);
             criteriaResult = CharacterDatabase.Query(stmt);
@@ -484,7 +449,7 @@ void GuildMgr::LoadGuilds()
     }
 
     // 11. Load challengesMgr
-    sLog->outString("Loading challenges...");
+    TC_LOG_INFO("misc", "Loading challenges...");
     {
         for (GuildContainer::const_iterator itr = GuildStore.begin(); itr != GuildStore.end(); ++itr)
         {
@@ -493,27 +458,19 @@ void GuildMgr::LoadGuilds()
     }
 
     // 12. Validate loaded guild data
-    sLog->outString("Validating data of loaded guilds...");
+    TC_LOG_INFO("misc", "Validating data of loaded guilds...");
     {
         uint32 oldMSTime = getMSTime();
-        std::set<Guild*> rm; // temporary storage to avoid modifying GuildStore with RemoveGuild() while iterating
 
-        for (GuildContainer::iterator itr = GuildStore.begin(); itr != GuildStore.end(); ++itr)
+        for (GuildContainer::iterator itr = GuildStore.begin(); itr != GuildStore.end();)
         {
             Guild* guild = itr->second;
+            ++itr;
             if (guild && !guild->Validate())
-                rm.insert(guild);
+                delete guild;
         }
 
-        for (std::set<Guild*>::iterator itr = rm.begin(); itr != rm.end(); ++itr)
-        {
-            Guild* guild = *itr;
-            RemoveGuild(guild->GetId());
-            delete guild;
-        }
-
-        sLog->outString(">> Validated data of loaded guilds in %u ms", GetMSTimeDiffToNow(oldMSTime));
-        sLog->outString();
+        TC_LOG_INFO("server.loading", ">> Validated data of loaded guilds in %u ms", GetMSTimeDiffToNow(oldMSTime));
     }
 }
 
@@ -525,13 +482,12 @@ void GuildMgr::LoadGuildXpForLevel()
     for (uint8 level = 0; level < sWorld->getIntConfig(CONFIG_GUILD_MAX_LEVEL); ++level)
         GuildXPperLevel[level] = 0;
 
-    //                                                0       1
+    //                                                 0         1
     QueryResult result = WorldDatabase.Query("SELECT lvl, xp_for_next_level FROM guild_xp_for_level");
 
     if (!result)
     {
-        sLog->outString(">> Loaded 0 xp for guild level definitions. DB table `guild_xp_for_level` is empty.");
-        sLog->outString();
+        TC_LOG_ERROR("server.loading", ">> Loaded 0 xp for guild level definitions. DB table `guild_xp_for_level` is empty.");
         return;
     }
 
@@ -541,17 +497,18 @@ void GuildMgr::LoadGuildXpForLevel()
     {
         Field* fields = result->Fetch();
 
-        uint32 level = fields[0].GetUInt32();
-        uint32 requiredXP = fields[1].GetUInt64();
+        uint32 level        = fields[0].GetUInt8();
+        uint32 requiredXP   = fields[1].GetUInt32();
 
         if (level >= sWorld->getIntConfig(CONFIG_GUILD_MAX_LEVEL))
         {
-            sLog->outString("Unused (> Guild.MaxLevel in worldserver.conf) level %u in `guild_xp_for_level` table, ignoring.", uint32(level));
+            TC_LOG_INFO("misc", "Unused (> Guild.MaxLevel in worldserver.conf) level %u in `guild_xp_for_level` table, ignoring.", uint32(level));
             continue;
         }
 
         GuildXPperLevel[level] = requiredXP;
         ++count;
+
     } while (result->NextRow());
 
     // fill level gaps
@@ -559,25 +516,24 @@ void GuildMgr::LoadGuildXpForLevel()
     {
         if (!GuildXPperLevel[level])
         {
-            sLog->outError("Level %i does not have XP for guild level data. Using data of level [%i] + 1660000.", level+1, level);
+            TC_LOG_ERROR("sql.sql", "Level %i does not have XP for guild level data. Using data of level [%i] + 1660000.", level+1, level);
             GuildXPperLevel[level] = GuildXPperLevel[level - 1] + 1660000;
         }
     }
 
-    sLog->outString(">> Loaded %u xp for guild level definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    sLog->outString();
+    TC_LOG_INFO("server.loading", ">> Loaded %u xp for guild level definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 void GuildMgr::LoadGuildRewards()
 {
     uint32 oldMSTime = getMSTime();
 
-                                                 //    0        1        2       3         4
-    QueryResult result = WorldDatabase.Query("SELECT entry, standing, racemask, price, achievement FROM guild_rewards");
+    //                                                 0     1         2         3      4
+    QueryResult result  = WorldDatabase.Query("SELECT entry, standing, racemask, price, achievement FROM guild_rewards");
 
     if (!result)
     {
-        sLog->outError(">> Loaded 0 guild reward definitions. DB table `guild_rewards` is empty.");
+        TC_LOG_ERROR("server.loading", ">> Loaded 0 guild reward definitions. DB table `guild_rewards` is empty.");
         return;
     }
 
@@ -587,27 +543,27 @@ void GuildMgr::LoadGuildRewards()
     {
         GuildReward reward;
         Field* fields = result->Fetch();
-        reward.Entry = fields[0].GetUInt32();
-        reward.Standing = fields[1].GetUInt8();
-        reward.Racemask = fields[2].GetInt32();
-        reward.Price = fields[3].GetUInt64();
+        reward.Entry         = fields[0].GetUInt32();
+        reward.Standing      = fields[1].GetUInt8();
+        reward.Racemask      = fields[2].GetInt32();
+        reward.Price         = fields[3].GetUInt64();
         reward.AchievementId = fields[4].GetUInt32();
 
         if (!sObjectMgr->GetItemTemplate(reward.Entry))
         {
-            sLog->outError("Guild rewards constains not existing item entry %u", reward.Entry);
+            TC_LOG_ERROR("server.loading", "Guild rewards constains not existing item entry %u", reward.Entry);
             continue;
         }
 
-        if (reward.AchievementId != 0 && (!sAchievementStore.LookupEntry(reward.AchievementId)))
+        if (reward.AchievementId != 0 && (!sAchievementMgr->GetAchievement(reward.AchievementId)))
         {
-            sLog->outError("Guild rewards constains not existing achievement entry %u", reward.AchievementId);
+            TC_LOG_ERROR("server.loading", "Guild rewards constains not existing achievement entry %u", reward.AchievementId);
             continue;
         }
 
         if (reward.Standing >= MAX_REPUTATION_RANK)
         {
-            sLog->outError("Guild rewards contains wrong reputation standing %u, max is %u", uint32(reward.Standing), MAX_REPUTATION_RANK - 1);
+            TC_LOG_ERROR("server.loading", "Guild rewards contains wrong reputation standing %u, max is %u", uint32(reward.Standing), MAX_REPUTATION_RANK - 1);
             continue;
         }
 
@@ -615,8 +571,7 @@ void GuildMgr::LoadGuildRewards()
         ++count;
     } while (result->NextRow());
 
-    sLog->outString(">> Loaded %u guild reward definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    sLog->outString();
+    TC_LOG_INFO("server.loading", ">> Loaded %u guild reward definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 void GuildMgr::ResetTimes(bool week)

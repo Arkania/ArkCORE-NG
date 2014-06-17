@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -25,56 +25,14 @@ SDCategory: Mulgore
 EndScriptData */
 
 /* ContentData
-npc_skorn_whitecloud
 npc_kyle_frenzied
 EndContentData */
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-
-
-enum eMulgore
-{
-	NPC_FLEDGLING_BRAVE				= 36942,
-	NPC_BRISTLEBACK_INVADER			= 36943,
-};
-
-/*######
-# npc_skorn_whitecloud
-######*/
-
-#define GOSSIP_SW "Tell me a story, Skorn."
-
-class npc_skorn_whitecloud : public CreatureScript
-{
-public:
-    npc_skorn_whitecloud() : CreatureScript("npc_skorn_whitecloud") { }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
-    {
-        player->PlayerTalkClass->ClearMenus();
-        if (action == GOSSIP_ACTION_INFO_DEF)
-            player->SEND_GOSSIP_MENU(523, creature->GetGUID());
-
-        return true;
-    }
-
-    bool OnGossipHello(Player* player, Creature* creature)
-    {
-        if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
-
-        if (!player->GetQuestRewardStatus(770))
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_SW, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-			 
-
-        player->SEND_GOSSIP_MENU(522, creature->GetGUID());
-
-        return true;
-    }
-
-};
+#include "Player.h"
+#include "SpellInfo.h"
 
 /*#####
 # npc_kyle_frenzied
@@ -82,10 +40,9 @@ public:
 
 enum KyleFrenzied
 {
-    //emote signed for 7780 but propably thats wrong id.
-    EMOTE_SEE_LUNCH         = -1000340,
-    EMOTE_EAT_LUNCH         = -1000341,
-    EMOTE_DANCE             = -1000342,
+    EMOTE_SEE_LUNCH         = 0,
+    EMOTE_EAT_LUNCH         = 1,
+    EMOTE_DANCE             = 2,
 
     SPELL_LUNCH             = 42222,
     NPC_KYLE_FRENZIED       = 23616,
@@ -93,19 +50,25 @@ enum KyleFrenzied
     POINT_ID                = 1
 };
 
+enum eMulgore
+{
+	NPC_FLEDGLING_BRAVE = 36942,
+	NPC_BRISTLEBACK_INVADER = 36943,
+};
+
 class npc_kyle_frenzied : public CreatureScript
 {
 public:
     npc_kyle_frenzied() : CreatureScript("npc_kyle_frenzied") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
         return new npc_kyle_frenziedAI (creature);
     }
 
     struct npc_kyle_frenziedAI : public ScriptedAI
     {
-        npc_kyle_frenziedAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_kyle_frenziedAI(Creature* creature) : ScriptedAI(creature) { }
 
         bool EventActive;
         bool IsMovingToLunch;
@@ -113,7 +76,7 @@ public:
         uint32 EventTimer;
         uint8 EventPhase;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             EventActive = false;
             IsMovingToLunch = false;
@@ -140,21 +103,21 @@ public:
                 }
 
                 EventActive = true;
-                DoScriptText(EMOTE_SEE_LUNCH, me);
+                Talk(EMOTE_SEE_LUNCH);
                 me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_CREATURE_SPECIAL);
             }
         }
 
-        void MovementInform(uint32 Type, uint32 PointId)
+        void MovementInform(uint32 type, uint32 pointId) OVERRIDE
         {
-            if (Type != POINT_MOTION_TYPE || !EventActive)
+            if (type != POINT_MOTION_TYPE || !EventActive)
                 return;
 
-            if (PointId == POINT_ID)
+            if (pointId == POINT_ID)
                 IsMovingToLunch = false;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (EventActive)
             {
@@ -169,7 +132,7 @@ public:
                     switch (EventPhase)
                     {
                         case 1:
-                            if (Unit* unit = Unit::GetUnit(*me, PlayerGUID))
+                            if (Unit* unit = ObjectAccessor::GetUnit(*me, PlayerGUID))
                             {
                                 if (GameObject* go = unit->GetGameObject(SPELL_LUNCH))
                                 {
@@ -179,18 +142,18 @@ public:
                             }
                             break;
                         case 2:
-                            DoScriptText(EMOTE_EAT_LUNCH, me);
+                            Talk(EMOTE_EAT_LUNCH);
                             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_USE_STANDING);
                             break;
                         case 3:
-                            if (Player* unit = Unit::GetPlayer(*me, PlayerGUID))
+                            if (Player* unit = ObjectAccessor::GetPlayer(*me, PlayerGUID))
                                 unit->TalkedToCreature(me->GetEntry(), me->GetGUID());
 
                             me->UpdateEntry(NPC_KYLE_FRIENDLY);
                             break;
                         case 4:
                             EventTimer = 30000;
-                            DoScriptText(EMOTE_DANCE, me);
+                            Talk(EMOTE_DANCE);
                             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_DANCESPECIAL);
                             break;
                         case 5:
@@ -309,9 +272,5 @@ public:
 
 void AddSC_mulgore()
 {
-    new npc_skorn_whitecloud();
     new npc_kyle_frenzied();
-	new npc_fledgling_brave();
-	new npc_bristleback_invader();
-
 }

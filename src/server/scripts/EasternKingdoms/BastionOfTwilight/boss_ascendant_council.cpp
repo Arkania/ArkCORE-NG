@@ -1,17 +1,17 @@
-/*Copyright (C) 2014 Arkania Project.
-*
-* Script done: 95%. ToDo: 
-*
-* - Script remaining spells. See each boss notes on ToDo.
-*
-* This file is NOT free software. Third-party users can NOT redistribute it or modify it :). 
-* If you find it, you are either hacking something, or very lucky (presuming someone else managed to hack it).
-*/
+/*
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ *
+ * Script done: 95%. ToDo: 
+ * - Script remaining spells. See each boss notes on ToDo.
+ *
+ * This file is NOT free software. Third-party users can NOT redistribute 
+ * it or modify it. If you find it, you are either hacking something, or very 
+ * lucky (presuming someone else managed to hack it).
+ */
 
-#include "ScriptPCH.h"
-#include "ObjectMgr.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ObjectMgr.h"
 #include "SpellScript.h"
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
@@ -398,7 +398,7 @@ public:
                 instance->SetData(DATA_ASCENDANT_COUNCIL, FAIL);
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* /*who*/)
         {
             //DoCast(me, SPELL_PACIFY_SELF);
             started = false;
@@ -600,7 +600,7 @@ class boss_feludius : public CreatureScript
             {
                 if (!instance)
                     me->IsAIEnabled = false;
-                else if (!me->IsDead())
+                else if (!me->isDead())
                     Reset();
             }
 
@@ -812,7 +812,7 @@ class boss_ignacious : public CreatureScript
             {
                 if (!instance)
                     me->IsAIEnabled = false;
-                else if (!me->IsDead())
+                else if (!me->isDead())
                     Reset();
             }
 
@@ -1063,7 +1063,7 @@ class boss_arion : public CreatureScript
             {
                 if (!instance)
                     me->IsAIEnabled = false;
-                else if (!me->IsDead())
+                else if (!me->isDead())
                     Reset();
             }
 
@@ -1229,7 +1229,7 @@ class boss_arion : public CreatureScript
                             break;
 
                         case EVENT_LIGHTNING_BLAST:
-                            DoCast(me->GetVictim(), SPELL_LIGHTNING_BLAST);
+                            DoCastVictim(SPELL_LIGHTNING_BLAST);
                             break;
 
                         case EVENT_THUNDERSHOCK:
@@ -1290,7 +1290,7 @@ class boss_terrastra : public CreatureScript
             {
                 if (!instance)
                     me->IsAIEnabled = false;
-                else if (!me->IsDead())
+                else if (!me->isDead())
                     Reset();
             }
 
@@ -1491,7 +1491,7 @@ class boss_monstrosity : public CreatureScript
             {
                 if (!instance)
                     me->IsAIEnabled = false;
-                else if (!me->IsDead())
+                else if (!me->isDead())
                     Reset();
             }
 
@@ -1695,7 +1695,7 @@ class boss_monstrosity : public CreatureScript
 class npc_feludius_waterbomb : public CreatureScript // 44201
 {
     public:
-        npc_feludius_waterbomb() : CreatureScript("npc_feludius_waterbomb") {}
+        npc_feludius_waterbomb() : CreatureScript("npc_feludius_waterbomb") { }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -1741,7 +1741,7 @@ class npc_feludius_waterbomb : public CreatureScript // 44201
 class npc_arion_callwinds : public CreatureScript // 44747
 {
     public:
-        npc_arion_callwinds() : CreatureScript("npc_arion_callwinds") {}
+        npc_arion_callwinds() : CreatureScript("npc_arion_callwinds") { }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -1792,7 +1792,7 @@ class npc_arion_callwinds : public CreatureScript // 44747
 class npc_terrastra_gravitywell : public CreatureScript // 44824
 {
     public:
-        npc_terrastra_gravitywell() : CreatureScript("npc_terrastra_gravitywell") {}
+        npc_terrastra_gravitywell() : CreatureScript("npc_terrastra_gravitywell") { }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -1813,16 +1813,16 @@ class npc_terrastra_gravitywell : public CreatureScript // 44824
 
             InstanceScript* instance;
 
-            void Reset() {}
+            void Reset() { }
 
-            void UpdateAI(uint32 diff) {}
+            void UpdateAI(uint32 /*diff*/) { }
         };
 };
 
 class npc_monstrosity_liquid_ice : public CreatureScript // 45452
 {
     public:
-        npc_monstrosity_liquid_ice() : CreatureScript("npc_monstrosity_liquid_ice") {}
+        npc_monstrosity_liquid_ice() : CreatureScript("npc_monstrosity_liquid_ice") { }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -1872,7 +1872,7 @@ class npc_monstrosity_liquid_ice : public CreatureScript // 45452
 class npc_monstrosity_lava_seed : public CreatureScript // 48538
 {
     public:
-        npc_monstrosity_lava_seed() : CreatureScript("npc_monstrosity_lava_seed") {}
+        npc_monstrosity_lava_seed() : CreatureScript("npc_monstrosity_lava_seed") { }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -1923,7 +1923,7 @@ class npc_monstrosity_lava_seed : public CreatureScript // 48538
 class npc_ignacious_flame_strike : public CreatureScript // 49432
 {
     public:
-        npc_ignacious_flame_strike() : CreatureScript("npc_ignacious_flame_strike") {}
+        npc_ignacious_flame_strike() : CreatureScript("npc_ignacious_flame_strike") { }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -1971,7 +1971,7 @@ class npc_ignacious_flame_strike : public CreatureScript // 49432
 class npc_feludius_frozen_orb : public CreatureScript // 49518
 {
     public:
-        npc_feludius_frozen_orb() : CreatureScript("npc_feludius_frozen_orb") {}
+        npc_feludius_frozen_orb() : CreatureScript("npc_feludius_frozen_orb") { }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -2046,7 +2046,7 @@ public:
     {
         PrepareSpellScript(spell_feludius_waterbombSpellScript);
 
-        bool Validate(SpellEntry const * spellEntry)
+        bool Validate(SpellInfo const* /*spellEntry*/)
         {
             return true;
         }
@@ -2056,7 +2056,7 @@ public:
             return true;
         }
 
-        void HandleDummy(SpellEffIndex effIndex)
+        void HandleDummy(SpellEffIndex /*effIndex*/)
         {
             std::list<Unit*> targets;
             GetCaster()->GetAI()->SelectTargetList(targets, GetCaster()->GetInstanceScript()->instance->Is25ManRaid() ? 5 : 2, SELECT_TARGET_RANDOM, 150.0f, true);
@@ -2103,7 +2103,7 @@ public:
                 SetHitDamage(10000);
         }
 
-        void EffectScriptEffect(SpellEffIndex effIndex)
+        void EffectScriptEffect(SpellEffIndex /*effIndex*/)
         {
             if (GetHitUnit()->HasAura(SPELL_WATERLOGGED))
                 GetCaster()->AddAura(SPELL_FROZEN, GetHitUnit()); // Special info.
@@ -2132,7 +2132,7 @@ public:
     {
         PrepareSpellScript(spell_arion_disperseSpellScript);
 
-        void EffectScriptEffect(SpellEffIndex effIndex)
+        void EffectScriptEffect(SpellEffIndex /*effIndex*/)
         {
                 GetCaster()->CastSpell(GetHitUnit(), SPELL_DISPERSE_TELEPORT, true); // Teleport.
         }

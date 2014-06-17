@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -34,15 +34,14 @@ enum ConnectionFlags
 {
     CONNECTION_ASYNC = 0x1,
     CONNECTION_SYNCH = 0x2,
-    CONNECTION_BOTH = CONNECTION_ASYNC | CONNECTION_SYNCH,
+    CONNECTION_BOTH = CONNECTION_ASYNC | CONNECTION_SYNCH
 };
 
 struct MySQLConnectionInfo
 {
-    MySQLConnectionInfo() {}
-    MySQLConnectionInfo(const std::string& infoString)
+    explicit MySQLConnectionInfo(std::string const& infoString)
     {
-        Tokens tokens(infoString, ';');
+        Tokenizer tokens(infoString, ';');
 
         if (tokens.size() != 5)
             return;
@@ -63,9 +62,7 @@ struct MySQLConnectionInfo
     std::string port_or_socket;
 };
 
-typedef std::map<uint32 /*index*/, std::pair<const char* /*query*/, ConnectionFlags /*sync/async*/> > PreparedStatementMap;
-
-#define PREPARE_STATEMENT(a, b, c) m_queries[a] = std::make_pair(strdup(b), c);
+typedef std::map<uint32 /*index*/, std::pair<std::string /*query*/, ConnectionFlags /*sync/async*/> > PreparedStatementMap;
 
 class MySQLConnection
 {
@@ -135,6 +132,9 @@ class MySQLConnection
         MySQLConnectionInfo&  m_connectionInfo;             //! Connection info (used for logging)
         ConnectionFlags       m_connectionFlags;            //! Connection flags (for preparing relevant statements)
         ACE_Thread_Mutex      m_Mutex;
+
+        MySQLConnection(MySQLConnection const& right) DELETE_MEMBER;
+        MySQLConnection& operator=(MySQLConnection const& right) DELETE_MEMBER;
 };
 
 #endif

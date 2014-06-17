@@ -1,3 +1,11 @@
+/*
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ *
+ * This file is NOT free software. Third-party users can NOT redistribute 
+ * it or modify it. If you find it, you are either hacking something, or very 
+ * lucky (presuming someone else managed to hack it).
+ */
+
 /* ScriptData
 SDName: boss_morchok
 SD%Complete: 70%
@@ -6,7 +14,8 @@ SDCategory: Boss Morchok
 EndScriptData
 */
 
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "dragon_soul.h"
 
 enum Yells
@@ -32,8 +41,8 @@ enum Events
     EVENT_BLACK_BLOOD_OF_THE_EARTH,
     EVENT_FURIOUS,
     EVENT_EARTHER_VORTEX,
-	EVENT_SUMMON_KOHCROM,
-	EVENT_SAY
+    EVENT_SUMMON_KOHCROM,
+    EVENT_SAY
 };
 
 enum Spells
@@ -80,9 +89,9 @@ public:
             events.ScheduleEvent(EVENT_STOMP, 60000);
             events.ScheduleEvent(EVENT_FURIOUS, 3000);
             events.ScheduleEvent(EVENT_BLACK_BLOOD_OF_THE_EARTH, 340000);
-			if(Is25ManRaid())
-				events.ScheduleEvent(EVENT_SUMMON_KOHCROM, 3000);
-			events.ScheduleEvent(EVENT_SAY, 30000);
+            if(Is25ManRaid())
+                events.ScheduleEvent(EVENT_SUMMON_KOHCROM, 3000);
+            events.ScheduleEvent(EVENT_SAY, 30000);
 
             Talk(SAY_AGGRO);
             _EnterCombat();
@@ -100,19 +109,19 @@ public:
                 switch (eventId)
                 {
                 case EVENT_CRUSH_ARMOR:
-		            DoCastVictim(SPELL_CRUSH_ARMOR);
+                    DoCastVictim(SPELL_CRUSH_ARMOR);
                     events.ScheduleEvent(EVENT_CRUSH_ARMOR, urand(5000,15000));
                     break;
 
                 case EVENT_STOMP:
-		            DoCast(SPELL_STOMP);
+                    DoCast(SPELL_STOMP);
                     Talk(SAY_GROUNT1);
                     events.ScheduleEvent(EVENT_STOMP, urand(60000,120000));
                     break;
 
                 case EVENT_BLACK_BLOOD_OF_THE_EARTH:
                     DoCast(me, SPELL_BLACK_BLOOD_OF_THE_EARTH);
-					Talk(SAY_GROUNT2);
+                    Talk(SAY_GROUNT2);
                     events.ScheduleEvent(EVENT_BLACK_BLOOD_OF_THE_EARTH, urand(120000,240000));
                     break;
 
@@ -126,24 +135,24 @@ public:
                         events.ScheduleEvent(EVENT_FURIOUS, 15000);
                     break;
 
-				case EVENT_SAY:
-					switch (urand(0, 1))
-					{
-					case 0:
-						Talk(SAY_EVENT3);
-						break;
-					case 1:
-						Talk(SAY_EVENT4);
-						break;
-					}
-					break;
+                case EVENT_SAY:
+                    switch (urand(0, 1))
+                    {
+                    case 0:
+                        Talk(SAY_EVENT3);
+                        break;
+                    case 1:
+                        Talk(SAY_EVENT4);
+                        break;
+                    }
+                    break;
 
                 case EVENT_SUMMON_KOHCROM:
                     if(me->GetHealthPct() < 90)
                     {
                         DoCastVictim(SPELL_SUMMON_KOHCROM);
                         events.CancelEvent(EVENT_FURIOUS);
-						Talk(SAY_SPLIT);
+                        Talk(SAY_SPLIT);
                     }
                     else
                         events.ScheduleEvent(EVENT_SUMMON_KOHCROM, 15000);
@@ -151,16 +160,15 @@ public:
                 default:
                     break;
                 }
-            }		
+            }
 
             DoMeleeAttackIfReady();
         }
 
-        void KilledUnit(Unit* victim)
-		{
-
+        void KilledUnit(Unit* /*victim*/)
+        {
             Talk(SAY_SLAY);
-		}
+        }
 
         void JustDied(Unit* /*killer*/)
         {
@@ -217,12 +225,12 @@ public:
                 switch (eventId)
                 {
                 case EVENT_CRUSH_ARMOR:
-		            DoCastVictim(SPELL_CRUSH_ARMOR);
+                    DoCastVictim(SPELL_CRUSH_ARMOR);
                     events.ScheduleEvent(EVENT_CRUSH_ARMOR, urand(15000,30000));
                     break;
 
                 case EVENT_STOMP:
-		            DoCast(SPELL_STOMP);
+                    DoCast(SPELL_STOMP);
                     events.ScheduleEvent(EVENT_STOMP, urand(120000,180000));
                     break;
 
@@ -243,7 +251,7 @@ public:
                 default:
                     break;
                 }
-            }		
+            }
 
             DoMeleeAttackIfReady();
         }

@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -20,17 +20,7 @@
 #define TRINITY_DB2STRUCTURE_H
 
 #include "Common.h"
-#include "DBCEnums.h"
-#include "Define.h"
-#include "Path.h"
-#include "Util.h"
-#include "Vehicle.h"
-#include "SharedDefines.h"
 #include "ItemPrototype.h"
-
-#include <map>
-#include <set>
-#include <vector>
 
 // GCC has alternative #pragma pack(N) syntax and old gcc version does not support pack(push, N), also any gcc version does not support it at some platform
 #if defined(__GNUC__)
@@ -99,11 +89,11 @@ struct ItemSparseEntry
     int32      SpellCategory[MAX_ITEM_PROTO_SPELLS];         // 85 - 89
     int32      SpellCategoryCooldown[MAX_ITEM_PROTO_SPELLS]; // 90 - 94
     uint32     Bonding;                                      // 95
-    char*      Name;                                         // 96
-    char*      Name2;                                        // 97
-    char*      Name3;                                        // 98
-    char*      Name4;                                        // 99
-    char*      Description;                                  // 100
+    LocalizedString* Name;                                   // 96
+    LocalizedString* Name2;                                  // 97
+    LocalizedString* Name3;                                  // 98
+    LocalizedString* Name4;                                  // 99
+    LocalizedString* Description;                            // 100
     uint32     PageText;                                     // 101
     uint32     LanguageID;                                   // 102
     uint32     PageMaterial;                                 // 103
@@ -146,7 +136,11 @@ struct ItemExtendedCostEntry
     //uint32    ItemPurchaseGroup;                          // 15
     uint32      RequiredCurrency[MAX_ITEM_EXT_COST_CURRENCIES];// 16-20 required curency id
     uint32      RequiredCurrencyCount[MAX_ITEM_EXT_COST_CURRENCIES];// 21-25 required curency count
-    //uint32    Unknown[5];                               // 26-30
+    uint32      RequiredFactionId;
+    uint32      RequiredFactionStanding;
+    uint32      RequirementFlags;
+    uint32      RequiredGuildLevel;
+    uint32      RequiredAchievement;
 };
 
 #define KEYCHAIN_SIZE   32

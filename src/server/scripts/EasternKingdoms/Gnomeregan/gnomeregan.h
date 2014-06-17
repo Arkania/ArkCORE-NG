@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -19,13 +19,14 @@
 #ifndef DEF_GNOMEREGAN_H
 #define DEF_GNOMEREGAN_H
 
-enum eGameObjects
+enum GameObjectIds
 {
     GO_CAVE_IN_LEFT     = 146085,
-    GO_CAVE_IN_RIGHT    = 146086
+    GO_CAVE_IN_RIGHT    = 146086,
+    GO_RED_ROCKET       = 103820
 };
 
-enum eCreatures
+enum CreatureIds
 {
     NPC_BLASTMASTER_EMI_SHORTFUSE   = 7998,
     NPC_CAVERNDEEP_AMBUSHER         = 6207,
@@ -33,12 +34,12 @@ enum eCreatures
     NPC_CHOMPER                     = 6215
 };
 
-enum eData
+enum Data
 {
     TYPE_EVENT = 1
 };
 
-enum eData64
+enum Data64
 {
     DATA_GO_CAVE_IN_LEFT,
     DATA_GO_CAVE_IN_RIGHT,

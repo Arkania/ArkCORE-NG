@@ -1,7 +1,14 @@
-#include "ScriptPCH.h"
-#include "ObjectMgr.h"
+/*
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ *
+ * This file is NOT free software. Third-party users can NOT redistribute 
+ * it or modify it. If you find it, you are either hacking something, or very 
+ * lucky (presuming someone else managed to hack it).
+ */
+
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ObjectMgr.h"
 #include "SpellScript.h"
 #include "SpellAuraEffects.h"
 #include "WorldPacket.h"
@@ -19,7 +26,7 @@ enum Spells
 class npc_containment_unit : public CreatureScript
 {
     public:
-        npc_containment_unit() : CreatureScript("npc_containment_unit") {}
+        npc_containment_unit() : CreatureScript("npc_containment_unit") { }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -41,7 +48,7 @@ class npc_containment_unit : public CreatureScript
                 RepellentRayTimer = 10000;
             }
 
-            void EnterCombat(Unit* who)
+            void EnterCombat(Unit* /*who*/)
             {
                 RepellentRayTimer = 10000;
             }
@@ -51,7 +58,7 @@ class npc_containment_unit : public CreatureScript
                 if (!UpdateVictim())
                     return;
 
-				if (me->HasUnitState(UNIT_STATE_CASTING))
+                if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
                 if (RepellentRayTimer <= diff)
@@ -70,7 +77,7 @@ class npc_containment_unit : public CreatureScript
 class npc_disciple_of_hate : public CreatureScript
 {
     public:
-        npc_disciple_of_hate() : CreatureScript("npc_disciple_of_hate") {}
+        npc_disciple_of_hate() : CreatureScript("npc_disciple_of_hate") { }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -93,7 +100,7 @@ class npc_disciple_of_hate : public CreatureScript
                 WhirlingBladesTimer = urand(5000, 15000);
             }
 
-            void EnterCombat(Unit* who)
+            void EnterCombat(Unit* /*who*/)
             {
                 WhirlingBladesTimer = urand(5000, 15000);
                 RunThroughTimer = urand(2000, 4000);
@@ -104,7 +111,7 @@ class npc_disciple_of_hate : public CreatureScript
                 if (!UpdateVictim())
                     return;
 
-				if (me->HasUnitState(UNIT_STATE_CASTING))
+                if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
                 if (WhirlingBladesTimer <= diff)
@@ -117,7 +124,7 @@ class npc_disciple_of_hate : public CreatureScript
 
                 if (RunThroughTimer <= diff)
                 {
-                    DoCast(me->GetVictim(), SPELL_RUN_THROUGH);
+                    DoCastVictim(SPELL_RUN_THROUGH);
                     RunThroughTimer = urand(9000, 12000);
                 }
                 else
@@ -131,7 +138,7 @@ class npc_disciple_of_hate : public CreatureScript
 class npc_eye_of_occuthar : public CreatureScript
 {
     public:
-        npc_eye_of_occuthar() : CreatureScript("npc_eye_of_occuthar") {}
+        npc_eye_of_occuthar() : CreatureScript("npc_eye_of_occuthar") { }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -154,7 +161,7 @@ class npc_eye_of_occuthar : public CreatureScript
                 GazeTimer = 1000;
             }
 
-            void EnterCombat(Unit* who)
+            void EnterCombat(Unit* /*who*/)
             {
                 GazeTimer = 1000;
             }
@@ -164,7 +171,7 @@ class npc_eye_of_occuthar : public CreatureScript
                 if (!UpdateVictim())
                     return;
 
-				if (me->HasUnitState(UNIT_STATE_CASTING))
+                if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
                 if (GazeTimer <= diff)
@@ -190,4 +197,3 @@ void AddSC_bh_trash()
     new npc_eye_of_occuthar();
     new npc_disciple_of_hate();
 }
-	

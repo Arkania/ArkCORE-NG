@@ -7,17 +7,22 @@
 
 enum zfEntries
 {
-    ENTRY_ZUMRAH = 7271,
-    ENTRY_BLY = 7604,
-    ENTRY_RAVEN = 7605,
-    ENTRY_ORO = 7606,
-    ENTRY_WEEGLI = 7607,
-    ENTRY_MURTA = 7608,
+    ENTRY_ZUM_RAH       = 7271,
+    ENTRY_BLY           = 7604,
+    ENTRY_RAVEN         = 7605,
+    ENTRY_ORO           = 7606,
+    ENTRY_WEEGLI        = 7607,
+    ENTRY_MURTA         = 7608,
 
-    GO_END_DOOR = 146084,
+    GO_END_DOOR         = 146084,
 
-    EVENT_PYRAMID = 1,
+    EVENT_PYRAMID       = 1,
     EVENT_GAHZRILLA
+};
+
+enum DataTypes
+{
+    DATA_ZUM_RAH = 0
 };
 
 enum zfPyramidPhases
@@ -31,11 +36,6 @@ enum zfPyramidPhases
     PYRAMID_PRE_WAVE_3,
     PYRAMID_WAVE_3,
     PYRAMID_KILLED_ALL_TROLLS,
-};
-
-enum eData
-{
-	DATA_ZUM_RAH,
 };
 
 #endif

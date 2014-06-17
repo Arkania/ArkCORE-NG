@@ -1,9 +1,6 @@
 /*
- *
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
- *
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- *
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -64,9 +61,9 @@ public:
     {
         boss_chrono_lord_dejaAI(Creature* creature) : BossAI(creature, TYPE_CRONO_LORD_DEJA) { }
 
-        void Reset()  { }
+        void Reset() OVERRIDE { }
 
-        void EnterCombat(Unit* /*who*/) 
+        void EnterCombat(Unit* /*who*/) OVERRIDE
         {
             events.ScheduleEvent(EVENT_ARCANE_BLAST, urand(18000, 23000));
             events.ScheduleEvent(EVENT_TIME_LAPSE, urand(10000, 15000));
@@ -77,7 +74,7 @@ public:
             Talk(SAY_AGGRO);
         }
 
-        void MoveInLineOfSight(Unit* who) 
+        void MoveInLineOfSight(Unit* who) OVERRIDE
 
         {
             //Despawn Time Keeper
@@ -93,19 +90,19 @@ public:
             ScriptedAI::MoveInLineOfSight(who);
         }
 
-        void KilledUnit(Unit* /*victim*/) 
+        void KilledUnit(Unit* /*victim*/) OVERRIDE
         {
             Talk(SAY_SLAY);
         }
 
-        void JustDied(Unit* /*killer*/) 
+        void JustDied(Unit* /*killer*/) OVERRIDE
         {
             Talk(SAY_DEATH);
 
             instance->SetData(TYPE_RIFT, SPECIAL);
         }
 
-        void UpdateAI(uint32 diff) 
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (!UpdateVictim())
                 return;
@@ -146,7 +143,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const 
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
         return GetInstanceAI<boss_chrono_lord_dejaAI>(creature);
     }

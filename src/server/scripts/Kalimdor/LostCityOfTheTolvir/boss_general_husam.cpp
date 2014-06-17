@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,9 +15,9 @@
  * You should have received a copy of the GNU General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
- 
- 
-#include "ScriptPCH.h"
+
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "lost_city_of_the_tolvir.h"
 #include "Vehicle.h"
 
@@ -73,12 +73,11 @@ enum ePhases
 
 enum Texts
 {
-    SAY_FINISH                                     = -1877000,
-    SAY_START                                      = -1877001,
-    SAY_CAST_SHOCKVAWE_1                           = -1877002,
-    SAY_CAST_SHOCKVAWE_2                           = -1877003,
-	YELL_KILL_PLAYER_1                             = -1877021,
-	YELL_TREAD_LIGHTLY                             = -1877022,
+    SAY_AGGRO                                      = 0,
+    SAY_TREAD_LIGHTLY                              = 1,
+    SAY_CAST_SHOCKVAWE                             = 2,
+    SAY_DEATH                                      = 3,
+    YELL_KILL_PLAYER                               = 4
 };
 
 class boss_general_husam : public CreatureScript
@@ -129,7 +128,7 @@ public:
             if (instance)
                 instance->SetData(DATA_GENERAL_HUSAM, IN_PROGRESS);
 
-            DoScriptText(SAY_START, me);
+            Talk(SAY_AGGRO);
             events.ScheduleEvent(EVENT_SUMMON_LAND_MINES, 3000);
             // To do: fix client crash
             //events.ScheduleEvent(EVENT_SUMMON_SHOCKWAVE, urand(12000, 17000));
@@ -148,27 +147,24 @@ public:
                 summoned->GetPosition(x, y, z);
                 
                 if (Creature* mine = me->SummonCreature(44796, x, y, z))
-                {
                     mine->EnterVehicle(summoned);
-                    mine->ClearUnitState(UNIT_STATE_ONVEHICLE);
-                }
             }
 
             lSummons.Summon(summoned);
         }
 
-		void KilledUnit(Unit* victim)
-		{
-			if (victim->GetTypeId() == TYPEID_PLAYER)
-				DoScriptText(YELL_KILL_PLAYER_1, me);
-		}
+        void KilledUnit(Unit* victim)
+        {
+            if (victim->GetTypeId() == TYPEID_PLAYER)
+                Talk(YELL_KILL_PLAYER);
+        }
 
         void JustDied(Unit* /*killer*/)
         {
             if (instance)
                 instance->SetData(DATA_GENERAL_HUSAM, DONE);
 
-            DoScriptText(SAY_FINISH, me);
+            Talk(SAY_DEATH);
             lSummons.DespawnAll();
             events.Reset();
         }
@@ -188,7 +184,7 @@ public:
                 switch (eventId)
                 {
                     case EVENT_COUNTDOWN_LAND_MINES:
-						DoScriptText(YELL_TREAD_LIGHTLY, me);
+                        Talk(SAY_TREAD_LIGHTLY);
                         events.ScheduleEvent(EVENT_COUNTDOWN_LAND_MINES, 15000);
                         me->CastSpell(me, SPELL_DETONATE_TRAPS, false);
                         break;
@@ -210,16 +206,15 @@ public:
                         {
                             me->SetReactState(REACT_PASSIVE);
                             me->AttackStop();
-                            DoScriptText(SAY_CAST_SHOCKVAWE_1, me);
-                            DoScriptText(SAY_CAST_SHOCKVAWE_2, me);
+                            Talk(SAY_CAST_SHOCKVAWE);
 
                             float _x, _y, x, y, z, o;
                             me->GetPosition(x, y, z, o);
 
                             for (int i = 0; i < 4; ++i)
                             {
-                                _x = x + 3.0f * cos(o);
-                                _y = y + 3.0f * sin(o);
+                                _x = x + 3.0f * std::cos(o);
+                                _y = y + 3.0f * std::sin(o);
                                 me->SummonCreature(44711, _x, _y, z, o);
                                 o += M_PI / 2;
                             }
@@ -282,7 +277,7 @@ public:
             uiCountdownTimer = urand(20000, 35000);
             me->SetInCombatWithZone();
         }
-        
+
         uint32 uiActivationTimer;
         uint32 uiCountdownTimer;
         uint32 uiDespawnTimer;
@@ -320,7 +315,7 @@ public:
                 StartCountDown();
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell, uint32 /*hitCount*/)
+        void SpellHitTarget(Unit* target, const SpellInfo* spell)
         {
             if (spell->Id == 83112)
             {
@@ -489,7 +484,7 @@ public:
 
     struct npc_bad_intentios_targetAI : public ScriptedAI
     {
-        npc_bad_intentios_targetAI(Creature* creature) : ScriptedAI(creature){}
+        npc_bad_intentios_targetAI(Creature* creature) : ScriptedAI(creature){ }
 
         uint32 uiExitTimer;
         bool Passenger;

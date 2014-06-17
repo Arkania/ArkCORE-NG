@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -167,7 +168,7 @@ enum GuildEvents
     GE_BANK_TAB_PURCHASED               = 19,
     GE_BANK_TAB_UPDATED                 = 20,
     GE_BANK_MONEY_SET                   = 21,
-    GE_BANK_MONEY_CHANGED               = 22,
+    GE_BANK_TAB_AND_MONEY_UPDATED       = 22,
     GE_BANK_TEXT_CHANGED                = 23,
     // 24 - error 795
     GE_SIGNED_ON_MOBILE                 = 25,
@@ -261,7 +262,7 @@ enum GuildNews
 
 enum ChallengesType
 {
-    CHALLENGE_TYPE_NONE                 = 0, //internal use only
+    CHALLENGE_TYPE_NONE                 = 0, // internal use only
     CHALLENGE_TYPE_DUNGEON              = 1,
     CHALLENGE_TYPE_RAID                 = 2,
     CHALLENGE_TYPE_RATEDBG              = 3,
@@ -376,13 +377,15 @@ private:
             m_rankId(rankId),
             m_achievementPoints(0),
             m_totalActivity(0),
-            m_weekActivity(0)
+            m_weekActivity(0),
+            m_totalReputation(0),
+            m_weekReputation(0)
         {
             memset(m_bankWithdraw, 0, (GUILD_BANK_MAX_TABS + 1) * sizeof(int32));
         }
 
         void SetStats(Player* player);
-        void SetStats(std::string const& name, uint8 level, uint8 _class, uint32 zoneId, uint32 accountId);
+        void SetStats(std::string const& name, uint8 level, uint8 _class, uint32 zoneId, uint32 accountId, uint32 reputation);
         bool CheckStats() const;
 
         void SetPublicNote(std::string const& publicNote);
@@ -390,6 +393,7 @@ private:
         void SetZoneId(uint32 id) { m_zoneId = id; }
         void SetAchievementPoints(uint32 val) { m_achievementPoints = val; }
         void SetLevel(uint8 var) { m_level = var; }
+        void AddReputation(uint32& reputation);
         void AddActivity(uint64 activity);
 
         void AddFlag(uint8 var) { m_flags |= var; }
@@ -413,6 +417,9 @@ private:
         uint32 GetAchievementPoints() const { return m_achievementPoints; }
         uint64 GetTotalActivity() const { return m_totalActivity; }
         uint64 GetWeekActivity() const { return m_weekActivity; }
+        uint32 GetTotalReputation() const { return m_totalReputation; }
+        uint32 GetWeekReputation() const { return m_weekReputation; }
+
         bool IsOnline() { return (m_flags & GUILDMEMBER_STATUS_ONLINE); }
 
         void ChangeRank(uint8 newRank);
@@ -448,6 +455,8 @@ private:
         uint32 m_achievementPoints;
         uint64 m_totalActivity;
         uint64 m_weekActivity;
+        uint32 m_totalReputation;
+        uint32 m_weekReputation;
     };
 
     // Base class for event entries
@@ -572,7 +581,7 @@ private:
     class LogHolder
     {
     public:
-        LogHolder(uint32 guildId, uint32 maxRecords) : m_guildId(guildId), m_maxRecords(maxRecords), m_nextGUID(uint32(GUILD_EVENT_LOG_GUID_UNDEFINED)) { }
+        LogHolder(uint32 maxRecords) : m_maxRecords(maxRecords), m_nextGUID(uint32(GUILD_EVENT_LOG_GUID_UNDEFINED)) { }
         ~LogHolder();
 
         uint8 GetSize() const { return uint8(m_log.size()); }
@@ -589,7 +598,6 @@ private:
 
     private:
         GuildLog m_log;
-        uint32 m_guildId;
         uint32 m_maxRecords;
         uint32 m_nextGUID;
     };
@@ -601,7 +609,8 @@ private:
         RankInfo(): m_guildId(0), m_rankId(GUILD_RANK_NONE), m_rights(GR_RIGHT_EMPTY), m_bankMoneyPerDay(0) { }
         RankInfo(uint32 guildId) : m_guildId(guildId), m_rankId(GUILD_RANK_NONE), m_rights(GR_RIGHT_EMPTY), m_bankMoneyPerDay(0) { }
         RankInfo(uint32 guildId, uint8 rankId, std::string const& name, uint32 rights, uint32 money) :
-            m_guildId(guildId), m_rankId(rankId), m_name(name), m_rights(rights), m_bankMoneyPerDay(money) { }
+            m_guildId(guildId), m_rankId(rankId), m_name(name), m_rights(rights),
+            m_bankMoneyPerDay(rankId != GR_GUILDMASTER ? money : GUILD_WITHDRAW_MONEY_UNLIMITED) { }
 
         void LoadFromDB(Field* fields);
         void SaveToDB(SQLTransaction& trans) const;
@@ -769,7 +778,6 @@ private:
     };
 
 public:
-
     typedef std::map<uint32,ChallengeReward> ChallengeRewards;
     typedef std::map<uint32,GuildChallenge> Challenges;
     typedef std::map<uint32,uint32> CompletedChallenges;
@@ -777,7 +785,7 @@ public:
     class ChallengesMgr
     {
         public:
-            ChallengesMgr(Guild* pGuild);
+            ChallengesMgr(Guild* guild);
             ~ChallengesMgr();
 
             void LoadFromDB();
@@ -805,7 +813,6 @@ public:
     };
 
 private:
-
     typedef UNORDERED_MAP<uint32, Member*> Members;
     typedef std::vector<RankInfo> Ranks;
     typedef std::vector<BankTab*> BankTabs;
@@ -833,7 +840,7 @@ public:
     bool SetName(std::string const& name);
 
     // Handle client commands
-    void HandleRoster(WorldSession* session = NULL);
+    void HandleRoster(WorldSession* session);
     void HandleQuery(WorldSession* session);
     void HandleSetMOTD(WorldSession* session, std::string const& motd);
     void HandleSetInfo(WorldSession* session, std::string const& info);
@@ -841,7 +848,7 @@ public:
     void HandleSetNewGuildMaster(WorldSession* session, std::string const& name);
     void HandleSetBankTabInfo(WorldSession* session, uint8 tabId, std::string const& name, std::string const& icon);
     void HandleSetMemberNote(WorldSession* session, std::string const& note, uint64 guid, bool isPublic);
-    void HandleSetRankInfo(WorldSession* session, uint8 rankId, std::string const& name, uint32 rights, uint32 moneyPerDay, GuildBankRightsAndSlotsVec rightsAndSlots);
+    void HandleSetRankInfo(WorldSession* session, uint8 rankId, std::string const& name, uint32 rights, uint32 moneyPerDay, GuildBankRightsAndSlotsVec const& rightsAndSlots);
     void HandleBuyBankTab(WorldSession* session, uint8 tabId);
     void HandleInviteMember(WorldSession* session, std::string const& name);
     void HandleAcceptMember(WorldSession* session);
@@ -870,7 +877,6 @@ public:
     void SendBankTabText(WorldSession* session, uint8 tabId) const;
     void SendPermissions(WorldSession* session) const;
     void SendMoneyInfo(WorldSession* session) const;
-    void SendGuildReputationWeeklyCap(WorldSession* session) const;
     void SendLoginInfo(WorldSession* session);
     void SendNewsUpdate(WorldSession* session);
     void SendUpdateRoster(std::set<Player*> players);
@@ -908,7 +914,7 @@ public:
     // Members
     // Adds member to guild. If rankId == GUILD_RANK_NONE, lowest rank is assigned.
     bool AddMember(uint64 guid, uint8 rankId = GUILD_RANK_NONE);
-    void DeleteMember(uint64 guid, bool isDisbanding = false, bool isKicked = false);
+    void DeleteMember(uint64 guid, bool isDisbanding = false, bool isKicked = false, bool canDeleteGuild = false);
     bool ChangeMemberRank(uint64 guid, uint8 newRank);
     bool IsMember(uint64 guid) const;
     uint32 GetMembersCount() { return m_members.size(); }
@@ -924,26 +930,12 @@ public:
     AchievementMgr<Guild>& GetAchievementMgr() { return m_achievementMgr; }
     AchievementMgr<Guild> const& GetAchievementMgr() const { return m_achievementMgr; }
 
-    // Guild Reputation
-    uint32 GetCharacterReputationGuild(uint32 guid);
-    uint32 GetCharacterReputationGuildRep(uint32 guid);
-    time_t GetCharacterReputationGuildTime(uint32 guid);
-    void GainReputation(uint64 guidid, uint32 rep);
-    void InsertCharacterReputationGuild(uint32 guid, uint32 guildid);
-    void UpdateCharacterReputationGuild(uint32 guildid, uint32 guid);
-    void UpdateDisbandCharacterReputationGuild(uint32 guid);
-    void ResetDisbandCharacterReputationGuild(uint32 guid);
-    void UpdateCharacterReputationGuildRep(uint32 wk_rep, uint32 guid);
-    void UpdateCharacterTotalReputationGuildRep(uint32 total_rep, uint32 guid);
-    uint32 GetCharacterTotalReputationGuildRep(uint32 guid);
-    uint32 GetMaximumWeeklyReputation() const { return sWorld->getIntConfig(CONFIG_GUILD_WEEKLY_REP_CAP); }
-
     // Guild leveling
     uint8 GetLevel() const { return _level; }
     void GiveXP(uint32 xp, Player* source = NULL);
     uint64 GetExperience() const { return _experience; }
     uint64 GetTodayExperience() const { return _todayExperience; }
-    void ResetDailyExperience(); // Reset cap.
+
     void AddGuildNews(uint8 type, uint64 guid, uint32 flags, uint32 value);
 
     void MoveRank(uint32 rankId, uint8 direction);
@@ -1067,6 +1059,7 @@ private:
 
     void _SendBankContentUpdate(MoveItemData* pSrc, MoveItemData* pDest) const;
     void _SendBankContentUpdate(uint8 tabId, SlotIds slots) const;
+    void SendGuildReputationWeeklyCap(WorldSession* session, uint32 reputation) const;
     void SendGuildRanksUpdate(uint64 setterGuid, uint64 targetGuid, uint32 rank);
 
     void _BroadcastEvent(GuildEvents guildEvent, uint64 guid, const char* param1 = NULL, const char* param2 = NULL, const char* param3 = NULL) const;

@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -17,8 +17,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "InstanceScript.h"
 #include "nexus.h"
+#include "Player.h"
 
 #define NUMBER_OF_ENCOUNTERS      4
 
@@ -32,14 +34,14 @@ class instance_nexus : public InstanceMapScript
 public:
     instance_nexus() : InstanceMapScript("instance_nexus", 576) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const OVERRIDE
     {
         return new instance_nexus_InstanceMapScript(map);
     }
 
     struct instance_nexus_InstanceMapScript : public InstanceScript
     {
-        instance_nexus_InstanceMapScript(Map* map) : InstanceScript(map) {}
+        instance_nexus_InstanceMapScript(Map* map) : InstanceScript(map) { }
 
         uint32 m_auiEncounter[NUMBER_OF_ENCOUNTERS];
 
@@ -52,7 +54,7 @@ public:
 
         std::string strInstData;
 
-        void Initialize()
+        void Initialize() OVERRIDE
         {
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
 
@@ -63,7 +65,7 @@ public:
             TelestrasContainmentSphere = 0;
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) OVERRIDE
         {
             Map::PlayerList const &players = instance->GetPlayers();
             uint32 TeamInInstance = 0;
@@ -125,7 +127,7 @@ public:
             }
         }
 
-        void OnGameObjectCreate(GameObject* go)
+        void OnGameObjectCreate(GameObject* go) OVERRIDE
         {
             switch (go->GetEntry())
             {
@@ -153,7 +155,7 @@ public:
             }
         }
 
-        uint32 GetData(uint32 identifier)
+        uint32 GetData(uint32 identifier) const OVERRIDE
         {
             switch (identifier)
             {
@@ -165,7 +167,7 @@ public:
             return 0;
         }
 
-        void SetData(uint32 identifier, uint32 data)
+        void SetData(uint32 identifier, uint32 data) OVERRIDE
         {
             switch (identifier)
             {
@@ -220,7 +222,7 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 uiIdentifier)
+        uint64 GetData64(uint32 uiIdentifier) const OVERRIDE
         {
             switch (uiIdentifier)
             {
@@ -233,7 +235,7 @@ public:
             return 0;
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() OVERRIDE
         {
             return strInstData;
         }

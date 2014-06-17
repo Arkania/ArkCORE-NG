@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -28,7 +28,6 @@ class AuthCrypt
 {
     public:
         AuthCrypt();
-        ~AuthCrypt();
 
         void Init(BigNumber* K);
         void DecryptRecv(uint8 *, size_t);
@@ -42,4 +41,3 @@ class AuthCrypt
         bool _initialized;
 };
 #endif
-

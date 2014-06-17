@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -30,16 +30,17 @@ guard_shattrath_aldor
 guard_shattrath_scryer
 EndContentData */
 
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "GuardAI.h"
+#include "Player.h"
+#include "SpellInfo.h"
 
 enum GuardGeneric
 {
     GENERIC_CREATURE_COOLDOWN       = 5000,
 
-    SAY_GUARD_SIL_AGGRO1            = -1070001,
-    SAY_GUARD_SIL_AGGRO2            = -1070002,
-    SAY_GUARD_SIL_AGGRO3            = -1070003,
+    SAY_GUARD_SIL_AGGRO             = 0,
 
     NPC_CENARION_HOLD_INFANTRY      = 15184,
     NPC_STORMWIND_CITY_GUARD        = 68,
@@ -54,23 +55,23 @@ public:
 
     struct guard_genericAI : public GuardAI
     {
-        guard_genericAI(Creature* creature) : GuardAI(creature) {}
+        guard_genericAI(Creature* creature) : GuardAI(creature) { }
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             globalCooldown = 0;
             buffTimer = 0;
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) OVERRIDE
         {
             if (me->GetEntry() == NPC_CENARION_HOLD_INFANTRY)
-                DoScriptText(RAND(SAY_GUARD_SIL_AGGRO1, SAY_GUARD_SIL_AGGRO2, SAY_GUARD_SIL_AGGRO3), me, who);
+                Talk(SAY_GUARD_SIL_AGGRO, who);
             if (SpellInfo const* spell = me->reachWithSpellAttack(who))
                 DoCast(who, spell->Id);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
              //Always decrease our global cooldown first
             if (globalCooldown > diff)
@@ -106,7 +107,7 @@ public:
                 return;
 
             // Make sure our attack is ready and we arn't currently casting
-            if (me->isAttackReady() && !me->IsNonMeleeSpellCasted(false))
+            if (me->isAttackReady() && !me->IsNonMeleeSpellCast(false))
             {
                 //If we are within range melee the target
                 if (me->IsWithinMeleeRange(me->GetVictim()))
@@ -131,7 +132,7 @@ public:
                         if (healing)
                             DoCast(me, info->Id);
                         else
-                            DoCast(me->GetVictim(), info->Id);
+                            DoCastVictim(info->Id);
 
                         //Set our global cooldown
                         globalCooldown = GENERIC_CREATURE_COOLDOWN;
@@ -145,7 +146,7 @@ public:
             else
             {
                 //Only run this code if we arn't already casting
-                if (!me->IsNonMeleeSpellCasted(false))
+                if (!me->IsNonMeleeSpellCast(false))
                 {
                     bool healing = false;
                     SpellInfo const* info = NULL;
@@ -174,7 +175,7 @@ public:
                         if (healing)
                             DoCast(me, info->Id);
                         else
-                            DoCast(me->GetVictim(), info->Id);
+                            DoCastVictim(info->Id);
 
                         //Set our global cooldown
                         globalCooldown = GENERIC_CREATURE_COOLDOWN;
@@ -197,29 +198,29 @@ public:
             switch (emote)
             {
                 case TEXT_EMOTE_KISS:
-                    me->HandleEmote(EMOTE_ONESHOT_BOW);
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_BOW);
                     break;
 
                 case TEXT_EMOTE_WAVE:
-                    me->HandleEmote(EMOTE_ONESHOT_WAVE);
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_WAVE);
                     break;
 
                 case TEXT_EMOTE_SALUTE:
-                    me->HandleEmote(EMOTE_ONESHOT_SALUTE);
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
                     break;
 
                 case TEXT_EMOTE_SHY:
-                    me->HandleEmote(EMOTE_ONESHOT_FLEX);
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_FLEX);
                     break;
 
                 case TEXT_EMOTE_RUDE:
                 case TEXT_EMOTE_CHICKEN:
-                    me->HandleEmote(EMOTE_ONESHOT_POINT);
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_POINT);
                     break;
             }
         }
 
-        void ReceiveEmote(Player* player, uint32 textEmote)
+        void ReceiveEmote(Player* player, uint32 textEmote) OVERRIDE
         {
             switch (me->GetEntry())
             {
@@ -242,7 +243,7 @@ public:
         uint32 buffTimer;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
        return new guard_genericAI(creature);
     }
@@ -263,9 +264,9 @@ public:
 
     struct guard_shattrath_scryerAI : public GuardAI
     {
-        guard_shattrath_scryerAI(Creature* creature) : GuardAI(creature) {}
+        guard_shattrath_scryerAI(Creature* creature) : GuardAI(creature) { }
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             banishTimer = 5000;
             exileTimer = 8500;
@@ -273,7 +274,7 @@ public:
             canTeleport = false;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (!UpdateVictim())
                 return;
@@ -315,7 +316,7 @@ public:
         bool canTeleport;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
         return new guard_shattrath_scryerAI(creature);
     }
@@ -328,9 +329,9 @@ public:
 
     struct guard_shattrath_aldorAI : public GuardAI
     {
-        guard_shattrath_aldorAI(Creature* creature) : GuardAI(creature) {}
+        guard_shattrath_aldorAI(Creature* creature) : GuardAI(creature) { }
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             banishTimer = 5000;
             exileTimer = 8500;
@@ -338,7 +339,7 @@ public:
             canTeleport = false;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (!UpdateVictim())
                 return;
@@ -379,7 +380,7 @@ public:
         bool canTeleport;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
         return new guard_shattrath_aldorAI(creature);
     }

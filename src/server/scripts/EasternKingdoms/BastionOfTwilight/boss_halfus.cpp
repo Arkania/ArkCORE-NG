@@ -1,15 +1,16 @@
-/*Copyright (C) 2014 Arkania Project.
-*
-* - Script complete: 99%. ToDo: Behemoth flight positions for Flame Barrage.
-*
-* This file is NOT free software. Third-party users can NOT redistribute it or modify it :). 
-* If you find it, you are either hacking something, or very lucky (presuming someone else managed to hack it).
-*/
+/*
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ *
+ * - Script complete: 99%. ToDo: Behemoth flight positions for Flame Barrage.
+ *
+ * This file is NOT free software. Third-party users can NOT redistribute 
+ * it or modify it. If you find it, you are either hacking something, or very 
+ * lucky (presuming someone else managed to hack it).
+ */
 
-#include "ScriptPCH.h"
-#include "ObjectMgr.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ObjectMgr.h"
 #include "SpellScript.h"
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
@@ -109,7 +110,7 @@ enum Creatures
 class boss_halfus : public CreatureScript
 {
     public:
-        boss_halfus() : CreatureScript("boss_halfus") {}
+        boss_halfus() : CreatureScript("boss_halfus") { }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -147,13 +148,13 @@ class boss_halfus : public CreatureScript
                 }
 
                 me->RemoveAllAuras();
-						
+
                 _Reset();
             }
 
             void InitializeAI()
             {
-              if(!me->IsDead())
+              if(!me->isDead())
                 Reset();
             }
 
@@ -175,7 +176,7 @@ class boss_halfus : public CreatureScript
                 _EnterEvadeMode();
             }
 
-            void JustDied(Unit* killer)
+            void JustDied(Unit* /*killer*/)
             {
                 Talk(SAY_DIE);
                 summons.DespawnAll();
@@ -330,7 +331,7 @@ class boss_halfus : public CreatureScript
                 Creature* netherScion  = me->FindNearestCreature(NPC_NETHER_SCION, 500.0f, true);
                 Creature* stormRider   = me->FindNearestCreature(NPC_STORM_RIDER, 500.0f, true);
                 Creature* timeRider    = me->FindNearestCreature(NPC_TIME_RIDER, 500.0f, true);
-                Creature* orphanWhelp  = me->FindNearestCreature(NPC_ORPHANED_WHELP, 500.0f, true);
+                //Creature* orphanWhelp  = me->FindNearestCreature(NPC_ORPHANED_WHELP, 500.0f, true);
 
                 if (!me->GetMap()->IsHeroic()) // 10 possible combinations, 3 drakes randomly selected available.
                 {
@@ -503,7 +504,7 @@ class boss_halfus : public CreatureScript
 class npc_proto_behemoth : public CreatureScript
 {
     public:
-        npc_proto_behemoth() : CreatureScript("npc_proto_behemoth") {}
+        npc_proto_behemoth() : CreatureScript("npc_proto_behemoth") { }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -654,7 +655,7 @@ public:
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         }
 
-        void EnterCombat(Unit* pWho)
+        void EnterCombat(Unit* /*who*/)
         {
             Creature* Halfus = me->FindNearestCreature(NPC_HALFUS_WORMBREAKER, 500.0f, true);
 
@@ -686,7 +687,7 @@ public:
                 Halfus->AddAura(SPELL_DRAGONS_VENGEANCE, Halfus);
         }
 
-        void UpdateAI(uint32 uiDiff)
+        void UpdateAI (uint32 /*diff*/)
         {
             if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                 return;
@@ -804,9 +805,9 @@ public:
             me->GetMotionMaster()->MoveTargetedHome();
         }
 
-        void JustDied(Unit* /*killer*/) {}
+        void JustDied(Unit* /*killer*/) { }
 
-        void UpdateAI(uint32 diff) 
+        void UpdateAI(uint32 /*diff*/) 
         {
             DoMeleeAttackIfReady();
         }
@@ -822,7 +823,7 @@ public:
     {
         PrepareSpellScript(spell_proto_fireballSpellScript);
 
-        bool Validate(SpellEntry const * spellEntry)
+        bool Validate(SpellInfo const* /*spellInfo*/)
         {
             return true;
         }
@@ -832,7 +833,7 @@ public:
             return true;
         }
 
-        void HandleDummy(SpellEffIndex effIndex)
+        void HandleDummy(SpellEffIndex /*effIndex*/)
         {
             if (GetCaster()->HasAura(SPELL_TIME_DILATION))
             {
@@ -867,7 +868,7 @@ public:
     {
         PrepareSpellScript(spell_proto_fireball_barrageSpellScript);
 
-        bool Validate(SpellEntry const * spellEntry)
+        bool Validate(SpellInfo const* /*spellInfo*/)
         {
             return true;
         }
@@ -877,7 +878,7 @@ public:
             return true;
         }
 
-        void HandleDummy(SpellEffIndex effIndex)
+        void HandleDummy(SpellEffIndex /*effIndex*/)
         {
             GetCaster()->CastSpell(GetCaster()->GetVictim(), SPELL_FIREBALL_BARRAGE_DAMAGE_TD, false);
         }

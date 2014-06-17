@@ -1,7 +1,6 @@
-#include "ScriptPCH.h"
-#include "ObjectMgr.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ObjectMgr.h"
 #include "SpellScript.h"
 #include "SpellAuraEffects.h"
 #include "halls_of_origination.h"
@@ -27,7 +26,7 @@ enum Yells
     SAY_SUPERNOVA  = 1,
     SAY_KILL       = 2,
     SAY_DEATH      = 3,
-    SAY_SPLIT      = -1900026,
+    SAY_SPLIT      = 4
 };
 
 enum Spells
@@ -86,18 +85,18 @@ class boss_isiset : public CreatureScript
 
             bool AstralRain, VeilOfSky, CelestialCall;
 
-            void EnterCombat(Unit *who)
+            void EnterCombat(Unit* /*who*/)
             {
                 Talk(SAY_AGGRO);
                 pInstance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me);
             }
 
-            void KilledUnit(Unit* victim)
+            void KilledUnit(Unit* /*victim*/)
             {
                 Talk(SAY_KILL);
             }
 
-            void JustDied(Unit* killer)
+            void JustDied(Unit* /*killer*/)
             {
                 Talk(SAY_DEATH);
                 RemoveSummons();
@@ -185,15 +184,14 @@ class boss_isiset : public CreatureScript
                 if ((me->GetHealth() * 100 / me->GetMaxHealth() <= 66) && Phase == 0)
                 {
                     me->SetPhaseMask(3, true);
-                    DoScriptText(SAY_SPLIT, me);
+                    Talk(SAY_SPLIT);
                     Phase = 1;
                     me->SetReactState(REACT_PASSIVE);
                     Phased = true;
                     AstralRain = true;
                     VeilOfSky = true;
                     CelestialCall = true;
-                    Position pos;
-                    me->GetPosition(&pos);
+                    Position pos = me->GetPosition();
                     me->SummonCreature(39720, pos, TEMPSUMMON_CORPSE_DESPAWN, 1000);
                     me->SummonCreature(39721, pos, TEMPSUMMON_CORPSE_DESPAWN, 1000);
                     me->SummonCreature(39722, pos, TEMPSUMMON_CORPSE_DESPAWN, 1000);
@@ -201,12 +199,11 @@ class boss_isiset : public CreatureScript
 
                 if ((me->GetHealth() * 100 / me->GetMaxHealth() <= 33) && Phase == 1)
                 {
-                    DoScriptText(SAY_SPLIT, me);
+                    Talk(SAY_SPLIT);
                     Phase = 2;
                     me->SetReactState(REACT_PASSIVE);
                     Phased = true;
-                    Position pos;
-                    me->GetPosition(&pos);
+                    Position pos = me->GetPosition();
                     if (AstralRain == false) // Make other two visible again.
                     {
                         me->SummonCreature(39721, pos, TEMPSUMMON_CORPSE_DESPAWN, 1000);
@@ -391,7 +388,7 @@ class boss_isiset : public CreatureScript
                 if (SupernovaTimer <= diff && Phased == false)
                 {
                     Talk(SAY_SUPERNOVA);
-                    DoCast(me->GetVictim(), SPELL_SUPERNOVA);
+                    DoCastVictim(SPELL_SUPERNOVA);
                     SupernovaTimer = urand(25000, 35000);
                 } else SupernovaTimer -= diff;
 
@@ -433,7 +430,7 @@ class spell_isiset_supernova : public SpellScriptLoader
 class npc_celestial_familiar : public CreatureScript
 {
     public:
-        npc_celestial_familiar() : CreatureScript("npc_celestial_familiar") {}
+        npc_celestial_familiar() : CreatureScript("npc_celestial_familiar") { }
 
         CreatureAI* GetAI(Creature* pCreature) const
         {
@@ -455,20 +452,20 @@ class npc_celestial_familiar : public CreatureScript
                 m_uiBarrageTimer = 1000;
             }
 
-            void EnterCombat(Unit* pWho)
+            void EnterCombat(Unit* /*who*/)
             {
                 me->SetDisplayId(25347);
                 me->AddAura(SPELL_FAMILIAR_VISUAL, me);
                 m_uiBarrageTimer = 1000;
             }
 
-            void JustDied(Unit* killer)
+            void JustDied(Unit* /*killer*/)
             {
                 me->RemoveAura(SPELL_FAMILIAR_VISUAL);
                 me->RemoveCorpse(false);
             }
 
-            void UpdateAI(uint32 uiDiff)
+            void UpdateAI(uint32 diff)
             {
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
@@ -476,13 +473,13 @@ class npc_celestial_familiar : public CreatureScript
                 if (!UpdateVictim())
                     return;
 
-                if (m_uiBarrageTimer <= uiDiff)
+                if (m_uiBarrageTimer <= diff)
                 {
-                    DoCast(me->GetVictim(), IsHeroic() ? SPELL_ARCANE_BARRAGE_H : SPELL_ARCANE_BARRAGE);
+                    DoCastVictim(IsHeroic() ? SPELL_ARCANE_BARRAGE_H : SPELL_ARCANE_BARRAGE);
                     m_uiBarrageTimer = urand(2000, 3000);
                 }
                 else
-                    m_uiBarrageTimer -= uiDiff;
+                    m_uiBarrageTimer -= diff;
             }
         };
 };
@@ -490,7 +487,7 @@ class npc_celestial_familiar : public CreatureScript
 class npc_veil_sky : public CreatureScript
 {
     public:
-        npc_veil_sky() : CreatureScript("npc_veil_sky") {}
+        npc_veil_sky() : CreatureScript("npc_veil_sky") { }
 
         CreatureAI* GetAI(Creature* pCreature) const
         {
@@ -515,12 +512,12 @@ class npc_veil_sky : public CreatureScript
                 m_uiVeilSkyTimer = 2000;
             }
 
-            void EnterCombat(Unit* pWho)
+            void EnterCombat(Unit* /*who*/)
             {
                 m_uiVeilSkyTimer = 2000;
             }
             
-            void UpdateAI(uint32 uiDiff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -528,13 +525,13 @@ class npc_veil_sky : public CreatureScript
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
-                if (m_uiVeilSkyTimer <= uiDiff)
+                if (m_uiVeilSkyTimer <= diff)
                 {
                     DoCast(me, IsHeroic() ? SPELL_VEIL_SKY_H : SPELL_VEIL_SKY);
                     m_uiVeilSkyTimer = 60000;
                 }
                 else
-                    m_uiVeilSkyTimer -= uiDiff;
+                    m_uiVeilSkyTimer -= diff;
 
                 DoMeleeAttackIfReady();
             }
@@ -544,7 +541,7 @@ class npc_veil_sky : public CreatureScript
 class npc_celestial_call : public CreatureScript
 {
     public:
-        npc_celestial_call() : CreatureScript("npc_celestial_call") {}
+        npc_celestial_call() : CreatureScript("npc_celestial_call") { }
 
         CreatureAI* GetAI(Creature* pCreature) const
         {
@@ -569,7 +566,7 @@ class npc_celestial_call : public CreatureScript
                 m_uiBarrageTimer = 1000;
             }
 
-            void EnterCombat(Unit* pWho)
+            void EnterCombat(Unit* /*who*/)
             {
                 m_uiBarrageTimer = 1000;
             }
@@ -584,7 +581,7 @@ class npc_celestial_call : public CreatureScript
 
                 if (m_uiBarrageTimer <= uiDiff)
                 {
-                    DoCast(me->GetVictim(), IsHeroic() ? SPELL_ARCANE_BARRAGE_H : SPELL_ARCANE_BARRAGE);
+                    DoCastVictim(IsHeroic() ? SPELL_ARCANE_BARRAGE_H : SPELL_ARCANE_BARRAGE);
                     m_uiBarrageTimer = 2000;
                 }
                 else
@@ -596,7 +593,7 @@ class npc_celestial_call : public CreatureScript
 class npc_astral_rain : public CreatureScript
 {
     public:
-        npc_astral_rain() : CreatureScript("npc_astral_rain") {}
+        npc_astral_rain() : CreatureScript("npc_astral_rain") { }
 
         CreatureAI* GetAI(Creature* pCreature) const
         {
@@ -621,7 +618,7 @@ class npc_astral_rain : public CreatureScript
                 m_uiAstralRainTimer = 2000;
             }
 
-            void EnterCombat(Unit* pWho)
+            void EnterCombat(Unit* /*who*/)
             {
                 m_uiAstralRainTimer = 2000;
             }

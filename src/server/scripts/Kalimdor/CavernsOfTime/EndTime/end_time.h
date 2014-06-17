@@ -1,3 +1,10 @@
+/*
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ *
+ * THIS particular file is NOT free software; third-party users 
+ * should NOT have access to it, redistribute it or modify it. :)
+ */
+
 #ifndef DEF_TIME_END_H
 #define DEF_TIME_END_H
 
@@ -5,7 +12,7 @@ enum Data
 {
     DATA_FIRST_ENCOUNTER,
     DATA_SECOND_ENCOUNTER,
-	DATA_LAST_ENCOUNTER,
+    DATA_LAST_ENCOUNTER,
 
     // Misc
     DATA_JAINA_PICKED_STATE,
@@ -14,10 +21,10 @@ enum Data
 enum Bosses
 {
     BOSS_ECHO_OF_SYLVANAS,
-	BOSS_ECHO_OF_BAINE,
-	BOSS_MUROZOND,
-	BOSS_ECHO_OF_TYRANDE,
-	BOSS_ECHO_OF_JAINA,
+    BOSS_ECHO_OF_BAINE,
+    BOSS_MUROZOND,
+    BOSS_ECHO_OF_TYRANDE,
+    BOSS_ECHO_OF_JAINA,
 };
 
 enum GameObjectIds

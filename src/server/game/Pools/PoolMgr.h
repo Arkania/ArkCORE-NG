@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2005-2009 MaNGOS <http://www.mangosproject.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -35,7 +35,7 @@ struct PoolObject
 {
     uint32  guid;
     float   chance;
-    PoolObject(uint32 _guid, float _chance): guid(_guid), chance(fabs(_chance)) {}
+    PoolObject(uint32 _guid, float _chance): guid(_guid), chance(fabs(_chance)) { }
 };
 
 class Pool                                                  // for Pool of Pool case
@@ -74,7 +74,7 @@ class PoolGroup
     public:
         explicit PoolGroup() : poolId(0) { }
         void SetPoolId(uint32 pool_id) { poolId = pool_id; }
-        ~PoolGroup() {};
+        ~PoolGroup() { };
         bool isEmpty() const { return ExplicitlyChanced.empty() && EqualChanced.empty(); }
         void AddEntry(PoolObject& poolitem, uint32 maxentries);
         bool CheckPool() const;
@@ -109,7 +109,7 @@ class PoolMgr
 
     private:
         PoolMgr();
-        ~PoolMgr() {};
+        ~PoolMgr() { };
 
     public:
         void LoadFromDB();

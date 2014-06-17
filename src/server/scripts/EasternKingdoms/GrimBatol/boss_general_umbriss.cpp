@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -17,13 +17,14 @@
  */
  
 #include "grim_batol.h"
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 
 enum ScriptTexts
 {
-    SAY_AGGRO    = 0,
+    SAY_AGGRO   = 0,
     SAY_KILL    = 1,
-    SAY_ADDS    = 4,
+    SAY_ADDS    = 4
 };
 
 enum Spells
@@ -35,33 +36,33 @@ enum Spells
     SPELL_GROUND_SIEGE_H        = 90249,
     SPELL_BLITZ                 = 74670,
     SPELL_BLITZ_H               = 90250,
-    SPELL_BLITZ_DMG                = 74675,
-    SPELL_BLITZ_DMG_H            = 90251,
+    SPELL_BLITZ_DMG             = 74675,
+    SPELL_BLITZ_DMG_H           = 90251,
     SPELL_FRENZY                = 74853,
     SPELL_CLAW_PUNCTURE         = 76507,
     SPELL_CLAW_PUNCTURE_H       = 90212,
     SPELL_MODGUD_MALICE         = 74699,
     SPELL_MODGUD_MALICE_H       = 90169,
     SPELL_MODGUD_MALICE_AURA    = 90170,
-    SPELL_MODGUD_MALADY            = 74837,
-    SPELL_MODGUD_MALADY_H        = 90179,
+    SPELL_MODGUD_MALADY         = 74837,
+    SPELL_MODGUD_MALADY_H       = 90179
 };
 
 enum Events
 {
-    EVENT_BLEEDING_WOUND     = 1,
-    EVENT_GROUND_SIEGE         = 2,
+    EVENT_BLEEDING_WOUND        = 1,
+    EVENT_GROUND_SIEGE          = 2,
     EVENT_BLITZ                 = 3,
     EVENT_CLAW_PUNCTURE         = 4,
-    EVENT_ADDS                 = 5,
+    EVENT_ADDS                  = 5
 };
 
 enum Adds
 {
     NPC_GROUND_SIEGE_STALKER    = 40030,
-    NPC_BLITZ_STALKER            = 40040,
-    NPC_MALIGNANT_TROGG            = 39984,
-    NPC_TROGG_DWELLER            = 45467,
+    NPC_BLITZ_STALKER           = 40040,
+    NPC_MALIGNANT_TROGG         = 39984,
+    NPC_TROGG_DWELLER           = 45467
 };
 
 const Position troggPos[2]=
@@ -74,7 +75,7 @@ class boss_general_umbriss : public CreatureScript
 {
     public:
 
-        boss_general_umbriss() : CreatureScript("boss_general_umbriss"){}
+        boss_general_umbriss() : CreatureScript("boss_general_umbriss"){ }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -116,7 +117,7 @@ class boss_general_umbriss : public CreatureScript
                 instance->SetData(DATA_GENERAL_UMBRISS, NOT_STARTED);
             }
 
-            void EnterCombat(Unit* who)
+            void EnterCombat(Unit* /*who*/)
             {
                 if (!instance)
                     return;
@@ -129,7 +130,7 @@ class boss_general_umbriss : public CreatureScript
                 instance->SetData(DATA_GENERAL_UMBRISS, IN_PROGRESS);
             }
 
-            void JustDied(Unit* killer)
+            void JustDied(Unit* /*killer*/)
             {
                 if (!instance)
                     return;
@@ -189,7 +190,7 @@ class boss_general_umbriss : public CreatureScript
                     switch(eventId)
                     {
                     case EVENT_BLEEDING_WOUND:
-                        DoCast(me->GetVictim(), SPELL_BLEEDING_WOUND);
+                        DoCastVictim(SPELL_BLEEDING_WOUND);
                         events.ScheduleEvent(EVENT_BLEEDING_WOUND, 25000);
                         break;
                     case EVENT_GROUND_SIEGE:
@@ -238,7 +239,7 @@ class npc_malignant_trogg : public CreatureScript
 {
     public:
 
-        npc_malignant_trogg() : CreatureScript("npc_malignant_trogg"){}
+        npc_malignant_trogg() : CreatureScript("npc_malignant_trogg"){ }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -258,12 +259,12 @@ class npc_malignant_trogg : public CreatureScript
                 DoCast(me, SPELL_MODGUD_MALICE);
             }
 
-            void EnterCombat(Unit* attacker)
+            void EnterCombat(Unit* /*attacker*/)
             {
                 events.ScheduleEvent(EVENT_CLAW_PUNCTURE, 5000);
             }
 
-            void JustDied(Unit* killer)
+            void JustDied(Unit* /*killer*/)
             {
                 DoCast(me, SPELL_MODGUD_MALADY, true);
                 if (IsHeroic())
@@ -285,7 +286,7 @@ class npc_malignant_trogg : public CreatureScript
                     switch(eventId)
                     {
                     case EVENT_CLAW_PUNCTURE:
-                        DoCast(me->GetVictim(), SPELL_CLAW_PUNCTURE);
+                        DoCastVictim(SPELL_CLAW_PUNCTURE);
                         events.ScheduleEvent(EVENT_CLAW_PUNCTURE, urand(5000, 10000));
                         break;
                     }
@@ -299,7 +300,7 @@ class npc_umbriss_trogg_dweller : public CreatureScript
 {
     public:
 
-        npc_umbriss_trogg_dweller() : CreatureScript("npc_umbriss_trogg_dweller"){}
+        npc_umbriss_trogg_dweller() : CreatureScript("npc_umbriss_trogg_dweller"){ }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -314,7 +315,7 @@ class npc_umbriss_trogg_dweller : public CreatureScript
             
             EventMap events;
 
-            void EnterCombat(Unit* attacker)
+            void EnterCombat(Unit* /*attacker*/)
             {
                 events.ScheduleEvent(EVENT_CLAW_PUNCTURE, 5000);
             }
@@ -334,7 +335,7 @@ class npc_umbriss_trogg_dweller : public CreatureScript
                     switch(eventId)
                     {
                     case EVENT_CLAW_PUNCTURE:
-                        DoCast(me->GetVictim(), SPELL_CLAW_PUNCTURE);
+                        DoCastVictim(SPELL_CLAW_PUNCTURE);
                         events.ScheduleEvent(EVENT_CLAW_PUNCTURE, urand(5000, 10000));
                         break;
                     }

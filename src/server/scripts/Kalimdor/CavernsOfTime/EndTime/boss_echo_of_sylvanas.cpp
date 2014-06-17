@@ -1,19 +1,18 @@
-/*Copyright (C) 2014 Arkania Project.
-*
-* Script 95% done. TODO:
-*
-* - Live Testing needed.
-*
-* THIS particular file is NOT free software; third-party users should NOT have access to it, redistribute it or modify it. :)
-*/
+/*
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ *
+ * Script 95% done. TODO:
+ * - Live Testing needed.
+ *
+ * THIS particular file is NOT free software; third-party users 
+ * should NOT have access to it, redistribute it or modify it. :)
+ */
 
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "end_time.h"
 #include "Vehicle.h"
 #include "Unit.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
 #include "ScriptedEscortAI.h"
 #include "Cell.h"
 #include "CellImpl.h"
@@ -55,10 +54,10 @@ class boss_echo_of_sylvanas : public CreatureScript
         {
             boss_echo_of_sylvanasAI(Creature* creature) : BossAI(creature, BOSS_ECHO_OF_SYLVANAS)
             {
-				instance = me->GetInstanceScript();
+                instance = me->GetInstanceScript();
             }
 
-			InstanceScript* instance;
+            InstanceScript* instance;
 
             void Reset()
             {
@@ -67,13 +66,15 @@ class boss_echo_of_sylvanas : public CreatureScript
                     instance->SetBossState(BOSS_ECHO_OF_SYLVANAS, NOT_STARTED);
             }
 
-            void JustDied(Unit* killer)
+            void JustDied(Unit* /*killer*/)
             {
-               if (instance)
-				 if (instance->GetData(DATA_FIRST_ENCOUNTER) == IN_PROGRESS)
-				  instance->SetData(DATA_FIRST_ENCOUNTER, DONE);
-				 else  
-				  instance->SetData(DATA_SECOND_ENCOUNTER, DONE);
+                if (instance)
+                {
+                    if (instance->GetData(DATA_FIRST_ENCOUNTER) == IN_PROGRESS)
+                        instance->SetData(DATA_FIRST_ENCOUNTER, DONE);
+                    else  
+                        instance->SetData(DATA_SECOND_ENCOUNTER, DONE);
+                }
             }
 
             void EnterCombat(Unit* /*who*/)
@@ -94,11 +95,11 @@ class boss_echo_of_sylvanas : public CreatureScript
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
-                while (uint32 eventId = events.ExecuteEvent())
+                while (/*uint32 eventId = */events.ExecuteEvent())
                 {
                     // switch (eventId)
                     // {
-					//	case EVENT_ROCK_SHARDS:
+                    //    case EVENT_ROCK_SHARDS:
                     //        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
                     //            DoCast(target, SPELL_ROCK_SHARDS);
                     //        events.ScheduleEvent(EVENT_ROCK_SHARDS, 15000);

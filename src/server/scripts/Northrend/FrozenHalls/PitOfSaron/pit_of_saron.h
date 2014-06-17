@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -16,11 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef DEF_PIT_OF_SARON_H
-#define DEF_PIT_OF_SARON_H
+#ifndef PIT_OF_SARON_H_
+#define PIT_OF_SARON_H_
 
 #define PoSScriptName "instance_pit_of_saron"
-#define MAX_ENCOUNTER 3
+
+uint32 const EncounterCount = 3;
 
 enum DataTypes
 {
@@ -35,7 +36,7 @@ enum DataTypes
     DATA_JAINA_SYLVANAS_1   = 5,    // GUID of either Jaina or Sylvanas part 1, depending on team, as it's the same spawn.
     DATA_JAINA_SYLVANAS_2   = 6,    // GUID of either Jaina or Sylvanas part 2, depending on team, as it's the same spawn.
     DATA_TYRANNUS_EVENT     = 7,
-    DATA_TEAM_IN_INSTANCE   = 8,
+    DATA_TEAM_IN_INSTANCE   = 8
 };
 
 enum CreatureIds
@@ -92,7 +93,13 @@ enum GameObjectIds
 {
     GO_SARONITE_ROCK                            = 196485,
     GO_ICE_WALL                                 = 201885,
-    GO_HALLS_OF_REFLECTION_PORTCULLIS           = 201848,
+    GO_HALLS_OF_REFLECTION_PORTCULLIS           = 201848
 };
 
-#endif
+template<class AI>
+AI* GetPitOfSaronAI(Creature* creature)
+{
+    return GetInstanceAI<AI>(creature, PoSScriptName);
+}
+
+#endif // PIT_OF_SARON_H_

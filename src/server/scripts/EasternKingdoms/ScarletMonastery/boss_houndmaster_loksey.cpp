@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -24,11 +24,16 @@ SDComment:
 SDCategory: Scarlet Monastery
 EndScriptData */
 
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 
-enum eEnums
+enum Yells
 {
-    SAY_AGGRO                       = -1189021,
+    SAY_AGGRO                       = 0,
+};
+
+enum Spells
+{
     SPELL_SUMMONSCARLETHOUND        = 17164,
     SPELL_BLOODLUST                 = 6742
 };
@@ -38,28 +43,28 @@ class boss_houndmaster_loksey : public CreatureScript
 public:
     boss_houndmaster_loksey() : CreatureScript("boss_houndmaster_loksey") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new boss_houndmaster_lokseyAI (creature);
+        return new boss_houndmaster_lokseyAI(creature);
     }
 
     struct boss_houndmaster_lokseyAI : public ScriptedAI
     {
-        boss_houndmaster_lokseyAI(Creature* creature) : ScriptedAI(creature) {}
+        boss_houndmaster_lokseyAI(Creature* creature) : ScriptedAI(creature) { }
 
         uint32 BloodLust_Timer;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             BloodLust_Timer = 20000;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) OVERRIDE
         {
-            DoScriptText(SAY_AGGRO, me);
+            Talk(SAY_AGGRO);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (!UpdateVictim())
                 return;

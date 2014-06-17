@@ -1,20 +1,21 @@
 /*
-* Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
-* Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
-*
-* This program is free software; you can redistribute it and/or modify it
-* under the terms of the GNU General Public License as published by the
-* Free Software Foundation; either version 2 of the License, or (at your
-* option) any later version.
-*
-* This program is distributed in the hope that it will be useful, but WITHOUT
-* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-* FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
-* more details.
-*
-* You should have received a copy of the GNU General Public License along
-* with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
+ * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation; either version 2 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #ifndef TRINITY_OBJECTDEFINES_H
 #define TRINITY_OBJECTDEFINES_H
@@ -23,20 +24,21 @@
 
 enum HighGuid
 {
-    HIGHGUID_ITEM          = 0x400,  // blizz 4000
-    HIGHGUID_CONTAINER     = 0x400,  // blizz 4000
-    HIGHGUID_PLAYER        = 0x000,  // blizz 0000
-    HIGHGUID_GAMEOBJECT    = 0xF11,  // blizz F110
-    HIGHGUID_TRANSPORT     = 0xF12,  // blizz F120 (for GAMEOBJECT_TYPE_TRANSPORT)
-    HIGHGUID_UNIT          = 0xF13,  // blizz F130
-    HIGHGUID_PET           = 0xF14,  // blizz F140
-    HIGHGUID_VEHICLE       = 0xF15,  // blizz F550
-    HIGHGUID_DYNAMICOBJECT = 0xF10,  // blizz F100
-    HIGHGUID_CORPSE        = 0xF101, // blizz F100
-    HIGHGUID_BATTLEGROUND  = 0x1F1,  // new 4.x
-    HIGHGUID_MO_TRANSPORT  = 0x1FC,  // blizz 1FC0 (for GAMEOBJECT_TYPE_MO_TRANSPORT)
-    HIGHGUID_GROUP         = 0x1F5,
-    HIGHGUID_GUILD         = 0x1FF   // new 4.x
+    HIGHGUID_ITEM           = 0x400,                       // blizz 4000
+    HIGHGUID_CONTAINER      = 0x400,                       // blizz 4000
+    HIGHGUID_PLAYER         = 0x000,                       // blizz 0000
+    HIGHGUID_GAMEOBJECT     = 0xF11,                       // blizz F110
+    HIGHGUID_TRANSPORT      = 0xF12,                       // blizz F120 (for GAMEOBJECT_TYPE_TRANSPORT)
+    HIGHGUID_UNIT           = 0xF13,                       // blizz F130
+    HIGHGUID_PET            = 0xF14,                       // blizz F140
+    HIGHGUID_VEHICLE        = 0xF15,                       // blizz F550
+    HIGHGUID_DYNAMICOBJECT  = 0xF10,                       // blizz F100
+    HIGHGUID_CORPSE         = 0xF101,                      // blizz F100
+    HIGHGUID_AREATRIGGER    = 0xF102,                      // blizz F100
+    HIGHGUID_BATTLEGROUND   = 0x1F1,                       // new 4.x
+    HIGHGUID_MO_TRANSPORT   = 0x1FC,                       // blizz 1FC0 (for GAMEOBJECT_TYPE_MO_TRANSPORT)
+    HIGHGUID_GROUP          = 0x1F5,
+    HIGHGUID_GUILD          = 0x1FF                        // new 4.x
 };
 
 // used for creating values for respawn for example
@@ -64,13 +66,14 @@ inline bool IS_CORPSE_GUID(uint64 guid);
 inline bool IS_TRANSPORT_GUID(uint64 guid);
 inline bool IS_MO_TRANSPORT_GUID(uint64 guid);
 inline bool IS_GROUP_GUID(uint64 guid);
+inline bool IS_AREATRIGGER_GUID(uint64 guid);
 
 // l - OBJECT_FIELD_GUID
 // e - OBJECT_FIELD_ENTRY for GO (except GAMEOBJECT_TYPE_MO_TRANSPORT) and creatures or UNIT_FIELD_PETNUMBER for pets
 // h - OBJECT_FIELD_GUID + 1
 inline uint64 MAKE_NEW_GUID(uint32 l, uint32 e, uint32 h);
 
-//#define GUID_HIPART(x) (uint32)((uint64(x) >> 52)) & 0x0000FFFF)
+//#define GUID_HIPART(x)   (uint32)((uint64(x) >> 52)) & 0x0000FFFF)
 inline uint32 GUID_HIPART(uint64 guid);
 inline uint32 GUID_ENPART(uint64 x);
 inline uint32 GUID_LOPART(uint64 x);
@@ -193,15 +196,20 @@ bool IS_GROUP_GUID(uint64 guid)
     return GUID_HIPART(guid) == HIGHGUID_GROUP;
 }
 
+bool IS_AREATRIGGER_GUID(uint64 guid)
+{
+    return GUID_HIPART(guid) == HIGHGUID_AREATRIGGER;
+}
+
 uint64 MAKE_NEW_GUID(uint32 l, uint32 e, uint32 h)
 {
-    return uint64(uint64(l) | (uint64(e) << 32) | (uint64(h) << ((h == HIGHGUID_CORPSE) ? 48 : 52)));
+    return uint64(uint64(l) | (uint64(e) << 32) | (uint64(h) << ((h == HIGHGUID_CORPSE || h == HIGHGUID_AREATRIGGER) ? 48 : 52)));
 }
 
 uint32 GUID_HIPART(uint64 guid)
 {
     uint32 t = ((uint64(guid) >> 48) & 0x0000FFFF);
-    return (t == HIGHGUID_CORPSE) ? t : ((t >> 4) & 0x00000FFF);
+    return (t == HIGHGUID_CORPSE || t == HIGHGUID_AREATRIGGER) ? t : ((t >> 4) & 0x00000FFF);
 }
 
 uint32 GUID_ENPART(uint64 x)
@@ -234,6 +242,7 @@ bool IsGuidHaveEnPart(uint64 guid)
         case HIGHGUID_PET:
         case HIGHGUID_VEHICLE:
         case HIGHGUID_MO_TRANSPORT:
+        case HIGHGUID_AREATRIGGER:
         default:
             return true;
     }
@@ -243,18 +252,19 @@ char const* GetLogNameForGuid(uint64 guid)
 {
     switch (GUID_HIPART(guid))
     {
-        case HIGHGUID_ITEM: return "item";
-        case HIGHGUID_PLAYER: return guid ? "player" : "none";
-        case HIGHGUID_GAMEOBJECT: return "gameobject";
-        case HIGHGUID_TRANSPORT: return "transport";
-        case HIGHGUID_UNIT: return "creature";
-        case HIGHGUID_PET: return "pet";
-        case HIGHGUID_VEHICLE: return "vehicle";
+        case HIGHGUID_ITEM:         return "item";
+        case HIGHGUID_PLAYER:       return guid ? "player" : "none";
+        case HIGHGUID_GAMEOBJECT:   return "gameobject";
+        case HIGHGUID_TRANSPORT:    return "transport";
+        case HIGHGUID_UNIT:         return "creature";
+        case HIGHGUID_PET:          return "pet";
+        case HIGHGUID_VEHICLE:      return "vehicle";
         case HIGHGUID_DYNAMICOBJECT:return "dynobject";
-        case HIGHGUID_CORPSE: return "corpse";
+        case HIGHGUID_CORPSE:       return "corpse";
         case HIGHGUID_MO_TRANSPORT: return "mo_transport";
-        case HIGHGUID_GROUP: return "group";
-        case HIGHGUID_GUILD: return "guild";
+        case HIGHGUID_GROUP:        return "group";
+        case HIGHGUID_GUILD:        return "guild";
+        case HIGHGUID_AREATRIGGER:  return "areatrigger";
         default:
             return "<unknown>";
     }

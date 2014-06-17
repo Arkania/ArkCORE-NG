@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -23,6 +23,7 @@ Field::Field()
     data.value = NULL;
     data.type = MYSQL_TYPE_NULL;
     data.length = 0;
+    data.raw = false;
 }
 
 Field::~Field()
@@ -35,7 +36,7 @@ void Field::SetByteValue(const void* newValue, const size_t newSize, enum_field_
     if (data.value)
         CleanUp();
 
-    // This value stores raw bytes that have to be explicitly casted later
+    // This value stores raw bytes that have to be explicitly cast later
     if (newValue)
     {
         data.value = new char[newSize];

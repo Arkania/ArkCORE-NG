@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -20,33 +20,42 @@
 /* ScriptData
 SDName: Westfall
 SD%Complete: 90
-SDComment: Quest support: 155, 1651
+SDComment: Quest support: 1651
 SDCategory: Westfall
 EndScriptData */
 
 /* ContentData
 npc_daphne_stilwell
-npc_defias_traitor
 EndContentData */
 
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
+#include "Player.h"
 
 /*######
 ## npc_daphne_stilwell
 ######*/
 
-enum eEnums
+enum DaphneStilwell
 {
-    SAY_DS_START        = -1000293,
-    SAY_DS_DOWN_1       = -1000294,
-    SAY_DS_DOWN_2       = -1000295,
-    SAY_DS_DOWN_3       = -1000296,
-    SAY_DS_PROLOGUE     = -1000297,
+    // Yells
+    SAY_DS_START        = 0,
+    SAY_DS_DOWN_1       = 1,
+    SAY_DS_DOWN_2       = 2,
+    SAY_DS_DOWN_3       = 3,
+    SAY_DS_PROLOGUE     = 4,
 
+    // Spells
     SPELL_SHOOT         = 6660,
+
+    // Quests
     QUEST_TOME_VALOR    = 1651,
+
+    // Creatures
     NPC_DEFIAS_RAIDER   = 6180,
+
+    // Equips
     EQUIP_ID_RIFLE      = 2511
 };
 
@@ -55,11 +64,11 @@ class npc_daphne_stilwell : public CreatureScript
 public:
     npc_daphne_stilwell() : CreatureScript("npc_daphne_stilwell") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest) OVERRIDE
     {
         if (quest->GetQuestId() == QUEST_TOME_VALOR)
         {
-            DoScriptText(SAY_DS_START, creature);
+            creature->AI()->Talk(SAY_DS_START);
 
             if (npc_escortAI* pEscortAI = CAST_AI(npc_daphne_stilwell::npc_daphne_stilwellAI, creature->AI()))
                 pEscortAI->Start(true, true, player->GetGUID());
@@ -68,32 +77,32 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
         return new npc_daphne_stilwellAI(creature);
     }
 
     struct npc_daphne_stilwellAI : public npc_escortAI
     {
-        npc_daphne_stilwellAI(Creature* creature) : npc_escortAI(creature) {}
+        npc_daphne_stilwellAI(Creature* creature) : npc_escortAI(creature) { }
 
         uint32 uiWPHolder;
         uint32 uiShootTimer;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             if (HasEscortState(STATE_ESCORT_ESCORTING))
             {
                 switch (uiWPHolder)
                 {
                     case 7:
-                        DoScriptText(SAY_DS_DOWN_1, me);
+                        Talk(SAY_DS_DOWN_1);
                         break;
                     case 8:
-                        DoScriptText(SAY_DS_DOWN_2, me);
+                        Talk(SAY_DS_DOWN_2);
                         break;
                     case 9:
-                        DoScriptText(SAY_DS_DOWN_3, me);
+                        Talk(SAY_DS_DOWN_3);
                         break;
                 }
             }
@@ -103,7 +112,7 @@ public:
             uiShootTimer = 0;
         }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) OVERRIDE
         {
             Player* player = GetPlayerForEscort();
             if (!player)
@@ -116,7 +125,7 @@ public:
                 case 4:
                     SetEquipmentSlots(false, EQUIP_NO_CHANGE, EQUIP_NO_CHANGE, EQUIP_ID_RIFLE);
                     me->SetSheath(SHEATH_STATE_RANGED);
-                    me->HandleEmote(EMOTE_STATE_USE_STANDING_NO_SHEATHE);
+                    me->HandleEmoteCommand(EMOTE_STATE_USE_STANDING_NO_SHEATHE);
                     break;
                 case 7:
                     me->SummonCreature(NPC_DEFIAS_RAIDER, -11450.836f, 1569.755f, 54.267f, 4.230f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
@@ -142,12 +151,12 @@ public:
                     SetRun(false);
                     break;
                 case 11:
-                    DoScriptText(SAY_DS_PROLOGUE, me);
+                    Talk(SAY_DS_PROLOGUE);
                     break;
                 case 13:
                     SetEquipmentSlots(true);
                     me->SetSheath(SHEATH_STATE_UNARMED);
-                    me->HandleEmote(EMOTE_STATE_USE_STANDING_NO_SHEATHE);
+                    me->HandleEmoteCommand(EMOTE_STATE_USE_STANDING_NO_SHEATHE);
                     break;
                 case 17:
                     player->GroupEventHappens(QUEST_TOME_VALOR, me);
@@ -155,7 +164,7 @@ public:
             }
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) OVERRIDE
         {
             if (!who)
                 return;
@@ -170,7 +179,7 @@ public:
             }
         }
 
-        void JustSummoned(Creature* summoned)
+        void JustSummoned(Creature* summoned) OVERRIDE
         {
             summoned->AI()->AttackStart(me);
         }
@@ -187,83 +196,13 @@ public:
                 uiShootTimer = 1500;
 
                 if (!me->IsWithinDist(me->GetVictim(), ATTACK_DISTANCE))
-                    DoCast(me->GetVictim(), SPELL_SHOOT);
+                    DoCastVictim(SPELL_SHOOT);
             } else uiShootTimer -= diff;
         }
-    };
-};
-
-/*######
-## npc_defias_traitor
-######*/
-
-#define SAY_START                   -1000101
-#define SAY_PROGRESS                -1000102
-#define SAY_END                     -1000103
-#define SAY_AGGRO_1                 -1000104
-#define SAY_AGGRO_2                 -1000105
-
-#define QUEST_DEFIAS_BROTHERHOOD    155
-
-class npc_defias_traitor : public CreatureScript
-{
-public:
-    npc_defias_traitor() : CreatureScript("npc_defias_traitor") { }
-
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
-    {
-        if (quest->GetQuestId() == QUEST_DEFIAS_BROTHERHOOD)
-        {
-            if (npc_escortAI* pEscortAI = CAST_AI(npc_defias_traitor::npc_defias_traitorAI, creature->AI()))
-                pEscortAI->Start(true, true, player->GetGUID());
-
-            DoScriptText(SAY_START, creature, player);
-        }
-
-        return true;
-    }
-
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new npc_defias_traitorAI(creature);
-    }
-
-    struct npc_defias_traitorAI : public npc_escortAI
-    {
-        npc_defias_traitorAI(Creature* creature) : npc_escortAI(creature) { Reset(); }
-
-        void WaypointReached(uint32 waypointId)
-        {
-            Player* player = GetPlayerForEscort();
-            if (!player)
-                return;
-
-            switch (waypointId)
-            {
-                case 35:
-                    SetRun(false);
-                    break;
-                case 36:
-                    DoScriptText(SAY_PROGRESS, me, player);
-                    break;
-                case 44:
-                    DoScriptText(SAY_END, me, player);
-                    player->GroupEventHappens(QUEST_DEFIAS_BROTHERHOOD, me);
-                    break;
-            }
-        }
-
-        void EnterCombat(Unit* who)
-        {
-            DoScriptText(RAND(SAY_AGGRO_1, SAY_AGGRO_2), me, who);
-        }
-
-        void Reset() {}
     };
 };
 
 void AddSC_westfall()
 {
     new npc_daphne_stilwell();
-    new npc_defias_traitor();
 }

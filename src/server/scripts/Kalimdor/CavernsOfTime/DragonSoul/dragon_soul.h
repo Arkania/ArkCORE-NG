@@ -1,3 +1,11 @@
+/*
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ *
+ * This file is NOT free software. Third-party users can NOT redistribute 
+ * it or modify it. If you find it, you are either hacking something, or very 
+ * lucky (presuming someone else managed to hack it).
+ */
+
 #ifndef DRAGON_SOUL_H_
 #define DRAGON_SOUL_H_
 
@@ -31,14 +39,14 @@ enum Data
 
 enum GameObject_
 {
-	GO_ULTRAXION_LOOT_10N = 210160,
-	GO_ULTRAXION_LOOT_25N = 210161,
-	GO_ULTRAXION_LOOT_10H = 210162,
-	GO_ULTRAXION_LOOT_25H = 210163,
-	GO_DEATHWING_LOOT_10N = 209894,
-	GO_DEATHWING_LOOT_25N = 209895,
-	GO_DEATHWING_LOOT_10H = 209896,
-	GO_DEATHWING_LOOT_25H = 209897,
+    GO_ULTRAXION_LOOT_10N = 210160,
+    GO_ULTRAXION_LOOT_25N = 210161,
+    GO_ULTRAXION_LOOT_10H = 210162,
+    GO_ULTRAXION_LOOT_25H = 210163,
+    GO_DEATHWING_LOOT_10N = 209894,
+    GO_DEATHWING_LOOT_25N = 209895,
+    GO_DEATHWING_LOOT_10H = 209896,
+    GO_DEATHWING_LOOT_25H = 209897,
 };
 
 enum Spell_aspect

@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -82,9 +83,14 @@ class boss_wrath_scryer_soccothrates : public CreatureScript
 
         struct boss_wrath_scryer_soccothratesAI : public BossAI
         {
-            boss_wrath_scryer_soccothratesAI(Creature* creature) : BossAI(creature, DATA_SOCCOTHRATES) { }
+            boss_wrath_scryer_soccothratesAI(Creature* creature) : BossAI(creature, DATA_SOCCOTHRATES)
+            {
+                preFight = false;
+                dalliahTaunt = false;
+                dalliahDeath = false;
+            }
 
-            void Reset() 
+            void Reset() OVERRIDE
             {
                 _Reset();
                 preFight = false;
@@ -93,7 +99,7 @@ class boss_wrath_scryer_soccothrates : public CreatureScript
                 DoCast(me, SPELL_FEL_IMMOLATION);
             }
 
-            void JustDied(Unit* /*killer*/) 
+            void JustDied(Unit* /*killer*/) OVERRIDE
             {
                 _JustDied();
                 Talk(SAY_DEATH);
@@ -103,7 +109,7 @@ class boss_wrath_scryer_soccothrates : public CreatureScript
                         dalliah->AI()->SetData(1, 1);
             }
 
-            void EnterCombat(Unit* /*who*/) 
+            void EnterCombat(Unit* /*who*/) OVERRIDE
             {
                 _EnterCombat();
                 events.ScheduleEvent(EVENT_FELFIRE_SHOCK, urand(12000, 14000));
@@ -113,12 +119,12 @@ class boss_wrath_scryer_soccothrates : public CreatureScript
                 preFight = false;
             }
 
-            void KilledUnit(Unit* /*victim*/) 
+            void KilledUnit(Unit* /*victim*/) OVERRIDE
             {
                 Talk(SAY_SLAY);
             }
 
-            void MoveInLineOfSight(Unit* who) 
+            void MoveInLineOfSight(Unit* who) OVERRIDE
             {
                 if (instance->GetData(DATA_CONVERSATION) == NOT_STARTED && who->GetTypeId() == TYPEID_PLAYER && me->IsWithinDistInMap(who, 70.0f))
                 {
@@ -130,7 +136,7 @@ class boss_wrath_scryer_soccothrates : public CreatureScript
                 }
             }
 
-            void SetData(uint32 /*type*/, uint32 data) 
+            void SetData(uint32 /*type*/, uint32 data) OVERRIDE
             {
                 switch (data)
                 {
@@ -143,7 +149,7 @@ class boss_wrath_scryer_soccothrates : public CreatureScript
                 }
             }
 
-            void UpdateAI(uint32 diff) 
+            void UpdateAI(uint32 diff) OVERRIDE
             {
                 if (!UpdateVictim())
                 {
@@ -271,9 +277,9 @@ class boss_wrath_scryer_soccothrates : public CreatureScript
             bool dalliahDeath;
         };
 
-        CreatureAI* GetAI(Creature* creature) const 
+        CreatureAI* GetAI(Creature* creature) const OVERRIDE
         {
-            return GetInstanceAI<boss_wrath_scryer_soccothratesAI>(creature);
+            return GetArcatrazAI<boss_wrath_scryer_soccothratesAI>(creature);
         }
 };
 

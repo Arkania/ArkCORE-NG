@@ -1,23 +1,23 @@
-/*Copyright (C) 2014 Arkania Project.
-*
-* Script 85% done. TODO:
-*
-* - Throw back totem mechanic?
-* - Nozdormu tele say.
-* - Live Testing needed.
-*
-* THIS particular file is NOT free software; third-party users should NOT have access to it, redistribute it or modify it. :)
-*/
+/*
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ *
+ * Script 85% done. TODO:
+ *
+ * - Throw back totem mechanic?
+ * - Nozdormu tele say.
+ * - Live Testing needed.
+ *
+ * THIS particular file is NOT free software; third-party users 
+ * should NOT have access to it, redistribute it or modify it. :)
+ */
 
 /**** The undying flames are all that remain of this sacred place. I sense much anger here... a seething rage, barely held in check. Be on your guard. VO_ET_NOZDORMU_INTRO_02 ****/
 
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "end_time.h"
 #include "Vehicle.h"
 #include "Unit.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
 #include "ScriptedEscortAI.h"
 #include "Cell.h"
 #include "CellImpl.h"
@@ -92,7 +92,7 @@ class boss_echo_of_baine : public CreatureScript
                 instance = me->GetInstanceScript();
             }
 
-			InstanceScript* instance;
+            InstanceScript* instance;
             bool introDone;
             Unit* pulverizeTarget;
             EventMap events;
@@ -112,9 +112,9 @@ class boss_echo_of_baine : public CreatureScript
                     DoCast(me, SPELL_BAINE_VIS);
             }
 
-		    void EnterEvadeMode()
-		    {
-				me->GetMotionMaster()->MoveTargetedHome();
+            void EnterEvadeMode()
+            {
+                me->GetMotionMaster()->MoveTargetedHome();
                 Reset();
 
                 me->SetHealth(me->GetMaxHealth());
@@ -124,7 +124,7 @@ class boss_echo_of_baine : public CreatureScript
                     instance->SetBossState(BOSS_ECHO_OF_BAINE, FAIL);
                     instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me); // Remove
                 }
-		    }
+            }
 
             void MoveInLineOfSight(Unit* who)
             {
@@ -138,7 +138,7 @@ class boss_echo_of_baine : public CreatureScript
                 introDone = true;
             }
 
-            void JustDied(Unit* killer)
+            void JustDied(Unit* /*killer*/)
             {
                 Talk(SAY_DEATH);
 
@@ -146,10 +146,10 @@ class boss_echo_of_baine : public CreatureScript
                 {
                     instance->SetBossState(BOSS_ECHO_OF_BAINE, DONE);
 
-				    if (instance->GetData(DATA_FIRST_ENCOUNTER) == IN_PROGRESS)
-				        instance->SetData(DATA_FIRST_ENCOUNTER, DONE);
-				    else  
-				        instance->SetData(DATA_SECOND_ENCOUNTER, DONE);
+                    if (instance->GetData(DATA_FIRST_ENCOUNTER) == IN_PROGRESS)
+                        instance->SetData(DATA_FIRST_ENCOUNTER, DONE);
+                    else  
+                        instance->SetData(DATA_SECOND_ENCOUNTER, DONE);
 
                     instance->HandleGameObject(4001, true); // Open the doors.
                     instance->HandleGameObject(4002, true);

@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -69,7 +70,7 @@ class boss_anzu : public CreatureScript
         {
             boss_anzuAI(Creature* creature) : BossAI(creature, DATA_ANZU) { }
 
-            void Reset() 
+            void Reset() OVERRIDE
             {
                 //_Reset();
                 events.Reset();
@@ -77,19 +78,19 @@ class boss_anzu : public CreatureScript
                 _under66Percent = false;
             }
 
-            void EnterCombat(Unit* /*who*/) 
+            void EnterCombat(Unit* /*who*/) OVERRIDE
             {
                 _EnterCombat();
                 events.ScheduleEvent(EVENT_PARALYZING_SCREECH, 14000);
                 events.ScheduleEvent(EVENT_CYCLONE_OF_FEATHERS, 5000);
             }
 
-            void JustDied(Unit* /*killer*/) 
+            void JustDied(Unit* /*killer*/) OVERRIDE
             {
                 _JustDied();
             }
 
-            void DamageTaken(Unit* /*killer*/, uint32 &damage) 
+            void DamageTaken(Unit* /*killer*/, uint32 &damage) OVERRIDE
             {
                 if (me->HealthBelowPctDamaged(33, damage) && !_under33Percent)
                 {
@@ -106,7 +107,7 @@ class boss_anzu : public CreatureScript
                 }
             }
 
-            void UpdateAI(uint32 diff) 
+            void UpdateAI(uint32 diff) OVERRIDE
             {
                 if (!UpdateVictim())
                     return;
@@ -140,7 +141,7 @@ class boss_anzu : public CreatureScript
                                 if (target->getPowerType() == POWER_MANA)
                                 {
                                     DoCast(target, SPELL_SPELL_BOMB);
-                                    Talk(SAY_SPELL_BOMB, target->GetGUID());
+                                    Talk(SAY_SPELL_BOMB, target);
                                 }
                             }
                             break;
@@ -157,9 +158,9 @@ class boss_anzu : public CreatureScript
                 bool _under66Percent;
         };
 
-        CreatureAI* GetAI(Creature* creature) const 
+        CreatureAI* GetAI(Creature* creature) const OVERRIDE
         {
-            return GetInstanceAI<boss_anzuAI>(creature);
+            return GetSethekkHallsAI<boss_anzuAI>(creature);
         }
 };
 

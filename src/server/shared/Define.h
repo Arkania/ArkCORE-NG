@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -20,12 +20,12 @@
 #ifndef TRINITY_DEFINE_H
 #define TRINITY_DEFINE_H
 
-#include <sys/types.h>
+#include "CompilerDefs.h"
 
 #include <ace/Basic_Types.h>
 #include <ace/ACE_export.h>
 
-#include "CompilerDefs.h"
+#include <cstddef>
 
 #define TRINITY_LITTLEENDIAN 0
 #define TRINITY_BIGENDIAN    1
@@ -71,6 +71,24 @@
 #  define ATTR_DEPRECATED
 #endif //COMPILER == COMPILER_GNU
 
+#if COMPILER_HAS_CPP11_SUPPORT
+#  define OVERRIDE override
+#  define FINAL final
+#  define DELETE_MEMBER = delete
+#else
+#  define OVERRIDE
+#  define FINAL
+#  define DELETE_MEMBER
+#endif //COMPILER_HAS_CPP11_SUPPORT
+
+#define UI64FMTD ACE_UINT64_FORMAT_SPECIFIER
+#define UI64LIT(N) ACE_UINT64_LITERAL(N)
+
+#define SI64FMTD ACE_INT64_FORMAT_SPECIFIER
+#define SI64LIT(N) ACE_INT64_LITERAL(N)
+
+#define SIZEFMTD ACE_SIZE_T_FORMAT_SPECIFIER
+
 typedef ACE_INT64 int64;
 typedef ACE_INT32 int32;
 typedef ACE_INT16 int16;
@@ -90,8 +108,8 @@ enum DBCFormer
     FT_BYTE='b',                                            //uint8
     FT_SORT='d',                                            //sorted by this field, field is not included
     FT_IND='n',                                             //the same, but parsed to data
-    FT_LOGIC='l',                                            //Logical (boolean)
-    FT_SQL_PRESENT='p',                                      //Used in sql format to mark column present in sql dbc
+    FT_SQL_PRESENT='p',                                     //Used in sql format to mark column present in sql dbc
     FT_SQL_ABSENT='a'                                       //Used in sql format to mark column absent in sql dbc
 };
+
 #endif //TRINITY_DEFINE_H

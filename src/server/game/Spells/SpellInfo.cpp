@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -16,12 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "SpellAuraDefines.h"
 #include "SpellInfo.h"
+#include "SpellAuraDefines.h"
 #include "SpellMgr.h"
 #include "Spell.h"
 #include "DBCStores.h"
+#include "DBCStructure.h"
 #include "ConditionMgr.h"
+#include "Player.h"
+#include "Battleground.h"
+#include "Vehicle.h"
 
 uint32 GetTargetFlagMask(SpellTargetObjectTypes objType)
 {
@@ -231,7 +235,7 @@ SpellImplicitTargetInfo::StaticData  SpellImplicitTargetInfo::_data[TOTAL_SPELL_
     {TARGET_OBJECT_TYPE_GOBJ, TARGET_REFERENCE_TYPE_TARGET, TARGET_SELECT_CATEGORY_DEFAULT, TARGET_CHECK_DEFAULT,  TARGET_DIR_NONE},        // 23 TARGET_GAMEOBJECT_TARGET
     {TARGET_OBJECT_TYPE_UNIT, TARGET_REFERENCE_TYPE_CASTER, TARGET_SELECT_CATEGORY_CONE,    TARGET_CHECK_ENEMY,    TARGET_DIR_FRONT},       // 24 TARGET_UNIT_CONE_ENEMY_24
     {TARGET_OBJECT_TYPE_UNIT, TARGET_REFERENCE_TYPE_TARGET, TARGET_SELECT_CATEGORY_DEFAULT, TARGET_CHECK_DEFAULT,  TARGET_DIR_NONE},        // 25 TARGET_UNIT_TARGET_ANY
-    {TARGET_OBJECT_TYPE_GOBJ_ITEM, TARGET_REFERENCE_TYPE_TARGET, TARGET_SELECT_CATEGORY_DEFAULT, TARGET_CHECK_DEFAULT, TARGET_DIR_NONE},        // 26 TARGET_GAMEOBJECT_ITEM_TARGET
+    {TARGET_OBJECT_TYPE_GOBJ_ITEM, TARGET_REFERENCE_TYPE_TARGET, TARGET_SELECT_CATEGORY_DEFAULT, TARGET_CHECK_DEFAULT, TARGET_DIR_NONE},    // 26 TARGET_GAMEOBJECT_ITEM_TARGET
     {TARGET_OBJECT_TYPE_UNIT, TARGET_REFERENCE_TYPE_CASTER, TARGET_SELECT_CATEGORY_DEFAULT, TARGET_CHECK_DEFAULT,  TARGET_DIR_NONE},        // 27 TARGET_UNIT_MASTER
     {TARGET_OBJECT_TYPE_DEST, TARGET_REFERENCE_TYPE_DEST,   TARGET_SELECT_CATEGORY_DEFAULT, TARGET_CHECK_ENEMY,    TARGET_DIR_NONE},        // 28 TARGET_DEST_DYNOBJ_ENEMY
     {TARGET_OBJECT_TYPE_DEST, TARGET_REFERENCE_TYPE_DEST,   TARGET_SELECT_CATEGORY_DEFAULT, TARGET_CHECK_ALLY,     TARGET_DIR_NONE},        // 29 TARGET_DEST_DYNOBJ_ALLY
@@ -266,7 +270,7 @@ SpellImplicitTargetInfo::StaticData  SpellImplicitTargetInfo::_data[TOTAL_SPELL_
     {TARGET_OBJECT_TYPE_UNIT, TARGET_REFERENCE_TYPE_CASTER, TARGET_SELECT_CATEGORY_NEARBY,  TARGET_CHECK_RAID,     TARGET_DIR_NONE},        // 58 TARGET_UNIT_NEARBY_RAID
     {TARGET_OBJECT_TYPE_UNIT, TARGET_REFERENCE_TYPE_CASTER, TARGET_SELECT_CATEGORY_CONE,    TARGET_CHECK_ALLY,     TARGET_DIR_FRONT},       // 59 TARGET_UNIT_CONE_ALLY
     {TARGET_OBJECT_TYPE_UNIT, TARGET_REFERENCE_TYPE_CASTER, TARGET_SELECT_CATEGORY_CONE,    TARGET_CHECK_ENTRY,    TARGET_DIR_FRONT},       // 60 TARGET_UNIT_CONE_ENTRY
-    {TARGET_OBJECT_TYPE_UNIT, TARGET_REFERENCE_TYPE_TARGET, TARGET_SELECT_CATEGORY_AREA,    TARGET_CHECK_RAID_CLASS,TARGET_DIR_NONE},       // 61 TARGET_UNIT_TARGET_AREA_RAID_CLASS
+    {TARGET_OBJECT_TYPE_UNIT, TARGET_REFERENCE_TYPE_TARGET, TARGET_SELECT_CATEGORY_AREA,    TARGET_CHECK_RAID_CLASS, TARGET_DIR_NONE},      // 61 TARGET_UNIT_TARGET_AREA_RAID_CLASS
     {TARGET_OBJECT_TYPE_NONE, TARGET_REFERENCE_TYPE_NONE,   TARGET_SELECT_CATEGORY_NYI,     TARGET_CHECK_DEFAULT,  TARGET_DIR_NONE},        // 62 TARGET_UNK_62
     {TARGET_OBJECT_TYPE_DEST, TARGET_REFERENCE_TYPE_TARGET, TARGET_SELECT_CATEGORY_DEFAULT, TARGET_CHECK_DEFAULT,  TARGET_DIR_NONE},        // 63 TARGET_DEST_TARGET_ANY
     {TARGET_OBJECT_TYPE_DEST, TARGET_REFERENCE_TYPE_TARGET, TARGET_SELECT_CATEGORY_DEFAULT, TARGET_CHECK_DEFAULT,  TARGET_DIR_FRONT},       // 64 TARGET_DEST_TARGET_FRONT
@@ -298,9 +302,9 @@ SpellImplicitTargetInfo::StaticData  SpellImplicitTargetInfo::_data[TOTAL_SPELL_
     {TARGET_OBJECT_TYPE_UNIT, TARGET_REFERENCE_TYPE_TARGET, TARGET_SELECT_CATEGORY_DEFAULT, TARGET_CHECK_DEFAULT,  TARGET_DIR_NONE},        // 90 TARGET_UNIT_TARGET_MINIPET
     {TARGET_OBJECT_TYPE_DEST, TARGET_REFERENCE_TYPE_DEST,   TARGET_SELECT_CATEGORY_DEFAULT, TARGET_CHECK_DEFAULT,  TARGET_DIR_RANDOM},      // 91 TARGET_DEST_DEST_RADIUS
     {TARGET_OBJECT_TYPE_UNIT, TARGET_REFERENCE_TYPE_CASTER, TARGET_SELECT_CATEGORY_DEFAULT, TARGET_CHECK_DEFAULT,  TARGET_DIR_NONE},        // 92 TARGET_UNIT_SUMMONER
-    {TARGET_OBJECT_TYPE_CORPSE, TARGET_REFERENCE_TYPE_SRC,   TARGET_SELECT_CATEGORY_NYI,     TARGET_CHECK_ENEMY,    TARGET_DIR_NONE},        // 93 TARGET_CORPSE_SRC_AREA_ENEMY
+    {TARGET_OBJECT_TYPE_CORPSE, TARGET_REFERENCE_TYPE_SRC,   TARGET_SELECT_CATEGORY_NYI,     TARGET_CHECK_ENEMY,    TARGET_DIR_NONE},       // 93 TARGET_CORPSE_SRC_AREA_ENEMY
     {TARGET_OBJECT_TYPE_UNIT, TARGET_REFERENCE_TYPE_CASTER, TARGET_SELECT_CATEGORY_DEFAULT, TARGET_CHECK_DEFAULT,  TARGET_DIR_NONE},        // 94 TARGET_UNIT_VEHICLE
-    {TARGET_OBJECT_TYPE_UNIT, TARGET_REFERENCE_TYPE_TARGET, TARGET_SELECT_CATEGORY_DEFAULT, TARGET_CHECK_PASSENGER, TARGET_DIR_NONE},        // 95 TARGET_UNIT_TARGET_PASSENGER
+    {TARGET_OBJECT_TYPE_UNIT, TARGET_REFERENCE_TYPE_TARGET, TARGET_SELECT_CATEGORY_DEFAULT, TARGET_CHECK_PASSENGER, TARGET_DIR_NONE},       // 95 TARGET_UNIT_TARGET_PASSENGER
     {TARGET_OBJECT_TYPE_UNIT, TARGET_REFERENCE_TYPE_CASTER, TARGET_SELECT_CATEGORY_DEFAULT, TARGET_CHECK_DEFAULT,  TARGET_DIR_NONE},        // 96 TARGET_UNIT_PASSENGER_0
     {TARGET_OBJECT_TYPE_UNIT, TARGET_REFERENCE_TYPE_CASTER, TARGET_SELECT_CATEGORY_DEFAULT, TARGET_CHECK_DEFAULT,  TARGET_DIR_NONE},        // 97 TARGET_UNIT_PASSENGER_1
     {TARGET_OBJECT_TYPE_UNIT, TARGET_REFERENCE_TYPE_CASTER, TARGET_SELECT_CATEGORY_DEFAULT, TARGET_CHECK_DEFAULT,  TARGET_DIR_NONE},        // 98 TARGET_UNIT_PASSENGER_2
@@ -311,7 +315,7 @@ SpellImplicitTargetInfo::StaticData  SpellImplicitTargetInfo::_data[TOTAL_SPELL_
     {TARGET_OBJECT_TYPE_UNIT, TARGET_REFERENCE_TYPE_CASTER, TARGET_SELECT_CATEGORY_DEFAULT, TARGET_CHECK_DEFAULT,  TARGET_DIR_NONE},        // 103 TARGET_UNIT_PASSENGER_7
     {TARGET_OBJECT_TYPE_UNIT, TARGET_REFERENCE_TYPE_CASTER, TARGET_SELECT_CATEGORY_CONE,    TARGET_CHECK_ENEMY,    TARGET_DIR_FRONT},       // 104 TARGET_UNIT_CONE_ENEMY_104
     {TARGET_OBJECT_TYPE_UNIT, TARGET_REFERENCE_TYPE_NONE,   TARGET_SELECT_CATEGORY_NYI,     TARGET_CHECK_DEFAULT,  TARGET_DIR_NONE},        // 105 TARGET_UNIT_UNK_105
-    {TARGET_OBJECT_TYPE_DEST, TARGET_REFERENCE_TYPE_TARGET, TARGET_SELECT_CATEGORY_DEFAULT, TARGET_CHECK_DEFAULT,  TARGET_DIR_NONE},        // 106 TARGET_DEST_CHANNEL_CASTER
+    {TARGET_OBJECT_TYPE_DEST, TARGET_REFERENCE_TYPE_CASTER, TARGET_SELECT_CATEGORY_CHANNEL, TARGET_CHECK_DEFAULT,  TARGET_DIR_NONE},        // 106 TARGET_DEST_CHANNEL_CASTER
     {TARGET_OBJECT_TYPE_NONE, TARGET_REFERENCE_TYPE_DEST,   TARGET_SELECT_CATEGORY_NYI,     TARGET_CHECK_DEFAULT,  TARGET_DIR_NONE},        // 107 TARGET_UNK_DEST_AREA_UNK_107
     {TARGET_OBJECT_TYPE_GOBJ, TARGET_REFERENCE_TYPE_CASTER, TARGET_SELECT_CATEGORY_CONE,    TARGET_CHECK_DEFAULT,  TARGET_DIR_FRONT},       // 108 TARGET_GAMEOBJECT_CONE
     {TARGET_OBJECT_TYPE_NONE, TARGET_REFERENCE_TYPE_NONE,   TARGET_SELECT_CATEGORY_NYI,     TARGET_CHECK_DEFAULT,  TARGET_DIR_NONE},        // 109
@@ -335,13 +339,12 @@ SpellImplicitTargetInfo::StaticData  SpellImplicitTargetInfo::_data[TOTAL_SPELL_
     {TARGET_OBJECT_TYPE_NONE, TARGET_REFERENCE_TYPE_NONE,   TARGET_SELECT_CATEGORY_NYI,     TARGET_CHECK_DEFAULT,  TARGET_DIR_NONE},        // 127
 };
 
-SpellEffectInfo::SpellEffectInfo(SpellEntry const* spellEntry, SpellInfo const* spellInfo, uint8 effIndex)
+SpellEffectInfo::SpellEffectInfo(SpellEntry const* /*spellEntry*/, SpellInfo const* spellInfo, uint8 effIndex, SpellEffectEntry const* _effect)
 {
-    SpellEffectEntry const* _effect = spellEntry->GetSpellEffect(effIndex);
     SpellScalingEntry const* scaling = spellInfo->GetSpellScaling();
-    
+
     _spellInfo = spellInfo;
-    _effIndex = effIndex;
+    _effIndex = _effect ? _effect->EffectIndex : effIndex;
     Effect = _effect ? _effect->Effect : 0;
     ApplyAuraName = _effect ? _effect->EffectApplyAuraName : 0;
     Amplitude = _effect ? _effect->EffectAmplitude : 0;
@@ -358,14 +361,15 @@ SpellEffectInfo::SpellEffectInfo(SpellEntry const* spellEntry, SpellInfo const* 
     TargetA = SpellImplicitTargetInfo(_effect ? _effect->EffectImplicitTargetA : 0);
     TargetB = SpellImplicitTargetInfo(_effect ? _effect->EffectImplicitTargetB : 0);
     RadiusEntry = _effect && _effect->EffectRadiusIndex ? sSpellRadiusStore.LookupEntry(_effect->EffectRadiusIndex) : NULL;
+    MaxRadiusEntry = _effect && _effect->EffectRadiusMaxIndex ? sSpellRadiusStore.LookupEntry(_effect->EffectRadiusMaxIndex) : NULL;
     ChainTarget = _effect ? _effect->EffectChainTarget : 0;
     ItemType = _effect ? _effect->EffectItemType : 0;
     TriggerSpell = _effect ? _effect->EffectTriggerSpell : 0;
     SpellClassMask = _effect ? _effect->EffectSpellClassMask : flag96(0);
     ImplicitTargetConditions = NULL;
-    ScalingMultiplier = scaling ? scaling->Multiplier[effIndex] : 0.0f;
-    DeltaScalingMultiplier = scaling ? scaling->RandomMultiplier[effIndex] : 0.0f;
-    ComboScalingMultiplier = scaling ? scaling->OtherMultiplier[effIndex] : 0.0f;
+    ScalingMultiplier = scaling ? scaling->Multiplier[_effIndex] : 0.0f;
+    DeltaScalingMultiplier = scaling ? scaling->RandomMultiplier[_effIndex] : 0.0f;
+    ComboScalingMultiplier = scaling ? scaling->OtherMultiplier[_effIndex] : 0.0f;
 }
 
 bool SpellEffectInfo::IsEffect() const
@@ -385,7 +389,7 @@ bool SpellEffectInfo::IsAura() const
 
 bool SpellEffectInfo::IsAura(AuraType aura) const
 {
-   return IsAura() && AuraType(ApplyAuraName) == aura;
+    return IsAura() && ApplyAuraName == uint32(aura);
 }
 
 bool SpellEffectInfo::IsTargetingArea() const
@@ -450,7 +454,7 @@ int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const
                 float preciseBasePoints = ScalingMultiplier * multiplier;
                 if (DeltaScalingMultiplier)
                 {
-                    float delta = DeltaScalingMultiplier * ScalingMultiplier * multiplier * 0.5f;
+                    float delta = fabs(DeltaScalingMultiplier * ScalingMultiplier * multiplier * 0.5f);
                     preciseBasePoints += frand(-delta, delta);
                 }
 
@@ -479,7 +483,7 @@ int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const
         switch (randomPoints)
         {
             case 0: break;
-            case 1: basePoints += 1; break; // range 1..1
+            case 1: basePoints += 1; break;                     // range 1..1
             default:
             {
                 // range can have positive (1..rand) and negative (rand..1) values, so order its for irand
@@ -506,6 +510,7 @@ int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const
         value = caster->ApplyEffectModifiers(_spellInfo, _effIndex, value);
 
         // amount multiplication based on caster's level
+/* REVIEW - MERGE <<<<<<< HEAD
         if (!_spellInfo->GetSpellScaling() && !basePointsPerLevel && (_spellInfo->Attributes & SPELL_ATTR0_LEVEL_DAMAGE_CALCULATION && _spellInfo->SpellLevel) &&
                 Effect != SPELL_EFFECT_WEAPON_PERCENT_DAMAGE &&
                 Effect != SPELL_EFFECT_KNOCK_BACK &&
@@ -517,6 +522,58 @@ int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const
                 //there are many more: slow speed, -healing pct
             value *= 0.25f * exp(caster->getLevel() * (70 - _spellInfo->SpellLevel) / 1000.0f);
             //value = int32(value * (int32)getLevel() / (int32)(_spellInfo->spellLevel ? _spellInfo->spellLevel : 1));
+======= */
+        if (!caster->IsControlledByPlayer() &&
+            _spellInfo->SpellLevel && _spellInfo->SpellLevel != caster->getLevel() &&
+            !basePointsPerLevel && (_spellInfo->Attributes & SPELL_ATTR0_LEVEL_DAMAGE_CALCULATION))
+        {
+            bool canEffectScale = false;
+            switch (Effect)
+            {
+                case SPELL_EFFECT_SCHOOL_DAMAGE:
+                case SPELL_EFFECT_DUMMY:
+                case SPELL_EFFECT_POWER_DRAIN:
+                case SPELL_EFFECT_HEALTH_LEECH:
+                case SPELL_EFFECT_HEAL:
+                case SPELL_EFFECT_WEAPON_DAMAGE:
+                case SPELL_EFFECT_POWER_BURN:
+                case SPELL_EFFECT_SCRIPT_EFFECT:
+                case SPELL_EFFECT_NORMALIZED_WEAPON_DMG:
+                case SPELL_EFFECT_FORCE_CAST_WITH_VALUE:
+                case SPELL_EFFECT_TRIGGER_SPELL_WITH_VALUE:
+                case SPELL_EFFECT_TRIGGER_MISSILE_SPELL_WITH_VALUE:
+                    canEffectScale = true;
+                    break;
+                default:
+                    break;
+            }
+
+            switch (ApplyAuraName)
+            {
+                case SPELL_AURA_PERIODIC_DAMAGE:
+                case SPELL_AURA_DUMMY:
+                case SPELL_AURA_PERIODIC_HEAL:
+                case SPELL_AURA_DAMAGE_SHIELD:
+                case SPELL_AURA_PROC_TRIGGER_DAMAGE:
+                case SPELL_AURA_PERIODIC_LEECH:
+                case SPELL_AURA_PERIODIC_MANA_LEECH:
+                case SPELL_AURA_SCHOOL_ABSORB:
+                case SPELL_AURA_PERIODIC_TRIGGER_SPELL_WITH_VALUE:
+                    canEffectScale = true;
+                    break;
+                default:
+                    break;
+            }
+
+            if (canEffectScale)
+            {
+                GtNPCManaCostScalerEntry const* spellScaler = sGtNPCManaCostScalerStore.LookupEntry(_spellInfo->SpellLevel - 1);
+                GtNPCManaCostScalerEntry const* casterScaler = sGtNPCManaCostScalerStore.LookupEntry(caster->getLevel() - 1);
+                if (spellScaler && casterScaler)
+                    value *= casterScaler->ratio / spellScaler->ratio;
+            }
+        }
+// REVIEW - MERGE >>>>>>> master
     }
 
     return int32(value);
@@ -551,475 +608,469 @@ bool SpellEffectInfo::HasRadius() const
     return RadiusEntry != NULL;
 }
 
+bool SpellEffectInfo::HasMaxRadius() const
+{
+    return MaxRadiusEntry != NULL;
+}
+
 float SpellEffectInfo::CalcRadius(bool positive, Unit* caster, Spell* spell) const
 {
-    if (!HasRadius()) //  Use for ANY non-radius spell. Define radius here.
+    const SpellRadiusEntry* entry = RadiusEntry;
+    if (!HasRadius()) // Use for ANY non-radius spell. Define radius here.
     {
-      switch(_spellInfo->Id)
-      {
-        // PLAYERS / PVP.
-          // Solar beam
-          case 81261:
-              return 5.0f;
-          // Gul'dan aur
-          case 93974: 
-          case 93987:
-          case 93986:
-          case 93975:
-            return 4.0f;
-          case 86041:
-            return 8.0f;
-           // Death and Decay
-          case 52212:
-            return 10.0f;
-           // Blood worms
-          case 81280:
-            return 15.0f;
-           // Fire nova
-          case 8349:
-            return 10.0f;
-           // Serpent Spread
-          case 88453:
-          case 88466:
-            return 8.0f;
-           // Healing Rain
-          case 73921:
-            return 10.0f;
-           // Earthquake
-          case 77478:
-            return 8.0f;
-           // Incaster absorb.
-          case 86261:
-            return 6.0f;
-           // Ralling cry
-          case 97463:
-            return 30.0f;
-           // Atonement
-          case 94472: 
-            return 15.0f;
-           // Consecration
-          case 81297:
-            return 8.0f;
-
-        // DUNGEONS, RAIDS / PVE.
-          // ICC
-          case 70541: // LK Infest
-          case 73779: // LK Infest
-          case 73780: // LK Infest
-          case 73781: // LK Infest
-            return 60.0f;
-          case 71429: // Mass Ressurection Terenas
-            return 200.0f;
-
-          // HOO
-          case 75194: // Burning Light Anhuur
-          case 75115: // Burning Light Anhuur
-            return 100.0f;
-          case 75117: // Burning Light Anhuur
-            return 4.0f;
-          case 76956: //Alpha Beams Anraphet
-            return 5.0f; // 5y
-          case 75790: // Rampant Growth Ammunae
-          case 89888: // Rampant Growth Ammunae
-            return 100.0f;
-          case 75702: // Spore Ammunae
-            return 6.0f;            
-          case 75540: // Flame Bolt Ptah
-            return 70.0f;
-          case 75548: // Quicksand Ptah
-          case 89648:
-            return 6.0f;
-          case 69355:
-            return 10.0f;
-          case 76355: // Blessing of the sun Rajh
-            return 100.0f;  // -- DONE.
-
-          // TOTT
-          case 80564: // Fungal Spores Naz'jar
-          case 91470:
-            return 5.0f;
-          case 75700: // Geyser Naz'jar
-          case 91469:
-          case 94046:
-          case 94047:
-            return 5.0f;
-          case 75690: // Naz'jar Waterspout knockback
-            return 5.0f;
-          case 76085: // Dark Fissure Ulthok
-          case 91375:
-            return 6.0f;
-          case 76341: // Unrelenting Agony Mindbender
-          case 91493:
-            return 100.0f;
-          case 84945: // Earth Shards Erunak
-          case 91491:
-            return 5.0f;                            
-          case 83561: // Blight Ozumat
-          case 91495:
-            return 10.0f; // -- DONE.
-
-          // ZUL'AMAN
-          case 97505: // Halazzi Water Totem
-            return 5.0f;
-          case 43208: // Daakara Flame Whirl
-          case 44090:
-            return 70.0f;
-          case 43217: // Daakara Pillar of Fire
-          case 97682:
-            return 3.0f;
-          case 43240: // Flame Volley Flame Caster
-          case 97464:
-            return 35.0f;
-          case 97974: // Hierophant Sanctify
-            return 3.5f;
-          case 98028: // Archon Sigils
-          case 98033:
-          case 98037:
-          case 98038:
-          case 98039:
-          case 98040:
-            return 100.0f;
-          case 98000: // Ancestral Call Juggernaut
-            return 25.0f;
-
-          // BWD
-          case 80161: // Omnotron Chemical Cloud
-          case 91471: // Omnotron Chemical Cloud
-          case 91472: // Omnotron Chemical Cloud
-          case 91473: // Omnotron Chemical Cloud
-          case 80164: // Omnotron Chemical Cloud
-          case 91478: // Omnotron Chemical Cloud
-          case 91479: // Omnotron Chemical Cloud
-          case 91480: // Omnotron Chemical Cloud
-            return 12.0f;
-
-          case 91849: // Omnotron Grip Of Death
-          case 92051: // Omnotron Shadow Conductor
-          case 92135: // Omnotron Shadow Conductor
-            return 100.0f;
-
-          case 79035: // Omnotron Incineration
-          case 91523: // Omnotron Incineration
-          case 91524: // Omnotron Incineration
-          case 91525: // Omnotron Incineration
-            return 50000.0f;
-          
-          case 77908: // Maloriak Arcane Storm
-          case 92961: // Maloriak Arcane Storm
-          case 92962: // Maloriak Arcane Storm
-          case 92963: // Maloriak Arcane Storm
-            return 80.0f;
-          case 93041: // Absolute 0 Maloriak
-          case 93042: // Absolute 0 Maloriak
-          case 93043: // Absolute 0 Maloriak
-          case 78208: // Absolute 0 Maloriak
-          case 77675: // Atramedes Sonar Pulse
-          case 92417: // Atramedes Sonar Pulse
-          case 92418: // Atramedes Sonar Pulse
-          case 92419: // Atramedes Sonar Pulse
-          case 92553: // Atramedes Sonar Bomb
-          case 92554: // Atramedes Sonar Bomb
-          case 92555: // Atramedes Sonar Bomb
-          case 92556: // Atramedes Sonar Bomb
-            return 5.0f;
-          case 80092: // Omnotron Poison Bomb
-          case 91498: // Omnotron Poison Bomb
-          case 91499: // Omnotron Poison Bomb
-          case 91500: // Omnotron Poison Bomb
-          case 80097: // Omnotron Poison Puddle
-          case 91488: // Omnotron Poison Puddle
-          case 91489: // Omnotron Poison Puddle
-          case 91490: // Omnotron Poison Puddle
-            return 6.0f;
-          case 91879: // Omnotron Arcane Blowback
-          case 91880: // Omnotron Arcane Blowback
-            return 17.0f;
-          case 82848: // Massacre Chimaeron
-          case 77612: // Atramedes Modulation
-          case 92451: // Atramedes Modulation
-          case 92452: // Atramedes Modulation
-          case 92453: // Atramedes Modulation
-            return 500.0f;
-          case 78023: // Atramedes Roaring Flame
-          case 78555: // Atramedes Roaring Flame
-          case 92472: // Atramedes Roaring Flame
-          case 92473: // Atramedes Roaring Flame
-          case 92474: // Atramedes Roaring Flame
-          case 92483: // Atramedes Roaring Flame
-          case 92484: // Atramedes Roaring Flame
-          case 92485: // Atramedes Roaring Flame
-          case 77982: // Atramedes Searing Flame
-          case 92421: // Atramedes Searing Flame
-          case 92422: // Atramedes Searing Flame
-          case 92423: // Atramedes Searing Flame
-          case 78353: // Atramedes Roaring Flame Breath
-          case 92445: // Atramedes Roaring Flame Breath
-          case 92446: // Atramedes Roaring Flame Breath
-          case 92447: // Atramedes Roaring Flame Breath
-            return 4.0f;
-
-          // BOT
-          case 83710: // Furious Roar Halfus
-          case 86169: // Furious Roar Halfus
-          case 86170: // Furious Roar Halfus
-          case 86171: // Furious Roar Halfus
-            return 200.0f;
-          case 83719: // Fireball Barrage Halfus Proto
-            return 500.0f;
-          case 83855: // Scorching Breath Halfus Proto 
-          case 86163: // Scorching Breath Halfus Proto 
-          case 86164: // Scorching Breath Halfus Proto
-          case 86165: // Scorching Breath Halfus Proto
-            return 500.0f;
-          case 86825: // Blackout Valiona
-          case 92879: // Blackout Valiona
-          case 92880: // Blackout Valiona
-          case 92881: // Blackout Valiona
-            return 8.0f;
-          case 86505: // Fabulous Flames Theralion
-          case 92907: // Fabulous Flames Theralion
-          case 92908: // Fabulous Flames Theralion
-          case 92909: // Fabulous Flames Theralion
-            return 12.0f;
-          case 93055: // Shifting Reality Valiona
-            return 8.0f;
-          case 86014: // Twilight Meteor Valiona
-          case 92863: // Twilight Meteor Valiona
-          case 92864: // Twilight Meteor Valiona
-          case 92865: // Twilight Meteor Valiona
-            return 6.0f;
-          case 93019: // Rift Blast Val/The
-          case 93020: // Rift Blast Val/The
-            return 30.0f;
-          case 86406: // Theralion Dazzling Destruction
-          case 92926: // Theralion Dazzling Destruction
-          case 92927: // Theralion Dazzling Destruction
-          case 92928: // Theralion Dazzling Destruction
-            return 12.0f;
-          case 86305: // Unstable Twilight Val/The
-          case 92882: // Unstable Twilight Val/The
-          case 92883: // Unstable Twilight Val/The
-          case 92884: // Unstable Twilight Val/The
-          case 86199: // Twilight Flames Val/The
-          case 92868: // Twilight Flames Val/The
-          case 92869: // Twilight Flames Val/The
-          case 92870: // Twilight Flames Val/The
-          case 86228: // Twilight Flames Val/The
-          case 92867: // Twilight Flames Val/The
-            return 8.0f;
-          case 82746: // Feludius Glaciate
-          case 92506: // Feludius Glaciate
-          case 92507: // Feludius Glaciate
-          case 92508: // Feludius Glaciate
-            return 200.0f;
-          case 82700: // Feludius Water Bomb
-          case 82762: // Feludius Waterlogged
-            return 6.0f;
-          case 82666: // Feludius Frost Imbued
-          case 82663: // Ignacious Flame Imbued
-          case 79332: // Terrastra Gravity Well Pull
-            return 10.0f;
-          case 92214: // Ignacious Flame Strike
-            return 7.0f;
-          case 83067: // Arion Thundershock
-          case 92469: // Arion Thundershock
-          case 92470: // Arion Thundershock
-          case 92471: // Arion Thundershock
-          case 83070: // Arion Lighting Blast
-          case 92454: // Arion Lighting Blast
-          case 92455: // Arion Lighting Blast
-          case 92456: // Arion Lighting Blast
-            return 200.0f;
-          case 84915: // Monstrosity Ice Pools
-          case 92497: // Monstrosity Ice Pools
-          case 92498: // Monstrosity Ice Pools
-          case 92499: // Monstrosity Ice Pools
-            return 10.0f;
-          case 83565: // Terrastra Quake
-          case 92544: // Terrastra Quake
-          case 92545: // Terrastra Quake
-          case 92546: // Terrastra Quake
-            return 150.0f;
-          case 81571: // Cho'gall Unleashed Shadows
-          case 93221: // Cho'gall Unleashed Shadows
-          case 93222: // Cho'gall Unleashed Shadows
-          case 93223: // Cho'gall Unleashed Shadows
-          case 82363: // Cho'gall Corr of the old god
-          case 93169: // Cho'gall Corr of the old god
-          case 93170: // Cho'gall Corr of the old god
-          case 93171: // Cho'gall Corr of the old god
-            return 200.0f;
-          case 82919: // Cho'gall Sprayed Corruption
-          case 93108: // Cho'gall Sprayed Corruption
-          case 93109: // Cho'gall Sprayed Corruption
-          case 93110: // Cho'gall Sprayed Corruption
-            return 20.0f;
-          case 81538: // Cho'gall Blaze
-          case 93212: // Cho'gall Blaze
-          case 93213: // Cho'gall Blaze
-          case 93214: // Cho'gall Blaze
-            return 5.0f;
-          case 81761: // Cho'gall Spilled blood of the old god
-          case 93172: // Cho'gall Spilled blood of the old god
-          case 93173: // Cho'gall Spilled blood of the old god
-          case 93174: // Cho'gall Spilled blood of the old god
-            return 10.0f;
-          case 88146: // Sinestra Twilight Essence
-          case 92950:
-            return 4.0f;
-          case 90028: // Sinestra Unleash Essence
-          case 92947:
-            return 100.0f;
-          case 78862: // Sinestra Twilight Slicer
-            return 5.0f;
-          case 87231: // Sinestra Calen Barrier
-            return 34.0f; // END
-
-          // TOTFW
-          case 86111: // Ice Patch Nezir
-          case 93129:
-          case 93130:
-          case 93131:
-            return 10.0f;
-          case 86282: // Toxic Spores Rohash
-          case 93120:
-          case 93121:
-          case 93122:
-            return 10.0f;
-          case 86367: // Sleet Storm Nezir
-          case 96135:
-          case 96136:
-          case 96137:
-            return 90.0f;
-          case 86133: // Rohash tornado
-          case 93141:
-          case 93142:
-          case 93143:
-            return 3.0f;
-          case 84651: // Zephyr Anshal
-          case 93117:
-          case 93118:
-          case 93119:
-            return 90.0f;
-          case 86487: // Hurricane Rohash
-          case 93144:
-          case 93145:
-          case 93146:
-            return 90.0f;
-          case 87770: // Windburst Al'Akir p1
-          case 93261: 
-          case 93262: 
-          case 93263:
-            return 90.0f;
-          case 88858: // Windburst Al'Akir p3
-          case 93286: 
-          case 93287: 
-          case 93288:
-            return 150.0f;
-          case 87873: // Static Shock Al'Akir
-            return 6.0f; // -- DONE.
-
-          // Baradin Hold
-          case 89000: // Argaloth Fel Flames
-            return 3.0f;
-          case 96883: // Occu'thar Focused Fire
-            return 12.0f;
-          case 96968: // Occu'thar's Destruction
-          case 101008:
-            return 500.0f;
-          case 105857: // Alizabal Disciple of Hate
-            return 10.0f;
-          case 104994: // Alizabal Blade Dance
-            return 13.0f;
-          case 105069: // Alizabal Seething Hate
-            return 6.0f; // -- DONE.
-
-           // Firelands
-          case 99171: // Ragnaros Engulfing Flames
-            return 13.0f;
-          case 99840: // Shannox Magma Rupture
-            return 50000.0f;
-          case 100002: // Shannox Hurl Spear
-            return 3.0f;
-          case 100495: // Shannox Magma Flare
-            return 50.0f;
-          case 99841: // Shannox Magma rupture
-            return 1.0f; 
-          case 99261: // Baloroc wave of torment
-          case 101636:
-          case 101637:
-          case 101638:
-            return 200.0f;
-          case 99518: // Baloroc countdown
-            return 100.0f;
-          case 98535: // Majordomus leaping flame
-          case 100206:
-          case 100207:
-          case 100208:
-            return 12.0f;
-          case 98443: // Majordomus fiery cyclone
-            return 200.0f;
-          case 98450: // Majordomus searing seeds
-            return 5000.0f;
-          case 99605: // Alysrazor firestorm
-          case 99606: // Alysrazor firestorm
-            return 500.0f;
-          case 98463: // Alysrazor volcan fire
-            return 6.0f;
-          case 99925: // Alysrazor full power
-            return 500.0f;
-          case 101410: // Alysrazor indicator power
-            return 50000.0f;
-          case 99461: // Alysrazor fire energy
-            return 8.0f;
-          case 100734: // Alysrazor fiery tornado
-            return 10.0f;
-		  case 98226: // Rhyolite indicator
-		    return 200.0f;
-		  case 97230: // Rhyolite magma line
-		    return 1.0f;
-		  case 97234: // Rhyolite magma line
-		    return 2.0f;
-		  case 98934: // Bethilac aoe damage on web
-		    return 300.0f;
-		  case 99333: // Bethilac venom rain
-		    return 500.0f;
-		  case 98471: // Bethilac burning acid
-		  case 100826:
-		  case 100827:
-		  case 100828:
-		    return 200.0f;
-		  case 99076: // Bethilac metheor
-		    return 7.0f;
-
-          // End Time
-          case 101810: // Jaina Frostbolt Volley
-            return 65.0f;
-          case 101587: // Jaina Flarecore
-            return 200.0f;
-          case 101980: // Jaina Flarecore
-            return 5.0f;
-
-          // Dragon Soul
-          case 103414: // Morchok Stomp.
-            return 25.0f;
-          case 103785: // Morchok Black Blood.
-            return 150.0f;
-            
-          default:
-            return 0.0f;
-          break;
-       }
+        switch(_spellInfo->Id)
+        {
+            // PLAYERS / PVP.
+            // Solar beam
+            case 81261:
+                return 5.0f;
+            // Gul'dan aur
+            case 93974: 
+            case 93987:
+            case 93986:
+            case 93975:
+                return 4.0f;
+            case 86041:
+                return 8.0f;
+            // Death and Decay
+            case 52212:
+                return 10.0f;
+            // Blood worms
+            case 81280:
+                return 15.0f;
+            // Fire nova
+            case 8349:
+                return 10.0f;
+            // Serpent Spread
+            case 88453:
+            case 88466:
+                return 8.0f;
+            // Healing Rain
+            case 73921:
+                return 10.0f;
+            // Earthquake
+            case 77478:
+                return 8.0f;
+            // Incaster absorb.
+            case 86261:
+                return 6.0f;
+            // Ralling cry
+            case 97463:
+                return 30.0f;
+            // Atonement
+            case 94472: 
+                return 15.0f;
+            // Consecration
+            case 81297:
+                return 8.0f;
+            // DUNGEONS, RAIDS / PVE.
+            // ICC
+            case 70541: // LK Infest
+            case 73779: // LK Infest
+            case 73780: // LK Infest
+            case 73781: // LK Infest
+                return 60.0f;
+            case 71429: // Mass Ressurection Terenas
+                return 200.0f;
+            // HOO
+            case 75194: // Burning Light Anhuur
+            case 75115: // Burning Light Anhuur
+                return 100.0f;
+            case 75117: // Burning Light Anhuur
+                return 4.0f;
+            case 76956: //Alpha Beams Anraphet
+                return 5.0f; // 5y
+            case 75790: // Rampant Growth Ammunae
+            case 89888: // Rampant Growth Ammunae
+                return 100.0f;
+            case 75702: // Spore Ammunae
+                return 6.0f;            
+            case 75540: // Flame Bolt Ptah
+                return 70.0f;
+            case 75548: // Quicksand Ptah
+            case 89648:
+                return 6.0f;
+            case 69355:
+                return 10.0f;
+            case 76355: // Blessing of the sun Rajh
+                return 100.0f;
+            // TOTT
+            case 80564: // Fungal Spores Naz'jar
+            case 91470:
+                return 5.0f;
+            case 75700: // Geyser Naz'jar
+            case 91469:
+            case 94046:
+            case 94047:
+                return 5.0f;
+            case 75690: // Naz'jar Waterspout knockback
+                return 5.0f;
+            case 76085: // Dark Fissure Ulthok
+            case 91375:
+                return 6.0f;
+            case 76341: // Unrelenting Agony Mindbender
+            case 91493:
+                return 100.0f;
+            case 84945: // Earth Shards Erunak
+            case 91491:
+                return 5.0f;                            
+            case 83561: // Blight Ozumat
+            case 91495:
+                return 10.0f; // -- DONE.
+            // ZUL'AMAN
+            case 97505: // Halazzi Water Totem
+                return 5.0f;
+            case 43208: // Daakara Flame Whirl
+            case 44090:
+                return 70.0f;
+            case 43217: // Daakara Pillar of Fire
+            case 97682:
+                return 3.0f;
+            case 43240: // Flame Volley Flame Caster
+            case 97464:
+                return 35.0f;
+            case 97974: // Hierophant Sanctify
+                return 3.5f;
+            case 98028: // Archon Sigils
+            case 98033:
+            case 98037:
+            case 98038:
+            case 98039:
+            case 98040:
+                return 100.0f;
+            case 98000: // Ancestral Call Juggernaut
+                return 25.0f;
+            // BWD
+            case 80161: // Omnotron Chemical Cloud
+            case 91471: // Omnotron Chemical Cloud
+            case 91472: // Omnotron Chemical Cloud
+            case 91473: // Omnotron Chemical Cloud
+            case 80164: // Omnotron Chemical Cloud
+            case 91478: // Omnotron Chemical Cloud
+            case 91479: // Omnotron Chemical Cloud
+            case 91480: // Omnotron Chemical Cloud
+                return 12.0f;
+            case 91849: // Omnotron Grip Of Death
+            case 92051: // Omnotron Shadow Conductor
+            case 92135: // Omnotron Shadow Conductor
+                return 100.0f;
+            case 79035: // Omnotron Incineration
+            case 91523: // Omnotron Incineration
+            case 91524: // Omnotron Incineration
+            case 91525: // Omnotron Incineration
+                return 50000.0f;
+            case 77908: // Maloriak Arcane Storm
+            case 92961: // Maloriak Arcane Storm
+            case 92962: // Maloriak Arcane Storm
+            case 92963: // Maloriak Arcane Storm
+                return 80.0f;
+            case 93041: // Absolute 0 Maloriak
+            case 93042: // Absolute 0 Maloriak
+            case 93043: // Absolute 0 Maloriak
+            case 78208: // Absolute 0 Maloriak
+            case 77675: // Atramedes Sonar Pulse
+            case 92417: // Atramedes Sonar Pulse
+            case 92418: // Atramedes Sonar Pulse
+            case 92419: // Atramedes Sonar Pulse
+            case 92553: // Atramedes Sonar Bomb
+            case 92554: // Atramedes Sonar Bomb
+            case 92555: // Atramedes Sonar Bomb
+            case 92556: // Atramedes Sonar Bomb
+                return 5.0f;
+            case 80092: // Omnotron Poison Bomb
+            case 91498: // Omnotron Poison Bomb
+            case 91499: // Omnotron Poison Bomb
+            case 91500: // Omnotron Poison Bomb
+            case 80097: // Omnotron Poison Puddle
+            case 91488: // Omnotron Poison Puddle
+            case 91489: // Omnotron Poison Puddle
+            case 91490: // Omnotron Poison Puddle
+                return 6.0f;
+            case 91879: // Omnotron Arcane Blowback
+            case 91880: // Omnotron Arcane Blowback
+                return 17.0f;
+            case 82848: // Massacre Chimaeron
+            case 77612: // Atramedes Modulation
+            case 92451: // Atramedes Modulation
+            case 92452: // Atramedes Modulation
+            case 92453: // Atramedes Modulation
+                return 500.0f;
+            case 78023: // Atramedes Roaring Flame
+            case 78555: // Atramedes Roaring Flame
+            case 92472: // Atramedes Roaring Flame
+            case 92473: // Atramedes Roaring Flame
+            case 92474: // Atramedes Roaring Flame
+            case 92483: // Atramedes Roaring Flame
+            case 92484: // Atramedes Roaring Flame
+            case 92485: // Atramedes Roaring Flame
+            case 77982: // Atramedes Searing Flame
+            case 92421: // Atramedes Searing Flame
+            case 92422: // Atramedes Searing Flame
+            case 92423: // Atramedes Searing Flame
+            case 78353: // Atramedes Roaring Flame Breath
+            case 92445: // Atramedes Roaring Flame Breath
+            case 92446: // Atramedes Roaring Flame Breath
+            case 92447: // Atramedes Roaring Flame Breath
+                return 4.0f;
+            // BOT
+            case 83710: // Furious Roar Halfus
+            case 86169: // Furious Roar Halfus
+            case 86170: // Furious Roar Halfus
+            case 86171: // Furious Roar Halfus
+                return 200.0f;
+            case 83719: // Fireball Barrage Halfus Proto
+                return 500.0f;
+            case 83855: // Scorching Breath Halfus Proto 
+            case 86163: // Scorching Breath Halfus Proto 
+            case 86164: // Scorching Breath Halfus Proto
+            case 86165: // Scorching Breath Halfus Proto
+                return 500.0f;
+            case 86825: // Blackout Valiona
+            case 92879: // Blackout Valiona
+            case 92880: // Blackout Valiona
+            case 92881: // Blackout Valiona
+                return 8.0f;
+            case 86505: // Fabulous Flames Theralion
+            case 92907: // Fabulous Flames Theralion
+            case 92908: // Fabulous Flames Theralion
+            case 92909: // Fabulous Flames Theralion
+                return 12.0f;
+            case 93055: // Shifting Reality Valiona
+                return 8.0f;
+            case 86014: // Twilight Meteor Valiona
+            case 92863: // Twilight Meteor Valiona
+            case 92864: // Twilight Meteor Valiona
+            case 92865: // Twilight Meteor Valiona
+                return 6.0f;
+            case 93019: // Rift Blast Val/The
+            case 93020: // Rift Blast Val/The
+                return 30.0f;
+            case 86406: // Theralion Dazzling Destruction
+            case 92926: // Theralion Dazzling Destruction
+            case 92927: // Theralion Dazzling Destruction
+            case 92928: // Theralion Dazzling Destruction
+                return 12.0f;
+            case 86305: // Unstable Twilight Val/The
+            case 92882: // Unstable Twilight Val/The
+            case 92883: // Unstable Twilight Val/The
+            case 92884: // Unstable Twilight Val/The
+            case 86199: // Twilight Flames Val/The
+            case 92868: // Twilight Flames Val/The
+            case 92869: // Twilight Flames Val/The
+            case 92870: // Twilight Flames Val/The
+            case 86228: // Twilight Flames Val/The
+            case 92867: // Twilight Flames Val/The
+                return 8.0f;
+            case 82746: // Feludius Glaciate
+            case 92506: // Feludius Glaciate
+            case 92507: // Feludius Glaciate
+            case 92508: // Feludius Glaciate
+                return 200.0f;
+            case 82700: // Feludius Water Bomb
+            case 82762: // Feludius Waterlogged
+                return 6.0f;
+            case 82666: // Feludius Frost Imbued
+            case 82663: // Ignacious Flame Imbued
+            case 79332: // Terrastra Gravity Well Pull
+                return 10.0f;
+            case 92214: // Ignacious Flame Strike
+                return 7.0f;
+            case 83067: // Arion Thundershock
+            case 92469: // Arion Thundershock
+            case 92470: // Arion Thundershock
+            case 92471: // Arion Thundershock
+            case 83070: // Arion Lighting Blast
+            case 92454: // Arion Lighting Blast
+            case 92455: // Arion Lighting Blast
+            case 92456: // Arion Lighting Blast
+                return 200.0f;
+            case 84915: // Monstrosity Ice Pools
+            case 92497: // Monstrosity Ice Pools
+            case 92498: // Monstrosity Ice Pools
+            case 92499: // Monstrosity Ice Pools
+                return 10.0f;
+            case 83565: // Terrastra Quake
+            case 92544: // Terrastra Quake
+            case 92545: // Terrastra Quake
+            case 92546: // Terrastra Quake
+                return 150.0f;
+            case 81571: // Cho'gall Unleashed Shadows
+            case 93221: // Cho'gall Unleashed Shadows
+            case 93222: // Cho'gall Unleashed Shadows
+            case 93223: // Cho'gall Unleashed Shadows
+            case 82363: // Cho'gall Corr of the old god
+            case 93169: // Cho'gall Corr of the old god
+            case 93170: // Cho'gall Corr of the old god
+            case 93171: // Cho'gall Corr of the old god
+                return 200.0f;
+            case 82919: // Cho'gall Sprayed Corruption
+            case 93108: // Cho'gall Sprayed Corruption
+            case 93109: // Cho'gall Sprayed Corruption
+            case 93110: // Cho'gall Sprayed Corruption
+                return 20.0f;
+            case 81538: // Cho'gall Blaze
+            case 93212: // Cho'gall Blaze
+            case 93213: // Cho'gall Blaze
+            case 93214: // Cho'gall Blaze
+                return 5.0f;
+            case 81761: // Cho'gall Spilled blood of the old god
+            case 93172: // Cho'gall Spilled blood of the old god
+            case 93173: // Cho'gall Spilled blood of the old god
+            case 93174: // Cho'gall Spilled blood of the old god
+                return 10.0f;
+            case 88146: // Sinestra Twilight Essence
+            case 92950:
+                return 4.0f;
+            case 90028: // Sinestra Unleash Essence
+            case 92947:
+                return 100.0f;
+            case 78862: // Sinestra Twilight Slicer
+                return 5.0f;
+            case 87231: // Sinestra Calen Barrier
+                return 34.0f; // END
+            // TOTFW
+            case 86111: // Ice Patch Nezir
+            case 93129:
+            case 93130:
+            case 93131:
+                return 10.0f;
+            case 86282: // Toxic Spores Rohash
+            case 93120:
+            case 93121:
+            case 93122:
+                return 10.0f;
+            case 86367: // Sleet Storm Nezir
+            case 96135:
+            case 96136:
+            case 96137:
+                return 90.0f;
+            case 86133: // Rohash tornado
+            case 93141:
+            case 93142:
+            case 93143:
+                return 3.0f;
+            case 84651: // Zephyr Anshal
+            case 93117:
+            case 93118:
+            case 93119:
+                return 90.0f;
+            case 86487: // Hurricane Rohash
+            case 93144:
+            case 93145:
+            case 93146:
+                return 90.0f;
+            case 87770: // Windburst Al'Akir p1
+            case 93261: 
+            case 93262: 
+            case 93263:
+                return 90.0f;
+            case 88858: // Windburst Al'Akir p3
+            case 93286: 
+            case 93287: 
+            case 93288:
+                return 150.0f;
+            case 87873: // Static Shock Al'Akir
+                return 6.0f; // -- DONE.
+            // Baradin Hold
+            case 89000: // Argaloth Fel Flames
+                return 3.0f;
+            case 96883: // Occu'thar Focused Fire
+                return 12.0f;
+            case 96968: // Occu'thar's Destruction
+            case 101008:
+                return 500.0f;
+            case 105857: // Alizabal Disciple of Hate
+                return 10.0f;
+            case 104994: // Alizabal Blade Dance
+                return 13.0f;
+            case 105069: // Alizabal Seething Hate
+                return 6.0f; // -- DONE.
+            // Firelands
+            case 99171: // Ragnaros Engulfing Flames
+                return 13.0f;
+            case 99840: // Shannox Magma Rupture
+                return 50000.0f;
+            case 100002: // Shannox Hurl Spear
+                return 3.0f;
+            case 100495: // Shannox Magma Flare
+                return 50.0f;
+            case 99841: // Shannox Magma rupture
+                return 1.0f; 
+            case 99261: // Baloroc wave of torment
+            case 101636:
+            case 101637:
+            case 101638:
+                return 200.0f;
+            case 99518: // Baloroc countdown
+                return 100.0f;
+            case 98535: // Majordomus leaping flame
+            case 100206:
+            case 100207:
+            case 100208:
+                return 12.0f;
+            case 98443: // Majordomus fiery cyclone
+                return 200.0f;
+            case 98450: // Majordomus searing seeds
+                return 5000.0f;
+            case 99605: // Alysrazor firestorm
+            case 99606: // Alysrazor firestorm
+                return 500.0f;
+            case 98463: // Alysrazor volcan fire
+                return 6.0f;
+            case 99925: // Alysrazor full power
+                return 500.0f;
+            case 101410: // Alysrazor indicator power
+                return 50000.0f;
+            case 99461: // Alysrazor fire energy
+                return 8.0f;
+            case 100734: // Alysrazor fiery tornado
+                return 10.0f;
+            case 98226: // Rhyolite indicator
+                return 200.0f;
+            case 97230: // Rhyolite magma line
+                return 1.0f;
+            case 97234: // Rhyolite magma line
+                return 2.0f;
+            case 98934: // Bethilac aoe damage on web
+                return 300.0f;
+            case 99333: // Bethilac venom rain
+                return 500.0f;
+            case 98471: // Bethilac burning acid
+            case 100826:
+            case 100827:
+            case 100828:
+                return 200.0f;
+            case 99076: // Bethilac metheor
+                return 7.0f;
+            // End Time
+            case 101810: // Jaina Frostbolt Volley
+                return 65.0f;
+            case 101587: // Jaina Flarecore
+                return 200.0f;
+            case 101980: // Jaina Flarecore
+                return 5.0f;
+            // Dragon Soul
+            case 103414: // Morchok Stomp.
+                return 25.0f;
+            case 103785: // Morchok Black Blood.
+                return 150.0f;
+            default:
+                return 0.0f;
+            break;
+        }
     }
 
+    if (!entry)
+        return 0.0f;
+
     float radius;
-    if(positive)
-        radius = RadiusEntry->radiusFriend;
+    if (positive)
+        radius = RadiusEntry->RadiusMax;
     else
-        radius = RadiusEntry->radiusHostile;
+        radius = RadiusEntry->RadiusMin;
     if (caster)
-    if (Player* modOwner = caster->GetSpellModOwner())
-        modOwner->ApplySpellMod(_spellInfo->Id, SPELLMOD_RADIUS, radius, spell);
+        if (Player* modOwner = caster->GetSpellModOwner())
+            modOwner->ApplySpellMod(_spellInfo->Id, SPELLMOD_RADIUS, radius, spell);
 
     return radius;
 }
@@ -1197,7 +1248,7 @@ SpellEffectInfo::StaticData SpellEffectInfo::_data[TOTAL_SPELL_EFFECTS] =
     {EFFECT_IMPLICIT_TARGET_EXPLICIT, TARGET_OBJECT_TYPE_UNIT}, // 128 SPELL_EFFECT_APPLY_AREA_AURA_FRIEND
     {EFFECT_IMPLICIT_TARGET_EXPLICIT, TARGET_OBJECT_TYPE_UNIT}, // 129 SPELL_EFFECT_APPLY_AREA_AURA_ENEMY
     {EFFECT_IMPLICIT_TARGET_EXPLICIT, TARGET_OBJECT_TYPE_UNIT}, // 130 SPELL_EFFECT_REDIRECT_THREAT
-    {EFFECT_IMPLICIT_TARGET_NONE,     TARGET_OBJECT_TYPE_UNIT}, // 131 SPELL_EFFECT_131
+    {EFFECT_IMPLICIT_TARGET_NONE,     TARGET_OBJECT_TYPE_UNIT}, // 131 SPELL_EFFECT_PLAY_SOUND
     {EFFECT_IMPLICIT_TARGET_EXPLICIT, TARGET_OBJECT_TYPE_UNIT}, // 132 SPELL_EFFECT_PLAY_MUSIC
     {EFFECT_IMPLICIT_TARGET_EXPLICIT, TARGET_OBJECT_TYPE_UNIT}, // 133 SPELL_EFFECT_UNLEARN_SPECIALIZATION
     {EFFECT_IMPLICIT_TARGET_NONE,     TARGET_OBJECT_TYPE_UNIT}, // 134 SPELL_EFFECT_KILL_CREDIT2
@@ -1232,7 +1283,7 @@ SpellEffectInfo::StaticData SpellEffectInfo::_data[TOTAL_SPELL_EFFECTS] =
     {EFFECT_IMPLICIT_TARGET_EXPLICIT, TARGET_OBJECT_TYPE_UNIT}, // 163 SPELL_EFFECT_163
     {EFFECT_IMPLICIT_TARGET_EXPLICIT, TARGET_OBJECT_TYPE_UNIT}, // 164 SPELL_EFFECT_REMOVE_AURA
     {EFFECT_IMPLICIT_TARGET_EXPLICIT, TARGET_OBJECT_TYPE_UNIT}, // 165 SPELL_EFFECT_COUNT_HEALTH_FROM_MAX_PCT
-    {EFFECT_IMPLICIT_TARGET_CASTER,   TARGET_OBJECT_TYPE_UNIT}, // 166 SPELL_EFFECT_REWARD_CURRENCY
+    {EFFECT_IMPLICIT_TARGET_CASTER,   TARGET_OBJECT_TYPE_UNIT}, // 166 SPELL_EFFECT_GIVE_CURRENCY
     {EFFECT_IMPLICIT_TARGET_EXPLICIT, TARGET_OBJECT_TYPE_UNIT}, // 167 SPELL_EFFECT_167
     {EFFECT_IMPLICIT_TARGET_EXPLICIT, TARGET_OBJECT_TYPE_UNIT}, // 168 SPELL_EFFECT_168
     {EFFECT_IMPLICIT_TARGET_NONE,     TARGET_OBJECT_TYPE_ITEM}, // 169 SPELL_EFFECT_DESTROY_ITEM
@@ -1251,7 +1302,7 @@ SpellEffectInfo::StaticData SpellEffectInfo::_data[TOTAL_SPELL_EFFECTS] =
     {EFFECT_IMPLICIT_TARGET_NONE,     TARGET_OBJECT_TYPE_UNIT}, // 182 SPELL_EFFECT_182
 };
 
-SpellInfo::SpellInfo(SpellEntry const* spellEntry)
+SpellInfo::SpellInfo(SpellEntry const* spellEntry, SpellEffectEntry const** effects)
 {
     Id = spellEntry->Id;
     Attributes = spellEntry->Attributes;
@@ -1271,8 +1322,10 @@ SpellInfo::SpellInfo(SpellEntry const* spellEntry)
     PowerType = spellEntry->powerType;
     RangeEntry = spellEntry->rangeIndex ? sSpellRangeStore.LookupEntry(spellEntry->rangeIndex) : NULL;
     Speed = spellEntry->speed;
+
     for (uint8 i = 0; i < 2; ++i)
         SpellVisual[i] = spellEntry->SpellVisual[i];
+
     SpellIconID = spellEntry->SpellIconID;
     ActiveIconID = spellEntry->activeIconID;
     SpellName = spellEntry->SpellName;
@@ -1299,7 +1352,7 @@ SpellInfo::SpellInfo(SpellEntry const* spellEntry)
 
     // SpellDifficultyEntry
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-        Effects[i] = SpellEffectInfo(spellEntry, this, i);
+        Effects[i] = SpellEffectInfo(spellEntry, this, i, effects[i]);
 
     // SpellScalingEntry
     SpellScalingEntry const* _scaling = GetSpellScaling();
@@ -1336,7 +1389,7 @@ SpellInfo::SpellInfo(SpellEntry const* spellEntry)
 
     // SpellCategoriesEntry
     SpellCategoriesEntry const* _categorie = GetSpellCategories();
-    Category = _categorie ? _categorie->Category : 0;
+    CategoryEntry = _categorie ? sSpellCategoryStore.LookupEntry(_categorie->Category) : NULL;
     Dispel = _categorie ? _categorie->Dispel : 0;
     Mechanic = _categorie ? _categorie->Mechanic : 0;
     StartRecoveryCategory = _categorie ? _categorie->StartRecoveryCategory : 0;
@@ -1404,13 +1457,17 @@ SpellInfo::SpellInfo(SpellEntry const* spellEntry)
     for (uint8 i = 0; i < 2; ++i)
         Totem[i] = _totem ? _totem->Totem[i] : 0;
 
-    ExplicitTargetMask = _GetExplicitTargetMask();
     ChainEntry = NULL;
 }
 
 SpellInfo::~SpellInfo()
 {
     _UnloadImplicitTargetConditionLists();
+}
+
+uint32 SpellInfo::GetCategory() const
+{
+    return CategoryEntry ? CategoryEntry->Id : 0;
 }
 
 bool SpellInfo::HasEffect(SpellEffects effect) const
@@ -1423,8 +1480,9 @@ bool SpellInfo::HasEffect(SpellEffects effect) const
 
 bool SpellInfo::HasAura(AuraType aura) const
 {
-          if (!this)
+    if (!this)
         return false;
+
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
         if (Effects[i].IsAura(aura))
             return true;
@@ -1568,10 +1626,12 @@ bool SpellInfo::NeedsExplicitUnitTarget() const
     return GetExplicitTargetMask() & TARGET_FLAG_UNIT_MASK;
 }
 
-bool SpellInfo::NeedsToBeTriggeredByCaster() const
+bool SpellInfo::NeedsToBeTriggeredByCaster(SpellInfo const* triggeringSpell) const
 {
     if (NeedsExplicitUnitTarget())
         return true;
+
+    /*
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
     {
         if (Effects[i].IsEffect())
@@ -1581,6 +1641,24 @@ bool SpellInfo::NeedsToBeTriggeredByCaster() const
                 return true;
         }
     }
+    */
+
+    if (triggeringSpell->IsChanneled())
+    {
+        uint32 mask = 0;
+        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+        {
+            if (Effects[i].TargetA.GetTarget() != TARGET_UNIT_CASTER && Effects[i].TargetA.GetTarget() != TARGET_DEST_CASTER
+                && Effects[i].TargetB.GetTarget() != TARGET_UNIT_CASTER && Effects[i].TargetB.GetTarget() != TARGET_DEST_CASTER)
+            {
+                mask |= Effects[i].GetProvidedTargetMask();
+            }
+        }
+
+        if (mask & TARGET_FLAG_UNIT_MASK)
+            return true;
+    }
+
     return false;
 }
 
@@ -1638,14 +1716,19 @@ bool SpellInfo::IsPassiveStackableWithRanks() const
 
 bool SpellInfo::IsMultiSlotAura() const
 {
-    return IsPassive() || Id == 44413;
+    return IsPassive() || Id == 55849 || Id == 40075 || Id == 44413; // Power Spark, Fel Flak Fire, Incanter's Absorption
 }
 
 bool SpellInfo::IsStackableOnOneSlotWithDifferentCasters() const
 {
     /// TODO: Re-verify meaning of SPELL_ATTR3_STACK_FOR_DIFF_CASTERS and update conditions here
     return StackAmount > 1 && !IsChanneled() && !(AttributesEx3 & SPELL_ATTR3_STACK_FOR_DIFF_CASTERS);
-} 
+}
+
+bool SpellInfo::IsCooldownStartedOnEvent() const
+{
+    return Attributes & SPELL_ATTR0_DISABLED_WHILE_ACTIVE || (CategoryEntry && CategoryEntry->Flags & SPELL_CATEGORY_FLAG_COOLDOWN_STARTS_ON_EVENT);
+}
 
 bool SpellInfo::IsDeathPersistent() const
 {
@@ -1717,7 +1800,7 @@ bool SpellInfo::IsAffectedBySpellMods() const
     return !(AttributesEx3 & SPELL_ATTR3_NO_DONE_BONUS);
 }
 
-bool SpellInfo::IsAffectedBySpellMod(SpellModifier* mod) const
+bool SpellInfo::IsAffectedBySpellMod(SpellModifier const* mod) const
 {
     if (!IsAffectedBySpellMods())
         return false;
@@ -1777,31 +1860,6 @@ bool SpellInfo::IsSingleTarget() const
         case SPELL_SPECIFIC_JUDGEMENT:
         case SPELL_SPECIFIC_LIFEBLOOM:
             return true;
-        default:
-            break;
-    }
-
-    return false;
-}
-
-bool SpellInfo::IsSingleTargetWith(SpellInfo const* spellInfo) const
-{
-    // TODO - need better check
-    // Equal icon and spellfamily
-    if (SpellFamilyName == spellInfo->SpellFamilyName &&
-        SpellIconID == spellInfo->SpellIconID)
-        return true;
-
-    SpellSpecificType spec = GetSpellSpecific();
-    // spell with single target specific types
-    switch (spec)
-    {
-        case SPELL_SPECIFIC_JUDGEMENT:
-        case SPELL_SPECIFIC_MAGE_POLYMORPH:
-        case SPELL_SPECIFIC_LIFEBLOOM:
-            if (spellInfo->GetSpellSpecific() == spec)
-                return true;
-            break;
         default:
             break;
     }
@@ -1873,10 +1931,10 @@ SpellCastResult SpellInfo::CheckShapeshift(uint32 form) const
 
     uint32 stanceMask = (form ? 1 << (form - 1) : 0);
 
-    if (stanceMask & StancesNot)                 // can explicitly not be casted in this stance
+    if (stanceMask & StancesNot)                 // can explicitly not be cast in this stance
         return SPELL_FAILED_NOT_SHAPESHIFT;
 
-    if (stanceMask & Stances)                    // can explicitly be casted in this stance
+    if (stanceMask & Stances)                    // can explicitly be cast in this stance
         return SPELL_CAST_OK;
 
     bool actAsShifted = false;
@@ -1886,7 +1944,7 @@ SpellCastResult SpellInfo::CheckShapeshift(uint32 form) const
         shapeInfo = sSpellShapeshiftFormStore.LookupEntry(form);
         if (!shapeInfo)
         {
-            sLog->outError("GetErrorAtShapeshiftedCast: unknown shapeshift %u", form);
+            TC_LOG_ERROR("spells", "GetErrorAtShapeshiftedCast: unknown shapeshift %u", form);
             return SPELL_CAST_OK;
         }
         actAsShifted = !(shapeInfo->flags1 & 1);            // shapeshift acts as normal form for spells
@@ -1908,7 +1966,7 @@ SpellCastResult SpellInfo::CheckShapeshift(uint32 form) const
 
     // Check if stance disables cast of not-stance spells
     // Example: cannot cast any other spells in zombie or ghoul form
-    // TODO: Find a way to disable use of these spells clientside
+    /// @todo Find a way to disable use of these spells clientside
     if (shapeInfo && shapeInfo->flags1 & 0x400)
     {
         if (!(stanceMask & Stances))
@@ -1974,7 +2032,7 @@ SpellCastResult SpellInfo::CheckLocation(uint32 map_id, uint32 zone_id, uint32 a
     {
         case 23333:                                         // Warsong Flag
         case 23335:                                         // Silverwing Flag
-            return ((map_id == 489 || map_id == 726) && player && player->InBattleground()) ? SPELL_CAST_OK : SPELL_FAILED_REQUIRES_AREA;
+           return ((map_id == 489 || map_id == 726) && player && player->InBattleground()) ? SPELL_CAST_OK : SPELL_FAILED_REQUIRES_AREA;
         case 34976:                                         // Netherstorm Flag
             return map_id == 566 && player && player->InBattleground() ? SPELL_CAST_OK : SPELL_FAILED_REQUIRES_AREA;
         case 2584:                                          // Waiting to Resurrect
@@ -2069,7 +2127,7 @@ SpellCastResult SpellInfo::CheckTarget(Unit const* caster, WorldObject const* ta
         return SPELL_FAILED_BAD_TARGETS;
 
     // check visibility - ignore stealth for implicit (area) targets
-    if (!(AttributesEx6 & SPELL_ATTR6_CAN_TARGET_INVISIBLE) && !caster->canSeeOrDetect(target, implicit))
+    if (!(AttributesEx6 & SPELL_ATTR6_CAN_TARGET_INVISIBLE) && !caster->CanSeeOrDetect(target, implicit))
         return SPELL_FAILED_BAD_TARGETS;
 
     Unit const* unitTarget = target->ToUnit();
@@ -2169,7 +2227,7 @@ SpellCastResult SpellInfo::CheckTarget(Unit const* caster, WorldObject const* ta
         if (!unitTarget->ToPlayer()->IsVisible())
             return SPELL_FAILED_BM_OR_INVISGOD;
 
-        if (unitTarget->ToPlayer()->isGameMaster())
+        if (unitTarget->ToPlayer()->IsGameMaster())
             return SPELL_FAILED_BM_OR_INVISGOD;
     }
 
@@ -2177,7 +2235,7 @@ SpellCastResult SpellInfo::CheckTarget(Unit const* caster, WorldObject const* ta
     if (unitTarget->HasUnitState(UNIT_STATE_IN_FLIGHT))
         return SPELL_FAILED_BAD_TARGETS;
 
-    /* TARGET_UNIT_MASTER gets blocked here for passengers, because the whole idea of this check is to 
+    /* TARGET_UNIT_MASTER gets blocked here for passengers, because the whole idea of this check is to
     not allow passengers to be implicitly hit by spells, however this target type should be an exception,
     if this is left it kills spells that award kill credit from vehicle to master (few spells),
     the use of these 2 covers passenger target check, logically, if vehicle cast this to master it should always hit
@@ -2241,10 +2299,60 @@ SpellCastResult SpellInfo::CheckExplicitTarget(Unit const* caster, WorldObject c
     return SPELL_CAST_OK;
 }
 
+SpellCastResult SpellInfo::CheckVehicle(Unit const* caster) const
+{
+    // All creatures should be able to cast as passengers freely, restriction and attribute are only for players
+    if (caster->GetTypeId() != TYPEID_PLAYER)
+        return SPELL_CAST_OK;
+
+    Vehicle* vehicle = caster->GetVehicle();
+    if (vehicle)
+    {
+        uint16 checkMask = 0;
+        for (uint8 effIndex = EFFECT_0; effIndex < MAX_SPELL_EFFECTS; ++effIndex)
+        {
+            if (Effects[effIndex].ApplyAuraName == SPELL_AURA_MOD_SHAPESHIFT)
+            {
+                SpellShapeshiftFormEntry const* shapeShiftFromEntry = sSpellShapeshiftFormStore.LookupEntry(Effects[effIndex].MiscValue);
+                if (shapeShiftFromEntry && (shapeShiftFromEntry->flags1 & 1) == 0)  // unk flag
+                    checkMask |= VEHICLE_SEAT_FLAG_UNCONTROLLED;
+                break;
+            }
+        }
+
+        if (HasAura(SPELL_AURA_MOUNTED))
+            checkMask |= VEHICLE_SEAT_FLAG_CAN_CAST_MOUNT_SPELL;
+
+        if (!checkMask)
+            checkMask = VEHICLE_SEAT_FLAG_CAN_ATTACK;
+
+        VehicleSeatEntry const* vehicleSeat = vehicle->GetSeatForPassenger(caster);
+        if (!(AttributesEx6 & SPELL_ATTR6_CASTABLE_WHILE_ON_VEHICLE) && !(Attributes & SPELL_ATTR0_CASTABLE_WHILE_MOUNTED)
+            && (vehicleSeat->m_flags & checkMask) != checkMask)
+            return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
+
+        // Can only summon uncontrolled minions/guardians when on controlled vehicle
+        if (vehicleSeat->m_flags & (VEHICLE_SEAT_FLAG_CAN_CONTROL | VEHICLE_SEAT_FLAG_UNK2))
+        {
+            for (uint32 i = EFFECT_0; i < MAX_SPELL_EFFECTS; ++i)
+            {
+                if (Effects[i].Effect != SPELL_EFFECT_SUMMON)
+                    continue;
+
+                SummonPropertiesEntry const* props = sSummonPropertiesStore.LookupEntry(Effects[i].MiscValueB);
+                if (props && props->Category != SUMMON_CATEGORY_WILD)
+                    return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
+            }
+        }
+    }
+
+    return SPELL_CAST_OK;
+}
+
 bool SpellInfo::CheckTargetCreatureType(Unit const* target) const
 {
     // Curse of Doom & Exorcism: not find another way to fix spell target check :/
-    if (SpellFamilyName == SPELLFAMILY_WARLOCK && Category == 1179)
+    if (SpellFamilyName == SPELLFAMILY_WARLOCK && GetCategory() == 1179)
     {
         // not allow cast at player
         if (target->GetTypeId() == TYPEID_PLAYER)
@@ -2266,7 +2374,7 @@ uint32 SpellInfo::GetAllEffectsMechanicMask() const
     uint32 mask = 0;
     if (Mechanic)
         mask |= 1 << Mechanic;
-    for (int i = 0; i < MAX_SPELL_EFFECTS; ++i)
+    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
         if (Effects[i].IsEffect() && Effects[i].Mechanic)
             mask |= 1 << Effects[i].Mechanic;
     return mask;
@@ -2276,9 +2384,9 @@ uint32 SpellInfo::GetEffectMechanicMask(uint8 effIndex) const
 {
     uint32 mask = 0;
     if (Mechanic)
-        mask |= 1<< Mechanic;
+        mask |= 1 << Mechanic;
     if (Effects[effIndex].IsEffect() && Effects[effIndex].Mechanic)
-        mask |= 1<< Effects[effIndex].Mechanic;
+        mask |= 1 << Effects[effIndex].Mechanic;
     return mask;
 }
 
@@ -2286,10 +2394,10 @@ uint32 SpellInfo::GetSpellMechanicMaskByEffectMask(uint32 effectMask) const
 {
     uint32 mask = 0;
     if (Mechanic)
-        mask |= 1<< Mechanic;
-    for (int i = 0; i < MAX_SPELL_EFFECTS; ++i)
+        mask |= 1 << Mechanic;
+    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
         if ((effectMask & (1 << i)) && Effects[i].Mechanic)
-            mask |= 1<< Effects[i].Mechanic;
+            mask |= 1 << Effects[i].Mechanic;
     return mask;
 }
 
@@ -2348,7 +2456,7 @@ AuraStateType SpellInfo::GetAuraState() const
         return AURA_STATE_FAERIE_FIRE;
 
     // Sting (hunter's pet ability)
-    if (Category == 1133)
+    if (GetCategory() == 1133)
         return AURA_STATE_FAERIE_FIRE;
 
     // Victorious
@@ -2484,7 +2592,7 @@ SpellSpecificType SpellInfo::GetSpellSpecific() const
             // only warlock curses have this
             if (Dispel == DISPEL_CURSE)
                 return SPELL_SPECIFIC_CURSE;
-                
+
             // Warlock (Demon Armor | Demon Skin | Fel Armor)
             if (SpellFamilyFlags[1] & 0x20000020 || SpellFamilyFlags[2] & 0x00000010)
                 return SPELL_SPECIFIC_WARLOCK_ARMOR;
@@ -2528,8 +2636,8 @@ SpellSpecificType SpellInfo::GetSpellSpecific() const
             if (SpellFamilyFlags[0] & 0x00002190)
                 return SPELL_SPECIFIC_HAND;
 
-            // Judgement of Wisdom, Judgement of Light, Judgement of Justice
-            if (Id == 20184 || Id == 20185 || Id == 20186)
+            // Judgement
+            if (Id == 20271)
                 return SPELL_SPECIFIC_JUDGEMENT;
 
             // only paladin auras have this (for palaldin class family)
@@ -2566,6 +2674,9 @@ SpellSpecificType SpellInfo::GetSpellSpecific() const
                 case SPELL_AURA_AOE_CHARM:
                     return SPELL_SPECIFIC_CHARM;
                 case SPELL_AURA_TRACK_CREATURES:
+                    /// @workaround For non-stacking tracking spells (We need generic solution)
+                    if (Id == 30645) // Gas Cloud Tracking
+                        return SPELL_SPECIFIC_NORMAL;
                 case SPELL_AURA_TRACK_RESOURCES:
                 case SPELL_AURA_TRACK_STEALTHED:
                     return SPELL_SPECIFIC_TRACKER;
@@ -2614,16 +2725,18 @@ int32 SpellInfo::GetMaxDuration() const
     return (DurationEntry->Duration[2] == -1) ? -1 : abs(DurationEntry->Duration[2]);
 }
 
-uint32 SpellInfo::CalcCastTime(Unit* caster, Spell* spell) const
+uint32 SpellInfo::CalcCastTime(uint8 level, Spell* spell /*= NULL*/) const
 {
     int32 castTime = 0;
-    
+    if (!level && spell)
+        level = spell->GetCaster()->getLevel();
+
     // not all spells have cast time index and this is all is passive abilities
-    if (caster && CastTimeMax > 0)
+    if (level && CastTimeMax > 0)
     {
         castTime = CastTimeMax;
-        if (CastTimeMaxLevel > int32(caster->getLevel()))
-            castTime = CastTimeMin + int32(caster->getLevel() - 1) * (CastTimeMax - CastTimeMin) / (CastTimeMaxLevel - 1);
+        if (CastTimeMaxLevel > level)
+            castTime = CastTimeMin + int32(level - 1) * (CastTimeMax - CastTimeMin) / (CastTimeMaxLevel - 1);
     }
     else if (CastTimeEntry)
         castTime = CastTimeEntry->CastTime;
@@ -2631,10 +2744,10 @@ uint32 SpellInfo::CalcCastTime(Unit* caster, Spell* spell) const
     if (!castTime)
         return 0;
 
-    if (caster)
-        caster->ModSpellCastTime(this, castTime, spell);
+    if (spell)
+        spell->GetCaster()->ModSpellCastTime(this, castTime, spell);
 
-    if (Attributes & SPELL_ATTR0_REQ_AMMO && (!IsAutoRepeatRangedSpell()))
+    if (Attributes & SPELL_ATTR0_REQ_AMMO && (!IsAutoRepeatRangedSpell()) && !(AttributesEx9 & SPELL_ATTR9_AIMED_SHOT))
         castTime += 500;
 
     return (castTime > 0) ? uint32(castTime) : 0;
@@ -2672,7 +2785,7 @@ uint32 SpellInfo::GetRecoveryTime() const
     return RecoveryTime > CategoryRecoveryTime ? RecoveryTime : CategoryRecoveryTime;
 }
 
-uint32 SpellInfo::CalcPowerCost(Unit const* caster, SpellSchoolMask schoolMask) const
+int32 SpellInfo::CalcPowerCost(Unit const* caster, SpellSchoolMask schoolMask) const
 {
     // Spell drain all exist power on cast (Only paladin lay of Hands)
     if (AttributesEx & SPELL_ATTR1_DRAIN_ALL_POWER)
@@ -2683,7 +2796,7 @@ uint32 SpellInfo::CalcPowerCost(Unit const* caster, SpellSchoolMask schoolMask) 
         // Else drain all power
         if (PowerType < MAX_POWERS)
             return caster->GetPower(Powers(PowerType));
-        sLog->outError("SpellInfo::CalcPowerCost: Unknown power type '%d' in spell %d", PowerType, Id);
+        TC_LOG_ERROR("spells", "SpellInfo::CalcPowerCost: Unknown power type '%d' in spell %d", PowerType, Id);
         return 0;
     }
 
@@ -2696,22 +2809,22 @@ uint32 SpellInfo::CalcPowerCost(Unit const* caster, SpellSchoolMask schoolMask) 
         {
             // health as power used
             case POWER_HEALTH:
-                powerCost += int32(CalculatePctU(caster->GetCreateHealth(), ManaCostPercentage));
+                powerCost += int32(CalculatePct(caster->GetCreateHealth(), ManaCostPercentage));
                 break;
             case POWER_MANA:
-                powerCost += int32(CalculatePctU(caster->GetCreateMana(), ManaCostPercentage));
+                powerCost += int32(CalculatePct(caster->GetCreateMana(), ManaCostPercentage));
                 break;
             case POWER_RAGE:
             case POWER_FOCUS:
             case POWER_ENERGY:
-                powerCost += int32(CalculatePctU(caster->GetMaxPower(Powers(PowerType)), ManaCostPercentage));
+                powerCost += int32(CalculatePct(caster->GetMaxPower(Powers(PowerType)), ManaCostPercentage));
                 break;
             case POWER_RUNES:
             case POWER_RUNIC_POWER:
-                sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "CalculateManaCost: Not implemented yet!");
+                TC_LOG_DEBUG("spells", "CalculateManaCost: Not implemented yet!");
                 break;
             default:
-                sLog->outError("CalculateManaCost: Unknown power type '%d' in spell %d", PowerType, Id);
+                TC_LOG_ERROR("spells", "CalculateManaCost: Unknown power type '%d' in spell %d", PowerType, Id);
                 return 0;
         }
     }
@@ -2726,15 +2839,41 @@ uint32 SpellInfo::CalcPowerCost(Unit const* caster, SpellSchoolMask schoolMask) 
             continue;
         powerCost += (*i)->GetAmount();
     }
+
     // Shiv - costs 20 + weaponSpeed*10 energy (apply only to non-triggered spell with energy cost)
     if (AttributesEx4 & SPELL_ATTR4_SPELL_VS_EXTEND_COST)
-        powerCost += caster->GetAttackTime(OFF_ATTACK) / 100;
+    {
+        uint32 speed = 0;
+/* REVIEW - MERGE
+        if (SpellShapeshiftEntry const* ss = sSpellShapeshiftStore.LookupEntry(caster->GetShapeshiftForm()))
+            speed = ss->attackSpeed;
+        else
+*/
+        {
+            WeaponAttackType slot = BASE_ATTACK;
+            if (AttributesEx3 & SPELL_ATTR3_REQ_OFFHAND)
+                slot = OFF_ATTACK;
+
+            speed = caster->GetAttackTime(slot);
+        }
+
+        powerCost += speed / 100;
+    }
+
     // Apply cost mod by spell
     if (Player* modOwner = caster->GetSpellModOwner())
         modOwner->ApplySpellMod(Id, SPELLMOD_COST, powerCost);
 
-    if (Attributes & SPELL_ATTR0_LEVEL_DAMAGE_CALCULATION)
-        powerCost = int32(powerCost / (1.117f * SpellLevel / caster->getLevel() -0.1327f));
+    if (!caster->IsControlledByPlayer())
+    {
+        if (Attributes & SPELL_ATTR0_LEVEL_DAMAGE_CALCULATION)
+        {
+            GtNPCManaCostScalerEntry const* spellScaler = sGtNPCManaCostScalerStore.LookupEntry(SpellLevel - 1);
+            GtNPCManaCostScalerEntry const* casterScaler = sGtNPCManaCostScalerStore.LookupEntry(caster->getLevel() - 1);
+            if (spellScaler && casterScaler)
+                powerCost *= casterScaler->ratio / spellScaler->ratio;
+        }
+    }
 
     // PCT mod from user auras by spell school and power type
     Unit::AuraEffectList const& aurasPct = caster->GetAuraEffectsByType(SPELL_AURA_MOD_POWER_COST_SCHOOL_PCT);
@@ -2744,7 +2883,7 @@ uint32 SpellInfo::CalcPowerCost(Unit const* caster, SpellSchoolMask schoolMask) 
             continue;
         if (!((*i)->GetMiscValueB() & (1 << PowerType)))
             continue;
-        powerCost += CalculatePctN(powerCost, (*i)->GetAmount());
+        powerCost += CalculatePct(powerCost, (*i)->GetAmount());
     }
     if (powerCost < 0)
         powerCost = 0;
@@ -2840,15 +2979,14 @@ bool SpellInfo::IsDifferentRankOf(SpellInfo const* spellInfo) const
 bool SpellInfo::IsHighRankOf(SpellInfo const* spellInfo) const
 {
     if (ChainEntry && spellInfo->ChainEntry)
-    {
         if (ChainEntry->first == spellInfo->ChainEntry->first)
             if (ChainEntry->rank > spellInfo->ChainEntry->rank)
                 return true;
-    }
+
     return false;
 }
 
-uint32 SpellInfo::_GetExplicitTargetMask() const
+void SpellInfo::_InitializeExplicitTargetMask()
 {
     bool srcSet = false;
     bool dstSet = false;
@@ -2858,6 +2996,7 @@ uint32 SpellInfo::_GetExplicitTargetMask() const
     {
         if (!Effects[i].IsEffect())
             continue;
+
         targetMask |= Effects[i].TargetA.GetExplicitTargetMask(srcSet, dstSet);
         targetMask |= Effects[i].TargetB.GetExplicitTargetMask(srcSet, dstSet);
 
@@ -2871,9 +3010,11 @@ uint32 SpellInfo::_GetExplicitTargetMask() const
         // don't add explicit object/dest flags when spell has no max range
         if (GetMaxRange(true) == 0.0f && GetMaxRange(false) == 0.0f)
             effectTargetMask &= ~(TARGET_FLAG_UNIT_MASK | TARGET_FLAG_GAMEOBJECT | TARGET_FLAG_CORPSE_MASK | TARGET_FLAG_DEST_LOCATION);
+
         targetMask |= effectTargetMask;
     }
-    return targetMask;
+
+    ExplicitTargetMask = targetMask;
 }
 
 bool SpellInfo::_IsPositiveEffect(uint8 effIndex, bool deep) const
@@ -2888,13 +3029,11 @@ bool SpellInfo::_IsPositiveEffect(uint8 effIndex, bool deep) const
             switch (Id)
             {
                 case 34700: // Allergic Reaction
-                case 61987: // Avenging Wrath Marker
-                case 61988: // Divine Shield exclude aura
                 case 62532: // Conservator's Grip
                     return false;
+                case 30877: // Tag Murloc
                 case 61716: // Rabbit Costume
                 case 61734: // Noblegarden Bunny
-                case 30877: // Tag Murloc
                 case 62344: // Fists of Stone
                     return true;
                 default:
@@ -2902,9 +3041,6 @@ bool SpellInfo::_IsPositiveEffect(uint8 effIndex, bool deep) const
             }
             break;
         case SPELLFAMILY_MAGE:
-            // Amplify Magic, Dampen Magic
-            if (SpellFamilyFlags[0] == 0x00002000)
-                return true;
             // Ignite
             if (SpellIconID == 45)
                 return true;
@@ -2920,23 +3056,11 @@ bool SpellInfo::_IsPositiveEffect(uint8 effIndex, bool deep) const
                     break;
             }
             break;
-        case SPELLFAMILY_HUNTER:
-            // Aspect of the Viper
-            if (Id == 34074)
-                return true;
-            break;
-        case SPELLFAMILY_SHAMAN:
-            if (Id == 30708)
-                return false;
-            break;
         case SPELLFAMILY_ROGUE:
             switch (Id)
             {
                 // Envenom must be considered as a positive effect even though it deals damage
-                case 32645:     // Envenom (Rank 1)
-                case 32684:     // Envenom (Rank 2)
-                case 57992:     // Envenom (Rank 3)
-                case 57993:     // Envenom (Rank 4)
+                case 32645: // Envenom
                     return true;
                 default:
                     break;
@@ -2980,6 +3104,8 @@ bool SpellInfo::_IsPositiveEffect(uint8 effIndex, bool deep) const
         case SPELL_EFFECT_HEAL_PCT:
         case SPELL_EFFECT_ENERGIZE_PCT:
             return true;
+       /* case SPELL_EFFECT_APPLY_AREA_AURA_ENEMY:
+            return false;*/
 
             // non-positive aura use
         case SPELL_EFFECT_APPLY_AURA:
@@ -3046,12 +3172,12 @@ bool SpellInfo::_IsPositiveEffect(uint8 effIndex, bool deep) const
                 case SPELL_AURA_PREVENT_RESURRECTION:
                     return false;
                 case SPELL_AURA_PERIODIC_DAMAGE:            // used in positive spells also.
-                    // part of negative spell if casted at self (prevent cancel)
+                    // part of negative spell if cast at self (prevent cancel)
                     if (Effects[effIndex].TargetA.GetTarget() == TARGET_UNIT_CASTER)
                         return false;
                     break;
                 case SPELL_AURA_MOD_DECREASE_SPEED:         // used in positive spells also
-                    // part of positive spell if casted at self
+                    // part of positive spell if cast at self
                     if (Effects[effIndex].TargetA.GetTarget() != TARGET_UNIT_CASTER)
                         return false;
                     // but not this if this first effect (didn't find better check)
@@ -3234,11 +3360,6 @@ SpellClassOptionsEntry const* SpellInfo::GetSpellClassOptions() const
 SpellCooldownsEntry const* SpellInfo::GetSpellCooldowns() const
 {
     return SpellCooldownsId ? sSpellCooldownsStore.LookupEntry(SpellCooldownsId) : NULL;
-}
-
-SpellEffectEntry const* SpellEntry::GetSpellEffect(uint32 eff) const
-{
-    return GetSpellEffectEntry(Id, eff);
 }
 
 void SpellInfo::_UnloadImplicitTargetConditionLists()

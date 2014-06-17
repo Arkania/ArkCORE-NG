@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -24,52 +24,42 @@ SDComment:  Only Horde Heroic
 SDCategory:
 Script Data End */
 
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 
-#define SPELL_BATTLE_SHOUT                                       31403
-#define SPELL_CHARGE                                             60067
-#define SPELL_FRIGHTENING_SHOUT                                  19134
-#define SPELL_WHIRLWIND_1                                        38619
-#define SPELL_WHIRLWIND_2                                        38618
-
-//not used
-//Yell
-#define SAY_AGGRO                                              -1576021
-#define SAY_KILL                                               -1576022
-#define SAY_DEATH                                              -1576023
+enum CommanderStoutbeard
+{
+    SPELL_BATTLE_SHOUT              = 31403,
+    SPELL_CHARGE                    = 60067,
+    SPELL_FRIGHTENING_SHOUT         = 19134,
+    SPELL_WHIRLWIND_1               = 38619,
+    SPELL_WHIRLWIND_2               = 38618
+};
 
 class boss_commander_stoutbeard : public CreatureScript
 {
 public:
     boss_commander_stoutbeard() : CreatureScript("boss_commander_stoutbeard") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new boss_commander_stoutbeardAI (creature);
+        return new boss_commander_stoutbeardAI(creature);
     }
 
     struct boss_commander_stoutbeardAI : public ScriptedAI
     {
-        boss_commander_stoutbeardAI(Creature* creature) : ScriptedAI(creature) {}
+        boss_commander_stoutbeardAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void Reset() {}
-        void EnterCombat(Unit* /*who*/)
-        {
-            DoScriptText(SAY_AGGRO, me);
-        }
-        void AttackStart(Unit* /*who*/) {}
-        void MoveInLineOfSight(Unit* /*who*/) {}
-        void UpdateAI(uint32 /*diff*/)
+        void Reset() OVERRIDE { }
+        void AttackStart(Unit* /*who*/) OVERRIDE { }
+        void MoveInLineOfSight(Unit* /*who*/) OVERRIDE { }
+        void UpdateAI(uint32 /*diff*/) OVERRIDE
         {
             //Return since we have no target
             if (!UpdateVictim())
                 return;
 
             DoMeleeAttackIfReady();
-        }
-        void JustDied(Unit* /*killer*/)
-        {
-            DoScriptText(SAY_DEATH, me);
         }
     };
 

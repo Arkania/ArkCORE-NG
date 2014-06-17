@@ -1,7 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
- * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -17,20 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef DEF_ARCATRAZ_H
-#define DEF_ARCATRAZ_H
-
-#define TYPE_ZEREKETH           1
-#define TYPE_DALLIAH            2
-#define TYPE_SOCCOTHRATES       3
-#define TYPE_HARBINGERSKYRISS   4
-#define TYPE_WARDEN_1           5
-#define TYPE_WARDEN_2           6
-#define TYPE_WARDEN_3           7
-#define TYPE_WARDEN_4           8
-#define TYPE_WARDEN_5           9
-#define TYPE_SHIELD_OPEN        11
-#define DATA_SPHERE_SHIELD      12
+#ifndef ARCATRAZ_H
+#define ARCATRAZ_H
 
 #define ArcatrazScriptName "instance_arcatraz"
 
@@ -52,7 +39,7 @@ enum DataTypes
     DATA_WARDEN_4                               = 8, // used by SmartAI
     DATA_WARDEN_5                               = 9, // used by SmartAI
     DATA_MELLICHAR                              = 10,
-    DATA_WARDENS_SHIELD                         = 11,
+    DATA_WARDENS_SHIELD                         = 11
 };
 
 enum CreatureIds
@@ -75,5 +62,10 @@ enum GameObjectIds
     GO_WARDENS_SHIELD                           = 184802  // shield 'protecting' mellichar
 };
 
-#endif
+template<class AI>
+AI* GetArcatrazAI(Creature* creature)
+{
+    return GetInstanceAI<AI>(creature, ArcatrazScriptName);
+}
 
+#endif // ARCATRAZ_H

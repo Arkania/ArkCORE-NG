@@ -12,12 +12,12 @@
 # This to stop a few silly crashes that could have been avoided IF people
 # weren't doing some -O3 psychooptimizations etc.
 
-if(CMAKE_COMPILER_IS_GNUCXX)
+if(CMAKE_COMPILER_IS_GNUCXX AND NOT MINGW)
   add_definitions(-fno-delete-null-pointer-checks)
 endif()
 
 if( SERVERS )
-  set(sources_Debugging
+  set(sources_windows_Debugging
     ${CMAKE_SOURCE_DIR}/src/server/shared/Debugging/WheatyExceptionReport.cpp
     ${CMAKE_SOURCE_DIR}/src/server/shared/Debugging/WheatyExceptionReport.h
   )
@@ -30,5 +30,6 @@ if( SERVERS )
 else()
   if( TOOLS )
     add_subdirectory(collision)
+    add_subdirectory(shared)
   endif()
 endif()

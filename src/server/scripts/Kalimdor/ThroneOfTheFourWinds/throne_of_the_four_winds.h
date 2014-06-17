@@ -28,7 +28,7 @@ enum CreatureIds
     NPC_RAVENOUS_CREEPER            = 45812,
     NPC_RAVENOUS_CREEPER_TRIGGER    = 45813,
     NPC_ICE_PATCH                   = 46186,
-	NPC_CYCLONE                     = 46419,
+    NPC_CYCLONE                     = 46419,
 };
 
 enum InstanceSpells

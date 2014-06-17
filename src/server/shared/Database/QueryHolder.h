@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -28,7 +28,7 @@ class SQLQueryHolder
         typedef std::pair<SQLElementData, SQLResultSetUnion> SQLResultPair;
         std::vector<SQLResultPair> m_queries;
     public:
-        SQLQueryHolder() {}
+        SQLQueryHolder() { }
         ~SQLQueryHolder();
         bool SetQuery(size_t index, const char *sql);
         bool SetPQuery(size_t index, const char *format, ...) ATTR_PRINTF(3, 4);
@@ -50,7 +50,7 @@ class SQLQueryHolderTask : public SQLOperation
 
     public:
         SQLQueryHolderTask(SQLQueryHolder *holder, QueryResultHolderFuture res)
-            : m_holder(holder), m_result(res){};
+            : m_holder(holder), m_result(res){ };
         bool Execute();
 
 };

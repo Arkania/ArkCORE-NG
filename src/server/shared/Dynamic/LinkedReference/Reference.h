@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -21,6 +21,7 @@
 #define _REFERENCE_H
 
 #include "Dynamic/LinkedList.h"
+#include "Errors.h" // for ASSERT
 
 //=====================================================
 
@@ -40,12 +41,12 @@ template <class TO, class FROM> class Reference : public LinkedListElement
         virtual void sourceObjectDestroyLink() = 0;
     public:
         Reference() { iRefTo = NULL; iRefFrom = NULL; }
-        virtual ~Reference() {}
+        virtual ~Reference() { }
 
         // Create new link
         void link(TO* toObj, FROM* fromObj)
         {
-            assert(fromObj);                                // fromObj MUST not be NULL
+            ASSERT(fromObj);                                // fromObj MUST not be NULL
             if (isValid())
                 unlink();
             if (toObj != NULL)
@@ -58,13 +59,21 @@ template <class TO, class FROM> class Reference : public LinkedListElement
 
         // We don't need the reference anymore. Call comes from the refFrom object
         // Tell our refTo object, that the link is cut
-        void unlink() { targetObjectDestroyLink(); delink(); iRefTo = NULL; iRefFrom = NULL; }
+        void unlink()
+        {
+            targetObjectDestroyLink();
+            delink();
+            iRefTo = NULL;
+            iRefFrom = NULL;
+        }
 
         // Link is invalid due to destruction of referenced target object. Call comes from the refTo object
         // Tell our refFrom object, that the link is cut
         void invalidate()                                   // the iRefFrom MUST remain!!
         {
-            sourceObjectDestroyLink(); delink(); iRefTo = NULL;
+            sourceObjectDestroyLink();
+            delink();
+            iRefTo = NULL;
         }
 
         bool isValid() const                                // Only check the iRefTo
@@ -83,11 +92,14 @@ template <class TO, class FROM> class Reference : public LinkedListElement
         Reference<TO, FROM> const* nocheck_prev() const { return((Reference<TO, FROM> const*) LinkedListElement::nocheck_prev()); }
 
         TO* operator ->() const { return iRefTo; }
-        TO* GetTarget() const { return iRefTo; }
+        TO* getTarget() const { return iRefTo; }
 
         FROM* GetSource() const { return iRefFrom; }
+
+    private:
+        Reference(Reference const&);
+        Reference& operator=(Reference const&);
 };
 
 //=====================================================
 #endif
-

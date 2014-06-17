@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -24,19 +24,20 @@ SDComment: Should reset if raid are out of room.
 SDCategory: Tempest Keep, The Eye
 EndScriptData */
 
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "the_eye.h"
 
-enum eEnums
+enum Yells
 {
-    SAY_AGGRO                   = -1550000,
-    SAY_SLAY1                   = -1550001,
-    SAY_SLAY2                   = -1550002,
-    SAY_SLAY3                   = -1550003,
-    SAY_DEATH                   = -1550004,
-    SAY_POUNDING1               = -1550005,
-    SAY_POUNDING2               = -1550006,
+    SAY_AGGRO                   = 0,
+    SAY_SLAY                    = 1,
+    SAY_DEATH                   = 2,
+    SAY_POUNDING                = 3
+};
 
+enum Spells
+{
     SPELL_POUNDING              = 34162,
     SPELL_ARCANE_ORB            = 34172,
     SPELL_KNOCK_AWAY            = 25778,
@@ -68,7 +69,7 @@ class boss_void_reaver : public CreatureScript
 
             bool Enraged;
 
-            void Reset()
+            void Reset() OVERRIDE
             {
                 Pounding_Timer = 15000;
                 ArcaneOrb_Timer = 3000;
@@ -77,41 +78,39 @@ class boss_void_reaver : public CreatureScript
 
                 Enraged = false;
 
-                if (instance && me->IsAlive())
+                if (me->IsAlive())
                     instance->SetData(DATA_VOIDREAVEREVENT, NOT_STARTED);
             }
 
-            void KilledUnit(Unit* /*victim*/)
+            void KilledUnit(Unit* /*victim*/) OVERRIDE
             {
-                DoScriptText(RAND(SAY_SLAY1, SAY_SLAY2, SAY_SLAY3), me);
+                Talk(SAY_SLAY);
             }
 
-            void JustDied(Unit* /*killer*/)
+            void JustDied(Unit* /*killer*/) OVERRIDE
             {
-                DoScriptText(SAY_DEATH, me);
+                Talk(SAY_DEATH);
                 DoZoneInCombat();
 
-                if (instance)
-                    instance->SetData(DATA_VOIDREAVEREVENT, DONE);
+                instance->SetData(DATA_VOIDREAVEREVENT, DONE);
             }
 
-            void EnterCombat(Unit* /*who*/)
+            void EnterCombat(Unit* /*who*/) OVERRIDE
             {
-                DoScriptText(SAY_AGGRO, me);
+                Talk(SAY_AGGRO);
 
-                if (instance)
-                    instance->SetData(DATA_VOIDREAVEREVENT, IN_PROGRESS);
+                instance->SetData(DATA_VOIDREAVEREVENT, IN_PROGRESS);
             }
 
-            void UpdateAI(uint32 diff)
+            void UpdateAI(uint32 diff) OVERRIDE
             {
                 if (!UpdateVictim())
                     return;
                 // Pounding
                 if (Pounding_Timer <= diff)
                 {
-                    DoCast(me->GetVictim(), SPELL_POUNDING);
-                    DoScriptText(RAND(SAY_POUNDING1, SAY_POUNDING2), me);
+                    DoCastVictim(SPELL_POUNDING);
+                    Talk(SAY_POUNDING);
                     Pounding_Timer = 15000; //cast time(3000) + cooldown time(12000)
                 }
                 else
@@ -147,7 +146,7 @@ class boss_void_reaver : public CreatureScript
                 // Single Target knock back, reduces aggro
                 if (KnockAway_Timer <= diff)
                 {
-                    DoCast(me->GetVictim(), SPELL_KNOCK_AWAY);
+                    DoCastVictim(SPELL_KNOCK_AWAY);
                     //Drop 25% aggro
                     if (DoGetThreat(me->GetVictim()))
                         DoModifyThreatPercent(me->GetVictim(), -25);
@@ -170,9 +169,9 @@ class boss_void_reaver : public CreatureScript
             }
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const OVERRIDE
         {
-            return new boss_void_reaverAI(creature);
+            return GetInstanceAI<boss_void_reaverAI>(creature);
         }
 };
 

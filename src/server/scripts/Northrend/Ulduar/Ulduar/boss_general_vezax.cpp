@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -21,24 +21,26 @@
 #include "SpellScript.h"
 #include "SpellAuraEffects.h"
 #include "ulduar.h"
+#include "Player.h"
 
 enum VezaxYells
 {
-    SAY_AGGRO                                    = -1603290,
-    SAY_SLAY_1                                   = -1603291,
-    SAY_SLAY_2                                   = -1603292,
-    SAY_SURGE_OF_DARKNESS                        = -1603293,
-    SAY_DEATH                                    = -1603294,
-    SAY_BERSERK                                  = -1603295,
-    SAY_HARDMODE                                 = -1603296,
+    SAY_AGGRO                                    = 0,
+    SAY_SLAY                                     = 1,
+    SAY_SURGE_OF_DARKNESS                        = 2,
+    SAY_DEATH                                    = 3,
+    SAY_BERSERK                                  = 4,
+    SAY_HARDMODE                                 = 5,
 };
 
 enum VezaxEmotes
 {
-    EMOTE_VAPORS                                 = -1603289,
-    EMOTE_ANIMUS                                 = -1603297,
-    EMOTE_BARRIER                                = -1603298,
-    EMOTE_SURGE_OF_DARKNESS                      = -1603299,
+    EMOTE_ANIMUS                                 = 6,
+    EMOTE_BARRIER                                = 7,
+    EMOTE_SURGE_OF_DARKNESS                      = 8,
+
+    // Saronite Vapor
+    EMOTE_VAPORS                                 = 0
 };
 
 enum VezaxSpells
@@ -89,8 +91,11 @@ enum VezaxEvents
     EVENT_RANDOM_MOVE                            = 8,
 };
 
-#define DATA_SMELL_SARONITE                      31813188
-#define DATA_SHADOWDODGER                        29962997
+enum Misc
+{
+    DATA_SMELL_SARONITE                          = 31813188,
+    DATA_SHADOWDODGER                            = 29962997
+};
 
 class boss_general_vezax : public CreatureScript
 {
@@ -108,7 +113,7 @@ class boss_general_vezax : public CreatureScript
             bool animusDead; // Check against getting a HardMode achievement before killing Saronite Animus
             uint8 vaporCount;
 
-            void Reset()
+            void Reset() OVERRIDE
             {
                 _Reset();
 
@@ -118,11 +123,11 @@ class boss_general_vezax : public CreatureScript
                 vaporCount = 0;
             }
 
-            void EnterCombat(Unit* /*who*/)
+            void EnterCombat(Unit* /*who*/) OVERRIDE
             {
                 _EnterCombat();
 
-                DoScriptText(SAY_AGGRO, me);
+                Talk(SAY_AGGRO);
                 DoCast(me, SPELL_AURA_OF_DESPAIR);
                 CheckShamanisticRage();
 
@@ -134,7 +139,7 @@ class boss_general_vezax : public CreatureScript
                 events.ScheduleEvent(EVENT_BERSERK, 600000);
             }
 
-            void UpdateAI(uint32 diff)
+            void UpdateAI(uint32 diff) OVERRIDE
             {
                 if (!UpdateVictim())
                     return;
@@ -173,8 +178,8 @@ class boss_general_vezax : public CreatureScript
                             break;
                         }
                         case EVENT_SURGE_OF_DARKNESS:
-                            DoScriptText(EMOTE_SURGE_OF_DARKNESS, me);
-                            DoScriptText(SAY_SURGE_OF_DARKNESS, me);
+                            Talk(EMOTE_SURGE_OF_DARKNESS);
+                            Talk(SAY_SURGE_OF_DARKNESS);
                             DoCast(me, SPELL_SURGE_OF_DARKNESS);
                             events.ScheduleEvent(EVENT_SURGE_OF_DARKNESS, urand(50000, 70000));
                             break;
@@ -183,8 +188,8 @@ class boss_general_vezax : public CreatureScript
                             events.ScheduleEvent(EVENT_SARONITE_VAPORS, urand(30000, 35000));
                             if (++vaporCount == 6 && smellSaronite)
                             {
-                                DoScriptText(SAY_HARDMODE, me);
-                                DoScriptText(EMOTE_BARRIER, me);
+                                Talk(SAY_HARDMODE);
+                                Talk(EMOTE_BARRIER);
                                 summons.DespawnAll();
                                 DoCast(me, SPELL_SARONITE_BARRIER);
                                 DoCast(SPELL_SUMMON_SARONITE_ANIMUS);
@@ -194,7 +199,7 @@ class boss_general_vezax : public CreatureScript
                             }
                             break;
                         case EVENT_BERSERK:
-                            DoScriptText(SAY_BERSERK, me);
+                            Talk(SAY_BERSERK);
                             DoCast(me, SPELL_BERSERK);
                             break;
                     }
@@ -203,21 +208,22 @@ class boss_general_vezax : public CreatureScript
                 DoMeleeAttackIfReady();
             }
 
-            void SpellHitTarget(Unit* who, SpellInfo const* spell)
+            void SpellHitTarget(Unit* who, SpellInfo const* spell) OVERRIDE
             {
                 if (who && who->GetTypeId() == TYPEID_PLAYER && spell->Id == SPELL_SHADOW_CRASH_HIT)
                     shadowDodger = false;
             }
 
-            void KilledUnit(Unit* /*who*/)
+            void KilledUnit(Unit* who) OVERRIDE
             {
-                DoScriptText(RAND(SAY_SLAY_1, SAY_SLAY_2), me);
+                if (who->GetTypeId() == TYPEID_PLAYER)
+                    Talk(SAY_SLAY);
             }
 
-            void JustDied(Unit* /*killer*/)
+            void JustDied(Unit* /*killer*/) OVERRIDE
             {
                 _JustDied();
-                DoScriptText(SAY_DEATH, me);
+                Talk(SAY_DEATH);
                 instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_AURA_OF_DESPAIR);
             }
 
@@ -235,7 +241,7 @@ class boss_general_vezax : public CreatureScript
                 }
             }
 
-            uint32 GetData(uint32 type)
+            uint32 GetData(uint32 type) const OVERRIDE
             {
                 switch (type)
                 {
@@ -248,7 +254,7 @@ class boss_general_vezax : public CreatureScript
                 return 0;
             }
 
-            void DoAction(int32 const action)
+            void DoAction(int32 action) OVERRIDE
             {
                 switch (action)
                 {
@@ -300,7 +306,7 @@ class boss_general_vezax : public CreatureScript
             }
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const OVERRIDE
         {
             return GetUlduarAI<boss_general_vezaxAI>(creature);
         }
@@ -316,23 +322,22 @@ class boss_saronite_animus : public CreatureScript
             boss_saronite_animusAI(Creature* creature) : ScriptedAI(creature)
             {
                 instance = me->GetInstanceScript();
-                DoScriptText(EMOTE_BARRIER, me);
             }
 
-            void Reset()
+            void Reset() OVERRIDE
             {
                 DoCast(me, SPELL_VISUAL_SARONITE_ANIMUS);
                 events.Reset();
                 events.ScheduleEvent(EVENT_PROFOUND_OF_DARKNESS, 3000);
             }
 
-            void JustDied(Unit* /*killer*/)
+            void JustDied(Unit* /*killer*/) OVERRIDE
             {
                 if (Creature* Vezax = me->GetCreature(*me, instance->GetData64(BOSS_VEZAX)))
                     Vezax->AI()->DoAction(ACTION_ANIMUS_DIE);
             }
 
-            void UpdateAI(uint32 diff)
+            void UpdateAI(uint32 diff) OVERRIDE
             {
                 if (!UpdateVictim())
                     return;
@@ -363,9 +368,9 @@ class boss_saronite_animus : public CreatureScript
             EventMap events;
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const OVERRIDE
         {
-            return new boss_saronite_animusAI(creature);
+            return GetInstanceAI<boss_saronite_animusAI>(creature);
         }
 };
 
@@ -378,20 +383,20 @@ class npc_saronite_vapors : public CreatureScript
         {
             npc_saronite_vaporsAI(Creature* creature) : ScriptedAI(creature)
             {
-                DoScriptText(EMOTE_VAPORS, me);
+                Talk(EMOTE_VAPORS);
                 instance = me->GetInstanceScript();
                 me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
                 me->ApplySpellImmune(0, IMMUNITY_ID, 49560, true); // Death Grip jump effect
                 me->SetReactState(REACT_PASSIVE);
             }
 
-            void Reset()
+            void Reset() OVERRIDE
             {
                 events.Reset();
                 events.ScheduleEvent(EVENT_RANDOM_MOVE, urand(5000, 7500));
             }
 
-            void UpdateAI(uint32 diff)
+            void UpdateAI(uint32 diff) OVERRIDE
             {
                 events.Update(diff);
 
@@ -409,7 +414,7 @@ class npc_saronite_vapors : public CreatureScript
                 }
             }
 
-            void DamageTaken(Unit* /*who*/, uint32& damage)
+            void DamageTaken(Unit* /*who*/, uint32& damage) OVERRIDE
             {
                 // This can't be on JustDied. In 63322 dummy handler caster needs to be this NPC
                 // if caster == target then damage mods will increase the damage taken
@@ -433,20 +438,27 @@ class npc_saronite_vapors : public CreatureScript
             EventMap events;
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const OVERRIDE
         {
-            return new npc_saronite_vaporsAI(creature);
+            return GetInstanceAI<npc_saronite_vaporsAI>(creature);
         }
 };
 
-class spell_mark_of_the_faceless : public SpellScriptLoader
+class spell_general_vezax_mark_of_the_faceless : public SpellScriptLoader
 {
     public:
-        spell_mark_of_the_faceless() : SpellScriptLoader("spell_mark_of_the_faceless") { }
+        spell_general_vezax_mark_of_the_faceless() : SpellScriptLoader("spell_general_vezax_mark_of_the_faceless") { }
 
-        class spell_mark_of_the_faceless_AuraScript : public AuraScript
+        class spell_general_vezax_mark_of_the_faceless_AuraScript : public AuraScript
         {
-            PrepareAuraScript(spell_mark_of_the_faceless_AuraScript);
+            PrepareAuraScript(spell_general_vezax_mark_of_the_faceless_AuraScript);
+
+            bool Validate(SpellInfo const* /*spellInfo*/)
+            {
+                if (!sSpellMgr->GetSpellInfo(SPELL_MARK_OF_THE_FACELESS_DAMAGE))
+                    return false;
+                return true;
+            }
 
             void HandleEffectPeriodic(AuraEffect const* aurEff)
             {
@@ -454,15 +466,44 @@ class spell_mark_of_the_faceless : public SpellScriptLoader
                     caster->CastCustomSpell(SPELL_MARK_OF_THE_FACELESS_DAMAGE, SPELLVALUE_BASE_POINT1, aurEff->GetAmount(), GetTarget(), true);
             }
 
-            void Register()
+            void Register() OVERRIDE
             {
-                OnEffectPeriodic += AuraEffectPeriodicFn(spell_mark_of_the_faceless_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+                OnEffectPeriodic += AuraEffectPeriodicFn(spell_general_vezax_mark_of_the_faceless_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
             }
         };
 
-        AuraScript* GetAuraScript() const
+        AuraScript* GetAuraScript() const OVERRIDE
         {
-            return new spell_mark_of_the_faceless_AuraScript();
+            return new spell_general_vezax_mark_of_the_faceless_AuraScript();
+        }
+};
+
+class spell_general_vezax_mark_of_the_faceless_leech : public SpellScriptLoader
+{
+    public:
+        spell_general_vezax_mark_of_the_faceless_leech() : SpellScriptLoader("spell_general_vezax_mark_of_the_faceless_leech") { }
+
+        class spell_general_vezax_mark_of_the_faceless_leech_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_general_vezax_mark_of_the_faceless_leech_SpellScript);
+
+            void FilterTargets(std::list<WorldObject*>& targets)
+            {
+                targets.remove(GetExplTargetWorldObject());
+
+                if (targets.empty())
+                    FinishCast(SPELL_FAILED_NO_VALID_TARGETS);
+            }
+
+            void Register()
+            {
+                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_general_vezax_mark_of_the_faceless_leech_SpellScript::FilterTargets, EFFECT_1, TARGET_UNIT_DEST_AREA_ENEMY);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_general_vezax_mark_of_the_faceless_leech_SpellScript();
         }
 };
 
@@ -475,7 +516,7 @@ class spell_general_vezax_saronite_vapors : public SpellScriptLoader
         {
             PrepareAuraScript(spell_general_vezax_saronite_vapors_AuraScript);
 
-            bool Validate(SpellInfo const* /*spell*/)
+            bool Validate(SpellInfo const* /*spell*/) OVERRIDE
             {
                 if (!sSpellMgr->GetSpellInfo(SPELL_SARONITE_VAPORS_ENERGIZE) || !sSpellMgr->GetSpellInfo(SPELL_SARONITE_VAPORS_DAMAGE))
                     return false;
@@ -493,13 +534,13 @@ class spell_general_vezax_saronite_vapors : public SpellScriptLoader
                 }
             }
 
-            void Register()
+            void Register() OVERRIDE
             {
                 AfterEffectApply += AuraEffectApplyFn(spell_general_vezax_saronite_vapors_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
             }
         };
 
-        AuraScript* GetAuraScript() const
+        AuraScript* GetAuraScript() const OVERRIDE
         {
             return new spell_general_vezax_saronite_vapors_AuraScript();
         }
@@ -512,7 +553,7 @@ class achievement_shadowdodger : public AchievementCriteriaScript
         {
         }
 
-        bool OnCheck(Player* /*player*/, Unit* target)
+        bool OnCheck(Player* /*player*/, Unit* target) OVERRIDE
         {
             if (!target)
                 return false;
@@ -532,7 +573,7 @@ class achievement_smell_saronite : public AchievementCriteriaScript
         {
         }
 
-        bool OnCheck(Player* /*player*/, Unit* target)
+        bool OnCheck(Player* /*player*/, Unit* target) OVERRIDE
         {
             if (!target)
                 return false;
@@ -550,7 +591,8 @@ void AddSC_boss_general_vezax()
     new boss_general_vezax();
     new boss_saronite_animus();
     new npc_saronite_vapors();
-    new spell_mark_of_the_faceless();
+    new spell_general_vezax_mark_of_the_faceless();
+    new spell_general_vezax_mark_of_the_faceless_leech();
     new spell_general_vezax_saronite_vapors();
     new achievement_shadowdodger();
     new achievement_smell_saronite();

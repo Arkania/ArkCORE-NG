@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,14 +15,15 @@
  * You should have received a copy of the GNU General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
- 
- 
+
 #include "lost_city_of_the_tolvir.h"
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "InstanceScript.h"
+#include "Player.h"
 
 enum eScriptText
 {
-    YELL_FREE                    = -1877010,
+    YELL_FREE                    = 0
 };
 
 class instance_lost_city_of_the_tolvir : public InstanceMapScript
@@ -93,7 +94,7 @@ class instance_lost_city_of_the_tolvir : public InstanceMapScript
                         SiamatFree();
 
                         if (Creature* siamat = instance->GetCreature(uiSiamatGUID))
-                            DoScriptText(YELL_FREE, siamat);
+                            siamat->AI()->Talk(YELL_FREE);
                     }
                     else
                         uiUpdateTimer -= diff;

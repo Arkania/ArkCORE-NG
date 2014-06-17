@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,10 +15,10 @@
  * You should have received a copy of the GNU General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
- 
- 
+
 #include "lost_city_of_the_tolvir.h"
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "AchievementMgr.h"
 
 enum eSpells
@@ -46,13 +46,13 @@ enum eSpells
     SPELL_TEMPEST_STORM_SUMMON       = 83414,
     SPELL_TEMPEST_STORM_TRANSFORM    = 83170,
     SPELL_LIGHTNING_CHARGE           = 91872,
-    SPELL_LIGHTNING_CHARGE_AURA      = 93959,
+    SPELL_LIGHTNING_CHARGE_AURA      = 93959
 };
 
 enum eCreatures
 {
     NPC_TEMPEST_STORM                = 44713,
-    NPC_SETVANT_OF_SIAMAT            = 45269,
+    NPC_SETVANT_OF_SIAMAT            = 45269
 };
 
 enum eActions
@@ -62,12 +62,10 @@ enum eActions
 
 enum eTexts
 {
-    SAY_START_1                        = -1877011,
-    SAY_START_2                        = -1877027,
-    SAY_WAILING_WINDS_1                = -1877012,
-    SAY_WAILING_WINDS_2                = -1877026,
-    SAY_DEATH                          = -1877013,
-    SAY_KILL_PLAYER                    = -1877025,
+    SAY_START                          = 1,
+    SAY_WAILING_WINDS                  = 2,
+    SAY_KILL_PLAYER                    = 3,
+    SAY_DEATH                          = 4
 };
 
 enum ePhases
@@ -97,7 +95,7 @@ enum eEvents
     // Siamat Minion
     EVENT_CHAIN_LIGHTNING            = 1,
     // Cloud Burst
-    EVENT_PERIODIC_CAST              = 1,
+    EVENT_PERIODIC_CAST              = 1
 };
 
 const uint32 StaticShock[3]=
@@ -146,7 +144,7 @@ public:
         
         void EnterCombat(Unit* /*who*/)
         {
-            DoScriptText(RAND(SAY_START_1, SAY_START_1), me);
+            Talk(SAY_START);
             events.SetPhase(PHASE_DEFLECTING_WINDS);
             events.ScheduleEvent(EVENT_STATIC_SHOCK, 2000, 0, PHASE_DEFLECTING_WINDS);
             events.ScheduleEvent(EVENT_DEFLECTING_WINDS, 5000, 0, PHASE_DEFLECTING_WINDS);
@@ -162,7 +160,7 @@ public:
         {
             if (action == ACTION_SERVANT_DEATH)
             {
-                DoScriptText(RAND(SAY_WAILING_WINDS_1, SAY_WAILING_WINDS_2), me);
+                Talk(SAY_WAILING_WINDS);
                 me->RemoveAura(SPELL_DEFLECTING_WINDS);
                 me->CastSpell(me, SPELL_WAILING_WINDS_AURA, false);
                 events.SetPhase(PHASE_WAILING_WINDS);
@@ -179,14 +177,14 @@ public:
         void KilledUnit(Unit* victim)
         {
             if (victim->GetTypeId() == TYPEID_PLAYER)
-                DoScriptText(SAY_KILL_PLAYER, me);
+                Talk(SAY_KILL_PLAYER);
         }
 
         void JustDied(Unit* /*killer*/)
         {
             events.Reset();
             lSummons.DespawnAll();
-            DoScriptText(SAY_DEATH, me);
+            Talk(SAY_DEATH);
         }
 
         void UpdateAI(uint32 diff)

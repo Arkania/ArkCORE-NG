@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -29,7 +29,7 @@ class Creature;
 class AggressorAI : public CreatureAI
 {
     public:
-        explicit AggressorAI(Creature* c) : CreatureAI(c) {}
+        explicit AggressorAI(Creature* c) : CreatureAI(c) { }
 
         void UpdateAI(uint32);
         static int Permissible(const Creature*);
@@ -40,7 +40,7 @@ typedef std::vector<uint32> SpellVct;
 class CombatAI : public CreatureAI
 {
     public:
-        explicit CombatAI(Creature* c) : CreatureAI(c) {}
+        explicit CombatAI(Creature* c) : CreatureAI(c) { }
 
         void InitializeAI();
         void Reset();
@@ -48,7 +48,9 @@ class CombatAI : public CreatureAI
         void JustDied(Unit* killer);
         void UpdateAI(uint32 diff);
         void SpellInterrupted(uint32 spellId, uint32 unTimeMs);
-        static int Permissible(const Creature*);
+
+        static int Permissible(Creature const* /*creature*/) { return PERMIT_BASE_NO; }
+
     protected:
         EventMap events;
         SpellVct spells;
@@ -73,7 +75,8 @@ struct ArcherAI : public CreatureAI
         void AttackStart(Unit* who);
         void UpdateAI(uint32 diff);
 
-        static int Permissible(const Creature*);
+        static int Permissible(Creature const* /*creature*/) { return PERMIT_BASE_NO; }
+
     protected:
         float m_minRange;
 };
@@ -82,34 +85,34 @@ struct TurretAI : public CreatureAI
 {
     public:
         explicit TurretAI(Creature* c);
-        bool CanAIAttack(const Unit* who) const;
+        bool CanAIAttack(Unit const* who) const;
         void AttackStart(Unit* who);
         void UpdateAI(uint32 diff);
 
-        static int Permissible(const Creature*);
+        static int Permissible(Creature const* /*creature*/) { return PERMIT_BASE_NO; }
+
     protected:
         float m_minRange;
 };
 
 #define VEHICLE_CONDITION_CHECK_TIME 1000
 #define VEHICLE_DISMISS_TIME 5000
+
 struct VehicleAI : public CreatureAI
 {
     public:
-        explicit VehicleAI(Creature* c);
+        explicit VehicleAI(Creature* creature);
 
         void UpdateAI(uint32 diff);
-        static int Permissible(const Creature*);
-        void Reset();
-        void MoveInLineOfSight(Unit*) {}
-        void AttackStart(Unit*) {}
+        void MoveInLineOfSight(Unit*) { }
+        void AttackStart(Unit*) { }
         void OnCharmed(bool apply);
 
+        static int Permissible(Creature const* /*creature*/) { return PERMIT_BASE_NO; }
+
     private:
-        Vehicle* m_vehicle;
-        bool m_IsVehicleInUse;
         void LoadConditions();
-        void CheckConditions(const uint32 diff);
+        void CheckConditions(uint32 diff);
         ConditionList conditions;
         uint32 m_ConditionsTimer;
         bool m_DoDismiss;

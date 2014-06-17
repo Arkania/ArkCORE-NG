@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -20,8 +20,10 @@
 #ifndef TRINITY_GRIDSTATES_H
 #define TRINITY_GRIDSTATES_H
 
-#include "Map.h"
-#include "Object.h"
+#include "GridDefines.h"
+#include "NGrid.h"
+
+class Map;
 
 class GridState
 {
@@ -29,44 +31,35 @@ class GridState
 #ifdef TRINITY_DEBUG
 #define MAGIC_TESTVAL 0xFBE823BA
         GridState() { i_Magic = MAGIC_TESTVAL; }
-        bool checkMagic()
-        {
-            if (i_Magic != MAGIC_TESTVAL)
-            {
-                sLog->outError("!!! GridState: Magic value gone !!!");
-                return false;
-            }
-            return true;
-        }
+        bool checkMagic();
         void setMagic() { i_Magic = MAGIC_TESTVAL; }
         unsigned int i_Magic;
 #endif
-        virtual ~GridState() {};
-        virtual void Update(Map &, NGridType&, GridInfo &, const uint32 t_diff) const = 0;
+        virtual ~GridState() { };
+        virtual void Update(Map &, NGridType&, GridInfo &, uint32 t_diff) const = 0;
 };
 
 class InvalidState : public GridState
 {
     public:
-        void Update(Map &, NGridType &, GridInfo &, const uint32 t_diff) const;
+        void Update(Map &, NGridType &, GridInfo &, uint32 t_diff) const;
 };
 
 class ActiveState : public GridState
 {
     public:
-        void Update(Map &, NGridType &, GridInfo &, const uint32 t_diff) const;
+        void Update(Map &, NGridType &, GridInfo &, uint32 t_diff) const;
 };
 
 class IdleState : public GridState
 {
     public:
-        void Update(Map &, NGridType &, GridInfo &, const uint32 t_diff) const;
+        void Update(Map &, NGridType &, GridInfo &, uint32 t_diff) const;
 };
 
 class RemovalState : public GridState
 {
     public:
-        void Update(Map &, NGridType &, GridInfo &, const uint32 t_diff) const;
+        void Update(Map &, NGridType &, GridInfo &, uint32 t_diff) const;
 };
 #endif
-

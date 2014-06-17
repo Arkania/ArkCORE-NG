@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -27,6 +27,7 @@
 #include "UpdateData.h"
 #include "CreatureAI.h"
 #include "SpellAuras.h"
+#include "Opcodes.h"
 
 template<class T>
 inline void Trinity::VisibleNotifier::Visit(GridRefManager<T> &m)
@@ -36,13 +37,6 @@ inline void Trinity::VisibleNotifier::Visit(GridRefManager<T> &m)
         vis_guids.erase(iter->GetSource()->GetGUID());
         i_player.UpdateVisibilityOf(iter->GetSource(), i_data, i_visibleNow);
     }
-}
-
-inline void Trinity::ObjectUpdater::Visit(CreatureMapType &m)
-{
-    for (CreatureMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
-        if (iter->GetSource()->IsInWorld())
-            iter->GetSource()->Update(i_timeDiff);
 }
 
 // SEARCHERS & LIST SEARCHERS & WORKERS
@@ -164,6 +158,28 @@ void Trinity::WorldObjectSearcher<Check>::Visit(DynamicObjectMapType &m)
     }
 }
 
+template<class Check>
+void Trinity::WorldObjectSearcher<Check>::Visit(AreaTriggerMapType &m)
+{
+    if (!(i_mapTypeMask & GRID_MAP_TYPE_MASK_AREATRIGGER))
+        return;
+
+    // already found
+    if (i_object)
+        return;
+
+    for (AreaTriggerMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
+    {
+        if (!itr->GetSource()->InSamePhase(i_phaseMask))
+            continue;
+
+        if (i_check(itr->GetSource()))
+        {
+            i_object = itr->GetSource();
+            return;
+        }
+    }
+}
 
 template<class Check>
 void Trinity::WorldObjectLastSearcher<Check>::Visit(GameObjectMapType &m)
@@ -246,6 +262,22 @@ void Trinity::WorldObjectLastSearcher<Check>::Visit(DynamicObjectMapType &m)
 }
 
 template<class Check>
+void Trinity::WorldObjectLastSearcher<Check>::Visit(AreaTriggerMapType &m)
+{
+    if (!(i_mapTypeMask & GRID_MAP_TYPE_MASK_AREATRIGGER))
+        return;
+
+    for (AreaTriggerMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
+    {
+        if (!itr->GetSource()->InSamePhase(i_phaseMask))
+            continue;
+
+        if (i_check(itr->GetSource()))
+            i_object = itr->GetSource();
+    }
+}
+
+template<class Check>
 void Trinity::WorldObjectListSearcher<Check>::Visit(PlayerMapType &m)
 {
     if (!(i_mapTypeMask & GRID_MAP_TYPE_MASK_PLAYER))
@@ -296,6 +328,17 @@ void Trinity::WorldObjectListSearcher<Check>::Visit(DynamicObjectMapType &m)
         return;
 
     for (DynamicObjectMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
+        if (i_check(itr->GetSource()))
+            i_objects.push_back(itr->GetSource());
+}
+
+template<class Check>
+void Trinity::WorldObjectListSearcher<Check>::Visit(AreaTriggerMapType &m)
+{
+    if (!(i_mapTypeMask & GRID_MAP_TYPE_MASK_AREATRIGGER))
+        return;
+
+    for (AreaTriggerMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
         if (i_check(itr->GetSource()))
             i_objects.push_back(itr->GetSource());
 }
@@ -524,14 +567,16 @@ void Trinity::LocalizedPacketDo<Builder>::operator()(Player* p)
     WorldPacket* data;
 
     // create if not cached yet
-    if (i_data_cache.size() < cache_idx+1 || !i_data_cache[cache_idx])
+    if (i_data_cache.size() < cache_idx + 1 || !i_data_cache[cache_idx])
     {
-        if (i_data_cache.size() < cache_idx+1)
-            i_data_cache.resize(cache_idx+1);
+        if (i_data_cache.size() < cache_idx + 1)
+            i_data_cache.resize(cache_idx + 1);
 
-        data = new WorldPacket(SMSG_MESSAGECHAT, 200);
+        data = new WorldPacket();
 
         i_builder(*data, loc_idx);
+
+        ASSERT(data->GetOpcode() != NULL_OPCODE);
 
         i_data_cache[cache_idx] = data;
     }

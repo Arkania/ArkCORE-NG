@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -99,9 +99,11 @@ enum Opcodes
     CMSG_BUYBACK_ITEM                                 = 0x6C17,
     CMSG_BUY_BANK_SLOT                                = 0x0425,
     CMSG_BUY_ITEM                                     = 0x0736,
+    CMSG_BUY_STABLE_SLOT                              = 0x1273,
     CMSG_CALENDAR_ADD_EVENT                           = 0x0726,
     CMSG_CALENDAR_ARENA_TEAM                          = 0x0204,
     CMSG_CALENDAR_COMPLAIN                            = 0x4C36,
+    CMSG_CALENDAR_CONTEXT_EVENT_SIGNUP                = 0x0000,
     CMSG_CALENDAR_COPY_EVENT                          = 0x0207,
     CMSG_CALENDAR_EVENT_INVITE                        = 0x2435,
     CMSG_CALENDAR_EVENT_MODERATOR_STATUS              = 0x6B35,
@@ -183,12 +185,10 @@ enum Opcodes
     CMSG_DEL_IGNORE                                   = 0x6D26,
     CMSG_DEL_VOICE_IGNORE                             = 0x0024,
     CMSG_DESTROY_ITEM                                 = 0x4A27,
-    CMSG_DESTROY_ITEMS                                = 0x0000,
     CMSG_DISMISS_CONTROLLED_VEHICLE                   = 0x3218,
     CMSG_DISMISS_CRITTER                              = 0x4227,
     CMSG_DUEL_ACCEPTED                                = 0x2136,
     CMSG_DUEL_CANCELLED                               = 0x6624,
-    CMSG_DUNGEON_FINDER_GET_SYSTEM_INFO               = 0x0412,
     CMSG_EJECT_PASSENGER                              = 0x6927,
     CMSG_EMOTE                                        = 0x4C26,
     CMSG_ENABLETAXI                                   = 0x0C16,
@@ -202,6 +202,9 @@ enum Opcodes
     CMSG_GAMEOBJECT_QUERY                             = 0x4017,
     CMSG_GAMEOBJ_REPORT_USE                           = 0x4827,
     CMSG_GAMEOBJ_USE                                  = 0x4E17,
+    CMSG_GAMESPEED_SET                                = 0x0000,
+    CMSG_GAMETIME_SET                                 = 0x0000,
+    CMSG_GETDEATHBINDZONE                             = 0x0000,
     CMSG_GET_MAIL_LIST                                = 0x4D37,
     CMSG_GET_MIRRORIMAGE_DATA                         = 0x0C25,
     CMSG_GHOST                                        = 0x0000,
@@ -249,7 +252,6 @@ enum Opcodes
     CMSG_GUILD_BANK_UPDATE_TAB                        = 0x0106,
     CMSG_GUILD_BANK_WITHDRAW_MONEY                    = 0x0037,
     CMSG_GUILD_CHANGE_NAME_REQUEST                    = 0x1232,
-    CMSG_GUILD_CREATE                                 = 0x0000,
     CMSG_GUILD_DECLINE                                = 0x3231,
     CMSG_GUILD_DEL_RANK                               = 0x3234,
     CMSG_GUILD_DEMOTE                                 = 0x1020,
@@ -293,13 +295,12 @@ enum Opcodes
     CMSG_LEARN_PREVIEW_TALENTS_PET                    = 0x6E24,
     CMSG_LEARN_TALENT                                 = 0x0306,
     CMSG_LEAVE_CHANNEL                                = 0x2D56,
-    CMSG_LFG_GET_PLAYER_INFO                          = 0x0000,
     CMSG_LFG_GET_STATUS                               = 0x2581,
     CMSG_LFG_JOIN                                     = 0x2430,
     CMSG_LFG_LEAVE                                    = 0x2433,
     CMSG_LFG_LFR_JOIN                                 = 0x0531,
     CMSG_LFG_LFR_LEAVE                                = 0x0500,
-    CMSG_LFG_PARTY_LOCK_INFO_REQUEST                  = 0x0000,
+    CMSG_LFG_LOCK_INFO_REQUEST                        = 0x0412,
     CMSG_LFG_PROPOSAL_RESULT                          = 0x0403,
     CMSG_LFG_SET_BOOT_VOTE                            = 0x04B3,
     CMSG_LFG_SET_COMMENT                              = 0x0530,
@@ -379,7 +380,6 @@ enum Opcodes
     CMSG_MOVE_SET_RELATIVE_POSITION                   = 0x0000,
     CMSG_MOVE_SET_VEHICLE_REC_ID_ACK                  = 0x0000,
     CMSG_MOVE_SPLINE_DONE                             = 0x790E,
-    CMSG_MOVE_TELEPORT_ACK                            = 0x390C,
     CMSG_MOVE_TIME_SKIPPED                            = 0x7A0A,
     CMSG_MOVE_TOGGLE_COLLISION_ACK                    = 0x0000,
     CMSG_MOVE_WATER_WALK_ACK                          = 0x3B00,
@@ -422,8 +422,6 @@ enum Opcodes
     CMSG_PUSHQUESTTOPARTY                             = 0x4B14,
     CMSG_PVP_LOG_DATA                                 = 0x7308,
     CMSG_QUERY_BATTLEFIELD_STATE                      = 0x7202,
-    CMSG_QUERY_COMPLETION_NPC_RESPONSE                = 0x7302,
-    CMSG_QUERY_GUILD_MAX_XP                           = 0x0000,
     CMSG_QUERY_GUILD_MEMBERS_FOR_RECIPE               = 0x1036,
     CMSG_QUERY_GUILD_MEMBER_RECIPES                   = 0x1037,
     CMSG_QUERY_GUILD_RECIPES                          = 0x3033,
@@ -445,7 +443,7 @@ enum Opcodes
     CMSG_QUESTLOG_REMOVE_QUEST                        = 0x0D16,
     CMSG_QUESTLOG_SWAP_QUEST                          = 0x0000,
     CMSG_QUEST_CONFIRM_ACCEPT                         = 0x0D15,
-    CMSG_QUEST_NPC_QUERY                              = 0x0000,
+    CMSG_QUEST_NPC_QUERY                              = 0x7302,
     CMSG_QUEST_POI_QUERY                              = 0x4037,
     CMSG_QUEST_QUERY                                  = 0x0D06,
     CMSG_RANDOMIZE_CHAR_NAME                          = 0x2413,
@@ -484,6 +482,8 @@ enum Opcodes
     CMSG_ROLE_POLL_BEGIN                              = 0x0430,
     CMSG_SAVE_CUF_PROFILES                            = 0x730E,
     CMSG_SAVE_PLAYER                                  = 0x0000,
+    CMSG_SEARCH_LFG_JOIN                              = 0x0000,
+    CMSG_SEARCH_LFG_LEAVE                             = 0x0000,
     CMSG_SELF_RES                                     = 0x6115,
     CMSG_SELL_ITEM                                    = 0x4E15,
     CMSG_SEND_MAIL                                    = 0x0523,
@@ -506,6 +506,7 @@ enum Opcodes
     CMSG_SET_FACTION_CHEAT                            = 0x0000,
     CMSG_SET_FACTION_INACTIVE                         = 0x0E37,
     CMSG_SET_GUILD_BANK_TEXT                          = 0x3023,
+    CMSG_SET_LFG_COMMENT                              = 0x0000,
     CMSG_SET_PET_SLOT                                 = 0x3A04,
     CMSG_SET_PLAYER_DECLINED_NAMES                    = 0x6316,
     CMSG_SET_PREFERED_CEMETERY                        = 0x311E,
@@ -527,6 +528,9 @@ enum Opcodes
     CMSG_SPELLCLICK                                   = 0x0805,
     CMSG_SPIRIT_HEALER_ACTIVATE                       = 0x2E26,
     CMSG_SPLIT_ITEM                                   = 0x0F17,
+    CMSG_STABLE_PET                                   = 0x1271,
+    CMSG_STABLE_REVIVE_PET                            = 0x1275,
+    CMSG_STABLE_SWAP_PET                              = 0x1276,
     CMSG_STANDSTATECHANGE                             = 0x0535,
     CMSG_START_QUEST                                  = 0x0000,
     CMSG_STOP_DANCE                                   = 0x2907,
@@ -539,6 +543,8 @@ enum Opcodes
     CMSG_SWAP_INV_ITEM                                = 0x2614,
     CMSG_SWAP_ITEM                                    = 0x6326,
     CMSG_SYNC_DANCE                                   = 0x0036,
+    CMSG_TAXICLEARALLNODES                            = 0x0000,
+    CMSG_TAXIENABLEALLNODES                           = 0x0000,
     CMSG_TAXINODE_STATUS_QUERY                        = 0x2F25,
     CMSG_TAXIQUERYAVAILABLENODES                      = 0x6C06,
     CMSG_TAXISHOWNODES                                = 0x0000,
@@ -561,6 +567,7 @@ enum Opcodes
     CMSG_UNLEARN_SKILL                                = 0x6106,
     CMSG_UNLEARN_SPECIALIZATION                       = 0x3210,
     CMSG_UNREGISTER_ALL_ADDON_PREFIXES                = 0x3D54,
+    CMSG_UNSTABLE_PET                                 = 0x1272,
     CMSG_UPDATE_ACCOUNT_DATA                          = 0x4736,
     CMSG_UPDATE_MISSILE_TRAJECTORY                    = 0x781E,
     CMSG_UPDATE_PROJECTILE_POSITION                   = 0x0E24,
@@ -571,7 +578,7 @@ enum Opcodes
     CMSG_VOID_STORAGE_QUERY                           = 0x790A,
     CMSG_VOID_STORAGE_TRANSFER                        = 0x380E,
     CMSG_VOID_STORAGE_UNLOCK                          = 0x7B14,
-	CMSG_VOID_SWAP_ITEM                               = 0x3204,
+    CMSG_VOID_SWAP_ITEM                               = 0x3204,
     CMSG_WARDEN_DATA                                  = 0x25A2,
     CMSG_WARGAME_ACCEPT                               = 0x2410,
     CMSG_WARGAME_START                                = 0x05A0,
@@ -589,20 +596,11 @@ enum Opcodes
     MSG_GM_SHOWLABEL                                  = 0x0000,
     MSG_GM_SUMMON                                     = 0x0000,
     MSG_INSPECT_ARENA_TEAMS                           = 0x2704,
-    MSG_LIST_STABLED_PETS                             = 0x0834, // hope this works (4.3.4)
-    CMSG_STABLE_PET                                   = 0x1271, // hope this works (4.3.4)
-    CMSG_UNSTABLE_PET                                 = 0x1272, // hope this works (4.3.4)
-    CMSG_BUY_STABLE_SLOT                              = 0x1273, // hope this works (4.3.4)
-    SMSG_STABLE_RESULT                                = 0x2204, // hope this works (4.3.4)
-    CMSG_STABLE_REVIVE_PET                            = 0x1275, // hope this works (4.3.4)
-    CMSG_STABLE_SWAP_PET                              = 0x1276, // hope this works (4.3.4)
+    MSG_LIST_STABLED_PETS                             = 0x0834,
     MSG_MINIMAP_PING                                  = 0x6635,
     MSG_MOVE_CHARM_TELEPORT_CHEAT                     = 0x7A08,
     MSG_MOVE_FALL_LAND                                = 0x380A,
-    MSG_MOVE_FEATHER_FALL                             = 0x0000,
-    MSG_MOVE_GRAVITY_CHNG                             = 0x0000,
     MSG_MOVE_HEARTBEAT                                = 0x3914,
-    MSG_MOVE_HOVER                                    = 0x0000,
     MSG_MOVE_JUMP                                     = 0x7A06,
     MSG_MOVE_SET_ALL_SPEED_CHEAT                      = 0x0000,
     MSG_MOVE_SET_COLLISION_HEIGHT                     = 0x0000,
@@ -635,14 +633,17 @@ enum Opcodes
     MSG_MOVE_STOP_STRAFE                              = 0x3002,
     MSG_MOVE_STOP_SWIM                                = 0x3802,
     MSG_MOVE_STOP_TURN                                = 0x331E,
+    MSG_MOVE_TELEPORT                                 = 0x55A0,
+    MSG_MOVE_TELEPORT_ACK                             = 0x390C,
     MSG_MOVE_TELEPORT_CHEAT                           = 0x3A10,
     MSG_MOVE_TIME_SKIPPED                             = 0x19B3,
     MSG_MOVE_TOGGLE_COLLISION_CHEAT                   = 0x7B04,
     MSG_MOVE_TOGGLE_FALL_LOGGING                      = 0x0000,
     MSG_MOVE_TOGGLE_LOGGING                           = 0x0000,
-    MSG_MOVE_UPDATE_CAN_FLY                           = 0x0000,
+    MSG_MOVE_UPDATE_FLIGHT_SPEED                      = 0x0000,//0x30B1
     MSG_MOVE_UPDATE_MOUSE                             = 0x0000,
-    MSG_MOVE_WATER_WALK                               = 0x0000,
+    MSG_MOVE_UPDATE_RUN_SPEED                         = 0x0000,//0x14A6
+    MSG_MOVE_UPDATE_TELEPORT                          = 0x50B2,
     MSG_MOVE_WORLDPORT_ACK                            = 0x2411,
     MSG_NOTIFY_PARTY_SQUELCH                          = 0x4D06,
     MSG_PARTY_ASSIGNMENT                              = 0x0424,
@@ -786,8 +787,8 @@ enum Opcodes
     SMSG_CHAT_WRONG_FACTION                           = 0x6724,
     SMSG_CHECK_FOR_BOTS                               = 0x0000,
     SMSG_CLEAR_BOSS_EMOTES                            = 0x19A3,
-    SMSG_CLEAR_COOLDOWNS                              = 0x59B4,
     SMSG_CLEAR_COOLDOWN                               = 0x0627,
+    SMSG_CLEAR_COOLDOWNS                              = 0x59B4,
     SMSG_CLEAR_FAR_SIGHT_IMMEDIATE                    = 0x2A04,
     SMSG_CLEAR_TARGET                                 = 0x4B26,
     SMSG_CLIENTCACHE_VERSION                          = 0x2734,
@@ -801,12 +802,7 @@ enum Opcodes
     SMSG_COMMENTATOR_SKIRMISH_QUEUE_RESULT2           = 0x6814,
     SMSG_COMMENTATOR_STATE_CHANGED                    = 0x0737,
     SMSG_COMPLAIN_RESULT                              = 0x6D24,
-    SMSG_COMPLETION_NPC_RESPONSE                      = 0x75A1,
-    SMSG_COMPRESSED_ACHIEVEMENT_DATA                  = 0x0000,
-    SMSG_COMPRESSED_CHAR_ENUM                         = 0x0000,
-    SMSG_COMPRESSED_GUILD_ROSTER                      = 0x0000,
     SMSG_COMPRESSED_MOVES                             = 0x0517,
-    SMSG_COMPRESSED_UPDATE_OBJECT                     = 0x0000,
     SMSG_COMSAT_CONNECT_FAIL                          = 0x6317,
     SMSG_COMSAT_DISCONNECT                            = 0x0316,
     SMSG_COMSAT_RECONNECT_TRY                         = 0x4D35,
@@ -999,6 +995,7 @@ enum Opcodes
     SMSG_LFG_DISABLED                                 = 0x0815,
     SMSG_LFG_JOIN_RESULT                              = 0x38B6,
     SMSG_LFG_OFFER_CONTINUE                           = 0x6B27,
+    SMSG_LFG_OPEN_FROM_GOSSIP                         = 0x0000,
     SMSG_LFG_PARTY_INFO                               = 0x2325,
     SMSG_LFG_PLAYER_INFO                              = 0x4B36,
     SMSG_LFG_PLAYER_REWARD                            = 0x6834,
@@ -1009,8 +1006,6 @@ enum Opcodes
     SMSG_LFG_SLOT_INVALID                             = 0x54B5,
     SMSG_LFG_TELEPORT_DENIED                          = 0x0E14,
     SMSG_LFG_UPDATE_LIST                              = 0x0000,
-    SMSG_LFG_UPDATE_PARTY                             = 0x0000,
-    SMSG_LFG_UPDATE_PLAYER                            = 0x0000,
     SMSG_LFG_UPDATE_SEARCH                            = 0x54A1,
     SMSG_LFG_UPDATE_STATUS                            = 0x31A4,
     SMSG_LFG_UPDATE_STATUS_NONE                       = 0x7CA1,
@@ -1064,10 +1059,6 @@ enum Opcodes
     SMSG_MOUNTSPECIAL_ANIM                            = 0x0217,
     SMSG_MOVE_COLLISION_DISABLE                       = 0x31B0,
     SMSG_MOVE_COLLISION_ENABLE                        = 0x11A7,
-    SMSG_MOVE_DISABLE_COLLISION                       = 0x0000,
-    SMSG_MOVE_DISABLE_GRAVITY                         = 0x0000,
-    SMSG_MOVE_ENABLE_COLLISION                        = 0x0000,
-    SMSG_MOVE_ENABLE_GRAVITY                          = 0x0000,
     SMSG_MOVE_FEATHER_FALL                            = 0x79B0,
     SMSG_MOVE_GRAVITY_DISABLE                         = 0x75B2,
     SMSG_MOVE_GRAVITY_ENABLE                          = 0x30B3,
@@ -1092,19 +1083,18 @@ enum Opcodes
     SMSG_MOVE_SET_VEHICLE_REC_ID                      = 0x0000,
     SMSG_MOVE_SET_WALK_IN_AIR                         = 0x0000,
     SMSG_MOVE_SET_WALK_SPEED                          = 0x1DA4,
-    SMSG_MOVE_TELEPORT                                = 0x55A0,
     SMSG_MOVE_UNROOT                                  = 0x7DB4,
     SMSG_MOVE_UNSET_CAN_FLY                           = 0x15A2,
     SMSG_MOVE_UNSET_CAN_TRANSITION_BETWEEN_SWIM_AND_FLY = 0x7DB2,
     SMSG_MOVE_UNSET_HOVER                             = 0x51B3,
     SMSG_MOVE_UNSET_WALK_IN_AIR                       = 0x0000,
     SMSG_MOVE_UPDATE_COLLISION_HEIGHT                 = 0x59A3,
-    SMSG_MOVE_UPDATE_FLIGHT_SPEED                     = 0x30B1,
     SMSG_MOVE_UPDATE_FLIGHT_BACK_SPEED                = 0x74A0,
+    SMSG_MOVE_UPDATE_FLIGHT_SPEED                     = 0x30B1,
     SMSG_MOVE_UPDATE_KNOCK_BACK                       = 0x3DB2,
     SMSG_MOVE_UPDATE_PITCH_RATE                       = 0x1DB5,
-    SMSG_MOVE_UPDATE_RUN_SPEED                        = 0x14A6,
     SMSG_MOVE_UPDATE_RUN_BACK_SPEED                   = 0x3DA6,
+    SMSG_MOVE_UPDATE_RUN_SPEED                        = 0x14A6,
     SMSG_MOVE_UPDATE_SWIM_BACK_SPEED                  = 0x30B5,
     SMSG_MOVE_UPDATE_SWIM_SPEED                       = 0x59B5,
     SMSG_MOVE_UPDATE_TELEPORT                         = 0x50B2,
@@ -1168,7 +1158,7 @@ enum Opcodes
     SMSG_PLAY_DANCE                                   = 0x4704,
     SMSG_PLAY_MUSIC                                   = 0x4B06,
     SMSG_PLAY_OBJECT_SOUND                            = 0x2635,
-	SMSG_PLAY_ONE_SHOT_ANIM_KIT                       = 0x4A35,
+    SMSG_PLAY_ONE_SHOT_ANIM_KIT                       = 0x4A35,
     SMSG_PLAY_SOUND                                   = 0x2134,
     SMSG_PLAY_SPELL_VISUAL                            = 0x10B1,
     SMSG_PLAY_SPELL_VISUAL_KIT                        = 0x55A5,
@@ -1200,6 +1190,7 @@ enum Opcodes
     SMSG_QUESTUPDATE_COMPLETE                         = 0x2937,
     SMSG_QUESTUPDATE_FAILED                           = 0x6324,
     SMSG_QUESTUPDATE_FAILEDTIMER                      = 0x6427,
+    SMSG_QUEST_NPC_QUERY_RESPONSE                     = 0x75A1,
     SMSG_QUEST_CONFIRM_ACCEPT                         = 0x6F07,
     SMSG_QUEST_FORCE_REMOVE                           = 0x6605,
     SMSG_QUEST_POI_QUERY_RESPONSE                     = 0x6304,
@@ -1244,12 +1235,15 @@ enum Opcodes
     SMSG_SERVER_INFO_RESPONSE                         = 0x74B5,
     SMSG_SERVER_MESSAGE                               = 0x6C04,
     SMSG_SERVER_PERF                                  = 0x74B6,
+    SMSG_SET_AI_ANIM_KIT                              = 0x0000,
     SMSG_SET_DF_FAST_LAUNCH_RESULT                    = 0x35B6,
     SMSG_SET_FACTION_ATWAR                            = 0x4216,
     SMSG_SET_FACTION_STANDING                         = 0x0126,
     SMSG_SET_FACTION_VISIBLE                          = 0x2525,
     SMSG_SET_FLAT_SPELL_MODIFIER                      = 0x2834,
     SMSG_SET_FORCED_REACTIONS                         = 0x4615,
+    SMSG_SET_MELEE_ANIM_KIT                           = 0x0000,
+    SMSG_SET_MOVEMENT_ANIM_KIT                        = 0x0000,
     SMSG_SET_PCT_SPELL_MODIFIER                       = 0x0224,
     SMSG_SET_PHASE_SHIFT                              = 0x70A0,
     SMSG_SET_PLAYER_DECLINED_NAMES_RESULT             = 0x2B25,
@@ -1260,6 +1254,7 @@ enum Opcodes
     SMSG_SHOW_BANK                                    = 0x2627,
     SMSG_SHOW_MAILBOX                                 = 0x2524,
     SMSG_SHOW_RATINGS                                 = 0x11B4,
+    SMSG_SOCKET_GEMS_RESULT                           = 0x6014,
     SMSG_SOR_START_EXPERIENCE_INCOMPLETE              = 0x7CA7,
     SMSG_SPELLBREAKLOG                                = 0x6B17,
     SMSG_SPELLDAMAGESHIELD                            = 0x2927,
@@ -1287,6 +1282,7 @@ enum Opcodes
     SMSG_SPLINE_MOVE_GRAVITY_DISABLE                  = 0x5DB5,
     SMSG_SPLINE_MOVE_GRAVITY_ENABLE                   = 0x3CA6,
     SMSG_SPLINE_MOVE_ROOT                             = 0x51B4,
+    SMSG_SPLINE_MOVE_SET_ANIM                         = 0x4335,
     SMSG_SPLINE_MOVE_SET_FEATHER_FALL                 = 0x3DA5,
     SMSG_SPLINE_MOVE_SET_FLIGHT_BACK_SPEED            = 0x38B3,
     SMSG_SPLINE_MOVE_SET_FLIGHT_SPEED                 = 0x39A0,
@@ -1303,13 +1299,14 @@ enum Opcodes
     SMSG_SPLINE_MOVE_SET_TURN_RATE                    = 0x78B5,
     SMSG_SPLINE_MOVE_SET_WALK_MODE                    = 0x54B6,
     SMSG_SPLINE_MOVE_SET_WALK_SPEED                   = 0x34A5,
-    SMSG_SPLINE_MOVE_SET_WATER_WALK                   = 0x0000,
+    SMSG_SPLINE_MOVE_SET_WATER_WALK                   = 0x50A2,
     SMSG_SPLINE_MOVE_START_SWIM                       = 0x31A5,
     SMSG_SPLINE_MOVE_STOP_SWIM                        = 0x1DA2,
     SMSG_SPLINE_MOVE_UNROOT                           = 0x75B6,
     SMSG_SPLINE_MOVE_UNSET_FLYING                     = 0x58A6,
     SMSG_SPLINE_MOVE_UNSET_HOVER                      = 0x7DA5,
     SMSG_SPLINE_MOVE_WATER_WALK                       = 0x50A2,
+    SMSG_STABLE_RESULT                                = 0x2204,
     SMSG_STANDSTATE_UPDATE                            = 0x6F04,
     SMSG_START_MIRROR_TIMER                           = 0x6824,
     SMSG_START_TIMER                                  = 0x59A5,
@@ -1350,14 +1347,13 @@ enum Opcodes
     SMSG_UNIT_HEALTH_FREQUENT                         = 0x2C26,
     SMSG_UNIT_SPELLCAST_START                         = 0x2517,
     SMSG_UPDATE_ACCOUNT_DATA                          = 0x6837,
-    SMSG_UPDATE_ACCOUNT_DATA_COMPLETE                 = 0x6126,
+    SMSG_UPDATE_ACCOUNT_DATA_COMPLETE                 = 0x2015,
     SMSG_UPDATE_COMBO_POINTS                          = 0x6B34,
     SMSG_UPDATE_CURRENCY                              = 0x59B0,
     SMSG_UPDATE_CURRENCY_WEEK_LIMIT                   = 0x70A7,
     SMSG_UPDATE_DUNGEON_ENCOUNTER_FOR_LOOT            = 0x3CB5,
     SMSG_UPDATE_INSTANCE_ENCOUNTER_UNIT               = 0x4007,
     SMSG_UPDATE_INSTANCE_OWNERSHIP                    = 0x4915,
-    SMSG_SOCKET_GEMS_RESULT                           = 0x6014,
     SMSG_UPDATE_LAST_INSTANCE                         = 0x0437,
     SMSG_UPDATE_OBJECT                                = 0x4715,
     SMSG_UPDATE_SERVER_PLAYER_POSITION                = 0x74A3,
@@ -1402,7 +1398,7 @@ enum SessionStatus
     STATUS_TRANSFER,                                        // Player transferring to another map (_player != NULL, m_GUID == _player->GetGUID(), !inWorld())
     STATUS_LOGGEDIN_OR_RECENTLY_LOGGOUT,                    // _player != NULL or _player == NULL && m_playerRecentlyLogout && m_playerLogout, m_GUID store last _player guid)
     STATUS_NEVER,                                           // Opcode not accepted from client (deprecated or server side only)
-    STATUS_UNHANDLED,                                       // Opcode not handled yet
+    STATUS_UNHANDLED                                        // Opcode not handled yet
 };
 
 enum PacketProcessing
@@ -1420,32 +1416,75 @@ typedef void(WorldSession::*pOpcodeHandler)(WorldPacket& recvPacket);
 struct OpcodeHandler
 {
     OpcodeHandler() {}
-    OpcodeHandler(char const* _name, char const* _compressedName, SessionStatus _status, PacketProcessing _processing, pOpcodeHandler _handler)
-        : name(_name), compressedName(_compressedName), status(_status), packetProcessing(_processing), handler(_handler) {}
+    OpcodeHandler(char const* _name, SessionStatus _status, PacketProcessing _processing, pOpcodeHandler _handler)
+        : Handler(_handler), Name(_name), Status(_status), ProcessingPlace(_processing) {}
 
-    char const* name;
-    char const* compressedName;
-    SessionStatus status;
-    PacketProcessing packetProcessing;
-    pOpcodeHandler handler;
+    pOpcodeHandler Handler;
+    char const* Name;
+    SessionStatus Status;
+    PacketProcessing ProcessingPlace;
 };
 
-extern OpcodeHandler* opcodeTable[NUM_OPCODE_HANDLERS];
+class OpcodeTable
+{
+    public:
+        OpcodeTable()
+        {
+            memset(_internalTable, 0, sizeof(_internalTable));
+        }
+
+        ~OpcodeTable()
+        {
+            for (uint16 i = 0; i < NUM_OPCODE_HANDLERS; ++i)
+                delete _internalTable[i];
+        }
+
+        void Initialize();
+
+        OpcodeHandler const* operator[](uint32 index) const
+        {
+            return _internalTable[index];
+        }
+
+    private:
+        template<bool isInValidRange, bool isNonZero>
+        void ValidateAndSetOpcode(uint16 opcode, char const* name, SessionStatus status, PacketProcessing processing, pOpcodeHandler handler);
+
+        // Prevent copying this structure
+        OpcodeTable(OpcodeTable const&);
+        OpcodeTable& operator=(OpcodeTable const&);
+
+        OpcodeHandler* _internalTable[NUM_OPCODE_HANDLERS];
+};
+
+extern OpcodeTable opcodeTable;
+
 void InitOpcodes();
 
 /// Lookup opcode name for human understandable logging
-inline const char* LookupOpcodeName(Opcodes id)
+inline std::string GetOpcodeNameForLogging(Opcodes id)
 {
+    uint32 opcode = uint32(id);
+    std::ostringstream ss;
+    ss << '[';
+
     if (id < UNKNOWN_OPCODE)
     {
-        bool isCompressed = uint32(id) & COMPRESSED_OPCODE_MASK;
-        if (OpcodeHandler* handler = opcodeTable[uint32(id) & 0x7FFF])
-            return isCompressed ? handler->compressedName : handler->name;
-
-        return "UNKNOWN OPCODE";
+        if (OpcodeHandler const* handler = opcodeTable[uint32(id) & 0x7FFF])
+        {
+            ss << handler->Name;
+            if (opcode & COMPRESSED_OPCODE_MASK)
+                ss << "_COMPRESSED";
+        }
+        else
+            ss << "UNKNOWN OPCODE";
     }
+    else
+        ss << "INVALID OPCODE";
 
-    return "INVALID OPCODE";
+    ss << " 0x" << std::hex << std::uppercase << opcode << std::nouppercase << " (" << std::dec << opcode << ")]";
+    return ss.str();
 }
+
 #endif
 /// @}

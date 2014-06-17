@@ -1,7 +1,14 @@
-#include "ScriptPCH.h"
-#include "ObjectMgr.h"
+/*
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ *
+ * This file is NOT free software. Third-party users can NOT redistribute 
+ * it or modify it. If you find it, you are either hacking something, or very 
+ * lucky (presuming someone else managed to hack it).
+ */
+
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ObjectMgr.h"
 #include "SpellScript.h"
 #include "SpellAuraEffects.h"
 #include "WorldPacket.h"
@@ -22,16 +29,11 @@ enum Spells
 class boss_argaloth : public CreatureScript
 {
     public:
-        boss_argaloth() : CreatureScript("boss_argaloth") {}
+        boss_argaloth() : CreatureScript("boss_argaloth") { }
 
-        CreatureAI* GetAI(Creature* pCreature) const
-        {
-            return new boss_argalothAI(pCreature);
-        }
-            
         struct boss_argalothAI : public ScriptedAI
         {
-            boss_argalothAI(Creature* pCreature) : ScriptedAI(pCreature), summons(me)
+            boss_argalothAI(Creature* pCreature) : ScriptedAI(pCreature)
             {
                 m_pInstance = pCreature->GetInstanceScript();
             }
@@ -41,8 +43,8 @@ class boss_argaloth : public CreatureScript
             uint32 m_uiMeteorSlashTimer;
             uint32 m_uiCancelTimer;
             uint32 m_uiBerserkTimer;
-            SummonList summons;
             bool felfire1, felfire2;
+            std::list<uint64> Summons;
 
             void Reset()
             {
@@ -52,7 +54,7 @@ class boss_argaloth : public CreatureScript
                 if (me->HasAura(47008))
                     me->RemoveAura(47008);
 
-                summons.DespawnAll();
+                Summons.clear();
                 if (me->HasAura(47008))
                     me->RemoveAura(47008);
                 m_uiConsumingDarknessTimer = 20000;
@@ -61,7 +63,7 @@ class boss_argaloth : public CreatureScript
                 m_uiBerserkTimer = 300000;
             }
 
-            void EnterCombat(Unit* pWho)
+            void EnterCombat(Unit* /*who*/)
             {
                 if (m_pInstance)
                    m_pInstance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me); // Add
@@ -76,17 +78,17 @@ class boss_argaloth : public CreatureScript
 
             void EnterEvadeMode() // AKA Wipe.
             {
-			    me->GetMotionMaster()->MoveTargetedHome();
+                me->GetMotionMaster()->MoveTargetedHome();
                 me->SetHealth(me->GetMaxHealth());
 
                 if (me->HasAura(47008))
                     me->RemoveAura(47008);
-					
+
                 if (m_pInstance)
                    m_pInstance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me); // Remove
             }
 
-            void JustDied(Unit* killer)
+            void JustDied(Unit* /*killer*/)
             {
                 if (m_pInstance)
                    m_pInstance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me); // Remove
@@ -94,7 +96,7 @@ class boss_argaloth : public CreatureScript
 
             void JustSummoned(Creature* summon)
             {
-                summons.push_back(summon->GetGUID());
+                Summons.push_back(summon->GetGUID());
                 DoZoneInCombat(summon);
             }
 
@@ -103,7 +105,7 @@ class boss_argaloth : public CreatureScript
                 if (!UpdateVictim())
                     return;
 
-				if (me->HasUnitState(UNIT_STATE_CASTING))
+                if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
                 if (m_uiConsumingDarknessTimer <= uiDiff)
@@ -144,7 +146,7 @@ class boss_argaloth : public CreatureScript
                     felfire2 = true;
                 }
                 if (m_uiCancelTimer <= uiDiff && m_uiCancelTimer > 0)
-                    summons.DespawnAll();
+                    Summons.clear();
                 else
                     m_uiCancelTimer -= uiDiff;
 
@@ -156,18 +158,18 @@ class boss_argaloth : public CreatureScript
                 DoMeleeAttackIfReady();
             }
         };
+
+        CreatureAI* GetAI(Creature* pCreature) const
+        {
+            return new boss_argalothAI(pCreature);
+        }
 };
 
 class npc_felflames : public CreatureScript
 {
     public:
-        npc_felflames() : CreatureScript("npc_felflames") {}
+        npc_felflames() : CreatureScript("npc_felflames") { }
 
-        CreatureAI* GetAI(Creature* pCreature) const
-        {
-            return new npc_felflamesAI(pCreature);
-        }
-            
         struct npc_felflamesAI : public ScriptedAI
         {
             npc_felflamesAI(Creature* pCreature) : ScriptedAI(pCreature)
@@ -178,36 +180,41 @@ class npc_felflames : public CreatureScript
             InstanceScript* m_pInstance;
             uint32 m_uiFlamesTimer;
             bool flames;
-			
+
             void Reset()
             {
                 m_uiFlamesTimer = 100;
                 flames = false;
             }
 
-            void EnterCombat(Unit* pWho) 
+            void EnterCombat(Unit* /*who*/) 
             {
                 m_uiFlamesTimer = 100;
                 flames = false;
-			}
-			
-			void UpdateAI(uint32 uiDiff)
+            }
+
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
 
-				if (me->HasUnitState(UNIT_STATE_CASTING))
+                if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
-                if (m_uiFlamesTimer <= uiDiff && flames == false)
-				{
+                if (m_uiFlamesTimer <= diff && flames == false)
+                {
                     DoCast(me, SPELL_FELFLAMES);
                     flames = true;
-				}
+                }
                 else
-                    m_uiFlamesTimer -= uiDiff;				
+                    m_uiFlamesTimer -= diff;
             }
         };
+
+        CreatureAI* GetAI(Creature* pCreature) const
+        {
+            return new npc_felflamesAI(pCreature);
+        }
 };
 
 void AddSC_boss_argaloth()

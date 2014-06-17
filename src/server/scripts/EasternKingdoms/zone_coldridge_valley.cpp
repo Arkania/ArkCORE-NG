@@ -1,9 +1,6 @@
 /*
- *
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
- *
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- *
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -38,21 +35,21 @@ EndContentData */
 
 enum zone_coldridge_valley
 {
-	NPC_ROCKSAW_INVADER									= 37070,
-	NPC_WOUNDED_COLDRIDGE_MOUNTAINEER_KILL_CREDIT		= 37079,
-	NPC_WOUNDED_COLDRIDGE_MOUNTAINEER					= 37080,
-	NPC_COLDRIDGE_DEFENDER								= 37177,
-	NPC_SOOTHSAYER_SHIKALA								= 37108,
-	NPC_SOOTHSAYER_RIKKARI  							= 37173,
-	NPC_SOOTHSAYER_MIRIMKOA								= 37174,
-	NPC_TROLLING_FOR_INFORMATION_KILL_CREDIT_BUNNY_SE	= 37109,
-	NPC_TROLLING_FOR_INFORMATION_KILL_CREDIT_BUNNY_SW	= 37110,
-	NPC_TROLLING_FOR_INFORMATION_KILL_CREDIT_BUNNY_W	= 37111,
+    NPC_ROCKSAW_INVADER                                    = 37070,
+    NPC_WOUNDED_COLDRIDGE_MOUNTAINEER_KILL_CREDIT        = 37079,
+    NPC_WOUNDED_COLDRIDGE_MOUNTAINEER                    = 37080,
+    NPC_COLDRIDGE_DEFENDER                                = 37177,
+    NPC_SOOTHSAYER_SHIKALA                                = 37108,
+    NPC_SOOTHSAYER_RIKKARI                              = 37173,
+    NPC_SOOTHSAYER_MIRIMKOA                                = 37174,
+    NPC_TROLLING_FOR_INFORMATION_KILL_CREDIT_BUNNY_SE    = 37109,
+    NPC_TROLLING_FOR_INFORMATION_KILL_CREDIT_BUNNY_SW    = 37110,
+    NPC_TROLLING_FOR_INFORMATION_KILL_CREDIT_BUNNY_W    = 37111,
 
-	SPELL_HEAL_WOUNDED_MOUNTAINEER						= 69855,
+    SPELL_HEAL_WOUNDED_MOUNTAINEER                        = 69855,
 
-	QUEST_AID_FOR_THE_WOUNDED							= 24471,
-	QUEST_TROLLING_FOR_INFORMATION						= 24489,
+    QUEST_AID_FOR_THE_WOUNDED                            = 24471,
+    QUEST_TROLLING_FOR_INFORMATION                        = 24489,
 
 
 };
@@ -68,32 +65,32 @@ public:
 
     struct npc_rockjaw_invaderAI : public ScriptedAI
     {
-        npc_rockjaw_invaderAI(Creature *c) : ScriptedAI(c) {}
+        npc_rockjaw_invaderAI(Creature *c) : ScriptedAI(c) { }
 
-        uint32 Attack1HTimer;        	
+        uint32 Attack1HTimer;            
 
         void Reset()  
         {
-            Attack1HTimer = urand(1800,2200);           			
+            Attack1HTimer = urand(1800,2200);                       
         }
 
         void UpdateAI(uint32 diff) 
-        {						
+        {                        
             if (!UpdateVictim())
-			{
-				if (Creature* infantry = me->FindNearestCreature (NPC_COLDRIDGE_DEFENDER, 3.0f)) 
-				{
-					if (Attack1HTimer <= diff)
-					{
-						me->SetFacingTo (me->GetAngle(infantry));
-						me->HandleEmoteCommand(EMOTE_ONESHOT_ATTACK1H);
-						Attack1HTimer = urand(1800,2200);
-					}
-					else Attack1HTimer -= diff;
-				}
-			} else 
-				DoMeleeAttackIfReady();
-			
+            {
+                if (Creature* infantry = me->FindNearestCreature (NPC_COLDRIDGE_DEFENDER, 3.0f)) 
+                {
+                    if (Attack1HTimer <= diff)
+                    {
+                        me->SetFacingTo (me->GetAngle(infantry));
+                        me->HandleEmoteCommand(EMOTE_ONESHOT_ATTACK1H);
+                        Attack1HTimer = urand(1800,2200);
+                    }
+                    else Attack1HTimer -= diff;
+                }
+            } else 
+                DoMeleeAttackIfReady();
+            
         }
     };
 
@@ -114,32 +111,32 @@ public:
 
     struct npc_coldridge_defenderAI : public ScriptedAI
     {
-        npc_coldridge_defenderAI(Creature *c) : ScriptedAI(c) {}
+        npc_coldridge_defenderAI(Creature *c) : ScriptedAI(c) { }
 
-        uint32 Attack1HTimer;        	
+        uint32 Attack1HTimer;            
 
         void Reset()  
         {
-            Attack1HTimer = urand(1800,2200);           			
+            Attack1HTimer = urand(1800,2200);                       
         }
 
         void UpdateAI(uint32 diff) 
-        {						
+        {                        
             if (!UpdateVictim())
-			{
-				if (Creature* infantry = me->FindNearestCreature (NPC_ROCKSAW_INVADER, 3.0f)) 
-				{
-					if (Attack1HTimer <= diff)
-					{
-						me->SetFacingTo (me->GetAngle(infantry));
-						me->HandleEmoteCommand(EMOTE_ONESHOT_ATTACK1H);
-						Attack1HTimer = urand(1800,2200);
-					}
-					else Attack1HTimer -= diff;
-				}
-			} else 
-				DoMeleeAttackIfReady();
-			
+            {
+                if (Creature* infantry = me->FindNearestCreature (NPC_ROCKSAW_INVADER, 3.0f)) 
+                {
+                    if (Attack1HTimer <= diff)
+                    {
+                        me->SetFacingTo (me->GetAngle(infantry));
+                        me->HandleEmoteCommand(EMOTE_ONESHOT_ATTACK1H);
+                        Attack1HTimer = urand(1800,2200);
+                    }
+                    else Attack1HTimer -= diff;
+                }
+            } else 
+                DoMeleeAttackIfReady();
+            
         }
     };
 
@@ -157,68 +154,68 @@ class npc_wounded_coldridge_mountaineer : public CreatureScript
 {
 public:
     npc_wounded_coldridge_mountaineer() : CreatureScript("npc_wounded_coldridge_mountaineer") { }
-	
-	bool OnGossipHello(Player* player, Creature* creature) 
+    
+    bool OnGossipHello(Player* player, Creature* creature) 
     {
-        player->PlayerTalkClass->SendCloseGossip();		
+        player->PlayerTalkClass->SendCloseGossip();        
 
-		if (player->HasUnitState(UNIT_STATE_CASTING)) 
-				return true;
-		
+        if (player->HasUnitState(UNIT_STATE_CASTING)) 
+                return true;
+        
         if (player->GetQuestStatus(QUEST_AID_FOR_THE_WOUNDED) == QUEST_STATUS_INCOMPLETE)
-        {  			
-			creature->CastSpell(creature, SPELL_HEAL_WOUNDED_MOUNTAINEER, false);
-			player->KilledMonsterCredit(NPC_WOUNDED_COLDRIDGE_MOUNTAINEER_KILL_CREDIT, NULL);
+        {              
+            creature->CastSpell(creature, SPELL_HEAL_WOUNDED_MOUNTAINEER, false);
+            player->KilledMonsterCredit(NPC_WOUNDED_COLDRIDGE_MOUNTAINEER_KILL_CREDIT, 0);
         }
         return true;
     }
 
     struct npc_wounded_coldridge_mountaineerAI : public ScriptedAI
     {
-		npc_wounded_coldridge_mountaineerAI(Creature *creature) : ScriptedAI(creature) 
-		{
-			isHealed=false; phase=3;
-		} 
-		
-		bool isHealed;
-		uint32 phase;
-		uint32 timer;
-				
-		void Reset()  
-		{ 
-			isHealed=false;
-			phase=0;
-			timer=1000;
-		}
-		
-		// ToDo
-	    void SpellHit(Unit * Hitter, SpellInfo const* spell) 
+        npc_wounded_coldridge_mountaineerAI(Creature *creature) : ScriptedAI(creature) 
         {
-			printf("zauber ist eingetroffen %d \n", spell->Id );
+            isHealed=false; phase=3;
+        } 
+        
+        bool isHealed;
+        uint32 phase;
+        uint32 timer;
+                
+        void Reset()  
+        { 
+            isHealed=false;
+            phase=0;
+            timer=1000;
+        }
+        
+        // ToDo
+        void SpellHit(Unit * Hitter, SpellInfo const* spell) 
+        {
+            printf("zauber ist eingetroffen %d \n", spell->Id );
             if (spell->Id == SPELL_HEAL_WOUNDED_MOUNTAINEER )
             {
-				isHealed=true;
-				DoCast(Hitter, NPC_WOUNDED_COLDRIDGE_MOUNTAINEER_KILL_CREDIT);
-				printf("Jo, ich wurde geheilt \n");
+                isHealed=true;
+                DoCast(Hitter, NPC_WOUNDED_COLDRIDGE_MOUNTAINEER_KILL_CREDIT);
+                printf("Jo, ich wurde geheilt \n");
             }
         }
-		
-		void UpdateAI(uint32 diff) 
+        
+        void UpdateAI(uint32 diff) 
         {   
 
-			if (!isHealed) return;
+            if (!isHealed) return;
 
-			if (timer <= diff)	
-			{
-			
+            if (timer <= diff)    
+            {
+            
 
-			}	
-			else 
-				timer -= diff;	
-		}
+            }    
+            else 
+                timer -= diff;    
+        }
     };
-	 
-	CreatureAI* GetAI(Creature* creature) const  
+     
+    CreatureAI* GetAI(Creature* creature) const  
     {
         return new npc_wounded_coldridge_mountaineerAI (creature);
     }
@@ -235,92 +232,92 @@ public:
 
     struct npc_soothsayer_shikalaAI : public ScriptedAI
     {
-        npc_soothsayer_shikalaAI(Creature *c) : ScriptedAI(c) {}
+        npc_soothsayer_shikalaAI(Creature *c) : ScriptedAI(c) { }
 
         uint32 timer;  
-		uint32 phase;
-		bool TalkSequenceIsStarted;
-		Player* player;
-		
+        uint32 phase;
+        bool TalkSequenceIsStarted;
+        Player* player;
+        
         void Reset()  
         {
-              timer=0; TalkSequenceIsStarted=false; phase=0;       			
+              timer=0; TalkSequenceIsStarted=false; phase=0;                   
         }
 
-		void MoveInLineOfSight(Unit* who) 
+        void MoveInLineOfSight(Unit* who) 
         {
             if (!who || !who->IsAlive() || TalkSequenceIsStarted)
                 return;
 
             if (who->GetTypeId() == TYPEID_PLAYER && me->IsWithinDistInMap(who, 10.0f))
-			{
-				player = who->ToPlayer();
-				if (player)
-				{
+            {
+                player = who->ToPlayer();
+                if (player)
+                {
                     if (player->GetQuestStatus(QUEST_TROLLING_FOR_INFORMATION) == QUEST_STATUS_INCOMPLETE)
                     {                   
                         TalkSequenceIsStarted = true;
-						timer = 2000; phase++;
+                        timer = 2000; phase++;
                     }
-				}
-			}                
+                }
+            }                
         }
 
         void UpdateAI(uint32 diff) 
-        {						
+        {                        
             if (!UpdateVictim())
-			{
-				if (TalkSequenceIsStarted)
-				{
-					if (!player)
-					{
-						timer=0; phase=0; TalkSequenceIsStarted=false;
-						return;
-					}
-					if (timer<=diff)
-					{						
-						switch (phase)
-						{
-						case 1:
-							{ 
-								Talk(0); timer=5000; phase++;
-								break;
-							}
-						case 2:
-							{ 
-								Talk(1); timer=5000; phase++;
-								break;
-							}
-						case 3:
-							{ 
-								Talk(2); timer=5000; phase++;
-								break;
-							}
-						case 4:
-							{																																						
-								player->KilledMonsterCredit(NPC_TROLLING_FOR_INFORMATION_KILL_CREDIT_BUNNY_SE, NULL);	
-								timer=120000; phase++; // cooldown
-								break;
-							}
-						case 5:
-							{																																																
-								timer=0; phase=0; TalkSequenceIsStarted=false;																			  								
-								break;
-							}
-						}				
-					}
-					else
-						timer-=diff;
+            {
+                if (TalkSequenceIsStarted)
+                {
+                    if (!player)
+                    {
+                        timer=0; phase=0; TalkSequenceIsStarted=false;
+                        return;
+                    }
+                    if (timer<=diff)
+                    {                        
+                        switch (phase)
+                        {
+                        case 1:
+                            { 
+                                Talk(0); timer=5000; phase++;
+                                break;
+                            }
+                        case 2:
+                            { 
+                                Talk(1); timer=5000; phase++;
+                                break;
+                            }
+                        case 3:
+                            { 
+                                Talk(2); timer=5000; phase++;
+                                break;
+                            }
+                        case 4:
+                            {                                                                                                                                                        
+                                player->KilledMonsterCredit(NPC_TROLLING_FOR_INFORMATION_KILL_CREDIT_BUNNY_SE, 0);    
+                                timer=120000; phase++; // cooldown
+                                break;
+                            }
+                        case 5:
+                            {                                                                                                                                                                                                
+                                timer=0; phase=0; TalkSequenceIsStarted=false;                                                                                                              
+                                break;
+                            }
+                        }                
+                    }
+                    else
+                        timer-=diff;
 
-					if (!me->IsInRange (player, 0.0f, 15.0F)) 
-					{ 
-						timer=0; phase=0; TalkSequenceIsStarted=false; // if player gone away, delete cooldown
-					}
-				}
+                    if (!me->IsInRange (player, 0.0f, 15.0F)) 
+                    { 
+                        timer=0; phase=0; TalkSequenceIsStarted=false; // if player gone away, delete cooldown
+                    }
+                }
 
-			} else 
-				DoMeleeAttackIfReady();
-			
+            } else 
+                DoMeleeAttackIfReady();
+            
         }
     };
 
@@ -341,92 +338,92 @@ public:
 
     struct npc_soothsayer_rikkariAI : public ScriptedAI
     {
-        npc_soothsayer_rikkariAI(Creature *c) : ScriptedAI(c) {}
+        npc_soothsayer_rikkariAI(Creature *c) : ScriptedAI(c) { }
 
         uint32 timer;  
-		uint32 phase;
-		bool TalkSequenceIsStarted;
-		Player* player;
-		
+        uint32 phase;
+        bool TalkSequenceIsStarted;
+        Player* player;
+        
         void Reset()  
         {
-              timer=0; TalkSequenceIsStarted=false; phase=0;       			
+              timer=0; TalkSequenceIsStarted=false; phase=0;                   
         }
 
-		void MoveInLineOfSight(Unit* who) 
+        void MoveInLineOfSight(Unit* who) 
         {
             if (!who || !who->IsAlive() || TalkSequenceIsStarted)
                 return;
 
             if (who->GetTypeId() == TYPEID_PLAYER && me->IsWithinDistInMap(who, 10.0f))
-			{				
-				player = who->ToPlayer();
-				if (player)
-				{
+            {                
+                player = who->ToPlayer();
+                if (player)
+                {
                     if (player->GetQuestStatus(QUEST_TROLLING_FOR_INFORMATION) == QUEST_STATUS_INCOMPLETE)
                     {                       
                         TalkSequenceIsStarted = true;
-						timer = 2000; phase++;
+                        timer = 2000; phase++;
                     }
-				}
-			}                
+                }
+            }                
         }
 
         void UpdateAI(uint32 diff) 
-        {						
+        {                        
             if (!UpdateVictim())
-			{
-				if (TalkSequenceIsStarted)
-				{					
-					if (!player)
-					{
-						timer=0; phase=0; TalkSequenceIsStarted=false;
-						return;
-					}
-					if (timer<=diff)
-					{						
-						switch (phase)
-						{
-						case 1:
-							{ 
-								Talk(0); timer=5000; phase++;
-								break;
-							}
-						case 2:
-							{ 
-								Talk(1); timer=5000; phase++;
-								break;
-							}
-						case 3:
-							{ 
-								Talk(2); timer=5000; phase++;
-								break;
-							}
-						case 4:
-							{																																								
-								player->KilledMonsterCredit(NPC_TROLLING_FOR_INFORMATION_KILL_CREDIT_BUNNY_SW, NULL);	
-								timer=120000; phase++; // cooldown																		  								
-								break;
-							}
-						case 5:
-							{																																																
-								timer=0; phase=0; TalkSequenceIsStarted=false;																			  								
-								break;
-							}
-						}				
-					}
-					else
-						timer-=diff;
+            {
+                if (TalkSequenceIsStarted)
+                {                    
+                    if (!player)
+                    {
+                        timer=0; phase=0; TalkSequenceIsStarted=false;
+                        return;
+                    }
+                    if (timer<=diff)
+                    {                        
+                        switch (phase)
+                        {
+                        case 1:
+                            { 
+                                Talk(0); timer=5000; phase++;
+                                break;
+                            }
+                        case 2:
+                            { 
+                                Talk(1); timer=5000; phase++;
+                                break;
+                            }
+                        case 3:
+                            { 
+                                Talk(2); timer=5000; phase++;
+                                break;
+                            }
+                        case 4:
+                            {                                                                                                                                                                
+                                player->KilledMonsterCredit(NPC_TROLLING_FOR_INFORMATION_KILL_CREDIT_BUNNY_SW, 0);    
+                                timer=120000; phase++; // cooldown                                                                                                          
+                                break;
+                            }
+                        case 5:
+                            {                                                                                                                                                                                                
+                                timer=0; phase=0; TalkSequenceIsStarted=false;                                                                                                              
+                                break;
+                            }
+                        }                
+                    }
+                    else
+                        timer-=diff;
 
-					if (!me->IsInRange (player, 0.0f, 15.0F)) 
-					{ 
-						timer=0; phase=0; TalkSequenceIsStarted=false; // if player gone away, delete cooldown
-					}
-				}
+                    if (!me->IsInRange (player, 0.0f, 15.0F)) 
+                    { 
+                        timer=0; phase=0; TalkSequenceIsStarted=false; // if player gone away, delete cooldown
+                    }
+                }
 
-			} else 
-				DoMeleeAttackIfReady();
-			
+            } else 
+                DoMeleeAttackIfReady();
+            
         }
     };
 
@@ -447,92 +444,92 @@ public:
 
     struct npc_soothsayer_mirimkoaAI : public ScriptedAI
     {
-        npc_soothsayer_mirimkoaAI(Creature *c) : ScriptedAI(c) {}
+        npc_soothsayer_mirimkoaAI(Creature *c) : ScriptedAI(c) { }
 
         uint32 timer;  
-		uint32 phase;
-		bool TalkSequenceIsStarted;
-		Player* player;
-		
+        uint32 phase;
+        bool TalkSequenceIsStarted;
+        Player* player;
+        
         void Reset()  
         {
-              timer=0; TalkSequenceIsStarted=false; phase=0;       			
+              timer=0; TalkSequenceIsStarted=false; phase=0;                   
         }
 
-		void MoveInLineOfSight(Unit* who) 
+        void MoveInLineOfSight(Unit* who) 
         {
             if (!who || !who->IsAlive() || TalkSequenceIsStarted)
                 return;
 
             if (who->GetTypeId() == TYPEID_PLAYER && me->IsWithinDistInMap(who, 10.0f))
-			{
-				player = who->ToPlayer();
-				if (player)
-				{
+            {
+                player = who->ToPlayer();
+                if (player)
+                {
                     if (player->GetQuestStatus(QUEST_TROLLING_FOR_INFORMATION) == QUEST_STATUS_INCOMPLETE)
                     {                        
                         TalkSequenceIsStarted = true;
-						timer = 2000; phase++;
+                        timer = 2000; phase++;
                     }
-				}
-			}                
+                }
+            }                
         }
 
         void UpdateAI(uint32 diff) 
-        {						
+        {                        
             if (!UpdateVictim())
-			{
-				if (TalkSequenceIsStarted)
-				{
-					if (!player)
-					{
-						timer=0; phase=0; TalkSequenceIsStarted=false;
-						return;
-					}
-					if (timer<=diff)
-					{						
-						switch (phase)
-						{
-						case 1:
-							{ 
-								Talk(0); timer=5000; phase++;
-								break;
-							}
-						case 2:
-							{ 
-								Talk(1); timer=5000; phase++;
-								break;
-							}
-						case 3:
-							{ 
-								Talk(2); timer=5000; phase++;
-								break;
-							}
-						case 4:
-							{																																										
-								player->KilledMonsterCredit(NPC_TROLLING_FOR_INFORMATION_KILL_CREDIT_BUNNY_W, NULL);	
-								timer=120000; phase++; // cooldown													  								
-								break;
-							}
-						case 5:
-							{																																																
-								timer=0; phase=0; TalkSequenceIsStarted=false;																			  								
-								break;
-							}
-						}				
-					}
-					else
-						timer-=diff;
+            {
+                if (TalkSequenceIsStarted)
+                {
+                    if (!player)
+                    {
+                        timer=0; phase=0; TalkSequenceIsStarted=false;
+                        return;
+                    }
+                    if (timer<=diff)
+                    {                        
+                        switch (phase)
+                        {
+                        case 1:
+                            { 
+                                Talk(0); timer=5000; phase++;
+                                break;
+                            }
+                        case 2:
+                            { 
+                                Talk(1); timer=5000; phase++;
+                                break;
+                            }
+                        case 3:
+                            { 
+                                Talk(2); timer=5000; phase++;
+                                break;
+                            }
+                        case 4:
+                            {                                                                                                                                                                        
+                                player->KilledMonsterCredit(NPC_TROLLING_FOR_INFORMATION_KILL_CREDIT_BUNNY_W, 0);    
+                                timer=120000; phase++; // cooldown                                                                                      
+                                break;
+                            }
+                        case 5:
+                            {                                                                                                                                                                                                
+                                timer=0; phase=0; TalkSequenceIsStarted=false;                                                                                                              
+                                break;
+                            }
+                        }                
+                    }
+                    else
+                        timer-=diff;
 
-					if (!me->IsInRange (player, 0.0f, 15.0F)) 
-					{ 
-						timer=0; phase=0; TalkSequenceIsStarted=false; // if player gone away, delete cooldown
-					}
-				}
+                    if (!me->IsInRange (player, 0.0f, 15.0F)) 
+                    { 
+                        timer=0; phase=0; TalkSequenceIsStarted=false; // if player gone away, delete cooldown
+                    }
+                }
 
-			} else 
-				DoMeleeAttackIfReady();
-			
+            } else 
+                DoMeleeAttackIfReady();
+            
         }
     };
 
@@ -549,11 +546,11 @@ public:
 void AddSC_coldridge_valley()
 {
     new npc_rockjaw_invader();
-	new npc_coldridge_defender();
-	new npc_wounded_coldridge_mountaineer();
-	new npc_soothsayer_shikala(); 
-	new npc_soothsayer_rikkari();
-	new npc_soothsayer_mirimkoa();
+    new npc_coldridge_defender();
+    new npc_wounded_coldridge_mountaineer();
+    new npc_soothsayer_shikala(); 
+    new npc_soothsayer_rikkari();
+    new npc_soothsayer_mirimkoa();
 
 }
 

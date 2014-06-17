@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -22,6 +22,7 @@
 #include "SharedDefines.h"
 #include "SpellAuras.h"
 #include "SpellAuraEffects.h"
+#include "ConditionMgr.h"
 
 class ObjectMgr;
 class Player;
@@ -72,7 +73,7 @@ typedef UNORDERED_MAP<uint32 /*spellId*/, SpellPhaseInfo> SpellPhaseStore;
 
 struct PhaseInfo
 {
-    PhaseInfo() : phasemask(0), terrainswapmap(0), phaseId(0) {}
+    PhaseInfo() : phasemask(0), terrainswapmap(0), phaseId(0) { }
 
     uint32 phasemask;
     uint32 terrainswapmap;
@@ -86,7 +87,7 @@ typedef UNORDERED_MAP<uint32 /*spellId*/, PhaseInfo> PhaseInfoContainer;
 
 struct PhaseData
 {
-    PhaseData(Player* _player) : player(_player), _PhasemaskThroughDefinitions(0), _PhasemaskThroughAuras(0), _CustomPhasemask(0) {}
+    PhaseData(Player* _player) : _PhasemaskThroughDefinitions(0), _PhasemaskThroughAuras(0), _CustomPhasemask(0), player(_player) { }
 
     uint32 _PhasemaskThroughDefinitions;
     uint32 _PhasemaskThroughAuras;
@@ -99,11 +100,13 @@ struct PhaseData
     void AddPhaseDefinition(PhaseDefinition const* phaseDefinition);
     bool HasActiveDefinitions() const { return !activePhaseDefinitions.empty(); }
 
-    void AddAuraInfo(uint32 const spellId, PhaseInfo phaseInfo);
-    uint32 RemoveAuraInfo(uint32 const spellId);
+    void AddAuraInfo(uint32 spellId, PhaseInfo const& phaseInfo);
+    uint32 RemoveAuraInfo(uint32 spellId);
 
     void SendPhaseMaskToPlayer();
     void SendPhaseshiftToPlayer();
+
+    void GetActivePhases(std::set<uint32>& phases) const;
 
 private:
     Player* player;
@@ -113,6 +116,7 @@ private:
 
 struct PhaseUpdateData
 {
+    PhaseUpdateData(): _conditionTypeFlags(0), _questId(0) { }
     void AddConditionType(ConditionTypes const conditionType) { _conditionTypeFlags |= (1 << conditionType); }
     void AddQuestUpdate(uint32 const questId);
 
@@ -127,7 +131,7 @@ class PhaseMgr
 {
 public:
     PhaseMgr(Player* _player);
-    ~PhaseMgr() {}
+    ~PhaseMgr() { }
 
     uint32 GetCurrentPhasemask() { return phaseData.GetCurrentPhasemask(); };
     inline uint32 GetPhaseMaskForSpawn() { return phaseData.GetCurrentPhasemask(); }
@@ -143,23 +147,25 @@ public:
     void UnRegisterPhasingAuraEffect(AuraEffect const* auraEffect);
 
     // Update flags (delayed phasing)
-    void AddUpdateFlag(PhaseUpdateFlag const updateFlag) { _UpdateFlags |= updateFlag; }
-    void RemoveUpdateFlag(PhaseUpdateFlag const updateFlag);
+    void AddUpdateFlag(PhaseUpdateFlag updateFlag) { _UpdateFlags |= updateFlag; }
+    void RemoveUpdateFlag(PhaseUpdateFlag updateFlag);
 
     // Needed for modify phase command
-    void SetCustomPhase(uint32 const phaseMask);
+    void SetCustomPhase(uint32 phaseMask);
 
     // Debug
     void SendDebugReportToPlayer(Player* const debugger);
 
-    static bool IsConditionTypeSupported(ConditionTypes const conditionType);
+    static bool IsConditionTypeSupported(ConditionTypes conditionType);
+
+    void GetActivePhases(std::set<uint32>& phases) const;
 
 private:
     void Recalculate();
 
     inline bool CheckDefinition(PhaseDefinition const* phaseDefinition);
 
-    bool NeedsPhaseUpdateWithData(PhaseUpdateData const updateData) const;
+    bool NeedsPhaseUpdateWithData(PhaseUpdateData const& updateData) const;
 
     inline bool IsUpdateInProgress() const { return (_UpdateFlags & PHASE_UPDATE_FLAG_ZONE_UPDATE) || (_UpdateFlags & PHASE_UPDATE_FLAG_AREA_UPDATE); }
 

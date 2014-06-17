@@ -18,6 +18,8 @@ include_directories (
   ${CMAKE_CURRENT_SOURCE_DIR}/loadlib
 )
 
+include_directories(${include_Dirs})
+
 add_executable(mapextractor
   ${sources}
 )
@@ -33,5 +35,5 @@ add_dependencies(mapextractor storm)
 if( UNIX )
   install(TARGETS mapextractor DESTINATION bin)
 elseif( WIN32 )
-  install(TARGETS mapextractor DESTINATION "${CMAKE_INSTALL_PREFIX}") 
+  install(TARGETS mapextractor DESTINATION "${CMAKE_INSTALL_PREFIX}")
 endif()

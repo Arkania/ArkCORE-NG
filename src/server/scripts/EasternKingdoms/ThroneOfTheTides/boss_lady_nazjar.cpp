@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
  
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "Spell.h"
 #include "throne_of_the_tides.h"
 
@@ -86,8 +87,8 @@ enum Adds
     NPC_TEMPEST_WITCH       = 44404,
     NPC_HONNOR_GUARD        = 40633,
     NPC_WATERSPOUT          = 48571,
-	NPC_WATERSPOUT_H        = 49108,
-	NPC_GEYSER              = 40597,
+    NPC_WATERSPOUT_H        = 49108,
+    NPC_GEYSER              = 40597,
 };
 
 const Position summonPos[3] =
@@ -134,7 +135,7 @@ class boss_lady_nazjar : public CreatureScript
             {
                 if (!instance || static_cast<InstanceMap*>(me->GetMap())->GetScriptId() != sObjectMgr->GetScriptId(TotTScriptName))
                     me->IsAIEnabled = false;
-                else if (!me->IsDead())
+                else if (!me->isDead())
                     Reset();
             }
 
@@ -148,7 +149,7 @@ class boss_lady_nazjar : public CreatureScript
                 events.Reset();
             }
 
-            void SummonedCreatureDies(Creature* summon, Unit* killer)
+            void SummonedCreatureDies(Creature* summon, Unit* /*killer*/)
             {
                 switch(summon->GetEntry())
                 {
@@ -164,14 +165,14 @@ class boss_lady_nazjar : public CreatureScript
                 Talk(SAY_KILL);
             }
 
-            void SpellHit(Unit* caster, SpellInfo const* spell)
+            void SpellHit(Unit* /*caster*/, SpellInfo const* spell)
             {
                 if (me->GetCurrentSpell(CURRENT_GENERIC_SPELL))
                     if (me->GetCurrentSpell(CURRENT_GENERIC_SPELL)->m_spellInfo->Id == SPELL_SHOCK_BLAST
                         || me->GetCurrentSpell(CURRENT_GENERIC_SPELL)->m_spellInfo->Id == SPELL_SHOCK_BLAST_H)
                         for (uint8 i = 0; i < 3; ++i)
-						    if (spell->Effects[i].Effect == SPELL_EFFECT_INTERRUPT_CAST)
-							    me->InterruptSpell(CURRENT_GENERIC_SPELL);
+                            if (spell->Effects[i].Effect == SPELL_EFFECT_INTERRUPT_CAST)
+                                me->InterruptSpell(CURRENT_GENERIC_SPELL);
             }
 
             void JustSummoned(Creature* summon)
@@ -327,7 +328,7 @@ class boss_lady_nazjar : public CreatureScript
                             events.ScheduleEvent(EVENT_FUNGAL_SPORES, urand(15000,18000));
                             break;
                         case EVENT_SHOCK_BLAST:
-                            DoCast(me->GetVictim(), SPELL_SHOCK_BLAST);
+                            DoCastVictim(SPELL_SHOCK_BLAST);
                             events.ScheduleEvent(EVENT_SHOCK_BLAST, urand(12000,14000));
                             break;
                         }
@@ -411,9 +412,9 @@ class npc_lady_nazjar_tempest_witch : public CreatureScript
             return new npc_lady_nazjar_tempest_witchAI (creature);
         }
 
-        struct npc_lady_nazjar_tempest_witchAI : public Scripted_NoMovementAI
+        struct npc_lady_nazjar_tempest_witchAI : public ScriptedAI
         {
-            npc_lady_nazjar_tempest_witchAI(Creature* creature) : Scripted_NoMovementAI(creature)
+            npc_lady_nazjar_tempest_witchAI(Creature* creature) : ScriptedAI(creature)
             {
                 me->SetReactState(REACT_PASSIVE);
             }
@@ -450,7 +451,7 @@ class npc_lady_nazjar_tempest_witch : public CreatureScript
                         events.ScheduleEvent(EVENT_LIGHTNING_SURGE, urand(10000, 15000));
                         break;
                     case EVENT_CHAIN_LIGHTNING:
-                        DoCast(me->GetVictim(), SPELL_CHAIN_LIGHTNING);
+                        DoCastVictim(SPELL_CHAIN_LIGHTNING);
                         events.ScheduleEvent(EVENT_CHAIN_LIGHTNING, 2000);
                         break;
                     }
@@ -492,7 +493,7 @@ class npc_lady_nazjar_waterspout : public CreatureScript
                 }
             }
 
-            void UpdateAI(uint32 diff)
+            void UpdateAI(uint32 /*diff*/)
             {
                 if (bHit)
                     return;
@@ -518,9 +519,9 @@ class npc_lady_nazjar_geyser : public CreatureScript
             return new npc_lady_nazjar_geyserAI (pCreature);
         }
 
-        struct npc_lady_nazjar_geyserAI : public Scripted_NoMovementAI
+        struct npc_lady_nazjar_geyserAI : public ScriptedAI
         {
-            npc_lady_nazjar_geyserAI(Creature* creature) : Scripted_NoMovementAI(creature)
+            npc_lady_nazjar_geyserAI(Creature* creature) : ScriptedAI(creature)
             {
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);

@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -24,20 +24,17 @@ SDComment: Should in addition spawn Myrmidons in the hallway outside
 SDCategory: Scarlet Monastery
 EndScriptData */
 
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 
 enum Says
 {
-    SAY_AGGRO                   = -1189000,
-    SAY_WHIRLWIND               = -1189001,
-    SAY_ENRAGE                  = -1189002,
-    SAY_KILL                    = -1189003
-};
-
-enum Emotes
-{
-    EMOTE_ENRAGE                = -1189004
+    SAY_AGGRO                   = 0,
+    SAY_WHIRLWIND               = 1,
+    SAY_ENRAGE                  = 2,
+    SAY_KILL                    = 3,
+    EMOTE_ENRAGE                = 4
 };
 
 enum Spells
@@ -59,54 +56,54 @@ class boss_herod : public CreatureScript
 public:
     boss_herod() : CreatureScript("boss_herod") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
         return new boss_herodAI(creature);
     }
 
     struct boss_herodAI : public ScriptedAI
     {
-        boss_herodAI(Creature* creature) : ScriptedAI(creature) {}
+        boss_herodAI(Creature* creature) : ScriptedAI(creature) { }
 
         bool Enrage;
 
         uint32 Cleave_Timer;
         uint32 Whirlwind_Timer;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             Enrage = false;
             Cleave_Timer = 12000;
             Whirlwind_Timer = 60000;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) OVERRIDE
         {
-            DoScriptText(SAY_AGGRO, me);
+            Talk(SAY_AGGRO);
             DoCast(me, SPELL_RUSHINGCHARGE);
         }
 
-         void KilledUnit(Unit* /*victim*/)
+         void KilledUnit(Unit* /*victim*/) OVERRIDE
          {
-             DoScriptText(SAY_KILL, me);
+             Talk(SAY_KILL);
          }
 
-         void JustDied(Unit* /*killer*/)
+         void JustDied(Unit* /*killer*/) OVERRIDE
          {
              for (uint8 i = 0; i < 20; ++i)
                  me->SummonCreature(ENTRY_SCARLET_TRAINEE, 1939.18f, -431.58f, 17.09f, 6.22f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000);
          }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (!UpdateVictim())
                 return;
 
             //If we are <30% hp goes Enraged
-            if (!Enrage && !HealthAbovePct(30) && !me->IsNonMeleeSpellCasted(false))
+            if (!Enrage && !HealthAbovePct(30) && !me->IsNonMeleeSpellCast(false))
             {
-                DoScriptText(EMOTE_ENRAGE, me);
-                DoScriptText(SAY_ENRAGE, me);
+                Talk(EMOTE_ENRAGE);
+                Talk(SAY_ENRAGE);
                 DoCast(me, SPELL_FRENZY);
                 Enrage = true;
             }
@@ -114,7 +111,7 @@ public:
             //Cleave_Timer
             if (Cleave_Timer <= diff)
             {
-                DoCast(me->GetVictim(), SPELL_CLEAVE);
+                DoCastVictim(SPELL_CLEAVE);
                 Cleave_Timer = 12000;
             }
             else Cleave_Timer -= diff;
@@ -122,8 +119,8 @@ public:
             // Whirlwind_Timer
             if (Whirlwind_Timer <= diff)
             {
-                DoScriptText(SAY_WHIRLWIND, me);
-                DoCast(me->GetVictim(), SPELL_WHIRLWIND);
+                Talk(SAY_WHIRLWIND);
+                DoCastVictim(SPELL_WHIRLWIND);
                 Whirlwind_Timer = 30000;
             }
             else Whirlwind_Timer -= diff;
@@ -138,7 +135,7 @@ class npc_scarlet_trainee : public CreatureScript
 public:
     npc_scarlet_trainee() : CreatureScript("npc_scarlet_trainee") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
         return new npc_scarlet_traineeAI(creature);
     }
@@ -152,16 +149,11 @@ public:
 
         uint32 Start_Timer;
 
-        void Reset() {}
+        void Reset() OVERRIDE { }
+        void WaypointReached(uint32 /*waypointId*/) OVERRIDE { }
+        void EnterCombat(Unit* /*who*/) OVERRIDE { }
 
-        void WaypointReached(uint32 /*waypointId*/)
-        {
-
-        }
-
-        void EnterCombat(Unit* /*who*/) {}
-
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (Start_Timer)
             {

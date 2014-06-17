@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -19,40 +19,37 @@
 #ifndef _TCSOAP_H
 #define _TCSOAP_H
 
-#include "Common.h"
-#include "World.h"
-#include "AccountMgr.h"
-#include "Log.h"
-
-#include "soapH.h"
-#include "soapStub.h"
-#include "stdsoap2.h"
+#include "Define.h"
 
 #include <ace/Semaphore.h>
 #include <ace/Task.h>
+#include <Threading.h>
 
-class TCSoapRunnable: public ACE_Based::Runnable
+class TCSoapRunnable : public ACE_Based::Runnable
 {
     public:
-        TCSoapRunnable() { }
-        void run();
-        void setListenArguments(std::string host, uint16 port)
+        TCSoapRunnable() : _port(0) { }
+
+        void run() OVERRIDE;
+
+        void SetListenArguments(const std::string& host, uint16 port)
         {
-            m_host = host;
-            m_port = port;
+            _host = host;
+            _port = port;
         }
+
     private:
         void process_message(ACE_Message_Block* mb);
 
-        std::string m_host;
-        uint16 m_port;
+        std::string _host;
+        uint16 _port;
 };
 
 class SOAPCommand
 {
     public:
         SOAPCommand():
-            pendingCommands(0, USYNC_THREAD, "pendingCommands")
+            pendingCommands(0, USYNC_THREAD, "pendingCommands"), m_success(false)
         {
         }
 

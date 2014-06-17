@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -17,76 +17,77 @@
  */
 
 #include "grim_batol.h"
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 
 enum ScriptTexts
 {
-    SAY_AGGRO    = 0,
+    SAY_AGGRO   = 0,
     SAY_KILL    = 1,
-    SAY_DEATH    = 2,
+    SAY_DEATH   = 2,
     SAY_GALE    = 3,
-    SAY_ADDS    = 4,
+    SAY_ADDS    = 4
 };
 
 enum Spells
 {
-    SPELL_ENFEEBLING_BLOW            = 75789,
-    SPELL_ENFEEBLING_BLOW_H            = 91091,
-    SPELL_BINDING_SHADOWS            = 79466,
-    SPELL_BINDING_SHADOWS_H            = 91081, 
+    SPELL_ENFEEBLING_BLOW             = 75789,
+    SPELL_ENFEEBLING_BLOW_H           = 91091,
+    SPELL_BINDING_SHADOWS             = 79466,
+    SPELL_BINDING_SHADOWS_H           = 91081, 
     SPELL_BINDING_SHADOWS_AURA        = 75861,
-    SPELL_BINDING_SHADOWS_AURA_H    = 91079,
-    SPELL_SIPHON_ESSENSE            = 75755,
+    SPELL_BINDING_SHADOWS_AURA_H      = 91079,
+    SPELL_SIPHON_ESSENSE              = 75755,
     SPELL_SIPHON_ESSENSE_H            = 91028,
-    SPELL_UMBRAL_MENDING            = 75763,
+    SPELL_UMBRAL_MENDING              = 75763,
     SPELL_UMBRAL_MENDING_H            = 91040,
-    SPELL_SHADOW_GALE_SPEED_TRIGGER    = 75675,
-    SPELL_SHADOW_GALE_SPEED            = 75694,
-    SPELL_SHADOW_GALE                = 75664,
-    SPELL_SHADOW_GALE_H                = 91086,
-    SPELL_SHADOW_GALE_DMG            = 75692,
-    SPELL_SHADOW_GALE_DMG_H            = 91087,
-    SPELL_TWILIGHT_CORRUPTION        = 75520,
-    SPELL_TWILIGHT_CORRUPTION_H        = 91049,
-    SPELL_TWILIGHT_CORRUPTION_DMG    = 75566,
-    SPELL_SUMMON_TWILIGHT_HATCHLING = 91058,
-    SPELL_SPAWN_FACELESS            = 75704,
+    SPELL_SHADOW_GALE_SPEED_TRIGGER   = 75675,
+    SPELL_SHADOW_GALE_SPEED           = 75694,
+    SPELL_SHADOW_GALE                 = 75664,
+    SPELL_SHADOW_GALE_H               = 91086,
+    SPELL_SHADOW_GALE_DMG             = 75692,
+    SPELL_SHADOW_GALE_DMG_H           = 91087,
+    SPELL_TWILIGHT_CORRUPTION         = 75520,
+    SPELL_TWILIGHT_CORRUPTION_H       = 91049,
+    SPELL_TWILIGHT_CORRUPTION_DMG     = 75566,
+    SPELL_SUMMON_TWILIGHT_HATCHLING   = 91058,
+    SPELL_SPAWN_FACELESS              = 75704,
     SPELL_SPAWN_FACELESS_H            = 91072,
-    SPELL_TWILIGHT_PORTAL_VISUAL    = 95716,
-    SPELL_TWILIGHT_BLAST_TRIGGER    = 76192,
-    SPELL_TWILIGHT_BLAST_DMG        = 76194,
+    SPELL_TWILIGHT_PORTAL_VISUAL      = 95716,
+    SPELL_TWILIGHT_BLAST_TRIGGER      = 76192,
+    SPELL_TWILIGHT_BLAST_DMG          = 76194,
     SPELL_TWILIGHT_BLAST_DMG_H        = 91042,
-    SPELL_SHIELD_OF_NIGHTMARES        = 75809,
+    SPELL_SHIELD_OF_NIGHTMARES        = 75809
 };
 
 enum Adds
 {
-    NPC_FACELESS_CORRUPTOR        = 40600,
-    NPC_FACELESS_CORRUPTOR_H    = 48844,
-    NPC_FACELESS_PORTAL_STALKER = 44314,
-    NPC_ALEXSTRASZA_EGG            = 40486,
-    NPC_TWILIGHT_HATCHLING        = 39388,
-    NPC_SHADOW_GALE_STALKER        = 40567,
+    NPC_FACELESS_CORRUPTOR            = 40600,
+    NPC_FACELESS_CORRUPTOR_H          = 48844,
+    NPC_FACELESS_PORTAL_STALKER       = 44314,
+    NPC_ALEXSTRASZA_EGG               = 40486,
+    NPC_TWILIGHT_HATCHLING            = 39388,
+    NPC_SHADOW_GALE_STALKER           = 40567
 };
 
 enum Events
 {
     EVENT_ENFEEBLING_BLOW            = 1,
     EVENT_BINDING_SHADOWS            = 2,
-    EVENT_ADDS                        = 3,
-    EVENT_SIPHON_ESSENSE            = 4,
-    EVENT_UMBRAL_MENDING            = 5,
-    EVENT_REMOVE_TWILIGHT_PORTAL    = 6,
+    EVENT_ADDS                       = 3,
+    EVENT_SIPHON_ESSENSE             = 4,
+    EVENT_UMBRAL_MENDING             = 5,
+    EVENT_REMOVE_TWILIGHT_PORTAL     = 6,
     EVENT_SHADOW_GALE                = 7,
     EVENT_TWILIGHT_CORRUPTION        = 8,
-    EVENT_CORRUPTOR_MOVE            = 9,
-    EVENT_SHIELD_OF_NIGHTMARES        = 10,
+    EVENT_CORRUPTOR_MOVE             = 9,
+    EVENT_SHIELD_OF_NIGHTMARES       = 10
 };
 
 enum Points
 {
-    POINT_SHADOWGALE    = 1001,
-    POINT_EGG            = 1002,
+    POINT_SHADOWGALE     = 1001,
+    POINT_EGG            = 1002
 };
 
 const Position erudaxportalPos = {-641.515f, -827.8f, 235.5f, 3.069f};
@@ -100,7 +101,7 @@ const Position shadowgalePos[3] =
 {
     {-745.07f, -845.16f, 232.41f, 0.0f},
     {-724.05f, -823.47f, 232.41f, 0.0f},
-    {-741.81f, -819.44f, 232.41f, 0.0f},
+    {-741.81f, -819.44f, 232.41f, 0.0f}
 };
 const Position eggPos[23]    =
 {
@@ -126,7 +127,7 @@ const Position eggPos[23]    =
     {-731.53f, -770.02f, 236.14f, 0.10f},
     {-730.15f, -885.09f, 235.96f, 5.93f},
     {-717.82f, -887.81f, 233.95f, 6.05f},
-    {-751.01f, -886.38f, 234.87f, 3.27f},
+    {-751.01f, -886.38f, 234.87f, 3.27f}
 };
 
 class boss_erudax : public CreatureScript
@@ -187,7 +188,7 @@ class boss_erudax : public CreatureScript
                 summons.Despawn(summon);
             }
 
-            void EnterCombat(Unit* who)
+            void EnterCombat(Unit* /*who*/)
             {
                 Talk(SAY_AGGRO);
                 FacelessPortalStalker = me->SummonCreature(NPC_FACELESS_PORTAL_STALKER, erudaxportalPos,TEMPSUMMON_MANUAL_DESPAWN);
@@ -198,7 +199,7 @@ class boss_erudax : public CreatureScript
                     instance->SetData(DATA_ERUDAX, IN_PROGRESS);
             }
             
-            void JustDied(Unit* killer)
+            void JustDied(Unit* /*killer*/)
             {
                 Talk(SAY_DEATH);
                 summons.DespawnAll();
@@ -206,7 +207,7 @@ class boss_erudax : public CreatureScript
                     instance->SetData(DATA_ERUDAX, DONE);
             }
 
-            void KilledUnit(Unit* victim)
+            void KilledUnit(Unit* /*victim*/)
             {
                 Talk(SAY_KILL);                
             }
@@ -233,7 +234,7 @@ class boss_erudax : public CreatureScript
                     {
                     case EVENT_SHADOW_GALE:
                         Talk(SAY_GALE);
-                        if (ShadowGaleTrigger = me->SummonCreature(NPC_SHADOW_GALE_STALKER, shadowgalePos[urand(0, 2)]))
+                        if (Creature* ShadowGaleTrigger = me->SummonCreature(NPC_SHADOW_GALE_STALKER, shadowgalePos[urand(0, 2)]))
                             ShadowGaleTrigger->CastSpell(ShadowGaleTrigger, SPELL_SHADOW_GALE_SPEED_TRIGGER, false);
                         //132 error
                         //DoCast(me, SPELL_SHADOW_GALE);
@@ -257,7 +258,7 @@ class boss_erudax : public CreatureScript
                         events.ScheduleEvent(EVENT_SHADOW_GALE, urand(40000,44000));
                         break;
                     case EVENT_ENFEEBLING_BLOW:
-                        DoCast(me->GetVictim(), SPELL_ENFEEBLING_BLOW);
+                        DoCastVictim(SPELL_ENFEEBLING_BLOW);
                         events.ScheduleEvent(EVENT_ENFEEBLING_BLOW, urand(20000, 30000));
                         break;
                     case EVENT_BINDING_SHADOWS:
@@ -279,7 +280,7 @@ class npc_erudax_faceless_corruptor : public CreatureScript
 {
     public:
 
-        npc_erudax_faceless_corruptor() : CreatureScript("npc_erudax_faceless_corruptor"){}
+        npc_erudax_faceless_corruptor() : CreatureScript("npc_erudax_faceless_corruptor"){ }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -311,13 +312,13 @@ class npc_erudax_faceless_corruptor : public CreatureScript
             {
             }
 
-            void EnterCombat(Unit* attacker)
+            void EnterCombat(Unit* /*attacker*/)
             {
                 events.ScheduleEvent(EVENT_UMBRAL_MENDING, urand(15000, 20000));
                 events.ScheduleEvent(EVENT_SIPHON_ESSENSE, urand(5000, 7000));
             }
 
-            void JustDied(Unit* killer)
+            void JustDied(Unit* /*killer*/)
             {
                 me->DespawnOrUnsummon();
             }
@@ -363,9 +364,9 @@ public:
         return new npc_alexstrasza_eggAI (creature);
     }
 
-    struct npc_alexstrasza_eggAI : public Scripted_NoMovementAI
+    struct npc_alexstrasza_eggAI : public ScriptedAI
     {
-        npc_alexstrasza_eggAI(Creature* creature) : Scripted_NoMovementAI(creature)
+        npc_alexstrasza_eggAI(Creature* creature) : ScriptedAI(creature)
         {
             me->SetReactState(REACT_PASSIVE);
             instance = creature->GetInstanceScript();
@@ -373,7 +374,7 @@ public:
 
         InstanceScript* instance;
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* /*killer*/)
         {
             DoCast(me, SPELL_SUMMON_TWILIGHT_HATCHLING, true);
         }
@@ -401,9 +402,9 @@ public:
         return new npc_shadow_gale_stalkerAI (creature);
     }
 
-    struct npc_shadow_gale_stalkerAI : public Scripted_NoMovementAI
+    struct npc_shadow_gale_stalkerAI : public ScriptedAI
     {
-        npc_shadow_gale_stalkerAI(Creature* creature) : Scripted_NoMovementAI(creature)
+        npc_shadow_gale_stalkerAI(Creature* creature) : ScriptedAI(creature)
         {
             me->SetReactState(REACT_PASSIVE);
         }
@@ -425,9 +426,9 @@ public:
         return new npc_erudax_twilight_hatchlingAI (creature);
     }
 
-    struct npc_erudax_twilight_hatchlingAI : public Scripted_NoMovementAI
+    struct npc_erudax_twilight_hatchlingAI : public ScriptedAI
     {
-        npc_erudax_twilight_hatchlingAI(Creature* creature) : Scripted_NoMovementAI(creature)
+        npc_erudax_twilight_hatchlingAI(Creature* creature) : ScriptedAI(creature)
         {
             SetCombatMovement(false);
             instance = creature->GetInstanceScript();
@@ -440,17 +441,17 @@ public:
             me->SetCanFly(true);
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* /*killer*/)
         {
             me->DespawnOrUnsummon();
         }
 
-        void IsSummonedBy(Unit* owner)
+        void IsSummonedBy(Unit* /*owner*/)
         {
             DoCast(me, SPELL_TWILIGHT_BLAST_TRIGGER);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 /*diff*/)
         {
             if (!instance)
                 return;

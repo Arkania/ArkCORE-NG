@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -17,9 +17,11 @@
  */
  
  
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "lost_city_of_the_tolvir.h"
 #include "Vehicle.h"
+#include "Player.h"
 
 enum Spells
 {
@@ -125,7 +127,7 @@ public:
 
     struct npc_pygmy_brute_tvAI : public ScriptedAI
     {
-        npc_pygmy_brute_tvAI(Creature* creature) : ScriptedAI(creature){}
+        npc_pygmy_brute_tvAI(Creature* creature) : ScriptedAI(creature){ }
 
         uint32 uiSummonTimer;
         uint32 uiImpaleTimer;

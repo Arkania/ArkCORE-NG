@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -24,7 +24,6 @@
 #include <ace/Thread_Mutex.h>
 
 #include "Field.h"
-#include "Log.h"
 
 #ifdef _WIN32
   #include <winsock2.h>
@@ -57,6 +56,9 @@ class ResultSet
         void CleanUp();
         MYSQL_RES* _result;
         MYSQL_FIELD* _fields;
+
+        ResultSet(ResultSet const& right) DELETE_MEMBER;
+        ResultSet& operator=(ResultSet const& right) DELETE_MEMBER;
 };
 
 typedef Trinity::AutoPtr<ResultSet, ACE_Thread_Mutex> QueryResult;
@@ -103,6 +105,8 @@ class PreparedResultSet
         void CleanUp();
         bool _NextRow();
 
+        PreparedResultSet(PreparedResultSet const& right) DELETE_MEMBER;
+        PreparedResultSet& operator=(PreparedResultSet const& right) DELETE_MEMBER;
 };
 
 typedef Trinity::AutoPtr<PreparedResultSet, ACE_Thread_Mutex> PreparedQueryResult;

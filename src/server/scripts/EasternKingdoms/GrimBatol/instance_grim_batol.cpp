@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -17,7 +17,9 @@
  */
  
 #include "grim_batol.h"
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "InstanceScript.h"
 
 class instance_grim_batol : public InstanceMapScript
 {
@@ -105,7 +107,7 @@ public:
                     SaveToDB();
         }
         
-        uint32 GetData(uint32 type)
+        uint32 GetData(uint32 type) const
         {
             switch(type)
             {
@@ -121,7 +123,7 @@ public:
             return 0;
         }
         
-        uint64 GetData64(uint32 identifier)
+        uint64 GetData64(uint32 identifier) const
         {
             switch(identifier)
             {

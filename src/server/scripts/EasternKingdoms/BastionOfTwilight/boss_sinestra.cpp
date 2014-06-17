@@ -1,22 +1,22 @@
-/*Copyright (C) 2014 Arkania Project.
-*
-* Script complete: 99%. ToDo:
-*
-* - Intro not working properly
-* - Slicers despawn after summon nothing happens
-* - Calen no fire shield.
-* - Calen visual on orb sinestra not (and no stuff said) -> p3 not possible.
-* - Spell links wrong.
-*
-* This file is NOT free software. Third-party users can NOT redistribute it or modify it :). 
-* If you find it, you are either hacking something, or very lucky (presuming someone else managed to hack it).
-*/
+/*
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ *
+ * Script complete: 99%. ToDo:
+ * - Intro not working properly
+ * - Slicers despawn after summon nothing happens
+ * - Calen no fire shield.
+ * - Calen visual on orb sinestra not (and no stuff said) -> p3 not possible.
+ * - Spell links wrong.
+ *
+ * This file is NOT free software. Third-party users can NOT redistribute 
+ * it or modify it. If you find it, you are either hacking something, or very 
+ * lucky (presuming someone else managed to hack it).
+ */
 
-#include "ScriptPCH.h"
-#include "Vehicle.h"
-#include "Unit.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "Vehicle.h"
+#include "Unit.h"
 #include "ScriptedGossip.h"
 #include "ScriptedEscortAI.h"
 #include "Cell.h"
@@ -41,38 +41,33 @@
 
 enum Yells
 {
-	/***** SINESTRA *****/
-	
+    /***** SINESTRA *****/
     SAY_AGGRO      = 0,  // We were fools to entrust an imbecile like Cho'gall with such a sacred duty. I will deal with you intruders myself!
     SAY_ADDS       = 1,  // Feed, children! Take your fill from their meaty husks!
     SAY_KILL_1     = 2,  // My brood will feed on your bones!
     SAY_KILL_2     = 3,  // Powerless...
     SAY_SPECIAL_1  = 4,  // The energy infused within my clutch is mine to reclaim!
-    SAY_SPECIAL_2  = 5,  // SUFFER!
-    SAY_SPECIAL_3  = 6,  // FEEL MY HATRED!
-    SAY_PHASE_2    = 7,  // I tire of this. Do you see this clutch amidst which you stand? I have nurtured the spark within them, but that life-force is and always will be mine. Behold, power beyond your comprehension!
-    SAY_PHASE_3    = 8,  // Enough! Drawing upon this source will set us back months. You should feel honored to be worthy of its expenditure. Now... die!
-	SAY_FIGHT_W    = 9,  // You mistake this for weakness? Fool! 
-    SAY_FIGHT_N    = 10, // This will be your tomb as well as theirs!
-	SAY_FIGHT_L    = 11, // My brood will feast upon your essence!
-    SAY_DEATH      = 12, // Deathwing! I have fallen.... The brood... is lost.
-    SAY_DRAKE      = 13, // Come forth, children of Twilight!
-    SAY_SPITECALL  = 14, // YOUR MOTHER CALLS!
-
-	/**  Warnings   **/
-	
-	SAY_SLICER     = 15, // Twilight Slicers are active!
+    SAY_SPECIAL_2  = 5,  // SUFFER! / FEEL MY HATRED!
+    SAY_PHASE_2    = 6,  // I tire of this. Do you see this clutch amidst which you stand? I have nurtured the spark within them, but that life-force is and always will be mine. Behold, power beyond your comprehension!
+    SAY_PHASE_3    = 7,  // Enough! Drawing upon this source will set us back months. You should feel honored to be worthy of its expenditure. Now... die!
+    SAY_FIGHT_W    = 8,  // You mistake this for weakness? Fool! 
+    SAY_FIGHT_N    = 9,  // This will be your tomb as well as theirs!
+    SAY_FIGHT_L    = 10, // My brood will feast upon your essence!
+    SAY_DEATH      = 11, // Deathwing! I have fallen.... The brood... is lost.
+    SAY_DRAKE      = 12, // Come forth, children of Twilight!
+    SAY_SPITECALL  = 13, // YOUR MOTHER CALLS!
+    SAY_SLICER     = 14  // Twilight Slicers are active!
 };
 
 enum CalenYells
 {
-	SAY_ENTRANCE   = 0, // Heroes! You are not alone in this dark place!
-	SAY_CALEN_W    = 1, // You are weakening, Sintharia! Accept the inevitable!
+    SAY_ENTRANCE   = 0, // Heroes! You are not alone in this dark place!
+    SAY_CALEN_W    = 1, // You are weakening, Sintharia! Accept the inevitable!
     SAY_CALEN_N    = 2, // Sintharia! Your master owes me a great debt... one that I intend to extract from his consort's hide! 
-	SAY_CALEN_L    = 3, // Heroes! My power wanes....
-	SAY_PREMATURE  = 4, // All is lost.... Forgive me, my Queen....
-	SAY_RECHARGE   = 5, // Flame of life, burn within me and renew my vigor!
-	SAY_CALEN_P3   = 6, // After Sinestra he says - The fires dim, champions.... Take this, the last of my power. Succeed where I have failed. Avenge me. Avenge the world...
+    SAY_CALEN_L    = 3, // Heroes! My power wanes....
+    SAY_PREMATURE  = 4, // All is lost.... Forgive me, my Queen....
+    SAY_RECHARGE   = 5, // Flame of life, burn within me and renew my vigor!
+    SAY_CALEN_P3   = 6, // After Sinestra he says - The fires dim, champions.... Take this, the last of my power. Succeed where I have failed. Avenge me. Avenge the world...
 };
 
 enum Spells
@@ -82,8 +77,8 @@ enum Spells
     SPELL_SUBMERGED_INTR = 96725,
 
     // Phase 1 - Starts at 60% till 40%.
-	
-	/** Drained - Sinestra deals 40% less damage in phase 1 **/
+
+    /** Drained - Sinestra deals 40% less damage in phase 1 **/
     SPELL_DRAINED        = 89350, // Initial spell with warning
 
     /** Flame breath **/
@@ -98,19 +93,19 @@ enum Spells
     SPELL_TWILIGHT_DUMMY = 87947, // Cast by Sinestra as the dummy spell for the damage 86371
 
     /** Twilight Slicer Mobs start following individual players. Cast line in between that deals damage to players **/
-	
-	/** Mana Barrier - Requires Visual + Spell Script **/
-	SPELL_MANA_BARRIER   = 87299,
-	
-	/** Channel Spell - Phase 2 **/
-	SPELL_TWILIGHT_POWA  = 87220, // Other 78198, in cast first fails
-	
-	/** Egg Siphon **/
-	SPELL_SIPHON_EGG     = 82354, //definitely not the right visual.
-	
-	/** Phase 2 **/
-	SPELL_TWI_EXTINCTION = 87945, //Bum-bum motherfucker!
-	SPELL_EXTINCT_DUMMY  = 86227, /**Requires spell link to 86226**/
+
+    /** Mana Barrier - Requires Visual + Spell Script **/
+    SPELL_MANA_BARRIER   = 87299,
+
+    /** Channel Spell - Phase 2 **/
+    SPELL_TWILIGHT_POWA  = 87220, // Other 78198, in cast first fails
+
+    /** Egg Siphon **/
+    SPELL_SIPHON_EGG     = 82354, //definitely not the right visual.
+
+    /** Phase 2 **/
+    SPELL_TWI_EXTINCTION = 87945, //Bum-bum motherfucker!
+    SPELL_EXTINCT_DUMMY  = 86227, /**Requires spell link to 86226**/
 
     // Misc
     SPELL_BERSERK        = 47008, // Sinestra has only soft enrage?
@@ -121,34 +116,34 @@ enum Spells
     SPELL_SLICER_DUMMY   = 92851, // The actual spell
     SPELL_SLICER_DAMAGE  = 92852, // 92854 possible alternative. Deals about 54000 in 100 yds. Needs to deal that damage per 0.3 second.
     SPELL_SLICER_PULSE   = 78861, // Cast by the shadow orb on itself
-	
-	// Twilight Pulsating Eggs
-	SPELL_TWI_CARAPACE   = 87654, // Removed by Sinestra when Siphoning the egg.
+
+    // Twilight Pulsating Eggs
+    SPELL_TWI_CARAPACE   = 87654, // Removed by Sinestra when Siphoning the egg.
 
     // Twilight Whelps
     SPELL_TWI_SPIT       = 89299, // !Stacks
-	
-	// Twilight Essence
+
+    // Twilight Essence
     SPELL_TWI_ESSENCE    = 89284, // On death spawns mob, revives whelps on essence. 88146 is spellscripted. 89284 triggers it every 2 seconds.
-	SPELL_TWI_INCREASE   = 89288, // Spell that makes essence bigger 15% at a time. 
-	
-	// Twilight Drake
-	SPELL_TWI_BREATH     = 76817, // Basic spell
+    SPELL_TWI_INCREASE   = 89288, // Spell that makes essence bigger 15% at a time. 
+
+    // Twilight Drake
+    SPELL_TWI_BREATH     = 76817, // Basic spell
     SPELL_ABSORB_ESSENCE = 90107, // !Stacks
 
     // Twilight Spitecaller
     SPELL_INDOMITABLE    = 90045, // on a check timer of a few minutes
     SPELL_UNLEASH_ESENCE = 90028,
-	
-	//Calen
-	SPELL_FIRESHIELD     = 95791, // is a 0.4 second cast that requires a spell link to 87229 to be casted at end of cast. - 96431 Visual? spell linked to be cast same time by 87229.
+
+    //Calen
+    SPELL_FIRESHIELD     = 95791, // is a 0.4 second cast that requires a spell link to 87229 to be casted at end of cast. - 96431 Visual? spell linked to be cast same time by 87229.
     SPELL_ESSENCE_CALEN  = 87496, // cast on death
-	SPELL_PYRRHIC_FOCUS  = 87323,
-	SPELL_FIRE_CHANNEL   = 87221, // 78192, In case it fails - magic battle
-	//SPELL_BARRIER_CHANNEL        = 76221,
-	
-	//Fiery Barrier
-	SPELL_FIREBARRIER    = 95791, // Visual + cast time
+    SPELL_PYRRHIC_FOCUS  = 87323,
+    SPELL_FIRE_CHANNEL   = 87221, // 78192, In case it fails - magic battle
+    //SPELL_BARRIER_CHANNEL        = 76221,
+
+    //Fiery Barrier
+    SPELL_FIREBARRIER    = 95791, // Visual + cast time
     SPELL_FIRE_BARRIER   = 87229  // Dmg reduct.
 };
 
@@ -159,15 +154,15 @@ enum Events
     EVENT_FLAME_BREATH, // P1
     EVENT_WRACK, // P1
     EVENT_TWILIGHT_SLICER, // P1
-	EVENT_TWILIGHT_BLAST, // P1
+    EVENT_TWILIGHT_BLAST, // P1
     EVENT_SUMMON_WHELPS, // P1
     EVENT_MAGIC_BATTLE, //P2
     EVENT_WIPE, //P2
     EVENT_VISUAL_SINESTRA, // P2
     EVENT_TWILIGHT_DRAKE, // P2
     EVENT_TWILIGHT_SPITECALLER, // P2
-	EVENT_SIPHON_EGG, //P2
-	EVENT_INTRO_2,
+    EVENT_SIPHON_EGG, //P2
+    EVENT_INTRO_2,
 
     EVENT_BATTLE_CHECK,
 
@@ -178,16 +173,16 @@ enum Events
     EVENT_INCREASE,
     // Twilight Drake
     EVENT_TWILIGHT_BREATH,
-	// Twilight Spite Caller
+    // Twilight Spite Caller
     EVENT_UNLEASE_ESSENCE,
     EVENT_INDOMITABLE,
-	// Twilight Slicer
-	EVENT_TARGET,
-	EVENT_DESPAWN,
-	// Calen
+    // Twilight Slicer
+    EVENT_TARGET,
+    EVENT_DESPAWN,
+    // Calen
     EVENT_VISUAL_CALEN,
-	EVENT_PYRRHIC_FOCUS,
-	EVENT_ESSENCE_OF_THE_RED,
+    EVENT_PYRRHIC_FOCUS,
+    EVENT_ESSENCE_OF_THE_RED,
     EVENT_FIRESHIELD,
 
     EVENT_BERSERK
@@ -202,10 +197,10 @@ enum Phases
 
 enum Npc
 {
-	BOSS_SINESTRA            = 45213,
+    BOSS_SINESTRA            = 45213,
     NPC_SHADOW_ORB           = 49863, // Responsible for twilight slicer
     NPC_PULSATING_EGG        = 46842,
-	NPC_TWILIGHT_ESSENCE     = 48018, // Spawned by twilight drake on death
+    NPC_TWILIGHT_ESSENCE     = 48018, // Spawned by twilight drake on death
     NPC_TWILIGHT_WHELPS      = 47265,
     NPC_TWILIGHT_SPITE       = 48415, // No target, casts one spell only
     NPC_TWILIGHT_DRAKE       = 48436, // Summoned from Eggs - Targets Calen
@@ -222,7 +217,7 @@ const Position WhelpsLocations[] = // Whelp summonings for last phase. 5 drakes 
     {-967.1657f, -812.9177f, 438.593f, 1.549f},
     {-983.1641f, -819.3153f, 438.593f, 1.568f},
     {-937.5960f, -779.9398f, 438.692f, 2.136f},
-	{-932.6f, -770.813f, 439.661f, 3.361f}
+    {-932.6f, -770.813f, 439.661f, 3.361f}
 };
 
 const Position WhelpsLocations2[] = // Whelp summonings for last phase. 5 drakes - 5 pos - left
@@ -231,7 +226,7 @@ const Position WhelpsLocations2[] = // Whelp summonings for last phase. 5 drakes
     {-1010.919f, -750.47f, 438.593f, 6.28f},
     {-1023.351f, -761.299f, 438.592f, 0.38f},
     {-1031.798f, -774.779f, 438.592f, 0.24f},
-	{-1001.364f, -741.629f, 438.577f, 6.04f}
+    {-1001.364f, -741.629f, 438.577f, 6.04f}
 };
 
 const Position EggLocations[] = // Done
@@ -281,10 +276,10 @@ public:
             phase = PHASE_NULL;
             summons.DespawnAll();
 
-			drainOff = false;
+            drainOff = false;
             phaseTwo = false;
-			Side = false;
-			left = false;
+            Side = false;
+            left = false;
             inMeleeRange = false;
             phase3 = false;
 
@@ -295,17 +290,17 @@ public:
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             }
 
-			me->AddAura(SPELL_DRAINED, me);
-			me->SetHealth(me->GetMaxHealth() / 5 * 3);
+            me->AddAura(SPELL_DRAINED, me);
+            me->SetHealth(me->GetMaxHealth() / 5 * 3);
             me->setRegeneratingHealth(false);
             me->SetMaxPower(POWER_MANA, 0);
             me->SetPower(POWER_MANA, 0);
-			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 
             for (int i = 0; i < 2; i++)
             {
                 Creature* egg = me->SummonCreature(NPC_PULSATING_EGG, EggLocations[i].GetPositionX(), EggLocations[i].GetPositionY(), EggLocations[i].GetPositionZ(), EggLocations[i].GetOrientation(), TEMPSUMMON_CORPSE_DESPAWN, 1000);
-			    egg->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+                egg->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
                 egg->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                 egg->AddAura(SPELL_TWI_CARAPACE, egg);
                 egg->CastSpell(egg,63726,true);
@@ -336,8 +331,8 @@ public:
         void EnterCombat(Unit* /*who*/)
         {
             EnterPhaseOne();
-			DoStartNoMovement(me);
-			DoCast(me, SPELL_DRAINED);
+            DoStartNoMovement(me);
+            DoCast(me, SPELL_DRAINED);
 
             if (instance)
             {
@@ -363,12 +358,12 @@ public:
                 events.ScheduleEvent(EVENT_SUMMON_WHELPS, 16000, PHASE_ONE); // every 50 seconds summoned. Soft enrage mechanic.
             }else
             {
-			    events.ScheduleEvent(EVENT_INTRO_2, 4000, PHASE_TWO);
+                events.ScheduleEvent(EVENT_INTRO_2, 4000, PHASE_TWO);
                 events.ScheduleEvent(EVENT_TWILIGHT_DRAKE, 10000, PHASE_TWO); // then 45-49 sec.
                 events.ScheduleEvent(EVENT_TWILIGHT_SPITECALLER, 15000, PHASE_TWO); // then 30 sec.
                 events.ScheduleEvent(EVENT_SIPHON_EGG, 9000, PHASE_TWO); // Apply to trigger.
-				events.ScheduleEvent(EVENT_MAGIC_BATTLE, 7000, PHASE_TWO); // This event checks the life % of bosses and damage done overall.
-				events.ScheduleEvent(EVENT_WIPE, 10000, PHASE_TWO);
+                events.ScheduleEvent(EVENT_MAGIC_BATTLE, 7000, PHASE_TWO); // This event checks the life % of bosses and damage done overall.
+                events.ScheduleEvent(EVENT_WIPE, 10000, PHASE_TWO);
             }
         }
 
@@ -377,7 +372,7 @@ public:
             Talk(SAY_FIGHT_L);
 
             Reset();
-			DoCast(me, SPELL_DRAINED);
+            DoCast(me, SPELL_DRAINED);
             me->GetMotionMaster()->MoveTargetedHome();
 
             if (instance)
@@ -396,15 +391,15 @@ public:
             me->RemoveAurasDueToSpell(SPELL_MANA_BARRIER);
             initEvents(true);
 
-			if (me->HasAura(SPELL_DRAINED) && drainOff)
-			{
-				me->RemoveAurasDueToSpell(SPELL_DRAINED);
+            if (me->HasAura(SPELL_DRAINED) && drainOff)
+            {
+                me->RemoveAurasDueToSpell(SPELL_DRAINED);
                 me->SetHealth(me->GetMaxHealth());
                 me->SetMaxPower(POWER_MANA, 0);
                 me->SetPower(POWER_MANA, 0);
-				Talk(SAY_PHASE_3);
-				drainOff = false;
-			}
+                Talk(SAY_PHASE_3);
+                drainOff = false;
+            }
         }
 
         void EnterPhaseTwo()
@@ -415,14 +410,14 @@ public:
             initEvents(false);
             me->SetMaxPower(POWER_MANA, 2012000);
             me->SetPower(POWER_MANA, 2012000);
-			me->SummonCreature(NPC_SINESTRA_BAT_TRIGGER, MagicBattlePos[1].GetPositionX(), MagicBattlePos[1].GetPositionY(), MagicBattlePos[1].GetPositionZ(), MagicBattlePos[1].GetOrientation(), TEMPSUMMON_MANUAL_DESPAWN);
-			me->SummonCreature(NPC_CALEN, -1004.784f, -810.12f, 438.593f, 0.91f, TEMPSUMMON_CORPSE_DESPAWN, 1000);
+            me->SummonCreature(NPC_SINESTRA_BAT_TRIGGER, MagicBattlePos[1].GetPositionX(), MagicBattlePos[1].GetPositionY(), MagicBattlePos[1].GetPositionZ(), MagicBattlePos[1].GetOrientation(), TEMPSUMMON_MANUAL_DESPAWN);
+            me->SummonCreature(NPC_CALEN, -1004.784f, -810.12f, 438.593f, 0.91f, TEMPSUMMON_CORPSE_DESPAWN, 1000);
         }
 
         void JustSummoned(Creature* summon)
         {
-			summons.Summon(summon);
-			summon->setActive(true);
+            summons.Summon(summon);
+            summon->setActive(true);
 
             summon->AI()->DoZoneInCombat();
         }
@@ -438,8 +433,8 @@ public:
                 instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me); // Remove
             }
 
-			if(Creature* trigger = me->FindNearestCreature(NPC_SINESTRA_BAT_TRIGGER, 200.0f, true))
-				trigger->DisappearAndDie();
+            if(Creature* trigger = me->FindNearestCreature(NPC_SINESTRA_BAT_TRIGGER, 200.0f, true))
+                trigger->DisappearAndDie();
 
             if (me->GetMap()->IsHeroic())
                 if (GameObject* sinestraDoor = me->FindNearestGameObject(GO_SINESTRA_DOOR, 200.0f))
@@ -477,11 +472,11 @@ public:
                     switch (eventId)
                     {
                         case EVENT_BERSERK:
-			               DoCast(me, SPELL_BERSERK);
+                           DoCast(me, SPELL_BERSERK);
                            break;
 
                         case EVENT_WRACK:
-							Talk(SAY_SPECIAL_2, SAY_SPECIAL_3);
+                            Talk(SAY_SPECIAL_2);
                             SelectTargetList(targets, NonTankTargetSelector(me), RAID_MODE(1, 1, 1, 2), SELECT_TARGET_RANDOM);
                             if (!targets.empty())
                                 for (std::list<Unit*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
@@ -490,34 +485,34 @@ public:
                             break;
 
                         case EVENT_FLAME_BREATH:
-                            DoCast(me->GetVictim(), SPELL_FLAME_BREATH);
+                            DoCastVictim(SPELL_FLAME_BREATH);
                             events.ScheduleEvent(EVENT_FLAME_BREATH, 28000, PHASE_ONE);
                             break;
 
                         case EVENT_SUMMON_WHELPS:
-							Talk(SAY_ADDS);
-							if (!Side)
-							{
-								for (int i = 0; i < 5; i++)
-									me->SummonCreature(NPC_TWILIGHT_WHELPS, WhelpsLocations[i].GetPositionX(), WhelpsLocations[i].GetPositionY(), WhelpsLocations[i].GetPositionZ(), WhelpsLocations[i].GetOrientation(), TEMPSUMMON_CORPSE_DESPAWN, 1000);
-								Side = true;
-							} else
-							{
-								for (int i = 0; i < 5; i++)
-									me->SummonCreature(NPC_TWILIGHT_WHELPS, WhelpsLocations2[i].GetPositionX(), WhelpsLocations2[i].GetPositionY(), WhelpsLocations2[i].GetPositionZ(), WhelpsLocations2[i].GetOrientation(), TEMPSUMMON_CORPSE_DESPAWN, 1000);
-								Side = false;
-							}							
+                            Talk(SAY_ADDS);
+                            if (!Side)
+                            {
+                                for (int i = 0; i < 5; i++)
+                                    me->SummonCreature(NPC_TWILIGHT_WHELPS, WhelpsLocations[i].GetPositionX(), WhelpsLocations[i].GetPositionY(), WhelpsLocations[i].GetPositionZ(), WhelpsLocations[i].GetOrientation(), TEMPSUMMON_CORPSE_DESPAWN, 1000);
+                                Side = true;
+                            } else
+                            {
+                                for (int i = 0; i < 5; i++)
+                                    me->SummonCreature(NPC_TWILIGHT_WHELPS, WhelpsLocations2[i].GetPositionX(), WhelpsLocations2[i].GetPositionY(), WhelpsLocations2[i].GetPositionZ(), WhelpsLocations2[i].GetOrientation(), TEMPSUMMON_CORPSE_DESPAWN, 1000);
+                                Side = false;
+                            }                            
                             events.ScheduleEvent(EVENT_SUMMON_WHELPS, 50000, PHASE_ONE);
                             break;
 
                         case EVENT_TWILIGHT_SLICER:
-							if (Creature* orb1 = me->SummonCreature(NPC_SHADOW_ORB, OrbLocation[0].GetPositionX(), OrbLocation[0].GetPositionY(), OrbLocation[0].GetPositionZ(), OrbLocation[0].GetOrientation(), TEMPSUMMON_CORPSE_DESPAWN, 1000))
-							if (Creature* orb2 = me->SummonCreature(NPC_SHADOW_ORB, OrbLocation[1].GetPositionX(), OrbLocation[1].GetPositionY(), OrbLocation[1].GetPositionZ(), OrbLocation[1].GetOrientation(), TEMPSUMMON_CORPSE_DESPAWN, 1000))
-								orb2->CastSpell(orb1, SPELL_SLICER_DUMMY, false);
-							events.ScheduleEvent(EVENT_TWILIGHT_SLICER, 28000, PHASE_ONE);
+                            if (Creature* orb1 = me->SummonCreature(NPC_SHADOW_ORB, OrbLocation[0].GetPositionX(), OrbLocation[0].GetPositionY(), OrbLocation[0].GetPositionZ(), OrbLocation[0].GetOrientation(), TEMPSUMMON_CORPSE_DESPAWN, 1000))
+                            if (Creature* orb2 = me->SummonCreature(NPC_SHADOW_ORB, OrbLocation[1].GetPositionX(), OrbLocation[1].GetPositionY(), OrbLocation[1].GetPositionZ(), OrbLocation[1].GetOrientation(), TEMPSUMMON_CORPSE_DESPAWN, 1000))
+                                orb2->CastSpell(orb1, SPELL_SLICER_DUMMY, false);
+                            events.ScheduleEvent(EVENT_TWILIGHT_SLICER, 28000, PHASE_ONE);
                             break;
-							
-						case EVENT_TWILIGHT_BLAST:
+                            
+                        case EVENT_TWILIGHT_BLAST:
                             if (Unit* target = me->GetVictim())
                             {
                                 if (target->IsWithinDistInMap(me, 1.0f)) // check if tank is in melee range.
@@ -529,14 +524,14 @@ public:
                                 }
                             }
                             events.ScheduleEvent(EVENT_TWILIGHT_BLAST, urand(1500, 2000)); 
-							break;						
+                            break;
                     }
                 }
             }
             else if (phase == PHASE_TWO) // Second phase
             {
                 // Check Phase 3.
-				if (!me->FindNearestCreature(NPC_PULSATING_EGG, 200.0f, true) && !drainOff && !phase3)
+                if (!me->FindNearestCreature(NPC_PULSATING_EGG, 200.0f, true) && !drainOff && !phase3)
                 {
                     drainOff = true;
                     phase3 = true;
@@ -549,55 +544,55 @@ public:
                     {
                         case EVENT_TWILIGHT_DRAKE:
                             Talk(SAY_DRAKE);
-							if(!left)
-							{
-								me->SummonCreature(NPC_TWILIGHT_DRAKE, WhelpsLocations[0].GetPositionX(), WhelpsLocations[0].GetPositionY(), WhelpsLocations[0].GetPositionZ(), WhelpsLocations[0].GetOrientation(), TEMPSUMMON_CORPSE_DESPAWN, 1000);
-								left = true;
-							}
-							else
-							{
-								me->SummonCreature(NPC_TWILIGHT_DRAKE, WhelpsLocations2[0].GetPositionX(), WhelpsLocations2[0].GetPositionY(), WhelpsLocations2[0].GetPositionZ(), WhelpsLocations2[0].GetOrientation(), TEMPSUMMON_CORPSE_DESPAWN, 1000);
-								left = false;
-							}
-							events.ScheduleEvent(EVENT_TWILIGHT_DRAKE, urand(28000, 34000), PHASE_TWO);
+                            if(!left)
+                            {
+                                me->SummonCreature(NPC_TWILIGHT_DRAKE, WhelpsLocations[0].GetPositionX(), WhelpsLocations[0].GetPositionY(), WhelpsLocations[0].GetPositionZ(), WhelpsLocations[0].GetOrientation(), TEMPSUMMON_CORPSE_DESPAWN, 1000);
+                                left = true;
+                            }
+                            else
+                            {
+                                me->SummonCreature(NPC_TWILIGHT_DRAKE, WhelpsLocations2[0].GetPositionX(), WhelpsLocations2[0].GetPositionY(), WhelpsLocations2[0].GetPositionZ(), WhelpsLocations2[0].GetOrientation(), TEMPSUMMON_CORPSE_DESPAWN, 1000);
+                                left = false;
+                            }
+                            events.ScheduleEvent(EVENT_TWILIGHT_DRAKE, urand(28000, 34000), PHASE_TWO);
                             break;
 
                         case EVENT_TWILIGHT_SPITECALLER:
                             Talk(SAY_SPITECALL);
-							me->SummonCreature(NPC_TWILIGHT_SPITE, me->GetPositionX()-15, me->GetPositionY(), me->GetPositionZ(), 0, TEMPSUMMON_CORPSE_DESPAWN, 1000);
+                            me->SummonCreature(NPC_TWILIGHT_SPITE, me->GetPositionX()-15, me->GetPositionY(), me->GetPositionZ(), 0, TEMPSUMMON_CORPSE_DESPAWN, 1000);
                             events.ScheduleEvent(EVENT_TWILIGHT_SPITECALLER, urand(28000, 34000), PHASE_TWO);
                             break;
 
                         case EVENT_SIPHON_EGG:
-			                if (Creature* eggnog = me->FindNearestCreature(NPC_PULSATING_EGG, 200.0f, true))
-								if(eggnog->HasAura(SPELL_TWI_CARAPACE))
-								{
-									eggnog->RemoveAurasDueToSpell(SPELL_TWI_CARAPACE);
+                            if (Creature* eggnog = me->FindNearestCreature(NPC_PULSATING_EGG, 200.0f, true))
+                                if(eggnog->HasAura(SPELL_TWI_CARAPACE))
+                                {
+                                    eggnog->RemoveAurasDueToSpell(SPELL_TWI_CARAPACE);
                                     eggnog->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-									me->CastSpell(eggnog, SPELL_SIPHON_EGG, true);
-									Talk(SAY_SPECIAL_1);
-								}
-							events.ScheduleEvent(EVENT_SIPHON_EGG, 90000, PHASE_TWO);
+                                    me->CastSpell(eggnog, SPELL_SIPHON_EGG, true);
+                                    Talk(SAY_SPECIAL_1);
+                                }
+                            events.ScheduleEvent(EVENT_SIPHON_EGG, 90000, PHASE_TWO);
                             break;
 
-						case EVENT_MAGIC_BATTLE: // Insert dramatic music!!!
-			                if(Creature* trigger = me->FindNearestCreature(NPC_SINESTRA_BAT_TRIGGER, 200.0f, true))
-			                	me->CastSpell(trigger, SPELL_TWILIGHT_POWA, true);
+                        case EVENT_MAGIC_BATTLE: // Insert dramatic music!!!
+                            if(Creature* trigger = me->FindNearestCreature(NPC_SINESTRA_BAT_TRIGGER, 200.0f, true))
+                                me->CastSpell(trigger, SPELL_TWILIGHT_POWA, true);
                             break;
 
-						case EVENT_WIPE: // BLAST THE BITCHES!
-			                if (!me->FindNearestCreature(NPC_CALEN, 200.0f, true))
-			                	DoCast(me, SPELL_TWI_EXTINCTION);
+                        case EVENT_WIPE: // BLAST THE BITCHES!
+                            if (!me->FindNearestCreature(NPC_CALEN, 200.0f, true))
+                                DoCast(me, SPELL_TWI_EXTINCTION);
                             break;
 
-						case EVENT_INTRO_2: // BLAST THE BITCHES!
-			                DoCast(me, SPELL_EXTINCT_DUMMY);
+                        case EVENT_INTRO_2: // BLAST THE BITCHES!
+                            DoCast(me, SPELL_EXTINCT_DUMMY);
                             break;
                     }
                 }
             }
 
-            DoMeleeAttackIfReady();			
+            DoMeleeAttackIfReady();
         }
 
     private:
@@ -611,7 +606,7 @@ class npc_twilight_essence : public CreatureScript
 {
 public:
 
-    npc_twilight_essence() : CreatureScript("npc_twilight_essence") {}
+    npc_twilight_essence() : CreatureScript("npc_twilight_essence") { }
 
     CreatureAI* GetAI(Creature* creature) const 
     {
@@ -632,11 +627,11 @@ public:
         void IsSummonedBy(Unit* /*summoner*/)
         {
             me->AddAura(SPELL_TWI_ESSENCE, me);
-			me->SetReactState(REACT_PASSIVE);
-			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+            me->SetReactState(REACT_PASSIVE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-			events.ScheduleEvent(EVENT_INCREASE, 15000);
+            events.ScheduleEvent(EVENT_INCREASE, 15000);
         }
 
         void UpdateAI(uint32 diff)
@@ -649,7 +644,7 @@ public:
                 {
                     case EVENT_INCREASE:
                     DoCast(me, SPELL_TWI_INCREASE);
-					events.ScheduleEvent(EVENT_INCREASE, 15000);
+                    events.ScheduleEvent(EVENT_INCREASE, 15000);
                     return;
                 }
             }
@@ -664,7 +659,7 @@ class npc_twilight_drake : public CreatureScript
 {
 public:
 
-    npc_twilight_drake() : CreatureScript("npc_twilight_drake") {}
+    npc_twilight_drake() : CreatureScript("npc_twilight_drake") { }
 
     CreatureAI* GetAI(Creature* creature) const 
     {
@@ -685,23 +680,23 @@ public:
         void IsSummonedBy(Unit* /*summoner*/)
         {
             events.ScheduleEvent(EVENT_TWILIGHT_BREATH, 9000);
-			if(Creature* caly = me->FindNearestCreature(NPC_CALEN, 200.0f, true))
-			{
-				me->SetInCombatWith(caly);
-				me->AddThreat(caly, 250.0f);
-			}
+            if(Creature* caly = me->FindNearestCreature(NPC_CALEN, 200.0f, true))
+            {
+                me->SetInCombatWith(caly);
+                me->AddThreat(caly, 250.0f);
+            }
         }
 
         void UpdateAI(uint32 diff)
         {
-			if (Creature* essence = me->FindNearestCreature(NPC_TWILIGHT_ESSENCE, 4.0f, true)) // Eat that essence
+            if (Creature* essence = me->FindNearestCreature(NPC_TWILIGHT_ESSENCE, 4.0f, true)) // Eat that essence
             {
                 DoCast(me, SPELL_ABSORB_ESSENCE);
                 essence->DespawnOrUnsummon();
             }
-			
+
             events.Update(diff);
-			
+
             while (uint32 eventId = events.ExecuteEvent())
             {
                 switch (eventId)
@@ -713,8 +708,8 @@ public:
                     break;
                 }
             }
-			
-			DoMeleeAttackIfReady();
+            
+            DoMeleeAttackIfReady();
         }
     };
 };
@@ -726,7 +721,7 @@ class npc_twilight_whelp_phas1 : public CreatureScript
 {
 public:
 
-    npc_twilight_whelp_phas1() : CreatureScript("npc_twilight_whelp_phas1") {}
+    npc_twilight_whelp_phas1() : CreatureScript("npc_twilight_whelp_phas1") { }
 
     CreatureAI* GetAI(Creature* creature) const 
     {
@@ -743,15 +738,15 @@ public:
 
         InstanceScript* instance;
         EventMap events;
-		bool Revived, died;
+        bool Revived, died;
         Unit* myEssence;
 
         void IsSummonedBy(Unit* /*summoner*/)
         {
-			me->AddUnitMovementFlag(MOVEMENTFLAG_FLYING);
+            me->AddUnitMovementFlag(MOVEMENTFLAG_FLYING);
             if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 150.0f, true))
                 AttackStart(target);
-				Revived = false;
+                Revived = false;
                 died = false;
         }
 
@@ -759,8 +754,8 @@ public:
         {
             events.ScheduleEvent(EVENT_SPIT, 4000);
         }
-		
-		void JustDied(Unit* /*killer*/) {}
+
+        void JustDied(Unit* /*killer*/) { }
 
         void DamageTaken(Unit* /*who*/, uint32& damage)
         {
@@ -770,36 +765,36 @@ public:
 
         void UpdateAI(uint32 diff)
         {
-		    if (me->HealthBelowPct(3) && !Revived) // Buli knows a better way... me I can't remember what I know
+            if (me->HealthBelowPct(3) && !Revived) // Buli knows a better way... me I can't remember what I know
             {
                 // "Die".
                 if (!died)
                 {
                     me->RemoveAllAuras();
-				    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                     me->SetFlag(UNIT_NPC_EMOTESTATE, EMOTE_STATE_DEAD);
                     me->SetUInt32Value(UNIT_FIELD_BYTES_1, UNIT_STAND_STATE_DEAD);
                     me->SetReactState(REACT_PASSIVE);
-				    myEssence = me->SummonCreature(NPC_TWILIGHT_ESSENCE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f, TEMPSUMMON_MANUAL_DESPAWN);
+                    myEssence = me->SummonCreature(NPC_TWILIGHT_ESSENCE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f, TEMPSUMMON_MANUAL_DESPAWN);
                     died = true;
                 }
 
                 if(Unit* swamp = me->FindNearestCreature(NPC_TWILIGHT_ESSENCE, 4.0f, true))
                     if(swamp && swamp->GetGUID() != myEssence->GetGUID())
-					{
-						me->SetHealth(me->GetMaxHealth());
-						me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-						me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-						me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-						me->RemoveFlag(UNIT_NPC_EMOTESTATE, EMOTE_STATE_DEAD);
-						me->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
-						me->SetReactState(REACT_AGGRESSIVE);
-						Revived = true;
-					}
+                    {
+                        me->SetHealth(me->GetMaxHealth());
+                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        me->RemoveFlag(UNIT_NPC_EMOTESTATE, EMOTE_STATE_DEAD);
+                        me->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
+                        me->SetReactState(REACT_AGGRESSIVE);
+                        Revived = true;
+                    }
             }
-		
+
             events.Update(diff);
 
             if(Creature* sinestra = me->FindNearestCreature(NPC_SINESTRA, 200.0f, true))
@@ -811,7 +806,7 @@ public:
                 switch (eventId)
                 {
                     case EVENT_SPIT:
-                        DoCast(me->GetVictim(), SPELL_TWI_SPIT);
+                        DoCastVictim(SPELL_TWI_SPIT);
                         events.ScheduleEvent(EVENT_SPIT, urand(9000, 12000));
                     break;
                 }
@@ -829,7 +824,7 @@ class npc_twilight_spite : public CreatureScript
 {
 public:
 
-    npc_twilight_spite() : CreatureScript("npc_twilight_spite") {}
+    npc_twilight_spite() : CreatureScript("npc_twilight_spite") { }
 
     CreatureAI* GetAI(Creature* creature) const 
     {
@@ -874,14 +869,14 @@ public:
                     case EVENT_INDOMITABLE:
                     if (me->HasUnitState(UNIT_STATE_STUNNED) || me->HasUnitState(UNIT_STATE_ROOT))
                     {
-						DoCast(me, SPELL_INDOMITABLE);
-						events.ScheduleEvent(EVENT_INDOMITABLE, 1000);
+                        DoCast(me, SPELL_INDOMITABLE);
+                        events.ScheduleEvent(EVENT_INDOMITABLE, 1000);
                     }
                     break;
 
                     case EVENT_UNLEASE_ESSENCE:
-					DoCastAOE(SPELL_UNLEASH_ESENCE);
-					events.ScheduleEvent(EVENT_UNLEASE_ESSENCE, urand(19000, 25000));
+                    DoCastAOE(SPELL_UNLEASH_ESENCE);
+                    events.ScheduleEvent(EVENT_UNLEASE_ESSENCE, urand(19000, 25000));
                     break;
                 }
             }
@@ -898,7 +893,7 @@ class npc_twilight_slicer : public CreatureScript
 {
 public:
 
-    npc_twilight_slicer() : CreatureScript("npc_twilight_slicer") {}
+    npc_twilight_slicer() : CreatureScript("npc_twilight_slicer") { }
 
     CreatureAI* GetAI(Creature* creature) const 
     {
@@ -920,10 +915,10 @@ public:
         void IsSummonedBy(Unit* /*summoner*/)
         {
             dead = false;
-			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             events.ScheduleEvent(EVENT_TARGET, 3000);
-			events.ScheduleEvent(EVENT_DESPAWN, 8000);
+            events.ScheduleEvent(EVENT_DESPAWN, 8000);
         }
 
         void UpdateAI(uint32 diff)
@@ -935,26 +930,26 @@ public:
                 switch (eventId)
                 {
                     case EVENT_TARGET:
-						if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
-						{
-							me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, true);
-							me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_ATTACK_ME, true);
-							me->SetSpeed(MOVE_WALK, 0.85f, true);
-							me->SetSpeed(MOVE_RUN, 0.85f, true);
-							me->AddThreat(target, 5000000.0f);
-							DoCast(me, SPELL_SLICER_PULSE);
-							me->GetMotionMaster()->MoveChase(target, 4.0f);
-						    if (Creature* Sinestra = me->FindNearestCreature(BOSS_SINESTRA, 200.0f, true))
-							    Sinestra->AI()->Talk(SAY_SLICER);
-						}
-					
-					case EVENT_DESPAWN:
-						if(Creature* orb = me->FindNearestCreature(NPC_SHADOW_ORB, 4.0f, true))
-						{
-			                me->DisappearAndDie();
-							events.ScheduleEvent(EVENT_DESPAWN, 1000);
-						}
-						break;
+                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
+                        {
+                            me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, true);
+                            me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_ATTACK_ME, true);
+                            me->SetSpeed(MOVE_WALK, 0.85f, true);
+                            me->SetSpeed(MOVE_RUN, 0.85f, true);
+                            me->AddThreat(target, 5000000.0f);
+                            DoCast(me, SPELL_SLICER_PULSE);
+                            me->GetMotionMaster()->MoveChase(target, 4.0f);
+                            if (Creature* Sinestra = me->FindNearestCreature(BOSS_SINESTRA, 200.0f, true))
+                                Sinestra->AI()->Talk(SAY_SLICER);
+                        }
+                    
+                    case EVENT_DESPAWN:
+                        if(me->FindNearestCreature(NPC_SHADOW_ORB, 4.0f, true))
+                        {
+                            me->DisappearAndDie();
+                            events.ScheduleEvent(EVENT_DESPAWN, 1000);
+                        }
+                        break;
                 }
             }
         }
@@ -968,7 +963,7 @@ class npc_calen : public CreatureScript
 {
 public:
 
-    npc_calen() : CreatureScript("npc_calen") {}
+    npc_calen() : CreatureScript("npc_calen") { }
 
     CreatureAI* GetAI(Creature* creature) const 
     {
@@ -992,11 +987,11 @@ public:
             premature = false;
             me->SetInCombatWith(summoner);
             me->AddThreat(summoner, 250.0f);
-			events.ScheduleEvent(EVENT_FIRESHIELD, 2000);
-			events.ScheduleEvent(EVENT_VISUAL_CALEN, 1000);
-			events.ScheduleEvent(EVENT_PYRRHIC_FOCUS, 500);
-			events.ScheduleEvent(EVENT_ESSENCE_OF_THE_RED, 3000);
-			Talk(SAY_ENTRANCE);
+            events.ScheduleEvent(EVENT_FIRESHIELD, 2000);
+            events.ScheduleEvent(EVENT_VISUAL_CALEN, 1000);
+            events.ScheduleEvent(EVENT_PYRRHIC_FOCUS, 500);
+            events.ScheduleEvent(EVENT_ESSENCE_OF_THE_RED, 3000);
+            Talk(SAY_ENTRANCE);
         }
 
         void UpdateAI(uint32 diff)
@@ -1012,50 +1007,50 @@ public:
                         break;
 
                     case EVENT_VISUAL_CALEN:
-						if(Creature* trigger = me->FindNearestCreature(NPC_SINESTRA_BAT_TRIGGER, 200.0f, true))
-						{
-			                me->CastSpell(trigger, SPELL_FIRE_CHANNEL, false);
-							me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, true);
-							me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_ATTACK_ME, true);
-							me->AddThreat(trigger, 5000000.0f);
-						}
-						break;
-						
-					case EVENT_PYRRHIC_FOCUS:
-						if(me->GetPower(POWER_MANA) < (me->GetMaxPower(POWER_MANA) * 30 / 100) && !me->HasAura(SPELL_PYRRHIC_FOCUS))
-						{
-							DoCast(me, SPELL_PYRRHIC_FOCUS);
-							Talk(SAY_RECHARGE);
-						}
-						events.ScheduleEvent(EVENT_PYRRHIC_FOCUS, 1000);
+                        if(Creature* trigger = me->FindNearestCreature(NPC_SINESTRA_BAT_TRIGGER, 200.0f, true))
+                        {
+                            me->CastSpell(trigger, SPELL_FIRE_CHANNEL, false);
+                            me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, true);
+                            me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_ATTACK_ME, true);
+                            me->AddThreat(trigger, 5000000.0f);
+                        }
+                        break;
+                        
+                    case EVENT_PYRRHIC_FOCUS:
+                        if(me->GetPower(POWER_MANA) < (me->GetMaxPower(POWER_MANA) * 30 / 100) && !me->HasAura(SPELL_PYRRHIC_FOCUS))
+                        {
+                            DoCast(me, SPELL_PYRRHIC_FOCUS);
+                            Talk(SAY_RECHARGE);
+                        }
+                        events.ScheduleEvent(EVENT_PYRRHIC_FOCUS, 1000);
                         break;
 
-					case EVENT_ESSENCE_OF_THE_RED:
-						if(!me->FindNearestCreature(NPC_PULSATING_EGG, 200.0f, true))
-							{
-									premature = true;
-									Talk(SAY_CALEN_P3);
-									std::list<Unit*> TargetList;
-									Trinity::AnyFriendlyUnitInObjectRangeCheck checker(me, me, 200.0f);
-									Trinity::UnitListSearcher<Trinity::AnyFriendlyUnitInObjectRangeCheck> searcher(me, TargetList, checker);
-									me->VisitNearbyObject(200.0f, searcher);
-									for (std::list<Unit*>::iterator itr = TargetList.begin(); itr != TargetList.end(); ++itr)
-										DoCast(*itr, SPELL_ESSENCE_CALEN, true); //Have a little Calen Essence - Night elf White Sauce version.
-									me->DespawnOrUnsummon(3000);
-							}
-						events.ScheduleEvent(EVENT_ESSENCE_OF_THE_RED, 4000);
+                    case EVENT_ESSENCE_OF_THE_RED:
+                        if(!me->FindNearestCreature(NPC_PULSATING_EGG, 200.0f, true))
+                            {
+                                    premature = true;
+                                    Talk(SAY_CALEN_P3);
+                                    std::list<Unit*> TargetList;
+                                    Trinity::AnyFriendlyUnitInObjectRangeCheck checker(me, me, 200.0f);
+                                    Trinity::UnitListSearcher<Trinity::AnyFriendlyUnitInObjectRangeCheck> searcher(me, TargetList, checker);
+                                    me->VisitNearbyObject(200.0f, searcher);
+                                    for (std::list<Unit*>::iterator itr = TargetList.begin(); itr != TargetList.end(); ++itr)
+                                        DoCast(*itr, SPELL_ESSENCE_CALEN, true); //Have a little Calen Essence - Night elf White Sauce version.
+                                    me->DespawnOrUnsummon(3000);
+                            }
+                        events.ScheduleEvent(EVENT_ESSENCE_OF_THE_RED, 4000);
                         break;
                 }
             }
         }
-		
-		void JustDied(Unit* /*killer*/)
+
+        void JustDied(Unit* /*killer*/)
         {
-			if(!premature)
+            if(!premature)
             Talk(SAY_PREMATURE);
 
-			if(Creature* trigger = me->FindNearestCreature(NPC_SINESTRA_BAT_TRIGGER, 200.0f, true))
-				trigger->DisappearAndDie();
+            if(Creature* trigger = me->FindNearestCreature(NPC_SINESTRA_BAT_TRIGGER, 200.0f, true))
+                trigger->DisappearAndDie();
         }
     };
 };
@@ -1067,7 +1062,7 @@ class npc_controller : public CreatureScript
 {
 public:
 
-    npc_controller() : CreatureScript("npc_controller") {}
+    npc_controller() : CreatureScript("npc_controller") { }
 
     CreatureAI* GetAI(Creature* creature) const 
     {
@@ -1084,17 +1079,17 @@ public:
 
         InstanceScript* instance;
         EventMap events;
-		uint8 talkcount;
+        uint8 talkcount;
 
         void IsSummonedBy(Unit* summoner)
         {
             me->SetInCombatWith(summoner);
             me->AddThreat(summoner, 250.0f);
-			me->SetReactState(REACT_PASSIVE);
-			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetReactState(REACT_PASSIVE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-			events.ScheduleEvent(EVENT_BATTLE_CHECK, 25000);
-			talkcount = 0;
+            events.ScheduleEvent(EVENT_BATTLE_CHECK, 25000);
+            talkcount = 0;
         }
 
         void UpdateAI(uint32 diff)
@@ -1106,97 +1101,97 @@ public:
                 switch (eventId)
                 {
                     case EVENT_BATTLE_CHECK:
-						if(Creature* egg = me->FindNearestCreature(NPC_PULSATING_EGG, 200.0f, true))
-							if(!egg->HasAura(SPELL_TWI_CARAPACE))
-							{
-								if(egg->HealthAbovePct(75) && talkcount == 0)
-								{
-									if(Creature* calen = me->FindNearestCreature(NPC_CALEN, 200.0f, true))
-										calen->AI()->Talk(SAY_CALEN_N);
-									if(Creature* sinestra = me->FindNearestCreature(BOSS_SINESTRA, 200.0f, true))
-										sinestra->AI()->Talk(SAY_FIGHT_N);
-									me->GetMotionMaster()->MovePoint(1, MagicBattlePos[1].GetPositionX(), MagicBattlePos[1].GetPositionY(), MagicBattlePos[1].GetPositionZ());
-									talkcount++;
-								}
-								if(egg->HealthBelowPct(75) && talkcount == 0)
-								{
-									if(Creature* calen = me->FindNearestCreature(NPC_CALEN, 200.0f, true))
-										calen->AI()->Talk(SAY_CALEN_W);
-									if(Creature* sinestra = me->FindNearestCreature(BOSS_SINESTRA, 200.0f, true))
-										sinestra->AI()->Talk(SAY_FIGHT_W);
-									me->GetMotionMaster()->MovePoint(1, MagicBattlePos[0].GetPositionX(), MagicBattlePos[0].GetPositionY(), MagicBattlePos[0].GetPositionZ());
-									talkcount++;
-								}
-								if(egg->HealthAbovePct(65) && talkcount == 1)
-								{
-									if(Creature* calen = me->FindNearestCreature(NPC_CALEN, 200.0f, true))
-										calen->AI()->Talk(SAY_CALEN_L);
-									if(Creature* sinestra = me->FindNearestCreature(BOSS_SINESTRA, 200.0f, true))
-										sinestra->AI()->Talk(SAY_FIGHT_L);
-									me->GetMotionMaster()->MovePoint(1, MagicBattlePos[2].GetPositionX(), MagicBattlePos[2].GetPositionY(), MagicBattlePos[2].GetPositionZ());
-									talkcount++;
+                        if(Creature* egg = me->FindNearestCreature(NPC_PULSATING_EGG, 200.0f, true))
+                            if(!egg->HasAura(SPELL_TWI_CARAPACE))
+                            {
+                                if(egg->HealthAbovePct(75) && talkcount == 0)
+                                {
+                                    if(Creature* calen = me->FindNearestCreature(NPC_CALEN, 200.0f, true))
+                                        calen->AI()->Talk(SAY_CALEN_N);
+                                    if(Creature* sinestra = me->FindNearestCreature(BOSS_SINESTRA, 200.0f, true))
+                                        sinestra->AI()->Talk(SAY_FIGHT_N);
+                                    me->GetMotionMaster()->MovePoint(1, MagicBattlePos[1].GetPositionX(), MagicBattlePos[1].GetPositionY(), MagicBattlePos[1].GetPositionZ());
+                                    talkcount++;
+                                }
+                                if(egg->HealthBelowPct(75) && talkcount == 0)
+                                {
+                                    if(Creature* calen = me->FindNearestCreature(NPC_CALEN, 200.0f, true))
+                                        calen->AI()->Talk(SAY_CALEN_W);
+                                    if(Creature* sinestra = me->FindNearestCreature(BOSS_SINESTRA, 200.0f, true))
+                                        sinestra->AI()->Talk(SAY_FIGHT_W);
+                                    me->GetMotionMaster()->MovePoint(1, MagicBattlePos[0].GetPositionX(), MagicBattlePos[0].GetPositionY(), MagicBattlePos[0].GetPositionZ());
+                                    talkcount++;
+                                }
+                                if(egg->HealthAbovePct(65) && talkcount == 1)
+                                {
+                                    if(Creature* calen = me->FindNearestCreature(NPC_CALEN, 200.0f, true))
+                                        calen->AI()->Talk(SAY_CALEN_L);
+                                    if(Creature* sinestra = me->FindNearestCreature(BOSS_SINESTRA, 200.0f, true))
+                                        sinestra->AI()->Talk(SAY_FIGHT_L);
+                                    me->GetMotionMaster()->MovePoint(1, MagicBattlePos[2].GetPositionX(), MagicBattlePos[2].GetPositionY(), MagicBattlePos[2].GetPositionZ());
+                                    talkcount++;
 
-									if(egg->HealthAbovePct(75))
-								        if(Creature* calen = me->FindNearestCreature(NPC_CALEN, 200.0f, true))
-									    {
-									    	calen->AI()->Talk(SAY_PREMATURE);
-									    	me->Kill(calen);
-									    }
-								}
-								if(egg->HealthBelowPct(75) && egg->HealthAbovePct(50) && talkcount == 1)
-								{
-									if(Creature* calen = me->FindNearestCreature(NPC_CALEN, 200.0f, true))
-										calen->AI()->Talk(SAY_CALEN_N);
-									if(Creature* sinestra = me->FindNearestCreature(BOSS_SINESTRA, 200.0f, true))
-										sinestra->AI()->Talk(SAY_FIGHT_N);
-									me->GetMotionMaster()->MovePoint(1, MagicBattlePos[1].GetPositionX(), MagicBattlePos[1].GetPositionY(), MagicBattlePos[1].GetPositionZ());
-									talkcount++;
-								}
-								if(egg->HealthBelowPct(50) && talkcount == 1)
-								{
-									if(Creature* calen = me->FindNearestCreature(NPC_CALEN, 200.0f, true))
-										calen->AI()->Talk(SAY_CALEN_W);
-									if(Creature* sinestra = me->FindNearestCreature(BOSS_SINESTRA, 200.0f, true))
-										sinestra->AI()->Talk(SAY_FIGHT_W);
-									me->GetMotionMaster()->MovePoint(1, MagicBattlePos[0].GetPositionX(), MagicBattlePos[0].GetPositionY(), MagicBattlePos[0].GetPositionZ());
-									talkcount++;
-								}
-								if(egg->HealthAbovePct(40) && talkcount == 2)
-								{
-									if(Creature* calen = me->FindNearestCreature(NPC_CALEN, 200.0f, true))
-										calen->AI()->Talk(SAY_CALEN_L);
-									if(Creature* sinestra = me->FindNearestCreature(BOSS_SINESTRA, 200.0f, true))
-										sinestra->AI()->Talk(SAY_FIGHT_L);
-									me->GetMotionMaster()->MovePoint(1, MagicBattlePos[2].GetPositionX(), MagicBattlePos[2].GetPositionY(), MagicBattlePos[2].GetPositionZ());
-									talkcount = 0;
-									if(egg->HealthAbovePct(50))
-								        if(Creature* calen = me->FindNearestCreature(NPC_CALEN, 200.0f, true))
-									    {
-									    	calen->AI()->Talk(SAY_PREMATURE);
-									    	me->Kill(calen);
-									    }
-								}
-								if(egg->HealthBelowPct(50) && egg->HealthAbovePct(25) && talkcount == 2)
-								{
-									if(Creature* calen = me->FindNearestCreature(NPC_CALEN, 200.0f, true))
-										calen->AI()->Talk(SAY_CALEN_N);
-									if(Creature* sinestra = me->FindNearestCreature(BOSS_SINESTRA, 200.0f, true))
-										sinestra->AI()->Talk(SAY_FIGHT_N);
-									me->GetMotionMaster()->MovePoint(1, MagicBattlePos[1].GetPositionX(), MagicBattlePos[1].GetPositionY(), MagicBattlePos[1].GetPositionZ());
-									talkcount = 0;
-								}
-								if(egg->HealthBelowPct(25) && talkcount == 2)
-								{
-									if(Creature* calen = me->FindNearestCreature(NPC_CALEN, 200.0f, true))
-										calen->AI()->Talk(SAY_CALEN_W);
-									if(Creature* sinestra = me->FindNearestCreature(BOSS_SINESTRA, 200.0f, true))
-										sinestra->AI()->Talk(SAY_FIGHT_W);
-									me->GetMotionMaster()->MovePoint(1, MagicBattlePos[0].GetPositionX(), MagicBattlePos[0].GetPositionY(), MagicBattlePos[0].GetPositionZ());
-									talkcount = 0;
-								}
-								events.ScheduleEvent(EVENT_BATTLE_CHECK, 25000);
-							}
-						break;
+                                    if(egg->HealthAbovePct(75))
+                                        if(Creature* calen = me->FindNearestCreature(NPC_CALEN, 200.0f, true))
+                                        {
+                                            calen->AI()->Talk(SAY_PREMATURE);
+                                            me->Kill(calen);
+                                        }
+                                }
+                                if(egg->HealthBelowPct(75) && egg->HealthAbovePct(50) && talkcount == 1)
+                                {
+                                    if(Creature* calen = me->FindNearestCreature(NPC_CALEN, 200.0f, true))
+                                        calen->AI()->Talk(SAY_CALEN_N);
+                                    if(Creature* sinestra = me->FindNearestCreature(BOSS_SINESTRA, 200.0f, true))
+                                        sinestra->AI()->Talk(SAY_FIGHT_N);
+                                    me->GetMotionMaster()->MovePoint(1, MagicBattlePos[1].GetPositionX(), MagicBattlePos[1].GetPositionY(), MagicBattlePos[1].GetPositionZ());
+                                    talkcount++;
+                                }
+                                if(egg->HealthBelowPct(50) && talkcount == 1)
+                                {
+                                    if(Creature* calen = me->FindNearestCreature(NPC_CALEN, 200.0f, true))
+                                        calen->AI()->Talk(SAY_CALEN_W);
+                                    if(Creature* sinestra = me->FindNearestCreature(BOSS_SINESTRA, 200.0f, true))
+                                        sinestra->AI()->Talk(SAY_FIGHT_W);
+                                    me->GetMotionMaster()->MovePoint(1, MagicBattlePos[0].GetPositionX(), MagicBattlePos[0].GetPositionY(), MagicBattlePos[0].GetPositionZ());
+                                    talkcount++;
+                                }
+                                if(egg->HealthAbovePct(40) && talkcount == 2)
+                                {
+                                    if(Creature* calen = me->FindNearestCreature(NPC_CALEN, 200.0f, true))
+                                        calen->AI()->Talk(SAY_CALEN_L);
+                                    if(Creature* sinestra = me->FindNearestCreature(BOSS_SINESTRA, 200.0f, true))
+                                        sinestra->AI()->Talk(SAY_FIGHT_L);
+                                    me->GetMotionMaster()->MovePoint(1, MagicBattlePos[2].GetPositionX(), MagicBattlePos[2].GetPositionY(), MagicBattlePos[2].GetPositionZ());
+                                    talkcount = 0;
+                                    if(egg->HealthAbovePct(50))
+                                        if(Creature* calen = me->FindNearestCreature(NPC_CALEN, 200.0f, true))
+                                        {
+                                            calen->AI()->Talk(SAY_PREMATURE);
+                                            me->Kill(calen);
+                                        }
+                                }
+                                if(egg->HealthBelowPct(50) && egg->HealthAbovePct(25) && talkcount == 2)
+                                {
+                                    if(Creature* calen = me->FindNearestCreature(NPC_CALEN, 200.0f, true))
+                                        calen->AI()->Talk(SAY_CALEN_N);
+                                    if(Creature* sinestra = me->FindNearestCreature(BOSS_SINESTRA, 200.0f, true))
+                                        sinestra->AI()->Talk(SAY_FIGHT_N);
+                                    me->GetMotionMaster()->MovePoint(1, MagicBattlePos[1].GetPositionX(), MagicBattlePos[1].GetPositionY(), MagicBattlePos[1].GetPositionZ());
+                                    talkcount = 0;
+                                }
+                                if(egg->HealthBelowPct(25) && talkcount == 2)
+                                {
+                                    if(Creature* calen = me->FindNearestCreature(NPC_CALEN, 200.0f, true))
+                                        calen->AI()->Talk(SAY_CALEN_W);
+                                    if(Creature* sinestra = me->FindNearestCreature(BOSS_SINESTRA, 200.0f, true))
+                                        sinestra->AI()->Talk(SAY_FIGHT_W);
+                                    me->GetMotionMaster()->MovePoint(1, MagicBattlePos[0].GetPositionX(), MagicBattlePos[0].GetPositionY(), MagicBattlePos[0].GetPositionZ());
+                                    talkcount = 0;
+                                }
+                                events.ScheduleEvent(EVENT_BATTLE_CHECK, 25000);
+                            }
+                        break;
                 }
             }
         }
@@ -1244,7 +1239,7 @@ class spell_sinestra_barrier : public SpellScriptLoader
 class ExactDistanceCheck
 {
     public:
-        ExactDistanceCheck(Unit* source, float dist) : _source(source), _dist(dist) {}
+        ExactDistanceCheck(Unit* source, float dist) : _source(source), _dist(dist) { }
 
         bool operator()(WorldObject* unit) const
         {
@@ -1287,7 +1282,7 @@ class spell_twilight_essence : public SpellScriptLoader
 class TwilightSlicerSelector
 {
     public:
-        TwilightSlicerSelector(Unit* caster, Unit* cutterCaster) : _caster(caster), _slicerActive(cutterCaster) {}
+        TwilightSlicerSelector(Unit* caster, Unit* cutterCaster) : _caster(caster), _slicerActive(cutterCaster) { }
 
         bool operator()(WorldObject* unit)
         {
@@ -1387,7 +1382,7 @@ class spell_wrack : public SpellScriptLoader // 89421
                 target = GetTarget();
             }
 
-            void HandleAfterDispel(DispelInfo* dispelInfo)
+            void HandleAfterDispel(DispelInfo* /*dispelInfo*/)
             {
                 Unit* caster = GetCaster();
 
@@ -1420,7 +1415,7 @@ class spell_wrack : public SpellScriptLoader // 89421
             }
         };
 
-		AuraScript* GetAuraScript() const
+        AuraScript* GetAuraScript() const
         {
             return new spell_wrack_AuraScript();
         }
@@ -1433,12 +1428,12 @@ void AddSC_boss_sinestra()
     new npc_twilight_slicer();
     new npc_twilight_drake();
     new npc_twilight_whelp_phas1();
-	new npc_twilight_spite();
-	new npc_calen();
-	new npc_controller();
+    new npc_twilight_spite();
+    new npc_calen();
+    new npc_controller();
     new spell_sinestra_barrier();
     new spell_twilight_essence();
-	new spell_twilight_slicer();
-	new spell_pyrrhic_focus();
+    new spell_twilight_slicer();
+    new spell_pyrrhic_focus();
     new spell_wrack();
 }

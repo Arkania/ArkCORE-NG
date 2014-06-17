@@ -1,16 +1,16 @@
-/*Copyright (C) 2014 Arkania Project.
-*
-*
-* This file is NOT free software. Third-party users can NOT redistribute it or modify it :). 
-* If you find it, you are either hacking something, or very lucky (presuming someone else managed to hack it).
-*/
+/*
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ *
+ * This file is NOT free software. Third-party users can NOT redistribute 
+ * it or modify it. If you find it, you are either hacking something, or very 
+ * lucky (presuming someone else managed to hack it).
+ */
 
-#include "ScriptPCH.h"
-#include "bastion_of_twilight.h"
-#include "ObjectMgr.h"
 #include "ScriptMgr.h"
 #include "InstanceScript.h"
 #include "ScriptedCreature.h"
+#include "bastion_of_twilight.h"
+#include "ObjectMgr.h"
 #include "Map.h"
 #include "PoolMgr.h"
 
@@ -98,58 +98,62 @@ class instance_bastion_of_twilight : public InstanceMapScript
                 return false;
             }
 
-            void OnCreatureCreate(Creature* pCreature, bool /*add*/)
+            void OnCreatureCreate(Creature* creature)
             {
-                switch (pCreature->GetEntry())
+                switch (creature->GetEntry())
                 {
                     case NPC_HALFUS_WORMBREAKER:
-                        halfus = pCreature->GetGUID();
+                        halfus = creature->GetGUID();
                         break;
                     case NPC_VALIONA_BOT:
-                        valiona = pCreature->GetGUID();
+                        valiona = creature->GetGUID();
                         break;
                     case NPC_THERALION_BOT:
-                        theralion = pCreature->GetGUID();
+                        theralion = creature->GetGUID();
                         break;
                     case NPC_ASCENDANT_COUNCIL:
-                        ascendantcouncil = pCreature->GetGUID();
+                        ascendantcouncil = creature->GetGUID();
                         break;
                     case NPC_FELUDIUS:
-                        feludius = pCreature->GetGUID();
+                        feludius = creature->GetGUID();
                         break;
                     case NPC_IGNACIOUS:
-                        ignacious = pCreature->GetGUID();
+                        ignacious = creature->GetGUID();
                         break;
                     case NPC_ARION:
-                        arion = pCreature->GetGUID();
+                        arion = creature->GetGUID();
                         break;
                     case NPC_TERRASTRA:
-                        terrastra = pCreature->GetGUID();
+                        terrastra = creature->GetGUID();
                         break;
                     case NPC_ELEMENTIUM_MONSTROSITY:
-                        monstrosity = pCreature->GetGUID();
+                        monstrosity = creature->GetGUID();
                         break;
                     case NPC_CHOGALL:
-                        chogall = pCreature->GetGUID();
+                        chogall = creature->GetGUID();
                         break;
                     case NPC_SINESTRA:
-                        sinestra = pCreature->GetGUID();
+                        sinestra = creature->GetGUID();
                         break;
                     case NPC_CHOGALL_HALFUS:
-                        chogallHalfus = pCreature->GetGUID();
+                        chogallHalfus = creature->GetGUID();
                         break;
                     case NPC_CHOGALL_DRAGONS:
-                        chogallValiona = pCreature->GetGUID();
+                        chogallValiona = creature->GetGUID();
                         break;
                     case NPC_CHOGALL_COUNCIL:
-                        chogallCouncil = pCreature->GetGUID();
+                        chogallCouncil = creature->GetGUID();
                         break;
                 }
             }
 
-            void OnGameObjectCreate(GameObject* go, bool /*add*/)
+            void OnGameObjectCreate(GameObject* go)
             {
-                /*switch(go->GetEntry()) { }*/
+                switch(go->GetEntry())
+                {
+                    default:
+                        break;
+                }
             }
 
             void SetData(uint32 type, uint32 data)
@@ -158,7 +162,7 @@ class instance_bastion_of_twilight : public InstanceMapScript
                     data_phase = data;
             }
 
-            uint32 GetData(uint32 type)
+            uint32 GetData(uint32 type) const
             {
                 if (type == DATA_AC_PHASE)
                     return data_phase;
@@ -166,7 +170,7 @@ class instance_bastion_of_twilight : public InstanceMapScript
                 return Encounter[type];
             }
 
-            uint64 GetData64(uint32 type)
+            uint64 GetData64(uint32 type) const
             {
                 switch (type)
                 {
@@ -214,7 +218,7 @@ class instance_bastion_of_twilight : public InstanceMapScript
                         break;
                 }
 
-                return NULL;
+                return 0;
             }
 
             bool SetBossState(uint32 data, EncounterState state) 

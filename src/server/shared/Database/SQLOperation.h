@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -38,7 +38,7 @@ union SQLElementUnion
 enum SQLElementDataType
 {
     SQL_ELEMENT_RAW,
-    SQL_ELEMENT_PREPARED,
+    SQL_ELEMENT_PREPARED
 };
 
 //- The element
@@ -60,7 +60,7 @@ class MySQLConnection;
 class SQLOperation : public ACE_Method_Request
 {
     public:
-        SQLOperation(): m_conn(NULL) {};
+        SQLOperation(): m_conn(NULL) { }
         virtual int call()
         {
             Execute();
@@ -70,6 +70,10 @@ class SQLOperation : public ACE_Method_Request
         virtual void SetConnection(MySQLConnection* con) { m_conn = con; }
 
         MySQLConnection* m_conn;
+
+    private:
+        SQLOperation(SQLOperation const& right) DELETE_MEMBER;
+        SQLOperation& operator=(SQLOperation const& right) DELETE_MEMBER;
 };
 
 #endif

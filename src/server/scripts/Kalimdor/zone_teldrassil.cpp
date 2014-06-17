@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -31,6 +31,7 @@ EndContentData */
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedFollowerAI.h"
+#include "Player.h"
 
 /*####
 # npc_mist
@@ -38,8 +39,8 @@ EndContentData */
 
 enum Mist
 {
-    SAY_AT_HOME             = -1000323,
-    EMOTE_AT_HOME           = -1000324,
+    SAY_AT_HOME             = 0,
+    EMOTE_AT_HOME           = 1,
     QUEST_MIST              = 938,
     NPC_ARYNIA              = 3519,
     FACTION_DARNASSUS       = 79
@@ -50,7 +51,7 @@ class npc_mist : public CreatureScript
 public:
     npc_mist() : CreatureScript("npc_mist") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) OVERRIDE
     {
         if (quest->GetQuestId() == QUEST_MIST)
             if (npc_mistAI* pMistAI = CAST_AI(npc_mist::npc_mistAI, creature->AI()))
@@ -59,7 +60,7 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
         return new npc_mistAI(creature);
     }
@@ -68,9 +69,10 @@ public:
     {
         npc_mistAI(Creature* creature) : FollowerAI(creature) { }
 
-        void Reset() { }
+        void Reset() OVERRIDE { }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) OVERRIDE
+
         {
             FollowerAI::MoveInLineOfSight(who);
 
@@ -78,7 +80,7 @@ public:
             {
                 if (me->IsWithinDistInMap(who, 10.0f))
                 {
-                    DoScriptText(SAY_AT_HOME, who);
+                    Talk(SAY_AT_HOME, who);
                     DoComplete();
                 }
             }
@@ -86,7 +88,7 @@ public:
 
         void DoComplete()
         {
-            DoScriptText(EMOTE_AT_HOME, me);
+            Talk(EMOTE_AT_HOME);
 
             Player* player = GetLeaderForFollower();
             if (player && player->GetQuestStatus(QUEST_MIST) == QUEST_STATUS_INCOMPLETE)
@@ -97,7 +99,7 @@ public:
         }
 
         //call not needed here, no known abilities
-        /*void UpdateFollowerAI(const uint32 Diff)
+        /*void UpdateFollowerAI(const uint32 Diff) OVERRIDE
         {
             if (!UpdateVictim())
                 return;

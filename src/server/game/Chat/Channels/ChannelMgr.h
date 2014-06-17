@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -30,24 +30,29 @@
 
 class ChannelMgr
 {
+    typedef std::map<std::wstring, Channel*> ChannelMap;
+
     public:
-        uint32 team;
-        typedef std::map<std::wstring, Channel*> ChannelMap;
-        ChannelMgr() {team = 0;}
+        ChannelMgr() : team(0)
+        { }
+
         ~ChannelMgr();
 
-        Channel* GetJoinChannel(std::string name, uint32 channel_id);
-        Channel* GetChannel(std::string name, Player* p, bool pkt = true);
-        void LeftChannel(std::string name);
+        static ChannelMgr * forTeam(uint32 team);
+        void setTeam(uint32 newTeam) { team = newTeam; }
+
+        Channel* GetJoinChannel(std::string const& name, uint32 channel_id);
+        Channel* GetChannel(std::string const& name, Player* player, bool pkt = true);
+        void LeftChannel(std::string const& name);
+
     private:
         ChannelMap channels;
-        void MakeNotOnPacket(WorldPacket* data, std::string name);
+        uint32 team;
+
+        void MakeNotOnPacket(WorldPacket* data, std::string const& name);
 };
 
-class AllianceChannelMgr : public ChannelMgr {};
-class HordeChannelMgr    : public ChannelMgr {};
-
-ChannelMgr* channelMgr(uint32 team);
+class AllianceChannelMgr : public ChannelMgr { };
+class HordeChannelMgr    : public ChannelMgr { };
 
 #endif
-

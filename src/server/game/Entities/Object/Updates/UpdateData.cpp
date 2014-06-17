@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -26,9 +26,7 @@
 #include "World.h"
 #include "zlib.h"
 
-UpdateData::UpdateData(uint16 map) : m_map(map), m_blockCount(0)
-{
-}
+UpdateData::UpdateData(uint16 map) : m_map(map), m_blockCount(0) { }
 
 void UpdateData::AddOutOfRangeGUID(std::set<uint64>& guids)
 {
@@ -74,3 +72,4 @@ void UpdateData::Clear()
     m_blockCount = 0;
     m_map = 0;
 }
+

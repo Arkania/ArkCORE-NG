@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,10 +15,11 @@
  * You should have received a copy of the GNU General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
- 
- 
-#include "ScriptPCH.h"
+
+#include "ScriptMgr.h"
+#include "InstanceScript.h"
 #include "the_vortex_pinnacle.h"
+#include "Player.h"
 
 #define ENCOUNTERS 3
 
@@ -80,7 +81,7 @@ public:
             
         }
 
-	    uint64 GetData64(uint32 identifier)
+        uint64 GetData64(uint32 identifier) const
         {
             switch(identifier)
             {
@@ -113,7 +114,7 @@ public:
              SaveToDB();
         }
 
-        uint32 GetData(uint32 type)
+        uint32 GetData(uint32 type) const
         {
             switch(type)
             {

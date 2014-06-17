@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -32,6 +32,7 @@ struct GossipTextOption
 {
     std::string Text_0;
     std::string Text_1;
+    uint32 BroadcastTextID;
     uint32 Language;
     float Probability;
     QEmote Emotes[MAX_GOSSIP_TEXT_EMOTES];

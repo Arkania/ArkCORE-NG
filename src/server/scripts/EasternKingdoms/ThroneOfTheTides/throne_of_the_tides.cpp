@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
  
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "throne_of_the_tides.h"
 
 enum ScriptTexts
@@ -92,16 +93,16 @@ public:
 
     bool OnTrigger(Player* pPlayer, const AreaTriggerEntry* /*pAt*/)
     {
-		if (InstanceScript* pInstance = pPlayer->GetInstanceScript())
-		{
-			if (pInstance->GetData(DATA_LADY_NAZJAR_EVENT) != DONE
+        if (InstanceScript* pInstance = pPlayer->GetInstanceScript())
+        {
+            if (pInstance->GetData(DATA_LADY_NAZJAR_EVENT) != DONE
                 && pInstance->GetBossState(DATA_COMMANDER_ULTHOK) != DONE)
-			{
+            {
                 pInstance->SetData(DATA_LADY_NAZJAR_EVENT, DONE);
                 if (Creature* pLadyNazjarEvent = ObjectAccessor::GetCreature(*pPlayer, pInstance->GetData64(DATA_LADY_NAZJAR_EVENT)))
                     pLadyNazjarEvent->AI()->DoAction(ACTION_LADY_NAZJAR_START_EVENT);
-			}
-		}
+            }
+        }
         return true;
     }
 };
@@ -115,7 +116,7 @@ const Position teleporterPos[2] =
 class npc_throne_of_the_tides_teleporter : public CreatureScript
 {
     public:
-        npc_throne_of_the_tides_teleporter() : CreatureScript("npc_throne_of_the_tides_teleporter"){}
+        npc_throne_of_the_tides_teleporter() : CreatureScript("npc_throne_of_the_tides_teleporter"){ }
 
         bool OnGossipHello(Player* pPlayer, Creature* pCreature)
         {
@@ -200,7 +201,7 @@ class npc_lady_nazjar_event : public CreatureScript
                 }
             }
 
-            void UpdateAI(uint32 diff)
+            void UpdateAI(uint32 /*diff*/)
             {
                 if(!pInstance)
                     return;
@@ -222,7 +223,7 @@ public:
 
     bool OnGossipHello(Player* /*player*/, GameObject* go)
     {
-        if(InstanceScript* instance = go->GetInstanceScript())
+        if(go->GetInstanceScript())
         {
             Map::PlayerList const &PlayerList = go->GetMap()->GetPlayers();
 

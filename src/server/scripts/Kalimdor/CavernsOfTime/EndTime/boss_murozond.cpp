@@ -1,19 +1,18 @@
-/*Copyright (C) 2014 Arkania Project.
-*
-* Script 95% done. TODO:
-*
-* - Live Testing needed.
-*
-* THIS particular file is NOT free software; third-party users should NOT have access to it, redistribute it or modify it. :)
-*/
+/*
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ *
+ * Script 95% done. TODO:
+ * - Live Testing needed.
+ *
+ * THIS particular file is NOT free software; third-party users 
+ * should NOT have access to it, redistribute it or modify it. :)
+ */
 
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "end_time.h"
 #include "Vehicle.h"
 #include "Unit.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
 #include "ScriptedEscortAI.h"
 #include "Cell.h"
 #include "CellImpl.h"
@@ -55,10 +54,10 @@ class boss_murozond : public CreatureScript
         {
             boss_murozondAI(Creature* creature) : BossAI(creature, BOSS_MUROZOND)
             {
-				instance = me->GetInstanceScript();
+                instance = me->GetInstanceScript();
             }
 
-			InstanceScript* instance;
+            InstanceScript* instance;
 
             void Reset()
             {
@@ -67,7 +66,7 @@ class boss_murozond : public CreatureScript
                     instance->SetData(DATA_LAST_ENCOUNTER, NOT_STARTED);
             }
 
-            void JustDied(Unit* killer)
+            void JustDied(Unit* /*killer*/)
             {
                 if (instance)
                     instance->SetData(DATA_LAST_ENCOUNTER, DONE);
@@ -91,19 +90,19 @@ class boss_murozond : public CreatureScript
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
-                while (uint32 eventId = events.ExecuteEvent())
+                while (/*uint32 eventId = */events.ExecuteEvent())
                 {
-                    // switch (eventId)
-                    // {
+                    //switch (eventId)
+                    //{
                     //    case EVENT_ROCK_SHARDS:
                     //        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
                     //            DoCast(target, SPELL_ROCK_SHARDS);
                     //        events.ScheduleEvent(EVENT_ROCK_SHARDS, 15000);
                     //        break;
 
-                    //     default:
+                    //    default:
                     //        break;
-                    // }
+                    //}
                 }
 
                 DoMeleeAttackIfReady();

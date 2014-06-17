@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -17,10 +17,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
 #include "Util.h"
+#include "Common.h"
 #include "utf8.h"
 #include "SFMT.h"
+#include "Errors.h" // for ASSERT
 #include <ace/TSS_T.h>
 
 typedef ACE_TSS<SFMTRand> SFMTRandTSS;
@@ -28,16 +29,19 @@ static SFMTRandTSS sfmtRand;
 
 int32 irand(int32 min, int32 max)
 {
+    ASSERT(max >= min);
     return int32(sfmtRand->IRandom(min, max));
 }
 
 uint32 urand(uint32 min, uint32 max)
 {
+    ASSERT(max >= min);
     return sfmtRand->URandom(min, max);
 }
 
 float frand(float min, float max)
 {
+    ASSERT(max >= min);
     return float(sfmtRand->Random() * (max - min) + min);
 }
 
@@ -56,13 +60,13 @@ double rand_chance(void)
     return sfmtRand->Random() * 100.0;
 }
 
-Tokens::Tokens(const std::string &src, const char sep, uint32 vectorReserve)
+Tokenizer::Tokenizer(const std::string &src, const char sep, uint32 vectorReserve)
 {
     m_str = new char[src.length() + 1];
     memcpy(m_str, src.c_str(), src.length() + 1);
 
     if (vectorReserve)
-        reserve(vectorReserve);
+        m_storage.reserve(vectorReserve);
 
     char* posold = m_str;
     char* posnew = m_str;
@@ -71,17 +75,17 @@ Tokens::Tokens(const std::string &src, const char sep, uint32 vectorReserve)
     {
         if (*posnew == sep)
         {
-            push_back(posold);
+            m_storage.push_back(posold);
             posold = posnew + 1;
 
-            *posnew = 0x00;
+            *posnew = '\0';
         }
-        else if (*posnew == 0x00)
+        else if (*posnew == '\0')
         {
             // Hack like, but the old code accepted these kind of broken strings,
             // so changing it would break other things
             if (posold != posnew)
-                push_back(posold);
+                m_storage.push_back(posold);
 
             break;
         }
@@ -92,7 +96,7 @@ Tokens::Tokens(const std::string &src, const char sep, uint32 vectorReserve)
 
 void stripLineInvisibleChars(std::string &str)
 {
-    static std::string invChars = " \t\7\n";
+    static std::string const invChars = " \t\7\n";
 
     size_t wpos = 0;
 
@@ -147,6 +151,37 @@ std::string secsToTimeString(uint64 timeInSecs, bool shortText, bool hoursOnly)
     return ss.str();
 }
 
+int64 MoneyStringToMoney(const std::string& moneyString)
+{
+    int64 money = 0;
+
+    if (!(std::count(moneyString.begin(), moneyString.end(), 'g') == 1 ||
+        std::count(moneyString.begin(), moneyString.end(), 's') == 1 ||
+        std::count(moneyString.begin(), moneyString.end(), 'c') == 1))
+        return 0; // Bad format
+
+    Tokenizer tokens(moneyString, ' ');
+    for (Tokenizer::const_iterator itr = tokens.begin(); itr != tokens.end(); ++itr)
+    {
+        std::string tokenString(*itr);
+        size_t gCount = std::count(tokenString.begin(), tokenString.end(), 'g');
+        size_t sCount = std::count(tokenString.begin(), tokenString.end(), 's');
+        size_t cCount = std::count(tokenString.begin(), tokenString.end(), 'c');
+        if (gCount + sCount + cCount != 1)
+            return 0;
+
+        uint64 amount = atol(*itr);
+        if (gCount == 1)
+            money += amount * 100 * 100;
+        else if (sCount == 1)
+            money += amount * 100;
+        else if (cCount == 1)
+            money += amount;
+    }
+
+    return money;
+}
+
 uint32 TimeStringToSecs(const std::string& timestring)
 {
     uint32 secs       = 0;
@@ -181,7 +216,8 @@ uint32 TimeStringToSecs(const std::string& timestring)
 
 std::string TimeToTimestampStr(time_t t)
 {
-    tm* aTm = localtime(&t);
+    tm aTm;
+    ACE_OS::localtime_r(&t, &aTm);
     //       YYYY   year
     //       MM     month (2 digits 01-12)
     //       DD     day (2 digits 01-31)
@@ -189,7 +225,7 @@ std::string TimeToTimestampStr(time_t t)
     //       MM     minutes (2 digits 00-59)
     //       SS     seconds (2 digits 00-59)
     char buf[20];
-    snprintf(buf, 20, "%04d-%02d-%02d_%02d-%02d-%02d", aTm->tm_year+1900, aTm->tm_mon+1, aTm->tm_mday, aTm->tm_hour, aTm->tm_min, aTm->tm_sec);
+    snprintf(buf, 20, "%04d-%02d-%02d_%02d-%02d-%02d", aTm.tm_year+1900, aTm.tm_mon+1, aTm.tm_mday, aTm.tm_hour, aTm.tm_min, aTm.tm_sec);
     return std::string(buf);
 }
 
@@ -232,7 +268,7 @@ uint32 CreatePIDFile(const std::string& filename)
     pid_t pid = getpid();
 #endif
 
-    fprintf(pid_file, "%d", pid );
+    fprintf(pid_file, "%u", pid );
     fclose(pid_file);
 
     return (uint32)pid;
@@ -475,6 +511,9 @@ void vutf8printf(FILE* out, const char *str, va_list* ap)
     wchar_t wtemp_buf[32*1024];
 
     size_t temp_len = vsnprintf(temp_buf, 32*1024, str, *ap);
+    //vsnprintf returns -1 if the buffer is too small
+    if (temp_len == size_t(-1))
+        temp_len = 32*1024-1;
 
     size_t wtemp_len = 32*1024-1;
     Utf8toWStr(temp_buf, temp_len, wtemp_buf, wtemp_len);
@@ -486,29 +525,21 @@ void vutf8printf(FILE* out, const char *str, va_list* ap)
 #endif
 }
 
-void hexEncodeByteArray(uint8* bytes, uint32 arrayLen, std::string& result)
+std::string ByteArrayToHexStr(uint8 const* bytes, uint32 arrayLen, bool reverse /* = false */)
 {
-    std::ostringstream ss;
-    for (uint32 i=0; i<arrayLen; ++i)
-    {
-        for (uint8 j=0; j<2; ++j)
-        {
-            unsigned char nibble = 0x0F & (bytes[i]>>((1-j)*4));
-            char encodedNibble;
-            if (nibble < 0x0A)
-                encodedNibble = '0'+nibble;
-            else
-                encodedNibble = 'A'+nibble-0x0A;
-            ss << encodedNibble;
-        }
-    }
-    result = ss.str();
-}
+    int32 init = 0;
+    int32 end = arrayLen;
+    int8 op = 1;
 
-std::string ByteArrayToHexStr(uint8* bytes, uint32 length)
-{
+    if (reverse)
+    {
+        init = arrayLen - 1;
+        end = -1;
+        op = -1;
+    }
+
     std::ostringstream ss;
-    for (uint32 i = 0; i < length; ++i)
+    for (int32 i = init; i != end; i += op)
     {
         char buffer[4];
         sprintf(buffer, "%02X", bytes[i]);

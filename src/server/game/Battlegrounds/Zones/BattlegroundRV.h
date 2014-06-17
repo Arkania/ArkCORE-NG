@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -19,7 +19,7 @@
 #ifndef __BATTLEGROUNDRV_H
 #define __BATTLEGROUNDRV_H
 
-class Battleground;
+#include "Battleground.h"
 
 enum BattlegroundRVObjectTypes
 {
@@ -45,7 +45,9 @@ enum BattlegroundRVObjectTypes
     BG_RV_OBJECT_PILAR_COLLISION_3,
     BG_RV_OBJECT_PILAR_COLLISION_4,
 
-    BG_RV_OBJECT_MAX,
+    BG_RV_OBJECT_ELEVATOR_1,
+    BG_RV_OBJECT_ELEVATOR_2,
+    BG_RV_OBJECT_MAX
 };
 
 enum BattlegroundRVObjects
@@ -55,22 +57,24 @@ enum BattlegroundRVObjects
     BG_RV_OBJECT_TYPE_FIRE_1                     = 192704,
     BG_RV_OBJECT_TYPE_FIRE_2                     = 192705,
 
-    BG_RV_OBJECT_TYPE_FIREDOOR_2                 = 208457,
-    BG_RV_OBJECT_TYPE_FIREDOOR_1                 = 208456,
-    BG_RV_OBJECT_TYPE_PULLEY_1                   = 208460,
-    BG_RV_OBJECT_TYPE_PULLEY_2                   = 208461,
-    BG_RV_OBJECT_TYPE_GEAR_1                     = 208463,
-    BG_RV_OBJECT_TYPE_GEAR_2                     = 208462,
+    BG_RV_OBJECT_TYPE_FIREDOOR_2                 = 192387,
+    BG_RV_OBJECT_TYPE_FIREDOOR_1                 = 192388,
+    BG_RV_OBJECT_TYPE_PULLEY_1                   = 192389,
+    BG_RV_OBJECT_TYPE_PULLEY_2                   = 192390,
+    BG_RV_OBJECT_TYPE_GEAR_1                     = 192393,
+    BG_RV_OBJECT_TYPE_GEAR_2                     = 192394,
+    BG_RV_OBJECT_TYPE_ELEVATOR_1                 = 194582,
+    BG_RV_OBJECT_TYPE_ELEVATOR_2                 = 194586,
 
-    BG_RV_OBJECT_TYPE_PILAR_COLLISION_1          = 208466, // axe
-    BG_RV_OBJECT_TYPE_PILAR_COLLISION_2          = 208465, // arena
-    BG_RV_OBJECT_TYPE_PILAR_COLLISION_3          = 208467, // lightning
-    BG_RV_OBJECT_TYPE_PILAR_COLLISION_4          = 208464, // ivory
+    BG_RV_OBJECT_TYPE_PILAR_COLLISION_1          = 194580, // axe
+    BG_RV_OBJECT_TYPE_PILAR_COLLISION_2          = 194579, // arena
+    BG_RV_OBJECT_TYPE_PILAR_COLLISION_3          = 194581, // lightning
+    BG_RV_OBJECT_TYPE_PILAR_COLLISION_4          = 194578, // ivory
 
-    BG_RV_OBJECT_TYPE_PILAR_1                    = 208468, // axe
-    BG_RV_OBJECT_TYPE_PILAR_2                    = 208469, // arena
-    BG_RV_OBJECT_TYPE_PILAR_3                    = 208470, // lightning
-    BG_RV_OBJECT_TYPE_PILAR_4                    = 208471, // ivory
+    BG_RV_OBJECT_TYPE_PILAR_1                    = 194583, // axe
+    BG_RV_OBJECT_TYPE_PILAR_2                    = 194584, // arena
+    BG_RV_OBJECT_TYPE_PILAR_3                    = 194585, // lightning
+    BG_RV_OBJECT_TYPE_PILAR_4                    = 194587  // ivory
 };
 
 enum BattlegroundRVData
@@ -85,14 +89,7 @@ enum BattlegroundRVData
     BG_RV_FIRST_TIMER                            = 20133,
     BG_RV_WORLD_STATE_A                          = 0xe10,
     BG_RV_WORLD_STATE_H                          = 0xe11,
-    BG_RV_WORLD_STATE                            = 0xe1a,
-};
-
-class BattlegroundRVScore : public BattlegroundScore
-{
-    public:
-        BattlegroundRVScore() {};
-        virtual ~BattlegroundRVScore() {};
+    BG_RV_WORLD_STATE                            = 0xe1a
 };
 
 class BattlegroundRV : public Battleground
@@ -102,31 +99,30 @@ class BattlegroundRV : public Battleground
         ~BattlegroundRV();
 
         /* inherited from BattlegroundClass */
-        virtual void AddPlayer(Player* player);
-        virtual void StartingEventCloseDoors();
-        virtual void StartingEventOpenDoors();
-        virtual void Reset();
-        virtual void FillInitialWorldStates(WorldPacket &d);
+        void AddPlayer(Player* player);
+        void StartingEventCloseDoors();
+        void StartingEventOpenDoors();
+        void Reset();
+        void FillInitialWorldStates(WorldPacket &d);
 
         void RemovePlayer(Player* player, uint64 guid, uint32 team);
         void HandleAreaTrigger(Player* Source, uint32 Trigger);
         bool SetupBattleground();
         void HandleKillPlayer(Player* player, Player* killer);
-        bool HandlePlayerUnderMap(Player* player);
 
     private:
         uint32 Timer;
         uint32 State;
         bool   PillarCollision;
 
-        virtual void PostUpdateImpl(uint32 diff);
+        void PostUpdateImpl(uint32 diff);
 
     protected:
-        uint32 getTimer() { return Timer; };
-        void setTimer(uint32 timer) { Timer = timer; };
+        uint32 getTimer() { return Timer; }
+        void setTimer(uint32 timer) { Timer = timer; }
 
-        uint32 getState() { return State; };
-        void setState(uint32 state) { State = state; };
+        uint32 getState() { return State; }
+        void setState(uint32 state) { State = state; }
         void TogglePillarCollision();
         bool GetPillarCollision() { return PillarCollision; }
         void SetPillarCollision(bool apply) { PillarCollision = apply; }

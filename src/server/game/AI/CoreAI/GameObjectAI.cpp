@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -19,7 +19,7 @@
 
 #include "GameObjectAI.h"
 
-//GameObjectAI::GameObjectAI(GameObject* g) : go(g) {}
+//GameObjectAI::GameObjectAI(GameObject* g) : go(g) { }
 int GameObjectAI::Permissible(const GameObject* go)
 {
     if (go->GetAIName() == "GameObjectAI")
@@ -27,4 +27,4 @@ int GameObjectAI::Permissible(const GameObject* go)
     return PERMIT_BASE_NO;
 }
 
-NullGameObjectAI::NullGameObjectAI(GameObject* g) : GameObjectAI(g) {}
+NullGameObjectAI::NullGameObjectAI(GameObject* g) : GameObjectAI(g) { }

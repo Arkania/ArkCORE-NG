@@ -1,3 +1,11 @@
+/*
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ *
+ * This file is NOT free software. Third-party users can NOT redistribute 
+ * it or modify it. If you find it, you are either hacking something, or very 
+ * lucky (presuming someone else managed to hack it).
+ */
+
 /* ScriptData
 SDName: boss_hagara_the_stormbinder
 SD%Complete: 70%
@@ -6,35 +14,35 @@ SDCategory: Boss Hagara
 EndScriptData
 */
 
-
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "dragon_soul.h"
 
 enum Events
 {
-	EVENT_ICE_SPEAR = 1,
-	EVENT_ICE_TOMB, // No Work
-	EVENT_SHATTERED_ICE,
-	EVENT_FOCUSED_ASSAULT, // No Work
+    EVENT_ICE_SPEAR = 1,
+    EVENT_ICE_TOMB, // No Work
+    EVENT_SHATTERED_ICE,
+    EVENT_FOCUSED_ASSAULT, // No Work
 
-	EVENT_DAMAGE_PHASE2_1,
-	EVENT_DAMAGE_PHASE2_3,
-	EVENT_REMOVE_PHASE_2,
-	HAS_ICE_SPEAR_DEATH,
+    EVENT_DAMAGE_PHASE2_1,
+    EVENT_DAMAGE_PHASE2_3,
+    EVENT_REMOVE_PHASE_2,
+    HAS_ICE_SPEAR_DEATH,
 
-	EVENT_DAMAGE_PHASE3_1,
-	EVENT_DAMAGE_PHASE3_2,
-	EVENT_SUMMON_CRYSTAL,
-	EVENT_DAMAGE_PHASE3_4,
-	EVENT_REMOVE_PHASE_3,
-	HAS_ARRESTER_RELOAD,
+    EVENT_DAMAGE_PHASE3_1,
+    EVENT_DAMAGE_PHASE3_2,
+    EVENT_SUMMON_CRYSTAL,
+    EVENT_DAMAGE_PHASE3_4,
+    EVENT_REMOVE_PHASE_3,
+    HAS_ARRESTER_RELOAD,
 
-	EVENT_CAST_CRYSTAL,
-	EVENT_DESTROY_CRISTAL,
+    EVENT_CAST_CRYSTAL,
+    EVENT_DESTROY_CRISTAL,
 
-	EVENT_PHASE_1,
-	EVENT_PHASE_2,
-	EVENT_PHASE_3,
+    EVENT_PHASE_1,
+    EVENT_PHASE_2,
+    EVENT_PHASE_3,
 };
 
 enum Spells
@@ -82,7 +90,7 @@ public:
 
         InstanceScript* instance;
         EventMap events;
-		uint8 phase;
+        uint8 phase;
 
         void Reset()
         {
@@ -114,15 +122,15 @@ public:
                 case EVENT_PHASE_1:
                     events.ScheduleEvent(EVENT_ICE_SPEAR, urand(5000,14000));
                     events.ScheduleEvent(EVENT_SHATTERED_ICE, urand(15000,30000));
-					switch (urand(0, 1))
-					{
-					case 0:
-					    events.ScheduleEvent(EVENT_PHASE_2, urand(200000, 340000));
-						break;
-					case 1:
-						events.ScheduleEvent(EVENT_PHASE_3, 200000,340000);
-						break;
-					}
+                    switch (urand(0, 1))
+                    {
+                    case 0:
+                        events.ScheduleEvent(EVENT_PHASE_2, urand(200000, 340000));
+                        break;
+                    case 1:
+                        events.ScheduleEvent(EVENT_PHASE_3, 200000,340000);
+                        break;
+                    }
                     break;
 
                 case EVENT_ICE_SPEAR:
@@ -136,7 +144,7 @@ public:
                     events.ScheduleEvent(EVENT_SHATTERED_ICE, urand(20000, 40000));
                     break;
 
-			    //phase 2
+                //phase 2
                 case EVENT_PHASE_2:
                     events.CancelEvent(EVENT_PHASE_1);
                     events.CancelEvent(EVENT_ICE_SPEAR);
@@ -150,22 +158,22 @@ public:
                     DoCast(SPELL_ICE_SHIELD);
                     break;
 
-				case HAS_ICE_SPEAR_DEATH:
-					if(me->HasAura(SPELL_AURA_CRYSTAL))
-					{
-						events.ScheduleEvent(HAS_ICE_SPEAR_DEATH, 1000);
-					}
-					else
-					{
-						events.CancelEvent(EVENT_PHASE_2);
-						events.CancelEvent(EVENT_REMOVE_PHASE_2);
-						events.CancelEvent(EVENT_DAMAGE_PHASE2_3);
-						events.CancelEvent(HAS_ICE_SPEAR_DEATH);
-						events.ScheduleEvent(EVENT_PHASE_1, 1);
-						me->RemoveAurasDueToSpell(SPELL_ICE_SHIELD);
-						instance->SetBossState(DATA_WAVE, DONE);
-					}
-					break;
+                case HAS_ICE_SPEAR_DEATH:
+                    if(me->HasAura(SPELL_AURA_CRYSTAL))
+                    {
+                        events.ScheduleEvent(HAS_ICE_SPEAR_DEATH, 1000);
+                    }
+                    else
+                    {
+                        events.CancelEvent(EVENT_PHASE_2);
+                        events.CancelEvent(EVENT_REMOVE_PHASE_2);
+                        events.CancelEvent(EVENT_DAMAGE_PHASE2_3);
+                        events.CancelEvent(HAS_ICE_SPEAR_DEATH);
+                        events.ScheduleEvent(EVENT_PHASE_1, 1);
+                        me->RemoveAurasDueToSpell(SPELL_ICE_SHIELD);
+                        instance->SetBossState(DATA_WAVE, DONE);
+                    }
+                    break;
 
                 case EVENT_REMOVE_PHASE_2:
                     events.CancelEvent(EVENT_PHASE_2);
@@ -196,10 +204,10 @@ public:
 
                     me->SummonCreature(NPC_ICICLE, 13585.291f, 13610.428f, 122.420f, 0.0f, TEMPSUMMON_CORPSE_DESPAWN, 340000);
 
-					me->SummonCreature(NPC_FORZEN_BINDIG_CRYSTAL, 13617.5f, 13580.9f, 123.567f, 0.0f, TEMPSUMMON_CORPSE_DESPAWN, 310000);
-					me->SummonCreature(NPC_FORZEN_BINDIG_CRYSTAL, 13557.4f, 13643.1f, 123.567f, 0.0f, TEMPSUMMON_CORPSE_DESPAWN, 310000);
-					me->SummonCreature(NPC_FORZEN_BINDIG_CRYSTAL, 13557.7f, 13580.7f, 123.567f, 0.0f, TEMPSUMMON_CORPSE_DESPAWN, 310000);
-					me->SummonCreature(NPC_FORZEN_BINDIG_CRYSTAL, 13617.3f, 13643.5f, 123.567f, 0.0f, TEMPSUMMON_CORPSE_DESPAWN, 310000);
+                    me->SummonCreature(NPC_FORZEN_BINDIG_CRYSTAL, 13617.5f, 13580.9f, 123.567f, 0.0f, TEMPSUMMON_CORPSE_DESPAWN, 310000);
+                    me->SummonCreature(NPC_FORZEN_BINDIG_CRYSTAL, 13557.4f, 13643.1f, 123.567f, 0.0f, TEMPSUMMON_CORPSE_DESPAWN, 310000);
+                    me->SummonCreature(NPC_FORZEN_BINDIG_CRYSTAL, 13557.7f, 13580.7f, 123.567f, 0.0f, TEMPSUMMON_CORPSE_DESPAWN, 310000);
+                    me->SummonCreature(NPC_FORZEN_BINDIG_CRYSTAL, 13617.3f, 13643.5f, 123.567f, 0.0f, TEMPSUMMON_CORPSE_DESPAWN, 310000);
                     break;
 
                 case EVENT_DAMAGE_PHASE2_3:
@@ -214,26 +222,26 @@ public:
                     events.CancelEvent(EVENT_SHATTERED_ICE);
                     events.ScheduleEvent(EVENT_REMOVE_PHASE_3, 310000);
                     events.ScheduleEvent(EVENT_DAMAGE_PHASE3_1, 10000);
-					events.ScheduleEvent(HAS_ARRESTER_RELOAD, 5000);
-					events.ScheduleEvent(EVENT_SUMMON_CRYSTAL, 1);
+                    events.ScheduleEvent(HAS_ARRESTER_RELOAD, 5000);
+                    events.ScheduleEvent(EVENT_SUMMON_CRYSTAL, 1);
                     DoCast(SPELL_WATER_SHIELD);
                     break;
 
-				case HAS_ARRESTER_RELOAD:
-					if(me->HasAura(SPELL_AURA_CRYSTAL))
-					{
-						events.ScheduleEvent(HAS_ARRESTER_RELOAD, 1000);
-					}
-					else
-					{
-						events.CancelEvent(EVENT_PHASE_3);
-						events.CancelEvent(EVENT_REMOVE_PHASE_3);
-						events.CancelEvent(EVENT_DAMAGE_PHASE3_1);
-						events.CancelEvent(HAS_ARRESTER_RELOAD);
-						events.ScheduleEvent(EVENT_PHASE_1, 1);
-						me->RemoveAurasDueToSpell(SPELL_WATER_SHIELD);
-					}
-					break;
+                case HAS_ARRESTER_RELOAD:
+                    if(me->HasAura(SPELL_AURA_CRYSTAL))
+                    {
+                        events.ScheduleEvent(HAS_ARRESTER_RELOAD, 1000);
+                    }
+                    else
+                    {
+                        events.CancelEvent(EVENT_PHASE_3);
+                        events.CancelEvent(EVENT_REMOVE_PHASE_3);
+                        events.CancelEvent(EVENT_DAMAGE_PHASE3_1);
+                        events.CancelEvent(HAS_ARRESTER_RELOAD);
+                        events.ScheduleEvent(EVENT_PHASE_1, 1);
+                        me->RemoveAurasDueToSpell(SPELL_WATER_SHIELD);
+                    }
+                    break;
 
                 case EVENT_REMOVE_PHASE_3:
                     events.CancelEvent(EVENT_PHASE_3);
@@ -250,15 +258,15 @@ public:
                     break;
 
                 case EVENT_SUMMON_CRYSTAL:
-				    me->SummonCreature(NPC_CRYSTAL_CONDUCTOR, 13617.5f, 13580.9f, 123.567f, 0.0f, TEMPSUMMON_CORPSE_DESPAWN, 310000);
-					me->SummonCreature(NPC_CRYSTAL_CONDUCTOR, 13557.4f, 13643.1f, 123.567f, 0.0f, TEMPSUMMON_CORPSE_DESPAWN, 310000);
-					me->SummonCreature(NPC_CRYSTAL_CONDUCTOR, 13557.7f, 13580.7f, 123.567f, 0.0f, TEMPSUMMON_CORPSE_DESPAWN, 310000);
-					me->SummonCreature(NPC_CRYSTAL_CONDUCTOR, 13617.3f, 13643.5f, 123.567f, 0.0f, TEMPSUMMON_CORPSE_DESPAWN, 310000);
+                    me->SummonCreature(NPC_CRYSTAL_CONDUCTOR, 13617.5f, 13580.9f, 123.567f, 0.0f, TEMPSUMMON_CORPSE_DESPAWN, 310000);
+                    me->SummonCreature(NPC_CRYSTAL_CONDUCTOR, 13557.4f, 13643.1f, 123.567f, 0.0f, TEMPSUMMON_CORPSE_DESPAWN, 310000);
+                    me->SummonCreature(NPC_CRYSTAL_CONDUCTOR, 13557.7f, 13580.7f, 123.567f, 0.0f, TEMPSUMMON_CORPSE_DESPAWN, 310000);
+                    me->SummonCreature(NPC_CRYSTAL_CONDUCTOR, 13617.3f, 13643.5f, 123.567f, 0.0f, TEMPSUMMON_CORPSE_DESPAWN, 310000);
                     break;
                 default:
                     break;
                 }
-            }		
+            }
 
             DoMeleeAttackIfReady();
         }
@@ -278,58 +286,58 @@ class npc_ice_wave : public CreatureScript
     public:
         npc_ice_wave() : CreatureScript("npc_ice_wave") { }
 
-		CreatureAI* GetAI(Creature* creature) const
-		{
-		    return GetDragonSoulAI<npc_ice_waveAI>(creature);
-		}
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return GetDragonSoulAI<npc_ice_waveAI>(creature);
+        }
 
-		struct npc_ice_waveAI : public ScriptedAI
-		{
-		    npc_ice_waveAI(Creature* creature) : ScriptedAI(creature)
-		    {
-			    instance = creature->GetInstanceScript();
-		    }
+        struct npc_ice_waveAI : public ScriptedAI
+        {
+            npc_ice_waveAI(Creature* creature) : ScriptedAI(creature)
+            {
+                instance = creature->GetInstanceScript();
+            }
 
-			InstanceScript* instance;
-			EventMap events;
+            InstanceScript* instance;
+            EventMap events;
 
-			void Reset()
-			{
-				events.ScheduleEvent(EVENT_DESTROY_CRISTAL, 1);
-				me->DespawnOrUnsummon(340000);
-				me->AddAura(105265, me);
-			}
+            void Reset()
+            {
+                events.ScheduleEvent(EVENT_DESTROY_CRISTAL, 1);
+                me->DespawnOrUnsummon(340000);
+                me->AddAura(105265, me);
+            }
 
-			void UpdateAI(uint32 diff)
-			{
-				if (!UpdateVictim())
-					return;
+            void UpdateAI(uint32 diff)
+            {
+                if (!UpdateVictim())
+                    return;
 
-				events.Update(diff);
+                events.Update(diff);
 
-				while (uint32 eventId = events.ExecuteEvent())
-				{
-					switch (eventId)
-					{
-					case EVENT_DESTROY_CRISTAL:
-						if(instance->GetBossState(DATA_WAVE) == DONE)
-						me->DespawnOrUnsummon(1);
-						events.ScheduleEvent(EVENT_DESTROY_CRISTAL, 1);
-						break;
-					default:
-						break;
-					}
-				}
+                while (uint32 eventId = events.ExecuteEvent())
+                {
+                    switch (eventId)
+                    {
+                    case EVENT_DESTROY_CRISTAL:
+                        if(instance->GetBossState(DATA_WAVE) == DONE)
+                        me->DespawnOrUnsummon(1);
+                        events.ScheduleEvent(EVENT_DESTROY_CRISTAL, 1);
+                        break;
+                    default:
+                        break;
+                    }
+                }
 
-				DoMeleeAttackIfReady();
-			}
+                DoMeleeAttackIfReady();
+            }
 
 
-			void JustDied(Unit* /*killer*/)
-			{
-				DoCast(SPELL_CRYSTALLINE_OVERLOAD);
-			}
-		};
+            void JustDied(Unit* /*killer*/)
+            {
+                DoCast(SPELL_CRYSTALLINE_OVERLOAD);
+            }
+        };
 };
 
 class npc_crystal_conductor : public CreatureScript
@@ -337,56 +345,56 @@ class npc_crystal_conductor : public CreatureScript
     public:
         npc_crystal_conductor() : CreatureScript("npc_crystal_conductor") { }
 
-		CreatureAI* GetAI(Creature* creature) const
-		{
-		    return GetDragonSoulAI<npc_crystal_conductorAI>(creature);
-		}
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return GetDragonSoulAI<npc_crystal_conductorAI>(creature);
+        }
 
-		struct npc_crystal_conductorAI : public ScriptedAI
-		{
-		    npc_crystal_conductorAI(Creature* creature) : ScriptedAI(creature)
-		    {
-			instance = creature->GetInstanceScript();
-		    }
+        struct npc_crystal_conductorAI : public ScriptedAI
+        {
+            npc_crystal_conductorAI(Creature* creature) : ScriptedAI(creature)
+            {
+            instance = creature->GetInstanceScript();
+            }
 
-			InstanceScript* instance;
-			EventMap events;
+            InstanceScript* instance;
+            EventMap events;
 
-			void EnterCombat(Unit* /*who*/)
-			{
-				if(Unit* target = me->FindNearestCreature(NPC_HAGARA, 100.0f))
-				    DoCast(target, SPELL_CRYSTALLINE_TETHER);
+            void EnterCombat(Unit* /*who*/)
+            {
+                if(Unit* target = me->FindNearestCreature(NPC_HAGARA, 100.0f))
+                    DoCast(target, SPELL_CRYSTALLINE_TETHER);
 
-				events.ScheduleEvent(EVENT_CAST_CRYSTAL, urand(5000,10000));
-			}
+                events.ScheduleEvent(EVENT_CAST_CRYSTAL, urand(5000,10000));
+            }
 
-			void UpdateAI(uint32 diff)
-			{
-				if (!UpdateVictim())
-				    return;
+            void UpdateAI(uint32 diff)
+            {
+                if (!UpdateVictim())
+                    return;
 
-				events.Update(diff);
+                events.Update(diff);
 
-				while (uint32 eventId = events.ExecuteEvent())
-				{
-					switch (eventId)
-					{
-					case EVENT_CAST_CRYSTAL:
-					     DoCastVictim(SPELL_LIGHTNING_CONDUIT);
-						 break;
-					}
-				}
-			}
+                while (uint32 eventId = events.ExecuteEvent())
+                {
+                    switch (eventId)
+                    {
+                    case EVENT_CAST_CRYSTAL:
+                         DoCastVictim(SPELL_LIGHTNING_CONDUIT);
+                         break;
+                    }
+                }
+            }
 
-			void JustDied(Unit* /*killer*/)
-			{
-			}
-		};
+            void JustDied(Unit* /*killer*/)
+            {
+            }
+        };
 };
 
 void AddSC_boss_hagara()
 {
-	new boss_hagara();
-	new npc_ice_wave();
-	new npc_crystal_conductor();
+    new boss_hagara();
+    new npc_ice_wave();
+    new npc_crystal_conductor();
 }

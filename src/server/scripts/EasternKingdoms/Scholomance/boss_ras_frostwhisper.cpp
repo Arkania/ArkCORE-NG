@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -24,28 +24,32 @@ SDComment:
 SDCategory: Scholomance
 EndScriptData */
 
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 
-#define SPELL_FROSTBOLT         21369
-#define SPELL_ICEARMOR          18100                       //This is actually a buff he gives himself
-#define SPELL_FREEZE            18763
-#define SPELL_FEAR              26070
-#define SPELL_CHILLNOVA         18099
-#define SPELL_FROSTVOLLEY       8398
+enum Spells
+{
+    SPELL_FROSTBOLT         = 21369,
+    SPELL_ICEARMOR          = 18100, // This is actually a buff he gives himself
+    SPELL_FREEZE            = 18763,
+    SPELL_FEAR              = 26070,
+    SPELL_CHILLNOVA         = 18099,
+    SPELL_FROSTVOLLEY       = 8398
+};
 
 class boss_boss_ras_frostwhisper : public CreatureScript
 {
 public:
     boss_boss_ras_frostwhisper() : CreatureScript("boss_boss_ras_frostwhisper") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new boss_rasfrostAI (creature);
+        return new boss_rasfrostAI(creature);
     }
 
     struct boss_rasfrostAI : public ScriptedAI
     {
-        boss_rasfrostAI(Creature* creature) : ScriptedAI(creature) {}
+        boss_rasfrostAI(Creature* creature) : ScriptedAI(creature) { }
 
         uint32 IceArmor_Timer;
         uint32 Frostbolt_Timer;
@@ -54,7 +58,7 @@ public:
         uint32 ChillNova_Timer;
         uint32 FrostVolley_Timer;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             IceArmor_Timer = 2000;
             Frostbolt_Timer = 8000;
@@ -66,9 +70,9 @@ public:
             DoCast(me, SPELL_ICEARMOR, true);
         }
 
-        void EnterCombat(Unit* /*who*/){}
+        void EnterCombat(Unit* /*who*/) OVERRIDE { }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (!UpdateVictim())
                 return;
@@ -92,28 +96,28 @@ public:
             //Freeze_Timer
             if (Freeze_Timer <= diff)
             {
-                DoCast(me->GetVictim(), SPELL_FREEZE);
+                DoCastVictim(SPELL_FREEZE);
                 Freeze_Timer = 24000;
             } else Freeze_Timer -= diff;
 
             //Fear_Timer
             if (Fear_Timer <= diff)
             {
-                DoCast(me->GetVictim(), SPELL_FEAR);
+                DoCastVictim(SPELL_FEAR);
                 Fear_Timer = 30000;
             } else Fear_Timer -= diff;
 
             //ChillNova_Timer
             if (ChillNova_Timer <= diff)
             {
-                DoCast(me->GetVictim(), SPELL_CHILLNOVA);
+                DoCastVictim(SPELL_CHILLNOVA);
                 ChillNova_Timer = 14000;
             } else ChillNova_Timer -= diff;
 
             //FrostVolley_Timer
             if (FrostVolley_Timer <= diff)
             {
-                DoCast(me->GetVictim(), SPELL_FROSTVOLLEY);
+                DoCastVictim(SPELL_FROSTVOLLEY);
                 FrostVolley_Timer = 15000;
             } else FrostVolley_Timer -= diff;
 

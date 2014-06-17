@@ -1,3 +1,11 @@
+/*
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ *
+ * This file is NOT free software. Third-party users can NOT redistribute 
+ * it or modify it. If you find it, you are either hacking something, or very 
+ * lucky (presuming someone else managed to hack it).
+ */
+
 /* ScriptData
 SDName: boss_warlord
 SD%Complete: 40%
@@ -6,7 +14,8 @@ SDCategory: Boss Warlord
 EndScriptData
 */
 
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "dragon_soul.h"
 
 enum Events
@@ -74,24 +83,24 @@ public:
                 switch (eventId)
                 {
                 case EVENT_FOCUSEF_ANGER:
-		            DoCast(me, SPELL_FOCUSED_ANGER);
+                    DoCast(me, SPELL_FOCUSED_ANGER);
                     events.ScheduleEvent(EVENT_FOCUSEF_ANGER, urand(60000,60000));
                     break;
 
                 case EVENT_PSYCHIC_DRAIN:
-		            DoCastVictim(SPELL_PSYCHIC_DRAIN);
+                    DoCastVictim(SPELL_PSYCHIC_DRAIN);
                     events.ScheduleEvent(EVENT_PSYCHIC_DRAIN, urand(150000,150000));
                     break;
 
                 case EVENT_DISRUPTING_SHADOWS:
-					if(Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+                    if(Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
                        DoCast(target, SPELL_DISRUPTING_SHADOWS);
                     events.ScheduleEvent(EVENT_DISRUPTING_SHADOWS, urand(40000,80000));
                     break;
                 default:
                     break;
                 }
-            }		
+            }
 
             DoMeleeAttackIfReady();
         }

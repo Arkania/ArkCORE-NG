@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -24,7 +24,9 @@ SDComment:
 SDCategory: CrystalsongForest
 Script Data End */
 
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "Player.h"
 
 /*******************************************************
  * npc_warmage_violetstand
@@ -48,25 +50,28 @@ class npc_warmage_violetstand : public CreatureScript
 public:
     npc_warmage_violetstand() : CreatureScript("npc_warmage_violetstand") { }
 
-    struct npc_warmage_violetstandAI : public Scripted_NoMovementAI
+    struct npc_warmage_violetstandAI : public ScriptedAI
     {
-        npc_warmage_violetstandAI(Creature* creature) : Scripted_NoMovementAI(creature){}
-
-        uint64 uiTargetGUID;
-
-        void Reset()
+        npc_warmage_violetstandAI(Creature* creature) : ScriptedAI(creature)
         {
-            uiTargetGUID = 0;
+            SetCombatMovement(false);
         }
 
-        void UpdateAI(uint32 /*diff*/)
+        uint64 targetGUID;
+
+        void Reset() OVERRIDE
         {
-            if (me->IsNonMeleeSpellCasted(false))
+            targetGUID = 0;
+        }
+
+        void UpdateAI(uint32 /*diff*/) OVERRIDE
+        {
+            if (me->IsNonMeleeSpellCast(false))
                 return;
 
             if (me->GetEntry() == NPC_WARMAGE_SARINA)
             {
-                if (!uiTargetGUID)
+                if (!targetGUID)
                 {
                     std::list<Creature*> orbList;
                     GetCreatureListWithEntryInGrid(orbList, me, NPC_TRANSITUS_SHIELD_DUMMY, 32.0f);
@@ -78,7 +83,7 @@ public:
                             {
                                 if (pOrb->GetPositionY() < 1000)
                                 {
-                                    uiTargetGUID = pOrb->GetGUID();
+                                    targetGUID = pOrb->GetGUID();
                                     break;
                                 }
                             }
@@ -87,19 +92,19 @@ public:
                 }
             }else
             {
-                if (!uiTargetGUID)
+                if (!targetGUID)
                     if (Creature* pOrb = GetClosestCreatureWithEntry(me, NPC_TRANSITUS_SHIELD_DUMMY, 32.0f))
-                        uiTargetGUID = pOrb->GetGUID();
+                        targetGUID = pOrb->GetGUID();
 
             }
 
-            if (Creature* pOrb = me->GetCreature(*me, uiTargetGUID))
+            if (Creature* pOrb = me->GetCreature(*me, targetGUID))
                 DoCast(pOrb, SPELL_TRANSITUS_SHIELD_BEAM);
 
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
         return new npc_warmage_violetstandAI(creature);
     }

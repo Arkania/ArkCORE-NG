@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "ScriptMgr.h"
 #include "OutdoorPvPTF.h"
 #include "OutdoorPvPMgr.h"
 #include "OutdoorPvP.h"
@@ -24,11 +25,21 @@
 #include "ObjectMgr.h"
 #include "Language.h"
 #include "World.h"
-#include "ScriptPCH.h"
 
 OutdoorPvPTF::OutdoorPvPTF()
 {
     m_TypeId = OUTDOOR_PVP_TF;
+
+    m_IsLocked = false;
+    m_LockTimer = TF_LOCK_TIME;
+    m_LockTimerUpdate = 0;
+
+    m_AllianceTowersControlled = 0;
+    m_HordeTowersControlled = 0;
+
+    hours_left = 6;
+    second_digit = 0;
+    first_digit = 0;
 }
 
 OPvPCapturePointTF::OPvPCapturePointTF(OutdoorPvP* pvp, OutdoorPvPTF_TowerType type)
@@ -297,9 +308,12 @@ void OPvPCapturePointTF::ChangeState()
         uint32 alliance_towers = ((OutdoorPvPTF*)m_PvP)->GetAllianceTowersControlled();
         if (alliance_towers < TF_TOWER_NUM)
             ((OutdoorPvPTF*)m_PvP)->SetAllianceTowersControlled(++alliance_towers);
+
         sWorld->SendZoneText(OutdoorPvPTFBuffZones[0], sObjectMgr->GetTrinityStringForDBCLocale(LANG_OPVP_TF_CAPTURE_A));
+
         for (PlayerSet::iterator itr = m_activePlayers[0].begin(); itr != m_activePlayers[0].end(); ++itr)
-            (*itr)->AreaExploredOrEventHappens(TF_ALLY_QUEST);
+            if (Player* player = ObjectAccessor::FindPlayer(*itr))
+                player->AreaExploredOrEventHappens(TF_ALLY_QUEST);
         break;
     }
     case OBJECTIVESTATE_HORDE:
@@ -309,9 +323,12 @@ void OPvPCapturePointTF::ChangeState()
         uint32 horde_towers = ((OutdoorPvPTF*)m_PvP)->GetHordeTowersControlled();
         if (horde_towers < TF_TOWER_NUM)
             ((OutdoorPvPTF*)m_PvP)->SetHordeTowersControlled(++horde_towers);
+
         sWorld->SendZoneText(OutdoorPvPTFBuffZones[0], sObjectMgr->GetTrinityStringForDBCLocale(LANG_OPVP_TF_CAPTURE_H));
+
         for (PlayerSet::iterator itr = m_activePlayers[1].begin(); itr != m_activePlayers[1].end(); ++itr)
-            (*itr)->AreaExploredOrEventHappens(TF_HORDE_QUEST);
+            if (Player* player = ObjectAccessor::FindPlayer(*itr))
+                player->AreaExploredOrEventHappens(TF_HORDE_QUEST);
         break;
     }
     case OBJECTIVESTATE_NEUTRAL:
@@ -350,7 +367,7 @@ class OutdoorPvP_terokkar_forest : public OutdoorPvPScript
         {
         }
 
-        OutdoorPvP* GetOutdoorPvP() const
+        OutdoorPvP* GetOutdoorPvP() const OVERRIDE
         {
             return new OutdoorPvPTF();
         }

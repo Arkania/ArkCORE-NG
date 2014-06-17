@@ -1,38 +1,24 @@
 /*
-* Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
-*
-* This program is free software; you can redistribute it and/or modify it
-* under the terms of the GNU General Public License as published by the
-* Free Software Foundation; either version 3 of the License, or (at your
-* option) any later version.
-*
-* This program is distributed in the hope that it will be useful, but WITHOUT
-* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-* FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
-* more details.
-*
-* You should have received a copy of the GNU General Public License along
-* with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
+ * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "ScriptMgr.h"
 #include "InstanceScript.h"
-
-enum Instance_baradin_hold
-{
-	DATA_ARGALOTH           = 0,
-    DATA_OCCUTHAR           = 1,
-    DATA_ALIZABAL           = 2,
-
-	BOSS_ARGALOTH           = 47120,
-    BOSS_OCCUTHAR           = 52363,
-	BOSS_ALIZABAL           = 55869,
-	BOSS_EncounterCount		= 3,
-
-	GO_ARGALOTH_DOOR        = 207619,
-    GO_OCCUTHAR_DOOR        = 208953,
-    GO_ALIZABAL_DOOR        = 209849,
-};
+#include "baradin_hold.h"
 
 DoorData const doorData[] =
 {
@@ -45,13 +31,13 @@ DoorData const doorData[] =
 class instance_baradin_hold: public InstanceMapScript
 {
     public:
-        instance_baradin_hold() : InstanceMapScript("instance_baradin_hold", 757) { }
+        instance_baradin_hold() : InstanceMapScript(BHScriptName, 757) { }
 
         struct instance_baradin_hold_InstanceMapScript: public InstanceScript
         {
             instance_baradin_hold_InstanceMapScript(InstanceMap* map) : InstanceScript(map)
             {
-                SetBossNumber(BOSS_EncounterCount);
+                SetBossNumber(EncounterCount);
                 LoadDoorData(doorData);
 
                 ArgalothGUID = 0;
@@ -59,7 +45,7 @@ class instance_baradin_hold: public InstanceMapScript
                 AlizabalGUID = 0;
             }
 
-            void OnCreatureCreate(Creature* creature) 
+            void OnCreatureCreate(Creature* creature) OVERRIDE
             {
                 switch(creature->GetEntry())
                 {
@@ -75,7 +61,7 @@ class instance_baradin_hold: public InstanceMapScript
                 }
             }
 
-            void OnGameObjectCreate(GameObject* go) 
+            void OnGameObjectCreate(GameObject* go) OVERRIDE
             {
                 switch(go->GetEntry())
                 {
@@ -87,7 +73,7 @@ class instance_baradin_hold: public InstanceMapScript
                 }
             }
 
-            uint64 GetData64(uint32 data) const 
+            uint64 GetData64(uint32 data) const OVERRIDE
             {
                 switch (data)
                 {
@@ -104,7 +90,7 @@ class instance_baradin_hold: public InstanceMapScript
                 return 0;
             }
 
-            void OnGameObjectRemove(GameObject* go) 
+            void OnGameObjectRemove(GameObject* go) OVERRIDE
             {
                 switch(go->GetEntry())
                 {
@@ -116,7 +102,7 @@ class instance_baradin_hold: public InstanceMapScript
                 }
             }
 
-            std::string GetSaveData() 
+            std::string GetSaveData() OVERRIDE
             {
                 OUT_SAVE_INST_DATA;
 
@@ -127,7 +113,7 @@ class instance_baradin_hold: public InstanceMapScript
                 return saveStream.str();
             }
 
-            void Load(const char* in) 
+            void Load(const char* in) OVERRIDE
             {
                 if (!in)
                 {
@@ -144,7 +130,7 @@ class instance_baradin_hold: public InstanceMapScript
 
                 if (dataHead1 == 'B' && dataHead2 == 'H')
                 {
-                    for (uint8 i = 0; i < BOSS_EncounterCount; ++i)
+                    for (uint8 i = 0; i < EncounterCount; ++i)
                     {
                         uint32 tmpState;
                         loadStream >> tmpState;

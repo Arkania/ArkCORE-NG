@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -60,7 +60,7 @@ public:
 
     virtual int open(void *);
 
-    virtual int close(int);
+    virtual int close(u_long);
 
     virtual int handle_input(ACE_HANDLE = ACE_INVALID_HANDLE);
     virtual int handle_output(ACE_HANDLE = ACE_INVALID_HANDLE);

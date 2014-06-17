@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -88,13 +89,9 @@ enum GameObjectIds
 };
 
 template<class AI>
-CreatureAI* GetZulGurubAI(Creature* creature)
+AI* GetZulGurubAI(Creature* creature)
 {
-    if (InstanceMap* instance = creature->GetMap()->ToInstanceMap())
-        if (instance->GetInstanceScript())
-            if (instance->GetScriptId() == sObjectMgr->GetScriptId(ZGScriptName))
-                return new AI(creature);
-    return NULL;
+    return GetInstanceAI<AI>(creature, ZGScriptName);
 }
 
 #endif

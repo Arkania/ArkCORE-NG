@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -16,256 +16,229 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
  
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "grim_batol.h"
     
 enum Creatures
 {
-    NPC_ASCENDED_FLAMESEEKER    = 39415,
-    NPC_ASCENDED_ROCKBREAKER    = 40272,
-    NPC_FISSURE                    = 41091,
-    NPC_ASCENDED_WATERLASHER    = 40273,
-    NPC_ASCENDED_WINDWALKER        = 39414,
-    NPC_AZUREBORNE_GUARDIAN        = 39854,
-    NPC_AZUREBORNE_SEER_1        = 39855,
-    NPC_AZUREBORNE_SEER_2        = 40291,
-    NPC_AZUREBORNE_WARLORD        = 39909,
-    NPC_EMPOWERING_FLAMES        = 41045,
-    NPC_ENSLAVED_BURNING_EMBER    = 39892,
-    NPC_ENSLAVED_GRONN_BRUTE    = 40166,
-    NPC_ENSLAVED_ROCK_ELEMENTAL    = 39900,
-    NPC_ENSLAVED_THUNDER_SPIRIT    = 40269,
-    NPC_ENSLAVED_WATER_SPIRIT    = 39961,
-    NPC_FACELESS_CORRUPTOR        = 39392,
-    NPC_HOOKED_NET                = 48756,
-    NPC_NET                        = 42570,
-    NPC_TROGG_DWELLER            = 39450,
-    NPC_TWILIGHT_ARMSMASTER_1    = 40306,
-    NPC_TWILIGHT_ARMSMASTER_2    = 41073,
-    NPC_TWILIGHT_BEGUILER        = 40167,
-    npc_twilight_drake_gb_1        = 41095,
-    npc_twilight_drake_gb_2        = 39390,
-    NPC_TWILIGHT_EARTHSHAPER    = 39890,
-    NPC_TWILIGHT_ENFORCER_1        = 40448,
-    NPC_TWILIGHT_ENFORCER_2        = 39956,
-    NPC_TWILIGHT_FIRECATCHER    = 39870,
-    NPC_TWILIGHT_SHADOW_WEAVER    = 39954,
-    NPC_KHAAPHOM                = 40953,
-    NPC_TWILIGHT_STORMBREAKER    = 39962,
-    NPC_TWILIGHT_THUNDERCALLER    = 40270,
-    NPC_TWILIGHT_WAR_MAGE        = 40268,
-    NPC_TWILIGHT_WYRMCALLER        = 39873,
-    NPC_TWISTED_VISAGE            = 41040,
-
-    
-    NPC_FARSEER_THOORANU        = 50385,
-    NPC_VELASTRASZA                = 50390,
-    NPC_BALEFLAME                = 50387,
+    NPC_ASCENDED_FLAMESEEKER        = 39415,
+    NPC_ASCENDED_ROCKBREAKER        = 40272,
+    NPC_FISSURE                     = 41091,
+    NPC_ASCENDED_WATERLASHER        = 40273,
+    NPC_ASCENDED_WINDWALKER         = 39414,
+    NPC_AZUREBORNE_GUARDIAN         = 39854,
+    NPC_AZUREBORNE_SEER_1           = 39855,
+    NPC_AZUREBORNE_SEER_2           = 40291,
+    NPC_AZUREBORNE_WARLORD          = 39909,
+    NPC_EMPOWERING_FLAMES           = 41045,
+    NPC_ENSLAVED_BURNING_EMBER      = 39892,
+    NPC_ENSLAVED_GRONN_BRUTE        = 40166,
+    NPC_ENSLAVED_ROCK_ELEMENTAL     = 39900,
+    NPC_ENSLAVED_THUNDER_SPIRIT     = 40269,
+    NPC_ENSLAVED_WATER_SPIRIT       = 39961,
+    NPC_FACELESS_CORRUPTOR          = 39392,
+    NPC_HOOKED_NET                  = 48756,
+    NPC_NET                         = 42570,
+    NPC_TROGG_DWELLER               = 39450,
+    NPC_TWILIGHT_ARMSMASTER_1       = 40306,
+    NPC_TWILIGHT_ARMSMASTER_2       = 41073,
+    NPC_TWILIGHT_BEGUILER           = 40167,
+    NPC_TWILIGHT_DRAKE_GB_1         = 41095,
+    NPC_TWILIGHT_DRAKE_GB_2         = 39390,
+    NPC_TWILIGHT_EARTHSHAPER        = 39890,
+    NPC_TWILIGHT_ENFORCER_1         = 40448,
+    NPC_TWILIGHT_ENFORCER_2         = 39956,
+    NPC_TWILIGHT_FIRECATCHER        = 39870,
+    NPC_TWILIGHT_SHADOW_WEAVER      = 39954,
+    NPC_KHAAPHOM                    = 40953,
+    NPC_TWILIGHT_STORMBREAKER       = 39962,
+    NPC_TWILIGHT_THUNDERCALLER      = 40270,
+    NPC_TWILIGHT_WAR_MAGE           = 40268,
+    NPC_TWILIGHT_WYRMCALLER         = 39873,
+    NPC_TWISTED_VISAGE              = 41040,
+    NPC_FARSEER_THOORANU            = 50385,
+    NPC_VELASTRASZA                 = 50390,
+    NPC_BALEFLAME                   = 50387
 };
 
 enum Spells
 {
     //ascended flameseeker
     SPELL_CONFOUNDING_FLAMES        = 76514,
-    SPELL_ERUPTING_FIRE                = 76517,
-    SPELL_ERUPTING_FIRE_H            = 90693,
-
+    SPELL_ERUPTING_FIRE             = 76517,
+    SPELL_ERUPTING_FIRE_H           = 90693,
     //ascended rockbreaker
-    SPELL_BURNING_FISTS                = 76086,
+    SPELL_BURNING_FISTS             = 76086,
     SPELL_PETRIFIED_SKIN            = 76792,
     SPELL_ROCK_SMASH                = 76779,
     SPELL_ROCK_SMASH_DMG            = 76782,
-    SPELL_ROCK_SMASH_DMG_H            = 90862,
-    SPELL_FISSURE_TRIGGER            = 76785,
-    SPELL_FISSURE_DMG                = 76786,
-    SPELL_FISSURE_DMG_H                = 90863,
-
+    SPELL_ROCK_SMASH_DMG_H          = 90862,
+    SPELL_FISSURE_TRIGGER           = 76785,
+    SPELL_FISSURE_DMG               = 76786,
+    SPELL_FISSURE_DMG_H             = 90863,
     //ascended waterlasher
     SPELL_FOCUSED_GAYSER            = 76797,
     SPELL_ABSORB_THUNDER            = 76095,
-    SPELL_LIGHTNING_CLOUD            = 76097, 
-    SPELL_LIGHTNING_STRIKE_DMG        = 76101,
-    SPELL_WATER_SPOUT                = 76794,
-
+    SPELL_LIGHTNING_CLOUD           = 76097, 
+    SPELL_LIGHTNING_STRIKE_DMG      = 76101,
+    SPELL_WATER_SPOUT               = 76794,
     //ascended windwalker
-    SPELL_ABSORB_WATER                = 76029, 
-    SPELL_WATER_INFUSIED_BLADES        = 76036, 
-    SPELL_TSUNAMI                    = 76045,
-    SPELL_WINDWALK                    = 76557,
-
+    SPELL_ABSORB_WATER              = 76029, 
+    SPELL_WATER_INFUSIED_BLADES     = 76036, 
+    SPELL_TSUNAMI                   = 76045,
+    SPELL_WINDWALK                  = 76557,
     //azureborne guardian
-    SPELL_ARCANE_INFUSION            = 76378,
-    SPELL_ARCANE_SLASH                = 76392,
+    SPELL_ARCANE_INFUSION           = 76378,
+    SPELL_ARCANE_SLASH              = 76392,
     SPELL_ARCANE_SLASH_H            = 90660,
-    SPELL_CURSE_OF_THE_AZUREBORNE    = 76394,
-
+    SPELL_CURSE_OF_THE_AZUREBORNE   = 76394,
     //azoreborne seer
-    SPELL_TWILIGHT_BOLT                = 76369,
+    SPELL_TWILIGHT_BOLT             = 76369,
     SPELL_TWISTED_ARCANE_TRIGGER    = 79446,
     SPELL_TWISTED_ARCANE            = 76340,
-    SPELL_TWISTED_ARCANE_H            = 90844, 
-    SPELL_WARPED_TWILIGHT            = 76370,
-    SPELL_WARPED_TWILIGHT_H            = 90300,
-    SPELL_WARPED_TWILIGHT_DUMMY        = 76373,
-
+    SPELL_TWISTED_ARCANE_H          = 90844, 
+    SPELL_WARPED_TWILIGHT           = 76370,
+    SPELL_WARPED_TWILIGHT_H         = 90300,
+    SPELL_WARPED_TWILIGHT_DUMMY     = 76373,
     //azureborne warlord
-    SPELL_AZURE_BLAST                = 76620,
-    SPELL_AZURE_BLAST_H                = 90697,
+    SPELL_AZURE_BLAST               = 76620,
+    SPELL_AZURE_BLAST_H             = 90697,
     SPELL_CONJURE_TWISTED_VISAGE    = 76626,
-
     //crimsonborne guardian
     SPELL_CRIMSON_CHARGE            = 76404,
-    SPELL_CRIMSON_SHOCKWAVE            = 76409,
-    SPELL_CRIMSON_SHOCKWAVE_H        = 90312,
-
+    SPELL_CRIMSON_SHOCKWAVE         = 76409,
+    SPELL_CRIMSON_SHOCKWAVE_H       = 90312,
     //crimsonborne seer
-    SPELL_BLAZING_TWILIGHT_SHIELD    = 76314,
-    SPELL_BLAZE                        = 76327,
-    SPELL_BLAZE_H                    = 90307,
-    SPELL_CORRUPTED_FLAME            = 76332,
-    
+    SPELL_BLAZING_TWILIGHT_SHIELD   = 76314,
+    SPELL_BLAZE                     = 76327,
+    SPELL_BLAZE_H                   = 90307,
+    SPELL_CORRUPTED_FLAME           = 76332,
     //crimsonborne warlord
-    SPELL_DISARMING_BLAZE            = 76679,
-    SPELL_EMPOWERING_TWILIGHT        = 76685,
-    SPELL_EMPOWERING_TWILIGHT_AURA    = 76692,
-    SPELL_EMPOWERING_TWILIGHT_DMG    = 76693,
-    SPELL_EMPOWERING_TWILIGHT_DMG_H    = 90707,
-
+    SPELL_DISARMING_BLAZE           = 76679,
+    SPELL_EMPOWERING_TWILIGHT       = 76685,
+    SPELL_EMPOWERING_TWILIGHT_AURA  = 76692,
+    SPELL_EMPOWERING_TWILIGHT_DMG   = 76693,
+    SPELL_EMPOWERING_TWILIGHT_DMG_H = 90707,
     //enslaved burning ember
-    SPELL_FLAME_SHOCK                = 90846,
-
+    SPELL_FLAME_SHOCK               = 90846,
     //enslaved gronn brute
-    SPELL_CRUNCH_ARMOR                = 76703,
-
+    SPELL_CRUNCH_ARMOR              = 76703,
     //enslaved rock elemental
     SPELL_JAGGED_ROCK_SHIELD        = 76014,
-
     //faceless corruptor
     SPELL_SIPHON_ESSENSE            = 75755,
-
     //trogg dweller
-    SPELL_CLAW_PUNCTURE                = 76507,
-
+    SPELL_CLAW_PUNCTURE             = 76507,
     //twilight armsmaster
-    SPELL_FLURRY_OF_BLOWS            = 76729,
-    SPELL_MORTAL_STRIKE                = 76727,
-    SPELL_MORTAL_STRIKE_H            = 90526,
-
+    SPELL_FLURRY_OF_BLOWS           = 76729,
+    SPELL_MORTAL_STRIKE             = 76727,
+    SPELL_MORTAL_STRIKE_H           = 90526,
     //twilight beguiler
-    SPELL_BEGUILE                    = 90719, //target script
-    SPELL_CHAINED_MIND                = 76711,
-    SPELL_DECEITFUL_BLAST            = 76715,
-
+    SPELL_BEGUILE                   = 90719, //target script
+    SPELL_CHAINED_MIND              = 76711,
+    SPELL_DECEITFUL_BLAST           = 76715,
     //twilight drake                
-    SPELL_TWILIGHT_BREATH            = 76817,
-
+    SPELL_TWILIGHT_BREATH           = 76817,
     //twilight earthshaper
-    SPELL_EARTH_SPIKE                = 76603,
-    SPELL_EARTH_SPIKE_H                = 90487,
+    SPELL_EARTH_SPIKE               = 76603,
+    SPELL_EARTH_SPIKE_H             = 90487,
     SPELL_STONE_SKIN                = 76596,
-    SPELL_SUMMON_ROCK_ELEMENTAL        = 74552,
-
+    SPELL_SUMMON_ROCK_ELEMENTAL     = 74552,
     //twilight enforcer
-    SPELL_DIZZY                        = 76415,
-    SPELL_MEAT_GRINDER                = 76411,
+    SPELL_DIZZY                     = 76415,
+    SPELL_MEAT_GRINDER              = 76411,
     SPELL_MEAT_GRINDER_H            = 90665,
-    SPELL_MEAT_GRINDER_DMG            = 76413,
+    SPELL_MEAT_GRINDER_DMG          = 76413,
     SPELL_MEAT_GRINDER_DMG_H        = 90664,
-    SPELL_MEAT_GRINDER_TRIGGER        = 76414,
-
+    SPELL_MEAT_GRINDER_TRIGGER      = 76414,
     //twilight firecatcher
-    SPELL_MOLTEN_BLAST                = 76765,
-    SPELL_FLAME_CONDUIT                = 76766,
-    SPELL_FLAME_CONDUIT_DMG            = 76768, 
-    SPELL_FLAME_CONDUIT_DMG_H        = 90850,
-    SPELL_SUMMON_BURNING_EMBER        = 74551,
-
+    SPELL_MOLTEN_BLAST              = 76765,
+    SPELL_FLAME_CONDUIT             = 76766,
+    SPELL_FLAME_CONDUIT_DMG         = 76768, 
+    SPELL_FLAME_CONDUIT_DMG_H       = 90850,
+    SPELL_SUMMON_BURNING_EMBER      = 74551,
     //twilight shadow weaver
-    SPELL_SHADOW_BOLT                = 76416,
-    SPELL_SHADOW_WEAVE_SCRIPT        = 90673, 
+    SPELL_SHADOW_BOLT               = 76416,
+    SPELL_SHADOW_WEAVE_SCRIPT       = 90673, 
     SPELL_SHADOW_WEAVE_DUMMY        = 90674,
-    SPELL_SHADOW_WEAVE_DMG            = 90678, 
-    SPELL_SUMMON_FELHUNTER            = 76418, 
+    SPELL_SHADOW_WEAVE_DMG          = 90678, 
+    SPELL_SUMMON_FELHUNTER          = 76418, 
     SPELL_SPELL_LOCK                = 40953, //heroic?
-
     //twilight stormbreaker
     SPELL_WATER_BOLT                = 76720,
-    SPELL_WATER_SHELL                = 90522,
-    SPELL_SUMMON_WATER_SPIRIT        = 74561,
-
+    SPELL_WATER_SHELL               = 90522,
+    SPELL_SUMMON_WATER_SPIRIT       = 74561,
     //twilight thunderbreaker
-    SPELL_CHAIN_LIGHTNING            = 76578, //5m
-    SPELL_CHAIN_LIGHTNING_H            = 90856,
+    SPELL_CHAIN_LIGHTNING           = 76578, //5m
+    SPELL_CHAIN_LIGHTNING_H         = 90856,
     SPELL_OVERCHARGE                = 76579,
-    SPELL_OVERCHARGE_H                = 90858,
+    SPELL_OVERCHARGE_H              = 90858,
     SPELL_ELECTRIC_BLAST            = 82973, //+dmg
-    SPELL_ELECTRIC_BLAST_H            = 90859,
-    SPELL_SUMMON_THUNDER_SPIRIT        = 75096,
-
+    SPELL_ELECTRIC_BLAST_H          = 90859,
+    SPELL_SUMMON_THUNDER_SPIRIT     = 75096,
     //twilight war-mage
-    SPELL_FIRE_ENCHANT                = 76822,
-    SPELL_ICE_ENCHANT                = 76823,
-    SPELL_POLYMORPH                    = 76826,
-
+    SPELL_FIRE_ENCHANT              = 76822,
+    SPELL_ICE_ENCHANT               = 76823,
+    SPELL_POLYMORPH                 = 76826,
     //twilight wyrmcaller
-    SPELL_FEED_PET                    = 76816, 
+    SPELL_FEED_PET                  = 76816 
 };
 
 enum Events
 {
     EVENT_CONFOUNDING_FLAMES        = 1,
-    EVENT_ERUPTING_FIRE                = 2,
-    EVENT_BURNING_FISTS                = 3,
+    EVENT_ERUPTING_FIRE             = 2,
+    EVENT_BURNING_FISTS             = 3,
     EVENT_PETRIFIED_SKIN            = 4,
     EVENT_ROCK_SMASH                = 5,
     EVENT_FOCUSED_GAYSER            = 6,
     EVENT_ABSORB_THUNDER            = 7,
-    EVENT_WATER_SPOUT                = 8,
-    EVENT_ABSORB_WATER                = 9,
-    EVENT_ARCANE_INFUSION            = 10,
-    EVENT_CURSE_OF_THE_AZUREBORNE    = 11,
-    EVENT_TWILIGHT_BOLT                = 12,
-    EVENT_WARPED_TWILIGHT            = 13,
-    EVENT_AZURE_BLAST                = 14,
+    EVENT_WATER_SPOUT               = 8,
+    EVENT_ABSORB_WATER              = 9,
+    EVENT_ARCANE_INFUSION           = 10,
+    EVENT_CURSE_OF_THE_AZUREBORNE   = 11,
+    EVENT_TWILIGHT_BOLT             = 12,
+    EVENT_WARPED_TWILIGHT           = 13,
+    EVENT_AZURE_BLAST               = 14,
     EVENT_CONJURE_TWISTED_VISAGE    = 15,
     EVENT_CRIMSON_CHARGE            = 16,
-    EVENT_BLAZING_TWILIGHT_SHIELD    = 17,
-    EVENT_CORRUPTED_FLAME            = 18,
-    EVENT_DISARMING_BLAZE            = 19,
-    EVENT_EMPOWERING_TWILIGHT        = 20,
-    EVENT_FLAME_SHOCK                = 21,
+    EVENT_BLAZING_TWILIGHT_SHIELD   = 17,
+    EVENT_CORRUPTED_FLAME           = 18,
+    EVENT_DISARMING_BLAZE           = 19,
+    EVENT_EMPOWERING_TWILIGHT       = 20,
+    EVENT_FLAME_SHOCK               = 21,
     EVENT_JAGGED_ROCK_SHIELD        = 22,
     EVENT_SIPHON_ESSENSE            = 23,
-    EVENT_CLAW_PUNCTURE                = 24,
-    EVENT_MORTAL_STRIKE                = 25,
-    EVENT_FLURRY_OF_BLOWS            = 26,
-    EVENT_TWILIGHT_BREATH            = 27,
+    EVENT_CLAW_PUNCTURE             = 24,
+    EVENT_MORTAL_STRIKE             = 25,
+    EVENT_FLURRY_OF_BLOWS           = 26,
+    EVENT_TWILIGHT_BREATH           = 27,
     EVENT_STONE_SKIN                = 28,
-    EVENT_EARTH_SPIKE                = 29,
-    EVENT_CHAINED_MIND                = 30,
-    EVENT_DECEITFUL_BLAST            = 31,
-    EVENT_CRUNCH_ARMOR                = 32,
-    EVENT_MEAT_GRINDER                = 33,
-    EVENT_FLAME_CONDUIT                = 34,
-    EVENT_MOLTEN_BLAST                = 35,
-    EVENT_CALL_WYRM                    = 36,
-    EVENT_ENCHANT                    = 37,
-    EVENT_POLYMORPH                    = 38,
-    EVENT_FEED_PET                    = 39,
-    EVENT_SHADOW_BOLT                = 40,
-    EVENT_SHADOW_WEAVE                = 41,
+    EVENT_EARTH_SPIKE               = 29,
+    EVENT_CHAINED_MIND              = 30,
+    EVENT_DECEITFUL_BLAST           = 31,
+    EVENT_CRUNCH_ARMOR              = 32,
+    EVENT_MEAT_GRINDER              = 33,
+    EVENT_FLAME_CONDUIT             = 34,
+    EVENT_MOLTEN_BLAST              = 35,
+    EVENT_CALL_WYRM                 = 36,
+    EVENT_ENCHANT                   = 37,
+    EVENT_POLYMORPH                 = 38,
+    EVENT_FEED_PET                  = 39,
+    EVENT_SHADOW_BOLT               = 40,
+    EVENT_SHADOW_WEAVE              = 41,
     EVENT_WATER_BOLT                = 42,
-    EVENT_WATER_SHELL                = 43,
-    EVENT_CHAIN_LIGHTNING            = 44,
-    EVENT_OVERCHARGE                = 45,
-
+    EVENT_WATER_SHELL               = 43,
+    EVENT_CHAIN_LIGHTNING           = 44,
+    EVENT_OVERCHARGE                = 45
 };
 
 class npc_ascended_flameseeker : public CreatureScript
 {
     public:
 
-        npc_ascended_flameseeker() : CreatureScript("npc_ascended_flameseeker"){}
+        npc_ascended_flameseeker() : CreatureScript("npc_ascended_flameseeker"){ }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -285,7 +258,7 @@ class npc_ascended_flameseeker : public CreatureScript
                 events.Reset();
             }
 
-            void EnterCombat(Unit* attacker)
+            void EnterCombat(Unit* /*attacker*/)
             {
                 events.ScheduleEvent(EVENT_CONFOUNDING_FLAMES, urand(5000, 10000));
                 events.ScheduleEvent(EVENT_ERUPTING_FIRE, urand(7000, 12000));
@@ -326,7 +299,7 @@ class npc_ascended_rockbreaker : public CreatureScript
 {
     public:
 
-        npc_ascended_rockbreaker() : CreatureScript("npc_ascended_rockbreaker"){}
+        npc_ascended_rockbreaker() : CreatureScript("npc_ascended_rockbreaker"){ }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -346,7 +319,7 @@ class npc_ascended_rockbreaker : public CreatureScript
                 events.Reset();
             }
 
-            void EnterCombat(Unit* attacker)
+            void EnterCombat(Unit* /*attacker*/)
             {
                 DoCast(me, SPELL_BURNING_FISTS);
                 events.ScheduleEvent(EVENT_BURNING_FISTS, 45000);
@@ -373,7 +346,7 @@ class npc_ascended_rockbreaker : public CreatureScript
                         events.ScheduleEvent(EVENT_BURNING_FISTS, 45000);
                         break;
                     case EVENT_PETRIFIED_SKIN:
-                        DoCast(me->GetVictim(), SPELL_PETRIFIED_SKIN);
+                        DoCastVictim(SPELL_PETRIFIED_SKIN);
                         events.ScheduleEvent(EVENT_PETRIFIED_SKIN, urand(8000, 12000));
                         break;
                     case EVENT_ROCK_SMASH:
@@ -392,7 +365,7 @@ class npc_ascended_waterlasher : public CreatureScript
 {
     public:
 
-        npc_ascended_waterlasher() : CreatureScript("npc_ascended_waterlasher"){}
+        npc_ascended_waterlasher() : CreatureScript("npc_ascended_waterlasher"){ }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -412,7 +385,7 @@ class npc_ascended_waterlasher : public CreatureScript
                 events.Reset();
             }
 
-            void EnterCombat(Unit* attacker)
+            void EnterCombat(Unit* /*attacker*/)
             {
                 events.ScheduleEvent(EVENT_ABSORB_THUNDER, urand(25000, 30000));
                 events.ScheduleEvent(EVENT_FOCUSED_GAYSER, urand(5000, 9000));
@@ -438,7 +411,7 @@ class npc_ascended_waterlasher : public CreatureScript
                         events.ScheduleEvent(EVENT_FOCUSED_GAYSER, urand(15000, 20000));
                         break;
                     case EVENT_WATER_SPOUT:
-                        DoCast(me->GetVictim(), SPELL_WATER_SPOUT);
+                        DoCastVictim(SPELL_WATER_SPOUT);
                         events.ScheduleEvent(EVENT_WATER_SPOUT, urand(15000, 20000));
                         break;
                     case EVENT_ABSORB_THUNDER:
@@ -456,7 +429,7 @@ class npc_ascended_windwalker: public CreatureScript
 {
     public:
 
-        npc_ascended_windwalker() : CreatureScript("npc_ascended_windwalker"){}
+        npc_ascended_windwalker() : CreatureScript("npc_ascended_windwalker"){ }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -476,7 +449,7 @@ class npc_ascended_windwalker: public CreatureScript
                 events.Reset();
             }
 
-            void EnterCombat(Unit* attacker)
+            void EnterCombat(Unit* /*attacker*/)
             {
                 events.ScheduleEvent(EVENT_ABSORB_WATER, urand(25000, 30000));
             }
@@ -510,7 +483,7 @@ class npc_azureborne_guardian: public CreatureScript
 {
     public:
 
-        npc_azureborne_guardian() : CreatureScript("npc_azureborne_guardian"){}
+        npc_azureborne_guardian() : CreatureScript("npc_azureborne_guardian"){ }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -530,7 +503,7 @@ class npc_azureborne_guardian: public CreatureScript
                 events.Reset();
             }
 
-            void EnterCombat(Unit* attacker)
+            void EnterCombat(Unit* /*attacker*/)
             {
                 events.ScheduleEvent(EVENT_ARCANE_INFUSION, urand(2000, 4000));
                 events.ScheduleEvent(EVENT_CURSE_OF_THE_AZUREBORNE, urand(6000, 7000));
@@ -570,7 +543,7 @@ class npc_azureborne_seer: public CreatureScript
 {
     public:
 
-        npc_azureborne_seer() : CreatureScript("npc_azureborne_seer"){}
+        npc_azureborne_seer() : CreatureScript("npc_azureborne_seer"){ }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -590,7 +563,7 @@ class npc_azureborne_seer: public CreatureScript
                 events.Reset();
             }
 
-            void EnterCombat(Unit* attacker)
+            void EnterCombat(Unit* /*attacker*/)
             {
                 events.ScheduleEvent(EVENT_WARPED_TWILIGHT, urand(15000, 20000));
                 events.ScheduleEvent(EVENT_TWILIGHT_BOLT, urand(1000, 2000));
@@ -619,7 +592,7 @@ class npc_azureborne_seer: public CreatureScript
                     switch(eventId)
                     {
                     case EVENT_TWILIGHT_BOLT:
-                        DoCast(me->GetVictim(), SPELL_TWILIGHT_BOLT);
+                        DoCastVictim(SPELL_TWILIGHT_BOLT);
                         events.ScheduleEvent(EVENT_TWILIGHT_BOLT, 3500);
                         break;
                     case EVENT_WARPED_TWILIGHT:
@@ -637,7 +610,7 @@ class npc_azureborne_warlord: public CreatureScript
 {
     public:
 
-        npc_azureborne_warlord() : CreatureScript("npc_azureborne_warlord"){}
+        npc_azureborne_warlord() : CreatureScript("npc_azureborne_warlord"){ }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -657,7 +630,7 @@ class npc_azureborne_warlord: public CreatureScript
                 events.Reset();
             }
 
-            void EnterCombat(Unit* attacker)
+            void EnterCombat(Unit* /*attacker*/)
             {
                 events.ScheduleEvent(EVENT_AZURE_BLAST, urand(5000, 10000));
                 events.ScheduleEvent(EVENT_CONJURE_TWISTED_VISAGE, urand(7000, 12000));
@@ -696,7 +669,7 @@ class npc_crimsonborne_guardian: public CreatureScript
 {
     public:
 
-        npc_crimsonborne_guardian() : CreatureScript("npc_crimsonborne_guardian"){}
+        npc_crimsonborne_guardian() : CreatureScript("npc_crimsonborne_guardian"){ }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -716,7 +689,7 @@ class npc_crimsonborne_guardian: public CreatureScript
                 events.Reset();
             }
 
-            void EnterCombat(Unit* attacker)
+            void EnterCombat(Unit* /*attacker*/)
             {
                 events.ScheduleEvent(EVENT_CRIMSON_CHARGE, urand(3000, 5000));
             }
@@ -751,7 +724,7 @@ class npc_crimsonborne_seer: public CreatureScript
 {
     public:
 
-        npc_crimsonborne_seer() : CreatureScript("npc_crimsonborne_seer"){}
+        npc_crimsonborne_seer() : CreatureScript("npc_crimsonborne_seer"){ }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -771,7 +744,7 @@ class npc_crimsonborne_seer: public CreatureScript
                 events.Reset();
             }
 
-            void EnterCombat(Unit* attacker)
+            void EnterCombat(Unit* /*attacker*/)
             {
                 events.ScheduleEvent(EVENT_BLAZING_TWILIGHT_SHIELD, urand(2000, 5000));
                 events.ScheduleEvent(EVENT_CORRUPTED_FLAME, urand(6000, 10000));
@@ -811,7 +784,7 @@ class npc_crimsonborne_warlord: public CreatureScript
 {
     public:
 
-        npc_crimsonborne_warlord() : CreatureScript("npc_crimsonborne_warlord"){}
+        npc_crimsonborne_warlord() : CreatureScript("npc_crimsonborne_warlord"){ }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -831,7 +804,7 @@ class npc_crimsonborne_warlord: public CreatureScript
                 events.Reset();
             }
 
-            void EnterCombat(Unit* attacker)
+            void EnterCombat(Unit* /*attacker*/)
             {
                 events.ScheduleEvent(EVENT_DISARMING_BLAZE, urand(3000, 5000));
                 events.ScheduleEvent(EVENT_EMPOWERING_TWILIGHT, urand(9000, 12000));
@@ -852,7 +825,7 @@ class npc_crimsonborne_warlord: public CreatureScript
                     switch(eventId)
                     {
                     case EVENT_DISARMING_BLAZE:
-                        DoCast(me->GetVictim(), SPELL_DISARMING_BLAZE);
+                        DoCastVictim(SPELL_DISARMING_BLAZE);
                         events.ScheduleEvent(EVENT_DISARMING_BLAZE, urand(10000, 12000));
                         break;
                     case EVENT_EMPOWERING_TWILIGHT:
@@ -870,7 +843,7 @@ class npc_enslaved_burning_ember: public CreatureScript
 {
     public:
 
-        npc_enslaved_burning_ember() : CreatureScript("npc_enslaved_burning_ember"){}
+        npc_enslaved_burning_ember() : CreatureScript("npc_enslaved_burning_ember"){ }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -890,7 +863,7 @@ class npc_enslaved_burning_ember: public CreatureScript
                 events.Reset();
             }
 
-            void EnterCombat(Unit* attacker)
+            void EnterCombat(Unit* /*attacker*/)
             {
                 events.ScheduleEvent(EVENT_FLAME_SHOCK, urand(3000, 4000));
             }
@@ -925,7 +898,7 @@ class npc_enslaved_rock_elemental: public CreatureScript
 {
     public:
 
-        npc_enslaved_rock_elemental() : CreatureScript("npc_enslaved_rock_elemental"){}
+        npc_enslaved_rock_elemental() : CreatureScript("npc_enslaved_rock_elemental"){ }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -945,7 +918,7 @@ class npc_enslaved_rock_elemental: public CreatureScript
                 events.Reset();
             }
 
-            void EnterCombat(Unit* attacker)
+            void EnterCombat(Unit* /*attacker*/)
             {
                 events.ScheduleEvent(EVENT_JAGGED_ROCK_SHIELD, 10000);
             }
@@ -979,7 +952,7 @@ class npc_enslaved_gronn_brute: public CreatureScript
 {
     public:
 
-        npc_enslaved_gronn_brute() : CreatureScript("npc_enslaved_gronn_brute"){}
+        npc_enslaved_gronn_brute() : CreatureScript("npc_enslaved_gronn_brute"){ }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -999,7 +972,7 @@ class npc_enslaved_gronn_brute: public CreatureScript
                 events.Reset();
             }
 
-            void EnterCombat(Unit* attacker)
+            void EnterCombat(Unit* /*attacker*/)
             {
                 events.ScheduleEvent(EVENT_CRUNCH_ARMOR, urand(2000, 4000));
             }
@@ -1019,7 +992,7 @@ class npc_enslaved_gronn_brute: public CreatureScript
                     switch(eventId)
                     {
                     case EVENT_CRUNCH_ARMOR:
-                        DoCast(me->GetVictim(), SPELL_CRUNCH_ARMOR);
+                        DoCastVictim(SPELL_CRUNCH_ARMOR);
                         events.ScheduleEvent(EVENT_CRUNCH_ARMOR, urand(10000, 15000));
                         break;
                     }
@@ -1033,7 +1006,7 @@ class npc_faceless_corruptor : public CreatureScript
 {
     public:
 
-        npc_faceless_corruptor() : CreatureScript("npc_faceless_corruptor"){}
+        npc_faceless_corruptor() : CreatureScript("npc_faceless_corruptor"){ }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -1064,7 +1037,7 @@ class npc_faceless_corruptor : public CreatureScript
                 events.Reset();
             }
 
-            void EnterCombat(Unit* attacker)
+            void EnterCombat(Unit* /*attacker*/)
             {
                 events.ScheduleEvent(EVENT_SIPHON_ESSENSE, urand(5000, 7000));
             }
@@ -1099,7 +1072,7 @@ class npc_trogg_dweller : public CreatureScript
 {
     public:
 
-        npc_trogg_dweller() : CreatureScript("npc_trogg_dweller"){}
+        npc_trogg_dweller() : CreatureScript("npc_trogg_dweller"){ }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -1119,7 +1092,7 @@ class npc_trogg_dweller : public CreatureScript
                 events.Reset();
             }
 
-            void EnterCombat(Unit* attacker)
+            void EnterCombat(Unit* /*attacker*/)
             {
                 events.ScheduleEvent(EVENT_CLAW_PUNCTURE, urand(5000, 7000));
             }
@@ -1140,7 +1113,7 @@ class npc_trogg_dweller : public CreatureScript
                     switch(eventId)
                     {
                     case EVENT_CLAW_PUNCTURE:
-                        DoCast(me->GetVictim(), SPELL_CLAW_PUNCTURE);
+                        DoCastVictim(SPELL_CLAW_PUNCTURE);
                         events.ScheduleEvent(EVENT_CLAW_PUNCTURE, urand(5000, 7000));
                         break;
                     }
@@ -1154,7 +1127,7 @@ class npc_twilight_armsmaster : public CreatureScript
 {
     public:
 
-        npc_twilight_armsmaster() : CreatureScript("npc_twilight_armsmaster"){}
+        npc_twilight_armsmaster() : CreatureScript("npc_twilight_armsmaster"){ }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -1174,7 +1147,7 @@ class npc_twilight_armsmaster : public CreatureScript
                 events.Reset();
             }
 
-            void EnterCombat(Unit* attacker)
+            void EnterCombat(Unit* /*attacker*/)
             {
                 events.ScheduleEvent(EVENT_MORTAL_STRIKE, urand(3000, 4000));
                 events.ScheduleEvent(EVENT_FLURRY_OF_BLOWS, urand(8000, 10000));
@@ -1195,7 +1168,7 @@ class npc_twilight_armsmaster : public CreatureScript
                     switch (eventId)
                     {
                     case EVENT_MORTAL_STRIKE:
-                        DoCast(me->GetVictim(), SPELL_MORTAL_STRIKE);
+                        DoCastVictim(SPELL_MORTAL_STRIKE);
                         events.ScheduleEvent(EVENT_MORTAL_STRIKE, urand(6000, 8000));
                         break;
                     case EVENT_FLURRY_OF_BLOWS:
@@ -1213,7 +1186,7 @@ class npc_twilight_beguiler : public CreatureScript
 {
     public:
 
-        npc_twilight_beguiler() : CreatureScript("npc_twilight_beguiler"){}
+        npc_twilight_beguiler() : CreatureScript("npc_twilight_beguiler"){ }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -1233,7 +1206,7 @@ class npc_twilight_beguiler : public CreatureScript
                 events.Reset();
             }
 
-            void EnterCombat(Unit* attacker)
+            void EnterCombat(Unit* /*attacker*/)
             {
                 events.ScheduleEvent(EVENT_CHAINED_MIND, urand(5000, 9000));
                 events.ScheduleEvent(EVENT_DECEITFUL_BLAST, urand(2000, 4000));
@@ -1276,7 +1249,7 @@ class npc_twilight_drake_gb : public CreatureScript
 {
     public:
 
-        npc_twilight_drake_gb() : CreatureScript("npc_twilight_drake_gb"){}
+        npc_twilight_drake_gb() : CreatureScript("npc_twilight_drake_gb"){ }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -1296,7 +1269,7 @@ class npc_twilight_drake_gb : public CreatureScript
                 events.Reset();
             }
 
-            void EnterCombat(Unit* attacker)
+            void EnterCombat(Unit* /*attacker*/)
             {
                 events.ScheduleEvent(EVENT_TWILIGHT_BREATH, urand(5000, 7000));
             }
@@ -1330,7 +1303,7 @@ class npc_twilight_earthshaper : public CreatureScript
 {
     public:
 
-        npc_twilight_earthshaper() : CreatureScript("npc_twilight_earthshaper"){}
+        npc_twilight_earthshaper() : CreatureScript("npc_twilight_earthshaper"){ }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -1351,7 +1324,7 @@ class npc_twilight_earthshaper : public CreatureScript
                 events.Reset();
             }
 
-            void EnterCombat(Unit* attacker)
+            void EnterCombat(Unit* /*attacker*/)
             {
                 events.ScheduleEvent(EVENT_EARTH_SPIKE, urand(3000, 5000));
                 events.ScheduleEvent(EVENT_STONE_SKIN, urand(4000, 7000));
@@ -1391,7 +1364,7 @@ class npc_twilight_enforcer : public CreatureScript
 {
     public:
 
-        npc_twilight_enforcer() : CreatureScript("npc_twilight_enforcer"){}
+        npc_twilight_enforcer() : CreatureScript("npc_twilight_enforcer"){ }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -1411,7 +1384,7 @@ class npc_twilight_enforcer : public CreatureScript
                 events.Reset();
             }
 
-            void EnterCombat(Unit* attacker)
+            void EnterCombat(Unit* /*attacker*/)
             {
                 events.ScheduleEvent(EVENT_MEAT_GRINDER, urand(5000, 6000));
             }
@@ -1446,7 +1419,7 @@ class npc_twilight_firecatcher : public CreatureScript
 {
     public:
 
-        npc_twilight_firecatcher() : CreatureScript("npc_twilight_firecatcher"){}
+        npc_twilight_firecatcher() : CreatureScript("npc_twilight_firecatcher"){ }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -1467,7 +1440,7 @@ class npc_twilight_firecatcher : public CreatureScript
                 events.Reset();
             }
 
-            void EnterCombat(Unit* attacker)
+            void EnterCombat(Unit* /*attacker*/)
             {
                 events.ScheduleEvent(EVENT_MOLTEN_BLAST, urand(2000, 3000));
                 events.ScheduleEvent(EVENT_FLAME_CONDUIT, urand(6000, 9000));
@@ -1488,7 +1461,7 @@ class npc_twilight_firecatcher : public CreatureScript
                     switch (eventId)
                     {
                     case EVENT_MOLTEN_BLAST:
-                        DoCast(me->GetVictim(), SPELL_MOLTEN_BLAST);
+                        DoCastVictim(SPELL_MOLTEN_BLAST);
                         events.ScheduleEvent(EVENT_MOLTEN_BLAST, urand(8000, 10000));
                         break;
                     case EVENT_FLAME_CONDUIT:
@@ -1507,7 +1480,7 @@ class npc_twilight_shadow_weaver : public CreatureScript
 {
     public:
 
-        npc_twilight_shadow_weaver() : CreatureScript("npc_twilight_shadow_weaver"){}
+        npc_twilight_shadow_weaver() : CreatureScript("npc_twilight_shadow_weaver"){ }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -1529,7 +1502,7 @@ class npc_twilight_shadow_weaver : public CreatureScript
                 events.Reset();
             }
 
-            void EnterCombat(Unit* attacker)
+            void EnterCombat(Unit* /*attacker*/)
             {
                 events.ScheduleEvent(EVENT_SHADOW_BOLT, urand(1000, 2000));
                 if (IsHeroic())
@@ -1551,7 +1524,7 @@ class npc_twilight_shadow_weaver : public CreatureScript
                     switch (eventId)
                     {
                     case EVENT_SHADOW_BOLT:
-                        DoCast(me->GetVictim(), SPELL_SHADOW_BOLT);
+                        DoCastVictim(SPELL_SHADOW_BOLT);
                         events.ScheduleEvent(EVENT_SHADOW_BOLT, urand(2500, 3000));
                         break;
                     case EVENT_SHADOW_WEAVE:
@@ -1569,7 +1542,7 @@ class npc_twilight_stormbreaker : public CreatureScript
 {
     public:
 
-        npc_twilight_stormbreaker() : CreatureScript("npc_twilight_stormbreaker"){}
+        npc_twilight_stormbreaker() : CreatureScript("npc_twilight_stormbreaker"){ }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -1590,7 +1563,7 @@ class npc_twilight_stormbreaker : public CreatureScript
                 events.Reset();
             }
 
-            void EnterCombat(Unit* attacker)
+            void EnterCombat(Unit* /*attacker*/)
             {
                 events.ScheduleEvent(EVENT_WATER_BOLT, urand(1000, 2000));
                 if (IsHeroic())
@@ -1612,7 +1585,7 @@ class npc_twilight_stormbreaker : public CreatureScript
                     switch (eventId)
                     {
                     case EVENT_WATER_BOLT:
-                        DoCast(me->GetVictim(), SPELL_WATER_BOLT);
+                        DoCastVictim(SPELL_WATER_BOLT);
                         events.ScheduleEvent(EVENT_WATER_BOLT, urand(2500, 3000));
                         break;
                     case EVENT_WATER_SHELL:
@@ -1630,7 +1603,7 @@ class npc_twilight_thundercaller : public CreatureScript
 {
     public:
 
-        npc_twilight_thundercaller() : CreatureScript("npc_twilight_thundercaller"){}
+        npc_twilight_thundercaller() : CreatureScript("npc_twilight_thundercaller"){ }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -1651,7 +1624,7 @@ class npc_twilight_thundercaller : public CreatureScript
                 events.Reset();
             }
 
-            void EnterCombat(Unit* attacker)
+            void EnterCombat(Unit* /*attacker*/)
             {
                 events.ScheduleEvent(EVENT_CHAIN_LIGHTNING, urand(2000, 3000));
                 events.ScheduleEvent(EVENT_OVERCHARGE, urand(9000, 12000));
@@ -1672,7 +1645,7 @@ class npc_twilight_thundercaller : public CreatureScript
                     switch (eventId)
                     {
                     case EVENT_CHAIN_LIGHTNING:
-                        DoCast(me->GetVictim(), SPELL_CHAIN_LIGHTNING);
+                        DoCastVictim(SPELL_CHAIN_LIGHTNING);
                         events.ScheduleEvent(EVENT_CHAIN_LIGHTNING, urand(5000, 7000));
                         break;
                     case EVENT_OVERCHARGE:
@@ -1693,7 +1666,7 @@ class npc_twilight_wyrmcaller : public CreatureScript
 {
     public:
 
-        npc_twilight_wyrmcaller() : CreatureScript("npc_twilight_wyrmcaller"){}
+        npc_twilight_wyrmcaller() : CreatureScript("npc_twilight_wyrmcaller"){ }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -1715,7 +1688,7 @@ class npc_twilight_wyrmcaller : public CreatureScript
                 events.Reset();
             }
 
-            void EnterCombat(Unit* attacker)
+            void EnterCombat(Unit* /*attacker*/)
             {
                 events.ScheduleEvent(EVENT_CALL_WYRM, 3000);
             }
@@ -1746,7 +1719,7 @@ class npc_twilight_wyrmcaller : public CreatureScript
                     {
                     case EVENT_CALL_WYRM:
                         me->MonsterYell(SAY_CALL_WYRM, 0, 0);
-                        if (Creature* _wyrm = me->SummonCreature(npc_twilight_drake_gb_1, 
+                        if (Creature* _wyrm = me->SummonCreature(NPC_TWILIGHT_DRAKE_GB_1, 
                             me->GetPositionX(),
                             me->GetPositionY(),
                             me->GetPositionZ() + 20.0f,
@@ -1758,7 +1731,7 @@ class npc_twilight_wyrmcaller : public CreatureScript
                         events.ScheduleEvent(EVENT_FEED_PET, urand(3000, 5000));
                         break;
                     case EVENT_FEED_PET:
-                        if (Creature* _wyrm = me->FindNearestCreature(npc_twilight_drake_gb_1, 100.0f, true))
+                        if (Creature* _wyrm = me->FindNearestCreature(NPC_TWILIGHT_DRAKE_GB_1, 100.0f, true))
                             DoCast(_wyrm, SPELL_FEED_PET);
                         break;
                     }
@@ -1772,7 +1745,7 @@ class npc_twilight_war_mage : public CreatureScript
 {
     public:
 
-        npc_twilight_war_mage() : CreatureScript("npc_twilight_war_mage"){}
+        npc_twilight_war_mage() : CreatureScript("npc_twilight_war_mage"){ }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -1792,7 +1765,7 @@ class npc_twilight_war_mage : public CreatureScript
                 events.Reset();
             }
 
-            void EnterCombat(Unit* attacker)
+            void EnterCombat(Unit* /*attacker*/)
             {
                 events.ScheduleEvent(EVENT_ENCHANT, 1000);
                 events.ScheduleEvent(EVENT_POLYMORPH, urand(5000, 7000));
@@ -1831,7 +1804,7 @@ class npc_ascended_rockbreaker_fissure : public CreatureScript
 {
     public:
 
-        npc_ascended_rockbreaker_fissure() : CreatureScript("npc_ascended_rockbreaker_fissure"){}
+        npc_ascended_rockbreaker_fissure() : CreatureScript("npc_ascended_rockbreaker_fissure"){ }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -1851,9 +1824,7 @@ class npc_ascended_rockbreaker_fissure : public CreatureScript
                 DoCast(me, SPELL_FISSURE_TRIGGER);
             }
 
-            void UpdateAI(uint32 diff)
-            {
-            }
+            void UpdateAI(uint32 /*diff*/) { }
         };
 };
 
@@ -1861,7 +1832,7 @@ class npc_crimsonborne_warlord_empowering_flames : public CreatureScript
 {
     public:
 
-        npc_crimsonborne_warlord_empowering_flames() : CreatureScript("npc_crimsonborne_warlord_empowering_flames"){}
+        npc_crimsonborne_warlord_empowering_flames() : CreatureScript("npc_crimsonborne_warlord_empowering_flames"){ }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -1881,9 +1852,7 @@ class npc_crimsonborne_warlord_empowering_flames : public CreatureScript
                 DoCast(me, SPELL_EMPOWERING_TWILIGHT_AURA);
             }
 
-            void UpdateAI(uint32 diff)
-            {
-            }
+            void UpdateAI(uint32 /*diff*/) { }
         };
 };
 
@@ -1896,7 +1865,7 @@ class spell_twilight_enforcer_meat_grinder : public SpellScriptLoader
         {
             PrepareAuraScript(spell_twilight_enforcer_meat_grinder_AuraScript);
 
-            void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 if (!GetCaster())
                     return;

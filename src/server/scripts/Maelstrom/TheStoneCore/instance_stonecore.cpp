@@ -1,9 +1,14 @@
-/*Copyright (C) 2014 Arkania Project.
-*
-* THIS particular file is NOT free software; third-party users should NOT have access to it, redistribute it or modify it. :)
-*/
+/*
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ *
+ * THIS particular file is NOT free software; third-party users should 
+ * NOT have access to it, redistribute it or modify it.
+ * We need to think up a better copyright than this. Who's your third party
+ * on the net dude, dude? Should NOT? Er must nicht!
+ */
 
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "InstanceScript.h"
 #include "stonecore.h"
 
 #define MAX_ENCOUNTER     4
@@ -20,7 +25,7 @@ public:
 
     struct instance_stonecore_InstanceMapScript : public InstanceScript
     {
-        instance_stonecore_InstanceMapScript(Map* map) : InstanceScript(map) {};
+        instance_stonecore_InstanceMapScript(Map* map) : InstanceScript(map) { };
 
         uint64 Corborus;
         uint64 Slabhide;
@@ -49,7 +54,7 @@ public:
              return false;
         }
 
-        void OnCreatureCreate(Creature* creature, bool /*add*/)
+        void OnCreatureCreate(Creature* creature)
         {
             Map::PlayerList const &players = instance->GetPlayers();
 
@@ -76,7 +81,7 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 identifier)
+        uint64 GetData64(uint32 identifier) const
         {
             switch (identifier)
             {
@@ -111,7 +116,7 @@ public:
                SaveToDB();
         }
 
-        uint32 GetData(uint32 type)
+        uint32 GetData(uint32 type) const
         {
             switch (type)
             {

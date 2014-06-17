@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/> 
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -20,7 +20,8 @@
 #ifndef _LINKEDLIST
 #define _LINKEDLIST
 
-#include "Common.h"
+#include "Define.h"
+#include <iterator>
 
 //============================================
 class LinkedListHead;
@@ -33,8 +34,8 @@ class LinkedListElement
         LinkedListElement* iNext;
         LinkedListElement* iPrev;
     public:
-        LinkedListElement() { iNext = NULL; iPrev = NULL; }
-        ~LinkedListElement() { delink(); }
+        LinkedListElement() : iNext(NULL), iPrev(NULL) { }
+        virtual ~LinkedListElement() { delink(); }
 
         bool hasNext() const { return(iNext && iNext->iNext != NULL); }
         bool hasPrev() const { return(iPrev && iPrev->iPrev != NULL); }
@@ -73,6 +74,10 @@ class LinkedListElement
             iNext->iPrev = pElem;
             iNext = pElem;
         }
+
+    private:
+        LinkedListElement(LinkedListElement const&);
+        LinkedListElement& operator=(LinkedListElement const&);
 };
 
 //============================================
@@ -83,15 +88,17 @@ class LinkedListHead
         LinkedListElement iFirst;
         LinkedListElement iLast;
         uint32 iSize;
+
     public:
-        LinkedListHead()
+        LinkedListHead(): iSize(0)
         {
             // create empty list
 
             iFirst.iNext = &iLast;
             iLast.iPrev = &iFirst;
-            iSize = 0;
         }
+
+        virtual ~LinkedListHead() { }
 
         bool isEmpty() const { return(!iFirst.iNext->isInList()); }
 
@@ -154,13 +161,14 @@ class LinkedListHead
 
                 Iterator& operator=(Iterator const &_Right)
                 {
-                    return (*this) = _Right._Ptr;
+                    _Ptr = _Right._Ptr;
+                    return *this;
                 }
 
                 Iterator& operator=(const_pointer const &_Right)
                 {
-                    _Ptr = (pointer)_Right;
-                    return (*this);
+                    _Ptr = pointer(_Right);
+                    return *this;
                 }
 
                 reference operator*()
@@ -239,8 +247,11 @@ class LinkedListHead
         };
 
         typedef Iterator<LinkedListElement> iterator;
+
+    private:
+        LinkedListHead(LinkedListHead const&);
+        LinkedListHead& operator=(LinkedListHead const&);
 };
 
 //============================================
 #endif
-

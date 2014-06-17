@@ -1,18 +1,17 @@
-/*Copyright (C) 2014 Arkania Project.
-*
-* Script 99% done. 1% = Testing live.
-*
-* THIS particular file is NOT free software; third-party users should NOT have access to it, redistribute it or modify it. :)
-* We need to think up a better copyright than this. Who's your third party on the net dude, dude? Should NOT? Er must nicht!
-*/
+/*
+ * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ *
+ * THIS particular file is NOT free software; third-party users should 
+ * NOT have access to it, redistribute it or modify it.
+ * We need to think up a better copyright than this. Who's your third party
+ * on the net dude, dude? Should NOT? Er must nicht!
+ */
 
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "stonecore.h"
 #include "Vehicle.h"
 #include "Unit.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
 #include "ScriptedEscortAI.h"
 #include "Cell.h"
 #include "CellImpl.h"
@@ -115,7 +114,7 @@ class boss_ozruk : public CreatureScript
                 }
             }
 
-            void JustDied(Unit* killer)
+            void JustDied(Unit* /*killer*/)
             {
                 if (instance)
                 {
@@ -186,7 +185,7 @@ class boss_ozruk : public CreatureScript
                                 break;
                                 
                             case EVENT_PARALYZE_DAMAGE:
-                                if (Unit* target = me->GetVictim())
+                                if (me->GetVictim())
                                 {
                                     std::list<HostileReference*> t_list = me->getThreatManager().getThreatList();
                                     for (std::list<HostileReference*>::const_iterator itr = t_list.begin(); itr!= t_list.end(); ++itr)
@@ -231,7 +230,7 @@ public:
 
         uint32 timerAura;
         
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* /*who*/)
         {
                 me->SetSpeed(MOVE_RUN, 0.8f);
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -269,7 +268,7 @@ class spell_ozruk_paralyze : public SpellScriptLoader
         {
             PrepareAuraScript(spell_ozruk_paralyze_AuraScript);
 
-            void OnRemove(AuraEffect const* /*aurEff* /, AuraEffectHandleModes /*mode* /)
+            void OnRemove(AuraEffect const* / *aurEff* /, AuraEffectHandleModes / *mode* /)
             {
                 switch (GetTargetApplication()->GetRemoveMode())
                 {
