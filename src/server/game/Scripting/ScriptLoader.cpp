@@ -259,6 +259,7 @@ void AddSC_instance_the_stockade();
 void AddSC_coldridge_valley();
 void AddSC_elwynn_forest();
 void AddSC_gilneas_city();
+void AddSC_gilneas_duskhaven();
 
 
 //void AddSC_alterac_mountains();
@@ -1043,7 +1044,7 @@ void AddEasternKingdomsScripts()
 	AddSC_coldridge_valley();
 	AddSC_elwynn_forest();
 	AddSC_gilneas_city();
-
+    AddSC_gilneas_duskhaven();
 
 #endif
 }
