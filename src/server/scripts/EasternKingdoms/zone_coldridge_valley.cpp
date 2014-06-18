@@ -30,6 +30,7 @@ EndContentData */
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
 #include "Player.h"
 
@@ -599,6 +600,135 @@ public:
     }
 };
 
+// ################################################ Quest: Follow that Gyro-Copter! 24491
+
+enum eQuest24491
+{
+    QUEST_FOLLOW_THAT_GYRO_COPTER = 24491,
+
+    NPC_HANDS_SPRINGSPROCKET = 6782,
+
+    SPELL_SEE_COLDRIGE_TUNNEL_ROCKS_SEE_QUEST_INVIS_1 = 70042,
+    SPELL_SEE_MILO_GEARTWINGE_SEE_QUEST_INVIS_2 = 70044,
+    SPELL_MILO_GEARTWINGE_INVISIBILITY_QUEST_INVIS_2 = 70045,
+};
+
+class npc_hands_springsprocket : public CreatureScript
+{
+public:
+    npc_hands_springsprocket() : CreatureScript("npc_hands_springsprocket") { }
+
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) 
+    { 
+        if (quest->GetQuestId() == QUEST_FOLLOW_THAT_GYRO_COPTER)
+            if (!player->HasAura(SPELL_SEE_MILO_GEARTWINGE_SEE_QUEST_INVIS_2))
+            {                
+                player->CastSpell(player, SPELL_SEE_COLDRIGE_TUNNEL_ROCKS_SEE_QUEST_INVIS_1, true);
+                player->CastSpell(player, SPELL_SEE_MILO_GEARTWINGE_SEE_QUEST_INVIS_2, true);               
+            }         
+
+        return true; 
+    }
+};
+
+
+// ################################################ Quest: Pack Your Bags 24492
+
+enum eQuest24492
+{    
+    QUEST_PACK_YOUR_BAGS = 24492,
+
+    NPC_MILO_GEARTWINGE = 37113,
+    NPC_MILO_GEARTWINGE_SPAWNED = 37518,
+    NPC_MILOS_GYRO = 37169,
+    NPC_MILOS_GYRO_SPAWNED = 37198,
+
+    SPELL_SUMMON_MILOS_GYROCOPTER = 70035,
+    SPELL_RIDING_MILOS_GYRO = 70036,
+};
+
+class npc_milos_gyro_spawned : public CreatureScript
+{
+public:
+    npc_milos_gyro_spawned() : CreatureScript("npc_milos_gyro_spawned") { }
+
+    struct npc_milos_gyro_spawnedAI : public npc_escortAI
+    {
+        npc_milos_gyro_spawnedAI(Creature* creature) : npc_escortAI(creature) 
+        {             
+            AddWaypoint(1, -6220.035645f, 296.816772f, 409.775787f);
+            AddWaypoint(2, -6180.738281f, 271.849091f, 435.231506f);
+            AddWaypoint(3, -6167.073730f, 213.735809f, 470.028137f);
+            AddWaypoint(4, -6134.929688f, 124.723755f, 507.195953f);
+            AddWaypoint(5, -6075.491699f, 73.982384f, 510.407410f);
+            AddWaypoint(6, -5984.715820f, -9.166074f, 470.231415f);
+            AddWaypoint(7, -5908.320313f, -225.218124f, 490.649323f);
+            AddWaypoint(8, -5727.785156f, -416.732208f, 466.876831f);
+            AddWaypoint(9, -5647.638672f, -482.040649f, 399.289917f);
+            AddWaypoint(10, -5629.615234f, -484.758545f, 396.980530f);
+            AddWaypoint(11, -5618.415527f, -484.724670f, 396.980530f);
+
+            SetDespawnAtEnd(true);
+            me->EnableAI();
+            _phase = 0;
+        }
+
+        uint32 _phase;
+
+        void PassengerBoarded(Unit* who, int8 seatId, bool apply)
+        {
+            if (!apply)
+                return;
+
+            if (seatId == 0)
+            {
+                me->SetSpeed(MOVE_FLIGHT, 2.0f, true);
+                Start();                
+            }
+        }
+
+        void WaypointReached(uint32 point)
+        {
+            _phase++;
+            switch (_phase)
+            {
+            case 1:
+                Talk(0);
+                break;
+            case 3:
+                Talk(1);
+                break;
+            case 4:
+                Talk(2);
+                break;
+            case 5:
+                Talk(3);
+                break;
+            case 6:
+                Talk(4);
+                break;
+            case 7:
+                Talk(5);
+                break;
+            case 8:
+                Talk(6);
+                break;
+            }
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+            npc_escortAI::UpdateAI(diff);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_milos_gyro_spawnedAI(creature);
+    }
+   
+};
+
 /*######
 ## AddSC
 ######*/
@@ -612,5 +742,7 @@ void AddSC_coldridge_valley()
 	new npc_soothsayer_rikkari();
 	new npc_soothsayer_mirimkoa();
     new npc_rockjaw_scavenger();
+    new npc_hands_springsprocket();
+    new npc_milos_gyro_spawned();
 }
 
