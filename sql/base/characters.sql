@@ -1,15 +1,17 @@
 /*
-SQLyog Community Edition- MySQL GUI v5.2 Beta 3
-Host - 5.5.30 : Database - trinitycharacters
+SQLyog Ultimate v11.28 (64 bit)
+MySQL - 5.5.27 : Database - ng_chars
 *********************************************************************
-Server version : 5.5.30
 */
 
-SET NAMES utf8;
+/*!40101 SET NAMES utf8 */;
 
-SET SQL_MODE='';
-SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO';
+/*!40101 SET SQL_MODE=''*/;
 
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 /*Table structure for table `account_data` */
 
 DROP TABLE IF EXISTS `account_data`;
@@ -133,6 +135,21 @@ CREATE TABLE `auctionhouse` (
 
 /*Data for the table `auctionhouse` */
 
+/*Table structure for table `banned_addons` */
+
+DROP TABLE IF EXISTS `banned_addons`;
+
+CREATE TABLE `banned_addons` (
+  `Id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `Name` varchar(255) NOT NULL,
+  `Version` varchar(255) NOT NULL DEFAULT '',
+  `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`Id`),
+  UNIQUE KEY `idx_name_ver` (`Name`,`Version`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*Data for the table `banned_addons` */
+
 /*Table structure for table `bugreport` */
 
 DROP TABLE IF EXISTS `bugreport`;
@@ -199,8 +216,6 @@ CREATE TABLE `channels` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Channel System';
 
 /*Data for the table `channels` */
-
-insert  into `channels`(`name`,`team`,`announce`,`ownership`,`password`,`bannedList`,`lastUsed`) values ('Global',67,1,1,'','',1367077432);
 
 /*Table structure for table `character_account_data` */
 
@@ -435,11 +450,11 @@ CREATE TABLE `character_cuf_profiles` (
 DROP TABLE IF EXISTS `character_currency`;
 
 CREATE TABLE `character_currency` (
-  `guid` int(10) NOT NULL,
-  `id` int(5) NOT NULL,
-  `countTotal` int(7) NOT NULL,
-  `countWeek` int(7) NOT NULL,
-  PRIMARY KEY (`guid`,`id`)
+  `guid` int(10) unsigned NOT NULL,
+  `currency` smallint(5) unsigned NOT NULL,
+  `total_count` int(10) unsigned NOT NULL,
+  `week_count` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`guid`,`currency`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*Data for the table `character_currency` */
@@ -678,6 +693,19 @@ CREATE TABLE `character_queststatus_daily` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Player System';
 
 /*Data for the table `character_queststatus_daily` */
+
+/*Table structure for table `character_queststatus_monthly` */
+
+DROP TABLE IF EXISTS `character_queststatus_monthly`;
+
+CREATE TABLE `character_queststatus_monthly` (
+  `guid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier',
+  `quest` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Quest Identifier',
+  PRIMARY KEY (`guid`,`quest`),
+  KEY `idx_guid` (`guid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Player System';
+
+/*Data for the table `character_queststatus_monthly` */
 
 /*Table structure for table `character_queststatus_rewarded` */
 
@@ -1133,6 +1161,7 @@ CREATE TABLE `groups` (
   `groupType` tinyint(3) unsigned NOT NULL,
   `difficulty` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `raiddifficulty` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `masterLooterGuid` int(10) unsigned NOT NULL,
   PRIMARY KEY (`guid`),
   KEY `leaderGuid` (`leaderGuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Groups';
@@ -1437,7 +1466,7 @@ CREATE TABLE `instance_reset` (
 
 /*Data for the table `instance_reset` */
 
-insert  into `instance_reset`(`mapid`,`difficulty`,`resettime`) values (33,1,1367121600),(36,1,1367121600),(249,0,1367294400),(249,1,1367294400),(269,1,1367121600),(409,0,1367294400),(469,0,1367294400),(509,0,1367121600),(531,0,1367294400),(532,0,1367294400),(533,0,1367294400),(533,1,1367294400),(534,0,1367294400),(540,1,1367121600),(542,1,1367121600),(543,1,1367121600),(544,0,1367294400),(545,1,1367121600),(546,1,1367121600),(547,1,1367121600),(548,0,1367294400),(550,0,1367294400),(552,1,1367121600),(553,1,1367121600),(554,1,1367121600),(555,1,1367121600),(556,1,1367121600),(557,1,1367121600),(558,1,1367121600),(560,1,1367121600),(564,0,1367294400),(565,0,1367294400),(568,1,1367121600),(574,1,1367121600),(575,1,1367121600),(576,1,1367121600),(578,1,1367121600),(580,0,1367294400),(585,1,1367121600),(595,1,1367121600),(598,1,1367121600),(599,1,1367121600),(600,1,1367121600),(601,1,1367121600),(602,1,1367121600),(603,0,1367294400),(603,1,1367294400),(604,1,1367121600),(608,1,1367121600),(615,0,1367294400),(615,1,1367294400),(616,0,1367294400),(616,1,1367294400),(619,1,1367121600),(624,0,1367294400),(624,1,1367294400),(631,0,1367294400),(631,1,1367294400),(631,2,1367294400),(631,3,1367294400),(632,1,1367121600),(643,1,1367121600),(644,1,1367121600),(645,1,1367121600),(649,0,1367294400),(649,1,1367294400),(649,2,1367294400),(649,3,1367294400),(650,1,1367121600),(657,1,1367121600),(658,1,1367121600),(668,1,1367121600),(669,0,1367294400),(669,1,1367294400),(669,2,1367294400),(669,3,1367294400),(670,1,1367121600),(671,0,1367294400),(671,1,1367294400),(671,2,1367294400),(671,3,1367294400),(720,0,1367294400),(720,1,1367294400),(720,2,1367294400),(720,3,1367294400),(724,0,1367294400),(724,1,1367294400),(724,2,1367294400),(724,3,1367294400),(725,1,1367121600),(754,0,1367294400),(754,1,1367294400),(754,2,1367294400),(754,3,1367294400),(755,1,1367121600),(757,0,1367294400),(757,1,1367294400),(859,1,1367121600),(938,1,1367121600),(939,1,1367121600),(940,1,1367121600),(967,0,1367294400),(967,1,1367294400),(967,2,1367294400),(967,3,1367294400);
+insert  into `instance_reset`(`mapid`,`difficulty`,`resettime`) values (33,1,1403150400),(36,1,1403150400),(249,0,1403582400),(249,1,1403582400),(269,1,1403150400),(409,0,1403582400),(469,0,1403582400),(509,0,1403150400),(531,0,1403582400),(532,0,1403582400),(533,0,1403582400),(533,1,1403582400),(534,0,1403582400),(540,1,1403150400),(542,1,1403150400),(543,1,1403150400),(544,0,1403582400),(545,1,1403150400),(546,1,1403150400),(547,1,1403150400),(548,0,1403582400),(550,0,1403582400),(552,1,1403150400),(553,1,1403150400),(554,1,1403150400),(555,1,1403150400),(556,1,1403150400),(557,1,1403150400),(558,1,1403150400),(560,1,1403150400),(564,0,1403582400),(565,0,1403582400),(568,1,1403150400),(574,1,1403150400),(575,1,1403150400),(576,1,1403150400),(578,1,1403150400),(580,0,1403582400),(585,1,1403150400),(595,1,1403150400),(598,1,1403150400),(599,1,1403150400),(600,1,1403150400),(601,1,1403150400),(602,1,1403150400),(603,0,1403582400),(603,1,1403582400),(604,1,1403150400),(608,1,1403150400),(615,0,1403582400),(615,1,1403582400),(616,0,1403582400),(616,1,1403582400),(619,1,1403150400),(624,0,1403582400),(624,1,1403582400),(631,0,1403582400),(631,1,1403582400),(631,2,1403582400),(631,3,1403582400),(632,1,1403150400),(643,1,1403150400),(644,1,1403150400),(645,1,1403150400),(649,0,1403582400),(649,1,1403582400),(649,2,1403582400),(649,3,1403582400),(650,1,1403150400),(657,1,1403150400),(658,1,1403150400),(668,1,1403150400),(669,0,1403582400),(669,1,1403582400),(669,2,1403582400),(669,3,1403582400),(670,1,1403150400),(671,0,1403582400),(671,1,1403582400),(671,2,1403582400),(671,3,1403582400),(720,0,1403582400),(720,1,1403582400),(720,2,1403582400),(720,3,1403582400),(724,0,1403582400),(724,1,1403582400),(724,2,1403582400),(724,3,1403582400),(725,1,1403150400),(754,0,1403582400),(754,1,1403582400),(754,2,1403582400),(754,3,1403582400),(755,1,1403150400),(757,0,1403582400),(757,1,1403582400),(859,1,1403150400),(938,1,1403150400),(939,1,1403150400),(940,1,1403150400),(967,0,1403582400),(967,1,1403582400),(967,2,1403582400),(967,3,1403582400);
 
 /*Table structure for table `item_instance` */
 
@@ -1463,6 +1492,37 @@ CREATE TABLE `item_instance` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Item System';
 
 /*Data for the table `item_instance` */
+
+/*Table structure for table `item_loot_items` */
+
+DROP TABLE IF EXISTS `item_loot_items`;
+
+CREATE TABLE `item_loot_items` (
+  `container_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'guid of container (item_instance.guid)',
+  `item_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'loot item entry (item_instance.itemEntry)',
+  `item_count` int(10) NOT NULL DEFAULT '0' COMMENT 'stack size',
+  `follow_rules` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'follow loot rules',
+  `ffa` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'free-for-all',
+  `blocked` tinyint(1) NOT NULL DEFAULT '0',
+  `counted` tinyint(1) NOT NULL DEFAULT '0',
+  `under_threshold` tinyint(1) NOT NULL DEFAULT '0',
+  `needs_quest` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'quest drop',
+  `rnd_prop` int(10) NOT NULL DEFAULT '0' COMMENT 'random enchantment added when originally rolled',
+  `rnd_suffix` int(10) NOT NULL DEFAULT '0' COMMENT 'random suffix added when originally rolled'
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+/*Data for the table `item_loot_items` */
+
+/*Table structure for table `item_loot_money` */
+
+DROP TABLE IF EXISTS `item_loot_money`;
+
+CREATE TABLE `item_loot_money` (
+  `container_id` int(10) NOT NULL DEFAULT '0' COMMENT 'guid of container (item_instance.guid)',
+  `money` int(10) NOT NULL DEFAULT '0' COMMENT 'money loot (in copper)'
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+/*Data for the table `item_loot_money` */
 
 /*Table structure for table `item_refund_instance` */
 
@@ -1657,6 +1717,8 @@ CREATE TABLE `pool_quest_save` (
 
 /*Data for the table `pool_quest_save` */
 
+insert  into `pool_quest_save`(`pool_id`,`quest_id`) values (372,28059),(372,28065),(373,27949),(373,27967),(374,27975),(374,28275),(375,27971),(375,27972),(376,28682),(376,28686),(377,28678),(377,28683),(378,28694),(378,28695),(379,28690),(379,28692),(380,12736),(381,12705),(382,12758),(383,12760),(500,13674),(501,13763),(502,13768),(503,13773),(504,13778),(505,13785),(506,13669),(507,13616),(508,13741),(509,13746),(510,13758),(511,13752),(512,13103),(513,13114),(514,13830),(515,12958),(516,24580),(523,26235),(524,26190),(525,25159),(526,25156),(527,26572),(528,26414),(529,29315),(530,29363),(531,29355),(532,29313),(533,29319),(534,29354),(535,29347),(536,29325);
+
 /*Table structure for table `reserved_name` */
 
 DROP TABLE IF EXISTS `reserved_name`;
@@ -1693,6 +1755,9 @@ CREATE TABLE `worldstates` (
 
 /*Data for the table `worldstates` */
 
-insert  into `worldstates`(`entry`,`value`,`comment`) values (3781,9000000,NULL),(3801,0,NULL),(3802,0,NULL),(20001,1367377200,'NextArenaPointDistributionTime'),(20002,1367440766,'NextWeeklyQuestResetTime'),(20003,1367118000,'NextBGRandomDailyResetTime'),(20004,0,'cleaning_flags'),(20006,1367118000,'Guild daily reset'),(20007,1367440766,'NextGuildRepReset');
+insert  into `worldstates`(`entry`,`value`,`comment`) values (3781,9000000,NULL),(3801,0,NULL),(3802,0,NULL),(20001,1403614800,'NextArenaPointDistributionTime'),(20002,1403672243,'NextWeeklyQuestResetTime'),(20003,1403096400,'NextBGRandomDailyResetTime'),(20004,0,'cleaning_flags'),(20006,1403096400,'Guild daily reset'),(20007,1404198000,'NextGuildRepReset'),(20050,1,NULL);
 
-SET SQL_MODE=@OLD_SQL_MODE;
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
