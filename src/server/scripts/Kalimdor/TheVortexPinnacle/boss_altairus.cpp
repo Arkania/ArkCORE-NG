@@ -262,9 +262,9 @@ class npc_air_current : public CreatureScript
         {
             return new npc_altairus_twisterAI(pCreature);
         }
-        struct npc_altairus_twisterAI : public Scripted_NoMovementAI
+        struct npc_altairus_twisterAI : public ScriptedAI
         {
-            npc_altairus_twisterAI(Creature* pCreature) : Scripted_NoMovementAI(pCreature)
+            npc_altairus_twisterAI(Creature* pCreature) : ScriptedAI(pCreature)
             {
             }
 

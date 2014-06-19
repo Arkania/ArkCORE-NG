@@ -516,7 +516,7 @@ public:
 
         void InitializeAI() OVERRIDE
         {
-            // Scripted_NoMovementAI::InitializeAI();
+            // ScriptedAI::InitializeAI();
         }
 
         void Reset() OVERRIDE
