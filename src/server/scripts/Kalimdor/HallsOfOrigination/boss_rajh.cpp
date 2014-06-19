@@ -59,17 +59,17 @@ class boss_rajh : public CreatureScript
     public:
         boss_rajh() : CreatureScript("boss_rajh") { }
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new boss_rajhAI(pCreature);
+            return new boss_rajhAI(creature);
         }
             
         struct boss_rajhAI : public ScriptedAI
         {
-            boss_rajhAI(Creature* pCreature) : ScriptedAI(pCreature)
+            boss_rajhAI(Creature* creature) : ScriptedAI(creature)
             {
-                ASSERT(pCreature->GetVehicleKit()); // we dont actually use it, just check if exists
-                m_pInstance = pCreature->GetInstanceScript();
+                ASSERT(creature->GetVehicleKit()); // we dont actually use it, just check if exists
+                m_pInstance = creature->GetInstanceScript();
             }
 
             InstanceScript* m_pInstance;
@@ -232,14 +232,14 @@ class npc_winds : public CreatureScript
     public:
         npc_winds() : CreatureScript("npc_winds") { }
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_windsAI(pCreature);
+            return new npc_windsAI(creature);
         }
             
         struct npc_windsAI : public ScriptedAI
         {
-            npc_windsAI(Creature* pCreature) : ScriptedAI(pCreature)
+            npc_windsAI(Creature* creature) : ScriptedAI(creature)
             {
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -249,7 +249,7 @@ class npc_winds : public CreatureScript
                 me->setFaction(16);
                 me->DespawnOrUnsummon(20000);
                 me->SetSpeed(MOVE_RUN, 0.4f);
-                m_pInstance = pCreature->GetInstanceScript();
+                m_pInstance = creature->GetInstanceScript();
             }
 
             InstanceScript* m_pInstance;

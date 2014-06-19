@@ -70,13 +70,13 @@ class boss_altairus : public CreatureScript
     public:
         boss_altairus() : CreatureScript("boss_altairus") { }
         
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new boss_altairusAI(pCreature);
+            return new boss_altairusAI(creature);
         }
         struct boss_altairusAI : public ScriptedAI
         {
-            boss_altairusAI(Creature* pCreature) : ScriptedAI(pCreature), summons(me)
+            boss_altairusAI(Creature* creature) : ScriptedAI(creature), summons(me)
             {
                 me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
@@ -89,7 +89,7 @@ class boss_altairus : public CreatureScript
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
-                pInstance = pCreature->GetInstanceScript();
+                pInstance = creature->GetInstanceScript();
             }
 
             InstanceScript *pInstance;
@@ -230,13 +230,13 @@ class npc_air_current : public CreatureScript
     public:
         npc_air_current() : CreatureScript("npc_air_current") { }
         
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_air_currentAI(pCreature);
+            return new npc_air_currentAI(creature);
         }
         struct npc_air_currentAI : public ScriptedAI
         {
-            npc_air_currentAI(Creature* pCreature) : ScriptedAI(pCreature)
+            npc_air_currentAI(Creature* creature) : ScriptedAI(creature)
             {
                 me->SetReactState(REACT_PASSIVE);
             }
@@ -258,13 +258,13 @@ class npc_air_current : public CreatureScript
     public:
         npc_altairus_twister() : CreatureScript("npc_altairus_twister") { }
         
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_altairus_twisterAI(pCreature);
+            return new npc_altairus_twisterAI(creature);
         }
         struct npc_altairus_twisterAI : public ScriptedAI
         {
-            npc_altairus_twisterAI(Creature* pCreature) : ScriptedAI(pCreature)
+            npc_altairus_twisterAI(Creature* creature) : ScriptedAI(creature)
             {
             }
 

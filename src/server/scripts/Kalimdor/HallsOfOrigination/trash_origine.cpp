@@ -55,9 +55,9 @@ public:
           }
        };
        
-      CreatureAI* GetAI(Creature* pCreature) const
+      CreatureAI* GetAI(Creature* creature) const
       {
-           return new npc_lancelombre_du_templeAI(pCreature);
+           return new npc_lancelombre_du_templeAI(creature);
       }
 };
 
@@ -118,9 +118,9 @@ public:
          }
       };
       
-      CreatureAI* GetAI(Creature* pCreature) const
+      CreatureAI* GetAI(Creature* creature) const
       {
-           return new npc_traqueur_veloce_du_templeAI(pCreature);
+           return new npc_traqueur_veloce_du_templeAI(creature);
       }       
 };      
 
@@ -170,9 +170,9 @@ public:
          }
       };
       
-      CreatureAI* GetAI(Creature* pCreature) const
+      CreatureAI* GetAI(Creature* creature) const
       {
-           return new npc_lanceur_de_runes_du_templeAI(pCreature);
+           return new npc_lanceur_de_runes_du_templeAI(creature);
       }
 };
 
@@ -241,9 +241,9 @@ public:
          }
       };
     
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
-           return new npc_sculptefeu_du_templeAI(pCreature);
+           return new npc_sculptefeu_du_templeAI(creature);
     }
     
 };
@@ -294,9 +294,9 @@ public:
          }
       };
     
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
-            return new npc_scarabee_caustiqueAI(pCreature);
+            return new npc_scarabee_caustiqueAI(creature);
     }
     
 };
@@ -348,9 +348,9 @@ public:
          }
       };
       
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
-           return new npc_glisseur_venimeuxAI(pCreature);
+           return new npc_glisseur_venimeuxAI(creature);
     }
     
 };
@@ -392,9 +392,9 @@ public:
          }
       };
     
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
-            return new npc_horreur_os_poussiereAI(pCreature);
+            return new npc_horreur_os_poussiereAI(creature);
     }
 
 };
@@ -446,9 +446,9 @@ public:
          }
       };
       
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
-           return new npc_tourmenteur_os_poussiereAI(pCreature);
+           return new npc_tourmenteur_os_poussiereAI(creature);
     }
     
 };
@@ -499,9 +499,9 @@ public:
         }
      };
     
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
-          return new npc_chercheur_du_videAI(pCreature);
+          return new npc_chercheur_du_videAI(creature);
     }
     
 };
@@ -553,9 +553,9 @@ public:
          }
       };
             
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
-           return new npc_seigneur_du_videAI(pCreature);
+           return new npc_seigneur_du_videAI(creature);
     }
     
 };
@@ -597,9 +597,9 @@ public:
         }
      };
     
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
-            return new npc_anomalie_spatialeAI(pCreature);
+            return new npc_anomalie_spatialeAI(creature);
     }
         
 };
@@ -642,9 +642,9 @@ public:
         }
      };
      
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
-          return new npc_animateur_de_fluxAI(pCreature);
+          return new npc_animateur_de_fluxAI(creature);
     }
     
 };
@@ -697,9 +697,9 @@ public :
         }
     };
       
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_serviteur_solegraceAI(pCreature);
+        return new npc_serviteur_solegraceAI(creature);
     }
     
 };
@@ -761,9 +761,9 @@ public :
         }
     };
              
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_fee_solegraceAI(pCreature);
+        return new npc_fee_solegraceAI(creature);
     }            
     
 };
@@ -824,9 +824,9 @@ public :
         }
     };
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_petite_fee_solegraceAI(pCreature);
+        return new npc_petite_fee_solegraceAI(creature);
     }
 
 };
@@ -878,9 +878,9 @@ public:
          }
       };
     
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
-            return new npc_porte_parole_solegraceAI(pCreature);
+            return new npc_porte_parole_solegraceAI(creature);
     }
     
 };
@@ -944,9 +944,9 @@ public :
            }
       };
       
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
-            return new npc_nymphe_gardienneAI(pCreature);
+            return new npc_nymphe_gardienneAI(creature);
     }
     
 };
@@ -989,9 +989,9 @@ public :
          }
       };
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_liane_vivanteAI(pCreature);
+        return new npc_liane_vivanteAI(creature);
     }           
 
 };
@@ -1042,9 +1042,9 @@ public :
         }
     };
         
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_spore_en_bourgeonAI(pCreature);
+        return new npc_spore_en_bourgeonAI(creature);
     }           
 
 };

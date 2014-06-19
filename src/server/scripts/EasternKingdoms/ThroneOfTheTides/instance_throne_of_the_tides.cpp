@@ -77,7 +77,7 @@ public:
                 uiTeamInInstance = pPlayer->GetTeam();
         }
 
-        void OnCreatureCreate(Creature* pCreature)
+        void OnCreatureCreate(Creature* creature)
         {
             if (!uiTeamInInstance)
             {
@@ -87,40 +87,40 @@ public:
                         uiTeamInInstance = player->GetTeam();
             }
 
-            switch(pCreature->GetEntry())
+            switch(creature->GetEntry())
             {
             case NPC_LADY_NAZJAR_EVENT:
-                uiLadyNazjarEventGUID = pCreature->GetGUID();
+                uiLadyNazjarEventGUID = creature->GetGUID();
                 break;
             case NPC_LADY_NAZJAR:
-                uiLadyNazjarGUID = pCreature->GetGUID();
+                uiLadyNazjarGUID = creature->GetGUID();
                 break;
             case NPC_COMMANDER_ULTHOK:
-                uiCommanderUlthokGUID = pCreature->GetGUID();
+                uiCommanderUlthokGUID = creature->GetGUID();
                 if (GetData(DATA_COMMANDER_ULTHOK_EVENT) == DONE)
-                    pCreature->SetPhaseMask(PHASEMASK_NORMAL, true);
+                    creature->SetPhaseMask(PHASEMASK_NORMAL, true);
                 else
-                    pCreature->SetPhaseMask(2, true);
+                    creature->SetPhaseMask(2, true);
                 break;
             case NPC_ERUNAK_STONESPEAKER:
-                uiErunakStonespeakerGUID = pCreature->GetGUID();
+                uiErunakStonespeakerGUID = creature->GetGUID();
                 break;
             case NPC_MINDBENDER_GHURSHA:
-                uiMindbenderGhurshaGUID = pCreature->GetGUID();
+                uiMindbenderGhurshaGUID = creature->GetGUID();
                 break;
             case NPC_OZUMAT:
-                uiOzumatGUID = pCreature->GetGUID();
+                uiOzumatGUID = creature->GetGUID();
                 break;
             case NPC_NEPTULON:
-                uiNeptulonGUID = pCreature->GetGUID();
+                uiNeptulonGUID = creature->GetGUID();
                 break;
             case NPC_CAPTAIN_TAYLOR:
                 if (uiTeamInInstance == HORDE)
-                    pCreature->UpdateEntry(NPC_LEGIONNAIRE_NAZGRIM);
+                    creature->UpdateEntry(NPC_LEGIONNAIRE_NAZGRIM);
                 break;
             case NPC_LEGIONNAIRE_NAZGRIM:
                 if (uiTeamInInstance == ALLIANCE)
-                    pCreature->UpdateEntry(NPC_CAPTAIN_TAYLOR);
+                    creature->UpdateEntry(NPC_CAPTAIN_TAYLOR);
                 break;
             }
         }

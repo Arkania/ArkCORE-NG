@@ -37,11 +37,11 @@ public:
 
     struct boss_baron_silverlaineAI : public ScriptedAI
     {
-        boss_baron_silverlaineAI(Creature* pCreature) : ScriptedAI(pCreature)
+        boss_baron_silverlaineAI(Creature* creature) : ScriptedAI(creature)
         {
             me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
             me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
-            pInstance = pCreature->GetInstanceScript();
+            pInstance = creature->GetInstanceScript();
         }
 
         InstanceScript *pInstance;
@@ -99,9 +99,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature *pCreature) const
+    CreatureAI* GetAI(Creature *creature) const
     {
-        return new boss_baron_silverlaineAI (pCreature);
+        return new boss_baron_silverlaineAI (creature);
     }
 };
 

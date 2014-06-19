@@ -70,13 +70,13 @@ class boss_grand_vizier_ertan : public CreatureScript
     public:
         boss_grand_vizier_ertan() : CreatureScript("boss_grand_vizier_ertan") { }
         
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new boss_grand_vizier_ertanAI(pCreature);
+            return new boss_grand_vizier_ertanAI(creature);
         }
         struct boss_grand_vizier_ertanAI : public ScriptedAI
         {
-            boss_grand_vizier_ertanAI(Creature* pCreature) : ScriptedAI(pCreature), Summons(me)
+            boss_grand_vizier_ertanAI(Creature* creature) : ScriptedAI(creature), Summons(me)
             {
                 me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
@@ -89,7 +89,7 @@ class boss_grand_vizier_ertan : public CreatureScript
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
-                pInstance = pCreature->GetInstanceScript();
+                pInstance = creature->GetInstanceScript();
             }
 
             InstanceScript *pInstance;
@@ -217,15 +217,15 @@ class npc_ertan_vortex : public CreatureScript
     public:
         npc_ertan_vortex() : CreatureScript("npc_ertan_vortex") { }
         
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_ertan_vortexAI(pCreature);
+            return new npc_ertan_vortexAI(creature);
         }
         struct npc_ertan_vortexAI : public ScriptedAI
         {
-            npc_ertan_vortexAI(Creature* pCreature) : ScriptedAI(pCreature)
+            npc_ertan_vortexAI(Creature* creature) : ScriptedAI(creature)
             {
-                pInstance = pCreature->GetInstanceScript();
+                pInstance = creature->GetInstanceScript();
             }
 
             InstanceScript *pInstance;

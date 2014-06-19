@@ -21,7 +21,7 @@ public:
  
        struct npc_gardien_dairAI : public ScriptedAI
        {
-            npc_gardien_dairAI(Creature * pCreature) : ScriptedAI(pCreature) { }
+            npc_gardien_dairAI(Creature * creature) : ScriptedAI(creature) { }
             
             uint32 cisaille_de_vent;
             
@@ -46,9 +46,9 @@ public:
          }
        };
        
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
-         return new npc_gardien_dairAI(pCreature);
+         return new npc_gardien_dairAI(creature);
     }
  
 };
@@ -67,7 +67,7 @@ public:
        
        struct npc_gardien_de_flammesAI : public ScriptedAI
        {
-              npc_gardien_de_flammesAI(Creature * pCreature) : ScriptedAI(pCreature) { }
+              npc_gardien_de_flammesAI(Creature * creature) : ScriptedAI(creature) { }
               
               uint32 eruption_de_lave;
               uint32 inferno_dechaine;
@@ -93,9 +93,9 @@ public:
               }
        };
         
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_gardien_de_flammesAI(pCreature);
+        return new npc_gardien_de_flammesAI(creature);
     }      
 
 };
@@ -114,7 +114,7 @@ public:
 
         struct npc_gardien_de_terreAI : public ScriptedAI
         {    
-         npc_gardien_de_terreAI(Creature * pCreature) : ScriptedAI(pCreature) { }
+         npc_gardien_de_terreAI(Creature * creature) : ScriptedAI(creature) { }
 
             uint32 empaler;
             uint32 vague_de_roche;
@@ -147,9 +147,9 @@ public:
             }
         };
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_gardien_de_terreAI(pCreature);
+        return new npc_gardien_de_terreAI(creature);
     }
 
 };

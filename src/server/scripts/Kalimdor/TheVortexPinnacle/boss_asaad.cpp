@@ -93,13 +93,13 @@ class boss_asaad : public CreatureScript
     public:
         boss_asaad() : CreatureScript("boss_asaad") { }
         
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new boss_asaadAI(pCreature);
+            return new boss_asaadAI(creature);
         }
         struct boss_asaadAI : public ScriptedAI
         {
-            boss_asaadAI(Creature* pCreature) : ScriptedAI(pCreature), summons(me)
+            boss_asaadAI(Creature* creature) : ScriptedAI(creature), summons(me)
             {
                 me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
@@ -112,7 +112,7 @@ class boss_asaad : public CreatureScript
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
-                pInstance = pCreature->GetInstanceScript();
+                pInstance = creature->GetInstanceScript();
             }
 
             InstanceScript *pInstance;
@@ -269,13 +269,13 @@ class npc_unstable_grounding_field : public CreatureScript
     public:
         npc_unstable_grounding_field() : CreatureScript("npc_unstable_grounding_field") { }
         
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_unstable_grounding_fieldAI(pCreature);
+            return new npc_unstable_grounding_fieldAI(creature);
         }
         struct npc_unstable_grounding_fieldAI : public ScriptedAI
         {
-            npc_unstable_grounding_fieldAI(Creature* pCreature) : ScriptedAI(pCreature)
+            npc_unstable_grounding_fieldAI(Creature* creature) : ScriptedAI(creature)
             {
                 me->SetReactState(REACT_PASSIVE);
             }

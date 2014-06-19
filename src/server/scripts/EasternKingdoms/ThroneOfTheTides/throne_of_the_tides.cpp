@@ -118,11 +118,11 @@ class npc_throne_of_the_tides_teleporter : public CreatureScript
     public:
         npc_throne_of_the_tides_teleporter() : CreatureScript("npc_throne_of_the_tides_teleporter"){ }
 
-        bool OnGossipHello(Player* pPlayer, Creature* pCreature)
+        bool OnGossipHello(Player* pPlayer, Creature* creature)
         {
             if (pPlayer->IsInCombat())
                 return false;
-            switch (pCreature->GetEntry())
+            switch (creature->GetEntry())
             {
             case NPC_THRONE_OF_THE_TIDES_TELEPORTER_1:
                     pPlayer->NearTeleportTo(teleporterPos[1].GetPositionX(),

@@ -42,11 +42,11 @@ public:
 
     struct boss_lord_waldenAI : public BossAI
     {
-        boss_lord_waldenAI(Creature* pCreature) : BossAI(pCreature, DATA_LORD_WALDEN)
+        boss_lord_waldenAI(Creature* creature) : BossAI(creature, DATA_LORD_WALDEN)
         {
             me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
             me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
-            pInstance = pCreature->GetInstanceScript();
+            pInstance = creature->GetInstanceScript();
         }
 
         uint32 ConjureMixtureTimer;
@@ -127,9 +127,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature *pCreature) const
+    CreatureAI* GetAI(Creature *creature) const
     {
-        return new boss_lord_waldenAI (pCreature);
+        return new boss_lord_waldenAI (creature);
     }
 };
 
@@ -140,9 +140,9 @@ public:
 
     struct npc_mystery_toxinAI : public ScriptedAI
     {
-        npc_mystery_toxinAI(Creature* pCreature) : ScriptedAI(pCreature)
+        npc_mystery_toxinAI(Creature* creature) : ScriptedAI(creature)
         {
-            pInstance = pCreature->GetInstanceScript();
+            pInstance = creature->GetInstanceScript();
         }
 
         InstanceScript *pInstance;
@@ -163,9 +163,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature *pCreature) const
+    CreatureAI* GetAI(Creature *creature) const
     {
-        return new npc_mystery_toxinAI (pCreature);
+        return new npc_mystery_toxinAI (creature);
     }
 };
 

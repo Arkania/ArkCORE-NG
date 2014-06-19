@@ -105,14 +105,14 @@ class boss_lady_nazjar : public CreatureScript
     public:
         boss_lady_nazjar() : CreatureScript("boss_lady_nazjar") { }
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new boss_lady_nazjarAI (pCreature);
+            return new boss_lady_nazjarAI (creature);
         }
 
         struct boss_lady_nazjarAI : public BossAI
         {
-            boss_lady_nazjarAI(Creature* pCreature) : BossAI(pCreature, DATA_LADY_NAZJAR)//, summons(me)
+            boss_lady_nazjarAI(Creature* creature) : BossAI(creature, DATA_LADY_NAZJAR)//, summons(me)
             {
                 me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
@@ -514,9 +514,9 @@ class npc_lady_nazjar_geyser : public CreatureScript
     public:
         npc_lady_nazjar_geyser() : CreatureScript("npc_lady_nazjar_geyser") { }
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_lady_nazjar_geyserAI (pCreature);
+            return new npc_lady_nazjar_geyserAI (creature);
         }
 
         struct npc_lady_nazjar_geyserAI : public ScriptedAI

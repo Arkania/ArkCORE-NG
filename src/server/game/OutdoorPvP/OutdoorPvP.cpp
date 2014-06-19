@@ -144,7 +144,7 @@ bool OPvPCapturePoint::DelCreature(uint32 type)
 {
     if (!m_Creatures[type])
     {
-        TC_LOG_DEBUG("outdoorpvp", "opvp creature type %u was already deleted", type);
+        TC_LOG_DEBUG("outdoorpvp", "opvcreature type %u was already deleted", type);
         return false;
     }
 
@@ -155,7 +155,7 @@ bool OPvPCapturePoint::DelCreature(uint32 type)
         m_Creatures[type] = 0;
         return false;
     }
-    TC_LOG_DEBUG("outdoorpvp", "deleting opvp creature type %u", type);
+    TC_LOG_DEBUG("outdoorpvp", "deleting opvcreature type %u", type);
     uint32 guid = cr->GetDBTableGUIDLow();
     // Don't save respawn time
     cr->SetRespawnTime(0);

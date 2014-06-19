@@ -52,16 +52,16 @@ class boss_setesh : public CreatureScript
     public:
         boss_setesh() : CreatureScript("boss_setesh") { }
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new boss_seteshAI(pCreature);
+            return new boss_seteshAI(creature);
         }
             
         struct boss_seteshAI : public ScriptedAI
         {
-            boss_seteshAI(Creature* pCreature) : ScriptedAI(pCreature)
+            boss_seteshAI(Creature* creature) : ScriptedAI(creature)
             {
-                m_pInstance = pCreature->GetInstanceScript();
+                m_pInstance = creature->GetInstanceScript();
             }
 
             InstanceScript* m_pInstance;
@@ -196,16 +196,16 @@ class npc_portal : public CreatureScript
     public:
         npc_portal() : CreatureScript("npc_portal") { }
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_portalAI(pCreature);
+            return new npc_portalAI(creature);
         }
             
         struct npc_portalAI : public ScriptedAI
         {
-            npc_portalAI(Creature* pCreature) : ScriptedAI(pCreature)
+            npc_portalAI(Creature* creature) : ScriptedAI(creature)
             {
-                m_pInstance = pCreature->GetInstanceScript();
+                m_pInstance = creature->GetInstanceScript();
             }
 
             InstanceScript* m_pInstance;
@@ -280,16 +280,16 @@ class npc_sentinel : public CreatureScript
     public:
         npc_sentinel() : CreatureScript("npc_sentinel") { }
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_sentinelAI(pCreature);
+            return new npc_sentinelAI(creature);
         }
             
         struct npc_sentinelAI : public ScriptedAI
         {
-            npc_sentinelAI(Creature* pCreature) : ScriptedAI(pCreature)
+            npc_sentinelAI(Creature* creature) : ScriptedAI(creature)
             {
-                m_pInstance = pCreature->GetInstanceScript();
+                m_pInstance = creature->GetInstanceScript();
             }
 
             InstanceScript* m_pInstance;
@@ -320,16 +320,16 @@ class npc_seeker : public CreatureScript
     public:
         npc_seeker() : CreatureScript("npc_seeker") { }
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_seekerAI(pCreature);
+            return new npc_seekerAI(creature);
         }
             
         struct npc_seekerAI : public ScriptedAI
         {
-            npc_seekerAI(Creature* pCreature) : ScriptedAI(pCreature)
+            npc_seekerAI(Creature* creature) : ScriptedAI(creature)
             {
-                m_pInstance = pCreature->GetInstanceScript();
+                m_pInstance = creature->GetInstanceScript();
             }
 
             InstanceScript* m_pInstance;

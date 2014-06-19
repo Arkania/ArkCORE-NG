@@ -47,11 +47,11 @@ public:
 
     struct boss_commander_springvaleAI : public ScriptedAI
     {
-        boss_commander_springvaleAI(Creature* pCreature) : ScriptedAI(pCreature)
+        boss_commander_springvaleAI(Creature* creature) : ScriptedAI(creature)
         {
             me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
             me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
-            pInstance = pCreature->GetInstanceScript();
+            pInstance = creature->GetInstanceScript();
         }
 
         std::list<uint64> SummonList;
@@ -187,9 +187,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature *pCreature) const
+    CreatureAI* GetAI(Creature *creature) const
     {
-        return new boss_commander_springvaleAI (pCreature);
+        return new boss_commander_springvaleAI (creature);
     }
 };
 

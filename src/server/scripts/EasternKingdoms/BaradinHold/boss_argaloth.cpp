@@ -33,9 +33,9 @@ class boss_argaloth : public CreatureScript
 
         struct boss_argalothAI : public ScriptedAI
         {
-            boss_argalothAI(Creature* pCreature) : ScriptedAI(pCreature)
+            boss_argalothAI(Creature* creature) : ScriptedAI(creature)
             {
-                m_pInstance = pCreature->GetInstanceScript();
+                m_pInstance = creature->GetInstanceScript();
             }
 
             InstanceScript* m_pInstance;
@@ -159,9 +159,9 @@ class boss_argaloth : public CreatureScript
             }
         };
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new boss_argalothAI(pCreature);
+            return new boss_argalothAI(creature);
         }
 };
 
@@ -172,9 +172,9 @@ class npc_felflames : public CreatureScript
 
         struct npc_felflamesAI : public ScriptedAI
         {
-            npc_felflamesAI(Creature* pCreature) : ScriptedAI(pCreature)
+            npc_felflamesAI(Creature* creature) : ScriptedAI(creature)
             {
-                m_pInstance = pCreature->GetInstanceScript();
+                m_pInstance = creature->GetInstanceScript();
             }
 
             InstanceScript* m_pInstance;
@@ -211,9 +211,9 @@ class npc_felflames : public CreatureScript
             }
         };
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_felflamesAI(pCreature);
+            return new npc_felflamesAI(creature);
         }
 };
 

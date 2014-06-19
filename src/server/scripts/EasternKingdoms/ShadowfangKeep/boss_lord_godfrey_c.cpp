@@ -41,14 +41,14 @@ class boss_lord_godfrey : public CreatureScript
 public:
     boss_lord_godfrey() : CreatureScript("boss_lord_godfrey") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return new boss_lord_godfreyAI(pCreature);
+        return new boss_lord_godfreyAI(creature);
     }
 
     struct boss_lord_godfreyAI : public BossAI
     {
-        boss_lord_godfreyAI(Creature* pCreature) : BossAI(pCreature,DATA_LORD_GODFREY)
+        boss_lord_godfreyAI(Creature* creature) : BossAI(creature,DATA_LORD_GODFREY)
         {
             me->ApplySpellImmune(0, IMMUNITY_ID, 93564, true); // Pistol Barrage
             me->ApplySpellImmune(0, IMMUNITY_ID, 93784, true); // Pistol Barrage
@@ -79,9 +79,9 @@ public:
                 Talk(SAY_AGGRO_H);
         }
 
-        void KilledUnit(Unit* pCreature)
+        void KilledUnit(Unit* creature)
         {
-            if (pCreature->GetEntry() == NPC_BLOODTHIRSTY_GHOUL)
+            if (creature->GetEntry() == NPC_BLOODTHIRSTY_GHOUL)
                 GhoulCount++;
             else
                 switch(urand(0,1))

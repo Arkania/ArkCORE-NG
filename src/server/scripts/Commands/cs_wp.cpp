@@ -650,11 +650,11 @@ public:
             handler->PSendSysMessage("|cff00ff00DEBUG: wp modify del, PathID: |r|cff00ffff%u|r", pathid);
 
             if (wpGuid != 0)
-                if (Creature* wpCreature = handler->GetSession()->GetPlayer()->GetMap()->GetCreature(MAKE_NEW_GUID(wpGuid, VISUAL_WAYPOINT, HIGHGUID_UNIT)))
+                if (Creature* wcreature = handler->GetSession()->GetPlayer()->GetMap()->GetCreature(MAKE_NEW_GUID(wpGuid, VISUAL_WAYPOINT, HIGHGUID_UNIT)))
                 {
-                    wpCreature->CombatStop();
-                    wpCreature->DeleteFromDB();
-                    wpCreature->AddObjectToRemoveList();
+                    wcreature->CombatStop();
+                    wcreature->DeleteFromDB();
+                    wcreature->AddObjectToRemoveList();
                 }
 
             PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_WAYPOINT_DATA);
@@ -687,33 +687,33 @@ public:
                 // Respawn the owner of the waypoints
                 if (wpGuid != 0)
                 {
-                    if (Creature* wpCreature = map->GetCreature(MAKE_NEW_GUID(wpGuid, VISUAL_WAYPOINT, HIGHGUID_UNIT)))
+                    if (Creature* wcreature = map->GetCreature(MAKE_NEW_GUID(wpGuid, VISUAL_WAYPOINT, HIGHGUID_UNIT)))
                     {
-                        wpCreature->CombatStop();
-                        wpCreature->DeleteFromDB();
-                        wpCreature->AddObjectToRemoveList();
+                        wcreature->CombatStop();
+                        wcreature->DeleteFromDB();
+                        wcreature->AddObjectToRemoveList();
                     }
                     // re-create
-                    Creature* wpCreature2 = new Creature();
-                    if (!wpCreature2->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_UNIT), map, chr->GetPhaseMgr().GetPhaseMaskForSpawn(), VISUAL_WAYPOINT, 0, 0, chr->GetPositionX(), chr->GetPositionY(), chr->GetPositionZ(), chr->GetOrientation()))
+                    Creature* wcreature2 = new Creature();
+                    if (!wcreature2->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_UNIT), map, chr->GetPhaseMgr().GetPhaseMaskForSpawn(), VISUAL_WAYPOINT, 0, 0, chr->GetPositionX(), chr->GetPositionY(), chr->GetPositionZ(), chr->GetOrientation()))
                     {
                         handler->PSendSysMessage(LANG_WAYPOINT_VP_NOTCREATED, VISUAL_WAYPOINT);
-                        delete wpCreature2;
-                        wpCreature2 = NULL;
+                        delete wcreature2;
+                        wcreature2 = NULL;
                         return false;
                     }
 
-                    wpCreature2->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()), chr->GetPhaseMgr().GetPhaseMaskForSpawn());
+                    wcreature2->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()), chr->GetPhaseMgr().GetPhaseMaskForSpawn());
                     // To call _LoadGoods(); _LoadQuests(); CreateTrainerSpells();
                     /// @todo Should we first use "Create" then use "LoadFromDB"?
-                    if (!wpCreature2->LoadCreatureFromDB(wpCreature2->GetDBTableGUIDLow(), map))
+                    if (!wcreature2->LoadCreatureFromDB(wcreature2->GetDBTableGUIDLow(), map))
                     {
                         handler->PSendSysMessage(LANG_WAYPOINT_VP_NOTCREATED, VISUAL_WAYPOINT);
-                        delete wpCreature2;
-                        wpCreature2 = NULL;
+                        delete wcreature2;
+                        wcreature2 = NULL;
                         return false;
                     }
-                    //sMapMgr->GetMap(npcCreature->GetMapId())->Add(wpCreature2);
+                    //sMapMgr->GetMap(npcCreature->GetMapId())->Add(wcreature2);
                 }
 
                 PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_WAYPOINT_DATA_POSITION);
@@ -918,37 +918,37 @@ public:
                 Map* map = chr->GetMap();
                 float o = chr->GetOrientation();
 
-                Creature* wpCreature = new Creature();
-                if (!wpCreature->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_UNIT), map, chr->GetPhaseMgr().GetPhaseMaskForSpawn(), id, 0, 0, x, y, z, o))
+                Creature* wcreature = new Creature();
+                if (!wcreature->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_UNIT), map, chr->GetPhaseMgr().GetPhaseMaskForSpawn(), id, 0, 0, x, y, z, o))
                 {
                     handler->PSendSysMessage(LANG_WAYPOINT_VP_NOTCREATED, id);
-                    delete wpCreature;
+                    delete wcreature;
                     return false;
                 }
 
                 // Set "wpguid" column to the visual waypoint
                 PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_WAYPOINT_DATA_WPGUID);
 
-                stmt->setInt32(0, int32(wpCreature->GetGUIDLow()));
+                stmt->setInt32(0, int32(wcreature->GetGUIDLow()));
                 stmt->setUInt32(1, pathid);
                 stmt->setUInt32(2, point);
 
                 WorldDatabase.Execute(stmt);
 
-                wpCreature->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()), chr->GetPhaseMgr().GetPhaseMaskForSpawn());
+                wcreature->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()), chr->GetPhaseMgr().GetPhaseMaskForSpawn());
                 // To call _LoadGoods(); _LoadQuests(); CreateTrainerSpells();
-                if (!wpCreature->LoadCreatureFromDB(wpCreature->GetDBTableGUIDLow(), map))
+                if (!wcreature->LoadCreatureFromDB(wcreature->GetDBTableGUIDLow(), map))
                 {
                     handler->PSendSysMessage(LANG_WAYPOINT_VP_NOTCREATED, id);
-                    delete wpCreature;
+                    delete wcreature;
                     return false;
                 }
 
                 if (target)
                 {
-                    wpCreature->SetDisplayId(target->GetDisplayId());
-                    wpCreature->SetObjectScale(0.5f);
-                    wpCreature->SetLevel(std::min<uint32>(point, STRONG_MAX_LEVEL));
+                    wcreature->SetDisplayId(target->GetDisplayId());
+                    wcreature->SetObjectScale(0.5f);
+                    wcreature->SetLevel(std::min<uint32>(point, STRONG_MAX_LEVEL));
                 }
             }
             while (result->NextRow());

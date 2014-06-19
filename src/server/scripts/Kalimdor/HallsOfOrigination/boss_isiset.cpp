@@ -53,16 +53,16 @@ class boss_isiset : public CreatureScript
     public:
         boss_isiset() : CreatureScript("boss_isiset") { }
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new boss_isisetAI(pCreature);
+            return new boss_isisetAI(creature);
         }
 
         struct boss_isisetAI : public ScriptedAI
         {
-            boss_isisetAI(Creature* pCreature) : ScriptedAI(pCreature)
+            boss_isisetAI(Creature* creature) : ScriptedAI(creature)
             {
-                pInstance = pCreature->GetInstanceScript();
+                pInstance = creature->GetInstanceScript();
                 SetCombatMovement(true);
             }
 
@@ -432,16 +432,16 @@ class npc_celestial_familiar : public CreatureScript
     public:
         npc_celestial_familiar() : CreatureScript("npc_celestial_familiar") { }
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_celestial_familiarAI(pCreature);
+            return new npc_celestial_familiarAI(creature);
         }
             
         struct npc_celestial_familiarAI : public ScriptedAI
         {
-            npc_celestial_familiarAI(Creature* pCreature) : ScriptedAI(pCreature)
+            npc_celestial_familiarAI(Creature* creature) : ScriptedAI(creature)
             {
-                m_pInstance = pCreature->GetInstanceScript();
+                m_pInstance = creature->GetInstanceScript();
             }
 
             InstanceScript* m_pInstance;
@@ -489,17 +489,17 @@ class npc_veil_sky : public CreatureScript
     public:
         npc_veil_sky() : CreatureScript("npc_veil_sky") { }
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_veil_skyAI(pCreature);
+            return new npc_veil_skyAI(creature);
         }
             
         struct npc_veil_skyAI : public ScriptedAI
         {
-            npc_veil_skyAI(Creature* pCreature) : ScriptedAI(pCreature)
+            npc_veil_skyAI(Creature* creature) : ScriptedAI(creature)
             {
-                m_pInstance = pCreature->GetInstanceScript();
-                ASSERT(pCreature->GetVehicleKit()); // we dont actually use it, just check if exists
+                m_pInstance = creature->GetInstanceScript();
+                ASSERT(creature->GetVehicleKit()); // we dont actually use it, just check if exists
             }
 
             InstanceScript* m_pInstance;
@@ -543,17 +543,17 @@ class npc_celestial_call : public CreatureScript
     public:
         npc_celestial_call() : CreatureScript("npc_celestial_call") { }
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_celestial_callAI(pCreature);
+            return new npc_celestial_callAI(creature);
         }
             
         struct npc_celestial_callAI : public ScriptedAI
         {
-            npc_celestial_callAI(Creature* pCreature) : ScriptedAI(pCreature)
+            npc_celestial_callAI(Creature* creature) : ScriptedAI(creature)
             {
-                m_pInstance = pCreature->GetInstanceScript();
-                ASSERT(pCreature->GetVehicleKit()); // we dont actually use it, just check if exists
+                m_pInstance = creature->GetInstanceScript();
+                ASSERT(creature->GetVehicleKit()); // we dont actually use it, just check if exists
             }
 
             InstanceScript* m_pInstance;
@@ -595,17 +595,17 @@ class npc_astral_rain : public CreatureScript
     public:
         npc_astral_rain() : CreatureScript("npc_astral_rain") { }
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_astral_rainAI(pCreature);
+            return new npc_astral_rainAI(creature);
         }
             
         struct npc_astral_rainAI : public ScriptedAI
         {
-            npc_astral_rainAI(Creature* pCreature) : ScriptedAI(pCreature)
+            npc_astral_rainAI(Creature* creature) : ScriptedAI(creature)
             {
-                m_pInstance = pCreature->GetInstanceScript();
-                ASSERT(pCreature->GetVehicleKit()); // we dont actually use it, just check if exists
+                m_pInstance = creature->GetInstanceScript();
+                ASSERT(creature->GetVehicleKit()); // we dont actually use it, just check if exists
             }
 
             InstanceScript* m_pInstance;

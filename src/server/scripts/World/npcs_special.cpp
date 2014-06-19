@@ -2354,7 +2354,7 @@ public:
 
     struct npc_power_word_barrierAI: public ScriptedAI
     {
-        npc_power_word_barrierAI (Creature *pCreature) : ScriptedAI(pCreature) { }
+        npc_power_word_barrierAI (Creature *creature) : ScriptedAI(creature) { }
 
         bool checker;
         uint32 cron;          // Duration
@@ -2409,9 +2409,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI (Creature* pCreature) const
+    CreatureAI* GetAI (Creature* creature) const
     {
-        return new npc_power_word_barrierAI(pCreature);
+        return new npc_power_word_barrierAI(creature);
     }
 };
 
@@ -2799,9 +2799,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI (Creature* pCreature) const
+    CreatureAI* GetAI (Creature* creature) const
     {
-        return new npc_ring_of_frostAI(pCreature);
+        return new npc_ring_of_frostAI(creature);
     }
 };
 
@@ -2893,7 +2893,7 @@ public:
 
     struct npc_guardian_of_ancient_kingsAI : public ScriptedAI
     {
-        npc_guardian_of_ancient_kingsAI(Creature *pCreature) : ScriptedAI(pCreature) { }
+        npc_guardian_of_ancient_kingsAI(Creature *creature) : ScriptedAI(creature) { }
 
         void InitializeAI()
         {
@@ -2934,9 +2934,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_guardian_of_ancient_kingsAI(pCreature);
+        return new npc_guardian_of_ancient_kingsAI(creature);
     }
 };
 */

@@ -64,18 +64,18 @@ public:
             return false;
         }
 
-        void OnCreatureCreate(Creature* pCreature)
+        void OnCreatureCreate(Creature* creature)
         {
-            switch(pCreature->GetEntry())
+            switch(creature->GetEntry())
             {
                 case NPC_GRAND_VIZIER_ERTAN:
-                    uiGrandVizierErtanGUID = pCreature->GetGUID();
+                    uiGrandVizierErtanGUID = creature->GetGUID();
                     break;
                 case NPC_ALTAIRUS:
-                    uiAltairusGUID = pCreature->GetGUID();
+                    uiAltairusGUID = creature->GetGUID();
                     break;
                 case NPC_ASAAD:
-                    uiAsaadGUID = pCreature->GetGUID();
+                    uiAsaadGUID = creature->GetGUID();
                     break;
             }
             

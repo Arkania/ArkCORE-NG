@@ -982,10 +982,10 @@ namespace Trinity
     };
 
     // do attack at call of help to friendly crearture
-    class CallOfHelpCreatureInRangeDo
+    class CallOfHelcreatureInRangeDo
     {
         public:
-            CallOfHelpCreatureInRangeDo(Unit* funit, Unit* enemy, float range)
+            CallOfHelcreatureInRangeDo(Unit* funit, Unit* enemy, float range)
                 : i_funit(funit), i_enemy(enemy), i_range(range)
             { }
             void operator()(Creature* u)

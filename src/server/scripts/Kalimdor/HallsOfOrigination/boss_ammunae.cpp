@@ -48,17 +48,17 @@ class boss_ammunae : public CreatureScript
     public:
         boss_ammunae() : CreatureScript("boss_ammunae") { }
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new boss_ammunaeAI(pCreature);
+            return new boss_ammunaeAI(creature);
         }
             
         struct boss_ammunaeAI : public ScriptedAI
         {
-            boss_ammunaeAI(Creature* pCreature) : ScriptedAI(pCreature)
+            boss_ammunaeAI(Creature* creature) : ScriptedAI(creature)
             {
-                ASSERT(pCreature->GetVehicleKit()); // we dont actually use it, just check if exists
-                m_pInstance = pCreature->GetInstanceScript();
+                ASSERT(creature->GetVehicleKit()); // we dont actually use it, just check if exists
+                m_pInstance = creature->GetInstanceScript();
             }
 
             InstanceScript* m_pInstance;
@@ -368,16 +368,16 @@ class npc_seedling : public CreatureScript
     public:
         npc_seedling() : CreatureScript("npc_seedling") { }
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_seedlingAI(pCreature);
+            return new npc_seedlingAI(creature);
         }
             
         struct npc_seedlingAI : public ScriptedAI
         {
-            npc_seedlingAI(Creature* pCreature) : ScriptedAI(pCreature)
+            npc_seedlingAI(Creature* creature) : ScriptedAI(creature)
             {
-                m_pInstance = pCreature->GetInstanceScript();
+                m_pInstance = creature->GetInstanceScript();
             }
 
             InstanceScript* m_pInstance;
@@ -417,16 +417,16 @@ class npc_blossom : public CreatureScript
     public:
         npc_blossom() : CreatureScript("npc_blossom") { }
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_blossomAI(pCreature);
+            return new npc_blossomAI(creature);
         }
             
         struct npc_blossomAI : public ScriptedAI
         {
-            npc_blossomAI(Creature* pCreature) : ScriptedAI(pCreature)
+            npc_blossomAI(Creature* creature) : ScriptedAI(creature)
             {
-                m_pInstance = pCreature->GetInstanceScript();
+                m_pInstance = creature->GetInstanceScript();
             }
 
             InstanceScript* m_pInstance;
@@ -467,16 +467,16 @@ class npc_spore : public CreatureScript
     public:
         npc_spore() : CreatureScript("npc_spore") { }
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_sporeAI(pCreature);
+            return new npc_sporeAI(creature);
         }
             
         struct npc_sporeAI : public ScriptedAI
         {
-            npc_sporeAI(Creature* pCreature) : ScriptedAI(pCreature)
+            npc_sporeAI(Creature* creature) : ScriptedAI(creature)
             {
-                m_pInstance = pCreature->GetInstanceScript();
+                m_pInstance = creature->GetInstanceScript();
             }
 
             InstanceScript* m_pInstance;

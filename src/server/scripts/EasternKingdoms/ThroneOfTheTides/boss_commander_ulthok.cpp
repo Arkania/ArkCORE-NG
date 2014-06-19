@@ -57,14 +57,14 @@ class boss_commander_ulthok : public CreatureScript
     public:
         boss_commander_ulthok() : CreatureScript("boss_commander_ulthok") { }
 
-        CreatureAI* GetAI(Creature *pCreature) const
+        CreatureAI* GetAI(Creature *creature) const
         {
-            return new boss_commander_ulthokAI (pCreature);
+            return new boss_commander_ulthokAI (creature);
         }
 
         struct boss_commander_ulthokAI : public BossAI
         {
-            boss_commander_ulthokAI(Creature* pCreature) : BossAI(pCreature, DATA_COMMANDER_ULTHOK)
+            boss_commander_ulthokAI(Creature* creature) : BossAI(creature, DATA_COMMANDER_ULTHOK)
             {
                 me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
@@ -166,9 +166,9 @@ class npc_ulthok_dark_fissure : public CreatureScript
     public:
         npc_ulthok_dark_fissure() : CreatureScript("npc_ulthok_dark_fissure") { }
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_ulthok_dark_fissureAI (pCreature);
+            return new npc_ulthok_dark_fissureAI (creature);
         }
 
         struct npc_ulthok_dark_fissureAI : public ScriptedAI

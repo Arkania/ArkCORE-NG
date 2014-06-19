@@ -58,7 +58,7 @@ public:
         static ChatCommand lookupCommandTable[] =
         {
             { "area",     rbac::RBAC_PERM_COMMAND_LOOKUP_AREA,     true, &HandleLookupAreaCommand,     "", NULL },
-            { "creature", rbac::RBAC_PERM_COMMAND_LOOKUP_CREATURE, true, &HandleLookupCreatureCommand, "", NULL },
+            { "creature", rbac::RBAC_PERM_COMMAND_LOOKUP_CREATURE, true, &HandleLookucreatureCommand, "", NULL },
             { "event",    rbac::RBAC_PERM_COMMAND_LOOKUP_EVENT,    true, &HandleLookupEventCommand,    "", NULL },
             { "faction",  rbac::RBAC_PERM_COMMAND_LOOKUP_FACTION,  true, &HandleLookupFactionCommand,  "", NULL },
             { "item",     rbac::RBAC_PERM_COMMAND_LOOKUP_ITEM,     true, &HandleLookupItemCommand,     "", NULL },
@@ -140,7 +140,7 @@ public:
         return true;
     }
 
-    static bool HandleLookupCreatureCommand(ChatHandler* handler, char const* args)
+    static bool HandleLookucreatureCommand(ChatHandler* handler, char const* args)
     {
         if (!*args)
             return false;

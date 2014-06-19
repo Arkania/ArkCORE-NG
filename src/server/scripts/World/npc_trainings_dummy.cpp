@@ -142,9 +142,9 @@ public:
     };
 
 
-	CreatureAI* GetAI(Creature* pCreature) const
+	CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_trainings_dummyAI (pCreature);
+        return new npc_trainings_dummyAI (creature);
     }
 };
 

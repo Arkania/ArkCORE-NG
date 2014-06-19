@@ -330,9 +330,9 @@ class npc_snowfall_glade_playmate : public CreatureScript
             uint64 orphanGUID;
         };
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_snowfall_glade_playmateAI(pCreature);
+            return new npc_snowfall_glade_playmateAI(creature);
         }
 };
 

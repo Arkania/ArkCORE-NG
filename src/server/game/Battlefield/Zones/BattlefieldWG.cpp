@@ -112,7 +112,7 @@ bool BattlefieldWG::SetupBattlefield()
     }
 
 
-    // Spawn workshop creatures and gameobjects
+    // Spawn workshocreatures and gameobjects
     for (uint8 i = 0; i < WG_MAX_WORKSHOP; i++)
     {
         WGWorkshop* workshop = new WGWorkshop(this, i);
@@ -130,14 +130,14 @@ bool BattlefieldWG::SetupBattlefield()
     {
         // Horde npc
         if (Creature* creature = SpawnCreature(WGKeepNPC[i].entryHorde, WGKeepNPC[i].x, WGKeepNPC[i].y, WGKeepNPC[i].z, WGKeepNPC[i].o, TEAM_HORDE))
-            KeepCreature[TEAM_HORDE].insert(creature->GetGUID());
+            Keecreature[TEAM_HORDE].insert(creature->GetGUID());
         // Alliance npc
         if (Creature* creature = SpawnCreature(WGKeepNPC[i].entryAlliance, WGKeepNPC[i].x, WGKeepNPC[i].y, WGKeepNPC[i].z, WGKeepNPC[i].o, TEAM_ALLIANCE))
-            KeepCreature[TEAM_ALLIANCE].insert(creature->GetGUID());
+            Keecreature[TEAM_ALLIANCE].insert(creature->GetGUID());
     }
 
     // Hide NPCs from the Attacker's team in the keep
-    for (GuidSet::const_iterator itr = KeepCreature[GetAttackerTeam()].begin(); itr != KeepCreature[GetAttackerTeam()].end(); ++itr)
+    for (GuidSet::const_iterator itr = Keecreature[GetAttackerTeam()].begin(); itr != Keecreature[GetAttackerTeam()].end(); ++itr)
         if (Creature* creature = GetCreature(*itr))
             HideNpc(creature);
 
@@ -320,11 +320,11 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
     if (!endByTimer) // One player triggered the relic
     {
         // Change all npc in keep
-        for (GuidSet::const_iterator itr = KeepCreature[GetAttackerTeam()].begin(); itr != KeepCreature[GetAttackerTeam()].end(); ++itr)
+        for (GuidSet::const_iterator itr = Keecreature[GetAttackerTeam()].begin(); itr != Keecreature[GetAttackerTeam()].end(); ++itr)
             if (Creature* creature = GetCreature(*itr))
                 HideNpc(creature);
 
-        for (GuidSet::const_iterator itr = KeepCreature[GetDefenderTeam()].begin(); itr != KeepCreature[GetDefenderTeam()].end(); ++itr)
+        for (GuidSet::const_iterator itr = Keecreature[GetDefenderTeam()].begin(); itr != Keecreature[GetDefenderTeam()].end(); ++itr)
             if (Creature* creature = GetCreature(*itr))
                 ShowNpc(creature, true);
 
@@ -639,8 +639,8 @@ void BattlefieldWG::HandleKill(Player* killer, Unit* victim)
         return;
     }
 
-    for (GuidSet::const_iterator itr = KeepCreature[GetOtherTeam(killerTeam)].begin();
-         itr != KeepCreature[GetOtherTeam(killerTeam)].end(); ++itr)
+    for (GuidSet::const_iterator itr = Keecreature[GetOtherTeam(killerTeam)].begin();
+         itr != Keecreature[GetOtherTeam(killerTeam)].end(); ++itr)
     {
         if (Creature* creature = GetCreature(*itr))
         {

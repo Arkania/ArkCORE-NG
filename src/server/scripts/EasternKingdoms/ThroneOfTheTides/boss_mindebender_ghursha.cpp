@@ -88,14 +88,14 @@ class boss_erunak_stonespeaker : public CreatureScript
     public:
         boss_erunak_stonespeaker() : CreatureScript("boss_erunak_stonespeaker") { }
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new boss_erunak_stonespeakerAI(pCreature);
+            return new boss_erunak_stonespeakerAI(creature);
         }
 
         struct boss_erunak_stonespeakerAI : public ScriptedAI
         {
-            boss_erunak_stonespeakerAI(Creature* pCreature) : ScriptedAI(pCreature), summons(me)
+            boss_erunak_stonespeakerAI(Creature* creature) : ScriptedAI(creature), summons(me)
             {
                 me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
@@ -109,7 +109,7 @@ class boss_erunak_stonespeaker : public CreatureScript
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
                 me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_CONFUSE, true);
-                pInstance = pCreature->GetInstanceScript();
+                pInstance = creature->GetInstanceScript();
             }
 
             InstanceScript* pInstance;
@@ -224,14 +224,14 @@ class boss_mindbender_ghursha : public CreatureScript
     public:
         boss_mindbender_ghursha() : CreatureScript("boss_mindbender_ghursha") { }
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new boss_mindbender_ghurshaAI (pCreature);
+            return new boss_mindbender_ghurshaAI (creature);
         }
 
         struct boss_mindbender_ghurshaAI : public BossAI
         {
-            boss_mindbender_ghurshaAI(Creature* pCreature) : BossAI(pCreature, DATA_MINDBENDER_GHURSHA)
+            boss_mindbender_ghurshaAI(Creature* creature) : BossAI(creature, DATA_MINDBENDER_GHURSHA)
             {
                 me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
@@ -347,14 +347,14 @@ class npc_erunak_earth_shards : public CreatureScript
     public:
         npc_erunak_earth_shards() : CreatureScript("npc_erunak_earth_shards") { }
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_erunak_earth_shardsAI(pCreature);
+            return new npc_erunak_earth_shardsAI(creature);
         }
 
         struct npc_erunak_earth_shardsAI : public ScriptedAI
         {
-            npc_erunak_earth_shardsAI(Creature* pCreature) : ScriptedAI(pCreature)
+            npc_erunak_earth_shardsAI(Creature* creature) : ScriptedAI(creature)
             {
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -384,14 +384,14 @@ class npc_ghursha_mind_fog : public CreatureScript
     public:
         npc_ghursha_mind_fog() : CreatureScript("npc_ghursha_mind_fog") { }
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_ghursha_mind_fogAI (pCreature);
+            return new npc_ghursha_mind_fogAI (creature);
         }
 
         struct npc_ghursha_mind_fogAI : public ScriptedAI
         {
-            npc_ghursha_mind_fogAI(Creature* pCreature) : ScriptedAI(pCreature)
+            npc_ghursha_mind_fogAI(Creature* creature) : ScriptedAI(creature)
             {
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);

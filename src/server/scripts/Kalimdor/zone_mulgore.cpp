@@ -213,9 +213,9 @@ public:
         }
     };
 
-       CreatureAI* GetAI(Creature* pCreature) const  
+       CreatureAI* GetAI(Creature* creature) const  
     {
-        return new npc_bristleback_invaderAI (pCreature);
+        return new npc_bristleback_invaderAI (creature);
     }
 };
 
@@ -261,9 +261,9 @@ public:
         }
     };
 
-       CreatureAI* GetAI(Creature* pCreature) const  
+       CreatureAI* GetAI(Creature* creature) const  
     {
-        return new npc_fledgling_braveAI (pCreature);
+        return new npc_fledgling_braveAI (creature);
     }
 };
 

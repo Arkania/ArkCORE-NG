@@ -124,14 +124,14 @@ class npc_neptulon : public CreatureScript
     public:
         npc_neptulon() : CreatureScript("npc_neptulon") { }
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_neptulonAI (pCreature);
+            return new npc_neptulonAI (creature);
         }
 
-        bool OnGossipHello(Player* pPlayer, Creature* pCreature)
+        bool OnGossipHello(Player* pPlayer, Creature* creature)
         {
-            if (InstanceScript* pInstance = pCreature->GetInstanceScript())
+            if (InstanceScript* pInstance = creature->GetInstanceScript())
             {
                 if (pInstance->GetBossState(DATA_COMMANDER_ULTHOK) != DONE
                     || pInstance->GetBossState(DATA_OZUMAT) == IN_PROGRESS
@@ -139,14 +139,14 @@ class npc_neptulon : public CreatureScript
                     return false;
 
                 pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_READY, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
-                pPlayer->SEND_GOSSIP_MENU(1, pCreature->GetGUID());
+                pPlayer->SEND_GOSSIP_MENU(1, creature->GetGUID());
             }
             return true;
         }
 
-        bool OnGossipSelect(Player* pPlayer, Creature* pCreature, uint32 /*uiSender*/, uint32 /*uiAction*/)
+        bool OnGossipSelect(Player* pPlayer, Creature* creature, uint32 /*uiSender*/, uint32 /*uiAction*/)
         {
-            if (InstanceScript* pInstance = pCreature->GetInstanceScript())
+            if (InstanceScript* pInstance = creature->GetInstanceScript())
             {
                 if (pInstance->GetBossState(DATA_COMMANDER_ULTHOK) != DONE
                     || pInstance->GetBossState(DATA_OZUMAT) == IN_PROGRESS
@@ -155,18 +155,18 @@ class npc_neptulon : public CreatureScript
 
                 pPlayer->PlayerTalkClass->ClearMenus();
                 pPlayer->CLOSE_GOSSIP_MENU();
-                pCreature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
                 pInstance->SetBossState(DATA_OZUMAT, IN_PROGRESS);
-                pCreature->AI()->DoAction(ACTION_NEPTULON_START);
+                creature->AI()->DoAction(ACTION_NEPTULON_START);
             }
             return true;
         }
 
         struct npc_neptulonAI : public ScriptedAI
         {
-            npc_neptulonAI(Creature* pCreature) : ScriptedAI(pCreature), summons(me)
+            npc_neptulonAI(Creature* creature) : ScriptedAI(creature), summons(me)
             {
-                pInstance = pCreature->GetInstanceScript();
+                pInstance = creature->GetInstanceScript();
             }
 
             InstanceScript* pInstance;
@@ -218,10 +218,10 @@ class npc_neptulon : public CreatureScript
                 summons.Summon(summon);
             }
 
-            void SummonedCreatureDies(Creature* pCreature, Unit* /*pKiller*/)
+            void SummonedCreatureDies(Creature* creature, Unit* /*pKiller*/)
             {
-                summons.Despawn(pCreature);
-                if (pCreature->GetEntry() == NPC_VICIOUS_MINDLASHER)
+                summons.Despawn(creature);
+                if (creature->GetEntry() == NPC_VICIOUS_MINDLASHER)
                 {
                     uiMindLasherCount++;
                     if (uiMindLasherCount > 2)
@@ -236,7 +236,7 @@ class npc_neptulon : public CreatureScript
                     else
                         events.ScheduleEvent(EVENT_SUMMON_MINDLASHER, urand(10000, 15000));
                 }
-                else if (pCreature->GetEntry() == NPC_FACELESS_SAPPER)
+                else if (creature->GetEntry() == NPC_FACELESS_SAPPER)
                 {
                     uiSapperCount++;
                     if (uiSapperCount > 2)
@@ -404,16 +404,16 @@ class npc_vicious_mindslasher : public CreatureScript
     public:
         npc_vicious_mindslasher() : CreatureScript("npc_vicious_mindslasher") { }
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_vicious_mindslasherAI(pCreature);
+            return new npc_vicious_mindslasherAI(creature);
         }
 
         struct npc_vicious_mindslasherAI : public ScriptedAI
         {
-            npc_vicious_mindslasherAI(Creature* pCreature) : ScriptedAI(pCreature)
+            npc_vicious_mindslasherAI(Creature* creature) : ScriptedAI(creature)
             {
-                pInstance = pCreature->GetInstanceScript();
+                pInstance = creature->GetInstanceScript();
             }
 
             InstanceScript* pInstance;
@@ -477,16 +477,16 @@ class npc_unyielding_behemoth : public CreatureScript
     public:
         npc_unyielding_behemoth() : CreatureScript("npc_unyielding_behemoth") { }
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_unyielding_behemothAI(pCreature);
+            return new npc_unyielding_behemothAI(creature);
         }
 
         struct npc_unyielding_behemothAI : public ScriptedAI
         {
-            npc_unyielding_behemothAI(Creature* pCreature) : ScriptedAI(pCreature)
+            npc_unyielding_behemothAI(Creature* creature) : ScriptedAI(creature)
             {
-                pInstance = pCreature->GetInstanceScript();
+                pInstance = creature->GetInstanceScript();
             }
 
             InstanceScript* pInstance;
@@ -536,14 +536,14 @@ class npc_faceless_sapper : public CreatureScript
     public:
         npc_faceless_sapper() : CreatureScript("npc_faceless_sapper") { }
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_faceless_sapperAI(pCreature);
+            return new npc_faceless_sapperAI(creature);
         }
 
         struct npc_faceless_sapperAI : public ScriptedAI
         {
-            npc_faceless_sapperAI(Creature* pCreature) : ScriptedAI(pCreature)
+            npc_faceless_sapperAI(Creature* creature) : ScriptedAI(creature)
             {
                 me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
@@ -571,9 +571,9 @@ class npc_blight_of_ozumat : public CreatureScript
     public:
         npc_blight_of_ozumat() : CreatureScript("npc_blight_of_ozumat") { }
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_blight_of_ozumatAI (pCreature);
+            return new npc_blight_of_ozumatAI (creature);
         }
 
         struct npc_blight_of_ozumatAI : public ScriptedAI

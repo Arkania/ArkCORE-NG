@@ -47,11 +47,11 @@ public:
 
     struct boss_baron_ashburyAI : public BossAI
     {
-        boss_baron_ashburyAI(Creature* pCreature) : BossAI(pCreature, DATA_BARON_ASHBURY)
+        boss_baron_ashburyAI(Creature* creature) : BossAI(creature, DATA_BARON_ASHBURY)
         {
             me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
             me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
-            pInstance = pCreature->GetInstanceScript();
+            pInstance = creature->GetInstanceScript();
         }
 
         uint32 PainAndSufferingTimer;
@@ -185,9 +185,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature *pCreature) const
+    CreatureAI* GetAI(Creature *creature) const
     {
-        return new boss_baron_ashburyAI (pCreature);
+        return new boss_baron_ashburyAI (creature);
     }
 };
 

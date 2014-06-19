@@ -184,9 +184,9 @@ class npc_vortex_pinnacle_slipsteam : public CreatureScript
     public:
         npc_vortex_pinnacle_slipsteam() : CreatureScript("npc_vortex_pinnacle_slipsteam") { }
         
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_vortex_pinnacle_slipsteamAI(pCreature);
+            return new npc_vortex_pinnacle_slipsteamAI(creature);
         }
 
         bool OnGossipHello(Player* pPlayer, Creature* creature)
@@ -217,7 +217,7 @@ class npc_vortex_pinnacle_slipsteam : public CreatureScript
 
         struct npc_vortex_pinnacle_slipsteamAI : public ScriptedAI
         {
-            npc_vortex_pinnacle_slipsteamAI(Creature* pCreature) : ScriptedAI(pCreature)
+            npc_vortex_pinnacle_slipsteamAI(Creature* creature) : ScriptedAI(creature)
             {
                 me->SetCanFly(true);
             }
@@ -237,14 +237,14 @@ class npc_skyfall_star : public CreatureScript
     public:
         npc_skyfall_star() : CreatureScript("npc_skyfall_star") { }
         
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_skyfall_starAI(pCreature);
+            return new npc_skyfall_starAI(creature);
         }
 
         struct npc_skyfall_starAI : public ScriptedAI
         {
-            npc_skyfall_starAI(Creature* pCreature) : ScriptedAI(pCreature)
+            npc_skyfall_starAI(Creature* creature) : ScriptedAI(creature)
             {
                 me->SetCanFly(true);
                 SetCombatMovement(false);
@@ -296,14 +296,14 @@ class npc_cloud_prince : public CreatureScript
     public:
         npc_cloud_prince() : CreatureScript("npc_cloud_prince") { }
         
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_cloud_princeAI(pCreature);
+            return new npc_cloud_princeAI(creature);
         }
 
         struct npc_cloud_princeAI : public ScriptedAI
         {
-            npc_cloud_princeAI(Creature* pCreature) : ScriptedAI(pCreature)
+            npc_cloud_princeAI(Creature* creature) : ScriptedAI(creature)
             {
             }
 
@@ -355,14 +355,14 @@ class npc_whipping_wind : public CreatureScript
     public:
         npc_whipping_wind() : CreatureScript("npc_whipping_wind") { }
         
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_whipping_windAI(pCreature);
+            return new npc_whipping_windAI(creature);
         }
 
         struct npc_whipping_windAI : public ScriptedAI
         {
-            npc_whipping_windAI(Creature* pCreature) : ScriptedAI(pCreature)
+            npc_whipping_windAI(Creature* creature) : ScriptedAI(creature)
             {
             }
 
@@ -408,14 +408,14 @@ class npc_young_storm_dragon : public CreatureScript
     public:
         npc_young_storm_dragon() : CreatureScript("npc_young_storm_dragon") { }
         
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_young_storm_dragonAI(pCreature);
+            return new npc_young_storm_dragonAI(creature);
         }
 
         struct npc_young_storm_dragonAI : public ScriptedAI
         {
-            npc_young_storm_dragonAI(Creature* pCreature) : ScriptedAI(pCreature)
+            npc_young_storm_dragonAI(Creature* creature) : ScriptedAI(creature)
             {
                 me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
@@ -474,14 +474,14 @@ class npc_armored_mistral : public CreatureScript
     public:
         npc_armored_mistral() : CreatureScript("npc_armored_mistral") { }
         
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_armored_mistralAI(pCreature);
+            return new npc_armored_mistralAI(creature);
         }
 
         struct npc_armored_mistralAI : public ScriptedAI
         {
-            npc_armored_mistralAI(Creature* pCreature) : ScriptedAI(pCreature)
+            npc_armored_mistralAI(Creature* creature) : ScriptedAI(creature)
             {
             }
 
@@ -533,14 +533,14 @@ class npc_empyrean_assassin : public CreatureScript
     public:
         npc_empyrean_assassin() : CreatureScript("npc_empyrean_assassin") { }
         
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_empyrean_assassinAI(pCreature);
+            return new npc_empyrean_assassinAI(creature);
         }
 
         struct npc_empyrean_assassinAI : public ScriptedAI
         {
-            npc_empyrean_assassinAI(Creature* pCreature) : ScriptedAI(pCreature)
+            npc_empyrean_assassinAI(Creature* creature) : ScriptedAI(creature)
             {
             }
 
@@ -587,14 +587,14 @@ class npc_executor_of_the_caliph : public CreatureScript
     public:
         npc_executor_of_the_caliph() : CreatureScript("npc_executor_of_the_caliph") { }
         
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_executor_of_the_caliphAI(pCreature);
+            return new npc_executor_of_the_caliphAI(creature);
         }
 
         struct npc_executor_of_the_caliphAI : public ScriptedAI
         {
-            npc_executor_of_the_caliphAI(Creature* pCreature) : ScriptedAI(pCreature)
+            npc_executor_of_the_caliphAI(Creature* creature) : ScriptedAI(creature)
             {
             }
 
@@ -650,14 +650,14 @@ class npc_gust_soldier : public CreatureScript
     public:
         npc_gust_soldier() : CreatureScript("npc_gust_soldier") { }
         
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_gust_soldierAI(pCreature);
+            return new npc_gust_soldierAI(creature);
         }
 
         struct npc_gust_soldierAI : public ScriptedAI
         {
-            npc_gust_soldierAI(Creature* pCreature) : ScriptedAI(pCreature)
+            npc_gust_soldierAI(Creature* creature) : ScriptedAI(creature)
             {
             }
 
@@ -709,14 +709,14 @@ class npc_lurking_tempest : public CreatureScript
     public:
         npc_lurking_tempest() : CreatureScript("npc_lurking_tempest") { }
         
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_lurking_tempestAI(pCreature);
+            return new npc_lurking_tempestAI(creature);
         }
 
         struct npc_lurking_tempestAI : public ScriptedAI
         {
-            npc_lurking_tempestAI(Creature* pCreature) : ScriptedAI(pCreature) { }
+            npc_lurking_tempestAI(Creature* creature) : ScriptedAI(creature) { }
 
             void Reset() { }
 
@@ -735,14 +735,14 @@ class npc_howling_gale : public CreatureScript
     public:
         npc_howling_gale() : CreatureScript("npc_howling_gale") { }
         
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_howling_galeAI(pCreature);
+            return new npc_howling_galeAI(creature);
         }
 
         struct npc_howling_galeAI : public ScriptedAI
         {
-            npc_howling_galeAI(Creature* pCreature) : ScriptedAI(pCreature)
+            npc_howling_galeAI(Creature* creature) : ScriptedAI(creature)
             {
                 me->SetReactState(REACT_PASSIVE);
                 SetCombatMovement(false);
@@ -821,14 +821,14 @@ class npc_minister_of_air : public CreatureScript
     public:
         npc_minister_of_air() : CreatureScript("npc_minister_of_air") { }
         
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_minister_of_airAI(pCreature);
+            return new npc_minister_of_airAI(creature);
         }
 
         struct npc_minister_of_airAI : public ScriptedAI
         {
-            npc_minister_of_airAI(Creature* pCreature) : ScriptedAI(pCreature)
+            npc_minister_of_airAI(Creature* creature) : ScriptedAI(creature)
             {
             }
 
@@ -880,14 +880,14 @@ class npc_servant_of_asaad : public CreatureScript
     public:
         npc_servant_of_asaad() : CreatureScript("npc_servant_of_asaad") { }
         
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_servant_of_asaadAI(pCreature);
+            return new npc_servant_of_asaadAI(creature);
         }
 
         struct npc_servant_of_asaadAI : public ScriptedAI
         {
-            npc_servant_of_asaadAI(Creature* pCreature) : ScriptedAI(pCreature)
+            npc_servant_of_asaadAI(Creature* creature) : ScriptedAI(creature)
             {
             }
 
@@ -939,14 +939,14 @@ class npc_temple_adept : public CreatureScript
     public:
         npc_temple_adept() : CreatureScript("npc_temple_adept") { }
         
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_temple_adeptAI(pCreature);
+            return new npc_temple_adeptAI(creature);
         }
 
         struct npc_temple_adeptAI : public ScriptedAI
         {
-            npc_temple_adeptAI(Creature* pCreature) : ScriptedAI(pCreature)
+            npc_temple_adeptAI(Creature* creature) : ScriptedAI(creature)
             {
             }
 
@@ -1023,14 +1023,14 @@ class npc_turbulent_squall : public CreatureScript
     public:
         npc_turbulent_squall() : CreatureScript("npc_turbulent_squall") { }
         
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_turbulent_squallAI(pCreature);
+            return new npc_turbulent_squallAI(creature);
         }
 
         struct npc_turbulent_squallAI : public ScriptedAI
         {
-            npc_turbulent_squallAI(Creature* pCreature) : ScriptedAI(pCreature) { }
+            npc_turbulent_squallAI(Creature* creature) : ScriptedAI(creature) { }
 
             EventMap events;
 
@@ -1086,14 +1086,14 @@ class npc_wild_vortex : public CreatureScript
     public:
         npc_wild_vortex() : CreatureScript("npc_wild_vortex") { }
         
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_wild_vortexAI(pCreature);
+            return new npc_wild_vortexAI(creature);
         }
 
         struct npc_wild_vortexAI : public ScriptedAI
         {
-            npc_wild_vortexAI(Creature* pCreature) : ScriptedAI(pCreature)
+            npc_wild_vortexAI(Creature* creature) : ScriptedAI(creature)
             {
             }
 
