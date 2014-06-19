@@ -210,9 +210,7 @@ public:
                     phase = 2;
                     break;
                 case 2:
-                    Position pos;
-                    me->GetNearPosition(pos, 25.0f, me->GetFollowAngle());
-                    me->GetMotionMaster()->MovePoint(0, pos);
+                    me->GetMotionMaster()->MovePoint(0, me->GetNearPosition(25.0f, me->GetFollowAngle()));
                     timer = 10000;
                     phase = 3;
                     break;
