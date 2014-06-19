@@ -425,7 +425,7 @@ class BattlefieldWG : public Battlefield
 
         GuidSet m_vehicles[2];
         GuidSet CanonList;
-        GuidSet Keecreature[2];
+        GuidSet KeepCreature[2];
         GuidSet OutsideCreature[2];
 
         uint32 m_tenacityStack;

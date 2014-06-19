@@ -1428,6 +1428,7 @@ void GameEventMgr::UpdateEventQuests(uint16 event_id, bool activate)
     {
         QuestRelations* CreatureQuestMap = sObjectMgr->GetCreatureQuestRelationMap();
         if (activate)                                           // Add the pair(id, quest) to the multimacreatureQuestMap->insert(QuestRelations::value_type(itr->first, itr->second));
+            CreatureQuestMap->insert(QuestRelations::value_type(itr->first, itr->second));
         else
         {
             if (!hasCreatureQuestActiveEventExcept(itr->second, event_id))

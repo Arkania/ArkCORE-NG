@@ -7256,6 +7256,7 @@ void ObjectMgr::LoadNPCSpellClickSpells()
 void ObjectMgr::DeleteCreatureData(uint32 guid)
 {
     // remove mapid*cellid -> guid_set macreatureData const* data = GetCreatureData(guid);
+    CreatureData const* data = GetCreatureData(guid);
     if (data)
         RemoveCreatureFromGrid(guid, data);
 
