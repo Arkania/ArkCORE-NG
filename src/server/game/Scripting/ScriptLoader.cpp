@@ -302,23 +302,6 @@ void AddSC_boss_venoxis();
 void AddSC_boss_wushoolay();
 void AddSC_boss_zanzil();
 void AddSC_instance_zulgurub();
-void AddSC_boss_pit_lord_argaloth();
-void AddSC_instance_baradin_hold();
-void AddSC_boss_assembly_of_ascendents();
-void AddSC_boss_ascendant_lord_obsidius();
-void AddSC_boss_beauty();
-void AddSC_boss_corla_herald_of_twilight();
-void AddSC_boss_karsh_steelbender();
-void AddSC_boss_romogg_bonecrusher();
-void AddSC_instance_blackrock_caverns();
-void AddSC_boss_gizrul_the_slavener();
-void AddSC_boss_urok_doomhowl();
-void AddSC_boss_lord_valthalak();
-void AddSC_boss_kirtonos_the_herald();
-void AddSC_instance_the_stockade();
-void AddSC_coldridge_valley();
-void AddSC_elwynn_forest();
-void AddSC_gilneas_city();
 void AddSC_gilneas_duskhaven();
 
 //void AddSC_alterac_mountains();
@@ -1178,23 +1161,6 @@ void AddEasternKingdomsScripts()
 
     // gilneas
     AddSC_gilneas();
-	AddSC_boss_pit_lord_argaloth();
-	AddSC_instance_baradin_hold();
-	AddSC_boss_assembly_of_ascendents();
-	AddSC_boss_ascendant_lord_obsidius();
-	AddSC_boss_beauty();
-	AddSC_boss_corla_herald_of_twilight();
-	AddSC_boss_karsh_steelbender();
-	AddSC_boss_romogg_bonecrusher();
-	AddSC_instance_blackrock_caverns();
-	AddSC_boss_gizrul_the_slavener();
-	AddSC_boss_urok_doomhowl();
-	AddSC_boss_lord_valthalak();
-	AddSC_boss_kirtonos_the_herald();
-	AddSC_instance_the_stockade();
-	AddSC_coldridge_valley();
-	AddSC_elwynn_forest();
-	AddSC_gilneas_city();
     AddSC_gilneas_duskhaven();
 
 #endif
