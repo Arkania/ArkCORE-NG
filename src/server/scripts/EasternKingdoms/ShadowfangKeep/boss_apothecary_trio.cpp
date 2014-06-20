@@ -182,7 +182,7 @@ class npc_apothecary_hummel : public CreatureScript
                     _instance->HandleGameObject(0, true, door);
             }
 
-            void DoAction(int32 const action)
+            void DoAction(int32 action) override
             {
                 switch (action)
                 {
@@ -386,7 +386,7 @@ class npc_apothecary_baxter : public CreatureScript
                 }
             }
 
-            void DoAction(int32 const action)
+            void DoAction(int32 action) override
             {
                 switch (action)
                 {
@@ -515,7 +515,7 @@ class npc_apothecary_frye : public CreatureScript
                 }
             }
 
-            void DoAction(int32 const action)
+            void DoAction(int32 action) override
             {
                 switch (action)
                 {

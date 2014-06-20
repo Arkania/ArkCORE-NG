@@ -194,7 +194,7 @@ class npc_neptulon : public CreatureScript
                         pInstance->SetBossState(DATA_OZUMAT, NOT_STARTED);
             }
 
-            void DoAction(const int32 action)
+            void DoAction(int32 action) override
             {
                 if (action == ACTION_NEPTULON_START_EVENT)
                 {

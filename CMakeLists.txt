@@ -9,15 +9,12 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 # Set projectname (must be done AFTER setting configurationtypes)
+
 project(ArkCORE4-NG)
 
 # CMake policies (can not be handled elsewhere)
-cmake_minimum_required(VERSION 2.8.9)
+cmake_minimum_required(VERSION 2.8)
 cmake_policy(SET CMP0005 OLD)
-
-# add this options before PROJECT keyword
-set(CMAKE_DISABLE_SOURCE_CHANGES ON)
-set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
 
 # Set RPATH-handing (CMake parameters)
 set(CMAKE_SKIP_BUILD_RPATH 0)
@@ -48,14 +45,9 @@ endif()
 include(CheckPlatform)
 
 # basic packagesearching and setup (further support will be needed, this is a preliminary release!)
-set(OPENSSL_EXPECTED_VERSION 1.0.0)
-set(ACE_EXPECTED_VERSION 5.8.3)
-
 find_package(PCHSupport)
 find_package(ACE REQUIRED)
 find_package(OpenSSL REQUIRED)
-find_package(Threads REQUIRED)
-
 if( NOT USE_MYSQL_SOURCES )
   find_package(MySQL REQUIRED)
 endif()
@@ -64,10 +56,6 @@ if( UNIX )
   find_package(Readline)
   find_package(ZLIB)
   find_package(BZip2)
-endif()
-
-if(NOT WITHOUT_GIT)
-  find_package(Git)
 endif()
 
 # Find revision ID and hash of the sourcetree

@@ -89,7 +89,7 @@ public:
             me->setActive(true);
         }
 
-        void DoAction(int32 const action)
+        void DoAction(int32 action) override
         {
             switch (action)
             {
@@ -215,7 +215,7 @@ public:
             }
         }
 
-        void DoAction(int32 const action)
+        void DoAction(int32 action) override
         {
             switch (action)
             {

@@ -267,7 +267,7 @@ class boss_mindbender_ghursha : public CreatureScript
                     pErunak->AI()->EnterEvadeMode();
             }
 
-            void DoAction(const int32 action)
+            void DoAction(int32 action) override
             {
                 if (action == ACTION_GHURSHA_START)
                 {

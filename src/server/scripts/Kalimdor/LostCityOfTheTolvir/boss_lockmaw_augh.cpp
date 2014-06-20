@@ -680,7 +680,7 @@ public:
             }
         }
 
-        void DoAction(const int32 action)
+        void DoAction(int32 action) override
         {
             if (action == ACTION_LOCKMAW_IS_DONE)
             {

@@ -272,7 +272,7 @@ public:
             }
         }
 
-        void DoAction(const int32 action)
+        void DoAction(int32 action) override
         {
             switch(action)
             {
@@ -519,7 +519,7 @@ public:
                 omnotron->AI()->DoAction(ACTION_OMNOTRON_RESET);
         };
 
-        void DoAction(const int32 action)
+        void DoAction(int32 action) override
         {
             events.Reset();
             me->FindNearestCreature(BOSS_OMNOTRON, 100.0f, true);

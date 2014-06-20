@@ -507,7 +507,7 @@ public:
             else uiSystemFailureTimer -= diff;
         }
 
-        void DoAction(const int32 action)
+        void DoAction(int32 action) override
         {
             // Map::PlayerList const &PlayerList = me->GetMap()->GetPlayers();
 

@@ -293,7 +293,7 @@ public:
             _EnterCombat();
         }
 
-        void DoAction(const int32 action)
+        void DoAction(int32 action) override
         {
             switch(action)
             {
@@ -866,7 +866,7 @@ public:
         InstanceScript* instance;
         bool firstChainHit, secondChainHit;
 
-        void DoAction(const int32 action)
+        void DoAction(int32 action) override
         {
             switch(action)
             {

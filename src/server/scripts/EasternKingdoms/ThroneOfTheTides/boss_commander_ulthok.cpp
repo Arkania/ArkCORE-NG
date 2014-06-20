@@ -93,7 +93,7 @@ class boss_commander_ulthok : public CreatureScript
                 _Reset();
             }
 
-            void DoAction(const int32 action)
+            void DoAction(int32 action) override
             {
                 if (action == ACTION_COMMANDER_ULTHOK_START_EVENT)
                 {

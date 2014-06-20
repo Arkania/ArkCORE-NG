@@ -480,7 +480,7 @@ class boss_ragnaros_firelands : public CreatureScript
                 _EnterCombat();
             }
 
-            void DoAction(int32 const action)
+            void DoAction(int32 action) override
             {
                 switch (action)
                 {

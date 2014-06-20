@@ -722,7 +722,7 @@ public:
             _EnterCombat();
         }
 
-		void DoAction(const int32 action) OVERRIDE
+		void DoAction(int32 action) override OVERRIDE
         {
             switch(action)
             {

@@ -1206,7 +1206,7 @@ public:
         uint8 uiType;
         bool Event;
 
-        void DoAction(const int32 action)
+        void DoAction(int32 action) override
         {
             if (action == ACTION_START_EVENT)
             {
@@ -2764,7 +2764,7 @@ public:
             summoned->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
         }
 
-        void DoAction(const int32 action)
+        void DoAction(int32 action) override
         {
             if (action == ACTION_EVENT_DONE)
             {
@@ -3892,7 +3892,7 @@ public:
             }
         }
 
-        void DoAction(const int32 action)
+        void DoAction(int32 action) override
         {
             if (action == ACTION_SUMMON_LUCIUS)
             {
@@ -3984,7 +3984,7 @@ public:
         uint32 uiDespawnTimer;
         bool Despawn;
 
-        void DoAction(const int32 action)
+        void DoAction(int32 action) override
         {
             if (action == ACTION_CHANCE_DESPAWN)
                 Despawn = true;
@@ -5162,7 +5162,7 @@ public:
             }
         }
 
-        void DoAction(const int32 action)
+        void DoAction(int32 action) override
         {
             if (action == ACTION_KOROTH_ATTACK)
                 if (Creature* koroth = Unit::GetCreature(*me, uiKorothGUID))
@@ -5600,7 +5600,7 @@ public:
             me->DespawnOrUnsummon();
         }
 
-        void DoAction(const int32 action)
+        void DoAction(int32 action) override
         {
             if (action == ACTION_PLAYER_IS_FREE)
             {
@@ -5724,7 +5724,7 @@ public:
             creature->SetFlag(UNIT_FIELD_FLAGS,UNIT_FLAG_NON_ATTACKABLE);
         }
 
-        void DoAction(const int32 action)
+        void DoAction(int32 action) override
         {
             if (action == ACTION_BACK)
             {
@@ -7194,7 +7194,7 @@ public:
                 }
         }
 
-        void DoAction(const int32 action)
+        void DoAction(int32 action) override
         {
             switch (action)
             {
@@ -8336,7 +8336,7 @@ public:
         bool gorerot;
         bool jump;
 
-        void DoAction(const int32 action)
+        void DoAction(int32 action) override
         {
             if (action == ACTION_GOREROT_FIGHT)
                 gorerot = true;
@@ -8691,7 +8691,7 @@ public:
             }
         }
 
-        void DoAction(const int32 action)
+        void DoAction(int32 action) override
         {
             if (action == ACTION_ATTACK_SYLVANAS)
                 sylvanas = true;
@@ -8945,7 +8945,7 @@ public:
         uint64 uiLiamGUID;
         bool Battle;
 
-        void DoAction(const int32 action)
+        void DoAction(int32 action) override
         {
             if (action == ACTION_BATTLE_COMPLETE)
             {
