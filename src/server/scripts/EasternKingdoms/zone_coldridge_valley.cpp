@@ -18,7 +18,7 @@
  */
 
 /* ScriptData
-SDName: Duskwood
+SDName: Coldridge_Valley
 SD%Complete: 0
 SDComment: Quest Support:
 SDCategory: Coldridge Valley
