@@ -407,7 +407,7 @@ public:
                 instance->SetData(DATA_ASCENDANT_COUNCIL,IN_PROGRESS);
         }
 
-        void DoAction(int32 action) override
+        void DoAction(int32 action)
         {
             switch(action)
             {

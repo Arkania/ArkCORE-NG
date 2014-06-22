@@ -149,11 +149,7 @@ class instance_bastion_of_twilight : public InstanceMapScript
 
             void OnGameObjectCreate(GameObject* go)
             {
-                switch(go->GetEntry())
-                {
-                    default:
-                        break;
-                }
+               
             }
 
             void SetData(uint32 type, uint32 data)

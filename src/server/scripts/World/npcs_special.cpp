@@ -2635,7 +2635,7 @@ public:
         bool Stun;
         uint64 ForebodingTimerStun;
 
-		void UpdateAI(const uint32 diff) OVERRIDE
+		void UpdateAI(uint32 diff)
         {
             if (FirstCasts)
             {
@@ -2678,7 +2678,7 @@ public:
             me->AttackStop();
         }
 
-		void UpdateAI(const uint32 uiDiff) OVERRIDE
+		void UpdateAI(uint32 uiDiff)
         {
             if (!UpdateVictim())
                 return;
@@ -2849,7 +2849,7 @@ public:
             }
         }
 
-		void UpdateAI(const uint32 /*diff*/) OVERRIDE
+		void UpdateAI(uint32 /*diff*/)
         {
             if (!UpdateVictim())
             {
@@ -3113,7 +3113,7 @@ public:
             }
         }
 
-		void UpdateAI(const uint32 /*diff*/) OVERRIDE
+		void UpdateAI(uint32 /*diff*/)
         {
             if (!UpdateVictim())
                 return;

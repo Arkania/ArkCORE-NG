@@ -187,7 +187,7 @@ class npc_lady_nazjar_event : public CreatureScript
                 }
             }
 
-            void DoAction(int32 action) override
+            void DoAction(int32 action)
             {
                 if (action == ACTION_LADY_NAZJAR_START_EVENT)
                 {

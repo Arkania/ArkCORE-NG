@@ -182,7 +182,7 @@ class npc_apothecary_hummel : public CreatureScript
                     _instance->HandleGameObject(0, true, door);
             }
 
-            void DoAction(int32 action) override
+            void DoAction(int32 action)
             {
                 switch (action)
                 {
@@ -250,7 +250,7 @@ class npc_apothecary_hummel : public CreatureScript
                 }
             }
 
-            void UpdateAI(uint32 const diff)
+            void UpdateAI(uint32 diff)
             {
                 if (_phase == PHASE_INTRO)
                 {
@@ -386,7 +386,7 @@ class npc_apothecary_baxter : public CreatureScript
                 }
             }
 
-            void DoAction(int32 action) override
+            void DoAction(int32 action)
             {
                 switch (action)
                 {
@@ -409,7 +409,7 @@ class npc_apothecary_baxter : public CreatureScript
                 }
             }
 
-			void UpdateAI(uint32 const diff) OVERRIDE
+			void UpdateAI(uint32 diff) OVERRIDE
             {
                 if (_phase == PHASE_INTRO)
                 {
@@ -515,7 +515,7 @@ class npc_apothecary_frye : public CreatureScript
                 }
             }
 
-            void DoAction(int32 action) override
+            void DoAction(int32 action)
             {
                 switch (action)
                 {
@@ -565,7 +565,7 @@ class npc_apothecary_frye : public CreatureScript
                 }
             }
 
-            void UpdateAI(uint32 const diff)
+            void UpdateAI(uint32 diff)
             {
                 if (_phase == PHASE_INTRO)
                 {
@@ -667,7 +667,7 @@ class npc_crazed_apothecary : public CreatureScript
                     me->DespawnOrUnsummon();
             }
 
-            void UpdateAI(uint32 const diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;

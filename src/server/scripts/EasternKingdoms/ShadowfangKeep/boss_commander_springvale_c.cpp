@@ -139,7 +139,7 @@ public:
                 pInstance->SetData(DATA_COMMANDER_SPRINGVALE_EVENT, DONE);
         }
 
-        void UpdateAI(uint32 const diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;

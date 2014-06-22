@@ -167,7 +167,7 @@ public:
             }
         }
 
-        void DoAction(int32 action) override
+        void DoAction(int32 action)
         {
             if (action == ACTION_REPENTANCE_DONE)
             {
@@ -405,7 +405,7 @@ public:
             uiBlazeTimer = 5;
         }
 
-        void DoAction(int32 action) override
+        void DoAction(int32 action)
         {
             switch (action)
             {
@@ -594,7 +594,7 @@ public:
             }
         }
 
-        void DoAction(int32 action) override
+        void DoAction(int32 action)
         {
             if (action == ACTION_REPENTANCE_DONE)
             {

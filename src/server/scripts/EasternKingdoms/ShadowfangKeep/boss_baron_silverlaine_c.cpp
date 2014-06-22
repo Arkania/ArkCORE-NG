@@ -77,7 +77,7 @@ public:
                 pInstance->SetData(DATA_BARON_SILVERLAINE_EVENT, DONE);
         }
 
-        void UpdateAI(uint32 const diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;

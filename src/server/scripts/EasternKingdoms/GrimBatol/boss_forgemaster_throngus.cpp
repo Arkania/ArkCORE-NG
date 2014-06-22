@@ -200,7 +200,7 @@ class boss_forgemaster_throngus : public CreatureScript
                 DoMeleeAttackIfReady();
             }
 
-            void DoAction(int32 action) override
+            void DoAction(int32 action)
             {
                 switch (action)
                 {

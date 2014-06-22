@@ -156,7 +156,7 @@ public:
                 instance->SetData(DATA_SIAMAT, IN_PROGRESS);
         }
 
-        void DoAction(int32 action) override
+        void DoAction(int32 action)
         {
             if (action == ACTION_SERVANT_DEATH)
             {

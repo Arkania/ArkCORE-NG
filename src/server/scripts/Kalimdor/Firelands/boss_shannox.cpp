@@ -294,7 +294,7 @@ public:
             Talk(SAY_ON_KILL);
         }
 
-        void DoAction(int32 action) override
+        void DoAction(int32 action)
         {
             switch(action)
             {
