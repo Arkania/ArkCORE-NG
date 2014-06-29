@@ -1598,3 +1598,22 @@ void WorldSession::HandleReforgeItemOpcode(WorldPacket& recvData)
     if (item->IsEquipped())
         player->ApplyReforgeEnchantment(item, true);
 }
+
+bool WorldSession::CanUseBank(uint64 bankerGUID) const
+{
+    // bankerGUID parameter is optional, set to 0 by default.
+    if (!bankerGUID)
+        bankerGUID = m_currentBankerGUID;
+
+    bool isUsingBankCommand = (bankerGUID == GetPlayer()->GetGUID() && bankerGUID == m_currentBankerGUID);
+
+    if (!isUsingBankCommand)
+    {
+        Creature* creature = GetPlayer()->GetNPCIfCanInteractWith(bankerGUID, UNIT_NPC_FLAG_BANKER);
+        if (!creature)
+            return false;
+    }
+
+    return true;
+}
+

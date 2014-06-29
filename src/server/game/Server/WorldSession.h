@@ -1083,6 +1083,8 @@ class WorldSession
         // private trade methods
         void moveItems(Item* myItems[], Item* hisItems[]);
 
+        bool CanUseBank(uint64 bankerGUID = 0) const;
+
         // logging helper
         void LogUnexpectedOpcode(WorldPacket* packet, const char* status, const char *reason);
         void LogUnprocessedTail(WorldPacket* packet);
@@ -1135,6 +1137,8 @@ class WorldSession
         bool m_isTrialAccount;
         uint32 m_trialTime;
         rbac::RBACData* _RBACData;
+
+        uint64 m_currentBankerGUID;
 
         WorldSession(WorldSession const& right) DELETE_MEMBER;
         WorldSession& operator=(WorldSession const& right) DELETE_MEMBER;
