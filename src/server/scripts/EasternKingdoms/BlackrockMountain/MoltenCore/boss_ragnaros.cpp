@@ -345,5 +345,5 @@ class npc_son_of_flame : public CreatureScript
 void AddSC_boss_ragnaros()
 {
     new boss_ragnaros();
-    new npc_son_of_flame();
+   // new npc_son_of_flame(); // is declared twice
 }
