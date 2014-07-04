@@ -55,7 +55,7 @@ INSERT INTO `creature_text`(`entry`,`groupid`,`id`,`type`,`sound`,`probability`,
 (52409,4,1,14,24515,100,"Ragnaros SAY_INTERMISSION2","Denizens of flame! Come to me!"),
 (52409,5,0,14,24516,100,"Ragnaros SAY_INTERMISSION1","Arrise, servants of fire! Consume their flesh!"),
 (52409,6,0,14,24525,100,"Ragnaros SAY_PHASE_2","Sulfuras will be your end!"),
-(52409,7,1,14,24533,100,"Ragnaros SAY_PHASE_3","Begone from my realm, insects!");
+(52409,7,1,14,24533,100,"Ragnaros SAY_PHASE_3","Begone from my realm, insects!"),
 (52409,8,0,14,24532,100,"Ragnaros SAY_PURGE","By fire be purged!"),
 (52409,9,0,14,24518,100,"Ragnaros SAY_DEATH_H","No, noooo- This was to be my hour of triumph..."),
 (52409,10,0,14,24520,100,"Ragnaros SAY_SULFURAS_SMASH","You will be crushed!"),
