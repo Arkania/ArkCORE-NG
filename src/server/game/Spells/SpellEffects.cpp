@@ -7276,10 +7276,14 @@ void Spell::EffectPlaySound(SpellEffIndex effIndex)
     if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
         return;
 
+    Player* player = unitTarget->ToPlayer();
+    if (!player)
+        return;
+
     switch (m_spellInfo->Id)
     {
         case 91604: // Restricted Flight Area
-            unitTarget->ToPlayer()->GetSession()->SendNotification(LANG_ZONE_NOFLYZONE);
+            player->GetSession()->SendNotification(LANG_ZONE_NOFLYZONE);
             break;
         default:
             break;
@@ -7293,10 +7297,7 @@ void Spell::EffectPlaySound(SpellEffIndex effIndex)
         return;
     }
 
-    WorldPacket data(SMSG_PLAY_SOUND, 4);
-    data << uint32(soundId);
-    data << uint64(m_caster->GetGUID());
-    unitTarget->ToPlayer()->GetSession()->SendPacket(&data);
+    player->PlayDirectSound(soundId, player);
 }
 
 void Spell::EffectRemoveAura(SpellEffIndex effIndex)

@@ -2043,7 +2043,7 @@ bool WorldObject::CanDetectStealthOf(WorldObject const* obj) const
 
 void WorldObject::SendPlaySound(uint32 Sound, bool OnlySelf)
 {
-    WorldPacket data(SMSG_PLAY_SOUND, 4);
+    WorldPacket data(SMSG_PLAY_SOUND, 4 + 8);
     data << uint32(Sound);
     data << uint64(GetGUID());
     if (OnlySelf && GetTypeId() == TYPEID_PLAYER)
@@ -2874,7 +2874,7 @@ bool WorldObject::InSamePhase(WorldObject const* obj) const
 
 void WorldObject::PlayDistanceSound(uint32 sound_id, Player* target /*= NULL*/)
 {
-    WorldPacket data(SMSG_PLAY_OBJECT_SOUND, 4+8);
+    WorldPacket data(SMSG_PLAY_OBJECT_SOUND, 4 + 8);
     data << uint32(sound_id);
     data << uint64(GetGUID());
     if (target)
@@ -2885,7 +2885,7 @@ void WorldObject::PlayDistanceSound(uint32 sound_id, Player* target /*= NULL*/)
 
 void WorldObject::PlayDirectSound(uint32 sound_id, Player* target /*= NULL*/)
 {
-    WorldPacket data(SMSG_PLAY_SOUND, 4);
+    WorldPacket data(SMSG_PLAY_SOUND, 4 + 8);
     data << uint32(sound_id);
     data << uint64(GetGUID());
     if (target)
