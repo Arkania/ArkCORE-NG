@@ -658,17 +658,13 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     if (!e.action.unitFlag.type)
                     {
                         (*itr)->ToUnit()->SetFlag(UNIT_FIELD_FLAGS, e.action.unitFlag.flag);
-
                         TC_LOG_DEBUG("scripts.ai", "SmartScript::ProcessAction:: SMART_ACTION_SET_UNIT_FLAG. Unit %u added flag %u to UNIT_FIELD_FLAGS",
-
                         (*itr)->GetGUIDLow(), e.action.unitFlag.flag);
                     }
                     else
                     {
                         (*itr)->ToUnit()->SetFlag(UNIT_FIELD_FLAGS_2, e.action.unitFlag.flag);
-
                         TC_LOG_DEBUG("scripts.ai", "SmartScript::ProcessAction:: SMART_ACTION_SET_UNIT_FLAG. Unit %u added flag %u to UNIT_FIELD_FLAGS_2",
-
                         (*itr)->GetGUIDLow(), e.action.unitFlag.flag);
                     }
                 }
@@ -690,7 +686,6 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     if (!e.action.unitFlag.type)
                     {
                         (*itr)->ToUnit()->RemoveFlag(UNIT_FIELD_FLAGS, e.action.unitFlag.flag);
-
                         TC_LOG_DEBUG("scripts.ai", "SmartScript::ProcessAction:: SMART_ACTION_REMOVE_UNIT_FLAG. Unit %u removed flag %u to UNIT_FIELD_FLAGS",
                         (*itr)->GetGUIDLow(), e.action.unitFlag.flag);
                     }
@@ -700,7 +695,6 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         TC_LOG_DEBUG("scripts.ai", "SmartScript::ProcessAction:: SMART_ACTION_REMOVE_UNIT_FLAG. Unit %u removed flag %u to UNIT_FIELD_FLAGS_2",
                         (*itr)->GetGUIDLow(), e.action.unitFlag.flag);
                     }
-
                 }
             }
 
@@ -885,7 +879,6 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         }
         case SMART_ACTION_CALL_KILLEDMONSTER:
         {
-
             if (e.target.type == SMART_TARGET_NONE || e.target.type == SMART_TARGET_SELF) // Loot recipient and his group members
             {
                 if (!me)
@@ -895,7 +888,6 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 {
                     player->RewardPlayerAndGroupAtEvent(e.action.killedMonster.creature, player);
                     TC_LOG_DEBUG("scripts.ai", "SmartScript::ProcessAction: SMART_ACTION_CALL_KILLEDMONSTER: Player %u, Killcredit: %u",
-
                         player->GetGUIDLow(), e.action.killedMonster.creature);
                 }
             }
@@ -910,7 +902,6 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     if (IsPlayer(*itr))
                     {
                         (*itr)->ToPlayer()->KilledMonsterCredit(e.action.killedMonster.creature);
-
                         TC_LOG_DEBUG("scripts.ai", "SmartScript::ProcessAction: SMART_ACTION_CALL_KILLEDMONSTER: Player %u, Killcredit: %u",
                             (*itr)->GetGUIDLow(), e.action.killedMonster.creature);
                     }
@@ -918,7 +909,6 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         if (Vehicle* vehicle = (*itr)->ToUnit()->GetVehicleKit())
                             for (SeatMap::iterator itr = vehicle->Seats.begin(); itr != vehicle->Seats.end(); ++itr)
                                 if (Player* player = ObjectAccessor::FindPlayer(itr->second.Passenger.Guid))
-
                                     player->KilledMonsterCredit(e.action.killedMonster.creature);
                 }
 
@@ -3112,7 +3102,6 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                     uint32 healthPct = uint32((*itr)->ToUnit()->GetHealthPct());
 
                     if (healthPct > e.event.friendlyHealthPct.maxHpPct || healthPct < e.event.friendlyHealthPct.minHpPct)
-
                         continue;
 
                     target = (*itr)->ToUnit();
@@ -3188,7 +3177,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
             if (gameobject)
                 ProcessTimedAction(e, e.event.distance.repeat, e.event.distance.repeat);
 
-				break;
+            break;
         }
         default:
             TC_LOG_ERROR("sql.sql", "SmartScript::ProcessEvent: Unhandled Event type %u", e.GetEventType());

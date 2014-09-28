@@ -1,8 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
-
  * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
-
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -107,8 +105,6 @@ struct npc_escortAI : public ScriptedAI
         bool GetAttack() { return m_bIsActiveAttacker; }//used in EnterEvadeMode override
         void SetCanAttack(bool attack) { m_bIsActiveAttacker = attack; }
         uint64 GetEventStarterGUID() { return m_uiPlayerGUID; }
-        //void SetSpeedXY(float speed){ speedXY = speed; }
-        //void SetSpeedZ(float speed){ speedZ = speed; } 		
 
     protected:
         Player* GetPlayerForEscort() { return ObjectAccessor::GetPlayer(*me, m_uiPlayerGUID); }

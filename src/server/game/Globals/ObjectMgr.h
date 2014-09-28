@@ -414,6 +414,13 @@ struct AreaTriggerStruct
 
 struct BroadcastText
 {
+    BroadcastText() : Id(0), Language(0), EmoteId0(0), EmoteId1(0), EmoteId2(0),
+        EmoteDelay0(0), EmoteDelay1(0), EmoteDelay2(0), SoundId(0), Unk1(0), Unk2(0)
+    {
+        MaleText.resize(DEFAULT_LOCALE + 1);
+        FemaleText.resize(DEFAULT_LOCALE + 1);
+    }
+
     uint32 Id;
     uint32 Language;
     StringVector MaleText;
@@ -427,7 +434,7 @@ struct BroadcastText
     uint32 SoundId;
     uint32 Unk1;
     uint32 Unk2;
-    // uint32 WDBVerified;
+    // uint32 VerifiedBuild;
 
     std::string const& GetText(LocaleConstant locale = DEFAULT_LOCALE, uint8 gender = GENDER_MALE, bool forceGender = false) const
     {

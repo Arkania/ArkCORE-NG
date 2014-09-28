@@ -112,7 +112,7 @@ bool BattlefieldWG::SetupBattlefield()
     }
 
 
-    // Spawn workshocreatures and gameobjects
+    // Spawn workshop creatures and gameobjects
     for (uint8 i = 0; i < WG_MAX_WORKSHOP; i++)
     {
         WGWorkshop* workshop = new WGWorkshop(this, i);

@@ -944,7 +944,6 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                 return false;
             break;
         }
-
         case SMART_ACTION_SET_POWER:
         case SMART_ACTION_ADD_POWER:
         case SMART_ACTION_REMOVE_POWER:

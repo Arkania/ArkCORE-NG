@@ -40,13 +40,13 @@ class WorldSession;
 
 enum CreatureFlagsExtra
 {
-    CREATURE_FLAG_EXTRA_INSTANCE_BIND   = 0x00000001,       // creature kill bind instance with killer and killer's groucreature_FLAG_EXTRA_CIVILIAN        = 0x00000002,       // not aggro (ignore faction/reputation hostility)
+    CREATURE_FLAG_EXTRA_INSTANCE_BIND   = 0x00000001,       // creature kill bind instance with killer and killer's group
     CREATURE_FLAG_EXTRA_CIVILIAN        = 0x00000002,       // not aggro (ignore faction/reputation hostility)
     CREATURE_FLAG_EXTRA_NO_PARRY        = 0x00000004,       // creature can't parry
     CREATURE_FLAG_EXTRA_NO_PARRY_HASTEN = 0x00000008,       // creature can't counter-attack at parry
     CREATURE_FLAG_EXTRA_NO_BLOCK        = 0x00000010,       // creature can't block
     CREATURE_FLAG_EXTRA_NO_CRUSH        = 0x00000020,       // creature can't do crush attacks
-    CREATURE_FLAG_EXTRA_NO_XP_AT_KILL   = 0x00000040,       // creature kill not provide Xcreature_FLAG_EXTRA_TRIGGER         = 0x00000080,       // trigger creature
+    CREATURE_FLAG_EXTRA_NO_XP_AT_KILL   = 0x00000040,       // creature kill not provide XP
     CREATURE_FLAG_EXTRA_TRIGGER         = 0x00000080,       // trigger creature
     CREATURE_FLAG_EXTRA_NO_TAUNT        = 0x00000100,       // creature is immune to taunt auras and effect attack me
     CREATURE_FLAG_EXTRA_WORLDEVENT      = 0x00004000,       // custom flag for world event creatures (left room for merging)

@@ -817,7 +817,7 @@ void WorldSession::HandleGuildNewsUpdateStickyOpcode(WorldPacket& recvPacket)
 
 void WorldSession::SendGuildCancelInvite(std::string unkString, uint8 unkByte)
 {
-    WorldPacket data(SMSG_GUILD_INVITE_CANCEL,1 + unkString.length());
+    WorldPacket data(SMSG_GUILD_INVITE_CANCEL, 1 + unkString.length());
 
     data << unkString << unkByte;
 
@@ -837,16 +837,16 @@ void WorldSession::HandleGuildSetGuildMaster(WorldPacket& recvPacket)
 
 void WorldSession::HandleGuildSwitchRank(WorldPacket& recvPacket)
 {
-    uint32 rankId;
+    uint32 rank;
     bool direction;                 // if its true, then the rank rises, if no, it goes down
 
-    recvPacket >> rankId;
+    recvPacket >> rank;
     direction = recvPacket.ReadBit();
 
     Guild* guild = GetPlayer()->GetGuild();
 
     if(guild)
-        guild->MoveRank(rankId, direction);
+        guild->MoveRank(rank, direction);
 }
 
 void WorldSession::HandleGuildAchievementMembers(WorldPacket& recvPacket)
@@ -977,8 +977,8 @@ void WorldSession::HandleGuildRenameRequest(WorldPacket& recvPacket)
 
         _guildRenameCallback.SetParam(newName);
 
-        stmt->setUInt32(1,pGuild->GetId());
-        stmt->setString(0,newName);
+        stmt->setUInt32(1, pGuild->GetId());
+        stmt->setString(0, newName);
 
         _guildRenameCallback.SetFutureResult(CharacterDatabase.AsyncQuery(stmt));
 
@@ -997,16 +997,14 @@ void WorldSession::HandleGuildRenameCallback(std::string newName)
 
     bool hasRenamed = ((PreparedQueryResult)_guildRenameCallback.GetFutureResult())->GetRowCount() > 0 ? true : false;
 
-    WorldPacket data(SMSG_GUILD_CHANGE_NAME_RESULT,1);
+    WorldPacket data(SMSG_GUILD_CHANGE_NAME_RESULT, 1);
     data.WriteBit(hasRenamed);
     data.FlushBits();
 
     SendPacket(&data);
 
     if(pGuild && hasRenamed)
-    {
         pGuild->SendGuildRename(newName);
-    }
 }
 
 void WorldSession::HandleGuildChallengeRequest(WorldPacket& /*recvPacket*/)

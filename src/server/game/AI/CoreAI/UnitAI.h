@@ -283,7 +283,6 @@ class SimpleCharmedAI : public PlayerAI
 {
     public:
         void UpdateAI(uint32 diff);
-
         SimpleCharmedAI(Player* player): PlayerAI(player) { }
 };
 

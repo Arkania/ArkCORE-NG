@@ -6880,9 +6880,9 @@ void ObjectMgr::LoadReputationOnKill()
         repOnKill.ReputationMaxCap2    = fields[7].GetUInt8();
         repOnKill.RepValue2            = fields[8].GetInt32();
         repOnKill.TeamDependent        = fields[9].GetUInt8();
-        repOnKill.currencyid1          = fields[10].GetUInt16();
-        repOnKill.currencyid2          = fields[11].GetUInt16();
-        repOnKill.currencyid3          = fields[12].GetUInt16();
+        repOnKill.currencyid1          = fields[10].GetUInt32();
+        repOnKill.currencyid2          = fields[11].GetUInt32();
+        repOnKill.currencyid3          = fields[12].GetUInt32();
         repOnKill.currencycount1       = fields[13].GetInt32();
         repOnKill.currencycount2       = fields[14].GetInt32();
         repOnKill.currencycount3       = fields[15].GetInt32();
@@ -7255,7 +7255,7 @@ void ObjectMgr::LoadNPCSpellClickSpells()
 
 void ObjectMgr::DeleteCreatureData(uint32 guid)
 {
-    // remove mapid*cellid -> guid_set macreatureData const* data = GetCreatureData(guid);
+    // remove mapid*cellid -> guid_set map
     CreatureData const* data = GetCreatureData(guid);
     if (data)
         RemoveCreatureFromGrid(guid, data);

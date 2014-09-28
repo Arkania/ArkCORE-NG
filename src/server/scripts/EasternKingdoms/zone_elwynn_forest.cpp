@@ -522,7 +522,7 @@ public:
                     }
                     case 3:
                     {
-                        me->GetMotionMaster()->MovePoint(0, -8830.69, -151.335, 80.256);
+                        me->GetMotionMaster()->MovePoint(0, -8830.69f, -151.335f, 80.256f);
                         m_timer=10000;
                         break;
                     }
@@ -540,6 +540,7 @@ public:
 };
 
 //#########################################  quest ''
+
 
 
 // ToDo
