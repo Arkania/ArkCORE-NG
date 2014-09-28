@@ -475,7 +475,7 @@ void GameObject::Update(uint32 diff)
                     bool IsBattlegroundTrap = false;
                     //FIXME: this is activation radius (in different casting radius that must be selected from spell data)
                     /// @todo move activated state code (cast itself) to GO_ACTIVATED, in this place only check activating and set state
-                    float radius = (float)(goInfo->trap.radius)/3*2; /// @todo rename radius to diameter (goInfo->trap.radius) should be (goInfo->trap.diameter)
+                    float radius = (float)(goInfo->trap.diameter) / 3 * 2; 
                     if (!radius)
                     {
                         if (goInfo->trap.cooldown != 3)            // cast in other case (at some triggering/linked go/etc explicit call)
@@ -1666,6 +1666,7 @@ void GameObject::Use(Unit* user)
                             else
                             if (bg->GetTypeID(true) == BATTLEGROUND_TP)
                                 bg->EventPlayerClickedOnFlag(player, this);
+                            break;
                         case 184142:                        // Netherstorm Flag
                             if (bg->GetTypeID(true) == BATTLEGROUND_EY)
                                 bg->EventPlayerClickedOnFlag(player, this);
