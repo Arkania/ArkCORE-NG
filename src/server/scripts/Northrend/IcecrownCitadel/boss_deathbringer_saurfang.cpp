@@ -250,7 +250,6 @@ class boss_deathbringer_saurfang : public CreatureScript
         {
             boss_deathbringer_saurfangAI(Creature* creature) : BossAI(creature, DATA_DEATHBRINGER_SAURFANG)
             {
-                ASSERT(creature->GetVehicleKit()); // we dont actually use it, just check if exists
                 _introDone = false;
                 _fallenChampionCastCount = 0;
             }

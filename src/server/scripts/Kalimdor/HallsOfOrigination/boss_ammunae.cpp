@@ -56,8 +56,7 @@ class boss_ammunae : public CreatureScript
         struct boss_ammunaeAI : public ScriptedAI
         {
             boss_ammunaeAI(Creature* creature) : ScriptedAI(creature)
-            {
-                ASSERT(creature->GetVehicleKit()); // we dont actually use it, just check if exists
+            {                
                 m_pInstance = creature->GetInstanceScript();
             }
 

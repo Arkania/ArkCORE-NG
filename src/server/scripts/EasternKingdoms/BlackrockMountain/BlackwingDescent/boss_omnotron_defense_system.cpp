@@ -419,7 +419,6 @@ public:
             creature->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
             creature->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
             creature->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
-            ASSERT(creature->GetVehicleKit()); // we dont actually use it, just check if exists
             homePosition = creature->GetHomePosition();
             creature->SetPower(POWER_ENERGY, 100);
             creature->SetMaxPower(POWER_ENERGY, 100);

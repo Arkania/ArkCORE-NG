@@ -68,7 +68,6 @@ class boss_rajh : public CreatureScript
         {
             boss_rajhAI(Creature* creature) : ScriptedAI(creature)
             {
-                ASSERT(creature->GetVehicleKit()); // we dont actually use it, just check if exists
                 m_pInstance = creature->GetInstanceScript();
             }
 

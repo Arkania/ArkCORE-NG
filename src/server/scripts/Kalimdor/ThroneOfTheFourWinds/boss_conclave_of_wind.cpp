@@ -260,7 +260,6 @@ public:
         {
             instance = creature->GetInstanceScript();
 
-            ASSERT(creature->GetVehicleKit()); // we dont actually use it, just check if exists - cause we check shit like that... you know? And if it does not exist?...
             creature->SetPower(POWER_ENERGY, 0);
             creature->SetMaxPower(POWER_ENERGY, 90);
         }
@@ -502,7 +501,6 @@ public:
         {
             instance = creature->GetInstanceScript();
 
-            ASSERT(creature->GetVehicleKit()); // we dont actually use it, just check if exists
             creature->SetPower(POWER_ENERGY, 0);
             creature->SetMaxPower(POWER_ENERGY, 90);
         }
@@ -728,7 +726,6 @@ public:
         {
             instance = creature->GetInstanceScript();
 
-            ASSERT(creature->GetVehicleKit()); // we dont actually use it, just check if exists
             creature->SetPower(POWER_ENERGY, 0);
             creature->SetMaxPower(POWER_ENERGY, 90);
         }

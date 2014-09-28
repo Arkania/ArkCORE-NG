@@ -155,7 +155,6 @@ public:
     {
         boss_bethtilacAI(Creature* creature) : ScriptedAI(creature)
         {
-            ASSERT(creature->GetVehicleKit()); // we dont actually use it, just check if exists
             instance = creature->GetInstanceScript();
         }
 

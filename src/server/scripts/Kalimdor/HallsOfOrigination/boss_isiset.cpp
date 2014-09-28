@@ -499,7 +499,6 @@ class npc_veil_sky : public CreatureScript
             npc_veil_skyAI(Creature* creature) : ScriptedAI(creature)
             {
                 m_pInstance = creature->GetInstanceScript();
-                ASSERT(creature->GetVehicleKit()); // we dont actually use it, just check if exists
             }
 
             InstanceScript* m_pInstance;
@@ -553,7 +552,6 @@ class npc_celestial_call : public CreatureScript
             npc_celestial_callAI(Creature* creature) : ScriptedAI(creature)
             {
                 m_pInstance = creature->GetInstanceScript();
-                ASSERT(creature->GetVehicleKit()); // we dont actually use it, just check if exists
             }
 
             InstanceScript* m_pInstance;
@@ -605,7 +603,6 @@ class npc_astral_rain : public CreatureScript
             npc_astral_rainAI(Creature* creature) : ScriptedAI(creature)
             {
                 m_pInstance = creature->GetInstanceScript();
-                ASSERT(creature->GetVehicleKit()); // we dont actually use it, just check if exists
             }
 
             InstanceScript* m_pInstance;
