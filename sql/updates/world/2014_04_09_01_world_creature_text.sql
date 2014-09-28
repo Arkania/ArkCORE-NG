@@ -187,9 +187,9 @@ INSERT INTO `creature_text`(`entry`,`groupid`,`id`,`type`,`sound`,`probability`,
 -- DELETE FROM `script_texts` WHERE `entry` BETWEEN -1977063 AND -1977069;
 DELETE FROM `creature_text` WHERE `entry`=35369;
 INSERT INTO `creature_text`(`entry`,`groupid`,`id`,`type`,`sound`,`probability`,`comment`,`text`) VALUES
-(35836,0,0,12,0,100,"Quest The Rebel Lord''s Arsenal RANDOM_JOSIAH_YELL","My face! What''s wrong with my face!"),
-(35836,0,1,12,0,100,"Quest The Rebel Lord''s Arsenal RANDOM_JOSIAH_YELL","My hands... don''t look at my hands!"),
-(35836,0,2,12,0,100,"Quest The Rebel Lord''s Arsenal RANDOM_JOSIAH_YELL","What''s wrong with me??!"),
-(35836,0,3,12,0,100,"Quest The Rebel Lord''s Arsenal RANDOM_JOSIAH_YELL","Make it stop!"),
-(35836,0,4,12,0,100,"Quest The Rebel Lord''s Arsenal RANDOM_JOSIAH_YELL","I can''t fight it!"),
-(35836,1,0,12,0,100,"Quest The Rebel Lord''s Arsenal SAY_WORGEN_BITE","The pain is unbearable!");
+(35369,0,0,12,0,100,"Quest The Rebel Lord''s Arsenal RANDOM_JOSIAH_YELL","My face! What''s wrong with my face!"),
+(35369,0,1,12,0,100,"Quest The Rebel Lord''s Arsenal RANDOM_JOSIAH_YELL","My hands... don''t look at my hands!"),
+(35369,0,2,12,0,100,"Quest The Rebel Lord''s Arsenal RANDOM_JOSIAH_YELL","What''s wrong with me??!"),
+(35369,0,3,12,0,100,"Quest The Rebel Lord''s Arsenal RANDOM_JOSIAH_YELL","Make it stop!"),
+(35369,0,4,12,0,100,"Quest The Rebel Lord''s Arsenal RANDOM_JOSIAH_YELL","I can''t fight it!"),
+(35369,1,0,12,0,100,"Quest The Rebel Lord''s Arsenal SAY_WORGEN_BITE","The pain is unbearable!");

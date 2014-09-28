@@ -21,6 +21,7 @@ update creature_template set AIName="", ScriptName="npc_josiah_avery_worgen_phas
 
 -- missing text
 delete from creature_text where entry=35370 and groupid=0 and id=0; 
-insert into creature_text value (35370,0,0,"The pain is unberable!",14,0,1,0,0,0,"Josiah Avery - Text 0");
+insert into creature_text (`entry`,`groupid`,`id`,`text`,`type`,`language`,`probability`,`emote`,`duration`,`sound`,`comment`) value 
+(35370,0,0,"The pain is unberable!",14,0,1,0,0,0,"Josiah Avery - Text 0");
 
 UPDATE quest_template SET RewardSpell=0 WHERE Id=14078;

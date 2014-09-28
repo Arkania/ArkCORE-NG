@@ -14,10 +14,11 @@ update creature_template set AIName="", ScriptName="npc_captive_spitescale_scout
 
 -- creature_text for entry 38142
 delete from creature_text where entry=38142 and groupid=0 and id between 0 and 3;
-insert into creature_text values (38142,0,0,"I sshal ssslaughter you, Darksspear runt!",12,0,100,0,0,0,"");
-insert into creature_text values (38142,0,1,"I sshal tasste your blood, landling.",12,0,100,0,0,0,"");
-insert into creature_text values (38142,0,2,"The Sssea Witch will kill you all.",12,0,100,0,0,0,"");
-insert into creature_text values (38142,0,3,"They sssend you to your death, youngling.",12,0,100,0,0,0,"");
+insert into creature_text (`entry`,`groupid`,`id`,`text`,`type`,`language`,`probability`,`emote`,`duration`,`sound`,`comment`) values 
+(38142,0,0,"I sshal ssslaughter you, Darksspear runt!",12,0,100,0,0,0,""),
+(38142,0,1,"I sshal tasste your blood, landling.",12,0,100,0,0,0,""),
+(38142,0,2,"The Sssea Witch will kill you all.",12,0,100,0,0,0,""),
+(38142,0,3,"They sssend you to your death, youngling.",12,0,100,0,0,0,"");
 
 update creature set MovementType=1, spawndist=10 where id=38141;
 update creature_template set AIName="",ScriptName="npc_docile_island_boar" where entry=38141;

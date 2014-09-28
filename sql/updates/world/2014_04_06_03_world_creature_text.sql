@@ -166,7 +166,7 @@ INSERT INTO `creature_text`(`entry`,`groupid`,`id`,`type`,`sound`,`probability`,
 
 -- A special surprise
 -- -- DELETE FROM `script_texts` WHERE `entry` BETWEEN -1609078 AND -1609025;
-DELETE FROM `creature_text` WHERE `entry` IN (29032,29061,29065,29067,29068,29070,29074,29072,29073,29071,49355,49356);
+DELETE FROM `creature_text` WHERE `entry` IN (29032,29061,29065,29067,29068,29070,29074,29072,29073,29071,49355,49356,29053);
 INSERT INTO `creature_text`(`entry`,`groupid`,`id`,`type`,`sound`,`probability`,`comment`,`text`) VALUES
 -- Malar Bravehorn
 (29032,0,0,12,0,100,"special_surprise SAY_EXEC_START_1","Come to finish the job, have you?"),
