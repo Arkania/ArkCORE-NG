@@ -1203,14 +1203,12 @@ void Guild::ChallengesMgr::LoadFromDB()
     else
         TC_LOG_ERROR("sql.sql", "No Guild Challenges defined in the database, guild challenges won't work at all");
 
-    /*stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_GUILD_CHALLENGES_COMPLETED);
-    stmt->setUInt32(0,m_owner->GetId());
-    We're using Execute until we figure out the crash with the prepared statement :/
-    Disable it for now, I'll review it l8r
+    stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_GUILD_CHALLENGES_COMPLETED);
+    stmt->setUInt32(0, m_owner->GetId());
+    // We're using Execute until we figure out the crash with the prepared statement
+    // Disable it for now, I'll review it l8r
 
-    uint32 pguildId = m_owner->GetId();
-    std::string completedQuery = "SELECT challengeId, dateCompleted FROM guild_challenges_completed WHERE guildId = %U",m_owner->GetId();
-    QueryResult completedResult = CharacterDatabase.Query(completedQuery.c_str());
+    QueryResult completedResult = CharacterDatabase.Query("SELECT challengeId, dateCompleted FROM guild_challenges_completed  ORDER BY guildId");
 
     if(completedResult && completedResult->GetRowCount() > 0)
     {
@@ -1221,7 +1219,7 @@ void Guild::ChallengesMgr::LoadFromDB()
             m_completed[row[0].GetUInt32()] = row[1].GetUInt32();
         }
         while(completedResult->NextRow());
-    }*/
+    }
 }
 
 void Guild::ChallengesMgr::SaveToDB()
@@ -1294,12 +1292,15 @@ void Guild::ChallengesMgr::CheckChallenge(Group* grp, uint32 challengeId)
     bool giveReward = false;
     uint32 guildMembersInGroup = 0;
 
-    Group::MemberSlotList membersGrp = grp->GetMemberSlots();
-
-    for(Group::MemberSlotList::iterator itr = membersGrp.begin(); itr != membersGrp.end();++itr)
+    if(grp)
     {
-        if(m_owner->GetMember(itr->guid))
-            guildMembersInGroup++;
+        Group::MemberSlotList const& membersGrp = grp->GetMemberSlots();
+
+        for(Group::MemberSlotList::const_iterator itr = membersGrp.begin(); itr != membersGrp.end();++itr)
+        {
+            if(m_owner->GetMember(itr->guid))
+                guildMembersInGroup++;
+        }
     }
 
     uint8 type = m_challenges[challengeId].typeId;
@@ -1344,14 +1345,9 @@ void Guild::ChallengesMgr::GiveReward(uint32 challengeId)
     ChallengeReward* reward = GetRewardForType(m_challenges[challengeId].typeId);
 
     m_owner->GiveXP(reward->XPReward);
+    m_owner->AddMoneyToBank(reward->GoldReward);
 
-    if(m_owner->GetLevel() >= 5)
-    {
-        m_owner->AddMoneyToBank(reward->GoldReward);
-        //we must implement bellow the Cash Flow guild perk
-    }
-
-    WorldPacket data(SMSG_GUILD_CHALLENGE_COMPLETED,20);
+    WorldPacket data(SMSG_GUILD_CHALLENGE_COMPLETED, 20);
 
     data << m_challenges[challengeId].typeId;                           // challenge type
     data << reward->GoldReward;                                         // gold reward
@@ -1367,7 +1363,8 @@ uint32 Guild::ChallengesMgr::GetRewardQuantity(uint8 rewardType,uint32 challenge
     uint32 challengeId = 0;
     uint32 rewardResult = 0;
 
-    if (m_challenges.begin() == m_challenges.end()) return 0;
+    if (m_challenges.begin() == m_challenges.end())
+        return 0;
 
     for(Challenges::iterator itr = m_challenges.begin(); itr != m_challenges.end();++itr)
     {
@@ -1549,6 +1546,8 @@ bool Guild::Create(Player* pLeader, std::string const& name)
         sScriptMgr->OnGuildCreate(this, pLeader, name);
     }
 
+    m_challengesMgr = new ChallengesMgr(this);
+
     return ret;
 }
 
@@ -1642,7 +1641,9 @@ void Guild::UpdateMemberData(Player* player, uint8 dataid, uint32 value)
                 TC_LOG_ERROR("guild", "Guild::UpdateMemberData: Called with incorrect DATAID %u (value %u)", dataid, value);
                 return;
         }
-        //HandleRoster();
+        std::set<Player*> members;
+        members.insert(player);
+        SendUpdateRoster(members);
     }
 }
 
@@ -1774,8 +1775,16 @@ void Guild::HandleRoster(WorldSession* session)
     data.AppendPackedTime(m_createdDate);
     data << uint32(0);
 
-    TC_LOG_DEBUG("guild", "SMSG_GUILD_ROSTER [%s]", session->GetPlayerInfo().c_str());
-    session->SendPacket(&data);
+    if (session)
+    {
+        TC_LOG_DEBUG("guild", "SMSG_GUILD_ROSTER [%s]", session->GetPlayerInfo().c_str());
+        session->SendPacket(&data);
+    }
+    else
+    {
+        TC_LOG_DEBUG("guild", "SMSG_GUILD_ROSTER [Broadcast]");
+        BroadcastPacket(&data);
+    }
 }
 
 void Guild::HandleQuery(WorldSession* session)

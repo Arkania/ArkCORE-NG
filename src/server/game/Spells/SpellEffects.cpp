@@ -898,14 +898,24 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                             //Gives your Water Elemental's Freeze spell a % chance to grant 2 charges of Fingers of Frost.
                             owner->SetAuraStack(44544, owner, 2);
                 }
-                // Early Frost
+                 // Early Frost
                 if (m_spellInfo->Id == 116)
-                {
-                    if (m_caster->HasAura(83049))
-                        m_caster->AddAura(83162,m_caster);
-                    else if (m_caster->HasAura(83050))
-                        m_caster->AddAura(83239,m_caster);
-                }
+                    if (AuraEffect* aurEff = m_caster->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_MAGE, 189, 0))
+                    {
+                        uint32 spellId = 0;
+                        switch (aurEff->GetId())
+                        {
+                            case 83049:
+                                spellId = 83162;
+                                break;
+                            case 83050:
+                                spellId = 83239;
+                                break;
+                        }
+
+                        if (spellId && !m_caster->HasAura(spellId))
+                            m_caster->CastSpell(m_caster, spellId, true);
+                    }
                 // Deep Freeze should deal damage to permanently stun-immune targets.
                 if (m_spellInfo->Id == 71757)
                     if (unitTarget->GetTypeId() != TYPEID_UNIT || !(unitTarget->IsImmunedToSpellEffect(sSpellMgr->GetSpellInfo(44572), 0)))
@@ -1770,7 +1780,10 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
         if (spellInfo->GetExplicitTargetMask() & TARGET_FLAG_DEST_LOCATION)
             targets.SetDst(m_targets);
 
-        targets.SetUnitTarget(m_caster);
+        if (Unit* target = m_targets.GetUnitTarget())
+            targets.SetUnitTarget(target);
+        else
+            targets.SetUnitTarget(m_caster);
     }
 
     CustomSpellValues values;

@@ -271,8 +271,8 @@ enum ChallengesType
 enum ChallengesRewardType
 {
     CHALLENGE_REWARD_XP                 = 1,
-    CHALLENGE_REWARD_GOLD,
-    CHALLENGE_REWARD_GOLD_BONUS,
+    CHALLENGE_REWARD_GOLD               = 2,
+    CHALLENGE_REWARD_GOLD_BONUS         = 3
 };
 
 struct GuildReward
@@ -793,15 +793,15 @@ public:
 
             uint32 GetTotalCountFor(uint8 typeId);
             uint32 GetCurrentCountFor(uint8 typeId);
-            uint32 GetXPRewardForType(uint8 typeId) { return GetRewardQuantity(CHALLENGE_REWARD_XP,typeId);}
-            uint32 GetGoldRewardForType(uint8 typeId) { return GetRewardQuantity(CHALLENGE_REWARD_GOLD,typeId);}
-            uint32 GetGoldBonusForType(uint8 typeId) { return GetRewardQuantity(CHALLENGE_REWARD_GOLD_BONUS,typeId);}
+            uint32 GetXPRewardForType(uint8 typeId) { return GetRewardQuantity(CHALLENGE_REWARD_XP, typeId);}
+            uint32 GetGoldRewardForType(uint8 typeId) { return GetRewardQuantity(CHALLENGE_REWARD_GOLD, typeId);}
+            uint32 GetGoldBonusForType(uint8 typeId) { return GetRewardQuantity(CHALLENGE_REWARD_GOLD_BONUS, typeId);}
             ChallengeReward* GetRewardForType(uint32 challengeTypeId);
-            void CheckBattlegroundChallenge(Battleground* bg,Group* grp);
+            void CheckBattlegroundChallenge(Battleground* bg, Group* grp);
             void CheckInstanceChallenge(InstanceScript* script, Group* grp);
 
         private:
-            uint32 GetRewardQuantity(uint8 rewardType,uint32 challengeType);
+            uint32 GetRewardQuantity(uint8 rewardType, uint32 challengeType);
             void GiveReward(uint32 challengeId);
             void CheckChallenge(Group* grp, uint32 challengeId);
 
@@ -836,7 +836,7 @@ public:
     std::string const& GetName() const { return m_name; }
     std::string const& GetMOTD() const { return m_motd; }
     std::string const& GetInfo() const { return m_info; }
-   
+
     bool SetName(std::string const& name);
 
     // Handle client commands

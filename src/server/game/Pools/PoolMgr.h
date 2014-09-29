@@ -144,7 +144,7 @@ class PoolMgr
 
         uint32 max_pool_id;
         typedef std::vector<PoolTemplateData>       PoolTemplateDataMap;
-        typedef std::vector<PoolGroup<Creature> >   PoolGroucreatureMap;
+        typedef std::vector<PoolGroup<Creature> >   PoolGroupCreatureMap;
         typedef std::vector<PoolGroup<GameObject> > PoolGroupGameObjectMap;
         typedef std::vector<PoolGroup<Pool> >       PoolGroupPoolMap;
         typedef std::vector<PoolGroup<Quest> >      PoolGroupQuestMap;
@@ -152,7 +152,7 @@ class PoolMgr
         typedef std::map<uint32, uint32>            SearchMap;
 
         PoolTemplateDataMap    mPoolTemplate;
-        PoolGroucreatureMap   mPoolCreatureGroups;
+        PoolGroupCreatureMap   mPoolCreatureGroups;
         PoolGroupGameObjectMap mPoolGameobjectGroups;
         PoolGroupPoolMap       mPoolPoolGroups;
         PoolGroupQuestMap      mPoolQuestGroups;
