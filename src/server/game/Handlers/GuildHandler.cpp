@@ -845,8 +845,17 @@ void WorldSession::HandleGuildSwitchRank(WorldPacket& recvPacket)
 
     Guild* guild = GetPlayer()->GetGuild();
 
-    if(guild)
-        guild->MoveRank(rank, direction);
+    if (!guild)
+    {
+        Guild::SendCommandResult(this, GUILD_COMMAND_CREATE, ERR_GUILD_PLAYER_NOT_IN_GUILD);
+        return;
+    }
+
+    if (GetPlayer()->GetGUID() != guild->GetLeaderGUID())
+    {
+        Guild::SendCommandResult(this, GUILD_COMMAND_INVITE, ERR_GUILD_PERMISSIONS);
+        return;
+    }
 }
 
 void WorldSession::HandleGuildAchievementMembers(WorldPacket& recvPacket)

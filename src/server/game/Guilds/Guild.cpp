@@ -4125,6 +4125,7 @@ void Guild::HandleNewsSetSticky(WorldSession* session, uint32 newsId, bool stick
     session->SendPacket(&data);
 }
 
+/*
 void Guild::MoveRank(uint32 rankId, uint8 direction)
 {
     for(Ranks::iterator itr = m_ranks.begin(); itr != m_ranks.end();++itr)
@@ -4151,3 +4152,4 @@ void Guild::MoveRank(uint32 rankId, uint8 direction)
         }
     }
 }
+/*
