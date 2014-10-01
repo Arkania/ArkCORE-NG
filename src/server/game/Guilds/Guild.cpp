@@ -4152,4 +4152,5 @@ void Guild::MoveRank(uint32 rankId, uint8 direction)
         }
     }
 }
-/*
+*/
+
