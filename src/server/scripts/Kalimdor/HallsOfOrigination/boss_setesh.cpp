@@ -154,7 +154,7 @@ class boss_setesh : public CreatureScript
                 {
                     me->CastStop();
 
-                    me->SummonCreature(NPC_SEED_OF_CHAOS, me->GetPositionX() + urand(-40, 40), me->GetPositionY() + urand(-40, 40), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 24000);
+                    me->SummonCreature(NPC_SEED_OF_CHAOS, me->GetPositionX() + frand(-40.0f, 40.0f), me->GetPositionY() + frand(-40.0f, 40.0f), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 24000);
 
                     m_uiSeedofChaosTimer = urand(15000, 20000);
                 }
@@ -179,9 +179,9 @@ class boss_setesh : public CreatureScript
                     me->CastStop();
                     Creature* portal;
                     if(urand(1, 2) == 1)
-                        portal = me->SummonCreature(NPC_PORTAL, me->GetPositionX()+urand(15, 25), me->GetPositionY()+urand(15, 25), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 36000);
+                        portal = me->SummonCreature(NPC_PORTAL, me->GetPositionX()+frand(15.0f, 25.0f), me->GetPositionY()+frand(15.0f, 25.0f), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 36000);
                     else
-                        portal = me->SummonCreature(NPC_PORTAL, me->GetPositionX()-urand(15, 25), me->GetPositionY()+urand(15, 25), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 36000);
+                        portal = me->SummonCreature(NPC_PORTAL, me->GetPositionX()-frand(15.0f, 25.0f), me->GetPositionY()+frand(15.0f, 25.0f), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 36000);
                     DoZoneInCombat(portal);
                     m_uiPortalTimer = IsHeroic() ? urand(22000, 27000) : urand(27000, 32000);
                 }
