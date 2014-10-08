@@ -357,7 +357,7 @@ void WorldSession::HandleGuildFinderPostRequest(WorldPacket& /*recvPacket*/)
 
     if (isGuildMaster)
     {
-        data.WriteBit(settings.IsListed());
+        data.WriteBit(settings.IsListed());    // wpp has this structure to.. TC is wrong 
         data.WriteBits(settings.GetComment().size(), 11);
         data << uint32(settings.GetLevel());
         data.WriteString(settings.GetComment());

@@ -176,6 +176,12 @@ void WorldSession::HandleArenaTeamInviteOpcode(WorldPacket& recvData)
         return;
     }
 
+    if (GetPlayer()->GetArenaTeamId(arenaTeam->GetSlot()) != arenaTeamId)
+    {
+        SendArenaTeamCommandResult(ERR_ARENA_TEAM_CREATE_S, "", "", ERR_ARENA_TEAM_PERMISSIONS);
+        return;
+    }
+
     // OK result but don't send invite
     if (player->GetSocial()->HasIgnore(GetPlayer()->GetGUIDLow()))
         return;
@@ -361,6 +367,10 @@ void WorldSession::HandleArenaTeamRemoveOpcode(WorldPacket& recvData)
         SendArenaTeamCommandResult(ERR_ARENA_TEAM_QUIT_S, "", "", ERR_ARENA_TEAM_LEADER_LEAVE_S);
         return;
     }
+
+    // Player cannot be removed during fights
+    if (arenaTeam->IsFighting())
+        return;
 
     arenaTeam->DelMember(member->Guid, true);
 

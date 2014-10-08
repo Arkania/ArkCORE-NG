@@ -715,6 +715,8 @@ Player::Player(WorldSession* session): Unit(true), phaseMgr(this)
     m_areaUpdateId = 0;
     m_team = 0;
 
+    m_needsZoneUpdate = false;
+
     m_nextSave = sWorld->getIntConfig(CONFIG_INTERVAL_SAVE);
 
     _resurrectionData = NULL;
@@ -6716,7 +6718,7 @@ void Player::SendActionButtons(uint32 state) const
         state can be 0, 1, 2
         0 - Sends initial action buttons, client does not validate if we have the spell or not
         1 - Used used after spec swaps, client validates if a spell is known.
-        2 - Clears the action bars client sided. This is sent during spec swap before unlearning and before sending the new buttons
+        2 - Clears the action bars client sided. This is sentPlayer::UpdatePositio during spec swap before unlearning and before sending the new buttons
     */
     if (state != 2)
     {
@@ -6835,6 +6837,15 @@ bool Player::UpdatePosition(float x, float y, float z, float orientation, bool t
     //if (movementInfo.flags & MOVEMENTFLAG_TURNING)
     //    mover->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TURNING);
     //AURA_INTERRUPT_FLAG_JUMP not sure
+
+    // Update player zone if needed
+    if (m_needsZoneUpdate)
+    {
+        uint32 newZone, newArea;
+        GetZoneAndAreaId(newZone, newArea);
+        UpdateZone(newZone, newArea);
+        m_needsZoneUpdate = false;
+    }
 
     // group update
     if (GetGroup())
@@ -7525,7 +7536,7 @@ void Player::SendPvpRewards() const
     packet << GetCurrencyOnWeek(CURRENCY_TYPE_CONQUEST_META_RBG, true);
     packet << GetCurrencyOnWeek(CURRENCY_TYPE_CONQUEST_META_ARENA, true);
     packet << GetCurrencyWeekCap(CURRENCY_TYPE_CONQUEST_POINTS, true);
-    packet << GetCurrencyWeekCap(CURRENCY_TYPE_CONQUEST_META_RBG, true);
+   // packet << GetCurrencyWeekCap(CURRENCY_TYPE_CONQUEST_META_RBG, true);  // on wpp this structure has only 6 uint32 fields
     GetSession()->SendPacket(&packet);
 }
 
@@ -7909,7 +7920,8 @@ void Player::UpdateArea(uint32 newArea)
     {
         SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_SANCTUARY);
         pvpInfo.IsInNoPvPArea = true;
-        CombatStopWithPets();
+        if (!duel)
+            CombatStopWithPets();
     }
     else
         RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_SANCTUARY);
@@ -8621,7 +8633,12 @@ void Player::_ApplyWeaponDependentAuraDamageMod(Item* item, WeaponAttackType att
     {
         HandleStatModifier(unitMod, unitModType, float(aura->GetAmount()), apply);
         if (unitModType == TOTAL_VALUE)
-            ApplyModUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS, aura->GetAmount(), apply);
+        {
+            if (aura->GetAmount() > 0)
+                ApplyModUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS, aura->GetAmount(), apply);
+            else
+                ApplyModUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_NEG, aura->GetAmount(), apply);
+        }
     }
 }
 
@@ -9159,7 +9176,7 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
 
             if (loot_type == LOOT_FISHING)
                 go->getFishLoot(loot, this);
-
+            
             if (go->GetGOInfo()->type == GAMEOBJECT_TYPE_CHEST && go->GetGOInfo()->chest.groupLootRules)
             {
                 if (Group* group = GetGroup())
@@ -9319,6 +9336,12 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
                 loot->gold = uint32(10 * (a + b) * sWorld->getRate(RATE_DROP_MONEY));
                 permission = OWNER_PERMISSION;
             }
+            else
+            {
+                permission = NONE_PERMISSION;
+                SendLootError(guid, LOOT_ERROR_ALREADY_PICKPOCKETED);
+                return;
+            }
         }
         else
         {
@@ -9353,8 +9376,8 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
                 }
             }
 
-            // possible only if creature->lootForBody && loot->empty() at spell cast check
-            if (loot_type == LOOT_SKINNING)
+            // possible only if creature->lootForBody && loot->empty() at spell cast check // LOOT_INSIGNIA and LOOT_FISHINGHOLE unsupported by client
+            if (loot_type == LOOT_SKINNING)  
             {
                 loot->clear();
                 loot->FillLoot(creature->GetCreatureTemplate()->SkinLootId, LootTemplates_Skinning, this, true);
@@ -9401,27 +9424,42 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
     {
         case LOOT_INSIGNIA:    loot_type = LOOT_SKINNING; break;
         case LOOT_FISHINGHOLE: loot_type = LOOT_FISHING; break;
+        case LOOT_FISHING_JUNK: loot_type = LOOT_FISHING; break;
         default: break;
     }
 
     // need know merged fishing/corpse loot type for achievements
     loot->loot_type = loot_type;
 
-    WorldPacket data(SMSG_LOOT_RESPONSE, 8 + 1 + 50 + 1 + 1);           // we guess size
-    data << uint64(guid);
-    data << uint8(loot_type);
-    data << LootView(*loot, this, permission);
-
-    SendDirectMessage(&data);
-
-    // add 'this' player as one of the players that are looting 'loot'
     if (permission != NONE_PERMISSION)
+    {
+        SetLootGUID(guid);
+
+        WorldPacket data(SMSG_LOOT_RESPONSE, (9 + 50));           // we guess size
+        data << uint64(guid);
+        data << uint8(loot_type);
+        data << LootView(*loot, this, permission);
+        SendDirectMessage(&data);
+
+        // add 'this' player as one of the players that are looting 'loot'
         loot->AddLooter(GetGUID());
+    }
+    else
+        SendLootError(GetLootGUID(), LOOT_ERROR_DIDNT_KILL);
 
     if (loot_type == LOOT_CORPSE && !IS_ITEM_GUID(guid))
         SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_LOOTING);
 }
 
+
+void Player::SendLootError(uint64 guid, LootError error)
+{
+    WorldPacket data(SMSG_LOOT_RESPONSE, 10);
+    data << uint64(guid);
+    data << uint8(LOOT_NONE);
+    data << uint8(error);
+    SendDirectMessage(&data);
+}
 void Player::SendNotifyLootMoneyRemoved()
 {
     WorldPacket data(SMSG_LOOT_CLEAR_MONEY, 0);
@@ -12039,6 +12077,11 @@ InventoryResult Player::CanUseItem(ItemTemplate const* proto) const
         // If World Event is not active, prevent using event dependant items
         if (proto->HolidayId && !IsHolidayActive((HolidayIds)proto->HolidayId))
             return EQUIP_ERR_CLIENT_LOCKED_OUT;
+
+        // learning (recipes, mounts, pets, etc.)
+        if (proto->Spells[0].SpellId == 483 || proto->Spells[0].SpellId == 55884)
+            if (HasSpell(proto->Spells[1].SpellId))
+                return EQUIP_ERR_INTERNAL_BAG_ERROR;
 
         return EQUIP_ERR_OK;
     }
@@ -15515,6 +15558,8 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
                     Item* item = StoreNewItem(dest, itemId, true, Item::GenerateItemRandomPropertyId(itemId));
                     SendNewItem(item, quest->RewardItemIdCount[i], true, false);
                 }
+                else if (quest->IsDFQuest())
+                    SendItemRetrievalMail(quest->RewardItemId[i], quest->RewardItemIdCount[i]);
             }
         }
     }
@@ -15665,6 +15710,10 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
 
 void Player::FailQuest(uint32 questId)
 {
+    // Already complete quests shouldn't turn failed.
+    if (GetQuestStatus(questId) == QUEST_STATUS_COMPLETE)
+        return;
+
     if (Quest const* quest = sObjectMgr->GetQuestTemplate(questId))
     {
         SetQuestStatus(questId, QUEST_STATUS_FAILED);
@@ -17640,6 +17689,8 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
     {
         uint64 transGUID = MAKE_NEW_GUID(transLowGUID, 0, HIGHGUID_MO_TRANSPORT);
 
+        m_transport = NULL;
+
         if (GameObject* go = HashMapHolder<GameObject>::Find(transGUID))
             m_transport = go->ToTransport();
 
@@ -18160,6 +18211,7 @@ bool Player::isAllowedToLoot(const Creature* creature)
 
     switch (thisGroup->GetLootMethod())
     {
+        case MASTER_LOOT:
         case FREE_FOR_ALL:
             return true;
         case ROUND_ROBIN:
@@ -18169,7 +18221,6 @@ bool Player::isAllowedToLoot(const Creature* creature)
                 return true;
 
             return loot->hasItemFor(this);
-        case MASTER_LOOT:
         case GROUP_LOOT:
         case NEED_BEFORE_GREED:
             // may only loot if the player is the loot roundrobin player
@@ -27495,6 +27546,22 @@ void Player::RefundItem(Item* item)
 
     SaveInventoryAndGoldToDB(trans);
 
+    CharacterDatabase.CommitTransaction(trans);
+}
+
+void Player::SendItemRetrievalMail(uint32 itemEntry, uint32 count)
+{
+    MailSender sender(MAIL_CREATURE, 34337 /* The Postmaster */);
+    MailDraft draft("Recovered Item", "We recovered a lost item in the twisting nether and noted that it was yours.$B$BPlease find said object enclosed."); // This is the text used in Cataclysm, it probably wasn't changed.
+    SQLTransaction trans = CharacterDatabase.BeginTransaction();
+
+    if (Item* item = Item::CreateItem(itemEntry, count, 0))
+    {
+        item->SaveToDB(trans);
+        draft.AddItem(item);
+    }
+
+    draft.SendMailTo(trans, MailReceiver(this, GetGUIDLow()), sender);
     CharacterDatabase.CommitTransaction(trans);
 }
 

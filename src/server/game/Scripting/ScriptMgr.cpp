@@ -1263,6 +1263,11 @@ void ScriptMgr::OnPlayerDelete(uint64 guid)
     FOREACH_SCRIPT(PlayerScript)->OnDelete(guid);
 }
 
+void ScriptMgr::OnPlayerFailedDelete(uint64 guid, uint32 accountId)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnFailedDelete(guid, accountId);
+}
+
 void ScriptMgr::OnPlayerSave(Player* player)
 {
     FOREACH_SCRIPT(PlayerScript)->OnSave(player);

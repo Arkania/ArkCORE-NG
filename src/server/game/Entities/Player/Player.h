@@ -1736,6 +1736,8 @@ class Player : public Unit, public GridObject<Player>
         PlayerMails::iterator GetMailBegin() { return m_mail.begin();}
         PlayerMails::iterator GetMailEnd() { return m_mail.end();}
 
+        void SendItemRetrievalMail(uint32 itemEntry, uint32 count); // Item retrieval mails sent by The Postmaster (34337), used in multiple places.
+
         /*********************************************************/
         /*** MAILED ITEMS SYSTEM ***/
         /*********************************************************/
@@ -1904,6 +1906,7 @@ class Player : public Unit, public GridObject<Player>
         void UpdatePvP(bool state, bool override=false);
         void UpdateZone(uint32 newZone, uint32 newArea);
         void UpdateArea(uint32 newArea);
+        void SetNeedsZoneUpdate(bool needsUpdate) { m_needsZoneUpdate = needsUpdate; }
 
         void UpdateZoneDependentAuras(uint32 zone_id);    // zones
         void UpdateAreaDependentAuras(uint32 area_id);    // subzones
@@ -2224,6 +2227,7 @@ class Player : public Unit, public GridObject<Player>
         std::vector<ItemSetEffect*> ItemSetEff;
 
         void SendLoot(uint64 guid, LootType loot_type);
+        void SendLootError(uint64 guid, LootError error);
         void SendLootRelease(uint64 guid);
         void SendNotifyLootItemRemoved(uint8 lootSlot);
         void SendNotifyCurrencyLootRemoved(uint8 lootSlot);
@@ -2839,6 +2843,7 @@ class Player : public Unit, public GridObject<Player>
 
         uint8 m_grantableLevels;
 
+        bool m_needsZoneUpdate;
         CUFProfile* _CUFProfiles[MAX_CUF_PROFILES];
 
     private:

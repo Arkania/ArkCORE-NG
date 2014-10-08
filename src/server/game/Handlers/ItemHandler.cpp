@@ -1561,6 +1561,13 @@ void WorldSession::HandleReforgeItemOpcode(WorldPacket& recvData)
 
     if (!reforgeEntry)
     {
+        if (!item->GetEnchantmentId(REFORGE_ENCHANTMENT_SLOT))
+        {
+            TC_LOG_ERROR("network", "WORLD: HandleReforgeItemOpcode - Player (Guid: %u Name: %s) tried to remove reforge from non-reforged item (Entry: %u)", player->GetGUIDLow(), player->GetName().c_str(), item->GetEntry());
+            SendReforgeResult(false);
+            return;
+        }
+
         // Reset the item
         if (item->IsEquipped())
             player->ApplyReforgeEnchantment(item, false);

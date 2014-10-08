@@ -725,10 +725,15 @@ void WorldSession::HandleCharDeleteOpcode(WorldPacket& recvData)
 {
     uint64 guid;
     recvData >> guid;
+    // Initiating
+    uint32 initAccountId = GetAccountId();
 
     // can't delete loaded character
     if (ObjectAccessor::FindPlayer(guid))
+    {
+        sScriptMgr->OnPlayerFailedDelete(guid, initAccountId);
         return;
+    }
 
     uint32 accountId = 0;
     uint8 level = 0;
@@ -765,11 +770,17 @@ void WorldSession::HandleCharDeleteOpcode(WorldPacket& recvData)
 
     // prevent deleting other players' characters using cheating tools
     if (accountId != GetAccountId())
+    {
+        sScriptMgr->OnPlayerFailedDelete(guid, initAccountId);
         return;
+    }
 
     std::string IP_str = GetRemoteAddress();
     TC_LOG_INFO("entities.player.character", "Account: %d, IP: %s deleted character: %s, GUID: %u, Level: %u", accountId, IP_str.c_str(), name.c_str(), GUID_LOPART(guid), level);
-    sScriptMgr->OnPlayerDelete(guid);
+   
+    // To prevent hook failure, place hook before removing reference from DB
+    sScriptMgr->OnPlayerDelete(guid); // To prevent race conditioning, but as it also makes sense, we hand the accountId over for successful delete.
+    // Shouldn't interfere with character deletion though
 
     if (sLog->ShouldLog("entities.player.dump", LOG_LEVEL_INFO)) // optimize GetPlayerDump call
     {
@@ -794,6 +805,7 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recvData)
     if (PlayerLoading() || GetPlayer() != NULL)
     {
         TC_LOG_ERROR("network", "Player tries to login again, AccountId = %d", GetAccountId());
+        KickPlayer();
         return;
     }
 

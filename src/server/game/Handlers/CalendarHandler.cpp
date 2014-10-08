@@ -299,6 +299,14 @@ void WorldSession::HandleCalendarUpdateEvent(WorldPacket& recvData)
     recvData.ReadPackedTime(timeZoneTime);
     recvData >> flags;
 
+    // prevent events in the past
+    // To Do: properly handle timezones and remove the "- time_t(86400L)" hack
+    if (time_t(eventPackedTime) < (time(NULL) - time_t(86400L)))
+    {
+        recvData.rfinish();
+        return;
+    }
+
     TC_LOG_DEBUG("network", "CMSG_CALENDAR_UPDATE_EVENT [" UI64FMTD "] EventId [" UI64FMTD
         "], InviteId [" UI64FMTD "] Title %s, Description %s, type %u "
         "Repeatable %u, MaxInvites %u, Dungeon ID %d, Time %u "

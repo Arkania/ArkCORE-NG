@@ -198,7 +198,7 @@ class Object
         virtual void SetObjectScale(float scale) { SetFloatValue(OBJECT_FIELD_SCALE_X, scale); }
 
         TypeID GetTypeId() const { return m_objectTypeId; }
-        bool isType(uint16 mask) const { return (mask & m_objectType); }
+        bool isType(uint16 mask) const { return (mask & m_objectType) != 0; }
 
         virtual void BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target) const;
         void SendUpdateToPlayer(Player* player);
@@ -302,7 +302,7 @@ class Object
         void BuildMovementUpdate(ByteBuffer* data, uint16 flags) const;
         virtual void BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, Player* target) const;
 
-        uint16 m_objectType;
+        uint16 m_objectType = 0;
 
         TypeID m_objectTypeId;
         uint16 m_updateFlag;

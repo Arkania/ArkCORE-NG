@@ -755,6 +755,9 @@ class PlayerScript : public UnitScript
         // Called when a player is deleted.
         virtual void OnDelete(uint64 /*guid*/) { }
 
+        // Called when a player delete failed
+        virtual void OnFailedDelete(uint64 /*guid*/, uint32 /*accountId*/) { }
+
         // Called when a player is about to be saved.
         virtual void OnSave(Player* /*player*/) { }
 
@@ -1038,6 +1041,7 @@ class ScriptMgr
         void OnPlayerLogout(Player* player);
         void OnPlayerCreate(Player* player);
         void OnPlayerDelete(uint64 guid);
+        void OnPlayerFailedDelete(uint64 guid, uint32 accountId);
         void OnPlayerSave(Player* player);
         void OnPlayerBindToInstance(Player* player, Difficulty difficulty, uint32 mapid, bool permanent);
         void OnPlayerUpdateZone(Player* player, uint32 newZone, uint32 newArea);

@@ -55,6 +55,9 @@ void VisibleNotifier::SendToSelf()
                     case TYPEID_UNIT:
                         i_player.UpdateVisibilityOf((*itr)->ToCreature(), i_data, i_visibleNow);
                         break;
+                    case TYPEID_DYNAMICOBJECT:
+                        i_player.UpdateVisibilityOf((*itr)->ToDynObject(), i_data, i_visibleNow);
+                        break;
                     default:
                         break;
                 }

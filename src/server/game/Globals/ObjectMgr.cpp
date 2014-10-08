@@ -4494,6 +4494,12 @@ void ObjectMgr::LoadScripts(ScriptsType type)
                         tableName.c_str(), tmp.Talk.TextID, MIN_DB_SCRIPT_STRING_ID, MAX_DB_SCRIPT_STRING_ID, tmp.id);
                     continue;
                 }
+                if (!sObjectMgr->GetBroadcastText(uint32(tmp.Talk.TextID)))
+                {
+                    TC_LOG_ERROR("sql.sql", "Table `%s` has invalid talk text id (dataint = %i) in SCRIPT_COMMAND_TALK for script id %u",
+                        tableName.c_str(), tmp.Talk.TextID, tmp.id);
+                    continue;
+                }
 
                 break;
             }

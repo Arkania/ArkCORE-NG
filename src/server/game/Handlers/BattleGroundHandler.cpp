@@ -256,7 +256,9 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
             // add to queue
             uint32 queueSlot = member->AddBattlegroundQueueId(bgQueueTypeId);
 
-            // send status packet (in queue)
+            // add joined time data
+            member->AddBattlegroundQueueJoinTime(bgTypeId, ginfo->JoinTime);
+            
             sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, member, queueSlot, STATUS_WAIT_QUEUE, avgTime, ginfo->JoinTime, ginfo->ArenaType);
             member->GetSession()->SendPacket(&data);
             TC_LOG_DEBUG("bg.battleground", "Battleground: player joined queue for bg queue type %u bg type %u: GUID %u, NAME %s",
@@ -420,7 +422,7 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recvData)
     guid[3] = recvData.ReadBit();
     guid[2] = recvData.ReadBit();
 
-    action = recvData.ReadBit() ? 1 : 0;
+    action = recvData.ReadBit() ? 1 : 0;  // tc is not change the bit!
 
     recvData.ReadByteSeq(guid[1]);
     recvData.ReadByteSeq(guid[3]);
@@ -575,7 +577,7 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recvData)
                 at->SaveToDB();
             }
         }
-        sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, _player, queueSlot, STATUS_NONE, _player->GetBattlegroundQueueJoinTime(bgTypeId), 0, 0);
+        sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, _player, queueSlot, STATUS_NONE, _player->GetBattlegroundQueueJoinTime(bgTypeId), 0, ginfo.ArenaType);
         SendPacket(&data);
 
         _player->RemoveBattlegroundQueueId(bgQueueTypeId);  // must be called this way, because if you move this call to queue->removeplayer, it causes bugs

@@ -534,13 +534,13 @@ public:
 
             float x, y, z, o;
             me->GetHomePosition(x, y, z, o);
-            DoTeleportTo(x, y, 71);
+            DoTeleportTo(x, y, 71.0f);
         }
 
         void JustDied(Unit* /*killer*/) OVERRIDE
         {
             for (uint8 i = 0; i < 8; ++i)
-                me->SummonCreature(NPC_VOID_SPAWN, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), float(rand()%6), TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 180000);
+                me->SummonCreature(NPC_VOID_SPAWN, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 180000); //  float(rand()%6)
         }
 
         void UpdateAI(uint32 diff) OVERRIDE

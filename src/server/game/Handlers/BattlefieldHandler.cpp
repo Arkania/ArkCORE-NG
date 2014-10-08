@@ -125,6 +125,8 @@ void WorldSession::SendBfQueueInviteResponse(uint64 battlefieldGuid, uint64 queu
     ObjectGuid battlefieldGuidBytes = battlefieldGuid;
     ObjectGuid queueGuidBytes = queueGuid;
 
+    const bool hasSecondGuid = false;
+    
     WorldPacket data(SMSG_BATTLEFIELD_MGR_QUEUE_REQUEST_RESPONSE);
 
     data.WriteBit(battlefieldGuidBytes[1]);
@@ -133,7 +135,7 @@ void WorldSession::SendBfQueueInviteResponse(uint64 battlefieldGuid, uint64 queu
     data.WriteBit(battlefieldGuidBytes[7]);
     data.WriteBit(Full);  // Logging In, VERIFYME
     data.WriteBit(battlefieldGuidBytes[0]);
-    data.WriteBit(true);  // send the queue ID
+    data.WriteBit(!hasSecondGuid);  // send the queue ID
     data.WriteBit(battlefieldGuidBytes[4]);
 
     // if (hasSecondGuid) 7 3 0 4 2 6 1 5
@@ -171,7 +173,7 @@ void WorldSession::SendBfQueueInviteResponse(uint64 battlefieldGuid, uint64 queu
     data.WriteByteSeq(battlefieldGuidBytes[7]);
     data.WriteByteSeq(battlefieldGuidBytes[0]);
 
-    data << uint8(battleHasBegun);
+    data << uint8(battleHasBegun);  // warmup?
 
     data.WriteByteSeq(battlefieldGuidBytes[2]);
     data.WriteByteSeq(battlefieldGuidBytes[4]);
