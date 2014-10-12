@@ -1917,7 +1917,8 @@ class spell_twilight_shadow_weaver_shadow_weave : public SpellScriptLoader
         }
 };
 
-class spell_twilight_thundercaller_electric_blast: public SpellScriptLoader
+// 82973
+class spell_twilight_thundercaller_electric_blast: public SpellScriptLoader 
 {
     public:
         spell_twilight_thundercaller_electric_blast() : SpellScriptLoader("spell_twilight_thundercaller_electric_blast") { }
@@ -1992,7 +1993,7 @@ void AddSC_grim_batol()
     new npc_twilight_wyrmcaller();
     new npc_ascended_rockbreaker_fissure();
     new npc_crimsonborne_warlord_empowering_flames();
-    new spell_twilight_enforcer_meat_grinder();
+    // new spell_twilight_enforcer_meat_grinder(); // wrong call:  EFFECT_0
     new spell_twilight_shadow_weaver_shadow_weave();
     new spell_twilight_thundercaller_electric_blast();
 }
