@@ -397,9 +397,15 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
             }
         }
 
-        // not have spell in spellbook
-        recvPacket.rfinish(); // prevent spam at ignore packet
-        return;
+        switch (spellId) // some spell have permission
+        {
+            case 68398:  
+                break;
+            default:
+                // not have spell in spellbook
+                recvPacket.rfinish(); // prevent spam at ignore packet
+                return;
+        }       
     }
 
     Unit::AuraEffectList swaps = mover->GetAuraEffectsByType(SPELL_AURA_OVERRIDE_ACTIONBAR_SPELLS);

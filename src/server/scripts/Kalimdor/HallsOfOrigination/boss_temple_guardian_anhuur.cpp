@@ -30,13 +30,18 @@ enum Spells
     SPELL_TELEPORT = 74969, // Teleport on phase switch
     SPELL_SHIELD_OF_LIGHT = 74938,
     SPELL_SHIELD_VISUAL_2 = 74930,
-    SPELL_DIVINE_RECKONING = 75592,
+    SPELL_DIVINE_RECKONING_NORMAL = 75592,
+    SPELL_DIVINE_RECKONING_HEROIC = 75591,
     SPELL_REVERBERATING_HYMN = 75322,
-    SPELL_BURNING_LIGHT = 75115,
-    SPELL_BURNING_LIGHT_2 = 75194,
+    SPELL_BURNING_LIGHT_1 = 75115, // trigger 75114
+    SPELL_BURNING_LIGHT_2 = 75194,  // trigger 75116
+    SPELL_BURNING_LIGHT_NORMAL10 = 75117,
+    SPELL_BURNING_LIGHT_NORMAL25 = 94951,
     SPELL_BEAM_LEFT = 83697,
     SPELL_BEAM_RIGHT = 83698,
-
+    SPELL_BEAM_OPEN = 68398,
+    SPELL_DISABLE_BEACON_BEAM_LEFT = 76606,
+    SPELL_DISABLE_BEACON_BEAM_RIGHT = 76608,
 };
 
 enum Quotes
@@ -57,9 +62,10 @@ enum Events
 
 enum Entities
 {
-    NPC_ANHUUR = 39425,
-    GO_LEVER_1 = 207218,
-    GO_LEVER_2 = 207219,
+    GO_BEACON_OF_LIGHT_LEVER_LEFT = 207218,
+    GO_BEACON_OF_LIGHT_LEVER_RIGHT = 207219,
+    GO_BEACON_OF_LIGHT_LIGHT_LEFT = 203133,
+    GO_BEACON_OF_LIGHT_LIGHT_RIGHT = 203136,    
 };
 
 enum MiscData
@@ -69,6 +75,7 @@ enum MiscData
 
 enum Phases
 {
+    PHASE_LOADED = 0,
     PHASE_NORMAL = 1,
     PHASE_SHIELDED = 2,
 };
@@ -82,40 +89,134 @@ public:
     {
         boss_temple_guardian_anhuurAI(Creature * creature) : BossAI(creature, DATA_TEMPLE_GUARDIAN_ANHUUR) {} // DATA_TEMPLE_GUARDIAN_ANHUUR_EVENT
 
-        std::list<uint64> SummonList;    
-        bool shielded;
-        int8 stage;
-        uint64 targetGUID;
-        bool beacons[2];
+        Creature*   _StalkerOnBeam[2];  //left=0 right=1
+        Creature*   _StalkerOnTribun[4];
+        Creature*   _StalkerOnEyesFront[4];
+        Creature*   _StalkerOnEyesRear[4];
+        Creature*   _StalkerOnShield[4];
+        GameObject* _LeverLeft;
+        GameObject* _LeverRight;
 
-        void Reset() override
+        uint32    _Phase;
+        bool      _BeaconLeft, _BeaconRight;
+
+        // called from spell 76606/76608
+        void SetData(uint32 type, uint32 data)
         {
-            RemoveSummons();
-            shielded = false;
-            stage = 0;
-            targetGUID = 0;
-            SetLevers(false);
-            memset(&beacons, false, sizeof(beacons));
-            _Reset();
+            if (events.IsInPhase(PHASE_NORMAL) || type != DATA_SHIELD)
+                return;
+
+            if (data == SPELL_DISABLE_BEACON_BEAM_RIGHT)
+            {
+                _BeaconRight = true;
+                _StalkerOnBeam[1]->RemoveAura(SPELL_BEAM_RIGHT);
+                _LeverRight->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+            }
+            else if (data == SPELL_DISABLE_BEACON_BEAM_LEFT)
+            {
+                _BeaconLeft = true;
+                _StalkerOnBeam[0]->RemoveAura(SPELL_BEAM_LEFT);
+                _LeverLeft->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+            }
+
+            if (_BeaconLeft && _BeaconRight)
+            {
+                Talk(EMOTE_SHIELD_REMOVED);
+                EndShieldEvent();
+            }
         }
 
-        void SetLevers(bool active)
+        void SpawnSummons()
         {
-            if (GameObject * lever1 = me->FindNearestGameObject(GO_LEVER_1, 50.0f))
-            {
-                if (active)
-                    lever1->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
-                else
-                    lever1->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
-            }
+            _StalkerOnBeam[0] = me->SummonCreature(NPC_CAVE_IN_STALKER, -603.5f, 334.3f, 65.39f, 3.12414f);
+            _StalkerOnBeam[1] = me->SummonCreature(NPC_CAVE_IN_STALKER, -678.1f, 334.3f, 64.90f, 0.24434f);
+            _StalkerOnTribun[0] = me->SummonCreature(NPC_CAVE_IN_STALKER, -656.4f, 319.0f, 85.6f, 0.768f);
+            _StalkerOnTribun[1] = me->SummonCreature(NPC_CAVE_IN_STALKER, -656.4f, 350.3f, 85.6f, 5.428f);
+            _StalkerOnTribun[2] = me->SummonCreature(NPC_CAVE_IN_STALKER, -625.4f, 319.3f, 85.6f, 2.391f);
+            _StalkerOnTribun[3] = me->SummonCreature(NPC_CAVE_IN_STALKER, -625.4f, 350.6f, 85.6f, 3.979f);
+            _StalkerOnShield[0] = me->SummonCreature(NPC_CAVE_IN_STALKER, -657.8f, 325.0f, 92.6f, 0.0f);
+            _StalkerOnShield[1] = me->SummonCreature(NPC_CAVE_IN_STALKER, -657.8f, 338.3f, 92.6f, 0.0f);
+            _StalkerOnShield[2] = me->SummonCreature(NPC_CAVE_IN_STALKER, -624.0f, 325.0f, 92.6f, 3.14f);
+            _StalkerOnShield[3] = me->SummonCreature(NPC_CAVE_IN_STALKER, -624.0f, 338.3f, 92.6f, 3.14f);
+            _StalkerOnEyesFront[0] = me->SummonCreature(NPC_CAVE_IN_STALKER, -662.21f, 373.78f, 101.628f, 0.0873f);
+            _StalkerOnEyesFront[1] = me->SummonCreature(NPC_CAVE_IN_STALKER, -661.816f, 368.4965f, 101.7023f, 0.314f);
+            _StalkerOnEyesFront[2] = me->SummonCreature(NPC_CAVE_IN_STALKER, -619.62f, 373.23f, 102.70f, 3.037f);
+            _StalkerOnEyesFront[3] = me->SummonCreature(NPC_CAVE_IN_STALKER, -619.54f, 368.26f, 102.65f, 2.827f);
+            _StalkerOnEyesRear[0] = me->SummonCreature(NPC_CAVE_IN_STALKER, -662.53f, 301.94f, 102.85f, 6.231f);
+            _StalkerOnEyesRear[1] = me->SummonCreature(NPC_CAVE_IN_STALKER, -662.13f, 296.63f, 102.78f, 0.192f);
+            _StalkerOnEyesRear[2] = me->SummonCreature(NPC_CAVE_IN_STALKER, -619.46f, 301.64f, 102.96f, 3.351f);
+            _StalkerOnEyesRear[3] = me->SummonCreature(NPC_CAVE_IN_STALKER, -619.06f, 296.11f, 102.91f, 3.142f);
+            _LeverLeft = me->FindNearestGameObject(GO_BEACON_OF_LIGHT_LEVER_LEFT, 50.0f);
+            _LeverRight = me->FindNearestGameObject(GO_BEACON_OF_LIGHT_LEVER_RIGHT, 50.0f);
+        }
 
-            if (GameObject * lever2 = me->FindNearestGameObject(GO_LEVER_2, 50.0f))
+        void Reset() override
+        {    
+            _Phase = 0;
+            _StalkerOnBeam[0] = 0;
+            _StalkerOnBeam[1] = 0;
+            for (uint32 c = 0; c < 4; c++)
             {
-                if (active)
-                    lever2->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
-                else
-                    lever2->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                _StalkerOnTribun[c] = 0;
+                _StalkerOnEyesFront[c] = 0;
+                _StalkerOnEyesRear[c] = 0;
+                _StalkerOnShield[c] = 0;
             }
+            _Reset();
+            SpawnSummons();
+            _BeaconLeft = false;
+            _BeaconRight = false;
+            SetLeversAreSelectableFlag(false);
+        }
+        
+        void SetLeversAreSelectableFlag(bool active)
+        {            
+                if (active)
+                    _LeverLeft->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                else
+                    _LeverLeft->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+            
+                if (active)
+                    _LeverRight->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                else
+                    _LeverRight->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+        }
+
+        void StartShieldEvent()
+        {
+            Talk(EMOTE_SHIELD);
+            Talk(SAY_SHIELD);
+
+            me->SetReactState(REACT_PASSIVE);
+            me->GetMotionMaster()->Clear();
+            me->GetMotionMaster()->MoveIdle();
+            DoCast(me, SPELL_TELEPORT, true);
+
+            events.SetPhase(PHASE_SHIELDED);
+            DoCast(me, SPELL_SHIELD_VISUAL_2, true);
+            DoCast(me, SPELL_SHIELD_OF_LIGHT, true);
+            DoCast(me, SPELL_REVERBERATING_HYMN, true);
+            me->SetReactState(REACT_AGGRESSIVE);
+            SetLeversAreSelectableFlag(true);
+            
+            if (_StalkerOnBeam[0] && _StalkerOnBeam[1])
+            {
+                _StalkerOnBeam[0]->CastSpell(me, SPELL_BEAM_LEFT, false);
+                _StalkerOnBeam[1]->CastSpell(me, SPELL_BEAM_RIGHT, false);
+            }
+        }
+
+        void EndShieldEvent()
+        {
+            me->RemoveAurasDueToSpell(SPELL_REVERBERATING_HYMN);
+            me->RemoveAurasDueToSpell(SPELL_SHIELD_VISUAL_2);
+            me->RemoveAurasDueToSpell(SPELL_SHIELD_OF_LIGHT);
+            _StalkerOnBeam[0]->RemoveAura(SPELL_BEAM_LEFT);
+            _StalkerOnBeam[1]->RemoveAura(SPELL_BEAM_RIGHT);
+            SetLeversAreSelectableFlag(false);
+            events.SetPhase(PHASE_NORMAL);
+            _BeaconLeft = false;
+            _BeaconRight = false;
         }
 
         void EnterCombat(Unit * /*who*/) override
@@ -130,7 +231,6 @@ public:
         {
             Talk(SAY_DEATH);
             BossAI::JustDied(killer);
-            RemoveSummons();
         }
 
         void KilledUnit(Unit *) override
@@ -140,131 +240,75 @@ public:
 
         void DamageTaken(Unit * done_by, uint32 &damage) override
         {
-            if (shielded) // to prevent possible exploits
+            if (me->HasAura(SPELL_SHIELD_OF_LIGHT))
             {
-                if (me->HasAura(SPELL_SHIELD_OF_LIGHT))
-                    damage = 0;
-                else
-                {
-                    events.SetPhase(PHASE_NORMAL);
-                    me->RemoveAurasDueToSpell(SPELL_REVERBERATING_HYMN);
-                    me->GetMotionMaster()->MoveChase(me->GetVictim() ? me->GetVictim() : done_by);
-                    shielded = false;
-                }
-            }
+                if (!me->HasAura(SPELL_REVERBERATING_HYMN))
+                    DoCast(me, SPELL_REVERBERATING_HYMN, true);
 
-            if (stage >= 2)
+                damage = 0;
                 return;
-
-            if (me->GetHealthPct() <= (stage ? 33.0f : 66.0f))
-            {
-                ++stage;
-
-                Talk(SAY_SHIELD);
-                Talk(EMOTE_SHIELD);
-
-                me->SetReactState(REACT_PASSIVE);
-                me->GetMotionMaster()->Clear();
-                me->GetMotionMaster()->MoveIdle();
-                DoCast(me, SPELL_TELEPORT, true);
-
-                events.SetPhase(PHASE_SHIELDED);
-                DoCast(me, SPELL_SHIELD_VISUAL_2, true);
-                DoCast(me, SPELL_SHIELD_OF_LIGHT, true);
-                DoCast(me, SPELL_REVERBERATING_HYMN, true);
-                me->SetReactState(REACT_AGGRESSIVE);
-                SetLevers(true);
-
-                shielded = true;
-
-                if (Creature *light1 = me->SummonCreature(40183, -603.465f, 334.38f, 65.4f, 3.12f, TEMPSUMMON_CORPSE_DESPAWN, 1000))
-                    light1->CastSpell(me, SPELL_BEAM_LEFT, false);
-
-                if (Creature *light2 = me->SummonCreature(40183, -678.132f, 334.212f, 64.9f, 0.24f, TEMPSUMMON_CORPSE_DESPAWN, 1000))
-                    light2->CastSpell(me, SPELL_BEAM_RIGHT, false);
             }
-        }
-
-        void SetData(uint32 type, uint32 data)
-        {
-            if (!shielded || type != DATA_SHIELD)
-                return;
-
-            if (data == 76608)
-                beacons[1] = true;
-            else if (data == 76606)
-                beacons[0] = true;
-
-            if (beacons[0] && beacons[1])
+            else
             {
-                me->RemoveAurasDueToSpell(SPELL_SHIELD_OF_LIGHT);
-                Talk(EMOTE_SHIELD_REMOVED);
-                RemoveSummons();
-                memset(&beacons, false, sizeof(beacons));
+                if (_LeverLeft->HasFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE))
+                    _LeverLeft->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+
+                if (_LeverRight->HasFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE))
+                    _LeverRight->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+
+                if (_StalkerOnBeam[0]->HasAura(SPELL_BEAM_LEFT))
+                    _StalkerOnBeam[0]->RemoveAura(SPELL_BEAM_LEFT);
+
+                if (_StalkerOnBeam[1]->HasAura(SPELL_BEAM_RIGHT))
+                    _StalkerOnBeam[1]->RemoveAura(SPELL_BEAM_RIGHT);
             }
-        }
 
-        void RemoveSummons()
-        {
-            if (SummonList.empty())
-                return;
-
-            for (std::list<uint64>::const_iterator itr = SummonList.begin(); itr != SummonList.end(); ++itr)
+            if (me->GetHealthPct() <= 66.0f && _Phase == 0)
             {
-                if (Creature* pTemp = Unit::GetCreature(*me, *itr))
-                    if (pTemp)
-                        pTemp->DisappearAndDie();
+                _Phase = 1;
+                StartShieldEvent();
             }
-            SummonList.clear();
-        }
-
-        void JustSummoned(Creature * summon)
-        {
-            SummonList.push_back(summon->GetGUID());
-            if (Player * player = me->GetPlayer(*me, targetGUID))
+            if (me->GetHealthPct() <= 33.0f && _Phase == 1)
             {
-                if (Creature * stalker = player->FindNearestCreature(NPC_CAVE_IN_STALKER, 100.0f))
-                    stalker->CastSpell(stalker, SPELL_BURNING_LIGHT_2, true, NULL, NULL, me->GetGUID());
-                summon->setFaction(14);
-                targetGUID = 0;
+                _Phase = 2;
+                StartShieldEvent();
             }
         }
 
         void UpdateAI(uint32 diff) override
         {
+            events.Update(diff);
+
             if (!UpdateVictim())
                 return;
 
-            events.Update(diff);
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
             if (uint32 eventId = events.ExecuteEvent())
             {
                 switch (eventId)
                 {
                 case EVENT_DIVINE_RECKONING:
-                {
-                    Unit * target = SelectTarget(SELECT_TARGET_RANDOM, 1, 50.0f, true);
-                    if (!target)
-                        target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true);
-                    if (target)
-                        DoCast(target, SPELL_DIVINE_RECKONING);
+                    if (!me->HasUnitState(UNIT_STATE_CASTING))
+                    {
+                        Unit * target = SelectTarget(SELECT_TARGET_RANDOM, 1, 50.0f, true);
+                        if (!target)
+                            target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true);
+                        if (target)
+                            DoCast(target, SPELL_DIVINE_RECKONING_NORMAL);
+                    }
                     events.ScheduleEvent(EVENT_DIVINE_RECKONING, urand(10000, 12000), 0, PHASE_NORMAL);
-                }
                     break;
                 case EVENT_BURNING_LIGHT:
-                {
-                    Unit * target = SelectTarget(SELECT_TARGET_RANDOM, 1, 50.0f, true);
-                    if (!target)
-                        target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true);
-                    if (target)
+                    if (!me->HasUnitState(UNIT_STATE_CASTING))
                     {
-                        targetGUID = target->GetGUID();
-                        DoCast(target, SPELL_BURNING_LIGHT, true);
+                        Unit * target = SelectTarget(SELECT_TARGET_RANDOM, 1, 50.0f, true);
+                        if (!target)
+                            target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true);
+                        if (target)
+                        {
+                            DoCast(target, SPELL_BURNING_LIGHT_1, true);
+                        }
                     }
                     events.ScheduleEvent(EVENT_BURNING_LIGHT, urand(10000, 15000), 0, PHASE_NORMAL);
-                }
                     break;
                 }
             }
@@ -279,6 +323,7 @@ public:
     }
 };
 
+// spell 76606 and 76608
 class spell_disable_beacon_beams : public SpellScriptLoader
 {
 public:
@@ -291,15 +336,15 @@ public:
         void HandleScript(SpellEffIndex /*effIndex*/)
         {
             if (Unit * caster = GetCaster())
-            {
-                if (Creature * boss = caster->FindNearestCreature(NPC_ANHUUR, 100.0f))
+            {                
+                if (Creature * boss = caster->FindNearestCreature(BOSS_TEMPLE_GUARDIAN_ANHUUR, 100.0f))
                     boss->AI()->SetData(DATA_SHIELD, GetSpellInfo()->Id);
             }
         }
-
+       
         void Register()
         {
-            OnEffectHitTarget += SpellEffectFn(spell_disable_beacon_beams_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+            OnEffectLaunch += SpellEffectFn(spell_disable_beacon_beams_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
@@ -309,56 +354,8 @@ public:
     }
 };
 
-class go_beacon_of_light : public GameObjectScript
-{
-    
-public:
-    go_beacon_of_light() : GameObjectScript("go_beacon_of_light") { }
-
-    struct go_beacon_of_lightAI : public GameObjectAI
-    {
-        go_beacon_of_lightAI(GameObject* go) : GameObjectAI(go) { }
-
-        void Reset() override
-        {
-            printf("Reset \n");
-        }
-
-        bool OnDummyEffect(Unit* /*caster*/, uint32 /*spellId*/, SpellEffIndex /*effIndex*/, GameObject* target) 
-        { 
-            printf("Reset %d \n", target->GetGUIDLow());
-            return false; 
-        }
-
-        void OnLootStateChanged(GameObject* go, uint32 /*state*/, Unit* /*unit*/) 
-        {         
-            printf("Reset %d \n", go->GetGUIDLow());
-        }
-
-        void OnGameObjectStateChanged(GameObject* go, uint32 /*state*/) 
-        { 
-            printf("Reset %d \n", go->GetGUIDLow());
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-
-        }
-    };
-
-    GameObjectAI* GetAI(GameObject* go) const OVERRIDE
-    {
-        return new go_beacon_of_lightAI(go);
-    }
-};
-
-
-
-
 void AddSC_boss_temple_guardian_anhuur()
 {
     new boss_temple_guardian_anhuur();
     new spell_disable_beacon_beams();
-    new go_beacon_of_light();
-
 }
