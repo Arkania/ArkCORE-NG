@@ -402,15 +402,15 @@ public:
                 UpdateWorldState(me->GetMap(), WORLD_STATE_EVENT_BEGIN, 0);
 
                 if (Creature* temp = Unit::GetCreature(*me, uiTirionGUID))
-                    temp->setDeathState(JUST_DIED);
+                    temp->SetDeathState(JUST_DIED);
                 if (Creature* temp = Unit::GetCreature(*me, uiKorfaxGUID))
-                    temp->setDeathState(JUST_DIED);
+                    temp->SetDeathState(JUST_DIED);
                 if (Creature* temp = Unit::GetCreature(*me, uiMaxwellGUID))
-                    temp->setDeathState(JUST_DIED);
+                    temp->SetDeathState(JUST_DIED);
                 if (Creature* temp = Unit::GetCreature(*me, uiEligorGUID))
-                    temp->setDeathState(JUST_DIED);
+                    temp->SetDeathState(JUST_DIED);
                 if (Creature* temp = Unit::GetCreature(*me, uiRayneGUID))
-                    temp->setDeathState(JUST_DIED);
+                    temp->SetDeathState(JUST_DIED);
 
                 uiTirionGUID = 0;
                 uiKorfaxGUID = 0;
@@ -421,13 +421,13 @@ public:
                 for (uint8 i = 0; i < ENCOUNTER_DEFENDER_NUMBER; ++i)
                 {
                     if (Creature* temp = Unit::GetCreature(*me, uiDefenderGUID[i]))
-                        temp->setDeathState(JUST_DIED);
+                        temp->SetDeathState(JUST_DIED);
                     uiDefenderGUID[i] = 0;
                 }
                 for (uint8 i = 0; i < ENCOUNTER_EARTHSHATTER_NUMBER; ++i)
                 {
                     if (Creature* temp = Unit::GetCreature(*me, uiEarthshatterGUID[i]))
-                        temp->setDeathState(JUST_DIED);
+                        temp->SetDeathState(JUST_DIED);
                     uiEarthshatterGUID[i] = 0;
                 }
 
@@ -447,25 +447,25 @@ public:
                 for (uint8 i = 0; i < ENCOUNTER_ABOMINATION_NUMBER; ++i)
                 {
                     if (Creature* temp = Unit::GetCreature(*me, uiAbominationGUID[i]))
-                        temp->setDeathState(JUST_DIED);
+                        temp->SetDeathState(JUST_DIED);
                     uiAbominationGUID[i] = 0;
                 }
                 for (uint8 i = 0; i < ENCOUNTER_BEHEMOTH_NUMBER; ++i)
                 {
                     if (Creature* temp = Unit::GetCreature(*me, uiBehemothGUID[i]))
-                        temp->setDeathState(JUST_DIED);
+                        temp->SetDeathState(JUST_DIED);
                     uiBehemothGUID[i] = 0;
                 }
                 for (uint8 i = 0; i < ENCOUNTER_GHOUL_NUMBER; ++i)
                 {
                     if (Creature* temp = Unit::GetCreature(*me, uiGhoulGUID[i]))
-                        temp->setDeathState(JUST_DIED);
+                        temp->SetDeathState(JUST_DIED);
                     uiGhoulGUID[i] = 0;
                 }
                 for (uint8 i = 0; i < ENCOUNTER_WARRIOR_NUMBER; ++i)
                 {
                     if (Creature* temp = Unit::GetCreature(*me, uiWarriorGUID[i]))
-                        temp->setDeathState(JUST_DIED);
+                        temp->SetDeathState(JUST_DIED);
                     uiWarriorGUID[i] = 0;
                 }
             }
@@ -894,7 +894,7 @@ public:
 
                         case 27:
                             if (Creature* temp = Unit::GetCreature(*me, uiDarionGUID))
-                                temp->setDeathState(JUST_DIED);
+                                temp->SetDeathState(JUST_DIED);
                             JumpToNextStep(24000);
                             break;
 

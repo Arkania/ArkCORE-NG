@@ -830,7 +830,7 @@ public:
                     if (Illi)
                     {
                         Illi->SetVisible(false);
-                        Illi->setDeathState(JUST_DIED);
+                        Illi->SetDeathState(JUST_DIED);
                     }
                     return 1000;
                     break;
@@ -1413,7 +1413,7 @@ public:
                     }
                     ++GroupMemberCount;
 
-                    if (GroupMember->isDead())
+                    if (GroupMember->IsDead())
                         ++DeadMemberCount;
                 }
 
@@ -1432,7 +1432,7 @@ public:
                     }
                     Failed = true;
                 }
-            } else if (player->isDead() || !player->IsWithinDistInMap(me, EVENT_AREA_RADIUS))
+            } else if (player->IsDead() || !player->IsWithinDistInMap(me, EVENT_AREA_RADIUS))
             {
                 player->FailQuest(QUEST_BATTLE_OF_THE_CRIMSON_WATCH);
                 Failed = true;

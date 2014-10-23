@@ -149,7 +149,7 @@ public:
                     }
 
                     if (Creature* pArthas = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_ARTHAS)))
-                        if (pArthas->isDead())
+                        if (pArthas->IsDead())
                         {
                             EnterEvadeMode();
                             me->DisappearAndDie();

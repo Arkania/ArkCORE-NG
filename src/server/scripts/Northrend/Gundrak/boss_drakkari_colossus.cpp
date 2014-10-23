@@ -89,7 +89,7 @@ class boss_drakkari_colossus : public CreatureScript
 
             void InitializeAI() OVERRIDE
             {
-                if (!me->isDead())
+                if (!me->IsDead())
                     Reset();
             }
 

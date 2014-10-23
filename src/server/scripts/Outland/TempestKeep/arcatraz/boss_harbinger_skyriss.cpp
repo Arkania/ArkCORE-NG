@@ -168,7 +168,7 @@ class boss_harbinger_skyriss : public CreatureScript
                             if (Unit* mellic = ObjectAccessor::GetUnit(*me, instance->GetData64(DATA_MELLICHAR)))
                             {
                                 //should have a better way to do this. possibly spell exist.
-                                mellic->setDeathState(JUST_DIED);
+                                mellic->SetDeathState(JUST_DIED);
                                 mellic->SetHealth(0);
                                 instance->HandleGameObject(instance->GetData64(DATA_WARDENS_SHIELD), false);
                             }

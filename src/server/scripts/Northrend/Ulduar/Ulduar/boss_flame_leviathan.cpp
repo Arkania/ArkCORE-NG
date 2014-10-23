@@ -232,7 +232,7 @@ class boss_flame_leviathan : public CreatureScript
             void InitializeAI() OVERRIDE
             {
                 ASSERT(vehicle);
-                if (!me->isDead())
+                if (!me->IsDead())
                     Reset();
 
                 ActiveTowersCount = 4;
@@ -521,7 +521,7 @@ class boss_flame_leviathan : public CreatureScript
                         me->SetLootMode(LOOT_MODE_DEFAULT | LOOT_MODE_HARD_MODE_1 | LOOT_MODE_HARD_MODE_2 | LOOT_MODE_HARD_MODE_3 | LOOT_MODE_HARD_MODE_4);
                         break;
                     case ACTION_MOVE_TO_CENTER_POSITION: // Triggered by 2 Collossus near door
-                        if (!me->isDead())
+                        if (!me->IsDead())
                         {
                             me->SetHomePosition(Center);
                             me->GetMotionMaster()->MoveCharge(Center.GetPositionX(), Center.GetPositionY(), Center.GetPositionZ()); // position center

@@ -868,12 +868,12 @@ void Map::ScriptsProcess()
                 // Source or target must be Creature.
                 if (Creature* cSource = _GetScriptCreatureSourceOrTarget(source, target, step.script))
                 {
-                    if (cSource->isDead())
+                    if (cSource->IsDead())
                         TC_LOG_ERROR("scripts", "%s creature is already dead (Entry: %u, GUID: %u)",
                             step.script->GetDebugInfo().c_str(), cSource->GetEntry(), cSource->GetGUIDLow());
                     else
                     {
-                        cSource->setDeathState(JUST_DIED);
+                        cSource->SetDeathState(JUST_DIED);
                         if (step.script->Kill.RemoveCorpse == 1)
                             cSource->RemoveCorpse();
                     }

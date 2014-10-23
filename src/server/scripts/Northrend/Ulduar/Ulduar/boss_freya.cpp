@@ -490,7 +490,7 @@ class boss_freya : public CreatureScript
                             {
                                 if (Elemental[0][i] && Elemental[1][i] && Elemental[2][i])
                                 {
-                                    if (Elemental[0][i]->isDead() && Elemental[1][i]->isDead() && Elemental[2][i]->isDead())
+                                    if (Elemental[0][i]->IsDead() && Elemental[1][i]->IsDead() && Elemental[2][i]->IsDead())
                                     {
                                         for (uint8 n = 0; n < 3; ++n)
                                         {

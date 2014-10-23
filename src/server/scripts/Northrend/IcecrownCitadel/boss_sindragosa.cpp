@@ -297,7 +297,7 @@ class boss_sindragosa : public CreatureScript
                     if (TempSummon* summon = me->ToTempSummon())
                         summon->SetTempSummonType(TEMPSUMMON_DEAD_DESPAWN);
 
-                    if (me->isDead())
+                    if (me->IsDead())
                         return;
 
                     me->setActive(true);
@@ -603,7 +603,7 @@ class npc_ice_tomb : public CreatureScript
                 if (_existenceCheckTimer <= diff)
                 {
                     Player* player = ObjectAccessor::GetPlayer(*me, _trappedPlayerGUID);
-                    if (!player || player->isDead() || !player->HasAura(SPELL_ICE_TOMB_DAMAGE))
+                    if (!player || player->IsDead() || !player->HasAura(SPELL_ICE_TOMB_DAMAGE))
                     {
                         // Remove object
                         JustDied(me);
@@ -641,7 +641,7 @@ class npc_spinestalker : public CreatureScript
             void InitializeAI() OVERRIDE
             {
                 // Increase add count
-                if (!me->isDead())
+                if (!me->IsDead())
                 {
                     _instance->SetData(DATA_SINDRAGOSA_FROSTWYRMS, me->GetDBTableGUIDLow());  // this cannot be in Reset because reset also happens on evade
                     Reset();
@@ -682,7 +682,7 @@ class npc_spinestalker : public CreatureScript
                         return;
 
                     _summoned = true;
-                    if (me->isDead())
+                    if (me->IsDead())
                         return;
 
                     me->setActive(true);
@@ -771,7 +771,7 @@ class npc_rimefang : public CreatureScript
             void InitializeAI() OVERRIDE
             {
                 // Increase add count
-                if (!me->isDead())
+                if (!me->IsDead())
                 {
                     _instance->SetData(DATA_SINDRAGOSA_FROSTWYRMS, me->GetDBTableGUIDLow());  // this cannot be in Reset because reset also happens on evade
                     Reset();
@@ -812,7 +812,7 @@ class npc_rimefang : public CreatureScript
                         return;
 
                     _summoned = true;
-                    if (me->isDead())
+                    if (me->IsDead())
                         return;
 
                     me->setActive(true);
@@ -930,7 +930,7 @@ class npc_sindragosa_trash : public CreatureScript
             {
                 _frostwyrmId = (me->GetHomePosition().GetPositionY() < 2484.35f) ? DATA_RIMEFANG : DATA_SPINESTALKER;
                 // Increase add count
-                if (!me->isDead())
+                if (!me->IsDead())
                 {
                     if (me->GetEntry() == NPC_FROSTWING_WHELP)
                         _instance->SetData(_frostwyrmId, me->GetDBTableGUIDLow());  // this cannot be in Reset because reset also happens on evade

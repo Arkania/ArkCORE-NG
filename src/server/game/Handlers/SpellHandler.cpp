@@ -474,7 +474,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
     }
 
     // can't use our own spells when we're in possession of another unit,
-    if (_player->isPossessing())
+    if (_player->IsPossessing())
     {
         recvPacket.rfinish(); // prevent spam at ignore packet
         return;

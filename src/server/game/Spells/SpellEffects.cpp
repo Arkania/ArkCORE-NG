@@ -4031,7 +4031,7 @@ void Spell::EffectSummonPet(SpellEffIndex effIndex)
         if (petentry == 0 || OldSummon->GetEntry() == petentry)
         {
             // pet in corpse state can't be summoned
-            if (OldSummon->isDead())
+            if (OldSummon->IsDead())
                 return;
 
             ASSERT(OldSummon->GetMap() == owner->GetMap());
@@ -4965,7 +4965,7 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                         caster->RewardPlayerAndGroupAtEvent(18388, unitTarget);
                         if (Creature* target = unitTarget->ToCreature())
                         {
-                            target->setDeathState(CORPSE);
+                            target->SetDeathState(CORPSE);
                             target->RemoveCorpse();
                         }
                     }
@@ -6469,7 +6469,7 @@ void Spell::EffectResurrectPet(SpellEffIndex /*effIndex*/)
 
     pet->SetUInt32Value(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_NONE);
     pet->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
-    pet->setDeathState(ALIVE);
+    pet->SetDeathState(ALIVE);
     pet->ClearUnitState(uint32(UNIT_STATE_ALL_STATE));
     pet->SetHealth(pet->CountPctFromMaxHealth(damage));
 

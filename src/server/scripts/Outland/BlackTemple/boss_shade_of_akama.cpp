@@ -281,7 +281,7 @@ public:
                                 for (std::list<Creature*>::const_iterator itr = ChannelerList.begin(); itr != ChannelerList.end(); ++itr)
                                 {
                                     Channelers.push_back((*itr)->GetGUID());
-                                    if ((*itr)->isDead())
+                                    if ((*itr)->IsDead())
                                         (*itr)->Respawn();
                                 }
 

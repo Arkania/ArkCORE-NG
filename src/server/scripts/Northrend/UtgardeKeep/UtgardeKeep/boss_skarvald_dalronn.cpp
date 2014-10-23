@@ -175,7 +175,7 @@ class boss_skarvald_the_constructor : public CreatureScript
                         {
                             Check_Timer = 5000;
                             Creature* dalronn = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_DALRONN));
-                            if (dalronn && dalronn->isDead())
+                            if (dalronn && dalronn->IsDead())
                             {
                                 Dalronn_isDead = true;
                                 Response_Timer = 2000;
@@ -334,7 +334,7 @@ class boss_dalronn_the_controller : public CreatureScript
                         {
                             Check_Timer = 5000;
                             Creature* skarvald = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_SKARVALD));
-                            if (skarvald && skarvald->isDead())
+                            if (skarvald && skarvald->IsDead())
                             {
                                 Skarvald_isDead = true;
                                 Response_Timer = 2000;

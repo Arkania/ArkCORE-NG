@@ -1870,7 +1870,7 @@ bool WorldObject::CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth, boo
         bool corpseCheck = false;
         if (Player const* thisPlayer = ToPlayer())
         {
-            if (thisPlayer->isDead() && thisPlayer->GetHealth() > 0 && // Cheap way to check for ghost state
+            if (thisPlayer->IsDead() && thisPlayer->GetHealth() > 0 && // Cheap way to check for ghost state
                 !(obj->m_serverSideVisibility.GetValue(SERVERSIDE_VISIBILITY_GHOST) & m_serverSideVisibility.GetValue(SERVERSIDE_VISIBILITY_GHOST) & GHOST_VISIBILITY_GHOST))
             {
                 if (Corpse* corpse = thisPlayer->GetCorpse())
@@ -2517,6 +2517,13 @@ Creature* WorldObject::FindNearestCreature(uint32 entry, float range, bool alive
     return creature;
 }
 
+std::list<Creature*> WorldObject::FindNearestCreatures(uint32 entry, float range) const
+{
+    std::list<Creature*> creatureList;
+    GetCreatureListWithEntryInGrid(creatureList, entry, range);   
+    return creatureList;
+}
+
 GameObject* WorldObject::FindNearestGameObject(uint32 entry, float range) const
 {
     GameObject* go = NULL;
@@ -2544,10 +2551,10 @@ Player* WorldObject::FindNearestPlayer(float range, bool alive)
     return player;
 }
 
-std::list<Player*> WorldObject::FindNearestPlayers(float range)
+std::list<Player*> WorldObject::FindNearestPlayers(float range, bool alive)
 {
     std::list<Player*> PlayerList; 
-    Trinity::AnyPlayerInObjectRangeCheck checker(this, range);
+    Trinity::AnyPlayerInObjectRangeCheck checker(this, range, alive);
     Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(this, PlayerList, checker);
     VisitNearbyWorldObject(range, searcher);
     return PlayerList;

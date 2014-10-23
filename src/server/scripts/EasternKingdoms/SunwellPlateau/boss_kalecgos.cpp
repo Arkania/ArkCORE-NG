@@ -365,7 +365,7 @@ public:
             me->SetVisible(false);
             if (isFriendly)
             {
-                me->setDeathState(JUST_DIED);
+                me->SetDeathState(JUST_DIED);
 
                 Map::PlayerList const& players = me->GetMap()->GetPlayers();
                 if (!players.isEmpty())
@@ -610,7 +610,7 @@ public:
             if (KalecGUID)
             {
                 if (Creature* Kalec = ObjectAccessor::GetCreature(*me, KalecGUID))
-                    Kalec->setDeathState(JUST_DIED);
+                    Kalec->SetDeathState(JUST_DIED);
                 KalecGUID = 0;
             }
 

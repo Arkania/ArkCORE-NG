@@ -328,7 +328,7 @@ class boss_ammunae : public CreatureScript
                             k++;
                             blossom[j] = me->SummonCreature(40620, seedling[j]->GetPositionX(), seedling[j]->GetPositionY(), seedling[j]->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 300000);
                             DoZoneInCombat(blossom[j]);
-                            seedling[j]->setDeathState(JUST_DIED);
+                            seedling[j]->SetDeathState(JUST_DIED);
                         }
                     for(uint8 p=0; p<10; p++)
                     {

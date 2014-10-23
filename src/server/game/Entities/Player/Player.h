@@ -1312,7 +1312,7 @@ class Player : public Unit, public GridObject<Player>
         uint32 GetTotalPlayedTime() { return m_Played_time[PLAYED_TIME_TOTAL]; }
         uint32 GetLevelPlayedTime() { return m_Played_time[PLAYED_TIME_LEVEL]; }
 
-        void setDeathState(DeathState s);                   // overwrite Unit::setDeathState
+        void SetDeathState(DeathState s);                   // overwrite Unit::setDeathState
 
         void InnEnter(time_t time, uint32 mapid, float x, float y, float z);
 

@@ -867,7 +867,7 @@ class at_bring_your_orphan_to : public AreaTriggerScript
 
         bool OnTrigger(Player* player, AreaTriggerEntry const* trigger)
         {
-            if (player->isDead() || !player->HasAura(SPELL_ORPHAN_OUT))
+            if (player->IsDead() || !player->HasAura(SPELL_ORPHAN_OUT))
                 return false;
 
             uint32 questId = 0;

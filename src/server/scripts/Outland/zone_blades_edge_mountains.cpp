@@ -355,7 +355,7 @@ public:
 
             if (id == 0)
             {
-                me->setDeathState(JUST_DIED);
+                me->SetDeathState(JUST_DIED);
                 me->RemoveCorpse();
                 me->SetHealth(0);
             }
@@ -1047,7 +1047,7 @@ class npc_simon_bunny : public CreatureScript
             {
                 if (Player* player = ObjectAccessor::GetPlayer(*me, playerGUID))
                 {
-                    if (player->isDead())
+                    if (player->IsDead())
                         return false;
                     if (player->GetDistance2d(me) >= 2.0f*searchDistance)
                     {

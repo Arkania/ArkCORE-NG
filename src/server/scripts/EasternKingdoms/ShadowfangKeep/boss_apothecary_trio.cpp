@@ -217,7 +217,7 @@ class npc_apothecary_hummel : public CreatureScript
                         {
                             _summons.DespawnAll();
                             me->SetCorpseDelay(90); // set delay
-                            me->setDeathState(JUST_DIED); // update delay
+                            me->SetDeathState(JUST_DIED); // update delay
                             _instance->SetData(TYPE_CROWN, DONE);
                             me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
 

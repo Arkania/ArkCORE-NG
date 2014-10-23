@@ -311,7 +311,7 @@ public:
 
         void InitializeAI() OVERRIDE
         {
-            if (me->isDead())
+            if (me->IsDead())
                 return;
 
             if (TempSummon* summ = me->ToTempSummon())
@@ -783,7 +783,7 @@ public:
                     for (std::list<Creature*>::iterator itr = servants.begin(); itr != servants.end(); ++itr)
                     {
                         // Couldn't find a spell that does this
-                        if ((*itr)->isDead())
+                        if ((*itr)->IsDead())
                             (*itr)->Respawn(true);
 
                         (*itr)->CastSpell(*itr, SPELL_FREYA_DUMMY_TRIGGER, true);

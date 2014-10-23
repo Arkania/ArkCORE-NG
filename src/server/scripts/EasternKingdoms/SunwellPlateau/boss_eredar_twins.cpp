@@ -104,7 +104,7 @@ public:
 
             if (Creature* temp =  ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_ALYTHESS)))
             {
-                if (temp->isDead())
+                if (temp->IsDead())
                     temp->Respawn();
                 else if (temp->GetVictim())
                     me->getThreatManager().addThreat(temp->GetVictim(), 0.0f);
@@ -202,7 +202,7 @@ public:
             if (!SisterDeath)
             {
                 Unit* Temp = ObjectAccessor::GetUnit(*me, instance->GetData64(DATA_ALYTHESS));
-                if (Temp && Temp->isDead())
+                if (Temp && Temp->IsDead())
                 {
                     Talk(YELL_SISTER_ALYTHESS_DEAD);
                     DoCast(me, SPELL_EMPOWER);
@@ -347,7 +347,7 @@ public:
 
             if (Creature* temp = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_SACROLASH)))
             {
-                if (temp->isDead())
+                if (temp->IsDead())
                     temp->Respawn();
                 else if (temp->GetVictim())
                     me->getThreatManager().addThreat(temp->GetVictim(), 0.0f);
@@ -523,7 +523,7 @@ public:
             if (!SisterDeath)
             {
                 Unit* Temp = ObjectAccessor::GetUnit(*me, instance->GetData64(DATA_SACROLASH));
-                if (Temp && Temp->isDead())
+                if (Temp && Temp->IsDead())
                 {
                     Talk(YELL_SISTER_SACROLASH_DEAD);
                     DoCast(me, SPELL_EMPOWER);
@@ -534,7 +534,7 @@ public:
             if (!me->GetVictim())
             {
                 Creature* sisiter = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_SACROLASH));
-                if (sisiter && !sisiter->isDead() && sisiter->GetVictim())
+                if (sisiter && !sisiter->IsDead() && sisiter->GetVictim())
                 {
                     me->AddThreat(sisiter->GetVictim(), 0.0f);
                     DoStartNoMovement(sisiter->GetVictim());

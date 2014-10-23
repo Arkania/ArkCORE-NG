@@ -145,13 +145,13 @@ class boss_warbringer_omrogg : public CreatureScript
             {
                 if (Unit* LeftHead  = Unit::GetUnit(*me, LeftHeadGUID))
                 {
-                    LeftHead->setDeathState(JUST_DIED);
+                    LeftHead->SetDeathState(JUST_DIED);
                     LeftHeadGUID = 0;
                 }
 
                 if (Unit* RightHead  = Unit::GetUnit(*me, RightHeadGUID))
                 {
-                    RightHead->setDeathState(JUST_DIED);
+                    RightHead->SetDeathState(JUST_DIED);
                     RightHeadGUID = 0;
                 }
 
@@ -424,7 +424,7 @@ class npc_omrogg_heads : public CreatureScript
                 if (events.ExecuteEvent() == EVENT_DEATH_YELL)
                 {
                     Talk(YELL_DIE_R);
-                    me->setDeathState(JUST_DIED);
+                    me->SetDeathState(JUST_DIED);
                 }
             }
 

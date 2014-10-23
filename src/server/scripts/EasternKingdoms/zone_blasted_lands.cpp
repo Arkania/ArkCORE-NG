@@ -62,7 +62,7 @@ class spell_razelikh_teleport_group : public SpellScriptLoader
                     {
                         for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
                             if (Player* member = itr->GetSource())
-                                if (member->IsWithinDistInMap(player, 20.0f) && !member->isDead())
+                                if (member->IsWithinDistInMap(player, 20.0f) && !member->IsDead())
                                     member->CastSpell(member, SPELL_TELEPORT_SINGLE_IN_GROUP, true);
                     }
                     else

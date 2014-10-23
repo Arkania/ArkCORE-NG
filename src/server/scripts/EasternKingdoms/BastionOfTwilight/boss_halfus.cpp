@@ -154,7 +154,7 @@ class boss_halfus : public CreatureScript
 
             void InitializeAI()
             {
-              if(!me->isDead())
+              if(!me->IsDead())
                 Reset();
             }
 

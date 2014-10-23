@@ -4654,7 +4654,7 @@ public:
             for (std::list<Creature*>::const_iterator itr = OrgeList.begin(); itr != OrgeList.end(); ++itr)
             {
                 if (!(*itr)->IsAlive())
-                    (*itr)->setDeathState(ALIVE);
+                    (*itr)->SetDeathState(ALIVE);
 
                 float x, y, z;
                 me->GetPosition(x, y, z);

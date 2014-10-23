@@ -2553,7 +2553,7 @@ public:
 
         void OnRemove(AuraEffect const*, AuraEffectHandleModes)
         {
-            if (GetTarget()->isDead())
+            if (GetTarget()->IsDead())
                 if (Unit* caster = GetCaster())
                     caster->CastSpell(NULL, SPELL_WINDSOUL_CREDT);
         }

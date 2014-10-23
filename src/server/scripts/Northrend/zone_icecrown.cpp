@@ -765,7 +765,7 @@ public:
 
             if (PhaseCount == 8)
                 if (Creature* Halof = me->GetCreature(*me, guidHalof))
-                    if (Halof->isDead())
+                    if (Halof->IsDead())
                     {
                         DoCast(me, SPELL_CRUSADERS_SPIRE_VICTORY, true);
                         Summons.DespawnEntry(NPC_HIDEOUS_PLAGEBRINGER);

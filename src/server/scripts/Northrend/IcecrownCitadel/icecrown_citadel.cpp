@@ -734,7 +734,7 @@ class boss_sister_svalna : public CreatureScript
 
             void InitializeAI() OVERRIDE
             {
-                if (!me->isDead())
+                if (!me->IsDead())
                     Reset();
 
                 me->SetReactState(REACT_PASSIVE);
@@ -1299,7 +1299,7 @@ struct npc_argent_captainAI : public ScriptedAI
             if (spell->Id == SPELL_REVIVE_CHAMPION && !IsUndead)
             {
                 IsUndead = true;
-                me->setDeathState(JUST_RESPAWNED);
+                me->SetDeathState(JUST_RESPAWNED);
                 uint32 newEntry = 0;
                 switch (me->GetEntry())
                 {

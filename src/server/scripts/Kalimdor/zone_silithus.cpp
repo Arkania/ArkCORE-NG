@@ -955,7 +955,7 @@ public:
                     }
                     ++GroupMemberCount;
 
-                    if (groupMember->isDead())
+                    if (groupMember->IsDead())
                         ++DeadMemberCount;
                 }
 

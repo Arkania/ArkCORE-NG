@@ -210,7 +210,7 @@ public:
                 {
                     if (Unit* remo = Unit::GetUnit(*me, ShieldGeneratorChannel[i]))
                     {
-                        remo->setDeathState(JUST_DIED);
+                        remo->SetDeathState(JUST_DIED);
                         ShieldGeneratorChannel[i] = 0;
                     }
                 }
@@ -621,7 +621,7 @@ public:
                         DoCast(me, SPELL_SURGE);
                 }
                 if (Creature* vashj = Unit::GetCreature(*me, VashjGUID))
-                    if (!vashj->IsInCombat() || CAST_AI(boss_lady_vashj::boss_lady_vashjAI, vashj->AI())->Phase != 2 || vashj->isDead())
+                    if (!vashj->IsInCombat() || CAST_AI(boss_lady_vashj::boss_lady_vashjAI, vashj->AI())->Phase != 2 || vashj->IsDead())
                         me->Kill(me);
                 Move = 1000;
             } else Move -= diff;
@@ -688,7 +688,7 @@ public:
             if (DespawnTimer <= diff)
             {
                 // call Unsummon()
-                me->setDeathState(DEAD);
+                me->SetDeathState(DEAD);
 
                 // to prevent crashes
                 DespawnTimer = 1000;
@@ -782,7 +782,7 @@ public:
                 if (!Vashj || !Vashj->IsAlive() || CAST_AI(boss_lady_vashj::boss_lady_vashjAI, Vashj->ToCreature()->AI())->Phase != 3)
                 {
                     // remove
-                    me->setDeathState(DEAD);
+                    me->SetDeathState(DEAD);
                     me->RemoveCorpse();
                     me->setFaction(35);
                 }
@@ -901,7 +901,7 @@ public:
 
                 // get and remove channel
                 if (Unit* channel = Unit::GetCreature(*vashj, CAST_AI(boss_lady_vashj::boss_lady_vashjAI, vashj->AI())->ShieldGeneratorChannel[channelIdentifier]))
-                    channel->setDeathState(JUST_DIED); // call Unsummon()
+                    channel->SetDeathState(JUST_DIED); // call Unsummon()
 
                 instance->SetData(identifier, 1);
 

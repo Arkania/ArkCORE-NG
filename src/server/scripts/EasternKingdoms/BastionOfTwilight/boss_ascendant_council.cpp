@@ -600,7 +600,7 @@ class boss_feludius : public CreatureScript
             {
                 if (!instance)
                     me->IsAIEnabled = false;
-                else if (!me->isDead())
+                else if (!me->IsDead())
                     Reset();
             }
 
@@ -812,7 +812,7 @@ class boss_ignacious : public CreatureScript
             {
                 if (!instance)
                     me->IsAIEnabled = false;
-                else if (!me->isDead())
+                else if (!me->IsDead())
                     Reset();
             }
 
@@ -1063,7 +1063,7 @@ class boss_arion : public CreatureScript
             {
                 if (!instance)
                     me->IsAIEnabled = false;
-                else if (!me->isDead())
+                else if (!me->IsDead())
                     Reset();
             }
 
@@ -1290,7 +1290,7 @@ class boss_terrastra : public CreatureScript
             {
                 if (!instance)
                     me->IsAIEnabled = false;
-                else if (!me->isDead())
+                else if (!me->IsDead())
                     Reset();
             }
 
@@ -1491,7 +1491,7 @@ class boss_monstrosity : public CreatureScript
             {
                 if (!instance)
                     me->IsAIEnabled = false;
-                else if (!me->isDead())
+                else if (!me->IsDead())
                     Reset();
             }
 

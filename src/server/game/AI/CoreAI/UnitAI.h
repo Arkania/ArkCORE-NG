@@ -127,7 +127,7 @@ class UnitAI
         virtual void AttackStart(Unit* /*target*/);
         virtual void UpdateAI(uint32 diff) = 0;
 
-        virtual void InitializeAI() { if (!me->isDead()) Reset(); }
+        virtual void InitializeAI() { if (!me->IsDead()) Reset(); }
 
         virtual void Reset() { };
 

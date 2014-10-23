@@ -134,7 +134,7 @@ public:
                                 for (std::list<Creature*>::const_iterator itr = BloodMageList.begin(); itr != BloodMageList.end(); ++itr)
                                 {
                                     bloodmage.push_back((*itr)->GetGUID());
-                                    if ((*itr)->isDead())
+                                    if ((*itr)->IsDead())
                                         (*itr)->Respawn();
                                 }
 
@@ -145,7 +145,7 @@ public:
                                 for (std::list<Creature*>::const_iterator itr = DeathShaperList.begin(); itr != DeathShaperList.end(); ++itr)
                                 {
                                     deathshaper.push_back((*itr)->GetGUID());
-                                    if ((*itr)->isDead())
+                                    if ((*itr)->IsDead())
                                         (*itr)->Respawn();
                                 }
 

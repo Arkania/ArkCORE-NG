@@ -277,7 +277,7 @@ public:
                     if (pInfernal->IsAlive())
                     {
                         pInfernal->SetVisible(false);
-                        pInfernal->setDeathState(JUST_DIED);
+                        pInfernal->SetDeathState(JUST_DIED);
                     }
 
             infernals.clear();

@@ -47,16 +47,6 @@ void InstanceScript::SaveToDB()
     CharacterDatabase.Execute(stmt);
 }
 
-void InstanceScript::HandleGameObject(uint64 GUID, bool open, GameObject* go)
-{
-    if (!go)
-        go = instance->GetGameObject(GUID);
-    if (go)
-        go->SetGoState(open ? GO_STATE_ACTIVE : GO_STATE_READY);
-    else
-        TC_LOG_DEBUG("scripts", "InstanceScript: HandleGameObject failed");
-}
-
 bool InstanceScript::IsEncounterInProgress() const
 {
     for (std::vector<BossInfo>::const_iterator itr = bosses.begin(); itr != bosses.end(); ++itr)
@@ -270,6 +260,16 @@ std::string InstanceScript::GetBossSaveData()
     for (std::vector<BossInfo>::iterator i = bosses.begin(); i != bosses.end(); ++i)
         saveStream << (uint32)i->state << ' ';
     return saveStream.str();
+}
+
+void InstanceScript::HandleGameObject(uint64 GUID, bool open, GameObject* go)
+{
+    if (!go)
+        go = instance->GetGameObject(GUID);
+    if (go)
+        go->SetGoState(open ? GO_STATE_ACTIVE : GO_STATE_READY);
+    else
+        TC_LOG_DEBUG("scripts", "InstanceScript: HandleGameObject failed");
 }
 
 void InstanceScript::DoUseDoorOrButton(uint64 uiGuid, uint32 uiWithRestoreTime, bool bUseAlternativeState)

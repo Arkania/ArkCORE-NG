@@ -1777,7 +1777,7 @@ public:
                 return false;
             }
 
-            if (target->isDead())
+            if (target->IsDead())
                 target->ToCreature()->Respawn();
             return true;
         }
@@ -2470,7 +2470,7 @@ public:
     {
         Player* player = handler->GetSession()->GetPlayer();
 
-        if (player->isPossessing())
+        if (player->IsPossessing())
             return false;
 
         player->StopCastingBindSight();

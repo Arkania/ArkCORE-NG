@@ -1443,7 +1443,7 @@ public:
                     eliteList.push_back(unit);
             }
             for (std::vector<Unit*>::const_iterator itr = eliteList.begin(); itr != eliteList.end(); ++itr)
-                (*itr)->setDeathState(JUST_DIED);
+                (*itr)->SetDeathState(JUST_DIED);
             EnterEvadeMode();
         }
 
@@ -1626,7 +1626,7 @@ public:
                 break;
             case 5:
                 Talk(SAY_AKAMA_BEWARE);
-                Channel->setDeathState(JUST_DIED);
+                Channel->SetDeathState(JUST_DIED);
                 Spirit[0]->SetVisible(false);
                 Spirit[1]->SetVisible(false);
                 Timer = 3000;
@@ -1827,7 +1827,7 @@ void boss_illidan_stormrage::boss_illidan_stormrageAI::JustSummoned(Creature* su
             if (Phase == PHASE_TALK_SEQUENCE)
             {
                 summon->SetVisible(false);
-                summon->setDeathState(JUST_DIED);
+                summon->SetDeathState(JUST_DIED);
                 return;
             }
             Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 0, 999, true);
@@ -1934,7 +1934,7 @@ void boss_illidan_stormrage::boss_illidan_stormrageAI::HandleTalkSequence()
         if (Creature* maiev = ObjectAccessor::GetCreature(*me, MaievGUID))
         {
             maiev->CastSpell(maiev, SPELL_TELEPORT_VISUAL, true);
-            maiev->setDeathState(JUST_DIED);
+            maiev->SetDeathState(JUST_DIED);
             me->SetUInt32Value(UNIT_FIELD_BYTES_1, UNIT_STAND_STATE_DEAD);
         }
         break;

@@ -406,7 +406,7 @@ public:
             creature->GetMotionMaster()->Initialize();
             if (creature->IsAlive())                            // dead creature will reset movement generator at respawn
             {
-                creature->setDeathState(JUST_DIED);
+                creature->SetDeathState(JUST_DIED);
                 creature->Respawn(true);
             }
             creature->SaveToDB();
@@ -877,7 +877,7 @@ public:
             creature->GetMotionMaster()->Initialize();
             if (creature->IsAlive())                            // dead creature will reset movement generator at respawn
             {
-                creature->setDeathState(JUST_DIED);
+                creature->SetDeathState(JUST_DIED);
                 creature->Respawn();
             }
         }
@@ -1068,7 +1068,7 @@ public:
             creature->GetMotionMaster()->Initialize();
             if (creature->IsAlive())                            // dead creature will reset movement generator at respawn
             {
-                creature->setDeathState(JUST_DIED);
+                creature->SetDeathState(JUST_DIED);
                 creature->Respawn();
             }
             creature->SaveToDB();
@@ -1146,7 +1146,7 @@ public:
         creature->GetMotionMaster()->Initialize();
         if (creature->IsAlive())                                // dead creature will reset movement generator at respawn
         {
-            creature->setDeathState(JUST_DIED);
+            creature->SetDeathState(JUST_DIED);
             creature->Respawn();
         }
 

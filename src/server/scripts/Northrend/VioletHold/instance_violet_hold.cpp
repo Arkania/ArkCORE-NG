@@ -553,7 +553,7 @@ public:
 
                 if (!bForceRespawn)
                 {
-                    if (pBoss->isDead())
+                    if (pBoss->IsDead())
                     {
                         // respawn but avoid to be looted again
                         pBoss->Respawn();

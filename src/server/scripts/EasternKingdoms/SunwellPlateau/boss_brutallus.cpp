@@ -238,7 +238,7 @@ public:
                     Talk(YELL_INTRO_KILL_MADRIGOSA);
                     me->SetOrientation(0.14f);
                     me->StopMoving();
-                    Madrigosa->setDeathState(CORPSE);
+                    Madrigosa->SetDeathState(CORPSE);
                     IntroPhaseTimer = 8000;
                     ++IntroPhase;
                     break;

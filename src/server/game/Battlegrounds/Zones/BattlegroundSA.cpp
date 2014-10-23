@@ -943,7 +943,7 @@ void BattlegroundSA::UpdateDemolisherSpawns()
         {
             if (Creature* Demolisher = GetBGCreature(i))
             {
-                if (Demolisher->isDead())
+                if (Demolisher->IsDead())
                 {
                     // Demolisher is not in list
                     if (DemoliserRespawnList.find(i) == DemoliserRespawnList.end())

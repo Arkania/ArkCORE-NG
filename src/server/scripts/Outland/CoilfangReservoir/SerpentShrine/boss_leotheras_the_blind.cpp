@@ -147,7 +147,7 @@ public:
                 {
                     me->AddThreat(owner, 999999);
                     AttackStart(owner);
-                } else if (owner && owner->isDead())
+                } else if (owner && owner->IsDead())
                 {
                     me->DealDamage(me, me->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
                     return;

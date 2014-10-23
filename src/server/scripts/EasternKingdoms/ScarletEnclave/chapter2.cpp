@@ -721,7 +721,7 @@ public:
                                     break;
                                 case 11:
                                     Talk(EMOTE_DIES);
-                                    me->setDeathState(JUST_DIED);
+                                    me->SetDeathState(JUST_DIED);
                                     me->SetHealth(0);
                                     return;
                             }
@@ -751,7 +751,7 @@ public:
                                     break;
                                 case 11:
                                     Talk(EMOTE_DIES);
-                                    me->setDeathState(JUST_DIED);
+                                    me->SetDeathState(JUST_DIED);
                                     me->SetHealth(0);
                                     return;
                             }
@@ -781,7 +781,7 @@ public:
                                     break;
                                 case 11:
                                     Talk(EMOTE_DIES);
-                                    me->setDeathState(JUST_DIED);
+                                    me->SetDeathState(JUST_DIED);
                                     me->SetHealth(0);
                                     return;
                             }
@@ -811,7 +811,7 @@ public:
                                     break;
                                 case 11:
                                     Talk(EMOTE_DIES);
-                                    me->setDeathState(JUST_DIED);
+                                    me->SetDeathState(JUST_DIED);
                                     me->SetHealth(0);
                                     return;
                             }
@@ -841,7 +841,7 @@ public:
                                     break;
                                 case 11:
                                     Talk(EMOTE_DIES);
-                                    me->setDeathState(JUST_DIED);
+                                    me->SetDeathState(JUST_DIED);
                                     me->SetHealth(0);
                                     return;
                             }
@@ -871,7 +871,7 @@ public:
                                     break;
                                 case 11:
                                     Talk(EMOTE_DIES);
-                                    me->setDeathState(JUST_DIED);
+                                    me->SetDeathState(JUST_DIED);
                                     me->SetHealth(0);
                                     return;
                             }
@@ -901,7 +901,7 @@ public:
                                     break;
                                 case 11:
                                     Talk(EMOTE_DIES);
-                                    me->setDeathState(JUST_DIED);
+                                    me->SetDeathState(JUST_DIED);
                                     me->SetHealth(0);
                                     return;
                             }
@@ -931,7 +931,7 @@ public:
                                     break;
                                 case 11:
                                     Talk(EMOTE_DIES);
-                                    me->setDeathState(JUST_DIED);
+                                    me->SetDeathState(JUST_DIED);
                                     me->SetHealth(0);
                                     return;
                             }
@@ -961,7 +961,7 @@ public:
                                     break;
                                 case 11:
                                     Talk(EMOTE_DIES);
-                                    me->setDeathState(JUST_DIED);
+                                    me->SetDeathState(JUST_DIED);
                                     me->SetHealth(0);
                                     return;
                             }
@@ -991,7 +991,7 @@ public:
                                     break;
                                 case 11:
                                     Talk(EMOTE_DIES);
-                                    me->setDeathState(JUST_DIED);
+                                    me->SetDeathState(JUST_DIED);
                                     me->SetHealth(0);
                                     return;
                             }

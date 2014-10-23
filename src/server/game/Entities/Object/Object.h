@@ -779,10 +779,11 @@ class WorldObject : public Object, public WorldLocation
         void SummonCreatureGroup(uint8 group, std::list<TempSummon*>* list = NULL);
 
         Creature*   FindNearestCreature(uint32 entry, float range, bool alive = true) const;
+        std::list<Creature*> WorldObject::FindNearestCreatures(uint32 entry, float range) const;
         GameObject* FindNearestGameObject(uint32 entry, float range) const;
         GameObject* FindNearestGameObjectOfType(GameobjectTypes type, float range) const;
         Player*     FindNearestPlayer(float range, bool alive = true);
-        std::list<Player*> FindNearestPlayers(float range);
+        std::list<Player*> FindNearestPlayers(float range, bool alive = true);
         bool        IsPlayerInRange(float range);
 
         void GetGameObjectListWithEntryInGrid(std::list<GameObject*>& lList, uint32 uiEntry, float fMaxSearchRange) const;

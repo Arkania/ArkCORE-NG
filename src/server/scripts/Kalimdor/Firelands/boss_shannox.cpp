@@ -440,7 +440,7 @@ public:
                     break;
 
                 case EVENT_HURL_SPEAR_OR_MAGMA_RUPTURE:
-                    if(GetRiplimb() && GetRiplimb()->isDead())
+                    if(GetRiplimb() && GetRiplimb()->IsDead())
                     { 
                         // Cast Magma Rupture when Ripclimb is Death
                         DoCastVictim(SPELL_MAGMA_RUPTURE_SHANNOX);
@@ -1214,7 +1214,7 @@ public:
                 }
             }    
 
-            if(myPrison && myPrison->isDead())
+            if(myPrison && myPrison->IsDead())
             {
                 myPrison->DisappearAndDie();
                 tempTarget->RemoveAurasDueToSpell(CRYSTAL_PRISON_EFFECT);

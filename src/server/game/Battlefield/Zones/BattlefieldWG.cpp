@@ -520,7 +520,7 @@ void BattlefieldWG::OnCreatureCreate(Creature* creature)
                     }
                     else
                     {
-                        creature->setDeathState(DEAD);
+                        creature->SetDeathState(DEAD);
                         creature->RemoveFromWorld();
                         return;
                     }
@@ -536,7 +536,7 @@ void BattlefieldWG::OnCreatureCreate(Creature* creature)
                     }
                     else
                     {
-                        creature->setDeathState(DEAD);
+                        creature->SetDeathState(DEAD);
                         creature->RemoveFromWorld();
                         return;
                     }

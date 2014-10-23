@@ -230,9 +230,9 @@ public:
                 if (AnetheronGUID)
                 {
                     Creature* boss = ObjectAccessor::GetCreature(*me, AnetheronGUID);
-                    if (!boss || (boss && boss->isDead()))
+                    if (!boss || (boss && boss->IsDead()))
                     {
-                        me->setDeathState(JUST_DIED);
+                        me->SetDeathState(JUST_DIED);
                         me->RemoveCorpse();
                         return;
                     }

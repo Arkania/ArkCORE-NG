@@ -3407,7 +3407,7 @@ void Unit::_UnapplyAura(AuraApplicationMap::iterator &i, AuraRemoveMode removeMo
     if (aurApp->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE && GetTypeId() == TYPEID_UNIT && ToCreature()->IsTotem()&& ToTotem()->GetSummonerGUID() == aura->GetCasterGUID())
     {
         if (ToTotem()->GetSpell() == aura->GetId() && ToTotem()->GetTotemType() == TOTEM_PASSIVE)
-            ToTotem()->setDeathState(JUST_DIED);
+            ToTotem()->SetDeathState(JUST_DIED);
     }
 
     // Remove aurastates only if were not found
@@ -9702,20 +9702,20 @@ void Unit::RemoveAllControlled()
         TC_LOG_FATAL("entities.unit", "Unit %u is not able to release its charm " UI64FMTD, GetEntry(), GetCharmGUID());
 }
 
-bool Unit::isPossessedByPlayer() const
+bool Unit::IsPossessedByPlayer() const
 {
     return HasUnitState(UNIT_STATE_POSSESSED) && IS_PLAYER_GUID(GetCharmerGUID());
 }
 
-bool Unit::isPossessing(Unit* u) const
+bool Unit::IsPossessing(Unit* u) const
 {
-    return u->isPossessed() && GetCharmGUID() == u->GetGUID();
+    return u->IsPossessed() && GetCharmGUID() == u->GetGUID();
 }
 
-bool Unit::isPossessing() const
+bool Unit::IsPossessing() const
 {
     if (Unit* u = GetCharm())
-        return u->isPossessed();
+        return u->IsPossessed();
     else
         return false;
 }
@@ -12353,7 +12353,7 @@ void Unit::SetSpeed(UnitMoveType mtype, float rate, bool forced)
     Movement::PacketSender(this, moveTypeToOpcode[mtype][0], moveTypeToOpcode[mtype][1], moveTypeToOpcode[mtype][2], &extra).Send();
 }
 
-void Unit::setDeathState(DeathState s)
+void Unit::SetDeathState(DeathState s)
 {
     // Death state needs to be updated before RemoveAllAurasOnDeath() is called, to prevent entering combat
     m_deathState = s;
@@ -13316,9 +13316,9 @@ void Unit::SetLevel(uint8 lvl)
 
 void Unit::SetHealth(uint32 val)
 {
-    if (getDeathState() == JUST_DIED)
+    if (GetDeathState() == JUST_DIED)
         val = 0;
-    else if (GetTypeId() == TYPEID_PLAYER && getDeathState() == DEAD)
+    else if (GetTypeId() == TYPEID_PLAYER && GetDeathState() == DEAD)
         val = 1;
     else
     {
@@ -13617,7 +13617,7 @@ void Unit::UpdateCharmAI()
         if (IsCharmed())
         {
             i_disabledAI = i_AI;
-            if (isPossessed() || IsVehicle())
+            if (IsPossessed() || IsVehicle())
                 i_AI = new PossessedAI(ToCreature());
             else
                 i_AI = new PetAI(ToCreature());
@@ -15399,11 +15399,11 @@ void Unit::Kill(Unit* victim, bool durabilityLoss)
     if (!spiritOfRedemption)
     {
         TC_LOG_DEBUG("entities.unit", "SET JUST_DIED");
-        victim->setDeathState(JUST_DIED);
+        victim->SetDeathState(JUST_DIED);
     }
 
     // Inform pets (if any) when player kills target)
-    // MUST come after victim->setDeathState(JUST_DIED); or pet next target
+    // MUST come after victim->SetDeathState(JUST_DIED); or pet next target
     // selection will get stuck on same target and break pet react state
     if (player)
     {
@@ -17246,8 +17246,8 @@ void Unit::_ExitVehicle(Position const* exitPosition)
     if (HasUnitTypeMask(UNIT_MASK_ACCESSORY))
     {
         // Vehicle just died, we die too
-        if (vehicle->GetBase()->getDeathState() == JUST_DIED)
-            setDeathState(JUST_DIED);
+        if (vehicle->GetBase()->GetDeathState() == JUST_DIED)
+            SetDeathState(JUST_DIED);
         // If for other reason we as minion are exiting the vehicle (ejected, master dismounted) - unsummon
         else if (IsSummon() && ToTempSummon())
             ToTempSummon()->DisappearAndDie();

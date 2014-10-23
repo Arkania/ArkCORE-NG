@@ -213,7 +213,7 @@ void Creature::DisappearAndDie()
     //SetVisibility(VISIBILITY_OFF);
     //ObjectAccessor::UpdateObjectVisibility(this);
     if (IsAlive())
-        setDeathState(JUST_DIED);
+        SetDeathState(JUST_DIED);
     RemoveCorpse(false);
 }
 
@@ -233,11 +233,11 @@ void Creature::SearchFormation()
 
 void Creature::RemoveCorpse(bool setSpawnTime)
 {
-    if (getDeathState() != CORPSE)
+    if (GetDeathState() != CORPSE)
         return;
 
     m_corpseRemoveTime = time(NULL);
-    setDeathState(DEAD);
+    SetDeathState(DEAD);
     RemoveAllAuras();
     UpdateObjectVisibility();
     loot.clear();
@@ -1369,7 +1369,7 @@ bool Creature::IsInvisibleDueToDespawn() const
     if (Unit::IsInvisibleDueToDespawn())
         return true;
 
-    if (IsAlive() || isDying() || m_corpseRemoveTime > time(NULL))
+    if (IsAlive() || IsDying() || m_corpseRemoveTime > time(NULL))
         return false;
 
     return true;
@@ -1459,9 +1459,9 @@ float Creature::GetAttackDistance(Unit const* player) const
     return (RetDistance*aggroRate);
 }
 
-void Creature::setDeathState(DeathState s)
+void Creature::SetDeathState(DeathState s)
 {
-    Unit::setDeathState(s);
+    Unit::SetDeathState(s);
 
     if (s == JUST_DIED)
     {
@@ -1495,7 +1495,7 @@ void Creature::setDeathState(DeathState s)
         if ((CanFly() || IsFlying()))
             GetMotionMaster()->MoveFall();
 
-        Unit::setDeathState(CORPSE);
+        Unit::SetDeathState(CORPSE);
     }
     else if (s == JUST_RESPAWNED)
     {
@@ -1515,7 +1515,7 @@ void Creature::setDeathState(DeathState s)
         Motion_Initialize();
         if (GetCreatureData() && GetPhaseMask() != GetCreatureData()->phaseMask)
             SetPhaseMask(GetCreatureData()->phaseMask, false);
-        Unit::setDeathState(ALIVE);
+        Unit::SetDeathState(ALIVE);
     }
 }
 
@@ -1526,14 +1526,14 @@ void Creature::Respawn(bool force)
     if (force)
     {
         if (IsAlive())
-            setDeathState(JUST_DIED);
-        else if (getDeathState() != CORPSE)
-            setDeathState(CORPSE);
+            SetDeathState(JUST_DIED);
+        else if (GetDeathState() != CORPSE)
+            SetDeathState(CORPSE);
     }
 
     RemoveCorpse(false);
 
-    if (getDeathState() == DEAD)
+    if (GetDeathState() == DEAD)
     {
         if (m_DBTableGuid)
             GetMap()->RemoveCreatureRespawnTime(m_DBTableGuid);
@@ -1549,7 +1549,7 @@ void Creature::Respawn(bool force)
 
         SelectLevel();
 
-        setDeathState(JUST_RESPAWNED);
+        SetDeathState(JUST_RESPAWNED);
 
         uint32 displayID = GetNativeDisplayId();
         CreatureModelInfo const* minfo = sObjectMgr->GetCreatureModelRandomGender(&displayID);
@@ -1592,7 +1592,7 @@ void Creature::ForcedDespawn(uint32 timeMSToDespawn)
     }
 
     if (IsAlive())
-        setDeathState(JUST_DIED);
+        SetDeathState(JUST_DIED);
 
     RemoveCorpse(false);
 }

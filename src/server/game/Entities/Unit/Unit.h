@@ -1665,10 +1665,10 @@ class Unit : public WorldObject
         void SendClearTarget();
 
         bool IsAlive() const { return (m_deathState == ALIVE); }
-        bool isDying() const { return (m_deathState == JUST_DIED); }
-        bool isDead() const { return (m_deathState == DEAD || m_deathState == CORPSE); }
-        DeathState getDeathState() const { return m_deathState; }
-        virtual void setDeathState(DeathState s);           // overwrited in Creature/Player/Pet
+        bool IsDying() const { return (m_deathState == JUST_DIED); }
+        bool IsDead() const { return (m_deathState == DEAD || m_deathState == CORPSE); }
+        DeathState GetDeathState() const { return m_deathState; }
+        virtual void SetDeathState(DeathState s);           // overwrited in Creature/Player/Pet
 
         uint64 GetOwnerGUID() const { return  GetUInt64Value(UNIT_FIELD_SUMMONEDBY); }
         void SetOwnerGUID(uint64 owner);
@@ -1715,10 +1715,10 @@ class Unit : public WorldObject
         void RemoveAllControlled();
 
         bool IsCharmed() const { return GetCharmerGUID() != 0; }
-        bool isPossessed() const { return HasUnitState(UNIT_STATE_POSSESSED); }
-        bool isPossessedByPlayer() const;
-        bool isPossessing() const;
-        bool isPossessing(Unit* u) const;
+        bool IsPossessed() const { return HasUnitState(UNIT_STATE_POSSESSED); }
+        bool IsPossessedByPlayer() const;
+        bool IsPossessing() const;
+        bool IsPossessing(Unit* u) const;
 
         CharmInfo* GetCharmInfo() { return m_charmInfo; }
         CharmInfo* InitCharmInfo();

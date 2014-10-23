@@ -782,7 +782,7 @@ public:
                 if (Player* playr = i->GetSource())
                     playr->AddAura(SPELL_SOUND_AURA, playr); // reset the bar.
 
-            creature->setDeathState(JUST_DIED);
+            creature->SetDeathState(JUST_DIED);
         }
         return true;
     }

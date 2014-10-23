@@ -536,7 +536,7 @@ class Creature : public Unit, public GridObject<Creature>, public MapObject
         // override WorldObject function for proper name localization
         std::string const& GetNameForLocaleIdx(LocaleConstant locale_idx) const;
 
-        void setDeathState(DeathState s);                   // override virtual Unit::setDeathState
+        void SetDeathState(DeathState s);                   // override virtual Unit::setDeathState
 
         bool LoadFromDB(uint32 guid, Map* map) { return LoadCreatureFromDB(guid, map, false); }
         bool LoadCreatureFromDB(uint32 guid, Map* map, bool addToMap = true);

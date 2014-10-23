@@ -220,9 +220,9 @@ class instance_uldaman : public InstanceMapScript
                 for (std::vector<uint64>::const_iterator i = archaedasWallMinions.begin(); i != archaedasWallMinions.end(); ++i)
                 {
                     Creature* target = instance->GetCreature(*i);
-                    if (!target || target->isDead() || target->getFaction() != 14)
+                    if (!target || target->IsDead() || target->getFaction() != 14)
                         continue;
-                    target->setDeathState(JUST_DIED);
+                    target->SetDeathState(JUST_DIED);
                     target->RemoveCorpse();
                 }
 
@@ -230,9 +230,9 @@ class instance_uldaman : public InstanceMapScript
                 for (std::vector<uint64>::const_iterator i = vaultWalkers.begin(); i != vaultWalkers.end(); ++i)
                 {
                     Creature* target = instance->GetCreature(*i);
-                    if (!target || target->isDead() || target->getFaction() != 14)
+                    if (!target || target->IsDead() || target->getFaction() != 14)
                         continue;
-                    target->setDeathState(JUST_DIED);
+                    target->SetDeathState(JUST_DIED);
                     target->RemoveCorpse();
                 }
 
@@ -240,9 +240,9 @@ class instance_uldaman : public InstanceMapScript
                 for (std::vector<uint64>::const_iterator i = earthenGuardians.begin(); i != earthenGuardians.end(); ++i)
                 {
                     Creature* target = instance->GetCreature(*i);
-                    if (!target || target->isDead() || target->getFaction() != 14)
+                    if (!target || target->IsDead() || target->getFaction() != 14)
                         continue;
-                    target->setDeathState(JUST_DIED);
+                    target->SetDeathState(JUST_DIED);
                     target->RemoveCorpse();
                 }
             }
@@ -277,7 +277,7 @@ class instance_uldaman : public InstanceMapScript
                 for (std::vector<uint64>::const_iterator i = archaedasWallMinions.begin(); i != archaedasWallMinions.end(); ++i)
                 {
                     Creature* target = instance->GetCreature(*i);
-                    if (target && target->isDead())
+                    if (target && target->IsDead())
                     {
                         target->Respawn();
                         target->GetMotionMaster()->MoveTargetedHome();
@@ -289,7 +289,7 @@ class instance_uldaman : public InstanceMapScript
                 for (std::vector<uint64>::const_iterator i = vaultWalkers.begin(); i != vaultWalkers.end(); ++i)
                 {
                     Creature* target = instance->GetCreature(*i);
-                    if (target && target->isDead())
+                    if (target && target->IsDead())
                     {
                         target->Respawn();
                         target->GetMotionMaster()->MoveTargetedHome();
@@ -301,7 +301,7 @@ class instance_uldaman : public InstanceMapScript
                 for (std::vector<uint64>::const_iterator i = earthenGuardians.begin(); i != earthenGuardians.end(); ++i)
                 {
                     Creature* target = instance->GetCreature(*i);
-                    if (target && target->isDead())
+                    if (target && target->IsDead())
                     {
                         target->Respawn();
                         target->GetMotionMaster()->MoveTargetedHome();

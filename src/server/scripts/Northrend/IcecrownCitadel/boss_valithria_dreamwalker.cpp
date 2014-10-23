@@ -291,7 +291,7 @@ class boss_valithria_dreamwalker : public CreatureScript
                     if (data->curhealth)
                         _spawnHealth = data->curhealth;
 
-                if (!me->isDead())
+                if (!me->IsDead())
                     Reset();
             }
 

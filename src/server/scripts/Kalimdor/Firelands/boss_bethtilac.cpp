@@ -164,7 +164,7 @@ public:
 
         void InitializeAI()
         {
-          if(!me->isDead())
+          if(!me->IsDead())
             Reset();
         }
 
@@ -445,7 +445,7 @@ public:
 
         void InitializeAI()
         {
-            if (!me->isDead())
+            if (!me->IsDead())
                 Reset();
         }
 
@@ -570,7 +570,7 @@ public:
 
         void InitializeAI()
         {
-            if (!me->isDead())
+            if (!me->IsDead())
                 Reset();
 
             SummonLift = true;
@@ -752,7 +752,7 @@ public:
 
         void InitializeAI()
         {
-            if (!me->isDead())
+            if (!me->IsDead())
                 Reset();
         }
         bool Founded;
