@@ -667,7 +667,7 @@ public:
                             for (itr = Patients.begin(); itr != Patients.end(); ++itr)
                             {
                                 if (Creature* patient = Unit::GetCreature((*me), *itr))
-                                    patient->setDeathState(JUST_DIED);
+                                    patient->SetDeathState(JUST_DIED);
                             }
                         }
 
@@ -805,7 +805,7 @@ public:
             {
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT);
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                me->setDeathState(JUST_DIED);
+                me->SetDeathState(JUST_DIED);
                 me->SetFlag(UNIT_DYNAMIC_FLAGS, 32);
 
                 if (DoctorGUID)
@@ -1463,7 +1463,7 @@ public:
             if (ExplosionTimer <= diff)
             {
                 DoCast(me, SPELL_TONK_MINE_DETONATE, true);
-                me->setDeathState(DEAD); // unsummon it
+                me->SetDeathState(DEAD); // unsummon it
             }
             else
                 ExplosionTimer -= diff;
