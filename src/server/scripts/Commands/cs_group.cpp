@@ -270,7 +270,7 @@ public:
         const char* onlineState = "";
 
         // Parse the guid to uint32...
-        uint32 parseGUID = MAKE_NEW_GUID(atol((char*)args), 0, HIGHGUID_PLAYER);
+        uint32 parseGUID = MAKE_NEW_GUID(atoul(args), 0, HIGHGUID_PLAYER);
 
         // ... and try to extract a player out of it.
         if (sObjectMgr->GetPlayerNameByGUID(parseGUID, nameTarget))

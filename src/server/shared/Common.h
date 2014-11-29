@@ -124,6 +124,9 @@
 
 inline float finiteAlways(float f) { return finite(f) ? f : 0.0f; }
 
+inline unsigned long atoul(char const* str) { return strtoul(str, nullptr, 10); }
+inline unsigned long long atoull(char const* str) { return strtoull(str, nullptr, 10); }
+
 #define atol(a) strtoul( a, NULL, 10)
 
 #define STRINGIZE(a) #a

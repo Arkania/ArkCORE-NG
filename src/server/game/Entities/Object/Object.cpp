@@ -789,7 +789,7 @@ void Object::_LoadIntoDataField(std::string const& data, uint32 startOffset, uin
 
     for (uint32 index = 0; index < count; ++index)
     {
-        m_uint32Values[startOffset + index] = atol(tokens[index]);
+        m_uint32Values[startOffset + index] = atoul(tokens[index]);
         _changesMask.SetBit(startOffset + index);
     }
 }
@@ -2519,9 +2519,28 @@ Creature* WorldObject::FindNearestCreature(uint32 entry, float range, bool alive
 
 std::list<Creature*> WorldObject::FindNearestCreatures(uint32 entry, float range) const
 {
-    std::list<Creature*> creatureList;
+    std::list<Creature*> creatureList;    
     GetCreatureListWithEntryInGrid(creatureList, entry, range);   
     return creatureList;
+}
+
+Creature* WorldObject::FindRandomCreatureInRange(uint32 entry, float range, bool alive)
+{
+    Creature* creature = NULL;
+    std::list<Creature*> creatureList = FindNearestCreatures(entry, range);
+    if (creatureList.empty())
+        return NULL;
+
+    int32 r1 = urand(0, creatureList.size() - 1);
+    int32 r2 = -1;
+    for (std::list<Creature*>::iterator itr = creatureList.begin(); itr != creatureList.end(); ++itr)
+    {
+        r2++;
+        if (r1 == r2)
+            return *itr;
+    }
+
+    return NULL;
 }
 
 GameObject* WorldObject::FindNearestGameObject(uint32 entry, float range) const
@@ -2545,7 +2564,7 @@ GameObject* WorldObject::FindNearestGameObjectOfType(GameobjectTypes type, float
 Player* WorldObject::FindNearestPlayer(float range, bool alive)
 {
     Player* player = NULL;
-    Trinity::AnyPlayerInObjectRangeCheck checker(this, GetVisibilityRange(), alive);
+    Trinity::AnyPlayerInObjectRangeCheck checker(this, range, alive);
     Trinity::PlayerSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(this, player, checker);
     VisitNearbyWorldObject(range, searcher);
     return player;
@@ -2558,6 +2577,25 @@ std::list<Player*> WorldObject::FindNearestPlayers(float range, bool alive)
     Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(this, PlayerList, checker);
     VisitNearbyWorldObject(range, searcher);
     return PlayerList;
+}
+
+Player* WorldObject::FindRandomPlayerInRange(float range, bool alive)
+{
+    Player* player = NULL;
+    std::list<Player*> PlayerList = FindNearestPlayers(range, alive);
+    if (PlayerList.empty())
+        return NULL;
+
+    int32 r1 = urand(0, PlayerList.size() - 1);
+    int32 r2 = -1;
+    for (std::list<Player*>::iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
+    {
+        r2++;
+        if (r1 == r2)
+            return *itr;
+    }
+
+    return NULL;
 }
 
 bool WorldObject::IsPlayerInRange(float range)
