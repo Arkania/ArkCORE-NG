@@ -170,18 +170,20 @@ public:
             if (Creature* npc = hitter->ToCreature())
             {
                 if (npc->GetEntry() == NPC_BLACKROCK_BATTLE_WORG && me->GetHealthPct() < m_minHealth)
-                    if (Creature* paxton = me->FindNearestCreature(NPC_BROTHER_PAXTON, 15.0f, true))
-                        if (m_SayPaxtonCooldownTimer == 0)
-                        {
-                            Talk(1);
+					if (Creature* paxton = me->FindNearestCreature(NPC_BROTHER_PAXTON, 15.0f, true))
+					{
+						if (m_SayPaxtonCooldownTimer == 0)
+						{
+							Talk(1);
 
-                            if (npc_brother_paxton::npc_brother_paxtonAI* paxtonAI = CAST_AI(npc_brother_paxton::npc_brother_paxtonAI, paxton->AI()))
-                                paxtonAI->CastHeal(paxton);
+							if (npc_brother_paxton::npc_brother_paxtonAI* paxtonAI = CAST_AI(npc_brother_paxton::npc_brother_paxtonAI, paxton->AI()))
+								paxtonAI->CastHeal(paxton);
 
-                            m_SayPaxtonCooldownTimer = 10000;
-                        }
-                        else
-                            uiDamage = 0;
+							m_SayPaxtonCooldownTimer = 10000;
+						}
+					}
+                    else
+                        uiDamage = 0;
 
                 if (!me->IsInCombat())
                 {
