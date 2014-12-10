@@ -1176,7 +1176,6 @@ void BattlegroundMgr::BuildBattlegroundListPacket(WorldPacket* data, uint64 guid
     data->WriteBit(0);                                      // unk
     data->WriteBit(0);                                      // unk
 
-    data->FlushBits();
     size_t count_pos = data->bitwpos();
     data->WriteBits(0, 24);                                 // placeholder
 
@@ -1186,7 +1185,7 @@ void BattlegroundMgr::BuildBattlegroundListPacket(WorldPacket* data, uint64 guid
     data->WriteBit(guidBytes[3]);
     data->WriteBit(0);                                      // unk
     data->WriteBit(guidBytes[5]);
-    data->WriteBit(0);                                      // unk
+	data->WriteBit(player->getLevel() != 10 ? 1 : 0);       // hide battleground list window, show only in level 10
 
     data->FlushBits();
 
