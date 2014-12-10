@@ -235,7 +235,10 @@ void WorldSession::HandleQuestgiverQueryQuestOpcode(WorldPacket& recvData)
             return;
 
         if (quest->IsAutoAccept() && _player->CanAddQuest(quest, true))
+        {
             _player->AddQuestAndCheckCompletion(quest, object);
+            _player->PlayerTalkClass->SendCloseGossip();
+        }
 
         if (quest->HasFlag(QUEST_FLAGS_AUTOCOMPLETE))
             _player->PlayerTalkClass->SendQuestGiverRequestItems(quest, object->GetGUID(), _player->CanCompleteQuest(quest->GetQuestId()), true);
