@@ -552,17 +552,17 @@ void Object::BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
         //if (true)   // Has time, controlled by bit just after HasTransport
         *data << uint32(getMSTime());
 
-        *data << self->GetSpeed(MOVE_FLIGHT_BACK);
-        data->WriteByteSeq(guid[6]);
         *data << self->GetSpeed(MOVE_TURN_RATE);
-        if (!G3D::fuzzyEq(self->GetOrientation(), 0.0f))
+		data->WriteByteSeq(guid[6]);
+		*data << self->GetSpeed(MOVE_FLIGHT);
+		if (!G3D::fuzzyEq(self->GetOrientation(), 0.0f))
             *data << float(self->GetOrientation());
 
         *data << self->GetSpeed(MOVE_RUN);
         if (hasPitch)
             *data << float(self->m_movementInfo.pitch);
 
-        *data << self->GetSpeed(MOVE_FLIGHT);
+		*data << self->GetSpeed(MOVE_FLIGHT_BACK);
     }
 
     if (flags & UPDATEFLAG_VEHICLE)
