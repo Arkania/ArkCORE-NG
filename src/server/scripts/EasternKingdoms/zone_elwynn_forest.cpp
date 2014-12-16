@@ -578,17 +578,17 @@ public:
             m_timer=0;
         }
 
-        void SpellHit(Unit* caster, SpellInfo const* spell) override
+        void SpellHit(Unit* caster, SpellInfo const* spell) override 
         {
-			if (Player* player = caster->ToPlayer())
-				if (spell->Id == SPELL_RENEWEDLIFE  && m_phase == 0)
+			if (Creature* creature = caster->ToCreature())
+				if (spell->Id == SPELL_RENEWEDLIFE  && m_phase == 0 && creature->GetEntry() == NPC_INJURED_SOLDIER)
 				{
 					m_phase = 1;
 					m_timer = 1000;
 				}
         }
 
-		void JustSummoned(Creature* summon) 
+		void JustSummoned(Creature* summon) override
 		{ 
 			CAST_AI(npc_injured_soldier_dummy::npc_injured_soldier_dummyAI, summon->AI())->_phase = 1;
 		}
