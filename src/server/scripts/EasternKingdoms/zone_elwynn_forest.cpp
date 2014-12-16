@@ -53,6 +53,10 @@ enum eShowfight
     SPELL_CONVERSATIONS_TRIGGER_01 = 84076,
     SPELL_REVIVE = 93799,
     SPELL_PRAYER_OF_HEALING = 93091,
+	SPELL_FLASH_HEAL = 17843,
+	SPELL_PENANCE = 47750,
+	SPELL_FORTITUDE = 13864,
+
 };
 
 class npc_blackrock_battle_worg : public CreatureScript
@@ -118,25 +122,58 @@ public:
     {
         npc_brother_paxtonAI(Creature *c) : ScriptedAI(c) { }
 
+		uint32 _phase;
+		uint32 _coolDown;
+		float  _angle;
+
         void Reset() override
         {
             me->GetMotionMaster()->MovePath(951, true);
+			_coolDown = 0;
+			_phase = 0;
+			_angle = 0;
         }
 
         void CastHeal(Creature* infantry)
-        {     
-            // me->HandleEmoteCommand(EMOTE_STATE_STAND);
-            me->CastSpell(infantry, SPELL_PRAYER_OF_HEALING);            
-            // me->SetFacingTo(me->GetAngle(infantry));
+        {   
+			if (_phase == 0)
+			{
+				uint8 c = urand(0, 3);
+				switch (c)
+				{
+				case  0:
+					DoCast(infantry, SPELL_FORTITUDE);
+					break;
+				case  1:
+					DoCast(infantry, SPELL_FLASH_HEAL);
+					break;
+				case  2:
+					DoCast(infantry, SPELL_PENANCE);
+					break;
+				case  3:
+					DoCast(infantry, SPELL_PRAYER_OF_HEALING);
+					break;
+				}
+				_coolDown = 5000;
+				_phase = 1;
+			}
         }
 
         void UpdateAI(uint32 diff) override
         {
+			if (_phase == 1)
+				if (_coolDown <= diff)
+				{
+					_phase = 0;
+				}
+				else
+					_coolDown -= diff;
+
             if (!UpdateVictim())
                 return;
 
             DoMeleeAttackIfReady();
-        }
+		}
     };
 
     CreatureAI* GetAI(Creature* creature) const
@@ -177,7 +214,7 @@ public:
 							Talk(1);
 
 							if (npc_brother_paxton::npc_brother_paxtonAI* paxtonAI = CAST_AI(npc_brother_paxton::npc_brother_paxtonAI, paxton->AI()))
-								paxtonAI->CastHeal(paxton);
+								paxtonAI->CastHeal(me);
 
 							m_SayPaxtonCooldownTimer = 10000;
 						}
@@ -234,14 +271,13 @@ public:
 
 //######################################### class quest series 'Lions for Lambs'
 
-enum eQuest28
+enum eQuestSerieLfL
 {
     SAY_BLACKROCK_COMBAT = 0,
 
-    SPELL_SPYING = 92857,
-    SPELL_SPYGLASS = 80676,
-    SPELL_SNEAKING = 93046,
-   
+	SPELL_SPYING = 92857,   // standing
+    SPELL_SPYGLASS = 80676, // standing
+    SPELL_SNEAKING = 93046, // walking		 
     NPC_BLACKROCK_SPY = 49874,
 };
 
@@ -252,68 +288,81 @@ public:
 
     struct npc_blackrock_spyAI : public ScriptedAI
     {
-        npc_blackrock_spyAI(Creature *c) : ScriptedAI(c) { }
+		npc_blackrock_spyAI(Creature *c) : ScriptedAI(c) { }
 
-        uint32 Phase;
-        uint32 Emote;
-        uint32 Aura;
-        uint32 Timer;
+        uint32 _phase;
+        uint32 _timer;
 
-        void Reset() override
-        { 
-            CreateNewPhase(); 
-        }
+		void Reset() override
+		{
+			_phase = 0;
+			_timer = 0;
+		}
 
-        void EnterCombat(Unit* /*who*/) override
+        void EnterCombat(Unit* who) override
         { 
             Talk(SAY_BLACKROCK_COMBAT);
+			me->RemoveAllAuras();
+			_phase = 0;
+			_timer = 0;
         }
+
+		void MovementInform(uint32 type, uint32 id) override
+		{
+			if (me->IsInCombat())
+				return;
+
+			if (id == 0 || id == 3)
+			{
+				uint8 r1 = urand(0, 100); // Spyglass yes/no
+				uint8 r2 = urand(0, 100); // Kneel while spying
+				uint8 r3 = urand(0, 100);
+				if (r1 < 33)
+				{
+					me->CastSpell(me, SPELL_SPYGLASS);
+					_phase = 1;
+					_timer = 4800;
+				}
+				if (r2 < 50)
+				{
+					me->HandleEmote(EMOTE_STATE_KNEEL);
+				}
+				if (r3 < 50)
+					me->CastSpell(me, SPELL_SPYING);
+				else
+					me->CastSpell(me, SPELL_SNEAKING);
+			}
+		}
 
         void UpdateAI(uint32 diff) override
         {
-            if (!UpdateVictim())
-            {
-                if (Timer <= diff)
-                    CreateNewPhase();
-                else
-                    Timer -= diff;
-            } else
-            {
-                me->RemoveAllAuras();
-                DoMeleeAttackIfReady();
-            }
+			if (_timer <= diff)
+				DoWork();
+			else
+				_timer -= diff;
+
+			if (!UpdateVictim())
+				return;
+
+			DoMeleeAttackIfReady();
         }
 
-        void CreateNewPhase()
+		void DoWork()
         {
-            Phase = urand(0, 2);
-            Emote = urand(0, 1);
-            Aura = urand(0, 2);
-            Timer = urand(10000, 30000);
-            switch(Phase)
-            {
-                case 0: // stand 2H
-                    me->GetMotionMaster()->MoveRandom(0.0f);
-                    if (me->HasAura(SPELL_SPYGLASS)) me->RemoveAurasDueToSpell(SPELL_SPYGLASS);
-                    if (me->HasAura(SPELL_SNEAKING)) me->RemoveAurasDueToSpell(SPELL_SNEAKING);
-                    if (me->HasAura(SPELL_SPYING)) me->RemoveAurasDueToSpell(SPELL_SPYING);
-                    me->HandleEmoteCommand(EMOTE_STATE_READY2H);
-                    break;
-                case 1: // sneaking and spying
-                    me->HandleEmoteCommand(EMOTE_STATE_NONE);
-                    if (me->HasAura(SPELL_SPYGLASS)) me->RemoveAurasDueToSpell(SPELL_SPYGLASS);
-                    if (!me->HasAura(SPELL_SNEAKING)) DoCast(me, SPELL_SNEAKING);
-                    if (!me->HasAura(SPELL_SPYING)) DoCast(me, SPELL_SPYING);
-                    me->GetMotionMaster()->MoveRandom(4.0f);
-                    break;
-                case 2: // spyglass
-                    me->GetMotionMaster()->MoveRandom(0.0f);
-                    me->HandleEmoteCommand(EMOTE_STATE_NONE);
-                    if (me->HasAura(SPELL_SNEAKING)) me->RemoveAurasDueToSpell(SPELL_SNEAKING);
-                    if (me->HasAura(SPELL_SPYING)) me->RemoveAurasDueToSpell(SPELL_SPYING);
-                    if (!me->HasAura(SPELL_SPYGLASS)) DoCast(me, SPELL_SPYGLASS);
-                    break;
-             } 
+			if (me->IsInCombat())
+				return;
+
+			switch (_phase)
+			{
+			case 1:
+				me->RemoveAllAuras();
+				_phase = 0;
+				_timer = 0;
+				break;
+			case 2:
+				break;
+			}
+           
         }
     };
 
@@ -379,6 +428,62 @@ enum eQuest28806
     SAY_INJURED_SOLDIER = 1,
 };
 
+class npc_injured_soldier_dummy : public CreatureScript
+{
+public:
+	npc_injured_soldier_dummy() : CreatureScript("npc_injured_soldier_dummy") { }
+
+	struct npc_injured_soldier_dummyAI : public ScriptedAI
+	{
+		npc_injured_soldier_dummyAI(Creature *creature) : ScriptedAI(creature) { }
+
+		uint32 _phase;
+		uint32 _timer;
+
+		void Reset() override
+		{
+			_phase = 0;
+			_timer = 1000;
+		}
+
+		void UpdateAI(uint32 diff) override
+		{
+			if (_timer <= diff)
+				DoWork();
+			else
+				_timer -= diff;
+		}
+
+		void DoWork()
+		{
+			_timer = 1000;
+
+			switch (_phase)
+			{
+			case 1:
+				if (Player* player = me->FindNearestPlayer(10.0f, true))
+					me->SetFacingTo(me->GetAngle(player));
+				_phase = 2;
+				break;
+			case 2:
+				Talk(SAY_INJURED_SOLDIER);
+				_timer = 2500;
+				_phase = 3;
+				break;
+			case 3:
+				me->GetMotionMaster()->MovePoint(0, -8830.69f, -151.335f, 80.256f);
+				_phase = 0;
+				break;
+			}
+		}
+	};
+
+	CreatureAI* GetAI(Creature* creature) const
+	{
+		return new npc_injured_soldier_dummyAI(creature);
+	}
+};
+
 class npc_injured_soldier : public CreatureScript
 {
 public:
@@ -393,8 +498,8 @@ public:
 
         if (IsHealingQuestActiv(player) && player->HasItemCount(ITEM_PAXTONS_PRAYER_BOOK, 1))
         {
-            creature->CastSpell(creature, SPELL_RENEWEDLIFE, false);
-            player->KilledMonsterCredit(creature->GetEntry(), 0);
+            creature->CastSpell(creature, SPELL_RENEWEDLIFE);
+            player->KilledMonsterCredit(creature->GetEntry());
         }
         return true;
     }
@@ -418,7 +523,7 @@ public:
 
     struct npc_injured_soldierAI : public ScriptedAI
     {
-        npc_injured_soldierAI(Creature *creature) : ScriptedAI(creature) { } 
+		npc_injured_soldierAI(Creature *creature) : ScriptedAI(creature) { m_phase = 0; }
 
         uint32 m_phase;
         uint32 m_timer;
@@ -429,15 +534,20 @@ public:
             m_timer=0;
         }
 
-        void SpellHit(Unit* /*hitter*/, SpellInfo const* spell) override
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
-            if (spell->Id == SPELL_RENEWEDLIFE  && m_phase == 0)
-            {
-                m_phase = 1;
-                m_timer = 1000;
-            }
-             
+			if (Player* player = caster->ToPlayer())
+				if (spell->Id == SPELL_RENEWEDLIFE  && m_phase == 0)
+				{
+					m_phase = 1;
+					m_timer = 1000;
+				}
         }
+
+		void JustSummoned(Creature* summon) 
+		{ 
+			CAST_AI(npc_injured_soldier_dummy::npc_injured_soldier_dummyAI, summon->AI())->_phase = 1;
+		}
 
         void UpdateAI(uint32 diff) override
         {
@@ -464,11 +574,8 @@ public:
                 break;
             case 2:
                 me->DespawnOrUnsummon();
-                m_timer = 10000;
-                m_phase = 3;
-                break;
-            case 3:
-                Reset();
+				m_phase = 0;
+				m_timer = 0;
                 break;
             }
         }
@@ -477,67 +584,6 @@ public:
     CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_injured_soldierAI (creature);
-    }
-};
-
-class npc_injured_soldier_dummy : public CreatureScript
-{
-public:
-    npc_injured_soldier_dummy() : CreatureScript("npc_injured_soldier_dummy") { }
-    
-    struct npc_injured_soldier_dummyAI : public ScriptedAI
-    {
-        npc_injured_soldier_dummyAI(Creature *creature) : ScriptedAI(creature) { }
-
-        uint32 m_phase;
-        uint32 m_timer;
-
-        void Reset() override
-        {
-            m_phase=0;
-            m_timer=1000;
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!me->IsAlive()) 
-                return;
-
-            if (m_timer <= diff)
-            {
-                m_phase ++;
-                m_timer=1000;
-
-                switch(m_phase)
-                {
-                    case 1:
-                    {
-                        if (Player* player = me->FindNearestPlayer(10.0f,true))
-                            me->SetFacingTo (me->GetAngle(player));
-                        break;
-                    }
-                    case 2:
-                    {
-                        Talk(SAY_INJURED_SOLDIER);
-                        m_timer=2500;
-                        break;
-                    }
-                    case 3:
-                    {
-                        me->GetMotionMaster()->MovePoint(0, -8830.69f, -151.335f, 80.256f);
-                        m_timer=10000;
-                        break;
-                    }
-                }
-            }
-             else 
-                m_timer -= diff;
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new npc_injured_soldier_dummyAI (creature);
     }
 };
 
