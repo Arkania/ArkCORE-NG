@@ -372,6 +372,50 @@ public:
     }
 };
 
+//######################################### class quest series, own quest for each class
+
+enum eQuest26919
+{
+	NPC_WOUNDET_TRAINEE = 44564,
+	SPELL_FLASH_HEAL_2061 = 2061,
+	NPC_KILLCREDIT= 44175,
+};
+
+class npc_woundet_trainee : public CreatureScript
+{
+public:
+	npc_woundet_trainee() : CreatureScript("npc_woundet_trainee") { }
+
+	struct npc_woundet_traineeAI : public ScriptedAI
+	{
+		npc_woundet_traineeAI(Creature *c) : ScriptedAI(c) { }
+
+		void SpellHit(Unit* caster, SpellInfo const* spell) 
+		{
+			if (Player* player = caster->ToPlayer())
+				if (spell->Id == SPELL_FLASH_HEAL_2061)
+				{
+					player->KilledMonsterCredit(NPC_KILLCREDIT, 0);
+					me->DespawnOrUnsummon();
+				}
+		}
+
+		void UpdateAI(uint32 diff) override
+		{
+			if (!UpdateVictim())
+				return;
+
+			DoMeleeAttackIfReady();
+		}
+	};
+
+	CreatureAI* GetAI(Creature* creature) const
+	{
+		return new npc_woundet_traineeAI(creature);
+	}
+};
+
+
 //#########################################  class quest 'They Sent Assassins'
 
 enum eQuest28794
@@ -664,4 +708,5 @@ void AddSC_elwynn_forest()
     new npc_blackrock_battle_worg();
     new npc_blackrock_spy(); 
     new npc_goblin_assassin();
+	new npc_woundet_trainee();
 }
