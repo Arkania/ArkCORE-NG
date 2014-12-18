@@ -32,6 +32,31 @@ EndContentData */
 #include "ScriptedGossip.h"
 #include "Player.h"
 
+enum eQuest26131
+{
+	QUEST_REINFORCEMENTS_FOR_LOCH_MODAN = 26131,
+	NPC_PILOT_HAMMERFOOT = 1960,
+};
+
+class npc_pilot_hammerfoot : public CreatureScript
+{
+public:
+	npc_pilot_hammerfoot() : CreatureScript("npc_pilot_hammerfoot") { }
+
+	bool OnGossipHello(Player* player, Creature* creature) override
+	{
+		if (player->GetQuestStatus(QUEST_REINFORCEMENTS_FOR_LOCH_MODAN) == QUEST_STATUS_INCOMPLETE)
+		{
+			// player->PlayerTalkClass->SendCloseGossip();
+			player->KilledMonsterCredit(NPC_PILOT_HAMMERFOOT);
+		}
+		
+		return false;
+	}
+};
+
+
 void AddSC_loch_modan()
 {
+	new npc_pilot_hammerfoot();
 }

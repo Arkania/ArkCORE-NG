@@ -631,9 +631,74 @@ public:
     }
 };
 
+enum ePrinzess
+{
+	NPC_PRINCESS = 330,
+	NPC_PORCINE_ENCOURAGE = 390,
+	SPELL_RUSHING_CHARGE = 6268,
+};
+
+class npc_porcine_encourage : public CreatureScript
+{
+public:
+	npc_porcine_encourage() : CreatureScript("npc_porcine_encourage") { }
+
+	struct npc_porcine_encourageAI : public ScriptedAI
+	{
+		npc_porcine_encourageAI(Creature *creature) : ScriptedAI(creature) { }
+
+		void StartAnim(Player* player) // start attack anim from princess
+		{
+			if (me->IsInCombat())
+				return;
+
+			me->CastSpell(me, SPELL_RUSHING_CHARGE);
+			me->Attack(player,true);
+		}
+	};
+
+	CreatureAI* GetAI(Creature* creature) const
+	{
+		return new npc_porcine_encourageAI(creature);
+	}
+};
+
+class npc_princess : public CreatureScript
+{
+public:
+	npc_princess() : CreatureScript("npc_princess") { }
+
+	struct npc_princessAI : public ScriptedAI
+	{
+		npc_princessAI(Creature *creature) : ScriptedAI(creature) { }
+
+		void EnterCombat(Unit* victim) override
+		{ 
+			std::list<Creature*> creatureList = me->FindNearestCreatures(NPC_PORCINE_ENCOURAGE, 20.0f);
+			Player* player = victim->ToPlayer();
+
+			if ((!player) || creatureList.empty())
+				return;
+
+			for (std::list<Creature*>::iterator itr = creatureList.begin(); itr != creatureList.end(); ++itr)
+			{
+				if (Creature* porcine = (*itr))
+				{
+					CAST_AI(npc_porcine_encourage::npc_porcine_encourageAI, porcine->AI())->StartAnim(player);
+				}
+			}
+		}
+	};
+
+	CreatureAI* GetAI(Creature* creature) const
+	{
+		return new npc_princessAI(creature);
+	}
+};
 //#########################################  quest ''
 
 
+//#########################################  quest ''
 
 // ToDo
 
@@ -709,4 +774,6 @@ void AddSC_elwynn_forest()
     new npc_blackrock_spy(); 
     new npc_goblin_assassin();
 	new npc_woundet_trainee();
+	new npc_porcine_encourage();
+	new npc_princess();
 }

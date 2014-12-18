@@ -1675,6 +1675,15 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
                 if (unitTarget->GetTypeId() != TYPEID_PLAYER)
                     return;
 
+                // using spell 1856 >> 18461 >> 11327 make you invisible, and stop all combat..
+                if (Player* player = unitTarget->ToPlayer())
+                    if (player->IsInCombat())
+                        {
+                            player->AttackStop();
+                            player->RemoveAllAttackers();
+                            player->ClearInCombat();
+                        }
+
                 // See if we already are stealthed. If so, we're done.
                 if (unitTarget->HasAura(1784))
                     return;
