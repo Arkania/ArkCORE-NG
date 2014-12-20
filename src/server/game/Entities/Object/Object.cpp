@@ -398,7 +398,7 @@ void Object::BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
         data->WriteBit(guid[3]);
         data->WriteBit(guid[2]);
         if (movementFlags)
-            data->WriteBits(movementFlags, 30);
+            data->WriteBits(movementFlags, 30);									// Movement Flags
 
         data->WriteBit(hasSpline && GetTypeId() == TYPEID_PLAYER);              // Has spline (from MovementInfo)
         data->WriteBit(!hasPitch);                                              // Has pitch
@@ -491,7 +491,7 @@ void Object::BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
 
         if (hasFallData)
         {
-            if (hasFallDirection)
+			if (hasFallDirection)
             {
                 *data << float(self->m_movementInfo.jump.xyspeed);
                 *data << float(self->m_movementInfo.jump.sinAngle);
