@@ -2,19 +2,19 @@
 
 delete from spell_area where spell=79489 and area=40;
 insert into spell_area (spell,area,quest_end,gender,autocast,quest_end_status) values
-(79489,40,26232,2,1,9); -- detect quest invis 0		Lou's Parting Thoughts
+(79489,40,26232,2,1,9); -- detect quest invis 0		TO  Lou's Parting Thoughts
 
 delete from spell_area where spell=79229 and area=40;
 insert into spell_area (spell,area,quest_start,quest_end,gender,autocast,quest_start_status,quest_end_status) values
-(79229,40,26215,26232,2,1,8,9); -- detect quest invis 1		Lou's Parting Thoughts
+(79229,40,26215,26232,2,1,74,9); -- detect quest invis 1		Meet Two-Shoed Lou  TO  Lou's Parting Thoughts
 
 delete from spell_area where spell=79341 and area=40;
 insert into spell_area (spell,area,quest_start,quest_end,gender,autocast,quest_start_status,quest_end_status) values
-(79341,40,26232,26236,2,1,72,11); -- detect quest invis 2		Lou's Parting Thoughts  TO  Shakedown at the Saldean's
+(79341,40,26232,26236,2,1,66,11); -- detect quest invis 2		Lou's Parting Thoughts  TO  Shakedown at the Saldean's
 
 delete from spell_area where spell=79498 and area=40;
 insert into spell_area (spell,area,quest_start,quest_end,gender,autocast,quest_start_status,quest_end_status) values
-(79498,40,26215,0,2,1,43,0); -- detect quest invis 3 		Meet Two-Shoed Lou (and open end)
+(79498,40,26215,0,2,1,74,0); -- detect quest invis 3 		Meet Two-Shoed Lou (and open end)
 
 update creature_template set faction_A=15,faction_H=15,npcflag=2,AIName="", ScriptName="npc_two_shoued_lou_alive" where entry=42405;
 update creature_template set faction_A=15,faction_H=15 where entry=42560;
