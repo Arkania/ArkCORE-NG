@@ -322,7 +322,10 @@ enum HitInfo
     // 0x00100000
     HITINFO_SWINGNOHITSOUND     = 0x00200000,               // unused?
     // 0x00400000
-    HITINFO_RAGE_GAIN           = 0x00800000
+    HITINFO_RAGE_GAIN           = 0x00800000,
+    HITINFO_FAKE_DAMAGE         = 0x01000000
+    // 0x02000000,
+    // 0x04000000,
 };
 
 //i would like to remove this: (it is defined in item.h

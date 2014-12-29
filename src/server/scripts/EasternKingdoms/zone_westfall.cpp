@@ -791,9 +791,6 @@ public:
 			if (m_phase > 8)
 			{
 				m_player->KilledMonsterCredit(NPC_FURLBROW_MURDER_INFO_004);
-				//m_player->RemoveAura(SPELL_DETECT_QUEST_INVIS_0);
-				//m_player->RemoveAura(SPELL_DETECT_QUEST_INVIS_1);
-				//m_player->AddAura(SPELL_DETECT_QUEST_INVIS_2, m_player);
 				m_player->PlayDistanceSound(SOUND_WOMAN_SCREAM);
 			}
 		}
@@ -804,7 +801,7 @@ public:
 			{
 				m_event = 1000;
 				if (m_phase == 0 && !me->IsInCombat())
-					if (Player* player = me->FindNearestPlayer(8))
+					if (Player* player = me->FindNearestPlayer(10.0f))
 						if (player->GetQuestStatus(QUEST_LOUS_PARTING_THOUGHTS) == QUEST_STATUS_INCOMPLETE)
 							if (HaveHighestGuid())
 							{
@@ -1046,15 +1043,167 @@ public:
 	}
 };
 
-// #############################################  quest = 26236  Shakedown at the Saldean's
+// #############################################  quest = 26236, 26241, 26266   Saldean's
 
 enum eQuest26236
 {
 	NPC_FARMER_SALDEAN = 233,
+	NPC_SALMA_SALDEAN = 235,
+	NPC_HOPE_SALDEAN = 42575,
+	NPC_ORPHAN = 42385,
 	QUEST_SHAKEDOWN_AT_THE_SALDEANS = 26236,
+	QUEST_WESTFALL_STEW = 26241,
+	QUEST_HOPE_FOR_THE_PEOPLE = 26266,
+	SPELL_QUEST_PHASEMASK_2 = 59073,
+	SPELL_QUEST_PHASEMASK_4 = 59074,
+	SPELL_QUEST_PHASEMASK_8 = 59087,
+
+}; 
+
+class npc_salma_saldean : public CreatureScript
+{
+public:
+	npc_salma_saldean() : CreatureScript("npc_salma_saldean") { }
+
+	bool OnQuestAccept(Player* player, Creature* /*creature*/, Quest const* quest) 
+	{
+		if (quest->GetQuestId() == QUEST_HOPE_FOR_THE_PEOPLE)
+		{
+			player->AddAura(SPELL_DETECT_QUEST_INVIS_3, player);
+		}
+
+		return false; 
+	}
+
+	bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*opt*/) 
+	{ 
+		if (quest->GetQuestId() == QUEST_WESTFALL_STEW)
+		{
+			creature->AI()->Talk(0, player);
+			CAST_AI(npc_salma_saldeanAI, creature->AI())->StartAnimation();
+		}
+
+		return false; 
+	}
+
+
+	struct npc_salma_saldeanAI : public ScriptedAI
+	{
+		npc_salma_saldeanAI(Creature* creature) : ScriptedAI(creature) { }
+
+		uint32  _timer;
+		uint32  _phase;
+
+		void Reset() override
+		{
+			_timer = 0; _phase = 0; 
+		}
+
+		void StartAnimation()
+		{
+			if (_phase == 0)
+			{
+				_timer = 2000;
+				_phase = 1;
+			}
+		}
+
+		void UpdateAI(uint32 diff) override
+		{
+			if (_timer <= diff)
+			{
+				_timer = 1000;
+				DoWork();
+			}
+			else
+				_timer -= diff;
+
+			if (!UpdateVictim())
+				return;
+			else
+				DoMeleeAttackIfReady();
+		}
+
+		void DoWork()
+		{
+			switch (_phase)
+			{
+			case 1:
+				me->GetMotionMaster()->MovePath(me->GetGUIDLow() * 10, false);
+				_phase = 2;
+				_timer = 5000; // salma zum tisch
+				break;
+			case 2:
+				Talk(1); // essen fertig
+				_phase = 3;
+				_timer = 2000;
+				break;
+			case 3:
+			{
+				std::list<Creature*> orphans = me->FindNearestCreatures(NPC_ORPHAN, 8.0f);
+				for (std::list<Creature*>::iterator itr = orphans.begin(); itr != orphans.end(); ++itr)
+				{
+					if (Creature* orphan = (*itr))
+						if (orphan->GetPositionZ()<40.0f)
+							orphan->GetMotionMaster()->MovePath(orphan->GetGUIDLow() * 10, false);
+				}
+				_phase = 4;
+				_timer = 7000;
+				break;
+			}
+			case 4: // kinder bedanken sich
+				if (Creature* orphan = me->FindRandomCreatureInRange(NPC_ORPHAN, 6.0f, true))
+				{
+					orphan->AI()->Talk(0);
+				}
+				_phase = 5;
+				_timer = 2000;
+				break;
+			case 5: // kinder bedanken sich
+				if (Creature* orphan = me->FindRandomCreatureInRange(NPC_ORPHAN, 6.0f, true))
+				{
+					orphan->AI()->Talk(1);
+				}
+				_phase = 6;
+				_timer = 15000;
+				break;
+			case 6: // alle zurücklaufen
+			{
+				std::list<Creature*> orphans = me->FindNearestCreatures(NPC_ORPHAN, 8.0f);
+				for (std::list<Creature*>::iterator itr = orphans.begin(); itr != orphans.end(); ++itr)
+				{
+					if (Creature* orphan = (*itr))
+						if (orphan->GetPositionZ()<40.0f)
+							orphan->GetMotionMaster()->MovePath(orphan->GetGUIDLow() * 10 + 1, false);
+				}
+				_phase = 7;
+				_timer = 2000;
+				break;
+			}
+			case 7: // salma zurück
+				me->GetMotionMaster()->MovePath(me->GetGUIDLow() * 10 + 1, false);
+				_phase = 0;
+				_timer = 0;
+				break;
+			case 8: // alles auf 0
+				_phase = 0;
+				_timer = 0;
+				break;
+			}
+		}
+	};
+
+	CreatureAI* GetAI(Creature* creature) const override
+	{
+		return new npc_salma_saldeanAI(creature);
+	}
 };
 
 // #############################################  
+
+
+
+
 
 // ToDo: is not checked:  npc_daphne_stilwell
 
@@ -1229,5 +1378,5 @@ void AddSC_westfall()
 	new npc_shadowy_figure();
 	new npc_thug();
 	new npc_horatio_lane_42558();
-
+	new npc_salma_saldean();
 }
