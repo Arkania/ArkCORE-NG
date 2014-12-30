@@ -60,6 +60,7 @@ enum eQuest26209
 	SPELL_DETECT_QUEST_INVIS_1 = 79229,
 	SPELL_DETECT_QUEST_INVIS_2 = 79341,
 	SPELL_DETECT_QUEST_INVIS_3 = 79498,
+	SPELL_DETECT_QUEST_INVIS_4 = 101419,
 	SPELL_COSMETIC_SLEEP_ZZZ = 78677,
 };
 
@@ -1357,8 +1358,8 @@ public:
 
 enum eSentinellHill
 {	
-    NPC_SMALL_TIME_HUSTLER = 42390,
-    NPC_WEST_PLAINS_DRIFTER = 42391,
+	NPC_SMALL_TIME_HUSTLER = 42390,
+	NPC_WEST_PLAINS_DRIFTER = 42391,
 	NPC_DEFIAS_KNUCKLEDUSTER = 449,
 	NPC_DEFIAS_PILLAGER = 589,
 	NPC_DEFIAS_HENCHMAN = 594,
@@ -1370,6 +1371,8 @@ enum eSentinellHill
 	NPC_RIVERPAW_HERBALIST_54373 = 54373,
 	NPC_SENTINEL_HILL_GUARD = 42407,
 	NPC_WESTFALL_BRIGADE_GUARD = 51915,
+	NPC_MARSHAL_GRYAN_STOUTMANTLE_234 = 234,
+	NPC_RIPSNARL = 42750,
 	SPELL_DIRT_TOSS = 80382,
 	SPELL_ROTTEN_APPLE_AROMA = 58511,
 	SPELL_ROTTEN_BANANA_AROMA = 58514,
@@ -1756,6 +1759,162 @@ public:
 	}
 };
 
+class npc_ripsnarl_sentinel_hill : public CreatureScript
+{
+public:
+	npc_ripsnarl_sentinel_hill() : CreatureScript("npc_ripsnarl_sentinel_hill") { }
+
+	struct npc_ripsnarl_sentinel_hillAI : public ScriptedAI
+	{
+		npc_ripsnarl_sentinel_hillAI(Creature *c) : ScriptedAI(c) { }
+
+		std::list<uint64> _playerList;
+		uint32      _timer;
+		uint32      _phase;
+
+		void Reset() override
+		{
+			_timer = 1000;
+			_phase = 0;
+		}
+
+		void UpdateAI(uint32 diff) override
+		{
+			if (_timer <= diff)
+			{
+				_timer = 1000;
+				DoWork();
+			}
+			else
+				_timer -= diff;
+
+			if (!UpdateVictim())
+				return;
+
+			DoMeleeAttackIfReady();
+		}
+
+		void DoWork()
+		{
+			switch (_phase)
+			{
+			case 0:
+				if (Player* player = me->FindNearestPlayer(10.0f, true))
+					if (!HasPlayerSeenVideo(player->GetGUID()))
+					    if (player->HasAura(SPELL_DETECT_QUEST_INVIS_3))
+						    if (!player->HasAura(SPELL_DETECT_QUEST_INVIS_4))
+						    {
+							    _playerList.push_back(player->GetGUID());
+							    _phase = 1;
+						    }
+				break;
+			case 1:
+				if (Creature* marshal = me->FindNearestCreature(NPC_MARSHAL_GRYAN_STOUTMANTLE_234, 15.0f))
+					marshal->AI()->Talk(10);
+
+				_timer = 7000; _phase = 2;
+				break;
+			case 2:
+				if (Creature* horatio = me->FindNearestCreature(NPC_HORATIO_LANE_42308, 15.0f))
+				{
+					horatio->AI()->Talk(10);
+					horatio->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
+				}
+					
+				_timer = 7000; _phase = 3;
+				break;
+			case 3:
+				if (Creature* horatio = me->FindNearestCreature(NPC_HORATIO_LANE_42308, 15.0f))
+				{
+					horatio->AI()->Talk(11);
+					horatio->HandleEmoteCommand(EMOTE_ONESHOT_QUESTION);
+				}
+
+				_timer = 7000; _phase = 4;
+				break;
+			case 4:
+				if (Creature* marshal = me->FindNearestCreature(NPC_MARSHAL_GRYAN_STOUTMANTLE_234, 15.0f))
+					marshal->AI()->Talk(11);
+
+				_timer = 7000; _phase = 5;
+				break;
+			case 5:
+				Talk(10);
+				_timer = 7000; _phase = 6;
+				break;
+			case 6: 
+				if (Creature* horatio = me->FindNearestCreature(NPC_HORATIO_LANE_42308, 15.0f))
+				{
+					horatio->GetMotionMaster()->MovePath(423081, false);
+				}
+				_timer = 4000; _phase = 7;
+				break;
+			case 7:
+				if (Creature* horatio = me->FindNearestCreature(NPC_HORATIO_LANE_42308, 15.0f))
+				{
+					horatio->AI()->Talk(12);
+					horatio->CastSpell(horatio, 78935);
+				}
+
+				_timer = 5000; _phase = 8;
+                break;
+			case 8:
+				if (Creature* horatio = me->FindNearestCreature(NPC_HORATIO_LANE_42308, 15.0f))
+				{
+					horatio->AI()->Talk(13);
+					horatio->CastSpell(horatio, 78935);
+				}
+
+				_timer = 5000; _phase = 9;
+				break;
+			case 9:
+				if (Creature* horatio = me->FindNearestCreature(NPC_HORATIO_LANE_42308, 15.0f))
+				{
+					horatio->AI()->Talk(14);
+				}
+
+				_timer = 5000; _phase = 10;
+				break;
+			case 10: // walk
+				if (Creature* horatio = me->FindNearestCreature(NPC_HORATIO_LANE_42308, 15.0f))
+				{
+					horatio->GetMotionMaster()->MovePath(423082, false);
+				}
+				_timer = 4000; _phase = 11;
+				break;
+			case 11:
+				if (Creature* horatio = me->FindNearestCreature(NPC_HORATIO_LANE_42308, 15.0f))
+					if (Creature* marshal = me->FindNearestCreature(NPC_MARSHAL_GRYAN_STOUTMANTLE_234, 15.0f))
+				    {
+					    horatio->RemoveAura(78935);
+						horatio->SetFacingToObject(marshal);
+				    }
+				_timer = 4000;
+				_phase = 0;
+				break;
+			case 12:
+				break;
+			}
+		}
+
+		bool HasPlayerSeenVideo(uint64 guid)
+		{
+			for (std::list<uint64>::iterator itr = _playerList.begin(); itr != _playerList.end(); ++itr)
+				if (guid == *itr)
+				{
+					return true;
+				}
+
+			return false;
+        }
+	};
+
+	CreatureAI* GetAI(Creature* creature) const
+	{
+		return new npc_ripsnarl_sentinel_hillAI(creature);
+	}
+};
+
 
 
 // ToDo: is not checked:  npc_daphne_stilwell
@@ -1937,4 +2096,5 @@ void AddSC_westfall()
 	new npc_riverpaw_sentinel_hill();
 	new npc_defias_sentinel_hill();
 	new npc_riverpaw_westfall();
+	new npc_ripsnarl_sentinel_hill();
 }
