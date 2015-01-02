@@ -85,8 +85,8 @@ public:
             { "saveall",          rbac::RBAC_PERM_COMMAND_SAVEALL,           true, &HandleSaveAllCommand,          "", NULL },
             { "save",             rbac::RBAC_PERM_COMMAND_SAVE,             false, &HandleSaveCommand,             "", NULL },
             { "setskill",         rbac::RBAC_PERM_COMMAND_SETSKILL,         false, &HandleSetSkillCommand,         "", NULL },
-            { "showarea",         rbac::RBAC_PERM_COMMAND_SHOWAREA,         false, &HandleShowAreaCommand,         "", NULL },
-            { "summon",           rbac::RBAC_PERM_COMMAND_SUMMON,           false, &HandleSummonCommand,           "", NULL },
+			{ "showarea",         rbac::RBAC_PERM_COMMAND_SHOWAREA,         false, &HandleShowAreaCommand,         "", NULL },
+			{ "summon",           rbac::RBAC_PERM_COMMAND_SUMMON,           false, &HandleSummonCommand,           "", NULL },
             { "unaura",           rbac::RBAC_PERM_COMMAND_UNAURA,           false, &HandleUnAuraCommand,           "", NULL },
             { "unbindsight",      rbac::RBAC_PERM_COMMAND_UNBINDSIGHT,      false, HandleUnbindSightCommand,       "", NULL },
             { "unfreeze",         rbac::RBAC_PERM_COMMAND_UNFREEZE,         false, &HandleUnFreezeCommand,         "", NULL },
@@ -231,8 +231,23 @@ public:
         // number or [name] Shift-click form |color|Hspell:spell_id|h[name]|h|r or Htalent form
         uint32 spellId = handler->extractSpellIdFromLink((char*)args);
 
-        if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId))
-            Aura::TryRefreshStackOrCreate(spellInfo, MAX_EFFECT_MASK, target, target);
+		if (!spellId)
+		{
+			uint32 count = 0;
+			for (uint32 spellId = 1; spellId < 120000; ++spellId)
+				if (target->HasAura(spellId))
+				{
+					handler->PSendSysMessage("Active aura is: %u \n", spellId);
+					count++;
+				}
+
+			handler->PSendSysMessage("Found %u active aura \n", count);
+		}
+		else
+		{
+			if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId))
+				Aura::TryRefreshStackOrCreate(spellInfo, MAX_EFFECT_MASK, target, target);
+		}
 
         return true;
     }
@@ -256,13 +271,24 @@ public:
 
         // number or [name] Shift-click form |color|Hspell:spell_id|h[name]|h|r or Htalent form
         uint32 spellId = handler->extractSpellIdFromLink((char*)args);
-        if (!spellId)
-            return false;
+		if (!spellId)
+		{
+			uint32 count = 0;
+			for (uint32 spellId = 1; spellId < 120000; ++spellId)
+				if (target->HasAura(spellId))
+				{
+					handler->PSendSysMessage("Active aura is: %u \n", spellId);
+					count++;
+				}
 
-        target->RemoveAurasDueToSpell(spellId);
+			handler->PSendSysMessage("Found %u active aura \n", count);
+		}
+		else
+            target->RemoveAurasDueToSpell(spellId);
 
         return true;
     }
+
     // Teleport to Player
     static bool HandleAppearCommand(ChatHandler* handler, char const* args)
     {
