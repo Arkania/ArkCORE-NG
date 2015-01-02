@@ -2190,6 +2190,174 @@ public:
     }
 };
 
+// ############################################# quest 26297 The Dawning of a New Day
+
+enum eQuest26297
+{
+    NPC_SHADOWY_FIGURE_42680 = 42680,
+    QUEST_THE_DAWNING_OF_A_NEW_DAY = 26297,
+    SPELL_SUMMON_SHADOWY_FIGURE1 = 79552,  
+    SPELL_SUMMON_SHADOWY_FIGURE2 = 79551,  
+};
+
+class npc_van_cleef_dummy : public CreatureScript
+{
+public:
+    npc_van_cleef_dummy() : CreatureScript("npc_van_cleef_dummy") { }
+
+    struct npc_van_cleef_dummyAI : public ScriptedAI
+    {
+        npc_van_cleef_dummyAI(Creature *c) : ScriptedAI(c) { }
+
+        uint32      _timer;
+        uint32      _phase;
+        Player*     _player;
+        Creature*   _shadowy;
+
+        void Reset() override
+        {
+            _timer = 1000;
+            _phase = 0;
+            _player = NULL;
+            _shadowy = NULL;
+        }
+
+        void JustSummoned(Creature* summon) 
+        { 
+            summon->CastSpell(summon, 79192);
+            _shadowy = summon;
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (_timer <= diff)
+            {
+                _timer = 1000;
+                DoWork();
+            }
+            else
+                _timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+
+        void DoWork()
+        {
+            switch (_phase)
+            {
+            case 0:
+            {
+                std::list<Player*> playerList = me->FindNearestPlayers(25.0);
+                if (playerList.empty())
+                    return;
+
+                for (std::list<Player*>::iterator itr = playerList.begin(); itr != playerList.end(); ++itr)
+                {
+                    Player* player = (*itr);
+                    if (player->GetQuestStatus(QUEST_THE_DAWNING_OF_A_NEW_DAY) == QUEST_STATUS_INCOMPLETE)
+                    {
+                        _player = player;
+                        _phase = 1; _timer = 1000;
+                        me->CastSpell(me, SPELL_SUMMON_SHADOWY_FIGURE1);
+                        return;
+                    }
+                }
+                break;
+            }
+            case 1:
+                _shadowy->AI()->Talk(0);
+                _phase = 2; _timer = 7000;
+                break;
+            case 2:
+                AwakeAllHomeless();
+                _phase = 3; _timer = 5000;
+                break;
+            case 3:
+                _shadowy->AI()->Talk(1);
+                _phase = 4; _timer = 7000;
+                break;
+            case 4:
+                _shadowy->AI()->Talk(2);
+                _phase = 5; _timer = 7000;
+                break;
+            case 5:
+                _shadowy->AI()->Talk(3);
+                _phase = 6; _timer = 7000;
+                break;
+            case 6:
+                _shadowy->AI()->Talk(4);
+                _phase = 7; _timer = 7000;
+                break;
+            case 7:
+                _shadowy->AI()->Talk(5);
+                _phase = 8; _timer = 7000;
+                break;
+            case 8:
+                _shadowy->AI()->Talk(6);
+                _phase = 9; _timer = 7000;
+                break;
+            case 9:
+                _shadowy->AI()->Talk(7);
+                _phase = 10; _timer = 7000;
+                break;
+            case 10:
+                if (_player)
+                    _player->KilledMonsterCredit(42680);
+
+                _shadowy->DespawnOrUnsummon(8000);
+                _phase = 11; _timer = 10000;
+                break;
+            case 11:
+                LetSleepAllHomeless();
+                _phase = 0; _timer = 0;
+                break;
+            }
+        }
+
+        void AwakeAllHomeless()
+        {
+            std::list<Creature*> creatureList;
+            GetCreatureListWithEntryInGrid(creatureList, me, NPC_HOMELESS_STORMWIND_CITIZEN_42384, 25.0f);
+            GetCreatureListWithEntryInGrid(creatureList, me, NPC_HOMELESS_STORMWIND_CITIZEN_42386, 25.0f);
+            if (creatureList.empty())
+                return;
+
+            for (std::list<Creature*>::iterator itr = creatureList.begin(); itr != creatureList.end(); ++itr)
+            {
+                Creature* creature = (*itr);
+                creature->RemoveAura(SPELL_COSMETIC_SLEEP_ZZZ);
+                creature->SetByteValue(UNIT_FIELD_BYTES_1, 0, UNIT_STAND_STATE_STAND);
+            }
+        }
+
+        void LetSleepAllHomeless()
+        {
+            std::list<Creature*> creatureList;
+            GetCreatureListWithEntryInGrid(creatureList, me, NPC_HOMELESS_STORMWIND_CITIZEN_42384, 25.0f);
+            GetCreatureListWithEntryInGrid(creatureList, me, NPC_HOMELESS_STORMWIND_CITIZEN_42386, 25.0f);
+            if (creatureList.empty())
+                return;
+
+            for (std::list<Creature*>::iterator itr = creatureList.begin(); itr != creatureList.end(); ++itr)
+            {
+                Creature* creature = (*itr);
+                creature->AddAura(SPELL_COSMETIC_SLEEP_ZZZ, creature);
+                creature->SetByteValue(UNIT_FIELD_BYTES_1, 0, UNIT_STAND_STATE_SLEEP);
+            } 
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_van_cleef_dummyAI(creature);
+    }
+};
+
+// ############################################# quest
+
 
 // ToDo: is not checked:  npc_daphne_stilwell
 
@@ -2374,4 +2542,5 @@ void AddSC_westfall()
     new npc_agent_kearnen();
     new item_potion_of_shrouding();
     new npc_helix_gearbreaker();
+    new npc_van_cleef_dummy();
 }
