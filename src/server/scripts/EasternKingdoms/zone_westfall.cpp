@@ -1379,6 +1379,8 @@ enum eSentinellHill
 	SPELL_SPIT = 58519,
 	EVENT_HOMELESS = 1,
 	EVENT_SHOWFIGHT = 2,
+    QUEST_IN_DEFENCE_OF_WESTFALL = 26286,
+    QUEST_SECRETS_REVEALED = 26319,
 };
 
 class npc_sentinel_hill_guard : public CreatureScript
@@ -1770,8 +1772,9 @@ public:
 	{
 		npc_ripsnarl_sentinel_hillAI(Creature *c) : ScriptedAI(c) { }
 
-		std::list<uint64> _playerList;
-		uint32      _timer;
+        std::list<uint64> _playerList1;
+        std::list<uint64> _playerList2;
+        uint32      _timer;
 		uint32      _phase;
 
 		void Reset() override
@@ -1801,14 +1804,27 @@ public:
 			switch (_phase)
 			{
 			case 0:
-				if (Player* player = me->FindNearestPlayer(10.0f, true))
-					if (!HasPlayerSeenVideo(player->GetGUID()))
-						if (player->HasAura(SPELL_DETECT_QUEST_INVIS_3))
-							if (!player->HasAura(SPELL_DETECT_QUEST_INVIS_4))
-							{
-								_playerList.push_back(player->GetGUID());
-								_phase = 1;
-							}
+                if (Player* player = me->FindNearestPlayer(10.0f, true))
+                {
+                    if (!HasPlayerSeenVideo1(player->GetGUID()))
+                    {
+                        if (player->HasAura(SPELL_DETECT_QUEST_INVIS_3) && player->GetQuestStatus(QUEST_IN_DEFENCE_OF_WESTFALL) == QUEST_STATUS_INCOMPLETE)
+                            if (!player->HasAura(SPELL_DETECT_QUEST_INVIS_4))
+                            {
+                                _playerList1.push_back(player->GetGUID());
+                                _phase = 1;
+                            }
+                    }
+                    else if (!HasPlayerSeenVideo2(player->GetGUID()))
+                    {
+                        if (player->GetQuestStatus(QUEST_IN_DEFENCE_OF_WESTFALL) == QUEST_STATUS_REWARDED && player->GetQuestStatus(QUEST_SECRETS_REVEALED) != QUEST_STATUS_REWARDED)
+                        {
+                            _phase = 20;
+                            _playerList2.push_back(player->GetGUID());
+                        }
+                    }
+                }
+
 				break;
 			case 1:
 				if (Creature* marshal = me->FindNearestCreature(NPC_MARSHAL_GRYAN_STOUTMANTLE_234, 15.0f))
@@ -1875,14 +1891,14 @@ public:
 					horatio->AI()->Talk(14);
 				}
 
-				_timer = 5000; _phase = 10;
+				_timer = 4000; _phase = 10;
 				break;
 			case 10: // walk
 				if (Creature* horatio = me->FindNearestCreature(NPC_HORATIO_LANE_42308, 15.0f))
 				{
 					horatio->GetMotionMaster()->MovePath(423082, false);
 				}
-				_timer = 4000; _phase = 11;
+				_timer = 2000; _phase = 11;
 				break;
 			case 11:
 				if (Creature* horatio = me->FindNearestCreature(NPC_HORATIO_LANE_42308, 15.0f))
@@ -1891,24 +1907,43 @@ public:
 						horatio->RemoveAura(78935);
 						horatio->SetFacingToObject(marshal);
 					}
-				_timer = 4000;
 				_phase = 0;
 				break;
-			case 12:
-				break;
-			}
+            case 20:
+                if (Creature* marshal = me->FindNearestCreature(NPC_MARSHAL_GRYAN_STOUTMANTLE_234, 15.0f))
+                    marshal->AI()->Talk(12);
+
+                _timer = 7000; _phase = 21;
+                break;
+            case 21:
+                Talk(11);
+                _timer = 7000; _phase = 22;
+                break;
+            case 22:
+                if (Creature* marshal = me->FindNearestCreature(NPC_MARSHAL_GRYAN_STOUTMANTLE_234, 15.0f))
+                    marshal->AI()->Talk(13);
+
+                _phase = 0;
+                break;
+}
 		}
 
-		bool HasPlayerSeenVideo(uint64 guid)
+		bool HasPlayerSeenVideo1(uint64 guid)
 		{
-			for (std::list<uint64>::iterator itr = _playerList.begin(); itr != _playerList.end(); ++itr)
+			for (std::list<uint64>::iterator itr = _playerList1.begin(); itr != _playerList1.end(); ++itr)
 				if (guid == *itr)
-				{
 					return true;
-				}
 
 			return false;
 		}
+        bool HasPlayerSeenVideo2(uint64 guid)
+        {
+            for (std::list<uint64>::iterator itr = _playerList2.begin(); itr != _playerList2.end(); ++itr)
+                if (guid == *itr)
+                    return true;
+
+            return false;
+        }
 	};
 
 	CreatureAI* GetAI(Creature* creature) const
@@ -1917,6 +1952,243 @@ public:
 	}
 };
 
+// #############################################  Quest 26290
+
+enum eQuest26290
+{
+    NPC_HELIX_GEARBREAKER = 42655,
+    NPC_HELIXS_LUMBERING_OAF = 42654,
+    NPC_SHADOWY_FIGURE_42662 = 42662,
+    QUEST_SECRETS_OF_THE_TOWER = 26290,
+    SPELL_POTION_OF_SHROUDING = 79528,
+    SPELL_QUEST_CREDIT_26290 = 79534,
+    SPELL_RIDE_VEHICLE_HARDCODET = 46598,
+};
+
+class npc_agent_kearnen : public CreatureScript
+{
+public:
+    npc_agent_kearnen() : CreatureScript("npc_agent_kearnen") { }
+
+    struct npc_agent_kearnenAI : public ScriptedAI
+    {
+        npc_agent_kearnenAI(Creature *c) : ScriptedAI(c) { }
+
+        uint32      _timer;
+        uint32      _phase;
+
+        void Reset() override
+        {
+            _timer = 1000;
+            _phase = 0;
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (_timer <= diff)
+            {
+                _timer = 1000;
+                DoWork();
+            }
+            else
+                _timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+
+        void DoWork()
+        {
+            std::list<Player*> playerList = me->FindNearestPlayers(70.0f);
+            if (playerList.empty())
+                return;
+
+            for (std::list<Player*>::iterator itr = playerList.begin(); itr != playerList.end(); ++itr)
+            {
+                if (Player* player = *itr)
+                    if (player->GetQuestStatus(QUEST_SECRETS_OF_THE_TOWER) == QUEST_STATUS_INCOMPLETE && player->IsInCombat())
+                    {
+                        Unit::AttackerSet unitList = player->getAttackers();
+                        if (!unitList.empty())
+                            for (std::set<Unit*>::iterator itr = unitList.begin(); itr != unitList.end(); ++itr)
+                                if (Creature* npc = (*itr)->ToCreature())
+                                    if (npc->GetEntry() == 42656)
+                                    {
+                                        me->CastSpell(npc, 79526, true);
+                                        Talk(0, player);
+                                        _timer = 3000; // make a small delay between the shoot from here
+                                        return;
+                                    }
+                    }
+                    else if (player->GetQuestStatus(QUEST_SECRETS_OF_THE_TOWER) == QUEST_STATUS_COMPLETE)
+                    {
+                        if (player->GetDistance2d(me) < 10.0f)
+                        {
+                            Talk(1);
+                            _timer = 30000;
+                        }
+                    }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_agent_kearnenAI(creature);
+    }
+};
+
+class npc_helix_gearbreaker : public CreatureScript
+{
+public:
+    npc_helix_gearbreaker() : CreatureScript("npc_helix_gearbreaker") { }
+
+    struct npc_helix_gearbreakerAI : public ScriptedAI
+    {
+        npc_helix_gearbreakerAI(Creature *c) : ScriptedAI(c) { }
+
+        uint32      _timer;
+        uint32      _phase;
+        Player*     _player;
+
+        void Reset() override
+        {
+            _timer = 0;
+            _phase = 0;
+            _player = NULL;
+        }
+
+        void StartAnim(Player* player) 
+        {
+            if (_phase == 0)
+            {
+                _phase = 1; 
+                _timer = 5000; 
+                _player = player;
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (_timer <= diff)
+            {
+                _timer = 1000;
+                DoWork();
+            }
+            else
+                _timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+
+        void DoWork()
+        {
+            Creature* shadow = me->FindNearestCreature(NPC_SHADOWY_FIGURE_42662, 10.0f);
+            if (!shadow)
+                return;
+
+            if (!_player)
+            {
+                _phase = 0;
+                _timer = 0;
+            }
+
+            switch (_phase)
+            {
+            case 1:
+                if (_player)
+                    if (_player->GetPositionZ() > 70.1f)
+                        _timer = 7000; _phase = 2;
+            case 2:
+                me->HandleEmoteCommand(1);
+                Talk(0);
+                _timer = 7000; _phase = 3;
+                break;
+            case 3:
+                shadow->HandleEmoteCommand(1);
+                shadow->AI()->Talk(0);
+                _timer = 7000; _phase = 4;
+                break;
+            case 4:
+                me->HandleEmoteCommand(1);
+                Talk(1);
+                _timer = 7000; _phase = 5;
+                break;
+            case 5:
+                shadow->HandleEmoteCommand(1);
+                shadow->AI()->Talk(1);
+                _timer = 7000; _phase = 6;
+                break;
+            case 6:
+                me->HandleEmoteCommand(1);
+                Talk(2);
+                _timer = 7000; _phase = 7;
+                break;
+            case 7:
+                shadow->HandleEmoteCommand(1);
+                shadow->AI()->Talk(2);
+                _timer = 7000; _phase = 8;
+                break;
+            case 8:
+                shadow->HandleEmoteCommand(1);
+                shadow->AI()->Talk(3);
+                _timer = 7000; _phase = 9;
+                break;
+            case 9:
+                me->HandleEmoteCommand(6);
+                Talk(3);
+                _timer = 7000; _phase = 10;
+                break;
+            case 10:
+                shadow->HandleEmoteCommand(273);
+                shadow->AI()->Talk(4);
+                _timer = 3000; _phase = 11;
+                break;
+            case 11:
+                if (_player)
+                    _player->CastSpell(_player, SPELL_QUEST_CREDIT_26290);
+
+                _player = NULL;
+                _timer = 60000; _phase = 12;
+                break;
+            case 12:
+                _timer = 0; _phase = 0;
+                break;
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_helix_gearbreakerAI(creature);
+    }
+};
+
+class item_potion_of_shrouding : public ItemScript
+{
+public:
+    item_potion_of_shrouding() : ItemScript("item_potion_of_shrouding") { }
+
+    bool OnUse(Player* player, Item* /*item*/, SpellCastTargets const& targets) OVERRIDE
+    {
+        Creature* helixGear = player->FindNearestCreature(NPC_HELIX_GEARBREAKER, 50.0f);
+        Creature* helixOar = player->FindNearestCreature(NPC_HELIXS_LUMBERING_OAF, 50.0f);
+        if (helixGear && helixOar)
+        {
+            helixGear->AddAura(SPELL_RIDE_VEHICLE_HARDCODET, helixGear);
+            helixGear->CastSpell(helixOar, SPELL_RIDE_VEHICLE_HARDCODET);
+            CAST_AI(npc_helix_gearbreaker::npc_helix_gearbreakerAI, helixGear->AI())->StartAnim(player);
+            return false;
+        }
+
+        return false;
+    }
+};
 
 
 // ToDo: is not checked:  npc_daphne_stilwell
@@ -2099,4 +2371,7 @@ void AddSC_westfall()
 	new npc_defias_sentinel_hill();
 	new npc_riverpaw_westfall();
 	new npc_ripsnarl_sentinel_hill();
+    new npc_agent_kearnen();
+    new item_potion_of_shrouding();
+    new npc_helix_gearbreaker();
 }
