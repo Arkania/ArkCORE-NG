@@ -51,7 +51,7 @@ enum eQuest26209
 	NPC_FURLBROW_MURDER_INFO_004 = 42417,
 	NPC_VERNA_FURLBROW = 238,
 	NPC_OLD_BLANCHY = 582,
-    NPC_WESTFALL_STEW = 42617,
+	NPC_WESTFALL_STEW = 42617,
 	QUEST_HEROS_CALL_WESTFALL1 = 26378,
 	QUEST_HEROS_CALL_WESTFALL2 = 28562,
 	QUEST_MURDER_WAS_THE_CASE_THAT_THEY_GAVE_ME = 26209,
@@ -1213,32 +1213,32 @@ enum eQuest26236
 	SPELL_QUEST_PHASEMASK_4 = 59074,
 	SPELL_QUEST_PHASEMASK_8 = 59087,
 
-}; 
+};
 
 class npc_salma_saldean : public CreatureScript
 {
 public:
 	npc_salma_saldean() : CreatureScript("npc_salma_saldean") { }
 
-	bool OnQuestAccept(Player* player, Creature* /*creature*/, Quest const* quest) 
+	bool OnQuestAccept(Player* player, Creature* /*creature*/, Quest const* quest)
 	{
 		if (quest->GetQuestId() == QUEST_HOPE_FOR_THE_PEOPLE)
 		{
 			player->AddAura(SPELL_DETECT_QUEST_INVIS_3, player);
 		}
 
-		return false; 
+		return false;
 	}
 
-	bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*opt*/) 
-	{ 
+	bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*opt*/)
+	{
 		if (quest->GetQuestId() == QUEST_WESTFALL_STEW)
 		{
 			creature->AI()->Talk(0, player);
 			CAST_AI(npc_salma_saldeanAI, creature->AI())->StartAnimation();
 		}
 
-		return false; 
+		return false;
 	}
 
 
@@ -1251,7 +1251,7 @@ public:
 
 		void Reset() override
 		{
-			_timer = 0; _phase = 0; 
+			_timer = 0; _phase = 0;
 		}
 
 		void StartAnimation()
@@ -1286,10 +1286,10 @@ public:
 			case 1:
 				me->GetMotionMaster()->MovePath(me->GetGUIDLow() * 10, false);
 				_phase = 2;
-				_timer = 5000;  
+				_timer = 5000;
 				break;
 			case 2:
-				Talk(1); 
+				Talk(1);
 				_phase = 3;
 				_timer = 2000;
 				break;
@@ -1299,14 +1299,14 @@ public:
 				for (std::list<Creature*>::iterator itr = orphans.begin(); itr != orphans.end(); ++itr)
 				{
 					if (Creature* orphan = (*itr))
-						if (orphan->GetPositionZ()<40.0f)
+						if (orphan->GetPositionZ() < 40.0f)
 							orphan->GetMotionMaster()->MovePath(orphan->GetGUIDLow() * 10, false);
 				}
 				_phase = 4;
 				_timer = 7000;
 				break;
 			}
-			case 4:  
+			case 4:
 				if (Creature* orphan = me->FindRandomCreatureInRange(NPC_ORPHAN, 6.0f, true))
 				{
 					orphan->AI()->Talk(0);
@@ -1314,7 +1314,7 @@ public:
 				_phase = 5;
 				_timer = 2000;
 				break;
-			case 5:  
+			case 5:
 				if (Creature* orphan = me->FindRandomCreatureInRange(NPC_ORPHAN, 6.0f, true))
 				{
 					orphan->AI()->Talk(1);
@@ -1322,25 +1322,25 @@ public:
 				_phase = 6;
 				_timer = 15000;
 				break;
-			case 6:  
+			case 6:
 			{
 				std::list<Creature*> orphans = me->FindNearestCreatures(NPC_ORPHAN, 8.0f);
 				for (std::list<Creature*>::iterator itr = orphans.begin(); itr != orphans.end(); ++itr)
 				{
 					if (Creature* orphan = (*itr))
-						if (orphan->GetPositionZ()<40.0f)
+						if (orphan->GetPositionZ() < 40.0f)
 							orphan->GetMotionMaster()->MovePath(orphan->GetGUIDLow() * 10 + 1, false);
 				}
 				_phase = 7;
 				_timer = 2000;
 				break;
 			}
-			case 7:  
+			case 7:
 				me->GetMotionMaster()->MovePath(me->GetGUIDLow() * 10 + 1, false);
 				_phase = 0;
 				_timer = 0;
 				break;
-			case 8:  
+			case 8:
 				_phase = 0;
 				_timer = 0;
 				break;
@@ -1357,7 +1357,7 @@ public:
 // #############################################  preprare sentinel hill area..
 
 enum eSentinellHill
-{	
+{
 	NPC_SMALL_TIME_HUSTLER = 42390,
 	NPC_WEST_PLAINS_DRIFTER = 42391,
 	NPC_DEFIAS_KNUCKLEDUSTER = 449,
@@ -1405,11 +1405,13 @@ public:
 		}
 
 		void DamageTaken(Unit* attacker, uint32& damage) override
-        { 
+		{
 			if (IsShowfight(attacker) && me->GetHealthPct() < 70.0f)
 				damage = 0;
-        }
-		
+		}
+
+
+
 		void UpdateAI(uint32 diff) override
 		{
 			_events.Update(diff);
@@ -1444,7 +1446,7 @@ public:
 					case 3:
 						CastRandomAbility();
 						_phaseHomeless = 0;
-						_events.ScheduleEvent(EVENT_HOMELESS, urand(45000,75000));
+						_events.ScheduleEvent(EVENT_HOMELESS, urand(45000, 75000));
 						break;
 					default:
 						_phaseHomeless = 0;
@@ -1455,7 +1457,7 @@ public:
 				case EVENT_SHOWFIGHT:
 					if (me->GetAreaId() == 108 && !me->IsInCombat())
 					{
-						
+
 					}
 					_events.ScheduleEvent(EVENT_SHOWFIGHT, 10000);
 					break;
@@ -1480,8 +1482,8 @@ public:
 			if (creatureList.empty())
 				false;
 
-			uint32 count = urand(0, creatureList.size()-1);
-            int32 r2 = -1;
+			uint32 count = urand(0, creatureList.size() - 1);
+			int32 r2 = -1;
 			for (std::list<Creature*>::iterator itr = creatureList.begin(); itr != creatureList.end(); ++itr)
 			{
 				r2++;
@@ -1801,12 +1803,12 @@ public:
 			case 0:
 				if (Player* player = me->FindNearestPlayer(10.0f, true))
 					if (!HasPlayerSeenVideo(player->GetGUID()))
-					    if (player->HasAura(SPELL_DETECT_QUEST_INVIS_3))
-						    if (!player->HasAura(SPELL_DETECT_QUEST_INVIS_4))
-						    {
-							    _playerList.push_back(player->GetGUID());
-							    _phase = 1;
-						    }
+						if (player->HasAura(SPELL_DETECT_QUEST_INVIS_3))
+							if (!player->HasAura(SPELL_DETECT_QUEST_INVIS_4))
+							{
+								_playerList.push_back(player->GetGUID());
+								_phase = 1;
+							}
 				break;
 			case 1:
 				if (Creature* marshal = me->FindNearestCreature(NPC_MARSHAL_GRYAN_STOUTMANTLE_234, 15.0f))
@@ -1820,7 +1822,7 @@ public:
 					horatio->AI()->Talk(10);
 					horatio->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
 				}
-					
+
 				_timer = 7000; _phase = 3;
 				break;
 			case 3:
@@ -1842,7 +1844,7 @@ public:
 				Talk(10);
 				_timer = 7000; _phase = 6;
 				break;
-			case 6: 
+			case 6:
 				if (Creature* horatio = me->FindNearestCreature(NPC_HORATIO_LANE_42308, 15.0f))
 				{
 					horatio->GetMotionMaster()->MovePath(423081, false);
@@ -1857,7 +1859,7 @@ public:
 				}
 
 				_timer = 5000; _phase = 8;
-                break;
+				break;
 			case 8:
 				if (Creature* horatio = me->FindNearestCreature(NPC_HORATIO_LANE_42308, 15.0f))
 				{
@@ -1885,10 +1887,10 @@ public:
 			case 11:
 				if (Creature* horatio = me->FindNearestCreature(NPC_HORATIO_LANE_42308, 15.0f))
 					if (Creature* marshal = me->FindNearestCreature(NPC_MARSHAL_GRYAN_STOUTMANTLE_234, 15.0f))
-				    {
-					    horatio->RemoveAura(78935);
+					{
+						horatio->RemoveAura(78935);
 						horatio->SetFacingToObject(marshal);
-				    }
+					}
 				_timer = 4000;
 				_phase = 0;
 				break;
@@ -1906,7 +1908,7 @@ public:
 				}
 
 			return false;
-        }
+		}
 	};
 
 	CreatureAI* GetAI(Creature* creature) const
@@ -2080,7 +2082,7 @@ public:
 
 void AddSC_westfall()
 {
-    new npc_daphne_stilwell();
+	new npc_daphne_stilwell();
 	new npc_horatio_lane_42308();
 	new npc_west_plains_drifters();
 	new npc_transient();

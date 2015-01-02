@@ -24,5 +24,6 @@ insert into waypoint_data (id,point,position_x,position_y,position_z,orientation
 (423082, 3, -10508.9, 1047.37, 60.76798, 0, 0, 0, 0, 100),
 (423082, 4, -10507.508, 1048.514, 60.51798, 4.356, 0, 0, 0, 100);
 
+update creature_template set unit_flags=32768 where entry=42407;
 
  
