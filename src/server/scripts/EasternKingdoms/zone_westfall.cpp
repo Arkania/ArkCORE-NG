@@ -2362,6 +2362,9 @@ enum eQuest26320
 {
     NPC_VISION_OF_THE_PAST = 42693,
     NPC_VANESSA_VAN_CLEEF = 42371,
+    NPC_ALLIANCE_WARRIOR = 42699,
+    NPC_DEFIAS_BLACKGUARD = 42698,
+    NPC_EDWIN_VAN_CLEEF = 42697,
     QUEST_VISION_OF_THE_PAST = 26320,
     SPELL_VISION_OF_THE_PAST1 = 79586,
     SPELL_VISION_OF_THE_PAST2 = 79587,
@@ -2459,13 +2462,89 @@ public:
                 break;
             case 11:
                 if (Player* player = me->GetCharmerOrOwner()->ToPlayer())
+                    Talk(0, player);
+
+                _phase = 12; _timer = 5000;
+                break;
+            case 12:
+                if (Creature* warrier = me->FindNearestCreature(NPC_ALLIANCE_WARRIOR, 25.0f))
+                    warrier->AI()->Talk(2);
+
+                _phase = 13; _timer = 5000;
+                break;
+            case 13:
+                if (Creature* warrier = me->FindNearestCreature(NPC_ALLIANCE_WARRIOR, 25.0f))
+                    warrier->AI()->Talk(3);
+
+                me->SummonCreature(NPC_EDWIN_VAN_CLEEF, -78.37f, -819.90f, 39.30f, 3.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 300000);
+                me->SummonCreature(NPC_DEFIAS_BLACKGUARD, -78.28f, -824.78f, 40.00f, 2.932f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 300000);
+                me->SummonCreature(NPC_DEFIAS_BLACKGUARD, -77.81f, -815.10f, 40.02f, 3.264f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 300000);
+
+                _phase = 14; _timer = 5000;
+                break;
+            case 14:
+                if (Creature* cleef = me->FindNearestCreature(NPC_EDWIN_VAN_CLEEF, 25.0f))
+                    cleef->AI()->Talk(1);
+
+                _phase = 15; _timer = 2000;
+                break;
+            case 15:
+                if (Creature* defias = me->FindNearestCreature(NPC_DEFIAS_BLACKGUARD, 25.0f))
+                    defias->AI()->Talk(0);
+
+                _phase = 16; _timer = 3000;
+                break;
+            case 16:
+                if (Creature* cleef = me->FindNearestCreature(NPC_EDWIN_VAN_CLEEF, 25.0f))
+                    cleef->AI()->Talk(2);
+                
+                _phase = 17; _timer = 5000;
+                break;
+            case 17:
+                if (Creature* cleef = me->FindNearestCreature(NPC_EDWIN_VAN_CLEEF, 25.0f))
+                    cleef->AI()->Talk(1);
+
+                _phase = 18; _timer = 3000;
+                break;
+            case 18:
+                if (Creature* cleef = me->FindNearestCreature(NPC_EDWIN_VAN_CLEEF, 25.0f))
+                    cleef->AI()->Talk(3);
+
+                _phase = 19; _timer = 5000;
+                break;
+            case 19:
+                if (Creature* cleef = me->FindNearestCreature(NPC_EDWIN_VAN_CLEEF, 25.0f))
+                    cleef->AI()->Talk(4);
+
+                _phase = 20; _timer = 5000;
+                break;
+            case 20:
+                if (Creature* warrier = me->FindNearestCreature(NPC_ALLIANCE_WARRIOR, 25.0f))
+                    warrier->AI()->Talk(0);
+
+                _phase = 21; _timer = 5000;
+                break;
+            case 21:
+                if (Creature* warrier = me->FindNearestCreature(NPC_ALLIANCE_WARRIOR, 25.0f))
+                    warrier->AI()->Talk(1);
+
+                _phase = 22; _timer = 5000;
+                break;
+            case 22:
+                if (Creature* vanessa = me->FindNearestCreature(NPC_VANESSA_VAN_CLEEF, 35.0f))
+                    vanessa->AI()->Talk(0);
+
+                _phase = 23; _timer = 5000;
+                break;
+            case 23:
+                if (Player* player = me->GetCharmerOrOwner()->ToPlayer())
                 {
                     player->CastSpell(player, SPELL_VISION_OF_THE_PAST_FINISH, true);
                     player->KilledMonsterCredit(NPC_VANESSA_VAN_CLEEF);
                 }
-                _phase = 12; _timer = 5000;
+                _phase = 24; _timer = 5000;
                 break;
-            case 12:
+            case 24:
                 if (Player* player = me->GetCharmerOrOwner()->ToPlayer())
                 {
                     me->RemoveAura(SPELL_VISION_OF_THE_PAST1);
@@ -2473,12 +2552,13 @@ public:
                     player->RemoveAura(SPELL_VISION_OF_THE_PAST1);
                     player->RemoveAura(SPELL_VISION_OF_THE_PAST2);
                     player->SetVisible(true);
-                    player->TeleportTo(0,-10916.2f,1521.1f, 51.552f, 4.587f);
+                    player->TeleportTo(0, -10916.2f, 1521.1f, 51.552f, 4.587f);
                 }
-                _phase = 0;
+                _phase = 25;
                 break;
-            case 13:
+            case 25:
                 me->DespawnOrUnsummon(0);
+                _phase = 0;
                 break;
             }
         }
