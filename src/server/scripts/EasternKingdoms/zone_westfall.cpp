@@ -2356,7 +2356,145 @@ public:
     }
 };
 
-// ############################################# quest
+// ############################################# quest 26320 Vision of the past
+
+enum eQuest26320
+{
+    NPC_VISION_OF_THE_PAST = 42693,
+    NPC_VANESSA_VAN_CLEEF = 42371,
+    QUEST_VISION_OF_THE_PAST = 26320,
+    SPELL_VISION_OF_THE_PAST1 = 79586,
+    SPELL_VISION_OF_THE_PAST2 = 79587,
+    SPELL_VISION_OF_THE_PAST_FINISH = 79620,
+};
+
+class npc_vision_of_the_past : public CreatureScript
+{
+public:
+    npc_vision_of_the_past() : CreatureScript("npc_vision_of_the_past") { }
+
+    struct npc_vision_of_the_past_VehicleAI : public VehicleAI
+    {
+        npc_vision_of_the_past_VehicleAI(Creature *c) : VehicleAI(c) { }
+
+        uint32      _timer;
+        uint32      _phase;
+
+        void Reset() override
+        {
+            _timer = 200;
+            _phase = 0;
+            me->SetDisplayId(11686);
+        }
+
+
+        void MovementInform(uint32 type, uint32 id) override
+        { 
+            AllNpcFeignDeath();
+            if (type==2 && id == 5)
+            {
+                _phase = 10;
+                _timer = 200;
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (_timer <= diff)
+            {
+                _timer = 1000;
+                DoWork();
+            }
+            else
+                _timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+
+        void DoWork()
+        {
+            switch (_phase)
+            {
+            case 0:
+                if (Player* player = me->GetCharmerOrOwner()->ToPlayer())
+                    if (player->GetQuestStatus(QUEST_VISION_OF_THE_PAST) == QUEST_STATUS_INCOMPLETE)
+                    {
+                        _phase = 1;
+                        _timer = 200;
+                    }
+                break;
+            case 1:
+                if (Player* player = me->GetCharmerOrOwner()->ToPlayer())
+                    me->NearTeleportTo(-97.8f, -690.0f, 24.4f, 4.5f);
+                
+                _phase = 2;
+                _timer = 200;
+                break;
+            case 2:
+                if (Player* player = me->GetCharmerOrOwner()->ToPlayer())
+                {
+                    me->SetVisible(false);
+                    player->SetVisible(false);
+                    me->SetDisableGravity(true);
+                    me->SetCanFly(true);
+                    me->SetSpeed(MOVE_WALK, 6.0f, true);
+                    me->SetSpeed(MOVE_FLIGHT, 6.0f, true);
+                    me->SetWalk(false);
+                    me->GetMotionMaster()->MovePath(426930, false);
+                }
+                _phase = 3;
+                _timer = 300000;
+                break;
+            case 3:
+                me->DespawnOrUnsummon();
+                break;
+            case 10:
+                // here start the showfight between van cleef and the alliance warrior's
+                // but all this instance have double and wrong spawns..
+                // so i stop here for future time
+                _phase = 11;
+                break;
+            case 11:
+                if (Player* player = me->GetCharmerOrOwner()->ToPlayer())
+                {
+                    player->CastSpell(player, SPELL_VISION_OF_THE_PAST_FINISH, true);
+                    player->KilledMonsterCredit(NPC_VANESSA_VAN_CLEEF);
+                }
+                _phase = 12; _timer = 5000;
+                break;
+            case 12:
+                if (Player* player = me->GetCharmerOrOwner()->ToPlayer())
+                {
+                    me->RemoveAura(SPELL_VISION_OF_THE_PAST1);
+                    me->RemoveAura(SPELL_VISION_OF_THE_PAST2);
+                    player->RemoveAura(SPELL_VISION_OF_THE_PAST1);
+                    player->RemoveAura(SPELL_VISION_OF_THE_PAST2);
+                    player->SetVisible(true);
+                    player->TeleportTo(0,-10916.2f,1521.1f, 51.552f, 4.587f);
+                }
+                _phase = 0;
+                break;
+            case 13:
+                me->DespawnOrUnsummon(0);
+                break;
+            }
+        }
+
+        void AllNpcFeignDeath()
+        {
+           
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_vision_of_the_past_VehicleAI(creature);
+    }
+};
+
 
 
 // ToDo: is not checked:  npc_daphne_stilwell
@@ -2543,4 +2681,5 @@ void AddSC_westfall()
     new item_potion_of_shrouding();
     new npc_helix_gearbreaker();
     new npc_van_cleef_dummy();
+    new npc_vision_of_the_past();
 }
