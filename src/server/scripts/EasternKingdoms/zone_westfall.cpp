@@ -2575,6 +2575,876 @@ public:
     }
 };
 
+// ############################################# quest 26322    Rise of the Brotherhood
+
+enum eQuest26322
+{
+    QUEST_RISE_OF_THE_BROTHERHOOD = 26322,
+    // NPC_MARSHAL_GRYAN_STOUTMANTLE_234 = 234,
+    NPC_HORATIO_LANE_42744 = 42744,
+    NPC_STORMWIND_INVESTIGATOR_42745 = 42745,
+    NPC_RIPSNARL_42748 = 42748,
+    NPC_HOPE_SALDEAN_42749 = 42749,
+    NPC_MARSHAL_GRYAN_STOUTMANTLE_42750 = 42750,
+    NPC_CAPTAIN_DANUVIN = 42751,
+    NPC_SCOUT_GALIAAN = 42752,
+    NPC_KING_WARIAN_WRYNN = 29611,
+    NPC_GLUBTOK_42755 = 42755,
+    NPC_HELIX_GEARBREAKER_42753 = 42753,
+    NPC_DEFIAS_BLACKGUARD_42769 = 42769,
+    NPC_SENTINEL_HILL_FIRE_TRIGGER = 42793,
+    SPELL_GENERIC_TRIGGER_1_GRYAN = 79785,
+    SPELL_GENERIC_TRIGGER_1_HOPE = 79786,
+    SPELL_GENERIC_TRIGGER_1_RIPSNARL = 79787,
+    SPELL_GENERIC_TRIGGER_1_HORATIO = 79788,
+    SPELL_GENERIC_TRIGGER_10_BLACKGUARDS = 79789,
+    SPELL_GENERIC_TRIGGER_2_GRYAN = 79790,
+    SPELL_GENERIC_TRIGGER_10_HELIX = 79791,
+    SPELL_GENERIC_TRIGGER_10_RIPSNARL = 79792,
+    SPELL_GENERIC_TRIGGER_10_GLUBTOK = 79793,
+    SPELL_GENERIC_TRIGGER_10_HOPE = 79794,
+    SPELL_GENERIC_TORCH_TOSS_TRIGGER = 79779,
+    SPELL_VANESSA_TRANSFORM = 79709,
+    SPELL_SPAWN_SMOKE = 79705,
+    SPELL_SUMMON_GLUBTOK_42755 = 79762,
+    SPELL_SUMMON_HELIX_42753 = 79763,
+    SPELL_SUMMON_DEFIAS_BLACKGUARD1 = 79708,
+    SPELL_SUMMON_DEFIAS_BLACKGUARD2 = 79712,
+    SPELL_SIMPLE_TELEPORT = 64195,
+    SPELL_TIE_UP_GOOD_GUYS1 = 79723,
+    SPELL_TIE_UP_GOOD_GUYS2 = 79795,
+    SPELL_TIED_UP = 79724,
+    SPELL_RIPSNARL_TRANSFORM_HUMAN = 79745,
+    SPELL_ADMIRALS_HAT = 79750,
+    SPELL_QUEST_CREDIT_DEFIAS_FINALE_EVENT = 79758,
+    SPELL_TOSS_TORCH = 79778,
+    SPELL_CLIFFWALKER_FIRE = 78573,
+};
+
+class npc_marshal_gryan_stoutmantle_234 : public CreatureScript
+{
+public:
+    npc_marshal_gryan_stoutmantle_234() : CreatureScript("npc_marshal_gryan_stoutmantle_234") { }
+
+    bool OnQuestAccept(Player* player, Creature* /*creature*/, Quest const* quest)
+    {
+        if (quest->GetQuestId() == QUEST_RISE_OF_THE_BROTHERHOOD)
+        {
+            player->SetPhaseMask(4, true);  // sniff phase = 232
+            player->CastSpell(player, 79663);
+            player->CastSpell(player, 79664);
+            player->CastSpell(player, 79665);
+            player->CastSpell(player, 79666);
+            player->CastSpell(player, 79667);
+            player->CastSpell(player, 79668);
+            player->CastSpell(player, 79669);
+            player->CastSpell(player, 79670);
+            player->CastSpell(player, 79679);  // from sniff
+            player->CastSpell(player, SPELL_GENERIC_TRIGGER_1_GRYAN); // from sniff
+        }
+
+        return true;
+    }
+};
+
+class npc_thor_523 : public CreatureScript
+{
+public:
+    npc_thor_523() : CreatureScript("npc_thor_523") { }
+
+    bool OnGossipHello(Player* player, Creature* /*creature*/) 
+    { 
+        if (player->GetQuestStatus(QUEST_RISE_OF_THE_BROTHERHOOD) == QUEST_STATUS_COMPLETE && player->GetPhaseMask() == 4)
+        {
+            player->SetPhaseMask(1, true);
+            player->RemoveAllAuras();
+            return true;
+        }
+
+        return false; 
+    }
+    
+};
+
+class npc_lieutenant_horatio_laine_42744 : public CreatureScript
+{
+public:
+    npc_lieutenant_horatio_laine_42744() : CreatureScript("npc_lieutenant_horatio_laine_42744") { }
+
+    struct npc_lieutenant_horatio_laine_42744AI : public ScriptedAI
+    {
+        npc_lieutenant_horatio_laine_42744AI(Creature* creature) : ScriptedAI(creature) { }
+
+        uint32  _phase;
+        uint32  _timer;
+
+        void Reset() override
+        {
+            me->SetOrientation(4.398f);
+        }
+
+        void SpellHit(Unit* caster, SpellInfo const* spell)
+        {
+            if (spell->Id == SPELL_GENERIC_TRIGGER_1_HORATIO)
+            {
+                _phase = 1;
+                _timer = 1500;
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (_timer <= diff)
+            {
+                _timer = 1000;
+                DoWork();
+            }
+            else
+                _timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+
+        void DoWork()
+        {
+            switch (_phase)
+            {
+            case 0:
+                break;
+            case 1: // 51:22
+                Talk(0);
+
+                _timer = 3000; _phase = 2;
+                break;
+            case 2: // 51:25
+                Talk(1);
+
+                _timer = 4000; _phase = 3;
+                break;
+            case 3:
+                me->CastSpell(me, SPELL_TIED_UP);
+                _timer = 5000; _phase = 4;
+                break;
+            case 4:
+                break;
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_lieutenant_horatio_laine_42744AI(creature);
+    }
+};
+
+class npc_Ripsnarl_42748 : public CreatureScript
+{
+public:
+    npc_Ripsnarl_42748() : CreatureScript("npc_Ripsnarl_42748") { }
+
+    struct npc_Ripsnarl_42748AI : public ScriptedAI
+    {
+        npc_Ripsnarl_42748AI(Creature* creature) : ScriptedAI(creature) { }
+
+        uint32  _phase;
+        uint32  _timer;
+
+        void Reset() override
+        {
+            _phase = 0;
+            _timer = 0;
+            me->SetOrientation(0.489f);
+        }
+
+        void SpellHit(Unit* caster, SpellInfo const* spell)
+        {
+            if (spell->Id == SPELL_GENERIC_TRIGGER_1_RIPSNARL)
+            {
+                _phase = 1;
+                _timer = 300;
+            }
+            else if (spell->Id == SPELL_GENERIC_TRIGGER_10_RIPSNARL)
+            { 
+                me->GetMotionMaster()->MovePoint(0, -10516.03f, 1062.179f, 55.78939f);
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (_timer <= diff)
+            {
+                _timer = 1000;
+                DoWork();
+            }
+            else
+                _timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+
+        void DoWork()
+        {
+            switch (_phase)
+            {
+            case 0:
+                break;
+            case 1:
+                me->CastSpell(me, SPELL_RIPSNARL_TRANSFORM_HUMAN, false); // 51:07
+
+                _timer = 3700; _phase = 2;
+                break;
+            case 2: //  51:10
+                me->GetMotionMaster()->MovePoint(0, -10514.8f, 1045.6f, 60.80753f);
+                me->HandleEmoteCommand(1);
+                Talk(0);
+
+                _timer = 3000; _phase = 3;
+                break;
+            case 3: // 51:13
+                me->GetMotionMaster()->MovePath(427481, false);
+
+                _timer = 2000; _phase = 4;
+                break;
+            case 4: // 51:15
+                me->CastSpell(me, SPELL_ADMIRALS_HAT);
+
+                _timer = 5000; _phase = 5;
+                break;
+            case 5:
+                break;
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_Ripsnarl_42748AI(creature);
+    }
+};
+
+class npc_captain_danuvin_42751 : public CreatureScript
+{
+public:
+    npc_captain_danuvin_42751() : CreatureScript("npc_captain_danuvin_42751") { }
+
+    struct npc_captain_danuvin_42751AI : public ScriptedAI
+    {
+        npc_captain_danuvin_42751AI(Creature* creature) : ScriptedAI(creature) { }
+
+        void Reset() override
+        {
+            me->SetOrientation(1.920f);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_captain_danuvin_42751AI(creature);
+    }
+};
+
+class npc_scout_galiaan_42752 : public CreatureScript
+{
+public:
+    npc_scout_galiaan_42752() : CreatureScript("npc_scout_galiaan_42752") { }
+
+    struct npc_scout_galiaan_42752AI : public ScriptedAI
+    {
+        npc_scout_galiaan_42752AI(Creature* creature) : ScriptedAI(creature) { }
+
+        void Reset() override
+        {
+            me->SetOrientation(1.920f);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_scout_galiaan_42752AI(creature);
+    }
+};
+
+class npc_stormwind_investigator_42745 : public CreatureScript
+{
+public:
+    npc_stormwind_investigator_42745() : CreatureScript("npc_stormwind_investigator_42745") { }
+
+    struct npc_stormwind_investigator_42745AI : public ScriptedAI
+    {
+        npc_stormwind_investigator_42745AI(Creature* creature) : ScriptedAI(creature) { }
+
+        void Reset() override
+        {
+            me->SetOrientation(4.555f);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_stormwind_investigator_42745AI(creature);
+    }
+};
+
+class npc_helix_gearbreaker_42753 : public CreatureScript
+{
+public:
+    npc_helix_gearbreaker_42753() : CreatureScript("npc_helix_gearbreaker_42753") { }
+
+    struct npc_helix_gearbreaker_42753AI : public ScriptedAI
+    {
+        npc_helix_gearbreaker_42753AI(Creature* creature) : ScriptedAI(creature) { }
+
+        void Reset() override
+        {
+            me->GetMotionMaster()->MovePath(427531, false);
+        }
+
+        void SpellHit(Unit* caster, SpellInfo const* spell)
+        {
+            if (spell->Id == SPELL_GENERIC_TRIGGER_10_HELIX)
+            {
+                me->GetMotionMaster()->MovePoint(0, -10519.46f, 1061.701f, 55.5351f);
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_helix_gearbreaker_42753AI(creature);
+    }
+};
+
+class npc_glubtok_42755 : public CreatureScript
+{
+public:
+    npc_glubtok_42755() : CreatureScript("npc_glubtok_42755") { }
+
+    struct npc_glubtok_42755AI : public ScriptedAI
+    {
+        npc_glubtok_42755AI(Creature* creature) : ScriptedAI(creature) { }
+
+        void Reset() override
+        {
+            me->SetOrientation(4.642f);
+        }
+
+        void SpellHit(Unit* caster, SpellInfo const* spell)
+        {
+            if (spell->Id == SPELL_GENERIC_TRIGGER_10_GLUBTOK)
+            {
+                me->GetMotionMaster()->MovePath(427551, false);
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_glubtok_42755AI(creature);
+    }
+};
+
+class npc_defias_blackguard_42769 : public CreatureScript
+{
+public:
+    npc_defias_blackguard_42769() : CreatureScript("npc_defias_blackguard_42769") { }
+
+    struct npc_defias_blackguard_42769AI : public ScriptedAI
+    {
+        npc_defias_blackguard_42769AI(Creature* creature) : ScriptedAI(creature) { }
+
+        uint32  _phase;
+        uint32  _timer;
+
+        void Reset() override
+        {
+            _phase = 0;
+            _timer = 0;
+        }
+
+        void MovementInform(uint32 type, uint32 id) override
+        {
+            if (type == 2)
+            {
+                _phase = 3;
+                _timer = 200;
+            }
+        }
+
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
+        {
+            if (spell->Id == SPELL_GENERIC_TRIGGER_10_BLACKGUARDS)
+            {
+                me->GetMotionMaster()->MovePath(4276901 + urand(0, 13), false);
+            }
+            else if (spell->Id == SPELL_GENERIC_TORCH_TOSS_TRIGGER)
+            {
+                _phase = 1;
+                _timer = 500;
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (_timer <= diff)
+            {
+                _timer = 1000;
+                DoWork();
+            }
+            else
+                _timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+
+        void DoWork()
+        {
+            switch (_phase)
+            {
+            case 0:
+                break;
+            case 1:
+                me->RemoveAura(SPELL_TOSS_TORCH);
+                me->GetMotionMaster()->MovePath(4276901 + urand(0, 13), false);
+
+                _timer = 60000; _phase = 2;
+                break;
+            case 2:
+                break;
+            case 3:
+                if (Creature* npc = me->FindNearestCreature(NPC_SENTINEL_HILL_FIRE_TRIGGER, 50.0f))
+                    npc->CastSpell(npc, SPELL_CLIFFWALKER_FIRE, true);
+                
+                _timer = 60000; _phase = 1;
+                break;
+            case 4:
+                break;
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_defias_blackguard_42769AI(creature);
+    }
+};
+
+class npc_hope_saldean_42749 : public CreatureScript
+{
+public:
+    npc_hope_saldean_42749() : CreatureScript("npc_hope_saldean_42749") { }
+
+    struct npc_hope_saldean_42749AI : public ScriptedAI
+    {
+        npc_hope_saldean_42749AI(Creature* creature) : ScriptedAI(creature) { }
+
+        uint32  _phase;
+        uint32  _timer;
+
+        void Reset() override
+        {
+            _phase = 0;
+            _timer = 0;
+            me->SetOrientation(2.024f);
+        }
+
+        void SpellHit(Unit* caster, SpellInfo const* spell)
+        {
+            if (spell->Id == SPELL_GENERIC_TRIGGER_1_HOPE)
+            {
+                _phase = 1;
+                _timer = 1000;
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (_timer <= diff)
+            {
+                _timer = 1000;
+                DoWork();
+            }
+            else
+                _timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+
+        void DoWork()
+        {
+            switch (_phase)
+            {
+            case 0:
+                break;
+            case 1:
+                me->GetMotionMaster()->MovePoint(0, -10507.4f, 1042.33f, 60.518f);
+                _timer = 3000; _phase = 2;
+                break;
+            case 2:
+                me->HandleEmoteCommand(25);
+                Talk(0);
+                _timer = 5000; _phase = 3;
+                break;
+            case 3:
+                if (Creature* gryan = me->FindNearestCreature(NPC_MARSHAL_GRYAN_STOUTMANTLE_42750, 25.0f))
+                {
+                    gryan->SetFacingToObject(me);
+                    gryan->HandleEmoteCommand(5);
+                    gryan->AI()->Talk(5);
+                }
+
+                _timer = 4000; _phase = 4;
+                break;
+            case 4:
+                Talk(1);
+
+                _timer = 5000; _phase = 5;
+                break;
+            case 5:
+                Talk(2);
+
+                _timer = 7000; _phase = 6;
+                break;
+            case 6:
+                me->CastSpell(me, SPELL_VANESSA_TRANSFORM, true);
+                _timer = 1000; _phase = 7;
+                break;
+            case 7:
+                me->HandleEmoteCommand(22);
+
+                _timer = 1000; _phase = 8;
+                break;
+            case 8:
+                Talk(3);
+
+                _timer = 2000; _phase = 9;
+                break;
+            case 9:
+                if (Player* player = me->FindNearestPlayer(25.0f, true))
+                {
+                    player->CastSpell(player, SPELL_SUMMON_DEFIAS_BLACKGUARD1);
+                    player->CastSpell(player, SPELL_SUMMON_GLUBTOK_42755);
+                    player->CastSpell(player, SPELL_SUMMON_HELIX_42753);
+                    Creature* defia;
+                    if (defia = me->SummonCreature(NPC_DEFIAS_BLACKGUARD_42769, -10510.16f, 1052.729f, 59.49126f, 4.892217f))
+                        defia->CastSpell(defia, 79705, false);
+                    if (defia = me->SummonCreature(NPC_DEFIAS_BLACKGUARD_42769, -10501.51f, 1046.292f, 60.60131f, 3.286149f))
+                        defia->CastSpell(defia, 79705, false);
+                    if (defia = me->SummonCreature(NPC_DEFIAS_BLACKGUARD_42769, -10512.69f, 1038.826f, 60.60131f, 1.024716f))
+                        defia->CastSpell(defia, 79705, false);
+                    if (defia = me->SummonCreature(NPC_DEFIAS_BLACKGUARD_42769, -10514.43f, 1049.165f, 60.17525f, 5.67358f))
+                        defia->CastSpell(defia, 79705, false);
+                    if (defia = me->SummonCreature(NPC_DEFIAS_BLACKGUARD_42769, -10505.78f, 1040.786f, 60.60131f, 2.167208f))
+                        defia->CastSpell(defia, 79705, false);
+                    if (defia = me->SummonCreature(NPC_DEFIAS_BLACKGUARD_42769, -10507.73f, 1039.929f, 60.60131f, 1.769489f))
+                        defia->CastSpell(defia, 79705, false);
+                    if (defia = me->SummonCreature(NPC_DEFIAS_BLACKGUARD_42769, -10512.3f, 1042.028f, 60.60131f, 0.7404307f))
+                        defia->CastSpell(defia, 79705, false);
+                    if (defia = me->SummonCreature(NPC_DEFIAS_BLACKGUARD_42769, -10516.88f, 1048.599f, 60.03143f, 5.888236f))
+                        defia->CastSpell(defia, 79705, false);
+                    if (defia = me->SummonCreature(NPC_DEFIAS_BLACKGUARD_42769, -10507.99f, 1051.469f, 60.25721f, 4.58273f))
+                        defia->CastSpell(defia, 79705, false);
+                    if (defia = me->SummonCreature(NPC_DEFIAS_BLACKGUARD_42769, -10504.66f, 1050.417f, 60.60131f, 4.038786f))
+                        defia->CastSpell(defia, 79705, false);
+                    if (defia = me->SummonCreature(NPC_DEFIAS_BLACKGUARD_42769, -10515.77f, 1040.724f, 60.60131f, 0.5737885f))
+                        defia->CastSpell(defia, 79705, false);
+                    if (defia = me->SummonCreature(NPC_DEFIAS_BLACKGUARD_42769, -10505.0f, 1053.427f, 59.97273f, 4.278519f))
+                        defia->CastSpell(defia, 79705, false);
+                    if (defia = me->SummonCreature(NPC_DEFIAS_BLACKGUARD_42769, -10511.16f, 1050.486f, 60.16436f, 5.134159f))
+                        defia->CastSpell(defia, 79705, false);
+                    if (defia = me->SummonCreature(NPC_DEFIAS_BLACKGUARD_42769, -10501.6f, 1042.736f, 60.60131f, 2.808118f))
+                        defia->CastSpell(defia, 79705, false);
+                    if (defia = me->SummonCreature(NPC_DEFIAS_BLACKGUARD_42769, -10514.06f, 1052.134f, 59.15881f, 5.363449f))
+                        defia->CastSpell(defia, 79705, false);
+                }
+
+                _timer = 1000; _phase = 10;
+                break;
+            case 10:
+                if (Creature* glubtok = me->FindNearestCreature(NPC_GLUBTOK_42755, 25.0))
+                    glubtok->CastSpell(glubtok, SPELL_SIMPLE_TELEPORT);
+
+
+                _timer = 5000; _phase = 11;
+                break;
+            case 11:
+                me->HandleEmoteCommand(25);
+                Talk(4); // tie them
+
+                _timer = 2000; _phase = 12;
+                break;
+            case 12:
+            {
+                me->CastSpell(me, SPELL_TIE_UP_GOOD_GUYS2);
+                if (Player* player = me->FindNearestPlayer(25.0f, true))
+                    player->CastSpell(player, SPELL_TIE_UP_GOOD_GUYS1);
+
+                if (Creature* npc = me->FindNearestCreature(NPC_HORATIO_LANE_42744, 25.0f))
+                    npc->CastSpell(npc, SPELL_TIE_UP_GOOD_GUYS1);
+
+                if (Creature* npc = me->FindNearestCreature(NPC_MARSHAL_GRYAN_STOUTMANTLE_42750, 25.0f))
+                    npc->CastSpell(npc, SPELL_TIE_UP_GOOD_GUYS1);
+
+                if (Creature* npc = me->FindNearestCreature(NPC_CAPTAIN_DANUVIN, 25.0f))
+                    npc->CastSpell(npc, SPELL_TIE_UP_GOOD_GUYS1);
+
+                if (Creature* npc = me->FindNearestCreature(NPC_SCOUT_GALIAAN, 25.0f))
+                    npc->CastSpell(npc, SPELL_TIE_UP_GOOD_GUYS1);
+
+                std::list<Creature*> npcList;
+                npcList = me->FindNearestCreatures(NPC_STORMWIND_INVESTIGATOR_42745, 25.0f);
+                for (std::list<Creature*>::iterator itr = npcList.begin(); itr != npcList.end(); ++itr)
+                {
+                    Creature* npc = *itr;
+                    npc->CastSpell(npc, SPELL_TIE_UP_GOOD_GUYS1);
+                }
+
+                if (Player* player = me->FindNearestPlayer(25.0f, true))
+                    player->CastSpell(player, SPELL_TIED_UP);
+
+                if (Creature* npc = me->FindNearestCreature(NPC_HORATIO_LANE_42744, 25.0f))
+                    npc->CastSpell(npc, SPELL_TIED_UP);
+
+                if (Creature* npc = me->FindNearestCreature(NPC_MARSHAL_GRYAN_STOUTMANTLE_42750, 25.0f))
+                    npc->CastSpell(npc, SPELL_TIED_UP);
+
+                if (Creature* npc = me->FindNearestCreature(NPC_CAPTAIN_DANUVIN, 25.0f))
+                    npc->CastSpell(npc, SPELL_TIED_UP);
+
+                if (Creature* npc = me->FindNearestCreature(NPC_SCOUT_GALIAAN, 25.0f))
+                    npc->CastSpell(npc, SPELL_TIED_UP);
+
+                npcList = me->FindNearestCreatures(NPC_STORMWIND_INVESTIGATOR_42745, 25.0f);
+                for (std::list<Creature*>::iterator itr = npcList.begin(); itr != npcList.end(); ++itr)
+                {
+                    Creature* npc = *itr;
+                    npc->CastSpell(npc, SPELL_TIED_UP);
+                }
+                _timer = 1000; _phase = 13;
+            }
+            break;
+            case 13:
+                me->GetMotionMaster()->MovePoint(0, -10512.44f, 1044.438f, 60.51799f);
+                _timer = 3000; _phase = 14;
+                break;
+            case 14:
+                me->HandleEmoteCommand(54);
+                _timer = 2000; _phase = 15;
+                break;
+            case 15:
+                me->HandleEmoteCommand(1);
+                Talk(5);
+                _timer = 1000; _phase = 16;
+                break;
+            case 16:  // 51:06
+                if (Creature* npc = me->FindNearestCreature(NPC_RIPSNARL_42748, 25.0f))
+                    npc->CastSpell(npc, SPELL_GENERIC_TRIGGER_1_RIPSNARL, false);
+
+                _timer = 6500; _phase = 17;
+                break;
+            case 17: // 51 : 13
+                me->GetMotionMaster()->MovePoint(0, -10512.44f, 1044.438f, 60.51799f);
+
+                if (Player* player = me->FindNearestPlayer(25.0f, true))
+                    me->SetFacingToObject(player);
+
+                me->HandleEmoteCommand(25);
+                Talk(6);
+
+                _timer = 7000; _phase = 18;
+                break;
+            case 18: // 51:20
+                me->GetMotionMaster()->MovePath(427491, false);
+
+                _timer = 2000; _phase = 19;
+                break;
+            case 19: // 51:22
+                if (Creature* horatio = me->FindNearestCreature(NPC_HORATIO_LANE_42744, 25.0f))
+                    horatio->CastSpell(horatio, SPELL_GENERIC_TRIGGER_1_HORATIO);
+
+                _timer = 6000; _phase = 20;
+                break;
+            case 20: // 51:28
+                Talk(7);
+
+                _timer = 9000; _phase = 21;
+                break;
+            case 21: // 51:37
+                me->HandleEmoteCommand(1);
+
+                _timer = 1000; _phase = 22;
+                break;
+            case 22: // 51:38
+                Talk(8);
+
+                _timer = 5000; _phase = 23;
+                break;
+            case 23: // 51:43
+                me->HandleEmoteCommand(22);
+                Talk(9);
+
+                _timer = 6000; _phase = 24;
+                break;
+            case 24: // 51:49
+                me->GetMotionMaster()->MovePoint(0, -10518.14f, 1067.859f, 54.86662f);
+
+                _timer = 5000; _phase = 25;
+                break;
+            case 25:// 51:52
+            {
+                std::list<Creature*> npcList;
+                npcList = me->FindNearestCreatures(NPC_DEFIAS_BLACKGUARD_42769, 25.0f);
+                for (std::list<Creature*>::iterator itr = npcList.begin(); itr != npcList.end(); ++itr)
+                {
+                    Creature* npc = *itr;
+                    npc->CastSpell(npc, SPELL_GENERIC_TRIGGER_10_BLACKGUARDS);
+                }
+            }
+
+            if (Creature* horatio = me->FindNearestCreature(NPC_MARSHAL_GRYAN_STOUTMANTLE_42750, 25.0f))
+                horatio->CastSpell(horatio, SPELL_GENERIC_TRIGGER_2_GRYAN);
+
+            if (Creature* horatio = me->FindNearestCreature(NPC_HELIX_GEARBREAKER_42753, 25.0f))
+                horatio->CastSpell(horatio, SPELL_GENERIC_TRIGGER_10_HELIX);
+
+            if (Creature* horatio = me->FindNearestCreature(NPC_RIPSNARL_42748, 25.0f))
+                horatio->CastSpell(horatio, SPELL_GENERIC_TRIGGER_10_RIPSNARL);
+
+            if (Creature* horatio = me->FindNearestCreature(NPC_GLUBTOK_42755, 25.0f))
+                horatio->CastSpell(horatio, SPELL_GENERIC_TRIGGER_10_GLUBTOK);
+
+            if (Creature* horatio = me->FindNearestCreature(NPC_HOPE_SALDEAN_42749, 25.0f))
+                horatio->CastSpell(horatio, SPELL_GENERIC_TRIGGER_10_HOPE);
+
+            _timer = 5000; _phase = 26;
+            break;
+            case 26:// 51:53
+            {
+                std::list<Creature*> npcList = me->FindNearestCreatures(NPC_DEFIAS_BLACKGUARD_42769, 25.0f);
+                for (std::list<Creature*>::iterator itr = npcList.begin(); itr != npcList.end(); ++itr)
+                {
+                    Creature* npc = *itr;
+                    npc->CastSpell(npc, SPELL_GENERIC_TORCH_TOSS_TRIGGER);
+                }
+            }
+
+            _timer = 5000; _phase = 27;
+            break;
+            case 27:// 
+
+                _timer = 5000; _phase = 28;
+                break;
+            case 28:// 
+
+                _timer = 5000; _phase = 29;
+                break;
+            }
+        }
+
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override   // empty phase, waiting on next trigger
+    {
+        return new npc_hope_saldean_42749AI(creature);
+    }
+};
+
+class npc_marshal_gryan_stoutmantle_42750 : public CreatureScript
+{
+public:
+    npc_marshal_gryan_stoutmantle_42750() : CreatureScript("npc_marshal_gryan_stoutmantle_42750") { }
+
+    struct npc_marshal_gryan_stoutmantle_42750AI : public ScriptedAI
+    {
+        npc_marshal_gryan_stoutmantle_42750AI(Creature* creature) : ScriptedAI(creature) { }
+
+        uint32  _phase;
+        uint32  _timer;
+
+        void Reset() override
+        {
+            _phase = 0;
+            _timer = 1000;
+            me->SetOrientation(1.204f);
+        }
+
+        void SpellHit(Unit* caster, SpellInfo const* spell)
+        {
+            if (spell->Id == SPELL_GENERIC_TRIGGER_2_GRYAN)
+            {
+                _phase = 4;
+                _timer = 1000;
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (_timer <= diff)
+            {
+                _timer = 1000;
+                DoWork();
+            }
+            else
+                _timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+
+        void DoWork()
+        {
+            switch (_phase)
+            {
+            case 0:
+                _timer = 3000; _phase = 1;
+                break;
+            case 1:
+                Talk(4);
+                _timer = 1000; _phase = 2;
+                break;
+            case 2:
+                if (Creature* hope = me->FindNearestCreature(NPC_HOPE_SALDEAN_42749, 25.0f))
+                    hope->CastSpell(hope, SPELL_GENERIC_TRIGGER_1_HOPE, false);
+
+                _timer = 300000; _phase = 3;
+                break;
+            case 3: // empty phase, waiting on next trigger
+                break;
+            case 4: // 51:53                
+                if (Player* player = me->FindNearestPlayer(25.0f, true))
+                {
+                    me->CastSpell(player, SPELL_QUEST_CREDIT_DEFIAS_FINALE_EVENT, false);
+                    player->RemoveAura(SPELL_TIED_UP);
+                }
+
+                Talk(6);
+
+                _timer = 1000; _phase = 5;
+                break;
+            case 5:
+                break;
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_marshal_gryan_stoutmantle_42750AI(creature);
+    }
+};
 
 
 // ToDo: is not checked:  npc_daphne_stilwell
@@ -2762,4 +3632,16 @@ void AddSC_westfall()
     new npc_helix_gearbreaker();
     new npc_van_cleef_dummy();
     new npc_vision_of_the_past();
+    new npc_marshal_gryan_stoutmantle_234();
+    new npc_lieutenant_horatio_laine_42744();
+    new npc_stormwind_investigator_42745();
+    new npc_Ripsnarl_42748();
+    new npc_hope_saldean_42749();
+    new npc_marshal_gryan_stoutmantle_42750();
+    new npc_captain_danuvin_42751();
+    new npc_scout_galiaan_42752();
+    new npc_helix_gearbreaker_42753();
+    new npc_glubtok_42755();
+    new npc_defias_blackguard_42769();
+    new npc_thor_523;
 }
