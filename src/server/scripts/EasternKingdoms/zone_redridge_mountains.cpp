@@ -39,6 +39,7 @@ enum eAnimRedridgeCity
     SPELL_APPLY_QUEST_INVIS_4 = 80816,
     SPELL_APPLY_QUEST_INVIS_5 = 81003,
     QUEST_JOHN_J_KEESHAN = 26567,
+    QUEST_TUNING_THE_GNOMECORDER = 26512,
 
 };
 
@@ -232,6 +233,110 @@ public:
     }
 };
 
+class npc_redrige_citizen_43247 : public CreatureScript
+{
+public:
+    npc_redrige_citizen_43247() : CreatureScript("npc_redrige_citizen_43247") { }
+
+    struct npc_redrige_citizen_43247AI : public ScriptedAI
+    {
+        npc_redrige_citizen_43247AI(Creature *c) : ScriptedAI(c) { }
+
+        uint32 m_timer;
+
+        void Reset() override
+        {
+            m_timer = 1000;
+        }
+
+
+        void UpdateAI(uint32 diff) override
+        {
+            
+            if (m_timer <= diff)
+            {
+                m_timer = 1000;
+                DoWork();
+            }
+            else
+                m_timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+
+
+        void DoWork()
+        {
+            if (uint32 r = urand(0, 500) < 11)
+            {
+                Talk(0); m_timer = 5000;
+                switch (r)
+                {
+                case 0:
+                    me->HandleEmote(1);
+                    break;
+                case 1:
+                    me->HandleEmote(4);
+                    break;
+                case 2:
+                    me->HandleEmote(5);
+                    break;
+                case 3:
+                    me->HandleEmote(6);
+                    break;
+                case 4:
+                    me->HandleEmote(14);
+                    break;
+                case 5:
+                    me->HandleEmote(15);
+                    break;
+                case 6:
+                    me->HandleEmote(20);
+                    break;
+                case 7:
+                    me->HandleEmote(22);
+                    break;
+                case 8:
+                    me->HandleEmote(25);
+                    break;
+                case 9:
+                    me->HandleEmote(53);
+                    break;
+                case 10:
+                    me->HandleEmote(274);
+                    break;
+                }
+            }
+        }
+
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_redrige_citizen_43247AI(creature);
+    }
+}; 
+
+class at_lakeshire_graveyard : public AreaTriggerScript
+{
+public:
+    at_lakeshire_graveyard() : AreaTriggerScript("at_lakeshire_graveyard") { }
+
+    bool OnTrigger(Player* player, const AreaTriggerEntry* at) override
+    {
+        if ((player->GetQuestStatus(QUEST_TUNING_THE_GNOMECORDER) == QUEST_STATUS_INCOMPLETE || player->GetQuestStatus(QUEST_TUNING_THE_GNOMECORDER) == QUEST_STATUS_COMPLETE) && at->id == 6034)
+        {
+            player->SendPlaySound(18125, true);
+            player->CastSpell(player, 81769, true);
+            player->CompleteQuest(QUEST_TUNING_THE_GNOMECORDER);
+        }
+
+        return false;
+    }
+};
 
 
 void AddSC_redridge_mountains()
@@ -239,5 +344,7 @@ void AddSC_redridge_mountains()
     new npc_marshal_marris();
     new npc_dumpy_43249();
     new npc_big_earl_43248();
+    new npc_redrige_citizen_43247();
+    new at_lakeshire_graveyard();
 }
 
