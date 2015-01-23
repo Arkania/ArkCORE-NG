@@ -8966,7 +8966,6 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
                     SendMeleeAttackStart(victim);
                     return true;
                 }
-                return true;
             }
             else if (HasUnitState(UNIT_STATE_MELEE_ATTACKING))
             {
