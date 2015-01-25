@@ -252,7 +252,6 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            
             if (m_timer <= diff)
             {
                 m_timer = 1000;
@@ -338,6 +337,328 @@ public:
     }
 };
 
+class npc_canyon_ettin_43094 : public CreatureScript
+{
+    enum eTest
+    {
+        QUEST_SAVING_FOREMAN_OSLOW = 26520,
+    };
+
+public:
+    npc_canyon_ettin_43094() : CreatureScript("npc_canyon_ettin_43094") { }
+
+    struct npc_canyon_ettin_43094_escortAI : public npc_escortAI
+    {
+        npc_canyon_ettin_43094_escortAI(Creature *creature) : npc_escortAI(creature) { }
+
+        uint32 m_timer;
+
+        void Reset() override
+        {
+            m_timer = 0;
+        }
+
+        void WaypointReached(uint32 waypointId) override
+        {
+
+        }
+
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
+        { 
+            printf("SpellHit ettin: %u \n", spell->Id);
+            if (Player* player = caster->ToPlayer())
+                if (player->GetQuestStatus(QUEST_SAVING_FOREMAN_OSLOW)== QUEST_STATUS_INCOMPLETE)
+                    if (Quest const* quest = sObjectMgr->GetQuestTemplate(QUEST_SAVING_FOREMAN_OSLOW))
+                        Start(true, false, caster->GetGUID(),quest);
+        }
+
+        bool OnDummyEffect(Unit* /*caster*/, uint32 spellId, SpellEffIndex /*effIndex*/, Creature* /*target*/)
+        { 
+            printf("OnDummyEffect ettin: %u \n", spellId);
+
+            return false; 
+        }
+        
+        void UpdateAI(uint32 diff) override
+        {
+            npc_escortAI::UpdateAI(diff);
+
+            if (m_timer <= diff)
+            {
+                m_timer = 1000;
+                DoWork();
+            }
+            else
+                m_timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+
+        void DoWork()
+        {
+
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_canyon_ettin_43094_escortAI(creature);
+    }
+};
+
+class npc_canyon_ettin_43197 : public CreatureScript
+{
+    enum eTest
+    {
+        NPC_HUGE_BOULDER = 43196,
+        NPC_BRIDGE_WORKER_TRENT = 648,
+        NPC_BRIDGE_WORKER_DMITRI = 649,
+        NPC_BRIDGE_WORKER_JESS = 650,
+        NPC_BRIDGE_WORKER_DANIEL = 651,
+        NPC_BRIDGE_WORKER_MATTHEW = 652,
+        NPC_BRIDGE_WORKER_ALEX = 653,
+        NPC_FOREMAN_OSLOW = 341,
+        SPELL_LIFT_HUGE_BOULDER = 80739,
+        SPELL_KILL_CREDIT_ETTIN_QUEST = 80744,
+        SPELL_EJECT_PASSENGER_1 = 80743,
+        QUEST_SAVING_FOREMAN_OSLOW = 26520,
+        PATH_GO_BACK_TO_MOUNTAIN = 431972,
+        PATH_GO_TO_BRIDGE = 431971,
+        SAY_OSLOW_JUST_REPAIR_BRIDGE = 0,
+        SAY_OSLOW_THANKS = 1,
+    };
+
+public:
+    npc_canyon_ettin_43197() : CreatureScript("npc_canyon_ettin_43197") { }
+
+    struct npc_canyon_ettin_43197_AI : public ScriptedAI
+    {
+        npc_canyon_ettin_43197_AI(Creature *c) : ScriptedAI(c) { }
+
+        uint32 m_timer;
+        uint32 m_phase;
+
+        void Reset() override
+        {
+            m_timer = 1000;
+            m_phase = 0;
+        }
+
+        void MovementInform(uint32 type, uint32 id) override
+        { 
+            if (type != 2)
+                return;
+
+            if (m_phase < 10)
+            {
+                switch (id)
+                {
+                case 1:
+                    if (Creature* oslow = me->FindNearestCreature(NPC_FOREMAN_OSLOW, 200.0f))
+                        oslow->AI()->Talk(SAY_OSLOW_THANKS);
+
+                    break;
+                case 4:
+                        if (Creature* oslow = me->FindNearestCreature(NPC_FOREMAN_OSLOW, 200.0f))
+                            oslow->DespawnOrUnsummon();
+
+                    break;
+                case 5: // last point in path 1
+                    m_phase = 7; m_timer = 500;
+                    break;
+                }
+            }
+            else if (m_phase > 10)
+            {
+                switch (id)
+                {
+                case 3:
+                    Talk(3);
+                    break;
+                case 5: // last point in path 2
+                    m_phase = 12; m_timer = 500;
+                    break;
+                }
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (m_timer <= diff)
+            {
+                m_timer = 1000;
+                DoWork();
+            }
+            else
+                m_timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+
+
+        void DoWork()
+        {
+            switch (m_phase)
+            {
+            case 0:
+            {
+                Player* player = NULL;
+                if (Unit* unit = me->GetOwner())
+                    if (player = unit->ToPlayer())
+                        if (player->IsInCombat())
+                            if (Unit* target = player->GetSelectedUnit())
+                                if (Creature* victim = target->ToCreature())
+                                    if (me->IsInCombat())
+                                    {
+                                        if (!me->IsHostileTo(target))
+                                            me->Attack(victim, true);
+                                    }
+                                    else
+                                        me->Attack(victim, true);
+
+                if (Creature* boulder = me->FindNearestCreature(NPC_HUGE_BOULDER, 8.0f))
+                {
+                    me->GetMotionMaster()->MoveIdle();
+                    me->GetMotionMaster()->Initialize();
+                    m_phase = 1;
+                }
+                m_timer = 100;
+                break;
+            }
+            case 1:
+                if (Creature* boulder = me->FindNearestCreature(NPC_HUGE_BOULDER, 15.0f))
+                    me->CastSpell(boulder, SPELL_LIFT_HUGE_BOULDER, true);
+                if (Creature* trent = me->FindNearestCreature(NPC_BRIDGE_WORKER_TRENT, 50.0f))
+                    trent->HandleEmoteState(EMOTE_STATE_STAND);
+                if (Creature* dmitri = me->FindNearestCreature(NPC_BRIDGE_WORKER_DMITRI, 50.0f))
+                    dmitri->HandleEmoteState(EMOTE_STATE_STAND);
+                if (Creature* jess = me->FindNearestCreature(NPC_BRIDGE_WORKER_JESS, 50.0f))
+                    jess->HandleEmoteState(EMOTE_STATE_STAND);
+                if (Creature* daniel = me->FindNearestCreature(NPC_BRIDGE_WORKER_DANIEL, 50.0f))
+                    daniel->HandleEmoteState(EMOTE_STATE_STAND);
+                if (Creature* matthew = me->FindNearestCreature(NPC_BRIDGE_WORKER_MATTHEW, 50.0f))
+                    matthew->HandleEmoteState(EMOTE_STATE_STAND);
+                if (Creature* alex = me->FindNearestCreature(NPC_BRIDGE_WORKER_ALEX, 50.0f))
+                    alex->HandleEmoteState(EMOTE_STATE_STAND);
+
+                Talk(0);
+                m_phase = 2; m_timer = 2000;
+                break;
+            case 2:
+                if (Creature* oslow = me->FindNearestCreature(NPC_FOREMAN_OSLOW, 100.0f))
+                {
+                    oslow->SetUInt32Value(UNIT_FIELD_BYTES_1, UNIT_STAND_STATE_KNEEL);
+                    oslow->SetWalk(true);
+                    oslow->SetSpeed(MOVE_WALK, 1.0f, true);
+                }
+
+                m_phase = 3; m_timer = 2000;
+                break;
+            case 3:
+                Talk(1);
+                m_phase = 4; m_timer = 4000;
+                break;
+            case 4:
+                if (Creature* trent = me->FindNearestCreature(NPC_BRIDGE_WORKER_TRENT, 50.0f))
+                    trent->AI()->Talk(1);
+                if (Creature* daniel = me->FindNearestCreature(NPC_BRIDGE_WORKER_DANIEL, 50.0f))
+                    daniel->AI()->Talk(1);
+                if (Creature* oslow = me->FindNearestCreature(NPC_FOREMAN_OSLOW, 100.0f))
+                    oslow->HandleEmoteState(EMOTE_STATE_STAND);
+
+                m_phase = 5; m_timer = 1500;
+                break;
+            case 5:
+                if (Creature* oslow = me->FindNearestCreature(NPC_FOREMAN_OSLOW, 100.0f))
+                {
+                    oslow->SetWalk(true);
+                    oslow->GetMotionMaster()->MovePoint(22, -9273.9f, -2185.4f, 64.09f);
+                }
+
+                m_phase = 6; m_timer = 1500;
+                break;
+            case 6:
+
+                if (Creature* oslow = me->FindNearestCreature(NPC_FOREMAN_OSLOW, 100.0f))
+                    oslow->AI()->Talk(SAY_OSLOW_JUST_REPAIR_BRIDGE);
+
+                Talk(2);
+                me->SetWalk(true);
+                me->SetSpeed(MOVE_WALK, 1.2f, true);
+                me->GetMotionMaster()->MovePath(PATH_GO_TO_BRIDGE, false);
+                m_phase = 9; m_timer = 120000;
+                break;           
+            case 7:
+                me->CastSpell(me, SPELL_EJECT_PASSENGER_1);
+
+               // if (Creature* boulder = me->FindNearestCreature(NPC_HUGE_BOULDER, 15.0f))
+                 //   boulder->GetMotionMaster()->MoveJumpTo(me->GetOrientation(), 150.0f, 4.0f);
+
+                m_phase = 8; m_timer = 2000;
+                break;
+            case 8:
+                me->GetMotionMaster()->InitDefault();
+                m_phase = 11; m_timer = 2000;
+                break;
+            case 9: // cooldown phase
+                m_phase = 13; m_timer = 100;
+                break;            
+            case 11:
+               // if (Creature* boulder = me->FindNearestCreature(NPC_HUGE_BOULDER, 30.0f))
+                 //   boulder->DespawnOrUnsummon(1000);
+
+                me->SetWalk(true);
+                me->GetMotionMaster()->MovePath(PATH_GO_BACK_TO_MOUNTAIN, false);  // path 2
+
+                m_phase = 13; m_timer = 120000;
+                break;
+            case 12:
+                if (Unit* unit = me->GetOwner())
+                    if (Player* player = unit->ToPlayer())
+                    {
+                        player->CastSpell(player, SPELL_KILL_CREDIT_ETTIN_QUEST);
+                        player->KilledMonsterCredit(341);
+                    }
+
+                m_phase = 13; m_timer = 1000;
+                break;
+            case 13:
+                if (Creature* boulder = me->FindNearestCreature(NPC_HUGE_BOULDER, 200.0f))
+                    boulder->DespawnOrUnsummon();
+                if (Creature* trent = me->FindNearestCreature(NPC_BRIDGE_WORKER_TRENT, 100.0f))
+                    trent->DespawnOrUnsummon();
+                if (Creature* dmitri = me->FindNearestCreature(NPC_BRIDGE_WORKER_DMITRI, 100.0f))
+                    dmitri->DespawnOrUnsummon();
+                if (Creature* jess = me->FindNearestCreature(NPC_BRIDGE_WORKER_JESS, 100.0f))
+                    jess->DespawnOrUnsummon();
+                if (Creature* daniel = me->FindNearestCreature(NPC_BRIDGE_WORKER_DANIEL, 100.0f))
+                    daniel->DespawnOrUnsummon();
+                if (Creature* matthew = me->FindNearestCreature(NPC_BRIDGE_WORKER_MATTHEW, 100.0f))
+                    matthew->DespawnOrUnsummon();
+                if (Creature* alex = me->FindNearestCreature(NPC_BRIDGE_WORKER_ALEX, 100.0f))
+                    alex->DespawnOrUnsummon();
+                
+                me->DespawnOrUnsummon();
+
+                m_phase = 0; m_timer = 1000;
+                break;
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_canyon_ettin_43197_AI(creature);
+    }
+   
+};
+
 
 void AddSC_redridge_mountains()
 {
@@ -346,5 +667,7 @@ void AddSC_redridge_mountains()
     new npc_big_earl_43248();
     new npc_redrige_citizen_43247();
     new at_lakeshire_graveyard();
+    new npc_canyon_ettin_43094();
+    new npc_canyon_ettin_43197();
 }
 

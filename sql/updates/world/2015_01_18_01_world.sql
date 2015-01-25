@@ -40,10 +40,13 @@ delete from creature_addon where guid in (16744,16745);
 update creature set position_x=-9298.24, position_y=-2360.14,position_z=56.211 where guid=9375 and id=43443;
 
 -- first quest's in redridge are with activ quest invis 1
-DELETE FROM `spell_area` WHERE `spell`=80695 AND `area`=44 AND `quest_start`=26503 AND `aura_spell`=0 AND `gender`=0 AND `racemask`=0;
-INSERT INTO `spell_area` (`spell`,`area`, `quest_start`, `quest_end`, `aura_spell`, `racemask`, `gender`, `autocast`, `quest_start_status`, `quest_end_status` ) VALUES 
-(80695, 44, 26503, 26616, 0, 0, 0, 1, 74, 9);
 
+DELETE FROM `spell_area` WHERE (`spell`=80695 OR `spell`=80817) AND `area`=44;
+INSERT INTO `spell_area` (`spell`,`area`, `quest_start`, `quest_end`, `aura_spell`, `racemask`, `gender`, `autocast`, `quest_start_status`, `quest_end_status` ) VALUES 
+(80695, 44, 26503, 26520, 0, 0, 0, 1, 74, 9);
+
+INSERT INTO `spell_area` (`spell`,`area`, `quest_start`, `quest_end`, `aura_spell`, `racemask`, `gender`, `autocast`, `quest_start_status`, `quest_end_status` ) VALUES 
+(80817, 44, 26503, 26616, 0, 0, 0, 1, 74, 9);
 
 
 

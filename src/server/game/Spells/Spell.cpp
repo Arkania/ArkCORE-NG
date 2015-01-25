@@ -4713,15 +4713,31 @@ SpellCastResult Spell::CheckCast(bool strict)
 {
     Unit* Target = m_targets.GetUnitTarget();
 
+    switch (m_spellInfo->Id)
+    {
+    case 68219:
+        if (Unit* unit = this->GetOriginalCaster())
+            if (Vehicle* horse = unit->GetVehicle())
+                if (!horse->HasEmptySeat(0))
+                    if (Player* player = horse->GetPassenger(0)->ToPlayer())
+                        if (Creature* krennan = player->FindNearestCreature(35753, 5.0f))
+                                return SPELL_CAST_OK;
+        break;
+    // control ettin
+    case 80704:
+    {
+        Creature* ettin = m_caster->FindNearestCreature(43094, 10.0f);
+        if (!ettin)
+            return SPELL_FAILED_OUT_OF_RANGE;
+        break;
+    }
     // Anshal Nurture.
-    if (m_spellInfo->Id == 85422 || m_spellInfo->Id == 85425 ||  m_spellInfo->Id == 85429)
+    case 85422:
+    case 85425:
+    case 85429:
         return SPELL_CAST_OK;
-
-    // gilneas specials
-    if (m_spellInfo->Id == SPELL_RESCUE_KRENNAN_ARANAS)
-        if (Creature* creature = this->GetOriginalCaster()->GetVehicle()->GetPassenger(0)->ToPlayer()->FindNearestCreature(NPC_KRENNAN_ARANAS, 5.0f, true))
-            return SPELL_CAST_OK;
-      
+    }
+  
     if (m_spellInfo->Id == 30449 && Target)          // Spellsteal Check
     {
         if (Target != m_caster && !Target->IsFriendlyTo(m_caster))
