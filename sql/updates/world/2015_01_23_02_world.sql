@@ -28,7 +28,7 @@ INSERT INTO waypoint_data (id,point,position_x, position_y, position_z, orientat
 
 update creature_addon set auras="80698" where guid in (34444,33943,33790,34335,34086,34217,33827,33989);
 
-update creature_addon set auras="80615" where guid=26647;
+update creature_template_addon set auras="80615" where entry=43194;
 
 
 
