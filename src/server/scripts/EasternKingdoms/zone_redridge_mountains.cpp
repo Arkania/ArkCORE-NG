@@ -31,6 +31,8 @@ enum eAnimRedridgeCity
 {
     NPC_DUMPY = 43249,
     NPC_BIG_EARL = 43248,
+    NPC_MAGISTRATE_SOLOMON = 344,
+    NPC_COLONEL_TROTEMAN_43221 = 43221,
     NPC_JOHN_J_KEESHAN_43184 = 43184,
     SPELL_DRINK_ALCOHOL = 58952,
     SPELL_APPLY_QUEST_INVIS_1 = 80895,
@@ -38,6 +40,7 @@ enum eAnimRedridgeCity
     SPELL_APPLY_QUEST_INVIS_3 = 80815,
     SPELL_APPLY_QUEST_INVIS_4 = 80816,
     SPELL_APPLY_QUEST_INVIS_5 = 81003,
+    SPELL_DETECT_QUEST_INVIS_4 = 80818,
     QUEST_JOHN_J_KEESHAN = 26567,
     QUEST_TUNING_THE_GNOMECORDER = 26512,
 
@@ -337,78 +340,6 @@ public:
     }
 };
 
-class npc_canyon_ettin_43094 : public CreatureScript
-{
-    enum eTest
-    {
-        QUEST_SAVING_FOREMAN_OSLOW = 26520,
-    };
-
-public:
-    npc_canyon_ettin_43094() : CreatureScript("npc_canyon_ettin_43094") { }
-
-    struct npc_canyon_ettin_43094_escortAI : public npc_escortAI
-    {
-        npc_canyon_ettin_43094_escortAI(Creature *creature) : npc_escortAI(creature) { }
-
-        uint32 m_timer;
-
-        void Reset() override
-        {
-            m_timer = 0;
-        }
-
-        void WaypointReached(uint32 waypointId) override
-        {
-
-        }
-
-        void SpellHit(Unit* caster, SpellInfo const* spell) override
-        { 
-            printf("SpellHit ettin: %u \n", spell->Id);
-            if (Player* player = caster->ToPlayer())
-                if (player->GetQuestStatus(QUEST_SAVING_FOREMAN_OSLOW)== QUEST_STATUS_INCOMPLETE)
-                    if (Quest const* quest = sObjectMgr->GetQuestTemplate(QUEST_SAVING_FOREMAN_OSLOW))
-                        Start(true, false, caster->GetGUID(),quest);
-        }
-
-        bool OnDummyEffect(Unit* /*caster*/, uint32 spellId, SpellEffIndex /*effIndex*/, Creature* /*target*/)
-        { 
-            printf("OnDummyEffect ettin: %u \n", spellId);
-
-            return false; 
-        }
-        
-        void UpdateAI(uint32 diff) override
-        {
-            npc_escortAI::UpdateAI(diff);
-
-            if (m_timer <= diff)
-            {
-                m_timer = 1000;
-                DoWork();
-            }
-            else
-                m_timer -= diff;
-
-            if (!UpdateVictim())
-                return;
-
-            DoMeleeAttackIfReady();
-        }
-
-        void DoWork()
-        {
-
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new npc_canyon_ettin_43094_escortAI(creature);
-    }
-};
-
 class npc_canyon_ettin_43197 : public CreatureScript
 {
     enum eTest
@@ -659,6 +590,125 @@ public:
    
 };
 
+class npc_colonel_troteman_43221 : public CreatureScript
+{
+public:
+    npc_colonel_troteman_43221() : CreatureScript("npc_colonel_troteman_43221") { }
+
+    struct npc_colonel_troteman_43221AI : public ScriptedAI
+    {
+        npc_colonel_troteman_43221AI(Creature *c) : ScriptedAI(c) { }
+
+        std::list<uint64> m_playerList;
+        uint32 m_timer;
+        uint32 m_phase;
+
+        void Reset() override
+        {
+            m_timer = 1000;
+            m_phase = 0;
+        }
+
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (m_timer <= diff)
+            {
+                m_timer = 1000;
+                DoWork();
+            }
+            else
+                m_timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+
+
+        void DoWork()
+        {
+            switch (m_phase)
+            {
+            case 0:
+                if (Player* player = me->FindNearestPlayer(15.0))
+                    if (!HasPlayerSeenVideo(player->GetGUID()) && !player->HasAura(SPELL_DETECT_QUEST_INVIS_4))
+                    {
+                        m_phase = 1;
+                        m_playerList.push_back(player->GetGUID());
+                    }
+            case 1:
+                if (Creature* solomon = me->FindNearestCreature(NPC_MAGISTRATE_SOLOMON, 10.0f))
+                    solomon->AI()->Talk(0);
+
+                m_timer = 5000; m_phase = 2;
+                break;
+            case 2:
+                if (Creature* solomon = me->FindNearestCreature(NPC_MAGISTRATE_SOLOMON, 10.0f))
+                    solomon->AI()->Talk(1);
+
+                m_timer = 5000; m_phase = 3;
+                break;
+            case 3:
+                Talk(0);
+                m_timer = 5000; m_phase = 4;
+                break;
+            case 4:
+                if (Creature* solomon = me->FindNearestCreature(NPC_MAGISTRATE_SOLOMON, 10.0f))
+                    solomon->AI()->Talk(2);
+
+                m_timer = 5000; m_phase = 5;
+                break;
+            case 5:
+                Talk(1);
+                m_timer = 5000; m_phase = 6;
+                break;
+            case 6:
+                Talk(2);
+                m_timer = 5000; m_phase = 7;
+                break;
+            case 7:
+                Talk(3);
+                m_timer = 5000; m_phase = 8;
+                break;
+            case 8:
+                Talk(4);
+                m_timer = 5000; m_phase = 9;
+                break;
+            case 9:
+                if (Creature* solomon = me->FindNearestCreature(NPC_MAGISTRATE_SOLOMON, 10.0f))
+                    solomon->AI()->Talk(3);
+
+                m_timer = 5000; m_phase = 10;
+                break;
+            case 10:
+                Talk(5);
+                m_timer = 5000; m_phase = 11;
+                break;
+            case 11:
+                m_phase = 0; 
+                break;
+            case 12:
+                break;
+            }
+        }
+
+        bool HasPlayerSeenVideo(uint64 guid)
+        {
+            for (std::list<uint64>::iterator itr = m_playerList.begin(); itr != m_playerList.end(); ++itr)
+                if (guid == *itr)
+                    return true;
+
+            return false;
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_colonel_troteman_43221AI(creature);
+    }
+};
 
 void AddSC_redridge_mountains()
 {
@@ -667,7 +717,7 @@ void AddSC_redridge_mountains()
     new npc_big_earl_43248();
     new npc_redrige_citizen_43247();
     new at_lakeshire_graveyard();
-    new npc_canyon_ettin_43094();
     new npc_canyon_ettin_43197();
+    new npc_colonel_troteman_43221();
 }
 
