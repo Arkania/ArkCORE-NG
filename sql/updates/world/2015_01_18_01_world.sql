@@ -1,5 +1,5 @@
 
--- spawned by script
+-- spawned by script, drive in the boat, from beach to beach
 -- http://de.wowhead.com/npc=43432/messner
 -- http://de.wowhead.com/npc=43433/jorgensen
 -- http://de.wowhead.com/npc=43434/krakauer
@@ -10,7 +10,7 @@ DELETE FROM `creature` WHERE `guid` in (9358,9359,9360,9361,26545);
 DELETE FROM `creature_addon` WHERE `guid` in (9358,9359,9360,9361,26545);
 DELETE FROM `creature_template_addon` WHERE `entry` in (43184,43432,43433,43434,43435);
 
--- http://www.wowhead.com/npc=43222/redridge-citizen 	should be near big earl, the steet fighter
+-- http://www.wowhead.com/npc=43222/redridge-citizen 	should be near big earl, the street fighter
 -- http://www.wowhead.com/npc=43247/redridge-citizen	should be near solomon, the magister
 DELETE FROM `creature_template_addon` WHERE (`entry`=43222);
 DELETE FROM `creature_template_addon` WHERE (`entry`=43247);
@@ -18,7 +18,7 @@ DELETE FROM `creature_template_addon` WHERE (`entry`=43247);
 update creature set id=43247 where id=43222 and position_z>60.0;
 update creature set id=43222 where id=43247 and position_z<60.0;
 
--- http://de.wowhead.com/npc=43449/john-j-keeshan
+-- http://de.wowhead.com/npc=43449/john-j-keeshan, waiting on the beach, bevor driving to other side..
 -- http://de.wowhead.com/npc=43448/messner
 -- http://de.wowhead.com/npc=43447/jorgensen
 -- http://de.wowhead.com/npc=43446/krakauer

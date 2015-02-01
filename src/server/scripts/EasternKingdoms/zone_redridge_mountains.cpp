@@ -26,6 +26,7 @@ Script Data End */
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "Player.h"
+#include "GameObjectAI.h"
 
 enum eAnimRedridgeCity
 {
@@ -34,15 +35,51 @@ enum eAnimRedridgeCity
     NPC_MAGISTRATE_SOLOMON = 344,
     NPC_COLONEL_TROTEMAN_43221 = 43221,
     NPC_JOHN_J_KEESHAN_43184 = 43184,
+    NPC_CAT = 8963,
+    NPC_MESSNER_43270 = 43270,
+    NPC_MESSNER_43300 = 43300,
+    NPC_JORGENSEN_43272 = 43272,
+    NPC_JORGENSEN_43305 = 43305,
+    NPC_KRAKAUER_43274 = 43274,
+    NPC_KRAKAUER_43303 = 43303,
+    NPC_DANFORTH_43275 = 43275,
+    NPC_DANFORTH_43302 = 43302,
+    NPC_DANFORT_INVISIBLE_DUMMY = 43366,
+    GO_CHAIN_LEVER = 204403,
     SPELL_DRINK_ALCOHOL = 58952,
     SPELL_APPLY_QUEST_INVIS_1 = 80895,
     SPELL_APPLY_QUEST_INVIS_2 = 80699,
     SPELL_APPLY_QUEST_INVIS_3 = 80815,
     SPELL_APPLY_QUEST_INVIS_4 = 80816,
     SPELL_APPLY_QUEST_INVIS_5 = 81003,
+    SPELL_APPLY_QUEST_INVIS_9 = 81201,
+    SPELL_APPLY_QUEST_INVIS_10 = 81240,
     SPELL_DETECT_QUEST_INVIS_4 = 80818,
+    SPELL_DETECT_QUEST_INVIS_5 = 81004,
+    SPELL_DETECT_QUEST_INVIS_6 = 81010,
+    SPELL_DETECT_QUEST_INVIS_7 = 81019,
+    SPELL_DETECT_QUEST_INVIS_8 = 81080,
+    SPELL_DETECT_QUEST_INVIS_9 = 81202,
+    SPELL_DETECT_QUEST_INVIS_10 = 81241,
+    SPELL_SUMMON_MESSNER = 80893,
+    SPELL_SUMMON_JORGENSEN = 80940,
+    SPELL_SUMMON_KRAKAUER = 80941,
+    SPELL_SUMMON_DANFORT = 80943,
+    SPELL_CONCENTRATION_AURA = 79963,
+    SPELL_SEAL_OF_RIGHTEOUSNESS = 79962,
+    SPELL_MOLTEN_ARMOR = 79849,
+    SPELL_REDRIDGE_TEAM_AURA = 80925,
+    // SPELL_ZONE_RESTICTION = 132108, spell is from 548
+    SPELL_GNOMECORDER = 80689,
+    SPELL_FREEING_DANFORT = 80887,
+    SPELL_BAKER_TEAM_BROADCAST = 81155,
+    SPELL_CHAINS_OF_CRUELTY_1 = 81081,
+    SPELL_CHAINS_OF_CRUELTY_2 = 81085,
     QUEST_JOHN_J_KEESHAN = 26567,
     QUEST_TUNING_THE_GNOMECORDER = 26512,
+    QUEST_JORGENSEN = 26560,
+    QUEST_THEY_DREW_FIRST_BLOOD = 26607,
+
 
 };
 
@@ -123,15 +160,13 @@ public:
         uint32 m_phase;
         Creature* m_dumpy;
         Creature* m_keeshan;
-        int32 m_questCooldown;
 
         void Reset() override
         {
             m_timer = 1000;
-            m_phase = 0;
+            m_phase = 3;
             m_dumpy = NULL;
             m_keeshan = NULL;
-            m_questCooldown = 0;
         }
 
         void DamageTaken(Unit* attacker, uint32& damage) override
@@ -140,11 +175,22 @@ public:
                 damage = 0;
         }
 
+        void MoveInLineOfSight(Unit* who) override
+        {
+            if (m_phase == 0)
+                if (Player* player = who->ToPlayer())
+                    if (player->GetQuestStatus(QUEST_JOHN_J_KEESHAN) == QUEST_STATUS_COMPLETE  && player->HasAura(SPELL_DETECT_QUEST_INVIS_4))
+                    {
+                        m_phase = 1; m_timer = 1000;
+                    }
+                    else
+                    {
+                        m_phase = 3; m_timer = 1000;
+                    }
+        }
+
         void UpdateAI(uint32 diff) override
         {
-            if (m_questCooldown>0)
-                m_questCooldown -= diff;
-
             if (m_timer <= diff)
             {
                 m_timer = 1000;
@@ -158,8 +204,7 @@ public:
 
             DoMeleeAttackIfReady();
         }
-
-
+        
         void DoWork()
         {
             Player* player = me->FindNearestPlayer(20.0f);
@@ -167,49 +212,26 @@ public:
             m_keeshan = me->FindNearestCreature(NPC_JOHN_J_KEESHAN_43184, 5.0f);
             switch (m_phase)
             {
-            case 0: 
-                if (player && player->m_positionZ < 65.0f)
-                    if (player->GetQuestStatus(QUEST_JOHN_J_KEESHAN) == QUEST_STATUS_INCOMPLETE)
-                    {
-                        if (m_dumpy)
-                            m_dumpy->DespawnOrUnsummon();
-
-                        if (!m_keeshan)
-                            m_keeshan = me->SummonCreature(NPC_JOHN_J_KEESHAN_43184, -9203.84f, -2155.79f, 57.187f, 3.565f, TEMPSUMMON_TIMED_DESPAWN, 600000);
-
-                        if (!m_keeshan->IsInCombat())
-                        {
-                            m_keeshan->Attack(me, true);
-                            me->Attack(m_keeshan, true);
-                        }
-                        m_phase = 2; m_timer = 100;
-                    }
-                    else
-                    {
-                        if (m_keeshan)
-                            m_keeshan->DespawnOrUnsummon();
-
-                        if (!m_dumpy)
-                            m_dumpy = me->SummonCreature(NPC_DUMPY, -2101.98f, -2154.78f, 57.19f, 1.659f);
-
-                        if (m_dumpy && !m_dumpy->IsInCombat())
-                        {
-                            m_dumpy->Attack(me, true);
-                            me->Attack(m_dumpy, true);
-                        }
-                    }
+            case 0:
                 break;
-            case 1: 
+            case 1:
+                if (m_dumpy)
+                    m_dumpy->DespawnOrUnsummon();
+
+                if (!m_keeshan)
+                    m_keeshan = me->SummonCreature(NPC_JOHN_J_KEESHAN_43184, -9203.84f, -2155.79f, 57.187f, 3.565f, TEMPSUMMON_TIMED_DESPAWN, 600000);
+
+                if (!m_keeshan->IsInCombat())
+                {
+                    m_keeshan->Attack(me, true);
+                    me->Attack(m_keeshan, true);
+                }
+                m_phase = 2; m_timer = 60000;
                 break;
-            case 2: // fighting against john until player is gone
-                if (!player)
-                {
-                    m_phase = 3; m_timer = 100;
-                }
-                else if (player->m_positionZ > 65.0f)
-                {
-                    m_phase = 3; m_timer = 100;
-                }
+            case 2:
+                if (!player || !m_keeshan)
+                    m_phase = 3;
+
                 break;
             case 3:
                 if (m_keeshan)
@@ -223,10 +245,9 @@ public:
                     m_dumpy->Attack(me, true);
                     me->Attack(m_dumpy, true);
                 }
-
-                m_phase = 0;
+                m_phase = 0; m_timer = 0;
                 break;
-            }
+           }
         }
     };
 
@@ -515,7 +536,6 @@ public:
                 m_phase = 6; m_timer = 1500;
                 break;
             case 6:
-
                 if (Creature* oslow = me->FindNearestCreature(NPC_FOREMAN_OSLOW, 100.0f))
                     oslow->AI()->Talk(SAY_OSLOW_JUST_REPAIR_BRIDGE);
 
@@ -527,10 +547,6 @@ public:
                 break;           
             case 7:
                 me->CastSpell(me, SPELL_EJECT_PASSENGER_1);
-
-               // if (Creature* boulder = me->FindNearestCreature(NPC_HUGE_BOULDER, 15.0f))
-                 //   boulder->GetMotionMaster()->MoveJumpTo(me->GetOrientation(), 150.0f, 4.0f);
-
                 m_phase = 8; m_timer = 2000;
                 break;
             case 8:
@@ -541,9 +557,6 @@ public:
                 m_phase = 13; m_timer = 100;
                 break;            
             case 11:
-               // if (Creature* boulder = me->FindNearestCreature(NPC_HUGE_BOULDER, 30.0f))
-                 //   boulder->DespawnOrUnsummon(1000);
-
                 me->SetWalk(true);
                 me->GetMotionMaster()->MovePath(PATH_GO_BACK_TO_MOUNTAIN, false);  // path 2
 
@@ -595,6 +608,35 @@ class npc_colonel_troteman_43221 : public CreatureScript
 public:
     npc_colonel_troteman_43221() : CreatureScript("npc_colonel_troteman_43221") { }
 
+    bool OnGossipHello(Player* player, Creature* /*creature*/) 
+    { 
+        if (player->GetQuestStatus(QUEST_THEY_DREW_FIRST_BLOOD) == QUEST_STATUS_COMPLETE)
+        {
+            if (Creature* messner = player->FindNearestCreature(NPC_MESSNER_43300, 300.0f))
+                messner->DespawnOrUnsummon();
+            
+            if (Creature* jorgensen = player->FindNearestCreature(NPC_JORGENSEN_43305, 300.0f))
+                jorgensen->DespawnOrUnsummon();
+
+            if (Creature* krakauer = player->FindNearestCreature(NPC_KRAKAUER_43303, 300.0f))
+                krakauer->DespawnOrUnsummon();
+
+            if (Creature* danforth = player->FindNearestCreature(NPC_DANFORTH_43302, 300.0f))
+                danforth->DespawnOrUnsummon();
+
+            player->RemoveAura(SPELL_DETECT_QUEST_INVIS_5);
+            player->RemoveAura(SPELL_DETECT_QUEST_INVIS_6);
+            player->RemoveAura(SPELL_DETECT_QUEST_INVIS_7);
+            player->RemoveAura(SPELL_DETECT_QUEST_INVIS_8);
+            player->AddAura(SPELL_DETECT_QUEST_INVIS_9, player);
+        }
+        
+        return false; 
+    }
+
+
+
+
     struct npc_colonel_troteman_43221AI : public ScriptedAI
     {
         npc_colonel_troteman_43221AI(Creature *c) : ScriptedAI(c) { }
@@ -609,6 +651,16 @@ public:
             m_phase = 0;
         }
 
+        void MoveInLineOfSight(Unit* who) override
+        {
+            if (Player* player = who->ToPlayer())
+                if (!HasPlayerSeenVideo(player->GetGUID()))
+                    if (!player->HasAura(SPELL_DETECT_QUEST_INVIS_4))
+                        {
+                            m_phase = 1;
+                            m_playerList.push_back(player->GetGUID());
+                        }
+        }
 
         void UpdateAI(uint32 diff) override
         {
@@ -632,12 +684,8 @@ public:
             switch (m_phase)
             {
             case 0:
-                if (Player* player = me->FindNearestPlayer(15.0))
-                    if (!HasPlayerSeenVideo(player->GetGUID()) && !player->HasAura(SPELL_DETECT_QUEST_INVIS_4))
-                    {
-                        m_phase = 1;
-                        m_playerList.push_back(player->GetGUID());
-                    }
+
+                break;
             case 1:
                 if (Creature* solomon = me->FindNearestCreature(NPC_MAGISTRATE_SOLOMON, 10.0f))
                     solomon->AI()->Talk(0);
@@ -687,9 +735,10 @@ public:
                 m_timer = 5000; m_phase = 11;
                 break;
             case 11:
-                m_phase = 0; 
+                m_timer = 60000; m_phase = 12;
                 break;
             case 12:
+                m_phase = 0;
                 break;
             }
         }
@@ -710,6 +759,520 @@ public:
     }
 };
 
+class npc_john_j_keeshan_43184 : public CreatureScript
+{
+public:
+    npc_john_j_keeshan_43184() : CreatureScript("npc_john_j_keeshan_43184") { }
+
+    struct npc_john_j_keeshan_43184AI : public ScriptedAI
+    {
+        npc_john_j_keeshan_43184AI(Creature *c) : ScriptedAI(c) { }
+
+        uint32 m_timer;
+
+        void Reset() override
+        {
+            m_timer = 1000;
+        }
+
+        void DamageTaken(Unit* attacker, uint32& damage) override
+        {
+            if (attacker->GetEntry() == NPC_DUMPY)
+                damage = 0;
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (m_timer <= diff)
+            {
+                m_timer = 1000;
+                DoWork();
+            }
+            else
+                m_timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+
+
+        void DoWork()
+        {
+          
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_john_j_keeshan_43184AI(creature);
+    }
+};
+
+class npc_hilary_8962 : public CreatureScript
+{
+public:
+    npc_hilary_8962() : CreatureScript("npc_hilary_8962") { }
+
+    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*opt*/)
+    {
+        if (Creature* cat = creature->FindNearestCreature(NPC_CAT, 5.0f))
+            cat->AI()->Talk(0);
+
+        creature->AI()->Talk(0);
+        return false;
+    }
+};
+
+class npc_messner_43270 : public CreatureScript
+{
+public:
+    npc_messner_43270() : CreatureScript("npc_messner_43270") { }
+
+    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*opt*/)
+    {
+        creature->AI()->Talk(0);
+        player->CastSpell(player, SPELL_SUMMON_MESSNER);
+        return false;
+    }
+};
+
+class npc_messner_43300 : public CreatureScript
+{
+public:
+    npc_messner_43300() : CreatureScript("npc_messner_43300") { }
+
+    struct npc_messner_43300AI : public ScriptedAI
+    {
+        npc_messner_43300AI(Creature *c) : ScriptedAI(c) { }
+
+        uint32 m_timer;
+        uint32 m_phase;
+        uint32 m_joke;
+
+        void Reset() override
+        {
+            if (Player* player = me->GetCharmerOrOwnerOrSelf()->ToPlayer())
+            {
+                player->RemoveAura(SPELL_DETECT_QUEST_INVIS_5);
+                player->AddAura(SPELL_DETECT_QUEST_INVIS_6, player);
+                player->CastSpell(player, SPELL_GNOMECORDER);
+            }
+            
+            me->CastSpell(me, SPELL_MOLTEN_ARMOR);
+            me->SetReactState(REACT_DEFENSIVE);
+            m_timer = 1000; 
+            m_phase = 0;
+            m_joke = urand(30, 60);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (m_timer <= diff)
+            {
+                m_timer = 1000;
+                DoWork();
+            }
+            else
+                m_timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+
+
+        void DoWork()
+        {
+            Player* player = me->GetCharmerOrOwnerOrSelf()->ToPlayer();
+            switch (m_phase)
+            {
+            case 0:
+                if (!me->IsInCombat() && player->GetQuestStatus(QUEST_JORGENSEN) == QUEST_STATUS_INCOMPLETE)
+                {
+                    if (m_joke > 0)
+                        m_joke -= 1;
+
+                    if (m_joke == 0)
+                        switch (urand(1, 11))
+                        {
+                        case 1:
+                            Talk(1);
+                            m_joke = urand(30, 60);
+                            break;
+                        case 2:
+                            Talk(2);
+                            m_phase = 1;
+                            m_timer = 5000;
+                            break;
+                        case 7:
+                            Talk(7);
+                            m_joke = urand(30, 60);
+                            break;
+                        case 8:
+                            Talk(8);
+                            m_joke = urand(30, 60);
+                            break;
+                        case 9:
+                            Talk(9);
+                            m_joke = urand(30, 60);
+                            break;
+                        case 10:
+                            Talk(10);
+                            m_joke = urand(30, 60);
+                            break;
+                    }
+                }
+                break;
+            case 1:
+                Talk(3);
+                m_phase = 0;
+                m_joke = urand(30, 60);
+                break;
+            case 2:
+                break;
+            case 3:
+                break;
+            case 4:
+                break;
+            }
+
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_messner_43300AI(creature);
+    }
+};
+
+class npc_jorgensen_43272 : public CreatureScript
+{
+public:
+    npc_jorgensen_43272() : CreatureScript("npc_jorgensen_43272") { }
+
+    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*opt*/)
+    {
+        creature->AI()->Talk(0);
+        
+        player->CastSpell(player, SPELL_SUMMON_JORGENSEN);
+        return false;
+    }
+};
+
+class npc_jorgensen_43305 : public CreatureScript
+{
+public:
+    npc_jorgensen_43305() : CreatureScript("npc_jorgensen_43305") { }
+
+    struct npc_jorgensen_43305AI : public ScriptedAI
+    {
+        npc_jorgensen_43305AI(Creature *c) : ScriptedAI(c) { }
+
+        uint32 m_timer;
+        uint32 m_phase;
+
+        void Reset() override
+        {
+            if (Player* player = me->GetCharmerOrOwnerOrSelf()->ToPlayer())
+            {
+                player->RemoveAura(SPELL_DETECT_QUEST_INVIS_6);
+                player->AddAura(SPELL_DETECT_QUEST_INVIS_7, player);
+                player->AddAura(SPELL_DETECT_QUEST_INVIS_8, player);
+                player->AddAura(SPELL_REDRIDGE_TEAM_AURA, player);
+                player->CastSpell(player, SPELL_GNOMECORDER);
+            }
+
+            me->AddAura(SPELL_CONCENTRATION_AURA, me);
+            me->CastSpell(me, SPELL_SEAL_OF_RIGHTEOUSNESS);
+            me->SetReactState(REACT_DEFENSIVE);
+            m_timer = 1000; m_phase = 1;
+        }
+
+        void KilledUnit(Unit* victim) 
+        { 
+            Talk(1);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (m_timer <= diff)
+            {
+                m_timer = 1000;
+                DoWork();
+            }
+            else
+                m_timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+
+
+        void DoWork()
+        {
+
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_jorgensen_43305AI(creature);
+    }
+};
+
+class npc_krakauer_43274 : public CreatureScript
+{
+public:
+    npc_krakauer_43274() : CreatureScript("npc_krakauer_43274") { }
+
+    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*opt*/)
+    {
+        creature->AI()->Talk(0);
+        
+        player->CastSpell(player, SPELL_SUMMON_KRAKAUER);
+        return false;
+    }
+};
+
+class npc_krakauer_43303 : public CreatureScript
+{
+public:
+    npc_krakauer_43303() : CreatureScript("npc_krakauer_43303") { }
+
+    struct npc_krakauer_43303AI : public ScriptedAI
+    {
+        npc_krakauer_43303AI(Creature *c) : ScriptedAI(c) { }
+
+        uint32 m_timer;
+        uint32 m_phase;
+
+        void Reset() override
+        {
+            if (Player* player = me->GetCharmerOrOwnerOrSelf()->ToPlayer())
+            {
+                player->AddAura(SPELL_DETECT_QUEST_INVIS_7, player);
+                player->AddAura(SPELL_DETECT_QUEST_INVIS_8, player);
+                player->AddAura(SPELL_REDRIDGE_TEAM_AURA, player);
+                player->CastSpell(player, SPELL_GNOMECORDER);
+            }
+
+            me->SetReactState(REACT_DEFENSIVE);
+            m_timer = 1000; m_phase = 1;
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (m_timer <= diff)
+            {
+                m_timer = 1000;
+                DoWork();
+            }
+            else
+                m_timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+
+
+        void DoWork()
+        {
+
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_krakauer_43303AI(creature);
+    }
+};
+
+class npc_danforth_43275 : public CreatureScript
+{
+public:
+    npc_danforth_43275() : CreatureScript("npc_danforth_43275") { }
+
+    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*opt*/)
+    {
+        creature->AI()->Talk(0);
+        
+        player->CastSpell(player, SPELL_SUMMON_DANFORT);
+        return false;
+    }
+
+    struct npc_danforth_43275AI : public ScriptedAI
+    {
+        npc_danforth_43275AI(Creature *c) : ScriptedAI(c) { }
+
+        uint32 m_timer;
+        uint32 m_phase;
+
+        void Reset() override
+        {
+            me->SetDisableGravity(true);
+            me->GetMotionMaster()->MoveIdle();
+            
+            m_timer = 0;
+            m_phase = 0;
+        }
+
+        void StartFreeing()
+        {
+            m_phase = 1;
+            m_timer = 500;
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (m_timer <= diff)
+            {
+                m_timer = 1000;
+                DoWork();
+            }
+            else
+                m_timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+
+
+        void DoWork()
+        {
+            switch (m_phase)
+            {
+            case 1:
+                me->GetMotionMaster()->MovePoint(1, -8805.83f, -2206.83f, 130.9454f);
+                m_timer = 120000;
+                m_phase = 2;
+                break;
+            case 2:
+                me->SetDisableGravity(true);
+                me->GetMotionMaster()->MovePoint(1, -8805.83f, -2206.83f, 144.3343f);
+                me->GetMotionMaster()->MoveIdle();
+                m_timer = 60000;
+                m_phase = 2;
+                break;
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_danforth_43275AI(creature);
+    }
+};
+
+class npc_danforth_43302 : public CreatureScript
+{
+public:
+    npc_danforth_43302() : CreatureScript("npc_danforth_43302") { }
+
+    struct npc_danforth_43302AI : public ScriptedAI
+    {
+        npc_danforth_43302AI(Creature *c) : ScriptedAI(c) { }
+
+        uint32 m_timer;
+        uint32 m_phase;
+
+        void Reset() override
+        {
+            if (Player* player = me->GetCharmerOrOwnerOrSelf()->ToPlayer())
+            {
+                player->AddAura(SPELL_REDRIDGE_TEAM_AURA, player);
+                player->CastSpell(player, SPELL_GNOMECORDER);
+            }
+
+            me->SetReactState(REACT_DEFENSIVE);
+            m_timer = 1000; m_phase = 1;
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (m_timer <= diff)
+            {
+                m_timer = 1000;
+                DoWork();
+            }
+            else
+                m_timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+
+
+        void DoWork()
+        {
+            switch (m_phase)
+            {
+            case 0:
+                break;
+            case 1:
+                me->SetSpeed(MOVE_SWIM, 0.2f, true);
+                me->GetMotionMaster()->MovePoint(2, -8819.81f, -2188.81f, 138.765f);
+                m_timer = 3000; m_phase = 2;
+                break;
+            case 2:
+                break;
+            case 3:
+                break;
+            case 4:
+                break;
+
+            case 10: // dumme sprüche..
+                break;
+
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_danforth_43302AI(creature);
+    }
+};
+
+class spell_freeing_danforth : public SpellScriptLoader
+{
+public:
+    spell_freeing_danforth() : SpellScriptLoader("spell_freeing_danforth") { }
+
+    class spell_freeing_danforth_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_freeing_danforth_SpellScript);
+
+        void OpenLock(SpellEffIndex effIndex)
+        {
+            if (Unit* go = this->GetCaster())
+                if (Creature* danforth = go->FindNearestCreature(NPC_DANFORTH_43275, 75.0f))
+                    CAST_AI(npc_danforth_43275::npc_danforth_43275AI, danforth->AI())->StartFreeing();
+        }
+
+        void Register() OVERRIDE
+        {
+            OnEffectLaunch += SpellEffectFn(spell_freeing_danforth_SpellScript::OpenLock, EFFECT_0, SPELL_EFFECT_OPEN_LOCK);
+        }
+    };
+
+    SpellScript* GetSpellScript() const OVERRIDE
+    {
+        return new spell_freeing_danforth_SpellScript();
+    }
+};
+
+
 void AddSC_redridge_mountains()
 {
     new npc_marshal_marris();
@@ -719,5 +1282,16 @@ void AddSC_redridge_mountains()
     new at_lakeshire_graveyard();
     new npc_canyon_ettin_43197();
     new npc_colonel_troteman_43221();
+    new npc_john_j_keeshan_43184();
+    new npc_hilary_8962();
+    new npc_messner_43270();
+    new npc_messner_43300();
+    new npc_jorgensen_43272();
+    new npc_jorgensen_43305();
+    new npc_krakauer_43274();
+    new npc_krakauer_43303();
+    new npc_danforth_43275();
+    new npc_danforth_43302();
+    new spell_freeing_danforth();
 }
 
