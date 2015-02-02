@@ -36,6 +36,7 @@ enum eAnimRedridgeCity
     NPC_COLONEL_TROTEMAN_43221 = 43221,
     NPC_JOHN_J_KEESHAN_43184 = 43184,
     NPC_CAT = 8963,
+    NPC_AREA_TRIGGER_BUNNY = 47971,
     NPC_MESSNER_43270 = 43270,
     NPC_MESSNER_43300 = 43300,
     NPC_JORGENSEN_43272 = 43272,
@@ -54,6 +55,9 @@ enum eAnimRedridgeCity
     SPELL_APPLY_QUEST_INVIS_5 = 81003,
     SPELL_APPLY_QUEST_INVIS_9 = 81201,
     SPELL_APPLY_QUEST_INVIS_10 = 81240,
+    SPELL_DETECT_QUEST_INVIS_1 = 80695,
+    SPELL_DETECT_QUEST_INVIS_2 = 80696,
+    SPELL_DETECT_QUEST_INVIS_3 = 80817,
     SPELL_DETECT_QUEST_INVIS_4 = 80818,
     SPELL_DETECT_QUEST_INVIS_5 = 81004,
     SPELL_DETECT_QUEST_INVIS_6 = 81010,
@@ -64,7 +68,7 @@ enum eAnimRedridgeCity
     SPELL_SUMMON_MESSNER = 80893,
     SPELL_SUMMON_JORGENSEN = 80940,
     SPELL_SUMMON_KRAKAUER = 80941,
-    SPELL_SUMMON_DANFORT = 80943,
+    SPELL_SUMMON_DANFORTH = 80943,
     SPELL_CONCENTRATION_AURA = 79963,
     SPELL_SEAL_OF_RIGHTEOUSNESS = 79962,
     SPELL_MOLTEN_ARMOR = 79849,
@@ -76,11 +80,11 @@ enum eAnimRedridgeCity
     SPELL_CHAINS_OF_CRUELTY_1 = 81081,
     SPELL_CHAINS_OF_CRUELTY_2 = 81085,
     QUEST_JOHN_J_KEESHAN = 26567,
+    QUEST_THIS_AINT_MY_WAR = 26568,
     QUEST_TUNING_THE_GNOMECORDER = 26512,
     QUEST_JORGENSEN = 26560,
+    QUEST_RETURN_OF_THE_BRAVO_COMPANY = 26563,
     QUEST_THEY_DREW_FIRST_BLOOD = 26607,
-
-
 };
 
 class npc_marshal_marris : public CreatureScript
@@ -152,21 +156,30 @@ class npc_big_earl_43248 : public CreatureScript
 public:
     npc_big_earl_43248() : CreatureScript("npc_big_earl_43248") { }
 
+    enum eFightStatus
+    {
+        None,
+        Dumpy,
+        Keeshan
+    };
+
     struct npc_big_earl_43248AI : public ScriptedAI
     {
         npc_big_earl_43248AI(Creature *c) : ScriptedAI(c) { }
 
         uint32 m_timer;
-        uint32 m_phase;
         Creature* m_dumpy;
         Creature* m_keeshan;
+        eFightStatus m_FightStatus;
+        eFightStatus m_FightStatusOld;
 
         void Reset() override
         {
             m_timer = 1000;
-            m_phase = 3;
             m_dumpy = NULL;
             m_keeshan = NULL;
+            m_FightStatus = eFightStatus::None;
+            m_FightStatusOld = eFightStatus::None;
         }
 
         void DamageTaken(Unit* attacker, uint32& damage) override
@@ -177,16 +190,19 @@ public:
 
         void MoveInLineOfSight(Unit* who) override
         {
-            if (m_phase == 0)
-                if (Player* player = who->ToPlayer())
-                    if (player->GetQuestStatus(QUEST_JOHN_J_KEESHAN) == QUEST_STATUS_COMPLETE  && player->HasAura(SPELL_DETECT_QUEST_INVIS_4))
-                    {
-                        m_phase = 1; m_timer = 1000;
-                    }
-                    else
-                    {
-                        m_phase = 3; m_timer = 1000;
-                    }
+            if (Player* player = who->ToPlayer())
+                if (player->HasAura(SPELL_DETECT_QUEST_INVIS_9))
+                {
+                    m_FightStatus = eFightStatus::None;
+                }
+                else if (player->HasAura(SPELL_DETECT_QUEST_INVIS_4))
+                {
+                    m_FightStatus = eFightStatus::Keeshan;
+                }
+                else if (player->HasAura(SPELL_DETECT_QUEST_INVIS_3))
+                {
+                    m_FightStatus = eFightStatus::Dumpy;
+                }
         }
 
         void UpdateAI(uint32 diff) override
@@ -207,47 +223,72 @@ public:
         
         void DoWork()
         {
-            Player* player = me->FindNearestPlayer(20.0f);
+            Player* player = me->FindNearestPlayer(20.0f); 
+
+            if (!player)
+                m_FightStatus = eFightStatus::None;
+
+            if (m_FightStatus == m_FightStatusOld)
+                return;
+
+            printf("m_FightStatus= %u \n", m_FightStatus);
+
             m_dumpy = me->FindNearestCreature(NPC_DUMPY, 5.0f);
             m_keeshan = me->FindNearestCreature(NPC_JOHN_J_KEESHAN_43184, 5.0f);
-            switch (m_phase)
+                      
+
+            switch (m_FightStatus)
             {
-            case 0:
-                break;
-            case 1:
+            case eFightStatus::None:
+                me->RemoveAura(SPELL_APPLY_QUEST_INVIS_1);
+                me->RemoveAura(SPELL_APPLY_QUEST_INVIS_4);
+                me->RemoveAura(SPELL_APPLY_QUEST_INVIS_9);
+                me->AttackStop();
                 if (m_dumpy)
-                    m_dumpy->DespawnOrUnsummon();
-
-                if (!m_keeshan)
-                    m_keeshan = me->SummonCreature(NPC_JOHN_J_KEESHAN_43184, -9203.84f, -2155.79f, 57.187f, 3.565f, TEMPSUMMON_TIMED_DESPAWN, 600000);
-
-                if (!m_keeshan->IsInCombat())
                 {
-                    m_keeshan->Attack(me, true);
-                    me->Attack(m_keeshan, true);
+                    m_dumpy->RemoveAura(SPELL_APPLY_QUEST_INVIS_3);
+                    m_dumpy->AttackStop();
                 }
-                m_phase = 2; m_timer = 60000;
-                break;
-            case 2:
-                if (!player || !m_keeshan)
-                    m_phase = 3;
-
-                break;
-            case 3:
                 if (m_keeshan)
-                    m_keeshan->DespawnOrUnsummon();
-
-                if (!m_dumpy)
-                    m_dumpy = me->SummonCreature(NPC_DUMPY, -2101.98f, -2154.78f, 57.19f, 1.659f);
-
-                if (m_dumpy && !m_dumpy->IsInCombat())
                 {
+                    m_keeshan->RemoveAura(SPELL_APPLY_QUEST_INVIS_4);
+                    m_keeshan->AttackStop();
+                }
+                break;
+            case eFightStatus::Dumpy:
+                if (m_keeshan && m_FightStatusOld == eFightStatus::Keeshan)
+                {
+                    m_keeshan->RemoveAura(SPELL_APPLY_QUEST_INVIS_4);
+                    me->RemoveAura(SPELL_APPLY_QUEST_INVIS_4);
+                    m_keeshan->AttackStop();
+                    me->AttackStop();
+                }
+                if (m_dumpy)
+                {
+                    m_dumpy->AddAura(SPELL_APPLY_QUEST_INVIS_3, m_dumpy);
+                    me->AddAura(SPELL_APPLY_QUEST_INVIS_3, me);
                     m_dumpy->Attack(me, true);
                     me->Attack(m_dumpy, true);
                 }
-                m_phase = 0; m_timer = 0;
                 break;
-           }
+            case eFightStatus::Keeshan:
+                if (m_dumpy && m_FightStatusOld == eFightStatus::Dumpy)
+                {
+                    m_dumpy->RemoveAura(SPELL_APPLY_QUEST_INVIS_3);
+                    m_dumpy->AttackStop();
+                    me->AttackStop();
+                }
+                if (m_keeshan)
+                {
+                    me->AddAura(SPELL_APPLY_QUEST_INVIS_4, me);
+                    m_keeshan->AddAura(SPELL_APPLY_QUEST_INVIS_4, m_keeshan);
+                    m_keeshan->Attack(me, true);
+                    me->Attack(m_keeshan, true);
+                }
+                break;
+            }
+            
+            m_FightStatusOld = m_FightStatus;
         }
     };
 
@@ -354,7 +395,7 @@ public:
         {
             player->SendPlaySound(18125, true);
             player->CastSpell(player, 81769, true);
-            player->CompleteQuest(QUEST_TUNING_THE_GNOMECORDER);
+            player->KilledMonsterCredit(NPC_AREA_TRIGGER_BUNNY);
         }
 
         return false;
@@ -608,13 +649,17 @@ class npc_colonel_troteman_43221 : public CreatureScript
 public:
     npc_colonel_troteman_43221() : CreatureScript("npc_colonel_troteman_43221") { }
 
-    bool OnGossipHello(Player* player, Creature* /*creature*/) 
+    bool OnQuestReward(Player* player, Creature* /*creature*/, Quest const* quest, uint32 /*opt*/) 
     { 
-        if (player->GetQuestStatus(QUEST_THEY_DREW_FIRST_BLOOD) == QUEST_STATUS_COMPLETE)
+        if (quest->GetQuestId() == QUEST_THIS_AINT_MY_WAR)
+        {
+            player->RemoveAura(SPELL_DETECT_QUEST_INVIS_4);
+        }
+        if (quest->GetQuestId() == QUEST_RETURN_OF_THE_BRAVO_COMPANY)
         {
             if (Creature* messner = player->FindNearestCreature(NPC_MESSNER_43300, 300.0f))
                 messner->DespawnOrUnsummon();
-            
+
             if (Creature* jorgensen = player->FindNearestCreature(NPC_JORGENSEN_43305, 300.0f))
                 jorgensen->DespawnOrUnsummon();
 
@@ -624,18 +669,26 @@ public:
             if (Creature* danforth = player->FindNearestCreature(NPC_DANFORTH_43302, 300.0f))
                 danforth->DespawnOrUnsummon();
 
+            player->RemoveAura(SPELL_SUMMON_MESSNER);
+            player->RemoveAura(SPELL_SUMMON_JORGENSEN);
+            player->RemoveAura(SPELL_SUMMON_KRAKAUER);
+            player->RemoveAura(SPELL_SUMMON_DANFORTH);
             player->RemoveAura(SPELL_DETECT_QUEST_INVIS_5);
             player->RemoveAura(SPELL_DETECT_QUEST_INVIS_6);
             player->RemoveAura(SPELL_DETECT_QUEST_INVIS_7);
             player->RemoveAura(SPELL_DETECT_QUEST_INVIS_8);
-            player->AddAura(SPELL_DETECT_QUEST_INVIS_9, player);
         }
-        
         return false; 
     }
 
-
-
+    bool OnQuestAccept(Player* player, Creature* /*creature*/, Quest const* quest) 
+    { 
+        if (quest->GetQuestId() == QUEST_RETURN_OF_THE_BRAVO_COMPANY)
+        {
+            player->AddAura(SPELL_DETECT_QUEST_INVIS_9, player);
+        }
+        return false; 
+    }
 
     struct npc_colonel_troteman_43221AI : public ScriptedAI
     {
@@ -655,7 +708,7 @@ public:
         {
             if (Player* player = who->ToPlayer())
                 if (!HasPlayerSeenVideo(player->GetGUID()))
-                    if (!player->HasAura(SPELL_DETECT_QUEST_INVIS_4))
+                    if (player->HasAura(SPELL_DETECT_QUEST_INVIS_3))
                         {
                             m_phase = 1;
                             m_playerList.push_back(player->GetGUID());
@@ -779,6 +832,9 @@ public:
         {
             if (attacker->GetEntry() == NPC_DUMPY)
                 damage = 0;
+
+            if (attacker->GetEntry() == NPC_BIG_EARL)
+                damage = 0;
         }
 
         void UpdateAI(uint32 diff) override
@@ -886,45 +942,47 @@ public:
 
         void DoWork()
         {
+            if (me->IsInCombat())
+            {
+                m_joke = 45;
+                return;
+            }
             Player* player = me->GetCharmerOrOwnerOrSelf()->ToPlayer();
             switch (m_phase)
             {
             case 0:
-                if (!me->IsInCombat() && player->GetQuestStatus(QUEST_JORGENSEN) == QUEST_STATUS_INCOMPLETE)
-                {
-                    if (m_joke > 0)
-                        m_joke -= 1;
+                if (m_joke > 0)
+                    m_joke -= 1;
 
-                    if (m_joke == 0)
-                        switch (urand(1, 11))
-                        {
-                        case 1:
-                            Talk(1);
-                            m_joke = urand(30, 60);
-                            break;
-                        case 2:
-                            Talk(2);
-                            m_phase = 1;
-                            m_timer = 5000;
-                            break;
-                        case 7:
-                            Talk(7);
-                            m_joke = urand(30, 60);
-                            break;
-                        case 8:
-                            Talk(8);
-                            m_joke = urand(30, 60);
-                            break;
-                        case 9:
-                            Talk(9);
-                            m_joke = urand(30, 60);
-                            break;
-                        case 10:
-                            Talk(10);
-                            m_joke = urand(30, 60);
-                            break;
+                if (m_joke == 0)
+                    switch (urand(1, 11))
+                    {
+                    case 1:
+                        Talk(1);
+                        m_joke = urand(30, 60);
+                        break;
+                    case 2:
+                        Talk(2);
+                        m_phase = 1;
+                        m_timer = 5000;
+                        break;
+                    case 7:
+                        Talk(7);
+                        m_joke = urand(30, 60);
+                        break;
+                    case 8:
+                        Talk(8);
+                        m_joke = urand(30, 60);
+                        break;
+                    case 9:
+                        Talk(9);
+                        m_joke = urand(30, 60);
+                        break;
+                    case 10:
+                        Talk(10);
+                        m_joke = urand(30, 60);
+                        break;
                     }
-                }
                 break;
             case 1:
                 Talk(3);
@@ -980,7 +1038,6 @@ public:
             {
                 player->RemoveAura(SPELL_DETECT_QUEST_INVIS_6);
                 player->AddAura(SPELL_DETECT_QUEST_INVIS_7, player);
-                player->AddAura(SPELL_DETECT_QUEST_INVIS_8, player);
                 player->AddAura(SPELL_REDRIDGE_TEAM_AURA, player);
                 player->CastSpell(player, SPELL_GNOMECORDER);
             }
@@ -1055,7 +1112,7 @@ public:
         {
             if (Player* player = me->GetCharmerOrOwnerOrSelf()->ToPlayer())
             {
-                player->AddAura(SPELL_DETECT_QUEST_INVIS_7, player);
+                player->RemoveAura(SPELL_DETECT_QUEST_INVIS_7);
                 player->AddAura(SPELL_DETECT_QUEST_INVIS_8, player);
                 player->AddAura(SPELL_REDRIDGE_TEAM_AURA, player);
                 player->CastSpell(player, SPELL_GNOMECORDER);
@@ -1101,9 +1158,7 @@ public:
 
     bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*opt*/)
     {
-        creature->AI()->Talk(0);
-        
-        player->CastSpell(player, SPELL_SUMMON_DANFORT);
+        player->CastSpell(player, SPELL_SUMMON_DANFORTH);
         return false;
     }
 
@@ -1113,20 +1168,19 @@ public:
 
         uint32 m_timer;
         uint32 m_phase;
-
+        
         void Reset() override
         {
             me->SetDisableGravity(true);
             me->GetMotionMaster()->MoveIdle();
-            
-            m_timer = 0;
-            m_phase = 0;
+            me->SetFacingTo(2.3f);
+            m_timer = 1000; 
+            m_phase = 2;
         }
 
-        void StartFreeing()
+        void FreeingDanforth()
         {
-            m_phase = 1;
-            m_timer = 500;
+            m_timer = 250; m_phase = 1;
         }
 
         void UpdateAI(uint32 diff) override
@@ -1145,22 +1199,24 @@ public:
             DoMeleeAttackIfReady();
         }
 
-
         void DoWork()
         {
             switch (m_phase)
             {
+            case 0:
+                break;
             case 1:
-                me->GetMotionMaster()->MovePoint(1, -8805.83f, -2206.83f, 130.9454f);
-                m_timer = 120000;
-                m_phase = 2;
+                me->GetMotionMaster()->MoveJump(-8805.83f, -2206.83f, 130.9454f, 10.0f, 5.0f);
+                m_timer = 120000; m_phase = 2;
                 break;
             case 2:
-                me->SetDisableGravity(true);
-                me->GetMotionMaster()->MovePoint(1, -8805.83f, -2206.83f, 144.3343f);
-                me->GetMotionMaster()->MoveIdle();
-                m_timer = 60000;
-                m_phase = 2;
+                me->GetMotionMaster()->MoveJump(-8805.83f, -2206.83f, 144.3343f, 10.0f, 5.0f);
+                me->HandleEmoteState(EMOTE_ONESHOT_NONE);
+                me->SetFacingTo(2.3f);
+               // me->GetMotionMaster()->MoveIdle();
+                m_timer = 0; m_phase = 0;
+                break;
+            case 3:
                 break;
             }
         }
@@ -1179,16 +1235,19 @@ public:
 
     struct npc_danforth_43302AI : public ScriptedAI
     {
-        npc_danforth_43302AI(Creature *c) : ScriptedAI(c) { }
+        npc_danforth_43302AI(Creature *c) : ScriptedAI(c) { m_NewSpawned = true; }
 
         uint32 m_timer;
         uint32 m_phase;
+        bool m_NewSpawned;
 
         void Reset() override
         {
             if (Player* player = me->GetCharmerOrOwnerOrSelf()->ToPlayer())
             {
+                player->RemoveAura(SPELL_DETECT_QUEST_INVIS_8);
                 player->AddAura(SPELL_REDRIDGE_TEAM_AURA, player);
+                player->AddAura(SPELL_REDRIDGE_TEAM_AURA, me);
                 player->CastSpell(player, SPELL_GNOMECORDER);
             }
 
@@ -1220,20 +1279,17 @@ public:
             case 0:
                 break;
             case 1:
-                me->SetSpeed(MOVE_SWIM, 0.2f, true);
-                me->GetMotionMaster()->MovePoint(2, -8819.81f, -2188.81f, 138.765f);
-                m_timer = 3000; m_phase = 2;
+                if (m_NewSpawned)
+                {
+                    // Danforth is only swimming.. he walk not upto land.. so i teleport him.. 
+                    me->NearTeleportTo(-8819.81f, -2188.81f, 138.765f, 2.3f);
+                    m_NewSpawned = false;
+                }
+                Talk(6);
+                m_timer = 0; m_phase = 0;
                 break;
             case 2:
                 break;
-            case 3:
-                break;
-            case 4:
-                break;
-
-            case 10: // dumme sprüche..
-                break;
-
             }
         }
     };
@@ -1255,9 +1311,9 @@ public:
 
         void OpenLock(SpellEffIndex effIndex)
         {
-            if (Unit* go = this->GetCaster())
-                if (Creature* danforth = go->FindNearestCreature(NPC_DANFORTH_43275, 75.0f))
-                    CAST_AI(npc_danforth_43275::npc_danforth_43275AI, danforth->AI())->StartFreeing();
+            if (Unit* unit = this->GetCaster())
+                if (Creature* danforth = unit->FindNearestCreature(NPC_DANFORTH_43275, 100.0f))
+                    CAST_AI(npc_danforth_43275::npc_danforth_43275AI, danforth->AI())->FreeingDanforth();
         }
 
         void Register() OVERRIDE
@@ -1293,5 +1349,6 @@ void AddSC_redridge_mountains()
     new npc_danforth_43275();
     new npc_danforth_43302();
     new spell_freeing_danforth();
+
 }
 

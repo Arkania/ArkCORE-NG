@@ -16,10 +16,10 @@ update creature_template set AIName="", ScriptName="npc_messner_43270" where ent
 update creature_template set AIName="", ScriptName="npc_messner_43300" where entry=43300;
 update creature_template set AIName="", ScriptName="npc_jorgensen_43272" where entry=43272;
 update creature_template set AIName="", ScriptName="npc_krakauer_43274" where entry=43274;
-update creature_template set AIName="", ScriptName="npc_danfort_43275" where entry=43275;
+update creature_template set AIName="", ScriptName="npc_danforth_43275" where entry=43275;
 update creature_template set AIName="", ScriptName="npc_jorgensen_43305" where entry=43305;
 update creature_template set AIName="", ScriptName="npc_krakauer_43303" where entry=43303;
-update creature_template set AIName="", ScriptName="npc_danfort_43302" where entry=43302;
+update creature_template set AIName="", ScriptName="npc_danforth_43302" where entry=43302;
 
 
 update quest_template set Flags=16252928, SpecialFlags=4, NextQuestId=26514 where Id=26512;
