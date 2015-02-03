@@ -35,6 +35,8 @@ enum eAnimRedridgeCity
     NPC_MAGISTRATE_SOLOMON = 344,
     NPC_COLONEL_TROTEMAN_43221 = 43221,
     NPC_JOHN_J_KEESHAN_43184 = 43184,
+    NPC_KRAKAUER_43434 = 43434,
+    NPC_DANFORTH_43435 = 43435,
     NPC_CAT = 8963,
     NPC_AREA_TRIGGER_BUNNY = 47971,
     NPC_MESSNER_43270 = 43270,
@@ -79,12 +81,15 @@ enum eAnimRedridgeCity
     SPELL_BAKER_TEAM_BROADCAST = 81155,
     SPELL_CHAINS_OF_CRUELTY_1 = 81081,
     SPELL_CHAINS_OF_CRUELTY_2 = 81085,
+    SPELL_KEESHANS_HEADBAND = 81234,
     QUEST_JOHN_J_KEESHAN = 26567,
     QUEST_THIS_AINT_MY_WAR = 26568,
     QUEST_TUNING_THE_GNOMECORDER = 26512,
+    QUEST_BREAKING_OUT_IS_HARD_TO_DO = 26587,
     QUEST_JORGENSEN = 26560,
     QUEST_RETURN_OF_THE_BRAVO_COMPANY = 26563,
     QUEST_THEY_DREW_FIRST_BLOOD = 26607,
+    QUEST_ITS_NEVER_OVER = 26616,
 };
 
 class npc_marshal_marris : public CreatureScript
@@ -683,7 +688,7 @@ public:
 
     bool OnQuestAccept(Player* player, Creature* /*creature*/, Quest const* quest) 
     { 
-        if (quest->GetQuestId() == QUEST_RETURN_OF_THE_BRAVO_COMPANY)
+        if (quest->GetQuestId() == QUEST_THEY_DREW_FIRST_BLOOD)
         {
             player->AddAura(SPELL_DETECT_QUEST_INVIS_9, player);
         }
@@ -817,6 +822,33 @@ class npc_john_j_keeshan_43184 : public CreatureScript
 public:
     npc_john_j_keeshan_43184() : CreatureScript("npc_john_j_keeshan_43184") { }
 
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    {
+        if (quest->GetQuestId() == QUEST_ITS_NEVER_OVER)
+        {
+            player->AddAura(SPELL_DETECT_QUEST_INVIS_10, player);
+            creature->AI()->Talk(0);
+
+            if (Creature* krakauer = creature->FindNearestCreature(NPC_KRAKAUER_43434, 10.0f))
+                krakauer->AI()->Talk(0);
+
+            if (Creature* danforth = creature->FindNearestCreature(NPC_DANFORTH_43435, 10.0f))
+                danforth->AI()->Talk(0);
+
+            player->RemoveAura(SPELL_GNOMECORDER);
+        }
+        return false;
+    }
+
+    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*opt*/)
+    {
+        if (quest->GetQuestId() == QUEST_THEY_DREW_FIRST_BLOOD)
+        {
+            creature->CastSpell(creature, SPELL_KEESHANS_HEADBAND);
+        }
+        return false;
+    }
+
     struct npc_john_j_keeshan_43184AI : public ScriptedAI
     {
         npc_john_j_keeshan_43184AI(Creature *c) : ScriptedAI(c) { }
@@ -888,9 +920,76 @@ public:
 
     bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*opt*/)
     {
-        creature->AI()->Talk(0);
-        player->CastSpell(player, SPELL_SUMMON_MESSNER);
+        if (quest->GetQuestId() == QUEST_BREAKING_OUT_IS_HARD_TO_DO)
+        {
+            CAST_AI(npc_messner_43270AI, creature->AI())->StartAnim(player);
+        }
         return false;
+    }
+
+    struct npc_messner_43270AI : public ScriptedAI
+    {
+        npc_messner_43270AI(Creature *c) : ScriptedAI(c) { }
+
+        uint32 m_timer;
+        uint32 m_phase;
+        Player* m_player;
+
+        void Reset() override
+        {
+            m_timer = 0;
+            m_phase = 0;
+            m_player = NULL;
+        }
+
+        void StartAnim(Player* player)
+        {            
+            m_player = player;
+            m_timer =250; m_phase = 1;
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (m_timer <= diff)
+            {
+                m_timer = 1000;
+                DoWork();
+            }
+            else
+                m_timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+
+        void DoWork()
+        {
+            switch (m_phase)
+            {
+            case 0:
+                break;
+            case 1:
+                Talk(0);
+                m_timer = 2000; m_phase = 2;
+                break;
+            case 2:
+                if (m_player)
+                    m_player->CastSpell(m_player, SPELL_SUMMON_MESSNER);
+
+                m_timer = 5000; m_phase = 3;
+                break;
+            case 3:
+                m_timer = 0; m_phase = 0;
+                break;
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_messner_43270AI(creature);
     }
 };
 
@@ -938,8 +1037,7 @@ public:
 
             DoMeleeAttackIfReady();
         }
-
-
+        
         void DoWork()
         {
             if (me->IsInCombat())
@@ -947,7 +1045,6 @@ public:
                 m_joke = 45;
                 return;
             }
-            Player* player = me->GetCharmerOrOwnerOrSelf()->ToPlayer();
             switch (m_phase)
             {
             case 0:
@@ -991,10 +1088,6 @@ public:
                 break;
             case 2:
                 break;
-            case 3:
-                break;
-            case 4:
-                break;
             }
 
         }
@@ -1013,10 +1106,73 @@ public:
 
     bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*opt*/)
     {
-        creature->AI()->Talk(0);
-        
-        player->CastSpell(player, SPELL_SUMMON_JORGENSEN);
+        CAST_AI(npc_jorgensen_43272AI, creature->AI())->StartAnim(player);
         return false;
+    }
+
+    struct npc_jorgensen_43272AI : public ScriptedAI
+    {
+        npc_jorgensen_43272AI(Creature *c) : ScriptedAI(c) { }
+
+        uint32 m_timer;
+        uint32 m_phase;
+        Player* m_player;
+
+        void Reset() override
+        {
+            m_timer = 0;
+            m_phase = 0;
+            m_player = NULL;
+        }
+
+        void StartAnim(Player* player)
+        {
+            m_player = player;
+            m_timer = 250; m_phase = 1;
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (m_timer <= diff)
+            {
+                m_timer = 1000;
+                DoWork();
+            }
+            else
+                m_timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+
+        void DoWork()
+        {
+            switch (m_phase)
+            {
+            case 0:
+                break;
+            case 1:
+                Talk(0);
+                m_timer = 2000; m_phase = 2;
+                break;
+            case 2:
+                if (m_player)
+                    m_player->CastSpell(m_player, SPELL_SUMMON_JORGENSEN);
+
+                m_timer = 5000; m_phase = 3;
+                break;
+            case 3:
+                Reset();
+                break;
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_jorgensen_43272AI(creature);
     }
 };
 
@@ -1284,8 +1440,8 @@ public:
                     // Danforth is only swimming.. he walk not upto land.. so i teleport him.. 
                     me->NearTeleportTo(-8819.81f, -2188.81f, 138.765f, 2.3f);
                     m_NewSpawned = false;
+                    Talk(6);
                 }
-                Talk(6);
                 m_timer = 0; m_phase = 0;
                 break;
             case 2:
@@ -1327,6 +1483,9 @@ public:
         return new spell_freeing_danforth_SpellScript();
     }
 };
+
+//###################################### Start Quest 26616 It's never over: riverboat ride to other beach..
+
 
 
 void AddSC_redridge_mountains()
