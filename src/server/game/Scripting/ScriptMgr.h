@@ -617,6 +617,8 @@ class VehicleScript : public ScriptObject
 
     public:
 
+        bool IsDatabaseBound() const FINAL{ return true; }
+
         // Called after a vehicle is installed.
         virtual void OnInstall(Vehicle* /*veh*/) { }
 
