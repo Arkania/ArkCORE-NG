@@ -27,6 +27,7 @@ Script Data End */
 #include "ScriptedEscortAI.h"
 #include "Player.h"
 #include "GameObjectAI.h"
+#include "Vehicle.h"
 
 enum eAnimRedridgeCity
 {
@@ -90,6 +91,7 @@ enum eAnimRedridgeCity
     QUEST_RETURN_OF_THE_BRAVO_COMPANY = 26563,
     QUEST_THEY_DREW_FIRST_BLOOD = 26607,
     QUEST_ITS_NEVER_OVER = 26616,
+    AREA_CAMP_EVERSTILL = 5326,
 };
 
 class npc_marshal_marris : public CreatureScript
@@ -1486,6 +1488,362 @@ public:
 
 //###################################### Start Quest 26616 It's never over: riverboat ride to other beach..
 
+enum eAnimBoot
+{
+    NPC_KEESHANS_RIVERBOAT_43450 = 43450,
+    NPN_JOHN_J_KEESHAN_43449 = 43449,
+    NPC_MESSNER_43448 = 43448,
+    NPC_JORGENSEN_43447 = 43447,
+    NPC_KRAKAUER_43446 = 43446,
+    NPN_DANFORTH_43445 = 43445,
+    NPN_JOHN_J_KEESHAN_43457 = 43457,
+    NPC_MESSNER_43432 = 43432,
+    NPC_JORGENSEN_43433 = 43433,
+    // NPC_KRAKAUER_43434 = 43434,
+    NPN_DANFORTH_43435 = 43435,
+    SPELL_RIDE_VEHICLE_HARDCODED = 46598,
+    SPELL_RIVERBOAT_TRIGGER_01 = 81257,
+    SPELL_RIVERBOAT_TRIGGER_02 = 81258,
+    SPELL_RIVERBOAT_TRIGGER_03 = 81263,
+    SPELL_RIVERBOAT_TRIGGER_04 = 81254,
+    SPELL_MESSNER_BOAT_ENGINE = 81260,
+    SPELL_DETECT_QUEST_INVIS_11 = 81267,
+    SPELL_DETECT_QUEST_INVIS_12 = 81497,
+    SPELL_APPLY_QUEST_INVIS_11 = 81266,
+    SPELL_APPLY_QUEST_INVIS_12 = 81496,
+    SPELL_RIVERBOAT_QUEST_CREDIT = 81265,
+};
+
+class npc_john_j_keeshan_43449 : public CreatureScript
+{
+public:
+    npc_john_j_keeshan_43449() : CreatureScript("npc_john_j_keeshan_43449") { }
+
+    struct npc_john_j_keeshan_43449AI : public ScriptedAI
+    {
+        npc_john_j_keeshan_43449AI(Creature *c) : ScriptedAI(c) { }
+
+        uint32 m_timer;
+        uint32 m_phase;
+
+        void Reset() override
+        {
+            m_timer = 0;
+            m_phase = 0;
+        }
+
+        void StartAnim()
+        {
+            if (m_phase == 0)
+            {
+                m_timer = 1000;
+                m_phase = 1;
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (m_timer <= diff)
+            {
+                m_timer = 1000;
+                DoWork();
+            }
+            else
+                m_timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+        
+        void DoWork()
+        {
+            switch (m_phase)
+            {
+            case 0:
+                break;
+            case 1:
+                if (Creature* vehicle = me->FindNearestCreature(NPC_KEESHANS_RIVERBOAT_43450, 25.0f))
+                {
+                    vehicle->SetFacingTo(3.57f);
+
+                    me->SetWaterWalking(true);
+                    me->GetMotionMaster()->MovePoint(0, vehicle->GetPosition());
+
+                    if (Player* player = vehicle->GetCharmerOrOwnerOrSelf()->ToPlayer())
+                        player->RemoveAura(SPELL_DETECT_QUEST_INVIS_3);
+
+                    if (Creature* npc = me->FindNearestCreature(NPC_MESSNER_43448, 25.0f))
+                    {
+                        npc->GetMotionMaster()->MovePoint(0, vehicle->GetPosition());
+                        npc->SetWaterWalking(true);
+                    }
+
+                    if (Creature* npc = me->FindNearestCreature(NPC_JORGENSEN_43447, 25.0f))
+                    {
+                        npc->GetMotionMaster()->MovePoint(0, vehicle->GetPosition());
+                        npc->SetWaterWalking(true);
+                    }
+
+                    if (Creature* npc = me->FindNearestCreature(NPC_KRAKAUER_43446, 25.0f))
+                    {
+                        npc->GetMotionMaster()->MovePoint(0, vehicle->GetPosition());
+                        npc->SetWaterWalking(true);
+                    }
+
+                    if (Creature* npc = me->FindNearestCreature(NPN_DANFORTH_43445, 25.0f))
+                    {
+                        npc->GetMotionMaster()->MovePoint(0, vehicle->GetPosition());
+                        npc->SetWaterWalking(true);
+                    }
+                }
+
+                m_timer = 2000; m_phase = 2;
+                break;
+            case 2:
+                if (Creature* vehicle = me->FindNearestCreature(NPC_KEESHANS_RIVERBOAT_43450, 25.0f))
+                {
+                    if (Player* player = vehicle->GetCharmerOrOwnerOrSelf()->ToPlayer())
+                    {
+                        player->RemoveAura(SPELL_DETECT_QUEST_INVIS_9);
+                        player->AddAura(SPELL_DETECT_QUEST_INVIS_10, player);
+
+                        if (Creature* npc = player->SummonCreature(NPN_JOHN_J_KEESHAN_43457, vehicle->GetNearPosition(2.0f, frand(0.0f, 6.28f))))
+                        {
+                            npc->EnterVehicle(vehicle, 1);
+                            npc->AddAura(SPELL_APPLY_QUEST_INVIS_10, npc);
+                            npc->AI()->Talk(0);
+                        }
+
+                        if (Creature* npc = player->SummonCreature(NPC_JORGENSEN_43433, vehicle->GetNearPosition(2.0f, frand(0.0f, 6.28f))))
+                        {
+                            npc->EnterVehicle(vehicle, 2);
+                            npc->AddAura(SPELL_APPLY_QUEST_INVIS_10, npc);
+                        }
+
+                        if (Creature* npc = player->SummonCreature(NPC_KRAKAUER_43434, vehicle->GetNearPosition(2.0f, frand(0.0f, 6.28f))))
+                        {
+                            npc->EnterVehicle(vehicle, 3);
+                            npc->AddAura(SPELL_APPLY_QUEST_INVIS_10, npc);
+                        }
+
+                        if (Creature* npc = player->SummonCreature(NPN_DANFORTH_43435, vehicle->GetNearPosition(2.0f, frand(0.0f, 6.28f))))
+                        {
+                            npc->EnterVehicle(vehicle, 4);
+                            npc->AddAura(SPELL_APPLY_QUEST_INVIS_10, npc);
+                        }
+
+                        if (Creature* npc = player->SummonCreature(NPC_MESSNER_43432, vehicle->GetNearPosition(2.0f, frand(0.0f, 6.28f))))
+                        {
+                            npc->EnterVehicle(vehicle, 0);
+                            npc->AddAura(SPELL_APPLY_QUEST_INVIS_10, npc);
+                        }
+                    }
+                }
+                m_timer = 1000; m_phase = 3;
+                break;
+            case 3:
+                if (Creature* npc = me->FindNearestCreature(NPN_JOHN_J_KEESHAN_43449, 25.0f))
+                    npc->GetMotionMaster()->MoveTargetedHome();
+
+                if (Creature* npc = me->FindNearestCreature(NPC_MESSNER_43448, 25.0f))
+                    npc->GetMotionMaster()->MoveTargetedHome();
+
+                if (Creature* npc = me->FindNearestCreature(NPC_JORGENSEN_43447, 25.0f))
+                    npc->GetMotionMaster()->MoveTargetedHome();
+
+                if (Creature* npc = me->FindNearestCreature(NPC_KRAKAUER_43446, 25.0f))
+                    npc->GetMotionMaster()->MoveTargetedHome();
+
+                if (Creature* npc = me->FindNearestCreature(NPN_DANFORTH_43445, 25.0f))
+                    npc->GetMotionMaster()->MoveTargetedHome();
+                
+                m_timer = 0; m_phase = 0;
+                break;
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_john_j_keeshan_43449AI(creature);
+    }
+};
+
+class vehicle_keeshans_riverboat_43450 : public VehicleScript
+{
+public:
+    vehicle_keeshans_riverboat_43450() : VehicleScript("vehicle_keeshans_riverboat_43450") { }
+
+    void OnAddPassenger(Vehicle* veh, Unit* passenger, int8 seatId) override
+    { 
+        if (passenger->ToPlayer() && seatId == 0)
+        {
+            if (Creature* john = passenger->FindNearestCreature(NPN_JOHN_J_KEESHAN_43449, 25.0f))
+                CAST_AI(npc_john_j_keeshan_43449::npc_john_j_keeshan_43449AI, john->AI())->StartAnim();
+        }
+    }
+};
+
+class npc_john_j_keeshan_43457 : public CreatureScript
+{
+public:
+    npc_john_j_keeshan_43457() : CreatureScript("npc_john_j_keeshan_43457") { }
+
+    struct npc_john_j_keeshan_43457AI : public ScriptedAI
+    {
+        npc_john_j_keeshan_43457AI(Creature *c) : ScriptedAI(c) { }
+
+        uint32 m_timer;
+        uint32 m_phase;
+
+        void Reset() override
+        {
+            m_timer = 3000;
+            m_phase = 1;
+        }
+
+ 
+        void UpdateAI(uint32 diff) override
+        {
+            if (m_timer <= diff)
+            {
+                m_timer = 1000;
+                DoWork();
+            }
+            else
+                m_timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+        
+        void DoWork()
+        {
+            switch (m_phase)
+            {
+            case 0:
+                break;
+            case 1:
+                if (Creature* messner = me->FindNearestCreature(NPC_MESSNER_43432, 25.0f))
+                {
+                    messner->CastSpell(messner, SPELL_MESSNER_BOAT_ENGINE);
+                    messner->AI()->Talk(0);
+                }
+                if (Creature* vehicle = me->FindNearestCreature(NPC_KEESHANS_RIVERBOAT_43450, 25.0f))
+                {
+                    vehicle->SetSpeed(MOVE_WALK, 3.5f, true);
+                    vehicle->GetMotionMaster()->MovePath(43450, false);
+                }
+                m_timer = 10000; m_phase = 2;
+                break;
+            case 2:
+                if (me->GetAreaId() == AREA_CAMP_EVERSTILL)
+                {
+                    m_timer = 3000;  m_phase = 3;
+                }
+                break;
+            case 3:
+                if (Creature* messner = me->FindNearestCreature(NPC_MESSNER_43432, 25.0f))
+                    messner->RemoveAura(SPELL_MESSNER_BOAT_ENGINE);
+
+                me->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
+                Talk(1);
+                m_timer = 5000; m_phase = 4;
+                break;
+            case 4:
+                if (Creature* vehicle = me->FindNearestCreature(NPC_KEESHANS_RIVERBOAT_43450, 25.0f))
+                    if (Player* player = vehicle->GetCharmerOrOwnerOrSelf()->ToPlayer())
+                    {
+                        player->CastSpell(player, SPELL_RIVERBOAT_QUEST_CREDIT);
+                        player->SetQuestStatus(QUEST_ITS_NEVER_OVER, QUEST_STATUS_COMPLETE, true);
+                        player->AddAura(SPELL_DETECT_QUEST_INVIS_11, player);
+                        player->AddAura(SPELL_DETECT_QUEST_INVIS_12, player);
+                    }
+                m_timer = 500; m_phase = 5;
+                break;
+            case 5:
+                if (Creature* npc = me->FindNearestCreature(NPC_MESSNER_43432, 25.0f))
+                    npc->DespawnOrUnsummon();
+                if (Creature* npc = me->FindNearestCreature(NPC_JORGENSEN_43433, 25.0f))
+                    npc->DespawnOrUnsummon();
+                if (Creature* npc = me->FindNearestCreature(NPC_KRAKAUER_43434, 25.0f))
+                    npc->DespawnOrUnsummon();
+                if (Creature* npc = me->FindNearestCreature(NPN_DANFORTH_43435, 25.0f))
+                    npc->DespawnOrUnsummon();
+                if (Creature* npc = me->FindNearestCreature(NPC_KEESHANS_RIVERBOAT_43450, 25.0f))
+                    npc->DespawnOrUnsummon();
+
+                m_timer = 500; m_phase = 6;
+                break;
+            case 6:
+                me->DespawnOrUnsummon();
+                break;
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_john_j_keeshan_43457AI(creature);
+    }
+};
+
+//###################################### End Quest 26616 It's never over: on other beach..
+
+class npc_john_j_keeshan_43458 : public CreatureScript
+{
+public:
+    npc_john_j_keeshan_43458() : CreatureScript("npc_john_j_keeshan_43458") { }
+
+    struct npc_john_j_keeshan_43458AI : public ScriptedAI
+    {
+        npc_john_j_keeshan_43458AI(Creature *c) : ScriptedAI(c) { }
+
+        uint32 m_timer;
+        uint32 m_phase;
+
+        void Reset() override
+        {
+            m_timer = 3000;
+            m_phase = 1;
+        }
+
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (m_timer <= diff)
+            {
+                m_timer = 1000;
+                DoWork();
+            }
+            else
+                m_timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+
+        void DoWork()
+        {
+            switch (m_phase)
+            {
+            case 0:
+                break;
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_john_j_keeshan_43458AI(creature);
+    }
+};
 
 
 void AddSC_redridge_mountains()
@@ -1508,6 +1866,9 @@ void AddSC_redridge_mountains()
     new npc_danforth_43275();
     new npc_danforth_43302();
     new spell_freeing_danforth();
-
+    new vehicle_keeshans_riverboat_43450();
+    new npc_john_j_keeshan_43449();
+    new npc_john_j_keeshan_43457();
+    new npc_john_j_keeshan_43458();
 }
 
