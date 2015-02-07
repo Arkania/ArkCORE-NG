@@ -1794,6 +1794,15 @@ public:
 
 //###################################### End Quest 26616 It's never over: on other beach..
 
+enum eCompanieBravo
+{
+    NPN_JOHN_J_KEESHAN_43458 = 43458,
+    NPC_MESSNER_43459 = 43459,
+    NPC_JORGENSEN_43460 = 43460,
+    NPC_KRAKAUER_43461 = 43461,
+    NPN_DANFORTH_43462 = 43462,
+};
+
 class npc_john_j_keeshan_43458 : public CreatureScript
 {
 public:
@@ -1808,10 +1817,18 @@ public:
 
         void Reset() override
         {
-            m_timer = 3000;
-            m_phase = 1;
+            m_timer = 0;
+            m_phase = 0;
         }
 
+        void MoveInLineOfSight(Unit* who) override
+        {
+            if (Player* player = who->ToPlayer())
+                if (player->HasAura(SPELL_DETECT_QUEST_INVIS_10) && m_phase == 0 && me->GetDistance2d(player) < 10.0f)
+                {
+                    m_timer = 1000; m_phase = 1;
+                }
+        }
 
         void UpdateAI(uint32 diff) override
         {
@@ -1834,6 +1851,66 @@ public:
             switch (m_phase)
             {
             case 0:
+                break;
+            case 1:
+                Talk(0);
+                m_timer = 5000; m_phase = 2;
+                break;
+            case 2:
+                if (Creature* npc = me->FindNearestCreature(NPN_DANFORTH_43462, 15.0f))
+                    npc->AI()->Talk(0);
+
+                m_timer = 5000; m_phase = 3;
+                break;
+            case 3:
+                Talk(1);
+                m_timer = 5000; m_phase = 4;
+                break;
+            case 4:
+                if (Creature* npc = me->FindNearestCreature(NPC_KRAKAUER_43461, 15.0f))
+                    npc->AI()->Talk(0);
+
+                m_timer = 5000; m_phase = 5;
+                break;
+            case 5:
+                if (Creature* npc = me->FindNearestCreature(NPC_KRAKAUER_43461, 15.0f))
+                    npc->AI()->Talk(1);
+
+                m_timer = 5000; m_phase = 6;
+                break;
+            case 6:
+                Talk(2);
+                m_timer = 5000; m_phase = 7;
+                break;
+            case 7:
+                if (Creature* npc = me->FindNearestCreature(NPC_JORGENSEN_43460, 15.0f))
+                    npc->AI()->Talk(0);
+
+                m_timer = 5000; m_phase = 8;
+                break;
+            case 8:
+                Talk(3);
+                m_timer = 5000; m_phase = 9;
+                break;
+            case 9:
+                if (Creature* npc = me->FindNearestCreature(NPC_MESSNER_43459, 15.0f))
+                    npc->AI()->Talk(0);
+
+                m_timer = 5000; m_phase = 10;
+                break;
+            case 10:
+                Talk(4);
+                m_timer = 5000; m_phase = 11;
+                break;
+            case 11:
+                Talk(5);
+                m_timer = 5000; m_phase = 12;
+                break;
+            case 12:
+                m_timer = 90000; m_phase = 13;
+                break;
+            case 13:
+                m_timer = 0; m_phase = 0;
                 break;
             }
         }
