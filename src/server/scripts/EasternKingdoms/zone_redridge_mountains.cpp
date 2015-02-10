@@ -2579,6 +2579,89 @@ public:
     }
 };
 
+class npc_john_j_keeshan_43611 : public CreatureScript
+{
+public:
+    npc_john_j_keeshan_43611() : CreatureScript("npc_john_j_keeshan_43611") { }
+
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)  override
+    {
+
+        return false;
+    }
+
+    bool OnQuestReward(Player* player, Creature* /*creature*/, Quest const* /*quest*/, uint32 /*opt*/)  override
+    {
+        Creature* npc = player->FindNearestCreature(NPC_JORGENSEN_43546, 100.0f);
+        Item* item1 = player->GetItemByEntry(ITEM_BRAVO_COMPANY_FIELD_KIT_1);
+        Item* item2 = player->GetItemByEntry(ITEM_BRAVO_COMPANY_FIELD_KIT_2);
+
+        if (npc)
+            npc->DespawnOrUnsummon();
+
+        uint32 count = 1;
+        if (item1)
+            player->DestroyItemCount(item1, count, true);
+
+        if (item2)
+            player->DestroyItemCount(item2, count, true);
+
+        if (player)
+        {
+            if (player->HasAura(SPELL_DETECT_QUEST_INVIS_10))
+                player->RemoveAura(SPELL_DETECT_QUEST_INVIS_10);
+            if (player->HasAura(SPELL_DETECT_QUEST_INVIS_11))
+                player->RemoveAura(SPELL_DETECT_QUEST_INVIS_11);
+            if (player->HasAura(SPELL_DETECT_QUEST_INVIS_12))
+                player->RemoveAura(SPELL_DETECT_QUEST_INVIS_12);
+        }
+                
+        return false;
+    }
+
+    struct npc_john_j_keeshan_43611AI : public ScriptedAI
+    {
+        npc_john_j_keeshan_43611AI(Creature *c) : ScriptedAI(c) { }
+
+        uint32 m_timer;
+        uint32 m_phase;
+
+        void Reset() override
+        {
+            m_timer = 0;
+            m_phase = 0;
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (m_timer <= diff)
+            {
+                m_timer = 1000;
+                DoWork();
+            }
+            else
+                m_timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+
+        void DoWork()
+        {
+           
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_john_j_keeshan_43611AI(creature);
+    }
+};
+
+//###################################### End Quest 26651 and starting Quest 26668 Detonation
+
 
 void AddSC_redridge_mountains()
 {
@@ -2613,6 +2696,6 @@ void AddSC_redridge_mountains()
     new npc_blackrock_warden();
     new go_blackrock_holding_pen();
     new spell_plant_seaforium();
-
+    new npc_john_j_keeshan_43611();
 }
 
