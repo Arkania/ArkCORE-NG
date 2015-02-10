@@ -1799,14 +1799,88 @@ enum eCompanieBravo
     NPN_JOHN_J_KEESHAN_43458 = 43458,
     NPC_MESSNER_43459 = 43459,
     NPC_JORGENSEN_43460 = 43460,
+    NPC_JORGENSEN_43546 = 43546,
     NPC_KRAKAUER_43461 = 43461,
     NPN_DANFORTH_43462 = 43462,
+    NPC_KIDNAPPED_REDRIGE_CITIZEN = 43571,
+    NPC_PRISONER_OF_WAR_KILL_CREDIT = 43574,
+    NPC_MUNITION_DUMP = 43589,
+    NPC_BLACKROCK_TOWER = 43590,
+    NPC_BLACKROCK_GUARD = 7013,
+    NPC_BRAVO_COMPANY_TRIGGER = 43594,
+    NPC_WILD_RAT = 43518,
+    GO_BLACKROCK_EXPLOSIVE_DEVICE_1 = 204444,
+    GO_BLACKROCK_EXPLOSIVE_DEVICE_2 = 204445,
+    GO_BLACKROCK_EXPLOSIVE_DEVICE_3 = 204446,
+    GO_BLACKROCK_KEY_POUCH = 204437,
+    GO_BLACKROCK_TOWER_OR_MUNITIONS_HUT = 301069,
+    ITEM_BRAVO_COMPANY_FIELD_KIT_1 = 60384,
+    ITEM_BRAVO_COMPANY_FIELD_KIT_2 = 60385,
+    QUEST_PRISONERS_OF_WAR = 26646,
+    QUEST_TO_WIN_A_WAR_YOU_GOTTA_BECOME_WAR = 26651,
+    SPELL_SUMMON_JORGENSEN_43546 = 81447,
+    SPELL_SEAL_OF_RIGHTEOUSNESS_43546 = 81454,
+    SPELL_CONCENTRATION_AURA_43546 = 81455,
+    SPELL_STATIC_SOUND = 81769,
+    SPELL_DISTRACTION = 82578,
+    SPELL_CHLOROFORM = 82579,
+    SPELL_AURA_SLEEP = 700,
+    SPELL_BRAVO_COMPANY_FIELD_KIT_ON = 82580,
+    SPELL_DISTRACTION_VISUAL = 81370,
+    //SPELL_BAKER_TEAM_BROADCAST = 81155,
+    SPELL_DEADLY_POISEN = 10022,
+    SPELL_CAMOUFLAGE = 82577,
 };
 
 class npc_john_j_keeshan_43458 : public CreatureScript
 {
 public:
     npc_john_j_keeshan_43458() : CreatureScript("npc_john_j_keeshan_43458") { }
+
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)  override
+    {
+        Creature* npc = creature->FindNearestCreature(NPC_JORGENSEN_43546, 100.0f);
+        uint32 item1 = player->GetItemCount(ITEM_BRAVO_COMPANY_FIELD_KIT_1, true);
+        uint32 item2 = player->GetItemCount(ITEM_BRAVO_COMPANY_FIELD_KIT_2, true);
+
+        if (quest->GetQuestId() == QUEST_PRISONERS_OF_WAR)
+        {
+            if (!npc)
+                player->CastSpell(player, SPELL_SUMMON_JORGENSEN_43546);
+
+            if (item1 == 0)
+                player->AddItem(ITEM_BRAVO_COMPANY_FIELD_KIT_1, 1);
+        }
+        else if (quest->GetQuestId() == QUEST_TO_WIN_A_WAR_YOU_GOTTA_BECOME_WAR)
+        {
+            if (!npc)
+                player->CastSpell(player, SPELL_SUMMON_JORGENSEN_43546);
+
+            if (item2 == 0)
+                player->AddItem(ITEM_BRAVO_COMPANY_FIELD_KIT_2, 1);
+        }
+
+        return false;
+    }
+
+    bool OnQuestReward(Player* player, Creature* /*creature*/, Quest const* /*quest*/, uint32 /*opt*/)  override
+    { 
+        Creature* npc = player->FindNearestCreature(NPC_JORGENSEN_43546, 100.0f);
+        Item* item1 = player->GetItemByEntry(ITEM_BRAVO_COMPANY_FIELD_KIT_1);
+        Item* item2 = player->GetItemByEntry(ITEM_BRAVO_COMPANY_FIELD_KIT_2);
+
+        if (npc)
+            npc->DespawnOrUnsummon();
+
+        uint32 count = 1;
+        if (item1)
+            player->DestroyItemCount(item1, count, true);
+
+        if (item2)
+            player->DestroyItemCount(item2, count, true);
+
+        return false; 
+    }
 
     struct npc_john_j_keeshan_43458AI : public ScriptedAI
     {
@@ -1922,6 +1996,589 @@ public:
     }
 };
 
+class npc_jorgensen_43546 : public CreatureScript
+{
+public:
+    npc_jorgensen_43546() : CreatureScript("npc_jorgensen_43546") { }
+
+    struct npc_jorgensen_43546AI : public ScriptedAI
+    {
+        npc_jorgensen_43546AI(Creature *c) : ScriptedAI(c) { }
+
+        uint32 m_timer;
+        uint32 m_phase;
+
+        void Reset() override
+        {
+            m_timer = 1000;
+            m_phase = 0;
+            me->AddAura(SPELL_SEAL_OF_RIGHTEOUSNESS_43546, me);
+            me->AddAura(SPELL_CONCENTRATION_AURA_43546, me);
+            me->SetReactState(REACT_DEFENSIVE);
+        }
+
+        void AttackStart(Unit* target) override
+        {
+            if (target->HasAura(SPELL_CHLOROFORM))
+                DoStopAttack();
+            if (target->HasAura(SPELL_DISTRACTION))
+                DoStopAttack();
+
+            me->Attack(target, true);            
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (m_timer <= diff)
+            {
+                m_timer = 1000;
+                DoWork();
+            }
+            else
+                m_timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+
+        void DoWork()
+        {
+            if (me->IsInCombat())
+                return;
+
+            if (Player* player = me->GetCharmerOrOwnerOrSelf()->ToPlayer())
+            {
+                if (player->IsInCombat())
+                    if (Unit* npc = me->getAttackerForHelper())
+                        me->Attack(npc, true);
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_jorgensen_43546AI(creature);
+    }
+};
+
+class npc_bravo_company_trigger : public CreatureScript
+{
+public:
+    npc_bravo_company_trigger() : CreatureScript("npc_bravo_company_trigger") { }
+
+    struct npc_bravo_company_triggerAI : public ScriptedAI
+    {
+        npc_bravo_company_triggerAI(Creature *c) : ScriptedAI(c) { }
+
+        uint32 m_position;
+        uint32 m_warning;
+        uint32 m_advise;
+
+        void Reset() override
+        {
+            m_warning = 0;
+            m_advise = 0;
+            if (Creature* keeshan = me->FindNearestCreature(NPN_JOHN_J_KEESHAN_43458, 75.0f))
+                m_position = 1;
+            else if (GameObject* key = me->FindNearestGameObject(GO_BLACKROCK_KEY_POUCH, 50.0f))
+                m_position = 2;
+            else if (Creature* blackrock = me->FindNearestCreature(NPC_BLACKROCK_GUARD, 75.0f, false))
+                m_position = 3;
+            else
+                m_position = 0;
+        }
+
+        void MoveInLineOfSight(Unit* who) override
+        {
+            if (Player* player = who->ToPlayer())
+            {
+                if (player->GetQuestStatus(QUEST_PRISONERS_OF_WAR) != QUEST_STATUS_INCOMPLETE && player->GetQuestStatus(QUEST_PRISONERS_OF_WAR) != QUEST_STATUS_INCOMPLETE)
+                    return;
+
+                uint32 ItemKitCount = player->GetItemCount(ITEM_BRAVO_COMPANY_FIELD_KIT_1) + player->GetItemCount(ITEM_BRAVO_COMPANY_FIELD_KIT_2);
+                if (ItemKitCount == 0)
+                    return;
+                
+                bool IsKitActivated = player->HasSpell(SPELL_CAMOUFLAGE);
+                
+                if (!IsKitActivated && m_warning == 0)
+                {
+                    Talk(0, player);
+                    m_warning = 1;
+                    m_advise = 0;
+                    return;
+                }
+                else if (IsKitActivated  && m_warning == 1)
+                {
+                    Talk(4, player);
+                    m_warning = 2;
+                }
+
+                if (!IsKitActivated)
+                    return;
+
+                if (m_position == 1 && m_advise == 0)
+                {
+                    Talk(3, player);
+                    m_advise = 1;
+                }
+                if (m_position == 2 && m_advise == 0)
+                {
+                    Talk(1, player);
+                    m_advise = 1;
+                }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_bravo_company_triggerAI(creature);
+    }
+};
+
+class npc_blackrock_grunt : public CreatureScript
+{
+public:
+    npc_blackrock_grunt() : CreatureScript("npc_blackrock_grunt") { }
+
+    struct npc_blackrock_gruntAI : public ScriptedAI
+    {
+        npc_blackrock_gruntAI(Creature *c) : ScriptedAI(c) { }
+
+        uint32 m_timer;
+        uint32 m_phase;
+
+        void Reset() override
+        {
+            m_timer = 1000;
+            m_phase = 0;
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (m_timer <= diff)
+            {
+                m_timer = 1000;
+                DoWork();
+            }
+            else
+                m_timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+        
+        void DoWork()
+        {
+            switch (m_phase)
+            {
+            case 0:
+                if (Creature* rat = me->FindNearestCreature(NPC_WILD_RAT, 15.0f))
+                {
+                    me->GetMotionMaster()->MoveIdle();
+                    m_timer = 500; m_phase = 1;
+                }
+                break;
+            case 1:
+                if (Creature* rat = me->FindNearestCreature(NPC_WILD_RAT, 15.0f))
+                    me->GetMotionMaster()->MovePoint(0, rat->GetNearPosition(1.0f, frand(0, 6.24f)));
+
+                m_timer = 2000; m_phase = 2;
+                break;
+            case 2:
+                if (Creature* rat = me->FindNearestCreature(NPC_WILD_RAT, 15.0f))
+                    me->SetFacingToObject(rat);
+
+                m_timer = 27000; m_phase = 3;
+                break;
+            case 3:
+                me->GetMotionMaster()->MoveTargetedHome();
+                m_timer = 2000; m_phase = 4;
+                break;
+            case 4:
+                me->GetMotionMaster()->Initialize();
+
+                m_timer = 1000; m_phase = 0;
+                break;
+            case 5:
+                break;
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_blackrock_gruntAI(creature);
+    }
+};
+
+class npc_blackrock_outrunner : public CreatureScript
+{
+public:
+    npc_blackrock_outrunner() : CreatureScript("npc_blackrock_outrunner") { }
+
+    struct npc_blackrock_outrunnerAI : public ScriptedAI
+    {
+        npc_blackrock_outrunnerAI(Creature *c) : ScriptedAI(c) { }
+
+        uint32 m_timer;
+        uint32 m_phase;
+
+        void Reset() override
+        {
+            m_timer = 1000;
+            m_phase = 0;
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (m_timer <= diff)
+            {
+                m_timer = 1000;
+                DoWork();
+            }
+            else
+                m_timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+
+        void DoWork()
+        {
+            switch (m_phase)
+            {
+            case 0:
+                if (Creature* rat = me->FindNearestCreature(NPC_WILD_RAT, 15.0f))
+                {
+                    me->GetMotionMaster()->MoveIdle();
+                    m_timer = 500; m_phase = 1;
+                }
+                break;
+            case 1:
+                if (Creature* rat = me->FindNearestCreature(NPC_WILD_RAT, 15.0f))
+                    me->GetMotionMaster()->MovePoint(0, rat->GetNearPosition(1.0f, frand(0, 6.24f)));
+
+                m_timer = 2000; m_phase = 2;
+                break;
+            case 2:
+                if (Creature* rat = me->FindNearestCreature(NPC_WILD_RAT, 15.0f))
+                    me->SetFacingToObject(rat);
+
+                m_timer = 27000; m_phase = 3;
+                break;
+            case 3:
+                me->GetMotionMaster()->MoveTargetedHome();
+                m_timer = 2000; m_phase = 4;
+                break;
+            case 4:
+                me->GetMotionMaster()->Initialize();
+
+                m_timer = 1000; m_phase = 0;
+                break;
+            case 5:
+                break;
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_blackrock_outrunnerAI(creature);
+    }
+};
+
+class npc_blackrock_guard : public CreatureScript
+{
+public:
+    npc_blackrock_guard() : CreatureScript("npc_blackrock_guard") { }
+
+    struct npc_blackrock_guardAI : public ScriptedAI
+    {
+        npc_blackrock_guardAI(Creature *c) : ScriptedAI(c) { }
+
+        uint32 m_timer;
+        uint32 m_phase;
+
+        void Reset() override
+        {
+            m_timer = 1000;
+            m_phase = 0;
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (m_timer <= diff)
+            {
+                m_timer = 1000;
+                DoWork();
+            }
+            else
+                m_timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+
+        void DoWork()
+        {
+            switch (m_phase)
+            {
+            case 0:
+                if (Creature* rat = me->FindNearestCreature(NPC_WILD_RAT, 15.0f))
+                {
+                    me->GetMotionMaster()->MoveIdle();
+                    m_timer = 500; m_phase = 1;
+                }
+                break;
+            case 1:
+                if (Creature* rat = me->FindNearestCreature(NPC_WILD_RAT, 15.0f))
+                    me->GetMotionMaster()->MovePoint(0, rat->GetNearPosition(1.0f, frand(0, 6.24f)));
+
+                m_timer = 2000; m_phase = 2;
+                break;
+            case 2:
+                if (Creature* rat = me->FindNearestCreature(NPC_WILD_RAT, 15.0f))
+                    me->SetFacingToObject(rat);
+
+                m_timer = 27000; m_phase = 3;
+                break;
+            case 3:
+                me->GetMotionMaster()->MoveTargetedHome();
+                m_timer = 2000; m_phase = 4;
+                break;
+            case 4:
+                me->GetMotionMaster()->Initialize();
+
+                m_timer = 1000; m_phase = 0;
+                break;
+            case 5:
+                break;
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_blackrock_guardAI(creature);
+    }
+};
+
+class npc_blackrock_drake_rider : public CreatureScript
+{
+public:
+    npc_blackrock_drake_rider() : CreatureScript("npc_blackrock_drake_rider") { }
+
+    struct npc_blackrock_drake_riderAI : public ScriptedAI
+    {
+        npc_blackrock_drake_riderAI(Creature *c) : ScriptedAI(c) { }
+
+        uint32 m_timer;
+        uint32 m_phase;
+
+        void Reset() override
+        {
+            m_timer = 1000;
+            m_phase = 0;
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (m_timer <= diff)
+            {
+                m_timer = 1000;
+                DoWork();
+            }
+            else
+                m_timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+
+        void DoWork()
+        {
+            switch (m_phase)
+            {
+            case 0:
+                if (Creature* rat = me->FindNearestCreature(NPC_WILD_RAT, 15.0f))
+                {
+                    me->GetMotionMaster()->MoveIdle();
+                    m_timer = 500; m_phase = 1;
+                }
+                break;
+            case 1:
+                if (Creature* rat = me->FindNearestCreature(NPC_WILD_RAT, 15.0f))
+                    me->GetMotionMaster()->MovePoint(0, rat->GetNearPosition(1.0f, frand(0, 6.24f)));
+
+                m_timer = 2000; m_phase = 2;
+                break;
+            case 2:
+                if (Creature* rat = me->FindNearestCreature(NPC_WILD_RAT, 15.0f))
+                    me->SetFacingToObject(rat);
+
+                m_timer = 27000; m_phase = 3;
+                break;
+            case 3:
+                me->GetMotionMaster()->MoveTargetedHome();
+                m_timer = 2000; m_phase = 4;
+                break;
+            case 4:
+                me->GetMotionMaster()->Initialize();
+
+                m_timer = 1000; m_phase = 0;
+                break;
+            case 5:
+                break;
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_blackrock_drake_riderAI(creature);
+    }
+};
+
+class npc_blackrock_warden : public CreatureScript
+{
+public:
+    npc_blackrock_warden() : CreatureScript("npc_blackrock_warden") { }
+
+    struct npc_blackrock_wardenAI : public ScriptedAI
+    {
+        npc_blackrock_wardenAI(Creature *c) : ScriptedAI(c) { }
+
+        uint32 m_timer;
+        uint32 m_phase;
+
+        void Reset() override
+        {
+            m_timer = 1000;
+            m_phase = 0;
+        }
+
+       void UpdateAI(uint32 diff) override
+        {
+            if (m_timer <= diff)
+            {
+                m_timer = 1000;
+                DoWork();
+            }
+            else
+                m_timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+
+        void DoWork()
+        {
+            switch (m_phase)
+            {
+            case 0:
+                if (Creature* rat = me->FindNearestCreature(NPC_WILD_RAT, 15.0f))
+                {
+                    me->GetMotionMaster()->MoveIdle();
+                    m_timer = 500; m_phase = 1;
+                }
+                break;
+            case 1:
+                if (Creature* rat = me->FindNearestCreature(NPC_WILD_RAT, 15.0f))
+                    me->GetMotionMaster()->MovePoint(0, rat->GetNearPosition(1.0f, frand(0, 6.24f)));
+
+                m_timer = 2000; m_phase = 2;
+                break;
+            case 2:
+                if (Creature* rat = me->FindNearestCreature(NPC_WILD_RAT, 15.0f))
+                    me->SetFacingToObject(rat);
+
+                m_timer = 27000; m_phase = 3;
+                break;
+            case 3:
+                me->GetMotionMaster()->MoveTargetedHome();
+                m_timer = 2000; m_phase = 4;
+                break;
+            case 4:
+                me->GetMotionMaster()->Initialize();
+
+                m_timer = 1000; m_phase = 0;
+                break;
+            case 5:
+                break;
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_blackrock_wardenAI(creature);
+    }
+};
+
+class go_blackrock_holding_pen : public GameObjectScript
+{
+public:
+    go_blackrock_holding_pen() : GameObjectScript("go_blackrock_holding_pen") { }
+
+    bool OnGossipHello(Player* player, GameObject* /*go*/) OVERRIDE
+    {
+        if (player->GetQuestStatus(QUEST_PRISONERS_OF_WAR) == QUEST_STATUS_INCOMPLETE)
+        {
+            if (Creature* npc = player->FindNearestCreature(NPC_KIDNAPPED_REDRIGE_CITIZEN, 25.0f))
+                npc->AI()->Talk(0);
+
+            player->CastSpell(player, SPELL_STATIC_SOUND);
+            player->KilledMonsterCredit(NPC_PRISONER_OF_WAR_KILL_CREDIT);
+        }
+        return true;
+    }
+};
+
+class spell_plant_seaforium : public SpellScriptLoader
+{
+public:
+    spell_plant_seaforium() : SpellScriptLoader("spell_plant_seaforium") { }
+
+    class spell_plant_seaforium_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_plant_seaforium_SpellScript);
+
+        void CheckCastOnPlace()
+        {
+            if (Player* player = GetCaster()->ToPlayer())
+                if (GameObject* go = player->FindNearestGameObject(GO_BLACKROCK_TOWER_OR_MUNITIONS_HUT, 5.0f))
+                    if (Creature* npc = player->FindNearestCreature(NPC_MUNITION_DUMP, 15.0f))
+                        player->KilledMonsterCredit(NPC_MUNITION_DUMP);
+                    else if (Creature* npc = player->FindNearestCreature(NPC_BLACKROCK_TOWER, 15.0f))
+                        player->KilledMonsterCredit(NPC_BLACKROCK_TOWER);
+        }
+
+        void Register() OVERRIDE
+        {
+            OnCast += SpellCastFn(spell_plant_seaforium_SpellScript::CheckCastOnPlace);
+        }
+    };
+
+    SpellScript* GetSpellScript() const OVERRIDE
+    {
+        return new spell_plant_seaforium_SpellScript();
+    }
+};
+
 
 void AddSC_redridge_mountains()
 {
@@ -1947,5 +2604,15 @@ void AddSC_redridge_mountains()
     new npc_john_j_keeshan_43449();
     new npc_john_j_keeshan_43457();
     new npc_john_j_keeshan_43458();
+    new npc_jorgensen_43546();
+    new npc_bravo_company_trigger();
+    new npc_blackrock_grunt();
+    new npc_blackrock_outrunner();
+    new npc_blackrock_guard();
+    new npc_blackrock_drake_rider();
+    new npc_blackrock_warden();
+    new go_blackrock_holding_pen();
+    new spell_plant_seaforium();
+
 }
 
