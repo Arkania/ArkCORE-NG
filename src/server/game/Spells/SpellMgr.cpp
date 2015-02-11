@@ -3016,6 +3016,10 @@ void SpellMgr::LoadSpellInfoCorrections()
 
         switch (spellInfo->Id)
         {
+            case 82580: // Bravo Company Field Kit
+            case 82587: // Bravo Company Field Kit w bomb
+                spellInfo->AttributesEx4 &= ~SPELL_ATTR4_TRIGGERED;
+                break;
             case 44614: // Frostfire Bolt
                 spellInfo->StackAmount = 0;
                 break;
@@ -3146,6 +3150,8 @@ void SpellMgr::LoadSpellInfoCorrections()
                 spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_SRC_AREA_ENEMY);
                 break;
             case 63320: // Glyph of Life Tap
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_CAN_PROC_WITH_TRIGGERED;
+                break;
             case 53228: // Rapid Killing (Rank 1)
             case 53232: // Rapid Killing (Rank 2)
                 // Entries were not updated after spell effect change, we have to do that manually :/
