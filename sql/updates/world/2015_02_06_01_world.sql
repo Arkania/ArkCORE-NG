@@ -54,12 +54,8 @@ insert into spell_script_names values (82585,"spell_plant_seaforium");
 
 update gameobject_template set AIName="", ScriptName="go_blackrock_tower_or_munitions_hut" where entry=301069;
 
--- by using items 60384 and 60385 the game client chrash with memory access violation..
--- i found no solution to fix this.. so i remove them from quest..
-update quest_template set SourceItemId=0, SourceItemCount=0 where Id=26646; 
-update quest_template set SourceItemId=0, SourceItemCount=0 where Id=26651;
--- update quest_template set SourceItemId=60384, SourceItemCount=1 where Id=26646;   -- inserting if core is fixed
--- update quest_template set SourceItemId=60385, SourceItemCount=1 where Id=26651;   -- inserting if core is fixed
+update quest_template set SourceItemId=60384, SourceItemCount=1 where Id=26646;   -- core is fixed
+update quest_template set SourceItemId=60385, SourceItemCount=1 where Id=26651;   -- core is fixed
 
 
 

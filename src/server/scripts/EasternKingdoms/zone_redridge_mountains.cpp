@@ -1830,6 +1830,7 @@ enum eCompanieBravo
     //SPELL_BAKER_TEAM_BROADCAST = 81155,
     SPELL_DEADLY_POISEN = 10022,
     SPELL_CAMOUFLAGE = 82577,
+    SPELL_DETECT_QUEST_INVIS_13 = 81581,
 };
 
 class npc_john_j_keeshan_43458 : public CreatureScript
@@ -1840,24 +1841,16 @@ public:
     bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)  override
     {
         Creature* npc = creature->FindNearestCreature(NPC_JORGENSEN_43546, 100.0f);
-        uint32 item1 = player->GetItemCount(ITEM_BRAVO_COMPANY_FIELD_KIT_1, true);
-        uint32 item2 = player->GetItemCount(ITEM_BRAVO_COMPANY_FIELD_KIT_2, true);
 
         if (quest->GetQuestId() == QUEST_PRISONERS_OF_WAR)
         {
-            if (!npc)
-                player->CastSpell(player, SPELL_SUMMON_JORGENSEN_43546);
-
-            if (item1 == 0)
-                player->AddItem(ITEM_BRAVO_COMPANY_FIELD_KIT_1, 1);
+           if (!npc)
+              player->CastSpell(player, SPELL_SUMMON_JORGENSEN_43546);
         }
         else if (quest->GetQuestId() == QUEST_TO_WIN_A_WAR_YOU_GOTTA_BECOME_WAR)
         {
-            if (!npc)
-                player->CastSpell(player, SPELL_SUMMON_JORGENSEN_43546);
-
-            if (item2 == 0)
-                player->AddItem(ITEM_BRAVO_COMPANY_FIELD_KIT_2, 1);
+          if (!npc)
+              player->CastSpell(player, SPELL_SUMMON_JORGENSEN_43546);
         }
 
         return false;
@@ -1866,18 +1859,9 @@ public:
     bool OnQuestReward(Player* player, Creature* /*creature*/, Quest const* /*quest*/, uint32 /*opt*/)  override
     { 
         Creature* npc = player->FindNearestCreature(NPC_JORGENSEN_43546, 100.0f);
-        Item* item1 = player->GetItemByEntry(ITEM_BRAVO_COMPANY_FIELD_KIT_1);
-        Item* item2 = player->GetItemByEntry(ITEM_BRAVO_COMPANY_FIELD_KIT_2);
 
         if (npc)
             npc->DespawnOrUnsummon();
-
-        uint32 count = 1;
-        if (item1)
-            player->DestroyItemCount(item1, count, true);
-
-        if (item2)
-            player->DestroyItemCount(item2, count, true);
 
         return false; 
     }
@@ -2003,15 +1987,28 @@ public:
 
     struct npc_jorgensen_43546AI : public ScriptedAI
     {
-        npc_jorgensen_43546AI(Creature *c) : ScriptedAI(c) { }
+        npc_jorgensen_43546AI(Creature *c) : ScriptedAI(c) 
+        {
+            ShownActive = false;
+            ShownTip1 = false;
+            ShownTip2 = false;
+            ShownTip3 = false;
+            CoolDownTimer = 0;
+        }
 
         uint32 m_timer;
         uint32 m_phase;
 
+        bool ShownActive;
+        bool ShownTip1;
+        bool ShownTip2;
+        bool ShownTip3;
+        uint32 CoolDownTimer;
+
         void Reset() override
         {
             m_timer = 1000;
-            m_phase = 0;
+            m_phase = 0;            
             me->AddAura(SPELL_SEAL_OF_RIGHTEOUSNESS_43546, me);
             me->AddAura(SPELL_CONCENTRATION_AURA_43546, me);
             me->SetReactState(REACT_DEFENSIVE);
@@ -2020,15 +2017,22 @@ public:
         void AttackStart(Unit* target) override
         {
             if (target->HasAura(SPELL_CHLOROFORM))
-                DoStopAttack();
-            if (target->HasAura(SPELL_DISTRACTION))
-                DoStopAttack();
-
-            me->Attack(target, true);            
+                return; 
+               
+            if (Creature* npc = me->GetCharmerOrOwner()->ToPlayer()->getAttackerForHelper()->ToCreature())
+            {
+                me->Attack(npc, true);
+                me->GetMotionMaster()->MoveChase(npc);
+            }
         }
 
         void UpdateAI(uint32 diff) override
         {
+            if (CoolDownTimer <= diff)
+                CoolDownTimer = 0;
+            else
+                CoolDownTimer -= diff;
+
             if (m_timer <= diff)
             {
                 m_timer = 1000;
@@ -2045,15 +2049,7 @@ public:
 
         void DoWork()
         {
-            if (me->IsInCombat())
-                return;
-
-            if (Player* player = me->GetCharmerOrOwnerOrSelf()->ToPlayer())
-            {
-                if (player->IsInCombat())
-                    if (Unit* npc = me->getAttackerForHelper())
-                        me->Attack(npc, true);
-            }
+           
         }
     };
 
@@ -2073,64 +2069,122 @@ public:
         npc_bravo_company_triggerAI(Creature *c) : ScriptedAI(c) { }
 
         uint32 m_position;
-        uint32 m_warning;
-        uint32 m_advise;
 
         void Reset() override
         {
-            m_warning = 0;
-            m_advise = 0;
-            if (Creature* keeshan = me->FindNearestCreature(NPN_JOHN_J_KEESHAN_43458, 75.0f))
+            CheckPosition();
+        }
+
+        void MoveInLineOfSight(Unit* who) override
+        {
+            if (m_position == 0)
+            {
+                CheckPosition();
+                if (m_position == 0)
+                    return;
+            }
+
+            Player* player = who->ToPlayer();
+            if (!player)
+                return;
+
+            if (player->GetQuestStatus(QUEST_PRISONERS_OF_WAR) != QUEST_STATUS_INCOMPLETE && player->GetQuestStatus(QUEST_PRISONERS_OF_WAR) != QUEST_STATUS_INCOMPLETE)
+                return;
+
+            uint32 InstalledKitCount = player->GetItemCount(ITEM_BRAVO_COMPANY_FIELD_KIT_1) + player->GetItemCount(ITEM_BRAVO_COMPANY_FIELD_KIT_2);
+            if (InstalledKitCount == 0)
+                return;
+
+            Creature* jorgensen = GetCharmedJorgensen(player);
+             
+            npc_jorgensen_43546::npc_jorgensen_43546AI* jorgensenAI = CAST_AI(npc_jorgensen_43546::npc_jorgensen_43546AI, jorgensen->AI());
+
+            bool IsKitActive = player->HasSpell(SPELL_CAMOUFLAGE);
+            bool IsCamouflageActiv = player->HasAura(SPELL_CAMOUFLAGE);
+            uint64 guid = player->GetGUID();
+
+            if (!IsKitActive)
+            {
+                if (jorgensenAI->CoolDownTimer == 0)
+                {
+                    Talk(0, player);
+                    jorgensenAI->CoolDownTimer = 6000;
+                    jorgensenAI->ShownActive = false;
+                }
+                return;
+            }
+
+            if (!jorgensenAI->ShownActive)
+            {
+                if (jorgensenAI->CoolDownTimer == 0)
+                {
+                    Talk(4, player);
+                    jorgensenAI->CoolDownTimer = 6000;
+                    jorgensenAI->ShownActive = true;
+                }
+                return;
+            }
+            if (jorgensenAI->CoolDownTimer == 0)
+            {
+                if (!IsCamouflageActiv)
+                {
+                    Talk(1, player); // Tip Enable Camourflage 1
+                    jorgensenAI->CoolDownTimer = 6000;
+                    jorgensenAI->ShownTip1 = true;
+                    return;
+                }
+                if (m_position == 3 && !jorgensenAI->ShownTip3)
+                {
+                    Talk(3, player); // Tip chloroform 3
+                    jorgensenAI->CoolDownTimer = 6000;
+                    jorgensenAI->ShownTip3 = true;
+                    return;
+                }
+                if (m_position == 2 && !jorgensenAI->ShownTip2)
+                {
+                    Talk(2, player); // Tip Distraction 2
+                    jorgensenAI->CoolDownTimer = 6000;
+                    jorgensenAI->ShownTip2 = true;
+                    return;
+                }
+            }
+        }
+ 
+        void CheckPosition()
+        {
+            if (me->GetPositionX() > -9600.0f)
                 m_position = 1;
-            else if (GameObject* key = me->FindNearestGameObject(GO_BLACKROCK_KEY_POUCH, 50.0f))
+            else if (me->GetPositionX() > -9700.0f && me->GetPositionX() < -9600.0f)
                 m_position = 2;
-            else if (Creature* blackrock = me->FindNearestCreature(NPC_BLACKROCK_GUARD, 75.0f, false))
+            else if (me->GetPositionX() < -9700.0f)
                 m_position = 3;
             else
                 m_position = 0;
         }
 
-        void MoveInLineOfSight(Unit* who) override
+        Creature* GetCharmedJorgensen(Player* player)
         {
-            if (Player* player = who->ToPlayer())
+            Creature* jorgensen = FindCharmedJorgensen(player);
+
+            if (!jorgensen)
             {
-                if (player->GetQuestStatus(QUEST_PRISONERS_OF_WAR) != QUEST_STATUS_INCOMPLETE && player->GetQuestStatus(QUEST_PRISONERS_OF_WAR) != QUEST_STATUS_INCOMPLETE)
-                    return;
-
-                uint32 ItemKitCount = player->GetItemCount(ITEM_BRAVO_COMPANY_FIELD_KIT_1) + player->GetItemCount(ITEM_BRAVO_COMPANY_FIELD_KIT_2);
-                if (ItemKitCount == 0)
-                    return;
-                
-                bool IsKitActivated = player->HasSpell(SPELL_CAMOUFLAGE);
-                
-                if (!IsKitActivated && m_warning == 0)
-                {
-                    Talk(0, player);
-                    m_warning = 1;
-                    m_advise = 0;
-                    return;
-                }
-                else if (IsKitActivated  && m_warning == 1)
-                {
-                    Talk(4, player);
-                    m_warning = 2;
-                }
-
-                if (!IsKitActivated)
-                    return;
-
-                if (m_position == 1 && m_advise == 0)
-                {
-                    Talk(3, player);
-                    m_advise = 1;
-                }
-                if (m_position == 2 && m_advise == 0)
-                {
-                    Talk(1, player);
-                    m_advise = 1;
-                }
+                player->CastSpell(player, SPELL_SUMMON_JORGENSEN_43546);
+                jorgensen = FindCharmedJorgensen(player);
             }
+
+            return jorgensen;
         }
+
+        Creature* FindCharmedJorgensen(Player* player)
+        {
+            std::list<Creature*> creatureList = me->FindNearestCreatures(NPC_JORGENSEN_43546, 100.0f);
+            for (std::list<Creature*>::iterator itr = creatureList.begin(); itr != creatureList.end(); ++itr)
+                if (player->GetGUID() == (*itr)->GetCharmerOrOwnerOrSelf()->GetGUID())
+                    return *itr;
+
+            return NULL;
+        }
+
     };
 
     CreatureAI* GetAI(Creature* creature) const
@@ -2586,6 +2640,17 @@ public:
 
     bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)  override
     {
+        player->RemoveAura(SPELL_DETECT_QUEST_INVIS_10);
+        player->RemoveAura(SPELL_DETECT_QUEST_INVIS_11);
+        player->RemoveAura(SPELL_DETECT_QUEST_INVIS_12);
+        player->RemoveAura(SPELL_SUMMON_JORGENSEN_43546);
+        player->AddAura(SPELL_DETECT_QUEST_INVIS_13, player);
+
+        if (quest->GetQuestId() == 26668)
+        {
+            player->CastSpell(player, 81607, true);
+            player->CastSpell(player, 81462, true);
+        }
 
         return false;
     }
@@ -2593,29 +2658,10 @@ public:
     bool OnQuestReward(Player* player, Creature* /*creature*/, Quest const* /*quest*/, uint32 /*opt*/)  override
     {
         Creature* npc = player->FindNearestCreature(NPC_JORGENSEN_43546, 100.0f);
-        Item* item1 = player->GetItemByEntry(ITEM_BRAVO_COMPANY_FIELD_KIT_1);
-        Item* item2 = player->GetItemByEntry(ITEM_BRAVO_COMPANY_FIELD_KIT_2);
 
         if (npc)
             npc->DespawnOrUnsummon();
 
-        uint32 count = 1;
-        if (item1)
-            player->DestroyItemCount(item1, count, true);
-
-        if (item2)
-            player->DestroyItemCount(item2, count, true);
-
-        if (player)
-        {
-            if (player->HasAura(SPELL_DETECT_QUEST_INVIS_10))
-                player->RemoveAura(SPELL_DETECT_QUEST_INVIS_10);
-            if (player->HasAura(SPELL_DETECT_QUEST_INVIS_11))
-                player->RemoveAura(SPELL_DETECT_QUEST_INVIS_11);
-            if (player->HasAura(SPELL_DETECT_QUEST_INVIS_12))
-                player->RemoveAura(SPELL_DETECT_QUEST_INVIS_12);
-        }
-                
         return false;
     }
 
@@ -2662,6 +2708,125 @@ public:
 
 //###################################### End Quest 26651 and starting Quest 26668 Detonation
 
+enum eRendersValley
+{
+
+};
+
+class npc_renders_valley_camera : public CreatureScript
+{
+public:
+    npc_renders_valley_camera() : CreatureScript("npc_renders_valley_camera") { }
+
+    struct npc_renders_valley_cameraAI : public ScriptedAI
+    {
+        npc_renders_valley_cameraAI(Creature *c) : ScriptedAI(c) { }
+
+        uint32 m_timer;
+        uint32 m_phase;
+
+        void Reset() override
+        {
+            m_timer = 0;
+            m_phase = 0;
+            me->SetDisplayId(11686);
+            me->SetSpeed(MOVE_WALK, 5.0f);
+            me->GetMotionMaster()->MovePath(43618, false);
+        }
+
+        void DamageTaken(Unit* /*attacker*/, uint32& damage) 
+        { 
+            damage = 0;
+        }
+
+        void MovementInform(uint32 type, uint32 id) 
+        { 
+            if (type != 2)
+                return;
+
+            switch (id)
+            {
+            case 14:
+                m_phase = 1; m_timer = 1000;
+                break;
+            case 17:
+                m_phase = 2;
+                break;
+            case 26:
+                if (Player* player = me->GetCharmerOrOwnerOrSelf()->ToPlayer())
+                {
+                    player->ExitVehicle();
+                    player->NearTeleportTo(-9647.77f, -3250.79f, 112.67f, 0.74f);
+                    player->CastSpell(player, 81620);
+                    me->DespawnOrUnsummon();
+                }
+                break;
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (m_timer <= diff)
+            {
+                m_timer = 1000;
+                DoWork();
+            }
+            else
+                m_timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+
+        void DoWork()
+        {
+            switch (m_phase)
+            {
+            case 0:
+                break;
+            case 1:
+                DoDetonation(60, false);
+                break;
+            case 2:
+                DoDetonation(200, true);
+                break;
+            case 3:
+                break;
+            }
+        }
+
+        void DoDetonation(float range, bool IsNuke)
+        {
+            std::list<Creature*> creatureList = me->FindNearestCreatures(43639, range);
+            
+            if (creatureList.empty())
+                return;
+
+            for (std::list<Creature*>::iterator itr = creatureList.begin(); itr != creatureList.end(); ++itr)
+            {
+                Creature* npc = (*itr);
+                if (IsNuke)
+                {
+                    uint32 r = urand(0, 100);
+                    if (r<5)
+                        npc->CastSpell(npc, 81631);
+                }
+                else
+                    npc->CastSpell(npc, 81639);
+            }
+                
+                
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_renders_valley_cameraAI(creature);
+    }
+};
+
 
 void AddSC_redridge_mountains()
 {
@@ -2697,5 +2862,6 @@ void AddSC_redridge_mountains()
     new go_blackrock_holding_pen();
     new spell_plant_seaforium();
     new npc_john_j_keeshan_43611();
+    new npc_renders_valley_camera();
 }
 
