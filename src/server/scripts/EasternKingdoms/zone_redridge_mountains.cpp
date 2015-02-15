@@ -1812,22 +1812,21 @@ enum eCompanieBravo
     GO_BLACKROCK_EXPLOSIVE_DEVICE_1 = 204444,
     GO_BLACKROCK_EXPLOSIVE_DEVICE_2 = 204445,
     GO_BLACKROCK_EXPLOSIVE_DEVICE_3 = 204446,
-    GO_BLACKROCK_KEY_POUCH = 204437,
     GO_BLACKROCK_TOWER_OR_MUNITIONS_HUT = 301069,
     ITEM_BRAVO_COMPANY_FIELD_KIT_1 = 60384,
     ITEM_BRAVO_COMPANY_FIELD_KIT_2 = 60385,
     QUEST_PRISONERS_OF_WAR = 26646,
     QUEST_TO_WIN_A_WAR_YOU_GOTTA_BECOME_WAR = 26651,
+    QUEST_DETONATION = 26668,
     SPELL_SUMMON_JORGENSEN_43546 = 81447,
     SPELL_SEAL_OF_RIGHTEOUSNESS_43546 = 81454,
     SPELL_CONCENTRATION_AURA_43546 = 81455,
     SPELL_STATIC_SOUND = 81769,
     SPELL_DISTRACTION = 82578,
     SPELL_CHLOROFORM = 82579,
-    SPELL_AURA_SLEEP = 700,
-    SPELL_BRAVO_COMPANY_FIELD_KIT_ON = 82580,
+    SPELL_BRAVO_COMPANY_FIELD_KIT_1_60384 = 82580,
+    SPELL_BRAVO_COMPANY_FIELD_KIT_2_60385 = 82587,
     SPELL_DISTRACTION_VISUAL = 81370,
-    //SPELL_BAKER_TEAM_BROADCAST = 81155,
     SPELL_DEADLY_POISEN = 10022,
     SPELL_CAMOUFLAGE = 82577,
     SPELL_DETECT_QUEST_INVIS_13 = 81581,
@@ -2633,6 +2632,48 @@ public:
     }
 };
 
+//###################################### Quest
+
+enum eJohnKeeshan
+{
+    NPN_DANFORTH_43607 = 43607,
+    NPC_KRAKAUER_43608 = 43608,
+    NPC_JORGENSEN_43609 = 43609,
+    NPC_MESSNER_43610 = 43610,
+    NPN_JOHN_J_KEESHAN_43611 = 43611,
+    NPC_COLONEL_TROTEMAN_43728 = 43728,
+    NPC_COLONEL_TROTEMAN_43733 = 43733,
+    NPC_COMPANY_BRAVO_SIEGE_TANK = 43714,
+    NPC_GRAND_MAGE_DOANE = 397,
+    GO_BLACKROCK_KEY_POUCH = 204437,
+    SPELL_BRAVO_COMPANY_FIELD_KIT_VISUAL = 81462,
+    QUEST_THE_GRAND_MAGUS_DOANE = 26694,
+    SPELL_RENDERS_VALLEY_CAMERA = 81607,
+    SPELL_PARACHUTE_81793 = 81793,
+    SPELL_APPLY_QUEST_INVIS_16 = 81805,
+    SPELL_DETECT_QUEST_INVIS_16 = 85598, // 81804 has duration 30 sec 
+    SAY_PAYLOAD = 1,
+    SAY_DANFORTH_DEVEL = 0,
+    SAY_JOHN_TROTEMAN = 2,
+    SAY_DANFORTH_TROTEMAN = 1,
+    SAY_DOANE_PATHWAY = 0,
+    SAY_DOANE_ERROR = 1,
+    SAY_DOANE_MINION = 2,
+    SAY_DOANE_BRAVO = 4,
+    SAY_DOANE_MATTER = 5,
+};
+
+enum eGrandMagus
+{
+    NPC_GRAND_MAGUS_DOANE = 397,
+    NPC_MINION_OF_DOANE = 2531,
+    ITEM_KEY_OF_ILGALAR = 59522,
+    SPELL_MINION_OF_DOANE = 3611,
+    SPELL_UNLOCKING_WARD_OF_ILGALAR = 81776,
+    SPELL_DOANE_CREDIT = 81791,
+
+};
+
 class npc_john_j_keeshan_43611 : public CreatureScript
 {
 public:
@@ -2646,21 +2687,32 @@ public:
         player->RemoveAura(SPELL_SUMMON_JORGENSEN_43546);
         player->AddAura(SPELL_DETECT_QUEST_INVIS_13, player);
 
-        if (quest->GetQuestId() == 26668)
+        if (quest->GetQuestId() == QUEST_DETONATION)
         {
-            player->CastSpell(player, 81607, true);
+            player->CastSpell(player, SPELL_RENDERS_VALLEY_CAMERA, true);
             player->CastSpell(player, 81462, true);
+        }
+
+        if (quest->GetQuestId() == QUEST_THE_GRAND_MAGUS_DOANE)
+        {
+            player->AddAura(SPELL_DETECT_QUEST_INVIS_16, player);
         }
 
         return false;
     }
 
-    bool OnQuestReward(Player* player, Creature* /*creature*/, Quest const* /*quest*/, uint32 /*opt*/)  override
+    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*opt*/)  override
     {
         Creature* npc = player->FindNearestCreature(NPC_JORGENSEN_43546, 100.0f);
 
         if (npc)
             npc->DespawnOrUnsummon();
+
+        if (quest->GetQuestId() == QUEST_THE_GRAND_MAGUS_DOANE)
+        {
+            player->AddAura(SPELL_DETECT_QUEST_INVIS_16, player);
+            CAST_AI(npc_john_j_keeshan_43611AI, creature->AI())->StartAnimTrotman();
+        }
 
         return false;
     }
@@ -2678,6 +2730,138 @@ public:
             m_phase = 0;
         }
 
+        void StartAnimTrotman()
+        {
+            m_timer = 1000; m_phase = 1;
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (m_timer <= diff)
+            {
+                m_timer = 1000;
+                DoWork();
+            }
+            else
+                m_timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+
+        void DoWork()
+        {
+            switch (m_phase)
+            {
+            case 1: // bravo group: moves some meter forward
+                if (Creature* npc = me->FindNearestCreature(NPN_DANFORTH_43607, 25.0f))
+                    npc->GetMotionMaster()->MovePoint(0, -9635.3f, -3470.72f, 121.1892f);
+                if (Creature* npc = me->FindNearestCreature(NPC_KRAKAUER_43608, 25.0f))
+                    npc->GetMotionMaster()->MovePoint(0, -9643.22f, -3475.18f, 120.9651f);
+                if (Creature* npc = me->FindNearestCreature(NPC_JORGENSEN_43609, 25.0f))
+                    npc->GetMotionMaster()->MovePoint(0, -9630.14f, -3472.34f, 121.6037f);
+                if (Creature* npc = me->FindNearestCreature(NPC_MESSNER_43610, 25.0f))
+                    npc->GetMotionMaster()->MovePoint(0, -9640.22f, -3474.26f, 121.2151f);
+                if (Creature* npc = me->FindNearestCreature(NPN_JOHN_J_KEESHAN_43611, 25.0f))
+                    npc->GetMotionMaster()->MovePoint(0, -9637.62f, -3471.96f, 121.2151f);
+                m_timer = 3000; m_phase = 2;
+                break;
+            case 2: 
+                me->HandleEmote(EMOTE_ONESHOT_EXCLAMATION);
+                Talk(SAY_PAYLOAD);
+                m_timer = 2000; m_phase = 3;
+                break;
+            case 3: // spawn tank with parachute and set troteman inside
+                me->SummonCreature(NPC_COMPANY_BRAVO_SIEGE_TANK, -9645.827f, -3459.116f, 157.2119f, 1.937315f, TEMPSUMMON_TIMED_DESPAWN, 120000);
+                me->SummonCreature(NPC_COLONEL_TROTEMAN_43728, -9645.827f, -3459.116f, 157.2119f, 1.937315f, TEMPSUMMON_TIMED_DESPAWN, 120000);
+                if (Creature* tank = me->FindNearestCreature(NPC_COMPANY_BRAVO_SIEGE_TANK, 60.0f))
+                    if (Creature* troteman = me->FindNearestCreature(NPC_COLONEL_TROTEMAN_43728, 60.0f))
+                        troteman->EnterVehicle(tank, 0);
+                m_timer = 5000; m_phase = 4;
+                break;
+            case 4:
+                break;
+            case 5:
+                break;
+            case 6:
+                break;
+            case 7:
+                break;
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_john_j_keeshan_43611AI(creature);
+    }
+};
+
+class npc_grand_magus_doane : public CreatureScript
+{
+public:
+    npc_grand_magus_doane() : CreatureScript("npc_grand_magus_doane") { }
+
+    struct npc_grand_magus_doaneAI : public ScriptedAI
+    {
+        npc_grand_magus_doaneAI(Creature *c) : ScriptedAI(c) { }
+
+        uint32 m_timer;
+        uint32 m_phase;
+        bool m_teleport;
+        bool m_summonMinion;
+        bool m_talk;
+
+        void Reset() override
+        {
+            m_timer = 0;
+            m_phase = 0;
+            m_teleport = false;
+            m_summonMinion = false;
+            m_talk = false;
+        }
+
+        void DamageTaken(Unit* attacker, uint32& damage) override
+        { 
+            if (me->GetHealthPct() < 25.0f)
+                damage = 0;
+
+            if (!m_talk)
+            {
+                Talk(0);
+                m_talk = true;
+                return;
+            }
+            else if (me->GetHealthPct() < 30.0f && !m_teleport)
+            {
+                Talk(1);
+                me->DespawnOrUnsummon(3000);                
+                m_teleport = true;
+                if (Player* player = me->FindNearestPlayer(30.0f))
+                {
+                    me->CastSpell(player, SPELL_DOANE_CREDIT);
+                    player->KilledMonsterCredit(NPC_GRAND_MAGUS_DOANE);
+                }
+                return;
+            }
+            else if (me->GetHealthPct() < 60.0f && !m_summonMinion)
+            {
+                Talk(2);
+                if (Creature* minion = me->SummonCreature(NPC_MINION_OF_DOANE, me->GetNearPosition(2.0f, 0.0f), TEMPSUMMON_TIMED_DESPAWN, 600000))
+                {
+                    minion->AddAura(SPELL_APPLY_QUEST_INVIS_16, minion);
+                    if (Player* player = me->FindNearestPlayer(20.0f))
+                    {
+                        minion->Attack(player, true);
+                        m_summonMinion = true;
+                    }
+                }
+                return;
+            }
+        }
+        
         void UpdateAI(uint32 diff) override
         {
             if (m_timer <= diff)
@@ -2702,7 +2886,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_john_j_keeshan_43611AI(creature);
+        return new npc_grand_magus_doaneAI(creature);
     }
 };
 
@@ -2710,7 +2894,12 @@ public:
 
 enum eRendersValley
 {
-
+    NPC_RENDERS_VALLEY_CAMERA_INVISIBLE_MODELID = 11686,
+    NPC_RENDERS_VALLEY_CAMERA = 43618,
+    NPC_EXPLOSIONS_TRIGGER = 43639,
+    SPELL_QUEST_DETONATION_COMPLETE = 81620,
+    SPELL_DETONATION_BIG = 81631,
+    SPELL_DETONATION_NUKE = 81639,
 };
 
 class npc_renders_valley_camera : public CreatureScript
@@ -2729,36 +2918,39 @@ public:
         {
             m_timer = 0;
             m_phase = 0;
-            me->SetDisplayId(11686);
+            me->SetDisplayId(NPC_RENDERS_VALLEY_CAMERA_INVISIBLE_MODELID);
             me->SetSpeed(MOVE_WALK, 5.0f);
-            me->GetMotionMaster()->MovePath(43618, false);
+            me->GetMotionMaster()->MovePath(NPC_RENDERS_VALLEY_CAMERA, false);
         }
 
-        void DamageTaken(Unit* /*attacker*/, uint32& damage) 
+        void DamageTaken(Unit* /*attacker*/, uint32& damage) override
         { 
             damage = 0;
         }
 
-        void MovementInform(uint32 type, uint32 id) 
+        void MovementInform(uint32 type, uint32 id) override
         { 
             if (type != 2)
                 return;
-
+           
             switch (id)
             {
+            case 13:
+                m_phase = 0; m_timer = 1000;
+                break;
             case 14:
-                m_phase = 1; m_timer = 1000;
+                m_phase = 1;
                 break;
             case 17:
                 m_phase = 2;
                 break;
-            case 26:
+            case 25:
                 if (Player* player = me->GetCharmerOrOwnerOrSelf()->ToPlayer())
                 {
                     player->ExitVehicle();
-                    player->NearTeleportTo(-9647.77f, -3250.79f, 112.67f, 0.74f);
-                    player->CastSpell(player, 81620);
-                    me->DespawnOrUnsummon();
+                    me->DespawnOrUnsummon(1000);
+                    player->CastSpell(player, SPELL_QUEST_DETONATION_COMPLETE);
+                    player->CompleteQuest(QUEST_DETONATION);
                 }
                 break;
             }
@@ -2799,8 +2991,7 @@ public:
 
         void DoDetonation(float range, bool IsNuke)
         {
-            std::list<Creature*> creatureList = me->FindNearestCreatures(43639, range);
-            
+            std::list<Creature*> creatureList = me->FindNearestCreatures(NPC_EXPLOSIONS_TRIGGER, range);
             if (creatureList.empty())
                 return;
 
@@ -2810,11 +3001,11 @@ public:
                 if (IsNuke)
                 {
                     uint32 r = urand(0, 100);
-                    if (r<5)
-                        npc->CastSpell(npc, 81631);
+                    if (r < 5)
+                        npc->CastSpell(npc, SPELL_DETONATION_BIG);
                 }
                 else
-                    npc->CastSpell(npc, 81639);
+                    npc->CastSpell(npc, SPELL_DETONATION_NUKE);
             }
                 
                 
@@ -2826,6 +3017,11 @@ public:
         return new npc_renders_valley_cameraAI(creature);
     }
 };
+
+
+
+
+
 
 
 void AddSC_redridge_mountains()
@@ -2863,5 +3059,6 @@ void AddSC_redridge_mountains()
     new spell_plant_seaforium();
     new npc_john_j_keeshan_43611();
     new npc_renders_valley_camera();
+    new npc_grand_magus_doane();
 }
 
