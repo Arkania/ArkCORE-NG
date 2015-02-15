@@ -2651,7 +2651,7 @@ enum eJohnKeeshan
     SPELL_RENDERS_VALLEY_CAMERA = 81607,
     SPELL_PARACHUTE_81793 = 81793,
     SPELL_APPLY_QUEST_INVIS_16 = 81805,
-    SPELL_DETECT_QUEST_INVIS_16 = 85598, // 81804 has duration 30 sec 
+    SPELL_DETECT_QUEST_INVIS_16 = 81804, // duration 30 sec 
     SAY_PAYLOAD = 1,
     SAY_DANFORTH_DEVEL = 0,
     SAY_JOHN_TROTEMAN = 2,
@@ -2667,11 +2667,18 @@ enum eGrandMagus
 {
     NPC_GRAND_MAGUS_DOANE = 397,
     NPC_MINION_OF_DOANE = 2531,
+    NPC_TROTEMANN_43728 = 43728,
     ITEM_KEY_OF_ILGALAR = 59522,
     SPELL_MINION_OF_DOANE = 3611,
     SPELL_UNLOCKING_WARD_OF_ILGALAR = 81776,
     SPELL_DOANE_CREDIT = 81791,
-
+    SPELL_APPLY_QUEST_INVIS_15 = 81795,
+    SPELL_DETECT_QUEST_INVIS_15 = 81794,
+    SPELL_EJECT_PASSENGER_1 = 80743,
+    SAY_DAN_WHERE = 0,
+    SAY_JOHN_TROTE = 2,
+    SAY_DAN_TROTE = 1,
+    SAY_SERVICE = 0, 
 };
 
 class npc_john_j_keeshan_43611 : public CreatureScript
@@ -2691,12 +2698,7 @@ public:
         {
             player->CastSpell(player, SPELL_RENDERS_VALLEY_CAMERA, true);
             player->CastSpell(player, 81462, true);
-        }
-
-        if (quest->GetQuestId() == QUEST_THE_GRAND_MAGUS_DOANE)
-        {
-            player->AddAura(SPELL_DETECT_QUEST_INVIS_16, player);
-        }
+        }   
 
         return false;
     }
@@ -2710,8 +2712,8 @@ public:
 
         if (quest->GetQuestId() == QUEST_THE_GRAND_MAGUS_DOANE)
         {
-            player->AddAura(SPELL_DETECT_QUEST_INVIS_16, player);
-            CAST_AI(npc_john_j_keeshan_43611AI, creature->AI())->StartAnimTrotman();
+            player->AddAura(SPELL_DETECT_QUEST_INVIS_16, player); // duration 30 sec. for see siege tank animation
+            CAST_AI(npc_john_j_keeshan_43611AI, creature->AI())->StartAnimTrotman(player);
         }
 
         return false;
@@ -2723,16 +2725,18 @@ public:
 
         uint32 m_timer;
         uint32 m_phase;
+        Player* m_player;
 
         void Reset() override
         {
             m_timer = 0;
             m_phase = 0;
+            m_player = NULL;
         }
 
-        void StartAnimTrotman()
+        void StartAnimTrotman(Player* player)
         {
-            m_timer = 1000; m_phase = 1;
+            m_timer = 1000; m_phase = 1; m_player = player;
         }
 
         void UpdateAI(uint32 diff) override
@@ -2761,7 +2765,7 @@ public:
                 if (Creature* npc = me->FindNearestCreature(NPC_KRAKAUER_43608, 25.0f))
                     npc->GetMotionMaster()->MovePoint(0, -9643.22f, -3475.18f, 120.9651f);
                 if (Creature* npc = me->FindNearestCreature(NPC_JORGENSEN_43609, 25.0f))
-                    npc->GetMotionMaster()->MovePoint(0, -9630.14f, -3472.34f, 121.6037f);
+                    npc->GetMotionMaster()->MovePoint(0, -9633.14f, -3468.32f, 121.1628f);
                 if (Creature* npc = me->FindNearestCreature(NPC_MESSNER_43610, 25.0f))
                     npc->GetMotionMaster()->MovePoint(0, -9640.22f, -3474.26f, 121.2151f);
                 if (Creature* npc = me->FindNearestCreature(NPN_JOHN_J_KEESHAN_43611, 25.0f))
@@ -2771,23 +2775,62 @@ public:
             case 2: 
                 me->HandleEmote(EMOTE_ONESHOT_EXCLAMATION);
                 Talk(SAY_PAYLOAD);
-                m_timer = 2000; m_phase = 3;
+                m_timer = 1000; m_phase = 3;
                 break;
             case 3: // spawn tank with parachute and set troteman inside
-                me->SummonCreature(NPC_COMPANY_BRAVO_SIEGE_TANK, -9645.827f, -3459.116f, 157.2119f, 1.937315f, TEMPSUMMON_TIMED_DESPAWN, 120000);
-                me->SummonCreature(NPC_COLONEL_TROTEMAN_43728, -9645.827f, -3459.116f, 157.2119f, 1.937315f, TEMPSUMMON_TIMED_DESPAWN, 120000);
-                if (Creature* tank = me->FindNearestCreature(NPC_COMPANY_BRAVO_SIEGE_TANK, 60.0f))
-                    if (Creature* troteman = me->FindNearestCreature(NPC_COLONEL_TROTEMAN_43728, 60.0f))
-                        troteman->EnterVehicle(tank, 0);
-                m_timer = 5000; m_phase = 4;
+                if (Creature* tank = me->SummonCreature(NPC_COMPANY_BRAVO_SIEGE_TANK, -9645.827f, -3459.116f, 157.2119f, 1.937315f, TEMPSUMMON_TIMED_DESPAWN, 22000))
+                {
+                    tank->SetDisableGravity(true);
+                    tank->SetSpeed(MOVE_WALK, 2.0f);
+                    tank->GetMotionMaster()->MovePath(NPC_COMPANY_BRAVO_SIEGE_TANK, false);
+                }
+                m_timer = 1000; m_phase = 4;
                 break;
             case 4:
+                m_timer = 3000; m_phase = 5;
                 break;
             case 5:
+                if (Creature* npc = me->FindNearestCreature(NPN_DANFORTH_43607, 25.0f))
+                    npc->AI()->Talk(SAY_DAN_WHERE);
+                m_timer = 2000; m_phase = 6;
                 break;
             case 6:
+                Talk(SAY_JOHN_TROTE);
+                m_timer = 2000; m_phase = 7;
                 break;
             case 7:
+                me->PlayDirectSound(18203);
+                if (Creature* tank = me->FindNearestCreature(NPC_COMPANY_BRAVO_SIEGE_TANK, 60.0f))
+                    tank->SetDisableGravity(false);
+                m_timer = 1000; m_phase = 8;
+                break;
+            case 8: 
+                if (Creature* tank = me->FindNearestCreature(NPC_COMPANY_BRAVO_SIEGE_TANK, 25.0f))
+                {
+                    tank->HandleEmote(EMOTE_ONESHOT_ATTACK_THROWN);
+                    tank->CastSpell(tank, SPELL_EJECT_PASSENGER_1);
+                }
+                if (Creature* npc = me->SummonCreature(NPC_COLONEL_TROTEMAN_43728, -9645.827f, -3459.116f, 121.61f, 1.937315f, TEMPSUMMON_TIMED_DESPAWN, 8000))
+                {
+                    npc->GetMotionMaster()->MovePoint(0, -9641.50f, -3466.29f, 120.4420f);
+                }
+                m_timer = 1000; m_phase = 9;
+                break;
+            case 9:
+                if (Creature* npc = me->FindNearestCreature(NPN_DANFORTH_43607, 25.0f))
+                    npc->AI()->Talk(SAY_DAN_TROTE);
+
+                m_timer = 3000; m_phase = 10;
+                break;
+            case 10:
+                if (Creature* npc = me->FindNearestCreature(NPC_TROTEMANN_43728, 25.0f))
+                    npc->AI()->Talk(SAY_SERVICE); 
+                m_timer = 3000; m_phase = 11;
+                break;
+            case 11:
+                if (m_player)
+                    m_player->AddAura(SPELL_DETECT_QUEST_INVIS_15, m_player);
+                m_timer = 0; m_phase = 0;
                 break;
             }
         }
@@ -2851,7 +2894,6 @@ public:
                 Talk(2);
                 if (Creature* minion = me->SummonCreature(NPC_MINION_OF_DOANE, me->GetNearPosition(2.0f, 0.0f), TEMPSUMMON_TIMED_DESPAWN, 600000))
                 {
-                    minion->AddAura(SPELL_APPLY_QUEST_INVIS_16, minion);
                     if (Player* player = me->FindNearestPlayer(20.0f))
                     {
                         minion->Attack(player, true);
@@ -3018,8 +3060,62 @@ public:
     }
 };
 
+//######################################  Quest 26708
+
+enum eQuest26708
+{
+    NPC_TROTEMANN_43733 = 43733,
+    NPC_BRAVO_COMPANY_SIEGE_TANK_43734 = 43734,
+    NPN_JOHN_J_KEESHAN_43744 = 43744,
+    NPC_KEESHANS_GUN = 43745,
+    SPELL_SUMMON_BRAVO_COMPANY_SIEGE_TANK = 81808,
+    QUEST_AHHHHHHHHHHHHH = 26708,
+};
+
+class npc_colonel_troteman_43733 : public CreatureScript
+{
+public:
+    npc_colonel_troteman_43733() : CreatureScript("npc_colonel_troteman_43733") { }
+
+    struct npc_colonel_troteman_43733AI : public ScriptedAI
+    {
+        npc_colonel_troteman_43733AI(Creature *c) : ScriptedAI(c) { }
+
+        uint32 m_timer;
+
+        void Reset() override
+        {
+            m_timer = 1000;
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (m_timer <= diff)
+            {
+                m_timer = 1000;
+                DoWork();
+            }
+            else
+                m_timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
 
 
+        void DoWork()
+        {
+
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_colonel_troteman_43733AI(creature);
+    }
+};
 
 
 
@@ -3060,5 +3156,6 @@ void AddSC_redridge_mountains()
     new npc_john_j_keeshan_43611();
     new npc_renders_valley_camera();
     new npc_grand_magus_doane();
+    new npc_colonel_troteman_43733();
 }
 

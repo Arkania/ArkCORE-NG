@@ -31,7 +31,7 @@ delete from creature where guid=358735 and id=43714;
 delete from creature where guid=9249 and id=43728;
 
 update creature_template set AIName="", ScriptName="npc_grand_magus_doane" where entry=397;
-update creature_addon set auras="13787 81805" where guid=34021;
+update creature_addon set auras="13787" where guid=34021;
 update quest_template set RequiredSourceItemId1=59522,RequiredSourceItemCount1=1 where Id=26694;
 update quest_template set RequiredSourceItemId4=0,RequiredSourceItemCount4=0 where Id=26694;
 
