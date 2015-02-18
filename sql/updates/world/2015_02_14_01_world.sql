@@ -11,7 +11,7 @@ update creature_text set emote=6 where entry=43607 and groupid=1 and id=0;
 
 delete from creature where guid=9248 and id=43714;
 insert INTO `creature` (`guid`, `id`, `map`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`) VALUES 
-(9248, 43714, 0, 1, 1, 25289, 0, -9646.64, -3454.93, 121.645, 1.93731, 300, 0, 0, 7260, 0, 0, 0, 0, 0);
+(9248, 43714, 0, 1, 1, 25289, 0, -9646.64, -3454.93, 116.645, 1.93731, 300, 0, 0, 7260, 0, 0, 0, 0, 0);
 
 DELETE FROM `creature_addon` WHERE (`guid`=9248);
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `auras`) VALUES 

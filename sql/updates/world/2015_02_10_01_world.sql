@@ -59,12 +59,12 @@ INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `e
 (269884, 0, 0, 0, 2, 0, "81496 81580 81583");
 
 DELETE FROM `creature_equip_template` WHERE `entry` IN (43607,43608,43609,43610,43611);
-INSERT INTO `creature_equip_template` (`entry`, `itemEntry1`, `itemEntry2`, `itemEntry3`) VALUES
-(43611, 5278, 0, 42775), -- John J. Keeshan
-(43607, 12786, 12893, 0), -- Danforth
-(43608, 33981, 33981, 0), -- Krakauer
-(43609, 30204, 0, 0), -- Jorgensen
-(43610, 14836, 0, 0); -- Messner
+INSERT INTO `creature_equip_template` (`entry`, `id`, `itemEntry1`, `itemEntry2`, `itemEntry3`) VALUES
+(43611, 1, 5278, 0, 42775), -- John J. Keeshan
+(43607, 1,  12786, 12893, 0), -- Danforth
+(43608, 1,  33981, 33981, 0), -- Krakauer
+(43609, 1,  30204, 0, 0), -- Jorgensen
+(43610, 1,  14836, 0, 0); -- Messner
 
 
 

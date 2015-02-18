@@ -779,7 +779,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                 return false;
             }
             break;
-        case SMART_ACTION_INC_EVENT_PHASE:
+        case SMART_ACTION_INC_EVENT_PHASE: // Emblazon Runeblade:
             if (!e.action.incEventPhase.inc && !e.action.incEventPhase.dec)
             {
                 TC_LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u is incrementing phase by 0, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
