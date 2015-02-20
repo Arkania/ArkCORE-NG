@@ -3069,13 +3069,171 @@ enum eQuest26708
     NPN_JOHN_J_KEESHAN_43744 = 43744,
     NPC_KEESHANS_GUN = 43745,
     SPELL_SUMMON_BRAVO_COMPANY_SIEGE_TANK = 81808,
+    SPELL_APPLY_QUEST_INVIS_17 = 81897,
+    SPELL_DETECT_QUEST_INVIS_17 = 81898,
+    SPELL_APPLY_QUEST_INVIS_18 = 82059,
+    SPELL_DETECT_QUEST_INVIS_18 = 82060,
+    SPELL_SUMMON_PERSONAL_GUARDIAN_KEESHAN = 82002,
+    SPELL_SUMMON_PERSONAL_GUARDIAN_MESSNER = 82004,
+    SPELL_SUMMON_PERSONAL_GUARDIAN_JORGENSEN = 82005,
+    SPELL_SUMMON_PERSONAL_GUARDIAN_DANFORTH = 82007,
+    SPELL_SUMMON_PERSONAL_GUARDIAN_KRAKAUER = 82008,
+    SPELL_COMMANDING_SHOUT = 82061,
     QUEST_AHHHHHHHHHHHHH = 26708,
+    QUEST_SHOWDOWN_AT_STONEWATCH = 26713,
+    QUEST_DARKBLAZE_BROOD_OF_THE_WORLDBREAKER = 26714,
+    QUEST_TRIUMPHANT_RETURN = 26726,
 };
 
 class npc_colonel_troteman_43733 : public CreatureScript
 {
 public:
     npc_colonel_troteman_43733() : CreatureScript("npc_colonel_troteman_43733") { }
+
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) 
+    { 
+        if (quest->GetQuestId() == QUEST_AHHHHHHHHHHHHH)
+        {
+            player->CastSpell(player, SPELL_SUMMON_BRAVO_COMPANY_SIEGE_TANK, true);
+        }
+        if (quest->GetQuestId() == QUEST_SHOWDOWN_AT_STONEWATCH)
+        {
+            // missing change map ??
+            SummonLevel17(creature);
+            player->CastSpell(player, SPELL_SUMMON_PERSONAL_GUARDIAN_KEESHAN, true);
+            player->CastSpell(player, SPELL_SUMMON_PERSONAL_GUARDIAN_MESSNER, true);
+            player->CastSpell(player, SPELL_SUMMON_PERSONAL_GUARDIAN_JORGENSEN, true);
+            player->CastSpell(player, SPELL_SUMMON_PERSONAL_GUARDIAN_DANFORTH, true);
+            player->CastSpell(player, SPELL_SUMMON_PERSONAL_GUARDIAN_KRAKAUER, true);
+            if (Creature* npc = player->FindNearestCreature(43812, 10.0f))
+            {
+                npc->AddAura(79849, npc);
+                npc->SetByteValue(UNIT_FIELD_BYTES_2, 0, SHEATH_STATE_MELEE);
+                npc->SetHomePosition(player->GetNearPosition(2.0f, frand(0, 6.24f)));
+            }
+            if (Creature* npc = player->FindNearestCreature(43826, 10.0f))
+            {
+                npc->SetByteValue(UNIT_FIELD_BYTES_2, 0, SHEATH_STATE_MELEE);
+                npc->SetHomePosition(player->GetNearPosition(2.0f, frand(0, 6.24f)));
+            }
+            if (Creature* npc = player->FindNearestCreature(43827, 10.0f))
+            {
+                npc->AddAura(79962, npc);
+                npc->AddAura(79963, npc);
+                npc->SetByteValue(UNIT_FIELD_BYTES_2, 0, SHEATH_STATE_MELEE);
+                npc->SetHomePosition(player->GetNearPosition(2.0f, frand(0, 6.24f)));
+            }
+            if (Creature* npc = player->FindNearestCreature(43828, 10.0f))
+            {
+                npc->SetByteValue(UNIT_FIELD_BYTES_2, 0, SHEATH_STATE_MELEE);
+                npc->SetHomePosition(player->GetNearPosition(2.0f, frand(0, 6.24f)));
+            }
+            if (Creature* npc = player->FindNearestCreature(43829, 10.0f))
+            {
+                npc->SetByteValue(UNIT_FIELD_BYTES_2, 0, SHEATH_STATE_MELEE);
+                npc->SetHomePosition(player->GetNearPosition(2.0f, frand(0, 6.24f)));
+            }
+        }
+        if (quest->GetQuestId() == QUEST_DARKBLAZE_BROOD_OF_THE_WORLDBREAKER)
+        {
+
+        }
+        return false; 
+    }
+
+    bool OnQuestReward(Player* player, Creature* /*creature*/, Quest const* quest, uint32 /*opt*/) 
+    {
+        if (quest->GetQuestId() == QUEST_AHHHHHHHHHHHHH) // this quest has buggy spell 81808 and is set to autocomplete
+        {                                                // on end you should stay at "keeshans posten" and have aura "see invis 17"
+            player->NearTeleportTo(-9143.38f, -3047.55f, 108.72f, 1.1947f);
+            player->RemoveAura(SPELL_DETECT_QUEST_INVIS_13);
+            player->RemoveAura(SPELL_DETECT_QUEST_INVIS_15);
+            player->AddAura(SPELL_DETECT_QUEST_INVIS_17, player);
+            player->AddAura(SPELL_DETECT_QUEST_INVIS_18, player);
+        }
+        if (quest->GetQuestId() == QUEST_SHOWDOWN_AT_STONEWATCH)
+        {
+
+        }
+        if (quest->GetQuestId() == QUEST_DARKBLAZE_BROOD_OF_THE_WORLDBREAKER)
+        {
+
+        }
+        return false; 
+    }
+
+    void SummonLevel17(Creature* npc)
+    {
+        if (Creature* target = npc->SummonCreature(4065, -9213.125f, -2982.141f, 100.0157f, 1.34429f, TEMPSUMMON_TIMED_DESPAWN, 900000))
+            target->AddAura(SPELL_APPLY_QUEST_INVIS_17, target);
+        if (Creature* target = npc->SummonCreature(4065, -9221.188f, -3056.101f, 100.8075f, 5.019916f, TEMPSUMMON_TIMED_DESPAWN, 900000))
+            target->AddAura(SPELL_APPLY_QUEST_INVIS_17, target);
+        if (Creature* target = npc->SummonCreature(4065, -9280.388f, -3025.233f, 119.9484f, 5.664678f, TEMPSUMMON_TIMED_DESPAWN, 900000))
+            target->AddAura(SPELL_APPLY_QUEST_INVIS_17, target);
+        if (Creature* target = npc->SummonCreature(4065, -9228.95f, -2929.91f, 112.9479f, 4.54403f, TEMPSUMMON_TIMED_DESPAWN, 900000))
+            target->AddAura(SPELL_APPLY_QUEST_INVIS_17, target);
+        if (Creature* target = npc->SummonCreature(4065, -9367.44f, -3070.87f, 149.3803f, 3.246312f, TEMPSUMMON_TIMED_DESPAWN, 900000))
+            target->AddAura(SPELL_APPLY_QUEST_INVIS_17, target);
+        if (Creature* target = npc->SummonCreature(4065, -9368.97f, -3087.17f, 149.3813f, 1.134464f, TEMPSUMMON_TIMED_DESPAWN, 900000))
+            target->AddAura(SPELL_APPLY_QUEST_INVIS_17, target);
+        if (Creature* target = npc->SummonCreature(4065, -9378.33f, -3084.07f, 140.5583f, 1.518436f, TEMPSUMMON_TIMED_DESPAWN, 900000))
+            target->AddAura(SPELL_APPLY_QUEST_INVIS_17, target);
+        if (Creature* target = npc->SummonCreature(4065, -9408.18f, -3060.87f, 140.5583f, 6.248279f, TEMPSUMMON_TIMED_DESPAWN, 900000))
+            target->AddAura(SPELL_APPLY_QUEST_INVIS_17, target);
+        if (Creature* target = npc->SummonCreature(4065, -9405.49f, -3065.58f, 164.6403f, 3.01942f, TEMPSUMMON_TIMED_DESPAWN, 900000))
+            target->AddAura(SPELL_APPLY_QUEST_INVIS_17, target);
+        if (Creature* target = npc->SummonCreature(4464, -9229.501f, -3011.467f, 101.0967f, 2.823587f, TEMPSUMMON_TIMED_DESPAWN, 900000))
+            target->AddAura(SPELL_APPLY_QUEST_INVIS_17, target);
+        if (Creature* target = npc->SummonCreature(4464, -9184.64f, -2931.53f, 107.8983f, 5.096361f, TEMPSUMMON_TIMED_DESPAWN, 900000))
+            target->AddAura(SPELL_APPLY_QUEST_INVIS_17, target);
+        if (Creature* target = npc->SummonCreature(4464, -9255.83f, -3024.38f, 115.2133f, 0.6806784f, TEMPSUMMON_TIMED_DESPAWN, 900000))
+            target->AddAura(SPELL_APPLY_QUEST_INVIS_17, target);
+        if (Creature* target = npc->SummonCreature(4464, -9317.43f, -2973.58f, 122.7913f, 4.29351f, TEMPSUMMON_TIMED_DESPAWN, 900000))
+            target->AddAura(SPELL_APPLY_QUEST_INVIS_17, target);
+        if (Creature* target = npc->SummonCreature(4464, -9291.47f, -2983.71f, 122.7743f, 4.34587f, TEMPSUMMON_TIMED_DESPAWN, 900000))
+            target->AddAura(SPELL_APPLY_QUEST_INVIS_17, target);
+        if (Creature* target = npc->SummonCreature(4464, -9274.663f, -2924.293f, 128.3869f, 2.20241f, TEMPSUMMON_TIMED_DESPAWN, 900000))
+            target->AddAura(SPELL_APPLY_QUEST_INVIS_17, target);
+        if (Creature* target = npc->SummonCreature(4464, -9305.78f, -2931.928f, 128.4665f, 4.234417f, TEMPSUMMON_TIMED_DESPAWN, 900000))
+            target->AddAura(SPELL_APPLY_QUEST_INVIS_17, target);
+        if (Creature* target = npc->SummonCreature(435, -9339.04f, -3041.75f, 135.9023f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 900000))
+            target->AddAura(SPELL_APPLY_QUEST_INVIS_17, target);
+        if (Creature* target = npc->SummonCreature(435, -9329.43f, -3025.18f, 134.1063f, 0.06981317f, TEMPSUMMON_TIMED_DESPAWN, 900000))
+            target->AddAura(SPELL_APPLY_QUEST_INVIS_17, target);
+        if (Creature* target = npc->SummonCreature(435, -9329.04f, -3032.32f, 133.8183f, 0.3665192f, TEMPSUMMON_TIMED_DESPAWN, 900000))
+            target->AddAura(SPELL_APPLY_QUEST_INVIS_17, target);
+        if (Creature* target = npc->SummonCreature(435, -9326.25f, -3015.28f, 135.6453f, 5.742133f, TEMPSUMMON_TIMED_DESPAWN, 900000))
+            target->AddAura(SPELL_APPLY_QUEST_INVIS_17, target);
+        if (Creature* target = npc->SummonCreature(435, -9385.44f, -3057.84f, 139.0983f, 1.64061f, TEMPSUMMON_TIMED_DESPAWN, 900000))
+            target->AddAura(SPELL_APPLY_QUEST_INVIS_17, target);
+        if (Creature* target = npc->SummonCreature(435, -9329.04f, -3032.32f, 133.8183f, 0.3665192f, TEMPSUMMON_TIMED_DESPAWN, 900000))
+            target->AddAura(SPELL_APPLY_QUEST_INVIS_17, target);
+        if (Creature* target = npc->SummonCreature(436, -9295.988f, -3045.026f, 124.1195f, 5.920075f, TEMPSUMMON_TIMED_DESPAWN, 900000))
+            target->AddAura(SPELL_APPLY_QUEST_INVIS_17, target);
+        if (Creature* target = npc->SummonCreature(436, -9266.205f, -2909.046f, 127.5425f, 3.558032f, TEMPSUMMON_TIMED_DESPAWN, 900000))
+            target->AddAura(SPELL_APPLY_QUEST_INVIS_17, target);
+        if (Creature* target = npc->SummonCreature(436, -9362.214f, -3016.605f, 136.7716f, 5.912722f, TEMPSUMMON_TIMED_DESPAWN, 900000))
+            target->AddAura(SPELL_APPLY_QUEST_INVIS_17, target);
+        if (Creature* target = npc->SummonCreature(436, -9362.97f, -3063.06f, 164.6403f, 0.2094395f, TEMPSUMMON_TIMED_DESPAWN, 900000))
+            target->AddAura(SPELL_APPLY_QUEST_INVIS_17, target);
+        if (Creature* target = npc->SummonCreature(436, -9382.58f, -3070.72f, 140.5583f, 3.211406f, TEMPSUMMON_TIMED_DESPAWN, 900000))
+            target->AddAura(SPELL_APPLY_QUEST_INVIS_17, target);
+        if (Creature* target = npc->SummonCreature(436, -9392.08f, -3053.25f, 156.6613f, 0.05235988f, TEMPSUMMON_TIMED_DESPAWN, 900000))
+            target->AddAura(SPELL_APPLY_QUEST_INVIS_17, target);
+        if (Creature* target = npc->SummonCreature(436, -9405.61f, -3087.89f, 139.6563f, 1.623156f, TEMPSUMMON_TIMED_DESPAWN, 900000))
+            target->AddAura(SPELL_APPLY_QUEST_INVIS_17, target);
+        if (Creature* target = npc->SummonCreature(436, -9415.86f, -3075.78f, 136.7763f, 2.443461f, TEMPSUMMON_TIMED_DESPAWN, 900000))
+            target->AddAura(SPELL_APPLY_QUEST_INVIS_17, target);
+        if (Creature* target = npc->SummonCreature(436, -9412.826f, -3030.809f, 136.7576f, 6.269172f, TEMPSUMMON_TIMED_DESPAWN, 900000))
+            target->AddAura(SPELL_APPLY_QUEST_INVIS_17, target);
+        if (Creature* target = npc->SummonCreature(436, -9440.95f, -3076.3f, 136.7703f, 0.715585f, TEMPSUMMON_TIMED_DESPAWN, 900000))
+            target->AddAura(SPELL_APPLY_QUEST_INVIS_17, target);
+        if (Creature* target = npc->SummonCreature(334, -9478.62f, -2963.11f, 129.3833f, 2.146755f, TEMPSUMMON_TIMED_DESPAWN, 900000))
+            target->AddAura(SPELL_APPLY_QUEST_INVIS_17, target);
+        if (Creature* target = npc->SummonCreature(486, -9326.42f, -3028.35f, 133.1993f, 6.213372f, TEMPSUMMON_TIMED_DESPAWN, 900000))
+            target->AddAura(SPELL_APPLY_QUEST_INVIS_17, target);
+    }
+
 
     struct npc_colonel_troteman_43733AI : public ScriptedAI
     {
@@ -3104,7 +3262,6 @@ public:
             DoMeleeAttackIfReady();
         }
 
-
         void DoWork()
         {
 
@@ -3117,7 +3274,378 @@ public:
     }
 };
 
+class npc_bravo_company_siege_tank : public CreatureScript
+{
+public:
+    npc_bravo_company_siege_tank() : CreatureScript("npc_bravo_company_siege_tank") { }
 
+    struct npc_bravo_company_siege_tankAI : public ScriptedAI
+    {
+        npc_bravo_company_siege_tankAI(Creature *c) : ScriptedAI(c) { }
+
+        uint32 m_timer;
+
+        void Reset() override
+        {
+            m_timer = 1000;
+            if (Creature* gun = me->SummonCreature(43745, me->GetPosition()))
+                if (Creature* john = me->SummonCreature(43744, me->GetPosition()))
+                {
+                    gun->EnterVehicle(me, 1);
+                    john->EnterVehicle(gun, 0);
+                }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (m_timer <= diff)
+            {
+                m_timer = 1000;
+                DoWork();
+            }
+            else
+                m_timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+
+        void DoWork()
+        {
+
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_bravo_company_siege_tankAI(creature);
+    }
+};
+
+//######################################  Quest 26713 26714 26726
+
+enum eQuest26713
+{
+    NPN_JOHN_J_KEESHAN_43812 = 43812, // hunter
+    NPC_MESSNER_43826 = 43826,        // mage
+    NPC_JORGENSEN_43827 = 43827,      // paladin
+    NPN_DANFORTH_43828 = 43828,       // warrior
+    NPC_KRAKAUER_43829 = 43829,       // warrior
+    SPELL_SUMMON_DARKBLAZE = 81953,
+    SPELL_DARKBLAZE_TRANSFORM = 82067,
+    SPELL_CLEAR_DARKBLAZE_AURA = 82092,
+    SPELL_DARKBLAZE_KILL_CREDIT = 82096,
+    SPELL_SHOWDOWN_82010 = 82010,
+    SPELL_SHOWDOWN_82086 = 82086,
+    SPELL_MARK_MASTER_AS_DESUMMONED = 80929,
+    SPELL_CANCEL_CAMOUFLAGE = 81554,
+    SPELL_PERMANENT_FEIGN_DEATH = 29266,
+    SPELL_SPARKLE = 99495,
+    SPELL_SUMMON_PERSONAL_GUARDIAN_KEESHAN_82091 = 82091,
+    SPELL_SUMMON_PERSONAL_GUARDIAN_MESSNER_82090 = 82090,
+    SPELL_SUMMON_PERSONAL_GUARDIAN_JORGENSEN_82089 = 82089,
+    SPELL_SUMMON_PERSONAL_GUARDIAN_DANFORTH_82088 = 82088,
+    SPELL_SUMMON_PERSONAL_GUARDIAN_KRAKAUER_82087 = 82087,
+};
+
+class npc_john_j_keeshan_43812 : public CreatureScript
+{
+public:
+    npc_john_j_keeshan_43812() : CreatureScript("npc_john_j_keeshan_43812") { }
+
+    enum eKeeshan
+    {
+        Bloodthirst = 79878,
+        CommandingShout = 82061,
+        Immolation = 35935,
+        ImmolationArrow = 82064,
+        Rend = 11977,
+        ShatteringThrow = 79883,
+        Slam = 79881,
+    };
+
+    struct npc_john_j_keeshan_43812AI : public ScriptedAI
+    {
+        npc_john_j_keeshan_43812AI(Creature *c) : ScriptedAI(c) { }
+
+        uint32 m_timer;
+
+        void Reset() override
+        {
+            m_timer = 0;
+            
+        }
+
+        void DamageTaken(Unit* attacker, uint32& damage) override
+        {
+
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (m_timer <= diff)
+            {
+                m_timer = 1000;
+                DoWork();
+            }
+            else
+                m_timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+
+
+        void DoWork()
+        {
+
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_john_j_keeshan_43812AI(creature);
+    }
+};
+
+class npc_messner_43826 : public CreatureScript
+{
+public:
+    npc_messner_43826() : CreatureScript("npc_messner_43826") { }
+
+    enum eMessner
+    {
+        BlastWave = 81996,
+        Fireball = 79854,
+        Flamestrike = 81995,
+        MoltenArmor1 = 79849,
+        MoltenArmor2 = 79848,
+    };
+
+    struct npc_messner_43826AI : public ScriptedAI
+    {
+        npc_messner_43826AI(Creature *c) : ScriptedAI(c) { }
+
+        uint32 m_timer;
+
+        void Reset() override
+        {
+            m_timer = 1000;
+        }
+
+        void DamageTaken(Unit* attacker, uint32& damage) override
+        {
+
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (m_timer <= diff)
+            {
+                m_timer = 1000;
+                DoWork();
+            }
+            else
+                m_timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+
+
+        void DoWork()
+        {
+
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_messner_43826AI(creature);
+    }
+};
+
+class npc_jorgensen_43827 : public CreatureScript
+{
+public:
+    npc_jorgensen_43827() : CreatureScript("npc_jorgensen_43827") { }
+
+    enum eJorgensen
+    {
+        ConcentrationAura = 79963,
+        Exorcism = 79964,
+        HolyLight = 79960,
+        HolyShock = 79961,
+        SealOfRighteousness = 79962,
+    };
+
+    struct npc_jorgensen_43827AI : public ScriptedAI
+    {
+        npc_jorgensen_43827AI(Creature *c) : ScriptedAI(c) { }
+
+        uint32 m_timer;
+
+        void Reset() override
+        {
+            m_timer = 1000;
+        }
+
+        void DamageTaken(Unit* attacker, uint32& damage) override
+        {
+
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (m_timer <= diff)
+            {
+                m_timer = 1000;
+                DoWork();
+            }
+            else
+                m_timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+
+
+        void DoWork()
+        {
+
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_jorgensen_43827AI(creature);
+    }
+};
+
+class npc_danforth_43828 : public CreatureScript
+{
+public:
+    npc_danforth_43828() : CreatureScript("npc_danforth_43828") { }
+
+    enum eDanforth
+    {
+        BattleShout = 81219,
+        Charge = 22120,
+        SunderArmor = 11971,
+        Thunderclap = 8078,
+    };
+
+    struct npc_danforth_43828AI : public ScriptedAI
+    {
+        npc_danforth_43828AI(Creature *c) : ScriptedAI(c) { }
+
+        uint32 m_timer;
+
+        void Reset() override
+        {
+            m_timer = 1000;
+        }
+
+        void DamageTaken(Unit* attacker, uint32& damage) override
+        {
+
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (m_timer <= diff)
+            {
+                m_timer = 1000;
+                DoWork();
+            }
+            else
+                m_timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+
+
+        void DoWork()
+        {
+
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_danforth_43828AI(creature);
+    }
+};
+
+class npc_krakauer_43829 : public CreatureScript
+{
+public:
+    npc_krakauer_43829() : CreatureScript("npc_krakauer_43829") { }
+
+    enum eKrakauer
+    {
+        BattleShout = 32064,
+        Bloodthirst = 79878,
+        Rend = 11977,
+        ShatteringThrow = 79883,
+        Slam = 79881,
+    };
+
+    struct npc_krakauer_43829AI : public ScriptedAI
+    {
+        npc_krakauer_43829AI(Creature *c) : ScriptedAI(c) { }
+
+        uint32 m_timer;
+
+        void Reset() override
+        {
+            m_timer = 1000;
+        }
+
+        void DamageTaken(Unit* attacker, uint32& damage) override
+        {
+
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (m_timer <= diff)
+            {
+                m_timer = 1000;
+                DoWork();
+            }
+            else
+                m_timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+
+
+        void DoWork()
+        {
+
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_krakauer_43829AI(creature);
+    }
+};
 
 
 void AddSC_redridge_mountains()
@@ -3157,5 +3685,11 @@ void AddSC_redridge_mountains()
     new npc_renders_valley_camera();
     new npc_grand_magus_doane();
     new npc_colonel_troteman_43733();
+    new npc_bravo_company_siege_tank();
+    new npc_john_j_keeshan_43812();
+    new npc_messner_43826();
+    new npc_jorgensen_43827();
+    new npc_danforth_43828();
+    new npc_krakauer_43829();
 }
 
