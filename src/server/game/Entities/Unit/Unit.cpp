@@ -1826,14 +1826,15 @@ void Unit::CalcAbsorbResist(Unit* victim, SpellSchoolMask schoolMask, DamageEffe
             splitDamage = RoundToInterval(splitDamage, uint32(0), uint32(dmgInfo.GetDamage()));
 
             dmgInfo.AbsorbDamage(splitDamage);
-            uint32 splitted = splitDamage;
             uint32 split_absorb = 0;
-            DealDamageMods(caster, splitted, &split_absorb);
+            DealDamageMods(caster, splitDamage, &split_absorb);
 
-            SendSpellNonMeleeDamageLog(caster, (*itr)->GetSpellInfo()->Id, splitted, schoolMask, split_absorb, 0, false, 0, false);
+            SendSpellNonMeleeDamageLog(caster, (*itr)->GetSpellInfo()->Id, splitDamage, schoolMask, split_absorb, 0, false, 0, false);
 
-            CleanDamage cleanDamage = CleanDamage(splitted, 0, BASE_ATTACK, MELEE_HIT_NORMAL);
-            DealDamage(caster, splitted, &cleanDamage, DIRECT_DAMAGE, schoolMask, (*itr)->GetSpellInfo(), false);
+            CleanDamage cleanDamage = CleanDamage(splitDamage, 0, BASE_ATTACK, MELEE_HIT_NORMAL);
+            DealDamage(caster, splitDamage, &cleanDamage, DIRECT_DAMAGE, schoolMask, (*itr)->GetSpellInfo(), false);
+            // break 'Fear' and similar auras
+            caster->ProcDamageAndSpellFor(true, this, PROC_FLAG_TAKEN_SPELL_MAGIC_DMG_CLASS_NEG, PROC_EX_NORMAL_HIT, BASE_ATTACK, (*itr)->GetSpellInfo(), splitDamage);
         }
     }
 
@@ -11158,9 +11159,8 @@ bool Unit::IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index) cons
         // Check for immune to application of harmful magical effects
         AuraEffectList const& immuneAuraApply = GetAuraEffectsByType(SPELL_AURA_MOD_IMMUNE_AURA_APPLY_SCHOOL);
         for (AuraEffectList::const_iterator iter = immuneAuraApply.begin(); iter != immuneAuraApply.end(); ++iter)
-            if (spellInfo->Dispel == DISPEL_MAGIC &&                                      // Magic debuff
-                ((*iter)->GetMiscValue() & spellInfo->GetSchoolMask()) &&  // Check school
-                !spellInfo->IsPositiveEffect(index))                                  // Harmful
+            if (((*iter)->GetMiscValue() & spellInfo->GetSchoolMask()) &&  // Check school
+                !spellInfo->IsPositiveEffect(index))                       // Harmful
                 return true;
     }
 
@@ -12806,24 +12806,25 @@ int32 Unit::ModSpellDuration(SpellInfo const* spellProto, Unit const* target, in
     return std::max(duration, 0);
 }
 
-void Unit::ModSpellCastTime(SpellInfo const* spellProto, int32 & castTime, Spell* spell)
+void Unit::ModSpellCastTime(SpellInfo const* spellInfo, int32 & castTime, Spell* spell)
 {
-    if (!spellProto || castTime < 0)
+    if (!spellInfo || castTime < 0)
         return;
+
+    if (spellInfo->IsChanneled() && !(spellInfo->AttributesEx5 & SPELL_ATTR5_HASTE_AFFECT_DURATION))
+        return;
+
     // called from caster
     if (Player* modOwner = GetSpellModOwner())
-        modOwner->ApplySpellMod(spellProto->Id, SPELLMOD_CASTING_TIME, castTime, spell);
+        modOwner->ApplySpellMod(spellInfo->Id, SPELLMOD_CASTING_TIME, castTime, spell);
 
-    if (!(spellProto->Attributes & (SPELL_ATTR0_ABILITY | SPELL_ATTR0_TRADESPELL)) && !(spellProto->AttributesEx6 & (SPELL_ATTR6_UNK17)) && ((GetTypeId() == TYPEID_PLAYER && spellProto->SpellFamilyName) || GetTypeId() == TYPEID_UNIT))
+    if (!((spellInfo->Attributes & (SPELL_ATTR0_ABILITY | SPELL_ATTR0_TRADESPELL)) || (spellInfo->AttributesEx3 & SPELL_ATTR3_NO_DONE_BONUS)) &&
+        ((GetTypeId() == TYPEID_PLAYER && spellInfo->SpellFamilyName) || GetTypeId() == TYPEID_UNIT))
         castTime = int32(float(castTime) * GetFloatValue(UNIT_MOD_CAST_SPEED));
-    else if (spellProto->Attributes & SPELL_ATTR0_REQ_AMMO && !(spellProto->AttributesEx2 & SPELL_ATTR2_AUTOREPEAT_FLAG))
+    else if (spellInfo->Attributes & SPELL_ATTR0_REQ_AMMO && !(spellInfo->AttributesEx2 & SPELL_ATTR2_AUTOREPEAT_FLAG))
         castTime = int32(float(castTime) * m_modAttackSpeedPct[RANGED_ATTACK]);
-    else if (spellProto->SpellVisual[0] == 3881 && HasAura(67556)) // cooking with Chef Hat.
+    else if (spellInfo->SpellVisual[0] == 3881 && HasAura(67556)) // cooking with Chef Hat.
         castTime = 500;
-
-    // Aimed shot! Instant (Master Marksman)
-    if (spellProto->Id == 82928 && HasAura(82926))
-        castTime = -1000;
 }
 
 DiminishingLevels Unit::GetDiminishing(DiminishingGroup group)
@@ -17591,7 +17592,8 @@ bool Unit::UpdatePosition(float x, float y, float z, float orientation, bool tel
 
     if (relocated)
     {
-        RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_MOVE);
+        if (!GetVehicle())
+            RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_MOVE);
 
         // move and update visible state if need
         if (GetTypeId() == TYPEID_PLAYER)

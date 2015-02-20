@@ -571,7 +571,7 @@ m_caster((info->AttributesEx6 & SPELL_ATTR6_CAST_BY_CHARMER && caster->GetCharme
     m_spellState = SPELL_STATE_NULL;
     _triggeredCastFlags = triggerFlags;
     if (info->AttributesEx4 & SPELL_ATTR4_TRIGGERED)
-        _triggeredCastFlags = TRIGGERED_FULL_MASK;
+        _triggeredCastFlags = TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_IGNORE_EQUIPPED_ITEM_REQUIREMENT);
 
     m_CastItem = NULL;
     m_castItemGUID = 0;
@@ -1278,8 +1278,12 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
             float angle = float(rand_norm()) * static_cast<float>(M_PI * 35.0f / 180.0f) - static_cast<float>(M_PI * 17.5f / 180.0f);
             m_caster->GetClosePoint(x, y, z, DEFAULT_WORLD_OBJECT_SIZE, dist, angle);
 
-            float ground = z;
-            float liquidLevel = m_caster->GetMap()->GetWaterOrGroundLevel(x, y, z, &ground);
+            float ground = m_caster->GetMap()->GetHeight(m_caster->GetPhaseMask(), x, y, z, true, 50.0f);
+            float liquidLevel = VMAP_INVALID_HEIGHT_VALUE;
+            LiquidData liquidData;
+            if (m_caster->GetMap()->getLiquidStatus(x, y, z, MAP_ALL_LIQUIDS, &liquidData))
+                liquidLevel = liquidData.level;
+
             if (liquidLevel <= ground) // When there is no liquid Map::GetWaterOrGroundLevel returns ground level
             {
                 SendCastResult(SPELL_FAILED_NOT_HERE);
@@ -2632,10 +2636,7 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
                     {
                         // Haste modifies duration of channeled spells
                         if (m_spellInfo->IsChanneled())
-                        {
-                            if (m_spellInfo->AttributesEx5 & SPELL_ATTR5_HASTE_AFFECT_DURATION)
-                                m_originalCaster->ModSpellCastTime(aurSpellInfo, duration, this);
-                        }
+                            m_originalCaster->ModSpellCastTime(aurSpellInfo, duration, this);
                         else if (m_spellInfo->AttributesEx5 & SPELL_ATTR5_HASTE_AFFECT_DURATION)
                         {
                             int32 origDuration = duration;
@@ -3794,7 +3795,7 @@ void Spell::SendSpellStart()
         castFlags |= CAST_FLAG_POWER_LEFT_SELF;
 
     if (m_spellInfo->RuneCostID && m_spellInfo->PowerType == POWER_RUNES)
-        castFlags |= CAST_FLAG_UNKNOWN_19;
+        castFlags |= CAST_FLAG_NO_GCD; // not needed, but Blizzard sends it
 
     WorldPacket data(SMSG_SPELL_START, (8+8+4+4+2));
     if (m_CastItem)
@@ -3883,16 +3884,17 @@ void Spell::SendSpellGo()
     if ((m_caster->GetTypeId() == TYPEID_PLAYER)
         && (m_caster->getClass() == CLASS_DEATH_KNIGHT)
         && m_spellInfo->RuneCostID
-        && m_spellInfo->PowerType == POWER_RUNES)
+        && m_spellInfo->PowerType == POWER_RUNES
+        && !(_triggeredCastFlags & TRIGGERED_IGNORE_POWER_AND_REAGENT_COST))
     {
-        castFlags |= CAST_FLAG_UNKNOWN_19;                   // same as in SMSG_SPELL_START
+        castFlags |= CAST_FLAG_NO_GCD;                   // same as in SMSG_SPELL_START
         castFlags |= CAST_FLAG_RUNE_LIST;                    // rune cooldowns list
     }
 
     if (m_spellInfo->HasEffect(SPELL_EFFECT_ACTIVATE_RUNE))
     {
         castFlags |= CAST_FLAG_RUNE_LIST;                    // rune cooldowns list
-        castFlags |= CAST_FLAG_UNKNOWN_19;                   // same as in SMSG_SPELL_START
+        castFlags |= CAST_FLAG_NO_GCD;                   // same as in SMSG_SPELL_START
     }
 
     if (m_targets.HasTraj())

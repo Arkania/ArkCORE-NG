@@ -515,8 +515,8 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
     switch (GetAuraType())
     {
         case SPELL_AURA_CONTROL_VEHICLE:
-            m_amount = m_baseAmount;
-            break;
+        //    m_amount = m_baseAmount;
+        //    break;
         // crowd control auras
         case SPELL_AURA_MOD_CONFUSE:
         case SPELL_AURA_MOD_FEAR:
@@ -1822,9 +1822,6 @@ void AuraEffect::HandleAuraModShapeshift(AuraApplication const* aurApp, uint8 mo
         if (aurApp->GetRemoveMode())
             return;
 
-        if (modelid > 0)
-            target->SetDisplayId(modelid);
-
         if (PowerType != POWER_MANA)
         {
             int32 oldPower = target->GetPower(PowerType);
@@ -1854,6 +1851,12 @@ void AuraEffect::HandleAuraModShapeshift(AuraApplication const* aurApp, uint8 mo
             return;
 
         target->SetShapeshiftForm(form);
+        if (modelid > 0)
+        {
+            SpellInfo const* transformSpellInfo = sSpellMgr->GetSpellInfo(target->getTransForm());
+            if (!transformSpellInfo || !GetSpellInfo()->IsPositive())
+                target->SetDisplayId(modelid);
+        }
     }
     else
     {
@@ -1973,9 +1976,11 @@ void AuraEffect::HandleAuraTransform(AuraApplication const* aurApp, uint8 mode, 
 
     if (apply)
     {
-        // update active transform spell only when transform or shapeshift not set or not overwriting negative by positive case
-        if (!target->GetModelForForm(target->GetShapeshiftForm()) || !GetSpellInfo()->IsPositive())
+        // update active transform spell only when transform not set or not overwriting negative by positive case
+        SpellInfo const* transformSpellInfo = sSpellMgr->GetSpellInfo(target->getTransForm());
+        if (!transformSpellInfo || !GetSpellInfo()->IsPositive() || transformSpellInfo->IsPositive())
         {
+            target->setTransForm(GetId());
             // special case (spell specific functionality)
             if (GetMiscValue() == 0)
             {
@@ -2143,11 +2148,6 @@ void AuraEffect::HandleAuraTransform(AuraApplication const* aurApp, uint8 mode, 
                 }
             }
         }
-
-        // update active transform spell only when transform or shapeshift not set or not overwriting negative by positive case
-        SpellInfo const* transformSpellInfo = sSpellMgr->GetSpellInfo(target->getTransForm());
-        if (!transformSpellInfo || !GetSpellInfo()->IsPositive() || transformSpellInfo->IsPositive())
-            target->setTransForm(GetId());
 
         // polymorph case
         if ((mode & AURA_EFFECT_HANDLE_REAL) && target->GetTypeId() == TYPEID_PLAYER && target->IsPolymorphed())
@@ -3070,8 +3070,8 @@ void AuraEffect::HandleAuraControlVehicle(AuraApplication const* aurApp, uint8 m
         // so this break such spells or most of them.
         // Current formula about m_amount: effect base points + dieside - 1
         // TO DO: Reasearch more about 0/0 and fix it.
-        // correct amount is already calculated adding one more -1 meant calculated amount - 1
-        caster->_EnterVehicle(target->GetVehicleKit(), m_amount, aurApp);
+        // // correct amount is already calculated adding one more -1 meant calculated amount - 1
+        caster->_EnterVehicle(target->GetVehicleKit(), m_amount - 1, aurApp);
     }
     else
     {
@@ -6019,6 +6019,21 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
                     // Personalized Weather
                     case 46736:
                         triggerSpellId = 46737;
+                        break;
+                    case 65418:                  //Well Fed - Candied Sweet Potatoes
+                        triggerSpellId = 65410;
+                        break;
+                    case 65419:                  //Well Fed - Spice Bread Stuffing
+                        triggerSpellId = 65416;
+                        break;
+                    case 65420:                  //Well Fed - Cranberry Chutney
+                        triggerSpellId = 65412;
+                        break;
+                    case 65421:                  //Well Fed - Pumpkin Pie
+                        triggerSpellId = 65415;
+                        break;
+                    case 65422:                  //Well Fed - Slow-Roasted Turkey
+                        triggerSpellId = 65414;
                         break;
                 }
                 break;

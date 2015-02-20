@@ -341,12 +341,16 @@ class ByteBuffer
         ByteBuffer &operator>>(float &value)
         {
             value = read<float>();
+            if (!std::isfinite(value))
+                throw ByteBufferException();
             return *this;
         }
 
         ByteBuffer &operator>>(double &value)
         {
             value = read<double>();
+            if (!std::isfinite(value))
+                throw ByteBufferException();
             return *this;
         }
 
@@ -506,9 +510,19 @@ class ByteBuffer
             return *this;
         }
 
-        uint8 * contents() { return &_storage[0]; }
+        uint8* contents()
+        {
+            if (_storage.empty())
+                throw ByteBufferException();
+            return _storage.data();
+        }
 
-        const uint8 *contents() const { return &_storage[0]; }
+        uint8 const* contents() const
+        {
+            if (_storage.empty())
+                throw ByteBufferException();
+            return _storage.data();
+        }
 
         size_t size() const { return _storage.size(); }
         bool empty() const { return _storage.empty(); }

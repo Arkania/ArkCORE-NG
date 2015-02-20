@@ -531,8 +531,8 @@ int WorldSocket::handle_input_payload (void)
 
     m_RecvPct.base (NULL, 0);
     m_RecvPct.reset();
-    delete m_RecvWPct;
     m_RecvWPct = NULL;
+    delete m_RecvWPct;
 
     m_Header.reset();
 
