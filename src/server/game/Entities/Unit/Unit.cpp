@@ -2932,11 +2932,15 @@ void Unit::SetCurrentCastSpell(Spell* pSpell)
 
     WorldPacket unitFrame(SMSG_UNIT_SPELLCAST_START,29);
 
-    unitFrame << pSpell->GetCaster()->GetGUID();
-    unitFrame << pSpell->m_targets.GetObjectTargetGUID();
+    unitFrame.append(pSpell->GetCaster()->GetPackGUID());
+    if (WorldObject* target = pSpell->m_targets.GetObjectTarget())
+        unitFrame.append(target->GetPackGUID());
+    else
+        unitFrame << uint8(0);
+
     unitFrame << pSpell->GetSpellInfo()->Id;
-    unitFrame << int32(0);                  //time casted
-    unitFrame << pSpell->GetCastTime();
+    unitFrame << pSpell->GetSpellInfo()->GetDuration();
+    unitFrame << pSpell->GetSpellInfo()->GetMaxDuration();
     unitFrame << uint8(0);
 
     SendMessageToSet(&unitFrame,false);
