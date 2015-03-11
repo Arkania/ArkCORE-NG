@@ -938,34 +938,21 @@ public:
 			m_player = NULL; m_thug1 = NULL; m_thug2 = NULL; m_thug3 = NULL;
 		}
 
-		void JustDied(Unit* killer)
-		{
-			if (!m_player)
-				return;
-
-			if (m_phase > 8)
-			{
-				m_player->KilledMonsterCredit(NPC_FURLBROW_MURDER_INFO_004);
-				m_player->PlayDistanceSound(SOUND_WOMAN_SCREAM);
-			}
-		}
+        void JustDied(Unit* killer) override
+        {
+            Player* player = killer->ToPlayer();
+            Creature* thug = killer->FindNearestCreature(NPC_THUG, 25.0f, true);
+            if (!thug && player)
+            {
+                player->KilledMonsterCredit(NPC_FURLBROW_MURDER_INFO_004);
+                player->PlayDistanceSound(SOUND_WOMAN_SCREAM);
+                player->RemoveAura(SPELL_DETECT_QUEST_INVIS_1);
+                player->AddAura(SPELL_DETECT_QUEST_INVIS_2, player);
+            }
+        }
 
 		void UpdateAI(uint32 diff) override
 		{
-			if (m_event <= diff)
-			{
-				m_event = 1000;
-				if (m_phase == 0 && !me->IsInCombat())
-					if (Player* player = me->FindNearestPlayer(10.0f))
-						if (player->GetQuestStatus(QUEST_LOUS_PARTING_THOUGHTS) == QUEST_STATUS_INCOMPLETE)
-							if (HaveHighestGuid())
-							{
-								m_phase = 1; m_timer = 1000; m_player = player;
-							}
-			}
-			else
-				m_event -= diff;
-
 			if (m_timer <= diff)
 			{
 				m_timer = 1000;
@@ -982,49 +969,61 @@ public:
 
 		void DoWork()
 		{
-			switch (m_phase)
-			{
-			case 1:
-				m_phase++; m_timer = 7000;
-				m_thug1->AI()->Talk(0);
-				break;
-			case 2:
-				m_phase++; m_timer = 5000;
-				m_thug2->AI()->Talk(1);
-				break;
-			case 3:
-				m_phase++; m_timer = 8000;
-				m_thug2->AI()->Talk(2);
-				break;
-			case 4:
-				m_phase++; m_timer = 8000;
-				m_thug3->AI()->Talk(3);
-				break;
-			case 5:
-				m_phase++; m_timer = 5000;
-				m_thug1->AI()->Talk(4);
-				break;
-			case 6:
-				m_phase++; m_timer = 3000;
-				m_thug1->AI()->Talk(5);
-				break;
-			case 7:
-				m_phase++; m_timer = 3000;
-				m_thug1->AI()->Talk(6);
-				break;
-			case 8:
-				m_phase++; m_timer = 0;
-				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-				m_thug1->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-				m_thug2->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-				m_thug3->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-				m_player->Attack(me, true);
-				me->Attack(m_player, true);
-				m_thug1->Attack(m_player, true);
-				m_thug2->Attack(m_player, true);
-				m_thug3->Attack(m_player, true);
-				break;
-			}
+            switch (m_phase)
+            {
+            case 0:
+                if (Player* player = me->FindNearestPlayer(12.0f))
+                    if (player->GetQuestStatus(QUEST_LOUS_PARTING_THOUGHTS) == QUEST_STATUS_INCOMPLETE)
+                        if (HaveHighestGuid())
+                        {
+                            m_phase = 1; m_timer = 1000; m_player = player;
+                        }
+                        else
+                        {
+                            m_phase = 20; m_timer = 0;
+                        }
+                break;
+            case 1:
+                m_phase = 2; m_timer = 7000;
+                m_thug1->AI()->Talk(0);
+                break;
+            case 2:
+                m_phase = 3; m_timer = 5000;
+                m_thug2->AI()->Talk(1);
+                break;
+            case 3:
+                m_phase = 4; m_timer = 8000;
+                m_thug2->AI()->Talk(2);
+                break;
+            case 4:
+                m_phase = 5; m_timer = 8000;
+                m_thug3->AI()->Talk(3);
+                break;
+            case 5:
+                m_phase = 6; m_timer = 5000;
+                m_thug1->AI()->Talk(4);
+                break;
+            case 6:
+                m_phase = 7; m_timer = 3000;
+                m_thug1->AI()->Talk(5);
+                break;
+            case 7:
+                m_phase = 8; m_timer = 3000;
+                m_thug1->AI()->Talk(6);
+                break;
+            case 8:
+                m_phase = 20; m_timer = 0;
+                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                m_thug1->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                m_thug2->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                m_thug3->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                m_player->Attack(me, false);
+                me->Attack(m_player, false);
+                m_thug1->Attack(m_player, false);
+                m_thug2->Attack(m_player, false);
+                m_thug3->Attack(m_player, false);
+                break;
+            }
 		}
 
 		bool HaveHighestGuid()
@@ -1074,7 +1073,6 @@ public:
 
 			return false;
 		}
-
 	};
 
 	CreatureAI* GetAI(Creature* creature) const
@@ -3568,7 +3566,7 @@ public:
 			}
 		}
 
-			void AttackStart(Unit* who) OVERRIDE
+		void AttackStart(Unit* who) OVERRIDE
 		{
 			if (!who)
 			return;
