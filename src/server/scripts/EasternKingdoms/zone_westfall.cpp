@@ -1196,6 +1196,119 @@ public:
 	}
 };
 
+// #############################################  quest = 26257  It's Alive!
+
+enum eQuest26257
+{
+    NPC_OVERLOADED_HARVEST_GOLEM_42381 = 42381,
+    NPC_OVERLOADED_HARVEST_GOLEM_42601 = 42601,
+    SPELL_UNBOUND_ENERGY = 79084,
+    SPELL_WAKE_HARVEST_GOLEM = 79436,
+    SPELL_REAPING_BLOWS = 79425,
+    SPELL_ROCKET_BOOST = 79430,
+    SPELL_ROCKET_BLAST = 79434,
+};
+
+class npc_overloaded_harvest_golem_42381 : public CreatureScript
+{
+public:
+    npc_overloaded_harvest_golem_42381() : CreatureScript("npc_overloaded_harvest_golem_42381") { }
+
+    struct npc_overloaded_harvest_golem_42381AI : public ScriptedAI
+    {
+        npc_overloaded_harvest_golem_42381AI(Creature* creature) : ScriptedAI(creature) { }
+
+        uint32  _timer;
+        uint32  _phase;
+
+        void Reset() override
+        {
+            _timer = urand(3000, 15000); _phase = 0;
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (_timer <= diff)
+            {
+                _timer = 1000;
+                DoWork();
+            }
+            else
+                _timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+
+        void DoWork()
+        {
+            _timer = urand(3000, 20000);
+            if (Creature* golem = me->FindRandomCreatureInRange(NPC_OVERLOADED_HARVEST_GOLEM_42381, 25.0f, true))
+                me->CastSpell(golem, SPELL_UNBOUND_ENERGY);
+            else
+                me->CastSpell(me, SPELL_UNBOUND_ENERGY);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_overloaded_harvest_golem_42381AI(creature);
+    }
+};
+
+class npc_overloaded_harvest_golem_42601 : public CreatureScript
+{
+public:
+    npc_overloaded_harvest_golem_42601() : CreatureScript("npc_overloaded_harvest_golem_42601") { }
+
+    struct npc_overloaded_harvest_golem_42601AI : public ScriptedAI
+    {
+        npc_overloaded_harvest_golem_42601AI(Creature* creature) : ScriptedAI(creature) { }
+
+        uint32  _timer;
+        uint32  _phase;
+
+        void Reset() override
+        {
+            _timer = 0; _phase = 0;
+            me->InitCharmInfo();
+            if (CharmInfo* cInfo = me->GetCharmInfo())
+            {
+                cInfo->SetActionBar(1, SPELL_REAPING_BLOWS, ACT_ENABLED);
+               
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (_timer <= diff)
+            {
+                _timer = 1000;
+                DoWork();
+            }
+            else
+                _timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+
+        void DoWork()
+        {
+
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_overloaded_harvest_golem_42601AI(creature);
+    }
+};
+
 // #############################################  quest = 26236, 26241, 26266   Saldean's
 
 enum eQuest26236
@@ -3619,6 +3732,8 @@ void AddSC_westfall()
 	new npc_shadowy_figure();
 	new npc_thug();
 	new npc_horatio_lane_42558();
+    new npc_overloaded_harvest_golem_42381();
+    new npc_overloaded_harvest_golem_42601();
 	new npc_salma_saldean();
 	new npc_sentinel_hill_guard();
 	new npc_riverpaw_sentinel_hill();
