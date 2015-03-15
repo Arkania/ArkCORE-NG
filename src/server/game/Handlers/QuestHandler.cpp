@@ -237,13 +237,13 @@ void WorldSession::HandleQuestgiverQueryQuestOpcode(WorldPacket& recvData)
         if (quest->IsAutoAccept() && _player->CanAddQuest(quest, true))
         {
             _player->AddQuestAndCheckCompletion(quest, object);
-            _player->PlayerTalkClass->SendCloseGossip();
+           // _player->PlayerTalkClass->SendCloseGossip();
         }
 
-        if (quest->HasFlag(QUEST_FLAGS_AUTOCOMPLETE))
+        if (quest->IsAutoComplete())
             _player->PlayerTalkClass->SendQuestGiverRequestItems(quest, object->GetGUID(), _player->CanCompleteQuest(quest->GetQuestId()), true);
         else
-            _player->PlayerTalkClass->SendQuestGiverQuestDetails(quest, object->GetGUID(), true);
+            _player->PlayerTalkClass->SendQuestGiverQuestDetails(quest, object->GetGUID(), quest->IsAutoAccept() ? false : true);
 
         switch (object->GetTypeId())
             {
@@ -299,7 +299,7 @@ void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPacket& recvData)
 
     Object* object = _player;
 
-    if (!quest->HasFlag(QUEST_FLAGS_AUTO_SUBMIT))
+    if (!quest->HasFlag(QUEST_FLAGS_AUTOCOMPLETE))
     {
         object = ObjectAccessor::GetObjectByTypeMask(*_player, guid, TYPEMASK_UNIT|TYPEMASK_GAMEOBJECT);
         if (!object || !object->hasInvolvedQuest(questId))
@@ -327,7 +327,7 @@ void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPacket& recvData)
             case TYPEID_UNIT:
             case TYPEID_PLAYER:
             {
-                //For AutoSubmition was added plr case there as it almost same exclute AI script cases.
+                //For AutoSubmition was added player case there, as it almost same exclute AI script cases.
                 Creature* creatureQGiver = object->ToCreature();
                 if (!creatureQGiver || !(sScriptMgr->OnQuestReward(_player, creatureQGiver, quest, reward)))
                 {
@@ -389,14 +389,15 @@ void WorldSession::HandleQuestgiverRequestRewardOpcode(WorldPacket& recvData)
 
     TC_LOG_DEBUG("network", "WORLD: Received CMSG_QUESTGIVER_REQUEST_REWARD npc = %u, quest = %u", uint32(GUID_LOPART(guid)), questId);
 
-    Object* object = ObjectAccessor::GetObjectByTypeMask(*_player, guid, TYPEMASK_UNIT | TYPEMASK_GAMEOBJECT);
-
-    if (!object || !object->hasInvolvedQuest(questId))
-        return;
-
-    // some kind of WPE protection
-    if (!_player->CanInteractWithQuestGiver(object))
-        return;
+    if (guid != _player->GetGUID())
+    {
+        Object* object = ObjectAccessor::GetObjectByTypeMask(*_player, guid, TYPEMASK_UNIT | TYPEMASK_GAMEOBJECT);
+        if (!object || !object->hasInvolvedQuest(questId))
+            return;
+        // some kind of WPE protection
+        if (!_player->CanInteractWithQuestGiver(object))
+            return;
+    }
 
     if (_player->CanCompleteQuest(questId))
         _player->CompleteQuest(questId);
@@ -514,15 +515,35 @@ void WorldSession::HandleQuestgiverCompleteQuest(WorldPacket& recvData)
     if (!quest)
         return;
 
-    Object* object = ObjectAccessor::GetObjectByTypeMask(*_player, playerGuid, TYPEMASK_UNIT | TYPEMASK_GAMEOBJECT);
-    if (!object || !object->hasInvolvedQuest(questId))
+    if (autoCompleteMode && !quest->HasFlag(QUEST_FLAGS_AUTOCOMPLETE))
         return;
 
+    Object* object = nullptr;
+    if (autoCompleteMode)
+        object = _player;
+    else
+        object = ObjectAccessor::GetObjectByTypeMask(*_player, playerGuid, TYPEMASK_UNIT | TYPEMASK_GAMEOBJECT);
+
+    if (!object)
+        return;
+
+   // Object* object = ObjectAccessor::GetObjectByTypeMask(*_player, playerGuid, TYPEMASK_UNIT | TYPEMASK_GAMEOBJECT);
+   // if (!object || !object->hasInvolvedQuest(questId))
+   //     return;
 
     if (autoCompleteMode == 0)
     {
+        if (!object->hasInvolvedQuest(questId))
+            return;
+
         // some kind of WPE protection
         if (!_player->CanInteractWithQuestGiver(object))
+            return;
+    }
+    else
+    {
+        // Do not allow completing quests on other players.
+        if (playerGuid != _player->GetGUID())
             return;
     }
 
@@ -553,9 +574,6 @@ void WorldSession::HandleQuestgiverCompleteQuest(WorldPacket& recvData)
 
     if (Creature* creature = object->ToCreature())
         sScriptMgr->OnQuestComplete(_player, creature, quest);
-
-    if (_player)
-        _player->SaveToDB(); // Save player.
 }
 
 void WorldSession::HandleQuestgiverQuestAutoLaunch(WorldPacket& /*recvPacket*/)

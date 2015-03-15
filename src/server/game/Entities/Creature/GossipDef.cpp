@@ -411,6 +411,10 @@ void PlayerMenu::SendQuestGiverQuestDetails(Quest const* quest, uint64 npcGUID, 
 
     if (sWorld->getBoolConfig(CONFIG_UI_QUESTLEVELS_IN_DIALOGS))
         AddQuestLevelToTitle(questTitle, quest->GetQuestLevel());
+    
+    uint8 ExtraQuestWindow = 0;
+    if (quest->HasFlag(QUEST_FLAGS_AUTO_ACCEPT) && !quest->HasSpecialFlag(QUEST_SPECIAL_FLAGS_AUTO_ACCEPT))
+        ExtraQuestWindow = 1;
 
     WorldPacket data(SMSG_QUESTGIVER_QUEST_DETAILS, 100);   // guess size
     data << uint64(npcGUID);
@@ -429,7 +433,7 @@ void PlayerMenu::SendQuestGiverQuestDetails(Quest const* quest, uint64 npcGUID, 
     data << uint32(quest->GetFlags());                      // 3.3.3 questFlags
     data << uint32(quest->GetSuggestedPlayers());
     data << uint8(0);                                       // IsFinished? value is sent back to server in quest accept packet
-    data << uint8(quest->HasFlag(QUEST_FLAGS_AUTO_ACCEPT) ? 1 : 0); // 4.x FIXME: Starts at AreaTrigger
+    data << uint8(ExtraQuestWindow);                        //  "0 = Normal, 1 = giv extra ! quest window on right site"
     data << uint32(quest->GetRequiredSpell());              // 4.x
 
     quest->BuildExtraQuestInfo(data, _session->GetPlayer());
@@ -514,7 +518,7 @@ void PlayerMenu::SendQuestQueryResponse(Quest const* quest) const
     data << uint32(quest->GetRewHonorAddition());
     data << float(quest->GetRewHonorMultiplier());
     data << uint32(quest->GetSrcItemId());                  // source item id
-    data << uint32(quest->GetFlags() & 0xFFFF);             // quest flags
+    data << uint32(quest->GetFlags());                      // quest flags
     data << uint32(quest->GetMinimapTargetMark());          // minimap target mark (skull, etc. missing enum)
     data << uint32(quest->GetCharTitleId());                // CharTitleId, new 2.4.0, player gets this title (id from CharTitles)
     data << uint32(quest->GetPlayersSlain());               // players slain

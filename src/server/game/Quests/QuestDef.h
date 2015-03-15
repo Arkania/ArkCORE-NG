@@ -155,9 +155,11 @@ enum QuestFlags
     QUEST_FLAGS_AUTO_ACCEPT             = 0x00080000,   // The client recognizes this flag as auto-accept. However, NONE of the current quests (3.3.5a) have this flag. Maybe blizz used to use it, or will use it in the future.
     QUEST_FLAGS_AUTO_SUBMIT             = 0x00100000,   // Quests with this flag player submit automatically by special button in player gui
     QUEST_FLAGS_AUTO_TAKE               = 0x00200000,   // Automatically suggestion of accepting quest. Not from npc. Player cast reward spell on complete
-    QUEST_FLAGS_UNK2                    = 0x00400000,
+    QUEST_FLAGS_UNK22                   = 0x00400000,
     QUEST_FLAGS_PORTRAIT                = 0x00800000,   // Found in quest 14069, Portrait in quest log
-    //QUEST_FLAGS_UNK4                    = 0x01000000,
+    QUEST_FLAGS_UNK24                   = 0x01000000,   // 
+    QUEST_FLAGS_UNK25                   = 0x02000000,   // 
+    QUEST_FLAGS_UNK26                   = 0x04000000,   //    
     // ... 4.x added flags up to 0x80000000 - all unknown for now
 };
 

@@ -15090,19 +15090,21 @@ bool Player::IsActiveQuest(uint32 quest_id) const
 Quest const* Player::GetNextQuest(uint64 guid, Quest const* quest)
 {
     QuestRelationBounds objectQR;
+    Creature* QuestGiver = ObjectAccessor::GetCreatureOrPetOrVehicle(*this, guid);
+   
     uint32 nextQuestID = quest->GetNextQuestInChain();
-
+    
     switch (GUID_HIPART(guid))
     {
         case HIGHGUID_PLAYER:
-            ASSERT(quest->HasFlag(QUEST_FLAGS_AUTO_SUBMIT));
+            ASSERT(quest->HasFlag(QUEST_FLAGS_AUTOCOMPLETE));
             return sObjectMgr->GetQuestTemplate(nextQuestID);
         case HIGHGUID_UNIT:
         case HIGHGUID_PET:
         case HIGHGUID_VEHICLE:
         {
             if (Creature* creature = ObjectAccessor::GetCreatureOrPetOrVehicle(*this, guid))
-                objectQR  = sObjectMgr->GetCreatureQuestRelationBounds(creature->GetEntry());
+                objectQR = sObjectMgr->GetCreatureQuestRelationBounds(creature->GetEntry());
             else
                 return NULL;
             break;
