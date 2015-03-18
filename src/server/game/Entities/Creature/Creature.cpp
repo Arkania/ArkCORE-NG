@@ -1040,6 +1040,7 @@ void Creature::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
 
 void Creature::SelectLevel()
 {
+
     CreatureTemplate const* cInfo = GetCreatureTemplate();
 
     uint32 rank = IsPet() ? 0 : cInfo->rank;
@@ -1076,6 +1077,7 @@ void Creature::SelectLevel()
             setPowerType(POWER_ENERGY);
             break;
         default:
+            setPowerType(POWER_MANA);
             SetMaxPower(POWER_MANA, mana); // MAX Mana
             SetPower(POWER_MANA, mana);
             break;
@@ -1086,22 +1088,26 @@ void Creature::SelectLevel()
 
     // damage
 
+    // here are conflict between new/old dmg system from trinity. 
+    // imported from ladel and d3thw0lf in big merge 2014/04
+    // i replace some changed lines back to old values
+
     float basedamage = stats->GenerateBaseDamage(cInfo);
 
     float weaponBaseMinDamage = basedamage;
     float weaponBaseMaxDamage = basedamage * 1.5;
 
-    SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, weaponBaseMinDamage);
-    SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, weaponBaseMaxDamage);
+    SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, cInfo->mindmg); // weaponBaseMinDamage
+    SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, cInfo->maxdmg); // weaponBaseMaxDamage
 
-    SetBaseWeaponDamage(OFF_ATTACK, MINDAMAGE, weaponBaseMinDamage);
-    SetBaseWeaponDamage(OFF_ATTACK, MAXDAMAGE, weaponBaseMaxDamage);
+    SetBaseWeaponDamage(OFF_ATTACK, MINDAMAGE, cInfo->mindmg); // weaponBaseMinDamage
+    SetBaseWeaponDamage(OFF_ATTACK, MAXDAMAGE, cInfo->maxdmg); // weaponBaseMaxDamage
 
-    SetBaseWeaponDamage(RANGED_ATTACK, MINDAMAGE, weaponBaseMinDamage);
-    SetBaseWeaponDamage(RANGED_ATTACK, MAXDAMAGE, weaponBaseMaxDamage);
+    SetBaseWeaponDamage(RANGED_ATTACK, MINDAMAGE, cInfo->minrangedmg); // weaponBaseMinDamage
+    SetBaseWeaponDamage(RANGED_ATTACK, MAXDAMAGE, cInfo->maxrangedmg); // weaponBaseMaxDamage
 
-    SetModifierValue(UNIT_MOD_ATTACK_POWER, BASE_VALUE, stats->AttackPower);
-    SetModifierValue(UNIT_MOD_ATTACK_POWER_RANGED, BASE_VALUE, stats->RangedAttackPower);
+    SetModifierValue(UNIT_MOD_ATTACK_POWER, BASE_VALUE, cInfo->attackpower); // stats->AttackPower
+    SetModifierValue(UNIT_MOD_ATTACK_POWER_RANGED, BASE_VALUE, cInfo->rangedattackpower); // stats->RangedAttackPower
 }
 
 float Creature::_GetHealthMod(int32 Rank)
