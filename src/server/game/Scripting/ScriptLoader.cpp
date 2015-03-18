@@ -784,7 +784,7 @@ void AddSC_boss_ozruk();
 void AddSC_boss_azil();
 void AddSC_stonecore();
 void AddSC_instance_stonecore();
-void AddSC_kezan();
+void AddSC_zone_kezan();
 void AddSC_zone_the_maelstrom();
 void AddSC_zone_lost_isles();
 void AddSC_zone_tolbarad_peninsula();
@@ -1630,7 +1630,7 @@ void AddMaelstromScripts()
     AddSC_boss_azil();
     AddSC_stonecore();
     AddSC_instance_stonecore();
-    AddSC_kezan();
+    AddSC_zone_kezan();
     AddSC_zone_tolbarad_peninsula();
     AddSC_zone_tolbarad();
     AddSC_zone_the_maelstrom();
