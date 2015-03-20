@@ -1949,22 +1949,44 @@ void Spell::EffectJump(SpellEffIndex effIndex)
     if (!unitTarget)
         return;
 
-    float x, y, z;
+    float x, y, z, speedXY, speedZ;
     unitTarget->GetContactPoint(m_caster, x, y, z, CONTACT_DISTANCE);
 
-    float speedXY, speedZ;
-    // Jump on 16yards, this only on demon leap
-    if (m_spellInfo->Effects[effIndex].TargetA.GetTarget() == TARGET_UNIT_CASTER)
+    switch (m_spellInfo->Id)
     {
-        x = m_caster->GetPositionX() + std::cos(m_caster->GetOrientation()) * 8;
-        y = m_caster->GetPositionY() + std::sin(m_caster->GetOrientation()) * 8;
+        // Demon leap
+        case 54785:
+        {
+            if (m_spellInfo->Effects[effIndex].TargetA.GetTarget() == TARGET_UNIT_CASTER)
+            {
+                x = m_caster->GetPositionX() + std::cos(m_caster->GetOrientation()) * 8;
+                y = m_caster->GetPositionY() + std::sin(m_caster->GetOrientation()) * 8;
+            }
+            break;
+        }
+        case 75002:
+        {
+            m_caster->Attack(unitTarget, true);
+            break;
+        }
+        default:
+            break;
     }
+
     CalculateJumpSpeeds(effIndex, m_caster->GetExactDist2d(x, y), speedXY, speedZ);
     m_caster->GetMotionMaster()->MoveJump(x, y, z, speedXY, speedZ);
 
-    // Demon leap
-    if (m_spellInfo->Id == 54785)
-        m_caster->CastSpell(x, y, z, 54786, true);
+    switch (m_spellInfo->Id)
+    {
+        // Demon leap
+        case 54785:
+        {
+            m_caster->CastSpell(x, y, z, 54786, true);
+            break;
+        }
+        default:
+            break;
+    }
 }
 
 void Spell::EffectJumpDest(SpellEffIndex effIndex)
@@ -3434,19 +3456,6 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
                 faction = m_originalCaster->getFaction();
 
             summon->setFaction(faction);
-
-            switch (properties->Id)
-            {
-            case 161:
-            {
-                summon->m_ControlledByPlayer = true;
-                break;
-            }
-            default:
-                break;
-            }
-
-            break;
     }
 
     if (summon)
@@ -4195,6 +4204,28 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
 
     switch (m_spellInfo->SpellFamilyName)
     {
+        case SPELLFAMILY_GENERIC:
+        {
+            switch (m_spellInfo->Id)
+            {
+                case 71232:
+                {
+                    spell_bonus = irand(-100, 100);
+
+
+                }
+                case 75002:
+                {
+                    m_caster->Attack(unitTarget, true);
+                    spell_bonus = unitTarget->GetHealth() + 1;
+                    break;
+                }
+            default:
+                break;
+            }
+
+            break;
+        }
         case SPELLFAMILY_PALADIN:
         {
             // Templar's Verdict
@@ -4214,6 +4245,8 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                 m_caster->CastSpell(m_caster, 85705, true);
                 break;
             }
+
+            break;
         }
         case SPELLFAMILY_WARRIOR:
         {
@@ -5381,9 +5414,10 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                     DoCreateItem(effIndex, itemId[urand(0, 4)]);
                     return;
                 }
+                // Wake Harvest Golem
                 case 79436:
                 {
-                    if (Player* player = unitTarget->ToPlayer())
+                    if (Player* player = m_caster->ToPlayer())
                         player->KilledMonsterCredit(42601);
                     break;
                 }

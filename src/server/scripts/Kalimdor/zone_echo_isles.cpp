@@ -83,6 +83,7 @@ enum eQuestChainStart
     SPELL_LEAPING_RUSH = 75002,
     SPELL_WILD_POUNCE = 71232,
     SPELL_PERMANENT_FEIGN_DEATH = 29266,
+    SPELL_FEIGN_DEATH = 71598,
     SPELL_SWIPE = 31279,
 };
 
@@ -104,7 +105,7 @@ public:
             m_phase = 0;
         }
 
-        void DamageTaken(Unit* attacker, uint32& damage) 
+        void DamageTaken(Unit* attacker, uint32& damage) override
         { 
             printf("Wildschwein: DamageTaken: %u \n", damage);
         }
@@ -114,19 +115,17 @@ public:
             if (spell->Id == SPELL_LEAPING_RUSH)
             {
                 caster->GetMotionMaster()->MoveIdle();
-               // me->AddAura(SPELL_PERMANENT_FEIGN_DEATH, me);
-               // me->DespawnOrUnsummon(5000);
                 m_phase = 2; m_timer = 5000;
             }
             else if (spell->Id == SPELL_WILD_POUNCE)
             {
                 caster->GetMotionMaster()->MoveIdle();
-                me->AddAura(SPELL_PERMANENT_FEIGN_DEATH, me);
+                me->AddAura(SPELL_FEIGN_DEATH, me);
                 m_phase = 1; m_timer = 5000;
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (m_timer <= diff)
             {
@@ -135,11 +134,6 @@ public:
             }
             else
                 m_timer -= diff;
-
-            if (!UpdateVictim())
-                return;
-            else 
-                DoMeleeAttackIfReady();
         }
 
         void DoWork()
@@ -150,11 +144,11 @@ public:
                     break;
                 case 1:
                 {
-                    me->RemoveAura(SPELL_PERMANENT_FEIGN_DEATH);
+                    me->RemoveAura(SPELL_FEIGN_DEATH);
                 }
                 case 2:
                 {
-                    me->GetMotionMaster()->MoveRandom(15.0f);
+                    UpdateVictim();
                     m_phase = 0; m_timer = 0;
                     break;
                 }
@@ -182,13 +176,14 @@ public:
         uint32 m_timer;
         uint32 m_phase;
 
-        void Reset()
+        void Reset() override
         {
             m_timer = urand(10000, 60000);
             m_phase = 0;
+            printf("Wildkatze Reset() \n");
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (m_timer <= diff)
             {
@@ -197,11 +192,6 @@ public:
             }
             else
                 m_timer -= diff;
-
-            if (!UpdateVictim())
-                return;
-            else 
-                DoMeleeAttackIfReady();
         }
 
         void DoWork()
@@ -232,18 +222,18 @@ public:
             }
             case 1:
             {
-                me->GetMotionMaster()->MoveRandom(15.0f);
+                UpdateVictim();
+                // me->GetMotionMaster()->MoveRandom(15.0f);
                 m_phase = 0; m_timer = 0;
                 break;
             }
             default:
                 break;
             }
-           
         }
     };
 
-       CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_wildmane_catAI (creature);
     }
