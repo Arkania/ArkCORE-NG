@@ -136,7 +136,7 @@ class npc_announcer_toc10 : public CreatureScript
 
             char const* _message = "We are ready!";
 
-            if (player->IsInCombat() || instance->IsEncounterInProgress() || instance->GetData(TYPE_EVENT))
+            if (player->IsInCombat() || instance->IsEncounterInProgress())
                 return true;
 
             uint8 i = 0;
@@ -202,20 +202,11 @@ class npc_announcer_toc10 : public CreatureScript
             }
             else if (instance->GetBossState(BOSS_LICH_KING) != DONE)
             {
-                if (GameObject* floor = GameObject::GetGameObject(*player, instance->GetData64(GO_ARGENT_COLISEUM_FLOOR)))
-                    floor->SetDestructibleState(GO_DESTRUCTIBLE_DAMAGED);
-
-                creature->CastSpell(creature, SPELL_CORPSE_TELEPORT, false);
-                creature->CastSpell(creature, SPELL_DESTROY_FLOOR_KNOCKUP, false);
-
-                Creature* anubArak = Unit::GetCreature(*creature, instance->GetData64(NPC_ANUBARAK));
-                if (!anubArak || !anubArak->IsAlive())
-                    anubArak = creature->SummonCreature(NPC_ANUBARAK, AnubarakLoc[0].GetPositionX(), AnubarakLoc[0].GetPositionY(), AnubarakLoc[0].GetPositionZ(), 3, TEMPSUMMON_CORPSE_TIMED_DESPAWN, DESPAWN_TIME);
-
-                instance->SetBossState(BOSS_ANUBARAK, NOT_STARTED);
-
-                if (creature->IsVisible())
-                    creature->SetVisible(false);
+				if (creature->GetMap()->GetPlayers().getFirst()->GetSource()->GetTeam() == ALLIANCE)
+					instance->SetData(TYPE_EVENT, 4020);
+				else
+					instance->SetData(TYPE_EVENT, 4030);
+				instance->SetBossState(BOSS_LICH_KING, NOT_STARTED);
             }
             creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
             return true;

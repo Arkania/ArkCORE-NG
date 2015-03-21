@@ -2316,6 +2316,82 @@ class spell_q14100_q14111_make_player_destroy_totems : public SpellScriptLoader
         }
 };
 
+enum Fumping
+{
+	SPELL_SUMMON_SAND_GNOME = 39240,
+	SPELL_SUMMON_BONE_SLICER = 39241
+};
+
+// 39238 - Fumping
+class spell_q10929_fumping : SpellScriptLoader
+{
+public:
+	spell_q10929_fumping() : SpellScriptLoader("spell_q10929_fumping") { }
+
+	class spell_q10929_fumpingAuraScript : public AuraScript
+	{
+		PrepareAuraScript(spell_q10929_fumpingAuraScript);
+
+		bool Validate(SpellInfo const* /*spell*/) override
+		{
+			if (!sSpellMgr->GetSpellInfo(SPELL_SUMMON_SAND_GNOME))
+				return false;
+			if (!sSpellMgr->GetSpellInfo(SPELL_SUMMON_BONE_SLICER))
+				return false;
+			return true;
+		}
+
+		void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+		{
+			if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE)
+				return;
+
+			if (Unit* caster = GetCaster())
+				caster->CastSpell(caster, urand(SPELL_SUMMON_SAND_GNOME, SPELL_SUMMON_BONE_SLICER), true);
+		}
+
+		void Register() override
+		{
+			OnEffectRemove += AuraEffectRemoveFn(spell_q10929_fumpingAuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+		}
+	};
+
+	AuraScript* GetAuraScript() const override
+	{
+		return new spell_q10929_fumpingAuraScript();
+	}
+};
+
+class spell_q12414_hand_over_reins : public SpellScriptLoader
+{
+public:
+	spell_q12414_hand_over_reins() : SpellScriptLoader("spell_q12414_hand_over_reins") { }
+
+	class spell_q12414_hand_over_reins_SpellScript : public SpellScript
+	{
+		PrepareSpellScript(spell_q12414_hand_over_reins_SpellScript);
+
+		void HandleScript(SpellEffIndex /*effIndex*/)
+		{
+			Creature* caster = GetCaster()->ToCreature();
+			GetHitUnit()->ExitVehicle();
+
+			if (caster)
+				caster->DespawnOrUnsummon();
+		}
+
+		void Register() override
+		{
+			OnEffectHitTarget += SpellEffectFn(spell_q12414_hand_over_reins_SpellScript::HandleScript, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
+		}
+	};
+
+	SpellScript* GetSpellScript() const override
+	{
+		return new spell_q12414_hand_over_reins_SpellScript();
+	}
+};
+
 void AddSC_quest_spell_scripts()
 {
     new spell_q55_sacred_cleansing();
@@ -2372,4 +2448,6 @@ void AddSC_quest_spell_scripts()
     new spell_q12919_gymers_throw();
     new spell_q13400_illidan_kill_master();
     new spell_q14100_q14111_make_player_destroy_totems();
+	new spell_q10929_fumping();
+	new spell_q12414_hand_over_reins();
 }
