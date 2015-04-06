@@ -44,7 +44,7 @@ delete from creature_addon where guid in (34523,9249,80705,26527);
 update quest_template set RequiredSourceItemCount4=0 where Id=2459;
 update quest_template set RequiredSourceItemCount2=0 where Id=13897;
 update quest_template set RequiredSourceItemCount2=0 where Id=13946;
-update quest_template set RequiredSkillId=-1024 where Id=3120;
+update quest_template set RequiredSkillId=0 where Id=3120;
 update quest_template set RequiredItemId2=0, RequiredSourceItemCount1=0 where Id=10813;
 update quest_template set RequiredItemId1=31463, RequiredItemCount1=1 where Id=10813;
 update quest_template set RequiredSourceItemCount2=0 where Id=13892;
