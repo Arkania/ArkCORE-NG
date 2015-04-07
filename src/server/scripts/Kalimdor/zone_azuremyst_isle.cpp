@@ -763,23 +763,23 @@ class npc_nestlewood_owlkin : public CreatureScript
         {
             npc_nestlewood_owlkinAI(Creature* creature) : ScriptedAI(creature) { }
 
-			void SpellHit(Unit * Hitter, SpellInfo const* spell) 
-			{		
-				Player* player = Hitter->ToPlayer();
+            void SpellHit(Unit * Hitter, SpellInfo const* spell)
+            {
+                Player* player = Hitter->ToPlayer();
 
-				if (!player)
-					return;				
+                if (!player)
+                    return;
 
-				if (spell->Id == SPELL_INOCULATE_NESTLEWOOD_OWLKIN )
-				{
-					if (player->GetQuestStatus(QUEST_INOCULATION) == QUEST_STATUS_INCOMPLETE) 
-					{						
-						player->KilledMonsterCredit(NPC_NESTLEWOOD_OWLKIN, NULL);
-						me->DespawnOrUnsummon(0);
-					}									
-				}
-			}                               
-        };
+                if (spell->Id == SPELL_INOCULATE_NESTLEWOOD_OWLKIN)
+                {
+                    if (player->GetQuestStatus(QUEST_INOCULATION) == QUEST_STATUS_INCOMPLETE)
+                    {
+                        player->KilledMonsterCredit(NPC_NESTLEWOOD_OWLKIN);
+                        me->DespawnOrUnsummon(0);
+                    }
+                }
+            }
+        }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -797,4 +797,5 @@ void AddSC_azuremyst_isle()
     new go_ravager_cage();
     new npc_stillpine_captive();
     new go_bristlelimb_cage();
+    new npc_nestlewood_owlkin();
 }

@@ -74,7 +74,7 @@ public:
     }
 };
 
-// ######################################################### Quest Chain: A Rough Start
+// #########################################################  Quest Class Chain: A Rough Start
 
 enum eQuestChainStart
 {
@@ -143,6 +143,11 @@ public:
             }
             else
                 m_timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
         }
 
         void DoWork()
@@ -210,6 +215,11 @@ public:
             }
             else
                 m_timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
         }
 
         void DoWork()
@@ -256,7 +266,7 @@ public:
     }
 };
 
-// #########################################################
+// #########################################################  Quest Class Chain: The Basics: Hitting Things
 
 enum TrollSpells
 {
@@ -301,7 +311,7 @@ public:
     };
 };
 
-// #########################################################
+// #########################################################   Quest Class Chain: Proving Pit
 
 
 enum TrollCreatures
@@ -385,6 +395,7 @@ public:
                     if (Player* player = me->FindNearestPlayer(25.0f))
                     {
                         Talk(0, player);
+                        me->setFaction(2224);
                         me->Attack(player , true);
                         player->Attack(me, true);
                         events.ScheduleEvent(EVENT_WAIT_ON_FIGHT, 8000);
@@ -563,7 +574,43 @@ public:
     }
 };
 
-// #########################################################
+// #########################################################  Quest Class Chain: The Arts of a <class>
+
+class npc_wounded_darkspear_watcher : public CreatureScript
+{
+public:
+    npc_wounded_darkspear_watcher() : CreatureScript("npc_wounded_darkspear_watcher"){ }
+
+    enum eQuest
+    {
+        NPC_WOUNDET_DARKSPEAR_WATCHER = 47057,
+        QUEST_THE_ART_OF_A_PRIEST = 24784,
+        SPELL_FLASH_HEAL = 2061,
+    };
+
+    struct npc_wounded_darkspear_watcherAI : public ScriptedAI
+    {
+        npc_wounded_darkspear_watcherAI(Creature* creature) : ScriptedAI(creature) { }
+
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
+        { 
+            if (Player* player = caster->ToPlayer())
+                if (player->GetQuestStatus(QUEST_THE_ART_OF_A_PRIEST) == QUEST_STATUS_INCOMPLETE)
+                    if (spell->Id == SPELL_FLASH_HEAL)
+                    {
+                        player->KilledMonsterCredit(NPC_WOUNDET_DARKSPEAR_WATCHER);
+                        me->DespawnOrUnsummon();
+                    }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_wounded_darkspear_watcherAI(creature);
+    }
+};
+
+// #########################################################  Quest Class Chain:
 
 
 void AddSC_zone_echo_isles()
@@ -574,4 +621,5 @@ void AddSC_zone_echo_isles()
     new npc_wildmane_cat();
     new npc_darkspear_jailor();
     new npc_captive_spitescale_scout();
+    new npc_wounded_darkspear_watcher();
 };

@@ -884,100 +884,100 @@ public:
 
     struct npc_astranaar_burning_fire_bunnyAI : public ScriptedAI
     {
-        npc_astranaar_burning_fire_bunnyAI(Creature* creature) : ScriptedAI(creature) {}		
+        npc_astranaar_burning_fire_bunnyAI(Creature* creature) : ScriptedAI(creature) {}
 
-		uint32	_timer_check_for_player;
-		uint32  _timer;
-		uint32	_phase;
-		Player*	_player;
+        uint32	_timer_check_for_player;
+        uint32  _timer;
+        uint32	_phase;
+        Player*	_player;
 
-		void Reset() 
-		{
-			_timer_check_for_player=2000; _phase=0; _timer=0;
-			me->AddAura(SPELL_BATHRANS_CORPSE_FIRE,me);
-		}
-
-		void SpellHit(Unit* Hitter, SpellInfo const* spell)   
-		{ 
-			_phase=1; _player= Hitter->ToPlayer();
-		}
-
-		void UpdateAI(uint32 diff) 
-        {	
-			if (_timer_check_for_player<=diff)				
-			{
-				DoCheckForNearPlayerWithQuest();
-				_timer_check_for_player=10000;												
-			}
-			else
-				_timer_check_for_player-=diff;	
-			
-			if (_timer<=diff)				
-					DoWork();
-				else
-					_timer-=diff;	
-
-            if (!UpdateVictim())			
-				return;						
-			else 
-				DoMeleeAttackIfReady();			
+        void Reset()
+        {
+            _timer_check_for_player = 2000; _phase = 0; _timer = 0;
+            me->AddAura(SPELL_BATHRANS_CORPSE_FIRE, me);
         }
 
-		void DoCheckForNearPlayerWithQuest()
-		{			
-			std::list<Player*> PlayerList; 
-			Trinity::AnyPlayerInObjectRangeCheck checker(me, 50.0f);
-			Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(me, PlayerList, checker);
-			me->VisitNearbyWorldObject(50.0, searcher);
-			if (PlayerList.empty()) return;					
-			for (std::list<Player*>::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
-            {
-				if (Player* player = *itr)
-                {	
-					switch (player->GetQuestStatus(QUEST_ASTRANAARS_BURNING))
-					{
-					case QUEST_STATUS_INCOMPLETE:
-						{							
-							if (!player->HasAura (SPELL_ASTRANAARS_BURNING_SEE_INVISIBLE_01))
-							{
-								player->AddAura(SPELL_ASTRANAARS_BURNING_SEE_INVISIBLE_01, player);
-							}
-							break;
-						}
-					case QUEST_STATUS_COMPLETE:
-						{
-						if (player->HasAura (SPELL_ASTRANAARS_BURNING_SEE_INVISIBLE_01))
-							{
-								player->RemoveAura(SPELL_ASTRANAARS_BURNING_SEE_INVISIBLE_01);
-								player->RemoveAuraFromStack(SPELL_ASTRANAARS_BURNING_SEE_INVISIBLE_01, player->GetGUID());
-							}
-							break;
-						}
-					}
-				}
-			}
-		}	
+        void SpellHit(Unit* Hitter, SpellInfo const* spell)
+        {
+            _phase = 1; _player = Hitter->ToPlayer();
+        }
 
-		void DoWork()
-		{
-			switch (_phase)
-			{
-			case 1:
-				{
-					me->RemoveAura(SPELL_BATHRANS_CORPSE_FIRE);
-					me->AddAura(SPELL_ASTRANAARS_BURNING_SMOKE, me);
-					if (_player) _player->KilledMonsterCredit(NPC_ASTRANAARS_BURNING_FIRE_BUNNY, NULL);	
-					_timer=60000; _phase=2;
-					break;
-				}
-			case 2:
-				{
-					me->DespawnOrUnsummon();
-					_timer=0; _phase=0;
-					break;
-				}
-			}
-		}
+        void UpdateAI(uint32 diff)
+        {
+            if (_timer_check_for_player <= diff)
+            {
+                DoCheckForNearPlayerWithQuest();
+                _timer_check_for_player = 10000;
+            }
+            else
+                _timer_check_for_player -= diff;
+
+            if (_timer <= diff)
+                DoWork();
+            else
+                _timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+
+        void DoCheckForNearPlayerWithQuest()
+        {
+            std::list<Player*> PlayerList;
+            Trinity::AnyPlayerInObjectRangeCheck checker(me, 50.0f);
+            Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(me, PlayerList, checker);
+            me->VisitNearbyWorldObject(50.0, searcher);
+            if (PlayerList.empty()) return;
+            for (std::list<Player*>::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
+            {
+                if (Player* player = *itr)
+                {
+                    switch (player->GetQuestStatus(QUEST_ASTRANAARS_BURNING))
+                    {
+                    case QUEST_STATUS_INCOMPLETE:
+                    {
+                        if (!player->HasAura(SPELL_ASTRANAARS_BURNING_SEE_INVISIBLE_01))
+                        {
+                            player->AddAura(SPELL_ASTRANAARS_BURNING_SEE_INVISIBLE_01, player);
+                        }
+                        break;
+                    }
+                    case QUEST_STATUS_COMPLETE:
+                    {
+                        if (player->HasAura(SPELL_ASTRANAARS_BURNING_SEE_INVISIBLE_01))
+                        {
+                            player->RemoveAura(SPELL_ASTRANAARS_BURNING_SEE_INVISIBLE_01);
+                            player->RemoveAuraFromStack(SPELL_ASTRANAARS_BURNING_SEE_INVISIBLE_01, player->GetGUID());
+                        }
+                        break;
+                    }
+                    }
+                }
+            }
+        }
+
+        void DoWork()
+        {
+            switch (_phase)
+            {
+            case 1:
+            {
+                me->RemoveAura(SPELL_BATHRANS_CORPSE_FIRE);
+                me->AddAura(SPELL_ASTRANAARS_BURNING_SMOKE, me);
+                if (_player) _player->KilledMonsterCredit(NPC_ASTRANAARS_BURNING_FIRE_BUNNY, NULL);
+                _timer = 60000; _phase = 2;
+                break;
+            }
+            case 2:
+            {
+                me->DespawnOrUnsummon();
+                _timer = 0; _phase = 0;
+                break;
+            }
+            }
+        }
     };
 
 	CreatureAI* GetAI(Creature* creature) const  
