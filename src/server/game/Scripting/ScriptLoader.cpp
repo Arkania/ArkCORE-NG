@@ -791,7 +791,7 @@ void AddSC_zone_tolbarad_peninsula();
 void AddSC_zone_tolbarad();
 void AddSC_zone_deepholm();
 void AddSC_zone_darkmoon_island();
-void AddSC_zone_echo_isles();
+// void AddSC_zone_echo_isles();
 
 // Events
 void AddSC_event_childrens_week();
@@ -1637,7 +1637,7 @@ void AddMaelstromScripts()
     AddSC_zone_lost_isles();
     AddSC_zone_deepholm();
     AddSC_zone_darkmoon_island();
-    AddSC_zone_echo_isles();
+//    AddSC_zone_echo_isles();
 #endif
 }
 
