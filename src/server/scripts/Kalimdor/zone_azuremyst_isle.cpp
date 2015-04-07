@@ -774,7 +774,7 @@ class npc_nestlewood_owlkin : public CreatureScript
 				{
 					if (player->GetQuestStatus(QUEST_INOCULATION) == QUEST_STATUS_INCOMPLETE) 
 					{						
-						player->KilledMonsterCredit(NPC_NESTLEWOOD_OWLKIN, NULL);
+            player->KilledMonsterCredit(NPC_NESTLEWOOD_OWLKIN);
 						me->DespawnOrUnsummon(0);
 					}									
 				}

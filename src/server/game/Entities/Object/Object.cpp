@@ -1965,13 +1965,13 @@ bool WorldObject::CanDetectInvisibilityOf(WorldObject const* obj) const
         return true;
 
     uint32 ownFlags = m_invisibilityDetect.GetFlags();
-    uint64 mask = objFlags & ownFlags;
+    uint32 mask = objFlags & ownFlags;
 
     if (GetTypeId() == TYPEID_PLAYER)
     {
         for (uint32 i = 0; i < TOTAL_INVISIBILITY_TYPES; ++i)
         {
-            if (!(mask & (1ui64 << i)))
+            if (!(mask & (1 << i)))
                 continue;
 
             int32 objInvisibleValue = obj->m_invisibility.GetValue(InvisibilityType(i));
@@ -1991,7 +1991,7 @@ bool WorldObject::CanDetectInvisibilityOf(WorldObject const* obj) const
 
     for (uint32 i = 0; i < TOTAL_INVISIBILITY_TYPES; ++i)
     {
-        if (!(mask & (1ui64 << i)))
+        if (!(mask & (1 << i)))
             continue;
 
         int32 objInvisibleValue = obj->m_invisibility.GetValue(InvisibilityType(i));

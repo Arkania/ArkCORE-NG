@@ -500,19 +500,19 @@ class spell_potion_of_wildfire : public SpellScriptLoader
             {
 				Player* player = GetCaster()->ToPlayer();
 				if (!player) return;
-				
-				if (player->GetQuestStatus(QUEST_OF_THEIR_OWN_DESIGN) == QUEST_STATUS_INCOMPLETE)				
-				{							
-					if (Creature* creature = player->FindNearestCreature(NPC_BATHRANS_CORPSE, 10.0f, true))					
-					{						
-						player->KilledMonsterCredit(NPC_BATHRANS_CORPSE, NULL);	
-					}
-				}				
+
+        if (player->GetQuestStatus(QUEST_OF_THEIR_OWN_DESIGN) == QUEST_STATUS_INCOMPLETE)
+         {
+          if (Creature* creature = player->FindNearestCreature(NPC_BATHRANS_CORPSE, 10.0f, true))
+          {
+           player->KilledMonsterCredit(NPC_BATHRANS_CORPSE);
+          }
+        }
             }
 
-			void Register() 
+        void Register()
             {                
-				OnHit += SpellHitFn(spell_potion_of_wildfire_SpellScript::HandleOnHit);				
+             OnHit += SpellHitFn(spell_potion_of_wildfire_SpellScript::HandleOnHit);
             }
 
 
@@ -966,7 +966,7 @@ public:
 				{
 					me->RemoveAura(SPELL_BATHRANS_CORPSE_FIRE);
 					me->AddAura(SPELL_ASTRANAARS_BURNING_SMOKE, me);
-					if (_player) _player->KilledMonsterCredit(NPC_ASTRANAARS_BURNING_FIRE_BUNNY, NULL);	
+          if (_player) _player->KilledMonsterCredit(NPC_ASTRANAARS_BURNING_FIRE_BUNNY);
 					_timer=60000; _phase=2;
 					break;
 				}
