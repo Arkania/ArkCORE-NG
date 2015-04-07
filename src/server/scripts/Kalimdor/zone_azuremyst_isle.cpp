@@ -779,7 +779,7 @@ class npc_nestlewood_owlkin : public CreatureScript
                     }
                 }
             }
-        }
+        };
 
         CreatureAI* GetAI(Creature* creature) const
         {
