@@ -228,19 +228,19 @@ public:
             {
             case 0:
             {
-                if (Creature* _boar = me->FindNearestCreature(NPC_DOCILE_ISLAND_BOAR, 45.0f))
+                if (Creature* boar = me->FindNearestCreature(NPC_DOCILE_ISLAND_BOAR, 45.0f))
                 {
-                    if (!_boar->HasAura(SPELL_PERMANENT_FEIGN_DEATH))
+                    if (!boar->HasAura(SPELL_PERMANENT_FEIGN_DEATH))
                     {
                         uint8 rn = urand(0, 100);
-                        if (me->IsWithinDist2d(&_boar->GetPosition(), 40.0f) && !me->IsWithinDist2d(&_boar->GetPosition(), 8.0f) && (rn < 50))
+                        if (me->IsWithinDist2d(&boar->GetPosition(), 40.0f) && !me->IsWithinDist2d(&boar->GetPosition(), 8.0f) && (rn < 50))
                         {
-                            me->CastSpell(_boar, SPELL_WILD_POUNCE, true); // Pinning a boar to the ground.
+                            me->CastSpell(boar, SPELL_WILD_POUNCE, true); // Pinning a boar to the ground.
                             m_phase = 1; m_timer = 5000;
                         }
-                        else if (!me->IsWithinDist2d(&_boar->GetPosition(), 5.0f) && (rn >= 50))
+                        else if (!me->IsWithinDist2d(&boar->GetPosition(), 5.0f) && (rn >= 50))
                         {
-                            me->CastSpell(_boar, SPELL_LEAPING_RUSH, true); // inflicting 100% weapon damage.
+                            me->CastSpell(boar, SPELL_LEAPING_RUSH, true); // inflicting 100% weapon damage.
                             m_phase = 1; m_timer = 5000;
                         }
                     }
