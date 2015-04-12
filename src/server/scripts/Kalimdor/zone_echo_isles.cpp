@@ -20,7 +20,9 @@
 #include "ScriptedGossip.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedFollowerAI.h"
+#include "Vehicle.h"
 #include "Player.h"
+#include "GameObjectAI.h"
 
 // #########################################################  fight novice vs tiki_target
 
@@ -610,7 +612,189 @@ public:
     }
 };
 
-// #########################################################  Quest Class Chain:
+// #########################################################  Quest 24623 Save the Young:
+
+class npc_lost_bloodtalon_hatchling : public CreatureScript
+{
+public:
+    npc_lost_bloodtalon_hatchling() : CreatureScript("npc_lost_bloodtalon_hatchling") { }
+
+    enum eHatchling
+    {
+        NPC_BLOODTALON_HATCHLING = 39157,
+        QUEST_SAVING_THE_YOUNG = 24623,
+        SPELL_BLOODTALON_WHISTLE = 70874,
+    };
+
+    struct npc_lost_bloodtalon_hatchlingAI : public ScriptedAI
+    {
+        npc_lost_bloodtalon_hatchlingAI(Creature* creature) : ScriptedAI(creature) { }
+
+        uint32 m_timer;
+        uint32 m_phase;
+        Player* m_player;
+
+        void Reset() override
+        {
+            m_timer = 0;
+            m_phase = 0;
+            m_player = NULL;
+        }
+
+        void SpellHit(Unit* caster, SpellInfo const* spell) 
+        { 
+            if (spell->Id == SPELL_BLOODTALON_WHISTLE && m_phase == 0)
+                if (m_player = caster->ToPlayer())
+                    if (m_player->GetQuestStatus(QUEST_SAVING_THE_YOUNG) == QUEST_STATUS_INCOMPLETE)
+                        if (me->GetDistance2d(m_player) < 15.0f)
+                        {
+                            me->GetMotionMaster()->MoveFollow(m_player, 2.0f, frand(0.0f, 6.28f));
+                            m_player->KilledMonsterCredit(NPC_BLOODTALON_HATCHLING);
+                            m_timer = 1000;
+                            m_phase = 1;
+                        }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (m_timer <= diff)
+            {
+                m_timer = 1000;
+                DoWork();
+            }
+            else
+                m_timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+
+        void DoWork()
+        {
+            switch (m_phase)
+            {           
+                case 1:
+                {
+                    if (!m_player)
+                        me->DespawnOrUnsummon();
+                    if (m_player->IsDead() || m_player->GetQuestStatus(QUEST_SAVING_THE_YOUNG) == QUEST_STATUS_REWARDED)
+                        me->DespawnOrUnsummon();                    
+                    break;
+                }
+                default:
+                    break;
+                }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_lost_bloodtalon_hatchlingAI(creature);
+    }
+};
+
+// #########################################################  Quest 24626 Young and Vicious
+
+class npc_swiftclaw_38002 : public CreatureScript
+{
+public:
+    npc_swiftclaw_38002() : CreatureScript("npc_swiftclaw_38002") { }
+
+    struct npc_swiftclaw_38002AI : public ScriptedAI
+    {
+        npc_swiftclaw_38002AI(Creature* creature) : ScriptedAI(creature) { }
+
+        void StartAnim(Player* player, Creature* raptor)
+        {
+            player->EnterVehicle(me, 1);
+            me->SetSpeed(MOVE_RUN, 1.2f, true);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_swiftclaw_38002AI(creature);
+    }
+};
+
+class at_raptor_pens : public AreaTriggerScript
+{
+public:
+    at_raptor_pens() : AreaTriggerScript("at_raptor_pens") { }
+
+    enum eAreaTrigger
+    {
+        QUEST_YOUNG_AND_VICIOUS = 24626,
+        NPC_SWIFTCLAW = 38002,
+    };
+
+    bool OnTrigger(Player* player, const AreaTriggerEntry* at) OVERRIDE
+    {
+        if (player && player->GetQuestStatus(QUEST_YOUNG_AND_VICIOUS) == QUEST_STATUS_INCOMPLETE)
+            if (Vehicle* vehicle = player->GetVehicle())
+                if (Unit* base = vehicle->GetBase())
+                    if (Creature* raptor = base->ToCreature())
+                    {
+                        player->Dismount();
+                        player->KilledMonsterCredit(NPC_SWIFTCLAW);
+                        raptor->DespawnOrUnsummon();
+                    }
+
+        return false;
+    }
+};
+
+class npc_swiftclaw_37989 : public CreatureScript
+{
+public:
+    npc_swiftclaw_37989() : CreatureScript("npc_swiftclaw_37989") { }
+
+    enum eAreaTrigger
+    {
+        QUEST_YOUNG_AND_VICIOUS = 24626,
+        NPC_SWIFTCLAW = 37989,
+        NPC_SWIFTCLAW_SUMMON = 38002,
+        SPELL_RAPTOR_ROPE = 70927,
+    };
+
+    struct npc_swiftclaw_37989AI : public ScriptedAI
+    {
+        npc_swiftclaw_37989AI(Creature* creature) : ScriptedAI(creature) { }
+
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
+        {
+            if (spell->Id == SPELL_RAPTOR_ROPE)
+                if (Player* player = caster->ToPlayer())
+                    if (player->GetQuestStatus(QUEST_YOUNG_AND_VICIOUS) == QUEST_STATUS_INCOMPLETE)
+                        if (me->GetDistance2d(player) < 2.0f)
+                        {
+                            player->KilledMonsterCredit(NPC_SWIFTCLAW);
+                            if (Creature* npc = player->SummonCreature(NPC_SWIFTCLAW_SUMMON, me->GetNearPosition(1.0f, 0.0f)))
+                                CAST_AI(npc_swiftclaw_38002::npc_swiftclaw_38002AI, npc->AI())->StartAnim(player, npc);
+
+                            me->SetPhaseMask(2, true);
+                            me->DespawnOrUnsummon();
+                        }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_swiftclaw_37989AI(creature);
+    }
+};
+
+// #########################################################  Quest
 
 
 void AddSC_zone_echo_isles()
@@ -622,4 +806,8 @@ void AddSC_zone_echo_isles()
     new npc_darkspear_jailor();
     new npc_captive_spitescale_scout();
     new npc_wounded_darkspear_watcher();
+    new npc_lost_bloodtalon_hatchling();
+    new npc_swiftclaw_37989();
+    new npc_swiftclaw_38002();
+    new at_raptor_pens();
 };
