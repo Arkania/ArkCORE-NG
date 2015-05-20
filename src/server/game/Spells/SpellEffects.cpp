@@ -1016,6 +1016,13 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
     {
         case SPELLFAMILY_GENERIC:
 
+            // Quest teritorial fetish
+            if (m_spellInfo->Id == 72070)
+            {
+                if (Creature * fetish = unitTarget->FindNearestCreature(38003, 5.0f))
+                    if (!fetish->HasAura(72072))
+                        fetish->AddAura(72072, fetish);
+            }
             // Zul'aman gong
             if (m_spellInfo->Id == 45226 && unitTarget->GetTypeId() == TYPEID_PLAYER)
             {

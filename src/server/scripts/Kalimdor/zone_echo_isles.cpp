@@ -794,7 +794,149 @@ public:
     }
 };
 
-// #########################################################  Quest
+// #########################################################  showfight between darkspear and spitescale 
+
+class npc_spitescale_showfight : public CreatureScript // 38300, 38301, 38302
+{
+public:
+    npc_spitescale_showfight() : CreatureScript("npc_spitescale_showfight") { }
+
+    struct npc_spitescale_showfightAI : public ScriptedAI
+    {
+        npc_spitescale_showfightAI(Creature* creature) : ScriptedAI(creature) { }
+
+        float m_health;
+
+        void Reset() override
+        {
+            m_health = frand(40.0f, 75.0f);
+        }
+
+        void DamageTaken(Unit* attacker, uint32& damage) override
+        {
+            bool sf = false;
+            if (attacker->GetEntry() == 38324) sf = true;
+            if (attacker->GetEntry() == 38326) sf = true;
+            if (sf)
+            {
+                if (me->GetHealthPct() < m_health)
+                    damage = 0;
+                else
+                    damage /= 10;
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_spitescale_showfightAI(creature);
+    }
+};
+
+class npc_darkspear_showfight : public CreatureScript // 38324, 38326
+{
+public:
+    npc_darkspear_showfight() : CreatureScript("npc_darkspear_showfight") { }
+
+    struct npc_darkspear_showfightAI : public ScriptedAI
+    {
+        npc_darkspear_showfightAI(Creature* creature) : ScriptedAI(creature) { }
+
+        float m_health;
+
+        void Reset() override
+        {
+            m_health = frand(40.0f, 75.0f);
+        }
+
+        void DamageTaken(Unit* attacker, uint32& damage) override
+        {
+            bool sf = false;
+            if (attacker->GetEntry() == 38300) sf = true;
+            if (attacker->GetEntry() == 38301) sf = true;
+            if (attacker->GetEntry() == 38302) sf = true;
+            if (sf)
+            {
+                if (me->GetHealthPct() < m_health)
+                    damage = 0;
+                else
+                    damage /= 10;
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_darkspear_showfightAI(creature);
+    }
+};
+
+// ######################################################### quest 25035 break the lines
+
+class npc_jornun_38989 : public CreatureScript
+{
+public:
+    npc_jornun_38989() : CreatureScript("npc_jornun_38989"){ }
+
+    enum eQuest25035
+    {
+        npc_jornun=38989,
+        npc_morakki=38442,
+        quest_break_the_lines = 25035,
+    };
+
+    bool OnGossipHello(Player* player, Creature* creature)
+    {
+        if (player && player->GetQuestStatus(quest_break_the_lines) == QUEST_STATUS_INCOMPLETE)
+        {
+            player->KilledMonsterCredit(npc_jornun);
+            creature->AI()->Talk(0);
+        }
+        return false;
+    }
+
+};
+
+class npc_morakki_38442 : public CreatureScript
+{
+public:
+    npc_morakki_38442() : CreatureScript("npc_morakki_38442"){ }
+
+    enum eQuest25035
+    {
+        npc_jornun = 38989,
+        npc_morakki = 38442,
+        quest_break_the_lines = 25035,
+    };
+
+    bool OnGossipHello(Player* player, Creature* creature)
+    {
+        if (player && player->GetQuestStatus(quest_break_the_lines) == QUEST_STATUS_INCOMPLETE)
+        {
+            player->KilledMonsterCredit(npc_morakki);
+        }
+        return true;
+    }
+
+};
+
+// ######################################################### 
 
 
 void AddSC_zone_echo_isles()
@@ -810,4 +952,8 @@ void AddSC_zone_echo_isles()
     new npc_swiftclaw_37989();
     new npc_swiftclaw_38002();
     new at_raptor_pens();
+    new npc_spitescale_showfight();
+    new npc_darkspear_showfight();
+    new npc_jornun_38989();
+    new npc_morakki_38442();
 };
