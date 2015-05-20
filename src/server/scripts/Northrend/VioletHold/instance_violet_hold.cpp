@@ -814,9 +814,10 @@ public:
             trigger->CastSpell(trigger, spellInfoLightning, true, 0, 0, trigger->GetGUID());
 
             // Kill all mobs registered with SetData64(ADD_TRASH_MOB)
-            for (std::set<uint64>::const_iterator itr = trashMobs.begin(); itr != trashMobs.end(); ++itr)
+            for (std::set<uint64>::const_iterator itr = trashMobs.begin(); itr != trashMobs.end();)
             {
                 Creature* creature = instance->GetCreature(*itr);
+                ++itr;
                 if (creature && creature->IsAlive())
                     trigger->Kill(creature);
             }
