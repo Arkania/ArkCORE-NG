@@ -682,6 +682,7 @@ enum RBACPermissions
     RBAC_PERM_COMMAND_MODIFY_CURRENCY                        = 775, // only 4.3.4
     RBAC_PERM_COMMAND_DEBUG_PHASE                            = 776, // only 4.3.4
     RBAC_PERM_COMMAND_MAILBOX                                = 777,
+	//AHBot command permissions
     RBAC_PERM_COMMAND_AHBOT                                  = 778,
     RBAC_PERM_COMMAND_AHBOT_ITEMS                            = 779,
     RBAC_PERM_COMMAND_AHBOT_ITEMS_GRAY                       = 780,
@@ -698,6 +699,19 @@ enum RBACPermissions
     RBAC_PERM_COMMAND_AHBOT_REBUILD                          = 791,
     RBAC_PERM_COMMAND_AHBOT_RELOAD                           = 792,
     RBAC_PERM_COMMAND_AHBOT_STATUS                           = 793,
+	//end AHBot
+	//NpcBot command permissions
+    RBAC_PERM_COMMAND_NPCBOT                                 = 794,
+    RBAC_PERM_COMMAND_NPCBOT_ADD                             = 795,
+    RBAC_PERM_COMMAND_NPCBOT_REMOVE                          = 796,
+    RBAC_PERM_COMMAND_NPCBOT_RESET                           = 797,
+    RBAC_PERM_COMMAND_NPCBOT_CMD                             = 798,
+    RBAC_PERM_COMMAND_NPCBOT_DIST                            = 799,
+    RBAC_PERM_COMMAND_NPCBOT_INFO                            = 800,
+    RBAC_PERM_COMMAND_NPCBOT_HELPER                          = 801,
+    RBAC_PERM_COMMAND_NPCBOT_REVIVE                          = 802,
+    RBAC_PERM_COMMAND_MAINTANK                               = 803,
+    //end NpcBot
     // custom permissions 1000+
     RBAC_PERM_MAX
 };

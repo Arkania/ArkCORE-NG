@@ -2376,7 +2376,12 @@ TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropert
             summon = new Puppet(properties, summoner);
             break;
         case UNIT_MASK_TOTEM:
-            summon = new Totem(properties, summoner);
+            // npc_bot: totem emul step 1
+            if (summoner && summoner->GetTypeId() == TYPEID_UNIT && summoner->ToCreature()->GetIAmABot())
+                summon = new Totem(properties, summoner->ToCreature()->GetBotOwner());
+            else
+                //end npc_bot
+                summon = new Totem(properties, summoner);
             break;
         case UNIT_MASK_MINION:
             summon = new Minion(properties, summoner, false);
@@ -2396,6 +2401,12 @@ TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropert
     summon->InitStats(duration);
     AddToMap(summon->ToCreature());
     summon->InitSummon();
+
+    // npc_bot: totem emul step 2
+    if (mask == UNIT_MASK_TOTEM)
+        if (summoner && summoner->GetTypeId() == TYPEID_UNIT && summoner->ToCreature()->GetIAmABot())
+            summoner->ToCreature()->OnBotSummon(summon);
+    //end npc_bot
 
     //ObjectAccessor::UpdateObjectVisibility(summon);
 

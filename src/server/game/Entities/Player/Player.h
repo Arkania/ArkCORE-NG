@@ -59,6 +59,12 @@ class SpellCastTargets;
 class UpdateMask;
 class PhaseMgr;
 
+// npcbot mod
+struct NpcBotMap;
+#define MAX_NPCBOTS 39
+class BotHelper;
+// end npcbot mod
+
 typedef std::deque<Mail*> PlayerMails;
 
 #define PLAYER_MAX_SKILLS           128
@@ -1712,6 +1718,7 @@ class Player : public Unit, public GridObject<Player>
 
         void SetTarget(uint64 /*guid*/) OVERRIDE { } /// Used for serverside target changes, does not apply to players
         void SetSelection(uint64 guid) { SetUInt64Value(UNIT_FIELD_TARGET, guid); }
+        uint64 GetSelection() const { return GetUInt64Value(UNIT_FIELD_TARGET); }
 
         uint8 GetComboPoints() const { return m_comboPoints; }
         uint64 GetComboTarget() const { return m_comboTarget; }
@@ -2568,6 +2575,42 @@ class Player : public Unit, public GridObject<Player>
         /*********************************************************/
         uint32 GetDigsiteEntry();
 
+        /*********************************************************/
+        /***                     BOT SYSTEM  434                  ***/
+        /*********************************************************/
+        void SetBotHelper(BotHelper* hlpr) { ASSERT(!_botHlpr); _botHlpr = hlpr; }
+        BotHelper* GetBotHelper() const { return _botHlpr; }
+        void RefreshBot(uint32 p_time);
+        void CreateBot(uint32 botentry, uint8 botrace, uint8 botclass, bool istank = false, bool revive = false);
+        void CreateNPCBot(uint8 botclass);
+        int8 GetNpcBotSlot(uint64 guid) const;
+        void SendBotCommandState(Creature* cre, CommandStates state);
+        bool HaveBot() const;
+        void RemoveBot(uint64 guid, bool final = false, bool eraseFromDB = true);
+        void SetBot(Creature* cre) { m_bot = cre; }
+        uint8 GetNpcBotsCount() const;
+        void SetBotMustBeCreated(uint32 m_entry, uint8 m_race, uint8 m_class, bool istank, uint32 *equips);
+        void ClearBotMustBeCreated(uint64 value, bool guid = true, bool fully = false);
+        bool GetBotMustBeCreated();
+        uint64 GetBotTankGuid() const { return m_botTankGuid; }
+        void SetBotTank(uint64 guid);
+        Unit* GetBotTank(uint32 entry);
+        uint8 GetBotFollowDist() const { return m_followdist; }
+        void SetBotFollowDist(int8 dist) { m_followdist = dist; }
+        void SetNpcBotDied(uint64 guid);
+        NpcBotMap const* GetBotMap(uint8 pos) const { return m_botmap[pos]; }
+        uint8 GetMaxNpcBots() const;
+        uint8 GetNpcBotXpReduction() const { return m_xpReductionNpcBots; }
+        bool RestrictBots() const;
+        uint32 GetNpcBotCost() const;
+        std::string GetNpcBotCostStr() const;
+        void InitBotEquips(Creature* bot);
+        void UpdateBotEquips(Creature* bot, uint8 slot, uint32 itemId);
+        uint32 GetBotEquip(Creature* bot, uint8 slot) const;
+        /*********************************************************/
+        /***                 END BOT SYSTEM                    ***/
+        /*********************************************************/
+        
     protected:
         // Gamemaster whisper whitelist
         WhisperListContainer WhisperList;
@@ -2850,6 +2893,31 @@ class Player : public Unit, public GridObject<Player>
         CUFProfile* _CUFProfiles[MAX_CUF_PROFILES];
 
     private:
+        /*********************************************************/
+        /***                     BOT SYSTEM                    ***/
+        /*********************************************************/
+        BotHelper* _botHlpr;
+        Creature* m_bot;
+        int8 m_followdist;
+        uint64 m_botTankGuid;
+        uint8 m_maxNpcBots;
+        uint8 m_maxClassNpcBots;
+        uint8 m_xpReductionNpcBots;
+        bool m_enableNpcBots;
+        bool m_enableNpcBotsArenas;
+        bool m_enableNpcBotsBGs;
+        bool m_enableNpcBotsDungeons;
+        bool m_enableNpcBotsRaids;
+        bool m_limitNpcBotsDungeons;
+        bool m_limitNpcBotsRaids;
+        uint32 m_NpcBotsCost;
+        uint32 m_botTimer;
+        uint32 m_botCreateTimer;
+        NpcBotMap* m_botmap[MAX_NPCBOTS];
+        /*********************************************************/
+        /***                END BOT SYSTEM                     ***/
+        /*********************************************************/
+
         // internal common parts for CanStore/StoreItem functions
         InventoryResult CanStoreItem_InSpecificSlot(uint8 bag, uint8 slot, ItemPosCountVec& dest, ItemTemplate const* pProto, uint32& count, bool swap, Item* pSrcItem) const;
         InventoryResult CanStoreItem_InBag(uint8 bag, ItemPosCountVec& dest, ItemTemplate const* pProto, uint32& count, bool merge, bool non_specialized, Item* pSrcItem, uint8 skip_bag, uint8 skip_slot) const;

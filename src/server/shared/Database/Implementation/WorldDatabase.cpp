@@ -98,4 +98,7 @@ void WorldDatabaseConnection::DoPrepareStatements()
     PrepareStatement(WORLD_SEL_DIGSITE_POS, "SELECT FindPosition, PositionX, PositionY FROM archaeology_digsites_positions WHERE Id=?", CONNECTION_SYNCH);
     PrepareStatement(WORLD_SEL_RANDOM_DIGSITE, "SELECT Entry FROM archaeology_digsites WHERE Level <= ? AND Map = ?", CONNECTION_SYNCH);
     PrepareStatement(WORLD_SEL_GUILD_CHALLENGES, "SELECT challengeId, challengeRewardId, challengeType, challengeEntry, xpReward, goldReward, goldExtraReward FROM guild_challenges JOIN guild_challenges_rewards ON guild_challenges.challengeRewardId = guild_challenges_rewards.rewardId", CONNECTION_SYNCH);
+    // Bot
+    PrepareStatement(WORLD_SEL_NPCBOT_TEMPLATE, "SELECT entry, trainer_race FROM creature_template WHERE scriptname = ? and trainer_class = ? and trainer_race IN (?, ?, ?, ?, ?, ?)", CONNECTION_SYNCH);
+    PrepareStatement(WORLD_SEL_NPCBOT_PET_LEVELSTATS, "SELECT hp, mana, armor, str, agi, sta, inte, spi FROM pet_levelstats WHERE creature_entry = ? AND level = ?", CONNECTION_SYNCH);
 }

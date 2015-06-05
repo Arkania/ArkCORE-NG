@@ -224,6 +224,33 @@ class CharacterCreateInfo
         uint8 CharCount;
 };
 
+//npcbot
+struct NpcBotMap
+{
+    friend class Player;
+    protected:
+        NpcBotMap() : m_guid(0), m_entry(0), m_race(0), m_class(0), m_creature(NULL), m_reviveTimer(0), tank(false)
+        {
+            for (uint8 i = 0; i != 18; ++i)
+                equips[i] = 0;
+        }
+        uint64 m_guid;
+        uint32 m_entry;
+        uint8  m_race;
+        uint8  m_class;
+        Creature* m_creature;
+        uint32 m_reviveTimer;
+        bool tank;
+        uint32 equips[18];
+        
+    public:
+        uint64 _Guid() const { return m_guid; }
+        Creature* _Cre() const { return m_creature; }
+        uint32 const getEquips(uint8 slot) const { return equips[slot]; }
+};
+//end bot mods
+
+
 /// Player session in the World
 class WorldSession
 {
