@@ -94,25 +94,31 @@ void WorldSession::HandleRepopRequestOpcode(WorldPacket& recvData)
 void WorldSession::HandleGossipSelectOptionOpcode(WorldPacket& recvData)
 {
     TC_LOG_DEBUG("network", "WORLD: CMSG_GOSSIP_SELECT_OPTION");
+    
 
     uint32 gossipListId;
     uint32 menuId;
     uint64 guid;
     std::string code = "";
-
+    PlayerMenu* pm = _player->PlayerTalkClass;
+    GossipMenu gm = pm->GetGossipMenu();
+    
     recvData >> guid >> menuId >> gossipListId;
 
-    if (!_player->PlayerTalkClass->GetGossipMenu().GetItem(gossipListId))
+    if (pm->IsGossipOptionCoded(gossipListId))
+        recvData >> code;
+
+    if (!&gm)
     {
         recvData.rfinish();
         return;
     }
-
-    if (_player->PlayerTalkClass->IsGossipOptionCoded(gossipListId))
-        recvData >> code;
+    const GossipMenuItem* gmi = gm.GetItem(gossipListId);
+    if (!gmi)
+        return;
 
     // Prevent cheating on C++ scripted menus
-    if (_player->PlayerTalkClass->GetGossipMenu().GetSenderGUID() != guid)
+    if (gm.GetSenderGUID() != guid)
         return;
 
     Creature* unit = NULL;
@@ -150,7 +156,6 @@ void WorldSession::HandleGossipSelectOptionOpcode(WorldPacket& recvData)
         TC_LOG_DEBUG("network", "WORLD: HandleGossipSelectOptionOpcode - unsupported GUID type for highguid %u. lowpart %u.", uint32(GUID_HIPART(guid)), uint32(GUID_LOPART(guid)));
         return;
     }
-
     // remove fake death
     if (GetPlayer()->HasUnitState(UNIT_STATE_DIED))
         GetPlayer()->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
@@ -162,7 +167,7 @@ void WorldSession::HandleGossipSelectOptionOpcode(WorldPacket& recvData)
             unit->LastUsedScriptID = unit->GetCreatureTemplate()->ScriptID;
         if (go)
             go->LastUsedScriptID = go->GetGOInfo()->ScriptId;
-        _player->PlayerTalkClass->SendCloseGossip();
+        pm->SendCloseGossip();
         return;
     }
     if (!code.empty())
@@ -170,7 +175,7 @@ void WorldSession::HandleGossipSelectOptionOpcode(WorldPacket& recvData)
         if (unit)
         {
             unit->AI()->sGossipSelectCode(_player, menuId, gossipListId, code.c_str());
-            if (!sScriptMgr->OnGossipSelectCode(_player, unit, _player->PlayerTalkClass->GetGossipOptionSender(gossipListId), _player->PlayerTalkClass->GetGossipOptionAction(gossipListId), code.c_str()))
+            if (!sScriptMgr->OnGossipSelectCode(_player, unit, pm->GetGossipOptionSender(gossipListId), pm->GetGossipOptionAction(gossipListId), code.c_str()))
                 _player->OnGossipSelect(unit, gossipListId, menuId);
         }
         //Bot
@@ -181,13 +186,13 @@ void WorldSession::HandleGossipSelectOptionOpcode(WorldPacket& recvData)
                 TC_LOG_ERROR("network", "WORLD: HandleGossipSelectOptionOpcode - Player (GUID: %u) do not have a helper on gossip select.", uint32(GUID_LOPART(guid)));
                 return;
             }
-            //_player->GetBotHelper()->OnCodedGossipSelect(_player, _player->PlayerTalkClass->GetGossipOptionSender(gossipListId), _player->PlayerTalkClass->GetGossipOptionAction(gossipListId), code.c_str());
+            //_player->GetBotHelper()->OnCodedGossipSelect(_player, pm->GetGossipOptionSender(gossipListId), pm->GetGossipOptionAction(gossipListId), code.c_str());
         }
         //end Bot
         else
         {
             go->AI()->GossipSelectCode(_player, menuId, gossipListId, code.c_str());
-            if (!sScriptMgr->OnGossipSelectCode(_player, go, _player->PlayerTalkClass->GetGossipOptionSender(gossipListId), _player->PlayerTalkClass->GetGossipOptionAction(gossipListId), code.c_str()))
+            if (!sScriptMgr->OnGossipSelectCode(_player, go, pm->GetGossipOptionSender(gossipListId), pm->GetGossipOptionAction(gossipListId), code.c_str()))
                 _player->OnGossipSelect(go, gossipListId, menuId);
         }
     }
@@ -196,7 +201,7 @@ void WorldSession::HandleGossipSelectOptionOpcode(WorldPacket& recvData)
         if (unit)
         {
             unit->AI()->sGossipSelect(_player, menuId, gossipListId);
-            if (!sScriptMgr->OnGossipSelect(_player, unit, _player->PlayerTalkClass->GetGossipOptionSender(gossipListId), _player->PlayerTalkClass->GetGossipOptionAction(gossipListId)))
+            if (!sScriptMgr->OnGossipSelect(_player, unit, pm->GetGossipOptionSender(gossipListId), pm->GetGossipOptionAction(gossipListId)))
                 _player->OnGossipSelect(unit, gossipListId, menuId);
         }
         //Bot
@@ -207,13 +212,13 @@ void WorldSession::HandleGossipSelectOptionOpcode(WorldPacket& recvData)
                 TC_LOG_ERROR("network", "WORLD: HandleGossipSelectOptionOpcode - Player (GUID: %u) do not have a helper on gossip select.", uint32(GUID_LOPART(guid)));
                 return;
             }
-            _player->GetBotHelper()->OnGossipSelect(_player, _player->PlayerTalkClass->GetGossipOptionSender(gossipListId), _player->PlayerTalkClass->GetGossipOptionAction(gossipListId));
+            _player->GetBotHelper()->OnGossipSelect(_player, gmi->Sender, gmi->OptionType);
         }
         //end Bot
         else
         {
             go->AI()->GossipSelect(_player, menuId, gossipListId);
-            if (!sScriptMgr->OnGossipSelect(_player, go, _player->PlayerTalkClass->GetGossipOptionSender(gossipListId), _player->PlayerTalkClass->GetGossipOptionAction(gossipListId)))
+            if (!sScriptMgr->OnGossipSelect(_player, go, pm->GetGossipOptionSender(gossipListId), pm->GetGossipOptionAction(gossipListId)))
                 _player->OnGossipSelect(go, gossipListId, menuId);
         }
     }

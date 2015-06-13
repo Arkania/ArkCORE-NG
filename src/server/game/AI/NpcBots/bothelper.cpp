@@ -18,18 +18,6 @@ Category: scripts/custom/bots
 #include "ScriptedGossip.h"
 #include "ScriptMgr.h"
 
-const uint8 GroupIcons[TARGETICONCOUNT] =
-{
-    /*STAR        = */0x001,
-    /*CIRCLE      = */0x002,
-    /*DIAMOND     = */0x004,
-    /*TRIANGLE    = */0x008,
-    /*MOON        = */0x010,
-    /*SQUARE      = */0x020,
-    /*CROSS       = */0x040,
-    /*SKULL       = */0x080
-};
-
 enum HelperActions
 {
     ACTION_ENABLE                                               = 1,
@@ -95,6 +83,9 @@ enum HelperGossip
     MAX_SENDERS
 };
 
+#define BOT_GOSSIP 56100
+#define BOT_TEXT 8446
+
 BotHelper::BotHelper(Player* const master) : _master(master) { }
 BotHelper::~BotHelper() {}
 
@@ -102,15 +93,24 @@ bool BotHelper::OnGossipSelect(Player* player, uint32 sender, uint32 action)
 {
     switch (sender)
     {
-        case SENDER_MAIN_PAGE:                          OnGossipHello(player);                              break;
-
-        case SENDER_CREATE_NBOT_MENU:                   SendCreateNPCBotMenu(player, action);               break;
-        case SENDER_CREATE_NBOT:                        SendCreateNPCBot(player, action);                   break;
-        case SENDER_REMOVE_NBOT_MENU:                   SendRemoveNPCBotMenu(player, action);               break;
-        case SENDER_REMOVE_NBOT:                        SendRemoveNPCBot(player, action);                   break;
-
-        case SENDER_INFO_WHISPER:                       SendBotHelpWhisper(player, action);                 break;
-
+        case SENDER_MAIN_PAGE:
+            OnGossipHello(player);
+            break;
+        case SENDER_CREATE_NBOT_MENU:
+            SendCreateNPCBotMenu(player, action);
+            break;
+        case SENDER_CREATE_NBOT:
+            SendCreateNPCBot(player, action);
+            break;
+        case SENDER_REMOVE_NBOT_MENU:
+            SendRemoveNPCBotMenu(player, action);
+            break;
+        case SENDER_REMOVE_NBOT:
+            SendRemoveNPCBot(player, action);
+            break;
+        case SENDER_INFO_WHISPER:
+            SendBotHelpWhisper(player, action);
+            break;
         default:
             break;
     }
@@ -119,49 +119,40 @@ bool BotHelper::OnGossipSelect(Player* player, uint32 sender, uint32 action)
 
 bool BotHelper::OnGossipHello(Player* player)
 {
-    player->PlayerTalkClass->ClearMenus(); //in case of return;
+    PlayerMenu* tc = player->PlayerTalkClass;
+    tc->ClearMenus();
 
     uint8 count = 0;
-
     uint8 maxNBcount = player->GetMaxNpcBots();
-
     bool allowNBots = sConfigMgr->GetBoolDefault("Bot.EnableNpcBots", true) && !player->RestrictBots();
-
     std::string tempstr;
 
     if (player->HaveBot())
     {
         count = player->GetNpcBotsCount();
         if (count > 0)
-        {
-            tempstr = "Abandon my Minion";
-            player->PlayerTalkClass->GetGossipMenu().AddMenuItem(4, 0, GetLocaleStringForTextID(tempstr, ABANDON_MINION, player->GetSession()->GetSessionDbLocaleIndex()), SENDER_REMOVE_NBOT_MENU, GOSSIP_ACTION_INFO_DEF + 4, "", 0);
-        }
+            tc->GetGossipMenu().AddMenuItem(BOT_GOSSIP, 1, SENDER_REMOVE_NBOT_MENU, GOSSIP_ACTION_INFO_DEF + 4);
+
         if (count < maxNBcount && allowNBots)
-        {
-            tempstr = "Recruit a Minion";
-            player->PlayerTalkClass->GetGossipMenu().AddMenuItem(2, 0, GetLocaleStringForTextID(tempstr, RECRUIT_MINION, player->GetSession()->GetSessionDbLocaleIndex()), SENDER_CREATE_NBOT_MENU, GOSSIP_ACTION_INFO_DEF + 2, "", 0);
-        }
+            tc->GetGossipMenu().AddMenuItem(BOT_GOSSIP, 0, SENDER_CREATE_NBOT_MENU, GOSSIP_ACTION_INFO_DEF + 2);
     }
     else if (allowNBots && maxNBcount != 0)
-    {
-        tempstr = "Recruit a Minion";
-        player->PlayerTalkClass->GetGossipMenu().AddMenuItem(2, 0, GetLocaleStringForTextID(tempstr, RECRUIT_MINION, player->GetSession()->GetSessionDbLocaleIndex()), SENDER_CREATE_NBOT_MENU, GOSSIP_ACTION_INFO_DEF + 2, "", 0);
-    }
+        tc->GetGossipMenu().AddMenuItem(BOT_GOSSIP, 0, SENDER_CREATE_NBOT_MENU, GOSSIP_ACTION_INFO_DEF + 2);
 
-    tempstr = "Help";
-    player->PlayerTalkClass->GetGossipMenu().AddMenuItem(6, 0, GetLocaleStringForTextID(tempstr, HELP_STR, player->GetSession()->GetSessionDbLocaleIndex()), SENDER_INFO_WHISPER, GOSSIP_ACTION_INFO_DEF + 6, "", 0);
+    tc->GetGossipMenu().AddMenuItem(BOT_GOSSIP, 2, SENDER_INFO_WHISPER, GOSSIP_ACTION_INFO_DEF + 6);
 
-    player->PlayerTalkClass->SendGossipMenu(8446, player->GetGUID());
+    tc->SendGossipMenu(BOT_TEXT, player->GetGUID());
     return true;
 }
 
 void BotHelper::SendRemoveNPCBot(Player* player, uint32 action)
 {
+    PlayerMenu* tc = player->PlayerTalkClass;
+
     int8 x = action - GOSSIP_ACTION_INFO_DEF;
     if (x == 1)
     {
-        player->CLOSE_GOSSIP_MENU();
+        tc->SendCloseGossip();
         for (uint8 i = 0; i != player->GetMaxNpcBots(); ++i)
             player->RemoveBot(player->GetBotMap(i)->_Guid(), true);
         return;
@@ -177,43 +168,48 @@ void BotHelper::SendRemoveNPCBot(Player* player, uint32 action)
         }
         --x;
     }
-    player->CLOSE_GOSSIP_MENU();
+    tc->SendCloseGossip();
 }
 
 void BotHelper::SendRemoveNPCBotMenu(Player* player, uint32 /*action*/)
 {
-    player->PlayerTalkClass->ClearMenus();
+    PlayerMenu* tc = player->PlayerTalkClass;
+    tc->ClearMenus();
+
     if (player->GetNpcBotsCount() == 1)
     {
         for (uint8 i = 0; i != player->GetMaxNpcBots(); ++i)
             player->RemoveBot(player->GetBotMap(i)->_Guid(), true);
-        player->CLOSE_GOSSIP_MENU();
+
+        tc->SendCloseGossip();
         return;
     }
-    std::string tempstr = "REMOVE ALL";
-    player->ADD_GOSSIP_ITEM(9, GetLocaleStringForTextID(tempstr, REMOVE_ALL, player->GetSession()->GetSessionDbLocaleIndex()), SENDER_REMOVE_NBOT, GOSSIP_ACTION_INFO_DEF + 1);
+
+    tc->GetGossipMenu().AddMenuItem(BOT_GOSSIP, 3, SENDER_REMOVE_NBOT, GOSSIP_ACTION_INFO_DEF + 1);
 
     uint8 x = 2;
     for (uint8 i = 0; i != player->GetMaxNpcBots(); ++i)
     {
         Creature* bot = player->GetBotMap(i)->_Cre();
         if (!bot) continue;
-        player->ADD_GOSSIP_ITEM(9, bot->GetName(), SENDER_REMOVE_NBOT, GOSSIP_ACTION_INFO_DEF + x);
+        tc->GetGossipMenu().AddMenuItem(-1, 9, bot->GetName(), SENDER_REMOVE_NBOT, GOSSIP_ACTION_INFO_DEF + x, "", 0);
         ++x;
     }
 
-    tempstr = "BACK";
-    player->ADD_GOSSIP_ITEM(0, GetLocaleStringForTextID(tempstr, BACK_STRING, player->GetSession()->GetSessionDbLocaleIndex()), SENDER_MAIN_PAGE, GOSSIP_ACTION_INFO_DEF + x);
+    AddMenuItem_CountOfAvaibleBots(player, tc);
+    AddMenuItem_BackToMainMenu(player, tc);
 
-    player->PlayerTalkClass->SendGossipMenu(8446, player->GetGUID());
+    tc->SendGossipMenu(BOT_TEXT, player->GetGUID());
 }
 
 void BotHelper::SendCreateNPCBot(Player* player, uint32 action)
 {
+    PlayerMenu* tc = player->PlayerTalkClass;
+    
     uint8 bot_class = 0;
     if (action == GOSSIP_ACTION_INFO_DEF + 1)//"Back"
     {
-        player->CLOSE_GOSSIP_MENU();
+        tc->SendCloseGossip();
         return;
     }
     else if (action == GOSSIP_ACTION_INFO_DEF + 2)
@@ -239,186 +235,97 @@ void BotHelper::SendCreateNPCBot(Player* player, uint32 action)
 
     if (bot_class != 0)
         player->CreateNPCBot(bot_class);
-    player->CLOSE_GOSSIP_MENU();
+    tc->SendCloseGossip();
     return;
 }
 
 void BotHelper::SendCreateNPCBotMenu(Player* player, uint32 /*action*/)
 {
     std::string cost = player->GetNpcBotCostStr();
-    player->PlayerTalkClass->ClearMenus();
+    PlayerMenu* tc = player->PlayerTalkClass;
+    tc->ClearMenus();
 
-    std::string tempstr = "Recruit a Warrior ";
-    player->ADD_GOSSIP_ITEM(9, GetLocaleStringForTextID(tempstr, RECRUIT_WARRIOR, player->GetSession()->GetSessionDbLocaleIndex()) + cost, SENDER_CREATE_NBOT, GOSSIP_ACTION_INFO_DEF + 2);
-    tempstr = "Recruit a Hunter ";
-    player->ADD_GOSSIP_ITEM(9, GetLocaleStringForTextID(tempstr, RECRUIT_HUNTER, player->GetSession()->GetSessionDbLocaleIndex()) + cost, SENDER_CREATE_NBOT, GOSSIP_ACTION_INFO_DEF + 3);
-    tempstr = "Recruit a Paladin ";
-    player->ADD_GOSSIP_ITEM(9, GetLocaleStringForTextID(tempstr, RECRUIT_PALADIN, player->GetSession()->GetSessionDbLocaleIndex()) + cost, SENDER_CREATE_NBOT, GOSSIP_ACTION_INFO_DEF + 4);
-    tempstr = "Recruit a Shaman ";
-    player->ADD_GOSSIP_ITEM(9, GetLocaleStringForTextID(tempstr, RECRUIT_SHAMAN, player->GetSession()->GetSessionDbLocaleIndex()) + cost, SENDER_CREATE_NBOT, GOSSIP_ACTION_INFO_DEF + 5);
-    tempstr = "Recruit a Rogue ";
-    player->ADD_GOSSIP_ITEM(9, GetLocaleStringForTextID(tempstr, RECRUIT_ROGUE, player->GetSession()->GetSessionDbLocaleIndex()) + cost, SENDER_CREATE_NBOT, GOSSIP_ACTION_INFO_DEF + 6);
-    tempstr = "Recruit a Druid ";
-    player->ADD_GOSSIP_ITEM(3, GetLocaleStringForTextID(tempstr, RECRUIT_DRUID, player->GetSession()->GetSessionDbLocaleIndex()) + cost, SENDER_CREATE_NBOT, GOSSIP_ACTION_INFO_DEF + 7);
-    tempstr = "Recruit a Mage ";
-    player->ADD_GOSSIP_ITEM(3, GetLocaleStringForTextID(tempstr, RECRUIT_MAGE, player->GetSession()->GetSessionDbLocaleIndex()) + cost, SENDER_CREATE_NBOT, GOSSIP_ACTION_INFO_DEF + 8);
-    tempstr = "Recruit a Priest ";
-    player->ADD_GOSSIP_ITEM(3, GetLocaleStringForTextID(tempstr, RECRUIT_PRIEST, player->GetSession()->GetSessionDbLocaleIndex()) + cost, SENDER_CREATE_NBOT, GOSSIP_ACTION_INFO_DEF + 9);
-    tempstr = "Recruit a Warlock ";
-    player->ADD_GOSSIP_ITEM(3, GetLocaleStringForTextID(tempstr, RECRUIT_WARLOCK, player->GetSession()->GetSessionDbLocaleIndex()) + cost, SENDER_CREATE_NBOT, GOSSIP_ACTION_INFO_DEF + 10);
+    for (uint8 id = 0; id < 9; ++id)
+    {
+        tc->GetGossipMenu().AddMenuItem(BOT_GOSSIP, 10 + id, SENDER_CREATE_NBOT, GOSSIP_ACTION_INFO_DEF + 2 + id);
+    }
     if (player->getLevel() >= 55)
     {
-        tempstr = "Recruit a Death Knight ";
-        player->ADD_GOSSIP_ITEM(9, GetLocaleStringForTextID(tempstr, RECRUIT_DEATH_KNIGHT, player->GetSession()->GetSessionDbLocaleIndex()) + cost, SENDER_CREATE_NBOT, GOSSIP_ACTION_INFO_DEF + 11);
+        tc->GetGossipMenu().AddMenuItem(BOT_GOSSIP, 19, SENDER_CREATE_NBOT, GOSSIP_ACTION_INFO_DEF + 11);
     }
 
-    std::ostringstream buff;
+    AddMenuItem_CountOfAvaibleBots(player, tc);
+    AddMenuItem_BackToMainMenu(player, tc);
+
+    tc->SendGossipMenu(BOT_TEXT, player->GetGUID());
+}
+
+void BotHelper::SendBotHelpWhisper(Player* player, uint32 /*action*/)
+{
+    PlayerMenu* tc = player->PlayerTalkClass;
+    tc->SendCloseGossip();
+    LocaleConstant loc = player->GetSession()->GetSessionDbLocaleIndex();
+    ChatHandler ch(player->GetSession());
+    
+    std::string msg1 = "\n";
+    msg1 += sObjectMgr->GetTrinityString(8010, loc);
+    std::string msg2 = sObjectMgr->GetTrinityString(8011, loc);
+    ch.SendSysMessage(msg1.c_str());
+    ch.SendSysMessage(msg2.c_str());
+    uint8 heal_mask = sConfigMgr->GetIntDefault("Bot.HealTargetIconsMask", 8);
+    if (heal_mask == 255)
+    {
+        std::string msg3 = sObjectMgr->GetTrinityString(8012, loc);
+        ch.SendSysMessage(msg3.c_str());
+    }
+    else if (heal_mask != 0)
+    {
+        std::string msg4 = sObjectMgr->GetTrinityString(8013, loc);
+        msg4 += "\n";
+        bool addComma = false;
+        for (uint8 i = 0; i < TARGETICONCOUNT; ++i)
+        {
+            uint16 x = 2 ^ i;
+            if (addComma)
+                msg4 += ", ";
+            addComma = true;
+            msg4 += sObjectMgr->GetTrinityString(8014 + i, loc);
+        }
+        ch.SendSysMessage(msg4.c_str());
+    }
+}
+
+void BotHelper::AddMenuItem_CountOfAvaibleBots(Player* player, PlayerMenu* pm)
+{
     uint8 bots = player->GetNpcBotsCount();
     uint8 maxNBcount = player->GetMaxNpcBots();
     uint32 freeNBSlots = maxNBcount - bots;
 
     if (freeNBSlots == 0)
     {
-        tempstr = "no more bots available";
-        buff << GetLocaleStringForTextID(tempstr, NO_MORE_AVAILABLE, player->GetSession()->GetSessionDbLocaleIndex());
+        pm->GetGossipMenu().AddMenuItem(BOT_GOSSIP, 5, SENDER_CREATE_NBOT_MENU, GOSSIP_ACTION_INFO_DEF + 12);
     }
     else
     {
-        buff << freeNBSlots;
-        buff << ' ';
         if (freeNBSlots == 1)
         {
             if (bots == 0)
-            {
-                tempstr = "bot available";
-                buff << GetLocaleStringForTextID(tempstr, ONE_AVAILABLE, player->GetSession()->GetSessionDbLocaleIndex());
-            }
+                pm->GetGossipMenu().AddMenuItem(BOT_GOSSIP, 6, SENDER_CREATE_NBOT_MENU, GOSSIP_ACTION_INFO_DEF + 12);
             else
-            {
-                tempstr = "more bot available";
-                buff << GetLocaleStringForTextID(tempstr, ONE_MORE_AVAILABLE, player->GetSession()->GetSessionDbLocaleIndex());
-            }
+                pm->GetGossipMenu().AddMenuItem(BOT_GOSSIP, 7, SENDER_CREATE_NBOT_MENU, GOSSIP_ACTION_INFO_DEF + 12);
         }
         else
         {
             if (bots == 0)
-            {
-                tempstr = "bots available";
-                buff << GetLocaleStringForTextID(tempstr, SOME_AVAILABLE, player->GetSession()->GetSessionDbLocaleIndex());
-            }
+                pm->GetGossipMenu().AddMenuItem(BOT_GOSSIP, 8, SENDER_CREATE_NBOT_MENU, GOSSIP_ACTION_INFO_DEF + 12);
             else
-            {
-                tempstr = "more bots available";
-                buff << GetLocaleStringForTextID(tempstr, SOME_MORE_AVAILABLE, player->GetSession()->GetSessionDbLocaleIndex());
-            }
+                pm->GetGossipMenu().AddMenuItem(BOT_GOSSIP, 9, SENDER_CREATE_NBOT_MENU, GOSSIP_ACTION_INFO_DEF + 12);
         }
     }
-    player->ADD_GOSSIP_ITEM(0, buff.str(), SENDER_CREATE_NBOT_MENU, GOSSIP_ACTION_INFO_DEF + 12);
 
-    tempstr = "BACK";
-    player->ADD_GOSSIP_ITEM(0, GetLocaleStringForTextID(tempstr, BACK_STRING, player->GetSession()->GetSessionDbLocaleIndex()), SENDER_MAIN_PAGE, GOSSIP_ACTION_INFO_DEF + 13);
-
-    player->PlayerTalkClass->SendGossipMenu(8446, player->GetGUID());
 }
 
-void BotHelper::SendBotHelpWhisper(Player* player, uint32 /*action*/)
+void BotHelper::AddMenuItem_BackToMainMenu(Player* player, PlayerMenu* pm)
 {
-    player->CLOSE_GOSSIP_MENU();
-    ChatHandler ch(player->GetSession());
-    //Basic
-    std::string tempstr = "To see list of available npcbot commands type .npcbot or .npcb";
-    std::string msg2 = GetLocaleStringForTextID(tempstr, ABOUT_BASIC_STR2, player->GetSession()->GetSessionDbLocaleIndex());
-    tempstr = "You can also use .maintank (or .mt or .main) command on any party member (even npcbot) so your bots will stick to your plan";
-    std::string msg3 = GetLocaleStringForTextID(tempstr, ABOUT_BASIC_STR3, player->GetSession()->GetSessionDbLocaleIndex());
-    ch.SendSysMessage(msg2.c_str());
-    ch.SendSysMessage(msg3.c_str());
-    //Heal Icons
-    uint8 mask = sConfigMgr->GetIntDefault("Bot.HealTargetIconsMask", 8);
-    std::string msg4 = "";
-    if (mask == 255)
-    {
-        tempstr = "If you want your npcbots to heal someone out of your party set any raid target icon on them";
-        msg4 = GetLocaleStringForTextID(tempstr, ABOUT_ICONS_STR1, player->GetSession()->GetSessionDbLocaleIndex());
-        ch.SendSysMessage(msg4.c_str());
-    }
-    else if (mask != 0)
-    {
-        tempstr = "If you want your npcbots to heal someone out of your party set proper raid target icon on them, one of these: ";
-        msg4 = GetLocaleStringForTextID(tempstr, ABOUT_ICONS_STR2, player->GetSession()->GetSessionDbLocaleIndex());
-        std::string iconrow = "";
-        uint8 count = 0;
-        for (uint8 i = 0; i != TARGETICONCOUNT; ++i)
-        {
-            if (mask & GroupIcons[i])
-            {
-                if (count != 0)
-                    iconrow += ", ";
-                ++count;
-                switch (i)
-                {
-                    case 0:
-                        tempstr = "star";
-                        iconrow += GetLocaleStringForTextID(tempstr, ICON_STRING_STAR, player->GetSession()->GetSessionDbLocaleIndex());
-                        break;
-                    case 1:
-                        tempstr = "circle";
-                        iconrow += GetLocaleStringForTextID(tempstr, ICON_STRING_CIRCLE, player->GetSession()->GetSessionDbLocaleIndex());
-                        break;
-                    case 2:
-                        tempstr = "diamond";
-                        iconrow += GetLocaleStringForTextID(tempstr, ICON_STRING_DIAMOND, player->GetSession()->GetSessionDbLocaleIndex());
-                        break;
-                    case 3:
-                        tempstr = "triangle";
-                        iconrow += GetLocaleStringForTextID(tempstr, ICON_STRING_TRIANGLE, player->GetSession()->GetSessionDbLocaleIndex());
-                        break;
-                    case 4:
-                        tempstr = "moon";
-                        iconrow += GetLocaleStringForTextID(tempstr, ICON_STRING_MOON, player->GetSession()->GetSessionDbLocaleIndex());
-                        break;
-                    case 5:
-                        tempstr = "square";
-                        iconrow += GetLocaleStringForTextID(tempstr, ICON_STRING_SQUARE, player->GetSession()->GetSessionDbLocaleIndex());
-                        break;
-                    case 6:
-                        tempstr = "cross";
-                        iconrow += GetLocaleStringForTextID(tempstr, ICON_STRING_CROSS, player->GetSession()->GetSessionDbLocaleIndex());
-                        break;
-                    case 7:
-                        tempstr = "skull";
-                        iconrow += GetLocaleStringForTextID(tempstr, ICON_STRING_SKULL, player->GetSession()->GetSessionDbLocaleIndex());
-                        break;
-                    default:
-                        tempstr = "unknown icon";
-                        iconrow += GetLocaleStringForTextID(tempstr, ICON_STRING_UNKNOWN, player->GetSession()->GetSessionDbLocaleIndex());
-                        break;
-                }
-            }
-        }
-        msg4 += iconrow;
-        ch.SendSysMessage(msg4.c_str());
-    }
-}
-
-std::string BotHelper::GetLocaleStringForTextID(std::string& textValue, uint32 textId, int32 localeIdx)
-{
-    if (textId >= MAX_STRINGS)
-    {
-        TC_LOG_ERROR("entities.player", "botgiver:GetLocaleStringForTextID:: unknown text id: %u!", uint32(textId));
-        return textValue;
-    }
-
-    if (localeIdx == DEFAULT_LOCALE)
-        return textValue; //use default
-
-    if (localeIdx < 0)
-    {
-        TC_LOG_ERROR("entities.player", "botgiver:GetLocaleStringForTextID:: unknown locale: %i! Sending default locale text...", localeIdx);
-        return textValue;
-    }
-
-    uint32 idxEntry = MAKE_PAIR32(60000, textId);
-    if (GossipMenuItemsLocale const* no = sObjectMgr->GetGossipMenuItemsLocale(idxEntry))
-        ObjectMgr::GetLocaleString(no->OptionText, localeIdx, textValue);
-    return textValue;
+    pm->GetGossipMenu().AddMenuItem(BOT_GOSSIP, 4, SENDER_MAIN_PAGE, GOSSIP_ACTION_INFO_DEF + 13);
 }

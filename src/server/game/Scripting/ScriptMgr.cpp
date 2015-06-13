@@ -794,7 +794,7 @@ uint32 ScriptMgr::GetDialogStatus(Player* player, Creature* creature)
     ASSERT(creature);
 
     GET_SCRIPT_RET(CreatureScript, creature->GetScriptId(), tmpscript, DIALOG_STATUS_SCRIPTED_NO_STATUS);
-    player->PlayerTalkClass->ClearMenus();
+    //player->PlayerTalkClass->ClearMenus();    // there coming every (5-10) secounds a cmsg_quest_status from client.. this here clear the PlayerTalkClass, so gossips are broken.. 
     return tmpscript->GetDialogStatus(player, creature);
 }
 

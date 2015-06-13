@@ -2,6 +2,7 @@
 #define _BOTHLP_H
 
 #include "Common.h"
+#include "Player.h"
 
 class Player;
 
@@ -25,6 +26,8 @@ class BotHelper
 
         static void SendBotHelpWhisper(Player* player, uint32 /*action*/);
         static std::string GetLocaleStringForTextID(std::string& textValue, uint32 textId, int32 localeIdx = 0);
+        static void AddMenuItem_CountOfAvaibleBots(Player* player, PlayerMenu* pm);
+        static void AddMenuItem_BackToMainMenu(Player* player, PlayerMenu* pm);
 
         Player* const _master;
 };
