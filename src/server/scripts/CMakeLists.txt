@@ -24,6 +24,12 @@ include(Examples/CMakeLists.txt)
 
 set(scripts_STAT_SRCS
   ${scripts_STAT_SRCS}
+  
+  # TeleNPC2
+  Custom/npc_teleport.cpp
+  ../game/AI/ScriptedAI/sc_npc_teleport.cpp
+  ../game/AI/ScriptedAI/sc_npc_teleport.h
+
   ../game/AI/ScriptedAI/ScriptedEscortAI.cpp
   ../game/AI/ScriptedAI/ScriptedCreature.cpp
   ../game/AI/ScriptedAI/ScriptedFollowerAI.cpp

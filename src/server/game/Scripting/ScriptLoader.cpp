@@ -44,6 +44,9 @@ void AddSC_holiday_spell_scripts();
 
 void AddSC_SmartSCripts();
 
+//TeleNPC2
+void AddSC_npc_teleport();
+
 //Commands
 void AddSC_account_commandscript();
 void AddSC_achievement_commandscript();
@@ -816,6 +819,7 @@ void AddSC_outdoorpvp_zm();
 
 // player
 void AddSC_chat_log();
+void AddSC_chat_censor();
 
 #endif
 
@@ -927,6 +931,7 @@ void AddWorldScripts()
     AddSC_npc_taxi();
     AddSC_achievement_scripts();
     AddSC_chat_log();
+    AddSC_chat_censor();
 	AddSC_npc_trainings_dummy();
 #endif
 }
@@ -1682,12 +1687,18 @@ void AddBattlegroundScripts()
 #ifdef SCRIPTS
 /* This is where custom scripts' loading functions should be declared. */
 
+    // TeleNPC2
+    void AddSC_npc_teleport();
+
 #endif
 
 void AddCustomScripts()
 {
 #ifdef SCRIPTS
     /* This is where custom scripts should be added. */
+
+    // TeleNPC2
+    AddSC_npc_teleport();
 
 #endif
 }
