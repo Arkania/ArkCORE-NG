@@ -3286,3 +3286,27 @@ AuctionHouseBot.Buyer.Neutral.Chance.Ratio = 3
 
 #
 ###################################################################################################
+
+###################################################################################################
+#    ChatCensor config
+#
+#    ChatCensor.Enabled
+#       Description: General enable or disable ChatCensor Bad Words functionality
+#       Default:     0 - (Disabled)
+#                    1 - (Enabled)
+
+ChatCensor.Enabled = 0
+
+#
+#    ChatCensor.BadnessLevel
+#       Description: How bad is a word.
+#                    0 - (Censor is Disabled)
+                    >0 - (Censor is Enabled. Trigger level of BadNess value.)
+		Default:     1 - (all bad word's are banned)
+#                   
+
+ChatCensor.BadnessLevel = 1
+
+#
+###################################################################################################
+
