@@ -1728,7 +1728,7 @@ class Unit : public WorldObject
         void DeleteCharmInfo();
         void UpdateCharmAI();
         void EnableAI();
-        //Player* GetMoverSource() const;
+        Player* GetMoverSource() const;
         Player* m_movedPlayer;
         SharedVisionList const& GetSharedVisionList() { return m_sharedVision; }
         void AddPlayerToVision(Player* player);

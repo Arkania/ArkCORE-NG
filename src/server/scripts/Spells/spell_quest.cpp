@@ -2099,6 +2099,43 @@ public:
     }
 };
 
+// 52694 - Recall Eye of Acherus
+enum Recall_Eye_of_Acherus
+{
+    THE_EYE_OF_ACHERUS = 51852
+};
+
+class spell_q12641_recall_eye_of_acherus : public SpellScriptLoader
+{
+public:
+    spell_q12641_recall_eye_of_acherus() : SpellScriptLoader("spell_q12641_recall_eye_of_acherus") { }
+
+    class spell_q12641_recall_eye_of_acherus_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_q12641_recall_eye_of_acherus_SpellScript);
+
+        void HandleDummy(SpellEffIndex /*effIndex*/)
+        {
+            if (Player* player = GetCaster()->GetCharmerOrOwner()->ToPlayer())
+            {
+                player->StopCastingCharm();
+                player->StopCastingBindSight();
+                player->RemoveAura(THE_EYE_OF_ACHERUS);
+            }
+        }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_q12641_recall_eye_of_acherus_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_q12641_recall_eye_of_acherus_SpellScript();
+    }
+};
+
 // 51769 - Emblazon Runeblade
 class spell_q12619_emblazon_runeblade : public SpellScriptLoader
 {
@@ -2442,6 +2479,7 @@ void AddSC_quest_spell_scripts()
     new spell_q12308_escape_from_silverbrook_summon_worgen();
     new spell_q12308_escape_from_silverbrook();
     new spell_q12641_death_comes_from_on_high();
+    new spell_q12641_recall_eye_of_acherus();
     new spell_q12619_emblazon_runeblade();
     new spell_q12619_emblazon_runeblade_effect();
     new spell_q12919_gymers_grab();

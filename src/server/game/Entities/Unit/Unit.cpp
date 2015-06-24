@@ -9774,6 +9774,16 @@ Unit* Unit::GetNextRandomRaidMemberOrPet(float radius)
     return nearMembers[randTarget];
 }
 
+Player * Unit::GetMoverSource() const
+{
+    if (GetTypeId() == TYPEID_PLAYER && ((Player*)this)->m_mover == this)
+        return (Player*)this;
+    if (Unit *charmer = GetCharmer())
+        if (charmer->GetTypeId() == TYPEID_PLAYER && ((Player*)charmer)->m_mover == this)
+            return (Player*)charmer;
+    return NULL;
+}
+
 // only called in Player::SetSeer
 // so move it to Player?
 void Unit::AddPlayerToVision(Player* player)
@@ -13722,6 +13732,7 @@ void CharmInfo::InitPossessCreateSpells()
             case 23575: // Mindless Abomination
             case 24783: // Trained Rock Falcon
             case 27664: // Crashin' Thrashin' Racer
+            case 28511: // Aye of Acherus
             case 40281: // Crashin' Thrashin' Racer
                 break;
             default:
@@ -15916,9 +15927,8 @@ bool Unit::SetCharmedBy(Unit* charmer, CharmType type, AuraApplication const* au
     // prevent undefined behaviour
     if (aurApp && aurApp->GetRemoveMode())
         return false;
-
-    // Pets already have a properly initialized CharmInfo, don't overwrite it.
-    if (type != CHARM_TYPE_VEHICLE && !GetCharmInfo())
+    
+    if (type != CHARM_TYPE_VEHICLE)
     {
         InitCharmInfo();
         if (type == CHARM_TYPE_POSSESS)
