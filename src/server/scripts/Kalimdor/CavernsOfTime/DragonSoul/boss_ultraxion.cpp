@@ -19,12 +19,12 @@ EndScriptData
 #include "ScriptedGossip.h"
 #include "dragon_soul.h"
 
-#define TRALL_MENU "Мы готовы!"
-#define ASPECT_MENU_1 "Последний защитник Азерота"
-#define ASPECT_MENU_2 "Виток времени"
-#define ASPECT_MENU_3 "Сущность cнов"
-#define ASPECT_MENU_4 "Дар жизни"
-#define ASPECT_MENU_5 "Магический источник"
+#define TRALL_MENU "We are ready!"
+#define ASPECT_MENU_1 "Last Defender of Azeroth"
+#define ASPECT_MENU_2 "Revolution time"
+#define ASPECT_MENU_3 "Essence of Dreams"
+#define ASPECT_MENU_4 "Gift of Life"
+#define ASPECT_MENU_5 "Magical power"
 
 
 #define H_TARGETS_10 1
