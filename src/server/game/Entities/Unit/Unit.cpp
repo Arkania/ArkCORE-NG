@@ -18000,6 +18000,11 @@ bool Unit::SetWalk(bool enable)
     return true;
 }
 
+bool Unit::SetRun(bool enable)
+{
+    return SetWalk(!enable);
+}
+
 bool Unit::SetDisableGravity(bool disable, bool packetOnly /*= false*/)
 {
     if (!packetOnly)

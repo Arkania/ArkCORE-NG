@@ -1648,6 +1648,7 @@ class Unit : public WorldObject
         bool IsLevitating() const { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY); }
         bool IsWalking() const { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_WALKING); }
         bool SetWalk(bool enable);
+        bool SetRun(bool enable);
         bool SetDisableGravity(bool disable, bool packetOnly = false);
         bool SetFall(bool enable);
         bool SetSwim(bool enable);
