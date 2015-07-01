@@ -357,7 +357,7 @@ public:
         if (!*args)
         {
             handler->PSendSysMessage(".npcbot command <command>");
-            handler->PSendSysMessage("Forces npcbots to either follow you or hold position.");
+            handler->PSendSysMessage("Forces npcbots to either attack, follow you or hold position.");
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -367,6 +367,8 @@ public:
             state = COMMAND_STAY;
         else if (!strncmp(command, "f", 2) || !strncmp(command, "follow", 7) || !strncmp(command, "fol", 4) || !strncmp(command, "fo", 3))
             state = COMMAND_FOLLOW;
+        else if (!strncmp(command, "a", 2) || !strncmp(command, "attack", 7) || !strncmp(command, "att", 4) || !strncmp(command, "at", 3))
+            state = COMMAND_ATTACK;
         if (state >= 0 && owner->HaveBot())
         {
             for (uint8 i = 0; i != owner->GetMaxNpcBots(); ++i)

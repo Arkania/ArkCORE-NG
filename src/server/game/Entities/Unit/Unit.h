@@ -1575,6 +1575,7 @@ class Unit : public WorldObject
         bool IsPolymorphed() const;
 
         bool isFrozen() const;
+        bool IsTankClass() const;
 
         bool isTargetableForAttack(bool checkFakeDeath = true) const;
 

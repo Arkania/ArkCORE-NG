@@ -13981,6 +13981,11 @@ bool Unit::isFrozen() const
     return HasAuraState(AURA_STATE_FROZEN);
 }
 
+bool Unit::IsTankClass() const
+{
+    return (getClass() == CLASS_WARRIOR || getClass() == CLASS_PALADIN || getClass() == CLASS_DEATH_KNIGHT);
+}
+
 struct ProcTriggeredData
 {
     ProcTriggeredData(Aura* _aura)

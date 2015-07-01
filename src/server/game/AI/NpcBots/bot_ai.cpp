@@ -336,7 +336,16 @@ void bot_minion_ai::SetBotCommandState(CommandStates st, bool force, Position* n
         me->GetMotionMaster()->MoveIdle();
     }
     else if (st == COMMAND_ATTACK)
-    { }
+    { 
+        if (Unit* victim = master->GetSelectedUnit())
+        {
+            if (InDuel(victim))
+                return;
+
+            victim->Attack(me, true);
+            me->Attack(victim, true);
+        }
+    }
     m_botCommandState = st;
     if (Creature* m_botsPet = me->GetBotsPet())
         m_botsPet->SetBotCommandState(st, force);
@@ -369,7 +378,9 @@ void bot_pet_ai::SetBotCommandState(CommandStates st, bool force, Position* /*ne
         me->GetMotionMaster()->MoveIdle();
     }
     else if (st == COMMAND_ATTACK)
-    { }
+    { 
+        
+    }
     m_botCommandState = st;
 }
 // Get Maintank
@@ -4239,6 +4250,7 @@ bool bot_minion_ai::Equip(uint32 itemId, uint8 slot)
         {
             if (!master->HasItemCount(itemId, 1))
             {
+                
                 std::ostringstream msg;
                 msg << "Cannot find ";
                 _AddItemTemplateLink(master, proto, msg);

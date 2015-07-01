@@ -2679,14 +2679,14 @@ void Creature::SetBotTank(Unit* newtank)
         
             if (m_bot_owner)
             {
-            switch (urand(1, 5))
-                 {
-                case 1: MonsterWhisper("I am tank here!", m_bot_owner); break;
-                case 2: MonsterWhisper("I will tank now.", m_bot_owner); break;
-                case 3: MonsterWhisper("I gonna tank", m_bot_owner); break;
-                case 4: MonsterWhisper("I think I will be best tank here...", m_bot_owner); break;
-                case 5: MonsterWhisper("I AM the tank!", m_bot_owner); break;
-                }
+                switch (urand(1, 5))
+                     {
+                    case 1: MonsterWhisper(8022, m_bot_owner); break;
+                    case 2: MonsterWhisper(8023, m_bot_owner); break;
+                    case 3: MonsterWhisper(8024, m_bot_owner); break;
+                    case 4: MonsterWhisper(8025, m_bot_owner); break;
+                    case 5: MonsterWhisper(8026, m_bot_owner); break;
+                    }
             }
         
             bot_AI->UpdateHealth();

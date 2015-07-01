@@ -125,7 +125,6 @@ bool BotHelper::OnGossipHello(Player* player)
     uint8 count = 0;
     uint8 maxNBcount = player->GetMaxNpcBots();
     bool allowNBots = sConfigMgr->GetBoolDefault("Bot.EnableNpcBots", true) && !player->RestrictBots();
-    std::string tempstr;
 
     if (player->HaveBot())
     {
