@@ -1,4 +1,5 @@
 
+SET NAMES 'utf8';
 
 INSERT IGNORE INTO locales_gossip_menu_option (menu_id, id) SELECT menu_id, id FROM gossip_menu_option;
 

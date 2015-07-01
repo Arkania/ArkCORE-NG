@@ -1,0 +1,12 @@
+
+Configuration is done in worldserver.conf
+
+
+ChatCensor.Enabled  	: you can enable or disable the Censor function.
+
+ChatCensor.BadnessLevel	: This is a trigger value
+						  each word have a level for badness in database.
+						  If a user using more as one bad word in one string, the level's are added.
+						  If this added values is => BadnessLevel the string is replaced by warning.
+
+Bad words Database		: table 'censor_bad_words' located in world database.
