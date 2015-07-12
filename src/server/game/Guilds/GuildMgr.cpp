@@ -477,9 +477,10 @@ void GuildMgr::LoadGuilds()
 void GuildMgr::LoadGuildXpForLevel()
 {
     uint32 oldMSTime = getMSTime();
+    uint32 maxLevel = sWorld->getIntConfig(CONFIG_GUILD_MAX_LEVEL);
 
-    GuildXPperLevel.resize(sWorld->getIntConfig(CONFIG_GUILD_MAX_LEVEL));
-    for (uint8 level = 0; level < sWorld->getIntConfig(CONFIG_GUILD_MAX_LEVEL); ++level)
+    GuildXPperLevel.resize(maxLevel + 1);
+    for (uint8 level = 0; level <= maxLevel; ++level)
         GuildXPperLevel[level] = 0;
 
     //                                                 0         1
@@ -492,15 +493,15 @@ void GuildMgr::LoadGuildXpForLevel()
     }
 
     uint32 count = 0;
-
+    
     do
     {
         Field* fields = result->Fetch();
 
-        uint32 level        = fields[0].GetUInt8();
-        uint32 requiredXP   = fields[1].GetUInt32();
+        uint32 level        = fields[0].GetUInt32();
+        uint64 requiredXP   = fields[1].GetUInt64();
 
-        if (level >= sWorld->getIntConfig(CONFIG_GUILD_MAX_LEVEL))
+        if (level > maxLevel)
         {
             TC_LOG_INFO("misc", "Unused (> Guild.MaxLevel in worldserver.conf) level %u in `guild_xp_for_level` table, ignoring.", uint32(level));
             continue;
@@ -512,11 +513,11 @@ void GuildMgr::LoadGuildXpForLevel()
     } while (result->NextRow());
 
     // fill level gaps
-    for (uint8 level = 1; level < sWorld->getIntConfig(CONFIG_GUILD_MAX_LEVEL); ++level)
+    for (uint8 level = 1; level <= maxLevel; ++level)
     {
         if (!GuildXPperLevel[level])
         {
-            TC_LOG_ERROR("sql.sql", "Level %i does not have XP for guild level data. Using data of level [%i] + 1660000.", level+1, level);
+            TC_LOG_ERROR("sql.sql", "Level %i does not have XP for guild level data. Using data of level [%i] + 1660000.", level, level - 1);
             GuildXPperLevel[level] = GuildXPperLevel[level - 1] + 1660000;
         }
     }
