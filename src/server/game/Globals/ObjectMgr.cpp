@@ -2571,7 +2571,7 @@ void ObjectMgr::LoadItemTemplates()
     }
 
     // Load missing items from item_template AND overwrite data from Item-sparse.db2 (item_template is supposed to contain Item-sparse.adb data)
-    //                                               0      1      2         3     4     5          6        7      8           9         10        11        12        13
+    //                                                 0      1      2         3                     4       5          6        7      8           9         10        11        12        13
     QueryResult result = WorldDatabase.Query("SELECT entry, Class, SubClass, SoundOverrideSubclass, Name, DisplayId, Quality, Flags, FlagsExtra, Unk430_1, Unk430_2, BuyCount, BuyPrice, SellPrice, "
     //                                        14             15              16             17         18             19             20                 21
                                              "InventoryType, AllowableClass, AllowableRace, ItemLevel, RequiredLevel, RequiredSkill, RequiredSkillRank, RequiredSpell, "
@@ -2629,7 +2629,7 @@ void ObjectMgr::LoadItemTemplates()
             itemTemplate.Name1                     = fields[4].GetString();
             itemTemplate.DisplayInfoID             = fields[5].GetUInt32();
             itemTemplate.Quality                   = uint32(fields[6].GetUInt8());
-            itemTemplate.Flags                     = fields[7].GetUInt32();
+            itemTemplate.Flags                     = fields[7].GetUInt64();
             itemTemplate.Flags2                    = fields[8].GetUInt32();
             itemTemplate.Unk430_1                  = fields[9].GetFloat();
             itemTemplate.Unk430_2                  = fields[10].GetFloat();

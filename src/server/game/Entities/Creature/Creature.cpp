@@ -1625,10 +1625,14 @@ void Creature::ForcedDespawn(uint32 timeMSToDespawn)
 
 void Creature::DespawnOrUnsummon(uint32 msTimeToDespawn /*= 0*/)
 {
-    if (TempSummon* summon = this->ToTempSummon())
-        summon->UnSummon(msTimeToDespawn);
-    else
-        ForcedDespawn(msTimeToDespawn);
+    if (this->IsAlive())
+        if (TempSummon* summon = this->ToTempSummon())
+        {
+            summon->UnSummon(msTimeToDespawn);
+            return;
+        }
+
+    ForcedDespawn(msTimeToDespawn);
 }
 
 bool Creature::IsImmunedToSpell(SpellInfo const* spellInfo) const

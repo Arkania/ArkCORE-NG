@@ -924,8 +924,14 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
                                 slot_type = LOOT_SLOT_TYPE_ROLL_ONGOING;
                                 break;
                             case MASTER_PERMISSION:
-                                slot_type = LOOT_SLOT_TYPE_MASTER;
-                                break;
+                                {
+                                    if (lv.viewer->GetGroup() && lv.viewer->GetGroup()->GetMasterLooterGuid() == lv.viewer->GetGUID())
+                                        slot_type = LOOT_SLOT_TYPE_MASTER;
+                                    else
+                                        slot_type = LOOT_SLOT_TYPE_LOCKED;
+
+                                    break;
+                                }
                             case RESTRICTED_PERMISSION:
                                 slot_type = LOOT_SLOT_TYPE_LOCKED;
                                 break;

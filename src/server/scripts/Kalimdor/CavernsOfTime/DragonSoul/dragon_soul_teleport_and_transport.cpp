@@ -8,7 +8,7 @@
 
 /* ScriptData
 SDName: dragon_soul_teleport_and_transport
-SD%Complete: 50%
+SD%Complete: 100%
 SDComment:
 SDCategory: Teleport and Transport
 EndScriptData
@@ -28,7 +28,12 @@ class npc_eiendormi : public CreatureScript
             if (InstanceScript* instance = creature->GetInstanceScript())
             {
                 if (instance->GetBossState(BOSS_MORCHOK) == DONE)
-                    player->TeleportTo(967, -1870.114f, -3077.727f, -176.308f, 0.390f);
+				{
+					player->TeleportTo(967, -1870.114f, -3077.727f, -176.308f, 0.390f);
+					//if (Creature *t = player->SummonCreature(572880, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(),
+					//player->GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 300 * IN_MILLISECONDS))
+					//player->CastCustomSpell(VEHICLE_SPELL_RIDE_HARDCODED, SPELLVALUE_BASE_POINT0, 1, t, false);
+				}
             }
 
             player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
@@ -45,8 +50,13 @@ class npc_valeera_tele : public CreatureScript
         {
             if (InstanceScript* instance = creature->GetInstanceScript())
             {
-                if (instance->GetBossState(BOSS_MORCHOK) == DONE)
-                    player->TeleportTo(967, -1735.930f, -1818.239f, -219.328f, 0.0f);
+                if (instance->GetBossState(BOSS_MORCHOK) == DONE)					
+				{
+					player->TeleportTo(967, -1735.930f, -1818.239f, -219.328f, 0.0f);
+					//if (Creature *t = player->SummonCreature(572890, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(),
+					//player->GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 300 * IN_MILLISECONDS))
+					//player->CastCustomSpell(VEHICLE_SPELL_RIDE_HARDCODED, SPELLVALUE_BASE_POINT0, 1, t, false);
+				}
             }
 
             player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
@@ -64,7 +74,12 @@ class npc_nethestrasz : public CreatureScript
             if (InstanceScript* instance = creature->GetInstanceScript())
             {
                 if (instance->GetBossState(BOSS_UNSLEEPING) == DONE && instance->GetBossState(BOSS_WARLORD) == DONE)
-                    player->TeleportTo(967, -1786.69f, -2393.67f, 341.355f, 0.16f);
+				{
+					player->TeleportTo(967, -1786.69f, -2393.67f, 341.355f, 0.16f);
+					//if (Creature *t = player->SummonCreature(572870, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(),
+					//player->GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 300 * IN_MILLISECONDS))
+					//player->CastCustomSpell(VEHICLE_SPELL_RIDE_HARDCODED, SPELLVALUE_BASE_POINT0, 1, t, false);
+				}
             }
 
             player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
@@ -156,6 +171,45 @@ class travel_to_the_deck_of_the_skyfire : public CreatureScript
         }
 };
 
+class travel_to_Spine : public CreatureScript
+{
+public:
+	travel_to_Spine() : CreatureScript("travel_to_Spine") { }
+	bool OnGossipHello(Player* player, Creature* creature)
+	{
+		if (InstanceScript* instance = creature->GetInstanceScript())
+		{
+			if (instance->GetBossState(BOSS_WARMASTER) == DONE)
+			{
+				player->TeleportTo(967, -13855.28f, -13667.97f, 268.03f, 1.64f);
+				player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
+			}
+		}
+		player->CLOSE_GOSSIP_MENU();
+		return true;
+	}
+};
+
+
+class travel_to_Maelstrom : public CreatureScript
+{
+public:
+	travel_to_Maelstrom() : CreatureScript("travel_to_Maelstrom") { }
+	bool OnGossipHello(Player* player, Creature* creature)
+	{
+		if (InstanceScript* instance = creature->GetInstanceScript())
+		{
+			if (instance->GetBossState(BOSS_ULTRAXION) == DONE)  //Need Spine Done
+			{
+				player->TeleportTo(967, -12120.15f, -12175.022f, 2.56f, 5.77f);
+				player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
+			}
+		}
+		player->CLOSE_GOSSIP_MENU();
+		return true;
+	}
+};
+
 void AddSC_dragon_soul_teleport_and_transport()
 {
     new npc_eiendormi();
@@ -165,4 +219,6 @@ void AddSC_dragon_soul_teleport_and_transport()
     new travel_to_wyrmrest_summit;
     new travel_to_the_eye_of_eternity;
     new travel_to_the_deck_of_the_skyfire;
+	new travel_to_Spine;
+	new travel_to_Maelstrom;
 }

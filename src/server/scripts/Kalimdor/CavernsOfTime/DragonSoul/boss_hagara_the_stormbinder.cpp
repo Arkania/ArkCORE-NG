@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2015 ArkCORE <http://www.arkania.net/>
  *
  * This file is NOT free software. Third-party users can NOT redistribute 
  * it or modify it. If you find it, you are either hacking something, or very 
@@ -69,6 +69,13 @@ enum Spells_other
 {
     SPELL_CRYSTALLINE_TETHER   = 105312,
     SPELL_CRYSTALLINE_OVERLOAD = 105311,
+};
+
+enum Say
+{
+    SAY_AGGRO = 0,
+    SAY_KILL = 1,
+    SAY_DEAD = 2,
 };
 
 class boss_hagara : public CreatureScript
@@ -277,6 +284,11 @@ public:
             instance->SetBossState(DATA_PORTALS_ON_OFF, DONE);
             instance->SetBossState(DATA_TRALL_VS_ULTRAXION, IN_PROGRESS);
             _JustDied();
+
+            Unit * portal = me->FindNearestCreature(NPC_PORTAL_SKYFIRE, 20.0f);
+
+            if (!portal)
+                portal = me->SummonCreature(NPC_PORTAL_SKYFIRE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 3, 1.5f, TEMPSUMMON_TIMED_DESPAWN, 5 * MINUTE*IN_MILLISECONDS);
         }
     };
 };

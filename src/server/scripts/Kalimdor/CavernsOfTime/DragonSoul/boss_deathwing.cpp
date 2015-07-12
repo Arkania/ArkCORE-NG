@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2015 ArkCORE <http://www.arkania.net/>
  *
  * This file is NOT free software. Third-party users can NOT redistribute 
  * it or modify it. If you find it, you are either hacking something, or very 
@@ -14,7 +14,7 @@ SDCategory: Boss Deathwing
 EndScriptData
 */
 
-#include "ScriptMgr.h"
+#include "ScriptPCH.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "dragon_soul.h"
@@ -22,11 +22,11 @@ EndScriptData
 #include "InstanceScript.h"
 #include "Map.h"
 
-#define TRALL_MENU "Мы готовы!"
-#define TELE_MENU_1 "1 Площадка"
-#define TELE_MENU_2 "2 Площадка"
-#define TELE_MENU_3 "3 Площадка"
-#define TELE_MENU_4 "4 Площадка"
+#define TRALL_MENU "We are ready!"
+#define TELE_MENU_1 "1st Area"
+#define TELE_MENU_2 "2nd Area"
+#define TELE_MENU_3 "3nd Area"
+#define TELE_MENU_4 "4nd Area"
 
 enum Events
 {
@@ -87,6 +87,8 @@ enum Spells
     SPELL_SHRAPNEL            = 106791,
     SPELL_TETANUS             = 106728,
     SPELL_CORRUPTED_BLOOD     = 106835,
+
+    SPELL_PLAY_MOVIE = 110112,
 };
 
 enum Texts
@@ -280,6 +282,7 @@ public:
 
         void JustDied(Unit* /*kller*/)
         {
+            DoCastAOE(SPELL_PLAY_MOVIE, true);
             instance->SetBossState(DATA_PORTALS_ON_OFF, DONE);
             if(instance)
                 instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me); // Remove
@@ -298,6 +301,10 @@ public:
             if(Creature* trall = me->FindNearestCreature(NPC_MAELSTROM_TRALL, 300.0f, true))
                 trall->AI()->Talk(SAY_TRALL_DEATH_DEATHWING);
             me->DespawnOrUnsummon(5000);
+            //if (RAID_DIFFICULTY_10MAN_NORMAL || RAID_DIFFICULTY_10MAN_HEROIC || RAID_DIFFICULTY_25MAN_NORMAL || RAID_DIFFICULTY_25MAN_HEROIC)
+            //    instance->DoCompleteAchievement(6177); // Destroyer's End
+            //if (RAID_DIFFICULTY_10MAN_HEROIC || RAID_DIFFICULTY_25MAN_HEROIC)
+            //    instance->DoCompleteAchievement(6116); // Heroic: Madness of Deathwing
             _JustDied();
         }
     };
@@ -310,7 +317,7 @@ class npc_maelstrom_trall : public CreatureScript
 
         bool OnGossipHello(Player* player, Creature* creature)
         {
-             if (creature->GetInstanceScript())
+            if (creature->GetInstanceScript())
                  player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, TRALL_MENU, GOSSIP_SENDER_MAIN, 10);
 
              player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
