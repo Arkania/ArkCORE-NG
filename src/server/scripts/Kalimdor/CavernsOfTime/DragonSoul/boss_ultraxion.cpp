@@ -1,8 +1,8 @@
 /*
  * Copyright (C) 2011-2015 ArkCORE <http://www.arkania.net/>
  *
- * This file is NOT free software. Third-party users can NOT redistribute 
- * it or modify it. If you find it, you are either hacking something, or very 
+ * This file is NOT free software. Third-party users can NOT redistribute
+ * it or modify it. If you find it, you are either hacking something, or very
  * lucky (presuming someone else managed to hack it).
  */
 
@@ -164,13 +164,7 @@ enum Actions
 class boss_ultraxion : public CreatureScript
 {
 public:
-    boss_ultraxion() : CreatureScript("boss_ultraxion")
-    {}
-
-    CreatureAI* GetAI(Creature* pCreature) const
-    {
-        return new boss_ultraxionAI(pCreature);
-    }
+    boss_ultraxion() : CreatureScript("boss_ultraxion") {}
 
     struct boss_ultraxionAI : public BossAI
     {
@@ -307,7 +301,7 @@ public:
             return true;
         }
 
-        void DoAction(const int32 action)
+        void DoAction(int32 action)
         {
             if (action == ACTION_TWILIGHT_ERUPTION)
             {
@@ -393,7 +387,7 @@ public:
                 Talk(SAY_KILL);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim() && !phase)
                 return;
@@ -588,13 +582,18 @@ public:
             instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_LAST_DEFENDER_OF_AZEROTH_WARRIOR);
         }
     };
+
+    CreatureAI* GetAI(Creature* pCreature) const
+    {
+        return GetDragonSoulAI<boss_ultraxionAI>(pCreature);
+    }
+
 };
 
 class npc_trall_vs_ultraxion : public CreatureScript
 {
 public:
-    npc_trall_vs_ultraxion() : CreatureScript("npc_trall_vs_ultraxion")
-    {}
+    npc_trall_vs_ultraxion() : CreatureScript("npc_trall_vs_ultraxion") { }
 
     bool OnGossipHello(Player* player, Creature* creature)
     {
@@ -645,8 +644,7 @@ public:
 class npc_nozdormu : public CreatureScript
 {
 public:
-    npc_nozdormu() : CreatureScript("npc_nozdormu")
-    {}
+    npc_nozdormu() : CreatureScript("npc_nozdormu") { }
 
     bool OnGossipHello(Player* player, Creature* creature)
     {
@@ -688,8 +686,7 @@ public:
 class npc_ysera : public CreatureScript
 {
 public:
-    npc_ysera() : CreatureScript("npc_ysera")
-    {}
+    npc_ysera() : CreatureScript("npc_ysera") { }
 
     bool OnGossipHello(Player* player, Creature* creature)
     {
@@ -731,8 +728,7 @@ public:
 class npc_alexstrasza : public CreatureScript
 {
 public:
-    npc_alexstrasza() : CreatureScript("npc_alexstrasza")
-    {}
+    npc_alexstrasza() : CreatureScript("npc_alexstrasza") { }
 
     bool OnGossipHello(Player* player, Creature* creature)
     {
@@ -774,8 +770,7 @@ public:
 class npc_aspect_of_magic : public CreatureScript
 {
 public:
-    npc_aspect_of_magic() : CreatureScript("npc_aspect_of_magic")
-    {}
+    npc_aspect_of_magic() : CreatureScript("npc_aspect_of_magic") { }
 
     bool OnGossipHello(Player* player, Creature* creature)
     {
@@ -817,8 +812,7 @@ public:
 class spell_ultraxion_twilight_instability : public SpellScriptLoader
 {
 public:
-    spell_ultraxion_twilight_instability() : SpellScriptLoader("spell_ultraxion_twilight_instability")
-    {}
+    spell_ultraxion_twilight_instability() : SpellScriptLoader("spell_ultraxion_twilight_instability") { }
 
     class spell_ultraxion_twilight_instability_SpellScript : public SpellScript
     {
@@ -968,8 +962,7 @@ public:
 class spell_ultraxion_fading_light : public SpellScriptLoader
 {
 public:
-    spell_ultraxion_fading_light() : SpellScriptLoader("spell_ultraxion_fading_light")
-    {}
+    spell_ultraxion_fading_light() : SpellScriptLoader("spell_ultraxion_fading_light") { }
 
     class spell_ultraxion_fading_light_AuraScript : public AuraScript
     {
@@ -1090,8 +1083,7 @@ public:
 class spell_ultraxion_last_defender_of_azeroth : public SpellScriptLoader
 {
 public:
-    spell_ultraxion_last_defender_of_azeroth() : SpellScriptLoader("spell_ultraxion_last_defender_of_azeroth")
-    {}
+    spell_ultraxion_last_defender_of_azeroth() : SpellScriptLoader("spell_ultraxion_last_defender_of_azeroth") { }
 
     class spell_ultraxion_last_defender_of_azeroth_SpellScript : public SpellScript
     {
@@ -1153,8 +1145,7 @@ public:
 class spell_ultraxion_last_defender_of_azeroth_dummy : public SpellScriptLoader
 {
 public:
-    spell_ultraxion_last_defender_of_azeroth_dummy() : SpellScriptLoader("spell_ultraxion_last_defender_of_azeroth_dummy")
-    {}
+    spell_ultraxion_last_defender_of_azeroth_dummy() : SpellScriptLoader("spell_ultraxion_last_defender_of_azeroth_dummy") { }
 
     class spell_ultraxion_last_defender_of_azeroth_dummy_SpellScript : public SpellScript
     {
@@ -1200,8 +1191,7 @@ public:
 class spell_ultraxion_heroic_will : public SpellScriptLoader
 {
 public:
-    spell_ultraxion_heroic_will() : SpellScriptLoader("spell_ultraxion_heroic_will")
-    {}
+    spell_ultraxion_heroic_will() : SpellScriptLoader("spell_ultraxion_heroic_will") { }
 
     class spell_ultraxion_heroic_will_AuraScript : public AuraScript
     {
@@ -1228,8 +1218,7 @@ public:
 class spell_ultraxion_time_loop : public SpellScriptLoader
 {
 public:
-    spell_ultraxion_time_loop() : SpellScriptLoader("spell_ultraxion_time_loop")
-    {}
+    spell_ultraxion_time_loop() : SpellScriptLoader("spell_ultraxion_time_loop") { }
 
     class spell_ultraxion_time_loop_AuraScript : public AuraScript
     {
@@ -1281,8 +1270,7 @@ typedef boss_ultraxion::boss_ultraxionAI UltraxionAI;
 class achievement_minutes_to_midnight : public AchievementCriteriaScript
 {
 public:
-    achievement_minutes_to_midnight() : AchievementCriteriaScript("achievement_minutes_to_midnight")
-    {}
+    achievement_minutes_to_midnight() : AchievementCriteriaScript("achievement_minutes_to_midnight") { }
 
     bool OnCheck(Player* source, Unit* target)
     {

@@ -1,8 +1,8 @@
 /*
  * Copyright (C) 2011-2015 ArkCORE <http://www.arkania.net/>
  *
- * This file is NOT free software. Third-party users can NOT redistribute 
- * it or modify it. If you find it, you are either hacking something, or very 
+ * This file is NOT free software. Third-party users can NOT redistribute
+ * it or modify it. If you find it, you are either hacking something, or very
  * lucky (presuming someone else managed to hack it).
  */
 
@@ -34,42 +34,42 @@ enum Events
 
 enum Spells
 {
-        // Unsleeping Spells
-        SPELL_COID_BOLT      = 104849,
-        SPELL_SEARING_BLOOD  = 105033,
-        SPELL_MANA_VOID      = 108223,
-        SPELL_MANA_DIFFUSION = 105539,
-        SPELL_PSYCHIC_SLICE  = 105671,
-        SPELL_DIGESTIVE_ACID = 105573,
+    // Unsleeping Spells
+    SPELL_COID_BOLT = 104849,
+    SPELL_SEARING_BLOOD = 105033,
+    SPELL_MANA_VOID = 108223,
+    SPELL_MANA_DIFFUSION = 105539,
+    SPELL_PSYCHIC_SLICE = 105671,
+    SPELL_DIGESTIVE_ACID = 105573,
 
-        // Blood spells
-        SPELL_FUSING_VAPORS           = 108235,  // should trigger spell 103968
-        SPELL_BLACK_BLOOD_OF_SHUMA    = 104894,
-        SPELL_COBALT_BLOOD_OF_SHUMA   = 105027,
-        SPELL_CRIMSON_BLOOD_OF_SHUMA  = 104897,
-        SPELL_GLOWING_BLOOD_OF_SHUMA  = 104901,
-        SPELL_ACIDIC_BLOOD_OF_SHUMA   = 104898,
-        SPELL_SHADOWED_BLOOD_OF_SHUMA = 104896,
+    // Blood spells
+    SPELL_FUSING_VAPORS = 108235,  // should trigger spell 103968
+    SPELL_BLACK_BLOOD_OF_SHUMA = 104894,
+    SPELL_COBALT_BLOOD_OF_SHUMA = 105027,
+    SPELL_CRIMSON_BLOOD_OF_SHUMA = 104897,
+    SPELL_GLOWING_BLOOD_OF_SHUMA = 104901,
+    SPELL_ACIDIC_BLOOD_OF_SHUMA = 104898,
+    SPELL_SHADOWED_BLOOD_OF_SHUMA = 104896,
 };
 
 Position const SummonPositions[6] =
 {
-    {-1808.229f, -3136.739f, -173.479f, 0.0f},
-    {-1722.599f, -3137.159f, -173.389f, 0.0f},
-    {-1662.959f, -2992.280f, -173.514f, 0.0f},
-    {-1863.989f, -2993.09f, -174.110f, 0.0f},
-    {-1723.76f, -2935.33f, -174.029f, 0.0f},
-    {-1663.89f, -3077.129f, -174.479f, 0.0f},
+    { -1808.229f, -3136.739f, -173.479f, 0.0f },
+    { -1722.599f, -3137.159f, -173.389f, 0.0f },
+    { -1662.959f, -2992.280f, -173.514f, 0.0f },
+    { -1863.989f, -2993.09f, -174.110f, 0.0f },
+    { -1723.76f, -2935.33f, -174.029f, 0.0f },
+    { -1663.89f, -3077.129f, -174.479f, 0.0f },
 };
 
 Position const SummonMvPositions[6] =
 {
-    {-1796.594f, -3024.409f, -182.306f, 0.0f},
-    {-1783.245f, -3059.68f, -182.314f, 0.0f},
-    {-1755.26f, -3064.184f, -182.333f, 0.0f},
-    {-1734.958f, -3035.269f, -182.309f, 0.0f},
-    {-1750.737f, -3007.436f, -182.33f, 0.0f},
-    {-1776.138f, -3006.868f, -182.352f, 0.0f},
+    { -1796.594f, -3024.409f, -182.306f, 0.0f },
+    { -1783.245f, -3059.68f, -182.314f, 0.0f },
+    { -1755.26f, -3064.184f, -182.333f, 0.0f },
+    { -1734.958f, -3035.269f, -182.309f, 0.0f },
+    { -1750.737f, -3007.436f, -182.33f, 0.0f },
+    { -1776.138f, -3006.868f, -182.352f, 0.0f },
 };
 
 Position const forgotten[3] =
@@ -95,23 +95,23 @@ Position const forgotten3[3] =
 
 enum Npc
 {
-    NPC_BLACK_BLOOD    = 55867,
-    NPC_COBLAT_BLOOD   = 55866,
-    NPC_CRIMSON_BLOOD  = 55865,
-    NPC_GLOWING_BLOOD  = 55864,
-    NPC_ACIDIC_BLOOD   = 55862,
+    NPC_BLACK_BLOOD = 55867,
+    NPC_COBLAT_BLOOD = 55866,
+    NPC_CRIMSON_BLOOD = 55865,
+    NPC_GLOWING_BLOOD = 55864,
+    NPC_ACIDIC_BLOOD = 55862,
     NPC_SHADOWED_BLOOD = 55863,
-    NPC_MANA_VOID      = 56231,
-    NPC_FORGOTTEN_ONE  = 56265,
+    NPC_MANA_VOID = 56231,
+    NPC_FORGOTTEN_ONE = 56265,
 };
 
 enum Says
 {
-        YELL             = 0,
-        WHISPER_DEATH    = 1,
-        WHISPER_KILL_ALL = 2,
-        WHISPER_KILL     = 3,
-        WHISPER_AGGRO    = 4
+    YELL = 0,
+    WHISPER_DEATH = 1,
+    WHISPER_KILL_ALL = 2,
+    WHISPER_KILL = 3,
+    WHISPER_AGGRO = 4
 };
 
 class boss_unsleeping : public CreatureScript
@@ -119,12 +119,7 @@ class boss_unsleeping : public CreatureScript
 public:
     boss_unsleeping() : CreatureScript("boss_unsleeping") { }
 
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return GetDragonSoulAI<boss_unsleepingAI>(creature);
-    }
-
-    struct boss_unsleepingAI: public BossAI
+    struct boss_unsleepingAI : public BossAI
     {
         boss_unsleepingAI(Creature* creature) : BossAI(creature, BOSS_UNSLEEPING)
         {
@@ -284,10 +279,10 @@ public:
             Talk(WHISPER_KILL_ALL);
         }
 
-       void KilledUnit(Unit* /*victim*/)
-       {
+        void KilledUnit(Unit* /*victim*/)
+        {
             Talk(WHISPER_KILL);
-       }
+        }
 
         void JustDied(Unit* /*killer*/)
         {
@@ -303,17 +298,17 @@ public:
 
         }
     };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return GetDragonSoulAI<boss_unsleepingAI>(creature);
+    }
 };
 
 class npc_blood : public CreatureScript
 {
-    public:
-        npc_blood() : CreatureScript("npc_blood") { }
-
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return GetDragonSoulAI<npc_bloodAI>(creature);
-    }
+public:
+    npc_blood() : CreatureScript("npc_blood") { }
 
     struct npc_bloodAI : public ScriptedAI
     {
@@ -405,98 +400,103 @@ class npc_blood : public CreatureScript
             instance->SetData(DATA_BLOOD, FAIL);
         }
     };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return GetDragonSoulAI<npc_bloodAI>(creature);
+    }
 };
 
 class npc_mana_void : public CreatureScript
 {
-    public:
-        npc_mana_void() : CreatureScript("npc_mana_void") { }
+public:
+    npc_mana_void() : CreatureScript("npc_mana_void") { }
 
-                CreatureAI* GetAI(Creature* creature) const
-                {
-                    return GetDragonSoulAI<npc_mana_voidAI>(creature);
-                }
+    struct npc_mana_voidAI : public ScriptedAI
+    {
+        npc_mana_voidAI(Creature* creature) : ScriptedAI(creature)
+        {
+            instance = creature->GetInstanceScript();
+        }
 
-                struct npc_mana_voidAI : public ScriptedAI
-                {
-                    npc_mana_voidAI(Creature* creature) : ScriptedAI(creature)
-                    {
-                        instance = creature->GetInstanceScript();
-                    }
+        InstanceScript* instance;
+        EventMap events;
 
-                        InstanceScript* instance;
-                        EventMap events;
+        void Reset()
+        {
+            me->SetInCombatWithZone();
+            me->AddAura(SPELL_MANA_VOID, me);
+            events.Reset();
+        }
 
-                        void Reset()
-                        {
-                            me->SetInCombatWithZone();
-                            me->AddAura(SPELL_MANA_VOID, me);
-                            events.Reset();
-                        }
+        void JustDied(Unit* /*killer*/)
+        {
+            DoCast(me, SPELL_MANA_DIFFUSION, true);
+            me->DespawnOrUnsummon(5000);
+        }
+    };
 
-                        void JustDied(Unit* /*killer*/)
-                        {
-                            DoCast(me, SPELL_MANA_DIFFUSION, true);
-                            me->DespawnOrUnsummon(5000);
-                        }
-                };
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return GetDragonSoulAI<npc_mana_voidAI>(creature);
+    }
 };
 
 class npc_forgotten_one : public CreatureScript
 {
-    public:
-        npc_forgotten_one() : CreatureScript("npc_forgotten_one") { }
+public:
+    npc_forgotten_one() : CreatureScript("npc_forgotten_one") { }
 
-                CreatureAI* GetAI(Creature* creature) const
-                {
-                    return GetDragonSoulAI<npc_forgotten_oneAI>(creature);
-                }
+    struct npc_forgotten_oneAI : public ScriptedAI
+    {
+        npc_forgotten_oneAI(Creature* creature) : ScriptedAI(creature)
+        {
+            instance = creature->GetInstanceScript();
+        }
 
-                struct npc_forgotten_oneAI : public ScriptedAI
-                {
-                    npc_forgotten_oneAI(Creature* creature) : ScriptedAI(creature)
-                    {
-                        instance = creature->GetInstanceScript();
-                    }
+        InstanceScript* instance;
+        EventMap events;
 
-                        InstanceScript* instance;
-                        EventMap events;
+        void Reset()
+        {
+            events.Reset();
+            me->SetInCombatWithZone();
+        }
 
-                        void Reset()
-                        {
-                            events.Reset();
-                            me->SetInCombatWithZone();
-                        }
+        void EnterCombat(Unit* /*who*/)
+        {
+            events.ScheduleEvent(EVENT_PSYCHIC_SLICE, urand(5000, 15000));
+        }
 
-                        void EnterCombat(Unit* /*who*/)
-                       {
-                        events.ScheduleEvent(EVENT_PSYCHIC_SLICE, urand(5000,15000));
-            }
+        void UpdateAI(uint32 diff)
+        {
+            if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
+                return;
 
-               void UpdateAI(uint32 diff)
+            events.Update(diff);
+
+            while (uint32 eventId = events.ExecuteEvent())
             {
-                if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
-                    return;
+                switch (eventId)
+                {
+                case EVENT_PSYCHIC_SLICE:
+                    DoCastVictim(SPELL_PSYCHIC_SLICE);
+                    events.ScheduleEvent(EVENT_PSYCHIC_SLICE, urand(5000, 30000));
+                    break;
+                }
+            }
+        }
 
-                    events.Update(diff);
+        void JustDied(Unit* /*killer*/)
+        {
+            me->DespawnOrUnsummon(5000);
+        }
+    };
 
-                     while (uint32 eventId = events.ExecuteEvent())
-                     {
-                      switch (eventId)
-                      {
-                          case EVENT_PSYCHIC_SLICE:
-                          DoCastVictim(SPELL_PSYCHIC_SLICE);
-                          events.ScheduleEvent(EVENT_PSYCHIC_SLICE, urand(5000,30000));
-                          break;
-                          }
-                      }
-                 }
-
-               void JustDied(Unit* /*killer*/)
-               {
-                me->DespawnOrUnsummon(5000);
-           }
-      };
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return GetDragonSoulAI<npc_forgotten_oneAI>(creature);
+    }
 };
 
 void AddSC_boss_unsleeping()

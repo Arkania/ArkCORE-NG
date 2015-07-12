@@ -1,8 +1,8 @@
 /*
  * Copyright (C) 2011-2015 ArkCORE <http://www.arkania.net/>
  *
- * This file is NOT free software. Third-party users can NOT redistribute 
- * it or modify it. If you find it, you are either hacking something, or very 
+ * This file is NOT free software. Third-party users can NOT redistribute
+ * it or modify it. If you find it, you are either hacking something, or very
  * lucky (presuming someone else managed to hack it).
  */
 /* ScriptData
@@ -143,11 +143,6 @@ class boss_warlord : public CreatureScript
 public:
     boss_warlord() : CreatureScript("boss_warlord") { }
 
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new boss_warlordAI(creature);
-    }
-
     struct boss_warlordAI : public BossAI
     {
         boss_warlordAI(Creature* creature) : BossAI(creature, BOSS_WARLORD)
@@ -198,7 +193,7 @@ public:
             _EnterEvadeMode();
         }
 
-        void UpdateAI(uint32 const diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                 return;
@@ -309,17 +304,17 @@ public:
     private:
         std::list<Unit *> playerList;
     };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return GetDragonSoulAI<boss_warlordAI>(creature); // GetInstanceAI
+    }
 };
 
 class npc_sphere : public CreatureScript
 {
 public:
     npc_sphere() : CreatureScript("npc_sphere") { }
-
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new npc_sphereAI(creature);
-    }
 
     struct npc_sphereAI : public ScriptedAI
     {
@@ -349,7 +344,7 @@ public:
             me->AddAura(AURA_DIFFUSION, me);
         }
 
-        void UpdateAI(uint32 const diff)
+        void UpdateAI(uint32 diff)
         {
             events.Update(diff);
 
@@ -419,6 +414,11 @@ public:
             me->DespawnOrUnsummon(1);
         }
     };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return GetDragonSoulAI<npc_sphereAI>(creature);
+    }
 };
 
 enum EyeSpells
@@ -430,11 +430,6 @@ class npc_eye_of_gorath : public CreatureScript
 {
 public:
     npc_eye_of_gorath() : CreatureScript("npc_eye_of_gorath") { }
-
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new npc_eye_of_gorathAI(creature);
-    }
 
     struct npc_eye_of_gorathAI : public ScriptedAI
     {
@@ -451,7 +446,7 @@ public:
             events.ScheduleEvent(EVENT_SHADOW_GAZE, 1000);
         }
 
-        void UpdateAI(uint32 const diff)
+        void UpdateAI(uint32 diff)
         {
             events.Update(diff);
 
@@ -468,6 +463,11 @@ public:
             }
         }
     };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return GetDragonSoulAI<npc_eye_of_gorathAI>(creature);
+    }
 };
 
 enum EyeSSpells
@@ -479,11 +479,6 @@ class npc_eye_of_gorath_s : public CreatureScript
 {
 public:
     npc_eye_of_gorath_s() : CreatureScript("npc_eye_of_gorath_s") { }
-
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new npc_eye_of_gorath_sAI(creature);
-    }
 
     struct npc_eye_of_gorath_sAI : public ScriptedAI
     {
@@ -504,7 +499,7 @@ public:
             events.ScheduleEvent(EVENT_SHADOW_GAZE, 1000);
         }
 
-        void UpdateAI(uint32 const diff)
+        void UpdateAI(uint32 diff)
         {
             events.Update(diff);
 
@@ -521,6 +516,11 @@ public:
             }
         }
     };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return GetDragonSoulAI<npc_eye_of_gorath_sAI>(creature);
+    }
 };
 
 enum ScourgeSpells
@@ -533,11 +533,6 @@ class npc_scourge_of_gorath : public CreatureScript
 {
 public:
     npc_scourge_of_gorath() : CreatureScript("npc_scourge_of_gorath") { }
-
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new npc_scourge_of_gorathAI(creature);
-    }
 
     struct npc_scourge_of_gorathAI : public ScriptedAI
     {
@@ -559,7 +554,7 @@ public:
             events.ScheduleEvent(EVENT_WILD_FLAIL, urand(1500, 15000));
         }
 
-        void UpdateAI(uint32 const diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -583,6 +578,11 @@ public:
             }
         }
     };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return GetDragonSoulAI<npc_scourge_of_gorathAI>(creature);
+    }
 };
 
 enum ScourheSSpells
@@ -595,11 +595,6 @@ class npc_scourge_of_gorath_s : public CreatureScript
 {
 public:
     npc_scourge_of_gorath_s() : CreatureScript("npc_scourge_of_gorath_s") { }
-
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new npc_scourge_of_gorath_sAI(creature);
-    }
 
     struct npc_scourge_of_gorath_sAI : public ScriptedAI
     {
@@ -632,7 +627,7 @@ public:
             events.ScheduleEvent(EVENT_WILD_FLAIL, urand(1500, 15000));
         }
 
-        void UpdateAI(uint32 const diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -656,6 +651,11 @@ public:
             }
         }
     };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return GetDragonSoulAI<npc_scourge_of_gorath_sAI>(creature);
+    }
 };
 
 enum ClawSpells
@@ -668,11 +668,6 @@ class npc_claw_of_gorath : public CreatureScript
 {
 public:
     npc_claw_of_gorath() : CreatureScript("npc_claw_of_gorath") { }
-
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new npc_claw_of_gorathAI(creature);
-    }
 
     struct npc_claw_of_gorathAI : public ScriptedAI
     {
@@ -712,7 +707,7 @@ public:
                 tv->ExitVehicle();
         }
 
-        void UpdateAI(uint32 const diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -762,6 +757,11 @@ public:
             }
         }
     };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return GetDragonSoulAI<npc_claw_of_gorathAI>(creature);
+    }
 };
 
 enum ClawSSpells
@@ -773,11 +773,6 @@ class npc_claw_of_gorath_s : public CreatureScript
 {
 public:
     npc_claw_of_gorath_s() : CreatureScript("npc_claw_of_gorath_s") { }
-
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new npc_claw_of_gorath_sAI(creature);
-    }
 
     struct npc_claw_of_gorath_sAI : public ScriptedAI
     {
@@ -804,7 +799,7 @@ public:
             events.ScheduleEvent(EVENT_OOZE_SPIT, 5000);
         }
 
-        void UpdateAI(uint32 const diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -824,6 +819,11 @@ public:
             }
         }
     };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return GetDragonSoulAI<npc_claw_of_gorath_sAI>(creature);
+    }
 };
 
 void AddSC_boss_warlord()
