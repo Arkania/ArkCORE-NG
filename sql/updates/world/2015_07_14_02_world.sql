@@ -52,7 +52,7 @@ update creature_text set BroadcastTextID=21736 where entry=22949 and groupid=5 a
 update creature_text set BroadcastTextID=18725 where entry=19220 and groupid=3 and id=0;
 update creature_text set BroadcastTextID=20042 where entry=19220 and groupid=4 and id=0;
 
-update creature_text set sound=0 where entry=19220 and grouzpid=1 and id=1;
+update creature_text set sound=0 where entry=19220 and groupid=1 and id=1;
 
 
 
