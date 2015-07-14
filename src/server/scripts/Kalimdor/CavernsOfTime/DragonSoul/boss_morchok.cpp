@@ -220,6 +220,7 @@ Position const BlackBloodPositions[105] =
     { -1994.12f, -2374.01f, 67.2098f, 0.0f }
 };
 
+// 55265
 class boss_morchok : public CreatureScript
 {
 public:
@@ -965,11 +966,6 @@ class boss_morchok2 : public CreatureScript
 public:
     boss_morchok2() : CreatureScript("boss_morchok2") { }
 
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return GetDragonSoulAI<boss_morchokAI>(creature);
-    }
-
     struct boss_morchokAI : public BossAI
     {
         boss_morchokAI(Creature* creature) : BossAI(creature, BOSS_MORCHOK)
@@ -1083,17 +1079,17 @@ public:
             _JustDied();
         }
     };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return GetDragonSoulAI<boss_morchokAI>(creature);
+    }
 };
 
 class npc_kohcrom2 : public CreatureScript
 {
 public:
     npc_kohcrom2() : CreatureScript("npc_kohcrom2") { }
-
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return GetDragonSoulAI<npc_kohcromAI>(creature);
-    }
 
     struct npc_kohcromAI : public ScriptedAI
     {
@@ -1161,10 +1157,16 @@ public:
             DoMeleeAttackIfReady();
         }
     };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return GetDragonSoulAI<npc_kohcromAI>(creature);
+    }
 };
 
 void AddSC_boss_morchok()
 {
+    printf("AddSC_boss_morchok \n");
     new boss_morchok();
     new npc_kohcrom();
     new npc_resonating_crystal();

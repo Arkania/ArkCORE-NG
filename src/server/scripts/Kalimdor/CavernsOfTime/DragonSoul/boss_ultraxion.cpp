@@ -161,6 +161,7 @@ enum Actions
     ACTION_TWILIGHT_ERUPTION = 1,
 };
 
+// 55294  (spawned from script 56259)
 class boss_ultraxion : public CreatureScript
 {
 public:

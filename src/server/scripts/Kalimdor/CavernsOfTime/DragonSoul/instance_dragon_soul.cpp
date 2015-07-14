@@ -29,6 +29,7 @@ public:
     {
         instance_dragon_soul_InstanceMapScript(InstanceMap* map) : InstanceScript(map)
         {
+            Initialize();
         }
         // Creatures
         uint64 MorchokGUID;

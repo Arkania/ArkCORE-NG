@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2015 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -22,141 +22,141 @@
 
 DoorData const doorData[] =
 {
-    { GO_ARGALOTH_DOOR,  DATA_ARGALOTH, DOOR_TYPE_ROOM, BOUNDARY_NONE },
-    { GO_OCCUTHAR_DOOR,  DATA_OCCUTHAR, DOOR_TYPE_ROOM, BOUNDARY_NONE },
-    { GO_ALIZABAL_DOOR,  DATA_ALIZABAL, DOOR_TYPE_ROOM, BOUNDARY_NONE },
-    { 0,                 0,             DOOR_TYPE_ROOM, BOUNDARY_NONE }  // END
+    { GO_ARGALOTH_DOOR, DATA_ARGALOTH, DOOR_TYPE_ROOM, BOUNDARY_NONE },
+    { GO_OCCUTHAR_DOOR, DATA_OCCUTHAR, DOOR_TYPE_ROOM, BOUNDARY_NONE },
+    { GO_ALIZABAL_DOOR, DATA_ALIZABAL, DOOR_TYPE_ROOM, BOUNDARY_NONE },
+    { 0, 0, DOOR_TYPE_ROOM, BOUNDARY_NONE }  // END
 };
 
-class instance_baradin_hold: public InstanceMapScript
+class instance_baradin_hold : public InstanceMapScript
 {
-    public:
-        instance_baradin_hold() : InstanceMapScript(BHScriptName, 757) { }
+public:
+    instance_baradin_hold() : InstanceMapScript(BHScriptName, 757) { }
 
-        struct instance_baradin_hold_InstanceMapScript: public InstanceScript
+    struct instance_baradin_hold_InstanceMapScript : public InstanceScript
+    {
+        instance_baradin_hold_InstanceMapScript(InstanceMap* map) : InstanceScript(map)
         {
-            instance_baradin_hold_InstanceMapScript(InstanceMap* map) : InstanceScript(map)
-            {
-                SetBossNumber(EncounterCount);
-                LoadDoorData(doorData);
+            SetBossNumber(EncounterCount);
+            LoadDoorData(doorData);
 
-                ArgalothGUID = 0;
-                OccutharGUID = 0;
-                AlizabalGUID = 0;
-            }
-
-            void OnCreatureCreate(Creature* creature) OVERRIDE
-            {
-                switch(creature->GetEntry())
-                {
-                    case BOSS_ARGALOTH:
-                        ArgalothGUID = creature->GetGUID();
-                        break;
-                    case BOSS_OCCUTHAR:
-                        OccutharGUID = creature->GetGUID();
-                        break;
-                    case BOSS_ALIZABAL:
-                        AlizabalGUID = creature->GetGUID();
-                        break;
-                }
-            }
-
-            void OnGameObjectCreate(GameObject* go) OVERRIDE
-            {
-                switch(go->GetEntry())
-                {
-                    case GO_ARGALOTH_DOOR:
-                    case GO_OCCUTHAR_DOOR:
-                    case GO_ALIZABAL_DOOR:
-                        AddDoor(go, true);
-                        break;
-                }
-            }
-
-            uint64 GetData64(uint32 data) const OVERRIDE
-            {
-                switch (data)
-                {
-                    case DATA_ARGALOTH:
-                        return ArgalothGUID;
-                    case DATA_OCCUTHAR:
-                        return OccutharGUID;
-                    case DATA_ALIZABAL:
-                        return AlizabalGUID;
-                    default:
-                        break;
-                }
-
-                return 0;
-            }
-
-            void OnGameObjectRemove(GameObject* go) OVERRIDE
-            {
-                switch(go->GetEntry())
-                {
-                    case GO_ARGALOTH_DOOR:
-                    case GO_OCCUTHAR_DOOR:
-                    case GO_ALIZABAL_DOOR:
-                        AddDoor(go, false);
-                        break;
-                }
-            }
-
-            std::string GetSaveData() OVERRIDE
-            {
-                OUT_SAVE_INST_DATA;
-
-                std::ostringstream saveStream;
-                saveStream << "B H " << GetBossSaveData();
-
-                OUT_SAVE_INST_DATA_COMPLETE;
-                return saveStream.str();
-            }
-
-            void Load(const char* in) OVERRIDE
-            {
-                if (!in)
-                {
-                    OUT_LOAD_INST_DATA_FAIL;
-                    return;
-                }
-
-                OUT_LOAD_INST_DATA(in);
-
-                char dataHead1, dataHead2;
-
-                std::istringstream loadStream(in);
-                loadStream >> dataHead1 >> dataHead2;
-
-                if (dataHead1 == 'B' && dataHead2 == 'H')
-                {
-                    for (uint8 i = 0; i < EncounterCount; ++i)
-                    {
-                        uint32 tmpState;
-                        loadStream >> tmpState;
-                        if (tmpState == IN_PROGRESS || tmpState > SPECIAL)
-                            tmpState = NOT_STARTED;
-
-                        SetBossState(i, EncounterState(tmpState));
-                    }
-
-                }
-                else
-                    OUT_LOAD_INST_DATA_FAIL;
-
-                OUT_LOAD_INST_DATA_COMPLETE;
-            }
-
-        protected:
-            uint64 ArgalothGUID;
-            uint64 OccutharGUID;
-            uint64 AlizabalGUID;
-        };
-
-        InstanceScript* GetInstanceScript(InstanceMap* map) const
-        {
-            return new instance_baradin_hold_InstanceMapScript(map);
+            ArgalothGUID = 0;
+            OccutharGUID = 0;
+            AlizabalGUID = 0;
         }
+
+        void OnCreatureCreate(Creature* creature) OVERRIDE
+        {
+            switch (creature->GetEntry())
+            {
+            case BOSS_ARGALOTH:
+                ArgalothGUID = creature->GetGUID();
+                break;
+            case BOSS_OCCUTHAR:
+                OccutharGUID = creature->GetGUID();
+                break;
+            case BOSS_ALIZABAL:
+                AlizabalGUID = creature->GetGUID();
+                break;
+            }
+        }
+
+        void OnGameObjectCreate(GameObject* go) OVERRIDE
+        {
+            switch (go->GetEntry())
+            {
+            case GO_ARGALOTH_DOOR:
+            case GO_OCCUTHAR_DOOR:
+            case GO_ALIZABAL_DOOR:
+                AddDoor(go, true);
+                break;
+            }
+        }
+
+        uint64 GetData64(uint32 data) const OVERRIDE
+        {
+            switch (data)
+            {
+            case DATA_ARGALOTH:
+                return ArgalothGUID;
+            case DATA_OCCUTHAR:
+                return OccutharGUID;
+            case DATA_ALIZABAL:
+                return AlizabalGUID;
+            default:
+                break;
+            }
+
+            return 0;
+        }
+
+        void OnGameObjectRemove(GameObject* go) OVERRIDE
+        {
+            switch (go->GetEntry())
+            {
+            case GO_ARGALOTH_DOOR:
+            case GO_OCCUTHAR_DOOR:
+            case GO_ALIZABAL_DOOR:
+                AddDoor(go, false);
+                break;
+            }
+        }
+
+        std::string GetSaveData() OVERRIDE
+        {
+            OUT_SAVE_INST_DATA;
+
+            std::ostringstream saveStream;
+            saveStream << "B H " << GetBossSaveData();
+
+            OUT_SAVE_INST_DATA_COMPLETE;
+            return saveStream.str();
+        }
+
+        void Load(const char* in) OVERRIDE
+        {
+            if (!in)
+            {
+                OUT_LOAD_INST_DATA_FAIL;
+                return;
+            }
+
+            OUT_LOAD_INST_DATA(in);
+
+            char dataHead1, dataHead2;
+
+            std::istringstream loadStream(in);
+            loadStream >> dataHead1 >> dataHead2;
+
+            if (dataHead1 == 'B' && dataHead2 == 'H')
+            {
+                for (uint8 i = 0; i < EncounterCount; ++i)
+                {
+                    uint32 tmpState;
+                    loadStream >> tmpState;
+                    if (tmpState == IN_PROGRESS || tmpState > SPECIAL)
+                        tmpState = NOT_STARTED;
+
+                    SetBossState(i, EncounterState(tmpState));
+                }
+
+            }
+            else
+                OUT_LOAD_INST_DATA_FAIL;
+
+            OUT_LOAD_INST_DATA_COMPLETE;
+        }
+
+    protected:
+        uint64 ArgalothGUID;
+        uint64 OccutharGUID;
+        uint64 AlizabalGUID;
+    };
+
+    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    {
+        return new instance_baradin_hold_InstanceMapScript(map);
+    }
 };
 
 void AddSC_instance_baradin_hold()
