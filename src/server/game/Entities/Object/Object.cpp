@@ -1487,6 +1487,11 @@ bool WorldObject::IsWithinDist2d(const Position* pos, float dist) const
     return IsInDist2d(pos, dist + GetObjectSize());
 }
 
+bool WorldObject::IsWithinDist2d(const Position pos, float dist) const
+{
+    return IsInDist2d(&pos, dist + GetObjectSize());
+}
+
 bool WorldObject::IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D /*= true*/) const
 {
     return obj && _IsWithinDist(obj, dist2compare, is3D);
