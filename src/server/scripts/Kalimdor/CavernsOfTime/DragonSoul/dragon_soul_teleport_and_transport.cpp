@@ -158,7 +158,6 @@ public:
 
 };
 
-
 class npc_dream_warden_57475 : public CreatureScript
 {
 public:
