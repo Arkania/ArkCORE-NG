@@ -1166,7 +1166,6 @@ public:
 
 void AddSC_boss_morchok()
 {
-    printf("AddSC_boss_morchok \n");
     new boss_morchok();
     new npc_kohcrom();
     new npc_resonating_crystal();
