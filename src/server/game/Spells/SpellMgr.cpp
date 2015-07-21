@@ -4193,6 +4193,9 @@ void SpellMgr::LoadSpellInfoCorrections()
             case 50526: // Wandering Plague
                 spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_DONE_BONUS;
                 break;
+            case 15290: // Vampiric Embrace
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_INITIAL_AGGRO;
+                break;
             case 12721: // Deep Wounds shouldnt ignore resillience or damage taken auras because its damage is not based off a spell.
                 spellInfo->AttributesEx4 = 0;
                 break;
