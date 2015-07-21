@@ -445,6 +445,61 @@ class spell_winter_veil_px_238_winter_wondervolt : public SpellScriptLoader
         }
 };
 
+enum TorchSpells
+{
+    SPELL_TORCH_TOSSING_TRAINING = 45716,
+    SPELL_TORCH_TOSSING_PRACTICE = 46630,
+    SPELL_TORCH_TOSSING_TRAINING_SUCCESS_ALLIANCE = 45719,
+    SPELL_TORCH_TOSSING_TRAINING_SUCCESS_HORDE = 46651,
+    SPELL_BRAZIERS_HIT = 45724
+};
+
+// 45724 - Braziers Hit!
+class spell_midsummer_braziers_hit : public SpellScriptLoader
+{
+public:
+    spell_midsummer_braziers_hit() : SpellScriptLoader("spell_midsummer_braziers_hit") { }
+
+    class spell_midsummer_braziers_hit_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_midsummer_braziers_hit_AuraScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            if (!sSpellMgr->GetSpellInfo(SPELL_TORCH_TOSSING_TRAINING) || !sSpellMgr->GetSpellInfo(SPELL_TORCH_TOSSING_PRACTICE))
+                return false;
+            return true;
+        }
+
+        void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            Player* player = GetTarget()->ToPlayer();
+            if (!player)
+                return;
+
+            if ((player->HasAura(SPELL_TORCH_TOSSING_TRAINING) && GetStackAmount() == 8) || (player->HasAura(SPELL_TORCH_TOSSING_PRACTICE) && GetStackAmount() == 20))
+            {
+                if (player->GetTeam() == ALLIANCE)
+                    player->CastSpell(player, SPELL_TORCH_TOSSING_TRAINING_SUCCESS_ALLIANCE, true);
+                else if (player->GetTeam() == HORDE)
+                    player->CastSpell(player, SPELL_TORCH_TOSSING_TRAINING_SUCCESS_HORDE, true);
+                Remove();
+            }
+        }
+
+        void Register() override
+        {
+            AfterEffectApply += AuraEffectApplyFn(spell_midsummer_braziers_hit_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AuraEffectHandleModes(AURA_EFFECT_HANDLE_REAPPLY));
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_midsummer_braziers_hit_AuraScript();
+    }
+};
+
+
 void AddSC_holiday_spell_scripts()
 {
     // Love is in the Air
@@ -462,4 +517,6 @@ void AddSC_holiday_spell_scripts()
     // Winter Veil
     new spell_winter_veil_mistletoe();
     new spell_winter_veil_px_238_winter_wondervolt();
+    // Midsummer Fire Festival
+    new spell_midsummer_braziers_hit();
 }
