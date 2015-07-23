@@ -33,6 +33,7 @@ EndContentData */
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
 #include "Player.h"
+#include "Vehicle.h"
 
 enum zone_coldridge_valley
 {
@@ -609,6 +610,7 @@ public:
 
 enum eQuest24491
 {
+    QUEST_A_TRIP_TO_IRONFORGE = 24490,
     QUEST_FOLLOW_THAT_GYRO_COPTER = 24491,
 
     NPC_HANDS_SPRINGSPROCKET = 6782,
@@ -616,6 +618,7 @@ enum eQuest24491
     SPELL_SEE_COLDRIGE_TUNNEL_ROCKS_SEE_QUEST_INVIS_1 = 70042,
     SPELL_SEE_MILO_GEARTWINGE_SEE_QUEST_INVIS_2 = 70044,
     SPELL_MILO_GEARTWINGE_INVISIBILITY_QUEST_INVIS_2 = 70045,
+    SPELL_A_TRIP_TO_IRONFORGE_QUEST_COMLETE = 70046,
 };
 
 class npc_hands_springsprocket : public CreatureScript
@@ -623,12 +626,19 @@ class npc_hands_springsprocket : public CreatureScript
 public:
     npc_hands_springsprocket() : CreatureScript("npc_hands_springsprocket") { }
 
+    bool OnQuestReward(Player* player, Creature* /*creature*/, Quest const* quest, uint32 /*opt*/) 
+    { 
+        if (quest->GetQuestId() == QUEST_A_TRIP_TO_IRONFORGE)
+            player->CastSpell(player, SPELL_A_TRIP_TO_IRONFORGE_QUEST_COMLETE, true);
+        
+        return false; 
+    }
+
     bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
     {
         if (quest->GetQuestId() == QUEST_FOLLOW_THAT_GYRO_COPTER)
             if (!player->HasAura(SPELL_SEE_MILO_GEARTWINGE_SEE_QUEST_INVIS_2))
             {
-                player->CastSpell(player, SPELL_SEE_COLDRIGE_TUNNEL_ROCKS_SEE_QUEST_INVIS_1, true);
                 player->CastSpell(player, SPELL_SEE_MILO_GEARTWINGE_SEE_QUEST_INVIS_2, true);
             }
 
@@ -652,53 +662,46 @@ enum eQuest24492
     SPELL_RIDING_MILOS_GYRO = 70036,
 };
 
+// 37198 npc_milos_gyro_spawned
 class npc_milos_gyro_spawned : public CreatureScript
 {
 public:
     npc_milos_gyro_spawned() : CreatureScript("npc_milos_gyro_spawned") { }
 
-    struct npc_milos_gyro_spawnedAI : public npc_escortAI
+    struct npc_milos_gyro_spawnedAI : public VehicleAI
     {
-        npc_milos_gyro_spawnedAI(Creature* creature) : npc_escortAI(creature)
-        {
-            AddWaypoint(1, -6220.035645f, 296.816772f, 409.775787f);
-            AddWaypoint(2, -6180.738281f, 271.849091f, 435.231506f);
-            AddWaypoint(3, -6167.073730f, 213.735809f, 470.028137f);
-            AddWaypoint(4, -6134.929688f, 124.723755f, 507.195953f);
-            AddWaypoint(5, -6075.491699f, 73.982384f, 510.407410f);
-            AddWaypoint(6, -5984.715820f, -9.166074f, 470.231415f);
-            AddWaypoint(7, -5908.320313f, -225.218124f, 490.649323f);
-            AddWaypoint(8, -5727.785156f, -416.732208f, 466.876831f);
-            AddWaypoint(9, -5647.638672f, -482.040649f, 399.289917f);
-            AddWaypoint(10, -5629.615234f, -484.758545f, 396.980530f);
-            AddWaypoint(11, -5618.415527f, -484.724670f, 396.980530f);
-
-            SetDespawnAtEnd(true);
-            me->EnableAI();
-            _phase = 0;
-        }
+        npc_milos_gyro_spawnedAI(Creature* creature) : VehicleAI(creature) { }
 
         uint32 _phase;
+
+        void Reset()
+        {
+           _phase = 0;
+        }
 
         void PassengerBoarded(Unit* who, int8 seatId, bool apply)
         {
             if (!apply)
                 return;
 
-            if (seatId == 0)
+            if (_phase == 0  && seatId == 0 && apply)
             {
-                me->SetSpeed(MOVE_FLIGHT, 2.0f, true);
-                Start();
+                _phase = 1;
+                me->SendGravityDisable();
+                me->GetMotionMaster()->MovePath(3719801, false);
             }
         }
 
-        void WaypointReached(uint32 point)
+        void MovementInform(uint32 type, uint32 id) OVERRIDE
         {
-            _phase++;
-            switch (_phase)
+            if (type != WAYPOINT_MOTION_TYPE || _phase != 1)
+                return;
+
+            switch (id)
             {
             case 1:
                 Talk(0);
+                me->SetSpeed(MOVE_RUN, 3.0f, true);
                 break;
             case 3:
                 Talk(1);
@@ -718,12 +721,11 @@ public:
             case 8:
                 Talk(6);
                 break;
+            case 10:
+                _phase = 2;
+                me->ExitVehicle();
+                me->DespawnOrUnsummon(5000);
             }
-        }
-
-        void UpdateAI(uint32 diff)
-        {
-            npc_escortAI::UpdateAI(diff);
         }
     };
 
@@ -733,10 +735,6 @@ public:
     }
 
 };
-
-/*######
-## AddSC
-######*/
 
 void AddSC_coldridge_valley()
 {
