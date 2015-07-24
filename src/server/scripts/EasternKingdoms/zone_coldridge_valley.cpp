@@ -736,6 +736,64 @@ public:
 
 };
 
+// 40991 npc_mountaineer_dunstan
+class npc_mountaineer_dunstan : public CreatureScript
+{
+public:
+    npc_mountaineer_dunstan() : CreatureScript("npc_mountaineer_dunstan") { }
+
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 /*action*/) 
+    { 
+        if (player && player->GetQuestStatus(313) == QUEST_STATUS_INCOMPLETE)
+        {
+            creature->AI()->Talk(0);
+            player->KilledMonsterCredit(40991);
+            player->CLOSE_GOSSIP_MENU();
+        }
+
+        return false; 
+    }
+};
+
+// 40994 npc_mountaineer_lewin
+class npc_mountaineer_lewin : public CreatureScript
+{
+public:
+    npc_mountaineer_lewin() : CreatureScript("npc_mountaineer_lewin") { }
+
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 /*action*/)
+    {
+        if (player && player->GetQuestStatus(313) == QUEST_STATUS_INCOMPLETE)
+        {
+            creature->AI()->Talk(0);
+            player->KilledMonsterCredit(40994);
+            player->CLOSE_GOSSIP_MENU();
+        }
+
+        return false;
+    }
+};
+
+// 41056 npc_mountaineer_valgrum
+class npc_mountaineer_valgrum : public CreatureScript
+{
+public:
+    npc_mountaineer_valgrum() : CreatureScript("npc_mountaineer_valgrum") { }
+
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 /*action*/)
+    {
+        if (player && player->GetQuestStatus(313) == QUEST_STATUS_INCOMPLETE)
+        {
+            creature->AI()->Talk(0);
+            player->KilledMonsterCredit(41056);
+            player->CLOSE_GOSSIP_MENU();
+        }
+
+        return false;
+    }
+};
+
+
 void AddSC_coldridge_valley()
 {
     new npc_rockjaw_invader();
@@ -748,5 +806,8 @@ void AddSC_coldridge_valley()
     new npc_rockjaw_scavenger();
     new npc_hands_springsprocket();
     new npc_milos_gyro_spawned();
+    new npc_mountaineer_dunstan();
+    new npc_mountaineer_lewin();
+    new npc_mountaineer_valgrum();
 }
 

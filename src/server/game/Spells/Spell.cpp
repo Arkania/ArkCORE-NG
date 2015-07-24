@@ -2925,6 +2925,14 @@ void Spell::prepare(SpellCastTargets const* targets, AuraEffect const* triggered
             triggeredByAura->GetBase()->SetDuration(0);
         }
 
+        if (m_caster->GetTypeId() == TYPEID_PLAYER)  // imported from trinity
+        {
+            m_caster->ToPlayer()->RestoreSpellMods(this);
+            // cleanup after mod system
+            // triggered spell pointer can be not removed in some cases
+            m_caster->ToPlayer()->SetSpellModTakingSpell(this, false);
+        }
+
         SendCastResult(result);
 
         finish(false);
