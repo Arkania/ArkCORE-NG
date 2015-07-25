@@ -80,26 +80,6 @@ update creature_template set AIName="", ScriptName="npc_mountaineer_valgrum" whe
 
 update item_template set RequiredReputationFaction=72, RequiredReputationRank=6 where entry=67531;
 
-delete from item_script_names where Id=56009;
-insert into item_script_names values (56009, "item_rune_of_fire");
-
--- http://de.wowhead.com/quest=25792/vorwarts-drangen
-
--- http://de.wowhead.com/item=56009/rune-des-feuers
-
--- http://de.wowhead.com/npc=41202/totem-der-konstriktion
-
--- http://de.wowhead.com/spell=77314/totem-der-konstriktion-verbrennen
-
--- Effekt Dummy Serverseitiges Skript  
-
-
-
-
-
-
-
-
 
 
 

@@ -606,8 +606,7 @@ public:
     }
 };
 
-// ################################################ Quest: Follow that Gyro-Copter! 24491
-
+// Quest: Follow that Gyro-Copter! 24491
 enum eQuest24491
 {
     QUEST_A_TRIP_TO_IRONFORGE = 24490,
@@ -621,6 +620,7 @@ enum eQuest24491
     SPELL_A_TRIP_TO_IRONFORGE_QUEST_COMLETE = 70046,
 };
 
+// 6782 npc_hands_springsprocket
 class npc_hands_springsprocket : public CreatureScript
 {
 public:
@@ -646,9 +646,7 @@ public:
     }
 };
 
-
-// ################################################ Quest: Pack Your Bags 24492
-
+// QUEST_PACK_YOUR_BAGS
 enum eQuest24492
 {
     QUEST_PACK_YOUR_BAGS = 24492,
