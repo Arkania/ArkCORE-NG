@@ -329,7 +329,7 @@ public:
 
 enum EyeOfAcherus
 {
-    DISPLAYID_EYE_HUGE     = 26320,
+    DISPLAYID_EYE_HUGE = 26320,
     DISPLAYID_EYE_SMALL    = 25499,
 
     SPELL_EYE_PHASEMASK    = 70889,
@@ -337,105 +337,112 @@ enum EyeOfAcherus
     SPELL_EYE_FL_BOOST_RUN = 51923,
     SPELL_EYE_FL_BOOST_FLY = 51890,
     SPELL_EYE_CONTROL      = 51852,
-};
 
-enum Texts
-{
-    SAY_EYE_LAUNCHED      = 1,
+    SAY_EYE_MOVE_START = 0,
+    SAY_EYE_LAUNCHED = 1,
     SAY_EYE_UNDER_CONTROL = 2,
+    SAY_EYE_CONTROL = 3,
+
+    EVENT_MOVE_START = 1,
+
+    POINT_EYE_FALL = 1,
+    POINT_EYE_MOVE_END = 3
 };
 
-static Position Center[]=
-{
-    {2346.550049f, -5694.430176f, 426.029999f, 0.0f},
-};
+Position const EyeOFAcherusFallPoint = { 2361.21f, -5660.45f, 496.7444f, 0.0f };
 
 class npc_eye_of_acherus : public CreatureScript
 {
 public:
     npc_eye_of_acherus() : CreatureScript("npc_eye_of_acherus") { }
 
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new npc_eye_of_acherusAI(creature);
-    }
-
     struct npc_eye_of_acherusAI : public ScriptedAI
     {
         npc_eye_of_acherusAI(Creature* creature) : ScriptedAI(creature)
         {
-            Reset();
+            me->SetDisplayId(me->GetCreatureTemplate()->Modelid1);
+            if (Player* owner = me->GetCharmerOrOwner()->ToPlayer())
+                owner->SendAutoRepeatCancel(me);
+
+            me->SetReactState(REACT_PASSIVE);
+
+            me->GetMotionMaster()->MovePoint(POINT_EYE_FALL, EyeOFAcherusFallPoint, false);
+
+            Movement::MoveSplineInit init(me);
+            init.MoveTo(EyeOFAcherusFallPoint.GetPositionX(), EyeOFAcherusFallPoint.GetPositionY(), EyeOFAcherusFallPoint.GetPositionZ(), false);
+            init.SetFall();
+            init.Launch();
         }
 
-        uint32 startTimer;
-        bool IsActive;
+        void OnCharmed(bool /*apply*/) override { }
 
-        void Reset()
+        void UpdateAI(uint32 diff) override
         {
-            if (Unit* controller = me->GetCharmer())
-            me->SetLevel(controller->getLevel());
+            _events.Update(diff);
 
-            me->CastSpell(me, 51890, true);
-            me->SetDisplayId(26320);
-            Talk(SAY_EYE_LAUNCHED);
-            me->SetHomePosition(2363.970589f, -5659.861328f, 504.316833f, 0);
-            me->GetMotionMaster()->MoveCharge(1752.858276f, -5878.270996f, 145.136444f, 0); //position center
-            me->SetReactState(REACT_AGGRESSIVE);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_STUNNED);
-
-            IsActive = false;
-            startTimer = 2000;
-        }
-
-        void AttackStart(Unit *) {}
-        void MoveInLineOfSight(Unit *) {}
-
-        void JustDied(Unit* /*killer*/)
-        {
-            if (Unit* charmer = me->GetCharmer())
-               charmer->RemoveAurasDueToSpell(51852);
-        }
-
-        void UpdateAI(uint32 diff)
-        {
-            if (me->IsCharmed())
+            while (uint32 eventId = _events.ExecuteEvent())
             {
-                if (startTimer <= diff && !IsActive) // fly to start point
+                switch (eventId)
                 {
-                    me->CastSpell(me, 70889, true);
-                    me->CastSpell(me, 51892, true);
-                    me->CastSpell(me, 51890, true);
+                case EVENT_MOVE_START:
+                {
+                    DoCast(me, SPELL_EYE_FL_BOOST_RUN);
 
-                    me->CastSpell(me, 51923, true);
-                    me->SetSpeed(MOVE_FLIGHT, 3.4f, true);
-                    me->GetMotionMaster()->MovePoint(0, 1711.0f, -5820.0f, 147.0f);
-					IsActive = true;
-                    return;
+                    me->SetControlled(false, UNIT_STATE_ROOT);
+                    if (Player* owner = me->GetCharmerOrOwner()->ToPlayer())
+                    {
+                        for (uint8 i = 0; i < MAX_MOVE_TYPE; ++i)
+                            me->SetSpeed(UnitMoveType(i), owner->GetSpeedRate(UnitMoveType(i)), true);
+                        Talk(SAY_EYE_MOVE_START, owner);
+                        Talk(SAY_EYE_LAUNCHED, owner);
+                    }
+                    me->GetMotionMaster()->MovePath(me->GetEntry() * 100, false);
+                    break;
                 }
-                else
-                startTimer -= diff;
+                default:
+                    break;
+                }
             }
-            else
-            me->DespawnOrUnsummon();
         }
 
-        void MovementInform(uint32 type, uint32 pointId)
+        void MovementInform(uint32 movementType, uint32 pointId) override
         {
-            if (type != POINT_MOTION_TYPE || pointId != 0)
-               return;
+            if (movementType == WAYPOINT_MOTION_TYPE && pointId == POINT_EYE_MOVE_END - 1)
+            {
+                me->SetByteValue(UNIT_FIELD_BYTES_2, 0, SHEATH_STATE_MELEE);
+                me->RemoveAllAuras();
 
-            // The little green morph is not blizz-like for this npc...
-            me->SetDisplayId(25499);
+                if (Player* owner = me->GetCharmerOrOwner()->ToPlayer())
+                {
+                    owner->RemoveAura(SPELL_EYE_FL_BOOST_RUN);
+                    for (uint8 i = 0; i < MAX_MOVE_TYPE; ++i)
+                        me->SetSpeed(UnitMoveType(i), owner->GetSpeedRate(UnitMoveType(i)), true);
 
-            // for some reason it does not work when this spell is casted before the waypoint movement
-            me->CastSpell(me, 51892, true);
-            me->CastSpell(me, 51890, true);
-            Talk(SAY_EYE_UNDER_CONTROL);
+                    Talk(SAY_EYE_UNDER_CONTROL, owner);
+                    Talk(SAY_EYE_CONTROL, owner);
+                }
+                me->SetDisableGravity(false);
+                DoCast(me, SPELL_EYE_FL_BOOST_FLY);
+            }
 
-            ((Player*)(me->GetCharmer()))->SetClientControl(me, 1);
+            if (movementType == POINT_MOTION_TYPE && pointId == POINT_EYE_FALL)
+            {
+                me->SetDisableGravity(true);
+                me->SetControlled(true, UNIT_STATE_ROOT);
+                _events.ScheduleEvent(EVENT_MOVE_START, 5000);
+            }
         }
+
+    private:
+        EventMap _events;
     };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_eye_of_acherusAI(creature);
+    }
 };
+
 
 /*######
 ## npc_death_knight_initiate
@@ -1204,4 +1211,5 @@ void AddSC_the_scarlet_enclave_c1()
     new npc_scarlet_ghoul();
     new npc_scarlet_miner();
     new npc_scarlet_miner_cart();
+    new npc_eye_of_acherus();   
 }

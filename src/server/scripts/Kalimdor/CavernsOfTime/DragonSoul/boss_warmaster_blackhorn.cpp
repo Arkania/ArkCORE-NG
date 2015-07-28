@@ -1,8 +1,8 @@
 /*
  * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  *
- * This file is NOT free software. Third-party users can NOT redistribute 
- * it or modify it. If you find it, you are either hacking something, or very 
+ * This file is NOT free software. Third-party users can NOT redistribute
+ * it or modify it. If you find it, you are either hacking something, or very
  * lucky (presuming someone else managed to hack it).
  */
 
@@ -39,12 +39,12 @@ enum Events
 
 enum Spells
 {
-    SPELL_DEVASTATE       = 108042,
+    SPELL_DEVASTATE = 108042,
     SPELL_DISRUPTING_ROAR = 108044,
-    SPELL_SHOCKWAVE       = 108046,
+    SPELL_SHOCKWAVE = 108046,
     SPELL_SIPHON_VITALITY = 110313, //no work
-    SPELL_SUNDER_ARMOR    = 108043, // no work
-    SPELL_VENGEANCE       = 108045,
+    SPELL_SUNDER_ARMOR = 108043, // no work
+    SPELL_VENGEANCE = 108045,
 };
 
 class boss_warmaster_blackhorn : public CreatureScript
@@ -52,12 +52,7 @@ class boss_warmaster_blackhorn : public CreatureScript
 public:
     boss_warmaster_blackhorn() : CreatureScript("boss_warmaster_blackhorn") { }
 
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return GetDragonSoulAI<boss_warmaster_blackhornAI>(creature);
-    }
-
-    struct boss_warmaster_blackhornAI: public BossAI
+    struct boss_warmaster_blackhornAI : public BossAI
     {
         boss_warmaster_blackhornAI(Creature* creature) : BossAI(creature, BOSS_WARMASTER)
         {
@@ -94,10 +89,10 @@ public:
                 switch (eventId)
                 {
                 case EVENT_PHASE_2:
-                    events.ScheduleEvent(EVENT_ATTACK_PHASE2_1, urand(2500,3500));
-                    events.ScheduleEvent(EVENT_ATTACK_PHASE2_2, urand(5500,15000));
-                    events.ScheduleEvent(EVENT_ATTACK_PHASE2_3, urand(60000,80000));
-                    events.ScheduleEvent(EVENT_ATTACK_PHASE2_4, urand(50000,70000));
+                    events.ScheduleEvent(EVENT_ATTACK_PHASE2_1, urand(2500, 3500));
+                    events.ScheduleEvent(EVENT_ATTACK_PHASE2_2, urand(5500, 15000));
+                    events.ScheduleEvent(EVENT_ATTACK_PHASE2_3, urand(60000, 80000));
+                    events.ScheduleEvent(EVENT_ATTACK_PHASE2_4, urand(50000, 70000));
                     break;
 
                 case EVENT_ATTACK_PHASE2_1:
@@ -113,7 +108,7 @@ public:
                     events.ScheduleEvent(EVENT_ATTACK_PHASE2_3, urand(100000, 130000));
                     break;
                 case EVENT_ATTACK_PHASE2_4:
-                    switch(urand(0,1))
+                    switch (urand(0, 1))
                     {
                     case 0:
                         me->SummonCreature(NPC_TWILIGHT_ELITE_SLAYER, 13424.7f, -12149.9f, 150.797f, 1.478f, TEMPSUMMON_CORPSE_DESPAWN, 600000);
@@ -137,10 +132,15 @@ public:
         void JustDied(Unit* killer)
         {
             instance->SetBossState(BOSS_WARMASTER, DONE);
-        killer->SummonCreature(NPC_TRAVEL_TO_THE_MAELSTROM, 13405.485f, -12131.544f, 150.971f, 6.213f, TEMPSUMMON_CORPSE_DESPAWN, 600000);
+            killer->SummonCreature(NPC_TRAVEL_TO_THE_MAELSTROM, 13405.485f, -12131.544f, 150.971f, 6.213f, TEMPSUMMON_CORPSE_DESPAWN, 600000);
             _JustDied();
         }
     };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return GetDragonSoulAI<boss_warmaster_blackhornAI>(creature);
+    }
 };
 
 void AddSC_boss_warmaster_blackhorn()

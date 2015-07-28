@@ -38,6 +38,11 @@ class Player;
 class SpellInfo;
 class WorldSession;
 
+// npc_bot
+class bot_ai;
+class bot_minion_ai;
+class bot_pet_ai;
+
 enum CreatureFlagsExtra
 {
     CREATURE_FLAG_EXTRA_INSTANCE_BIND   = 0x00000001,       // creature kill bind instance with killer and killer's group
@@ -55,6 +60,7 @@ enum CreatureFlagsExtra
     CREATURE_FLAG_EXTRA_NO_SKILLGAIN    = 0x00040000,       // creature won't increase weapon skills
     CREATURE_FLAG_EXTRA_TAUNT_DIMINISH  = 0x00080000,       // Taunt is a subject to diminishing returns on this creautre
     CREATURE_FLAG_EXTRA_ALL_DIMINISH    = 0x00100000,       // Creature is subject to all diminishing returns as player are
+    CREATURE_FLAG_EXTRA_NPCBOT          = 0x04000000,       // NPCBot custom flag
     CREATURE_FLAG_EXTRA_DUNGEON_BOSS    = 0x10000000        // creature is a dungeon boss (SET DYNAMICALLY, DO NOT ADD IN DB)
 };
 
@@ -63,7 +69,7 @@ enum CreatureFlagsExtra
     CREATURE_FLAG_EXTRA_NO_CRUSH | CREATURE_FLAG_EXTRA_NO_XP_AT_KILL | CREATURE_FLAG_EXTRA_TRIGGER | \
     CREATURE_FLAG_EXTRA_NO_TAUNT | CREATURE_FLAG_EXTRA_WORLDEVENT | CREATURE_FLAG_EXTRA_NO_CRIT | \
     CREATURE_FLAG_EXTRA_NO_SKILLGAIN | CREATURE_FLAG_EXTRA_TAUNT_DIMINISH | CREATURE_FLAG_EXTRA_ALL_DIMINISH | \
-    CREATURE_FLAG_EXTRA_GUARD)
+    CREATURE_FLAG_EXTRA_GUARD | CREATURE_FLAG_EXTRA_NPCBOT)
 
 #define MAX_KILL_CREDIT 2
 #define CREATURE_REGEN_INTERVAL 2 * IN_MILLISECONDS
@@ -425,6 +431,10 @@ typedef std::map<uint32, time_t> CreatureSpellCooldowns;
 
 #define MAX_VENDOR_ITEMS 150                                // Limitation in 4.x.x item count in SMSG_LIST_INVENTORY
 
+//used for handling non-repeatable random texts
+typedef std::vector<uint8> CreatureTextRepeatIds;
+typedef std::unordered_map<uint8, CreatureTextRepeatIds> CreatureTextRepeatGroup;
+
 class Creature : public Unit, public GridObject<Creature>, public MapObject
 {
     public:
@@ -674,6 +684,51 @@ class Creature : public Unit, public GridObject<Creature>, public MapObject
         void SetSeerGUID(uint64 guid) { uiSeerGUID = guid; }
         uint64 GetSeerGUID() const { return uiSeerGUID; }
 
+        CreatureTextRepeatIds GetTextRepeatGroup(uint8 textGroup);
+        void SetTextRepeatId(uint8 textGroup, uint8 id);
+        void ClearTextRepeatGroup(uint8 textGroup);
+
+        // npc_bot commands
+        //misc
+            uint32 GetBlockPercent() const;
+        
+        Player* GetBotOwner() const { return m_bot_owner; }
+        void SetBotOwner(Player* newowner) { m_bot_owner = newowner; }
+        Creature* GetCreatureOwner() const { return m_creature_owner; }
+        void SetCreatureOwner(Creature* newCreOwner) { m_creature_owner = newCreOwner; }
+        Creature* GetBotsPet() const { return m_bots_pet; }
+        void SetBotsPetDied();
+        void SetBotsPet(Creature* newpet) { /*ASSERT (!m_bots_pet);*/ m_bots_pet = newpet; }
+        void SetIAmABot(bool bot = true);
+        bool GetIAmABot() const;
+        bool GetIAmABotsPet() const;
+        void SetBotClass(uint8 myclass) { m_bot_class = myclass; }
+        uint8 GetBotClass() const;
+        void SetBotTank(Unit* newtank);
+        bot_ai* GetBotAI() const { return bot_AI; }
+        bot_minion_ai* GetBotMinionAI() const;
+        bot_pet_ai* GetBotPetAI() const;
+        void InitBotAI(bool asPet = false);
+        void SetBotCommandState(CommandStates st, bool force = false);
+        CommandStates GetBotCommandState() const;
+        void ApplyBotDamageMultiplierMelee(uint32& damage, CalcDamageInfo& damageinfo) const;
+        void ApplyBotDamageMultiplierMelee(int32& damage, SpellNonMeleeDamage& damageinfo, SpellInfo const* spellInfo, WeaponAttackType attackType, bool& crit) const;
+        void ApplyBotDamageMultiplierSpell(int32& damage, SpellNonMeleeDamage& damageinfo, SpellInfo const* spellInfo, WeaponAttackType attackType, bool& crit) const;
+        void ApplyBotDamageMultiplierEffect(SpellInfo const* spellInfo, uint8 effect_index, float &value) const;
+        void SetBotShouldUpdateStats();
+        void OnBotSummon(Creature* summon);
+        void OnBotDespawn(Creature* summon);
+        void SetCanUpdate(bool can) { m_canUpdate = can; }
+        void RemoveBotItemBonuses(uint8 slot);
+        void ApplyBotItemBonuses(uint8 slot);
+        bool CanUseOffHand() const;
+        bool CanUseRanged() const;
+        bool CanEquip(ItemTemplate const* item, uint8 slot) const;
+        bool Unequip(uint8 slot) const;
+        bool Equip(uint32 itemId, uint8 slot) const;
+        bool ResetEquipment(uint8 slot) const;
+        // npc_bot commands
+        
     protected:
         bool CreateFromProto(uint32 guidlow, uint32 Entry, uint32 vehId, uint32 team, const CreatureData* data = NULL);
         bool InitEntry(uint32 entry, uint32 team=ALLIANCE, const CreatureData* data=NULL);
@@ -724,6 +779,14 @@ class Creature : public Unit, public GridObject<Creature>, public MapObject
         bool CanAlwaysSee(WorldObject const* obj) const;
         uint64 uiSeerGUID;
     private:
+        // npc_bot system
+        Player* m_bot_owner;
+        Creature* m_creature_owner;
+        Creature* m_bots_pet;
+        bot_ai* bot_AI;
+        uint8 m_bot_class;
+        bool m_canUpdate;
+        //end npc_bot system
         void ForcedDespawn(uint32 timeMSToDespawn = 0);
 
         //WaypointMovementGenerator vars
@@ -735,6 +798,8 @@ class Creature : public Unit, public GridObject<Creature>, public MapObject
         bool TriggerJustRespawned;
 
         Spell const* _focusSpell;   ///> Locks the target during spell cast for proper facing
+
+        CreatureTextRepeatGroup m_textRepeat;
 };
 
 class AssistDelayEvent : public BasicEvent

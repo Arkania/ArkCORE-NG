@@ -24,6 +24,7 @@
 #include "ObjectMgr.h"
 #include "OutdoorPvPMgr.h"
 #include "ScriptLoader.h"
+#include "sc_npc_teleport.h"
 #include "ScriptSystem.h"
 #include "Transport.h"
 #include "Vehicle.h"
@@ -187,6 +188,9 @@ void ScriptMgr::Initialize()
     uint32 oldMSTime = getMSTime();
 
     LoadDatabase();
+
+    // Load TeleNPC2 - maybe not the best place to load it ...
+    LoadNpcTele();
 
     TC_LOG_INFO("server.loading", "Loading C++ scripts");
 
@@ -790,7 +794,7 @@ uint32 ScriptMgr::GetDialogStatus(Player* player, Creature* creature)
     ASSERT(creature);
 
     GET_SCRIPT_RET(CreatureScript, creature->GetScriptId(), tmpscript, DIALOG_STATUS_SCRIPTED_NO_STATUS);
-    player->PlayerTalkClass->ClearMenus();
+    //player->PlayerTalkClass->ClearMenus();    // there coming every (5-10) secounds a cmsg_quest_status from client.. this here clear the PlayerTalkClass, so gossips are broken.. 
     return tmpscript->GetDialogStatus(player, creature);
 }
 

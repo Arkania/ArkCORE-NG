@@ -17,12 +17,13 @@ set(scripts_STAT_SRCS
   EasternKingdoms/AlteracValley/boss_drekthar.cpp
   EasternKingdoms/AlteracValley/boss_vanndar.cpp
   EasternKingdoms/AlteracValley/alterac_valley.cpp
+  EasternKingdoms/BaradinHold/baradin_hold.h
+  EasternKingdoms/BaradinHold/bh_trash.cpp
   EasternKingdoms/BaradinHold/boss_alizabal.cpp
+  EasternKingdoms/BaradinHold/boss_argaloth.cpp
   EasternKingdoms/BaradinHold/boss_occuthar.cpp
   EasternKingdoms/BaradinHold/boss_pit_lord_argaloth.cpp
   EasternKingdoms/BaradinHold/instance_baradin_hold.cpp
-  EasternKingdoms/BaradinHold/boss_argaloth.cpp
-  EasternKingdoms/BaradinHold/bh_trash.cpp
   EasternKingdoms/BastionOfTwilight/bastion_of_twilight.h
   EasternKingdoms/BastionOfTwilight/bastion_of_twilight.cpp
   EasternKingdoms/BastionOfTwilight/instance_bastion_of_twilight.cpp

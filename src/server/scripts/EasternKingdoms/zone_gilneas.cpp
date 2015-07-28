@@ -29,7 +29,19 @@ EndScriptData */
 
 #include "ScriptMgr.h"
 
+
+
+
+
+
+
+
+
 void AddSC_gilneas_city()
 {
+
+
+
+
 };
 

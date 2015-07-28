@@ -49,6 +49,9 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 
+//bot
+#include "Config.h"
+
 class LoginQueryHolder : public SQLQueryHolder
 {
     private:
@@ -1157,6 +1160,35 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
     // Handle Login-Achievements (should be handled after loading)
     _player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_ON_LOGIN, 1);
 
+    //the only place where we check if it has NPC bots
+    if (sConfigMgr->GetBoolDefault("Bot.EnableNpcBots", true))
+    {
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_NPCBOTS);
+        stmt->setUInt32(0, pCurrChar->GetGUIDLow());
+        PreparedQueryResult result = CharacterDatabase.Query(stmt);
+        if (result)
+        {
+            uint32 m_bot_entry = 0;
+            uint8 m_bot_race = 0;
+            uint8 m_bot_class = 0;
+            uint8 Tank = 0;
+            uint32 equips[18];
+            do
+            {
+                Field* fields = result->Fetch();
+                m_bot_entry = fields[0].GetUInt32();
+                m_bot_race = fields[1].GetUInt8();
+                m_bot_class = fields[2].GetInt8();
+                Tank = fields[3].GetInt8();
+                for (uint8 i = 0; i != 18; ++i)
+                    equips[i] = fields[i + 4].GetUInt32();
+
+                if (m_bot_entry && m_bot_race && m_bot_class)
+                    pCurrChar->SetBotMustBeCreated(m_bot_entry, m_bot_race, m_bot_class, bool(Tank), equips);
+            } while (result->NextRow());
+        }
+    }
+    
     sScriptMgr->OnPlayerLogin(pCurrChar);
     delete holder;
 }

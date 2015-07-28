@@ -835,6 +835,23 @@ void WorldSession::HandleGuildSetGuildMaster(WorldPacket& recvPacket)
         guild->HandleSetNewGuildMaster(this, playerName);
 }
 
+void WorldSession::HandleGuildSetAchievementTracking(WorldPacket& recvPacket)
+{
+	uint32 count = recvPacket.ReadBits(24);
+	std::set<uint32> criteriaIds;
+
+	for (uint32 i = 0; i < count; ++i)
+	{
+		uint32 criteriaId;
+		recvPacket >> criteriaId;
+		criteriaIds.insert(criteriaId);
+	}
+
+	if (Guild* guild = GetPlayer()->GetGuild())
+		guild->HandleSetAchievementTracking(this, criteriaIds);
+}
+
+
 void WorldSession::HandleGuildSwitchRank(WorldPacket& recvPacket)
 {
     uint32 rank;

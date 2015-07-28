@@ -1564,9 +1564,13 @@ public:
         {
         }
 
-        void IsSummonedBy(Unit* summoner) OVERRIDE
+        void Reset() OVERRIDE
         {
             _summoner = NULL;
+        }
+
+        void IsSummonedBy(Unit* summoner) OVERRIDE
+        {
             if (Player* player = summoner->ToPlayer())
             {
                 _summoner = player;
@@ -1584,7 +1588,9 @@ public:
                 switch (eventId)
                 {
                     case EVENT_CAST_RIDE_SPELL:
-                        me->CastSpell(_summoner, SPELL_RIDE_RED_DRAGON_TRIGGERED, true);
+                        if (_summoner)
+                            me->CastSpell(_summoner, SPELL_RIDE_RED_DRAGON_TRIGGERED, true);
+
                         break;
                 }
             }

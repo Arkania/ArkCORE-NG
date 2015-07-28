@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2015 ArkCORE <http://www.arkania.net/>
  *
  * This file is NOT free software. Third-party users can NOT redistribute 
  * it or modify it. If you find it, you are either hacking something, or very 
@@ -33,8 +33,18 @@ enum Bosses
 
 enum Data
 {
+    DATA_MORCHOK,
+    DATA_ULTRAXION,
+    DATA_BLOOD,
     DATA_DAMAGE_DEATHWING,
     DATA_ATTACK_DEATHWING,
+    DATA_KOHCROM_JUMP,
+    DATA_MORCHOK_JUMP,
+    DATA_KOHCROM_HEALTH,
+    DATA_LESSER_CACHE_10N = 210160,
+    DATA_LESSER_CACHE_25N = 210161,
+    DATA_LESSER_CACHE_10H = 210162,
+    DATA_LESSER_CACHE_25H = 210163,
 };
 
 enum GameObject_
@@ -82,7 +92,14 @@ enum Creatures
     NPC_MYTATED_CORRUPTION = 56471,
 
     NPC_EIENDORMI          = 57288,
-
+    NPC_SPHERE = 55334,
+    NPC_EYE_1 = 55416,
+    NPC_EYE_2 = 57875,
+    NPC_SCOURGE_1 = 55417,
+    NPC_SCOURGE_2 = 57877,
+    NPC_CLAW_1 = 55418,
+    NPC_CLAW_2 = 57890,
+    NPC_TENTACLE_TOSS = 57836,
 
     NPC_FORZEN_BINDIG_CRYSTAL     = 56136,
     NPC_CRYSTAL_CONDUCTOR         = 56165,
@@ -92,20 +109,34 @@ enum Creatures
     NPC_TWILIGHT_ELITE_SLAYER     = 56848,
     NPC_TWILIGHT_ELITE_DREADBLADE = 56854,
 
-    NPC_TRALL_VS_ULTRAXION = 56667,
-    NPC_ALEXSTRASZA        = 56630,
-    NPC_YSERA              = 56665,
-    NPC_NOZDORMU           = 56666,
-    NPC_ASPECT_OF_MAGIC    = 56664,
+    NPC_TRALL_VS_ULTRAXION = 56667, // double
+    NPC_ALEXSTRASZA        = 56630, // double
+    NPC_YSERA              = 56665, // double
+    NPC_NOZDORMU           = 56666, // double
+    NPC_ASPECT_OF_MAGIC    = 56664, // double
 
-    NPC_TRAVEL_TO_THE_DECK_OF_THE_SKYFIRE = 57378,
-    NPC_TRAVEL_TO_THE_MAELSTROM           = 57443,
+    NPC_TRAVEL_TO_THE_DECK_OF_THE_SKYFIRE = 57378, // double
+    NPC_TRAVEL_TO_THE_MAELSTROM           = 57443, // double
     NPC_PORTAL                            = 57328,
 
     NPC_CORRUPTION_PARASITE = 57479,
     NPC_CONGEALING_BLOOD    = 57798,
     NPC_ELEMENTIUM_FRAGMENT = 56724,
     NPC_ELEMENTIUM_TERROR   = 56710,
+    NPC_KOHCROM = 57773,
+
+    NPC_THRALL_1 = 56667,
+    NPC_YSERA_THE_AWAKENED = 56665,
+    NPC_ALEXTRASZA_THE_LIFE_BINDER = 56630,
+    NPC_NOZDORMU_THE_TIMELESS_ONE = 56666,
+    NPC_KALECGOS = 56664,
+
+    NPC_PORTAL_WYRMREST_BASE = 57882, // Portal - Travel to Wyrmrest Base
+    NPC_PORTAL_ETERNITY = 57377, // Portal - Travel to the Eye of Eternity
+    NPC_PORTAL_SKYFIRE = 57378, // Portal - Travel to the deck of The Skyfire
+    NPC_PORTAL_WYRMREST_SUMMIT = 57379, // Portal - Travel to Wyrmrest Summit
+    NPC_PORTAL_MAELSTROM = 57443, // Portal - Travel to The Maelstrom
+
 };
 
 template<class AI>

@@ -41,7 +41,6 @@ enum Data64
 enum CreatureIds
 {
     // Dungeon Bosses
-
     BOSS_ROMOGG_BONECRUSHER      = 39665,
     BOSS_CORLA                   = 39679,
     BOSS_KARSH_STEELBENDER       = 39698,
@@ -49,7 +48,6 @@ enum CreatureIds
     BOSS_ASCENDANT_LORD_OBSIDIUS = 39705,
 
     // Trash mobs
-
     NPC_BUSTER                   = 40013,
     NPC_CHAINS_OF_WOE            = 40447,
     NPC_CONFLAGRATION            = 39994,
@@ -66,10 +64,24 @@ enum CreatureIds
     NPC_TWILIGHT_ZEALOT          = 39990,
 
     // Various NPCs
-
     NPC_RAZ_THE_CRAZED           = 39670,
     NPC_FINKLE_EINHORN           = 49476,
     NPC_TWILIGHT_PORTAL          = 51340,
+
+    // Ascendant Lord Obsidius
+    NPC_SHADOW_OF_OBSIDIUS = 40817,
+
+    // Karsh Steelbender
+    NPC_BOUND_FLAMES = 50417,
+    NPC_LAVA_SPOUT_TRIGGER = 49529,
+
+    // Corla, Herald of Twilight
+    NPC_TWILIGHT_ZEALOT_CORLA = 50284,
+    NPC_NETHER_ESSENCE_TRIGGER = 49526,
+
+    // Romogg Bonecrusher
+    NPC_ANGERED_EARTH = 50376,
+   // NPC_CHAINS_OF_WOE = 40447,
 };
 
 enum GameObjectIds

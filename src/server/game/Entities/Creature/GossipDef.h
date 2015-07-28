@@ -217,7 +217,7 @@ class GossipMenu
     private:
         GossipMenuItemContainer _menuItems;
         GossipMenuItemDataContainer _menuItemData;
-        uint32 _menuId;
+        int32 _menuId;
         uint64 _senderGUID;
         LocaleConstant _locale;
 };

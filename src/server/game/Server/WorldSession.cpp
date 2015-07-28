@@ -464,6 +464,20 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
 /// %Log the player out
 void WorldSession::LogoutPlayer(bool save)
 {
+    uint8 nBotCount = 0;
+    if (_player)
+    {
+        //remove npcbots but do not delete from DB so they can be reacqured on next login
+        for (uint8 i = 0; i != _player->GetMaxNpcBots(); ++i)
+        {
+            if (_player->GetBotMap(i)->_Guid())
+            {
+                _player->RemoveBot(_player->GetBotMap(i)->_Guid(), true, false);
+                ++nBotCount;
+            }
+        }
+    }
+    
     // finish pending transfers before starting the logout
     while (_player && _player->IsBeingTeleportedFar())
         HandleMoveWorldportAckOpcode();
@@ -557,7 +571,10 @@ void WorldSession::LogoutPlayer(bool save)
         // remove player from the group if he is:
         // a) in group; b) not in raid group; c) logging out normally (not being kicked or disconnected)
         if (_player->GetGroup() && !_player->GetGroup()->isRaidGroup() && m_Socket)
-            _player->RemoveFromGroup();
+            //bot d) if has no NpcBots or not in instance (trying to save instance)
+            if (nBotCount == 0 || !_player->GetMap()->Instanceable())
+                //end bot
+                _player->RemoveFromGroup();
 
         //! Send update to group and reset stored max enchanting level
         if (_player->GetGroup())

@@ -24,11 +24,6 @@ class boss_ascendant_lord_obsidius : public CreatureScript
 public:
     boss_ascendant_lord_obsidius() : CreatureScript("boss_ascendant_lord_obsidius") { }
 
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new boss_ascendant_lord_obsidiusAI (creature);
-    }
-
     struct boss_ascendant_lord_obsidiusAI : public ScriptedAI
     {
         boss_ascendant_lord_obsidiusAI(Creature* creature) : ScriptedAI(creature)
@@ -50,6 +45,11 @@ public:
             DoMeleeAttackIfReady();
         }
     };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new boss_ascendant_lord_obsidiusAI(creature);
+    }
 };
 
 void AddSC_boss_ascendant_lord_obsidius()

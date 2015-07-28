@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2015 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -234,6 +234,7 @@ enum Events
     EVENT_OVERCHARGE                = 45
 };
 
+// 39415
 class npc_ascended_flameseeker : public CreatureScript
 {
     public:
@@ -295,6 +296,7 @@ class npc_ascended_flameseeker : public CreatureScript
         };
 };
 
+// 40272
 class npc_ascended_rockbreaker : public CreatureScript
 {
     public:
@@ -361,6 +363,7 @@ class npc_ascended_rockbreaker : public CreatureScript
         };
 };
 
+// 40273
 class npc_ascended_waterlasher : public CreatureScript
 {
     public:
@@ -425,6 +428,7 @@ class npc_ascended_waterlasher : public CreatureScript
         };
 };
 
+// 39414
 class npc_ascended_windwalker: public CreatureScript
 {
     public:
@@ -479,6 +483,7 @@ class npc_ascended_windwalker: public CreatureScript
         };
 };
 
+// 39854  (spawn by script is 40294)
 class npc_azureborne_guardian: public CreatureScript
 {
     public:
@@ -539,6 +544,7 @@ class npc_azureborne_guardian: public CreatureScript
         };
 };
 
+// 39855 40291
 class npc_azureborne_seer: public CreatureScript
 {
     public:
@@ -606,6 +612,7 @@ class npc_azureborne_seer: public CreatureScript
         };
 };
 
+// 39909 
 class npc_azureborne_warlord: public CreatureScript
 {
     public:
@@ -665,6 +672,7 @@ class npc_azureborne_warlord: public CreatureScript
         };
 };
 
+// 39381 (spawn by script is 40293)
 class npc_crimsonborne_guardian: public CreatureScript
 {
     public:
@@ -720,6 +728,7 @@ class npc_crimsonborne_guardian: public CreatureScript
         };
 };
 
+// 39405 40290
 class npc_crimsonborne_seer: public CreatureScript
 {
     public:
@@ -780,6 +789,7 @@ class npc_crimsonborne_seer: public CreatureScript
         };
 };
 
+// 39626
 class npc_crimsonborne_warlord: public CreatureScript
 {
     public:
@@ -839,6 +849,7 @@ class npc_crimsonborne_warlord: public CreatureScript
         };
 };
 
+// 39892
 class npc_enslaved_burning_ember: public CreatureScript
 {
     public:
@@ -894,6 +905,7 @@ class npc_enslaved_burning_ember: public CreatureScript
         };
 };
 
+// 39900
 class npc_enslaved_rock_elemental: public CreatureScript
 {
     public:
@@ -948,6 +960,7 @@ class npc_enslaved_rock_elemental: public CreatureScript
         };
 };
 
+// 40166
 class npc_enslaved_gronn_brute: public CreatureScript
 {
     public:
@@ -1002,6 +1015,7 @@ class npc_enslaved_gronn_brute: public CreatureScript
         };
 };
 
+// 48844 40600 39392 57749
 class npc_faceless_corruptor : public CreatureScript
 {
     public:
@@ -1068,6 +1082,7 @@ class npc_faceless_corruptor : public CreatureScript
         };
 };
 
+// 39450 45467
 class npc_trogg_dweller : public CreatureScript
 {
     public:
@@ -1123,6 +1138,7 @@ class npc_trogg_dweller : public CreatureScript
         };
 };
 
+// 40306 41073
 class npc_twilight_armsmaster : public CreatureScript
 {
     public:
@@ -1182,6 +1198,7 @@ class npc_twilight_armsmaster : public CreatureScript
         };
 };
 
+// 40167
 class npc_twilight_beguiler : public CreatureScript
 {
     public:
@@ -1245,6 +1262,7 @@ class npc_twilight_beguiler : public CreatureScript
         };
 };
 
+// 39390 41095
 class npc_twilight_drake_gb : public CreatureScript
 {
     public:
@@ -1299,6 +1317,7 @@ class npc_twilight_drake_gb : public CreatureScript
         };
 };
 
+// 39890
 class npc_twilight_earthshaper : public CreatureScript
 {
     public:
@@ -1360,6 +1379,7 @@ class npc_twilight_earthshaper : public CreatureScript
         };
 };
 
+// 39956 40448
 class npc_twilight_enforcer : public CreatureScript
 {
     public:
@@ -1415,6 +1435,7 @@ class npc_twilight_enforcer : public CreatureScript
         };
 };
 
+// 39870
 class npc_twilight_firecatcher : public CreatureScript
 {
     public:
@@ -1476,6 +1497,7 @@ class npc_twilight_firecatcher : public CreatureScript
         };
 };
 
+// 39954
 class npc_twilight_shadow_weaver : public CreatureScript
 {
     public:
@@ -1538,6 +1560,7 @@ class npc_twilight_shadow_weaver : public CreatureScript
         };
 };
 
+// 39962
 class npc_twilight_stormbreaker : public CreatureScript
 {
     public:
@@ -1599,6 +1622,7 @@ class npc_twilight_stormbreaker : public CreatureScript
         };
 };
 
+// 40270
 class npc_twilight_thundercaller : public CreatureScript
 {
     public:
@@ -1662,6 +1686,7 @@ class npc_twilight_thundercaller : public CreatureScript
 
 #define SAY_CALL_WYRM "Come to my aid, Drake!"
 
+// 39873
 class npc_twilight_wyrmcaller : public CreatureScript
 {
     public:
@@ -1741,6 +1766,7 @@ class npc_twilight_wyrmcaller : public CreatureScript
         };
 };
 
+// 40268
 class npc_twilight_war_mage : public CreatureScript
 {
     public:
@@ -1800,6 +1826,7 @@ class npc_twilight_war_mage : public CreatureScript
         };
 };
 
+// 40272
 class npc_ascended_rockbreaker_fissure : public CreatureScript
 {
     public:
@@ -1828,6 +1855,7 @@ class npc_ascended_rockbreaker_fissure : public CreatureScript
         };
 };
 
+// 41045 (spawned by spell)
 class npc_crimsonborne_warlord_empowering_flames : public CreatureScript
 {
     public:
@@ -1856,6 +1884,7 @@ class npc_crimsonborne_warlord_empowering_flames : public CreatureScript
         };
 };
 
+// 76411
 class spell_twilight_enforcer_meat_grinder : public SpellScriptLoader
 {
     public:
@@ -1875,7 +1904,7 @@ class spell_twilight_enforcer_meat_grinder : public SpellScriptLoader
             
             void Register()
             {
-                OnEffectRemove += AuraEffectRemoveFn(spell_twilight_enforcer_meat_grinder_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+                OnEffectRemove += AuraEffectRemoveFn(spell_twilight_enforcer_meat_grinder_AuraScript::OnRemove, EFFECT_2, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
             }
         };
 
@@ -1885,6 +1914,7 @@ class spell_twilight_enforcer_meat_grinder : public SpellScriptLoader
         }
 };
 
+// 90673
 class spell_twilight_shadow_weaver_shadow_weave : public SpellScriptLoader
 {
     public:
@@ -1993,7 +2023,7 @@ void AddSC_grim_batol()
     new npc_twilight_wyrmcaller();
     new npc_ascended_rockbreaker_fissure();
     new npc_crimsonborne_warlord_empowering_flames();
-    // new spell_twilight_enforcer_meat_grinder(); // wrong call:  EFFECT_0
+    new spell_twilight_enforcer_meat_grinder();
     new spell_twilight_shadow_weaver_shadow_weave();
     new spell_twilight_thundercaller_electric_blast();
 }

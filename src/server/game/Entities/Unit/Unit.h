@@ -1575,6 +1575,7 @@ class Unit : public WorldObject
         bool IsPolymorphed() const;
 
         bool isFrozen() const;
+        bool IsTankClass() const;
 
         bool isTargetableForAttack(bool checkFakeDeath = true) const;
 
@@ -1648,6 +1649,7 @@ class Unit : public WorldObject
         bool IsLevitating() const { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY); }
         bool IsWalking() const { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_WALKING); }
         bool SetWalk(bool enable);
+        bool SetRun(bool enable);
         bool SetDisableGravity(bool disable, bool packetOnly = false);
         bool SetFall(bool enable);
         bool SetSwim(bool enable);
@@ -1728,7 +1730,7 @@ class Unit : public WorldObject
         void DeleteCharmInfo();
         void UpdateCharmAI();
         void EnableAI();
-        //Player* GetMoverSource() const;
+        Player* GetMoverSource() const;
         Player* m_movedPlayer;
         SharedVisionList const& GetSharedVisionList() { return m_sharedVision; }
         void AddPlayerToVision(Player* player);

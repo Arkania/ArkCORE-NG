@@ -684,9 +684,10 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                 // Wrath
                 else if (m_spellInfo->SpellFamilyFlags[0] & 0x00000001)
                 {
-                    if (m_caster->ToPlayer()->HasAura(16913)) // Check Balance spec
-                        m_caster->SetEclipsePower(int32(m_caster->GetEclipsePower() - 13));
-
+                    if (Player* player = m_caster->ToPlayer())
+                        if (player->HasAura(16913)) // Check Balance spec
+                            m_caster->SetEclipsePower(int32(m_caster->GetEclipsePower() - 13));
+                    
                     // Improved Insect Swarm
                     if (AuraEffect const * aurEff = m_caster->GetDummyAuraEffect(SPELLFAMILY_DRUID, 1771, 0))
                         if (unitTarget->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_DRUID, 0x00200000, 0, 0))

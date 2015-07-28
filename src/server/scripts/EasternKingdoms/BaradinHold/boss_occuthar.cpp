@@ -61,7 +61,7 @@ class boss_occuthar : public CreatureScript
             boss_occutharAI(Creature* creature) : BossAI(creature, DATA_OCCUTHAR),
                 _vehicle(me->GetVehicleKit())
             {
-                ASSERT(_vehicle);
+                ASSERT(_vehicle); // this boss has vehicleid 1598
             }
 
             void EnterCombat(Unit* /*who*/) OVERRIDE

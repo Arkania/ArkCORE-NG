@@ -33,35 +33,33 @@ EndContentData */
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
 #include "Player.h"
+#include "Vehicle.h"
 
 enum zone_coldridge_valley
 {
-	NPC_ROCKSAW_INVADER									= 37070,
-	NPC_WOUNDED_COLDRIDGE_MOUNTAINEER_KILL_CREDIT		= 37079,
-	NPC_WOUNDED_COLDRIDGE_MOUNTAINEER					= 37080,
-	NPC_COLDRIDGE_DEFENDER								= 37177,
-    NPC_ROCKJAW_SCAVENGER                               = 37105,
-	NPC_SOOTHSAYER_SHIKALA								= 37108,
-	NPC_SOOTHSAYER_RIKKARI  							= 37173,
-	NPC_SOOTHSAYER_MIRIMKOA								= 37174,
-	NPC_TROLLING_FOR_INFORMATION_KILL_CREDIT_BUNNY_SE	= 37109,
-	NPC_TROLLING_FOR_INFORMATION_KILL_CREDIT_BUNNY_SW	= 37110,
-	NPC_TROLLING_FOR_INFORMATION_KILL_CREDIT_BUNNY_W	= 37111,
+    NPC_ROCKSAW_INVADER = 37070,
+    NPC_WOUNDED_COLDRIDGE_MOUNTAINEER_KILL_CREDIT = 37079,
+    NPC_WOUNDED_COLDRIDGE_MOUNTAINEER = 37080,
+    NPC_COLDRIDGE_DEFENDER = 37177,
+    NPC_ROCKJAW_SCAVENGER = 37105,
+    NPC_SOOTHSAYER_SHIKALA = 37108,
+    NPC_SOOTHSAYER_RIKKARI = 37173,
+    NPC_SOOTHSAYER_MIRIMKOA = 37174,
+    NPC_TROLLING_FOR_INFORMATION_KILL_CREDIT_BUNNY_SE = 37109,
+    NPC_TROLLING_FOR_INFORMATION_KILL_CREDIT_BUNNY_SW = 37110,
+    NPC_TROLLING_FOR_INFORMATION_KILL_CREDIT_BUNNY_W = 37111,
 
-	SPELL_HEAL_WOUNDED_MOUNTAINEER						= 69855,
-    SPELL_THROW_PRICELESS_ARTIFACT                      = 69897,
+    SPELL_HEAL_WOUNDED_MOUNTAINEER = 69855,
+    SPELL_THROW_PRICELESS_ARTIFACT = 69897,
 
-	QUEST_AID_FOR_THE_WOUNDED							= 24471,
-	QUEST_TROLLING_FOR_INFORMATION						= 24489,
-    QUEST_MAKE_HAY_WHILE_THE_SUN_SHINES                 = 24486,
-    ITEM_PRICELESS_ROCKJAW_ARTIFACT                     = 49751,
+    QUEST_AID_FOR_THE_WOUNDED = 24471,
+    QUEST_TROLLING_FOR_INFORMATION = 24489,
+    QUEST_MAKE_HAY_WHILE_THE_SUN_SHINES = 24486,
+    ITEM_PRICELESS_ROCKJAW_ARTIFACT = 49751,
 
 };
 
-/*######
-## npc_rockjaw_invader
-######*/
-
+// 37070 npc_rockjaw_invader
 class npc_rockjaw_invader : public CreatureScript
 {
 public:
@@ -71,43 +69,41 @@ public:
     {
         npc_rockjaw_invaderAI(Creature *c) : ScriptedAI(c) { }
 
-        uint32 Attack1HTimer;            
+        uint32 Attack1HTimer;
 
-        void Reset()  
+        void Reset()
         {
-            Attack1HTimer = urand(1800,2200);                       
+            Attack1HTimer = urand(1800, 2200);
         }
 
-        void UpdateAI(uint32 diff) 
-        {                        
+        void UpdateAI(uint32 diff)
+        {
             if (!UpdateVictim())
             {
-                if (Creature* infantry = me->FindNearestCreature (NPC_COLDRIDGE_DEFENDER, 3.0f)) 
+                if (Creature* infantry = me->FindNearestCreature(NPC_COLDRIDGE_DEFENDER, 3.0f))
                 {
                     if (Attack1HTimer <= diff)
                     {
-                        me->SetFacingTo (me->GetAngle(infantry));
+                        me->SetFacingTo(me->GetAngle(infantry));
                         me->HandleEmoteCommand(EMOTE_ONESHOT_ATTACK1H);
-                        Attack1HTimer = urand(1800,2200);
+                        Attack1HTimer = urand(1800, 2200);
                     }
                     else Attack1HTimer -= diff;
                 }
-            } else 
+            }
+            else
                 DoMeleeAttackIfReady();
-            
+
         }
     };
 
-       CreatureAI* GetAI(Creature* creature) const  
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_rockjaw_invaderAI (creature);
+        return new npc_rockjaw_invaderAI(creature);
     }
 };
 
-/*######
-## npc_coldridge_defender
-######*/
-
+// 37177 npc_coldridge_defender
 class npc_coldridge_defender : public CreatureScript
 {
 public:
@@ -117,124 +113,142 @@ public:
     {
         npc_coldridge_defenderAI(Creature *c) : ScriptedAI(c) { }
 
-        uint32 Attack1HTimer;            
+        uint32 Attack1HTimer;
 
-        void Reset()  
+        void Reset()
         {
-            Attack1HTimer = urand(1800,2200);                       
+            Attack1HTimer = urand(1800, 2200);
         }
 
-        void UpdateAI(uint32 diff) 
-        {                        
+        void UpdateAI(uint32 diff)
+        {
             if (!UpdateVictim())
             {
-                if (Creature* infantry = me->FindNearestCreature (NPC_ROCKSAW_INVADER, 3.0f)) 
+                if (Creature* infantry = me->FindNearestCreature(NPC_ROCKSAW_INVADER, 3.0f))
                 {
                     if (Attack1HTimer <= diff)
                     {
-                        me->SetFacingTo (me->GetAngle(infantry));
+                        me->SetFacingTo(me->GetAngle(infantry));
                         me->HandleEmoteCommand(EMOTE_ONESHOT_ATTACK1H);
-                        Attack1HTimer = urand(1800,2200);
+                        Attack1HTimer = urand(1800, 2200);
                     }
                     else Attack1HTimer -= diff;
                 }
-            } else 
+            }
+            else
                 DoMeleeAttackIfReady();
-            
+
         }
     };
 
-       CreatureAI* GetAI(Creature* creature) const  
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_coldridge_defenderAI (creature);
+        return new npc_coldridge_defenderAI(creature);
     }
 };
 
-/*######
-## npc_wounded_coldridge_mountaineer
-## ToDo:  spell is wrong implemented in core
-######*/
-
+// 37080 npc_wounded_coldridge_mountaineer
 class npc_wounded_coldridge_mountaineer : public CreatureScript
 {
 public:
     npc_wounded_coldridge_mountaineer() : CreatureScript("npc_wounded_coldridge_mountaineer") { }
-    
-    bool OnGossipHello(Player* player, Creature* creature) 
-    {
-        player->PlayerTalkClass->SendCloseGossip();        
-
-        if (player->HasUnitState(UNIT_STATE_CASTING)) 
-                return true;
-        
-        if (player->GetQuestStatus(QUEST_AID_FOR_THE_WOUNDED) == QUEST_STATUS_INCOMPLETE)
-        {              
-            creature->CastSpell(creature, SPELL_HEAL_WOUNDED_MOUNTAINEER, false);
-            player->KilledMonsterCredit(NPC_WOUNDED_COLDRIDGE_MOUNTAINEER_KILL_CREDIT, 0);
-        }
-        return true;
-    }
 
     struct npc_wounded_coldridge_mountaineerAI : public ScriptedAI
     {
-		npc_wounded_coldridge_mountaineerAI(Creature *creature) : ScriptedAI(creature) 
-		{
-            timer = 0; phase = 0;
-		} 
-				
-		uint32 phase;
-		uint32 timer;
-				
-	    void SpellHit(Unit* Hitter, SpellInfo const* spell) 
-        {	
-            if (Player* player = Hitter->ToPlayer())
-                if (player->GetQuestStatus(QUEST_AID_FOR_THE_WOUNDED) == QUEST_STATUS_INCOMPLETE)
-                    if (me->GetDistance(player) < 5.0f)
-                        if (spell->Id == SPELL_HEAL_WOUNDED_MOUNTAINEER)
-                        {
-                            phase = 1;
-                            timer = 1000;
-                            DoCast(Hitter, NPC_WOUNDED_COLDRIDGE_MOUNTAINEER_KILL_CREDIT);				                
-                        }
+        npc_wounded_coldridge_mountaineerAI(Creature *creature) : ScriptedAI(creature) { }
+
+        uint32 phase;
+        uint32 timer;
+
+        void Reset()
+        {
+            timer = 0; 
+            phase = 0;
         }
 
-		void UpdateAI(uint32 diff) 
-        {   
-			if (timer <= diff)	
-			{
-                switch (phase)
-                {
-                case 1:
-                    Talk(0);
-                    timer = 5000;
-                    phase = 2;
-                    break;
-                case 2:
-                    me->GetMotionMaster()->MovePoint(0, me->GetNearPosition(25.0f, me->GetFollowAngle()));
-                    timer = 10000;
-                    phase = 3;
-                    break;
-                case 3:
-                    me->DisappearAndDie();
-                    phase = 0;
-                    break;
-                }               
-			}	
-			else 
-				timer -= diff;	
-		}
+        void DoAction(int32 actionID) override
+        {
+            phase = 1;
+            timer = 1000;
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+            if (timer <= diff)
+            {
+                timer = 1000;
+                DoWork();
+            }
+            else
+                timer -= diff;
+        }
+
+        void DoWork()
+        {
+            switch (phase)
+            {
+            case 1:
+                Talk(0);
+                timer = 5000;
+                me->SetUInt32Value(UNIT_FIELD_BYTES_1, UNIT_STAND_STATE_STAND);
+                phase = 2;
+                break;
+            case 2:
+                me->GetMotionMaster()->MovePoint(0, me->GetNearPosition(25.0f, me->GetFollowAngle()));
+                timer = 3000;
+                phase = 3;
+                break;
+            case 3:
+                me->DisappearAndDie();
+                phase = 0;
+                break;
+            }
+        }
     };
-     
-    CreatureAI* GetAI(Creature* creature) const  
+
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_wounded_coldridge_mountaineerAI (creature);
+        return new npc_wounded_coldridge_mountaineerAI(creature);
     }
 };
 
-/*######
-## npc_rockjaw_scavenger
-######*/
+// 69855
+class spell_heal_wounded_mountaineer : public SpellScriptLoader
+{
+public:
+    spell_heal_wounded_mountaineer() : SpellScriptLoader("spell_heal_wounded_mountaineer") { }
 
+    class spell_heal_wounded_mountaineer_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_heal_wounded_mountaineer_SpellScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) OVERRIDE
+        {
+            return true;
+        }
+
+        void HandleDummyEffect(SpellEffIndex /*effIndex*/)
+        {
+            if (Creature* mountaineer = GetCaster()->FindNearestCreature(37080, 5.0f, true))
+                mountaineer->AI()->DoAction(1);
+        }
+
+        void Register() OVERRIDE
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_heal_wounded_mountaineer_SpellScript::HandleDummyEffect, EFFECT_0, SPELL_EFFECT_DUMMY);
+        }
+
+    private:
+        uint32 _targetCount;
+    };
+
+    SpellScript* GetSpellScript() const OVERRIDE
+    {
+        return new spell_heal_wounded_mountaineer_SpellScript();
+    }
+ };
+
+// 37105 npc_rockjaw_scavenger
 class npc_rockjaw_scavenger : public CreatureScript
 {
 public:
@@ -242,11 +256,11 @@ public:
 
     struct npc_rockjaw_scavengerAI : public ScriptedAI
     {
-        npc_rockjaw_scavengerAI(Creature *creature) : ScriptedAI(creature)  
-        { 
+        npc_rockjaw_scavengerAI(Creature *creature) : ScriptedAI(creature)
+        {
             _hasCasted = false;
         }
-       
+
         bool _hasCasted;
 
         void DamageTaken(Unit* Hitter, uint32& Damage)
@@ -256,13 +270,13 @@ public:
                     if (!_hasCasted)
                         if (me->GetDistance(player) >= 5.0f && me->GetDistance(player) <= 15.0f)
                             switch (urand(0, 3))
-                            {
+                        {
                             case 2:
                                 me->CastSpell(player, SPELL_THROW_PRICELESS_ARTIFACT, true);
                                 player->AddItem(ITEM_PRICELESS_ROCKJAW_ARTIFACT, 1);
                                 _hasCasted = true;
-                            }
-        
+                        }
+
         }
 
         void UpdateAI(uint32 diff)
@@ -270,7 +284,7 @@ public:
             if (!UpdateVictim())
                 return;
 
-            DoMeleeAttackIfReady();           
+            DoMeleeAttackIfReady();
         }
     };
 
@@ -280,10 +294,7 @@ public:
     }
 };
 
-/*######
-## npc_soothsayer_shikala
-######*/
-
+// 37108 npc_soothsayer_shikala
 class npc_soothsayer_shikala : public CreatureScript
 {
 public:
@@ -293,17 +304,17 @@ public:
     {
         npc_soothsayer_shikalaAI(Creature *c) : ScriptedAI(c) { }
 
-        uint32 timer;  
+        uint32 timer;
         uint32 phase;
         bool TalkSequenceIsStarted;
         Player* player;
-        
-        void Reset()  
+
+        void Reset()
         {
-              timer=0; TalkSequenceIsStarted=false; phase=0;                   
+            timer = 0; TalkSequenceIsStarted = false; phase = 0;
         }
 
-        void MoveInLineOfSight(Unit* who) 
+        void MoveInLineOfSight(Unit* who)
         {
             if (!who || !who->IsAlive() || TalkSequenceIsStarted)
                 return;
@@ -314,82 +325,80 @@ public:
                 if (player)
                 {
                     if (player->GetQuestStatus(QUEST_TROLLING_FOR_INFORMATION) == QUEST_STATUS_INCOMPLETE)
-                    {                   
+                    {
                         TalkSequenceIsStarted = true;
                         timer = 2000; phase++;
                     }
                 }
-            }                
+            }
         }
 
-        void UpdateAI(uint32 diff) 
-        {                        
+        void UpdateAI(uint32 diff)
+        {
             if (!UpdateVictim())
             {
                 if (TalkSequenceIsStarted)
                 {
                     if (!player)
                     {
-                        timer=0; phase=0; TalkSequenceIsStarted=false;
+                        timer = 0; phase = 0; TalkSequenceIsStarted = false;
                         return;
                     }
-                    if (timer<=diff)
-                    {                        
+                    if (timer <= diff)
+                    {
                         switch (phase)
                         {
                         case 1:
-                            { 
-                                Talk(0); timer=5000; phase++;
-                                break;
-                            }
+                        {
+                            Talk(0); timer = 5000; phase++;
+                            break;
+                        }
                         case 2:
-                            { 
-                                Talk(1); timer=5000; phase++;
-                                break;
-                            }
+                        {
+                            Talk(1); timer = 5000; phase++;
+                            break;
+                        }
                         case 3:
-                            { 
-                                Talk(2); timer=5000; phase++;
-                                break;
-                            }
+                        {
+                            Talk(2); timer = 5000; phase++;
+                            break;
+                        }
                         case 4:
-                            {                                                                                                                                                        
-                                player->KilledMonsterCredit(NPC_TROLLING_FOR_INFORMATION_KILL_CREDIT_BUNNY_SE, 0);    
-                                timer=120000; phase++; // cooldown
-                                break;
-                            }
+                        {
+                            player->KilledMonsterCredit(NPC_TROLLING_FOR_INFORMATION_KILL_CREDIT_BUNNY_SE, 0);
+                            timer = 120000; phase++; // cooldown
+                            break;
+                        }
                         case 5:
-                            {                                                                                                                                                                                                
-                                timer=0; phase=0; TalkSequenceIsStarted=false;                                                                                                              
-                                break;
-                            }
-                        }                
+                        {
+                            timer = 0; phase = 0; TalkSequenceIsStarted = false;
+                            break;
+                        }
+                        }
                     }
                     else
-                        timer-=diff;
+                        timer -= diff;
 
-                    if (!me->IsInRange (player, 0.0f, 15.0F)) 
-                    { 
-                        timer=0; phase=0; TalkSequenceIsStarted=false; // if player gone away, delete cooldown
+                    if (!me->IsInRange(player, 0.0f, 15.0F))
+                    {
+                        timer = 0; phase = 0; TalkSequenceIsStarted = false; // if player gone away, delete cooldown
                     }
                 }
 
-            } else 
+            }
+            else
                 DoMeleeAttackIfReady();
-            
+
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const  
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_soothsayer_shikalaAI (creature);
+        return new npc_soothsayer_shikalaAI(creature);
     }
 };
 
-/*######
-## npc_soothsayer_rikkari
-######*/
-
+// 37173 npc_soothsayer_rikkari
 class npc_soothsayer_rikkari : public CreatureScript
 {
 public:
@@ -399,103 +408,101 @@ public:
     {
         npc_soothsayer_rikkariAI(Creature *c) : ScriptedAI(c) { }
 
-        uint32 timer;  
+        uint32 timer;
         uint32 phase;
         bool TalkSequenceIsStarted;
         Player* player;
-        
-        void Reset()  
+
+        void Reset()
         {
-              timer=0; TalkSequenceIsStarted=false; phase=0;                   
+            timer = 0; TalkSequenceIsStarted = false; phase = 0;
         }
 
-        void MoveInLineOfSight(Unit* who) 
+        void MoveInLineOfSight(Unit* who)
         {
             if (!who || !who->IsAlive() || TalkSequenceIsStarted)
                 return;
 
             if (who->GetTypeId() == TYPEID_PLAYER && me->IsWithinDistInMap(who, 10.0f))
-            {                
+            {
                 player = who->ToPlayer();
                 if (player)
                 {
                     if (player->GetQuestStatus(QUEST_TROLLING_FOR_INFORMATION) == QUEST_STATUS_INCOMPLETE)
-                    {                       
+                    {
                         TalkSequenceIsStarted = true;
                         timer = 2000; phase++;
                     }
                 }
-            }                
+            }
         }
 
-        void UpdateAI(uint32 diff) 
-        {                        
+        void UpdateAI(uint32 diff)
+        {
             if (!UpdateVictim())
             {
                 if (TalkSequenceIsStarted)
-                {                    
+                {
                     if (!player)
                     {
-                        timer=0; phase=0; TalkSequenceIsStarted=false;
+                        timer = 0; phase = 0; TalkSequenceIsStarted = false;
                         return;
                     }
-                    if (timer<=diff)
-                    {                        
+                    if (timer <= diff)
+                    {
                         switch (phase)
                         {
                         case 1:
-                            { 
-                                Talk(0); timer=5000; phase++;
-                                break;
-                            }
+                        {
+                            Talk(0); timer = 5000; phase++;
+                            break;
+                        }
                         case 2:
-                            { 
-                                Talk(1); timer=5000; phase++;
-                                break;
-                            }
+                        {
+                            Talk(1); timer = 5000; phase++;
+                            break;
+                        }
                         case 3:
-                            { 
-                                Talk(2); timer=5000; phase++;
-                                break;
-                            }
+                        {
+                            Talk(2); timer = 5000; phase++;
+                            break;
+                        }
                         case 4:
-                            {                                                                                                                                                                
-                                player->KilledMonsterCredit(NPC_TROLLING_FOR_INFORMATION_KILL_CREDIT_BUNNY_SW, 0);    
-                                timer=120000; phase++; // cooldown                                                                                                          
-                                break;
-                            }
+                        {
+                            player->KilledMonsterCredit(NPC_TROLLING_FOR_INFORMATION_KILL_CREDIT_BUNNY_SW, 0);
+                            timer = 120000; phase++; // cooldown                                                                                                          
+                            break;
+                        }
                         case 5:
-                            {                                                                                                                                                                                                
-                                timer=0; phase=0; TalkSequenceIsStarted=false;                                                                                                              
-                                break;
-                            }
-                        }                
+                        {
+                            timer = 0; phase = 0; TalkSequenceIsStarted = false;
+                            break;
+                        }
+                        }
                     }
                     else
-                        timer-=diff;
+                        timer -= diff;
 
-                    if (!me->IsInRange (player, 0.0f, 15.0F)) 
-                    { 
-                        timer=0; phase=0; TalkSequenceIsStarted=false; // if player gone away, delete cooldown
+                    if (!me->IsInRange(player, 0.0f, 15.0F))
+                    {
+                        timer = 0; phase = 0; TalkSequenceIsStarted = false; // if player gone away, delete cooldown
                     }
                 }
 
-            } else 
+            }
+            else
                 DoMeleeAttackIfReady();
-            
+
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const  
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_soothsayer_rikkariAI (creature);
+        return new npc_soothsayer_rikkariAI(creature);
     }
 };
 
-/*######
-## npc_soothsayer_mirimkoa
-######*/
-
+// 37174 npc_soothsayer_mirimkoa
 class npc_soothsayer_mirimkoa : public CreatureScript
 {
 public:
@@ -505,17 +512,17 @@ public:
     {
         npc_soothsayer_mirimkoaAI(Creature *c) : ScriptedAI(c) { }
 
-        uint32 timer;  
+        uint32 timer;
         uint32 phase;
         bool TalkSequenceIsStarted;
         Player* player;
-        
-        void Reset()  
+
+        void Reset()
         {
-              timer=0; TalkSequenceIsStarted=false; phase=0;                   
+            timer = 0; TalkSequenceIsStarted = false; phase = 0;
         }
 
-        void MoveInLineOfSight(Unit* who) 
+        void MoveInLineOfSight(Unit* who)
         {
             if (!who || !who->IsAlive() || TalkSequenceIsStarted)
                 return;
@@ -526,82 +533,83 @@ public:
                 if (player)
                 {
                     if (player->GetQuestStatus(QUEST_TROLLING_FOR_INFORMATION) == QUEST_STATUS_INCOMPLETE)
-                    {                        
+                    {
                         TalkSequenceIsStarted = true;
                         timer = 2000; phase++;
                     }
                 }
-            }                
+            }
         }
 
-        void UpdateAI(uint32 diff) 
-        {                        
+        void UpdateAI(uint32 diff)
+        {
             if (!UpdateVictim())
             {
                 if (TalkSequenceIsStarted)
                 {
                     if (!player)
                     {
-                        timer=0; phase=0; TalkSequenceIsStarted=false;
+                        timer = 0; phase = 0; TalkSequenceIsStarted = false;
                         return;
                     }
-                    if (timer<=diff)
-                    {                        
+                    if (timer <= diff)
+                    {
                         switch (phase)
                         {
                         case 1:
-                            { 
-                                Talk(0); timer=5000; phase++;
-                                break;
-                            }
+                        {
+                            Talk(0); timer = 5000; phase++;
+                            break;
+                        }
                         case 2:
-                            { 
-                                Talk(1); timer=5000; phase++;
-                                break;
-                            }
+                        {
+                            Talk(1); timer = 5000; phase++;
+                            break;
+                        }
                         case 3:
-                            { 
-                                Talk(2); timer=5000; phase++;
-                                break;
-                            }
+                        {
+                            Talk(2); timer = 5000; phase++;
+                            break;
+                        }
                         case 4:
-                            {                                                                                                                                                                        
-                                player->KilledMonsterCredit(NPC_TROLLING_FOR_INFORMATION_KILL_CREDIT_BUNNY_W, 0);    
-                                timer=120000; phase++; // cooldown                                                                                      
-                                break;
-                            }
+                        {
+                            player->KilledMonsterCredit(NPC_TROLLING_FOR_INFORMATION_KILL_CREDIT_BUNNY_W, 0);
+                            timer = 120000; phase++; // cooldown                                                                                      
+                            break;
+                        }
                         case 5:
-                            {                                                                                                                                                                                                
-                                timer=0; phase=0; TalkSequenceIsStarted=false;                                                                                                              
-                                break;
-                            }
-                        }                
+                        {
+                            timer = 0; phase = 0; TalkSequenceIsStarted = false;
+                            break;
+                        }
+                        }
                     }
                     else
-                        timer-=diff;
+                        timer -= diff;
 
-                    if (!me->IsInRange (player, 0.0f, 15.0F)) 
-                    { 
-                        timer=0; phase=0; TalkSequenceIsStarted=false; // if player gone away, delete cooldown
+                    if (!me->IsInRange(player, 0.0f, 15.0F))
+                    {
+                        timer = 0; phase = 0; TalkSequenceIsStarted = false; // if player gone away, delete cooldown
                     }
                 }
 
-            } else 
+            }
+            else
                 DoMeleeAttackIfReady();
-            
+
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const  
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_soothsayer_mirimkoaAI (creature);
+        return new npc_soothsayer_mirimkoaAI(creature);
     }
 };
 
-// ################################################ Quest: Follow that Gyro-Copter! 24491
-
+// Quest: Follow that Gyro-Copter! 24491
 enum eQuest24491
 {
+    QUEST_A_TRIP_TO_IRONFORGE = 24490,
     QUEST_FOLLOW_THAT_GYRO_COPTER = 24491,
 
     NPC_HANDS_SPRINGSPROCKET = 6782,
@@ -609,31 +617,38 @@ enum eQuest24491
     SPELL_SEE_COLDRIGE_TUNNEL_ROCKS_SEE_QUEST_INVIS_1 = 70042,
     SPELL_SEE_MILO_GEARTWINGE_SEE_QUEST_INVIS_2 = 70044,
     SPELL_MILO_GEARTWINGE_INVISIBILITY_QUEST_INVIS_2 = 70045,
+    SPELL_A_TRIP_TO_IRONFORGE_QUEST_COMLETE = 70046,
 };
 
+// 6782 npc_hands_springsprocket
 class npc_hands_springsprocket : public CreatureScript
 {
 public:
     npc_hands_springsprocket() : CreatureScript("npc_hands_springsprocket") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) 
+    bool OnQuestReward(Player* player, Creature* /*creature*/, Quest const* quest, uint32 /*opt*/) 
     { 
+        if (quest->GetQuestId() == QUEST_A_TRIP_TO_IRONFORGE)
+            player->CastSpell(player, SPELL_A_TRIP_TO_IRONFORGE_QUEST_COMLETE, true);
+        
+        return false; 
+    }
+
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    {
         if (quest->GetQuestId() == QUEST_FOLLOW_THAT_GYRO_COPTER)
             if (!player->HasAura(SPELL_SEE_MILO_GEARTWINGE_SEE_QUEST_INVIS_2))
-            {                
-                player->CastSpell(player, SPELL_SEE_COLDRIGE_TUNNEL_ROCKS_SEE_QUEST_INVIS_1, true);
-                player->CastSpell(player, SPELL_SEE_MILO_GEARTWINGE_SEE_QUEST_INVIS_2, true);               
-            }         
+            {
+                player->CastSpell(player, SPELL_SEE_MILO_GEARTWINGE_SEE_QUEST_INVIS_2, true);
+            }
 
-        return true; 
+        return true;
     }
 };
 
-
-// ################################################ Quest: Pack Your Bags 24492
-
+// QUEST_PACK_YOUR_BAGS
 enum eQuest24492
-{    
+{
     QUEST_PACK_YOUR_BAGS = 24492,
 
     NPC_MILO_GEARTWINGE = 37113,
@@ -645,53 +660,46 @@ enum eQuest24492
     SPELL_RIDING_MILOS_GYRO = 70036,
 };
 
+// 37198 npc_milos_gyro_spawned
 class npc_milos_gyro_spawned : public CreatureScript
 {
 public:
     npc_milos_gyro_spawned() : CreatureScript("npc_milos_gyro_spawned") { }
 
-    struct npc_milos_gyro_spawnedAI : public npc_escortAI
+    struct npc_milos_gyro_spawnedAI : public VehicleAI
     {
-        npc_milos_gyro_spawnedAI(Creature* creature) : npc_escortAI(creature) 
-        {             
-            AddWaypoint(1, -6220.035645f, 296.816772f, 409.775787f);
-            AddWaypoint(2, -6180.738281f, 271.849091f, 435.231506f);
-            AddWaypoint(3, -6167.073730f, 213.735809f, 470.028137f);
-            AddWaypoint(4, -6134.929688f, 124.723755f, 507.195953f);
-            AddWaypoint(5, -6075.491699f, 73.982384f, 510.407410f);
-            AddWaypoint(6, -5984.715820f, -9.166074f, 470.231415f);
-            AddWaypoint(7, -5908.320313f, -225.218124f, 490.649323f);
-            AddWaypoint(8, -5727.785156f, -416.732208f, 466.876831f);
-            AddWaypoint(9, -5647.638672f, -482.040649f, 399.289917f);
-            AddWaypoint(10, -5629.615234f, -484.758545f, 396.980530f);
-            AddWaypoint(11, -5618.415527f, -484.724670f, 396.980530f);
-
-            SetDespawnAtEnd(true);
-            me->EnableAI();
-            _phase = 0;
-        }
+        npc_milos_gyro_spawnedAI(Creature* creature) : VehicleAI(creature) { }
 
         uint32 _phase;
+
+        void Reset()
+        {
+           _phase = 0;
+        }
 
         void PassengerBoarded(Unit* who, int8 seatId, bool apply)
         {
             if (!apply)
                 return;
 
-            if (seatId == 0)
+            if (_phase == 0  && seatId == 0 && apply)
             {
-                me->SetSpeed(MOVE_FLIGHT, 2.0f, true);
-                Start();                
+                _phase = 1;
+                me->SendGravityDisable();
+                me->GetMotionMaster()->MovePath(3719801, false);
             }
         }
 
-        void WaypointReached(uint32 point)
+        void MovementInform(uint32 type, uint32 id) OVERRIDE
         {
-            _phase++;
-            switch (_phase)
+            if (type != WAYPOINT_MOTION_TYPE || _phase != 1)
+                return;
+
+            switch (id)
             {
             case 1:
                 Talk(0);
+                me->SetSpeed(MOVE_RUN, 3.0f, true);
                 break;
             case 3:
                 Talk(1);
@@ -711,12 +719,11 @@ public:
             case 8:
                 Talk(6);
                 break;
+            case 10:
+                _phase = 2;
+                me->ExitVehicle();
+                me->DespawnOrUnsummon(5000);
             }
-        }
-
-        void UpdateAI(uint32 diff)
-        {
-            npc_escortAI::UpdateAI(diff);
         }
     };
 
@@ -724,23 +731,81 @@ public:
     {
         return new npc_milos_gyro_spawnedAI(creature);
     }
-   
+
 };
 
-/*######
-## AddSC
-######*/
+// 40991 npc_mountaineer_dunstan
+class npc_mountaineer_dunstan : public CreatureScript
+{
+public:
+    npc_mountaineer_dunstan() : CreatureScript("npc_mountaineer_dunstan") { }
+
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 /*action*/) 
+    { 
+        if (player && player->GetQuestStatus(313) == QUEST_STATUS_INCOMPLETE)
+        {
+            creature->AI()->Talk(0);
+            player->KilledMonsterCredit(40991);
+            player->CLOSE_GOSSIP_MENU();
+        }
+
+        return false; 
+    }
+};
+
+// 40994 npc_mountaineer_lewin
+class npc_mountaineer_lewin : public CreatureScript
+{
+public:
+    npc_mountaineer_lewin() : CreatureScript("npc_mountaineer_lewin") { }
+
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 /*action*/)
+    {
+        if (player && player->GetQuestStatus(313) == QUEST_STATUS_INCOMPLETE)
+        {
+            creature->AI()->Talk(0);
+            player->KilledMonsterCredit(40994);
+            player->CLOSE_GOSSIP_MENU();
+        }
+
+        return false;
+    }
+};
+
+// 41056 npc_mountaineer_valgrum
+class npc_mountaineer_valgrum : public CreatureScript
+{
+public:
+    npc_mountaineer_valgrum() : CreatureScript("npc_mountaineer_valgrum") { }
+
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 /*action*/)
+    {
+        if (player && player->GetQuestStatus(313) == QUEST_STATUS_INCOMPLETE)
+        {
+            creature->AI()->Talk(0);
+            player->KilledMonsterCredit(41056);
+            player->CLOSE_GOSSIP_MENU();
+        }
+
+        return false;
+    }
+};
+
 
 void AddSC_coldridge_valley()
 {
     new npc_rockjaw_invader();
-	new npc_coldridge_defender();
-	new npc_wounded_coldridge_mountaineer();
-	new npc_soothsayer_shikala(); 
-	new npc_soothsayer_rikkari();
-	new npc_soothsayer_mirimkoa();
+    new npc_coldridge_defender();
+    new npc_wounded_coldridge_mountaineer();
+    new spell_heal_wounded_mountaineer();
+    new npc_soothsayer_shikala();
+    new npc_soothsayer_rikkari();
+    new npc_soothsayer_mirimkoa();
     new npc_rockjaw_scavenger();
     new npc_hands_springsprocket();
     new npc_milos_gyro_spawned();
+    new npc_mountaineer_dunstan();
+    new npc_mountaineer_lewin();
+    new npc_mountaineer_valgrum();
 }
 

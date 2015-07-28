@@ -231,6 +231,7 @@ uint32 CreatureTextMgr::SendChat(Creature* source, uint8 textGroup, WorldObject 
             groupItr->second.clear();
         }
 
+        // source->ClearTextRepeatGroup(textGroup);  // prepared test
         tempGroup = textGroupContainer;
     }
 
@@ -274,6 +275,9 @@ uint32 CreatureTextMgr::SendChat(Creature* source, uint8 textGroup, WorldObject 
     ChatMsg finalType = (msgType == CHAT_MSG_ADDON) ? iter->type : msgType;
     Language finalLang = (language == LANG_ADDON) ? iter->lang : language;
     uint32 finalSound = sound ? sound : iter->sound;
+
+    //if (range == TEXT_RANGE_NORMAL)
+    //    range = iter->TextRange;   // TextRange is a new element in database.. prepared for future use..
 
     if (finalSound)
         SendSound(source, finalSound, finalType, whisperTarget, range, team, gmOnly);

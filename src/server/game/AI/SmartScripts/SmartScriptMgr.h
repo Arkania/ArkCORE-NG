@@ -169,7 +169,10 @@ enum SMART_EVENT
     SMART_EVENT_FRIENDLY_HEALTH_PCT      = 74,      // minHpPct, maxHpPct, repeatMin, repeatMax
     SMART_EVENT_DISTANCE_CREATURE        = 75,      // guid, entry, distance, repeat
     SMART_EVENT_DISTANCE_GAMEOBJECT      = 76,      // guid, entry, distance, repeat
-    SMART_EVENT_END                      = 77
+
+    // prepare 
+    SMART_EVENT_COUNTER_SET,      // id, value, cooldownMin, cooldownMax
+    SMART_EVENT_END                     
 };
 
 struct SmartEvent
@@ -530,7 +533,10 @@ enum SMART_ACTION
     SMART_ACTION_REMOVE_POWER                       = 110,    // PowerType, newPower
     SMART_ACTION_GAME_EVENT_STOP                    = 111,    // GameEventId
     SMART_ACTION_GAME_EVENT_START                   = 112,    // GameEventId
-    SMART_ACTION_END                                = 113
+
+    // preparing 
+    SMART_ACTION_SET_COUNTER,     // id, value, reset (0/1)
+    SMART_ACTION_END                               
 };
 
 struct SmartAction
@@ -655,6 +661,7 @@ struct SmartAction
         struct
         {
             uint32 spell;
+            uint32 charges;
         } removeAura;
 
         struct
@@ -820,6 +827,13 @@ struct SmartAction
         {
             uint32 mapID;
         } teleport;
+
+        struct
+        {
+            uint32 counterId;
+            uint32 value;
+            uint32 reset;
+        } setCounter;
 
         struct
         {
@@ -1583,7 +1597,7 @@ class SmartAIMgr
             return true;
         }
 
-        //bool IsTextValid(SmartScriptHolder const& e, uint32 id);
+        bool IsTextValid(SmartScriptHolder const& e, uint32 id);
 
         // Helpers
         void LoadHelperStores();
@@ -1592,10 +1606,12 @@ class SmartAIMgr
         CacheSpellContainerBounds GetSummonCreatureSpellContainerBounds(uint32 creatureEntry) const;
         CacheSpellContainerBounds GetSummonGameObjectSpellContainerBounds(uint32 gameObjectEntry) const;
         CacheSpellContainerBounds GetKillCreditSpellContainerBounds(uint32 killCredit) const;
+        CacheSpellContainerBounds GetCreateItemSpellContainerBounds(uint32 itemId) const;
 
         CacheSpellContainer SummonCreatureSpellStore;
         CacheSpellContainer SummonGameObjectSpellStore;
         CacheSpellContainer KillCreditSpellStore;
+        CacheSpellContainer CreateItemSpellStore;
 };
 
 #define sSmartScriptMgr ACE_Singleton<SmartAIMgr, ACE_Null_Mutex>::instance()
