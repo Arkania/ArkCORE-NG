@@ -45,7 +45,7 @@ public:
             AlizabalGUID = 0;
         }
 
-        void OnCreatureCreate(Creature* creature) OVERRIDE
+        void OnCreatureCreate(Creature* creature)
         {
             switch (creature->GetEntry())
             {
@@ -61,7 +61,7 @@ public:
             }
         }
 
-        void OnGameObjectCreate(GameObject* go) OVERRIDE
+        void OnGameObjectCreate(GameObject* go)
         {
             switch (go->GetEntry())
             {
@@ -73,7 +73,7 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 data) const OVERRIDE
+        uint64 GetData64(uint32 data) const
         {
             switch (data)
             {
@@ -90,7 +90,7 @@ public:
             return 0;
         }
 
-        void OnGameObjectRemove(GameObject* go) OVERRIDE
+        void OnGameObjectRemove(GameObject* go)
         {
             switch (go->GetEntry())
             {
@@ -102,7 +102,7 @@ public:
             }
         }
 
-        std::string GetSaveData() OVERRIDE
+        std::string GetSaveData()
         {
             OUT_SAVE_INST_DATA;
 
@@ -113,7 +113,7 @@ public:
             return saveStream.str();
         }
 
-        void Load(const char* in) OVERRIDE
+        void Load(const char* in)
         {
             if (!in)
             {

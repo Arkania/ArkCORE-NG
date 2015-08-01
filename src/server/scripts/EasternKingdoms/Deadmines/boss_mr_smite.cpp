@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2015 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -39,24 +39,22 @@ enum Spels
     SAY_AGGRO               = 0,
 };
 
+// http://www.wowhead.com/npc=646/mr-smite
 class boss_mr_smite : public CreatureScript
 {
 public:
     boss_mr_smite() : CreatureScript("boss_mr_smite") { }
 
-    CreatureAI* GetAI(Creature* creature) const OVERRIDE
-    {
-        return GetInstanceAI<boss_mr_smiteAI>(creature);
-    }
-
     struct boss_mr_smiteAI : public ScriptedAI
     {
         boss_mr_smiteAI(Creature* creature) : ScriptedAI(creature)
         {
-            instance = creature->GetInstanceScript();
+            m_instance = creature->GetInstanceScript();
         }
 
-        InstanceScript* instance;
+        InstanceScript* m_instance;
+        EventMap m_events;
+        uint32 m_phase;
 
         uint32 uiTrashTimer;
         uint32 uiSlamTimer;
@@ -67,8 +65,10 @@ public:
         uint32 uiPhase;
         uint32 uiTimer;
 
-        void Reset() OVERRIDE
-        {
+        void Reset()
+        {           
+            m_events.Reset();
+
             uiTrashTimer = urand(5000, 9000);
             uiSlamTimer = 9000;
             uiNimbleReflexesTimer = urand(15500, 31600);
@@ -81,9 +81,14 @@ public:
             SetEquipmentSlots(false, EQUIP_SWORD, EQUIP_UNEQUIP, EQUIP_NO_CHANGE);
         }
 
-        void EnterCombat(Unit* /*who*/) OVERRIDE
+        void EnterCombat(Unit* /*who*/)
         {
            Talk(SAY_AGGRO);
+        }
+
+        void JustDied(Unit* /*Killer*/)
+        {
+
         }
 
         bool bCheckChances()
@@ -95,7 +100,7 @@ public:
                 return true;
         }
 
-        void UpdateAI(uint32 uiDiff) OVERRIDE
+        void UpdateAI(uint32 uiDiff)
         {
             if (!UpdateVictim())
                 return;
@@ -128,7 +133,7 @@ public:
                 ++uiHealth;
                 DoCastAOE(SPELL_SMITE_STOMP, false);
                 SetCombatMovement(false);
-                if (GameObject* go = GameObject::GetGameObject(*me, instance->GetData64(DATA_SMITE_CHEST)))
+                if (GameObject* go = GameObject::GetGameObject(*me, m_instance->GetData64(DATA_MR_SMITE_CHEST)))
                 {
                     me->GetMotionMaster()->Clear();
                     me->GetMotionMaster()->MovePoint(1, go->GetPositionX() - 3.0f, go->GetPositionY(), go->GetPositionZ());
@@ -166,7 +171,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void MovementInform(uint32 uiType, uint32 /*uiId*/) OVERRIDE
+        void MovementInform(uint32 uiType, uint32 /*uiId*/)
         {
             if (uiType != POINT_MOTION_TYPE)
                 return;
@@ -175,6 +180,11 @@ public:
             uiPhase = 1;
         }
     };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return GetDeadminesAI<boss_mr_smiteAI>(creature);
+    }
 };
 
 void AddSC_boss_mr_smite()

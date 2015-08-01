@@ -2230,6 +2230,7 @@ public:
     static bool HandleCombatStopCommand(ChatHandler* handler, char const* args)
     {
         Player* target = NULL;
+        Unit* victim = NULL;
 
         if (args && strlen(args) > 0)
         {
@@ -2251,6 +2252,25 @@ public:
         // check online security
         if (handler->HasLowerSecurity(target, 0))
             return false;
+
+        // display all mops involved in combat
+        uint32 size = target->getHostileRefManager().getSize();
+        if (size)
+        {
+            uint32 count = 0;
+            handler->PSendSysMessage("Hostil reference list of %s (guid %u)", target->GetName().c_str(), target->GetGUIDLow());
+            HostileReference* ref = target->getHostileRefManager().getFirst();
+            while (ref)
+            {
+                if (Unit* unit = ref->GetSource()->GetOwner())
+                {
+                    ++count;
+                    handler->PSendSysMessage("   %u.   %s   (guid %u)(entry %u)  - threat %f", count, unit->GetName().c_str(), unit->GetGUIDLow(), unit->GetEntry(), ref->getThreat());
+                }
+                ref = ref->next();
+            }
+            handler->SendSysMessage("End of hostil reference list.");
+        }
 
         target->CombatStop();
         target->getHostileRefManager().deleteReferences();
