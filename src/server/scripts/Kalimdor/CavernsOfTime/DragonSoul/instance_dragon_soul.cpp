@@ -27,10 +27,7 @@ public:
 
     struct instance_dragon_soul_InstanceMapScript : public InstanceScript
     {
-        instance_dragon_soul_InstanceMapScript(InstanceMap* map) : InstanceScript(map)
-        {
-            Initialize();
-        }
+        instance_dragon_soul_InstanceMapScript(InstanceMap* map) : InstanceScript(map) { }
         // Creatures
         uint64 MorchokGUID;
         uint64 UnsleepingGUID;
