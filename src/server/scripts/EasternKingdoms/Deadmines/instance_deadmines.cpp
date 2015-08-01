@@ -318,12 +318,6 @@ public:
                     npc->setFaction(35);
                 if (Creature* npc = door->SummonCreature(46903, -53.5035f, -402.894f, 55.534f, 2.40855f))
                     npc->setFaction(35);
-                if (Creature* npc = door->SummonCreature(46903, -81.9973f, -784.703f, 26.4822f, 3.32525f))
-                    npc->setFaction(35);
-                if (Creature* npc = door->SummonCreature(46903, -82.2208f, -781.419f, 26.6876f, 3.28652f))
-                    npc->setFaction(35);
-                if (Creature* npc = door->SummonCreature(46902, -85.1321f, -783.436f, 26.5951f, 3.42386f))
-                    npc->setFaction(35);
             }
             else if (m_TeamInInstance == HORDE)
             {
@@ -337,9 +331,6 @@ public:
                 door->SummonCreature(46889, -66.2517f, -401.241f, 54.2756f, 1.51844f);
                 door->SummonCreature(46890, -82.8833f, -380.416f, 56.5812f, 2.71094f);
                 door->SummonCreature(46890, -82.5976f, -369.945f, 57.2399f, 3.44135f);
-                door->SummonCreature(46903, -81.9973f, -784.703f, 26.4822f, 3.32525f);
-                door->SummonCreature(46903, -82.2208f, -781.419f, 26.6876f, 3.28652f);
-                door->SummonCreature(46902, -85.1321f, -783.436f, 26.5951f, 3.42386f);
             }
             else if (m_TeamInInstance == ALLIANCE)
             {
