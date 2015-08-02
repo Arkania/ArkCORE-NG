@@ -709,11 +709,41 @@ public:
     }
 };
 
+// npc 28406 -- some initiate are mounted and flying
+class npc_dk_initiate_28406 : public CreatureScript
+{
+public:
+    npc_dk_initiate_28406() : CreatureScript("npc_dk_initiate_28406") { }
+
+    struct npc_dk_initiate_28406AI : public ScriptedAI
+    {
+        npc_dk_initiate_28406AI(Creature* creature) : ScriptedAI(creature) { }
+
+        void Reset() override
+        {
+            if (me->IsMounted())
+            {
+                me->SetByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_HOVER);
+                me->AddUnitMovementFlag(MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_FLYING);
+                me->SetCanFly(true);
+                me->SetDisableGravity(true);
+            }
+                
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_dk_initiate_28406AI(creature);
+    }
+};
+
+
 
 void AddSC_the_scarlet_enclave()
 {
     new npc_valkyr_battle_maiden();
     new npc_acherus_necromancer();
     new npc_instructor_razuvious();
-
+    new npc_dk_initiate_28406();
 }

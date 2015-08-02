@@ -2576,15 +2576,15 @@ void Player::RefreshBot(uint32 diff)
     if (m_botTimer > 0)
          return;
     
-        if (IsInFlight())
+    if (IsInFlight())
          m_botTimer = 3000;
     
-        if (!HaveBot())
+    if (!HaveBot())
          return;
     
-            //BOT REVIVE SUPPORT part 2
-            //Revive timer condition (maybe we should check whole party?)
-        bool partyInCombat = IsInCombat();
+    //BOT REVIVE SUPPORT part 2
+    //Revive timer condition (maybe we should check whole party?)
+    bool partyInCombat = IsInCombat();
     if (!partyInCombat)
     {
         for (uint8 i = 0; i != GetMaxNpcBots(); ++i)
