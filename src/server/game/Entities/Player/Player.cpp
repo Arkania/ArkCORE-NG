@@ -2845,12 +2845,20 @@ void Player::RemoveBot(uint64 guid, bool final, bool eraseFromDB)
             ClearBotMustBeCreated(guid);
             if (eraseFromDB)//by command
             {
-                PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_NPCBOT_ACTIVE);
-                stmt->setUInt8(0, uint8(0));
-                stmt->setUInt32(1, GetGUIDLow());
-                stmt->setUInt32(2, m_bot->GetEntry());
+                // old version: set status to "not active".. all data of bot, stay in db..
+                //PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_NPCBOT_ACTIVE);
+                //stmt->setUInt8(0, uint8(0));
+                //stmt->setUInt32(1, GetGUIDLow());
+                //stmt->setUInt32(2, m_bot->GetEntry());
+                //CharacterDatabase.Execute(stmt);
+                // comment: maybe what it shoult be // CharacterDatabase.PExecute("DELETE FROM `character_npcbot` WHERE `owner` = '%u' AND `entry` = '%u'", GetGUIDLow(), m_bot->GetEntry());
+
+                // new Version: delete this player::bot from characters db
+                PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_NPCBOT);
+                stmt->setUInt32(0, GetGUIDLow());
+                stmt->setUInt32(1, m_bot->GetEntry());
                 CharacterDatabase.Execute(stmt);
-                //CharacterDatabase.PExecute("DELETE FROM `character_npcbot` WHERE `owner` = '%u' AND `entry` = '%u'", GetGUIDLow(), m_bot->GetEntry());
+                // comment: now this is a equivalent to: // CharacterDatabase.PExecute("DELETE FROM `character_npcbot` WHERE `owner` = '%u' AND `entry` = '%u'", GetGUIDLow(), m_bot->GetEntry());
             }
         }
         else
@@ -6179,7 +6187,7 @@ void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmC
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_NPCBOTS);
             stmt->setUInt32(0, guid);
             trans->Append(stmt);
-            //CharacterDatabase.PExecute("DELETE FROM `character_npcbot` WHERE `owner` = '%u'", guid);
+            //CharacterDatabase.PExecute("DELETE FROM `character_npcbot` WHERE `owner` = '%u'", guid);           
             //end npc_bot
                 
             CharacterDatabase.CommitTransaction(trans);

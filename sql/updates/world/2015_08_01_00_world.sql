@@ -77,7 +77,6 @@ delete from game_graveyard_zone where id=1374;
 
 delete from game_graveyard_zone where id=109;
 insert into game_graveyard_zone values
-(109, 33, 0),
 (109, 214, 0),
 (109, 5339, 0);
 

@@ -583,6 +583,7 @@ enum CharacterDatabaseStatements
     // Bot
     CHAR_SEL_NPCBOTS,
     CHAR_DEL_NPCBOTS,
+    CHAR_DEL_NPCBOT,
     CHAR_INS_NPCBOT,
     CHAR_SEL_MAINTANK,
     CHAR_UPD_NPCBOT_TANK,

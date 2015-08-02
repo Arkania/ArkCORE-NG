@@ -658,6 +658,7 @@ void CharacterDatabaseConnection::DoPrepareStatements()
     PrepareStatement(CHAR_SEL_NPCBOTS, "SELECT entry, race, class, istank, equipMhEx, equipOhEx, equipRhEx, "
         "equipHead, equipShoulders, equipChest, equipWaist, equipLegs, equipFeet, equipWrist, equipHands, equipBack, equipBody, equipFinger1, equipFinger2, equipTrinket1, equipTrinket2, equipNeck FROM character_npcbot WHERE owner = ? AND active = 1", CONNECTION_SYNCH);
     PrepareStatement(CHAR_DEL_NPCBOTS, "DELETE FROM character_npcbot WHERE owner = ?", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_DEL_NPCBOT, "DELETE FROM character_npcbot WHERE owner = ? AND entry=?", CONNECTION_ASYNC);
     PrepareStatement(CHAR_INS_NPCBOT, "REPLACE INTO character_npcbot (owner, entry, race, class, istank, equipMhEx, equipOhEx, equipRhEx, "
         "equipHead, equipShoulders, equipChest, equipWaist, equipLegs, equipFeet, equipWrist, equipHands, equipBack, equipBody, equipFinger1, equipFinger2, equipTrinket1, equipTrinket2, equipNeck, active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", CONNECTION_ASYNC);
     PrepareStatement(CHAR_SEL_MAINTANK, "SELECT memberGuid, memberFlags FROM group_member WHERE guid = ?", CONNECTION_SYNCH);
