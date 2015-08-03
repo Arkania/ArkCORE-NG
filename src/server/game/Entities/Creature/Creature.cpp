@@ -2568,8 +2568,15 @@ void Creature::UpdateMovementFlags()
     float ground = GetMap()->GetHeight(GetPositionX(), GetPositionY(), GetPositionZMinusOffset());
 
     bool isInAir = (G3D::fuzzyGt(GetPositionZMinusOffset(), ground + 0.05f) || G3D::fuzzyLt(GetPositionZMinusOffset(), ground - 0.05f)); // Can be underground too, prevent the falling
+    bool allowedToFly = GetUnitMovementFlags() & MOVEMENTFLAG_CAN_FLY && GetByteValue(UNIT_FIELD_BYTES_1, 3) & UNIT_BYTE1_FLAG_HOVER && isInAir;
+    bool allowedToWalk = GetUnitMovementFlags() & MOVEMENTFLAG_WALKING && !(GetByteValue(UNIT_FIELD_BYTES_1, 3) & UNIT_BYTE1_FLAG_HOVER) && !isInAir;
 
-    if (GetCreatureTemplate()->InhabitType & INHABIT_AIR && isInAir && !IsFalling())
+    if ((allowedToFly || allowedToWalk) && !IsInWater() && !IsFalling())
+    {
+        // if movement allow what we do, we not change the value back.
+        // so we allow every single mob of a entry, to have flying/walking flag or not..
+    }
+    else if (GetCreatureTemplate()->InhabitType & INHABIT_AIR && isInAir && !IsFalling())
     {
         if (GetCreatureTemplate()->InhabitType & INHABIT_GROUND)
             SetCanFly(true);
