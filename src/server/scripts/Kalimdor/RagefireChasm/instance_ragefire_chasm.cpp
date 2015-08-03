@@ -31,18 +31,33 @@ class instance_ragefire_chasm : public InstanceMapScript
 public:
     instance_ragefire_chasm() : InstanceMapScript("instance_ragefire_chasm", 389) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const OVERRIDE
+    InstanceScript* GetInstanceScript(InstanceMap* map) const
     {
+        printf("instance_ragefire_chasm:: GetInstanceScript \n ");
         return new instance_ragefire_chasm_InstanceMapScript(map);
     }
 
     struct instance_ragefire_chasm_InstanceMapScript : public InstanceScript
     {
-        instance_ragefire_chasm_InstanceMapScript(Map* map) : InstanceScript(map) { }
+        instance_ragefire_chasm_InstanceMapScript(Map* map) : InstanceScript(map) 
+        {
+            printf("instance_ragefire_chasm_InstanceMapScript map : %u \n ", map->GetId());
+        }
+
+        void Initialize()
+        {
+            printf("Initialize ragefire_chasm\n");
+        }
+
+        void OnPlayerEnter(Player* player)
+        {
+            printf("OnPlayerEnter: name=%s \n", player->GetName().c_str());
+        }
     };
 };
 
 void AddSC_instance_ragefire_chasm()
 {
+    printf("AddSC_instance_ragefire_chasm \n ");
     new instance_ragefire_chasm();
 }
