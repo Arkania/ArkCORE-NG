@@ -715,6 +715,12 @@ class npc_dk_initiate_28406 : public CreatureScript
 public:
     npc_dk_initiate_28406() : CreatureScript("npc_dk_initiate_28406") { }
 
+    enum eInitiate
+    {
+        QUEST_DEATHS_CHALLENGE = 12733,
+        SPELL_EBON_HOLD_DUEL_CREDIT = 29025,
+    };
+
     struct npc_dk_initiate_28406AI : public ScriptedAI
     {
         npc_dk_initiate_28406AI(Creature* creature) : ScriptedAI(creature) { }
@@ -725,10 +731,23 @@ public:
             {
                 me->SetByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_HOVER);
                 me->AddUnitMovementFlag(MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_FLYING);
-                me->SetCanFly(true);
                 me->SetDisableGravity(true);
+                me->SetCanFly(true);
+            }
+            else
+            {
+                me->setFaction(12);
             }
                 
+        }
+
+        void JustDied(Unit* killer) 
+        { 
+            if (Player* player = killer->ToPlayer())
+                if (player->GetQuestStatus(QUEST_DEATHS_CHALLENGE) == QUEST_STATUS_INCOMPLETE)
+                {
+                    me->CastSpell(killer,SPELL_EBON_HOLD_DUEL_CREDIT);
+                }
         }
     };
 
@@ -739,11 +758,11 @@ public:
 };
 
 
-
 void AddSC_the_scarlet_enclave()
 {
     new npc_valkyr_battle_maiden();
     new npc_acherus_necromancer();
     new npc_instructor_razuvious();
     new npc_dk_initiate_28406();
+
 }
