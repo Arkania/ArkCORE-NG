@@ -1916,12 +1916,13 @@ void Player::Update(uint32 p_time)
     if (IsHasDelayedTeleport() && IsAlive())
         TeleportTo(m_teleport_dest, m_teleport_options); 
 
-
     // npc_bot mod: Update
     if (m_botTimer > 0)
     {
         if (p_time >= m_botTimer)
             m_botTimer = 0;
+        else if (this == 0)
+            ASSERT(false); // TC_LOG_ERROR("entities.player", "player::update Z 1925: Player* is a unwanted nullptr.ASSERT.ASSERT.ASSERT");
         else if (!sMapMgr->CanPlayerEnter(GetMap()->GetId(), this, false))
             m_botTimer -= p_time;
     }

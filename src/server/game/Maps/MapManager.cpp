@@ -204,8 +204,13 @@ bool MapManager::CanPlayerEnter(uint32 mapid, Player* player, bool loginCheck)
         InstanceGroupBind* boundInstance = group->GetBoundInstance(entry);
         if (boundInstance && boundInstance->save)
             if (Map* boundMap = sMapMgr->FindMap(mapid, boundInstance->save->GetInstanceId()))
+            {
+                if (!player)
+                    ASSERT(false); // check for CanPlayerEnter crash..
+
                 if (!loginCheck && !boundMap->CanEnter(player))
                     return false;
+            }
             /*
                 This check has to be moved to InstanceMap::CanEnter()
                 // Player permanently bounded to different instance than groups one

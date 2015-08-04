@@ -976,6 +976,9 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket& recvData)
     bool teleported = false;
     if (player->GetMapId() != at->target_mapId)
     {
+        if (!player)
+            ASSERT(false); // check for CanPlayerEnter crash..
+
         if (!sMapMgr->CanPlayerEnter(at->target_mapId, player, false))
             return;
 
