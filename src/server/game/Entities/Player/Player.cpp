@@ -18891,8 +18891,6 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
     }
     else if (map->IsDungeon()) // if map is dungeon...
     {
-        TC_LOG_DEBUG("entities.player.loading", "Player %s has InstanceId %u for map %u. Now checking player is allready inside map.", GetName().c_str(), instanceId, mapId);
-
         if (!((InstanceMap*)map)->CanEnter(this)) // ... and can't enter map, then look for entry point.
         {
             areaTrigger = sObjectMgr->GetGoBackTrigger(mapId);
