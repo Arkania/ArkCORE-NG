@@ -2844,16 +2844,9 @@ void InstanceMap::InitVisibilityDistance()
 */
 bool InstanceMap::CanEnter(Player* player)
 {
-    if (!player)
-    {
-        TC_LOG_ERROR("maps", "InstanceMap::CanEnter - player that entering map: %u: is a nullptr!", GetId());
-        //ASSERT(false);
-        return false;
-    }
-
     if (player->GetMapRef().getTarget() == this)
     {
-        TC_LOG_ERROR("maps", "InstanceMap::CanEnter - player %s(%u) already in map %d, %d, %d!", player->GetName().c_str(), player->GetGUIDLow(), GetId(), GetInstanceId(), GetSpawnMode());
+        TC_LOG_ERROR("maps", "ASSERT Check InstanceMap::CanEnter - player %s(%u) already in map %d, %d, %d!", player->GetName().c_str(), player->GetGUIDLow(), GetId(), GetInstanceId(), GetSpawnMode());
         //ASSERT(false);
         return false;
     }

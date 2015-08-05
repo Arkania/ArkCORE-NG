@@ -205,9 +205,7 @@ bool MapManager::CanPlayerEnter(uint32 mapid, Player* player, bool loginCheck)
         if (boundInstance && boundInstance->save)
             if (Map* boundMap = sMapMgr->FindMap(mapid, boundInstance->save->GetInstanceId()))
             {
-                if (!player)
-                    ASSERT(false); // check for CanPlayerEnter crash..
-
+                TC_LOG_ERROR("maps", "ASSERT Check Map::CanPlayerEnter:: Group: %u Instance: %u",group->GetLowGUID() , boundMap->GetEntry());
                 if (!loginCheck && !boundMap->CanEnter(player))
                     return false;
             }
