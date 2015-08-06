@@ -1587,13 +1587,15 @@ void WorldSession::HandleTimeSyncResp(WorldPacket& recvData)
 {
     TC_LOG_DEBUG("network", "CMSG_TIME_SYNC_RESP");
 
-    uint32 counter, clientTicks;
-    recvData >> counter >> clientTicks;
+    uint32 clientCounter, clientTicks;
+    recvData >> clientCounter >> clientTicks;
+    uint32 playerCounter = _player->m_timeSyncQueue.front();
+    int32 tickDiff = abs(int32(playerCounter - clientCounter));
 
-    if (counter != _player->m_timeSyncQueue.front())
+    if (tickDiff > 1)
         TC_LOG_ERROR("network", "Wrong time sync counter from player %s (cheater?)", _player->GetName().c_str());
 
-    TC_LOG_DEBUG("network", "Time sync received: counter %u, client ticks %u, time since last sync %u", counter, clientTicks, clientTicks - _player->m_timeSyncClient);
+    TC_LOG_DEBUG("network", "Time sync received: counter %u, client ticks %u, time since last sync %u", clientCounter, clientTicks, clientTicks - _player->m_timeSyncClient);
 
     uint32 ourTicks = clientTicks + (getMSTime() - _player->m_timeSyncServer);
 
