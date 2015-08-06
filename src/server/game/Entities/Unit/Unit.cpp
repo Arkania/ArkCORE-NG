@@ -8364,7 +8364,10 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
         {
             bool proc = false;
             if (damage)
-                proc = damage >= ToPlayer()->CountPctFromMaxHealth(10);
+            {
+                if (Unit* unit = ToUnit())
+                    proc = damage >= unit->CountPctFromMaxHealth(10);
+            }
             if (trigger_spell_id == 89007)
             {
                 if (proc || (procSpell && procSpell->Id == 32409)) 
