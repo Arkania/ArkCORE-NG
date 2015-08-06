@@ -42,7 +42,6 @@ public:
             m_events.ScheduleEvent(1, 10000);
             m_phase = 0;
             
-            printf("boss_oggleflint: Reset: IsAlive: %s \n", me->IsAlive() ? "true" : "false");
             if (instance->GetData(BOSS_OGGLEFLINT) == TO_BE_DECIDED)
                 instance->SetData(BOSS_OGGLEFLINT, NOT_STARTED);
         }
@@ -58,7 +57,6 @@ public:
 
         void JustDied(Unit* Killer)
         {
-            printf("boss_oggleflint: JustDied: %u \n", me->IsAlive());
             instance->SetData(BOSS_OGGLEFLINT, DONE);
         }
 

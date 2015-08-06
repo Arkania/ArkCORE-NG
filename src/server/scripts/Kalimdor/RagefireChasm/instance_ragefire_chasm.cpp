@@ -145,8 +145,8 @@ public:
 
             std::ostringstream saveStream;
             saveStream << "R C " << GetBossSaveData();
-            std::string str = "R C " + GetBossSaveData(); 
-            printf("Instance GetSaveData %s \n", str);
+            
+            printf("Instance GetSaveData %s \n", saveStream.str().c_str());
 
             OUT_SAVE_INST_DATA_COMPLETE;
             return saveStream.str();

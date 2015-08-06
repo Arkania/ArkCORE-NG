@@ -188,7 +188,6 @@ void InstanceScript::AddMinion(Creature* minion, bool add)
 
 bool InstanceScript::SetBossState(uint32 id, EncounterState state)
 {
-    printf("Instance::SetBossState \n ");
     if (id < bosses.size())
     {
         BossInfo* bossInfo = &bosses[id];
