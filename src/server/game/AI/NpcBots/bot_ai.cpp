@@ -314,6 +314,11 @@ void bot_minion_ai::SetBotCommandState(CommandStates st, bool force, Position* n
         return;
     if (st == COMMAND_FOLLOW && ((!me->isMoving() && !IsCasting() && master->IsAlive()) || force))
     {
+        if (Unit* unit = master->GetSelectedUnit())
+            if (unit->GetEntry() == me->GetEntry())
+                if (unit->GetDistance(me) < 20.0f)
+                    return;
+
         if (CCed(me, true)/* || master->HasUnitState(UNIT_STATE_FLEEING)*/) return;
         if (me->isMoving() && Rand() > 25) return;
         if (!newpos)
