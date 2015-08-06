@@ -2846,7 +2846,7 @@ bool InstanceMap::CanEnter(Player* player)
 {
     if (player->GetMapRef().getTarget() == this)
     {
-        TC_LOG_ERROR("maps", "ASSERT Check InstanceMap::CanEnter - player %s(%u) already in map %d, %d, %d!", player->GetName().c_str(), player->GetGUIDLow(), GetId(), GetInstanceId(), GetSpawnMode());
+        TC_LOG_ERROR("maps", "ASSERT Check InstanceMap::CanEnter - player %s(%u) already in map %d, %d", player->GetName().c_str(), player->GetGUIDLow(), GetId(), GetInstanceId());
         //ASSERT(false);
         return false;
     }

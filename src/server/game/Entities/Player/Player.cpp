@@ -1923,9 +1923,10 @@ void Player::Update(uint32 p_time)
             m_botTimer = 0;
         else
         {
-            TC_LOG_ERROR("entities.player", "ASSERT Check player::update::m_botTimer MapId: %u Player: %u GUID: %llu ", GetMap()->GetId(), this->GetName().c_str(), this->GetGUID());
+            TC_LOG_ERROR("entities.player", "\nASSERT Check player::update::m_botTimer start MapId: %u GUID: %llu", GetMap()->GetId(), this->GetGUID());
             if (!sMapMgr->CanPlayerEnter(GetMap()->GetId(), this, false))
                 m_botTimer -= p_time;
+            TC_LOG_ERROR("entities.player", "ASSERT Check player::update::m_botTimer end ");
         }
     }
     else

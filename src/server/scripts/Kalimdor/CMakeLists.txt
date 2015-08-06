@@ -139,7 +139,13 @@ set(scripts_STAT_SRCS
   Kalimdor/OnyxiasLair/boss_onyxia.cpp
   Kalimdor/OnyxiasLair/onyxias_lair.h
   Kalimdor/OnyxiasLair/instance_onyxias_lair.cpp
+  Kalimdor/RagefireChasm/ragefire_chasm.h
+  Kalimdor/RagefireChasm/ragefire_chasm.cpp
   Kalimdor/RagefireChasm/instance_ragefire_chasm.cpp
+  Kalimdor/RagefireChasm/boss_bazzalan.cpp
+  Kalimdor/RagefireChasm/boss_jergosh_the_invoker.cpp
+  Kalimdor/RagefireChasm/boss_oggleflint.cpp
+  Kalimdor/RagefireChasm/boss_taragaman_the_hungerer.cpp
   Kalimdor/DireMaul/instance_dire_maul.cpp
   Kalimdor/Firelands/boss_shannox.cpp
   Kalimdor/Firelands/boss_alysrazor.cpp
