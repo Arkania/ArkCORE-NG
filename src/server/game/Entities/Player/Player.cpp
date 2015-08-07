@@ -1922,12 +1922,8 @@ void Player::Update(uint32 p_time)
         if (p_time >= m_botTimer)
             m_botTimer = 0;
         else
-        {
-            TC_LOG_ERROR("entities.player", "\nASSERT Check player::update::m_botTimer start MapId: %u GUID: %llu", GetMap()->GetId(), this->GetGUID());
             if (!sMapMgr->CanPlayerEnter(GetMap()->GetId(), this, false))
                 m_botTimer -= p_time;
-            TC_LOG_ERROR("entities.player", "ASSERT Check player::update::m_botTimer end ");
-        }
     }
     else
         RefreshBot(p_time);
@@ -2826,7 +2822,22 @@ void Player::RemoveBot(uint64 guid, bool final, bool eraseFromDB)
         if (gr && gr->IsMember(guid))
         {
             if (gr->GetMembersCount() > 2 || /*!GetMap()->Instanceable() || */(final && eraseFromDB))
-                gr->RemoveMember(guid);
+            {
+                if (this->GetGUID() == gr->GetLeaderGUID() && gr->GetMembersCount() == 2 && GetMap()->Instanceable())
+                {
+                    InstanceSave* save = GetInstanceSave(GetMap()->GetInstanceId(), GetMap()->IsRaid());
+                    InstancePlayerBind* playerBind = GetBoundInstance(GetMap()->GetId(), GetDifficulty(GetMap()->IsRaid()));
+                    
+                    bool permanent = false;
+                    if (playerBind)
+                        permanent = true;
+                    
+                    gr->RemoveMember(guid);
+                    BindToInstance(save, permanent, false);
+                }
+                else
+                    gr->RemoveMember(guid);
+            }
             else //just cleanup
             {
                 PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GROUP_MEMBER);
@@ -3050,7 +3061,12 @@ void Player::CreateBot(uint32 botentry, uint8 botrace, uint8 botclass, bool ista
             return;
         }
         sGroupMgr->AddGroup(gr);
-        if (!gr->AddMember((Player*)m_bot))
+        if (gr->AddMember((Player*)m_bot))
+        {
+            if (this->GetMap()->Instanceable())
+                this->UnbindInstance(this->GetMap()->GetId(), this->GetDifficulty(this->GetMap()->IsRaid()));
+        }
+        else
             RemoveBot(m_bot->GetGUID(), true);
     }
 

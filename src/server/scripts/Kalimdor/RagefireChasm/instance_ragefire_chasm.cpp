@@ -125,10 +125,7 @@ public:
         void SetData(uint32 bossId, uint32 value)   // handle enum BossState
         {
             if (bossId < MAX_BOSS_ENCOUNTER)
-            {
-                printf("Instance: SetData: EncounterState: %u, %u \n", bossId, value);
                 SetBossState(bossId, EncounterState(value));
-            }
         }
 
         bool SetBossState(uint32 data, EncounterState state) 
@@ -145,8 +142,6 @@ public:
 
             std::ostringstream saveStream;
             saveStream << "R C " << GetBossSaveData();
-            
-            printf("Instance GetSaveData %s \n", saveStream.str().c_str());
 
             OUT_SAVE_INST_DATA_COMPLETE;
             return saveStream.str();
@@ -159,8 +154,6 @@ public:
                 OUT_LOAD_INST_DATA_FAIL;
                 return;
             }
-
-            printf("Instance Load %s \n", str);
 
             OUT_LOAD_INST_DATA(str);
 
