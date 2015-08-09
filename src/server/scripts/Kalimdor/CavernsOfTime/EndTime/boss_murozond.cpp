@@ -45,6 +45,7 @@ enum Events
 {
 };
 
+// 54432
 class boss_murozond : public CreatureScript
 {
     public:

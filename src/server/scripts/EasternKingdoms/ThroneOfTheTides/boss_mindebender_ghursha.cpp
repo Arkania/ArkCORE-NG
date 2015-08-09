@@ -83,6 +83,7 @@ enum Adds
     NPC_MIND_FOG        = 40861,
 };
 
+// 40825
 class boss_erunak_stonespeaker : public CreatureScript
 {
     public:
@@ -219,6 +220,7 @@ class boss_erunak_stonespeaker : public CreatureScript
         };
 };
 
+// 40788
 class boss_mindbender_ghursha : public CreatureScript
 {
     public:
@@ -342,6 +344,7 @@ class boss_mindbender_ghursha : public CreatureScript
         };
 };
 
+// 45469
 class npc_erunak_earth_shards : public CreatureScript
 {
     public:
@@ -379,6 +382,7 @@ class npc_erunak_earth_shards : public CreatureScript
         };
 };
 
+// 40861
 class npc_ghursha_mind_fog : public CreatureScript
 {
     public:

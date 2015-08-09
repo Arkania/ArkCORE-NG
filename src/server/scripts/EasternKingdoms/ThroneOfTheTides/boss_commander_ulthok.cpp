@@ -52,6 +52,7 @@ enum Adds
     NPC_DARK_FISSURE = 40784,
 };
 
+// 40765
 class boss_commander_ulthok : public CreatureScript
 {
     public:
@@ -161,6 +162,7 @@ class boss_commander_ulthok : public CreatureScript
 
 };
 
+// 40784
 class npc_ulthok_dark_fissure : public CreatureScript
 {
     public:
@@ -189,6 +191,7 @@ class npc_ulthok_dark_fissure : public CreatureScript
         };
 };
 
+// ???
 class at_tott_commander_ulthok : public AreaTriggerScript
 {
     public:

@@ -100,6 +100,7 @@ const Position summonPos[3] =
 
 const Position centerPos = {192.05f, 802.52f, 807.64f, 3.14f};
 
+// 40586 49079
 class boss_lady_nazjar : public CreatureScript
 {
     public:
@@ -340,6 +341,7 @@ class boss_lady_nazjar : public CreatureScript
         };
 };
 
+// 40633
 class npc_lady_nazjar_honnor_guard : public CreatureScript
 {
     public:
@@ -402,6 +404,7 @@ class npc_lady_nazjar_honnor_guard : public CreatureScript
         };
 };
 
+// 44404
 class npc_lady_nazjar_tempest_witch : public CreatureScript
 {
     public:
@@ -460,6 +463,7 @@ class npc_lady_nazjar_tempest_witch : public CreatureScript
         };
 };
 
+// 48571
 class npc_lady_nazjar_waterspout : public CreatureScript
 {
     public:
@@ -509,6 +513,7 @@ class npc_lady_nazjar_waterspout : public CreatureScript
         };
 };
 
+// 40597
 class npc_lady_nazjar_geyser : public CreatureScript
 {
     public:

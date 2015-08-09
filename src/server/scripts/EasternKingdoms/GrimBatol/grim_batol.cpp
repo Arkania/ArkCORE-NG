@@ -1992,7 +1992,6 @@ void AddSC_grim_batol()
     new npc_twilight_thundercaller();
     new npc_twilight_war_mage();
     new npc_twilight_wyrmcaller();
-    new npc_ascended_rockbreaker_fissure();
     new npc_crimsonborne_warlord_empowering_flames();
     new spell_twilight_enforcer_meat_grinder();
     new spell_twilight_shadow_weaver_shadow_weave();

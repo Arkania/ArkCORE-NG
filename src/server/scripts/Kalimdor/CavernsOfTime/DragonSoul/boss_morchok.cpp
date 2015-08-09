@@ -487,6 +487,7 @@ public:
     }
 };
 
+// 57773
 class npc_kohcrom : public CreatureScript
 {
 public:
@@ -594,6 +595,7 @@ public:
     }
 };
 
+// 55346 15769
 class npc_resonating_crystal : public CreatureScript
 {
 public:
@@ -754,14 +756,15 @@ public:
     }
 };
 
-class npc_minnor_resonating_crystal : public CreatureScript
+// 15805
+class npc_minor_resonating_crystal : public CreatureScript
 {
 public:
-    npc_minnor_resonating_crystal() : CreatureScript("npc_minnor_resonating_crystal") { }
+    npc_minor_resonating_crystal() : CreatureScript("npc_minor_resonating_crystal") { }
 
-    struct npc_minnor_resonating_crystalAI : public ScriptedAI
+    struct npc_minor_resonating_crystalAI : public ScriptedAI
     {
-        npc_minnor_resonating_crystalAI(Creature* creature) : ScriptedAI(creature),
+        npc_minor_resonating_crystalAI(Creature* creature) : ScriptedAI(creature),
             _instance(creature->GetInstanceScript())
         {
         }
@@ -803,10 +806,11 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return GetDragonSoulAI<npc_minnor_resonating_crystalAI>(creature);
+        return GetDragonSoulAI<npc_minor_resonating_crystalAI>(creature);
     }
 };
 
+// 103414
 class spell_morchok_stomp : public SpellScriptLoader
 {
 public:
@@ -865,6 +869,7 @@ public:
 
 };
 
+// 103851
 class spell_morchok_black_blood : public SpellScriptLoader
 {
 public:
@@ -902,7 +907,8 @@ public:
     }
 };
 
-class npc_black_blood_of_the_earth : public CreatureScript // 55267
+// 55267
+class npc_black_blood_of_the_earth : public CreatureScript 
 {
 public:
     npc_black_blood_of_the_earth() : CreatureScript("npc_black_blood_of_the_earth") { }
@@ -1169,7 +1175,7 @@ void AddSC_boss_morchok()
     new boss_morchok();
     new npc_kohcrom();
     new npc_resonating_crystal();
-    new npc_minnor_resonating_crystal();
+    new npc_minor_resonating_crystal();
     new spell_morchok_stomp();
     new spell_morchok_black_blood();
     new npc_black_blood_of_the_earth();

@@ -29,37 +29,24 @@
 #include "CreatureTextMgr.h"
 
 
-
-
-/*######
-## npc_death_knight_initiate
-######*/
-
 #define GOSSIP_ACCEPT_DUEL      "I challenge you, death knight!"
 
-enum Spells_DKI
-{
-    SPELL_DUEL                  = 52996,
-    //SPELL_DUEL_TRIGGERED        = 52990,
-    SPELL_DUEL_VICTORY          = 52994,
-    SPELL_DUEL_FLAG             = 52991,
-};
-
-enum Says_VBM
-{
-    SAY_DUEL                    = 0,
-};
-
-enum Misc_VBN
-{
-    QUEST_DEATH_CHALLENGE       = 12733,
-    FACTION_HOSTILE             = 2068
-};
-
+// unused 28406.. we are using npc_dk_initiate_28406
 class npc_death_knight_initiate : public CreatureScript
 {
 public:
     npc_death_knight_initiate() : CreatureScript("npc_death_knight_initiate") { }
+
+    enum Misc_VBN
+    {
+        SAY_DUEL = 0,
+        QUEST_DEATH_CHALLENGE = 12733,
+        FACTION_HOSTILE = 2068,
+        SPELL_DUEL = 52996,
+        //SPELL_DUEL_TRIGGERED        = 52990,
+        SPELL_DUEL_VICTORY = 52994,
+        SPELL_DUEL_FLAG = 52991,
+    };
 
     bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
     {
@@ -210,15 +197,7 @@ public:
 
 };
 
-
-
-
-
-
-
-
-
-
+// 28768
 class npc_ros_dark_rider : public CreatureScript
 {
 public:
@@ -268,21 +247,17 @@ public:
 
 };
 
-// correct way: 52312 52314 52555 ...
-enum Creatures_SG
-{
-    NPC_GHOULS = 28845,
-    NPC_GHOSTS = 28846,
-};
+// 28658    // correct way: 52312 52314 52555 ...
 class npc_dkc1_gothik : public CreatureScript
 {
 public:
     npc_dkc1_gothik() : CreatureScript("npc_dkc1_gothik") { }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    enum Creatures_SG
     {
-        return new npc_dkc1_gothikAI(creature);
-    }
+        NPC_GHOULS = 28845,
+        NPC_GHOSTS = 28846,
+    };
 
     struct npc_dkc1_gothikAI : public ScriptedAI
     {
@@ -316,17 +291,23 @@ public:
         }
     };
 
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_dkc1_gothikAI(creature);
+    }
 };
 
+// 28845
 class npc_scarlet_ghoul : public CreatureScript
 {
 public:
     npc_scarlet_ghoul() : CreatureScript("npc_scarlet_ghoul") { }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    enum Creatures_SG
     {
-        return new npc_scarlet_ghoulAI(creature);
-    }
+        NPC_GHOULS = 28845,
+        NPC_GHOSTS = 28846,
+    };
 
     struct npc_scarlet_ghoulAI : public ScriptedAI
     {
@@ -396,26 +377,26 @@ public:
         }
     };
 
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_scarlet_ghoulAI(creature);
+    }
 };
 
-/*####
-## npc_scarlet_miner_cart
-####*/
-
-enum ScarletMinerCart
-{
-    SPELL_CART_CHECK        = 54173,
-    SPELL_SUMMON_CART       = 52463,
-    SPELL_SUMMON_MINER      = 52464,
-    SPELL_CART_DRAG         = 52465,
-
-    NPC_MINER               = 28841
-};
-
+// 28817
 class npc_scarlet_miner_cart : public CreatureScript
 {
     public:
         npc_scarlet_miner_cart() : CreatureScript("npc_scarlet_miner_cart") { }
+
+        enum ScarletMinerCart
+        {
+            SPELL_CART_CHECK = 54173,
+            SPELL_SUMMON_CART = 52463,
+            SPELL_SUMMON_MINER = 52464,
+
+            NPC_MINER = 28841
+        };
 
         struct npc_scarlet_miner_cartAI : public PassiveAI
         {
@@ -480,20 +461,18 @@ class npc_scarlet_miner_cart : public CreatureScript
         }
 };
 
-/*####
-## npc_scarlet_miner
-####*/
-
-enum Says_SM
-{
-    SAY_SCARLET_MINER_0         = 0,
-    SAY_SCARLET_MINER_1         = 1
-};
-
+// 28841
 class npc_scarlet_miner : public CreatureScript
 {
     public:
         npc_scarlet_miner() : CreatureScript("npc_scarlet_miner") { }
+
+        enum eMiner
+        {
+            SAY_SCARLET_MINER_0 = 0,
+            SAY_SCARLET_MINER_1 = 1,
+            SPELL_CART_DRAG = 52465,
+        };
 
         struct npc_scarlet_minerAI : public npc_escortAI
         {
@@ -622,14 +601,9 @@ class npc_scarlet_miner : public CreatureScript
 
 void AddSC_the_scarlet_enclave_c1()
 {
-
-    new npc_death_knight_initiate();
-  
-    
     new npc_ros_dark_rider();
     new npc_dkc1_gothik();
     new npc_scarlet_ghoul();
     new npc_scarlet_miner();
     new npc_scarlet_miner_cart();
-       
 }

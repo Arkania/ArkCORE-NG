@@ -25,6 +25,7 @@ enum Events
 {
 };
 
+// 54544
 class boss_echo_of_tyrande : public CreatureScript
 {
     public:

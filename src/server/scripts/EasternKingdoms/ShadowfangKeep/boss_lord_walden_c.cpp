@@ -133,6 +133,7 @@ public:
     }
 };
 
+// 50439 50522 
 class npc_mystery_toxin : public CreatureScript
 {
 public:

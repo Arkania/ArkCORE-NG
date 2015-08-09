@@ -113,6 +113,7 @@ const Position teleporterPos[2] =
     {-14.72f, 796.57f, 808.12f, 1.99f}, // upper
 };
 
+// 51391 51395
 class npc_throne_of_the_tides_teleporter : public CreatureScript
 {
     public:
@@ -216,6 +217,7 @@ class npc_lady_nazjar_event : public CreatureScript
         };
 };
 
+// 203199
 class go_totd_defense_system : public GameObjectScript
 {
 public:

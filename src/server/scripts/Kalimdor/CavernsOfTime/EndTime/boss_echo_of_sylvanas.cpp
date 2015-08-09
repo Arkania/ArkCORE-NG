@@ -45,6 +45,7 @@ enum Events
 {
 };
 
+// 54123
 class boss_echo_of_sylvanas : public CreatureScript
 {
     public:

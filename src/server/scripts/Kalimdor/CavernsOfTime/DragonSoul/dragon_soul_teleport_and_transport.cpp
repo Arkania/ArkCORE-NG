@@ -20,6 +20,7 @@ EndScriptData
 #include "Vehicle.h"
 #include "CombatAI.h"
 
+// 57288
 class npc_eiendormi : public CreatureScript
 {
 public:
@@ -43,6 +44,7 @@ public:
     }
 };
 
+// 57630
 class npc_halo_jump_parachute_57630 : public CreatureScript
 {
 public:
@@ -158,6 +160,7 @@ public:
 
 };
 
+// 57475
 class npc_dream_warden_57475 : public CreatureScript
 {
 public:
@@ -264,6 +267,7 @@ public:
 
 };
 
+// 57289
 class npc_valeera_tele_57289 : public CreatureScript
 {
 public:
@@ -327,6 +331,7 @@ public:
 
 };
 
+// 57287
 class npc_nethestrasz : public CreatureScript
 {
 public:
@@ -350,6 +355,7 @@ public:
     }
 };
 
+// 57882
 class travel_to_wyrmrest_base : public CreatureScript
 {
 public:
@@ -371,6 +377,7 @@ public:
     }
 };
 
+// 57379
 class travel_to_wyrmrest_summit : public CreatureScript
 {
 public:
@@ -392,6 +399,7 @@ public:
     }
 };
 
+// 57377
 class travel_to_the_eye_of_eternity : public CreatureScript
 {
 public:
@@ -413,6 +421,7 @@ public:
     }
 };
 
+// 57378
 class travel_to_the_deck_of_the_skyfire : public CreatureScript
 {
 public:
@@ -434,10 +443,11 @@ public:
     }
 };
 
-class travel_to_Spine : public CreatureScript
+// ????
+class travel_to_spine : public CreatureScript
 {
 public:
-    travel_to_Spine() : CreatureScript("travel_to_Spine") { }
+    travel_to_spine() : CreatureScript("travel_to_Spine") { }
     bool OnGossipHello(Player* player, Creature* creature)
     {
         if (InstanceScript* instance = creature->GetInstanceScript())
@@ -453,10 +463,11 @@ public:
     }
 };
 
-class travel_to_Maelstrom : public CreatureScript
+// 57443
+class travel_to_maelstrom : public CreatureScript
 {
 public:
-    travel_to_Maelstrom() : CreatureScript("travel_to_Maelstrom") { }
+    travel_to_maelstrom() : CreatureScript("travel_to_maelstrom") { }
     bool OnGossipHello(Player* player, Creature* creature)
     {
         if (InstanceScript* instance = creature->GetInstanceScript())
@@ -483,6 +494,6 @@ void AddSC_dragon_soul_teleport_and_transport()
     new travel_to_wyrmrest_summit;
     new travel_to_the_eye_of_eternity;
     new travel_to_the_deck_of_the_skyfire;
-    new travel_to_Spine;
-    new travel_to_Maelstrom;
+    // new travel_to_spine;
+    new travel_to_maelstrom;
 }
