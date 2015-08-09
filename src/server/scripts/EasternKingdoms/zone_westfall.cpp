@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2015 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -2233,7 +2233,7 @@ class item_potion_of_shrouding : public ItemScript
 public:
     item_potion_of_shrouding() : ItemScript("item_potion_of_shrouding") { }
 
-    bool OnUse(Player* player, Item* /*item*/, SpellCastTargets const& targets) OVERRIDE
+    bool OnUse(Player* player, Item* /*item*/, SpellCastTargets const& targets) override
     {
         Creature* helixGear = player->FindNearestCreature(NPC_HELIX_GEARBREAKER, 50.0f);
         Creature* helixOar = player->FindNearestCreature(NPC_HELIXS_LUMBERING_OAF, 50.0f);
@@ -3527,7 +3527,7 @@ class npc_daphne_stilwell : public CreatureScript
 public:
 	npc_daphne_stilwell() : CreatureScript("npc_daphne_stilwell") { }
 
-	bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest) OVERRIDE
+	bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest) override
 	{
 		if (quest->GetQuestId() == QUEST_TOME_VALOR)
 		{
@@ -3540,7 +3540,7 @@ public:
 		return true;
 	}
 
-		CreatureAI* GetAI(Creature* creature) const OVERRIDE
+		CreatureAI* GetAI(Creature* creature) const override
 	{
 		return new npc_daphne_stilwellAI(creature);
 	}
@@ -3552,7 +3552,7 @@ public:
 		uint32 uiWPHolder;
 		uint32 uiShootTimer;
 
-		void Reset() OVERRIDE
+		void Reset() override
 		{
 			if (HasEscortState(STATE_ESCORT_ESCORTING))
 			{
@@ -3575,7 +3575,7 @@ public:
 			uiShootTimer = 0;
 		}
 
-			void WaypointReached(uint32 waypointId) OVERRIDE
+			void WaypointReached(uint32 waypointId) override
 		{
 			Player* player = GetPlayerForEscort();
 			if (!player)
@@ -3627,7 +3627,7 @@ public:
 			}
 		}
 
-		void AttackStart(Unit* who) OVERRIDE
+		void AttackStart(Unit* who) override
 		{
 			if (!who)
 			return;
@@ -3642,7 +3642,7 @@ public:
 			}
 		}
 
-			void JustSummoned(Creature* summoned) OVERRIDE
+			void JustSummoned(Creature* summoned) override
 		{
 			summoned->AI()->AttackStart(me);
 		}

@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2015 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -64,7 +64,7 @@ class boss_scarlet_commander_mograine : public CreatureScript
 public:
     boss_scarlet_commander_mograine() : CreatureScript("boss_scarlet_commander_mograine") { }
 
-    CreatureAI* GetAI(Creature* creature) const OVERRIDE
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_scarlet_commander_mograineAI>(creature);
     }
@@ -85,7 +85,7 @@ public:
         bool _bHeal;
         bool _bFakeDeath;
 
-        void Reset() OVERRIDE
+        void Reset() override
         {
             CrusaderStrike_Timer = 10000;
             HammerOfJustice_Timer = 10000;
@@ -103,13 +103,13 @@ public:
             _bFakeDeath = false;
         }
 
-        void JustReachedHome() OVERRIDE
+        void JustReachedHome() override
         {
             if (instance->GetData(TYPE_MOGRAINE_AND_WHITE_EVENT) != NOT_STARTED)
                 instance->SetData(TYPE_MOGRAINE_AND_WHITE_EVENT, FAIL);
         }
 
-        void EnterCombat(Unit* /*who*/) OVERRIDE
+        void EnterCombat(Unit* /*who*/) override
         {
             Talk(SAY_MO_AGGRO);
             DoCast(me, SPELL_RETRIBUTIONAURA);
@@ -117,12 +117,12 @@ public:
             me->CallForHelp(VISIBLE_RANGE);
         }
 
-        void KilledUnit(Unit* /*victim*/) OVERRIDE
+        void KilledUnit(Unit* /*victim*/) override
         {
             Talk(SAY_MO_KILL);
         }
 
-        void DamageTaken(Unit* /*doneBy*/, uint32 &damage) OVERRIDE
+        void DamageTaken(Unit* /*doneBy*/, uint32 &damage) override
         {
             if (damage < me->GetHealth() || _bHasDied || _bFakeDeath)
                 return;
@@ -156,7 +156,7 @@ public:
             }
         }
 
-        void SpellHit(Unit* /*who*/, const SpellInfo* spell) OVERRIDE
+        void SpellHit(Unit* /*who*/, const SpellInfo* spell) override
         {
             //When hit with ressurection say text
             if (spell->Id == SPELL_SCARLETRESURRECTION)
@@ -168,7 +168,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff) OVERRIDE
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -222,7 +222,7 @@ class boss_high_inquisitor_whitemane : public CreatureScript
 public:
     boss_high_inquisitor_whitemane() : CreatureScript("boss_high_inquisitor_whitemane") { }
 
-    CreatureAI* GetAI(Creature* creature) const OVERRIDE
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_high_inquisitor_whitemaneAI>(creature);
     }
@@ -244,7 +244,7 @@ public:
         bool _bCanResurrectCheck;
         bool _bCanResurrect;
 
-        void Reset() OVERRIDE
+        void Reset() override
         {
             Wait_Timer = 7000;
             Heal_Timer = 10000;
@@ -258,7 +258,7 @@ public:
                 instance->SetData(TYPE_MOGRAINE_AND_WHITE_EVENT, NOT_STARTED);
         }
 
-        void AttackStart(Unit* who) OVERRIDE
+        void AttackStart(Unit* who) override
         {
             if (instance->GetData(TYPE_MOGRAINE_AND_WHITE_EVENT) == NOT_STARTED)
                 return;
@@ -266,23 +266,23 @@ public:
             ScriptedAI::AttackStart(who);
         }
 
-        void EnterCombat(Unit* /*who*/) OVERRIDE
+        void EnterCombat(Unit* /*who*/) override
         {
             Talk(SAY_WH_INTRO);
         }
 
-        void KilledUnit(Unit* /*victim*/) OVERRIDE
+        void KilledUnit(Unit* /*victim*/) override
         {
             Talk(SAY_WH_KILL);
         }
 
-        void DamageTaken(Unit* /*attacker*/, uint32& damage) OVERRIDE
+        void DamageTaken(Unit* /*attacker*/, uint32& damage) override
         {
             if (!_bCanResurrectCheck && damage >= me->GetHealth())
                 damage = me->GetHealth() - 1;
         }
 
-        void UpdateAI(uint32 diff) OVERRIDE
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;

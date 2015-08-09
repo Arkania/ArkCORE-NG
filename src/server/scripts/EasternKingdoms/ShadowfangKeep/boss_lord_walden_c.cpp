@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2015 ArkCORE <http://www.arkania.net/>
  *
  * This file is NOT free software. Third-party users can NOT redistribute 
  * it or modify it. If you find it, you are either hacking something, or very 
@@ -93,7 +93,7 @@ public:
                 pInstance->SetData(DATA_LORD_WALDEN_EVENT, DONE);
         }
 
-		void UpdateAI(uint32 diff) OVERRIDE
+		void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;

@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2015 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -57,7 +57,7 @@ class npc_doom_blossom : public CreatureScript
 public:
     npc_doom_blossom() : CreatureScript("npc_doom_blossom") { }
 
-    CreatureAI* GetAI(Creature* creature) const OVERRIDE
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_doom_blossomAI(creature);
     }
@@ -70,16 +70,16 @@ public:
         uint32 ShadowBoltTimer;
         uint64 TeronGUID;
 
-        void Reset() OVERRIDE
+        void Reset() override
         {
             CheckTeronTimer = 5000;
             ShadowBoltTimer = 12000;
             TeronGUID = 0;
         }
 
-        void EnterCombat(Unit* /*who*/) OVERRIDE { }
-        void AttackStart(Unit* /*who*/) OVERRIDE { }
-        void MoveInLineOfSight(Unit* /*who*/) OVERRIDE { }
+        void EnterCombat(Unit* /*who*/) override { }
+        void AttackStart(Unit* /*who*/) override { }
+        void MoveInLineOfSight(Unit* /*who*/) override { }
 
 
         void Despawn()
@@ -88,7 +88,7 @@ public:
             me->RemoveCorpse();
         }
 
-        void UpdateAI(uint32 diff) OVERRIDE
+        void UpdateAI(uint32 diff) override
         {
             if (CheckTeronTimer <= diff)
             {
@@ -126,7 +126,7 @@ class npc_shadowy_construct : public CreatureScript
 public:
     npc_shadowy_construct() : CreatureScript("npc_shadowy_construct") { }
 
-    CreatureAI* GetAI(Creature* creature) const OVERRIDE
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_shadowy_constructAI(creature);
     }
@@ -141,7 +141,7 @@ public:
         uint32 CheckPlayerTimer;
         uint32 CheckTeronTimer;
 
-        void Reset() OVERRIDE
+        void Reset() override
         {
             GhostGUID = 0;
             TeronGUID = 0;
@@ -150,9 +150,9 @@ public:
             CheckTeronTimer = 5000;
         }
 
-        void EnterCombat(Unit* /*who*/) OVERRIDE { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void MoveInLineOfSight(Unit* who) OVERRIDE
+        void MoveInLineOfSight(Unit* who) override
 
         {
             if (!who || (!who->IsAlive()) || (who->GetGUID() == GhostGUID))
@@ -162,7 +162,7 @@ public:
         }
 
     /* Comment it out for now. NOTE TO FUTURE DEV: UNCOMMENT THIS OUT ONLY AFTER MIND CONTROL IS IMPLEMENTED
-        void DamageTaken(Unit* done_by, uint32 &damage) OVERRIDE
+        void DamageTaken(Unit* done_by, uint32 &damage) override
         {
             if (done_by->GetGUID() != GhostGUID)
             damage = 0;                                         // Only the ghost can deal damage.
@@ -191,7 +191,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff) OVERRIDE
+        void UpdateAI(uint32 diff) override
         {
             if (CheckPlayerTimer <= diff)
             {
@@ -216,7 +216,7 @@ class boss_teron_gorefiend : public CreatureScript
 public:
     boss_teron_gorefiend() : CreatureScript("boss_teron_gorefiend") { }
 
-    CreatureAI* GetAI(Creature* creature) const OVERRIDE
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_teron_gorefiendAI>(creature);
     }
@@ -245,7 +245,7 @@ public:
         bool Intro;
         bool Done;
 
-        void Reset() OVERRIDE
+        void Reset() override
         {
             instance->SetBossState(DATA_TERON_GOREFIEND, NOT_STARTED);
 
@@ -266,9 +266,9 @@ public:
             Done = false;
         }
 
-        void EnterCombat(Unit* /*who*/) OVERRIDE { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void MoveInLineOfSight(Unit* who) OVERRIDE
+        void MoveInLineOfSight(Unit* who) override
 
         {
             if (!Intro && who->GetTypeId() == TYPEID_PLAYER && me->CanCreatureAttack(who))
@@ -289,12 +289,12 @@ public:
                 ScriptedAI::MoveInLineOfSight(who);
         }
 
-        void KilledUnit(Unit* /*victim*/) OVERRIDE
+        void KilledUnit(Unit* /*victim*/) override
         {
             Talk(SAY_SLAY);
         }
 
-        void JustDied(Unit* /*killer*/) OVERRIDE
+        void JustDied(Unit* /*killer*/) override
         {
             instance->SetBossState(DATA_TERON_GOREFIEND, DONE);
 
@@ -379,7 +379,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff) OVERRIDE
+        void UpdateAI(uint32 diff) override
         {
             if (Intro && !Done)
             {

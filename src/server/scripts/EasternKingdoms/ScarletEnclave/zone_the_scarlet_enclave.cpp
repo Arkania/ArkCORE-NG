@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2015 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -34,7 +34,7 @@ class npc_valkyr_battle_maiden : public CreatureScript
 public:
     npc_valkyr_battle_maiden() : CreatureScript("npc_valkyr_battle_maiden") { }
 
-    CreatureAI* GetAI(Creature* creature) const OVERRIDE
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_valkyr_battle_maidenAI(creature);
     }
@@ -47,7 +47,7 @@ public:
         float x, y, z;
         uint32 phase;
 
-        void Reset() OVERRIDE
+        void Reset() override
         {
             me->setActive(true);
             me->SetVisible(false);
@@ -64,7 +64,7 @@ public:
             me->SetPosition(x, y, z, 0.0f);
         }
 
-        void UpdateAI(uint32 diff) OVERRIDE
+        void UpdateAI(uint32 diff) override
         {
             if (FlyBackTimer <= diff)
             {
@@ -1010,7 +1010,7 @@ class npc_unworthy_initiate_anchor : public CreatureScript
 public:
     npc_unworthy_initiate_anchor() : CreatureScript("npc_unworthy_initiate_anchor") { }
 
-    CreatureAI* GetAI(Creature* creature) const OVERRIDE
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_unworthy_initiate_anchorAI(creature);
     }
@@ -1021,13 +1021,13 @@ public:
 
         uint64 prisonerGUID;
 
-        void SetGUID(uint64 guid, int32 /*id*/) OVERRIDE
+        void SetGUID(uint64 guid, int32 /*id*/) override
         {
             if (!prisonerGUID)
             prisonerGUID = guid;
         }
 
-            uint64 GetGUID(int32 /*id*/) const OVERRIDE
+            uint64 GetGUID(int32 /*id*/) const override
         {
             return prisonerGUID;
         }
@@ -1040,7 +1040,7 @@ class go_acherus_soul_prison : public GameObjectScript
 public:
     go_acherus_soul_prison() : GameObjectScript("go_acherus_soul_prison") { }
 
-    bool OnGossipHello(Player* player, GameObject* go) OVERRIDE
+    bool OnGossipHello(Player* player, GameObject* go) override
     {
         if (Creature* anchor = go->FindNearestCreature(29521, 15))
         if (uint64 prisonerGUID = anchor->AI()->GetGUID())

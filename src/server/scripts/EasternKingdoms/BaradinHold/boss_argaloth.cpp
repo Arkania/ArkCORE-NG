@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2015 ArkCORE <http://www.arkania.net/>
  *
  * This file is NOT free software. Third-party users can NOT redistribute 
  * it or modify it. If you find it, you are either hacking something, or very 
@@ -26,6 +26,7 @@ enum Spells
 
 #define SPELL_METEOR_SLASH                   RAID_MODE(88942, 95172)
 
+// 47120 boss_argaloth
 class boss_argaloth : public CreatureScript
 {
     public:

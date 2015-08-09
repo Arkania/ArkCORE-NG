@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2015 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -77,22 +77,22 @@ class boss_nazan : public CreatureScript
                 flight = true;
             }
 
-            void Reset() OVERRIDE
+            void Reset() override
             {
                 Fireball_Timer = 4000;
                 Fly_Timer = 45000;
                 Turn_Timer = 0;
             }
 
-            void EnterCombat(Unit* /*who*/) OVERRIDE { }
+            void EnterCombat(Unit* /*who*/) override { }
 
-            void IsSummonedBy(Unit* summoner) OVERRIDE
+            void IsSummonedBy(Unit* summoner) override
             {
                 if (summoner->GetEntry() == NPC_VAZRUDEN_HERALD)
                     VazrudenGUID = summoner->GetGUID();
             }
 
-            void JustSummoned(Creature* summoned) OVERRIDE
+            void JustSummoned(Creature* summoned) override
             {
                 if (summoned && summoned->GetEntry() == NPC_LIQUID_FIRE)
                 {
@@ -103,13 +103,13 @@ class boss_nazan : public CreatureScript
                 }
             }
 
-            void SpellHitTarget(Unit* target, const SpellInfo* entry) OVERRIDE
+            void SpellHitTarget(Unit* target, const SpellInfo* entry) override
             {
                 if (target && entry->Id == uint32(SPELL_FIREBALL))
                     me->SummonCreature(NPC_LIQUID_FIRE, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 30000);
             }
 
-            void UpdateAI(uint32 diff) OVERRIDE
+            void UpdateAI(uint32 diff) override
             {
                 if (!UpdateVictim())
                     return;
@@ -189,7 +189,7 @@ class boss_nazan : public CreatureScript
                 uint64 VazrudenGUID;
         };
 
-        CreatureAI* GetAI(Creature* creature) const OVERRIDE
+        CreatureAI* GetAI(Creature* creature) const override
         {
             return new boss_nazanAI(creature);
         }
@@ -204,7 +204,7 @@ class boss_vazruden : public CreatureScript
         {
             boss_vazrudenAI(Creature* creature) : BossAI(creature, DATA_VAZRUDEN) { }
 
-            void Reset() OVERRIDE
+            void Reset() override
             {
                 Revenge_Timer = 4000;
                 UnsummonCheck = 2000;
@@ -212,26 +212,26 @@ class boss_vazruden : public CreatureScript
                 _Reset();
             }
 
-            void EnterCombat(Unit* /*who*/) OVERRIDE
+            void EnterCombat(Unit* /*who*/) override
             {
                 Talk(SAY_AGGRO);
                 _EnterCombat();
             }
 
-            void KilledUnit(Unit* who) OVERRIDE
+            void KilledUnit(Unit* who) override
             {
                 if (who && who->GetEntry() != NPC_VAZRUDEN)
                     Talk(SAY_KILL);
             }
 
-            void JustDied(Unit* killer) OVERRIDE
+            void JustDied(Unit* killer) override
             {
                 if (killer && killer != me)
                     Talk(SAY_DIE);
                 _JustDied();
             }
 
-            void UpdateAI(uint32 diff) OVERRIDE
+            void UpdateAI(uint32 diff) override
             {
                 if (!UpdateVictim())
                 {
@@ -267,7 +267,7 @@ class boss_vazruden : public CreatureScript
                 uint32 UnsummonCheck;
         };
 
-        CreatureAI* GetAI(Creature* creature) const OVERRIDE
+        CreatureAI* GetAI(Creature* creature) const override
         {
             return new boss_vazrudenAI(creature);
         }
@@ -289,7 +289,7 @@ class boss_vazruden_the_herald : public CreatureScript
                 VazrudenGUID = 0;
             }
 
-            void Reset() OVERRIDE
+            void Reset() override
             {
                 phase = 0;
                 waypoint = 0;
@@ -338,7 +338,7 @@ class boss_vazruden_the_herald : public CreatureScript
                 }
             }
 
-            void EnterCombat(Unit* /*who*/) OVERRIDE
+            void EnterCombat(Unit* /*who*/) override
             {
                 if (phase == 0)
                 {
@@ -348,7 +348,7 @@ class boss_vazruden_the_herald : public CreatureScript
                 }
             }
 
-            void JustSummoned(Creature* summoned) OVERRIDE
+            void JustSummoned(Creature* summoned) override
             {
                 if (!summoned)
                     return;
@@ -376,7 +376,7 @@ class boss_vazruden_the_herald : public CreatureScript
                     sentryDown = true;
             }
 
-            void UpdateAI(uint32 diff) OVERRIDE
+            void UpdateAI(uint32 diff) override
             {
                 switch (phase)
                 {
@@ -444,7 +444,7 @@ class boss_vazruden_the_herald : public CreatureScript
                 bool lootSpawned;
         };
 
-        CreatureAI* GetAI(Creature* creature) const OVERRIDE
+        CreatureAI* GetAI(Creature* creature) const override
         {
             return new boss_vazruden_the_heraldAI(creature);
         }
@@ -459,20 +459,20 @@ class npc_hellfire_sentry : public CreatureScript
         {
             npc_hellfire_sentryAI(Creature* creature) : ScriptedAI(creature) { }
 
-            void Reset() OVERRIDE
+            void Reset() override
             {
                 KidneyShot_Timer = urand(3000, 7000);
             }
 
-            void EnterCombat(Unit* /*who*/) OVERRIDE { }
+            void EnterCombat(Unit* /*who*/) override { }
 
-            void JustDied(Unit* killer) OVERRIDE
+            void JustDied(Unit* killer) override
             {
                 if (Creature* herald = me->FindNearestCreature(NPC_VAZRUDEN_HERALD, 150))
                     CAST_AI(boss_vazruden_the_herald::boss_vazruden_the_heraldAI, herald->AI())->SentryDownBy(killer);
             }
 
-            void UpdateAI(uint32 diff) OVERRIDE
+            void UpdateAI(uint32 diff) override
             {
                 if (!UpdateVictim())
                     return;
@@ -493,7 +493,7 @@ class npc_hellfire_sentry : public CreatureScript
                 uint32 KidneyShot_Timer;
         };
 
-        CreatureAI* GetAI(Creature* creature) const OVERRIDE
+        CreatureAI* GetAI(Creature* creature) const override
         {
             return new npc_hellfire_sentryAI(creature);
         }

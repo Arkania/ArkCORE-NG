@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2015 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -1474,13 +1474,13 @@ public:
                     CAST_AI(npc_danforth_43275::npc_danforth_43275AI, danforth->AI())->FreeingDanforth();
         }
 
-        void Register() OVERRIDE
+        void Register() override
         {
             OnEffectLaunch += SpellEffectFn(spell_freeing_danforth_SpellScript::OpenLock, EFFECT_0, SPELL_EFFECT_OPEN_LOCK);
         }
     };
 
-    SpellScript* GetSpellScript() const OVERRIDE
+    SpellScript* GetSpellScript() const override
     {
         return new spell_freeing_danforth_SpellScript();
     }
@@ -2587,7 +2587,7 @@ class go_blackrock_holding_pen : public GameObjectScript
 public:
     go_blackrock_holding_pen() : GameObjectScript("go_blackrock_holding_pen") { }
 
-    bool OnGossipHello(Player* player, GameObject* /*go*/) OVERRIDE
+    bool OnGossipHello(Player* player, GameObject* /*go*/) override
     {
         if (player->GetQuestStatus(QUEST_PRISONERS_OF_WAR) == QUEST_STATUS_INCOMPLETE)
         {
@@ -2620,13 +2620,13 @@ public:
                         player->KilledMonsterCredit(NPC_BLACKROCK_TOWER);
         }
 
-        void Register() OVERRIDE
+        void Register() override
         {
             OnCast += SpellCastFn(spell_plant_seaforium_SpellScript::CheckCastOnPlace);
         }
     };
 
-    SpellScript* GetSpellScript() const OVERRIDE
+    SpellScript* GetSpellScript() const override
     {
         return new spell_plant_seaforium_SpellScript();
     }

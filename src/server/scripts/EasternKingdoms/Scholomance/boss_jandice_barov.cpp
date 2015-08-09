@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2015 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -41,7 +41,7 @@ class boss_jandice_barov : public CreatureScript
 public:
     boss_jandice_barov() : CreatureScript("boss_jandice_barov") { }
 
-    CreatureAI* GetAI(Creature* creature) const OVERRIDE
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_jandicebarovAI(creature);
     }
@@ -56,7 +56,7 @@ public:
         uint32 Invisible_Timer;
         bool Invisible;
 
-        void Reset() OVERRIDE
+        void Reset() override
         {
             CurseOfBlood_Timer = 15000;
             Illusion_Timer = 30000;
@@ -64,7 +64,7 @@ public:
             Invisible = false;
         }
 
-        void EnterCombat(Unit* /*who*/) OVERRIDE
+        void EnterCombat(Unit* /*who*/) override
         {
         }
 
@@ -74,7 +74,7 @@ public:
                 Illusion->AI()->AttackStart(victim);
         }
 
-        void UpdateAI(uint32 diff) OVERRIDE
+        void UpdateAI(uint32 diff) override
         {
             if (Invisible && Invisible_Timer <= diff)
             {
@@ -163,7 +163,7 @@ class npc_illusionofjandicebarov : public CreatureScript
 public:
     npc_illusionofjandicebarov() : CreatureScript("npc_illusionofjandicebarov") { }
 
-    CreatureAI* GetAI(Creature* creature) const OVERRIDE
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_illusionofjandicebarovAI(creature);
     }
@@ -174,17 +174,17 @@ public:
 
         uint32 Cleave_Timer;
 
-        void Reset() OVERRIDE
+        void Reset() override
         {
             Cleave_Timer = urand(2000, 8000);
             me->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_MAGIC, true);
         }
 
-        void EnterCombat(Unit* /*who*/) OVERRIDE
+        void EnterCombat(Unit* /*who*/) override
         {
         }
 
-        void UpdateAI(uint32 diff) OVERRIDE
+        void UpdateAI(uint32 diff) override
         {
             //Return since we have no target
             if (!UpdateVictim())

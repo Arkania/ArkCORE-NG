@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2015 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -738,7 +738,7 @@ public:
         NPC_SWIFTCLAW               = 38002,
     };
 
-    bool OnTrigger(Player* player, const AreaTriggerEntry* at) OVERRIDE
+    bool OnTrigger(Player* player, const AreaTriggerEntry* at) override
     {
         if (player && player->GetQuestStatus(QUEST_YOUNG_AND_VICIOUS) == QUEST_STATUS_INCOMPLETE)
         if (Vehicle* vehicle = player->GetVehicle())

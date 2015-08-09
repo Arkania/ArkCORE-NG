@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2015 ArkCORE <http://www.arkania.net/>
  * (start by PlayBoy Buli)
  * 
  * If you have found this script on the internet feel free to use it as I can do fuck to stop you.

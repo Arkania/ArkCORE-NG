@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2015 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -53,13 +53,13 @@ public:
     {
         boss_mordresh_fire_eyeAI(Creature* creature) : BossAI(creature, DATA_MORDRESH_FIRE_EYE) { }
 
-        void Reset() OVERRIDE
+        void Reset() override
         {
             _Reset();
             events.ScheduleEvent(EVENT_OOC_1, 10000);
         }
 
-        void EnterCombat(Unit* /*who*/) OVERRIDE
+        void EnterCombat(Unit* /*who*/) override
         {
             _EnterCombat();
             events.Reset();
@@ -68,12 +68,12 @@ public:
             events.ScheduleEvent(EVENT_FIRE_NOVA, urand(8000, 12000));
         }
 
-        void JustDied(Unit* /*killer*/) OVERRIDE
+        void JustDied(Unit* /*killer*/) override
         {
             _JustDied();
         }
 
-        void UpdateAI(uint32 diff) OVERRIDE
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
 
@@ -125,7 +125,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const OVERRIDE
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_mordresh_fire_eyeAI(creature);
     }

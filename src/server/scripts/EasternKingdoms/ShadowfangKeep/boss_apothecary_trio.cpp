@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2015 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -409,7 +409,7 @@ class npc_apothecary_baxter : public CreatureScript
                 }
             }
 
-			void UpdateAI(uint32 diff) OVERRIDE
+			void UpdateAI(uint32 diff) override
             {
                 if (_phase == PHASE_INTRO)
                 {

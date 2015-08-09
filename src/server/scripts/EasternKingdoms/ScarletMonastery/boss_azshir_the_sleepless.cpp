@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2015 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -39,7 +39,7 @@ class boss_azshir_the_sleepless : public CreatureScript
 public:
     boss_azshir_the_sleepless() : CreatureScript("boss_azshir_the_sleepless") { }
 
-    CreatureAI* GetAI(Creature* creature) const OVERRIDE
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_azshir_the_sleeplessAI(creature);
     }
@@ -52,16 +52,16 @@ public:
         uint32 CallOftheGrave_Timer;
         uint32 Terrify_Timer;
 
-        void Reset() OVERRIDE
+        void Reset() override
         {
             SoulSiphon_Timer = 1;
             CallOftheGrave_Timer = 30000;
             Terrify_Timer = 20000;
         }
 
-        void EnterCombat(Unit* /*who*/) OVERRIDE { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void UpdateAI(uint32 diff) OVERRIDE
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;

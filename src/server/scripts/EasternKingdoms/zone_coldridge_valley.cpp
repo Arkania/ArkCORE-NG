@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2015 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -222,7 +222,7 @@ public:
     {
         PrepareSpellScript(spell_heal_wounded_mountaineer_SpellScript);
 
-        bool Validate(SpellInfo const* /*spellInfo*/) OVERRIDE
+        bool Validate(SpellInfo const* /*spellInfo*/) override
         {
             return true;
         }
@@ -233,7 +233,7 @@ public:
                 mountaineer->AI()->DoAction(1);
         }
 
-        void Register() OVERRIDE
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_heal_wounded_mountaineer_SpellScript::HandleDummyEffect, EFFECT_0, SPELL_EFFECT_DUMMY);
         }
@@ -242,7 +242,7 @@ public:
         uint32 _targetCount;
     };
 
-    SpellScript* GetSpellScript() const OVERRIDE
+    SpellScript* GetSpellScript() const override
     {
         return new spell_heal_wounded_mountaineer_SpellScript();
     }
@@ -690,7 +690,7 @@ public:
             }
         }
 
-        void MovementInform(uint32 type, uint32 id) OVERRIDE
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type != WAYPOINT_MOTION_TYPE || _phase != 1)
                 return;

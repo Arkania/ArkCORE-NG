@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2015 ArkCORE <http://www.arkania.net/>
  *
  * This file is NOT free software. Third-party users can NOT redistribute 
  * it or modify it. If you find it, you are either hacking something, or very 
@@ -107,7 +107,7 @@ public:
             }
         }
 
-		void EnterCombat(Unit* /*who*/) OVERRIDE
+		void EnterCombat(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
 
@@ -115,7 +115,7 @@ public:
                 pInstance->SetData(DATA_BARON_ASHBURY_EVENT, IN_PROGRESS);
         }
 
-		void JustDied(Unit* /*pKiller*/) OVERRIDE 
+		void JustDied(Unit* /*pKiller*/) override 
         {
             Talk(SAY_DEATH);
 
@@ -123,7 +123,7 @@ public:
                 pInstance->SetData(DATA_BARON_ASHBURY_EVENT, DONE);
         }
 
-        void UpdateAI(uint32 diff) OVERRIDE
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;

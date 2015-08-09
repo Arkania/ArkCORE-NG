@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2015 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -33,7 +33,7 @@ public:
     {
         instance_obsidian_sanctum_InstanceMapScript(Map* map) : InstanceScript(map) { }
 
-        void Initialize() OVERRIDE
+        void Initialize() override
         {
             sartharionGUID = 0;
             tenebronGUID   = 0;
@@ -41,7 +41,7 @@ public:
             vesperonGUID   = 0;
         }
 
-        void OnCreatureCreate(Creature* creature) OVERRIDE
+        void OnCreatureCreate(Creature* creature) override
         {
             switch (creature->GetEntry())
             {
@@ -65,7 +65,7 @@ public:
             }
         }
 
-        bool SetBossState(uint32 type, EncounterState state) OVERRIDE
+        bool SetBossState(uint32 type, EncounterState state) override
         {
             if (!InstanceScript::SetBossState(type, state))
                  return false;
@@ -83,7 +83,7 @@ public:
             return true;
         }
 
-        uint64 GetData64(uint32 Data) const OVERRIDE
+        uint64 GetData64(uint32 Data) const override
         {
             switch (Data)
             {
@@ -99,7 +99,7 @@ public:
             return 0;
         }
 
-        std::string GetSaveData() OVERRIDE
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
 
@@ -110,7 +110,7 @@ public:
             return saveStream.str();
         }
 
-        void Load(const char* str) OVERRIDE
+        void Load(const char* str) override
         {
             if (!str)
             {
@@ -149,7 +149,7 @@ public:
         uint64 vesperonGUID;
     };
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const OVERRIDE
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_obsidian_sanctum_InstanceMapScript(map);
     }

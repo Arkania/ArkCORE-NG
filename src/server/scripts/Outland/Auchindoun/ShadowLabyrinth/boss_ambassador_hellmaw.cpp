@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2015 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -66,7 +66,7 @@ class boss_ambassador_hellmaw : public CreatureScript
                 _intro = false;
             }
 
-            void Reset() OVERRIDE
+            void Reset() override
             {
                 if (!me->IsAlive())
                     return;
@@ -82,7 +82,7 @@ class boss_ambassador_hellmaw : public CreatureScript
                 DoAction(ACTION_AMBASSADOR_HELLMAW_BANISH);
             }
 
-            void MoveInLineOfSight(Unit* who) OVERRIDE
+            void MoveInLineOfSight(Unit* who) override
             {
                 if (me->HasAura(SPELL_BANISH))
                     return;
@@ -90,7 +90,7 @@ class boss_ambassador_hellmaw : public CreatureScript
                 npc_escortAI::MoveInLineOfSight(who);
             }
 
-            void WaypointReached(uint32 /*waypointId*/) OVERRIDE
+            void WaypointReached(uint32 /*waypointId*/) override
             {
             }
 
@@ -119,25 +119,25 @@ class boss_ambassador_hellmaw : public CreatureScript
                 Start(true, false, 0, NULL, false, true);
             }
 
-            void EnterCombat(Unit* /*who*/) OVERRIDE
+            void EnterCombat(Unit* /*who*/) override
             {
                 _instance->SetBossState(DATA_AMBASSADOR_HELLMAW, IN_PROGRESS);
                 Talk(SAY_AGGRO);
             }
 
-            void KilledUnit(Unit* who) OVERRIDE
+            void KilledUnit(Unit* who) override
             {
                 if (who->GetTypeId() == TYPEID_PLAYER)
                     Talk(SAY_SLAY);
             }
 
-            void JustDied(Unit* /*killer*/) OVERRIDE
+            void JustDied(Unit* /*killer*/) override
             {
                 _instance->SetBossState(DATA_AMBASSADOR_HELLMAW, DONE);
                 Talk(SAY_DEATH);
             }
 
-            void UpdateEscortAI(uint32 const diff) OVERRIDE
+            void UpdateEscortAI(uint32 const diff) override
             {
                 if (!UpdateVictim())
                     return;
@@ -182,7 +182,7 @@ class boss_ambassador_hellmaw : public CreatureScript
             bool _intro;
         };
 
-        CreatureAI* GetAI(Creature* creature) const OVERRIDE
+        CreatureAI* GetAI(Creature* creature) const override
         {
             return GetShadowLabyrinthAI<boss_ambassador_hellmawAI>(creature);
         }

@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2015 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -28,7 +28,7 @@ class instance_gnomeregan : public InstanceMapScript
 public:
     instance_gnomeregan() : InstanceMapScript("instance_gnomeregan", 90) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const OVERRIDE
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_gnomeregan_InstanceMapScript(map);
     }
@@ -46,7 +46,7 @@ public:
 
         uint64 uiBastmasterEmiShortfuseGUID;
 
-        void Initialize() OVERRIDE
+        void Initialize() override
         {
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
 
@@ -56,7 +56,7 @@ public:
             uiBastmasterEmiShortfuseGUID    = 0;
         }
 
-        void Load(const char* in) OVERRIDE
+        void Load(const char* in) override
         {
             if (!in)
             {
@@ -78,7 +78,7 @@ public:
             OUT_LOAD_INST_DATA_COMPLETE;
         }
 
-        void OnCreatureCreate(Creature* creature) OVERRIDE
+        void OnCreatureCreate(Creature* creature) override
         {
             switch (creature->GetEntry())
             {
@@ -86,7 +86,7 @@ public:
             }
         }
 
-        void OnGameObjectCreate(GameObject* go) OVERRIDE
+        void OnGameObjectCreate(GameObject* go) override
         {
             switch (go->GetEntry())
             {
@@ -103,7 +103,7 @@ public:
             }
         }
 
-        void SetData(uint32 uiType, uint32 uiData) OVERRIDE
+        void SetData(uint32 uiType, uint32 uiData) override
         {
             switch (uiType)
             {
@@ -115,7 +115,7 @@ public:
             }
         }
 
-        uint32 GetData(uint32 uiType) const OVERRIDE
+        uint32 GetData(uint32 uiType) const override
         {
             switch (uiType)
             {
@@ -124,7 +124,7 @@ public:
             return 0;
         }
 
-        uint64 GetData64(uint32 uiType) const OVERRIDE
+        uint64 GetData64(uint32 uiType) const override
         {
             switch (uiType)
             {

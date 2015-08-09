@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2015 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -135,7 +135,7 @@ public:
     {
         boss_sartharionAI(Creature* creature) : BossAI(creature, DATA_SARTHARION) { }
 
-        void Reset() OVERRIDE
+        void Reset() override
         {
             _isBerserk     = false;
             _isSoftEnraged = false;
@@ -151,12 +151,12 @@ public:
             instance->SetBossState(DATA_PORTAL_OPEN, NOT_STARTED);
         }
 
-        void JustReachedHome() OVERRIDE
+        void JustReachedHome() override
         {
             _Reset();
         }
 
-        void EnterCombat(Unit* /*who*/) OVERRIDE
+        void EnterCombat(Unit* /*who*/) override
         {
             Talk(SAY_SARTHARION_AGGRO);
             _EnterCombat();
@@ -174,7 +174,7 @@ public:
             events.ScheduleEvent(EVENT_CALL_VESPERON, 120000);
         }
 
-        void JustDied(Unit* /*killer*/) OVERRIDE
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_SARTHARION_DEATH);
             _JustDied();
@@ -192,7 +192,7 @@ public:
                     vesperon->DisappearAndDie();
         }
 
-        void KilledUnit(Unit* who) OVERRIDE
+        void KilledUnit(Unit* who) override
         {
             if (who->GetTypeId() == TYPEID_PLAYER)
                 Talk(SAY_SARTHARION_SLAY);
@@ -376,7 +376,7 @@ public:
             }
         }
 
-        uint32 GetData(uint32 type) const OVERRIDE
+        uint32 GetData(uint32 type) const override
         {
             if (type == TWILIGHT_ACHIEVEMENTS)
                 return drakeCount;
@@ -399,7 +399,7 @@ public:
             Trinity::Containers::SelectRandomContainerElement(fireCyclonesList)->CastSpell(target, SPELL_LAVA_STRIKE, true);
         }
 
-        void UpdateAI(uint32 diff) OVERRIDE
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -507,7 +507,7 @@ public:
         uint8 drakeCount;
     };
 
-    CreatureAI* GetAI(Creature* creature) const OVERRIDE
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetObsidianSanctumAI<boss_sartharionAI>(creature);
     }

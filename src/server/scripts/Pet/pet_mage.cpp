@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2015 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -41,7 +41,7 @@ class npc_pet_mage_mirror_image : public CreatureScript
         {
             npc_pet_mage_mirror_imageAI(Creature* creature) : CasterAI(creature) { }
 
-            void InitializeAI() OVERRIDE
+            void InitializeAI() override
             {
                 CasterAI::InitializeAI();
                 Unit* owner = me->GetOwner();
@@ -56,7 +56,7 @@ class npc_pet_mage_mirror_image : public CreatureScript
             }
 
             // Do not reload Creature templates on evade mode enter - prevent visual lost
-            void EnterEvadeMode() OVERRIDE
+            void EnterEvadeMode() override
             {
                 if (me->IsInEvadeMode() || !me->IsAlive())
                     return;
@@ -72,7 +72,7 @@ class npc_pet_mage_mirror_image : public CreatureScript
             }
         };
 
-        CreatureAI* GetAI(Creature* creature) const OVERRIDE
+        CreatureAI* GetAI(Creature* creature) const override
         {
             return new npc_pet_mage_mirror_imageAI(creature);
         }

@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2015 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -1666,7 +1666,7 @@ void LoadLootTemplates_Item()
     TC_LOG_INFO("server.loading", "Loading item loot templates...");
 
     uint32 oldMSTime = getMSTime();
-
+    uint32 itemsUsedBySpell[] = {5524, 7973, 36781, 45909, 52340, 54464};
     LootIdSet lootIdSet;
     uint32 count = LootTemplates_Item.LoadAndCollectLootIds(lootIdSet);
 
@@ -1675,7 +1675,14 @@ void LoadLootTemplates_Item()
     for (ItemTemplateContainer::const_iterator itr = its->begin(); itr != its->end(); ++itr)
         if (lootIdSet.find(itr->second.ItemId) != lootIdSet.end() && itr->second.Flags & ITEM_PROTO_FLAG_OPENABLE)
             lootIdSet.erase(itr->second.ItemId);
-
+        else
+        {
+            int len = sizeof(itemsUsedBySpell) / 4;
+            for (int i = 0; i<len; i++) {
+                if (itr->second.ItemId == itemsUsedBySpell[i])
+                    lootIdSet.erase(itr->second.ItemId);
+            }
+        }
     // output error for any still listed (not referenced from appropriate table) ids
     LootTemplates_Item.ReportUnusedIds(lootIdSet);
 

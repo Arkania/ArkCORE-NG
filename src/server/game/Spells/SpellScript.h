@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2015 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -56,7 +56,7 @@ enum SpellScriptState
 class _SpellScript
 {
     // internal use classes & functions
-    // DO NOT OVERRIDE THESE IN SCRIPTS
+    // DO NOT override THESE IN SCRIPTS
     protected:
         virtual bool _Validate(SpellInfo const* entry);
 
@@ -152,7 +152,7 @@ enum SpellScriptHookType
 class SpellScript : public _SpellScript
 {
     // internal use classes & functions
-    // DO NOT OVERRIDE THESE IN SCRIPTS
+    // DO NOT override THESE IN SCRIPTS
     public:
         #define SPELLSCRIPT_FUNCTION_TYPE_DEFINES(CLASSNAME) \
             typedef SpellCastResult(CLASSNAME::*SpellCheckCastFnType)(); \
@@ -471,7 +471,7 @@ enum AuraScriptHookType
 class AuraScript : public _SpellScript
 {
     // internal use classes & functions
-    // DO NOT OVERRIDE THESE IN SCRIPTS
+    // DO NOT override THESE IN SCRIPTS
     public:
 
     #define AURASCRIPT_FUNCTION_TYPE_DEFINES(CLASSNAME) \

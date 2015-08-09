@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2015 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -42,7 +42,7 @@ class npc_pet_gen_mojo : public CreatureScript
         {
             npc_pet_gen_mojoAI(Creature* creature) : ScriptedAI(creature) { }
 
-            void Reset() OVERRIDE
+            void Reset() override
             {
                 _victimGUID = 0;
 
@@ -50,10 +50,10 @@ class npc_pet_gen_mojo : public CreatureScript
                     me->GetMotionMaster()->MoveFollow(owner, 0.0f, 0.0f);
             }
 
-            void EnterCombat(Unit* /*who*/) OVERRIDE { }
-            void UpdateAI(uint32 /*diff*/) OVERRIDE { }
+            void EnterCombat(Unit* /*who*/) override { }
+            void UpdateAI(uint32 /*diff*/) override { }
 
-            void ReceiveEmote(Player* player, uint32 emote) OVERRIDE
+            void ReceiveEmote(Player* player, uint32 emote) override
             {
                 me->HandleEmoteCommand(emote);
                 Unit* owner = me->GetOwner();
@@ -80,7 +80,7 @@ class npc_pet_gen_mojo : public CreatureScript
             uint64 _victimGUID;
         };
 
-        CreatureAI* GetAI(Creature* creature) const OVERRIDE
+        CreatureAI* GetAI(Creature* creature) const override
         {
             return new npc_pet_gen_mojoAI(creature);
         }

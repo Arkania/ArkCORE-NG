@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2015 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -40,7 +40,7 @@ class boss_hydromancer_thespia : public CreatureScript
 public:
     boss_hydromancer_thespia() : CreatureScript("boss_hydromancer_thespia") { }
 
-    CreatureAI* GetAI(Creature* creature) const OVERRIDE
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_thespiaAI>(creature);
     }
@@ -58,7 +58,7 @@ public:
         uint32 LungBurst_Timer;
         uint32 EnvelopingWinds_Timer;
 
-        void Reset() OVERRIDE
+        void Reset() override
         {
             LightningCloud_Timer = 15000;
             LungBurst_Timer = 7000;
@@ -67,26 +67,26 @@ public:
             instance->SetBossState(DATA_HYDROMANCER_THESPIA, NOT_STARTED);
         }
 
-        void JustDied(Unit* /*killer*/) OVERRIDE
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEAD);
 
             instance->SetBossState(DATA_HYDROMANCER_THESPIA, DONE);
         }
 
-        void KilledUnit(Unit* /*victim*/) OVERRIDE
+        void KilledUnit(Unit* /*victim*/) override
         {
             Talk(SAY_SLAY);
         }
 
-        void EnterCombat(Unit* /*who*/) OVERRIDE
+        void EnterCombat(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
 
             instance->SetBossState(DATA_HYDROMANCER_THESPIA, IN_PROGRESS);
         }
 
-        void UpdateAI(uint32 diff) OVERRIDE
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -137,7 +137,7 @@ class npc_coilfang_waterelemental : public CreatureScript
 public:
     npc_coilfang_waterelemental() : CreatureScript("npc_coilfang_waterelemental") { }
 
-    CreatureAI* GetAI(Creature* creature) const OVERRIDE
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_coilfang_waterelementalAI(creature);
     }
@@ -148,14 +148,14 @@ public:
 
         uint32 WaterBoltVolley_Timer;
 
-        void Reset() OVERRIDE
+        void Reset() override
         {
             WaterBoltVolley_Timer = 3000+rand()%3000;
         }
 
-        void EnterCombat(Unit* /*who*/) OVERRIDE { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void UpdateAI(uint32 diff) OVERRIDE
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;

@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2015 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -74,7 +74,7 @@ class instance_the_black_morass : public InstanceMapScript
 public:
     instance_the_black_morass() : InstanceMapScript("instance_the_black_morass", 269) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const OVERRIDE
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_the_black_morass_InstanceMapScript(map);
     }
@@ -93,7 +93,7 @@ public:
         uint64 _medivhGUID;
         uint8  _currentRiftId;
 
-        void Initialize() OVERRIDE
+        void Initialize() override
         {
             _medivhGUID         = 0;
             Clear();
@@ -118,7 +118,7 @@ public:
             DoUpdateWorldState(WORLD_STATE_BM_RIFT, 0);
         }
 
-        bool IsEncounterInProgress() const OVERRIDE
+        bool IsEncounterInProgress() const override
         {
             if (GetData(TYPE_MEDIVH) == IN_PROGRESS)
                 return true;
@@ -126,7 +126,7 @@ public:
             return false;
         }
 
-        void OnPlayerEnter(Player* player) OVERRIDE
+        void OnPlayerEnter(Player* player) override
         {
             if (GetData(TYPE_MEDIVH) == IN_PROGRESS)
                 return;
@@ -134,7 +134,7 @@ public:
             player->SendUpdateWorldState(WORLD_STATE_BM, 0);
         }
 
-        void OnCreatureCreate(Creature* creature) OVERRIDE
+        void OnCreatureCreate(Creature* creature) override
         {
             if (creature->GetEntry() == NPC_MEDIVH)
                 _medivhGUID = creature->GetGUID();
@@ -166,7 +166,7 @@ public:
             }
         }
 
-        void SetData(uint32 type, uint32 data) OVERRIDE
+        void SetData(uint32 type, uint32 data) override
         {
             switch (type)
             {
@@ -237,7 +237,7 @@ public:
             }
         }
 
-        uint32 GetData(uint32 type) const OVERRIDE
+        uint32 GetData(uint32 type) const override
         {
             switch (type)
             {
@@ -253,7 +253,7 @@ public:
             return 0;
         }
 
-        uint64 GetData64(uint32 data) const OVERRIDE
+        uint64 GetData64(uint32 data) const override
         {
             if (data == DATA_MEDIVH)
                 return _medivhGUID;
@@ -317,7 +317,7 @@ public:
             }
         }
 
-        void Update(uint32 diff) OVERRIDE
+        void Update(uint32 diff) override
         {
             if (m_auiEncounter[1] != IN_PROGRESS)
                 return;

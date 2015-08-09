@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2015 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -43,7 +43,7 @@ class DynamicObject : public WorldObject, public GridObject<DynamicObject>, publ
         void AddToWorld();
         void RemoveFromWorld();
 
-        void CleanupsBeforeDelete(bool finalCleanup = true) OVERRIDE;
+        void CleanupsBeforeDelete(bool finalCleanup = true) override;
 
         bool CreateDynamicObject(uint32 guidlow, Unit* caster, SpellInfo const* spell, Position const& pos, float radius, DynamicObjectType type);
         void Update(uint32 p_time);

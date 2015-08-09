@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2015 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -50,7 +50,7 @@ class instance_karazhan : public InstanceMapScript
 public:
     instance_karazhan() : InstanceMapScript("instance_karazhan", 532) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const OVERRIDE
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_karazhan_InstanceMapScript(map);
     }
@@ -81,7 +81,7 @@ public:
         uint64 ImageGUID;
         uint64 DustCoveredChest;
 
-        void Initialize() OVERRIDE
+        void Initialize() override
         {
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
 
@@ -109,7 +109,7 @@ public:
             DustCoveredChest    = 0;
         }
 
-        bool IsEncounterInProgress() const OVERRIDE
+        bool IsEncounterInProgress() const override
         {
             for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
                 if (m_auiEncounter[i] == IN_PROGRESS)
@@ -118,7 +118,7 @@ public:
             return false;
         }
 
-        void OnCreatureCreate(Creature* creature) OVERRIDE
+        void OnCreatureCreate(Creature* creature) override
         {
             switch (creature->GetEntry())
             {
@@ -128,7 +128,7 @@ public:
             }
         }
 
-        void SetData(uint32 type, uint32 uiData) OVERRIDE
+        void SetData(uint32 type, uint32 uiData) override
         {
             switch (type)
             {
@@ -183,7 +183,7 @@ public:
             }
         }
 
-         void SetData64(uint32 identifier, uint64 data) OVERRIDE
+         void SetData64(uint32 identifier, uint64 data) override
          {
              switch (identifier)
              {
@@ -191,7 +191,7 @@ public:
              }
          }
 
-        void OnGameObjectCreate(GameObject* go) OVERRIDE
+        void OnGameObjectCreate(GameObject* go) override
         {
             switch (go->GetEntry())
             {
@@ -237,12 +237,12 @@ public:
             }
         }
 
-        std::string GetSaveData() OVERRIDE
+        std::string GetSaveData() override
         {
             return strSaveData;
         }
 
-        uint32 GetData(uint32 uiData) const OVERRIDE
+        uint32 GetData(uint32 uiData) const override
         {
             switch (uiData)
             {
@@ -265,7 +265,7 @@ public:
             return 0;
         }
 
-        uint64 GetData64(uint32 uiData) const OVERRIDE
+        uint64 GetData64(uint32 uiData) const override
         {
             switch (uiData)
             {

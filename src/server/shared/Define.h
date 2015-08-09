@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2015 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -72,11 +72,11 @@
 #endif //COMPILER == COMPILER_GNU
 
 #if COMPILER_HAS_CPP11_SUPPORT
-#  define OVERRIDE override
+// #  define override override
 #  define FINAL final
 #  define DELETE_MEMBER = delete
 #else
-#  define OVERRIDE
+// #  define override
 #  define FINAL
 #  define DELETE_MEMBER
 #endif //COMPILER_HAS_CPP11_SUPPORT

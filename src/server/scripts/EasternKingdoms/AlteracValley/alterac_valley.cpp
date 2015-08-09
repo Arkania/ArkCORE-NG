@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2015 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -87,7 +87,7 @@ class npc_av_marshal_or_warmaster : public CreatureScript
         {
             npc_av_marshal_or_warmasterAI(Creature* creature) : ScriptedAI(creature) { }
 
-            void Reset() OVERRIDE
+            void Reset() override
             {
                 events.Reset();
                 events.ScheduleEvent(EVENT_CHARGE_TARGET, urand(2 * IN_MILLISECONDS, 12 * IN_MILLISECONDS));
@@ -100,12 +100,12 @@ class npc_av_marshal_or_warmaster : public CreatureScript
                 _hasAura = false;
             }
 
-            void JustRespawned() OVERRIDE
+            void JustRespawned() override
             {
                 Reset();
             }
 
-            void UpdateAI(uint32 diff) OVERRIDE
+            void UpdateAI(uint32 diff) override
             {
                 // I have a feeling this isn't blizzlike, but owell, I'm only passing by and cleaning up.
                 if (!_hasAura)
@@ -171,7 +171,7 @@ class npc_av_marshal_or_warmaster : public CreatureScript
             bool _hasAura;
         };
 
-        CreatureAI* GetAI(Creature* creature) const OVERRIDE
+        CreatureAI* GetAI(Creature* creature) const override
         {
             return new npc_av_marshal_or_warmasterAI(creature);
         }

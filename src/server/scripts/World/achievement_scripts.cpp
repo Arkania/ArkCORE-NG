@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2015 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -28,7 +28,7 @@ class achievement_resilient_victory : public AchievementCriteriaScript
     public:
         achievement_resilient_victory() : AchievementCriteriaScript("achievement_resilient_victory") { }
 
-        bool OnCheck(Player* source, Unit* target) OVERRIDE
+        bool OnCheck(Player* source, Unit* target) override
         {
             if (Battleground* bg = source->GetBattleground())
                 return bg->CheckAchievementCriteriaMeet(BG_CRITERIA_CHECK_RESILIENT_VICTORY, source, target);
@@ -42,7 +42,7 @@ class achievement_bg_control_all_nodes : public AchievementCriteriaScript
     public:
         achievement_bg_control_all_nodes() : AchievementCriteriaScript("achievement_bg_control_all_nodes") { }
 
-        bool OnCheck(Player* source, Unit* /*target*/) OVERRIDE
+        bool OnCheck(Player* source, Unit* /*target*/) override
         {
             if (Battleground* bg = source->GetBattleground())
                 return bg->IsAllNodesControlledByTeam(source->GetTeam());
@@ -56,7 +56,7 @@ class achievement_save_the_day : public AchievementCriteriaScript
     public:
         achievement_save_the_day() : AchievementCriteriaScript("achievement_save_the_day") { }
 
-        bool OnCheck(Player* source, Unit* target) OVERRIDE
+        bool OnCheck(Player* source, Unit* target) override
         {
             if (Battleground* bg = source->GetBattleground())
                 return bg->CheckAchievementCriteriaMeet(BG_CRITERIA_CHECK_SAVE_THE_DAY, source, target);
@@ -70,7 +70,7 @@ class achievement_bg_ic_resource_glut : public AchievementCriteriaScript
     public:
         achievement_bg_ic_resource_glut() : AchievementCriteriaScript("achievement_bg_ic_resource_glut") { }
 
-        bool OnCheck(Player* source, Unit* /*target*/) OVERRIDE
+        bool OnCheck(Player* source, Unit* /*target*/) override
         {
             if (source->HasAura(SPELL_OIL_REFINERY) && source->HasAura(SPELL_QUARRY))
                 return true;
@@ -84,7 +84,7 @@ class achievement_bg_ic_glaive_grave : public AchievementCriteriaScript
     public:
         achievement_bg_ic_glaive_grave() : AchievementCriteriaScript("achievement_bg_ic_glaive_grave") { }
 
-        bool OnCheck(Player* source, Unit* /*target*/) OVERRIDE
+        bool OnCheck(Player* source, Unit* /*target*/) override
         {
             if (Creature* vehicle = source->GetVehicleCreatureBase())
             {
@@ -101,7 +101,7 @@ class achievement_bg_ic_mowed_down : public AchievementCriteriaScript
     public:
         achievement_bg_ic_mowed_down() : AchievementCriteriaScript("achievement_bg_ic_mowed_down") { }
 
-        bool OnCheck(Player* source, Unit* /*target*/) OVERRIDE
+        bool OnCheck(Player* source, Unit* /*target*/) override
         {
             if (Creature* vehicle = source->GetVehicleCreatureBase())
             {
@@ -118,7 +118,7 @@ class achievement_bg_sa_artillery : public AchievementCriteriaScript
     public:
         achievement_bg_sa_artillery() : AchievementCriteriaScript("achievement_bg_sa_artillery") { }
 
-        bool OnCheck(Player* source, Unit* /*target*/) OVERRIDE
+        bool OnCheck(Player* source, Unit* /*target*/) override
         {
             if (Creature* vehicle = source->GetVehicleCreatureBase())
             {
@@ -138,7 +138,7 @@ class achievement_arena_kills : public AchievementCriteriaScript
         {
         }
 
-        bool OnCheck(Player* source, Unit* /*target*/) OVERRIDE
+        bool OnCheck(Player* source, Unit* /*target*/) override
         {
             // this checks GetBattleground() for NULL already
             if (!source->InArena())
@@ -156,7 +156,7 @@ class achievement_sickly_gazelle : public AchievementCriteriaScript
 public:
     achievement_sickly_gazelle() : AchievementCriteriaScript("achievement_sickly_gazelle") { }
 
-    bool OnCheck(Player* /*source*/, Unit* target) OVERRIDE
+    bool OnCheck(Player* /*source*/, Unit* target) override
     {
         if (!target)
             return false;
@@ -174,7 +174,7 @@ class achievement_everything_counts : public AchievementCriteriaScript
     public:
         achievement_everything_counts() : AchievementCriteriaScript("achievement_everything_counts") { }
 
-        bool OnCheck(Player* source, Unit* target) OVERRIDE
+        bool OnCheck(Player* source, Unit* target) override
         {
             if (Battleground* bg = source->GetBattleground())
                 return bg->CheckAchievementCriteriaMeet(BG_CRITERIA_CHECK_EVERYTHING_COUNTS, source, target);
@@ -188,7 +188,7 @@ class achievement_bg_av_perfection : public AchievementCriteriaScript
     public:
         achievement_bg_av_perfection() : AchievementCriteriaScript("achievement_bg_av_perfection") { }
 
-        bool OnCheck(Player* source, Unit* target) OVERRIDE
+        bool OnCheck(Player* source, Unit* target) override
         {
             if (Battleground* bg = source->GetBattleground())
                 return bg->CheckAchievementCriteriaMeet(BG_CRITERIA_CHECK_AV_PERFECTION, source, target);
@@ -202,7 +202,7 @@ class achievement_bg_sa_defense_of_ancients : public AchievementCriteriaScript
     public:
         achievement_bg_sa_defense_of_ancients() : AchievementCriteriaScript("achievement_bg_sa_defense_of_ancients") { }
 
-        bool OnCheck(Player* source, Unit* target) OVERRIDE
+        bool OnCheck(Player* source, Unit* target) override
         {
             if (Battleground* bg = source->GetBattleground())
                 return bg->CheckAchievementCriteriaMeet(BG_CRITERIA_CHECK_DEFENSE_OF_THE_ANCIENTS, source, target);
@@ -226,7 +226,7 @@ class achievement_tilted : public AchievementCriteriaScript
     public:
         achievement_tilted() : AchievementCriteriaScript("achievement_tilted") { }
 
-        bool OnCheck(Player* player, Unit* /*target*/) OVERRIDE
+        bool OnCheck(Player* player, Unit* /*target*/) override
         {
             if (!player)
                 return false;
@@ -247,7 +247,7 @@ class achievement_not_even_a_scratch : public AchievementCriteriaScript
     public:
         achievement_not_even_a_scratch() : AchievementCriteriaScript("achievement_not_even_a_scratch") { }
 
-        bool OnCheck(Player* source, Unit* target) OVERRIDE
+        bool OnCheck(Player* source, Unit* target) override
         {
             if (Battleground* bg = source->GetBattleground())
                 return bg->CheckAchievementCriteriaMeet(BG_CRITERIA_CHECK_NOT_EVEN_A_SCRATCH, source, target);
@@ -268,7 +268,7 @@ class achievement_flirt_with_disaster_perf_check : public AchievementCriteriaScr
     public:
         achievement_flirt_with_disaster_perf_check() : AchievementCriteriaScript("achievement_flirt_with_disaster_perf_check") { }
 
-        bool OnCheck(Player* player, Unit* /*target*/) OVERRIDE
+        bool OnCheck(Player* player, Unit* /*target*/) override
         {
             if (!player)
                 return false;
@@ -285,7 +285,7 @@ class achievement_killed_exp_or_honor_target : public AchievementCriteriaScript
     public:
         achievement_killed_exp_or_honor_target() : AchievementCriteriaScript("achievement_killed_exp_or_honor_target") { }
 
-        bool OnCheck(Player* player, Unit* target) OVERRIDE
+        bool OnCheck(Player* player, Unit* target) override
         {
             return target && player->isHonorOrXPTarget(target);
         }

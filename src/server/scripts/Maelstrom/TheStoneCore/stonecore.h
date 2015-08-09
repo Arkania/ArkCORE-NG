@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2015 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2011-2012 EnturionEMU <http://www.Enturion.com/>
  *
  * This program is free software; you can redistribute it and/or modify it

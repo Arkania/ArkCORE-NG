@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2015 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -97,7 +97,7 @@ class boss_ossirian : public CreatureScript
             uint8 CrystalIterator;
             bool SaidIntro;
 
-            void Reset() OVERRIDE
+            void Reset() override
             {
                 _Reset();
                 CrystalIterator = 0;
@@ -105,7 +105,7 @@ class boss_ossirian : public CreatureScript
                 CrystalGUID = 0;
             }
 
-            void SpellHit(Unit* caster, SpellInfo const* spell) OVERRIDE
+            void SpellHit(Unit* caster, SpellInfo const* spell) override
             {
                 for (uint8 i = 0; i < NUM_WEAKNESS; ++i)
                 {
@@ -118,7 +118,7 @@ class boss_ossirian : public CreatureScript
                 }
             }
 
-            void DoAction(int32 action) OVERRIDE
+            void DoAction(int32 action) override
             {
                 if (action == ACTION_TRIGGER_WEAKNESS)
                     if (Creature* Trigger = me->GetMap()->GetCreature(TriggerGUID))
@@ -126,7 +126,7 @@ class boss_ossirian : public CreatureScript
                             Trigger->CastSpell(Trigger, SpellWeakness[urand(0, 4)], false);
             }
 
-            void EnterCombat(Unit* /*who*/) OVERRIDE
+            void EnterCombat(Unit* /*who*/) override
             {
                 _EnterCombat();
                 events.Reset();
@@ -155,19 +155,19 @@ class boss_ossirian : public CreatureScript
                 SpawnNextCrystal();
             }
 
-            void KilledUnit(Unit* /*victim*/) OVERRIDE
+            void KilledUnit(Unit* /*victim*/) override
             {
                 Talk(SAY_SLAY);
             }
 
-            void EnterEvadeMode() OVERRIDE
+            void EnterEvadeMode() override
             {
                 Cleanup();
                 summons.DespawnAll();
                 BossAI::EnterEvadeMode();
             }
 
-            void JustDied(Unit* /*killer*/) OVERRIDE
+            void JustDied(Unit* /*killer*/) override
             {
                 Cleanup();
                 _JustDied();
@@ -199,7 +199,7 @@ class boss_ossirian : public CreatureScript
                 }
             }
 
-            void MoveInLineOfSight(Unit* who) OVERRIDE
+            void MoveInLineOfSight(Unit* who) override
 
             {
                 if (!SaidIntro)
@@ -210,7 +210,7 @@ class boss_ossirian : public CreatureScript
                 BossAI::MoveInLineOfSight(who);
             }
 
-            void UpdateAI(uint32 diff) OVERRIDE
+            void UpdateAI(uint32 diff) override
             {
                 if (!UpdateVictim())
                     return;
@@ -268,7 +268,7 @@ class boss_ossirian : public CreatureScript
             }
         };
 
-        CreatureAI* GetAI(Creature* creature) const OVERRIDE
+        CreatureAI* GetAI(Creature* creature) const override
         {
             return GetInstanceAI<boss_ossirianAI>(creature);
         }
@@ -279,7 +279,7 @@ class go_ossirian_crystal : public GameObjectScript
     public:
         go_ossirian_crystal() : GameObjectScript("go_ossirian_crystal") { }
 
-        bool OnGossipHello(Player* player, GameObject* /*go*/) OVERRIDE
+        bool OnGossipHello(Player* player, GameObject* /*go*/) override
         {
             InstanceScript* Instance = player->GetInstanceScript();
             if (!Instance)

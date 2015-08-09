@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2015 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -93,12 +93,12 @@ class npc_voljin_zulaman : public CreatureScript
                     me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
             }
 
-            void Reset() OVERRIDE
+            void Reset() override
             {
                 _gongCount = 0;
             }
 
-            void sGossipSelect(Player* player, uint32 sender, uint32 action) OVERRIDE
+            void sGossipSelect(Player* player, uint32 sender, uint32 action) override
             {
                 if (_instance->GetData(DATA_ZULAMAN_STATE) != NOT_STARTED)
                     return;
@@ -115,7 +115,7 @@ class npc_voljin_zulaman : public CreatureScript
                 }
             }
 
-            void DoAction(int32 action) OVERRIDE
+            void DoAction(int32 action) override
             {
                 if (action == ACTION_START_ZULAMAN)
                 {
@@ -124,7 +124,7 @@ class npc_voljin_zulaman : public CreatureScript
                 }
             }
 
-            void UpdateAI(uint32 diff) OVERRIDE
+            void UpdateAI(uint32 diff) override
             {
                 _events.Update(diff);
                 while (uint32 eventId = _events.ExecuteEvent())
@@ -184,7 +184,7 @@ class npc_voljin_zulaman : public CreatureScript
                 }
             }
 
-            void MovementInform(uint32 movementType, uint32 pointId) OVERRIDE
+            void MovementInform(uint32 movementType, uint32 pointId) override
             {
                 if (movementType != POINT_MOTION_TYPE)
                     return;
@@ -212,7 +212,7 @@ class npc_voljin_zulaman : public CreatureScript
             uint8 _gongCount;
         };
 
-        CreatureAI* GetAI(Creature* creature) const OVERRIDE
+        CreatureAI* GetAI(Creature* creature) const override
         {
             return GetInstanceAI<npc_voljin_zulamanAI>(creature);
         }
@@ -234,13 +234,13 @@ class spell_banging_the_gong : public SpellScriptLoader
                 GetHitGObj()->SendCustomAnim(0);
             }
 
-            void Register() OVERRIDE
+            void Register() override
             {
                 OnEffectHitTarget += SpellEffectFn(spell_banging_the_gong_SpellScript::Activate, EFFECT_1, SPELL_EFFECT_ACTIVATE_OBJECT);
             }
         };
 
-        SpellScript* GetSpellScript() const OVERRIDE
+        SpellScript* GetSpellScript() const override
         {
             return new spell_banging_the_gong_SpellScript();
         }

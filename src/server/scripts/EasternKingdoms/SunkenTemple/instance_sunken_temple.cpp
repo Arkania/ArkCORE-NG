@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2015 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -52,7 +52,7 @@ class instance_sunken_temple : public InstanceMapScript
 public:
     instance_sunken_temple() : InstanceMapScript("instance_sunken_temple", 109) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const OVERRIDE
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_sunken_temple_InstanceMapScript(map);
     }
@@ -80,7 +80,7 @@ public:
         bool s5;
         bool s6;
 
-        void Initialize() OVERRIDE
+        void Initialize() override
         {
             GOAtalaiStatue1 = 0;
             GOAtalaiStatue2 = 0;
@@ -100,7 +100,7 @@ public:
             s6 = false;
         }
 
-        void OnGameObjectCreate(GameObject* go) OVERRIDE
+        void OnGameObjectCreate(GameObject* go) override
         {
             switch (go->GetEntry())
             {
@@ -194,13 +194,13 @@ public:
          }
          */
 
-         void SetData(uint32 type, uint32 data) OVERRIDE
+         void SetData(uint32 type, uint32 data) override
          {
             if (type == EVENT_STATE)
                 State = data;
          }
 
-         uint32 GetData(uint32 type) const OVERRIDE
+         uint32 GetData(uint32 type) const override
          {
             if (type == EVENT_STATE)
                 return State;

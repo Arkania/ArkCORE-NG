@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2015 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -65,7 +65,7 @@ class boss_murmur : public CreatureScript
                 SetCombatMovement(false);
             }
 
-            void Reset() OVERRIDE
+            void Reset() override
             {
                 _Reset();
                 events.ScheduleEvent(EVENT_SONIC_BOOM, 30000);
@@ -85,17 +85,17 @@ class boss_murmur : public CreatureScript
                 me->ResetPlayerDamageReq();
             }
 
-            void EnterCombat(Unit* /*who*/) OVERRIDE
+            void EnterCombat(Unit* /*who*/) override
             {
                 _EnterCombat();
             }
 
-            void JustDied(Unit* /*killer*/) OVERRIDE
+            void JustDied(Unit* /*killer*/) override
             {
                 _JustDied();
             }
 
-            void UpdateAI(uint32 diff) OVERRIDE
+            void UpdateAI(uint32 diff) override
             {
                 if (!UpdateVictim())
                     return;
@@ -168,7 +168,7 @@ class boss_murmur : public CreatureScript
             }
         };
 
-        CreatureAI* GetAI(Creature* creature) const OVERRIDE
+        CreatureAI* GetAI(Creature* creature) const override
         {
             return GetShadowLabyrinthAI<boss_murmurAI>(creature);
         }
@@ -184,7 +184,7 @@ class spell_murmur_sonic_boom : public SpellScriptLoader
         {
             PrepareSpellScript(spell_murmur_sonic_boom_SpellScript);
 
-            bool Validate(SpellInfo const* /*spellInfo*/) OVERRIDE
+            bool Validate(SpellInfo const* /*spellInfo*/) override
             {
                 if (!sSpellMgr->GetSpellInfo(SPELL_SONIC_BOOM_EFFECT))
                     return false;
@@ -196,13 +196,13 @@ class spell_murmur_sonic_boom : public SpellScriptLoader
                 GetCaster()->CastSpell((Unit*)NULL, SPELL_SONIC_BOOM_EFFECT, true);
             }
 
-            void Register() OVERRIDE
+            void Register() override
             {
                 OnEffectHit += SpellEffectFn(spell_murmur_sonic_boom_SpellScript::HandleEffect, EFFECT_0, SPELL_EFFECT_DUMMY);
             }
         };
 
-        SpellScript* GetSpellScript() const OVERRIDE
+        SpellScript* GetSpellScript() const override
         {
             return new spell_murmur_sonic_boom_SpellScript();
         }
@@ -224,13 +224,13 @@ class spell_murmur_sonic_boom_effect : public SpellScriptLoader
                     SetHitDamage(target->CountPctFromMaxHealth(80)); /// @todo: find correct value
             }
 
-            void Register() OVERRIDE
+            void Register() override
             {
                 OnHit += SpellHitFn(spell_murmur_sonic_boom_effect_SpellScript::CalcDamage);
             }
         };
 
-        SpellScript* GetSpellScript() const OVERRIDE
+        SpellScript* GetSpellScript() const override
         {
             return new spell_murmur_sonic_boom_effect_SpellScript();
         }
@@ -266,13 +266,13 @@ class spell_murmur_thundering_storm : public SpellScriptLoader
                 targets.remove_if(ThunderingStormCheck(GetCaster()));
             }
 
-            void Register() OVERRIDE
+            void Register() override
             {
                 OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_murmur_thundering_storm_SpellScript::FilterTarget, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
             }
         };
 
-        SpellScript* GetSpellScript() const OVERRIDE
+        SpellScript* GetSpellScript() const override
         {
             return new spell_murmur_thundering_storm_SpellScript();
         }

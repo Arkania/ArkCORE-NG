@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2015 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -71,7 +71,7 @@ public:
     {
         boss_razorgoreAI(Creature* creature) : BossAI(creature, BOSS_RAZORGORE) { }
 
-        void Reset() OVERRIDE
+        void Reset() override
         {
             _Reset();
 
@@ -79,7 +79,7 @@ public:
             instance->SetData(DATA_EGG_EVENT, NOT_STARTED);
         }
 
-        void JustDied(Unit* /*killer*/) OVERRIDE
+        void JustDied(Unit* /*killer*/) override
         {
             _JustDied();
             Talk(SAY_DEATH);
@@ -99,19 +99,19 @@ public:
             me->SetHealth(me->GetMaxHealth());
         }
 
-        void DoAction(int32 action) OVERRIDE
+        void DoAction(int32 action) override
         {
             if (action == ACTION_PHASE_TWO)
                 DoChangePhase();
         }
 
-        void DamageTaken(Unit* /*who*/, uint32& damage) OVERRIDE
+        void DamageTaken(Unit* /*who*/, uint32& damage) override
         {
             if (!secondPhase)
                 damage = 0;
         }
 
-        void UpdateAI(uint32 diff) OVERRIDE
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -153,7 +153,7 @@ public:
         bool secondPhase;
     };
 
-    CreatureAI* GetAI(Creature* creature) const OVERRIDE
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_razorgoreAI>(creature);
     }
@@ -164,7 +164,7 @@ class go_orb_of_domination : public GameObjectScript
 public:
     go_orb_of_domination() : GameObjectScript("go_orb_of_domination") { }
 
-    bool OnGossipHello(Player* player, GameObject* go) OVERRIDE
+    bool OnGossipHello(Player* player, GameObject* go) override
     {
         if (InstanceScript* instance = go->GetInstanceScript())
             if (instance->GetData(DATA_EGG_EVENT) != DONE)
@@ -192,13 +192,13 @@ class spell_egg_event : public SpellScriptLoader
                     instance->SetData(DATA_EGG_EVENT, SPECIAL);
             }
 
-            void Register() OVERRIDE
+            void Register() override
             {
                 OnHit += SpellHitFn(spell_egg_eventSpellScript::HandleOnHit);
             }
         };
 
-        SpellScript* GetSpellScript() const OVERRIDE
+        SpellScript* GetSpellScript() const override
         {
             return new spell_egg_eventSpellScript();
         }

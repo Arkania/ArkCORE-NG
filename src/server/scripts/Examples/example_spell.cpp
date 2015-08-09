@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2015 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -51,7 +51,7 @@ class spell_ex_5581 : public SpellScriptLoader
 
             // function called on server startup
             // checks if script has data required for it to work
-            bool Validate(SpellInfo const* /*spellInfo*/) OVERRIDE
+            bool Validate(SpellInfo const* /*spellInfo*/) override
             {
                 // check if spellid 70522 exists in dbc, we will trigger it later
                 if (!sSpellMgr->GetSpellInfo(SPELL_TRIGGERED))
@@ -61,7 +61,7 @@ class spell_ex_5581 : public SpellScriptLoader
 
             // function called just after script is added to spell
             // we initialize local variables if needed
-            bool Load() OVERRIDE
+            bool Load() override
             {
                 localVariable = "we're using local variable";
                 localVariable2 = new char();
@@ -74,7 +74,7 @@ class spell_ex_5581 : public SpellScriptLoader
 
             // function called just before script delete
             // we free allocated memory
-            void Unload() OVERRIDE
+            void Unload() override
             {
                 delete localVariable2;
             }
@@ -160,7 +160,7 @@ class spell_ex_5581 : public SpellScriptLoader
             }
 
             // register functions used in spell script - names of these functions do not matter
-            void Register() OVERRIDE
+            void Register() override
             {
                 // we're registering our functions here
                 BeforeCast += SpellCastFn(spell_ex_5581SpellScript::HandleBeforeCast);
@@ -193,7 +193,7 @@ class spell_ex_5581 : public SpellScriptLoader
         };
 
         // function which creates SpellScript
-        SpellScript* GetSpellScript() const OVERRIDE
+        SpellScript* GetSpellScript() const override
         {
             return new spell_ex_5581SpellScript();
         }
@@ -209,7 +209,7 @@ class spell_ex_66244 : public SpellScriptLoader
             PrepareAuraScript(spell_ex_66244AuraScript);
             // function called on server startup
             // checks if script has data required for it to work
-            bool Validate(SpellInfo const* /*spellInfo*/) OVERRIDE
+            bool Validate(SpellInfo const* /*spellInfo*/) override
             {
                 // check if spellid exists in dbc, we will trigger it later
                 if (!sSpellMgr->GetSpellInfo(SPELL_TRIGGERED))
@@ -219,7 +219,7 @@ class spell_ex_66244 : public SpellScriptLoader
 
             // function called in aura constructor
             // we initialize local variables if needed
-            bool Load() OVERRIDE
+            bool Load() override
             {
                 // do not load script if aura is cast by player or caster not avalible
                 if (Unit* caster = GetCaster())
@@ -317,7 +317,7 @@ class spell_ex_66244 : public SpellScriptLoader
             }
 
             // function registering
-            void Register() OVERRIDE
+            void Register() override
             {
                 OnEffectApply += AuraEffectApplyFn(spell_ex_66244AuraScript::HandleOnEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
                 OnEffectRemove += AuraEffectRemoveFn(spell_ex_66244AuraScript::HandleOnEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
@@ -348,7 +348,7 @@ class spell_ex_66244 : public SpellScriptLoader
         };
 
         // function which creates AuraScript
-        AuraScript* GetAuraScript() const OVERRIDE
+        AuraScript* GetAuraScript() const override
         {
             return new spell_ex_66244AuraScript();
         }
@@ -380,7 +380,7 @@ class spell_ex_absorb_aura : public SpellScriptLoader
             }
 
             // function registering
-            void Register() OVERRIDE
+            void Register() override
             {
                 OnEffectAbsorb += AuraEffectAbsorbFn(spell_ex_absorb_auraAuraScript::HandleOnEffectAbsorb, EFFECT_0);
                 AfterEffectAbsorb += AuraEffectAbsorbFn(spell_ex_absorb_auraAuraScript::HandleAfterEffectAbsorb, EFFECT_0);
@@ -388,7 +388,7 @@ class spell_ex_absorb_aura : public SpellScriptLoader
         };
 
         // function which creates AuraScript
-        AuraScript* GetAuraScript() const OVERRIDE
+        AuraScript* GetAuraScript() const override
         {
             return new spell_ex_absorb_auraAuraScript();
         }
@@ -409,14 +409,14 @@ class spell_ex_463 : public SpellScriptLoader
                 // in our script we allow only players to be affected
                 return target->GetTypeId() == TYPEID_PLAYER;
             }
-            void Register() OVERRIDE
+            void Register() override
             {
                 DoCheckAreaTarget += AuraCheckAreaTargetFn(spell_ex_463AuraScript::CheckAreaTarget);
             }
         };
 
         // function which creates AuraScript
-        AuraScript* GetAuraScript() const OVERRIDE
+        AuraScript* GetAuraScript() const override
         {
             return new spell_ex_463AuraScript();
         }
@@ -441,18 +441,18 @@ class spell_ex : public SpellScriptLoader
         {
             PrepareSpellScript(spell_ex_SpellScript);
 
-            //bool Validate(SpellInfo const* spellEntry){return true;} OVERRIDE
+            //bool Validate(SpellInfo const* spellEntry){return true;} override
             //bool Load(){return true;}
             //void Unload(){ }
 
             //void Function(SpellEffIndex effIndex) //OnEffect += SpellEffectFn(spell_ex_SpellScript::Function, EFFECT_ANY, SPELL_EFFECT_ANY);
             //void Function() //OnHit += SpellEffectFn(spell_ex_SpellScript::Function);
-            void Register() OVERRIDE
+            void Register() override
             {
             }
         };
 
-        SpellScript* GetSpellScript() const OVERRIDE
+        SpellScript* GetSpellScript() const override
         {
             return new spell_ex_SpellScript();
         }
@@ -468,7 +468,7 @@ class spell_ex : public SpellScriptLoader
         class spell_ex_AuraScript : public AuraScript
         {
             PrepareAuraScript(spell_ex)
-            //bool Validate(SpellInfo const* spellEntry){return true;} OVERRIDE
+            //bool Validate(SpellInfo const* spellEntry){return true;} override
             //bool Load(){return true;}
             //void Unload(){ }
 
@@ -479,12 +479,12 @@ class spell_ex : public SpellScriptLoader
             //void spell_ex_SpellScript::Function(AuraEffect const* aurEff, int32& amount, bool& canBeRecalculated) //DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_ex_SpellScript::Function, EFFECT_ANY, SPELL_AURA_ANY);
             //void spell_ex_SpellScript::Function(AuraEffect const* aurEff, bool& isPeriodic, int32& amplitude) //OnEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_ex_SpellScript::Function, EFFECT_ANY, SPELL_AURA_ANY);
             //void spell_ex_SpellScript::Function(AuraEffect const* aurEff, SpellModifier*& spellMod) //OnEffectCalcSpellMod += AuraEffectCalcSpellModFn(spell_ex_SpellScript::Function, EFFECT_ANY, SPELL_AURA_ANY);
-            void Register() OVERRIDE
+            void Register() override
             {
             }
         };
 
-        AuraScript* GetAuraScript() const OVERRIDE
+        AuraScript* GetAuraScript() const override
         {
             return new spell_ex_AuraScript();
         }
