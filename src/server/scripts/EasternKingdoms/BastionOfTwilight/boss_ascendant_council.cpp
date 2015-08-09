@@ -308,6 +308,7 @@ enum Phases // Boss Phases.
 
 #define healthController RAID_MODE<uint32>(23190840, 73008200, 42430648, 125058752) // Controller health on different diffs.
 
+// 43691
 class npc_ascendant_council_controller : public CreatureScript // 43691
 {
 public:
@@ -579,6 +580,7 @@ Monstrosity Summon Pos:
 -1008.824f, -582.617f, 831.902f, 0.026f. - Controller event. - DONE.
 */
 
+// 43687
 class boss_feludius : public CreatureScript
 {
     public:
@@ -790,6 +792,7 @@ class boss_feludius : public CreatureScript
     }
 };
 
+// 43686
 class boss_ignacious : public CreatureScript
 {
     public:
@@ -1040,6 +1043,7 @@ class boss_ignacious : public CreatureScript
     }
 };
 
+// 43688
 class boss_arion : public CreatureScript
 {
     public:
@@ -1269,6 +1273,7 @@ class boss_arion : public CreatureScript
     }
 };
 
+// 43689
 class boss_terrastra : public CreatureScript
 {
     public:
@@ -1471,6 +1476,7 @@ class boss_terrastra : public CreatureScript
     }
 };
 
+// 43735
 class boss_monstrosity : public CreatureScript
 {
     public:
@@ -1692,6 +1698,7 @@ class boss_monstrosity : public CreatureScript
     }
 };
 
+// 44201
 class npc_feludius_waterbomb : public CreatureScript // 44201
 {
     public:
@@ -1738,6 +1745,7 @@ class npc_feludius_waterbomb : public CreatureScript // 44201
         };
 };
 
+// 44747
 class npc_arion_callwinds : public CreatureScript // 44747
 {
     public:
@@ -1789,6 +1797,7 @@ class npc_arion_callwinds : public CreatureScript // 44747
         };
 };
 
+// 44824
 class npc_terrastra_gravitywell : public CreatureScript // 44824
 {
     public:
@@ -1819,6 +1828,7 @@ class npc_terrastra_gravitywell : public CreatureScript // 44824
         };
 };
 
+// 45452
 class npc_monstrosity_liquid_ice : public CreatureScript // 45452
 {
     public:
@@ -1869,6 +1879,7 @@ class npc_monstrosity_liquid_ice : public CreatureScript // 45452
         };
 };
 
+// 48538
 class npc_monstrosity_lava_seed : public CreatureScript // 48538
 {
     public:
@@ -1920,6 +1931,7 @@ class npc_monstrosity_lava_seed : public CreatureScript // 48538
 
 // HEROIC NPC-s.
 
+// 49432
 class npc_ignacious_flame_strike : public CreatureScript // 49432
 {
     public:
@@ -1968,6 +1980,7 @@ class npc_ignacious_flame_strike : public CreatureScript // 49432
         };
 };
 
+// 49518
 class npc_feludius_frozen_orb : public CreatureScript // 49518
 {
     public:
@@ -2037,6 +2050,7 @@ class npc_feludius_frozen_orb : public CreatureScript // 49518
         };
 };
 
+// 82699
 class spell_feludius_waterbomb : public SpellScriptLoader // 82699.
 {
 public:
@@ -2079,6 +2093,7 @@ public:
     }
 };
 
+// 82746 92506 92507 92508
 class spell_feludius_glaciate: public SpellScriptLoader // 82746
 {
 public:
@@ -2122,6 +2137,7 @@ public:
     }
 };
 
+// 83087
 class spell_arion_disperse: public SpellScriptLoader // 83087
 {
 public:
@@ -2149,6 +2165,7 @@ public:
     }
 };
 
+// 83067 92469 92470 92471
 class spell_arion_thundershock: public SpellScriptLoader // 83067
 {
 public:
@@ -2188,6 +2205,7 @@ public:
     }
 };
 
+// 83565 92544 92545 92546
 class spell_terrastra_quake: public SpellScriptLoader // 83565
 {
 public:

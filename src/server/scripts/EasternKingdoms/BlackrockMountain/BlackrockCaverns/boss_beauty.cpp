@@ -174,7 +174,7 @@ public:
     }
 };
 
-//
+// 40008, 40011, 40013  children lucky, spot, buster
 class npc_beauty_family : public CreatureScript
 {
 public:

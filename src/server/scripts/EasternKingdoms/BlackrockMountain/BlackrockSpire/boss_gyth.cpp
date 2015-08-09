@@ -47,6 +47,7 @@ enum Events
     EVENT_SUMMONED_2                = 6
 };
 
+// 10339
 class boss_gyth : public CreatureScript
 {
 public:

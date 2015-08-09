@@ -209,6 +209,7 @@ Position const HeroicPositions[1] =
     {-330.978f, -62.313f, 212.289f, 5.976f} // Nefarians Position
 };
 
+// 41570
 class boss_magmaw : public CreatureScript
 {
 public:
@@ -651,6 +652,7 @@ public:
     };
 };
 
+// 42347
 class npc_exposed_magmaw_head : public CreatureScript
 {
 public:
@@ -665,7 +667,6 @@ public:
     {
         npc_exposed_magmaw_headAI(Creature* creature) : ScriptedAI(creature), vehicle(creature->GetVehicleKit())
         {
-            ASSERT(vehicle);
             instance = creature->GetInstanceScript();
         }
 
@@ -694,6 +695,7 @@ public:
     };
 };
 
+// 41620 41789
 class npc_magmaw_pincer : public CreatureScript
 {
 public:
@@ -727,6 +729,7 @@ public:
     };
 };
 
+// 49416
 class npc_blazing_bone_construct : public CreatureScript
 {
 public:
@@ -793,6 +796,7 @@ public:
     };
 };
 
+// 49447
 class npc_ignition_trigger : public CreatureScript
 {
 public:
@@ -843,6 +847,7 @@ public:
     };
 };
 
+// 41767
 class npc_magmaw_spike_stalker : public CreatureScript
 {
 public:
@@ -921,7 +926,8 @@ public:
     };
 };
 
-class spell_magmaw_massive_crash : public SpellScriptLoader // 88253.
+// 88253
+class spell_magmaw_massive_crash : public SpellScriptLoader 
 {
 public:
     spell_magmaw_massive_crash() : SpellScriptLoader("spell_magmaw_massive_crash") { }

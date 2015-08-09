@@ -179,6 +179,7 @@ enum ScriptTexts
     SAY_AIR_PHASE    = 7 // Yes, run! With every step your heart quickens. The beating, loud and thunderous... Almost deafening. You cannot escape!
 };
 
+// 41442
 class boss_atramedes : public CreatureScript
 {
 public:
@@ -543,9 +544,8 @@ public:
     };
 };
 
-// Ground phase
-
-class npc_sonar_pulse : public CreatureScript // 41546
+// 41546 // Ground phase
+class npc_sonar_pulse : public CreatureScript
 {
 public:
     npc_sonar_pulse() : CreatureScript("npc_sonar_pulse") { }
@@ -590,7 +590,8 @@ public:
     };
 };
 
-class npc_searing_flame : public CreatureScript // 41807
+// 41807
+class npc_searing_flame : public CreatureScript 
 {
 public:
     npc_searing_flame() : CreatureScript("npc_searing_flame") { }
@@ -627,8 +628,8 @@ public:
     };
 };
 
-
-class npc_obnoxious_fiend : public CreatureScript // 49740
+// 49740
+class npc_obnoxious_fiend : public CreatureScript
 {
 public:
     npc_obnoxious_fiend() : CreatureScript("npc_obnoxious_fiend") { }
@@ -666,9 +667,8 @@ public:
     };
 };
 
-// Air phase
-
-class npc_roaring_flame_target : public CreatureScript // 42121
+// 42121 // Air phase
+class npc_roaring_flame_target : public CreatureScript 
 {
 public:
     npc_roaring_flame_target() : CreatureScript("npc_roaring_flame_target") { }
@@ -705,7 +705,8 @@ public:
     };
 };
 
-class npc_roaring_flame : public CreatureScript // 42001
+// 42001
+class npc_roaring_flame : public CreatureScript 
 {
 public:
     npc_roaring_flame() : CreatureScript("npc_roaring_flame") { }
@@ -742,8 +743,8 @@ public:
     };
 };
 
-// Gongs
-class npc_atramedes_gong : public CreatureScript // 42949
+// 42949 // Gongs  
+class npc_atramedes_gong : public CreatureScript
 {
 public:
     npc_atramedes_gong() : CreatureScript("npc_atramedes_gong") 
@@ -816,6 +817,7 @@ uint16 const times[16] =
     5000, 8000, 5000, 7500, 3000, 8000, 9000, 5000
 };
 
+// 49938  ?? name = malorik - test
 class npc_maloriak_atramedes_event : public CreatureScript
 {
 public:
@@ -951,6 +953,7 @@ public:
     }
 };
 
+// 78075
 class spell_atramedes_sonic_breath : public SpellScriptLoader
 {
     public:

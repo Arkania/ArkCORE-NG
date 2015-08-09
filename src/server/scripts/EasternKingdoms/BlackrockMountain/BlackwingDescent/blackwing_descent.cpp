@@ -16,6 +16,7 @@ enum Says
     SAY_INTRO_HEROIC = 1
 };
 
+// 49427 npc_nefarian_helper_heroic
 class npc_nefarian_helper_heroic : public CreatureScript
 {
 public:
@@ -49,6 +50,7 @@ public:
     };
 };
 
+// 49580
 class npc_nefarian_yeller : public CreatureScript // 49580
 {
 public:

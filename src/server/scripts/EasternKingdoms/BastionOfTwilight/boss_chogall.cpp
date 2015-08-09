@@ -226,6 +226,7 @@ NOTES:
     Flame / Shadow Orders rotation is made through different time of periodic trigger application. Phase 2 hits -> triggers are removed.
 */
 
+// 43324
 class boss_chogall : public CreatureScript
 {
 public:

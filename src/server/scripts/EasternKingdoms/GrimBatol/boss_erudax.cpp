@@ -130,6 +130,7 @@ const Position eggPos[23]    =
     {-751.01f, -886.38f, 234.87f, 3.27f}
 };
 
+// 40484
 class boss_erudax : public CreatureScript
 {
     public:
@@ -276,6 +277,7 @@ class boss_erudax : public CreatureScript
         };
 };
 
+// 39392
 class npc_erudax_faceless_corruptor : public CreatureScript
 {
     public:
@@ -354,6 +356,7 @@ class npc_erudax_faceless_corruptor : public CreatureScript
         };
 };
 
+// 40486
 class npc_alexstrasza_egg : public CreatureScript
 {
 public:
@@ -392,6 +395,7 @@ public:
     };
 };
 
+// 40567
 class npc_shadow_gale_stalker : public CreatureScript
 {
 public:
@@ -416,6 +420,7 @@ public:
     };
 };
 
+// 39388
 class npc_erudax_twilight_hatchling : public CreatureScript
 {
 public:
@@ -462,6 +467,7 @@ public:
     };
 };
 
+// 75664
 class spell_erudax_shadow_gale: public SpellScriptLoader
 {
     public:

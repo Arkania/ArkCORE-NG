@@ -1294,6 +1294,7 @@ class TwilightSlicerSelector
         Unit* _slicerActive;
 };
 
+// 78862
 class spell_twilight_slicer : public SpellScriptLoader
 {
     public:
@@ -1334,6 +1335,7 @@ class spell_twilight_slicer : public SpellScriptLoader
         }
 };
 
+// 87323  92941
 class spell_pyrrhic_focus : public SpellScriptLoader
 {
     public:
@@ -1366,7 +1368,8 @@ class spell_pyrrhic_focus : public SpellScriptLoader
         }
 };
 
-class spell_wrack : public SpellScriptLoader // 89421
+// 89421
+class spell_wrack : public SpellScriptLoader 
 {
     public:
         spell_wrack() : SpellScriptLoader("spell_wrack") { }

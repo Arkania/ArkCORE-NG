@@ -82,6 +82,7 @@ const Position drahgavalionaPos[2] =
     {-431.79f, -697.17f, 268.62f, 3.45f}
 };
 
+// 40319
 class boss_drahga_shadowburner : public CreatureScript
 {
     public:
@@ -232,6 +233,7 @@ class boss_drahga_shadowburner : public CreatureScript
         }
 };
 
+// 40320
 class npc_drahga_valiona : public CreatureScript
 {
     public:
@@ -362,6 +364,7 @@ class npc_drahga_valiona : public CreatureScript
         }
 };
 
+// 40355
 class npc_invocation_of_flame_stalker : public CreatureScript
 {
     public:
@@ -401,6 +404,7 @@ class npc_invocation_of_flame_stalker : public CreatureScript
         };
 };
 
+// 40357
 class npc_invoked_flaming_spirit : public CreatureScript
 {
     public:
@@ -448,6 +452,7 @@ class npc_invoked_flaming_spirit : public CreatureScript
         };
 };
 
+// 40365
 class npc_seeping_twilight : public CreatureScript
 {
     public:
@@ -473,6 +478,7 @@ class npc_seeping_twilight : public CreatureScript
         };
 };
 
+// 75238
 class spell_drahga_supernova : public SpellScriptLoader
 {
     public:

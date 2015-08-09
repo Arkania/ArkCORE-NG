@@ -106,6 +106,7 @@ const Position  twilightarcherPos[13] =
     {-481.352f, -477.21f, 280.714f, 3.72334f}
 };
 
+// 40177
 class boss_forgemaster_throngus : public CreatureScript
 {
     public:
@@ -233,8 +234,7 @@ class boss_forgemaster_throngus : public CreatureScript
         }
 };
 
-
-
+// ????
 class npc_throngus_fire_patch : public CreatureScript
 {
     public:
@@ -259,6 +259,7 @@ class npc_throngus_fire_patch : public CreatureScript
         };
 };
 
+// 75000
 class spell_throngus_pick_weapon : public SpellScriptLoader
 {
     public:

@@ -475,6 +475,7 @@ class TriggerWickedSpirit : public BasicEvent
         uint32 _counter;
 };
 
+// 36597
 class boss_the_lich_king : public CreatureScript
 {
     public:
@@ -1104,6 +1105,7 @@ class boss_the_lich_king : public CreatureScript
         }
 };
 
+// 38995
 class npc_tirion_fordring_tft : public CreatureScript
 {
     public:
@@ -1254,6 +1256,7 @@ class npc_tirion_fordring_tft : public CreatureScript
         }
 };
 
+// 37698
 class npc_shambling_horror_icc : public CreatureScript
 {
     public:
@@ -1323,6 +1326,7 @@ class npc_shambling_horror_icc : public CreatureScript
         }
 };
 
+// 36701
 class npc_raging_spirit : public CreatureScript
 {
     public:
@@ -1399,6 +1403,7 @@ class npc_raging_spirit : public CreatureScript
         }
 };
 
+// 36609
 class npc_valkyr_shadowguard : public CreatureScript
 {
     public:
@@ -1547,6 +1552,7 @@ class npc_valkyr_shadowguard : public CreatureScript
         }
 };
 
+// 36598
 class npc_strangulate_vehicle : public CreatureScript
 {
     public:
@@ -1653,6 +1659,7 @@ class npc_strangulate_vehicle : public CreatureScript
         }
 };
 
+// 36823
 class npc_terenas_menethil : public CreatureScript
 {
     public:
@@ -1806,6 +1813,7 @@ class npc_terenas_menethil : public CreatureScript
         }
 };
 
+// 36824
 class npc_spirit_warden : public CreatureScript
 {
     public:
@@ -1865,6 +1873,7 @@ class npc_spirit_warden : public CreatureScript
         }
 };
 
+// 39189
 class npc_spirit_bomb : public CreatureScript
 {
     public:
@@ -1912,6 +1921,7 @@ class npc_spirit_bomb : public CreatureScript
         }
 };
 
+// 38584
 class npc_broken_frostmourne : public CreatureScript
 {
     public:
@@ -1978,6 +1988,7 @@ class npc_broken_frostmourne : public CreatureScript
         }
 };
 
+// 70541 73779 73780 73781
 class spell_the_lich_king_infest : public SpellScriptLoader
 {
     public:
@@ -2018,6 +2029,7 @@ class spell_the_lich_king_infest : public SpellScriptLoader
         }
 };
 
+// 70337 73912 73913 73914
 class spell_the_lich_king_necrotic_plague : public SpellScriptLoader
 {
     public:
@@ -2066,6 +2078,7 @@ class spell_the_lich_king_necrotic_plague : public SpellScriptLoader
         }
 };
 
+// 70338 73785 73786 73787
 class spell_the_lich_king_necrotic_plague_jump : public SpellScriptLoader
 {
     public:
@@ -2190,6 +2203,7 @@ class spell_the_lich_king_necrotic_plague_jump : public SpellScriptLoader
         }
 };
 
+// 73530
 class spell_the_lich_king_shadow_trap_visual : public SpellScriptLoader
 {
     public:
@@ -2217,6 +2231,7 @@ class spell_the_lich_king_shadow_trap_visual : public SpellScriptLoader
         }
 };
 
+// 74282
 class spell_the_lich_king_shadow_trap_periodic : public SpellScriptLoader
 {
     public:
@@ -2246,6 +2261,7 @@ class spell_the_lich_king_shadow_trap_periodic : public SpellScriptLoader
         }
 };
 
+// 72262
 class spell_the_lich_king_quake : public SpellScriptLoader
 {
     public:
@@ -2285,6 +2301,7 @@ class spell_the_lich_king_quake : public SpellScriptLoader
         }
 };
 
+// 69110
 class spell_the_lich_king_ice_burst_target_search : public SpellScriptLoader
 {
     public:
@@ -2328,6 +2345,7 @@ class spell_the_lich_king_ice_burst_target_search : public SpellScriptLoader
         }
 };
 
+// 69200
 class spell_the_lich_king_raging_spirit : public SpellScriptLoader
 {
     public:
@@ -2377,6 +2395,7 @@ class ExactDistanceCheck
         float _dist;
 };
 
+// 72754 73708 73709 73710
 class spell_the_lich_king_defile : public SpellScriptLoader
 {
     public:
@@ -2414,6 +2433,7 @@ class spell_the_lich_king_defile : public SpellScriptLoader
         }
 };
 
+// 69037 70497 70499 74300
 class spell_the_lich_king_summon_into_air : public SpellScriptLoader
 {
     public:
@@ -2449,6 +2469,7 @@ class spell_the_lich_king_summon_into_air : public SpellScriptLoader
         }
 };
 
+// 69409 73797 73798 73799
 class spell_the_lich_king_soul_reaper : public SpellScriptLoader
 {
     public:
@@ -2483,6 +2504,7 @@ class spell_the_lich_king_soul_reaper : public SpellScriptLoader
         }
 };
 
+// 69030
 class spell_the_lich_king_valkyr_target_search : public SpellScriptLoader
 {
     public:
@@ -2549,6 +2571,7 @@ class spell_the_lich_king_valkyr_target_search : public SpellScriptLoader
         }
 };
 
+// 68984 74445
 class spell_the_lich_king_cast_back_to_caster : public SpellScriptLoader
 {
     public:
@@ -2575,6 +2598,7 @@ class spell_the_lich_king_cast_back_to_caster : public SpellScriptLoader
         }
 };
 
+// 73488 73782 73783 73784
 class spell_the_lich_king_life_siphon : public SpellScriptLoader
 {
     public:
@@ -2608,6 +2632,7 @@ class spell_the_lich_king_life_siphon : public SpellScriptLoader
         }
 };
 
+// 70498
 class spell_the_lich_king_vile_spirits : public SpellScriptLoader
 {
     public:
@@ -2643,6 +2668,7 @@ class spell_the_lich_king_vile_spirits : public SpellScriptLoader
         }
 };
 
+// 70499
 class spell_the_lich_king_vile_spirits_visual : public SpellScriptLoader
 {
     public:
@@ -2670,6 +2696,7 @@ class spell_the_lich_king_vile_spirits_visual : public SpellScriptLoader
         }
 };
 
+// 70501
 class spell_the_lich_king_vile_spirit_move_target_search : public SpellScriptLoader
 {
     public:
@@ -2719,6 +2746,7 @@ class spell_the_lich_king_vile_spirit_move_target_search : public SpellScriptLoa
         }
 };
 
+// 70534
 class spell_the_lich_king_vile_spirit_damage_target_search : public SpellScriptLoader
 {
     public:
@@ -2760,6 +2788,7 @@ class spell_the_lich_king_vile_spirit_damage_target_search : public SpellScriptL
         }
 };
 
+// 68980 74296 74297 74325
 class spell_the_lich_king_harvest_soul : public SpellScriptLoader
 {
     public:
@@ -2793,6 +2822,7 @@ class spell_the_lich_king_harvest_soul : public SpellScriptLoader
         }
 };
 
+// 69382
 class spell_the_lich_king_lights_favor : public SpellScriptLoader
 {
     public:
@@ -2830,6 +2860,7 @@ class spell_the_lich_king_lights_favor : public SpellScriptLoader
         }
 };
 
+// 69397
 class spell_the_lich_king_soul_rip : public SpellScriptLoader
 {
     public:
@@ -2859,6 +2890,7 @@ class spell_the_lich_king_soul_rip : public SpellScriptLoader
         }
 };
 
+// 72595 73650
 class spell_the_lich_king_restore_soul : public SpellScriptLoader
 {
     public:
@@ -2912,6 +2944,7 @@ class spell_the_lich_king_restore_soul : public SpellScriptLoader
         }
 };
 
+// 69383
 class spell_the_lich_king_dark_hunger : public SpellScriptLoader
 {
     public:
@@ -2947,6 +2980,7 @@ class spell_the_lich_king_dark_hunger : public SpellScriptLoader
         }
 };
 
+// 74276
 class spell_the_lich_king_in_frostmourne_room : public SpellScriptLoader
 {
     public:
@@ -2980,6 +3014,7 @@ class spell_the_lich_king_in_frostmourne_room : public SpellScriptLoader
         }
 };
 
+// 74302 74341 74342 74343
 class spell_the_lich_king_summon_spirit_bomb : public SpellScriptLoader
 {
     public:
@@ -3007,6 +3042,7 @@ class spell_the_lich_king_summon_spirit_bomb : public SpellScriptLoader
         }
 };
 
+// 73582
 class spell_the_lich_king_trigger_vile_spirit : public SpellScriptLoader
 {
     public:
@@ -3037,6 +3073,7 @@ class spell_the_lich_king_trigger_vile_spirit : public SpellScriptLoader
         }
 };
 
+// 71811
 class spell_the_lich_king_jump : public SpellScriptLoader
 {
     public:
@@ -3067,6 +3104,7 @@ class spell_the_lich_king_jump : public SpellScriptLoader
         }
 };
 
+// 72431
 class spell_the_lich_king_jump_remove_aura : public SpellScriptLoader
 {
     public:
@@ -3094,6 +3132,7 @@ class spell_the_lich_king_jump_remove_aura : public SpellScriptLoader
         }
 };
 
+// 13244 13245 13246 13247
 class achievement_been_waiting_long_time : public AchievementCriteriaScript
 {
     public:
@@ -3108,6 +3147,7 @@ class achievement_been_waiting_long_time : public AchievementCriteriaScript
         }
 };
 
+// 12823 13163 13164 13243
 class achievement_neck_deep_in_vile : public AchievementCriteriaScript
 {
     public:

@@ -166,6 +166,7 @@ class boss_argaloth : public CreatureScript
         }
 };
 
+// 47829
 class npc_felflames : public CreatureScript
 {
     public:

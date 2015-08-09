@@ -334,6 +334,7 @@ class VehicleCheckPredicate
         bool operator()(uint64 guid) { return IS_VEHICLE_GUID(guid); }
 };
 
+// 28859
 class boss_malygos : public CreatureScript
 {
 public:
@@ -1055,6 +1056,7 @@ public:
     }
 };
 
+// 30118
 class npc_portal_eoe: public CreatureScript
 {
 public:
@@ -1105,6 +1107,7 @@ public:
     }
 };
 
+// 30084
 class npc_power_spark: public CreatureScript
 {
 public:
@@ -1167,6 +1170,7 @@ public:
     }
 };
 
+// 30234
 class npc_melee_hover_disk : public CreatureScript
 {
 public:
@@ -1269,6 +1273,7 @@ public:
     }
 };
 
+// 30248
 class npc_caster_hover_disk : public CreatureScript
 {
 public:
@@ -1351,6 +1356,7 @@ public:
     }
 };
 
+// 30245
 class npc_nexus_lord : public CreatureScript
 {
     public:
@@ -1427,6 +1433,7 @@ class npc_nexus_lord : public CreatureScript
         }
 };
 
+// 30249
 class npc_scion_of_eternity : public CreatureScript
 {
     public:
@@ -1494,6 +1501,7 @@ class npc_scion_of_eternity : public CreatureScript
         }
 };
 
+// 30282
 class npc_arcane_overload : public CreatureScript
 {
 public:
@@ -1552,7 +1560,7 @@ public:
     }
 };
 
-// SmartAI does not work correctly for vehicles
+// 30161    SmartAI does not work correctly for vehicles
 class npc_wyrmrest_skytalon : public CreatureScript
 {
 public:
@@ -1622,8 +1630,7 @@ public:
     }
 };
 
-// We shouldn't use SAI for stuff that aren't within boss main mechanic
-// and SAI type of despawn can cause problems here.
+// 30592    We shouldn't use SAI for stuff that aren't within boss main mechanic  and SAI type of despawn can cause problems here.
 class npc_static_field : public CreatureScript
 {
     public:
@@ -1648,6 +1655,7 @@ class npc_static_field : public CreatureScript
         }
 };
 
+// 56046
 class spell_malygos_portal_beam : public SpellScriptLoader
 {
     public:
@@ -1695,6 +1703,7 @@ class spell_malygos_portal_beam : public SpellScriptLoader
         }
 };
 
+// 56047
 class spell_malygos_random_portal : public SpellScriptLoader
 {
     public:
@@ -1751,6 +1760,7 @@ class IsCreatureVehicleCheck
         bool _isVehicle;
 };
 
+// 57459 61693 61694
 class spell_malygos_arcane_storm : public SpellScriptLoader
 {
     public:
@@ -1811,6 +1821,7 @@ class spell_malygos_arcane_storm : public SpellScriptLoader
         }
 };
 
+// 56105
 class spell_malygos_vortex_dummy : public SpellScriptLoader
 {
 public:
@@ -1848,6 +1859,7 @@ public:
     }
 };
 
+// 55873
 class spell_malygos_vortex_visual : public SpellScriptLoader
 {
     public:
@@ -1927,6 +1939,7 @@ class ExactDistanceCheck
         float _dist;
 };
 
+// 56438
 class spell_arcane_overload : public SpellScriptLoader
 {
     public:
@@ -1960,6 +1973,7 @@ class spell_arcane_overload : public SpellScriptLoader
         }
 };
 
+// 61210
 class spell_nexus_lord_align_disk_aggro : public SpellScriptLoader
 {
     public:
@@ -2011,6 +2025,7 @@ class IsPlayerOnHoverDisk
         bool _isOnHoverDisk;
 };
 
+// 56397
 class spell_scion_of_eternity_arcane_barrage : public SpellScriptLoader
 {
     public:
@@ -2095,6 +2110,7 @@ class spell_scion_of_eternity_arcane_barrage : public SpellScriptLoader
         }
 };
 
+// 58842
 class spell_malygos_destroy_platform_channel : public SpellScriptLoader
 {
     public:
@@ -2137,6 +2153,7 @@ class spell_malygos_destroy_platform_channel : public SpellScriptLoader
         }
 };
 
+// 59084
 class spell_alexstrasza_bunny_destroy_platform_boom_visual : public SpellScriptLoader
 {
     public:
@@ -2177,6 +2194,7 @@ class spell_alexstrasza_bunny_destroy_platform_boom_visual : public SpellScriptL
         }
 };
 
+// 59099
 class spell_alexstrasza_bunny_destroy_platform_event : public SpellScriptLoader
 {
     public:
@@ -2251,6 +2269,7 @@ class spell_wyrmrest_skytalon_summon_red_dragon_buddy : public SpellScriptLoader
         }
 };
 
+// 56072
 class spell_wyrmrest_skytalon_ride_red_dragon_buddy_trigger : public SpellScriptLoader
 {
     public:
@@ -2283,6 +2302,7 @@ class spell_wyrmrest_skytalon_ride_red_dragon_buddy_trigger : public SpellScript
         }
 };
 
+// 60939
 class spell_malygos_surge_of_power_warning_selector_25 : public SpellScriptLoader
 {
     public:
@@ -2349,6 +2369,7 @@ class spell_malygos_surge_of_power_warning_selector_25 : public SpellScriptLoade
         }
 };
 
+// 60936
 class spell_malygos_surge_of_power_25 : public SpellScriptLoader
 {
     public:
@@ -2400,6 +2421,7 @@ class spell_malygos_surge_of_power_25 : public SpellScriptLoader
         }
 };
 
+// 61028
 class spell_alexstrasza_gift_beam : public SpellScriptLoader
 {
     public:
@@ -2447,6 +2469,7 @@ class spell_alexstrasza_gift_beam : public SpellScriptLoader
         }
 };
 
+// 61023
 class spell_alexstrasza_gift_beam_visual : public SpellScriptLoader
 {
     public:
@@ -2503,6 +2526,7 @@ class spell_alexstrasza_gift_beam_visual : public SpellScriptLoader
         }
 };
 
+// 7573 7574
 class achievement_denyin_the_scion : public AchievementCriteriaScript
 {
     public:

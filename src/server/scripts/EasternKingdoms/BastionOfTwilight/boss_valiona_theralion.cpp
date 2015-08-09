@@ -293,6 +293,7 @@ Position const TwilFlamePos[90] = // 15 per row, 2 rows per side, 3 sides.
 {-768.016f, -756.87f, 836.686f}
 };
 
+// 45992
 class boss_valiona_bot : public CreatureScript
 {
 public:
@@ -661,6 +662,7 @@ public:
     };
 };
 
+// 45993
 class boss_theralion_bot : public CreatureScript
 {
 public:
@@ -975,6 +977,7 @@ public:
     };
 };
 
+// 46374
 class npc_dazzling_visual : public CreatureScript // 46374
 {
 public:
@@ -1019,6 +1022,7 @@ public:
     };
 };
 
+// 46448
 class npc_fabulous_flames : public CreatureScript // 46448
 {
 public:
@@ -1063,6 +1067,7 @@ public:
     };
 };
 
+// 50008
 class npc_twilight_sentry : public CreatureScript // 50008 - Heroic. Summons Rift every 15 seconds.
 {
 public:
@@ -1120,6 +1125,7 @@ public:
     };
 };
 
+// 50014
 class npc_twilight_rift : public CreatureScript // 50014 - Heroic. Spawned in Twilight Realm every 15 seconds.
 {
 public:
@@ -1168,6 +1174,7 @@ public:
     };
 };
 
+// 46304
 class npc_unstable_twilight : public CreatureScript // 46304 - Spawned in Twilight Realm explodes on player in 8 yards.
 {
 public:
@@ -1222,6 +1229,7 @@ public:
     };
 };
 
+// 40718
 class npc_twilight_flame : public CreatureScript // 40718. Summ by Valiona on deep breaths.
 {
 public:
@@ -1269,6 +1277,7 @@ public:
     };
 };
 
+// 46301
 class npc_collapsing_tw_portal : public CreatureScript // 46301
 {
 public:
@@ -1317,6 +1326,7 @@ public:
     };
 };
 
+// 86844 92872 92873 92874
 class spell_devouring_flames : public SpellScriptLoader // 92051
 {
     public:
@@ -1355,6 +1365,7 @@ class spell_devouring_flames : public SpellScriptLoader // 92051
         }
 };
 
+// 86408
 class spell_dazzling_destruction: public SpellScriptLoader // 86408
 {
 public:
@@ -1402,6 +1413,7 @@ public:
     }
 };
 
+// 86406 92926 92927 92928
 class spell_dazzling_missile: public SpellScriptLoader // 86406
 {
 public:

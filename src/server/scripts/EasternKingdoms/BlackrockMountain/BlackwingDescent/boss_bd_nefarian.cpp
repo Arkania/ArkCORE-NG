@@ -214,6 +214,7 @@ Position ChromaticPositions[3] =
     {-107.213f, -224.62f, -6.8679f, 3.1416f}, // Position for p2.
 };
 
+// 41376
 class boss_bd_nefarian : public CreatureScript
 {
 public:
@@ -601,6 +602,7 @@ public:
     };
 };
 
+// 41270
 class boss_bd_onyxia : public CreatureScript
 {
 public:
@@ -700,7 +702,8 @@ public:
     };
 };
 
-class npc_nefarian_intro : public CreatureScript // 41379
+// 41379
+class npc_nefarian_intro : public CreatureScript 
 {
 public:
     npc_nefarian_intro() : CreatureScript("npc_nefarian_intro") { }
@@ -796,6 +799,7 @@ public:
     };
 };
 
+// 41918
 class npc_animated_bone_warrior : public CreatureScript
 {
 public:
@@ -856,6 +860,7 @@ public:
     };
 };
 
+// 41948
 class npc_chromatic_prototype : public CreatureScript
 {
 public:
@@ -882,6 +887,7 @@ public:
     };
 };
 
+// 54254 ???? i'm not shure this is script for this npc
 class npc_shadowflame_flashfire : public CreatureScript
 {
 public:
@@ -930,6 +936,7 @@ public:
     };
 };
 
+// 42596
 class npc_shadowblaze : public CreatureScript
 {
 public:
@@ -973,6 +980,7 @@ public:
     };
 };
 
+// 77827 94128 94129 94130
 class spell_nefarian_tail_lash : public SpellScriptLoader
 {
     public:
@@ -1008,6 +1016,7 @@ class spell_nefarian_tail_lash : public SpellScriptLoader
         }
 };
 
+// 77944 94116 94117 94118
 class spell_onyxia_lightning_discharge : public SpellScriptLoader
 {
     public:

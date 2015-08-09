@@ -107,6 +107,7 @@ enum Creatures
     NPC_ORPHANED_WHELP                       = 44641
 };
 
+// 44600
 class boss_halfus : public CreatureScript
 {
     public:
@@ -501,6 +502,7 @@ class boss_halfus : public CreatureScript
         };
 };
 
+// 44687
 class npc_proto_behemoth : public CreatureScript
 {
     public:
@@ -631,6 +633,7 @@ class npc_proto_behemoth : public CreatureScript
         };
 };
 
+// 44645 44650 44652 44797
 class npc_halfus_dragon: public CreatureScript
 {
 public:
@@ -753,6 +756,7 @@ public:
     }
 };
 
+// 44641
 class npc_orphaned_whelp : public CreatureScript
 {
 public:
@@ -814,6 +818,7 @@ public:
     };
 };
 
+// 83862 86058
 class spell_proto_fireball : public SpellScriptLoader // 86058, 83862
 {
 public:
@@ -859,6 +864,7 @@ public:
     }
 };
 
+// 83719
 class spell_proto_fireball_barrage : public SpellScriptLoader // 83719.
 {
 public:
@@ -895,6 +901,7 @@ public:
     }
 };
 
+// 83603 84593
 class spell_halfus_stone_touch: public SpellScriptLoader { // 84593.
 public:
     spell_halfus_stone_touch() : SpellScriptLoader("spell_halfus_stone_touch") { }
@@ -923,6 +930,7 @@ public:
     }
 };
 
+// 205087
 class go_halfus_whelp_cage : public GameObjectScript
 {
     public:

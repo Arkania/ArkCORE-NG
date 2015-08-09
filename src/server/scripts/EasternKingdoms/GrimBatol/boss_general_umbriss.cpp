@@ -71,6 +71,7 @@ const Position troggPos[2]=
     {-702.22f, -450.9f, 268.77f, 1.34f}
 };
 
+// 39625
 class boss_general_umbriss : public CreatureScript
 {
     public:
@@ -235,6 +236,7 @@ class boss_general_umbriss : public CreatureScript
 
 };
 
+// 39984
 class npc_malignant_trogg : public CreatureScript
 {
     public:
@@ -296,6 +298,7 @@ class npc_malignant_trogg : public CreatureScript
         };
 };
 
+// 45467
 class npc_umbriss_trogg_dweller : public CreatureScript
 {
     public:

@@ -244,6 +244,7 @@ enum Waygate
     QUEST_MEETING_A_GREAT_ONE                   = 13956,
 };
 
+// 5046 5047
 class AreaTrigger_at_sholazar_waygate : public AreaTriggerScript
 {
     public:
@@ -282,6 +283,7 @@ enum NatsLanding
     NPC_LURKING_SHARK  = 23928
 };
 
+// 4752
 class AreaTrigger_at_nats_landing : public AreaTriggerScript
 {
     public:
@@ -323,6 +325,7 @@ enum Brewfest
     AREATRIGGER_TALK_COOLDOWN   = 5, // in seconds
 };
 
+// 4820 4829
 class AreaTrigger_at_brewfest : public AreaTriggerScript
 {
     public:
@@ -377,6 +380,7 @@ enum Area52Entrance
     AT_AREA_52_EAST       = 4422,
 };
 
+// 4422 4466 4471 4472
 class AreaTrigger_at_area_52_entrance : public AreaTriggerScript
 {
     public:
@@ -448,6 +452,7 @@ enum FrostgripsHollow
 Position const stormforgedMonitorPosition = {6963.95f, 45.65f, 818.71f, 4.948f};
 Position const stormforgedEradictorPosition = {6983.18f, 7.15f, 806.33f, 2.228f};
 
+// 5173
 class AreaTrigger_at_frostgrips_hollow : public AreaTriggerScript
 {
 public:

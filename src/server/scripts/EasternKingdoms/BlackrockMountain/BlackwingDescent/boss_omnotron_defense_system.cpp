@@ -183,6 +183,7 @@ Position const wayPos[2] =
     {-334.152f, -400.321f, 214.005f}
 };
 
+// 42186
 class boss_omnotron : public CreatureScript
 {
 public:
@@ -401,6 +402,7 @@ public:
     };
 };
 
+// 42166 42178 42179 42180
 class boss_trons : public CreatureScript
 {
 public:
@@ -841,7 +843,8 @@ public:
     };
 };
 
-class npc_poison_bomb : public CreatureScript // 42897
+// 42897
+class npc_poison_bomb : public CreatureScript 
 {
 public:
     npc_poison_bomb() : CreatureScript("npc_poison_bomb") { }
@@ -893,7 +896,8 @@ public:
     }
 };
 
-class npc_poison_puddle : public CreatureScript // 42920
+// 42920
+class npc_poison_puddle : public CreatureScript 
 {
 public:
     npc_poison_puddle() : CreatureScript("npc_poison_puddle") { }
@@ -916,7 +920,8 @@ public:
     }
 };
 
-class npc_chemical_cloud : public CreatureScript // 42934
+// 42934
+class npc_chemical_cloud : public CreatureScript
 {
 public:
     npc_chemical_cloud() : CreatureScript("npc_chemical_cloud") { }
@@ -958,7 +963,8 @@ public:
     }
 };
 
-class npc_power_generator : public CreatureScript // 42733
+// 42733
+class npc_power_generator : public CreatureScript
 {
 public:
     npc_power_generator() : CreatureScript("npc_power_generator") { }
@@ -998,7 +1004,8 @@ public:
     }
 };
 
-class spell_shadow_conductor : public SpellScriptLoader // 92051
+// 92051
+class spell_shadow_conductor : public SpellScriptLoader 
 {
     public:
         spell_shadow_conductor() : SpellScriptLoader("spell_shadow_conductor") { }
@@ -1029,6 +1036,7 @@ class spell_shadow_conductor : public SpellScriptLoader // 92051
         }
 };
 
+// 78740 95016
 class spell_activate : public SpellScriptLoader
 {
     public:
@@ -1056,6 +1064,7 @@ class spell_activate : public SpellScriptLoader
         }
 };
 
+// 79501 92035
 class spell_fire : public SpellScriptLoader
 {
     public:
