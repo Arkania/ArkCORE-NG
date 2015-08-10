@@ -122,6 +122,11 @@ public:
         InstanceScript* instance;
         EventMap events;
 
+        void InitializeAI()
+        {
+
+        }
+
         void Reset()
         {
             events.Reset();

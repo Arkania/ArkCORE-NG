@@ -21,6 +21,7 @@
 #include "PassiveAI.h"
 #include "Player.h"
 #include "CreatureTextMgr.h"
+#include "Vehicle.h"
 
 // npc 28534
 class npc_valkyr_battle_maiden : public CreatureScript
@@ -1332,6 +1333,59 @@ public:
     }
 };
 
+// 28768
+class npc_dark_rider_of_acherus_28768 : public CreatureScript
+{
+public:
+    npc_dark_rider_of_acherus_28768() : CreatureScript("npc_dark_rider_of_acherus_28768") { }
+
+    enum e28768
+    {
+        NPC_ACHERUS_DEATHCHARGER = 28782,
+    };
+
+    struct npc_dark_rider_of_acherus_28768AI : public ScriptedAI
+    {
+        npc_dark_rider_of_acherus_28768AI(Creature* creature) : ScriptedAI(creature) { }
+
+        void Reset() override
+        {
+            if (Creature* deathcharger = me->FindNearestCreature(NPC_ACHERUS_DEATHCHARGER, 30))
+            {
+                deathcharger->RestoreFaction();
+                deathcharger->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
+                deathcharger->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                if (Vehicle* horse = deathcharger->GetVehicleKit())
+                    if (horse->HasEmptySeat(0))
+                        me->EnterVehicle(deathcharger);
+            }
+        }
+
+        void EnterCombat(Unit* /*who*/) override
+        {
+            me->ExitVehicle();
+        }
+
+        void JustDied(Unit* killer) override
+        {
+            if (Creature* deathcharger = me->FindNearestCreature(NPC_ACHERUS_DEATHCHARGER, 30))
+                if (killer->GetTypeId() == TYPEID_PLAYER && deathcharger->GetTypeId() == TYPEID_UNIT && deathcharger->IsVehicle())
+                {
+                    deathcharger->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
+                    deathcharger->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    deathcharger->setFaction(2096);
+                }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_dark_rider_of_acherus_28768AI(creature);
+    }
+};
+
+
+
 
 void AddSC_the_scarlet_enclave()
 {
@@ -1345,5 +1399,5 @@ void AddSC_the_scarlet_enclave()
     new npc_eye_of_acherus();
     new npc_dark_rider_of_acherus();
     new npc_salanar_the_horseman();
-
+    new npc_dark_rider_of_acherus_28768();
 }

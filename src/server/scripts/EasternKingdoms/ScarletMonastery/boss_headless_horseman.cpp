@@ -656,14 +656,14 @@ public:
                                 if (count < 3)
                                 {
                                     if (player)
-                                        player->Say(Text[count], 0);
+                                        player->Say(Text[count], LANG_UNIVERSAL);
                                 }
                                 else
                                 {
                                     DoCast(me, SPELL_RHYME_BIG);
                                     if (player)
                                     {
-                                        player->Say(Text[count], 0);
+                                        player->Say(Text[count], LANG_UNIVERSAL);
                                         player->HandleEmoteCommand(ANIM_EMOTE_SHOUT);
                                     }
                                     wp_reached = true;

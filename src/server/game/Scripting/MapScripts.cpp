@@ -302,37 +302,37 @@ void Map::ScriptsProcess()
         {
             switch (GUID_HIPART(step.sourceGUID))
             {
-                case HIGHGUID_ITEM: // as well as HIGHGUID_CONTAINER
-                    if (Player* player = HashMapHolder<Player>::Find(step.ownerGUID))
-                        source = player->GetItemByGuid(step.sourceGUID);
-                    break;
-                case HIGHGUID_UNIT:
-                case HIGHGUID_VEHICLE:
-                    source = HashMapHolder<Creature>::Find(step.sourceGUID);
-                    break;
-                case HIGHGUID_PET:
-                    source = HashMapHolder<Pet>::Find(step.sourceGUID);
-                    break;
-                case HIGHGUID_PLAYER:
-                    source = HashMapHolder<Player>::Find(step.sourceGUID);
-                    break;
-                case HIGHGUID_TRANSPORT:
-                case HIGHGUID_GAMEOBJECT:
-                    source = HashMapHolder<GameObject>::Find(step.sourceGUID);
-                    break;
-                case HIGHGUID_CORPSE:
-                    source = HashMapHolder<Corpse>::Find(step.sourceGUID);
-                    break;
-                case HIGHGUID_MO_TRANSPORT:
-                {
-                    GameObject* go = HashMapHolder<GameObject>::Find(step.sourceGUID);
-                    source = go ? go->ToTransport() : NULL;
-                    break;
-                }
-                default:
-                    TC_LOG_ERROR("scripts", "%s source with unsupported high guid (GUID: " UI64FMTD ", high guid: %u).",
-                        step.script->GetDebugInfo().c_str(), step.sourceGUID, GUID_HIPART(step.sourceGUID));
-                    break;
+            case HIGHGUID_ITEM: // as well as HIGHGUID_CONTAINER
+                if (Player* player = HashMapHolder<Player>::Find(step.ownerGUID))
+                    source = player->GetItemByGuid(step.sourceGUID);
+                break;
+            case HIGHGUID_UNIT:
+            case HIGHGUID_VEHICLE:
+                source = HashMapHolder<Creature>::Find(step.sourceGUID);
+                break;
+            case HIGHGUID_PET:
+                source = HashMapHolder<Pet>::Find(step.sourceGUID);
+                break;
+            case HIGHGUID_PLAYER:
+                source = HashMapHolder<Player>::Find(step.sourceGUID);
+                break;
+            case HIGHGUID_TRANSPORT:
+            case HIGHGUID_GAMEOBJECT:
+                source = HashMapHolder<GameObject>::Find(step.sourceGUID);
+                break;
+            case HIGHGUID_CORPSE:
+                source = HashMapHolder<Corpse>::Find(step.sourceGUID);
+                break;
+            case HIGHGUID_MO_TRANSPORT:
+            {
+                GameObject* go = HashMapHolder<GameObject>::Find(step.sourceGUID);
+                source = go ? go->ToTransport() : NULL;
+                break;
+            }
+            default:
+                TC_LOG_ERROR("scripts", "%s source with unsupported high guid (GUID: " UI64FMTD ", high guid: %u).",
+                    step.script->GetDebugInfo().c_str(), step.sourceGUID, GUID_HIPART(step.sourceGUID));
+                break;
             }
         }
 
@@ -341,117 +341,88 @@ void Map::ScriptsProcess()
         {
             switch (GUID_HIPART(step.targetGUID))
             {
-                case HIGHGUID_UNIT:
-                case HIGHGUID_VEHICLE:
-                    target = HashMapHolder<Creature>::Find(step.targetGUID);
-                    break;
-                case HIGHGUID_PET:
-                    target = HashMapHolder<Pet>::Find(step.targetGUID);
-                    break;
-                case HIGHGUID_PLAYER:                       // empty GUID case also
-                    target = HashMapHolder<Player>::Find(step.targetGUID);
-                    break;
-                case HIGHGUID_TRANSPORT:
-                case HIGHGUID_GAMEOBJECT:
-                    target = HashMapHolder<GameObject>::Find(step.targetGUID);
-                    break;
-                case HIGHGUID_CORPSE:
-                    target = HashMapHolder<Corpse>::Find(step.targetGUID);
-                    break;
-                case HIGHGUID_MO_TRANSPORT:
-                {
-                    GameObject* go = HashMapHolder<GameObject>::Find(step.targetGUID);
-                    target = go ? go->ToTransport() : NULL;
-                    break;
-                }
-                default:
-                    TC_LOG_ERROR("scripts", "%s target with unsupported high guid (GUID: " UI64FMTD ", high guid: %u).",
-                        step.script->GetDebugInfo().c_str(), step.targetGUID, GUID_HIPART(step.targetGUID));
-                    break;
+            case HIGHGUID_UNIT:
+            case HIGHGUID_VEHICLE:
+                target = HashMapHolder<Creature>::Find(step.targetGUID);
+                break;
+            case HIGHGUID_PET:
+                target = HashMapHolder<Pet>::Find(step.targetGUID);
+                break;
+            case HIGHGUID_PLAYER:                       // empty GUID case also
+                target = HashMapHolder<Player>::Find(step.targetGUID);
+                break;
+            case HIGHGUID_TRANSPORT:
+            case HIGHGUID_GAMEOBJECT:
+                target = HashMapHolder<GameObject>::Find(step.targetGUID);
+                break;
+            case HIGHGUID_CORPSE:
+                target = HashMapHolder<Corpse>::Find(step.targetGUID);
+                break;
+            case HIGHGUID_MO_TRANSPORT:
+            {
+                GameObject* go = HashMapHolder<GameObject>::Find(step.targetGUID);
+                target = go ? go->ToTransport() : NULL;
+                break;
+            }
+            default:
+                TC_LOG_ERROR("scripts", "%s target with unsupported high guid (GUID: " UI64FMTD ", high guid: %u).",
+                    step.script->GetDebugInfo().c_str(), step.targetGUID, GUID_HIPART(step.targetGUID));
+                break;
             }
         }
 
         switch (step.script->command)
         {
             case SCRIPT_COMMAND_TALK:
-                if (step.script->Talk.ChatType > CHAT_TYPE_WHISPER && step.script->Talk.ChatType != CHAT_MSG_RAID_BOSS_WHISPER)
+            {
+                if (step.script->Talk.ChatType > CHAT_TYPE_BOSS_WHISPER)
                 {
                     TC_LOG_ERROR("scripts", "%s invalid chat type (%u) specified, skipping.", step.script->GetDebugInfo().c_str(), step.script->Talk.ChatType);
                     break;
                 }
-                if (step.script->Talk.Flags & SF_TALK_USE_PLAYER)
-                {
-                    if (Player* player = _GetScriptPlayerSourceOrTarget(source, target, step.script))
-                    {
-                        LocaleConstant loc_idx = player->GetSession()->GetSessionDbLocaleIndex();
-                        std::string text(sObjectMgr->GetTrinityString(step.script->Talk.TextID, loc_idx));
 
-                        switch (step.script->Talk.ChatType)
-                        {
-                            case CHAT_TYPE_SAY:
-                                player->Say(text, LANG_UNIVERSAL);
-                                break;
-                            case CHAT_TYPE_YELL:
-                                player->Yell(text, LANG_UNIVERSAL);
-                                break;
-                            case CHAT_TYPE_TEXT_EMOTE:
-                            case CHAT_TYPE_BOSS_EMOTE:
-                                player->TextEmote(text);
-                                break;
-                            case CHAT_TYPE_WHISPER:
-                            case CHAT_MSG_RAID_BOSS_WHISPER:
-                            {
-                                uint64 targetGUID = target ? target->GetGUID() : 0;
-                                if (!targetGUID || !IS_PLAYER_GUID(targetGUID))
-                                    TC_LOG_ERROR("scripts", "%s attempt to whisper to non-player unit, skipping.", step.script->GetDebugInfo().c_str());
-                                else
-                                    player->Whisper(text, LANG_UNIVERSAL, targetGUID);
-                                break;
-                            }
-                            default:
-                                break;                              // must be already checked at load
-                        }
-                    }
-                }
+                if (step.script->Talk.Flags & SF_TALK_USE_PLAYER)
+                    source = _GetScriptPlayerSourceOrTarget(source, target, step.script);
                 else
+                    source = _GetScriptCreatureSourceOrTarget(source, target, step.script);
+
+                if (source)
                 {
-                    // Source or target must be Creature.
-                    if (Creature* cSource = _GetScriptCreatureSourceOrTarget(source, target, step.script))
+                    Unit* sourceUnit = source->ToUnit();
+                    if (!sourceUnit)
                     {
-                        uint64 targetGUID = target ? target->GetGUID() : 0;
-                        switch (step.script->Talk.ChatType)
-                        {
-                            case CHAT_TYPE_SAY:
-                                cSource->MonsterSay(step.script->Talk.TextID, LANG_UNIVERSAL, target);
-                                break;
-                            case CHAT_TYPE_YELL:
-                                cSource->MonsterYell(step.script->Talk.TextID, LANG_UNIVERSAL, target);
-                                break;
-                            case CHAT_TYPE_TEXT_EMOTE:
-                                cSource->MonsterTextEmote(step.script->Talk.TextID, target);
-                                break;
-                            case CHAT_TYPE_BOSS_EMOTE:
-                                cSource->MonsterTextEmote(step.script->Talk.TextID, target, true);
-                                break;
-                            case CHAT_TYPE_WHISPER:
-                                if (!targetGUID || !IS_PLAYER_GUID(targetGUID))
-                                    TC_LOG_ERROR("scripts", "%s attempt to whisper to non-player unit, skipping.", step.script->GetDebugInfo().c_str());
-                                else
-                                    cSource->MonsterWhisper(step.script->Talk.TextID, target->ToPlayer());
-                                break;
-                            case CHAT_MSG_RAID_BOSS_WHISPER:
-                                if (!targetGUID || !IS_PLAYER_GUID(targetGUID))
-                                    TC_LOG_ERROR("scripts", "%s attempt to raidbosswhisper to non-player unit, skipping.", step.script->GetDebugInfo().c_str());
-                                else
-                                    cSource->MonsterWhisper(step.script->Talk.TextID, target->ToPlayer(), true);
-                                break;
-                            default:
-                                break;                              // must be already checked at load
-                        }
+                        TC_LOG_ERROR("scripts", "%s source object (" UI64FMTD ") is not an unit, skipping.", step.script->GetDebugInfo().c_str(), source->GetGUID());
+                        break;
+                    }
+
+                    switch (step.script->Talk.ChatType)
+                    {
+                    case CHAT_TYPE_SAY:
+                        sourceUnit->Say(step.script->Talk.TextID, target);
+                        break;
+                    case CHAT_TYPE_YELL:
+                        sourceUnit->Yell(step.script->Talk.TextID, target);
+                        break;
+                    case CHAT_TYPE_TEXT_EMOTE:
+                    case CHAT_TYPE_BOSS_EMOTE:
+                        sourceUnit->TextEmote(step.script->Talk.TextID, target, step.script->Talk.ChatType == CHAT_TYPE_BOSS_EMOTE);
+                        break;
+                    case CHAT_TYPE_WHISPER:
+                    case CHAT_TYPE_BOSS_WHISPER:
+                    {
+                        Player* receiver = target ? target->ToPlayer() : nullptr;
+                        if (!receiver)
+                            TC_LOG_ERROR("scripts", "%s attempt to whisper to non-player unit, skipping.", step.script->GetDebugInfo().c_str());
+                        else
+                            sourceUnit->Whisper(step.script->Talk.TextID, receiver, step.script->Talk.ChatType == CHAT_TYPE_BOSS_WHISPER);
+                        break;
+                    }
+                    default:
+                        break;                              // must be already checked at load
                     }
                 }
                 break;
-
+            }
             case SCRIPT_COMMAND_EMOTE:
                 // Source or target must be Creature.
                 if (Creature* cSource = _GetScriptCreatureSourceOrTarget(source, target, step.script))
@@ -470,8 +441,8 @@ void Map::ScriptsProcess()
                     // Validate field number.
                     if (step.script->FieldSet.FieldID <= OBJECT_FIELD_ENTRY || step.script->FieldSet.FieldID >= cSource->GetValuesCount())
                         TC_LOG_ERROR("scripts", "%s wrong field %u (max count: %u) in object (TypeId: %u, Entry: %u, GUID: %u) specified, skipping.",
-                            step.script->GetDebugInfo().c_str(), step.script->FieldSet.FieldID,
-                            cSource->GetValuesCount(), cSource->GetTypeId(), cSource->GetEntry(), cSource->GetGUIDLow());
+                        step.script->GetDebugInfo().c_str(), step.script->FieldSet.FieldID,
+                        cSource->GetValuesCount(), cSource->GetTypeId(), cSource->GetEntry(), cSource->GetGUIDLow());
                     else
                         cSource->SetUInt32Value(step.script->FieldSet.FieldID, step.script->FieldSet.FieldValue);
                 }
@@ -499,8 +470,8 @@ void Map::ScriptsProcess()
                     // Validate field number.
                     if (step.script->FlagToggle.FieldID <= OBJECT_FIELD_ENTRY || step.script->FlagToggle.FieldID >= cSource->GetValuesCount())
                         TC_LOG_ERROR("scripts", "%s wrong field %u (max count: %u) in object (TypeId: %u, Entry: %u, GUID: %u) specified, skipping.",
-                            step.script->GetDebugInfo().c_str(), step.script->FlagToggle.FieldID,
-                            cSource->GetValuesCount(), cSource->GetTypeId(), cSource->GetEntry(), cSource->GetGUIDLow());
+                        step.script->GetDebugInfo().c_str(), step.script->FlagToggle.FieldID,
+                        cSource->GetValuesCount(), cSource->GetTypeId(), cSource->GetEntry(), cSource->GetGUIDLow());
                     else
                         cSource->SetFlag(step.script->FlagToggle.FieldID, step.script->FlagToggle.FieldValue);
                 }
@@ -513,8 +484,8 @@ void Map::ScriptsProcess()
                     // Validate field number.
                     if (step.script->FlagToggle.FieldID <= OBJECT_FIELD_ENTRY || step.script->FlagToggle.FieldID >= cSource->GetValuesCount())
                         TC_LOG_ERROR("scripts", "%s wrong field %u (max count: %u) in object (TypeId: %u, Entry: %u, GUID: %u) specified, skipping.",
-                            step.script->GetDebugInfo().c_str(), step.script->FlagToggle.FieldID,
-                            cSource->GetValuesCount(), cSource->GetTypeId(), cSource->GetEntry(), cSource->GetGUIDLow());
+                        step.script->GetDebugInfo().c_str(), step.script->FlagToggle.FieldID,
+                        cSource->GetValuesCount(), cSource->GetTypeId(), cSource->GetEntry(), cSource->GetGUIDLow());
                     else
                         cSource->RemoveFlag(step.script->FlagToggle.FieldID, step.script->FlagToggle.FieldValue);
                 }
@@ -622,8 +593,8 @@ void Map::ScriptsProcess()
                     }
 
                     if (pGO->GetGoType() == GAMEOBJECT_TYPE_FISHINGNODE ||
-                        pGO->GetGoType() == GAMEOBJECT_TYPE_DOOR        ||
-                        pGO->GetGoType() == GAMEOBJECT_TYPE_BUTTON      ||
+                        pGO->GetGoType() == GAMEOBJECT_TYPE_DOOR ||
+                        pGO->GetGoType() == GAMEOBJECT_TYPE_BUTTON ||
                         pGO->GetGoType() == GAMEOBJECT_TYPE_TRAP)
                     {
                         TC_LOG_ERROR("scripts", "%s can not be used with gameobject of type %u (guid: %u).",
@@ -715,26 +686,26 @@ void Map::ScriptsProcess()
                 // source/target cast spell at target/source (script->datalong2: 0: s->t 1: s->s 2: t->t 3: t->s
                 switch (step.script->CastSpell.Flags)
                 {
-                    case SF_CASTSPELL_SOURCE_TO_TARGET: // source -> target
-                        uSource = source ? source->ToUnit() : NULL;
-                        uTarget = target ? target->ToUnit() : NULL;
-                        break;
-                    case SF_CASTSPELL_SOURCE_TO_SOURCE: // source -> source
-                        uSource = source ? source->ToUnit() : NULL;
-                        uTarget = uSource;
-                        break;
-                    case SF_CASTSPELL_TARGET_TO_TARGET: // target -> target
-                        uSource = target ? target->ToUnit() : NULL;
-                        uTarget = uSource;
-                        break;
-                    case SF_CASTSPELL_TARGET_TO_SOURCE: // target -> source
-                        uSource = target ? target->ToUnit() : NULL;
-                        uTarget = source ? source->ToUnit() : NULL;
-                        break;
-                    case SF_CASTSPELL_SEARCH_CREATURE: // source -> creature with entry
-                        uSource = source ? source->ToUnit() : NULL;
-                        uTarget = uSource ? GetClosestCreatureWithEntry(uSource, abs(step.script->CastSpell.CreatureEntry), step.script->CastSpell.SearchRadius) : NULL;
-                        break;
+                case SF_CASTSPELL_SOURCE_TO_TARGET: // source -> target
+                    uSource = source ? source->ToUnit() : NULL;
+                    uTarget = target ? target->ToUnit() : NULL;
+                    break;
+                case SF_CASTSPELL_SOURCE_TO_SOURCE: // source -> source
+                    uSource = source ? source->ToUnit() : NULL;
+                    uTarget = uSource;
+                    break;
+                case SF_CASTSPELL_TARGET_TO_TARGET: // target -> target
+                    uSource = target ? target->ToUnit() : NULL;
+                    uTarget = uSource;
+                    break;
+                case SF_CASTSPELL_TARGET_TO_SOURCE: // target -> source
+                    uSource = target ? target->ToUnit() : NULL;
+                    uTarget = source ? source->ToUnit() : NULL;
+                    break;
+                case SF_CASTSPELL_SEARCH_CREATURE: // source -> creature with entry
+                    uSource = source ? source->ToUnit() : NULL;
+                    uTarget = uSource ? GetClosestCreatureWithEntry(uSource, abs(step.script->CastSpell.CreatureEntry), step.script->CastSpell.SearchRadius) : NULL;
+                    break;
                 }
 
                 if (!uSource || !uSource->isType(TYPEMASK_UNIT))
@@ -870,7 +841,7 @@ void Map::ScriptsProcess()
                 {
                     if (cSource->IsDead())
                         TC_LOG_ERROR("scripts", "%s creature is already dead (Entry: %u, GUID: %u)",
-                            step.script->GetDebugInfo().c_str(), cSource->GetEntry(), cSource->GetGUIDLow());
+                        step.script->GetDebugInfo().c_str(), cSource->GetEntry(), cSource->GetGUIDLow());
                     else
                     {
                         cSource->SetDeathState(JUST_DIED);
@@ -926,6 +897,7 @@ void Map::ScriptsProcess()
                 TC_LOG_ERROR("scripts", "Unknown script command %s.", step.script->GetDebugInfo().c_str());
                 break;
         }
+
 
         m_scriptSchedule.erase(iter);
         iter = m_scriptSchedule.begin();

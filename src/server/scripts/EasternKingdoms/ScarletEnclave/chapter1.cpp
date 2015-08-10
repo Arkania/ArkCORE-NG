@@ -31,7 +31,7 @@
 
 #define GOSSIP_ACCEPT_DUEL      "I challenge you, death knight!"
 
-// unused 28406.. we are using npc_dk_initiate_28406
+// unused script for 28406.. we are using npc_dk_initiate_28406
 class npc_death_knight_initiate : public CreatureScript
 {
 public:
@@ -192,56 +192,6 @@ public:
             /// @todo spells
 
             CombatAI::UpdateAI(uiDiff);
-        }
-    };
-
-};
-
-// 28768
-class npc_ros_dark_rider : public CreatureScript
-{
-public:
-    npc_ros_dark_rider() : CreatureScript("npc_ros_dark_rider") { }
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_ros_dark_riderAI(creature);
-    }
-
-    struct npc_ros_dark_riderAI : public ScriptedAI
-    {
-        npc_ros_dark_riderAI(Creature* creature) : ScriptedAI(creature) { }
-
-        void EnterCombat(Unit* /*who*/) override
-        {
-            me->ExitVehicle();
-        }
-
-        void Reset() override
-        {
-            Creature* deathcharger = me->FindNearestCreature(28782, 30);
-            if (!deathcharger)
-                return;
-
-            deathcharger->RestoreFaction();
-            deathcharger->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
-            deathcharger->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-            if (!me->GetVehicle() && deathcharger->IsVehicle() && deathcharger->GetVehicleKit()->HasEmptySeat(0))
-                me->EnterVehicle(deathcharger);
-        }
-
-        void JustDied(Unit* killer) override
-        {
-            Creature* deathcharger = me->FindNearestCreature(28782, 30);
-            if (!deathcharger)
-                return;
-
-            if (killer->GetTypeId() == TYPEID_PLAYER && deathcharger->GetTypeId() == TYPEID_UNIT && deathcharger->IsVehicle())
-            {
-                deathcharger->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
-                deathcharger->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                deathcharger->setFaction(2096);
-            }
         }
     };
 
@@ -601,7 +551,7 @@ class npc_scarlet_miner : public CreatureScript
 
 void AddSC_the_scarlet_enclave_c1()
 {
-    new npc_ros_dark_rider();
+    // new npc_death_knight_initiate();
     new npc_dkc1_gothik();
     new npc_scarlet_ghoul();
     new npc_scarlet_miner();
