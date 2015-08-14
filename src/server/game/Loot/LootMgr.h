@@ -199,7 +199,7 @@ typedef std::vector<QuestItem> QuestItemList;
 typedef std::vector<LootItem> LootItemList;
 typedef std::map<uint32, QuestItemList*> QuestItemMap;
 typedef std::list<LootStoreItem*> LootStoreItemList;
-typedef UNORDERED_MAP<uint32, LootTemplate*> LootTemplateMap;
+typedef std::unordered_map<uint32, LootTemplate*> LootTemplateMap;
 
 typedef std::set<uint32> LootIdSet;
 
@@ -325,7 +325,7 @@ struct Loot
     uint8 maxDuplicates;                                    // Max amount of items with the same entry that can drop (default is 1; on 25 man raid mode 3)
 
     // GUIDLow of container that holds this loot (item_instance.entry)
-    //  Only set for inventory items that can be right-click looted
+    // Only set for inventory items that can be right-click looted
     uint32 containerID;
 
     Loot(uint32 _gold = 0) : gold(_gold), unlootedCount(0), roundRobinPlayer(0), loot_type(LOOT_CORPSE), maxDuplicates(1), containerID(0) { }
@@ -362,6 +362,7 @@ struct Loot
         gold = 0;
         unlootedCount = 0;
         roundRobinPlayer = 0;
+        loot_type = LOOT_NONE;
         i_LootValidatorRefManager.clearReferences();
     }
 

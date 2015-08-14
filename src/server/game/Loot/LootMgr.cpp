@@ -1132,6 +1132,9 @@ void LootTemplate::LootGroup::AddEntry(LootStoreItem* item)
 // Rolls an item from the group, returns NULL if all miss their chances
 LootStoreItem const* LootTemplate::LootGroup::Roll(Loot& loot, uint16 lootMode) const
 {
+    if (lootMode == LOOT_FISHING_JUNK)
+        assert(false);
+
     LootStoreItemList possibleLoot = ExplicitlyChanced;
     possibleLoot.remove_if(LootGroupInvalidSelector(loot, lootMode));
 
@@ -1199,6 +1202,9 @@ void LootTemplate::LootGroup::CopyConditions(ConditionList /*conditions*/)
 // Rolls an item from the group (if any takes its chance) and adds the item to the loot
 void LootTemplate::LootGroup::Process(Loot& loot, uint16 lootMode) const
 {
+    if (lootMode == LOOT_FISHING_JUNK)
+        assert(false);
+
     if (LootStoreItem const* item = Roll(loot, lootMode))
         loot.AddItem(*item);
 }
@@ -1319,6 +1325,9 @@ void LootTemplate::CopyConditions(LootItem* li) const
 // Rolls for every item in the template and adds the rolled items the the loot
 void LootTemplate::Process(Loot& loot, bool rate, uint16 lootMode, uint8 groupId) const
 {
+    if (lootMode == LOOT_FISHING_JUNK)
+        assert(false);
+
     if (groupId)                                            // Group reference uses own processing of the group
     {
         if (groupId > Groups.size())
@@ -1609,6 +1618,7 @@ void LoadLootTemplates_Fishing()
 
     uint32 oldMSTime = getMSTime();
 
+    std::list<uint32> missingLootIds;
     LootIdSet lootIdSet;
     uint32 count = LootTemplates_Fishing.LoadAndCollectLootIds(lootIdSet);
 
@@ -1617,6 +1627,8 @@ void LoadLootTemplates_Fishing()
         if (AreaTableEntry const* areaEntry = sAreaStore.LookupEntry(i))
             if (lootIdSet.find(areaEntry->ID) != lootIdSet.end())
                 lootIdSet.erase(areaEntry->ID);
+            else
+                missingLootIds.push_back(areaEntry->ID);
 
     // output error for any still listed (not referenced from appropriate table) ids
     LootTemplates_Fishing.ReportUnusedIds(lootIdSet);
