@@ -747,14 +747,75 @@ public:
     {
         QUEST_DEATHS_CHALLENGE = 12733,
         SPELL_EBON_HOLD_DUEL_CREDIT = 29025,
+        SAY_DUEL = 0,
+        FACTION_HOSTILE = 2068,
+        SPELL_DUEL = 52996,
+        SPELL_DUEL_TRIGGERED = 52990,
+        SPELL_DUEL_VICTORY = 52994,
+        SPELL_DUEL_FLAG = 52991,
     };
+    
+    
 
-    struct npc_dk_initiate_28406AI : public ScriptedAI
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
     {
-        npc_dk_initiate_28406AI(Creature* creature) : ScriptedAI(creature) { }
+        player->PlayerTalkClass->ClearMenus();
+        if (action == GOSSIP_ACTION_INFO_DEF)
+        {
+            player->CLOSE_GOSSIP_MENU();
+
+            if (player->IsInCombat() || creature->IsInCombat())
+                return true;
+
+            if (npc_dk_initiate_28406AI* initiateAI = CAST_AI(npc_dk_initiate_28406AI, creature->AI()))
+            {
+                if (initiateAI->m_IsDuelInProgress)
+                    return true;
+            }
+
+            creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+            creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_15);
+
+            sCreatureTextMgr->SendChat(creature, SAY_DUEL, NULL, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_NORMAL, 0, TEAM_OTHER, false, player);
+
+            player->CastSpell(creature, SPELL_DUEL, false);
+            player->CastSpell(player, SPELL_DUEL_FLAG, true);
+        }
+        return true;
+    }
+
+    bool OnGossipHello(Player* player, Creature* creature) override
+    {
+        if (player->GetQuestStatus(QUEST_DEATHS_CHALLENGE) == QUEST_STATUS_INCOMPLETE && creature->IsFullHealth())
+        {
+            if (player->HealthBelowPct(10))
+                return true;
+
+            if (player->IsInCombat() || creature->IsInCombat())
+                return true;
+            
+            player->ADD_GOSSIP_ITEM_DB(9765, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+            player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
+        }
+        return true;
+    }
+
+    struct npc_dk_initiate_28406AI : public CombatAI
+    {
+        npc_dk_initiate_28406AI(Creature* creature) : CombatAI(creature) { }
+
+        bool m_lose;
+        uint64 m_DuelerGUID;
+        uint32 m_DuelTimer;
+        bool m_IsDuelInProgress;
 
         void Reset() override
         {
+            m_lose = false;
+            m_DuelerGUID = 0;
+            m_DuelTimer = 5000;
+            m_IsDuelInProgress = false;
+
             if (me->IsMounted())
             {
                 me->SetByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_HOVER);
@@ -764,18 +825,96 @@ public:
             }
             else if (me->GetPositionZ() < 250.0f)
             {
-                me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+                me->RestoreFaction();
+                CombatAI::Reset();
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_15);              
                 me->SetNoCallAssistance(true);
                 me->SetNoSearchAssistance(true);
-                me->setFaction(7);
+            }
+        }
+
+        void SpellHit(Unit* caster, const SpellInfo* spell) override
+        {
+            if (!m_IsDuelInProgress && spell->Id == SPELL_DUEL)
+            {
+                m_DuelerGUID = caster->GetGUID();
+                m_IsDuelInProgress = true;
+            }
+        }
+
+        void DamageTaken(Unit* hitter, uint32 &damage) override
+        {
+            if (m_IsDuelInProgress && hitter->IsControlledByPlayer())
+            {
+                if (hitter->GetGUID() != m_DuelerGUID && hitter->GetOwnerGUID() != m_DuelerGUID) // other players cannot help
+                    damage = 0;
+                else if (damage >= me->GetHealth())
+                {
+                    damage = 0;
+
+                    if (!m_lose)
+                    {
+                        hitter->RemoveGameObject(SPELL_DUEL_FLAG, true);
+                        hitter->AttackStop();
+                        me->CastSpell(hitter, SPELL_DUEL_VICTORY, true);
+                        m_lose = true;
+                        me->CastSpell(me, 7267, true);
+                        me->RestoreFaction();
+
+                       // if (Player* player = hitter->ToPlayer())
+                         //   if (player->GetQuestStatus(QUEST_DEATHS_CHALLENGE) == QUEST_STATUS_INCOMPLETE)
+                           //     player->KilledMonsterCredit(SPELL_EBON_HOLD_DUEL_CREDIT);
+                    }
+                }
             }
         }
 
         void JustDied(Unit* killer) 
         { 
-            if (Player* player = killer->ToPlayer())
-                if (player->GetQuestStatus(QUEST_DEATHS_CHALLENGE) == QUEST_STATUS_INCOMPLETE)
-                    player->KilledMonsterCredit(SPELL_EBON_HOLD_DUEL_CREDIT);
+            //if (Player* player = killer->ToPlayer())
+              //  if (player->GetQuestStatus(QUEST_DEATHS_CHALLENGE) == QUEST_STATUS_INCOMPLETE)
+                    //player->KilledMonsterCredit(SPELL_EBON_HOLD_DUEL_CREDIT);
+        }
+
+        void UpdateAI(uint32 uiDiff) override
+        {
+            if (!UpdateVictim())
+            {
+                if (m_IsDuelInProgress)
+                {
+                    if (m_DuelTimer <= uiDiff)
+                    {
+                        me->setFaction(FACTION_HOSTILE);
+
+                        if (Unit* unit = Unit::GetUnit(*me, m_DuelerGUID))
+                            AttackStart(unit);
+                    }
+                    else
+                        m_DuelTimer -= uiDiff;
+                }
+                return;
+            }
+
+            if (m_IsDuelInProgress)
+            {
+                if (m_lose)
+                {
+                    if (!me->HasAura(7267))
+                        EnterEvadeMode();
+                    return;
+                }
+                else if (me->GetVictim() && me->EnsureVictim()->GetTypeId() == TYPEID_PLAYER && me->EnsureVictim()->HealthBelowPct(10))
+                {
+                    me->EnsureVictim()->CastSpell(me->GetVictim(), 7267, true); // beg
+                    me->EnsureVictim()->RemoveGameObject(SPELL_DUEL_FLAG, true);
+                    EnterEvadeMode();
+                    return;
+                }
+            }
+
+            /// @todo spells
+
+            CombatAI::UpdateAI(uiDiff);
         }
     };
 
@@ -1297,7 +1436,7 @@ public:
             }
         }
 
-            void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who)
         {
             ScriptedAI::MoveInLineOfSight(who);
 
@@ -1342,28 +1481,32 @@ public:
     enum e28768
     {
         NPC_ACHERUS_DEATHCHARGER = 28782,
+        SPELL_SUMMON_DARK_RIDER_OF_ACHERUS = 52289,
+        SPELL_DESPAWN_DARK_RIDER_OF_ACHERUS = 52294,
     };
 
     struct npc_dark_rider_of_acherus_28768AI : public ScriptedAI
     {
         npc_dark_rider_of_acherus_28768AI(Creature* creature) : ScriptedAI(creature) { }
 
+        uint32 m_timer;
+        uint32 m_phase;
+
         void Reset() override
         {
-            if (Creature* deathcharger = me->FindNearestCreature(NPC_ACHERUS_DEATHCHARGER, 30))
-            {
-                deathcharger->RestoreFaction();
-                deathcharger->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
-                deathcharger->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                if (Vehicle* horse = deathcharger->GetVehicleKit())
-                    if (horse->HasEmptySeat(0))
-                        me->EnterVehicle(deathcharger);
-            }
+            m_timer = 1000;
+            m_phase = 1;
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void EnterCombat(Unit* who) override
         {
+            printf("EnterCombat: \n");
             me->ExitVehicle();
+            me->HandleEmoteState(EMOTE_ONESHOT_NONE);
+            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+            me->SetByteFlag(UNIT_FIELD_BYTES_1, 0, 0x00);
+            me->SetByteFlag(UNIT_FIELD_BYTES_2, 0, 0x00);
+            me->Attack(who, true);
         }
 
         void JustDied(Unit* killer) override
@@ -1376,6 +1519,28 @@ public:
                     deathcharger->setFaction(2096);
                 }
         }
+
+        void UpdateAI(uint32 diff)
+        {
+            if (m_timer <= diff)
+            {
+                m_timer = 1000;
+                DoWork();
+            }
+            else
+                m_timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+
+        void DoWork()
+        {
+            if (me->IsInCombat())
+                return;
+        }
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -1384,7 +1549,95 @@ public:
     }
 };
 
+// 28782
+class npc_acherus_deathcharger_28782 : public CreatureScript
+{
+public:
+    npc_acherus_deathcharger_28782() : CreatureScript("npc_acherus_deathcharger_28782") { }
 
+    enum e28782
+    {    
+        NPC_ACHERUS_DEATHCHARGER = 28782,
+        NPC_DARK_RIDER_OF_ACHERUS = 28768,
+        SPELL_SUMMON_DARK_RIDER_OF_ACHERUS = 52289,
+        SPELL_DESPAWN_DARK_RIDER_OF_ACHERUS = 52294,
+    };
+
+    struct npc_acherus_deathcharger_28782AI : public ScriptedAI
+    {
+        npc_acherus_deathcharger_28782AI(Creature* creature) : ScriptedAI(creature) { }
+
+        uint32 m_timer;
+        uint32 m_phase;
+
+        void Reset() override
+        {
+            m_timer = 1000;
+            m_phase = 0;
+        }
+
+        void PassengerBoarded(Unit* who, int8 seatId, bool apply)
+        {
+            if (who->GetEntry() == NPC_DARK_RIDER_OF_ACHERUS)
+                if (apply)
+                {
+                    me->RestoreFaction();
+                    me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
+                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                }
+                else
+                {
+                    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    me->setFaction(2096);
+                    me->AttackStop();
+                }
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+            if (m_timer <= diff)
+            {
+                m_timer = 1000;
+                DoWork();
+            }
+            else
+                m_timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+
+        void DoWork()
+        {
+            Vehicle* vehicle = me->GetVehicleKit();
+            if (!vehicle)
+                return;
+            if (vehicle->IsVehicleInUse())
+                return;
+            Creature* darkrider = me->FindNearestCreature(NPC_DARK_RIDER_OF_ACHERUS, 30);
+            if (!darkrider)
+                return;
+            if (darkrider->IsMounted())
+                return;
+
+            if (darkrider->IsAlive() && !darkrider->IsInCombat() && vehicle->HasEmptySeat(0))
+            {
+                darkrider->EnterVehicle(me, 0);
+                return;
+            }
+
+            printf("pferd müsste jetzt was tun???  \n");
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_acherus_deathcharger_28782AI(creature);
+    }
+};
 
 
 void AddSC_the_scarlet_enclave()
@@ -1400,4 +1653,5 @@ void AddSC_the_scarlet_enclave()
     new npc_dark_rider_of_acherus();
     new npc_salanar_the_horseman();
     new npc_dark_rider_of_acherus_28768();
+    new npc_acherus_deathcharger_28782();
 }
