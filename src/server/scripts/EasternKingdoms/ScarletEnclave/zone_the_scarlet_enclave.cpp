@@ -18,6 +18,7 @@
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
 #include "PassiveAI.h"
 #include "Player.h"
 #include "CreatureTextMgr.h"
@@ -1395,11 +1396,11 @@ public:
     }
 };
 
-// 28653 28788  salanar_the_horseman
-class npc_salanar_the_horseman : public CreatureScript
+// 28653 salanar_the_horseman
+class npc_salanar_the_horseman_28653 : public CreatureScript
 {
 public:
-    npc_salanar_the_horseman() : CreatureScript("npc_salanar_the_horseman") { }
+    npc_salanar_the_horseman_28653() : CreatureScript("npc_salanar_the_horseman_28653") { }
 
     enum Spells_Salanar
     {
@@ -1410,9 +1411,9 @@ public:
         SPELL_EFFECT_OVERTAKE = 52349
     };
 
-    struct npc_salanar_the_horsemanAI : public ScriptedAI
+    struct npc_salanar_the_horseman_28653AI : public ScriptedAI
     {
-        npc_salanar_the_horsemanAI(Creature* creature) : ScriptedAI(creature) { }
+        npc_salanar_the_horseman_28653AI(Creature* creature) : ScriptedAI(creature) { }
 
         void SpellHit(Unit* caster, const SpellInfo* spell)
         {
@@ -1468,7 +1469,83 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_salanar_the_horsemanAI(creature);
+        return new npc_salanar_the_horseman_28653AI(creature);
+    }
+};
+
+// 28788 salanar_the_horseman
+class npc_salanar_the_horseman_28788 : public CreatureScript
+{
+public:
+    npc_salanar_the_horseman_28788() : CreatureScript("npc_salanar_the_horseman_28788") { }
+
+    enum e28788
+    {
+        SPELL_REALM_OF_SHADOWS = 52275,
+        SPELL_DEATH_RACE_COMPLETE = 52361,
+    };
+
+    struct npc_salanar_the_horseman_28788AI : public ScriptedAI
+    {
+        npc_salanar_the_horseman_28788AI(Creature* creature) : ScriptedAI(creature) { }
+
+        uint32 m_timer;
+        uint32 m_phase;
+
+        void Reset() override
+        {
+            m_timer = 1000;
+            m_phase = 1;
+            if (Player* player = me->FindNearestPlayer(10.0f))
+                me->SetFacingToObject(player);
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+            if (m_timer <= diff)
+            {
+                m_timer = 1000;
+                DoWork();
+            }
+            else
+                m_timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+
+        void DoWork()
+        {
+            switch (m_phase)
+            {
+            case 1:
+                Talk(0);
+                m_phase = 2;
+                m_timer = 6000;
+                break;
+            case 2:
+                if (Unit* owner = me->GetCharmerOrOwnerOrSelf())
+                    if (Player* player = owner->ToPlayer())
+                    {
+                        player->Dismount();
+                        player->RemoveAura(SPELL_REALM_OF_SHADOWS);
+                        player->CastSpell(player, SPELL_DEATH_RACE_COMPLETE);
+                        m_phase = 3;
+                        m_timer = 5000;
+                    }
+                break;
+            case 3:
+                me->DespawnOrUnsummon();
+                break;
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_salanar_the_horseman_28788AI(creature);
     }
 };
 
@@ -1496,11 +1573,12 @@ public:
         {
             m_timer = 1000;
             m_phase = 1;
+            if (me->FindNearestCreature(28653, 15.0f))
+                me->DespawnOrUnsummon();
         }
 
         void EnterCombat(Unit* who) override
         {
-            printf("EnterCombat: \n");
             me->ExitVehicle();
             me->HandleEmoteState(EMOTE_ONESHOT_NONE);
             me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
@@ -1512,34 +1590,13 @@ public:
         void JustDied(Unit* killer) override
         {
             if (Creature* deathcharger = me->FindNearestCreature(NPC_ACHERUS_DEATHCHARGER, 30))
-                if (killer->GetTypeId() == TYPEID_PLAYER && deathcharger->GetTypeId() == TYPEID_UNIT && deathcharger->IsVehicle())
-                {
-                    deathcharger->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
-                    deathcharger->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                    deathcharger->setFaction(2096);
-                }
-        }
-
-        void UpdateAI(uint32 diff)
-        {
-            if (m_timer <= diff)
-            {
-                m_timer = 1000;
-                DoWork();
-            }
-            else
-                m_timer -= diff;
-
-            if (!UpdateVictim())
-                return;
-            else
-                DoMeleeAttackIfReady();
-        }
-
-        void DoWork()
-        {
-            if (me->IsInCombat())
-                return;
+                if (Player* player = killer->ToPlayer())
+                    if (deathcharger->GetTypeId() == TYPEID_UNIT && deathcharger->IsVehicle())
+                    {
+                        deathcharger->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
+                        deathcharger->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        deathcharger->setFaction(35);
+                    }
         }
     };
 
@@ -1556,7 +1613,8 @@ public:
     npc_acherus_deathcharger_28782() : CreatureScript("npc_acherus_deathcharger_28782") { }
 
     enum e28782
-    {    
+    {   
+        QUEST_INTO_THE_REALM_OF_SHADOW = 12687,
         NPC_ACHERUS_DEATHCHARGER = 28782,
         NPC_DARK_RIDER_OF_ACHERUS = 28768,
         SPELL_SUMMON_DARK_RIDER_OF_ACHERUS = 52289,
@@ -1569,29 +1627,54 @@ public:
 
         uint32 m_timer;
         uint32 m_phase;
+        uint64 m_darkriderGUID;
 
         void Reset() override
         {
             m_timer = 1000;
             m_phase = 0;
+            m_darkriderGUID = NULL;
+            if (me->FindNearestCreature(28653, 15.0f))
+                me->DespawnOrUnsummon();
+        }
+
+        void OnSpellClick(Unit* clicker, bool& result) override
+        {
+            if (me->getFaction() == 35)
+                if (Player* player = clicker->ToPlayer())
+                    if (Vehicle* vehicle = me->GetVehicleKit())
+                        if (player->GetQuestStatus(QUEST_INTO_THE_REALM_OF_SHADOW) == QUEST_STATUS_INCOMPLETE)
+                            if (Creature* darkrider = ObjectAccessor::GetCreature(*me, m_darkriderGUID))
+                            {
+                                me->GetMotionMaster()->Initialize();
+                                me->SetSpeed(MOVE_RUN, 3.0f, true);
+                            }
         }
 
         void PassengerBoarded(Unit* who, int8 seatId, bool apply)
         {
             if (who->GetEntry() == NPC_DARK_RIDER_OF_ACHERUS)
+            {
+                m_darkriderGUID = who->GetGUID();
                 if (apply)
                 {
                     me->RestoreFaction();
                     me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    me->setFaction(2096);
                 }
                 else
                 {
                     me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                    me->setFaction(2096);
                     me->AttackStop();
+                    me->setFaction(35);
                 }
+            }
+            else
+                if (Player* player = who->ToPlayer())
+                    if (apply == false)
+                        me->DespawnOrUnsummon();
         }
 
         void UpdateAI(uint32 diff)
@@ -1617,19 +1700,16 @@ public:
                 return;
             if (vehicle->IsVehicleInUse())
                 return;
-            Creature* darkrider = me->FindNearestCreature(NPC_DARK_RIDER_OF_ACHERUS, 30);
+            Creature* darkrider = me->FindNearestCreature(NPC_DARK_RIDER_OF_ACHERUS, 20);
             if (!darkrider)
                 return;
             if (darkrider->IsMounted())
                 return;
-
-            if (darkrider->IsAlive() && !darkrider->IsInCombat() && vehicle->HasEmptySeat(0))
+            if (darkrider->IsAlive() && !darkrider->IsInCombat() && vehicle->HasEmptySeat(0) && !darkrider->IsMounted())
             {
                 darkrider->EnterVehicle(me, 0);
                 return;
             }
-
-            printf("pferd müsste jetzt was tun???  \n");
         }
     };
 
@@ -1638,6 +1718,429 @@ public:
         return new npc_acherus_deathcharger_28782AI(creature);
     }
 };
+
+// 28658    // correct way: 52312 52314 52555 ...
+class npc_gothik_the_harvester_28658 : public CreatureScript
+{
+public:
+    npc_gothik_the_harvester_28658() : CreatureScript("npc_gothik_the_harvester_28658") { }
+
+    enum Creatures_SG
+    {
+        NPC_GHOULS = 28845,
+        NPC_GHOSTS = 28846,
+        SPELL_SCARLET_GHOUL_CREDIT = 52517,
+        QUEST_THE_GIFT_THAT_KEEPS_ON_GIVING = 12698,
+    };
+
+    struct npc_gothik_the_harvester_28658AI : public ScriptedAI
+    {
+        npc_gothik_the_harvester_28658AI(Creature* creature) : ScriptedAI(creature) { }
+
+        void MoveInLineOfSight(Unit* who) override
+        {
+            ScriptedAI::MoveInLineOfSight(who);
+
+            if (Creature* creature = who->ToCreature())
+                if (creature->GetEntry() == NPC_GHOULS && me->IsWithinDistInMap(who, 10.0f))
+                    if (Unit* owner = who->GetOwner())
+                        if (Player* player = owner->ToPlayer())
+                            if (player->GetQuestStatus(QUEST_THE_GIFT_THAT_KEEPS_ON_GIVING) == QUEST_STATUS_INCOMPLETE)
+                            {
+                                player->KilledMonsterCredit(NPC_GHOULS);
+                                creature->DespawnOrUnsummon();
+                                //player->RemoveAllMinionsByEntry(NPC_GHOSTS);
+                            }
+                            //  @todo Creatures must not be removed, but, must instead
+                            //  stand next to Gothik and be commanded into the pit
+        }                   //  and dig into the ground.
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_gothik_the_harvester_28658AI(creature);
+    }
+};
+
+// 28845 28846
+class npc_scarlet_ghoul_28845 : public CreatureScript
+{
+public:
+    npc_scarlet_ghoul_28845() : CreatureScript("npc_scarlet_ghoul_28845") { }
+
+    enum Creatures_SG
+    {
+        NPC_GHOULS = 28845,
+        NPC_GHOSTS = 28846,
+    };
+
+    struct npc_scarlet_ghoul_28845AI : public ScriptedAI
+    {
+        npc_scarlet_ghoul_28845AI(Creature* creature) : ScriptedAI(creature)
+        {
+            // Ghouls should display their Birth Animation
+            // Crawling out of the ground
+            //DoCast(me, 35177, true);
+            //me->MonsterSay("Mommy?", LANG_UNIVERSAL, 0);
+            me->SetReactState(REACT_DEFENSIVE);
+        }
+
+        void FindMinions(Unit* owner)
+        {
+            std::list<Creature*> MinionList;
+            owner->GetAllMinionsByEntry(MinionList, NPC_GHOULS);
+
+            if (!MinionList.empty())
+            {
+                for (std::list<Creature*>::const_iterator itr = MinionList.begin(); itr != MinionList.end(); ++itr)
+                {
+                    if ((*itr)->GetOwner()->GetGUID() == me->GetOwner()->GetGUID())
+                    {
+                        if ((*itr)->IsInCombat() && (*itr)->getAttackerForHelper())
+                        {
+                            AttackStart((*itr)->getAttackerForHelper());
+                        }
+                    }
+                }
+            }
+        }
+
+        void UpdateAI(uint32 /*diff*/) override
+        {
+            if (!me->IsInCombat())
+            {
+                if (Unit* owner = me->GetOwner())
+                {
+                    Player* plrOwner = owner->ToPlayer();
+                    if (plrOwner && plrOwner->IsInCombat())
+                    {
+                        if (plrOwner->getAttackerForHelper() && plrOwner->getAttackerForHelper()->GetEntry() == NPC_GHOSTS)
+                            AttackStart(plrOwner->getAttackerForHelper());
+                        else
+                            FindMinions(owner);
+                    }
+                }
+            }
+
+            if (!UpdateVictim() || !me->GetVictim())
+                return;
+
+            //ScriptedAI::UpdateAI(diff);
+            //Check if we have a current target
+            if (me->EnsureVictim()->GetEntry() == NPC_GHOSTS)
+            {
+                if (me->isAttackReady())
+                {
+                    //If we are within range melee the target
+                    if (me->IsWithinMeleeRange(me->GetVictim()))
+                    {
+                        me->AttackerStateUpdate(me->GetVictim());
+                        me->resetAttackTimer();
+                    }
+                }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_scarlet_ghoul_28845AI(creature);
+    }
+};
+
+// 28817
+class npc_scarlet_miner_cart_28817 : public CreatureScript
+{
+public:
+    npc_scarlet_miner_cart_28817() : CreatureScript("npc_scarlet_miner_cart_28817") { }
+
+    enum ScarletMinerCart
+    {
+        SPELL_CART_CHECK = 54173,
+        SPELL_SUMMON_CART = 52463,
+        SPELL_SUMMON_MINER = 52464,
+
+        NPC_MINER = 28841
+    };
+
+    struct npc_scarlet_miner_cart_28817AI : public PassiveAI
+    {
+        npc_scarlet_miner_cart_28817AI(Creature* creature) : PassiveAI(creature), _minerGUID(0), _playerGUID(0)
+        {
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+            me->SetDisplayId(me->GetCreatureTemplate()->Modelid1); // Modelid2 is a horse.
+        }
+
+        void JustSummoned(Creature* summon) override
+        {
+            if (summon->GetEntry() == NPC_MINER)
+            {
+                _minerGUID = summon->GetGUID();
+                summon->AI()->SetGUID(_playerGUID);
+            }
+        }
+
+        void SummonedCreatureDespawn(Creature* summon) override
+        {
+            if (summon->GetEntry() == NPC_MINER)
+                _minerGUID = 0;
+        }
+
+        void DoAction(int32 /*param*/) override
+        {
+            if (Creature* miner = ObjectAccessor::GetCreature(*me, _minerGUID))
+            {
+                me->SetWalk(false);
+
+                // Not 100% correct, but movement is smooth. Sometimes miner walks faster
+                // than normal, this speed is fast enough to keep up at those times.
+                me->SetSpeed(MOVE_RUN, 1.25f);
+
+                me->GetMotionMaster()->MoveFollow(miner, 1.0f, 0);
+            }
+        }
+
+        void PassengerBoarded(Unit* who, int8 /*seatId*/, bool apply) override
+        {
+            if (apply)
+            {
+                _playerGUID = who->GetGUID();
+                me->CastSpell((Unit*)NULL, SPELL_SUMMON_MINER, true);
+            }
+            else
+            {
+                _playerGUID = 0;
+                if (Creature* miner = ObjectAccessor::GetCreature(*me, _minerGUID))
+                    miner->DespawnOrUnsummon();
+            }
+        }
+
+    private:
+        uint64 _minerGUID;
+        uint64 _playerGUID;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_scarlet_miner_cart_28817AI(creature);
+    }
+};
+
+// 28841
+class npc_scarlet_miner_28841 : public CreatureScript
+{
+public:
+    npc_scarlet_miner_28841() : CreatureScript("npc_scarlet_miner_28841") { }
+
+    enum eMiner
+    {
+        SAY_SCARLET_MINER_0 = 0,
+        SAY_SCARLET_MINER_1 = 1,
+        SPELL_CART_DRAG = 52465,
+    };
+
+    struct npc_scarlet_miner_28841AI : public npc_escortAI
+    {
+        npc_scarlet_miner_28841AI(Creature* creature) : npc_escortAI(creature)
+        {
+            me->SetReactState(REACT_PASSIVE);
+        }
+
+        uint32 IntroTimer;
+        uint32 IntroPhase;
+        uint64 carGUID;
+
+        void Reset() override
+        {
+            carGUID = 0;
+            IntroTimer = 0;
+            IntroPhase = 0;
+        }
+
+        void IsSummonedBy(Unit* summoner) override
+        {
+            carGUID = summoner->GetGUID();
+        }
+
+        void InitWaypoint()
+        {
+            AddWaypoint(1, 2389.03f, -5902.74f, 109.014f, 5000);
+            AddWaypoint(2, 2341.812012f, -5900.484863f, 102.619743f);
+            AddWaypoint(3, 2306.561279f, -5901.738281f, 91.792419f);
+            AddWaypoint(4, 2300.098389f, -5912.618652f, 86.014885f);
+            AddWaypoint(5, 2294.142090f, -5927.274414f, 75.316849f);
+            AddWaypoint(6, 2286.984375f, -5944.955566f, 63.714966f);
+            AddWaypoint(7, 2280.001709f, -5961.186035f, 54.228283f);
+            AddWaypoint(8, 2259.389648f, -5974.197754f, 42.359348f);
+            AddWaypoint(9, 2242.882812f, -5984.642578f, 32.827850f);
+            AddWaypoint(10, 2217.265625f, -6028.959473f, 7.675705f);
+            AddWaypoint(11, 2202.595947f, -6061.325684f, 5.882018f);
+            AddWaypoint(12, 2188.974609f, -6080.866699f, 3.370027f);
+
+            if (urand(0, 1))
+            {
+                AddWaypoint(13, 2176.483887f, -6110.407227f, 1.855181f);
+                AddWaypoint(14, 2172.516602f, -6146.752441f, 1.074235f);
+                AddWaypoint(15, 2138.918457f, -6158.920898f, 1.342926f);
+                AddWaypoint(16, 2129.866699f, -6174.107910f, 4.380779f);
+                AddWaypoint(17, 2117.709473f, -6193.830078f, 13.3542f, 10000);
+            }
+            else
+            {
+                AddWaypoint(13, 2184.190186f, -6166.447266f, 0.968877f);
+                AddWaypoint(14, 2234.265625f, -6163.741211f, 0.916021f);
+                AddWaypoint(15, 2268.071777f, -6158.750977f, 1.822252f);
+                AddWaypoint(16, 2270.028320f, -6176.505859f, 6.340538f);
+                AddWaypoint(17, 2271.739014f, -6195.401855f, 13.3542f, 10000);
+            }
+        }
+
+        void SetGUID(uint64 guid, int32 /*id = 0*/) override
+        {
+            InitWaypoint();
+            Start(false, false, guid);
+            SetDespawnAtFar(false);
+        }
+
+        void WaypointReached(uint32 waypointId) override
+        {
+            switch (waypointId)
+            {
+            case 1:
+                if (Unit* car = ObjectAccessor::GetCreature(*me, carGUID))
+                    me->SetFacingToObject(car);
+                Talk(SAY_SCARLET_MINER_0);
+                SetRun(true);
+                IntroTimer = 4000;
+                IntroPhase = 1;
+                break;
+            case 17:
+                if (Unit* car = ObjectAccessor::GetCreature(*me, carGUID))
+                {
+                    me->SetFacingToObject(car);
+                    car->Relocate(car->GetPositionX(), car->GetPositionY(), me->GetPositionZ() + 1);
+                    car->StopMoving();
+                    car->RemoveAura(SPELL_CART_DRAG);
+                }
+                Talk(SAY_SCARLET_MINER_1);
+                break;
+            default:
+                break;
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (IntroPhase)
+            {
+                if (IntroTimer <= diff)
+                {
+                    if (IntroPhase == 1)
+                    {
+                        if (Creature* car = Unit::GetCreature(*me, carGUID))
+                            DoCast(car, SPELL_CART_DRAG);
+                        IntroTimer = 800;
+                        IntroPhase = 2;
+                    }
+                    else
+                    {
+                        if (Creature* car = Unit::GetCreature(*me, carGUID))
+                            car->AI()->DoAction(0);
+                        IntroPhase = 0;
+                    }
+                }
+                else
+                    IntroTimer -= diff;
+            }
+            npc_escortAI::UpdateAI(diff);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_scarlet_miner_28841AI(creature);
+    }
+};
+
+// 28907  prince_valanar
+class npc_prince_valanar_28907 : public CreatureScript
+{
+public:
+    npc_prince_valanar_28907() : CreatureScript("npc_prince_valanar_28907") { }
+
+    struct npc_prince_valanar_28907AI : public ScriptedAI
+    {
+        npc_prince_valanar_28907AI(Creature* creature) : ScriptedAI(creature) { }
+
+        uint32 m_phase;
+        uint32 m_timer;
+        uint32 m_say;
+        
+        void Reset() override
+        {
+            m_phase = 0;
+            m_timer = 1000;
+            m_say = 0;
+            me->SetWalk(true);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (m_timer <= diff)
+            {
+                DoWork();
+            }
+            else
+                m_timer -= diff;
+        }
+
+        void DoWork()
+        {
+            m_phase++;
+            switch (m_phase)
+            {
+            case 1:
+                me->GetMotionMaster()->MovePoint(1, 2321.48f, -5739.86f, 153.92f);
+                m_timer = 2000;
+                break;
+            case 2:
+                me->SetFacingTo(0.7f);
+                Talk(m_say);
+                m_timer = urand(5000, 8000);
+                break;
+            case 3:
+                me->GetMotionMaster()->MovePoint(1, 2319.13f, -5736.79f, 153.92f);
+                m_timer = 2000;
+                break;
+            case 4:
+                me->SetFacingTo(0.7f);
+                Talk(m_say);
+                m_timer = urand(5000, 8000);
+                break;
+            case 5:
+                me->GetMotionMaster()->MovePoint(1, 2316.30f, -5733.26f, 153.92f);
+                m_timer = 2000;
+                break;
+            case 6:
+                me->SetFacingTo(0.7f);
+                Talk(m_say);
+                m_timer = urand(5000, 8000);
+                m_phase = 0;
+                break;
+            }
+
+            m_say++;
+            if (m_say > 14)
+                m_say = 0;
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_prince_valanar_28907AI(creature);
+    }
+};
+
 
 
 void AddSC_the_scarlet_enclave()
@@ -1651,7 +2154,13 @@ void AddSC_the_scarlet_enclave()
     new go_acherus_soul_prison();
     new npc_eye_of_acherus();
     new npc_dark_rider_of_acherus();
-    new npc_salanar_the_horseman();
+    new npc_salanar_the_horseman_28653();
+    new npc_salanar_the_horseman_28788();
     new npc_dark_rider_of_acherus_28768();
     new npc_acherus_deathcharger_28782();
+    new npc_gothik_the_harvester_28658();
+    new npc_scarlet_ghoul_28845();
+    new npc_scarlet_miner_cart_28817();
+    new npc_scarlet_miner_28841();
+    new npc_prince_valanar_28907();
 }
