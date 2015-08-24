@@ -42,10 +42,12 @@ enum GuardGeneric
 
     SAY_GUARD_SIL_AGGRO             = 0,
 
-    NPC_CENARION_HOLD_INFANTRY      = 15184,
     NPC_STORMWIND_CITY_GUARD        = 68,
+    NPC_STORMWIND_ROYAL_GUARD       = 1756,
     NPC_STORMWIND_CITY_PATROLLER    = 1976,
-    NPC_ORGRIMMAR_GRUNT             = 3296
+    NPC_ORGRIMMAR_GRUNT             = 3296,
+    NPC_KORKRON_ELITE               = 14304,
+    NPC_CENARION_HOLD_INFANTRY      = 15184,
 };
 
 class guard_generic : public CreatureScript
@@ -61,6 +63,8 @@ public:
         {
             globalCooldown = 0;
             buffTimer = 0;
+            m_timer1 = 1000;
+            m_timer2 = 1000;
         }
 
         void EnterCombat(Unit* who) override
@@ -73,6 +77,8 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
+            DoWork(diff);
+
              //Always decrease our global cooldown first
             if (globalCooldown > diff)
                 globalCooldown -= diff;
@@ -237,10 +243,106 @@ public:
 
             DoReplyToTextEmote(textEmote);
         }
+        
+        void DoWork(uint32 diff)
+        {
+            if (m_timer1 < diff)
+            {
+                m_timer1 = 1000;
+                DoWorkForQuest13188();
+            }
+            else
+                m_timer1 -= diff;
+
+            if (m_timer2 < diff)
+            {
+                m_timer2 = 1000;
+                DoWorkForQuest13189();
+            }
+            else
+                m_timer2 -= diff;
+        }
+
+        void DoWorkForQuest13188() // ally
+        {
+            if (me->GetZoneId() != 1519)
+                return;
+            if (me->GetEntry() != 68 && me->GetEntry() != 1756 && me->GetEntry() != 1976)
+                return;
+            Player* player = me->FindNearestPlayer(10.0f);
+            if (!player || player->GetQuestStatus(13188) != QUEST_STATE_COMPLETE)
+                return;
+            switch (urand(1,25))
+            {
+                case 1:
+                    me->CastSpell(player, 58511);
+                    Talk(2);
+                    m_timer1 = 8000;
+                    break;
+                case 2:
+                    me->CastSpell(player, 58514);
+                    Talk(3);
+                    m_timer1 = 8000;
+                    break;
+                case 3:
+                    me->CastSpell(player, 58519);
+                    Talk(4);
+                    m_timer1 = 8000;
+                    break;
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                    Talk(5);
+                    m_timer1 = 8000;
+                    break;
+             }
+
+        }
+
+        void DoWorkForQuest13189() // horde
+        {
+            if (me->GetZoneId() != 1637 || me->GetEntry() != 14304)
+                return;
+            Player* player = me->FindNearestPlayer(10.0f);
+            if (!player || player->GetQuestStatus(13189) != QUEST_STATE_COMPLETE)
+                return;
+            switch (urand(1, 25))
+            {
+            case 1:
+                me->CastSpell(player, 58511);
+                Talk(2);
+                m_timer2 = 8000;
+                break;
+            case 2:
+                me->CastSpell(player, 58514);
+                Talk(3);
+                m_timer2 = 8000;
+                break;
+            case 3:
+                me->CastSpell(player, 58519);
+                Talk(4);
+                m_timer2 = 8000;
+                break;
+            case 4:
+            case 5:
+            case 6:
+            case 7:
+            case 8:
+            case 9:
+                Talk(5);
+                m_timer2 = 8000;
+                break;
+            }
+        }
 
     private:
         uint32 globalCooldown;
         uint32 buffTimer;
+        uint32 m_timer1;
+        uint32 m_timer2;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
