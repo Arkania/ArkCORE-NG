@@ -23,6 +23,7 @@
 #include "Player.h"
 #include "CreatureTextMgr.h"
 #include "Vehicle.h"
+#include "GameObjectAI.h"
 
 // npc 28534
 class npc_valkyr_battle_maiden : public CreatureScript
@@ -1749,7 +1750,6 @@ public:
                             {
                                 player->KilledMonsterCredit(NPC_GHOULS);
                                 creature->DespawnOrUnsummon();
-                                //player->RemoveAllMinionsByEntry(NPC_GHOSTS);
                             }
                             //  @todo Creatures must not be removed, but, must instead
                             //  stand next to Gothik and be commanded into the pit
@@ -2142,6 +2142,163 @@ public:
 };
 
 
+//28610, 28939, 28940
+class npc_crusade_persuaded_28610 : public CreatureScript
+{
+public:
+    npc_crusade_persuaded_28610() : CreatureScript("npc_crusade_persuaded_28610") { }
+
+    enum win_friends
+    {
+        SAY_PLAYER = 1,
+        SAY_CRUSADER = 2,
+        SAY_BREAK1 = 3,
+        SAY_BREAK2 = 4,
+        SAY_BREAK3 = 5,
+        SAY_BREAK4 = 6,
+        SAY_BREAK5 = 7,
+        SAY_BREAK6 = 8,
+        SAY_DEAD1 = 9,
+        SPELL_PERSUASIVE_STRIKE = 52781,
+        SPELL_THREAT_PULSE = 58111,
+        QUEST_HOW_TO_WIN_FRIENDS = 12720,
+    };
+
+    struct npc_crusade_persuaded_28610AI : public ScriptedAI
+    {
+        npc_crusade_persuaded_28610AI(Creature* creature) : ScriptedAI(creature) { }
+
+        uint32 speechTimer;
+        uint32 speechCounter;
+        uint64 playerGUID;
+
+        void Reset() override
+        {
+            speechTimer = 0;
+            speechCounter = 0;
+            playerGUID = 0;
+            me->SetReactState(REACT_AGGRESSIVE);
+            me->RestoreFaction();
+        }
+
+        void DamageTaken(Unit* attacker, uint32& damage) 
+        { 
+            switch (speechCounter)
+            {
+            case 0:
+                return;
+                break;
+            case 1:
+                if (me->GetHealthPct() < 20)
+                {
+                    damage = 1;
+                    speechCounter++;
+                }
+                break;
+            default:
+                damage /= 2;
+                break;
+            }
+        }
+
+        void SpellHit(Unit* caster, const SpellInfo* spell) override
+        {
+            if (spell->Id == SPELL_PERSUASIVE_STRIKE && caster->GetTypeId() == TYPEID_PLAYER && me->IsAlive() && !speechCounter)
+            {
+                if (Player* player = caster->ToPlayer())
+                {
+                    if (player->GetQuestStatus(QUEST_HOW_TO_WIN_FRIENDS) == QUEST_STATUS_INCOMPLETE)
+                    {
+                        playerGUID = player->GetGUID();
+                        speechTimer = 500;
+                        speechCounter = 1;
+                    }
+                }
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (speechCounter)
+            {
+                if (speechTimer <= diff)
+                {
+                    Player* player = ObjectAccessor::GetPlayer(*me, playerGUID);
+                    if (!player)
+                    {
+                        EnterEvadeMode();
+                        return;
+                    }
+
+                    switch (speechCounter)
+                    {
+                    case 1:
+                        sCreatureTextMgr->SendChat(me, SAY_PLAYER, NULL, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_NORMAL, 0, TEAM_OTHER, false, player);
+                        Talk(SAY_CRUSADER);
+                        speechTimer = 8000;
+                        break;
+                    case 2:
+                        Talk(SAY_BREAK1);
+                        me->setFaction(player->getFaction());
+                        me->CombatStop(true);
+                        me->GetMotionMaster()->MoveIdle();
+                        me->SetReactState(REACT_PASSIVE);
+                        DoCastAOE(SPELL_THREAT_PULSE, true);
+                        speechTimer = 8000;
+                        break;
+                    case 3:
+                        Talk(SAY_BREAK2);
+                        speechTimer = 8000;
+                        break;
+                    case 4:
+                        Talk(SAY_BREAK3);
+                        speechTimer = 8000;
+                        break;
+                    case 5:
+                        Talk(SAY_BREAK4);
+                        speechTimer = 8000;
+                        break;
+                    case 6:
+                        sCreatureTextMgr->SendChat(me, SAY_BREAK5, NULL, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_NORMAL, 0, TEAM_OTHER, false, player);
+                        speechTimer = 8000;
+                        break;
+                    case 7:
+                        Talk(SAY_BREAK6);
+                        speechTimer = 8000;
+                        break;
+                    case 8:
+                        Talk(SAY_DEAD1);
+                        player->Kill(me);
+                        speechCounter = 0;
+                        player->GroupEventHappens(QUEST_HOW_TO_WIN_FRIENDS, me);
+                        return;
+                    }
+
+                    if (speechCounter > 1)
+                        ++speechCounter;
+
+                    DoCastAOE(SPELL_THREAT_PULSE, true);
+
+                }
+                else
+                    speechTimer -= diff;
+
+                return;
+            }
+
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_crusade_persuaded_28610AI(creature);
+    }
+};
+
 
 void AddSC_the_scarlet_enclave()
 {
@@ -2163,4 +2320,5 @@ void AddSC_the_scarlet_enclave()
     new npc_scarlet_miner_cart_28817();
     new npc_scarlet_miner_28841();
     new npc_prince_valanar_28907();
+    new npc_crusade_persuaded_28610();
 }

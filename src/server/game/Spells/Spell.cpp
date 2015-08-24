@@ -4737,18 +4737,23 @@ void Spell::HandleEffects(Unit* pUnitTarget, Item* pItemTarget, GameObject* pGOT
     }
 }
 
-enum GilneasValues
-{
-    NPC_KRENNAN_ARANAS                  = 35753,    
-    SPELL_RESCUE_KRENNAN_ARANAS         = 68219,
-};
-
 SpellCastResult Spell::CheckCast(bool strict)
 {
+    enum eCheckCast
+    {
+        NPC_KRENNAN_ARANAS = 35753,
+        SPELL_RESCUE_KRENNAN_ARANAS = 68219,
+    };
+
     Unit* Target = m_targets.GetUnitTarget();
 
     switch (m_spellInfo->Id)
     {
+    case 52781:
+        if (Player* player = m_caster->ToPlayer())
+            if (player->GetQuestStatus(12720) == QUEST_STATUS_INCOMPLETE)
+                return SPELL_CAST_OK;
+        break;
     case 68219:
         if (Unit* unit = this->GetOriginalCaster())
             if (Vehicle* horse = unit->GetVehicle())
