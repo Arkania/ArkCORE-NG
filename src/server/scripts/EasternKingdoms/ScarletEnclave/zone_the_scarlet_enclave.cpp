@@ -2141,7 +2141,6 @@ public:
     }
 };
 
-
 //28610, 28939, 28940
 class npc_crusade_persuaded_28610 : public CreatureScript
 {
@@ -2177,8 +2176,6 @@ public:
             speechTimer = 0;
             speechCounter = 0;
             playerGUID = 0;
-            me->SetReactState(REACT_AGGRESSIVE);
-            me->RestoreFaction();
         }
 
         void DamageTaken(Unit* attacker, uint32& damage) 
@@ -2268,6 +2265,8 @@ public:
                         break;
                     case 8:
                         Talk(SAY_DEAD1);
+                        me->SetReactState(REACT_AGGRESSIVE);
+                        me->RestoreFaction();
                         player->Kill(me);
                         speechCounter = 0;
                         player->GroupEventHappens(QUEST_HOW_TO_WIN_FRIENDS, me);
@@ -2298,6 +2297,7 @@ public:
         return new npc_crusade_persuaded_28610AI(creature);
     }
 };
+
 
 
 void AddSC_the_scarlet_enclave()
