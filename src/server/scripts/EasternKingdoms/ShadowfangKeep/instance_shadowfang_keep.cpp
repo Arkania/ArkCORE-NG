@@ -29,6 +29,7 @@ EndScriptData */
 #include "InstanceScript.h"
 #include "shadowfang_keep.h"
 #include "TemporarySummon.h"
+#include "GroupMgr.h"
 
 enum Apothecary
 {
@@ -42,20 +43,6 @@ enum Yells
     SAY_ARCHMAGE            = 0
 };
 
-enum Creatures
-{
-    NPC_ASH                 = 3850,
-    NPC_ADA                 = 3849,
-    NPC_ARCHMAGE_ARUGAL     = 4275,
-    NPC_ARUGAL_VOIDWALKER   = 4627
-};
-
-enum GameObjects
-{
-    GO_COURTYARD_DOOR       = 18895, //door to open when talking to NPC's
-    GO_SORCERER_DOOR        = 18972, //door to open when Fenrus the Devourer
-    GO_ARUGAL_DOOR          = 18971  //door to open when Wolf Master Nandos
-};
 
 enum Spells
 {
@@ -75,81 +62,91 @@ class instance_shadowfang_keep : public InstanceMapScript
 public:
     instance_shadowfang_keep() : InstanceMapScript("instance_shadowfang_keep", 33) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const override
-    {
-        return new instance_shadowfang_keep_InstanceMapScript(map);
-    }
-
     struct instance_shadowfang_keep_InstanceMapScript : public InstanceScript
     {
         instance_shadowfang_keep_InstanceMapScript(Map* map) : InstanceScript(map) { }
 
-        uint32 m_auiEncounter[MAX_ENCOUNTER];
-        std::string str_data;
-
-        uint64 uiAshGUID;
-        uint64 uiAdaGUID;
-        uint64 uiArchmageArugalGUID;
-
-        uint64 DoorCourtyardGUID;
-        uint64 DoorSorcererGUID;
-        uint64 DoorArugalGUID;
-
-        uint64 fryeGUID;
-        uint64 hummelGUID;
-        uint64 baxterGUID;
-        uint32 spawnCrazedTimer;
-
-        uint64 LordWaldenGUID;
-        uint64 uiBaronAshbury;
-        uint64 uiBaronSilverlaine;
-        uint64 uiCommanderSpringvale;
-        uint64 uiLordGodfrey;
-
-        uint8 uiPhase;
-        uint16 uiTimer;
-
         void Initialize() override
         {
-            memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
+            SetBossNumber(MAX_BOSS_ENCOUNTER);
+            LoadDoorData(doorData);
 
-            uiAshGUID = 0;
-            uiAdaGUID = 0;
-            uiArchmageArugalGUID = 0;
+            for (uint8 i = 0; i < MAX_DATA_ENCOUNTER; ++i)
+                m_ListOfGUID[i] = 0;
 
-            DoorCourtyardGUID = 0;
-            DoorSorcererGUID = 0;
-            DoorArugalGUID = 0;
-
-            fryeGUID = 0;
-            hummelGUID = 0;
-            baxterGUID = 0;
-
-            LordWaldenGUID = 0;
-            uiBaronAshbury = 0;
-            uiBaronSilverlaine = 0;
-            uiCommanderSpringvale = 0;
-            uiLordGodfrey = 0;
+            for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
+                m_ListOfEncounters[i] = 0;
 
             uiPhase = 0;
             uiTimer = 0;
+            spawnCrazedTimer = 0;
+            m_IsHeroicMode = false;
+            m_TeamId = TEAM_NEUTRAL;
+            m_Group = NULL;
+            m_GroupSize = 0;
+            m_isSpecialNpcSpawned = false;
+        }
+
+        void OnPlayerEnter(Player* player)
+        {
+            if (player->GetGroup()->IsLeader(player->GetGUID()))
+            {
+                m_IsHeroicMode = player->GetMap()->IsHeroic();
+                m_GroupSize = player->GetGroup()->GetMembersCount();
+                m_Group = player->GetGroup();
+                m_TeamId = player->GetTeamId();
+
+                if (!m_isSpecialNpcSpawned)
+                    SummonAllSpecialNpc();
+            }            
         }
 
         void OnCreatureCreate(Creature* creature) override
         {
             switch (creature->GetEntry())
             {
-                case NPC_ASH: uiAshGUID = creature->GetGUID(); break;
-                case NPC_ADA: uiAdaGUID = creature->GetGUID(); break;
-                case NPC_ARCHMAGE_ARUGAL: uiArchmageArugalGUID = creature->GetGUID(); break;
-                case NPC_FRYE: fryeGUID = creature->GetGUID(); break;
-                case NPC_HUMMEL: hummelGUID = creature->GetGUID(); break;
-                case NPC_BAXTER: baxterGUID = creature->GetGUID(); break;
-                case BOSS_BARON_ASHBURY: uiBaronAshbury = creature->GetGUID();        break;
-                case BOSS_BARON_SILVERLAINE: uiBaronSilverlaine = creature->GetGUID();    break;
-                case BOSS_COMMANDER_SPRINGVALE: uiCommanderSpringvale = creature->GetGUID(); break;
-                case BOSS_LORD_GODFREY: uiLordGodfrey = creature->GetGUID();         break;
-                case BOSS_LORD_WALDEN: LordWaldenGUID = creature->GetGUID(); break;
+            case NPC_ASH: 
+                m_ListOfGUID[DATA_ASH] = creature->GetGUID();
+                break;
+            case NPC_ADA:
+                m_ListOfGUID[DATA_ADA] = creature->GetGUID(); 
+                break;
+            case NPC_ARCHMAGE_ARUGAL:
+                m_ListOfGUID[DATA_ARCHMAGE_ARUGAL] = creature->GetGUID(); 
+                break;
+            case NPC_ARUGAL_VOIDWALKER:
+                m_ListOfGUID[DATA_ARUGAL_VOIDWALKER] = creature->GetGUID();
+                break;
+            case NPC_FRYE:
+                m_ListOfGUID[DATA_FRYE] = creature->GetGUID();
+                break;
+            case NPC_HUMMEL: 
+                m_ListOfGUID[DATA_HUMMEL] = creature->GetGUID();
+                break;
+            case NPC_BAXTER: 
+                m_ListOfGUID[DATA_BAXTER] = creature->GetGUID();
+                break;
+            case NPC_TORMENTED_OFFICER:
+                m_ListOfGUID[DATA_TORMENTED_OFFICER] = creature->GetGUID();
+                break;
+            case NPC_WAILING_GUARDSMAN:
+                m_ListOfGUID[DATA_WAILING_GUARDSMAN] = creature->GetGUID();
+                break;
+            case BOSS_LORD_WALDEN:
+                m_ListOfGUID[DATA_LORD_WALDEN] = creature->GetGUID();
+                break;
+            case BOSS_BARON_ASHBURY:
+                m_ListOfGUID[DATA_BARON_ASHBURY] = creature->GetGUID();
+                break;
+            case BOSS_BARON_SILVERLAINE: 
+                m_ListOfGUID[DATA_BARON_SILVERLAINE] = creature->GetGUID();
+                break;
+            case BOSS_COMMANDER_SPRINGVALE: 
+                m_ListOfGUID[DATA_COMMANDER_SPRINGVALE] = creature->GetGUID();
+                break;
+            case BOSS_LORD_GODFREY: 
+                m_ListOfGUID[DATA_LORD_GODFREY] = creature->GetGUID();
+                break;
             }
         }
 
@@ -157,28 +154,31 @@ public:
         {
             switch (go->GetEntry())
             {
-                case GO_COURTYARD_DOOR:
-                    DoorCourtyardGUID = go->GetGUID();
-                    if (m_auiEncounter[0] == DONE)
-                        HandleGameObject(0, true, go);
-                    break;
-                case GO_SORCERER_DOOR:
-                    DoorSorcererGUID = go->GetGUID();
-                    if (m_auiEncounter[2] == DONE)
-                        HandleGameObject(0, true, go);
-                    break;
-                case GO_ARUGAL_DOOR:
-                    DoorArugalGUID = go->GetGUID();
-                    if (m_auiEncounter[3] == DONE)
-                        HandleGameObject(0, true, go);
-                    break;
+            case GO_COURTYARD_DOOR:
+                m_ListOfGUID[DATA_COURTYARD_DOOR] = go->GetGUID();
+                AddDoor(go, true);
+                if (m_ListOfEncounters[DOOR_COURTYARD] == DONE)
+                    HandleGameObject(0, true, go);
+                break;
+            case GO_SORCERER_DOOR:
+                m_ListOfGUID[DATA_SORCERER_DOOR] = go->GetGUID();
+                AddDoor(go, true);
+                if (m_ListOfEncounters[DOOR_SORCERER] == DONE)
+                    HandleGameObject(0, true, go);
+                break;
+            case GO_ARUGAL_DOOR:
+                m_ListOfGUID[DATA_ARUGAL_DOOR] = go->GetGUID();
+                AddDoor(go, true);
+                if (m_ListOfEncounters[DOOR_ARUGAL] == DONE)
+                    HandleGameObject(0, true, go);
+                break;
             }
         }
 
         void DoSpeech()
         {
-            Creature* pAda = instance->GetCreature(uiAdaGUID);
-            Creature* pAsh = instance->GetCreature(uiAshGUID);
+            Creature* pAda = instance->GetCreature(m_ListOfGUID[DATA_ADA]);
+            Creature* pAsh = instance->GetCreature(m_ListOfGUID[DATA_ASH]);
 
             if (pAda && pAda->IsAlive() && pAsh && pAsh->IsAlive())
             {
@@ -187,57 +187,20 @@ public:
             }
         }
 
-        void SetData(uint32 type, uint32 data) override
+        void SetData(uint32 State, uint32 Value) override
         {
-            switch (type)
-            {
-                case TYPE_FREE_NPC:
-                    if (data == DONE)
-                        DoUseDoorOrButton(DoorCourtyardGUID);
-                    m_auiEncounter[0] = data;
-                    break;
-                case TYPE_RETHILGORE:
-                    if (data == DONE)
-                        DoSpeech();
-                    m_auiEncounter[1] = data;
-                    break;
-                case DATA_LORD_WALDEN_EVENT:
-                    if (data == DONE)
-                        DoUseDoorOrButton(DoorSorcererGUID);
-                    m_auiEncounter[2] = data;
-                    break;
-                case TYPE_NANDOS:
-                    if (data == DONE)
-                        DoUseDoorOrButton(DoorArugalGUID);
-                    m_auiEncounter[3] = data;
-                    break;
-                case TYPE_CROWN:
-                    if (data == NOT_STARTED)
-                        spawnCrazedTimer = urand(7000, 14000);
-                    m_auiEncounter[4] = data;
-                    break;
-                case DATA_BARON_ASHBURY_EVENT:
-                    m_auiEncounter[5] = data;
-                    break;
-                case DATA_BARON_SILVERLAINE_EVENT:
-                    m_auiEncounter[6] = data;
-                    break;
-                case DATA_COMMANDER_SPRINGVALE_EVENT:
-                    m_auiEncounter[7] = data;
-                    break;
-                case DATA_LORD_GODFREY_EVENT:
-                    m_auiEncounter[8] = data;
-                    break;
-                default:
-                    break;
-            }
+            if (State < MAX_DATA_ENCOUNTER)
+                SetBossState(State, EncounterState(Value));
 
-            if (data == DONE)
+            if (State == DONE)
             {
                 OUT_SAVE_INST_DATA;
 
                 std::ostringstream saveStream;
-                saveStream << m_auiEncounter[0] << ' ' << m_auiEncounter[1] << ' ' << m_auiEncounter[2] << ' ' << m_auiEncounter[3] << ' ' << m_auiEncounter[4] << ' ' << m_auiEncounter[5] << ' ' << m_auiEncounter[6] << ' ' << m_auiEncounter[7] << ' ' << m_auiEncounter[8];
+                saveStream << "S K " << GetBossSaveData();
+                    
+                for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
+                    saveStream << ' ' << m_ListOfEncounters[i];
 
                 str_data = saveStream.str();
 
@@ -246,46 +209,19 @@ public:
             }
         }
 
-        uint32 GetData(uint32 type) const override
+        uint32 GetData(uint32 DataId) const override
         {
-            switch (type)
-            {
-                case TYPE_FREE_NPC:
-                    return m_auiEncounter[0];
-                case TYPE_RETHILGORE:
-                    return m_auiEncounter[1];
-                case DATA_LORD_WALDEN_EVENT:
-                    return m_auiEncounter[2];
-                case TYPE_NANDOS:
-                    return m_auiEncounter[3];
-                case TYPE_CROWN:
-                    return m_auiEncounter[4];
-                case DATA_BARON_ASHBURY_EVENT:
-                    return m_auiEncounter[5];
-                case DATA_BARON_SILVERLAINE_EVENT:
-                    return m_auiEncounter[6];
-                case DATA_COMMANDER_SPRINGVALE_EVENT:
-                    return m_auiEncounter[7];
-                case DATA_LORD_GODFREY_EVENT:
-                    return m_auiEncounter[8];
-            }
+            if (DataId < MAX_DATA_ENCOUNTER)
+                GetBossState(DataId);
+            
             return 0;
         }
 
-        uint64 GetData64(uint32 id) const
+        uint64 GetData64(uint32 identifier) const
         {
-            switch(id)
-            {
-                case DATA_DOOR:   return DoorCourtyardGUID;
-                case DATA_FRYE:   return fryeGUID;
-                case DATA_HUMMEL: return hummelGUID;
-                case DATA_BAXTER: return baxterGUID;
-                case DATA_LORD_WALDEN: return LordWaldenGUID;
-                case DATA_BARON_ASHBURY: return uiBaronAshbury;
-                case DATA_BARON_SILVERLAINE: return uiBaronSilverlaine;
-                case DATA_COMMANDER_SPRINGVALE: return uiCommanderSpringvale;
-                case DATA_LORD_GODFREY: return uiLordGodfrey;
-            }
+            if (identifier < MAX_DATA_ENCOUNTER)
+                return m_ListOfGUID[identifier];
+
             return 0;
         }
 
@@ -304,13 +240,28 @@ public:
 
             OUT_LOAD_INST_DATA(in);
 
+            char dataHead1, dataHead2;
             std::istringstream loadStream(in);
-            loadStream >> m_auiEncounter[0] >> m_auiEncounter[1] >> m_auiEncounter[2] >> m_auiEncounter[3] >> m_auiEncounter[4] >> m_auiEncounter[5] >> m_auiEncounter[6] >> m_auiEncounter[7] >> m_auiEncounter[8];
+            loadStream >> dataHead1 >> dataHead2;
 
-            for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
+            if (dataHead1 == 'S' && dataHead2 == 'K')
             {
-                if (m_auiEncounter[i] == IN_PROGRESS)
-                    m_auiEncounter[i] = NOT_STARTED;
+                for (uint32 i = 0; i < MAX_BOSS_ENCOUNTER; ++i)
+                {
+                    uint32 tmpState;
+                    loadStream >> tmpState;
+                    if (tmpState == IN_PROGRESS || tmpState > SPECIAL)
+                        tmpState = NOT_STARTED;
+                    SetBossState(i, EncounterState(tmpState));
+                }
+                for (uint32 i = 0; i < MAX_ENCOUNTER; ++i)
+                {
+                    uint32 tmpState;
+                    loadStream >> tmpState;
+                    if (tmpState == IN_PROGRESS || tmpState > SPECIAL)
+                        tmpState = NOT_STARTED;
+                    m_ListOfEncounters[i] = tmpState;
+                }
             }
 
             OUT_LOAD_INST_DATA_COMPLETE;
@@ -322,7 +273,7 @@ public:
             {
                 if (spawnCrazedTimer <= uiDiff)
                 {
-                    if (Creature* hummel = instance->GetCreature(hummelGUID))
+                    if (Creature* hummel = instance->GetCreature(m_ListOfGUID[DATA_HUMMEL]))
                         hummel->AI()->DoAction(ACTION_SPAWN_CRAZED);
                     spawnCrazedTimer = urand(2000, 5000);
                 }
@@ -333,7 +284,7 @@ public:
             if (GetData(TYPE_FENRUS) != DONE)
                 return;
 
-            Creature* pArchmage = instance->GetCreature(uiArchmageArugalGUID);
+            Creature* pArchmage = instance->GetCreature(m_ListOfGUID[DATA_ARCHMAGE_ARUGAL]);
 
             if (!pArchmage || !pArchmage->IsAlive())
                 return;
@@ -344,33 +295,64 @@ public:
                 {
                     switch (uiPhase)
                     {
-                        case 1:
-                        {
-                            Creature* summon = pArchmage->SummonCreature(pArchmage->GetEntry(), SpawnLocation[4], TEMPSUMMON_TIMED_DESPAWN, 10000);
-                            summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-                            summon->SetReactState(REACT_DEFENSIVE);
-                            summon->CastSpell(summon, SPELL_ASHCROMBE_TELEPORT, true);
-                            summon->AI()->Talk(SAY_ARCHMAGE);
-                            uiTimer = 2000;
-                            uiPhase = 2;
-                            break;
-                        }
-                        case 2:
-                        {
-                            pArchmage->SummonCreature(NPC_ARUGAL_VOIDWALKER, SpawnLocation[0], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000);
-                            pArchmage->SummonCreature(NPC_ARUGAL_VOIDWALKER, SpawnLocation[1], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000);
-                            pArchmage->SummonCreature(NPC_ARUGAL_VOIDWALKER, SpawnLocation[2], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000);
-                            pArchmage->SummonCreature(NPC_ARUGAL_VOIDWALKER, SpawnLocation[3], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000);
-                            uiPhase = 0;
-                            break;
-                        }
+                    case 1:
+                    {
+                        Creature* summon = pArchmage->SummonCreature(pArchmage->GetEntry(), SpawnLocation[4], TEMPSUMMON_TIMED_DESPAWN, 10000);
+                        summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                        summon->SetReactState(REACT_DEFENSIVE);
+                        summon->CastSpell(summon, SPELL_ASHCROMBE_TELEPORT, true);
+                        summon->AI()->Talk(SAY_ARCHMAGE);
+                        uiTimer = 2000;
+                        uiPhase = 2;
+                        break;
+                    }
+                    case 2:
+                    {
+                        pArchmage->SummonCreature(NPC_ARUGAL_VOIDWALKER, SpawnLocation[0], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000);
+                        pArchmage->SummonCreature(NPC_ARUGAL_VOIDWALKER, SpawnLocation[1], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000);
+                        pArchmage->SummonCreature(NPC_ARUGAL_VOIDWALKER, SpawnLocation[2], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000);
+                        pArchmage->SummonCreature(NPC_ARUGAL_VOIDWALKER, SpawnLocation[3], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000);
+                        uiPhase = 0;
+                        break;
+                    }
 
                     }
-                } else uiTimer -= uiDiff;
+                }
+                else uiTimer -= uiDiff;
             }
         }
+
+        void SummonAllSpecialNpc()
+        {
+            m_isSpecialNpcSpawned = true;
+            if (m_TeamId == TEAM_HORDE || m_TeamId == TEAM_NEUTRAL)
+            {
+
+            }
+            if (m_TeamId == TEAM_ALLIANCE || m_TeamId == TEAM_NEUTRAL)
+            {
+
+            }
+        }
+
+    private:
+        uint64 m_ListOfGUID[MAX_DATA_ENCOUNTER];
+        uint32 m_ListOfEncounters[MAX_ENCOUNTER];
+        std::string str_data;
+        uint32 uiPhase;
+        uint32 uiTimer;
+        uint32 spawnCrazedTimer;
+        bool m_IsHeroicMode;
+        uint8 m_TeamId;
+        Group* m_Group;
+        uint32 m_GroupSize;
+        bool m_isSpecialNpcSpawned;
     };
 
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
+    {
+        return new instance_shadowfang_keep_InstanceMapScript(map);
+    }
 };
 
 void AddSC_instance_shadowfang_keep()

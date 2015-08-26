@@ -20,36 +20,79 @@
 #ifndef DEF_SHADOWFANG_H
 #define DEF_SHADOWFANG_H
 
-#define MAX_ENCOUNTER              9
+#define SKScriptName    "instance_shadowfang_keep"
+#define SKScriptId      33
 
-enum DataTypes
+enum Bosses
 {
-    TYPE_FREE_NPC                     = 1,
-    TYPE_RETHILGORE                   = 2,
-    TYPE_FENRUS                       = 3,
-    TYPE_NANDOS                       = 4,
-    TYPE_CROWN                        = 5,
-    DATA_LORD_WALDEN_EVENT            = 6,
-    DATA_BARON_ASHBURY_EVENT          = 7,
-    DATA_BARON_SILVERLAINE_EVENT      = 8,
-    DATA_COMMANDER_SPRINGVALE_EVENT   = 9,
-    DATA_LORD_GODFREY_EVENT           = 10,
+    BOSS_BARON_ASHBURY = 0,
+    BOSS_BARON_SILVERLAINE,
+    BOSS_COMMANDER_SPRINGVALE,
+    BOSS_LORD_WALDEN,
+    BOSS_LORD_GODFREY,
+    MAX_BOSS_ENCOUNTER
 };
 
-enum Creaturesapothecary
+enum Data64
 {
-    NPC_FRYE                          = 36272,
-    NPC_HUMMEL                        = 36296,
-    NPC_BAXTER                        = 36565,
-    NPC_TORMENTED_OFFICER             = 50615,
-    NPC_WAILING_GUARDSMAN             = 50613,
-    NPC_BLOODTHIRSTY_GHOUL            = 50561,
+    DATA_COURTYARD_DOOR = 0,
+    DATA_SORCERER_DOOR,
+    DATA_ARUGAL_DOOR,
+    DATA_ASH,
+    DATA_ADA,
+    DATA_ARCHMAGE_ARUGAL,
+    DATA_ARUGAL_VOIDWALKER,
+    DATA_FRYE,
+    DATA_HUMMEL,
+    DATA_BAXTER,
+    DATA_TORMENTED_OFFICER,
+    DATA_WAILING_GUARDSMAN,
+    DATA_LORD_WALDEN,
+    DATA_BARON_ASHBURY,
+    DATA_BARON_SILVERLAINE,
+    DATA_COMMANDER_SPRINGVALE,
+    DATA_LORD_GODFREY,
+    MAX_DATA_ENCOUNTER
+};
+
+enum eEncounters
+{
+    DOOR_COURTYARD = 0,
+    DOOR_SORCERER,
+    DOOR_ARUGAL,
+    TYPE_FREE_NPC,
+    TYPE_RETHILGORE,
+    TYPE_FENRUS,
+    TYPE_NANDOS,
+    TYPE_CROWN,
+    MAX_ENCOUNTER
+};
+
+enum CreaturesIDs
+{
+    NPC_FRYE                        = 36272,
+    NPC_HUMMEL                      = 36296,
+    NPC_BAXTER                      = 36565,
+    NPC_TORMENTED_OFFICER           = 50615,
+    NPC_WAILING_GUARDSMAN           = 50613,
+    NPC_BLOODTHIRSTY_GHOUL          = 50561,
     // Bosses
-    BOSS_LORD_WALDEN                  = 46963,
-    BOSS_BARON_ASHBURY                = 46962,
-    BOSS_BARON_SILVERLAINE            = 3887,
-    BOSS_LORD_GODFREY                 = 46964,
-    BOSS_COMMANDER_SPRINGVALE         = 4278
+    NPC_LORD_WALDEN                 = 46963,
+    NPC_BARON_ASHBURY               = 46962,
+    NPC_BARON_SILVERLAINE           = 3887,
+    NPC_LORD_GODFREY                = 46964,
+    NPC_COMMANDER_SPRINGVALE        = 4278,
+    NPC_ASH                         = 3850,
+    NPC_ADA                         = 3849,
+    NPC_ARCHMAGE_ARUGAL             = 4275,
+    NPC_ARUGAL_VOIDWALKER           = 4627,
+};
+
+enum GameObjectIDs
+{
+    GO_COURTYARD_DOOR               = 18895, //door to open when talking to NPC's
+    GO_SORCERER_DOOR                = 18972, //door to open when Fenrus the Devourer
+    GO_ARUGAL_DOOR                  = 18971  //door to open when Wolf Master Nandos
 };
 
 enum Achievements
@@ -59,18 +102,31 @@ enum Achievements
     ACHIEV_BULLET_TIME                = 5505,
 };
 
-enum Data64
+DoorData const doorData[] =
 {
-    DATA_DOOR,
-    DATA_FRYE,
-    DATA_HUMMEL,
-    DATA_BAXTER,
-    DATA_LORD_WALDEN,
-    DATA_BARON_ASHBURY,
-    DATA_BARON_SILVERLAINE,
-    DATA_COMMANDER_SPRINGVALE,
-    DATA_LORD_GODFREY,
+    { GO_COURTYARD_DOOR, DATA_COURTYARD_DOOR, DOOR_TYPE_PASSAGE, BOUNDARY_NONE },
+    { GO_SORCERER_DOOR, DATA_SORCERER_DOOR, DOOR_TYPE_PASSAGE, BOUNDARY_NONE },
+    { GO_ARUGAL_DOOR, DATA_ARUGAL_DOOR, DOOR_TYPE_PASSAGE, BOUNDARY_NONE },
+    { 0, 0, DOOR_TYPE_ROOM, BOUNDARY_NONE }, // END
 };
+
+template<class AI>
+CreatureAI* GetShadowfangKeepAI(Creature* creature)
+{
+    if (InstanceMap* instance = creature->GetMap()->ToInstanceMap())
+        if (instance->GetInstanceScript())
+            if (instance->GetScriptId() == sObjectMgr->GetScriptId(SKScriptName))
+                return new AI(creature);
+
+    return NULL;
+}
+
+template<class AI, class T>
+AI* GetShadowfangKeepAI(T* obj)
+{
+    return GetInstanceAI<AI, T>(obj, SKScriptName);
+}
+
 
 #endif
 

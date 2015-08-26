@@ -178,7 +178,7 @@ class npc_apothecary_hummel : public CreatureScript
                         frye->Respawn();
                 }
 
-                if (GameObject* door = _instance->instance->GetGameObject(_instance->GetData64(DATA_DOOR)))
+                if (GameObject* door = _instance->instance->GetGameObject(_instance->GetData64(DATA_COURTYARD_DOOR)))
                     _instance->HandleGameObject(0, true, door);
             }
 

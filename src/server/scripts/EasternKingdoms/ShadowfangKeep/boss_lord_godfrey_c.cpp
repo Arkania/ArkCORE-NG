@@ -41,17 +41,11 @@ class boss_lord_godfrey : public CreatureScript
 public:
     boss_lord_godfrey() : CreatureScript("boss_lord_godfrey") { }
 
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new boss_lord_godfreyAI(creature);
-    }
-
     struct boss_lord_godfreyAI : public BossAI
     {
-        boss_lord_godfreyAI(Creature* creature) : BossAI(creature,DATA_LORD_GODFREY)
+        boss_lord_godfreyAI(Creature* creature) : BossAI(creature, BOSS_LORD_GODFREY)
         {
-            me->ApplySpellImmune(0, IMMUNITY_ID, 93564, true); // Pistol Barrage
-            me->ApplySpellImmune(0, IMMUNITY_ID, 93784, true); // Pistol Barrage
+            pInstance = creature->GetInstanceScript();
         }
 
         InstanceScript *pInstance;
@@ -63,15 +57,17 @@ public:
 
         uint16 GhoulCount;
 
-        void Reset()
+        void Reset() override
         {
             GhoulCount = 0;
             SummonGhoulsTimer = 30000;
             CursedBulletsTimer = 15000;
             MortalWoundTimer = 6000;
+            me->ApplySpellImmune(0, IMMUNITY_ID, 93564, true); // Pistol Barrage
+            me->ApplySpellImmune(0, IMMUNITY_ID, 93784, true); // Pistol Barrage
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             if(who->ToPlayer()->GetTeamId() == TEAM_ALLIANCE)
                 Talk(SAY_AGGRO_A);
@@ -79,7 +75,7 @@ public:
                 Talk(SAY_AGGRO_H);
         }
 
-        void KilledUnit(Unit* creature)
+        void KilledUnit(Unit* creature) override
         {
             if (creature->GetEntry() == NPC_BLOODTHIRSTY_GHOUL)
                 GhoulCount++;
@@ -91,12 +87,12 @@ public:
                 }
         }
 
-        void JustDied(Unit* /*pKiller*/)
+        void JustDied(Unit* /*pKiller*/) override
         {
             Talk(SAY_DEATH);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -139,6 +135,10 @@ public:
         }
     };
 
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return GetShadowfangKeepAI<boss_lord_godfreyAI>(creature);
+    }
 };
 
 

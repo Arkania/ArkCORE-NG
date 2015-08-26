@@ -55,13 +55,7 @@ enum Yells
 enum Spells
 {
     SPELL_UNLOCK            = 6421,
-
     SPELL_DARK_OFFERING     = 7154
-};
-
-enum Creatures
-{
-    NPC_ASH                 = 3850
 };
 
 #define GOSSIP_ITEM_DOOR        "Thanks, I'll follow you to the door."

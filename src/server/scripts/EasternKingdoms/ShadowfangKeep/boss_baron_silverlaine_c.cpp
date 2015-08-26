@@ -35,12 +35,10 @@ class boss_baron_silverlaine : public CreatureScript
 public:
     boss_baron_silverlaine() : CreatureScript("boss_baron_silverlaine") { }
 
-    struct boss_baron_silverlaineAI : public ScriptedAI
+    struct boss_baron_silverlaineAI : public BossAI
     {
-        boss_baron_silverlaineAI(Creature* creature) : ScriptedAI(creature)
+        boss_baron_silverlaineAI(Creature* creature) : BossAI(creature, BOSS_BARON_SILVERLAINE)
         {
-            me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
-            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
             pInstance = creature->GetInstanceScript();
         }
 
@@ -55,9 +53,11 @@ public:
             Phase = 0;
 
             CurserVeilTimer = 5500;
+            me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
 
             if (pInstance)
-                pInstance->SetData(DATA_BARON_SILVERLAINE_EVENT, NOT_STARTED);
+                pInstance->SetData(BOSS_BARON_SILVERLAINE, NOT_STARTED);
         }
 
         void EnterCombat(Unit* /*who*/)
@@ -65,7 +65,7 @@ public:
             Talk(SAY_AGGRO);
 
             if (pInstance)
-                pInstance->SetData(DATA_BARON_SILVERLAINE_EVENT, IN_PROGRESS);
+                pInstance->SetData(BOSS_BARON_SILVERLAINE, IN_PROGRESS);
         }
 
         void JustDied(Unit* /*pKiller*/)
@@ -74,7 +74,7 @@ public:
             Talk(SAY_DEATH);
 
             if (pInstance)
-                pInstance->SetData(DATA_BARON_SILVERLAINE_EVENT, DONE);
+                pInstance->SetData(BOSS_BARON_SILVERLAINE, DONE);
         }
 
         void UpdateAI(uint32 diff)
@@ -101,7 +101,7 @@ public:
 
     CreatureAI* GetAI(Creature *creature) const
     {
-        return new boss_baron_silverlaineAI (creature);
+        return GetShadowfangKeepAI<boss_baron_silverlaineAI>(creature);
     }
 };
 
