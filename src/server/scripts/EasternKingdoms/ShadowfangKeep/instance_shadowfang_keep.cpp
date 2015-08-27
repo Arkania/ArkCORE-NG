@@ -81,7 +81,7 @@ public:
             uiTimer = 0;
             spawnCrazedTimer = 0;
             m_IsHeroicMode = false;
-            m_TeamId = TEAM_NEUTRAL;
+            m_Team = -1;
             m_Group = NULL;
             m_GroupSize = 0;
             m_isSpecialNpcSpawned = false;
@@ -89,16 +89,22 @@ public:
 
         void OnPlayerEnter(Player* player)
         {
-            if (player->GetGroup()->IsLeader(player->GetGUID()))
+            if (m_Group = player->GetGroup())
+            {
+                if (m_Group->IsLeader(player->GetGUID()))
+                {
+                    m_GroupSize = m_Group->GetMembersCount();
+                    m_IsHeroicMode = player->GetMap()->IsHeroic();
+                    m_Team = player->GetTeam();
+                    SummonAllSpecialNpc();
+                }
+            }
+            else
             {
                 m_IsHeroicMode = player->GetMap()->IsHeroic();
-                m_GroupSize = player->GetGroup()->GetMembersCount();
-                m_Group = player->GetGroup();
-                m_TeamId = player->GetTeamId();
-
-                if (!m_isSpecialNpcSpawned)
-                    SummonAllSpecialNpc();
-            }            
+                m_Team = player->GetTeam();
+                SummonAllSpecialNpc();
+            }
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -148,6 +154,7 @@ public:
                 m_ListOfGUID[DATA_LORD_GODFREY] = creature->GetGUID();
                 break;
             }
+            SummonAllSpecialNpc();
         }
 
         void OnGameObjectCreate(GameObject* go) override
@@ -158,7 +165,8 @@ public:
                 m_ListOfGUID[DATA_COURTYARD_DOOR] = go->GetGUID();
                 AddDoor(go, true);
                 if (m_ListOfEncounters[DOOR_COURTYARD] == DONE)
-                    HandleGameObject(0, true, go);
+                    HandleGameObject(0, true, go);                
+                SummonAllSpecialNpc();
                 break;
             case GO_SORCERER_DOOR:
                 m_ListOfGUID[DATA_SORCERER_DOOR] = go->GetGUID();
@@ -324,14 +332,34 @@ public:
 
         void SummonAllSpecialNpc()
         {
+            if (m_isSpecialNpcSpawned || m_Team == -1)
+                return;
+
+            GameObject* door = instance->GetGameObject(GetData64(DATA_COURTYARD_DOOR));
+            if (!door) return;
+
             m_isSpecialNpcSpawned = true;
-            if (m_TeamId == TEAM_HORDE || m_TeamId == TEAM_NEUTRAL)
+
+            if (m_Team == HORDE)
             {
+                door->SummonCreature(47293, -220.958f, 2129.48f, 80.7898f, 4.60767f);
+                door->SummonCreature(47293, -241.012f, 2129.97f, 87.0242f, 4.04738f);
+                door->SummonCreature(47293, -260.385f, 2290.04f, 75.0826f, 2.77507f);
+                door->SummonCreature(47293, -227.415f, 2257.64f, 102.753f, 3.44501f);
+                door->SummonCreature(47293, -171.591f, 2181.00f, 129.284f, 1.06933f);
+                door->SummonCreature(47293, -168.792f, 2183.66f, 151.936f, 4.79931f);
+
 
             }
-            if (m_TeamId == TEAM_ALLIANCE || m_TeamId == TEAM_NEUTRAL)
+            if (m_Team == ALLIANCE)
             {
-
+                door->SummonCreature(47006, -219.417f, 2137.05f, 80.9709f, 4.4855f);
+                door->SummonCreature(47006, -228.681f, 2146.92f, 90.624f, 2.72695f);
+                door->SummonCreature(47006, -246.660f, 2163.02f, 96.6991f, 2.44048f);
+                door->SummonCreature(47006, -170.928f, 2180.24f, 129.297f, 0.661583f);
+                door->SummonCreature(47027, -225.805f, 2131.28f, 80.7369f, 4.4482f);
+                door->SummonCreature(47027, -216.662f, 2128.37f, 80.6875f, 4.41238f);
+                door->SummonCreature(47862, -248.597f, 2115.47f, 81.2629f, 2.77507f);
             }
         }
 
@@ -343,7 +371,7 @@ public:
         uint32 uiTimer;
         uint32 spawnCrazedTimer;
         bool m_IsHeroicMode;
-        uint8 m_TeamId;
+        int32 m_Team;
         Group* m_Group;
         uint32 m_GroupSize;
         bool m_isSpecialNpcSpawned;
