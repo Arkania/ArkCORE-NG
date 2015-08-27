@@ -23,19 +23,38 @@
 #define SKScriptName    "instance_shadowfang_keep"
 #define SKScriptId      33
 
-enum Bosses
+enum Bosses // boss bit value given by DungeonEncounter.dbc
 {
     BOSS_BARON_ASHBURY = 0,
     BOSS_BARON_SILVERLAINE,
     BOSS_COMMANDER_SPRINGVALE,
     BOSS_LORD_WALDEN,
     BOSS_LORD_GODFREY,
-    MAX_BOSS_ENCOUNTER
+    MAX_BOSS_ENCOUNTERS
 };
 
-enum Data64
+enum eExtraEncounters // additional bit values, no official value 
 {
-    DATA_COURTYARD_DOOR = 0,
+    TYPE_DOOR_COURTYARD = MAX_BOSS_ENCOUNTERS,
+    TYPE_DOOR_SORCERER,
+    TYPE_DOOR_ARUGAL,
+    TYPE_FREE_NPC,
+    TYPE_RETHILGORE,
+    TYPE_FENRUS,
+    TYPE_NANDOS,
+    TYPE_CROWN,
+    MAX_EXTRA_ENCOUNTERS
+};
+
+
+enum Data64 
+{
+    DATA_BARON_ASHBURY = 0,
+    DATA_BARON_SILVERLAINE,
+    DATA_COMMANDER_SPRINGVALE,
+    DATA_LORD_WALDEN,
+    DATA_LORD_GODFREY,
+    DATA_COURTYARD_DOOR,
     DATA_SORCERER_DOOR,
     DATA_ARUGAL_DOOR,
     DATA_ASH,
@@ -47,25 +66,7 @@ enum Data64
     DATA_BAXTER,
     DATA_TORMENTED_OFFICER,
     DATA_WAILING_GUARDSMAN,
-    DATA_LORD_WALDEN,
-    DATA_BARON_ASHBURY,
-    DATA_BARON_SILVERLAINE,
-    DATA_COMMANDER_SPRINGVALE,
-    DATA_LORD_GODFREY,
     MAX_DATA_ENCOUNTER
-};
-
-enum eEncounters
-{
-    DOOR_COURTYARD = 0,
-    DOOR_SORCERER,
-    DOOR_ARUGAL,
-    TYPE_FREE_NPC,
-    TYPE_RETHILGORE,
-    TYPE_FENRUS,
-    TYPE_NANDOS,
-    TYPE_CROWN,
-    MAX_ENCOUNTER
 };
 
 enum CreaturesIDs

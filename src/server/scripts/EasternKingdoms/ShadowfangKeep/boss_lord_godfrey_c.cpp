@@ -65,6 +65,9 @@ public:
             MortalWoundTimer = 6000;
             me->ApplySpellImmune(0, IMMUNITY_ID, 93564, true); // Pistol Barrage
             me->ApplySpellImmune(0, IMMUNITY_ID, 93784, true); // Pistol Barrage
+
+            if (pInstance)
+                pInstance->SetData(BOSS_LORD_GODFREY, NOT_STARTED);
         }
 
         void EnterCombat(Unit* who) override
@@ -73,6 +76,9 @@ public:
                 Talk(SAY_AGGRO_A);
             else
                 Talk(SAY_AGGRO_H);
+
+            if (pInstance)
+                pInstance->SetData(BOSS_LORD_GODFREY, IN_PROGRESS);
         }
 
         void KilledUnit(Unit* creature) override
@@ -90,6 +96,9 @@ public:
         void JustDied(Unit* /*pKiller*/) override
         {
             Talk(SAY_DEATH);
+
+            if (pInstance)
+                pInstance->SetData(BOSS_LORD_GODFREY, DONE);
         }
 
         void UpdateAI(uint32 diff) override

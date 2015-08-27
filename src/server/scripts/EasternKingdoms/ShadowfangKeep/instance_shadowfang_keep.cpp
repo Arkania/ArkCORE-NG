@@ -68,13 +68,13 @@ public:
 
         void Initialize() override
         {
-            SetBossNumber(MAX_BOSS_ENCOUNTER);
+            SetBossNumber(MAX_BOSS_ENCOUNTERS);
             LoadDoorData(doorData);
 
             for (uint8 i = 0; i < MAX_DATA_ENCOUNTER; ++i)
                 m_ListOfGUID[i] = 0;
 
-            for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
+            for (uint8 i = 0; i < MAX_EXTRA_ENCOUNTERS; ++i)
                 m_ListOfEncounters[i] = 0;
 
             uiPhase = 0;
@@ -164,51 +164,49 @@ public:
             case GO_COURTYARD_DOOR:
                 m_ListOfGUID[DATA_COURTYARD_DOOR] = go->GetGUID();
                 AddDoor(go, true);
-                if (m_ListOfEncounters[DOOR_COURTYARD] == DONE)
+                if (m_ListOfEncounters[TYPE_DOOR_COURTYARD] == DONE)
                     HandleGameObject(0, true, go);                
                 SummonAllSpecialNpc();
                 break;
             case GO_SORCERER_DOOR:
                 m_ListOfGUID[DATA_SORCERER_DOOR] = go->GetGUID();
                 AddDoor(go, true);
-                if (m_ListOfEncounters[DOOR_SORCERER] == DONE)
+                if (m_ListOfEncounters[TYPE_DOOR_SORCERER] == DONE)
                     HandleGameObject(0, true, go);
                 break;
             case GO_ARUGAL_DOOR:
                 m_ListOfGUID[DATA_ARUGAL_DOOR] = go->GetGUID();
                 AddDoor(go, true);
-                if (m_ListOfEncounters[DOOR_ARUGAL] == DONE)
+                if (m_ListOfEncounters[TYPE_DOOR_ARUGAL] == DONE)
                     HandleGameObject(0, true, go);
                 break;
             }
         }
 
-        void DoSpeech()
+        uint64 GetData64(uint32 identifier) const
         {
-            Creature* pAda = instance->GetCreature(m_ListOfGUID[DATA_ADA]);
-            Creature* pAsh = instance->GetCreature(m_ListOfGUID[DATA_ASH]);
+            if (identifier < MAX_DATA_ENCOUNTER)
+                return m_ListOfGUID[identifier];
 
-            if (pAda && pAda->IsAlive() && pAsh && pAsh->IsAlive())
-            {
-                pAda->AI()->Talk(SAY_BOSS_DIE_AD);
-                pAsh->AI()->Talk(SAY_BOSS_DIE_AS);
-            }
+            return 0;
         }
 
-        void SetData(uint32 State, uint32 Value) override
+        void SetData(uint32 id, uint32 state) override
         {
-            if (State < MAX_DATA_ENCOUNTER)
-                SetBossState(State, EncounterState(Value));
+            if (id < MAX_BOSS_ENCOUNTERS)
+                SetBossState(id, EncounterState(state));
+            if (id < MAX_EXTRA_ENCOUNTERS)
+                m_ListOfEncounters[id] = state;
 
-            if (State == DONE)
+            if (state == DONE)
             {
                 OUT_SAVE_INST_DATA;
 
                 std::ostringstream saveStream;
                 saveStream << "S K " << GetBossSaveData();
                     
-                for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
-                    saveStream << ' ' << m_ListOfEncounters[i];
+                for (uint8 i = MAX_BOSS_ENCOUNTERS; i < MAX_EXTRA_ENCOUNTERS; ++i)
+                    saveStream << m_ListOfEncounters[i] << ' ';
 
                 str_data = saveStream.str();
 
@@ -217,18 +215,12 @@ public:
             }
         }
 
-        uint32 GetData(uint32 DataId) const override
+        uint32 GetData(uint32 id) const override
         {
-            if (DataId < MAX_DATA_ENCOUNTER)
-                GetBossState(DataId);
-            
-            return 0;
-        }
-
-        uint64 GetData64(uint32 identifier) const
-        {
-            if (identifier < MAX_DATA_ENCOUNTER)
-                return m_ListOfGUID[identifier];
+            if (id < MAX_BOSS_ENCOUNTERS)
+                GetBossState(id);
+            if (id < MAX_EXTRA_ENCOUNTERS)
+                return m_ListOfEncounters[id];
 
             return 0;
         }
@@ -254,21 +246,16 @@ public:
 
             if (dataHead1 == 'S' && dataHead2 == 'K')
             {
-                for (uint32 i = 0; i < MAX_BOSS_ENCOUNTER; ++i)
+                for (uint32 i = 0; i < MAX_EXTRA_ENCOUNTERS; ++i)
                 {
                     uint32 tmpState;
                     loadStream >> tmpState;
                     if (tmpState == IN_PROGRESS || tmpState > SPECIAL)
                         tmpState = NOT_STARTED;
-                    SetBossState(i, EncounterState(tmpState));
-                }
-                for (uint32 i = 0; i < MAX_ENCOUNTER; ++i)
-                {
-                    uint32 tmpState;
-                    loadStream >> tmpState;
-                    if (tmpState == IN_PROGRESS || tmpState > SPECIAL)
-                        tmpState = NOT_STARTED;
-                    m_ListOfEncounters[i] = tmpState;
+                    if (i < MAX_BOSS_ENCOUNTERS)
+                        SetBossState(i, EncounterState(tmpState));
+                    if (i < MAX_EXTRA_ENCOUNTERS)
+                        m_ListOfEncounters[i] = tmpState;
                 }
             }
 
@@ -330,6 +317,18 @@ public:
             }
         }
 
+        void DoSpeech()
+        {
+            Creature* pAda = instance->GetCreature(m_ListOfGUID[DATA_ADA]);
+            Creature* pAsh = instance->GetCreature(m_ListOfGUID[DATA_ASH]);
+
+            if (pAda && pAda->IsAlive() && pAsh && pAsh->IsAlive())
+            {
+                pAda->AI()->Talk(SAY_BOSS_DIE_AD);
+                pAsh->AI()->Talk(SAY_BOSS_DIE_AS);
+            }
+        }
+
         void SummonAllSpecialNpc()
         {
             if (m_isSpecialNpcSpawned || m_Team == -1)
@@ -348,7 +347,11 @@ public:
                 door->SummonCreature(47293, -227.415f, 2257.64f, 102.753f, 3.44501f);
                 door->SummonCreature(47293, -171.591f, 2181.00f, 129.284f, 1.06933f);
                 door->SummonCreature(47293, -168.792f, 2183.66f, 151.936f, 4.79931f);
-
+                door->SummonCreature(3849, -243.712f, 2113.72f, 81.2629f, 2.86234f);
+                door->SummonCreature(6486, -217.264f, 2246.63f, 79.7742f, 5.05225f);
+                door->SummonCreature(6486, -223.681f, 2245.57f, 79.7747f, 5.18184f);
+                door->SummonCreature(11153, -225.453f, 2232.16f, 79.7772f, 1.85567f);
+                door->SummonCreature(11154, -234.999f, 2236.92f, 79.7772f, 0.310152f);
 
             }
             if (m_Team == ALLIANCE)
@@ -360,12 +363,17 @@ public:
                 door->SummonCreature(47027, -225.805f, 2131.28f, 80.7369f, 4.4482f);
                 door->SummonCreature(47027, -216.662f, 2128.37f, 80.6875f, 4.41238f);
                 door->SummonCreature(47862, -248.597f, 2115.47f, 81.2629f, 2.77507f);
+                door->SummonCreature(3865, -217.197f, 2246.87f, 79.7733f, 5.04009f);
+                door->SummonCreature(3864, -234.131f, 2236.26f, 79.8619f, 0.296706f);
+                door->SummonCreature(3865, -223.612f, 2245.72f, 79.8582f, 5.13127f);
+                door->SummonCreature(3864, -225.615f, 2232.22f, 79.7786f, 1.83252f);
+
             }
         }
 
     private:
         uint64 m_ListOfGUID[MAX_DATA_ENCOUNTER];
-        uint32 m_ListOfEncounters[MAX_ENCOUNTER];
+        uint32 m_ListOfEncounters[MAX_EXTRA_ENCOUNTERS];
         std::string str_data;
         uint32 uiPhase;
         uint32 uiTimer;
