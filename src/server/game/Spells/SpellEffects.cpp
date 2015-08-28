@@ -673,8 +673,14 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                 // Starfire
                 else if (m_spellInfo->SpellFamilyFlags[0] & 0x00000004)
                 {
-                    if (m_caster->ToPlayer()->HasAura(16913)) // Check Balance spec
-                        m_caster->SetEclipsePower(int32(m_caster->GetEclipsePower() + 20));
+                    if (Player* player = m_caster->ToPlayer()) // ToDo  enable for npcbot 
+                        if (player->HasAura(16913)) // Check Balance spec 
+                            player->SetEclipsePower(int32(player->GetEclipsePower() + 20));
+
+                    if (Creature* creature = m_caster->ToCreature()) // enable spell for NpcBot
+                        if (creature->GetIAmABot())
+                            if (creature->HasAura(16913))
+                                creature->SetEclipsePower(int32(creature->GetEclipsePower() + 20));
 
                     //Euphoria
                     if ((m_caster->HasAura(81061) && roll_chance_i(12)) || (m_caster->HasAura(81062) && roll_chance_i(24)))
@@ -687,7 +693,12 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                     if (Player* player = m_caster->ToPlayer())
                         if (player->HasAura(16913)) // Check Balance spec
                             m_caster->SetEclipsePower(int32(m_caster->GetEclipsePower() - 13));
-                    
+                        
+                    if (Creature* creature = m_caster->ToCreature()) // enable spell for NpcBot
+                        if (creature->GetIAmABot())
+                            if (creature->HasAura(16913))
+                                creature->SetEclipsePower(int32(creature->GetEclipsePower() - 13));
+
                     // Improved Insect Swarm
                     if (AuraEffect const * aurEff = m_caster->GetDummyAuraEffect(SPELLFAMILY_DRUID, 1771, 0))
                         if (unitTarget->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_DRUID, 0x00200000, 0, 0))
