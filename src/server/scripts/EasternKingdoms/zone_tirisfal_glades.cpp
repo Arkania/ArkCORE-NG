@@ -830,17 +830,30 @@ class npc_marshal_redpath_49230 : public CreatureScript
 public:
     npc_marshal_redpath_49230() : CreatureScript("npc_marshal_redpath_49230") { }
 
+    enum eMarshal
+    {
+        QUEST_THE_WAKENING = 24960,
+    };
+
+    bool OnGossipHello(Player* player, Creature* creature) override
+    {
+        if (player->GetQuestStatus(QUEST_THE_WAKENING) == QUEST_STATUS_INCOMPLETE)
+            return false;
+
+        return true;
+    }
+
     bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action) override
     {
-        uint32 id = player->PlayerTalkClass->GetGossipMenu().GetMenuId();
-        if (player->GetReqKillOrCastCurrentCount(24960, 49230) == 0)
-            if (player->GetQuestStatus(24960) == QUEST_STATUS_INCOMPLETE && id == 17567)
+        if (player->GetQuestStatus(24960) == QUEST_STATUS_INCOMPLETE)
+        {
+            uint32 id = player->PlayerTalkClass->GetGossipMenu().GetMenuId();
+            if (id == 17567 && player->GetReqKillOrCastCurrentCount(QUEST_THE_WAKENING, 49230) == 0)
             {
                 player->PlayerTalkClass->SendCloseGossip();
                 CAST_AI(npc_marshal_redpath_49230AI, creature->AI())->StartAnim(player);
-                return false;
             }
-
+        }
         return false;
     }
 
@@ -884,12 +897,11 @@ public:
             switch (m_phase)
             {
             case 1:
-
+                Talk(1);
                 m_timer = 2000;
                 m_phase = 2;
                 break;
             case 2:
-                Talk(1);
                 if (m_player)
                     m_player->KilledMonsterCredit(49230);
 
@@ -922,16 +934,30 @@ class npc_valdred_moray_49231 : public CreatureScript
 public:
     npc_valdred_moray_49231() : CreatureScript("npc_valdred_moray_49231") { }
 
+    enum eValdred
+    {
+        QUEST_THE_WAKENING = 24960,
+    };
+
+    bool OnGossipHello(Player* player, Creature* creature) override
+    {
+        if (player->GetQuestStatus(QUEST_THE_WAKENING) == QUEST_STATUS_INCOMPLETE)
+            return false;
+
+        return true;
+    }
+
     bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action) override
     {
-        uint32 id = player->PlayerTalkClass->GetGossipMenu().GetMenuId();
-        if (player->GetReqKillOrCastCurrentCount(24960, 49231) == 0)
-            if (player->GetQuestStatus(24960) == QUEST_STATUS_INCOMPLETE && id == 12488)
+        if (player->GetQuestStatus(QUEST_THE_WAKENING) == QUEST_STATUS_INCOMPLETE)
+        {
+            uint32 id = player->PlayerTalkClass->GetGossipMenu().GetMenuId();
+            if (id == 12488 && player->GetReqKillOrCastCurrentCount(QUEST_THE_WAKENING, 49231) == 0)
             {
                 player->PlayerTalkClass->SendCloseGossip();
                 CAST_AI(npc_valdred_moray_49231AI, creature->AI())->StartAnim(player);
-                return false;
             }
+        }
 
         return false;
     }
@@ -976,11 +1002,11 @@ public:
             switch (m_phase)
             {
             case 1:
+                Talk(1);
                 m_timer = 2000;
                 m_phase = 2;
                 break;
             case 2:
-                Talk(1);
                 if (m_player)
                     m_player->KilledMonsterCredit(49231);
 
@@ -1013,16 +1039,30 @@ class npc_lilian_voss_38895 : public CreatureScript
 public:
     npc_lilian_voss_38895() : CreatureScript("npc_lilian_voss_38895") { }
 
+    enum eLilian
+    {
+        QUEST_THE_WAKENING = 24960,
+    };
+
+    bool OnGossipHello(Player* player, Creature* creature) override
+    {
+        if (player->GetQuestStatus(QUEST_THE_WAKENING) == QUEST_STATUS_INCOMPLETE)
+            return false;
+
+        return true;
+    }
+
     bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action) override
     {
-        uint32 id = player->PlayerTalkClass->GetGossipMenu().GetMenuId();
-        if (player->GetReqKillOrCastCurrentCount(24960, 38895) == 0)
-            if (player->GetQuestStatus(24960) == QUEST_STATUS_INCOMPLETE && id == 17565)
+        if (player->GetQuestStatus(QUEST_THE_WAKENING) == QUEST_STATUS_INCOMPLETE)
+        {
+            uint32 id = player->PlayerTalkClass->GetGossipMenu().GetMenuId();
+            if (id == 17565 && player->GetReqKillOrCastCurrentCount(QUEST_THE_WAKENING, 38895) == 0)
             {
                 player->PlayerTalkClass->SendCloseGossip();
                 CAST_AI(npc_lilian_voss_38895AI, creature->AI())->StartAnim(player);
-                return false;
             }
+        }
 
         return false;
     }
@@ -1067,12 +1107,11 @@ public:
             switch (m_phase)
             {
             case 1:
-
+                Talk(1);
                 m_timer = 2000;
                 m_phase = 2;
                 break;
             case 2:
-                Talk(1);
                 if (m_player)
                     m_player->KilledMonsterCredit(38895);
 
