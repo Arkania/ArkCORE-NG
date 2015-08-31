@@ -31,6 +31,10 @@ EndScriptData */
 #include "TemporarySummon.h"
 #include "GroupMgr.h"
 
+enum Spells
+{
+    SPELL_ASHCROMBE_TELEPORT = 15742,
+};
 enum Apothecary
 {
     ACTION_SPAWN_CRAZED         = 3
@@ -43,12 +47,6 @@ enum Yells
     SAY_ARCHMAGE            = 0
 };
 
-
-enum Spells
-{
-    SPELL_ASHCROMBE_TELEPORT    = 15742
-};
-
 const Position SpawnLocation[] =
 {
     {-148.199f, 2165.647f, 128.448f, 1.026f},
@@ -57,10 +55,11 @@ const Position SpawnLocation[] =
     {-140.794f, 2178.037f, 128.448f, 4.090f},
     {-138.640f, 2170.159f, 136.577f, 2.737f}
 };
+
 class instance_shadowfang_keep : public InstanceMapScript
 {
 public:
-    instance_shadowfang_keep() : InstanceMapScript("instance_shadowfang_keep", 33) { }
+    instance_shadowfang_keep() : InstanceMapScript(SKScriptName, SKScriptId) { }
 
     struct instance_shadowfang_keep_InstanceMapScript : public InstanceScript
     {
@@ -111,7 +110,7 @@ public:
         {
             switch (creature->GetEntry())
             {
-            case NPC_ASH: 
+            case NPC_ASH:
                 m_ListOfGUID[DATA_ASH] = creature->GetGUID();
                 break;
             case NPC_ADA:
@@ -138,19 +137,19 @@ public:
             case NPC_WAILING_GUARDSMAN:
                 m_ListOfGUID[DATA_WAILING_GUARDSMAN] = creature->GetGUID();
                 break;
-            case BOSS_LORD_WALDEN:
+            case NPC_LORD_WALDEN:
                 m_ListOfGUID[DATA_LORD_WALDEN] = creature->GetGUID();
                 break;
-            case BOSS_BARON_ASHBURY:
+            case NPC_BARON_ASHBURY:
                 m_ListOfGUID[DATA_BARON_ASHBURY] = creature->GetGUID();
                 break;
-            case BOSS_BARON_SILVERLAINE: 
+            case NPC_BARON_SILVERLAINE: 
                 m_ListOfGUID[DATA_BARON_SILVERLAINE] = creature->GetGUID();
                 break;
-            case BOSS_COMMANDER_SPRINGVALE: 
+            case NPC_COMMANDER_SPRINGVALE: 
                 m_ListOfGUID[DATA_COMMANDER_SPRINGVALE] = creature->GetGUID();
                 break;
-            case BOSS_LORD_GODFREY: 
+            case NPC_LORD_GODFREY: 
                 m_ListOfGUID[DATA_LORD_GODFREY] = creature->GetGUID();
                 break;
             }
@@ -158,14 +157,14 @@ public:
         }
 
         void OnGameObjectCreate(GameObject* go) override
-        {
+        {            
             switch (go->GetEntry())
             {
             case GO_COURTYARD_DOOR:
                 m_ListOfGUID[DATA_COURTYARD_DOOR] = go->GetGUID();
                 AddDoor(go, true);
                 if (m_ListOfEncounters[TYPE_DOOR_COURTYARD] == DONE)
-                    HandleGameObject(0, true, go);                
+                    HandleGameObject(0, true, go);
                 SummonAllSpecialNpc();
                 break;
             case GO_SORCERER_DOOR:
@@ -179,6 +178,33 @@ public:
                 AddDoor(go, true);
                 if (m_ListOfEncounters[TYPE_DOOR_ARUGAL] == DONE)
                     HandleGameObject(0, true, go);
+                break;
+            case GO_PRISON_DOOR1:
+                m_ListOfGUID[DATA_PRISON_DOOR1] = go->GetGUID();
+                AddDoor(go, true);
+                if (m_ListOfEncounters[DATA_PRISON_DOOR1] == DONE)
+                    HandleGameObject(0, true, go);
+                break;
+            case GO_PRISON_DOOR2:
+                m_ListOfGUID[DATA_PRISON_DOOR2] = go->GetGUID();
+                AddDoor(go, true);
+                if (m_ListOfEncounters[DATA_PRISON_DOOR2] == DONE)
+                    HandleGameObject(0, true, go);
+                break;
+            case GO_PRISON_DOOR3:
+                m_ListOfGUID[DATA_PRISON_DOOR3] = go->GetGUID();
+                AddDoor(go, true);
+                if (m_ListOfEncounters[DATA_PRISON_DOOR3] == DONE)
+                    HandleGameObject(0, true, go);
+                break;
+            case GO_PRISON_LEVER1:
+                m_ListOfGUID[DATA_PRISON_LEVER1] = go->GetGUID();
+                break;
+            case GO_PRISON_LEVER2:
+                m_ListOfGUID[DATA_PRISON_LEVER2] = go->GetGUID();
+                break;
+            case GO_PRISON_LEVER3:
+                m_ListOfGUID[DATA_PRISON_LEVER3] = go->GetGUID();
                 break;
             }
         }

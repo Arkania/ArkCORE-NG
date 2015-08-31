@@ -38,7 +38,10 @@ enum eExtraEncounters // additional bit values, no official value
     TYPE_DOOR_COURTYARD = MAX_BOSS_ENCOUNTERS,
     TYPE_DOOR_SORCERER,
     TYPE_DOOR_ARUGAL,
-    TYPE_FREE_NPC,
+    TYPE_DOOR_1,
+    TYPE_DOOR_2,
+    TYPE_DOOR_3,
+    TYPE_FREE_NPC,  // if courtyard door is been opened 
     TYPE_RETHILGORE,
     TYPE_FENRUS,
     TYPE_NANDOS,
@@ -54,6 +57,12 @@ enum Data64
     DATA_COMMANDER_SPRINGVALE,
     DATA_LORD_WALDEN,
     DATA_LORD_GODFREY,
+    DATA_PRISON_DOOR1,
+    DATA_PRISON_LEVER1,
+    DATA_PRISON_DOOR2,
+    DATA_PRISON_LEVER2,
+    DATA_PRISON_DOOR3,
+    DATA_PRISON_LEVER3,
     DATA_COURTYARD_DOOR,
     DATA_SORCERER_DOOR,
     DATA_ARUGAL_DOOR,
@@ -93,7 +102,13 @@ enum GameObjectIDs
 {
     GO_COURTYARD_DOOR               = 18895, //door to open when talking to NPC's
     GO_SORCERER_DOOR                = 18972, //door to open when Fenrus the Devourer
-    GO_ARUGAL_DOOR                  = 18971  //door to open when Wolf Master Nandos
+    GO_ARUGAL_DOOR                  = 18971, //door to open when Wolf Master Nandos
+    GO_PRISON_DOOR1                 = 18934,
+    GO_PRISON_LEVER1                = 18900,
+    GO_PRISON_DOOR2                 = 18936,
+    GO_PRISON_LEVER2                = 18901,
+    GO_PRISON_DOOR3                 = 18935,
+    GO_PRISON_LEVER3                = 101811,
 };
 
 enum Achievements
@@ -108,6 +123,9 @@ DoorData const doorData[] =
     { GO_COURTYARD_DOOR, DATA_COURTYARD_DOOR, DOOR_TYPE_PASSAGE, BOUNDARY_NONE },
     { GO_SORCERER_DOOR, DATA_SORCERER_DOOR, DOOR_TYPE_PASSAGE, BOUNDARY_NONE },
     { GO_ARUGAL_DOOR, DATA_ARUGAL_DOOR, DOOR_TYPE_PASSAGE, BOUNDARY_NONE },
+    { GO_PRISON_DOOR1, DATA_PRISON_DOOR1, DOOR_TYPE_PASSAGE, BOUNDARY_NONE },
+    { GO_PRISON_DOOR2, DATA_PRISON_DOOR2, DOOR_TYPE_PASSAGE, BOUNDARY_NONE },
+    { GO_PRISON_DOOR3, DATA_PRISON_DOOR3, DOOR_TYPE_PASSAGE, BOUNDARY_NONE },
     { 0, 0, DOOR_TYPE_ROOM, BOUNDARY_NONE }, // END
 };
 

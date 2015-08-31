@@ -49,7 +49,7 @@ public:
     {
         boss_baron_ashburyAI(Creature* creature) : BossAI(creature, BOSS_BARON_ASHBURY)
         {
-            pInstance = creature->GetInstanceScript();
+            m_instance = creature->GetInstanceScript();
         }
 
         uint32 PainAndSufferingTimer;
@@ -58,7 +58,7 @@ public:
         uint32 WrackingPainTimer;
         uint32 DarkArchangelTimer;
 
-        InstanceScript *pInstance;
+        InstanceScript *m_instance;
 
         bool Phased, Asphyxiate, Angel, Achievement;
 
@@ -83,8 +83,16 @@ public:
                 Achievement = true;
             }
 
-            if (pInstance)
-                pInstance->SetData(BOSS_BARON_ASHBURY, NOT_STARTED);
+            if (m_instance)
+            {
+                m_instance->SetData(BOSS_BARON_ASHBURY, NOT_STARTED);
+                if (GameObject* door = ObjectAccessor::GetGameObject(*me, m_instance->GetData64(DATA_PRISON_DOOR1))) 
+                    door->SetGoState(GO_STATE_READY);
+                if (GameObject* door = ObjectAccessor::GetGameObject(*me, m_instance->GetData64(DATA_PRISON_DOOR2)))
+                    door->SetGoState(GO_STATE_READY);
+                if (GameObject* door = ObjectAccessor::GetGameObject(*me, m_instance->GetData64(DATA_PRISON_DOOR3)))
+                    door->SetGoState(GO_STATE_READY);
+            }
         }
 
         void SpellHit(Unit* hitter, SpellInfo const* spell) override
@@ -111,16 +119,16 @@ public:
         {
             Talk(SAY_AGGRO);
 
-            if (pInstance)
-                pInstance->SetData(BOSS_BARON_ASHBURY, IN_PROGRESS);
+            if (m_instance)
+                m_instance->SetData(BOSS_BARON_ASHBURY, IN_PROGRESS);
         }
 
 		void JustDied(Unit* /*pKiller*/) override 
         {
             Talk(SAY_DEATH);
 
-            if (pInstance)
-                pInstance->SetData(BOSS_BARON_ASHBURY, DONE);
+            if (m_instance)
+                m_instance->SetData(BOSS_BARON_ASHBURY, DONE);
         }
 
         void UpdateAI(uint32 diff) override
