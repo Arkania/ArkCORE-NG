@@ -2298,7 +2298,38 @@ public:
     }
 };
 
+//31084
+class npc_highlord_darion_mograine_31084 : public CreatureScript
+{
+public:
+    npc_highlord_darion_mograine_31084() : CreatureScript("npc_highlord_darion_mograine_31084") { }
 
+    enum eMograine
+    {
+        QUEST_THE_BATTLE_FOR_THE_EBON_HOLD = 13166,
+        SPELL_THE_MIGHT_OF_MOGRAINE = 53642,
+    };
+
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) 
+    { 
+        if (quest->GetQuestId() == QUEST_THE_BATTLE_FOR_THE_EBON_HOLD)
+            creature->CastSpell(player, SPELL_THE_MIGHT_OF_MOGRAINE);
+
+        return false; 
+    }
+ 
+    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*opt*/)
+    {
+        if (quest->GetQuestId() == QUEST_THE_BATTLE_FOR_THE_EBON_HOLD)
+        {
+            player->RemoveAura(SPELL_THE_MIGHT_OF_MOGRAINE);
+            creature->RemoveAura(SPELL_THE_MIGHT_OF_MOGRAINE);
+        }
+            
+
+        return false;
+    }
+};
 
 void AddSC_the_scarlet_enclave()
 {
@@ -2321,4 +2352,5 @@ void AddSC_the_scarlet_enclave()
     new npc_scarlet_miner_28841();
     new npc_prince_valanar_28907();
     new npc_crusade_persuaded_28610();
+    new npc_highlord_darion_mograine_31084();
 }
