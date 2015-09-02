@@ -63,10 +63,7 @@ public:
     }
 };
 
-/*######
-## npc_augustus_the_touched
-######*/
-
+// 12384 npc_augustus_the_touched
 class npc_augustus_the_touched : public CreatureScript
 {
 public:
@@ -86,7 +83,7 @@ public:
             player->PrepareQuestMenu(creature->GetGUID());
 
         if (creature->IsVendor() && player->GetQuestRewardStatus(6164))
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
+            player->ADD_GOSSIP_ITEM_DB(4085, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
 
         player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
         return true;

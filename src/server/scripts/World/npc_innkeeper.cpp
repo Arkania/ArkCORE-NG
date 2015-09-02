@@ -37,13 +37,6 @@ enum Spells
     SPELL_TREAT                 = 24715
 };
 
-#define LOCALE_TRICK_OR_TREAT_0 "Trick or Treat!"
-#define LOCALE_TRICK_OR_TREAT_2 "Des bonbons ou des blagues!"
-#define LOCALE_TRICK_OR_TREAT_3 "Süßes oder Saures!"
-#define LOCALE_TRICK_OR_TREAT_6 "¡Truco o trato!"
-
-#define LOCALE_INNKEEPER_0 "Make this inn my home."
-#define LOCALE_INNKEEPER_3 "Ich möchte dieses Gasthaus zu meinem Heimatort machen."
 
 class npc_innkeeper : public CreatureScript
 {
@@ -53,34 +46,16 @@ public:
     bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (IsHolidayActive(HOLIDAY_HALLOWS_END) && !player->HasAura(SPELL_TRICK_OR_TREATED))
-        {
-            const char* localizedEntry;
-            switch (player->GetSession()->GetSessionDbcLocale())
-            {
-                case LOCALE_frFR: localizedEntry = LOCALE_TRICK_OR_TREAT_2; break;
-                case LOCALE_deDE: localizedEntry = LOCALE_TRICK_OR_TREAT_3; break;
-                case LOCALE_esES: localizedEntry = LOCALE_TRICK_OR_TREAT_6; break;
-                case LOCALE_enUS: default: localizedEntry = LOCALE_TRICK_OR_TREAT_0;
-            }
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, localizedEntry, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-        }
+            player->ADD_GOSSIP_ITEM_DB(0, 18, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
         if (creature->IsQuestGiver())
             player->PrepareQuestMenu(creature->GetGUID());
 
-        if (creature->IsVendor())
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
-
         if (creature->IsInnkeeper())
-        {
-            const char* localizedEntry;
-            switch (player->GetSession()->GetSessionDbcLocale())
-            {
-                case LOCALE_deDE: localizedEntry = LOCALE_INNKEEPER_3; break;
-                case LOCALE_enUS: default: localizedEntry = LOCALE_INNKEEPER_0;
-            }
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, localizedEntry, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INN);
-        }
+            player->ADD_GOSSIP_ITEM_DB(0, 6, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INN);
+
+        if (creature->IsVendor())
+            player->ADD_GOSSIP_ITEM_DB(0, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
 
         player->TalkedToCreature(creature->GetEntry(), creature->GetGUID());
         player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
