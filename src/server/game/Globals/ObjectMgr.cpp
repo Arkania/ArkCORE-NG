@@ -9151,11 +9151,11 @@ void ObjectMgr::LoadPhaseDefinitions()
         PhaseDefinition PhaseDefinition;
 
         PhaseDefinition.zoneId                = fields[0].GetUInt32();
-        PhaseDefinition.entry                 = fields[1].GetUInt32();
-        PhaseDefinition.phasemask             = fields[2].GetUInt32();
-        PhaseDefinition.phaseId               = fields[3].GetUInt32();
-        PhaseDefinition.terrainswapmap        = fields[4].GetUInt32();
-        PhaseDefinition.flags                 = fields[5].GetUInt32();
+        PhaseDefinition.entry                 = fields[1].GetUInt16();
+        PhaseDefinition.phasemask             = fields[2].GetUInt64();
+        PhaseDefinition.phaseId               = fields[3].GetUInt16();
+        PhaseDefinition.terrainswapmap        = fields[4].GetUInt16();
+        PhaseDefinition.flags                 = fields[5].GetUInt8();
 
         // Checks
         if ((PhaseDefinition.flags & PHASE_FLAG_OVERWRITE_EXISTING) && (PhaseDefinition.flags & PHASE_FLAG_NEGATE_PHASE))
