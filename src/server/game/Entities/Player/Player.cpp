@@ -5211,7 +5211,15 @@ void Player::learnSpell(uint32 spell_id, bool dependent)
         }
     }
 
-    if (spell_id == 78670 || spell_id == 89720 || spell_id == 89721) // It adds them when you learn the spells.
+    if (spell_id == 78670 || 
+        spell_id == 88961 ||
+        spell_id == 89718 ||
+        spell_id == 89719 ||
+        spell_id == 89720 ||
+        spell_id == 89721 ||
+        spell_id == 89722 ||
+        spell_id == 110393 ||
+        spell_id == 158762) // It adds them when you learn the spells.
     {
         GetArcheologyMgr().OnSkillUpdate(GetSkillValue(SKILL_ARCHAEOLOGY));
         GetArcheologyMgr().SaveDigsitesToDB(); // Also save the sites once generated.
