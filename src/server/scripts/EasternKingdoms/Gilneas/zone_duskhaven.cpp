@@ -135,7 +135,7 @@ public:
 
 
 
-void AddSC_gilneas_duskhaven()
+void AddSC_zone_gilneas_duskhaven()
 {	
     new npc_lord_godfrey_36170();
     new npc_krennan_aranas_36331();

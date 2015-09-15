@@ -311,7 +311,8 @@ void AddSC_boss_venoxis();
 void AddSC_boss_wushoolay();
 void AddSC_boss_zanzil();
 void AddSC_instance_zulgurub();
-void AddSC_gilneas_duskhaven();
+void AddSC_zone_gilneas_duskhaven();
+void AddSC_zone_gilneas_city();
 
 //void AddSC_alterac_mountains();
 void AddSC_arathi_highlands();
@@ -323,7 +324,6 @@ void AddSC_duskwood();
 void AddSC_eastern_plaguelands();
 void AddSC_elwynn_forest();
 void AddSC_eversong_woods();
-void AddSC_gilneas_city();
 void AddSC_ghostlands();
 void AddSC_hinterlands();
 void AddSC_ironforge();
@@ -340,8 +340,6 @@ void AddSC_undercity();
 void AddSC_western_plaguelands();
 void AddSC_westfall();
 void AddSC_wetlands();
-// Gilneas old
-void AddSC_gilneas();
 
 // Kalimdor
 void AddSC_blackfathom_deeps();              //Blackfathom Depths
@@ -1168,7 +1166,6 @@ void AddEasternKingdomsScripts()
     AddSC_elwynn_forest();
     AddSC_eversong_woods();
     AddSC_ghostlands();
-    AddSC_gilneas_city();
     AddSC_hinterlands();
     AddSC_ironforge();
     AddSC_isle_of_queldanas();
@@ -1184,10 +1181,8 @@ void AddEasternKingdomsScripts()
     AddSC_western_plaguelands();
     AddSC_westfall();
     AddSC_wetlands();
-
-    // gilneas
-    AddSC_gilneas();
-    AddSC_gilneas_duskhaven();
+    AddSC_zone_gilneas_duskhaven();
+    AddSC_zone_gilneas_city();
 
 #endif
 }
