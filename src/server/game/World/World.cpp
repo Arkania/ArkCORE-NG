@@ -1734,6 +1734,9 @@ void World::SetInitialWorldSettings()
     TC_LOG_INFO("server.loading", "Loading Phase definitions...");
     sObjectMgr->LoadPhaseDefinitions();
 
+    TC_LOG_INFO("server.loading", "Loading Phase Areas...");
+    sObjectMgr->LoadPhaseArea();
+
     TC_LOG_INFO("server.loading", "Loading Conditions...");
     sConditionMgr->LoadConditions();
 

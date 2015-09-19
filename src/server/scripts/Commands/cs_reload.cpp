@@ -1199,6 +1199,8 @@ public:
     {
         TC_LOG_INFO("misc", "Reloading phase_definitions table...");
         sObjectMgr->LoadPhaseDefinitions();
+        TC_LOG_INFO("misc", "Reloading Phase Areas...");
+        sObjectMgr->LoadPhaseArea();
         sWorld->UpdatePhaseDefinitions();
         handler->SendGlobalGMSysMessage("Phase Definitions reloaded.");
         return true;

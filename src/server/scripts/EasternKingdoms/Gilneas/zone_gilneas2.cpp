@@ -3823,9 +3823,10 @@ public:
             {
               std::set<uint32> terrainswap;
               std::set<uint32> phaseId;
+              std::set<uint32> worldMapSwap;
               terrainswap.insert(655);
               phaseId.insert(1);
-              player->GetSession()->SendSetPhaseShift(phaseId, terrainswap);
+              player->GetSession()->SendSetPhaseShift(phaseId, terrainswap, worldMapSwap);
 			}
 
 		return true;

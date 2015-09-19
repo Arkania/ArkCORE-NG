@@ -1,22 +1,22 @@
 /*
- * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2015 ArkCORE <http://www.arkania.net/>
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
- */
+* Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
+* Copyright (C) 2011-2015 ArkCORE <http://www.arkania.net/>
+*
+* This program is free software; you can redistribute it and/or modify it
+* under the terms of the GNU General Public License as published by the
+* Free Software Foundation; either version 2 of the License, or (at your
+* option) any later version.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+* FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+* more details.
+*
+* You should have received a copy of the GNU General Public License along
+* with this program. If not, see <http://www.gnu.org/licenses/>.
+*/
 
-#ifndef TRINITY_PHASEMGR_H
+#ifndef TRINITY_PHASEMGR_H 
 #define TRINITY_PHASEMGR_H
 
 #include "SharedDefines.h"
@@ -30,20 +30,41 @@ class Player;
 // Phasing (visibility)
 enum PhasingFlags
 {
-    PHASE_FLAG_OVERWRITE_EXISTING           = 0x01,       // don't stack with existing phases, overwrites existing phases
-    PHASE_FLAG_NO_MORE_PHASES               = 0x02,       // stop calculating phases after this phase was applied (no more phases will be applied)
-    PHASE_FLAG_NEGATE_PHASE                 = 0x04        // negate instead to add the phasemask
+    PHASE_FLAG_OVERWRITE_EXISTING = 0x01,       // don't stack with existing phases, overwrites existing phases
+    PHASE_FLAG_NO_MORE_PHASES = 0x02,       // stop calculating phases after this phase was applied (no more phases will be applied)
+    PHASE_FLAG_NEGATE_PHASE = 0x04        // negate instead to add the phasemask
 };
 
 enum PhaseUpdateFlag
 {
-    PHASE_UPDATE_FLAG_ZONE_UPDATE           = 0x01,
-    PHASE_UPDATE_FLAG_AREA_UPDATE           = 0x02,
+    PHASE_UPDATE_FLAG_ZONE_UPDATE = 0x01,
+    PHASE_UPDATE_FLAG_AREA_UPDATE = 0x02,
 
     // Internal flags
-    PHASE_UPDATE_FLAG_CLIENTSIDE_CHANGED    = 0x08,
-    PHASE_UPDATE_FLAG_SERVERSIDE_CHANGED    = 0x10,
+    PHASE_UPDATE_FLAG_CLIENTSIDE_CHANGED = 0x08,
+    PHASE_UPDATE_FLAG_SERVERSIDE_CHANGED = 0x10,
 };
+
+enum ePhaseUpdateStatus
+{
+    PHASE_UPDATE_NOT_NEEDED,
+    PHASE_UPDATE_NEEDED,
+    EMPTY_DATABASE,
+};
+
+struct PhaseArea
+{
+    uint32 areaId;
+    uint32 entry;
+    uint32 quest_start;
+    uint32 quest_end;
+    uint32 quest_start_status;
+    uint32 quest_end_status;
+    uint32 flags;
+};
+
+typedef std::list<PhaseArea> PhaseAreaContainer;
+typedef UNORDERED_MAP<uint32 /*areaId*/, PhaseAreaContainer> PhaseAreaStore;
 
 struct PhaseDefinition
 {
@@ -52,6 +73,7 @@ struct PhaseDefinition
     uint64 phasemask;
     uint32 phaseId;
     uint32 terrainswapmap;
+    uint32 worldMapAreaSwap;
     uint8 flags;
 
     bool IsOverwritingExistingPhases() const { return flags & PHASE_FLAG_OVERWRITE_EXISTING; }
@@ -67,17 +89,19 @@ struct SpellPhaseInfo
     uint32 spellId;
     uint32 phasemask;
     uint32 terrainswapmap;
+    uint32 worldmapareaswap;
 };
 
 typedef UNORDERED_MAP<uint32 /*spellId*/, SpellPhaseInfo> SpellPhaseStore;
 
 struct PhaseInfo
 {
-    PhaseInfo() : phasemask(0), terrainswapmap(0), phaseId(0) { }
+    PhaseInfo() : phasemask(0), terrainswapmap(0), phaseId(0), worldMapAreaSwap(0) {}
 
     uint32 phasemask;
     uint32 terrainswapmap;
     uint32 phaseId;
+    uint32 worldMapAreaSwap;
 
     bool NeedsServerSideUpdate() const { return phasemask; }
     bool NeedsClientSideUpdate() const { return terrainswapmap || phaseId; }
@@ -94,10 +118,10 @@ struct PhaseData
     uint32 _CustomPhasemask;
 
     uint32 GetCurrentPhasemask() const;
-    inline uint32 GetPhaseMaskForSpawn() const;
+    uint32 GetPhaseMaskForSpawn() const;
 
     void ResetDefinitions() { _PhasemaskThroughDefinitions = 0; activePhaseDefinitions.clear(); }
-    void AddPhaseDefinition(PhaseDefinition const* phaseDefinition);
+    void AddPhaseDefinition(PhaseDefinition phaseDefinition);
     bool HasActiveDefinitions() const { return !activePhaseDefinitions.empty(); }
 
     void AddAuraInfo(uint32 spellId, PhaseInfo const& phaseInfo);
@@ -110,13 +134,13 @@ struct PhaseData
 
 private:
     Player* player;
-    std::list<PhaseDefinition const*> activePhaseDefinitions;
+    std::list<PhaseDefinition> activePhaseDefinitions;
     PhaseInfoContainer spellPhaseInfo;
 };
 
 struct PhaseUpdateData
 {
-    PhaseUpdateData(): _conditionTypeFlags(0), _questId(0) { }
+    PhaseUpdateData() : _conditionTypeFlags(0), _questId(0) { }
     void AddConditionType(ConditionTypes const conditionType) { _conditionTypeFlags |= (1 << conditionType); }
     void AddQuestUpdate(uint32 const questId);
 
@@ -134,7 +158,7 @@ public:
     ~PhaseMgr() { }
 
     uint32 GetCurrentPhasemask() { return phaseData.GetCurrentPhasemask(); };
-    inline uint32 GetPhaseMaskForSpawn() { return phaseData.GetCurrentPhasemask(); }
+    uint32 GetPhaseMaskForSpawn() { return phaseData.GetCurrentPhasemask(); }
 
     // Phase definitions update handling
     void NotifyConditionChanged(PhaseUpdateData const& updateData);
@@ -160,17 +184,25 @@ public:
 
     void GetActivePhases(std::set<uint32>& phases) const;
 
+
 private:
     void Recalculate();
 
-    inline bool CheckDefinition(PhaseDefinition const* phaseDefinition);
+    uint8 CheckDefinition(PhaseDefinition phaseDefinition);
+    uint8 CheckArea(PhaseDefinition phaseDefinition, PhaseAreaContainer pac);
+    uint32 GetQuestStatusFlag(uint32 questId);
 
+    PhaseAreaContainer GetPhaseAreaContainer(uint32 zoneId) const;
+    PhaseDefinitionContainer GetPhaseDefinitionContainer(uint32 zoneId) const;
     bool NeedsPhaseUpdateWithData(PhaseUpdateData const& updateData) const;
+    bool IsConditionRelated(PhaseUpdateData const& updateData, uint32 zoneId, uint32 entry) const;
+    bool IsAreaRelated(PhaseUpdateData const& updateData, uint32 areaId, uint32 entry) const;
 
-    inline bool IsUpdateInProgress() const { return (_UpdateFlags & PHASE_UPDATE_FLAG_ZONE_UPDATE) || (_UpdateFlags & PHASE_UPDATE_FLAG_AREA_UPDATE); }
+    bool IsUpdateInProgress() const { return (_UpdateFlags & PHASE_UPDATE_FLAG_ZONE_UPDATE) || (_UpdateFlags & PHASE_UPDATE_FLAG_AREA_UPDATE); }
 
     PhaseDefinitionStore const* _PhaseDefinitionStore;
     SpellPhaseStore const* _SpellPhaseStore;
+    PhaseAreaStore const* _PhaseAreaStore;
 
     Player* player;
     PhaseData phaseData;

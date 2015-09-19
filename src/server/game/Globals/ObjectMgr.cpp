@@ -9133,8 +9133,8 @@ void ObjectMgr::LoadPhaseDefinitions()
 
     uint32 oldMSTime = getMSTime();
 
-    //                                                 0       1       2         3            4           5
-    QueryResult result = WorldDatabase.Query("SELECT zoneId, entry, phasemask, phaseId, terrainswapmap, flags FROM `phase_definitions` ORDER BY `entry` ASC");
+    //                                                 0       1       2         3            4                 5           6
+    QueryResult result = WorldDatabase.Query("SELECT zoneId, entry, phasemask, phaseId, terrainswapmap, worldMapAreaSwap, flags FROM `phase_definitions` ORDER BY `entry` ASC");
 
     if (!result)
     {
@@ -9155,7 +9155,8 @@ void ObjectMgr::LoadPhaseDefinitions()
         PhaseDefinition.phasemask             = fields[2].GetUInt64();
         PhaseDefinition.phaseId               = fields[3].GetUInt16();
         PhaseDefinition.terrainswapmap        = fields[4].GetUInt16();
-        PhaseDefinition.flags                 = fields[5].GetUInt8();
+        PhaseDefinition.worldMapAreaSwap      = fields[5].GetUInt16();
+        PhaseDefinition.flags                 = fields[6].GetUInt8();
 
         // Checks
         if ((PhaseDefinition.flags & PHASE_FLAG_OVERWRITE_EXISTING) && (PhaseDefinition.flags & PHASE_FLAG_NEGATE_PHASE))
@@ -9218,6 +9219,45 @@ void ObjectMgr::LoadSpellPhaseInfo()
     }
     while (result->NextRow());
     TC_LOG_INFO("server.loading", ">> Loaded %u spell dbc infos in %u ms.", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+void ObjectMgr::LoadPhaseArea()
+{
+    _PhaseAreaStore.clear();
+
+    uint32 oldMSTime = getMSTime();
+
+    //                                                 0       1       2         3            4           5
+    QueryResult result = WorldDatabase.Query("SELECT areaId, entry, quest_start, quest_end, quest_start_status, quest_end_status, flags FROM `phase_area` ORDER BY `entry` ASC");
+
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 phase areas. DB table `phase_areas` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+
+    do
+    {
+        Field* fields = result->Fetch();
+
+        PhaseArea area;
+        area.areaId                 = fields[0].GetUInt32();
+        area.entry                  = fields[1].GetUInt32();
+        area.quest_start            = fields[2].GetUInt32();
+        area.quest_end              = fields[3].GetUInt32();
+        area.quest_start_status     = fields[4].GetUInt32();
+        area.quest_end_status       = fields[5].GetUInt32();
+        area.flags                  = fields[6].GetUInt32();
+
+        _PhaseAreaStore[area.areaId].push_back(area);
+
+        ++count;
+
+    } while (result->NextRow());
+
+    TC_LOG_INFO("server.loading", ">> Loaded %u phase areas in %u ms.", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 GameObjectTemplate const* ObjectMgr::GetGameObjectTemplate(uint32 entry)
