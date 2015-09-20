@@ -18,7 +18,7 @@ CREATE TABLE `phase_area` (
 insert into phase_area (areaId, entry, quest_start, quest_end, quest_start_status, quest_end_status, flags, comment) values
 (4755, 0, 14091, 14091, 11, 64, 0, "Gilneas phase 1"), 
 (4755, 1, 14091, 14159, 74, 64, 0, "Gilneas phase 2"), 
-(4755, 2, 14159, 14204, 64, 72, 0, "Gilneas phase 4"), 
+(4755, 2, 14099, 14204, 64, 72, 0, "Gilneas phase 4"), 
 (4755, 3, 14204, 12345, 74, 72, 0, "Gilneas phase 8");
 
 

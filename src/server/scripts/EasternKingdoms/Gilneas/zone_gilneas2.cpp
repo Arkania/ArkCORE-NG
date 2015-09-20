@@ -3,11 +3,166 @@
 #include "ScriptPCH.h"
 #include "Unit.h"
 #include "ScriptedEscortAI.h"
+#include "ScriptedFollowerAI.h"
 #include "Vehicle.h"
 #include "GameObjectAI.h"
 #include "CreatureGroups.h"
 
 // Phase 2
+
+/* 35660 // part showfight worgen <> liam */   /* Quest 14098 */
+class npc_rampaging_worgen_35660 : public CreatureScript
+{
+public:
+    npc_rampaging_worgen_35660() : CreatureScript("npc_rampaging_worgen_35660") { }
+
+    struct npc_rampaging_worgen_35660AI : public ScriptedAI
+    {
+        npc_rampaging_worgen_35660AI(Creature* creature) : ScriptedAI(creature) { }
+
+        uint32 m_attackLiamT;
+        uint32 m_attackLiamP;
+        uint32 m_enrage;
+        uint32 m_merchantP;
+        uint32 m_merchantT;
+
+        void Reset()
+        {
+            m_attackLiamT = 0;
+            m_attackLiamP = 0;
+            m_enrage = 0;
+            m_merchantP = 0;
+            m_merchantT = 0;
+        }
+
+        void JustDied(Unit* /*killer*/)
+        {
+            if (Creature* liam = me->FindNearestCreature(34913, 4.0f))
+            {
+                m_attackLiamP = 0;
+                me->DespawnOrUnsummon(1000);
+            }
+        }
+
+        void MovementInform(uint32 type, uint32 id)
+        {
+            if (type == POINT_MOTION_TYPE && id == 1234)
+            {
+                m_attackLiamP = 1;
+                m_attackLiamT = 500;
+            }
+        }
+
+        void DamageTaken(Unit* who, uint32 &damage)
+        {
+            if (who->GetEntry() == 34913)
+            {
+                damage /= 2;
+                if (!m_enrage && me->GetHealthPct() < 50.0f)
+                {
+                    me->CastSpell(me, 56646);
+                    m_enrage = 250;
+                }
+            }
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+            if (m_attackLiamT <= diff)
+            {
+                m_attackLiamT = 500;
+                DoFight();
+            }
+            else m_attackLiamT -= diff;
+
+            if (m_merchantT <= diff)
+            {
+                m_merchantT = 1000;
+                DoMerchant();
+            }
+            else m_merchantT -= diff;
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+
+        void DoFight()
+        {
+            if (m_enrage)
+                m_enrage--;
+
+            switch (m_attackLiamP)
+            {
+            case 1:
+                me->SetSpeed(MOVE_RUN, 1.8f, true);
+                me->GetMotionMaster()->MovePoint(1234, -1482.9f, 1394.6f, 35.55f);
+                m_attackLiamP = 2;
+                break;
+            case 2:
+                if (Creature* liam = me->FindNearestCreature(34913, 100.0f))
+                {
+                    m_attackLiamP = 3;
+                    Position p1 = liam->GetPosition();
+                    float o1 = liam->GetAngle(p1.GetPositionX(), p1.GetPositionY());
+                    Position p2 = liam->GetNearPosition(2.0f, o1);
+                    me->GetMotionMaster()->MovePoint(0, p2, true);
+                }
+                break;
+            case 3:
+                if (Creature* liam = me->FindNearestCreature(34913, 4.0f))
+                {
+                    m_attackLiamP = 4;
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    me->Attack(liam, true);
+                    liam->Attack(me, true);
+                }
+                break;
+            }
+        }
+
+        void DoMerchant()
+        {
+            switch (m_merchantP)
+            {
+            case 1:
+                m_merchantP = 2;
+                if (Creature* c = me->FindNearestCreature(35836, 10.0f))
+                {
+                    me->GetMotionMaster()->MoveFollow(c, 1.0f, 0.0f);
+                }
+                break;
+            case 2:
+                Creature* c = me->FindNearestCreature(35836, 10.0f);
+                if (!c)
+                    me->DespawnOrUnsummon(0);
+                break;
+            }
+        }
+
+        void StartAnimMerchant(Player* player)
+        {
+            if (!this) return;
+
+            m_merchantT = 1000;
+            m_merchantP = 1;
+        }
+
+        void StartAnimFight()
+        {
+            if (!this) return;
+
+            m_attackLiamT = 500;
+            m_attackLiamP = 1;
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_rampaging_worgen_35660AI(creature);
+    }
+};
 
 // 34913 // part showfight liam <> worgen
 class npc_prince_liam_greymane_34913 : public CreatureScript
@@ -51,117 +206,15 @@ public:
 
         void DoShowFight()
         {
-            me->SummonCreature(35660, -1491.9f, 1413.1f, 35.56f, 5.5f);
+            if (Unit* unit = me->SummonCreature(35660, -1491.9f, 1413.1f, 35.56f, 5.5f))
+                if (Creature* worgen = unit->ToCreature())
+                    CAST_AI(npc_rampaging_worgen_35660::npc_rampaging_worgen_35660AI, worgen->AI())->StartAnimFight();
         }
     };
 
     CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_prince_liam_greymane_34913AI(creature);
-    }
-};
-
-// 35660 // part showfight worgen <> liam
-class npc_rampaging_worgen_35660 : public CreatureScript
-{
-public:
-    npc_rampaging_worgen_35660() : CreatureScript("npc_rampaging_worgen_35660") {}
-
-    struct npc_rampaging_worgen_35660AI : public ScriptedAI
-    {
-        npc_rampaging_worgen_35660AI(Creature* creature) : ScriptedAI(creature) {}
-
-        uint32 m_timer;
-        uint32 m_enrage;
-        uint32 m_attackLiam;
-
-        void Reset()
-        {
-            m_timer = 0;
-            m_enrage = 0;
-            m_attackLiam = 0;
-            me->SetSpeed(MOVE_RUN, 1.8f, true);
-            me->GetMotionMaster()->MovePoint(1234, -1482.9f, 1394.6f, 35.55f);
-        }
-
-        void JustDied(Unit* /*killer*/) 
-        {
-            if (Creature* liam = me->FindNearestCreature(34913, 4.0f))
-            {
-                m_attackLiam = 0;
-                me->DespawnOrUnsummon(1000);
-            }
-        }
-
-        void MovementInform(uint32 type, uint32 id) 
-        { 
-            if (type == POINT_MOTION_TYPE && id == 1234)
-                m_attackLiam = 1;
-        }
-
-        void DamageTaken(Unit* who, uint32 &damage)
-        {
-            if (who->GetEntry() == 34913)
-            {
-                damage /= 2;
-                if (!m_enrage && me->GetHealthPct() < 50.0f)
-                {
-                    me->CastSpell(me, 56646);
-                    m_enrage = 250;
-                }
-            }
-        }
-
-        void UpdateAI(uint32 diff)
-        {
-            if (m_timer <= diff)
-            {
-                m_timer = 500;
-                DoFight();
-            }
-            else m_timer -= diff;
-
-            if (!UpdateVictim())
-                return;
-            else
-                DoMeleeAttackIfReady();
-        }
-
-        void DoFight()
-        {
-            if (m_enrage)
-                m_enrage--;
-
-            switch (m_attackLiam)
-            {
-            case 1:
-                if (Creature* liam = me->FindNearestCreature(34913, 100.0f))
-                {
-                    m_attackLiam = 2;
-                    Position p1 = liam->GetPosition();
-                    float o1 = liam->GetAngle(p1.GetPositionX(), p1.GetPositionY());
-                    Position p2 = liam->GetNearPosition(2.0f, o1);
-                    me->GetMotionMaster()->MovePoint(0, p2, true);
-                }
-                break;
-            case 2:
-                if (Creature* liam = me->FindNearestCreature(34913, 4.0f))
-                {
-                    m_attackLiam = 3;
-                    me->SetReactState(REACT_AGGRESSIVE);
-                    me->Attack(liam, true);
-                    liam->Attack(me, true);
-                }
-                break;
-            case 3:
-                break;
-            }
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new npc_rampaging_worgen_35660AI(creature);
     }
 };
 
@@ -183,7 +236,6 @@ public:
             m_timer = urand(100, 2000);
             m_phase = 0;
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             me->getThreatManager().resetAllAggro();
         }
        
@@ -248,13 +300,13 @@ public:
             m_phase = 0;
             m_encount = urand(20, 220);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             me->getThreatManager().resetAllAggro();
         }
 
         void DamageTaken(Unit* who, uint32 &damage)
         {
-
+            if (who->ToPlayer())
+                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
         }
 
         void UpdateAI(uint32 diff)
@@ -295,6 +347,185 @@ public:
     CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_rampaging_worgen_34884AI(creature);
+    }
+};
+
+/* Quest Evacuate the Merchant Square 14098
+   34981 Frightened Citizen,  NPC may be spawned via a script ( alone )
+   35836 Frightened Citizen,  NPC may be spawned via a script ( with worgen )
+   35660 Rampaging Worgen,  NPC may be spawned via a script */   
+class npc_frightened_citizen_34981 : public CreatureScript
+{
+public:
+    npc_frightened_citizen_34981() : CreatureScript("npc_frightened_citizen_34981") {}
+
+    struct npc_frightened_citizen_34981AI : public ScriptedAI
+    {
+        npc_frightened_citizen_34981AI(Creature* creature) : ScriptedAI(creature) {}
+
+        uint32 m_merchantP;
+        uint32 m_merchantT;
+
+        void Reset()
+        {
+            startPath = false;
+            mui_moveTimer = 1000;
+            m_merchantP = 0;
+            m_merchantT = 0;
+        }
+
+        void MovementInform(uint32 type, uint32 point)
+        {
+            if (type == 8)
+                switch (point)
+                {
+                case 1230:
+                    m_merchantP = 3;
+                    break;
+                case 1231:
+                    me->DespawnOrUnsummon();
+                    break;
+                }
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+            if (m_merchantT <= diff)
+            {
+                m_merchantT = 1000;
+                DoMerchant();
+            }
+            else m_merchantT -= diff;
+
+            if (!startPath)
+                return;
+
+            if (mui_moveTimer <= diff)
+            {
+                me->ClearUnitState(UNIT_STATE_IGNORE_PATHFINDING);
+                me->GetMotionMaster()->MovePoint(5, FrightenedWay[urand(0, 1)]);
+                mui_moveTimer = 10000;
+            }
+            else
+                mui_moveTimer -= diff;
+        }
+
+        void DoMerchant()
+        {
+            me->setFaction(35);
+            switch (m_merchantP)
+            {
+            case 1:
+                m_merchantP = 2;
+                if (me->GetEntry() == 34981)
+                {
+                    if (Creature* m = me->FindNearestCreature(35830, 10.0f))
+                    {
+                        me->SetFacingToObject(m);
+                        Talk(0);
+                        me->GetMotionMaster()->MovePoint(1230, m->GetPosition());
+                    }
+                }
+                else if (me->GetEntry() == 35836)
+                {
+                    if (Creature* m = me->FindNearestCreature(35660, 10.0f))
+                    {
+                        me->SetFacingToObject(m);
+                        Talk(1);
+                        me->GetMotionMaster()->MovePoint(1230, m->GetPosition());
+                    }
+                }
+                break;
+            case 2:
+                break;
+            case 3:
+                m_merchantP = 4;
+                if (Creature* m = me->FindNearestCreature(35010, 100.0f))
+                    me->GetMotionMaster()->MovePoint(1231, m->GetPosition());
+                break;
+            case 4:
+                break;
+            }
+        }
+
+        void StartAnim(Player* player)
+        {
+            if (!this) return;
+
+            m_merchantP = 1;
+            m_merchantT = 1000;
+        }
+
+    private:
+        bool startPath;
+        uint32 mui_moveTimer;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_frightened_citizen_34981AI(creature);
+    }
+};
+
+// 195327
+class go_merchant_square_door_195327 : public GameObjectScript
+{
+public:
+    go_merchant_square_door_195327() : GameObjectScript("go_merchant_square_door_195327") { }
+
+    bool OnGossipHello(Player* player, GameObject* go)
+    {
+        if (!player || !go)
+            return false;
+
+        switch (urand(0, 1))
+        {
+            case 0:
+                SummonOnlyCitizen(player, go);
+                break;
+            case 1:
+                SummonCitizenAndWorgen(player, go);
+                break;
+        }
+
+        return false;
+    }
+
+private:
+    void SummonOnlyCitizen(Player* player, GameObject* go)
+    {
+        Position posC = GetCitizenPosition(go);
+        Unit* unitC = player->SummonCreature(34981, posC, TEMPSUMMON_TIMED_DESPAWN, 30000);
+        if (Creature* citizen = unitC->ToCreature())
+            CAST_AI(npc_frightened_citizen_34981::npc_frightened_citizen_34981AI, citizen->AI())->StartAnim(player);
+    }
+        
+    void SummonCitizenAndWorgen(Player* player, GameObject* go)
+    {
+        Position posC = GetCitizenPosition(go);
+        Unit* unitC = player->SummonCreature(35836, posC, TEMPSUMMON_TIMED_DESPAWN, 30000);
+        Position posW = GetWorgenPosition(go);
+        Unit* unitW = player->SummonCreature(35660, posW, TEMPSUMMON_TIMED_DESPAWN, 30000);
+        if (Creature* citizen = unitC->ToCreature())
+            if (Creature* worgen = unitW->ToCreature())
+            {
+                CAST_AI(npc_frightened_citizen_34981::npc_frightened_citizen_34981AI, citizen->AI())->StartAnim(player);
+                CAST_AI(npc_rampaging_worgen_35660::npc_rampaging_worgen_35660AI, worgen->AI())->StartAnimMerchant(player);
+            }
+    }
+
+    Position GetCitizenPosition(GameObject* go)
+    {
+        float x, y;
+        go->GetNearPoint2D(x, y, 1.0f, go->GetOrientation() + M_PI);
+        return Position(x, y, go->GetPositionZ());
+    }
+
+    Position GetWorgenPosition(GameObject* go)
+    {
+        float x, y;
+        go->GetNearPoint2D(x, y, 3.0f, go->GetOrientation() + M_PI * 0.75f);
+        return Position(x, y, go->GetPositionZ());
     }
 };
 
@@ -447,59 +678,6 @@ public:
     CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_gilnean_royal_guard_35232AI(creature);
-    }
-};
-
-// 34981, 35836
-class npc_frightened_citizen_34981 : public CreatureScript
-{
-public:
-    npc_frightened_citizen_34981() : CreatureScript("npc_frightened_citizen_34981") {}
-
-    struct npc_frightened_citizen_34981AI : public ScriptedAI
-    {
-        npc_frightened_citizen_34981AI(Creature* creature) : ScriptedAI(creature) {}
-
-        void Reset()
-        {
-            startPath = false;
-            mui_moveTimer = 1000;
-        }
-
-        void MovementInform(uint32 type, uint32 point)
-        {
-            if (point == 42)
-            {
-                startPath = true;
-                Talk(0, 0);
-            }
-            else if (point == 5)
-                me->DespawnOrUnsummon();
-        }
-
-        void UpdateAI(uint32 diff)
-        {
-            if (!startPath)
-                return;
-
-            if (mui_moveTimer <= diff)
-            {
-                me->ClearUnitState(UNIT_STATE_IGNORE_PATHFINDING);
-                me->GetMotionMaster()->MovePoint(5, FrightenedWay[urand(0, 1)]);
-                mui_moveTimer = 10000;
-            }
-            else
-                mui_moveTimer -= diff;
-        }
-
-    private :
-        bool startPath;
-        uint32 mui_moveTimer;
-    };
-
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new npc_frightened_citizen_34981AI(creature);
     }
 };
 
@@ -3742,6 +3920,7 @@ void AddSC_zone_gilneas_city2()
     new npc_admiral_nightwind_36616();
     new npc_gilneas_city_guard_34916();
     new npc_prince_liam_greymane_34913();
+    new go_merchant_square_door_195327();
     new npc_rampaging_worgen_34884();
     new npc_rampaging_worgen_35660();
     new npc_sergeant_cleese_35839();
