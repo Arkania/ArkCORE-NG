@@ -9,7 +9,7 @@
 
 // Phase 2
 
-// 34913
+// 34913 // part showfight liam <> worgen
 class npc_prince_liam_greymane_34913 : public CreatureScript
 {
 public:
@@ -19,104 +19,39 @@ public:
     {
         npc_prince_liam_greymane_34913AI(Creature* c) : ScriptedAI(c) {}
 
-        uint32 tAnimate, tSound, dmgCount, tYell, tSeek;
-        bool playSnd, doYell;
+        uint32 m_timer;
+        uint32 m_phase;
 
         void Reset()
         {
-            tAnimate = DELAY_ANIMATE;
-            dmgCount = 0;
-            tSound = DELAY_SOUND;
-            playSnd = false;
-            tSeek = urand(1000, 2000);
-            doYell = true;
-            tYell = DELAY_YELL_PRINCE_LIAM_GREYMANE;
+            m_timer = 2000;
+            m_phase = 0;
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
         }
 
-		// There is NO phase shift here!!!!
-        void DamageTaken(Unit* who, uint32 & /*uiDamage*/)
+        void DamageTaken(Unit* who, uint32 &damage)
         {
-            bool isPlayer = who->GetTypeId() == TYPEID_PLAYER;
-
-            if (isPlayer || who->IsPet())
-            {
-                me->getThreatManager().resetAllAggro();
-                if (isPlayer)
-                    who->AddThreat(me, 1.0f);
-                me->AddThreat(who, 1.0f);
-                me->AI()->AttackStart(who);
-                dmgCount = 0;
-            }
-        }
-
-        void DamageDealt(Unit* target, uint32& /*damage*/, DamageEffectType /*damaGetPositionYpe*/)
-        {
-            if (target->GetEntry() == NPC_RAMPAGING_WORGEN_1)
-                ++dmgCount;
+            damage /= 2;
         }
 
         void UpdateAI(uint32 diff)
         {
-            //If creature has no target
+            if (m_timer <= diff)
+            {
+                m_timer = 120000;
+                DoShowFight();
+            }
+            else m_timer -= diff;
+
             if (!UpdateVictim())
-            {
-                if (tSeek <= diff)
-                {
-                    //Find worgen nearby
-                    if (me->IsAlive() && !me->IsInCombat() && (me->GetDistance2d(me->GetHomePosition().GetPositionX(), me->GetHomePosition().GetPositionY()) <= 1.0f))
-                        if (Creature* enemy = me->FindNearestCreature(NPC_RAMPAGING_WORGEN_1, 16.0f, true))
-                            me->AI()->AttackStart(enemy);
-                    tSeek = urand(1000, 2000);//optimize cpu load
-                }
-                else tSeek -= diff;
-
-                //Yell only once after Reset()
-                if (doYell)
-                {
-                    //Yell Timer
-                    if (tYell <= diff)
-                    {
-                        //Random yell
-						Talk(YELL_PRINCE_LIAM_GREYMANE);
-						tYell = urand(10000, 20000);
-                        doYell = false;
-                    }
-                    else
-                        tYell -= diff;
-                }
-            }
+                return;
             else
-            {
-                //Play sword attack sound
-                if (tSound <= diff)
-                {
-                    me->PlayDistanceSound(SOUND_SWORD_FLESH);
-                    tSound = DELAY_SOUND;
-                    playSnd = false;
-                }
+                DoMeleeAttackIfReady();
+        }
 
-                if (playSnd == true) tSound -= diff;
-
-                //Attack
-                if (dmgCount < 2)
-                    DoMeleeAttackIfReady();
-                else if (me->GetVictim()->GetTypeId() == TYPEID_PLAYER) dmgCount = 0;
-                else if (me->GetVictim()->IsPet()) dmgCount = 0;
-                else
-                {
-                    if (tAnimate <= diff)
-                    {
-                        me->HandleEmoteCommand(EMOTE_ONESHOT_ATTACK1H);
-                        playSnd = true;
-                        tAnimate = DELAY_ANIMATE;
-                    }
-                    else
-                        tAnimate -= diff;
-                }
-
-                //Stop yell timer on combat
-                doYell = false;
-            }
+        void DoShowFight()
+        {
+            me->SummonCreature(35660, -1491.9f, 1413.1f, 35.56f, 5.5f);
         }
     };
 
@@ -126,99 +61,165 @@ public:
     }
 };
 
-// 34916
-class npc_gilneas_city_guard_34916 : public CreatureScript
+// 35660 // part showfight worgen <> liam
+class npc_rampaging_worgen_35660 : public CreatureScript
 {
 public:
-    npc_gilneas_city_guard_34916() : CreatureScript("npc_gilneas_city_guard_34916") {}
+    npc_rampaging_worgen_35660() : CreatureScript("npc_rampaging_worgen_35660") {}
 
-    struct npc_gilneas_city_guard_34916AI : public ScriptedAI
+    struct npc_rampaging_worgen_35660AI : public ScriptedAI
     {
-        npc_gilneas_city_guard_34916AI(Creature* creature) : ScriptedAI(creature) {}
+        npc_rampaging_worgen_35660AI(Creature* creature) : ScriptedAI(creature) {}
+
+        uint32 m_timer;
+        uint32 m_enrage;
+        uint32 m_attackLiam;
 
         void Reset()
         {
-            tAnimate   = DELAY_ANIMATE;
-            dmgCount   = 0;
-            tSound     = DELAY_SOUND;
-            playSound  = false;
-            tSeek      = urand(1000, 2000);
+            m_timer = 0;
+            m_enrage = 0;
+            m_attackLiam = 0;
+            me->SetSpeed(MOVE_RUN, 1.8f, true);
+            me->GetMotionMaster()->MovePoint(1234, -1482.9f, 1394.6f, 35.55f);
         }
 
-        void DamageTaken(Unit* who, uint32 &Damage)
+        void JustDied(Unit* /*killer*/) 
         {
-            if (who->GetTypeId() == TYPEID_PLAYER)
+            if (Creature* liam = me->FindNearestCreature(34913, 4.0f))
             {
-                me->getThreatManager().resetAllAggro();
-                who->AddThreat(me, 1.0f);
-                me->AddThreat(who, 1.0f);
-                me->AI()->AttackStart(who);
-                dmgCount = 0;
-            }
-            else if (who->IsPet())
-            {
-                me->getThreatManager().resetAllAggro();
-                me->AddThreat(who, 1.0f);
-                me->AI()->AttackStart(who);
-                dmgCount = 0;
+                m_attackLiam = 0;
+                me->DespawnOrUnsummon(1000);
             }
         }
 
-        void DamageDealt(Unit* target, uint32& damage, DamageEffectType damageType)
+        void MovementInform(uint32 type, uint32 id) 
+        { 
+            if (type == POINT_MOTION_TYPE && id == 1234)
+                m_attackLiam = 1;
+        }
+
+        void DamageTaken(Unit* who, uint32 &damage)
         {
-            if (target->GetEntry() == NPC_RAMPAGING_WORGEN_1)
-                dmgCount ++;
+            if (who->GetEntry() == 34913)
+            {
+                damage /= 2;
+                if (!m_enrage && me->GetHealthPct() < 50.0f)
+                {
+                    me->CastSpell(me, 56646);
+                    m_enrage = 250;
+                }
+            }
         }
 
         void UpdateAI(uint32 diff)
         {
-            if (tSeek <= diff)
+            if (m_timer <= diff)
             {
-                if ((me->IsAlive()) && (!me->IsInCombat() && (me->GetDistance2d(me->GetHomePosition().GetPositionX(), me->GetHomePosition().GetPositionY()) <= 1.0f)))
-                    if (Creature* enemy = me->FindNearestCreature(NPC_RAMPAGING_WORGEN_1, 16.0f, true))
-                        me->AI()->AttackStart(enemy);
-                tSeek = urand(1000, 2000);
+                m_timer = 500;
+                DoFight();
             }
-            else tSeek -= diff;
+            else m_timer -= diff;
 
             if (!UpdateVictim())
                 return;
-
-            if (tSound <= diff)
-            {
-                me->PlayDistanceSound(SOUND_SWORD_FLESH);
-                tSound = DELAY_SOUND;
-                playSound = false;
-            }
-
-            if (playSound == true)
-                tSound -= diff;
-
-            if (dmgCount < 2)
+            else
                 DoMeleeAttackIfReady();
-            else
-                if (me->GetVictim()->GetTypeId() == TYPEID_PLAYER) dmgCount = 0;
-            else
-                if (me->GetVictim()->IsPet()) dmgCount = 0;
-            else
-            {
-                if (tAnimate <= diff)
-                {
-                    me->HandleEmoteCommand(EMOTE_ONESHOT_ATTACK1H);
-                    playSound = true;
-                    tAnimate = DELAY_ANIMATE;
-                }
-                else
-                    tAnimate -= diff;
-            }
         }
 
-    private :
-        uint32 tAnimate;
-        uint32 tSound;
-        uint32 dmgCount;
-        uint32 tSeek;
-        bool playSound;
+        void DoFight()
+        {
+            if (m_enrage)
+                m_enrage--;
+
+            switch (m_attackLiam)
+            {
+            case 1:
+                if (Creature* liam = me->FindNearestCreature(34913, 100.0f))
+                {
+                    m_attackLiam = 2;
+                    Position p1 = liam->GetPosition();
+                    float o1 = liam->GetAngle(p1.GetPositionX(), p1.GetPositionY());
+                    Position p2 = liam->GetNearPosition(2.0f, o1);
+                    me->GetMotionMaster()->MovePoint(0, p2, true);
+                }
+                break;
+            case 2:
+                if (Creature* liam = me->FindNearestCreature(34913, 4.0f))
+                {
+                    m_attackLiam = 3;
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    me->Attack(liam, true);
+                    liam->Attack(me, true);
+                }
+                break;
+            case 3:
+                break;
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_rampaging_worgen_35660AI(creature);
+    }
+};
+
+// 34916 // part showfight guard <> worgen..
+class npc_gilneas_city_guard_34916 : public CreatureScript
+{
+public:
+    npc_gilneas_city_guard_34916() : CreatureScript("npc_gilneas_city_guard_34916") { }
+
+    struct npc_gilneas_city_guard_34916AI : public ScriptedAI
+    {
+        npc_gilneas_city_guard_34916AI(Creature* creature) : ScriptedAI(creature) { }
+
+        uint32 m_timer;
+        uint32 m_phase;
+
+        void Reset()
+        {
+            m_timer = urand(100, 2000);
+            m_phase = 0;
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->getThreatManager().resetAllAggro();
+        }
+       
+        void DamageTaken(Unit* who, uint32 &damage)
+        {
+
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+            if (m_timer <= diff)
+            {
+                m_timer = urand(900,1200);
+                DoShowFight();
+            }
+            else m_timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+
+        void DoShowFight()
+        {
+            if (Creature* worgen = me->FindNearestCreature(34884, 4.0f))
+            {
+                me->SetFacingToObject(worgen);
+                me->HandleEmote(EMOTE_ONESHOT_ATTACK1H);
+            }
+            else if (Creature* worgen = me->FindNearestCreature(35660, 4.0f))
+            {
+                me->SetFacingToObject(worgen);
+                me->HandleEmote(EMOTE_ONESHOT_ATTACK1H);
+            }
+        }
     };
 
     CreatureAI* GetAI(Creature* creature) const
@@ -227,7 +228,7 @@ public:
     }
 };
 
-// 34884
+// 34884 // part showfight worgen <> guard..
 class npc_rampaging_worgen_34884 : public CreatureScript
 {
 public:
@@ -237,91 +238,56 @@ public:
     {
         npc_rampaging_worgen_34884AI(Creature* creature) : ScriptedAI(creature) {}
 
-        uint32 tEnrage;
-        uint32 dmgCount;
-        uint32 tAnimate;
-        uint32 tSound;
-        bool playSound, willCastEnrage;
+        uint32 m_timer;
+        uint32 m_phase;
+        uint32 m_encount;
 
         void Reset()
         {
-            tEnrage    = 0;
-            dmgCount   = 0;
-            tAnimate   = DELAY_ANIMATE;
-            tSound     = DELAY_SOUND;
-            playSound  = false;
-            willCastEnrage = urand(0, 1);
+            m_timer = urand(100, 2000);
+            m_phase = 0;
+            m_encount = urand(20, 220);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->getThreatManager().resetAllAggro();
         }
 
-        void DamageDealt(Unit* target, uint32& damage, DamageEffectType damageType)
+        void DamageTaken(Unit* who, uint32 &damage)
         {
-            if (target->GetEntry() == NPC_GILNEAS_CITY_GUARD || target->GetEntry() == NPC_PRINCE_LIAM_GREYMANE)
-                dmgCount++;
-        }
 
-        void DamageTaken(Unit* who, uint32 &Damage)
-        {
-            if (who->GetTypeId() == TYPEID_PLAYER)
-            {
-                me->getThreatManager().resetAllAggro();
-                who->AddThreat(me, 1.0f);
-                me->AddThreat(who, 1.0f);
-                me->AI()->AttackStart(who);
-                dmgCount = 0;
-            }
-            else if (who->IsPet())
-            {
-                me->getThreatManager().resetAllAggro();
-                me->AddThreat(who, 1.0f);
-                me->AI()->AttackStart(who);
-                dmgCount = 0;
-            }
         }
 
         void UpdateAI(uint32 diff)
         {
+            if (m_timer <= diff)
+            {
+                m_timer = urand(900, 1200);
+                DoShowFight();
+            }
+            else m_timer -= diff;
+
             if (!UpdateVictim())
                 return;
-
-            if (tEnrage <= diff && willCastEnrage)
-            {
-                if (me->GetHealthPct() <= 30)
-                {
-                    me->MonsterTextEmote(-106, 0);
-                    DoCast(me, SPELL_ENRAGE);
-                    tEnrage = CD_ENRAGE;
-                }
-            }
-            else tEnrage -= diff;
-
-            if (playSound == true)
-                tSound -= diff;
-
-            if (tSound <= diff)
-            {
-                me->PlayDistanceSound(SOUND_SWORD_PLATE);
-                tSound = DELAY_SOUND;
-                playSound = false;
-            }
-
-            if (dmgCount < 2)
+            else
                 DoMeleeAttackIfReady();
-            else
-                if (me->GetVictim()->GetTypeId() == TYPEID_PLAYER)
-                    dmgCount = 0;
-            else
-                if (me->GetVictim()->IsPet())
-                    dmgCount = 0;
-            else
+        }
+
+        void DoShowFight()
+        {
+            if (Creature* guard = me->FindNearestCreature(34916, 4.0f))
             {
-                if (tAnimate <= diff)
+                me->SetFacingToObject(guard);
+                if (m_encount)
                 {
-                    me->HandleEmoteCommand(EMOTE_ONESHOT_ATTACK_UNARMED);
-                    tAnimate = DELAY_ANIMATE;
-                    playSound = true;
+                    me->HandleEmote(EMOTE_ONESHOT_ATTACK1H);
+                    m_encount--;
                 }
                 else
-                    tAnimate -= diff;
+                {
+                    m_encount = urand(160, 220);
+                    me->CastSpell(me, 8599);
+                    m_timer = 2500;
+                }
             }
         }
     };
@@ -379,69 +345,6 @@ public:
     CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_mariam_spellwalker_35872AI(creature);
-    }
-};
-
-// 35660
-class npc_rampaging_worgen_35660 : public CreatureScript
-{
-public:
-    npc_rampaging_worgen_35660() : CreatureScript("npc_rampaging_worgen_35660") {}
-
-    struct npc_rampaging_worgen_35660AI : public ScriptedAI
-    {
-        npc_rampaging_worgen_35660AI(Creature* creature) : ScriptedAI(creature) {}
-
-        void JustRespawned()
-        {
-            tEnrage = 0;
-            tRun = 500;
-            onceRun = true;
-            x = me->m_positionX + cos(me->m_orientation)*8;
-            y = me->m_positionY + sin(me->m_orientation)*8;
-            z = me->m_positionZ;
-            willCastEnrage = urand(0, 1);
-        }
-
-        void UpdateAI(uint32 diff)
-        {
-            if (tRun <= diff && onceRun)
-            {
-                me->GetMotionMaster()->MoveCharge(x, y, z, 8);
-                onceRun = false;
-            }
-            else
-                tRun -= diff;
-
-            if (!UpdateVictim())
-                return;
-
-            if (tEnrage <= diff)
-            {
-                if (me->GetHealthPct() <= 30 && willCastEnrage)
-                {
-                    me->MonsterTextEmote(-106, 0);
-                    DoCast(me, SPELL_ENRAGE);
-                    tEnrage = CD_ENRAGE;
-                }
-            }
-            else
-                tEnrage -= diff;
-
-            DoMeleeAttackIfReady();
-        }
-
-    private :
-        uint16 tRun;
-        uint16 tEnrage;
-        bool onceRun;
-        bool willCastEnrage;
-        float x, y, z;
-    };
-
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new npc_rampaging_worgen_35660AI(creature);
     }
 };
 
@@ -2396,11 +2299,11 @@ public:
     }
 };
 
-// 36332
-class npc_king_genn_greymane_36332 : public CreatureScript
+// 36332 wrong
+class npc_king_genn_greymane : public CreatureScript
 {
 public:
-    npc_king_genn_greymane_36332() : CreatureScript("npc_king_genn_greymane_36332") {}
+    npc_king_genn_greymane() : CreatureScript("npc_king_genn_greymane") {}
 
     bool OnQuestReward(Player* player, Creature* creature, Quest const* _Quest, uint32)
     {
@@ -3833,7 +3736,7 @@ public:
 	}
 };
 
-void AddSC_gilneas()
+void AddSC_zone_gilneas_city2()
 {
     new spell_attack_lurker_67805();
     new npc_admiral_nightwind_36616();
@@ -3863,7 +3766,7 @@ void AddSC_gilneas()
     new npc_lord_darius_crowley_35552();
     new npc_trigger_event_c3();
     new npc_trigger_event_first_c3();
-    new npc_king_genn_greymane_36332();
+    new npc_king_genn_greymane();
 	
     new npc_lord_darius_crowley_35077();
     new npc_worgen_runt_35188();

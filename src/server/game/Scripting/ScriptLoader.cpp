@@ -313,6 +313,7 @@ void AddSC_boss_zanzil();
 void AddSC_instance_zulgurub();
 void AddSC_zone_gilneas_duskhaven();
 void AddSC_zone_gilneas_city();
+void AddSC_zone_gilneas_city2();
 
 //void AddSC_alterac_mountains();
 void AddSC_arathi_highlands();
@@ -1183,6 +1184,7 @@ void AddEasternKingdomsScripts()
     AddSC_wetlands();
     AddSC_zone_gilneas_duskhaven();
     AddSC_zone_gilneas_city();
+    AddSC_zone_gilneas_city2();
 
 #endif
 }
