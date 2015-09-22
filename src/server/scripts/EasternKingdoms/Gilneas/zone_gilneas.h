@@ -185,58 +185,26 @@ Position const FrightenedWay[2] =
     {-1403.31f, 1375.35f, 35.55f, 0.0f}
 };
 
-struct Waypoint
+Position const JumpW1[3] =
 {
-    float X, Y, Z;
+    { -1643.91f, 1482.96f, 63.22f, 3.95f },
+    { -1638.83f, 1478.07f, 65.36f, 3.84f },
+    { -1631.49f, 1475.02f, 65.64f, 3.84f }
 };
 
-Waypoint NW_WAYPOINT_LOC1[2]=
+Position const LandingW1[3] =
 {
-    { -1630.62f, 1480.55f, 70.40f }, // Worgen Runt 1 top edge of Roof Waypoint
-    { -1636.01f, 1475.81f, 64.51f }  // Worgen Runt 1 Edge of Roof Waypoint
+    { -1677.39f, 1455.52f, 52.29f, 4.06f },
+    { -1671.89f, 1449.27f, 52.29f, 3.84f },
+    { -1664.82f, 1443.62f, 52.29f, 3.84f }
 };
 
-Waypoint NW_WAYPOINT_LOC2[2]=
+Position const LandingW2[4] =
 {
-    { -1637.26f, 1488.86f, 69.95f }, // Worgen Runt 1 top edge of Roof Waypoint
-    { -1642.45f, 1482.23f, 64.30f }  // Worgen Runt 1 Edge of Roof Waypoint
-};
-
-Waypoint SW_WAYPOINT_LOC1[2]=
-{
-    { -1718.31f, 1526.62f, 55.91f }, // Worgen Runt 2 Corner where we turn
-    { -1717.86f, 1490.77f, 56.61f }  // Worgen Runt 2 Edge of Roof Waypoint
-};
-
-Waypoint SW_WAYPOINT_LOC2[2]=
-{
-    { -1718.31f, 1526.62f, 55.91f }, // Worgen Alpha 1 Corner where we turn
-    { -1717.86f, 1487.00f, 57.07f }  // Worgen Alpha 1 Edge of Roof Waypoint
-};
-
-Waypoint N_WAYPOINT_LOC[1]=
-{
-    { -1593.38f, 1408.02f, 72.64f } // Worgen Runt 2 Edge of Roof Waypoint
-};
-
-/* QUEST - 14154 - By The Skin of His Teeth */
-static const Position spawnPos[3][3] =
-{
-    {
-        { -1718.195f, 1526.525879f, 55.918981f, 4.698965f }, // Spawn Left
-        { -1718.152f, 1486.315918f, 57.232832f, 5.437238f }, // MoveTo Left
-        { -1699.458f, 1468.477783f, 52.297140f, 5.523634f } // JumpTo Left
-    },
-    {
-        { -1625.497f, 1492.348755f, 73.716627f, 4.070646f }, // Spawn Mid
-        { -1632.688f, 1485.533447f, 74.958799f, 3.874443f }, // MoveTo Mid
-        { -1676.319f, 1445.140747f, 52.297140f, 0.748411f } // JumpTo Mid - CENTER
-    },
-    {
-        { -1562.104f, 1409.827148f, 71.676458f, 3.218636f }, // Spawn Right
-        { -1594.044f, 1408.207397f, 72.850088f, 3.120459f }, // MoveTo Right
-        { -1655.406f, 1425.001953f, 52.297109f, 2.291864f } //JumpTo Right
-    }
+    { -1704.93f, 1469.07f, 52.29f, 5.34f },
+    { -1698.90f, 1472.92f, 52.29f, 5.41f },
+    { -1703.37f, 1470.66f, 52.29f, 5.49f },
+    { -1700.37f, 1473.32f, 52.29f, 5.41f }
 };
 
 #define DELAY_EMOTE_PANICKED_CITIZEN                  urand(5000, 15000)

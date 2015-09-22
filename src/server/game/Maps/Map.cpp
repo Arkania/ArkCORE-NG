@@ -2225,6 +2225,11 @@ bool Map::IsOutdoors(float x, float y, float z) const
     return IsOutdoorWMO(mogpFlags, adtId, rootId, groupId, wmoEntry, atEntry);
 }
 
+bool Map::IsIndoors(WorldObject* wo) const
+{
+    return !IsOutdoors(wo->GetPositionX(), wo->GetPositionY(), wo->GetPositionZ());
+}
+
 bool Map::GetAreaInfo(float x, float y, float z, uint32 &flags, int32 &adtId, int32 &rootId, int32 &groupId) const
 {
     float vmap_z = z;

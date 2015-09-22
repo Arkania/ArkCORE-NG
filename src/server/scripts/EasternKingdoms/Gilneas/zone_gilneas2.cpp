@@ -271,6 +271,11 @@ public:
                 me->SetFacingToObject(worgen);
                 me->HandleEmote(EMOTE_ONESHOT_ATTACK1H);
             }
+            else if (Creature* worgen = me->FindNearestCreature(35118, 4.0f))
+            {
+                me->SetFacingToObject(worgen);
+                me->HandleEmote(EMOTE_ONESHOT_ATTACK1H);
+            }
         }
     };
 
@@ -747,219 +752,174 @@ class npc_lord_darius_crowley_35077 : public CreatureScript
 public:
     npc_lord_darius_crowley_35077() : CreatureScript("npc_lord_darius_crowley_35077") { }
 
-    enum
-    {
-        SPELL_DEMORALIZING_SHOUT            = 61044,
-        SPELL_BY_THE_SKIN                   = 66914,
-        SPELL_LEFT_HOOK                     = 67825,
-        SPELL_SNAP_KICK                     = 67827,
-        SPELL_PHASING_AURA                  = 59073,
-
-        QUEST_BY_THE_SKIN                   = 14154,
-        ACTION_START_EVENT                  = 1,
-
-        NPC_WORGEN_RUNT_C2                  = 35456,
-        NPC_WORGEN_RUNT_C1                  = 35188,
-        NPC_WORGEN_ALPHA_C2                 = 35167,
-        NPC_WORGEN_ALPHA_C1                 = 35170,
-
-        EVENT_DEMORALIZING_SHOUT            = 1,
-        EVENT_LEFT_HOOK                     = 2,
-        EVENT_SNAP_KICK                     = 3,
-        EVENT_NEXT_WAVE                     = 4,
-    };
-
     bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
     {
-        if (quest->GetQuestId() == QUEST_BY_THE_SKIN)
-        {
-            creature->AI()->DoAction(ACTION_START_EVENT);
-            creature->AI()->SetGUID(player->GetGUID());
-            creature->CastSpell(player, SPELL_BY_THE_SKIN, true);
-        }
+        if (quest->GetQuestId() == 14154)
+            if (CAST_AI(npc_lord_darius_crowley_35077AI,creature->AI())->m_playerGUID == 0)
+            {
+                creature->AI()->SetGUID(player->GetGUID());
+                creature->AI()->DoAction(ACTION_START_EVENT);
+                creature->CastSpell(player, SPELL_BY_THE_SKIN, true);
+            }
         return true;
     }
 
     struct npc_lord_darius_crowley_35077AI : public ScriptedAI
     {
-        npc_lord_darius_crowley_35077AI(Creature* creature) : ScriptedAI(creature), summons(me) {  }
+        npc_lord_darius_crowley_35077AI(Creature* creature) : ScriptedAI(creature), m_summons(me) { Init(); }
 
-        Player* m_player;
-
-        void Reset()
+        enum eQ14154
         {
-            EventInProgress = false;
-            stage = 1;
-            summonPos = 0;
-            cnt = 0;
-            toSummon = 0;
-            phaseTimer = 15000;
-            m_player = NULL;
+            Event120Secounds = 1,
+            EventCheckPlayerIsAlive,
+            EventSummonNextWave,
+            EventHelpPlayer,
+        };
 
-            events.Reset();
-            SetCombatMovement(false);
-            summons.DespawnAll();
+        uint64 m_playerGUID;
+        EventMap m_events;
+        SummonList m_summons;
+        uint32 m_phase;
+
+        void Init()
+        {
+            m_events.Reset();
+            m_playerGUID = 0;
+            m_phase = 0;
+            m_summons.DespawnAll();
         }
 
-        void EnterEvadeMode()
+        void JustSummoned(Creature* summoned) override
         {
-            if (!EventInProgress)
-                ScriptedAI::EnterEvadeMode();
+            m_summons.Summon(summoned);
         }
 
-        void JustSummoned(Creature* summoned)
+        void SummonedCreatureDies(Creature* summon, Unit* /*killer*/) override
         {
-            summons.Summon(summoned);
-            summoned->AI()->SetData(0, summonPos);
+            m_summons.Despawn(summon);
         }
 
-        void DoAction(int32 /*action*/)
+        void DoAction(int32 /*action*/) override
         {
-            if (!EventInProgress)
-            {
-                EventInProgress = true;
-                stage = 1;
-                events.ScheduleEvent(EVENT_NEXT_WAVE, 5000);
-                events.ScheduleEvent(EVENT_DEMORALIZING_SHOUT, 20000);
-                events.ScheduleEvent(EVENT_LEFT_HOOK, 25000);
-                events.ScheduleEvent(EVENT_SNAP_KICK, 28000);
-            }
+            m_phase = 1;
+            m_events.ScheduleEvent(EventCheckPlayerIsAlive, 1000);
+            m_events.ScheduleEvent(EventSummonNextWave, 1000);
+            m_events.ScheduleEvent(Event120Secounds, 120000);
+            m_events.ScheduleEvent(EventHelpPlayer, 250);
         }
 
-        void SetGUID(uint64 guid, int32)
+        void SetGUID(uint64 guid, int32 type = 0) override
         {
-            if (!EventInProgress)
-                playerGUID = guid;
+            m_playerGUID = guid;
         }
 
-        void SummonedCreatureDespawn(Creature* summoned)
-        {
-            summons.Despawn(summoned);
-        }
-
-        void JustDied(Unit* /*killer*/)
-        {
-            if (Player * player = me->GetPlayer(*me, playerGUID))
-            {
-                player->RemoveAurasDueToSpell(SPELL_PHASING_AURA);
-                player->FailQuest(QUEST_BY_THE_SKIN);
-            }
-        }
-
-        void CastVictim(uint32 spellId)
-        {
-            if (me->GetVictim())
-                DoCastVictim(spellId);
-        }
-
-        void UpdateAI(uint32 diff)
-        {
-            if (me->IsInCombat())
-                if (Unit* victim = me->SelectVictim())
-                    AttackStart(victim);
-
-            if (!EventInProgress)
-                return;
-
-            events.Update(diff);
-
-            if (uint32 eventId = events.ExecuteEvent())
-            {
-                switch(eventId)
+        void DamageTaken(Unit* attacker, uint32& /*damage*/) 
+        { 
+            if (Creature* worgen = attacker->ToCreature())
+                if (!me->IsInCombat())
                 {
-                case EVENT_DEMORALIZING_SHOUT:
-                    DoCast(SPELL_DEMORALIZING_SHOUT);
-                    events.ScheduleEvent(EVENT_DEMORALIZING_SHOUT, 15000);
-                    break;
-                case EVENT_LEFT_HOOK:
-                    CastVictim(SPELL_LEFT_HOOK);
-                    events.ScheduleEvent(EVENT_LEFT_HOOK, 5000);
-                    break;
-                case EVENT_SNAP_KICK:
-                    CastVictim(SPELL_SNAP_KICK);
-                    events.ScheduleEvent(EVENT_SNAP_KICK, urand(3000, 8000));
-                    break;
-                case EVENT_NEXT_WAVE:
+                } //   me->Attack(worgen, true);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                    case Event120Secounds:
+                        Init();
+                        break;
+                    case EventCheckPlayerIsAlive: // check every sec player is alive
+                        if (m_playerGUID && m_phase)
+                            if (Player* player = Player::GetPlayer(*me, m_playerGUID))
+                                if (!player->IsInWorld() || !player->IsAlive())
+                                    Init();
+
+                        m_events.ScheduleEvent(EventCheckPlayerIsAlive, 1000);
+                        break;
+                    case EventSummonNextWave:
                     {
-                        cnt = 0;
-                        toSummon = 0;
-
-                   switch (urand (1,5)) // After intial wave, wave spawns should be random
-                    {
-                        case 1: // One Alpha on SW Roof and One Alpha on NW Roof
-                            me->SummonCreature(NPC_WORGEN_ALPHA_C2, SW_ROOF_SPAWN_LOC_1, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, WORGEN_EVENT_SPAWNTIME);
-                            me->SummonCreature(NPC_WORGEN_ALPHA_C1, NW_ROOF_SPAWN_LOC_1, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, WORGEN_EVENT_SPAWNTIME);
-                            break;
-
-                        case 2: // 8 Runts on NW Roof
-                            for (int i = 0; i < 5; i++)
-                                me->SummonCreature(NPC_WORGEN_RUNT_C1, NW_ROOF_SPAWN_LOC_1, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, WORGEN_EVENT_SPAWNTIME);
-                                me->SummonCreature(NPC_WORGEN_RUNT_C1, NW_ROOF_SPAWN_LOC_2, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, WORGEN_EVENT_SPAWNTIME);
-                            break;
-
-                        case 3: // 8 Runts on SW Roof
-                            for (int i = 0; i < 5; i++)
-                                me->SummonCreature(NPC_WORGEN_RUNT_C2, SW_ROOF_SPAWN_LOC_1, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, WORGEN_EVENT_SPAWNTIME);
-                                me->SummonCreature(NPC_WORGEN_RUNT_C2, SW_ROOF_SPAWN_LOC_2, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, WORGEN_EVENT_SPAWNTIME);
-                            break;
-
-                        case 4: // One Alpha on SW Roof and One Alpha on N Roof
-                            me->SummonCreature(NPC_WORGEN_ALPHA_C2, SW_ROOF_SPAWN_LOC_1, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, WORGEN_EVENT_SPAWNTIME);
-                            me->SummonCreature(NPC_WORGEN_ALPHA_C1, N_ROOF_SPAWN_LOC, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, WORGEN_EVENT_SPAWNTIME);
-                            break;
-                        case 5: // 8 Runts - Half NW and Half SW
-                            for (int i = 0; i < 5; i++)
-                                me->SummonCreature(NPC_WORGEN_RUNT_C2, SW_ROOF_SPAWN_LOC_1, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, WORGEN_EVENT_SPAWNTIME);
-                                me->SummonCreature(NPC_WORGEN_RUNT_C1, NW_ROOF_SPAWN_LOC_2, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, WORGEN_EVENT_SPAWNTIME);
-                            break;
-                        default:
-                            return;
-                        }
-                        for(int i = 0; i < cnt; ++i)
-                            me->SummonCreature(NPC_WORGEN_RUNT_C2, spawnPos[summonPos][0], TEMPSUMMON_CORPSE_DESPAWN, 10000);
-                        me->SummonCreature(toSummon, spawnPos[summonPos][0], TEMPSUMMON_CORPSE_DESPAWN, 10000);
-
-                        ++stage;
-
-                        if (summonPos > 1)
-                            summonPos = 0;
-                        else
-                            ++summonPos;
-
-                        if (stage > 7)
+                        for (int i = 0; i < 4; i++)
                         {
-                            stage = 1;
-                            EventInProgress = false;
-                            events.Reset();
+                            uint32 w1 = RAND(NPC_WORGEN_RUNT_C1, NPC_WORGEN_RUNT_C2, NPC_WORGEN_ALPHA_C1, NPC_WORGEN_ALPHA_C2);
+                            uint32 w2 = RAND(NPC_WORGEN_RUNT_C1, NPC_WORGEN_RUNT_C2, NPC_WORGEN_ALPHA_C1, NPC_WORGEN_ALPHA_C2);
+                            Creature* creature1 = me->SummonCreature(w1, -1610.39f, 1507.16f, 74.99f, 3.94f, TEMPSUMMON_TIMED_DESPAWN, 120000);
+                            m_summons.Summon(creature1);
+                            creature1->AI()->SetGUID(m_playerGUID);
+                            creature1->AI()->DoAction(1);
+                            Creature* creature2 = me->SummonCreature(w2, -1718.01f, 1516.81f, 55.40f, 4.6f, TEMPSUMMON_TIMED_DESPAWN, 120000);
+                            m_summons.Summon(creature2);
+                            creature2->AI()->SetGUID(m_playerGUID);
+                            creature2->AI()->DoAction(2);
                         }
-                        else
-                            events.ScheduleEvent(EVENT_NEXT_WAVE, 15000);
+
+                        m_events.ScheduleEvent(EventSummonNextWave, 30000); // every 30 secounds one wave
+                        break;
                     }
-                    break;
-                default:
-                    break;
+                    case EventHelpPlayer:
+                    {
+                        if (!me->IsInCombat())
+                        {
+                            Creature* creature = NULL;
+                            creature = me->FindNearestCreature(NPC_WORGEN_RUNT_C1, 5.0f);
+                            if (!creature)
+                                creature = me->FindNearestCreature(NPC_WORGEN_RUNT_C2, 5.0f);
+                            if (!creature)
+                                creature = me->FindNearestCreature(NPC_WORGEN_ALPHA_C1, 5.0f);
+                            if (!creature)
+                                creature = me->FindNearestCreature(NPC_WORGEN_ALPHA_C2, 5.0f);
+                            if (creature)
+                            {
+                                me->Attack(creature, true);
+                                // creature->Attack(me, true);
+                            }
+                        }
+
+                        m_events.ScheduleEvent(EventHelpPlayer, 250);
+                        break;
+                    }
                 }
             }
+
+            if (!UpdateVictim())
+                return;
 
             DoMeleeAttackIfReady();
         }
 
-    private:
-        bool EventInProgress;
-        uint8 stage;
-        uint8 summonPos;
-        int cnt;
-        uint32 toSummon;
-        uint32 phaseTimer;
-        uint64 playerGUID;
-
-        EventMap events;
-        SummonList summons;
     };
 
     CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_lord_darius_crowley_35077AI(creature);
+    }
+};
+
+// 35124
+class npc_tobias_mistmantle_35124 : public CreatureScript
+{
+public:
+    npc_tobias_mistmantle_35124() : CreatureScript("npc_tobias_mistmantle_35124") { }
+
+    struct npc_tobias_mistmantle_35124AI : public ScriptedAI
+    {
+        npc_tobias_mistmantle_35124AI(Creature* creature) : ScriptedAI(creature)  { }
+
+        void UpdateAI(uint32 diff)
+        {
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_tobias_mistmantle_35124AI(creature);
     }
 };
 
@@ -971,115 +931,114 @@ public:
 
     struct npc_worgen_runt_35188AI : public ScriptedAI
     {
-        npc_worgen_runt_35188AI(Creature* creature) : ScriptedAI(creature) {}
+        npc_worgen_runt_35188AI(Creature* creature) : ScriptedAI(creature) { Init(); }
+       
+        uint64 m_playerGUID;
+        EventMap m_events;
+        uint32 m_phase;
+        Position jump;
 
-        uint32 WaypointId, willCastEnrage, tEnrage, CommonWPCount;
-        bool Run, Loc1, Loc2, Jump, Combat;
-
-        void Reset()
+        void Init()
         {
-            Run = Loc1 = Loc2 = Combat= Jump = false;
-            WaypointId          = 0;
-            tEnrage             = 0;
-            willCastEnrage      = urand(0, 1);
+            m_playerGUID = 0;
+            m_phase = 0;
+        }
+
+        void DoAction(int32 action) override
+        {
+            if (m_playerGUID)
+            {
+                m_events.ScheduleEvent(1, 500);
+                m_phase = action;
+                me->SetSpeed(MOVE_RUN, frand(1.2f, 1.6f));
+            }
+        }
+
+        void SetGUID(uint64 guid, int32 type = 0) override
+        {
+            m_playerGUID = guid;
+        }
+
+        void MovementInform(uint32 type, uint32 pointId)
+        {
+            if (type == POINT_MOTION_TYPE || type == EFFECT_MOTION_TYPE)
+                m_phase = pointId;
         }
 
         void UpdateAI(uint32 diff)
         {
-            if (me->GetPositionX() == -1611.40f && me->GetPositionY() == 1498.49f) // I was spawned in location 1
-            {
-                Run = true; // Start running across roof
-                Loc1 = true;
-            }
-            else if (me->GetPositionX() == -1618.86f && me->GetPositionY() == 1505.68f) // I was spawned in location 2
-            {
-                Run = true; // Start running across roof
-                Loc2 = true;
-            }
+            m_events.Update(diff);
 
-            if (Run && !Jump && !Combat)
+            uint32 eventId = m_events.ExecuteEvent();
+            switch (eventId)
             {
-                if (Loc1) // If I was spawned in Location 1
+                case 1:
                 {
-                    if (WaypointId < 2)
-                        me->GetMotionMaster()->MovePoint(WaypointId,NW_WAYPOINT_LOC1[WaypointId].X, NW_WAYPOINT_LOC1[WaypointId].Y, NW_WAYPOINT_LOC1[WaypointId].Z);
-                }
-                else if (Loc2)// If I was spawned in Location 2
-                {
-                    if (WaypointId < 2)
-                        me->GetMotionMaster()->MovePoint(WaypointId,NW_WAYPOINT_LOC2[WaypointId].X, NW_WAYPOINT_LOC2[WaypointId].Y, NW_WAYPOINT_LOC2[WaypointId].Z);
+                    m_events.ScheduleEvent(1, 500);
+                    DoWalk();
+                    break;
                 }
             }
 
-            if (!Run && Jump && !Combat) // After Jump
-            {
-                if (me->GetPositionZ() == PLATFORM_Z) // Check that we made it to the platform
-                {
-                    me->GetMotionMaster()->Clear(); // Stop Movement
-                    // Set our new home position so we don't try and run back to the rooftop on reset
-                    me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
-                    Combat = true; // Start Combat
-                    Jump = false; // We have already Jumped
-                }
-            }
+            
 
-            if (Combat && !Run && !Jump) // Our Combat AI
-            {
-                if (Player* player = me->SelectNearestPlayer(40.0f)) // Try to attack nearest player 1st (Blizz-Like)
-                    AttackStart(player);
-                else
-                    AttackStart(me->FindNearestCreature(NPC_LORD_DARIUS_CROWLEY_C1, 40.0f)); // Attack Darius 2nd - After that, doesn't matter
-
-                if (!UpdateVictim())
-                    return;
-
-                if (tEnrage <= diff) // Our Enrage trigger
-                {
-                    if (me->GetHealthPct() <= 30 && willCastEnrage)
-                    {
-                        me->MonsterTextEmote(-106, 0);
-                        DoCast(me, SPELL_ENRAGE);
-                        tEnrage = CD_ENRAGE;
-                    }
-                }
-                else
-                    tEnrage -= diff;
-
-                DoMeleeAttackIfReady();
-            }
-        }
-
-        void MovementInform(uint32 Type, uint32 PointId)
-        {
-            if (Type != POINT_MOTION_TYPE)
+            if (!UpdateVictim())
                 return;
 
-            if (Loc1)
+            DoMeleeAttackIfReady();
+        }
+
+        void DoWalk()
+        {
+            switch (m_phase)
             {
-                CommonWPCount = sizeof(NW_WAYPOINT_LOC1)/sizeof(Waypoint); // Count our waypoints
+            case 1:
+            {
+                m_phase = 3;
+                uint8 rol = urand(0, 2);
+                jump = JumpW1[rol];
+                me->GetMotionMaster()->MovePoint(11 + rol, jump);
+                break;
             }
-            else if (Loc2)
+            case 2:
+                m_phase = 3;
+                jump = Position(-1717.73f, 1486.27f, 57.23f, 5.45f);
+                me->GetMotionMaster()->MovePoint(21, jump);
+                break;
+            case 11:
+                m_phase = 4;
+                me->GetMotionMaster()->MoveJump(LandingW1[0], frand(20.0f, 25.0f), frand(15.0f, 20.0f), 25);
+                break;
+            case 12:
+                m_phase = 4;
+                me->GetMotionMaster()->MoveJump(LandingW1[1], frand(20.0f, 25.0f), frand(15.0f, 20.0f), 25);
+                break;
+            case 13:
+                m_phase = 4;
+                me->GetMotionMaster()->MoveJump(LandingW1[2], frand(20.0f, 25.0f), frand(15.0f, 20.0f), 25);
+                break;
+            case 21:
             {
-                CommonWPCount = sizeof(NW_WAYPOINT_LOC2)/sizeof(Waypoint); // Count our waypoints
+                m_phase = 5;
+                uint8 rol = urand(0, 3);
+                jump = LandingW2[rol];
+                me->GetMotionMaster()->MoveJump(jump, frand(20.0f, 25.0f), frand(15.0f, 20.0f), 25);
+                break;
             }
-
-            WaypointId = PointId+1; // Increase to next waypoint
-
-            if (WaypointId >= CommonWPCount) // If we have reached the last waypoint
-            {
-                if (Loc1)
-                {
-                    me->GetMotionMaster()->MoveJump(-1668.52f + irand(-3, 3), 1439.69f + irand(-3, 3), PLATFORM_Z, 20.0f, 22.0f);
-                    Loc1 = false;
-                }
-                else if (Loc2)
-                {
-                    me->GetMotionMaster()->MoveJump(-1678.04f + irand(-3, 3), 1450.88f + irand(-3, 3), PLATFORM_Z, 20.0f, 22.0f);
-                    Loc2 = false;
-                }
-
-                Run = false; // Stop running - Regardless of spawn location
-                Jump = true; // Time to Jump - Regardless of spawn location
+            case 25:
+                m_phase = 6;
+                if (m_playerGUID)
+                    if (Player* player = Player::GetPlayer(*me, m_playerGUID))
+                        if (player->IsInWorld() || player->IsAlive())
+                        {
+                            Position pos = player->GetNearPosition(frand(2.0f, 4.0f), frand(3.14f, 6.28f));
+                            me->GetMotionMaster()->MovePoint(26, pos);
+                        }
+                break;
+            case 26:
+                m_phase = 7;
+                me->SetHomePosition(me->GetPosition());
+                break;
             }
         }
     };
@@ -1094,119 +1053,116 @@ public:
 class npc_worgen_runt_35456 : public CreatureScript
 {
 public:
-    npc_worgen_runt_35456() : CreatureScript("npc_worgen_runt_35456") {}
+    npc_worgen_runt_35456() : CreatureScript("npc_worgen_runt_35456") { }
 
     struct npc_worgen_runt_35456AI : public ScriptedAI
     {
-        npc_worgen_runt_35456AI(Creature* creature) : ScriptedAI(creature) {}
+        npc_worgen_runt_35456AI(Creature* creature) : ScriptedAI(creature) { Init(); }
+        
+        uint64 m_playerGUID;
+        EventMap m_events;
+        uint32 m_phase;
+        Position jump;
 
-        uint32 WaypointId, willCastEnrage, tEnrage, CommonWPCount;
-        bool Run, Loc1, Loc2, Jump, Combat;
-
-        void Reset()
+        void Init()
         {
-            Run = Loc1 = Loc2 = Combat= Jump = false;
-            WaypointId          = 0;
-            tEnrage             = 0;
-            willCastEnrage      = urand(0, 1);
+            m_playerGUID = 0;
+            m_phase = 0;
+        }
+
+        void DoAction(int32 action) override
+        {
+            if (m_playerGUID)
+            {
+                m_events.ScheduleEvent(1, 500);
+                m_phase = action;
+                me->SetSpeed(MOVE_RUN, frand(1.2f, 1.6f));
+            }
+        }
+
+        void SetGUID(uint64 guid, int32 type = 0) override
+        {
+            m_playerGUID = guid;
+        }
+
+        void MovementInform(uint32 type, uint32 pointId)
+        {
+            if (type == POINT_MOTION_TYPE || type == EFFECT_MOTION_TYPE)
+                m_phase = pointId;
         }
 
         void UpdateAI(uint32 diff)
         {
-            if (me->GetPositionX() == -1732.81f && me->GetPositionY() == 1526.34f) // I was spawned in location 1
-            {
-                Run = true; // Start running across roof
-                Loc1 = true;
-            }
-            else if (me->GetPositionX() == -1737.49f && me->GetPositionY() == 1526.11f) // I was spawned in location 2
-            {
-                Run = true; // Start running across roof
-                Loc2 = true;
-            }
+            m_events.Update(diff);
 
-            if (Run && !Jump && !Combat)
+            uint32 eventId = m_events.ExecuteEvent();
+            switch (eventId)
             {
-                if (Loc1) // If I was spawned in Location 1
+                case 1:
                 {
-                    if (WaypointId < 2)
-                        me->GetMotionMaster()->MovePoint(WaypointId,SW_WAYPOINT_LOC1[WaypointId].X, SW_WAYPOINT_LOC1[WaypointId].Y, SW_WAYPOINT_LOC1[WaypointId].Z);
-                }
-                else if (Loc2)// If I was spawned in Location 2
-                {
-                    if (WaypointId < 2)
-                        me->GetMotionMaster()->MovePoint(WaypointId,SW_WAYPOINT_LOC2[WaypointId].X, SW_WAYPOINT_LOC2[WaypointId].Y, SW_WAYPOINT_LOC2[WaypointId].Z);
+                    m_events.ScheduleEvent(1, 500);
+                    DoWalk();
+                    break;
                 }
             }
 
-            if (!Run && Jump && !Combat) // After Jump
-            {
-                if (me->GetPositionZ() == PLATFORM_Z) // Check that we made it to the platform
-                {
-                    me->GetMotionMaster()->Clear(); // Stop Movement
-                    // Set our new home position so we don't try and run back to the rooftop on reset
-                    me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
-                    Combat = true; // Start Combat
-                    Jump = false; // We have already Jumped
-                }
-            }
-
-            if (Combat && !Run && !Jump) // Our Combat AI
-            {
-                if (Player* player = me->SelectNearestPlayer(50.0f)) // Try to attack nearest player 1st (Blizz-Like)
-                    AttackStart(player);
-                else
-                    AttackStart(me->FindNearestCreature(NPC_LORD_DARIUS_CROWLEY_C1, 50.0f)); // Attack Darius 2nd - After that, doesn't matter
-
-                if (!UpdateVictim())
-                    return;
-
-                if (tEnrage <= diff) // Our Enrage trigger
-                {
-                    if (me->GetHealthPct() <= 30 && willCastEnrage)
-                    {
-                        me->MonsterTextEmote(-106, 0);
-                        DoCast(me, SPELL_ENRAGE);
-                        tEnrage = CD_ENRAGE;
-                    }
-                }
-                else
-                    tEnrage -= diff;
-
-                DoMeleeAttackIfReady();
-            }
-        }
-
-        void MovementInform(uint32 Type, uint32 PointId)
-        {
-            if (Type != POINT_MOTION_TYPE)
+            if (!UpdateVictim())
                 return;
 
-            if (Loc1)
+            DoMeleeAttackIfReady();
+        }
+
+        void DoWalk()
+        {
+            switch (m_phase)
             {
-                CommonWPCount = sizeof(SW_WAYPOINT_LOC1)/sizeof(Waypoint); // Count our waypoints
+            case 1:
+            {
+                m_phase = 3;
+                uint8 rol = urand(0, 2);
+                jump = JumpW1[rol];
+                me->GetMotionMaster()->MovePoint(11 + rol, jump);
+                break;
             }
-            else if (Loc2)
+            case 2:
+                m_phase = 3;
+                jump = Position(-1717.73f, 1486.27f, 57.23f, 5.45f);
+                me->GetMotionMaster()->MovePoint(21, jump);
+                break;
+            case 11:
+                m_phase = 4;
+                me->GetMotionMaster()->MoveJump(LandingW1[0], frand(20.0f, 25.0f), frand(15.0f, 20.0f), 25);
+                break;
+            case 12:
+                m_phase = 4;
+                me->GetMotionMaster()->MoveJump(LandingW1[1], frand(20.0f, 25.0f), frand(15.0f, 20.0f), 25);
+                break;
+            case 13:
+                m_phase = 4;
+                me->GetMotionMaster()->MoveJump(LandingW1[2], frand(20.0f, 25.0f), frand(15.0f, 20.0f), 25);
+                break;
+            case 21:
             {
-                CommonWPCount = sizeof(SW_WAYPOINT_LOC2)/sizeof(Waypoint); // Count our waypoints
+                m_phase = 5;
+                uint8 rol = urand(0, 3);
+                jump = LandingW2[rol];
+                me->GetMotionMaster()->MoveJump(jump, frand(20.0f, 25.0f), frand(15.0f, 20.0f), 25);
+                break;
             }
-
-            WaypointId = PointId+1; // Increase to next waypoint
-
-            if (WaypointId >= CommonWPCount) // If we have reached the last waypoint
-            {
-                if (Loc1)
-                {
-                    me->GetMotionMaster()->MoveJump(-1685.521f + irand(-3, 3), 1458.48f + irand(-3, 3), PLATFORM_Z, 20.0f, 22.0f);
-                    Loc1 = false;
-                }
-                else if (Loc2)
-                {
-                    me->GetMotionMaster()->MoveJump(-1681.81f + irand(-3, 3), 1445.54f + irand(-3, 3), PLATFORM_Z, 20.0f, 22.0f);
-                    Loc2 = false;
-                }
-
-                Run = false; // Stop running - Regardless of spawn location
-                Jump = true; // Time to Jump - Regardless of spawn location
+            case 25:
+                m_phase = 6;
+                if (m_playerGUID)
+                    if (Player* player = Player::GetPlayer(*me, m_playerGUID))
+                        if (player->IsInWorld() || player->IsAlive())
+                        {
+                            Position pos = player->GetNearPosition(frand(2.0f, 4.0f), frand(3.14f, 6.28f));
+                            me->GetMotionMaster()->MovePoint(26, pos);
+                        }
+                break;
+            case 26:
+                m_phase = 7;
+                me->SetHomePosition(me->GetPosition());
+                break;
             }
         }
     };
@@ -1225,115 +1181,112 @@ public:
 
     struct npc_worgen_alpha_35170AI : public ScriptedAI
     {
-        npc_worgen_alpha_35170AI(Creature* creature) : ScriptedAI(creature) {}
+        npc_worgen_alpha_35170AI(Creature* creature) : ScriptedAI(creature) { Init(); }
 
-        uint32 WaypointId, willCastEnrage, tEnrage, CommonWPCount;
-        bool Run, Loc1, Loc2, Jump, Combat;
+        uint64 m_playerGUID;
+        EventMap m_events;
+        uint32 m_phase;
+        Position jump;
 
-        void Reset()
+        void Init()
         {
-            Run = Loc1 = Loc2 = Combat= Jump = false;
-            WaypointId          = 0;
-            tEnrage             = 0;
-            willCastEnrage      = urand(0, 1);
+            m_playerGUID = 0;
+            m_phase = 0;
+        }
+
+        void DoAction(int32 action) override
+        {
+            if (m_playerGUID)
+            {
+                m_events.ScheduleEvent(1, 500);
+                m_phase = action;
+                me->SetSpeed(MOVE_RUN, frand(1.2f, 1.6f));
+            }
+        }
+
+        void SetGUID(uint64 guid, int32 type = 0) override
+        {
+            m_playerGUID = guid;
+        }
+
+        void MovementInform(uint32 type, uint32 pointId)
+        {
+            if (type == POINT_MOTION_TYPE || type == EFFECT_MOTION_TYPE)
+                m_phase = pointId;
         }
 
         void UpdateAI(uint32 diff)
         {
-            if (me->GetPositionX() == -1618.86f && me->GetPositionY() == 1505.68f) // I was spawned in location 1 on NW Rooftop
-            {
-                Run = true; // Start running across roof
-                Loc1 = true;
-            }
-            else if (me->GetPositionX() == -1562.59f && me->GetPositionY() == 1409.35f) // I was spawned on the North Rooftop
-            {
-                Run = true; // Start running across roof
-                Loc2 = true;
-            }
+            m_events.Update(diff);
 
-            if (Run && !Jump && !Combat)
+            uint32 eventId = m_events.ExecuteEvent();
+            switch (eventId)
             {
-                if (Loc1) // If I was spawned in Location 1
+                case 1:
                 {
-                    if (WaypointId < 2)
-                        me->GetMotionMaster()->MovePoint(WaypointId,NW_WAYPOINT_LOC1[WaypointId].X, NW_WAYPOINT_LOC1[WaypointId].Y, NW_WAYPOINT_LOC1[WaypointId].Z);
-                }
-                else if (Loc2)// If I was spawned in Location 2
-                {
-                    if (WaypointId < 2)
-                        me->GetMotionMaster()->MovePoint(WaypointId,N_WAYPOINT_LOC[WaypointId].X, N_WAYPOINT_LOC[WaypointId].Y, N_WAYPOINT_LOC[WaypointId].Z);
+                    m_events.ScheduleEvent(1, 500);
+                    DoWalk();
+                    break;
                 }
             }
 
-            if (!Run && Jump && !Combat) // After Jump
-            {
-                if (me->GetPositionZ() == PLATFORM_Z) // Check that we made it to the platform
-                {
-                    me->GetMotionMaster()->Clear(); // Stop Movement
-                    // Set our new home position so we don't try and run back to the rooftop on reset
-                    me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
-                    Combat = true; // Start Combat
-                    Jump = false; // We have already Jumped
-                }
-            }
-
-            if (Combat && !Run && !Jump) // Our Combat AI
-            {
-                if (Player* player = me->SelectNearestPlayer(40.0f)) // Try to attack nearest player 1st (Blizz-Like)
-                    AttackStart(player);
-                else
-                    AttackStart(me->FindNearestCreature(NPC_LORD_DARIUS_CROWLEY_C1, 40.0f)); // Attack Darius 2nd - After that, doesn't matter
-
-                if (!UpdateVictim())
-                    return;
-
-                if (tEnrage <= diff) // Our Enrage trigger
-                {
-                    if (me->GetHealthPct() <= 30 && willCastEnrage)
-                    {
-                        me->MonsterTextEmote(-106, 0);
-                        DoCast(me, SPELL_ENRAGE);
-                        tEnrage = CD_ENRAGE;
-                    }
-                }
-                else
-                    tEnrage -= diff;
-
-                DoMeleeAttackIfReady();
-            }
-        }
-
-        void MovementInform(uint32 Type, uint32 PointId)
-        {
-            if (Type != POINT_MOTION_TYPE)
+            if (!UpdateVictim())
                 return;
 
-            if (Loc1)
-            {
-                CommonWPCount = sizeof(NW_WAYPOINT_LOC1)/sizeof(Waypoint); // Count our waypoints
-            }
-            else if (Loc2)
-            {
-                CommonWPCount = sizeof(N_WAYPOINT_LOC)/sizeof(Waypoint); // Count our waypoints
-            }
+            DoMeleeAttackIfReady();
+        }
 
-            WaypointId = PointId+1; // Increase to next waypoint
-
-            if (WaypointId >= CommonWPCount) // If we have reached the last waypoint
+        void DoWalk()
+        {
+            switch (m_phase)
             {
-                if (Loc1)
+                case 1:
                 {
-                    me->GetMotionMaster()->MoveJump(-1668.52f + irand(-3, 3), 1439.69f + irand(-3, 3), PLATFORM_Z, 20.0f, 22.0f);
-                    Loc1 = false;
+                    m_phase = 3;
+                    uint8 rol = urand(0, 2);
+                    jump = JumpW1[rol];
+                    me->GetMotionMaster()->MovePoint(11 + rol, jump);
+                    break;
                 }
-                else if (Loc2)
+                case 2:
+                    m_phase = 3;
+                    jump = Position(-1717.73f, 1486.27f, 57.23f, 5.45f);
+                    me->GetMotionMaster()->MovePoint(21, jump);
+                    break;
+                case 11:
+                    m_phase = 4;
+                    me->GetMotionMaster()->MoveJump(LandingW1[0], frand(20.0f, 25.0f), frand(15.0f, 20.0f), 25);
+                    break;
+                case 12:
+                    m_phase = 4;
+                    me->GetMotionMaster()->MoveJump(LandingW1[1], frand(20.0f, 25.0f), frand(15.0f, 20.0f), 25);
+                    break;
+                case 13:
+                    m_phase = 4;
+                    me->GetMotionMaster()->MoveJump(LandingW1[2], frand(20.0f, 25.0f), frand(15.0f, 20.0f), 25);
+                    break;
+                case 21:
                 {
-                    me->GetMotionMaster()->MoveJump(-1660.17f + irand(-3, 3), 1429.55f + irand(-3, 3), PLATFORM_Z, 22.0f, 20.0f);
-                    Loc2 = false;
+                    m_phase = 5;
+                    uint8 rol = urand(0, 3);
+                    jump = LandingW2[rol];
+                    me->GetMotionMaster()->MoveJump(jump, frand(20.0f, 25.0f), frand(15.0f, 20.0f), 25);
+                    break;
                 }
-
-                Run = false; // Stop running - Regardless of spawn location
-                Jump = true; // Time to Jump - Regardless of spawn location
+                case 25:
+                    m_phase = 6;
+                    if (m_playerGUID)
+                        if (Player* player = Player::GetPlayer(*me, m_playerGUID))
+                            if (player->IsInWorld() || player->IsAlive())
+                            {
+                                Position pos = player->GetNearPosition(frand(2.0f, 4.0f), frand(3.14f, 6.28f));
+                                me->GetMotionMaster()->MovePoint(26, pos);
+                            }
+                    break;
+                case 26:
+                    m_phase = 7;
+                    me->SetHomePosition(me->GetPosition());
+                    break;
             }
         }
     };
@@ -1352,84 +1305,112 @@ public:
 
     struct npc_worgen_alpha_35167AI : public ScriptedAI
     {
-        npc_worgen_alpha_35167AI(Creature* creature) : ScriptedAI(creature) {}
+        npc_worgen_alpha_35167AI(Creature* creature) : ScriptedAI(creature) { Init(); }
 
-        uint32 WaypointId, willCastEnrage, tEnrage, CommonWPCount;
-        bool Run, Jump, Combat;
+        uint64 m_playerGUID;
+        EventMap m_events;
+        uint32 m_phase;
+        Position jump;
 
-        void Reset()
+        void Init()
         {
-            Run = Combat= Jump = false;
-            WaypointId          = 0;
-            tEnrage             = 0;
-            willCastEnrage      = urand(0, 1);
+            m_playerGUID = 0;
+            m_phase = 0;
+        }
+
+        void DoAction(int32 action) override
+        {
+            if (m_playerGUID)
+            {
+                m_events.ScheduleEvent(1, 500);
+                m_phase = action;
+                me->SetSpeed(MOVE_RUN, frand(1.2f, 1.6f));
+            }
+        }
+
+        void SetGUID(uint64 guid, int32 type = 0) override
+        {
+            m_playerGUID = guid;
+        }
+
+        void MovementInform(uint32 type, uint32 pointId)
+        {
+            if (type == POINT_MOTION_TYPE || type == EFFECT_MOTION_TYPE)
+                m_phase = pointId;
         }
 
         void UpdateAI(uint32 diff)
         {
-            if (me->GetPositionX() == -1732.81f && me->GetPositionY() == 1526.34f) // I was just spawned
-            {
-                Run = true; // Start running across roof
-            }
+            m_events.Update(diff);
 
-            if (Run && !Jump && !Combat)
+            uint32 eventId = m_events.ExecuteEvent();
+            switch (eventId)
             {
-                if (WaypointId < 2)
-                    me->GetMotionMaster()->MovePoint(WaypointId,SW_WAYPOINT_LOC1[WaypointId].X, SW_WAYPOINT_LOC1[WaypointId].Y, SW_WAYPOINT_LOC1[WaypointId].Z);
-            }
-
-            if (!Run && Jump && !Combat) // After Jump
-            {
-                if (me->GetPositionZ() == PLATFORM_Z) // Check that we made it to the platform
+                case 1:
                 {
-                    me->GetMotionMaster()->Clear(); // Stop Movement
-                    // Set our new home position so we don't try and run back to the rooftop on reset
-                    me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
-                    Combat = true; // Start Combat
-                    Jump = false; // We have already Jumped
+                    m_events.ScheduleEvent(1, 500);
+                    DoWalk();
+                    break;
                 }
             }
 
-            if (Combat && !Run && !Jump) // Our Combat AI
-            {
-                if (Player* player = me->SelectNearestPlayer(40.0f)) // Try to attack nearest player 1st (Blizz-Like)
-                    AttackStart(player);
-                else
-                    AttackStart(me->FindNearestCreature(NPC_LORD_DARIUS_CROWLEY_C1, 40.0f)); // Attack Darius 2nd - After that, doesn't matter
-
-                if (!UpdateVictim())
-                    return;
-
-                if (tEnrage <= diff) // Our Enrage trigger
-                {
-                    if (me->GetHealthPct() <= 30 && willCastEnrage)
-                    {
-                        me->MonsterTextEmote(-106, 0);
-                        DoCast(me, SPELL_ENRAGE);
-                        tEnrage = CD_ENRAGE;
-                    }
-                }
-                else
-                    tEnrage -= diff;
-
-                DoMeleeAttackIfReady();
-            }
-        }
-
-        void MovementInform(uint32 Type, uint32 PointId)
-        {
-            if (Type != POINT_MOTION_TYPE)
+            if (!UpdateVictim())
                 return;
 
-            CommonWPCount = sizeof(SW_WAYPOINT_LOC1)/sizeof(Waypoint); // Count our waypoints
+            DoMeleeAttackIfReady();
+        }
 
-            WaypointId = PointId+1; // Increase to next waypoint
-
-            if (WaypointId >= CommonWPCount) // If we have reached the last waypoint
+        void DoWalk()
+        {
+            switch (m_phase)
             {
-                me->GetMotionMaster()->MoveJump(-1685.52f + irand(-3, 3), 1458.48f + irand(-3, 3), PLATFORM_Z, 20.0f, 22.0f);
-                Run = false; // Stop running
-                Jump = true; // Time to Jump
+            case 1:
+            {
+                m_phase = 3;
+                uint8 rol = urand(0, 2);
+                jump = JumpW1[rol];
+                me->GetMotionMaster()->MovePoint(11 + rol, jump);
+                break;
+            }
+            case 2:
+                m_phase = 3;
+                jump = Position(-1717.73f, 1486.27f, 57.23f, 5.45f);
+                me->GetMotionMaster()->MovePoint(21, jump);
+                break;
+            case 11:
+                m_phase = 4;
+                me->GetMotionMaster()->MoveJump(LandingW1[0], frand(20.0f, 25.0f), frand(15.0f, 20.0f), 25);
+                break;
+            case 12:
+                m_phase = 4;
+                me->GetMotionMaster()->MoveJump(LandingW1[1], frand(20.0f, 25.0f), frand(15.0f, 20.0f), 25);
+                break;
+            case 13:
+                m_phase = 4;
+                me->GetMotionMaster()->MoveJump(LandingW1[2], frand(20.0f, 25.0f), frand(15.0f, 20.0f), 25);
+                break;
+            case 21:
+            {
+                m_phase = 5;
+                uint8 rol = urand(0, 3);
+                jump = LandingW2[rol];
+                me->GetMotionMaster()->MoveJump(jump, frand(20.0f, 25.0f), frand(15.0f, 20.0f), 25);
+                break;
+            }
+            case 25:
+                m_phase = 6;
+                if (m_playerGUID)
+                    if (Player* player = Player::GetPlayer(*me, m_playerGUID))
+                        if (player->IsInWorld() || player->IsAlive())
+                        {
+                            Position pos = player->GetNearPosition(frand(2.0f, 4.0f), frand(3.14f, 6.28f));
+                            me->GetMotionMaster()->MovePoint(26, pos);
+                        }
+                break;
+            case 26:
+                m_phase = 7;
+                me->SetHomePosition(me->GetPosition());
+                break;
             }
         }
     };
@@ -1440,6 +1421,121 @@ public:
     }
 };
 
+// 35112
+class npc_king_genn_greymane_35112 : public CreatureScript
+{
+public:
+    npc_king_genn_greymane_35112() : CreatureScript("npc_king_genn_greymane_35112") { }
+
+    struct npc_king_genn_greymane_35112AI : public ScriptedAI
+    {
+        npc_king_genn_greymane_35112AI(Creature* creature) : ScriptedAI(creature) {}
+
+        void Reset()
+        {
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_king_genn_greymane_35112AI(creature);
+    }
+};
+
+// 35115
+class npc_lord_godfrey_35115 : public CreatureScript
+{
+public:
+    npc_lord_godfrey_35115() : CreatureScript("npc_lord_godfrey_35115") { }
+
+    struct npc_lord_godfrey_35115AI : public ScriptedAI
+    {
+        npc_lord_godfrey_35115AI(Creature* creature) : ScriptedAI(creature) {}
+
+        void Reset()
+        {
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_lord_godfrey_35115AI(creature);
+    }
+};
+
+// 35118 showfight <> guard 34916
+class npc_bloodfang_worgen_35118 : public CreatureScript
+{
+public:
+    npc_bloodfang_worgen_35118() : CreatureScript("npc_bloodfang_worgen_35118") {}
+
+    struct npc_bloodfang_worgen_35118AI : public ScriptedAI
+    {
+        npc_bloodfang_worgen_35118AI(Creature* creature) : ScriptedAI(creature) {}
+
+        uint32 m_timer;
+        uint32 m_phase;
+        uint32 m_encount;
+
+        void Reset()
+        {
+            m_timer = urand(100, 2000);
+            m_phase = 0;
+            m_encount = urand(20, 220);
+            if (Creature* guard = me->FindNearestCreature(34916, 4.0f))
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+        }
+
+        void DamageTaken(Unit* who, uint32 &damage)
+        {
+            if (who->ToPlayer())
+                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+            if (m_timer <= diff)
+            {
+                m_timer = urand(900, 1200);
+                DoShowFight();
+            }
+            else m_timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+
+        void DoShowFight()
+        {
+            if (Creature* guard = me->FindNearestCreature(34916, 4.0f))
+            {
+                me->SetFacingToObject(guard);
+                if (m_encount)
+                {
+                    me->HandleEmote(EMOTE_ONESHOT_ATTACK1H);
+                    m_encount--;
+                }
+                else
+                {
+                    m_encount = urand(160, 220);
+                    me->CastSpell(me, 8599);
+                    m_timer = 2500;
+                }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_bloodfang_worgen_35118AI(creature);
+    }
+};
 /* QUEST - 14154 - By The Skin of His Teeth - END */
 
 /* Phase 4 - QUEST - 14159 - The Rebel Lord's Arsenal - START */
@@ -1456,9 +1552,7 @@ public:
         {
             creature->AddAura(SPELL_WORGEN_BITE, player);
             player->RemoveAura(SPELL_PHASE_QUEST_2);
-            creature->SetPhaseMask(4, 1);
             creature->CastSpell(creature, SPELL_SUMMON_JOSIAH_AVERY);
-            creature->SetPhaseMask(2, 1);
         }
         return true;
     }
@@ -1467,58 +1561,102 @@ public:
     {
         npc_josiah_avery_35369AI(Creature* creature) : ScriptedAI(creature) {}
 
-        uint32 tSay; // Time left for say
+        uint32 m_timerSay; 
         uint32 cSay; // Current Say
 
 		        // Evade or Respawn
         void Reset()
         {
-            tSay = DELAY_SAY_JOSIAH_AVERY; // Reset timer
-            cSay = 1;                              // Start from 1
+            m_timerSay = DELAY_SAY_JOSIAH_AVERY; // Reset timer
+            cSay = 1;                            // Start from 1
         }
 
         //Timed events
         void UpdateAI(uint32 diff)
         {
-            //Out of combat
             if (!me->GetVictim())
             {
-                //Timed say
-                if (tSay <= diff)
+                if (m_timerSay <= diff)
                 {
-                    switch (cSay)
-                    {
-                        default:
-                        case 1:
-                             Talk(SAY_JOSIAH_AVERY_1);
-                            cSay++;
-                            break;
-                        case 2:
-                             Talk(SAY_JOSIAH_AVERY_2);
-                            cSay++;
-                            break;
-                        case 3:
-                             Talk(SAY_JOSIAH_AVERY_3);
-                            cSay++;
-                            break;
-                        case 4:
-                             Talk(SAY_JOSIAH_AVERY_4);
-                            cSay++;
-                            break;
-                        case 5:
-                             Talk(SAY_JOSIAH_AVERY_5);
-                            cSay = 1; // Reset to 1
-                            break;							
-                    }
-
-                    tSay = DELAY_SAY_JOSIAH_AVERY; // Reset the timer
+                    m_timerSay = DELAY_SAY_JOSIAH_AVERY; // Reset the timer
+                    DoWork();
                 }
                 else
-                {
-                    tSay -= diff;
-                }
-                return;
+                    m_timerSay -= diff;
             }
+        }
+
+        void DoWork()
+        {
+            std::list<Player*> pList = GetListOfPlayersNearAndIndoorsAndWithQuest();
+            if (pList.empty())
+                return;
+
+            switch (cSay)
+            {
+            case 1:
+                TalkToGroup(pList, 0);
+                cSay++;
+                break;
+            case 2:
+                TalkToGroup(pList, 1);
+                cSay++;
+                break;
+            case 3:
+                TalkToGroup(pList, 2);
+                cSay++;
+                break;
+            case 4:
+                TalkToGroup(pList, 3);
+                cSay++;
+                break;
+            case 5:
+                TalkToGroup(pList, 4);
+                cSay++;
+                break;
+            case 6:
+                TalkToGroup(pList, 5);
+                cSay = 1; // Reset to 1
+                break;
+            }
+        }
+
+        std::list<Player*> GetListOfPlayersNearAndIndoorsAndWithQuest()
+        {
+            std::list<Player*> pList = me->FindNearestPlayers(20.0f);
+            while (DeleteWrongPlayer(pList)) { }
+            return pList;
+        }
+
+        bool DeleteWrongPlayer(std::list<Player*> &pList)
+        {
+            if (pList.empty())
+                return false;
+
+            for (std::list<Player*>::const_iterator itr = pList.begin(); itr != pList.end(); itr++)
+            {
+                Player* player = (*itr);
+                if (!player->GetMap()->IsIndoors(player))
+                {
+                    pList.remove(player);
+                    return true;
+                }
+                if (player->GetQuestStatus(14159) != QUEST_STATUS_INCOMPLETE)
+                {
+                    pList.remove(player);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        void TalkToGroup(std::list<Player*> pList, uint8 groupId)
+        {
+            if (pList.empty())
+                return;
+
+            for (std::list<Player*>::const_iterator itr = pList.begin(); itr != pList.end(); itr++)
+                Talk(groupId, (*itr));
         }
     };
 
@@ -2114,11 +2252,11 @@ public:
     }
 };
 
-// 35115 35906
-class npc_lord_godfrey_35115 : public CreatureScript
+// 35906
+class npc_lord_godfrey_35906 : public CreatureScript
 {
 public:
-    npc_lord_godfrey_35115() : CreatureScript("npc_lord_godfrey_35115") { }
+    npc_lord_godfrey_35906() : CreatureScript("npc_lord_godfrey_35906") { }
 
     bool OnQuestReward(Player* player, Creature* godfrey, Quest const* quest, uint32 opt)
     {
@@ -2127,7 +2265,7 @@ public:
             godfrey->AI()->Talk(SAY_LORD_GODFREY_P4);
             player->RemoveAura(SPELL_WORGEN_BITE);
             godfrey->AddAura(SPELL_INFECTED_BITE, player);
-			player->RemoveAura(76642);// Only Infected bite aura should be added
+            player->RemoveAura(76642);// Only Infected bite aura should be added
             player->CastSpell(player, SPELL_GILNEAS_CANNON_CAMERA);
             player->SaveToDB();
             if (Creature* cannon = GetClosestCreatureWithEntry(godfrey, NPC_COMMANDEERED_CANNON, 50.0f))
@@ -2138,6 +2276,7 @@ public:
         return true;
     }
 };
+
 
 // 35552
 class npc_lord_darius_crowley_35552 : public CreatureScript
@@ -3924,6 +4063,8 @@ void AddSC_zone_gilneas_city2()
     new npc_rampaging_worgen_34884();
     new npc_rampaging_worgen_35660();
     new npc_sergeant_cleese_35839();
+    new npc_king_genn_greymane_35112();
+    new npc_bloodfang_worgen_35118();
     new npc_josiah_avery_35369();
     new npc_josiah_avery_trigger_50415();
     new npc_lorna_crowley_35378();
@@ -3933,7 +4074,8 @@ void AddSC_zone_gilneas_city2()
     new npc_frightened_citizen_34981();
     new npc_gilnean_royal_guard_35232();
     new npc_mariam_spellwalker_35872();
-
+    new npc_lord_godfrey_35906();
+    new npc_tobias_mistmantle_35124();
     new npc_lord_darius_crowley_35566();
     new npc_king_genn_greymane_35550();
     new npc_crowley_horse_35231();
