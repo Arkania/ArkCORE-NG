@@ -114,7 +114,7 @@ void PhaseMgr::Recalculate()
                 if (phase.phasemask)
                     _UpdateFlags |= PHASE_UPDATE_FLAG_SERVERSIDE_CHANGED;
 
-                if (phase.phaseId || phase.terrainswapmap)
+                if (phase.phaseId || phase.terrainswapmap || phase.worldMapAreaSwap)
                     _UpdateFlags |= PHASE_UPDATE_FLAG_CLIENTSIDE_CHANGED;
 
                 if (phase.IsLastDefinition())
@@ -252,28 +252,36 @@ void PhaseMgr::RegisterPhasingAuraEffect(AuraEffect const* auraEffect)
 {
     PhaseInfo phaseInfo;
 
+    SpellPhaseStore::const_iterator itr = _SpellPhaseStore->find(auraEffect->GetId());
+    if (itr != _SpellPhaseStore->end())
+    {
+        if (itr->second.phasemask)
+        {
+            _UpdateFlags |= PHASE_UPDATE_FLAG_SERVERSIDE_CHANGED;
+            phaseInfo.phasemask = itr->second.phasemask;
+        }
+        if (itr->second.terrainswapmap)
+        {
+            _UpdateFlags |= PHASE_UPDATE_FLAG_CLIENTSIDE_CHANGED;
+            phaseInfo.terrainswapmap = itr->second.terrainswapmap;
+        }
+        if (itr->second.terrainswapmap)
+        {
+            _UpdateFlags |= PHASE_UPDATE_FLAG_CLIENTSIDE_CHANGED;
+            phaseInfo.worldMapAreaSwap = itr->second.worldmapareaswap;
+        }
+    }
+
     if (auraEffect->GetMiscValue())
     {
         _UpdateFlags |= PHASE_UPDATE_FLAG_SERVERSIDE_CHANGED;
         phaseInfo.phasemask = auraEffect->GetMiscValue();
     }
-    else
+    if (auraEffect->GetMiscValueB())
     {
-        SpellPhaseStore::const_iterator itr = _SpellPhaseStore->find(auraEffect->GetId());
-        if (itr != _SpellPhaseStore->end())
-        {
-            if (itr->second.phasemask)
-            {
-                _UpdateFlags |= PHASE_UPDATE_FLAG_SERVERSIDE_CHANGED;
-                phaseInfo.phasemask = itr->second.phasemask;
-            }
-
-            if (itr->second.terrainswapmap)
-                phaseInfo.terrainswapmap = itr->second.terrainswapmap;
-        }
+        _UpdateFlags |= PHASE_UPDATE_FLAG_CLIENTSIDE_CHANGED;
+        phaseInfo.phaseId = auraEffect->GetMiscValueB();
     }
-
-    phaseInfo.phaseId = auraEffect->GetMiscValueB();
 
     if (phaseInfo.NeedsClientSideUpdate())
         _UpdateFlags |= PHASE_UPDATE_FLAG_CLIENTSIDE_CHANGED;

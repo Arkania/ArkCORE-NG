@@ -9180,8 +9180,8 @@ void ObjectMgr::LoadSpellPhaseInfo()
 
     uint32 oldMSTime = getMSTime();
 
-    //                                               0       1            2
-    QueryResult result = WorldDatabase.Query("SELECT id, phasemask, terrainswapmap FROM `spell_phase`");
+    //                                               0             1            2                 3
+    QueryResult result = WorldDatabase.Query("SELECT spell_id, phasemask, terrainswapmap, worldmapareaswap FROM `spell_phase`");
 
     if (!result)
     {
@@ -9210,8 +9210,9 @@ void ObjectMgr::LoadSpellPhaseInfo()
             continue;
         }
 
-        spellPhaseInfo.phasemask              = fields[1].GetUInt32();
-        spellPhaseInfo.terrainswapmap         = fields[2].GetUInt32();
+        spellPhaseInfo.phasemask              = fields[1].GetUInt64();
+        spellPhaseInfo.terrainswapmap         = fields[2].GetUInt16();
+        spellPhaseInfo.worldmapareaswap       = fields[3].GetUInt16();
 
         _SpellPhaseStore[spellPhaseInfo.spellId] = spellPhaseInfo;
 

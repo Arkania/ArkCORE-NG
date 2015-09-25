@@ -104,7 +104,7 @@ struct PhaseInfo
     uint32 worldMapAreaSwap;
 
     bool NeedsServerSideUpdate() const { return phasemask; }
-    bool NeedsClientSideUpdate() const { return terrainswapmap || phaseId; }
+    bool NeedsClientSideUpdate() const { return terrainswapmap || phaseId || worldMapAreaSwap; }
 };
 
 typedef UNORDERED_MAP<uint32 /*spellId*/, PhaseInfo> PhaseInfoContainer;
