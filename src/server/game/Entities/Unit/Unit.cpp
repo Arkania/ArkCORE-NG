@@ -5780,6 +5780,33 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 triggered_spell_id = 37436;
                 break;
             }
+            switch (dummySpell->Id)
+            {
+                // Glyph of Icy Veins
+                case 56374:
+                {
+                    RemoveAurasByType(SPELL_AURA_HASTE_SPELLS, 0, 0, true, false);
+                    RemoveAurasByType(SPELL_AURA_MOD_DECREASE_SPEED);
+                    return true;
+                }
+                // Glyph of Polymorph
+                case 56375:
+                {
+                    if (!target)
+                        return false;
+                    target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE, 0, target->GetAura(32409)); // SW:D shall not be removed.
+                    target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE_PERCENT);
+                    target->RemoveAurasByType(SPELL_AURA_PERIODIC_LEECH);
+                    return true;
+                }
+                case 79683: // Arcane Missiles!
+                {
+                    // Do not let arcane missiles missile remove the activation aura
+                    if (procSpell->Id == 7268)
+                        return false;
+                    break;
+                }
+            }
         }
         case SPELLFAMILY_WARLOCK:
         {

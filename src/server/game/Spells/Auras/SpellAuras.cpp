@@ -397,7 +397,7 @@ Aura::~Aura()
 
     // free effects memory
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-         delete m_effects[i];
+        delete m_effects[i];
 
     ASSERT(m_applications.empty());
     _DeleteRemovedApplications();
@@ -1206,6 +1206,9 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         if (GetStackAmount() >= 5 && !target->HasAura(50812))
                             target->CastSpell(target, 50812, true);
                         break;
+                    case 91322: // Blind Spot
+                        target->RemoveAurasDueToSpell(91320);
+                        break;
                 }
                 break;
             case SPELLFAMILY_DRUID:
@@ -1333,99 +1336,94 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
             case SPELLFAMILY_PRIEST:
                 if (!caster)
                     break;
-                // Prayer of Mending
-                if (GetId() == 41635)
+                switch (GetId())
                 {
-                    if (caster->HasAura(14751))
+                    case 17: // Power Word: Shield
+                    case 73325: // Leap of Faith
+                        //Body and Soul rank 2
+                        if (caster->HasAura(64129))
+                            caster->CastSpell(target, 65081, true);
+                        //Body and Soul rank 1
+                        if (caster->HasAura(64127))
+                            caster->CastSpell(target, 64128, true);
+                        // Glyph of Power Word: Shield
+                        if (AuraEffect* glyph = caster->GetAuraEffect(55672, 0))
+                        {
+                            // instantly heal m_amount% of the absorb-value
+                            int32 heal = glyph->GetAmount() * GetEffect(0)->GetAmount() / 100;
+                            caster->CastCustomSpell(GetUnitOwner(), 56160, &heal, NULL, NULL, true, 0, GetEffect(0));
+                        }
+                        break;
+                    case 139: // Empowered Renew
+                        if (AuraEffect const * aurEff = caster->GetDummyAuraEffect(SPELLFAMILY_PRIEST, 3021, 0))
+                        {
+                            int32 basepoints0 = aurEff->GetAmount() * GetEffect(0)->GetTotalTicks() * caster->SpellHealingBonusDone(target, GetSpellInfo(), GetEffect(0)->GetAmount(), HEAL) / 100;
+                            caster->CastCustomSpell(target, 63544, &basepoints0, NULL, NULL, true, NULL, GetEffect(0));
+                        }
+                        break;
+                    case 528: // Cure Disease
                     {
-                        caster->CastSpell(caster, 81206, true); // Chakra: Sanctuary
-                        caster->RemoveAurasDueToSpell(14751);
+                        // Body and Soul
+                        if (caster->HasAura(64127) || caster->HasAura(64129))
+                            if (target == caster)
+                                caster->CastSpell(target, 64136, true, NULL, NULL, GetCasterGUID());
+                        break;
                     }
-                }
-                // Mind spike
-                else if (GetId() == 87178)
-                {
-                    if (caster->HasAura(14751))
-                    {
-                        caster->CastSpell(caster, 81209, true); // Chakra: Chastise
-                        caster->RemoveAurasDueToSpell(14751);
-                    }
-                }
-                // Devouring Plague
-                else if (GetId() == 2944)
-                {
-                    // Improved Devouring Plague
-                    if (AuraEffect const* aurEff = caster->GetDummyAuraEffect(SPELLFAMILY_PRIEST, 3790, 0))
-                    {
-                        int32 basepoints0 = aurEff->GetAmount() * GetEffect(0)->GetTotalTicks() * caster->SpellDamageBonusDone(target, GetSpellInfo(), GetEffect(0)->GetAmount(), DOT) / 100;
-
-                        caster->CastCustomSpell(target, 63675, &basepoints0, NULL, NULL, true, NULL, GetEffect(0));
-                    }
-                }
-                // Renew
-                else if (GetId() == 139)
-                {
-                    // Empowered Renew
-                    if (AuraEffect const * aurEff = caster->GetDummyAuraEffect(SPELLFAMILY_PRIEST, 3021, 0))
-                    {
-                        int32 basepoints0 = aurEff->GetAmount() * GetEffect(0)->GetTotalTicks() * caster->SpellHealingBonusDone(target, GetSpellInfo(), GetEffect(0)->GetAmount(), HEAL) / 100;
-                        caster->CastCustomSpell(target, 63544, &basepoints0, NULL, NULL, true, NULL, GetEffect(0));
-                    }
-                }
-                // Power Word: Shield
-                else if (GetId() == 17) 
-                {
-                    //Body and Soul rank 2
-                    if(caster->HasAura(64129))
-                        caster->CastSpell(target, 65081,true);
-                    //Body and Soul rank 1
-                    if(caster->HasAura(64127))
-                        caster->CastSpell(target, 64128,true);
-                    // Glyph of Power Word: Shield
-                    if (AuraEffect* glyph = caster->GetAuraEffect(55672, 0))
-                    {
-                        // instantly heal m_amount% of the absorb-value
-                        int32 heal = glyph->GetAmount() * GetEffect(0)->GetAmount()/100;
-                        caster->CastCustomSpell(GetUnitOwner(), 56160, &heal, NULL, NULL, true, 0, GetEffect(0));
-                    }
-                }
-                // Inner Focus
-                else if (GetId() == 89485)
-                {
-                     // Strength of Soul rank 1
-                     if (caster->HasAura(89488))
-                         caster->CastSpell(caster, 96266,true);
-                     // Strenght of Soul rank 2
-                     else if (caster->HasAura(89489))
-                         caster->CastSpell(caster, 96267,true);
-                }
-                // Phantasm
-                else if (GetId() == 586)
-                {
-                    if ((target->HasAura(47569) && roll_chance_i(50)) || target->HasAura(47570))
-                        target->RemoveMovementImpairingAuras();
+                    case 586: // Phantasm
+                        if ((target->HasAura(47569) && roll_chance_i(50)) || target->HasAura(47570))
+                            target->RemoveMovementImpairingAuras();
+                        break;
+                    case 2944: // Devouring Plague
+                        // Improved Devouring Plague
+                        if (AuraEffect const* aurEff = caster->GetDummyAuraEffect(SPELLFAMILY_PRIEST, 3790, 0))
+                        {
+                            int32 basepoints0 = aurEff->GetAmount() * GetEffect(0)->GetTotalTicks() * caster->SpellDamageBonusDone(target, GetSpellInfo(), GetEffect(0)->GetAmount(), DOT) / 100;
+                            caster->CastCustomSpell(target, 63675, &basepoints0, NULL, NULL, true, NULL, GetEffect(0));
+                        }
+                        break;
+                    case 41635: // Prayer of Mending
+                        if (caster->HasAura(14751))
+                        {
+                            caster->CastSpell(caster, 81206, true); // Chakra: Sanctuary
+                            caster->RemoveAurasDueToSpell(14751);
+                        }
+                        break;
+                    case 87178: // Mind spike
+                        if (caster->HasAura(14751))
+                        {
+                            caster->CastSpell(caster, 81209, true); // Chakra: Chastise
+                            caster->RemoveAurasDueToSpell(14751);
+                        }
+                        break;
+                    case 89485: // Inner Focus
+                        // Strength of Soul rank 1
+                        if (caster->HasAura(89488))
+                            caster->CastSpell(caster, 96266, true);
+                        // Strenght of Soul rank 2
+                        else if (caster->HasAura(89489))
+                            caster->CastSpell(caster, 96267, true);
+                        break;
                 }
                 break;
             case SPELLFAMILY_ROGUE:
-                // Glyph of blind
-                if (GetId() == 2094)
+                switch (GetId())
+                {
+                case 2094: // Glyph of blind
                     if (caster->HasAura(91299))
                         target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE);
-
+                    break;
+                case 84590: // Deadly Momentum
+                    if (Aura* snd = target->GetAura(5171))
+                        snd->RefreshDuration();
+                    if (Aura* rec = target->GetAura(73651))
+                        rec->RefreshDuration();
+                    break;
+                }
                 // Sprint (skip non player cast spells by category)
                 if (GetSpellInfo()->SpellFamilyFlags[0] & 0x40 && GetSpellInfo()->GetCategory() == 44)
                     // in official maybe there is only one icon?
                     if (target->HasAura(58039)) // Glyph of Blurred Speed
                         target->CastSpell(target, 61922, true); // Sprint (waterwalk)
-
-                // Deadly Momentum
-                if (GetId() == 84590)
-                {
-                    if (Aura* snd = target->GetAura(5171))
-                        snd->RefreshDuration();
-                    if (Aura* rec = target->GetAura(73651))
-                        rec->RefreshDuration();
-                }
 
                 //Savage Combat
                 if (GetSpellInfo()->Dispel == DISPEL_POISON && (GetSpellInfo()->SchoolMask & SPELL_SCHOOL_MASK_NATURE) && GetSpellInfo()->DmgClass == SPELL_DAMAGE_CLASS_MAGIC)
@@ -1438,37 +1436,38 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     }
                 break;
             case SPELLFAMILY_PALADIN: // Speed of Light (talent)
-                if (GetId() == 498)
+                switch (GetId())
                 {
-                    int32 bp = 0;
-                    if (target->HasAura(85495)) // r1
+                    case 498:
                     {
-                        bp = 20;
-                        target->CastCustomSpell(target, 85497, &bp, NULL, NULL, true);
+                        int32 bp = 0;
+                        if (target->HasAura(85495)) // r1
+                        {
+                            bp = 20;
+                            target->CastCustomSpell(target, 85497, &bp, NULL, NULL, true);
+                        }
+                        if (target->HasAura(85498)) // r2
+                        {
+                            bp = 40;
+                            target->CastCustomSpell(target, 85497, &bp, NULL, NULL, true);
+                        }
+                        if (target->HasAura(85499)) // r3
+                        {
+                            bp = 60;
+                            target->CastCustomSpell(target, 85497, &bp, NULL, NULL, true);
+                        }
                     }
-                    if (target->HasAura(85498)) // r2
-                    {
-                        bp = 40;
-                        target->CastCustomSpell(target, 85497, &bp, NULL, NULL, true);
-                    }
-                    if (target->HasAura(85499)) // r3
-                    {
-                        bp = 60;
-                        target->CastCustomSpell(target, 85497, &bp, NULL, NULL, true);
-                    }
+                    break;
+                    case 31884: // Sanctfied Wrath Cataclysm proc
+                        if (caster->HasAura(53375) || caster->HasAura(53376) || caster->HasAura(90286))
+                            caster->CastSpell(caster, 57318, true);
+                        break;
+                    case 84963: // Inquisition
+                        // Divine Purpose
+                        if (target->HasAura(90174))
+                            target->SetPower(POWER_HOLY_POWER, 0);
+                        break;
                 }
-                // Inquisition
-                if (m_spellInfo->Id == 84963) // Inquisition
-                {
-                    // Divine Purpose
-                    if (target->HasAura(90174))
-                        target->SetPower(POWER_HOLY_POWER, 0);
-                }
-
-                // Sanctfied Wrath Cataclysm proc
-                if (GetId() == 31884)
-                    if (caster->HasAura(53375) || caster->HasAura(53376) || caster->HasAura(90286))
-                        caster->CastSpell(caster,57318,true);
                 break;
             case SPELLFAMILY_WARLOCK:
                 //Nether ward
@@ -1560,6 +1559,10 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                             }
                         }
                         break;
+                    case 74002: // Combat readiness should fall after 10 seconds of no attacks
+                        if (removeMode == AURA_REMOVE_BY_EXPIRE)
+                            target->RemoveAurasDueToSpell(74001);
+                        break;
                     case 79582: // Magmatron barrier
                         if (caster)
                         {
@@ -1615,6 +1618,10 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                             break;
                         if (target->HasAura(70752))          //Item - Mage T10 2P Bonus
                             target->CastSpell(target, 70753, true);
+                        break;
+                    case 83239: // Early Frost
+                    case 83162: // Early Frost
+                        target->CastSpell(target, 94315, true);
                         break;
                     default:
                         break;
@@ -1752,14 +1759,24 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         target->CastSpell(target, 61394, true);
                 break;
             case SPELLFAMILY_SHAMAN:
-                // Flame Shock
-                if (GetId() == 8050 && removeMode == AURA_REMOVE_BY_ENEMY_SPELL)
-                    // Lava Flows
-                    if (AuraEffect const * aurEff = caster->GetDummyAuraEffect(SPELLFAMILY_SHAMAN, 3087, 0))
-                    {
-                        int32 bp = aurEff->GetAmount();
-                        caster->CastCustomSpell(caster, 65264, &bp, NULL, NULL, true);
-                    }
+                switch (GetId())
+                {
+                case 8050:
+                {
+                    if (removeMode == AURA_REMOVE_BY_ENEMY_SPELL)
+                        // Lava Flows
+                        if (AuraEffect const * aurEff = caster->GetDummyAuraEffect(SPELLFAMILY_SHAMAN, 3087, 0))
+                        {
+                            int32 bp = aurEff->GetAmount();
+                            caster->CastCustomSpell(caster, 65264, &bp, NULL, NULL, true);
+                        }
+                }
+                break;
+                case 53817: // Maelstrom Weapon
+                    if (!onReapply)
+                        target->RemoveAurasDueToSpell(60349);
+                    break;
+                }
                 break;
         }
     }
@@ -1771,22 +1788,6 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
         {
             switch (GetId())
             {
-                case 1490: // Curse of the Elements
-                {
-                    if (apply && caster && target)
-                    {
-                        if(caster->HasAura(18179)) // Jinx rank 1
-                            caster->CastSpell(target,85547,true);
-                        else if(caster->HasAura(85479)) // Jinxs rank 2
-                            caster->CastSpell(target,86105,true);
-                        // Need remove jinx of target who has CoE
-                        if (target->HasAura(85547))
-                            target->RemoveAura(85547);
-                        else if (target->HasAura(86105))
-                           target->RemoveAura(86105);
-                    }
-                    break;
-                }
                 case 702: // Curse of weakness
                 {
                     if(apply && caster && target)
@@ -1845,6 +1846,22 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         target->RemoveAurasDueToSpell(85540);
                         target->RemoveAurasDueToSpell(85539);
                     }
+                }
+                case 1490: // Curse of the Elements
+                {
+                    if (apply && caster && target)
+                    {
+                        if (caster->HasAura(18179)) // Jinx rank 1
+                            caster->CastSpell(target, 85547, true);
+                        else if (caster->HasAura(85479)) // Jinxs rank 2
+                            caster->CastSpell(target, 86105, true);
+                        // Need remove jinx of target who has CoE
+                        if (target->HasAura(85547))
+                            target->RemoveAura(85547);
+                        else if (target->HasAura(86105))
+                            target->RemoveAura(86105);
+                    }
+                    break;
                 }
                 default:
                     break;
@@ -1972,11 +1989,42 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         }
                     }
                     break;
+                case 51755: // Camouflage
+                {
+                    if (apply)
+                        target->CastSpell(target, 80326, true);
+                    else
+                    {
+                        target->RemoveAurasDueToSpell(80326);
+                        target->RemoveAurasDueToSpell(80325);
+                        if (target->GetTypeId() == TYPEID_PLAYER)
+                            if (Pet* playerPet = target->ToPlayer()->GetPet())
+                                playerPet->RemoveAurasDueToSpell(51755);
+                    }
+                    break;
+                }
             }
             break;
         case SPELLFAMILY_PALADIN:
             switch (GetId())
             {
+                case 31821:
+                    // Aura Mastery Triggered Spell Handler
+                    // If apply Concentration Aura -> trigger -> apply Aura Mastery Immunity
+                    // If remove Concentration Aura -> trigger -> remove Aura Mastery Immunity
+                    // If remove Aura Mastery -> trigger -> remove Aura Mastery Immunity
+                    // Do effects only on aura owner
+                    if (GetCasterGUID() != target->GetGUID())
+                        break;
+
+                    if (apply)
+                    {
+                        if ((GetSpellInfo()->Id == 31821 && target->HasAura(19746, GetCasterGUID())) || (GetSpellInfo()->Id == 19746 && target->HasAura(31821)))
+                            target->CastSpell(target, 64364, true);
+                    }
+                    else
+                        target->RemoveAurasDueToSpell(64364, GetCasterGUID());
+                    break;
                 case 31842: // Divine Favor
                     // Item - Paladin T10 Holy 2P Bonus
                     if (target->HasAura(70755))
@@ -2057,6 +2105,29 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
             break;
         case SPELLFAMILY_MAGE:
             {
+                switch (GetId())
+                {
+                    // Arcane Missiles!
+                case 79683:
+                    if (apply)
+                        target->CastSpell(target, 79808, true);
+                    else
+                        target->RemoveAurasDueToSpell(79808);
+                    break;
+                    // Brain Freeze
+                case 44546:
+                case 44548:
+                case 44549:
+                    // Hot Streak
+                case 44445:
+                    if (apply)
+                        target->RemoveAurasDueToSpell(79684);
+                    else
+                        target->AddAura(79684, target);
+                    break;
+                default:
+                    break;
+                }
                 // Pyromaniac
                 if (GetSpellInfo()->IsPeriodicDamage() && caster)
                 {

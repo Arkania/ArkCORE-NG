@@ -359,6 +359,38 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
 
                 switch (m_spellInfo->Id)                     // better way to check unknown
                 {
+                    // percent from health with min
+                    case 25599: // Thundercrash
+                    {
+                        damage = unitTarget->GetHealth() / 2;
+                        if (damage < 200)
+                            damage = 200;
+                        break;
+                    }
+                    // Consumption
+                    case 28865:
+                        damage = (((InstanceMap*)m_caster->GetMap())->GetDifficulty() == REGULAR_DIFFICULTY ? 2750 : 4250);
+                        break;
+                    // arcane charge. must only affect demons (also undead?)
+                    case 45072:
+                    {
+                        if (unitTarget->GetCreatureType() != CREATURE_TYPE_DEMON || unitTarget->GetCreatureType() != CREATURE_TYPE_UNDEAD)
+                            return;
+                        break;
+                    }
+                    // Gargoyle Strike
+                    case 51963:
+                    {
+                        // about +4 base spell dmg per level
+                        damage = (m_caster->getLevel() - 60) * 4 + 60;
+                        break;
+                    }
+                    case 75566:
+                    case 91052:
+                    {
+                        damage = m_spellInfo->Effects[EFFECT_0].BasePoints * unitTarget->GetMaxHealth() / 100;
+                        break;
+                    }
                     // Meltdown
                     case 98649:
                     case 101646:
@@ -389,32 +421,6 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                         else
                             damage = m_spellInfo->Effects[2].BasePoints;
                         break;
-                    // Consumption
-                    case 28865:
-                        damage = (((InstanceMap*)m_caster->GetMap())->GetDifficulty() == REGULAR_DIFFICULTY ? 2750 : 4250);
-                        break;
-                    // percent from health with min
-                    case 25599:                             // Thundercrash
-                    {
-                        damage = unitTarget->GetHealth() / 2;
-                        if (damage < 200)
-                            damage = 200;
-                        break;
-                    }
-                    // arcane charge. must only affect demons (also undead?)
-                    case 45072:
-                    {
-                        if (unitTarget->GetCreatureType() != CREATURE_TYPE_DEMON || unitTarget->GetCreatureType() != CREATURE_TYPE_UNDEAD)
-                            return;
-                        break;
-                    }
-                    // Gargoyle Strike
-                    case 51963:
-                    {
-                        // about +4 base spell dmg per level
-                        damage = (m_caster->getLevel() - 60) * 4 + 60;
-                        break;
-                    }
                 }
                 break;
             }
@@ -436,65 +442,66 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
             }
             case SPELLFAMILY_WARLOCK:
             {
-                //Pet Firebolt
-                if (m_spellInfo->Id == 3110)
-                    if (m_caster->IsPet())
-                    {
-                         if (Unit* owner = m_caster->GetOwner())
-                         {
-                             int32 SpellPower = m_caster->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FIRE);
-                             damage += (SpellPower * 0.50) * 0.657;
-
-                            if (owner->HasAura(91986)) // Burning Embers - Firebolt
-                            {
-                                int32 bp0 = damage * (0.5 / 7);
-                                owner->CastCustomSpell(unitTarget, 85421, &bp0, NULL, NULL, true);
-                            }
-                            if (m_caster->GetOwner()->ToPlayer()->HasAura(85112))
-                            {
-                                int32 bp0 = damage * (1.0 / 7);
-                                owner->CastCustomSpell(unitTarget, 85421, &bp0, NULL, NULL, true);
-                            }
-                      }
-                }
-
-                if (m_spellInfo->Id == 6353)  // Burning embers - Soul Fire
+                switch (m_spellInfo->Id)
                 {
-                    if (m_caster->HasAura(91986))
-                    {
-                       int32 bp0 = damage * (0.5 / 7);
-                       m_caster->CastCustomSpell(unitTarget, 85421, &bp0, NULL, NULL, true);
-                    }
-                    if (m_caster->HasAura(85112))
-                    {
-                       int32 bp0 = damage * (1.0 / 7);
-                       m_caster->CastCustomSpell(unitTarget, 85421, &bp0, NULL, NULL, true);
-                    }
+                    case 0:
+                        break;
+                    case 3110: //Pet Firebolt
+                        if (m_spellInfo->Id == 3110)
+                            if (m_caster->IsPet())
+                            {
+                                if (Unit* owner = m_caster->GetOwner())
+                                {
+                                    int32 SpellPower = m_caster->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FIRE);
+                                    damage += (SpellPower * 0.50) * 0.657;
+
+                                    if (owner->HasAura(91986)) // Burning Embers - Firebolt
+                                    {
+                                        int32 bp0 = damage * (0.5 / 7);
+                                        owner->CastCustomSpell(unitTarget, 85421, &bp0, NULL, NULL, true);
+                                    }
+                                    if (m_caster->GetOwner()->ToPlayer()->HasAura(85112))
+                                    {
+                                        int32 bp0 = damage * (1.0 / 7);
+                                        owner->CastCustomSpell(unitTarget, 85421, &bp0, NULL, NULL, true);
+                                    }
+                                }
+                            }
+                        break;
+                    case 6353: // Burning embers - Soul Fire
+                        if (m_caster->HasAura(91986))
+                        {
+                            int32 bp0 = damage * (0.5 / 7);
+                            m_caster->CastCustomSpell(unitTarget, 85421, &bp0, NULL, NULL, true);
+                        }
+                        if (m_caster->HasAura(85112))
+                        {
+                            int32 bp0 = damage * (1.0 / 7);
+                            m_caster->CastCustomSpell(unitTarget, 85421, &bp0, NULL, NULL, true);
+                        }
+                        break;
+                    case 6360: //Whiplash
+                        if (m_caster->IsPet())
+                        {
+                            int32 SpellPower = m_caster->GetTotalAttackPowerValue(BASE_ATTACK);
+                            damage += 0.85 * (SpellPower * 0.5);
+                        }
+                        break;
+                    case 7814: //Lash of Pain
+                        if (m_caster->IsPet())
+                        {
+                            int32 SpellPower = m_caster->GetTotalAttackPowerValue(BASE_ATTACK);
+                            damage += 0.612 * (SpellPower * 0.5);
+                        }
+                        break;
+                    case 54049: //Shadow Bite
+                        if (m_caster->IsPet())
+                        {
+                            int32 SpellPower = m_caster->GetTotalAttackPowerValue(BASE_ATTACK);
+                            damage += 0.614 * (SpellPower * 0.5);
+                        }
+                        break;
                 }
-
-                //Shadow Bite
-                if (m_spellInfo->Id == 54049)
-                    if (m_caster->IsPet())
-                    {
-                        int32 SpellPower = m_caster->GetTotalAttackPowerValue(BASE_ATTACK);
-                        damage += 0.614 * (SpellPower * 0.5);
-                    }
-
-                //Lash of Pain
-                if (m_spellInfo->Id == 7814)
-                    if (m_caster->IsPet())
-                    {
-                        int32 SpellPower = m_caster->GetTotalAttackPowerValue(BASE_ATTACK);
-                        damage += 0.612 * (SpellPower * 0.5);
-                    }
-
-                //Whiplash
-                if (m_spellInfo->Id == 6360)
-                    if (m_caster->IsPet())
-                    {
-                        int32 SpellPower = m_caster->GetTotalAttackPowerValue(BASE_ATTACK);
-                        damage += 0.85 * (SpellPower * 0.5);
-                    }
 
                 // Incinerate Rank 1 & 2
                 if ((m_spellInfo->SpellFamilyFlags[1] & 0x000040) && m_spellInfo->SpellIconID == 2128)
