@@ -27,6 +27,7 @@ EndScriptData */
 
 /* ContentData */
 
+#include "zone_gilneas.h"
 #include "Creature.h"
 #include "CreatureAI.h"
 #include "ScriptMgr.h"
@@ -47,11 +48,6 @@ public:
     struct npc_gilneas_city_guard_gate_34864AI : public ScriptedAI
     {
         npc_gilneas_city_guard_gate_34864AI(Creature* creature) : ScriptedAI(creature)  { }
-
-        enum e34864
-        {
-            NPC_PANICKED_CITIZEN_GATE = 44086,
-        };
 
         uint32		_timer;
         uint8		_phase;
@@ -159,12 +155,6 @@ class npc_prince_liam_greymane_34850 : public CreatureScript
 public:
     npc_prince_liam_greymane_34850() : CreatureScript("npc_prince_liam_greymane_34850") { }
 
-    enum e34850
-    {
-        QUEST_LOCKDOWN = 14078,
-        NPC_PANICKED_CITIZEN = 34851,
-    };
-
     bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
     {
         if (quest->GetQuestId() == QUEST_LOCKDOWN)
@@ -231,17 +221,12 @@ class npc_lieutenant_walden_34863 : public CreatureScript
 public:
     npc_lieutenant_walden_34863() : CreatureScript("npc_lieutenant_walden_34863") { }
 
-    enum e34863
-    {
-        QUEST_LOCKDOWN = 14078,
-        SPELL_GENERIC_QUEST_INVISIBILITY_DERECTION_1 = 49416,
-    };
-
     bool OnQuestComplete(Player* player, Creature* creature, Quest const* quest)
     {
         if (quest->GetQuestId() == QUEST_LOCKDOWN)
         {
             player->AddAura(SPELL_GENERIC_QUEST_INVISIBILITY_DERECTION_1, player);
+            player->AddAura(SPELL_PHASE_QUEST_ZONE_SPECIFIC_01, player);
             player->SaveToDB();
         }
 

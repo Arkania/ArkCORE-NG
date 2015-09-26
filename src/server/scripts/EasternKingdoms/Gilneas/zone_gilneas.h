@@ -20,6 +20,8 @@
 
 enum CreatureIds
 {
+    NPC_PANICKED_CITIZEN                              = 34851,
+    NPC_PANICKED_CITIZEN_GATE                         = 44086,
     NPC_PRINCE_LIAM_GREYMANE                          = 34913,
     NPC_GILNEAS_CITY_GUARD                            = 34916,
     NPC_RAMPAGING_WORGEN_1                            = 34884,
@@ -71,14 +73,13 @@ enum QuestIds
 enum SpellIds
 {
     SPELL_ENRAGE                                       = 8599,
-	SPELL_PHASE_QUEST_2                                = 59073,
+    SPELL_PHASE_QUEST_ZONE_SPECIFIC_01                 = 59073,
 	SPELL_SUMMON_JOSIAH_AVERY                          = 67350,
 	SPELL_SUMMON_GILNEAN_MASTIFF                       = 67807,
 	SPELL_ATTACK_LURKER                                = 67805,
 	SPELL_SHADOWSTALKER_STEALTH                        = 5916,
 	SPELL_GET_SHOT                                     = 67349,
 	SPELL_SHOOT                                        = 6660,
-	SPELL_PHASE_2                                      = 59073,
 	SPELL_PHASE_4                                      = 59074,
     SPELL_FROSTBOLT_VISUAL_ONLY                        = 74277,
     SPELL_SUMMON_CROWLEY                               = 67004,
@@ -89,12 +90,11 @@ enum SpellIds
     SPELL_BY_THE_SKIN                                  = 66914,				
     SPELL_LEFT_HOOK                                    = 67825,
     SPELL_SNAP_KICK                                    = 67827,
-    SPELL_PHASING_AURA                                 = 59073,
 	SPELL_GILNEAS_CANNON_CAMERA                        = 93555,
 	SPELL_CANNON_FIRE                                  = 68235,
     SPELL_WORGEN_BITE                                  = 72870,
     SPELL_INFECTED_BITE                                = 72872,
-    SPELL_QUEST_DETECTION                              = 49416,
+    SPELL_GENERIC_QUEST_INVISIBILITY_DERECTION_1       = 49416,
     SPELL_BARREL_KEG                                   = 69094	
 };
 

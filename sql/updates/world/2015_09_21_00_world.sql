@@ -28,7 +28,7 @@ insert into creature_text values (35369, 3, 0, "The pain is unbearable!", 14, 0,
 insert into creature_text values (35369, 4, 0, "Make it stop!", 14, 0, 100, 0, 0, 0, "Quest The Rebel Lord's Arsenal RANDOM_JOSIAH_YELL", 38740);
 insert into creature_text values (35369, 5, 0, "I can't fight it!", 14, 0, 100, 0, 0, 0, "Quest The Rebel Lord's Arsenal RANDOM_JOSIAH_YELL", 38741);
 
-update creature set phaseMask=4 where guid in (250195, 250197, 250198, 250218, 250202);
+update creature set phaseMask=2 where guid in (250195, 250197, 250198, 250218, 250202);
 
 update creature_template set minlevel=5, maxlevel=5 where entry=35112;
 
@@ -45,12 +45,12 @@ update gameobject set phaseMask=1, state=0  where guid=166801;
 
 delete from creature where id=34916 and guid in(250198, 250199, 250278, 250279, 250280, 250281);
 insert into creature values
-(250198, 34916, 654, 1, 4, 0, 0, -1767.91, 1405.72, 19.7933, 5.4925,  500, 0, 0, 52668, 0, 0, 0, 0, 0),
-(250199, 34916, 654, 1, 4, 0, 0, -1733.99, 1416.65, 21.669,  5.80578, 500, 0, 0, 52668, 0, 0, 0, 0, 0),
-(250278, 34916, 654, 1, 4, 0, 0, -1795.0,  1395.63, 19.892,  4.81814, 500, 0, 0, 40328, 0, 0, 0, 0, 0),
-(250279, 34916, 654, 1, 4, 0, 0, -1799.22, 1394.71, 19.8935, 5.0891,  500, 0, 0, 23856, 0, 0, 0, 0, 0),
-(250280, 34916, 654, 1, 4, 0, 0, -1803.0,  1391.03, 20.2854, 5.44253, 500, 0, 0, 31240, 0, 0, 0, 0, 0),
-(250281, 34916, 654, 1, 4, 0, 0, -1790.93, 1396.96, 20.2941, 5.1323,  500, 0, 0, 40328, 0, 0, 0, 0, 0);
+(250198, 34916, 654, 1, 2, 0, 0, -1767.91, 1405.72, 19.7933, 5.4925,  500, 0, 0, 52668, 0, 0, 0, 0, 0),
+(250199, 34916, 654, 1, 2, 0, 0, -1733.99, 1416.65, 21.669,  5.80578, 500, 0, 0, 52668, 0, 0, 0, 0, 0),
+(250278, 34916, 654, 1, 2, 0, 0, -1795.0,  1395.63, 19.892,  4.81814, 500, 0, 0, 40328, 0, 0, 0, 0, 0),
+(250279, 34916, 654, 1, 2, 0, 0, -1799.22, 1394.71, 19.8935, 5.0891,  500, 0, 0, 23856, 0, 0, 0, 0, 0),
+(250280, 34916, 654, 1, 2, 0, 0, -1803.0,  1391.03, 20.2854, 5.44253, 500, 0, 0, 31240, 0, 0, 0, 0, 0),
+(250281, 34916, 654, 1, 2, 0, 0, -1790.93, 1396.96, 20.2941, 5.1323,  500, 0, 0, 40328, 0, 0, 0, 0, 0);
 
 
 delete from creature where id=35504;
@@ -73,8 +73,8 @@ UPDATE locales_quest SET EndText_loc3="", CompletedText_loc3="Kehrt zu Lord Godf
 
 DELETE FROM `creature` WHERE `guid` in (278395, 278396);
 INSERT INTO `creature` (`guid`,`id`,`map`,`spawnMask`,`phaseMask`,`modelid`,`equipment_id`,`position_x`,`position_y`,`position_z`,`orientation`,`spawntimesecs`,`spawndist`,`currentwaypoint`,`curhealth`,`curmana`,`MovementType`,`npcflag`,`unit_flags`,`dynamicflags`) VALUES
-(278395, 35118, 654, 1, 4, 0, 0, -1725.81, 1449.33, 52.2857, 2.56687, 300, 0, 0, 71, 0, 0, 0, 0, 0),
-(278396, 35118, 654, 1, 4, 0, 0, -1738.17, 1436.62, 52.2899, 3.91383, 300, 0, 0, 55, 0, 0, 0, 0, 0);
+(278395, 35118, 654, 1, 2, 0, 0, -1725.81, 1449.33, 52.2857, 2.56687, 300, 0, 0, 71, 0, 0, 0, 0, 0),
+(278396, 35118, 654, 1, 2, 0, 0, -1738.17, 1436.62, 52.2899, 3.91383, 300, 0, 0, 55, 0, 0, 0, 0, 0);
 
 update creature_template_addon set path_id=0 where entry in (35170, 35188, 35456, 35167);
 update creature_template set MovementType=0 where entry in (35170, 35188, 35456, 35167);

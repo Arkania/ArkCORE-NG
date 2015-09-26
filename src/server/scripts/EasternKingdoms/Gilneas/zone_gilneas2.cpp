@@ -236,12 +236,12 @@ public:
             m_timer = urand(100, 2000);
             m_phase = 0;
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-            me->getThreatManager().resetAllAggro();
         }
        
         void DamageTaken(Unit* who, uint32 &damage)
         {
-
+            if (who->GetEntry() == 34884)
+                damage = 0;
         }
 
         void UpdateAI(uint32 diff)
@@ -305,13 +305,14 @@ public:
             m_phase = 0;
             m_encount = urand(20, 220);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-            me->getThreatManager().resetAllAggro();
         }
 
         void DamageTaken(Unit* who, uint32 &damage)
         {
             if (who->ToPlayer())
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+            if (who->GetEntry() == 34916)
+                damage = 0;
         }
 
         void UpdateAI(uint32 diff)
@@ -1492,9 +1493,27 @@ public:
 
         void DamageTaken(Unit* who, uint32 &damage)
         {
-            if (who->ToPlayer())
+            if (Player* player = who->ToPlayer())
+            {
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+                me->Attack(player, true);
+            }
         }
+
+        void SpellHit(Unit* caster, SpellInfo const* spell) 
+        { 
+            if (Player* player = caster->ToPlayer())
+            {
+                if (player->GetQuestStatus(14276) == QUEST_STATUS_INCOMPLETE)
+                    if (spell->Id == 56641)
+                        player->KilledMonsterCredit(44175);
+
+                if (player->GetQuestStatus(14281) == QUEST_STATUS_INCOMPLETE)
+                    if (spell->Id == 5143)
+                        player->KilledMonsterCredit(44175);
+            }
+        }
+
 
         void UpdateAI(uint32 diff)
         {
@@ -1551,7 +1570,7 @@ public:
         if (quest->GetQuestId() == QUEST_THE_REBEL_LORDS_ARSENAL)
         {
             creature->AddAura(SPELL_WORGEN_BITE, player);
-            player->RemoveAura(SPELL_PHASE_QUEST_2);
+            player->RemoveAura(SPELL_PHASE_QUEST_ZONE_SPECIFIC_01);
             creature->CastSpell(creature, SPELL_SUMMON_JOSIAH_AVERY);
         }
         return true;
