@@ -51,7 +51,6 @@ EndContentData */
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "ArcheologyMgr.h"
 #include "GameObjectAI.h"
 #include "Spell.h"
 #include "Player.h"

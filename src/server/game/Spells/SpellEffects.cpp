@@ -65,7 +65,7 @@
 #include "PathGenerator.h"
 #include "Guild.h"
 #include "GuildMgr.h"
-#include "ArcheologyMgr.h"
+#include "ArchaeologyMgr.h"
 #include "ReputationMgr.h"
 #include "AreaTrigger.h"
 
@@ -2665,91 +2665,9 @@ void Spell::EffectCreateItem(SpellEffIndex effIndex)
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
         return;
 
+    // Archaeology: complete project, last part: create item, handle currency, create new project 
     if (m_caster->ToPlayer() && m_caster->ToPlayer()->HasSkill(SKILL_ARCHAEOLOGY))
-    {
-        for (uint8 i = 1; i < 28; ++i)
-        {
-            if (i == 9)
-                i = 27;
-
-            ResearchProjectEntry* rp = sResearchProjectStore.LookupRow(m_caster->ToPlayer()->GetArcheologyMgr().m_researchProject[i]);
-            if (!rp)
-                continue;
-
-            if (rp->ProjectSpell == m_spellInfo->Id)
-            {
-                int32 reqFragments = int32(rp->RequiredFragments);
-                uint32 currencyId = 0;
-                uint32 stone = 0;
-                switch (rp->ResearchBranchID)
-                {
-                    // Dwarf
-                    case 1: currencyId = CURRENCY_TYPE_DWARF_FRAGMENT;  stone = ARCHEOLOGY_STONE_DWARF; break;
-                    // Draenei
-                    case 2: currencyId = CURRENCY_TYPE_DRAENEI_FRAGMENT;  stone = ARCHEOLOGY_STONE_DRAENEI; break;
-                    // Fossil
-                    case 3: currencyId = CURRENCY_TYPE_FOSSIL_FRAGMENT;  stone = ARCHEOLOGY_STONE_FOSSIL; break;
-                    // Night Elf
-                    case 4: currencyId = CURRENCY_TYPE_NELF_FRAGMENT;  stone = ARCHEOLOGY_STONE_NIGHT_ELF; break;
-                    // Nerubian
-                    case 5: currencyId = CURRENCY_TYPE_NERUBIAN_FRAGMENT;  stone = ARCHEOLOGY_STONE_NERUBIAN; break;
-                    // Orc
-                    case 6: currencyId = CURRENCY_TYPE_ORC_FRAGMENT;  stone = ARCHEOLOGY_STONE_ORC; break;
-                    // Tol'vir
-                    case 7: currencyId = CURRENCY_TYPE_TOLVIR_FRAGMENT;  stone = ARCHEOLOGY_STONE_TOLVIR; break;
-                    // Troll
-                    case 8: currencyId = CURRENCY_TYPE_TROLL_FRAGMENT;  stone = ARCHEOLOGY_STONE_TROLL; break;
-                    // Vrykul
-                    case 27: currencyId = CURRENCY_TYPE_VRYKUL_FRAGMENT; stone = ARCHEOLOGY_STONE_VRYKUL; break;
-                }
-
-                if (damage > 0)
-                {
-                    if (m_caster->ToPlayer()->HasItemCount(stone, damage, false))
-                    {
-                        if (Item* pStone = m_caster->ToPlayer()->GetItemByEntry(stone))
-                        {
-                            if (pStone->GetCount() > uint32(damage))
-                                pStone->SetCount(pStone->GetCount() - damage);
-                            else if (pStone->GetCount() == uint32(damage))
-                                m_caster->ToPlayer()->DestroyItem(pStone->GetBagSlot(), pStone->GetSlot(), true);
-                            else
-                            {
-                                for (int x = 0; x < damage;)
-                                {
-                                    if (x > 0)
-                                    {
-                                        pStone = m_caster->ToPlayer()->GetItemByEntry(stone);
-                                        if (pStone && pStone->GetCount() > uint32(damage) - x)
-                                        {
-                                            pStone->SetCount(pStone->GetCount() - damage + x);
-                                            break;
-                                        }
-                                    }
-                                    if (pStone)
-                                        m_caster->ToPlayer()->DestroyItem(pStone->GetBagSlot(), pStone->GetSlot(), true);
-                                    x += pStone->GetCount();
-                                }
-                            }
-
-                            reqFragments -= 12 * damage;
-                        }
-                    }
-                }
-
-                m_caster->ToPlayer()->ModifyCurrency(currencyId, -(reqFragments));
-                m_caster->ToPlayer()->GetArcheologyMgr().GenerateResearchProject(rp->ResearchBranchID, true, rp->ProjectSpell);
-
-                // Send research complete opcode.
-                WorldPacket completed(SMSG_RESEARCH_COMPLETE, 12);
-                completed << rp->ResearchBranchID << uint32(0) << rp->ID;           // I have my theory that the second must be onRare, but I'm not quite sure.
-                m_caster->ToPlayer()->GetSession()->SendPacket(&completed);
-
-                damage = 0;
-                break;
-            }
-        }
-    }
+        m_caster->ToPlayer()->GetArchaeologyMgr().EffectOnCreateItem(m_spellInfo->Id, damage);
 
     DoCreateItem(effIndex, m_spellInfo->Effects[effIndex].ItemType);
     ExecuteLogEffectCreateItem(effIndex, m_spellInfo->Effects[effIndex].ItemType);
@@ -6007,40 +5925,20 @@ void Spell::EffectSummonObject(SpellEffIndex effIndex)
 
     uint32 go_id = m_spellInfo->Effects[effIndex].MiscValue;
 
-    if (m_spellInfo->Id == 80451) // Survey spell
+    sCharacterDigsite* cd = new sCharacterDigsite();
+    cd->Clear();
+    uint16 pos = 0;
+    float dist = 0;
+    float orientation = 0;
+
+    if (m_spellInfo->Id == 80451) // Archaeology: Survey spell
     {
-        go_id = m_caster->ToPlayer()->GetArcheologyMgr().OnSurveyBotActivated();
+        go_id = m_caster->ToPlayer()->GetArchaeologyMgr().OnSurveyBotActivated(cd, pos, dist, orientation);
         if (go_id == 0) // If location is not valid, returns 0, and we must stop it.
             return;
     }
 
     uint8 slot = m_spellInfo->Effects[effIndex].Effect - SPELL_EFFECT_SUMMON_OBJECT_SLOT1;
-
-    uint32 branchId = 0;
-    switch (go_id)
-    {
-        // Dwarf
-        case 204282: branchId = 1; break;
-        // Draenei
-        case 207188: branchId = 2; break;
-        // Fossil
-        case 206836: branchId = 3; break;
-        // Nerubian
-        case 203078: branchId = 5; break;
-        // Night Elf
-        case 203071: branchId = 4; break;
-        // Orc
-        case 207187: branchId = 6; break;
-        // Tol'vir
-        case 207190: branchId = 7; break;
-        // Troll
-        case 202655: branchId = 8; break;
-        // Vrykul
-        case 207189: branchId = 27; break;
-    }
-
-    if (branchId > 0 && m_caster->ToPlayer()->GetArcheologyMgr().m_researchProject[branchId] == 0)
-        m_caster->ToPlayer()->GetArcheologyMgr().GenerateResearchProject(branchId, false, 0);
 
     if (uint64 guid = m_caster->m_ObjectSlot[slot])
     {
@@ -6065,10 +5963,12 @@ void Spell::EffectSummonObject(SpellEffIndex effIndex)
         m_caster->GetClosePoint(x, y, z, DEFAULT_WORLD_OBJECT_SIZE);
 
     Map* map = m_caster->GetMap();
-    if (m_spellInfo->Id == 80451)
+    if (m_spellInfo->Id == 80451) // Archaeology: Survey successful, summit binoculars bot or chest
     {
+        float deviation = m_caster->ToPlayer()->GetArchaeologyMgr().GetOrientationWithDeviation(dist, orientation);
+        m_caster->GetClosePoint(x, y, z, DEFAULT_WORLD_OBJECT_SIZE);
         if (!go->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_GAMEOBJECT), go_id, map,
-            m_caster->GetPhaseMask(), x, y, z, m_caster->ToPlayer()->GetArcheologyMgr().SetNearestFindOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 0, GO_STATE_READY))
+            m_caster->GetPhaseMask(), x, y, z, deviation, 0.0f, 0.0f, 0.0f, 0.0f, 0, GO_STATE_READY))
         {
             delete go;
             return;

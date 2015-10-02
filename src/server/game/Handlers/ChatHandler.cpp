@@ -17,6 +17,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "ArchaeologyMgr.h"
 #include "Common.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
@@ -737,6 +738,10 @@ void WorldSession::HandleTextEmoteOpcode(WorldPacket& recvData)
     EmotesTextEntry const* textEmote = sEmotesTextStore.LookupEntry(text_emote);
     if (!textEmote)
         return;
+
+    // Archaeology: Update digging places when open the Map.
+    if (GetPlayer()->HasSkill(SKILL_ARCHAEOLOGY))
+        GetPlayer()->GetArchaeologyMgr().UpdateCharacterDigsite();
 
     EmotesEntry const* emote = sEmotesStore.LookupEntry(textEmote->textid);
     if (emote && !emote->UnitStandState)

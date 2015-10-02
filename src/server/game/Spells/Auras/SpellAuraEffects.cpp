@@ -42,7 +42,7 @@
 #include "WeatherMgr.h"
 #include "Pet.h"
 #include "ReputationMgr.h"
-#include "ArcheologyMgr.h"
+#include "ArchaeologyMgr.h"
 
 class Aura;
 //
@@ -2519,50 +2519,13 @@ void AuraEffect::HandleAuraTrackResources(AuraApplication const* aurApp, uint8 m
     else
         target->RemoveFlag(PLAYER_TRACK_RESOURCES, uint32(1) << (GetMiscValue() - 1));
 
-    switch (aurApp->GetBase()->GetId())
-    {
-        case 74268: // Archaeology track
-            if (apply)
+    if (aurApp->GetBase()->GetId() == 74268)
+        if (apply)
+            if (target->ToPlayer()->HasSkill(SKILL_ARCHAEOLOGY))
             {
-                if (target->ToPlayer()->HasSkill(SKILL_ARCHAEOLOGY))
-                {
-                    // Clean archaeology current artifacts.
-                    for (uint8 i = 0; i < 28; i++)
-                        target->ToPlayer()->GetArcheologyMgr().m_researchProject[i] = 0;
-
-                    // Load archaeology current artifacts.
-                    PreparedStatement* stmt = NULL;
-                    stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PLAYER_PROJECT);
-                    stmt->setUInt32(0, target->ToPlayer()->GetGUIDLow());
-                    PreparedQueryResult artifactsResult = CharacterDatabase.Query(stmt);
-
-                    if (artifactsResult && artifactsResult->GetRowCount() > 0)
-                    {
-                        do
-                        {
-                            Field* artFields = artifactsResult->Fetch();
-                            uint32 artId = artFields[0].GetUInt32();
-                            uint32 branchId = artFields[1].GetUInt32();
-                            target->ToPlayer()->GetArcheologyMgr().m_researchProject[branchId] = artId;
-                        }
-                        while (artifactsResult->NextRow());
-                    }
-
-                    target->ToPlayer()->GetArcheologyMgr().GenerateSavedArtifacts();
-                }
-
+                target->ToPlayer()->GetArchaeologyMgr().Initialize();
                 target->SetFlag(PLAYER_TRACK_RESOURCES, uint32(1) << (GetMiscValue() - 1));
             }
-            else
-                target->RemoveFlag(PLAYER_TRACK_RESOURCES, uint32(1) << (GetMiscValue() - 1));
-            break;
-        default: // Default tracks
-            if (apply)
-                target->SetFlag(PLAYER_TRACK_RESOURCES, uint32(1) << (GetMiscValue() - 1));
-            else
-                target->RemoveFlag(PLAYER_TRACK_RESOURCES, uint32(1) << (GetMiscValue() - 1));
-            break;
-    }
 }
 
 void AuraEffect::HandleAuraTrackStealthed(AuraApplication const* aurApp, uint8 mode, bool apply) const

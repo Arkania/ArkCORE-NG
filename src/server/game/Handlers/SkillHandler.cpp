@@ -18,7 +18,7 @@
  */
 
 #include "Common.h"
-#include "ArcheologyMgr.h"
+#include "ArchaeologyMgr.h"
 #include "DatabaseEnv.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
@@ -133,23 +133,24 @@ void WorldSession::HandleSetPrimaryTree(WorldPacket& recvPacket)
     recvPacket >> talentTabId;
 }
 
-void WorldSession::HandleArcheologyRequestHistory(WorldPacket& /*recvPacket*/)
+// Archaeology: Send a list with all data for completed items you made..
+void WorldSession::HandleArchaeologyRequestHistory(WorldPacket& /*recvPacket*/)
 {
-    //empty handler, we must send SMSG_RESEARCH_SETUP_HISTORY. We still need to implement time of completion and a completion counter for proj id.
     WorldPacket data(SMSG_RESEARCH_SETUP_HISTORY);
 
-    uint32 count = _player->GetArcheologyMgr().m_completedProjects.size();
+    uint32 count = _player->GetArchaeologyMgr().completedProjects.size();
 
     data.WriteBits(count, 22);
 
     data.FlushBits();
 
     if (count > 0)
-        for (std::list<uint32>::const_iterator itr = _player->GetArcheologyMgr().m_completedProjects.begin(); itr != _player->GetArcheologyMgr().m_completedProjects.end(); ++itr)
+        for (std::vector<sCompletedProject>::const_iterator itr = _player->GetArchaeologyMgr().completedProjects.begin(); itr != _player->GetArchaeologyMgr().completedProjects.end(); ++itr)
         {
-            data << uint32(*itr);
-            data << uint32(_player->GetArcheologyMgr().GetCompletedProjectsCount(_player->GetGUIDLow(), *itr));
-            data << uint32(_player->GetArcheologyMgr().GetCompletedProjectsTime(_player->GetGUIDLow(), *itr)); // dword order : projectID, completion count, time of completion.
+            sCompletedProject cp = *itr;
+            data << uint32(cp.projectId);
+            data << uint32(cp.counter_completed);
+            data << uint32(cp.timeFirst);
         }
 
     SendPacket(&data);

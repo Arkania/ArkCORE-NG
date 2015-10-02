@@ -20,7 +20,7 @@
 #include "Player.h"
 #include "AccountMgr.h"
 #include "AchievementMgr.h"
-#include "ArcheologyMgr.h"
+#include "ArchaeologyMgr.h"
 #include "ArenaTeam.h"
 #include "ArenaTeamMgr.h"
 #include "Battlefield.h"
@@ -948,7 +948,7 @@ Player::Player(WorldSession* session): Unit(true), phaseMgr(this)
     memset(_CUFProfiles, 0, MAX_CUF_PROFILES * sizeof(CUFProfile*));
 
     m_achievementMgr = new AchievementMgr<Player>(this);
-    m_archeologyMgr = new ArcheologyMgr(this);
+    m_archaeologyMgr = new ArchaeologyMgr(this);
     m_reputationMgr = new ReputationMgr(this);
 }
 
@@ -981,7 +981,7 @@ Player::~Player()
     delete m_declinedname;
     delete m_runes;
     delete m_achievementMgr;
-    delete m_archeologyMgr;
+    delete m_archaeologyMgr;
     delete m_reputationMgr;
 
     for (uint8 i = 0; i < VOID_STORAGE_MAX_SLOT; ++i)
@@ -5211,6 +5211,7 @@ void Player::learnSpell(uint32 spell_id, bool dependent)
         }
     }
 
+    // Archaeology: if lerning a new level, include new digsites
     if (spell_id == 78670 || 
         spell_id == 88961 ||
         spell_id == 89718 ||
@@ -5219,10 +5220,9 @@ void Player::learnSpell(uint32 spell_id, bool dependent)
         spell_id == 89721 ||
         spell_id == 89722 ||
         spell_id == 110393 ||
-        spell_id == 158762) // It adds them when you learn the spells.
+        spell_id == 158762)
     {
-        GetArcheologyMgr().OnSkillUpdate(GetSkillValue(SKILL_ARCHAEOLOGY));
-        GetArcheologyMgr().SaveDigsitesToDB(); // Also save the sites once generated.
+        GetArchaeologyMgr().UpdateCharacterDigsite();
     }
 }
 
@@ -5251,8 +5251,9 @@ void Player::removeSpell(uint32 spell_id, bool disabled, bool learn_low_rank)
     if (itr == m_spells.end())
         return;                                             // already unleared
 
+    // Archaeology: if unlearn skill, remove all data from database
     if (spell_id == 78670)
-        CharacterDatabase.PExecute("DELETE FROM character_archaeology_digsites WHERE guid ='%u'", GetGUID());      // Remove all digsites the player has when unlearning Archaeology.
+        GetArchaeologyMgr().RemovePlayerProfession();
 
     bool giveTalentPoints = disabled || !itr->second->disabled;
 
@@ -7371,6 +7372,7 @@ bool Player::UpdateGatherSkill(uint32 SkillId, uint32 SkillValue, uint32 RedLeve
                 return UpdateSkillPro(SkillId, SkillGainChance(SkillValue, RedLevel+100, RedLevel+50, RedLevel+25)*Multiplicator, gathering_skill_gain);
             else
                 return UpdateSkillPro(SkillId, (SkillGainChance(SkillValue, RedLevel+100, RedLevel+50, RedLevel+25)*Multiplicator) >> (SkillValue/sWorld->getIntConfig(CONFIG_SKILL_CHANCE_MINING_STEPS)), gathering_skill_gain);
+        // Archaeology: increase the skill points on survey
         case SKILL_ARCHAEOLOGY:
             if (sWorld->getIntConfig(CONFIG_SKILL_CHANCE_ARCHAEOLOGY_STEPS) == 0)
                 return UpdateSkillPro(SkillId, SkillGainChance(SkillValue, RedLevel+100, RedLevel+50, RedLevel+25)*Multiplicator, gathering_skill_gain);
@@ -21591,8 +21593,9 @@ void Player::_SaveMonthlyQuestStatus(SQLTransaction& trans)
 
 void Player::_SaveSkills(SQLTransaction& trans)
 {
+    // Archaeology: to check 30 min cooldown for empty digsites, we need polling the update function. better place are maybe "open the map", but where is this?
     if(HasSkill(SKILL_ARCHAEOLOGY))
-        GetArcheologyMgr().SaveDigsitesToDB();
+        GetArchaeologyMgr().UpdateCharacterDigsite();
 
     PreparedStatement* stmt = NULL;
     // we don't need transactions here.
@@ -26999,8 +27002,9 @@ void Player::_LoadSkills(PreparedQueryResult result)
             SetSkill(SKILL_UNARMED, 0, base_skill, base_skill);
     }
 
-    if(HasSkill(SKILL_ARCHAEOLOGY)) // It loads them when it loads the skills
-        GetArcheologyMgr().Initialize();
+    // Archaeology: On Main Load, if skill is present, do a init
+    if(HasSkill(SKILL_ARCHAEOLOGY))
+        GetArchaeologyMgr().Initialize();
 }
 
 InventoryResult Player::CanEquipUniqueItem(Item* pItem, uint8 eslot, uint32 limit_count) const
@@ -28954,24 +28958,6 @@ void Player::SendRatedBGStats()
         data << uint32(0); //i + 1?
 
     GetSession()->SendPacket(&data);
-}
-
-// Archaeology system
-uint32 Player::GetDigsiteEntry()
-{
-    if (GetArcheologyMgr().m_digsites.size() == 0 || !HasSkill(SKILL_ARCHAEOLOGY))
-        return 0;
-
-    for (digSiteList::iterator iter = GetArcheologyMgr().m_digsites.begin(); iter != GetArcheologyMgr().m_digsites.end(); iter++)
-    {
-        float artifactDistance = ARCHAEOLOGY_DIG_SITE_RADIUS;
-
-        for (uint8 i = 1; i < iter->second.artifactsAvailable + 1; ++i)
-            if (artifactDistance >= GetDistance2d(iter->second.artifacts[i - 1].positionX, iter->second.artifacts[i - 1].positionY))
-                return iter->first;
-    }
-
-    return 0;
 }
 
 Guild* Player::GetGuild()

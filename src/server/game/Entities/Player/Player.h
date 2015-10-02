@@ -44,7 +44,7 @@ struct VendorItem;
 
 template<class T> class AchievementMgr;
 class ReputationMgr;
-class ArcheologyMgr;
+class ArchaeologyMgr;
 class Channel;
 class CharacterCreateInfo;
 class Creature;
@@ -2142,8 +2142,8 @@ class Player : public Unit, public GridObject<Player>
         uint8 GetGrantableLevels() { return m_grantableLevels; }
         void SetGrantableLevels(uint8 val) { m_grantableLevels = val; }
 
-        ArcheologyMgr&       GetArcheologyMgr()       { return *m_archeologyMgr; }
-        ArcheologyMgr const& GetArcheologyMgr() const { return *m_archeologyMgr; }
+        ArchaeologyMgr&       GetArchaeologyMgr()       { return *m_archaeologyMgr; }
+        ArchaeologyMgr const& GetArchaeologyMgr() const { return *m_archaeologyMgr; }
 
         ReputationMgr&       GetReputationMgr()       { return *m_reputationMgr; }
         ReputationMgr const& GetReputationMgr() const { return *m_reputationMgr; }
@@ -2571,11 +2571,6 @@ class Player : public Unit, public GridObject<Player>
         VoidStorageItem* GetVoidStorageItem(uint64 id, uint8& slot) const;
 
         /*********************************************************/
-        /***              ARCHAEOLOGY SYSTEM                   ***/
-        /*********************************************************/
-        uint32 GetDigsiteEntry();
-
-        /*********************************************************/
         /***                     BOT SYSTEM  434                  ***/
         /*********************************************************/
         void SetBotHelper(BotHelper* hlpr) { ASSERT(!_botHlpr); _botHlpr = hlpr; }
@@ -2972,7 +2967,7 @@ class Player : public Unit, public GridObject<Player>
         uint32 m_oldpetspell;
 
         AchievementMgr<Player>* m_achievementMgr;
-        ArcheologyMgr*  m_archeologyMgr;
+        ArchaeologyMgr*  m_archaeologyMgr;
         ReputationMgr*  m_reputationMgr;
 
         SpellCooldowns m_spellCooldowns;

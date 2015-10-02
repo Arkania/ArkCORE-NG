@@ -30,7 +30,7 @@
 #include "Totem.h"
 #include "TemporarySummon.h"
 #include "SpellAuras.h"
-#include "ArcheologyMgr.h"
+#include "ArchaeologyMgr.h"
 #include "CreatureAI.h"
 #include "ScriptMgr.h"
 #include "SpellInfo.h"
@@ -56,7 +56,7 @@ void WorldSession::HandleClientCastFlags(WorldPacket& recvPacket, uint8 castFlag
         if (hasMovementData)
             HandleMovementOpcodes(recvPacket);
     }
-    else if (castFlags & 0x8)   // Archaeology
+    else if (castFlags & 0x8)   // Archaeology:
     {
         uint32 count, entry, usedCount;
         uint8 type;
@@ -380,22 +380,13 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
 
     if (caster->GetTypeId() == TYPEID_PLAYER && !caster->ToPlayer()->HasActiveSpell(spellId))
     {
-        // Archeology craft artifacts
+        // Archaeology: craft artifacts
         if (caster->ToPlayer()->HasSkill(SKILL_ARCHAEOLOGY))
-        {
-            for (uint32 i = 9; i < sResearchProjectStore.GetNumRows(); i++)
+            if (caster->ToPlayer()->GetArchaeologyMgr().CompleteArtifact(spellId, recvPacket))
             {
-                if (ResearchProjectEntry* rp = sResearchProjectStore.LookupRow(i))
-                {
-                    if (rp->ProjectSpell == spellId)
-                    {
-                        caster->ToPlayer()->GetArcheologyMgr().CompleteArtifact(rp->ID, rp->ProjectSpell, recvPacket);
-                        recvPacket.rfinish();
-                        return;
-                    }
-                }
+                recvPacket.rfinish();
+                return;
             }
-        }
 
         switch (spellId) // some spell have permission
         {
