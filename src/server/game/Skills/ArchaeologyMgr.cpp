@@ -88,7 +88,12 @@ uint32 ArchaeologyMgr::OnSurveyBotActivated(sCharacterDigsite* &cd, uint16 &pos,
 
     if (FindNearestDigsite(cd, pos, dist, orientation))
     {
-        if (dist <= ARCHAEOLOGY_DIG_SITE_FAR_DIST && dist > ARCHAEOLOGY_DIG_SITE_MED_DIST) // Red 80-50y
+        if (dist > ARCHAEOLOGY_DIG_SITE_FAR_DIST)
+        {
+            m_player->GetSession()->SendNotification(LANG_COMMAND_TARGETOBJNOTFOUND);
+            return 0;
+        }
+        else if (dist <= ARCHAEOLOGY_DIG_SITE_FAR_DIST && dist > ARCHAEOLOGY_DIG_SITE_MED_DIST) // Red 80-50y
             return ARCHAEOLOGY_DIG_SITE_FAR_SURVEYBOT;
         else if (dist <= ARCHAEOLOGY_DIG_SITE_MED_DIST && dist > ARCHAEOLOGY_DIG_SITE_CLOSE_DIST) // Yellow 50-20y
             return ARCHAEOLOGY_DIG_SITE_MEDIUM_SURVEYBOT;
@@ -664,32 +669,33 @@ bool ArchaeologyMgr::FindNearestDigsite(sCharacterDigsite* &digsite, uint16 &pos
     uint16 area = m_player->GetAreaId();
     uint16 zone = m_player->GetZoneId();
 
-    float dist = 1000.0f;
+    float dist = 2000.0f;
+    bool inside = false;
 
     for (uint16 slot = 0; slot < GetMaxDigsite(); slot++)
     {
         sCharacterDigsite* cd = &m_characterDigsite[slot];
-        if (cd->entry>0 && cd->counter_digsite < 6 && cd->digsite.mapId == map && (cd->digsite.areaId == area || cd->digsite.areaId == zone))
+        if (cd->entry>0 && cd->digsite.mapId == map && (cd->digsite.areaId == area || cd->digsite.areaId == zone))
         {
-            for (uint8 i = 0; i < 3; i++)
-            {
-                if (cd->positions[i].count > 0)
-                {
-                    float d = cd->positions[i].GetDistance2D(m_player);
-                    if (d < dist)
+            inside = true;
+            if (cd->counter_digsite < 6)
+                for (uint8 i = 0; i < 3; i++)
+                    if (cd->positions[i].count > 0)
                     {
-                        digsite = cd;
-                        pos = i;
-                        dist = d;
-                        distance2D = d;
-                        orientation = cd->positions[i].GetOrientation(m_player);
+                        float d = cd->positions[i].GetDistance2D(m_player);
+                        if (d < dist)
+                        {
+                            digsite = cd;
+                            pos = i;
+                            dist = d;
+                            distance2D = d;
+                            orientation = cd->positions[i].GetOrientation(m_player);
+                        }
                     }
-                }
-            }
         }
     }
 
-    return dist < 150.0f ? true: false;  
+    return inside;  
 }
 
 /** current project handling **/
