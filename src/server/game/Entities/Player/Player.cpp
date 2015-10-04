@@ -21593,7 +21593,6 @@ void Player::_SaveMonthlyQuestStatus(SQLTransaction& trans)
 
 void Player::_SaveSkills(SQLTransaction& trans)
 {
-    // Archaeology: to check 30 min cooldown for empty digsites, we need polling the update function. better place are maybe "open the map", but where is this?
     if(HasSkill(SKILL_ARCHAEOLOGY))
         GetArchaeologyMgr().UpdateCharacterDigsite();
 
