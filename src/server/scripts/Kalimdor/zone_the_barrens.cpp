@@ -35,21 +35,30 @@ EndContentData */
 #include "Player.h"
 #include "SpellInfo.h"
 
-/*######
-## npc_beaten_corpse
-######*/
-
-#define GOSSIP_CORPSE "Examine corpse in detail..."
-
-enum BeatenCorpse
+// position for npc 6248 twiggy flathead
+Position const AffrayChallengerLoc[6] =
 {
-    QUEST_LOST_IN_BATTLE    = 4921
+    { -1683.0f, -4326.0f, 2.79f, 0.0f },
+    { -1682.0f, -4329.0f, 2.79f, 0.0f },
+    { -1683.0f, -4330.0f, 2.79f, 0.0f },
+    { -1680.0f, -4334.0f, 2.79f, 1.49f },
+    { -1674.0f, -4326.0f, 2.79f, 3.49f },
+    { -1677.0f, -4334.0f, 2.79f, 1.66f }
 };
 
+
+// 10668  spawned by script
 class npc_beaten_corpse : public CreatureScript
 {
 public:
     npc_beaten_corpse() : CreatureScript("npc_beaten_corpse") { }
+
+    enum BeatenCorpse
+    {
+        QUEST_LOST_IN_BATTLE = 4921
+    };
+
+    #define GOSSIP_CORPSE "Examine corpse in detail..."
 
     bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
     {
@@ -73,34 +82,31 @@ public:
 
 };
 
-/*######
-# npc_gilthares
-######*/
-
-enum Gilthares
-{
-    SAY_GIL_START               = 0,
-    SAY_GIL_AT_LAST             = 1,
-    SAY_GIL_PROCEED             = 2,
-    SAY_GIL_FREEBOOTERS         = 3,
-    SAY_GIL_AGGRO               = 4,
-    SAY_GIL_ALMOST              = 5,
-    SAY_GIL_SWEET               = 6,
-    SAY_GIL_FREED               = 7,
-
-    QUEST_FREE_FROM_HOLD        = 898,
-    AREA_MERCHANT_COAST         = 391,
-    FACTION_ESCORTEE            = 232                       //guessed, possible not needed for this quest
-};
-
-class npc_gilthares : public CreatureScript
+// 3465 (quest 898 is outdated)
+class npc_gilthares_firebough : public CreatureScript
 {
 public:
-    npc_gilthares() : CreatureScript("npc_gilthares") { }
+    npc_gilthares() : CreatureScript("npc_gilthares_firebough") { }
+
+    enum Gilthares
+    {
+        SAY_GIL_START = 0,
+        SAY_GIL_AT_LAST = 1,
+        SAY_GIL_PROCEED = 2,
+        SAY_GIL_FREEBOOTERS = 3,
+        SAY_GIL_AGGRO = 4,
+        SAY_GIL_ALMOST = 5,
+        SAY_GIL_SWEET = 6,
+        SAY_GIL_FREED = 7,
+
+        QUEST_FREE_FROM_THE_HOLD = 898,
+        AREA_THE_MERCHANT_COAST = 391,
+        FACTION_ESCORTEE = 232                       //guessed, possible not needed for this quest
+    };
 
     bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest) override
     {
-        if (quest->GetQuestId() == QUEST_FREE_FROM_HOLD)
+        if (quest->GetQuestId() == QUEST_FREE_FROM_THE_HOLD)
         {
             creature->setFaction(FACTION_ESCORTEE);
             creature->SetStandState(UNIT_STAND_STATE_STAND);
@@ -113,14 +119,9 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    struct npc_gilthares_fireboughAI : public npc_escortAI
     {
-        return new npc_giltharesAI(creature);
-    }
-
-    struct npc_giltharesAI : public npc_escortAI
-    {
-        npc_giltharesAI(Creature* creature) : npc_escortAI(creature) { }
+        npc_gilthares_fireboughAI(Creature* creature) : npc_escortAI(creature) { }
 
         void Reset() override { }
 
@@ -169,28 +170,24 @@ public:
         }
     };
 
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_gilthares_fireboughAI(creature);
+    }
 };
 
-/*######
-## npc_taskmaster_fizzule
-######*/
-
-enum TaskmasterFizzule
-{
-    FACTION_FRIENDLY_F  = 35,
-    SPELL_FLARE         = 10113,
-    SPELL_FOLLY         = 10137,
-};
-
+// 7233
 class npc_taskmaster_fizzule : public CreatureScript
 {
 public:
     npc_taskmaster_fizzule() : CreatureScript("npc_taskmaster_fizzule") { }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    enum TaskmasterFizzule
     {
-        return new npc_taskmaster_fizzuleAI(creature);
-    }
+        FACTION_FRIENDLY_F = 35,
+        SPELL_FLARE = 10113,
+        SPELL_FOLLY = 10137,
+    };
 
     struct npc_taskmaster_fizzuleAI : public ScriptedAI
     {
@@ -270,43 +267,29 @@ public:
         }
     };
 
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_taskmaster_fizzuleAI(creature);
+    }
 };
 
-/*#####
-## npc_twiggy_flathead
-#####*/
-
-enum TwiggyFlathead
-{
-    NPC_BIG_WILL                = 6238,
-    NPC_AFFRAY_CHALLENGER       = 6240,
-
-    SAY_BIG_WILL_READY          = 0,
-    SAY_TWIGGY_FLATHEAD_BEGIN   = 0,
-    SAY_TWIGGY_FLATHEAD_FRAY    = 1,
-    SAY_TWIGGY_FLATHEAD_DOWN    = 2,
-    SAY_TWIGGY_FLATHEAD_OVER    = 3
-};
-
-Position const AffrayChallengerLoc[6] =
-{
-    {-1683.0f, -4326.0f, 2.79f, 0.0f},
-    {-1682.0f, -4329.0f, 2.79f, 0.0f},
-    {-1683.0f, -4330.0f, 2.79f, 0.0f},
-    {-1680.0f, -4334.0f, 2.79f, 1.49f},
-    {-1674.0f, -4326.0f, 2.79f, 3.49f},
-    {-1677.0f, -4334.0f, 2.79f, 1.66f}
-};
-
+// 6248 spawned by script
 class npc_twiggy_flathead : public CreatureScript
 {
 public:
     npc_twiggy_flathead() : CreatureScript("npc_twiggy_flathead") { }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    enum TwiggyFlathead
     {
-        return new npc_twiggy_flatheadAI(creature);
-    }
+        NPC_BIG_WILL = 6238,
+        NPC_AFFRAY_CHALLENGER = 6240,
+
+        SAY_BIG_WILL_READY = 0,
+        SAY_TWIGGY_FLATHEAD_BEGIN = 0,
+        SAY_TWIGGY_FLATHEAD_FRAY = 1,
+        SAY_TWIGGY_FLATHEAD_DOWN = 2,
+        SAY_TWIGGY_FLATHEAD_OVER = 3
+    };
 
     struct npc_twiggy_flatheadAI : public ScriptedAI
     {
@@ -481,33 +464,45 @@ public:
         }
     };
 
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_twiggy_flatheadAI(creature);
+    }
 };
 
-/*#####
-## npc_wizzlecrank_shredder
-#####*/
-
-enum Wizzlecrank
-{
-    SAY_MERCENARY       = 0,
-    SAY_START           = 0,
-    SAY_STARTUP1        = 1,
-    SAY_STARTUP2        = 2,
-    SAY_PROGRESS_1      = 3,
-    SAY_PROGRESS_2      = 4,
-    SAY_PROGRESS_3      = 5,
-    SAY_END             = 6,
-
-    QUEST_ESCAPE        = 863,
-    FACTION_RATCHET     = 637,
-    NPC_PILOT_WIZZ      = 3451,
-    NPC_MERCENARY       = 3282,
-};
-
+// 3439
 class npc_wizzlecrank_shredder : public CreatureScript
 {
 public:
     npc_wizzlecrank_shredder() : CreatureScript("npc_wizzlecrank_shredder") { }
+
+    enum Wizzlecrank
+    {
+        SAY_MERCENARY = 0,
+        SAY_START = 0,
+        SAY_STARTUP1 = 1,
+        SAY_STARTUP2 = 2,
+        SAY_PROGRESS_1 = 3,
+        SAY_PROGRESS_2 = 4,
+        SAY_PROGRESS_3 = 5,
+        SAY_END = 6,
+
+        QUEST_ESCAPE = 863,
+        FACTION_RATCHET = 637,
+        NPC_PILOT_WIZZ = 3451,
+        NPC_MERCENARY = 3282,
+    };
+
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
+    {
+        if (quest->GetQuestId() == QUEST_ESCAPE)
+        {
+            creature->setFaction(FACTION_RATCHET);
+            if (npc_escortAI* pEscortAI = CAST_AI(npc_wizzlecrank_shredder::npc_wizzlecrank_shredderAI, creature->AI()))
+                pEscortAI->Start(true, false, player->GetGUID());
+        }
+        return true;
+    }
 
     struct npc_wizzlecrank_shredderAI : public npc_escortAI
     {
@@ -628,22 +623,10 @@ public:
         }
     };
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
-    {
-        if (quest->GetQuestId() == QUEST_ESCAPE)
-        {
-            creature->setFaction(FACTION_RATCHET);
-            if (npc_escortAI* pEscortAI = CAST_AI(npc_wizzlecrank_shredder::npc_wizzlecrank_shredderAI, creature->AI()))
-                pEscortAI->Start(true, false, player->GetGUID());
-        }
-        return true;
-    }
-
     CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_wizzlecrank_shredderAI(creature);
     }
-
 };
 
 void AddSC_the_barrens()
