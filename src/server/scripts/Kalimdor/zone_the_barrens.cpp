@@ -86,7 +86,7 @@ public:
 class npc_gilthares_firebough : public CreatureScript
 {
 public:
-    npc_gilthares() : CreatureScript("npc_gilthares_firebough") { }
+    npc_gilthares_firebough() : CreatureScript("npc_gilthares_firebough") { }
 
     enum Gilthares
     {
@@ -113,7 +113,7 @@ public:
 
             creature->AI()->Talk(SAY_GIL_START, player);
 
-            if (npc_giltharesAI* pEscortAI = CAST_AI(npc_gilthares::npc_giltharesAI, creature->AI()))
+            if (npc_gilthares_fireboughAI* pEscortAI = CAST_AI(npc_gilthares_fireboughAI, creature->AI()))
                 pEscortAI->Start(false, false, player->GetGUID(), quest);
         }
         return true;
@@ -150,7 +150,7 @@ public:
                     break;
                 case 53:
                     Talk(SAY_GIL_FREED, player);
-                    player->GroupEventHappens(QUEST_FREE_FROM_HOLD, me);
+                    player->GroupEventHappens(QUEST_FREE_FROM_THE_HOLD, me);
                     break;
             }
         }
@@ -162,7 +162,7 @@ public:
                 return;
 
             //only aggro text if not player and only in this area
-            if (who->GetTypeId() != TYPEID_PLAYER && me->GetAreaId() == AREA_MERCHANT_COAST)
+            if (who->GetTypeId() != TYPEID_PLAYER && me->GetAreaId() == AREA_THE_MERCHANT_COAST)
             {
                 //appears to be pretty much random (possible only if escorter not in combat with who yet?)
                 Talk(SAY_GIL_AGGRO, who);
