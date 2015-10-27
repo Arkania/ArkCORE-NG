@@ -887,7 +887,9 @@ public:
     }
 };
 
-// ######################################################### quest 25035 break the lines
+// ######################################################### quest 25035 break the lines  
+// ToDo: showfight between darkspear and spitescale 
+// ToDo: mount raptor summoned by jornun
 
 class npc_jornun_38989 : public CreatureScript
 {
@@ -908,6 +910,7 @@ public:
             player->KilledMonsterCredit(npc_jornun);
             creature->AI()->Talk(0);
         }
+
         return false;
     }
 
@@ -930,13 +933,119 @@ public:
         if (player && player->GetQuestStatus(quest_break_the_lines) == QUEST_STATUS_INCOMPLETE)
         {
             player->KilledMonsterCredit(npc_morakki);
+            return true;
         }
-        return true;
+
+        return false;
     }
 
 };
 
-// ######################################################### 
+// ######################################################### quest 24814 
+// ToDo: videos not ready..i want sniffs..
+// ToDo: fight with Sea Witch 
+
+class npc_voljin_38225 : public CreatureScript
+{
+public:
+    npc_voljin_38225() : CreatureScript("npc_voljin_38225"){ }
+
+    enum eQuest25035
+    {
+        NPC_ZUNI = 38423,
+        NPC_VANIRA = 38437,
+        NPC_ZARJIRA = 38306,
+        NPC_VOLJIN = 38225,
+        QUEST_AN_ANCIENT_ENEMY = 24814,
+    };
+
+    bool OnGossipHello(Player* player, Creature* creature)
+    {
+        if (player &&  player->GetQuestStatus(QUEST_AN_ANCIENT_ENEMY) == QUEST_STATUS_INCOMPLETE)
+            player->KilledMonsterCredit(NPC_VOLJIN);            
+
+        return false;
+    }
+
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action) 
+    { 
+        if (player && player->GetQuestStatus(QUEST_AN_ANCIENT_ENEMY) == QUEST_STATUS_INCOMPLETE)
+        {
+            player->KilledMonsterCredit(NPC_ZARJIRA);
+            player->TeleportTo(1, -1304.986f, -5589.265f, 23.72f, 3.85f);
+            return true;
+        }
+
+        return false; 
+    }
+
+    struct npc_voljin_38225AI : public ScriptedAI
+    {
+        npc_voljin_38225AI(Creature* creature) : ScriptedAI(creature) { }
+
+        void Reset() override
+        {
+            
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_voljin_38225AI(creature);
+    }
+};
+
+class npc_voljin_38966 : public CreatureScript
+{
+public:
+    npc_voljin_38966() : CreatureScript("npc_voljin_38966"){ }
+
+    enum eQuest25035
+    {
+      
+        QUEST_AN_ANCIENT_ENEMY = 24814,
+    };
+
+    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*opt*/) 
+    { 
+        
+        return false; 
+    }
+
+    struct npc_voljin_38966AI : public ScriptedAI
+    {
+        npc_voljin_38966AI(Creature* creature) : ScriptedAI(creature) { }
+
+        void Reset() override
+        {
+
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_voljin_38966AI(creature);
+    }
+};
+
+// ######################################################### sen'jin
+
 
 
 void AddSC_zone_echo_isles()
@@ -956,4 +1065,6 @@ void AddSC_zone_echo_isles()
     new npc_darkspear_showfight();
     new npc_jornun_38989();
     new npc_morakki_38442();
+    new npc_voljin_38225();
+    new npc_voljin_38966();
 };
