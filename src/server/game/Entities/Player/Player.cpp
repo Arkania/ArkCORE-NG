@@ -5121,7 +5121,7 @@ bool Player::addSpell(uint32 spellId, bool active, bool learning, bool dependent
     }
 
     // return true (for send learn packet) only if spell active (in case ranked spells) and not replace old spell
-    return active && !disabled && !superceded_old;
+    return active && !disabled && (!superceded_old || learning);
 }
 
 void Player::AddTemporarySpell(uint32 spellId)
