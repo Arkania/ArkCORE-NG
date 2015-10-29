@@ -10714,10 +10714,13 @@ void Unit::SpellReceivedCriticalValue(Unit* victim, const SpellInfo* spellProto)
            if (spellProto->Id == 116)
            {
                // Piercing Chill
-               if (HasAura(83156))
-                  victim->CastSpell(SelectNearbyTarget(victim), 83154, true);
-               else if (HasAura(83157))
-                  victim->CastSpell(SelectNearbyTarget(victim), 99560, true);
+               if (Unit* unit = SelectNearbyTarget(victim))
+               {
+                   if (HasAura(83156))
+                       victim->CastSpell(unit, 83154, true);
+                   else if (HasAura(83157))
+                       victim->CastSpell(unit, 99560, true);
+               }
            }
            break;
        case SPELLFAMILY_HUNTER:
