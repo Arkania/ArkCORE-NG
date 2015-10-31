@@ -3061,12 +3061,7 @@ void Player::CreateBot(uint32 botentry, uint8 botrace, uint8 botclass, bool ista
             return;
         }
         sGroupMgr->AddGroup(gr);
-        if (gr->AddMember((Player*)m_bot))
-        {
-            if (this->GetMap()->Instanceable())
-                this->UnbindInstance(this->GetMap()->GetId(), this->GetDifficulty(this->GetMap()->IsRaid()));
-        }
-        else
+        if (!gr->AddMember((Player*)m_bot))
             RemoveBot(m_bot->GetGUID(), true);
     }
 
