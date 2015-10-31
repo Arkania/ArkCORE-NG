@@ -1778,6 +1778,11 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
                 }
                 return;
             }
+            // triggered from (dbc) spell 89023, but spell 32733 not exist
+            case 32733:
+            {
+                return;
+            }
         }
     }
 
@@ -1795,6 +1800,11 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
 
     // normal case
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(triggered_spell_id);
+
+    // spell 89023 trigger (dbc) spell 32733, but spell 32733 not exist
+    if (m_spellInfo->Id == 89023 && triggered_spell_id == 32733)
+        return;
+
     if (!spellInfo)
     {
         TC_LOG_ERROR("spells", "Spell::EffectTriggerSpell spell %u tried to trigger unknown spell %u", m_spellInfo->Id, triggered_spell_id);
