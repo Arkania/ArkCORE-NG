@@ -198,7 +198,11 @@ void InstanceSave::SaveToDB()
         }
     }
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_INSTANCE_SAVE);
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_INSTANCE_BY_INSTANCE);
+    stmt->setUInt32(0, m_instanceid);
+    CharacterDatabase.Execute(stmt);
+
+    stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_INSTANCE_SAVE);
     stmt->setUInt32(0, m_instanceid);
     stmt->setUInt16(1, GetMapId());
     stmt->setUInt32(2, uint32(GetResetTimeForDB()));
@@ -485,7 +489,18 @@ void InstanceSaveManager::Update()
         if (t >= now)
             break;
 
+        // if m_resetTime has new resetTime, then write it to Queue, not delete the active instance.. 
         InstResetEvent &event = m_resetTimeQueue.begin()->second;
+        time_t resetTime = GetResetTimeFor(event.mapid, event.difficulty);
+        InstanceSave* save = GetInstanceSave(event.instanceId);
+        time_t t2 = save->GetResetTime();
+        if (t2 >= t)
+        {
+            m_resetTimeQueue.erase(m_resetTimeQueue.begin());
+            m_resetTimeQueue.insert(std::pair<time_t, InstResetEvent>(t2, event));
+            break;
+        }
+
         if (event.type == 0)
         {
             // for individual normal instances, max creature respawn + X hours
@@ -495,13 +510,12 @@ void InstanceSaveManager::Update()
         else
         {
             // global reset/warning for a certain map
-            time_t resetTime = GetResetTimeFor(event.mapid, event.difficulty);
             _ResetOrWarnAll(event.mapid, event.difficulty, event.type != 4, resetTime);
             if (event.type != 4)
             {
                 // schedule the next warning/reset
                 ++event.type;
-                ScheduleReset(true, resetTime - ResetTimeDelay[event.type-1], event);
+                ScheduleReset(true, resetTime - ResetTimeDelay[event.type - 1], event);
             }
             m_resetTimeQueue.erase(m_resetTimeQueue.begin());
         }

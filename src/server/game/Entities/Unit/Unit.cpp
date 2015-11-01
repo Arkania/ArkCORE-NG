@@ -15601,7 +15601,8 @@ void Unit::Kill(Unit* victim, bool durabilityLoss)
                     // until the players leave the instance
                     time_t resettime = creature->GetRespawnTimeEx() + 2 * HOUR;
                     if (InstanceSave* save = sInstanceSaveMgr->GetInstanceSave(creature->GetInstanceId()))
-                        if (save->GetResetTime() < resettime) save->SetResetTime(resettime);
+                        if (save->GetResetTime() < resettime) 
+                            save->SetResetTime(resettime);
                 }
             }
         }

@@ -1921,9 +1921,8 @@ void Player::Update(uint32 p_time)
     {
         if (p_time >= m_botTimer)
             m_botTimer = 0;
-        else
-            if (!sMapMgr->CanPlayerEnter(GetMap()->GetId(), this, false))
-                m_botTimer -= p_time;
+        else           
+            m_botTimer -= p_time;
     }
     else
         RefreshBot(p_time);
