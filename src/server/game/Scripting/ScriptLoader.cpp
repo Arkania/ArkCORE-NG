@@ -282,8 +282,14 @@ void AddSC_boss_eredar_twins();
 void AddSC_boss_muru();
 void AddSC_boss_kiljaeden();
 void AddSC_sunwell_plateau();
-void AddSC_boss_archaedas();                 //Uldaman
+void AddSC_boss_revelosh();                  //Uldaman
+void AddSC_boss_the_lost_dwarves();
 void AddSC_boss_ironaya();
+void AddSC_boss_obsidian_sentinel();
+void AddSC_boss_ancient_stone_keeper();
+void AddSC_boss_galgann_firehammer();
+void AddSC_boss_grimlok();
+void AddSC_boss_archaedas();
 void AddSC_uldaman();
 void AddSC_instance_uldaman();
 void AddSC_instance_the_stockade();          //The Stockade
@@ -1133,8 +1139,14 @@ void AddEasternKingdomsScripts()
     AddSC_boss_erunak_stonespeaker();
     AddSC_boss_ozumat();
     AddSC_instance_throne_of_the_tides();
-    AddSC_boss_archaedas();                 //Uldaman
+    AddSC_boss_revelosh();                  //Uldaman
+    AddSC_boss_the_lost_dwarves();
     AddSC_boss_ironaya();
+    AddSC_boss_obsidian_sentinel();
+    AddSC_boss_ancient_stone_keeper();
+    AddSC_boss_galgann_firehammer();
+    AddSC_boss_grimlok();
+    AddSC_boss_archaedas();
     AddSC_uldaman();
     AddSC_instance_uldaman();
     AddSC_boss_akilzon();                   //Zul'Aman

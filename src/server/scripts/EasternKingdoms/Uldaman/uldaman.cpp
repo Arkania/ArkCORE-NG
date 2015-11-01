@@ -17,51 +17,31 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Uldaman
-SD%Complete: 100
-SDComment: Quest support: 2240, 2278 + 1 trash mob.
-SDCategory: Uldaman
-EndScriptData */
-
-/* ContentData
-npc_jadespine_basilisk
-go_keystone_chamber
-at_map_chamber
-EndContentData */
-
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "uldaman.h"
 #include "Player.h"
 
-/*######
-## npc_jadespine_basilisk
-######*/
-
-enum Spells
-{
-    SPELL_CRYSTALLINE_SLUMBER   = 3636,
-};
-
+// 4863 npc_jadespine_basilisk
 class npc_jadespine_basilisk : public CreatureScript
 {
     public:
 
-        npc_jadespine_basilisk()
-            : CreatureScript("npc_jadespine_basilisk")
-        {
-        }
+        npc_jadespine_basilisk(): CreatureScript("npc_jadespine_basilisk") { }
 
         struct npc_jadespine_basiliskAI : public ScriptedAI
         {
-            npc_jadespine_basiliskAI(Creature* creature) : ScriptedAI(creature) { }
+            npc_jadespine_basiliskAI(Creature* creature) : ScriptedAI(creature) 
+            { 
+                m_instance = creature->GetInstanceScript(); 
+            }
 
-            uint32 uiCslumberTimer;
+            uint32 m_slumberTimer;
+            InstanceScript* m_instance;
 
             void Reset() override
             {
-                uiCslumberTimer = 2000;
+                m_slumberTimer = 2000;
             }
 
             void EnterCombat(Unit* /*who*/) override
@@ -75,13 +55,13 @@ class npc_jadespine_basilisk : public CreatureScript
                     return;
 
                 //uiCslumberTimer
-                if (uiCslumberTimer <= uiDiff)
+                if (m_slumberTimer <= uiDiff)
                 {
                     //Cast
                     DoCastVictim(SPELL_CRYSTALLINE_SLUMBER, true);
 
                     //Stop attacking target thast asleep and pick new target
-                    uiCslumberTimer = 28000;
+                    m_slumberTimer = 28000;
 
                     Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 0);
 
@@ -91,7 +71,8 @@ class npc_jadespine_basilisk : public CreatureScript
                     if (target)
                         me->TauntApply(target);
 
-                } else uiCslumberTimer -= uiDiff;
+                }
+                else m_slumberTimer -= uiDiff;
 
                 DoMeleeAttackIfReady();
             }
@@ -103,10 +84,7 @@ class npc_jadespine_basilisk : public CreatureScript
         }
 };
 
-/*######
-## go_keystone_chamber
-######*/
-
+// 124371  go_keystone_chamber
 class go_keystone_chamber : public GameObjectScript
 {
 public:
@@ -115,26 +93,18 @@ public:
     bool OnGossipHello(Player* /*player*/, GameObject* go) override
     {
         if (InstanceScript* instance = go->GetInstanceScript())
-            instance->SetData(DATA_IRONAYA_SEAL, IN_PROGRESS); //door animation and save state.
+            instance->SetData(ENC_IRONAYA_SEAL, IN_PROGRESS); //door animation and save state.
 
         return false;
     }
 };
 
-/*######
-## at_map_chamber
-######*/
-
-#define QUEST_HIDDEN_CHAMBER    2240
-
+// 822  at_map_chamber
 class AreaTrigger_at_map_chamber : public AreaTriggerScript
 {
     public:
 
-        AreaTrigger_at_map_chamber()
-            : AreaTriggerScript("at_map_chamber")
-        {
-        }
+        AreaTrigger_at_map_chamber(): AreaTriggerScript("at_map_chamber") { }
 
         bool OnTrigger(Player* player, AreaTriggerEntry const* /*trigger*/) override
         {

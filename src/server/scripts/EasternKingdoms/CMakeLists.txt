@@ -166,10 +166,16 @@ set(scripts_STAT_SRCS
   EasternKingdoms/MagistersTerrace/boss_vexallus.cpp
   EasternKingdoms/MagistersTerrace/magisters_terrace.cpp
   EasternKingdoms/Uldaman/uldaman.cpp
-  EasternKingdoms/Uldaman/boss_ironaya.cpp
   EasternKingdoms/Uldaman/uldaman.h
   EasternKingdoms/Uldaman/instance_uldaman.cpp
   EasternKingdoms/Uldaman/boss_archaedas.cpp
+  EasternKingdoms/Uldaman/boss_ironaya.cpp
+  EasternKingdoms/Uldaman/boss_ancient_stone_keeper.cpp
+  EasternKingdoms/Uldaman/boss_galgann_firehammer.cpp
+  EasternKingdoms/Uldaman/boss_grimlok.cpp
+  EasternKingdoms/Uldaman/boss_obsidian_sentinel.cpp
+  EasternKingdoms/Uldaman/boss_revelosh.cpp
+  EasternKingdoms/Uldaman/boss_the_lost_dwarves.cpp
   EasternKingdoms/zone_swamp_of_sorrows.cpp
   EasternKingdoms/SunwellPlateau/boss_eredar_twins.cpp
   EasternKingdoms/SunwellPlateau/boss_kiljaeden.cpp

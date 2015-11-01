@@ -19,14 +19,14 @@
 #include "ScriptedCreature.h"
 #include "uldaman.h"
 
-class boss_archaedas : public CreatureScript
+class boss_revelosh : public CreatureScript
 {
 public:
-    boss_archaedas() : CreatureScript("boss_archaedas") { }
+    boss_revelosh() : CreatureScript("boss_revelosh") { }
 
-    struct boss_archaedasAI : public ScriptedAI
+    struct boss_reveloshAI : public ScriptedAI
     {
-        boss_archaedasAI(Creature* creature) : ScriptedAI(creature)
+        boss_reveloshAI(Creature* creature) : ScriptedAI(creature)
         {
             m_instance = creature->GetInstanceScript();
         }
@@ -37,19 +37,19 @@ public:
 
         void Reset()
         {
-            m_instance->SetData(ENC_ARCHAEDAS, NOT_STARTED);
+            m_instance->SetData(ENC_REVELOSH, NOT_STARTED);
             m_events.Reset();
             m_phase = 0;
         }
 
         void EnterCombat(Unit* /*who*/)
         {
-            m_instance->SetData(ENC_ARCHAEDAS, IN_PROGRESS);
+            m_instance->SetData(ENC_REVELOSH, IN_PROGRESS);
         }
 
         void JustDied(Unit* /*Killer*/)
         {
-            m_instance->SetData(ENC_ARCHAEDAS, DONE);
+            m_instance->SetData(ENC_REVELOSH, DONE);
         }
 
         void UpdateAI(uint32 uiDiff)
@@ -62,11 +62,11 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return GetUldamanAI<boss_archaedasAI>(creature);
+        return GetUldamanAI<boss_reveloshAI>(creature);
     }
 };
 
-void AddSC_boss_archaedas()
+void AddSC_boss_revelosh()
 {
-    new boss_archaedas();
+    new boss_revelosh();
 }

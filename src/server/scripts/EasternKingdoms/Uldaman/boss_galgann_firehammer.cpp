@@ -19,14 +19,14 @@
 #include "ScriptedCreature.h"
 #include "uldaman.h"
 
-class boss_archaedas : public CreatureScript
+class boss_galgann_firehammer : public CreatureScript
 {
 public:
-    boss_archaedas() : CreatureScript("boss_archaedas") { }
+    boss_galgann_firehammer() : CreatureScript("boss_galgann_firehammer") { }
 
-    struct boss_archaedasAI : public ScriptedAI
+    struct boss_galgann_firehammerAI : public ScriptedAI
     {
-        boss_archaedasAI(Creature* creature) : ScriptedAI(creature)
+        boss_galgann_firehammerAI(Creature* creature) : ScriptedAI(creature)
         {
             m_instance = creature->GetInstanceScript();
         }
@@ -37,19 +37,19 @@ public:
 
         void Reset()
         {
-            m_instance->SetData(ENC_ARCHAEDAS, NOT_STARTED);
+            m_instance->SetData(ENC_GALGANN_FIREHAMMER, NOT_STARTED);
             m_events.Reset();
             m_phase = 0;
         }
 
         void EnterCombat(Unit* /*who*/)
         {
-            m_instance->SetData(ENC_ARCHAEDAS, IN_PROGRESS);
+            m_instance->SetData(ENC_GALGANN_FIREHAMMER, IN_PROGRESS);
         }
 
         void JustDied(Unit* /*Killer*/)
         {
-            m_instance->SetData(ENC_ARCHAEDAS, DONE);
+            m_instance->SetData(ENC_GALGANN_FIREHAMMER, DONE);
         }
 
         void UpdateAI(uint32 uiDiff)
@@ -62,11 +62,11 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return GetUldamanAI<boss_archaedasAI>(creature);
+        return GetUldamanAI<boss_galgann_firehammerAI>(creature);
     }
 };
 
-void AddSC_boss_archaedas()
+void AddSC_boss_galgann_firehammer()
 {
-    new boss_archaedas();
+    new boss_galgann_firehammer();
 }
