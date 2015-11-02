@@ -200,18 +200,22 @@ MoveSpline::MoveSpline() : m_Id(0), time_passed(0),
 
 bool MoveSplineInitArgs::Validate(Unit* unit) const
 {
-#define CHECK(exp) \
-    if (!(exp))\
-    {\
-        TC_LOG_ERROR("misc", "MoveSplineInitArgs::Validate: expression '%s' failed for GUID: %u Entry: %u", #exp, unit->GetTypeId() == TYPEID_PLAYER ? unit->GetGUIDLow() : unit->ToCreature()->GetDBTableGUIDLow(), unit->GetEntry());\
-        return false;\
+    if (path.size() <= 1)
+    {
+        TC_LOG_ERROR("misc", "MoveSplineInitArgs::Validate size <= 1.0f : expression failed for GUID: %u Entry: %u", unit->GetTypeId() == TYPEID_PLAYER ? unit->GetGUIDLow() : unit->ToCreature()->GetDBTableGUIDLow(), unit->GetEntry());
+        return false;
     }
-    CHECK(path.size() > 1);
-    CHECK(velocity >= 0.1f);
-    CHECK(time_perc >= 0.f && time_perc <= 1.f);
-    //CHECK(_checkPathBounds());
+    if (velocity < 0.1f)
+    {
+        TC_LOG_ERROR("misc", "MoveSplineInitArgs::Validate velocity < 0.1: expression failed for GUID: %u Entry: %u", unit->GetTypeId() == TYPEID_PLAYER ? unit->GetGUIDLow() : unit->ToCreature()->GetDBTableGUIDLow(), unit->GetEntry());
+        return false;
+    }
+    if (time_perc < 0.f || time_perc > 1.f)
+    {
+        TC_LOG_ERROR("misc", "MoveSplineInitArgs::Validate time_perc between 0 and 1: expression failed for GUID: %u Entry: %u", unit->GetTypeId() == TYPEID_PLAYER ? unit->GetGUIDLow() : unit->ToCreature()->GetDBTableGUIDLow(), unit->GetEntry());
+        return false;
+    }
     return true;
-#undef CHECK
 }
 
 // MONSTER_MOVE packet format limitation for not CatmullRom movement:
