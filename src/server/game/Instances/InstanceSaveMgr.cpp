@@ -481,7 +481,7 @@ void InstanceSaveManager::ScheduleReset(bool add, time_t time, InstResetEvent ev
 void InstanceSaveManager::Update()
 {
     time_t now = time(NULL);
-    time_t t;
+    time_t t, t2;
 
     while (!m_resetTimeQueue.empty())
     {
@@ -492,15 +492,17 @@ void InstanceSaveManager::Update()
         // if m_resetTime has new resetTime, then write it to Queue, not delete the active instance.. 
         InstResetEvent &event = m_resetTimeQueue.begin()->second;
         time_t resetTime = GetResetTimeFor(event.mapid, event.difficulty);
-        InstanceSave* save = GetInstanceSave(event.instanceId);
-        time_t t2 = save->GetResetTime();
-        if (t2 >= t)
+        if (InstanceSave* save = GetInstanceSave(event.instanceId))
         {
-            m_resetTimeQueue.erase(m_resetTimeQueue.begin());
-            m_resetTimeQueue.insert(std::pair<time_t, InstResetEvent>(t2, event));
-            break;
+            if (t2 = save->GetResetTime())
+                if (t2 >= t)
+                {
+                    m_resetTimeQueue.erase(m_resetTimeQueue.begin());
+                    m_resetTimeQueue.insert(std::pair<time_t, InstResetEvent>(t2, event));
+                    break;
+                }
         }
-
+       
         if (event.type == 0)
         {
             // for individual normal instances, max creature respawn + X hours
