@@ -24,12 +24,9 @@ class boss_revelosh : public CreatureScript
 public:
     boss_revelosh() : CreatureScript("boss_revelosh") { }
 
-    struct boss_reveloshAI : public ScriptedAI
+    struct boss_reveloshAI : public BossAI
     {
-        boss_reveloshAI(Creature* creature) : ScriptedAI(creature)
-        {
-            m_instance = creature->GetInstanceScript();
-        }
+        boss_reveloshAI(Creature* creature) : BossAI(creature, ENC_REVELOSH) { m_instance = creature->GetInstanceScript(); }
 
         InstanceScript* m_instance;
         EventMap m_events;

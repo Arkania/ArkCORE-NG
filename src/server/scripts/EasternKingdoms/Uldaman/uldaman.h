@@ -24,6 +24,7 @@
 
 enum eEncounters
 {
+    // BossEncounters
     ENC_REVELOSH = 0,
     ENC_THE_LOST_DWARVES,
     ENC_IRONAYA,
@@ -32,8 +33,7 @@ enum eEncounters
     ENC_GALGANN_FIREHAMMER,
     ENC_GRIMLOK,
     ENC_ARCHAEDAS,
-    ENC_IRONAYA_SEAL,   // door animation and save state.
-    MAX_BOSS_ENCOUNTER
+    MAX_BOSS_ENCOUNTERS
 };
 
 enum eDataTypes
@@ -53,8 +53,8 @@ enum eDataTypes
     DATA_TEMPLE_DOOR_3,
     DATA_ANCIENT_VAULT_DOOR,
     DATA_IRONAYA_SEAL_DOOR,
-    DATA_KEYSTONE,
     DATA_ECHOMOK_DOOR,
+    DATA_KEYSTONE,
     DATA_ALTAR_OF_THE_KEEPER,
     MAX_DATA_ENCOUNTER
 };
@@ -80,20 +80,9 @@ enum eGameObject
     GO_TEMPLE_DOOR_3        = 141869,
     GO_ANCIENT_VAULT_DOOR   = 124369,
     GO_IRONAYA_SEAL_DOOR    = 124372,
+    GO_ECHOMOK_DOOR         = 124370,
     GO_KEYSTONE             = 124371,
     GO_ALTAR_OF_THE_KEEPER  = 130511,
-    GO_ECHOMOK_DOOR         = 124370,
-};
-
-DoorData const doorData[] =
-{
-    { GO_TEMPLE_DOOR_1,         DATA_ARCHAEDAS,             DOOR_TYPE_ROOM, BOUNDARY_NONE },
-    { GO_TEMPLE_DOOR_2,         DATA_ALTAR_OF_THE_KEEPER,   DOOR_TYPE_ROOM, BOUNDARY_NONE },
-    { GO_TEMPLE_DOOR_3,         DATA_ARCHAEDAS,             DOOR_TYPE_ROOM, BOUNDARY_NONE },
-    { GO_ANCIENT_VAULT_DOOR,    DATA_ANCIENT_VAULT_DOOR,    DOOR_TYPE_ROOM, BOUNDARY_NONE },
-    { GO_IRONAYA_SEAL_DOOR,     DATA_IRONAYA_SEAL_DOOR,     DOOR_TYPE_ROOM, BOUNDARY_NONE },
-    { GO_ECHOMOK_DOOR,          DATA_OBSIDIAN_SENTINEL,     DOOR_TYPE_ROOM, BOUNDARY_NONE },
-    { 0,                        0,                          DOOR_TYPE_ROOM, BOUNDARY_NONE } // END
 };
 
 enum eSpells
@@ -101,6 +90,9 @@ enum eSpells
     SPELL_ARCHAEDAS_AWAKEN = 10347,
     SPELL_AWAKEN_VAULT_WALKER = 10258,
     SPELL_CRYSTALLINE_SLUMBER = 3636,
+    SPELL_ARCINGSMASH = 8374,
+    SPELL_KNOCKAWAY = 10101,
+    SPELL_WSTOMP = 11876,
 };
 
 enum eEvents
@@ -113,6 +105,12 @@ enum eQuest
     QUEST_HIDDEN_CHAMBER = 2240
 };
 
+enum eDoorState
+{
+    OpenState = 1,
+    CloseState = 2,
+};
+
 template<class AI>
 CreatureAI* GetUldamanAI(Creature* creature)
 {
@@ -123,6 +121,7 @@ CreatureAI* GetUldamanAI(Creature* creature)
 
     return NULL;
 }
+
 
 template<class AI, class T>
 AI* GetUldamanAI(T* obj)

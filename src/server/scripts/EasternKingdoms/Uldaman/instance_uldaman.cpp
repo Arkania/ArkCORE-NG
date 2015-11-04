@@ -30,128 +30,165 @@ class instance_uldaman : public InstanceMapScript
         {
             instance_uldaman_InstanceMapScript(Map* map) : InstanceScript(map) { }
 
-            void Initialize()
+            void Initialize() override
             {
-                SetBossNumber(MAX_BOSS_ENCOUNTER);
-                LoadDoorData(doorData);
+                SetBossNumber(MAX_BOSS_ENCOUNTERS);
 
                 for (uint8 i = 0; i < MAX_DATA_ENCOUNTER; ++i)
                     m_ListOfGUID[i] = 0;
 
                 m_LoadingInstanceTimer = 0;
-                m_AreTeamNpcsSpawned = false;
+                m_IsTeamNpcsSpawned = false;
                 m_hasDoor = false;
                 m_hasPlayer = false;
                 m_team = 0;
             }
 
-            void OnPlayerEnter(Player* player)
+            void OnPlayerEnter(Player* player) override
             {
                 m_hasPlayer = true;
                 m_team = player->GetTeam(); // ALLIANCE or HORDE
                 m_LoadingInstanceTimer = 100;
             }
 
-            void OnGameObjectCreate(GameObject* go)
+            void OnGameObjectCreate(GameObject* go) override
             {
                 uint32 entry = go->GetEntry();
                 switch (entry)
                 {
                     case GO_TEMPLE_DOOR_1:
                         m_ListOfGUID[DATA_TEMPLE_DOOR_1] = go->GetGUID();
+                        break;
                     case GO_TEMPLE_DOOR_2:
                         m_ListOfGUID[DATA_TEMPLE_DOOR_2] = go->GetGUID();
+                        break;
                     case GO_TEMPLE_DOOR_3:
                         m_ListOfGUID[DATA_TEMPLE_DOOR_3] = go->GetGUID();
                         m_hasDoor = true;
+                        break;
                     case GO_ANCIENT_VAULT_DOOR:
                         m_ListOfGUID[DATA_ANCIENT_VAULT_DOOR] = go->GetGUID();
+                        break;
                     case GO_IRONAYA_SEAL_DOOR:
                         m_ListOfGUID[DATA_IRONAYA_SEAL_DOOR] = go->GetGUID();
+                        break;
+                    case GO_ECHOMOK_DOOR:
+                        m_ListOfGUID[DATA_ECHOMOK_DOOR] = go->GetGUID();
+                        break;
                     case GO_KEYSTONE:
                         m_ListOfGUID[DATA_KEYSTONE] = go->GetGUID();
+                        break;
+                    case GO_ALTAR_OF_THE_KEEPER:
+                        m_ListOfGUID[DATA_ALTAR_OF_THE_KEEPER] = go->GetGUID();
+                        break;
                 }
             }
 
-            void OnGameObjectRemove(GameObject* go)
+            void OnGameObjectRemove(GameObject* go) override
             {
                 uint32 entry = go->GetEntry();
                 switch (entry)
                 {
                     case GO_TEMPLE_DOOR_1:
                         m_ListOfGUID[DATA_TEMPLE_DOOR_1] = go->GetGUID();
+                        break;
                     case GO_TEMPLE_DOOR_2:
                         m_ListOfGUID[DATA_TEMPLE_DOOR_2] = go->GetGUID();
+                        break;
                     case GO_TEMPLE_DOOR_3:
                         m_ListOfGUID[DATA_TEMPLE_DOOR_3] = go->GetGUID();
                         m_hasDoor = false;
+                        break;
                     case GO_ANCIENT_VAULT_DOOR:
                         m_ListOfGUID[DATA_ANCIENT_VAULT_DOOR] = 0;
+                        break;
                     case GO_IRONAYA_SEAL_DOOR:
                         m_ListOfGUID[DATA_IRONAYA_SEAL_DOOR] = 0;
+                        break;
                     case GO_KEYSTONE:
                         m_ListOfGUID[DATA_KEYSTONE] = 0;
+                        break;
                 }
             }
 
-            void OnCreatureCreate(Creature* creature)
+            void OnCreatureCreate(Creature* creature) override
             {
                 uint32 entry = creature->GetEntry();
                 switch (entry)
                 {
                     case BOSS_REVELOSH:
                         m_ListOfGUID[DATA_REVELOSH] = creature->GetGUID();
+                        break;
                     case BOSS_BAELOG:
                         m_ListOfGUID[DATA_BAELOG] = creature->GetGUID();
+                        break;
                     case BOSS_ERIC:
                         m_ListOfGUID[DATA_ERIC] = creature->GetGUID();
+                        break;
                     case BOSS_OLAV:
                         m_ListOfGUID[DATA_OLAV] = creature->GetGUID();
+                        break;
                     case BOSS_IRONAYA:
                         m_ListOfGUID[DATA_IRONAYA] = creature->GetGUID();
+                        break;
                     case BOSS_OBSIDIAN_SENTINEL:
                         m_ListOfGUID[DATA_OBSIDIAN_SENTINEL] = creature->GetGUID();
+                        break;
                     case BOSS_ANCIENT_STONE_KEEPER:
                         m_ListOfGUID[DATA_ANCIENT_STONE_KEEPER] = creature->GetGUID();
+                        break;
                     case BOSS_GALGANN_FIREHAMMER:
                         m_ListOfGUID[DATA_GALGANN_FIREHAMMER] = creature->GetGUID();
+                        break;
                     case BOSS_GRIMLOK:
                         m_ListOfGUID[DATA_GRIMLOK] = creature->GetGUID();
+                        break;
                     case BOSS_ARCHAEDAS:
                         m_ListOfGUID[DATA_ARCHAEDAS] = creature->GetGUID();
-                }               
+                        break;
+                }
             }
 
-            void OnCreatureRemove(Creature* creature)
+            void OnCreatureRemove(Creature* creature) override
             { 
                 uint32 entry = creature->GetEntry();
                 switch (entry)
                 {
                 case BOSS_REVELOSH:
                     m_ListOfGUID[DATA_REVELOSH] = 0;
+                    break;
                 case BOSS_BAELOG:
                     m_ListOfGUID[DATA_BAELOG] = 0;
+                    break;
                 case BOSS_ERIC:
                     m_ListOfGUID[DATA_ERIC] = 0;
+                    break;
                 case BOSS_OLAV:
                     m_ListOfGUID[DATA_OLAV] = 0;
+                    break;
                 case BOSS_IRONAYA:
                     m_ListOfGUID[DATA_IRONAYA] = 0;
+                    break;
                 case BOSS_OBSIDIAN_SENTINEL:
                     m_ListOfGUID[DATA_OBSIDIAN_SENTINEL] = 0;
+                    break;
                 case BOSS_ANCIENT_STONE_KEEPER:
                     m_ListOfGUID[DATA_ANCIENT_STONE_KEEPER] = 0;
+                    break;
                 case BOSS_GALGANN_FIREHAMMER:
                     m_ListOfGUID[DATA_GALGANN_FIREHAMMER] = 0;
+                    break;
                 case BOSS_GRIMLOK:
                     m_ListOfGUID[DATA_GRIMLOK] = 0;
+                    break;
                 case BOSS_ARCHAEDAS:
                     m_ListOfGUID[DATA_ARCHAEDAS] = 0;
+                    break;
                 }
             }
 
-            // Stored GUID of Boss, GameObjects and Creatures
-            uint64 GetData64(uint32 identifier) const
+            // Prefix DATA_ : Stored GUID of Boss, GameObjects and Creatures
+            uint64 GetData64(uint32 identifier) const override
             {
                 if (identifier < MAX_DATA_ENCOUNTER)
                     return m_ListOfGUID[identifier];
@@ -159,23 +196,23 @@ class instance_uldaman : public InstanceMapScript
                 return 0;
             }
 
-            // NOT_STARTED = 0, IN_PROGRESS = 1, FAIL = 2, DONE = 3, SPECIAL = 4, TO_BE_DECIDED = 5
-            uint32 GetData(uint32 DataId) const
+            // Prefix ENC_ : NOT_STARTED = 0, IN_PROGRESS = 1, FAIL = 2, DONE = 3, SPECIAL = 4, TO_BE_DECIDED = 5
+            uint32 GetData(uint32 Id) const override
             {
-                if (DataId < MAX_DATA_ENCOUNTER)
-                    GetBossState(DataId);
+                if (Id < MAX_BOSS_ENCOUNTERS)
+                    GetBossState(Id);
 
                 return 0;
             }
 
-            // NOT_STARTED = 0, IN_PROGRESS = 1, FAIL = 2, DONE = 3, SPECIAL = 4, TO_BE_DECIDED = 5
-            void SetData(uint32 DataId, uint32 Value)
+            // Prefix ENC_ : NOT_STARTED = 0, IN_PROGRESS = 1, FAIL = 2, DONE = 3, SPECIAL = 4, TO_BE_DECIDED = 5
+            void SetData(uint32 Id, uint32 Value) override
             {
-                if (DataId < MAX_DATA_ENCOUNTER)
-                    SetBossState(DataId, EncounterState(Value));
+                if (Id < MAX_BOSS_ENCOUNTERS)
+                    SetBossState(Id, EncounterState(Value));
             }
 
-            std::string GetSaveData()
+            std::string GetSaveData() override
             {
                 OUT_SAVE_INST_DATA;
 
@@ -186,7 +223,7 @@ class instance_uldaman : public InstanceMapScript
                 return saveStream.str();
             }
 
-            void Load(const char* str)
+            void Load(const char* str) override
             {
                 if (!str)
                 {
@@ -203,7 +240,7 @@ class instance_uldaman : public InstanceMapScript
 
                 if (dataHead1 == 'U' && dataHead2 == 'L')
                 {
-                    for (uint32 i = 0; i < MAX_BOSS_ENCOUNTER; ++i)
+                    for (uint32 i = 0; i < MAX_BOSS_ENCOUNTERS; ++i)
                     {
                         uint32 tmpState;
                         loadStream >> tmpState;
@@ -219,11 +256,11 @@ class instance_uldaman : public InstanceMapScript
                 OUT_LOAD_INST_DATA_COMPLETE;
             }
 
-            void Update(uint32 diff)
+            void Update(uint32 diff) override
             {
                 if (m_LoadingInstanceTimer < diff)
                 {
-                    if (m_AreTeamNpcsSpawned)
+                    if (m_IsTeamNpcsSpawned)
                         m_LoadingInstanceTimer = 0;
                     else
                     {
@@ -236,16 +273,16 @@ class instance_uldaman : public InstanceMapScript
 
             }
 
-            void ProcessEvent(WorldObject* obj, uint32 eventId) 
+            void ProcessEvent(WorldObject* obj, uint32 eventId) override
             { 
-            
+                printf("Instance Uldaman ProcessEvent: ID: %u \n", eventId);
             }
 
             // private instance functions
 
             void SpawnNpcs()
             {
-                if (m_AreTeamNpcsSpawned || !m_hasDoor || !m_hasPlayer)
+                if (m_IsTeamNpcsSpawned || !m_hasDoor || !m_hasPlayer)
                     return;
 
                 if (m_team == ALLIANCE)
@@ -262,7 +299,7 @@ class instance_uldaman : public InstanceMapScript
                 if (m_ListOfGUID[DATA_TEMPLE_DOOR_3] > 0)
                     if (door = instance->GetGameObject(m_ListOfGUID[DATA_TEMPLE_DOOR_3]))
                     {
-                        m_AreTeamNpcsSpawned = true;
+                        m_IsTeamNpcsSpawned = true;
                         door->SummonCreature(46231, -217.644f, 65.1548f, -45.9551f, 4.67748f);
                         door->SummonCreature(46231, -243.465f, 49.8025f, -45.9353f, 3.78736f);
                         door->SummonCreature(46231, -223.069f, 54.5037f, -45.9551f, 4.76475f);
@@ -284,7 +321,7 @@ class instance_uldaman : public InstanceMapScript
                 if (m_ListOfGUID[DATA_TEMPLE_DOOR_3 ] > 0)
                     if (door = instance->GetGameObject(m_ListOfGUID[DATA_TEMPLE_DOOR_3]))
                     {
-                        m_AreTeamNpcsSpawned = true;
+                        m_IsTeamNpcsSpawned = true;
                         door->SummonCreature(46232, -243.503f, 71.802f, -45.9353f, 3.12414f);
                         door->SummonCreature(46232, -209.841f, 69.7669f, -45.9353f, 1.64061f);
                         door->SummonCreature(46232, -243.499f, 49.799f, -45.9353f, 3.80482f);
@@ -304,7 +341,7 @@ class instance_uldaman : public InstanceMapScript
          private:
             uint64  m_ListOfGUID[MAX_DATA_ENCOUNTER];
             uint32  m_LoadingInstanceTimer;
-            bool    m_AreTeamNpcsSpawned;
+            bool    m_IsTeamNpcsSpawned;
             bool    m_hasDoor;
             bool    m_hasPlayer;
             uint32  m_team;

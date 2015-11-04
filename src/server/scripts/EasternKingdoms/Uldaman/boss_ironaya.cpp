@@ -19,48 +19,62 @@
 #include "ScriptedCreature.h"
 #include "uldaman.h"
 
+//  7228  boss_ironaya
 class boss_ironaya : public CreatureScript
 {
 public:
     boss_ironaya() : CreatureScript("boss_ironaya") { }
-
-    struct boss_ironayaAI : public ScriptedAI
+    
+    enum eTalk
     {
-        boss_ironayaAI(Creature* creature) : ScriptedAI(creature)
-        {
-            m_instance = creature->GetInstanceScript();
-        }
+        SAY_AGGRO,
+    };
+
+    struct boss_ironayaAI : public BossAI
+    {
+        boss_ironayaAI(Creature* creature) : BossAI(creature, ENC_IRONAYA) { m_instance = creature->GetInstanceScript(); }
 
         InstanceScript* m_instance;
         EventMap m_events;
         uint32 m_phase;
 
-        void Reset()
+        void Reset() override
         {
-            m_instance->SetData(ENC_IRONAYA, NOT_STARTED);
             m_events.Reset();
             m_phase = 0;
+
+            if (m_instance)
+            {
+                m_instance->SetData(ENC_IRONAYA, NOT_STARTED);
+                if (GameObject* door = ObjectAccessor::GetGameObject(*me, m_instance->GetData64(DATA_IRONAYA_SEAL_DOOR)))
+                    if (me->IsAlive())
+                        door->SetGoState(GO_STATE_READY);
+                    else
+                        door->SetGoState(GO_STATE_ACTIVE);
+            }
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             m_instance->SetData(ENC_IRONAYA, IN_PROGRESS);
+            Talk(SAY_AGGRO);
         }
 
-        void JustDied(Unit* /*Killer*/)
+        void JustDied(Unit* Killer) override
         {
             m_instance->SetData(ENC_IRONAYA, DONE);
         }
 
-        void UpdateAI(uint32 uiDiff)
+        void UpdateAI(uint32 uiDiff) override
         {
             if (!UpdateVictim())
                 return;
             DoMeleeAttackIfReady();
         }
+
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetUldamanAI<boss_ironayaAI>(creature);
     }
