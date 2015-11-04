@@ -346,25 +346,39 @@ bool ChatHandler::ExecuteCommandInTable(ChatCommand* table, const char* text, st
             Player* player = m_session->GetPlayer();
             if (!AccountMgr::IsPlayerAccount(m_session->GetSecurity()))
             {
-                uint64 guid = player->GetTarget();
+                Unit* target = player->GetSelectedUnit();
                 uint32 areaId = player->GetAreaId();
                 std::string areaName = "Unknown";
                 std::string zoneName = "Unknown";
+                uint64 targetGuid = 0;
+                uint32 targetEntry = 0;
+                uint32 targetDBGuid = 0;
+                std::string targetName = "";
+                if (target)
+                {
+                    targetGuid = target->GetGUID();
+                    targetEntry = target->GetEntry();
+                    targetDBGuid = target->GetGUIDLow();
+                    if (Creature* creature = target->ToCreature())
+                        targetDBGuid = creature->GetDBTableGUIDLow();
+                    targetName = target->GetName().c_str();
+                }
+
                 if (AreaTableEntry const* area = GetAreaEntryByAreaID(areaId))
                 {
                     areaName = area->area_name;
+                    zoneName = area->area_name;
                     if (AreaTableEntry const* zone = GetAreaEntryByAreaID(area->zone))
                         zoneName = zone->area_name;
                 }
 
-                sLog->outCommand(m_session->GetAccountId(), "Command: %s [Player: %s (Guid: %u) (Account: %u) X: %f Y: %f Z: %f O: %f Map: %u (%s) Area: %u (%s) Zone: %s Selected %s: %s (GUID: %u)]",
+                sLog->outCommand(m_session->GetAccountId(), "Command: %s [Player: %s (Guid: %u) (Account: %u) X: %f Y: %f Z: %f O: %f Map: %u (%s) Area: %u (%s) Zone: %s Selected %s: %s (Entry: %u, GUID: %u)]",
                     fullcmd.c_str(), player->GetName().c_str(), GUID_LOPART(player->GetGUID()),
                     m_session->GetAccountId(), player->GetPositionX(), player->GetPositionY(),
 					player->GetPositionZ(), player->GetOrientation(), player->GetMapId(),
                     player->GetMap() ? player->GetMap()->GetMapName() : "Unknown",
-                    areaId, areaName.c_str(), zoneName.c_str(), GetLogNameForGuid(guid),
-                    (player->GetSelectedUnit()) ? player->GetSelectedUnit()->GetName().c_str() : "",
-                    GUID_LOPART(guid));
+                    areaId, areaName.c_str(), zoneName.c_str(), 
+                    GetLogNameForGuid(targetGuid), targetName.c_str(), targetEntry, targetDBGuid);
             }
         }
         // some commands have custom error messages. Don't send the default one in these cases.
