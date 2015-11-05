@@ -13,11 +13,16 @@ update gameobject set state=1 where guid in (188058, 188032);
 -- set echomok's door to autoclose 5 sec.
 update gameobject_template set data2=5000 where entry=124370;
 
+-- 
+
 DELETE FROM pool_template WHERE entry=14141;
 INSERT INTO pool_template VALUES (14141,3,"MP Stonevault Mauler");
 
 DELETE FROM pool_template WHERE entry=14142;
 INSERT INTO pool_template VALUES (14142,3,"PP Stonevault Mauler");
+
+DELETE FROM pool_pool WHERE pool_id=14142 and mother_pool=14141;
+INSERT INTO pool_pool VALUES (14142, 14141, 0, "Stonevault");
 
 DELETE FROM pool_creature WHERE guid=147254;
 INSERT INTO pool_creature VALUES (147254,14142,0,"Stonevault Mauler");
@@ -33,6 +38,8 @@ INSERT INTO pool_creature VALUES (147271,14142,0,"Stonevault Mauler");
 
 DELETE FROM pool_creature WHERE guid=147272;
 INSERT INTO pool_creature VALUES (147272,14142,0,"Stonevault Flameweaver");
+
+-- 
 
 update gameobject_template set AIName="", ScriptName="go_ironaya_seal_door_124372" where entry=124372;
 
