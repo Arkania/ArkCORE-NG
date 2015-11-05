@@ -2564,6 +2564,20 @@ std::list<Creature*> WorldObject::FindNearestCreatures(uint32 entry, float range
     return creatureList;
 }
 
+std::vector<Creature*> WorldObject::FindNearestCreatures(uint32 entry, float range, bool alive) const
+{
+    std::list<Creature*> creatureList;
+    std::vector<Creature*> returnList;
+    GetCreatureListWithEntryInGrid(creatureList, entry, range);
+    
+    for (std::list<Creature*>::iterator itr = creatureList.begin(); itr != creatureList.end(); ++itr)
+    {
+        if ((*itr)->IsAlive() == alive)
+            returnList.push_back(*itr);
+    }
+    return returnList;
+}
+
 Creature* WorldObject::FindRandomCreatureInRange(uint32 entry, float range, bool alive)
 {
     Creature* creature = NULL;
