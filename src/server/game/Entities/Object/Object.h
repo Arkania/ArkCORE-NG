@@ -781,7 +781,7 @@ class WorldObject : public Object, public WorldLocation
 
         Creature*   FindNearestCreature(uint32 entry, float range, bool alive = true) const;
         std::list<Creature*> FindNearestCreatures(uint32 entry, float range) const;
-        std::vector<Creature*> WorldObject::FindNearestCreatures(uint32 entry, float range, bool alive) const;
+        std::vector<Creature*> FindNearestCreatures(uint32 entry, float range, bool alive) const;
         Creature*   FindRandomCreatureInRange(uint32 entry, float range, bool alive);
         GameObject* FindNearestGameObject(uint32 entry, float range) const;
         GameObject* FindNearestGameObjectOfType(GameobjectTypes type, float range) const;
