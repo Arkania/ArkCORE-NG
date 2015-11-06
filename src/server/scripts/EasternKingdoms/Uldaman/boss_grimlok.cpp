@@ -24,12 +24,9 @@ class boss_grimlok : public CreatureScript
 public:
     boss_grimlok() : CreatureScript("boss_grimlok") { }
 
-    struct boss_grimlokAI : public ScriptedAI
+    struct boss_grimlokAI : public BossAI
     {
-        boss_grimlokAI(Creature* creature) : ScriptedAI(creature)
-        {
-            m_instance = creature->GetInstanceScript();
-        }
+        boss_grimlokAI(Creature* creature) : BossAI(creature, ENC_GRIMLOK) { m_instance = creature->GetInstanceScript(); }
 
         InstanceScript* m_instance;
         EventMap m_events;

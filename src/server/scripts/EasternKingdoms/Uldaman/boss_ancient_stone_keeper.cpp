@@ -24,12 +24,9 @@ class boss_ancient_stone_keeper : public CreatureScript
 public:
     boss_ancient_stone_keeper() : CreatureScript("boss_ancient_stone_keeper") { }
 
-    struct boss_ancient_stone_keeperAI : public ScriptedAI
+    struct boss_ancient_stone_keeperAI : public BossAI
     {
-        boss_ancient_stone_keeperAI(Creature* creature) : ScriptedAI(creature)
-        {
-            m_instance = creature->GetInstanceScript();
-        }
+        boss_ancient_stone_keeperAI(Creature* creature) : BossAI(creature, ENC_ANCIENT_STONE_KEEPER) { m_instance = creature->GetInstanceScript(); }
 
         InstanceScript* m_instance;
         EventMap m_events;

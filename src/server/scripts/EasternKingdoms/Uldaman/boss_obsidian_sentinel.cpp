@@ -24,12 +24,9 @@ class boss_obsidian_sentinel : public CreatureScript
 public:
     boss_obsidian_sentinel() : CreatureScript("boss_obsidian_sentinel") { }
 
-    struct boss_obsidian_sentinelAI : public ScriptedAI
+    struct boss_obsidian_sentinelAI : public BossAI
     {
-        boss_obsidian_sentinelAI(Creature* creature) : ScriptedAI(creature)
-        {
-            m_instance = creature->GetInstanceScript();
-        }
+        boss_obsidian_sentinelAI(Creature* creature) : BossAI(creature, ENC_OBSIDIAN_SENTINEL) { m_instance = creature->GetInstanceScript(); }
 
         InstanceScript* m_instance;
         EventMap m_events;

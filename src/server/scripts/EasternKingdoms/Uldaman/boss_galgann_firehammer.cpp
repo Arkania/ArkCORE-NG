@@ -24,12 +24,9 @@ class boss_galgann_firehammer : public CreatureScript
 public:
     boss_galgann_firehammer() : CreatureScript("boss_galgann_firehammer") { }
 
-    struct boss_galgann_firehammerAI : public ScriptedAI
+    struct boss_galgann_firehammerAI : public BossAI
     {
-        boss_galgann_firehammerAI(Creature* creature) : ScriptedAI(creature)
-        {
-            m_instance = creature->GetInstanceScript();
-        }
+        boss_galgann_firehammerAI(Creature* creature) : BossAI(creature, ENC_GALGANN_FIREHAMMER) { m_instance = creature->GetInstanceScript(); }
 
         InstanceScript* m_instance;
         EventMap m_events;

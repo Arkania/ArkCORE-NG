@@ -42,6 +42,7 @@ class instance_uldaman : public InstanceMapScript
                 m_hasDoor = false;
                 m_hasPlayer = false;
                 m_team = 0;
+                m_doorTimer = 5000;
             }
 
             void OnPlayerEnter(Player* player) override
@@ -81,6 +82,9 @@ class instance_uldaman : public InstanceMapScript
                     case GO_ALTAR_OF_THE_KEEPER:
                         m_ListOfGUID[DATA_ALTAR_OF_THE_KEEPER] = go->GetGUID();
                         break;
+                    case GO_ALTAR_OF_ARCHAEDAS:
+                        m_ListOfGUID[DATA_ALTAR_OF_ARCHAEDAS] = go->GetGUID();
+                        break;
                 }
             }
 
@@ -90,13 +94,13 @@ class instance_uldaman : public InstanceMapScript
                 switch (entry)
                 {
                     case GO_TEMPLE_DOOR_1:
-                        m_ListOfGUID[DATA_TEMPLE_DOOR_1] = go->GetGUID();
+                        m_ListOfGUID[DATA_TEMPLE_DOOR_1] = 0;
                         break;
                     case GO_TEMPLE_DOOR_2:
-                        m_ListOfGUID[DATA_TEMPLE_DOOR_2] = go->GetGUID();
+                        m_ListOfGUID[DATA_TEMPLE_DOOR_2] = 0;
                         break;
                     case GO_TEMPLE_DOOR_3:
-                        m_ListOfGUID[DATA_TEMPLE_DOOR_3] = go->GetGUID();
+                        m_ListOfGUID[DATA_TEMPLE_DOOR_3] = 0;
                         m_hasDoor = false;
                         break;
                     case GO_ANCIENT_VAULT_DOOR:
@@ -105,8 +109,17 @@ class instance_uldaman : public InstanceMapScript
                     case GO_IRONAYA_SEAL_DOOR:
                         m_ListOfGUID[DATA_IRONAYA_SEAL_DOOR] = 0;
                         break;
+                    case GO_ECHOMOK_DOOR:
+                        m_ListOfGUID[DATA_ECHOMOK_DOOR] = 0;
+                        break;
                     case GO_KEYSTONE:
                         m_ListOfGUID[DATA_KEYSTONE] = 0;
+                        break;
+                    case GO_ALTAR_OF_THE_KEEPER:
+                        m_ListOfGUID[DATA_ALTAR_OF_THE_KEEPER] = 0;
+                        break;
+                    case GO_ALTAR_OF_ARCHAEDAS:
+                        m_ListOfGUID[DATA_ALTAR_OF_ARCHAEDAS] = 0;
                         break;
                 }
             }
@@ -145,6 +158,15 @@ class instance_uldaman : public InstanceMapScript
                         break;
                     case BOSS_ARCHAEDAS:
                         m_ListOfGUID[DATA_ARCHAEDAS] = creature->GetGUID();
+                        break;
+                    case NPC_EARTHEN_GUARDIAN:
+                         
+                        break;
+                    case NPC_EARTHEN_CUSTODIAN:
+                         
+                        break;
+                    case NPC_VAULT_WARDER:
+                         
                         break;
                 }
             }
@@ -271,6 +293,24 @@ class instance_uldaman : public InstanceMapScript
                 else
                     m_LoadingInstanceTimer -= diff;
 
+                if (m_doorTimer < diff)
+                {
+                    m_doorTimer = 5000;
+                    if (GameObject* door = instance->GetGameObject(m_ListOfGUID[DATA_IRONAYA_SEAL_DOOR]))
+                        if (GetData(ENC_IRONAYA) == DONE)
+                            door->SetGoState(GO_STATE_ACTIVE);
+
+                    if (GameObject* door = instance->GetGameObject(m_ListOfGUID[DATA_TEMPLE_DOOR_1]))
+                        if (GetData(ENC_ANCIENT_STONE_KEEPER) == DONE)
+                            door->SetGoState(GO_STATE_ACTIVE);
+
+                    if (GameObject* door = instance->GetGameObject(m_ListOfGUID[DATA_TEMPLE_DOOR_2]))
+                        if (GetData(ENC_ANCIENT_STONE_KEEPER) == DONE)
+                            door->SetGoState(GO_STATE_ACTIVE);
+
+                }
+                else
+                    m_doorTimer -= diff;
             }
 
             void ProcessEvent(WorldObject* obj, uint32 eventId) override
@@ -345,6 +385,7 @@ class instance_uldaman : public InstanceMapScript
             bool    m_hasDoor;
             bool    m_hasPlayer;
             uint32  m_team;
+            uint32  m_doorTimer;            
         };
 
         InstanceScript* GetInstanceScript(InstanceMap* map) const override

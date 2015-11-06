@@ -56,21 +56,22 @@ enum eDataTypes
     DATA_ECHOMOK_DOOR,
     DATA_KEYSTONE,
     DATA_ALTAR_OF_THE_KEEPER,
+    DATA_ALTAR_OF_ARCHAEDAS,
     MAX_DATA_ENCOUNTER
 };
 
 enum eBoss
 {
-    BOSS_REVELOSH = 6910,
-    BOSS_BAELOG = 6906,
-    BOSS_ERIC = 6907,
-    BOSS_OLAV = 6908,
-    BOSS_IRONAYA = 7228,
-    BOSS_OBSIDIAN_SENTINEL = 7023,
-    BOSS_ANCIENT_STONE_KEEPER = 7206,
-    BOSS_GALGANN_FIREHAMMER = 7291,
-    BOSS_GRIMLOK = 4854,
-    BOSS_ARCHAEDAS = 2748,
+    BOSS_REVELOSH               = 6910,
+    BOSS_BAELOG                 = 6906,
+    BOSS_ERIC                   = 6907,
+    BOSS_OLAV                   = 6908,
+    BOSS_IRONAYA                = 7228,
+    BOSS_OBSIDIAN_SENTINEL      = 7023,
+    BOSS_ANCIENT_STONE_KEEPER   = 7206,
+    BOSS_GALGANN_FIREHAMMER     = 7291,
+    BOSS_GRIMLOK                = 4854,
+    BOSS_ARCHAEDAS              = 2748,
 };
 
 enum eGameObject
@@ -83,21 +84,49 @@ enum eGameObject
     GO_ECHOMOK_DOOR         = 124370,
     GO_KEYSTONE             = 124371,
     GO_ALTAR_OF_THE_KEEPER  = 130511,
+    GO_ALTAR_OF_ARCHAEDAS   = 133234,
+};
+
+enum eNpc
+{
+    NPC_EARTHEN_GUARDIAN    = 7076,
+    NPC_EARTHEN_CUSTODIAN   = 7309,
+    NPC_VAULT_WARDER        = 10120,
 };
 
 enum eSpells
 {
-    SPELL_ARCHAEDAS_AWAKEN = 10347,
-    SPELL_AWAKEN_VAULT_WALKER = 10258,
-    SPELL_CRYSTALLINE_SLUMBER = 3636,
-    SPELL_ARCINGSMASH = 8374,
-    SPELL_KNOCKAWAY = 10101,
-    SPELL_WSTOMP = 11876,
+    SPELL_ARCHAEDAS_AWAKEN          = 10347,
+    SPELL_AWAKEN_VAULT_WALKER       = 10258,
+    SPELL_CRYSTALLINE_SLUMBER       = 3636,
+    SPELL_ARCINGSMASH               = 8374,
+    SPELL_KNOCKAWAY                 = 10101,
+    SPELL_WSTOMP                    = 11876,
+    SPELL_GROUND_TREMOR             = 6524,   
+    SPELL_BOSS_OBJECT_VISUAL        = 11206,
+    SPELL_BOSS_AGGRO                = 10340,
+    SPELL_SUB_BOSS_AGGRO            = 11568,
+    SPELL_AWAKEN_EARTHEN_GUARDIAN   = 10252,
+    SPELL_STONED                    = 10255,
+    SPELL_SELF_DESTRUCT             = 9874,
+    SPELL_AWAKEN_EARTHEN_DWARF      = 10259,
+
 };
 
 enum eEvents
 {
     EVENT_SUB_BOSS_AGGRO = 2228
+};
+
+enum eAction
+{
+    ACTION_AWAKE = 1,
+};
+
+enum eTimerEvent
+{
+    EVENT_CHECK_HEALTH = 1,
+    EVENT_AWAKE_HELP = 2,
 };
 
 enum eQuest
