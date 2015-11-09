@@ -385,7 +385,7 @@ class instance_uldaman : public InstanceMapScript
             bool    m_hasDoor;
             bool    m_hasPlayer;
             uint32  m_team;
-            uint32  m_doorTimer;            
+            uint32  m_doorTimer;
         };
 
         InstanceScript* GetInstanceScript(InstanceMap* map) const override
