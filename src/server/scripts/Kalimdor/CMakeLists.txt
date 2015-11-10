@@ -147,6 +147,27 @@ set(scripts_STAT_SRCS
   Kalimdor/RagefireChasm/boss_oggleflint.cpp
   Kalimdor/RagefireChasm/boss_taragaman_the_hungerer.cpp
   Kalimdor/DireMaul/instance_dire_maul.cpp
+  Kalimdor/DireMaul/dire_maul.cpp
+  Kalimdor/DireMaul/dire_maul.h
+  Kalimdor/DireMaul/boss_alzzin_the_wildshaper.cpp
+  Kalimdor/DireMaul/boss_captain_kromcrush.cpp
+  Kalimdor/DireMaul/boss_chorush_the_observer.cpp
+  Kalimdor/DireMaul/boss_guard_fengus.cpp
+  Kalimdor/DireMaul/boss_guard_moldar.cpp
+  Kalimdor/DireMaul/boss_guard_slipkik.cpp
+  Kalimdor/DireMaul/boss_hydrospawn.cpp
+  Kalimdor/DireMaul/boss_illyanna_ravenoak.cpp
+  Kalimdor/DireMaul/boss_immolthar.cpp
+  Kalimdor/DireMaul/boss_king_gordok.cpp
+  Kalimdor/DireMaul/boss_lethtendris.cpp
+  Kalimdor/DireMaul/boss_magister_kalendris.cpp
+  Kalimdor/DireMaul/boss_prince_tortheldrin.cpp
+  Kalimdor/DireMaul/boss_stomper_kreeg.cpp
+  Kalimdor/DireMaul/boss_tendris_warpwood.cpp
+  Kalimdor/DireMaul/boss_zevrim_thornhoof.cpp
+  Kalimdor/DireMaul/zone_capital_gardens.cpp
+  Kalimdor/DireMaul/zone_gordoks_commons.cpp
+  Kalimdor/DireMaul/zone_warpwood_quarter.cpp
   Kalimdor/Firelands/boss_shannox.cpp
   Kalimdor/Firelands/boss_alysrazor.cpp
   Kalimdor/Firelands/boss_lord_rhyolith.cpp

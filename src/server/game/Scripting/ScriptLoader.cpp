@@ -419,6 +419,26 @@ void AddSC_elementaires_sdo();
 void AddSC_npc_trash_sdo();
 void AddSC_instance_halls_of_origination();
 void AddSC_instance_dire_maul();             //Dire Maul
+void AddSC_dire_maul();
+void AddSC_gordoks_commons();
+void AddSC_capital_gardens();
+void AddSC_warpwood_quarter();
+void AddSC_boss_alzzin_the_wildshaper();
+void AddSC_boss_captain_kromcrush();
+void AddSC_boss_chorush_the_observer();
+void AddSC_boss_guard_fengus();
+void AddSC_boss_guard_moldar();
+void AddSC_boss_guard_slipkik();
+void AddSC_boss_hydrospawn();
+void AddSC_boss_illyanna_ravenoak();
+void AddSC_boss_immolthar();
+void AddSC_boss_king_gordok();
+void AddSC_boss_lethtendris();
+void AddSC_boss_magister_kalendris();
+void AddSC_boss_prince_tortheldrin();
+void AddSC_boss_stomper_kreeg();
+void AddSC_boss_tendris_warpwood();
+void AddSC_boss_zevrim_thornhoof();
 void AddSC_lost_city_of_the_tolvir();        //Lost City of the Tol'Vir
 void AddSC_boss_general_husam();
 void AddSC_boss_lockmaw_augh();
@@ -1254,6 +1274,26 @@ void AddKalimdorScripts()
     AddSC_instance_hour_of_twilight();
     AddSC_instance_culling_of_stratholme();
     AddSC_instance_dire_maul();             //Dire Maul
+    AddSC_dire_maul();
+    AddSC_gordoks_commons();
+    AddSC_capital_gardens();
+    AddSC_warpwood_quarter();
+    AddSC_boss_alzzin_the_wildshaper();
+    AddSC_boss_captain_kromcrush();
+    AddSC_boss_chorush_the_observer();
+    AddSC_boss_guard_fengus();
+    AddSC_boss_guard_moldar();
+    AddSC_boss_guard_slipkik();
+    AddSC_boss_hydrospawn();
+    AddSC_boss_illyanna_ravenoak();
+    AddSC_boss_immolthar();
+    AddSC_boss_king_gordok();
+    AddSC_boss_lethtendris();
+    AddSC_boss_magister_kalendris();
+    AddSC_boss_prince_tortheldrin();
+    AddSC_boss_stomper_kreeg();
+    AddSC_boss_tendris_warpwood();
+    AddSC_boss_zevrim_thornhoof();
     AddSC_boss_shannox();                   //Firelands
     AddSC_boss_bethtilac();
     AddSC_boss_alysrazor();

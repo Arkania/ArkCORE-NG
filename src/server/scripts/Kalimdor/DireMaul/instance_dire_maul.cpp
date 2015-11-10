@@ -25,21 +25,199 @@ gets instead the deserter debuff.
 
 #include "ScriptMgr.h"
 #include "InstanceScript.h"
+#include "dire_maul.h"
 
 class instance_dire_maul : public InstanceMapScript
 {
 public:
-    instance_dire_maul() : InstanceMapScript("instance_dire_maul", 429) { }
+    instance_dire_maul() : InstanceMapScript(DMScriptName, 429) { }
+
+    struct instance_dire_maul_InstanceMapScript : public InstanceScript
+    {
+        instance_dire_maul_InstanceMapScript(Map* map) : InstanceScript(map) { }
+
+        void Initialize() override
+        {
+            SetBossNumber(MAX_ENC_ENCOUNTER);
+
+            for (uint8 i = 0; i < MAX_DATA_ENCOUNTER; ++i)
+                m_ListOfGUID[i] = 0;
+
+            m_LoadingInstanceTimer = 0;
+            m_IsTeamNpcsSpawned = false;
+            m_hasDoor = false;
+            m_hasPlayer = false;
+            m_team = 0;
+            m_doorTimer = 5000;
+        }
+
+        void OnPlayerEnter(Player* player) override
+        {
+            m_hasPlayer = true;
+            m_team = player->GetTeam(); // ALLIANCE or HORDE
+            m_LoadingInstanceTimer = 100;
+        }
+
+        void OnGameObjectCreate(GameObject* go) override
+        {
+
+        }
+
+        void OnGameObjectRemove(GameObject* go) override
+        {
+
+        }
+
+        void OnCreatureCreate(Creature* creature) override
+        {
+
+        }
+
+        void OnCreatureRemove(Creature* creature) override
+        {
+
+        }
+
+        // Prefix DATA_ : Stored GUID of Boss, GameObjects and Creatures
+        uint64 GetData64(uint32 identifier) const override
+        {
+            if (identifier < MAX_DATA_ENCOUNTER)
+                return m_ListOfGUID[identifier];
+
+            return 0;
+        }
+
+        // Prefix ENC_ : NOT_STARTED = 0, IN_PROGRESS = 1, FAIL = 2, DONE = 3, SPECIAL = 4, TO_BE_DECIDED = 5
+        uint32 GetData(uint32 Id) const override
+        {
+            if (Id < MAX_ENC_ENCOUNTER)
+                GetBossState(Id);
+
+            return 0;
+        }
+
+        // Prefix ENC_ : NOT_STARTED = 0, IN_PROGRESS = 1, FAIL = 2, DONE = 3, SPECIAL = 4, TO_BE_DECIDED = 5
+        void SetData(uint32 Id, uint32 Value) override
+        {
+            if (Id < MAX_ENC_ENCOUNTER)
+                SetBossState(Id, EncounterState(Value));
+        }
+
+        std::string GetSaveData() override
+        {
+            OUT_SAVE_INST_DATA;
+
+            std::ostringstream saveStream;
+            saveStream << "D M " << GetBossSaveData();
+
+            OUT_SAVE_INST_DATA_COMPLETE;
+            return saveStream.str();
+        }
+
+        void Load(const char* str) override
+        {
+            if (!str)
+            {
+                OUT_LOAD_INST_DATA_FAIL;
+                return;
+            }
+
+            OUT_LOAD_INST_DATA(str);
+
+            char dataHead1, dataHead2;
+
+            std::istringstream loadStream(str);
+            loadStream >> dataHead1 >> dataHead2;
+
+            if (dataHead1 == 'D' && dataHead2 == 'M')
+            {
+                for (uint32 i = 0; i < MAX_ENC_ENCOUNTER; ++i)
+                {
+                    uint32 tmpState;
+                    loadStream >> tmpState;
+                    if (tmpState == IN_PROGRESS || tmpState > SPECIAL)
+                        tmpState = NOT_STARTED;
+
+                    SetBossState(i, EncounterState(tmpState));
+                }
+            }
+            else
+                OUT_LOAD_INST_DATA_FAIL;
+
+            OUT_LOAD_INST_DATA_COMPLETE;
+        }
+
+        void Update(uint32 diff) override
+        {
+            if (m_LoadingInstanceTimer < diff)
+            {
+                if (m_IsTeamNpcsSpawned)
+                    m_LoadingInstanceTimer = 0;
+                else
+                {
+                    SpawnNpcs();
+                    m_LoadingInstanceTimer = 100;
+                }
+            }
+            else
+                m_LoadingInstanceTimer -= diff;
+        }
+
+        void ProcessEvent(WorldObject* obj, uint32 eventId) override
+        {
+            printf("Instance Dire Maul ProcessEvent: ID: %u \n", eventId);
+        }
+
+        // private instance functions
+
+        void SpawnNpcs()
+        {
+            if (m_IsTeamNpcsSpawned || !m_hasDoor || !m_hasPlayer)
+                return;
+
+            if (m_team == ALLIANCE)
+                SpawnAllyNpcs();
+            else if (m_team == HORDE)
+                SpawnHordeNpcs();
+            else
+                ASSERT(false);
+
+        }
+        void SpawnHordeNpcs()
+        {
+            GameObject* door = NULL;
+            if (m_ListOfGUID[DATA_] > 0)
+                if (door = instance->GetGameObject(m_ListOfGUID[DATA_]))
+                {
+                    m_IsTeamNpcsSpawned = true;
+                    
+                }
+        }
+        void SpawnAllyNpcs()
+        {
+            GameObject* door = NULL;
+            if (m_ListOfGUID[DATA_] > 0)
+                if (door = instance->GetGameObject(m_ListOfGUID[DATA_]))
+                {
+                    m_IsTeamNpcsSpawned = true;
+                   
+                }
+        }
+
+        private:
+            uint64  m_ListOfGUID[MAX_DATA_ENCOUNTER];
+            uint32  m_LoadingInstanceTimer;
+            bool    m_IsTeamNpcsSpawned;
+            bool    m_hasDoor;
+            bool    m_hasPlayer;
+            uint32  m_team;
+            uint32  m_doorTimer;
+    };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_dire_maul_InstanceMapScript(map);
     }
-
-    struct instance_dire_maul_InstanceMapScript : public InstanceScript
-    {
-        instance_dire_maul_InstanceMapScript(Map* map) : InstanceScript(map) { }
-    };
 };
 
 void AddSC_instance_dire_maul()
