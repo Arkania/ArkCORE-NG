@@ -42,8 +42,6 @@
 // back in wotlk you had to have the crescent key to enter the front door of the northwing,
 // not sure if that was depreciated after the Catalysm.
 
-// http://www.wowhead.com/npc=14354/pusillin does not drop the key like he used to soo...  maybe some research on that.
-
 // Other objects Crystal Pylons Crystal Generator : id = 177259, 177257, 177258, 179504, 179505
 // Additionally, you need to shut down the five pylons scattered throughout Dire Maul West to
 // eliminate the forcefield surrounding Immol'thar's prison : Pylons are shutdown by killing

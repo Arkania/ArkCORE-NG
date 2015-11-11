@@ -60,7 +60,12 @@ public:
 
         void OnGameObjectCreate(GameObject* go) override
         {
-
+            switch (go->GetEntry())
+            {
+                GO_CONSERVATORY_DOOR:
+                    m_ListOfGUID[DATA_CONSERVATORY_DOOR] = go->GetGUID();
+                    break;
+            }
         }
 
         void OnGameObjectRemove(GameObject* go) override
@@ -70,7 +75,87 @@ public:
 
         void OnCreatureCreate(Creature* creature) override
         {
-
+            switch (creature->GetEntry())
+            {
+                case NPC_PUSILLIN:
+                    m_ListOfGUID[DATA_PUSILLIN] = creature->GetGUID();
+                    break;
+                case BOSS_HYDROSPAWN:
+                    m_ListOfGUID[DATA_HYDROSPAWN] = creature->GetGUID();
+                    break;
+                case BOSS_LETHTENDRIS:
+                    m_ListOfGUID[DATA_LETHTENDRIS] = creature->GetGUID();
+                    break;
+                case NPC_PIMGIP:
+                    m_ListOfGUID[DATA_PIMGIP] = creature->GetGUID();
+                    break;
+                case BOSS_ZEVRIM_THORNHOOF:
+                    m_ListOfGUID[DATA_ZEVRIM_THORNHOOF] = creature->GetGUID();
+                    break;
+                case BOSS_ALZZIN_THE_WILDAHAPER:
+                    m_ListOfGUID[DATA_ALZZIN_THE_WILDAHAPER] = creature->GetGUID();
+                    break;
+                case NPC_ISALIEN:
+                    m_ListOfGUID[DATA_ISALIEN] = creature->GetGUID();
+                    break;
+                case NPC_EMPYREAN:
+                    m_ListOfGUID[DATA_EMPYREAN] = creature->GetGUID();
+                    break;
+                case NPC_OLD_IRONBARK:
+                    m_ListOfGUID[DATA_OLD_IRONBARK] = creature->GetGUID();
+                    break;
+                case NPC_IRONBARK_THE_REDEEMED:
+                    m_ListOfGUID[DATA_IRONBARK_THE_REDEEMED] = creature->GetGUID();
+                    break;
+                case BOSS_TENDRIS_WARPWOOD:
+                    m_ListOfGUID[DATA_TENDRIS_WARPWOOD] = creature->GetGUID();
+                    break;
+                case BOSS_ILLYANNA_RAVENOAK:
+                    m_ListOfGUID[DATA_ILLYANNA_RAVENOAK] = creature->GetGUID();
+                    break;
+                case NPC_FERRA:
+                    m_ListOfGUID[DATA_FERRA] = creature->GetGUID();
+                    break;
+                case NPC_TSUZEE:
+                    m_ListOfGUID[DATA_TSUZEE] = creature->GetGUID();
+                    break;
+                case BOSS_MAGISTER_KALENDRIS:
+                    m_ListOfGUID[DATA_MAGISTER_KALENDRIS] = creature->GetGUID();
+                    break;
+                case NPC_REVANCHION:
+                    m_ListOfGUID[DATA_REVANCHION] = creature->GetGUID();
+                    break;
+                case BOSS_IMMOLTHAR:
+                    m_ListOfGUID[DATA_IMMOLTHAR] = creature->GetGUID();
+                    break;
+                case NPC_LORD_HELNURATH:
+                    m_ListOfGUID[DATA_LORD_HELNURATH] = creature->GetGUID();
+                    break;
+                case BOSS_PRINCE_TORTHELDRIN:
+                    m_ListOfGUID[DATA_PRINCE_TORTHELDRIN] = creature->GetGUID();
+                    break;
+                case BOSS_GUARD_MOLDAR:
+                    m_ListOfGUID[DATA_GUARD_MOLDAR] = creature->GetGUID();
+                    break;
+                case BOSS_STOMPER_KREEG:
+                    m_ListOfGUID[DATA_STOMPER_KREEG] = creature->GetGUID();
+                    break;
+                case BOSS_GUARD_FENGUS:
+                    m_ListOfGUID[DATA_GUARD_FENGUS] = creature->GetGUID();
+                    break;
+                case BOSS_GUARD_SLIPKIK:
+                    m_ListOfGUID[DATA_GUARD_SLIPKIK] = creature->GetGUID();
+                    break;
+                case BOSS_CAPTAIN_KROMCRUSH:
+                    m_ListOfGUID[DATA_CAPTAIN_KROMCRUSH] = creature->GetGUID();
+                    break;
+                case BOSS_CHORUSH_THE_OBSERVER:
+                    m_ListOfGUID[DATA_CHORUSH_THE_OBSERVER] = creature->GetGUID();
+                    break;
+                case BOSS_KING_GORDOK:
+                    m_ListOfGUID[DATA_KING_GORDOK] = creature->GetGUID();
+                    break;
+            }
         }
 
         void OnCreatureRemove(Creature* creature) override
@@ -186,8 +271,8 @@ public:
         void SpawnHordeNpcs()
         {
             GameObject* door = NULL;
-            if (m_ListOfGUID[DATA_] > 0)
-                if (door = instance->GetGameObject(m_ListOfGUID[DATA_]))
+            if (m_ListOfGUID[0] > 0)
+                if (door = instance->GetGameObject(m_ListOfGUID[0]))
                 {
                     m_IsTeamNpcsSpawned = true;
                     
@@ -196,8 +281,8 @@ public:
         void SpawnAllyNpcs()
         {
             GameObject* door = NULL;
-            if (m_ListOfGUID[DATA_] > 0)
-                if (door = instance->GetGameObject(m_ListOfGUID[DATA_]))
+            if (m_ListOfGUID[0] > 0)
+                if (door = instance->GetGameObject(m_ListOfGUID[0]))
                 {
                     m_IsTeamNpcsSpawned = true;
                    

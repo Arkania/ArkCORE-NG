@@ -52,6 +52,9 @@ public:
         void JustDied(Unit* /*Killer*/)
         {
             m_instance->SetData(ENC_ZEVRIM_THORNHOOF, DONE);
+            Creature* oldIron = ObjectAccessor::GetCreature(*me, m_instance->GetData64(DATA_OLD_IRONBARK));
+            me->SummonCreature(NPC_IRONBARK_THE_REDEEMED, oldIron->GetPosition());
+            oldIron->DespawnOrUnsummon();
         }
 
         void UpdateAI(uint32 uiDiff)
