@@ -19,6 +19,9 @@
 #include "ScriptedCreature.h"
 #include "GameObjectAI.h"
 #include "GameObject.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "MoveSplineInit.h"
 #include "dire_maul.h"
 
 
@@ -54,18 +57,162 @@ class npc_pusillin_14354 : public CreatureScript
 public:
     npc_pusillin_14354() : CreatureScript("npc_pusillin_14354") { }
 
+    bool OnGossipHello(Player* player, Creature* creature) override
+    { 
+        uint8 rol = CAST_AI(npc_pusillin_14354AI, creature->AI())->m_home_pos_counter;
+        switch (rol)
+        {
+            case 0:
+                player->ADD_GOSSIP_ITEM_DB(5709, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                player->SEND_GOSSIP_MENU(6877, creature->GetGUID());
+                break;
+            case 1:
+                player->ADD_GOSSIP_ITEM_DB(5710, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                player->SEND_GOSSIP_MENU(6878, creature->GetGUID());
+                break;
+            case 2:
+                player->ADD_GOSSIP_ITEM_DB(5711, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+                player->SEND_GOSSIP_MENU(6879, creature->GetGUID());
+                break;
+            case 3:
+                player->ADD_GOSSIP_ITEM_DB(5712, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
+                player->SEND_GOSSIP_MENU(6880, creature->GetGUID());
+                break;
+            case 4:
+                player->ADD_GOSSIP_ITEM_DB(5713, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
+                player->SEND_GOSSIP_MENU(6881, creature->GetGUID());
+                break;
+        }
+
+        return true;
+    }
+
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
+    {
+        CAST_AI(npc_pusillin_14354AI, creature->AI())->RunAway(player, action);
+        return false;
+    }
+
     struct npc_pusillin_14354AI : public ScriptedAI
     {
         npc_pusillin_14354AI(Creature* creature) : ScriptedAI(creature) { m_instance = creature->GetInstanceScript(); }
 
         InstanceScript* m_instance;
+        uint32 m_home_pos_counter;
+        uint32 m_phase;
+        uint32 m_timer;
+        uint32 m_max_waypoints;
 
-        void UpdateAI(uint32 diff)
+        void Reset() override
         {
+            m_home_pos_counter = 0;
+            m_phase = 0;
+            m_timer = 1000;
+            m_max_waypoints = 0;
+        }
+
+        void MovementInform(uint32 type, uint32 id) override
+        {
+            if (type == WAYPOINT_MOTION_TYPE && id == m_max_waypoints)
+            {
+                me->SetHomePosition(me->GetPosition());
+                m_home_pos_counter++;
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (m_timer < diff)
+            {
+                m_timer = 1000;
+                if (m_phase)
+                    DoWork();
+            }
+            else
+                m_timer -= diff;
+
             if (!UpdateVictim())
                 return;
 
             DoMeleeAttackIfReady();
+        }
+
+        void DoWork()
+        {
+            switch (m_phase)
+            {
+                case 1001:
+                {                    
+                    me->GetMotionMaster()->MovePath(me->GetDBTableGUIDLow() * 10 + 1, false);
+                    m_max_waypoints = 7;
+                    m_phase = 1;
+                    m_timer = 400;
+                    break;
+                }
+                case 1002:
+                {
+                    me->GetMotionMaster()->MovePath(me->GetDBTableGUIDLow() * 10 + 2, false);
+                    m_max_waypoints = 7;
+                    m_phase = 2;
+                    m_timer = 400;
+                    break;
+                }
+                case 1003:
+                {
+                    me->GetMotionMaster()->MovePath(me->GetDBTableGUIDLow() * 10 + 3, false);
+                    m_max_waypoints = 8;
+                    m_phase = 3;
+                    m_timer = 400;
+                    break;
+                }
+                case 1004:
+                {
+                    me->GetMotionMaster()->MovePath(me->GetDBTableGUIDLow() * 10 + 4, false);
+                    m_max_waypoints = 2;
+                    m_phase = 4;
+                    m_timer = 400;
+                    break;
+                }
+                case 1005:
+                {
+                    Talk(5);
+                    m_phase = 1006;
+                    m_timer = 400;
+                    break;
+                }
+                case 1006:                   
+                    me->setFaction(14);
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    me->CastSpell(me, 22735);
+                    m_phase = 6;
+                    if (Player* player = me->FindNearestPlayer(10.0f))
+                    {
+                        me->Attack(player, true);
+                        if (Creature* npc = me->SummonCreature(13276, me->GetNearPosition(4, frand(3.0f, 6.2f))))
+                            npc->Attack(player, true);
+                        if (Creature* npc = me->SummonCreature(13276, me->GetNearPosition(4, frand(3.0f, 6.2f))))
+                            npc->Attack(player, true);
+                        if (Creature* npc = me->SummonCreature(13276, me->GetNearPosition(4, frand(3.0f, 6.2f))))
+                            npc->Attack(player, true);
+                        if (Creature* npc = me->SummonCreature(13276, me->GetNearPosition(4, frand(3.0f, 6.2f))))
+                            npc->Attack(player, true);
+                    }
+                    break;
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                    Talk(m_phase);
+                    m_phase = 6;
+                    break;
+            }
+        }
+
+        void RunAway(Player* player, uint32 action)
+        {
+            m_phase = action;
+            m_timer = 100;
         }
     };
 
