@@ -206,6 +206,7 @@ set(scripts_STAT_SRCS
   Kalimdor/LostCityOfTheTolvir/instance_lost_city_of_the_tolvir.cpp
   Kalimdor/LostCityOfTheTolvir/lost_city_of_the_tolvir.cpp
   Kalimdor/LostCityOfTheTolvir/lost_city_of_the_tolvir.h
+  Kalimdor/zone_northern_barrens.cpp
 )
 
 message("  -> Prepared: Kalimdor")
