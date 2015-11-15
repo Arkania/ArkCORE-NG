@@ -46,7 +46,7 @@
 #include "ace/config-win32-msvc-12.h"
 #elif (_MSC_VER >= 1700)
 # include "ace/config-win32-msvc-11.h"
-#if (_MSC_VER >= 1600)
+#elif (_MSC_VER >= 1600)
 # include "ace/config-win32-msvc-10.h"
 #elif (_MSC_VER >= 1500)
 # include "ace/config-win32-msvc-9.h"
