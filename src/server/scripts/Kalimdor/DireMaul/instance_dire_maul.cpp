@@ -42,8 +42,11 @@ public:
 
             for (uint8 i = 0; i < MAX_DATA_ENCOUNTER; ++i)
                 m_ListOfGUID[i] = 0;
+            for (uint8 i = 0; i < MAX_EXTRA_ENCOUNTER; i++)
+                m_Extra_State[i] = TO_BE_DECIDED;
 
             m_LoadingInstanceTimer = 0;
+            m_checkGameProgressTimer = 0;
             m_IsTeamNpcsSpawned = false;
             m_hasDoor = false;
             m_hasPlayer = false;
@@ -62,7 +65,7 @@ public:
         {
             switch (go->GetEntry())
             {
-                GO_CONSERVATORY_DOOR:
+                case GO_CONSERVATORY_DOOR:
                     m_ListOfGUID[DATA_CONSERVATORY_DOOR] = go->GetGUID();
                     break;
             }
@@ -177,6 +180,8 @@ public:
         {
             if (Id < MAX_ENC_ENCOUNTER)
                 GetBossState(Id);
+            else if (Id < MAX_EXTRA_ENCOUNTER)
+                GetExtraState(Id);
 
             return 0;
         }
@@ -186,6 +191,8 @@ public:
         {
             if (Id < MAX_ENC_ENCOUNTER)
                 SetBossState(Id, EncounterState(Value));
+            else if (Id < MAX_EXTRA_ENCOUNTER)
+                SetExtraState(Id, TO_BE_DECIDED);
         }
 
         std::string GetSaveData() override
@@ -193,7 +200,7 @@ public:
             OUT_SAVE_INST_DATA;
 
             std::ostringstream saveStream;
-            saveStream << "D M " << GetBossSaveData();
+            saveStream << "D M " << GetBossSaveData() << GetExtraSaveData();
 
             OUT_SAVE_INST_DATA_COMPLETE;
             return saveStream.str();
@@ -225,6 +232,15 @@ public:
 
                     SetBossState(i, EncounterState(tmpState));
                 }
+                for (uint32 i = MAX_ENC_ENCOUNTER; i < MAX_EXTRA_ENCOUNTER; i++)
+                {
+                    uint32 tmpState;
+                    loadStream >> tmpState;
+                    if (tmpState == IN_PROGRESS || tmpState > SPECIAL)
+                        tmpState = NOT_STARTED;
+
+                    SetExtraState(i, EncounterState(tmpState));
+                }
             }
             else
                 OUT_LOAD_INST_DATA_FAIL;
@@ -237,7 +253,10 @@ public:
             if (m_LoadingInstanceTimer < diff)
             {
                 if (m_IsTeamNpcsSpawned)
+                {
                     m_LoadingInstanceTimer = 0;
+                    m_checkGameProgressTimer = 100;
+                }
                 else
                 {
                     SpawnNpcs();
@@ -246,6 +265,14 @@ public:
             }
             else
                 m_LoadingInstanceTimer -= diff;
+
+            if (m_checkGameProgressTimer < diff)
+            {
+                m_checkGameProgressTimer = 5000;
+                DoCheckGameProgress();
+            }
+            else
+                m_checkGameProgressTimer -= diff;
         }
 
         void ProcessEvent(WorldObject* obj, uint32 eventId) override
@@ -266,6 +293,11 @@ public:
                 SpawnHordeNpcs();
             else
                 ASSERT(false);
+
+            if (GetData(DATA_ZEVRIM_THORNHOOF) == DONE)
+            {
+                printf("");
+            }
 
         }
         void SpawnHordeNpcs()
@@ -288,10 +320,42 @@ public:
                    
                 }
         }
+        void DoCheckGameProgress()
+        {
+            if (GetData(DATA_ZEVRIM_THORNHOOF) == DONE)
+            {
+                printf("");
+            }
+        }
+        EncounterState GetExtraState(uint32 id) const
+        {
+            if (id < MAX_EXTRA_ENCOUNTER)
+                return m_Extra_State[id];
+
+            return TO_BE_DECIDED;
+        }
+        void SetExtraState(uint32 id, EncounterState state)
+        {
+            if (id < MAX_EXTRA_ENCOUNTER)
+                m_Extra_State[id] = state;
+
+            this->SaveToDB();
+        }
+        std::string GetExtraSaveData()
+        {
+            std::ostringstream saveStream;
+            
+            for (uint32 i = MAX_ENC_ENCOUNTER; i < MAX_EXTRA_ENCOUNTER; i++)
+                saveStream << (uint32)m_Extra_State[i] << ' ';
+
+            return saveStream.str();
+        }
 
         private:
             uint64  m_ListOfGUID[MAX_DATA_ENCOUNTER];
+            EncounterState m_Extra_State[MAX_EXTRA_ENCOUNTER];
             uint32  m_LoadingInstanceTimer;
+            uint32 m_checkGameProgressTimer;
             bool    m_IsTeamNpcsSpawned;
             bool    m_hasDoor;
             bool    m_hasPlayer;

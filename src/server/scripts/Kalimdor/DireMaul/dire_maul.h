@@ -52,6 +52,15 @@ enum eEncounters
     MAX_ENC_ENCOUNTER
 };
 
+enum eExtraEncounters
+{
+    EXTRA_OLD_IRONBARK = MAX_ENC_ENCOUNTER,
+    EXTRA_IRONBARK_THE_REDEEMED,
+    EXTRA_CONSERVATORY_DOOR,
+
+    MAX_EXTRA_ENCOUNTER
+};
+
 enum eDataTypes
 {
     DATA_PUSILLIN,
