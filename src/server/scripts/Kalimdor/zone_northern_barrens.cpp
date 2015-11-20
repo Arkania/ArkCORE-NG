@@ -337,6 +337,193 @@ public:
 
 };
 
+// 34846
+class npc_wyneth_34846 : public CreatureScript
+{
+public:
+	npc_wyneth_34846() : CreatureScript("npc_wyneth_34846") { }
+
+	struct npc_wyneth_34846AI : public ScriptedAI
+	{
+		npc_wyneth_34846AI(Creature* creature) : ScriptedAI(creature) { }
+
+		void JustDied(Unit* killer) override
+		{ 
+			if (Player* player = killer->ToPlayer())
+				if (player->GetQuestStatus(851) == QUEST_STATUS_INCOMPLETE)
+				{
+					Talk(0);
+					me->SummonCreature(3395, -1201.7f, -2763.1f, 95.97f, 1.73f);
+				}
+		}
+	};
+
+	CreatureAI* GetAI(Creature* creature) const override
+	{
+		return new npc_wyneth_34846AI(creature);
+	}
+};
+
+// 3395
+class npc_verog_the_dervish_3395 : public CreatureScript
+{
+public:
+	npc_verog_the_dervish_3395() : CreatureScript("npc_verog_the_dervish_3395") { }
+
+	struct npc_verog_the_dervish_3395AI : public ScriptedAI
+	{
+		npc_verog_the_dervish_3395AI(Creature* creature) : ScriptedAI(creature) { }
+
+		uint32 m_phase;
+		uint32 m_timer;
+
+		void Reset() override
+		{
+			m_phase = 1;
+			m_timer = 1000;
+		}
+
+		void UpdateAI(uint32 diff) override
+		{
+			if (m_timer < diff)
+			{
+				m_timer = 1000;
+				if (m_phase) DoWork();
+			}
+			else
+				m_timer -= diff;
+
+			if (!UpdateVictim())
+				return;
+
+			DoMeleeAttackIfReady();
+		}
+
+		void DoWork()
+		{
+			switch (m_phase)
+			{
+			case 1:
+				Talk(0);
+				m_timer = 5000;
+				m_phase = 2;
+				break;
+			case 2:
+				if (Player* player = me->FindNearestPlayer(50.0f))
+				{
+					me->GetMotionMaster()->MoveChase(player, 2.0f);
+					me->Attack(player, true);
+					m_phase = 3;
+				}
+				break;
+			}
+		}
+	};
+
+	CreatureAI* GetAI(Creature* creature) const override
+	{
+		return new npc_verog_the_dervish_3395AI(creature);
+	}
+};
+
+// 34285
+class npc_trapped_wolf_34285 : public CreatureScript
+{
+public:
+	npc_trapped_wolf_34285() : CreatureScript("npc_trapped_wolf_34285") { }
+
+	struct npc_trapped_wolf_34285AI : public ScriptedAI
+	{
+		npc_trapped_wolf_34285AI(Creature* creature) : ScriptedAI(creature) { }
+
+		uint32 m_phase;
+
+		void Reset() override
+		{
+			m_phase = 0;
+			if (Creature* chain = me->FindNearestCreature(34287, 6.0f))
+				chain->CastSpell(me, 65072);
+		}
+
+		void MovementInform(uint32 type, uint32 id)
+		{
+			if (type == 2 && id == 2)
+				me->DespawnOrUnsummon(100);
+		}
+
+		void DoAction(int32 param)
+		{
+			if (param == 1 && m_phase == 0)
+			{
+				m_phase = 1;
+				me->RemoveAura(65072);
+				me->GetMotionMaster()->MovePath(1165501, false);
+			}
+		}
+	};
+
+	CreatureAI* GetAI(Creature* creature) const override
+	{
+		return new npc_trapped_wolf_34285AI(creature);
+	}
+};
+
+// 34287
+class npc_chain_origin_34287 : public CreatureScript
+{
+public:
+	npc_chain_origin_34287() : CreatureScript("npc_chain_origin_34287") { }
+
+	struct npc_chain_origin_34287AI : public ScriptedAI
+	{
+		npc_chain_origin_34287AI(Creature* creature) : ScriptedAI(creature) { }
+
+		void Reset() override
+		{
+			if (Creature* wolf = me->FindNearestCreature(34285, 6.0f))
+			{
+				me->CastSpell(wolf, 65072);
+			}
+		}
+	};
+
+	CreatureAI* GetAI(Creature* creature) const override
+	{
+		return new npc_chain_origin_34287AI(creature);
+	}
+};
+
+// 195001, 195003, 195004
+class go_wolf_chains : public GameObjectScript
+{
+public:
+	go_wolf_chains() : GameObjectScript("go_wolf_chains") { }
+
+	struct go_wolf_chainsAI : public GameObjectAI
+	{
+		go_wolf_chainsAI(GameObject* go) : GameObjectAI(go) { }
+
+		void OnStateChanged(uint32 state, Unit* unit) 
+		{ 
+			if (unit)
+				if (Player* player = unit->ToPlayer())
+					if (player->GetQuestStatus(13878) == QUEST_STATUS_INCOMPLETE)
+						if (Creature* wolf = go->FindNearestCreature(34285, 7.0f))
+						{
+							wolf->AI()->DoAction(1);
+							player->KilledMonsterCredit(34285);
+						}
+
+		}
+	};
+
+	GameObjectAI* GetAI(GameObject* go) const override
+	{
+		return new go_wolf_chainsAI(go);
+	}
+
+};
+
 
 void AddSC_zone_northern_barrens()
 {
@@ -345,4 +532,9 @@ void AddSC_zone_northern_barrens()
     new go_red_raptor_nest_6906();
     new go_blue_raptor_nest_6907();
     new go_yellow_raptor_nest_6908();
+	new npc_wyneth_34846();
+	new npc_verog_the_dervish_3395();
+	new npc_trapped_wolf_34285();
+	new npc_chain_origin_34287();
+	new go_wolf_chains();
 }
