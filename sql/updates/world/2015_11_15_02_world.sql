@@ -29,7 +29,6 @@ update npc_text set BroadcasttextID0=51307 where ID=17960;
 
 UPDATE locales_quest SET CompletedText_loc3="Bringt Helbrims Forschungsergebnisse zu Sashya in Ratschet im Nördlichen Brachland." WHERE Id=13999;
 
-delete from gameobject where guid=404489;
 delete from gameobject where guid=10;
 insert into gameobject values
 (10, 164651, 1, 1, 1, -14.7305, -2378.33, 91.6835, 0.0126479, 0, 0, 0.00632389, 0.99998, 300, 0, 1);
