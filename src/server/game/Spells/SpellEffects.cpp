@@ -4168,13 +4168,11 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                 case 71232:
                 {
                     spell_bonus = irand(-100, 100);
-
-
+                    break;
                 }
                 case 75002:
                 {
-                    m_caster->Attack(unitTarget, true);
-                    spell_bonus = unitTarget->GetHealth() + 1;
+                    totalDamagePercentMod = 100.0f;                   
                     break;
                 }
             default:
