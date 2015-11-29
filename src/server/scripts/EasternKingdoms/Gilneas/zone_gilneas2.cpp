@@ -1807,10 +1807,13 @@ public:
 
         void Reset()
         {
-            me->GetCharmInfo()->InitEmptyActionBar(false);
-            me->GetCharmInfo()->SetActionBar(0, SPELL_ATTACK_LURKER, ACT_PASSIVE);
-            me->SetReactState(REACT_DEFENSIVE);
-            me->GetCharmInfo()->SetIsFollowing(true);
+            if (CharmInfo* info = me->GetCharmInfo())
+            {
+                info->InitEmptyActionBar(false);
+                info->SetActionBar(0, SPELL_ATTACK_LURKER, ACT_PASSIVE);
+                me->SetReactState(REACT_DEFENSIVE);
+                info->SetIsFollowing(true);
+            }
         }
 
         void UpdateAI(uint32 diff) /*diff*/
@@ -1824,7 +1827,8 @@ public:
 
             if (!UpdateVictim())
             {
-                me->GetCharmInfo()->SetIsFollowing(true);
+                if (CharmInfo* info = me->GetCharmInfo())
+                    info->SetIsFollowing(true);
                 me->SetReactState(REACT_DEFENSIVE);
                 return;
             }
