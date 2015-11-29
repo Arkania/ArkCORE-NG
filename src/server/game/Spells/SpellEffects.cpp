@@ -4172,7 +4172,7 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                 }
                 case 75002:
                 {
-                    totalDamagePercentMod = 100.0f;                   
+                    totalDamagePercentMod = 1.0f;                   
                     break;
                 }
             default:

@@ -33,38 +33,30 @@ EndContentData */
 #include "ScriptedGossip.h"
 #include "Player.h"
 #include "SpellInfo.h"
+#include "GameObjectAI.h"
+#include "GameObject.h"
+#include "Vehicle.h"
+#include "VehicleDefines.h"
+#include "Transport.h"
+#include "TransportMgr.h"
 
-/*#####
-# npc_kyle_frenzied
-######*/
-
-enum KyleFrenzied
-{
-    EMOTE_SEE_LUNCH         = 0,
-    EMOTE_EAT_LUNCH         = 1,
-    EMOTE_DANCE             = 2,
-
-    SPELL_LUNCH             = 42222,
-    NPC_KYLE_FRENZIED       = 23616,
-    NPC_KYLE_FRIENDLY       = 23622,
-    POINT_ID                = 1
-};
-
-enum eMulgore
-{
-	NPC_FLEDGLING_BRAVE = 36942,
-	NPC_BRISTLEBACK_INVADER = 36943,
-};
-
+// 23616
 class npc_kyle_frenzied : public CreatureScript
 {
 public:
     npc_kyle_frenzied() : CreatureScript("npc_kyle_frenzied") { }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    enum KyleFrenzied
     {
-        return new npc_kyle_frenziedAI (creature);
-    }
+        EMOTE_SEE_LUNCH = 0,
+        EMOTE_EAT_LUNCH = 1,
+        EMOTE_DANCE = 2,
+
+        SPELL_LUNCH = 42222,
+        NPC_KYLE_FRENZIED = 23616,
+        NPC_KYLE_FRIENDLY = 23622,
+        POINT_ID = 1
+    };
 
     struct npc_kyle_frenziedAI : public ScriptedAI
     {
@@ -169,16 +161,22 @@ public:
         }
     };
 
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_kyle_frenziedAI(creature);
+    }
 };
 
-/*######
-## npc_bristleback_invader
-######*/
-
+// 36943
 class npc_bristleback_invader : public CreatureScript
 {
 public:
     npc_bristleback_invader() : CreatureScript("npc_bristleback_invader") { }
+
+    enum eMulgore
+    {
+        NPC_FLEDGLING_BRAVE = 36942,
+    };
 
     struct npc_bristleback_invaderAI : public ScriptedAI
     {
@@ -219,14 +217,16 @@ public:
     }
 };
 
-/*######
-## npc_fledgling_brave
-######*/
-
+// 36942
 class npc_fledgling_brave : public CreatureScript
 {
 public:
     npc_fledgling_brave() : CreatureScript("npc_fledgling_brave") { }
+
+    enum eMulgore
+    {
+        NPC_BRISTLEBACK_INVADER = 36943,
+    };
 
     struct npc_fledgling_braveAI : public ScriptedAI
     {
@@ -267,10 +267,177 @@ public:
     }
 };
 
+// 202112
+class go_quilboar_cage_202112 : public GameObjectScript
+{
+public:
+    go_quilboar_cage_202112() : GameObjectScript("go_quilboar_cage_202112") { }
 
+    struct go_quilboar_cage_202112AI : public GameObjectAI
+    {
+        go_quilboar_cage_202112AI(GameObject* go) : GameObjectAI(go) { }
+
+        void OnStateChanged(uint32 state, Unit* unit) override
+        {
+            if (unit)
+                if (Player* player = unit->ToPlayer())
+                    if (player->GetQuestStatus(24852) != QUEST_STATUS_REWARDED)
+                        if (Creature* brave = go->FindNearestCreature(38345, 5.0f))
+                        {
+                            player->CastSpell(go, 71725, false);
+                            brave->AI()->Talk(0);
+                            Position pos = brave->GetNearPosition(30.0f, 0.0f);
+                            brave->GetMotionMaster()->MovePoint(1, pos);
+                            brave->DespawnOrUnsummon(5000);
+                        }
+        }
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_quilboar_cage_202112AI(go);
+    }
+
+};
+
+// 50465
+class item_water_pitcher_50465 : public ItemScript
+{
+public:
+    item_water_pitcher_50465() : ItemScript("item_water_pitcher_50465") { }
+
+    bool OnUse(Player* player, Item* /*item*/, SpellCastTargets const& targets) override
+    {
+        player->KilledMonsterCredit(38438);
+        return false;
+    }
+
+};
+
+// 36790
+class npc_eagle_spirit_36790 : public CreatureScript
+{
+public:
+    npc_eagle_spirit_36790() : CreatureScript("npc_eagle_spirit_36790") { }
+
+    struct npc_eagle_spirit_36790AI : public ScriptedAI
+    {
+        npc_eagle_spirit_36790AI(Creature *c) : ScriptedAI(c) {}
+
+        void Reset()
+        {
+            me->SetSpeed(MOVE_FLIGHT, 4.0f, true);
+            me->GetMotionMaster()->MovePath(3679001, false);
+        }
+
+        void MovementInform(uint32 type, uint32 pointId) override
+        {
+            if (type == WAYPOINT_MOTION_TYPE && pointId == 5)
+                if (Vehicle* vehicle = me->GetVehicleKit())
+                    if (Unit* unit = vehicle->GetPassenger(0))
+                        if (Player* player = unit->ToPlayer())
+                            player->ExitVehicle();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_eagle_spirit_36790AI(creature);
+    }
+};
+
+// 36845
+class npc_agitated_earth_spirit_36845 : public CreatureScript
+{
+public:
+    npc_agitated_earth_spirit_36845() : CreatureScript("npc_agitated_earth_spirit_36845") { }
+
+    struct npc_agitated_earth_spirit_36845AI : public ScriptedAI
+    {
+        npc_agitated_earth_spirit_36845AI(Creature *c) : ScriptedAI(c) {}
+
+        uint32 m_phase;
+        uint32 m_cd81305;
+        uint64 m_playerGUID;
+
+        void Reset()
+        {
+            m_phase = 0;
+            m_cd81305 = 0;
+            m_playerGUID = NULL;
+        }
+
+        void EnterCombat(Unit* victim) 
+        {
+            if (Player* player = victim->ToPlayer())
+                m_playerGUID = player->GetGUID();
+
+            CastRockBarrage();
+        }
+
+        void SpellHit(Unit* caster, SpellInfo const* spell) 
+        { 
+            if (spell->Id == 69453)
+                if (Player* player = caster->ToPlayer())
+                    if (player->GetQuestStatus(14491) == QUEST_STATUS_INCOMPLETE)
+                    {
+                        m_playerGUID = player->GetGUID();
+                        uint32 rol = urand(0, 100);
+                        if (rol < 30)
+                        {
+                            m_phase = 1;
+                            me->setFaction(57);
+                            CastRockBarrage();
+                        }
+                        else
+                        {
+                            me->setFaction(35);
+                            player->KilledMonsterCredit(36872);
+                            me->DespawnOrUnsummon(3000);
+                        }
+                    }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (m_phase)
+                if (m_cd81305 < diff)
+                    CastRockBarrage();
+                else
+                    m_cd81305 -= diff;
+
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+
+        void CastRockBarrage()
+        {
+            if (!m_playerGUID || !m_phase)
+                return;
+            
+            m_cd81305 = urand(21000, 31000);
+            if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))                
+                me->CastSpell(player, 81305);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_agitated_earth_spirit_36845AI(creature);
+    }
+};
 
 
 void AddSC_mulgore()
 {
     new npc_kyle_frenzied();
+    new npc_bristleback_invader();
+    new npc_fledgling_brave();
+    new go_quilboar_cage_202112();
+    new item_water_pitcher_50465();
+    new npc_eagle_spirit_36790();
+    new npc_agitated_earth_spirit_36845();
+
 }
