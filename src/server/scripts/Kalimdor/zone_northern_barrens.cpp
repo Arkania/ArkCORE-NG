@@ -22,6 +22,10 @@
 #include "GameObjectAI.h"
 #include "GameObject.h"
 #include "Player.h"
+#include "Vehicle.h"
+#include "VehicleDefines.h"
+#include "Transport.h"
+#include "TransportMgr.h"
 
 // 34634
 class npc_gorgal_angerscar_34634 : public CreatureScript
@@ -341,188 +345,663 @@ public:
 class npc_wyneth_34846 : public CreatureScript
 {
 public:
-	npc_wyneth_34846() : CreatureScript("npc_wyneth_34846") { }
+    npc_wyneth_34846() : CreatureScript("npc_wyneth_34846") { }
 
-	struct npc_wyneth_34846AI : public ScriptedAI
-	{
-		npc_wyneth_34846AI(Creature* creature) : ScriptedAI(creature) { }
+    struct npc_wyneth_34846AI : public ScriptedAI
+    {
+        npc_wyneth_34846AI(Creature* creature) : ScriptedAI(creature) { }
 
-		void JustDied(Unit* killer) override
-		{ 
-			if (Player* player = killer->ToPlayer())
-				if (player->GetQuestStatus(851) == QUEST_STATUS_INCOMPLETE)
-				{
-					Talk(0);
-					me->SummonCreature(3395, -1201.7f, -2763.1f, 95.97f, 1.73f);
-				}
-		}
-	};
+        void JustDied(Unit* killer) override
+        { 
+            if (Player* player = killer->ToPlayer())
+                if (player->GetQuestStatus(851) == QUEST_STATUS_INCOMPLETE)
+                {
+                    Talk(0);
+                    me->SummonCreature(3395, -1201.7f, -2763.1f, 95.97f, 1.73f);
+                }
+        }
+    };
 
-	CreatureAI* GetAI(Creature* creature) const override
-	{
-		return new npc_wyneth_34846AI(creature);
-	}
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_wyneth_34846AI(creature);
+    }
 };
 
 // 3395
 class npc_verog_the_dervish_3395 : public CreatureScript
 {
 public:
-	npc_verog_the_dervish_3395() : CreatureScript("npc_verog_the_dervish_3395") { }
+    npc_verog_the_dervish_3395() : CreatureScript("npc_verog_the_dervish_3395") { }
 
-	struct npc_verog_the_dervish_3395AI : public ScriptedAI
-	{
-		npc_verog_the_dervish_3395AI(Creature* creature) : ScriptedAI(creature) { }
+    struct npc_verog_the_dervish_3395AI : public ScriptedAI
+    {
+        npc_verog_the_dervish_3395AI(Creature* creature) : ScriptedAI(creature) { }
 
-		uint32 m_phase;
-		uint32 m_timer;
+        uint32 m_phase;
+        uint32 m_timer;
 
-		void Reset() override
-		{
-			m_phase = 1;
-			m_timer = 1000;
-		}
+        void Reset() override
+        {
+            m_phase = 1;
+            m_timer = 1000;
+        }
 
-		void UpdateAI(uint32 diff) override
-		{
-			if (m_timer < diff)
-			{
-				m_timer = 1000;
-				if (m_phase) DoWork();
-			}
-			else
-				m_timer -= diff;
+        void UpdateAI(uint32 diff) override
+        {
+            if (m_timer < diff)
+            {
+                m_timer = 1000;
+                if (m_phase) DoWork();
+            }
+            else
+                m_timer -= diff;
 
-			if (!UpdateVictim())
-				return;
+            if (!UpdateVictim())
+                return;
 
-			DoMeleeAttackIfReady();
-		}
+            DoMeleeAttackIfReady();
+        }
 
-		void DoWork()
-		{
-			switch (m_phase)
-			{
-			case 1:
-				Talk(0);
-				m_timer = 5000;
-				m_phase = 2;
-				break;
-			case 2:
-				if (Player* player = me->FindNearestPlayer(50.0f))
-				{
-					me->GetMotionMaster()->MoveChase(player, 2.0f);
-					me->Attack(player, true);
-					m_phase = 3;
-				}
-				break;
-			}
-		}
-	};
+        void DoWork()
+        {
+            switch (m_phase)
+            {
+            case 1:
+                Talk(0);
+                m_timer = 5000;
+                m_phase = 2;
+                break;
+            case 2:
+                if (Player* player = me->FindNearestPlayer(50.0f))
+                {
+                    me->GetMotionMaster()->MoveChase(player, 2.0f);
+                    me->Attack(player, true);
+                    m_phase = 3;
+                }
+                break;
+            }
+        }
+    };
 
-	CreatureAI* GetAI(Creature* creature) const override
-	{
-		return new npc_verog_the_dervish_3395AI(creature);
-	}
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_verog_the_dervish_3395AI(creature);
+    }
 };
 
 // 34285
 class npc_trapped_wolf_34285 : public CreatureScript
 {
 public:
-	npc_trapped_wolf_34285() : CreatureScript("npc_trapped_wolf_34285") { }
+    npc_trapped_wolf_34285() : CreatureScript("npc_trapped_wolf_34285") { }
 
-	struct npc_trapped_wolf_34285AI : public ScriptedAI
-	{
-		npc_trapped_wolf_34285AI(Creature* creature) : ScriptedAI(creature) { }
+    struct npc_trapped_wolf_34285AI : public ScriptedAI
+    {
+        npc_trapped_wolf_34285AI(Creature* creature) : ScriptedAI(creature) { }
 
-		uint32 m_phase;
+        uint32 m_phase;
 
-		void Reset() override
-		{
-			m_phase = 0;
-			if (Creature* chain = me->FindNearestCreature(34287, 6.0f))
-				chain->CastSpell(me, 65072);
-		}
+        void Reset() override
+        {
+            m_phase = 0;
+            if (Creature* chain = me->FindNearestCreature(34287, 6.0f))
+                chain->CastSpell(me, 65072);
+        }
 
-		void MovementInform(uint32 type, uint32 id)
-		{
-			if (type == 2 && id == 2)
-				me->DespawnOrUnsummon(100);
-		}
+        void MovementInform(uint32 type, uint32 id)
+        {
+            if (type == 2 && id == 2)
+                me->DespawnOrUnsummon(100);
+        }
 
-		void DoAction(int32 param)
-		{
-			if (param == 1 && m_phase == 0)
-			{
-				m_phase = 1;
-				me->RemoveAura(65072);
-				me->GetMotionMaster()->MovePath(1165501, false);
-			}
-		}
-	};
+        void DoAction(int32 param)
+        {
+            if (param == 1 && m_phase == 0)
+            {
+                m_phase = 1;
+                me->RemoveAura(65072);
+                me->GetMotionMaster()->MovePath(1165501, false);
+            }
+        }
+    };
 
-	CreatureAI* GetAI(Creature* creature) const override
-	{
-		return new npc_trapped_wolf_34285AI(creature);
-	}
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_trapped_wolf_34285AI(creature);
+    }
 };
 
 // 34287
 class npc_chain_origin_34287 : public CreatureScript
 {
 public:
-	npc_chain_origin_34287() : CreatureScript("npc_chain_origin_34287") { }
+    npc_chain_origin_34287() : CreatureScript("npc_chain_origin_34287") { }
 
-	struct npc_chain_origin_34287AI : public ScriptedAI
-	{
-		npc_chain_origin_34287AI(Creature* creature) : ScriptedAI(creature) { }
+    struct npc_chain_origin_34287AI : public ScriptedAI
+    {
+        npc_chain_origin_34287AI(Creature* creature) : ScriptedAI(creature) { }
 
-		void Reset() override
-		{
-			if (Creature* wolf = me->FindNearestCreature(34285, 6.0f))
-			{
-				me->CastSpell(wolf, 65072);
-			}
-		}
-	};
+        void Reset() override
+        {
+            if (Creature* wolf = me->FindNearestCreature(34285, 6.0f))
+            {
+                me->CastSpell(wolf, 65072);
+            }
+        }
+    };
 
-	CreatureAI* GetAI(Creature* creature) const override
-	{
-		return new npc_chain_origin_34287AI(creature);
-	}
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_chain_origin_34287AI(creature);
+    }
 };
 
 // 195001, 195003, 195004
 class go_wolf_chains : public GameObjectScript
 {
 public:
-	go_wolf_chains() : GameObjectScript("go_wolf_chains") { }
+    go_wolf_chains() : GameObjectScript("go_wolf_chains") { }
 
-	struct go_wolf_chainsAI : public GameObjectAI
-	{
-		go_wolf_chainsAI(GameObject* go) : GameObjectAI(go) { }
+    struct go_wolf_chainsAI : public GameObjectAI
+    {
+        go_wolf_chainsAI(GameObject* go) : GameObjectAI(go) { }
 
-		void OnStateChanged(uint32 state, Unit* unit) 
-		{ 
-			if (unit)
-				if (Player* player = unit->ToPlayer())
-					if (player->GetQuestStatus(13878) == QUEST_STATUS_INCOMPLETE)
-						if (Creature* wolf = go->FindNearestCreature(34285, 7.0f))
-						{
-							wolf->AI()->DoAction(1);
-							player->KilledMonsterCredit(34285);
-						}
+        void OnStateChanged(uint32 state, Unit* unit) 
+        { 
+            if (unit)
+                if (Player* player = unit->ToPlayer())
+                    if (player->GetQuestStatus(13878) == QUEST_STATUS_INCOMPLETE)
+                        if (Creature* wolf = go->FindNearestCreature(34285, 7.0f))
+                        {
+                            wolf->AI()->DoAction(1);
+                            player->KilledMonsterCredit(34285);
+                        }
+        }
+    };
 
-		}
-	};
-
-	GameObjectAI* GetAI(GameObject* go) const override
-	{
-		return new go_wolf_chainsAI(go);
-	}
-
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_wolf_chainsAI(go);
+    }
 };
+
+/* ################################################# */
+
+// 34487
+class npc_razormane_raider_34487 : public CreatureScript
+{
+public:
+    npc_razormane_raider_34487() : CreatureScript("npc_razormane_raider_34487") { }
+
+    struct npc_razormane_raider_34487AI : public ScriptedAI
+    {
+        npc_razormane_raider_34487AI(Creature* creature) : ScriptedAI(creature) { }
+
+        uint32 m_phase;
+        uint32 m_timer;
+        float m_target;
+        bool m_isRiding;
+        uint64 m_kodoPackGUID;
+
+        void Reset() override
+        {
+            m_phase = 0;
+            m_timer = 0;
+            m_isRiding = false;
+            m_kodoPackGUID = NULL;
+            me->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+        }
+
+        void SetGUID(uint64 guid, int32 id = 0)
+        {
+            switch (id)
+            {
+            case 34432:
+                m_kodoPackGUID = guid;
+                if (Creature* kodo2 = ObjectAccessor::GetCreature(*me, m_kodoPackGUID))
+                {
+                    m_target = RAND(frand(4.0f, 5.2f), frand(0.9f, 2.1f));
+                    me->SetSpeed(MOVE_WALK, 4.1f);
+                    me->SetSpeed(MOVE_RUN, 4.2f);
+                    me->SetWalk(false);
+                    me->GetMotionMaster()->MoveFollow(kodo2, frand(0.1f, 1.5f), m_target);
+                    m_phase = 1;
+                    m_timer = 100;
+                }
+                break;
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (m_timer < diff)
+            {
+                m_timer = 1000;
+                if (m_phase) DoWork();
+            }
+            else
+                m_timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+
+        void DoWork()
+        {
+            Creature* kodo2 = ObjectAccessor::GetCreature(*me, m_kodoPackGUID);
+            if (!kodo2)
+            {
+                me->DespawnOrUnsummon(100);
+                return;
+            }
+
+            m_phase++;
+
+            if (m_phase > 7 && !m_isRiding)
+            {
+                me->CastSpell(kodo2, 63316);
+                m_isRiding = true;
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_razormane_raider_34487AI(creature);
+    }
+};
+
+// 34258
+class npc_halga_bloodeye_34258 : public CreatureScript
+{
+public:
+    npc_halga_bloodeye_34258() : CreatureScript("npc_halga_bloodeye_34258") { }
+
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 /*action*/) 
+    { 
+        Creature* kodo = creature->FindNearestCreature(34430, 200.0f);
+        if (player->GetQuestStatus(13949) == QUEST_STATUS_INCOMPLETE)
+            if (!kodo)
+            {
+                creature->CastSpell(player, 65486, true);
+                creature->CastSpell(player, 61286);
+                creature->GetAI()->SetGUID(player->GetGUID(), 99999);
+                return true;
+            }
+        return false;	
+    }
+
+    struct npc_halga_bloodeye_34258AI : public ScriptedAI
+    {
+        npc_halga_bloodeye_34258AI(Creature* creature) : ScriptedAI(creature) { }
+
+        uint32 m_phase;
+        uint32 m_timer;
+        uint64 m_playerGUID;
+
+        void Reset() override
+        {
+            m_phase = 0;
+            m_timer = 0;
+            m_playerGUID = NULL;
+        }
+
+        void JustSummoned(Creature* summon) override
+        {
+            switch (summon->GetEntry())
+            {
+            case 34430:
+                summon->AI()->SetGUID(me->GetGUID(), me->GetEntry());
+                summon->AI()->SetGUID(m_playerGUID, 99999);
+                break;
+            }
+        }
+
+        void SetGUID(uint64 guid, int32 id = 0)
+        {
+            switch (id)
+            {
+                case 99999:
+                    if (!m_playerGUID)
+                        m_playerGUID = guid;
+                    break;
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_halga_bloodeye_34258AI(creature);
+    }
+};
+
+// 34430
+class npc_lead_caravan_kodo_34430 : public CreatureScript
+{
+public:
+    npc_lead_caravan_kodo_34430() : CreatureScript("npc_lead_caravan_kodo_34430") { }
+
+    struct npc_lead_caravan_kodo_34430AI : public ScriptedAI
+    {
+        npc_lead_caravan_kodo_34430AI(Creature* creature) : ScriptedAI(creature) { }
+
+        uint32 m_phase;
+        uint32 m_timer;
+        bool m_IsArrived;
+        uint64 m_halgaGUID;
+        uint64 m_playerGUID;
+        uint64 m_gunnerGUID;
+        uint64 m_balgorGUID;
+        uint64 m_kodoPackGUID;
+
+        void Reset() override
+        {
+            m_phase = 1;
+            m_timer = 1000;
+            m_IsArrived = false;
+            m_halgaGUID = NULL;
+            m_playerGUID = NULL;
+            m_gunnerGUID = NULL;
+            m_balgorGUID = NULL;
+            m_kodoPackGUID = NULL;
+            me->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+        }
+
+        void MovementInform(uint32 type, uint32 id) override
+        {
+            if (type == 8 && id == 21)
+                me->CastSpell(me, 65494);
+            else if (type == 8 && id == 22)
+            {
+                me->DespawnOrUnsummon(100);
+                if (Creature* gunner = ObjectAccessor::GetCreature(*me, m_gunnerGUID))
+                    gunner->DespawnOrUnsummon(100);
+                if (Creature* balgor = ObjectAccessor::GetCreature(*me, m_balgorGUID))
+                {
+                    me->CastSpell(balgor, 65557);
+                    balgor->DespawnOrUnsummon(100);
+                }
+            }
+            else if (type == 2 && id == 2)
+            {
+                Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID);
+                Creature* gunner = ObjectAccessor::GetCreature(*me, m_gunnerGUID);
+                if (player && gunner)
+                    gunner->AI()->Talk(0, player);
+            }
+            else if (type == 2 && id > 4 && id < 17)
+                CreateAttack();
+            else if (type == 2 && id == 19)
+                TargetArrived();
+        }
+
+        void JustSummoned(Creature* summon) override
+        { 
+            switch (summon->GetEntry())
+            {
+                case 34431:
+                    m_balgorGUID = summon->GetGUID();
+                    summon->AI()->SetGUID(me->GetGUID(), me->GetEntry());
+                    break;
+                case 34432:
+                    m_kodoPackGUID = summon->GetGUID();
+                    summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+                    break;
+                case 34438:
+                    m_gunnerGUID = summon->GetGUID();
+                    summon->AI()->SetGUID(me->GetGUID(), me->GetEntry());
+                    break;
+                case 34487:
+                    summon->AI()->SetGUID(m_kodoPackGUID, 34432);
+                    break;
+            }
+        }
+
+        void SetGUID(uint64 guid, int32 id = 0)
+        {
+            switch (id)
+            {
+                case 34258:
+                    m_halgaGUID = guid;
+                    break;
+                case 99999:
+                    if (!m_playerGUID)
+                        m_playerGUID = guid;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        uint64 GetGUID(int32 id = 0) const
+        {
+            switch (id)
+            {
+                case 34431:
+                    return m_balgorGUID;
+                case 34432:
+                    return m_kodoPackGUID;
+                case 34438:
+                    return m_gunnerGUID;
+                default:
+                    return 0;                
+            }
+        }
+
+        void PassengerBoarded(Unit* passenger, int8 seatId, bool apply) 
+        { 
+            if (apply)
+            {
+                if (passenger->GetEntry() == 34438)
+                {
+                    Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID);
+                    Creature* kodo2 = ObjectAccessor::GetCreature(*me, m_kodoPackGUID);
+                    if (player && kodo2)
+                    {
+                        player->CastSpell(passenger, 65466, true);
+                        kodo2->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+                        kodo2->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                        kodo2->GetMotionMaster()->MoveFollow(me, 15.0f, M_PI);
+                        kodo2->SetWalk(true);
+                        me->GetMotionMaster()->MovePath(3443001, false);
+                    }
+                }
+            }
+            else
+            {
+                if (!m_IsArrived)
+                    if (passenger->GetEntry() == 34438) 
+                    {
+                        me->CastSpell(me, 65557);
+                        me->DespawnOrUnsummon(200);
+                        if (Creature* kodo2 = ObjectAccessor::GetCreature(*me, m_kodoPackGUID))
+                            kodo2->DespawnOrUnsummon(200);
+                        if (Creature* balgor = ObjectAccessor::GetCreature(*me, m_balgorGUID))
+                            balgor->DespawnOrUnsummon(200);
+                    }
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (m_timer < diff)
+            {
+                m_timer = 1000;
+                if (m_phase) DoWork();
+            }
+            else
+                m_timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+
+        void DoWork()
+        {
+            switch (m_phase)
+            {
+            case 1:
+            {
+                if (Creature* halga = me->FindNearestCreature(34258, 30.0f))
+                {
+                    halga->AI()->Talk(0);
+                    me->SummonCreature(34431, 321.8f, -3699.1f, 27.03f);
+                    me->SummonCreature(34438, 323.8f, -3697.1f, 27.03f);
+                    me->GetMotionMaster()->MovePoint(21, 318.54f, -3670.49f, 27.18f);
+                    m_phase = 2;
+                }
+                break;
+            }
+            case 2:
+                break;
+            case 3:
+                me->GetMotionMaster()->MovePoint(22, 199.76f, -2979.85f, 91.67f);
+                m_phase = 4;
+                break;
+            case 4:
+                break;
+            }
+        }
+
+        void CreateAttack()
+        {
+            if (Creature* gunner = ObjectAccessor::GetCreature(*me, m_gunnerGUID))
+            {
+                std::list<Creature*> cList = me->FindNearestCreatures(34487, 40.0f);
+                for (uint32 i = cList.size(); i < urand(3, 5); i++)
+                    me->CastSpell(gunner, 65496, true);
+            }
+        }
+
+        void TargetArrived()
+        {
+            m_IsArrived = true;
+            if (Creature* balgor = ObjectAccessor::GetCreature(*me, m_balgorGUID))
+                balgor->AI()->Talk(0);
+            if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+            {
+                player->KilledMonsterCredit(53613);
+                player->CastSpell(player, 65561);
+                player->ExitVehicle();
+                player->CompleteQuest(13949);
+            }
+            m_phase = 3;
+            m_timer = 3000;
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_lead_caravan_kodo_34430AI(creature);
+    }
+};
+
+// 34431
+class npc_balgor_whipshank_34431 : public CreatureScript
+{
+public:
+    npc_balgor_whipshank_34431() : CreatureScript("npc_balgor_whipshank_34431") { }
+
+    struct npc_balgor_whipshank_34431AI : public ScriptedAI
+    {
+        npc_balgor_whipshank_34431AI(Creature* creature) : ScriptedAI(creature) { }
+
+        uint64 m_kodoLeaderGUID;
+
+        void Reset() override
+        {
+            m_kodoLeaderGUID = NULL;
+        }
+
+        void SetGUID(uint64 guid, int32 id = 0) 
+        { 
+            switch (id)
+            {
+                case 34430:
+                    m_kodoLeaderGUID = guid;
+                    if (Creature* kodo = ObjectAccessor::GetCreature(*me, guid))
+                        me->EnterVehicle(kodo, 0);
+                    break;
+            }
+        }
+
+        uint64 GetGUID(int32 id = 0) const 
+        { 
+            switch (id)
+            {
+                case 34430:
+                    return m_kodoLeaderGUID;
+                default:
+                    return 0;
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_balgor_whipshank_34431AI(creature);
+    }
+};
+
+// 34438
+class vehicle_riding_shotgun_34438 : public VehicleScript
+{
+public:
+    vehicle_riding_shotgun_34438() : VehicleScript("npc_riding_shotgun_34438") { }
+
+    void OnAddPassenger(Vehicle* veh, Unit* passenger, int8 /*seatId*/)
+    {
+        passenger->SetFacingTo(M_PI);
+        veh->RelocatePassengers();
+    }
+
+    void OnRemovePassenger(Vehicle* veh, Unit* passenger)
+    {
+        if (Creature* gunner = veh->GetBase()->ToCreature())
+            gunner->DespawnOrUnsummon(100);
+    }
+};
+
+// 65485
+class spell_mount_caravan_kodo_cue_65485 : public SpellScriptLoader
+{
+public:
+    spell_mount_caravan_kodo_cue_65485() : SpellScriptLoader("spell_mount_caravan_kodo_cue_65485") { }
+
+    class spell_mount_caravan_kodo_cue_65485_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_mount_caravan_kodo_cue_65485_SpellScript);
+
+        void SetMount(SpellEffIndex effIndex)
+        {
+            if (Unit* unit = GetCaster())
+                if (Player* player = unit->ToPlayer())
+                    if (Creature* kodo1 = player->FindNearestCreature(34430, 6.0f)) //  how to find kodo as spell target?? GetCaster and GetHitUnit are both player
+                        if (Creature* gunner = ObjectAccessor::GetCreature(*unit, kodo1->AI()->GetGUID(34438)))
+                        {
+                            kodo1->AI()->SetGUID(player->GetGUID(), 99999);
+                            gunner->EnterVehicle(kodo1, 1);
+                        }
+        }
+
+        void Register()
+        {
+            OnEffectHit += SpellEffectFn(spell_mount_caravan_kodo_cue_65485_SpellScript::SetMount, EFFECT_0, SPELL_EFFECT_DUMMY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_mount_caravan_kodo_cue_65485_SpellScript();
+    }
+};
+
+/* ################################################# */
 
 
 void AddSC_zone_northern_barrens()
@@ -532,9 +1011,15 @@ void AddSC_zone_northern_barrens()
     new go_red_raptor_nest_6906();
     new go_blue_raptor_nest_6907();
     new go_yellow_raptor_nest_6908();
-	new npc_wyneth_34846();
-	new npc_verog_the_dervish_3395();
-	new npc_trapped_wolf_34285();
-	new npc_chain_origin_34287();
-	new go_wolf_chains();
+    new npc_wyneth_34846();
+    new npc_verog_the_dervish_3395();
+    new npc_trapped_wolf_34285();
+    new npc_chain_origin_34287();
+    new go_wolf_chains();
+    new npc_halga_bloodeye_34258();
+    new npc_lead_caravan_kodo_34430();
+    new npc_balgor_whipshank_34431();
+    new vehicle_riding_shotgun_34438();
+    new spell_mount_caravan_kodo_cue_65485();
+    new npc_razormane_raider_34487();
 }
