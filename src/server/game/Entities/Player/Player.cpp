@@ -15855,9 +15855,13 @@ void Player::SendPreparedGossip(WorldObject* source)
     // (quest entries from quest menu will be included in list)
 
     uint32 textId = GetGossipTextId(source);
+    uint32 menuId = PlayerTalkClass->GetGossipMenu().GetMenuId();
+    uint32 npcTextId = PlayerTalkClass->GetGossipMenu().GetNpcTextId();
 
-    if (uint32 menuId = PlayerTalkClass->GetGossipMenu().GetMenuId())
+    if (menuId > 0)
         textId = GetGossipTextId(menuId, source);
+    else if (npcTextId > 0)
+        textId = npcTextId;
 
     PlayerTalkClass->SendGossipMenu(textId, source->GetGUID());
 }

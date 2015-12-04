@@ -1003,6 +1003,842 @@ public:
 
 /* ################################################# */
 
+// 34305
+class npc_razormane_pillager_34503 : public CreatureScript
+{
+public:
+    npc_razormane_pillager_34503() : CreatureScript("npc_razormane_pillager_34503") { }
+
+    enum eRazormane
+    {
+        QUEST_DRAG_IT_OUT_OF_THEM = 13961,
+        SPELL_GROLDOM_NET = 65580,
+        SPELL_SNARED_IN_NET = 65581,
+        SPELL_GET_A_HOGTIED_RAZORMANE = 65599,
+        SPELL_PERMANENT_FEIGN_DEATH = 29266,
+        SPELL_SUMMON_HOGTIED_RAZORMANE = 65595,
+        PLAYER_GUID = 99999,
+    };
+
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action) 
+    { 
+        if (player->GetQuestStatus(QUEST_DRAG_IT_OUT_OF_THEM) == QUEST_STATUS_INCOMPLETE)
+            if (action == 1)
+            {
+                creature->SetHomePosition(creature->GetPosition());
+                player->CastSpell(creature, SPELL_GET_A_HOGTIED_RAZORMANE);
+                creature->AI()->SetGUID(player->GetGUID(), PLAYER_GUID);
+                creature->AI()->DoAction(1);
+                return true;
+            }
+
+        return false; 
+    }
+
+    struct npc_razormane_pillager_34503AI : public ScriptedAI
+    {
+        npc_razormane_pillager_34503AI(Creature* creature) : ScriptedAI(creature) { }
+
+        uint32 m_timer;
+        uint32 m_phase;
+        uint64 m_playerGUID;
+
+        void Reset() override
+        {
+            m_timer = 0;
+            m_phase = 0;
+            m_playerGUID = NULL;
+        }
+
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
+        { 
+            if (spell->Id == SPELL_GROLDOM_NET)
+            {
+                me->setFaction(1933);
+                me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAGS);
+                me->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_RENAME || UNIT_FLAG_STUNNED || UNIT_FLAG_IN_COMBAT || UNIT_FLAG_DISABLE_MOVE);
+                me->CastSpell(me, SPELL_SNARED_IN_NET, true);
+                me->SetDisplayId(1344);
+                Talk(1);
+            }
+        }
+
+        void SetGUID(uint64 guid, int32 id = 0) override
+        {
+            switch (id)
+            {
+            case 99999:
+                if (!m_playerGUID)
+                    m_playerGUID = guid;
+                break;
+            }
+        }
+
+        uint64 GetGUID(int32 id = 0) const override
+        {
+            switch (id)
+            {
+            case 99999:
+                return m_playerGUID;
+            default:
+                return 0;
+            }
+        }
+
+        void DoAction(int32 param) override
+        { 
+            switch (param)
+            {
+            case 1:
+                m_phase = 1;
+                m_timer = 1000;
+                break;
+            default:
+                break;
+            }
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+            if (m_timer < diff)
+            {
+                m_timer = 1000;
+                if (m_phase) 
+                    DoWork();
+            }
+            else
+                m_timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+
+        void DoWork()
+        {
+            switch (m_phase)
+            {
+                case 1:
+                {
+                    me->CastSpell(me, SPELL_PERMANENT_FEIGN_DEATH);
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                    {
+                        player->CastSpell(player, SPELL_SUMMON_HOGTIED_RAZORMANE);
+
+                    }
+                    m_phase = 2;
+                    m_timer = 50;
+                    break;
+                }
+                case 2:
+                {
+                    if (Creature* raz = me->FindNearestCreature(34514, 10.0f))
+                        raz->AI()->SetGUID(m_playerGUID, PLAYER_GUID);
+                    me->DespawnOrUnsummon(200);
+                    m_phase = 0;
+                    m_timer = 0;
+                    break;
+                }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_razormane_pillager_34503AI(creature);
+    }
+};
+
+// 34514
+class npc_hogtied_razormane_34514 : public CreatureScript
+{
+public:
+    npc_hogtied_razormane_34514() : CreatureScript("npc_hogtied_razormane_34514") { }
+
+    enum eRazormane
+    {
+        NPC_TOGRIK_34513 = 34513,
+        QUEST_DRAG_IT_OUT_OF_THEM = 13961,
+        SPELL_DEAD_SOLDIER = 45801,
+        SPELL_HOGTIED_RAZORMANE_ROPE = 65596,
+        SPELL_DRAGGING_A_RAZORMANE = 65601,
+        SPELL_RAZORMANE_DRAGGING_AURA = 65608,
+        SPELL_SUMMON_HOGTIED_RAZORMANE = 65595,
+        SPELL_RAZORMANE_DRAGGING_TRIGGER = 65610,
+        PLAYER_GUID = 99999,
+    };
+
+    struct npc_hogtied_razormane_34514AI : public ScriptedAI
+    {
+        npc_hogtied_razormane_34514AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+        uint32 m_timer;
+        uint32 m_phase;
+        uint64 m_playerGUID;
+
+        void Initialize()
+        {
+            m_timer = 0;
+            m_phase = 0;
+            m_playerGUID = NULL;
+        }
+
+        void IsSummonedBy(Unit* summoner) override
+        { 
+            if (Player* player = summoner->ToPlayer())
+            {
+                m_playerGUID = player->GetGUID();
+                me->CastSpell(me, SPELL_DEAD_SOLDIER);
+                me->CastSpell(player, SPELL_DRAGGING_A_RAZORMANE);
+                me->CastSpell(me, SPELL_RAZORMANE_DRAGGING_AURA, true);                
+                player->AddAura(SPELL_DRAGGING_A_RAZORMANE, me);
+                player->AddAura(SPELL_RAZORMANE_DRAGGING_AURA, me);
+                player->CastSpell(me, SPELL_HOGTIED_RAZORMANE_ROPE);
+                m_phase = 1;
+                m_timer = 1000;
+            }
+        }
+
+        void SetGUID(uint64 guid, int32 id = 0) override
+        {
+            switch (id)
+            {
+            case PLAYER_GUID:
+                if (!m_playerGUID)
+                    m_playerGUID = guid;
+                break;
+            }
+        }
+
+        uint64 GetGUID(int32 id = 0) const override
+        {
+            switch (id)
+            {
+            case PLAYER_GUID:
+                return m_playerGUID;
+            default:
+                return 0;
+            }
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+            if (m_timer < diff)
+            {
+                m_timer = 1000;
+                if (m_phase)
+                    DoWork();
+            }
+            else
+                m_timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+
+        void DoWork()
+        {
+            switch (m_phase)
+            {
+                case 1:
+                {
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        if (player->GetQuestStatus(QUEST_DRAG_IT_OUT_OF_THEM) == QUEST_STATUS_COMPLETE)
+                        {
+                            player->RemoveAura(SPELL_HOGTIED_RAZORMANE_ROPE);
+                            player->RemoveAura(SPELL_DRAGGING_A_RAZORMANE);
+                            me->DespawnOrUnsummon(0);
+                            m_phase = 0;
+                            m_timer = 0;
+                        }
+                        else
+                        {
+                            if (!me->HasAura(SPELL_HOGTIED_RAZORMANE_ROPE))
+                                player->CastSpell(me, SPELL_HOGTIED_RAZORMANE_ROPE);
+                            me->CastSpell(me, SPELL_RAZORMANE_DRAGGING_TRIGGER);
+                        }
+                    break;
+                }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_hogtied_razormane_34514AI(creature);
+    }
+};
+
+// 5465 AreaTrigger
+class at_groldoms_farm_5465 : public AreaTriggerScript
+{
+public:
+    at_groldoms_farm_5465() : AreaTriggerScript("at_groldoms_farm_5465") { }
+
+    enum eRazormane
+    {
+        QUEST_DRAG_IT_OUT_OF_THEM = 13961,
+        AT_GROLDOMS_FARM = 5465,
+        SPELL_DELIVER_HOGTIED_RAZORMANE = 65603,
+        SPELL_SUMMON_HOGTIED_RAZORMANE = 65595,
+        PLAYER_GUID = 99999,
+    };
+
+    bool OnTrigger(Player* player, const AreaTriggerEntry* at) override
+    {
+        if (at->id == AT_GROLDOMS_FARM)
+            if ((player->GetQuestStatus(QUEST_DRAG_IT_OUT_OF_THEM) == QUEST_STATUS_INCOMPLETE))
+            {
+                player->CompleteQuest(QUEST_DRAG_IT_OUT_OF_THEM);
+                player->CastSpell(player, SPELL_DELIVER_HOGTIED_RAZORMANE);
+
+            }
+
+        return false;
+    }
+};
+
+/* ################################################# */
+
+// 34513
+class npc_togrik_34513 : public CreatureScript
+{
+public:
+    npc_togrik_34513() : CreatureScript("npc_togrik_34513") { }
+
+    enum eRazormane
+    {
+        QUEST_BY_HOOK_OR_BY_CROOK = 13963,
+        NPC_CAPTURED_RAZORMANE = 34523,
+        NPC_TOGRIK = 34513,
+        EVENT_MAX_TIME = 1,
+        DATA_MENU_ID = 99980,
+        PLAYER_GUID = 99999,
+        DOACTION_CREATE_CHAIN = 1,
+        DOACTION_RESET = 3,
+        DOACTION_GOSSIP_HELLO = 10,
+        DOACTION_GOSSIP_SELECT = 11,
+    };
+
+    bool OnGossipHello(Player* player, Creature* creature)
+    {
+        if (player->GetQuestStatus(QUEST_BY_HOOK_OR_BY_CROOK) == QUEST_STATUS_INCOMPLETE)
+        {
+            creature->AI()->SetGUID(player->GetGUID(), PLAYER_GUID);
+            creature->AI()->DoAction(DOACTION_GOSSIP_HELLO);
+            return true;
+        }
+        else
+        {
+            player->SEND_GOSSIP_MENU(14554, creature->GetGUID());
+        }
+
+        return false;
+    }
+
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action)
+    {
+        if (action >= 1000)
+        {
+            creature->AI()->SetData(DATA_MENU_ID, action);
+            creature->AI()->DoAction(DOACTION_GOSSIP_SELECT);
+            return true;
+        }
+
+        return false;
+    }
+
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) 
+    {
+        if (quest->GetQuestId() == QUEST_BY_HOOK_OR_BY_CROOK)
+        {
+            if (creature->AI()->GetData(NPC_TOGRIK) == 0)
+            {
+                creature->AI()->SetGUID(player->GetGUID(), PLAYER_GUID);
+                creature->AI()->DoAction(1);
+            }
+            else
+            {
+                creature->AI()->DoAction(2);
+            }
+        }
+
+        return false; 
+    }
+
+    struct npc_togrik_34513AI : public ScriptedAI
+    {
+        npc_togrik_34513AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+        EventMap m_events;
+        uint32   m_phase;
+        uint32   m_action_id;
+        uint64   m_playerGUID;
+        uint64   m_razorGUID;
+        uint8    m_encounter;
+
+        void Initialize()
+        {           
+            m_encounter = 0;
+        }
+
+        void Reset() override
+        {
+            m_events.Reset();
+            m_phase = 0;
+            m_action_id = 0;
+            m_playerGUID = NULL;
+            m_razorGUID = NULL;
+        }
+
+        void SetData(uint32 id, uint32 value)
+        {
+            switch (id)
+            {
+            case DATA_MENU_ID:
+                m_action_id = value;
+                break;
+            }
+        }
+
+        uint32 GetData(uint32 id) const override
+        {
+            switch (id)
+            {
+            case NPC_TOGRIK:
+                return m_encounter;
+            default:
+                return 0;
+            }
+        }
+
+        void SetGUID(uint64 guid, int32 id = 0) override
+        {
+            switch (id)
+            {
+            case PLAYER_GUID:
+                if (!m_playerGUID)
+                    m_playerGUID = guid;
+                break;
+            }
+        }
+
+        uint64 GetGUID(int32 id = 0) const override
+        {
+            switch (id)
+            {
+            case PLAYER_GUID:
+                return m_playerGUID;
+            default:
+                return 0;
+            }
+        }
+
+        void DoAction(int32 param) 
+        { 
+            switch (param)
+            {
+                case DOACTION_CREATE_CHAIN:
+                {
+                    CreateRazor();
+                    break;
+                }
+                case DOACTION_RESET:
+                {
+                    Initialize();
+                    Reset();
+                    break;
+                }
+                case DOACTION_GOSSIP_HELLO:
+                {
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                    {
+                        player->ADD_GOSSIP_ITEM_DB(10520, 0, GOSSIP_SENDER_MAIN, 1002);
+                        player->SEND_GOSSIP_MENU(14554, me->GetGUID());
+                    }
+                    break;
+                }
+                case DOACTION_GOSSIP_SELECT:
+                {
+                    switch (m_action_id)
+                    {
+                        case 1002:
+                        {
+                            Creature* razor = ObjectAccessor::GetCreature(*me, m_razorGUID);
+                            if (!razor)
+                            {
+                                CreateRazor();
+                            }
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_MAX_TIME:
+                    if (Creature* razor = ObjectAccessor::GetCreature(*me, m_razorGUID))
+                        razor->DespawnOrUnsummon();
+                    Initialize();
+                    Reset();
+                    break;
+                default:
+                    break;
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+
+        void CreateRazor()
+        {
+            m_encounter = 1;
+            m_events.ScheduleEvent(EVENT_MAX_TIME, 600000);
+            if (Creature* razor = me->SummonCreature(NPC_CAPTURED_RAZORMANE, 283.4774f, -3050.653f, 95.93713f, 3.490659f, TEMPSUMMON_TIMED_DESPAWN, 600000))
+            {
+                m_razorGUID = razor->GetGUID();
+                razor->AI()->SetGUID(m_playerGUID);
+                razor->AI()->DoAction(DOACTION_CREATE_CHAIN);
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_togrik_34513AI(creature);
+    }
+};
+
+// 34523
+class npc_captured_razormane_34523 : public CreatureScript
+{
+public:
+    npc_captured_razormane_34523() : CreatureScript("npc_captured_razormane_34523") { }
+
+    enum eRazormane
+    {
+        QUEST_BY_HOOK_OR_BY_CROOK = 13963,
+        NPC_DAVES_INDUSTRIAL_LIGHT_AND_MAGIC_BUNNY = 34527,
+        NPC_TOGRIK = 34513,
+        SPELL_COSMETIC_CHAINS = 65612,
+        PLAYER_GUID = 99999,
+        DATA_ACTION_ID = 99980,
+        PATH_RAZORMANE = 3452301,
+        DOACTION_CREATE_CHAIN = 1,
+        DOACTION_RESET = 3,
+        DOACTION_GOSSIP_HELLO = 10,
+        DOACTION_GOSSIP_SELECT = 11,
+        EVENT_SAY_END = 1,
+    };
+
+    bool OnGossipHello(Player* player, Creature* creature) 
+    { 
+        creature->AI()->SetGUID(player->GetGUID(), PLAYER_GUID);
+        creature->AI()->DoAction(DOACTION_GOSSIP_HELLO);
+        return true; 
+    }
+
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action)
+    {
+        creature->AI()->SetData(DATA_ACTION_ID, action);
+        creature->AI()->DoAction(DOACTION_GOSSIP_SELECT);
+        return true;
+    }
+
+    struct npc_captured_razormane_34523AI : public ScriptedAI
+    {
+        npc_captured_razormane_34523AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap m_events;
+        uint32   m_phase;
+        uint32   m_action_id;
+        uint64   m_playerGUID;
+        uint64   m_bunnyGUID;
+        uint64   m_togrikGUID;
+        
+        void Reset() override
+        {
+            m_events.Reset();
+            m_phase = 0;
+            m_action_id = 0;
+            m_playerGUID = NULL;
+            m_togrikGUID = NULL;
+
+            if (Creature* bunny = me->FindNearestCreature(NPC_DAVES_INDUSTRIAL_LIGHT_AND_MAGIC_BUNNY, 25.0f))
+                m_bunnyGUID = bunny->GetGUID();
+            else
+                m_bunnyGUID = NULL;
+        }
+
+        void JustDied(Unit* /*killer*/) 
+        { 
+            if (Creature* togrik = ObjectAccessor::GetCreature(*me, m_togrikGUID))
+                togrik->AI()->DoAction(DOACTION_RESET);
+        }
+
+        void SetData(uint32 id, uint32 value) 
+        { 
+            switch (id)
+            {
+                case DATA_ACTION_ID:
+                    m_action_id = value;
+                    break;
+                }
+        }
+
+        void SetGUID(uint64 guid, int32 id = 0) override
+        {
+            switch (id)
+            {
+                case NPC_DAVES_INDUSTRIAL_LIGHT_AND_MAGIC_BUNNY:
+                    m_bunnyGUID = guid;
+                    break;
+                case NPC_TOGRIK:
+                    m_togrikGUID = guid;
+                    break;
+                case PLAYER_GUID:
+                    if (!m_playerGUID)
+                        m_playerGUID = guid;
+                    break;
+            }
+        }
+
+        uint64 GetGUID(int32 id = 0) const override
+        {
+            switch (id)
+            {
+                case NPC_DAVES_INDUSTRIAL_LIGHT_AND_MAGIC_BUNNY:
+                    return m_bunnyGUID;
+                case NPC_TOGRIK:
+                    return m_togrikGUID;
+                case PLAYER_GUID:
+                    return m_playerGUID;
+                default:
+                    return 0;
+            }
+        }
+
+        void DoAction(int32 param)
+        {
+            switch (param)
+            {
+                case DOACTION_CREATE_CHAIN:
+                {
+                    me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                    if (Creature* bunny = ObjectAccessor::GetCreature(*me, m_bunnyGUID))
+                    {
+                        bunny->CastSpell(me, SPELL_COSMETIC_CHAINS);
+                        me->SetSpeed(MOVE_WALK, 0.5f);
+                        me->GetMotionMaster()->MovePath(PATH_RAZORMANE, true);
+                    }
+                    break;
+                }
+                case DOACTION_GOSSIP_HELLO:
+                {
+                    Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID);
+                    if (!player)
+                        return;
+
+                    switch (m_phase)
+                    {
+                        case 0:
+                        {
+                            player->ADD_GOSSIP_ITEM_DB(10521, 0, GOSSIP_SENDER_MAIN, 1010);
+                            player->ADD_GOSSIP_ITEM_DB(10521, 1, GOSSIP_SENDER_MAIN, 1011);
+                            player->ADD_GOSSIP_ITEM_DB(10521, 2, GOSSIP_SENDER_MAIN, 1012);
+                            player->ADD_GOSSIP_ITEM_DB(10521, 3, GOSSIP_SENDER_MAIN, 1013);
+                            player->ADD_GOSSIP_ITEM_DB(10521, 4, GOSSIP_SENDER_MAIN, 1014);
+                            player->SEND_GOSSIP_MENU(14555, me->GetGUID());
+                            break;
+                        }
+                        case 1:
+                        case 2:
+                        case 3:
+                        case 4:
+                        case 5:
+                        {
+                            player->ADD_GOSSIP_ITEM_DB(10521, 0, GOSSIP_SENDER_MAIN, 1010);
+                            player->ADD_GOSSIP_ITEM_DB(10521, 1, GOSSIP_SENDER_MAIN, 1011);
+                            player->ADD_GOSSIP_ITEM_DB(10521, 2, GOSSIP_SENDER_MAIN, 1012);
+                            player->SEND_GOSSIP_MENU(14555, me->GetGUID());
+                            break;
+                        }
+                    }
+                    break;
+                }
+                case DOACTION_GOSSIP_SELECT:
+                {
+                    Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID);
+                    if (!player)
+                        return;
+
+                    switch (m_action_id)
+                    {
+                    case 1010:
+                        player->CastSpell(me, 65618);
+                        break;
+                    case 1011:
+                        player->CastSpell(me, 65620);
+                        break;
+                    case 1012:
+                        player->CastSpell(me, 65619);
+                        break;
+                    case 1013:
+                        player->CastSpell(me, 65618);
+                        break;
+                    case 1014:
+                        player->CastSpell(me, 65621);
+                        break;
+                    }
+
+                    Talk(m_phase);
+                    me->HandleEmoteCommand(34);
+                    player->PlayerTalkClass->SendCloseGossip();
+                    m_phase++;
+                
+                    if (m_phase >= 5)
+                    {
+                        player->KilledMonsterCredit(34529);
+                        m_events.RescheduleEvent(EVENT_SAY_END, 5000);
+                    }
+                    break;
+                }
+            }
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_SAY_END:
+                    {
+                        Talk(m_phase);
+                        me->DespawnOrUnsummon(10000);
+                        break;
+                    }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_captured_razormane_34523AI(creature);
+    }
+};
+
+/* ################################################# */
+
+// 34547
+class npc_groldom_kodo_34547 : public CreatureScript
+{
+public:
+    npc_groldom_kodo_34547() : CreatureScript("npc_groldom_kodo_34547") { }
+
+    enum eRazormane
+    {
+        QUEST_THE_KODOS_RETURN = 13971,
+    };
+
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    {
+        if (quest->GetQuestId() == QUEST_THE_KODOS_RETURN)
+        {
+            creature->RemoveAura(54852);
+            creature->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
+            creature->SetUInt32Value(UNIT_FIELD_BYTES_2, 0);
+            creature->GetMotionMaster()->MovePoint(1, 50.17f, -3129.29f, 96.67f, true);
+            creature->DespawnOrUnsummon(10000);
+            return true;
+        }
+
+        return false;
+    }
+};
+
+// 34543
+class npc_fez_34543 : public CreatureScript
+{
+public:
+    npc_fez_34543() : CreatureScript("npc_fez_34543") { }
+
+    enum eFez
+    {
+       
+    };
+
+    struct npc_fez_34543AI : public ScriptedAI
+    {
+        npc_fez_34543AI(Creature* creature) : ScriptedAI(creature) {  }
+
+        EventMap m_events;
+       
+        void Reset() override
+        {
+            m_events.Reset();
+            m_events.ScheduleEvent(1, 2500);
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case 1:
+                    m_events.ScheduleEvent(1, 2500);
+                    if (!me->IsInCombat())
+                        if (Vehicle* fez = me->GetVehicleKit())
+                            if (!fez->IsVehicleInUse())
+                                if (Creature* tortusk = me->FindNearestCreature(34544, 50.0f))
+                                    if (!tortusk->IsInCombat())
+                                        tortusk->EnterVehicle(me, 0);
+                    break;
+                default:
+                    break;
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_fez_34543AI(creature);
+    }
+};
+
+/* ################################################# */
 
 void AddSC_zone_northern_barrens()
 {
@@ -1022,4 +1858,11 @@ void AddSC_zone_northern_barrens()
     new vehicle_riding_shotgun_34438();
     new spell_mount_caravan_kodo_cue_65485();
     new npc_razormane_raider_34487();
+    new npc_razormane_pillager_34503();
+    new npc_hogtied_razormane_34514();
+    new at_groldoms_farm_5465();
+    new npc_togrik_34513();
+    new npc_captured_razormane_34523();
+    new npc_groldom_kodo_34547();
+    new npc_fez_34543();
 }
