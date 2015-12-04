@@ -168,6 +168,8 @@ class GossipMenu
 
         void SetMenuId(uint32 menu_id) { _menuId = menu_id; }
         uint32 GetMenuId() const { return _menuId; }
+        void SetNpcTextId(uint32 text_id) { _npcTextId = text_id; }
+        uint32 GetNpcTextId() const { return _npcTextId; }
         void SetSenderGUID(uint64 guid) { _senderGUID = guid; }
         uint64 GetSenderGUID() const { return _senderGUID; }
         void SetLocale(LocaleConstant locale) { _locale = locale; }
@@ -218,6 +220,7 @@ class GossipMenu
         GossipMenuItemContainer _menuItems;
         GossipMenuItemDataContainer _menuItemData;
         int32 _menuId;
+        uint32 _npcTextId;
         uint64 _senderGUID;
         LocaleConstant _locale;
 };
