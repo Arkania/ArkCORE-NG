@@ -927,6 +927,13 @@ public:
                     if (Creature* kodo = ObjectAccessor::GetCreature(*me, guid))
                         me->EnterVehicle(kodo, 0);
                     break;
+                case 34577:
+                {
+                    m_kodoLeaderGUID = guid;
+                    if (Creature* kodo = ObjectAccessor::GetCreature(*me, guid))
+                        me->EnterVehicle(kodo, 0);
+                    break;
+                }
             }
         }
 
@@ -935,6 +942,8 @@ public:
             switch (id)
             {
                 case 34430:
+                    return m_kodoLeaderGUID;
+                case 34577:
                     return m_kodoLeaderGUID;
                 default:
                     return 0;
@@ -1840,6 +1849,646 @@ public:
 
 /* ################################################# */
 
+// 34578
+class npc_rocco_whipshank_34578 : public CreatureScript
+{
+public:
+    npc_rocco_whipshank_34578() : CreatureScript("npc_rocco_whipshank_34578") { }
+
+    enum eRocco
+    {
+        QUEST_CROSSROADS_CARAVAN_DELIVERY = 13975,
+        NPC_HEAD_CARAVAN_KODO = 34577,
+        NPN_BALGOR_WHIPSHANK = 34431,
+        SPELL_SUMMON_KODO_PART2 = 65662,
+        SPELL_WORLD_GENERIC_DISMOUNT_CANCEL_SHAPESHIFT = 61286,
+        PLAYER_GUID = 99999,
+        DATA_IS_ANUM_STARTED = 99998,
+        DOACTION_RESET = 3,
+        DOACTION_GOSSIP_HELLO = 10,
+        DOACTION_GOSSIP_SELECT = 11,
+        EVENT_MAX_TIME = 1,
+    };
+
+    bool OnGossipHello(Player* player, Creature* creature)
+    {
+        if (player->GetQuestStatus(QUEST_CROSSROADS_CARAVAN_DELIVERY) == QUEST_STATUS_INCOMPLETE)
+        {
+            creature->AI()->SetGUID(player->GetGUID(), PLAYER_GUID);
+            creature->AI()->DoAction(DOACTION_GOSSIP_HELLO);
+            return true;
+        }
+
+        return false;
+    }
+
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action)
+    {
+        if (action == 1002)
+        {
+            creature->AI()->SetGUID(player->GetGUID(), PLAYER_GUID);
+            creature->AI()->DoAction(DOACTION_GOSSIP_SELECT);
+            player->PlayerTalkClass->SendCloseGossip();
+            return true;
+        }
+
+        return false;
+    }
+
+    struct npc_rocco_whipshank_34578AI : public ScriptedAI
+    {
+        npc_rocco_whipshank_34578AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap m_events;
+        uint32   m_phase;
+        uint32   m_is_anim_started;
+        uint64   m_playerGUID;
+        uint64   m_kodoLeader;
+        uint64   m_kodoPack;
+
+        void Reset() override
+        {
+            m_events.Reset();
+            m_phase = 0;
+            m_is_anim_started = false;
+            m_playerGUID = NULL;
+            m_kodoLeader = NULL;
+            m_kodoPack = NULL;
+        }
+
+        void JustSummoned(Creature* summon) 
+        { 
+            switch (summon->GetEntry())
+            {
+            case NPC_HEAD_CARAVAN_KODO:
+                m_kodoLeader = summon->GetGUID();
+                summon->AI()->SetGUID(m_playerGUID, PLAYER_GUID);
+                summon->AI()->SetGUID(me->GetGUID(), me->GetEntry());
+                summon->SummonCreature(NPN_BALGOR_WHIPSHANK, 220.5f, -2964.5f, 91.82f);
+                break;
+            default:
+                printf("JustSummoned rocco: %u \n", summon->GetEntry());
+                break;
+            }
+        }
+
+        void SetData(uint32 id, uint32 value)
+        {
+            switch (id)
+            {
+            case DATA_IS_ANUM_STARTED:
+                m_is_anim_started = value;
+                break;
+            }
+        }
+
+        uint32 GetData(uint32 id) const override
+        {
+            switch (id)
+            {
+            case DATA_IS_ANUM_STARTED:
+                return m_is_anim_started;
+            default:
+                return 0;
+            }
+        }
+
+        void SetGUID(uint64 guid, int32 id = 0) override
+        {
+            switch (id)
+            {
+            case PLAYER_GUID:
+                if (!m_playerGUID)
+                    m_playerGUID = guid;
+                break;
+            }
+        }
+
+        uint64 GetGUID(int32 id = 0) const override
+        {
+            switch (id)
+            {
+            case PLAYER_GUID:
+                return m_playerGUID;
+            default:
+                return 0;
+            }
+        }
+
+        void DoAction(int32 param)
+        {
+            switch (param)
+            {
+                case DOACTION_RESET:
+                {
+                    Reset();
+                    break;
+                }
+                case DOACTION_GOSSIP_HELLO:
+                {
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        if (!m_is_anim_started)
+                        {
+                            player->ADD_GOSSIP_ITEM_DB(10528, 0, GOSSIP_SENDER_MAIN, 1002);
+                            player->SEND_GOSSIP_MENU(14566, me->GetGUID());
+                        }
+                    break;
+                }
+                case DOACTION_GOSSIP_SELECT:
+                {
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                    {
+                        m_is_anim_started = true;
+                        m_events.ScheduleEvent(EVENT_MAX_TIME, 600000);
+                        me->CastSpell(player, SPELL_SUMMON_KODO_PART2);
+                        me->CastSpell(player, SPELL_WORLD_GENERIC_DISMOUNT_CANCEL_SHAPESHIFT);
+                    }
+                    break;
+                }
+            }
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                    case EVENT_MAX_TIME:
+                        // delete kodoleader mm
+                        Reset();
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+
+        void CreateKodo()
+        {
+            
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_rocco_whipshank_34578AI(creature);
+    }
+};
+
+// 34577
+class npc_head_caravan_kodo_34577 : public CreatureScript
+{
+public:
+    npc_head_caravan_kodo_34577() : CreatureScript("npc_head_caravan_kodo_34577") { }
+
+    enum eKodo
+    {
+        QUEST_CROSSROADS_CARAVAN_DELIVERY = 13975,
+        PLAYER_GUID = 99999,
+        NPC_ROCCO_WHIPSHANK = 34578,
+        NPC_THE_HOTSEAT = 34582,
+        NPC_CROSSROADS_CARAVAN_KODO = 34576,
+        NPN_BALGOR_WHIPSHANK = 34431,
+        NPC_BURNING_BLADE_MOUNT = 34593,
+        NPC_BURNING_BLADE_RAIDER = 34594,
+        SPELL_CALL_A_PACK_KODO2 = 65663,
+        SPELL_MOUNT_UP = 65671,
+        SPELL_RIDE_CARAVAN_KODO = 65466,
+        EVENT_SUMMON_CARAVAN = 1,
+        EVENT_RIDE_KODO = 2,
+        EVENT_START_CARAVAN = 3,
+        DOACTION_RESET=3,
+    };
+
+    struct npc_head_caravan_kodo_34577AI : public ScriptedAI
+    {
+        npc_head_caravan_kodo_34577AI(Creature* creature) : ScriptedAI(creature) { }
+
+        uint32 m_phase;
+        EventMap m_events;
+        bool m_IsArrived;
+        uint64 m_playerGUID;
+        uint64 m_roccoGUID;
+        uint64 m_balgorGUID;
+        uint64 m_kodo2GUID;
+        uint64 m_hotseatGUID;
+
+        void Reset() override
+        {
+            m_phase = 1;
+            m_events.Reset();
+            m_IsArrived = false;
+            m_playerGUID = NULL;
+            m_roccoGUID = NULL;
+            m_balgorGUID = NULL;
+            m_kodo2GUID = NULL;
+            m_hotseatGUID = NULL;
+            me->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+        }
+
+        void MovementInform(uint32 type, uint32 id) override
+        {
+            if (type == 8 && id == 21)
+                m_events.ScheduleEvent(EVENT_SUMMON_CARAVAN, 100);
+            else if (type == 2)
+            {
+                if (id == 1)
+                    Greetings();
+                else if (id == 3)
+                    Warning1();
+                else if (id == 5)
+                    Warning2();
+                else if (id == 26)
+                    MadeIt();
+                else if (id == 27)
+                    CaravanArrived();
+                else if (id > 7 && id < 25)
+                    CreateAttack();
+            }
+        }
+
+        void JustSummoned(Creature* summon) override
+        {
+            switch (summon->GetEntry())
+            {
+            case NPN_BALGOR_WHIPSHANK:
+                m_balgorGUID = summon->GetGUID();
+                summon->EnterVehicle(me, 0);
+                summon->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                me->GetMotionMaster()->MovePoint(21, 205.1f, -2935.985f, 92.66f, true);
+                break;
+            case NPC_CROSSROADS_CARAVAN_KODO:
+                m_kodo2GUID = summon->GetGUID();
+                summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE || UNIT_FLAG_IMMUNE_TO_NPC);
+                summon->SetWalk(false);
+                break;
+            case NPC_THE_HOTSEAT:
+                m_hotseatGUID = summon->GetGUID();
+                summon->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                break;
+            case NPC_BURNING_BLADE_MOUNT:
+                if (Creature* raider = me->SummonCreature(NPC_BURNING_BLADE_RAIDER, summon->GetPosition(), TEMPSUMMON_TIMED_DESPAWN, 300000))
+                {
+                    raider->SetSpeed(MOVE_WALK, 3.0f, true);
+                    summon->SetSpeed(MOVE_WALK, 3.0f, true);
+                    raider->EnterVehicle(summon);
+                    raider->AI()->SetGUID(m_playerGUID, PLAYER_GUID);
+                    raider->AI()->SetGUID(m_kodo2GUID, NPC_CROSSROADS_CARAVAN_KODO);
+                }
+                break;
+            default:
+                break;
+            }
+        }
+
+        void SetGUID(uint64 guid, int32 id = 0)
+        {
+            switch (id)
+            {
+                case NPC_ROCCO_WHIPSHANK:
+                    m_roccoGUID = guid;
+                    break;
+                case PLAYER_GUID:
+                    m_playerGUID = guid;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        uint64 GetGUID(int32 id = 0) const
+        {
+            switch (id)
+            {
+            case NPC_ROCCO_WHIPSHANK:
+                return m_roccoGUID;
+            case PLAYER_GUID:
+                return m_playerGUID;
+            case NPC_THE_HOTSEAT:
+                return m_hotseatGUID;
+            default:
+                return 0;
+            }
+        }
+
+        void PassengerBoarded(Unit* passenger, int8 seatId, bool apply)
+        {
+            if (apply)
+            {
+                if (passenger->GetEntry() == NPC_THE_HOTSEAT)
+                {
+                    Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID);
+                    Creature* hotseat = ObjectAccessor::GetCreature(*me, m_hotseatGUID);
+                    if (player && hotseat)
+                    {
+                        hotseat->CastSpell(player, SPELL_MOUNT_UP);
+                        m_events.ScheduleEvent(EVENT_RIDE_KODO, 250); 
+                        m_events.ScheduleEvent(EVENT_START_CARAVAN, 500);
+                    }
+                }
+            }
+            else
+            {
+                if (!m_IsArrived)
+                    if (passenger->GetEntry() == NPC_THE_HOTSEAT)
+                    {
+                        if (Creature* balgor = ObjectAccessor::GetCreature(*me, m_balgorGUID))
+                            balgor->DespawnOrUnsummon(100);
+                        if (Creature* rocco = ObjectAccessor::GetCreature(*me, m_roccoGUID))
+                            rocco->AI()->DoAction(DOACTION_RESET);
+                        me->DespawnOrUnsummon(100);
+                    }
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_SUMMON_CARAVAN:
+                    me->CastSpell(me, SPELL_CALL_A_PACK_KODO2);
+                    me->SummonCreature(NPC_THE_HOTSEAT, me->GetPosition());                    
+                    if (Creature* rocco = ObjectAccessor::GetCreature(*me, m_roccoGUID))
+                        rocco->AI()->Talk(0);
+                    break;
+                case EVENT_RIDE_KODO:
+                {
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        if (Creature* hotseat = ObjectAccessor::GetCreature(*me, m_hotseatGUID))
+                            player->CastSpell(hotseat, SPELL_RIDE_CARAVAN_KODO);
+
+                    break;
+                }
+                case EVENT_START_CARAVAN:
+                {
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        if (Creature* rocco = ObjectAccessor::GetCreature(*me, m_roccoGUID))
+                            if (Creature* kodo2 = ObjectAccessor::GetCreature(*me, m_kodo2GUID))
+                            {
+                                kodo2->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+                                kodo2->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                                kodo2->GetMotionMaster()->MoveFollow(me, 15.0f, M_PI);
+                                kodo2->SetWalk(true);
+                                me->GetMotionMaster()->MovePath(3457701, false);
+                                rocco->AI()->Talk(1);
+                            }
+                    break;
+                }
+                default:
+                    break;
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+
+        void Greetings()
+        {            
+            // Music ID : 24676
+            if (Creature* rocco = ObjectAccessor::GetCreature(*me, m_roccoGUID))
+                rocco->AI()->Talk(1);           
+        }
+
+        void Warning1()
+        {
+            if (Creature* balgor = ObjectAccessor::GetCreature(*me, m_balgorGUID))
+                balgor->AI()->Talk(1);
+        }
+
+        void Warning2()
+        {
+            if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                if (Creature* hotseat = ObjectAccessor::GetCreature(*me, m_hotseatGUID))
+                    hotseat->AI()->Talk(0, player);
+        }
+
+        void CreateAttack()
+        {
+            std::list<Creature*> cList = me->FindNearestCreatures(34594, 50.0f);
+            for (uint32 i = cList.size(); i < 5; i++)
+                me->CastSpell(me, 65692);
+        }
+
+        void MadeIt()
+        {
+            if (Creature* balgor = ObjectAccessor::GetCreature(*me, m_balgorGUID))
+                balgor->AI()->Talk(2, me);
+        }
+
+        void CaravanArrived()
+        {
+            m_IsArrived = true;
+            if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+            {
+                player->ExitVehicle();
+                player->KilledMonsterCredit(65892);
+                player->RemoveAura(65466);
+                player->CompleteQuest(QUEST_CROSSROADS_CARAVAN_DELIVERY);
+            }
+            if (Creature* balgor = ObjectAccessor::GetCreature(*me, m_balgorGUID))
+            {
+                me->CastSpell(balgor, 65695);
+                balgor->DespawnOrUnsummon(100);
+            }
+            if (Creature* hotseat = ObjectAccessor::GetCreature(*me, m_hotseatGUID))
+            {
+                hotseat->CastSpell(hotseat, 50630);
+                hotseat->DespawnOrUnsummon(100);
+            }
+            if (Creature* rocco = ObjectAccessor::GetCreature(*me, m_roccoGUID))
+                rocco->AI()->DoAction(DOACTION_RESET);
+            if (Creature* kodo2 = ObjectAccessor::GetCreature(*me, m_kodo2GUID))
+                kodo2->CastSpell(kodo2, 50630);
+            // ServerToClient: SMSG_PET_DISMISS_SOUND(0x1ABB) Length : 16 ConnIdx : 0 Time : 09 / 07 / 2014 07 : 27 : 46.000 Number : 392240
+            // Sound ID : 1731
+            me->DespawnOrUnsummon(100);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_head_caravan_kodo_34577AI(creature);
+    }
+};
+
+// 34582
+class vehicle_hotseat_34582 : public VehicleScript
+{
+public:
+    vehicle_hotseat_34582() : VehicleScript("vehicle_hotseat_34582") { }
+
+    void OnAddPassenger(Vehicle* veh, Unit* passenger, int8 /*seatId*/)
+    {
+        passenger->SetFacingTo(5.14f);
+        veh->RelocatePassengers();
+    }
+
+    void OnRemovePassenger(Vehicle* veh, Unit* passenger)
+    {
+        passenger->RemoveAura(65466);
+        if (Creature* gunner = veh->GetBase()->ToCreature())
+            gunner->DespawnOrUnsummon(100);
+    }
+};
+
+// 65669
+class spell_mount_caravan_kodo_cue_part2_65669 : public SpellScriptLoader
+{
+public:
+    spell_mount_caravan_kodo_cue_part2_65669() : SpellScriptLoader("spell_mount_caravan_kodo_cue_part2_65669") { }
+
+    enum eSpell
+    {
+        NPC_HEAD_CARAVAN_KODO = 34577,
+        NPC_THE_HOTSEAT = 34582,
+    };
+
+    class spell_mount_caravan_kodo_cue_part2_65669_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_mount_caravan_kodo_cue_part2_65669_SpellScript);
+
+        void SetMount(SpellEffIndex effIndex)
+        {
+            if (Unit* unit = GetCaster())
+                if (Player* player = unit->ToPlayer())
+                    if (Creature* kodo1 = player->FindNearestCreature(NPC_HEAD_CARAVAN_KODO, 6.0f)) //  how to find kodo as spell target?? GetCaster and GetHitUnit are both player
+                        if (Creature* hotseat = ObjectAccessor::GetCreature(*unit, kodo1->AI()->GetGUID(NPC_THE_HOTSEAT)))
+                            hotseat->EnterVehicle(kodo1, 1);
+        }
+
+        void Register()
+        {
+            OnEffectHit += SpellEffectFn(spell_mount_caravan_kodo_cue_part2_65669_SpellScript::SetMount, EFFECT_0, SPELL_EFFECT_DUMMY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_mount_caravan_kodo_cue_part2_65669_SpellScript();
+    }
+};
+
+// 34593
+class vehicle_burning_blade_mount_34593 : public VehicleScript
+{
+public:
+    vehicle_burning_blade_mount_34593() : VehicleScript("vehicle_burning_blade_mount_34593") { }
+
+    enum eVehicle
+    {
+        NPC_CROSSROADS_CARAVAN_KODO = 34576,
+    };
+
+    void OnAddPassenger(Vehicle* veh, Unit* passenger, int8 /*seatId*/)
+    {
+        if (Creature* mount = veh->GetBase()->ToCreature())
+            if (Creature* kodo2 = mount->FindNearestCreature(NPC_CROSSROADS_CARAVAN_KODO, 50.0f))
+                mount->GetMotionMaster()->MoveFollow(kodo2, frand(0.5f, 2.0f), frand(0.0f, 6.28f));
+    }
+
+    void OnRemovePassenger(Vehicle* veh, Unit* passenger)
+    {
+        if (Creature* mount = veh->GetBase()->ToCreature())
+        {
+            mount->SetSpeed(MOVE_WALK, 0.4f, true);
+            mount->GetMotionMaster()->MoveConfused();
+            mount->DespawnOrUnsummon(30000);
+        }
+    }
+};
+
+// 34594
+class npc_burning_blade_raider_34594 : public CreatureScript
+{
+public:
+    npc_burning_blade_raider_34594() : CreatureScript("npc_burning_blade_raider_34594") { }
+
+    enum eRaider
+    {
+        QUEST_CROSSROADS_CARAVAN_DELIVERY = 13975,
+        PLAYER_GUID = 99999,
+        NPC_CROSSROADS_CARAVAN_KODO = 34576,
+    };
+
+    struct npc_burning_blade_raider_34594AI : public ScriptedAI
+    {
+        npc_burning_blade_raider_34594AI(Creature* creature) : ScriptedAI(creature) { }
+
+        uint32 m_timer;
+        uint64 m_playerGUID;
+        uint64 m_kodo2GUID;
+
+        void Reset()
+        {
+            m_timer = 3000;
+            m_playerGUID = NULL;
+        }
+
+        void SetGUID(uint64 guid, int32 id = 0)
+        {
+            switch (id)
+            {
+            case PLAYER_GUID:
+                m_playerGUID = guid;
+                break;
+            case NPC_CROSSROADS_CARAVAN_KODO:
+                m_kodo2GUID = guid;
+                break;
+            default:
+                break;
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (m_timer < diff)
+            {
+                m_timer = 1000;
+                if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                    if (player->GetQuestStatus(QUEST_CROSSROADS_CARAVAN_DELIVERY) == QUEST_STATUS_COMPLETE)
+                        me->DespawnOrUnsummon(1000);
+                if (!me->IsMounted())
+                {
+                    m_timer = 10000;
+                    me->SetSpeed(MOVE_WALK, 3.0f, true);
+                    if (Creature* kodo2 = ObjectAccessor::GetCreature(*me, m_kodo2GUID))
+                        me->GetMotionMaster()->MoveFollow(kodo2, 1, frand(0.0f, 6.28f));
+                }
+            }
+            else
+                m_timer -= diff;
+
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_burning_blade_raider_34594AI(creature);
+    }
+};
+
+/* ################################################# */
+
+
 void AddSC_zone_northern_barrens()
 {
     new npc_gorgal_angerscar_34634();
@@ -1865,4 +2514,10 @@ void AddSC_zone_northern_barrens()
     new npc_captured_razormane_34523();
     new npc_groldom_kodo_34547();
     new npc_fez_34543();
+    new npc_rocco_whipshank_34578();
+    new npc_head_caravan_kodo_34577();
+    new vehicle_hotseat_34582();
+    new spell_mount_caravan_kodo_cue_part2_65669();
+    new vehicle_burning_blade_mount_34593();
+    new npc_burning_blade_raider_34594();
 }
