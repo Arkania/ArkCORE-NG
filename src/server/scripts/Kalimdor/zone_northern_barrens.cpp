@@ -2296,7 +2296,7 @@ public:
             if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
             {
                 player->ExitVehicle();
-                player->KilledMonsterCredit(65892);
+                player->KilledMonsterCredit(53572);
                 player->RemoveAura(65466);
                 player->CompleteQuest(QUEST_CROSSROADS_CARAVAN_DELIVERY);
             }

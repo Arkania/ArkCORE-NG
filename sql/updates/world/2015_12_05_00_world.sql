@@ -76,7 +76,7 @@ delete from creature where id=34593;
 
 UPDATE creature_template SET minlevel=11, maxlevel=12, mindmg=17, maxdmg=22, attackpower=46, baseattacktime=2000, rangeattacktime=2000, minrangedmg=11, maxrangedmg=17 WHERE entry=34594;
 
-UPDATE quest_template SET RequiredNpcOrGo1=65892, RequiredNpcOrGoCount1=1, EndText="", ObjectiveText1="Crossroads Caravan Escorted" WHERE Id=13975;
+UPDATE quest_template SET RequiredNpcOrGo1=53572, RequiredNpcOrGoCount1=1, EndText="", ObjectiveText1="Crossroads Caravan Escorted" WHERE Id=13975;
 UPDATE locales_quest SET EndText_loc3="", ObjectiveText1_loc3="Die Karawane zum Wegekreuz begleitet" WHERE Id=13975;
 
 
