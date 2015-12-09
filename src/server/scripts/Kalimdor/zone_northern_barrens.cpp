@@ -33,9 +33,17 @@ class npc_gorgal_angerscar_34634 : public CreatureScript
 public:
     npc_gorgal_angerscar_34634() : CreatureScript("npc_gorgal_angerscar_34634") { }
 
+    enum eGorgal
+    {
+        QUEST_KING_OF_CENTAUR_MOUNTAIN = 13995,
+        NPC_GORGAL = 34634,
+        NPC_KURAK = 34635,
+        NPC_KOLKAR = 3275,
+    };
+
     bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) 
     { 
-        if (quest->GetQuestId() == 13995)
+        if (quest->GetQuestId() == QUEST_KING_OF_CENTAUR_MOUNTAIN)
         {
             creature->AI()->DoAction(1);
             CAST_AI(npc_gorgal_angerscar_34634AI, creature->GetAI())->m_playerGUID = player->GetGUID();
@@ -65,9 +73,9 @@ public:
 
         void KilledUnit(Unit* victim) 
         {
-            if (victim->GetEntry() == 3275)
+            if (victim->GetEntry() == NPC_KOLKAR)
                 m_phase = 5;
-            else if (victim->GetEntry() == 34635)
+            else if (victim->GetEntry() == NPC_KURAK)
                 m_phase = 7;
         }
 
@@ -120,7 +128,7 @@ public:
                 break;
             case 3:
             {
-                if (Creature* kolkar = me->SummonCreature(3275, -1158.43f, -2954.45f, 93.689f, 2.61691f))
+                if (Creature* kolkar = me->SummonCreature(NPC_KOLKAR, -1158.43f, -2954.45f, 93.689f, 2.61691f))
                 {
                     m_kolkarGUID = kolkar->GetGUID();
                     kolkar->GetMotionMaster()->MoveChase(me);
@@ -141,7 +149,7 @@ public:
             case 5:
             {
                 Talk(2);
-                if (Creature* kolkar = me->SummonCreature(3275, -1158.43f, -2954.45f, 93.689f, 2.61691f))
+                if (Creature* kolkar = me->SummonCreature(NPC_KOLKAR, -1158.43f, -2954.45f, 93.689f, 2.61691f))
                 {
                     m_kolkarGUID = kolkar->GetGUID();
                     kolkar->GetMotionMaster()->MoveChase(me);
@@ -152,7 +160,7 @@ public:
             }               
             case 6:
             {
-                if (Creature* kurak = me->SummonCreature(3275, -1158.43f, -2954.45f, 93.689f, 2.61691f))
+                if (Creature* kurak = me->SummonCreature(NPC_KURAK, -1158.43f, -2954.45f, 93.689f, 2.61691f))
                 {
                     m_kurakGUID = kurak->GetGUID();
                     kurak->GetMotionMaster()->MoveChase(me);
@@ -176,7 +184,7 @@ public:
             {
                 Talk(4);
                 if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
-                    player->KilledMonsterCredit(34635);
+                    player->KilledMonsterCredit(NPC_KURAK);
 
                 m_phase = 9;
                 m_timer = 5000;
