@@ -15860,7 +15860,7 @@ void Player::SendPreparedGossip(WorldObject* source)
 
     if (menuId > 0)
         textId = GetGossipTextId(menuId, source);
-    else if (npcTextId > 0)
+    else if (textId != 0xFFFFFF && npcTextId > 0)
         textId = npcTextId;
 
     PlayerTalkClass->SendGossipMenu(textId, source->GetGUID());

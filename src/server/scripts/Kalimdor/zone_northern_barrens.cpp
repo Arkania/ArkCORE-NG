@@ -39,6 +39,12 @@ public:
         NPC_GORGAL = 34634,
         NPC_KURAK = 34635,
         NPC_KOLKAR = 3275,
+        EVENT_START_ANIM = 1,
+        EVENT_CHECK_KOLKAR,
+        EVENT_CHECK_KURAK,
+        EVENT_TALK_FINISH,
+        EVENT_RESET,
+        SPELL_RAISE_BANNER = 65804,
     };
 
     bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) 
@@ -54,151 +60,150 @@ public:
 
     struct npc_gorgal_angerscar_34634AI : public ScriptedAI
     {
-        npc_gorgal_angerscar_34634AI(Creature* creature) : ScriptedAI(creature) { }
+        npc_gorgal_angerscar_34634AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
 
-        uint32 m_phase;
-        uint32 m_timer;
+        EventMap m_events;
         uint64 m_kolkarGUID;
         uint64 m_kurakGUID;
         uint64 m_playerGUID;
+        uint32 m_killCount;
+        bool m_isAnimStarted;
+
+        void Initialize()
+        {
+            m_isAnimStarted = false;           
+        }
 
         void Reset() override
         {
-            m_phase = 0;
-            m_timer = 0;
-            m_kolkarGUID = NULL;
-            m_kurakGUID = NULL;
-            m_playerGUID = NULL;
-        }
-
-        void KilledUnit(Unit* victim) 
-        {
-            if (victim->GetEntry() == NPC_KOLKAR)
-                m_phase = 5;
-            else if (victim->GetEntry() == NPC_KURAK)
-                m_phase = 7;
+            if (!m_isAnimStarted)
+            {
+                m_events.Reset();
+                m_killCount = 0;
+                m_kolkarGUID = NULL;
+                m_kurakGUID = NULL;
+                m_playerGUID = NULL;
+            }
         }
 
         void MovementInform(uint32 type, uint32 id) 
         { 
             if (type == 2 && id == 7)
             {
-                Talk(1);
-                m_phase = 3;
-                m_timer = 2000;
+                me->CastSpell(me, SPELL_RAISE_BANNER);
+                m_events.ScheduleEvent(EVENT_CHECK_KOLKAR, 1000);
             }
+        }
+
+        void DamageTaken(Unit* attacker, uint32& damage) 
+        { 
+            if (attacker->GetEntry() == NPC_KOLKAR || attacker->GetEntry() == NPC_KURAK)
+                damage = 0;
+        }
+
+        void JustDied(Unit* /*killer*/) 
+        { 
+            m_isAnimStarted = false;
+            me->DespawnOrUnsummon();
         }
 
         void DoAction(int32 param) 
         { 
-            if (param == 1 && m_phase == 0)
+            if (param == 1 && !m_isAnimStarted)
             {
-                m_phase = 1;
-                m_timer = 100;
+                m_isAnimStarted = true;
+                m_events.ScheduleEvent(EVENT_START_ANIM, 100);
+                m_events.ScheduleEvent(EVENT_RESET, 300000);
             }
         }
 
         void UpdateAI(uint32 diff) override
         {
-            if (m_timer < diff)
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
             {
-                m_timer = 1000;
-                if (m_phase) DoWork();
+                switch (eventId)
+                {
+                    case EVENT_START_ANIM:
+                        Talk(0);
+                        me->GetMotionMaster()->MovePath(1389261, false);
+                        break;
+                    case EVENT_RESET:
+                        m_isAnimStarted = false;
+                        me->DespawnOrUnsummon();
+                        break;
+                    case EVENT_CHECK_KOLKAR:
+                    {
+                        Creature* kolkar = ObjectAccessor::GetCreature(*me, m_kolkarGUID);
+                        if (!IsAlive(kolkar))
+                        {
+                            if (m_kolkarGUID)
+                                m_killCount++;
+                            if (m_killCount < 3)
+                            {
+                                if (kolkar = me->SummonCreature(NPC_KOLKAR, -1158.43f, -2954.45f, 93.689f, 2.61691f))
+                                {
+                                    if (m_killCount == 0)
+                                        Talk(1);
+                                    else
+                                        Talk(2);
+                                    m_kolkarGUID = kolkar->GetGUID();
+                                    kolkar->GetMotionMaster()->MoveChase(me);
+                                }
+                            }
+                            else
+                            {
+                                if (Creature* kurak = me->SummonCreature(NPC_KURAK, -1158.43f, -2954.45f, 93.689f, 2.61691f))
+                                {
+                                    Talk(3);
+                                    m_kurakGUID = kurak->GetGUID();
+                                    kurak->GetMotionMaster()->MoveChase(me);
+                                    m_events.ScheduleEvent(EVENT_CHECK_KURAK, 1000);
+                                    break;
+                                }
+                            }
+                        }
+                        m_events.ScheduleEvent(EVENT_CHECK_KOLKAR, 1000);
+                        break;
+                    }
+                    case EVENT_CHECK_KURAK:
+                    {
+                        Creature* kurak = ObjectAccessor::GetCreature(*me, m_kurakGUID);
+                        if (IsAlive(kurak))
+                            m_events.ScheduleEvent(EVENT_CHECK_KURAK, 1000);
+                        else
+                        {
+                            Talk(4);
+                            if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                                player->KilledMonsterCredit(NPC_KURAK);
+                            m_events.ScheduleEvent(EVENT_TALK_FINISH, 5000);
+                        }
+                        break;
+                    }
+                    case EVENT_TALK_FINISH:
+                    {
+                        Talk(6);
+                        me->DespawnOrUnsummon(5000);
+                        m_isAnimStarted = false;
+                        break;
+                    }
+                    default:
+                        break;
+                }
             }
-            else
-                m_timer -= diff;
 
             if (!UpdateVictim())
                 return;
-
-            DoMeleeAttackIfReady();
+            else
+                DoMeleeAttackIfReady();
         }
 
-        void DoWork()
+        bool IsAlive(Creature* npc)
         {
-            switch (m_phase)
-            {
-            case 1:
-                Talk(0);
-                me->GetMotionMaster()->MovePath(1389261, false);
-                m_phase = 2;
-                break;
-            case 2:
-                // do nothing.. waiting on MovementInform
-                break;
-            case 3:
-            {
-                if (Creature* kolkar = me->SummonCreature(NPC_KOLKAR, -1158.43f, -2954.45f, 93.689f, 2.61691f))
-                {
-                    m_kolkarGUID = kolkar->GetGUID();
-                    kolkar->GetMotionMaster()->MoveChase(me);
-                }
-
-                m_phase = 4;
-                break;
-            }
-            case 4:
-            {
-                // do nothing.. waiting on KilledUnit kolkar 
-                Creature* kolkar = ObjectAccessor::GetCreature(*me, m_kolkarGUID);
-                if (kolkar && !kolkar->IsAlive())
-                    m_phase = 5;
-
-                break;
-            }
-            case 5:
-            {
-                Talk(2);
-                if (Creature* kolkar = me->SummonCreature(NPC_KOLKAR, -1158.43f, -2954.45f, 93.689f, 2.61691f))
-                {
-                    m_kolkarGUID = kolkar->GetGUID();
-                    kolkar->GetMotionMaster()->MoveChase(me);
-                }
-                m_phase = 6;
-                m_timer = 3000;
-                break;
-            }               
-            case 6:
-            {
-                if (Creature* kurak = me->SummonCreature(NPC_KURAK, -1158.43f, -2954.45f, 93.689f, 2.61691f))
-                {
-                    m_kurakGUID = kurak->GetGUID();
-                    kurak->GetMotionMaster()->MoveChase(me);
-                }
-
-                Talk(3);
-                m_phase = 7;
-                break;
-            }
-            case 7:
-            {
-                // do nothing.. waiting on KilledUnit kurak    
-                Creature* kurak = ObjectAccessor::GetCreature(*me, m_kurakGUID);
-                Creature* kolkar = ObjectAccessor::GetCreature(*me, m_kolkarGUID);
-                if (kurak && kolkar && !kurak->IsAlive() && !kolkar->IsAlive())
-                    m_phase = 8;
-
-                break;
-            }
-            case 8:
-            {
-                Talk(4);
-                if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
-                    player->KilledMonsterCredit(NPC_KURAK);
-
-                m_phase = 9;
-                m_timer = 5000;
-                break;
-            }
-            case 9:
-                Talk(6);
-                m_phase = 10;
-                m_timer = 5000;
-                break;
-            case 10:
-                me->DespawnOrUnsummon();
-                break;
-            }
+            if (!npc)
+                return false;
+            return npc->IsAlive();
         }
     };
 
