@@ -695,8 +695,373 @@ public:
 		return new npc_princessAI(creature);
 	}
 };
+
 //#########################################  quest ''
 
+// 197  http://www.wowhead.com/quest=54/report-to-goldshire
+class npc_marshal_mcbride : public CreatureScript
+{
+public:
+    npc_marshal_mcbride() : CreatureScript("npc_marshal_mcbride") { }
+
+    enum Marshal
+    {
+        QUEST_REPORT_TO_GOLDSHIRE = 54,
+        SAY_DISMISSED = 0
+    };
+
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    {
+        if (quest->GetQuestId() == QUEST_REPORT_TO_GOLDSHIRE)
+        {
+            creature->AI()->Talk(SAY_DISMISSED, player);
+        }
+        return true;
+    }
+};
+
+// 448
+class npc_hogger : public CreatureScript
+{
+public:
+    npc_hogger() : CreatureScript("npc_hogger") { }
+
+    enum Spells
+    {
+        SPELL_EATING = 87351,
+        SPELL_VICIOUS_SLICE = 87337,
+        SPELL_SUMMON_MINIONS = 87366,
+        SPELL_SIMPLY_TELEPORT = 64446,
+    };
+
+    struct npc_hoggerAI : public ScriptedAI
+    {
+        uint8 phase;
+
+        uint32 m_uiViciousSliceTimer;
+        uint32 m_uiSummonMinions;
+        uint32 m_uiPhaseTimer;
+        uint32 m_uiDespawnTimer;
+
+        uint64 GeneralGUID;
+        uint64 Mage1GUID;
+        uint64 Mage2GUID;
+        uint64 Raga1GUID;
+        uint64 Raga2GUID;
+        uint64 PlayerGUID;
+
+        bool bSay;
+        bool bSay2;
+        bool bSay3;
+        bool Summon;
+        bool bSummoned;
+        bool bSummoned3;
+        bool bGo1;
+        bool bCasted;
+        bool Credit;
+
+        npc_hoggerAI(Creature *c) : ScriptedAI(c) {}
+
+        void Reset()
+        {
+            me->RestoreFaction();
+            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+
+            m_uiViciousSliceTimer = 8000;
+            m_uiSummonMinions = 15000;
+            m_uiPhaseTimer = 0;
+            m_uiDespawnTimer = 500;
+
+            phase = 0;
+            GeneralGUID = 0;
+            Mage1GUID = 0;
+            Mage2GUID = 0;
+            Raga1GUID = 0;
+            Raga2GUID = 0;
+            PlayerGUID = 0;
+
+            Summon = false;
+            bSay = false;
+            bCasted = false;
+            bSay2 = false;
+            bSay3 = false;
+            bSummoned = false;
+            bSummoned3 = false;
+            bGo1 = false;
+            Credit = false;
+        }
+
+        void JustDied(Unit* /*killer*/) override
+        {
+            me->RestoreFaction();
+        }
+
+        void AttackedBy(Unit* pAttacker) override
+        {
+            if (me->GetVictim() || me->IsFriendlyTo(pAttacker))
+                return;
+
+            AttackStart(pAttacker);
+        }
+
+        void MovementInform(uint32 type, uint32 id) override
+        {
+            if (id == 0)
+            {
+                DoCast(me, SPELL_EATING);
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            ScriptedAI::UpdateAI(diff);
+
+            DoMeleeAttackIfReady();
+
+            if (m_uiViciousSliceTimer <= diff)
+            {
+                DoCast(me->GetVictim(), SPELL_VICIOUS_SLICE);
+                m_uiViciousSliceTimer = 10000;
+            }
+            else
+                m_uiViciousSliceTimer -= diff;
+
+            if (HealthBelowPct(50))
+            {
+                if (!bSummoned)
+                {
+                    DoCast(me->GetVictim(), SPELL_SUMMON_MINIONS);
+                    bSummoned = true;
+                }
+                if (!bSay)
+                {
+                    Talk(1);
+                    bSay = true;
+                }
+            }
+
+            if (HealthBelowPct(35))
+            {
+                if (!bSay2)
+                {
+                    Talk(4);
+                    bSay2 = true;
+                }
+                if (!bGo1)
+                {
+                    me->AttackStop();
+                    me->SetReactState(REACT_PASSIVE);
+                    me->GetMotionMaster()->MovePoint(0, -10142.081f, 671.773f, 36.014f);
+                    bGo1 = true;
+                }
+            }
+
+            if (HealthBelowPct(10))
+            {
+                if (!bSummoned3)
+                {
+                    if (!bSay3)
+                    {
+                        Talk(5);
+                        bSay3 = true;
+                    }
+
+                    me->CombatStop(true);
+                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+
+                    Creature* General = me->SummonCreature(46942, -10133.275f, 663.244f, 35.964616f, 2.45f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 180000);
+                    GeneralGUID = General->GetGUID();
+
+                    Creature* Mage1 = me->SummonCreature(46941, -10129.976f, 667.982f, 35.67f, 2.85f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 180000);
+                    Mage1GUID = Mage1->GetGUID();
+
+                    Creature* Mage2 = me->SummonCreature(46940, -10137.671f, 659.926f, 35.971f, 2.051f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 180000);
+                    Mage2GUID = Mage2->GetGUID();
+
+                    Creature* Raga1 = me->SummonCreature(46943, -10133.339f, 660.087f, 35.971f, 2.26f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 180000);
+                    Raga1GUID = Raga1->GetGUID();
+
+                    Creature* Raga2 = me->SummonCreature(42413, -10129.461f, 663.180f, 35.9491f, 2.37f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 180000);
+                    Raga2GUID = Raga2->GetGUID();
+
+                    Summon = true;
+
+                    m_uiPhaseTimer = 1500;
+                    phase = 1;
+                }
+
+                if (Summon)
+                {
+                    Creature* General = Unit::GetCreature(*me, GeneralGUID);
+                    Creature* Raga2 = Unit::GetCreature(*me, Raga2GUID);
+                    Creature* Raga1 = Unit::GetCreature(*me, Raga1GUID);
+                    Creature* Mage2 = Unit::GetCreature(*me, Mage2GUID);
+                    Creature* Mage1 = Unit::GetCreature(*me, Mage1GUID);
+
+                    if (!bCasted)
+                    {
+                        General->CastSpell(General, 64446, true);
+                        Raga2->CastSpell(Raga2, 64446, true);
+                        Raga1->CastSpell(Raga1, 64446, true);
+                        Mage2->CastSpell(Raga2, 64446, true);
+                        Mage1->CastSpell(Raga1, 64446, true);
+                        bCasted = true;
+                    }
+
+                    bSummoned3 = true;
+                    me->SetSpeed(MOVE_RUN, 1.0f);
+                }
+            }
+
+            if (bCasted)
+            {
+                if (m_uiPhaseTimer <= diff)
+                {
+                    Creature* General = Unit::GetCreature(*me, GeneralGUID);
+                    Creature* Raga2 = Unit::GetCreature(*me, Raga2GUID);
+                    Creature* Raga1 = Unit::GetCreature(*me, Raga1GUID);
+                    Creature* Mage2 = Unit::GetCreature(*me, Mage2GUID);
+                    Creature* Mage1 = Unit::GetCreature(*me, Mage1GUID);
+
+                    switch (phase)
+                    {
+                        case 1:
+                            me->GetMotionMaster()->MovePoint(1, -10141.054f, 670.719f, 35.9569f); 
+                            m_uiPhaseTimer = 3000; 
+                            phase = 2; 
+                            break;
+                        case 2: 
+                            General->AI()->Talk(0);
+                            m_uiPhaseTimer = 2500; 
+                            phase = 3; 
+                            break;
+                        case 3: 
+                            Raga1->AI()->Talk(0);
+                            m_uiPhaseTimer = 1500; 
+                            phase = 4; 
+                            break;
+                        case 4: 
+                            Raga2->AI()->Talk(1);
+                            m_uiPhaseTimer = 1500; 
+                            phase = 5; 
+                            break;
+                        case 5:
+                        {
+                            if (Creature* General = Unit::GetCreature(*me, GeneralGUID))
+                            {
+                                General->AI()->Talk(1);
+                                General->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                                General->GetMotionMaster()->MovePoint(0, -10137.162f, 667.919f, 35.937f);
+                                m_uiPhaseTimer = 3000;
+                            }
+                            phase = 6;
+                            break;
+                        }
+                        case 6: 
+                            Talk(2);
+                            m_uiPhaseTimer = 4000; 
+                            phase = 7; 
+                            break; 
+                        case 7:
+                        {
+                            General->HandleEmoteCommand(EMOTE_ONESHOT_POINT);
+                            m_uiPhaseTimer = 4500;
+                            phase = 8;
+                            break;
+                        } 
+                        case 8: 
+                            General->AI()->Talk(2);
+                            m_uiPhaseTimer = 4000; 
+                            phase = 9; 
+                            break;
+                        case 9: 
+                            Talk(3);
+                            m_uiPhaseTimer = 4000; 
+                            phase = 10; 
+                            break;
+                        case 10: 
+                            General->AI()->Talk(3);
+                            m_uiPhaseTimer = 4000; 
+                            phase = 11; 
+                            break;
+                            General->SetOrientation(6.08f);
+                        case 11:
+                        {
+                            General->CastSpell(General, 64446, true);
+                            Raga1->CastSpell(Raga1, 64446, true);
+                            Raga2->CastSpell(Raga2, 64446, true);
+                            Mage1->CastSpell(Mage1, 64446, true);
+                            Mage2->CastSpell(Mage2, 64446, true);
+                            me->CastSpell(me, 64446, true);
+
+                            General->DespawnOrUnsummon(500);
+                            Raga1->DespawnOrUnsummon(500);
+                            Raga2->DespawnOrUnsummon(500);
+                            Mage1->DespawnOrUnsummon(500);
+                            Mage2->DespawnOrUnsummon(500);
+                            me->DespawnOrUnsummon(500);
+
+                            std::list<Player*> players = me->FindNearestPlayers(35.0f);
+
+                            for (std::list<Player*>::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                                (*itr)->KilledMonsterCredit(448, NULL);
+
+                            phase = 0;
+                            break;
+                        }
+                        default: 
+                            break;
+                    }
+                }
+                else m_uiPhaseTimer -= diff;
+            }
+            if (me->GetHealth() <= 1)
+            {
+                if (m_uiDespawnTimer <= diff)
+                {
+                    me->CombatStop(true);
+                    me->AttackStop();
+                    me->ClearAllReactives();
+                    me->DeleteThreatList();
+                    me->SetHealth(me->GetMaxHealth());
+                }
+                else m_uiDespawnTimer -= diff;
+            }
+        }
+
+        void DamageTaken(Unit* done_by, uint32 & damage) override
+        {
+            if (PlayerGUID == 0)
+            {
+                if (Player *pPlayer = done_by->ToPlayer())
+                {
+                    PlayerGUID = pPlayer->GetGUID();
+                }
+            }
+
+            if (me->GetHealth() <= damage)
+            {
+                damage = me->GetHealth() - 1;
+
+                if (Credit == false)
+                {
+                    me->RemoveAllAuras();
+                    me->CombatStop(true);
+                    me->AttackStop();
+                    me->ClearAllReactives();
+                    me->DeleteThreatList();
+
+                }
+                Credit = true;
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* pCreature) const
+    {
+        return new npc_hoggerAI(pCreature);
+    }
+};
 
 //#########################################  quest ''
 
@@ -776,4 +1141,6 @@ void AddSC_elwynn_forest()
 	new npc_woundet_trainee();
 	new npc_porcine_encourage();
 	new npc_princess();
+    new npc_marshal_mcbride();
+    new npc_hogger();
 }

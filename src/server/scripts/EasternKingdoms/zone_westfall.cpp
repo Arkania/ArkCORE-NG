@@ -638,14 +638,15 @@ public:
 	}
 };
 
-class npc_ragamuffin : public CreatureScript
+// 42413
+class npc_ragamuffin_42413 : public CreatureScript
 {
 public:
-	npc_ragamuffin() : CreatureScript("npc_ragamuffin") { }
+    npc_ragamuffin_42413() : CreatureScript("npc_ragamuffin_42413") { }
 
-	struct npc_ragamuffinAI : public ScriptedAI
+    struct npc_ragamuffin_42413AI : public ScriptedAI
 	{
-		npc_ragamuffinAI(Creature *c) : ScriptedAI(c) { }
+        npc_ragamuffin_42413AI(Creature *c) : ScriptedAI(c) { }
 
 		uint32 m_timer;
 		uint32 m_phase;
@@ -683,7 +684,7 @@ public:
 
 	CreatureAI* GetAI(Creature* creature) const
 	{
-		return new npc_ragamuffinAI(creature);
+        return new npc_ragamuffin_42413AI(creature);
 	}
 };
 
@@ -3675,7 +3676,7 @@ void AddSC_westfall()
 	new npc_transient();
 	new npc_homeless_stormwind_citizen_42384();
 	new npc_homeless_stormwind_citizen_42386();
-	new npc_ragamuffin();
+    new npc_ragamuffin_42413();
 	new npc_lues_old_house();
 	new npc_shadowy_figure();
 	new npc_thug();
