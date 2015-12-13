@@ -13,6 +13,7 @@ set(scripts_STAT_SRCS
   Kalimdor/zone_stonetalon_mountains.cpp
   Kalimdor/zone_silithus.cpp
   Kalimdor/zone_moonglade.cpp
+  Kalimdor/zone_hyjal.cpp
   Kalimdor/RazorfenDowns/razorfen_downs.cpp
   Kalimdor/RazorfenDowns/instance_razorfen_downs.cpp
   Kalimdor/RazorfenDowns/boss_tuten_kash.cpp
