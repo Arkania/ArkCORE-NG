@@ -699,10 +699,10 @@ public:
 //#########################################  quest ''
 
 // 197  http://www.wowhead.com/quest=54/report-to-goldshire
-class npc_marshal_mcbride : public CreatureScript
+class npc_marshal_mcbride_197 : public CreatureScript
 {
 public:
-    npc_marshal_mcbride() : CreatureScript("npc_marshal_mcbride") { }
+    npc_marshal_mcbride_197() : CreatureScript("npc_marshal_mcbride_197") { }
 
     enum Marshal
     {
@@ -721,10 +721,10 @@ public:
 };
 
 // 448
-class npc_hogger : public CreatureScript
+class npc_hogger_448 : public CreatureScript
 {
 public:
-    npc_hogger() : CreatureScript("npc_hogger") { }
+    npc_hogger_448() : CreatureScript("npc_hogger_448") { }
 
     enum Spells
     {
@@ -734,7 +734,7 @@ public:
         SPELL_SIMPLY_TELEPORT = 64446,
     };
 
-    struct npc_hoggerAI : public ScriptedAI
+    struct npc_hogger_448AI : public ScriptedAI
     {
         uint8 phase;
 
@@ -760,7 +760,7 @@ public:
         bool bCasted;
         bool Credit;
 
-        npc_hoggerAI(Creature *c) : ScriptedAI(c) {}
+        npc_hogger_448AI(Creature *c) : ScriptedAI(c) {}
 
         void Reset()
         {
@@ -802,6 +802,33 @@ public:
                 return;
 
             AttackStart(pAttacker);
+        }
+
+        void DamageTaken(Unit* done_by, uint32 & damage) override
+        {
+            if (PlayerGUID == 0)
+            {
+                if (Player *pPlayer = done_by->ToPlayer())
+                {
+                    PlayerGUID = pPlayer->GetGUID();
+                }
+            }
+
+            if (me->GetHealth() <= damage)
+            {
+                damage = me->GetHealth() - 1;
+
+                if (Credit == false)
+                {
+                    me->RemoveAllAuras();
+                    me->CombatStop(true);
+                    me->AttackStop();
+                    me->ClearAllReactives();
+                    me->DeleteThreatList();
+
+                }
+                Credit = true;
+            }
         }
 
         void MovementInform(uint32 type, uint32 id) override
@@ -881,7 +908,7 @@ public:
                     Creature* Raga1 = me->SummonCreature(46943, -10133.339f, 660.087f, 35.971f, 2.26f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 180000);
                     Raga1GUID = Raga1->GetGUID();
 
-                    Creature* Raga2 = me->SummonCreature(42413, -10129.461f, 663.180f, 35.9491f, 2.37f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 180000);
+                    Creature* Raga2 = me->SummonCreature(46943, -10129.461f, 663.180f, 35.9491f, 2.37f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 180000);
                     Raga2GUID = Raga2->GetGUID();
 
                     Summon = true;
@@ -1029,37 +1056,11 @@ public:
             }
         }
 
-        void DamageTaken(Unit* done_by, uint32 & damage) override
-        {
-            if (PlayerGUID == 0)
-            {
-                if (Player *pPlayer = done_by->ToPlayer())
-                {
-                    PlayerGUID = pPlayer->GetGUID();
-                }
-            }
-
-            if (me->GetHealth() <= damage)
-            {
-                damage = me->GetHealth() - 1;
-
-                if (Credit == false)
-                {
-                    me->RemoveAllAuras();
-                    me->CombatStop(true);
-                    me->AttackStop();
-                    me->ClearAllReactives();
-                    me->DeleteThreatList();
-
-                }
-                Credit = true;
-            }
-        }
     };
 
     CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new npc_hoggerAI(pCreature);
+        return new npc_hogger_448AI(pCreature);
     }
 };
 
@@ -1141,6 +1142,6 @@ void AddSC_elwynn_forest()
 	new npc_woundet_trainee();
 	new npc_porcine_encourage();
 	new npc_princess();
-    new npc_marshal_mcbride();
-    new npc_hogger();
+    new npc_marshal_mcbride_197();
+    new npc_hogger_448();
 }

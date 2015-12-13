@@ -13,7 +13,7 @@ insert into creature_text values
 (448, 4, 0, "Hogger is eating! Stop him!", 12, 0, 100, 0, 0, 0, "Hogger Script", 46939),
 (448, 5, 0, "No hurt Hogger!", 14, 0, 100, 0, 0, 0, "Hogger Script", 47000);
 
-update creature_template set AIName="", ScriptName="npc_general_jonathan_marcus_46942" where entry=46942;
+update creature_template set AIName="", ScriptName="" where entry=46942;
 delete from creature_text where entry=46942;
 insert into creature_text values
 (46942, 0, 0, "Hold your blade, adventurer!", 14, 0, 100, 0, 0, 0, "", 47004),
@@ -21,12 +21,13 @@ insert into creature_text values
 (46942, 2, 0, "We're taking him into custody in the name of King Varian Wrynn.", 12, 0, 100, 0, 0, 0, "", 47008),
 (46942, 3, 0, "Take us to the Stockades, Andromath.", 12, 0, 100, 0, 0, 0, "", 47009);
 
-update creature_template set AIName="", ScriptName="npc_ragamuffin_46943" where entry=46943;
+update creature_template set AIName="", ScriptName="" where entry=46943;
 delete from creature_text where entry=46943;
 insert into creature_text values
-(46943, 0, 0, "WoW!", 14, 0, 100, 0, 0, 0, "", 47006);
+(46943, 0, 0, "WoW!", 14, 0, 100, 0, 0, 0, "", 47006),
+(46943, 1, 0, "General Jonathan Marcus!", 14, 0, 100, 0, 0, 0, "", 47005);
 
-update creature_template set AIName="", ScriptName="npc_ragamuffin_42413" where entry=42413;
+update creature_template set AIName="", ScriptName="" where entry=42413;
 delete from creature_text where entry=42413 and groupid=1;
 insert into creature_text values
 (42413, 1, 0, "General Jonathan Marcus!", 14, 0, 100, 0, 0, 0, "", 47005);
