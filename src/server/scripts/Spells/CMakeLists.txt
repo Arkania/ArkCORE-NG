@@ -10,6 +10,7 @@
 
 set(scripts_STAT_SRCS
   ${scripts_STAT_SRCS}
+  Spells/spell_guild.cpp
   Spells/spell_shaman.cpp
   Spells/spell_hunter.cpp
   Spells/spell_rogue.cpp
