@@ -31,14 +31,20 @@ public:
 
     struct npc_trainings_dummyAI : public ScriptedAI
     {
-        npc_trainings_dummyAI(Creature *c) : ScriptedAI(c) { }
+        npc_trainings_dummyAI(Creature *c) : ScriptedAI(c) 
+        { 
+            SetCombatMovement(false);
+        }
 	
 		bool	_spell_is_on_work;
 		uint32	_timer;
 
 		void Reset()  
 		{ 			
-			_spell_is_on_work=false; _timer=0;
+			_spell_is_on_work=false; 
+            _timer=0;
+            me->SetReactState(REACT_PASSIVE);
+            me->SetControlled(true, UNIT_STATE_STUNNED);
 		}
 
 		void SpellHit(Unit * Hitter, SpellInfo const* spell) 
@@ -129,16 +135,16 @@ public:
 			}
         }
 
-		 void UpdateAI(uint32 diff) 
-         {
-			if (_spell_is_on_work)
-			{
-				if (_timer <= diff)	
-					_spell_is_on_work=false;
-				else 
-					_timer -= diff;	
-			}
-		 }
+        void UpdateAI(uint32 diff)
+        {
+            if (_spell_is_on_work)
+            {
+                if (_timer <= diff)
+                    _spell_is_on_work = false;
+                else
+                    _timer -= diff;
+            }
+        }
     };
 
 
