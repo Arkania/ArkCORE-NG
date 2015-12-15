@@ -3128,6 +3128,53 @@ public:
     }
 };
 
+// 57220 58077 58078
+class npc_tentacle_of_the_old_ones: public CreatureScript
+{
+public:
+    npc_tentacle_of_the_old_ones() : CreatureScript("npc_tentacle_of_the_old_ones") { }
+
+    struct npc_tentacle_of_the_old_onesAI : CasterAI
+    {
+        npc_tentacle_of_the_old_onesAI(Creature* creature) : CasterAI(creature) {}
+
+        uint32 Mindflays_Timer;
+
+        void InitializeAI() override
+        {
+            CasterAI::InitializeAI();
+            Unit* owner = me->GetOwner();
+            if (!owner)
+                return;
+
+            me->SetReactState(REACT_AGGRESSIVE);
+        }
+
+        void UpdateAI(const uint32 diff) override
+        {
+            if (!UpdateVictim())
+                return;
+
+            if (Mindflays_Timer <= diff)
+            {
+                DoCast(me->GetVictim(), 52586);
+                Mindflays_Timer = 6000;
+            }
+            else Mindflays_Timer -= diff;
+        }
+        void EnterCombat(Unit* /* who */ ) override
+        {
+            DoCast(me->GetVictim(), 52586);
+        }
+
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_tentacle_of_the_old_onesAI(creature);
+    }
+};
+
 void AddSC_npcs_special()
 {
     new npc_air_force_bots();
@@ -3160,4 +3207,5 @@ void AddSC_npcs_special()
     new npc_guardian_of_ancient_kings();
     new npc_bloodworm();
     new npc_dancing_rune_weapon();
+    new npc_tentacle_of_the_old_ones();
 }
