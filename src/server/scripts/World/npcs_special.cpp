@@ -561,7 +561,7 @@ uint32 const HordeSoldierId[3] =
 };
 
 /*######
-## npc_doctor (handles both Gustaf Vanhowzen and Gregory Victor)
+## npc_doctor (handles both Gustaf Vanhowzen 12939 and Gregory Victor 12920)
 ######*/
 class npc_doctor : public CreatureScript
 {
@@ -2365,7 +2365,7 @@ public:
             cron = 10000;
         }
 
-        void InitializeAI ()
+        void InitializeAI() override
         {
             ScriptedAI::InitializeAI();
             Unit * owner = me->GetOwner();
@@ -2383,7 +2383,7 @@ public:
                 DoCast(me, 81781);
         }
 
-        void UpdateAI (uint32 diff)
+        void UpdateAI (uint32 diff) override
         {
             if (cron <= diff)
             {
@@ -2409,7 +2409,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI (Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_power_word_barrierAI(creature);
     }
@@ -2452,14 +2452,14 @@ public:
         uint32 uiDespawnCheckTimer;
         uint32 uiDamageTimer;
 
-        void EnterCombat (Unit* /*target*/)
+        void EnterCombat(Unit* /*target*/) override
         {
             me->GetMotionMaster()->MoveCharge(newx, newy, z, 1.14286f);          // Normal speed
             uiDespawnTimer = 15 * IN_MILLISECONDS;
             CombatCheck = true;
         }
 
-        void Reset ()
+        void Reset() override
         {
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
             me->AddUnitMovementFlag(MOVEMENTFLAG_FLYING);
@@ -2472,7 +2472,7 @@ public:
             me->GetMotionMaster()->MovePoint(0, newx, newy, z);
         }
 
-        void UpdateAI (uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!me->IsInCombat() && CombatCheck == false)
             {
@@ -2535,14 +2535,14 @@ public:
         uint32 uiDespawnCheckTimer;
         uint32 uiDamageTimer;
 
-        void EnterCombat (Unit* /*target*/)
+        void EnterCombat(Unit* /*target*/) override
         {
             me->GetMotionMaster()->MoveCharge(newx, newy, z, 1.14286f);          // Normal speed
             uiDespawnTimer = 15 * IN_MILLISECONDS;
             CombatCheck = true;
         }
 
-        void Reset ()
+        void Reset() override
         {
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
             me->AddUnitMovementFlag(MOVEMENTFLAG_FLYING);
@@ -2555,7 +2555,7 @@ public:
             me->GetMotionMaster()->MovePoint(0, newx, newy, z);
         }
 
-        void UpdateAI (uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!me->IsInCombat() && CombatCheck == false)
             {
@@ -2610,7 +2610,7 @@ public:
             FirstCasts = true;
             Stun = true;
         }
-        void IsSummonedBy(Unit* summoner)
+        void IsSummonedBy(Unit* summoner) override
         {
             if (summoner->HasAura(89604))
             {
@@ -2635,7 +2635,7 @@ public:
         bool Stun;
         uint64 ForebodingTimerStun;
 
-		void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (FirstCasts)
             {
@@ -2672,13 +2672,13 @@ public:
 
         uint64 DoomBoltTimer;
 
-        void EnterCombat (Unit* /*target*/)
+        void EnterCombat(Unit* /*target*/) override
         {
             DoomBoltTimer = 3000;
             me->AttackStop();
         }
 
-		void UpdateAI(uint32 uiDiff)
+        void UpdateAI(uint32 uiDiff) override
         {
             if (!UpdateVictim())
                 return;
@@ -2720,13 +2720,13 @@ public:
         bool Isready;
         uint32 timer;
 
-        void Reset ()
+        void Reset() override
         {
             timer = 3000;          // 3sec
             Isready = false;
         }
 
-        void InitializeAI ()
+        void InitializeAI() override
         {
             ScriptedAI::InitializeAI();
             Unit * owner = me->GetOwner();
@@ -2758,7 +2758,7 @@ public:
             }
         }
 
-        void EnterEvadeMode ()
+        void EnterEvadeMode() override
         {
             return;
         }
@@ -2774,7 +2774,7 @@ public:
             }
         }
 
-        void UpdateAI (uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (timer <= diff)
             {
@@ -2820,7 +2820,7 @@ public:
 
         uint64 targetGuid;
 
-        void Reset ()
+        void Reset() override
         {
             Unit* owner = me->GetOwner();
             if (!owner)
@@ -2839,7 +2839,7 @@ public:
             }
         }
 
-        void MoveInLineOfSight (Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (who->GetGUID() == targetGuid && me->GetDistance(who) <= 1.0f)
             {
@@ -2849,7 +2849,7 @@ public:
             }
         }
 
-		void UpdateAI(uint32 /*diff*/)
+        void UpdateAI(uint32 /*diff*/) override
         {
             if (!UpdateVictim())
             {
@@ -2960,7 +2960,7 @@ public:
             }
         }
 
-        void Reset()
+        void Reset() override
         {
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
             
@@ -2988,7 +2988,7 @@ public:
              }
         }
 
-        void UpdateAI(uint32 /*diff*/)
+        void UpdateAI(uint32 /*diff*/) override
         {
             if (!UpdateVictim())
                 return;
@@ -3023,7 +3023,7 @@ public:
         bool alive;
         uint32 uiDespawnTimer;
 
-        void Reset()
+        void Reset() override
         {
             me->SetReactState(REACT_AGGRESSIVE);
             // Start attacking attacker of owner on first ai update after spawn - move in line of sight may choose better target
@@ -3034,7 +3034,7 @@ public:
         }
 
         //Redefined for random target selection:
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (!me->GetVictim() && me->CanCreatureAttack(who))
             {
@@ -3048,7 +3048,7 @@ public:
             }
         }
 
-        void UpdateAI (uint32 diff)
+        void UpdateAI (uint32 diff) override
         {
             if (uiDespawnTimer <= diff)
             {
@@ -3088,7 +3088,7 @@ public:
             me->AddAura(81256,me->GetOwner());
         }
 
-        void Reset()
+        void Reset() override
         {
             me->SetReactState(REACT_AGGRESSIVE);
             // Start attacking attacker of owner on first ai update after spawn - move in line of sight may choose better target
@@ -3099,7 +3099,7 @@ public:
         }
 
         //Redefined for random target selection:
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (!me->GetVictim() && me->CanCreatureAttack(who))
             {
@@ -3113,7 +3113,7 @@ public:
             }
         }
 
-		void UpdateAI(uint32 /*diff*/)
+		void UpdateAI(uint32 /*diff*/) override
         {
             if (!UpdateVictim())
                 return;
@@ -3150,7 +3150,7 @@ public:
             me->SetReactState(REACT_AGGRESSIVE);
         }
 
-        void UpdateAI(const uint32 diff) override
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -3172,6 +3172,159 @@ public:
     CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_tentacle_of_the_old_onesAI(creature);
+    }
+};
+
+// 27717, 30066, 30337
+class npc_generic_harpoon_cannon : public CreatureScript
+{
+public:
+    npc_generic_harpoon_cannon() : CreatureScript("npc_generic_harpoon_cannon") { }
+
+    struct npc_generic_harpoon_cannonAI : public ScriptedAI
+    {
+        npc_generic_harpoon_cannonAI(Creature* creature) : ScriptedAI(creature) {}
+
+        void Reset() override
+        {
+            me->SetUnitMovementFlags(MOVEMENTFLAG_ROOT);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_generic_harpoon_cannonAI(creature);
+    }
+};
+
+// 47649
+class npc_mushroom : public CreatureScript
+{
+public:
+    npc_mushroom() : CreatureScript("npc_mushroom"){ }
+
+    struct npc_mushroomAI : public PassiveAI
+    {
+        uint32 invisTimer;
+
+        npc_mushroomAI(Creature* creature) : PassiveAI(creature)
+        {
+            invisTimer = 6000;
+        }
+
+        void Reset() override
+        {
+            Unit* owner = me->GetOwner();
+            if (!owner)
+                return;
+
+            me->SetLevel(owner->getLevel());
+            me->SetMaxHealth(5);
+            me->setFaction(owner->getFaction());
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (invisTimer > 0)
+            {
+                if (invisTimer > diff)
+                    invisTimer -= diff;
+                else
+                {
+                    invisTimer = 0;
+                    DoCast(me, 92661);
+                }
+                return;
+            }
+            PassiveAI::UpdateAI(diff);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_mushroomAI(creature);
+    }
+};
+
+// 53491
+class npc_t12_fiery_imp : public CreatureScript
+{
+public:
+    npc_t12_fiery_imp() : CreatureScript("npc_t12_fiery_imp") { }
+
+    struct npc_t12_fiery_impAI : CasterAI
+    {
+        npc_t12_fiery_impAI(Creature* creature) : CasterAI(creature) {}
+        uint32 checkTimer;
+        float followdist;
+
+        void InitializeAI() override
+        {
+            CasterAI::InitializeAI();
+            Unit* owner = me->GetOwner();
+            if (!owner)
+                return;
+            followdist = PET_FOLLOW_DIST * 2;
+            owner = me->ToTempSummon()->GetSummoner();
+            checkTimer = 250;
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (checkTimer <= diff)
+            {
+                if (!me->GetOwner() || !me->GetOwner()->ToPlayer())
+                    return;
+                Player* owner = me->GetOwner()->ToPlayer();
+                //actions by the fiery imp
+                if (owner->IsInCombat()){
+                    if (Unit* target = owner->GetSelectedUnit())
+                    {
+
+                        if (me->HasUnitState(UNIT_STATE_CASTING))
+                        { //does not interrupt himself while casting
+                            checkTimer = 200;
+                        }
+                        else
+                        {
+                            // flame blast spam on target
+                            me->CastSpell(target, 99226);
+                            checkTimer = 2500;
+                        }
+                    }
+                }
+                else
+                { //if out of combat will simply follow the caster
+                    me->GetMotionMaster()->Clear(false);
+                    me->GetMotionMaster()->MoveFollow(owner, followdist, me->GetFollowAngle(), MOTION_SLOT_ACTIVE);
+                    checkTimer = 200;
+                }
+            }
+            else
+                checkTimer -= diff;
+
+        }
+
+        // Do not reload Creature templates on evade mode enter - prevent visual lost
+        void EnterEvadeMode() override
+        {
+            if (me->IsInEvadeMode() || !me->IsAlive())
+                return;
+
+            Unit* owner = me->GetCharmerOrOwner();
+
+            me->CombatStop(true);
+            if (owner && !me->HasUnitState(UNIT_STATE_FOLLOW))
+            {
+                me->GetMotionMaster()->Clear(false);
+                me->GetMotionMaster()->MoveFollow(owner, followdist, me->GetFollowAngle(), MOTION_SLOT_ACTIVE);
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_t12_fiery_impAI(creature);
     }
 };
 
@@ -3208,4 +3361,8 @@ void AddSC_npcs_special()
     new npc_bloodworm();
     new npc_dancing_rune_weapon();
     new npc_tentacle_of_the_old_ones();
+    new npc_generic_harpoon_cannon();
+    new npc_mushroom();
+    new npc_t12_fiery_imp();
+
 }
