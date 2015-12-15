@@ -394,6 +394,7 @@ class SpellScript : public _SpellScript
         void PreventHitDamage() { SetHitDamage(0); }
         // setter/getter for for heal done by spell to target of spell hit
         // returns healing calculated before hit, and real dmg done after hit
+        void SetBasepoints(int32 basepoints);
         int32 GetHitHeal();
         void SetHitHeal(int32 heal);
         void PreventHitHeal() { SetHitHeal(0); }

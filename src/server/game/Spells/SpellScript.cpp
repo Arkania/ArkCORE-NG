@@ -511,6 +511,16 @@ void SpellScript::SetHitDamage(int32 damage)
     m_spell->m_damage = damage;
 }
 
+void SpellScript::SetBasepoints(int32 basepoints)
+{
+    if (!IsInEffectHook())
+    {
+        TC_LOG_ERROR("scripts", "Script: `%s` Spell: `%u`: function SpellScript::SetBasepoints was called, but function has no effect in current hook!", m_scriptName->c_str(), m_scriptSpellId);
+        return;
+    }
+
+    m_spell->damage = basepoints;
+}
 int32 SpellScript::GetHitHeal()
 {
     if (!IsInTargetHook())
