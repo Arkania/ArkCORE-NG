@@ -47,7 +47,7 @@ public:
             me->SetControlled(true, UNIT_STATE_STUNNED);
 		}
 
-        void DamageTaken(Unit* /*attacker*/, uint32& damage) override
+        void DamageTaken(Unit* attacker, uint32& damage) override
         { 
             damage = 0;
         }
