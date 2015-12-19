@@ -3719,6 +3719,37 @@ class spell_gen_eject_all_passengers : public SpellScriptLoader
         }
 };
 
+class spell_gen_flap : public SpellScriptLoader
+{
+public:
+    spell_gen_flap() : SpellScriptLoader("spell_gen_flap") { }
+
+    class spell_gen_flap_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_gen_flap_SpellScript)
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return true;
+        }
+
+        void HandleDummy()
+        {
+            Unit* caster = GetCaster();
+            caster->CastSpell(caster, 96441);
+        }
+
+        void Register() override
+        {
+            OnCast += SpellCastFn(spell_gen_flap_SpellScript::HandleDummy);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_gen_flap_SpellScript();
+    }
+};
 void AddSC_generic_spell_scripts()
 {
     new spell_gen_absorb0_hitlimit1();
@@ -3804,4 +3835,5 @@ void AddSC_generic_spell_scripts()
     new spell_gen_wg_water();
     new spell_gen_whisper_gulch_yogg_saron_whisper();
     new spell_gen_eject_all_passengers();
+    new spell_gen_flap();
 }
