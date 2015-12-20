@@ -2501,6 +2501,51 @@ public:
 
 /* ################################################# */
 
+// 5482 AreaTrigger - quest 14066
+class at_caravan_scene_5482 : public AreaTriggerScript
+{
+public:
+    at_caravan_scene_5482() : AreaTriggerScript("at_caravan_scene_5482") { }
+
+    enum eQuest
+    {
+        QUEST_INVESTIGATE_THE_WRECKAGE = 14066,
+        NPC_QUESTGIVER = 3464,
+    };
+
+    bool OnTrigger(Player* player, const AreaTriggerEntry* at) override
+    {
+        if ((player->GetQuestStatus(QUEST_INVESTIGATE_THE_WRECKAGE) == QUEST_STATUS_INCOMPLETE))
+        {
+            player->KilledMonsterCredit(NPC_QUESTGIVER);
+        }
+
+        return false;
+    }
+};
+
+// 5483 AreaTrigger - quest 869
+class at_follow_the_tracks_5483 : public AreaTriggerScript
+{
+public:
+    at_follow_the_tracks_5483() : AreaTriggerScript("at_follow_the_tracks_5483") { }
+
+    enum eQuest
+    {
+        QUEST_TO_TRACK_A_THIEF = 869,
+        NPC_QUESTGIVER = 3464,
+    };
+
+    bool OnTrigger(Player* player, const AreaTriggerEntry* at) override
+    {
+        if ((player->GetQuestStatus(QUEST_TO_TRACK_A_THIEF) == QUEST_STATUS_INCOMPLETE))
+        {
+            player->KilledMonsterCredit(NPC_QUESTGIVER);
+        }
+
+        return false;
+    }
+};
 
 void AddSC_zone_northern_barrens()
 {
@@ -2533,4 +2578,7 @@ void AddSC_zone_northern_barrens()
     new spell_mount_caravan_kodo_cue_part2_65669();
     new vehicle_burning_blade_mount_34593();
     new npc_burning_blade_raider_34594();
+    new at_caravan_scene_5482();
+    new at_follow_the_tracks_5483();
+
 }
