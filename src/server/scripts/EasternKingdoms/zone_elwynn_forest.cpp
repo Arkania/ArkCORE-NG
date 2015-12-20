@@ -126,12 +126,12 @@ public:
 		uint32 _coolDown;
 		float  _angle;
 
-        void Reset() override
+        void InitializeAI() override
         {
             me->GetMotionMaster()->MovePath(951, true);
-			_coolDown = 0;
-			_phase = 0;
-			_angle = 0;
+            _coolDown = 0;
+            _phase = 0;
+            _angle = 0;
         }
 
         void CastHeal(Creature* infantry)
@@ -218,6 +218,7 @@ public:
 
 							m_SayPaxtonCooldownTimer = 10000;
 						}
+                        uiDamage = 0;
 					}
                     else
                         uiDamage = 0;
