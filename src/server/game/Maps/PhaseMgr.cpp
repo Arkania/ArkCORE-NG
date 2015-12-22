@@ -265,7 +265,7 @@ void PhaseMgr::RegisterPhasingAuraEffect(AuraEffect const* auraEffect)
             _UpdateFlags |= PHASE_UPDATE_FLAG_CLIENTSIDE_CHANGED;
             phaseInfo.terrainswapmap = itr->second.terrainswapmap;
         }
-        if (itr->second.terrainswapmap)
+        if (itr->second.worldmapareaswap)
         {
             _UpdateFlags |= PHASE_UPDATE_FLAG_CLIENTSIDE_CHANGED;
             phaseInfo.worldMapAreaSwap = itr->second.worldmapareaswap;
@@ -401,7 +401,7 @@ void PhaseData::SendPhaseshiftToPlayer()
             terrainswaps.insert((itr)->terrainswapmap);
 
         if ((itr)->worldMapAreaSwap)
-            terrainswaps.insert((itr)->worldMapAreaSwap);
+            worldAreaSwaps.insert((itr)->worldMapAreaSwap);
     }
 
     player->GetSession()->SendSetPhaseShift(phaseIds, terrainswaps, worldAreaSwaps);
