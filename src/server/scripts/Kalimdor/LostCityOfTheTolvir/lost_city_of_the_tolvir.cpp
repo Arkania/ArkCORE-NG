@@ -266,7 +266,7 @@ public:
             {
                 if ((*itr).uiPersonalTimer <= diff)
                 {
-                    if (Player* player = Unit::GetPlayer(*me, (*itr).uiPlayerGUID))
+					if (Player* player = ObjectAccessor::GetPlayer(*me, (*itr).uiPlayerGUID))
                         if (Creature* Landing = me->FindNearestCreature(48097, 100.0f))
                         {
                             player->ExitVehicle();

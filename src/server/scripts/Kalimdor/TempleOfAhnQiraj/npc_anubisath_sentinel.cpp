@@ -133,7 +133,7 @@ public:
         void SendMyListToBuddies()
         {
             for (int i=0; i<3; ++i)
-                if (Creature* pNearby = Unit::GetCreature(*me, NearbyGUID[i]))
+				if (Creature* pNearby = ObjectAccessor::GetCreature(*me, NearbyGUID[i]))
                     GiveBuddyMyList(pNearby);
         }
 
@@ -141,7 +141,7 @@ public:
         {
             for (int i=0; i<3; ++i)
             {
-                Creature* c = Unit::GetCreature(*me, NearbyGUID[i]);
+				Creature* c = ObjectAccessor::GetCreature(*me, NearbyGUID[i]);
                 if (c)
                 {
                     if (!c->IsInCombat())
@@ -196,7 +196,7 @@ public:
                 if (!NearbyGUID[bli])
                     break;
 
-                Creature* pNearby = Unit::GetCreature(*me, NearbyGUID[bli]);
+				Creature* pNearby = ObjectAccessor::GetCreature(*me, NearbyGUID[bli]);
                 if (!pNearby)
                     break;
 
@@ -222,7 +222,7 @@ public:
                 {
                     if (!NearbyGUID[i])
                         continue;
-                    if (Creature* pNearby = Unit::GetCreature(*me, NearbyGUID[i]))
+					if (Creature* pNearby = ObjectAccessor::GetCreature(*me, NearbyGUID[i]))
                     {
                         if (pNearby->IsDead())
                             pNearby->Respawn();
@@ -251,7 +251,7 @@ public:
         {
             for (int ni=0; ni<3; ++ni)
             {
-                Creature* sent = Unit::GetCreature(*me, NearbyGUID[ni]);
+				Creature* sent = ObjectAccessor::GetCreature(*me, NearbyGUID[ni]);
                 if (!sent)
                     continue;
                 if (sent->IsDead())

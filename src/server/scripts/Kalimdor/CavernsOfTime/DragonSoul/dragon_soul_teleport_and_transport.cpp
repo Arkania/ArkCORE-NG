@@ -227,7 +227,7 @@ public:
         void JustSummoned(Creature* summon) override
         {
             if (summon->GetEntry() == NPC_HALO_JUMP_PARACHUTE)
-                if (Player* player = Unit::GetPlayer(*me, m_playerGuid))
+				if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGuid))
                 {
                     m_vehicleGuid = summon->GetGUID();
                     summon->SetDisplayId(11686);

@@ -420,7 +420,7 @@ public:
             summoned->AddAura(SPELL_SHOCKWAVE_STALKER_VISUAL, summoned);
 
             if (instance)
-                if (Creature* husam = Unit::GetCreature(*me, instance->GetData64(DATA_GENERAL_HUSAM)))
+				if (Creature* husam = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_GENERAL_HUSAM)))
                     husam->AI()->JustSummoned(summoned);
 
             if (uint64 uiGUID = summoned->GetGUID())
@@ -439,7 +439,7 @@ public:
                     return;
 
                 for (std::list<uint64>::const_iterator itr = lSummonedGUID.begin(); itr != lSummonedGUID.end(); ++itr)
-                    if (Creature* shockwave = Unit::GetCreature(*me, (*itr)))
+					if (Creature* shockwave = ObjectAccessor::GetCreature(*me, (*itr)))
                     {
                         shockwave->CastSpell(shockwave, SPELL_SHOCKWAVE_DAMAGE, true);
                         shockwave->RemoveAllAuras();

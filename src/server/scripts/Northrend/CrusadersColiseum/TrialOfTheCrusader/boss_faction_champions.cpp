@@ -480,7 +480,7 @@ class boss_toc_champion_controller : public CreatureScript
                     case 1:
                         for (std::list<uint64>::iterator i = _summons.begin(); i != _summons.end(); ++i)
                         {
-                            if (Creature* temp = Unit::GetCreature(*me, *i))
+                            if (Creature* temp = ObjectAccessor::GetCreature(*me, *i))
                             {
                                 temp->SetReactState(REACT_AGGRESSIVE);
                                 temp->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC);
@@ -560,7 +560,7 @@ struct boss_faction_championsAI : public BossAI
 
     void JustReachedHome() override
     {
-        if (Creature* pChampionController = Unit::GetCreature((*me), instance->GetData64(NPC_CHAMPIONS_CONTROLLER)))
+        if (Creature* pChampionController = ObjectAccessor::GetCreature((*me), instance->GetData64(NPC_CHAMPIONS_CONTROLLER)))
             pChampionController->AI()->SetData(2, FAIL);
         me->DespawnOrUnsummon();
     }
@@ -578,7 +578,7 @@ struct boss_faction_championsAI : public BossAI
         std::list<HostileReference*> const& tList = me->getThreatManager().getThreatList();
         for (std::list<HostileReference*>::const_iterator itr = tList.begin(); itr != tList.end(); ++itr)
         {
-            Unit* unit = Unit::GetUnit(*me, (*itr)->getUnitGuid());
+            Unit* unit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid());
             if (unit && me->getThreatManager().getThreat(unit))
             {
                 if (unit->GetTypeId() == TYPEID_PLAYER)
@@ -610,7 +610,7 @@ struct boss_faction_championsAI : public BossAI
     void JustDied(Unit* /*killer*/) override
     {
         if (_aiType != AI_PET)
-            if (Creature* pChampionController = Unit::GetCreature((*me), instance->GetData64(NPC_CHAMPIONS_CONTROLLER)))
+            if (Creature* pChampionController = ObjectAccessor::GetCreature((*me), instance->GetData64(NPC_CHAMPIONS_CONTROLLER)))
                 pChampionController->AI()->SetData(2, DONE);
     }
 
@@ -618,7 +618,7 @@ struct boss_faction_championsAI : public BossAI
     {
         DoCast(me, SPELL_ANTI_AOE, true);
         _EnterCombat();
-        if (Creature* pChampionController = Unit::GetCreature((*me), instance->GetData64(NPC_CHAMPIONS_CONTROLLER)))
+        if (Creature* pChampionController = ObjectAccessor::GetCreature((*me), instance->GetData64(NPC_CHAMPIONS_CONTROLLER)))
             pChampionController->AI()->SetData(2, IN_PROGRESS);
     }
 
@@ -635,11 +635,11 @@ struct boss_faction_championsAI : public BossAI
 
             if (TeamInInstance == ALLIANCE)
             {
-                if (Creature* temp = Unit::GetCreature(*me, instance->GetData64(NPC_VARIAN)))
+                if (Creature* temp = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_VARIAN)))
                     temp->AI()->Talk(SAY_KILL_PLAYER);
             }
             else
-                if (Creature* temp = Unit::GetCreature(*me, instance->GetData64(NPC_GARROSH)))
+                if (Creature* temp = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_GARROSH)))
                     temp->AI()->Talk(SAY_KILL_PLAYER);
 
 
@@ -664,7 +664,7 @@ struct boss_faction_championsAI : public BossAI
         Unit* target;
         for (iter = tList.begin(); iter!=tList.end(); ++iter)
         {
-            target = Unit::GetUnit(*me, (*iter)->getUnitGuid());
+            target = ObjectAccessor::GetUnit(*me, (*iter)->getUnitGuid());
             if (target && target->getPowerType() == POWER_MANA)
                 return target;
         }
@@ -679,7 +679,7 @@ struct boss_faction_championsAI : public BossAI
         Unit* target;
         for (iter = tList.begin(); iter != tList.end(); ++iter)
         {
-            target = Unit::GetUnit(*me, (*iter)->getUnitGuid());
+            target = ObjectAccessor::GetUnit(*me, (*iter)->getUnitGuid());
                 if (target && me->GetDistance2d(target) < distance)
                     ++count;
         }

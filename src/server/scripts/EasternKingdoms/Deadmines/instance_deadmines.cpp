@@ -438,7 +438,7 @@ public:
                 return;
 
             for (std::list<uint64>::const_iterator itr = m_CreatureList.begin(); itr != m_CreatureList.end(); ++itr)
-                if (Creature* npc = (Unit::GetCreature(*door, *itr)))
+				if (Creature* npc = (ObjectAccessor::GetCreature(*door, *itr)))
                 {
                     SetMobToLevel(npc, RAND(m_TeamMinLevel, m_TeamMaxLevel));
                 }

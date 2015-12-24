@@ -163,7 +163,7 @@ public:
 
             for (uint8 i = 0; i < MAX_ACTIVE_LACKEY; ++i)
             {
-                if (Unit* pAdd = Unit::GetUnit(*me, m_auiLackeyGUID[i]))
+                if (Unit* pAdd = ObjectAccessor::GetUnit(*me, m_auiLackeyGUID[i]))
                 {
                     if (!pAdd->GetVictim())
                     {
@@ -211,7 +211,7 @@ public:
             {
                 for (std::vector<uint32>::const_iterator itr = LackeyEntryList.begin(); itr != LackeyEntryList.end(); ++itr)
                 {
-                    Unit* pAdd = Unit::GetUnit(*me, m_auiLackeyGUID[j]);
+                    Unit* pAdd = ObjectAccessor::GetUnit(*me, m_auiLackeyGUID[j]);
 
                     //object already removed, not exist
                     if (!pAdd)
@@ -272,7 +272,7 @@ public:
                 Unit* target = me;
                 for (uint8 i = 0; i < MAX_ACTIVE_LACKEY; ++i)
                 {
-                    if (Unit* pAdd = Unit::GetUnit(*me, m_auiLackeyGUID[i]))
+                    if (Unit* pAdd = ObjectAccessor::GetUnit(*me, m_auiLackeyGUID[i]))
                     {
                         if (pAdd->IsAlive() && pAdd->GetHealth() < health)
                             target = pAdd;
@@ -288,7 +288,7 @@ public:
                 Unit* target = me;
 
                 if (urand(0, 1))
-                    if (Unit* pAdd = Unit::GetUnit(*me, m_auiLackeyGUID[rand()%MAX_ACTIVE_LACKEY]))
+                    if (Unit* pAdd = ObjectAccessor::GetUnit(*me, m_auiLackeyGUID[rand()%MAX_ACTIVE_LACKEY]))
                         if (pAdd->IsAlive())
                             target = pAdd;
 
@@ -301,7 +301,7 @@ public:
                 Unit* target = me;
 
                 if (urand(0, 1))
-                    if (Unit* pAdd = Unit::GetUnit(*me, m_auiLackeyGUID[rand()%MAX_ACTIVE_LACKEY]))
+                    if (Unit* pAdd = ObjectAccessor::GetUnit(*me, m_auiLackeyGUID[rand()%MAX_ACTIVE_LACKEY]))
                         if (pAdd->IsAlive() && !pAdd->HasAura(SPELL_SHIELD))
                             target = pAdd;
 
@@ -320,7 +320,7 @@ public:
                     if (urand(0, 1))
                         target = me;
                     else
-                        if (Unit* pAdd = Unit::GetUnit(*me, m_auiLackeyGUID[rand()%MAX_ACTIVE_LACKEY]))
+                        if (Unit* pAdd = ObjectAccessor::GetUnit(*me, m_auiLackeyGUID[rand()%MAX_ACTIVE_LACKEY]))
                             if (pAdd->IsAlive())
                                 target = pAdd;
                 }
@@ -391,7 +391,7 @@ struct boss_priestess_lackey_commonAI : public ScriptedAI
 
         for (uint8 i = 0; i < MAX_ACTIVE_LACKEY; ++i)
         {
-            if (Unit* pAdd = Unit::GetUnit(*me, m_auiLackeyGUIDs[i]))
+            if (Unit* pAdd = ObjectAccessor::GetUnit(*me, m_auiLackeyGUIDs[i]))
             {
                 if (!pAdd->GetVictim() && pAdd != me)
                 {
@@ -401,7 +401,7 @@ struct boss_priestess_lackey_commonAI : public ScriptedAI
             }
         }
 
-        if (Creature* pDelrissa = Unit::GetCreature(*me, instance->GetData64(DATA_DELRISSA)))
+        if (Creature* pDelrissa = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_DELRISSA)))
         {
             if (pDelrissa->IsAlive() && !pDelrissa->GetVictim())
             {
@@ -413,7 +413,7 @@ struct boss_priestess_lackey_commonAI : public ScriptedAI
 
     void JustDied(Unit* /*killer*/) override
     {
-        Creature* pDelrissa = Unit::GetCreature(*me, instance->GetData64(DATA_DELRISSA));
+        Creature* pDelrissa = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_DELRISSA));
         uint32 uiLackeyDeathCount = instance->GetData(DATA_DELRISSA_DEATH_COUNT);
 
         if (!pDelrissa)
@@ -442,13 +442,13 @@ struct boss_priestess_lackey_commonAI : public ScriptedAI
 
     void KilledUnit(Unit* victim) override
     {
-        if (Creature* Delrissa = Unit::GetCreature(*me, instance->GetData64(DATA_DELRISSA)))
+        if (Creature* Delrissa = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_DELRISSA)))
             Delrissa->AI()->KilledUnit(victim);
     }
 
     void AcquireGUIDs()
     {
-        if (Creature* Delrissa = (Unit::GetCreature(*me, instance->GetData64(DATA_DELRISSA))))
+        if (Creature* Delrissa = (ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_DELRISSA))))
         {
             for (uint8 i = 0; i < MAX_ACTIVE_LACKEY; ++i)
                 m_auiLackeyGUIDs[i] = CAST_AI(boss_priestess_delrissa::boss_priestess_delrissaAI, Delrissa->AI())->m_auiLackeyGUID[i];
@@ -833,7 +833,7 @@ public:
                 ThreatContainer::StorageType const &t_list = me->getThreatManager().getThreatList();
                 for (ThreatContainer::StorageType::const_iterator itr = t_list.begin(); itr!= t_list.end(); ++itr)
                 {
-                    if (Unit* target = Unit::GetUnit(*me, (*itr)->getUnitGuid()))
+                    if (Unit* target = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
                     {
                         //if in melee range
                         if (target->IsWithinDistInMap(me, 5))
@@ -919,7 +919,7 @@ public:
                 ThreatContainer::StorageType const &t_list = me->getThreatManager().getThreatList();
                 for (ThreatContainer::StorageType::const_iterator itr = t_list.begin(); itr!= t_list.end(); ++itr)
                 {
-                    if (Unit* target = Unit::GetUnit(*me, (*itr)->getUnitGuid()))
+                    if (Unit* target = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
                     {
                         //if in melee range
                         if (target->IsWithinDistInMap(me, ATTACK_DISTANCE))
@@ -1023,7 +1023,7 @@ public:
             Wing_Clip_Timer = 4000;
             Freezing_Trap_Timer = 15000;
 
-            Unit* pPet = Unit::GetUnit(*me, m_uiPetGUID);
+            Unit* pPet = ObjectAccessor::GetUnit(*me, m_uiPetGUID);
             if (!pPet)
                 me->SummonCreature(NPC_SLIVER, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_CORPSE_DESPAWN, 0);
 
@@ -1172,7 +1172,7 @@ public:
                 // uint64 guid = (*itr)->guid;
                 // if (guid)
                 // {
-                //   Unit* pAdd = Unit::GetUnit(*me, (*itr)->guid);
+                //   Unit* pAdd = ObjectAccessor::GetUnit(*me, (*itr)->guid);
                 //   if (pAdd && pAdd->IsAlive())
                 //   {
                 DoCast(me, SPELL_LESSER_HEALING_WAVE);
@@ -1257,7 +1257,7 @@ public:
             {
                 for (uint8 i = 0; i < MAX_ACTIVE_LACKEY; ++i)
                 {
-                    if (Unit* pAdd = Unit::GetUnit(*me, m_auiLackeyGUIDs[i]))
+                    if (Unit* pAdd = ObjectAccessor::GetUnit(*me, m_auiLackeyGUIDs[i]))
                     {
                         if (pAdd->IsPolymorphed())
                         {

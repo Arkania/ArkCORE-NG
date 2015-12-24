@@ -108,8 +108,8 @@ public:
             //for (uint8 i = 0; i < CRYSTALS_NUMBER; ++i)
             for (std::list<uint64>::const_iterator itr = Crystals.begin(); itr != Crystals.end(); ++itr)
             {
-                //Unit* unit = Unit::GetUnit(*me, FelCrystals[i]);
-                if (Creature* creature = Unit::GetCreature(*me, *itr))
+                //Unit* unit = ObjectAccessor::GetUnit(*me, FelCrystals[i]);
+                if (Creature* creature = ObjectAccessor::GetCreature(*me, *itr))
                 {
                     if (!creature->IsAlive())
                         creature->Respawn();      // Let the core handle setting death state, etc.
@@ -149,8 +149,8 @@ public:
             for (std::list<uint64>::const_iterator itr = Crystals.begin(); itr != Crystals.end(); ++itr)
             {
                 pCrystal = NULL;
-                //pCrystal = Unit::GetUnit(*me, FelCrystals[i]);
-                pCrystal = Unit::GetUnit(*me, *itr);
+                //pCrystal = ObjectAccessor::GetUnit(*me, FelCrystals[i]);
+                pCrystal = ObjectAccessor::GetUnit(*me, *itr);
                 if (pCrystal && pCrystal->IsAlive())
                 {
                     // select nearest
@@ -185,8 +185,8 @@ public:
             //for (uint8 i = 0; i < CRYSTALS_NUMBER; ++i)
             for (std::list<uint64>::const_iterator itr = Crystals.begin(); itr != Crystals.end(); ++itr)
             {
-                //Creature* pCrystal = (Unit::GetCreature(*me, FelCrystals[i]));
-                Creature* pCrystal = Unit::GetCreature(*me, *itr);
+                //Creature* pCrystal = (ObjectAccessor::GetCreature(*me, FelCrystals[i]));
+                Creature* pCrystal = ObjectAccessor::GetCreature(*me, *itr);
                 if (pCrystal && pCrystal->IsAlive())
                     pCrystal->Kill(pCrystal);
             }
@@ -207,7 +207,7 @@ public:
         {
             if (type == POINT_MOTION_TYPE && id == 1)
             {
-                Unit* CrystalChosen = Unit::GetUnit(*me, CrystalGUID);
+                Unit* CrystalChosen = ObjectAccessor::GetUnit(*me, CrystalGUID);
                 if (CrystalChosen && CrystalChosen->IsAlive())
                 {
                     // Make the crystal attackable
@@ -293,7 +293,7 @@ public:
 
                         Talk(SAY_EMPOWERED);
 
-                        Unit* CrystalChosen = Unit::GetUnit(*me, CrystalGUID);
+                        Unit* CrystalChosen = ObjectAccessor::GetUnit(*me, CrystalGUID);
                         if (CrystalChosen && CrystalChosen->IsAlive())
                             // Use Deal Damage to kill it, not setDeathState.
                             CrystalChosen->Kill(CrystalChosen);
@@ -336,7 +336,7 @@ public:
         {
             if (InstanceScript* instance = me->GetInstanceScript())
             {
-                Creature* Selin = (Unit::GetCreature(*me, instance->GetData64(DATA_SELIN)));
+                Creature* Selin = (ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_SELIN)));
                 if (Selin && Selin->IsAlive())
                 {
                     if (CAST_AI(boss_selin_fireheart::boss_selin_fireheartAI, Selin->AI())->CrystalGUID == me->GetGUID())

@@ -1657,7 +1657,7 @@ class boss_monstrosity : public CreatureScript
                             SelectTargetList(targets, RAID_MODE(5, 10, 8, 15), SELECT_TARGET_RANDOM, 500.0f, true);
                             if (!targets.empty())
                             for (std::list<Unit*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
-                            if (Unit* raider = Unit::GetUnit(*me, (*itr)->GetGUID()))
+								if (Unit* raider = ObjectAccessor::GetUnit(*me, (*itr)->GetGUID()))
                             if (raider->GetTypeId() == TYPEID_PLAYER)
                                 me->SummonCreature(NPC_LAVA_SEED, raider->GetPositionX(), raider->GetPositionY(), raider->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, RAID_MODE(6000, 5000, 6000, 5000));
                         }
@@ -1672,7 +1672,7 @@ class boss_monstrosity : public CreatureScript
                             SelectTargetList(targets, RAID_MODE(1, 3, 1, 3), SELECT_TARGET_RANDOM, 500.0f, true);
                             if (!targets.empty())
                                 for (std::list<Unit*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
-                            if (Unit* raider = Unit::GetUnit(*me, (*itr)->GetGUID()))
+									if (Unit* raider = ObjectAccessor::GetUnit(*me, (*itr)->GetGUID()))
                             if (raider->GetTypeId() == TYPEID_PLAYER)
                                 //me->SummonCreature(NPC_GRAVITY_CRUSH, raider->GetPositionX(), raider->GetPositionY(), raider->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 6500);
                                 me->AddAura(SPELL_GRAVITY_CRUSH, raider);
@@ -2076,7 +2076,7 @@ public:
             GetCaster()->GetAI()->SelectTargetList(targets, GetCaster()->GetInstanceScript()->instance->Is25ManRaid() ? 5 : 2, SELECT_TARGET_RANDOM, 150.0f, true);
             if (!targets.empty())
                 for (std::list<Unit*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
-                    if (Unit* temp = Unit::GetUnit(*GetCaster(), (*itr)->GetGUID()))
+					if (Unit* temp = ObjectAccessor::GetUnit(*GetCaster(), (*itr)->GetGUID()))
                         if (temp->GetTypeId() == TYPEID_PLAYER)
                             GetCaster()->SummonCreature(NPC_WATER_BOMB, temp->GetPositionX(), temp->GetPositionY(), temp->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 500);
         }

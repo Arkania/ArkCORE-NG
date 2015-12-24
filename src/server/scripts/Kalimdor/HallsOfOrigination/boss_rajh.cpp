@@ -390,7 +390,7 @@ class npc_inferno_leap : public CreatureScript
                     std::list<HostileReference *> t_list = me->getThreatManager().getThreatList();
                     for (std::list<HostileReference *>::const_iterator itr = t_list.begin(); itr!= t_list.end(); ++itr)
                     {
-                        pTarget = Unit::GetUnit(*me, (*itr)->getUnitGuid());
+						pTarget = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid());
                         if (pTarget && pTarget->IsWithinDistInMap(me, 12))
                         {
                             me->AddAura(SPELL_ADRENALINE, pTarget);

@@ -134,7 +134,7 @@ public:
                 {
                     if (bCanEat && !bIsEating)
                     {
-                        if (Unit* unit = Unit::GetUnit(*me, uiPlayerGUID))
+                        if (Unit* unit = ObjectAccessor::GetUnit(*me, uiPlayerGUID))
                         {
                             if (GameObject* go = unit->FindNearestGameObject(GO_CARCASS, 10))
                             {
@@ -274,7 +274,7 @@ public:
             {
                 if (PlayerGUID)
                 {
-                    Unit* player = Unit::GetUnit(*me, PlayerGUID);
+                    Unit* player = ObjectAccessor::GetUnit(*me, PlayerGUID);
                     if (player)
                         DoCast(player, SPELL_FORCE_OF_NELTHARAKU, true);
 
@@ -1226,7 +1226,7 @@ public:
 
             if (TorlothAnim[AnimationCount].creature == 1)
             {
-                creature = (Unit::GetCreature(*me, LordIllidanGUID));
+                creature = (ObjectAccessor::GetCreature(*me, LordIllidanGUID));
 
                 if (!creature)
                     return;
@@ -1327,7 +1327,7 @@ public:
                     break;
             }
 
-            if (Creature* LordIllidan = (Unit::GetCreature(*me, LordIllidanGUID)))
+            if (Creature* LordIllidan = (ObjectAccessor::GetCreature(*me, LordIllidanGUID)))
                 LordIllidan->AI()->EnterEvadeMode();
         }
     };
@@ -1508,7 +1508,7 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             me->RemoveCorpse();
-            if (Creature* LordIllidan = (Unit::GetCreature(*me, LordIllidanGUID)))
+            if (Creature* LordIllidan = (ObjectAccessor::GetCreature(*me, LordIllidanGUID)))
                 if (LordIllidan)
                     CAST_AI(npc_lord_illidan_stormrage::npc_lord_illidan_stormrageAI, LordIllidan->AI())->LiveCounter();
         }

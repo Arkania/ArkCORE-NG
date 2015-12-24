@@ -281,7 +281,7 @@ public:
                 {
                     Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 150, true);
                     if (!target)
-                        target = Unit::GetUnit(*me, instance->GetData64(DATA_PLAYER_GUID));
+                        target = ObjectAccessor::GetUnit(*me, instance->GetData64(DATA_PLAYER_GUID));
 
                     if (!target)
                     {
@@ -307,7 +307,7 @@ public:
 
                     Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 150, true);
                     if (!target)
-                        target = Unit::GetUnit(*me, instance->GetData64(DATA_PLAYER_GUID));
+                        target = ObjectAccessor::GetUnit(*me, instance->GetData64(DATA_PLAYER_GUID));
 
                     if (!target)
                     {
@@ -336,7 +336,7 @@ public:
                 {
                     Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 150, true);
                     if (!target)
-                        target = Unit::GetUnit(*me, instance->GetData64(DATA_PLAYER_GUID));
+                        target = ObjectAccessor::GetUnit(*me, instance->GetData64(DATA_PLAYER_GUID));
 
                     if (!target)
                     {

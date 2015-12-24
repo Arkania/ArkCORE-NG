@@ -190,7 +190,7 @@ class boss_ozruk : public CreatureScript
                                     std::list<HostileReference*> t_list = me->getThreatManager().getThreatList();
                                     for (std::list<HostileReference*>::const_iterator itr = t_list.begin(); itr!= t_list.end(); ++itr)
                                     {
-                                        Unit* target = Unit::GetUnit(*me, (*itr)->getUnitGuid());
+										Unit* target = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid());
                                         if (target && target->HasAura(SPELL_PARALYZE))
                                         {
                                             target->CastSpell(target, SPELL_PARALYZE_DMG, true);

@@ -165,7 +165,7 @@ public:
 
             for (std::list<uint64>::const_iterator itr = m_lGolemGUIDList.begin(); itr != m_lGolemGUIDList.end(); ++itr)
             {
-                if (Creature* temp = Unit::GetCreature(*me, *itr))
+                if (Creature* temp = ObjectAccessor::GetCreature(*me, *itr))
                 {
                     if (temp->IsAlive())
                         temp->DespawnOrUnsummon();
@@ -182,7 +182,7 @@ public:
 
             for (std::list<uint64>::const_iterator itr = m_lGolemGUIDList.begin(); itr != m_lGolemGUIDList.end(); ++itr)
             {
-                if (Creature* temp = Unit::GetCreature(*me, *itr))
+                if (Creature* temp = ObjectAccessor::GetCreature(*me, *itr))
                 {
                     // Only shatter brittle golems
                     if (temp->IsAlive() && temp->GetEntry() == NPC_BRITTLE_GOLEM)

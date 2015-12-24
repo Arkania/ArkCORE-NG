@@ -420,7 +420,7 @@ public:
                         case EVENT_MODULATION:
                             DoCast(me, SPELL_MODULATION);
                             for (ThreatContainer::StorageType::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
-                                if (Unit* unit = Unit::GetUnit(*me, (*itr)->getUnitGuid()))
+								if (Unit* unit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
                                     unit->SetPower(POWER_ALTERNATE_POWER, unit->GetPower(POWER_ALTERNATE_POWER) + 7);
 
                             events.ScheduleEvent(EVENT_MODULATION, 20000);
@@ -492,7 +492,7 @@ public:
                         case EVENT_ROARING_FLAME_SUMMON:
                             for (ThreatContainer::StorageType::const_iterator i = m_threatlist.begin(); i != m_threatlist.end(); ++i)
                             {
-                                Unit* unit = Unit::GetUnit(*me, (*i)->getUnitGuid());
+								Unit* unit = ObjectAccessor::GetUnit(*me, (*i)->getUnitGuid());
                                 if (unit && unit->HasAura(SPELL_NOISY)) // You rang? :)
                                 {
                                     me->SummonCreature(NPC_ROARING_FLAME_TARGET, unit->GetPositionX(), unit->GetPositionY(), unit->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 30000);

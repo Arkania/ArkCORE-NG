@@ -95,7 +95,7 @@ public:
                 ThreatContainer::StorageType::const_iterator i = threatlist.begin();
                 for (i = threatlist.begin(); i != threatlist.end(); ++i)
                 {
-                    Unit* unit = Unit::GetUnit(*me, (*i)->getUnitGuid());
+					Unit* unit = ObjectAccessor::GetUnit(*me, (*i)->getUnitGuid());
                     if (unit && (unit->GetTypeId() == TYPEID_PLAYER))
                     {
                         DoTeleportPlayer(unit, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()+3, unit->GetOrientation());

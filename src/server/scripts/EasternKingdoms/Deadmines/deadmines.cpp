@@ -515,9 +515,9 @@ public:
             }
             case 1:
             {
-                if (Player* player = me->GetPlayer(*me, m_PlayerGUID))
-                    if (Creature* bunny = me->GetCreature(*me, m_BunnyGUID))
-                        if (Creature* worker = me->GetCreature(*me, m_WorkerGUID))
+				if (Player* player = ObjectAccessor::GetPlayer(*me, m_PlayerGUID))
+					if (Creature* bunny = ObjectAccessor::GetCreature(*me, m_BunnyGUID))
+						if (Creature* worker = ObjectAccessor::GetCreature(*me, m_WorkerGUID))
                         {
                             float dist = bunny->GetDistance2d(player);
                             if (dist < 10.0f)
@@ -542,9 +542,9 @@ public:
                 break;
             }
             case 2:
-                if (Player* player = me->GetPlayer(*me, m_PlayerGUID))
-                    if (Creature* bunny = me->GetCreature(*me, m_BunnyGUID))
-                        if (Creature* worker = me->GetCreature(*me, m_WorkerGUID))
+				if (Player* player = ObjectAccessor::GetPlayer(*me, m_PlayerGUID))
+					if (Creature* bunny = ObjectAccessor::GetCreature(*me, m_BunnyGUID))
+						if (Creature* worker = ObjectAccessor::GetCreature(*me, m_WorkerGUID))
                             if (m_TargetTyp == 1)
                             {
                                 me->CastSpell(player, SPELL_CANNON_B, true);

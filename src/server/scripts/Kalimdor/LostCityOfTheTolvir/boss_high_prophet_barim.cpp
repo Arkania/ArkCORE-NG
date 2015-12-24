@@ -147,7 +147,7 @@ public:
             {
                 instance->SetData(DATA_HIGH_PROPHET_BARIM, NOT_STARTED);
 
-                if (Creature* blaze = Unit::GetCreature(*me, instance->GetData64(DATA_BLAZE)))
+				if (Creature* blaze = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_BLAZE)))
                     blaze->AI()->EnterEvadeMode();
             }
         }
@@ -157,7 +157,7 @@ public:
             if (me->IsInCombat())
             {
                 if (instance)
-                    if (Creature* blaze = Unit::GetCreature(*me, instance->GetData64(DATA_BLAZE)))
+					if (Creature* blaze = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_BLAZE)))
                         blaze->AI()->DoAction(ACTION_REPENTANCE_START);
 
                 Talk(SAY_KNEEL_DOWN);
@@ -174,7 +174,7 @@ public:
                 lSummons.DespawnEntry(NPC_SOUL_FRAGMENT);
 
                 for (SummonList::const_iterator itr = lSummons.begin(); itr != lSummons.end(); ++itr)
-                    if (Creature* pSummon = Unit::GetCreature(*me, (*itr))) 
+					if (Creature* pSummon = ObjectAccessor::GetCreature(*me, (*itr)))
                         if (pSummon->GetEntry() == NPC_REPENTANCE_MIRROR && pSummon->IsAIEnabled)
                             pSummon->AI()->DoAction(ACTION_REPENTANCE_DONE);
                     
@@ -197,7 +197,7 @@ public:
                 instance->SetData(DATA_HIGH_PROPHET_BARIM, DONE);
 
             if (instance)
-                if (Creature* blaze = Unit::GetCreature(*me, instance->GetData64(DATA_BLAZE)))
+				if (Creature* blaze = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_BLAZE)))
                     blaze->AI()->EnterEvadeMode();
         }
 
@@ -297,7 +297,7 @@ public:
                                         events.ScheduleEvent(EVENT_PLAGUE_OF_AGES, 6000, 0, PHASE_BARIM);
 
                                         if (instance)
-                                            if (Creature* blaze = Unit::GetCreature(*me, instance->GetData64(DATA_BLAZE)))
+											if (Creature* blaze = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_BLAZE)))
                                                 blaze->AI()->DoAction(ACTION_REPENTANCE_DONE);
                                     }
                                     break;
@@ -577,7 +577,7 @@ public:
             me->SetVisible(false);
 
             if (instance)
-                if (Creature* barim = Unit::GetCreature(*me, instance->GetData64(DATA_HIGH_PROPHET_BARIM)))
+				if (Creature* barim = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_HIGH_PROPHET_BARIM)))
                     barim->AI()->JustSummoned(me);
         }
 
@@ -657,7 +657,7 @@ public:
             {
                 instance->SetData64(DATA_HARBINGER, me->GetGUID());
 
-                if (Creature* barim = Unit::GetCreature(*me, instance->GetData64(DATA_HIGH_PROPHET_BARIM)))
+				if (Creature* barim = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_HIGH_PROPHET_BARIM)))
                     barim->AI()->JustSummoned(me);
             }
         }
@@ -679,7 +679,7 @@ public:
         {
             instance->SetData64(DATA_HARBINGER, 0);
 
-            if (Creature* barim = Unit::GetCreature(*me, instance->GetData64(DATA_HIGH_PROPHET_BARIM)))
+			if (Creature* barim = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_HIGH_PROPHET_BARIM)))
                 barim->AI()->EnterEvadeMode();
         }
 
@@ -792,7 +792,7 @@ public:
             me->SetReactState(REACT_PASSIVE);
 
             if (instance)
-                if (Creature* barim = Unit::GetCreature(*me, instance->GetData64(DATA_HIGH_PROPHET_BARIM)))
+				if (Creature* barim = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_HIGH_PROPHET_BARIM)))
                     barim->AI()->JustSummoned(me);
         }
 

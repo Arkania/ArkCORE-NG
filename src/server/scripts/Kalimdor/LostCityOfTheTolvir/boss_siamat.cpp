@@ -424,7 +424,7 @@ public:
                 InstanceScript* instance = me->GetInstanceScript();
 
                 if (instance)
-                    if (Creature* siamat = Unit::GetCreature(*me, instance->GetData64(DATA_SIAMAT)))
+					if (Creature* siamat = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_SIAMAT)))
                         siamat->AI()->JustSummoned(summoned);
             }
         }

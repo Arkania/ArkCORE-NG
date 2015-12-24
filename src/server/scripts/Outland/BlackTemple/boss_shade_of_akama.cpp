@@ -778,7 +778,7 @@ public:
 
         void IsSummonedBy(Unit* /*summoner*/) override
         {
-            if (Creature* summoner = (Unit::GetCreature((*me), summonerGuid)))
+            if (Creature* summoner = (ObjectAccessor::GetCreature((*me), summonerGuid)))
                 CAST_AI(npc_creature_generator_akama::npc_creature_generator_akamaAI, summoner->AI())->JustSummoned(me);
         }
 
@@ -884,7 +884,7 @@ public:
 
         void IsSummonedBy(Unit* /*summoner*/) override
         {
-            if (Creature* summoner = (Unit::GetCreature((*me), summonerGuid)))
+            if (Creature* summoner = (ObjectAccessor::GetCreature((*me), summonerGuid)))
                 CAST_AI(npc_creature_generator_akama::npc_creature_generator_akamaAI, summoner->AI())->JustSummoned(me);
         }
 
@@ -974,7 +974,7 @@ public:
 
         void IsSummonedBy(Unit* /*summoner*/) override
         {
-            if (Creature* summoner = (Unit::GetCreature((*me), summonerGuid)))
+            if (Creature* summoner = (ObjectAccessor::GetCreature((*me), summonerGuid)))
                 CAST_AI(npc_creature_generator_akama::npc_creature_generator_akamaAI, summoner->AI())->JustSummoned(me);
         }
 
@@ -1054,7 +1054,7 @@ public:
 
         void IsSummonedBy(Unit* /*summoner*/) override
         {
-            if (Creature* summoner = (Unit::GetCreature((*me), summonerGuid)))
+            if (Creature* summoner = (ObjectAccessor::GetCreature((*me), summonerGuid)))
                 CAST_AI(npc_creature_generator_akama::npc_creature_generator_akamaAI, summoner->AI())->JustSummoned(me);
         }
 
@@ -1136,7 +1136,7 @@ public:
 
         void IsSummonedBy(Unit* /*summoner*/) override
         {
-            if (Creature* summoner = (Unit::GetCreature((*me), summonerGuid)))
+            if (Creature* summoner = (ObjectAccessor::GetCreature((*me), summonerGuid)))
                 CAST_AI(npc_creature_generator_akama::npc_creature_generator_akamaAI, summoner->AI())->JustSummoned(me);
         }
 

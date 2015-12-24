@@ -279,7 +279,7 @@ class boss_drakkari_elemental : public CreatureScript
                 if (killer == me)
                     return;
 
-                if (Creature* colossus = Unit::GetCreature(*me, instance->GetData64(DATA_DRAKKARI_COLOSSUS)))
+                if (Creature* colossus = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_DRAKKARI_COLOSSUS)))
                     killer->Kill(colossus);
             }
 
@@ -315,7 +315,7 @@ class boss_drakkari_elemental : public CreatureScript
                 {
                     case ACTION_RETURN_TO_COLOSSUS:
                         DoCast(SPELL_SURGE_VISUAL);
-                        if (Creature* colossus = Unit::GetCreature(*me, instance->GetData64(DATA_DRAKKARI_COLOSSUS)))
+                        if (Creature* colossus = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_DRAKKARI_COLOSSUS)))
                             // what if the elemental is more than 80 yards from drakkari colossus ?
                             DoCast(colossus, SPELL_MERGE, true);
                         break;
@@ -326,7 +326,7 @@ class boss_drakkari_elemental : public CreatureScript
             {
                 if (HealthBelowPct(50) && instance)
                 {
-                    if (Creature* colossus = Unit::GetCreature(*me, instance->GetData64(DATA_DRAKKARI_COLOSSUS)))
+                    if (Creature* colossus = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_DRAKKARI_COLOSSUS)))
                     {
                         if (colossus->AI()->GetData(DATA_COLOSSUS_PHASE) ==  COLOSSUS_PHASE_FIRST_ELEMENTAL_SUMMON)
                         {
@@ -424,7 +424,7 @@ public:
 
             if (id == 1)
             {
-                if (Creature* colossus = Unit::GetCreature(*me, instance->GetData64(DATA_DRAKKARI_COLOSSUS)))
+                if (Creature* colossus = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_DRAKKARI_COLOSSUS)))
                 {
                     colossus->AI()->DoAction(ACTION_UNFREEZE_COLOSSUS);
                     if (!colossus->AI()->GetData(DATA_INTRO_DONE))

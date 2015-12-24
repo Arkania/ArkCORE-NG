@@ -628,7 +628,7 @@ public:
                             JumpToNextStep(2000);
                             break;
                         case 3:
-                            if (Creature* uther = Unit::GetCreature(*me, utherGUID))
+                            if (Creature* uther = ObjectAccessor::GetCreature(*me, utherGUID))
                             {
                                 uther->AI()->Talk(SAY_PHASE102);
                             }
@@ -643,13 +643,13 @@ public:
                             break;
                         //After waypoint 1
                         case 5:
-                            if (Creature* jaina = Unit::GetCreature(*me, jainaGUID))
+                            if (Creature* jaina = ObjectAccessor::GetCreature(*me, jainaGUID))
                                 jaina->SetTarget(me->GetGUID());
                             Talk(SAY_PHASE104);
                             JumpToNextStep(10000);
                             break;
                         case 6:
-                            if (Creature* uther = Unit::GetCreature(*me, utherGUID))
+                            if (Creature* uther = ObjectAccessor::GetCreature(*me, utherGUID))
                                 uther->AI()->Talk(SAY_PHASE105);
                             JumpToNextStep(1000);
                             break;
@@ -658,7 +658,7 @@ public:
                             JumpToNextStep(4000);
                             break;
                         case 8:
-                            if (Creature* uther = Unit::GetCreature(*me, utherGUID))
+                            if (Creature* uther = ObjectAccessor::GetCreature(*me, utherGUID))
                                  uther->AI()->Talk(SAY_PHASE107);
                             JumpToNextStep(6000);
                             break;
@@ -667,7 +667,7 @@ public:
                             JumpToNextStep(4000);
                             break;
                         case 10:
-                            if (Creature* uther = Unit::GetCreature(*me, utherGUID))
+                            if (Creature* uther = ObjectAccessor::GetCreature(*me, utherGUID))
                                  uther->AI()->Talk(SAY_PHASE109);
                             JumpToNextStep(8000);
                             break;
@@ -676,7 +676,7 @@ public:
                             JumpToNextStep(4000);
                             break;
                         case 12:
-                            if (Creature* uther = Unit::GetCreature(*me, utherGUID))
+                            if (Creature* uther = ObjectAccessor::GetCreature(*me, utherGUID))
                                  uther->AI()->Talk(SAY_PHASE111);
                             JumpToNextStep(4000);
                             break;
@@ -685,7 +685,7 @@ public:
                             JumpToNextStep(11000);
                             break;
                         case 14:
-                            if (Creature* jaina = Unit::GetCreature(*me, jainaGUID))
+                            if (Creature* jaina = ObjectAccessor::GetCreature(*me, jainaGUID))
                                  jaina->AI()->Talk(SAY_PHASE113);
                             JumpToNextStep(3000);
                             break;
@@ -694,12 +694,12 @@ public:
                             JumpToNextStep(9000);
                             break;
                         case 16:
-                            if (Creature* uther = Unit::GetCreature(*me, utherGUID))
+                            if (Creature* uther = ObjectAccessor::GetCreature(*me, utherGUID))
                                 uther->AI()->Talk(SAY_PHASE115);
                             JumpToNextStep(4000);
                             break;
                         case 17:
-                            if (Creature* uther = Unit::GetCreature(*me, utherGUID))
+                            if (Creature* uther = ObjectAccessor::GetCreature(*me, utherGUID))
                             {
                                 uther->SetWalk(true);
                                 uther->GetMotionMaster()->MovePoint(0, 1794.357f, 1272.183f, 140.558f);
@@ -707,7 +707,7 @@ public:
                             JumpToNextStep(1000);
                             break;
                         case 18:
-                            if (Creature* jaina = Unit::GetCreature(*me, jainaGUID))
+                            if (Creature* jaina = ObjectAccessor::GetCreature(*me, jainaGUID))
                             {
                                 me->SetTarget(jainaGUID);
                                 jaina->SetWalk(true);
@@ -720,7 +720,7 @@ public:
                             JumpToNextStep(1000);
                             break;
                         case 20:
-                            if (Creature* jaina = Unit::GetCreature(*me, jainaGUID))
+                            if (Creature* jaina = ObjectAccessor::GetCreature(*me, jainaGUID))
                                 jaina->AI()->Talk(SAY_PHASE117);
                             JumpToNextStep(3000);
                             break;
@@ -741,10 +741,10 @@ public:
                             bStepping = false;
                             SetRun(true);
 
-                            if (Creature* jaina = Unit::GetCreature(*me, jainaGUID))
+                            if (Creature* jaina = ObjectAccessor::GetCreature(*me, jainaGUID))
                                 jaina->DisappearAndDie();
 
-                            if (Creature* uther = Unit::GetCreature(*me, utherGUID))
+                            if (Creature* uther = ObjectAccessor::GetCreature(*me, utherGUID))
                                 uther->DisappearAndDie();
 
                             me->SetTarget(0);
@@ -773,7 +773,7 @@ public:
                         //After waypoint 9
                         case 27:
                             me->SetTarget(citymenGUID[0]);
-                            if (Creature* cityman = Unit::GetCreature(*me, citymenGUID[0]))
+                            if (Creature* cityman = ObjectAccessor::GetCreature(*me, citymenGUID[0]))
                             {
                                 cityman->SetTarget(me->GetGUID());
                                 cityman->SetWalk(true);
@@ -782,7 +782,7 @@ public:
                             JumpToNextStep(2000);
                             break;
                         case 28:
-                            if (Creature* cityman = Unit::GetCreature(*me, citymenGUID[0]))
+                            if (Creature* cityman = ObjectAccessor::GetCreature(*me, citymenGUID[0]))
                                 cityman->AI()->Talk(SAY_PHASE202);
                             JumpToNextStep(4000);
                             break;
@@ -800,11 +800,11 @@ public:
                         case 31:
                             SetEscortPaused(false);
                             bStepping = false;
-                            if (Creature* cityman1 = Unit::GetCreature(*me, citymenGUID[1]))
+                            if (Creature* cityman1 = ObjectAccessor::GetCreature(*me, citymenGUID[1]))
                             {
                                 cityman1->AI()->Talk(SAY_PHASE204);
                                 cityman1->SetTarget(me->GetGUID());
-                                if (Creature* cityman0 = Unit::GetCreature(*me, citymenGUID[0]))
+                                if (Creature* cityman0 = ObjectAccessor::GetCreature(*me, citymenGUID[0]))
                                     cityman0->Kill(cityman0);
                                 me->SetTarget(citymenGUID[1]);
                             }
@@ -816,7 +816,7 @@ public:
                             JumpToNextStep(1000);
                             break;
                         case 33:
-                            if (Creature* cityman1 = Unit::GetCreature(*me, citymenGUID[1]))
+                            if (Creature* cityman1 = ObjectAccessor::GetCreature(*me, citymenGUID[1]))
                                 cityman1->Kill(cityman1);
                             JumpToNextStep(1000);
                             break;
@@ -840,7 +840,7 @@ public:
                         case 36:
                             if (Creature* malganis = me->SummonCreature(NPC_MAL_GANIS, 2117.349f, 1288.624f, 136.271f, 1.37f, TEMPSUMMON_TIMED_DESPAWN, 60000))
                             {
-                                if (Creature* pStalkerM = Unit::GetCreature(*me, stalkerGUID))
+                                if (Creature* pStalkerM = ObjectAccessor::GetCreature(*me, stalkerGUID))
                                     malganis->CastSpell(pStalkerM, 63793, false);
 
                                 malganisGUID = malganis->GetGUID();
@@ -851,7 +851,7 @@ public:
                             JumpToNextStep(11000);
                             break;
                         case 37:
-                            if (Creature* malganis = Unit::GetCreature(*me, malganisGUID))
+                            if (Creature* malganis = ObjectAccessor::GetCreature(*me, malganisGUID))
                             {
                                 Creature* pZombie = GetClosestCreatureWithEntry(malganis, NPC_CITY_MAN, 100.0f);
                                 if (!pZombie)
@@ -866,12 +866,12 @@ public:
                             phaseTimer = 500;
                             break;
                         case 38:
-                            if (Creature* malganis = Unit::GetCreature(*me, malganisGUID))
+                            if (Creature* malganis = ObjectAccessor::GetCreature(*me, malganisGUID))
                                 malganis->AI()->Talk(SAY_PHASE207);
                             JumpToNextStep(17000);
                             break;
                         case 39:
-                            if (Creature* malganis = Unit::GetCreature(*me, malganisGUID))
+                            if (Creature* malganis = ObjectAccessor::GetCreature(*me, malganisGUID))
                                 malganis->SetVisible(false);
                             Talk(SAY_PHASE208);
                             JumpToNextStep(7000);
@@ -923,7 +923,7 @@ public:
                                     if (waveGUID[i] == 0)
                                         break;
                                     ++mobCounter;
-                                    Unit* temp = Unit::GetCreature(*me, waveGUID[i]);
+									Unit* temp = ObjectAccessor::GetCreature(*me, waveGUID[i]);
                                     if (!temp || temp->IsDead())
                                         ++deadCounter;
                                 }
@@ -977,16 +977,16 @@ public:
                         //After Gossip 2 (waypoint 22)
                         case 61:
                             me->SetReactState(REACT_AGGRESSIVE);
-                            if (Creature* disguised0 = Unit::GetCreature(*me, infiniteDraconianGUID[0]))
+                            if (Creature* disguised0 = ObjectAccessor::GetCreature(*me, infiniteDraconianGUID[0]))
                                 disguised0->SetTarget(me->GetGUID());
-                            if (Creature* disguised1 = Unit::GetCreature(*me, infiniteDraconianGUID[1]))
+                            if (Creature* disguised1 = ObjectAccessor::GetCreature(*me, infiniteDraconianGUID[1]))
                                 disguised1->SetTarget(me->GetGUID());
-                            if (Creature* disguised2 = Unit::GetCreature(*me, infiniteDraconianGUID[2]))
+                            if (Creature* disguised2 = ObjectAccessor::GetCreature(*me, infiniteDraconianGUID[2]))
                                 disguised2->SetTarget(me->GetGUID());
                             JumpToNextStep(1000);
                             break;
                         case 62:
-                            if (Creature* disguised0 = Unit::GetCreature(*me, infiniteDraconianGUID[0]))
+                            if (Creature* disguised0 = ObjectAccessor::GetCreature(*me, infiniteDraconianGUID[0]))
                                 disguised0->AI()->Talk(SAY_PHASE302);
                             JumpToNextStep(7000);
                             break;
@@ -1002,7 +1002,7 @@ public:
                             JumpToNextStep(1000);
                             break;
                         case 65:
-                            if (Creature* disguised0 = Unit::GetCreature(*me, infiniteDraconianGUID[0]))
+                            if (Creature* disguised0 = ObjectAccessor::GetCreature(*me, infiniteDraconianGUID[0]))
                                 disguised0->HandleEmoteCommand(11);
                             JumpToNextStep(1000);
                             break;
@@ -1011,12 +1011,12 @@ public:
                             JumpToNextStep(2000);
                             break;
                         case 67:
-                            if (Creature* disguised0 = Unit::GetCreature(*me, infiniteDraconianGUID[0]))
+                            if (Creature* disguised0 = ObjectAccessor::GetCreature(*me, infiniteDraconianGUID[0]))
                                 disguised0->AI()->Talk(SAY_PHASE305);
                             JumpToNextStep(1000);
                             break;
                         case 68:
-                            if (Creature* disguised2 = Unit::GetCreature(*me, infiniteDraconianGUID[2]))
+                            if (Creature* disguised2 = ObjectAccessor::GetCreature(*me, infiniteDraconianGUID[2]))
                             {
                                 disguised2->UpdateEntry(NPC_INFINITE_HUNTER, 0);
                                 //Make them unattackable
@@ -1026,7 +1026,7 @@ public:
                             JumpToNextStep(2000);
                             break;
                         case 69:
-                            if (Creature* disguised1 = Unit::GetCreature(*me, infiniteDraconianGUID[1]))
+                            if (Creature* disguised1 = ObjectAccessor::GetCreature(*me, infiniteDraconianGUID[1]))
                             {
                                 disguised1->UpdateEntry(NPC_INFINITE_AGENT, 0);
                                 //Make them unattackable
@@ -1036,7 +1036,7 @@ public:
                             JumpToNextStep(2000);
                             break;
                         case 70:
-                            if (Creature* disguised0 = Unit::GetCreature(*me, infiniteDraconianGUID[0]))
+                            if (Creature* disguised0 = ObjectAccessor::GetCreature(*me, infiniteDraconianGUID[0]))
                             {
                                 disguised0->UpdateEntry(NPC_INFINITE_ADVERSARY, 0);
                                 //Make them unattackable
@@ -1052,7 +1052,7 @@ public:
                         case 77:
                             //Make cratures attackable
                             for (uint32 i = 0; i< ENCOUNTER_DRACONIAN_NUMBER; ++i)
-                                if (Creature* temp = Unit::GetCreature(*me, infiniteDraconianGUID[i]))
+                                if (Creature* temp = ObjectAccessor::GetCreature(*me, infiniteDraconianGUID[i]))
                                 {
                                     temp->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                                     temp->SetReactState(REACT_AGGRESSIVE);
@@ -1092,7 +1092,7 @@ public:
                             if (instance->GetData(DATA_EPOCH_EVENT) != DONE)
                             {
                                 SpawnTimeRift(17, &epochGUID);
-                                if (Creature* epoch = Unit::GetCreature(*me, epochGUID))
+                                if (Creature* epoch = ObjectAccessor::GetCreature(*me, epochGUID))
                                     epoch->AI()->Talk(SAY_PHASE314);
                                 me->SetTarget(epochGUID);
                             }
@@ -1106,7 +1106,7 @@ public:
                         case 82:
                             if (instance->GetData(DATA_EPOCH_EVENT) != DONE)
                             {
-                                if (Creature* epoch = Unit::GetCreature(*me, epochGUID))
+                                if (Creature* epoch = ObjectAccessor::GetCreature(*me, epochGUID))
                                 {
                                     //Make Epoch attackable
                                     epoch->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
@@ -1158,7 +1158,7 @@ public:
                             me->SetTarget(malganisGUID);
                             break;
                         case 87:
-                            if (Creature* malganis = Unit::GetCreature(*me, malganisGUID))
+                            if (Creature* malganis = ObjectAccessor::GetCreature(*me, malganisGUID))
                             {
                                 malganis->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_UNK_6 | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_UNK_15);
                                 malganis->SetReactState(REACT_AGGRESSIVE);

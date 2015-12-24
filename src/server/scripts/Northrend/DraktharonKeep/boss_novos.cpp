@@ -315,7 +315,7 @@ public:
         {
             if (InstanceScript* instance = me->GetInstanceScript())
                 if (uint64 guid = instance->GetData64(DATA_NOVOS))
-                    if (Creature* novos = Creature::GetCreature(*me, guid))
+                    if (Creature* novos = ObjectAccessor::GetCreature(*me, guid))
                         novos->AI()->JustSummoned(summon);
 
             if (summon)

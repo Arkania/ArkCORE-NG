@@ -175,7 +175,7 @@ public:
             {
                 instance->SetData(DATA_LOCKMAW, DONE);
 
-                if (Creature* augh = Unit::GetCreature(*me, instance->GetData64(DATA_AUGH)))
+				if (Creature* augh = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_AUGH)))
                     augh->AI()->DoAction(ACTION_LOCKMAW_IS_DONE);
             }
         }
@@ -298,7 +298,7 @@ public:
             InstanceScript* instance = creature->GetInstanceScript();
 
             if (instance)
-                if (Creature* lockmaw = Unit::GetCreature(*me, instance->GetData64(DATA_LOCKMAW)))
+				if (Creature* lockmaw = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_LOCKMAW)))
                     lockmaw->AI()->JustSummoned(me);
         }
 
@@ -431,7 +431,7 @@ public:
                 AttackStart(target);
 
             if (instance)
-                if (Creature* lockmaw = Unit::GetCreature(*me, instance->GetData64(DATA_LOCKMAW)))
+				if (Creature* lockmaw = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_LOCKMAW)))
                     lockmaw->AI()->JustSummoned(me);
         }
 
@@ -498,7 +498,7 @@ public:
             }
 
             if (instance)
-                if (Creature* lockmaw = Unit::GetCreature(*me, instance->GetData64(DATA_LOCKMAW)))
+				if (Creature* lockmaw = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_LOCKMAW)))
                     lockmaw->AI()->JustSummoned(me);
         }
 
@@ -563,7 +563,7 @@ public:
             instance = creature->GetInstanceScript();
 
             if (instance)
-                if (Creature* lockmaw = Unit::GetCreature(*me, instance->GetData64(DATA_LOCKMAW)))
+				if (Creature* lockmaw = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_LOCKMAW)))
                 {
                     lockmaw->AI()->JustSummoned(me);
 

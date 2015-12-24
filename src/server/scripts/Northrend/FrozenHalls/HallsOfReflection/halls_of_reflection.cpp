@@ -1776,12 +1776,12 @@ public:
         {
             _instance->ProcessEvent(0, EVENT_SPAWN_WAVES);
 
-            if (Creature* falric = player->GetCreature(*player, _instance->GetData64(DATA_FALRIC_EVENT)))
+            if (Creature* falric = ObjectAccessor::GetCreature(*player, _instance->GetData64(DATA_FALRIC_EVENT)))
             {
                 falric->CastSpell(falric, SPELL_BOSS_SPAWN_AURA, true);
                 falric->SetVisible(true);
             }
-            if (Creature* marwyn = player->GetCreature(*player, _instance->GetData64(DATA_MARWYN_EVENT)))
+            if (Creature* marwyn = ObjectAccessor::GetCreature(*player, _instance->GetData64(DATA_MARWYN_EVENT)))
             {
                 marwyn->CastSpell(marwyn, SPELL_BOSS_SPAWN_AURA, true);
                 marwyn->SetVisible(true);

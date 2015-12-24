@@ -105,7 +105,7 @@ void UnitAI::DoAddAuraToAllHostilePlayers(uint32 spellid)
         ThreatContainer::StorageType threatlist = me->getThreatManager().getThreatList();
         for (ThreatContainer::StorageType::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
         {
-            if (Unit* unit = Unit::GetUnit(*me, (*itr)->getUnitGuid()))
+            if (Unit* unit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
                 if (unit->GetTypeId() == TYPEID_PLAYER)
                     me->AddAura(spellid, unit);
         }
@@ -119,7 +119,7 @@ void UnitAI::DoCastToAllHostilePlayers(uint32 spellid, bool triggered)
         ThreatContainer::StorageType threatlist = me->getThreatManager().getThreatList();
         for (ThreatContainer::StorageType::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
         {
-            if (Unit* unit = Unit::GetUnit(*me, (*itr)->getUnitGuid()))
+            if (Unit* unit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
                 if (unit->GetTypeId() == TYPEID_PLAYER)
                     me->CastSpell(unit, spellid, triggered);
         }

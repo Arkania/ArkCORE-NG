@@ -180,7 +180,7 @@ public:
             {
                 if (caster->ToPlayer()->GetQuestStatus(QUEST_TROLLS_IS_GONE_CRAZY) == QUEST_STATUS_INCOMPLETE)
                 {
-                    if (Creature* rageclaw = Unit::GetCreature(*me, _rageclawGUID))
+                    if (Creature* rageclaw = ObjectAccessor::GetCreature(*me, _rageclawGUID))
                     {
                         UnlockRageclaw(caster, rageclaw);
                         caster->ToPlayer()->KilledMonster(rageclaw->GetCreatureTemplate(), _rageclawGUID);
@@ -985,7 +985,7 @@ public:
                 std::list<HostileReference*> t_list = me->getThreatManager().getThreatList();
                 for (std::list<HostileReference*>::const_iterator itr = t_list.begin(); itr!= t_list.end(); ++itr)
                 {
-                    if (Unit* unit = Unit::GetUnit(*me, (*itr)->getUnitGuid()))
+					if (Unit* unit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
                     {
                         if (unit->GetPositionZ() <= 286.276f)
                         {
@@ -1108,7 +1108,7 @@ public:
                     std::list<HostileReference*> t_list = me->getThreatManager().getThreatList();
                     for (std::list<HostileReference*>::const_iterator itr = t_list.begin(); itr!= t_list.end(); ++itr)
                     {
-                        if (Unit* unit = Unit::GetUnit(*me, (*itr)->getUnitGuid()))
+						if (Unit* unit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
                         {
                             if (unit->GetPositionZ() <= 286.276f)
                             {
@@ -1235,7 +1235,7 @@ public:
             if (!SummonList.empty())
                 for (std::list<uint64>::const_iterator itr = SummonList.begin(); itr != SummonList.end(); ++itr)
                 {
-                    if (Creature* temp = Unit::GetCreature(*me, *itr))
+					if (Creature* temp = ObjectAccessor::GetCreature(*me, *itr))
                     {
                         temp->m_CombatDistance = 100.0f; // ugly hack? we are not in a instance sorry. :(
                         temp->AI()->AttackStart(unit);
@@ -1253,7 +1253,7 @@ public:
                 std::list<HostileReference*> t_list = me->getThreatManager().getThreatList();
                 for (std::list<HostileReference*>::const_iterator itr = t_list.begin(); itr!= t_list.end(); ++itr)
                 {
-                    if (Unit* unit = Unit::GetUnit(*me, (*itr)->getUnitGuid()))
+					if (Unit* unit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
                     {
                         if (unit->GetPositionZ() <= 286.276f)
                         {
@@ -1278,7 +1278,7 @@ public:
                 if (!SummonList.empty())
                     for (std::list<uint64>::const_iterator itr = SummonList.begin(); itr != SummonList.end(); ++itr)
                     {
-                        if (Creature* temp = Unit::GetCreature(*me, *itr))
+						if (Creature* temp = ObjectAccessor::GetCreature(*me, *itr))
                         {
                             if (temp->GetPositionZ() >= 287.00f)
                                 continue;
@@ -1298,7 +1298,7 @@ public:
         {
             if (!SummonList.empty())
                 for (std::list<uint64>::const_iterator itr = SummonList.begin(); itr != SummonList.end(); ++itr)
-                    if (Creature* temp = Unit::GetCreature(*me, *itr))
+					if (Creature* temp = ObjectAccessor::GetCreature(*me, *itr))
                         temp->DespawnOrUnsummon();
 
             if (Player* player = killer->GetCharmerOrOwnerPlayerOrPlayerItself())

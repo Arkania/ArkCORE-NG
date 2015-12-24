@@ -246,7 +246,7 @@ struct boss_twin_baseAI : public BossAI
     // Called when sister pointer needed
     Creature* GetSister()
     {
-        return Unit::GetCreature((*me), instance->GetData64(SisterNpcId));
+        return ObjectAccessor::GetCreature((*me), instance->GetData64(SisterNpcId));
     }
 
     void EnterCombat(Unit* /*who*/) override

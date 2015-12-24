@@ -188,7 +188,7 @@ public:
             {
                 if (Die_Timer <= diff)
                 {
-                    if (Unit* temp = Unit::GetUnit(*me, Tagger))
+                    if (Unit* temp = ObjectAccessor::GetUnit(*me, Tagger))
                     {
                         if (Player* player = temp->ToPlayer())
                             player->KilledMonsterCredit(NPC_RESTLESS, me->GetGUID());

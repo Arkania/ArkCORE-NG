@@ -835,7 +835,7 @@ public:
                         break;
                     case EventCheckPlayerIsAlive: // check every sec player is alive
                         if (m_playerGUID && m_phase)
-                            if (Player* player = Player::GetPlayer(*me, m_playerGUID))
+							if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
                                 if (!player->IsInWorld() || !player->IsAlive())
                                     Init();
 
@@ -1029,7 +1029,7 @@ public:
             case 25:
                 m_phase = 6;
                 if (m_playerGUID)
-                    if (Player* player = Player::GetPlayer(*me, m_playerGUID))
+					if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
                         if (player->IsInWorld() || player->IsAlive())
                         {
                             Position pos = player->GetNearPosition(frand(2.0f, 4.0f), frand(3.14f, 6.28f));
@@ -1153,7 +1153,7 @@ public:
             case 25:
                 m_phase = 6;
                 if (m_playerGUID)
-                    if (Player* player = Player::GetPlayer(*me, m_playerGUID))
+					if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
                         if (player->IsInWorld() || player->IsAlive())
                         {
                             Position pos = player->GetNearPosition(frand(2.0f, 4.0f), frand(3.14f, 6.28f));
@@ -1277,7 +1277,7 @@ public:
                 case 25:
                     m_phase = 6;
                     if (m_playerGUID)
-                        if (Player* player = Player::GetPlayer(*me, m_playerGUID))
+						if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
                             if (player->IsInWorld() || player->IsAlive())
                             {
                                 Position pos = player->GetNearPosition(frand(2.0f, 4.0f), frand(3.14f, 6.28f));
@@ -1401,7 +1401,7 @@ public:
             case 25:
                 m_phase = 6;
                 if (m_playerGUID)
-                    if (Player* player = Player::GetPlayer(*me, m_playerGUID))
+					if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
                         if (player->IsInWorld() || player->IsAlive())
                         {
                             Position pos = player->GetNearPosition(frand(2.0f, 4.0f), frand(3.14f, 6.28f));
@@ -2691,8 +2691,8 @@ public:
 
         void MovementInform(uint32 type, uint32 point)
         {
-            Creature* godfrey = Unit::GetCreature(*me, godfreyGUID);
-            Creature* genn = Unit::GetCreature(*me, gennGUID);
+			Creature* godfrey = ObjectAccessor::GetCreature(*me, godfreyGUID);
+			Creature* genn = ObjectAccessor::GetCreature(*me, gennGUID);
             switch (point)
             {
                 case 0:
@@ -2713,8 +2713,8 @@ public:
                 return;
             if (mui_timer_event <= diff)
             {
-                Creature* godfrey = Unit::GetCreature(*me, godfreyGUID);
-                Creature* genn = Unit::GetCreature(*me, gennGUID);
+				Creature* godfrey = ObjectAccessor::GetCreature(*me, godfreyGUID);
+				Creature* genn = ObjectAccessor::GetCreature(*me, gennGUID);
                 if (!genn)
                     if (godfrey)
                         godfrey->DespawnOrUnsummon();
@@ -3054,7 +3054,7 @@ public:
                 return;
             if (mui_timerAllowSummon <= diff)
             {
-                if (Player *player = Unit::GetPlayer(*me, playerGUID))
+				if (Player *player = ObjectAccessor::GetPlayer(*me, playerGUID))
                     if (me->FindNearestCreature(37953, 100) == NULL)
                         me->CastSpell(player, 70794, true);
                 allowSummon = false;
@@ -3131,7 +3131,7 @@ public:
 
         void StartBattle(Player* player)
         {
-            if (Creature* prince = Unit::GetCreature(*me, princeGUID))
+			if (Creature* prince = ObjectAccessor::GetCreature(*me, princeGUID))
             {
                 if (me->GetDistance2d(prince->GetPositionX(), prince->GetPositionY()) > 50)
                     me->MonsterSay("event already started please wait a minute.", LANG_UNIVERSAL, 0);
@@ -3155,7 +3155,7 @@ public:
 
         void EndBattle()
         {
-            if (Creature* prince = Unit::GetCreature(*me, princeGUID))
+			if (Creature* prince = ObjectAccessor::GetCreature(*me, princeGUID))
                 prince->DespawnOrUnsummon();
             princeGUID = 0;
             if (Creature* newPrince = me->SummonCreature(NPC_PRINCE_LIAM_GREYMANE_BATTLE, -1408.661f, 1260.017f, 36.51123f, 1.79f, TEMPSUMMON_DEAD_DESPAWN, 180000))
@@ -3236,7 +3236,7 @@ public:    npc_prince_liam_greymane_gilneas() : CreatureScript("npc_prince_liam_
         void moveGroup(uint32 group, float x, float y, float z)
         {
             for (int i = 0; i < 70; i++)
-                if (Creature *milit = Unit::GetCreature(*me, militiamans[i]))
+				if (Creature *milit = ObjectAccessor::GetCreature(*me, militiamans[i]))
                     if (milit->AI()->GetData(DATA_GROUP) == group)
                     {
                         milit->SetHomePosition(x, y, z, milit->GetOrientation());
@@ -3300,7 +3300,7 @@ public:    npc_prince_liam_greymane_gilneas() : CreatureScript("npc_prince_liam_
                 break;
             case 15:
                 for (int i = 0; i < 70; i++)
-                    if (Creature *milit = Unit::GetCreature(*me, militiamans[i]))
+					if (Creature *milit = ObjectAccessor::GetCreature(*me, militiamans[i]))
                         milit->AI()->SetData(DATA_GROUP, GROUP_1);
                 break;
             case 19:
@@ -3320,7 +3320,7 @@ public:    npc_prince_liam_greymane_gilneas() : CreatureScript("npc_prince_liam_
                 float distance = urand(0, 7);
                 float angle = frand(-3 * M_PI / 4, 3 * M_PI / 2);
                 me->GetNearPoint(me, x, y, z, me->GetObjectSize(), distance, angle);
-                if (Creature *milit = Unit::GetCreature(*me, militiamans[i]))
+				if (Creature *milit = ObjectAccessor::GetCreature(*me, militiamans[i]))
                     if (milit->AI()->GetData(DATA_GROUP) == group)
                         milit->SetHomePosition(x, y, z, me->GetOrientation());
             }
@@ -3394,7 +3394,7 @@ public:    npc_prince_liam_greymane_gilneas() : CreatureScript("npc_prince_liam_
                     case 8:
                         me->PlayDistanceSound(22584);
                         for (int i = 0; i < 70; i++)
-                            if (Creature *milit = Unit::GetCreature(*me, militiamans[i]))
+							if (Creature *milit = ObjectAccessor::GetCreature(*me, militiamans[i]))
                             {
                                 milit->HandleEmoteCommand(25);
                                 float distance = urand(7, 15);
@@ -3481,10 +3481,10 @@ public:
                             if (i == 0 || i == 1 || i == 2)
                                 citizenGUID[i] = milit->GetGUID();
                             if (i != 0)
-                                if (Creature *firstCiti = Unit::GetCreature(*me, citizenGUID[0]))
+								if (Creature *firstCiti = ObjectAccessor::GetCreature(*me, citizenGUID[0]))
                                     milit->GetMotionMaster()->MoveFollow(firstCiti, urand(0, 5), frand(-3 * M_PI / 8, 3 * M_PI / 8), MOTION_SLOT_ACTIVE);
                         }
-                    if (Creature *firstCiti = Unit::GetCreature(*me, citizenGUID[0]))
+					if (Creature *firstCiti = ObjectAccessor::GetCreature(*me, citizenGUID[0]))
                         firstCiti->GetMotionMaster()->MovePoint(0, -1571.79f, 1318.833f, 35.56271f);
                     me->GetMotionMaster()->MovePoint(0, -1571.79f, 1318.833f, 35.56271f);
                     if (Creature *c = me->SummonCreature(38424, -1542.548f, 1290.957f, 6.239825f, 3.490021f, TEMPSUMMON_MANUAL_DESPAWN))
@@ -3507,11 +3507,11 @@ public:
 
             if (mui_moveTimer <= diff)
             {
-                if (Creature *canon = Unit::GetCreature(*me, canonGUID))
+				if (Creature *canon = ObjectAccessor::GetCreature(*me, canonGUID))
                 {
-                    if (Creature *firstCiti = Unit::GetCreature(*me, citizenGUID[1]))
+					if (Creature *firstCiti = ObjectAccessor::GetCreature(*me, citizenGUID[1]))
                         firstCiti->GetMotionMaster()->MovePoint(1, -1606.97f, 1313.59f, 18.99f);
-                    if (Creature *firstCiti = Unit::GetCreature(*me, citizenGUID[2]))
+					if (Creature *firstCiti = ObjectAccessor::GetCreature(*me, citizenGUID[2]))
                         firstCiti->GetMotionMaster()->MovePoint(1, -1610.97f, 1310.59f, 18.11f);
                     me->CastCustomSpell(VEHICLE_SPELL_RIDE_HARDCODED, SPELLVALUE_BASE_POINT0, 1, canon, false);
                     canon->GetMotionMaster()->MovePoint(1, -1609.97f, 1312.59f, 18.11f);
@@ -3530,7 +3530,7 @@ public:
             if (mui_attack <= diff)
             {
                 if (Creature *c = me->FindNearestCreature(38420, 200))
-                    if (Creature *canon = Unit::GetCreature(*me, canonGUID))
+					if (Creature *canon = ObjectAccessor::GetCreature(*me, canonGUID))
                         canon->CastSpell(c, 72013, true);
                 mui_attack = 5000;
             }
@@ -3689,9 +3689,9 @@ public:
             {
                 if (mui_jumpBoss <= diff)
                 {
-                    if (Creature *abo = Unit::GetCreature(*me, aboGUID))
+					if (Creature *abo = ObjectAccessor::GetCreature(*me, aboGUID))
                         for (int i = 0; i <= 3; i++)
-                            if (Creature *worgen = Unit::GetCreature(*me, worgenGUID[i]))
+							if (Creature *worgen = ObjectAccessor::GetCreature(*me, worgenGUID[i]))
                                 worgen->CastCustomSpell(VEHICLE_SPELL_RIDE_HARDCODED, SPELLVALUE_BASE_POINT0, i + 1, abo, false);
                     moveJumpBoss = false;
                     mui_jumpBoss = 3600000;
@@ -3907,7 +3907,7 @@ public:
 
         void StartEncounter(Player* pl)
         {
-            if (Creature* tobias = Unit::GetCreature(*me, tobiasGUID))
+			if (Creature* tobias = ObjectAccessor::GetCreature(*me, tobiasGUID))
                 pl->TeleportTo(MAP_GILNEAS, tobias->GetPositionX(), tobias->GetPositionY(), tobias->GetPositionZ(), 5.42f);
             else
             {

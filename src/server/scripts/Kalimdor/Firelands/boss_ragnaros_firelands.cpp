@@ -632,7 +632,7 @@ public:
 
                         for (ThreatContainer::StorageType::const_iterator itr = threatList.begin(); itr != threatList.end(); ++itr)
                         {
-                            if (Unit* unit = Unit::GetUnit(*me, (*itr)->getUnitGuid()))
+							if (Unit* unit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
                                 if (unit->GetTypeId() == TYPEID_PLAYER)
                                     if (Player* player = unit->ToPlayer())
                                         if (player->hasQuest(QUEST_HEART_FLAME))

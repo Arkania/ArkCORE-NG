@@ -461,7 +461,7 @@ class npc_reign_of_chaos : public CreatureScript
                     std::list<HostileReference *> t_list = me->getThreatManager().getThreatList();
                     for (std::list<HostileReference *>::const_iterator itr = t_list.begin(); itr!= t_list.end(); ++itr)
                     {
-                        pTarget = Unit::GetUnit(*me, (*itr)->getUnitGuid());
+						pTarget = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid());
                         if (pTarget && pTarget->IsWithinDistInMap(me, 6))
                             DoCast(pTarget, DUNGEON_MODE(SPELL_REIGN_OF_CHAOS_N, SPELL_REIGN_OF_CHAOS_H), true);
 

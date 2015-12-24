@@ -125,7 +125,7 @@ class boss_nazan : public CreatureScript
 
                 if (flight) // phase 1 - the flight
                 {
-                    Creature* Vazruden = Unit::GetCreature(*me, VazrudenGUID);
+                    Creature* Vazruden = ObjectAccessor::GetCreature(*me, VazrudenGUID);
                     if (Fly_Timer < diff || !(Vazruden && Vazruden->IsAlive() && Vazruden->HealthAbovePct(20)))
                     {
                         flight = false;
@@ -301,7 +301,7 @@ class boss_vazruden_the_herald : public CreatureScript
             {
                 if (summoned)
                 {
-                    Creature* Nazan = Unit::GetCreature(*me, NazanGUID);
+                    Creature* Nazan = ObjectAccessor::GetCreature(*me, NazanGUID);
                     if (!Nazan)
                         Nazan = me->FindNearestCreature(NPC_NAZAN, 5000);
                     if (Nazan)
@@ -310,7 +310,7 @@ class boss_vazruden_the_herald : public CreatureScript
                         NazanGUID = 0;
                     }
 
-                    Creature* Vazruden = Unit::GetCreature(*me, VazrudenGUID);
+                    Creature* Vazruden = ObjectAccessor::GetCreature(*me, VazrudenGUID);
                     if (!Vazruden)
                         Vazruden = me->FindNearestCreature(NPC_VAZRUDEN, 5000);
                     if (Vazruden)
@@ -405,8 +405,8 @@ class boss_vazruden_the_herald : public CreatureScript
                 default: // adds do the job now
                     if (check <= diff)
                     {
-                        Creature* Nazan = Unit::GetCreature(*me, NazanGUID);
-                        Creature* Vazruden = Unit::GetCreature(*me, VazrudenGUID);
+                        Creature* Nazan = ObjectAccessor::GetCreature(*me, NazanGUID);
+                        Creature* Vazruden = ObjectAccessor::GetCreature(*me, VazrudenGUID);
                         if ((Nazan && Nazan->IsAlive()) || (Vazruden && Vazruden->IsAlive()))
                         {
                             if ((Nazan && Nazan->GetVictim()) || (Vazruden && Vazruden->GetVictim()))
