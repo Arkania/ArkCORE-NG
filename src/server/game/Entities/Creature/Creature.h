@@ -84,10 +84,10 @@ struct CreatureTemplate
     uint32  Entry;
     uint32  DifficultyEntry[MAX_DIFFICULTY - 1];
     uint32  KillCredit[MAX_KILL_CREDIT];
-    uint32  Modelid1;
-    uint32  Modelid2;
-    uint32  Modelid3;
-    uint32  Modelid4;
+    int32   Modelid1;
+    int32   Modelid2;
+    int32   Modelid3;
+    int32   Modelid4;
     std::string  Name;
     std::string  SubName;
     std::string  IconName;
@@ -147,8 +147,8 @@ struct CreatureTemplate
     uint32  MechanicImmuneMask;
     uint32  flags_extra;
     uint32  ScriptID;
-    uint32  GetRandomValidModelId() const;
-    uint32  GetFirstValidModelId() const;
+    int32   GetRandomValidModelId() const;
+    int32   GetFirstValidModelId() const;
 
     // helpers
     SkillType GetRequiredLootSkill() const
@@ -447,6 +447,9 @@ class Creature : public Unit, public GridObject<Creature>, public MapObject
 
         void SetObjectScale(float scale);
         void SetDisplayId(uint32 modelId);
+
+        void SetOutfit(int32 outfit) { outfitId = outfit; };
+        int32 GetOutfit() const { return outfitId; };
 
         void DisappearAndDie();
 
@@ -798,6 +801,8 @@ class Creature : public Unit, public GridObject<Creature>, public MapObject
         bool TriggerJustRespawned;
 
         Spell const* _focusSpell;   ///> Locks the target during spell cast for proper facing
+
+        int32 outfitId;
 
         CreatureTextRepeatGroup m_textRepeat;
 };
