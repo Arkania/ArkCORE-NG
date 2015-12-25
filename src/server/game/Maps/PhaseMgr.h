@@ -64,7 +64,7 @@ struct PhaseArea
 };
 
 typedef std::list<PhaseArea> PhaseAreaContainer;
-typedef UNORDERED_MAP<uint32 /*areaId*/, PhaseAreaContainer> PhaseAreaStore;
+typedef std::unordered_map<uint32 /*areaId*/, PhaseAreaContainer> PhaseAreaStore;
 
 struct PhaseDefinition
 {
@@ -82,7 +82,7 @@ struct PhaseDefinition
 };
 
 typedef std::list<PhaseDefinition> PhaseDefinitionContainer;
-typedef UNORDERED_MAP<uint32 /*zoneId*/, PhaseDefinitionContainer> PhaseDefinitionStore;
+typedef std::unordered_map<uint32 /*zoneId*/, PhaseDefinitionContainer> PhaseDefinitionStore;
 
 struct SpellPhaseInfo
 {
@@ -92,7 +92,7 @@ struct SpellPhaseInfo
     uint32 worldmapareaswap;
 };
 
-typedef UNORDERED_MAP<uint32 /*spellId*/, SpellPhaseInfo> SpellPhaseStore;
+typedef std::unordered_map<uint32 /*spellId*/, SpellPhaseInfo> SpellPhaseStore;
 
 struct PhaseInfo
 {
@@ -107,7 +107,7 @@ struct PhaseInfo
     bool NeedsClientSideUpdate() const { return terrainswapmap || phaseId || worldMapAreaSwap; }
 };
 
-typedef UNORDERED_MAP<uint32 /*spellId*/, PhaseInfo> PhaseInfoContainer;
+typedef std::unordered_map<uint32 /*spellId*/, std::list<PhaseInfo>> PhaseInfoContainer;
 
 struct PhaseData
 {

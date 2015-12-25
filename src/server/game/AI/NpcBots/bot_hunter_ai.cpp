@@ -8,7 +8,7 @@ Hunter NpcBot (reworked by Graff onlysuffering@gmail.com)
 Complete - around 35%
 TODO:
 */
-typedef UNORDERED_MAP<uint32 /*spellId*/, int32 /*manaCost*/> ManaRestoreList;
+typedef std::unordered_map<uint32 /*spellId*/, int32 /*manaCost*/> ManaRestoreList;
 ManaRestoreList TotH;
 class hunter_bot : public CreatureScript
 {

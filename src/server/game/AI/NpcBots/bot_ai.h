@@ -314,7 +314,7 @@ class bot_ai : public ScriptedAI
         Unit* getTarget(bool byspell, bool ranged, bool &reset) const;
 
         typedef std::set<Unit*> AttackerSet;
-        typedef UNORDERED_MAP<uint32 /*stat*/, int32 /*statvalue*/> BotStat;
+		typedef std::unordered_map<uint32 /*stat*/, int32 /*statvalue*/> BotStat;
         typedef std::pair<uint32 /*spellId*/, uint32 /*cooldown*/> BotCTCSpell;
 
         BotStat _stats[BOT_MAX_SLOTS - 1];

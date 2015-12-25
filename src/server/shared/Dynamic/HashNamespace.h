@@ -17,7 +17,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TRINITY_HASH_NAMESPACE_H
+#ifndef TRINITY_HASH_NAMESPACE_H  
 #define TRINITY_HASH_NAMESPACE_H
 
 #include "Define.h"
@@ -41,7 +41,7 @@
 #if !_HAS_TRADITIONAL_STL
 #ifndef HASH_NAMESPACE
 #define HASH_NAMESPACE
-#else
+#else  
 
 // can be not used by some platforms, so provide fake forward
 HASH_NAMESPACE_START
@@ -58,7 +58,7 @@ HASH_NAMESPACE_END
 #endif
 #endif
 
-#elif COMPILER == COMPILER_INTEL
+#elif COMPILER == COMPILER_INTEL  
 # define HASH_NAMESPACE_START namespace std {
 # define HASH_NAMESPACE_END }
 #elif COMPILER == COMPILER_GNU && defined(__clang__) && defined(_LIBCPP_VERSION)
@@ -74,7 +74,7 @@ HASH_NAMESPACE_END
 #include <ext/hash_fun.h>
 #include <string>
 
-HASH_NAMESPACE_START
+HASH_NAMESPACE_START  
 
 template<>
 class hash<unsigned long long>
@@ -107,7 +107,7 @@ HASH_NAMESPACE_END
 
 #if COMPILER != COMPILER_MICROSOFT
 
-// Visual Studio use non standard hash calculation function, so provide fake forward for other
+// Visual Studio use non standard hash calculation function, so provide fake forward for other  
 HASH_NAMESPACE_START
 
 template<class K>

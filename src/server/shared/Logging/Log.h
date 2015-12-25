@@ -24,8 +24,8 @@
 #include "Appender.h"
 #include "Logger.h"
 #include "LogWorker.h"
-#include "Dynamic/UnorderedMap.h"
 
+#include <unordered_map>
 #include <string>
 #include <ace/Singleton.h>
 
@@ -35,8 +35,8 @@ class Log
 {
     friend class ACE_Singleton<Log, ACE_Thread_Mutex>;
 
-    typedef UNORDERED_MAP<std::string, Logger> LoggerMap;
-    typedef UNORDERED_MAP<std::string, Logger const*> CachedLoggerContainer;
+    typedef std::unordered_map<std::string, Logger> LoggerMap;
+    typedef std::unordered_map<std::string, Logger const*> CachedLoggerContainer;
 
     private:
         Log();
