@@ -381,14 +381,18 @@ void PhaseData::SendPhaseshiftToPlayer()
 
     for (PhaseInfoContainer::const_iterator itr = spellPhaseInfo.begin(); itr != spellPhaseInfo.end(); ++itr)
     {
-        if (itr->second.phaseId)
-            phaseIds.insert(itr->second.phaseId);
+        std::list<PhaseInfo> pi = (itr)->second;
+        for (auto ph = pi.begin(); ph != pi.end(); ++ph)
+        {
+            if (ph->phaseId)
+                phaseIds.insert(ph->phaseId);
 
-        if (itr->second.terrainswapmap)
-            terrainswaps.insert(itr->second.terrainswapmap);
+            if (ph->terrainswapmap)
+                terrainswaps.insert(ph->terrainswapmap);
 
-        if (itr->second.worldMapAreaSwap)
-            worldAreaSwaps.insert(itr->second.worldMapAreaSwap);
+            if (ph->worldMapAreaSwap)
+                worldAreaSwaps.insert(ph->worldMapAreaSwap);
+        }
     }
 
     // Phase Definitions
@@ -410,8 +414,9 @@ void PhaseData::SendPhaseshiftToPlayer()
 void PhaseData::GetActivePhases(std::set<uint32>& phases) const
 {
     for (PhaseInfoContainer::const_iterator itr = spellPhaseInfo.begin(); itr != spellPhaseInfo.end(); ++itr)
-        if (itr->second.phaseId)
-            phases.insert(itr->second.phaseId);
+        for (auto phase = itr->second.begin(); phase != itr->second.end(); ++phase)
+            if (phase->phaseId)
+                phases.insert(phase->phaseId);
 
     // Phase Definitions
     for (std::list<PhaseDefinition>::const_iterator itr = activePhaseDefinitions.begin(); itr != activePhaseDefinitions.end(); ++itr)
@@ -442,7 +447,7 @@ void PhaseData::AddAuraInfo(uint32 spellId, PhaseInfo const& phaseInfo)
     if (phaseInfo.phasemask)
         _PhasemaskThroughAuras |= phaseInfo.phasemask;
 
-    spellPhaseInfo[spellId] = phaseInfo;
+    spellPhaseInfo[spellId].push_back(phaseInfo);
 }
 
 uint32 PhaseData::RemoveAuraInfo(uint32 spellId)
@@ -452,19 +457,25 @@ uint32 PhaseData::RemoveAuraInfo(uint32 spellId)
     {
         uint32 updateflag = 0;
 
-        if (rAura->second.NeedsClientSideUpdate())
-            updateflag |= PHASE_UPDATE_FLAG_CLIENTSIDE_CHANGED;
-
-        if (rAura->second.NeedsServerSideUpdate())
+        for (auto phase = rAura->second.begin(); phase != rAura->second.end(); ++phase)
         {
-            _PhasemaskThroughAuras = 0;
+            if (phase->NeedsClientSideUpdate())
+                updateflag |= PHASE_UPDATE_FLAG_CLIENTSIDE_CHANGED;
 
-            updateflag |= PHASE_UPDATE_FLAG_SERVERSIDE_CHANGED;
+            if (phase->NeedsServerSideUpdate())
+            {
+                _PhasemaskThroughAuras = 0;
+                updateflag |= PHASE_UPDATE_FLAG_SERVERSIDE_CHANGED;
+            }
+        }
 
+        if (updateflag & PHASE_UPDATE_FLAG_SERVERSIDE_CHANGED)
+        {
             spellPhaseInfo.erase(rAura);
 
             for (PhaseInfoContainer::const_iterator itr = spellPhaseInfo.begin(); itr != spellPhaseInfo.end(); ++itr)
-                _PhasemaskThroughAuras |= itr->second.phasemask;
+                for (auto ph = itr->second.begin(); ph != itr->second.end(); ++ph)
+                    _PhasemaskThroughAuras |= ph->phasemask;
         }
 
         return updateflag;
