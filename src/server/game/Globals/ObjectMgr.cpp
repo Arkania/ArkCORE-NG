@@ -5720,12 +5720,6 @@ void ObjectMgr::LoadGraveyardZones()
             continue;
         }
 
-        if (areaEntry->zone != 0)
-        {
-            TC_LOG_ERROR("sql.sql", "Table `game_graveyard_zone` Id (%u) has a record for subzone id (%u) instead of zone, skipped.", safeLocId, zoneId);
-            continue;
-        }
-
         if (team != 0 && team != HORDE && team != ALLIANCE)
         {
             TC_LOG_ERROR("sql.sql", "Table `game_graveyard_zone` Id (%u) has a record for non player faction (%u), skipped.", safeLocId, team);
@@ -5768,6 +5762,8 @@ WorldSafeLocsEntry const* ObjectMgr::GetClosestGraveYard(float x, float y, float
         }
     }
 
+    MapEntry const* mapEntry = sMapStore.LookupEntry(MapId);
+
     // Simulate std. algorithm:
     //   found some graveyard associated to (ghost_zone, ghost_map)
     //
@@ -5776,10 +5772,9 @@ WorldSafeLocsEntry const* ObjectMgr::GetClosestGraveYard(float x, float y, float
     //   if mapId != graveyard.mapId (ghost in instance) and search any graveyard associated
     //     then check faction
     GraveYardMapBounds range = GraveYardStore.equal_range(zoneId);
-    MapEntry const* map = sMapStore.LookupEntry(MapId);
 
     // not need to check validity of map object; MapId _MUST_ be valid here
-    if (range.first == range.second && !map->IsBattlegroundOrArena())
+    if (range.first == range.second && !mapEntry->IsBattlegroundOrArena())
     {
         TC_LOG_ERROR("sql.sql", "Table `game_graveyard_zone` incomplete: Zone %u Team %u does not have a linked graveyard.", zoneId, team);
         return GetDefaultGraveYard(team);
@@ -5797,8 +5792,6 @@ WorldSafeLocsEntry const* ObjectMgr::GetClosestGraveYard(float x, float y, float
 
     // some where other
     WorldSafeLocsEntry const* entryFar = NULL;
-
-    MapEntry const* mapEntry = sMapStore.LookupEntry(MapId);
 
     for (; range.first != range.second; ++range.first)
     {
