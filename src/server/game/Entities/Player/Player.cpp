@@ -8217,6 +8217,40 @@ void Player::RewardReputation(Unit* victim, float rate)
         return;
 
     ReputationOnKillEntry const* Rep = sObjectMgr->GetReputationOnKilEntry(victim->ToCreature()->GetCreatureTemplate()->Entry);
+	ReputationOnKillEntry const* addRep = NULL;
+	
+    // All mob in level 85 dungeons give championing Rewutation && All bosses give guild Rewutation
+	if (!Rep)
+		 {
+		if (Map* map = victim->GetMap())
+			 {
+			if (map->IsDungeon())
+				 {
+				   // Dungeon & Raid trashes
+					if (victim->getLevel() >= 82 && victim->GetMaxHealth() >= 45000)
+					 {
+					if (!map->IsHeroic())
+						Rep = sObjectMgr->GetReputationOnKilEntry(42696);
+					else
+						Rep = sObjectMgr->GetReputationOnKilEntry(49667);
+					}
+				
+					// Dungeon & Raid Bosses 
+					if (victim->getLevel() >= 86 && victim->GetMaxHealth() >= 2000000)
+					 {
+					if (!map->IsHeroic())
+						Rep = sObjectMgr->GetReputationOnKilEntry(43296);
+					else
+						Rep = sObjectMgr->GetReputationOnKilEntry(47775);
+					
+						if (!map->IsHeroic())
+							addRep = sObjectMgr->GetReputationOnKilEntry(43438);
+					else
+						addRep = sObjectMgr->GetReputationOnKilEntry(49642);
+					}
+				}
+			}
+		}
     if (!Rep)
         return;
 
@@ -8234,6 +8268,13 @@ void Player::RewardReputation(Unit* victim, float rate)
 
     uint32 team = GetTeam();
 
+	// Skip Guild rep from championing if we are in a guild group
+	if (Rep->RepFaction1 == 1168 || Rep->RepFaction2 == 1168)
+		 {
+		if (GetGroup() && GetGroup()->IsGuildGroup(GetGuildId()))
+			 ChampioningFaction = 0;
+		}
+
     if (Rep->RepFaction1 && (!Rep->TeamDependent || team == ALLIANCE))
     {
         int32 donerep1 = CalculateReputationGain(REPUTATION_SOURCE_KILL, victim->getLevel(), Rep->RepValue1, ChampioningFaction ? ChampioningFaction : Rep->RepFaction1);
@@ -8244,6 +8285,31 @@ void Player::RewardReputation(Unit* victim, float rate)
         if (factionEntry1 && current_reputation_rank1 <= Rep->ReputationMaxCap1)
             GetReputationMgr().ModifyReputation(factionEntry1, donerep1);
     }
+
+	// Give Additional Rep
+	if (addRep)
+		{
+		
+			if (addRep->RepFaction1)
+			 {
+			int32 donerep1 = CalculateReputationGain(REPUTATION_SOURCE_KILL, victim->getLevel(), addRep->RepValue1, addRep->RepFaction1);
+			donerep1 = int32(donerep1 * rate);
+			FactionEntry const* factionEntry1 = sFactionStore.LookupEntry(addRep->RepFaction1);
+			uint32 current_reputation_rank1 = GetReputationMgr().GetRank(factionEntry1);
+			if (factionEntry1 && current_reputation_rank1 <= addRep->ReputationMaxCap1)
+				 GetReputationMgr().ModifyReputation(factionEntry1, donerep1);
+			}
+		
+		if (addRep->RepFaction2)
+			 {
+			int32 donerep2 = CalculateReputationGain(REPUTATION_SOURCE_KILL, victim->getLevel(), addRep->RepValue2, addRep->RepFaction2);
+			donerep2 = int32(donerep2 * rate);
+			FactionEntry const* factionEntry2 = sFactionStore.LookupEntry(addRep->RepFaction2);
+			uint32 current_reputation_rank2 = GetReputationMgr().GetRank(factionEntry2);
+			if (factionEntry2 && current_reputation_rank2 <= addRep->ReputationMaxCap2)
+				 GetReputationMgr().ModifyReputation(factionEntry2, donerep2);
+		}
+	}
 
     if (Rep->RepFaction2 && (!Rep->TeamDependent || team == HORDE))
     {
@@ -8299,6 +8365,20 @@ void Player::RewardReputation(Quest const* quest)
 
         if (FactionEntry const* factionEntry = sFactionStore.LookupEntry(quest->RewardFactionId[i]))
             GetReputationMgr().ModifyReputation(factionEntry, rep);
+
+        // Give guild rep on completed quest
+        if (Guild * pGuild = sGuildMgr->GetGuildById(GetGuildId()))
+        {
+            if (uint32 exp = quest->XPValue(this))
+            {
+                uint32 gRep = exp / 450;
+                if (gRep <= 0)
+                    gRep = 1;
+
+                if (FactionEntry const* guildEntry = sFactionStore.LookupEntry(1168))
+                    GetReputationMgr().ModifyReputation(guildEntry, gRep);
+            }
+        }
     }
 }
 

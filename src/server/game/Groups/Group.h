@@ -214,6 +214,7 @@ class Group
         bool isBFGroup()   const;
         bool IsGuildGroup(bool AllInSameMap = false, bool AllInSameInstanceId = false);
         bool IsCreated()   const;
+		bool IsGuildGroup(uint32 guildId, bool AllInSameMap = false, bool AllInSameInstanceId = false);
         uint64 GetLeaderGUID() const;
         uint64 GetGUID() const;
         uint32 GetLowGUID() const;
