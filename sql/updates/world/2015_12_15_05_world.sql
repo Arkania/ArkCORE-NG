@@ -30,18 +30,18 @@ update npc_text set BroadcastTextID0=40544 where ID=15897;
 DELETE FROM phase_area WHERE areaId=5050;
 DELETE FROM phase_area WHERE areaId=616;
 INSERT INTO phase_area (areaId, entry, quest_start, quest_end, quest_start_status, quest_end_status, flags, comment) VALUES 
-(616, 0, 25523, 25525, 74, 75, 1, "Hatchery start and Flight in the Firelands"),
-(616, 1, 25525, 25544, 74, 75, 1, "Hatchery Wave one"),
-(616, 2, 25544, 25560, 74, 75, 1, "Hatchery Wave two"),
+(616, 0, 25523, 25525, 74, 74, 1, "Hatchery start and Flight in the Firelands"),
+(616, 1, 25525, 25544, 74, 74, 1, "Hatchery Wave one"),
+(616, 2, 25544, 25560, 74, 74, 1, "Hatchery Wave two"),
 (616, 3, 25560, 25832, 74, 64, 0, "Hatchery Egg Wave");
 
 delete from phase_definitions where zoneId=5050;
 delete from phase_definitions where zoneId=616 and entry between 0 and 4;
 insert into phase_definitions values
-(616, 0, 33554432, 0, 0, 719, 0, "Hatchery start and Flight in the Firelands"),
-(616, 1, 16777216, 0, 0, 719, 0, "Hatchery Wave one"),
-(616, 2,  8388608, 0, 0, 719, 0, "Hatchery Wave two"),
-(616, 3,  4194304, 0, 0, 719, 0, "Hatchery Egg Wave");
+(616, 0, 33554433, 194, 719, 683, 0, "Hatchery start and Flight in the Firelands"), --  33554433 phaseMask
+(616, 1, 16777217, 193, 719, 683, 0, "Hatchery Wave one"), -- 16777217
+(616, 2,  8388609, 192, 719, 683, 0, "Hatchery Wave two"), -- 8388609
+(616, 3,  4194305, 191, 719, 683, 0, "Hatchery Egg Wave"); -- 4194305
 
 update npc_text set BroadcastTextID0=50266 where ID=17731;
 
