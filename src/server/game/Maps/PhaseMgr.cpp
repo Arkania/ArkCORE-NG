@@ -250,43 +250,64 @@ uint32 PhaseMgr::GetQuestStatusFlag(uint32 questId)
 
 void PhaseMgr::RegisterPhasingAuraEffect(AuraEffect const* auraEffect)
 {
-    PhaseInfo phaseInfo;
+    std::list<PhaseInfo> phaseInfos;
 
-    SpellPhaseStore::const_iterator itr = _SpellPhaseStore->find(auraEffect->GetId());
-    if (itr != _SpellPhaseStore->end())
+    if (auraEffect->GetAuraType() == SPELL_AURA_PHASE)
     {
-        if (itr->second.phasemask)
+        PhaseInfo phaseInfo;
+
+        SpellPhaseStore::const_iterator itr = _SpellPhaseStore->find(auraEffect->GetId());
+        if (itr != _SpellPhaseStore->end())
+        {
+            if (itr->second.phasemask)
+            {
+                _UpdateFlags |= PHASE_UPDATE_FLAG_SERVERSIDE_CHANGED;
+                phaseInfo.phasemask = itr->second.phasemask;
+            }
+            if (itr->second.terrainswapmap)
+            {
+                _UpdateFlags |= PHASE_UPDATE_FLAG_CLIENTSIDE_CHANGED;
+                phaseInfo.terrainswapmap = itr->second.terrainswapmap;
+            }
+            if (itr->second.worldmapareaswap)
+            {
+                _UpdateFlags |= PHASE_UPDATE_FLAG_CLIENTSIDE_CHANGED;
+                phaseInfo.worldMapAreaSwap = itr->second.worldmapareaswap;
+            }
+        }
+    
+        if (auraEffect->GetMiscValue())
         {
             _UpdateFlags |= PHASE_UPDATE_FLAG_SERVERSIDE_CHANGED;
-            phaseInfo.phasemask = itr->second.phasemask;
+            phaseInfo.phasemask = auraEffect->GetMiscValue();
         }
-        if (itr->second.terrainswapmap)
+        if (auraEffect->GetMiscValueB())
         {
-            _UpdateFlags |= PHASE_UPDATE_FLAG_CLIENTSIDE_CHANGED;
-            phaseInfo.terrainswapmap = itr->second.terrainswapmap;
+            _UpdateFlags |= PHASE_UPDATE_FLAG_SERVERSIDE_CHANGED;
+            phaseInfo.phaseId = auraEffect->GetMiscValueB();
         }
-        if (itr->second.worldmapareaswap)
+
+        if (phaseInfo.NeedsClientSideUpdate())
+            _UpdateFlags |= PHASE_UPDATE_FLAG_CLIENTSIDE_CHANGED;
+
+        phaseInfos.push_back(phaseInfo);
+    }
+    else if(auraEffect->GetAuraType() == SPELL_AURA_PHASE_GROUP)
+    {
+        uint32 group = auraEffect->GetMiscValueB();
+        std::set<uint32> const& groupPhases = GetPhasesForGroup(group);
+        for (auto itr = groupPhases.begin(); itr != groupPhases.end(); ++itr)
         {
-            _UpdateFlags |= PHASE_UPDATE_FLAG_CLIENTSIDE_CHANGED;
-            phaseInfo.worldMapAreaSwap = itr->second.worldmapareaswap;
+            PhaseInfo phaseInfo;
+            phaseInfo.phaseId = auraEffect->GetMiscValueB();
+            if (phaseInfo.NeedsClientSideUpdate())
+                _UpdateFlags |= PHASE_UPDATE_FLAG_CLIENTSIDE_CHANGED;
+            phaseInfos.push_back(phaseInfo);
         }
     }
 
-    if (auraEffect->GetMiscValue())
-    {
-        _UpdateFlags |= PHASE_UPDATE_FLAG_SERVERSIDE_CHANGED;
-        phaseInfo.phasemask = auraEffect->GetMiscValue();
-    }
-    if (auraEffect->GetMiscValueB())
-    {
-        _UpdateFlags |= PHASE_UPDATE_FLAG_CLIENTSIDE_CHANGED;
-        phaseInfo.phaseId = auraEffect->GetMiscValueB();
-    }
-
-    if (phaseInfo.NeedsClientSideUpdate())
-        _UpdateFlags |= PHASE_UPDATE_FLAG_CLIENTSIDE_CHANGED;
-
-    phaseData.AddAuraInfo(auraEffect->GetId(), phaseInfo);
+    for (auto itr = phaseInfos.begin(); itr != phaseInfos.end(); ++itr)
+        phaseData.AddAuraInfo(auraEffect->GetId(), *itr);
 
     Update();
 }
