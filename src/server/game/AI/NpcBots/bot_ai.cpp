@@ -13,6 +13,7 @@ I NEED MORE
 #include "CellImpl.h"
 #include "Chat.h"
 #include "Config.h"
+#include "GameEventMgr.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "ScriptedGossip.h"
@@ -101,21 +102,64 @@ bot_ai::~bot_ai(){}
 
 SpellCastResult bot_ai::checkBotCast(Unit* victim, uint32 spellId, uint8 botclass) const
 {
-    if (spellId == 0)
-        return SPELL_FAILED_DONT_REPORT;
-
-    if (InDuel(victim))
-        return SPELL_FAILED_DONT_REPORT;
+    if (victim->GetTypeId() == TYPEID_PLAYER && victim->ToPlayer()->IsGameMaster())
+        return SPELL_FAILED_BAD_TARGETS;
 
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
     if (!spellInfo)
         return SPELL_FAILED_DONT_REPORT;
 
-    if (!CheckImmunities(spellId, victim))
-        return SPELL_FAILED_DONT_REPORT;
+    if (me->IsMounted() && !(spellInfo->Attributes & SPELL_ATTR0_CASTABLE_WHILE_MOUNTED))
+        return SPELL_FAILED_NOT_MOUNTED;
 
-    if (Powers(spellInfo->PowerType) == me->getPowerType() &&
-        (int32)me->GetPower(me->getPowerType()) < spellInfo->CalcPowerCost(me, spellInfo->GetSchoolMask()))
+    //if (Powers(spellInfo->PowerType) == me->getPowerType() &&
+    //    (int32)me->GetPower(me->getPowerType()) < spellInfo->CalcPowerCost(me, spellInfo->GetSchoolMask()))
+    //    return SPELL_FAILED_NO_POWER;
+
+    if ((int32)me->GetPower(Powers(spellInfo->PowerType)) < spellInfo->CalcPowerCost(me, spellInfo->GetSchoolMask()))
+        return SPELL_FAILED_NO_POWER;
+
+    if (victim->isType(TYPEMASK_UNIT) && InDuel(victim))
+        return SPELL_FAILED_BAD_TARGETS;
+
+    if (victim->isType(TYPEMASK_UNIT) && !spellInfo->IsPassive())
+    {
+        bool needRankSelection = false;
+        for (uint8 i = 0; i != MAX_SPELL_EFFECTS; ++i)
+        {
+            if (spellInfo->IsPositiveEffect(i) &&
+                (spellInfo->Effects[i].Effect == SPELL_EFFECT_APPLY_AURA ||
+                spellInfo->Effects[i].Effect == SPELL_EFFECT_APPLY_AREA_AURA_PARTY ||
+                spellInfo->Effects[i].Effect == SPELL_EFFECT_APPLY_AREA_AURA_RAID))
+            {
+                needRankSelection = true;
+                break;
+            }
+        }
+        if (needRankSelection && victim->getLevel() < spellInfo->GetFirstRankSpell()->BaseLevel)
+            return SPELL_FAILED_LOWLEVEL;
+    }
+
+    //disarmed
+    if (spellInfo->EquippedItemClass == ITEM_CLASS_WEAPON)
+    {
+        if (spellInfo->EquippedItemInventoryTypeMask != 0)
+        {
+            if ((spellInfo->EquippedItemInventoryTypeMask & (1 << INVTYPE_WEAPONMAINHAND)) &&
+                !me->CanUseAttackType(BASE_ATTACK))
+                return SPELL_FAILED_EQUIPPED_ITEM_CLASS_MAINHAND;
+            if ((spellInfo->EquippedItemInventoryTypeMask & (1 << INVTYPE_WEAPONOFFHAND)) &&
+                !me->CanUseAttackType(OFF_ATTACK))
+                return SPELL_FAILED_EQUIPPED_ITEM_CLASS_OFFHAND;
+            if ((spellInfo->EquippedItemInventoryTypeMask & ((1 << INVTYPE_RANGED) | (1 << INVTYPE_RANGEDRIGHT))) &&
+                !me->CanUseAttackType(RANGED_ATTACK))
+                return SPELL_FAILED_EQUIPPED_ITEM_CLASS;
+        }
+        else if (!me->CanUseAttackType(BASE_ATTACK))
+            return SPELL_FAILED_EQUIPPED_ITEM_CLASS_MAINHAND;
+    }
+
+    if (!CheckImmunities(spellId, victim))
         return SPELL_FAILED_DONT_REPORT;
 
     switch (botclass)
@@ -138,6 +182,7 @@ SpellCastResult bot_ai::checkBotCast(Unit* victim, uint32 spellId, uint8 botclas
         case CLASS_HUNTER:
         case CLASS_DEATH_KNIGHT:
         default:
+            TC_LOG_ERROR("entities.player", "CheckBotCast(): Unknown bot class %u", botclass);
             break;
     }
 
@@ -147,7 +192,6 @@ SpellCastResult bot_ai::checkBotCast(Unit* victim, uint32 spellId, uint8 botclas
 bool bot_ai::doCast(Unit* victim, uint32 spellId, bool triggered, uint64 originalCaster)
 {
     if (spellId == 0) return false;
-    if (me->IsMounted()) return false;
     if (IsCasting()) return false;
     if (!victim || !victim->IsInWorld() || me->GetMap() != victim->FindMap()) return false;
 
@@ -155,9 +199,23 @@ bool bot_ai::doCast(Unit* victim, uint32 spellId, bool triggered, uint64 origina
     if (!info)
         return false;
 
+    //select aura level
+    if (victim->isType(TYPEMASK_UNIT))
+        if (SpellInfo const* actualSpellInfo = info->GetAuraRankForLevel(victim->getLevel()))
+        info = actualSpellInfo;
+    
+        if (info->CalcCastTime() && JumpingFlyingOrFalling())
+        return false;
+
     if (spellId == MANAPOTION)
     {
         value = urand(me->GetMaxPower(POWER_MANA)/4, me->GetMaxPower(POWER_MANA)/2);
+        me->CastCustomSpell(victim, spellId, &value, 0, 0, true);
+        return true;
+    }
+    else if (spellId == HEALINGPOTION)
+    {
+        value = urand(me->GetMaxHealth() / 3, me->GetMaxHealth() / 2);
         me->CastCustomSpell(victim, spellId, &value, 0, 0, true);
         return true;
     }
@@ -214,6 +272,7 @@ bool bot_ai::doCast(Unit* victim, uint32 spellId, bool triggered, uint64 origina
 
     return true;
 }
+
 //Follow point calculation
 void bot_minion_ai::CalculatePos(Position & pos)
 {
@@ -307,6 +366,21 @@ void bot_minion_ai::CalculatePos(Position & pos)
     //d - default (druid, rogue, hunter)
     //r - ranged/support (priest, warlock, mage, elem shaman)
 }
+
+bool bot_minion_ai::IAmFree() const
+{
+    if (!me->GetOwnerGUID())
+        return true;
+    if (me->GetOwnerGUID() != master->GetGUID())
+        return true;
+    if (!me->HasUnitTypeMask(UNIT_MASK_MINION))
+        return true;
+
+    return false;
+    //return (!_ownerGuid || _ownerGuid != master->GetGUID() || !me->HasUnitTypeMask(UNIT_MASK_MINION));
+    //        //has owner   and   //owner is found          and        //bound to owner
+}
+
 // Movement set
 void bot_minion_ai::SetBotCommandState(CommandStates st, bool force, Position* newpos)
 {
@@ -956,6 +1030,35 @@ void bot_ai::listAuras(Player* player, Unit* unit) const
         //if (IsPetAI()) GetPetAI()->ListSpells(&ch);
     }
 }
+
+void bot_ai::BotSay(char const* text, Player const* target) const
+{
+    if (!target && master->GetTypeId() == TYPEID_PLAYER)
+        target = master;
+    if (!target)
+        return;
+
+    me->MonsterSay(text, LANG_UNIVERSAL, target);
+}
+void bot_ai::BotWhisper(char const* text, Player const* target) const
+{
+    if (!target && master->GetTypeId() == TYPEID_PLAYER)
+        target = master;
+    if (!target)
+        return;
+
+    me->MonsterWhisper(text, target);
+}
+void bot_ai::BotYell(char const* text, Player const* target) const
+{
+    if (!target && master->GetTypeId() == TYPEID_PLAYER)
+        target = master;
+    if (!target)
+        return;
+
+    me->MonsterYell(text, LANG_UNIVERSAL, target);
+}
+
 //SETSTATS
 // Health, Armor, Powers, Combat Ratings, and global update setup
 void bot_minion_ai::setStats(uint8 myclass, uint8 myrace, uint8 mylevel, bool force, bool shapeshift)

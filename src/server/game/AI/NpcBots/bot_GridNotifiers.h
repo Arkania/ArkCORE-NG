@@ -19,7 +19,7 @@ class NearestHostileUnitCheck
 {
     public:
         explicit NearestHostileUnitCheck(Unit const* unit, float dist, bool magic, bot_ai const* m_ai, bool targetCCed = false) :
-        me(unit), m_range(dist), byspell(magic), ai(m_ai), AttackCCed(targetCCed) { }
+            me(unit), m_range(dist), byspell(magic), ai(m_ai), AttackCCed(targetCCed) { }
         bool operator()(Unit* u)
         {
             if (!PvP && (u->ToPlayer() || (u->ToCreature() && u->ToCreature()->GetBotAI())))
@@ -91,6 +91,9 @@ class HostileDispelTargetCheck
                     AuraApplication const* aurApp = aura->GetApplicationOfTarget(u->GetGUID());
                     if (aurApp && aurApp->IsPositive())
                     {
+                        const std::string name = Info->SpellName;
+                        if (name == "Vengeance" || name == "Bloody Vengeance")
+                            continue;
                         return true;
                     }
                 }
@@ -344,12 +347,16 @@ class UndeadCCUnitCheck
                 return false;
             if (!u->getAttackers().empty())
                 return false;
-            if (u->GetCreatureType() != CREATURE_TYPE_UNDEAD && m_spellId == 9484)//shackle undead
+            if (u->GetCreatureType() != CREATURE_TYPE_UNDEAD && 
+                (m_spellId == 9484 || m_spellId == 9485 || m_spellId == 10955))//shackle undead
                 return false;
             //most horrible hacks
             if (u->GetCreatureType() != CREATURE_TYPE_UNDEAD &&
                 u->GetCreatureType() != CREATURE_TYPE_DEMON &&
-                (m_spellId == 2812 || m_spellId == 10326))//holy wrath or turn evil
+                (m_spellId == 2812 || m_spellId == 10318 || //holy
+                m_spellId == 27139 || m_spellId == 48816 || //wra
+                m_spellId == 48817 ||                       //th or
+                m_spellId == 10326))                        //turn evil
                 return false;
             if (u->HasUnitState(UNIT_STATE_CONFUSED | UNIT_STATE_STUNNED | UNIT_STATE_FLEEING | UNIT_STATE_DISTRACTED | UNIT_STATE_CONFUSED_MOVE | UNIT_STATE_FLEEING_MOVE))
                 return false;
@@ -581,6 +588,106 @@ class NearbyHostileUnitCheck
         bot_ai const* ai;
         bool m_forCC;
         NearbyHostileUnitCheck(NearbyHostileUnitCheck const&);
+};
+
+
+class NearbyFriendlyUnitCheck
+{
+public:
+    explicit NearbyFriendlyUnitCheck(Unit const* unit, float maxdist, bot_ai const* m_ai) : me(unit), max_range(maxdist), ai(m_ai) { }
+    bool operator()(Unit* u) const
+    {
+        if (u == me)
+            return false;
+        //if (!u->IsInCombat())
+        //    return false;
+        if (u->IsTotem() || u->IsSummon())
+            return false;
+        if (!u->InSamePhase(me))
+            return false;
+        if (!me->IsWithinDistInMap(u, max_range))
+            return false;
+        if (!me->CanSeeOrDetect(u))
+            return false;
+        if (ai->InDuel(u))
+            return false;
+        if (!ai->IsInBotParty(u))
+            return false;
+
+        return true;
+    }
+private:
+    Unit const* me;
+    float max_range;
+    bot_ai const* ai;
+    NearbyFriendlyUnitCheck(NearbyFriendlyUnitCheck const&);
+};
+
+class NearbyRezTargetCheck
+{
+public:
+    explicit NearbyRezTargetCheck(Unit const* unit, float maxdist, bot_ai const* m_ai) : me(unit), max_range(maxdist), ai(m_ai) { }
+    bool operator()(WorldObject* u) const
+    {
+        if (u == me)
+            return false;
+        if (u->GetTypeId() != TYPEID_PLAYER && u->GetTypeId() != TYPEID_CORPSE)
+            return false;
+        if (!u->InSamePhase(me))
+            return false;
+        if (!me->IsWithinDistInMap(u, max_range))
+            return false;
+        if (Player* p = u->ToPlayer())
+        {
+            if (p->IsAlive())
+                return false;
+            if (p->IsRessurectRequested())
+                return false;
+            if (!ai->IsInBotParty(p))
+                return false;
+        }
+        if (!me->CanSeeOrDetect(u))
+            return false;
+        if (urand(0, 100) > 20)
+            return false;
+        if (u->GetTypeId() == TYPEID_CORPSE && !sObjectAccessor->FindPlayer(u->ToCorpse()->GetOwnerGUID()))
+            return false;
+
+        return true;
+    }
+private:
+    Unit const* me;
+    float max_range;
+    bot_ai const* ai;
+    NearbyRezTargetCheck(NearbyRezTargetCheck const&);
+};
+
+template<class Check>
+struct UnitListSearcher
+{
+    uint32 i_phaseMask;
+    std::list<uint64> &i_objects;
+    Check& i_check;
+
+    UnitListSearcher(WorldObject const* searcher, std::list<uint64> &objects, Check &check)
+        : i_phaseMask(searcher->GetPhaseMask()), i_objects(objects), i_check(check) { }
+
+    void Visit(PlayerMapType &m)
+    {
+        for (PlayerMapType::iterator itr = m.begin(); itr != m.end(); ++itr)
+            if (itr->GetSource()->InSamePhase(i_phaseMask))
+                if (i_check(itr->GetSource()))
+                    i_objects.push_back(itr->GetSource()->GetGUID());
+    }
+    void Visit(CreatureMapType &m)
+    {
+        for (CreatureMapType::iterator itr = m.begin(); itr != m.end(); ++itr)
+            if (itr->GetSource()->InSamePhase(i_phaseMask))
+                if (i_check(itr->GetSource()))
+                    i_objects.push_back(itr->GetSource()->GetGUID());
+    }
+
+    template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED> &) { }
 };
 
 #endif

@@ -72,6 +72,22 @@ enum BotStances
     //DRUID_FLY_FORM                    = 30    //NYI
 };
 
+enum BotRoles
+{
+    BOT_ROLE_NONE = 0x00,
+    BOT_ROLE_TANK = 0x01,
+    BOT_ROLE_DPS = 0x02,
+    BOT_ROLE_HEAL = 0x04,
+    BOT_ROLE_RANGED = 0x08,
+
+    BOT_ROLE_PARTY = 0x10, //hidden
+
+    //BOT_ROLE_TANK_MELEE                 = (BOT_ROLE_TANK | BOT_ROLE_DPS),
+    //BOT_ROLE_TANK_RANGED                = (BOT_ROLE_TANK | BOT_ROLE_DPS | BOT_ROLE_RANGED),
+
+    BOT_MAX_ROLE = 0x20
+};
+
 enum BotPetTypes
 {
     PET_TYPE_NONE,
@@ -267,6 +283,7 @@ class bot_ai : public ScriptedAI
         SpellCastResult checkBotCast(Unit* victim, uint32 spellId, uint8 botclass) const;
         virtual void removeFeralForm(bool /*recast*/ = false) {}
 
+        inline bool JumpingFlyingOrFalling() const { return me->IsFalling() || me->HasUnitMovementFlag(MOVEMENTFLAG_PITCH_UP | MOVEMENTFLAG_PITCH_DOWN | MOVEMENTFLAG_SPLINE_ELEVATION | MOVEMENTFLAG_FALLING_SLOW); }
         inline bool Feasting() const { return (me->HasAura(EAT) || me->HasAura(DRINK)); }
         inline bool isTwoHander() const { return !me->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1); }
         static inline bool isMeleeClass(uint8 m_class) { return (m_class == CLASS_WARRIOR || m_class == CLASS_ROGUE || m_class == CLASS_PALADIN || m_class == CLASS_DEATH_KNIGHT || m_class == DRUID_BEAR_FORM); }
@@ -332,6 +349,10 @@ class bot_ai : public ScriptedAI
         void _LocalizeQuest(Player* forPlayer, std::string &questTitle, uint32 entry) const;
         void _LocalizeCreature(Player* forPlayer, std::string &creatureName, uint32 entry) const;
         void _LocalizeGameObject(Player* forPlayer, std::string &gameobjectName, uint32 entry) const;
+
+        void BotSay(char const* text, Player const* target = NULL) const;
+        void BotWhisper(char const* text, Player const* target = NULL) const;
+        void BotYell(char const* text, Player const* target = NULL) const;
 
         Player* master;
         Unit* opponent;
@@ -457,6 +478,7 @@ class bot_minion_ai : public bot_ai
 
     private:
         bool CanCureTarget(Unit* target, uint32 cureSpell, uint32 diff) const;
+        bool IAmFree() const;
         void GetBotDispellableAuraList(Unit* target, Unit* caster, uint32 dispelMask, DispelChargesList& dispelList) const;
         void CalculatePos(Position& pos);
         void UpdateMountedState();
