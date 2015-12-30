@@ -21,6 +21,7 @@
 #include "Battleground.h"
 #include "MMapFactory.h"
 #include "CellImpl.h"
+#include "Config.h"
 #include "DynamicTree.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
@@ -2862,6 +2863,11 @@ bool InstanceMap::CanEnter(Player* player)
 
     // cannot enter if the instance is full (player cap), GMs don't count
     uint32 maxPlayers = GetMaxPlayers();
+    
+    bool  ignoreMaxPlayer = sConfigMgr->GetBoolDefault("Instance.IgnoreMaxPlayerCount", false);
+    if (ignoreMaxPlayer)
+        maxPlayers = 99;
+
     if (GetPlayersCountExceptGMs() >= maxPlayers)
     {
         TC_LOG_INFO("maps", "MAP: Instance '%u' of map '%s' cannot have more than '%u' players. Player '%s' rejected", GetInstanceId(), GetMapName(), maxPlayers, player->GetName().c_str());

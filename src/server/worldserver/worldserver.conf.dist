@@ -764,6 +764,14 @@ ActivateWeather = 1
 CastUnstuck = 1
 
 #
+#	 Instance.IgnoreMaxPlayerCount
+#		 Description: Set the maximal amount of players that can entering a instance to 99.
+#        Default:     0 - (Disabled, core setting value of amount)
+#                     1 - (Enabled,  amount = 99)
+
+Instance.IgnoreMaxPlayerCount = 0
+
+#
 #    Instance.IgnoreLevel
 #        Description: Ignore level requirement when entering instances.
 #        Default:     0 - (Disabled)
