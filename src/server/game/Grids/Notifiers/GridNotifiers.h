@@ -807,7 +807,39 @@ namespace Trinity
             uint32 i_spell;
     };
 
-    class AnyUnfriendlyUnitInObjectRangeCheck
+    class AnyUnfriendlyCreatureInUnitRangeCheck
+    {
+    public:
+        explicit AnyUnfriendlyCreatureInUnitRangeCheck(Unit* unitOwner, uint32 entry, float range) : _unitOwner(unitOwner), _entry(entry), _range(range) { }
+
+        bool operator()(Unit* unit) const
+        {
+            // Check unit entry
+            if (unit->GetEntry() != _entry)
+                return false;
+
+            // Check unit owner
+            if (unit->GetCharmerOrOwner() != _unitOwner)
+                return false;
+
+            // Check unit display id
+            if (unit->GetDisplayId() != unit->GetNativeDisplayId())
+                return false;
+
+            // Check owner distance to unit
+            if (_unitOwner->GetDistance2d(unit) > _range)
+                return false;
+
+            return true;
+        }
+
+    private:
+        Unit* _unitOwner;
+        uint32 _entry;
+        float _range;
+    };
+
+    class AnyUnfriendlyUnitInObjectRangeCheck 
     {
         public:
             AnyUnfriendlyUnitInObjectRangeCheck(WorldObject const* obj, Unit const* funit, float range) : i_obj(obj), i_funit(funit), i_range(range) { }
@@ -848,6 +880,26 @@ namespace Trinity
             WorldObject const* i_obj;
             Unit const* i_funit;
             float i_range;
+    };
+
+    class AnyUnfriendlyAttackableVisibleUnitInObjectRangeCheck
+    {
+    public:
+        AnyUnfriendlyAttackableVisibleUnitInObjectRangeCheck(Unit const* funit, float range)
+            : i_funit(funit), i_range(range) {}
+
+        bool operator()(const Unit* u)
+        {
+            return u->isAlive()
+                && i_funit->IsWithinDistInMap(u, i_range)
+                && !i_funit->IsFriendlyTo(u)
+                && i_funit->IsValidAttackTarget(u)
+                && u->GetCreatureType() != CREATURE_TYPE_CRITTER
+                && i_funit->canSeeOrDetect(u);
+        }
+    private:
+        Unit const* i_funit;
+        float i_range;
     };
 
     class CreatureWithDbGUIDCheck
