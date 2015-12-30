@@ -890,12 +890,12 @@ namespace Trinity
 
         bool operator()(const Unit* u)
         {
-            return u->isAlive()
+            return u->IsAlive()
                 && i_funit->IsWithinDistInMap(u, i_range)
                 && !i_funit->IsFriendlyTo(u)
                 && i_funit->IsValidAttackTarget(u)
                 && u->GetCreatureType() != CREATURE_TYPE_CRITTER
-                && i_funit->canSeeOrDetect(u);
+                && i_funit->CanSeeOrDetect(u);
         }
     private:
         Unit const* i_funit;
