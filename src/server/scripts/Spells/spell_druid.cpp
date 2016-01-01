@@ -170,73 +170,74 @@ class spell_dru_eclipse_energize : public SpellScriptLoader
 
             void HandleEnergize(SpellEffIndex effIndex)
             {
-                Player* caster = GetCaster()->ToPlayer();
-
-                // No boomy, no deal.
-                if (caster->GetPrimaryTalentTree(caster->GetActiveSpec()) != TALENT_TREE_DRUID_BALANCE)
-                    return;
-
-                switch (GetSpellInfo()->Id)
+                if (Player* caster = GetCaster()->ToPlayer())
                 {
-                    case SPELL_DRUID_WRATH:
-                    {
-                        energizeAmount = -GetSpellInfo()->Effects[effIndex].BasePoints; // -13
-                        // If we are set to fill the lunar side or we've just logged in with 0 power..
-                        if ((!caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE_MARKER) && caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE_MARKER))
-                            || caster->GetPower(POWER_ECLIPSE) == 0)
-                        {
-                            caster->CastCustomSpell(caster, SPELL_DRUID_ECLIPSE_GENERAL_ENERGIZE, &energizeAmount, 0, 0, true);
-                            // If the energize was due to 0 power, cast the eclipse marker aura
-                            if (!caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE_MARKER))
-                                caster->CastSpell(caster, SPELL_DRUID_LUNAR_ECLIPSE_MARKER, true);
-                        }
-                        // The energizing effect brought us out of the solar eclipse, remove the aura
-                        if (caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE) && caster->GetPower(POWER_ECLIPSE) <= 0)
-                            caster->RemoveAurasDueToSpell(SPELL_DRUID_SOLAR_ECLIPSE);
-                        break;
-                    }
-                    case SPELL_DRUID_STARFIRE:
-                    {
-                        energizeAmount = GetSpellInfo()->Effects[effIndex].BasePoints; // 20
-                        // If we are set to fill the solar side or we've just logged in with 0 power..
-                        if ((!caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE_MARKER) && caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE_MARKER))
-                            || caster->GetPower(POWER_ECLIPSE) == 0)
-                        {
-                            caster->CastCustomSpell(caster, SPELL_DRUID_ECLIPSE_GENERAL_ENERGIZE, &energizeAmount, 0, 0, true);
-                            // If the energize was due to 0 power, cast the eclipse marker aura
-                            if (!caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE_MARKER))
-                                caster->CastSpell(caster, SPELL_DRUID_SOLAR_ECLIPSE_MARKER, true);
-                        }
-                        // The energizing effect brought us out of the lunar eclipse, remove the aura
-                        if (caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE) && caster->GetPower(POWER_ECLIPSE) >= 0)
-                            caster->RemoveAura(SPELL_DRUID_LUNAR_ECLIPSE);
-                        break;
-                    }
-                    case SPELL_DRUID_STARSURGE:
-                    {
-                        // If we are set to fill the solar side or we've just logged in with 0 power (confirmed with sniffs)
-                        if ((!caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE_MARKER) && caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE_MARKER))
-                            || caster->GetPower(POWER_ECLIPSE) == 0)
-                        {
-                            energizeAmount = GetSpellInfo()->Effects[effIndex].BasePoints; // 15
-                            caster->CastCustomSpell(caster, SPELL_DRUID_STARSURGE_ENERGIZE, &energizeAmount, 0, 0, true);
+                    // No boomy, no deal.
+                    if (caster->GetPrimaryTalentTree(caster->GetActiveSpec()) != TALENT_TREE_DRUID_BALANCE)
+                        return;
 
-                            // If the energize was due to 0 power, cast the eclipse marker aura
-                            if (!caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE_MARKER))
-                                caster->CastSpell(caster, SPELL_DRUID_SOLAR_ECLIPSE_MARKER, true);
-                        }
-                        else if (!caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE_MARKER) && caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE_MARKER))
+                    switch (GetSpellInfo()->Id)
+                    {
+                        case SPELL_DRUID_WRATH:
                         {
-                            energizeAmount = -GetSpellInfo()->Effects[effIndex].BasePoints; // -15
-                            caster->CastCustomSpell(caster, SPELL_DRUID_STARSURGE_ENERGIZE, &energizeAmount, 0, 0, true);
+                            energizeAmount = -GetSpellInfo()->Effects[effIndex].BasePoints; // -13
+                            // If we are set to fill the lunar side or we've just logged in with 0 power..
+                            if ((!caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE_MARKER) && caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE_MARKER))
+                                || caster->GetPower(POWER_ECLIPSE) == 0)
+                            {
+                                caster->CastCustomSpell(caster, SPELL_DRUID_ECLIPSE_GENERAL_ENERGIZE, &energizeAmount, 0, 0, true);
+                                // If the energize was due to 0 power, cast the eclipse marker aura
+                                if (!caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE_MARKER))
+                                    caster->CastSpell(caster, SPELL_DRUID_LUNAR_ECLIPSE_MARKER, true);
+                            }
+                            // The energizing effect brought us out of the solar eclipse, remove the aura
+                            if (caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE) && caster->GetPower(POWER_ECLIPSE) <= 0)
+                                caster->RemoveAurasDueToSpell(SPELL_DRUID_SOLAR_ECLIPSE);
+                            break;
                         }
-                        // The energizing effect brought us out of the lunar eclipse, remove the aura
-                        if (caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE) && caster->GetPower(POWER_ECLIPSE) >= 0)
-                            caster->RemoveAura(SPELL_DRUID_LUNAR_ECLIPSE);
-                        // The energizing effect brought us out of the solar eclipse, remove the aura
-                        else if (caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE) && caster->GetPower(POWER_ECLIPSE) <= 0)
-                            caster->RemoveAura(SPELL_DRUID_SOLAR_ECLIPSE);
-                        break;
+                        case SPELL_DRUID_STARFIRE:
+                        {
+                            energizeAmount = GetSpellInfo()->Effects[effIndex].BasePoints; // 20
+                            // If we are set to fill the solar side or we've just logged in with 0 power..
+                            if ((!caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE_MARKER) && caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE_MARKER))
+                                || caster->GetPower(POWER_ECLIPSE) == 0)
+                            {
+                                caster->CastCustomSpell(caster, SPELL_DRUID_ECLIPSE_GENERAL_ENERGIZE, &energizeAmount, 0, 0, true);
+                                // If the energize was due to 0 power, cast the eclipse marker aura
+                                if (!caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE_MARKER))
+                                    caster->CastSpell(caster, SPELL_DRUID_SOLAR_ECLIPSE_MARKER, true);
+                            }
+                            // The energizing effect brought us out of the lunar eclipse, remove the aura
+                            if (caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE) && caster->GetPower(POWER_ECLIPSE) >= 0)
+                                caster->RemoveAura(SPELL_DRUID_LUNAR_ECLIPSE);
+                            break;
+                        }
+                        case SPELL_DRUID_STARSURGE:
+                        {
+                            // If we are set to fill the solar side or we've just logged in with 0 power (confirmed with sniffs)
+                            if ((!caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE_MARKER) && caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE_MARKER))
+                                || caster->GetPower(POWER_ECLIPSE) == 0)
+                            {
+                                energizeAmount = GetSpellInfo()->Effects[effIndex].BasePoints; // 15
+                                caster->CastCustomSpell(caster, SPELL_DRUID_STARSURGE_ENERGIZE, &energizeAmount, 0, 0, true);
+
+                                // If the energize was due to 0 power, cast the eclipse marker aura
+                                if (!caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE_MARKER))
+                                    caster->CastSpell(caster, SPELL_DRUID_SOLAR_ECLIPSE_MARKER, true);
+                            }
+                            else if (!caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE_MARKER) && caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE_MARKER))
+                            {
+                                energizeAmount = -GetSpellInfo()->Effects[effIndex].BasePoints; // -15
+                                caster->CastCustomSpell(caster, SPELL_DRUID_STARSURGE_ENERGIZE, &energizeAmount, 0, 0, true);
+                            }
+                            // The energizing effect brought us out of the lunar eclipse, remove the aura
+                            if (caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE) && caster->GetPower(POWER_ECLIPSE) >= 0)
+                                caster->RemoveAura(SPELL_DRUID_LUNAR_ECLIPSE);
+                            // The energizing effect brought us out of the solar eclipse, remove the aura
+                            else if (caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE) && caster->GetPower(POWER_ECLIPSE) <= 0)
+                                caster->RemoveAura(SPELL_DRUID_SOLAR_ECLIPSE);
+                            break;
+                        }
                     }
                 }
             }
@@ -1120,30 +1121,31 @@ class spell_dru_t10_restoration_4p_bonus : public SpellScriptLoader
 
             void FilterTargets(std::list<WorldObject*>& targets)
             {
-                if (!GetCaster()->ToPlayer()->GetGroup())
-                {
-                    targets.clear();
-                    targets.push_back(GetCaster());
-                }
-                else
-                {
-                    targets.remove(GetExplTargetUnit());
-                    std::list<Unit*> tempTargets;
-                    for (std::list<WorldObject*>::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
-                        if ((*itr)->GetTypeId() == TYPEID_PLAYER && GetCaster()->IsInRaidWith((*itr)->ToUnit()))
-                            tempTargets.push_back((*itr)->ToUnit());
-
-                    if (tempTargets.empty())
+                if (Player* player = GetCaster()->ToPlayer())
+                    if (!player->GetGroup())
                     {
                         targets.clear();
-                        FinishCast(SPELL_FAILED_DONT_REPORT);
-                        return;
+                        targets.push_back(GetCaster());
                     }
+                    else
+                    {
+                        targets.remove(GetExplTargetUnit());
+                        std::list<Unit*> tempTargets;
+                        for (std::list<WorldObject*>::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
+                            if ((*itr)->GetTypeId() == TYPEID_PLAYER && GetCaster()->IsInRaidWith((*itr)->ToUnit()))
+                                tempTargets.push_back((*itr)->ToUnit());
 
-                    Unit* target = Trinity::Containers::SelectRandomContainerElement(tempTargets);
-                    targets.clear();
-                    targets.push_back(target);
-                }
+                        if (tempTargets.empty())
+                        {
+                            targets.clear();
+                            FinishCast(SPELL_FAILED_DONT_REPORT);
+                            return;
+                        }
+
+                        Unit* target = Trinity::Containers::SelectRandomContainerElement(tempTargets);
+                        targets.clear();
+                        targets.push_back(target);
+                    }
             }
 
             void Register() override
@@ -1327,14 +1329,14 @@ public:
 };
 
 // Empowered touch 5185 50464
-class spell_dru_emp_touch : public SpellScriptLoader
+class spell_dru_empowered_touch : public SpellScriptLoader
 {
 public:
-    spell_dru_emp_touch() : SpellScriptLoader("spell_dru_emp_touch") { }
+    spell_dru_empowered_touch() : SpellScriptLoader("spell_dru_empowered_touch") { }
 
-    class spell_dru_emp_touch_SpellScript : public SpellScript
+    class spell_dru_empowered_touch_SpellScript : public SpellScript
     {
-        PrepareSpellScript(spell_dru_emp_touch_SpellScript);
+        PrepareSpellScript(spell_dru_empowered_touch_SpellScript);
 
         void OnHit()
         {
@@ -1345,25 +1347,25 @@ public:
 
         void Register()
         {
-            AfterHit += SpellHitFn(spell_dru_emp_touch_SpellScript::OnHit);
+            AfterHit += SpellHitFn(spell_dru_empowered_touch_SpellScript::OnHit);
         }
     };
 
     SpellScript* GetSpellScript() const
     {
-        return new spell_dru_emp_touch_SpellScript();
+        return new spell_dru_empowered_touch_SpellScript();
     }
 };
 
 // Empowered touch 88433
-class spell_dru_emp_touch_triggered : public SpellScriptLoader
+class spell_dru_empowered_touch_triggered : public SpellScriptLoader
 {
 public:
-    spell_dru_emp_touch_triggered() : SpellScriptLoader("spell_dru_emp_touch_triggered") { }
+    spell_dru_empowered_touch_triggered() : SpellScriptLoader("spell_dru_empowered_touch_triggered") { }
 
-    class spell_dru_emp_touch_triggered_SpellScript : public SpellScript
+    class spell_dru_empowered_touch_triggered_SpellScript : public SpellScript
     {
-        PrepareSpellScript(spell_dru_emp_touch_triggered_SpellScript);
+        PrepareSpellScript(spell_dru_empowered_touch_triggered_SpellScript);
 
         void OnHit()
         {
@@ -1374,13 +1376,13 @@ public:
 
         void Register()
         {
-            AfterHit += SpellHitFn(spell_dru_emp_touch_triggered_SpellScript::OnHit);
+            AfterHit += SpellHitFn(spell_dru_empowered_touch_triggered_SpellScript::OnHit);
         }
     };
 
     SpellScript* GetSpellScript() const
     {
-        return new spell_dru_emp_touch_triggered_SpellScript();
+        return new spell_dru_empowered_touch_triggered_SpellScript();
     }
 };
 
@@ -1406,57 +1408,58 @@ public:
 
         void OnHit()
         {
-            Player* caster = GetCaster()->ToPlayer();
-
-            // No boomy, no deal.
-            if (caster->GetPrimaryTalentTree(caster->GetActiveSpec()) != TALENT_TREE_DRUID_BALANCE)
-                return;
-
-            bool lunar = caster->GetPower(POWER_ECLIPSE) == -100;
-            bool solar = caster->GetPower(POWER_ECLIPSE) == 100;
-            if (caster->GetPower(POWER_ECLIPSE) > 0)
+            if (Player* caster = GetCaster()->ToPlayer())
             {
-                if (!caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE_MARKER))
-                    caster->CastSpell(caster, SPELL_DRUID_SOLAR_ECLIPSE_MARKER, true);
-            }
-            else if (caster->GetPower(POWER_ECLIPSE) < 0)
-            {
-                if (!caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE_MARKER))
-                    caster->CastSpell(caster, SPELL_DRUID_LUNAR_ECLIPSE_MARKER, true);
-            }
-            if (solar || lunar)
-            {
-                // Euphoria mana regen
-                if (AuraEffect* euphoria = caster->GetDummyAuraEffect(SPELLFAMILY_DRUID, 4431, EFFECT_2))
-                    caster->CastCustomSpell(81070, SPELLVALUE_BASE_POINT0, euphoria->GetAmount(), caster, TRIGGERED_FULL_MASK);
+                // No boomy, no deal.
+                if (caster->GetPrimaryTalentTree(caster->GetActiveSpec()) != TALENT_TREE_DRUID_BALANCE)
+                    return;
 
-                // Remove Nature's grace cooldown
-                caster->RemoveSpellCooldown(16886);
-
-                if (solar)
+                bool lunar = caster->GetPower(POWER_ECLIPSE) == -100;
+                bool solar = caster->GetPower(POWER_ECLIPSE) == 100;
+                if (caster->GetPower(POWER_ECLIPSE) > 0)
                 {
-                    // Sunfire
-                    if (AuraEffect* sunfire = caster->GetDummyAuraEffect(SPELLFAMILY_DRUID, 3262, EFFECT_0))
-                        caster->CastCustomSpell(94338, SPELLVALUE_BASE_POINT0, 93402, caster, TRIGGERED_FULL_MASK);
-
-                    if (caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE_MARKER))
-                    {
-                        caster->RemoveAurasDueToSpell(SPELL_DRUID_SOLAR_ECLIPSE_MARKER);
-                        caster->CastSpell(caster, SPELL_DRUID_LUNAR_ECLIPSE_MARKER, true);
-                    }
-
-                    caster->CastSpell(caster, 48517, true);
-                }
-
-                if (lunar)
-                {
-                    if (caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE_MARKER))
-                    {
-                        caster->RemoveAurasDueToSpell(SPELL_DRUID_LUNAR_ECLIPSE_MARKER);
+                    if (!caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE_MARKER))
                         caster->CastSpell(caster, SPELL_DRUID_SOLAR_ECLIPSE_MARKER, true);
+                }
+                else if (caster->GetPower(POWER_ECLIPSE) < 0)
+                {
+                    if (!caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE_MARKER))
+                        caster->CastSpell(caster, SPELL_DRUID_LUNAR_ECLIPSE_MARKER, true);
+                }
+                if (solar || lunar)
+                {
+                    // Euphoria mana regen
+                    if (AuraEffect* euphoria = caster->GetDummyAuraEffect(SPELLFAMILY_DRUID, 4431, EFFECT_2))
+                        caster->CastCustomSpell(81070, SPELLVALUE_BASE_POINT0, euphoria->GetAmount(), caster, TRIGGERED_FULL_MASK);
+
+                    // Remove Nature's grace cooldown
+                    caster->RemoveSpellCooldown(16886);
+
+                    if (solar)
+                    {
+                        // Sunfire
+                        if (AuraEffect* sunfire = caster->GetDummyAuraEffect(SPELLFAMILY_DRUID, 3262, EFFECT_0))
+                            caster->CastCustomSpell(94338, SPELLVALUE_BASE_POINT0, 93402, caster, TRIGGERED_FULL_MASK);
+
+                        if (caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE_MARKER))
+                        {
+                            caster->RemoveAurasDueToSpell(SPELL_DRUID_SOLAR_ECLIPSE_MARKER);
+                            caster->CastSpell(caster, SPELL_DRUID_LUNAR_ECLIPSE_MARKER, true);
+                        }
+
+                        caster->CastSpell(caster, 48517, true);
                     }
 
-                    caster->CastSpell(caster, 48518, true);
+                    if (lunar)
+                    {
+                        if (caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE_MARKER))
+                        {
+                            caster->RemoveAurasDueToSpell(SPELL_DRUID_LUNAR_ECLIPSE_MARKER);
+                            caster->CastSpell(caster, SPELL_DRUID_SOLAR_ECLIPSE_MARKER, true);
+                        }
+
+                        caster->CastSpell(caster, 48518, true);
+                    }
                 }
             }
         }
@@ -1859,9 +1862,6 @@ public:
             if (Unit* caster = GetCaster())
                 if (Player* player = caster->ToPlayer())
                 {
-                    if (!caster->ToPlayer())
-                        return;
-
                     uint32 rejuvCount = 0;
                     Unit::AuraMap const& auras = player->GetOwnedAuras();
 
@@ -2365,6 +2365,139 @@ public:
     }
 };
 
+// wild_mushroom Efflorescence 81262
+class spell_dru_wild_mushroom_efflorescence : public SpellScriptLoader
+{
+public:
+    spell_dru_wild_mushroom_efflorescence() : SpellScriptLoader("spell_dru_wild_mushroom_efflorescence") { }
+
+    class spell_dru_wild_mushroom_efflorescence_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_dru_wild_mushroom_efflorescence_AuraScript);
+
+        void HandleEffectPeriodic(AuraEffect const* aurEff)
+        {
+            if (DynamicObject* dyn = GetTarget()->GetDynObject(aurEff->GetId()))
+                GetTarget()->CastSpell(dyn->GetPositionX(), dyn->GetPositionY(), dyn->GetPositionZ(), 81269, true);
+        }
+
+        void Register()
+        {
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_dru_wild_mushroom_efflorescence_AuraScript::HandleEffectPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_dru_wild_mushroom_efflorescence_AuraScript();
+    }
+};
+
+// wild_mushroom efflorescence_heal 81269
+class spell_dru_wild_mushroom_efflorescence_heal : public SpellScriptLoader
+{
+public:
+    spell_dru_wild_mushroom_efflorescence_heal() : SpellScriptLoader("spell_dru_wild_mushroom_efflorescence_heal") { }
+
+    class spell_dru_wild_mushroom_efflorescence_heal_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_dru_wild_mushroom_efflorescence_heal_SpellScript);
+
+        void FilterTargets(std::list<WorldObject*>& targets)
+        {
+            std::list<Unit*> temp;
+            for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); itr++)
+                if (Unit* unit = (*itr)->ToUnit())
+                    temp.push_back(unit);
+
+            targets.clear();
+            temp.sort(Trinity::HealthPctOrderPred());
+            if (temp.size() > 3)
+                temp.resize(3);
+            for (std::list<Unit*>::iterator itr = temp.begin(); itr != temp.end(); itr++)
+                targets.push_back((WorldObject*)(*itr));
+        }
+
+        void HandleHeal(SpellEffIndex /*effIndex*/)
+        {
+            if (AuraEffect* aurEff = GetCaster()->GetAuraEffect(81262, EFFECT_1, GetCaster()->GetGUID()))
+                SetHitHeal(aurEff->GetAmount());
+        }
+
+        void Register()
+        {
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_dru_wild_mushroom_efflorescence_heal_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_DEST_AREA_ALLY);
+            OnEffectHitTarget += SpellEffectFn(spell_dru_wild_mushroom_efflorescence_heal_SpellScript::HandleHeal, EFFECT_0, SPELL_EFFECT_HEAL);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_dru_wild_mushroom_efflorescence_heal_SpellScript();
+    }
+};
+
+// 99015
+class spell_dru_t12_4p_restoration_item_bonus : public SpellScriptLoader
+{
+public:
+    spell_dru_t12_4p_restoration_item_bonus() : SpellScriptLoader("spell_dru_t12_4p_restoration_item_bonus") { }
+
+    class spell_dru_t12_4p_restoration_item_bonus_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_dru_t12_4p_restoration_item_bonus_AuraScript);
+
+        enum { SPELL_RUNIC_ENERGIZE = 61258 };
+
+        bool CheckProc(ProcEventInfo& procInfo)
+        {
+            SpellInfo const* const spellInfo = procInfo.GetSpellInfo();
+            if (!spellInfo)
+                return false;
+
+            HealInfo* const healInfo = procInfo.GetHealInfo();
+            if (!healInfo || !healInfo->GetHeal())
+                return false;
+
+            return SelectFriendlyTarget();
+        }
+
+
+        void HandleProc(AuraEffect const*, ProcEventInfo& procInfo)
+        {
+            Unit* const target = SelectFriendlyTarget();
+
+            int32 const value = int32(procInfo.GetHealInfo()->GetHeal());
+            GetTarget()->CastCustomSpell(target, procInfo.GetSpellInfo()->Id, &value, NULL, NULL, true);
+        }
+
+
+        Unit* SelectFriendlyTarget() const
+        {
+            Unit* unit = NULL;
+            Unit* const target = GetTarget();
+
+            Trinity::MostHPMissingInRange check(target, 15.0f, 1);
+            Trinity::UnitLastSearcher<Trinity::MostHPMissingInRange> searcher(target, unit, check);
+            target->VisitNearbyObject(15.0f, searcher);
+
+            return unit;
+        }
+
+
+        void Register()
+        {
+            DoCheckProc += AuraCheckProcFn(spell_dru_t12_4p_restoration_item_bonus_AuraScript::CheckProc);
+            OnEffectProc += AuraEffectProcFn(spell_dru_t12_4p_restoration_item_bonus_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_dru_t12_4p_restoration_item_bonus_AuraScript();
+    }
+};
+
 void AddSC_druid_spell_scripts()
 {
     new spell_dru_barkskin();
@@ -2374,8 +2507,8 @@ void AddSC_druid_spell_scripts()
     new spell_dru_eclipse("spell_dru_eclipse_lunar");
     new spell_dru_eclipse("spell_dru_eclipse_solar");
     new spell_dru_eclipse_energize();
-    new spell_dru_emp_touch();
-    new spell_dru_emp_touch_triggered();
+    new spell_dru_empowered_touch();
+    new spell_dru_empowered_touch_triggered();
     new spell_dru_energize();
     new spell_dru_enrage();
     new spell_dru_faerie_fire();
@@ -2414,7 +2547,10 @@ void AddSC_druid_spell_scripts()
     new spell_dru_tiger_s_fury();
     new spell_dru_typhoon();
     new spell_dru_t10_restoration_4p_bonus();
+    new spell_dru_t12_4p_restoration_item_bonus();
     new spell_dru_wild_growth();
     new spell_dru_wild_mushroom();
     new spell_dru_wild_mushroom_detonation();
+    new spell_dru_wild_mushroom_efflorescence();
+    new spell_dru_wild_mushroom_efflorescence_heal();
 }

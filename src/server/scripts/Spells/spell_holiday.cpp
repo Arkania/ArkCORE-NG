@@ -31,21 +31,31 @@
 #include "GridNotifiersImpl.h"
 #include "CellImpl.h"
 
-// 45102 Romantic Picnic
-enum SpellsPicnic
+enum PilgrimsBountyBuffFood
 {
-    SPELL_BASKET_CHECK              = 45119, // Holiday - Valentine - Romantic Picnic Near Basket Check
-    SPELL_MEAL_PERIODIC             = 45103, // Holiday - Valentine - Romantic Picnic Meal Periodic - effect dummy
-    SPELL_MEAL_EAT_VISUAL           = 45120, // Holiday - Valentine - Romantic Picnic Meal Eat Visual
-    //SPELL_MEAL_PARTICLE             = 45114, // Holiday - Valentine - Romantic Picnic Meal Particle - unused
-    SPELL_DRINK_VISUAL              = 45121, // Holiday - Valentine - Romantic Picnic Drink Visual
-    SPELL_ROMANTIC_PICNIC_ACHIEV    = 45123, // Romantic Picnic periodic = 5000
+    // Pilgrims Bounty Buff Food
+    SPELL_WELL_FED_AP_TRIGGER = 65414,
+    SPELL_WELL_FED_ZM_TRIGGER = 65412,
+    SPELL_WELL_FED_HIT_TRIGGER = 65416,
+    SPELL_WELL_FED_HASTE_TRIGGER = 65410,
+    SPELL_WELL_FED_SPIRIT_TRIGGER = 65415
 };
 
+// 45102
 class spell_love_is_in_the_air_romantic_picnic : public SpellScriptLoader
 {
     public:
         spell_love_is_in_the_air_romantic_picnic() : SpellScriptLoader("spell_love_is_in_the_air_romantic_picnic") { }
+
+        enum SpellsPicnic
+        {
+            SPELL_BASKET_CHECK = 45119, // Holiday - Valentine - Romantic Picnic Near Basket Check
+            SPELL_MEAL_PERIODIC = 45103, // Holiday - Valentine - Romantic Picnic Meal Periodic - effect dummy
+            SPELL_MEAL_EAT_VISUAL = 45120, // Holiday - Valentine - Romantic Picnic Meal Eat Visual
+            //SPELL_MEAL_PARTICLE             = 45114, // Holiday - Valentine - Romantic Picnic Meal Particle - unused
+            SPELL_DRINK_VISUAL = 45121, // Holiday - Valentine - Romantic Picnic Drink Visual
+            SPELL_ROMANTIC_PICNIC_ACHIEV = 45123, // Romantic Picnic periodic = 5000
+        };
 
         class spell_love_is_in_the_air_romantic_picnic_AuraScript : public AuraScript
         {
@@ -113,25 +123,25 @@ class spell_love_is_in_the_air_romantic_picnic : public SpellScriptLoader
         }
 };
 
-// 24750 Trick
-enum TrickSpells
-{
-    SPELL_PIRATE_COSTUME_MALE           = 24708,
-    SPELL_PIRATE_COSTUME_FEMALE         = 24709,
-    SPELL_NINJA_COSTUME_MALE            = 24710,
-    SPELL_NINJA_COSTUME_FEMALE          = 24711,
-    SPELL_LEPER_GNOME_COSTUME_MALE      = 24712,
-    SPELL_LEPER_GNOME_COSTUME_FEMALE    = 24713,
-    SPELL_SKELETON_COSTUME              = 24723,
-    SPELL_GHOST_COSTUME_MALE            = 24735,
-    SPELL_GHOST_COSTUME_FEMALE          = 24736,
-    SPELL_TRICK_BUFF                    = 24753,
-};
-
+// 24750 
 class spell_hallow_end_trick : public SpellScriptLoader
 {
     public:
         spell_hallow_end_trick() : SpellScriptLoader("spell_hallow_end_trick") { }
+
+        enum TrickSpells
+        {
+            SPELL_PIRATE_COSTUME_MALE = 24708,
+            SPELL_PIRATE_COSTUME_FEMALE = 24709,
+            SPELL_NINJA_COSTUME_MALE = 24710,
+            SPELL_NINJA_COSTUME_FEMALE = 24711,
+            SPELL_LEPER_GNOME_COSTUME_MALE = 24712,
+            SPELL_LEPER_GNOME_COSTUME_FEMALE = 24713,
+            SPELL_SKELETON_COSTUME = 24723,
+            SPELL_GHOST_COSTUME_MALE = 24735,
+            SPELL_GHOST_COSTUME_FEMALE = 24736,
+            SPELL_TRICK_BUFF = 24753,
+        };
 
         class spell_hallow_end_trick_SpellScript : public SpellScript
         {
@@ -190,21 +200,21 @@ class spell_hallow_end_trick : public SpellScriptLoader
         }
 };
 
-// 24751 Trick or Treat
-enum TrickOrTreatSpells
-{
-    SPELL_TRICK                 = 24714,
-    SPELL_TREAT                 = 24715,
-    SPELL_TRICKED_OR_TREATED    = 24755,
-    SPELL_TRICKY_TREAT_SPEED    = 42919,
-    SPELL_TRICKY_TREAT_TRIGGER  = 42965,
-    SPELL_UPSET_TUMMY           = 42966
-};
-
+// 24751 
 class spell_hallow_end_trick_or_treat : public SpellScriptLoader
 {
     public:
         spell_hallow_end_trick_or_treat() : SpellScriptLoader("spell_hallow_end_trick_or_treat") { }
+
+        enum TrickOrTreatSpells
+        {
+            SPELL_TRICK = 24714,
+            SPELL_TREAT = 24715,
+            SPELL_TRICKED_OR_TREATED = 24755,
+            SPELL_TRICKY_TREAT_SPEED = 42919,
+            SPELL_TRICKY_TREAT_TRIGGER = 42965,
+            SPELL_UPSET_TUMMY = 42966
+        };
 
         class spell_hallow_end_trick_or_treat_SpellScript : public SpellScript
         {
@@ -239,10 +249,21 @@ class spell_hallow_end_trick_or_treat : public SpellScriptLoader
         }
 };
 
+// 44436
 class spell_hallow_end_tricky_treat : public SpellScriptLoader
 {
     public:
         spell_hallow_end_tricky_treat() : SpellScriptLoader("spell_hallow_end_tricky_treat") { }
+
+        enum TrickOrTreatSpells
+        {
+            SPELL_TRICK = 24714,
+            SPELL_TREAT = 24715,
+            SPELL_TRICKED_OR_TREATED = 24755,
+            SPELL_TRICKY_TREAT_SPEED = 42919,
+            SPELL_TRICKY_TREAT_TRIGGER = 42965,
+            SPELL_UPSET_TUMMY = 42966
+        };
 
         class spell_hallow_end_tricky_treat_SpellScript : public SpellScript
         {
@@ -278,16 +299,7 @@ class spell_hallow_end_tricky_treat : public SpellScriptLoader
         }
 };
 
-enum PilgrimsBountyBuffFood
-{
-    // Pilgrims Bounty Buff Food
-    SPELL_WELL_FED_AP_TRIGGER       = 65414,
-    SPELL_WELL_FED_ZM_TRIGGER       = 65412,
-    SPELL_WELL_FED_HIT_TRIGGER      = 65416,
-    SPELL_WELL_FED_HASTE_TRIGGER    = 65410,
-    SPELL_WELL_FED_SPIRIT_TRIGGER   = 65415
-};
-
+// 65418, 65419, , 65420, 65421, 65422
 class spell_pilgrims_bounty_buff_food : public SpellScriptLoader
 {
     private:
@@ -334,17 +346,18 @@ class spell_pilgrims_bounty_buff_food : public SpellScriptLoader
         }
 };
 
-enum Mistletoe
-{
-    SPELL_CREATE_MISTLETOE          = 26206,
-    SPELL_CREATE_HOLLY              = 26207,
-    SPELL_CREATE_SNOWFLAKES         = 45036
-};
-
+// 26218
 class spell_winter_veil_mistletoe : public SpellScriptLoader
 {
     public:
         spell_winter_veil_mistletoe() : SpellScriptLoader("spell_winter_veil_mistletoe") { }
+
+        enum Mistletoe
+        {
+            SPELL_CREATE_MISTLETOE = 26206,
+            SPELL_CREATE_HOLLY = 26207,
+            SPELL_CREATE_SNOWFLAKES = 45036
+        };
 
         class spell_winter_veil_mistletoe_SpellScript : public SpellScript
         {
@@ -380,19 +393,19 @@ class spell_winter_veil_mistletoe : public SpellScriptLoader
         }
 };
 
-// 26275 - PX-238 Winter Wondervolt TRAP
-enum PX238WinterWondervolt
-{
-    SPELL_PX_238_WINTER_WONDERVOLT_TRANSFORM_1  = 26157,
-    SPELL_PX_238_WINTER_WONDERVOLT_TRANSFORM_2  = 26272,
-    SPELL_PX_238_WINTER_WONDERVOLT_TRANSFORM_3  = 26273,
-    SPELL_PX_238_WINTER_WONDERVOLT_TRANSFORM_4  = 26274
-};
-
+// 26275
 class spell_winter_veil_px_238_winter_wondervolt : public SpellScriptLoader
 {
     public:
         spell_winter_veil_px_238_winter_wondervolt() : SpellScriptLoader("spell_winter_veil_px_238_winter_wondervolt") { }
+
+        enum PX238WinterWondervolt
+        {
+            SPELL_PX_238_WINTER_WONDERVOLT_TRANSFORM_1 = 26157,
+            SPELL_PX_238_WINTER_WONDERVOLT_TRANSFORM_2 = 26272,
+            SPELL_PX_238_WINTER_WONDERVOLT_TRANSFORM_3 = 26273,
+            SPELL_PX_238_WINTER_WONDERVOLT_TRANSFORM_4 = 26274
+        };
 
         class spell_winter_veil_px_238_winter_wondervolt_SpellScript : public SpellScript
         {
@@ -445,20 +458,20 @@ class spell_winter_veil_px_238_winter_wondervolt : public SpellScriptLoader
         }
 };
 
-enum TorchSpells
-{
-    SPELL_TORCH_TOSSING_TRAINING = 45716,
-    SPELL_TORCH_TOSSING_PRACTICE = 46630,
-    SPELL_TORCH_TOSSING_TRAINING_SUCCESS_ALLIANCE = 45719,
-    SPELL_TORCH_TOSSING_TRAINING_SUCCESS_HORDE = 46651,
-    SPELL_BRAZIERS_HIT = 45724
-};
-
-// 45724 - Braziers Hit!
+// 45724 
 class spell_midsummer_braziers_hit : public SpellScriptLoader
 {
 public:
     spell_midsummer_braziers_hit() : SpellScriptLoader("spell_midsummer_braziers_hit") { }
+
+    enum TorchSpells
+    {
+        SPELL_TORCH_TOSSING_TRAINING = 45716,
+        SPELL_TORCH_TOSSING_PRACTICE = 46630,
+        SPELL_TORCH_TOSSING_TRAINING_SUCCESS_ALLIANCE = 45719,
+        SPELL_TORCH_TOSSING_TRAINING_SUCCESS_HORDE = 46651,
+        SPELL_BRAZIERS_HIT = 45724
+    };
 
     class spell_midsummer_braziers_hit_AuraScript : public AuraScript
     {

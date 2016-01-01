@@ -40,13 +40,17 @@ enum DeathKnightSpells
     SPELL_DK_BLOOD_SHIELD_ABSORB                = 77535,
     SPELL_DK_BUTCHERY                           = 50163,
     SPELL_DK_CORPSE_EXPLOSION_TRIGGERED         = 43999,
+    SPELL_DK_CORPSE_EXPLOSION_VISUAL            = 51270,
     SPELL_DK_DEATH_COIL_DAMAGE                  = 47632,
     SPELL_DK_DEATH_COIL_HEAL                    = 47633,
     SPELL_DK_DEATH_STRIKE_HEAL                  = 45470,
     SPELL_DK_DEATH_STRIKE_ENABLER               = 89832,
     SPELL_DK_FROST_PRESENCE                     = 48266,
     SPELL_DK_GHOUL_EXPLODE                      = 47496,
+    SPELL_DK_GLYPH_OF_CHAINS_OF_ICE             = 58620,
+    SPELL_DK_GLYPH_OF_CHAINS_OF_ICE_DAMAGE      = 58621,
     SPELL_DK_GLYPH_OF_ICEBOUND_FORTITUDE        = 58625,
+    SPELL_DK_GLYPH_OF_SCOURGE_STRIKE            = 58642,
     SPELL_DK_IMPROVED_BLOOD_PRESENCE_R1         = 50365,
     SPELL_DK_IMPROVED_DEATH_STRIKE              = 62905,
     SPELL_DK_IMPROVED_FROST_PRESENCE_R1         = 50384,
@@ -56,13 +60,33 @@ enum DeathKnightSpells
     SPELL_DK_ITEM_SIGIL_VENGEFUL_HEART          = 64962,
     SPELL_DK_ITEM_T8_MELEE_4P_BONUS             = 64736,
     SPELL_DK_MASTER_OF_GHOULS                   = 52143,
+    SPELL_DK_MERCILESS_COMBAT_RANK_1            = 49024,
+    SPELL_DK_MERCILESS_COMBAT_RANK_2            = 49538,
     SPELL_DK_RAISE_DEAD_USE_REAGENT             = 48289,
     SPELL_DK_RUNIC_POWER_ENERGIZE               = 49088,
     SPELL_DK_RUNE_TAP                           = 48982,
     SPELL_DK_SCENT_OF_BLOOD                     = 50422,
     SPELL_DK_SCOURGE_STRIKE_TRIGGERED           = 70890,
     SPELL_DK_UNHOLY_PRESENCE                    = 48265,
-    SPELL_DK_WILL_OF_THE_NECROPOLIS             = 96171
+    SPELL_DK_WILL_OF_THE_NECROPOLIS             = 96171,
+    SPELL_DK_WILL_OF_THE_NECROPOLIS_TALENT_R1   = 49189,
+    SPELL_DK_WILL_OF_THE_NECROPOLIS_AURA_R1     = 52284,
+};
+
+enum DeathKnightSpellIcons
+{
+    DK_ICON_ID_IMPROVED_DEATH_STRIKE = 2751
+};
+
+enum DKPetCalculate
+{
+    SPELL_DEATH_KNIGHT_RUNE_WEAPON_02 = 51906,
+    SPELL_DEATH_KNIGHT_PET_SCALING_01 = 54566,
+    SPELL_DEATH_KNIGHT_PET_SCALING_02 = 51996,
+    SPELL_DEATH_KNIGHT_PET_SCALING_03 = 61697,
+    SPELL_NIGHT_OF_THE_DEAD = 55620,
+    ENTRY_ARMY_OF_THE_DEAD_GHOUL = 24207,
+    SPELL_DEATH_KNIGHT_GLYPH_OF_GHOUL = 58686,
 };
 
 // 50462 - Anti-Magic Shell (on raid member)
@@ -1396,31 +1420,859 @@ class spell_dk_will_of_the_necropolis : public SpellScriptLoader
         }
 };
 
+// new #############################################
+
+// 62137
+class spell_dk_avoidance_passive : public SpellScriptLoader
+{
+public:
+    spell_dk_avoidance_passive() : SpellScriptLoader("spell_dk_avoidance_passive") { }
+
+    class spell_dk_avoidance_passive_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_dk_avoidance_passive_AuraScript);
+
+        bool Load()
+        {
+            if (!GetCaster() || !GetCaster()->GetOwner() || GetCaster()->GetOwner()->GetTypeId() != TYPEID_PLAYER)
+                return false;
+            return true;
+        }
+
+        void CalculateAvoidanceAmount(AuraEffect const* /* aurEff */, int32& amount, bool& /*canBeRecalculated*/)
+        {
+            if (Unit* pet = GetUnitOwner())
+            {
+                if (Unit* owner = pet->GetOwner())
+                {
+                    // Army of the dead ghoul
+                    if (pet->GetEntry() == ENTRY_ARMY_OF_THE_DEAD_GHOUL)
+                        amount = -90;
+                    // Night of the dead
+                    else if (Aura* aur = owner->GetAuraOfRankedSpell(SPELL_NIGHT_OF_THE_DEAD))
+                        amount = aur->GetSpellInfo()->Effects[EFFECT_2].CalcValue();
+                }
+            }
+        }
+
+        void Register()
+        {
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dk_avoidance_passive_AuraScript::CalculateAvoidanceAmount, EFFECT_0, SPELL_AURA_MOD_CREATURE_AOE_DAMAGE_AVOIDANCE);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_dk_avoidance_passive_AuraScript();
+    }
+};
+
+// 54566
+class spell_dk_pet_scaling_01 : public SpellScriptLoader
+{
+public:
+    spell_dk_pet_scaling_01() : SpellScriptLoader("spell_dk_pet_scaling_01") { }
+
+    class spell_dk_pet_scaling_01_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_dk_pet_scaling_01_AuraScript);
+
+        bool Load()
+        {
+            if (!GetCaster() || !GetCaster()->GetOwner() || GetCaster()->GetOwner()->GetTypeId() != TYPEID_PLAYER)
+                return false;
+            _tempHealth = 0;
+            return true;
+        }
+
+        void CalculateStaminaAmount(AuraEffect const* /* aurEff */, int32& amount, bool& /*canBeRecalculated*/)
+        {
+            if (Unit* pet = GetUnitOwner())
+            {
+                if (pet->IsGuardian())
+                {
+                    if (Unit* owner = pet->GetOwner())
+                    {
+                        float mod = 1.0f;
+                        // Glyph of Raise dead
+                        if (AuraEffect const* aurEff = owner->GetAuraEffect(58686, 0))
+                            AddPct(mod, aurEff->GetAmount());
+
+                        float ownerBonus = float(owner->GetStat(STAT_STAMINA)) * mod;
+                        amount += ownerBonus;
+                    }
+                }
+            }
+        }
+
+        void ApplyEffect(AuraEffect const* /* aurEff */, AuraEffectHandleModes /*mode*/)
+        {
+            if (Unit* pet = GetUnitOwner())
+                if (_tempHealth)
+                    pet->SetHealth(_tempHealth);
+        }
+
+        void RemoveEffect(AuraEffect const* /* aurEff */, AuraEffectHandleModes /*mode*/)
+        {
+            if (Unit* pet = GetUnitOwner())
+                _tempHealth = pet->GetHealth();
+        }
+
+        void CalculateStrengthAmount(AuraEffect const* /* aurEff */, int32& amount, bool& /*canBeRecalculated*/)
+        {
+            if (Unit* pet = GetUnitOwner())
+            {
+                if (!pet->IsGuardian())
+                    return;
+
+                Unit* owner = pet->GetOwner();
+                if (!owner)
+                    return;
+
+                float mod = 1.0f;
+                // Glyph of raise dead
+                if (AuraEffect const* aurEff = owner->GetAuraEffect(58686, 0))
+                    AddPct(mod, aurEff->GetAmount());
+
+                float ownerBonus = float(owner->GetStat(STAT_STRENGTH)) * mod;
+                amount += ownerBonus;
+            }
+        }
+
+        void Register()
+        {
+            OnEffectRemove += AuraEffectRemoveFn(spell_dk_pet_scaling_01_AuraScript::RemoveEffect, EFFECT_0, SPELL_AURA_MOD_STAT, AURA_EFFECT_HANDLE_CHANGE_AMOUNT_MASK);
+            AfterEffectApply += AuraEffectApplyFn(spell_dk_pet_scaling_01_AuraScript::ApplyEffect, EFFECT_0, SPELL_AURA_MOD_STAT, AURA_EFFECT_HANDLE_CHANGE_AMOUNT_MASK);
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dk_pet_scaling_01_AuraScript::CalculateStaminaAmount, EFFECT_0, SPELL_AURA_MOD_STAT);
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dk_pet_scaling_01_AuraScript::CalculateStrengthAmount, EFFECT_1, SPELL_AURA_MOD_STAT);
+        }
+
+    private:
+        uint32 _tempHealth;
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_dk_pet_scaling_01_AuraScript();
+    }
+};
+
+// 51996
+class spell_dk_pet_scaling_02 : public SpellScriptLoader
+{
+public:
+    spell_dk_pet_scaling_02() : SpellScriptLoader("spell_dk_pet_scaling_02") { }
+
+    class spell_dk_pet_scaling_02_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_dk_pet_scaling_02_AuraScript);
+
+        bool Load()
+        {
+            if (!GetCaster() || !GetCaster()->GetOwner() || GetCaster()->GetOwner()->GetTypeId() != TYPEID_PLAYER)
+                return false;
+            return true;
+        }
+
+        void CalculateAmountMeleeHaste(AuraEffect const* /* aurEff */, int32& amount, bool& /*canBeRecalculated*/)
+        {
+            if (!GetCaster() || !GetCaster()->GetOwner())
+                return;
+            if (Player* owner = GetCaster()->GetOwner()->ToPlayer())
+            {
+                // For others recalculate it from:
+                float HasteMelee = 0.0f;
+                HasteMelee += (1 - owner->m_modAttackSpeedPct[BASE_ATTACK]) * 100;
+                amount += int32(HasteMelee);
+            }
+        }
+
+        void CalculateBonusDamagePct(AuraEffect const* /* aurEff */, int32& amount, bool& /*canBeRecalculated*/)
+        {
+            if (!GetCaster() || !GetCaster()->GetOwner())
+                return;
+
+            if (Player* owner = GetCaster()->GetOwner()->ToPlayer())
+            {
+                Unit::AuraEffectList const& auraDamagePctList = owner->GetAuraEffectsByType(SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
+                for (Unit::AuraEffectList::const_iterator itr = auraDamagePctList.begin(); itr != auraDamagePctList.end(); ++itr)
+                    if ((*itr)->GetMiscValue() & SPELL_SCHOOL_MASK_NORMAL)
+                        amount += (*itr)->GetAmount();
+            }
+        }
+
+
+        void Register()
+        {
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dk_pet_scaling_02_AuraScript::CalculateBonusDamagePct, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dk_pet_scaling_02_AuraScript::CalculateAmountMeleeHaste, EFFECT_1, SPELL_AURA_MELEE_SLOW);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_dk_pet_scaling_02_AuraScript();
+    }
+};
+
+// 61697
+class spell_dk_pet_scaling_03 : public SpellScriptLoader
+{
+public:
+    spell_dk_pet_scaling_03() : SpellScriptLoader("spell_dk_pet_scaling_03") { }
+
+    class spell_dk_pet_scaling_03_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_dk_pet_scaling_03_AuraScript);
+
+        bool Load()
+        {
+            if (!GetCaster() || !GetCaster()->GetOwner() || GetCaster()->GetOwner()->GetTypeId() != TYPEID_PLAYER)
+                return false;
+            return true;
+        }
+
+        void CalculateAmountMeleeHit(AuraEffect const* /* aurEff */, int32& amount, bool& /*canBeRecalculated*/)
+        {
+            if (!GetCaster() || !GetCaster()->GetOwner())
+                return;
+            if (Player* owner = GetCaster()->GetOwner()->ToPlayer())
+            {
+                // For others recalculate it from:
+                float HitMelee = 0.0f;
+                // Increase hit from SPELL_AURA_MOD_HIT_CHANCE
+                HitMelee += owner->GetTotalAuraModifier(SPELL_AURA_MOD_HIT_CHANCE);
+                // Increase hit melee from meele hit ratings
+                HitMelee += owner->GetRatingBonusValue(CR_HIT_MELEE);
+
+                amount += int32(HitMelee);
+            }
+        }
+
+        void CalculateAmountSpellHit(AuraEffect const* /* aurEff */, int32& amount, bool& /*canBeRecalculated*/)
+        {
+            if (!GetCaster() || !GetCaster()->GetOwner())
+                return;
+            if (Player* owner = GetCaster()->GetOwner()->ToPlayer())
+            {
+                // For others recalculate it from:
+                float HitSpell = 0.0f;
+                // Increase hit from SPELL_AURA_MOD_SPELL_HIT_CHANCE
+                HitSpell += owner->GetTotalAuraModifier(SPELL_AURA_MOD_SPELL_HIT_CHANCE);
+                // Increase hit spell from spell hit ratings
+                HitSpell += owner->GetRatingBonusValue(CR_HIT_SPELL);
+
+                amount += int32(HitSpell);
+            }
+        }
+
+        void Register()
+        {
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dk_pet_scaling_03_AuraScript::CalculateAmountMeleeHit, EFFECT_0, SPELL_AURA_MOD_HIT_CHANCE);
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dk_pet_scaling_03_AuraScript::CalculateAmountSpellHit, EFFECT_1, SPELL_AURA_MOD_SPELL_HIT_CHANCE);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_dk_pet_scaling_03_AuraScript();
+    }
+};
+
+// 51906
+class spell_dk_rune_weapon_scaling_02 : public SpellScriptLoader
+{
+public:
+    spell_dk_rune_weapon_scaling_02() : SpellScriptLoader("spell_dk_rune_weapon_scaling_02") { }
+
+    class spell_dk_rune_weapon_scaling_02_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_dk_rune_weapon_scaling_02_AuraScript);
+
+        bool Load()
+        {
+            if (!GetCaster() || !GetCaster()->GetOwner() || GetCaster()->GetOwner()->GetTypeId() != TYPEID_PLAYER)
+                return false;
+            return true;
+        }
+
+        void CalculateDamageDoneAmount(AuraEffect const* /* aurEff */, int32& amount, bool& /*canBeRecalculated*/)
+        {
+            if (Unit* pet = GetUnitOwner())
+            {
+                Unit* owner = pet->GetOwner();
+                if (!owner)
+                    return;
+
+                if (pet->IsGuardian())
+                    ((Guardian*)pet)->SetBonusDamage(owner->GetTotalAttackPowerValue(BASE_ATTACK));
+
+                amount += owner->CalculateDamage(BASE_ATTACK, true, true);
+            }
+        }
+
+        void CalculateAmountMeleeHaste(AuraEffect const* /* aurEff */, int32& amount, bool& /*canBeRecalculated*/)
+        {
+            if (!GetCaster() || !GetCaster()->GetOwner())
+                return;
+            if (Player* owner = GetCaster()->GetOwner()->ToPlayer())
+            {
+                // For others recalculate it from:
+                float HasteMelee = 0.0f;
+                // Increase hit from SPELL_AURA_MOD_HIT_CHANCE
+                HasteMelee += (1 - owner->m_modAttackSpeedPct[BASE_ATTACK]) * 100;
+
+                amount += int32(HasteMelee);
+            }
+        }
+
+        void Register()
+        {
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dk_rune_weapon_scaling_02_AuraScript::CalculateDamageDoneAmount, EFFECT_0, SPELL_AURA_MOD_DAMAGE_DONE);
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dk_rune_weapon_scaling_02_AuraScript::CalculateAmountMeleeHaste, EFFECT_1, SPELL_AURA_MELEE_SLOW);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_dk_rune_weapon_scaling_02_AuraScript();
+    }
+};
+
+// 45524 
+class spell_dk_chains_of_ice : public SpellScriptLoader
+{
+public:
+    spell_dk_chains_of_ice() : SpellScriptLoader("spell_dk_chains_of_ice") { }
+
+    class spell_dk_chains_of_ice_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_dk_chains_of_ice_SpellScript);
+
+        void HandleOnHit()
+        {
+            if (Player* _player = GetCaster()->ToPlayer())
+                if (Unit* target = GetHitUnit())
+                    if (_player->HasAura(SPELL_DK_GLYPH_OF_CHAINS_OF_ICE))
+                        _player->CastSpell(target, SPELL_DK_GLYPH_OF_CHAINS_OF_ICE_DAMAGE, true);
+        }
+
+        void Register()
+        {
+            OnHit += SpellHitFn(spell_dk_chains_of_ice_SpellScript::HandleOnHit);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_dk_chains_of_ice_SpellScript();
+    }
+};
+
+// 50435
+class spell_dk_chilblains : public SpellScriptLoader
+{
+public:
+    spell_dk_chilblains() : SpellScriptLoader("spell_dk_chilblains") { }
+
+    class spell_dk_chilblains_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_dk_chilblains_SpellScript);
+
+        void OnHitTarget(SpellEffIndex /*effIndex*/)
+        {
+            Unit* caster = GetCaster();
+            Unit* target = GetHitUnit();
+            if (AuraEffect* chilblains = caster->GetAuraEffect(SPELL_AURA_ADD_TARGET_TRIGGER, SPELLFAMILY_DEATHKNIGHT, 143, EFFECT_0))
+            {
+                uint32 triggeredId = 0;
+                switch (chilblains->GetId())
+                {
+                case 50040:
+                    triggeredId = 96293;
+                    break;
+                case 50041:
+                    triggeredId = 96294;
+                    break;
+                }
+                caster->CastSpell(target, triggeredId, true);
+            }
+        }
+
+        void Register()
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_dk_chilblains_SpellScript::OnHitTarget, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_dk_chilblains_SpellScript;
+    }
+};
+
+// 63560
+class spell_dk_dark_transformation : public SpellScriptLoader
+{
+public:
+    spell_dk_dark_transformation() : SpellScriptLoader("spell_dk_dark_transformation") { }
+
+    class spell_dk_dark_transformation_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_dk_dark_transformation_SpellScript);
+
+        void HandleOnHit()
+        {
+            GetHitUnit()->RemoveAurasDueToSpell(91342);
+            GetCaster()->RemoveAurasDueToSpell(93426);
+        }
+
+        void Register()
+        {
+            OnHit += SpellHitFn(spell_dk_dark_transformation_SpellScript::HandleOnHit);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_dk_dark_transformation_SpellScript();
+    }
+};
+
+// 96268
+class spell_dk_deaths_advance : public SpellScriptLoader
+{
+public:
+    spell_dk_deaths_advance() : SpellScriptLoader("spell_dk_deaths_advance") { }
+
+    class spell_dk_deaths_advance_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_dk_deaths_advance_AuraScript);
+
+        void HandleEffectPeriodic(AuraEffect const* /*aurEff*/)
+        {
+            Player* player = GetCaster()->ToPlayer();
+            if (!player)
+                return;
+
+            uint8 unholyRunesOnCooldown = 0;
+            for (uint32 i = 2; i < 4; ++i)
+                if (player->GetRuneCooldown(i))
+                    unholyRunesOnCooldown++;
+            if (unholyRunesOnCooldown == 2)
+                RefreshDuration();
+        }
+
+        void Register()
+        {
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_dk_deaths_advance_AuraScript::HandleEffectPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_dk_deaths_advance_AuraScript();
+    }
+};
+
+// 85948
+class spell_dk_festering : public SpellScriptLoader
+{
+public:
+    spell_dk_festering() : SpellScriptLoader("spell_dk_festering") { }
+
+    class spell_dk_festering_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_dk_festering_SpellScript);
+
+        void OnHitTarget(SpellEffIndex /*effIndex*/)
+        {
+            Unit* caster = GetCaster();
+            Unit* target = GetHitUnit();
+            Aura* aura = NULL;
+            int32 newDuration = GetSpellInfo()->Effects[EFFECT_2].BasePoints * 1000;
+            // Increase chains of ice
+            if (aura = target->GetAura(45524, caster->GetGUID()))
+                aura->SetDuration(std::min(newDuration + aura->GetDuration(), aura->GetMaxDuration()), true);
+            // Increase Blood plague
+            if (aura = target->GetAura(55078, caster->GetGUID()))
+                aura->SetDuration(std::min(newDuration + aura->GetDuration(), aura->GetMaxDuration()), true);
+            // Increase frost fever
+            if (aura = target->GetAura(55095, caster->GetGUID()))
+                aura->SetDuration(std::min(newDuration + aura->GetDuration(), aura->GetMaxDuration()), true);
+            // Increase Ebon Plague
+            if (aura = target->GetAura(65142, caster->GetGUID()))
+                aura->SetDuration(std::min(newDuration + aura->GetDuration(), aura->GetMaxDuration()), true);
+        }
+
+        void Register()
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_dk_festering_SpellScript::OnHitTarget, EFFECT_2, SPELL_EFFECT_SCRIPT_EFFECT);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_dk_festering_SpellScript;
+    }
+};
+
+// 58620
+class spell_dk_glyph_chains_of_ice : public SpellScriptLoader
+{
+public:
+    spell_dk_glyph_chains_of_ice() : SpellScriptLoader("spell_dk_glyph_chains_of_ice") { }
+
+    class spell_dk_glyph_chains_of_ice_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_dk_glyph_chains_of_ice_SpellScript);
+
+        void CalculateDamage(SpellEffIndex /*effect*/)
+        {
+            // Formula: 0.08 to 0.13 * AP
+            if (Unit* caster = GetCaster())
+            {
+                int32 ap = caster->GetTotalAttackPowerValue(BASE_ATTACK);
+                SetHitDamage(int32(0.01f * irand(8, 13) * ap));
+            }
+        }
+
+        void Register()
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_dk_glyph_chains_of_ice::spell_dk_glyph_chains_of_ice_SpellScript::CalculateDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_dk_glyph_chains_of_ice_SpellScript();
+    }
+};
+
+// 49024 49538
+class spell_dk_merciless_combat : public SpellScriptLoader
+{
+public:
+    spell_dk_merciless_combat() : SpellScriptLoader("spell_dk_merciless_combat") { }
+
+    class spell_dk_merciless_combat_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_dk_merciless_combat_SpellScript);
+
+        void HandleOnHit()
+        {
+            if (Player* caster = GetCaster()->ToPlayer())
+            {
+                if (GetHitUnit()->GetHealthPct() <= 35.0f)
+                {
+                    int32 damage = GetHitDamage();
+                    if (caster->HasTalent(SPELL_DK_MERCILESS_COMBAT_RANK_1, caster->GetActiveSpec()))
+                    {
+                        SetHitDamage(uint32(damage * 1.06f));
+                    }
+                    else if (caster->HasTalent(SPELL_DK_MERCILESS_COMBAT_RANK_2, caster->GetActiveSpec()))
+                    {
+                        SetHitDamage(uint32(damage * 1.12f));
+                    }
+                }
+            }
+        }
+
+        void Register()
+        {
+            OnHit += SpellHitFn(spell_dk_merciless_combat_SpellScript::HandleOnHit);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_dk_merciless_combat_SpellScript();
+    }
+};
+
+// 50842
+class spell_dk_pestilence : public SpellScriptLoader
+{
+public:
+    spell_dk_pestilence() : SpellScriptLoader("spell_dk_pestilence") { }
+
+    class script_impl : public SpellScript
+    {
+        PrepareSpellScript(script_impl);
+
+        enum
+        {
+            SPELL_DOT_REDUCTION = 76243,
+            SPELL_GLYPH_OF_PESTILENCE = 63334,
+            SPELL_PESTILENCE_ANIMATION = 91939,
+            SPELL_BLOOD_PLAGUE = 55078,
+            SPELL_FROST_FEVER = 55095,
+        };
+
+        Unit* m_explTarget;
+
+        bool Load()
+        {
+            m_explTarget = GetExplTargetUnit();
+            return m_explTarget;
+        }
+
+        void FilterTargets(std::list<WorldObject*>& targets)
+        {
+            targets.remove(m_explTarget);
+        }
+
+        void HandleScript(SpellEffIndex)
+        {
+            Unit* const caster = GetCaster();
+            Unit* const target = GetHitUnit();
+            if (!target)
+                return;
+
+            caster->CastSpell(caster, SPELL_DOT_REDUCTION, true);
+
+            // Blood Plague
+            if (m_explTarget->HasAura(SPELL_BLOOD_PLAGUE, caster->GetGUID()))
+                caster->CastSpell(target, SPELL_BLOOD_PLAGUE, true);
+
+            // Frost Fever
+            if (m_explTarget->HasAura(SPELL_FROST_FEVER, caster->GetGUID()))
+                caster->CastSpell(target, SPELL_FROST_FEVER, true);
+
+            caster->CastSpell(target, SPELL_PESTILENCE_ANIMATION, true);
+        }
+
+        void Register()
+        {
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(script_impl::FilterTargets, EFFECT_2, TARGET_UNIT_DEST_AREA_ENEMY);
+            OnEffectHitTarget += SpellEffectFn(script_impl::HandleScript, EFFECT_2, SPELL_EFFECT_SCRIPT_EFFECT);
+        }
+    };
+
+   SpellScript* GetSpellScript() const
+    {
+        return new script_impl();
+    }
+};
+
+// 47468 47481 47482 47484
+class spell_dk_pet_spells : public SpellScriptLoader
+{
+public:
+    spell_dk_pet_spells() : SpellScriptLoader("spell_dk_pet_spells") { }
+
+    class spell_dk_pet_spells_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_dk_pet_spells_SpellScript);
+
+        void HandleDummy(SpellEffIndex /*effIndex*/)
+        {
+            bool darkTransformation = GetCaster()->HasAura(63560);
+            int32 triggered_spell_id = 0;
+            switch (GetSpellInfo()->Id)
+            {
+            case 47481: // Gnaw
+                triggered_spell_id = darkTransformation ? 91797 : 91800;
+                break;
+            case 47468: // Claw
+                triggered_spell_id = darkTransformation ? 91778 : 91776;
+                break;
+            case 47482: // Leap
+                triggered_spell_id = darkTransformation ? 91802 : 91809;
+                break;
+            case 47484: // Huddle
+                triggered_spell_id = darkTransformation ? 91837 : 91838;
+                break;
+            }
+            if (triggered_spell_id)
+                GetCaster()->CastSpell(GetHitUnit(), triggered_spell_id, true);
+        }
+
+        void Register()
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_dk_pet_spells_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_dk_pet_spells_SpellScript();
+    }
+};
+
+// 51271
+class spell_dk_pillar_of_frost : public SpellScriptLoader
+{
+public:
+    spell_dk_pillar_of_frost() : SpellScriptLoader("spell_dk_pillar_of_frost") { }
+
+    class spell_dk_pillar_of_frost_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_dk_pillar_of_frost_AuraScript);
+
+        void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            Unit* target = GetTarget();
+            if (AuraEffect* glyph = target->GetDummyAuraEffect(SPELLFAMILY_DEATHKNIGHT, 4919, EFFECT_0))
+                target->CastSpell(target, 90259, true);
+        }
+
+        void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            GetTarget()->RemoveAurasDueToSpell(90259);
+        }
+
+        void Register()
+        {
+            AfterEffectApply += AuraEffectApplyFn(spell_dk_pillar_of_frost_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+            AfterEffectRemove += AuraEffectRemoveFn(spell_dk_pillar_of_frost_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_dk_pillar_of_frost_AuraScript();
+    }
+};
+
+// 55078 55095
+class spell_dk_resilient_infection : public SpellScriptLoader
+{
+public:
+    spell_dk_resilient_infection() : SpellScriptLoader("spell_dk_resilient_infection") { }
+
+    class spell_dk_resilient_infection_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_dk_resilient_infection_AuraScript);
+
+        void HandleDispel(DispelInfo* /*dispelInfo*/)
+        {
+            if (Unit* caster = GetCaster())
+            {
+                // Resilient Infection
+                if (AuraEffect const* aurEff = caster->GetDummyAuraEffect(SPELLFAMILY_GENERIC, 1910, EFFECT_0))
+                    if (roll_chance_i(aurEff->GetAmount()))
+                    {
+                        int32 bp0 = 0;
+                        int32 bp1 = 0;
+                        if (GetId() == 55095)
+                            bp0 = 1;
+                        else
+                            bp1 = 1;
+
+                        caster->CastCustomSpell(caster, 90721, &bp0, &bp1, NULL, true);
+                    }
+            }
+        }
+
+        void Register()
+        {
+            AfterDispel += AuraDispelFn(spell_dk_resilient_infection_AuraScript::HandleDispel);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_dk_resilient_infection_AuraScript();
+    }
+};
+
+// 47476
+class spell_dk_strangulate : public SpellScriptLoader
+{
+public:
+    spell_dk_strangulate() : SpellScriptLoader("spell_dk_strangulate") { }
+
+    class spell_dk_strangulate_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_dk_strangulate_SpellScript);
+
+        bool Load()
+        {
+            wasCasting = false;
+            return true;
+        }
+
+        void HandleBeforeHit()
+        {
+            if (GetHitUnit())
+                wasCasting = GetHitUnit()->IsNonMeleeSpellCast(false, false, true);
+        }
+
+        void OnHitTarget(SpellEffIndex /*effIndex*/)
+        {
+            if (!wasCasting)
+                return;
+
+            Unit* caster = GetCaster();
+            Unit* target = GetHitUnit();
+            if (AuraEffect* glyph = caster->GetDummyAuraEffect(SPELLFAMILY_DEATHKNIGHT, 2027, EFFECT_0))
+                if (Aura* strangulate = GetHitAura())
+                {
+                    strangulate->SetMaxDuration(strangulate->GetDuration() + glyph->GetAmount());
+                    strangulate->SetDuration(strangulate->GetDuration() + glyph->GetAmount());
+                }
+        }
+
+        void Register()
+        {
+            BeforeHit += SpellHitFn(spell_dk_strangulate_SpellScript::HandleBeforeHit);
+            OnEffectHitTarget += SpellEffectFn(spell_dk_strangulate_SpellScript::OnHitTarget, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
+        }
+
+        bool wasCasting;
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_dk_strangulate_SpellScript;
+    }
+};
+
 void AddSC_deathknight_spell_scripts()
 {
     new spell_dk_anti_magic_shell_raid();
     new spell_dk_anti_magic_shell_self();
     new spell_dk_anti_magic_zone();
+    new spell_dk_avoidance_passive();
     new spell_dk_blood_boil();
     new spell_dk_blood_gorged();
     new spell_dk_butchery();
+    new spell_dk_chains_of_ice();
+    new spell_dk_chilblains();
+    new spell_dk_dark_transformation();
+    new spell_dk_deaths_advance();
     new spell_dk_death_coil();
     new spell_dk_death_gate();
     new spell_dk_death_grip();
     new spell_dk_death_pact();
     new spell_dk_death_strike();
     new spell_dk_death_strike_enabler();
+    new spell_dk_festering();
     new spell_dk_ghoul_explode();
+    new spell_dk_glyph_chains_of_ice();
     new spell_dk_icebound_fortitude();
     new spell_dk_improved_blood_presence();
     new spell_dk_improved_frost_presence();
     new spell_dk_improved_unholy_presence();
+    new spell_dk_merciless_combat();
     new spell_dk_necrotic_strike();
+    new spell_dk_pestilence();
+    new spell_dk_pet_scaling_01();
+    new spell_dk_pet_scaling_02();
+    new spell_dk_pet_scaling_03();
+    new spell_dk_pet_spells();
+    new spell_dk_pillar_of_frost();
     new spell_dk_presence();
     new spell_dk_raise_dead();
+    new spell_dk_resilient_infection();
     new spell_dk_rune_tap_party();
+    new spell_dk_rune_weapon_scaling_02();
     new spell_dk_scent_of_blood();
     new spell_dk_scourge_strike();
+    new spell_dk_strangulate();
     new spell_dk_vampiric_blood();
     new spell_dk_will_of_the_necropolis();
 }
+
+

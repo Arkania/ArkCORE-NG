@@ -27,24 +27,20 @@ enum General
     FACTION_GUILD_REPUTATION    = 1168,
 };
 
-/***********************
-* Guild Chest 83958 88304
-* http://www.wowhead.com/spell=83958/mobile-banking
-***********************/
-
-enum GuildChest
-{
-    SPELL_SUMMON_CHEST_ALLIANCE = 88304,
-    GOB_GUILD_CHEST_ALLIANCE    = 206602,
-
-    SPELL_SUMMON_CHEST_HORDE    = 88306,
-    GOB_GUILD_CHEST_HORDE       = 206603
-};
-
+// 83958 88304
 class spell_guild_chest : public SpellScriptLoader
 {
 public:
     spell_guild_chest() : SpellScriptLoader("spell_guild_chest") { }
+
+    enum GuildChest
+    {
+        SPELL_SUMMON_CHEST_ALLIANCE = 88304,
+        GOB_GUILD_CHEST_ALLIANCE = 206602,
+
+        SPELL_SUMMON_CHEST_HORDE = 88306,
+        GOB_GUILD_CHEST_HORDE = 206603
+    };
 
     class spell_guild_chest_SpellScript : public SpellScript
     {
@@ -84,11 +80,7 @@ public:
     }
 };
 
-/***********************
-* General spellscript to check friendly guild reputation 44643
-* http://www.wowhead.com/spell=44643/reputation-and-language#comments
-***********************/
-
+// 44643
 class spell_guild_check_friendly_reputation : public SpellScriptLoader
 {
 public:
@@ -122,24 +114,20 @@ public:
     }
 };
 
-/***********************
-* Flask of Battle 92679
-* http://www.wowhead.com/spell=92679/flask-of-battle
-***********************/
-
-enum FlaskOfBattle
-{
-    SPELL_FLASK_OF_THE_STEELSKIN    = 79469,
-    SPELL_FLASK_OF_TITANIC_STRENGHT = 79472,
-    SPELL_FLASK_OF_THE_WINDS        = 79471,
-    SPELL_FLASK_OF_FLOWING_WATER    = 94160,
-    SPELL_FLASK_OF_DRACONIC_MIND    = 79470,
-};
-
+// 92679
 class spell_guild_flask_of_battle : public SpellScriptLoader
 {
 public:
     spell_guild_flask_of_battle() : SpellScriptLoader("spell_guild_flask_of_battle") {}
+
+    enum FlaskOfBattle
+    {
+        SPELL_FLASK_OF_THE_STEELSKIN = 79469,
+        SPELL_FLASK_OF_TITANIC_STRENGHT = 79472,
+        SPELL_FLASK_OF_THE_WINDS = 79471,
+        SPELL_FLASK_OF_FLOWING_WATER = 94160,
+        SPELL_FLASK_OF_DRACONIC_MIND = 79470,
+    };
 
     class spell_guild_flask_of_battle_SpellScript : public SpellScript
     {

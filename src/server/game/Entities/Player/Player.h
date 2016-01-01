@@ -1385,6 +1385,7 @@ class Player : public Unit, public GridObject<Player>
         void SetBankBagSlotCount(uint8 count) { SetByteValue(PLAYER_BYTES_2, 2, count); }
         bool HasItemCount(uint32 item, uint32 count = 1, bool inBankAlso = false) const;
         bool HasItemFitToSpellRequirements(SpellInfo const* spellInfo, Item const* ignoreItem = NULL) const;
+        bool HasAllItemsToFitToSpellRequirements(SpellInfo const* spellInfo);
         bool CanNoReagentCast(SpellInfo const* spellInfo) const;
         bool HasItemOrGemWithIdEquipped(uint32 item, uint32 count, uint8 except_slot = NULL_SLOT) const;
         bool HasItemOrGemWithLimitCategoryEquipped(uint32 limitCategory, uint32 count, uint8 except_slot = NULL_SLOT) const;
@@ -1996,8 +1997,6 @@ class Player : public Unit, public GridObject<Player>
         void ApplyRatingMod(CombatRating cr, int32 value, bool apply);
         void UpdateRating(CombatRating cr);
         void UpdateAllRatings();
-        void UpdateMastery();
-        bool CanUseMastery() const;
 
         void CalculateMinMaxDamage(WeaponAttackType attType, bool normalized, bool addTotalPct, float& minDamage, float& maxDamage) override;
 
@@ -2196,6 +2195,27 @@ class Player : public Unit, public GridObject<Player>
         float GetTotalPercentageModValue(BaseModGroup modGroup) const { return m_auraBaseMod[modGroup][FLAT_MOD] + m_auraBaseMod[modGroup][PCT_MOD]; }
         void _ApplyAllStatBonuses();
         void _RemoveAllStatBonuses();
+
+        // Mastery Functions
+        void UpdateMastery();
+        float GetBaseMasteryPoints() const
+        {
+            switch (GetPrimaryTalentTree(GetActiveSpec()))
+            {
+            case TALENT_TREE_MAGE_FIRE:
+                return 7.86f;
+            case TALENT_TREE_MAGE_FROST:
+            case TALENT_TREE_WARRIOR_FURY:
+                return 2.0f;
+            default:
+                return 8.0f;
+            }
+        }
+        float GetMasteryPoints() const { return GetBaseMasteryPoints() + CalculateMasteryFromMasteryRating(m_baseRatingValue[CR_MASTERY]); }
+        float CalculateMasteryFromMasteryRating(int32 curr_rating) const { return float(curr_rating * 0.0055779569892473f); }
+        int32 CalculateMasteryRatingFromMastery(float curr_mastery) { return int32(curr_mastery / 0.0055779569892473f); }
+        void RemoveOrAddMasterySpells();
+        bool CanUseMastery() const;
 
         void ResetAllPowers();
 

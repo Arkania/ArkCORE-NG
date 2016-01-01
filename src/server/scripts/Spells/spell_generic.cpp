@@ -39,6 +39,81 @@
 #include "SpellAuraEffects.h"
 #include "Vehicle.h"
 
+enum Mounts
+{
+    SPELL_COLD_WEATHER_FLYING = 54197,
+
+    // Magic Broom
+    SPELL_MAGIC_BROOM_60 = 42680,
+    SPELL_MAGIC_BROOM_100 = 42683,
+    SPELL_MAGIC_BROOM_150 = 42667,
+    SPELL_MAGIC_BROOM_280 = 42668,
+
+    // Headless Horseman's Mount
+    SPELL_HEADLESS_HORSEMAN_MOUNT_60 = 51621,
+    SPELL_HEADLESS_HORSEMAN_MOUNT_100 = 48024,
+    SPELL_HEADLESS_HORSEMAN_MOUNT_150 = 51617,
+    SPELL_HEADLESS_HORSEMAN_MOUNT_280 = 48023,
+
+    // Winged Steed of the Ebon Blade
+    SPELL_WINGED_STEED_150 = 54726,
+    SPELL_WINGED_STEED_280 = 54727,
+
+    // Big Love Rocket
+    SPELL_BIG_LOVE_ROCKET_0 = 71343,
+    SPELL_BIG_LOVE_ROCKET_60 = 71344,
+    SPELL_BIG_LOVE_ROCKET_100 = 71345,
+    SPELL_BIG_LOVE_ROCKET_150 = 71346,
+    SPELL_BIG_LOVE_ROCKET_310 = 71347,
+
+    // Invincible
+    SPELL_INVINCIBLE_60 = 72281,
+    SPELL_INVINCIBLE_100 = 72282,
+    SPELL_INVINCIBLE_150 = 72283,
+    SPELL_INVINCIBLE_310 = 72284,
+
+    // Blazing Hippogryph
+    SPELL_BLAZING_HIPPOGRYPH_150 = 74854,
+    SPELL_BLAZING_HIPPOGRYPH_280 = 74855,
+
+    // Celestial Steed
+    SPELL_CELESTIAL_STEED_60 = 75619,
+    SPELL_CELESTIAL_STEED_100 = 75620,
+    SPELL_CELESTIAL_STEED_150 = 75617,
+    SPELL_CELESTIAL_STEED_280 = 75618,
+    SPELL_CELESTIAL_STEED_310 = 76153,
+
+    // X-53 Touring Rocket
+    SPELL_X53_TOURING_ROCKET_150 = 75957,
+    SPELL_X53_TOURING_ROCKET_280 = 75972,
+    SPELL_X53_TOURING_ROCKET_310 = 76154,
+};
+
+enum SpectatorCheerTrigger
+{
+    EMOTE_ONE_SHOT_CHEER = 4,
+    EMOTE_ONE_SHOT_EXCLAMATION = 5,
+    EMOTE_ONE_SHOT_APPLAUD = 21
+};
+
+uint8 const EmoteArray[3] = { EMOTE_ONE_SHOT_CHEER, EMOTE_ONE_SHOT_EXCLAMATION, EMOTE_ONE_SHOT_APPLAUD };
+
+enum GenericLifebloom
+{
+    SPELL_HEXLORD_MALACRASS_LIFEBLOOM_FINAL_HEAL = 43422,
+    SPELL_TUR_RAGEPAW_LIFEBLOOM_FINAL_HEAL = 52552,
+    SPELL_CENARION_SCOUT_LIFEBLOOM_FINAL_HEAL = 53692,
+    SPELL_TWISTED_VISAGE_LIFEBLOOM_FINAL_HEAL = 57763,
+    SPELL_FACTION_CHAMPIONS_DRU_LIFEBLOOM_FINAL_HEAL = 66094
+};
+
+enum SummonElemental
+{
+    SPELL_SUMMON_FIRE_ELEMENTAL = 8985,
+    SPELL_SUMMON_EARTH_ELEMENTAL = 19704
+};
+
+// 39228 60218
 class spell_gen_absorb0_hitlimit1 : public SpellScriptLoader
 {
     public:
@@ -75,19 +150,19 @@ class spell_gen_absorb0_hitlimit1 : public SpellScriptLoader
 };
 
 // 28764 - Adaptive Warding (Frostfire Regalia Set)
-enum AdaptiveWarding
-{
-    SPELL_GEN_ADAPTIVE_WARDING_FIRE     = 28765,
-    SPELL_GEN_ADAPTIVE_WARDING_NATURE   = 28768,
-    SPELL_GEN_ADAPTIVE_WARDING_FROST    = 28766,
-    SPELL_GEN_ADAPTIVE_WARDING_SHADOW   = 28769,
-    SPELL_GEN_ADAPTIVE_WARDING_ARCANE   = 28770
-};
-
 class spell_gen_adaptive_warding : public SpellScriptLoader
 {
     public:
         spell_gen_adaptive_warding() : SpellScriptLoader("spell_gen_adaptive_warding") { }
+
+        enum AdaptiveWarding
+        {
+            SPELL_GEN_ADAPTIVE_WARDING_FIRE = 28765,
+            SPELL_GEN_ADAPTIVE_WARDING_NATURE = 28768,
+            SPELL_GEN_ADAPTIVE_WARDING_FROST = 28766,
+            SPELL_GEN_ADAPTIVE_WARDING_SHADOW = 28769,
+            SPELL_GEN_ADAPTIVE_WARDING_ARCANE = 28770
+        };
 
         class spell_gen_adaptive_warding_AuraScript : public AuraScript
         {
@@ -165,17 +240,17 @@ class spell_gen_adaptive_warding : public SpellScriptLoader
         }
 };
 
-enum AlchemistStone
-{
-    ALECHEMIST_STONE_HEAL      = 21399,
-    ALECHEMIST_STONE_MANA      = 21400,
-};
-
 // 17619 - Alchemist Stone
 class spell_gen_alchemist_stone : public SpellScriptLoader
 {
     public:
         spell_gen_alchemist_stone() : SpellScriptLoader("spell_gen_alchemist_stone") { }
+
+        enum AlchemistStone
+        {
+            ALECHEMIST_STONE_HEAL = 21399,
+            ALECHEMIST_STONE_MANA = 21400,
+        };
 
         class spell_gen_alchemist_stone_AuraScript : public AuraScript
         {
@@ -226,6 +301,7 @@ class spell_gen_alchemist_stone : public SpellScriptLoader
         }
 };
 
+// 4073 12749 13166 13258 19804
 class spell_gen_allow_cast_from_item_only : public SpellScriptLoader
 {
     public:
@@ -254,16 +330,17 @@ class spell_gen_allow_cast_from_item_only : public SpellScriptLoader
         }
 };
 
-enum AnimalBloodPoolSpell
-{
-    SPELL_ANIMAL_BLOOD      = 46221,
-    SPELL_SPAWN_BLOOD_POOL  = 63471
-};
-
+// 46221
 class spell_gen_animal_blood : public SpellScriptLoader
 {
     public:
         spell_gen_animal_blood() : SpellScriptLoader("spell_gen_animal_blood") { }
+
+        enum AnimalBloodPoolSpell
+        {
+            SPELL_ANIMAL_BLOOD = 46221,
+            SPELL_SPAWN_BLOOD_POOL = 63471
+        };
 
         class spell_gen_animal_blood_AuraScript : public AuraScript
         {
@@ -332,20 +409,21 @@ class spell_gen_aura_of_anger : public SpellScriptLoader
         }
 };
 
-enum ServiceUniform
-{
-    // Spells
-    SPELL_SERVICE_UNIFORM       = 71450,
-
-    // Models
-    MODEL_GOBLIN_MALE           = 31002,
-    MODEL_GOBLIN_FEMALE         = 31003
-};
-
+// 71450
 class spell_gen_aura_service_uniform : public SpellScriptLoader
 {
     public:
         spell_gen_aura_service_uniform() : SpellScriptLoader("spell_gen_aura_service_uniform") { }
+
+        enum ServiceUniform
+        {
+            // Spells
+            SPELL_SERVICE_UNIFORM = 71450,
+
+            // Models
+            MODEL_GOBLIN_MALE = 31002,
+            MODEL_GOBLIN_FEMALE = 31003
+        };
 
         class spell_gen_aura_service_uniform_AuraScript : public AuraScript
         {
@@ -391,6 +469,7 @@ class spell_gen_aura_service_uniform : public SpellScriptLoader
         }
 };
 
+// 45822 45823 45824 45826 45828 45829 45830
 class spell_gen_av_drekthar_presence : public SpellScriptLoader
 {
     public:
@@ -434,15 +513,16 @@ class spell_gen_av_drekthar_presence : public SpellScriptLoader
         }
 };
 
-enum GenericBandage
-{
-    SPELL_RECENTLY_BANDAGED     = 11196
-};
-
+// -746
 class spell_gen_bandage : public SpellScriptLoader
 {
     public:
         spell_gen_bandage() : SpellScriptLoader("spell_gen_bandage") { }
+
+        enum GenericBandage
+        {
+            SPELL_RECENTLY_BANDAGED = 11196
+        };
 
         class spell_gen_bandage_SpellScript : public SpellScript
         {
@@ -484,17 +564,18 @@ class spell_gen_bandage : public SpellScriptLoader
         }
 };
 
-enum Bonked
-{
-    SPELL_BONKED            = 62991,
-    SPELL_FOAM_SWORD_DEFEAT = 62994,
-    SPELL_ON_GUARD          = 62972
-};
-
+// 62991
 class spell_gen_bonked : public SpellScriptLoader
 {
     public:
         spell_gen_bonked() : SpellScriptLoader("spell_gen_bonked") { }
+
+        enum Bonked
+        {
+            SPELL_BONKED = 62991,
+            SPELL_FOAM_SWORD_DEFEAT = 62994,
+            SPELL_ON_GUARD = 62972
+        };
 
         class spell_gen_bonked_SpellScript : public SpellScript
         {
@@ -531,43 +612,44 @@ class spell_gen_bonked : public SpellScriptLoader
         }
 };
 
-/* DOCUMENTATION: Break-Shield spells
-    Break-Shield spells can be classified in three groups:
-
-        - Spells on vehicle bar used by players:
-            + EFFECT_0: SCRIPT_EFFECT
-            + EFFECT_1: NONE
-            + EFFECT_2: NONE
-        - Spells cast by players triggered by script:
-            + EFFECT_0: SCHOOL_DAMAGE
-            + EFFECT_1: SCRIPT_EFFECT
-            + EFFECT_2: FORCE_CAST
-        - Spells cast by NPCs on players:
-            + EFFECT_0: SCHOOL_DAMAGE
-            + EFFECT_1: SCRIPT_EFFECT
-            + EFFECT_2: NONE
-
-    In the following script we handle the SCRIPT_EFFECT for effIndex EFFECT_0 and EFFECT_1.
-        - When handling EFFECT_0 we're in the "Spells on vehicle bar used by players" case
-          and we'll trigger "Spells cast by players triggered by script"
-        - When handling EFFECT_1 we're in the "Spells cast by players triggered by script"
-          or "Spells cast by NPCs on players" so we'll search for the first defend layer and drop it.
-*/
-
-enum BreakShieldSpells
-{
-    SPELL_BREAK_SHIELD_DAMAGE_2K                 = 62626,
-    SPELL_BREAK_SHIELD_DAMAGE_10K                = 64590,
-
-    SPELL_BREAK_SHIELD_TRIGGER_FACTION_MOUNTS    = 62575, // Also on ToC5 mounts
-    SPELL_BREAK_SHIELD_TRIGGER_CAMPAING_WARHORSE = 64595,
-    SPELL_BREAK_SHIELD_TRIGGER_UNK               = 66480
-};
-
+// 62575 62626 64342 64507 64590 64595 64686 65147 66480 68504
 class spell_gen_break_shield: public SpellScriptLoader
 {
     public:
         spell_gen_break_shield(const char* name) : SpellScriptLoader(name) { }
+
+        /* DOCUMENTATION: Break-Shield spells
+        Break-Shield spells can be classified in three groups:
+
+        - Spells on vehicle bar used by players:
+        + EFFECT_0: SCRIPT_EFFECT
+        + EFFECT_1: NONE
+        + EFFECT_2: NONE
+        - Spells cast by players triggered by script:
+        + EFFECT_0: SCHOOL_DAMAGE
+        + EFFECT_1: SCRIPT_EFFECT
+        + EFFECT_2: FORCE_CAST
+        - Spells cast by NPCs on players:
+        + EFFECT_0: SCHOOL_DAMAGE
+        + EFFECT_1: SCRIPT_EFFECT
+        + EFFECT_2: NONE
+
+        In the following script we handle the SCRIPT_EFFECT for effIndex EFFECT_0 and EFFECT_1.
+        - When handling EFFECT_0 we're in the "Spells on vehicle bar used by players" case
+        and we'll trigger "Spells cast by players triggered by script"
+        - When handling EFFECT_1 we're in the "Spells cast by players triggered by script"
+        or "Spells cast by NPCs on players" so we'll search for the first defend layer and drop it.
+        */
+
+        enum BreakShieldSpells
+        {
+            SPELL_BREAK_SHIELD_DAMAGE_2K = 62626,
+            SPELL_BREAK_SHIELD_DAMAGE_10K = 64590,
+
+            SPELL_BREAK_SHIELD_TRIGGER_FACTION_MOUNTS = 62575, // Also on ToC5 mounts
+            SPELL_BREAK_SHIELD_TRIGGER_CAMPAING_WARHORSE = 64595,
+            SPELL_BREAK_SHIELD_TRIGGER_UNK = 66480
+        };
 
         class spell_gen_break_shield_SpellScript : public SpellScript
         {
@@ -668,15 +750,16 @@ class spell_gen_burn_brutallus : public SpellScriptLoader
         }
 };
 
-enum CannibalizeSpells
-{
-    SPELL_CANNIBALIZE_TRIGGERED = 20578
-};
-
+// 20577
 class spell_gen_cannibalize : public SpellScriptLoader
 {
     public:
         spell_gen_cannibalize() : SpellScriptLoader("spell_gen_cannibalize") { }
+
+        enum CannibalizeSpells
+        {
+            SPELL_CANNIBALIZE_TRIGGERED = 20578
+        };
 
         class spell_gen_cannibalize_SpellScript : public SpellScript
         {
@@ -721,15 +804,16 @@ class spell_gen_cannibalize : public SpellScriptLoader
         }
 };
 
-enum ChaosBlast
-{
-    SPELL_CHAOS_BLAST   = 37675
-};
-
+// 37674
 class spell_gen_chaos_blast : public SpellScriptLoader
 {
     public:
         spell_gen_chaos_blast() : SpellScriptLoader("spell_gen_chaos_blast") { }
+
+        enum ChaosBlast
+        {
+            SPELL_CHAOS_BLAST = 37675
+        };
 
         class spell_gen_chaos_blast_SpellScript : public SpellScript
         {
@@ -761,15 +845,16 @@ class spell_gen_chaos_blast : public SpellScriptLoader
         }
 };
 
-enum Clone
-{
-    SPELL_NIGHTMARE_FIGMENT_MIRROR_IMAGE        = 57528
-};
-
+// 45204 45785 49889 50218 51719 57528 69828
 class spell_gen_clone : public SpellScriptLoader
 {
     public:
         spell_gen_clone() : SpellScriptLoader("spell_gen_clone") { }
+
+        enum Clone
+        {
+            SPELL_NIGHTMARE_FIGMENT_MIRROR_IMAGE = 57528
+        };
 
         class spell_gen_clone_SpellScript : public SpellScript
         {
@@ -802,18 +887,7 @@ class spell_gen_clone : public SpellScriptLoader
         }
 };
 
-enum CloneWeaponSpells
-{
-    SPELL_COPY_WEAPON_AURA       = 41054,
-    SPELL_COPY_WEAPON_2_AURA     = 63418,
-    SPELL_COPY_WEAPON_3_AURA     = 69893,
-
-    SPELL_COPY_OFFHAND_AURA      = 45205,
-    SPELL_COPY_OFFHAND_2_AURA    = 69896,
-
-    SPELL_COPY_RANGED_AURA       = 57594
-};
-
+// 41055 45206 57593 63416 69891 69892
 class spell_gen_clone_weapon : public SpellScriptLoader
 {
     public:
@@ -841,10 +915,23 @@ class spell_gen_clone_weapon : public SpellScriptLoader
         }
 };
 
+// 41054 45205 57594 63418 69893 69896
 class spell_gen_clone_weapon_aura : public SpellScriptLoader
 {
     public:
         spell_gen_clone_weapon_aura() : SpellScriptLoader("spell_gen_clone_weapon_aura") { }
+
+        enum CloneWeaponSpells
+        {
+            SPELL_COPY_WEAPON_AURA = 41054,
+            SPELL_COPY_WEAPON_2_AURA = 63418,
+            SPELL_COPY_WEAPON_3_AURA = 69893,
+
+            SPELL_COPY_OFFHAND_AURA = 45205,
+            SPELL_COPY_OFFHAND_2_AURA = 69896,
+
+            SPELL_COPY_RANGED_AURA = 57594
+        };
 
         class spell_gen_clone_weapon_auraScript : public AuraScript
         {
@@ -963,6 +1050,8 @@ class spell_gen_clone_weapon_aura : public SpellScriptLoader
         }
 };
 
+// parameter: spell_gen_50pct_count_pct_from_max_hp:   38441 48292 66316 67100 67101 67102
+// parameter: spell_gen_default_count_pct_from_max_hp: 29142 35139 42393 49882 55269 56578
 class spell_gen_count_pct_from_max_hp : public SpellScriptLoader
 {
     public:
@@ -1002,16 +1091,16 @@ class spell_gen_count_pct_from_max_hp : public SpellScriptLoader
 };
 
 // 63845 - Create Lance
-enum CreateLanceSpells
-{
-    SPELL_CREATE_LANCE_ALLIANCE = 63914,
-    SPELL_CREATE_LANCE_HORDE    = 63919
-};
-
 class spell_gen_create_lance : public SpellScriptLoader
 {
     public:
         spell_gen_create_lance() : SpellScriptLoader("spell_gen_create_lance") { }
+
+        enum CreateLanceSpells
+        {
+            SPELL_CREATE_LANCE_ALLIANCE = 63914,
+            SPELL_CREATE_LANCE_HORDE = 63919
+        };
 
         class spell_gen_create_lance_SpellScript : public SpellScript
         {
@@ -1050,6 +1139,7 @@ class spell_gen_create_lance : public SpellScriptLoader
         }
 };
 
+// 29266 31261 35356 35357 57685 58951 70592 70628 71598 74490 
 class spell_gen_creature_permanent_feign_death : public SpellScriptLoader
 {
     public:
@@ -1081,21 +1171,22 @@ class spell_gen_creature_permanent_feign_death : public SpellScriptLoader
         }
 };
 
-enum DalaranDisguiseSpells
-{
-    SPELL_SUNREAVER_DISGUISE_TRIGGER       = 69672,
-    SPELL_SUNREAVER_DISGUISE_FEMALE        = 70973,
-    SPELL_SUNREAVER_DISGUISE_MALE          = 70974,
-
-    SPELL_SILVER_COVENANT_DISGUISE_TRIGGER = 69673,
-    SPELL_SILVER_COVENANT_DISGUISE_FEMALE  = 70971,
-    SPELL_SILVER_COVENANT_DISGUISE_MALE    = 70972
-};
-
+// 69672 69673
 class spell_gen_dalaran_disguise : public SpellScriptLoader
 {
     public:
         spell_gen_dalaran_disguise(const char* name) : SpellScriptLoader(name) { }
+
+        enum DalaranDisguiseSpells
+        {
+            SPELL_SUNREAVER_DISGUISE_TRIGGER = 69672,
+            SPELL_SUNREAVER_DISGUISE_FEMALE = 70973,
+            SPELL_SUNREAVER_DISGUISE_MALE = 70974,
+
+            SPELL_SILVER_COVENANT_DISGUISE_TRIGGER = 69673,
+            SPELL_SILVER_COVENANT_DISGUISE_FEMALE = 70971,
+            SPELL_SILVER_COVENANT_DISGUISE_MALE = 70972
+        };
 
         class spell_gen_dalaran_disguise_SpellScript : public SpellScript
         {
@@ -1155,17 +1246,18 @@ class spell_gen_dalaran_disguise : public SpellScriptLoader
         }
 };
 
-enum DefendVisuals
-{
-    SPELL_VISUAL_SHIELD_1 = 63130,
-    SPELL_VISUAL_SHIELD_2 = 63131,
-    SPELL_VISUAL_SHIELD_3 = 63132
-};
-
+// 62552 62719 66482
 class spell_gen_defend : public SpellScriptLoader
 {
     public:
         spell_gen_defend() : SpellScriptLoader("spell_gen_defend") { }
+
+        enum DefendVisuals
+        {
+            SPELL_VISUAL_SHIELD_1 = 63130,
+            SPELL_VISUAL_SHIELD_2 = 63131,
+            SPELL_VISUAL_SHIELD_3 = 63132
+        };
 
         class spell_gen_defend_AuraScript : public AuraScript
         {
@@ -1241,6 +1333,7 @@ class spell_gen_defend : public SpellScriptLoader
         }
 };
 
+// 15998 25952 29435 45980 51592 51910 52267 54420
 class spell_gen_despawn_self : public SpellScriptLoader
 {
     public:
@@ -1273,16 +1366,16 @@ class spell_gen_despawn_self : public SpellScriptLoader
         }
 };
 
-enum DivineStormSpell
-{
-    SPELL_DIVINE_STORM      = 53385,
-};
-
 // 70769 Divine Storm!
 class spell_gen_divine_storm_cd_reset : public SpellScriptLoader
 {
     public:
         spell_gen_divine_storm_cd_reset() : SpellScriptLoader("spell_gen_divine_storm_cd_reset") { }
+
+        enum DivineStormSpell
+        {
+            SPELL_DIVINE_STORM = 53385,
+        };
 
         class spell_gen_divine_storm_cd_reset_SpellScript : public SpellScript
         {
@@ -1302,9 +1395,9 @@ class spell_gen_divine_storm_cd_reset : public SpellScriptLoader
 
             void HandleScript(SpellEffIndex /*effIndex*/)
             {
-                Player* caster = GetCaster()->ToPlayer();
-                if (caster->HasSpellCooldown(SPELL_DIVINE_STORM))
-                    caster->RemoveSpellCooldown(SPELL_DIVINE_STORM, true);
+                if (Player* caster = GetCaster()->ToPlayer())
+                    if (caster->HasSpellCooldown(SPELL_DIVINE_STORM))
+                        caster->RemoveSpellCooldown(SPELL_DIVINE_STORM, true);
             }
 
             void Register() override
@@ -1319,6 +1412,7 @@ class spell_gen_divine_storm_cd_reset : public SpellScriptLoader
         }
 };
 
+// 61698
 class spell_gen_ds_flush_knockback : public SpellScriptLoader
 {
     public:
@@ -1356,16 +1450,17 @@ class spell_gen_ds_flush_knockback : public SpellScriptLoader
         }
 };
 
-enum DummyTrigger
-{
-    SPELL_PERSISTANT_SHIELD_TRIGGERED       = 26470,
-    SPELL_PERSISTANT_SHIELD                 = 26467
-};
-
+// 13567
 class spell_gen_dummy_trigger : public SpellScriptLoader
 {
     public:
         spell_gen_dummy_trigger() : SpellScriptLoader("spell_gen_dummy_trigger") { }
+
+        enum DummyTrigger
+        {
+            SPELL_PERSISTANT_SHIELD_TRIGGERED = 26470,
+            SPELL_PERSISTANT_SHIELD = 26467
+        };
 
         class spell_gen_dummy_trigger_SpellScript : public SpellScript
         {
@@ -1401,6 +1496,7 @@ class spell_gen_dummy_trigger : public SpellScriptLoader
         }
 };
 
+// 58630 72830 72706 68663 68574 68572 68184 65195 65074 64985 64899 61863 59450 59046 72959
 class spell_gen_dungeon_credit : public SpellScriptLoader
 {
     public:
@@ -1443,23 +1539,24 @@ class spell_gen_dungeon_credit : public SpellScriptLoader
         }
 };
 
-enum EluneCandle
-{
-    // Creatures
-    NPC_OMEN                       = 15467,
-
-    // Spells
-    SPELL_ELUNE_CANDLE_OMEN_HEAD   = 26622,
-    SPELL_ELUNE_CANDLE_OMEN_CHEST  = 26624,
-    SPELL_ELUNE_CANDLE_OMEN_HAND_R = 26625,
-    SPELL_ELUNE_CANDLE_OMEN_HAND_L = 26649,
-    SPELL_ELUNE_CANDLE_NORMAL      = 26636
-};
-
+// 26374
 class spell_gen_elune_candle : public SpellScriptLoader
 {
     public:
         spell_gen_elune_candle() : SpellScriptLoader("spell_gen_elune_candle") { }
+
+        enum EluneCandle
+        {
+            // Creatures
+            NPC_OMEN = 15467,
+
+            // Spells
+            SPELL_ELUNE_CANDLE_OMEN_HEAD = 26622,
+            SPELL_ELUNE_CANDLE_OMEN_CHEST = 26624,
+            SPELL_ELUNE_CANDLE_OMEN_HAND_R = 26625,
+            SPELL_ELUNE_CANDLE_OMEN_HAND_L = 26649,
+            SPELL_ELUNE_CANDLE_NORMAL = 26636
+        };
 
         class spell_gen_elune_candle_SpellScript : public SpellScript
         {
@@ -1515,17 +1612,18 @@ class spell_gen_elune_candle : public SpellScriptLoader
         }
 };
 
-enum TransporterBackfires
-{
-    SPELL_TRANSPORTER_MALFUNCTION_POLYMORPH     = 23444,
-    SPELL_TRANSPORTER_EVIL_TWIN                 = 23445,
-    SPELL_TRANSPORTER_MALFUNCTION_MISS          = 36902
-};
-
+// 23448
 class spell_gen_gadgetzan_transporter_backfire : public SpellScriptLoader
 {
     public:
         spell_gen_gadgetzan_transporter_backfire() : SpellScriptLoader("spell_gen_gadgetzan_transporter_backfire") { }
+
+        enum TransporterBackfires
+        {
+            SPELL_TRANSPORTER_MALFUNCTION_POLYMORPH = 23444,
+            SPELL_TRANSPORTER_EVIL_TWIN = 23445,
+            SPELL_TRANSPORTER_MALFUNCTION_MISS = 36902
+        };
 
         class spell_gen_gadgetzan_transporter_backfire_SpellScript : public SpellScript
         {
@@ -1564,7 +1662,7 @@ class spell_gen_gadgetzan_transporter_backfire : public SpellScriptLoader
         }
 };
 
-
+// 28880 59542 59543 59544 59545 59547 59548
 class spell_gen_gift_of_naaru : public SpellScriptLoader
 {
     public:
@@ -1617,16 +1715,17 @@ class spell_gen_gift_of_naaru : public SpellScriptLoader
         }
 };
 
-enum GnomishTransporter
-{
-    SPELL_TRANSPORTER_SUCCESS                   = 23441,
-    SPELL_TRANSPORTER_FAILURE                   = 23446
-};
-
+// 23453
 class spell_gen_gnomish_transporter : public SpellScriptLoader
 {
     public:
         spell_gen_gnomish_transporter() : SpellScriptLoader("spell_gen_gnomish_transporter") { }
+
+        enum GnomishTransporter
+        {
+            SPELL_TRANSPORTER_SUCCESS = 23441,
+            SPELL_TRANSPORTER_FAILURE = 23446
+        };
 
         class spell_gen_gnomish_transporter_SpellScript : public SpellScript
         {
@@ -1657,6 +1756,7 @@ class spell_gen_gnomish_transporter : public SpellScriptLoader
         }
 };
 
+// 66630 66637
 class spell_gen_gunship_portal : public SpellScriptLoader
 {
     public:
@@ -1673,10 +1773,10 @@ class spell_gen_gunship_portal : public SpellScriptLoader
 
             void HandleScript(SpellEffIndex /*effIndex*/)
             {
-                Player* caster = GetCaster()->ToPlayer();
-                if (Battleground* bg = caster->GetBattleground())
-                    if (bg->GetTypeID(true) == BATTLEGROUND_IC)
-                        bg->DoAction(1, caster->GetGUID());
+                if (Player* caster = GetCaster()->ToPlayer())
+                    if (Battleground* bg = caster->GetBattleground())
+                        if (bg->GetTypeID(true) == BATTLEGROUND_IC)
+                            bg->DoAction(1, caster->GetGUID());
             }
 
             void Register() override
@@ -1691,18 +1791,16 @@ class spell_gen_gunship_portal : public SpellScriptLoader
         }
 };
 
-
-enum Interrupt
-{
-    SPELL_GEN_THROW_INTERRUPT           = 32747
-};
-
-// 32748 - Deadly Throw Interrupt
-// 44835 - Maim Interrupt
+// 32748 - Deadly Throw Interrupt, 44835 - Maim Interrupt
 class spell_gen_interrupt : public SpellScriptLoader
 {
     public:
         spell_gen_interrupt() : SpellScriptLoader("spell_gen_interrupt") { }
+
+        enum Interrupt
+        {
+            SPELL_GEN_THROW_INTERRUPT = 32747
+        };
 
         class spell_gen_interrupt_AuraScript : public AuraScript
         {
@@ -1733,15 +1831,16 @@ class spell_gen_interrupt : public SpellScriptLoader
         }
 };
 
-enum Launch
-{
-    SPELL_LAUNCH_NO_FALLING_DAMAGE  = 66251
-};
-
+// 66218 68659
 class spell_gen_launch : public SpellScriptLoader
 {
     public:
         spell_gen_launch() : SpellScriptLoader("spell_gen_launch") { }
+
+        enum Launch
+        {
+            SPELL_LAUNCH_NO_FALLING_DAMAGE = 66251
+        };
 
         class spell_gen_launch_SpellScript : public SpellScript
         {
@@ -1785,6 +1884,16 @@ class spell_gen_launch : public SpellScriptLoader
         }
 };
 
+/* 
+Spells for entry:
+    spell_pal_blessing_of_kings:    20217
+    spell_pal_blessing_of_might:    19740
+    spell_dru_mark_of_the_wild:      1126
+    spell_pri_power_word_fortitude: 21562
+    spell_pri_shadow_protection:    27683
+    spell_mage_arcane_brilliance:    1459
+    spell_mage_dalaran_brilliance:  61316
+*/
 class spell_gen_increase_stats_buff : public SpellScriptLoader
 {
     public:
@@ -1814,15 +1923,7 @@ class spell_gen_increase_stats_buff : public SpellScriptLoader
         }
 };
 
-enum GenericLifebloom
-{
-    SPELL_HEXLORD_MALACRASS_LIFEBLOOM_FINAL_HEAL        = 43422,
-    SPELL_TUR_RAGEPAW_LIFEBLOOM_FINAL_HEAL              = 52552,
-    SPELL_CENARION_SCOUT_LIFEBLOOM_FINAL_HEAL           = 53692,
-    SPELL_TWISTED_VISAGE_LIFEBLOOM_FINAL_HEAL           = 57763,
-    SPELL_FACTION_CHAMPIONS_DRU_LIFEBLOOM_FINAL_HEAL    = 66094
-};
-
+// 43422 52552 53692 57763 66094
 class spell_gen_lifebloom : public SpellScriptLoader
 {
     public:
@@ -1870,60 +1971,61 @@ class spell_gen_lifebloom : public SpellScriptLoader
         uint32 _spellId;
 };
 
-/* DOCUMENTATION: Charge spells
-    Charge spells can be classified in four groups:
-
-        - Spells on vehicle bar used by players:
-            + EFFECT_0: SCRIPT_EFFECT
-            + EFFECT_1: TRIGGER_SPELL
-            + EFFECT_2: NONE
-        - Spells cast by player's mounts triggered by script:
-            + EFFECT_0: CHARGE
-            + EFFECT_1: TRIGGER_SPELL
-            + EFFECT_2: APPLY_AURA
-        - Spells cast by players on the target triggered by script:
-            + EFFECT_0: SCHOOL_DAMAGE
-            + EFFECT_1: SCRIPT_EFFECT
-            + EFFECT_2: NONE
-        - Spells cast by NPCs on players:
-            + EFFECT_0: SCHOOL_DAMAGE
-            + EFFECT_1: CHARGE
-            + EFFECT_2: SCRIPT_EFFECT
-
-    In the following script we handle the SCRIPT_EFFECT and CHARGE
-        - When handling SCRIPT_EFFECT:
-            + EFFECT_0: Corresponds to "Spells on vehicle bar used by players" and we make player's mount cast
-              the charge effect on the current target ("Spells cast by player's mounts triggered by script").
-            + EFFECT_1 and EFFECT_2: Triggered when "Spells cast by player's mounts triggered by script" hits target,
-              corresponding to "Spells cast by players on the target triggered by script" and "Spells cast by
-              NPCs on players" and we check Defend layers and drop a charge of the first found.
-        - When handling CHARGE:
-            + Only launched for "Spells cast by player's mounts triggered by script", makes the player cast the
-              damaging spell on target with a small chance of failing it.
-*/
-
-enum ChargeSpells
-{
-    SPELL_CHARGE_DAMAGE_8K5             = 62874,
-    SPELL_CHARGE_DAMAGE_20K             = 68498,
-    SPELL_CHARGE_DAMAGE_45K             = 64591,
-
-    SPELL_CHARGE_CHARGING_EFFECT_8K5    = 63661,
-    SPELL_CHARGE_CHARGING_EFFECT_20K_1  = 68284,
-    SPELL_CHARGE_CHARGING_EFFECT_20K_2  = 68501,
-    SPELL_CHARGE_CHARGING_EFFECT_45K_1  = 62563,
-    SPELL_CHARGE_CHARGING_EFFECT_45K_2  = 66481,
-
-    SPELL_CHARGE_TRIGGER_FACTION_MOUNTS = 62960,
-    SPELL_CHARGE_TRIGGER_TRIAL_CHAMPION = 68282,
-
-    SPELL_CHARGE_MISS_EFFECT            = 62977,
-};
-
+// 62563 62874 62960 63003 63010 63661 64591 66481 68282 68284 68321 68498 68501
 class spell_gen_mounted_charge: public SpellScriptLoader
 {
     public:
         spell_gen_mounted_charge() : SpellScriptLoader("spell_gen_mounted_charge") { }
+        
+        /* DOCUMENTATION: Charge spells
+        Charge spells can be classified in four groups:
+
+        - Spells on vehicle bar used by players:
+        + EFFECT_0: SCRIPT_EFFECT
+        + EFFECT_1: TRIGGER_SPELL
+        + EFFECT_2: NONE
+        - Spells cast by player's mounts triggered by script:
+        + EFFECT_0: CHARGE
+        + EFFECT_1: TRIGGER_SPELL
+        + EFFECT_2: APPLY_AURA
+        - Spells cast by players on the target triggered by script:
+        + EFFECT_0: SCHOOL_DAMAGE
+        + EFFECT_1: SCRIPT_EFFECT
+        + EFFECT_2: NONE
+        - Spells cast by NPCs on players:
+        + EFFECT_0: SCHOOL_DAMAGE
+        + EFFECT_1: CHARGE
+        + EFFECT_2: SCRIPT_EFFECT
+
+        In the following script we handle the SCRIPT_EFFECT and CHARGE
+        - When handling SCRIPT_EFFECT:
+        + EFFECT_0: Corresponds to "Spells on vehicle bar used by players" and we make player's mount cast
+        the charge effect on the current target ("Spells cast by player's mounts triggered by script").
+        + EFFECT_1 and EFFECT_2: Triggered when "Spells cast by player's mounts triggered by script" hits target,
+        corresponding to "Spells cast by players on the target triggered by script" and "Spells cast by
+        NPCs on players" and we check Defend layers and drop a charge of the first found.
+        - When handling CHARGE:
+        + Only launched for "Spells cast by player's mounts triggered by script", makes the player cast the
+        damaging spell on target with a small chance of failing it.
+        */
+
+        enum ChargeSpells
+        {
+            SPELL_CHARGE_DAMAGE_8K5 = 62874,
+            SPELL_CHARGE_DAMAGE_20K = 68498,
+            SPELL_CHARGE_DAMAGE_45K = 64591,
+
+            SPELL_CHARGE_CHARGING_EFFECT_8K5 = 63661,
+            SPELL_CHARGE_CHARGING_EFFECT_20K_1 = 68284,
+            SPELL_CHARGE_CHARGING_EFFECT_20K_2 = 68501,
+            SPELL_CHARGE_CHARGING_EFFECT_45K_1 = 62563,
+            SPELL_CHARGE_CHARGING_EFFECT_45K_2 = 66481,
+
+            SPELL_CHARGE_TRIGGER_FACTION_MOUNTS = 62960,
+            SPELL_CHARGE_TRIGGER_TRIAL_CHAMPION = 68282,
+
+            SPELL_CHARGE_MISS_EFFECT = 62977,
+        };
 
         class spell_gen_mounted_charge_SpellScript : public SpellScript
         {
@@ -2031,16 +2133,16 @@ class spell_gen_mounted_charge: public SpellScriptLoader
         }
 };
 
-enum Netherbloom
-{
-    SPELL_NETHERBLOOM_POLLEN_1      = 28703
-};
-
 // 28702 - Netherbloom
 class spell_gen_netherbloom : public SpellScriptLoader
 {
     public:
         spell_gen_netherbloom() : SpellScriptLoader("spell_gen_netherbloom") { }
+
+        enum Netherbloom
+        {
+            SPELL_NETHERBLOOM_POLLEN_1 = 28703
+        };
 
         class spell_gen_netherbloom_SpellScript : public SpellScript
         {
@@ -2089,16 +2191,16 @@ class spell_gen_netherbloom : public SpellScriptLoader
         }
 };
 
-enum NightmareVine
-{
-    SPELL_NIGHTMARE_POLLEN      = 28721
-};
-
 // 28720 - Nightmare Vine
 class spell_gen_nightmare_vine : public SpellScriptLoader
 {
     public:
         spell_gen_nightmare_vine() : SpellScriptLoader("spell_gen_nightmare_vine") { }
+
+        enum NightmareVine
+        {
+            SPELL_NIGHTMARE_POLLEN = 28721
+        };
 
         class spell_gen_nightmare_vine_SpellScript : public SpellScript
         {
@@ -2135,21 +2237,21 @@ class spell_gen_nightmare_vine : public SpellScriptLoader
         }
 };
 
-enum ObsidianArmor
-{
-    SPELL_GEN_OBSIDIAN_ARMOR_HOLY       = 27536,
-    SPELL_GEN_OBSIDIAN_ARMOR_FIRE       = 27533,
-    SPELL_GEN_OBSIDIAN_ARMOR_NATURE     = 27538,
-    SPELL_GEN_OBSIDIAN_ARMOR_FROST      = 27534,
-    SPELL_GEN_OBSIDIAN_ARMOR_SHADOW     = 27535,
-    SPELL_GEN_OBSIDIAN_ARMOR_ARCANE     = 27540
-};
-
 // 27539 - Obsidian Armor
 class spell_gen_obsidian_armor : public SpellScriptLoader
 {
     public:
         spell_gen_obsidian_armor() : SpellScriptLoader("spell_gen_obsidian_armor") { }
+
+        enum ObsidianArmor
+        {
+            SPELL_GEN_OBSIDIAN_ARMOR_HOLY = 27536,
+            SPELL_GEN_OBSIDIAN_ARMOR_FIRE = 27533,
+            SPELL_GEN_OBSIDIAN_ARMOR_NATURE = 27538,
+            SPELL_GEN_OBSIDIAN_ARMOR_FROST = 27534,
+            SPELL_GEN_OBSIDIAN_ARMOR_SHADOW = 27535,
+            SPELL_GEN_OBSIDIAN_ARMOR_ARCANE = 27540
+        };
 
         class spell_gen_obsidian_armor_AuraScript : public AuraScript
         {
@@ -2222,105 +2324,106 @@ class spell_gen_obsidian_armor : public SpellScriptLoader
         }
 };
 
-enum TournamentPennantSpells
-{
-    SPELL_PENNANT_STORMWIND_ASPIRANT        = 62595,
-    SPELL_PENNANT_STORMWIND_VALIANT         = 62596,
-    SPELL_PENNANT_STORMWIND_CHAMPION        = 62594,
-    SPELL_PENNANT_GNOMEREGAN_ASPIRANT       = 63394,
-    SPELL_PENNANT_GNOMEREGAN_VALIANT        = 63395,
-    SPELL_PENNANT_GNOMEREGAN_CHAMPION       = 63396,
-    SPELL_PENNANT_SEN_JIN_ASPIRANT          = 63397,
-    SPELL_PENNANT_SEN_JIN_VALIANT           = 63398,
-    SPELL_PENNANT_SEN_JIN_CHAMPION          = 63399,
-    SPELL_PENNANT_SILVERMOON_ASPIRANT       = 63401,
-    SPELL_PENNANT_SILVERMOON_VALIANT        = 63402,
-    SPELL_PENNANT_SILVERMOON_CHAMPION       = 63403,
-    SPELL_PENNANT_DARNASSUS_ASPIRANT        = 63404,
-    SPELL_PENNANT_DARNASSUS_VALIANT         = 63405,
-    SPELL_PENNANT_DARNASSUS_CHAMPION        = 63406,
-    SPELL_PENNANT_EXODAR_ASPIRANT           = 63421,
-    SPELL_PENNANT_EXODAR_VALIANT            = 63422,
-    SPELL_PENNANT_EXODAR_CHAMPION           = 63423,
-    SPELL_PENNANT_IRONFORGE_ASPIRANT        = 63425,
-    SPELL_PENNANT_IRONFORGE_VALIANT         = 63426,
-    SPELL_PENNANT_IRONFORGE_CHAMPION        = 63427,
-    SPELL_PENNANT_UNDERCITY_ASPIRANT        = 63428,
-    SPELL_PENNANT_UNDERCITY_VALIANT         = 63429,
-    SPELL_PENNANT_UNDERCITY_CHAMPION        = 63430,
-    SPELL_PENNANT_ORGRIMMAR_ASPIRANT        = 63431,
-    SPELL_PENNANT_ORGRIMMAR_VALIANT         = 63432,
-    SPELL_PENNANT_ORGRIMMAR_CHAMPION        = 63433,
-    SPELL_PENNANT_THUNDER_BLUFF_ASPIRANT    = 63434,
-    SPELL_PENNANT_THUNDER_BLUFF_VALIANT     = 63435,
-    SPELL_PENNANT_THUNDER_BLUFF_CHAMPION    = 63436,
-    SPELL_PENNANT_ARGENT_CRUSADE_ASPIRANT   = 63606,
-    SPELL_PENNANT_ARGENT_CRUSADE_VALIANT    = 63500,
-    SPELL_PENNANT_ARGENT_CRUSADE_CHAMPION   = 63501,
-    SPELL_PENNANT_EBON_BLADE_ASPIRANT       = 63607,
-    SPELL_PENNANT_EBON_BLADE_VALIANT        = 63608,
-    SPELL_PENNANT_EBON_BLADE_CHAMPION       = 63609
-};
-
-enum TournamentMounts
-{
-    NPC_STORMWIND_STEED                     = 33217,
-    NPC_IRONFORGE_RAM                       = 33316,
-    NPC_GNOMEREGAN_MECHANOSTRIDER           = 33317,
-    NPC_EXODAR_ELEKK                        = 33318,
-    NPC_DARNASSIAN_NIGHTSABER               = 33319,
-    NPC_ORGRIMMAR_WOLF                      = 33320,
-    NPC_DARK_SPEAR_RAPTOR                   = 33321,
-    NPC_THUNDER_BLUFF_KODO                  = 33322,
-    NPC_SILVERMOON_HAWKSTRIDER              = 33323,
-    NPC_FORSAKEN_WARHORSE                   = 33324,
-    NPC_ARGENT_WARHORSE                     = 33782,
-    NPC_ARGENT_STEED_ASPIRANT               = 33845,
-    NPC_ARGENT_HAWKSTRIDER_ASPIRANT         = 33844
-};
-
-enum TournamentQuestsAchievements
-{
-    ACHIEVEMENT_CHAMPION_STORMWIND          = 2781,
-    ACHIEVEMENT_CHAMPION_DARNASSUS          = 2777,
-    ACHIEVEMENT_CHAMPION_IRONFORGE          = 2780,
-    ACHIEVEMENT_CHAMPION_GNOMEREGAN         = 2779,
-    ACHIEVEMENT_CHAMPION_THE_EXODAR         = 2778,
-    ACHIEVEMENT_CHAMPION_ORGRIMMAR          = 2783,
-    ACHIEVEMENT_CHAMPION_SEN_JIN            = 2784,
-    ACHIEVEMENT_CHAMPION_THUNDER_BLUFF      = 2786,
-    ACHIEVEMENT_CHAMPION_UNDERCITY          = 2787,
-    ACHIEVEMENT_CHAMPION_SILVERMOON         = 2785,
-    ACHIEVEMENT_ARGENT_VALOR                = 2758,
-    ACHIEVEMENT_CHAMPION_ALLIANCE           = 2782,
-    ACHIEVEMENT_CHAMPION_HORDE              = 2788,
-
-    QUEST_VALIANT_OF_STORMWIND              = 13593,
-    QUEST_A_VALIANT_OF_STORMWIND            = 13684,
-    QUEST_VALIANT_OF_DARNASSUS              = 13706,
-    QUEST_A_VALIANT_OF_DARNASSUS            = 13689,
-    QUEST_VALIANT_OF_IRONFORGE              = 13703,
-    QUEST_A_VALIANT_OF_IRONFORGE            = 13685,
-    QUEST_VALIANT_OF_GNOMEREGAN             = 13704,
-    QUEST_A_VALIANT_OF_GNOMEREGAN           = 13688,
-    QUEST_VALIANT_OF_THE_EXODAR             = 13705,
-    QUEST_A_VALIANT_OF_THE_EXODAR           = 13690,
-    QUEST_VALIANT_OF_ORGRIMMAR              = 13707,
-    QUEST_A_VALIANT_OF_ORGRIMMAR            = 13691,
-    QUEST_VALIANT_OF_SEN_JIN                = 13708,
-    QUEST_A_VALIANT_OF_SEN_JIN              = 13693,
-    QUEST_VALIANT_OF_THUNDER_BLUFF          = 13709,
-    QUEST_A_VALIANT_OF_THUNDER_BLUFF        = 13694,
-    QUEST_VALIANT_OF_UNDERCITY              = 13710,
-    QUEST_A_VALIANT_OF_UNDERCITY            = 13695,
-    QUEST_VALIANT_OF_SILVERMOON             = 13711,
-    QUEST_A_VALIANT_OF_SILVERMOON           = 13696
-};
-
+// 63034
 class spell_gen_on_tournament_mount : public SpellScriptLoader
 {
     public:
         spell_gen_on_tournament_mount() : SpellScriptLoader("spell_gen_on_tournament_mount") { }
+
+        enum TournamentPennantSpells
+        {
+            SPELL_PENNANT_STORMWIND_ASPIRANT = 62595,
+            SPELL_PENNANT_STORMWIND_VALIANT = 62596,
+            SPELL_PENNANT_STORMWIND_CHAMPION = 62594,
+            SPELL_PENNANT_GNOMEREGAN_ASPIRANT = 63394,
+            SPELL_PENNANT_GNOMEREGAN_VALIANT = 63395,
+            SPELL_PENNANT_GNOMEREGAN_CHAMPION = 63396,
+            SPELL_PENNANT_SEN_JIN_ASPIRANT = 63397,
+            SPELL_PENNANT_SEN_JIN_VALIANT = 63398,
+            SPELL_PENNANT_SEN_JIN_CHAMPION = 63399,
+            SPELL_PENNANT_SILVERMOON_ASPIRANT = 63401,
+            SPELL_PENNANT_SILVERMOON_VALIANT = 63402,
+            SPELL_PENNANT_SILVERMOON_CHAMPION = 63403,
+            SPELL_PENNANT_DARNASSUS_ASPIRANT = 63404,
+            SPELL_PENNANT_DARNASSUS_VALIANT = 63405,
+            SPELL_PENNANT_DARNASSUS_CHAMPION = 63406,
+            SPELL_PENNANT_EXODAR_ASPIRANT = 63421,
+            SPELL_PENNANT_EXODAR_VALIANT = 63422,
+            SPELL_PENNANT_EXODAR_CHAMPION = 63423,
+            SPELL_PENNANT_IRONFORGE_ASPIRANT = 63425,
+            SPELL_PENNANT_IRONFORGE_VALIANT = 63426,
+            SPELL_PENNANT_IRONFORGE_CHAMPION = 63427,
+            SPELL_PENNANT_UNDERCITY_ASPIRANT = 63428,
+            SPELL_PENNANT_UNDERCITY_VALIANT = 63429,
+            SPELL_PENNANT_UNDERCITY_CHAMPION = 63430,
+            SPELL_PENNANT_ORGRIMMAR_ASPIRANT = 63431,
+            SPELL_PENNANT_ORGRIMMAR_VALIANT = 63432,
+            SPELL_PENNANT_ORGRIMMAR_CHAMPION = 63433,
+            SPELL_PENNANT_THUNDER_BLUFF_ASPIRANT = 63434,
+            SPELL_PENNANT_THUNDER_BLUFF_VALIANT = 63435,
+            SPELL_PENNANT_THUNDER_BLUFF_CHAMPION = 63436,
+            SPELL_PENNANT_ARGENT_CRUSADE_ASPIRANT = 63606,
+            SPELL_PENNANT_ARGENT_CRUSADE_VALIANT = 63500,
+            SPELL_PENNANT_ARGENT_CRUSADE_CHAMPION = 63501,
+            SPELL_PENNANT_EBON_BLADE_ASPIRANT = 63607,
+            SPELL_PENNANT_EBON_BLADE_VALIANT = 63608,
+            SPELL_PENNANT_EBON_BLADE_CHAMPION = 63609
+        };
+
+        enum TournamentMounts
+        {
+            NPC_STORMWIND_STEED = 33217,
+            NPC_IRONFORGE_RAM = 33316,
+            NPC_GNOMEREGAN_MECHANOSTRIDER = 33317,
+            NPC_EXODAR_ELEKK = 33318,
+            NPC_DARNASSIAN_NIGHTSABER = 33319,
+            NPC_ORGRIMMAR_WOLF = 33320,
+            NPC_DARK_SPEAR_RAPTOR = 33321,
+            NPC_THUNDER_BLUFF_KODO = 33322,
+            NPC_SILVERMOON_HAWKSTRIDER = 33323,
+            NPC_FORSAKEN_WARHORSE = 33324,
+            NPC_ARGENT_WARHORSE = 33782,
+            NPC_ARGENT_STEED_ASPIRANT = 33845,
+            NPC_ARGENT_HAWKSTRIDER_ASPIRANT = 33844
+        };
+
+        enum TournamentQuestsAchievements
+        {
+            ACHIEVEMENT_CHAMPION_STORMWIND = 2781,
+            ACHIEVEMENT_CHAMPION_DARNASSUS = 2777,
+            ACHIEVEMENT_CHAMPION_IRONFORGE = 2780,
+            ACHIEVEMENT_CHAMPION_GNOMEREGAN = 2779,
+            ACHIEVEMENT_CHAMPION_THE_EXODAR = 2778,
+            ACHIEVEMENT_CHAMPION_ORGRIMMAR = 2783,
+            ACHIEVEMENT_CHAMPION_SEN_JIN = 2784,
+            ACHIEVEMENT_CHAMPION_THUNDER_BLUFF = 2786,
+            ACHIEVEMENT_CHAMPION_UNDERCITY = 2787,
+            ACHIEVEMENT_CHAMPION_SILVERMOON = 2785,
+            ACHIEVEMENT_ARGENT_VALOR = 2758,
+            ACHIEVEMENT_CHAMPION_ALLIANCE = 2782,
+            ACHIEVEMENT_CHAMPION_HORDE = 2788,
+
+            QUEST_VALIANT_OF_STORMWIND = 13593,
+            QUEST_A_VALIANT_OF_STORMWIND = 13684,
+            QUEST_VALIANT_OF_DARNASSUS = 13706,
+            QUEST_A_VALIANT_OF_DARNASSUS = 13689,
+            QUEST_VALIANT_OF_IRONFORGE = 13703,
+            QUEST_A_VALIANT_OF_IRONFORGE = 13685,
+            QUEST_VALIANT_OF_GNOMEREGAN = 13704,
+            QUEST_A_VALIANT_OF_GNOMEREGAN = 13688,
+            QUEST_VALIANT_OF_THE_EXODAR = 13705,
+            QUEST_A_VALIANT_OF_THE_EXODAR = 13690,
+            QUEST_VALIANT_OF_ORGRIMMAR = 13707,
+            QUEST_A_VALIANT_OF_ORGRIMMAR = 13691,
+            QUEST_VALIANT_OF_SEN_JIN = 13708,
+            QUEST_A_VALIANT_OF_SEN_JIN = 13693,
+            QUEST_VALIANT_OF_THUNDER_BLUFF = 13709,
+            QUEST_A_VALIANT_OF_THUNDER_BLUFF = 13694,
+            QUEST_VALIANT_OF_UNDERCITY = 13710,
+            QUEST_A_VALIANT_OF_UNDERCITY = 13695,
+            QUEST_VALIANT_OF_SILVERMOON = 13711,
+            QUEST_A_VALIANT_OF_SILVERMOON = 13696
+        };
 
         class spell_gen_on_tournament_mount_AuraScript : public AuraScript
         {
@@ -2339,10 +2442,11 @@ class spell_gen_on_tournament_mount : public SpellScriptLoader
                 if (Unit* caster = GetCaster())
                 {
                     if (Unit* vehicle = caster->GetVehicleBase())
-                    {
-                        _pennantSpellId = GetPennatSpellId(caster->ToPlayer(), vehicle);
-                        caster->CastSpell(caster, _pennantSpellId, true);
-                    }
+                        if (Player* player = caster->ToPlayer())
+                        {
+                            _pennantSpellId = GetPennatSpellId(player, vehicle);
+                            caster->CastSpell(caster, _pennantSpellId, true);
+                        }
                 }
             }
 
@@ -2475,6 +2579,7 @@ class spell_gen_on_tournament_mount : public SpellScriptLoader
         }
 };
 
+// 53475 53487 54015
 class spell_gen_oracle_wolvar_reputation : public SpellScriptLoader
 {
     public:
@@ -2491,21 +2596,23 @@ class spell_gen_oracle_wolvar_reputation : public SpellScriptLoader
 
             void HandleDummy(SpellEffIndex effIndex)
             {
-                Player* player = GetCaster()->ToPlayer();
-                uint32 factionId = GetSpellInfo()->Effects[effIndex].CalcValue();
-                int32  repChange =  GetSpellInfo()->Effects[EFFECT_1].CalcValue();
+                if (Player* player = GetCaster()->ToPlayer())
+                {
+                    uint32 factionId = GetSpellInfo()->Effects[effIndex].CalcValue();
+                    int32  repChange = GetSpellInfo()->Effects[EFFECT_1].CalcValue();
 
-                FactionEntry const* factionEntry = sFactionStore.LookupEntry(factionId);
+                    FactionEntry const* factionEntry = sFactionStore.LookupEntry(factionId);
 
-                if (!factionEntry)
-                    return;
+                    if (!factionEntry)
+                        return;
 
-                // Set rep to baserep + basepoints (expecting spillover for oposite faction -> become hated)
-                // Not when player already has equal or higher rep with this faction
-                if (player->GetReputationMgr().GetBaseReputation(factionEntry) < repChange)
-                    player->GetReputationMgr().SetReputation(factionEntry, repChange);
+                    // Set rep to baserep + basepoints (expecting spillover for oposite faction -> become hated)
+                    // Not when player already has equal or higher rep with this faction
+                    if (player->GetReputationMgr().GetBaseReputation(factionEntry) < repChange)
+                        player->GetReputationMgr().SetReputation(factionEntry, repChange);
 
-                // EFFECT_INDEX_2 most likely update at war state, we already handle this in SetReputation
+                    // EFFECT_INDEX_2 most likely update at war state, we already handle this in SetReputation
+                }
             }
 
             void Register() override
@@ -2520,17 +2627,18 @@ class spell_gen_oracle_wolvar_reputation : public SpellScriptLoader
         }
 };
 
-enum OrcDisguiseSpells
-{
-    SPELL_ORC_DISGUISE_TRIGGER       = 45759,
-    SPELL_ORC_DISGUISE_MALE          = 45760,
-    SPELL_ORC_DISGUISE_FEMALE        = 45762
-};
-
+// 45759
 class spell_gen_orc_disguise : public SpellScriptLoader
 {
     public:
         spell_gen_orc_disguise() : SpellScriptLoader("spell_gen_orc_disguise") { }
+
+        enum OrcDisguiseSpells
+        {
+            SPELL_ORC_DISGUISE_TRIGGER = 45759,
+            SPELL_ORC_DISGUISE_MALE = 45760,
+            SPELL_ORC_DISGUISE_FEMALE = 45762
+        };
 
         class spell_gen_orc_disguise_SpellScript : public SpellScript
         {
@@ -2570,17 +2678,17 @@ class spell_gen_orc_disguise : public SpellScriptLoader
         }
 };
 
-enum ParachuteSpells
-{
-    SPELL_PARACHUTE         = 45472,
-    SPELL_PARACHUTE_BUFF    = 44795,
-};
-
 // 45472 Parachute
 class spell_gen_parachute : public SpellScriptLoader
 {
     public:
         spell_gen_parachute() : SpellScriptLoader("spell_gen_parachute") { }
+
+        enum ParachuteSpells
+        {
+            SPELL_PARACHUTE = 45472,
+            SPELL_PARACHUTE_BUFF = 44795,
+        };
 
         class spell_gen_parachute_AuraScript : public AuraScript
         {
@@ -2616,15 +2724,16 @@ class spell_gen_parachute : public SpellScriptLoader
         }
 };
 
-enum ParachuteIC
-{
-    SPELL_PARACHUTE_IC      = 66657
-};
-
+// 66656
 class spell_gen_parachute_ic : public SpellScriptLoader
 {
     public:
         spell_gen_parachute_ic() : SpellScriptLoader("spell_gen_parachute_ic") { }
+
+        enum ParachuteIC
+        {
+            SPELL_PARACHUTE_IC = 66657
+        };
 
         class spell_gen_parachute_ic_AuraScript : public AuraScript
         {
@@ -2649,17 +2758,18 @@ class spell_gen_parachute_ic : public SpellScriptLoader
         }
 };
 
-enum PetSummoned
-{
-    NPC_DOOMGUARD       = 11859,
-    NPC_INFERNAL        = 89,
-    NPC_IMP             = 416
-};
-
+// 6962
 class spell_gen_pet_summoned : public SpellScriptLoader
 {
     public:
         spell_gen_pet_summoned() : SpellScriptLoader("spell_gen_pet_summoned") { }
+
+        enum PetSummoned
+        {
+            NPC_DOOMGUARD = 11859,
+            NPC_INFERNAL = 89,
+            NPC_IMP = 416
+        };
 
         class spell_gen_pet_summoned_SpellScript : public SpellScript
         {
@@ -2672,34 +2782,34 @@ class spell_gen_pet_summoned : public SpellScriptLoader
 
             void HandleScript(SpellEffIndex /*effIndex*/)
             {
-                Player* player = GetCaster()->ToPlayer();
-                if (player->GetLastPetNumber())
-                {
-                    PetType newPetType = (player->getClass() == CLASS_HUNTER) ? HUNTER_PET : SUMMON_PET;
-                    if (Pet* newPet = new Pet(player, newPetType))
+                if (Player* player = GetCaster()->ToPlayer())
+                    if (player->GetLastPetNumber())
                     {
-                        if (newPet->LoadPetFromDB(player, 0, player->GetLastPetNumber(), true))
+                        PetType newPetType = (player->getClass() == CLASS_HUNTER) ? HUNTER_PET : SUMMON_PET;
+                        if (Pet* newPet = new Pet(player, newPetType))
                         {
-                            // revive the pet if it is dead
-                            if (newPet->GetDeathState() == DEAD)
-                                newPet->SetDeathState(ALIVE);
-
-                            newPet->SetFullHealth();
-                            newPet->SetPower(newPet->getPowerType(), newPet->GetMaxPower(newPet->getPowerType()));
-
-                            switch (newPet->GetEntry())
+                            if (newPet->LoadPetFromDB(player, 0, player->GetLastPetNumber(), true))
                             {
-                                case NPC_DOOMGUARD:
-                                case NPC_INFERNAL:
-                                    newPet->SetEntry(NPC_IMP);
-                                    break;
-                                default:
-                                    break;
+                                // revive the pet if it is dead
+                                if (newPet->GetDeathState() == DEAD)
+                                    newPet->SetDeathState(ALIVE);
+
+                                newPet->SetFullHealth();
+                                newPet->SetPower(newPet->getPowerType(), newPet->GetMaxPower(newPet->getPowerType()));
+
+                                switch (newPet->GetEntry())
+                                {
+                                    case NPC_DOOMGUARD:
+                                    case NPC_INFERNAL:
+                                        newPet->SetEntry(NPC_IMP);
+                                        break;
+                                    default:
+                                        break;
+                                }
                             }
+                            else
+                                delete newPet;
                         }
-                        else
-                            delete newPet;
-                    }
                 }
             }
 
@@ -2715,6 +2825,7 @@ class spell_gen_pet_summoned : public SpellScriptLoader
         }
 };
 
+// 60893 61177 61288 61756
 class spell_gen_profession_research : public SpellScriptLoader
 {
     public:
@@ -2731,25 +2842,28 @@ class spell_gen_profession_research : public SpellScriptLoader
 
             SpellCastResult CheckRequirement()
             {
-                if (HasDiscoveredAllSpells(GetSpellInfo()->Id, GetCaster()->ToPlayer()))
-                {
-                    SetCustomCastResultMessage(SPELL_CUSTOM_ERROR_NOTHING_TO_DISCOVER);
-                    return SPELL_FAILED_CUSTOM_ERROR;
-                }
+                if (Player* player = GetCaster()->ToPlayer())
+                    if (HasDiscoveredAllSpells(GetSpellInfo()->Id, player))
+                    {
+                        SetCustomCastResultMessage(SPELL_CUSTOM_ERROR_NOTHING_TO_DISCOVER);
+                        return SPELL_FAILED_CUSTOM_ERROR;
+                    }
 
                 return SPELL_CAST_OK;
             }
 
             void HandleScript(SpellEffIndex /*effIndex*/)
             {
-                Player* caster = GetCaster()->ToPlayer();
-                uint32 spellId = GetSpellInfo()->Id;
+                if (Player* player = GetCaster()->ToPlayer())
+                {
+                    uint32 spellId = GetSpellInfo()->Id;
 
-                // learn random explicit discovery recipe (if any)
-                if (uint32 discoveredSpellId = GetExplicitDiscoverySpell(spellId, caster))
-                    caster->learnSpell(discoveredSpellId, false);
+                    // learn random explicit discovery recipe (if any)
+                    if (uint32 discoveredSpellId = GetExplicitDiscoverySpell(spellId, player))
+                        player->learnSpell(discoveredSpellId, false);
 
-                caster->UpdateCraftSkill(spellId);
+                    player->UpdateCraftSkill(spellId);
+                }
             }
 
             void Register() override
@@ -2765,6 +2879,7 @@ class spell_gen_profession_research : public SpellScriptLoader
         }
 };
 
+// 58601
 class spell_gen_remove_flight_auras : public SpellScriptLoader
 {
     public:
@@ -2795,28 +2910,29 @@ class spell_gen_remove_flight_auras : public SpellScriptLoader
         }
 };
 
-enum Replenishment
-{
-    SPELL_REPLENISHMENT             = 57669,
-    SPELL_INFINITE_REPLENISHMENT    = 61782
-};
-
-class ReplenishmentCheck
-{
-public:
-    bool operator()(WorldObject* obj) const
-    {
-        if (Unit* target = obj->ToUnit())
-            return target->getPowerType() != POWER_MANA;
-
-        return true;
-    }
-};
-
+// 57669 61782
 class spell_gen_replenishment : public SpellScriptLoader
 {
     public:
         spell_gen_replenishment() : SpellScriptLoader("spell_gen_replenishment") { }
+
+        enum Replenishment
+        {
+            SPELL_REPLENISHMENT = 57669,
+            SPELL_INFINITE_REPLENISHMENT = 61782
+        };
+
+        class ReplenishmentCheck
+        {
+        public:
+            bool operator()(WorldObject* obj) const
+            {
+                if (Unit* target = obj->ToUnit())
+                    return target->getPowerType() != POWER_MANA;
+
+                return true;
+            }
+        };
 
         class spell_gen_replenishment_SpellScript : public SpellScript
         {
@@ -2893,18 +3009,18 @@ class spell_gen_replenishment : public SpellScriptLoader
         }
 };
 
-
-enum RunningWildMountIds
-{
-    RUNNING_WILD_MODEL_MALE     = 29422,
-    RUNNING_WILD_MODEL_FEMALE   = 29423,
-    SPELL_ALTERED_FORM          = 97709
-};
-
+// 87840
 class spell_gen_running_wild : public SpellScriptLoader
 {
     public:
         spell_gen_running_wild() : SpellScriptLoader("spell_gen_running_wild") { }
+
+        enum RunningWildMountIds
+        {
+            RUNNING_WILD_MODEL_MALE = 29422,
+            RUNNING_WILD_MODEL_FEMALE = 29423,
+            SPELL_ALTERED_FORM = 97709
+        };
 
         class spell_gen_running_wild_AuraScript : public AuraScript
         {
@@ -2972,10 +3088,18 @@ class spell_gen_running_wild : public SpellScriptLoader
         }
 };
 
+// 68996
 class spell_gen_two_forms : public SpellScriptLoader
 {
     public:
         spell_gen_two_forms() : SpellScriptLoader("spell_gen_two_forms") { }
+
+        enum RunningWildMountIds
+        {
+            RUNNING_WILD_MODEL_MALE = 29422,
+            RUNNING_WILD_MODEL_FEMALE = 29423,
+            SPELL_ALTERED_FORM = 97709
+        };
 
         class spell_gen_two_forms_SpellScript : public SpellScript
         {
@@ -3022,10 +3146,18 @@ class spell_gen_two_forms : public SpellScriptLoader
         }
 };
 
+// 68992
 class spell_gen_darkflight : public SpellScriptLoader
 {
     public:
         spell_gen_darkflight() : SpellScriptLoader("spell_gen_darkflight") { }
+
+        enum RunningWildMountIds
+        {
+            RUNNING_WILD_MODEL_MALE = 29422,
+            RUNNING_WILD_MODEL_FEMALE = 29423,
+            SPELL_ALTERED_FORM = 97709
+        };
 
         class spell_gen_darkflight_SpellScript : public SpellScript
         {
@@ -3047,15 +3179,17 @@ class spell_gen_darkflight : public SpellScriptLoader
             return new spell_gen_darkflight_SpellScript();
         }
 };
-enum SeaforiumSpells
-{
-    SPELL_PLANT_CHARGES_CREDIT_ACHIEVEMENT  = 60937
-};
 
+// 52408
 class spell_gen_seaforium_blast : public SpellScriptLoader
 {
     public:
         spell_gen_seaforium_blast() : SpellScriptLoader("spell_gen_seaforium_blast") { }
+
+        enum SeaforiumSpells
+        {
+            SPELL_PLANT_CHARGES_CREDIT_ACHIEVEMENT = 60937
+        };
 
         class spell_gen_seaforium_blast_SpellScript : public SpellScript
         {
@@ -3095,15 +3229,7 @@ class spell_gen_seaforium_blast : public SpellScriptLoader
         }
 };
 
-enum SpectatorCheerTrigger
-{
-    EMOTE_ONE_SHOT_CHEER        = 4,
-    EMOTE_ONE_SHOT_EXCLAMATION  = 5,
-    EMOTE_ONE_SHOT_APPLAUD      = 21
-};
-
-uint8 const EmoteArray[3] = { EMOTE_ONE_SHOT_CHEER, EMOTE_ONE_SHOT_EXCLAMATION, EMOTE_ONE_SHOT_APPLAUD };
-
+// 55945
 class spell_gen_spectator_cheer_trigger : public SpellScriptLoader
 {
     public:
@@ -3130,6 +3256,7 @@ class spell_gen_spectator_cheer_trigger : public SpellScriptLoader
         }
 };
 
+// 17251
 class spell_gen_spirit_healer_res : public SpellScriptLoader
 {
     public:
@@ -3146,13 +3273,13 @@ class spell_gen_spirit_healer_res : public SpellScriptLoader
 
             void HandleDummy(SpellEffIndex /* effIndex */)
             {
-                Player* originalCaster = GetOriginalCaster()->ToPlayer();
-                if (Unit* target = GetHitUnit())
-                {
-                    WorldPacket data(SMSG_SPIRIT_HEALER_CONFIRM, 8);
-                    data << uint64(target->GetGUID());
-                    originalCaster->GetSession()->SendPacket(&data);
-                }
+               if ( Player* originalCaster = GetOriginalCaster()->ToPlayer())
+                   if (Unit* target = GetHitUnit())
+                   {
+                       WorldPacket data(SMSG_SPIRIT_HEALER_CONFIRM, 8);
+                       data << uint64(target->GetGUID());
+                       originalCaster->GetSession()->SendPacket(&data);
+                   }
             }
 
             void Register() override
@@ -3167,12 +3294,7 @@ class spell_gen_spirit_healer_res : public SpellScriptLoader
         }
 };
 
-enum SummonElemental
-{
-    SPELL_SUMMON_FIRE_ELEMENTAL  = 8985,
-    SPELL_SUMMON_EARTH_ELEMENTAL = 19704
-};
-
+// 8985 19704
 class spell_gen_summon_elemental : public SpellScriptLoader
 {
     public:
@@ -3203,8 +3325,8 @@ class spell_gen_summon_elemental : public SpellScriptLoader
             {
                 if (GetCaster())
                     if (Unit* owner = GetCaster()->GetOwner())
-                        if (owner->GetTypeId() == TYPEID_PLAYER) /// @todo this check is maybe wrong
-                            owner->ToPlayer()->RemovePet(NULL, PET_SAVE_NOT_IN_SLOT, true);
+                        if (Player* player = owner->ToPlayer())
+                            player->RemovePet(NULL, PET_SAVE_NOT_IN_SLOT, true);
             }
 
             void Register() override
@@ -3226,15 +3348,16 @@ class spell_gen_summon_elemental : public SpellScriptLoader
         uint32 _spellId;
 };
 
-enum TournamentMountsSpells
-{
-    SPELL_LANCE_EQUIPPED     = 62853
-};
-
+// 62774 62779 62780 62781 62782 62783 62784 62785 62786 62787 63663 63791 63792
 class spell_gen_summon_tournament_mount : public SpellScriptLoader
 {
     public:
         spell_gen_summon_tournament_mount() : SpellScriptLoader("spell_gen_summon_tournament_mount") { }
+
+        enum TournamentMountsSpells
+        {
+            SPELL_LANCE_EQUIPPED = 62853
+        };
 
         class spell_gen_summon_tournament_mount_SpellScript : public SpellScript
         {
@@ -3301,16 +3424,17 @@ class spell_gen_throw_shield : public SpellScriptLoader
         }
 };
 
-enum MountedDuelSpells
-{
-    SPELL_ON_TOURNAMENT_MOUNT = 63034,
-    SPELL_MOUNTED_DUEL        = 62875
-};
-
+// 62863
 class spell_gen_tournament_duel : public SpellScriptLoader
 {
     public:
         spell_gen_tournament_duel() : SpellScriptLoader("spell_gen_tournament_duel") { }
+
+        enum MountedDuelSpells
+        {
+            SPELL_ON_TOURNAMENT_MOUNT = 63034,
+            SPELL_MOUNTED_DUEL = 62875
+        };
 
         class spell_gen_tournament_duel_SpellScript : public SpellScript
         {
@@ -3353,6 +3477,8 @@ class spell_gen_tournament_duel : public SpellScriptLoader
         }
 };
 
+// 62594 62595 62596 63394 63395 63396 63397 63398 63399 63401 63402 63403 63404 63405 63406 63421 63422 63423
+// 63425 63426 63427 63428 63429 63430 63431 63432 63433 63434 63435 63436 63500 63501 63606 63607 63608 63609
 class spell_gen_tournament_pennant : public SpellScriptLoader
 {
     public:
@@ -3386,22 +3512,21 @@ class spell_gen_tournament_pennant : public SpellScriptLoader
         }
 };
 
-
-
-enum PvPTrinketTriggeredSpells
-{
-    SPELL_WILL_OF_THE_FORSAKEN_COOLDOWN_TRIGGER         = 72752,
-    SPELL_WILL_OF_THE_FORSAKEN_COOLDOWN_TRIGGER_WOTF    = 72757
-};
-
-class spell_pvp_trinket_wotf_shared_cd : public SpellScriptLoader
+// 7744 42292 72752 72757
+class spell_gen_pvp_trinket_wotf_shared_cd : public SpellScriptLoader
 {
     public:
-        spell_pvp_trinket_wotf_shared_cd() : SpellScriptLoader("spell_pvp_trinket_wotf_shared_cd") { }
+        spell_gen_pvp_trinket_wotf_shared_cd() : SpellScriptLoader("spell_gen_pvp_trinket_wotf_shared_cd") { }
 
-        class spell_pvp_trinket_wotf_shared_cd_SpellScript : public SpellScript
+        enum PvPTrinketTriggeredSpells
         {
-            PrepareSpellScript(spell_pvp_trinket_wotf_shared_cd_SpellScript);
+            SPELL_WILL_OF_THE_FORSAKEN_COOLDOWN_TRIGGER = 72752,
+            SPELL_WILL_OF_THE_FORSAKEN_COOLDOWN_TRIGGER_WOTF = 72757
+        };
+
+        class spell_gen_pvp_trinket_wotf_shared_cd_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_gen_pvp_trinket_wotf_shared_cd_SpellScript);
 
             bool Load() override
             {
@@ -3420,30 +3545,32 @@ class spell_pvp_trinket_wotf_shared_cd : public SpellScriptLoader
             {
                 // This is only needed because spells cast from spell_linked_spell are triggered by default
                 // Spell::SendSpellCooldown() skips all spells with TRIGGERED_IGNORE_SPELL_AND_CATEGORY_CD
-                GetCaster()->ToPlayer()->AddSpellAndCategoryCooldowns(GetSpellInfo(), GetCastItem() ? GetCastItem()->GetEntry() : 0, GetSpell());
+                if (Player* player = GetCaster()->ToPlayer())
+                    player->AddSpellAndCategoryCooldowns(GetSpellInfo(), GetCastItem() ? GetCastItem()->GetEntry() : 0, GetSpell());
             }
 
             void Register() override
             {
-                AfterCast += SpellCastFn(spell_pvp_trinket_wotf_shared_cd_SpellScript::HandleScript);
+                AfterCast += SpellCastFn(spell_gen_pvp_trinket_wotf_shared_cd_SpellScript::HandleScript);
             }
         };
 
         SpellScript* GetSpellScript() const override
         {
-            return new spell_pvp_trinket_wotf_shared_cd_SpellScript();
+            return new spell_gen_pvp_trinket_wotf_shared_cd_SpellScript();
         }
 };
 
-enum FriendOrFowl
-{
-    SPELL_TURKEY_VENGEANCE      = 25285
-};
-
+// 25281
 class spell_gen_turkey_marker : public SpellScriptLoader
 {
     public:
         spell_gen_turkey_marker() : SpellScriptLoader("spell_gen_turkey_marker") { }
+
+        enum FriendOrFowl
+        {
+            SPELL_TURKEY_VENGEANCE = 25285
+        };
 
         class spell_gen_turkey_marker_AuraScript : public AuraScript
         {
@@ -3485,19 +3612,20 @@ class spell_gen_turkey_marker : public SpellScriptLoader
         }
 };
 
-enum FoamSword
-{
-    ITEM_FOAM_SWORD_GREEN   = 45061,
-    ITEM_FOAM_SWORD_PINK    = 45176,
-    ITEM_FOAM_SWORD_BLUE    = 45177,
-    ITEM_FOAM_SWORD_RED     = 45178,
-    ITEM_FOAM_SWORD_YELLOW  = 45179
-};
-
+// 64142
 class spell_gen_upper_deck_create_foam_sword : public SpellScriptLoader
 {
     public:
         spell_gen_upper_deck_create_foam_sword() : SpellScriptLoader("spell_gen_upper_deck_create_foam_sword") { }
+
+        enum FoamSword
+        {
+            ITEM_FOAM_SWORD_GREEN = 45061,
+            ITEM_FOAM_SWORD_PINK = 45176,
+            ITEM_FOAM_SWORD_BLUE = 45177,
+            ITEM_FOAM_SWORD_RED = 45178,
+            ITEM_FOAM_SWORD_YELLOW = 45179
+        };
 
         class spell_gen_upper_deck_create_foam_sword_SpellScript : public SpellScript
         {
@@ -3531,15 +3659,16 @@ class spell_gen_upper_deck_create_foam_sword : public SpellScriptLoader
         }
 };
 
-enum VehicleScaling
-{
-    SPELL_GEAR_SCALING      = 66668
-};
-
+// 65266 65635 65636 66666 66667 66668
 class spell_gen_vehicle_scaling : public SpellScriptLoader
 {
     public:
         spell_gen_vehicle_scaling() : SpellScriptLoader("spell_gen_vehicle_scaling") { }
+
+        enum VehicleScaling
+        {
+            SPELL_GEAR_SCALING = 66668
+        };
 
         class spell_gen_vehicle_scaling_AuraScript : public AuraScript
         {
@@ -3569,7 +3698,9 @@ class spell_gen_vehicle_scaling : public SpellScriptLoader
                         break;
                 }
 
-                float avgILvl = caster->ToPlayer()->GetAverageItemLevel();
+                float avgILvl = 0;
+                if (Player* player = caster->ToPlayer())
+                    player->GetAverageItemLevel();
                 if (avgILvl < baseItemLevel)
                     return;                     /// @todo Research possibility of scaling down
 
@@ -3590,16 +3721,17 @@ class spell_gen_vehicle_scaling : public SpellScriptLoader
         }
 };
 
-enum VendorBarkTrigger
-{
-    NPC_AMPHITHEATER_VENDOR     = 30098,
-    SAY_AMPHITHEATER_VENDOR     = 0
-};
-
+// 56096
 class spell_gen_vendor_bark_trigger : public SpellScriptLoader
 {
     public:
         spell_gen_vendor_bark_trigger() : SpellScriptLoader("spell_gen_vendor_bark_trigger") { }
+
+        enum VendorBarkTrigger
+        {
+            NPC_AMPHITHEATER_VENDOR = 30098,
+            SAY_AMPHITHEATER_VENDOR = 0
+        };
 
         class spell_gen_vendor_bark_trigger_SpellScript : public SpellScript
         {
@@ -3625,6 +3757,7 @@ class spell_gen_vendor_bark_trigger : public SpellScriptLoader
 
 };
 
+// 36444
 class spell_gen_wg_water : public SpellScriptLoader
 {
     public:
@@ -3653,15 +3786,16 @@ class spell_gen_wg_water : public SpellScriptLoader
         }
 };
 
-enum WhisperGulchYoggSaronWhisper
-{
-    SPELL_YOGG_SARON_WHISPER_DUMMY  = 29072
-};
-
+// 27769
 class spell_gen_whisper_gulch_yogg_saron_whisper : public SpellScriptLoader
 {
     public:
         spell_gen_whisper_gulch_yogg_saron_whisper() : SpellScriptLoader("spell_gen_whisper_gulch_yogg_saron_whisper") { }
+
+        enum WhisperGulchYoggSaronWhisper
+        {
+            SPELL_YOGG_SARON_WHISPER_DUMMY = 29072
+        };
 
         class spell_gen_whisper_gulch_yogg_saron_whisper_AuraScript : public AuraScript
         {
@@ -3692,6 +3826,7 @@ class spell_gen_whisper_gulch_yogg_saron_whisper : public SpellScriptLoader
         }
 };
 
+// 50630 63109 68576
 class spell_gen_eject_all_passengers : public SpellScriptLoader
 {
     public:
@@ -3719,6 +3854,7 @@ class spell_gen_eject_all_passengers : public SpellScriptLoader
         }
 };
 
+// 74183
 class spell_gen_flap : public SpellScriptLoader
 {
 public:
@@ -3750,17 +3886,1248 @@ public:
         return new spell_gen_flap_SpellScript();
     }
 };
+
+// 91836
+class spell_gen_angerforge : public SpellScriptLoader
+{
+public:
+    spell_gen_angerforge() : SpellScriptLoader("spell_gen_angerforge") { }
+
+    class spell_gen_angerforge_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_gen_angerforge_SpellScript);
+
+        SpellCastResult CheckRequirement()
+        {
+            Aura* rawFury = GetCaster()->GetAura(91832);
+            if (!rawFury || rawFury->GetStackAmount() != rawFury->GetSpellInfo()->StackAmount)
+                return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
+            return SPELL_CAST_OK;
+        }
+
+        void HandleOnHit()
+        {
+            GetHitUnit()->RemoveAurasDueToSpell(91832);
+        }
+
+        void Register()
+        {
+            OnHit += SpellHitFn(spell_gen_angerforge_SpellScript::HandleOnHit);
+            OnCheckCast += SpellCheckCastFn(spell_gen_angerforge_SpellScript::CheckRequirement);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_gen_angerforge_SpellScript();
+    }
+};
+
+// 96934 97127
+class spell_gen_apparatus_of_khaz : public SpellScriptLoader
+{
+public:
+    spell_gen_apparatus_of_khaz() : SpellScriptLoader("spell_gen_apparatus_of_khaz") { }
+
+    class spell_gen_apparatus_of_khaz_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_gen_apparatus_of_khaz_SpellScript);
+
+        void HandleOnHit(SpellEffIndex /*effIndex*/)
+        {
+            if (Aura* tracker = GetCaster()->GetAura(96923))
+            {
+                int32 bp0 = tracker->GetStackAmount() * GetSpellInfo()->Effects[EFFECT_0].BasePoints;
+                if (Player* caster = GetCaster()->ToPlayer())
+                {
+                    uint32 mastery = caster->GetRatingBonusValue(CR_MASTERY);
+                    uint32 haste = caster->GetRatingBonusValue(CR_HASTE_MELEE);
+                    uint32 crit = caster->GetRatingBonusValue(CR_CRIT_MELEE);
+                    if (mastery > haste && mastery > crit)
+                        caster->CastCustomSpell(caster, 96929, &bp0, NULL, NULL, true);
+                    else if (haste > mastery && haste > crit)
+                        caster->CastCustomSpell(caster, 96927, &bp0, NULL, NULL, true);
+                    else if (crit > haste && crit > mastery)
+                        caster->CastCustomSpell(caster, 96928, &bp0, NULL, NULL, true);
+                }
+                GetCaster()->RemoveAurasDueToSpell(96923);
+            }
+        }
+
+        void Register()
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_gen_apparatus_of_khaz_SpellScript::HandleOnHit, EFFECT_0, SPELL_EFFECT_DUMMY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_gen_apparatus_of_khaz_SpellScript();
+    }
+};
+
+// 86524 86525 86526 86528 86529 86530 86531
+class spell_gen_armor_specialization : public SpellScriptLoader
+{
+public:
+    spell_gen_armor_specialization(char const* scriptName) : SpellScriptLoader(scriptName) { }
+
+    class spell_gen_armor_specialization_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_gen_armor_specialization_SpellScript);
+
+        bool Load()
+        {
+            return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+        }
+
+        void HandleDummy(SpellEffIndex /*effIndex*/)
+        {
+            Player* player = GetHitPlayer();
+            if (!player)
+                return;
+
+            uint32 spellId = 0;
+
+            switch (player->GetPrimaryTalentTree(player->GetActiveSpec()))
+            {
+            case TALENT_TREE_WARRIOR_ARMS:
+                spellId = 86110;
+                break;
+            case TALENT_TREE_WARRIOR_FURY:
+                spellId = 86101;
+                break;
+            case TALENT_TREE_WARRIOR_PROTECTION:
+                spellId = 86535;
+                break;
+            case TALENT_TREE_PALADIN_HOLY:
+                spellId = 86103;
+                break;
+            case TALENT_TREE_PALADIN_PROTECTION:
+                spellId = 86102;
+                break;
+            case TALENT_TREE_PALADIN_RETRIBUTION:
+                spellId = 86539;
+                break;
+            case TALENT_TREE_HUNTER_BEAST_MASTERY:
+            case TALENT_TREE_HUNTER_MARKSMANSHIP:
+            case TALENT_TREE_HUNTER_SURVIVAL:
+                spellId = 86538;
+                break;
+            case TALENT_TREE_ROGUE_ASSASSINATION:
+            case TALENT_TREE_ROGUE_COMBAT:
+            case TALENT_TREE_ROGUE_SUBTLETY:
+                spellId = 86092;
+                break;
+            case TALENT_TREE_DEATH_KNIGHT_BLOOD:
+                spellId = 86537;
+                break;
+            case TALENT_TREE_DEATH_KNIGHT_FROST:
+                spellId = 86536;
+                break;
+            case TALENT_TREE_DEATH_KNIGHT_UNHOLY:
+                spellId = 86113;
+                break;
+            case TALENT_TREE_SHAMAN_ELEMENTAL:
+                spellId = 86100;
+                break;
+            case TALENT_TREE_SHAMAN_ENHANCEMENT:
+                spellId = 86099;
+                break;
+            case TALENT_TREE_SHAMAN_RESTORATION:
+                spellId = 86108;
+                break;
+            case TALENT_TREE_DRUID_BALANCE:
+                spellId = 86093;
+                break;
+            case TALENT_TREE_DRUID_FERAL_COMBAT:
+            {
+                if (player->GetShapeshiftForm() == FORM_BEAR)
+                    spellId = 86096;
+                else
+                    spellId = 86097;
+                break;
+            }
+            case TALENT_TREE_DRUID_RESTORATION:
+                spellId = 86104;
+                break;
+            default:
+                return;
+            }
+
+            if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId))
+                if (player->HasAllItemsToFitToSpellRequirements(spellInfo))
+                    player->CastSpell(player, spellId, true);
+        }
+
+        void Register()
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_gen_armor_specialization_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_gen_armor_specialization_SpellScript();
+    }
+};
+
+// 97127 Apparatus of Khaz'goroth (trinket)
+class spell_gen_blessing_of_khazgoroth : public SpellScriptLoader
+{
+public:
+    spell_gen_blessing_of_khazgoroth() : SpellScriptLoader("spell_gen_blessing_of_khazgoroth") { }
+
+    class spell_gen_blessing_of_khazgoroth_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_gen_blessing_of_khazgoroth_SpellScript)
+
+            void BeforeEffect(SpellEffIndex /*effIndex*/)
+        {
+           if (Unit* caster = GetCaster())
+               if (Player* player = caster->ToPlayer())
+               {
+                   if (Aura* titanPower = caster->GetAura(96923))
+                   {
+                       uint8 stacks = titanPower->GetStackAmount();
+                       uint32 triggeredSpell = 0;
+                       int32 amount = stacks * 508;
+
+                       float mastery = player->CalculateMasteryRatingFromMastery(player->GetMasteryPoints() - 8.0f);
+                       float crit = float(player->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + CR_CRIT_MELEE));
+                       float haste = float(player->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + CR_HASTE_MELEE));
+
+                       float stat = 0.0f;
+                       if (mastery > stat)
+                       {
+                           stat = mastery;
+                           triggeredSpell = 96929;
+                       }
+
+                       if (crit > stat)
+                       {
+                           stat = crit;
+                           triggeredSpell = 96928;
+                       }
+
+                       if (haste > stat)
+                       {
+                           stat = haste;
+                           triggeredSpell = 96927;
+                       }
+
+                       if (triggeredSpell != 0)
+                           caster->CastCustomSpell(caster, triggeredSpell, &amount, NULL, NULL, true);
+                   }
+
+                   caster->RemoveAurasDueToSpell(96923);
+               }
+        }
+
+        void Register()
+        {
+            OnEffectLaunch += SpellEffectFn(spell_gen_blessing_of_khazgoroth_SpellScript::BeforeEffect, EFFECT_0, SPELL_EFFECT_DUMMY);
+        }
+    };
+
+    SpellScript *GetSpellScript() const
+    {
+        return new spell_gen_blessing_of_khazgoroth_SpellScript();
+    }
+};
+
+class spell_gen_dream_funnel : public SpellScriptLoader
+{
+public:
+    spell_gen_dream_funnel() : SpellScriptLoader("spell_gen_dream_funnel") { }
+
+    class spell_gen_dream_funnel_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_gen_dream_funnel_AuraScript);
+
+        void HandleEffectCalcAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& canBeRecalculated)
+        {
+            if (GetCaster())
+                amount = GetCaster()->GetMaxHealth() * 0.05f;
+
+            canBeRecalculated = false;
+        }
+
+        void Register()
+        {
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_gen_dream_funnel_AuraScript::HandleEffectCalcAmount, EFFECT_0, SPELL_AURA_PERIODIC_HEAL);
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_gen_dream_funnel_AuraScript::HandleEffectCalcAmount, EFFECT_2, SPELL_AURA_PERIODIC_DAMAGE);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_gen_dream_funnel_AuraScript();
+    }
+};
+
+// 66601,'spell_gen_fix_anticheat'
+class spell_gen_fix_anticheat : public SpellScriptLoader
+{
+public:
+    spell_gen_fix_anticheat() : SpellScriptLoader("spell_gen_fix_anticheat") { }
+    class spell_gen_fix_anticheat_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_gen_fix_anticheat_AuraScript)
+
+            void HandleOnEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            Unit* caster = GetCaster();
+
+            if (!caster || caster->GetTypeId() != TYPEID_PLAYER)
+                return;
+
+            if (Aura* aur = caster->GetAura(66601))
+                aur->SetDuration(1000);
+        }
+
+        void Register()
+        {
+            OnEffectApply += AuraEffectApplyFn(spell_gen_fix_anticheat_AuraScript::HandleOnEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_gen_fix_anticheat_AuraScript();
+    }
+};
+
+// 91832
+class spell_gen_forged_fury : public SpellScriptLoader
+{
+public:
+    spell_gen_forged_fury() : SpellScriptLoader("spell_gen_forged_fury") { }
+
+    class spell_gen_forged_fury_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_gen_forged_fury_SpellScript)
+
+            SpellCastResult CheckRequirement()
+        {
+            if (Unit* caster = GetCaster())
+            {
+                if (Aura* rawFury = caster->GetAura(91832))
+                {
+                    //Check if there are any dots on the target
+                    if (rawFury->GetStackAmount() >= 5)
+                        return SPELL_CAST_OK;
+                }
+
+            }
+            return SPELL_FAILED_NO_POWER;
+        }
+
+        void BeforeEffect(SpellEffIndex /*effIndex*/)
+        {
+            Unit* caster = GetCaster();
+            Unit* target = GetHitUnit();
+
+            if (!target)
+                return;
+
+            if (!caster)
+                return;
+
+            caster->RemoveAurasDueToSpell(91832);
+        }
+
+        void Register()
+        {
+            OnCheckCast += SpellCheckCastFn(spell_gen_forged_fury_SpellScript::CheckRequirement);
+            OnEffectHitTarget += SpellEffectFn(spell_gen_forged_fury_SpellScript::BeforeEffect, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
+        }
+    };
+
+    SpellScript *GetSpellScript() const
+    {
+        return new spell_gen_forged_fury_SpellScript();
+    }
+};
+
+// 91041 92328
+class spell_gen_ignacious : public SpellScriptLoader
+{
+public:
+    spell_gen_ignacious() : SpellScriptLoader("spell_gen_ignacious") { }
+
+    class spell_gen_ignacious_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_gen_ignacious_AuraScript);
+
+        void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
+        {
+            if (Unit* caster = GetCaster())
+            {
+                Aura* stacks = NULL;
+                switch (GetId())
+                {
+                case 91041:
+                    if (stacks = caster->GetAura(91027))
+                        amount = amount * stacks->GetStackAmount();
+                    caster->RemoveAurasDueToSpell(91027);
+                    break;
+                case 92328:
+                    if (stacks = caster->GetAura(92325))
+                        amount = amount * stacks->GetStackAmount();
+                    caster->RemoveAurasDueToSpell(92325);
+                    break;
+                }
+            }
+        }
+
+        void Register()
+        {
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_gen_ignacious_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_MOD_RATING);
+        }
+    };
+
+    class spell_gen_ignacious_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_gen_ignacious_SpellScript);
+
+        SpellCastResult CheckRequirement()
+        {
+            if (!GetCaster()->HasAura(91027) && !GetCaster()->HasAura(92325))
+                return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
+            return SPELL_CAST_OK;
+        }
+
+        void Register()
+        {
+            OnCheckCast += SpellCheckCastFn(spell_gen_ignacious_SpellScript::CheckRequirement);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_gen_ignacious_AuraScript();
+    }
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_gen_ignacious_SpellScript();
+    }
+};
+
+// -81708
+class spell_gen_lifeblood : public SpellScriptLoader
+{
+public:
+    spell_gen_lifeblood() : SpellScriptLoader("spell_gen_lifeblood") { }
+
+    class spell_gen_lifeblood_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_gen_lifeblood_AuraScript);
+
+        void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
+        {
+            if (Unit* owner = GetUnitOwner())
+                amount += int32(CalculatePct(owner->GetMaxHealth(), 1.5f / aurEff->GetTotalTicks()));
+        }
+
+        void Register()
+        {
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_gen_lifeblood_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_PERIODIC_HEAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_gen_lifeblood_AuraScript();
+    }
+};
+
+// 72221
+class spell_gen_luck_of_the_draw : public SpellScriptLoader
+{
+public:
+    spell_gen_luck_of_the_draw() : SpellScriptLoader("spell_gen_luck_of_the_draw") { }
+
+    class spell_gen_luck_of_the_draw_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_gen_luck_of_the_draw_AuraScript);
+
+        bool Load()
+        {
+            return GetUnitOwner()->GetTypeId() == TYPEID_PLAYER;
+        }
+
+        // cheap hax to make it have update calls
+        void CalcPeriodic(AuraEffect const* /*effect*/, bool& isPeriodic, int32& amplitude)
+        {
+            isPeriodic = true;
+            amplitude = 5 * IN_MILLISECONDS;
+        }
+
+        void Update(AuraEffect* /*effect*/)
+        {
+            if (Player* owner = GetUnitOwner()->ToPlayer())
+            {
+                std::set<uint32> dungeons = sLFGMgr->GetSelectedDungeons(owner->GetGUID());
+                std::set<uint32>::const_iterator itr = dungeons.begin();
+
+                if (itr == dungeons.end())
+                {
+                    Remove(AURA_REMOVE_BY_DEFAULT);
+                    return;
+                }
+
+                Remove(AURA_REMOVE_BY_DEFAULT);
+            }
+        }
+
+        void Register()
+        {
+            DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_gen_luck_of_the_draw_AuraScript::CalcPeriodic, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
+            OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_gen_luck_of_the_draw_AuraScript::Update, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_gen_luck_of_the_draw_AuraScript();
+    }
+};
+
+// 65917
+class spell_gen_magic_rooster : public SpellScriptLoader
+{
+public:
+    spell_gen_magic_rooster() : SpellScriptLoader("spell_gen_magic_rooster") { }
+    
+    enum MagicRoosterSpells
+    {
+        SPELL_MAGIC_ROOSTER_NORMAL = 66122,
+        SPELL_MAGIC_ROOSTER_DRAENEI_MALE = 66123,
+        SPELL_MAGIC_ROOSTER_TAUREN_MALE = 66124,
+    };
+
+    class spell_gen_magic_rooster_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_gen_magic_rooster_SpellScript);
+
+        void HandleScript(SpellEffIndex effIndex)
+        {
+            PreventHitDefaultEffect(effIndex);
+            if (Player* target = GetHitPlayer())
+            {
+                // prevent client crashes from stacking mounts
+                target->RemoveAurasByType(SPELL_AURA_MOUNTED);
+
+                uint32 spellId = SPELL_MAGIC_ROOSTER_NORMAL;
+                switch (target->getRace())
+                {
+                case RACE_DRAENEI:
+                    if (target->getGender() == GENDER_MALE)
+                        spellId = SPELL_MAGIC_ROOSTER_DRAENEI_MALE;
+                    break;
+                case RACE_TAUREN:
+                    if (target->getGender() == GENDER_MALE)
+                        spellId = SPELL_MAGIC_ROOSTER_TAUREN_MALE;
+                    break;
+                default:
+                    break;
+                }
+
+                target->CastSpell(target, spellId, true);
+            }
+        }
+
+        void Register()
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_gen_magic_rooster_SpellScript::HandleScript, EFFECT_2, SPELL_EFFECT_SCRIPT_EFFECT);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_gen_magic_rooster_SpellScript();
+    }
+};
+
+/* 
+673, 2367, 2374, 2378, 3160, 3164, 3166, 3219, 3220, 3222, 3223, 3593, 7844, 8212, 11328, 11334, 11348, 11349,
+11390, 11396, 11405, 11406, 11474, 17535, 17537, 17538, 17539, 17626, 17627, 17628, 17629, 21920, 24361, 24363,
+26276, 28490, 28491, 28493, 28497, 28501, 28502, 28503, 28509, 28514, 28518, 28519, 28520, 28521, 28540, 33720,
+33721, 33726, 38954, 39625, 39626, 39627, 39628, 42735, 53746, 53747, 53748, 53749, 53751, 53752, 53755, 53758,
+53760, 53763, 53764, 54212, 54452, 54494, 60340, 60341, 60343, 60344, 60345, 60346, 60347, 62380, 63729
+*/
+class spell_gen_mixology_bonus : public SpellScriptLoader
+{
+public:
+    spell_gen_mixology_bonus() : SpellScriptLoader("spell_gen_mixology_bonus") { }
+
+    enum RequiredMixologySpells
+    {
+        SPELL_MIXOLOGY = 53042,
+        // Flasks
+        SPELL_FLASK_OF_THE_FROST_WYRM = 53755,
+        SPELL_FLASK_OF_STONEBLOOD = 53758,
+        SPELL_FLASK_OF_ENDLESS_RAGE = 53760,
+        SPELL_FLASK_OF_PURE_MOJO = 54212,
+        SPELL_LESSER_FLASK_OF_RESISTANCE = 62380,
+        SPELL_LESSER_FLASK_OF_TOUGHNESS = 53752,
+        SPELL_FLASK_OF_BLINDING_LIGHT = 28521,
+        SPELL_FLASK_OF_CHROMATIC_WONDER = 42735,
+        SPELL_FLASK_OF_FORTIFICATION = 28518,
+        SPELL_FLASK_OF_MIGHTY_RESTORATION = 28519,
+        SPELL_FLASK_OF_PURE_DEATH = 28540,
+        SPELL_FLASK_OF_RELENTLESS_ASSAULT = 28520,
+        SPELL_FLASK_OF_CHROMATIC_RESISTANCE = 17629,
+        SPELL_FLASK_OF_DISTILLED_WISDOM = 17627,
+        SPELL_FLASK_OF_SUPREME_POWER = 17628,
+        SPELL_FLASK_OF_THE_TITANS = 17626,
+        // Elixirs
+        SPELL_ELIXIR_OF_MIGHTY_AGILITY = 28497,
+        SPELL_ELIXIR_OF_ACCURACY = 60340,
+        SPELL_ELIXIR_OF_DEADLY_STRIKES = 60341,
+        SPELL_ELIXIR_OF_MIGHTY_DEFENSE = 60343,
+        SPELL_ELIXIR_OF_EXPERTISE = 60344,
+        SPELL_ELIXIR_OF_ARMOR_PIERCING = 60345,
+        SPELL_ELIXIR_OF_LIGHTNING_SPEED = 60346,
+        SPELL_ELIXIR_OF_MIGHTY_FORTITUDE = 53751,
+        SPELL_ELIXIR_OF_MIGHTY_MAGEBLOOD = 53764,
+        SPELL_ELIXIR_OF_MIGHTY_STRENGTH = 53748,
+        SPELL_ELIXIR_OF_MIGHTY_TOUGHTS = 60347,
+        SPELL_ELIXIR_OF_PROTECTION = 53763,
+        SPELL_ELIXIR_OF_SPIRIT = 53747,
+        SPELL_GURUS_ELIXIR = 53749,
+        SPELL_SHADOWPOWER_ELIXIR = 33721,
+        SPELL_WRATH_ELIXIR = 53746,
+        SPELL_ELIXIR_OF_EMPOWERMENT = 28514,
+        SPELL_ELIXIR_OF_MAJOR_MAGEBLOOD = 28509,
+        SPELL_ELIXIR_OF_MAJOR_SHADOW_POWER = 28503,
+        SPELL_ELIXIR_OF_MAJOR_DEFENSE = 28502,
+        SPELL_FEL_STRENGTH_ELIXIR = 38954,
+        SPELL_ELIXIR_OF_IRONSKIN = 39628,
+        SPELL_ELIXIR_OF_MAJOR_AGILITY = 54494,
+        SPELL_ELIXIR_OF_DRAENIC_WISDOM = 39627,
+        SPELL_ELIXIR_OF_MAJOR_FIREPOWER = 28501,
+        SPELL_ELIXIR_OF_MAJOR_FROST_POWER = 28493,
+        SPELL_EARTHEN_ELIXIR = 39626,
+        SPELL_ELIXIR_OF_MASTERY = 33726,
+        SPELL_ELIXIR_OF_HEALING_POWER = 28491,
+        SPELL_ELIXIR_OF_MAJOR_FORTITUDE = 39625,
+        SPELL_ELIXIR_OF_MAJOR_STRENGTH = 28490,
+        SPELL_ADEPTS_ELIXIR = 54452,
+        SPELL_ONSLAUGHT_ELIXIR = 33720,
+        SPELL_MIGHTY_TROLLS_BLOOD_ELIXIR = 24361,
+        SPELL_GREATER_ARCANE_ELIXIR = 17539,
+        SPELL_ELIXIR_OF_THE_MONGOOSE = 17538,
+        SPELL_ELIXIR_OF_BRUTE_FORCE = 17537,
+        SPELL_ELIXIR_OF_SAGES = 17535,
+        SPELL_ELIXIR_OF_SUPERIOR_DEFENSE = 11348,
+        SPELL_ELIXIR_OF_DEMONSLAYING = 11406,
+        SPELL_ELIXIR_OF_GREATER_FIREPOWER = 26276,
+        SPELL_ELIXIR_OF_SHADOW_POWER = 11474,
+        SPELL_MAGEBLOOD_ELIXIR = 24363,
+        SPELL_ELIXIR_OF_GIANTS = 11405,
+        SPELL_ELIXIR_OF_GREATER_AGILITY = 11334,
+        SPELL_ARCANE_ELIXIR = 11390,
+        SPELL_ELIXIR_OF_GREATER_INTELLECT = 11396,
+        SPELL_ELIXIR_OF_GREATER_DEFENSE = 11349,
+        SPELL_ELIXIR_OF_FROST_POWER = 21920,
+        SPELL_ELIXIR_OF_AGILITY = 11328,
+        SPELL_MAJOR_TROLLS_BLLOOD_ELIXIR = 3223,
+        SPELL_ELIXIR_OF_FORTITUDE = 3593,
+        SPELL_ELIXIR_OF_OGRES_STRENGTH = 3164,
+        SPELL_ELIXIR_OF_FIREPOWER = 7844,
+        SPELL_ELIXIR_OF_LESSER_AGILITY = 3160,
+        SPELL_ELIXIR_OF_DEFENSE = 3220,
+        SPELL_STRONG_TROLLS_BLOOD_ELIXIR = 3222,
+        SPELL_ELIXIR_OF_MINOR_ACCURACY = 63729,
+        SPELL_ELIXIR_OF_WISDOM = 3166,
+        SPELL_ELIXIR_OF_GIANTH_GROWTH = 8212,
+        SPELL_ELIXIR_OF_MINOR_AGILITY = 2374,
+        SPELL_ELIXIR_OF_MINOR_FORTITUDE = 2378,
+        SPELL_WEAK_TROLLS_BLOOD_ELIXIR = 3219,
+        SPELL_ELIXIR_OF_LIONS_STRENGTH = 2367,
+        SPELL_ELIXIR_OF_MINOR_DEFENSE = 673
+    };
+
+    class spell_gen_mixology_bonus_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_gen_mixology_bonus_AuraScript);
+
+    public:
+        spell_gen_mixology_bonus_AuraScript() { bonus = 0; }
+
+        bool Validate(SpellInfo const* /*spellInfo*/)
+        {
+            if (!sSpellMgr->GetSpellInfo(SPELL_MIXOLOGY))
+                return false;
+            return true;
+        }
+
+        bool Load()
+        {
+            return GetCaster() && GetCaster()->GetTypeId() == TYPEID_PLAYER;
+        }
+
+        void SetBonusValueForEffect(SpellEffIndex effIndex, int32 value, AuraEffect const* aurEff)
+        {
+            if (aurEff->GetEffIndex() == uint32(effIndex))
+                bonus = value;
+        }
+
+        void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
+        {
+            if (GetCaster()->HasAura(SPELL_MIXOLOGY) && GetCaster()->HasSpell(GetSpellInfo()->Effects[EFFECT_0].TriggerSpell))
+            {
+                switch (GetId())
+                {
+                case SPELL_WEAK_TROLLS_BLOOD_ELIXIR:
+                case SPELL_MAGEBLOOD_ELIXIR:
+                    bonus = amount;
+                    break;
+                case SPELL_ELIXIR_OF_FROST_POWER:
+                case SPELL_LESSER_FLASK_OF_TOUGHNESS:
+                case SPELL_LESSER_FLASK_OF_RESISTANCE:
+                    bonus = CalculatePct(amount, 80);
+                    break;
+                case SPELL_ELIXIR_OF_MINOR_DEFENSE:
+                case SPELL_ELIXIR_OF_LIONS_STRENGTH:
+                case SPELL_ELIXIR_OF_MINOR_AGILITY:
+                case SPELL_MAJOR_TROLLS_BLLOOD_ELIXIR:
+                case SPELL_ELIXIR_OF_SHADOW_POWER:
+                case SPELL_ELIXIR_OF_BRUTE_FORCE:
+                case SPELL_MIGHTY_TROLLS_BLOOD_ELIXIR:
+                case SPELL_ELIXIR_OF_GREATER_FIREPOWER:
+                case SPELL_ONSLAUGHT_ELIXIR:
+                case SPELL_EARTHEN_ELIXIR:
+                case SPELL_ELIXIR_OF_MAJOR_AGILITY:
+                case SPELL_FLASK_OF_THE_TITANS:
+                case SPELL_FLASK_OF_RELENTLESS_ASSAULT:
+                case SPELL_FLASK_OF_STONEBLOOD:
+                case SPELL_ELIXIR_OF_MINOR_ACCURACY:
+                    bonus = CalculatePct(amount, 50);
+                    break;
+                case SPELL_ELIXIR_OF_PROTECTION:
+                    bonus = 280;
+                    break;
+                case SPELL_ELIXIR_OF_MAJOR_DEFENSE:
+                    bonus = 200;
+                    break;
+                case SPELL_ELIXIR_OF_GREATER_DEFENSE:
+                case SPELL_ELIXIR_OF_SUPERIOR_DEFENSE:
+                    bonus = 140;
+                    break;
+                case SPELL_ELIXIR_OF_FORTITUDE:
+                    bonus = 100;
+                    break;
+                case SPELL_FLASK_OF_ENDLESS_RAGE:
+                    bonus = 82;
+                    break;
+                case SPELL_ELIXIR_OF_DEFENSE:
+                    bonus = 70;
+                    break;
+                case SPELL_ELIXIR_OF_DEMONSLAYING:
+                    bonus = 50;
+                    break;
+                case SPELL_FLASK_OF_THE_FROST_WYRM:
+                    bonus = 47;
+                    break;
+                case SPELL_WRATH_ELIXIR:
+                    bonus = 32;
+                    break;
+                case SPELL_ELIXIR_OF_MAJOR_FROST_POWER:
+                case SPELL_ELIXIR_OF_MAJOR_FIREPOWER:
+                case SPELL_ELIXIR_OF_MAJOR_SHADOW_POWER:
+                    bonus = 29;
+                    break;
+                case SPELL_ELIXIR_OF_MIGHTY_TOUGHTS:
+                    bonus = 27;
+                    break;
+                case SPELL_FLASK_OF_SUPREME_POWER:
+                case SPELL_FLASK_OF_BLINDING_LIGHT:
+                case SPELL_FLASK_OF_PURE_DEATH:
+                case SPELL_SHADOWPOWER_ELIXIR:
+                    bonus = 23;
+                    break;
+                case SPELL_ELIXIR_OF_MIGHTY_AGILITY:
+                case SPELL_FLASK_OF_DISTILLED_WISDOM:
+                case SPELL_ELIXIR_OF_SPIRIT:
+                case SPELL_ELIXIR_OF_MIGHTY_STRENGTH:
+                case SPELL_FLASK_OF_PURE_MOJO:
+                case SPELL_ELIXIR_OF_ACCURACY:
+                case SPELL_ELIXIR_OF_DEADLY_STRIKES:
+                case SPELL_ELIXIR_OF_MIGHTY_DEFENSE:
+                case SPELL_ELIXIR_OF_EXPERTISE:
+                case SPELL_ELIXIR_OF_ARMOR_PIERCING:
+                case SPELL_ELIXIR_OF_LIGHTNING_SPEED:
+                    bonus = 20;
+                    break;
+                case SPELL_FLASK_OF_CHROMATIC_RESISTANCE:
+                    bonus = 17;
+                    break;
+                case SPELL_ELIXIR_OF_MINOR_FORTITUDE:
+                case SPELL_ELIXIR_OF_MAJOR_STRENGTH:
+                    bonus = 15;
+                    break;
+                case SPELL_FLASK_OF_MIGHTY_RESTORATION:
+                    bonus = 13;
+                    break;
+                case SPELL_ARCANE_ELIXIR:
+                    bonus = 12;
+                    break;
+                case SPELL_ELIXIR_OF_GREATER_AGILITY:
+                case SPELL_ELIXIR_OF_GIANTS:
+                    bonus = 11;
+                    break;
+                case SPELL_ELIXIR_OF_AGILITY:
+                case SPELL_ELIXIR_OF_GREATER_INTELLECT:
+                case SPELL_ELIXIR_OF_SAGES:
+                case SPELL_ELIXIR_OF_IRONSKIN:
+                case SPELL_ELIXIR_OF_MIGHTY_MAGEBLOOD:
+                    bonus = 10;
+                    break;
+                case SPELL_ELIXIR_OF_HEALING_POWER:
+                    bonus = 9;
+                    break;
+                case SPELL_ELIXIR_OF_DRAENIC_WISDOM:
+                case SPELL_GURUS_ELIXIR:
+                    bonus = 8;
+                    break;
+                case SPELL_ELIXIR_OF_FIREPOWER:
+                case SPELL_ELIXIR_OF_MAJOR_MAGEBLOOD:
+                case SPELL_ELIXIR_OF_MASTERY:
+                    bonus = 6;
+                    break;
+                case SPELL_ELIXIR_OF_LESSER_AGILITY:
+                case SPELL_ELIXIR_OF_OGRES_STRENGTH:
+                case SPELL_ELIXIR_OF_WISDOM:
+                case SPELL_ELIXIR_OF_THE_MONGOOSE:
+                    bonus = 5;
+                    break;
+                case SPELL_STRONG_TROLLS_BLOOD_ELIXIR:
+                case SPELL_FLASK_OF_CHROMATIC_WONDER:
+                    bonus = 4;
+                    break;
+                case SPELL_ELIXIR_OF_EMPOWERMENT:
+                    bonus = -10;
+                    break;
+                case SPELL_ADEPTS_ELIXIR:
+                    SetBonusValueForEffect(EFFECT_0, 13, aurEff);
+                    SetBonusValueForEffect(EFFECT_1, 13, aurEff);
+                    SetBonusValueForEffect(EFFECT_2, 8, aurEff);
+                    break;
+                case SPELL_ELIXIR_OF_MIGHTY_FORTITUDE:
+                    SetBonusValueForEffect(EFFECT_0, 160, aurEff);
+                    break;
+                case SPELL_ELIXIR_OF_MAJOR_FORTITUDE:
+                    SetBonusValueForEffect(EFFECT_0, 116, aurEff);
+                    SetBonusValueForEffect(EFFECT_1, 6, aurEff);
+                    break;
+                case SPELL_FEL_STRENGTH_ELIXIR:
+                    SetBonusValueForEffect(EFFECT_0, 40, aurEff);
+                    SetBonusValueForEffect(EFFECT_1, 40, aurEff);
+                    break;
+                case SPELL_FLASK_OF_FORTIFICATION:
+                    SetBonusValueForEffect(EFFECT_0, 210, aurEff);
+                    SetBonusValueForEffect(EFFECT_1, 5, aurEff);
+                    break;
+                case SPELL_GREATER_ARCANE_ELIXIR:
+                    SetBonusValueForEffect(EFFECT_0, 19, aurEff);
+                    SetBonusValueForEffect(EFFECT_1, 19, aurEff);
+                    SetBonusValueForEffect(EFFECT_2, 5, aurEff);
+                    break;
+                case SPELL_ELIXIR_OF_GIANTH_GROWTH:
+                    SetBonusValueForEffect(EFFECT_0, 5, aurEff);
+                    break;
+                default:
+                    TC_LOG_ERROR("spells","SpellId %d couldn't be processed in spell_gen_mixology_bonus", GetId());
+                    break;
+                }
+                amount += bonus;
+            }
+        }
+
+        int32 bonus;
+
+        void Register()
+        {
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_gen_mixology_bonus_AuraScript::CalculateAmount, EFFECT_ALL, SPELL_AURA_ANY);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_gen_mixology_bonus_AuraScript();
+    }
+};
+
+// 62563 62874 62960 63003 63010 63661 64591 66481 68282 68284 68321 68498 68501
+class spell_gen_mount : public SpellScriptLoader
+{
+public:
+    spell_gen_mount(const char* name, uint32 mount0 = 0, uint32 mount60 = 0, uint32 mount100 = 0, uint32 mount150 = 0, uint32 mount280 = 0, uint32 mount310 = 0) : SpellScriptLoader(name),
+        _mount0(mount0), _mount60(mount60), _mount100(mount100), _mount150(mount150), _mount280(mount280), _mount310(mount310) { }
+private:
+    uint32 _mount0;
+    uint32 _mount60;
+    uint32 _mount100;
+    uint32 _mount150;
+    uint32 _mount280;
+    uint32 _mount310;
+
+    class spell_gen_mount_SpellScript : public SpellScript 
+        { PrepareSpellScript(spell_gen_mount_SpellScript);
+
+    public:
+        spell_gen_mount_SpellScript(uint32 mount0, uint32 mount60, uint32 mount100, uint32 mount150, uint32 mount280, uint32 mount310) : SpellScript(),
+            _mount0(mount0), _mount60(mount60), _mount100(mount100), _mount150(mount150), _mount280(mount280), _mount310(mount310) { }
+
+        bool Validate(SpellInfo const* /*spell*/)
+        {
+            if (_mount0 && !sSpellMgr->GetSpellInfo(_mount0))
+                return false;
+            if (_mount60 && !sSpellMgr->GetSpellInfo(_mount60))
+                return false;
+            if (_mount100 && !sSpellMgr->GetSpellInfo(_mount100))
+                return false;
+            if (_mount150 && !sSpellMgr->GetSpellInfo(_mount150))
+                return false;
+            if (_mount280 && !sSpellMgr->GetSpellInfo(_mount280))
+                return false;
+            if (_mount310 && !sSpellMgr->GetSpellInfo(_mount310))
+                return false;
+            return true;
+        }
+
+        void HandleMount(SpellEffIndex effIndex)
+        {
+            PreventHitDefaultEffect(effIndex);
+
+            if (Player* target = GetHitPlayer())
+            {
+                // Prevent stacking of mounts and client crashes upon dismounting
+                target->RemoveAurasByType(SPELL_AURA_MOUNTED, 0, GetHitAura());
+
+                // Triggered spell id dependent on riding skill and zone
+                bool canFly = false;
+                uint32 map = GetVirtualMapForMapAndZone(target->GetMapId(), target->GetZoneId());
+                if (map == 530 || (map == 571 && target->HasSpell(SPELL_COLD_WEATHER_FLYING)))
+                    canFly = true;
+
+                float x, y, z;
+                target->GetPosition(x, y, z);
+                uint32 areaFlag = target->GetBaseMap()->GetAreaFlag(x, y, z);
+                AreaTableEntry const* area = sAreaStore.LookupEntry(areaFlag);
+                if (!area || (canFly && (area->flags & AREA_FLAG_NO_FLY_ZONE)))
+                    canFly = false;
+
+                uint32 mount = 0;
+                switch (target->GetBaseSkillValue(SKILL_RIDING))
+                {
+                case 0:
+                    mount = _mount0;
+                    break;
+                case 75:
+                    mount = _mount60;
+                    break;
+                case 150:
+                    mount = _mount100;
+                    break;
+                case 225:
+                    if (canFly)
+                        mount = _mount150;
+                    else
+                        mount = _mount100;
+                    break;
+                case 300:
+                    if (canFly)
+                        mount = _mount280;
+                    else
+                        mount = _mount100;
+                    break;
+                case 375:
+                    if (canFly)
+                        mount = _mount310;
+                    else
+                        mount = _mount100;
+                    break;
+                default:
+                    break;
+                }
+
+                if (mount)
+                {
+                    PreventHitAura();
+                    target->CastSpell(target, mount, true);
+                }
+            }
+        }
+
+        void Register()
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_gen_mount_SpellScript::HandleMount, EFFECT_2, SPELL_EFFECT_SCRIPT_EFFECT);
+        }
+
+    private:
+        uint32 _mount0;
+        uint32 _mount60;
+        uint32 _mount100;
+        uint32 _mount150;
+        uint32 _mount280;
+        uint32 _mount310;
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_gen_mount_SpellScript(_mount0, _mount60, _mount100, _mount150, _mount280, _mount310);
+    }
+};
+
+// 42292 59752
+class spell_gen_pvp_trinket : public SpellScriptLoader
+{
+public:
+    spell_gen_pvp_trinket() : SpellScriptLoader("spell_gen_pvp_trinket") { }
+
+    class spell_gen_pvp_trinket_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_gen_pvp_trinket_SpellScript);
+
+        void TriggerAnimation()
+        {
+            if (Player* caster = GetCaster()->ToPlayer())
+                switch (caster->GetTeam())
+                {
+                    case ALLIANCE:
+                        caster->CastSpell(caster, 97403, TRIGGERED_FULL_MASK);
+                        break;
+                    case HORDE:
+                        caster->CastSpell(caster, 97404, TRIGGERED_FULL_MASK);
+                        break;
+                }
+        }
+
+        void Register()
+        {
+            AfterCast += SpellCastFn(spell_gen_pvp_trinket_SpellScript::TriggerAnimation);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_gen_pvp_trinket_SpellScript();
+    }
+};
+
+// 80353 90355 Filter targets for Ancient Hysteria, Bloodlust, Heroism, and Time Warp.
+class spell_gen_raid_haste : public SpellScriptLoader
+{
+public:
+    spell_gen_raid_haste(char const* scriptName) : SpellScriptLoader(scriptName) { }
+
+    enum RaidHasteSpellsBuffsAndDebuffs
+    {
+        SPELL_BUFF_BLOODLUST = 2825,
+        SPELL_DEBUFF_SATED = 57724,
+
+        SPELL_BUFF_HEROISM = 32182,
+        SPELL_DEBUFF_EXHAUSTION = 57723,
+
+        SPELL_BUFF_TIME_WARP = 80353,
+        SPELL_DEBUFF_TEMPORAL_DISPLACEMENT = 80354,
+
+        SPELL_BUFF_ANCIENT_HYSTERIA = 90355,
+        SPELL_DEBUFF_INSANITY = 95809,
+    };
+
+    class spell_gen_raid_SPELL_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_gen_raid_SPELL_SpellScript);
+
+        bool Validate(SpellInfo const* /*spellEntry*/)
+        {
+            if (!sSpellMgr->GetSpellInfo(SPELL_DEBUFF_SATED) ||
+                !sSpellMgr->GetSpellInfo(SPELL_DEBUFF_EXHAUSTION) ||
+                !sSpellMgr->GetSpellInfo(SPELL_DEBUFF_TEMPORAL_DISPLACEMENT) ||
+                !sSpellMgr->GetSpellInfo(SPELL_DEBUFF_INSANITY))
+                return false;
+            return true;
+        }
+
+        void RemoveInvalidTargets(std::list<WorldObject*>& targets)
+        {
+            targets.remove_if(Trinity::UnitAuraCheck(true, SPELL_DEBUFF_SATED));
+            targets.remove_if(Trinity::UnitAuraCheck(true, SPELL_DEBUFF_EXHAUSTION));
+            targets.remove_if(Trinity::UnitAuraCheck(true, SPELL_DEBUFF_TEMPORAL_DISPLACEMENT));
+            targets.remove_if(Trinity::UnitAuraCheck(true, SPELL_DEBUFF_INSANITY));
+        }
+
+        void ApplyDebuff()
+        {
+            switch (GetSpellInfo()->Id)
+            {
+            case SPELL_BUFF_BLOODLUST:
+                GetHitUnit()->CastSpell(GetHitUnit(), SPELL_DEBUFF_SATED, true);
+                break;
+            case SPELL_BUFF_HEROISM:
+                GetHitUnit()->CastSpell(GetHitUnit(), SPELL_DEBUFF_EXHAUSTION, true);
+                break;
+            case SPELL_BUFF_TIME_WARP:
+                GetHitUnit()->CastSpell(GetHitUnit(), SPELL_DEBUFF_TEMPORAL_DISPLACEMENT, true);
+                break;
+            case SPELL_BUFF_ANCIENT_HYSTERIA:
+                GetHitUnit()->CastSpell(GetHitUnit(), SPELL_DEBUFF_INSANITY, true);
+                break;
+            }
+        }
+
+        void Register()
+        {
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_gen_raid_SPELL_SpellScript::RemoveInvalidTargets, EFFECT_0, TARGET_UNIT_CASTER_AREA_RAID);
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_gen_raid_SPELL_SpellScript::RemoveInvalidTargets, EFFECT_1, TARGET_UNIT_CASTER_AREA_RAID);
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_gen_raid_SPELL_SpellScript::RemoveInvalidTargets, EFFECT_2, TARGET_UNIT_CASTER_AREA_RAID);
+            AfterHit += SpellHitFn(spell_gen_raid_SPELL_SpellScript::ApplyDebuff);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_gen_raid_SPELL_SpellScript();
+    }
+};
+
+// 96879
+class spell_gen_scales_of_life : public SpellScriptLoader
+{
+public:
+    spell_gen_scales_of_life() : SpellScriptLoader("spell_gen_scales_of_life") { }
+
+    class spell_gen_scales_of_life_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_gen_scales_of_life_SpellScript);
+
+        SpellCastResult CheckRequirement()
+        {
+            if (!GetCaster()->HasAura(96881))
+                return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
+            return SPELL_CAST_OK;
+        }
+
+        void HandleOnHit(SpellEffIndex /*effIndex*/)
+        {
+            if (AuraEffect* tracker = GetCaster()->GetAuraEffect(96881, EFFECT_0))
+                SetHitHeal(tracker->GetAmount());
+
+            GetHitUnit()->RemoveAurasDueToSpell(96881);
+        }
+
+        void Register()
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_gen_scales_of_life_SpellScript::HandleOnHit, EFFECT_0, SPELL_EFFECT_HEAL);
+            OnCheckCast += SpellCheckCastFn(spell_gen_scales_of_life_SpellScript::CheckRequirement);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_gen_scales_of_life_SpellScript();
+    }
+};
+
+// 96880 Scales of Life (trinket)
+class spell_gen_tipping_of_scales : public SpellScriptLoader
+{
+public:
+    spell_gen_tipping_of_scales() : SpellScriptLoader("spell_gen_tipping_of_scales") { }
+
+    class spell_gen_tipping_of_scales_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_gen_tipping_of_scales_SpellScript)
+
+            SpellCastResult CheckRequirement()
+        {
+            if (Unit* caster = GetCaster())
+            {
+                if (caster->HasAura(96881))
+                    return SPELL_CAST_OK;
+            }
+            return SPELL_FAILED_NO_POWER;
+        }
+
+        void BeforeEffect(SpellEffIndex /*effIndex*/)
+        {
+            if (Unit* caster = GetCaster())
+            {
+                if (Aura* buff = caster->GetAura(96881))
+                    SetHitHeal(buff->GetEffect(0)->GetAmount());
+
+                caster->RemoveAurasDueToSpell(96881);
+            }
+        }
+
+        void Register()
+        {
+            OnCheckCast += SpellCheckCastFn(spell_gen_tipping_of_scales_SpellScript::CheckRequirement);
+            OnEffectHitTarget += SpellEffectFn(spell_gen_tipping_of_scales_SpellScript::BeforeEffect, EFFECT_0, SPELL_EFFECT_HEAL);
+        }
+    };
+
+    SpellScript *GetSpellScript() const
+    {
+        return new spell_gen_tipping_of_scales_SpellScript();
+    }
+};
+
+// 50341
+class spell_gen_touch_the_nightmare : public SpellScriptLoader
+{
+public:
+    spell_gen_touch_the_nightmare() : SpellScriptLoader("spell_gen_touch_the_nightmare") { }
+
+    class spell_gen_touch_the_nightmare_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_gen_touch_the_nightmare_SpellScript);
+
+        void HandleDamageCalc(SpellEffIndex /*effIndex*/)
+        {
+            uint32 bp = GetCaster()->GetMaxHealth() * 0.3f;
+            SetHitDamage(bp);
+        }
+
+        void Register()
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_gen_touch_the_nightmare_SpellScript::HandleDamageCalc, EFFECT_2, SPELL_EFFECT_SCHOOL_DAMAGE);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_gen_touch_the_nightmare_SpellScript();
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     new spell_gen_absorb0_hitlimit1();
     new spell_gen_adaptive_warding();
     new spell_gen_alchemist_stone();
     new spell_gen_allow_cast_from_item_only();
+    new spell_gen_angerforge();
     new spell_gen_animal_blood();
+    new spell_gen_apparatus_of_khaz();
+    new spell_gen_armor_specialization("spell_dru_armor_specialization");
+    new spell_gen_armor_specialization("spell_rog_armor_specialization");
+    new spell_gen_armor_specialization("spell_sha_armor_specialization");
+    new spell_gen_armor_specialization("spell_hun_armor_specialization");
+    new spell_gen_armor_specialization("spell_pal_armor_specialization");
+    new spell_gen_armor_specialization("spell_dk_armor_specialization");
+    new spell_gen_armor_specialization("spell_war_armor_specialization");
     new spell_gen_aura_of_anger();
     new spell_gen_aura_service_uniform();
     new spell_gen_av_drekthar_presence();
     new spell_gen_bandage();
+    new spell_gen_blessing_of_khazgoroth();
     new spell_gen_bonked();
     new spell_gen_break_shield("spell_gen_break_shield");
     new spell_gen_break_shield("spell_gen_tournament_counterattack");
@@ -3776,17 +5143,24 @@ void AddSC_generic_spell_scripts()
     new spell_gen_creature_permanent_feign_death();
     new spell_gen_dalaran_disguise("spell_gen_sunreaver_disguise");
     new spell_gen_dalaran_disguise("spell_gen_silver_covenant_disguise");
+    new spell_gen_darkflight();
     new spell_gen_defend();
     new spell_gen_despawn_self();
     new spell_gen_divine_storm_cd_reset();
+    new spell_gen_dream_funnel();
     new spell_gen_ds_flush_knockback();
     new spell_gen_dummy_trigger();
     new spell_gen_dungeon_credit();
+    new spell_gen_eject_all_passengers();
     new spell_gen_elune_candle();
+    new spell_gen_fix_anticheat();
+    new spell_gen_flap();
+    new spell_gen_forged_fury();
     new spell_gen_gadgetzan_transporter_backfire();
     new spell_gen_gift_of_naaru();
     new spell_gen_gnomish_transporter();
     new spell_gen_gunship_portal();
+    new spell_gen_ignacious();
     new spell_gen_increase_stats_buff("spell_pal_blessing_of_kings");
     new spell_gen_increase_stats_buff("spell_pal_blessing_of_might");
     new spell_gen_increase_stats_buff("spell_dru_mark_of_the_wild");
@@ -3796,13 +5170,26 @@ void AddSC_generic_spell_scripts()
     new spell_gen_increase_stats_buff("spell_mage_dalaran_brilliance");
     new spell_gen_interrupt();
     new spell_gen_launch();
+    new spell_gen_lifeblood();
     new spell_gen_lifebloom("spell_hexlord_lifebloom", SPELL_HEXLORD_MALACRASS_LIFEBLOOM_FINAL_HEAL);
     new spell_gen_lifebloom("spell_tur_ragepaw_lifebloom", SPELL_TUR_RAGEPAW_LIFEBLOOM_FINAL_HEAL);
     new spell_gen_lifebloom("spell_cenarion_scout_lifebloom", SPELL_CENARION_SCOUT_LIFEBLOOM_FINAL_HEAL);
     new spell_gen_lifebloom("spell_twisted_visage_lifebloom", SPELL_TWISTED_VISAGE_LIFEBLOOM_FINAL_HEAL);
     new spell_gen_lifebloom("spell_faction_champion_dru_lifebloom", SPELL_FACTION_CHAMPIONS_DRU_LIFEBLOOM_FINAL_HEAL);
+    new spell_gen_luck_of_the_draw();
+    new spell_gen_magic_rooster();
+    new spell_gen_mixology_bonus();
+    new spell_gen_mount("spell_magic_broom", 0, SPELL_MAGIC_BROOM_60, SPELL_MAGIC_BROOM_100, SPELL_MAGIC_BROOM_150, SPELL_MAGIC_BROOM_280);
+    new spell_gen_mount("spell_headless_horseman_mount", 0, SPELL_HEADLESS_HORSEMAN_MOUNT_60, SPELL_HEADLESS_HORSEMAN_MOUNT_100, SPELL_HEADLESS_HORSEMAN_MOUNT_150, SPELL_HEADLESS_HORSEMAN_MOUNT_280);
+    new spell_gen_mount("spell_winged_steed_of_the_ebon_blade", 0, 0, 0, SPELL_WINGED_STEED_150, SPELL_WINGED_STEED_280);
+    new spell_gen_mount("spell_big_love_rocket", SPELL_BIG_LOVE_ROCKET_0, SPELL_BIG_LOVE_ROCKET_60, SPELL_BIG_LOVE_ROCKET_100, SPELL_BIG_LOVE_ROCKET_150, SPELL_BIG_LOVE_ROCKET_310);
+    new spell_gen_mount("spell_invincible", 0, SPELL_INVINCIBLE_60, SPELL_INVINCIBLE_100, SPELL_INVINCIBLE_150, SPELL_INVINCIBLE_310);
+    new spell_gen_mount("spell_blazing_hippogryph", 0, 0, 0, SPELL_BLAZING_HIPPOGRYPH_150, SPELL_BLAZING_HIPPOGRYPH_280);
+    new spell_gen_mount("spell_celestial_steed", 0, SPELL_CELESTIAL_STEED_60, SPELL_CELESTIAL_STEED_100, SPELL_CELESTIAL_STEED_150, SPELL_CELESTIAL_STEED_280, SPELL_CELESTIAL_STEED_310);
+    new spell_gen_mount("spell_x53_touring_rocket", 0, 0, 0, SPELL_X53_TOURING_ROCKET_150, SPELL_X53_TOURING_ROCKET_280, SPELL_X53_TOURING_ROCKET_310);
     new spell_gen_mounted_charge();
     new spell_gen_netherbloom();
+    new spell_gen_nightmare_vine();
     new spell_gen_obsidian_armor();
     new spell_gen_on_tournament_mount();
     new spell_gen_oracle_wolvar_reputation();
@@ -3811,13 +5198,16 @@ void AddSC_generic_spell_scripts()
     new spell_gen_parachute_ic();
     new spell_gen_pet_summoned();
     new spell_gen_profession_research();
+    new spell_gen_pvp_trinket();
+    new spell_gen_pvp_trinket_wotf_shared_cd();
+    new spell_gen_raid_haste("spell_bloodlust");
+    new spell_gen_raid_haste("spell_heroism");
+    new spell_gen_raid_haste("spell_time_warp");
+    new spell_gen_raid_haste("spell_ancient_hysteria");
     new spell_gen_remove_flight_auras();
     new spell_gen_replenishment();
-    // Running Wild
     new spell_gen_running_wild();
-    new spell_gen_two_forms();
-    new spell_gen_darkflight();
-    /*                          */
+    new spell_gen_scales_of_life();
     new spell_gen_seaforium_blast();
     new spell_gen_spectator_cheer_trigger();
     new spell_gen_spirit_healer_res();
@@ -3825,15 +5215,16 @@ void AddSC_generic_spell_scripts()
     new spell_gen_summon_elemental("spell_gen_summon_earth_elemental", SPELL_SUMMON_EARTH_ELEMENTAL);
     new spell_gen_summon_tournament_mount();
     new spell_gen_throw_shield();
+    new spell_gen_tipping_of_scales();
+    new spell_gen_touch_the_nightmare();
     new spell_gen_tournament_duel();
     new spell_gen_tournament_pennant();
-    new spell_pvp_trinket_wotf_shared_cd();
     new spell_gen_turkey_marker();
+    new spell_gen_two_forms();
     new spell_gen_upper_deck_create_foam_sword();
     new spell_gen_vehicle_scaling();
     new spell_gen_vendor_bark_trigger();
     new spell_gen_wg_water();
     new spell_gen_whisper_gulch_yogg_saron_whisper();
-    new spell_gen_eject_all_passengers();
-    new spell_gen_flap();
+
 }

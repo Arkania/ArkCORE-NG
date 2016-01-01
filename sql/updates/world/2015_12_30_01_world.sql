@@ -11,14 +11,14 @@ delete from spell_script_names where spell_id=80863;
 insert into spell_script_names values 
 (80863, "spell_dru_blood_in_the_water");
 
-delete from spell_script_names where spell_id in (5185, 50464) and ScriptName="spell_dru_emp_touch";
+delete from spell_script_names where spell_id in (5185, 50464) and ScriptName="spell_dru_emporered_touch";
 insert into spell_script_names values 
- (5185, "spell_dru_emp_touch"),
-(50464, "spell_dru_emp_touch");
+ (5185, "spell_dru_emporered_touch"),
+(50464, "spell_dru_emporered_touch");
 
-delete from spell_script_names where spell_id=88433;
+delete from spell_script_names where spell_id=88433 and ScriptName="spell_dru_empowered_touch_triggered";
 insert into spell_script_names values 
-(88433, "spell_dru_emp_touch_triggered");
+(88433, "spell_dru_empowered_touch_triggered");
 
 delete from spell_script_names where spell_id=95746;
 insert into spell_script_names values 

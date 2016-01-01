@@ -811,7 +811,7 @@ public:
     }
 };
 
-// -51625 - Deadly Brew
+// 3409 25809 44289
 class spell_rog_crippling_poison : public SpellScriptLoader
 {
     public:

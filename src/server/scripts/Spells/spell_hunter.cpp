@@ -33,36 +33,70 @@
 
 enum HunterSpells
 {
-    SPELL_HUNTER_BESTIAL_WRATH                      = 19574,
-    SPELL_HUNTER_CHIMERA_SHOT_HEAL                  = 53353,
-    SPELL_HUNTER_FIRE                               = 82926,
-    SPELL_HUNTER_GENERIC_ENERGIZE_FOCUS             = 91954,
-    SPELL_HUNTER_IMPROVED_MEND_PET                  = 24406,
-    SPELL_HUNTER_INSANITY                           = 95809,
-    SPELL_HUNTER_INVIGORATION_TRIGGERED             = 53398,
-    SPELL_HUNTER_LOCK_AND_LOAD                      = 56453,
-    SPELL_HUNTER_MASTERS_CALL_TRIGGERED             = 62305,
-    SPELL_HUNTER_MISDIRECTION_PROC                  = 35079,
-    SPELL_HUNTER_PET_LAST_STAND_TRIGGERED           = 53479,
-    SPELL_HUNTER_PET_HEART_OF_THE_PHOENIX           = 55709,
+    SPELL_HUNTER_ANIMAL_HANDLER = 34453,
+    SPELL_HUNTER_SERPENT_STING                  = 1978,
+    SPELL_HUNTER_BESTIAL_WRATH = 19574,
+    SPELL_HUNTER_READINESS = 23989,
+    SPELL_HUNTER_IMPROVED_MEND_PET = 24406,
+    SPELL_HUNTER_THRILL_OF_THE_HUNT = 34720,
+    SPELL_HUNTER_FOCUSED_FIRE_1 = 35029,
+    SPELL_HUNTER_FOCUSED_FIRE_2 = 35030,
+    SPELL_HUNTER_MISDIRECTION_PROC = 35079,
+    SPELL_HUNTER_IMPROVED_STEADY_SHOT = 53220,
+    SPELL_HUNTER_IMPROVED_STEADY_SHOT_RANK_1 = 53221,
+    SPELL_HUNTER_IMPROVED_STEADY_SHOT_RANK_2 = 53222,
+    SPELL_HUNTER_IMPROVED_STEADY_SHOT_RANK_3 = 53224,
+    SPELL_HUNTER_SNIPER_TRAINING_R1 = 53302,
+    SPELL_HUNTER_KILL_SHOT = 53351,
+    SPELL_HUNTER_CHIMERA_SHOT_HEAL = 53353,
+    SPELL_HUNTER_INVIGORATION_TRIGGERED = 53398,
+    SPELL_HUNTER_PET_LAST_STAND_TRIGGERED = 53479,
+    SPELL_HUNTER_PET_CARRION_FEEDER_TRIGGERED = 54045,
     SPELL_HUNTER_PET_HEART_OF_THE_PHOENIX_TRIGGERED = 54114,
-    SPELL_HUNTER_PET_HEART_OF_THE_PHOENIX_DEBUFF    = 55711,
-    SPELL_HUNTER_PET_CARRION_FEEDER_TRIGGERED       = 54045,
-    SPELL_HUNTER_RAPID_RECUPERATION                 = 58883,
-    SPELL_HUNTER_READINESS                          = 23989,
-    SPELL_HUNTER_SERPENT_STING                      = 1978,
-    SPELL_HUNTER_SNIPER_TRAINING_R1                 = 53302,
-    SPELL_HUNTER_SNIPER_TRAINING_BUFF_R1            = 64418,
-    SPELL_HUNTER_STEADY_SHOT_FOCUS                  = 77443,
-    SPELL_HUNTER_THRILL_OF_THE_HUNT                 = 34720
+    SPELL_HUNTER_PET_HEART_OF_THE_PHOENIX = 55709,
+    SPELL_HUNTER_PET_HEART_OF_THE_PHOENIX_DEBUFF = 55711,
+    SPELL_HUNTER_LOCK_AND_LOAD = 56453,
+    SPELL_HUNTER_GLYPH_OF_SILENCING_SHOT = 56836,
+    SPELL_SHAMAN_EXHAUSTION = 57723,
+    SPELL_SHAMAN_SATED = 57724,
+    SPELL_HUNTER_RAPID_RECUPERATION = 58883,
+    SPELL_DRAENEI_GIFT_OF_THE_NAARU = 59543,
+    SPELL_HUNTER_KILL_COMMAND_CRIT_10 = 60110,
+    SPELL_HUNTER_KILL_COMMAND_CRIT_20 = 60113,
+    SPELL_HUNTER_MASTERS_CALL_TRIGGERED = 62305,
+    SPELL_HUNTER_GLYPH_KILL_SHOT = 63067,
+    SPELL_HUNTER_SNIPER_TRAINING_BUFF_R1 = 64418,
+    SPELL_HUNTER_STEADY_SHOT_FOCUS = 77443,
+    SPELL_MAGE_TEMPORAL_DISPLACEMENT = 80354,
+    SPELL_HUNTER_FOCUS_ENERGIZE = 82716,
+    SPELL_HUNTER_FIRE = 82926,
+    SPELL_HUNTER_TERMINATION_RANK_1 = 83489,
+    SPELL_HUNTER_TERMINATION_RANK_2 = 83490,
+    SPELL_HUNTER_GLYPH_KILL_SHOT_CD = 90967,
+    SPELL_HUNTER_GENERIC_ENERGIZE_FOCUS = 91954,
+    SPELL_HUNTER_INSANITY                           = 95809,
+
 };
 
-enum MiscSpells
+enum HunterPetCalculate
 {
-    SPELL_DRAENEI_GIFT_OF_THE_NAARU                 = 59543,
-    SPELL_MAGE_TEMPORAL_DISPLACEMENT                = 80354,
-    SPELL_SHAMAN_EXHAUSTION                         = 57723,
-    SPELL_SHAMAN_SATED                              = 57724
+    SPELL_TAMED_PET_PASSIVE_06 = 19591,
+    SPELL_TAMED_PET_PASSIVE_07 = 20784,
+    SPELL_TAMED_PET_PASSIVE_08 = 34666,
+    SPELL_TAMED_PET_PASSIVE_09 = 34667,
+    SPELL_TAMED_PET_PASSIVE_10 = 34675,
+    SPELL_HUNTER_PET_SCALING_01 = 34902,
+    SPELL_HUNTER_PET_SCALING_02 = 34903,
+    SPELL_HUNTER_PET_SCALING_03 = 34904,
+    SPELL_HUNTER_PET_SCALING_04 = 61017,
+    SPELL_HUNTER_PET_SCALING_05 = 89446
+};
+
+enum HunterPetTreeSpecializationMarker
+{
+    SPELL_HUNTER_PET_FEROCITY_MARKER = 87887,
+    SPELL_HUNTER_PET_TENACITY_MARKER = 87891,
+    SPELL_HUNTER_PET_CUNNING_MARKER = 87884
 };
 
 // 90355 - Ancient Hysteria
@@ -1082,26 +1116,1785 @@ class spell_hun_tnt : public SpellScriptLoader
         }
 };
 
+// new ###############################################
+
+// 51753 - Camouflage
+class spell_hun_camouflage : public SpellScriptLoader
+{
+public:
+    spell_hun_camouflage() : SpellScriptLoader("spell_hun_camouflage") { }
+
+    class spell_hun_camouflage_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_hun_camouflage_SpellScript);
+
+        void HandleDummy(SpellEffIndex /*effIndex*/)
+        {
+            Unit* caster = GetCaster();
+            caster->CastSpell(caster, 51755, true);
+            if (caster->ToPlayer())
+                if (Pet* pet = caster->ToPlayer()->GetPet())
+                    pet->CastSpell(pet, 51755, true);
+        }
+
+        void Register()
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_hun_camouflage_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_hun_camouflage_SpellScript();
+    }
+};
+
+// 80326 - Camouflage periodic
+class spell_hun_camouflage_periodic : public SpellScriptLoader
+{
+public:
+    spell_hun_camouflage_periodic() : SpellScriptLoader("spell_hun_camouflage_periodic") { }
+
+    class spell_hun_camouflage_periodic_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_hun_camouflage_periodic_AuraScript);
+
+        void HandlePeriodic(AuraEffect const* aurEff)
+        {
+            if (GetUnitOwner()->isMoving())
+                PreventDefaultAction();
+        }
+
+        void Register()
+        {
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_hun_camouflage_periodic_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_hun_camouflage_periodic_AuraScript();
+    }
+};
+
+// 5116 Concussive shot
+class spell_hun_concussive : public SpellScriptLoader
+{
+public:
+    spell_hun_concussive() : SpellScriptLoader("spell_hun_concussive") { }
+
+    class spell_hun_concussive_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_hun_concussive_SpellScript);
+
+        void HandleOnHit()
+        {
+            AuraEffect* glyph = GetCaster()->GetAuraEffect(56851, EFFECT_0);
+            if (Aura* debuff = GetHitAura())
+            {
+                // Modify normalization based on glyph
+                if (AuraEffect* normalization = debuff->GetEffect(EFFECT_1))
+                {
+                    if (!glyph)
+                    {
+                        normalization->SetAmount(0);
+                        normalization->HandleEffect(GetHitUnit(), AURA_REMOVE_BY_DEFAULT, false);
+                    }
+                }
+            }
+        }
+
+        void Register()
+        {
+            OnHit += SpellHitFn(spell_hun_concussive_SpellScript::HandleOnHit);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_hun_concussive_SpellScript();
+    }
+};
+
+// 56641 - Steady Shot 77767 - Cobra Shot
+class spell_hun_energize : public SpellScriptLoader
+{
+public:
+    spell_hun_energize() : SpellScriptLoader("spell_hun_energize") { }
+
+    class spell_hun_energize_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_hun_energize_SpellScript);
+
+        void HandleOnHit()
+        {
+            uint32 triggeredSpell = 91954;
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(triggeredSpell);
+            if (!spellInfo)
+                return;
+
+            int32 bp0 = spellInfo->Effects[EFFECT_0].BasePoints;
+            Unit* caster = GetCaster();
+            if (Unit* unitTarget = GetHitUnit())
+            {
+                // Refresh serpent sting
+                if (GetSpellInfo()->Id == 77767)
+                    if (Aura* aura = unitTarget->GetAura(1978, GetCaster()->GetGUID()))
+                        aura->SetDuration(std::min(aura->GetDuration() + GetSpellInfo()->Effects[EFFECT_1].BasePoints * 1000, aura->GetMaxDuration()), true);
+
+                // TALENTO Termination 
+                // No estoy seguro de qeu cobrashot use este talento 
+                // Termination
+                if (AuraEffect* termination = caster->GetDummyAuraEffect(SPELLFAMILY_HUNTER, 2008, EFFECT_0))
+                    if (unitTarget->GetHealthPct() <= 25.0f)
+                        bp0 += termination->GetAmount();
+                caster->CastCustomSpell(caster, triggeredSpell, &bp0, NULL, NULL, true);
+
+                if (caster->HasAura(SPELL_HUNTER_TERMINATION_RANK_1))
+                {
+                    // 3 puntos de FOCO con un punt de TALENTO
+                    caster->SetPower(POWER_FOCUS, caster->GetPower(POWER_FOCUS) + 3);
+
+                }
+                else if (caster->HasAura(SPELL_HUNTER_TERMINATION_RANK_2))
+                {
+
+                    // 6 puntos de FOCO con un punt de TALENTO
+                    caster->SetPower(POWER_FOCUS, caster->GetPower(POWER_FOCUS) + 6);
+
+                }
+            }
+
+        }
+
+        void Register()
+        {
+            OnHit += SpellHitFn(spell_hun_energize_SpellScript::HandleOnHit);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_hun_energize_SpellScript();
+    }
+};
+
+// -82692 - Focus Fire
+class spell_hun_focus_fire : public SpellScriptLoader
+{
+public:
+    spell_hun_focus_fire() : SpellScriptLoader("spell_hun_focus_fire") { }
+
+    // SpellScript
+    class spell_hun_focus_fire_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_hun_focus_fire_SpellScript)
+
+            bool Validate(SpellInfo const* /*spellEntry*/)
+        {
+            if (!sSpellMgr->GetSpellInfo(82692))
+                return false;
+            return true;
+        }
+
+        SpellCastResult CheckPetFrenzy()
+        {
+            Unit * pet = GetCaster()->GetGuardianPet();
+            if (!pet)
+                return SPELL_FAILED_NO_PET;
+
+            if (pet->HasAura(19615))
+                return SPELL_CAST_OK;
+            else
+                return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
+        }
+
+        void Register()
+        {
+            OnCheckCast += SpellCheckCastFn(spell_hun_focus_fire_SpellScript::CheckPetFrenzy);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_hun_focus_fire_SpellScript();
+    }
+
+    // AuraScript
+
+    class spell_hun_focus_fire_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_hun_focus_fire_AuraScript);
+
+        bool Load()
+        {
+            return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+        }
+
+        void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
+        {
+            if (Pet* pet = GetCaster()->ToPlayer()->GetPet())
+                if (Aura* aur = pet->GetAura(19615, pet->GetGUID()))
+                    amount *= aur->GetStackAmount();
+        }
+
+        void OnApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+        {
+            int32 basepoints0 = aurEff->GetAmount();
+            if (Pet* pet = GetCaster()->ToPlayer()->GetPet())
+                if (Aura* aur = pet->GetAura(19615, pet->GetGUID()))
+                {
+                    basepoints0 *= aur->GetStackAmount();
+                    GetCaster()->CastCustomSpell(pet, 83468, &basepoints0, NULL, NULL, true);
+                    aur->Remove();
+                }
+        }
+
+        void Register()
+        {
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_hun_focus_fire_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_MOD_RANGED_HASTE);
+            AfterEffectApply += AuraEffectApplyFn(spell_hun_focus_fire_AuraScript::OnApply, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_hun_focus_fire_AuraScript();
+    }
+};
+
+// 90967 Glyph Of Kill Shot
+class spell_hun_glyph_kill_shot : public SpellScriptLoader
+{
+public:
+    spell_hun_glyph_kill_shot() : SpellScriptLoader("spell_hun_glyph_kill_shot") { }
+
+    class spell_hun_glyph_kill_shot_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_hun_glyph_kill_shot_SpellScript);
+
+        void HandleGlyph()
+        {
+            if (GetCaster()->HasAura(SPELL_HUNTER_GLYPH_KILL_SHOT) && !GetCaster()->HasAura(SPELL_HUNTER_GLYPH_KILL_SHOT_CD))
+            {
+                if (GetHitUnit()->GetHealthPct() <= 20 && GetHitUnit()->GetHealth() > (uint32)GetHitDamage())
+                {
+                    GetCaster()->AddAura(SPELL_HUNTER_GLYPH_KILL_SHOT_CD, GetCaster());
+                    GetCaster()->ToPlayer()->RemoveSpellCooldown(SPELL_HUNTER_KILL_SHOT, true);
+                }
+            }
+        }
+
+        void Register()
+        {
+            OnHit += SpellHitFn(spell_hun_glyph_kill_shot_SpellScript::HandleGlyph);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_hun_glyph_kill_shot_SpellScript();
+    }
+};
+
+// 53476 Intervene
+class spell_hun_intervene : public SpellScriptLoader
+{
+public:
+    spell_hun_intervene() : SpellScriptLoader("spell_hun_intervene") { }
+
+    class spell_hun_intervene_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_hun_intervene_AuraScript);
+
+        void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
+        {
+            if (Unit* caster = GetCaster())
+                amount = caster->CountPctFromMaxHealth(amount);
+        }
+
+        void Register()
+        {
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_hun_intervene_AuraScript::CalculateAmount, EFFECT_1, SPELL_AURA_SCHOOL_ABSORB);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_hun_intervene_AuraScript();
+    }
+};
+
+// 53351
+class spell_hun_kill_shot : public SpellScriptLoader
+{
+public:
+    spell_hun_kill_shot() : SpellScriptLoader("spell_hun_kill_shot") { }
+
+    class spell_hun_kill_shot_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_hun_kill_shot_SpellScript);
+
+        void HandleDamage()
+        {
+            Unit* caster = GetCaster();
+            if (caster->GetTypeId() != TYPEID_PLAYER)
+                return;
+
+            Unit* target = GetHitUnit();
+            int32 damage = GetHitDamage();
+            // Glyph cooldown reset when target was failed to kill
+            if (AuraEffect* glyph = caster->GetDummyAuraEffect(SPELLFAMILY_HUNTER, 3676, EFFECT_0))
+                if (target && target->GetHealthPct() <= glyph->GetAmount() && !caster->HasAura(90967))
+                    if (int32(target->GetHealth()) > damage)
+                    {
+                        caster->ToPlayer()->RemoveSpellCooldown(53351, true);
+                        caster->CastSpell(caster, 90967, true);
+                    }
+        }
+
+        void Register()
+        {
+            OnHit += SpellHitFn(spell_hun_kill_shot_SpellScript::HandleDamage);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_hun_kill_shot_SpellScript();
+    }
+};
+
+// 136 Mend pet
+class spell_hun_mend_pet : public SpellScriptLoader
+{
+public:
+    spell_hun_mend_pet() : SpellScriptLoader("spell_hun_mend_pet") { }
+
+    class spell_hun_mend_pet_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_hun_mend_pet_AuraScript);
+
+        void HandlePeriodic(AuraEffect const* aurEff)
+        {
+            if (Unit* caster = GetCaster())
+                if (AuraEffect* aurEff = caster->GetDummyAuraEffect(SPELLFAMILY_HUNTER, 267, EFFECT_0))
+                    if (roll_chance_i(aurEff->GetAmount()))
+                        caster->CastSpell(GetTarget(), 24406, true);
+        }
+
+        void Register()
+        {
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_hun_mend_pet_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_OBS_MOD_HEALTH);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_hun_mend_pet_AuraScript();
+    }
+};
+
+// 83381
+class spell_hun_pet_damage_spells : public SpellScriptLoader
+{
+public:
+    spell_hun_pet_damage_spells() : SpellScriptLoader("spell_hun_pet_damage_spells") { }
+
+    class spell_hun_pet_damage_spells_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_hun_pet_damage_spells_SpellScript);
+
+        void HandleHit(SpellEffIndex /*effIndex*/)
+        {
+            Unit* caster = GetCaster();
+            if (Unit* owner = caster->GetOwner())
+            {
+                float coeff = 1.0f;
+                switch (GetSpellInfo()->Id)
+                {
+                case 16827: // Claw
+                case 49966: // Smack
+                case 17253: // Bite
+                    coeff = 0.2f * 0.4f;
+                    if (caster->GetPower(POWER_FOCUS) >= 50)
+                    {
+                        // Wild Hunt
+                        if (caster->HasSpell(62758))
+                        {
+                            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(62758);
+                            AddPct(coeff, spellInfo->Effects[EFFECT_0].BasePoints);
+                        }
+                        else if (caster->HasSpell(62762))
+                        {
+                            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(62762);
+                            AddPct(coeff, spellInfo->Effects[EFFECT_0].BasePoints);
+                        }
+                    }
+                    break;
+                case 83381: // Kill command
+                    coeff = 0.516f;
+                    break;
+                }
+                int32 baseDamage = GetEffectValue() + (coeff * owner->GetTotalAttackPowerValue(RANGED_ATTACK));
+                SetHitDamage(baseDamage); // SetEffectDamage
+            }
+        }
+
+        void Register()
+        {
+            OnEffectLaunchTarget += SpellEffectFn(spell_hun_pet_damage_spells_SpellScript::HandleHit, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_hun_pet_damage_spells_SpellScript();
+    }
+};
+
+// 19591
+class spell_hun_pet_passive_crit : public SpellScriptLoader
+{
+public:
+    spell_hun_pet_passive_crit() : SpellScriptLoader("spell_hun_pet_passive_crit") { }
+
+    class spell_hun_pet_passive_crit_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_hun_pet_passive_crit_AuraScript);
+
+        bool Load()
+        {
+            if (!GetCaster() || !GetCaster()->GetOwner() || GetCaster()->GetOwner()->GetTypeId() != TYPEID_PLAYER)
+                return false;
+            return true;
+        }
+
+        void CalculateAmountCritSpell(AuraEffect const* /* aurEff */, int32& /*amount*/, bool& /*canBeRecalculated*/)
+        {
+        }
+
+        void CalculateAmountCritMelee(AuraEffect const* /* aurEff */, int32& /*amount*/, bool& /*canBeRecalculated*/)
+        {
+        }
+
+        void Register()
+        {
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_hun_pet_passive_crit_AuraScript::CalculateAmountCritMelee, EFFECT_0, SPELL_AURA_MOD_WEAPON_CRIT_PERCENT);
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_hun_pet_passive_crit_AuraScript::CalculateAmountCritSpell, EFFECT_1, SPELL_AURA_MOD_SPELL_CRIT_CHANCE);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_hun_pet_passive_crit_AuraScript();
+    }
+};
+
+// 8875
+class spell_hun1_pet_passive_damage_done : public SpellScriptLoader
+{
+public:
+    spell_hun1_pet_passive_damage_done() : SpellScriptLoader("spell_hun_pet_passive_damage_done") { }
+
+    class spell_hun_pet_passive_damage_done_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_hun_pet_passive_damage_done_AuraScript);
+
+        bool Load()
+        {
+            if (!GetCaster() || !GetCaster()->GetOwner() || GetCaster()->GetOwner()->GetTypeId() != TYPEID_PLAYER)
+                return false;
+            return true;
+        }
+
+        void CalculateAmountDamageDone(AuraEffect const* /* aurEff */, int32& amount, bool& /*canBeRecalculated*/)
+        {
+            if (!GetCaster() || !GetCaster()->GetOwner())
+                return;
+        }
+
+        void Register()
+        {
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_hun_pet_passive_damage_done_AuraScript::CalculateAmountDamageDone, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_hun_pet_passive_damage_done_AuraScript();
+    }
+};
+class spell_hun_pet_passive_damage_done : public SpellScriptLoader
+{
+public:
+    spell_hun_pet_passive_damage_done() : SpellScriptLoader("spell_hun_pet_passive_damage_done") { }
+
+    class spell_hun_pet_passive_damage_done_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_hun_pet_passive_damage_done_AuraScript);
+
+        bool Load() override
+        {
+            if (!GetCaster() || !GetCaster()->GetOwner() || GetCaster()->GetOwner()->GetTypeId() != TYPEID_PLAYER)
+                return false;
+            return true;
+        }
+
+        void CalculateAmountDamageDone(AuraEffect const* /* aurEff */, int32& amount, bool& /*canBeRecalculated*/)
+        {
+            if (!GetCaster() || !GetCaster()->GetOwner())
+                return;
+            if (GetCaster()->GetOwner()->ToPlayer())
+            {
+                // Cobra Reflexes
+                if (AuraEffect* cobraReflexes = GetCaster()->GetAuraEffectOfRankedSpell(61682, EFFECT_0))
+                    amount -= cobraReflexes->GetAmount();
+            }
+        }
+
+        void Register() override
+        {
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_hun_pet_passive_damage_done_AuraScript::CalculateAmountDamageDone, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_hun_pet_passive_damage_done_AuraScript();
+    }
+};
+
+// 87884 87887 87891
+class spell_hun_pet_passive_tree_marker : public SpellScriptLoader
+{
+public:
+    spell_hun_pet_passive_tree_marker() : SpellScriptLoader("spell_hun_pet_passive_tree_marker") { }
+
+    class spell_hun_pet_passive_tree_marker_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_hun_pet_passive_tree_marker_AuraScript);
+
+        void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            if (Unit* caster = GetCaster())
+            {
+                if (caster->HasUnitTypeMask(UNIT_MASK_GUARDIAN))
+                {
+                    ((Guardian*)caster)->GetStat(STAT_STAMINA); // RecalculatePetScalingStats
+                    ((Guardian*)caster)->GetResistance(SPELL_SCHOOL_NORMAL); // RecalculatePetScalingResistance
+                }
+            }
+        }
+
+        void Register()
+        {
+            AfterEffectApply += AuraEffectApplyFn(spell_hun_pet_passive_tree_marker_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_hun_pet_passive_tree_marker_AuraScript();
+    }
+};
+
+// 34902
+class spell_hun1_pet_scaling_01 : public SpellScriptLoader
+{
+public:
+    spell_hun1_pet_scaling_01() : SpellScriptLoader("spell_hun_pet_scaling_01") { }
+
+    class spell_hun_pet_scaling_01_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_hun_pet_scaling_01_AuraScript);
+
+        bool Load()
+        {
+            if (!GetCaster() || !GetCaster()->GetOwner() || GetCaster()->GetOwner()->GetTypeId() != TYPEID_PLAYER)
+                return false;
+            _tempHealth = 0;
+            return true;
+        }
+
+        void CalculateMaxHealthAmount(AuraEffect const* /* aurEff */, int32& amount, bool& /*canBeRecalculated*/)
+        {
+            if (Unit* pet = GetUnitOwner())
+                if (pet->IsPet())
+                    if (Unit* owner = pet->ToPet()->GetOwner())
+                    {
+                        float mod = 0.0f;
+                        if (pet->HasAura(SPELL_HUNTER_PET_FEROCITY_MARKER))
+                            mod = 0.67f;
+                        else if (pet->HasAura(SPELL_HUNTER_PET_TENACITY_MARKER))
+                            mod = 0.78f;
+                        else if (pet->HasAura(SPELL_HUNTER_PET_CUNNING_MARKER))
+                            mod = 0.725f;
+
+                        float ownerBonus = owner->GetStat(STAT_STAMINA) * mod * 10.0f; // convert stamina in p
+                        amount += ownerBonus;
+                    }
+        }
+
+        void ApplyEffect(AuraEffect const* /* aurEff */, AuraEffectHandleModes /*mode*/)
+        {
+            if (Unit* pet = GetUnitOwner())
+            {
+                if (_tempHealth)
+                    pet->SetHealth(_tempHealth);
+                else
+                    pet->SetHealth(pet->GetMaxHealth());
+            }
+        }
+
+        void RemoveEffect(AuraEffect const* /* aurEff */, AuraEffectHandleModes /*mode*/)
+        {
+            if (Unit* pet = GetUnitOwner())
+                _tempHealth = pet->GetHealth();
+        }
+
+        void CalculateAttackPowerAmount(AuraEffect const* /* aurEff */, int32& amount, bool& /*canBeRecalculated*/)
+        {
+            if (Unit* pet = GetUnitOwner())
+            {
+                if (!pet->IsPet())
+                    return;
+
+                Unit* owner = pet->ToPet()->GetOwner();
+                if (!owner)
+                    return;
+
+                float mod = 0.425f;                                                 //Hunter contribution modifier
+                float bonusAP = owner->GetTotalAttackPowerValue(RANGED_ATTACK) * mod;
+                amount += bonusAP;
+            }
+        }
+
+        void CalculateSpellDamageDoneAmount(AuraEffect const* /* aurEff */, int32& amount, bool& /*canBeRecalculated*/)
+        {
+            if (Unit* pet = GetUnitOwner())
+            {
+                if (!pet->IsPet())
+                    return;
+
+                Unit* owner = pet->ToPet()->GetOwner();
+                if (!owner)
+                    return;
+
+                float mod = 1.0f;                                                 //Hunter contribution modifier
+                float bonusDamage = owner->GetTotalAttackPowerValue(RANGED_ATTACK) * 0.1287f * mod;
+                amount += bonusDamage;
+            }
+        }
+
+        void Register()
+        {
+            OnEffectRemove += AuraEffectRemoveFn(spell_hun_pet_scaling_01_AuraScript::RemoveEffect, EFFECT_0, SPELL_AURA_MOD_STAT, AURA_EFFECT_HANDLE_CHANGE_AMOUNT_MASK);
+            AfterEffectApply += AuraEffectApplyFn(spell_hun_pet_scaling_01_AuraScript::ApplyEffect, EFFECT_0, SPELL_AURA_MOD_STAT, AURA_EFFECT_HANDLE_CHANGE_AMOUNT_MASK);
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_hun_pet_scaling_01_AuraScript::CalculateMaxHealthAmount, EFFECT_0, SPELL_AURA_MOD_MAX_HEALTH);
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_hun_pet_scaling_01_AuraScript::CalculateAttackPowerAmount, EFFECT_1, SPELL_AURA_MOD_ATTACK_POWER);
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_hun_pet_scaling_01_AuraScript::CalculateSpellDamageDoneAmount, EFFECT_2, SPELL_AURA_MOD_DAMAGE_DONE);
+        }
+
+    private:
+        uint32 _tempHealth;
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_hun_pet_scaling_01_AuraScript();
+    }
+};
+class spell_hun_pet_scaling_01 : public SpellScriptLoader
+{
+public:
+    spell_hun_pet_scaling_01() : SpellScriptLoader("spell_hun_pet_scaling_01") { }
+
+    class spell_hun_pet_scaling_01_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_hun_pet_scaling_01_AuraScript);
+
+        void CalculateStaminaAmount(AuraEffect const* /* aurEff */, int32& amount, bool& /*canBeRecalculated*/)
+        {
+            if (Unit* pet = GetUnitOwner())
+                if (pet->IsPet())
+                    if (Unit* owner = pet->ToPet()->GetOwner())
+                    {
+                        float mod = 0.45f;
+                        float ownerBonus = 0.0f;
+
+                        PetSpellMap::const_iterator itr = (pet->ToPet()->m_spells.find(62758)); // Wild Hunt rank 1
+                        if (itr == pet->ToPet()->m_spells.end())
+                            itr = pet->ToPet()->m_spells.find(62762); // Wild Hunt rank 2
+
+                        if (itr != pet->ToPet()->m_spells.end()) // If pet has Wild Hunt
+                        {
+                            SpellInfo const* spellInfo = sSpellMgr->EnsureSpellInfo(itr->first); // Then get the SpellProto and add the dummy effect value
+                            AddPct(mod, spellInfo->Effects[EFFECT_0].CalcValue());
+                        }
+
+                        ownerBonus = owner->GetStat(STAT_STAMINA)*mod;
+
+                        amount += ownerBonus;
+                    }
+        }
+
+        void ApplyEffect(AuraEffect const* /* aurEff */, AuraEffectHandleModes /*mode*/)
+        {
+            if (Unit* pet = GetUnitOwner())
+                if (_tempHealth)
+                    pet->SetHealth(_tempHealth);
+        }
+
+        void RemoveEffect(AuraEffect const* /* aurEff */, AuraEffectHandleModes /*mode*/)
+        {
+            if (Unit* pet = GetUnitOwner())
+                _tempHealth = pet->GetHealth();
+        }
+
+        void CalculateAttackPowerAmount(AuraEffect const* /* aurEff */, int32& amount, bool& /*canBeRecalculated*/)
+        {
+            if (Unit* pet = GetUnitOwner())
+            {
+                if (!pet->IsPet())
+                    return;
+
+                Unit* owner = pet->ToPet()->GetOwner();
+                if (!owner)
+                    return;
+
+                float mod = 1.0f;                                                 //Hunter contribution modifier
+                float bonusAP = 0.0f;
+
+                PetSpellMap::const_iterator itr = (pet->ToPet()->m_spells.find(62758)); // Wild Hunt rank 1
+                if (itr == pet->ToPet()->m_spells.end())
+                    itr = pet->ToPet()->m_spells.find(62762); // Wild Hunt rank 2
+
+                if (itr != pet->ToPet()->m_spells.end()) // If pet has Wild Hunt
+                {
+                    SpellInfo const* spellInfo = sSpellMgr->EnsureSpellInfo(itr->first); // Then get the SpellProto and add the dummy effect value
+                    mod += CalculatePct(1.0f, spellInfo->Effects[EFFECT_1].CalcValue());
+                }
+
+                bonusAP = owner->GetTotalAttackPowerValue(RANGED_ATTACK) * 0.22f * mod;
+
+                amount += bonusAP;
+            }
+        }
+
+        void CalculateDamageDoneAmount(AuraEffect const* /* aurEff */, int32& amount, bool& /*canBeRecalculated*/)
+        {
+            if (Unit* pet = GetUnitOwner())
+            {
+                if (!pet->IsPet())
+                    return;
+
+                Unit* owner = pet->ToPet()->GetOwner();
+                if (!owner)
+                    return;
+
+                float mod = 1.0f;                                                 //Hunter contribution modifier
+                float bonusDamage = 0.0f;
+
+                PetSpellMap::const_iterator itr = (pet->ToPet()->m_spells.find(62758)); // Wild Hunt rank 1
+                if (itr == pet->ToPet()->m_spells.end())
+                    itr = pet->ToPet()->m_spells.find(62762); // Wild Hunt rank 2
+
+                if (itr != pet->ToPet()->m_spells.end()) // If pet has Wild Hunt
+                {
+                    SpellInfo const* spellInfo = sSpellMgr->EnsureSpellInfo(itr->first); // Then get the SpellProto and add the dummy effect value
+                    mod += CalculatePct(1.0f, spellInfo->Effects[EFFECT_1].CalcValue());
+                }
+
+                bonusDamage = owner->GetTotalAttackPowerValue(RANGED_ATTACK) * 0.1287f * mod;
+
+                amount += bonusDamage;
+            }
+        }
+
+        void Register() override
+        {
+            OnEffectRemove += AuraEffectRemoveFn(spell_hun_pet_scaling_01_AuraScript::RemoveEffect, EFFECT_0, SPELL_AURA_MOD_STAT, AURA_EFFECT_HANDLE_CHANGE_AMOUNT_MASK);
+            AfterEffectApply += AuraEffectApplyFn(spell_hun_pet_scaling_01_AuraScript::ApplyEffect, EFFECT_0, SPELL_AURA_MOD_STAT, AURA_EFFECT_HANDLE_CHANGE_AMOUNT_MASK);
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_hun_pet_scaling_01_AuraScript::CalculateStaminaAmount, EFFECT_0, SPELL_AURA_MOD_STAT);
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_hun_pet_scaling_01_AuraScript::CalculateAttackPowerAmount, EFFECT_1, SPELL_AURA_MOD_ATTACK_POWER);
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_hun_pet_scaling_01_AuraScript::CalculateDamageDoneAmount, EFFECT_2, SPELL_AURA_MOD_DAMAGE_DONE);
+        }
+
+    private:
+        uint32 _tempHealth;
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_hun_pet_scaling_01_AuraScript();
+    }
+};
+
+// 34903
+class spell_hun1_pet_scaling_02 : public SpellScriptLoader
+{
+public:
+    spell_hun1_pet_scaling_02() : SpellScriptLoader("spell_hun_pet_scaling_02") { }
+
+    class spell_hun_pet_scaling_02_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_hun_pet_scaling_02_AuraScript);
+
+        bool Load()
+        {
+            if (!GetCaster() || !GetCaster()->GetOwner() || GetCaster()->GetOwner()->GetTypeId() != TYPEID_PLAYER)
+                return false;
+            return true;
+        }
+
+        void CalculateFrostResistanceAmount(AuraEffect const* /* aurEff */, int32& amount, bool& /*canBeRecalculated*/)
+        {
+            if (Unit* pet = GetUnitOwner())
+            {
+                if (!pet->IsPet())
+                    return;
+
+                Unit* owner = pet->ToPet()->GetOwner();
+                if (!owner)
+                    return;
+
+                float ownerBonus = 0.0f;
+
+                ownerBonus = CalculatePct(owner->GetResistance(SPELL_SCHOOL_FROST), 40);
+
+                amount += ownerBonus;
+            }
+        }
+
+        void CalculateFireResistanceAmount(AuraEffect const* /* aurEff */, int32& amount, bool& /*canBeRecalculated*/)
+        {
+            if (Unit* pet = GetUnitOwner())
+            {
+                if (!pet->IsPet())
+                    return;
+
+                Unit* owner = pet->ToPet()->GetOwner();
+                if (!owner)
+                    return;
+
+                float ownerBonus = 0.0f;
+
+                ownerBonus = CalculatePct(owner->GetResistance(SPELL_SCHOOL_FIRE), 40);
+
+                amount += ownerBonus;
+            }
+        }
+
+        void CalculateNatureResistanceAmount(AuraEffect const* /* aurEff */, int32& amount, bool& /*canBeRecalculated*/)
+        {
+            if (Unit* pet = GetUnitOwner())
+            {
+                if (!pet->IsPet())
+                    return;
+
+                Unit* owner = pet->ToPet()->GetOwner();
+                if (!owner)
+                    return;
+
+                float ownerBonus = 0.0f;
+
+                ownerBonus = CalculatePct(owner->GetResistance(SPELL_SCHOOL_NATURE), 40);
+
+                amount += ownerBonus;
+            }
+        }
+
+        void Register()
+        {
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_hun_pet_scaling_02_AuraScript::CalculateFireResistanceAmount, EFFECT_0, SPELL_AURA_MOD_RESISTANCE);
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_hun_pet_scaling_02_AuraScript::CalculateFrostResistanceAmount, EFFECT_1, SPELL_AURA_MOD_RESISTANCE);
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_hun_pet_scaling_02_AuraScript::CalculateNatureResistanceAmount, EFFECT_2, SPELL_AURA_MOD_RESISTANCE);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_hun_pet_scaling_02_AuraScript();
+    }
+};
+class spell_hun_pet_scaling_02 : public SpellScriptLoader
+{
+public:
+    spell_hun_pet_scaling_02() : SpellScriptLoader("spell_hun_pet_scaling_02") { }
+
+    class spell_hun_pet_scaling_02_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_hun_pet_scaling_02_AuraScript);
+
+        bool Load() override
+        {
+            if (!GetCaster() || !GetCaster()->GetOwner() || GetCaster()->GetOwner()->GetTypeId() != TYPEID_PLAYER)
+                return false;
+            return true;
+        }
+
+        void CalculateFrostResistanceAmount(AuraEffect const* /* aurEff */, int32& amount, bool& /*canBeRecalculated*/)
+        {
+            if (Unit* pet = GetUnitOwner())
+            {
+                if (!pet->IsPet())
+                    return;
+
+                Unit* owner = pet->ToPet()->GetOwner();
+                if (!owner)
+                    return;
+
+                float ownerBonus = 0.0f;
+
+                ownerBonus = CalculatePct(owner->GetResistance(SPELL_SCHOOL_FROST), 40);
+
+                amount += ownerBonus;
+            }
+        }
+
+        void CalculateFireResistanceAmount(AuraEffect const* /* aurEff */, int32& amount, bool& /*canBeRecalculated*/)
+        {
+            if (Unit* pet = GetUnitOwner())
+            {
+                if (!pet->IsPet())
+                    return;
+
+                Unit* owner = pet->ToPet()->GetOwner();
+                if (!owner)
+                    return;
+
+                float ownerBonus = 0.0f;
+
+                ownerBonus = CalculatePct(owner->GetResistance(SPELL_SCHOOL_FIRE), 40);
+
+                amount += ownerBonus;
+            }
+        }
+
+        void CalculateNatureResistanceAmount(AuraEffect const* /* aurEff */, int32& amount, bool& /*canBeRecalculated*/)
+        {
+            if (Unit* pet = GetUnitOwner())
+            {
+                if (!pet->IsPet())
+                    return;
+
+                Unit* owner = pet->ToPet()->GetOwner();
+                if (!owner)
+                    return;
+
+                float ownerBonus = 0.0f;
+
+                ownerBonus = CalculatePct(owner->GetResistance(SPELL_SCHOOL_NATURE), 40);
+
+                amount += ownerBonus;
+            }
+        }
+
+        void Register() override
+        {
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_hun_pet_scaling_02_AuraScript::CalculateFrostResistanceAmount, EFFECT_1, SPELL_AURA_MOD_RESISTANCE);
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_hun_pet_scaling_02_AuraScript::CalculateFireResistanceAmount, EFFECT_0, SPELL_AURA_MOD_RESISTANCE);
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_hun_pet_scaling_02_AuraScript::CalculateNatureResistanceAmount, EFFECT_2, SPELL_AURA_MOD_RESISTANCE);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_hun_pet_scaling_02_AuraScript();
+    }
+};
+
+// 34904
+class spell_hun1_pet_scaling_03 : public SpellScriptLoader
+{
+public:
+    spell_hun1_pet_scaling_03() : SpellScriptLoader("spell_hun_pet_scaling_03") { }
+
+    class spell_hun_pet_scaling_03_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_hun_pet_scaling_03_AuraScript);
+
+        bool Load()
+        {
+            if (!GetCaster() || !GetCaster()->GetOwner() || GetCaster()->GetOwner()->GetTypeId() != TYPEID_PLAYER)
+                return false;
+            return true;
+        }
+
+        void CalculateShadowResistanceAmount(AuraEffect const* /* aurEff */, int32& amount, bool& /*canBeRecalculated*/)
+        {
+            if (Unit* pet = GetUnitOwner())
+            {
+                if (!pet->IsPet())
+                    return;
+
+                Unit* owner = pet->ToPet()->GetOwner();
+                if (!owner)
+                    return;
+
+                float ownerBonus = 0.0f;
+
+                ownerBonus = CalculatePct(owner->GetResistance(SPELL_SCHOOL_SHADOW), 40);
+
+                amount += ownerBonus;
+            }
+        }
+
+        void CalculateArcaneResistanceAmount(AuraEffect const* /* aurEff */, int32& amount, bool& /*canBeRecalculated*/)
+        {
+            if (Unit* pet = GetUnitOwner())
+            {
+                if (!pet->IsPet())
+                    return;
+
+                Unit* owner = pet->ToPet()->GetOwner();
+                if (!owner)
+                    return;
+
+                float ownerBonus = 0.0f;
+
+                ownerBonus = CalculatePct(owner->GetResistance(SPELL_SCHOOL_ARCANE), 40);
+
+                amount += ownerBonus;
+            }
+        }
+
+        void CalculateArmorAmount(AuraEffect const* /* aurEff */, int32& amount, bool& /*canBeRecalculated*/)
+        {
+            if (Unit* pet = GetUnitOwner())
+            {
+                if (!pet->IsPet())
+                    return;
+
+                Unit* owner = pet->ToPet()->GetOwner();
+                if (!owner)
+                    return;
+
+                float ownerBonus = 0.0f;
+                float pctMod = 0.0f;
+
+                if (pet->HasAura(SPELL_HUNTER_PET_FEROCITY_MARKER))
+                    pctMod = 50.0f;
+                else if (pet->HasAura(SPELL_HUNTER_PET_TENACITY_MARKER))
+                    pctMod = 60.0f;
+                else if (pet->HasAura(SPELL_HUNTER_PET_CUNNING_MARKER))
+                    pctMod = 70.0f;
+
+                ownerBonus = CalculatePct(owner->GetArmor(), pctMod);
+
+                amount += ownerBonus;
+            }
+        }
+
+        void Register()
+        {
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_hun_pet_scaling_03_AuraScript::CalculateShadowResistanceAmount, EFFECT_0, SPELL_AURA_MOD_RESISTANCE);
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_hun_pet_scaling_03_AuraScript::CalculateArcaneResistanceAmount, EFFECT_1, SPELL_AURA_MOD_RESISTANCE);
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_hun_pet_scaling_03_AuraScript::CalculateArmorAmount, EFFECT_2, SPELL_AURA_MOD_RESISTANCE);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_hun_pet_scaling_03_AuraScript();
+    }
+};
+class spell_hun_pet_scaling_03 : public SpellScriptLoader
+{
+public:
+    spell_hun_pet_scaling_03() : SpellScriptLoader("spell_hun_pet_scaling_03") { }
+
+    class spell_hun_pet_scaling_03_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_hun_pet_scaling_03_AuraScript);
+
+        bool Load() override
+        {
+            if (!GetCaster() || !GetCaster()->GetOwner() || GetCaster()->GetOwner()->GetTypeId() != TYPEID_PLAYER)
+                return false;
+            return true;
+        }
+
+        void CalculateShadowResistanceAmount(AuraEffect const* /* aurEff */, int32& amount, bool& /*canBeRecalculated*/)
+        {
+            if (Unit* pet = GetUnitOwner())
+            {
+                if (!pet->IsPet())
+                    return;
+
+                Unit* owner = pet->ToPet()->GetOwner();
+                if (!owner)
+                    return;
+
+                float ownerBonus = 0.0f;
+
+                ownerBonus = CalculatePct(owner->GetResistance(SPELL_SCHOOL_SHADOW), 40);
+
+                amount += ownerBonus;
+            }
+        }
+
+        void CalculateArcaneResistanceAmount(AuraEffect const* /* aurEff */, int32& amount, bool& /*canBeRecalculated*/)
+        {
+            if (Unit* pet = GetUnitOwner())
+            {
+                if (!pet->IsPet())
+                    return;
+
+                Unit* owner = pet->ToPet()->GetOwner();
+                if (!owner)
+                    return;
+
+                float ownerBonus = 0.0f;
+
+                ownerBonus = CalculatePct(owner->GetResistance(SPELL_SCHOOL_ARCANE), 40);
+
+                amount += ownerBonus;
+            }
+        }
+
+        void CalculateArmorAmount(AuraEffect const* /* aurEff */, int32& amount, bool& /*canBeRecalculated*/)
+        {
+            if (Unit* pet = GetUnitOwner())
+            {
+                if (!pet->IsPet())
+                    return;
+
+                Unit* owner = pet->ToPet()->GetOwner();
+                if (!owner)
+                    return;
+
+                float ownerBonus = 0.0f;
+
+                ownerBonus = CalculatePct(owner->GetArmor(), 35);
+
+                amount += ownerBonus;
+            }
+        }
+
+        void Register() override
+        {
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_hun_pet_scaling_03_AuraScript::CalculateShadowResistanceAmount, EFFECT_0, SPELL_AURA_MOD_RESISTANCE);
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_hun_pet_scaling_03_AuraScript::CalculateArcaneResistanceAmount, EFFECT_1, SPELL_AURA_MOD_RESISTANCE);
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_hun_pet_scaling_03_AuraScript::CalculateArmorAmount, EFFECT_2, SPELL_AURA_MOD_RESISTANCE);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_hun_pet_scaling_03_AuraScript();
+    }
+};
+
+// 61017
+class spell_hun1_pet_scaling_04 : public SpellScriptLoader
+{
+public:
+    spell_hun1_pet_scaling_04() : SpellScriptLoader("spell_hun_pet_scaling_04") { }
+
+    class spell_hun_pet_scaling_04_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_hun_pet_scaling_04_AuraScript);
+
+        bool Load()
+        {
+            if (!GetCaster() || !GetCaster()->GetOwner() || GetCaster()->GetOwner()->GetTypeId() != TYPEID_PLAYER)
+                return false;
+            return true;
+        }
+
+        void CalculateAmountMeleeHit(AuraEffect const* /* aurEff */, int32& amount, bool& /*canBeRecalculated*/)
+        {
+            if (!GetCaster() || !GetCaster()->GetOwner())
+                return;
+            if (Player* owner = GetCaster()->GetOwner()->ToPlayer())
+            {
+                // For others recalculate it from:
+                float HitMelee = 0.0f;
+                // Increase hit from SPELL_AURA_MOD_HIT_CHANCE
+                HitMelee += owner->GetTotalAuraModifier(SPELL_AURA_MOD_HIT_CHANCE);
+                // Increase hit melee from meele hit ratings
+                HitMelee += owner->GetRatingBonusValue(CR_HIT_MELEE);
+
+                amount += int32(HitMelee);
+            }
+        }
+
+        void CalculateAmountSpellHit(AuraEffect const* /* aurEff */, int32& amount, bool& /*canBeRecalculated*/)
+        {
+            if (!GetCaster() || !GetCaster()->GetOwner())
+                return;
+            if (Player* owner = GetCaster()->GetOwner()->ToPlayer())
+            {
+                // For others recalculate it from:
+                float HitSpell = 0.0f;
+                // Increase hit from SPELL_AURA_MOD_SPELL_HIT_CHANCE
+                HitSpell += owner->GetTotalAuraModifier(SPELL_AURA_MOD_SPELL_HIT_CHANCE);
+                // Increase hit spell from spell hit ratings
+                HitSpell += owner->GetRatingBonusValue(CR_HIT_SPELL);
+
+                amount += int32(HitSpell);
+            }
+        }
+
+        void CalculateAmountExpertise(AuraEffect const* /* aurEff */, int32& amount, bool& /*canBeRecalculated*/)
+        {
+            if (!GetCaster() || !GetCaster()->GetOwner())
+                return;
+            if (Player* owner = GetCaster()->GetOwner()->ToPlayer())
+            {
+                // For others recalculate it from:
+                float Expertise = 0.0f;
+                // Increase hit from SPELL_AURA_MOD_EXPERTISE
+                Expertise += owner->GetTotalAuraModifier(SPELL_AURA_MOD_EXPERTISE);
+                // Increase Expertise from Expertise ratings
+                Expertise += owner->GetRatingBonusValue(CR_EXPERTISE);
+
+                amount += int32(Expertise);
+            }
+        }
+
+        void Register()
+        {
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_hun_pet_scaling_04_AuraScript::CalculateAmountMeleeHit, EFFECT_0, SPELL_AURA_MOD_HIT_CHANCE);
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_hun_pet_scaling_04_AuraScript::CalculateAmountSpellHit, EFFECT_1, SPELL_AURA_MOD_SPELL_HIT_CHANCE);
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_hun_pet_scaling_04_AuraScript::CalculateAmountExpertise, EFFECT_2, SPELL_AURA_MOD_EXPERTISE);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_hun_pet_scaling_04_AuraScript();
+    }
+};
+class spell_hun_pet_scaling_04 : public SpellScriptLoader
+{
+public:
+    spell_hun_pet_scaling_04() : SpellScriptLoader("spell_hun_pet_scaling_04") { }
+
+    class spell_hun_pet_scaling_04_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_hun_pet_scaling_04_AuraScript);
+
+        bool Load() override
+        {
+            if (!GetCaster() || !GetCaster()->GetOwner() || GetCaster()->GetOwner()->GetTypeId() != TYPEID_PLAYER)
+                return false;
+            return true;
+        }
+
+        void CalculateAmountMeleeHit(AuraEffect const* /* aurEff */, int32& amount, bool& /*canBeRecalculated*/)
+        {
+            if (!GetCaster() || !GetCaster()->GetOwner())
+                return;
+            if (Player* owner = GetCaster()->GetOwner()->ToPlayer())
+            {
+                // For others recalculate it from:
+                float HitMelee = 0.0f;
+                // Increase hit from SPELL_AURA_MOD_HIT_CHANCE
+                HitMelee += owner->GetTotalAuraModifier(SPELL_AURA_MOD_HIT_CHANCE);
+                // Increase hit melee from meele hit ratings
+                HitMelee += owner->GetRatingBonusValue(CR_HIT_MELEE);
+
+                amount += int32(HitMelee);
+            }
+        }
+
+        void CalculateAmountSpellHit(AuraEffect const* /* aurEff */, int32& amount, bool& /*canBeRecalculated*/)
+        {
+            if (!GetCaster() || !GetCaster()->GetOwner())
+                return;
+            if (Player* owner = GetCaster()->GetOwner()->ToPlayer())
+            {
+                // For others recalculate it from:
+                float HitSpell = 0.0f;
+                // Increase hit from SPELL_AURA_MOD_SPELL_HIT_CHANCE
+                HitSpell += owner->GetTotalAuraModifier(SPELL_AURA_MOD_SPELL_HIT_CHANCE);
+                // Increase hit spell from spell hit ratings
+                HitSpell += owner->GetRatingBonusValue(CR_HIT_SPELL);
+
+                amount += int32(HitSpell);
+            }
+        }
+
+        void CalculateAmountExpertise(AuraEffect const* /* aurEff */, int32& amount, bool& /*canBeRecalculated*/)
+        {
+            if (!GetCaster() || !GetCaster()->GetOwner())
+                return;
+            if (Player* owner = GetCaster()->GetOwner()->ToPlayer())
+            {
+                // For others recalculate it from:
+                float Expertise = 0.0f;
+                // Increase hit from SPELL_AURA_MOD_EXPERTISE
+                Expertise += owner->GetTotalAuraModifier(SPELL_AURA_MOD_EXPERTISE);
+                // Increase Expertise from Expertise ratings
+                Expertise += owner->GetRatingBonusValue(CR_EXPERTISE);
+
+                amount += int32(Expertise);
+            }
+        }
+
+        void Register() override
+        {
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_hun_pet_scaling_04_AuraScript::CalculateAmountMeleeHit, EFFECT_0, SPELL_AURA_MOD_HIT_CHANCE);
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_hun_pet_scaling_04_AuraScript::CalculateAmountSpellHit, EFFECT_1, SPELL_AURA_MOD_SPELL_HIT_CHANCE);
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_hun_pet_scaling_04_AuraScript::CalculateAmountExpertise, EFFECT_2, SPELL_AURA_MOD_EXPERTISE);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_hun_pet_scaling_04_AuraScript();
+    }
+};
+
+// 89446
+class spell_hun1_pet_scaling_05 : public SpellScriptLoader
+{
+public:
+    spell_hun1_pet_scaling_05() : SpellScriptLoader("spell_hun_pet_scaling_05") { }
+
+    class spell_hun_pet_scaling_05_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_hun_pet_scaling_05_AuraScript);
+
+        bool Load()
+        {
+            if (!GetCaster() || !GetCaster()->GetOwner() || GetCaster()->GetOwner()->GetTypeId() != TYPEID_PLAYER)
+                return false;
+            return true;
+        }
+
+        void CalculateAmountCritPct(AuraEffect const* /* aurEff */, int32& /*amount*/, bool& /*canBeRecalculated*/)
+        {
+        }
+
+        void CalculateAmountHaste(AuraEffect const* /* aurEff */, int32& amount, bool& /*canBeRecalculated*/)
+        {
+            if (!GetCaster() || !GetCaster()->GetOwner())
+                return;
+            if (Player* owner = GetCaster()->GetOwner()->ToPlayer())
+            {
+                float meleeHaste = (1.0f - owner->m_modAttackSpeedPct[BASE_ATTACK]) * 100.0f;
+                amount += int32(meleeHaste);
+            }
+        }
+
+        void CalculateAmountResistance(AuraEffect const* /* aurEff */, int32& /*amount*/, bool& /*canBeRecalculated*/)
+        {
+        }
+
+        void Register()
+        {
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_hun_pet_scaling_05_AuraScript::CalculateAmountCritPct, EFFECT_0, SPELL_AURA_MOD_CRIT_PCT);
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_hun_pet_scaling_05_AuraScript::CalculateAmountHaste, EFFECT_1, SPELL_AURA_MELEE_SLOW);
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_hun_pet_scaling_05_AuraScript::CalculateAmountResistance, EFFECT_2, SPELL_AURA_MOD_TARGET_RESISTANCE);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_hun_pet_scaling_05_AuraScript();
+    }
+};
+class spell_hun_pet_scaling_05 : public SpellScriptLoader
+{
+public:
+    spell_hun_pet_scaling_05() : SpellScriptLoader("spell_hun_pet_scaling_05") { }
+
+    class spell_hun_pet_scaling_05_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_hun_pet_scaling_05_AuraScript);
+
+        bool Load() override
+        {
+            if (!GetCaster() || !GetCaster()->GetOwner() || GetCaster()->GetOwner()->GetTypeId() != TYPEID_PLAYER)
+                return false;
+            return true;
+        }
+
+        void CalculateAmountMeleeHit(AuraEffect const* /* aurEff */, int32& amount, bool& /*canBeRecalculated*/)
+        {
+            if (!GetCaster() || !GetCaster()->GetOwner())
+                return;
+            if (Player* owner = GetCaster()->GetOwner()->ToPlayer())
+            {
+                // For others recalculate it from:
+                float HitMelee = 0.0f;
+                // Increase hit from SPELL_AURA_MOD_HIT_CHANCE
+                HitMelee += owner->GetTotalAuraModifier(SPELL_AURA_MOD_CRIT_PCT);
+                // Increase hit melee from meele hit ratings
+                HitMelee += owner->GetRatingBonusValue(CR_HIT_MELEE);
+
+                amount += int32(HitMelee);
+            }
+        }
+
+        void CalculateAmountSpellHit(AuraEffect const* /* aurEff */, int32& amount, bool& /*canBeRecalculated*/)
+        {
+            if (!GetCaster() || !GetCaster()->GetOwner())
+                return;
+            if (Player* owner = GetCaster()->GetOwner()->ToPlayer())
+            {
+                // For others recalculate it from:
+                float HitSpell = 0.0f;
+                // Increase hit from SPELL_AURA_MOD_SPELL_HIT_CHANCE
+                HitSpell += owner->GetTotalAuraModifier(SPELL_AURA_MELEE_SLOW);
+                // Increase hit spell from spell hit ratings
+                HitSpell += owner->GetRatingBonusValue(CR_HIT_SPELL);
+
+                amount += int32(HitSpell);
+            }
+        }
+
+        void CalculateAmountExpertise(AuraEffect const* /* aurEff */, int32& amount, bool& /*canBeRecalculated*/)
+        {
+
+            /* should be:  Apply Aura #123: Mod Target Resistance (126) ... but how to insert (126) */
+
+            if (!GetCaster() || !GetCaster()->GetOwner())
+                return;
+            if (Player* owner = GetCaster()->GetOwner()->ToPlayer())
+            {
+                // For others recalculate it from:
+                float Expertise = 0.0f;
+                // Increase hit from SPELL_AURA_MOD_EXPERTISE
+                Expertise += owner->GetTotalAuraModifier(SPELL_AURA_MOD_TARGET_RESISTANCE);
+                // Increase Expertise from Expertise ratings
+                Expertise += owner->GetRatingBonusValue(CR_EXPERTISE);
+
+                amount += int32(Expertise);
+            }
+        }
+
+        void Register() override
+        {
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_hun_pet_scaling_05_AuraScript::CalculateAmountMeleeHit, EFFECT_0, SPELL_AURA_MOD_HIT_CHANCE);
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_hun_pet_scaling_05_AuraScript::CalculateAmountSpellHit, EFFECT_1, SPELL_AURA_MOD_SPELL_HIT_CHANCE);
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_hun_pet_scaling_05_AuraScript::CalculateAmountExpertise, EFFECT_2, SPELL_AURA_MOD_EXPERTISE);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_hun_pet_scaling_05_AuraScript();
+    }
+};
+
+// 90361
+class spell_hun_pet_spirit_mend : public SpellScriptLoader
+{
+public:
+    spell_hun_pet_spirit_mend() : SpellScriptLoader("spell_hun_pet_spirit_mend") { }
+
+    class spell_hun_pet_spirit_mend_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_hun_pet_spirit_mend_SpellScript);
+
+        void HandleHeal(SpellEffIndex /*effIndex*/)
+        {
+            if (!GetCaster())
+                return;
+
+            if (Unit* owner = GetCaster()->GetOwner())
+            {
+                float coeff = 0.35f * 0.5f;
+                SetHitDamage(GetEffectValue() + (coeff * owner->GetTotalAttackPowerValue(RANGED_ATTACK)));
+            }
+        }
+
+        void Register()
+        {
+            OnEffectLaunchTarget += SpellEffectFn(spell_hun_pet_spirit_mend_SpellScript::HandleHeal, EFFECT_0, SPELL_EFFECT_HEAL);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_hun_pet_spirit_mend_SpellScript();
+    }
+
+    class spell_hun_pet_spirit_mend_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_hun_pet_spirit_mend_AuraScript);
+
+        void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
+        {
+            if (!GetCaster())
+                return;
+
+            if (Unit* owner = GetCaster()->GetOwner())
+            {
+                float coeff = 0.35f * 0.335f;
+                amount += (coeff * owner->GetTotalAttackPowerValue(RANGED_ATTACK));
+            }
+        }
+
+        void Register()
+        {
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_hun_pet_spirit_mend_AuraScript::CalculateAmount, EFFECT_1, SPELL_AURA_PERIODIC_HEAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_hun_pet_spirit_mend_AuraScript();
+    }
+};
+
+// 82897 83676 - Resistance is futile periodic trigger
+class spell_hun_resistance_is_futile : public SpellScriptLoader
+{
+public:
+    spell_hun_resistance_is_futile() : SpellScriptLoader("spell_hun_resistance_is_futile") { }
+
+    class spell_hun_resistance_is_futile_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_hun_resistance_is_futile_AuraScript);
+
+        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            oldPos = GetUnitOwner()->GetPosition();
+        }
+
+        void HandleUpdatePeriodic(AuraEffect* aurEff)
+        {
+            if (Unit* caster = GetCaster())
+            {
+                Position newPos = GetUnitOwner()->GetPosition();
+                // Proc chance every 2 yards moved
+                if (newPos.GetExactDist(&oldPos) > 2.0f)
+                {
+                    newPos = oldPos.GetPosition();
+                    if (AuraEffect* aur = caster->GetDummyAuraEffect(SPELLFAMILY_HUNTER, 5119, EFFECT_0))
+                        if (roll_chance_i(aur->GetAmount()))
+                            caster->CastSpell(caster, 82897, true);
+                }
+            }
+        }
+
+        void Register()
+        {
+            OnEffectApply += AuraEffectApplyFn(spell_hun_resistance_is_futile_AuraScript::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+            OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_hun_resistance_is_futile_AuraScript::HandleUpdatePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+        }
+
+        Position oldPos;
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_hun_resistance_is_futile_AuraScript();
+    }
+};
+
+// 2643 - Multi-shot
+class spell_hun_serpent_spread : public SpellScriptLoader
+{
+public:
+    spell_hun_serpent_spread() : SpellScriptLoader("spell_hun_serpent_spread") { }
+
+    class spell_hun_serpent_spread_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_hun_serpent_spread_SpellScript);
+
+        void HandleOnHit()
+        {
+            Unit* caster = GetCaster();
+            if (Unit* unitTarget = GetHitUnit())
+            {
+                uint32 triggeredSpell = 0;
+                if (caster->HasSpell(87934))
+                    triggeredSpell = 88453;
+                else if (caster->HasSpell(87935))
+                    triggeredSpell = 88466;
+
+                if (triggeredSpell)
+                    caster->CastSpell(unitTarget, triggeredSpell, true);
+            }
+        }
+
+        void Register()
+        {
+            OnHit += SpellHitFn(spell_hun_serpent_spread_SpellScript::HandleOnHit);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_hun_serpent_spread_SpellScript();
+    }
+};
+
+// 1978 - serpent sting
+class spell_hun_serpent_sting : public SpellScriptLoader
+{
+public:
+    spell_hun_serpent_sting() : SpellScriptLoader("spell_hun_serpent_sting") { }
+
+    class spell_hun_serpent_sting_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_hun_serpent_sting_SpellScript);
+
+        void HandleAfterHit()
+        {
+            Unit* caster = GetCaster();
+            if (Unit* unitTarget = GetHitUnit())
+            {
+                if (AuraEffect* impSerpent = caster->GetDummyAuraEffect(SPELLFAMILY_HUNTER, 536, EFFECT_0))
+                {
+                    if (AuraEffect* aurEff = unitTarget->GetAuraEffect(1978, EFFECT_0, caster->GetGUID()))
+                    {
+                        Aura* aura = aurEff->GetBase();
+                        int32 TickCount = aurEff->GetTotalTicks();
+                        int32 bp0 = aurEff->GetAmount();
+                        ApplyPct(bp0, TickCount * impSerpent->GetAmount());
+                        bp0 = unitTarget->SpellDamageBonusTaken(caster, GetSpellInfo(), bp0, DOT, aura->GetStackAmount());
+                        caster->CastCustomSpell(unitTarget, 83077, &bp0, NULL, NULL, true);
+                    }
+                }
+            }
+        }
+
+        void Register()
+        {
+            AfterHit += SpellHitFn(spell_hun_serpent_sting_SpellScript::HandleAfterHit);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_hun_serpent_sting_SpellScript();
+    }
+};
+
+// 34490 - Silencing Shot
+class spell_hun_silencing_shot : public SpellScriptLoader
+{
+public:
+    spell_hun_silencing_shot() : SpellScriptLoader("spell_hun_silencing_shot") { }
+
+    class spell_hun_silencing_shot_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_hun_silencing_shot_AuraScript);
+
+        void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            Unit* caster = GetCaster();
+            Unit* target = GetTarget();
+            if (caster && target)
+            {
+                // Glyph of Silencing Shot energize on spell interruption
+                if (caster->HasAura(SPELL_HUNTER_GLYPH_OF_SILENCING_SHOT) && target->HasUnitState(UNIT_STATE_CASTING))
+                {
+                    // Fixed value
+                    int32 bp0 = 10;
+                    caster->CastCustomSpell(caster, SPELL_HUNTER_FOCUS_ENERGIZE, &bp0, NULL, NULL, true);
+                }
+            }
+        }
+
+        void Register()
+        {
+            OnEffectApply += AuraEffectApplyFn(spell_hun_silencing_shot_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_MOD_SILENCE, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+        }
+    };
+
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_hun_silencing_shot_AuraScript();
+    }
+};
+
+// 87325
+class spell_hun_animal_handler : public SpellScriptLoader
+{
+public:
+    spell_hun_animal_handler() : SpellScriptLoader("spell_hun_animal_handler") { }
+
+    class spell_hun_animal_handler_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_hun_animal_handler_AuraScript);
+
+        bool Load() override
+        {
+            if (!GetCaster() || !GetCaster()->GetOwner() || GetCaster()->GetOwner()->GetTypeId() != TYPEID_PLAYER)
+                return false;
+            return true;
+        }
+
+        void CalculateAmountDamageDone(AuraEffect const* /* aurEff */, int32& amount, bool& /*canBeRecalculated*/)
+        {
+            if (!GetCaster() || !GetCaster()->GetOwner())
+                return;
+            if (Player* owner = GetCaster()->GetOwner()->ToPlayer())
+            {
+                if (AuraEffect* /* aurEff */ect = owner->GetAuraEffectOfRankedSpell(SPELL_HUNTER_ANIMAL_HANDLER, EFFECT_1))
+                    amount = /* aurEff */ect->GetAmount();
+                else
+                    amount = 0;
+            }
+        }
+
+        void Register() override
+        {
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_hun_animal_handler_AuraScript::CalculateAmountDamageDone, EFFECT_0, SPELL_AURA_MOD_ATTACK_POWER_PCT);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_hun_animal_handler_AuraScript();
+    }
+};
+
+
 void AddSC_hunter_spell_scripts()
 {
     new spell_hun_ancient_hysteria();
+    new spell_hun_animal_handler();
+    new spell_hun_camouflage();
+    new spell_hun_camouflage_periodic();
     new spell_hun_chimera_shot();
     new spell_hun_cobra_shot();
+    new spell_hun_concussive();
     new spell_hun_disengage();
+    new spell_hun_energize();
     new spell_hun_fire();
+    new spell_hun_focus_fire();
+    new spell_hun_glyph_kill_shot();
     new spell_hun_improved_mend_pet();
     new spell_hun_improved_serpent_sting();
+    new spell_hun_intervene();
     new spell_hun_invigoration();
+    new spell_hun_kill_shot();
     new spell_hun_last_stand_pet();
     new spell_hun_masters_call();
+    new spell_hun_mend_pet();
     new spell_hun_misdirection();
     new spell_hun_misdirection_proc();
     new spell_hun_pet_carrion_feeder();
+    new spell_hun_pet_damage_spells();
     new spell_hun_pet_heart_of_the_phoenix();
+    new spell_hun_pet_passive_crit();
+    new spell_hun_pet_passive_damage_done();
+    new spell_hun_pet_passive_tree_marker();
+    new spell_hun_pet_scaling_01();
+    new spell_hun_pet_scaling_02();
+    new spell_hun_pet_scaling_03();
+    new spell_hun_pet_scaling_04();
+    new spell_hun_pet_scaling_05();
+    new spell_hun_pet_spirit_mend();
     new spell_hun_rapid_recuperation();
     new spell_hun_readiness();
     new spell_hun_ready_set_aim();
+    new spell_hun_resistance_is_futile();
     new spell_hun_scatter_shot();
+    new spell_hun_serpent_spread();
+    new spell_hun_serpent_sting();
+    new spell_hun_silencing_shot();
     new spell_hun_sniper_training();
     new spell_hun_steady_shot();
     new spell_hun_tame_beast();

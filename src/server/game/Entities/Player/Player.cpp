@@ -25721,6 +25721,21 @@ bool Player::HasItemFitToSpellRequirements(SpellInfo const* spellInfo, Item cons
     return false;
 }
 
+bool Player::HasAllItemsToFitToSpellRequirements(SpellInfo const* spellInfo)
+{
+    uint8 count = 0;
+
+    for (uint8 slot = EQUIPMENT_SLOT_START; slot <= EQUIPMENT_SLOT_HANDS; ++slot)
+        if (Item* item = GetUseableItemByPos(INVENTORY_SLOT_BAG_0, slot))
+            if (item->IsFitToSpellRequirements(spellInfo))
+                ++count;
+
+    if (count >= 8)
+        return true;
+
+    return false;
+}
+
 bool Player::CanNoReagentCast(SpellInfo const* spellInfo) const
 {
     // don't take reagents for spells with SPELL_ATTR5_NO_REAGENT_WHILE_PREP
@@ -29170,6 +29185,181 @@ Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
 bool Player::CanUseMastery() const
 {
     return HasSpell(MasterySpells[getClass()]);
+}
+
+void Player::RemoveOrAddMasterySpells()
+{
+    if (!IsAlive())
+        return;
+
+    if (!HasAuraType(SPELL_AURA_MASTERY) || GetPrimaryTalentTree(GetActiveSpec()) == 0)
+    {
+        if (HasAura(76838)) { RemoveAurasDueToSpell(76838); }                                                                     //Strikes of Opportunity
+
+        if (HasAura(76856)) { RemoveAurasDueToSpell(76856); }                                                                     //Unshackled Fury
+
+        if (HasAura(76857)) { RemoveAurasDueToSpell(76857); }                                                                     //Critical Block
+
+        if (HasAura(76669)) { RemoveAurasDueToSpell(76669); }                                                                     //Illuminated Healing
+
+        if (HasAura(76671)) { RemoveAurasDueToSpell(76671); }                                                                     //Divine Bulwark
+
+        if (HasAura(76672)) { RemoveAurasDueToSpell(76672); }                                                                     //Hand of Light
+
+        if (HasAura(76657)) { RemoveAurasDueToSpell(76657); }                                                                     //Master of Beasts
+
+        if (HasAura(76659)) { RemoveAurasDueToSpell(76659); }                                                                     //Wild Quiver
+
+        if (HasAura(76658)) { RemoveAurasDueToSpell(76658); }                                                                     //Essence of the Viper
+
+        if (HasAura(76803)) { RemoveAurasDueToSpell(76803); }                                                                     //Potent Poisons
+
+        if (HasAura(76806)) { RemoveAurasDueToSpell(76806); }                                                                     //Main Gauche
+
+        if (HasAura(76808)) { RemoveAurasDueToSpell(76808); }                                                                     //Executioner
+
+        if (HasAura(77484)) { RemoveAurasDueToSpell(77484); }                                                                     //Shield Discipline
+
+        if (HasAura(77485)) { RemoveAurasDueToSpell(77485); }                                                                     //Echo of Light
+
+        if (HasAura(77486)) { RemoveAurasDueToSpell(77486); }                                                                     //Shadow Orb Power
+
+        if (HasAura(77513)) { RemoveAurasDueToSpell(77513); }                                                                     //Blood Shield
+
+        if (HasAura(77514)) { RemoveAurasDueToSpell(77514); }                                                                     //Frozen Heart
+
+        if (HasAura(77515)) { RemoveAurasDueToSpell(77515); }                                                                     //Dreadblade
+
+        if (HasAura(77222)) { RemoveAurasDueToSpell(77222); }                                                                     //Elemental Overload
+
+        if (HasAura(77223)) { RemoveAurasDueToSpell(77223); }                                                                     //Enhanced Elements
+
+        if (HasAura(77226)) { RemoveAurasDueToSpell(77226); }                                                                     //Deep Healing
+
+        if (HasAura(76547)) { RemoveAurasDueToSpell(76547); }                                                                     //Mana Adept
+
+        if (HasAura(76595)) { RemoveAurasDueToSpell(76595); }                                                                     //Flashburn
+
+        if (HasAura(76613)) { RemoveAurasDueToSpell(76613); }                                                                     //Frostburn
+
+        if (HasAura(77215)) { RemoveAurasDueToSpell(77215); }                                                                     //Potent Afflictions
+
+        if (HasAura(77219)) { RemoveAurasDueToSpell(77219); }                                                                     //Master Demonologist
+
+        if (HasAura(77220)) { RemoveAurasDueToSpell(77220); }                                                                     //Fiery Apocalypse
+
+        if (HasAura(77492)) { RemoveAurasDueToSpell(77492); }                                                                     //Total Eclipse
+
+        if (HasAura(77494)) { RemoveAurasDueToSpell(77494); }                                                                     //Savage Defender
+
+        if (HasAura(77495)) { RemoveAurasDueToSpell(77495); }                                                                     //Harmony
+    }
+    else if (HasAuraType(SPELL_AURA_MASTERY))
+    {
+        switch (getClass())
+        {
+        case CLASS_WARRIOR:
+            if (GetPrimaryTalentTree(GetActiveSpec()) == TALENT_TREE_WARRIOR_ARMS) { if (!HasAura(76838)) { AddAura(76838, this); } }            //Strikes of Opportunity
+            else if (HasAura(76838)) { RemoveAurasDueToSpell(76838); }
+
+            if (GetPrimaryTalentTree(GetActiveSpec()) == TALENT_TREE_WARRIOR_FURY) { if (!HasAura(76856)) { AddAura(76856, this); } }            //Unshackled Fury
+            else if (HasAura(76856)) { RemoveAurasDueToSpell(76856); }
+
+            if (GetPrimaryTalentTree(GetActiveSpec()) == TALENT_TREE_WARRIOR_PROTECTION) { if (!HasAura(76857)) { AddAura(76857, this); } }      //Critical Block
+            else if (HasAura(76857)) { RemoveAurasDueToSpell(76857); }
+            break;
+        case CLASS_PALADIN:
+            if (GetPrimaryTalentTree(GetActiveSpec()) == TALENT_TREE_PALADIN_HOLY) { if (!HasAura(76669)) { AddAura(76669, this); } }            //Illuminated Healing
+            else if (HasAura(76669)) { RemoveAurasDueToSpell(76669); }
+
+            if (GetPrimaryTalentTree(GetActiveSpec()) == TALENT_TREE_PALADIN_PROTECTION) { if (!HasAura(76671)) { AddAura(76671, this); } }      //Divine Bulwark
+            else if (HasAura(76671)) { RemoveAurasDueToSpell(76671); }
+
+            if (GetPrimaryTalentTree(GetActiveSpec()) == TALENT_TREE_PALADIN_RETRIBUTION) { if (!HasAura(76672)) { AddAura(76672, this); } }     //Hand of Light
+            else if (HasAura(76672)) { RemoveAurasDueToSpell(76672); }
+            break;
+        case CLASS_HUNTER:
+            if (GetPrimaryTalentTree(GetActiveSpec()) == TALENT_TREE_HUNTER_BEAST_MASTERY) { if (!HasAura(76657)) { AddAura(76657, this); } }    //Master of Beasts
+            else if (HasAura(76657)) { RemoveAurasDueToSpell(76657); }
+
+            if (GetPrimaryTalentTree(GetActiveSpec()) == TALENT_TREE_HUNTER_MARKSMANSHIP) { if (!HasAura(76659)) { AddAura(76659, this); } }      //Wild Quiver
+            else if (HasAura(76659)) { RemoveAurasDueToSpell(76659); }
+
+            if (GetPrimaryTalentTree(GetActiveSpec()) == TALENT_TREE_HUNTER_SURVIVAL) { if (!HasAura(76658)) { AddAura(76658, this); } }         //Essence of the Viper
+            else if (HasAura(76658)) { RemoveAurasDueToSpell(76658); }
+            break;
+        case CLASS_ROGUE:
+            if (GetPrimaryTalentTree(GetActiveSpec()) == TALENT_TREE_ROGUE_ASSASSINATION) { if (!HasAura(76803)) { AddAura(76803, this); } }     //Potent Poisons
+            else if (HasAura(76803)) { RemoveAurasDueToSpell(76803); }
+
+            if (GetPrimaryTalentTree(GetActiveSpec()) == TALENT_TREE_ROGUE_COMBAT) { if (!HasAura(76806)) { AddAura(76806, this); } }           //Main Gauche
+            else if (HasAura(76806)) { RemoveAurasDueToSpell(76806); }
+
+            if (GetPrimaryTalentTree(GetActiveSpec()) == TALENT_TREE_ROGUE_SUBTLETY) { if (!HasAura(76808)) { AddAura(76808, this); } }         //Executioner
+            else if (HasAura(76808)) { RemoveAurasDueToSpell(76808); }
+            break;
+        case CLASS_PRIEST:
+            if (GetPrimaryTalentTree(GetActiveSpec()) == TALENT_TREE_PRIEST_DISCIPLINE) { if (!HasAura(77484)) { AddAura(77484, this); } }      //Shield Discipline
+            else if (HasAura(77484)) { RemoveAurasDueToSpell(77484); }
+
+            if (GetPrimaryTalentTree(GetActiveSpec()) == TALENT_TREE_PRIEST_HOLY) { if (!HasAura(77485)) { AddAura(77485, this); } }            //Echo of Light
+            else if (HasAura(77485)) { RemoveAurasDueToSpell(77485); }
+
+            if (GetPrimaryTalentTree(GetActiveSpec()) == TALENT_TREE_PRIEST_SHADOW) { if (!HasAura(77486)) { AddAura(77486, this); } }          //Shadow Orb Power
+            else if (HasAura(77486)) { RemoveAurasDueToSpell(77486); }
+            break;
+        case CLASS_DEATH_KNIGHT:
+            if (GetPrimaryTalentTree(GetActiveSpec()) == TALENT_TREE_DEATH_KNIGHT_BLOOD) { if (!HasAura(77513)) { AddAura(77513, this); } }     //Blood Shield
+            else if (HasAura(77513)) { RemoveAurasDueToSpell(77513); }
+
+            if (GetPrimaryTalentTree(GetActiveSpec()) == TALENT_TREE_DEATH_KNIGHT_FROST) { if (!HasAura(77514)) { AddAura(77514, this); } }     //Frozen Heart
+            else if (HasAura(77514)) { RemoveAurasDueToSpell(77514); }
+
+            if (GetPrimaryTalentTree(GetActiveSpec()) == TALENT_TREE_DEATH_KNIGHT_UNHOLY) { if (!HasAura(77515)) { AddAura(77515, this); } }    //Dreadblade
+            else if (HasAura(77515)) { RemoveAurasDueToSpell(77515); }
+            break;
+        case CLASS_SHAMAN:
+            if (GetPrimaryTalentTree(GetActiveSpec()) == TALENT_TREE_SHAMAN_ELEMENTAL) { if (!HasAura(77222)) { AddAura(77222, this); } }       //Elemental Overload
+            else if (HasAura(77222)) { RemoveAurasDueToSpell(77222); }
+
+            if (GetPrimaryTalentTree(GetActiveSpec()) == TALENT_TREE_SHAMAN_ENHANCEMENT) { if (!HasAura(77223)) { AddAura(77223, this); } }    //Enhanced Elements
+            else if (HasAura(76857)) { RemoveAurasDueToSpell(76857); }
+
+            if (GetPrimaryTalentTree(GetActiveSpec()) == TALENT_TREE_SHAMAN_RESTORATION) { if (!HasAura(77226)) { AddAura(77226, this); } }     //Deep Healing
+            else if (HasAura(77226)) { RemoveAurasDueToSpell(77226); }
+            break;
+        case CLASS_MAGE:
+            if (GetPrimaryTalentTree(GetActiveSpec()) == TALENT_TREE_MAGE_ARCANE) { if (!HasAura(76547)) { AddAura(76547, this); } }            //Mana Adept
+            else if (HasAura(76547)) { RemoveAurasDueToSpell(76547); }
+
+            if (GetPrimaryTalentTree(GetActiveSpec()) == TALENT_TREE_MAGE_FIRE) { if (!HasAura(76595)) { AddAura(76595, this); } }              //Flashburn
+            else if (HasAura(76595)) { RemoveAurasDueToSpell(76595); }
+
+            if (GetPrimaryTalentTree(GetActiveSpec()) == TALENT_TREE_MAGE_FROST) { if (!HasAura(76613)) { AddAura(76613, this); } }             //Frostburn
+            else if (HasAura(76613)) { RemoveAurasDueToSpell(76613); }
+            break;
+        case CLASS_WARLOCK:
+            if (GetPrimaryTalentTree(GetActiveSpec()) == TALENT_TREE_WARLOCK_AFFLICTION) { if (!HasAura(77215)) { AddAura(77215, this); } }     //Potent Afflictions
+            else if (HasAura(77215)) { RemoveAurasDueToSpell(77215); }
+
+            if (GetPrimaryTalentTree(GetActiveSpec()) == TALENT_TREE_WARLOCK_DEMONOLOGY) { if (!HasAura(77219)) { AddAura(77219, this); } }     //Master Demonologist
+            else if (HasAura(77219)) { RemoveAurasDueToSpell(77219); }
+
+            if (GetPrimaryTalentTree(GetActiveSpec()) == TALENT_TREE_WARLOCK_DESTRUCTION) { if (!HasAura(77220)) { AddAura(77220, this); } }    //Fiery Apocalypse
+            else if (HasAura(77220)) { RemoveAurasDueToSpell(77220); }
+            break;
+        case CLASS_DRUID:
+            if (GetPrimaryTalentTree(GetActiveSpec()) == TALENT_TREE_DRUID_BALANCE) { if (!HasAura(77492)) { AddAura(77492, this); } }          //Total Eclipse
+            else if (HasAura(77492)) { RemoveAurasDueToSpell(77492); }
+
+            if (GetPrimaryTalentTree(GetActiveSpec()) == TALENT_TREE_DRUID_FERAL_COMBAT) { if (!HasAura(77494)) { AddAura(77494, this); } }     //Savage Defender
+            else if (HasAura(77494)) { RemoveAurasDueToSpell(77494); }
+
+            if (GetPrimaryTalentTree(GetActiveSpec()) == TALENT_TREE_DRUID_RESTORATION) { if (!HasAura(77495)) { AddAura(77495, this); } }      //Harmony
+            else if (HasAura(77495)) { RemoveAurasDueToSpell(77495); }
+            break;
+        }
+    }
 }
 
 void Player::ReadMovementInfo(WorldPacket& data, MovementInfo* mi, Movement::ExtraMovementStatusElement* extras /*= NULL*/)
