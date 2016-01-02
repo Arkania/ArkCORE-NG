@@ -493,17 +493,20 @@
 #cmakedefine ssize_t @ssize_t@
 #cmakedefine strcasecmp @strcasecmp@
 #cmakedefine strncasecmp @strncasecmp@
-#cmakedefine snprintf @snprintf@
 #cmakedefine strtok_r @strtok_r@
 #cmakedefine strtoll @strtoll@
 #cmakedefine strtoull @strtoull@
 #cmakedefine vsnprintf @vsnprintf@
 #if (_MSC_VER > 1310)
 # define HAVE_SETENV
-#define setenv(a,b,c) _putenv_s(a,b)
+# define setenv(a,b,c) _putenv_s(a,b)
 #endif
 
-
+#if _MSC_VER < 1900
+#cmakedefine snprintf @snprintf@
+#else _MSC_VER >= 1900
+#define STDC99
+#endif
 
 
 /*

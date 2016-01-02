@@ -10,11 +10,14 @@
 #pragma warning(disable:4996)
 #pragma warning(disable:4312)
 #pragma warning(disable:4311)
+#pragma warning(disable:4091)
+
 #include <windows.h>
 #include <tlhelp32.h>
 #include <stdio.h>
 #include <tchar.h>
 #define _NO_CVCONST_H
+
 #include <dbghelp.h>
 
 #include "WheatyExceptionReport.h"
@@ -1079,7 +1082,7 @@ PVOID pAddress)
         switch (basicType)
         {
             case btChar:
-                pszCurrBuffer += sprintf(pszCurrBuffer, " = \"%s\"", pAddress);
+                pszCurrBuffer += sprintf(pszCurrBuffer, " = \"%s\"", (char*)pAddress);
                 break;
             case btStdString:
                 pszCurrBuffer += sprintf(pszCurrBuffer, " = \"%s\"", static_cast<std::string*>(pAddress)->c_str());
@@ -1124,7 +1127,7 @@ PVOID pAddress)
                 else
                 {
     #if _WIN64
-                    pszCurrBuffer += sprintf(pszCurrBuffer, " = %I64X", (DWORD64*)pAddress);
+                    pszCurrBuffer += sprintf(pszCurrBuffer, " = %px", (DWORD64*)pAddress);
     #else
                     pszCurrBuffer += sprintf(pszCurrBuffer, " = %X", (PDWORD)pAddress);
     #endif
@@ -1135,7 +1138,7 @@ PVOID pAddress)
     __except (EXCEPTION_EXECUTE_HANDLER)
     {
 #if _WIN64
-        pszCurrBuffer += sprintf(pszCurrBuffer, " <Unable to read memory> = %I64X", (DWORD64*)pAddress);
+        pszCurrBuffer += sprintf(pszCurrBuffer, " <Unable to read memory> = %px", (DWORD64*)pAddress);
 #else
         pszCurrBuffer += sprintf(pszCurrBuffer, " <Unable to read memory> = %X", (PDWORD)pAddress);
 #endif

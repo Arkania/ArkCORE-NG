@@ -109,11 +109,14 @@
 
 #include <float.h>
 
-#define snprintf _snprintf
 #define atoll _atoi64
 #define vsnprintf _vsnprintf
 #define finite(X) _finite(X)
 #define llabs _abs64
+
+#if _MSC_VER < 1900 
+#  define snprintf _snprintf
+#endif
 
 #else
 

@@ -101,7 +101,11 @@ static DWORD get_milliseconds(const struct timespec *abstime)
     - subtract start time from current time(values are in 100ns units)
     - convert to millisec by dividing with 10000
   */
-  millis= (abstime->tv.i64 - now.i64) / 10000;
+#if _MSC_VER >= 1900
+  millis = (abstime->tv_sec - now.i64) / 10000;
+#else
+  millis = (abstime->tv.i64 - now.i64) / 10000;
+#endif
   
   /* Don't allow the timeout to be negative */
   if (millis < 0)
@@ -111,9 +115,14 @@ static DWORD get_milliseconds(const struct timespec *abstime)
     Make sure the calculated timeout does not exceed original timeout
     value which could cause "wait for ever" if system time changes
   */
+#if _MSC_VER >= 1900
+  if (millis > abstime->tv_nsec)
+      millis = abstime->tv_nsec;
+#else
   if (millis > abstime->max_timeout_msec)
     millis= abstime->max_timeout_msec;
-  
+#endif
+
   if (millis > UINT_MAX)
     millis= UINT_MAX;
 

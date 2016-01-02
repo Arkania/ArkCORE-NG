@@ -29,6 +29,10 @@ my_bool init_tmpdir(MY_TMPDIR *tmpdir, const char *pathlist)
   DBUG_ENTER("init_tmpdir");
   DBUG_PRINT("enter", ("pathlist: %s", pathlist ? pathlist : "NULL"));
 
+#if _MSC_VER >= 1900
+#  define P_tmpdir "C:\\";
+#endif
+
   mysql_mutex_init(key_TMPDIR_mutex, &tmpdir->mutex, MY_MUTEX_INIT_FAST);
   if (my_init_dynamic_array(&tmpdir->full_list, sizeof(char*), 1, 5))
     goto err;

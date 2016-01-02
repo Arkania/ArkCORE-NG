@@ -57,6 +57,7 @@ typedef struct {
 #define PTR(V)      (LF_SLIST *)((V) & (~(intptr)1))
 #define DELETED(V)  ((V) & 1)
 
+#if _MSC_VER < 1900 
 /*
   DESCRIPTION
     Search for hashnr/key/keylen in the list starting from 'head' and
@@ -134,6 +135,7 @@ retry:
     _lf_pin(pins, 1, cursor->curr);
   }
 }
+#endif
 
 /*
   DESCRIPTION
@@ -244,6 +246,7 @@ static int ldelete(LF_SLIST * volatile *head, CHARSET_INFO *cs, uint32 hashnr,
   return res;
 }
 
+#if _MSC_VER < 1900 
 /*
   DESCRIPTION
     searches for a node as identified by hashnr/keey/keylen in the list
@@ -269,6 +272,7 @@ static LF_SLIST *lsearch(LF_SLIST * volatile *head, CHARSET_INFO *cs,
   _lf_unpin(pins, 1);
   return res ? cursor.curr : 0;
 }
+#endif
 
 static inline const uchar* hash_key(const LF_HASH *hash,
                                     const uchar *record, size_t *length)

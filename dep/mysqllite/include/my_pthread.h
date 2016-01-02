@@ -99,21 +99,33 @@ typedef volatile LONG my_pthread_once_t;
   FILETIME ft;
   __int64 i64;
  };
-struct timespec {
-  union ft64 tv;
-  /* The max timeout value in millisecond for pthread_cond_timedwait */
-  long max_timeout_msec;
-};
+
+ // XXX: VS2015 has timespec by mscdex 
+#if _MSC_VER >= 1900
+#  include <time.h>
+#define max_timeout_msec tv_nsec;
 #define set_timespec(ABSTIME,SEC) { \
-  GetSystemTimeAsFileTime(&((ABSTIME).tv.ft)); \
-  (ABSTIME).tv.i64+= (__int64)(SEC)*10000000; \
-  (ABSTIME).max_timeout_msec= (long)((SEC)*1000); \
-}
+    (ABSTIME).tv_sec=time(0) + (time_t) (SEC); \
+    (ABSTIME).tv_nsec=0; }
 #define set_timespec_nsec(ABSTIME,NSEC) { \
-  GetSystemTimeAsFileTime(&((ABSTIME).tv.ft)); \
-  (ABSTIME).tv.i64+= (__int64)(NSEC)/100; \
-  (ABSTIME).max_timeout_msec= (long)((NSEC)/1000000); \
-}
+    ulonglong now= my_getsystime() + (NSEC/100); \
+    (ABSTIME).tv_sec=  (now / ULL(10000000)); \
+    (ABSTIME).tv_nsec= (now % ULL(10000000) * 100 + ((NSEC) % 100)); }
+#else
+ struct timespec {
+     union ft64 tv;
+     /* The max timeout value in millisecond for pthread_cond_timedwait */
+     long max_timeout_msec;
+ };
+#define set_timespec(ABSTIME,SEC) { \
+    GetSystemTimeAsFileTime(&((ABSTIME).tv.ft)); \
+    (ABSTIME).tv.i64+= (__int64)(SEC)*10000000; \
+    (ABSTIME).max_timeout_msec= (long)((SEC)*1000); }
+#define set_timespec_nsec(ABSTIME,NSEC) { \
+    GetSystemTimeAsFileTime(&((ABSTIME).tv.ft)); \
+    (ABSTIME).tv.i64+= (__int64)(NSEC)/100; \
+    (ABSTIME).max_timeout_msec= (long)((NSEC)/1000000); }
+#endif
 
 /**
    Compare two timespec structs.

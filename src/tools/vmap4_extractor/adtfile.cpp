@@ -24,7 +24,9 @@
 #include <cstdio>
 
 #ifdef WIN32
+#if _MSC_VER < 1900 
 #define snprintf _snprintf
+#endif
 #endif
 
 char const* GetPlainName(char const* FileName)
