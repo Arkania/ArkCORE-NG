@@ -2634,20 +2634,20 @@ uint32 Creature::GetBlockPercent() const
     
         return 30;
     }
-//end misc
+
 uint8 Creature::GetBotClass() const
- {
+{
     switch (m_bot_class)
-        {
-        case DRUID_BEAR_FORM:
-            case DRUID_CAT_FORM:
-                        //case TRAVEL:
-                            //case FLY:
-                    return CLASS_DRUID;
-                default:
-                    return m_bot_class;
-                    }
+    {
+    case DRUID_BEAR_FORM:
+    case DRUID_CAT_FORM:
+        //case TRAVEL:
+        //case FLY:
+        return CLASS_DRUID;
+    default:
+        return m_bot_class;
     }
+}
 
 void Creature::SetIAmABot(bool bot)
  {
@@ -2832,6 +2832,7 @@ bool Creature::ResetEquipment(uint8 slot) const
 {
     return bot_AI && bot_AI->ResetEquipment(slot);
 }
+// end npc_bot misc
 
 void Creature::SetTarget(uint64 guid)
 {
