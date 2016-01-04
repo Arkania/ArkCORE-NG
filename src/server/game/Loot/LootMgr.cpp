@@ -561,30 +561,18 @@ QuestItemList* Loot::FillQuestLoot(Player* player)
     for (uint8 i = 0; i < quest_items.size(); ++i)
     {
         LootItem &item = quest_items[i];
-        
-        bool fLoot = false;        
-        if (!item.is_looted && item.follow_loot_rules && item.AllowedForPlayer(player))
-            if (Group* group = player->GetGroup())
-            {
-                if (group->GetLootMethod() == MASTER_LOOT && group->GetMasterLooterGuid() == player->GetGUID())
-                    fLoot = true;
-                else if (group->GetLootMethod() != MASTER_LOOT)
-                    fLoot = true;
-            }
-            else
-                fLoot = true;
 
-        // if (!item.is_looted && (item.AllowedForPlayer(player) || (item.follow_loot_rules && player->GetGroup() && ((player->GetGroup()->GetLootMethod() == MASTER_LOOT && player->GetGroup()->GetLooterGuid() == player->GetGUID()) || player->GetGroup()->GetLootMethod() != MASTER_LOOT))))
-        if (fLoot)
+        if (!item.is_looted && (item.AllowedForPlayer(player) || (item.follow_loot_rules && player->GetGroup() && ((player->GetGroup()->GetLootMethod() == MASTER_LOOT && player->GetGroup()->GetLooterGuid() == player->GetGUID()) || player->GetGroup()->GetLootMethod() != MASTER_LOOT))))
         {
             ql->push_back(QuestItem(i));
 
-            // quest items get blocked when they first appear in a player's quest vector
-            // increase once, if one looter only, 
-            // increase looter-times if free for all
+            // quest items get blocked when they first appear in a
+            // player's quest vector
+            //
+            // increase once if one looter only, looter-times if free for all
             if (item.freeforall || !item.is_blocked)
                 ++unlootedCount;
-            if (!player->GetGroup() || (player->GetGroup()->GetLootMethod() != GROUP_LOOT && player->GetGroup()->GetLootMethod() != ROUND_ROBIN))
+            if (!player->GetGroup() || (player->GetGroup()->GetLootMethod() != GROUP_LOOT || player->GetGroup()->GetLootMethod() != ROUND_ROBIN))
                 item.is_blocked = true;
 
             if (items.size() + ql->size() == MAX_NR_LOOT_ITEMS)
