@@ -481,7 +481,7 @@ void InstanceSaveManager::ScheduleReset(bool add, time_t time, InstResetEvent ev
 void InstanceSaveManager::Update()
 {
     time_t now = time(NULL);
-    time_t t, t2;
+    time_t t;
 
     while (!m_resetTimeQueue.empty())
     {
@@ -489,20 +489,7 @@ void InstanceSaveManager::Update()
         if (t >= now)
             break;
 
-        // if m_resetTime has new resetTime, then write it to Queue, not delete the active instance.. 
         InstResetEvent &event = m_resetTimeQueue.begin()->second;
-        time_t resetTime = GetResetTimeFor(event.mapid, event.difficulty);
-        if (InstanceSave* save = GetInstanceSave(event.instanceId))
-        {
-            if (t2 = save->GetResetTime())
-                if (t2 >= t)
-                {
-                    m_resetTimeQueue.erase(m_resetTimeQueue.begin());
-                    m_resetTimeQueue.insert(std::pair<time_t, InstResetEvent>(t2, event));
-                    break;
-                }
-        }
-       
         if (event.type == 0)
         {
             // for individual normal instances, max creature respawn + X hours
@@ -512,6 +499,7 @@ void InstanceSaveManager::Update()
         else
         {
             // global reset/warning for a certain map
+            time_t resetTime = GetResetTimeFor(event.mapid, event.difficulty);
             _ResetOrWarnAll(event.mapid, event.difficulty, event.type != 4, resetTime);
             if (event.type != 4)
             {
