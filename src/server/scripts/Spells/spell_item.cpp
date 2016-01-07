@@ -2631,18 +2631,17 @@ class spell_item_refocus : public SpellScriptLoader
 public:
     spell_item_refocus() : SpellScriptLoader("spell_item_refocus") { }
 
-    enum Refocus
+    class spell_item_refocus_AuraScript : public AuraScript
     {
-        SPELL_AIMED_SHOT = 19434,
-        SPELL_MULTISHOT = 2643,
-        SPELL_VOLLEY = 42243,
-    };
+        PrepareAuraScript(spell_item_refocus_AuraScript);
 
-    class spell_item_refocus_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_item_refocus_SpellScript);
+        enum
+        {
+            SPELL_AIMED_SHOT = 19434,
+            SPELL_MULTISHOT = 2643,
+        };
 
-        void HandleDummy(SpellEffIndex /*effIndex*/)
+        void OnApply(AuraEffect const* const, AuraEffectHandleModes)
         {
             Player* caster = GetCaster()->ToPlayer();
 
@@ -2654,20 +2653,17 @@ public:
 
             if (caster->HasSpellCooldown(SPELL_MULTISHOT))
                 caster->RemoveSpellCooldown(SPELL_MULTISHOT, true);
-
-            if (caster->HasSpellCooldown(SPELL_VOLLEY))
-                caster->RemoveSpellCooldown(SPELL_VOLLEY, true);
         }
 
         void Register()
         {
-            OnEffectHitTarget += SpellEffectFn(spell_item_refocus_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+            OnEffectApply += AuraEffectApplyFn(spell_item_refocus_AuraScript::OnApply, EFFECT_0, SPELL_AURA_ADD_FLAT_MODIFIER, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    AuraScript* GetAuraScript() const
     {
-        return new spell_item_refocus_SpellScript();
+        return new spell_item_refocus_AuraScript();
     }
 };
 
