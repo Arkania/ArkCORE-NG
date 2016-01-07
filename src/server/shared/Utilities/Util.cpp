@@ -60,6 +60,12 @@ double rand_chance(void)
     return sfmtRand->Random() * 100.0;
 }
 
+bool rand_chance(uint8 percent)
+{    
+    uint8 rol = urand(0, 100);
+    return percent > rol ? true : false;
+}
+
 Tokenizer::Tokenizer(const std::string &src, const char sep, uint32 vectorReserve)
 {
     m_str = new char[src.length() + 1];

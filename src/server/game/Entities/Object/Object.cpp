@@ -2819,6 +2819,17 @@ Position WorldObject::GetNearPosition(float dist, float angle)
     return pos;
 }
 
+Position WorldObject::GetNearPositionInFront(float dist, float hub)
+{
+    if (hub < 0.0f || hub > (M_PI / 2))
+        hub = frand(0.0f, 1.55f);
+    float angle = frand(2 * M_PI - hub, 2 * M_PI);
+    float angle2 = frand(0, hub);
+    uint32 rol = urand(0, 100);
+    if (rol < 50) angle = angle2;
+    return GetNearPosition(dist, angle);
+}
+
 Position WorldObject::GetFirstCollisionPosition(float dist, float angle)
 {
     Position pos = GetPosition();

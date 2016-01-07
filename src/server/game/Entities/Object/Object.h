@@ -662,6 +662,8 @@ class WorldObject : public Object, public WorldLocation
         void GetClosePoint(float &x, float &y, float &z, float size, float distance2d = 0, float angle = 0) const;
         void MovePosition(Position &pos, float dist, float angle);
         Position GetNearPosition(float dist, float angle);
+        /* the hub set max tolerance from front. is a float 0.0 - 1.55. */
+        Position GetNearPositionInFront(float dist, float hub);
         void MovePositionToFirstCollision(Position &pos, float dist, float angle);
         Position GetFirstCollisionPosition(float dist, float angle);
         Position GetRandomNearPosition(float radius);

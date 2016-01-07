@@ -100,6 +100,9 @@ double rand_norm(void);
 */
 double rand_chance(void);
 
+/* return true if the computet chance fits percent chance*/
+bool rand_chance(uint8 percent);
+
 /* Return true if a random roll fits in the specified chance (range 0-100). */
 inline bool roll_chance_f(float chance)
 {
