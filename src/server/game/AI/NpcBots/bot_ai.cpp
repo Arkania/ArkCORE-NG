@@ -102,6 +102,9 @@ bot_ai::~bot_ai(){}
 
 SpellCastResult bot_ai::checkBotCast(Unit* victim, uint32 spellId, uint8 botclass) const
 {
+	if (spellId == 0)
+		return SPELL_FAILED_DONT_REPORT;
+
     if (victim->GetTypeId() == TYPEID_PLAYER && victim->ToPlayer()->IsGameMaster())
         return SPELL_FAILED_BAD_TARGETS;
 
@@ -111,6 +114,10 @@ SpellCastResult bot_ai::checkBotCast(Unit* victim, uint32 spellId, uint8 botclas
 
     if (me->IsMounted() && !(spellInfo->Attributes & SPELL_ATTR0_CASTABLE_WHILE_MOUNTED))
         return SPELL_FAILED_NOT_MOUNTED;
+
+    // health is no real power type, the spell 29131 crash core in line 126
+    if (Powers(spellInfo->PowerType) == Powers(POWER_HEALTH))
+        return SPELL_FAILED_NO_POWER;
 
     //if (Powers(spellInfo->PowerType) == me->getPowerType() &&
     //    (int32)me->GetPower(me->getPowerType()) < spellInfo->CalcPowerCost(me, spellInfo->GetSchoolMask()))
@@ -169,18 +176,18 @@ SpellCastResult bot_ai::checkBotCast(Unit* victim, uint32 spellId, uint8 botclas
         case CLASS_PRIEST:
         case CLASS_DRUID:
         case CLASS_WARLOCK:
+        case CLASS_ROGUE:
+        case CLASS_HUNTER:
+        case CLASS_DEATH_KNIGHT:
         case CLASS_SHAMAN:
             if (Feasting() && !master->IsInCombat() && !master->HasAuraType(SPELL_AURA_PERIODIC_DAMAGE))
                 return SPELL_FAILED_DONT_REPORT;
             break;
         case CLASS_WARRIOR:
             //BladeStorm
-            if (me->HasAura(46924/*67541*/))
+            if (me->HasAura(46924/*67541*/)) // Bladestorm: has 9 different spell??
                 return SPELL_FAILED_DONT_REPORT;
             break;
-        case CLASS_ROGUE:
-        case CLASS_HUNTER:
-        case CLASS_DEATH_KNIGHT:
         default:
             TC_LOG_ERROR("entities.player", "CheckBotCast(): Unknown bot class %u", botclass);
             break;

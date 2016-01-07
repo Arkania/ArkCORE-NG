@@ -1073,7 +1073,7 @@ public:
             OVERPOWER_1                             = 7384,
             TAUNT_1                                 = 355,
             //DISARM_1                                = 676,
-            BLOODRAGE_1                             = 29131,//2687,
+            BLOODRAGE_1                             = 29131,//2687,  removed in 4.01
             BERSERKERRAGE_1                         = 18499,
             INTERCEPT_1                             = 20252,
             CLEAVE_1                                = 90981,//'90981 - (150% damage 3 targets)'//845,
