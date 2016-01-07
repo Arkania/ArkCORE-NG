@@ -2313,16 +2313,16 @@ public:
     }
 };
 
-enum RelicOfTheEarthenRing
-{
-    SPELL_TOTEM_OF_THE_EARTHEN_RING = 66747
-};
-
 // 66744 - Make Player Destroy Totems
 class spell_q14100_q14111_make_player_destroy_totems : public SpellScriptLoader
 {
 public:
     spell_q14100_q14111_make_player_destroy_totems() : SpellScriptLoader("spell_q14100_q14111_make_player_destroy_totems") { }
+
+    enum RelicOfTheEarthenRing
+    {
+        SPELL_TOTEM_OF_THE_EARTHEN_RING = 66747
+    };
 
     class spell_q14100_q14111_make_player_destroy_totems_SpellScript : public SpellScript
     {
@@ -2331,7 +2331,7 @@ public:
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
             if (!sSpellMgr->GetSpellInfo(SPELL_TOTEM_OF_THE_EARTHEN_RING))
-            return false;
+                return false;
             return true;
         }
 
@@ -2353,17 +2353,17 @@ public:
     }
 };
 
-enum Fumping
-{
-    SPELL_SUMMON_SAND_GNOME = 39240,
-    SPELL_SUMMON_BONE_SLICER = 39241
-};
-
 // 39238 - Fumping
 class spell_q10929_fumping : SpellScriptLoader
 {
 public:
     spell_q10929_fumping() : SpellScriptLoader("spell_q10929_fumping") { }
+
+    enum Fumping
+    {
+        NPC_BONE_SLICER = 22482,
+        NPC_SAND_GNOME = 22483,
+    };
 
     class spell_q10929_fumpingAuraScript : public AuraScript
     {
@@ -2371,10 +2371,6 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_SUMMON_SAND_GNOME))
-                return false;
-            if (!sSpellMgr->GetSpellInfo(SPELL_SUMMON_BONE_SLICER))
-                return false;
             return true;
         }
 
@@ -2384,7 +2380,11 @@ public:
                 return;
 
             if (Unit* caster = GetCaster())
-                caster->CastSpell(caster, urand(SPELL_SUMMON_SAND_GNOME, SPELL_SUMMON_BONE_SLICER), true);
+            {
+                Position pos = caster->GetNearPositionInFront(10.0f, 1.0f);
+                uint32   npc = rand_chance(60) ? NPC_BONE_SLICER : NPC_SAND_GNOME;
+                caster->SummonCreature(npc, pos, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300000);
+            }    
         }
 
         void Register() override
@@ -2398,6 +2398,53 @@ public:
         return new spell_q10929_fumpingAuraScript();
     }
 };
+
+// 39246 - Fumping
+class spell_q10930_fumping : SpellScriptLoader
+{
+public:
+    spell_q10930_fumping() : SpellScriptLoader("spell_q10930_fumping") { }
+
+    enum Fumping
+    {
+        NPC_DECREPIT_CLEFTHOOF = 22105,
+        NPC_HAISHULUD = 22038,
+    };
+
+    class spell_q10930_fumpingAuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_q10930_fumpingAuraScript);
+
+        bool Validate(SpellInfo const* /*spell*/) override
+        {
+            return true;
+        }
+
+        void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE)
+                return;
+
+            if (Unit* caster = GetCaster())
+                if (Creature* clefthoof = caster->FindNearestCreature(NPC_DECREPIT_CLEFTHOOF, 25.0f, false))
+                {
+                    Position pos = clefthoof->GetNearPosition(10.0f, frand(0.0f, 6.28f));
+                    caster->SummonCreature(NPC_HAISHULUD, pos, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300000);
+                }
+        }
+
+        void Register() override
+        {
+            OnEffectRemove += AuraEffectRemoveFn(spell_q10930_fumpingAuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_q10930_fumpingAuraScript();
+    }
+};
+
 
 class spell_q12414_hand_over_reins : public SpellScriptLoader
 {
@@ -2487,5 +2534,6 @@ void AddSC_quest_spell_scripts()
     new spell_q13400_illidan_kill_master();
     new spell_q14100_q14111_make_player_destroy_totems();
     new spell_q10929_fumping();
+    new spell_q10930_fumping();
     new spell_q12414_hand_over_reins();
 }
