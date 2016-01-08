@@ -87,8 +87,14 @@ struct AchievementCriteriaEntry
             uint32  winCount;                               // 4
         } win_bg;
 
+        // ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_ARCHAEOLOGY_PROJECTS = 3
+        struct
+        {
+            uint32 unused;                                  // 3
+            uint32 count;                                   // 4
+        } archaeology;
+
         // ACHIEVEMENT_CRITERIA_TYPE_REACH_LEVEL            = 5
-        // ACHIEVEMENT_CRITERIA_TYPE_REACH_GUILD_LEVEL      = 125
         struct
         {
             uint32  unused;                                 // 3
