@@ -2667,7 +2667,7 @@ public:
     }
 };
 
-// 82174 82175
+// 82174
 class spell_item_synapse_springs : public SpellScriptLoader
 {
 public:

@@ -822,43 +822,6 @@ class spell_warl_healthstone_heal : public SpellScriptLoader
         }
 };
 
-// -18119 - Improved Soul Fire
-class spell_warl_improved_soul_fire : public SpellScriptLoader
-{
-    public:
-        spell_warl_improved_soul_fire() : SpellScriptLoader("spell_warl_improved_soul_fire") { }
-
-        class spell_warl_improved_soul_fire_AuraScript : public AuraScript
-        {
-            PrepareAuraScript(spell_warl_improved_soul_fire_AuraScript);
-
-            bool Validate(SpellInfo const* /*spellInfo*/) override
-            {
-                if (!sSpellMgr->GetSpellInfo(SPELL_WARLOCK_IMPROVED_SOUL_FIRE_PCT) ||
-                    !sSpellMgr->GetSpellInfo(SPELL_WARLOCK_IMPROVED_SOUL_FIRE_STATE))
-                    return false;
-                return true;
-            }
-
-            void OnProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
-            {
-                PreventDefaultAction();
-                GetTarget()->CastCustomSpell(SPELL_WARLOCK_IMPROVED_SOUL_FIRE_PCT, SPELLVALUE_BASE_POINT0, aurEff->GetAmount(), GetTarget(), true, NULL, aurEff);
-                GetTarget()->CastSpell(GetTarget(), SPELL_WARLOCK_IMPROVED_SOUL_FIRE_STATE, true, NULL, aurEff);
-            }
-
-            void Register() override
-            {
-                OnEffectProc += AuraEffectProcFn(spell_warl_improved_soul_fire_AuraScript::OnProc, EFFECT_0, SPELL_AURA_DUMMY);
-            }
-        };
-
-        AuraScript* GetAuraScript() const override
-        {
-            return new spell_warl_improved_soul_fire_AuraScript();
-        }
-};
-
 // 1454 - Life Tap
 /// Updated 4.3.4
 class spell_warl_life_tap : public SpellScriptLoader
@@ -1451,7 +1414,6 @@ void AddSC_warlock_spell_scripts()
     new spell_warl_haunt();
     new spell_warl_health_funnel();
     new spell_warl_healthstone_heal();
-    new spell_warl_improved_soul_fire();
     new spell_warl_life_tap();
     new spell_warl_nether_ward_overrride();
     new spell_warl_seduction();
@@ -1466,3 +1428,12 @@ void AddSC_warlock_spell_scripts()
     new spell_warl_soulshatter();
     new spell_warl_unstable_affliction();
 }
+
+/*  found old spells there now are part of core
+
+    new spell_warl_improved_soul_fire();
+
+*/
+
+
+

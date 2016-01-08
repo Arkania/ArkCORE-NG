@@ -811,41 +811,6 @@ public:
     }
 };
 
-// 3409 25809 44289
-class spell_rog_crippling_poison : public SpellScriptLoader
-{
-    public:
-        spell_rog_crippling_poison() : SpellScriptLoader("spell_rog_crippling_poison") { }
-
-        class spell_rog_crippling_poison_AuraScript : public AuraScript
-        {
-            PrepareAuraScript(spell_rog_crippling_poison_AuraScript);
-
-            bool Validate(SpellInfo const* /*spellInfo*/) override
-            {
-                if (!sSpellMgr->GetSpellInfo(SPELL_ROGUE_CRIPPLING_POISON))
-                    return false;
-                return true;
-            }
-
-            void OnProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
-            {
-                PreventDefaultAction();
-                GetTarget()->CastSpell(eventInfo.GetProcTarget(), SPELL_ROGUE_CRIPPLING_POISON, true, NULL, aurEff);
-            }
-
-            void Register() override
-            {
-                OnEffectProc += AuraEffectProcFn(spell_rog_crippling_poison_AuraScript::OnProc, EFFECT_0, SPELL_AURA_DUMMY);
-            }
-        };
-
-        AuraScript* GetAuraScript() const override
-        {
-            return new spell_rog_crippling_poison_AuraScript();
-        }
-};
-
 // 51625 51626
 class spell_rog_deadly_brew : public SpellScriptLoader
 {
@@ -1333,37 +1298,14 @@ public:
 };
 
 // 76577 - Smoke Bomb
-class spell_rog_smoke_bomb_inv : public SpellScriptLoader
+class spell_rog_smoke_bomb : public SpellScriptLoader
 {
 public:
-    spell_rog_smoke_bomb_inv() : SpellScriptLoader("spell_rog_smoke_bomb_inv") { }
+    spell_rog_smoke_bomb() : SpellScriptLoader("spell_rog_smoke_bomb") { }
 
-    class spell_rog_smoke_bomb_inv_SpellScript : public SpellScript
+    class spell_rog_smoke_bomb_AuraScript : public AuraScript
     {
-        PrepareSpellScript(spell_rog_smoke_bomb_inv_SpellScript);
-
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            for (std::list<WorldObject*>::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
-            {
-                if ((*itr)->GetTypeId() == TYPEID_PLAYER)
-                {
-                    Player* pl = (*itr)->ToPlayer();
-                    if (!pl->IsFriendlyTo(GetCaster()))
-                        pl->RemoveAurasByType(SPELL_AURA_MOD_STEALTH);
-                }
-            }
-        }
-
-        void Register()
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_rog_smoke_bomb_inv_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_DEST_AREA_ENTRY);
-        }
-    };
-
-    class spell_rog_smoke_bomb_inv_AuraScript : public AuraScript
-    {
-        PrepareAuraScript(spell_rog_smoke_bomb_inv_AuraScript);
+        PrepareAuraScript(spell_rog_smoke_bomb_AuraScript);
 
         void OnTick(AuraEffect const* aurEff)
         {
@@ -1381,18 +1323,13 @@ public:
 
         void Register()
         {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_rog_smoke_bomb_inv_AuraScript::OnTick, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_rog_smoke_bomb_AuraScript::OnTick, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
-    {
-        return new spell_rog_smoke_bomb_inv_SpellScript();
-    }
-
     AuraScript* GetAuraScript() const
     {
-        return new spell_rog_smoke_bomb_inv_AuraScript();
+        return new spell_rog_smoke_bomb_AuraScript();
     }
 };
 
@@ -1548,7 +1485,6 @@ void AddSC_rogue_spell_scripts()
 {
     new spell_rog_blade_flurry();
     new spell_rog_cheat_death();
-    new spell_rog_crippling_poison();
     new spell_rog_cut_to_the_chase();
     new spell_rog_deadly_poison();
     new spell_rog_killing_spree();
@@ -1568,7 +1504,6 @@ void AddSC_rogue_spell_scripts()
     new spell_rog_sap();
     new spell_rog_gouge();
     new spell_rog_blind();
-    new spell_rog_smoke_bomb_inv();
     new spell_rog_deadly_brew();
     new spell_rog_deadly_momentum();
     new spell_rog_eviscerate();
@@ -1577,3 +1512,10 @@ void AddSC_rogue_spell_scripts()
     new spell_rog_restless_blades();
 
 };
+
+/*  found old spells there now are part of core
+
+    new spell_rog_smoke_bomb();
+    new spell_rog_crippling_poison();
+
+*/

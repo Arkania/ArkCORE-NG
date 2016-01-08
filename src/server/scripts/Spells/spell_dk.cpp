@@ -1095,8 +1095,8 @@ class spell_dk_raise_dead : public SpellScriptLoader
 
             bool Validate(SpellInfo const* spellInfo) override
             {
-                if (!sSpellMgr->GetSpellInfo(spellInfo->Effects[EFFECT_1].CalcValue())
-                    || !sSpellMgr->GetSpellInfo(spellInfo->Effects[EFFECT_2].CalcValue())
+                if (!sSpellMgr->GetSpellInfo(spellInfo->Effects[EFFECT_0].CalcValue())
+                    || !sSpellMgr->GetSpellInfo(spellInfo->Effects[EFFECT_1].CalcValue())
                     || !sSpellMgr->GetSpellInfo(SPELL_DK_RAISE_DEAD_USE_REAGENT)
                     || !sSpellMgr->GetSpellInfo(SPELL_DK_MASTER_OF_GHOULS))
                     return false;
@@ -1180,10 +1180,10 @@ class spell_dk_raise_dead : public SpellScriptLoader
                 // Do we have talent Master of Ghouls?
                 if (GetCaster()->HasAura(SPELL_DK_MASTER_OF_GHOULS))
                     // summon as pet
-                    return GetSpellInfo()->Effects[EFFECT_2].CalcValue();
+                    return GetSpellInfo()->Effects[EFFECT_1].CalcValue();
 
                 // or guardian
-                return GetSpellInfo()->Effects[EFFECT_1].CalcValue();
+                return GetSpellInfo()->Effects[EFFECT_0].CalcValue();
             }
 
             void HandleRaiseDead(SpellEffIndex /*effIndex*/)
@@ -1198,11 +1198,10 @@ class spell_dk_raise_dead : public SpellScriptLoader
             void Register() override
             {
                 OnCheckCast += SpellCheckCastFn(spell_dk_raise_dead_SpellScript::CheckCast);
-                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_dk_raise_dead_SpellScript::CheckTargets, EFFECT_1, TARGET_UNIT_DEST_AREA_ENTRY);
-                OnObjectTargetSelect += SpellObjectTargetSelectFn(spell_dk_raise_dead_SpellScript::CheckTarget, EFFECT_2, TARGET_UNIT_CASTER);
+                OnObjectTargetSelect += SpellObjectTargetSelectFn(spell_dk_raise_dead_SpellScript::CheckTarget, EFFECT_1, TARGET_UNIT_CASTER);
                 OnCast += SpellCastFn(spell_dk_raise_dead_SpellScript::ConsumeReagents);
-                OnEffectHitTarget += SpellEffectFn(spell_dk_raise_dead_SpellScript::HandleRaiseDead, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
-                OnEffectHitTarget += SpellEffectFn(spell_dk_raise_dead_SpellScript::HandleRaiseDead, EFFECT_2, SPELL_EFFECT_DUMMY);
+                OnEffectHitTarget += SpellEffectFn(spell_dk_raise_dead_SpellScript::HandleRaiseDead, EFFECT_0, SPELL_EFFECT_DUMMY);
+                OnEffectHitTarget += SpellEffectFn(spell_dk_raise_dead_SpellScript::HandleRaiseDead, EFFECT_1, SPELL_EFFECT_DUMMY);
             }
 
         private:
@@ -1917,38 +1916,6 @@ public:
     }
 };
 
-// 58620
-class spell_dk_glyph_chains_of_ice : public SpellScriptLoader
-{
-public:
-    spell_dk_glyph_chains_of_ice() : SpellScriptLoader("spell_dk_glyph_chains_of_ice") { }
-
-    class spell_dk_glyph_chains_of_ice_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_dk_glyph_chains_of_ice_SpellScript);
-
-        void CalculateDamage(SpellEffIndex /*effect*/)
-        {
-            // Formula: 0.08 to 0.13 * AP
-            if (Unit* caster = GetCaster())
-            {
-                int32 ap = caster->GetTotalAttackPowerValue(BASE_ATTACK);
-                SetHitDamage(int32(0.01f * irand(8, 13) * ap));
-            }
-        }
-
-        void Register()
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_dk_glyph_chains_of_ice::spell_dk_glyph_chains_of_ice_SpellScript::CalculateDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
-        }
-    };
-
-    SpellScript* GetSpellScript() const
-    {
-        return new spell_dk_glyph_chains_of_ice_SpellScript();
-    }
-};
-
 // 49024 49538
 class spell_dk_merciless_combat : public SpellScriptLoader
 {
@@ -2250,7 +2217,6 @@ void AddSC_deathknight_spell_scripts()
     new spell_dk_death_strike_enabler();
     new spell_dk_festering();
     new spell_dk_ghoul_explode();
-    new spell_dk_glyph_chains_of_ice();
     new spell_dk_icebound_fortitude();
     new spell_dk_improved_blood_presence();
     new spell_dk_improved_frost_presence();
@@ -2274,5 +2240,13 @@ void AddSC_deathknight_spell_scripts()
     new spell_dk_vampiric_blood();
     new spell_dk_will_of_the_necropolis();
 }
+
+/*   found old spells there now are part of core
+
+new spell_dk_glyph_chains_of_ice();
+
+
+*/
+
 
 

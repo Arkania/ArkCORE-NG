@@ -725,6 +725,7 @@ class MarkOfNatureTargetSelector
         }
 };
 
+// 25040 25043 // Disabled: wrong register
 class spell_mark_of_nature : public SpellScriptLoader
 {
     public:
@@ -781,5 +782,5 @@ void AddSC_emerald_dragons()
 
     // dragon spellscripts
     new spell_dream_fog_sleep();
-    new spell_mark_of_nature();
+    // new spell_mark_of_nature(); // Disabled: wrong register
 };

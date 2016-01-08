@@ -183,6 +183,7 @@ class npc_flame_warder : public CreatureScript
         }
 };
 
+// 66725 68161
 class spell_koralon_meteor_fists : public SpellScriptLoader
 {
     public:

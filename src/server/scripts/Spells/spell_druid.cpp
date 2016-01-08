@@ -894,7 +894,7 @@ class spell_dru_starfall_dummy : public SpellScriptLoader
         }
 };
 
-// -78892 - Stampede
+// -78892 - Stampede // Disabled: wrong register.. some parts outdated
 class spell_dru_stampede : public SpellScriptLoader
 {
     public:
@@ -1691,34 +1691,7 @@ public:
     }
 };
 
-// Owlkin Frenzy 48391
-class spell_dru_owlkin_frenzy : public SpellScriptLoader
-{
-public:
-    spell_dru_owlkin_frenzy() : SpellScriptLoader("spell_dru_owlkin_frenzy") { }
-
-    class spell_dru_owlkin_frenzy_AuraScript : public AuraScript
-    {
-        PrepareAuraScript(spell_dru_owlkin_frenzy_AuraScript);
-
-        void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
-        {
-            amount = CalculatePct(GetUnitOwner()->GetCreatePowers(POWER_MANA), amount);
-        }
-
-        void Register()
-        {
-            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dru_owlkin_frenzy_AuraScript::CalculateAmount, EFFECT_2, SPELL_AURA_PERIODIC_ENERGIZE);
-        }
-    };
-
-    AuraScript* GetAuraScript() const
-    {
-        return new spell_dru_owlkin_frenzy_AuraScript();
-    }
-};
-
-// Primal madness 50334
+// 50334 
 class spell_dru_primal_madness : public SpellScriptLoader
 {
 public:
@@ -1759,9 +1732,7 @@ public:
         void Register()
         {
             AfterEffectApply += AuraEffectApplyFn(spell_dru_primal_madness_AuraScript::OnApply, EFFECT_0, SPELL_AURA_ADD_PCT_MODIFIER, AURA_EFFECT_HANDLE_REAL);
-            AfterEffectApply += AuraEffectApplyFn(spell_dru_primal_madness_AuraScript::OnApply, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_DONE, AURA_EFFECT_HANDLE_REAL);
             AfterEffectRemove += AuraEffectRemoveFn(spell_dru_primal_madness_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_ADD_PCT_MODIFIER, AURA_EFFECT_HANDLE_REAL);
-            AfterEffectRemove += AuraEffectRemoveFn(spell_dru_primal_madness_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_DONE, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
@@ -2526,7 +2497,6 @@ void AddSC_druid_spell_scripts()
     new spell_dru_lacerate();
     new spell_dru_living_seed();
     new spell_dru_living_seed_proc();
-    new spell_dru_owlkin_frenzy();
     new spell_dru_predatory_strikes();
     new spell_dru_primal_madness();
     new spell_dru_pulverize();
@@ -2538,7 +2508,7 @@ void AddSC_druid_spell_scripts()
     new spell_dru_savage_roar();
     new spell_dru_shred_maul();
     new spell_dru_skull_bash();
-    new spell_dru_stampede();
+    // new spell_dru_stampede(); // Disabled: wrong register
     new spell_dru_starfall_dummy();
     new spell_dru_starsurge();
     new spell_dru_survival_instincts();
@@ -2554,3 +2524,11 @@ void AddSC_druid_spell_scripts()
     new spell_dru_wild_mushroom_efflorescence();
     new spell_dru_wild_mushroom_efflorescence_heal();
 }
+
+/*   found old spells there now are part of core
+
+new spell_dru_owlkin_frenzy();
+
+
+*/
+

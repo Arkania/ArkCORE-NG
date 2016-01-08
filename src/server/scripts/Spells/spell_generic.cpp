@@ -853,7 +853,8 @@ class spell_gen_clone : public SpellScriptLoader
 
         enum Clone
         {
-            SPELL_NIGHTMARE_FIGMENT_MIRROR_IMAGE = 57528
+            SPELL_NIGHTMARE_FIGMENT_MIRROR_IMAGE = 57528,
+            SPELL_CLONE_ME = 45204,
         };
 
         class spell_gen_clone_SpellScript : public SpellScript
@@ -868,7 +869,11 @@ class spell_gen_clone : public SpellScriptLoader
 
             void Register() override
             {
-                if (m_scriptSpellId == SPELL_NIGHTMARE_FIGMENT_MIRROR_IMAGE)
+                if (m_scriptSpellId == SPELL_CLONE_ME)
+                {
+                    OnEffectHitTarget += SpellEffectFn(spell_gen_clone_SpellScript::HandleScriptEffect, EFFECT_2, SPELL_EFFECT_SCRIPT_EFFECT);
+                }
+                else if (m_scriptSpellId == SPELL_NIGHTMARE_FIGMENT_MIRROR_IMAGE)
                 {
                     OnEffectHitTarget += SpellEffectFn(spell_gen_clone_SpellScript::HandleScriptEffect, EFFECT_1, SPELL_EFFECT_DUMMY);
                     OnEffectHitTarget += SpellEffectFn(spell_gen_clone_SpellScript::HandleScriptEffect, EFFECT_2, SPELL_EFFECT_DUMMY);
@@ -2910,7 +2915,7 @@ class spell_gen_remove_flight_auras : public SpellScriptLoader
         }
 };
 
-// 57669 61782
+// 57669
 class spell_gen_replenishment : public SpellScriptLoader
 {
     public:
@@ -4315,7 +4320,7 @@ public:
     }
 };
 
-// -81708
+// -81708  rank: (81708, 55428, 55480, 55500, 55501, 55502, 55503, 74497)
 class spell_gen_lifeblood : public SpellScriptLoader
 {
 public:
@@ -4441,7 +4446,7 @@ public:
 
         void Register()
         {
-            OnEffectHitTarget += SpellEffectFn(spell_gen_magic_rooster_SpellScript::HandleScript, EFFECT_2, SPELL_EFFECT_SCRIPT_EFFECT);
+            OnEffectHitTarget += SpellEffectFn(spell_gen_magic_rooster_SpellScript::HandleScript, EFFECT_0, SPELL_AURA_MOUNTED);
         }
     };
 
@@ -4762,128 +4767,6 @@ public:
     }
 };
 
-// 62563 62874 62960 63003 63010 63661 64591 66481 68282 68284 68321 68498 68501
-class spell_gen_mount : public SpellScriptLoader
-{
-public:
-    spell_gen_mount(const char* name, uint32 mount0 = 0, uint32 mount60 = 0, uint32 mount100 = 0, uint32 mount150 = 0, uint32 mount280 = 0, uint32 mount310 = 0) : SpellScriptLoader(name),
-        _mount0(mount0), _mount60(mount60), _mount100(mount100), _mount150(mount150), _mount280(mount280), _mount310(mount310) { }
-private:
-    uint32 _mount0;
-    uint32 _mount60;
-    uint32 _mount100;
-    uint32 _mount150;
-    uint32 _mount280;
-    uint32 _mount310;
-
-    class spell_gen_mount_SpellScript : public SpellScript 
-        { PrepareSpellScript(spell_gen_mount_SpellScript);
-
-    public:
-        spell_gen_mount_SpellScript(uint32 mount0, uint32 mount60, uint32 mount100, uint32 mount150, uint32 mount280, uint32 mount310) : SpellScript(),
-            _mount0(mount0), _mount60(mount60), _mount100(mount100), _mount150(mount150), _mount280(mount280), _mount310(mount310) { }
-
-        bool Validate(SpellInfo const* /*spell*/)
-        {
-            if (_mount0 && !sSpellMgr->GetSpellInfo(_mount0))
-                return false;
-            if (_mount60 && !sSpellMgr->GetSpellInfo(_mount60))
-                return false;
-            if (_mount100 && !sSpellMgr->GetSpellInfo(_mount100))
-                return false;
-            if (_mount150 && !sSpellMgr->GetSpellInfo(_mount150))
-                return false;
-            if (_mount280 && !sSpellMgr->GetSpellInfo(_mount280))
-                return false;
-            if (_mount310 && !sSpellMgr->GetSpellInfo(_mount310))
-                return false;
-            return true;
-        }
-
-        void HandleMount(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-
-            if (Player* target = GetHitPlayer())
-            {
-                // Prevent stacking of mounts and client crashes upon dismounting
-                target->RemoveAurasByType(SPELL_AURA_MOUNTED, 0, GetHitAura());
-
-                // Triggered spell id dependent on riding skill and zone
-                bool canFly = false;
-                uint32 map = GetVirtualMapForMapAndZone(target->GetMapId(), target->GetZoneId());
-                if (map == 530 || (map == 571 && target->HasSpell(SPELL_COLD_WEATHER_FLYING)))
-                    canFly = true;
-
-                float x, y, z;
-                target->GetPosition(x, y, z);
-                uint32 areaFlag = target->GetBaseMap()->GetAreaFlag(x, y, z);
-                AreaTableEntry const* area = sAreaStore.LookupEntry(areaFlag);
-                if (!area || (canFly && (area->flags & AREA_FLAG_NO_FLY_ZONE)))
-                    canFly = false;
-
-                uint32 mount = 0;
-                switch (target->GetBaseSkillValue(SKILL_RIDING))
-                {
-                case 0:
-                    mount = _mount0;
-                    break;
-                case 75:
-                    mount = _mount60;
-                    break;
-                case 150:
-                    mount = _mount100;
-                    break;
-                case 225:
-                    if (canFly)
-                        mount = _mount150;
-                    else
-                        mount = _mount100;
-                    break;
-                case 300:
-                    if (canFly)
-                        mount = _mount280;
-                    else
-                        mount = _mount100;
-                    break;
-                case 375:
-                    if (canFly)
-                        mount = _mount310;
-                    else
-                        mount = _mount100;
-                    break;
-                default:
-                    break;
-                }
-
-                if (mount)
-                {
-                    PreventHitAura();
-                    target->CastSpell(target, mount, true);
-                }
-            }
-        }
-
-        void Register()
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_gen_mount_SpellScript::HandleMount, EFFECT_2, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-
-    private:
-        uint32 _mount0;
-        uint32 _mount60;
-        uint32 _mount100;
-        uint32 _mount150;
-        uint32 _mount280;
-        uint32 _mount310;
-    };
-
-    SpellScript* GetSpellScript() const
-    {
-        return new spell_gen_mount_SpellScript(_mount0, _mount60, _mount100, _mount150, _mount280, _mount310);
-    }
-};
-
 // 42292 59752
 class spell_gen_pvp_trinket : public SpellScriptLoader
 {
@@ -5170,23 +5053,13 @@ void AddSC_generic_spell_scripts()
     new spell_gen_increase_stats_buff("spell_mage_dalaran_brilliance");
     new spell_gen_interrupt();
     new spell_gen_launch();
-    new spell_gen_lifeblood();
     new spell_gen_lifebloom("spell_hexlord_lifebloom", SPELL_HEXLORD_MALACRASS_LIFEBLOOM_FINAL_HEAL);
     new spell_gen_lifebloom("spell_tur_ragepaw_lifebloom", SPELL_TUR_RAGEPAW_LIFEBLOOM_FINAL_HEAL);
     new spell_gen_lifebloom("spell_cenarion_scout_lifebloom", SPELL_CENARION_SCOUT_LIFEBLOOM_FINAL_HEAL);
     new spell_gen_lifebloom("spell_twisted_visage_lifebloom", SPELL_TWISTED_VISAGE_LIFEBLOOM_FINAL_HEAL);
     new spell_gen_lifebloom("spell_faction_champion_dru_lifebloom", SPELL_FACTION_CHAMPIONS_DRU_LIFEBLOOM_FINAL_HEAL);
     new spell_gen_luck_of_the_draw();
-    new spell_gen_magic_rooster();
     new spell_gen_mixology_bonus();
-    new spell_gen_mount("spell_magic_broom", 0, SPELL_MAGIC_BROOM_60, SPELL_MAGIC_BROOM_100, SPELL_MAGIC_BROOM_150, SPELL_MAGIC_BROOM_280);
-    new spell_gen_mount("spell_headless_horseman_mount", 0, SPELL_HEADLESS_HORSEMAN_MOUNT_60, SPELL_HEADLESS_HORSEMAN_MOUNT_100, SPELL_HEADLESS_HORSEMAN_MOUNT_150, SPELL_HEADLESS_HORSEMAN_MOUNT_280);
-    new spell_gen_mount("spell_winged_steed_of_the_ebon_blade", 0, 0, 0, SPELL_WINGED_STEED_150, SPELL_WINGED_STEED_280);
-    new spell_gen_mount("spell_big_love_rocket", SPELL_BIG_LOVE_ROCKET_0, SPELL_BIG_LOVE_ROCKET_60, SPELL_BIG_LOVE_ROCKET_100, SPELL_BIG_LOVE_ROCKET_150, SPELL_BIG_LOVE_ROCKET_310);
-    new spell_gen_mount("spell_invincible", 0, SPELL_INVINCIBLE_60, SPELL_INVINCIBLE_100, SPELL_INVINCIBLE_150, SPELL_INVINCIBLE_310);
-    new spell_gen_mount("spell_blazing_hippogryph", 0, 0, 0, SPELL_BLAZING_HIPPOGRYPH_150, SPELL_BLAZING_HIPPOGRYPH_280);
-    new spell_gen_mount("spell_celestial_steed", 0, SPELL_CELESTIAL_STEED_60, SPELL_CELESTIAL_STEED_100, SPELL_CELESTIAL_STEED_150, SPELL_CELESTIAL_STEED_280, SPELL_CELESTIAL_STEED_310);
-    new spell_gen_mount("spell_x53_touring_rocket", 0, 0, 0, SPELL_X53_TOURING_ROCKET_150, SPELL_X53_TOURING_ROCKET_280, SPELL_X53_TOURING_ROCKET_310);
     new spell_gen_mounted_charge();
     new spell_gen_netherbloom();
     new spell_gen_nightmare_vine();
@@ -5228,3 +5101,20 @@ void AddSC_generic_spell_scripts()
     new spell_gen_whisper_gulch_yogg_saron_whisper();
 
 }
+
+/*   found old spells there now are part of core
+
+    new spell_gen_lifeblood();  -81708  rank: (81708, 55428, 55480, 55500, 55501, 55502, 55503, 74497)
+    new spell_gen_magic_rooster(); 65917
+    new spell_gen_mount("spell_magic_broom", 0, SPELL_MAGIC_BROOM_60, SPELL_MAGIC_BROOM_100, SPELL_MAGIC_BROOM_150, SPELL_MAGIC_BROOM_280);
+    new spell_gen_mount("spell_headless_horseman_mount", 0, SPELL_HEADLESS_HORSEMAN_MOUNT_60, SPELL_HEADLESS_HORSEMAN_MOUNT_100, SPELL_HEADLESS_HORSEMAN_MOUNT_150, SPELL_HEADLESS_HORSEMAN_MOUNT_280);
+    new spell_gen_mount("spell_winged_steed_of_the_ebon_blade", 0, 0, 0, SPELL_WINGED_STEED_150, SPELL_WINGED_STEED_280);
+    new spell_gen_mount("spell_big_love_rocket", SPELL_BIG_LOVE_ROCKET_0, SPELL_BIG_LOVE_ROCKET_60, SPELL_BIG_LOVE_ROCKET_100, SPELL_BIG_LOVE_ROCKET_150, SPELL_BIG_LOVE_ROCKET_310);
+    new spell_gen_mount("spell_invincible", 0, SPELL_INVINCIBLE_60, SPELL_INVINCIBLE_100, SPELL_INVINCIBLE_150, SPELL_INVINCIBLE_310);
+    new spell_gen_mount("spell_blazing_hippogryph", 0, 0, 0, SPELL_BLAZING_HIPPOGRYPH_150, SPELL_BLAZING_HIPPOGRYPH_280);
+    new spell_gen_mount("spell_celestial_steed", 0, SPELL_CELESTIAL_STEED_60, SPELL_CELESTIAL_STEED_100, SPELL_CELESTIAL_STEED_150, SPELL_CELESTIAL_STEED_280, SPELL_CELESTIAL_STEED_310);
+    new spell_gen_mount("spell_x53_touring_rocket", 0, 0, 0, SPELL_X53_TOURING_ROCKET_150, SPELL_X53_TOURING_ROCKET_280, SPELL_X53_TOURING_ROCKET_310);
+
+
+*/
+
