@@ -314,7 +314,7 @@ void Item::UpdateDuration(Player* owner, uint32 diff)
     SetState(ITEM_CHANGED, owner);                          // save new time in database
 }
 
-void Item::SaveToDB(SQLTransaction& trans)
+ItemUpdateState Item::SaveToDB(SQLTransaction& trans)
 {
     bool isInTransaction = !(trans.null());
     if (!isInTransaction)
@@ -389,7 +389,7 @@ void Item::SaveToDB(SQLTransaction& trans)
                 ItemContainerDeleteLootMoneyAndLootItemsFromDB();
 
             delete this;
-            return;
+            return ITEM_REMOVED;
         }
         case ITEM_UNCHANGED:
             break;
@@ -399,6 +399,8 @@ void Item::SaveToDB(SQLTransaction& trans)
 
     if (!isInTransaction)
         CharacterDatabase.CommitTransaction(trans);
+
+    return ITEM_UNCHANGED;
 }
 
 bool Item::LoadFromDB(uint32 guid, uint64 owner_guid, Field* fields, uint32 entry)
