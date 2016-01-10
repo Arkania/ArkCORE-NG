@@ -32,7 +32,7 @@ enum DumpTableType
                                                             // character_action, character_aura, character_homebind,
                                                             // character_queststatus, character_queststatus_rewarded, character_reputation,
                                                             // character_spell, character_spell_cooldown, character_ticket, character_talent,
-                                                            // character_cuf_profiles, character_currency, character_archaeology_digsites
+                                                            // character_cuf_profiles, character_currency, character_archaeology_digsite
 
     DTT_EQSET_TABLE,    // <- guid                          // character_equipmentsets
 

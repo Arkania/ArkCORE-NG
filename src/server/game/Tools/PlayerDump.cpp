@@ -52,7 +52,7 @@ static DumpTable dumpTables[DUMP_TABLE_COUNT] =
     { "character_queststatus",            DTT_CHAR_TABLE },
     { "character_queststatus_rewarded",   DTT_CHAR_TABLE },
     { "character_reputation",             DTT_CHAR_TABLE },
-    { "character_archaeology_digsites",   DTT_CHAR_TABLE },
+    { "character_archaeology_digsite",    DTT_CHAR_TABLE },
     { "character_skills",                 DTT_CHAR_TABLE },
     { "character_spell",                  DTT_CHAR_TABLE },
     { "character_spell_cooldown",         DTT_CHAR_TABLE },
