@@ -36,7 +36,7 @@ enum Spells
 {
     SPELL_FLAMESTRIKE            = 18399,
     SPELL_BLAST_WAVE             = 16046,
-    SPELL_FIRESHIELD             = 19626,
+    SPELL_FIRESHIELD             = 30513, // 19626,
     SPELL_FRENZY                 = 8269  // 28371
 };
 
