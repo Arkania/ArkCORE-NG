@@ -1,13 +1,28 @@
+/*
+ * Copyright (C) 2011-2016 ArkCORE <http://www.arkania.net/>
+ *
+ * Thanks to Trickerer, LordPsyan and all of People that written the script.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation; either version 2 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+ 
 #include "bot_ai.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "Spell.h"
 #include "SpellAuras.h"
-/*
-Hunter NpcBot (reworked by Graff onlysuffering@gmail.com)
-Complete - around 35%
-TODO:
-*/
+
 typedef std::unordered_map<uint32 /*spellId*/, int32 /*manaCost*/> ManaRestoreList;
 ManaRestoreList TotH;
 class hunter_bot : public CreatureScript
