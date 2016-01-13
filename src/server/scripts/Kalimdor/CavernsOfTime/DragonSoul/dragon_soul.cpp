@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2015 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2016 ArkCORE <http://www.arkania.net/>
  *
  * This is private work. If you're not supposed to have/see this, GTFO.
  */

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2015 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2016 ArkCORE <http://www.arkania.net/>
  *
  * Script complete: 99%. Most complicated entry-raid boss i've ever fucking seen.
  * - Live Testing needed.

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2015 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2016 ArkCORE <http://www.arkania.net/>
  *
  * Script done: 95%. ToDo: 
  * - Script remaining spells. See each boss notes on ToDo.

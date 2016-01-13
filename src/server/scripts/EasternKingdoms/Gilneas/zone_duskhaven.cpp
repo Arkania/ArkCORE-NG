@@ -1,6 +1,6 @@
 /*
  *
-* Copyright (C) 2011-2015 ArkCORE <http://www.arkania.net/>
+* Copyright (C) 2011-2016 ArkCORE <http://www.arkania.net/>
  *
 * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
  *
