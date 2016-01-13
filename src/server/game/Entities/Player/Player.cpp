@@ -20927,6 +20927,7 @@ void Player::SaveToDB(bool create /*=false*/)
 
         stmt->setUInt8(index++, GetByteValue(PLAYER_FIELD_BYTES, 2));
         stmt->setUInt32(index++, m_grantableLevels);
+        stmt->setUInt32(index++, GetAchievementPoints());
         stmt->setUInt32(index++, GetRatedBGWins());
         stmt->setUInt32(index++, GetRatedBGLoose());
         stmt->setUInt32(index++, GetRatedBGRating());
@@ -21062,7 +21063,7 @@ void Player::SaveToDB(bool create /*=false*/)
         stmt->setUInt32(index++, m_grantableLevels);
 
         stmt->setUInt8(index++, IsInWorld() && !GetSession()->PlayerLogout() ? 1 : 0);
-
+        stmt->setUInt32(index++, GetAchievementPoints());
         stmt->setUInt32(index++, GetRatedBGWins());
         stmt->setUInt32(index++, GetRatedBGLoose());
         stmt->setUInt32(index++, GetRatedBGRating());
