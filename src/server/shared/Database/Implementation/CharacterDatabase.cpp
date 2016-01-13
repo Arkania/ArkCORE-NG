@@ -68,7 +68,7 @@ void CharacterDatabaseConnection::DoPrepareStatements()
                      "position_x, position_y, position_z, map, orientation, taximask, cinematic, totaltime, leveltime, rest_bonus, logout_time, is_logout_resting, resettalents_cost, "
                      "resettalents_time, talentTree, trans_x, trans_y, trans_z, trans_o, transguid, extra_flags, stable_slots, at_login, zone, online, death_expire_time, taxi_path, instance_mode_mask, "
                      "totalKills, todayKills, yesterdayKills, chosenTitle, watchedFaction, drunk, "
-                     "health, power1, power2, power3, power4, power5, instance_id, speccount, activespec, exploredZones, equipmentCache, knownTitles, actionBars, grantableLevels "
+                     "health, power1, power2, power3, power4, power5, instance_id, speccount, activespec, exploredZones, equipmentCache, knownTitles, actionBars, grantableLevels, ratedBGWins, ratedBGLoose, ratedBGRating "
                      "FROM characters WHERE guid = ?", CONNECTION_ASYNC);
 
     PrepareStatement(CHAR_SEL_GROUP_MEMBER, "SELECT guid FROM group_member WHERE memberGuid = ?", CONNECTION_BOTH);
@@ -177,12 +177,25 @@ void CharacterDatabaseConnection::DoPrepareStatements()
     // 0: string, 1: uint32
     PrepareStatement(CHAR_UPD_GUILD_NAME, "UPDATE guild SET name = ? WHERE guildid = ?", CONNECTION_ASYNC);
     // 0: uint32, 1: uint32, 2: uint8, 4: string, 5: string
-    PrepareStatement(CHAR_INS_GUILD_MEMBER, "INSERT INTO guild_member (guildid, guid, rank, pnote, offnote) VALUES (?, ?, ?, ?, ?)", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_INS_GUILD_MEMBER, "INSERT INTO guild_member (guildid, guid, rank, pnote, offnote, activity, weekActivity, weekReputation) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", CONNECTION_ASYNC);
     PrepareStatement(CHAR_DEL_GUILD_MEMBER, "DELETE FROM guild_member WHERE guid = ?", CONNECTION_ASYNC); // 0: uint32
     PrepareStatement(CHAR_DEL_GUILD_MEMBERS, "DELETE FROM guild_member WHERE guildid = ?", CONNECTION_ASYNC); // 0: uint32
     PrepareStatement(CHAR_SEL_GUILD_CHALLENGES_COMPLETED, "SELECT challengeId, dateCompleted FROM guild_challenges_completed WHERE guildId = ?", CONNECTION_SYNCH);
+    PrepareStatement(CHAR_SEL_FIRST_GUILD_CHALLENGE_COMPLETED_DATE, "SELECT dateCompleted FROM guild_challenges_completed WHERE guildId = ? ORDER BY dateCompleted ASC", CONNECTION_SYNCH);
     PrepareStatement(CHAR_INS_GUILD_CHALLENGE_DONE, "REPLACE INTO guild_challenges_completed (guildId, challengeId, dateCompleted) VALUES (?, ?, ?)", CONNECTION_ASYNC);
     PrepareStatement(CHAR_DEL_GUILD_CHALLENGE_EXPIERED, "DELETE FROM guild_challenges_completed WHERE guildId = ? AND challengeId = ?", CONNECTION_ASYNC);
+
+    // Guild Reputation
+    PrepareStatement(CHAR_ADD_GUILD_REP, "INSERT INTO character_guild_reputation (guid, guildid) VALUES (?, ?)", CONNECTION_ASYNC); // 0,1: uint32
+    PrepareStatement(CHAR_GET_GUILD_REP, "SELECT guildid FROM character_guild_reputation WHERE guid = ?", CONNECTION_SYNCH); // 0: uint32
+    PrepareStatement(CHAR_SET_GUILD_REP, "UPDATE character_guild_reputation SET guildid = ? WHERE guid = ?", CONNECTION_ASYNC); // 0,1: uint32
+    PrepareStatement(CHAR_SET_GUILD_REP_TIME, "UPDATE character_guild_reputation SET disband_time = UNIX_TIMESTAMP(NOW()) WHERE guid = ?", CONNECTION_ASYNC); // 0: uint32
+    PrepareStatement(CHAR_SET_GUILD_REP_RESET_TIME, "UPDATE character_guild_reputation SET disband_time = '0' WHERE guid = ?", CONNECTION_ASYNC); // 0: uint32
+    PrepareStatement(CHAR_GET_GUILD_REP_TIME, "SELECT disband_time FROM character_guild_reputation WHERE guid = ?", CONNECTION_SYNCH); // 0: uint32
+    PrepareStatement(CHAR_GET_GUILD_REP_VAL, "SELECT weekly_rep FROM character_guild_reputation WHERE guid = ?", CONNECTION_SYNCH); // 0: uint32
+    PrepareStatement(CHAR_SET_GUILD_REP_VAL, "UPDATE character_guild_reputation SET weekly_rep = ? WHERE guid = ?", CONNECTION_ASYNC); // 0,1: uint32
+    PrepareStatement(CHAR_GET_GUILD_TOTAL_REP_VAL, "SELECT total_rep FROM character_guild_reputation WHERE guid = ?", CONNECTION_SYNCH); // 0: uint32
+    PrepareStatement(CHAR_SET_GUILD_TOTAL_REP_VAL, "UPDATE character_guild_reputation SET total_rep = ? WHERE guid = ?", CONNECTION_ASYNC); // 0,1: uint32
 
     // 0: uint32, 1: uint8, 3: string, 4: uint32, 5: uint32
     PrepareStatement(CHAR_INS_GUILD_RANK, "INSERT INTO guild_rank (guildid, rid, rname, rights, BankMoneyPerDay) VALUES (?, ?, ?, ?, ?)", CONNECTION_ASYNC);
@@ -212,6 +225,14 @@ void CharacterDatabaseConnection::DoPrepareStatements()
     PrepareStatement(CHAR_UPD_GUILD_MEMBER_OFFNOTE, "UPDATE guild_member SET offnote = ? WHERE guid = ?", CONNECTION_ASYNC); // 0: string, 1: uint32
     PrepareStatement(CHAR_UPD_GUILD_MEMBER_RANK, "UPDATE guild_member SET rank = ? WHERE guid = ?", CONNECTION_ASYNC); // 0: uint8, 1: uint32
     PrepareStatement(CHAR_UPD_GUILD_MOTD, "UPDATE guild SET motd = ? WHERE guildid = ?", CONNECTION_ASYNC); // 0: string, 1: uint32
+    PrepareStatement(CHAR_UPD_GUILD_MEMBER_ACTIVITY, "UPDATE guild_member SET activity = ?, weekActivity = ? WHERE guid = ?", CONNECTION_ASYNC); // 0: uint64, 1: uint64, 2: uint32
+    PrepareStatement(CHAR_UPD_GUILD_MEMBER_PROFESSION, "UPDATE guild_member SET profession1_level=?, profession1_skillID=?, profession1_rank=?, "
+        "profession2_level=?, profession2_skillID=?, profession2_rank=? WHERE guid=?", CONNECTION_ASYNC);
+
+    PrepareStatement(CHAR_UPD_GUILD_MEMBER_WEEK_REPUTATION, "UPDATE guild_member SET weekReputation = ? WHERE guid = ?", CONNECTION_ASYNC); // 0: uint32, 1: uint32
+    PrepareStatement(CHAR_RESET_GUILD_MEMBER_WEEK_ACTIVITY, "UPDATE guild_member SET weekActivity = 0 WHERE guid = ?", CONNECTION_ASYNC); // 0: uint32
+    PrepareStatement(CHAR_RESET_GUILD_MEMBER_WEEK_REPUTATION, "UPDATE guild_member SET weekReputation = 0 WHERE guid = ?", CONNECTION_ASYNC); // 0: uint32
+
     PrepareStatement(CHAR_UPD_GUILD_INFO, "UPDATE guild SET info = ? WHERE guildid = ?", CONNECTION_ASYNC); // 0: string, 1: uint32
     PrepareStatement(CHAR_UPD_GUILD_LEADER, "UPDATE guild SET leaderguid = ? WHERE guildid = ?", CONNECTION_ASYNC); // 0: uint32, 1: uint32
     PrepareStatement(CHAR_UPD_GUILD_RANK_NAME, "UPDATE guild_rank SET rname = ? WHERE rid = ? AND guildid = ?", CONNECTION_ASYNC); // 0: string, 1: uint8, 2: uint32
@@ -233,6 +254,11 @@ void CharacterDatabaseConnection::DoPrepareStatements()
 
     // 0: uint32, 1: uint32, 2: uint32
     PrepareStatement(CHAR_SEL_CHAR_DATA_FOR_GUILD, "SELECT name, level, class, zone, account FROM characters WHERE guid = ?", CONNECTION_SYNCH);
+    PrepareStatement(CHAR_SEL_OLD_GUILD_DATA, "SELECT guildId, weekReputation FROM guild_old_member WHERE guid = ?", CONNECTION_SYNCH);
+    PrepareStatement(CHAR_DEL_OLD_GUILD_DATA, "DELETE FROM guild_old_member WHERE guid = ?", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_RESET_OLD_GUILD_WEEK_REPUTATION, "UPDATE guild_old_member SET weekReputation = 0", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_DEL_OLD_OLD_GUILD_MEMBER, "DELETE FROM guild_old_member WHERE leaveDate < ?", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_INS_LEAVE_GUILD_DATA, "INSERT INTO guild_old_member (guid, guildId, weekReputation, leaveDate) VALUES (?, ?, ?, ?)", CONNECTION_ASYNC);
     PrepareStatement(CHAR_DEL_GUILD_ACHIEVEMENT, "DELETE FROM guild_achievement WHERE guildId = ? AND achievement = ?", CONNECTION_ASYNC);
     PrepareStatement(CHAR_INS_GUILD_ACHIEVEMENT, "INSERT INTO guild_achievement (guildId, achievement, date, guids) VALUES (?, ?, ?, ?)", CONNECTION_ASYNC);
     PrepareStatement(CHAR_DEL_GUILD_ACHIEVEMENT_CRITERIA, "DELETE FROM guild_achievement_progress WHERE guildId = ? AND criteria = ?", CONNECTION_ASYNC);
@@ -242,6 +268,8 @@ void CharacterDatabaseConnection::DoPrepareStatements()
     PrepareStatement(CHAR_SEL_GUILD_ACHIEVEMENT, "SELECT achievement, date, guids FROM guild_achievement WHERE guildId = ?", CONNECTION_SYNCH);
     PrepareStatement(CHAR_SEL_GUILD_ACHIEVEMENT_CRITERIA, "SELECT criteria, counter, date, completedGuid FROM guild_achievement_progress WHERE guildId = ?", CONNECTION_SYNCH);
     PrepareStatement(CHAR_UPD_GUILD_EXPERIENCE, "UPDATE guild SET level = ?, experience = ?, todayExperience = ? WHERE guildId = ?", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_UPD_GUILD_CHALLENGE, "UPDATE guild SET DungeonChallenge = ?, RaidChallenge = ?, RatedBGChallenge = ? WHERE guildId = ?", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_UPD_GUILD_RESET_CHALLENGE, "UPDATE guild SET DungeonChallenge = 0, RaidChallenge = 0, RatedBGChallenge = 0 WHERE guildId = ?", CONNECTION_ASYNC);
     PrepareStatement(CHAR_UPD_GUILD_RESET_TODAY_EXPERIENCE, "UPDATE guild SET todayExperience = 0", CONNECTION_ASYNC);
     PrepareStatement(CHAR_INS_GUILD_NEWS, "INSERT INTO guild_newslog (guildid, LogGuid, EventType, PlayerGuid, Flags, Value, Timestamp) VALUES (?, ?, ?, ?, ?, ?, ?)"
                      " ON DUPLICATE KEY UPDATE LogGuid = VALUES (LogGuid), EventType = VALUES (EventType), PlayerGuid = VALUES (PlayerGuid), Flags = VALUES (Flags), Value = VALUES (Value), Timestamp = VALUES (Timestamp)", CONNECTION_ASYNC);
@@ -382,14 +410,14 @@ void CharacterDatabaseConnection::DoPrepareStatements()
                      "extra_flags, stable_slots, at_login, zone, "
                      "death_expire_time, taxi_path, totalKills, "
                      "todayKills, yesterdayKills, chosenTitle, watchedFaction, drunk, health, power1, power2, power3, "
-                     "power4, power5, latency, speccount, activespec, exploredZones, equipmentCache, knownTitles, actionBars, grantableLevels) VALUES "
-                     "(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", CONNECTION_ASYNC);
+                     "power4, power5, latency, speccount, activespec, exploredZones, equipmentCache, knownTitles, actionBars, grantableLevels, ratedBGWins, ratedBGLoose, ratedBGRating) VALUES "
+                     "(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", CONNECTION_ASYNC);
     PrepareStatement(CHAR_UPD_CHARACTER, "UPDATE characters SET name=?,race=?,class=?,gender=?,level=?,xp=?,money=?,playerBytes=?,playerBytes2=?,playerFlags=?,"
                      "map=?,instance_id=?,instance_mode_mask=?,position_x=?,position_y=?,position_z=?,orientation=?,trans_x=?,trans_y=?,trans_z=?,trans_o=?,transguid=?,taximask=?,cinematic=?,totaltime=?,leveltime=?,rest_bonus=?,"
                      "logout_time=?,is_logout_resting=?,resettalents_cost=?,resettalents_time=?,talentTree=?,extra_flags=?,stable_slots=?,at_login=?,zone=?,death_expire_time=?,taxi_path=?,"
                      "totalKills=?,todayKills=?,yesterdayKills=?,chosenTitle=?,"
                      "watchedFaction=?,drunk=?,health=?,power1=?,power2=?,power3=?,power4=?,power5=?,latency=?,speccount=?,activespec=?,exploredZones=?,"
-                     "equipmentCache=?,knownTitles=?,actionBars=?,grantableLevels=?,online=? WHERE guid=?", CONNECTION_ASYNC);
+                     "equipmentCache=?,knownTitles=?,actionBars=?,grantableLevels=?,ratedBGWins=?,ratedBGLoose=?,ratedBGRating=?,online=? WHERE guid=?", CONNECTION_ASYNC);
 
     PrepareStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG, "UPDATE characters SET at_login = at_login | ? WHERE guid = ?", CONNECTION_ASYNC);
     PrepareStatement(CHAR_UPD_REM_AT_LOGIN_FLAG, "UPDATE characters set at_login = at_login & ~ ? WHERE guid = ?", CONNECTION_ASYNC);

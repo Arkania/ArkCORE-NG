@@ -815,34 +815,32 @@ void WorldSession::HandleRequestRatedBgInfo(WorldPacket& recvData)
 {
     TC_LOG_DEBUG("network", "WORLD: CMSG_REQUEST_RATED_BG_INFO");
 
-    uint8 unk;
-    recvData >> unk;
+    uint8 type;
+    recvData >> type;
 
-    TC_LOG_DEBUG("bg.battleground", "WorldSession::HandleRequestRatedBgInfo: unk = %u", unk);
+    TC_LOG_DEBUG("bg.battleground", "WorldSession::HandleRequestRatedBgInfo: unk = %u", type);
 
-    /// @Todo: perfome research in this case
-    /// The unk fields are related to arenas
-    WorldPacket data(SMSG_RATED_BG_STATS, 72);
-    data << uint32(0);      // BgWeeklyWins20vs20
-    data << uint32(0);      // BgWeeklyPlayed20vs20
-    data << uint32(0);      // BgWeeklyPlayed15vs15
-    data << uint32(0);
-    data << uint32(0);      // BgWeeklyWins10vs10
-    data << uint32(0);
-    data << uint32(0);
-    data << uint32(0);
-    data << uint32(0);      // BgWeeklyWins15vs15
-    data << uint32(0);
-    data << uint32(0);
-    data << uint32(0);
-    data << uint32(0);
-    data << uint32(0);
-    data << uint32(0);
-    data << uint32(0);      // BgWeeklyPlayed10vs10
-    data << uint32(0);
-    data << uint32(0);
+    WorldPacket packet1(SMSG_BATTLEFIELD_RATED_INFO);
+    packet1 << uint32(sWorld->getIntConfig(CONFIG_ARENA_CONQUEST_POINTS_REWARD)); // Reward
+    packet1 << uint8(0); // for arena
+    packet1 << uint32(0); // Raiting
+    packet1 << uint32(0); // Unk UInt32 3
+    packet1 << uint32(0); // Conquest Points Weekly Cap
+    packet1 << uint32(0); // Unk UInt32 5
+    packet1 << uint32(0); // Unk UInt32 6
+    packet1 << uint32(0); // Current Conquest Points
+    SendPacket(&packet1);
 
-    SendPacket(&data);
+    WorldPacket packet2(SMSG_BATTLEFIELD_RATED_INFO);
+    packet2 << uint32(sWorld->getIntConfig(CONFIG_RBG_CONQUEST_POINTS_REWARD)); // Reward
+    packet2 << uint8(3); // for rbg
+    packet2 << uint32(_player->GetRatedBGRating()); // Raiting
+    packet2 << uint32(0); // Unk UInt32 3
+    packet2 << uint32(0); // Conquest Points Weekly Cap
+    packet2 << uint32(0); // Unk UInt32 5
+    packet2 << uint32(0); // Unk UInt32 6
+    packet2 << uint32(0); // Current Conquest Points
+    SendPacket(&packet2);
 }
 
 void WorldSession::HandleRequestPvpOptions(WorldPacket& /*recvData*/)
@@ -873,17 +871,26 @@ void WorldSession::HandleRequestRatedBgStats(WorldPacket& /*recvData*/)
 {
     TC_LOG_DEBUG("network", "WORLD: CMSG_REQUEST_RATED_BG_STATS");
 
-    WorldPacket data(SMSG_BATTLEFIELD_RATED_INFO, 29);
-    data << uint32(0);  // Reward
-    data << uint8(3);   // unk
-    data << uint32(0);  // unk
-    data << uint32(0);  // unk
-    data << _player->GetCurrencyWeekCap(CURRENCY_TYPE_CONQUEST_META_RBG, true);
-    data << uint32(0);  // unk
-    data << uint32(0);  // unk
-    data << _player->GetCurrency(CURRENCY_TYPE_CONQUEST_POINTS, true);
-
-    SendPacket(&data);
+    WorldPacket packet(SMSG_RATED_BG_STATS);
+    packet << uint32(0);    // field18
+    packet << uint32(0);    // field3c
+    packet << uint32(0);    // field38
+    packet << uint32(0);    // field44
+    packet << uint32(_player->GetRatedBGWins());   // Rated BG wins
+    packet << uint32(0);    // field48
+    packet << uint32(0);    // field20
+    packet << uint32(0);    // field28
+    packet << uint32(0);    // field14
+    packet << uint32(0);    // field54
+    packet << uint32(0);    // field1c
+    packet << uint32(0);    // field2c
+    packet << uint32(0);    // field40
+    packet << uint32(0);    // field24
+    packet << uint32(0);    // field4c
+    packet << uint32(_player->GetRatedBGWins() + _player->GetRatedBGLoose());   // Rated BG total
+    packet << uint32(0);    // field30
+    packet << uint32(0);    // field50
+    SendPacket(&packet);
 }
 
 void WorldSession::HandleBattlegroundStateQuery(WorldPacket& /*recvData*/)

@@ -2113,6 +2113,30 @@ uint64 ObjectMgr::GetPlayerGUIDByName(std::string const& name) const
     return guid;
 }
 
+bool ObjectMgr::GetPlayerGuildIdByGUID(uint64 guid, uint32 &guildId) const
+{
+    // prevent DB access for online player
+    if (Player* player = ObjectAccessor::FindPlayer(guid))
+    {
+        guildId = player->GetGuildId();
+        return true;
+    }
+
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_GUILD_MEMBER);
+
+    stmt->setUInt32(0, GUID_LOPART(guid));
+
+    PreparedQueryResult result = CharacterDatabase.Query(stmt);
+
+    if (result)
+    {
+        guildId = (*result)[0].GetUInt32();
+        return true;
+    }
+
+    return false;
+}
+
 bool ObjectMgr::GetPlayerNameByGUID(uint64 guid, std::string& name) const
 {
     // prevent DB access for online player

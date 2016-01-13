@@ -29,6 +29,35 @@
 #include "GossipDef.h"
 #include "SocialMgr.h"
 
+void WorldSession::HandleGuildSwitchRankOpcode(WorldPacket& recvPacket)
+{
+    uint32 rankId;
+    bool up;
+
+    recvPacket >> rankId;
+    up = recvPacket.ReadBit();
+
+    TC_LOG_DEBUG("LOG_FILTER_NETWORKIO", "WORLD: Received CMSG_GUILD_SWITCH_RANK rank %u up %u", rankId, up);
+
+    Guild* guild = GetPlayer()->GetGuild();
+    if (!guild)
+    {
+        Guild::SendCommandResult(this, GUILD_COMMAND_CREATE, ERR_GUILD_PLAYER_NOT_IN_GUILD);
+        return;
+    }
+
+    if (GetPlayer()->GetGUID() != guild->GetLeaderGUID())
+    {
+        Guild::SendCommandResult(this, GUILD_COMMAND_INVITE, ERR_GUILD_PERMISSIONS);
+        return;
+    }
+
+    guild->SwitchRank(rankId, up);
+    guild->HandleRoster();
+    guild->HandleQuery(GetPlayer()->GetSession());
+    guild->SendGuildRankInfo(GetPlayer()->GetSession());
+}
+
 void WorldSession::HandleGuildQueryOpcode(WorldPacket& recvPacket)
 {
     uint64 guildGuid, playerGuid;
@@ -838,19 +867,18 @@ void WorldSession::HandleGuildSetGuildMaster(WorldPacket& recvPacket)
 void WorldSession::HandleGuildSetAchievementTracking(WorldPacket& recvPacket)
 {
 	uint32 count = recvPacket.ReadBits(24);
-	std::set<uint32> criteriaIds;
-
-	for (uint32 i = 0; i < count; ++i)
-	{
-		uint32 criteriaId;
-		recvPacket >> criteriaId;
-		criteriaIds.insert(criteriaId);
-	}
-
-	if (Guild* guild = GetPlayer()->GetGuild())
-		guild->HandleSetAchievementTracking(this, criteriaIds);
+	std::set<uint32> achievementIds;
+	
+		for (uint32 i = 0; i < count; ++i)
+		 {
+		uint32 achievementId;
+		recvPacket >> achievementId;
+		achievementIds.insert(achievementId);
+		}
+	
+		if (Guild* guild = GetPlayer()->GetGuild())
+		 guild->HandleSetAchievementTracking(this, achievementIds);
 }
-
 
 void WorldSession::HandleGuildSwitchRank(WorldPacket& recvPacket)
 {
@@ -1033,13 +1061,20 @@ void WorldSession::HandleGuildRenameCallback(std::string newName)
         pGuild->SendGuildRename(newName);
 }
 
-void WorldSession::HandleGuildChallengeRequest(WorldPacket& /*recvPacket*/)
+void WorldSession::HandleGuildChallengeRequest(WorldPacket& recvPacket)
 {
-    if(Guild* pGuild = GetPlayer()->GetGuild())
+    uint8 counter = 4;
+
+    if (Guild* pGuild = GetPlayer()->GetGuild())
     {
         if (Guild::ChallengesMgr* challengesMgr = pGuild->GetChallengesMgr())
         {
-            WorldPacket data(SMSG_GUILD_CHALLENGE_UPDATED,5*4*4);
+            // First check if it's time to reset the challenges.
+            time_t thisTime = time(NULL);
+            if (pGuild->GetChallengesMgr()->CompletedFirstChallenge(pGuild->GetId()) && pGuild->GetChallengesMgr()->GetFirstCompletedChallengeTime(pGuild->GetId()) + WEEK <= thisTime)
+                pGuild->GetChallengesMgr()->ResetWeeklyChallenges();
+
+            WorldPacket data(SMSG_GUILD_CHALLENGE_UPDATED, 5 * 4 * 4);
 
             //Guild Experience Reward block
 
@@ -1055,18 +1090,21 @@ void WorldSession::HandleGuildChallengeRequest(WorldPacket& /*recvPacket*/)
             data << challengesMgr->GetGoldBonusForType(CHALLENGE_TYPE_RATEDBG);                     //rated BG
 
             //Total Count block
+
             data << uint32(0);                                                                      //in the block its always 1
             data << challengesMgr->GetTotalCountFor(CHALLENGE_TYPE_DUNGEON);                        //dungeon
             data << challengesMgr->GetTotalCountFor(CHALLENGE_TYPE_RAID);                           //raid
             data << challengesMgr->GetTotalCountFor(CHALLENGE_TYPE_RATEDBG);                        //rated BG            
 
             //Completion Gold Reward block
+
             data << uint32(0);                                                                      //in the block its always 1
             data << challengesMgr->GetGoldRewardForType(CHALLENGE_TYPE_DUNGEON);                    //dungeon
             data << challengesMgr->GetGoldRewardForType(CHALLENGE_TYPE_RAID);                       //raid
             data << challengesMgr->GetGoldRewardForType(CHALLENGE_TYPE_RATEDBG);                    //rated BG
 
             //Current Count block
+
             data << uint32(0);                                                                      //in the block its always 1
             data << challengesMgr->GetCurrentCountFor(CHALLENGE_TYPE_DUNGEON);                      //dungeon
             data << challengesMgr->GetCurrentCountFor(CHALLENGE_TYPE_RAID);                         //raid
@@ -1077,3 +1115,4 @@ void WorldSession::HandleGuildChallengeRequest(WorldPacket& /*recvPacket*/)
         return;
     }
 }
+

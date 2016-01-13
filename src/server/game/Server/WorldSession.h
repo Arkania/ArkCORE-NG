@@ -648,6 +648,8 @@ class WorldSession
         void SendGuildCancelInvite(std::string unkString, uint8 unkByte);
         void HandleGuildRenameCallback(std::string newName);
         void HandleAutoDeclineGuildInvites(WorldPacket& recvPacket);
+        void HandleGuildSwitchRankOpcode(WorldPacket& recvPacket);
+        void HandleGuildRequestChallengeUpdate(WorldPacket& recvPacket);
 
         // Guild Finder
         void HandleGuildFinderAddRecruit(WorldPacket& recvPacket);

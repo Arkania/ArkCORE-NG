@@ -172,6 +172,7 @@ class Group
             uint8       group;
             uint8       flags;
             uint8       roles;
+            uint32      guildId;
         };
         typedef std::list<MemberSlot> MemberSlotList;
         typedef MemberSlotList::const_iterator member_citerator;
@@ -322,6 +323,14 @@ class Group
 
         //Bot
         uint64 const *GetTargetIcons() const { return m_targetIcons; }
+
+        // Use for guild system
+        bool IsGuildGroupFor(Player *player);
+        uint32 GetMembersCountOfGuild(uint32 guildId);
+        uint32 GetNeededMembersOfSameGuild(uint8 arenaType, Map const *map);
+        float GetGuildXpRateForPlayer(Player *player);
+        void UpdateGuildFor(uint64 guid, uint32 guildId);
+        bool MemberLevelIsInRange(uint32 levelMin, uint32 levelMax);
 
     protected:
         bool _setMembersGroup(uint64 guid, uint8 group);

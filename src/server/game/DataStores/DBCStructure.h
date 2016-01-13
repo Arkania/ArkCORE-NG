@@ -142,6 +142,8 @@ struct AchievementCriteriaEntry
             uint32 count;
         } currencyGain;
 
+        // ACHIEVEMENT_CRITERIA_TYPE_DAMAGE_DONE            = 13 = 55
+
         // ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_DAILY_QUEST   = 14
         struct
         {
@@ -215,7 +217,7 @@ struct AchievementCriteriaEntry
             uint32  castCount;                              // 4
         } cast_spell;
 
-        // ACHIEVEMENT_CRITERIA_TYPE_BG_OBJECTIVE_CAPTURE
+        // ACHIEVEMENT_CRITERIA_TYPE_BG_OBJECTIVE_CAPTURE   = 30
         struct
         {
             uint32 objectiveId;                             // 3
@@ -268,7 +270,7 @@ struct AchievementCriteriaEntry
             uint32  teamtype;                               // 3 {2, 3, 5}
         } highest_team_rating;
 
-        // ACHIEVEMENT_CRITERIA_TYPE_REACH_TEAM_RATING      = 39
+        // ACHIEVEMENT_CRITERIA_TYPE_REACH_TEAM_RATING      = 39 -- missing??
         struct
         {
             uint32  teamtype;                               // 3 {2, 3, 5}
@@ -389,7 +391,6 @@ struct AchievementCriteriaEntry
         } do_emote;
         // ACHIEVEMENT_CRITERIA_TYPE_DAMAGE_DONE            = 13
         // ACHIEVEMENT_CRITERIA_TYPE_HEALING_DONE           = 55
-        // ACHIEVEMENT_CRITERIA_TYPE_GET_KILLING_BLOWS      = 56
         struct
         {
             uint32  unused;                                 // 3
@@ -431,6 +432,8 @@ struct AchievementCriteriaEntry
             uint32  useCount;                               // 4
         } use_gameobject;
 
+        // ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2       = 69 = 28
+
         // ACHIEVEMENT_CRITERIA_TYPE_SPECIAL_PVP_KILL       = 70
         /// @todo are those special criteria stored in the dbc or do we have to add another sql table?
         struct
@@ -459,6 +462,20 @@ struct AchievementCriteriaEntry
             uint32  unused;                                 // 3
             uint32  duelCount;                              // 4
         } win_duel;
+
+        // ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE_TYPE     = 78
+        struct
+        {
+            uint32  unused;                                 // 3
+            uint32  count;                                  // 4
+        } kill_creature_type;
+
+        // ACHIEVEMENT_CRITERIA_TYPE_LOOT_EPIC_ITEM         = 90
+        struct
+        {
+            uint32  unused;                                 // 3
+            uint32  count;                                 // 4
+        } item_type_count;
 
         // ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_POWER          = 96
         struct
@@ -490,6 +507,8 @@ struct AchievementCriteriaEntry
             uint32  lootType;                               // 3 3=fishing, 2=pickpocket, 4=disentchant
             uint32  lootTypeCount;                          // 4
         } loot_type;
+
+        // ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2            = 110 = 29
 
         // ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILL_LINE       = 112
         struct
@@ -554,6 +573,13 @@ struct AchievementCriteriaEntry
             uint32 winCount;
         } win_rated_battleground;
 
+        // ACHIEVEMENT_CRITERIA_TYPE_REACH_BG_RATING = 132
+        struct
+        {
+            uint32  unused;                                 // 3
+            uint32  rating;                                 // 4
+        } rated_bg_rating;
+
         // ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUESTS_GUILD = 134
         struct
         {
@@ -575,11 +601,11 @@ struct AchievementCriteriaEntry
             uint32 count;
         } kill_creature_type_guild;
 
-        struct
-        {
-            uint32 unused;       // 3
-            uint32 goldInCopper; // 4
-        } guild_gold_repairs;
+		struct
+		{
+			uint32 unused;       // 3
+			uint32 goldInCopper; // 4
+		} guild_gold_repairs;
 
         struct
         {

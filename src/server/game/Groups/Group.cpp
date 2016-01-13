@@ -2332,6 +2332,117 @@ bool Group::IsAssistant(uint64 guid) const
     return mslot->flags & MEMBER_FLAG_ASSISTANT;
 }
 
+bool Group::IsGuildGroupFor(Player *player)
+{
+    if (!IsMember(player->GetGUID()))
+        return false;
+
+    if (!player->GetGuildId())
+        return false;
+
+    if (!player->GetMap()->IsDungeon() &&
+        !(player->InArena() && player->GetBattleground()->isRated()))
+        return false;
+
+    if (GetMembersCountOfGuild(player->GetGuildId()) < GetNeededMembersOfSameGuild((player->InArena() && player->GetBattleground()->isRated())
+        ? player->GetBattleground()->GetArenaType() : 0, player->GetMap()))
+        return false;
+
+    return true;
+}
+
+float Group::GetGuildXpRateForPlayer(Player *player)
+{
+    if (!IsMember(player->GetGUID()))
+        return 0.0f;
+
+    if (!player->GetGuildId())
+        return 0.0f;
+
+    if (!player->GetMap()->IsDungeon() &&
+        !(player->InArena() && player->GetBattleground()->isRated()))
+        return 0.0f;
+
+    if (player->GetMap()->IsNonRaidDungeon())
+    {
+        switch (GetMembersCountOfGuild(player->GetGuildId()))
+        {
+        case 3:
+            return 0.5f;
+        case 4:
+            return 1.0f;
+        case 5:
+            return 1.25f;
+        default:
+            return 0.0f;
+        }
+    }
+
+    return 1.0f;
+}
+
+bool Group::MemberLevelIsInRange(uint32 levelMin, uint32 levelMax)
+{
+    for (member_citerator itr = m_memberSlots.begin(); itr != m_memberSlots.end(); ++itr)
+        if (Player *member = ObjectAccessor::FindPlayer(itr->guid))
+            if (member->getLevel() < levelMin || member->getLevel() > levelMax)
+                return false;
+
+    return true;
+}
+
+uint32 Group::GetMembersCountOfGuild(uint32 guildId)
+{
+    uint32 count = 0;
+
+    for (member_citerator itr = m_memberSlots.begin(); itr != m_memberSlots.end(); ++itr)
+        if (itr->guildId == guildId)
+            ++count;
+
+    return count;
+}
+
+uint32 Group::GetNeededMembersOfSameGuild(uint8 arenaType, Map const *map)
+{
+    // For arena (100% of member)
+    if (arenaType && map->IsBattleArena())
+        return arenaType;
+
+    if (map->IsNonRaidDungeon())
+        return 3;
+
+    if (map->IsRaid())
+    {
+        if (map->GetEntry()->Expansion() == 0) // classic
+            return 10;
+
+        if (map->GetEntry()->Expansion() == 1) // TBC
+            return 8;
+
+        if (map->Is25ManRaid())
+            return 20;
+
+        return 8;
+    }
+
+    return 0;
+}
+
+void Group::UpdateGuildFor(uint64 guid, uint32 guildId)
+{
+    for (member_witerator itr = m_memberSlots.begin(); itr != m_memberSlots.end(); ++itr)
+    {
+        if (itr->guid == guid)
+            itr->guildId = guildId; // Change guild ID
+
+        // Update guild flag
+        if (itr->guildId == guildId)
+            if (Player *member = ObjectAccessor::FindPlayer(itr->guid))
+                if (Guild *guild = member->GetGuild())
+                    guild->HandleGuildPartyRequest(member->GetSession());
+    }
+}
+
 bool Group::SameSubGroup(uint64 guid1, uint64 guid2) const
 {
     member_citerator mslot2 = _getMemberCSlot(guid2);

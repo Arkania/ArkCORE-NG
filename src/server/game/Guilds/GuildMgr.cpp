@@ -123,7 +123,9 @@ void GuildMgr::LoadGuilds()
                                                      //          0          1       2             3              4              5              6
         QueryResult result = CharacterDatabase.Query("SELECT g.guildid, g.name, g.leaderguid, g.EmblemStyle, g.EmblemColor, g.BorderStyle, g.BorderColor, "
                                                      //   7                  8       9       10            11          12        13                14                 15
-                                                     "g.BackgroundColor, g.info, g.motd, g.createdate, g.BankMoney, g.level, g.experience, g.todayExperience, COUNT(gbt.guildid) "
+                                                     "g.BackgroundColor, g.info, g.motd, g.createdate, g.BankMoney, g.level, g.experience, g.todayExperience, COUNT(gbt.guildid), "
+                                                     //      16                 17                18
+                                                     "g.DungeonChallenge, g.RaidChallenge, g.RatedBGChallenge "
                                                      "FROM guild g LEFT JOIN guild_bank_tab gbt ON g.guildid = gbt.guildid GROUP BY g.guildid ORDER BY g.guildid ASC");
 
         if (!result)
@@ -200,10 +202,15 @@ void GuildMgr::LoadGuilds()
 
                                                 //           0           1        2     3      4        5       6       7       8       9       10
         QueryResult result = CharacterDatabase.Query("SELECT gm.guildid, gm.guid, rank, pnote, offnote, w.tab0, w.tab1, w.tab2, w.tab3, w.tab4, w.tab5, "
-                                                //    11      12      13       14      15       16       17      18         19
-                                                     "w.tab6, w.tab7, w.money, c.name, c.level, c.class, c.zone, c.account, c.logout_time "
+                                                //      11      12      13       14      15       16       17      18         19					20
+                                                     "w.tab6, w.tab7, w.money, c.name, c.level, c.class, c.zone, c.account, c.logout_time, gm.activity, "
+                                                //	       21                22                23            24					25
+                                                     "gm.weekActivity, c.achievementPoint, r.standing, gm.weekReputation, gm.profession1_level, "
+                                                //			26						27						28						29					30
+                                                     "gm.profession1_skillID, gm.profession1_rank, gm.profession2_level, gm.profession2_skillID, gm.profession2_rank "
                                                      "FROM guild_member gm "
                                                      "LEFT JOIN guild_member_withdraw w ON gm.guid = w.guid "
+                                                     "LEFT JOIN character_reputation r ON gm.guid = r.guid AND r.faction = 1168 "
                                                      "LEFT JOIN characters c ON c.guid = gm.guid ORDER BY gm.guildid ASC");
 
         if (!result)
@@ -449,25 +456,32 @@ void GuildMgr::LoadGuilds()
     }
 
     // 11. Load challengesMgr
-    TC_LOG_INFO("misc", "Loading challenges...");
+    TC_LOG_INFO("server.loading", "Loading challenges...");
     {
         for (GuildContainer::const_iterator itr = GuildStore.begin(); itr != GuildStore.end(); ++itr)
         {
-            itr->second->GetChallengesMgr()->LoadFromDB();
+            itr->second->GetChallengesMgr()->LoadChallengesFromDB();
         }
     }
 
     // 12. Validate loaded guild data
-    TC_LOG_INFO("misc", "Validating data of loaded guilds...");
+    TC_LOG_INFO("server.loading", "Validating data of loaded guilds...");
     {
         uint32 oldMSTime = getMSTime();
+        std::set<Guild*> rm; // temporary storage to avoid modifying GuildStore with RemoveGuild() while iterating
 
-        for (GuildContainer::iterator itr = GuildStore.begin(); itr != GuildStore.end();)
+        for (GuildContainer::iterator itr = GuildStore.begin(); itr != GuildStore.end(); ++itr)
         {
             Guild* guild = itr->second;
-            ++itr;
             if (guild && !guild->Validate())
-                delete guild;
+                rm.insert(guild);
+        }
+
+        for (std::set<Guild*>::iterator itr = rm.begin(); itr != rm.end(); ++itr)
+        {
+            Guild* guild = *itr;
+            RemoveGuild(guild->GetId());
+            delete guild;
         }
 
         TC_LOG_INFO("server.loading", ">> Validated data of loaded guilds in %u ms", GetMSTimeDiffToNow(oldMSTime));
@@ -477,10 +491,9 @@ void GuildMgr::LoadGuilds()
 void GuildMgr::LoadGuildXpForLevel()
 {
     uint32 oldMSTime = getMSTime();
-    uint32 maxLevel = sWorld->getIntConfig(CONFIG_GUILD_MAX_LEVEL);
-
-    GuildXPperLevel.resize(maxLevel + 1);
-    for (uint8 level = 0; level <= maxLevel; ++level)
+   
+    GuildXPperLevel.resize(sWorld->getIntConfig(CONFIG_GUILD_MAX_LEVEL));
+    for (uint8 level = 0; level < sWorld->getIntConfig(CONFIG_GUILD_MAX_LEVEL); ++level)
         GuildXPperLevel[level] = 0;
 
     //                                                 0         1
@@ -488,7 +501,7 @@ void GuildMgr::LoadGuildXpForLevel()
 
     if (!result)
     {
-        TC_LOG_ERROR("server.loading", ">> Loaded 0 xp for guild level definitions. DB table `guild_xp_for_level` is empty.");
+        TC_LOG_INFO("server.loading", ">> Loaded 0 xp for guild level definitions. DB table `guild_xp_for_level` is empty.");
         return;
     }
 
@@ -498,12 +511,12 @@ void GuildMgr::LoadGuildXpForLevel()
     {
         Field* fields = result->Fetch();
 
-        uint32 level        = fields[0].GetUInt32();
+        uint32 level        = fields[0].GetUInt8();
         uint64 requiredXP   = fields[1].GetUInt64();
 
-        if (level > maxLevel)
+        if (level >= sWorld->getIntConfig(CONFIG_GUILD_MAX_LEVEL))
         {
-            TC_LOG_INFO("misc", "Unused (> Guild.MaxLevel in worldserver.conf) level %u in `guild_xp_for_level` table, ignoring.", uint32(level));
+            TC_LOG_ERROR("server.loading", "Unused (> Guild.MaxLevel in worldserver.conf) level %u in `guild_xp_for_level` table, ignoring.", uint32(level));
             continue;
         }
 
@@ -513,11 +526,11 @@ void GuildMgr::LoadGuildXpForLevel()
     } while (result->NextRow());
 
     // fill level gaps
-    for (uint8 level = 1; level <= maxLevel; ++level)
+    for (uint8 level = 1; level < sWorld->getIntConfig(CONFIG_GUILD_MAX_LEVEL); ++level)
     {
         if (!GuildXPperLevel[level])
         {
-            TC_LOG_ERROR("sql.sql", "Level %i does not have XP for guild level data. Using data of level [%i] + 1660000.", level, level - 1);
+            TC_LOG_ERROR("server.loading", "Level %i does not have XP for guild level data. Using data of level [%i] + 1660000.", level + 1, level);
             GuildXPperLevel[level] = GuildXPperLevel[level - 1] + 1660000;
         }
     }
@@ -534,7 +547,7 @@ void GuildMgr::LoadGuildRewards()
 
     if (!result)
     {
-        TC_LOG_ERROR("server.loading", ">> Loaded 0 guild reward definitions. DB table `guild_rewards` is empty.");
+        TC_LOG_INFO("server.loading", ">> Loaded 0 guild reward definitions. DB table `guild_rewards` is empty.");
         return;
     }
 
@@ -580,7 +593,23 @@ void GuildMgr::ResetTimes(bool week)
     CharacterDatabase.Execute(CharacterDatabase.GetPreparedStatement(CHAR_UPD_GUILD_RESET_TODAY_EXPERIENCE));
     CharacterDatabase.Execute(CharacterDatabase.GetPreparedStatement(CHAR_DEL_GUILD_MEMBER_WITHDRAW));
 
+    // Delete too old old guild member
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_OLD_OLD_GUILD_MEMBER);
+    stmt->setUInt32(0, uint32(time(NULL) - time_t(30 * DAY)));
+    CharacterDatabase.Execute(stmt);
+    
+    // Reset week reputation for old guild member
+    if (week)
+        CharacterDatabase.Execute(CharacterDatabase.GetPreparedStatement(CHAR_RESET_OLD_GUILD_WEEK_REPUTATION));
+    
     for (GuildContainer::const_iterator itr = GuildStore.begin(); itr != GuildStore.end(); ++itr)
         if (Guild* guild = itr->second)
             guild->ResetTimes(week);
+}
+
+void GuildMgr::ResetDailyXPCap()
+{
+    for (GuildContainer::const_iterator itr = GuildStore.begin(); itr != GuildStore.end(); ++itr)
+        if (Guild* guild = itr->second)
+            guild->ResetDailyExperience();
 }

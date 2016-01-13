@@ -173,6 +173,8 @@ class boss_kirtonos_the_herald : public CreatureScript
                                 me->SetDisableGravity(false);
                                 DoCast(me, SPELL_KIRTONOS_TRANSFORM);
                                 me->SetCanFly(false);
+                                me->RemoveByteFlag(UNIT_FIELD_BYTES_1, 3, 0x02);
+                                me->RemoveUnitMovementFlag(MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_FLYING);
                                 events.ScheduleEvent(INTRO_5, 1000);
                                 break;
                             case INTRO_5:
@@ -234,12 +236,16 @@ class boss_kirtonos_the_herald : public CreatureScript
                                 me->RemoveAura(SPELL_KIRTONOS_TRANSFORM);
                                 me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, uint32(0));
                                 me->SetCanFly(false);
+                                me->RemoveByteFlag(UNIT_FIELD_BYTES_1, 3, 0x02);
+                                me->RemoveUnitMovementFlag(MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_FLYING);
                             }
                             else
                             {
                                 DoCast(me, SPELL_KIRTONOS_TRANSFORM);
                                 me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, uint32(WEAPON_KIRTONOS_STAFF));
                                 me->SetCanFly(true);
+                                me->SetByteFlag(UNIT_FIELD_BYTES_1, 3, 0x02);
+                                me->AddUnitMovementFlag(MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_FLYING);
                             }
                             events.ScheduleEvent(EVENT_KIRTONOS_TRANSFORM, urand(16000, 18000));
                             break;
@@ -270,7 +276,7 @@ enum Brazier_Of_The_Herald
 
 Position const PosSummon[1] =
 {
-    { 315.028f, 70.53845f, 102.1496f, 0.3859715f }
+    { 315.028f, 70.53845f, 102.1496f, 0.3859715f } // { 328.028f, 93.53845f, 106.1496f, 3.0859715f }
 };
 
 class go_brazier_of_the_herald : public GameObjectScript

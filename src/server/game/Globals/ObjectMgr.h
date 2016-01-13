@@ -796,6 +796,7 @@ class ObjectMgr
         * @return true if player was found, false otherwise
         */
         bool GetPlayerNameByGUID(uint64 guid, std::string& name) const;
+        bool GetPlayerGuildIdByGUID(uint64 guid, uint32 &guildId) const;
         uint32 GetPlayerTeamByGUID(uint64 guid) const;
         uint32 GetPlayerAccountIdByGUID(uint64 guid) const;
         uint32 GetPlayerAccountIdByPlayerName(std::string const& name) const;

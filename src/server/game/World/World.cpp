@@ -1242,6 +1242,10 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_BG_REWARD_WINNER_CONQUEST_LAST]  = sConfigMgr->GetIntDefault("Battleground.RewardWinnerConquestLast", 5000);
     m_int_configs[CONFIG_BG_REWARD_LOSER_HONOR_FIRST]  = sConfigMgr->GetIntDefault("Battleground.RewardLoserHonorFirst", 4500);
     m_int_configs[CONFIG_BG_REWARD_LOSER_HONOR_LAST]   = sConfigMgr->GetIntDefault("Battleground.RewardLoserHonorLast", 3500);
+    m_int_configs[CONFIG_RBG_CONQUEST_POINTS_REWARD] = sConfigMgr->GetIntDefault("Battleground.RatedConquestPointsReward", 400);
+
+    // Arena
+    m_int_configs[CONFIG_ARENA_CONQUEST_POINTS_REWARD] = sConfigMgr->GetIntDefault("Arena.ConquestPointsReward", 135);
 
     // Max instances per hour
     m_int_configs[CONFIG_MAX_INSTANCES_PER_HOUR] = sConfigMgr->GetIntDefault("AccountInstancesPerHour", 5);

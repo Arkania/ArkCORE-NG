@@ -2112,6 +2112,7 @@ Battleground.RewardWinnerHonorLast      = 13500
 Battleground.RewardWinnerConquestLast   = 5000
 Battleground.RewardLoserHonorFirst      = 4500
 Battleground.RewardLoserHonorLast       = 3500
+Battleground.RatedConquestPointsReward	= 400
 
 #
 ###################################################################################################
@@ -2257,6 +2258,13 @@ Arena.ArenaStartPersonalRating = 0
 #        Default:     1500
 
 Arena.ArenaStartMatchmakerRating = 1500
+
+#
+#    Arena.ConquestPointsReward
+#        Description: 
+#        Default:     180
+
+Arena.ConquestPointsReward = 135
 
 #
 #    ArenaLog.ExtendedInfo

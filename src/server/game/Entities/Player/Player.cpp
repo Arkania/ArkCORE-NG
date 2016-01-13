@@ -950,6 +950,9 @@ Player::Player(WorldSession* session): Unit(true), phaseMgr(this)
     m_achievementMgr = new AchievementMgr<Player>(this);
     m_archaeologyMgr = new ArchaeologyMgr(this);
     m_reputationMgr = new ReputationMgr(this);
+
+    m_ratedBGLoose = 0;
+    m_ratedBGWins = 0;
 }
 
 Player::~Player()
@@ -5917,7 +5920,7 @@ void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmC
 
     if (uint32 guildId = GetGuildIdFromDB(playerguid))
         if (Guild* guild = sGuildMgr->GetGuildById(guildId))
-            guild->DeleteMember(guid, false, false, true);
+            guild->DeleteMember(guid, false, false);
 
     // remove from arena teams
     LeaveAllArenaTeams(playerguid);
@@ -18650,8 +18653,8 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
     //"totalKills, todayKills, yesterdayKills, chosenTitle, watchedFaction, drunk, "
     // 46      47      48      49      50      51      52           53         54          55             56
     //"health, power1, power2, power3, power4, power5, instance_id, speccount, activespec, exploredZones, equipmentCache, "
-    // 57           58          59
-    //"knownTitles, actionBars, grantableLevels FROM characters WHERE guid = '%u'", guid);
+    // 57           58          59                  60              61          62  
+    //"knownTitles, actionBars, grantableLevels, ratedBGWins, ratedBGLoose, ratedBGRating FROM characters WHERE guid = '%u'", guid);
     PreparedQueryResult result = holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_FROM);
     if (!result)
     {
@@ -19344,6 +19347,10 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
     _LoadEquipmentSets(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_EQUIPMENT_SETS));
 
     _LoadCUFProfiles(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_CUF_PROFILES));
+
+    SetRatedBGWins(fields[60].GetUInt32());
+    SetRatedBGLoose(fields[61].GetUInt32());
+    SetRatedBGRating(fields[62].GetUInt32());
 
     return true;
 }
@@ -20920,6 +20927,9 @@ void Player::SaveToDB(bool create /*=false*/)
 
         stmt->setUInt8(index++, GetByteValue(PLAYER_FIELD_BYTES, 2));
         stmt->setUInt32(index++, m_grantableLevels);
+        stmt->setUInt32(index++, GetRatedBGWins());
+        stmt->setUInt32(index++, GetRatedBGLoose());
+        stmt->setUInt32(index++, GetRatedBGRating());
     }
     else
     {
@@ -21052,6 +21062,11 @@ void Player::SaveToDB(bool create /*=false*/)
         stmt->setUInt32(index++, m_grantableLevels);
 
         stmt->setUInt8(index++, IsInWorld() && !GetSession()->PlayerLogout() ? 1 : 0);
+
+        stmt->setUInt32(index++, GetRatedBGWins());
+        stmt->setUInt32(index++, GetRatedBGLoose());
+        stmt->setUInt32(index++, GetRatedBGRating());
+
         // Index
         stmt->setUInt32(index++, GetGUIDLow());
     }

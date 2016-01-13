@@ -40,30 +40,30 @@ public:
     {
         static ChatCommand guildCommandTable[] =
         {
-            { "create",   rbac::RBAC_PERM_COMMAND_GUILD_CREATE,   true, &HandleGuildCreateCommand,           "", NULL },
-            { "delete",   rbac::RBAC_PERM_COMMAND_GUILD_DELETE,   true, &HandleGuildDeleteCommand,           "", NULL },
-            { "invite",   rbac::RBAC_PERM_COMMAND_GUILD_INVITE,   true, &HandleGuildInviteCommand,           "", NULL },
-            { "uninvite", rbac::RBAC_PERM_COMMAND_GUILD_UNINVITE, true, &HandleGuildUninviteCommand,         "", NULL },
-            { "rank",     rbac::RBAC_PERM_COMMAND_GUILD_RANK,     true, &HandleGuildRankCommand,             "", NULL },
-            { "rename",   rbac::RBAC_PERM_COMMAND_GUILD_RENAME,   true, &HandleGuildRenameCommand,           "", NULL },
-            { NULL,       0,                               false, NULL,                                "", NULL }
+            { "create", rbac::RBAC_PERM_COMMAND_GUILD_CREATE, true, &HandleGuildCreateCommand, "", NULL },
+            { "delete", rbac::RBAC_PERM_COMMAND_GUILD_DELETE, true, &HandleGuildDeleteCommand, "", NULL },
+            { "invite", rbac::RBAC_PERM_COMMAND_GUILD_INVITE, true, &HandleGuildInviteCommand, "", NULL },
+            { "uninvite", rbac::RBAC_PERM_COMMAND_GUILD_UNINVITE, true, &HandleGuildUninviteCommand, "", NULL },
+            { "rank", rbac::RBAC_PERM_COMMAND_GUILD_RANK, true, &HandleGuildRankCommand, "", NULL },
+            { "rename", rbac::RBAC_PERM_COMMAND_GUILD_RENAME, true, &HandleGuildRenameCommand, "", NULL },
+            { NULL, 0, false, NULL, "", NULL }
         };
         static ChatCommand commandTable[] =
         {
-            { "guild", rbac::RBAC_PERM_COMMAND_GUILD,  true, NULL, "", guildCommandTable },
-            { NULL,    0,                       false, NULL, "", NULL }
+            { "guild", rbac::RBAC_PERM_COMMAND_GUILD, true, NULL, "", guildCommandTable },
+            { NULL, 0, false, NULL, "", NULL }
         };
         return commandTable;
     }
 
     /** \brief GM command level 3 - Create a guild.
-     *
-     * This command allows a GM (level 3) to create a guild.
-     *
-     * The "args" parameter contains the name of the guild leader
-     * and then the name of the guild.
-     *
-     */
+    *
+    * This command allows a GM (level 3) to create a guild.
+    *
+    * The "args" parameter contains the name of the guild leader
+    * and then the name of the guild.
+    *
+    */
     static bool HandleGuildCreateCommand(ChatHandler* handler, char const* args)
     {
         if (!*args)
@@ -167,7 +167,7 @@ public:
         if (!targetGuild)
             return false;
 
-        targetGuild->DeleteMember(targetGuid, false, true, true);
+        targetGuild->DeleteMember(targetGuid, false, true);
         return true;
     }
 

@@ -70,6 +70,7 @@ typedef std::deque<Mail*> PlayerMails;
 #define PLAYER_MAX_SKILLS           128
 #define PLAYER_MAX_DAILY_QUESTS     25
 #define PLAYER_EXPLORED_ZONES_SIZE  156
+#define PLAYER_GUILD_REPUTATION     1168
 
 // Note: SPELLMOD_* values is aura types in fact
 enum SpellModType
@@ -1962,7 +1963,19 @@ class Player : public Unit, public GridObject<Player>
         uint32 GetArenaPersonalRating(uint8 slot) const { return GetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (slot * ARENA_TEAM_END) + ARENA_TEAM_PERSONAL_RATING); }
         void SetArenaTeamIdInvited(uint32 ArenaTeamId) { m_ArenaTeamIdInvited = ArenaTeamId; }
         uint32 GetArenaTeamIdInvited() { return m_ArenaTeamIdInvited; }
+
         uint32 GetRBGPersonalRating() const { return 0; }
+
+        void SetRatedBGWins(uint32 value) { m_ratedBGWins = value; }
+        uint32 GetRatedBGWins() const { return m_ratedBGWins; }
+        void SetRatedBGLoose(uint32 value) { m_ratedBGLoose = value; }
+        uint32 GetRatedBGLoose() const { return m_ratedBGLoose; }
+        void SetRatedBGRating(uint32 value)
+        {
+            UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_BG_RATING, value);
+            SetUInt32Value(PLAYER_FIELD_BATTLEGROUND_RATING, value);
+        }
+        uint32 GetRatedBGRating() const { return GetUInt32Value(PLAYER_FIELD_BATTLEGROUND_RATING); }
 
         Difficulty GetDifficulty(bool isRaid) const { return isRaid ? m_raidDifficulty : m_dungeonDifficulty; }
         Difficulty GetDungeonDifficulty() const { return m_dungeonDifficulty; }
@@ -3009,6 +3022,9 @@ class Player : public Unit, public GridObject<Player>
         uint32 _maxPersonalArenaRate;
 
         PhaseMgr phaseMgr;
+
+        uint32 m_ratedBGLoose;
+        uint32 m_ratedBGWins;
 };
 
 void AddItemsSetItem(Player*player, Item* item);
