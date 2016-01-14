@@ -1,0 +1,14 @@
+
+ALTER TABLE `creature_template_outfits`
+MODIFY COLUMN `head`  int(10) NOT NULL DEFAULT 0 AFTER `facialhair`,
+MODIFY COLUMN `shoulders`  int(10) NOT NULL DEFAULT 0 AFTER `head`,
+MODIFY COLUMN `body`  int(10) NOT NULL DEFAULT 0 AFTER `shoulders`,
+MODIFY COLUMN `chest`  int(10) NOT NULL DEFAULT 0 AFTER `body`,
+MODIFY COLUMN `waist`  int(10) NOT NULL DEFAULT 0 AFTER `chest`,
+MODIFY COLUMN `legs`  int(10) NOT NULL DEFAULT 0 AFTER `waist`,
+MODIFY COLUMN `feet`  int(10) NOT NULL DEFAULT 0 AFTER `legs`,
+MODIFY COLUMN `wrists`  int(10) NOT NULL DEFAULT 0 AFTER `feet`,
+MODIFY COLUMN `hands`  int(10) NOT NULL DEFAULT 0 AFTER `wrists`,
+MODIFY COLUMN `back`  int(10) NOT NULL DEFAULT 0 AFTER `hands`,
+MODIFY COLUMN `tabard`  int(10) NOT NULL DEFAULT 0 AFTER `back`;
+
