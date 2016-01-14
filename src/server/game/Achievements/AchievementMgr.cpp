@@ -110,6 +110,8 @@ bool AchievementCriteriaData::IsValid(AchievementCriteriaEntry const* criteria)
         case ACHIEVEMENT_CRITERIA_TYPE_USE_ITEM:                // only Children's Week achievements
         case ACHIEVEMENT_CRITERIA_TYPE_GET_KILLING_BLOWS:
         case ACHIEVEMENT_CRITERIA_TYPE_REACH_LEVEL:
+        case ACHIEVEMENT_CRITERIA_TYPE_EARNED_PVP_TITLE:        // not shure..
+        case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST_COUNT:    // not shure..
             break;
         default:
             if (dataType != ACHIEVEMENT_CRITERIA_DATA_TYPE_SCRIPT)
@@ -3611,6 +3613,7 @@ void AchievementGlobalMgr::LoadAchievementCriteriaData()
         if (!criteria)
         {
 			TC_LOG_ERROR("sql.sql", "Table `achievement_criteria_data` has data for non-existing criteria (Entry: %u), ignore.", criteria_id);
+            TC_LOG_ERROR("sql.sql", "Possible solution: DELETE FROM achievement_criteria_data WHERE criteria_id=%u;", criteria_id);            
             continue;
         }
 

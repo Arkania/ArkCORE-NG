@@ -996,6 +996,7 @@ void ObjectMgr::LoadCreatureAddons()
         if (!creData)
         {
             TC_LOG_ERROR("sql.sql", "Creature (GUID: %u) does not exist but has a record in `creature_addon`", guid);
+            TC_LOG_ERROR("sql.sql", "Possible solution: DELETE FROM creature_addon WHERE guid=%u;", guid);
             continue;
         }
 
