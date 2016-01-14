@@ -139,7 +139,7 @@ class boss_kirtonos_the_herald : public CreatureScript
             {
                 if (type == WAYPOINT_MOTION_TYPE && id == POINT_KIRTONOS_LAND)
                 {
-                    events.ScheduleEvent(INTRO_2, 1500);
+                    events.ScheduleEvent(INTRO_2, 500);
                 }
             }
 
@@ -171,11 +171,8 @@ class boss_kirtonos_the_herald : public CreatureScript
                                     brazier->SetGoState(GO_STATE_READY);
                                 DoCast(me, SPELL_KIRTONOS_TRANSFORM);
                                 me->SetCanFly(false);
-                                me->RemoveByteFlag(UNIT_FIELD_BYTES_1, 3, 0x02);
-                                me->RemoveUnitMovementFlag(MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_FLYING);
-                                me->SetWalk(true);
                                 me->SetDisableGravity(false);
-                                printf("EVENT INTRO_4: ausgeschaltet\n");
+                                me->RemoveByteFlag(UNIT_FIELD_BYTES_1, 3, 0x02);
                                 events.ScheduleEvent(INTRO_5, 1000);
                                 break;
                             case INTRO_5:
@@ -238,8 +235,7 @@ class boss_kirtonos_the_herald : public CreatureScript
                                 me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, uint32(0));
                                 me->SetCanFly(false);
                                 me->RemoveByteFlag(UNIT_FIELD_BYTES_1, 3, 0x02);
-                                me->RemoveUnitMovementFlag(MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_FLYING);
-                                printf("EVENT_KIRTONOS_TRANSFORM: ausgeschaltet\n");
+                                // me->RemoveUnitMovementFlag(MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_FLYING);
                             }
                             else
                             {
@@ -247,8 +243,7 @@ class boss_kirtonos_the_herald : public CreatureScript
                                 me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, uint32(WEAPON_KIRTONOS_STAFF));
                                 me->SetCanFly(true);
                                 me->SetByteFlag(UNIT_FIELD_BYTES_1, 3, 0x02);
-                                me->AddUnitMovementFlag(MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_FLYING);
-                                printf("EVENT_KIRTONOS_TRANSFORM: eingeschaltet\n");
+                                // me->AddUnitMovementFlag(MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_FLYING);
                             }
                             events.ScheduleEvent(EVENT_KIRTONOS_TRANSFORM, urand(16000, 18000));
                             break;
@@ -289,9 +284,12 @@ class go_brazier_of_the_herald : public GameObjectScript
 
         bool OnGossipHello(Player* player, GameObject* go) override
         {
-            go->UseDoorOrButton();
-            go->PlayDirectSound(SOUND_SCREECH, 0);
-            player->SummonCreature(NPC_KIRTONOS, PosSummon[0], TEMPSUMMON_DEAD_DESPAWN, 900000);
+            if (player && player->GetQuestStatus(27147) == QUEST_STATUS_INCOMPLETE)
+            {
+                go->UseDoorOrButton();
+                go->PlayDirectSound(SOUND_SCREECH, 0);
+                player->SummonCreature(NPC_KIRTONOS, PosSummon[0], TEMPSUMMON_DEAD_DESPAWN, 900000);
+            }
             return true;
         }
 };
