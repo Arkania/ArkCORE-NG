@@ -238,7 +238,7 @@ enum AchievementCriteriaTypes
     ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2              = 69,
     ACHIEVEMENT_CRITERIA_TYPE_SPECIAL_PVP_KILL              = 70,
     ACHIEVEMENT_CRITERIA_TYPE_FISH_IN_GAMEOBJECT            = 72,
-    ACHIEVEMENT_CRITERIA_TYPE_ON_LOGIN                      = 73,
+    // reused ?? = 73
 	ACHIEVEMENT_CRITERIA_TYPE_EARNED_PVP_TITLE              = 74, // TODO: title id is not mentioned in dbc
     ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILLLINE_SPELLS        = 75,
     ACHIEVEMENT_CRITERIA_TYPE_WIN_DUEL                      = 76,
@@ -291,10 +291,10 @@ enum AchievementCriteriaTypes
     ACHIEVEMENT_CRITERIA_TYPE_HONORABLE_KILLS_GUILD         = 135,
     ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE_TYPE_GUILD      = 136,
     ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_GUILD_CHALLENGE_TYPE = 138, //struct { Flag flag; uint32 count; } 1: Guild Dungeon, 2:Guild Challenge, 3:Guild battlefield
-    ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_GUILD_CHALLENGE      = 139  //struct { uint32 count; } Guild Challenge
+    ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_GUILD_CHALLENGE      = 139, //struct { uint32 count; } Guild Challenge
+    ACHIEVEMENT_CRITERIA_TYPE_ON_LOGIN                      = 140,
+    ACHIEVEMENT_CRITERIA_TYPE_TOTAL                         = 141  // #define ACHIEVEMENT_CRITERIA_TYPE_TOTAL 141
 };
-
-#define ACHIEVEMENT_CRITERIA_TYPE_TOTAL 140
 
 enum AreaFlags
 {

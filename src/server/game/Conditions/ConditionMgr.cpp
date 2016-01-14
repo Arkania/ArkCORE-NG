@@ -918,6 +918,7 @@ void ConditionMgr::LoadConditions(bool isReload)
         if (cond->ErrorTextId && !cond->ErrorType)
         {
             TC_LOG_ERROR("sql.sql", "Condition type %u entry %i has any ErrorType, ErrorTextId (%u) is set, set to 0!", uint32(cond->SourceType), cond->SourceEntry, cond->ErrorTextId);
+            TC_LOG_ERROR("sql.sql", "Possible solution: UPDATE conditions SET ErrorTextId=0 WHERE SourceTypeOrReferenceId=%u AND SourceEntry = %u AND ConditionTypeOrReference=%u AND ErrorType=%u AND ErrorTextId=%u;", uint32(cond->SourceType), cond->SourceEntry, cond->ConditionType, cond->ErrorType, cond->ErrorTextId);
             cond->ErrorTextId = 0;
         }
 
@@ -1990,6 +1991,7 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
             if (!sWorld->getWorldState(cond->ConditionValue1))
             {
                 TC_LOG_ERROR("sql.sql", "World state condition has non existing world state in value1 (%u), skipped", cond->ConditionValue1);
+                TC_LOG_ERROR("sql.sql", "Possible solution: DELETE FROM conditions WHERE SourceTypeOrReferenceId=%u AND SourceGroup=%u AND SourceEntry=%u AND ConditionTypeOrReference=11 AND ConditionValue1=%u;",cond->SourceType, cond->SourceGroup, cond->SourceEntry,  cond->ConditionValue1);
                 return false;
             }
             if (cond->ConditionValue3)

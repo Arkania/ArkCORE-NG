@@ -8938,7 +8938,13 @@ void ObjectMgr::LoadCreatureClassLevelStats()
         for (uint16 lvl = itr->second.minlevel; lvl <= itr->second.maxlevel; ++lvl)
         {
             if (_creatureBaseStatsStore.find(MAKE_PAIR16(lvl, itr->second.unit_class)) == _creatureBaseStatsStore.end())
-                TC_LOG_ERROR("sql.sql", "Missing base stats for creature class %u level %u", itr->second.unit_class, lvl);
+            {
+                TC_LOG_ERROR("sql.sql", "Missing base stats for creature entry: %u, class: %u, level: %u", itr->first, itr->second.unit_class, lvl);
+                if (!lvl)
+                    TC_LOG_ERROR("sql.sql", "Possible solution: UPDATE creature_template SET minlevel=1, maxlevel=1 WHERE entry=%u;", itr->first);
+                else
+                    TC_LOG_ERROR("sql.sql", "Possible solution: INSERT INTO creature_classlevelstats (level, class, basehp0, basehp1, basehp2, basehp3, basemana, basearmor, attackpower, rangedattackpower, damage_base, damage_exp1, damage_exp2, damage_exp3, comment) VALUES (%u, %u, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Insert all missing values for this level/class');", lvl, itr->second.unit_class);
+            }
         }
     }
 
