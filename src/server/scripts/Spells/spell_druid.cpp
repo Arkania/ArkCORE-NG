@@ -1328,7 +1328,7 @@ public:
     }
 };
 
-// Empowered touch 5185 50464
+// Empowered touch 5185, 8936, 50464
 class spell_dru_empowered_touch : public SpellScriptLoader
 {
 public:
@@ -1357,7 +1357,7 @@ public:
     }
 };
 
-// Empowered touch 88433
+// Empowered touch 88433 
 class spell_dru_empowered_touch_triggered : public SpellScriptLoader
 {
 public:
