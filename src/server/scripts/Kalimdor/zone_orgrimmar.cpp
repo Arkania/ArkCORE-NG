@@ -40,10 +40,41 @@ public:
     }
 };
 
+// spell 94687
+class spell_waters_of_farseeing_94687 : public SpellScriptLoader
+{
+public:
+    spell_waters_of_farseeing_94687() : SpellScriptLoader("spell_waters_of_farseeing_94687") { }
+
+    class spell_waters_of_farseeing_94687_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_waters_of_farseeing_94687_AuraScript);
+
+        void OnApply(AuraEffect const* aurEff, AuraEffectHandleModes mode)
+        {
+            if (aurEff->GetMiscValue() == 807)
+                if (Unit* caster = GetCaster())                
+                    if (Player* player = caster->ToPlayer())
+                        if (player->GetQuestStatus(28805) == QUEST_STATUS_INCOMPLETE || player->GetQuestStatus(28826) == QUEST_STATUS_INCOMPLETE)
+                            player->KilledMonsterCredit(50054);
+        }
+
+        void Register()
+        {
+            OnEffectApply += AuraEffectApplyFn(spell_waters_of_farseeing_94687_AuraScript::OnApply, EFFECT_0, SPELL_AURA_SCREEN_EFFECT, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_waters_of_farseeing_94687_AuraScript();
+    }
+};
 
 
 void AddSC_orgrimmar()
 {
     new npc_muddy_crawfish_42548();
+    new spell_waters_of_farseeing_94687();
 
 }
