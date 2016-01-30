@@ -108,6 +108,10 @@ class ScriptRegistry
                 }
                 else
                 {
+                    std::string sn = script->GetName().c_str();
+                    if (sn.find("example") == 0)
+                        return;
+
                     // The script uses a script name from database, but isn't assigned to anything.
                     TC_LOG_ERROR("sql.sql", "Script named '%s' does not have a script name assigned in database.", script->GetName().c_str());
 
