@@ -588,6 +588,9 @@ public:
         NPC_WOUNDET_DARKSPEAR_WATCHER   = 47057,
         QUEST_THE_ART_OF_A_PRIEST       = 24784,
         SPELL_FLASH_HEAL                = 2061,
+        QUEST_THE_ART_OF_A_DRUID        = 24766,
+        SPELL_REJUVENATION              = 774,
+
     };
 
     struct npc_wounded_darkspear_watcherAI : public ScriptedAI
@@ -597,12 +600,20 @@ public:
         void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
             if (Player* player = caster->ToPlayer())
+            {
                 if (player->GetQuestStatus(QUEST_THE_ART_OF_A_PRIEST) == QUEST_STATUS_INCOMPLETE)
                     if (spell->Id == SPELL_FLASH_HEAL)
                     {
                         player->KilledMonsterCredit(NPC_WOUNDET_DARKSPEAR_WATCHER);
                         me->DespawnOrUnsummon();
                     }
+                if (player->GetQuestStatus(QUEST_THE_ART_OF_A_DRUID) == QUEST_STATUS_INCOMPLETE)
+                    if (spell->Id == SPELL_REJUVENATION)
+                    {
+                        player->KilledMonsterCredit(NPC_WOUNDET_DARKSPEAR_WATCHER);
+                        me->DespawnOrUnsummon();
+                    }
+            }
         }
     };
 
