@@ -30,8 +30,6 @@ private:
     ~GuildMgr();
 
 public:
-    typedef std::unordered_map<uint32, Guild*> GuildContainer;
-
     Guild* GetGuildByLeader(uint64 guid) const;
     Guild* GetGuildById(uint32 guildId) const;
     Guild* GetGuildByGuid(uint64 guid) const;
@@ -57,6 +55,7 @@ public:
 
     void ResetTimes(bool week);
     void ResetDailyXPCap();
+
 protected:
     typedef std::unordered_map<uint32, Guild*> GuildContainer;
     uint32 NextGuildId;
