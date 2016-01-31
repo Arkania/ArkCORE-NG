@@ -20,10 +20,11 @@
 #ifndef _VMAPMANAGER2_H
 #define _VMAPMANAGER2_H
 
-#include "Define.h"
 #include <ace/Thread_Mutex.h>
-#include "IVMapManager.h"
 #include <unordered_map>
+#include "Define.h"
+
+#include "IVMapManager.h"
 
 //===========================================================
 
@@ -54,7 +55,7 @@ namespace VMAP
     class ManagedModel
     {
         public:
-            ManagedModel() : iModel(0), iRefCount(0) { }
+            ManagedModel() : iModel(nullptr), iRefCount(0) { }
             void setModel(WorldModel* model) { iModel = model; }
             WorldModel* getModel() { return iModel; }
             void incRefCount() { ++iRefCount; }
@@ -66,6 +67,14 @@ namespace VMAP
 
 	typedef std::unordered_map<uint32, StaticMapTree*> InstanceTreeMap;
 	typedef std::unordered_map<std::string, ManagedModel> ModelFileMap;
+
+    enum DisableTypes
+    {
+        VMAP_DISABLE_AREAFLAG = 0x1,
+        VMAP_DISABLE_HEIGHT = 0x2,
+        VMAP_DISABLE_LOS = 0x4,
+        VMAP_DISABLE_LIQUIDSTATUS = 0x8
+    };
 
     class VMapManager2 : public IVMapManager
     {
@@ -79,6 +88,9 @@ namespace VMAP
             bool _loadMap(uint32 mapId, const std::string& basePath, uint32 tileX, uint32 tileY);
             /* void _unloadMap(uint32 pMapId, uint32 x, uint32 y); */
 
+            static uint32 GetLiquidFlagsDummy(uint32) { return 0; }
+            static bool IsVMAPDisabledForDummy(uint32 /*entry*/, uint8 /*flags*/) { return false; }
+
         public:
             // public for debug
             G3D::Vector3 convertPositionToInternalRep(float x, float y, float z) const;
@@ -87,34 +99,40 @@ namespace VMAP
             VMapManager2();
             ~VMapManager2(void);
 
-            int loadMap(const char* pBasePath, unsigned int mapId, int x, int y);
+            int loadMap(const char* pBasePath, unsigned int mapId, int x, int y) override;
 
-            void unloadMap(unsigned int mapId, int x, int y);
-            void unloadMap(unsigned int mapId);
+            void unloadMap(unsigned int mapId, int x, int y) override;
+            void unloadMap(unsigned int mapId) override;
 
-            bool isInLineOfSight(unsigned int mapId, float x1, float y1, float z1, float x2, float y2, float z2) ;
+            bool isInLineOfSight(unsigned int mapId, float x1, float y1, float z1, float x2, float y2, float z2) override;
             /**
             fill the hit pos and return true, if an object was hit
             */
-            bool getObjectHitPos(unsigned int mapId, float x1, float y1, float z1, float x2, float y2, float z2, float& rx, float& ry, float& rz, float modifyDist);
-            float getHeight(unsigned int mapId, float x, float y, float z, float maxSearchDist);
+            bool getObjectHitPos(unsigned int mapId, float x1, float y1, float z1, float x2, float y2, float z2, float& rx, float& ry, float& rz, float modifyDist) override;
+            float getHeight(unsigned int mapId, float x, float y, float z, float maxSearchDist) override;
 
-            bool processCommand(char* /*command*/) { return false; } // for debug and extensions
+            bool processCommand(char* /*command*/) override { return false; } // for debug and extensions
 
-            bool getAreaInfo(unsigned int pMapId, float x, float y, float& z, uint32& flags, int32& adtId, int32& rootId, int32& groupId) const;
-            bool GetLiquidLevel(uint32 pMapId, float x, float y, float z, uint8 reqLiquidType, float& level, float& floor, uint32& type) const;
+            bool getAreaInfo(unsigned int pMapId, float x, float y, float& z, uint32& flags, int32& adtId, int32& rootId, int32& groupId) const override;
+            bool GetLiquidLevel(uint32 pMapId, float x, float y, float z, uint8 reqLiquidType, float& level, float& floor, uint32& type) const override;
 
             WorldModel* acquireModelInstance(const std::string& basepath, const std::string& filename);
             void releaseModelInstance(const std::string& filename);
 
             // what's the use of this? o.O
-            virtual std::string getDirFileName(unsigned int mapId, int /*x*/, int /*y*/) const
+            virtual std::string getDirFileName(unsigned int mapId, int /*x*/, int /*y*/) const override
             {
                 return getMapFileName(mapId);
             }
-            virtual bool existsMap(const char* basePath, unsigned int mapId, int x, int y);
+            virtual bool existsMap(const char* basePath, unsigned int mapId, int x, int y) override;
         public:
             void getInstanceMapTree(InstanceTreeMap &instanceMapTree);
+
+            typedef uint32(*GetLiquidFlagsFn)(uint32 liquidType);
+            GetLiquidFlagsFn GetLiquidFlagsPtr;
+
+            typedef bool(*IsVMAPDisabledForFn)(uint32 entry, uint8 flags);
+            IsVMAPDisabledForFn IsVMAPDisabledForPtr;
     };
 }
 

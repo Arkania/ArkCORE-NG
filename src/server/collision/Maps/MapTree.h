@@ -32,7 +32,7 @@ namespace VMAP
 
     struct LocationInfo
     {
-        LocationInfo(): hitInstance(0), hitModel(0), ground_Z(-G3D::inf()) { }
+        LocationInfo() : hitInstance(nullptr), hitModel(nullptr), ground_Z(-G3D::finf()) { }
         const ModelInstance* hitInstance;
         const GroupModel* hitModel;
         float ground_Z;
@@ -84,13 +84,13 @@ namespace VMAP
             void getModelInstances(ModelInstance* &models, uint32 &count);
 
         private:
-            StaticMapTree(StaticMapTree const& right) DELETE_MEMBER;
-            StaticMapTree& operator=(StaticMapTree const& right) DELETE_MEMBER;
+            StaticMapTree(StaticMapTree const& right) = delete;
+            StaticMapTree& operator=(StaticMapTree const& right) = delete;
     };
 
     struct AreaInfo
     {
-        AreaInfo(): result(false), ground_Z(-G3D::inf()), flags(0), adtId(0),
+        AreaInfo(): result(false), ground_Z(-G3D::finf()), flags(0), adtId(0),
             rootId(0), groupId(0) { }
         bool result;
         float ground_Z;

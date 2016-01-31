@@ -22,8 +22,8 @@
 #include "ObjectMgr.h"
 #include "OutdoorPvP.h"
 #include "SpellMgr.h"
-#include "VMapManager2.h"
 #include "Player.h"
+#include "World.h"
 
 namespace DisableMgr
 {
@@ -194,28 +194,28 @@ void LoadDisables()
                 switch (mapEntry->map_type)
                 {
                     case MAP_COMMON:
-                        if (flags & VMAP_DISABLE_AREAFLAG)
+                        if (flags & VMAP::VMAP_DISABLE_AREAFLAG)
                             TC_LOG_INFO("misc", "Areaflag disabled for world map %u.", entry);
-                        if (flags & VMAP_DISABLE_LIQUIDSTATUS)
+                        if (flags & VMAP::VMAP_DISABLE_LIQUIDSTATUS)
                             TC_LOG_INFO("misc", "Liquid status disabled for world map %u.", entry);
                         break;
                     case MAP_INSTANCE:
                     case MAP_RAID:
-                        if (flags & VMAP_DISABLE_HEIGHT)
+                        if (flags & VMAP::VMAP_DISABLE_HEIGHT)
                             TC_LOG_INFO("misc", "Height disabled for instance map %u.", entry);
-                        if (flags & VMAP_DISABLE_LOS)
+                        if (flags & VMAP::VMAP_DISABLE_LOS)
                             TC_LOG_INFO("misc", "LoS disabled for instance map %u.", entry);
                         break;
                     case MAP_BATTLEGROUND:
-                        if (flags & VMAP_DISABLE_HEIGHT)
+                        if (flags & VMAP::VMAP_DISABLE_HEIGHT)
                             TC_LOG_INFO("misc", "Height disabled for battleground map %u.", entry);
-                        if (flags & VMAP_DISABLE_LOS)
+                        if (flags & VMAP::VMAP_DISABLE_LOS)
                             TC_LOG_INFO("misc", "LoS disabled for battleground map %u.", entry);
                         break;
                     case MAP_ARENA:
-                        if (flags & VMAP_DISABLE_HEIGHT)
+                        if (flags & VMAP::VMAP_DISABLE_HEIGHT)
                             TC_LOG_INFO("misc", "Height disabled for arena map %u.", entry);
-                        if (flags & VMAP_DISABLE_LOS)
+                        if (flags & VMAP::VMAP_DISABLE_LOS)
                             TC_LOG_INFO("misc", "LoS disabled for arena map %u.", entry);
                         break;
                     default:
@@ -340,7 +340,7 @@ bool IsDisabledFor(DisableType type, uint32 entry, Unit const* unit, uint8 flags
             else if (spellFlags & SPELL_DISABLE_DEPRECATED_SPELL)    // call not from spellcast
                 return true;
             else if (flags & SPELL_DISABLE_LOS)
-                return spellFlags & SPELL_DISABLE_LOS;
+                return (spellFlags & SPELL_DISABLE_LOS) != 0;
 
             break;
         }
@@ -356,13 +356,13 @@ bool IsDisabledFor(DisableType type, uint32 entry, Unit const* unit, uint8 flags
                     switch (targetDifficulty)
                     {
                         case DUNGEON_DIFFICULTY_NORMAL:
-                            return disabledModes & DUNGEON_STATUSFLAG_NORMAL;
+                            return (disabledModes & DUNGEON_STATUSFLAG_NORMAL) != 0;
                         case DUNGEON_DIFFICULTY_HEROIC:
-                            return disabledModes & DUNGEON_STATUSFLAG_HEROIC;
+                            return (disabledModes & DUNGEON_STATUSFLAG_HEROIC) != 0;
                         case RAID_DIFFICULTY_10MAN_HEROIC:
-                            return disabledModes & RAID_STATUSFLAG_10MAN_HEROIC;
+                            return (disabledModes & RAID_STATUSFLAG_10MAN_HEROIC) != 0;
                         case RAID_DIFFICULTY_25MAN_HEROIC:
-                            return disabledModes & RAID_STATUSFLAG_25MAN_HEROIC;
+                            return (disabledModes & RAID_STATUSFLAG_25MAN_HEROIC) != 0;
                     }
                 }
                 else if (mapEntry->map_type == MAP_COMMON)
@@ -382,10 +382,21 @@ bool IsDisabledFor(DisableType type, uint32 entry, Unit const* unit, uint8 flags
         case DISABLE_TYPE_MMAP:
             return true;
         case DISABLE_TYPE_VMAP:
-           return flags & itr->second.flags;
+            return (flags & itr->second.flags) != 0;
     }
 
     return false;
+}
+
+bool IsVMAPDisabledFor(uint32 entry, uint8 flags)
+{
+    return IsDisabledFor(DISABLE_TYPE_VMAP, entry, NULL, flags);
+}
+
+bool IsPathfindingEnabled(uint32 mapId)
+{
+    return sWorld->getBoolConfig(CONFIG_ENABLE_MMAPS)
+        && !IsDisabledFor(DISABLE_TYPE_MMAP, mapId, NULL, MMAP_DISABLE_PATHFINDING);
 }
 
 } // Namespace
