@@ -67,7 +67,7 @@ else()
 	string(REGEX REPLACE -[a-z0-9+]+ "" rev_ver ${rev_info})
     string(REGEX REPLACE ${rev_ver}-|[0-9]+-g "" rev_hash ${rev_info})
 	string(REGEX REPLACE [a-z] "" rev_ver ${rev_ver})
-	string(REGEX REPLACE [.*] "," rev_ver ${rev_ver})
+	string(REGEX REPLACE [.*] ", " rev_ver ${rev_ver})
   endif()
 endif()
 
