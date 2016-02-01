@@ -64,12 +64,14 @@ else()
     set(rev_branch "Master")
   else()
     # Extract information required to build a proper versionstring
-    string(REGEX REPLACE init-|[0-9]+-g "" rev_hash ${rev_info})
+	string(REGEX REPLACE -[a-z0-9+]+ "" rev_ver ${rev_info})
+    string(REGEX REPLACE ${rev_ver}-|[0-9]+-g "" rev_hash ${rev_info})
+	string(REGEX REPLACE [a-z] "" rev_ver ${rev_ver})
+	string(REGEX REPLACE [.*] "," rev_ver ${rev_ver})
   endif()
 endif()
 
 # Create the actual revision.h file from the above params
-if(NOT "${rev_hash_cached}" MATCHES "${rev_hash}" OR NOT "${rev_branch_cached}" MATCHES "${rev_branch}" OR NOT EXISTS "${BUILDDIR}/revision.h")
   configure_file(
     "${CMAKE_SOURCE_DIR}/revision.h.in.cmake"
     "${BUILDDIR}/revision.h"
@@ -77,5 +79,4 @@ if(NOT "${rev_hash_cached}" MATCHES "${rev_hash}" OR NOT "${rev_branch_cached}" 
   )
   set(rev_hash_cached "${rev_hash}" CACHE INTERNAL "Cached commit-hash")
   set(rev_branch_cached "${rev_branch}" CACHE INTERNAL "Cached branch name")
-endif()
 
