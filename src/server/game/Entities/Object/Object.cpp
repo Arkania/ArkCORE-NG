@@ -2686,6 +2686,64 @@ void WorldObject::GetCreatureListWithEntryInGrid(std::list<Creature*>& creatureL
     cell.Visit(pair, visitor, *(this->GetMap()), *this, maxSearchRange);
 }
 
+std::list<Creature*> WorldObject::FindAllCreaturesInRange(float range)
+{
+    std::list<Creature*> templist;
+    float x, y, z;
+    this->GetPosition(x, y, z);
+
+    CellCoord pair(Trinity::ComputeCellCoord(x, y));
+    Cell cell(pair);
+    cell.SetNoCreate();
+
+    Trinity::AllCreaturesInRange check(this, 100);
+    Trinity::CreatureListSearcher<Trinity::AllCreaturesInRange> searcher(this, templist, check);
+    TypeContainerVisitor<Trinity::CreatureListSearcher<Trinity::AllCreaturesInRange>, GridTypeMapContainer> cSearcher(searcher);
+    cell.Visit(pair, cSearcher, *(this->GetMap()), *this, this->GetGridActivationRange());
+
+    return templist;
+}
+
+std::list<Creature*> WorldObject::FindAllFriendlyCreaturesInRange(float range)
+{
+    std::list<Creature*> templist;
+    if (Unit* unit = this->ToUnit())
+    {
+        float x, y, z;
+        unit->GetPosition(x, y, z);
+
+        CellCoord pair(Trinity::ComputeCellCoord(x, y));
+        Cell cell(pair);
+        cell.SetNoCreate();
+
+        Trinity::AllFriendlyCreaturesInRange check(unit, 100);
+        Trinity::CreatureListSearcher<Trinity::AllFriendlyCreaturesInRange> searcher(unit, templist, check);
+        TypeContainerVisitor<Trinity::CreatureListSearcher<Trinity::AllFriendlyCreaturesInRange>, GridTypeMapContainer> cSearcher(searcher);
+        cell.Visit(pair, cSearcher, *(unit->GetMap()), *unit, unit->GetGridActivationRange());
+    }
+    return templist;
+}
+
+std::list<Creature*> WorldObject::FindAllUnfriendlyCreaturesInRange(float range)
+{
+    std::list<Creature*> templist;
+    if (Unit* unit = this->ToUnit())
+    {
+        float x, y, z;
+        unit->GetPosition(x, y, z);
+
+        CellCoord pair(Trinity::ComputeCellCoord(x, y));
+        Cell cell(pair);
+        cell.SetNoCreate();
+
+        Trinity::AllUnfriendlyCreaturesInRange check(unit, 100);
+        Trinity::CreatureListSearcher<Trinity::AllUnfriendlyCreaturesInRange> searcher(unit, templist, check);
+        TypeContainerVisitor<Trinity::CreatureListSearcher<Trinity::AllUnfriendlyCreaturesInRange>, GridTypeMapContainer> cSearcher(searcher);
+        cell.Visit(pair, cSearcher, *(unit->GetMap()), *unit, unit->GetGridActivationRange());
+    }
+    return templist;
+}
+
 /*
 namespace Trinity
 {

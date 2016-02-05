@@ -1357,6 +1357,55 @@ namespace Trinity
             float m_fRange;
     };
 
+    class AllCreaturesInRange
+    {
+    public:
+        AllCreaturesInRange(const WorldObject* object, float maxRange) : m_pObject(object), m_fRange(maxRange) { }
+        bool operator() (Unit* unit)
+        {
+            if (m_pObject->IsWithinDist(unit, m_fRange, false))
+                return true;
+
+            return false;
+        }
+
+    private:
+        const WorldObject* m_pObject;
+        float m_fRange;
+    };
+
+    class AllFriendlyCreaturesInRange 
+    {
+    public:
+        AllFriendlyCreaturesInRange(Unit const* obj, float maxRange) : m_unit(obj), m_fRange(maxRange) { }
+        bool operator() (Unit* unit)
+        {
+            if (unit->IsAlive() && unit->IsVisible() && unit->IsFriendlyTo(m_unit) && unit->IsWithinDist(m_unit, m_fRange, false))
+                return true;
+
+            return false;
+        }
+    private:
+        Unit const* m_unit;
+        float m_fRange;
+    };
+
+    class AllUnfriendlyCreaturesInRange
+    {
+    public:
+        AllUnfriendlyCreaturesInRange(Unit const* obj, float maxRange) : m_unit(obj), m_fRange(maxRange) { }
+        bool operator() (Unit* unit)
+        {
+            if (unit->IsAlive() && unit->IsVisible() && !unit->IsFriendlyTo(m_unit) && unit->IsWithinDist(m_unit, m_fRange, false))
+                return true;
+
+            return false;
+        }
+    private:
+        Unit const* m_unit;
+        float m_fRange;
+    };
+
     class PlayerAtMinimumRangeAway
     {
     public:

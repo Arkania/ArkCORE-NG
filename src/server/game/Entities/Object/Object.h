@@ -796,6 +796,10 @@ class WorldObject : public Object, public WorldLocation
         void GetGameObjectListWithEntryInGrid(std::list<GameObject*>& lList, uint32 uiEntry, float fMaxSearchRange) const;
         void GetCreatureListWithEntryInGrid(std::list<Creature*>& lList, uint32 uiEntry, float fMaxSearchRange) const;
 
+        std::list<Creature*> FindAllCreaturesInRange(float range);
+        std::list<Creature*> FindAllFriendlyCreaturesInRange(float range);
+        std::list<Creature*> FindAllUnfriendlyCreaturesInRange(float range);
+
         void DestroyForNearbyPlayers();
         virtual void UpdateObjectVisibility(bool forced = true);
         void BuildUpdate(UpdateDataMapType&);
