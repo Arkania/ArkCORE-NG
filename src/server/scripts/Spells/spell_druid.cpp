@@ -36,8 +36,6 @@ enum DruidSpells
     SPELL_DRUID_ENRAGE_MOD_DAMAGE = 51185,
     SPELL_DRUID_FERAL_CHARGE_BEAR = 16979,
     SPELL_DRUID_FERAL_CHARGE_CAT = 49376,
-    SPELL_DRUID_FUNGAL_GROWTH_GRAPHIC = 94339,
-    SPELL_DRUID_FUNGAL_GROWTH_SUMMON = 81291,
     SPELL_DRUID_GLYPH_OF_INNERVATE = 54833,
     SPELL_DRUID_GLYPH_OF_STARFIRE = 54846,
     SPELL_DRUID_GLYPH_OF_TYPHOON = 62135,
@@ -54,12 +52,9 @@ enum DruidSpells
     SPELL_DRUID_LUNAR_ECLIPSE_MARKER = 67484, // Will make the yellow arrow on eclipse bar point to the blue side (lunar)
     SPELL_DRUID_NATURES_GRACE = 16880,
     SPELL_DRUID_NATURES_GRACE_TRIGGER = 16886,
-    SPELL_DRUID_NPC_WILD_MUSHROOM = 47649,
     SPELL_DRUID_SAVAGE_ROAR = 62071,
     SPELL_DRUID_SOLAR_ECLIPSE = 48517,
     SPELL_DRUID_SOLAR_ECLIPSE_MARKER = 67483, // Will make the yellow arrow on eclipse bar point to the yellow side (solar)
-    SPELL_DRUID_SPELL_WILD_MUSHROOM_DAMAGE = 78777,
-    SPELL_DRUID_SPELL_WILD_MUSHROOM_SUICIDE = 92853,
     SPELL_DRUID_STAMPEDE_BAER_RANK_1 = 81016,
     SPELL_DRUID_STAMPEDE_CAT_RANK_1 = 81021,
     SPELL_DRUID_STAMPEDE_CAT_STATE = 109881,
@@ -2071,10 +2066,13 @@ public:
             if (Unit* caster = GetCaster())
             {
                 float coeff = 0.168f;
+                float bonus = 0;
                 if (caster->HasSpell(33876))
-                    amount = caster->GetTotalAttackPowerValue(BASE_ATTACK) * coeff;
+                    bonus = caster->GetTotalAttackPowerValue(BASE_ATTACK) * coeff;
                 else
-                    amount = caster->SpellBaseDamageBonusDone(GetSpellInfo()->GetSchoolMask()) * coeff;
+                    bonus = caster->SpellBaseDamageBonusDone(GetSpellInfo()->GetSchoolMask()) * coeff;
+                
+                amount *= (1 + bonus);
             }
         }
 
@@ -2096,66 +2094,58 @@ class spell_dru_wild_mushroom : public SpellScriptLoader
 public:
     spell_dru_wild_mushroom() : SpellScriptLoader("spell_dru_wild_mushroom") { }
 
+    enum eSpell
+    {
+        SPELL_DRUID_NPC_WILD_MUSHROOM = 47649,
+    };
+
     class spell_dru_wild_mushroom_SpellScript : public SpellScript
     {
-        PrepareSpellScript(spell_dru_wild_mushroom_SpellScript)
+        PrepareSpellScript(spell_dru_wild_mushroom_SpellScript);
 
-            void HandleSummon(SpellEffIndex effIndex)
+        void HandleSummon(SpellEffIndex effIndex)
         {
             PreventHitDefaultEffect(effIndex);
 
-            Unit* caster = GetCaster();
             WorldLocation const* targetDest = GetExplTargetDest();
             SpellInfo const* spellInfo = GetSpellInfo();
+            Unit* caster = GetCaster();
 
-            if (caster && targetDest)
+            if (targetDest && spellInfo && caster)
             {
-                if (Player* player = caster->ToPlayer())
-                {
-                    Position pos;
-                    std::list<Creature*> list;
-
-                    Trinity::AnyUnfriendlyCreatureInUnitRangeCheck check(player, SPELL_DRUID_NPC_WILD_MUSHROOM, 100.0f);
-                    Trinity::CreatureListSearcher<Trinity::AnyUnfriendlyCreatureInUnitRangeCheck> searcher(player, list, check);
-                    player->VisitNearbyGridObject(100.0f, searcher);
-
-                    // Max 3 Wild Mushroom
-                    if ((int32)list.size() >= GetEffectValue())
-                    {
-                        if (list.back())
+                        Position pos = targetDest->GetPosition();
+                        const SummonPropertiesEntry* properties = sSummonPropertiesStore.LookupEntry(spellInfo->Effects[effIndex].MiscValueB);
+                        uint32 entry = spellInfo->Effects[0].MiscValue;
+                        if (Player* player = caster->ToPlayer())
                         {
-                            if (TempSummon* temp = list.back()->ToTempSummon())
+                            std::list<Creature*> list = player->FindNearestCreatures(SPELL_DRUID_NPC_WILD_MUSHROOM, 100.0f);
+
+                            // Max 3 Wild Mushroom
+                            if ((int32)list.size() >= GetEffectValue())
+                                if (list.back())
+                                    if (TempSummon* temp = list.back()->ToTempSummon())
+                                        temp->UnSummon();
+
+                            if (Creature* mushroom = player->SummonCreature(entry, pos, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, spellInfo->GetDuration()))
                             {
-                                temp->UnSummon();
+                                mushroom->SetUInt32Value(UNIT_CREATED_BY_SPELL, GetSpellInfo()->Id);
+                                mushroom->SetMaxHealth(5);
+                                mushroom->SetLevel(player->getLevel());
+                                mushroom->setFaction(player->getFaction());
+                                mushroom->SetUInt64Value(UNIT_FIELD_SUMMONEDBY, player->GetGUID());
+                                mushroom->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+                                mushroom->StopMoving();
+                                mushroom->SetControlled(true, UNIT_STATE_STUNNED);
+                                // i have no idee why.. the mushroom spawns only if the player is involved in moving etc.. 
+                                mushroom->SetFacingToObject(player);
                             }
                         }
                     }
-
-                    // Summon position
-                    pos = targetDest->GetPosition();
-
-                    // Summon properties
-                    const SummonPropertiesEntry* properties = sSummonPropertiesStore.LookupEntry(spellInfo->Effects[effIndex].MiscValueB);
-
-                    TempSummon* summon = player->SummonCreature(spellInfo->Effects[0].MiscValue, pos, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, spellInfo->GetDuration());
-
-                    if (!summon)
-                        return;
-
-                    summon->SetUInt64Value(UNIT_FIELD_SUMMONEDBY, player->GetGUID());
-                    summon->setFaction(player->getFaction());
-                    summon->SetUInt32Value(UNIT_CREATED_BY_SPELL, GetSpellInfo()->Id);
-                    summon->SetMaxHealth(5);
-                    summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-                    summon->StopMoving();
-                    summon->SetControlled(true, UNIT_STATE_STUNNED);
-                }
-            }
         }
-
+      
         void Register()
         {
-            OnEffectHit += SpellEffectFn(spell_dru_wild_mushroom_SpellScript::HandleSummon, EFFECT_0, SPELL_EFFECT_SUMMON);
+           OnEffectHit += SpellEffectFn(spell_dru_wild_mushroom_SpellScript::HandleSummon, EFFECT_0, SPELL_EFFECT_SUMMON);
         }
     };
 
@@ -2171,11 +2161,25 @@ class spell_dru_wild_mushroom_detonation : public SpellScriptLoader
 public:
     spell_dru_wild_mushroom_detonation() : SpellScriptLoader("spell_dru_wild_mushroom_detonation") { }
 
+    enum eSpell
+    {
+        FORCE_OF_NATURE_FUNGAL_GROWTH_SUMMON = 81283,
+        NPC_WILD_MUSHROOM = 47649,
+        SPELL_DRUID_SPELL_WILD_MUSHROOM_DAMAGE = 78777,
+        SPELL_DRUID_FUNGAL_GROWTH_SUMMON = 81291,
+        SPELL_DRUID_FUNGAL_GROWTH_GRAPHIC = 94339,
+        SPELL_DRUID_SPELL_WILD_MUSHROOM_SUICIDE = 92853,
+        SPELL_THORNS = 467,
+    };
+
     class spell_dru_wild_mushroom_detonation_SpellScript : public SpellScript
     {
-        PrepareSpellScript(spell_dru_wild_mushroom_detonation_SpellScript)
+        PrepareSpellScript(spell_dru_wild_mushroom_detonation_SpellScript);
 
-            bool Load()
+        float spellRange;
+        std::list<Creature*> mushroomList;
+
+        bool Load()
         {
             spellRange = GetSpellInfo()->GetMaxRange();
 
@@ -2183,145 +2187,86 @@ public:
                 return false;
 
             if (Unit* caster = GetCaster())
-            {
                 if (Player* player = caster->ToPlayer())
                 {
-                    std::list<Creature*> list;
-
-                    Trinity::AnyUnfriendlyCreatureInUnitRangeCheck check(player, SPELL_DRUID_NPC_WILD_MUSHROOM, 100.0f);
-                    Trinity::CreatureListSearcher<Trinity::AnyUnfriendlyCreatureInUnitRangeCheck> searcher(player, mushroomList, check);
-                    player->VisitNearbyGridObject(100.0f, searcher);
-
+                    mushroomList = player->FindNearestCreatures(NPC_WILD_MUSHROOM, 40.0f);
                     return true;
                 }
-            }
 
             return false;
         }
 
         SpellCastResult CheckCast()
         {
+            if (mushroomList.empty())
+                return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
+
             if (Unit* caster = GetCaster())
-            {
                 if (Player* player = caster->ToPlayer())
                 {
-                    if (mushroomList.empty())
-                        return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
-
                     bool inRange = false;
 
-                    for (std::list<Creature*>::const_iterator i = mushroomList.begin(); i != mushroomList.end(); i)
-                    {
-                        if ((*i))
+                    for (std::list<Creature*>::const_iterator i = mushroomList.begin(); i != mushroomList.end(); i++)
+                        if (*i)
                         {
-                            Position pos;
-                            pos = (*i)->GetPosition();
-
+                            Position pos = (*i)->GetPosition();
                             // Must have at least one mushroom within 40 yards
                             if (player->IsWithinDist3d(&pos, spellRange))
-                            {
                                 return SPELL_CAST_OK;
-                            }
+                            else
+                                SetCustomCastResultMessage(SPELL_CUSTOM_ERROR_TARGET_TOO_FAR);
                         }
-
-                        i++;
-                    }
-
-                    SetCustomCastResultMessage(SPELL_CUSTOM_ERROR_TARGET_TOO_FAR);
                     return SPELL_FAILED_CUSTOM_ERROR;
                 }
-            }
             return SPELL_FAILED_CASTER_DEAD;
         }
 
-        void HandleDummy(SpellEffIndex /*effIndex*/)
+        void HandleDummy(SpellEffIndex effIndex)
         {
             if (Unit* caster = GetCaster())
-            {
                 if (Player* player = caster->ToPlayer())
                 {
-                    int32 fungalGrowthSlowSpellId;
-
-                    for (std::list<Creature*>::const_iterator i = mushroomList.begin(); i != mushroomList.end(); i)
-                    {
-                        Position pos;
-                        Creature* tempMushroom = (*i);
-
-                        if (tempMushroom)
-                        {
-                            pos = tempMushroom->GetPosition();
-
-                            // Explosion visual and suicide
-                            tempMushroom->CastSpell(tempMushroom, SPELL_DRUID_SPELL_WILD_MUSHROOM_SUICIDE, true);
-
-                            // Explosion damage
-                            player->CastSpell(
-                                pos.GetPositionX(),
-                                pos.GetPositionY(),
-                                pos.GetPositionZ(),
-                                SPELL_DRUID_SPELL_WILD_MUSHROOM_DAMAGE, true);
-
-                            // Fungal Growth
-                            if (AuraEffect* aurEff = caster->GetDummyAuraEffect(SPELLFAMILY_DRUID, 2681, EFFECT_0))
+                    for (std::list<Creature*>::const_iterator i = mushroomList.begin(); i != mushroomList.end(); i++)
+                        if (Creature* tempMushroom = (*i))
+                            if (tempMushroom)
                             {
-                                fungalGrowthSlowSpellId = aurEff->GetMiscValue();
+                                Position pos = tempMushroom->GetPosition();
 
-                                // Summon fungal
-                                player->CastSpell(
-                                    pos.GetPositionX(),
-                                    pos.GetPositionY(),
-                                    pos.GetPositionZ(),
-                                    SPELL_DRUID_FUNGAL_GROWTH_SUMMON, true);
+                                // Explosion visual and suicide
+                                tempMushroom->CastSpell(tempMushroom, SPELL_DRUID_SPELL_WILD_MUSHROOM_SUICIDE, true);
+
+                                // Explosion damage
+                                player->CastSpell(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), SPELL_DRUID_SPELL_WILD_MUSHROOM_DAMAGE, true);
+
+                                // Summon fungal, npc 43497
+                                player->CastSpell(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), SPELL_DRUID_FUNGAL_GROWTH_SUMMON, true);
                             }
-                        }
-
-                        i++;
-                    }
-
-                    // Frees the memory
-                    mushroomList.clear();
 
                     // Fungal Growth spells
-                    if (fungalGrowthSlowSpellId)
+                    if (SpellInfo const* fungalGrowthSpellInfo = sSpellMgr->GetSpellInfo(SPELL_DRUID_FUNGAL_GROWTH_SUMMON))
                     {
-                        if (SpellInfo const* fungalGrowthSpellInfo = sSpellMgr->GetSpellInfo(SPELL_DRUID_FUNGAL_GROWTH_SUMMON))
-                        {
-                            Trinity::AnyUnfriendlyCreatureInUnitRangeCheck check(player, fungalGrowthSpellInfo->Effects[0].MiscValue, 100.0f);
-                            Trinity::CreatureListSearcher<Trinity::AnyUnfriendlyCreatureInUnitRangeCheck> searcher(player, mushroomList, check);
-                            player->VisitNearbyGridObject(100.0f, searcher);
-
-                            for (std::list<Creature*>::const_iterator i = mushroomList.begin(); i != mushroomList.end(); i)
+                        uint32 entry = fungalGrowthSpellInfo->Effects[0].MiscValue;
+                        mushroomList = player->FindNearestCreatures(entry, 100);
+                        for (std::list<Creature*>::const_iterator i = mushroomList.begin(); i != mushroomList.end(); i++)
+                            if (Creature* tempFungal = (*i))
                             {
-                                Creature* tempFungal = (*i);
+                                tempFungal->SetUInt64Value(UNIT_FIELD_SUMMONEDBY, player->GetGUID());
+                                tempFungal->SetUInt32Value(UNIT_CREATED_BY_SPELL, SPELL_DRUID_FUNGAL_GROWTH_SUMMON);
+                                tempFungal->SetMaxHealth(5);
+                                tempFungal->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+                                tempFungal->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                                tempFungal->StopMoving();
+                                tempFungal->SetControlled(true, UNIT_STATE_STUNNED);
 
-                                if (tempFungal)
-                                {
-                                    tempFungal->SetUInt64Value(UNIT_FIELD_SUMMONEDBY, player->GetGUID());
-                                    tempFungal->SetUInt32Value(UNIT_CREATED_BY_SPELL, SPELL_DRUID_FUNGAL_GROWTH_SUMMON);
-                                    tempFungal->SetMaxHealth(5);
-                                    tempFungal->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-                                    tempFungal->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                                    tempFungal->StopMoving();
-                                    tempFungal->SetControlled(true, UNIT_STATE_STUNNED);
+                                // Graphical effect
+                                tempFungal->CastSpell(tempFungal, SPELL_DRUID_FUNGAL_GROWTH_GRAPHIC, true);
 
-                                    // Graphical effect
-                                    tempFungal->CastSpell(tempFungal, SPELL_DRUID_FUNGAL_GROWTH_GRAPHIC, true);
-
-                                    // Slow effect
-                                    tempFungal->CastSpell(tempFungal, fungalGrowthSlowSpellId, true);
-                                }
-
-                                i++;
+                                // Slow effect
+                                tempFungal->CastSpell(tempFungal, SPELL_THORNS, true);
                             }
-                        }
                     }
                 }
-            }
         }
-
-    private:
-        float spellRange;
-        std::list<Creature*> mushroomList;
 
         void Register()
         {

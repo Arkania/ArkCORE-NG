@@ -1308,10 +1308,15 @@ class spell_mage_ring_of_frost_freeze : public SpellScriptLoader
                 float outRadius = sSpellMgr->GetSpellInfo(SPELL_MAGE_RING_OF_FROST_SUMMON)->Effects[EFFECT_0].CalcRadius();
                 float inRadius  = 4.7f;
 
-                for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
+                if (Player* player = GetCaster()->ToPlayer())
+                    if (player->IsGameMaster())
+                        targets.empty();
+
+                for (std::list<WorldObject*>::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
                     if (Unit* unit = (*itr)->ToUnit())
-                        if (unit->HasAura(SPELL_MAGE_RING_OF_FROST_DUMMY) || unit->HasAura(SPELL_MAGE_RING_OF_FROST_FREEZE) || unit->GetExactDist(GetExplTargetDest()) > outRadius || unit->GetExactDist(GetExplTargetDest()) < inRadius)
-                            targets.erase(itr--);
+                        if (unit->HasAura(SPELL_MAGE_RING_OF_FROST_DUMMY) || unit->HasAura(SPELL_MAGE_RING_OF_FROST_FREEZE) || unit->GetExactDist(GetExplTargetDest()) > outRadius)
+                            if (unit->GetExactDist(GetExplTargetDest()) > inRadius)
+                                targets.erase(itr--);
             }
 
             void Register() override

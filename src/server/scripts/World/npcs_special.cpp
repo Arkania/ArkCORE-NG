@@ -2709,21 +2709,33 @@ public:
     }
 };
 
+// 44199
 class npc_ring_of_frost: public CreatureScript
 {
 public:
     npc_ring_of_frost () : CreatureScript("npc_ring_of_frost") { }
+
+    enum eNpc
+    {
+        SPELL_MAGE_RING_OF_FROST_SUMMON = 82676,
+        SPELL_MAGE_RING_OF_FROST_FREEZE = 82691,
+        SPELL_MAGE_RING_OF_FROST_DUMMY = 91264,
+    };
 
     struct npc_ring_of_frostAI: public ScriptedAI
     {
         npc_ring_of_frostAI (Creature *c) : ScriptedAI(c) { }
         bool Isready;
         uint32 timer;
+        float outRadius;
+        float inRadius;
 
         void Reset() override
         {
             timer = 3000;          // 3sec
             Isready = false;
+            outRadius = sSpellMgr->GetSpellInfo(SPELL_MAGE_RING_OF_FROST_SUMMON)->Effects[EFFECT_0].CalcRadius();
+            inRadius = 4.7f;
         }
 
         void InitializeAI() override
@@ -2739,17 +2751,7 @@ public:
 
             // Remove other ring spawned by the player
             {
-                CellCoord pair(Trinity::ComputeCellCoord(owner->GetPositionX(), owner->GetPositionY()));
-                Cell cell(pair);
-                cell.SetNoCreate();
-
-                std::list<Creature*> templist;
-                Trinity::AllCreaturesOfEntryInRange check(owner, me->GetEntry(), 6);
-                Trinity::CreatureListSearcher<Trinity::AllCreaturesOfEntryInRange> searcher(owner, templist, check);
-
-                TypeContainerVisitor<Trinity::CreatureListSearcher<Trinity::AllCreaturesOfEntryInRange>, GridTypeMapContainer> visitor(searcher);
-                cell.Visit(pair, visitor, *(owner->GetMap()), *(owner), 6);
-
+                std::list<Creature*> templist = me->FindNearestCreatures(me->GetEntry(), outRadius);
                 if (!templist.empty())
                     for (std::list<Creature*>::const_iterator itr = templist.begin(); itr != templist.end(); ++itr)
                         if ((*itr)->GetOwner() == me->GetOwner() && *itr != me)
@@ -2758,20 +2760,18 @@ public:
             }
         }
 
-        void EnterEvadeMode() override
-        {
-            return;
-        }
-
         void CheckIfMoveInRing (Unit *who)
         {
-            if (who->IsAlive() && me->IsInRange(who, 0, 6.0f) && !who->HasAura(82691)/*<= target already frozen*/
-            && !who->HasAura(91264)/*<= target is immune*/
-            && me->IsWithinLOSInMap(who) && Isready)
-            {
-                me->CastSpell(who, 82691, true);
-                me->CastSpell(who, 91264, true);
-            }
+            if (who->HasAura(SPELL_MAGE_RING_OF_FROST_FREEZE || who->HasAura(SPELL_MAGE_RING_OF_FROST_DUMMY)))
+                return;
+            if (!who->IsAlive() || !me->IsWithinLOSInMap(who) || !Isready)
+                return;
+            if (who->GetCreatureType() == CREATURE_TYPE_CRITTER)
+                return;
+            if (!me->IsInRange(who, 0, inRadius))
+                return;
+
+            me->CastSpell(who, SPELL_MAGE_RING_OF_FROST_FREEZE, true);
         }
 
         void UpdateAI(uint32 diff) override
@@ -2791,9 +2791,9 @@ public:
 
             // Find all the enemies
             std::list<Unit*> targets;
-            Trinity::AnyUnfriendlyUnitInObjectRangeCheck u_check(me, me, 6.0f);
+            Trinity::AnyUnfriendlyUnitInObjectRangeCheck u_check(me, me, inRadius);
             Trinity::UnitListSearcher<Trinity::AnyUnfriendlyUnitInObjectRangeCheck> searcher(me, targets, u_check);
-            me->VisitNearbyObject(6.0f, searcher);
+            me->VisitNearbyObject(inRadius, searcher);
             for (std::list<Unit*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
                 CheckIfMoveInRing(*iter);
         }
@@ -3198,51 +3198,120 @@ public:
 };
 
 // 47649
-class npc_mushroom : public CreatureScript
+class npc_mushroom_47649 : public CreatureScript
 {
 public:
-    npc_mushroom() : CreatureScript("npc_mushroom"){ }
+    npc_mushroom_47649() : CreatureScript("npc_mushroom_47649"){ }
 
-    struct npc_mushroomAI : public PassiveAI
+    enum eNpc
     {
-        uint32 invisTimer;
+        FORCE_OF_NATURE_FUNGAL_GROWTH_SUMMON = 81283,
+        SPELL_DRUID_SPELL_WILD_MUSHROOM_DAMAGE = 78777,
+        SPELL_DRUID_FUNGAL_GROWTH_SUMMON = 81291,
+        SPELL_DETONATE = 88751,
+        SPELL_INVISIBLE_TO_ENEMIES = 92661,
+        SPELL_DRUID_SPELL_WILD_MUSHROOM_SUICIDE = 92853,
+        EVENT_GO_INVISIBLE = 1,
+        EVENT_CHECK_OWNER = 2,
+    };
 
-        npc_mushroomAI(Creature* creature) : PassiveAI(creature)
-        {
-            invisTimer = 6000;
-        }
+    struct npc_mushroom_47649AI : public ScriptedAI
+    {
+        EventMap m_events;
+        Player* m_player;
 
+        npc_mushroom_47649AI(Creature* creature) : ScriptedAI(creature) { }
+        
         void Reset() override
         {
-            Unit* owner = me->GetOwner();
-            if (!owner)
-                return;
+            m_player = NULL;
+            m_events.ScheduleEvent(EVENT_GO_INVISIBLE, 6000);
+            m_events.ScheduleEvent(EVENT_CHECK_OWNER, 500);            
+        }
 
-            me->SetLevel(owner->getLevel());
-            me->SetMaxHealth(5);
-            me->setFaction(owner->getFaction());
+        void IsSummonedBy(Unit* summoner) 
+        { 
+            m_player = summoner->ToPlayer();
+        }
+
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
+        { 
+            printf("SpellHit  %u \n", spell->Id);
+          
+        }
+
+        void JustDied(Unit* /*killer*/)
+        {
+         
         }
 
         void UpdateAI(uint32 diff) override
         {
-            if (invisTimer > 0)
-            {
-                if (invisTimer > diff)
-                    invisTimer -= diff;
-                else
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+                switch (eventId)
                 {
-                    invisTimer = 0;
-                    DoCast(me, 92661);
+                    case EVENT_GO_INVISIBLE:
+                    {
+                        me->CastSpell(me, SPELL_INVISIBLE_TO_ENEMIES, true);
+                        break;
+                    }
+                    case EVENT_CHECK_OWNER:
+                    {
+                        if (!m_player)
+                            return;
+
+                        if (!m_player->IsInWorld() || m_player->IsDead() || m_player->GetDistance2d(me) > 40.0f)
+                        {
+                            me->DespawnOrUnsummon();
+                            return;
+                        }
+                        m_events.ScheduleEvent(EVENT_CHECK_OWNER, 500);
+                        break;
+                    }
                 }
-                return;
-            }
-            PassiveAI::UpdateAI(diff);
         }
     };
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_mushroomAI(creature);
+        return new npc_mushroom_47649AI(creature);
+    }
+};
+
+// 43497
+class npc_mushroom_43497 : public CreatureScript
+{
+public:
+    npc_mushroom_43497() : CreatureScript("npc_mushroom_43497"){ }
+
+    enum eNpc
+    {
+       
+    };
+
+    struct npc_mushroom_43497AI : public ScriptedAI
+    {
+        Player* m_player;
+
+        npc_mushroom_43497AI(Creature* creature) : ScriptedAI(creature) { }
+
+        void Reset() override
+        {
+            m_player = NULL;
+        }
+
+        void IsSummonedBy(Unit* summoner)
+        {
+            m_player = summoner->ToPlayer();
+           
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_mushroom_43497AI(creature);
     }
 };
 
@@ -3362,7 +3431,8 @@ void AddSC_npcs_special()
     new npc_dancing_rune_weapon();
     new npc_tentacle_of_the_old_ones();
     new npc_generic_harpoon_cannon();
-    new npc_mushroom();
+    new npc_mushroom_47649();
+    new npc_mushroom_43497();
     new npc_t12_fiery_imp();
 
 }
