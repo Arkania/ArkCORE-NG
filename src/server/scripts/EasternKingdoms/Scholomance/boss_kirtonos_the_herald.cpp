@@ -71,6 +71,7 @@ Position const PosMove[2] =
     { 314.8673f, 90.30210f, 101.6459f, 0.0f }
 };
 
+// 10506
 class boss_kirtonos_the_herald : public CreatureScript
 {
     public: boss_kirtonos_the_herald() : CreatureScript("boss_kirtonos_the_herald") { }

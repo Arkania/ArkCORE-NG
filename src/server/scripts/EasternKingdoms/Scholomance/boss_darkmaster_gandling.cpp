@@ -49,6 +49,7 @@ enum Events
     EVENT_SHADOW_PORTAL         = 4
 };
 
+// 1853
 class boss_darkmaster_gandling : public CreatureScript
 {
     public: boss_darkmaster_gandling() : CreatureScript("boss_darkmaster_gandling") { }
