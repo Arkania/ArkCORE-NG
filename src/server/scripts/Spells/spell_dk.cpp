@@ -961,9 +961,9 @@ class spell_dk_necrotic_strike : public SpellScriptLoader
         }
 };
 
-// 48266 - Blood Presence
-// 48263 - Frost Presence
+// 48263 - Blood Presence
 // 48265 - Unholy Presence
+// 48266 - Frost Presence
 class spell_dk_presence : public SpellScriptLoader
 {
     public:
