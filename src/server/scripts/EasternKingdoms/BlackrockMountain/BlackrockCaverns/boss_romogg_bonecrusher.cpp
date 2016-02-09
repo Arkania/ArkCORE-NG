@@ -239,5 +239,5 @@ public:
 void AddSC_boss_romogg_bonecrusher()
 {
     new boss_romogg_bonecrusher();
-    new spell_chains_of_woe();
+    // new spell_chains_of_woe(); // wrong spell implemets
 }

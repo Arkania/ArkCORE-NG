@@ -417,35 +417,6 @@ class boss_isiset : public CreatureScript
         };
 };
 
-class spell_isiset_supernova : public SpellScriptLoader
-{
-    public:
-        spell_isiset_supernova() : SpellScriptLoader("spell_isiset_supernova") { }
-        class spell_isiset_supernova_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_isiset_supernova_SpellScript);
-
-            void FilterTargetsInitial(std::list<WorldObject*>& unitList)
-            {
-                unitList.remove_if(OrientationCheck(GetCaster()));
-
-                uint32 maxSize = uint32(GetCaster()->GetMap()->GetSpawnMode() & 1 ? 5 : 5);
-                if (unitList.size() > maxSize)
-                    Trinity::Containers::RandomResizeList(unitList, maxSize);
-            }
-
-            void Register()
-            {
-               OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_isiset_supernova_SpellScript::FilterTargetsInitial, EFFECT_1, TARGET_UNIT_SRC_AREA_ENEMY);
-            }
-        };
-
-        SpellScript *GetSpellScript() const
-        {
-            return new spell_isiset_supernova_SpellScript();
-        }
-};
-
 class npc_celestial_familiar : public CreatureScript
 {
     public:
@@ -670,7 +641,6 @@ class npc_astral_rain : public CreatureScript
 void AddSC_boss_isiset()
 {
     new boss_isiset();
-    new spell_isiset_supernova();
     new npc_celestial_familiar();
     new npc_celestial_call();
     new npc_veil_sky();

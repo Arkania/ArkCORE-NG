@@ -1958,7 +1958,7 @@ class spell_attack_lurker_67805 : public SpellScriptLoader
 			}
 			void Register()
 			{
-                OnEffectHit += SpellEffectFn(spell_attack_lurker_67805_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+                OnEffectHit += SpellEffectFn(spell_attack_lurker_67805_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_JUMP);
 			}
 		};
 
