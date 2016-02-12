@@ -14,7 +14,7 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES (48362,0,1,0,61,0,100,0,0,0,0,0,41,1000,0,0,0,0,0,1,0,0,0,0,0,0,0,'On smartLink~elemental gate bunny~Despawn');
 
 -- supports Priest class quests 28328,28474,28475,28476,28477,28478.
-UPDATE `quest_template` SET `RequiredNpcOrGo1`=198002,`RequiredNpcOrGoCount1`=8 WHERE `id` IN (28328,28474,28475,28476,28477,28478);
+UPDATE `quest_template` SET `RequiredNpcOrGo1`=-207088,`RequiredNpcOrGoCount1`=8 WHERE `id` IN (28328,28474,28475,28476,28477,28478);
 UPDATE `gameobject_template` SET `AIName`='SmartGameObjectAI' WHERE `entry`=207088;
 UPDATE `gameobject_template` SET `data5`=1,`flags`=64 WHERE `entry`=207088;
 DELETE FROM `smart_scripts` WHERE `entryorguid`=207088;

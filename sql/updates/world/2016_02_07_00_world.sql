@@ -74,11 +74,6 @@ UPDATE creature_template_addon SET bytes2=257 WHERE entry=32597; -- 0
 UPDATE creature_template_addon SET bytes2=257 WHERE entry=32598; -- 0
 UPDATE creature_template_addon SET bytes2=257 WHERE entry=29548; -- 0
 
-DELETE FROM quest_poi WHERE (questId=31013 AND id=0) OR (questId=32249 AND id=0);
-INSERT INTO quest_poi (questId, id, objIndex, mapid, WorldMapAreaId, FloorId, unk3, unk4) VALUES
-(31013, 0,  0,   1, 321, 12, 0, 0), -- The Horde Way
-(32249, 0, -1, 870, 857,  1, 0, 0); -- Meet the Scout
-
 update creature set spawndist=0, MovementType=2 where guid=151058;
 delete from creature_addon where guid=151058;
 insert into creature_addon values

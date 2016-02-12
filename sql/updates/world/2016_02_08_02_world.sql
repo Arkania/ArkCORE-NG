@@ -7,7 +7,6 @@ DELETE FROM creature_addon WHERE guid=39481;
 delete from conditions where SourceTypeOrReferenceId=13 and SourceGroup=0 and SourceEntry=89557;
 delete from conditions where SourceTypeOrReferenceId=13 and SourceGroup=0 and SourceEntry=89089;
 
-delete from quest_poi where questId=31013;
-delete from quest_poi where questId=32249;
-
+delete from quest_poi where questId=31013 and id=0 and objIndex=0;
+delete from quest_poi where questId=32249 and id=0 and objIndex=-1;
 

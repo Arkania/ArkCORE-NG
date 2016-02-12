@@ -27,6 +27,7 @@ UPDATE `creature_loot_template` SET `Chance`=100 WHERE `entry`=32985 AND `item`=
 -- (34741, 61373, -100, 1, 0, 1, 1); -- Stack of Questionable Publications
 
 -- [Swamp Of Sorrows] Stonard Supplies (by Noxious)
+delete from gameobject_loot_template where entry=206391 and item=62516;
 INSERT INTO gameobject_loot_template values -- ` SET `ChanceOrQuestChance`=-100 WHERE `entry`=206391 AND `item`=62516; -- Stonard Supplies
 (206391, 62516, 0, 100, 1, 1, 0, 1, 1, "");
 
