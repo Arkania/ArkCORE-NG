@@ -7705,7 +7705,7 @@ bool ObjectMgr::LoadTrinityStrings(const char* table, int32 min_value, int32 max
     if (!result)
     {
         if (min_value == MIN_ARKCORE_STRING_ID)              // error only in case internal strings
-            TC_LOG_ERROR("server.loading", ">> Loaded 0 trinity strings. DB table `%s` is empty. Cannot continue.", table);
+            TC_LOG_ERROR("server.loading", ">> Loaded 0 arkcore strings. DB table `%s` is empty. Cannot continue.", table);
         else
             TC_LOG_INFO("server.loading", ">> Loaded 0 string templates. DB table `%s` is empty.", table);
 
@@ -7747,7 +7747,7 @@ bool ObjectMgr::LoadTrinityStrings(const char* table, int32 min_value, int32 max
     } while (result->NextRow());
 
     if (min_value == MIN_ARKCORE_STRING_ID)
-        TC_LOG_INFO("server.loading", ">> Loaded %u Trinity strings from table %s in %u ms", count, table, GetMSTimeDiffToNow(oldMSTime));
+        TC_LOG_INFO("server.loading", ">> Loaded %u arkcore strings from table %s in %u ms", count, table, GetMSTimeDiffToNow(oldMSTime));
     else
         TC_LOG_INFO("server.loading", ">> Loaded %u string templates from %s in %u ms", count, table, GetMSTimeDiffToNow(oldMSTime));
 
@@ -7765,9 +7765,9 @@ const char *ObjectMgr::GetTrinityString(int32 entry, LocaleConstant locale_idx) 
     }
 
     if (entry > 0)
-        TC_LOG_ERROR("sql.sql", "Entry %i not found in `trinity_string` table.", entry);
+        TC_LOG_ERROR("sql.sql", "Entry %i not found in `arkcore_string` table.", entry);
     else
-        TC_LOG_ERROR("sql.sql", "Trinity string entry %i not found in DB.", entry);
+        TC_LOG_ERROR("sql.sql", "Arkcore string entry %i not found in DB.", entry);
     return "<error>";
 }
 
