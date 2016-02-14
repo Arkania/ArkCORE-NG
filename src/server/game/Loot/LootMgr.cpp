@@ -270,7 +270,14 @@ void LootStore::ReportUnusedIds(LootIdSet const& lootIdSet) const
 {
     // all still listed ids isn't referenced
     for (LootIdSet::const_iterator itr = lootIdSet.begin(); itr != lootIdSet.end(); ++itr)
+    {
         TC_LOG_ERROR("sql.sql", "Table '%s' Entry %d isn't %s and not referenced from loot, and thus useless.", GetName(), *itr, GetEntryName());
+        if (GetName() == "gameobject_template")
+        {
+            TC_LOG_ERROR("sql.sql", "Possible failure: Missing loot_id in data1 of the gameobject.");
+            TC_LOG_ERROR("sql.sql", "Possible solution: UPDATE gameobject_template SET data1=%u WHERE entry=%u;", *itr);
+        }
+    }
 }
 
 void LootStore::ReportNonExistingId(uint32 lootId) const
@@ -281,7 +288,7 @@ void LootStore::ReportNonExistingId(uint32 lootId) const
 void LootStore::ReportNonExistingId(uint32 lootId, const char* ownerType, uint32 ownerId) const
 {
     TC_LOG_ERROR("sql.sql", "Table '%s' Entry %d does not exist but it is used by %s %d", GetName(), lootId, ownerType, ownerId);
-    TC_LOG_ERROR("sql.sql", "Possible FIX: INSERT INTO '%s' (all dropped loot items for %s %d found by sniff)", GetName(), ownerType, ownerId);
+    TC_LOG_ERROR("sql.sql", "Possible FIX: INSERT INTO '%s' (insert dropped loot items for %s %d. only found by sniff)", GetName(), ownerType, ownerId);
 }
 
 //
