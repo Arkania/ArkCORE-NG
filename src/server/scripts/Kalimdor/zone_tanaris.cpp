@@ -30,39 +30,32 @@ npc_steward_of_time
 npc_OOX17
 EndContentData */
 
+#include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedFollowerAI.h"
-#include "Player.h"
+#include "Vehicle.h"
 #include "WorldSession.h"
 
-/*######
-## npc_aquementas
-######*/
-
-enum Aquementas
-{
-    AGGRO_YELL_AQUE     = 0,
-
-    SPELL_AQUA_JET      = 13586,
-    SPELL_FROST_SHOCK   = 15089
-};
-
-class npc_aquementas : public CreatureScript
+// 9453
+class npc_aquementas_9453 : public CreatureScript
 {
 public:
-    npc_aquementas() : CreatureScript("npc_aquementas") { }
+    npc_aquementas_9453() : CreatureScript("npc_aquementas_9453") { }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    enum Aquementas
     {
-        return new npc_aquementasAI (creature);
-    }
+        AGGRO_YELL_AQUE = 0,
 
-    struct npc_aquementasAI : public ScriptedAI
+        SPELL_AQUA_JET = 13586,
+        SPELL_FROST_SHOCK = 15089
+    };
+
+    struct npc_aquementas_9453AI : public ScriptedAI
     {
-        npc_aquementasAI(Creature* creature) : ScriptedAI(creature) { }
+        npc_aquementas_9453AI(Creature* creature) : ScriptedAI(creature) { }
 
         uint32 SendItemTimer;
         uint32 SwitchFactionTimer;
@@ -143,43 +136,39 @@ public:
         }
     };
 
-};
-
-/*######
-## npc_custodian_of_time
-######*/
-
-enum CustodianOfTime
-{
-    WHISPER_CUSTODIAN_1     = 0,
-    WHISPER_CUSTODIAN_2     = 1,
-    WHISPER_CUSTODIAN_3     = 2,
-    WHISPER_CUSTODIAN_4     = 3,
-    WHISPER_CUSTODIAN_5     = 4,
-    WHISPER_CUSTODIAN_6     = 5,
-    WHISPER_CUSTODIAN_7     = 6,
-    WHISPER_CUSTODIAN_8     = 7,
-    WHISPER_CUSTODIAN_9     = 8,
-    WHISPER_CUSTODIAN_10    = 9,
-    WHISPER_CUSTODIAN_11    = 10,
-    WHISPER_CUSTODIAN_12    = 11,
-    WHISPER_CUSTODIAN_13    = 12,
-    WHISPER_CUSTODIAN_14    = 13
-};
-
-class npc_custodian_of_time : public CreatureScript
-{
-public:
-    npc_custodian_of_time() : CreatureScript("npc_custodian_of_time") { }
-
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_custodian_of_timeAI(creature);
+        return new npc_aquementas_9453AI(creature);
     }
+};
 
-    struct npc_custodian_of_timeAI : public npc_escortAI
+// 19950
+class npc_custodian_of_time_19950 : public CreatureScript
+{
+public:
+    npc_custodian_of_time_19950() : CreatureScript("npc_custodian_of_time_19950") { }
+
+    enum CustodianOfTime
     {
-        npc_custodian_of_timeAI(Creature* creature) : npc_escortAI(creature) { }
+        WHISPER_CUSTODIAN_1 = 0,
+        WHISPER_CUSTODIAN_2 = 1,
+        WHISPER_CUSTODIAN_3 = 2,
+        WHISPER_CUSTODIAN_4 = 3,
+        WHISPER_CUSTODIAN_5 = 4,
+        WHISPER_CUSTODIAN_6 = 5,
+        WHISPER_CUSTODIAN_7 = 6,
+        WHISPER_CUSTODIAN_8 = 7,
+        WHISPER_CUSTODIAN_9 = 8,
+        WHISPER_CUSTODIAN_10 = 9,
+        WHISPER_CUSTODIAN_11 = 10,
+        WHISPER_CUSTODIAN_12 = 11,
+        WHISPER_CUSTODIAN_13 = 12,
+        WHISPER_CUSTODIAN_14 = 13
+    };
+
+    struct npc_custodian_of_time_19950AI : public npc_escortAI
+    {
+        npc_custodian_of_time_19950AI(Creature* creature) : npc_escortAI(creature) { }
 
         void WaypointReached(uint32 waypointId)
         {
@@ -275,18 +264,17 @@ public:
         }
     };
 
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_custodian_of_time_19950AI(creature);
+    }
 };
 
-/*######
-## npc_steward_of_time
-######*/
-
-#define GOSSIP_ITEM_FLIGHT  "Please take me to the master's lair."
-
-class npc_steward_of_time : public CreatureScript
+// 20142
+class npc_steward_of_time_20142 : public CreatureScript
 {
 public:
-    npc_steward_of_time() : CreatureScript("npc_steward_of_time") { }
+    npc_steward_of_time_20142() : CreatureScript("npc_steward_of_time_20142") { }
 
     bool OnQuestAccept(Player* player, Creature* /*creature*/, Quest const* quest)
     {
@@ -312,7 +300,7 @@ public:
 
         if (player->GetQuestStatus(10279) == QUEST_STATUS_INCOMPLETE || player->GetQuestRewardStatus(10279))
         {
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_FLIGHT, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Please take me to the master's lair.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
             player->SEND_GOSSIP_MENU(9978, creature->GetGUID());
         }
         else
@@ -320,31 +308,27 @@ public:
 
         return true;
     }
-
 };
 
-/*######
-## npc_OOX17
-######*/
-
-enum Npc00X17
-{
-    SAY_OOX_START           = 0,
-    SAY_OOX_AGGRO           = 1,
-    SAY_OOX_AMBUSH          = 2,
-    SAY_OOX17_AMBUSH_REPLY  = 0,
-    SAY_OOX_END             = 3,
-
-    Q_OOX17                 = 648,
-    SPAWN_FIRST             = 7803,
-    SPAWN_SECOND_1          = 5617,
-    SPAWN_SECOND_2          = 7805
-};
-
-class npc_OOX17 : public CreatureScript
+// 7784
+class npc_OOX17_7784 : public CreatureScript
 {
 public:
-    npc_OOX17() : CreatureScript("npc_OOX17") { }
+    npc_OOX17_7784() : CreatureScript("npc_OOX17_7784") { }
+
+    enum Npc00X17
+    {
+        SAY_OOX_START = 0,
+        SAY_OOX_AGGRO = 1,
+        SAY_OOX_AMBUSH = 2,
+        SAY_OOX17_AMBUSH_REPLY = 0,
+        SAY_OOX_END = 3,
+
+        Q_OOX17 = 648,
+        SPAWN_FIRST = 7803,
+        SPAWN_SECOND_1 = 5617,
+        SPAWN_SECOND_2 = 7805
+    };
 
     bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
     {
@@ -356,20 +340,15 @@ public:
             creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
             creature->AI()->Talk(SAY_OOX_START);
 
-            if (npc_escortAI* pEscortAI = CAST_AI(npc_OOX17::npc_OOX17AI, creature->AI()))
+            if (npc_escortAI* pEscortAI = CAST_AI(npc_OOX17_7784::npc_OOX17_7784AI, creature->AI()))
                 pEscortAI->Start(true, false, player->GetGUID());
         }
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    struct npc_OOX17_7784AI : public npc_escortAI
     {
-        return new npc_OOX17AI(creature);
-    }
-
-    struct npc_OOX17AI : public npc_escortAI
-    {
-        npc_OOX17AI(Creature* creature) : npc_escortAI(creature) { }
+        npc_OOX17_7784AI(Creature* creature) : npc_escortAI(creature) { }
 
         void WaypointReached(uint32 waypointId)
         {
@@ -411,55 +390,50 @@ public:
             summoned->AI()->AttackStart(me);
         }
     };
+    
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_OOX17_7784AI(creature);
+    }
 };
 
-/*####
-# npc_tooga
-####*/
-
-enum Tooga
-{
-    SAY_TOOG_WORRIED            = 0,
-    SAY_TOOG_POST_1             = 1,
-    SAY_TORT_POST_2             = 0,
-    SAY_TOOG_POST_3             = 2,
-    SAY_TORT_POST_4             = 1,
-    SAY_TOOG_POST_5             = 3,
-    SAY_TORT_POST_6             = 2,
-
-    QUEST_TOOGA                 = 1560,
-    NPC_TORTA                   = 6015,
-
-    POINT_ID_TO_WATER           = 1,
-    FACTION_TOOG_ESCORTEE       = 113
-};
-
-Position const ToWaterLoc = {-7032.664551f, -4906.199219f, -1.606446f, 0.0f};
-
-class npc_tooga : public CreatureScript
+// 5955
+class npc_tooga_5955 : public CreatureScript
 {
 public:
-    npc_tooga() : CreatureScript("npc_tooga") { }
+    npc_tooga_5955() : CreatureScript("npc_tooga_5955") { }
+
+    enum Tooga
+    {
+        SAY_TOOG_WORRIED = 0,
+        SAY_TOOG_POST_1 = 1,
+        SAY_TORT_POST_2 = 0,
+        SAY_TOOG_POST_3 = 2,
+        SAY_TORT_POST_4 = 1,
+        SAY_TOOG_POST_5 = 3,
+        SAY_TORT_POST_6 = 2,
+
+        QUEST_TOOGA = 1560,
+        NPC_TORTA = 6015,
+
+        POINT_ID_TO_WATER = 1,
+        FACTION_TOOG_ESCORTEE = 113
+    };
 
     bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest)
     {
         if (quest->GetQuestId() == QUEST_TOOGA)
         {
-            if (npc_toogaAI* pToogaAI = CAST_AI(npc_tooga::npc_toogaAI, creature->AI()))
+            if (npc_tooga_5955AI* pToogaAI = CAST_AI(npc_tooga_5955::npc_tooga_5955AI, creature->AI()))
                 pToogaAI->StartFollow(player, FACTION_TOOG_ESCORTEE, quest);
         }
 
         return true;
     }
-
-    CreatureAI* GetAI(Creature* creature) const override
+    
+    struct npc_tooga_5955AI : public FollowerAI
     {
-        return new npc_toogaAI(creature);
-    }
-
-    struct npc_toogaAI : public FollowerAI
-    {
-        npc_toogaAI(Creature* creature) : FollowerAI(creature) { }
+        npc_tooga_5955AI(Creature* creature) : FollowerAI(creature) { }
 
         uint32 CheckSpeechTimer;
         uint32 PostEventTimer;
@@ -543,7 +517,7 @@ public:
                                 break;
                             case 6:
                                 torta->AI()->Talk(SAY_TORT_POST_6);
-                                me->GetMotionMaster()->MovePoint(POINT_ID_TO_WATER, ToWaterLoc);
+                                me->GetMotionMaster()->MovePoint(POINT_ID_TO_WATER, -7032.664551f, -4906.199219f, -1.606446f);
                                 break;
                         }
 
@@ -573,11 +547,223 @@ public:
         }
     };
 
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_tooga_5955AI(creature);
+    }
 };
+
+// 46516
+class npc_uldum_caravan_harness_46516 : public CreatureScript
+{
+public:
+    npc_uldum_caravan_harness_46516() : CreatureScript("npc_uldum_caravan_harness_46516") { }
+
+    enum eNpc
+    {
+        EVENT_CHECK_PASSENGER = 1,
+        NPC_KODO = 46514,
+        NPC_KURZEL = 46529,
+        NPC_HARKOR = 46530,
+        NPC_TURGORE = 46525,
+        NPC_TANZAR = 46528,
+        DRIVER_LEFT = 1,
+        DRIVER_RIGHT = 0,
+        DRIVER_KODO = 4,
+        PASSENGER_MID = 2,
+        PASSENGER_LAST = 3,
+    };
+
+    struct npc_uldum_caravan_harness_46516AI : public ScriptedAI
+    {
+        npc_uldum_caravan_harness_46516AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap m_events;
+        uint64 kodoGUID;
+        uint64 kurzelGUID;
+        uint64 harkorGUID;
+        uint64 turgoreGUID;
+        uint64 tanzarGUID;
+
+        void Reset() override
+        {
+            kodoGUID = NULL;
+            kurzelGUID = NULL;
+            harkorGUID = NULL;
+            turgoreGUID = NULL;
+            tanzarGUID = NULL;
+            m_events.ScheduleEvent(EVENT_CHECK_PASSENGER, 1000);
+        }
+
+        void JustSummoned(Creature* summon) override
+        { 
+            summon->AddAura(46598, summon);
+            summon->AddAura(46598, me);
+            summon->SetDisableGravity(true);
+            if (Vehicle* caravan = me->GetVehicleKit())
+            {
+                switch (summon->GetEntry())
+                {
+                case NPC_KODO:
+                    kodoGUID = summon->GetGUID();
+                    summon->EnterVehicle(me, DRIVER_KODO);
+                    break;
+                case NPC_TURGORE:
+                    turgoreGUID = summon->GetGUID();
+                    summon->EnterVehicle(me, DRIVER_RIGHT);
+                    break;
+                case NPC_TANZAR:
+                    tanzarGUID = summon->GetGUID();
+                    summon->EnterVehicle(me, PASSENGER_LAST);
+                    break;
+                case NPC_KURZEL:
+                    kurzelGUID = summon->GetGUID();
+                    summon->EnterVehicle(me, PASSENGER_MID);
+                    break;
+                case NPC_HARKOR:
+                    harkorGUID = summon->GetGUID();
+                    summon->EnterVehicle(me, DRIVER_LEFT);
+                    break;
+                }
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                    case EVENT_CHECK_PASSENGER:
+                    {
+                        if (Vehicle* caravan = me->GetVehicleKit())
+                        {
+                            if (!kurzelGUID)
+                                me->SummonCreature(NPC_KURZEL, me->GetNearPosition(5.0f, 0.0f), TEMPSUMMON_MANUAL_DESPAWN);
+                            else if (!turgoreGUID)
+                                me->SummonCreature(NPC_TURGORE, me->GetNearPosition(5.0f, 0.0f), TEMPSUMMON_MANUAL_DESPAWN);
+                            else if (!tanzarGUID)
+                                me->SummonCreature(NPC_TANZAR, me->GetNearPosition(5.0f, 0.0f), TEMPSUMMON_MANUAL_DESPAWN);
+                            else if (!kodoGUID)
+                                me->SummonCreature(NPC_KODO, me->GetNearPosition(5.0f, 0.0f), TEMPSUMMON_MANUAL_DESPAWN);
+                            else if (!harkorGUID)
+                            {
+                                me->SummonCreature(NPC_HARKOR, me->GetNearPosition(5.0f, 0.0f), TEMPSUMMON_MANUAL_DESPAWN);
+                                return;
+                            }
+                        }
+                        m_events.ScheduleEvent(EVENT_CHECK_PASSENGER, 50);
+
+                        break;
+                    }
+                }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_uldum_caravan_harness_46516AI(creature);
+    }
+};
+
+// 44833
+class npc_adarrah_44833 : public CreatureScript
+{
+public:
+    npc_adarrah_44833() : CreatureScript("npc_adarrah_44833") { }
+
+    enum eNpc
+    {
+        EVENT_CHECK_PASSENGER = 1,       
+    };
+
+    struct npc_adarrah_44833AI : public ScriptedAI
+    {
+        npc_adarrah_44833AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap m_events;
+
+        void Reset() override
+        {            
+            m_events.Reset();
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                    case 0:               
+                        break;                
+                }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_adarrah_44833AI(creature);
+    }
+};
+
+// 46517
+class npc_lady_humps_46517 : public CreatureScript
+{
+public:
+    npc_lady_humps_46517() : CreatureScript("npc_lady_humps_46517") { }
+
+    enum eNpc
+    {
+        EVENT_CHECK_PASSENGER = 1,
+    };
+
+    struct npc_lady_humps_46517AI : public ScriptedAI
+    {
+        npc_lady_humps_46517AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap m_events;
+
+        void Reset() override
+        {
+            m_events.Reset();
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case 0:
+                    break;
+                }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_lady_humps_46517AI(creature);
+    }
+};
+
 
 void AddSC_tanaris()
 {
-    new npc_custodian_of_time();
-    new npc_steward_of_time();
-    new npc_OOX17();
+    new npc_aquementas_9453();
+    new npc_custodian_of_time_19950();
+    new npc_steward_of_time_20142();
+    new npc_OOX17_7784();
+    new npc_tooga_5955();
+    new npc_uldum_caravan_harness_46516();
+    new npc_adarrah_44833();
+    new npc_lady_humps_46517();
 }
