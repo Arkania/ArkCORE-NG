@@ -579,53 +579,15 @@ public:
         npc_uldum_caravan_harness_46516AI(Creature* creature) : ScriptedAI(creature) { }
 
         EventMap m_events;
-        uint64 kodoGUID;
-        uint64 kurzelGUID;
-        uint64 harkorGUID;
-        uint64 turgoreGUID;
-        uint64 tanzarGUID;
 
         void Reset() override
         {
-            kodoGUID = NULL;
-            kurzelGUID = NULL;
-            harkorGUID = NULL;
-            turgoreGUID = NULL;
-            tanzarGUID = NULL;
             m_events.ScheduleEvent(EVENT_CHECK_PASSENGER, 1000);
         }
 
         void JustSummoned(Creature* summon) override
         { 
-            summon->AddAura(46598, summon);
-            summon->AddAura(46598, me);
-            summon->SetDisableGravity(true);
-            if (Vehicle* caravan = me->GetVehicleKit())
-            {
-                switch (summon->GetEntry())
-                {
-                case NPC_KODO:
-                    kodoGUID = summon->GetGUID();
-                    summon->EnterVehicle(me, DRIVER_KODO);
-                    break;
-                case NPC_TURGORE:
-                    turgoreGUID = summon->GetGUID();
-                    summon->EnterVehicle(me, DRIVER_RIGHT);
-                    break;
-                case NPC_TANZAR:
-                    tanzarGUID = summon->GetGUID();
-                    summon->EnterVehicle(me, PASSENGER_LAST);
-                    break;
-                case NPC_KURZEL:
-                    kurzelGUID = summon->GetGUID();
-                    summon->EnterVehicle(me, PASSENGER_MID);
-                    break;
-                case NPC_HARKOR:
-                    harkorGUID = summon->GetGUID();
-                    summon->EnterVehicle(me, DRIVER_LEFT);
-                    break;
-                }
-            }
+          
         }
 
         void UpdateAI(uint32 diff) override
@@ -638,23 +600,6 @@ public:
                 {
                     case EVENT_CHECK_PASSENGER:
                     {
-                        if (Vehicle* caravan = me->GetVehicleKit())
-                        {
-                            if (!kurzelGUID)
-                                me->SummonCreature(NPC_KURZEL, me->GetNearPosition(5.0f, 0.0f), TEMPSUMMON_MANUAL_DESPAWN);
-                            else if (!turgoreGUID)
-                                me->SummonCreature(NPC_TURGORE, me->GetNearPosition(5.0f, 0.0f), TEMPSUMMON_MANUAL_DESPAWN);
-                            else if (!tanzarGUID)
-                                me->SummonCreature(NPC_TANZAR, me->GetNearPosition(5.0f, 0.0f), TEMPSUMMON_MANUAL_DESPAWN);
-                            else if (!kodoGUID)
-                                me->SummonCreature(NPC_KODO, me->GetNearPosition(5.0f, 0.0f), TEMPSUMMON_MANUAL_DESPAWN);
-                            else if (!harkorGUID)
-                            {
-                                me->SummonCreature(NPC_HARKOR, me->GetNearPosition(5.0f, 0.0f), TEMPSUMMON_MANUAL_DESPAWN);
-                                return;
-                            }
-                        }
-                        m_events.ScheduleEvent(EVENT_CHECK_PASSENGER, 50);
 
                         break;
                     }

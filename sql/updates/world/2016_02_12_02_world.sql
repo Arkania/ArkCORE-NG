@@ -16,14 +16,22 @@ update creature_template set AIName="", ScriptName="npc_uldum_caravan_harness_46
 update creature_template set AIName="", ScriptName="npc_adarrah_44833" where entry=44833;
 update creature_template set AIName="", ScriptName="npc_lady_humps_46517" where entry=46517;
 
-
 delete from vehicle_template_accessory where entry=46516;
--- insert into vehicle_template_accessory value
--- (46516, 46525, 0, 1, "Turgore", 6, 30000),
--- (46516, 46529, 2, 1, "Kurzel", 6, 30000),
--- (46516, 46514, 3, 1, "Kodo", 6, 30000),
--- (46516, 46530, 4, 1, "Harkor", 6, 30000),
--- (46516, 46528, 5, 1, "Tanzar", 6, 30000);
+insert into vehicle_template_accessory values
+(46516, 46525, 0, 0, "Turgore", 8, 0),
+(46516, 46528, 5, 0, "Tanzar", 8, 0),
+(46516, 46529, 2, 0, "Kurzel", 8, 0),
+(46516, 46514, 3, 0, "Domesticated Kodo", 8, 0),
+(46516, 46530, 4, 0, "Harkor", 8, 0);
+
+delete from npc_spellclick_spells where npc_entry in (46514, 46525, 46528, 46529, 46530);
+insert into npc_spellclick_spells values
+(46514, 46598, 0, 0),
+(46516, 46598, 0, 0),
+(46525, 46598, 0, 0),
+(46528, 46598, 0, 0),
+(46529, 46598, 0, 0),
+(46530, 46598, 0, 0);
 
 -- spawned by script
 delete from creature where guid in (103801, 104508, 104732, 104745, 104952, 105171);
