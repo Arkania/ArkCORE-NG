@@ -2071,7 +2071,7 @@ void Guild::SendGuildRankInfo(WorldSession* session) const
             rankData << uint32(rankInfo->GetBankTabRights(j));
         }
 
-        rankData << uint32(rankInfo->GetBankMoneyPerDay() / GOLD); // Divide by gold copper cost to show right gold remaining withdrawal.
+        rankData << uint32(rankInfo->GetBankMoneyPerDay());
         rankData << uint32(rankInfo->GetRights());
 
         if (rankInfo->GetName().length())
