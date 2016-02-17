@@ -379,7 +379,8 @@ void Guild::RankInfo::LoadFromDB(Field* fields)
     m_rankId            = fields[1].GetUInt8();
     m_name              = fields[2].GetString();
     m_rights            = fields[3].GetUInt32();
-    m_bankMoneyPerDay   = fields[4].GetUInt32();
+    uint32 gold         = fields[4].GetUInt32();
+    m_bankMoneyPerDay = gold * GOLD;
     if (m_rankId == GR_GUILDMASTER)                     // Prevent loss of leader rights
         m_rights |= GR_RIGHT_ALL;
 }
@@ -461,7 +462,7 @@ void Guild::RankInfo::SetBankMoneyPerDay(uint32 money)
     m_bankMoneyPerDay = money;
 
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GUILD_RANK_BANK_MONEY);
-    stmt->setUInt32(0, money);
+    stmt->setUInt32(0, money / GOLD);
     stmt->setUInt8 (1, m_rankId);
     stmt->setUInt32(2, m_guildId);
     CharacterDatabase.Execute(stmt);
@@ -2071,7 +2072,7 @@ void Guild::SendGuildRankInfo(WorldSession* session) const
             rankData << uint32(rankInfo->GetBankTabRights(j));
         }
 
-        rankData << uint32(rankInfo->GetBankMoneyPerDay());
+        rankData << uint32(rankInfo->GetBankMoneyPerDay() / GOLD); // Divide by gold copper cost to show right gold remaining with draw all.
         rankData << uint32(rankInfo->GetRights());
 
         if (rankInfo->GetName().length())
