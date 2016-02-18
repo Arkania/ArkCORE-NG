@@ -61,7 +61,9 @@ public:
 
         void Reset() override
         {
-            globalCooldown = 0;
+            globalCooldown1 = 0;
+            globalCooldown2 = 0;
+            events.Reset();
             buffTimer = 0;
             m_timer1 = 1000;
             m_timer2 = 1000;
@@ -77,13 +79,91 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
+            static uint64 playerguid;
+            events.Update(diff);
+
             DoWork(diff);
 
              //Always decrease our global cooldown first
-            if (globalCooldown > diff)
-                globalCooldown -= diff;
+            if (globalCooldown1 > diff)
+                globalCooldown1 -= diff;
             else
-                globalCooldown = 0;
+                globalCooldown1 = 0;
+
+            if (globalCooldown2 > diff)
+                globalCooldown2 -= diff;
+            else
+                globalCooldown2 = 0;
+
+            //Buff for Love is in the Air
+            if (me->IsAlive() && IsEventActive(8) && !me->IsInCombat() && !me->HasAura(71507) &&
+                (me->GetEntry() == NPC_STORMWIND_CITY_GUARD || me->GetEntry() == NPC_STORMWIND_CITY_PATROLLER || me->GetEntry() == NPC_ORGRIMMAR_GRUNT))
+                me->AddAura(71507, me);
+            else if (!IsEventActive(8) && me->HasAura(71507))
+                me->RemoveAura(71507);
+
+            Player * pplayer = me->SelectNearestPlayer(20);
+
+            //Fun emotes they do to players
+            if (pplayer && pplayer->GetGUIDLow() != playerguid)
+            {
+                playerguid = pplayer->GetGUIDLow();
+                if (me->GetDistance(pplayer->GetPositionX(), pplayer->GetPositionY(), pplayer->GetPositionZ()) <= 7 && me->IsAlive() && !me->IsInCombat() && (me->GetEntry() == NPC_STORMWIND_CITY_GUARD
+                    || me->GetEntry() == NPC_STORMWIND_CITY_PATROLLER || me->GetEntry() == NPC_ORGRIMMAR_GRUNT) && globalCooldown2 == 0)
+                {
+                    if ((pplayer->GetQuestStatus(13188) != QUEST_STATUS_NONE && pplayer->GetQuestStatus(13188) != QUEST_STATUS_REWARDED) || (pplayer->GetQuestStatus(13189) != QUEST_STATUS_NONE && pplayer->GetQuestStatus(13189) != QUEST_STATUS_REWARDED))
+                        events.ScheduleEvent(3, 100);
+                    else
+                        events.ScheduleEvent(urand(1, 2), 100);
+                }
+            }
+            else if (!pplayer)
+                playerguid = 0;
+            while (uint32 eventId = events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case 1:
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_WAVE);
+                    events.Reset();
+                    events.ScheduleEvent(4, 100);
+                    break;
+                case 2:
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
+                    events.Reset();
+                    events.ScheduleEvent(4, 100);
+                    break;
+                case 4:
+
+                    globalCooldown2 = urand(9000, 10000);
+                    events.Reset();
+                    break;
+                case 3:
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_RUDE);
+                    int ur = urand(1, 3);
+                    if (ur == 1)
+                        me->CastSpell(pplayer, 58511, true);
+                    else if (ur == 2)
+                        me->CastSpell(pplayer, 58514, true);
+                    else
+                        me->CastSpell(pplayer, 58519, true);
+                    int ura = urand(1, 5);
+                    if (ura == 1)
+                        me->MonsterYell("How dare you set foot in our city!", 0, 0);
+                    else if (ura == 2)
+                        me->MonsterYell("My family was wiped out by the scourge! MONSTER!", 0, 0);
+                    else if (ura == 3)
+                        me->MonsterYell("GET A ROPE!", 0, 0);
+                    else if (ura == 4)
+                        me->MonsterYell("Traitorous dog!", 0, 0);
+                    else if (ura == 5)
+                        me->MonsterYell("Monster!", 0, 0);
+                    events.Reset();
+                    events.ScheduleEvent(4, 100);
+                    break;
+
+                }
+            }
 
             //Buff timer (only buff when we are alive and not in combat
             if (me->IsAlive() && !me->IsInCombat())
@@ -93,13 +173,13 @@ public:
                     //Find a spell that targets friendly and applies an aura (these are generally buffs)
                     SpellInfo const* info = SelectSpell(me, 0, 0, SELECT_TARGET_ANY_FRIEND, 0, 0, 0, 0, SELECT_EFFECT_AURA);
 
-                    if (info && !globalCooldown)
+                    if (info && !globalCooldown1)
                     {
                         //Cast the buff spell
                         DoCast(me, info->Id);
 
                         //Set our global cooldown
-                        globalCooldown = GENERIC_CREATURE_COOLDOWN;
+                        globalCooldown1 = GENERIC_CREATURE_COOLDOWN;
 
                         //Set our timer to 10 minutes before rebuff
                         buffTimer = 600000;
@@ -132,7 +212,7 @@ public:
                         info = SelectSpell(me->GetVictim(), 0, 0, SELECT_TARGET_ANY_ENEMY, 0, 0, 0, 0, SELECT_EFFECT_DONTCARE);
 
                     //20% chance to replace our white hit with a spell
-                    if (info && urand(0, 99) < 20 && !globalCooldown)
+                    if (info && urand(0, 99) < 20 && !globalCooldown1)
                     {
                         //Cast the spell
                         if (healing)
@@ -141,7 +221,7 @@ public:
                             DoCastVictim(info->Id);
 
                         //Set our global cooldown
-                        globalCooldown = GENERIC_CREATURE_COOLDOWN;
+                        globalCooldown1 = GENERIC_CREATURE_COOLDOWN;
                     }
                     else
                         me->AttackerStateUpdate(me->GetVictim());
@@ -168,7 +248,7 @@ public:
                         info = SelectSpell(me->GetVictim(), 0, 0, SELECT_TARGET_ANY_ENEMY, 0, 0, NOMINAL_MELEE_RANGE, 0, SELECT_EFFECT_DONTCARE);
 
                     //Found a spell, check if we arn't on cooldown
-                    if (info && !globalCooldown)
+                    if (info && !globalCooldown1)
                     {
                         //If we are currently moving stop us and set the movement generator
                         if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() != IDLE_MOTION_TYPE)
@@ -184,7 +264,7 @@ public:
                             DoCastVictim(info->Id);
 
                         //Set our global cooldown
-                        globalCooldown = GENERIC_CREATURE_COOLDOWN;
+                        globalCooldown1 = GENERIC_CREATURE_COOLDOWN;
                     }                                               //If no spells available and we arn't moving run to target
                     else if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() != CHASE_MOTION_TYPE)
                     {
@@ -339,7 +419,9 @@ public:
         }
 
     private:
-        uint32 globalCooldown;
+        EventMap events;
+        uint32 globalCooldown1;
+        uint32 globalCooldown2;
         uint32 buffTimer;
         uint32 m_timer1;
         uint32 m_timer2;
