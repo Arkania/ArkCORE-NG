@@ -14,7 +14,7 @@ update creature_template set AIName="", ScriptName="npc_OOX17_7784" where entry=
 update creature_template set AIName="", ScriptName="npc_tooga_5955" where entry=5955;
 update creature_template set AIName="", ScriptName="npc_uldum_caravan_harness_46516" where entry=46516;
 update creature_template set AIName="", ScriptName="npc_adarrah_44833" where entry=44833;
-update creature_template set AIName="", ScriptName="npc_lady_humps_46517" where entry=46517;
+update creature_template set AIName="", ScriptName="" where entry=46517;
 
 delete from vehicle_template_accessory where entry=46516;
 insert into vehicle_template_accessory values
@@ -43,19 +43,12 @@ UPDATE locales_quest SET CompletedText_loc3="Sprecht mit Adarrah in der verloren
 
 UPDATE quest_template SET Flags=786432, RequiredNpcOrGo1=44833, RequiredNpcOrGoCount1=1 WHERE Id=27003;
 
-UPDATE creature_template SET npcflag=16777216 WHERE entry=46517;
+UPDATE creature_template SET npcflag=0 WHERE entry=46517;
 delete from npc_spellclick_spells where npc_entry=46517 and spell_id=86942;
-insert into npc_spellclick_spells values
-(46517,  86942, 1, 0);
 
 delete from creature_text where entry=46533 and groupid in (0, 1);
-insert into creature_text values
-(46533, 0, 0, "No, no, silly $R...", 12, 0, 100, 11, 0, 0, "", 46688),
-(46533, 1, 0, "No one rides the Lady!", 12, 0, 100, 274, 0, 0, "", 46689);
 
 delete from creature_text where entry=46520 and groupid in (0);
-insert into creature_text values
-(46520, 0, 0, "Ahoy!", 12, 0, 100, 70, 0, 21174, "", 46715);
 
 delete from creature_text where entry=47326 and groupid in (0, 1, 2);
 insert into creature_text values

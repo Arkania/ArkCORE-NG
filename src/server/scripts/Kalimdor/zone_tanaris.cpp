@@ -553,41 +553,225 @@ public:
     }
 };
 
-// 46516
-class npc_uldum_caravan_harness_46516 : public CreatureScript
+// ##########  Vision 1: expedition to uldum
+
+enum eQuest27003
+{
+    QUEST_EASY_MONEY = 27003,
+
+    SPELL_DETECT_QUEST_INVIS_ZONE_5 = 86749,
+    SPELL_DETECT_QUEST_INVIS_ZONE_1 = 89270,
+    SPELL_SUMMON_BEAM_TARGET_BUNNY = 86942,
+    SPELL_INITIALIZE_ULDRUM_INTRO = 86748,
+    SPELL_PLAYER_PREP = 86750,
+    SPELL_SUMMON_CLONED_IMAGE = 86782,
+    SPELL_REVERSE_CAST_MIRROR_IMAGE = 86783, // Script Effect Value: 86784
+    SPELL_MIRROR_IMAGE_AURA = 86784, // Script Effect Value: 41055  Value : 45206
+    SPELL_CHAINS_OF_BONDAGE_1 = 73447,
+    SPELL_CHAINS_OF_BONDAGE_2 = 73448,
+    SPELL_CHAINS_OF_BONDAGE_3 = 73449,
+
+    SPELL_SUMMON_ADARRAH = 86751,
+    SPELL_SUMMON_CARAVAN = 86752,
+    SPELL_SUMMON_LADY_HUMPS = 86753,
+    SPELL_SUMMON_PACK_MULE = 86754,
+    SPELL_SUMMON_BUDDS_CAMEL = 86755,
+    SPELL_SUMMON_SAMIRS_CAMEL = 86756,
+    SPELL_SUMMON_MACKS_CAMEL = 86757,
+    SPELL_SUMMON_ADARRAHS_CAMEL = 86758,
+    
+    NPC_ADARRAH = 46533,
+    NPC_LADY_HUMPS = 46536,
+    NPC_PACK_MULE = 46537,
+    NPC_BUDDS_CAMEL = 46538,
+    NPC_SAMIRS_CAMEL = 46540,
+    NPC_MACKS_CAMEL = 46543,
+    NPC_ADARRAHS_CAMEL = 46546,
+    NPC_CLONED_IMAGE = 46554,
+    NPC_HARNISH = 46596,
+    NPC_KODO_2 = 46534,
+    NPC_KURZEL_2 = 46548,
+    NPC_TURGORE_2 = 46544,
+    NPC_TANZAR_2 = 46547,
+    NPC_HARKOR_2 = 46545,
+    NPC_PLAYER_GUID = 99999,
+    
+    EVENT_START_ADARRAH = 2,
+    EVENT_TALK_2 = 3,
+    EVENT_MOVE_ADARRAH_2 = 4,
+    EVENT_CHECK_PLAYER_IS_PRESENT = 5,
+    EVENT_START_CARAVAN = 6,
+};
+
+// 44833
+class npc_adarrah_44833 : public CreatureScript
 {
 public:
-    npc_uldum_caravan_harness_46516() : CreatureScript("npc_uldum_caravan_harness_46516") { }
+    npc_adarrah_44833() : CreatureScript("npc_adarrah_44833") { }
 
-    enum eNpc
-    {
-        EVENT_CHECK_PASSENGER = 1,
-        NPC_KODO = 46514,
-        NPC_KURZEL = 46529,
-        NPC_HARKOR = 46530,
-        NPC_TURGORE = 46525,
-        NPC_TANZAR = 46528,
-        DRIVER_LEFT = 1,
-        DRIVER_RIGHT = 0,
-        DRIVER_KODO = 4,
-        PASSENGER_MID = 2,
-        PASSENGER_LAST = 3,
-    };
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) 
+    { 
+        if (quest->GetQuestId() == QUEST_EASY_MONEY)
+        {
+            player->RemoveAura(SPELL_DETECT_QUEST_INVIS_ZONE_5);
+            player->AddAura(SPELL_DETECT_QUEST_INVIS_ZONE_1, player);
+            player->CastSpell(player, SPELL_SUMMON_BEAM_TARGET_BUNNY);
+        }
 
-    struct npc_uldum_caravan_harness_46516AI : public ScriptedAI
+        return false; 
+    }
+};
+
+// 46661
+class npc_beam_target_bunny_46661 : public CreatureScript
+{
+public:
+    npc_beam_target_bunny_46661() : CreatureScript("npc_beam_target_bunny_46661") { }
+     
+    struct npc_beam_target_bunny_46661AI : public ScriptedAI
     {
-        npc_uldum_caravan_harness_46516AI(Creature* creature) : ScriptedAI(creature) { }
+        npc_beam_target_bunny_46661AI(Creature* creature) : ScriptedAI(creature) { }
 
         EventMap m_events;
+        uint64 playerGUID;
+        uint64 adarrahGUID;
+        uint64 harnishGUID;
+        uint64 lady_humpsGUID;
+        uint64 pack_muleGUID;
+        uint64 budds_camelGUID;
+        uint64 samirs_camelGUID;
+        uint64 macks_camelGUID;
+        uint64 adarrahs_camelGUID;
+        uint64 clone_imageGUID;
 
         void Reset() override
         {
-            m_events.ScheduleEvent(EVENT_CHECK_PASSENGER, 1000);
+            m_events.Reset();
+            playerGUID = NULL;
+            adarrahGUID = NULL;
+            harnishGUID = NULL;
+            lady_humpsGUID = NULL;
+            pack_muleGUID = NULL;
+            budds_camelGUID = NULL;
+            samirs_camelGUID = NULL;
+            macks_camelGUID = NULL;
+            adarrahs_camelGUID = NULL;
+            clone_imageGUID = NULL;
+        }
+
+        void IsSummonedBy(Unit* summoner) override
+        {
+            if (Player* player = summoner->ToPlayer())
+            {
+                playerGUID = player->GetGUID();
+                // player->CastSpell(player, SPELL_PLAYER_PREP);
+                me->CastSpell(player, SPELL_SUMMON_ADARRAH);
+                me->CastSpell(player, SPELL_SUMMON_CARAVAN);
+                me->CastSpell(player, SPELL_SUMMON_LADY_HUMPS);
+                me->CastSpell(player, SPELL_SUMMON_PACK_MULE);
+                me->CastSpell(player, SPELL_SUMMON_BUDDS_CAMEL);
+                me->CastSpell(player, SPELL_SUMMON_SAMIRS_CAMEL);
+                me->CastSpell(player, SPELL_SUMMON_MACKS_CAMEL);
+                me->CastSpell(player, SPELL_SUMMON_ADARRAHS_CAMEL);
+                player->CastSpell(player, SPELL_SUMMON_CLONED_IMAGE);
+                //player->CastSpell(player, SPELL_INITIALIZE_ULDRUM_INTRO);
+                m_events.ScheduleEvent(EVENT_CHECK_PLAYER_IS_PRESENT, 10000);
+            }
         }
 
         void JustSummoned(Creature* summon) override
+        {
+            switch (summon->GetEntry())
+            {
+                case NPC_ADARRAH:
+                    adarrahGUID = summon->GetGUID();
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, playerGUID))
+                        summon->SetFacingToObject(player);
+                    break;
+                case NPC_HARNISH:
+                    harnishGUID = summon->GetGUID();
+                    summon->SetSpeed(MOVE_WALK, 0.4f);
+                    summon->SetFacingToObject(me);
+                    break;
+                case NPC_LADY_HUMPS:
+                    lady_humpsGUID = summon->GetGUID();
+                    summon->SetSpeed(MOVE_WALK, 0.4f);
+                    summon->SetFacingToObject(me);
+                    break;
+                case NPC_PACK_MULE:
+                    pack_muleGUID = summon->GetGUID();
+                    summon->SetSpeed(MOVE_WALK, 0.4f);
+                    summon->SetFacingToObject(me);
+                    break;
+                case NPC_BUDDS_CAMEL:
+                    budds_camelGUID = summon->GetGUID();
+                    summon->SetSpeed(MOVE_WALK, 0.4f);
+                    summon->SetFacingToObject(me);
+                    break;
+                case NPC_SAMIRS_CAMEL:
+                    samirs_camelGUID = summon->GetGUID();
+                    summon->SetSpeed(MOVE_WALK, 0.4f);
+                    summon->SetFacingToObject(me);
+                    break;
+                case NPC_MACKS_CAMEL:
+                    macks_camelGUID = summon->GetGUID();
+                    summon->SetSpeed(MOVE_WALK, 0.4f);
+                    summon->SetFacingToObject(me);
+                    break;
+                case NPC_ADARRAHS_CAMEL:
+                    adarrahs_camelGUID = summon->GetGUID();
+                    summon->SetSpeed(MOVE_WALK, 0.4f);
+                    summon->SetFacingToObject(me);
+                    break;
+                case NPC_CLONED_IMAGE:
+                    clone_imageGUID = summon->GetGUID();
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, playerGUID))
+                        summon->SetFacingTo(player->GetOrientation());
+                    break;
+            }
+        }
+
+        void DoAction(int32 param) override
         { 
-          
+            switch (param)
+            {
+                case EVENT_START_ADARRAH:
+                {
+                    if (Creature* adarrah = sObjectAccessor->GetCreature(*me, adarrahGUID))
+                        adarrah->GetAI()->DoAction(EVENT_START_ADARRAH);
+                    break;
+                }
+                case EVENT_START_CARAVAN:
+                {
+                    printf("EVENT_START_CARAVAN \n");
+                }
+            }
+        }
+
+        uint64 GetGUID(int32 id = 0) const 
+        { 
+            switch (id)
+            {
+                case NPC_ADARRAH:
+                    return adarrahGUID;
+                case NPC_LADY_HUMPS:
+                    return lady_humpsGUID;
+                case NPC_PACK_MULE:
+                    return pack_muleGUID;
+                case NPC_BUDDS_CAMEL:
+                    return budds_camelGUID;
+                case NPC_SAMIRS_CAMEL:
+                    return samirs_camelGUID;
+                case NPC_MACKS_CAMEL:
+                    return macks_camelGUID;
+                case NPC_HARNISH:
+                    return harnishGUID;
+                case NPC_ADARRAHS_CAMEL:
+                    return adarrahs_camelGUID;
+                case NPC_PLAYER_GUID:
+                    return playerGUID;
+            }
+            return 0; 
         }
 
         void UpdateAI(uint32 diff) override
@@ -598,9 +782,162 @@ public:
             {
                 switch (eventId)
                 {
-                    case EVENT_CHECK_PASSENGER:
+                    case EVENT_CHECK_PLAYER_IS_PRESENT:
                     {
+                        if (Player* player = sObjectAccessor->GetPlayer(*me, playerGUID))
+                            if (player->IsAlive() && player->GetDistance2d(me) < 100.0f)
+                                m_events.ScheduleEvent(EVENT_CHECK_PLAYER_IS_PRESENT, 10000);
+                            else
+                                DespawnCaravan();
+                        else
+                            DespawnCaravan();
 
+                        break;
+                    }                   
+                }
+            }
+        }
+
+        void DespawnCaravan()
+        {
+            if (Creature* npc = sObjectAccessor->GetCreature(*me, adarrahGUID))
+                npc->DespawnOrUnsummon();
+            if (Creature* npc = sObjectAccessor->GetCreature(*me, harnishGUID))
+                npc->DespawnOrUnsummon();
+            if (Creature* npc = sObjectAccessor->GetCreature(*me, lady_humpsGUID))
+                npc->DespawnOrUnsummon();
+            if (Creature* npc = sObjectAccessor->GetCreature(*me, pack_muleGUID))
+                npc->DespawnOrUnsummon();
+            if (Creature* npc = sObjectAccessor->GetCreature(*me, budds_camelGUID))
+                npc->DespawnOrUnsummon();
+            if (Creature* npc = sObjectAccessor->GetCreature(*me, samirs_camelGUID))
+                npc->DespawnOrUnsummon();
+            if (Creature* npc = sObjectAccessor->GetCreature(*me, macks_camelGUID))
+                npc->DespawnOrUnsummon();
+            if (Creature* npc = sObjectAccessor->GetCreature(*me, adarrahs_camelGUID))
+                npc->DespawnOrUnsummon();
+            me->DespawnOrUnsummon();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_beam_target_bunny_46661AI(creature);
+    }
+};
+
+// 46533
+class npc_adarrah_46533 : public CreatureScript
+{
+public:
+    npc_adarrah_46533() : CreatureScript("npc_adarrah_46533") { }
+
+    struct npc_adarrah_46533AI : public ScriptedAI
+    {
+        npc_adarrah_46533AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap m_events;
+        uint64 target_bunnyGUID;
+        float angle;
+
+        void Reset() override
+        {
+            target_bunnyGUID = NULL;
+            angle = 0;
+            m_events.Reset();
+        }
+
+        void IsSummonedBy(Unit* summoner) override
+        {
+            target_bunnyGUID = summoner->GetGUID();
+        }
+
+        void MovementInform(uint32 type, uint32 id)
+        {
+            if (type != 8)
+                return;
+         
+            switch (id)
+            {
+                case 21:
+                {
+                    Talk(0);
+                    if (Creature* bunny = sObjectAccessor->GetCreature(*me, target_bunnyGUID))
+                        if (Player* player = sObjectAccessor->GetPlayer(*me, bunny->GetAI()->GetGUID(NPC_PLAYER_GUID)))
+                            me->SetFacingToObject(player);
+                    m_events.ScheduleEvent(EVENT_TALK_2, 5000);
+                    break;
+                }
+                case 23:
+                {
+                    if (Creature* bunny = sObjectAccessor->GetCreature(*me, target_bunnyGUID))
+                        if (Creature* camel = sObjectAccessor->GetCreature(*me, bunny->GetAI()->GetGUID(NPC_ADARRAHS_CAMEL)))
+                        {
+                            me->EnterVehicle(camel, 0);
+                            bunny->GetAI()->DoAction(EVENT_START_CARAVAN);
+                        }
+
+                    break;
+                }
+            }
+        }
+
+        void DoAction(int32 param) override
+        {
+            switch (param)
+            {
+            case EVENT_START_ADARRAH:
+                if (Creature* bunny = sObjectAccessor->GetCreature(*me, target_bunnyGUID))
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, bunny->GetAI()->GetGUID(NPC_PLAYER_GUID)))
+                    {
+                        angle = me->GetAngle(player->GetPositionX(), player->GetPositionY());
+                        Position pos = player->GetNearPosition(2.0f, angle);
+                        me->GetMotionMaster()->MovePoint(21, pos);
+                    }
+                break;
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                    case EVENT_TALK_2:
+                    {
+                        Talk(1);
+                        m_events.ScheduleEvent(EVENT_MOVE_ADARRAH_2, 5000);
+                        me->SetWalk(true);
+                        break;
+                    }
+                    case EVENT_MOVE_ADARRAH_2:
+                    {
+                        if (Creature* bunny = sObjectAccessor->GetCreature(*me, target_bunnyGUID))
+                            if (Player* player = sObjectAccessor->GetPlayer(*me, bunny->GetAI()->GetGUID(NPC_PLAYER_GUID)))
+                            {
+                                angle = me->GetAngle(player->GetPositionX(), player->GetPositionY());
+                                Position pos = player->GetNearPosition(2.0f, angle);
+
+                                if (angle > 1.7f)
+                                {
+                                    angle -= 0.3f;
+                                    if (angle < 0) angle += M_PI * 2;
+                                    Position pos = player->GetNearPosition(2.0f, angle);
+                                    me->GetMotionMaster()->MovePoint(22, pos);
+                                    m_events.ScheduleEvent(EVENT_MOVE_ADARRAH_2, 400);
+                                }
+                                else
+                                    if (Creature* camel = sObjectAccessor->GetCreature(*me, bunny->GetAI()->GetGUID(NPC_ADARRAHS_CAMEL)))
+                                    {
+                                        me->SetWalk(false);
+                                        angle = me->GetAngle(camel->GetPositionX(), camel->GetPositionY());
+                                        Position pos = camel->GetNearPosition(2.0f, angle);
+                                        me->GetMotionMaster()->MovePoint(23, pos);
+                                    }
+                            }
                         break;
                     }
                 }
@@ -610,95 +947,185 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_uldum_caravan_harness_46516AI(creature);
+        return new npc_adarrah_46533AI(creature);
     }
 };
 
-// 44833
-class npc_adarrah_44833 : public CreatureScript
+// 46536
+class npc_lady_humps_46536 : public CreatureScript
 {
 public:
-    npc_adarrah_44833() : CreatureScript("npc_adarrah_44833") { }
+    npc_lady_humps_46536() : CreatureScript("npc_lady_humps_46536") { }
 
-    enum eNpc
+    struct npc_lady_humps_46536AI : public ScriptedAI
     {
-        EVENT_CHECK_PASSENGER = 1,       
-    };
+        npc_lady_humps_46536AI(Creature* creature) : ScriptedAI(creature) { }
 
-    struct npc_adarrah_44833AI : public ScriptedAI
-    {
-        npc_adarrah_44833AI(Creature* creature) : ScriptedAI(creature) { }
-
-        EventMap m_events;
+        uint64 target_bunnyGUID;
+        bool isStarted;
 
         void Reset() override
-        {            
-            m_events.Reset();
-        }
-
-        void UpdateAI(uint32 diff) override
         {
-            m_events.Update(diff);
-
-            while (uint32 eventId = m_events.ExecuteEvent())
-            {
-                switch (eventId)
-                {
-                    case 0:               
-                        break;                
-                }
-            }
+            target_bunnyGUID = NULL;
+            isStarted = false;
         }
+
+        void IsSummonedBy(Unit* summoner) override
+        {
+            target_bunnyGUID = summoner->GetGUID();
+        }
+
+        void OnSpellClick(Unit* clicker, bool& result) override
+        {
+            if (!isStarted)
+            if (Player* player = clicker->ToPlayer())
+                if (player->GetQuestStatus(QUEST_EASY_MONEY) == QUEST_STATUS_INCOMPLETE)
+                    if (Creature* bunny = sObjectAccessor->GetCreature(*me, target_bunnyGUID))
+                    {
+                        bunny->GetAI()->DoAction(EVENT_START_ADARRAH);
+                        isStarted = true;
+                    }
+        }
+
+       
     };
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_adarrah_44833AI(creature);
+        return new npc_lady_humps_46536AI(creature);
     }
 };
 
-// 46517
-class npc_lady_humps_46517 : public CreatureScript
+// 46554
+class npc_cloned_image_46554 : public CreatureScript
 {
 public:
-    npc_lady_humps_46517() : CreatureScript("npc_lady_humps_46517") { }
+    npc_cloned_image_46554() : CreatureScript("npc_cloned_image_46554") { }
 
-    enum eNpc
+    struct npc_cloned_image_46554AI : public ScriptedAI
     {
-        EVENT_CHECK_PASSENGER = 1,
-    };
+        npc_cloned_image_46554AI(Creature* creature) : ScriptedAI(creature) { }
 
-    struct npc_lady_humps_46517AI : public ScriptedAI
-    {
-        npc_lady_humps_46517AI(Creature* creature) : ScriptedAI(creature) { }
-
-        EventMap m_events;
+        uint64 playerGUID;
 
         void Reset() override
         {
-            m_events.Reset();
+            playerGUID = NULL;
         }
 
-        void UpdateAI(uint32 diff) override
+        void IsSummonedBy(Unit* summoner) override
         {
-            m_events.Update(diff);
+            playerGUID = summoner->GetGUID();
+            me->CastSpell(summoner, SPELL_REVERSE_CAST_MIRROR_IMAGE, true);  // trigger 86784 and some copy script events.. 41055/45206 and back 41054/45205                 
 
-            while (uint32 eventId = m_events.ExecuteEvent())
+            //me->CastSpell(summoner, 41055);
+            //me->CastSpell(summoner, 45206);
+        }
+
+        void SpellHitTarget(Unit* target, SpellInfo const* spell) 
+        { 
+            switch (spell->Id)
             {
-                switch (eventId)
+            case 41055:
+                //target->CastSpell(me, 41054);
+                break;
+            case 45206:
+                //target->CastSpell(me, 45205);
+                break;
+            }
+        }
+
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_cloned_image_46554AI(creature);
+    }
+};
+
+// 46596
+class npc_uldum_caravan_harness_46596 : public CreatureScript
+{
+public:
+    npc_uldum_caravan_harness_46596() : CreatureScript("npc_uldum_caravan_harness_46596") { }
+
+    struct npc_uldum_caravan_harness_46596AI : public ScriptedAI
+    {
+        npc_uldum_caravan_harness_46596AI(Creature* creature) : ScriptedAI(creature) { }
+
+        uint64 bunnyGUID;
+        uint64 kodoGUID;
+        uint64 kurzelGUID;
+        uint64 turgoreGUID;
+        uint64 tanzarGUID;
+        uint64 harkorGUID;
+        bool   hasChains;
+
+        void Reset() override
+        {
+            bunnyGUID = NULL;
+            kodoGUID = NULL;
+            kurzelGUID = NULL;
+            turgoreGUID = NULL;
+            tanzarGUID = NULL;
+            harkorGUID = NULL;
+            hasChains = false;
+        }
+
+        void IsSummonedBy(Unit* summoner) override
+        {
+            bunnyGUID = summoner->GetGUID();
+        }
+
+        void JustSummoned(Creature* summon) override
+        {
+            switch (summon->GetEntry())
+            {
+                case NPC_KODO_2:
                 {
-                case 0:
+                    kodoGUID = summon->GetGUID();
+                    break;
+                }
+                case NPC_KURZEL_2:
+                {
+                    kurzelGUID = summon->GetGUID();
+                    break;
+                }
+                case NPC_TURGORE_2:
+                {
+                    turgoreGUID = summon->GetGUID();
+                    if (!hasChains)
+                    {
+                        hasChains = true;
+                        me->CastSpell(summon, SPELL_CHAINS_OF_BONDAGE_1);
+                        summon->CastSpell(me, SPELL_CHAINS_OF_BONDAGE_2);
+                        summon->CastSpell(me, SPELL_CHAINS_OF_BONDAGE_3);
+                    }
+                    break;
+                }
+                case NPC_TANZAR_2:
+                {
+                    tanzarGUID = summon->GetGUID();
+                    break;
+                }
+                case NPC_HARKOR_2:
+                {
+                    harkorGUID = summon->GetGUID();
                     break;
                 }
             }
         }
+
     };
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_lady_humps_46517AI(creature);
+        return new npc_uldum_caravan_harness_46596AI(creature);
     }
 };
+
+// ##########  Vision 2: 
+
 
 
 void AddSC_tanaris()
@@ -708,7 +1135,10 @@ void AddSC_tanaris()
     new npc_steward_of_time_20142();
     new npc_OOX17_7784();
     new npc_tooga_5955();
-    new npc_uldum_caravan_harness_46516();
     new npc_adarrah_44833();
-    new npc_lady_humps_46517();
+    new npc_beam_target_bunny_46661();
+    new npc_adarrah_46533();
+    new npc_lady_humps_46536();
+    new npc_cloned_image_46554();
+    new npc_uldum_caravan_harness_46596();
 }
