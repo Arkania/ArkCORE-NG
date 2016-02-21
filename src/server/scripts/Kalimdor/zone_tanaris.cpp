@@ -562,14 +562,14 @@ enum eQuest27003
     SPELL_DETECT_QUEST_INVIS_ZONE_5 = 86749,
     SPELL_DETECT_QUEST_INVIS_ZONE_1 = 89270,
     SPELL_SUMMON_BEAM_TARGET_BUNNY = 86942,
-    SPELL_INITIALIZE_ULDRUM_INTRO = 86748,
-    SPELL_PLAYER_PREP = 86750,
-    SPELL_SUMMON_CLONED_IMAGE = 86782,
-    SPELL_REVERSE_CAST_MIRROR_IMAGE = 86783, // Script Effect Value: 86784
-    SPELL_MIRROR_IMAGE_AURA = 86784, // Script Effect Value: 41055  Value : 45206
     SPELL_CHAINS_OF_BONDAGE_1 = 73447,
     SPELL_CHAINS_OF_BONDAGE_2 = 73448,
     SPELL_CHAINS_OF_BONDAGE_3 = 73449,
+    SPELL_PLAYER_SUMMON_CAMERA = 95747,
+    SPELL_SUMMON_CAMERA_BUNNY = 86792,
+    SPELL_PING_CAMERA_00 = 86815,
+    SPELL_PERMANENT_FEIGN_DEATH = 29266,
+    SPELL_IMPRISONED = 89318,
 
     SPELL_SUMMON_ADARRAH = 86751,
     SPELL_SUMMON_CARAVAN = 86752,
@@ -595,12 +595,46 @@ enum eQuest27003
     NPC_TANZAR_2 = 46547,
     NPC_HARKOR_2 = 46545,
     NPC_PLAYER_GUID = 99999,
-    
-    EVENT_START_ADARRAH = 2,
-    EVENT_TALK_2 = 3,
-    EVENT_MOVE_ADARRAH_2 = 4,
-    EVENT_CHECK_PLAYER_IS_PRESENT = 5,
-    EVENT_START_CARAVAN = 6,
+    NPC_SAND_PUGMY = 47326,
+
+    EVENT_CHECK_PLAYER_IS_PRESENT = 1,
+    EVENT_ADARRAH_TALK_VIDEO,
+    EVENT_ADARRAH_TALK_0,
+    EVENT_ADARRAH_TALK_1,
+    EVENT_MOVE_ADARRAH_AROUND_PLAYER,
+    EVENT_MOVE_ADARRAH_TO_CAMEL,
+    EVENT_ADARRAH_MOUNT_CAMEL,
+    EVENT_STARTING_CARAVAN,
+    EVENT_PLAYER_MOUNT_HARNISH,
+    EVENT_BUDD_SAY_AHOJ,
+    EVENT_TELEPORT_TO_VIDEO2,
+    EVENT_SUMMON_ACTORS_VIDEO2,
+    EVENT_STARTING_VIDEO2,
+    EVENT_PUGMY_TALK1,
+    EVENT_IMPRISONED,
+    EVENT_REMOVE_IMPRISONED,
+    EVENT_PUGMY_TALK2,
+    EVENT_PUGMY_GO_AWAY,
+
+    ACTION_START_ADARRAH_TALK_VIDEO = 101,
+    ACTION_MOVE_ADARRAH_TO_PLAYER,
+    ACTION_STARTING_CARAVAN,
+
+    MOVE_ADARRAH_TO_PLAYER = 201,
+    MOVE_ADARRAH_AROUND_PLAYER,
+    MOVE_ADARRAH_TO_CAMEL,
+
+    // the blizz video create a clone of player, and let this clone do some emotes
+    // maybe someone can fix this spells.
+    SPELL_INITIALIZE_ULDRUM_INTRO = 86748,
+    SPELL_PLAYER_PREP = 86750,
+    SPELL_SUMMON_CLONED_IMAGE = 86782, // create a empty player clone.
+    SPELL_REVERSE_CAST_MIRROR_IMAGE = 86783, // Script Effect Value: 86784
+    SPELL_MIRROR_IMAGE_AURA = 86784, // Script Effect Value: 41055  Value : 45206
+    SPELL_COPY_WEAPON_ACK = 41054,
+    SPELL_COPY_WEAPON = 41055,
+    SPELL_COPY_OFF_HAND_WEAPON_ACK = 45205,
+    SPELL_COPY_OFF_HAND_WEAPON = 45206,
 };
 
 // 44833
@@ -613,8 +647,8 @@ public:
     { 
         if (quest->GetQuestId() == QUEST_EASY_MONEY)
         {
-            player->RemoveAura(SPELL_DETECT_QUEST_INVIS_ZONE_5);
-            player->AddAura(SPELL_DETECT_QUEST_INVIS_ZONE_1, player);
+            //player->RemoveAura(SPELL_DETECT_QUEST_INVIS_ZONE_5);
+            //player->AddAura(SPELL_DETECT_QUEST_INVIS_ZONE_1, player);
             player->CastSpell(player, SPELL_SUMMON_BEAM_TARGET_BUNNY);
         }
 
@@ -642,7 +676,9 @@ public:
         uint64 samirs_camelGUID;
         uint64 macks_camelGUID;
         uint64 adarrahs_camelGUID;
-        uint64 clone_imageGUID;
+        uint64 sandPugmy[5];
+        uint32 sandPugmyCount;
+        bool   isVideo2;
 
         void Reset() override
         {
@@ -656,7 +692,12 @@ public:
             samirs_camelGUID = NULL;
             macks_camelGUID = NULL;
             adarrahs_camelGUID = NULL;
-            clone_imageGUID = NULL;
+
+            for (int32 i = 0; i < 6; i++)
+                sandPugmy[i] = NULL;
+            sandPugmyCount = 0;
+
+            isVideo2 = false;
         }
 
         void IsSummonedBy(Unit* summoner) override
@@ -664,7 +705,6 @@ public:
             if (Player* player = summoner->ToPlayer())
             {
                 playerGUID = player->GetGUID();
-                // player->CastSpell(player, SPELL_PLAYER_PREP);
                 me->CastSpell(player, SPELL_SUMMON_ADARRAH);
                 me->CastSpell(player, SPELL_SUMMON_CARAVAN);
                 me->CastSpell(player, SPELL_SUMMON_LADY_HUMPS);
@@ -673,8 +713,6 @@ public:
                 me->CastSpell(player, SPELL_SUMMON_SAMIRS_CAMEL);
                 me->CastSpell(player, SPELL_SUMMON_MACKS_CAMEL);
                 me->CastSpell(player, SPELL_SUMMON_ADARRAHS_CAMEL);
-                player->CastSpell(player, SPELL_SUMMON_CLONED_IMAGE);
-                //player->CastSpell(player, SPELL_INITIALIZE_ULDRUM_INTRO);
                 m_events.ScheduleEvent(EVENT_CHECK_PLAYER_IS_PRESENT, 10000);
             }
         }
@@ -690,44 +728,59 @@ public:
                     break;
                 case NPC_HARNISH:
                     harnishGUID = summon->GetGUID();
+                    summon->SetWalk(true);
                     summon->SetSpeed(MOVE_WALK, 0.4f);
                     summon->SetFacingToObject(me);
                     break;
                 case NPC_LADY_HUMPS:
                     lady_humpsGUID = summon->GetGUID();
+                    summon->SetWalk(true);
                     summon->SetSpeed(MOVE_WALK, 0.4f);
                     summon->SetFacingToObject(me);
                     break;
                 case NPC_PACK_MULE:
                     pack_muleGUID = summon->GetGUID();
+                    summon->SetWalk(true);
                     summon->SetSpeed(MOVE_WALK, 0.4f);
                     summon->SetFacingToObject(me);
                     break;
                 case NPC_BUDDS_CAMEL:
                     budds_camelGUID = summon->GetGUID();
+                    summon->SetWalk(true);
                     summon->SetSpeed(MOVE_WALK, 0.4f);
                     summon->SetFacingToObject(me);
                     break;
                 case NPC_SAMIRS_CAMEL:
                     samirs_camelGUID = summon->GetGUID();
+                    summon->SetWalk(true);
                     summon->SetSpeed(MOVE_WALK, 0.4f);
                     summon->SetFacingToObject(me);
                     break;
                 case NPC_MACKS_CAMEL:
                     macks_camelGUID = summon->GetGUID();
+                    summon->SetWalk(true);
                     summon->SetSpeed(MOVE_WALK, 0.4f);
                     summon->SetFacingToObject(me);
                     break;
                 case NPC_ADARRAHS_CAMEL:
                     adarrahs_camelGUID = summon->GetGUID();
+                    summon->SetWalk(true);
                     summon->SetSpeed(MOVE_WALK, 0.4f);
                     summon->SetFacingToObject(me);
                     break;
-                case NPC_CLONED_IMAGE:
-                    clone_imageGUID = summon->GetGUID();
-                    if (Player* player = sObjectAccessor->GetPlayer(*me, playerGUID))
-                        summon->SetFacingTo(player->GetOrientation());
+                case NPC_SAND_PUGMY:
+                    summon->RemoveAura(SPELL_PERMANENT_FEIGN_DEATH);
+                    summon->setFaction(7);
+                    summon->SetUInt32Value(UNIT_FIELD_FLAGS, 0);
+                    summon->SetUInt32Value(UNIT_FIELD_FLAGS_2, 2048);
+                    summon->SetUInt32Value(UNIT_DYNAMIC_FLAGS, 0);                    
+                    sandPugmy[sandPugmyCount] = summon->GetGUID();
+                    sandPugmyCount += 1;
                     break;
+            }
+            if (isVideo2)
+            {
+                summon->SetPhaseMask(2, true);
             }
         }
 
@@ -735,15 +788,9 @@ public:
         { 
             switch (param)
             {
-                case EVENT_START_ADARRAH:
-                {
-                    if (Creature* adarrah = sObjectAccessor->GetCreature(*me, adarrahGUID))
-                        adarrah->GetAI()->DoAction(EVENT_START_ADARRAH);
-                    break;
-                }
-                case EVENT_START_CARAVAN:
-                {
-                    printf("EVENT_START_CARAVAN \n");
+                case ACTION_STARTING_CARAVAN:
+                {                    
+                    m_events.ScheduleEvent(EVENT_STARTING_CARAVAN, 1000);
                 }
             }
         }
@@ -784,16 +831,91 @@ public:
                 {
                     case EVENT_CHECK_PLAYER_IS_PRESENT:
                     {
+                        bool ok = false;
                         if (Player* player = sObjectAccessor->GetPlayer(*me, playerGUID))
-                            if (player->IsAlive() && player->GetDistance2d(me) < 100.0f)
-                                m_events.ScheduleEvent(EVENT_CHECK_PLAYER_IS_PRESENT, 10000);
-                            else
-                                DespawnCaravan();
+                            if (player->IsAlive() && player->GetDistance2d(me) < 500.0f)
+                                if (player->GetQuestStatus(QUEST_EASY_MONEY) == QUEST_STATUS_INCOMPLETE)
+                                    ok = true;
+
+                        if (ok)
+                            m_events.ScheduleEvent(EVENT_CHECK_PLAYER_IS_PRESENT, 5000);
                         else
                             DespawnCaravan();
+                       
+                        break;
+                    } 
+                    case EVENT_STARTING_CARAVAN:
+                    {
+                        StartMovingCaravan();
+                        m_events.ScheduleEvent(EVENT_PLAYER_MOUNT_HARNISH, 3000);
+                        m_events.ScheduleEvent(EVENT_BUDD_SAY_AHOJ, 6000);
+                        m_events.ScheduleEvent(EVENT_TELEPORT_TO_VIDEO2, 11000);
+                        m_events.ScheduleEvent(EVENT_SUMMON_ACTORS_VIDEO2, 12000);
+                        m_events.ScheduleEvent(EVENT_STARTING_VIDEO2, 16000);
+                        break;
+                    }
+                    case EVENT_PLAYER_MOUNT_HARNISH:
+                    {
+                        Player* player = sObjectAccessor->GetPlayer(*me, playerGUID);
+                        Creature* npc = sObjectAccessor->GetCreature(*me, harnishGUID);
+                        if (player)
+                        {
+                            if (isVideo2)
+                            {
+                                player->AddAura(59073, player);
+                                player->AddAura(49416, player);
+                            }
+
+                            if (npc)
+                                player->EnterVehicle(npc, -1);
+                            else
+                                m_events.ScheduleEvent(EVENT_PLAYER_MOUNT_HARNISH, 500);
+                        }
 
                         break;
                     }                   
+                    case EVENT_BUDD_SAY_AHOJ:
+                    {
+                        if (Creature* budd = sObjectAccessor->GetCreature(*me, budds_camelGUID))
+                            budd->AI()->Talk(0);
+                        break;
+                    }
+                    case EVENT_TELEPORT_TO_VIDEO2:
+                    {
+                        StartTeleport();
+                        break;
+                    }
+                    case EVENT_SUMMON_ACTORS_VIDEO2:
+                    {
+                        SummonActorsVideo2();
+                        break;
+                    }
+                    case EVENT_STARTING_VIDEO2:
+                    {
+                        if (Creature* npc = sObjectAccessor->GetCreature(*me, sandPugmy[2]))
+                            npc->AI()->Talk(0);
+
+                        m_events.ScheduleEvent(EVENT_PUGMY_TALK1, 5000);
+                        break;
+                    }                   
+                    case EVENT_PUGMY_TALK1:
+                    {
+                        if (Creature* npc = sObjectAccessor->GetCreature(*me, sandPugmy[4]))
+                            npc->AI()->Talk(1);
+
+                        m_events.ScheduleEvent(EVENT_IMPRISONED, 5000);
+                        break;
+                    }
+                    case EVENT_IMPRISONED:
+                    {
+                        if (Player* player = sObjectAccessor->GetPlayer(*me, playerGUID))
+                        {
+                            DespawnCaravan();
+                            player->CastSpell(player, SPELL_IMPRISONED);
+                            m_events.ScheduleEvent(EVENT_REMOVE_IMPRISONED, 5000);
+                        }
+                        break;
+                    }
                 }
             }
         }
@@ -816,8 +938,74 @@ public:
                 npc->DespawnOrUnsummon();
             if (Creature* npc = sObjectAccessor->GetCreature(*me, adarrahs_camelGUID))
                 npc->DespawnOrUnsummon();
-            me->DespawnOrUnsummon();
+
+            adarrahGUID = NULL;
+            harnishGUID = NULL;
+            lady_humpsGUID = NULL;
+            pack_muleGUID = NULL;
+            budds_camelGUID = NULL;
+            samirs_camelGUID = NULL;
+            macks_camelGUID = NULL;
+            adarrahs_camelGUID = NULL;
+
+            for (int32 i = 0; i < 6; i++)
+                if (Creature* npc = sObjectAccessor->GetCreature(*me, sandPugmy[i]))
+                {
+                    npc->DespawnOrUnsummon();
+                    sandPugmy[i] = NULL;
+                }
+            sandPugmyCount = 0;
         }
+
+        void StartMovingCaravan()
+        {
+            if (Creature* npc = sObjectAccessor->GetCreature(*me, harnishGUID))
+                npc->GetMotionMaster()->MovePoint(24, me->GetPosition());
+            if (Creature* npc = sObjectAccessor->GetCreature(*me, lady_humpsGUID))
+                npc->GetMotionMaster()->MovePoint(24, me->GetPosition());
+            if (Creature* npc = sObjectAccessor->GetCreature(*me, pack_muleGUID))
+                npc->GetMotionMaster()->MovePoint(24, me->GetPosition());
+            if (Creature* npc = sObjectAccessor->GetCreature(*me, budds_camelGUID))
+                npc->GetMotionMaster()->MovePoint(24, me->GetPosition());
+            if (Creature* npc = sObjectAccessor->GetCreature(*me, samirs_camelGUID))
+                npc->GetMotionMaster()->MovePoint(24, me->GetPosition());
+            if (Creature* npc = sObjectAccessor->GetCreature(*me, macks_camelGUID))
+                npc->GetMotionMaster()->MovePoint(24, me->GetPosition());
+            if (Creature* npc = sObjectAccessor->GetCreature(*me, adarrahs_camelGUID))
+                npc->GetMotionMaster()->MovePoint(24, me->GetPosition());
+        }
+
+        void StartTeleport()
+        {
+            isVideo2 = true;
+            me->NearTeleportTo(-8958.0f, -1610.0f, 94.5f, 4.73f);           
+            DespawnCaravan();
+            if (Player* player = sObjectAccessor->GetPlayer(*me, playerGUID))
+                player->NearTeleportTo(-8958.0f, -1697.0f, 94.46f, 1.57f);
+        }
+
+        void SummonActorsVideo2()
+        {
+            me->SetPhaseMask(2, true);
+            me->SummonCreature(NPC_LADY_HUMPS, -8958.0f, -1671.0f, 94.46f, 1.57f, TEMPSUMMON_TIMED_DESPAWN, 120000);
+            me->SummonCreature(NPC_HARNISH, -8958.0f, -1697.0f, 94.46f, 1.57f, TEMPSUMMON_TIMED_DESPAWN, 120000);
+            me->SummonCreature(NPC_PACK_MULE, -8948.0f, -1695.0f, 94.46f, 1.57f, TEMPSUMMON_TIMED_DESPAWN, 120000);
+            me->SummonCreature(NPC_MACKS_CAMEL, -8948.0f, -1700.0f, 94.46f, 1.57f, TEMPSUMMON_TIMED_DESPAWN, 120000);
+            me->SummonCreature(NPC_SAMIRS_CAMEL, -8948.0f, -1705.0f, 94.46f, 1.57f, TEMPSUMMON_TIMED_DESPAWN, 120000);
+            me->SummonCreature(NPC_ADARRAHS_CAMEL, -8968.0f, -1697.0f, 94.46f, 1.57f, TEMPSUMMON_TIMED_DESPAWN, 120000);
+            me->SummonCreature(NPC_ADARRAH, -8968.0f, -1697.0f, 94.46f, 1.57f, TEMPSUMMON_TIMED_DESPAWN, 120000);
+            me->SummonCreature(NPC_BUDDS_CAMEL, -8968.0f, -1690.0f, 94.46f, 1.57f, TEMPSUMMON_TIMED_DESPAWN, 120000);
+
+            me->SummonCreature(NPC_SAND_PUGMY, -8961.2f, -1669.1f, 94.46f, 4.57f, TEMPSUMMON_TIMED_DESPAWN, 120000);
+            me->SummonCreature(NPC_SAND_PUGMY, -8955.9f, -1669.2f, 94.46f, 4.57f, TEMPSUMMON_TIMED_DESPAWN, 120000);
+            me->SummonCreature(NPC_SAND_PUGMY, -8955.1f, -1707.6f, 94.46f, 1.57f, TEMPSUMMON_TIMED_DESPAWN, 120000);
+            me->SummonCreature(NPC_SAND_PUGMY, -8960.0f, -1708.0f, 94.46f, 1.57f, TEMPSUMMON_TIMED_DESPAWN, 120000);
+            me->SummonCreature(NPC_SAND_PUGMY, -8965.3f, -1707.3f, 94.46f, 1.57f, TEMPSUMMON_TIMED_DESPAWN, 120000);
+            me->SummonCreature(NPC_SAND_PUGMY, -8963.3f, -1707.0f, 94.46f, 1.57f, TEMPSUMMON_TIMED_DESPAWN, 120000);
+
+            m_events.ScheduleEvent(EVENT_PLAYER_MOUNT_HARNISH, 200);
+        }
+
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -859,24 +1047,19 @@ public:
          
             switch (id)
             {
-                case 21:
+                case MOVE_ADARRAH_TO_PLAYER:
                 {
-                    Talk(0);
-                    if (Creature* bunny = sObjectAccessor->GetCreature(*me, target_bunnyGUID))
-                        if (Player* player = sObjectAccessor->GetPlayer(*me, bunny->GetAI()->GetGUID(NPC_PLAYER_GUID)))
-                            me->SetFacingToObject(player);
-                    m_events.ScheduleEvent(EVENT_TALK_2, 5000);
+                    m_events.ScheduleEvent(EVENT_ADARRAH_TALK_0, 25);
                     break;
                 }
-                case 23:
+                case MOVE_ADARRAH_AROUND_PLAYER:
                 {
-                    if (Creature* bunny = sObjectAccessor->GetCreature(*me, target_bunnyGUID))
-                        if (Creature* camel = sObjectAccessor->GetCreature(*me, bunny->GetAI()->GetGUID(NPC_ADARRAHS_CAMEL)))
-                        {
-                            me->EnterVehicle(camel, 0);
-                            bunny->GetAI()->DoAction(EVENT_START_CARAVAN);
-                        }
-
+                    m_events.ScheduleEvent(EVENT_MOVE_ADARRAH_TO_CAMEL, 25);
+                    break;
+                }
+                case MOVE_ADARRAH_TO_CAMEL:
+                {
+                    m_events.ScheduleEvent(EVENT_ADARRAH_MOUNT_CAMEL, 25);
                     break;
                 }
             }
@@ -886,15 +1069,17 @@ public:
         {
             switch (param)
             {
-            case EVENT_START_ADARRAH:
-                if (Creature* bunny = sObjectAccessor->GetCreature(*me, target_bunnyGUID))
-                    if (Player* player = sObjectAccessor->GetPlayer(*me, bunny->GetAI()->GetGUID(NPC_PLAYER_GUID)))
-                    {
-                        angle = me->GetAngle(player->GetPositionX(), player->GetPositionY());
-                        Position pos = player->GetNearPosition(2.0f, angle);
-                        me->GetMotionMaster()->MovePoint(21, pos);
-                    }
-                break;
+                case ACTION_START_ADARRAH_TALK_VIDEO:
+                {
+                    if (Creature* bunny = sObjectAccessor->GetCreature(*me, target_bunnyGUID))
+                        if (Player* player = sObjectAccessor->GetPlayer(*me, bunny->GetAI()->GetGUID(NPC_PLAYER_GUID)))
+                        {
+                            angle = me->GetAngle(player->GetPositionX(), player->GetPositionY());
+                            Position pos = player->GetNearPosition(2.0f, angle);
+                            me->GetMotionMaster()->MovePoint(MOVE_ADARRAH_TO_PLAYER, pos);
+                        }
+                    break;
+                }
             }
         }
 
@@ -906,37 +1091,53 @@ public:
             {
                 switch (eventId)
                 {
-                    case EVENT_TALK_2:
+                    case EVENT_ADARRAH_TALK_0:
                     {
-                        Talk(1);
-                        m_events.ScheduleEvent(EVENT_MOVE_ADARRAH_2, 5000);
-                        me->SetWalk(true);
+                        Talk(0);
+                        if (Creature* bunny = sObjectAccessor->GetCreature(*me, target_bunnyGUID))
+                            if (Player* player = sObjectAccessor->GetPlayer(*me, bunny->GetAI()->GetGUID(NPC_PLAYER_GUID)))
+                                me->SetFacingToObject(player);
+                        m_events.ScheduleEvent(EVENT_ADARRAH_TALK_1, 5000);
                         break;
                     }
-                    case EVENT_MOVE_ADARRAH_2:
+                    case EVENT_ADARRAH_TALK_1:
+                    {
+                        Talk(1);
+                        m_events.ScheduleEvent(EVENT_MOVE_ADARRAH_AROUND_PLAYER, 5000);
+                        break;
+                    }
+                    case EVENT_MOVE_ADARRAH_AROUND_PLAYER:
                     {
                         if (Creature* bunny = sObjectAccessor->GetCreature(*me, target_bunnyGUID))
                             if (Player* player = sObjectAccessor->GetPlayer(*me, bunny->GetAI()->GetGUID(NPC_PLAYER_GUID)))
                             {
-                                angle = me->GetAngle(player->GetPositionX(), player->GetPositionY());
-                                Position pos = player->GetNearPosition(2.0f, angle);
-
-                                if (angle > 1.7f)
-                                {
-                                    angle -= 0.3f;
-                                    if (angle < 0) angle += M_PI * 2;
-                                    Position pos = player->GetNearPosition(2.0f, angle);
-                                    me->GetMotionMaster()->MovePoint(22, pos);
-                                    m_events.ScheduleEvent(EVENT_MOVE_ADARRAH_2, 400);
-                                }
+                                float d1 = me->GetDistance2d(-8929.17f, -2262.24f);
+                                float d2 = me->GetDistance2d(-8928.21f, -2267.25f);
+                                if (d1 < d2)
+                                    me->GetMotionMaster()->MovePoint(MOVE_ADARRAH_AROUND_PLAYER, -8929.17f, -2262.24f, 8.877f);
                                 else
-                                    if (Creature* camel = sObjectAccessor->GetCreature(*me, bunny->GetAI()->GetGUID(NPC_ADARRAHS_CAMEL)))
-                                    {
-                                        me->SetWalk(false);
-                                        angle = me->GetAngle(camel->GetPositionX(), camel->GetPositionY());
-                                        Position pos = camel->GetNearPosition(2.0f, angle);
-                                        me->GetMotionMaster()->MovePoint(23, pos);
-                                    }
+                                    me->GetMotionMaster()->MovePoint(MOVE_ADARRAH_AROUND_PLAYER, -8929.17f, -2262.24f, 8.877f);
+                            }
+                        break;
+                    }
+                    case EVENT_MOVE_ADARRAH_TO_CAMEL:
+                    {
+                        if (Creature* bunny = sObjectAccessor->GetCreature(*me, target_bunnyGUID))
+                            if (Creature* camel = sObjectAccessor->GetCreature(*me, bunny->GetAI()->GetGUID(NPC_ADARRAHS_CAMEL)))
+                            {
+                                float angle = camel->GetAngle(me->GetPositionX(), me->GetPositionY());
+                                Position pos = camel->GetNearPosition(2.0f, angle);
+                                me->GetMotionMaster()->MovePoint(MOVE_ADARRAH_TO_CAMEL, pos);
+                            }
+                        break;
+                    }
+                    case EVENT_ADARRAH_MOUNT_CAMEL:
+                    {
+                        if (Creature* bunny = sObjectAccessor->GetCreature(*me, target_bunnyGUID))
+                            if (Creature* camel = sObjectAccessor->GetCreature(*me, bunny->GetAI()->GetGUID(NPC_ADARRAHS_CAMEL)))
+                            {
+                                me->EnterVehicle(camel, 0);
+                                bunny->GetAI()->DoAction(ACTION_STARTING_CARAVAN);
                             }
                         break;
                     }
@@ -959,15 +1160,14 @@ public:
 
     struct npc_lady_humps_46536AI : public ScriptedAI
     {
-        npc_lady_humps_46536AI(Creature* creature) : ScriptedAI(creature) { }
+        npc_lady_humps_46536AI(Creature* creature) : ScriptedAI(creature) { isStarted = false; }
 
         uint64 target_bunnyGUID;
         bool isStarted;
 
         void Reset() override
         {
-            target_bunnyGUID = NULL;
-            isStarted = false;
+            target_bunnyGUID = NULL;            
         }
 
         void IsSummonedBy(Unit* summoner) override
@@ -981,65 +1181,17 @@ public:
             if (Player* player = clicker->ToPlayer())
                 if (player->GetQuestStatus(QUEST_EASY_MONEY) == QUEST_STATUS_INCOMPLETE)
                     if (Creature* bunny = sObjectAccessor->GetCreature(*me, target_bunnyGUID))
-                    {
-                        bunny->GetAI()->DoAction(EVENT_START_ADARRAH);
-                        isStarted = true;
-                    }
+                        if (Creature* adarrah = sObjectAccessor->GetCreature(*me, bunny->GetAI()->GetGUID(NPC_ADARRAH)))
+                        {
+                            adarrah->GetAI()->DoAction(ACTION_START_ADARRAH_TALK_VIDEO);
+                            isStarted = true;
+                        }
         }
-
-       
     };
 
     CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_lady_humps_46536AI(creature);
-    }
-};
-
-// 46554
-class npc_cloned_image_46554 : public CreatureScript
-{
-public:
-    npc_cloned_image_46554() : CreatureScript("npc_cloned_image_46554") { }
-
-    struct npc_cloned_image_46554AI : public ScriptedAI
-    {
-        npc_cloned_image_46554AI(Creature* creature) : ScriptedAI(creature) { }
-
-        uint64 playerGUID;
-
-        void Reset() override
-        {
-            playerGUID = NULL;
-        }
-
-        void IsSummonedBy(Unit* summoner) override
-        {
-            playerGUID = summoner->GetGUID();
-            me->CastSpell(summoner, SPELL_REVERSE_CAST_MIRROR_IMAGE, true);  // trigger 86784 and some copy script events.. 41055/45206 and back 41054/45205                 
-
-            //me->CastSpell(summoner, 41055);
-            //me->CastSpell(summoner, 45206);
-        }
-
-        void SpellHitTarget(Unit* target, SpellInfo const* spell) 
-        { 
-            switch (spell->Id)
-            {
-            case 41055:
-                //target->CastSpell(me, 41054);
-                break;
-            case 45206:
-                //target->CastSpell(me, 45205);
-                break;
-            }
-        }
-
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_cloned_image_46554AI(creature);
     }
 };
 
@@ -1053,6 +1205,7 @@ public:
     {
         npc_uldum_caravan_harness_46596AI(Creature* creature) : ScriptedAI(creature) { }
 
+        EventMap m_events;
         uint64 bunnyGUID;
         uint64 kodoGUID;
         uint64 kurzelGUID;
@@ -1063,6 +1216,7 @@ public:
 
         void Reset() override
         {
+            m_events.Reset();
             bunnyGUID = NULL;
             kodoGUID = NULL;
             kurzelGUID = NULL;
@@ -1094,13 +1248,6 @@ public:
                 case NPC_TURGORE_2:
                 {
                     turgoreGUID = summon->GetGUID();
-                    if (!hasChains)
-                    {
-                        hasChains = true;
-                        me->CastSpell(summon, SPELL_CHAINS_OF_BONDAGE_1);
-                        summon->CastSpell(me, SPELL_CHAINS_OF_BONDAGE_2);
-                        summon->CastSpell(me, SPELL_CHAINS_OF_BONDAGE_3);
-                    }
                     break;
                 }
                 case NPC_TANZAR_2:
@@ -1114,8 +1261,23 @@ public:
                     break;
                 }
             }
+            CreateChains();
         }
 
+        // maybe better to disable??? chains are visible in different phases and uses wrong start/end data..
+        void CreateChains()
+        {
+            if (!hasChains)
+                if (Creature* kodo = sObjectAccessor->GetCreature(*me, kodoGUID))
+                    if (Creature* turgore = sObjectAccessor->GetCreature(*me, turgoreGUID))
+                    {
+                        hasChains = true;
+                        kodo->CastSpell(turgore, SPELL_CHAINS_OF_BONDAGE_1, true);
+                        //turgore->CastSpell(kodo, SPELL_CHAINS_OF_BONDAGE_2, true);
+                        //turgore->CastSpell(kodo, SPELL_CHAINS_OF_BONDAGE_3, true);
+                    }
+        }
+        
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -1124,9 +1286,49 @@ public:
     }
 };
 
-// ##########  Vision 2: 
+// ##########  Vision 2: has same actors as in video 1..
 
+// ##########  Vision 3: 
 
+// 46873
+class npc_adarrah_46873 : public CreatureScript
+{
+public:
+    npc_adarrah_46873() : CreatureScript("npc_adarrah_46873") { }
+
+    struct npc_adarrah_46873AI : public ScriptedAI
+    {
+        npc_adarrah_46873AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap m_events;
+       
+        void Reset() override
+        {
+            m_events.Reset();
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_ADARRAH_TALK_0:
+                {
+                   
+                }                
+                }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_adarrah_46873AI(creature);
+    }
+};
 
 void AddSC_tanaris()
 {
@@ -1139,6 +1341,6 @@ void AddSC_tanaris()
     new npc_beam_target_bunny_46661();
     new npc_adarrah_46533();
     new npc_lady_humps_46536();
-    new npc_cloned_image_46554();
     new npc_uldum_caravan_harness_46596();
+    new npc_adarrah_46873();
 }

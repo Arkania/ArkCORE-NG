@@ -4,7 +4,7 @@ UPDATE quest_template SET Flags=262144 WHERE Id=27003;
 update creature_template set AIName="", ScriptName="npc_beam_target_bunny_46661" where entry=46661;
 update creature_template set AIName="", ScriptName="npc_adarrah_46533" where entry=46533;
 update creature_template set AIName="", ScriptName="npc_lady_humps_46536" where entry=46536;
-update creature_template set AIName="", ScriptName="npc_cloned_image_46554" where entry=46554;
+update creature_template set AIName="", ScriptName="" where entry=46554;
 update creature_template set AIName="", ScriptName="npc_uldum_caravan_harness_46596" where entry=46596;
 
 UPDATE creature_template SET npcflag=16777216 WHERE entry=46536;

@@ -52,9 +52,9 @@ delete from creature_text where entry=46520 and groupid in (0);
 
 delete from creature_text where entry=47326 and groupid in (0, 1, 2);
 insert into creature_text values
-(47326, 0, 0, "Attack!", 12, 0, 100, 0, 0, 0, "", 0),
-(47326, 1, 0, "How many cocosnut we can get for the ugly one?", 12, 0, 100, 0, 0, 0, "", 0),
-(47326, 2, 0, "TREEE? he woulda paid five, easy... dummy!", 12, 0, 100, 0, 0, 0, "", 0);
+(47326, 0, 0, "Attack!", 12, 0, 100, 0, 0, 0, "", 46761),
+(47326, 1, 0, "How many coconuts we can get for the ugly one?", 12, 0, 100, 0, 0, 0, "", 46774),
+(47326, 2, 0, "TREEE? he woulda paid five, easy... dummy!", 12, 0, 100, 0, 0, 0, "", 46839);
 
 delete from creature_text where entry=48030 and groupid in (0, 1, 2);
 insert into creature_text values

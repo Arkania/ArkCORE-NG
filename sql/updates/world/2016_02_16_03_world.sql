@@ -5,7 +5,7 @@ UPDATE creature SET phaseMask=2 WHERE id=35177;
 UPDATE creature_template SET maxlevel=15,minlevel=15 WHERE entry=35195;
 --  support quest 24576 "Love is in the air event".
 UPDATE creature_template SET gossip_menu_id=10929 WHERE entry=37715;
-delete from conditions where SourceTypeOrReferenceId=15 and SourceGroup=10929 and ConditionTypeOrReference=9 and ConditionTarget=24576;
+delete from conditions where SourceTypeOrReferenceId=15 and SourceGroup=10929 and ConditionTypeOrReference=9 and ConditionValue1=24576;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`,`SourceGroup`,`SourceEntry`,`SourceId`,`ElseGroup`,`ConditionTypeOrReference`,`ConditionTarget`,`ConditionValue1`,`ConditionValue2`,`ConditionValue3`,`NegativeCondition`,`ErrorType`,`ErrorTextId`,`ScriptName`,`Comment`) VALUES 
 (15,10929,0,0,0,9,0,24576,0,0,0,0,0,'','required quest to show gossip');
 
