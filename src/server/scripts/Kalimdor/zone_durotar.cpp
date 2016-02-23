@@ -21,33 +21,25 @@
 #include "SpellScript.h"
 #include "Player.h"
 
-/*######
-## Quest 25134: Lazy Peons
-## npc_lazy_peon
-######*/
-
-enum LazyPeonYells
-{
-    SAY_SPELL_HIT                                 = 0
-};
-
-enum LazyPeon
-{
-    QUEST_LAZY_PEONS    = 25134,
-    GO_LUMBERPILE       = 175784,
-    SPELL_BUFF_SLEEP    = 17743,
-    SPELL_AWAKEN_PEON   = 19938
-};
-
+// 10556, Quest 25134:
 class npc_lazy_peon : public CreatureScript
 {
 public:
     npc_lazy_peon() : CreatureScript("npc_lazy_peon") { }
 
-    CreatureAI* GetAI(Creature* creature) const override
+
+    enum LazyPeonYells
     {
-        return new npc_lazy_peonAI(creature);
-    }
+        SAY_SPELL_HIT = 0
+    };
+
+    enum LazyPeon
+    {
+        QUEST_LAZY_PEONS = 25134,
+        GO_LUMBERPILE = 175784,
+        SPELL_BUFF_SLEEP = 17743,
+        SPELL_AWAKEN_PEON = 19938
+    };
 
     struct npc_lazy_peonAI : public ScriptedAI
     {
@@ -103,17 +95,11 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-};
 
-enum VoodooSpells
-{
-    SPELL_BREW      = 16712, // Special Brew
-    SPELL_GHOSTLY   = 16713, // Ghostly
-    SPELL_HEX1      = 16707, // Hex
-    SPELL_HEX2      = 16708, // Hex
-    SPELL_HEX3      = 16709, // Hex
-    SPELL_GROW      = 16711, // Grow
-    SPELL_LAUNCH    = 16716, // Launch (Whee!)
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_lazy_peonAI(creature);
+    }
 };
 
 // 17009
@@ -121,6 +107,18 @@ class spell_voodoo : public SpellScriptLoader
 {
     public:
         spell_voodoo() : SpellScriptLoader("spell_voodoo") { }
+
+
+        enum VoodooSpells
+        {
+            SPELL_BREW = 16712, // Special Brew
+            SPELL_GHOSTLY = 16713, // Ghostly
+            SPELL_HEX1 = 16707, // Hex
+            SPELL_HEX2 = 16708, // Hex
+            SPELL_HEX3 = 16709, // Hex
+            SPELL_GROW = 16711, // Grow
+            SPELL_LAUNCH = 16716, // Launch (Whee!)
+        };
 
         class spell_voodoo_SpellScript : public SpellScript
         {
@@ -155,8 +153,94 @@ class spell_voodoo : public SpellScriptLoader
         }
 };
 
+// 39464
+class npc_drowned_thunder_lizard_39464 : public CreatureScript
+{
+public:
+    npc_drowned_thunder_lizard_39464() : CreatureScript("npc_drowned_thunder_lizard_39464") { }
+
+    enum eQuest
+    {
+        QUEST_THUNDER_DOWN_UNDER = 25236,
+        NPC_THUNDER_LIZARD = 39464,
+        NPC_HULKING_ORCISH_LABORER = 39465,
+        SPELL_ATTACH_TETHER = 73945,
+        SPELL_LIFT_DROWNED_THUNDER_LIZARD = 73951,
+        SPELL_LIGHTNING_DISCHARGE = 73958,
+        EVENT_LIGHTNING_DISCHARGE = 101,
+    };
+
+    struct npc_drowned_thunder_lizard_39464AI : public ScriptedAI
+    {
+        npc_drowned_thunder_lizard_39464AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+        EventMap m_events;
+        bool m_isWorking;
+
+        void Initialize()
+        {
+            m_events.Reset();
+            m_isWorking = false;
+        }
+
+        void Reset() override
+        {           
+            m_events.ScheduleEvent(EVENT_LIGHTNING_DISCHARGE, urand(20000, 60000));
+        }
+
+        void OnSpellClick(Unit* clicker, bool& result) 
+        { 
+            if (!m_isWorking)
+                if (Player* player = clicker->ToPlayer())
+                    if (player->GetQuestStatus(QUEST_THUNDER_DOWN_UNDER) == QUEST_STATUS_INCOMPLETE)
+                        if (Creature* hulk = me->FindNearestCreature(NPC_HULKING_ORCISH_LABORER, 300.0f))
+                        {
+                            m_isWorking = true;
+                            hulk->CastSpell(me, SPELL_LIFT_DROWNED_THUNDER_LIZARD, true);
+                            player->KilledMonsterCredit(NPC_THUNDER_LIZARD);
+                            Position pos = me->GetPosition();
+                            pos.m_positionZ += 10.0f;
+                            me->SetCanFly(true);
+                            me->SetDisableGravity(true);
+                            me->SetByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_HOVER);
+                            me->SetSpeed(MOVE_RUN, 0.2f, true);
+                            me->GetMotionMaster()->MoveTakeoff(101, pos);
+                            me->DespawnOrUnsummon(5000);
+                        }
+        }
+
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                    case EVENT_LIGHTNING_DISCHARGE:
+                    {
+                        me->CastSpell(me, SPELL_LIGHTNING_DISCHARGE);
+                        m_events.ScheduleEvent(EVENT_LIGHTNING_DISCHARGE, urand(30000, 60000));
+                        break;
+                    }
+                }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_drowned_thunder_lizard_39464AI(creature);
+    }
+};
+
+
 void AddSC_durotar()
 {
     new npc_lazy_peon();
     new spell_voodoo();
+    new npc_drowned_thunder_lizard_39464();
+
 }
+
