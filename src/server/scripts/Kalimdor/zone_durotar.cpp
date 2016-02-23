@@ -209,7 +209,6 @@ public:
                         }
         }
 
-
         void UpdateAI(uint32 diff) override
         {
             m_events.Update(diff);
@@ -235,12 +234,49 @@ public:
     }
 };
 
+// 80962
+class spell_kill_golden_stonefish_80962 : public SpellScriptLoader
+{
+public:
+    spell_kill_golden_stonefish_80962() : SpellScriptLoader("spell_kill_golden_stonefish_80962") { }
+
+    enum eSpell
+    {
+        NPC_GOLDEN_STONEFISH = 43331,
+    };
+
+    class spell_kill_golden_stonefish_80962_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_kill_golden_stonefish_80962_SpellScript);
+
+        void SelectTarget(std::list<WorldObject*>& targets)
+        {
+            std::list<WorldObject*> list;
+            for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
+                if ((*itr)->ToCreature() && (*itr)->GetEntry() == NPC_GOLDEN_STONEFISH)
+                    list.push_back((*itr));
+
+            targets = list;
+        }
+
+        void Register() override
+        {
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_kill_golden_stonefish_80962_SpellScript::SelectTarget, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_kill_golden_stonefish_80962_SpellScript();
+    }
+};
+
 
 void AddSC_durotar()
 {
     new npc_lazy_peon();
     new spell_voodoo();
     new npc_drowned_thunder_lizard_39464();
-
+    new spell_kill_golden_stonefish_80962();
 }
 
