@@ -5,8 +5,6 @@ update creature_template set npcflag=16777216, unit_flags=262976, AIName="", Scr
 DELETE FROM `smart_scripts` WHERE `entryorguid`=39464 AND `source_type`=0;
 
 delete from npc_spellclick_spells where npc_entry=39464 and spell_id=80948;
-insert into npc_spellclick_spells values
-(39464, 80948, 1, 0);
 
 update item_template set class=12, spellid_1=73945 where entry=52574;
 

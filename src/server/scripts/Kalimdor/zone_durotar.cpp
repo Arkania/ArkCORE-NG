@@ -314,6 +314,8 @@ public:
             m_hulkList.push_back(Position(905.344482f, -4176.950195f, 26.277588f, 0.307187f));
             m_hulkList.push_back(Position(972.444702f, -4222.325684f, 22.747892f, 3.550868f));
             m_hulkList.push_back(Position(801.102844f, -4089.484619f, 25.795090f, 4.882112f));
+            m_hulkList.push_back(Position(810.994995f, -4087.808594f, 25.023535f, 5.612078f));
+            m_hulkList.push_back(Position(829.534973f, -4022.998779f, 20.646587f, 4.626402f));
         }
     };
 
