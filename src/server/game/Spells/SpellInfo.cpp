@@ -632,6 +632,9 @@ float SpellEffectInfo::CalcRadius(bool positive, Unit* caster, Spell* spell) con
                 return 4.0f;
             case 86041:
                 return 8.0f;
+            // Lightning Discharge
+            case 73958:
+                return 8.0f;
             // Death and Decay
             case 52212:
                 return 10.0f;

@@ -165,9 +165,14 @@ public:
         NPC_THUNDER_LIZARD = 39464,
         NPC_HULKING_ORCISH_LABORER = 39465,
         SPELL_ATTACH_TETHER = 73945,
+        SPELL_LIFT_DROWNED_THUNDER_LIZARD_TARGET = 73950,
         SPELL_LIFT_DROWNED_THUNDER_LIZARD = 73951,
         SPELL_LIGHTNING_DISCHARGE = 73958,
-        EVENT_LIGHTNING_DISCHARGE = 101,
+        EVENT_WAIT_ON_HULK = 101,
+        EVENT_LIGHTNING_DISCHARGE,
+        EVENT_LIFT_DROWNED_THUNDER_LIZARD_TARGET1,
+        EVENT_LIFT_DROWNED_THUNDER_LIZARD_TARGET2,
+        EVENT_RESET_FOR_HULK,
     };
 
     struct npc_drowned_thunder_lizard_39464AI : public ScriptedAI
@@ -175,38 +180,36 @@ public:
         npc_drowned_thunder_lizard_39464AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
 
         EventMap m_events;
+        uint64   m_hulkGUID;
+        uint64   m_playerGUID;
         bool m_isWorking;
+        std::list<Position> m_hulkList;
 
         void Initialize()
         {
-            m_events.Reset();
-            m_isWorking = false;
+            m_hulkGUID = NULL;
+            m_playerGUID = NULL;            
+            FillHulkPositionList();
         }
 
         void Reset() override
         {           
+            m_events.Reset();
             m_events.ScheduleEvent(EVENT_LIGHTNING_DISCHARGE, urand(20000, 60000));
+            m_isWorking = false;
         }
 
         void OnSpellClick(Unit* clicker, bool& result) 
         { 
             if (!m_isWorking)
-                if (Player* player = clicker->ToPlayer())
-                    if (player->GetQuestStatus(QUEST_THUNDER_DOWN_UNDER) == QUEST_STATUS_INCOMPLETE)
-                        if (Creature* hulk = me->FindNearestCreature(NPC_HULKING_ORCISH_LABORER, 300.0f))
-                        {
-                            m_isWorking = true;
-                            hulk->CastSpell(me, SPELL_LIFT_DROWNED_THUNDER_LIZARD, true);
-                            player->KilledMonsterCredit(NPC_THUNDER_LIZARD);
-                            Position pos = me->GetPosition();
-                            pos.m_positionZ += 10.0f;
-                            me->SetCanFly(true);
-                            me->SetDisableGravity(true);
-                            me->SetByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_HOVER);
-                            me->SetSpeed(MOVE_RUN, 0.2f, true);
-                            me->GetMotionMaster()->MoveTakeoff(101, pos);
-                            me->DespawnOrUnsummon(5000);
-                        }
+            if (Player* player = clicker->ToPlayer())
+                if (player->GetQuestStatus(QUEST_THUNDER_DOWN_UNDER) == QUEST_STATUS_INCOMPLETE)
+                {
+                    m_isWorking = true;
+                    m_playerGUID = player->GetGUID();
+                    m_events.ScheduleEvent(EVENT_WAIT_ON_HULK, 250);
+                    m_events.ScheduleEvent(EVENT_RESET_FOR_HULK, 10000);
+                }
         }
 
         void UpdateAI(uint32 diff) override
@@ -223,8 +226,94 @@ public:
                         m_events.ScheduleEvent(EVENT_LIGHTNING_DISCHARGE, urand(30000, 60000));
                         break;
                     }
+                    case EVENT_WAIT_ON_HULK:
+                    {
+                        if (Creature* hulk = me->FindNearestCreature(NPC_HULKING_ORCISH_LABORER, 15.0f))
+                        {
+                            m_hulkGUID = hulk->GetGUID();
+                            Position pos = FindBestHulkPosition(hulk->GetPosition());
+                            hulk->NearTeleportTo(pos.m_positionX, pos.m_positionY, pos.m_positionZ, pos.m_orientation, true);
+                            m_events.ScheduleEvent(EVENT_LIFT_DROWNED_THUNDER_LIZARD_TARGET1, 25);
+                        }
+                        else
+                            m_events.ScheduleEvent(EVENT_WAIT_ON_HULK, 100);
+
+                        break;
+                    }
+                    case EVENT_LIFT_DROWNED_THUNDER_LIZARD_TARGET1:
+                    {
+                        if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                            if (Creature* hulk = sObjectAccessor->GetCreature(*me, m_hulkGUID))
+                            {
+                                hulk->CastSpell(me, SPELL_LIFT_DROWNED_THUNDER_LIZARD, true);
+                                hulk->CastSpell(hulk, SPELL_LIFT_DROWNED_THUNDER_LIZARD_TARGET, true);
+                            }
+
+                        m_events.ScheduleEvent(EVENT_LIFT_DROWNED_THUNDER_LIZARD_TARGET2, 2000);
+                        break;
+                    }
+                    case EVENT_LIFT_DROWNED_THUNDER_LIZARD_TARGET2:
+                    {
+                        if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                            if (Creature* hulk = sObjectAccessor->GetCreature(*me, m_hulkGUID))
+                            {
+                                Position pos = me->GetPosition();
+                                pos.m_positionZ = 12.0f;
+                                me->SetCanFly(true);
+                                me->SetDisableGravity(true);
+                                me->SetByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_HOVER);
+                                me->SetSpeed(MOVE_RUN, 0.15f, true);
+                                me->GetMotionMaster()->MoveTakeoff(101, pos);
+                                me->DespawnOrUnsummon(10000);
+                                hulk->DespawnOrUnsummon(10000);
+                            }
+                        break;
+                    }
+                    case EVENT_RESET_FOR_HULK:
+                    {
+                        Reset();
+                        break;
+                    }
                 }
             }
+        }
+
+        Position FindBestHulkPosition(Position pos)
+        {
+            float dist = 500.0f;
+            Position newPos;
+            for (std::list<Position>::iterator itr = m_hulkList.begin(); itr != m_hulkList.end(); ++itr)
+            {
+                Position p = (*itr);
+                float d = p.GetExactDist2d(pos.m_positionX, pos.m_positionY);
+                if (d < dist)
+                {
+                    dist = d; 
+                    newPos = p;
+                }
+            }
+            return newPos;
+        }
+
+        void FillHulkPositionList()
+        {
+            m_hulkList.clear();
+            m_hulkList.push_back(Position(761.681519f, -4114.352539f, 27.533762f, 1.669859f));
+            m_hulkList.push_back(Position(789.240173f, -4105.788574f, 26.680470f, 1.956528f));
+            m_hulkList.push_back(Position(843.065918f, -4059.360596f, 27.911030f, 2.596630f));
+            m_hulkList.push_back(Position(769.185669f, -4030.059082f, 26.620789f, 4.336287f));
+            m_hulkList.push_back(Position(868.856018f, -4027.161377f, 32.579823f, 3.539107f));
+            m_hulkList.push_back(Position(885.622131f, -4024.350342f, 33.658619f, 6.154483f));
+            m_hulkList.push_back(Position(921.469360f, -4034.692871f, 36.609566f, 0.256142f));
+            m_hulkList.push_back(Position(961.751343f, -4070.507324f, 23.249489f, 2.918641f));
+            m_hulkList.push_back(Position(945.061340f, -4078.592041f, 27.331806f, 0.558519f));
+            m_hulkList.push_back(Position(941.900757f, -4121.144043f, 23.914780f, 5.867807f));
+            m_hulkList.push_back(Position(899.980408f, -4170.012207f, 24.881603f, 1.709126f));
+            m_hulkList.push_back(Position(965.486877f, -4204.474121f, 22.279196f, 3.095355f));
+            m_hulkList.push_back(Position(940.573730f, -4231.450195f, 20.181242f, 5.592918f));
+            m_hulkList.push_back(Position(905.344482f, -4176.950195f, 26.277588f, 0.307187f));
+            m_hulkList.push_back(Position(972.444702f, -4222.325684f, 22.747892f, 3.550868f));
+            m_hulkList.push_back(Position(801.102844f, -4089.484619f, 25.795090f, 4.882112f));
         }
     };
 
