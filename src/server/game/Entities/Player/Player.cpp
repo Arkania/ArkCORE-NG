@@ -21057,16 +21057,17 @@ void Player::SaveToDB(bool create /*=false*/)
         ss.str("");
         for (uint32 i = 0; i < KNOWN_TITLES_SIZE*2; ++i)
             ss << GetUInt32Value(PLAYER__FIELD_KNOWN_TITLES + i) << ' ';
-
         stmt->setString(index++, ss.str());
+
         stmt->setUInt8(index++, GetByteValue(PLAYER_FIELD_BYTES, 2));
         stmt->setUInt32(index++, m_grantableLevels);
-
-        stmt->setUInt8(index++, IsInWorld() && !GetSession()->PlayerLogout() ? 1 : 0);
         stmt->setUInt32(index++, GetAchievementPoints());
+
         stmt->setUInt32(index++, GetRatedBGWins());
         stmt->setUInt32(index++, GetRatedBGLoose());
         stmt->setUInt32(index++, GetRatedBGRating());
+
+        stmt->setUInt8(index++, IsInWorld() && !GetSession()->PlayerLogout() ? 1 : 0);
 
         // Index
         stmt->setUInt32(index++, GetGUIDLow());
