@@ -77,12 +77,6 @@ void PhaseMgr::NotifyConditionChanged(PhaseUpdateData const& updateData)
 {
     if (NeedsPhaseUpdateWithData(updateData))
     {
-        if (phaseData.HasActiveDefinitions())
-        {
-            phaseData.ResetDefinitions();
-            _UpdateFlags |= (PHASE_UPDATE_FLAG_CLIENTSIDE_CHANGED | PHASE_UPDATE_FLAG_SERVERSIDE_CHANGED);
-        }
-
         Recalculate();
         Update();
     }
@@ -100,14 +94,10 @@ void PhaseMgr::Recalculate()
         for (PhaseDefinitionContainer::const_iterator itr = pdc.begin(); itr != pdc.end(); ++itr)
         {
             PhaseDefinition phase = *itr;
-            bool _needUpdate = false;
             uint8 cd = CheckDefinition(phase);
             uint8 ca = CheckArea(phase, pac);
 
             if ((cd == 2 && ca == 2) || cd == 1 || ca == 1)
-                _needUpdate = true;
-
-            if (_needUpdate)
             {
                 phaseData.AddPhaseDefinition(phase);
 
@@ -141,15 +131,15 @@ uint8 PhaseMgr::CheckArea(PhaseDefinition phaseDefinition, PhaseAreaContainer pa
     for (PhaseAreaContainer::const_iterator area = pac.begin(); area != pac.end(); ++area)
         if (phaseDefinition.zoneId == area->areaId && phaseDefinition.entry == area->entry)
         {
-            uint32 qss = GetQuestStatusFlag(area->quest_start);
-            uint32 qse = GetQuestStatusFlag(area->quest_end);
-            uint32 qfs = area->quest_start_status;
-            uint32 qfe = area->quest_end_status;
-            bool rqs = qss & qfs;
-            bool rqe = qse & qfe;
+            if (area->quest_start)                              // not in expected required quest state
+                if (!player || (((1 << player->GetQuestStatus(area->quest_start)) & area->quest_start_status) == 0))
+                    continue;
 
-            if (rqs && !rqe)
-                return PHASE_UPDATE_NEEDED;
+            if (area->quest_end)                                // not in expected forbidden quest state
+                if (!player || (((1 << player->GetQuestStatus(area->quest_end)) & area->quest_end_status) == 0))
+                    continue;
+
+            return PHASE_UPDATE_NEEDED;
         }
 
     return PHASE_UPDATE_NOT_NEEDED;
@@ -182,26 +172,15 @@ bool PhaseMgr::NeedsPhaseUpdateWithData(PhaseUpdateData const& updateData) const
     bool ret = false;
 
     if (!pdc.empty())
-    {
         for (PhaseDefinitionContainer::const_iterator phase = pdc.begin(); phase != pdc.end(); ++phase)
-        {
             if (IsConditionRelated(updateData, phase->zoneId, phase->entry))
             {
-                ret = true; break;
+                ret = true; 
+                break;
             }
-        }
-    }
 
     if (!pac.empty())
-    {
-        for (PhaseAreaContainer::const_iterator area = pac.begin(); area != pac.end(); ++area)
-        {
-            if (IsAreaRelated(updateData, area->areaId, area->entry))
-            {
-                ret = true; break;
-            }
-        }
-    }
+        ret = true;
 
     return ret;
 }
@@ -215,34 +194,6 @@ bool PhaseMgr::IsConditionRelated(PhaseUpdateData const& updateData, uint32 zone
                 return true;
 
     return false;
-}
-
-bool PhaseMgr::IsAreaRelated(PhaseUpdateData const& updateData, uint32 zoneId, uint32 entry) const
-{
-    return true;
-}
-
-uint32 PhaseMgr::GetQuestStatusFlag(uint32 questId)
-{
-    uint32 qs = player->GetQuestStatus(questId);
-    switch (qs)
-    {
-    case 0:
-        return 1;
-    case 1:
-        return 2;
-    case 2:
-        return 4;
-    case 3:
-        return 8;
-    case 4:
-        return 16;
-    case 5:
-        return 32;
-    case 6:
-        return 64;
-    }
-    return 0;
 }
 
 //////////////////////////////////////////////////////////////////
