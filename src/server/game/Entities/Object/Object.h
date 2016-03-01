@@ -783,7 +783,9 @@ class WorldObject : public Object, public WorldLocation
         void SummonCreatureGroup(uint8 group, std::list<TempSummon*>* list = NULL);
 
         Creature*   FindNearestCreature(uint32 entry, float range, bool alive = true) const;
-        std::list<Creature*> FindNearestCreatures(uint32 entry, float range) const;
+        Creature*   FindNearestCreature(std::list<uint32> entrys, float range, bool alive = true) const;
+        std::list<Creature*>   FindNearestCreatures(uint32 entry, float range) const;
+        std::list<Creature*>   FindNearestCreatures(std::list<uint32> entrys, float range) const;
         std::vector<Creature*> FindNearestCreatures(uint32 entry, float range, bool alive) const;
         Creature*   FindRandomCreatureInRange(uint32 entry, float range, bool alive);
         GameObject* FindNearestGameObject(uint32 entry, float range) const;

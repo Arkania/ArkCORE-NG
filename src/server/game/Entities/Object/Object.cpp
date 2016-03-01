@@ -2557,10 +2557,33 @@ Creature* WorldObject::FindNearestCreature(uint32 entry, float range, bool alive
     return creature;
 }
 
+Creature* WorldObject::FindNearestCreature(std::list<uint32> entrys, float range, bool alive) const
+{
+    Creature* creature = NULL;
+    float dist = range;
+    for (std::list<uint32>::iterator itr = entrys.begin(); itr != entrys.end(); ++itr)
+        if (Creature* npc = FindNearestCreature((*itr), range, alive))
+            if (this->GetDistance2d(npc) < dist)
+            {
+                creature = npc;
+                dist = this->GetDistance2d(npc);
+            }
+
+    return creature;
+}
+
 std::list<Creature*> WorldObject::FindNearestCreatures(uint32 entry, float range) const
 {
     std::list<Creature*> creatureList;    
     GetCreatureListWithEntryInGrid(creatureList, entry, range);   
+    return creatureList;
+}
+
+std::list<Creature*> WorldObject::FindNearestCreatures(std::list<uint32> entrys, float range) const
+{
+    std::list<Creature*> creatureList;
+    for (std::list<uint32>::iterator itr = entrys.begin(); itr != entrys.end(); ++itr)
+        GetCreatureListWithEntryInGrid(creatureList, (*itr), range);
     return creatureList;
 }
 
