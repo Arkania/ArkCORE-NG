@@ -2537,15 +2537,16 @@ public:
 
 };
 
-enum WindsoulTotemAura
-{
-    SPELL_WINDSOUL_CREDT = 46378
-};
-
+// 46374
 class spell_windsoul_totem_aura : public SpellScriptLoader
 {
 public:
     spell_windsoul_totem_aura() : SpellScriptLoader("spell_windsoul_totem_aura") { }
+
+    enum WindsoulTotemAura
+    {
+        SPELL_WINDSOUL_CREDT = 46378
+    };
 
     class spell_windsoul_totem_aura_AuraScript : public AuraScript
     {
