@@ -8324,6 +8324,20 @@ void Player::RewardReputation(Unit* victim, float rate)
         if (factionEntry2 && current_reputation_rank2 <= Rep->ReputationMaxCap2)
             GetReputationMgr().ModifyReputation(factionEntry2, donerep2);
     }
+    if (Rep->currencyid1 && Rep->currencycount1)
+    {
+        ModifyCurrency(Rep->currencyid1, Rep->currencycount1);
+    }
+
+    if (Rep->currencyid2 && Rep->currencycount2)
+    {
+        ModifyCurrency(Rep->currencyid2, Rep->currencycount2);
+    }
+
+    if (Rep->currencyid3 && Rep->currencycount3)
+    {
+        ModifyCurrency(Rep->currencyid3, Rep->currencycount3);
+    }
 }
 
 // Calculate how many reputation points player gain with the quest
