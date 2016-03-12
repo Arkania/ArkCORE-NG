@@ -16775,7 +16775,11 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
 
     for (uint8 i = 0; i < QUEST_REWARD_CURRENCY_COUNT; ++i)
         if (quest->RewardCurrencyId[i])
-            ModifyCurrency(quest->RewardCurrencyId[i], quest->RewardCurrencyCount[i]);
+        {
+            CurrencyTypesEntry const* currency = sCurrencyTypesStore.LookupEntry(quest->RewardCurrencyId[i]);
+            int32 precision = currency->Flags & CURRENCY_FLAG_HIGH_PRECISION ? CURRENCY_PRECISION : 1;
+            ModifyCurrency(quest->RewardCurrencyId[i], quest->RewardCurrencyCount[i] * precision);
+        }
 
     if (uint32 skill = quest->GetRewardSkillId())
         UpdateSkillPro(skill, 1000, quest->GetRewardSkillPoints());

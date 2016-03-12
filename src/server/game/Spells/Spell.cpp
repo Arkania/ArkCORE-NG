@@ -4762,7 +4762,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                         if (Creature* krennan = player->FindNearestCreature(35753, 5.0f))
                                 return SPELL_CAST_OK;
         break;
-    // control ettin
+     // control ettin
     case 80704:
     {
         Creature* ettin = m_caster->FindNearestCreature(43094, 10.0f);

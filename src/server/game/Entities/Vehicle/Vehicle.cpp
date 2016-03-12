@@ -63,7 +63,12 @@ Vehicle::~Vehicle()
     /// @Uninstall must be called before this.
     ASSERT(_status == STATUS_UNINSTALLING);
     for (SeatMap::const_iterator itr = Seats.begin(); itr != Seats.end(); ++itr)
-        ASSERT(itr->second.IsEmpty());
+    {
+        if (itr->second.Passenger.Guid)
+            TC_LOG_ERROR("entities.vehicle", "Vehicle::~Vehicle (Entry: %u) has passenger %u in seat %u during destroy.", GetBase()->GetEntry(), itr->second.Passenger, itr->first);
+
+        ASSERT(itr->second.IsEmpty()); // ASSERT(!itr->second.Passenger.Guid);
+    }
 }
 
 /**
@@ -233,6 +238,8 @@ void Vehicle::ApplyAllImmunities()
         case 160: // Strand of the Ancients
         case 244: // Wintergrasp
         case 510: // Isle of Conquest
+        case 452: // Isle of Conquest
+        case 543: // Isle of Conquest
             _me->SetControlled(true, UNIT_STATE_ROOT);
             // why we need to apply this? we can simple add immunities to slow mechanic in DB
             _me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_DECREASE_SPEED, true);
@@ -345,7 +352,7 @@ SeatMap::const_iterator Vehicle::GetNextEmptySeat(int8 seatId, bool next) const
     if (seat == Seats.end())
         return seat;
 
-    while (!seat->second.IsEmpty() || (!seat->second.SeatInfo->CanEnterOrExit() && !seat->second.SeatInfo->IsUsableByOverride()))
+    while (!seat->second.IsEmpty() || HasPendingEventForSeat(seat->first) || (!seat->second.SeatInfo->CanEnterOrExit() && !seat->second.SeatInfo->IsUsableByOverride()))
     {
         if (next)
         {
@@ -450,7 +457,7 @@ bool Vehicle::AddPassenger(Unit* unit, int8 seatId)
     if (seatId < 0) // no specific seat requirement
     {
         for (seat = Seats.begin(); seat != Seats.end(); ++seat)
-            if (seat->second.IsEmpty() && (seat->second.SeatInfo->CanEnterOrExit() || seat->second.SeatInfo->IsUsableByOverride()))
+            if (seat->second.IsEmpty() && !HasPendingEventForSeat(seat->first) && (seat->second.SeatInfo->CanEnterOrExit() || seat->second.SeatInfo->IsUsableByOverride()))
                 break;
 
         if (seat == Seats.end()) // no available seat
@@ -677,7 +684,7 @@ uint8 Vehicle::GetAvailableSeatCount() const
     uint8 ret = 0;
     SeatMap::const_iterator itr;
     for (itr = Seats.begin(); itr != Seats.end(); ++itr)
-        if (itr->second.IsEmpty() && (itr->second.SeatInfo->CanEnterOrExit() || itr->second.SeatInfo->IsUsableByOverride()))
+        if (itr->second.IsEmpty() && !HasPendingEventForSeat(itr->first) && (itr->second.SeatInfo->CanEnterOrExit() || itr->second.SeatInfo->IsUsableByOverride()))
             ++ret;
 
     return ret;
@@ -758,6 +765,16 @@ void Vehicle::RemovePendingEventsForPassenger(Unit* passenger)
     }
 }
 
+// workaround for delayed mount of player. trinity issue 9443. 
+bool Vehicle::HasPendingEventForSeat(int8 seatId) const
+{
+    for (PendingJoinEventContainer::const_iterator itr = _pendingJoinEvents.begin(); itr != _pendingJoinEvents.end(); ++itr)
+        if ((*itr)->Seat->first == seatId)
+            return true;
+
+    return false;
+}
+
 VehicleJoinEvent::~VehicleJoinEvent()
 {
     if (Target)
@@ -830,6 +847,7 @@ bool VehicleJoinEvent::Execute(uint64, uint32)
     Passenger->m_movementInfo.transport.time = 0;
     Passenger->m_movementInfo.transport.seat = Seat->first;
     Passenger->m_movementInfo.transport.guid = Target->GetBase()->GetGUID();
+    Passenger->m_movementInfo.transport.vehicleId = Target->GetVehicleInfo()->m_ID;
 
     if (Target->GetBase()->GetTypeId() == TYPEID_UNIT && Passenger->GetTypeId() == TYPEID_PLAYER &&
         Seat->second.SeatInfo->m_flags & VEHICLE_SEAT_FLAG_CAN_CONTROL)
