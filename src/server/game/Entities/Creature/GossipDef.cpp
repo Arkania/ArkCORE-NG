@@ -28,7 +28,6 @@
 GossipMenu::GossipMenu()
 {
     _menuId = -1;
-    _npcTextId = 0;
     _locale = DEFAULT_LOCALE;
     _senderGUID = 0;
 }
@@ -193,7 +192,6 @@ void PlayerMenu::ClearMenus()
 void PlayerMenu::SendGossipMenu(uint32 titleTextId, uint64 objectGUID)
 {
     _gossipMenu.SetSenderGUID(objectGUID);
-    _gossipMenu.SetNpcTextId(titleTextId);
 
     WorldPacket data(SMSG_GOSSIP_MESSAGE, 100);         // guess size
     data << uint64(objectGUID);
