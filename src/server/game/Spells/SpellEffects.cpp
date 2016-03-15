@@ -2006,6 +2006,20 @@ void Spell::EffectJump(SpellEffIndex effIndex)
             m_caster->Attack(unitTarget, true);
             break;
         }
+        case 67805:
+        {
+            if (Creature* lurker = m_caster->FindNearestCreature(35463, 50.0f))
+            {
+                unitTarget = lurker->ToUnit();
+                unitTarget->GetContactPoint(m_caster, x, y, z, CONTACT_DISTANCE);
+                if (unitTarget->GetDistance2d(m_caster) > 25.0f)
+                {
+                    m_caster->SetFacingToObject(unitTarget);
+                    return;
+                }
+            }
+            break;
+        }
         default:
             break;
     }

@@ -27,6 +27,7 @@
 #include "GameObject.h"
 #include "GridNotifiers.h"
 #include "PassiveAI.h"
+#include "Pet.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
@@ -2527,6 +2528,7 @@ public:
     enum eNpc
     {
         QUEST_FROM_THE_SHADOWS = 14204,
+        NPC_GILNEAN_MASTIFF = 35631,
         SPELL_SUMMON_GILNEAN_MASTIFF = 67807,
         SAY_LORNA_CROWLEY_P4 = 0,
     };
@@ -2553,6 +2555,7 @@ public:
     enum eNpc
     {
         QUEST_FROM_THE_SHADOWS = 14204,
+        NPC_BLOODFANG_LURKER = 35463,
         SPELL_SHADOWSTALKER_STEALTH = 5916,
         SPELL_ATTACK_LURKER = 67805,
         EVENT_CHECK_QUEST_REWARDED = 101,
@@ -2562,12 +2565,14 @@ public:
     {
         npc_gilnean_mastiff_35631AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
 
-        uint64 m_playerGUID;
         EventMap m_events;
+        uint64 m_playerGUID;
+        uint64 m_lurkerGUID;
 
         void Initialize()
         {
             m_playerGUID = NULL;
+            m_lurkerGUID = NULL;
         }
 
         void Reset() override
@@ -2578,9 +2583,9 @@ public:
                 info->SetActionBar(0, SPELL_ATTACK_LURKER, ACT_PASSIVE);
                 me->SetReactState(REACT_DEFENSIVE);
                 info->SetIsFollowing(true);
-                m_events.Reset();
-                m_events.ScheduleEvent(EVENT_CHECK_QUEST_REWARDED, 1000);
             }
+            m_events.Reset();
+            m_events.ScheduleEvent(EVENT_CHECK_QUEST_REWARDED, 10000);
         }
 
         void IsSummonedBy(Unit* summoner) override
@@ -2589,25 +2594,14 @@ public:
                 m_playerGUID = player->GetGUID();
         }
 
-        void SpellHitTarget(Unit* Mastiff, SpellInfo const* cSpell) override
+        void SpellHitTarget(Unit* mastiff, SpellInfo const* cSpell) override
         {
-            if (cSpell->Id == SPELL_ATTACK_LURKER)
-            {
-                Mastiff->RemoveAura(SPELL_SHADOWSTALKER_STEALTH);
-                Mastiff->AddThreat(me, 1.0f);
-                me->AddThreat(Mastiff, 1.0f);
-                me->AI()->AttackStart(Mastiff);
-            }
+            
         }
 
         void JustDied(Unit* /*killer*/) override // Otherwise, player is stuck with pet corpse they cannot remove from world
         {
             me->DespawnOrUnsummon(1);
-        }
-
-        void KilledUnit(Unit* /*victim*/) override
-        {
-            Reset();
         }
 
         void UpdateAI(uint32 diff) override
@@ -2621,24 +2615,19 @@ public:
                     case EVENT_CHECK_QUEST_REWARDED:
                     {
                         if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
-                            if (player->GetQuestStatus(QUEST_FROM_THE_SHADOWS) == QUEST_STATUS_REWARDED)
+                            if (player->GetQuestStatus(QUEST_FROM_THE_SHADOWS) != QUEST_STATUS_INCOMPLETE)
                                 me->DespawnOrUnsummon(1);
 
-                        m_events.ScheduleEvent(EVENT_CHECK_QUEST_REWARDED, 1000);
+                        m_events.ScheduleEvent(EVENT_CHECK_QUEST_REWARDED, 10000);
                         break;
                     }
                 }
             }
 
             if (!UpdateVictim())
-            {
-                if (CharmInfo* info = me->GetCharmInfo())
-                    info->SetIsFollowing(true);
-                me->SetReactState(REACT_DEFENSIVE);
                 return;
-            }
-
-            DoMeleeAttackIfReady();
+            else
+                DoMeleeAttackIfReady();
         }
     };
 
@@ -2711,39 +2700,6 @@ public:
     CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_bloodfang_lurker_35463AI(creature);
-    }
-};
-
-// 67805
-class spell_attack_lurker_67805 : public SpellScriptLoader
-{
-public:
-    spell_attack_lurker_67805() : SpellScriptLoader("spell_attack_lurker_67805"){}
-
-    enum eSpell
-    {
-        NPC_BLOODFANG_LURKER = 35463,
-        SPELL_ATTACK_LURKER = 67805,
-    };
-
-    class spell_attack_lurker_67805_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_attack_lurker_67805_SpellScript);
-        void HandleDummy(SpellEffIndex /*index*/)
-        {
-            Unit * caster = GetCaster();
-            caster->CastSpell(caster, SPELL_ATTACK_LURKER, true);
-            caster->SummonCreature(NPC_BLOODFANG_LURKER, caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ(), caster->GetOrientation(), TEMPSUMMON_DEAD_DESPAWN);
-        }
-        void Register()
-        {
-            OnEffectHit += SpellEffectFn(spell_attack_lurker_67805_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_JUMP);
-        }
-    };
-
-    SpellScript * GetSpellScript() const
-    {
-        return new spell_attack_lurker_67805_SpellScript();
     }
 };
 
@@ -4044,7 +4000,7 @@ public:
                     case EVENT_CAST_RENEW:
                     {
                         if (Player* player = me->FindRandomPlayerInRange(40.0f, true))
-                            if (!player->HasAura(EVENT_CAST_RENEW))
+                            if (!player->HasAura(SPELL_RENEW))
                                 me->CastSpell(player, SPELL_RENEW);
 
                         m_events.ScheduleEvent(EVENT_CAST_RENEW, 5000);
@@ -4551,7 +4507,6 @@ void AddSC_zone_gilneas_city()
     new npc_lord_godfrey_35115();
     new npc_josiah_avery_35369();
     new npc_josiah_avery_trigger_50415();
-    new spell_attack_lurker_67805();
     new npc_lorna_crowley_35378();
     new npc_bloodfang_lurker_35463();
     new npc_gilnean_mastiff_35631();
