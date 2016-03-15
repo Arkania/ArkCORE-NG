@@ -291,8 +291,10 @@ public:
     {
         HandleReloadGossipMenuCommand(handler, "a");
         HandleReloadGossipMenuOptionCommand(handler, "a");
+        HandleReloadNpcTextCommand(handler, "a");
+        HandleReloadLocalesNpcTextCommand(handler, "a");
         if (*args != 'a')                                          // already reload from all_scripts
-        HandleReloadPointsOfInterestCommand(handler, "a");
+            HandleReloadPointsOfInterestCommand(handler, "a");
         return true;
     }
 
@@ -570,6 +572,15 @@ public:
         TC_LOG_INFO("misc", "Re-Loading `gossip_menu_option` Table!");
         sObjectMgr->LoadGossipMenuItems();
         handler->SendGlobalGMSysMessage("DB table `gossip_menu_option` reloaded.");
+        sConditionMgr->LoadConditions(true);
+        return true;
+    }
+
+    static bool HandleReloadNpcTextCommand(ChatHandler* handler, const char* /*args*/)
+    {
+        TC_LOG_INFO("misc", "Re-Loading `npc_text` Table!");
+        sObjectMgr->LoadGossipText();
+        handler->SendGlobalGMSysMessage("DB table `npc_text` reloaded.");
         sConditionMgr->LoadConditions(true);
         return true;
     }
