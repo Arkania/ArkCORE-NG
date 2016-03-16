@@ -54,7 +54,6 @@ public:
     std::vector<GuildReward> const& GetGuildRewards() const { return GuildRewards; }
 
     void ResetTimes(bool week);
-    void ResetDailyXPCap();
 
 protected:
     typedef std::unordered_map<uint32, Guild*> GuildContainer;

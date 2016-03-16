@@ -602,14 +602,8 @@ void GuildMgr::ResetTimes(bool week)
     if (week)
         CharacterDatabase.Execute(CharacterDatabase.GetPreparedStatement(CHAR_RESET_OLD_GUILD_WEEK_REPUTATION));
     
+    // Reset daily/weekly guild/member values
     for (GuildContainer::const_iterator itr = GuildStore.begin(); itr != GuildStore.end(); ++itr)
         if (Guild* guild = itr->second)
             guild->ResetTimes(week);
-}
-
-void GuildMgr::ResetDailyXPCap()
-{
-    for (GuildContainer::const_iterator itr = GuildStore.begin(); itr != GuildStore.end(); ++itr)
-        if (Guild* guild = itr->second)
-            guild->ResetDailyExperience();
 }

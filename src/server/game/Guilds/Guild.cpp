@@ -4545,7 +4545,7 @@ void Guild::SendGuildXP(WorldSession* session /* = NULL */) const
     BroadcastPacket(&data);
 }
 
-void Guild::ResetDailyExperience()
+void Guild::ResetDailyGuildXP()
 {
     _todayExperience = 0;
     CharacterDatabase.Execute("UPDATE `guild` SET `todayExperience` = 0");
@@ -4564,16 +4564,19 @@ void Guild::ResetTimes(bool weekly)
         CharacterDatabase.Execute(stmt);
     }
 
+    // Reset daily/weekly member based guild/bank values
     for (Members::const_iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
     {
         itr->second->ResetValues(weekly);
-        if (Player* player = itr->second->FindPlayer())
+        if (Player* player = itr->second->FindPlayer()) // player online since last restart?
         {
-            ResetDailyExperience(); // Reset the XP here too.
             WorldPacket data(SMSG_GUILD_MEMBER_DAILY_RESET, 0); // tells the client to request bank withdrawal limit
             player->GetSession()->SendPacket(&data);
         }
     }
+    // Reset daily guild.todayExperience
+    if (GetTodayExperience() > 0)
+        ResetDailyGuildXP();
 }
 
 void Guild::AddGuildNews(uint8 type, uint64 guid, uint32 flags, uint32 value)
