@@ -30,6 +30,7 @@
 #include "GridNotifiers.h"
 #include "Unit.h"
 
+
 enum DruidSpells
 {
     SPELL_DRUID_ECLIPSE_GENERAL_ENERGIZE = 89265,
@@ -1889,6 +1890,31 @@ public:
     AuraScript* GetAuraScript() const
     {
         return new spell_dru_rejuvenation_AuraScript();
+    }
+
+    class spell_dru_rejuvenation_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_dru_rejuvenation_SpellScript);
+
+        void FilterObject(WorldObject*& target)
+        {
+            if (target == GetCaster())
+                if (Player* player = target->ToPlayer())
+                    if (Unit* unit = player->GetSelectedUnit())
+                        if (player->IsFriendlyTo(unit) || unit->IsFriendlyTo(player))
+                            target = unit;
+        }
+
+        void Register()
+        {
+            OnObjectTargetSelect += SpellObjectTargetSelectFn(spell_dru_rejuvenation_SpellScript::FilterObject, EFFECT_0, TARGET_UNIT_TARGET_ALLY);
+            OnObjectTargetSelect += SpellObjectTargetSelectFn(spell_dru_rejuvenation_SpellScript::FilterObject, EFFECT_1, TARGET_UNIT_TARGET_ALLY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_dru_rejuvenation_SpellScript();
     }
 };
 

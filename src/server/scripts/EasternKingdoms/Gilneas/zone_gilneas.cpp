@@ -1064,6 +1064,116 @@ private:
     }
 };
 
+// 35840
+class npc_gwen_armstead_35840 : public CreatureScript
+{
+public:
+    npc_gwen_armstead_35840() : CreatureScript("npc_gwen_armstead_35840") {}
+
+    enum eNpc
+    {
+        EVENT_CHECK_TALK = 101,
+        EVENT_DO_NEXT_TALK,
+        EVENT_DO_LAST_TALK,
+    };
+
+    struct npc_gwen_armstead_35840AI : public ScriptedAI
+    {
+        npc_gwen_armstead_35840AI(Creature* creature) : ScriptedAI(creature) {}
+
+        EventMap m_events;
+        uint8 m_say;
+
+        void Reset() override
+        {
+            m_events.Reset();
+            m_events.ScheduleEvent(EVENT_CHECK_TALK, 2500);
+            m_say = 0;
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                    case EVENT_CHECK_TALK:
+                    {
+                        if (Player* player = me->FindNearestPlayer(15.0f))
+                        {
+                            Talk(m_say);
+                            m_say += 1;
+                            m_events.ScheduleEvent(EVENT_DO_NEXT_TALK, 6000);
+                            break;
+                        }
+                        m_events.ScheduleEvent(EVENT_CHECK_TALK, 2500);
+                        break;
+                    }
+                    case EVENT_DO_NEXT_TALK:
+                    {
+                        Talk(m_say);
+                        m_say += 1;
+                        if (m_say < 2)
+                            m_events.ScheduleEvent(EVENT_DO_NEXT_TALK, 6000);
+                        else
+                            m_events.ScheduleEvent(EVENT_DO_LAST_TALK, 6000);
+                        break;
+                    }
+                    case EVENT_DO_LAST_TALK:
+                    {
+                        Talk(m_say);
+                        m_say = 0;
+                        m_events.ScheduleEvent(EVENT_CHECK_TALK, 30000);
+                        break;
+                    }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_gwen_armstead_35840AI(creature);
+    }
+};
+
+// 47091
+class npc_wounded_guard_47091 : public CreatureScript
+{
+public:
+    npc_wounded_guard_47091() : CreatureScript("npc_wounded_guard_47091") {}
+
+    enum eNpc
+    {
+        QUEST_A_REJUVENATING_TOUCH = 14283,
+        NPC_HEALING_CREDIT = 47091,
+    };
+
+    struct npc_wounded_guard_47091AI : public ScriptedAI
+    {
+        npc_wounded_guard_47091AI(Creature* creature) : ScriptedAI(creature) {}
+
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
+        { 
+            if (Player* player = caster->ToPlayer())
+                if (player->GetQuestStatus(QUEST_A_REJUVENATING_TOUCH) == QUEST_STATUS_INCOMPLETE)
+                    player->KilledMonsterCredit(NPC_HEALING_CREDIT);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_wounded_guard_47091AI(creature);
+    }
+};
+
 // 35872
 class npc_mariam_spellwalker_35872 : public CreatureScript
 {
@@ -4493,8 +4603,10 @@ void AddSC_zone_gilneas_city()
     new npc_rampaging_worgen_34884();
     new npc_frightened_citizen_34981();
     new npc_frightened_citizen_35836();
+    new npc_gwen_armstead_35840();
     new npc_sergeant_cleese_35839();
     new npc_gilnean_royal_guard_35232();
+    new npc_wounded_guard_47091();
     new npc_mariam_spellwalker_35872();
     new npc_king_genn_greymane_35112();
     new npc_bloodfang_worgen_35118();
