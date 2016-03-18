@@ -1153,6 +1153,7 @@ public:
     enum eNpc
     {
         QUEST_A_REJUVENATING_TOUCH = 14283,
+        QUEST_FLASH_HEAL = 14279,
         NPC_HEALING_CREDIT = 47091,
     };
 
@@ -1164,6 +1165,8 @@ public:
         { 
             if (Player* player = caster->ToPlayer())
                 if (player->GetQuestStatus(QUEST_A_REJUVENATING_TOUCH) == QUEST_STATUS_INCOMPLETE)
+                    player->KilledMonsterCredit(NPC_HEALING_CREDIT);
+                else if (player->GetQuestStatus(QUEST_FLASH_HEAL) == QUEST_STATUS_INCOMPLETE)
                     player->KilledMonsterCredit(NPC_HEALING_CREDIT);
         }
     };

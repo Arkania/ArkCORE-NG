@@ -1230,6 +1230,39 @@ class spell_pri_vampiric_touch : public SpellScriptLoader
         }
 };
 
+// Flash Heal 2061
+class spell_pri_flash_heal_2061 : public SpellScriptLoader
+{
+public:
+    spell_pri_flash_heal_2061() : SpellScriptLoader("spell_pri_flash_heal_2061") { }
+
+    class spell_pri_flash_heal_2061_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_pri_flash_heal_2061_SpellScript);
+
+        void FilterObject(WorldObject*& target)
+        {
+            if (target == GetCaster())
+                if (Player* player = target->ToPlayer())
+                    if (Unit* unit = player->GetSelectedUnit())
+                        if (player->IsFriendlyTo(unit) || unit->IsFriendlyTo(player))
+                            target = unit;
+        }
+
+        void Register()
+        {
+            OnObjectTargetSelect += SpellObjectTargetSelectFn(spell_pri_flash_heal_2061_SpellScript::FilterObject, EFFECT_0, TARGET_UNIT_TARGET_ALLY);
+            OnObjectTargetSelect += SpellObjectTargetSelectFn(spell_pri_flash_heal_2061_SpellScript::FilterObject, EFFECT_1, TARGET_UNIT_TARGET_ALLY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_pri_flash_heal_2061_SpellScript();
+    }
+};
+
+
 void AddSC_priest_spell_scripts()
 {
     new spell_pri_body_and_soul();
@@ -1237,6 +1270,7 @@ void AddSC_priest_spell_scripts()
     new spell_pri_dispel_magic();
     new spell_pri_divine_aegis();
     new spell_pri_divine_hymn();
+    new spell_pri_flash_heal_2061();
     new spell_pri_glyph_of_prayer_of_healing();
     new spell_pri_hymn_of_hope();
     new spell_pri_improved_power_word_shield();
