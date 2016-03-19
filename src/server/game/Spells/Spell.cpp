@@ -1457,6 +1457,15 @@ void Spell::SelectImplicitTargetObjectTargets(SpellEffIndex effIndex, SpellImpli
 
     WorldObject* target = m_targets.GetObjectTarget();
 
+    if (targetType.GetTarget() == TARGET_UNIT_TARGET_ALLY)
+    {
+        if (target == GetCaster())
+            if (Player* player = target->ToPlayer())
+                if (Unit* unit = player->GetSelectedUnit())
+                    if (player->IsFriendlyTo(unit) || unit->IsFriendlyTo(player))
+                        target = unit;        
+    }
+
     CallScriptObjectTargetSelectHandlers(target, effIndex, targetType);
 
     if (target)
