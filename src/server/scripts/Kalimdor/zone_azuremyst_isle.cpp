@@ -60,7 +60,6 @@ enum Azuremyst_Isle
 	QUEST_GNOMERCY						= 9537,
 
 	SPELL_INOCULATE_NESTLEWOOD_OWLKIN	= 29528,
-	SPELL_IRRIDATION					= 35046,
     SPELL_STUNNED						= 28630,
 	SPELL_DYNAMITE						= 7978,
 	SPELL_REND							= 13443,
@@ -77,123 +76,111 @@ enum Azuremyst_Isle
 
 #define GOSSIP_FIGHT "Traitor! You will be brought to justice!"
 
-/*######
-## npc_draenei_survivor
-######*/
-
-enum draeneiSurvivor
-{
-    SAY_HEAL            = 0,
-    SAY_HELP            = 1,
-};
-
-class npc_draenei_survivor : public CreatureScript
+// 16483
+class npc_draenei_survivor_16483 : public CreatureScript
 {
 public:
-    npc_draenei_survivor() : CreatureScript("npc_draenei_survivor") { }
+    npc_draenei_survivor_16483() : CreatureScript("npc_draenei_survivor_16483") { }
 
-    struct npc_draenei_survivorAI : public ScriptedAI
+    enum draeneiSurvivor
     {
-        npc_draenei_survivorAI(Creature* creature) : ScriptedAI(creature) { }
+        NPC_DRAENEI_SURVIVOR = 16483,
+        SAY_HELP = 2,
+        SAY_HEAL = 1,
+        SAY_THANKS = 0,
+        SPELL_IRRIDATION = 35046,
+        EVENT_CHECK_PLAYER_NEAR = 101,
+        EVENT_SAY_THANKS,
+        EVENT_RUN_AWAY,
+        EVENT_FINISH,
+    };
 
-        uint64 pCaster;
+    struct npc_draenei_survivor_16483AI : public ScriptedAI
+    {
+        npc_draenei_survivor_16483AI(Creature* creature) : ScriptedAI(creature) { }
 
-        uint32 SayThanksTimer;
-        uint32 RunAwayTimer;
-        uint32 SayHelpTimer;
-
-        bool CanSayHelp;
+        EventMap m_events;
+        uint64   m_playerGUID;
 
         void Reset() override
         {
-            pCaster = 0;
-
-            SayThanksTimer = 0;
-            RunAwayTimer = 0;
-            SayHelpTimer = 10000;
-
-            CanSayHelp = true;
-
-            DoCast(me, SPELL_IRRIDATION, true);
-
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT);
-            me->SetHealth(me->CountPctFromMaxHealth(10));
+            m_events.Reset();
+            m_events.ScheduleEvent(EVENT_CHECK_PLAYER_NEAR, 1000);
+            m_playerGUID = NULL;
             me->SetStandState(UNIT_STAND_STATE_SLEEP);
+            if (!me->HasAura(SPELL_IRRIDATION))
+                DoCast(me, SPELL_IRRIDATION, true);
         }
 
-        void EnterCombat(Unit* /*who*/) override { }
-
-        void MoveInLineOfSight(Unit* who) override
+        void SpellHit(Unit* caster, const SpellInfo* Spell) override
         {
-            if (CanSayHelp && who->GetTypeId() == TYPEID_PLAYER && me->IsFriendlyTo(who) && me->IsWithinDistInMap(who, 25.0f))
-            {
-                //Random switch between 4 texts
-                Talk(SAY_HELP, who);
-
-                SayHelpTimer = 20000;
-                CanSayHelp = false;
-            }
-        }
-
-        void SpellHit(Unit* Caster, const SpellInfo* Spell) override
-        {
-            if (Spell->SpellFamilyFlags[2] & 0x080000000)
-            {
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
-                me->SetStandState(UNIT_STAND_STATE_STAND);
-                DoCast(me, SPELL_STUNNED, true);
-                pCaster = Caster->GetGUID();
-                SayThanksTimer = 5000;
-            }
+            if (!m_playerGUID)
+                if (Spell->Id == 28880 || Spell->Id == 59548)
+                {
+                    m_playerGUID = caster->GetGUID();
+                    m_events.CancelEvent(EVENT_CHECK_PLAYER_NEAR);
+                    m_events.ScheduleEvent(EVENT_SAY_THANKS, 6000);
+                    Talk(SAY_HEAL);
+                    me->SetStandState(UNIT_STAND_STATE_STAND);
+                }
         }
 
         void UpdateAI(uint32 diff) override
         {
-            if (SayThanksTimer)
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
             {
-                if (SayThanksTimer <= diff)
+                switch (eventId)
                 {
-                    me->RemoveAurasDueToSpell(SPELL_IRRIDATION);
-
-                    if (Player* player = ObjectAccessor::GetPlayer(*me, pCaster))
+                    case EVENT_CHECK_PLAYER_NEAR:
                     {
-                        Talk(SAY_HEAL, player);
+                        if (Player* player = me->FindNearestPlayer(15.0f))
+                        {
+                            Talk(SAY_HELP);
+                            m_events.ScheduleEvent(EVENT_CHECK_PLAYER_NEAR, 10000);
+                        }
+                        else
+                            m_events.ScheduleEvent(EVENT_CHECK_PLAYER_NEAR, 1000);
 
-                        player->TalkedToCreature(me->GetEntry(), me->GetGUID());
+                        break;
                     }
-
-                    me->GetMotionMaster()->Clear();
-                    me->GetMotionMaster()->MovePoint(0, -4115.053711f, -13754.831055f, 73.508949f);
-
-                    RunAwayTimer = 10000;
-                    SayThanksTimer = 0;
-                } else SayThanksTimer -= diff;
-
-                return;
+                    case EVENT_SAY_THANKS:
+                    {
+                        Talk(SAY_THANKS);
+                        me->GetMotionMaster()->Clear();
+                        m_events.ScheduleEvent(EVENT_RUN_AWAY, 3000);
+                        break;
+                    }
+                    case EVENT_RUN_AWAY:
+                    {
+                        if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                        {
+                            me->GetMotionMaster()->MoveFleeing(player, 10000);
+                            player->KilledMonsterCredit(NPC_DRAENEI_SURVIVOR);
+                        }
+                        m_events.ScheduleEvent(EVENT_FINISH, 5000);
+                        break;
+                    }
+                    case EVENT_FINISH:
+                    {
+                        me->DespawnOrUnsummon(1);
+                        Reset();
+                        break;
+                    }
+                }
             }
 
-            if (RunAwayTimer)
-            {
-                if (RunAwayTimer <= diff)
-                    me->DespawnOrUnsummon();
-                else
-                    RunAwayTimer -= diff;
-
+            if (!UpdateVictim())
                 return;
-            }
-
-            if (SayHelpTimer <= diff)
-            {
-                CanSayHelp = true;
-                SayHelpTimer = 20000;
-            } else SayHelpTimer -= diff;
+            else
+                DoMeleeAttackIfReady();
         }
     };
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_draenei_survivorAI(creature);
+        return new npc_draenei_survivor_16483AI(creature);
     }
 };
 
@@ -789,7 +776,7 @@ class npc_nestlewood_owlkin : public CreatureScript
 
 void AddSC_azuremyst_isle()
 {
-    new npc_draenei_survivor();
+    new npc_draenei_survivor_16483();
     new npc_engineer_spark_overgrind();
     new npc_injured_draenei();
     new npc_magwin();
