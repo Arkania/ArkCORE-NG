@@ -115,7 +115,7 @@ public:
         void SpellHit(Unit* caster, const SpellInfo* Spell) override
         {
             if (!m_playerGUID)
-                if (Spell->Id == 28880 || Spell->Id == 59548)
+                if (Spell->Id == 28880 || (Spell->Id >= 59542 && Spell->Id <= 59548) || Spell->Id == 57901)
                 {
                     m_playerGUID = caster->GetGUID();
                     m_events.CancelEvent(EVENT_CHECK_PLAYER_NEAR);
