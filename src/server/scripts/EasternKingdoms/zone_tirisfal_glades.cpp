@@ -1604,6 +1604,337 @@ public:
     }
 };
 
+// 1543
+class npc_vile_fin_puddlejumper_1543 : public CreatureScript
+{
+public:
+    npc_vile_fin_puddlejumper_1543() : CreatureScript("npc_vile_fin_puddlejumper_1543") { }
+
+    enum eNPC
+    {
+        SPELL_MURLOC_LEACH = 73108,
+        SPELL_SUMMON_PUDDLEJUMPER = 73110,
+        SPELL_VILE_FIN_GUARDIAN_AURA = 94266,
+    };
+
+    struct npc_vile_fin_puddlejumper_1543AI : public ScriptedAI
+    {
+        npc_vile_fin_puddlejumper_1543AI(Creature* creature) : ScriptedAI(creature) { }
+
+        uint64 m_playerGUID;
+
+        void Reset()  override
+        {
+            uint64 m_playerGUID = NULL;
+        }
+
+        void DamageTaken(Unit* attacker, uint32& damage) 
+        { 
+            if (Player* player = attacker->ToPlayer())
+                if (me->GetHealthPct() <= 15.0f)
+                {
+                    Talk(0);
+                    me->GetMotionMaster()->MoveIdle();
+                    me->GetMotionMaster()->MoveFleeing(player);
+                }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_vile_fin_puddlejumper_1543AI(creature);
+    }
+};
+
+// 1544
+class npc_vile_fin_minor_oracle_1544 : public CreatureScript
+{
+public:
+    npc_vile_fin_minor_oracle_1544() : CreatureScript("npc_vile_fin_minor_oracle_1544") { }
+
+    enum eNPC
+    {
+        SPELL_MURLOC_LEACH = 73108,
+        SPELL_SUMMON_ORACLE = 73434,
+        SPELL_VILE_FIN_GUARDIAN_AURA = 94266,
+    };
+
+    struct npc_vile_fin_minor_oracle_1544AI : public ScriptedAI
+    {
+        npc_vile_fin_minor_oracle_1544AI(Creature* creature) : ScriptedAI(creature) { }
+
+        uint64 m_playerGUID;
+
+        void Reset()  override
+        {
+            uint64 m_playerGUID = NULL;
+        }
+
+        void DamageTaken(Unit* attacker, uint32& damage) override
+        {
+            if (Player* player = attacker->ToPlayer())
+                if (me->GetHealthPct() <= 15.0f)
+                {
+                    Talk(0);
+                    me->GetMotionMaster()->MoveIdle();
+                    me->GetMotionMaster()->MoveFleeing(player);
+                }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_vile_fin_minor_oracle_1544AI(creature);
+    }
+};
+
+// 73108
+class spell_murloc_leash_73108 : public SpellScriptLoader
+{
+public:
+    spell_murloc_leash_73108() : SpellScriptLoader("spell_murloc_leash_73108") { }
+
+    enum eSpell
+    {
+        NPC_CAPTURED_PUDDLEJUMPER = 38923,
+        NPC_CAPTURED_ORACLE = 39078,
+        NPC_PUDDLEJUMPER = 1543,
+        NPC_MINOR_ORACLE = 1544,
+        SPELL_SUMMON_PUDDLEJUMPER = 73110,
+        SPELL_SUMMON_ORACLE = 73434,
+    };
+
+    class spell_murloc_leash_73108_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_murloc_leash_73108_SpellScript);
+
+        SpellCastResult CheckRequirement()
+        {
+            std::list<uint32>targets;
+            targets.push_back(NPC_CAPTURED_PUDDLEJUMPER);
+            targets.push_back(NPC_CAPTURED_ORACLE);
+            if (Player* player = GetCaster()->ToPlayer())
+            {
+                std::list<Creature*> npcs = player->FindNearestCreatures(targets, 10.0f);
+                if (npcs.size() > 0)
+                    return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
+            }
+
+            if (Unit* unit = GetExplTargetUnit())
+                if (unit->GetEntry() == NPC_PUDDLEJUMPER || unit->GetEntry() == NPC_MINOR_ORACLE)
+                {
+                    if (unit->GetHealthPct() < 80.0f)
+                        return SPELL_CAST_OK;
+                }
+                else
+                    return SPELL_FAILED_BAD_TARGETS;
+
+            return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
+        }
+
+        void CheckTarget(WorldObject*& target)
+        {
+            if (Creature* npc = target->ToCreature())
+                if (npc->GetEntry() == NPC_PUDDLEJUMPER || npc->GetEntry() == NPC_MINOR_ORACLE)
+                    if (npc->GetHealthPct() < 80.0f)
+                        return;
+            target = NULL;
+        }
+
+        void ApplyBeforeCast()
+        {
+            if (Player* player = GetCaster()->ToPlayer())
+                if (Unit* unit = GetExplTargetUnit())
+                    if (Creature* npc = unit->ToCreature())
+                    {
+                        if (npc->GetEntry() == NPC_PUDDLEJUMPER)
+                            player->CastSpell(player, SPELL_SUMMON_PUDDLEJUMPER);
+                        else if (npc->GetEntry() == NPC_MINOR_ORACLE)
+                            player->CastSpell(player, SPELL_SUMMON_ORACLE);
+                        npc->DespawnOrUnsummon(1);
+                    }
+        }
+
+        void Register()
+        {
+            BeforeCast += SpellCastFn(spell_murloc_leash_73108_SpellScript::ApplyBeforeCast);
+            OnCheckCast += SpellCheckCastFn(spell_murloc_leash_73108_SpellScript::CheckRequirement);
+            OnObjectTargetSelect += SpellObjectTargetSelectFn(spell_murloc_leash_73108_SpellScript::CheckTarget, EFFECT_0, TARGET_UNIT_TARGET_ANY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_murloc_leash_73108_SpellScript();
+    }
+};
+
+// 38923
+class npc_captured_vile_fin_puddlejumper_38923 : public CreatureScript
+{
+public:
+    npc_captured_vile_fin_puddlejumper_38923() : CreatureScript("npc_captured_vile_fin_puddlejumper_38923") { }
+
+    enum eNPC
+    {
+        NPC_CAPTURE_MURLOC_CREDIT = 38923,
+        SPELL_VILE_FIN_GUARDIAN_AURA = 94266,
+        EVENT_CHECK_PLAYER = 101,
+    };
+
+    struct npc_captured_vile_fin_puddlejumper_38923AI : public ScriptedAI
+    {
+        npc_captured_vile_fin_puddlejumper_38923AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap m_events;
+        uint64 m_playerGUID;
+
+        void Reset()  override
+        {
+            m_events.Reset();
+            m_events.ScheduleEvent(EVENT_CHECK_PLAYER, 1000);
+            uint64 m_playerGUID = NULL;
+        }
+
+        void IsSummonedBy(Unit* summoner) override 
+        { 
+            if (Player* player = summoner->ToPlayer())
+            {
+                m_playerGUID = player->GetGUID();
+                player->KilledMonsterCredit(NPC_CAPTURE_MURLOC_CREDIT);
+                me->GetMotionMaster()->MoveFollow(player, 4.0f, 3.14f);
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_captured_vile_fin_puddlejumper_38923AI(creature);
+    }
+};
+
+// 39078
+class npc_captured_vile_fin_minor_oracle_39078 : public CreatureScript
+{
+public:
+    npc_captured_vile_fin_minor_oracle_39078() : CreatureScript("npc_captured_vile_fin_minor_oracle_39078") { }
+
+    enum eNPC
+    {
+        NPC_CAPTURE_MURLOC_CREDIT = 38923,
+        SPELL_VILE_FIN_GUARDIAN_AURA = 94266,
+        EVENT_CHECK_PLAYER = 101,
+    };
+
+    struct npc_captured_vile_fin_minor_oracle_39078AI : public ScriptedAI
+    {
+        npc_captured_vile_fin_minor_oracle_39078AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap m_events;
+        uint64 m_playerGUID;
+
+        void Reset()  override
+        {
+            m_events.Reset();
+            m_events.ScheduleEvent(EVENT_CHECK_PLAYER, 1000);
+            uint64 m_playerGUID = NULL;
+        }
+
+        void IsSummonedBy(Unit* summoner) override
+        {
+            if (Player* player = summoner->ToPlayer())
+            {
+                m_playerGUID = player->GetGUID();
+                player->KilledMonsterCredit(NPC_CAPTURE_MURLOC_CREDIT);
+                me->GetMotionMaster()->MoveFollow(player, 4.0f, 3.14f);
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_captured_vile_fin_minor_oracle_39078AI(creature);
+    }
+};
+
+// 38925
+class npc_sedrick_calston_38925 : public CreatureScript
+{
+public:
+    npc_sedrick_calston_38925() : CreatureScript("npc_sedrick_calston_38925") { }
+
+    enum eNPC
+    {
+        NPC_CAPTURED_PUDDLEJUMPER = 38923,
+        NPC_CAPTURED_ORACLE = 39078,
+        NPC_CAPTURE_MURLOC_CREDIT = 38923,
+        NPC_DELIVERED_MURLOC_CREDIT = 38887,
+        QUEST_EVER_SO_LONELY = 24974,
+        SPELL_VILE_FIN_GUARDIAN_AURA = 94266,
+        EVENT_CHECK_PLAYER=101,
+    };
+
+    struct npc_sedrick_calston_38925AI : public ScriptedAI
+    {
+        npc_sedrick_calston_38925AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap m_events;
+
+        void Reset() override
+        {
+            m_events.Reset();
+            m_events.ScheduleEvent(EVENT_CHECK_PLAYER, 1000);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                    case EVENT_CHECK_PLAYER:
+                    {
+                        if (Player* player = me->FindNearestPlayer(7.0f))
+                            if (player->GetQuestStatus(QUEST_EVER_SO_LONELY) == QUEST_STATUS_INCOMPLETE)
+                                if (player->GetReqKillOrCastCurrentCount(QUEST_EVER_SO_LONELY, NPC_CAPTURE_MURLOC_CREDIT) > 0)
+                                {
+                                    std::list<uint32>targets;
+                                    targets.push_back(NPC_CAPTURED_PUDDLEJUMPER);
+                                    targets.push_back(NPC_CAPTURED_ORACLE);
+                                    std::list<Creature*> npcs = me->FindNearestCreatures(targets, 10.0f);
+                                    if (npcs.size() > 0)
+                                    {
+                                        player->RemoveAura(SPELL_VILE_FIN_GUARDIAN_AURA);
+                                        player->KilledMonsterCredit(NPC_DELIVERED_MURLOC_CREDIT);
+
+                                        for (std::list<Creature*>::iterator itr = npcs.begin(); itr != npcs.end(); ++itr)
+                                            (*itr)->DespawnOrUnsummon(1);
+                                    }
+                                }
+
+                        m_events.ScheduleEvent(EVENT_CHECK_PLAYER, 1000);
+                        break;
+                    }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+     };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_sedrick_calston_38925AI(creature);
+    }
+};
+
 
 void AddSC_tirisfal_glades()
 {
@@ -1623,5 +1954,11 @@ void AddSC_tirisfal_glades()
     new npc_rotbrain_magus();
     new npc_marshal_redpath();
     new npc_deathguard_protector();
+    new npc_vile_fin_puddlejumper_1543();
+    new npc_vile_fin_minor_oracle_1544();
+    new spell_murloc_leash_73108();
+    new npc_captured_vile_fin_puddlejumper_38923();
+    new npc_captured_vile_fin_minor_oracle_39078();
+    new npc_sedrick_calston_38925();
 
 }
