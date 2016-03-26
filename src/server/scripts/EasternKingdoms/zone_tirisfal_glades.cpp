@@ -1935,6 +1935,233 @@ public:
     }
 };
 
+// 39117 // quest 25006
+class npc_shadow_priestess_malia_39117 : public CreatureScript
+{
+public:
+    npc_shadow_priestess_malia_39117() : CreatureScript("npc_shadow_priestess_malia_39117") { }
+
+    enum eNPC
+    {
+        QUEST_THE_GRASP_WEAKENS = 25006,
+        NPC_SPIRIT_OF_DEVLIN_AGAMAND_38980 = 38980,
+        NPC_SHADOW_OF_AGAMAND_38981 = 38981,
+        NPC_SHADOW_OF_AGAMAND_38983 = 38983,
+        PLAYER_GUID = 99999,
+        WAYPOINT_UPSTARS = 3702201,
+        WAYPOINT_DOWNSTARS = 3702202,
+        ACTION_START_ANIM = 100,
+        EVENT_CHECK_MasterReset = 101,
+        EVENT_START_ANIM,
+        EVENT_ANIM,
+    };
+
+    bool OnGossipHello(Player* player, Creature* creature) 
+    {
+        if (player->GetQuestStatus(QUEST_THE_GRASP_WEAKENS) == QUEST_STATUS_INCOMPLETE)
+        {
+            player->ADD_GOSSIP_ITEM_DB(11156, 0, GOSSIP_SENDER_MAIN, 1001);
+            player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
+
+            return true;
+        }
+
+        return false; 
+    }
+
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action) override
+    {
+        switch (action)
+        {
+        case 1001:
+            creature->AI()->SetGUID(player->GetGUID(), PLAYER_GUID);
+            creature->AI()->DoAction(ACTION_START_ANIM);
+            break;
+        }
+        player->CLOSE_GOSSIP_MENU();
+
+        return true;
+    }
+
+    struct npc_shadow_priestess_malia_39117AI : public ScriptedAI
+    {
+        npc_shadow_priestess_malia_39117AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap m_events;
+        uint64   m_playerGUID;
+        uint64   m_spiritAgamand;
+        uint64   m_shadowAgamand1;
+        uint64   m_shadowAgamand2;
+        bool     m_animStarted;
+        uint32   m_phase;
+        uint32   m_sayPriestess;
+        uint32   m_sayAgamand;
+
+        void Reset() override
+        {
+            m_events.Reset();
+            m_playerGUID = NULL;
+            m_spiritAgamand = NULL;
+            m_shadowAgamand1 = NULL;
+            m_shadowAgamand2 = NULL;
+            m_animStarted = 0;
+            m_phase = 0;
+            m_sayPriestess = 0;
+            m_sayAgamand = 0;
+        }
+
+        void JustSummoned(Creature* summon) override
+        {
+            switch (summon->GetEntry())
+            {
+                case NPC_SPIRIT_OF_DEVLIN_AGAMAND_38980:
+                {
+                    m_spiritAgamand = summon->GetGUID();
+                    break;
+                }
+                case NPC_SHADOW_OF_AGAMAND_38981: // attacker
+                {
+                    m_shadowAgamand1 = summon->GetGUID();
+                    summon->SetReactState(REACT_AGGRESSIVE);
+                    summon->SetWalk(true);
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                        summon->Attack(player, true);
+                    break;
+                }
+                case NPC_SHADOW_OF_AGAMAND_38983: // shadow
+                {
+                    m_shadowAgamand2 = summon->GetGUID();
+                    summon->SetReactState(REACT_PASSIVE);
+                    break;
+                }
+            }
+        }
+
+        void SummonedCreatureDies(Creature* summon, Unit* killer) override 
+        { 
+            if (summon->GetGUID() == m_shadowAgamand1)
+                if (killer->GetGUID() == m_playerGUID)
+                    m_events.ScheduleEvent(EVENT_ANIM + 6, 7000);
+        }
+
+        void MovementInform(uint32 type, uint32 id) override 
+        { 
+            if (type == WAYPOINT_MOTION_TYPE && id == 9 && m_phase == 1)
+                    m_events.ScheduleEvent(EVENT_ANIM + 2, 1000);
+            if (type == WAYPOINT_MOTION_TYPE && id == 10 && m_phase == 2)
+            {
+                if (Creature* shadow = sObjectAccessor->GetCreature(*me, m_shadowAgamand2))
+                    shadow->DespawnOrUnsummon(1);
+                Reset();
+            }
+        }
+
+        void SetGUID(uint64 guid, int32 id) override
+        {
+            switch (id)
+            {
+                case PLAYER_GUID:
+                {
+                    m_playerGUID = guid;
+                    break;
+                }
+            }
+        }
+
+        void DoAction(int32 param) override 
+        { 
+            if (!m_animStarted && param == ACTION_START_ANIM)
+            {
+                m_animStarted = true;
+                m_events.ScheduleEvent(EVENT_START_ANIM, 500);
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                    case EVENT_CHECK_MasterReset:
+                    {
+                        me->DespawnOrUnsummon(1);
+                        break;
+                    }
+                    case EVENT_START_ANIM:
+                    {
+                        Talk(m_sayPriestess);
+                        m_sayPriestess++;
+                        m_events.ScheduleEvent(EVENT_ANIM+1, 2000);
+                        m_events.ScheduleEvent(EVENT_CHECK_MasterReset, 120000);
+                        break;
+                    }
+                    case EVENT_ANIM + 1:
+                    {
+                        m_phase = 1;
+                        me->GetMotionMaster()->MovePath(WAYPOINT_UPSTARS, false);
+                        break;
+                    }
+                    case EVENT_ANIM + 2: // priestess is telling the story
+                    {
+                        Talk(m_sayPriestess);
+                        m_sayPriestess++;
+                        if (m_sayPriestess < 5)
+                            m_events.ScheduleEvent(EVENT_ANIM + 2, 5000);
+                        else
+                            m_events.ScheduleEvent(EVENT_ANIM + 3, 5000);
+                        break;
+                    }
+                    case EVENT_ANIM + 3:
+                    {
+                        me->SummonCreature(NPC_SPIRIT_OF_DEVLIN_AGAMAND_38980, 2247.13f, 228.04f, 44.2511f, 1.95477f, TEMPSUMMON_TIMED_DESPAWN, 120000);
+                        m_events.ScheduleEvent(EVENT_ANIM + 4, 3000);
+                        break;
+                    }
+                    case EVENT_ANIM + 4: // agamand is telling the story
+                    {
+                        if (Creature* agamand = sObjectAccessor->GetCreature(*me, m_spiritAgamand))
+                            agamand->AI()->Talk(m_sayAgamand);
+                        m_sayAgamand++;
+                        if (m_sayAgamand < 7)
+                            m_events.ScheduleEvent(EVENT_ANIM + 4, 5000);
+                        else
+                            m_events.ScheduleEvent(EVENT_ANIM + 5, 1000); // say immediately: die wretches
+                        break;
+                    }
+                    case EVENT_ANIM + 5:
+                    {
+                        me->SummonCreature(NPC_SHADOW_OF_AGAMAND_38981, 2247.13f, 228.04f, 44.2511f, 1.95477f, TEMPSUMMON_TIMED_DESPAWN, 60000); // attacker of agamand
+                        me->SummonCreature(NPC_SHADOW_OF_AGAMAND_38983, 2247.13f, 228.04f, 44.2511f, 1.95477f, TEMPSUMMON_TIMED_DESPAWN, 60000); // shadow of agamand
+                        if (Creature* agamand = sObjectAccessor->GetCreature(*me, m_spiritAgamand))
+                            agamand->DespawnOrUnsummon(1);
+                        break;
+                    }
+                    case EVENT_ANIM + 6:
+                    {
+                        Talk(m_sayPriestess);
+                        m_phase = 2;
+                        me->GetMotionMaster()->MovePath(WAYPOINT_DOWNSTARS, false);
+                        break;
+                    }
+                } 
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_shadow_priestess_malia_39117AI(creature);
+    }
+};
+
 
 void AddSC_tirisfal_glades()
 {
@@ -1960,5 +2187,5 @@ void AddSC_tirisfal_glades()
     new npc_captured_vile_fin_puddlejumper_38923();
     new npc_captured_vile_fin_minor_oracle_39078();
     new npc_sedrick_calston_38925();
-
+    new npc_shadow_priestess_malia_39117();
 }
