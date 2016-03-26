@@ -2162,6 +2162,79 @@ public:
     }
 };
 
+// 38936 // vehicle sanders
+class npc_lieutenant_sanders_noose_38936 : public CreatureScript
+{
+public:
+    npc_lieutenant_sanders_noose_38936() : CreatureScript("npc_lieutenant_sanders_noose_38936") { }
+
+    enum eNPC
+    {
+        NPC_LEUTNANT_SANDERS = 13158,
+        NPC_LEUTNANT_SANDERS_NOSE_FOCUS = 39093,
+        SPELL_SANDERS_HANGING = 73443,
+        SPELL_SANDERS_FOOT_NOSE = 73444,
+        EVENT_CHECK_SANDERS = 101,
+    };
+
+    struct npc_lieutenant_sanders_noose_38936AI : public ScriptedAI
+    {
+        npc_lieutenant_sanders_noose_38936AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap m_events;
+
+        void Reset() override
+        {
+            m_events.Reset();
+            m_events.ScheduleEvent(EVENT_CHECK_SANDERS, 100);
+            me->SetByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_HOVER);
+            me->AddUnitMovementFlag(MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_FLYING);
+            me->SetDisableGravity(true);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                    case EVENT_CHECK_SANDERS:
+                    {
+                        if (!me->HasAura(SPELL_SANDERS_HANGING))
+                            me->CastSpell(me, SPELL_SANDERS_HANGING, true);
+
+                        if (Vehicle* vehicle = me->GetVehicleKit())
+                        {
+                            Unit* unit = vehicle->GetPassenger(0);
+                            if (!unit)
+                                if (Creature* sanders = me->FindNearestCreature(NPC_LEUTNANT_SANDERS, 10.0f))
+                                {
+                                    sanders->SetDisableGravity(true);
+                                    sanders->EnterVehicle(me, 0);
+                                    me->CastSpell(2533.339f, -920.6719f, 60.98916f, SPELL_SANDERS_FOOT_NOSE, true);
+                                }
+                        }
+
+                        m_events.ScheduleEvent(EVENT_CHECK_SANDERS, 1000);
+                        break;
+                    }
+                }
+            }
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_lieutenant_sanders_noose_38936AI(creature);
+    }
+};
+
 
 void AddSC_tirisfal_glades()
 {
@@ -2188,4 +2261,6 @@ void AddSC_tirisfal_glades()
     new npc_captured_vile_fin_minor_oracle_39078();
     new npc_sedrick_calston_38925();
     new npc_shadow_priestess_malia_39117();
+    new npc_lieutenant_sanders_noose_38936();
+
 }
