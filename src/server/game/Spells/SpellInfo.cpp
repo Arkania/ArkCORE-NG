@@ -620,83 +620,56 @@ float SpellEffectInfo::CalcRadius(bool positive, Unit* caster, Spell* spell) con
     {
         switch(_spellInfo->Id)
         {
-            // PLAYERS / PVP.
-            // Solar beam
-            case 81261:
-                return 5.0f;
-            // Gul'dan aur
-            case 93974: 
+            // PLAYERS / PVP. // DUNGEONS, RAIDS / PVE.
+            
+            case 75117: // Burning Light Anhuur
+            case 93974: // Gul'dan aur
             case 93987:
             case 93986:
             case 93975:
                 return 4.0f;
+            case 76956: //Alpha Beams Anraphet
+            case 81261: // Solar beam
+                return 5.0f;
+            case 75548: // Quicksand Ptah
+            case 75702: // Spore Ammunae
+            case 86261: // Incaster absorb.
+            case 89648:
+                return 6.0f;
+            case 73958: // Lightning Discharge
+            case 77478: // Earthquake
+            case 81297: // Consecration
             case 86041:
-                return 8.0f;
-            // Lightning Discharge
-            case 73958:
-                return 8.0f;
-            // Death and Decay
-            case 52212:
-                return 10.0f;
-            // Blood worms
-            case 81280:
-                return 15.0f;
-            // Fire nova
-            case 8349:
-                return 10.0f;
-            // Serpent Spread
-            case 88453:
+            case 88453: // Serpent Spread
             case 88466:
                 return 8.0f;
-            // Healing Rain
-            case 73921:
+            case 8349:  // Fire nova
+            case 52212: // Death and Decay
+            case 69355:
+            case 73921: // Healing Rain
                 return 10.0f;
-            // Earthquake
-            case 77478:
-                return 8.0f;
-            // Incaster absorb.
-            case 86261:
-                return 6.0f;
-            // Ralling cry
-            case 97463:
-                return 30.0f;
-            // Atonement
-            case 94472: 
+            case 81280: // Blood worms
+            case 94472: // Atonement
                 return 15.0f;
-            // Consecration
-            case 81297:
-                return 8.0f;
-            // DUNGEONS, RAIDS / PVE.
-            // ICC
+            case 73309: // Lilian's Death Grip 
+            case 97463: // Ralling cry
+                return 30.0f;            
             case 70541: // LK Infest
             case 73779: // LK Infest
             case 73780: // LK Infest
             case 73781: // LK Infest
                 return 60.0f;
-            case 71429: // Mass Ressurection Terenas
-                return 200.0f;
-            // HOO
-            case 75194: // Burning Light Anhuur
-            case 75115: // Burning Light Anhuur
-                return 100.0f;
-            case 75117: // Burning Light Anhuur
-                return 4.0f;
-            case 76956: //Alpha Beams Anraphet
-                return 5.0f; // 5y
-            case 75790: // Rampant Growth Ammunae
-            case 89888: // Rampant Growth Ammunae
-                return 100.0f;
-            case 75702: // Spore Ammunae
-                return 6.0f;            
             case 75540: // Flame Bolt Ptah
                 return 70.0f;
-            case 75548: // Quicksand Ptah
-            case 89648:
-                return 6.0f;
-            case 69355:
-                return 10.0f;
+            case 75194: // Burning Light Anhuur
+            case 75115: // Burning Light Anhuur
+            case 75790: // Rampant Growth Ammunae
             case 76355: // Blessing of the sun Rajh
+            case 89888: // Rampant Growth Ammunae
                 return 100.0f;
+            case 71429: // Mass Ressurection Terenas
+                return 200.0f;
+            
             // TOTT
             case 80564: // Fungal Spores Naz'jar
             case 91470:

@@ -2186,7 +2186,7 @@ public:
         void Reset() override
         {
             m_events.Reset();
-            m_events.ScheduleEvent(EVENT_CHECK_SANDERS, 100);
+            m_events.ScheduleEvent(EVENT_CHECK_SANDERS, 250);
             me->SetByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_HOVER);
             me->AddUnitMovementFlag(MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_FLYING);
             me->SetDisableGravity(true);
@@ -2206,16 +2206,17 @@ public:
                             me->CastSpell(me, SPELL_SANDERS_HANGING, true);
 
                         if (Vehicle* vehicle = me->GetVehicleKit())
-                        {
-                            Unit* unit = vehicle->GetPassenger(0);
-                            if (!unit)
+                            if (Unit* sanders = vehicle->GetPassenger(0))
+                            {
+                                if (!sanders->HasAura(SPELL_SANDERS_FOOT_NOSE))
+                                    me->CastSpell(2533.339f, -920.6719f, 60.98916f, SPELL_SANDERS_FOOT_NOSE, true);
+                            }
+                            else
                                 if (Creature* sanders = me->FindNearestCreature(NPC_LEUTNANT_SANDERS, 10.0f))
                                 {
                                     sanders->SetDisableGravity(true);
                                     sanders->EnterVehicle(me, 0);
-                                    me->CastSpell(2533.339f, -920.6719f, 60.98916f, SPELL_SANDERS_FOOT_NOSE, true);
                                 }
-                        }
 
                         m_events.ScheduleEvent(EVENT_CHECK_SANDERS, 1000);
                         break;
@@ -2232,6 +2233,396 @@ public:
     CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_lieutenant_sanders_noose_38936AI(creature);
+    }
+};
+
+// 39038
+class npc_lilian_voss_39038 : public CreatureScript
+{
+public:
+    npc_lilian_voss_39038() : CreatureScript("npc_lilian_voss_39038") { }
+
+    enum eNPC
+    {
+        QUEST_A_DAUGHTERS_EMBRACE = 25046,
+        NPC_BENEDICTUS = 39097,
+        NPC_BENEDICTUS_CREDIT = 39098,
+        NPC_BODYGUARD = 1660,
+        NPC_MELRACHE = 1665,
+        NPC_SCARLET_FRIAR = 1538,
+        NPC_SCARLET_NEOPHYTE = 1539,
+        NPC_SCARLET_VANGUARD = 1540,
+        SPELL_SHADOWY_AURA = 73304,
+        SPELL_LILIANS_BRAIN_BURST = 73307,
+        SPELL_LILIANS_SHADOW_HOP = 73308,
+        SPELL_LILIANS_DEATH_GRIP = 73309,
+        SPELL_STEALTH = 73392,
+        EVENT_CD_73308 = 101,
+        EVENT_CD_73309,
+        EVENT_CHECK_ATTACK,
+        EVENT_CHECK_FATHER_SEQUENCE,
+        EVENT_START_FATHER_SEQUENCE,
+        EVENT_TALK_PART,
+    };
+
+    struct npc_lilian_voss_39038AI : public ScriptedAI
+    {
+        npc_lilian_voss_39038AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+        EventMap m_events;
+        uint64 m_playerGUID;
+        uint64 m_fatherGUID;
+        bool   cd_73308, cd_73309;
+        std::list<uint32>m_targets;
+        std::list<uint32>m_father;
+        bool m_fatherSequence1;
+
+        void Initialize()
+        {
+            m_events.Reset();
+            m_playerGUID = NULL;
+            m_fatherGUID = NULL;
+            cd_73308 = false;
+            cd_73309 = false;
+            m_targets.push_back(NPC_SCARLET_FRIAR);
+            m_targets.push_back(NPC_SCARLET_NEOPHYTE);
+            m_targets.push_back(NPC_SCARLET_VANGUARD);
+            m_father.push_back(NPC_BODYGUARD);
+            m_father.push_back(NPC_MELRACHE);
+            m_father.push_back(NPC_BENEDICTUS);
+            m_fatherSequence1 = false;
+            m_events.ScheduleEvent(EVENT_CHECK_FATHER_SEQUENCE, 1000);
+            m_events.ScheduleEvent(EVENT_CHECK_ATTACK, 1000);
+        }
+
+        void Reset() override
+        {
+            if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                me->GetMotionMaster()->MoveFollow(player, 4.0f, 3.14f);
+            me->SetReactState(REACT_DEFENSIVE);
+        }
+
+        void IsSummonedBy(Unit* summoner) override 
+        { 
+            if (Player* player = summoner->ToPlayer())
+            {
+                m_playerGUID = player->GetGUID();
+                me->GetMotionMaster()->MoveFollow(player, 4.0f, 3.14f);
+            }
+        }
+
+        void EnterCombat(Unit* victim)
+        { 
+            uint8 rol = urand(0, 100);
+            std::list<Creature*>m_c30 = me->FindNearestCreatures(m_targets, 30.0f);
+            if (!cd_73309 && m_c30.size() > 4)
+                CastSpell_LiliansDeathGrip();
+            else
+                if (!cd_73308 && rol < 90)
+                    if (Creature* target = victim->ToCreature())
+                        CastSpell_LiliansShadowHop(target);
+        }
+
+        void KilledUnit(Unit* victim) 
+        { 
+            if (victim->GetCreatureType() == CREATURE_TYPE_HUMANOID)
+                me->AddAura(SPELL_SHADOWY_AURA, victim);
+
+            if (victim->GetEntry() == NPC_BENEDICTUS)
+                if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                {
+                    player->KilledMonsterCredit(NPC_BENEDICTUS_CREDIT);
+                    m_events.ScheduleEvent(EVENT_TALK_PART + 11, 1000);
+                }
+            if (victim->GetEntry() == NPC_BODYGUARD || victim->GetEntry() == NPC_MELRACHE)
+                m_events.ScheduleEvent(EVENT_TALK_PART + 3, 500);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                    case EVENT_CD_73308:
+                    {
+                        cd_73308 = false;
+                        break;
+                    }
+                    case EVENT_CD_73309:
+                    {
+                        cd_73309 = false;
+                        break;
+                    }
+                    case EVENT_CHECK_ATTACK:
+                    {                        
+                        if (!cd_73309 && !cd_73308)
+                            if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                                if (player->IsInCombat())
+                                    if (me->IsInCombat())
+                                    {
+                                        if (Unit* unit = me->SelectVictim())
+                                            if (Creature* target = unit->ToCreature())
+                                                if (target->GetEntry() == NPC_SCARLET_FRIAR || target->GetEntry() == NPC_SCARLET_NEOPHYTE || target->GetEntry() == NPC_SCARLET_VANGUARD)
+                                                    CastSpell_LiliansShadowHop(target);
+                                    }
+                                    else
+                                    {
+                                        printf("EVENT_CHECK_ATTACK player is in combat, ich nicht...\n");
+                                    }
+
+                        m_events.ScheduleEvent(EVENT_CHECK_ATTACK, 1000);
+                        break;
+                    }
+                    case EVENT_CHECK_FATHER_SEQUENCE:
+                    {
+                        std::list<Creature*>m_guard = me->FindNearestCreatures(m_father, 23.0f);
+                        if (m_guard.size() > 0)
+                            for (std::list<Creature*>::iterator itr = m_guard.begin(); itr != m_guard.end(); ++itr)
+                                (*itr)->SetReactState(REACT_PASSIVE);
+
+                        Creature* father = me->FindNearestCreature(NPC_BENEDICTUS, 23.0f);
+                        if (father)
+                        {
+                            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                            m_fatherGUID = father->GetGUID();
+                            m_events.ScheduleEvent(EVENT_START_FATHER_SEQUENCE, 200);
+                        }
+                        else
+                            m_events.ScheduleEvent(EVENT_CHECK_FATHER_SEQUENCE, 1000);
+
+                        break;
+                    }
+                    case EVENT_START_FATHER_SEQUENCE:
+                    {
+                        Talk(0);
+                        me->GetMotionMaster()->Clear();
+                        me->SetWalk(true);
+                        me->GetMotionMaster()->MovePath(3903801, false);
+                        m_events.ScheduleEvent(EVENT_TALK_PART + 1, 6000);
+                        break;
+                    }
+                    case EVENT_TALK_PART + 1:
+                    {
+                        if (Creature* father = sObjectAccessor->GetCreature(*me, m_fatherGUID))
+                            father->AI()->Talk(0); 
+                        m_events.ScheduleEvent(EVENT_TALK_PART + 2, 6000);
+                        break;
+                    }
+                    case EVENT_TALK_PART + 2:
+                    {
+                        Talk(1);
+                        m_events.ScheduleEvent(EVENT_TALK_PART + 3, 6000);
+                        break;
+                    }
+                    case EVENT_TALK_PART + 3:
+                    {
+                        std::list<Creature*>m_guard = me->FindNearestCreatures(m_father, 20.0f);
+                        if (m_guard.size() > 0)
+                            for (std::list<Creature*>::iterator itr = m_guard.begin(); itr != m_guard.end(); ++itr)
+                                if ((*itr)->IsAlive())
+                                    if ((*itr)->GetEntry() != NPC_BENEDICTUS)
+                                    {
+                                        me->CastSpell((*itr), SPELL_LILIANS_SHADOW_HOP, true);
+                                        return;
+                                    }
+
+                        if (!m_fatherSequence1)
+                        {
+                            m_events.ScheduleEvent(EVENT_TALK_PART + 4, 1000);
+                            m_fatherSequence1 = true;
+                        }
+                        break;
+                    }
+                    case EVENT_TALK_PART + 4:
+                    {
+                        Talk(2);
+                        m_events.ScheduleEvent(EVENT_TALK_PART + 5, 6000);
+                        break;
+                    }
+                    case EVENT_TALK_PART + 5:
+                    {
+                        if (Creature* father = sObjectAccessor->GetCreature(*me, m_fatherGUID))
+                            father->AI()->Talk(1);
+                        m_events.ScheduleEvent(EVENT_TALK_PART + 6, 6000);
+                        break;
+                    }
+                    case EVENT_TALK_PART + 6:
+                    {
+                        Talk(3);
+                        m_events.ScheduleEvent(EVENT_TALK_PART + 7, 6000);
+                        break;
+                    }
+                    case EVENT_TALK_PART + 7:
+                    {
+                        if (Creature* father = sObjectAccessor->GetCreature(*me, m_fatherGUID))
+                            father->AI()->Talk(2); 
+                        m_events.ScheduleEvent(EVENT_TALK_PART + 8, 6000);
+                        break;
+                    }
+                    case EVENT_TALK_PART + 8:
+                    {
+                        Talk(4); 
+                        m_events.ScheduleEvent(EVENT_TALK_PART + 9, 6000);
+                        break;
+                    }
+                    case EVENT_TALK_PART + 9:
+                    {
+                        Talk(5);
+                        m_events.ScheduleEvent(EVENT_TALK_PART + 10, 6000);
+                        break;
+                    }
+                    case EVENT_TALK_PART + 10:
+                    {
+                        if (Creature* father = sObjectAccessor->GetCreature(*me, m_fatherGUID))
+                            me->CastSpell(father, SPELL_LILIANS_SHADOW_HOP, true);
+
+                        break;
+                    }
+                    case EVENT_TALK_PART + 11:
+                    {
+                        me->GetMotionMaster()->MovePath(3903802, false);
+                        m_events.ScheduleEvent(EVENT_TALK_PART + 12, 9000);
+                        break;
+                    }
+                    case EVENT_TALK_PART + 12:
+                    {
+                        me->DespawnOrUnsummon(1);
+                        break;
+                    }
+                }
+            }
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+
+        void CastSpell_LiliansDeathGrip()
+        {
+            me->CastSpell(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), SPELL_LILIANS_DEATH_GRIP, true);
+            m_events.ScheduleEvent(EVENT_CD_73309, 30000);
+            cd_73309 = true;
+        }
+
+        void CastSpell_LiliansShadowHop(Creature* target)
+        {
+            me->CastSpell(target, SPELL_LILIANS_SHADOW_HOP, true);
+            m_events.ScheduleEvent(EVENT_CD_73308, 5000);
+            cd_73308 = true;
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_lilian_voss_39038AI(creature);
+    }
+};
+
+// 73307
+class spell_lilians_brain_burst_73307 : public SpellScriptLoader
+{
+public:
+    spell_lilians_brain_burst_73307() : SpellScriptLoader("spell_lilians_brain_burst_73307") { }
+
+    class spell_lilians_brain_burst_73307_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_lilians_brain_burst_73307_AuraScript);
+
+        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            if (!GetCaster() || !GetTarget())
+                return;
+
+            GetCaster()->Kill(GetTarget());
+        }
+
+        void Register() override
+        {      
+            OnEffectApply += AuraEffectApplyFn(spell_lilians_brain_burst_73307_AuraScript::OnApply, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_lilians_brain_burst_73307_AuraScript();
+    }
+};
+
+// 73308
+class spell_lilians_shadow_hop_73308 : public SpellScriptLoader
+{
+public:
+    spell_lilians_shadow_hop_73308() : SpellScriptLoader("spell_lilians_shadow_hop_73308") { }
+
+    enum Spells
+    {
+        SPELL_LILIANS_BRAIN_BURST = 73307,
+    };
+
+    class spell_lilians_shadow_hop_73308_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_lilians_shadow_hop_73308_AuraScript);
+
+        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            if (!GetCaster() || !GetTarget())
+                return;
+
+            GetCaster()->CastSpell(GetTarget(), SPELL_LILIANS_BRAIN_BURST, true);
+        }
+
+        void Register() override
+        {
+            OnEffectRemove += AuraEffectRemoveFn(spell_lilians_shadow_hop_73308_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_CONTROL_VEHICLE, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_lilians_shadow_hop_73308_AuraScript();
+    }
+};
+
+// 73309
+class spell_lilians_death_grip_73309 : public SpellScriptLoader
+{
+public:
+    spell_lilians_death_grip_73309() : SpellScriptLoader("spell_lilians_death_grip_73309") { }
+
+    class spell_lilians_death_grip_73309_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_lilians_death_grip_73309_AuraScript);
+
+        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            if (Unit* owner = GetOwner()->ToUnit())
+                if (Unit* target = GetTarget())
+                {
+                    target->JumpTo(owner, 15.0f);
+                    target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED | UNIT_FLAG_DISABLE_MOVE);
+                }
+        }
+
+        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            if (Unit* owner = GetOwner()->ToUnit())
+                if (Unit* target = GetTarget())
+                    owner->Kill(target);
+        }
+
+        void Register() override
+        {
+            OnEffectApply += AuraEffectApplyFn(spell_lilians_death_grip_73309_AuraScript::OnApply, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+            AfterEffectRemove += AuraEffectRemoveFn(spell_lilians_death_grip_73309_AuraScript::OnRemove, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_lilians_death_grip_73309_AuraScript();
     }
 };
 
@@ -2262,5 +2653,8 @@ void AddSC_tirisfal_glades()
     new npc_sedrick_calston_38925();
     new npc_shadow_priestess_malia_39117();
     new npc_lieutenant_sanders_noose_38936();
-
+    new npc_lilian_voss_39038();
+    new spell_lilians_brain_burst_73307();
+    new spell_lilians_shadow_hop_73308();
+    new spell_lilians_death_grip_73309();
 }

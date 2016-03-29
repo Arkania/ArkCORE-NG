@@ -263,6 +263,34 @@ private:
     std::list<WorldObject*> _targets;
 };
 
+class IsUnitDead
+{
+public:
+    explicit IsUnitDead() { }
+
+    bool operator()(WorldObject* obj) const
+    {
+        if (Unit* unit = obj->ToUnit())
+            return unit->IsDead();
+
+        return false;
+    }
+};
+
+class IsUnitAlive
+{
+public:
+    explicit IsUnitAlive() { }
+
+    bool operator()(WorldObject* obj) const
+    {
+        if (Unit* unit = obj->ToUnit())
+            return unit->IsAlive();
+
+        return false;
+    }
+};
+
 // end beta test area
 
 #endif
