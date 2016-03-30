@@ -652,6 +652,7 @@ float SpellEffectInfo::CalcRadius(bool positive, Unit* caster, Spell* spell) con
             case 94472: // Atonement
                 return 15.0f;
             case 73309: // Lilian's Death Grip 
+            case 83173: // Raise Forsaken
             case 97463: // Ralling cry
                 return 30.0f;            
             case 70541: // LK Infest
