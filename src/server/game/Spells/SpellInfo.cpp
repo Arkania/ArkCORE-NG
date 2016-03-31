@@ -648,6 +648,7 @@ float SpellEffectInfo::CalcRadius(bool positive, Unit* caster, Spell* spell) con
             case 69355:
             case 73921: // Healing Rain
                 return 10.0f;
+            case 73868: // Rumbling Hooves
             case 81280: // Blood worms
             case 94472: // Atonement
                 return 15.0f;

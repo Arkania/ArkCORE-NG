@@ -362,6 +362,380 @@ public:
     }
 };
 
+// 39380
+class npc_shin_stonepillar_39380 : public CreatureScript
+{
+public:
+    npc_shin_stonepillar_39380() : CreatureScript("npc_shin_stonepillar_39380") { }
+
+    enum eNPC
+    {
+        QUEST_THE_KODO_AND_THE_WOLF = 25205,
+        PLAYER_GUID = 99999,
+        SPELL_SUMMON_THE_WOLF = 73840,
+        SPELL_QUEST_INVIS_KODO_AND_THE_WOLF = 73919,
+        SPELL_SEE_QUEST_INVIS_01 = 73426,
+
+    };
+
+    bool OnGossipHello(Player* player, Creature* creature) override
+    { 
+        if (player->GetQuestStatus(QUEST_THE_KODO_AND_THE_WOLF) == QUEST_STATUS_INCOMPLETE)
+        {
+            player->PrepareQuestMenu(creature->GetGUID());
+            player->ADD_GOSSIP_ITEM_DB(11209, 0, GOSSIP_SENDER_MAIN, 1001);
+            player->SEND_GOSSIP_MENU(11209, creature->GetGUID());
+            return true;
+        }
+
+        return false;     
+    }
+
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action) override 
+    { 
+        if (action == 1001)
+        {
+            player->CastSpell(player, SPELL_SUMMON_THE_WOLF);
+            player->CastSpell(player, SPELL_SEE_QUEST_INVIS_01);            
+            player->CLOSE_GOSSIP_MENU();
+            return true;
+        }
+
+        return false; 
+    }
+};
+
+// 39364
+class npc_the_wolf_39364 : public CreatureScript
+{
+public:
+    npc_the_wolf_39364() : CreatureScript("npc_the_wolf_39364") { }
+
+    enum eNPC
+    {
+        NPC_SHIN_STONEPILLAR = 39380,
+        NPC_KODO = 39365,
+        SPELL_HUNTING = 73841,
+        SPELL_STUN_WOLF = 73866,
+        SPELL_RUMBLING_HOOVES = 73868,
+        SPELL_PLAYER_SWITCHES_SEATS = 82959,
+        SPELL_PERMANENT_FEIGN_DEATH = 29266,
+        SPELL_QUEST_INVIS_KODO_AND_THE_WOLF = 73919,
+        SPELL_SEE_QUEST_INVIS_01 = 73426,
+        PHASE_START_TO_EAST = 0,
+        PHASE_SEARCHING_FOR_KODO,
+        PHASE_WAITING_FOR_EAT,
+        EVENT_CHECK_POSITION,
+        EVENT_CHECK_KODOS,
+        EVENT_TALK_SEARCHING,
+        EVENT_KODOS_FIGHTING,
+        EVENT_TRY_EAT_KODO,
+    };
+
+    struct npc_the_wolf_39364_AI : public VehicleAI
+    {
+        npc_the_wolf_39364_AI(Creature* creature) : VehicleAI(creature) { }
+
+        EventMap m_events;
+        uint64   m_playerGUID;
+        uint64   m_shinGUID;
+        uint64   m_kodo1GUID, m_kodo2GUID;
+        uint8    m_phase;
+
+        void Reset() override
+        {
+            m_events.Reset();
+            m_events.ScheduleEvent(EVENT_CHECK_POSITION, 1000);
+            m_phase = PHASE_START_TO_EAST;
+            m_playerGUID = NULL;
+            m_shinGUID = NULL;
+            m_kodo1GUID = NULL;
+            m_kodo2GUID = NULL;
+            FindShinStonepillar();
+        }
+
+        void IsSummonedBy(Unit* summoner) override
+        {
+            if (Player* player = summoner->ToPlayer())
+                m_playerGUID = player->GetGUID();
+        }
+
+        void PassengerBoarded(Unit* passenger, int8 /*seatId*/, bool apply) override
+        {
+            if (Player* player = passenger->ToPlayer())
+                if (apply)
+                    m_playerGUID = player->GetGUID();
+                else
+                    m_playerGUID = NULL;
+            
+            FindShinStonepillar();
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_CHECK_POSITION:
+                {
+                    switch (m_phase)
+                    {
+                    case PHASE_START_TO_EAST:
+                    {
+                        if (Creature* shin = sObjectAccessor->GetCreature(*me, m_shinGUID))
+                            if (shin->GetDistance2d(me) < 10.0f)
+                                m_phase = PHASE_START_TO_EAST;
+                            else
+                            {
+                                if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                                    Talk(0, player);
+
+                                m_phase = PHASE_SEARCHING_FOR_KODO;
+                                me->AddAura(SPELL_HUNTING, me);
+                                m_events.ScheduleEvent(EVENT_TALK_SEARCHING, urand(5000, 7000));
+                                m_events.ScheduleEvent(EVENT_CHECK_KODOS, 1000);
+                            }
+                        break;
+                    }
+                    case PHASE_SEARCHING_FOR_KODO:
+                    {
+                        if (Creature* shin = sObjectAccessor->GetCreature(*me, m_shinGUID))
+                            if (shin->GetDistance2d(me) < 10.0f)
+                                m_phase = PHASE_START_TO_EAST;
+
+                        if (Creature* kodo = sObjectAccessor->GetCreature(*me, m_kodo1GUID))
+                            if (kodo->GetDistance2d(me) < 20)
+                            {
+                                m_phase = PHASE_WAITING_FOR_EAT;
+                                m_events.Reset();
+                                m_events.ScheduleEvent(EVENT_TRY_EAT_KODO, 100);
+                                return;
+                            }
+                        break;
+                    }
+                    }
+                    m_events.ScheduleEvent(EVENT_CHECK_POSITION, 1000);
+                    break;
+                }
+                case EVENT_TALK_SEARCHING:
+                {
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                        Talk(4, player);
+                    m_events.ScheduleEvent(EVENT_TALK_SEARCHING, urand(5000, 7000));
+                    break;
+                }
+                case EVENT_CHECK_KODOS:
+                {
+                    if (!m_kodo1GUID || !m_kodo2GUID)
+                    {
+                        std::list<Creature*> kodos = me->FindNearestCreatures(NPC_KODO, 100.0f);
+                        if (kodos.size() == 2)
+                        {
+                            std::list<Creature*>::iterator itr = kodos.begin();
+                            m_kodo1GUID = (*itr)->GetGUID();
+                            itr++;
+                            m_kodo2GUID = (*itr)->GetGUID();
+                        }
+                        m_events.ScheduleEvent(EVENT_CHECK_KODOS, 1000);
+                    }
+                    else
+                        m_events.ScheduleEvent(EVENT_KODOS_FIGHTING, urand(2000, 4000));
+
+                    break;
+                }
+                case EVENT_KODOS_FIGHTING:
+                {
+                    if (Creature* kodo1 = sObjectAccessor->GetCreature(*me, m_kodo1GUID))
+                        if (Creature* kodo2 = sObjectAccessor->GetCreature(*me, m_kodo2GUID))
+                        {
+                            kodo1->HandleEmoteCommand(EMOTE_ONESHOT_ATTACK_UNARMED);
+                            kodo2->HandleEmoteCommand(EMOTE_ONESHOT_WOUND);
+                        }
+
+                    m_events.ScheduleEvent(EVENT_KODOS_FIGHTING, urand(2000,4000));
+                    break;
+                }
+                case EVENT_TRY_EAT_KODO:
+                {
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                        Talk(1, player);
+                    me->SetControlled(true, UNIT_STATE_ROOT);
+                    me->GetMotionMaster()->Clear();
+                    m_events.ScheduleEvent(EVENT_TRY_EAT_KODO + 1, 2000);
+                    break;
+                }
+                case EVENT_TRY_EAT_KODO + 1:
+                {
+                    if (Creature* kodo1 = sObjectAccessor->GetCreature(*me, m_kodo1GUID))
+                        kodo1->HandleEmoteCommand(EMOTE_ONESHOT_SPELL_CAST);
+                    if (Creature* kodo2 = sObjectAccessor->GetCreature(*me, m_kodo2GUID))
+                        kodo2->HandleEmoteCommand(EMOTE_ONESHOT_WOUND_CRITICAL);
+
+                    m_events.ScheduleEvent(EVENT_TRY_EAT_KODO + 2, 4000);
+                    break;
+                }
+                case EVENT_TRY_EAT_KODO + 2:
+                {
+                    if (Creature* kodo1 = sObjectAccessor->GetCreature(*me, m_kodo1GUID))
+                        if (Creature* kodo2 = sObjectAccessor->GetCreature(*me, m_kodo2GUID))
+                        {
+                            kodo1->HandleEmoteCommand(EMOTE_ONESHOT_SPELL_CAST);
+                            kodo1->Kill(kodo2);
+                        }
+                    // kodo2->HandleEmoteState(EMOTE_STATE_DEAD);
+
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                        Talk(2, player);
+
+                    m_events.ScheduleEvent(EVENT_TRY_EAT_KODO + 3, 2000);
+                    break;
+                }
+                case EVENT_TRY_EAT_KODO + 3:
+                {
+                    Position pos;
+                    if (Creature* kodo = sObjectAccessor->GetCreature(*me, m_kodo2GUID))
+                    {
+                        me->SetSpeed(MOVE_WALK, 0.7f, true);
+                        me->GetMotionMaster()->MovePoint(1234, kodo->GetNearPosition(3.0f, kodo->GetAngle(me)));
+                    }
+
+                    m_events.ScheduleEvent(EVENT_TRY_EAT_KODO + 4, 4000);
+                    break;
+                }
+                case EVENT_TRY_EAT_KODO + 4:
+                {
+                    m_events.Reset();
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                        Talk(3, player);
+
+                    if (Creature* kodo = sObjectAccessor->GetCreature(*me, m_kodo1GUID))
+                    {
+                        kodo->CastSpell(me, SPELL_STUN_WOLF);
+                        me->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_DISABLE_TURN);
+                        kodo->CastSpell(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), SPELL_RUMBLING_HOOVES, true);
+                        kodo->CastSpell(me, SPELL_PLAYER_SWITCHES_SEATS, true);
+                    }
+
+                    m_events.ScheduleEvent(EVENT_TRY_EAT_KODO + 5, 3000);
+                    break;
+                }
+                case EVENT_TRY_EAT_KODO + 5:
+                {
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                        player->KilledMonsterCredit(NPC_KODO);
+
+                    m_events.ScheduleEvent(EVENT_TRY_EAT_KODO + 6, 6000);
+                    break;
+                }
+                case EVENT_TRY_EAT_KODO + 6:
+                {
+                    me->DespawnOrUnsummon(200);
+
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                    {
+                        player->RemoveAura(SPELL_SEE_QUEST_INVIS_01);
+                        player->NearTeleportTo(1287.98f, -4336.36f, 34.0345f, 3.176133f);
+                    }
+                    break;
+                }
+                }
+            }
+        }
+
+        void FindShinStonepillar()
+        {
+            if (m_shinGUID)
+                return;
+
+            if (Creature* shin = me->FindNearestCreature(NPC_SHIN_STONEPILLAR, 10.0f))
+                m_shinGUID = shin->GetGUID();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_the_wolf_39364_AI(creature);
+    }
+};
+
+// 73868
+class spell_rumbling_hooves_73868 : public SpellScriptLoader
+{
+public:
+    spell_rumbling_hooves_73868() : SpellScriptLoader("spell_rumbling_hooves_73868") { }
+
+    enum eSpell
+    {
+        NPC_THE_WOLF = 39364,
+    };
+
+    class IsEntry
+    {
+    public:
+        explicit IsEntry(uint32 entry) : _entry(entry) { }
+
+        bool operator()(WorldObject* obj) const
+        {
+            if (Creature* target = obj->ToCreature())
+                return target->GetEntry() == _entry;
+
+            return true;
+        }
+
+    private:
+        uint32 _entry;
+    };
+
+    class spell_rumbling_hooves_73868_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_rumbling_hooves_73868_SpellScript);
+
+        void FilterTargets(std::list<WorldObject*>& targets)
+        {
+            targets.remove_if(IsEntry(GetCaster()->GetEntry()));
+        }
+
+        void Register()
+        {
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_rumbling_hooves_73868_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_DEST_AREA_ENTRY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_rumbling_hooves_73868_SpellScript();
+    }
+};
+
+// 39365
+class npc_the_kodo_39365 : public CreatureScript
+{
+public:
+    npc_the_kodo_39365() : CreatureScript("npc_the_kodo_39365") { }
+
+    enum eNPC
+    {
+        SPELL_QUEST_INVIS_KODO_AND_THE_WOLF = 73919,
+    };
+
+    struct npc_the_kodo_39365AI : public ScriptedAI
+    {
+        npc_the_kodo_39365AI(Creature* creature) : ScriptedAI(creature) {}
+       
+        void Reset() override
+        {
+            me->AddAura(SPELL_QUEST_INVIS_KODO_AND_THE_WOLF, me);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_the_kodo_39365AI(creature);
+    }
+};
 
 void AddSC_durotar()
 {
@@ -369,5 +743,10 @@ void AddSC_durotar()
     new spell_voodoo();
     new npc_drowned_thunder_lizard_39464();
     new spell_kill_golden_stonefish_80962();
+    new npc_shin_stonepillar_39380();
+    new npc_the_wolf_39364();
+    new spell_rumbling_hooves_73868();
+    new npc_the_kodo_39365();
+
 }
 
