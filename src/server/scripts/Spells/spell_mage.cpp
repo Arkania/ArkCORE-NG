@@ -1290,6 +1290,30 @@ class spell_mage_ring_of_frost_freeze : public SpellScriptLoader
     public:
         spell_mage_ring_of_frost_freeze() : SpellScriptLoader("spell_mage_ring_of_frost_freeze") { }
 
+        class isOutsideRadius
+        {
+        public:
+            explicit isOutsideRadius(const WorldLocation* pos, float inRadius, float outRadius) :  _pos(pos), _inRadius(inRadius), _outRadius(outRadius) { }
+
+            bool operator()(WorldObject* obj) const
+            {
+                if (Unit* target = obj->ToUnit())
+                {
+                    if (target->HasAura(SPELL_MAGE_RING_OF_FROST_DUMMY) || target->HasAura(SPELL_MAGE_RING_OF_FROST_FREEZE) || target->GetExactDist(_pos) > _outRadius)
+                        return true;
+                    if (target->GetExactDist(_pos) < _inRadius)
+                        return false;
+                }
+
+                return true;
+            }
+
+        private:
+            const WorldLocation* _pos;
+            float _inRadius;
+            float _outRadius;
+        };
+
         class spell_mage_ring_of_frost_freeze_SpellScript : public SpellScript
         {
             PrepareSpellScript(spell_mage_ring_of_frost_freeze_SpellScript);
@@ -1308,15 +1332,7 @@ class spell_mage_ring_of_frost_freeze : public SpellScriptLoader
                 float outRadius = sSpellMgr->GetSpellInfo(SPELL_MAGE_RING_OF_FROST_SUMMON)->Effects[EFFECT_0].CalcRadius();
                 float inRadius  = 4.7f;
 
-                if (Player* player = GetCaster()->ToPlayer())
-                    if (player->IsGameMaster())
-                        targets.empty();
-
-                for (std::list<WorldObject*>::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
-                    if (Unit* unit = (*itr)->ToUnit())
-                        if (unit->HasAura(SPELL_MAGE_RING_OF_FROST_DUMMY) || unit->HasAura(SPELL_MAGE_RING_OF_FROST_FREEZE) || unit->GetExactDist(GetExplTargetDest()) > outRadius)
-                            if (unit->GetExactDist(GetExplTargetDest()) > inRadius)
-                                targets.erase(itr--);
+                targets.remove_if(isOutsideRadius(GetExplTargetDest(), inRadius, outRadius));
             }
 
             void Register() override
