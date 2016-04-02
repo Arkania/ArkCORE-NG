@@ -136,8 +136,8 @@ INSERT INTO creature_text values
 
 DELETE FROM creature_text where entry=44821 and groupid between 0 and 1;
 INSERT INTO creature_text values 
-(44821, 0, 0, "Eliminate all murlocs by using the Blight Concoction!$B$B|r|TInterface\Icons\INV_ALCHEMY_POTION_05.BLP:24|t", 12, 0, 100, 0, 0, 0, "", 44902),
-(44821, 1, 0, "Returning to Forsaken High Command!$B$B|r|TInterface\Icons\ACHIEVEMENT_ZONE_SILVERPINE_01.BLP:24|t", 12, 0, 100, 0, 0, 0, "", 44903);
+(44821, 0, 0, "Eliminate all murlocs by using the Blight Concoction!$B$B|r|TInterface\Icons\INV_ALCHEMY_POTION_05.BLP:24|t", 42, 0, 100, 0, 0, 0, "", 44902),
+(44821, 1, 0, "Returning to Forsaken High Command!$B$B|r|TInterface\Icons\ACHIEVEMENT_ZONE_SILVERPINE_01.BLP:24|t", 42, 0, 100, 0, 0, 0, "", 44903);
 
 DELETE FROM creature_text where entry=44882 and groupid between 0 and 2;
 INSERT INTO creature_text values 

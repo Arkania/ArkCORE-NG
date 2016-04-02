@@ -32,6 +32,8 @@ EndContentData */
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "Player.h"
+#include "Vehicle.h"
+#include "VehicleDefines.h"
 
 
 // 1978
@@ -976,16 +978,25 @@ public:
 
     enum eNPC
     {
-        
+        QUEST_ITERATING_UPON_SUCCESS = 26998,
+        SPELL_SUMMON_BAT = 83584,
+        ACTION_OPTION_ID = 1,
     };
 
     bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action) override
     {
-        switch (action) // is option_id in gossip_menu_option
+        switch (action) 
         {
-        case 1:
-           
-            break;
+        case ACTION_OPTION_ID:
+        {
+            if (player->GetQuestStatus(QUEST_ITERATING_UPON_SUCCESS) == QUEST_STATUS_INCOMPLETE)
+            {
+                player->CastSpell(player, SPELL_SUMMON_BAT);
+                creature->HandleEmoteCommand(EMOTE_ONESHOT_POINT);
+                creature->AI()->Talk(0);
+                break;
+            }
+        }
         }
         player->CLOSE_GOSSIP_MENU();
         
@@ -1038,33 +1049,140 @@ public:
 
     enum eNPC
     {
-
+        QUEST_ITERATING_UPON_SUCCESS = 26998,
+        NPC_VILE_FIN_ORACLE = 1908,
+        NPC_BAT_HANDLER_MAGGOTBREATH = 44825,
+        WAYPOINT_QUEST_26998 = 4482101,
+        SPELL_GO_HOME = 83594,
+        EVENT_CHECK_FINISH = 101,
+        EVENT_START_MOVEMENT,
+        EVENT_GO_HOME2,
+        EVENT_GO_HOME,
     };
 
-    struct npc_forsaken_bat_44821AI : public ScriptedAI
+    struct npc_forsaken_bat_44821AI : public VehicleAI
     {
-        npc_forsaken_bat_44821AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+        npc_forsaken_bat_44821AI(Creature* creature) : VehicleAI(creature) { Initialize(); }
 
         EventMap m_events;
+        uint64 m_playerGUID;
+        Position m_homePos;
+        Position m_homePos2;
 
         void Initialize()
         {
-
-        }
-
-        void Reset() override
-        {
+            m_playerGUID = NULL;
             m_events.Reset();
-
         }
 
+        void IsSummonedBy(Unit* summoner) override
+        {
+            if (Player* player = summoner->ToPlayer())
+                if (player->GetQuestStatus(QUEST_ITERATING_UPON_SUCCESS) == QUEST_STATUS_INCOMPLETE)
+                    if (Vehicle* vehicle = me->GetVehicleKit())
+                    {
+                        m_playerGUID = player->GetGUID();
+                        m_homePos = me->GetPosition();
+                    }
+        }
 
+        void MovementInform(uint32 type, uint32 id) override
+        {
+            if (type == WAYPOINT_MOTION_TYPE)
+                switch (id)
+                {
+                case 0:
+                {
+                    me->SetSpeed(MOVE_RUN, 3.9f, true);
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                        player->KilledMonsterCredit(NPC_BAT_HANDLER_MAGGOTBREATH);
+                    break;
+                }
+                case 1:
+                {
+                    m_homePos2 = me->GetPosition();
+                    m_homePos2.m_positionZ += 40.0f;
+                    break;
+                }
+                case 4:
+                {
+                    me->SetSpeed(MOVE_RUN, 2.4f, true);
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                        Talk(0, player);
+                    break;
+                }
+                }
+            if (type == POINT_MOTION_TYPE)
+                if (id == 1234)
+                    m_events.ScheduleEvent(EVENT_GO_HOME, 10);
+                else if (id == 1236)
+                {
+                    me->GetVehicleKit()->RemoveAllPassengers();
+                    me->DespawnOrUnsummon(100);
+                }
+        }
+
+        void PassengerBoarded(Unit* passenger, int8 seatId, bool apply) override 
+        { 
+            if (apply)
+                if (Player* player = passenger->ToPlayer())
+                    if (player->GetQuestStatus(QUEST_ITERATING_UPON_SUCCESS) == QUEST_STATUS_INCOMPLETE)
+                    {
+                        m_playerGUID = player->GetGUID();                        
+                        m_events.ScheduleEvent(EVENT_START_MOVEMENT, 2000);
+                        return;
+                    }
+
+            m_playerGUID = NULL;
+        }
+
+        void EnterEvadeMode() override {}
 
         void UpdateAI(uint32 diff) override
         {
             m_events.Update(diff);
 
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_CHECK_FINISH:
+                {
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                        if (player->GetReqKillOrCastCurrentCount(QUEST_ITERATING_UPON_SUCCESS, NPC_VILE_FIN_ORACLE) >= 50)
+                        {
+                            Talk(1, player);
+                            me->CastSpell(me, SPELL_GO_HOME, true);
+                            me->GetMotionMaster()->Clear();
+                            m_events.ScheduleEvent(EVENT_GO_HOME2, 250);
+                            return;
+                        }
 
+                    m_events.ScheduleEvent(EVENT_CHECK_FINISH, 1000);
+                    break;
+                }
+                case EVENT_START_MOVEMENT:
+                {
+                    me->SetCanFly(true);
+                    me->SetDisableGravity(true);
+                    me->GetMotionMaster()->MovePath(WAYPOINT_QUEST_26998, false);
+                    m_events.ScheduleEvent(EVENT_CHECK_FINISH, 1000);
+                    break;
+                }
+                case EVENT_GO_HOME2:
+                {
+                    me->SetSpeed(MOVE_RUN, 3.5f);
+                    me->GetMotionMaster()->MovePoint(1234, m_homePos2);
+                    break;
+                }
+                case EVENT_GO_HOME:
+                {
+                    me->SetSpeed(MOVE_RUN, 2.0f);
+                    me->GetMotionMaster()->MovePoint(1236, m_homePos);
+                    break;
+                }
+                }
+            }
 
             if (!UpdateVictim())
                 return;
