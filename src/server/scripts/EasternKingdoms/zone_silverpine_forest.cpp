@@ -713,6 +713,373 @@ public:
     }
 };
 
+// 44793 // showfight vs trooper
+class npc_worgen_renegade_44793 : public CreatureScript
+{
+public:
+    npc_worgen_renegade_44793() : CreatureScript("npc_worgen_renegade_44793") { }
+
+    enum eNPC
+    {
+        NPC_FORSAKEN_TROOPER1 = 44791,
+        NPC_FORSAKEN_TROOPER2 = 44792,
+        EVENT_CHECK_SHOWFIGHT = 101,
+        MOVE_TO_HOMEPOSITION,
+    };
+
+    struct npc_worgen_renegade_44793AI : public ScriptedAI
+    {
+        npc_worgen_renegade_44793AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+        EventMap m_events;
+        float    m_minHealthPct;
+        bool     m_isShowFight;
+        uint32    m_minDamage;
+        uint32    m_maxDamage;
+        std::list<uint32> m_targetList;
+
+        void Initialize()
+        {
+            m_targetList.clear();
+            m_targetList.push_back(NPC_FORSAKEN_TROOPER1);
+            m_targetList.push_back(NPC_FORSAKEN_TROOPER2);
+            m_minHealthPct = frand(30.0f, 85.0f);
+            m_minDamage = 1;
+            m_maxDamage = 1;
+        }
+
+        void Reset() override
+        {
+            m_events.Reset();
+            m_isShowFight = true;
+            m_events.ScheduleEvent(EVENT_CHECK_SHOWFIGHT, 1000);
+        }
+
+        void MovementInform(uint32 type, uint32 pointId) override
+        {
+            if (type == POINT_MOTION_TYPE && pointId == MOVE_TO_HOMEPOSITION)
+                m_events.ScheduleEvent(EVENT_CHECK_SHOWFIGHT, 25);
+        }
+
+        uint32 FindTargetEntry(uint32 entry)
+        {
+            if (m_targetList.empty())
+                return 0;
+
+            for (std::list<uint32>::const_iterator itr = m_targetList.begin(); itr != m_targetList.end(); ++itr)
+                if ((*itr) == entry)
+                    return entry;
+
+            return 0;
+        }
+
+        void DamageTaken(Unit* who, uint32 &damage) override
+        {
+            if (m_isShowFight && who->ToCreature())
+                if (FindTargetEntry(who->GetEntry()))
+                {
+                    if (damage > m_maxDamage)
+                        damage = m_maxDamage;
+
+                    if (me->GetHealthPct() < m_minHealthPct)
+                        damage = 0;
+                }
+
+        }
+
+        void DamageDealt(Unit* victim, uint32& damage, DamageEffectType damageType) override
+        {
+            if (m_isShowFight && victim->ToCreature())
+                if (FindTargetEntry(victim->GetEntry()))
+                {
+                    if (damage > m_maxDamage)
+                        damage = m_maxDamage;
+
+                    if (victim->GetHealthPct() < m_minHealthPct)
+                        damage = m_minDamage;
+                }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_CHECK_SHOWFIGHT:
+                {
+                    if (me->IsInCombat() || me->IsDead())
+                    {
+                        m_events.ScheduleEvent(EVENT_CHECK_SHOWFIGHT, 2500);
+                        return;
+                    }
+
+                    if (me->GetDistance2d(me->GetHomePosition().GetPositionX(), me->GetHomePosition().GetPositionY()) > 10.0f)
+                    {
+                        me->GetMotionMaster()->MovePoint(MOVE_TO_HOMEPOSITION, me->GetHomePosition());
+                        return;
+                    }
+
+                    if (Creature* worgen = me->FindNearestCreature(m_targetList, 5.0f))
+                    {
+                        me->Attack(worgen, true);
+                        worgen->Attack(me, true);
+                        m_events.ScheduleEvent(EVENT_CHECK_SHOWFIGHT, 2500);
+                        return;
+                    }
+
+                    m_events.ScheduleEvent(EVENT_CHECK_SHOWFIGHT, 2500);
+                    break;
+                }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_worgen_renegade_44793AI(creature);
+    }
+};
+
+// 44791 // 44792
+class npc_forsaken_trooper_44791 : public CreatureScript
+{
+public:
+    npc_forsaken_trooper_44791() : CreatureScript("npc_forsaken_trooper_44791") { }
+
+    enum eNPC
+    {
+        NPC_WORGEN_RENEGATE = 44793,
+        EVENT_CHECK_SHOWFIGHT = 101,
+        MOVE_TO_HOMEPOSITION,
+    };
+
+    struct npc_forsaken_trooper_44791AI : public ScriptedAI
+    {
+        npc_forsaken_trooper_44791AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+        EventMap m_events;
+        float    m_minHealthPct;
+        bool     m_isShowFight;
+        uint32    m_minDamage;
+        uint32    m_maxDamage;
+
+        void Initialize()
+        {
+            m_minHealthPct = frand(30.0f, 85.0f);
+            m_minDamage = 1;
+            m_maxDamage = 1;
+        }
+
+        void Reset() override
+        {
+            m_events.Reset();
+            m_isShowFight = true;
+            m_events.ScheduleEvent(EVENT_CHECK_SHOWFIGHT, 1000);
+        }
+
+        void MovementInform(uint32 type, uint32 pointId) override
+        {
+            if (type == POINT_MOTION_TYPE && pointId == MOVE_TO_HOMEPOSITION)
+                m_events.ScheduleEvent(EVENT_CHECK_SHOWFIGHT, 25);
+        }
+
+        void DamageTaken(Unit* who, uint32 &damage) override
+        {
+            if (m_isShowFight && who->ToCreature())
+                if (who->GetEntry() == NPC_WORGEN_RENEGATE)
+                {
+                    if (damage > m_maxDamage)
+                        damage = m_maxDamage;
+
+                    if (me->GetHealthPct() < m_minHealthPct)
+                        damage = 0;
+                }
+
+        }
+
+        void DamageDealt(Unit* victim, uint32& damage, DamageEffectType damageType) override
+        {
+            if (m_isShowFight && victim->ToCreature())
+                if (victim->GetEntry() == NPC_WORGEN_RENEGATE)
+                {
+                    if (damage > m_maxDamage)
+                        damage = m_maxDamage;
+
+                    if (victim->GetHealthPct() < m_minHealthPct)
+                        damage = m_minDamage;
+                }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_CHECK_SHOWFIGHT:
+                {
+                    if (me->IsInCombat() || me->IsDead())
+                    {
+                        m_events.ScheduleEvent(EVENT_CHECK_SHOWFIGHT, 2500);
+                        return;
+                    }
+
+                    if (me->GetDistance2d(me->GetHomePosition().GetPositionX(), me->GetHomePosition().GetPositionY()) > 10.0f)
+                    {
+                        me->GetMotionMaster()->MovePoint(MOVE_TO_HOMEPOSITION, me->GetHomePosition());
+                        return;
+                    }
+
+                    if (Creature* worgen = me->FindNearestCreature(NPC_WORGEN_RENEGATE, 5.0f))
+                    {
+                        me->Attack(worgen, true);
+                        worgen->Attack(me, true);
+                        m_events.ScheduleEvent(EVENT_CHECK_SHOWFIGHT, 2500);
+                        return;
+                    }
+
+                    m_events.ScheduleEvent(EVENT_CHECK_SHOWFIGHT, 2500);
+                    break;
+                }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_forsaken_trooper_44791AI(creature);
+    }
+};
+
+// 44825 // quest 26998
+class npc_bat_handler_maggotbreath_44825 : public CreatureScript
+{
+public:
+    npc_bat_handler_maggotbreath_44825() : CreatureScript("npc_bat_handler_maggotbreath_44825") { }
+
+    enum eNPC
+    {
+        
+    };
+
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action) override
+    {
+        switch (action) // is option_id in gossip_menu_option
+        {
+        case 1:
+           
+            break;
+        }
+        player->CLOSE_GOSSIP_MENU();
+        
+        return true;
+    }
+
+    struct npc_bat_handler_maggotbreath_44825AI : public ScriptedAI
+    {
+        npc_bat_handler_maggotbreath_44825AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+        EventMap m_events;
+        
+        void Initialize()
+        {
+
+        }
+
+        void Reset() override
+        {
+            m_events.Reset();
+           
+        }
+
+  
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+          
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_bat_handler_maggotbreath_44825AI(creature);
+    }
+};
+
+// 44821 // quest 26998
+class npc_forsaken_bat_44821 : public CreatureScript
+{
+public:
+    npc_forsaken_bat_44821() : CreatureScript("npc_forsaken_bat_44821") { }
+
+    enum eNPC
+    {
+
+    };
+
+    struct npc_forsaken_bat_44821AI : public ScriptedAI
+    {
+        npc_forsaken_bat_44821AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+        EventMap m_events;
+
+        void Initialize()
+        {
+
+        }
+
+        void Reset() override
+        {
+            m_events.Reset();
+
+        }
+
+
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_forsaken_bat_44821AI(creature);
+    }
+};
+
+
 
 void AddSC_silverpine_forest()
 {
@@ -721,5 +1088,9 @@ void AddSC_silverpine_forest()
     new spell_raise_forsaken_83173();
     new spell_forsaken_trooper_master_script_83149();
     new npc_fallen_human_44592();
+    new npc_worgen_renegade_44793();
+    new npc_forsaken_trooper_44791();
+    new npc_bat_handler_maggotbreath_44825();
+    new npc_forsaken_bat_44821();
 
 }

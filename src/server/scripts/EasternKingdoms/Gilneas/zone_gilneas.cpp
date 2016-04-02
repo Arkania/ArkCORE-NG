@@ -4208,7 +4208,7 @@ public:
 
     struct npc_northgate_rebel_36057AI : public ScriptedAI
     {
-        npc_northgate_rebel_36057AI(Creature* creature) : ScriptedAI(creature) {}
+        npc_northgate_rebel_36057AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
 
         EventMap m_events;
         float    m_minHealthPct;
