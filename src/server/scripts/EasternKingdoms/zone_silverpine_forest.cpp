@@ -1197,6 +1197,762 @@ public:
     }
 };
 
+// 205143 // quest 27045
+class go_abandoned_outhouse_205143 : public GameObjectScript
+{
+public:
+    go_abandoned_outhouse_205143() : GameObjectScript("go_abandoned_outhouse_205143") { }
+
+    enum eGameObject
+    {
+        QUEST_WAITING_TO_EXSANGUINATE = 27045,
+        SPELL_SUMMON_DEATHSTALKER_YORICK = 83751,
+    };
+
+    bool OnQuestAccept(Player* player, GameObject* go, Quest const* quest) 
+    { 
+        if (quest->GetQuestId() == QUEST_WAITING_TO_EXSANGUINATE)
+            player->CastSpell(1301.87f, 1189.36f, 52.1045f, SPELL_SUMMON_DEATHSTALKER_YORICK, true, 0, 0, player->GetGUID());
+
+        return false; 
+    }
+};
+
+// 44882 // quest 27045
+class npc_deathstalker_rane_yorick_44882 : public CreatureScript
+{
+public:
+    npc_deathstalker_rane_yorick_44882() : CreatureScript("npc_deathstalker_rane_yorick_44882") { }
+
+    enum eNPC
+    {
+        NPC_DEATHSTALKER_RANE_YORICK = 44882,
+        NPC_ARMOIRE_IN_ROOM = 44894,
+        NPC_ARMOIRE_SUMMONED = 44893,
+        NPC_PACKLEADER_IVAR_BLOODFANG = 44884,
+        SPELL_STEALTH = 34189,
+        SPELL_PERMANENT_FEIGN_DEATH = 29266,
+        WAYPOINTS_UP = 4488201,
+        MOVEPOINT_HIDDEN_PLACE = 1234,
+        EVENT_START_ANIM = 101,
+        EVENT_WAIT_ON_PLAYER,
+        EVENT_TALK_TO_PLAYER,
+        EVENT_HIDE,
+        EVENT_SET_FACE_TO_BLOODFANG,
+        EVENT_RANE_LAST_MOVE,
+        ACTION_RANE_JUMP_DEATH = 2,
+    };
+
+    struct npc_deathstalker_rane_yorick_44882AI : public ScriptedAI
+    {
+        npc_deathstalker_rane_yorick_44882AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+        EventMap m_events;
+        uint64   m_playerGUID;
+        uint64   m_bloodfangGUID;
+
+        void Initialize()
+        {
+            m_playerGUID = NULL;
+            m_bloodfangGUID = NULL;
+            m_events.Reset();
+        }
+
+        void IsSummonedBy(Unit* summoner) override 
+        { 
+            if (Player* player = summoner->ToPlayer())
+                m_playerGUID = player->GetGUID();
+            m_events.ScheduleEvent(EVENT_START_ANIM, 1000);
+        }
+
+        void MovementInform(uint32 type, uint32 id) override 
+        {
+            if (type == WAYPOINT_MOTION_TYPE)
+                switch (id)
+                {
+                case 1:
+                {
+                    Talk(0);
+                    break;
+                }
+                case 15:
+                {
+                    m_events.ScheduleEvent(EVENT_WAIT_ON_PLAYER, 1000);
+                    break;
+                }
+                }
+            if (type == POINT_MOTION_TYPE)
+                switch (id)
+                {
+                case MOVEPOINT_HIDDEN_PLACE:
+                {
+                    me->SetFacingTo(4.8f);
+                    break;
+                }
+                }
+        }
+
+        void DoAction(int32 param) override 
+        { 
+            switch (param)
+            {
+            case ACTION_RANE_JUMP_DEATH:
+                m_events.ScheduleEvent(EVENT_RANE_LAST_MOVE, 10);
+                break;
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_START_ANIM:
+                {
+                    me->GetMotionMaster()->MovePath(WAYPOINTS_UP, false);
+                    break;
+                }
+                case EVENT_WAIT_ON_PLAYER:
+                {
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                        if (abs(player->GetPositionZ() - me->GetPositionZ()) < 0.1f && player->GetDistance2d(me) < 5.0f)
+                            m_events.ScheduleEvent(EVENT_TALK_TO_PLAYER, 1000);
+                        else
+                            m_events.ScheduleEvent(EVENT_WAIT_ON_PLAYER, 1000);
+                    break;
+                }
+                case EVENT_TALK_TO_PLAYER:
+                {
+                    Talk(1);
+                    m_events.ScheduleEvent(EVENT_HIDE, 3000);
+                    m_events.ScheduleEvent(EVENT_SET_FACE_TO_BLOODFANG, 5000);
+                    break;
+                }
+                case EVENT_HIDE:
+                {
+                    me->GetMotionMaster()->MovePoint(MOVEPOINT_HIDDEN_PLACE, 1313.515f, 1212.22f, 58.4988f);
+                    me->CastSpell(me, SPELL_STEALTH);                   
+                    break;
+                }
+                case EVENT_SET_FACE_TO_BLOODFANG:
+                {
+                    if (!m_bloodfangGUID)
+                        if (Creature* ivar = me->FindNearestCreature(NPC_PACKLEADER_IVAR_BLOODFANG, 25.0f))
+                            m_bloodfangGUID = ivar->GetGUID();
+
+                    if (Creature* ivar = sObjectAccessor->GetCreature(*me, m_bloodfangGUID))
+                        me->SetFacingToObject(ivar);
+
+                    m_events.ScheduleEvent(EVENT_SET_FACE_TO_BLOODFANG, 1000);
+                    break;
+                }
+                case EVENT_RANE_LAST_MOVE:
+                {
+                    me->MonsterMoveWithSpeed(1299.025f, 1206.724f, 59.64236f, 5.0f);
+                    m_events.ScheduleEvent(EVENT_RANE_LAST_MOVE + 1, 1000);
+                    break;
+                }
+                case EVENT_RANE_LAST_MOVE + 1:
+                {
+                    me->SetDisableGravity(false);
+                    me->AddAura(SPELL_PERMANENT_FEIGN_DEATH, me);
+                    me->DespawnOrUnsummon(60000);
+                    break;
+                }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_deathstalker_rane_yorick_44882AI(creature);
+    }
+};
+
+// 44893 // quest 27045
+class npc_armoire_44893 : public CreatureScript
+{
+public:
+    npc_armoire_44893() : CreatureScript("npc_armoire_44893") { }
+
+    enum eNPC
+    {
+        NPC_RANE_YORICK = 44882,
+        NPC_LORD_DARIUS_CROWLEY = 44883,
+        NPC_PACKLEADER_IVAR_BLOODFANG = 44884,
+        PLAYER_GUID = 99999,
+        MOVEPATH_DARIUS = 4488301,
+        MOVEPATH_IVAR = 4488401,
+        QUEST_WAITING_TO_EXSANGUINATE = 27045,
+        SPELL_STEALTH = 34189,
+        SPELL_PERMANENT_FEIGN_DEATH = 29266,
+        SPELL_EJECT_PASSENGER_1 = 80743,
+        SPELL_SUMMON_CROWLEY = 83752,
+        SPELL_SUMMON_BLOODFANG = 83753,
+        SPELL_SUMMON_CROWLEY_BLOODFANG_MASTER = 83762, // for spell effect 160 is no handler written in core
+        SPELL_ARMOIRE_CAMERA_A = 83763,
+        SPELL_ARMOIRE_CAMERA_B = 83764,
+        SPELL_ARMOIRE_CAMERA_C = 83768,
+        SPELL_ARMOIRE_CAMERA_D = 83769,
+        SPELL_CONVERSATION_TRIGGER_01A = 83773,
+        SPELL_CONVERSATION_TRIGGER_01B = 83774,
+        SPELL_CONVERSATION_TRIGGER_01C = 83782,
+        SPELL_CONVERSATION_TRIGGER_02A = 83775,
+        SPELL_CONVERSATION_TRIGGER_02B = 83777,
+        SPELL_CONVERSATION_TRIGGER_02C = 83779,
+        SPELL_CONVERSATION_TRIGGER_02D = 83955,
+        SPELL_CONVERSATION_TRIGGER_03 = 83787,
+        SPELL_CONVERSATION_TRIGGER_04 = 83784,
+        SPELL_REVERSE_RIDE_VEHICLE = 83781,
+        SPELL_KILL_CREDIT_YORICK = 83786,
+        SPELL_HIDE_IN_ARMOIRE = 83788,
+        SPELL_DESPAWN_ALL = 83770,
+        ACTION_MOVE_TO_RANA = 500,
+        ACTION_RANE_JUMP_DEATH = 2,
+        EVENT_START_ANIMATION = 101,
+        EVENT_CAMERA_STEP = 200,
+        EVENT_TEXT_STEP = 300,
+    };
+
+    struct npc_armoire_44893AI : public VehicleAI
+    {
+        npc_armoire_44893AI(Creature* creature) : VehicleAI(creature) { Initialize(); }
+
+        EventMap m_events;
+        uint64 m_playerGUID;
+        uint64 m_raneGUID;
+        uint64 m_crowleyGUID;
+        uint64 m_bloodfangGUID;
+        
+        void Initialize()
+        {
+            m_playerGUID = NULL;
+            m_raneGUID = NULL;
+            m_crowleyGUID = NULL;
+            m_bloodfangGUID = NULL;
+            m_events.Reset();
+        }
+
+        void IsSummonedBy(Unit* summoner) override
+        {
+            if (Player* player = summoner->ToPlayer())
+                if (player->GetQuestStatus(QUEST_WAITING_TO_EXSANGUINATE) == QUEST_STATUS_INCOMPLETE)
+                    if (Vehicle* vehicle = me->GetVehicleKit())
+                        m_playerGUID = player->GetGUID();                        
+        }
+
+        void PassengerBoarded(Unit* passenger, int8 seatId, bool apply) override
+        {
+            if (apply)
+            {
+                if (Player* player = passenger->ToPlayer())
+                    if (player->GetQuestStatus(QUEST_WAITING_TO_EXSANGUINATE) == QUEST_STATUS_INCOMPLETE)
+                    {
+                        m_playerGUID = player->GetGUID();
+                        m_events.ScheduleEvent(EVENT_START_ANIMATION, 2000);
+                        return;
+                    }
+            }
+            else
+            {
+                if (Creature* darius = sObjectAccessor->GetCreature(*me, m_crowleyGUID))
+                    darius->DespawnOrUnsummon(1000);
+                if (Creature* ivar = sObjectAccessor->GetCreature(*me, m_bloodfangGUID))
+                    ivar->DespawnOrUnsummon(1000);
+                if (Creature* rane = sObjectAccessor->GetCreature(*me, m_raneGUID))
+                    rane->DespawnOrUnsummon(1000);
+                me->DespawnOrUnsummon(1000);
+            }
+
+            m_playerGUID = NULL;
+        }
+
+        void SetGUID(uint64 guid, int32 id) override
+        {
+            switch (id)
+            {
+            case PLAYER_GUID:
+                m_playerGUID = guid;
+                break;
+            case NPC_LORD_DARIUS_CROWLEY:
+                m_crowleyGUID = guid;
+                break;
+            case NPC_PACKLEADER_IVAR_BLOODFANG:
+                m_bloodfangGUID = guid;
+                break;
+            }
+        }
+
+        void EnterEvadeMode() override {}
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+            
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_START_ANIMATION:
+                {
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                    {
+                        player->CastSpell(player, SPELL_SUMMON_CROWLEY_BLOODFANG_MASTER, true);
+                        m_events.ScheduleEvent(EVENT_START_ANIMATION + 1, 2000);
+                        m_events.ScheduleEvent(EVENT_CAMERA_STEP + 1, 4000);
+                    }
+                    break;
+                }
+                case EVENT_START_ANIMATION + 1:
+                {
+                    if (Creature* darius = sObjectAccessor->GetCreature(*me, m_crowleyGUID))
+                        darius->GetMotionMaster()->MovePath(MOVEPATH_DARIUS, false);
+                    if (Creature* ivar = sObjectAccessor->GetCreature(*me, m_bloodfangGUID))
+                        ivar->GetMotionMaster()->MovePath(MOVEPATH_IVAR, false);
+                    if (Creature* rane = me->FindNearestCreature(NPC_RANE_YORICK, 15.0f))
+                        m_raneGUID = rane->GetGUID();
+                    break;
+                }
+                case EVENT_CAMERA_STEP + 1:
+                {
+                    if (Creature* rane = sObjectAccessor->GetCreature(*me, m_raneGUID))
+                        me->CastSpell(rane->GetPositionX(), rane->GetPositionY(), rane->GetPositionZ(), SPELL_CONVERSATION_TRIGGER_02D, true);
+
+                    m_events.ScheduleEvent(EVENT_CAMERA_STEP + 2, 16250);
+                    m_events.ScheduleEvent(EVENT_TEXT_STEP + 1, 11500);
+                    break;
+                }
+                case EVENT_CAMERA_STEP + 2:
+                {
+                    if (Creature* darius = sObjectAccessor->GetCreature(*me, m_crowleyGUID))
+                        if (Creature* ivar = sObjectAccessor->GetCreature(*me, m_bloodfangGUID))
+                            darius->CastSpell(ivar->GetPositionX(), ivar->GetPositionY(), ivar->GetPositionZ(), SPELL_CONVERSATION_TRIGGER_01A, true);
+
+                    m_events.ScheduleEvent(EVENT_CAMERA_STEP + 3, 12000);
+                    m_events.ScheduleEvent(EVENT_TEXT_STEP + 2, 3700);
+                    break;
+                }
+                case EVENT_CAMERA_STEP + 3:
+                {
+                    if (Creature* darius = sObjectAccessor->GetCreature(*me, m_crowleyGUID))
+                        if (Creature* ivar = sObjectAccessor->GetCreature(*me, m_bloodfangGUID))
+                            ivar->CastSpell(darius->GetPositionX(), darius->GetPositionY(), darius->GetPositionZ(), SPELL_CONVERSATION_TRIGGER_01B, true);
+
+                    m_events.ScheduleEvent(EVENT_CAMERA_STEP + 4, 19250);
+                    m_events.ScheduleEvent(EVENT_TEXT_STEP + 3, 3700);
+                    m_events.ScheduleEvent(EVENT_TEXT_STEP + 4, 12000);
+                    break;
+                }
+                case EVENT_CAMERA_STEP + 4:
+                {
+                    if (Creature* darius = sObjectAccessor->GetCreature(*me, m_crowleyGUID))
+                        if (Creature* ivar = sObjectAccessor->GetCreature(*me, m_bloodfangGUID))
+                            darius->CastSpell(ivar->GetPositionX(), ivar->GetPositionY(), ivar->GetPositionZ(), SPELL_CONVERSATION_TRIGGER_02A, true);
+
+                    m_events.ScheduleEvent(EVENT_CAMERA_STEP + 5, 18100);
+                    m_events.ScheduleEvent(EVENT_TEXT_STEP + 5, 3700);
+                    m_events.ScheduleEvent(EVENT_TEXT_STEP + 6, 7300);
+                    m_events.ScheduleEvent(EVENT_TEXT_STEP + 7, 9800);
+                    break;
+                }
+                case EVENT_CAMERA_STEP + 5:
+                {
+                    if (Creature* darius = sObjectAccessor->GetCreature(*me, m_crowleyGUID))
+                        if (Creature* ivar = sObjectAccessor->GetCreature(*me, m_bloodfangGUID))
+                            ivar->CastSpell(darius->GetPositionX(), darius->GetPositionY(), darius->GetPositionZ(), SPELL_CONVERSATION_TRIGGER_02B, true);
+
+                    m_events.ScheduleEvent(EVENT_CAMERA_STEP + 6, 4800);
+                    m_events.ScheduleEvent(EVENT_TEXT_STEP + 8, 2500);
+                    break;
+                }
+                case EVENT_CAMERA_STEP + 6:
+                {
+                    if (Creature* darius = sObjectAccessor->GetCreature(*me, m_crowleyGUID))
+                        if (Creature* ivar = sObjectAccessor->GetCreature(*me, m_bloodfangGUID))
+                            darius->CastSpell(ivar->GetPositionX(), ivar->GetPositionY(), ivar->GetPositionZ(), SPELL_CONVERSATION_TRIGGER_02C, true);
+
+                    m_events.ScheduleEvent(EVENT_CAMERA_STEP + 7, 30000);
+                    m_events.ScheduleEvent(EVENT_TEXT_STEP + 9, 3700);
+                    m_events.ScheduleEvent(EVENT_TEXT_STEP + 10, 7300);
+                    m_events.ScheduleEvent(EVENT_TEXT_STEP + 11, 12100);
+                    m_events.ScheduleEvent(EVENT_TEXT_STEP + 12, 20500);
+                    m_events.ScheduleEvent(EVENT_TEXT_STEP + 13, 26600);
+                    break;
+                }
+                case EVENT_CAMERA_STEP + 7:
+                {
+                    if (Creature* rane = sObjectAccessor->GetCreature(*me, m_raneGUID))
+                        if (Creature* ivar = sObjectAccessor->GetCreature(*me, m_bloodfangGUID))
+                        {
+                            ivar->CastSpell(rane->GetPositionX(), rane->GetPositionY(), rane->GetPositionZ(), SPELL_CONVERSATION_TRIGGER_01C, true);
+                            rane->RemoveAura(SPELL_STEALTH);
+                            rane->SetDisableGravity(true);
+                            rane->EnterVehicle(ivar, 0);
+                        }
+
+                    m_events.ScheduleEvent(EVENT_CAMERA_STEP + 8, 3600);
+                    m_events.ScheduleEvent(EVENT_TEXT_STEP + 14, 500);
+                    break;
+                }
+                case EVENT_CAMERA_STEP + 8:
+                {
+                    if (Creature* rane = sObjectAccessor->GetCreature(*me, m_raneGUID))
+                        if (Creature* ivar = sObjectAccessor->GetCreature(*me, m_bloodfangGUID))
+                        {
+                            rane->CastSpell(ivar->GetPositionX(), ivar->GetPositionY(), ivar->GetPositionZ(), SPELL_CONVERSATION_TRIGGER_04, true);
+                            //ivar->CastSpell(ivar, SPELL_EJECT_PASSENGER_1);
+                            rane->ExitVehicle(0);
+                            rane->GetAI()->DoAction(ACTION_RANE_JUMP_DEATH);
+                        }
+
+                    m_events.ScheduleEvent(EVENT_CAMERA_STEP + 9, 14500);
+                    m_events.ScheduleEvent(EVENT_TEXT_STEP + 15, 1500);
+                    m_events.ScheduleEvent(EVENT_TEXT_STEP + 16, 7400);
+                    break;
+                }
+                case EVENT_CAMERA_STEP + 9:
+                {
+                    if (Creature* darius = sObjectAccessor->GetCreature(*me, m_crowleyGUID))
+                        if (Creature* ivar = sObjectAccessor->GetCreature(*me, m_bloodfangGUID))
+                            ivar->CastSpell(darius->GetPositionX(), darius->GetPositionY(), darius->GetPositionZ(), SPELL_CONVERSATION_TRIGGER_03, true);
+
+                    m_events.ScheduleEvent(EVENT_CAMERA_STEP + 10, 6000);
+                    break;
+                }
+                case EVENT_CAMERA_STEP + 10:
+                {
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                    {
+                        if (Creature* darius = sObjectAccessor->GetCreature(*me, m_crowleyGUID))
+                            darius->GetAI()->DoAction(ACTION_MOVE_TO_RANA);
+                        if (Creature* ivar = sObjectAccessor->GetCreature(*me, m_bloodfangGUID))
+                            ivar->GetAI()->DoAction(ACTION_MOVE_TO_RANA);
+
+                        player->RemoveAura(SPELL_HIDE_IN_ARMOIRE);
+                        player->GetMotionMaster()->Clear();
+                        //player->GetMotionMaster()->MovePoint(1231, 1313.48f, 1206.09f, 58.5119f);
+                    }
+
+                    m_events.ScheduleEvent(EVENT_CAMERA_STEP + 11, 1000);
+                    break;
+                }
+                case EVENT_CAMERA_STEP + 11:
+                {
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                        if (Creature* darius = sObjectAccessor->GetCreature(*me, m_crowleyGUID))
+                            darius->CastSpell(player, SPELL_KILL_CREDIT_YORICK);
+
+                    me->CastSpell(me, SPELL_DESPAWN_ALL);
+                    me->DespawnOrUnsummon(10);
+                    break;
+                }
+                case EVENT_TEXT_STEP + 1:
+                    if (Creature* crowley = sObjectAccessor->GetCreature(*me, m_crowleyGUID))
+                        crowley->AI()->Talk(0);
+                    break;
+                case EVENT_TEXT_STEP + 2:
+                    if (Creature* ivar = sObjectAccessor->GetCreature(*me, m_bloodfangGUID))
+                        ivar->AI()->Talk(0);
+                    break;
+                case EVENT_TEXT_STEP + 3:
+                    if (Creature* crowley = sObjectAccessor->GetCreature(*me, m_crowleyGUID))
+                        crowley->AI()->Talk(1);
+                    break;
+                case EVENT_TEXT_STEP + 4:
+                    if (Creature* crowley = sObjectAccessor->GetCreature(*me, m_crowleyGUID))
+                        crowley->AI()->Talk(2);
+                    break;
+                case EVENT_TEXT_STEP + 5:
+                    if (Creature* ivar = sObjectAccessor->GetCreature(*me, m_bloodfangGUID))
+                        ivar->AI()->Talk(1);
+                    break;
+                case EVENT_TEXT_STEP + 6:
+                    if (Creature* ivar = sObjectAccessor->GetCreature(*me, m_bloodfangGUID))
+                        ivar->AI()->Talk(2);
+                    break;
+                case EVENT_TEXT_STEP + 7:
+                    if (Creature* ivar = sObjectAccessor->GetCreature(*me, m_bloodfangGUID))
+                        ivar->AI()->Talk(3);
+                    break;
+                case EVENT_TEXT_STEP + 8:
+                    if (Creature* crowley = sObjectAccessor->GetCreature(*me, m_crowleyGUID))
+                        crowley->AI()->Talk(3);
+                    break;
+                case EVENT_TEXT_STEP + 9:
+                    if (Creature* ivar = sObjectAccessor->GetCreature(*me, m_bloodfangGUID))
+                        ivar->AI()->Talk(4);
+                    break;
+                case EVENT_TEXT_STEP + 10:
+                    if (Creature* ivar = sObjectAccessor->GetCreature(*me, m_bloodfangGUID))
+                        ivar->AI()->Talk(5);
+                    break;
+                case EVENT_TEXT_STEP + 11:
+                    if (Creature* ivar = sObjectAccessor->GetCreature(*me, m_bloodfangGUID))
+                        ivar->AI()->Talk(6);
+                    break;
+                case EVENT_TEXT_STEP + 12:
+                    if (Creature* ivar = sObjectAccessor->GetCreature(*me, m_bloodfangGUID))
+                        ivar->AI()->Talk(7);
+                    break;
+                case EVENT_TEXT_STEP + 13:
+                    if (Creature* ivar = sObjectAccessor->GetCreature(*me, m_bloodfangGUID))
+                        ivar->AI()->Talk(8);
+                    break;
+                case EVENT_TEXT_STEP + 14:
+                    if (Creature* rane = sObjectAccessor->GetCreature(*me, m_raneGUID))
+                        rane->AI()->Talk(2);
+                    break;
+                case EVENT_TEXT_STEP + 15:
+                    if (Creature* ivar = sObjectAccessor->GetCreature(*me, m_bloodfangGUID))
+                        ivar->AI()->Talk(9);
+                    break;
+                case EVENT_TEXT_STEP + 16:
+                    if (Creature* ivar = sObjectAccessor->GetCreature(*me, m_bloodfangGUID))
+                        ivar->AI()->Talk(10);
+                    break;
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_armoire_44893AI(creature);
+    }
+};
+
+// 44894 // quest 27045
+class npc_armoire_44894 : public CreatureScript
+{
+public:
+    npc_armoire_44894() : CreatureScript("npc_armoire_44894") { }
+
+    enum eNPC
+    {
+        NPC_DEATHSTALKER_RANE_YORICK = 44882,
+        QUEST_WAITING_TO_EXSANGUINATE = 27045,
+        SPELL_HIDE_IN_ARMOIRE = 83788,
+        SPELL_SUMMON_HIDING_SPOT = 83756,
+    };
+
+    struct npc_armoire_44894AI : public ScriptedAI
+    {
+        npc_armoire_44894AI(Creature* creature) : ScriptedAI(creature) { }
+
+        void OnSpellClick(Unit* clicker, bool& result) override
+        {
+            if (Player* player = clicker->ToPlayer())
+                if (player->GetQuestStatus(QUEST_WAITING_TO_EXSANGUINATE) == QUEST_STATUS_INCOMPLETE)
+                    if (Creature* rane = me->FindNearestCreature(NPC_DEATHSTALKER_RANE_YORICK, 5.0f))
+                    {
+                        player->CastSpell(me, SPELL_HIDE_IN_ARMOIRE, true);
+                        player->CastSpell(1314.91f, 1211.39f, 58.49675f, SPELL_SUMMON_HIDING_SPOT, true);
+                        return;
+                    }
+
+            result = false;
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_armoire_44894AI(creature);
+    }
+};
+
+// 44883 // quest 27045
+class npc_lord_darius_crowley_44883 : public CreatureScript
+{
+public:
+    npc_lord_darius_crowley_44883() : CreatureScript("npc_lord_darius_crowley_44883") { }
+
+    enum eNPC
+    {
+        NPC_ARMOIRE = 44893,
+        NPC_PACKLEADER_IVAR_BLOODFANG = 44884,
+        EVENTS_TURN_FACE,
+        ACTION_MOVE_TO_RANA = 500,
+    };
+
+    struct npc_lord_darius_crowley_44883AI : public ScriptedAI
+    {
+        npc_lord_darius_crowley_44883AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+        EventMap m_events;
+        uint64   m_playerGUID;
+        uint64   m_armoireGUID;
+        uint64   m_bloodfangGUID;
+
+        void Initialize()
+        {
+            m_events.Reset();
+            m_playerGUID = NULL;
+            m_armoireGUID = NULL;
+            m_bloodfangGUID = NULL;
+        }
+
+        void Reset() override
+        {
+            me->SetReactState(REACT_PASSIVE);
+        }
+
+        void IsSummonedBy(Unit* summoner) override
+        {
+            if (Player* player = summoner->ToPlayer())
+                m_playerGUID = player->GetGUID();
+
+            FindAllGuid();
+        }
+
+        void MovementInform(uint32 type, uint32 id) override 
+        { 
+            FindAllGuid();
+            if (type == WAYPOINT_MOTION_TYPE)
+                if (id == 5)
+                    m_events.ScheduleEvent(EVENTS_TURN_FACE, 250);
+
+            if (type == POINT_MOTION_TYPE && id == 1230)
+                me->DespawnOrUnsummon(1000);
+        }
+
+        void DoAction(int32 param) override
+        {
+            switch (param)
+            {
+            case ACTION_MOVE_TO_RANA:
+            {
+                me->SetSpeed(MOVE_WALK, 1.0f);
+                me->GetMotionMaster()->MovePoint(1230, 1299.025f, 1206.724f, 59.64236f);
+                break;
+            }
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENTS_TURN_FACE:
+                {
+                    if (Creature* ivar = sObjectAccessor->GetCreature(*me, m_bloodfangGUID))
+                        me->SetFacingToObject(ivar);
+                    break;
+                }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+
+        void FindAllGuid()
+        {
+            if (!m_bloodfangGUID)
+                if (Creature* ivar = me->FindNearestCreature(NPC_PACKLEADER_IVAR_BLOODFANG, 30.0f))
+                    m_bloodfangGUID = ivar->GetGUID();
+
+            if (!m_armoireGUID)
+                if (Creature* armoire = me->FindNearestCreature(NPC_ARMOIRE, 30.0f))
+                {
+                    m_armoireGUID = armoire->GetGUID();
+                    armoire->GetAI()->SetGUID(me->GetGUID(), me->GetEntry());
+                }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_lord_darius_crowley_44883AI(creature);
+    }
+};
+
+// 44884  // quest 27045
+class npc_packleader_ivar_bloodfang_44884 : public CreatureScript
+{
+public:
+    npc_packleader_ivar_bloodfang_44884() : CreatureScript("npc_packleader_ivar_bloodfang_44884") { }
+
+    enum eNPC
+    {
+        NPC_ARMOIRE = 44893,
+        ACTION_MOVE_TO_RANA = 500,
+    };
+
+    struct npc_packleader_ivar_bloodfang_44884AI : public ScriptedAI
+    {
+        npc_packleader_ivar_bloodfang_44884AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+        EventMap m_events;
+        uint64   m_playerGUID;
+        uint64   m_armoireGUID;
+
+        void Initialize()
+        {
+            m_playerGUID = NULL;
+        }
+
+        void Reset() override
+        {
+            me->SetReactState(REACT_PASSIVE);
+        }
+
+        void IsSummonedBy(Unit* summoner) override
+        {
+            if (Player* player = summoner->ToPlayer())
+                m_playerGUID = player->GetGUID();
+            if (Creature* armoire = me->FindNearestCreature(NPC_ARMOIRE, 30.0f))
+            {
+                m_armoireGUID = armoire->GetGUID();
+                armoire->GetAI()->SetGUID(me->GetGUID(), me->GetEntry());
+            }
+        }
+
+        void MovementInform(uint32 type, uint32 id) override
+        {
+            if (type == POINT_MOTION_TYPE && id == 1230)
+                me->DespawnOrUnsummon(1000);
+        }
+
+        void DoAction(int32 param) override
+        {
+            switch (param)
+            {
+            case ACTION_MOVE_TO_RANA:
+            {
+                me->SetSpeed(MOVE_WALK, 1.0f);
+                me->GetMotionMaster()->MovePoint(1230, 1299.025f, 1206.724f, 59.64236f);
+                break;
+            }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_packleader_ivar_bloodfang_44884AI(creature);
+    }
+};
+
 
 
 void AddSC_silverpine_forest()
@@ -1210,5 +1966,11 @@ void AddSC_silverpine_forest()
     new npc_forsaken_trooper_44791();
     new npc_bat_handler_maggotbreath_44825();
     new npc_forsaken_bat_44821();
-
+    new go_abandoned_outhouse_205143();
+    new npc_deathstalker_rane_yorick_44882();
+    new npc_armoire_44893();
+    new npc_armoire_44894();
+    new npc_lord_darius_crowley_44883();
+    new npc_packleader_ivar_bloodfang_44884();
+   
 }
