@@ -349,6 +349,7 @@ class Spell
         void EffectGiveCurrency(SpellEffIndex effIndex);
         void EffectResurrectWithAura(SpellEffIndex effIndex);
         void EffectCreateAreaTrigger(SpellEffIndex effIndex);
+        void EffectTriggerSpell_160(SpellEffIndex effIndex);
 
         typedef std::set<Aura*> UsedSpellMods;
 
