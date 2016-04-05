@@ -615,7 +615,6 @@ bool SpellEffectInfo::HasMaxRadius() const
 
 float SpellEffectInfo::CalcRadius(bool positive, Unit* caster, Spell* spell) const
 {
-    const SpellRadiusEntry* entry = RadiusEntry;
     if (!HasRadius()) // Use for ANY non-radius spell. Define radius here.
     {
         switch(_spellInfo->Id)
@@ -654,7 +653,7 @@ float SpellEffectInfo::CalcRadius(bool positive, Unit* caster, Spell* spell) con
                 return 15.0f;
             case 73309: // Lilian's Death Grip 
             case 82676: // Ring of Frost
-            case 83173: // Raise Forsaken
+            case 83173: // Raise Forsaken            
             case 97463: // Ralling cry
                 return 30.0f;            
             case 70541: // LK Infest
@@ -1032,21 +1031,30 @@ float SpellEffectInfo::CalcRadius(bool positive, Unit* caster, Spell* spell) con
             case 103414: // Morchok Stomp.
                 return 25.0f;
             case 103785: // Morchok Black Blood.
-                return 150.0f;
-            default:
-                return 0.0f;
-            break;
+                return 150.0f;            
         }
     }
+
+    const SpellRadiusEntry* entry = RadiusEntry;
+    if (!HasRadius() && HasMaxRadius())
+        entry = MaxRadiusEntry;
 
     if (!entry)
         return 0.0f;
 
     float radius;
     if (positive)
-        radius = RadiusEntry->RadiusMax;
+        radius = entry->RadiusMax;
     else
-        radius = RadiusEntry->RadiusMin;
+    {
+        radius = entry->RadiusMin;
+        if (caster)
+        {
+            radius += entry->RadiusPerLevel * caster->getLevel();
+            radius = std::min(radius, entry->RadiusMax);
+        }
+    }
+
     if (caster)
         if (Player* modOwner = caster->GetSpellModOwner())
             modOwner->ApplySpellMod(_spellInfo->Id, SPELLMOD_RADIUS, radius, spell);
