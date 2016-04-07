@@ -135,7 +135,7 @@ public:
     }
 };
 
-// 44615
+// 44615 // quest 26965
 class npc_grand_executor_mortuus_44615 : public CreatureScript
 {
 public:
@@ -547,7 +547,7 @@ public:
     }
 };
 
-// 83173
+// 83173 // quest 26965
 class spell_raise_forsaken_83173 : public SpellScriptLoader
 {
 public:
@@ -641,7 +641,7 @@ public:
     }
 };
 
-// 83149
+// 83149 // quest 26965
 class spell_forsaken_trooper_master_script_83149 : public SpellScriptLoader
 {
 public:
@@ -687,7 +687,7 @@ public:
     }
 };
 
-// 44592 44593
+// 44592 44593 // quest 26965
 class npc_fallen_human_44592 : public CreatureScript
 {
 public:
@@ -1953,6 +1953,613 @@ public:
     }
 };
 
+// 44365  // quest 27065
+class npc_lady_sylvanas_windrunner_44365 : public CreatureScript
+{
+public:
+    npc_lady_sylvanas_windrunner_44365() : CreatureScript("npc_lady_sylvanas_windrunner_44365") { }
+
+    enum eNPC
+    {
+        QUEST_THE_WARCHIEFS_FLEET_27065 = 27065,
+        SPELL_SEE_QUEST_INVIS_5 = 84241,
+    };
+
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    {
+        if (quest->GetQuestId() == QUEST_THE_WARCHIEFS_FLEET_27065)
+        {
+            player->AddAura(SPELL_SEE_QUEST_INVIS_5, player);
+        }
+
+        return false;
+    }
+};
+
+// 44914  // quest 27069
+class npc_orc_sea_pup_44914 : public CreatureScript
+{
+public:
+    npc_orc_sea_pup_44914() : CreatureScript("npc_orc_sea_pup_44914") { }
+
+    enum eNPC
+    {
+        QUEST_STEEL_THUNDER = 27069,
+        NPC_ORC_CRATE = 44915,
+        SPELL_SUMMON_ORC_CRATE = 83835,
+        SPELL_PICK_UP_ORC_CRATE = 83838,
+        SPELL_DESPAWN_ALL = 83840,
+        SPELL_CREDIT = 83843,
+        EVENT_TALK_TO_PLAYER = 100,
+        EVENT_CHECK_PLAYER_ALIVE,
+    };
+
+    struct npc_orc_sea_pup_44914AI : public VehicleAI
+    {
+        npc_orc_sea_pup_44914AI(Creature* creature) : VehicleAI(creature) { Initialize(); }
+
+        EventMap m_events;
+        uint64 m_playerGUID;
+        bool   m_IsFull;
+
+        void Initialize()
+        {
+            m_playerGUID = NULL;
+            m_IsFull = false;
+        }
+
+        void Reset() override
+        {
+            m_events.Reset();
+        }
+
+        void IsSummonedBy(Unit* summoner) override
+        {
+            if (Player* player = summoner->ToPlayer())
+                if (player->GetQuestStatus(QUEST_STEEL_THUNDER) == QUEST_STATUS_INCOMPLETE)
+                {
+                    Talk(0);
+                    m_playerGUID = player->GetGUID();
+                    me->GetMotionMaster()->MoveFollow(player, 3.0f, M_PI);
+                    m_events.ScheduleEvent(EVENT_CHECK_PLAYER_ALIVE, 1000);
+                    int c = player->GetReqKillOrCastCurrentCount(QUEST_STEEL_THUNDER, NPC_ORC_CRATE);
+                    for (int i = 0; i < c; i++)
+                        me->CastSpell(me, SPELL_SUMMON_ORC_CRATE, true);
+                }
+        }
+
+        void PassengerBoarded(Unit* passenger, int8 seatId, bool apply) 
+        { 
+            if (passenger->GetEntry() == NPC_ORC_CRATE)
+                if (apply)
+                {
+                    Talk(seatId + 1);
+                    if (seatId == 4)
+                    {
+                        m_IsFull = true;
+                        m_events.ScheduleEvent(EVENT_TALK_TO_PLAYER, 1000);
+                    }
+                }
+                else
+                {
+                    if (Creature* crate = passenger->ToCreature())
+                        crate->DespawnOrUnsummon(6000);
+                }
+        }
+
+        void JustSummoned(Creature* summon) override 
+        { 
+            if (summon->GetEntry() == NPC_ORC_CRATE)
+                if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                    summon->EnterVehicle(me, -1);
+        }
+
+        void SpellHit(Unit* caster, SpellInfo const* spell) 
+        { 
+            if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                if (spell->Id == SPELL_PICK_UP_ORC_CRATE)
+                {
+                    me->CastSpell(me, SPELL_SUMMON_ORC_CRATE, true);
+                    me->CastSpell(player, SPELL_CREDIT);
+                }
+        }
+
+        void DoAction(int32 param) override 
+        { 
+            if (param == 2)
+            {
+                m_events.CancelEvent(EVENT_TALK_TO_PLAYER);
+                Talk(6);
+                me->GetVehicleKit()->RemoveAllPassengers();
+                me->DespawnOrUnsummon(6000);
+            }
+            else if (param == 3)
+                if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                    player->CastSpell(player, SPELL_DESPAWN_ALL);
+        }
+
+        void EnterEvadeMode() override {}
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_TALK_TO_PLAYER:
+                {
+                    Talk(7);
+                    m_events.ScheduleEvent(EVENT_TALK_TO_PLAYER, urand(10000, 20000));
+                    break;
+                }
+                case EVENT_CHECK_PLAYER_ALIVE:
+                {
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                        if (player->IsAlive() && player->IsInWorld())
+                        {
+                            m_events.ScheduleEvent(EVENT_CHECK_PLAYER_ALIVE, 1000);
+                            break;
+                        }
+                    
+                    me->GetVehicleKit()->RemoveAllPassengers();
+                    me->DespawnOrUnsummon(10);
+                    break;
+                }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_orc_sea_pup_44914AI(creature);
+    }
+};
+
+// 44916  // quest 27069
+class npc_admiral_hatchet_44916 : public CreatureScript
+{
+public:
+    npc_admiral_hatchet_44916() : CreatureScript("npc_admiral_hatchet_44916") { }
+
+    enum eNPC
+    {
+        QUEST_STEEL_THUNDER = 27069,
+        NPC_WARLORD_TOROK =  44917,
+        NPC_SEA_PUP = 44914,
+        SPELL_SUMMON_SEA_PUP = 83839,
+        SPELL_SEA_PUP_TRIGGER = 83865,
+        EVENT_CHECK_TALK = 100,
+        EVENT_TALK_COOLDOWN = 101,
+        EVENT_TALK = 200,
+    };
+
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action) 
+    { 
+        if (player->GetQuestStatus(QUEST_STEEL_THUNDER) == QUEST_STATUS_INCOMPLETE)
+            if (creature->FindNearestCreature(NPC_SEA_PUP, 10.0f) == 0)
+                if (action == 1)
+                {
+                    player->CastSpell(player, SPELL_SEA_PUP_TRIGGER);
+                    player->CLOSE_GOSSIP_MENU();
+                    return true;
+                }
+
+        return false; 
+    }
+
+    bool OnQuestReward(Player* /*player*/, Creature* creature, Quest const* quest, uint32 /*opt*/) 
+    { 
+        if (quest->GetQuestId() == QUEST_STEEL_THUNDER)
+            if (Creature* pup = creature->FindNearestCreature(NPC_SEA_PUP, 10.0f))
+                pup->GetAI()->DoAction(2);
+
+        return false; 
+    }
+
+    struct npc_admiral_hatchet_44916AI : public ScriptedAI
+    {
+        npc_admiral_hatchet_44916AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+        EventMap m_events;
+        uint64   m_playerGUID;
+        uint64   m_torokGUID;
+
+        void Initialize()
+        {
+            m_playerGUID = NULL;
+            m_torokGUID = NULL;
+        }
+
+        void Reset() override
+        {
+            m_events.Reset();
+            m_events.ScheduleEvent(EVENT_CHECK_TALK, 1000);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_CHECK_TALK:
+                {
+                    CheckForGUID();
+                    if (Player* player = me->FindNearestPlayer(30.0f))
+                    {
+                        m_playerGUID = player->GetGUID();
+                        m_events.ScheduleEvent(EVENT_TALK + 1, 1000);
+                        m_events.ScheduleEvent(EVENT_TALK_COOLDOWN, 90000);
+
+                    }
+                    else
+                    {
+                        m_playerGUID = NULL;
+                        m_events.ScheduleEvent(EVENT_CHECK_TALK, 1000);
+                    }
+                    break;
+                }
+                case EVENT_TALK_COOLDOWN:
+                {
+                    Reset();
+                    break;
+                }
+                case EVENT_TALK + 1:
+                {
+                    Talk(0);
+                    m_events.ScheduleEvent(EVENT_TALK + 2, 8000);
+                    break;
+                }
+                case EVENT_TALK + 2:
+                {
+                    if (Creature* torok = sObjectAccessor->GetCreature(*me, m_torokGUID))
+                        torok->AI()->Talk(0);
+                    m_events.ScheduleEvent(EVENT_TALK + 3, 6000);
+                    break;
+                }
+                case EVENT_TALK + 3:
+                {
+                    Talk(1);
+                    m_events.ScheduleEvent(EVENT_TALK + 4, 6000);
+                    break;
+                }
+                case EVENT_TALK + 4:
+                {
+                    if (Creature* torok = sObjectAccessor->GetCreature(*me, m_torokGUID))
+                        torok->AI()->Talk(1);
+                    break;
+                }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+
+        void CheckForGUID()
+        {
+            if (!m_torokGUID)
+                if (Creature* torok = me->FindNearestCreature(NPC_WARLORD_TOROK, 30.0f))
+                    m_torokGUID = torok->GetGUID();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_admiral_hatchet_44916AI(creature);
+    }
+};
+
+// 45498  // conversation
+class npc_salty_rocka_45498 : public CreatureScript
+{
+public:
+    npc_salty_rocka_45498() : CreatureScript("npc_salty_rocka_45498") { }
+
+    enum eNPC
+    {
+        NPC_GORGAR = 45497,
+        NPC_ROCKA = 45498,
+        EVENT_CHECK_TALK = 100,
+        EVENT_TALK_COOLDOWN = 101,
+        EVENT_TALK = 200,
+    };
+
+    struct npc_salty_rocka_45498AI : public ScriptedAI
+    {
+        npc_salty_rocka_45498AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+        EventMap m_events;
+        uint64   m_playerGUID;
+        uint64   m_gorgarGUID;
+
+        void Initialize()
+        {           
+            m_gorgarGUID = NULL;
+        }
+
+        void Reset() override
+        {
+            m_events.Reset();
+            m_events.ScheduleEvent(EVENT_CHECK_TALK, 1000);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_CHECK_TALK:
+                {
+                    CheckForGUID();
+                    if (Player* player = me->FindNearestPlayer(30.0f))
+                    {
+                        m_playerGUID = player->GetGUID(); 
+                        m_events.ScheduleEvent(EVENT_TALK + 1, 1000);
+                        m_events.ScheduleEvent(EVENT_TALK_COOLDOWN, 120000);
+
+                    }
+                    else
+                    {
+                        m_playerGUID = NULL;
+                        m_events.ScheduleEvent(EVENT_CHECK_TALK, 1000);
+                    }
+                    break;
+                }
+                case EVENT_TALK_COOLDOWN:
+                {
+                    Reset();
+                    break;
+                }
+                case EVENT_TALK + 1:
+                {
+                    Talk(0);
+                    m_events.ScheduleEvent(EVENT_TALK + 2, 8000);
+                    break;
+                }
+                case EVENT_TALK + 2:
+                {
+                    Talk(1);
+                    m_events.ScheduleEvent(EVENT_TALK + 3, 8000);
+                    break;
+                }
+                case EVENT_TALK + 3:
+                {
+                    Talk(2);
+                    m_events.ScheduleEvent(EVENT_TALK + 4, 8000);
+                    break;
+                }
+                case EVENT_TALK + 4:
+                {
+                    if (Creature* gorgar = sObjectAccessor->GetCreature(*me, m_gorgarGUID))
+                        gorgar->AI()->Talk(0);
+                    m_events.ScheduleEvent(EVENT_TALK + 5, 8000);
+                    break;
+                }
+                case EVENT_TALK + 5:
+                {
+                    if (Creature* gorgar = sObjectAccessor->GetCreature(*me, m_gorgarGUID))
+                        gorgar->AI()->Talk(1);
+                    m_events.ScheduleEvent(EVENT_TALK + 6, 8000);
+                    break;
+                }
+                case EVENT_TALK + 6:
+                {
+                    if (Creature* gorgar = sObjectAccessor->GetCreature(*me, m_gorgarGUID))
+                        gorgar->AI()->Talk(2);
+                    m_events.ScheduleEvent(EVENT_TALK + 7, 8000);
+                    break;
+                }
+                case EVENT_TALK + 7:
+                {
+                    Talk(3);
+                    m_events.ScheduleEvent(EVENT_TALK + 8, 8000);
+                    break;
+                }
+                case EVENT_TALK + 8:
+                {
+                    Talk(4);
+                    break;
+                }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+
+        void CheckForGUID()
+        {
+            if (!m_gorgarGUID)
+                if (Creature* gorgar = me->FindNearestCreature(NPC_GORGAR, 50.0f))
+                    m_gorgarGUID = gorgar->GetGUID();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_salty_rocka_45498AI(creature);
+    }
+};
+
+// 83865  // quest 27069
+class spell_sea_pup_trigger_83865 : public SpellScriptLoader
+{
+public:
+    spell_sea_pup_trigger_83865() : SpellScriptLoader("spell_sea_pup_trigger_83865") { }
+
+    enum eSpell
+    {
+        SPELL_SUMMON_SEA_PUP = 83839,
+    };
+
+    class IsNotPlayerGuid
+    {
+    public:
+        explicit IsNotPlayerGuid(uint64 guid) : _guid(guid) { }
+
+        bool operator()(WorldObject* obj) const
+        {
+            if (Player* player = obj->ToPlayer())
+                return player->GetGUID() != _guid;
+
+            return true;
+        }
+
+    private:
+        uint64 _guid;
+    };
+
+    class spell_sea_pup_trigger_83865_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_sea_pup_trigger_83865_SpellScript);
+
+        void FilterTargets(std::list<WorldObject*>& targets)
+        {
+            targets.remove_if(IsNotPlayerGuid(GetCaster()->GetGUID()));
+        }
+
+        void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+        {
+            if (Unit* unit = GetCaster())
+                if (Player* player = unit->ToPlayer())
+                    player->CastSpell(player, SPELL_SUMMON_SEA_PUP);
+        }
+        void Register()
+        {
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_sea_pup_trigger_83865_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
+            OnEffectHitTarget += SpellEffectFn(spell_sea_pup_trigger_83865_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_sea_pup_trigger_83865_SpellScript();
+    }
+};
+
+// 83838  // quest 27069
+class spell_pick_up_orc_crate_83838 : public SpellScriptLoader
+{
+public:
+    spell_pick_up_orc_crate_83838() : SpellScriptLoader("spell_pick_up_orc_crate_83838") { }
+
+    enum eSpell
+    {
+        NPC_ORC_SEA_PUP = 44914,
+    };
+
+    class IsNotEntry
+    {
+    public:
+        explicit IsNotEntry(uint32 entry) : _entry(entry) { }
+
+        bool operator()(WorldObject* obj) const
+        {
+            if (Creature* target = obj->ToCreature())
+                return target->GetEntry() != _entry;
+
+            return true;
+        }
+
+    private:
+        uint32 _entry;
+    };
+
+    class spell_pick_up_orc_crate_83838_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_pick_up_orc_crate_83838_SpellScript);
+
+        void FilterTargets(std::list<WorldObject*>& targets)
+        {
+            targets.remove_if(IsNotEntry(NPC_ORC_SEA_PUP));
+        }
+
+        void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+        {
+            if (Unit* unit = GetCaster())
+                if (Player* player = unit->ToPlayer())
+                {
+                   // player->CastSpell(player, SPELL_SUMMON_SEA_PUP);
+                }
+        }
+        void Register()
+        {
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_pick_up_orc_crate_83838_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
+            OnEffectHitTarget += SpellEffectFn(spell_pick_up_orc_crate_83838_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_pick_up_orc_crate_83838_SpellScript();
+    }
+};
+
+// 44917
+class npc_warlord_torok_44917 : public CreatureScript
+{
+public:
+    npc_warlord_torok_44917() : CreatureScript("npc_warlord_torok_44917") { }
+
+    enum eNPC
+    {
+    };
+
+    struct npc_warlord_torok_44917AI : public ScriptedAI
+    {
+        npc_warlord_torok_44917AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+        EventMap m_events;
+
+        void Initialize()
+        {
+        }
+
+        void Reset() override
+        {
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_warlord_torok_44917AI(creature);
+    }
+};
 
 
 void AddSC_silverpine_forest()
@@ -1972,5 +2579,12 @@ void AddSC_silverpine_forest()
     new npc_armoire_44894();
     new npc_lord_darius_crowley_44883();
     new npc_packleader_ivar_bloodfang_44884();
-   
+    new npc_lady_sylvanas_windrunner_44365();
+    new npc_orc_sea_pup_44914();
+    new npc_admiral_hatchet_44916();
+    new npc_warlord_torok_44917();
+    new npc_salty_rocka_45498();
+    new spell_sea_pup_trigger_83865();
+    new spell_pick_up_orc_crate_83838();
+
 }

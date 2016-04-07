@@ -178,6 +178,37 @@ public:
     }
 };
 
+class IsNotPlayer
+{
+public:
+    explicit IsNotPlayer() { }
+
+    bool operator()(WorldObject* obj) const
+    {
+        if (Player* player = obj->ToPlayer())
+            return false;
+        else
+            return true;
+    }
+};
+
+class IsNotPlayerGuid
+{
+public:
+    explicit IsNotPlayerGuid(uint64 guid) : _guid(guid) { }
+
+    bool operator()(WorldObject* obj) const
+    {
+        if (Player* player = obj->ToPlayer())
+            return player->GetGUID() != _guid;
+
+        return true;
+    }
+
+private:
+    uint64 _guid;
+};
+
 class IsPowerType
 {
 public:
