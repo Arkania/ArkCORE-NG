@@ -67,7 +67,7 @@ public:
     {
         npc_deathstalker_erlandAI(Creature* creature) : npc_escortAI(creature) { }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             Player* player = GetPlayerForEscort();
             if (!player)
@@ -110,13 +110,13 @@ public:
 
         void Reset() override { }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             Talk(SAY_AGGRO, who);
         }
     };
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
     {
         if (quest->GetQuestId() == QUEST_ESCORTING)
         {
@@ -164,7 +164,7 @@ public:
         EVENT_SUMMON_GARROSH,
     };
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
     {
         if (quest->GetQuestId() == QUEST_THE_WARCHIEF_COMETH_26965)
         {
@@ -178,7 +178,7 @@ public:
 
     struct npc_grand_executor_mortuus_44615AI : public ScriptedAI
     {
-        npc_grand_executor_mortuus_44615AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+        npc_grand_executor_mortuus_44615AI(Creature* creature) : ScriptedAI(creature) { }
 
         EventMap m_events;
         uint64  m_playerGUID;
@@ -189,11 +189,6 @@ public:
         uint8   m_animPhase;
         std::list<uint64>spawnedList;
         std::list<uint64>portalList;
-
-        void Initialize()
-        {
-
-        }
 
         void Reset() override
         {
@@ -1002,43 +997,6 @@ public:
         
         return true;
     }
-
-    struct npc_bat_handler_maggotbreath_44825AI : public ScriptedAI
-    {
-        npc_bat_handler_maggotbreath_44825AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
-
-        EventMap m_events;
-        
-        void Initialize()
-        {
-
-        }
-
-        void Reset() override
-        {
-            m_events.Reset();
-           
-        }
-
-  
-
-        void UpdateAI(uint32 diff) override
-        {
-            m_events.Update(diff);
-
-          
-
-            if (!UpdateVictim())
-                return;
-            else
-                DoMeleeAttackIfReady();
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_bat_handler_maggotbreath_44825AI(creature);
-    }
 };
 
 // 44821 // quest 26998
@@ -1209,7 +1167,7 @@ public:
         SPELL_SUMMON_DEATHSTALKER_YORICK = 83751,
     };
 
-    bool OnQuestAccept(Player* player, GameObject* go, Quest const* quest) 
+    bool OnQuestAccept(Player* player, GameObject* go, Quest const* quest) override
     { 
         if (quest->GetQuestId() == QUEST_WAITING_TO_EXSANGUINATE)
             player->CastSpell(1301.87f, 1189.36f, 52.1045f, SPELL_SUMMON_DEATHSTALKER_YORICK, true, 0, 0, player->GetGUID());
@@ -1965,7 +1923,7 @@ public:
         SPELL_SEE_QUEST_INVIS_5 = 84241,
     };
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
     {
         if (quest->GetQuestId() == QUEST_THE_WARCHIEFS_FLEET_27065)
         {
@@ -2028,7 +1986,7 @@ public:
                 }
         }
 
-        void PassengerBoarded(Unit* passenger, int8 seatId, bool apply) 
+        void PassengerBoarded(Unit* passenger, int8 seatId, bool apply) override
         { 
             if (passenger->GetEntry() == NPC_ORC_CRATE)
                 if (apply)
@@ -2054,7 +2012,7 @@ public:
                     summon->EnterVehicle(me, -1);
         }
 
-        void SpellHit(Unit* caster, SpellInfo const* spell) 
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
         { 
             if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
                 if (spell->Id == SPELL_PICK_UP_ORC_CRATE)
@@ -2141,7 +2099,7 @@ public:
         EVENT_TALK = 200,
     };
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action) 
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action) override
     { 
         if (player->GetQuestStatus(QUEST_STEEL_THUNDER) == QUEST_STATUS_INCOMPLETE)
             if (creature->FindNearestCreature(NPC_SEA_PUP, 10.0f) == 0)
@@ -2155,7 +2113,7 @@ public:
         return false; 
     }
 
-    bool OnQuestReward(Player* /*player*/, Creature* creature, Quest const* quest, uint32 /*opt*/) 
+    bool OnQuestReward(Player* /*player*/, Creature* creature, Quest const* quest, uint32 /*opt*/) override
     { 
         if (quest->GetQuestId() == QUEST_STEEL_THUNDER)
             if (Creature* pup = creature->FindNearestCreature(NPC_SEA_PUP, 10.0f))
@@ -2492,18 +2450,9 @@ public:
             targets.remove_if(IsNotEntry(NPC_ORC_SEA_PUP));
         }
 
-        void HandleScriptEffect(SpellEffIndex /*effIndex*/)
-        {
-            if (Unit* unit = GetCaster())
-                if (Player* player = unit->ToPlayer())
-                {
-                   // player->CastSpell(player, SPELL_SUMMON_SEA_PUP);
-                }
-        }
         void Register()
         {
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_pick_up_orc_crate_83838_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
-            OnEffectHitTarget += SpellEffectFn(spell_pick_up_orc_crate_83838_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
@@ -2513,28 +2462,86 @@ public:
     }
 };
 
-// 44917
-class npc_warlord_torok_44917 : public CreatureScript
+// 44941  // quest 27093
+class npc_webbed_victim_44941 : public CreatureScript
 {
 public:
-    npc_warlord_torok_44917() : CreatureScript("npc_warlord_torok_44917") { }
+    npc_webbed_victim_44941() : CreatureScript("npc_webbed_victim_44941") { }
 
     enum eNPC
     {
+        NPC_ORC_SEA_DOG = 44942,
+        QUEST_LOST_IN_THE_DARKNESS = 27093,
+        SPELL_FREE_WEBBED_VICTIM1 = 83919,
+        SPELL_FREE_WEBBED_VICTIM2 = 83921,
+        SPELL_FREE_WEBBED_VICTIM3 = 83927,
+        SPELL_DESPAWN_ALL_SUMMONS = 83935,
     };
 
-    struct npc_warlord_torok_44917AI : public ScriptedAI
+    struct npc_webbed_victim_44941AI : public ScriptedAI
     {
-        npc_warlord_torok_44917AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+        npc_webbed_victim_44941AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
 
-        EventMap m_events;
+        uint64   m_playerGUID;
 
         void Initialize()
         {
+            m_playerGUID = NULL;
         }
 
-        void Reset() override
+        void JustDied(Unit* killer) override
         {
+            if (Player* player = killer->ToPlayer())
+                if (player->GetQuestStatus(QUEST_LOST_IN_THE_DARKNESS) == QUEST_STATUS_INCOMPLETE)
+                {
+                    m_playerGUID = player->GetGUID();
+                    player->CastSpell(me, SPELL_FREE_WEBBED_VICTIM3, true);
+                }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_webbed_victim_44941AI(creature);
+    }
+};
+
+// 44942  // quest 27093
+class npc_orc_sea_dog_44942 : public CreatureScript
+{
+public:
+    npc_orc_sea_dog_44942() : CreatureScript("npc_orc_sea_dog_44942") { }
+
+    enum eNPC
+    {
+        QUEST_LOST_IN_THE_DARKNESS = 27093,
+        NPC_WEBBED_VICTIM = 44941,
+        NPC_ORC_SEA_DOG = 44942,
+        SPELL_DESPAWN_ALL_SUMMONS = 83935,
+        EVENT_CHECK_PLAYER = 100,
+    };
+
+    struct npc_orc_sea_dog_44942AI : public ScriptedAI
+    {
+        npc_orc_sea_dog_44942AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+        EventMap m_events;
+        uint64   m_playerGUID;
+
+        void Initialize()
+        {
+            m_playerGUID = NULL;
+            m_events.Reset();
+        }
+
+        void IsSummonedBy(Unit* summoner) override
+        {
+            if (Player* player = summoner->ToPlayer())
+            {
+                m_playerGUID = player->GetGUID();
+                me->GetMotionMaster()->MoveFollow(player, 4.0f, frand(1.57f, 4.71f));
+                m_events.ScheduleEvent(EVENT_CHECK_PLAYER, 1000);
+            }
         }
 
         void UpdateAI(uint32 diff) override
@@ -2545,6 +2552,18 @@ public:
             {
                 switch (eventId)
                 {
+                case EVENT_CHECK_PLAYER:
+                {
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                        if (player->IsAlive() && player->IsInWorld() && !player->IsQuestRewarded(QUEST_LOST_IN_THE_DARKNESS))
+                        {
+                            m_events.ScheduleEvent(EVENT_CHECK_PLAYER, 1000);
+                            break;
+                        }
+
+                    me->DespawnOrUnsummon(10);
+                    break;
+                }
                 }
             }
 
@@ -2557,9 +2576,175 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_warlord_torok_44917AI(creature);
+        return new npc_orc_sea_dog_44942AI(creature);
     }
 };
+
+// 44367  // quest 27088
+class npc_forest_ettin_44367 : public CreatureScript
+{
+public:
+    npc_forest_ettin_44367() : CreatureScript("npc_forest_ettin_44367") { }
+
+    enum eNPC
+    {
+        NPC_MUTANT_BUSH_CHICKEN = 44935,
+        SPELL_BUSH_CHICKEN_EXPLOSION = 83903,
+        SPELL_REVERSE_CAST_RIDE_VEHICLE = 83904,
+        SPELL_ETTINS_MOUTH = 83907,
+        EVENT_CHECK_FOR_CHICKEN = 101,
+        EVENT_EAT_CHICKEN,
+        EVENT_CHICKEN_EXPLODE,
+    };
+
+    struct npc_forest_ettin_44367AI : public VehicleAI
+    {
+        npc_forest_ettin_44367AI(Creature* creature) : VehicleAI(creature) { }
+
+        EventMap m_events;
+        uint64 m_playerGUID;
+        uint64 m_chickenGUID;
+        bool isChickenFollower;
+        bool isChickenRideOnEttin;
+
+        void Reset() override
+        {
+            m_playerGUID = NULL;
+            m_chickenGUID = NULL;
+            isChickenFollower = false;
+            isChickenRideOnEttin = false;
+            m_events.Reset();
+            m_events.ScheduleEvent(EVENT_CHECK_FOR_CHICKEN, 1000);
+        }
+
+        void JustDied(Unit* killer) override
+        { 
+            if (killer->GetEntry() == NPC_MUTANT_BUSH_CHICKEN)
+                if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                    player->KilledMonsterCredit(me->GetEntry());
+        }
+
+        void PassengerBoarded(Unit* passenger, int8 seatId, bool apply) override
+        { 
+            if (apply && passenger->GetEntry() == NPC_MUTANT_BUSH_CHICKEN)
+            {
+                m_playerGUID = passenger->GetCharmerOrOwnerGUID();
+                isChickenRideOnEttin = true;
+                m_events.ScheduleEvent(EVENT_EAT_CHICKEN, 2500);
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_CHECK_FOR_CHICKEN:
+                {
+                    if (!m_chickenGUID)
+                        if (Creature* chicken = me->FindNearestCreature(NPC_MUTANT_BUSH_CHICKEN, 20.0f))
+                            m_chickenGUID = chicken->GetGUID();
+
+                    if (Creature* chicken = sObjectAccessor->GetCreature(*me, m_chickenGUID))
+                    {
+                        if (!isChickenRideOnEttin && me->GetDistance2d(chicken) < 5.0f)
+                        {
+                            me->GetMotionMaster()->Clear();
+                            me->GetMotionMaster()->MoveIdle();
+                            me->CastSpell(chicken, SPELL_REVERSE_CAST_RIDE_VEHICLE, true);
+                            chicken->SendPlaySound(15936, false);
+                        }
+                        else if (!isChickenFollower)
+                        {
+                            isChickenFollower = true;
+                            chicken->SetWalk(true);
+                            chicken->GetMotionMaster()->MoveFollow(me, 5.0f, 0.0f);
+                            chicken->SendPlaySound(15936, false);
+                        }
+                    }
+                    else
+                    {
+                        m_chickenGUID = NULL;
+                        isChickenFollower = false;
+                        isChickenRideOnEttin = false;
+                    }
+
+                    m_events.ScheduleEvent(EVENT_CHECK_FOR_CHICKEN, 1000);
+                    break;
+                }
+                case EVENT_EAT_CHICKEN:
+                {
+                    if (Creature* chicken = sObjectAccessor->GetCreature(*me, m_chickenGUID))
+                    {
+                        chicken->CastSpell(me, SPELL_ETTINS_MOUTH, true);
+                        m_events.ScheduleEvent(EVENT_CHICKEN_EXPLODE, 6000);
+                    }
+                    break;
+                }
+                case EVENT_CHICKEN_EXPLODE:
+                {
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                        if (Creature* chicken = sObjectAccessor->GetCreature(*me, m_chickenGUID))
+                            chicken->CastSpell(me, SPELL_BUSH_CHICKEN_EXPLOSION, true);
+
+                    break;
+                }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_forest_ettin_44367AI(creature);
+    }
+};
+
+// 83904  // quest 27088
+class spell_reverse_cast_ride_vehicle_83904 : public SpellScriptLoader
+{
+public:
+    spell_reverse_cast_ride_vehicle_83904() : SpellScriptLoader("spell_reverse_cast_ride_vehicle_83904") { }
+
+    enum eSpell
+    {
+        NPC_ETTIN = 44367,
+        NPC_CHICKEN = 44935,
+    };
+
+    class spell_reverse_cast_ride_vehicle_83904_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_reverse_cast_ride_vehicle_83904_SpellScript);
+
+        void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+        {
+            if (Unit* unit1 = GetHitUnit())
+                if (Creature* chicken = unit1->ToCreature())
+                    if (Unit* unit2 = GetCaster())
+                        if (Creature* ettin = unit2->ToCreature())
+                            chicken->EnterVehicle(ettin, 0);
+        }
+        
+        void Register()
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_reverse_cast_ride_vehicle_83904_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_reverse_cast_ride_vehicle_83904_SpellScript();
+    }
+};
+
 
 
 void AddSC_silverpine_forest()
@@ -2582,9 +2767,12 @@ void AddSC_silverpine_forest()
     new npc_lady_sylvanas_windrunner_44365();
     new npc_orc_sea_pup_44914();
     new npc_admiral_hatchet_44916();
-    new npc_warlord_torok_44917();
     new npc_salty_rocka_45498();
     new spell_sea_pup_trigger_83865();
     new spell_pick_up_orc_crate_83838();
+    new npc_webbed_victim_44941();
+    new npc_orc_sea_dog_44942();
+    new npc_forest_ettin_44367();
+    new spell_reverse_cast_ride_vehicle_83904();
 
 }

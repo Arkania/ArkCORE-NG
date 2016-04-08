@@ -38,7 +38,7 @@ UPDATE quest_template SET NextQuestIdChain=27069 WHERE Id=27065;
 
 update creature_template set AIName="", ScriptName="npc_admiral_hatchet_44916" where entry=44916;
 
-update creature_template set AIName="", ScriptName="npc_warlord_torok_44917" where entry=44917;
+update creature_template set AIName="", ScriptName="" where entry=44917;
 
 update creature_template set AIName="", ScriptName="npc_salty_rocka_45498" where entry=45498;
 
