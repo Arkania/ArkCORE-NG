@@ -1911,7 +1911,7 @@ public:
     }
 };
 
-// 44365  // quest 27065
+// 44365  // quest 27065 // 27096 // 27097 // 27099
 class npc_lady_sylvanas_windrunner_44365 : public CreatureScript
 {
 public:
@@ -1920,17 +1920,36 @@ public:
     enum eNPC
     {
         QUEST_THE_WARCHIEFS_FLEET_27065 = 27065,
+        QUEST_ORCS_ARE_IN_ORDER = 27096,
+        QUEST_RISE_FORSAKEN = 27097,
+        QUEST_NO_ESCAPE = 27099,
+        SPELL_SUMMON_AGATHA = 83982,
         SPELL_SEE_QUEST_INVIS_5 = 84241,
+        SPELL_DEATH_WALK = 85451,
     };
 
     bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
     {
         if (quest->GetQuestId() == QUEST_THE_WARCHIEFS_FLEET_27065)
-        {
             player->AddAura(SPELL_SEE_QUEST_INVIS_5, player);
-        }
+        else if (quest->GetQuestId() == QUEST_RISE_FORSAKEN)
+            player->CastSpell(1380.69f, 1037.616f, 53.046f, SPELL_SUMMON_AGATHA, true);
+        else if (quest->GetQuestId() == QUEST_NO_ESCAPE)
+            player->CastSpell(1380.69f, 1037.616f, 53.046f, SPELL_SUMMON_AGATHA, true);
 
         return false;
+    }
+
+    bool OnQuestReward(Player* player, Creature* /*creature*/, Quest const* quest, uint32 /*opt*/) override
+    { 
+        if (quest->GetQuestId() == QUEST_ORCS_ARE_IN_ORDER)
+            player->RemoveAura(SPELL_SEE_QUEST_INVIS_5);
+        if (quest->GetQuestId() == QUEST_RISE_FORSAKEN)
+            player->RemoveAura(SPELL_DEATH_WALK);
+        if (quest->GetQuestId() == QUEST_NO_ESCAPE)
+            player->RemoveAura(SPELL_DEATH_WALK);
+
+        return false; 
     }
 };
 
@@ -2745,6 +2764,247 @@ public:
     }
 };
 
+// 44951  // quest 27097 // 27099
+class npc_agatha_44951 : public CreatureScript
+{
+public:
+    npc_agatha_44951() : CreatureScript("npc_agatha_44951") { }
+
+    enum eNPC
+    {
+        NPC_HILLSBRAD_REFUGEE1 = 44954,
+        NPC_HILLSBRAD_REFUGEE2 = 44966,
+        NPC_FORSAKEN = 44959,
+        QUEST_RISE_FORSAKEN = 27097,
+        QUEST_NO_ESCAPE = 27099,
+        SPELL_DEATH_WALK = 85451,
+        SPELL_NOTIFY_AGATHA = 83990,
+        SPELL_RISE_FORSAKEN = 83993,
+        SPELL_KILL_CREDIT = 83996,
+        SPELL_DOOMHOWL = 84012,
+        SPELL_UNHOLY_DARKNESS = 84013,
+        SPELL_UNHOLY_SMITE = 84014,
+        EVENT_CHAT_TO_PLAYER = 100,
+        EVENT_CHECK_PLAYER,
+        EVENT_CAST_AGGRO,
+        EVENT_HEAL_COOLDOWN,
+    };
+
+    struct npc_agatha_44951AI : public VehicleAI
+    {
+        npc_agatha_44951AI(Creature* creature) : VehicleAI(creature) { Initialize(); }
+
+        EventMap m_events;
+        uint64 m_playerGUID;
+        uint64 m_targetGUID;
+        bool   m_doomhoulDone;
+        bool   m_healCD;
+        
+        void Initialize()
+        {
+            m_playerGUID = NULL;
+            m_targetGUID = NULL;
+            m_doomhoulDone = false;
+            m_events.Reset();
+            m_events.ScheduleEvent(EVENT_CHAT_TO_PLAYER, 60000);
+            m_events.ScheduleEvent(EVENT_CHECK_PLAYER, 2000);
+            m_healCD = false;
+        }
+
+        void Reset() override
+        {
+            me->SetDisableGravity(true);
+            me->SetWaterWalking(true);
+        }
+
+        void IsSummonedBy(Unit* summoner) override 
+        { 
+            if (Player* player = summoner->ToPlayer())
+            {
+                m_playerGUID = player->GetGUID();
+                me->SetFacingToObject(player);
+                me->GetMotionMaster()->MoveFollow(player, 3.0f, M_PI);
+                me->SetReactState(REACT_PASSIVE);
+                me->CastSpell(me, SPELL_DEATH_WALK, true);
+                me->AddAura(SPELL_DEATH_WALK, player);
+            }
+        }
+
+        void SpellHit(Unit* caster, SpellInfo const* spell) override 
+        { 
+            if ((caster->GetEntry() == NPC_HILLSBRAD_REFUGEE1 || caster->GetEntry() == NPC_HILLSBRAD_REFUGEE2) && spell->Id == SPELL_NOTIFY_AGATHA)
+            {
+                me->CastSpell(caster, SPELL_RISE_FORSAKEN, true);
+                if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                    player->CastSpell(player, SPELL_KILL_CREDIT);
+            }
+        }
+
+        void DamageTaken(Unit* attacker, uint32& damage) override 
+        { 
+            if (attacker->GetGUID() != m_targetGUID)
+                if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                    if (Unit* unit = player->GetVictim())
+                        if (unit->GetGUID() != m_targetGUID)
+                            EnterCombat(unit);
+        }
+
+        void EnterCombat(Unit* victim) override
+        {
+            m_doomhoulDone = false;
+            m_targetGUID = victim->GetGUID();
+            me->CastSpell(victim, SPELL_UNHOLY_SMITE);
+            m_events.RescheduleEvent(EVENT_CAST_AGGRO, urand(1000, 4000));
+        }
+
+        void EnterEvadeMode() override { }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_CHAT_TO_PLAYER:
+                {
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                        me->AI()->Talk(0);
+                    m_events.ScheduleEvent(EVENT_CHAT_TO_PLAYER, 60000);
+                    break;
+                }
+                case EVENT_CHECK_PLAYER:
+                {
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                        if (player->IsAlive() || player->IsInWorld())
+                            if (CheckQuestStatus(player))
+                            {
+                                if (!m_healCD && player->GetHealthPct() < 90.0f)
+                                {
+                                    me->CastSpell(player, SPELL_UNHOLY_DARKNESS);
+                                    m_healCD = true;
+                                    m_events.ScheduleEvent(EVENT_HEAL_COOLDOWN, 2000);
+                                }
+                                
+                                if (Unit* unit = player->GetVictim())
+                                {
+                                    if (unit->GetGUID() != m_targetGUID)
+                                        EnterCombat(unit);
+                                }
+                                else if (player->IsInCombat())
+                                {
+                                    if (Unit* unit = player->GetSelectedUnit())
+                                        if (unit->GetGUID() != m_targetGUID)
+                                            EnterCombat(unit);
+                                }
+
+                                m_events.ScheduleEvent(EVENT_CHECK_PLAYER, 1000);
+                                break;
+                            }
+
+                    me->DespawnOrUnsummon(10);
+                    break;
+                }
+                case EVENT_CAST_AGGRO:
+                {
+                    if (Creature* target = sObjectAccessor->GetCreature(*me, m_targetGUID))
+                        if (target->IsAlive())
+                        {
+                            if (target->GetEntry() == NPC_HILLSBRAD_REFUGEE1 || target->GetEntry() == NPC_HILLSBRAD_REFUGEE2)
+                                if (!m_doomhoulDone)
+                                {
+                                    m_doomhoulDone = true;
+                                    me->CastSpell(me, SPELL_DOOMHOWL); 
+                                    m_events.ScheduleEvent(EVENT_CAST_AGGRO, urand(2000, 3000));
+                                    break;
+                                }
+
+                            me->CastSpell(target, SPELL_UNHOLY_SMITE);
+                            m_events.ScheduleEvent(EVENT_CAST_AGGRO, urand(1000, 6000));                           
+                        }
+                    break;
+                }
+                case EVENT_HEAL_COOLDOWN:
+                {
+                    m_healCD = false;
+                    break;
+                }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+
+        bool CheckQuestStatus(Player* player)
+        {
+            if (player->GetQuestStatus(QUEST_RISE_FORSAKEN) == QUEST_STATUS_INCOMPLETE || player->GetQuestStatus(QUEST_RISE_FORSAKEN) == QUEST_STATUS_COMPLETE)
+                return true;
+            else if (player->GetQuestStatus(QUEST_NO_ESCAPE) == QUEST_STATUS_INCOMPLETE || player->GetQuestStatus(QUEST_NO_ESCAPE) == QUEST_STATUS_COMPLETE)
+                return true;
+
+            return false;
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_agatha_44951AI(creature);
+    }
+};
+
+// 44954 //44966
+class npc_hillsbrad_refugee_44966 : public CreatureScript
+{
+public:
+    npc_hillsbrad_refugee_44966() : CreatureScript("npc_hillsbrad_refugee_44966") { }
+
+    enum eNPC
+    {
+        NPC_AGATHA = 44951,
+        SPELL_NOTIFY_AGATHA = 83990,
+        SPELL_DOOMHOWL = 84012,
+        SPELL_UNHOLY_SMITE = 84014,
+        QUEST_RISE_FORSAKEN = 27097,
+    };
+
+    struct npc_hillsbrad_refugee_44966AI : public ScriptedAI
+    {
+        npc_hillsbrad_refugee_44966AI(Creature* creature) : ScriptedAI(creature) { }
+
+        void JustSummoned(Creature* summon) override
+        {
+            uint32 rol = urand(0, 100);
+            if (rol < 50)
+            {
+                summon->AI()->Talk(0);
+                summon->DespawnOrUnsummon(10000);
+            }
+        }
+
+        void JustDied(Unit* killer) override 
+        { 
+            if (Creature* agatha = me->FindNearestCreature(NPC_AGATHA, 30.0f))
+            {
+                me->CastSpell(agatha, SPELL_NOTIFY_AGATHA);
+                uint32 m_forsakenSpell;
+                if (me->getGender() == GENDER_MALE)
+                    m_forsakenSpell = RAND(83998, 83999, 84000, 84001);
+                else
+                    m_forsakenSpell = RAND(84002, 84003, 84004, 84005);
+                me->CastSpell(me, m_forsakenSpell);
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_hillsbrad_refugee_44966AI(creature);
+    }
+};
 
 
 void AddSC_silverpine_forest()
@@ -2774,5 +3034,8 @@ void AddSC_silverpine_forest()
     new npc_orc_sea_dog_44942();
     new npc_forest_ettin_44367();
     new spell_reverse_cast_ride_vehicle_83904();
+    new npc_agatha_44951();
+    new npc_hillsbrad_refugee_44966();
+
 
 }

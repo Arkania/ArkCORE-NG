@@ -198,26 +198,26 @@ INSERT INTO creature_text values
 
 DELETE FROM creature_text where entry=44951 and groupid between 0 and 11;
 INSERT INTO creature_text values 
-(44951, 0, 0, "Rise, $N! Become Forsaken!", 12, 0, 100, 0, 0, 0, "", 45091),
-(44951, 1, 0, "Waste no time, $N. We mustn't keep the Banshee Queen waiting.", 12, 0, 100, 0, 0, 0, "", 45092),
-(44951, 2, 0, "Different master, same insatiable thirst for power.", 12, 0, 100, 0, 0, 0, "", 45093),
-(44951, 3, 0, "I sense doom in your future, $N.", 12, 0, 100, 0, 0, 0, "", 45094),
-(44951, 4, 0, "The warmth of this place sickens me.", 12, 0, 100, 0, 0, 0, "", 45095),
-(44951, 5, 0, "I long for the frozen wastes of Northrend.", 12, 0, 100, 0, 0, 0, "", 45096),
-(44951, 6, 0, "Do you feel it, $N? The darkness surrounds us.", 12, 0, 100, 0, 0, 0, "", 45097),
-(44951, 7, 0, "Life is meaningless. It is in the afterlife that we are truly tested.", 12, 0, 100, 0, 0, 0, "", 45098),
-(44951, 8, 0, "Through me the Banshee Queen sees all...", 12, 0, 100, 0, 0, 0, "", 45099),
-(44951, 9, 0, "Bow before your new master!", 12, 0, 100, 0, 0, 0, "", 45114),
-(44951, 10, 0, "Rise and destroy our enemies!", 12, 0, 100, 0, 0, 0, "", 45115),
-(44951, 11, 0, "This way, $N. We will take them by surprise.", 12, 0, 100, 457, 0, 0, "", 45193);
+(44951, 0, 0, "This way, $N. We will take them by surprise.", 12, 0, 100, 457, 0, 0, "", 45193),
+(44951, 0, 1, "The warmth of this place sickens me.", 12, 0, 100, 0, 0, 0, "", 45095),
+(44951, 0, 2, "Do you feel it, $N? The darkness surrounds us.", 12, 0, 100, 0, 0, 0, "", 45097),
+(44951, 0, 3, "Life is meaningless. It is in the afterlife that we are truly tested.", 12, 0, 100, 0, 0, 0, "", 45098),
+(44951, 0, 4, "I sense doom in your future, $N.", 12, 0, 100, 0, 0, 0, "", 45094),
+(44951, 0, 5, "I long for the frozen wastes of Northrend.", 12, 0, 100, 0, 0, 0, "", 45096),
+(44951, 0, 6, "Different master, same insatiable thirst for power.", 12, 0, 100, 0, 0, 0, "", 45093),
+(44951, 0, 7, "Waste no time, $N. We mustn't keep the Banshee Queen waiting.", 12, 0, 100, 0, 0, 0, "", 45092),
+(44951, 0, 8, "Through me the Banshee Queen sees all...", 12, 0, 100, 0, 0, 0, "", 45099),
+(44951, 1, 0, "Rise, $N! Become Forsaken!", 14, 0, 100, 0, 0, 0, "", 45091),
+(44951, 1, 1, "Bow before your new master!", 14, 0, 100, 0, 0, 0, "", 45114),
+(44951, 1, 2, "Rise and destroy our enemies!", 14, 0, 100, 0, 0, 0, "", 45115);
 
 DELETE FROM creature_text where entry=44959 and groupid between 0 and 4;
 INSERT INTO creature_text values 
 (44959, 0, 0, "I am Forsaken.", 12, 0, 100, 66, 0, 0, "", 45106),
-(44959, 1, 0, "For the glory of the Dark Lady!", 12, 0, 100, 15, 0, 0, "", 45107),
-(44959, 2, 0, "Wha... What has happened?", 12, 0, 100, 6, 0, 0, "", 45108),
-(44959, 3, 0, "I am eternal... I am death.", 12, 0, 100, 273, 0, 0, "", 45109),
-(44959, 4, 0, "I LIVE!", 12, 0, 100, 15, 0, 0, "", 45111);
+(44959, 0, 1, "For the glory of the Dark Lady!", 12, 0, 100, 15, 0, 0, "", 45107),
+(44959, 0, 2, "Wha... What has happened?", 12, 0, 100, 6, 0, 0, "", 45108),
+(44959, 0, 3, "I am eternal... I am death.", 12, 0, 100, 273, 0, 0, "", 45109),
+(44959, 0, 4, "I LIVE!", 12, 0, 100, 15, 0, 0, "", 45111);
 
 DELETE FROM creature_text where entry=44964 and groupid between 0 and 1;
 INSERT INTO creature_text values 
