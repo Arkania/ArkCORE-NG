@@ -2764,6 +2764,56 @@ public:
     }
 };
 
+// 44954 //44966 // quest 27097
+class npc_hillsbrad_refugee_44966 : public CreatureScript
+{
+public:
+    npc_hillsbrad_refugee_44966() : CreatureScript("npc_hillsbrad_refugee_44966") { }
+
+    enum eNPC
+    {
+        NPC_AGATHA = 44951,
+        SPELL_NOTIFY_AGATHA = 83990,
+        SPELL_DOOMHOWL = 84012,
+        SPELL_UNHOLY_SMITE = 84014,
+        QUEST_RISE_FORSAKEN = 27097,
+    };
+
+    struct npc_hillsbrad_refugee_44966AI : public ScriptedAI
+    {
+        npc_hillsbrad_refugee_44966AI(Creature* creature) : ScriptedAI(creature) { }
+
+        void JustSummoned(Creature* summon) override
+        {
+            uint32 rol = urand(0, 100);
+            if (rol < 50)
+            {
+                summon->AI()->Talk(0);
+                summon->DespawnOrUnsummon(10000);
+            }
+        }
+
+        void JustDied(Unit* killer) override
+        {
+            if (Creature* agatha = me->FindNearestCreature(NPC_AGATHA, 30.0f))
+            {
+                me->CastSpell(agatha, SPELL_NOTIFY_AGATHA);
+                uint32 m_forsakenSpell;
+                if (me->getGender() == GENDER_MALE)
+                    m_forsakenSpell = RAND(83998, 83999, 84000, 84001);
+                else
+                    m_forsakenSpell = RAND(84002, 84003, 84004, 84005);
+                me->CastSpell(me, m_forsakenSpell);
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_hillsbrad_refugee_44966AI(creature);
+    }
+};
+
 // 44951  // quest 27097 // 27099
 class npc_agatha_44951 : public CreatureScript
 {
@@ -2784,10 +2834,13 @@ public:
         SPELL_DOOMHOWL = 84012,
         SPELL_UNHOLY_DARKNESS = 84013,
         SPELL_UNHOLY_SMITE = 84014,
+        SPELL_GENERAL_TRIGGER_84107 = 84107,
+        SPELL_GENERAL_TRIGGER_84114 = 84114,
         EVENT_CHAT_TO_PLAYER = 100,
         EVENT_CHECK_PLAYER,
         EVENT_CAST_AGGRO,
         EVENT_HEAL_COOLDOWN,
+        EVENT_27099_RUN,
     };
 
     struct npc_agatha_44951AI : public VehicleAI
@@ -2828,16 +2881,47 @@ public:
                 me->CastSpell(me, SPELL_DEATH_WALK, true);
                 me->AddAura(SPELL_DEATH_WALK, player);
             }
+            if (Creature* stalker = me->FindNearestCreature(45032,25.0f))
+                SetForQuest27099();
         }
 
         void SpellHit(Unit* caster, SpellInfo const* spell) override 
         { 
-            if ((caster->GetEntry() == NPC_HILLSBRAD_REFUGEE1 || caster->GetEntry() == NPC_HILLSBRAD_REFUGEE2) && spell->Id == SPELL_NOTIFY_AGATHA)
+            switch (spell->Id)
             {
+            case SPELL_NOTIFY_AGATHA:
                 me->CastSpell(caster, SPELL_RISE_FORSAKEN, true);
                 if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
                     player->CastSpell(player, SPELL_KILL_CREDIT);
+                break;
+            case SPELL_GENERAL_TRIGGER_84114:
+                SetForQuest27099();
+                break;
+            case 83978:
+            {
+                // send chat to player..
+                break;
             }
+            case 84107:
+            {
+                m_events.ScheduleEvent(EVENT_27099_RUN, 1000);
+                break;
+            }
+            }
+        }
+
+        void MovementInform(uint32 type, uint32 id) override 
+        { 
+            if (type == POINT_MOTION_TYPE && id == 1231)
+                m_events.ScheduleEvent(EVENT_27099_RUN + 1, 100);
+            if (type == WAYPOINT_MOTION_TYPE && id == 42)
+                m_events.ScheduleEvent(EVENT_27099_RUN + 4, 100);
+        }
+
+        void PassengerBoarded(Unit* passenger, int8 seatId, bool apply) override 
+        { 
+            if (apply && passenger->ToPlayer())
+                m_events.ScheduleEvent(EVENT_27099_RUN + 3, 100);
         }
 
         void DamageTaken(Unit* attacker, uint32& damage) override 
@@ -2930,6 +3014,47 @@ public:
                     m_healCD = false;
                     break;
                 }
+                case EVENT_27099_RUN:
+                {
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                        me->GetMotionMaster()->MovePoint(1231, player->GetPosition());
+
+                    break;
+                }
+                case EVENT_27099_RUN + 1:
+                {
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                    {
+                        player->ExitVehicle();
+                        me->CastSpell(player, 84112, true); // camera spell
+                        Talk(2, player);
+                    }
+                    m_events.ScheduleEvent(EVENT_27099_RUN + 2, 1500);
+                    break;
+                }
+                case EVENT_27099_RUN + 2:
+                {
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                    {
+                        me->CastSpell(player, 84109); // ride vehicle, script_effect
+                        player->EnterVehicle(me);
+                        Talk(3, player);                        
+                    }
+                    break;
+                }
+                case EVENT_27099_RUN + 3:
+                {
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                        player->KilledMonsterCredit(44951);
+                    me->GetMotionMaster()->MovePath(4495101, false);
+                    break;
+                }
+                case EVENT_27099_RUN + 4:
+                {
+                    me->GetVehicleKit()->RemoveAllPassengers();
+                    me->DespawnOrUnsummon(1000);
+                    break;
+                }
                 }
             }
 
@@ -2948,6 +3073,14 @@ public:
 
             return false;
         }
+
+        void SetForQuest27099()
+        {
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetReactState(REACT_PASSIVE);
+            me->GetMotionMaster()->MovePoint(1234, 982.57f, 671.04f, 77.298f);
+            m_events.CancelEvent(EVENT_CHAT_TO_PLAYER);
+        }
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -2956,55 +3089,938 @@ public:
     }
 };
 
-// 44954 //44966
-class npc_hillsbrad_refugee_44966 : public CreatureScript
+enum eQuest27099
+{
+    NPC_AGATHA = 44951,
+    QUEST_NO_ESCAPE = 27099,
+    NPC_BLOODFANG = 44990,
+    NPC_CROWLEY = 44989,
+    NPC_PHIN_ODELIC = 44993,
+    NPC_BARTOLO_GINSETTI = 44994,
+    NPC_LOREMASTER_DIBBS = 44995,
+    NPC_MAGISTRATE_HENRY_MALEB = 44996,
+    NPC_CARETAKER_SMITHERS = 44997,
+    NPC_SOPHIA_ZWOSKI = 45002,
+    SPELL_FORCE_CAST_FENRIS_CAMERA = 84113,
+    SPELL_SUMMON_BLOODFANG = 84054,
+    SPELL_SUMMON_CROWLEY = 84055,
+    SPELL_SUMMON_PHIN_ODELIC = 84056,
+    SPELL_SUMMON_BARTOLO_GINSETTI = 84057,
+    SPELL_SUMMON_LOREMASTER_DIBBS = 84058,
+    SPELL_SUMMON_MAGISTRATE_HENRY_MALEB = 84059,
+    SPELL_SUMMON_CARETAKER_SMITHERS = 84060,
+    SPELL_SUMMON_SOPHIA = 84061,
+    SPELL_SUMMON_AGATHA = 83982,
+    SPELL_CONVERSATION_TRIGGER_84076 = 84076, // start conversation for maleb
+    SPELL_CONVERSATION_TRIGGER_84077 = 84077, // start drinking poison
+    SPELL_ARMORE_CAMERA = 84104,
+    SPELL_GENERAL_TRIGGER_84102 = 84102,      // start conversation for crowley
+    SPELL_GENERAL_TRIGGER_84107 = 84107,      // finish video.. starting agatha RUN
+    SPELL_GENERAL_TRIGGER_84114 = 84114,      // von player an agatha.. n:262723
+    SOUND_WORGEN_HOWLING = 17671,
+    EVENT_CHECK_QUEST = 101,
+    EVENT_CHECK_PLAYER,
+    EVENT_START_ANIMATION,
+    EVENT_MASTER_RESET,
+    EVENT_DRINKING,
+    EVENT_MORPHING,
+    EVENT_HOWLING,
+    EVENT_MOVE_TO_STARTPOINT,
+    EVENT_CHANGE_TO_SEAT_2,
+    EVENT_TRIGGER_84102,
+    EVENT_ANIMATION = 200,
+};
+
+// 45032 // quest 27099
+class npc_fenris_keep_stalker_45032 : public CreatureScript
 {
 public:
-    npc_hillsbrad_refugee_44966() : CreatureScript("npc_hillsbrad_refugee_44966") { }
+    npc_fenris_keep_stalker_45032() : CreatureScript("npc_fenris_keep_stalker_45032") { }
 
-    enum eNPC
+    struct npc_fenris_keep_stalker_45032AI : public ScriptedAI
     {
-        NPC_AGATHA = 44951,
-        SPELL_NOTIFY_AGATHA = 83990,
-        SPELL_DOOMHOWL = 84012,
-        SPELL_UNHOLY_SMITE = 84014,
-        QUEST_RISE_FORSAKEN = 27097,
-    };
+        npc_fenris_keep_stalker_45032AI(Creature* creature) : ScriptedAI(creature) { }
 
-    struct npc_hillsbrad_refugee_44966AI : public ScriptedAI
-    {
-        npc_hillsbrad_refugee_44966AI(Creature* creature) : ScriptedAI(creature) { }
+        EventMap m_events;
+        uint64   m_playerGUID;
+        uint64   m_bloodfangGUID;
+        uint64   m_crowleyGUID;
+        uint64   m_phinOdelicGUID;
+        uint64   m_bartoloGinsettiGUID;
+        uint64   m_loremasterDibbsGUID;
+        uint64   m_henryMalebGUID;
+        uint64   m_caretakersSmithersGUID;
+        uint64   m_sophiaGUID;
+        bool     m_animatonIsStarted;
 
-        void JustSummoned(Creature* summon) override
+        void Reset() override
         {
-            uint32 rol = urand(0, 100);
-            if (rol < 50)
+            m_playerGUID = NULL;
+            m_bloodfangGUID = NULL;
+            m_crowleyGUID = NULL;
+            m_phinOdelicGUID = NULL;
+            m_bartoloGinsettiGUID = NULL;
+            m_loremasterDibbsGUID = NULL;
+            m_henryMalebGUID = NULL;
+            m_caretakersSmithersGUID = NULL;
+            m_sophiaGUID = NULL;
+            m_events.Reset();
+            m_events.ScheduleEvent(EVENT_CHECK_QUEST, 1000);
+            m_animatonIsStarted = false;
+        }
+
+        void JustSummoned(Creature* summon) override 
+        { 
+            switch (summon->GetEntry())
             {
-                summon->AI()->Talk(0);
-                summon->DespawnOrUnsummon(10000);
+            case NPC_BLOODFANG:
+                m_bloodfangGUID = summon->GetGUID();
+                break;
+            case NPC_CROWLEY:
+                m_crowleyGUID = summon->GetGUID();
+                break;
+            case NPC_PHIN_ODELIC:
+                m_phinOdelicGUID = summon->GetGUID();
+                SetCreatureValues(summon);
+                break;
+            case NPC_BARTOLO_GINSETTI:
+                m_bartoloGinsettiGUID = summon->GetGUID();
+                SetCreatureValues(summon);
+                break;
+            case NPC_LOREMASTER_DIBBS:
+                m_loremasterDibbsGUID = summon->GetGUID();
+                SetCreatureValues(summon);
+                break;
+            case NPC_MAGISTRATE_HENRY_MALEB:
+                m_henryMalebGUID = summon->GetGUID();
+                SetCreatureValues(summon);
+                break;
+            case NPC_CARETAKER_SMITHERS:
+                m_caretakersSmithersGUID = summon->GetGUID();
+                SetCreatureValues(summon);
+                break;
+            case NPC_SOPHIA_ZWOSKI:
+                m_sophiaGUID = summon->GetGUID();
+                SetCreatureValues(summon);
+                break;
+            }
+            summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+        }
+
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
+        {
+            switch (spell->Id)
+            {
+            case SPELL_GENERAL_TRIGGER_84107:               
+                m_events.RescheduleEvent(EVENT_MASTER_RESET, 30000);
+                break;
+            case SPELL_GENERAL_TRIGGER_84102:
+                if (Creature* camera = me->FindNearestCreature(45003, 25.0f))
+                    if (Creature* crowley = sObjectAccessor->GetCreature(*me, m_crowleyGUID))
+                        if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                        {
+                            // camera spell is wrong
+                            // camera->CastSpell(crowley->GetPositionX(), crowley->GetPositionY(), crowley->GetPositionZ(), 83763, true);
+                        }
+                break;
             }
         }
 
-        void JustDied(Unit* killer) override 
-        { 
-            if (Creature* agatha = me->FindNearestCreature(NPC_AGATHA, 30.0f))
+        void EnterEvadeMode() override { }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
             {
-                me->CastSpell(agatha, SPELL_NOTIFY_AGATHA);
-                uint32 m_forsakenSpell;
-                if (me->getGender() == GENDER_MALE)
-                    m_forsakenSpell = RAND(83998, 83999, 84000, 84001);
-                else
-                    m_forsakenSpell = RAND(84002, 84003, 84004, 84005);
-                me->CastSpell(me, m_forsakenSpell);
+                switch (eventId)
+                {
+                case EVENT_CHECK_QUEST:
+                {
+                    if (!m_animatonIsStarted)
+                        if (Player* player = me->FindNearestPlayer(15.0f))
+                            if (abs(player->GetPositionZ() - me->GetPositionZ()) < 1.0f)
+                                if (player->GetQuestStatus(QUEST_NO_ESCAPE) == QUEST_STATUS_INCOMPLETE)
+                                {
+                                    m_playerGUID = player->GetGUID();
+                                    m_animatonIsStarted = true;
+                                    m_events.ScheduleEvent(EVENT_START_ANIMATION, 100);
+                                    m_events.ScheduleEvent(EVENT_CHECK_PLAYER, 1000);
+                                    m_events.ScheduleEvent(EVENT_MASTER_RESET, 250000);
+                                }
+
+                    m_events.ScheduleEvent(EVENT_CHECK_QUEST, 1000);
+                    break;
+                }
+                case EVENT_CHECK_PLAYER:
+                {
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                        if (player->IsAlive() || player->IsInWorld())
+                        {
+                            m_events.ScheduleEvent(EVENT_CHECK_PLAYER, 1000);
+                            break;
+                        }
+                } // no break;
+                case EVENT_MASTER_RESET:
+                {
+                    DespawnAllSummons();
+                    Reset();
+                    break;
+                }
+                case EVENT_START_ANIMATION:
+                {
+                    me->CastSpell(994.530f, 687.740f, 74.8984f, SPELL_SUMMON_BLOODFANG, true);
+                    me->CastSpell(994.562f, 691.186f, 74.8984f, SPELL_SUMMON_CROWLEY, true);
+                    me->CastSpell(1002.520f, 693.027f, 76.1922f, SPELL_SUMMON_PHIN_ODELIC, true);
+                    me->CastSpell(1002.760f, 687.195f, 76.1922f, SPELL_SUMMON_BARTOLO_GINSETTI, true);
+                    me->CastSpell(1002.800f, 684.256f, 76.1922f, SPELL_SUMMON_LOREMASTER_DIBBS, true);
+                    me->CastSpell(1000.670f, 689.759f, 76.1922f, SPELL_SUMMON_MAGISTRATE_HENRY_MALEB, true);
+                    me->CastSpell(1002.700f, 695.775f, 76.1922f, SPELL_SUMMON_CARETAKER_SMITHERS, true);
+                    me->CastSpell(1004.530f, 688.619f, 76.1922f, SPELL_SUMMON_SOPHIA, true);
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                    {
+                        Creature* agatha = me->FindNearestCreature(NPC_AGATHA, 30.0f);
+                        if (!agatha)
+                            player->CastSpell(982.57f, 671.04f, 77.298f, SPELL_SUMMON_AGATHA, true);
+                        me->CastSpell(player, SPELL_FORCE_CAST_FENRIS_CAMERA, true);
+                    }
+                    break;
+                }
+                }
+            }
+        }
+
+        void DespawnAllSummons()
+        {
+            if (Creature* creature = sObjectAccessor->GetCreature(*me, m_bloodfangGUID))
+                creature->DespawnOrUnsummon(10);
+            if (Creature* creature = sObjectAccessor->GetCreature(*me, m_crowleyGUID))
+                creature->DespawnOrUnsummon(10);
+            if (Creature* creature = sObjectAccessor->GetCreature(*me, m_phinOdelicGUID))
+                creature->DespawnOrUnsummon(10);
+            if (Creature* creature = sObjectAccessor->GetCreature(*me, m_bartoloGinsettiGUID))
+                creature->DespawnOrUnsummon(10);
+            if (Creature* creature = sObjectAccessor->GetCreature(*me, m_loremasterDibbsGUID))
+                creature->DespawnOrUnsummon(10);
+            if (Creature* creature = sObjectAccessor->GetCreature(*me, m_henryMalebGUID))
+                creature->DespawnOrUnsummon(10);
+            if (Creature* creature = sObjectAccessor->GetCreature(*me, m_caretakersSmithersGUID))
+                creature->DespawnOrUnsummon(10);
+            if (Creature* creature = sObjectAccessor->GetCreature(*me, m_sophiaGUID))
+                creature->DespawnOrUnsummon(10);
+            if (Creature* creature = me->FindNearestCreature(45003, 30.0f))
+                creature->DespawnOrUnsummon(10);
+        }
+
+        void SetCreatureValues(Creature* npc)
+        {
+            Position pos = npc->GetPosition();
+            pos.SetOrientation(3.33f);
+            npc->SetHomePosition(pos);
+            npc->GetMotionMaster()->MoveTargetedHome();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_fenris_keep_stalker_45032AI(creature);
+    }
+};
+
+// 44989 // quest 27099
+class npc_lord_darius_crowley_44989 : public CreatureScript
+{
+public:
+    npc_lord_darius_crowley_44989() : CreatureScript("npc_lord_darius_crowley_44989") { }
+
+    struct npc_lord_darius_crowley_44989AI : public ScriptedAI
+    {
+        npc_lord_darius_crowley_44989AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+        EventMap m_events;
+        uint64 m_playerGUID;
+
+        void Initialize()
+        {
+            m_playerGUID = NULL;
+        }
+
+        void Reset() override
+        {
+
+        }
+
+        void IsSummonedBy(Unit* summoner) override
+        {
+            if (Player* player = summoner->ToPlayer())
+                m_playerGUID = player->GetGUID();
+        }
+
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
+        {
+            switch (spell->Id)
+            {
+            case SPELL_GENERAL_TRIGGER_84102:
+                m_events.ScheduleEvent(EVENT_ANIMATION, 500);
+                break;
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {                
+                case EVENT_ANIMATION + 0:
+                {
+                    Talk(0);
+                    m_events.ScheduleEvent(EVENT_ANIMATION + 1, 4700);
+                    break;
+                }
+                case EVENT_ANIMATION + 1:
+                {
+                    Talk(1);
+                    m_events.ScheduleEvent(EVENT_ANIMATION + 2, 4700);
+                    break;
+                }
+                case EVENT_ANIMATION + 2:
+                {
+                    Talk(2);
+                    m_events.ScheduleEvent(EVENT_ANIMATION + 3, 4700);
+                    break;
+                }
+                case EVENT_ANIMATION + 3:
+                {
+                    Talk(3);
+                    m_events.ScheduleEvent(EVENT_ANIMATION + 4, 4700);
+                    break;
+                }
+                case EVENT_ANIMATION + 4:
+                {
+                    Talk(4);
+                    m_events.ScheduleEvent(EVENT_ANIMATION + 5, 6100);
+                    break;
+                }
+                case EVENT_ANIMATION + 5:
+                {
+                    Talk(5);
+                    m_events.ScheduleEvent(EVENT_ANIMATION + 6, 9500);
+                    break;
+                }
+                case EVENT_ANIMATION + 6:
+                {
+                    me->CastSpell(me, SPELL_CONVERSATION_TRIGGER_84076, true);
+                    break;
+                }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_lord_darius_crowley_44989AI(creature);
+    }
+};
+
+// 44993 // quest 27099
+class npc_phin_odelic_44993 : public CreatureScript
+{
+public:
+    npc_phin_odelic_44993() : CreatureScript("npc_phin_odelic_44993") { }
+
+    struct npc_phin_odelic_44993AI : public ScriptedAI
+    {
+        npc_phin_odelic_44993AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+        EventMap m_events;
+        uint64 m_playerGUID;
+        bool   m_isWorgen;
+
+        void Initialize()
+        {
+            m_playerGUID = NULL;
+        }
+
+        void Reset() override
+        {
+            m_isWorgen = false;
+        }
+
+        void IsSummonedBy(Unit* summoner) override
+        {
+            if (Player* player = summoner->ToPlayer())
+                m_playerGUID = player->GetGUID();
+        }
+
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
+        {
+            switch (spell->Id)
+            {
+            case SPELL_CONVERSATION_TRIGGER_84077:
+                m_events.ScheduleEvent(EVENT_DRINKING, 100);
+                break;
+            }
+            if (!m_isWorgen)
+                if (me->HasAura(84094))
+                    me->RemoveAura(84094);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_DRINKING:
+                {
+                    // place for emote
+                    m_events.ScheduleEvent(EVENT_MORPHING, 3000);
+                    break;
+                }
+                case EVENT_MORPHING:
+                {
+                    m_isWorgen = true;
+                    me->CastSpell(me, 84094);
+                    break;
+                }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_phin_odelic_44993AI(creature);
+    }
+};
+
+// 44994 // quest 27099
+class npc_bartolo_ginsetti_44994 : public CreatureScript
+{
+public:
+    npc_bartolo_ginsetti_44994() : CreatureScript("npc_bartolo_ginsetti_44994") { }
+
+    struct npc_bartolo_ginsetti_44994AI : public ScriptedAI
+    {
+        npc_bartolo_ginsetti_44994AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+        EventMap m_events;
+        uint64 m_playerGUID;
+        bool   m_isWorgen;
+
+        void Initialize()
+        {
+            m_playerGUID = NULL;
+        }
+
+        void Reset() override
+        {
+            m_isWorgen = false;
+        }
+
+        void IsSummonedBy(Unit* summoner) override
+        {
+            if (Player* player = summoner->ToPlayer())
+                m_playerGUID = player->GetGUID();
+        }
+
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
+        {
+            switch (spell->Id)
+            {
+            case SPELL_CONVERSATION_TRIGGER_84077:
+                m_events.ScheduleEvent(EVENT_DRINKING, 100);
+                break;
+            }
+            if (!m_isWorgen)
+                if (me->HasAura(84095))
+                    me->RemoveAura(84095);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_DRINKING:
+                {
+                    // place for emote
+                    m_events.ScheduleEvent(EVENT_MORPHING, 3000);
+                    break;
+                }
+                case EVENT_MORPHING:
+                {
+                    m_isWorgen = true;
+                    me->CastSpell(me, 84095);
+                    break;
+                }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_bartolo_ginsetti_44994AI(creature);
+    }
+};
+
+// 44995 // quest 27099
+class npc_loremaster_dibbs_44995 : public CreatureScript
+{
+public:
+    npc_loremaster_dibbs_44995() : CreatureScript("npc_loremaster_dibbs_44995") { }
+
+    struct npc_loremaster_dibbs_44995AI : public ScriptedAI
+    {
+        npc_loremaster_dibbs_44995AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+        EventMap m_events;
+        uint64 m_playerGUID;
+        bool   m_isWorgen;
+
+        void Initialize()
+        {
+            m_playerGUID = NULL;
+        }
+
+        void Reset() override
+        {
+            m_isWorgen = false;
+        }
+
+        void IsSummonedBy(Unit* summoner) override
+        {
+            if (Player* player = summoner->ToPlayer())
+                m_playerGUID = player->GetGUID();
+        }
+
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
+        {
+            switch (spell->Id)
+            {
+            case SPELL_CONVERSATION_TRIGGER_84077:
+                m_events.ScheduleEvent(EVENT_DRINKING, 100);
+                break;
+            }
+            if (!m_isWorgen)
+                if (me->HasAura(84096))
+                    me->RemoveAura(84096);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_DRINKING:
+                {
+                    // place for emote
+                    m_events.ScheduleEvent(EVENT_MORPHING, 3000);
+                    break;
+                }
+                case EVENT_MORPHING:
+                {
+                    m_isWorgen = true;
+                    me->CastSpell(me, 84096);
+                    break;
+                }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_loremaster_dibbs_44995AI(creature);
+    }
+};
+
+// 44996 // quest 27099
+class npc_magistrate_henry_maleb_44996: public CreatureScript
+{
+public:
+    npc_magistrate_henry_maleb_44996() : CreatureScript("npc_magistrate_henry_maleb_44996") { }
+
+    struct npc_magistrate_henry_maleb_44996AI : public ScriptedAI
+    {
+        npc_magistrate_henry_maleb_44996AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+        EventMap m_events;
+        uint64 m_playerGUID;
+        bool   m_isWorgen;
+
+        void Initialize()
+        {
+            m_playerGUID = NULL;
+        }
+
+        void Reset() override
+        {
+            m_isWorgen = false;
+        }
+
+        void IsSummonedBy(Unit* summoner) override
+        {
+            if (Player* player = summoner->ToPlayer())
+                m_playerGUID = player->GetGUID();
+        }
+
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
+        {
+            switch (spell->Id)
+            {
+            case SPELL_CONVERSATION_TRIGGER_84076:
+                if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                    me->CastSpell(player, SPELL_ARMORE_CAMERA, true);
+                m_events.ScheduleEvent(EVENT_ANIMATION, 500);
+                break;
+            case SPELL_CONVERSATION_TRIGGER_84077:
+                m_events.ScheduleEvent(EVENT_DRINKING, 100);
+                break;
+            }
+            if (!m_isWorgen)
+                if (me->HasAura(84097))
+                    me->RemoveAura(84097);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_ANIMATION:
+                {
+                    Talk(0);
+                    m_events.ScheduleEvent(EVENT_ANIMATION + 1, 10800);
+                    break;
+                }
+                case EVENT_ANIMATION + 1:
+                {
+                    Talk(1);
+                    m_events.ScheduleEvent(EVENT_ANIMATION + 2, 3500);
+                    break;
+                }
+                case EVENT_ANIMATION + 2:
+                {
+                    me->CastSpell(me, SPELL_CONVERSATION_TRIGGER_84077, true);
+                    break;
+                }
+                case EVENT_DRINKING:
+                {
+                    
+                    m_events.ScheduleEvent(EVENT_MORPHING, 3000);
+                    break;
+                }
+                case EVENT_MORPHING:
+                {
+                    m_isWorgen = true;
+                    me->CastSpell(me, 84097);
+                    me->CastSpell(me, SPELL_GENERAL_TRIGGER_84107, true);
+                    break;
+                }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_magistrate_henry_maleb_44996AI(creature);
+    }
+};
+
+// 44997 // quest 27099
+class npc_caretaker_smithers_44997 : public CreatureScript
+{
+public:
+    npc_caretaker_smithers_44997() : CreatureScript("npc_caretaker_smithers_44997") { }
+
+    struct npc_caretaker_smithers_44997AI : public ScriptedAI
+    {
+        npc_caretaker_smithers_44997AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+        EventMap m_events;
+        uint64 m_playerGUID;
+        bool   m_isWorgen;
+
+        void Initialize()
+        {
+            m_playerGUID = NULL;
+        }
+
+        void Reset() override
+        {
+            m_isWorgen = false;
+        }
+
+        void IsSummonedBy(Unit* summoner) override
+        {
+            if (Player* player = summoner->ToPlayer())
+                m_playerGUID = player->GetGUID();
+        }
+
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
+        {
+            switch (spell->Id)
+            {
+            case SPELL_CONVERSATION_TRIGGER_84077:
+                m_events.ScheduleEvent(EVENT_DRINKING, 100);
+                break;
+            }
+            if (!m_isWorgen)
+                if (me->HasAura(84098))
+                    me->RemoveAura(84098);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_DRINKING:
+                {
+                    // place for emote
+                    m_events.ScheduleEvent(EVENT_MORPHING, 3000);
+                    break;
+                }
+                case EVENT_MORPHING:
+                {
+                    m_isWorgen = true;
+                    me->CastSpell(me, 84098);
+                    break;
+                }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_caretaker_smithers_44997AI(creature);
+    }
+};
+
+// 45002 // quest 27099
+class npc_sophia_zwoski_45002 : public CreatureScript
+{
+public:
+    npc_sophia_zwoski_45002() : CreatureScript("npc_sophia_zwoski_45002") { }
+
+    struct npc_sophia_zwoski_45002AI : public ScriptedAI
+    {
+        npc_sophia_zwoski_45002AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+        EventMap m_events;
+        uint64 m_playerGUID;
+        bool   m_isWorgen;
+
+        void Initialize()
+        {
+            m_playerGUID = NULL;
+        }
+
+        void Reset() override
+        {
+            m_isWorgen = false;
+        }
+
+        void IsSummonedBy(Unit* summoner) override
+        {
+            if (Player* player = summoner->ToPlayer())
+                m_playerGUID = player->GetGUID();
+        }
+
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
+        {
+            switch (spell->Id)
+            {
+            case SPELL_CONVERSATION_TRIGGER_84077:
+                m_events.ScheduleEvent(EVENT_DRINKING, 100);
+                break;
+            }
+            if (!m_isWorgen)
+                if (me->HasAura(84099))
+                    me->RemoveAura(84099);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {               
+                case EVENT_DRINKING:
+                {
+                    // place for emote
+                    m_events.ScheduleEvent(EVENT_MORPHING, 3000);
+                    break;
+                }
+                case EVENT_MORPHING:
+                {
+                    m_isWorgen = true;
+                    me->CastSpell(me, 84099);
+                    m_events.ScheduleEvent(EVENT_HOWLING, 1500);
+                    break;
+                }
+                case EVENT_HOWLING:
+                {
+                    me->PlayDirectSound(SOUND_WORGEN_HOWLING);
+                    break;
+                }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_sophia_zwoski_45002AI(creature);
+    }
+};
+
+// 45003 // quest 27099
+class npc_camera_45003 : public CreatureScript
+{
+public:
+    npc_camera_45003() : CreatureScript("npc_camera_45003") { }
+
+    struct npc_camera_45003AI : public VehicleAI
+    {
+        npc_camera_45003AI(Creature* creature) : VehicleAI(creature) { Initialize(); }
+
+        EventMap m_events;
+        uint64   m_playerGUID;
+
+        void Initialize()
+        {
+            m_playerGUID = NULL;
+        }
+
+        void Reset() override
+        {
+            me->SetVisible(false);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetReactState(REACT_PASSIVE);
+        }
+
+        void IsSummonedBy(Unit* summoner) override 
+        { 
+            if (Player* player = summoner->ToPlayer())
+                m_playerGUID = player->GetGUID();
+        }
+
+        void PassengerBoarded(Unit* passenger, int8 seatId, bool apply) override 
+        { 
+            if (apply && seatId == 0)
+                m_events.ScheduleEvent(EVENT_MOVE_TO_STARTPOINT, 100);
+            if (apply && seatId == 1)
+                passenger->SetFacingTo(0.0f);
+            if (!apply && seatId == 1)
+                me->DespawnOrUnsummon(1000);
+        }
+
+        void MovementInform(uint32 type, uint32 id) override 
+        { 
+            if (type == POINT_MOTION_TYPE && id == 1230)
+                m_events.ScheduleEvent(EVENT_CHANGE_TO_SEAT_2, 100);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_MOVE_TO_STARTPOINT:
+                {
+                    me->GetMotionMaster()->MovePoint(1230, 980.7f, 689.14f, 76.9f);
+                    break;
+                }
+                case EVENT_CHANGE_TO_SEAT_2:
+                {
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                    {
+                        player->EnterVehicle(me, 1);
+                        me->CastSpell(player, 84091, true);
+                    }
+                    m_events.ScheduleEvent(EVENT_TRIGGER_84102, 1500);
+                    break;
+                }
+                case EVENT_TRIGGER_84102:
+                {
+                    me->CastSpell(me, SPELL_GENERAL_TRIGGER_84102, true);
+                    break;
+                }
+                }
             }
         }
     };
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_hillsbrad_refugee_44966AI(creature);
+        return new npc_camera_45003AI(creature);
     }
 };
+
 
 
 void AddSC_silverpine_forest()
@@ -3036,6 +4052,14 @@ void AddSC_silverpine_forest()
     new spell_reverse_cast_ride_vehicle_83904();
     new npc_agatha_44951();
     new npc_hillsbrad_refugee_44966();
-
+    new npc_fenris_keep_stalker_45032();
+    new npc_lord_darius_crowley_44989();
+    new npc_phin_odelic_44993();
+    new npc_bartolo_ginsetti_44994();
+    new npc_loremaster_dibbs_44995();
+    new npc_magistrate_henry_maleb_44996();
+    new npc_caretaker_smithers_44997();
+    new npc_sophia_zwoski_45002();
+    new npc_camera_45003();
 
 }
