@@ -7598,5 +7598,16 @@ void Spell::EffectTriggerSpell_160(SpellEffIndex effIndex)
         return;
     }
 
-    m_caster->CastSpell(unitTarget, spellInfo, TRIGGERED_FULL_MASK);
+    if (unitTarget)
+        m_caster->CastSpell(unitTarget, spellInfo, TRIGGERED_FULL_MASK);
+    else
+    {
+    /* 
+        TODO:
+        if targets of triggered spell are (23, 0) == TARGET_GAMEOBJECT_TARGET (used in quest 14098, spells 66639/67869)
+        then unitTarget is empty.
+        i can't find the used GameObject. (Door) to insert as target..
+        (doing nothing = i cancel here triggering of spell to prevent crash.)
+    */
+    }
 }
