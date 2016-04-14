@@ -302,8 +302,44 @@ public:
     };
 };
 
+// 15274
+class npc_mana_wyrm_15274 : public CreatureScript
+{
+public:
+    npc_mana_wyrm_15274() : CreatureScript("npc_mana_wyrm_15274") { }
+
+    enum eNPC
+    {
+        QUEST_THIRST_UNENDING = 8346,
+        NPC_SUNSTRIDER_MANA_TAP_COUNTER = 15468,
+        SPELL_QUEST_CREDIT_8346 = 61314,
+        SPELL_ARCANE_TORRENT = 28730,
+    };
+
+    struct npc_mana_wyrm_15274AI : public ScriptedAI
+    {
+        npc_mana_wyrm_15274AI(Creature* creature) : ScriptedAI(creature) { }
+
+        void SpellHit(Unit* caster, SpellInfo const* spell) override 
+        { 
+            if (spell->Id == SPELL_ARCANE_TORRENT)
+                if (Player* player = caster->ToPlayer())
+                    if (player->GetQuestStatus(QUEST_THIRST_UNENDING) == QUEST_STATUS_INCOMPLETE)
+                        player->KilledMonsterCredit(NPC_SUNSTRIDER_MANA_TAP_COUNTER);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_mana_wyrm_15274AI(creature);
+    }
+};
+
+
 void AddSC_eversong_woods()
 {
     new npc_apprentice_mirveda();
     new npc_infused_crystal();
+    new npc_mana_wyrm_15274();
+
 }
