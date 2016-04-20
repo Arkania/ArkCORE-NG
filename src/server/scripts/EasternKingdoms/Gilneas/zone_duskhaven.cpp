@@ -854,33 +854,34 @@ public:
                 {
                     case EVENT_CHECK_ATTACK:
                     {
-                        
-                        Creature* thyala = sObjectAccessor->GetCreature(*me, m_thyalaGUID);
-                        if (!thyala->IsAlive() || !thyala->IsInWorld())
+                        if (Creature* thyala = sObjectAccessor->GetCreature(*me, m_thyalaGUID))
                         {
-                            if (Player* player = sObjectAccessor->GetPlayer(*me, m_player_GUID))
-                                player->KilledMonsterCredit(NPC_DARK_RANGER_THYALA);
+                            if (!thyala->IsAlive() || !thyala->IsInWorld())
+                            {
+                                if (Player* player = sObjectAccessor->GetPlayer(*me, m_player_GUID))
+                                    player->KilledMonsterCredit(NPC_DARK_RANGER_THYALA);
 
-                            me->DespawnOrUnsummon(1000);
+                                me->DespawnOrUnsummon(1000);
+                            }
+
+                            if (me->GetDistance2d(thyala) < 20.0f)
+                            {
+                                me->SetWalk(false);
+                                me->GetMotionMaster()->MoveIdle();
+                            }
                         }
-
-                        if (me->GetDistance2d(thyala) < 20.0f)
-                        {
-                            me->SetWalk(false);
-                            me->GetMotionMaster()->MoveIdle();
-                        }
-
                         m_events.ScheduleEvent(EVENT_CHECK_ATTACK, 1000);
                         break;
                     }
                     case EVENT_SEND_MORE_MASTIFF:
                     {
-                        if (m_mastiff_counter < 50)
-                        {
-                            std::list<Creature*>trigger = me->FindNearestCreatures(NPC_TRIGGER, 100.0f);
-                            for (std::list<Creature*>::const_iterator itr = trigger.begin(); itr != trigger.end(); ++itr)
-                                me->SummonCreature(NPC_MASTIFF, (*itr)->GetNearPosition(5.0f, frand(0.0f, 6.28f)), TEMPSUMMON_TIMED_DESPAWN, urand(30000, 60000));
-                        }
+                        if (Creature* thyala = sObjectAccessor->GetCreature(*me, m_thyalaGUID))
+                            if (m_mastiff_counter < 50)
+                            {
+                                std::list<Creature*>trigger = me->FindNearestCreatures(NPC_TRIGGER, 100.0f);
+                                for (std::list<Creature*>::const_iterator itr = trigger.begin(); itr != trigger.end(); ++itr)
+                                    me->SummonCreature(NPC_MASTIFF, (*itr)->GetNearPosition(5.0f, frand(0.0f, 6.28f)), TEMPSUMMON_TIMED_DESPAWN, urand(30000, 60000));
+                            }
 
                         m_events.ScheduleEvent(EVENT_SEND_MORE_MASTIFF, 250);
                         break;
