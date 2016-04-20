@@ -41,6 +41,25 @@ private:
     uint32 _entry;
 };
 
+class IsNotEntryButPlayer
+{
+public:
+    explicit IsNotEntryButPlayer(uint32 entry) : _entry(entry) { }
+
+    bool operator()(WorldObject* obj) const
+    {
+        if (Player* player = obj->ToPlayer())
+            return false;
+        else if (Creature* target = obj->ToCreature())
+            return target->GetEntry() != _entry;
+
+        return true;
+    }
+
+private:
+    uint32 _entry;
+};
+
 class IsNotInEntryList
 {
 public:

@@ -457,10 +457,11 @@ class npc_forsaken_catapult_36283 : public CreatureScript
 public:
     npc_forsaken_catapult_36283() : CreatureScript("npc_forsaken_catapult_36283") { }
 
-    enum eHorrid
+    enum eCatapult
     {
         NPC_FORSAKEN_MACHINIST = 36292,
-        NPC_GENERIC_TRIGGER_LAB = 36286,
+        NPC_GENERIC_TRIGGER_LAB_AOI = 36286, // target on land
+        NPC_GENERIC_TRIGGER_LAB_MP = 35374, // target on ship
         PASSENGER_GUID = 99998,
         PLAYER_GUID = 99999,
         SPELL_FIERY_BOULDER = 68591, 
@@ -469,44 +470,81 @@ public:
         SPELL_LAUNCH3 = 66227,
         SPELL_LAUNCH4 = 96185,
         EVENT_CHECK_PLAYER = 101,
-        EVENT_CAST_BOULDER_PREPARE,
+        EVENT_CAST_BOULDER,
+        EVENT_CAST_PLAYER,
         EVENT_MASTER_RESET,
     };
 
-    struct npc_forsaken_catapult_36283AI : public ScriptedAI
+    struct npc_forsaken_catapult_36283AI : public VehicleAI
     {
-        npc_forsaken_catapult_36283AI(Creature* creature) : ScriptedAI(creature) {}
+        npc_forsaken_catapult_36283AI(Creature* creature) : VehicleAI(creature) { }
 
         EventMap m_events;
-        uint64   m_playerGUID;
-        uint64   m_forsakenGUID;
-        int32    m_phase;
+        uint64   m_playerGUID; // guid only set if mounted
+        uint64   m_forsakenGUID; // guid only set if mounted
+        uint64   m_targetGUID;
 
         void Reset() override
         {
-            m_phase = 0;
             m_events.Reset();
-            m_events.ScheduleEvent(EVENT_CHECK_PLAYER, 1000);
             m_playerGUID = NULL;
             m_forsakenGUID = NULL;
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-            me->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_DISABLE_TURN);
+            m_targetGUID = NULL;
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
             me->SetReactState(REACT_PASSIVE);
+            me->setFaction(1735);
         }
 
         void PassengerBoarded(Unit* passenger, int8 seatId, bool apply) override
         { 
-            m_playerGUID = NULL;
-            m_forsakenGUID = NULL;
             if (apply)
+            {
                 if (Player* player = passenger->ToPlayer())
+                {
                     m_playerGUID = player->GetGUID();
+                }
                 else if (Creature* npc = passenger->ToCreature())
-                    if (npc->GetEntry() == NPC_FORSAKEN_MACHINIST)
-                    {
-                        m_forsakenGUID = npc->GetGUID();
-                        m_events.ScheduleEvent(EVENT_CAST_BOULDER_PREPARE, urand(1000, 15000));
-                    }
+                {
+                    m_forsakenGUID = npc->GetGUID();
+                    npc->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
+                    m_events.ScheduleEvent(EVENT_CAST_BOULDER, 100);
+                    m_events.ScheduleEvent(EVENT_CHECK_PLAYER, 1000);
+                    me->setFaction(1735);
+                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                }
+            }
+            else
+            {
+                if (Player* player = passenger->ToPlayer())
+                {
+                    m_events.ScheduleEvent(EVENT_CAST_PLAYER, 1000);
+                }
+                else if (Creature* npc = passenger->ToCreature())
+                {
+                    m_forsakenGUID = NULL;
+                    npc->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
+                    m_events.CancelEvent(EVENT_CAST_BOULDER);
+                    m_events.CancelEvent(EVENT_CHECK_PLAYER);
+                    m_events.ScheduleEvent(EVENT_MASTER_RESET, 180000);
+                    me->setFaction(35);
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                }
+            }
+        }
+
+        void EnterEvadeMode() {}
+
+        void SetGUID(uint64 guid, int32 id) override
+        {
+            switch (id)
+            {
+            case NPC_GENERIC_TRIGGER_LAB_MP:
+            {
+                m_targetGUID = guid;
+                me->GetVehicleKit()->RemoveAllPassengers();
+                break;
+            }
+            }
         }
 
         void UpdateAI(uint32 diff) override
@@ -517,56 +555,47 @@ public:
             {
                 switch (eventId)
                 {
-                    case EVENT_CHECK_PLAYER:
-                    {
-                        Vehicle* catapult = me->GetVehicleKit();
-                        Unit* unit = catapult->GetPassenger(0);
-                        if (catapult)
-                            if (unit)
+                case EVENT_CHECK_PLAYER:
+                {
+                    if (Creature* target = sObjectAccessor->GetCreature(*me, m_forsakenGUID))
+                        if (Player* player = me->FindNearestPlayer(7.0f))
                             {
-                                if (Creature* forsaken = unit->ToCreature())
-                                {
-                                    if (forsaken->IsInCombat())
-                                    {
-                                        forsaken->ExitVehicle();
-                                        forsaken->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
-                                        m_events.ScheduleEvent(EVENT_MASTER_RESET, 10000);
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                if (me->getFaction() != 35)
-                                {
-                                    m_events.CancelEvent(EVENT_CAST_BOULDER_PREPARE);
-                                    me->setFaction(35);
-                                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NOT_SELECTABLE);
-                                    me->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_DISABLE_TURN);
-                                }
+                                target->ExitVehicle();
                                 break;
                             }
+                    m_events.ScheduleEvent(EVENT_CHECK_PLAYER, 1000);
+                    break;
+                }
+                case EVENT_CAST_BOULDER:
+                {
+                    me->CastSpell(me, SPELL_FIERY_BOULDER, true);
+                    m_events.ScheduleEvent(EVENT_CAST_BOULDER, urand(10000, 15000));
+                    break;
+                }
+                case EVENT_MASTER_RESET:
+                {
+                    if (m_forsakenGUID || m_playerGUID)
+                        m_events.ScheduleEvent(EVENT_MASTER_RESET, 180000);
+                    else
+                    {
+                        if (Creature* npc = me->SummonCreature(NPC_FORSAKEN_MACHINIST, me->GetPosition()))
+                            npc->EnterVehicle(me, 0);
 
-                        m_events.ScheduleEvent(EVENT_CHECK_PLAYER, 1000);
-                        break;
+                        Reset();
                     }
-                    case EVENT_CAST_BOULDER_PREPARE:
-                    {
-                        me->CastSpell(me, SPELL_FIERY_BOULDER, true);
-                        m_events.ScheduleEvent(EVENT_CAST_BOULDER_PREPARE, urand(8000,15000));
-                        break;
-                    }
-                    case EVENT_MASTER_RESET:
-                    {
-                        me->DespawnOrUnsummon(1);
-                        break;
-                    }
+                    break;
+                }
+                case EVENT_CAST_PLAYER:
+                {
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                        if (Creature* t = sObjectAccessor->GetCreature(*me, m_targetGUID))
+                            player->NearTeleportTo(t->GetPositionX(), t->GetPositionY(), t->GetPositionZ(), player->GetOrientation());
+
+                    m_playerGUID = NULL;
+                    break;
+                }
                 }
             }
-
-            if (!UpdateVictim())
-                return;
-            else
-                DoMeleeAttackIfReady();
         }
     };
 
@@ -587,77 +616,81 @@ public:
         // TRAJ  short from trajectories = Flugbahnen, Flugkurven, Bewegungsbahnen 
         NPC_FORSAKEN_CATAPULT = 36283,
         NPC_FORSAKEN_MACHINIST = 36292,
-        NPC_GENERIC_TRIGGER_LAB = 36286,
+        NPC_GENERIC_TRIGGER_LAB_AOI = 36286, // target on land
+        NPC_GENERIC_TRIGGER_LAB_MP = 35374, // target on ship
         PASSENGER_GUID = 99998,
         PLAYER_GUID = 99999,
+    };
+
+    class IsNotEntry
+    {
+    public:
+        explicit IsNotEntry(uint32 entry) : _entry(entry) { }
+
+        bool operator()(WorldObject* obj) const
+        {
+            if (Creature* target = obj->ToCreature())
+                return target->GetEntry() != _entry;
+
+            return true;
+        }
+
+    private:
+        uint32 _entry;
     };
 
     class spell_launch_68659_SpellScript : public SpellScript
     {
         PrepareSpellScript(spell_launch_68659_SpellScript);
 
-        uint64 m_playerGuid = NULL;
-        std::list<uint32> _guids;
+        uint64 m_playerGUID = NULL;
         Position pos = Position();
-
-        void Initialize()
-        {
-            if (_guids.empty())
-            {
-                _guids.push_back(116836);
-                _guids.push_back(116837);
-                _guids.push_back(116838);
-                _guids.push_back(116839);
-                _guids.push_back(116840);
-                _guids.push_back(116841);
-                _guids.push_back(116842);
-                _guids.push_back(116843);
-                _guids.push_back(116844);
-            }
-        }
 
         void HandleBeforeCast()
         {
+            m_playerGUID = NULL;
             if (Creature* catapult = GetCaster()->ToCreature())
                 if (Vehicle* vehicle = catapult->GetVehicleKit())
                     if (Unit* unit = vehicle->GetPassenger(0))
                         if (Player* player = unit->ToPlayer())
                         {
-                            m_playerGuid = player->GetGUID();
-                            player->ExitVehicle(0);
+                            m_playerGUID = player->GetGUID();
+                            player->EnterVehicle(GetCaster(), 1);
                         }
-                        else
-                            m_playerGuid = NULL;
         }
-
+       
         void CheckTargets(std::list<WorldObject*>& targets)
         {
-            Initialize();
-            targets.remove_if(IsNotInDBGuidList(_guids));
-            if (targets.size())
+            targets.remove_if(IsNotEntry(NPC_GENERIC_TRIGGER_LAB_MP));
+            if (targets.empty())
+                return;
+            WorldObject* target = NULL;
+            float target_orientation = 6.28f;
+            float ori = GetCaster()->GetOrientation();
+            for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
             {
-                std::list<WorldObject*>::iterator itr = targets.begin();
-                pos = (*itr)->GetPosition();
+                float angle = GetCaster()->GetAngle((*itr));
+                float diff = abs(ori - angle);
+                if (diff < target_orientation)
+                {
+                    target_orientation = diff;
+                    target = (*itr);
+                    pos = target->GetPosition();
+                }
             }
-            targets.remove_if(IsNotBetweenAngle(GetCaster(), 1.57f, 4.71f));
-            targets.remove_if(ReduceToOneRandomTarget(targets));
-            if (targets.size())
-            {
-                std::list<WorldObject*>::iterator itr = targets.begin();
-                pos = (*itr)->GetPosition();
-            }
+            targets.clear();
+            targets.push_back(target);
+            GetCaster()->GetAI()->SetGUID(target->GetGUID(), target->GetEntry());            
         }
 
-        void HandleDummy(SpellEffIndex effIndex)
+        void HandleDummy(SpellEffIndex /*effIndex*/)
         {
-            if (Player* player = sObjectAccessor->GetPlayer(*GetCaster(), m_playerGuid))
-               if (pos.GetPositionX())
-                    player->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), player->GetOrientation());
+
         }
 
         void Register() override
         {
-            BeforeCast += SpellCastFn(spell_launch_68659_SpellScript::HandleBeforeCast);
+           // BeforeCast += SpellCastFn(spell_launch_68659_SpellScript::HandleBeforeCast);
             OnEffectHit += SpellEffectFn(spell_launch_68659_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_launch_68659_SpellScript::CheckTargets, EFFECT_0, TARGET_UNIT_DEST_AREA_ENTRY);
         }
@@ -680,50 +713,47 @@ public:
         // TRAJ  short from trajectories = Flugbahnen, Flugkurven, Bewegungsbahnen 
         NPC_FORSAKEN_CATAPULT = 36283,
         NPC_FORSAKEN_MACHINIST = 36292,
-        NPC_GENERIC_TRIGGER_LAB = 36286,
-        PASSENGER_GUID = 99998,
-        PLAYER_GUID = 99999,
+        NPC_GENERIC_TRIGGER_LAB_AOI = 36286, // target on land
+        NPC_GENERIC_TRIGGER_LAB_MP = 35374, // target on ship
+    };
+
+    class IsNotEntryButPlayer
+    {
+    public:
+        explicit IsNotEntryButPlayer(Unit const* caster, uint32 entry) : _caster(caster), _entry(entry) { }
+
+        bool operator()(WorldObject* obj) const
+        {
+            if (_caster->GetExactDist2d(obj) < 5.0f || _caster->GetExactDist2d(obj) > 80.0f)
+                return true;
+            if (Player* player = obj->ToPlayer())
+                return player->IsMounted();
+            else if (Creature* target = obj->ToCreature())
+                return target->GetEntry() != _entry;
+
+            return true;
+        }
+
+    private:
+        const Unit* _caster;
+        uint32 _entry;
     };
 
     class spell_fire_boulder_68591_SpellScript : public SpellScript
     {
         PrepareSpellScript(spell_fire_boulder_68591_SpellScript);
 
-        uint64 m_playerGuid = NULL;
-        std::list<Position> _posHouse;
-        std::list<Position> _posGarden;
-        std::list<Position> _posWay;
-        std::list<uint32> _guids;
-
-        void Initialize()
-        {
-            if (_guids.empty())
-            {
-                _guids.push_back(116845);
-                _guids.push_back(116846);
-                _guids.push_back(116847);
-                _guids.push_back(116848);
-                _guids.push_back(116849);
-                _guids.push_back(116850);
-                _guids.push_back(116851);
-                _guids.push_back(116852);
-                _guids.push_back(116853);
-                _guids.push_back(116854);
-                _guids.push_back(116855);
-                _guids.push_back(116856);
-                _guids.push_back(116857);
-                _guids.push_back(116858);
-                _guids.push_back(116859);
-                _guids.push_back(116860);
-            }
-        }
-
         void CheckTargets(std::list<WorldObject*>& targets)
         {
-            Initialize();
-            targets.remove_if(IsNotInDBGuidList(_guids));
-            targets.remove_if(IsOutsideDistance(GetCaster(), 30, 120));
+            targets.remove_if(IsNotEntryButPlayer(GetCaster(), NPC_GENERIC_TRIGGER_LAB_AOI));
             targets.remove_if(ReduceToOneRandomTarget(targets));
+            if (!targets.size())
+                this->FinishCast(SPELL_CAST_OK);
+            else
+            {
+                std::list<WorldObject*>::iterator itr = targets.begin();
+                GetCaster()->SetFacingToObject(*itr);
+            }
         }
 
         void Register() override
