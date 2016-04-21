@@ -1043,6 +1043,37 @@ public:
 
 // Phase 16384
 
+// 36440
+class npc_drowning_watchman_36440 : public CreatureScript
+{
+public:
+    npc_drowning_watchman_36440() : CreatureScript("npc_drowning_watchman_36440") { }
+
+    enum eNpc
+    {
+        QUEST_GASPING_FOR_BREATH = 14395,
+        NPC_DROWNING_WATCHMAN_CREDIT = 36450,
+        SPELL_PARACHUTE = 45472,
+    };
+
+    struct npc_drowning_watchman_36440AI : public ScriptedAI
+    {
+        npc_drowning_watchman_36440AI(Creature* creature) : ScriptedAI(creature) { }
+
+        void SpellHit(Unit* caster, SpellInfo const* spell) override 
+        { 
+            if (Player* player = caster->ToPlayer())
+                if (player->GetQuestStatus(QUEST_GASPING_FOR_BREATH) == QUEST_STATUS_INCOMPLETE)
+                    if (spell->Id == SPELL_PARACHUTE)
+                        player->KilledMonsterCredit(NPC_DROWNING_WATCHMAN_CREDIT);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_drowning_watchman_36440AI(creature);
+    }
+};
 
 
 
@@ -1063,4 +1094,6 @@ void AddSC_zone_gilneas_duskhaven()
     new npc_mastiff_36409();
     new npc_mastiff_36405();
     new npc_lord_godfrey_36290();
+    new npc_drowning_watchman_36440();
+        
 };
