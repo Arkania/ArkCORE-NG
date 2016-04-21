@@ -1075,6 +1075,107 @@ public:
     }
 };
 
+// 36440
+class npc_chance_36459 : public CreatureScript
+{
+public:
+    npc_chance_36459() : CreatureScript("npc_chance_36459") { }
+
+    enum eNpc
+    {
+        QUEST_GRANDMAS_CAT = 14401,
+        NPC_CAT = 36459,
+        NPC_LUCIUS = 36461,
+        EVENT_CHECK_PLAYER = 101,
+        EVENT_CREATE_LUCIUS,
+        EVENT_MASTER_RESET,
+    };
+
+    struct npc_chance_36459AI : public ScriptedAI
+    {
+        npc_chance_36459AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap m_events;
+        uint64   m_luciusGUID;
+        uint64   m_playerGUID;
+        bool     m_isLucisKilled;
+
+        void Reset() override
+        {
+            m_events.Reset();
+            m_events.ScheduleEvent(EVENT_CHECK_PLAYER, 1000);
+            m_luciusGUID = NULL;
+            m_playerGUID = NULL;
+            m_isLucisKilled = false;
+        }
+
+        void JustSummoned(Creature* summon) override 
+        { 
+            if (summon->GetEntry() == NPC_LUCIUS)
+                summon->AI()->Talk(1);
+        }
+
+        void SummonedCreatureDies(Creature* summon, Unit* killer) override 
+        { 
+            m_isLucisKilled = true;
+            m_luciusGUID = NULL;
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_CHECK_PLAYER:
+                {
+                    if (!m_playerGUID)
+                    {
+                        if (Player* player = me->FindNearestPlayer(10.0f))
+                            if (player->GetQuestStatus(QUEST_GRANDMAS_CAT) == QUEST_STATUS_INCOMPLETE)
+                            {
+                                m_playerGUID = player->GetGUID();
+                                m_events.ScheduleEvent(EVENT_MASTER_RESET, 180000);
+                                me->SummonCreature(NPC_LUCIUS, -2109.36f, 2330.28f, 7.36667f, 0.151307f, TEMPSUMMON_TIMED_DESPAWN, 180000);
+                            }
+                    }
+                    else if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                    {
+                        if (player->GetQuestStatus(QUEST_GRANDMAS_CAT) == QUEST_STATUS_COMPLETE)
+                        {
+                            me->DespawnOrUnsummon(10);
+                            Reset();
+                        }
+                    }
+                    else if (m_isLucisKilled)
+                        Reset();
+
+                    m_events.ScheduleEvent(EVENT_CHECK_PLAYER, 1000);
+                    break;
+                }
+                case EVENT_MASTER_RESET:
+                {
+                    Reset();
+                    break;
+                }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_chance_36459AI(creature);
+    }
+};
+
 
 
 void AddSC_zone_gilneas_duskhaven()
@@ -1095,5 +1196,6 @@ void AddSC_zone_gilneas_duskhaven()
     new npc_mastiff_36405();
     new npc_lord_godfrey_36290();
     new npc_drowning_watchman_36440();
-        
+    new npc_chance_36459();
+
 };
