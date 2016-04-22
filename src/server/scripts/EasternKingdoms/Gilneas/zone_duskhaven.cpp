@@ -36,6 +36,7 @@ EndScriptData */
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
+#include "ScriptedFollowerAI.h"
 #include "SpellScript.h"
 #include "SpellAuraEffects.h"
 #include "Vehicle.h"
@@ -1176,6 +1177,248 @@ public:
     }
 };
 
+// 36488
+class npc_forsaken_castaway_36488 : public CreatureScript
+{
+public:
+    npc_forsaken_castaway_36488() : CreatureScript("npc_forsaken_castaway_36488") { }
+
+    enum eNpc
+    {
+       
+    };
+
+    struct npc_forsaken_castaway_36488AI : public ScriptedAI
+    {
+        npc_forsaken_castaway_36488AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap m_events;
+        uint64   m_luciusGUID;
+        uint64   m_playerGUID;
+        bool     m_isLucisKilled;
+
+        void DamageDealt(Unit* victim, uint32& damage, DamageEffectType damageType) 
+        { 
+            uint8 rol = urand(0, 100);
+            if (victim->GetEntry() == 36454 || victim->GetEntry() == 36455 || victim->GetEntry() == 36492 || victim->GetEntry() == 36456)
+                if (rol < 70 || victim->GetHealthPct() < 70.0f)
+                    damage = 0;
+                else
+                    damage = 1;
+        }
+
+        void DamageTaken(Unit* attacker, uint32& damage) override 
+        { 
+            uint8 rol = urand(0, 100);
+            if (attacker->GetEntry() == 36454 || attacker->GetEntry() == 36455 || attacker->GetEntry() == 36492 || attacker->GetEntry() == 36456)
+                if (rol < 70)
+                    damage = 0;
+                else
+                    damage = 1;
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_forsaken_castaway_36488AI(creature);
+    }
+};
+
+// 36555
+class npc_mountain_horse_36555 : public CreatureScript
+{
+public:
+    npc_mountain_horse_36555() : CreatureScript("npc_mountain_horse_36555") { }
+
+    enum eNpc
+    {
+        QUEST_THE_HUNGRY_ETTIN = 54416,
+        NPC_LORNA_CROWLEY = 36457,
+        SPELL_ROUND_UP_HORSE = 68903,
+        SPELL_ROPE_IN_HORSE = 68908,
+        SPELL_ROPE_CHANNEL = 68940,
+        SPELL_MOUNTAIN_HORSE_CREDIT = 68917,
+        SPELL_RIDE_VEHICLE = 94654,
+        EVENT_START_FOLLOWING = 101,
+    };
+
+    struct npc_mountain_horse_36555AI : public ScriptedAI
+    {
+        npc_mountain_horse_36555AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap m_events;
+        uint64   m_playerGUID;
+        uint64   m_lornaGUID;
+        float    m_dist;
+        float    m_angle;
+        float    m_size;
+        Position m_oldPosition;
+        bool     m_isLornaNear;
+        bool     m_isPlayerMounted;
+        bool     m_hasPlayerRope;
+
+
+        void Reset() override
+        {
+            m_events.Reset();
+            m_playerGUID = NULL;
+            m_lornaGUID = NULL;
+            m_isLornaNear = false;
+            m_isPlayerMounted = false;
+            m_hasPlayerRope = false;
+            me->SetWalk(false);
+            me->SetSpeed(MOVE_RUN, 1.4f);
+        }
+
+        void IsSummonedBy(Unit* summoner) override 
+        { 
+            if (Player* player = summoner->ToPlayer())
+            {
+                m_playerGUID = summoner->GetGUID();
+                me->CastSpell(player, SPELL_ROPE_CHANNEL, true);
+                me->SetPhaseMask(player->GetPhaseMask(), true);
+                m_dist = frand(3.0f, 5.0f);
+                m_angle = frand(2.59f, 3.53f);
+                m_size = me->GetObjectSize();
+                m_oldPosition = player->GetPosition();
+                m_events.ScheduleEvent(EVENT_START_FOLLOWING, 100);
+            }
+        }
+
+        void MoveInLineOfSight(Unit* who) override
+        {
+            if (Creature* lorna = who->ToCreature())
+                if (lorna->GetEntry() == NPC_LORNA_CROWLEY)
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                        m_lornaGUID = lorna->GetGUID();
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_START_FOLLOWING:
+                {                    
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                    {
+                        CheckLornaRelated(player);
+                        if (abs(m_oldPosition.GetExactDist(player) > 0.5f))
+                        {
+                            Position pos;
+                            player->GetNearPoint(player, pos.m_positionX, pos.m_positionY, pos.m_positionZ, m_size, m_dist, m_angle);
+                            me->GetMotionMaster()->MovePoint(0, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ());
+                            m_oldPosition = player->GetPosition();
+                        }
+                        if (!m_isPlayerMounted && m_hasPlayerRope)
+                        {
+                            if (m_isLornaNear)
+                                me->CastSpell(player, SPELL_MOUNTAIN_HORSE_CREDIT);
+                            me->DespawnOrUnsummon();
+                        }
+                    }
+                    m_events.ScheduleEvent(EVENT_START_FOLLOWING, 100);
+                    break;
+                }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+
+        void CheckLornaRelated(Player* player)
+        {
+            if (!player)
+                return;
+
+            m_isPlayerMounted = player->HasAura(SPELL_RIDE_VEHICLE);
+            m_hasPlayerRope = player->HasAura(SPELL_ROPE_CHANNEL);
+            if (m_lornaGUID)
+                if (Creature* lorna = sObjectAccessor->GetCreature(*me, m_lornaGUID))
+                    m_isLornaNear = (player->GetDistance(lorna) < 10.0f);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_mountain_horse_36555AI(creature);
+    }
+};
+
+// 36540
+class npc_mountain_horse_36540 : public CreatureScript
+{
+public:
+    npc_mountain_horse_36540() : CreatureScript("npc_mountain_horse_36540") { }
+
+    enum eNpc
+    {
+        QUEST_THE_HUNGRY_ETTIN = 54416,
+        NPC_LORNA_CROWLEY = 36457,
+        SPELL_ROUND_UP_HORSE = 68903,
+        SPELL_ROPE_IN_HORSE = 68908,
+        SPELL_ROPE_CHANNEL = 68940,
+        EVENT_START_FOLLOWING = 101,
+    };
+
+    struct npc_mountain_horse_36540AI : public VehicleAI
+    {
+        npc_mountain_horse_36540AI(Creature* creature) : VehicleAI(creature) { }
+
+        EventMap m_events;
+        uint64   m_playerGUID;
+        float    m_dist;
+        float    m_angle;
+        float    m_size;
+        Position m_oldPosition;
+        bool     m_lornaIsNear;
+
+        void Reset() override
+        {
+            m_events.Reset();
+            m_lornaIsNear = false;
+        }
+
+        void MoveInLineOfSight(Unit* who) override
+        {
+            if (Creature* lorna = who->ToCreature())
+                if (lorna->GetEntry() == NPC_LORNA_CROWLEY)
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                        m_lornaIsNear = (player->GetDistance(who) < 7.0f);
+        }
+
+        void PassengerBoarded(Unit* passenger, int8 seatId, bool apply) override
+        {
+            if (apply)
+            {
+                if (Player* player = passenger->ToPlayer())
+                {
+                    m_playerGUID = player->GetGUID();
+                    me->SetPhaseMask(player->GetPhaseMask(), true);
+                }
+            }
+            else if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+            {
+                if (m_lornaIsNear)
+                {
+                    player->KilledMonsterCredit(36560);
+                    me->DespawnOrUnsummon(1000);
+                }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_mountain_horse_36540AI(creature);
+    }
+};
 
 
 void AddSC_zone_gilneas_duskhaven()
@@ -1197,5 +1440,8 @@ void AddSC_zone_gilneas_duskhaven()
     new npc_lord_godfrey_36290();
     new npc_drowning_watchman_36440();
     new npc_chance_36459();
+    new npc_forsaken_castaway_36488();
+    new npc_mountain_horse_36555();
+    new npc_mountain_horse_36540();
 
 };

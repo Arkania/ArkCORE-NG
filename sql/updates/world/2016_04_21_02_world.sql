@@ -26,21 +26,12 @@ UPDATE quest_template SET NextQuestId=0, ExclusiveGroup=0 WHERE Id=14400;
 
 UPDATE quest_template SET NextQuestId=0, ExclusiveGroup=0 WHERE Id=14401;
 
-UPDATE quest_template SET NextQuestId=0, ExclusiveGroup=0 WHERE Id=14402;
-
 UPDATE quest_template SET NextQuestId=0, ExclusiveGroup=0 WHERE Id=14404;
-
-UPDATE quest_template SET PrevQuestId=14412, NextQuestId=0, ExclusiveGroup=0 WHERE Id=14405;
 
 UPDATE quest_template SET PrevQuestId=14397, NextQuestId=0, ExclusiveGroup=0 WHERE Id=14406;
 
 UPDATE quest_template SET NextQuestId=0, ExclusiveGroup=0 WHERE Id=14416;
 
-UPDATE quest_template SET NextQuestId=0, ExclusiveGroup=0 WHERE Id=14463;
-
 delete from quest_poi where questId=14404 and id=3;
-
-
-
 
 
