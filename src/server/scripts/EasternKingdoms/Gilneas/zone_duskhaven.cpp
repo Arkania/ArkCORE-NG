@@ -1042,7 +1042,7 @@ public:
     }
 };
 
-// Phase 16384
+// Phase 16384 // from here: WorldMap 678 and TerrainSwap 655
 
 // 36440
 class npc_drowning_watchman_36440 : public CreatureScript
@@ -1420,6 +1420,394 @@ public:
     }
 };
 
+// 36452
+class npc_gwen_armstead_36452 : public CreatureScript
+{
+public:
+    npc_gwen_armstead_36452() : CreatureScript("npc_gwen_armstead_36452") {}
+
+    enum eNpc
+    {
+        QUEST_TO_GREYMANE_MANOR = 14465,
+        SPELL_FORCECAST_SUMMON_SWIFT_MOUNTAIN_HORSE = 69256,
+    };
+
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
+    {
+        if (quest->GetQuestId() == QUEST_TO_GREYMANE_MANOR)
+        {
+            player->CastSpell(player, SPELL_FORCECAST_SUMMON_SWIFT_MOUNTAIN_HORSE);
+        }
+        return true;
+    }
+};
+
+// Phase 16384 + 32768 
+
+// 36741
+class npc_swift_mountain_horse_36741 : public CreatureScript
+{
+public:
+    npc_swift_mountain_horse_36741() : CreatureScript("npc_swift_mountain_horse_36741") { }
+
+    enum eNpc
+    {
+        SPELL_PHASE_QUEST_ZONE_SPECIFIC_09 = 69077,
+        SPELL_FORCECAST_UPDATE_ZONE_AURAS = 94828,
+        SPELL_UPDATE_ZONE_AURAS = 89180,
+        WAYPOINT_ID = 3674101,
+
+    };
+
+    struct npc_swift_mountain_horse_36741AI : public VehicleAI
+    {
+        npc_swift_mountain_horse_36741AI(Creature* creature) : VehicleAI(creature) { }
+
+        EventMap m_events;
+        uint64   m_playerGUID;
+        
+        void Reset() override
+        {
+            m_events.Reset();
+            m_playerGUID = NULL;
+        }
+
+        void MovementInform(uint32 type, uint32 id) override
+        {
+            if (type == WAYPOINT_MOTION_TYPE)
+                switch (id)
+                {
+                case 2:
+                {
+                    if (GameObject* door = me->FindNearestGameObject(196399, 15.0f))
+                        door->UseDoorOrButton(5000);
+                    break;
+                }
+                case 3:
+                {
+                    if (GameObject* door = me->FindNearestGameObject(196399, 15.0f))
+                        door->ResetDoorOrButton();
+                    break;
+                }
+                case 9:
+                {
+                    if (GameObject* door = me->FindNearestGameObject(196401, 15.0f))
+                        door->UseDoorOrButton(5000);
+                    break;
+                }
+                case 10:
+                {
+                    if (GameObject* door = me->FindNearestGameObject(196401, 15.0f))
+                        door->ResetDoorOrButton();
+                    break;
+                }
+                case 11:
+                {
+                    me->GetVehicleKit()->RemoveAllPassengers();
+                    break;
+                }
+                }
+        }
+
+        void PassengerBoarded(Unit* passenger, int8 seatId, bool apply) override
+        {
+            if (apply)
+            {
+                if (Player* player = passenger->ToPlayer())
+                {
+                    m_playerGUID = player->GetGUID();
+                    me->CastSpell(player, SPELL_FORCECAST_UPDATE_ZONE_AURAS, true);
+                    me->GetMotionMaster()->MovePath(WAYPOINT_ID, false);
+                }
+            }
+            else 
+            {
+                if (Player* player = passenger->ToPlayer())
+                    player->AddAura(SPELL_PHASE_QUEST_ZONE_SPECIFIC_09, player);
+
+                me->DespawnOrUnsummon(1000);
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_swift_mountain_horse_36741AI(creature);
+    }
+};
+
+// 36606 
+class npc_queen_mia_greymane_36606 : public CreatureScript
+{
+public:
+    npc_queen_mia_greymane_36606() : CreatureScript("npc_queen_mia_greymane_36606") { }
+
+    enum eNpc
+    {
+        QUEST_TO_GREYMANE_MANOR = 14465,
+        SPELL_UPDATE_BIND_TO_GREYMANE_MANOR = 82892,
+    };
+
+    bool OnQuestReward(Player* player, Creature* /*creature*/, Quest const* quest, uint32 /*opt*/) 
+    {
+        if (quest->GetQuestId() == QUEST_TO_GREYMANE_MANOR)
+            player->CastSpell(player, SPELL_UPDATE_BIND_TO_GREYMANE_MANOR);
+
+        return false; 
+    }
+};
+
+// 36743 
+class npc_king_genn_greymane_36743 : public CreatureScript
+{
+public:
+    npc_king_genn_greymane_36743() : CreatureScript("npc_king_genn_greymane_36743") { }
+
+    enum eNpc
+    {
+        QUEST_ALAS_GILNEAS = 14467,
+        SPELL_PHASE_QUEST_ZONE_SPECIFIC_08 = 68483, //  16384
+        SPELL_PHASE_QUEST_ZONE_SPECIFIC_09 = 69077, //  32768
+        SPELL_PHASE_QUEST_ZONE_SPECIFIC_11 = 69484, // 131072
+        SPELL_FORCECAST_GILNEAS_TELESCOPE = 69258,
+    };
+
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    {
+        if (quest->GetQuestId() == QUEST_ALAS_GILNEAS)
+        {
+            player->RemoveAura(SPELL_PHASE_QUEST_ZONE_SPECIFIC_08);
+            player->AddAura(SPELL_PHASE_QUEST_ZONE_SPECIFIC_11, player);
+            player->CastSpell(player, SPELL_FORCECAST_GILNEAS_TELESCOPE);
+        }
+
+        return true;
+    }
+
+    bool OnQuestReward(Player* player, Creature* /*creature*/, Quest const* quest, uint32 /*opt*/)
+    {
+        if (quest->GetQuestId() == QUEST_ALAS_GILNEAS)
+        {
+
+        }
+
+        return false;
+    }
+};
+
+// Phase 32768 + 131072  // from here: WorldMap 679 and TerrainSwap 656
+
+// 44928
+class npc_stagecoach_carriage_44928 : public CreatureScript
+{
+public:
+    npc_stagecoach_carriage_44928() : CreatureScript("npc_stagecoach_carriage_44928") { }
+
+    enum eNpc
+    {
+        QUEST_EXODUS = 24438,
+        SPELL_SUMMON_CARRIAGE = 72767,
+        NPC_HARNESS_38755 = 38755,
+        NPC_HARNESS_43336 = 43336,
+        NPC_CAR_43337 = 43337,
+        PLAYER_GUID = 99999, 
+    };
+
+    bool OnGossipHello(Player* player, Creature* creature) 
+    { 
+        if (player->GetQuestStatus(QUEST_EXODUS) == QUEST_STATUS_COMPLETE)
+            if (Creature* harness = creature->FindNearestCreature(NPC_HARNESS_38755, 15.0f))
+                player->SummonCreature(NPC_HARNESS_43336, harness->GetPosition(), TEMPSUMMON_MANUAL_DESPAWN);                
+                    
+        return true; 
+    }
+};
+
+// 43336
+class npc_harness_43336 : public CreatureScript
+{
+public:
+    npc_harness_43336() : CreatureScript("npc_harness_43336") { }
+
+    enum eNpc
+    {
+        WAYPOINT_ID = 4492801,
+        NPC_LORNA_CRAWLEY = 51409,
+        NPC_HARNESS_43336 = 43336,
+        NPC_CARRIAGE_43337 = 43337,
+        PLAYER_GUID = 99999,
+        LORNA_SAY_ATTACK = 1,
+        CAR_DESPAWN = 2,
+        EVENT_START_MOVEMENT = 101,
+        EVENT_PLAYER_ENTER_VEHICLE,
+    };
+
+    struct npc_harness_43336AI : public VehicleAI
+    {
+        npc_harness_43336AI(Creature* creature) : VehicleAI(creature) { }
+
+        EventMap m_events;
+        uint64   m_playerGUID;
+        uint64   m_carriageGUID;
+
+        void Reset() override
+        {
+            m_events.Reset();
+            m_playerGUID = NULL;
+            m_carriageGUID = NULL;           
+        }
+
+        void IsSummonedBy(Unit* summoner) override 
+        { 
+            if (Player* player = summoner->ToPlayer())
+                m_playerGUID = player->GetGUID();
+        }
+
+        void JustSummoned(Creature* summon) override
+        {
+            if (Creature* carriage = summon->ToCreature())
+                if (carriage->GetEntry() == NPC_CARRIAGE_43337)
+                {
+                    m_carriageGUID = carriage->GetGUID();
+                    m_events.ScheduleEvent(EVENT_PLAYER_ENTER_VEHICLE, 1000);
+                }
+        }
+
+        void MovementInform(uint32 type, uint32 id) override
+        {
+            if (type == WAYPOINT_MOTION_TYPE)
+                switch (id)
+            {
+                case 1:
+                {
+                    if (GameObject* door = me->FindNearestGameObject(196401, 15.0f))
+                        door->UseDoorOrButton(5000);
+                    break;
+                }
+                case 2:
+                {
+                    if (GameObject* door = me->FindNearestGameObject(196401, 15.0f))
+                        door->ResetDoorOrButton();
+                    break;
+                }
+                case 15:
+                {
+                    if (GameObject* door = me->FindNearestGameObject(196412, 15.0f))
+                        door->UseDoorOrButton(5000);
+                    break;
+                }
+                case 16:
+                {
+                    if (GameObject* door = me->FindNearestGameObject(196412, 15.0f))
+                        door->ResetDoorOrButton();
+                    break;
+                }
+                case 28:
+                {
+                    // attack from orc...
+                    if (Creature* car = sObjectAccessor->GetCreature(*me, m_carriageGUID))
+                        car->GetAI()->DoAction(LORNA_SAY_ATTACK);
+                    break;
+                }
+                case 33:
+                {
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                        player->ExitVehicle();
+                    break;
+                }
+                case 44:
+                {
+                    me->DespawnOrUnsummon(1000);
+                    if (Creature* car = sObjectAccessor->GetCreature(*me, m_carriageGUID))
+                        car->GetAI()->DoAction(CAR_DESPAWN);
+                    break;
+                }
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_PLAYER_ENTER_VEHICLE:
+                {
+                    if (Creature* car = sObjectAccessor->GetCreature(*me, m_carriageGUID))
+                        if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                            player->EnterVehicle(car, 0);
+
+                    m_events.ScheduleEvent(EVENT_START_MOVEMENT, 1000);
+                    break;
+                }
+                case EVENT_START_MOVEMENT:
+                {
+                    me->GetMotionMaster()->MovePath(WAYPOINT_ID, false);
+                    break;
+                }
+                }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_harness_43336AI(creature);
+    }
+};
+
+// 43337
+class npc_stagecoach_carriage_43337 : public CreatureScript
+{
+public:
+    npc_stagecoach_carriage_43337() : CreatureScript("npc_stagecoach_carriage_43337") { }
+
+    enum eNpc
+    {
+        NPC_LORNA_CRAWLEY = 51409,
+        NPC_HARNESS_43336 = 43336,
+        PLAYER_GUID = 99999,
+    };
+
+    struct npc_stagecoach_carriage_43337AI : public VehicleAI
+    {
+        npc_stagecoach_carriage_43337AI(Creature* creature) : VehicleAI(creature) { }
+
+        uint64 m_playerGUID;
+        uint64   m_lornaGUID;
+
+        void Reset() override
+        {
+            m_playerGUID = NULL;
+            m_lornaGUID = NULL;
+        }
+
+        void JustSummoned(Creature* summon) override
+        {
+            if (Creature* lorna = summon->ToCreature())
+                if (lorna->GetEntry() == NPC_LORNA_CRAWLEY)
+                    m_lornaGUID = lorna->GetGUID();
+        }
+
+        void DoAction(int32 param) override 
+        { 
+            if (param == 1)
+                if (Creature* lorna = sObjectAccessor->GetCreature(*me, m_lornaGUID))
+                    lorna->AI()->Talk(0);
+            if (param == 2)
+                me->DespawnOrUnsummon(1000);
+        }
+   };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_stagecoach_carriage_43337AI(creature);
+    }
+};
+
+
 
 void AddSC_zone_gilneas_duskhaven()
 {	
@@ -1443,5 +1831,13 @@ void AddSC_zone_gilneas_duskhaven()
     new npc_forsaken_castaway_36488();
     new npc_mountain_horse_36555();
     new npc_mountain_horse_36540();
+    new npc_gwen_armstead_36452();
+    new npc_swift_mountain_horse_36741();
+    new npc_queen_mia_greymane_36606();
+    new npc_king_genn_greymane_36743();
+    new npc_stagecoach_carriage_44928();
+    new npc_harness_43336();
+    new npc_stagecoach_carriage_43337();
+
 
 };
