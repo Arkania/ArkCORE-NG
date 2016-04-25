@@ -1807,6 +1807,46 @@ public:
     }
 };
 
+//37065
+class npc_prince_liam_greymane_37065 : public CreatureScript
+{
+public:
+    npc_prince_liam_greymane_37065() : CreatureScript("npc_prince_liam_greymane_37065") { }
+
+    enum eNpc
+    {
+        NPC_KOROTH = 37808,
+        MOVEMENT_KOROTH = 2515531,
+        QUEST_INTRODUCTIONS_ARE_IN_ORDER = 24472,
+        QUEST_STORMGLEN = 24483,
+        SPELL_GENERIC_QUEST_INVISIBLE_DETECTION_10 = 84481,
+    };
+
+    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*opt*/) 
+    { 
+        if (quest->GetQuestId() == QUEST_INTRODUCTIONS_ARE_IN_ORDER)
+        {
+            if (Creature* koroth = creature->FindNearestCreature(NPC_KOROTH, 50.0f))
+            {
+                player->AddAura(SPELL_GENERIC_QUEST_INVISIBLE_DETECTION_10, player);
+                koroth->SetSpeed(MOVE_RUN, 1.3f);
+                koroth->SetReactState(REACT_AGGRESSIVE);
+                koroth->GetMotionMaster()->MovePath(MOVEMENT_KOROTH, false);
+                koroth->AI()->Talk(0);
+            }
+        }
+        return false; 
+    }
+
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
+    {
+        if (quest->GetQuestId() == QUEST_STORMGLEN)
+        {
+            player->RemoveAura(SPELL_GENERIC_QUEST_INVISIBLE_DETECTION_10);
+        }
+        return true;
+    }
+};
 
 
 void AddSC_zone_gilneas_duskhaven()
@@ -1838,6 +1878,6 @@ void AddSC_zone_gilneas_duskhaven()
     new npc_stagecoach_carriage_44928();
     new npc_harness_43336();
     new npc_stagecoach_carriage_43337();
-
+    new npc_prince_liam_greymane_37065();
 
 };
