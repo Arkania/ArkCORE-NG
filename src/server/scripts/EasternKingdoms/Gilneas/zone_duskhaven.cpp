@@ -1807,7 +1807,7 @@ public:
     }
 };
 
-//37065
+// 37065
 class npc_prince_liam_greymane_37065 : public CreatureScript
 {
 public:
@@ -1848,6 +1848,178 @@ public:
     }
 };
 
+// 6687
+class at_the_blackwald_6687 : public AreaTriggerScript
+{
+public:
+    at_the_blackwald_6687() : AreaTriggerScript("at_the_blackwald_6687") { }
+
+    enum eAreatrigger
+    {
+        QUEST_LOSING_YOUR_TAIL = 24616,
+        SPELL_FREEZING_TRAP_EFFECT = 70794,
+    };
+
+    bool OnTrigger(Player* player, const AreaTriggerEntry* at) override
+    {
+        if (player->GetQuestStatus(QUEST_LOSING_YOUR_TAIL) == QUEST_STATUS_INCOMPLETE)
+            player->CastSpell(player, SPELL_FREEZING_TRAP_EFFECT, true);
+        return false;
+    }
+};
+
+// 37953
+class npc_dark_scout_37953 : public CreatureScript
+{
+public:
+    npc_dark_scout_37953() : CreatureScript("npc_dark_scout_37953") { }
+
+    enum eNpc
+    {
+        QUEST_LOSING_YOUR_TAIL = 24616,
+        SPELL_AIMED_SHOOT = 70796,
+        SPELL_FREEZING_TRAP_EFFECT = 70794,
+        TALK_EASY = 0,
+        TALK_DO = 2,
+        TALK_HOW = 1,
+        EVENT_CHECK_PLAYER = 101,
+        EVENT_TALK_START,
+        EVENT_SHOOT,
+        EVENT_CHECK_AURA,
+        EVENT_MELEE_ATTACK,
+    };
+
+    struct npc_dark_scout_37953AI : public VehicleAI
+    {
+        npc_dark_scout_37953AI(Creature* creature) : VehicleAI(creature) { }
+
+        EventMap m_events;
+        uint64 m_playerGUID;
+       
+
+        void Reset() override
+        {
+            m_events.Reset();
+            m_playerGUID = NULL;
+        }
+
+        void IsSummonedBy(Unit* summoner) override
+        {
+            if (Player* player = summoner->ToPlayer())
+            {
+                m_playerGUID = player->GetGUID();
+                me->GetMotionMaster()->Clear();
+                me->SetFacingToObject(player);
+                me->AI()->Talk(TALK_EASY);
+                m_events.ScheduleEvent(EVENT_TALK_START, 1000);
+                m_events.ScheduleEvent(EVENT_CHECK_PLAYER, 1000);
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_CHECK_PLAYER:
+                {
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID)) 
+                        if (player->GetQuestStatus(QUEST_LOSING_YOUR_TAIL) == QUEST_STATUS_INCOMPLETE)
+                        {
+                            m_events.ScheduleEvent(EVENT_CHECK_PLAYER, 1000);
+                            break;
+                        }
+                    me->DespawnOrUnsummon(100);
+                    break;
+                }
+                case EVENT_TALK_START:
+                {
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                        Talk(TALK_DO, player);
+                    m_events.ScheduleEvent(EVENT_SHOOT, 7500);
+                    m_events.ScheduleEvent(EVENT_CHECK_AURA, 250);
+                    break;
+                }
+                case EVENT_SHOOT:
+                {
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                    {
+                        m_events.CancelEvent(EVENT_CHECK_AURA);
+                        me->CastSpell(player, SPELL_AIMED_SHOOT);
+                        me->GetMotionMaster()->Clear();
+                        me->SetWalk(true);
+                        me->SetSpeed(MOVE_WALK, 1.0f);
+                        me->GetMotionMaster()->MoveChase(player);
+                        me->Attack(player, true);
+                    }
+                    break;
+                }
+                case EVENT_CHECK_AURA:
+                {
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                        if (player->HasAura(SPELL_FREEZING_TRAP_EFFECT))
+                        {
+                            m_events.ScheduleEvent(EVENT_CHECK_AURA, 250);
+                            break;
+                        }
+                    m_events.CancelEvent(EVENT_SHOOT);
+                    Talk(TALK_HOW);
+                    m_events.ScheduleEvent(EVENT_MELEE_ATTACK, 1500);
+                    break;
+                }
+                case EVENT_MELEE_ATTACK:
+                {
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                    {
+                        me->GetMotionMaster()->Clear();
+                        me->SetWalk(true);
+                        me->SetSpeed(MOVE_WALK, 1.0f);
+                        me->GetMotionMaster()->MoveChase(player);
+                        me->Attack(player, true);
+                    }
+                    break;
+                }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_dark_scout_37953AI(creature);
+    }
+};
+
+// 49944
+class item_belysras_talisman_49944 : public ItemScript
+{
+public:
+    item_belysras_talisman_49944() : ItemScript("item_belysras_talisman_49944") { }
+
+    enum eItem
+    {
+        QUEST_LOSING_YOUR_TAIL = 24616,
+        SPELL_FREEZING_TRAP_EFFECT = 70794,
+    };
+
+    bool OnUse(Player* player, Item* /*item*/, SpellCastTargets const& targets) override
+    {
+        if (player->GetQuestStatus(QUEST_LOSING_YOUR_TAIL) == QUEST_STATUS_INCOMPLETE)
+            if (player->HasAura(SPELL_FREEZING_TRAP_EFFECT))
+                player->RemoveAura(SPELL_FREEZING_TRAP_EFFECT);
+
+        return false;
+    }
+};
+
 
 void AddSC_zone_gilneas_duskhaven()
 {	
@@ -1879,5 +2051,8 @@ void AddSC_zone_gilneas_duskhaven()
     new npc_harness_43336();
     new npc_stagecoach_carriage_43337();
     new npc_prince_liam_greymane_37065();
+    new at_the_blackwald_6687();
+    new npc_dark_scout_37953();
+    new item_belysras_talisman_49944();
 
 };
