@@ -3397,6 +3397,60 @@ public:
     }
 };
 
+// 55089 55093
+class npc_fire_juggler_generic : public CreatureScript
+{
+public:
+    npc_fire_juggler_generic() : CreatureScript("npc_fire_juggler_generic") { }
+
+    enum eNPC
+    {
+        SPELL_JUGGLE_TORCH_AURA = 102905,
+        EVENT_START_FIRE_JUGGLING = 101,
+    };
+
+    struct npc_fire_juggler_genericAI : public ScriptedAI
+    {
+        npc_fire_juggler_genericAI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap m_events;
+
+        void Reset() override
+        {
+            m_events.Reset();
+            m_events.ScheduleEvent(EVENT_START_FIRE_JUGGLING, 1000);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_START_FIRE_JUGGLING:
+                {
+                    me->AddAura(SPELL_JUGGLE_TORCH_AURA, me);
+                    m_events.ScheduleEvent(EVENT_START_FIRE_JUGGLING, 150000);
+                    break;
+                }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_fire_juggler_genericAI(creature);
+    }
+};
+
 void AddSC_npcs_special()
 {
     new npc_air_force_bots();
@@ -3434,5 +3488,6 @@ void AddSC_npcs_special()
     new npc_mushroom_47649();
     new npc_mushroom_43497();
     new npc_t12_fiery_imp();
+    new npc_fire_juggler_generic();
 
 }
