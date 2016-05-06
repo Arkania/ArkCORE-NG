@@ -4761,8 +4761,16 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
         {
             switch (m_spellInfo->Id)
             {
-                // Impact
-                case 12355:
+                case 23853: // jubling-cooldown (spell is triggered from 23852)
+                {
+                    if (Player* player = unitTarget->ToPlayer())
+                    {
+                        player->AddSpellCooldown(23852, 19462, time(NULL) + (7 * 86400));
+                        player->SendInitialSpells();
+                    }
+                    return;
+                }
+                case 12355: // Impact
                     if (!unitTarget)
                         return;
 
