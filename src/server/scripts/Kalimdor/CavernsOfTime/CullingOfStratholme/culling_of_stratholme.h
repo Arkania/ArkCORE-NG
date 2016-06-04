@@ -57,6 +57,7 @@ enum Creatures
     NPC_UTHER           = 26528,
     NPC_CHROMIE_2       = 27915,
     NPC_GENERIC_BUNNY   = 28960,
+    NPC_CRATES_KILLCREDIT_BUNNY = 30996,
 };
 
 enum GameObjects

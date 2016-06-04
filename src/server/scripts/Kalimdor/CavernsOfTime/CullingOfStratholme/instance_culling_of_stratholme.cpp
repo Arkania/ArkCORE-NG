@@ -189,6 +189,14 @@ class instance_culling_of_stratholme : public InstanceMapScript
                             if (Creature* chromie = instance->SummonCreature(NPC_CHROMIE_2, ChromieSummonPos))
                                 if (!instance->GetPlayers().isEmpty())
                                     sCreatureTextMgr->SendChat(chromie, SAY_CRATES_COMPLETED, NULL, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_MAP);
+
+                            Map::PlayerList const &PlayerList = instance->GetPlayers();
+                            if (!PlayerList.isEmpty())
+                                for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+                                    if (Player* pPlayer = i->GetSource())
+                                        if (pPlayer->GetQuestStatus(13149) == QUEST_STATUS_INCOMPLETE)
+                                            pPlayer->KilledMonsterCredit(NPC_CRATES_KILLCREDIT_BUNNY);
+
                         }
                         DoUpdateWorldState(WORLDSTATE_CRATES_REVEALED, _crateCount);
                         break;
