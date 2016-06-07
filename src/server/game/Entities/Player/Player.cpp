@@ -11209,7 +11209,7 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
             {
                 data << uint32(3479) << uint32(0);              // 9  WORLDSTATE_SHOW_CRATES
                 data << uint32(3480) << uint32(0);              // 10 WORLDSTATE_CRATES_REVEALED
-                data << uint32(3504) << uint32(0);              // 11 WORLDSTATE_WAVE_COUNT
+                data << uint32(3504) << uint32(1);              // 11 WORLDSTATE_WAVE_COUNT
                 data << uint32(3931) << uint32(25);             // 12 WORLDSTATE_TIME_GUARDIAN
                 data << uint32(3932) << uint32(0);              // 13 WORLDSTATE_TIME_GUARDIAN_SHOW
             }

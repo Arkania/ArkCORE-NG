@@ -68,6 +68,7 @@ class instance_culling_of_stratholme : public InstanceMapScript
                 _malGanisChestGUID = 0;
                 _genericBunnyGUID = 0;
                 memset(&_encounterState[0], 0, sizeof(uint32) * MAX_ENCOUNTER);
+                _showCrateCount = 0;
                 _crateCount = 0;
             }
 
@@ -82,11 +83,19 @@ class instance_culling_of_stratholme : public InstanceMapScript
 
             void FillInitialWorldStates(WorldPacket& data) override
             {
-                data << uint32(WORLDSTATE_SHOW_CRATES) << uint32(1);
+                data << uint32(WORLDSTATE_SHOW_CRATES) << uint32(0);
                 data << uint32(WORLDSTATE_CRATES_REVEALED) << uint32(_crateCount);
                 data << uint32(WORLDSTATE_WAVE_COUNT) << uint32(0);
                 data << uint32(WORLDSTATE_TIME_GUARDIAN) << uint32(25);
                 data << uint32(WORLDSTATE_TIME_GUARDIAN_SHOW) << uint32(0);
+            }
+
+            void OnPlayerEnter(Player* player) override
+            {
+                if (player->GetQuestStatus(13149) == QUEST_STATUS_INCOMPLETE)
+                    _showCrateCount = 1;
+
+                DoUpdateWorldState(WORLDSTATE_SHOW_CRATES, _showCrateCount);
             }
 
             void OnCreatureCreate(Creature* creature) override
@@ -178,6 +187,13 @@ class instance_culling_of_stratholme : public InstanceMapScript
                     case DATA_INFINITE_EVENT:
                         _encounterState[4] = data;
                         break;
+                    case DATA_SHOW_CRATE_EVENT:
+                        if (_showCrateCount == 0)
+                        {
+                            _showCrateCount = 1;
+                            DoUpdateWorldState(WORLDSTATE_SHOW_CRATES, 1);
+                        }
+                        break;
                     case DATA_CRATE_COUNT:
                         _crateCount = data;
                         if (_crateCount == 5)
@@ -197,6 +213,8 @@ class instance_culling_of_stratholme : public InstanceMapScript
                                         if (pPlayer->GetQuestStatus(13149) == QUEST_STATUS_INCOMPLETE)
                                             pPlayer->KilledMonsterCredit(NPC_CRATES_KILLCREDIT_BUNNY);
 
+                            _showCrateCount = 0;
+                            DoUpdateWorldState(WORLDSTATE_SHOW_CRATES, 0);
                         }
                         DoUpdateWorldState(WORLDSTATE_CRATES_REVEALED, _crateCount);
                         break;
@@ -290,7 +308,7 @@ class instance_culling_of_stratholme : public InstanceMapScript
                     _encounterState[1] = data1;
                     _encounterState[2] = data2;
                     _encounterState[3] = data3;
-                    _encounterState[4] = data4;
+                    _encounterState[4] = data4;                    
 
                     for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
                         if (_encounterState[i] == IN_PROGRESS)
@@ -317,6 +335,7 @@ class instance_culling_of_stratholme : public InstanceMapScript
             uint64 _malGanisChestGUID;
             uint64 _genericBunnyGUID;
             uint32 _encounterState[MAX_ENCOUNTER];
+            uint32 _showCrateCount;
             uint32 _crateCount;
         };
 };

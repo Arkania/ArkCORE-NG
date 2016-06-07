@@ -307,7 +307,7 @@ public:
         {
             switch (ai->gossipStep)
             {
-                case 0: //This one is a workaround since the very beggining of the script is wrong.
+                case 0: //This one is a workaround since the very begining of the script is wrong.
                 {
                     QuestStatus status = player->GetQuestStatus(13149);
                     if (status != QUEST_STATUS_COMPLETE && status != QUEST_STATUS_REWARDED)
@@ -1248,8 +1248,25 @@ class npc_crate_helper : public CreatureScript
         }
 };
 
+// 26527
+class npc_chromie_26527 : public CreatureScript
+{
+public:
+    npc_chromie_26527() : CreatureScript("npc_chromie_26527") { }
+
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) 
+    { 
+        if (quest->GetQuestId() == 13149)
+            if (InstanceScript* instance = creature->GetInstanceScript())
+                instance->SetData(DATA_SHOW_CRATE_EVENT, 1);
+
+        return false; 
+    }
+};
+
 void AddSC_culling_of_stratholme()
 {
     new npc_arthas();
     new npc_crate_helper();
+    new npc_chromie_26527();
 }
