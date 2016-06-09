@@ -70,6 +70,8 @@ class instance_culling_of_stratholme : public InstanceMapScript
                 memset(&_encounterState[0], 0, sizeof(uint32) * MAX_ENCOUNTER);
                 _showCrateCount = 0;
                 _crateCount = 0;
+                _arthasWave = 0;
+                _arthasTimer = 0;
             }
 
             bool IsEncounterInProgress() const override
@@ -218,6 +220,34 @@ class instance_culling_of_stratholme : public InstanceMapScript
                         }
                         DoUpdateWorldState(WORLDSTATE_CRATES_REVEALED, _crateCount);
                         break;
+                    case DATA_ARTHAS_EVENT:
+                    {
+                        _arthasState = data;
+                        break;
+                    }
+                    case DATA_ARTHAS_WAVE:
+                    {      
+                        if (_arthasWave != data)
+                            DoUpdateWorldState(WORLDSTATE_WAVE_COUNT, data);
+                     
+                        _arthasWave = data;
+                        break;
+                    }
+                    case DATA_ARTHAS_TIMER:
+                    {
+                        if (data)
+                        {
+                            DoUpdateWorldState(WORLDSTATE_TIME_GUARDIAN_SHOW, 1);
+                            DoUpdateWorldState(WORLDSTATE_TIME_GUARDIAN, data);
+                        }                        
+                        else if (_arthasTimer && !data)
+                        {
+                            DoUpdateWorldState(WORLDSTATE_TIME_GUARDIAN_SHOW, 0);
+                            DoUpdateWorldState(WORLDSTATE_TIME_GUARDIAN, 0);
+                        }                       
+                        _arthasTimer = data;                        
+                        break;
+                    }
                 }
 
                 if (data == DONE)
@@ -240,6 +270,12 @@ class instance_culling_of_stratholme : public InstanceMapScript
                         return _encounterState[4];
                     case DATA_CRATE_COUNT:
                         return _crateCount;
+                    case DATA_ARTHAS_EVENT:
+                        return _arthasState;
+                    case DATA_ARTHAS_WAVE:
+                        return _arthasWave;
+                    case DATA_ARTHAS_TIMER:
+                        return _arthasTimer;
                 }
                 return 0;
             }
@@ -280,7 +316,7 @@ class instance_culling_of_stratholme : public InstanceMapScript
 
                 std::ostringstream saveStream;
                 saveStream << "C S " << _encounterState[0] << ' ' << _encounterState[1] << ' '
-                    << _encounterState[2] << ' ' << _encounterState[3] << ' ' << _encounterState[4];
+                    << _encounterState[2] << ' ' << _encounterState[3] << ' ' << _encounterState[4] << ' ' << _arthasState;
 
                 OUT_SAVE_INST_DATA_COMPLETE;
                 return saveStream.str();
@@ -297,10 +333,10 @@ class instance_culling_of_stratholme : public InstanceMapScript
                 OUT_LOAD_INST_DATA(in);
 
                 char dataHead1, dataHead2;
-                uint16 data0, data1, data2, data3, data4;
+                uint16 data0, data1, data2, data3, data4, arthas;
 
                 std::istringstream loadStream(in);
-                loadStream >> dataHead1 >> dataHead2 >> data0 >> data1 >> data2 >> data3 >> data4;
+                loadStream >> dataHead1 >> dataHead2 >> data0 >> data1 >> data2 >> data3 >> data4 >> arthas;
 
                 if (dataHead1 == 'C' && dataHead2 == 'S')
                 {
@@ -308,7 +344,8 @@ class instance_culling_of_stratholme : public InstanceMapScript
                     _encounterState[1] = data1;
                     _encounterState[2] = data2;
                     _encounterState[3] = data3;
-                    _encounterState[4] = data4;                    
+                    _encounterState[4] = data4;
+                    _arthasState = arthas;
 
                     for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
                         if (_encounterState[i] == IN_PROGRESS)
@@ -337,6 +374,9 @@ class instance_culling_of_stratholme : public InstanceMapScript
             uint32 _encounterState[MAX_ENCOUNTER];
             uint32 _showCrateCount;
             uint32 _crateCount;
+            uint32 _arthasState;
+            uint32 _arthasWave;
+            uint32 _arthasTimer;
         };
 };
 
