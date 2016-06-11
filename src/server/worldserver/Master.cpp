@@ -303,7 +303,9 @@ int Master::Run()
 
     TC_LOG_INFO("server.worldserver", "%s (worldserver-daemon) ready...", _FULLVERSION);
 
-    // ASSERT(false);  // my debugging stop
+#ifdef _DEBUG
+    ASSERT(false);  // my debugging stop
+#endif
 
     // when the main thread closes the singletons get unloaded
     // since worldrunnable uses them, it will crash if unloaded after master
