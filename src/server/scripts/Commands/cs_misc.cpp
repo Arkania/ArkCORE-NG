@@ -30,6 +30,7 @@
 #include "Opcodes.h"
 #include "SpellAuras.h"
 #include "TargetedMovementGenerator.h"
+#include "Transport.h"
 #include "WeatherMgr.h"
 #include "ace/INET_Addr.h"
 #include "Player.h"
@@ -175,6 +176,35 @@ public:
         float zoneY = object->GetPositionY();
 
         Map2ZoneCoordinates(zoneX, zoneY, zoneId);
+
+        const Transport* transport = object->GetTransport();
+        float relX = object->GetTransOffsetX(); // m_movementInfo.transport.pos.GetPositionX()
+        float relY = object->GetTransOffsetY();
+        float relZ = object->GetTransOffsetZ();
+        float relO = object->GetTransOffsetO();
+        Position relPos = Position(relX, relY, relZ, relO);
+        uint32   relMap = 0;
+        std::set<WorldObject*> pList;
+        std::set<WorldObject*> cList;
+        if (transport)
+        {
+            pList = transport->GetPassengers();
+            cList = transport->GetStaticPassengers();
+            uint32 mapid = transport->GetMapId();
+            const char* name = transport->GetName().c_str();            
+            if (const GameObject* gObject = transport->ToGameObject())
+            {
+                if (const GameObjectTemplate* info = gObject->GetGOInfo())
+                    relMap = info->raw.data[6];
+            }
+            else if (const Creature* creature = transport->ToCreature())
+            {/* prepared */}
+            else if (const Player* player = transport->ToPlayer())
+            {/* prepared */}
+
+            handler->PSendSysMessage("Transport: Named: %s, with %u passenger and %u crewmember.\n", name, pList.size(), cList.size());
+            handler->PSendSysMessage("RelPos: X: %f, Y: %f, Z: %f, O: %f, Map: %u\n", relX, relY, relZ, relO, relMap);
+        }
 
         Map const* map = object->GetMap();
         float groundZ = map->GetHeight(object->GetPhaseMask(), object->GetPositionX(), object->GetPositionY(), MAX_HEIGHT);

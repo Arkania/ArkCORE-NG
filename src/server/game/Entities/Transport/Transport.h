@@ -44,6 +44,7 @@ class Transport : public GameObject, public TransportBase
         void AddPassenger(WorldObject* passenger);
         void RemovePassenger(WorldObject* passenger);
         std::set<WorldObject*> const& GetPassengers() const { return _passengers; }
+        std::set<WorldObject*> const& GetStaticPassengers() const { return _staticPassengers; }
 
         Creature* CreateNPCPassenger(uint32 guid, CreatureData const* data);
         GameObject* CreateGOPassenger(uint32 guid, GameObjectData const* data);
