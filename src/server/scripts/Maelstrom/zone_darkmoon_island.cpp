@@ -97,7 +97,7 @@ public:
     }
 
     bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action) override
-    {   
+    {
         player->PlayerTalkClass->ClearMenus();
         switch (action)
         {
@@ -128,14 +128,14 @@ public:
             }
             if (player->HasAura(SPELL_WHACK_A_GNOLL_1))
             {
-                //player->AddAura(110230, player);
+                player->AddAura(110230, player);
                 //creature->SummonCreature(58570, -3984.896973f, 6291.482422f, 13.117249f, (0.0F), TEMPSUMMON_TIMED_DESPAWN, 60000);
             }
             player->CLOSE_GOSSIP_MENU();
             break;
         }
         }
-       
+
         return true;
     }
 
@@ -195,7 +195,120 @@ public:
     }
 };
 
-// only prepared
+// 58570
+class npc_darkmoon_faire_whack_a_gnoll_bunny_58570 : public CreatureScript
+{
+public:
+    npc_darkmoon_faire_whack_a_gnoll_bunny_58570() : CreatureScript("npc_darkmoon_faire_whack_a_gnoll_bunny_58570") { }
+
+    enum eNpc
+    {
+        EVENT_CHECK_VISIBLE_BUNNY = 101,
+        EVENT_PLAYER_WITH_GAME_IS_AVAIBLE,
+    };
+
+    struct npc_darkmoon_faire_whack_a_gnoll_bunny_58570AI : public ScriptedAI
+    {
+        npc_darkmoon_faire_whack_a_gnoll_bunny_58570AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+        EventMap m_events;
+        bool     m_active_player;
+
+        void Initialize()
+        {
+
+        }
+
+        void Reset() override
+        {
+            m_events.Reset();
+            m_events.ScheduleEvent(EVENT_CHECK_VISIBLE_BUNNY, 250);
+            m_active_player = false;
+        }
+
+        void MoveInLineOfSight(Unit* who) override
+        {
+            if (Player* player = who->ToPlayer())
+                if (player->HasAura(101612))
+                {
+                    m_events.RescheduleEvent(EVENT_PLAYER_WITH_GAME_IS_AVAIBLE, 2500);
+                    m_active_player = true;
+                }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_PLAYER_WITH_GAME_IS_AVAIBLE:
+                {
+                    m_active_player = false;
+                    break;
+                }
+                case EVENT_CHECK_VISIBLE_BUNNY:
+                {
+                    if (!m_active_player)
+                    {
+                        //   break;
+                    }
+
+                    while (GetBunnys().size() < 3)
+                    {
+                        uint32 _rol = urand(0, 100);
+                        uint32 _spell;
+                        if (_rol < 10)
+                            _spell = 102044;
+                        else if (_rol < 35)
+                            _spell = 102043;
+                        else
+                            _spell = 102036;
+
+                        if (Creature* barrel = me->FindRandomCreatureInRange(54546, 20.0f, true))
+                        {
+                            me->CastSpell(barrel, 102136);
+                            me->CastSpell(barrel, _spell);
+                        }
+                    }
+                    m_events.ScheduleEvent(EVENT_CHECK_VISIBLE_BUNNY, 250);
+                    break;
+                }
+                }
+            }
+        }
+
+        std::list<Creature*> GetBunnys()
+        {
+            std::list<Creature*> cList;
+            GetCreatureListWithEntryInGrid(cList, me, 54444, 20.0f);
+            GetCreatureListWithEntryInGrid(cList, me, 54466, 20.0f);
+            GetCreatureListWithEntryInGrid(cList, me, 54549, 20.0f);
+            return cList;
+        }
+
+        bool HasBonnyAura(Creature* barrel)
+        {
+            if (barrel->HasAura(102036))
+                return true;
+            else if (barrel->HasAura(102043))
+                return true;
+            else if (barrel->HasAura(102044))
+                return true;
+
+            return false;
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_darkmoon_faire_whack_a_gnoll_bunny_58570AI(creature);
+    }
+};
+
+// 54444 // 54466 // 54549
 class npc_whacked_gnoll : public CreatureScript
 {
 public:
@@ -205,6 +318,11 @@ public:
     struct npc_whacked_gnollAI : public ScriptedAI
     {
         npc_whacked_gnollAI(Creature* creature) : ScriptedAI(creature) { }
+
+        void IsSummonedBy(Unit* summoner) override
+        {
+
+        }
 
         void JustDied(Unit* killer) override
         {
@@ -232,7 +350,7 @@ public:
     }
 };
 
-// only prepared
+// 54546
 class npc_gnoll_barrel : public CreatureScript
 {
 public:
@@ -241,26 +359,17 @@ public:
 
     struct npc_gnoll_barrelAI : public ScriptedAI
     {
-        npc_gnoll_barrelAI(Creature* creature) : ScriptedAI(creature) { spawn = 10000; }
-       
-        uint16 spawn;
+        npc_gnoll_barrelAI(Creature* creature) : ScriptedAI(creature) { }
 
-        virtual void UpdateAI(uint32 diff) override
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
-            if (me->FindNearestCreature(58570, /*distance*/300, /*alive*/true))
-                if (spawn<diff)
-                {
-                    if (RAND(0, 1, 2))
-                    {
-                        me->CastSpell(me, 102136);
-                        me->SummonCreature(RAND(54444, 54466, 54549), me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, RAND(3000, 4000, 4500));
-                        spawn = RAND(5000, 6200, 6800);
-                    }
-                    else
-                        spawn = RAND(1000, 2000, 1500);
-                }
-                else
-                    spawn -= diff;
+            printf("SpellHit: %u \n", spell->Id);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            // me->CastSpell(me, 102136);
+            // me->SummonCreature(RAND(54444, 54466, 54549), me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, RAND(3000, 4000, 4500));
         }
     };
 
@@ -998,6 +1107,7 @@ void AddSC_zone_darkmoon_island()
     new npc_mola_54601();
     new npc_whacked_gnoll();
     new npc_gnoll_barrel();
+    new npc_darkmoon_faire_whack_a_gnoll_bunny_58570();
     new spell_mallet();
     new npc_maxima_blastenheimer_15303();
     new npc_teleportologist_fozlebub_57850();
