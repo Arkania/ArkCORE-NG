@@ -77,6 +77,7 @@ Object::Object() : m_PackGUID(sizeof(uint64)+1)
 {
     m_objectTypeId      = TYPEID_OBJECT;
     m_objectType        = TYPEMASK_OBJECT;
+    m_updateFlag        = UPDATEFLAG_NONE;
 
     m_uint32Values      = NULL;
     m_valuesCount       = 0;
@@ -576,20 +577,20 @@ void Object::BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
         WorldObject const* self = static_cast<WorldObject const*>(this);
         ObjectGuid transGuid = self->m_movementInfo.transport.guid;
 
-        data->WriteBit(transGuid[0]);
-        data->WriteBit(transGuid[5]);
+        data->WriteByteSeq(transGuid[0]); // WriteBit
+        data->WriteByteSeq(transGuid[5]);
 		if (hasVehicleId)
 			*data << uint32(self->m_movementInfo.transport.vehicleId);
 
-        data->WriteBit(transGuid[3]);
+        data->WriteByteSeq(transGuid[3]);
         *data << float(self->GetTransOffsetX());
-        data->WriteBit(transGuid[4]);
-        data->WriteBit(transGuid[6]);
-        data->WriteBit(transGuid[1]);
+        data->WriteByteSeq(transGuid[4]);
+        data->WriteByteSeq(transGuid[6]);
+        data->WriteByteSeq(transGuid[1]);
         *data << uint32(self->GetTransTime());
         *data << float(self->GetTransOffsetY());
-        data->WriteBit(transGuid[2]);
-        data->WriteBit(transGuid[7]);
+        data->WriteByteSeq(transGuid[2]);
+        data->WriteByteSeq(transGuid[7]);
         *data << float(self->GetTransOffsetZ());
         *data << int8(self->GetTransSeat());
         *data << float(self->GetTransOffsetO());
@@ -3209,3 +3210,4 @@ uint64 WorldObject::GetTransGUID() const
         return GetTransport()->GetGUID();
     return 0;
 }
+

@@ -290,6 +290,8 @@ class Object
         AreaTrigger* ToAreaTrigger() { if (GetTypeId() == TYPEID_AREATRIGGER) return reinterpret_cast<AreaTrigger*>(this); else return NULL; }
         AreaTrigger const* ToAreaTrigger() const { if (GetTypeId() == TYPEID_AREATRIGGER) return reinterpret_cast<AreaTrigger const*>(this); else return NULL; }
 
+		uint16 m_updateFlag;
+
     protected:
         Object();
 
@@ -306,7 +308,7 @@ class Object
         uint16 m_objectType = 0;
 
         TypeID m_objectTypeId;
-        uint16 m_updateFlag;
+        //
 
         union
         {

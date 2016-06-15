@@ -1222,65 +1222,12 @@ void GameObject::Use(Unit* user)
 
             // a chair may have n slots. we have to calculate their positions and teleport the player to the nearest one
 
-            float lowestDist = DEFAULT_VISIBILITY_DISTANCE;
+			if ((ToGameObject()->m_updateFlag & UPDATEFLAG_GO_TRANSPORT_POSITION) == 0)
+				TeleportToNearestChairSeat(GetPosition(), info, player);
+			else
+				TeleportToNearestChairSeat(m_movementInfo.transport.pos, info, player);				
 
-            uint32 nearest_slot = 0;
-            float x_lowest = GetPositionX();
-            float y_lowest = GetPositionY();
-
-            // the object orientation + 1/2 pi
-            // every slot will be on that straight line
-            float orthogonalOrientation = GetOrientation()+M_PI*0.5f;
-            // find nearest slot
-            bool found_free_slot = false;
-            for (ChairSlotAndUser::iterator itr = ChairListSlots.begin(); itr != ChairListSlots.end(); ++itr)
-            {
-                // the distance between this slot and the center of the go - imagine a 1D space
-                float relativeDistance = (info->size*itr->first)-(info->size*(info->chair.slots-1)/2.0f);
-
-                float x_i = GetPositionX() + relativeDistance * std::cos(orthogonalOrientation);
-                float y_i = GetPositionY() + relativeDistance * std::sin(orthogonalOrientation);
-
-                if (itr->second)
-                {
-                    if (Player* ChairUser = ObjectAccessor::FindPlayer(itr->second))
-                    {
-                        if (ChairUser->IsSitState() && ChairUser->getStandState() != UNIT_STAND_STATE_SIT && ChairUser->GetExactDist2d(x_i, y_i) < 0.1f)
-                            continue;        // This seat is already occupied by ChairUser. NOTE: Not sure if the ChairUser->getStandState() != UNIT_STAND_STATE_SIT check is required.
-                        else
-                            itr->second = 0; // This seat is unoccupied.
-                    }
-                    else
-                        itr->second = 0;     // The seat may of had an occupant, but they're offline.
-                }
-
-                found_free_slot = true;
-
-                // calculate the distance between the player and this slot
-                float thisDistance = player->GetDistance2d(x_i, y_i);
-
-                if (thisDistance <= lowestDist)
-                {
-                    nearest_slot = itr->first;
-                    lowestDist = thisDistance;
-                    x_lowest = x_i;
-                    y_lowest = y_i;
-                }
-            }
-
-            if (found_free_slot)
-            {
-                ChairSlotAndUser::iterator itr = ChairListSlots.find(nearest_slot);
-                if (itr != ChairListSlots.end())
-                {
-                    itr->second = player->GetGUID(); //this slot in now used by player
-                    player->TeleportTo(GetMapId(), x_lowest, y_lowest, GetPositionZ(), GetOrientation(), TELE_TO_NOT_LEAVE_TRANSPORT | TELE_TO_NOT_LEAVE_COMBAT | TELE_TO_NOT_UNSUMMON_PET);
-                    player->SetStandState(UNIT_STAND_STATE_SIT_LOW_CHAIR+info->chair.height);
-                    return;
-                }
-            }
-
-            return;
+			return;
         }
         //big gun, its a spell/aura
         case GAMEOBJECT_TYPE_GOOBER:                        //10
@@ -1735,6 +1682,68 @@ void GameObject::Use(Unit* user)
         spellCaster->CastSpell(user, spellInfo, triggered);
     else
         CastSpell(user, spellId);
+}
+
+void GameObject::TeleportToNearestChairSeat(Position pos, GameObjectTemplate const* info, Player* player)
+{
+	uint32 nearest_slot = 0;
+	float lowestDist = DEFAULT_VISIBILITY_DISTANCE;
+	float pos_x = pos.GetPositionX();
+	float pos_y = pos.GetPositionY();
+	float pos_z = pos.GetPositionZ();
+	float pos_o = pos.GetOrientation();
+
+	// the object orientation + 1/2 pi
+	// every slot will be on that straight line
+	float orthogonalOrientation = pos_o + M_PI * 0.5f;
+	// find nearest slot
+	bool found_free_slot = false;
+	for (ChairSlotAndUser::iterator itr = ChairListSlots.begin(); itr != ChairListSlots.end(); ++itr)
+	{
+		// the distance between this slot and the center of the go - imagine a 1D space
+		float relativeDistance = (info->size*itr->first) - (info->size*(info->chair.slots - 1) / 2.0f);
+
+		float x_i = pos.GetPositionX() + relativeDistance * std::cos(orthogonalOrientation);
+		float y_i = pos.GetPositionY() + relativeDistance * std::sin(orthogonalOrientation);
+
+		if (itr->second)
+		{
+			if (Player* ChairUser = ObjectAccessor::FindPlayer(itr->second))
+			{
+				if (ChairUser->IsSitState() && ChairUser->getStandState() != UNIT_STAND_STATE_SIT && ChairUser->GetExactDist2d(x_i, y_i) < 0.1f)
+					continue;        // This seat is already occupied by ChairUser. NOTE: Not sure if the ChairUser->getStandState() != UNIT_STAND_STATE_SIT check is required.
+				else
+					itr->second = 0; // This seat is unoccupied.
+			}
+			else
+				itr->second = 0;     // The seat may of had an occupant, but they're offline.
+		}
+
+		found_free_slot = true;
+
+		// calculate the distance between the player and this slot
+		float thisDistance = player->GetDistance2d(x_i, y_i);
+
+		if (thisDistance <= lowestDist)
+		{
+			nearest_slot = itr->first;
+			lowestDist = thisDistance;
+			pos_x = x_i;
+			pos_y = y_i;
+		}
+	}
+
+	if (found_free_slot)
+	{
+		ChairSlotAndUser::iterator itr = ChairListSlots.find(nearest_slot);
+		if (itr != ChairListSlots.end())
+		{
+			itr->second = player->GetGUID(); //this slot in now used by player
+			player->TeleportTo(GetMapId(), pos_x, pos_y, pos_z, pos_o, TELE_TO_NOT_LEAVE_TRANSPORT | TELE_TO_NOT_LEAVE_COMBAT | TELE_TO_NOT_UNSUMMON_PET);
+			player->SetStandState(UNIT_STAND_STATE_SIT_LOW_CHAIR + info->chair.height);
+			return;
+		}
+	}
 }
 
 void GameObject::CastSpell(Unit* target, uint32 spellId, bool triggered /*= true*/)

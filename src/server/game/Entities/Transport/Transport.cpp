@@ -310,6 +310,8 @@ GameObject* Transport::CreateGOPassenger(uint32 guid, GameObjectData const* data
     go->m_movementInfo.transport.pos.Relocate(x, y, z, o);
     CalculatePassengerPosition(x, y, z, &o);
     go->Relocate(x, y, z, o);
+    go->RelocateStationaryPosition(x, y, z, o);
+	go->m_updateFlag |= UPDATEFLAG_GO_TRANSPORT_POSITION;
 
     if (!go->IsPositionValid())
     {
@@ -489,8 +491,8 @@ void Transport::LoadStaticPassengers()
 
             // GameObjects on transport
             guidEnd = cellItr->second.gameobjects.end();
-            for (CellGuidSet::const_iterator guidItr = cellItr->second.gameobjects.begin(); guidItr != guidEnd; ++guidItr)
-                CreateGOPassenger(*guidItr, sObjectMgr->GetGOData(*guidItr));
+			for (CellGuidSet::const_iterator guidItr = cellItr->second.gameobjects.begin(); guidItr != guidEnd; ++guidItr)
+				CreateGOPassenger(*guidItr, sObjectMgr->GetGOData(*guidItr));
         }
     }
 }
