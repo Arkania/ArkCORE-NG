@@ -1,0 +1,88 @@
+
+
+-- fix issue #115
+
+update gameobject_template set data0=1726, data1=185220  where entry=185220;
+update gameobject_template set data1=185569  where entry=185569;
+update gameobject_template set data1=207472  where entry=207472;
+update gameobject_template set data0=57, data1=207496  where entry=207496;
+update gameobject_template set data0=57, data1=207485  where entry=207485;
+update gameobject_template set data1=207521  where entry=207521;
+update gameobject_template set data1=207533  where entry=207533;
+update gameobject_template set data0=57, data1=207486  where entry=207486;
+update gameobject_template set data0=57, data1=207474  where entry=207474;
+update gameobject_template set data1=207498  where entry=207498;
+update gameobject_template set data0=57, data1=207522  where entry=207522;
+update gameobject_template set data1=207534  where entry=207534;
+update gameobject_template set data0=57, data1=207487  where entry=207487;
+update gameobject_template set data0=57, data1=207475  where entry=207475;
+update gameobject_template set data1=207523  where entry=207523;
+update gameobject_template set data0=57, data1=207535  where entry=207535;
+update gameobject_template set data0=57, data1=207488  where entry=207488;
+update gameobject_template set data0=57, data1=207476  where entry=207476;
+update gameobject_template set data0=57, data1=207500  where entry=207500;
+update gameobject_template set data1=207477  where entry=207477;
+update gameobject_template set data0=57, data1=207489  where entry=207489;
+update gameobject_template set data0=57, data1=207513  where entry=207513;
+update gameobject_template set data1=207478  where entry=207478;
+update gameobject_template set data1=207480  where entry=207480;
+update gameobject_template set data1=207528  where entry=207528;
+update gameobject_template set data1=207493  where entry=207493;
+update gameobject_template set data1=207494  where entry=207494;
+update gameobject_template set data1=207518  where entry=207518;
+update gameobject_template set data1=207507  where entry=207507;
+update gameobject_template set data1=207519  where entry=207519;
+update gameobject_template set data0=57, data1=208420  where entry=208420;
+
+delete from gameobject where guid between 17120 and 17168;
+INSERT INTO `gameobject` VALUES (17120, 207524, 1, 1, 1, -4187.5, -1054.29, 88.3833, 1.65806, 0, 0, 0, 1, 120, 255, 1);
+INSERT INTO `gameobject` VALUES (17121, 207522, 1, 1, 1, 588.252, -156.646, 22.1494, 4.10152, 0, 0, 0, 1, 120, 255, 1);
+INSERT INTO `gameobject` VALUES (17122, 207522, 1, 1, 1, 19.8646, -683.983, -17.2363, 1.78023, 0, 0, 0, 1, 120, 255, 1);
+INSERT INTO `gameobject` VALUES (17123, 207519, 1, 1, 1, -11118.3, -659.856, 78.0122, 1.6057, 0, 0, 0, 1, 120, 255, 1);
+INSERT INTO `gameobject` VALUES (17124, 207520, 1, 1, 1, 212.132, -5064.63, 5.85208, 3.31614, 0, 0, 0, 1, 120, 255, 1);
+INSERT INTO `gameobject` VALUES (17125, 207518, 646, 1, 1, 414.87, 868.684, 6.19541, 4.57276, 0, 0, 0, 1, 7200, 255, 1);
+INSERT INTO `gameobject` VALUES (17126, 207518, 646, 1, 1, 1465.59, -23.5226, -82.9001, 2.67035, 0, 0, 0, 1, 7200, 255, 1);
+INSERT INTO `gameobject` VALUES (17127, 207513, 0, 1, 1, -11278.2, -3471.31, 8.42948, 5.89921, 0, 0, 0, 1, 120, 255, 1);
+INSERT INTO `gameobject` VALUES (17128, 207513, 0, 1, 1, -10609.4, -2550.09, 22.6336, 1.18682, 0, 0, 0, 1, 120, 255, 1);
+INSERT INTO `gameobject` VALUES (17129, 207512, 1, 1, 1, -6507.99, -4431.86, 89.048, 6.16101, 0, 0, 0, 1, 120, 255, 1);
+INSERT INTO `gameobject` VALUES (17130, 207512, 1, 1, 1, -8892.77, -3454.17, 11.1319, 2.35619, 0, 0, 0, 1, 120, 255, 1);
+INSERT INTO `gameobject` VALUES (17131, 207512, 1, 1, 1, -8323.35, -3579.75, 15.4568, 2.3911, 0, 0, 0, 1, 120, 255, 1);
+INSERT INTO `gameobject` VALUES (17132, 207512, 1, 1, 1, -5413.51, -1292.27, 86.8526, 0.418879, 0, 0, 0, 1, 120, 255, 1);
+INSERT INTO `gameobject` VALUES (17133, 207496, 0, 1, 1, -5439.21, -137.578, 350.944, 4.95674, 0, 0, 0, 1, 120, 255, 1);
+INSERT INTO `gameobject` VALUES (17134, 207494, 646, 1, 1, 1762.75, 1816.32, 356.809, 4.62512, 0, 0, 0, 1, 7200, 255, 1);
+INSERT INTO `gameobject` VALUES (17135, 207494, 646, 1, 1, 2021.13, -67.2778, -153.214, 5.77704, 0, 0, 0, 1, 7200, 255, 1);
+INSERT INTO `gameobject` VALUES (17136, 207489, 0, 1, 1, -10803.1, -2201.68, 117.131, 2.14675, 0, 0, 0, 1, 120, 255, 1);
+INSERT INTO `gameobject` VALUES (17137, 207488, 0, 1, 1, 3024.36, -4981.21, 106.656, 1.65806, 0, 0, 0, 1, 120, 255, 1);
+INSERT INTO `gameobject` VALUES (17138, 207488, 0, 1, 1, 2521.81, -4262.81, 74.9882, 2.35619, 0, 0, 0, 1, 120, 255, 1);
+INSERT INTO `gameobject` VALUES (17139, 207486, 0, 1, 1, -13070.1, -619.616, 53.3712, 1.09956, 0, 0, 0, 1, 120, 255, 1);
+INSERT INTO `gameobject` VALUES (17140, 207486, 0, 1, 1, -11479.3, -875.689, 36.2671, 0.942477, 0, 0, 0, 1, 120, 255, 1);
+INSERT INTO `gameobject` VALUES (17141, 207486, 1, 1, 1, 2314.44, -1437.4, 86.8048, 1.97222, 0, 0, 0, 1, 120, 255, 1);
+INSERT INTO `gameobject` VALUES (17142, 207486, 1, 1, 1, 2828.41, -2672.38, 212.678, 0.087266, 0, 0, 0, 1, 120, 255, 1);
+INSERT INTO `gameobject` VALUES (17143, 207486, 0, 1, 1, -448.762, -1477.35, 92.7387, 3.90954, 0, 0, 0, 1, 120, 255, 1);
+INSERT INTO `gameobject` VALUES (17144, 207486, 0, 1, 1, -218.026, -308.681, 159.862, 3.3685, 0, 0, 0, 1, 120, 255, 1);
+INSERT INTO `gameobject` VALUES (17145, 207486, 0, 1, 1, -582.988, -32.3281, 47.056, 3.4383, 0, 0, 0, 1, 120, 255, 1);
+INSERT INTO `gameobject` VALUES (17146, 207486, 0, 1, 1, 508.332, -335.47, 154.369, 2.02458, 0, 0, 0, 1, 120, 255, 1);
+INSERT INTO `gameobject` VALUES (17147, 207484, 1, 1, 1, 771.951, -4457.11, 15.6685, 3.68265, 0, 0, 0, 1, 120, 255, 1);
+INSERT INTO `gameobject` VALUES (17148, 207484, 1, 1, 1, 433.49, -4243.12, 23.0519, 1.48353, 0, 0, 0, 1, 120, 255, 1);
+INSERT INTO `gameobject` VALUES (17149, 207484, 648, 1, 4096, 158.16, 2069.17, 18.8376, 4.81711, 0, 0, 0, 1, 120, 255, 1);
+INSERT INTO `gameobject` VALUES (17150, 207484, 648, 1, 4096, 707.75, 1691.56, 120.084, 0, 0, 0, 0, 1, 120, 255, 1);
+INSERT INTO `gameobject` VALUES (17151, 207484, 648, 1, 4096, 1586.97, 2803.71, 11.4835, 5.5676, 0, 0, 0, 1, 120, 255, 1);
+INSERT INTO `gameobject` VALUES (17152, 207484, 648, 1, 4096, 1583.98, 1818.7, 265.944, 3.15906, 0, 0, 0, 1, 120, 255, 1);
+INSERT INTO `gameobject` VALUES (17153, 207474, 0, 1, 1, -1639.29, -1770.48, 81.3879, 6.10865, 0, 0, 0, 1, 120, 255, 1);
+INSERT INTO `gameobject` VALUES (17154, 207474, 0, 1, 1, -1186.15, -1970.35, 24.8313, 0.59341, 0, 0, 0, 1, 120, 255, 1);
+INSERT INTO `gameobject` VALUES (17155, 207474, 0, 1, 1, -1495.73, -2158.91, 16.7789, 3.54302, 0, 0, 0, 1, 120, 255, 1);
+INSERT INTO `gameobject` VALUES (17156, 207474, 1, 1, 1, 516.207, 630.93, 72.8539, 4.57276, 0, 0, 0, 1, 120, 255, 1);
+INSERT INTO `gameobject` VALUES (17157, 207475, 1, 1, 1, -3698.96, -3462.4, 37.2803, 0.157079, 0, 0, 0, 1, 120, 255, 1);
+INSERT INTO `gameobject` VALUES (17158, 207475, 1, 1, 1, -4332.94, -3231.63, 34.4904, 5.91667, 0, 0, 0, 1, 120, 255, 1);
+INSERT INTO `gameobject` VALUES (17159, 207472, 0, 1, 1, 2536.54, -917.839, 56.3031, 0, 0, 0, 0.870356, 0.492424, 300, 100, 1);
+INSERT INTO `gameobject` VALUES (17160, 207529, 571, 1, 1, 8525.64, 1415.32, 638.293, 0.363812, 0, 0, 0.180905, 0.983501, 300, 0, 1);
+INSERT INTO `gameobject` VALUES (17161, 207529, 571, 1, 1, 7044.73, 4176.19, 665.89, 1.22773, 0, 0, 0.576032, 0.817427, 300, 0, 1);
+INSERT INTO `gameobject` VALUES (17162, 207529, 571, 1, 1, 7770.59, 3593.25, 665.793, 3.05378, 0, 0, 0.999036, 0.0438916, 300, 0, 1);
+INSERT INTO `gameobject` VALUES (17163, 207524, 1, 1, 1, -5146.56, -1931.87, 89.1882, 0.0117702, 0, 0, 0.00588509, 0.999983, 300, 0, 1);
+INSERT INTO `gameobject` VALUES (17164, 207524, 1, 1, 1, -5256.8, -2362.22, 90.5358, 0.396615, 0, 0, 0.19701, 0.980401, 300, 0, 1);
+INSERT INTO `gameobject` VALUES (17165, 207524, 1, 1, 1, -5475.63, -2453.03, 89.284, 4.34323, 0, 0, 0.824874, -0.565317, 300, 0, 1);
+INSERT INTO `gameobject` VALUES (17166, 207521, 1, 1, 1, 6380.85, 575.028, 6.74488, 4.83179, 0, 0, 0.663657, -0.748037, 300, 0, 1);
+INSERT INTO `gameobject` VALUES (17167, 207521, 1, 1, 1, 7798.42, -966.777, 31.5609, 1.69411, 0, 0, 0.749335, 0.662191, 300, 0, 1);
+INSERT INTO `gameobject` VALUES (17168, 207521, 1, 1, 1, 7193.95, -740.366, 59.009, 4.10529, 0, 0, 0.88614, -0.463418, 300, 0, 1);
+
+
