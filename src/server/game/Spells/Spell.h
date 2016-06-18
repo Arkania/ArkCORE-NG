@@ -213,6 +213,8 @@ enum SpellEffectHandleMode
     SPELL_EFFECT_HANDLE_HIT_TARGET
 };
 
+static const uint32 SPELL_INTERRUPT_NONPLAYER = 32747;
+
 class Spell
 {
     friend void Unit::SetCurrentCastSpell(Spell* pSpell);

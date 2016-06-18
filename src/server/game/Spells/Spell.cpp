@@ -2468,6 +2468,10 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
                 unit->SetStandState(UNIT_STAND_STATE_STAND);
     }
 
+	// Check for SPELL_ATTR7_INTERRUPT_ONLY_NONPLAYER
+	if (m_spellInfo->HasAttribute(SPELL_ATTR7_INTERRUPT_ONLY_NONPLAYER) && unit->GetTypeId() != TYPEID_PLAYER)
+		caster->CastSpell(unit, SPELL_INTERRUPT_NONPLAYER, true);
+
     if (spellHitTarget)
     {
         //AI functions

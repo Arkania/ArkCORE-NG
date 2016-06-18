@@ -3026,7 +3026,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         if (spellInfo->ActiveIconID == 2158)  // flight
             spellInfo->Attributes |= SPELL_ATTR0_PASSIVE;
 
-        switch (spellInfo->Id)
+        switch (spellInfo->Id)//! HACK: This spell break quest complete for alliance
         {
             case 63026: // Force Cast (HACK: Target shouldn't be changed)
             case 63137: // Force Cast (HACK: Target shouldn't be changed; summon position should be untied from spell destination)
@@ -3433,6 +3433,13 @@ void SpellMgr::LoadSpellInfoCorrections()
                 //! HACK: This spell break quest complete for alliance and on retail not used °_O
                 spellInfo->Effects[EFFECT_0].Effect = 0;
                 break;
+			case 47476: // Deathknight - Strangulate
+			case 15487: // Priest - Silence
+			case 5211:  // Druid - Bash  - R1
+			case 6798:  // Druid - Bash  - R2
+			case 8983:  // Druid - Bash  - R3
+				spellInfo->AttributesEx7 |= SPELL_ATTR7_INTERRUPT_ONLY_NONPLAYER;
+				break;
             // ULDUAR SPELLS
             //
             case 62374: // Pursued (Flame Leviathan)
