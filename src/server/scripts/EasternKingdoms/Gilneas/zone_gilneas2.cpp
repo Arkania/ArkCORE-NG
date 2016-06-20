@@ -285,7 +285,7 @@ public:
 };
 
 /*######
-## npc_prince_liam_greymane_gilneas
+## npc_prince_liam_greymane_gilneas ??? 38474
 ######*/
 class npc_prince_liam_greymane_gilneas : public CreatureScript
 {
@@ -1215,14 +1215,14 @@ void AddSC_zone_gilneas_city2()
     new npc_trigger_quest_24616();
 
     new npc_krennan_aranas_38553();
-    new npc_prince_liam_greymane_gilneas();
+    //new npc_prince_liam_greymane_gilneas();
     new npc_gilnean_militia_38221();
     new npc_lord_darius_crowley_38415();
     new npc_worgen_warrior_38348();
-    new npc_lady_sylvanas_gilneas();
+    //new npc_lady_sylvanas_gilneas();
     new npc_lorna_crowley_38611();
 
-    new npc_lorna_crowley_event();
+    //new npc_lorna_crowley_event();
     new npc_captured_riding_bat_38615();
   
 }

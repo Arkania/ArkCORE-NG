@@ -4907,7 +4907,7 @@ public:
 
         void Register()
         {
-            OnEffectHitTarget += SpellEffectFn(spell_gen_scales_of_life_SpellScript::HandleOnHit, EFFECT_0, SPELL_EFFECT_HEAL);
+            OnEffectHitTarget += SpellEffectFn(spell_gen_scales_of_life_SpellScript::HandleOnHit, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
             OnCheckCast += SpellCheckCastFn(spell_gen_scales_of_life_SpellScript::CheckRequirement);
         }
     };

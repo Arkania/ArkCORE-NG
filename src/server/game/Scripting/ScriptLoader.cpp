@@ -411,7 +411,6 @@ void AddSC_boss_majordomus();
 void AddSC_instance_firelands();
 void AddSC_boss_ammunae();                   //Halls Of Origination
 void AddSC_boss_anraphet();
-//void AddSC_boss_ptah();
 void AddSC_boss_earthrager_ptah();
 void AddSC_boss_isiset();
 void AddSC_boss_rajh();
@@ -1316,7 +1315,6 @@ void AddKalimdorScripts()
     AddSC_boss_isiset();
     AddSC_boss_rajh();
     AddSC_boss_setesh();
-    //AddSC_boss_ptah();
     AddSC_elementaires_sdo();   
     AddSC_npc_trash_sdo();
     AddSC_instance_halls_of_origination();

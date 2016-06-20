@@ -1588,14 +1588,15 @@ enum GeneralEvents
     SPELL_SPIRIT_BURST           = 69900, // 73046 on hc
 };
 
-class npc_frostworn_general : public CreatureScript
+// 36723
+class npc_frostsworn_general_36723 : public CreatureScript
 {
 public:
-    npc_frostworn_general() : CreatureScript("npc_frostworn_general") { }
+    npc_frostsworn_general_36723() : CreatureScript("npc_frostsworn_general_36723") { }
 
-    struct npc_frostworn_generalAI : public ScriptedAI
+    struct npc_frostsworn_general_36723AI : public ScriptedAI
     {
-        npc_frostworn_generalAI(Creature* creature) : ScriptedAI(creature)
+        npc_frostsworn_general_36723AI(Creature* creature) : ScriptedAI(creature)
         {
             _instance = me->GetInstanceScript();
             Reset();
@@ -1677,7 +1678,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_frostworn_generalAI>(creature);
+        return GetInstanceAI<npc_frostsworn_general_36723AI>(creature);
     }
 };
 
@@ -2023,7 +2024,6 @@ public:
     }
 };
 
-
 class npc_lumbering_abomination : public CreatureScript
 {
 public:
@@ -2124,6 +2124,6 @@ void AddSC_halls_of_reflection()
     new npc_raging_ghoul();
     new npc_risen_witch_doctor();
     new npc_lumbering_abomination();
-    new npc_frostworn_general();
+    new npc_frostsworn_general_36723();
     new npc_spiritual_reflection();
 }

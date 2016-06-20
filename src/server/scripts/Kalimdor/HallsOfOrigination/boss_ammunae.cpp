@@ -430,19 +430,15 @@ class npc_seedling : public CreatureScript
         };
 };
 
-class npc_blossom : public CreatureScript
+// 40620
+class npc_bloodpetal_blossom_40620 : public CreatureScript
 {
     public:
-        npc_blossom() : CreatureScript("npc_blossom") { }
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new npc_blossomAI(creature);
-        }
+        npc_bloodpetal_blossom_40620() : CreatureScript("npc_bloodpetal_blossom_40620") { }
             
-        struct npc_blossomAI : public ScriptedAI
+        struct npc_bloodpetal_blossom_40620AI : public ScriptedAI
         {
-            npc_blossomAI(Creature* creature) : ScriptedAI(creature)
+            npc_bloodpetal_blossom_40620AI(Creature* creature) : ScriptedAI(creature)
             {
                 m_pInstance = creature->GetInstanceScript();
             }
@@ -478,6 +474,11 @@ class npc_blossom : public CreatureScript
                 DoMeleeAttackIfReady();
             }
         };
+
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return new npc_bloodpetal_blossom_40620AI(creature);
+        }
 };
 
 class npc_spore : public CreatureScript
@@ -525,6 +526,6 @@ void AddSC_boss_ammunae()
 {
     new boss_ammunae();
     new npc_seedling();
-    new npc_blossom();
+    new npc_bloodpetal_blossom_40620();
     new npc_spore();
 }

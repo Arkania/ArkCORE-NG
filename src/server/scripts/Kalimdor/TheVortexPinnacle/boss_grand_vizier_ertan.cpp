@@ -65,6 +65,7 @@ const Position ertanvortexPos_1[8] =
     {-719.55f,   -21.19f, 635.67f, 0.0f},
 };
 
+// 43878
 class boss_grand_vizier_ertan : public CreatureScript
 {
     public:
@@ -212,18 +213,15 @@ class boss_grand_vizier_ertan : public CreatureScript
         };
 };
 
-class npc_ertan_vortex : public CreatureScript
+// 46007
+class npc_ertans_vortex_46007 : public CreatureScript
 {
     public:
-        npc_ertan_vortex() : CreatureScript("npc_ertan_vortex") { }
-        
-        CreatureAI* GetAI(Creature* creature) const
+        npc_ertans_vortex_46007() : CreatureScript("npc_ertans_vortex_46007") { }
+
+        struct npc_ertans_vortex_46007AI : public ScriptedAI
         {
-            return new npc_ertan_vortexAI(creature);
-        }
-        struct npc_ertan_vortexAI : public ScriptedAI
-        {
-            npc_ertan_vortexAI(Creature* creature) : ScriptedAI(creature)
+            npc_ertans_vortex_46007AI(Creature* creature) : ScriptedAI(creature)
             {
                 pInstance = creature->GetInstanceScript();
             }
@@ -253,10 +251,15 @@ class npc_ertan_vortex : public CreatureScript
                     uiDespawnTimer -= diff;
             }
      };
+
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return new npc_ertans_vortex_46007AI(creature);
+        }
 };
 
 void AddSC_boss_grand_vizier_ertan()
 {
     new boss_grand_vizier_ertan();
-    new npc_ertan_vortex();
+    new npc_ertans_vortex_46007();
 }

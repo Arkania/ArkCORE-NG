@@ -34,10 +34,6 @@ EndContentData */
 #include "ScriptedCreature.h"
 #include "arcatraz.h"
 
-/*#####
-# npc_millhouse_manastorm_arc
-#####*/
-
 enum MillhouseSays
 {
     SAY_INTRO_1                = 0,
@@ -67,17 +63,15 @@ enum MillhouseSpells
     SPELL_PYROBLAST            = 33975,
 };
 
-class npc_millhouse_manastorm_arc : public CreatureScript
+// 20977
+class npc_millhouse_manastorm_20977 : public CreatureScript
 {
     public:
-        npc_millhouse_manastorm_arc()
-            : CreatureScript("npc_millhouse_manastorm_arc")
-        {
-        }
+        npc_millhouse_manastorm_20977() : CreatureScript("npc_millhouse_manastorm_20977") { }
 
-        struct npc_millhouse_manastorm_arcAI : public ScriptedAI
+        struct npc_millhouse_manastorm_20977AI : public ScriptedAI
         {
-			npc_millhouse_manastorm_arcAI(Creature* creature) : ScriptedAI(creature)
+            npc_millhouse_manastorm_20977AI(Creature* creature) : ScriptedAI(creature)
 			{
 				instance = creature->GetInstanceScript();
 			}
@@ -219,9 +213,10 @@ class npc_millhouse_manastorm_arc : public CreatureScript
 
         CreatureAI* GetAI(Creature* creature) const override
         {
-			return GetArcatrazAI<npc_millhouse_manastorm_arcAI>(creature);
+			return GetArcatrazAI<npc_millhouse_manastorm_20977AI>(creature);
         }
 };
+
 /*#####
 # npc_warden_mellichar
 #####*/
@@ -540,7 +535,7 @@ class npc_zerekethvoidzone : public CreatureScript
 
 void AddSC_arcatraz()
 {
-    new npc_millhouse_manastorm_arc();
+    new npc_millhouse_manastorm_20977();
     new npc_warden_mellichar();
     new npc_zerekethvoidzone();
 }

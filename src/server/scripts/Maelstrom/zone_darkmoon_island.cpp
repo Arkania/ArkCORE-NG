@@ -309,15 +309,15 @@ public:
 };
 
 // 54444 // 54466 // 54549
-class npc_whacked_gnoll : public CreatureScript
+class npc_darkmoon_faire_gnoll_54444 : public CreatureScript
 {
 public:
 
-    npc_whacked_gnoll() : CreatureScript("npc_whacked_gnoll") { }
+    npc_darkmoon_faire_gnoll_54444() : CreatureScript("npc_darkmoon_faire_gnoll_54444") { }
 
-    struct npc_whacked_gnollAI : public ScriptedAI
+    struct npc_darkmoon_faire_gnoll_54444AI : public ScriptedAI
     {
-        npc_whacked_gnollAI(Creature* creature) : ScriptedAI(creature) { }
+        npc_darkmoon_faire_gnoll_54444AI(Creature* creature) : ScriptedAI(creature) { }
 
         void IsSummonedBy(Unit* summoner) override
         {
@@ -346,7 +346,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_whacked_gnollAI(creature);
+        return new npc_darkmoon_faire_gnoll_54444AI(creature);
     }
 };
 
@@ -1105,10 +1105,10 @@ public:
 void AddSC_zone_darkmoon_island()
 {
     new npc_mola_54601();
-    new npc_whacked_gnoll();
-    new npc_gnoll_barrel();
+    new npc_darkmoon_faire_gnoll_54444();
+    //new npc_gnoll_barrel();
     new npc_darkmoon_faire_whack_a_gnoll_bunny_58570();
-    new spell_mallet();
+    //new spell_mallet();
     new npc_maxima_blastenheimer_15303();
     new npc_teleportologist_fozlebub_57850();
     new npc_rinling_14841();

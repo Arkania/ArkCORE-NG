@@ -210,19 +210,15 @@ class boss_setesh : public CreatureScript
         };
 };
 
-class npc_portal : public CreatureScript
+// 41055
+class npc_chaos_portal_41055 : public CreatureScript
 {
     public:
-        npc_portal() : CreatureScript("npc_portal") { }
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new npc_portalAI(creature);
-        }
+        npc_chaos_portal_41055() : CreatureScript("npc_chaos_portal_41055") { }
             
-        struct npc_portalAI : public ScriptedAI
+        struct npc_chaos_portal_41055AI : public ScriptedAI
         {
-            npc_portalAI(Creature* creature) : ScriptedAI(creature)
+            npc_chaos_portal_41055AI(Creature* creature) : ScriptedAI(creature)
             {
                 m_pInstance = creature->GetInstanceScript();
             }
@@ -292,21 +288,22 @@ class npc_portal : public CreatureScript
                     m_uiSeekerTimer -= uiDiff;
             }
         };
-};
-
-class npc_sentinel : public CreatureScript
-{
-    public:
-        npc_sentinel() : CreatureScript("npc_sentinel") { }
 
         CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_sentinelAI(creature);
+            return new npc_chaos_portal_41055AI(creature);
         }
+};
+
+// 41208
+class npc_void_sentinel_41208 : public CreatureScript
+{
+    public:
+        npc_void_sentinel_41208() : CreatureScript("npc_void_sentinel_41208") { }
             
-        struct npc_sentinelAI : public ScriptedAI
+        struct npc_void_sentinel_41208AI : public ScriptedAI
         {
-            npc_sentinelAI(Creature* creature) : ScriptedAI(creature)
+            npc_void_sentinel_41208AI(Creature* creature) : ScriptedAI(creature)
             {
                 m_pInstance = creature->GetInstanceScript();
             }
@@ -332,21 +329,22 @@ class npc_sentinel : public CreatureScript
                 DoMeleeAttackIfReady();
             }
         };
-};
-
-class npc_seeker : public CreatureScript
-{
-    public:
-        npc_seeker() : CreatureScript("npc_seeker") { }
 
         CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_seekerAI(creature);
+            return new npc_void_sentinel_41208AI(creature);
         }
+};
+
+// 41148 // 41371
+class npc_void_seeker_41148 : public CreatureScript
+{
+    public:
+        npc_void_seeker_41148() : CreatureScript("npc_void_seeker_41148") { }
             
-        struct npc_seekerAI : public ScriptedAI
+        struct npc_void_seeker_41148AI : public ScriptedAI
         {
-            npc_seekerAI(Creature* creature) : ScriptedAI(creature)
+            npc_void_seeker_41148AI(Creature* creature) : ScriptedAI(creature)
             {
                 m_pInstance = creature->GetInstanceScript();
             }
@@ -382,7 +380,13 @@ class npc_seeker : public CreatureScript
                 DoMeleeAttackIfReady();
             }
         };
+
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return new npc_void_seeker_41148AI(creature);
+        }
 };
+
 class npc_seed_of_chaos : public CreatureScript
 {
     public:
@@ -443,6 +447,7 @@ class npc_seed_of_chaos : public CreatureScript
             return new npc_seed_of_chaosAI(creature);
         }
 };
+
 class npc_reign_of_chaos : public CreatureScript
 {
     public:
@@ -496,12 +501,13 @@ class npc_reign_of_chaos : public CreatureScript
             return new npc_reign_of_chaosAI(creature);
         }
 };
+
 void AddSC_boss_setesh()
 {
     new boss_setesh();
-    new npc_portal();
-    new npc_sentinel();
-    new npc_seeker();
+    new npc_chaos_portal_41055();
+    new npc_void_sentinel_41208();
+    new npc_void_seeker_41148();
     new npc_seed_of_chaos();
     new npc_reign_of_chaos();
 }

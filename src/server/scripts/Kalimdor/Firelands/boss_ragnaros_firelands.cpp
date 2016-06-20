@@ -1872,14 +1872,14 @@ public:
 };
 
 // 53953
-class npc_breathoffrost : public CreatureScript
+class npc_breadth_of_frost_53953 : public CreatureScript
 {
 public:
-    npc_breathoffrost() : CreatureScript("npc_breathoffrost") { }
+    npc_breadth_of_frost_53953() : CreatureScript("npc_breadth_of_frost_53953") { }
 
-    struct npc_breathoffrostAI : public ScriptedAI
+    struct npc_breadth_of_frost_53953AI : public ScriptedAI
     {
-        npc_breathoffrostAI(Creature* creature) : ScriptedAI(creature)
+        npc_breadth_of_frost_53953AI(Creature* creature) : ScriptedAI(creature)
         {
             instance = creature->GetInstanceScript();
         }
@@ -1910,7 +1910,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_breathoffrostAI(creature);
+        return new npc_breadth_of_frost_53953AI(creature);
     }
 };
 
@@ -2135,7 +2135,7 @@ void AddSC_boss_ragnaros_firelands()
     new npc_entrapping_roots();
     new npc_dreadflame();
     new npc_cloudburst();
-    new npc_breathoffrost();
+    new npc_breadth_of_frost_53953();
     new npc_hamuul();
     new npc_malfurion();
     new npc_cenarius();

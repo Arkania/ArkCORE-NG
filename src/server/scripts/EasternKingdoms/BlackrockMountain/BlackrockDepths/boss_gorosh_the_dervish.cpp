@@ -26,19 +26,15 @@ enum Spells
     SPELL_MORTALSTRIKE                                     = 24573
 };
 
-class boss_gorosh_the_dervish : public CreatureScript
+// 9027
+class boss_gorosh_the_dervish_9027 : public CreatureScript
 {
 public:
-    boss_gorosh_the_dervish() : CreatureScript("boss_gorosh_the_dervish") { }
+    boss_gorosh_the_dervish_9027() : CreatureScript("boss_gorosh_the_dervish_9027") { }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    struct boss_gorosh_the_dervish_9027AI : public ScriptedAI
     {
-        return new boss_gorosh_the_dervishAI(creature);
-    }
-
-    struct boss_gorosh_the_dervishAI : public ScriptedAI
-    {
-        boss_gorosh_the_dervishAI(Creature* creature) : ScriptedAI(creature) { }
+        boss_gorosh_the_dervish_9027AI(Creature* creature) : ScriptedAI(creature) { }
 
         uint32 WhirlWind_Timer;
         uint32 MortalStrike_Timer;
@@ -76,9 +72,14 @@ public:
             DoMeleeAttackIfReady();
         }
     };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new boss_gorosh_the_dervish_9027AI(creature);
+    }
 };
 
 void AddSC_boss_gorosh_the_dervish()
 {
-    new boss_gorosh_the_dervish();
+    new boss_gorosh_the_dervish_9027();
 }

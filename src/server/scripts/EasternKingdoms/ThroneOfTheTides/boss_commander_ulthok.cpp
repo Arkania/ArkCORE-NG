@@ -220,5 +220,5 @@ void AddSC_boss_commander_ulthok()
 {
     new boss_commander_ulthok();
     new npc_ulthok_dark_fissure();
-    new at_tott_commander_ulthok();
+   // new at_tott_commander_ulthok();
 }

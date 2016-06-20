@@ -132,7 +132,8 @@ enum Spells
     SPELL_HOWLING_GALE          = 85084,
     SPELL_HOWLING_GALE_1        = 85086,
     SPELL_HOWLING_GALE_2        = 85136,
-    SPELL_HOWLING_GALE_3        = 85086,
+    SPELL_HOWLING_GALE_3        = 85137,
+    SPELL_HOWLING_GALE_4        = 85158,
     SPELL_HOWLING_GALE_DMG      = 85159,
 
 };
@@ -179,21 +180,17 @@ enum Other
     TYPE_SLIPSTREAM    = 1,
 };
 
-class npc_vortex_pinnacle_slipsteam : public CreatureScript
+// 45455
+class npc_slipstream_45455 : public CreatureScript
 {
     public:
-        npc_vortex_pinnacle_slipsteam() : CreatureScript("npc_vortex_pinnacle_slipsteam") { }
-        
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new npc_vortex_pinnacle_slipsteamAI(creature);
-        }
+        npc_slipstream_45455() : CreatureScript("npc_slipstream_45455") { }
 
         bool OnGossipHello(Player* pPlayer, Creature* creature)
         {
             if (InstanceScript* pInstance = creature->GetInstanceScript())
             {
-                if (pInstance->GetData(DATA_ALTAIRUS) == DONE)
+                if (pInstance->GetData(DATA_ALTAIRUS) == DONE)  // 43873
                 {
                     pPlayer->NearTeleportTo(
                         teleportPos[1].GetPositionX(),
@@ -202,7 +199,7 @@ class npc_vortex_pinnacle_slipsteam : public CreatureScript
                         teleportPos[1].GetOrientation());
                     return true;
                 }
-                else if (pInstance->GetData(DATA_GRAND_VIZIER_ERTAN) == DONE)
+                else if (pInstance->GetData(DATA_GRAND_VIZIER_ERTAN) == DONE) // 43878
                 {
                     pPlayer->NearTeleportTo(
                         teleportPos[0].GetPositionX(),
@@ -215,9 +212,9 @@ class npc_vortex_pinnacle_slipsteam : public CreatureScript
             return false;
         }
 
-        struct npc_vortex_pinnacle_slipsteamAI : public ScriptedAI
+        struct npc_slipstream_45455AI : public ScriptedAI
         {
-            npc_vortex_pinnacle_slipsteamAI(Creature* creature) : ScriptedAI(creature)
+            npc_slipstream_45455AI(Creature* creature) : ScriptedAI(creature)
             {
                 me->SetCanFly(true);
             }
@@ -230,21 +227,22 @@ class npc_vortex_pinnacle_slipsteam : public CreatureScript
 
             void UpdateAI(uint32 /*diff*/) { }
      };
-};
 
-class npc_skyfall_star : public CreatureScript
-{
-    public:
-        npc_skyfall_star() : CreatureScript("npc_skyfall_star") { }
-        
         CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_skyfall_starAI(creature);
+            return new npc_slipstream_45455AI(creature);
         }
+};
 
-        struct npc_skyfall_starAI : public ScriptedAI
+// 45932 // 52019
+class npc_skyfall_star_45932 : public CreatureScript
+{
+    public:
+        npc_skyfall_star_45932() : CreatureScript("npc_skyfall_star_45932") { }
+
+        struct npc_skyfall_star_45932AI : public ScriptedAI
         {
-            npc_skyfall_starAI(Creature* creature) : ScriptedAI(creature)
+            npc_skyfall_star_45932AI(Creature* creature) : ScriptedAI(creature)
             {
                 me->SetCanFly(true);
                 SetCombatMovement(false);
@@ -289,21 +287,22 @@ class npc_skyfall_star : public CreatureScript
                 }
             }
      };
-};
 
-class npc_cloud_prince : public CreatureScript
-{
-    public:
-        npc_cloud_prince() : CreatureScript("npc_cloud_prince") { }
-        
         CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_cloud_princeAI(creature);
+            return new npc_skyfall_star_45932AI(creature);
         }
+};
 
-        struct npc_cloud_princeAI : public ScriptedAI
+// 45917
+class npc_cloud_prince_45917 : public CreatureScript
+{
+    public:
+        npc_cloud_prince_45917() : CreatureScript("npc_cloud_prince_45917") { }
+
+        struct npc_cloud_prince_45917AI : public ScriptedAI
         {
-            npc_cloud_princeAI(Creature* creature) : ScriptedAI(creature)
+            npc_cloud_prince_45917AI(Creature* creature) : ScriptedAI(creature)
             {
             }
 
@@ -348,23 +347,22 @@ class npc_cloud_prince : public CreatureScript
                 DoMeleeAttackIfReady();
             }
      };
-};
 
-class npc_whipping_wind : public CreatureScript
-{
-    public:
-        npc_whipping_wind() : CreatureScript("npc_whipping_wind") { }
-        
         CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_whipping_windAI(creature);
+            return new npc_cloud_prince_45917AI(creature);
         }
+};
 
-        struct npc_whipping_windAI : public ScriptedAI
+// 47238
+class npc_whipping_wind_47238 : public CreatureScript
+{
+    public:
+        npc_whipping_wind_47238() : CreatureScript("npc_whipping_wind_47238") { }
+
+        struct npc_whipping_wind_47238AI : public ScriptedAI
         {
-            npc_whipping_windAI(Creature* creature) : ScriptedAI(creature)
-            {
-            }
+            npc_whipping_wind_47238AI(Creature* creature) : ScriptedAI(creature) { }
 
             EventMap events;
 
@@ -401,21 +399,22 @@ class npc_whipping_wind : public CreatureScript
                 DoMeleeAttackIfReady();
             }
      };
-};
 
-class npc_young_storm_dragon : public CreatureScript
-{
-    public:
-        npc_young_storm_dragon() : CreatureScript("npc_young_storm_dragon") { }
-        
         CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_young_storm_dragonAI(creature);
+            return new npc_whipping_wind_47238AI(creature);
         }
+};
 
-        struct npc_young_storm_dragonAI : public ScriptedAI
+// 45919
+class npc_young_storm_dragon_45919 : public CreatureScript
+{
+    public:
+        npc_young_storm_dragon_45919() : CreatureScript("npc_young_storm_dragon_45919") { }
+
+        struct npc_young_storm_dragon_45919AI : public ScriptedAI
         {
-            npc_young_storm_dragonAI(Creature* creature) : ScriptedAI(creature)
+            npc_young_storm_dragon_45919AI(Creature* creature) : ScriptedAI(creature)
             {
                 me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
@@ -467,23 +466,22 @@ class npc_young_storm_dragon : public CreatureScript
                 DoMeleeAttackIfReady();
             }
      };
-};
 
-class npc_armored_mistral : public CreatureScript
-{
-    public:
-        npc_armored_mistral() : CreatureScript("npc_armored_mistral") { }
-        
         CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_armored_mistralAI(creature);
+            return new npc_young_storm_dragon_45919AI(creature);
         }
+};
 
-        struct npc_armored_mistralAI : public ScriptedAI
+// 45915
+class npc_armored_mistral_45915 : public CreatureScript
+{
+    public:
+        npc_armored_mistral_45915() : CreatureScript("npc_armored_mistral_45915") { }
+
+        struct npc_armored_mistral_45915AI : public ScriptedAI
         {
-            npc_armored_mistralAI(Creature* creature) : ScriptedAI(creature)
-            {
-            }
+            npc_armored_mistral_45915AI(Creature* creature) : ScriptedAI(creature) { }
 
             EventMap events;
 
@@ -526,23 +524,22 @@ class npc_armored_mistral : public CreatureScript
                 DoMeleeAttackIfReady();
             }
      };
-};
 
-class npc_empyrean_assassin : public CreatureScript
-{
-    public:
-        npc_empyrean_assassin() : CreatureScript("npc_empyrean_assassin") { }
-        
         CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_empyrean_assassinAI(creature);
+            return new npc_armored_mistral_45915AI(creature);
         }
+};
 
-        struct npc_empyrean_assassinAI : public ScriptedAI
+// 45922
+class npc_empyrean_assassin_45922 : public CreatureScript
+{
+    public:
+        npc_empyrean_assassin_45922() : CreatureScript("npc_empyrean_assassin_45922") { }
+
+        struct npc_empyrean_assassin_45922AI : public ScriptedAI
         {
-            npc_empyrean_assassinAI(Creature* creature) : ScriptedAI(creature)
-            {
-            }
+            npc_empyrean_assassin_45922AI(Creature* creature) : ScriptedAI(creature) { }
 
             EventMap events;
 
@@ -580,23 +577,22 @@ class npc_empyrean_assassin : public CreatureScript
                 DoMeleeAttackIfReady();
             }
      };
-};
 
-class npc_executor_of_the_caliph : public CreatureScript
-{
-    public:
-        npc_executor_of_the_caliph() : CreatureScript("npc_executor_of_the_caliph") { }
-        
         CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_executor_of_the_caliphAI(creature);
+            return new npc_empyrean_assassin_45922AI(creature);
         }
+};
 
-        struct npc_executor_of_the_caliphAI : public ScriptedAI
+// 45928
+class npc_executor_of_the_caliph_45928 : public CreatureScript
+{
+    public:
+        npc_executor_of_the_caliph_45928() : CreatureScript("npc_executor_of_the_caliph_45928") { }
+
+        struct npc_executor_of_the_caliph_45928AI : public ScriptedAI
         {
-            npc_executor_of_the_caliphAI(Creature* creature) : ScriptedAI(creature)
-            {
-            }
+            npc_executor_of_the_caliph_45928AI(Creature* creature) : ScriptedAI(creature) { }
 
             EventMap events;
 
@@ -643,23 +639,22 @@ class npc_executor_of_the_caliph : public CreatureScript
                 DoMeleeAttackIfReady();
             }
      };
-};
 
-class npc_gust_soldier : public CreatureScript
-{
-    public:
-        npc_gust_soldier() : CreatureScript("npc_gust_soldier") { }
-        
         CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_gust_soldierAI(creature);
+            return new npc_executor_of_the_caliph_45928AI(creature);
         }
+};
 
-        struct npc_gust_soldierAI : public ScriptedAI
+// 45477
+class npc_gust_soldier_45477 : public CreatureScript
+{
+    public:
+        npc_gust_soldier_45477() : CreatureScript("npc_gust_soldier_45477") { }
+
+        struct npc_gust_soldier_45477AI : public ScriptedAI
         {
-            npc_gust_soldierAI(Creature* creature) : ScriptedAI(creature)
-            {
-            }
+            npc_gust_soldier_45477AI(Creature* creature) : ScriptedAI(creature) { }
 
             EventMap events;
 
@@ -702,21 +697,22 @@ class npc_gust_soldier : public CreatureScript
                 DoMeleeAttackIfReady();
             }
      };
-};
 
-class npc_lurking_tempest : public CreatureScript
-{
-    public:
-        npc_lurking_tempest() : CreatureScript("npc_lurking_tempest") { }
-        
         CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_lurking_tempestAI(creature);
+            return new npc_gust_soldier_45477AI(creature);
         }
+};
 
-        struct npc_lurking_tempestAI : public ScriptedAI
+// 45704
+class npc_lurking_tempest_45704 : public CreatureScript
+{
+    public:
+        npc_lurking_tempest_45704() : CreatureScript("npc_lurking_tempest_45704") { }
+
+        struct npc_lurking_tempest_45704AI : public ScriptedAI
         {
-            npc_lurking_tempestAI(Creature* creature) : ScriptedAI(creature) { }
+            npc_lurking_tempest_45704AI(Creature* creature) : ScriptedAI(creature) { }
 
             void Reset() { }
 
@@ -728,21 +724,22 @@ class npc_lurking_tempest : public CreatureScript
                     return;
             }
      };
-};
 
-class npc_howling_gale : public CreatureScript
-{
-    public:
-        npc_howling_gale() : CreatureScript("npc_howling_gale") { }
-        
         CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_howling_galeAI(creature);
+            return new npc_lurking_tempest_45704AI(creature);
         }
+};
 
-        struct npc_howling_galeAI : public ScriptedAI
+// 45572
+class npc_howling_gale_45572 : public CreatureScript
+{
+    public:
+        npc_howling_gale_45572() : CreatureScript("npc_howling_gale_45572") { }
+
+        struct npc_howling_gale_45572AI : public ScriptedAI
         {
-            npc_howling_galeAI(Creature* creature) : ScriptedAI(creature)
+            npc_howling_gale_45572AI(Creature* creature) : ScriptedAI(creature)
             {
                 me->SetReactState(REACT_PASSIVE);
                 SetCombatMovement(false);
@@ -814,23 +811,22 @@ class npc_howling_gale : public CreatureScript
                 }
             }
      };
-};
 
-class npc_minister_of_air : public CreatureScript
-{
-    public:
-        npc_minister_of_air() : CreatureScript("npc_minister_of_air") { }
-        
         CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_minister_of_airAI(creature);
+            return new npc_howling_gale_45572AI(creature);
         }
+};
 
-        struct npc_minister_of_airAI : public ScriptedAI
+// 45930
+class npc_minister_of_air_45930 : public CreatureScript
+{
+    public:
+        npc_minister_of_air_45930() : CreatureScript("npc_minister_of_air_45930") { }
+
+        struct npc_minister_of_air_45930AI : public ScriptedAI
         {
-            npc_minister_of_airAI(Creature* creature) : ScriptedAI(creature)
-            {
-            }
+            npc_minister_of_air_45930AI(Creature* creature) : ScriptedAI(creature) { }
 
             EventMap events;
 
@@ -873,23 +869,22 @@ class npc_minister_of_air : public CreatureScript
                 DoMeleeAttackIfReady();
             }
      };
-};
 
-class npc_servant_of_asaad : public CreatureScript
-{
-    public:
-        npc_servant_of_asaad() : CreatureScript("npc_servant_of_asaad") { }
-        
         CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_servant_of_asaadAI(creature);
+            return new npc_minister_of_air_45930AI(creature);
         }
+};
 
-        struct npc_servant_of_asaadAI : public ScriptedAI
+// 45926
+class npc_servant_of_asaad_45926 : public CreatureScript
+{
+    public:
+        npc_servant_of_asaad_45926() : CreatureScript("npc_servant_of_asaad_45926") { }
+
+        struct npc_servant_of_asaad_45926AI : public ScriptedAI
         {
-            npc_servant_of_asaadAI(Creature* creature) : ScriptedAI(creature)
-            {
-            }
+            npc_servant_of_asaad_45926AI(Creature* creature) : ScriptedAI(creature) { }
 
             EventMap events;
 
@@ -932,23 +927,22 @@ class npc_servant_of_asaad : public CreatureScript
                 DoMeleeAttackIfReady();
             }
      };
-};
 
-class npc_temple_adept : public CreatureScript
-{
-    public:
-        npc_temple_adept() : CreatureScript("npc_temple_adept") { }
-        
         CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_temple_adeptAI(creature);
+            return new npc_servant_of_asaad_45926AI(creature);
         }
+};
 
-        struct npc_temple_adeptAI : public ScriptedAI
+// 45935
+class npc_temple_adept_45935 : public CreatureScript
+{
+    public:
+        npc_temple_adept_45935() : CreatureScript("npc_temple_adept_45935") { }
+
+        struct npc_temple_adept_45935AI : public ScriptedAI
         {
-            npc_temple_adeptAI(Creature* creature) : ScriptedAI(creature)
-            {
-            }
+            npc_temple_adept_45935AI(Creature* creature) : ScriptedAI(creature) { }
 
             EventMap events;
 
@@ -1016,21 +1010,21 @@ class npc_temple_adept : public CreatureScript
             }
      };
 
-};
-
-class npc_turbulent_squall : public CreatureScript
-{
-    public:
-        npc_turbulent_squall() : CreatureScript("npc_turbulent_squall") { }
-        
         CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_turbulent_squallAI(creature);
+            return new npc_temple_adept_45935AI(creature);
         }
+};
 
-        struct npc_turbulent_squallAI : public ScriptedAI
+// 45924
+class npc_turbulent_squall_45924 : public CreatureScript
+{
+    public:
+        npc_turbulent_squall_45924() : CreatureScript("npc_turbulent_squall_45924") { }
+
+        struct npc_turbulent_squall_45924AI : public ScriptedAI
         {
-            npc_turbulent_squallAI(Creature* creature) : ScriptedAI(creature) { }
+            npc_turbulent_squall_45924AI(Creature* creature) : ScriptedAI(creature) { }
 
             EventMap events;
 
@@ -1079,23 +1073,22 @@ class npc_turbulent_squall : public CreatureScript
                 DoMeleeAttackIfReady();
             }
      };
-};
 
-class npc_wild_vortex : public CreatureScript
-{
-    public:
-        npc_wild_vortex() : CreatureScript("npc_wild_vortex") { }
-        
         CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_wild_vortexAI(creature);
+            return new npc_turbulent_squall_45924AI(creature);
         }
+};
 
-        struct npc_wild_vortexAI : public ScriptedAI
+// 45912
+class npc_wild_vortex_45912 : public CreatureScript
+{
+    public:
+        npc_wild_vortex_45912() : CreatureScript("npc_wild_vortex_45912") { }
+
+        struct npc_wild_vortex_45912AI : public ScriptedAI
         {
-            npc_wild_vortexAI(Creature* creature) : ScriptedAI(creature)
-            {
-            }
+            npc_wild_vortex_45912AI(Creature* creature) : ScriptedAI(creature) { }
 
             EventMap events;
 
@@ -1144,8 +1137,14 @@ class npc_wild_vortex : public CreatureScript
                 }
             }
      };
+
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return new npc_wild_vortex_45912AI(creature);
+        }
 };
 
+// 87762
 class spell_minister_of_air_lightning_lash : public SpellScriptLoader
 {
     public:
@@ -1177,6 +1176,7 @@ class spell_minister_of_air_lightning_lash : public SpellScriptLoader
         }
 };
 
+// 85084 
 class spell_howling_gale_howling_gale : public SpellScriptLoader
 {
     public:
@@ -1211,22 +1211,22 @@ class spell_howling_gale_howling_gale : public SpellScriptLoader
 
 void AddSC_the_vortex_pinnacle()
 {
-    new npc_vortex_pinnacle_slipsteam();
-    new npc_skyfall_star();
-    new npc_cloud_prince();
-    new npc_whipping_wind();
-    new npc_young_storm_dragon();
-    new npc_armored_mistral();
-    new npc_empyrean_assassin();
-    new npc_executor_of_the_caliph();
-    new npc_gust_soldier();
-    new npc_howling_gale();
-    new npc_lurking_tempest();
-    new npc_minister_of_air();
-    new npc_servant_of_asaad();
-    new npc_temple_adept();
-    new npc_turbulent_squall();
-    new npc_wild_vortex();
+    new npc_slipstream_45455();
+    new npc_skyfall_star_45932();
+    new npc_cloud_prince_45917();
+    new npc_whipping_wind_47238();
+    new npc_young_storm_dragon_45919();
+    new npc_armored_mistral_45915();
+    new npc_empyrean_assassin_45922();
+    new npc_executor_of_the_caliph_45928();
+    new npc_gust_soldier_45477();
+    new npc_howling_gale_45572();
+    new npc_lurking_tempest_45704();
+    new npc_minister_of_air_45930();
+    new npc_servant_of_asaad_45926();
+    new npc_temple_adept_45935();
+    new npc_turbulent_squall_45924();
+    new npc_wild_vortex_45912();
     new spell_minister_of_air_lightning_lash();
     new spell_howling_gale_howling_gale();
 };

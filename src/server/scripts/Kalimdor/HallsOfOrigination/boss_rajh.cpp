@@ -245,19 +245,15 @@ class boss_rajh : public CreatureScript
         };
 };
 
-class npc_winds : public CreatureScript
+// 39634
+class npc_solar_winds_39634 : public CreatureScript
 {
     public:
-        npc_winds() : CreatureScript("npc_winds") { }
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new npc_windsAI(creature);
-        }
+        npc_solar_winds_39634() : CreatureScript("npc_solar_winds_39634") { }
             
-        struct npc_windsAI : public ScriptedAI
+        struct npc_solar_winds_39634AI : public ScriptedAI
         {
-            npc_windsAI(Creature* creature) : ScriptedAI(creature)
+            npc_solar_winds_39634AI(Creature* creature) : ScriptedAI(creature)
             {
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -310,15 +306,22 @@ class npc_winds : public CreatureScript
                     m_uiDamageTimer -= uiDiff;
             }
         };
+
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return new npc_solar_winds_39634AI(creature);
+        }
 };
-class npc_sun_orb : public CreatureScript
+
+// 40835
+class npc_orb_of_the_sun_40835 : public CreatureScript
 {
     public:
-        npc_sun_orb() : CreatureScript("npc_sun_orb") { }
+        npc_orb_of_the_sun_40835() : CreatureScript("npc_orb_of_the_sun_40835") { }
 
-        struct npc_sun_orbAI : public ScriptedAI
+        struct npc_orb_of_the_sun_40835AI : public ScriptedAI
         {
-            npc_sun_orbAI(Creature* creature) : ScriptedAI(creature)
+            npc_orb_of_the_sun_40835AI(Creature* creature) : ScriptedAI(creature)
             {
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -361,17 +364,19 @@ class npc_sun_orb : public CreatureScript
 
         CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_sun_orbAI(creature);
+            return new npc_orb_of_the_sun_40835AI(creature);
         }
 };
-class npc_inferno_leap : public CreatureScript
+
+// 47040
+class npc_inferno_leap_47040 : public CreatureScript
 {
     public:
-        npc_inferno_leap() : CreatureScript("npc_inferno_leap") { }
+        npc_inferno_leap_47040() : CreatureScript("npc_inferno_leap_47040") { }
 
-        struct npc_inferno_leapAI : public ScriptedAI
+        struct npc_inferno_leap_47040AI : public ScriptedAI
         {
-            npc_inferno_leapAI(Creature* creature) : ScriptedAI(creature)
+            npc_inferno_leap_47040AI(Creature* creature) : ScriptedAI(creature)
             {
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -423,17 +428,19 @@ class npc_inferno_leap : public CreatureScript
 
         CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_inferno_leapAI(creature);
+            return new npc_inferno_leap_47040AI(creature);
         }
 };
-class npc_solar_wind : public CreatureScript
+
+// 47922
+class npc_solar_winds_47922 : public CreatureScript
 {
     public:
-        npc_solar_wind() : CreatureScript("npc_solar_wind") { }
+        npc_solar_winds_47922() : CreatureScript("npc_solar_winds_47922") { }
 
-        struct npc_solar_windAI : public ScriptedAI
+        struct npc_solar_winds_47922AI : public ScriptedAI
         {
-            npc_solar_windAI(Creature* creature) : ScriptedAI(creature)
+            npc_solar_winds_47922AI(Creature* creature) : ScriptedAI(creature)
             {
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -458,15 +465,15 @@ class npc_solar_wind : public CreatureScript
 
         CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_solar_windAI(creature);
+            return new npc_solar_winds_47922AI(creature);
         }
 };
 
 void AddSC_boss_rajh()
 {
     new boss_rajh();
-    new npc_winds();
-    new npc_sun_orb();
-    new npc_inferno_leap();
-    new npc_solar_wind();
+    new npc_solar_winds_39634();
+    new npc_orb_of_the_sun_40835();
+    new npc_inferno_leap_47040();
+    new npc_solar_winds_47922();
 }

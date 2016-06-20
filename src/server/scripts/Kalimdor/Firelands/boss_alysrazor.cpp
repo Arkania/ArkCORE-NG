@@ -397,7 +397,8 @@ enum Events
     EVENT_SUMMON_TALON           = 51
 };
 
-class npc_molten_feather : public CreatureScript // 53089
+// 53089
+class npc_molten_feather : public CreatureScript 
 {
 public:
     npc_molten_feather() : CreatureScript("npc_molten_feather") { }
@@ -427,19 +428,15 @@ public:
     };
 };
 
-class npc_incendiary_cloud : public CreatureScript // 53541
+// 53541
+class npc_incindiary_cloud_53541 : public CreatureScript
 {
 public:
-    npc_incendiary_cloud() : CreatureScript("npc_incendiary_cloud") { }
+    npc_incindiary_cloud_53541() : CreatureScript("npc_incindiary_cloud_53541") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    struct npc_incindiary_cloud_53541AI : public ScriptedAI
     {
-        return new npc_incendiary_cloudAI(creature);
-    }
-
-    struct npc_incendiary_cloudAI : public ScriptedAI
-    {
-        npc_incendiary_cloudAI(Creature* creature) : ScriptedAI(creature)
+        npc_incindiary_cloud_53541AI(Creature* creature) : ScriptedAI(creature)
         { 
             creature->SetDisplayId(11686);
         }
@@ -459,21 +456,22 @@ public:
             else timer -= diff;
         }
     };
-};
-
-class npc_blazing_power : public CreatureScript // 53554
-{
-public:
-    npc_blazing_power() : CreatureScript("npc_blazing_power") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_blazing_powerAI(creature);
+        return new npc_incindiary_cloud_53541AI(creature);
     }
+};
 
-    struct npc_blazing_powerAI : public ScriptedAI
+// 53554
+class npc_blazing_power_53554 : public CreatureScript
+{
+public:
+    npc_blazing_power_53554() : CreatureScript("npc_blazing_power_53554") { }
+
+    struct npc_blazing_power_53554AI : public ScriptedAI
     {
-        npc_blazing_powerAI(Creature* creature) : ScriptedAI(creature)
+        npc_blazing_power_53554AI(Creature* creature) : ScriptedAI(creature)
         { 
             creature->SetDisplayId(11686);
         }
@@ -497,9 +495,15 @@ public:
             else timer -= diff;
         }
     };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_blazing_power_53554AI(creature);
+    }
 };
 
-class npc_alysrazor_volcano : public CreatureScript // 53158
+// 53158
+class npc_alysrazor_volcano : public CreatureScript 
 {
 public:
     npc_alysrazor_volcano() : CreatureScript("npc_alysrazor_volcano") { }
@@ -546,7 +550,8 @@ public:
     };
 };
 
-class npc_voracious_hatchling : public CreatureScript // 53509
+// 53509
+class npc_voracious_hatchling : public CreatureScript 
 {
 public:
     npc_voracious_hatchling() : CreatureScript("npc_voracious_hatchling") { }
@@ -626,7 +631,8 @@ public:
     };
 };
 
-class npc_plumb_lava_worm : public CreatureScript // 53520
+// 53520
+class npc_plumb_lava_worm : public CreatureScript 
 {
 public:
     npc_plumb_lava_worm() : CreatureScript("npc_plumb_lava_worm") { }
@@ -680,7 +686,8 @@ public:
     };
 };
 
-class npc_blazing_broodmother : public CreatureScript // 53680
+// 53680
+class npc_blazing_broodmother : public CreatureScript 
 {
 public:
     npc_blazing_broodmother() : CreatureScript("npc_blazing_broodmother") { }
@@ -743,7 +750,8 @@ public:
     };
 };
 
-class npc_blazing_talon_clawshaper : public CreatureScript // 53734
+// 53734
+class npc_blazing_talon_clawshaper : public CreatureScript 
 {
 public:
     npc_blazing_talon_clawshaper() : CreatureScript("npc_blazing_talon_clawshaper") { }
@@ -861,7 +869,8 @@ public:
     };
 };
 
-class npc_blazing_talon : public CreatureScript // 53896
+// 53896
+class npc_blazing_talon : public CreatureScript 
 {
 public:
     npc_blazing_talon() : CreatureScript("npc_blazing_talon") { }
@@ -966,7 +975,8 @@ public:
     };
 };
 
-class npc_brushfire : public CreatureScript // 53372
+// 53372
+class npc_brushfire : public CreatureScript 
 {
 public:
     npc_brushfire() : CreatureScript("npc_brushfire") { }
@@ -2033,13 +2043,13 @@ class spell_hatchling_debuff : public SpellScriptLoader
 void AddSC_boss_alysrazor()
 {
     new npc_molten_feather();
-    new npc_incendiary_cloud();
+    new npc_incindiary_cloud_53541();
     new boss_alysrazor();
     new npc_alysrazor_volcano();
     new npc_fier_tornado();
     new spell_molthen_feater();
     new spell_molthen();
-    new npc_blazing_power();
+    new npc_blazing_power_53554();
     new npc_plumb_lava_worm();
     new npc_blazing_broodmother();
     new npc_molten_egg();

@@ -46,5 +46,5 @@ public:
 
 void AddSC_boss_azil()
 {
-    new boss_azil();
+   // new boss_azil();
 }

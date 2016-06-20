@@ -737,18 +737,15 @@ class go_bristlelimb_cage : public GameObjectScript
         }
 };
 
-/*######
-## npc_nestlewood_owlkin
-######*/
-
-class npc_nestlewood_owlkin : public CreatureScript
+// 16518
+class npc_nestlewood_owlkin_16518 : public CreatureScript
 {
     public:
-        npc_nestlewood_owlkin() : CreatureScript("npc_nestlewood_owlkin") { }
+        npc_nestlewood_owlkin_16518() : CreatureScript("npc_nestlewood_owlkin_16518") { }
 
-        struct npc_nestlewood_owlkinAI : public ScriptedAI
+        struct npc_nestlewood_owlkin_16518AI : public ScriptedAI
         {
-            npc_nestlewood_owlkinAI(Creature* creature) : ScriptedAI(creature) { }
+            npc_nestlewood_owlkin_16518AI(Creature* creature) : ScriptedAI(creature) { }
 
             void SpellHit(Unit * Hitter, SpellInfo const* spell)
             {
@@ -770,7 +767,7 @@ class npc_nestlewood_owlkin : public CreatureScript
 
         CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_nestlewood_owlkinAI(creature);
+            return new npc_nestlewood_owlkin_16518AI(creature);
         }
 };
 
@@ -784,5 +781,5 @@ void AddSC_azuremyst_isle()
     new go_ravager_cage();
     new npc_stillpine_captive();
     new go_bristlelimb_cage();
-    new npc_nestlewood_owlkin();
+    new npc_nestlewood_owlkin_16518();
 }

@@ -143,19 +143,15 @@ class npc_throne_of_the_tides_teleporter : public CreatureScript
         }
 };
 
-class npc_lady_nazjar_event : public CreatureScript
+// 39959
+class npc_lady_nazjar_event_39959 : public CreatureScript
 {
     public:
-        npc_lady_nazjar_event() : CreatureScript("npc_lady_nazjar_event") { }
+        npc_lady_nazjar_event_39959() : CreatureScript("npc_lady_nazjar_event_39959") { }
 
-        CreatureAI* GetAI(Creature* creature) const
+        struct npc_lady_nazjar_event_39959AI : public ScriptedAI
         {
-            return new npc_lady_nazjar_eventAI (creature);
-        }
-
-        struct npc_lady_nazjar_eventAI : public ScriptedAI
-        {
-            npc_lady_nazjar_eventAI(Creature* creature) : ScriptedAI(creature)
+            npc_lady_nazjar_event_39959AI(Creature* creature) : ScriptedAI(creature)
             {
                 pInstance = creature->GetInstanceScript();
             }
@@ -215,6 +211,11 @@ class npc_lady_nazjar_event : public CreatureScript
                 }
             }
         };
+
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return new npc_lady_nazjar_event_39959AI(creature);
+        }
 };
 
 // 203199
@@ -239,8 +240,8 @@ public:
 
 void AddSC_throne_of_the_tides()
 {
-    new npc_lady_nazjar_event();
+    new npc_lady_nazjar_event_39959();
     new go_totd_defense_system();
     new npc_throne_of_the_tides_teleporter();
-    new at_tott_lady_nazjar_event();
+    //new at_tott_lady_nazjar_event();
 }

@@ -27,7 +27,7 @@ enum General
     FACTION_GUILD_REPUTATION    = 1168,
 };
 
-// 83958 88304
+// 83958 
 class spell_guild_chest : public SpellScriptLoader
 {
 public:

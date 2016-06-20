@@ -91,14 +91,15 @@ protected:
     InstanceScript* _instance;
 };
 
-class boss_earthrager_ptah : public CreatureScript
+// 39428
+class boss_earthrager_ptah_39428 : public CreatureScript
 {
 public:
-    boss_earthrager_ptah() : CreatureScript("boss_earthrager_ptah") { }
+    boss_earthrager_ptah_39428() : CreatureScript("boss_earthrager_ptah_39428") { }
 
-    struct boss_earthrager_ptahAI : public BossAI
+    struct boss_earthrager_ptah_39428AI : public BossAI
     {
-        boss_earthrager_ptahAI(Creature* creature) : BossAI(creature, DATA_EARTHRAGER_PTAH), _summonDeaths(0), _hasDispersed(false) { }
+        boss_earthrager_ptah_39428AI(Creature* creature) : BossAI(creature, DATA_EARTHRAGER_PTAH), _summonDeaths(0), _hasDispersed(false) { }
 
         void Cleanup()
         {
@@ -269,7 +270,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetHallsOfOriginationAI<boss_earthrager_ptahAI>(creature);
+        return GetHallsOfOriginationAI<boss_earthrager_ptah_39428AI>(creature);
     }
 };
 
@@ -341,7 +342,7 @@ public:
 
 void AddSC_boss_earthrager_ptah()
 {
-    new boss_earthrager_ptah();
+    new boss_earthrager_ptah_39428();
     new spell_earthrager_ptah_flame_bolt();
     new spell_earthrager_ptah_explosion();
 }
