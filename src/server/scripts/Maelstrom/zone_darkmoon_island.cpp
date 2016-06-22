@@ -216,13 +216,12 @@ public:
 
         void Initialize()
         {
-
+            m_events.Reset();
         }
 
         void Reset() override
         {
-            m_events.Reset();
-            m_events.ScheduleEvent(EVENT_CHECK_VISIBLE_BUNNY, 250);
+            
             m_active_player = false;
         }
 
@@ -231,8 +230,8 @@ public:
             if (Player* player = who->ToPlayer())
                 if (player->HasAura(101612))
                 {
-                    m_events.RescheduleEvent(EVENT_PLAYER_WITH_GAME_IS_AVAIBLE, 2500);
-                    m_active_player = true;
+                  
+                    
                 }
         }
 
@@ -246,59 +245,11 @@ public:
                 {
                 case EVENT_PLAYER_WITH_GAME_IS_AVAIBLE:
                 {
-                    m_active_player = false;
-                    break;
-                }
-                case EVENT_CHECK_VISIBLE_BUNNY:
-                {
-                    if (!m_active_player)
-                    {
-                        //   break;
-                    }
-
-                    while (GetBunnys().size() < 3)
-                    {
-                        uint32 _rol = urand(0, 100);
-                        uint32 _spell;
-                        if (_rol < 10)
-                            _spell = 102044;
-                        else if (_rol < 35)
-                            _spell = 102043;
-                        else
-                            _spell = 102036;
-
-                        if (Creature* barrel = me->FindRandomCreatureInRange(54546, 20.0f, true))
-                        {
-                            me->CastSpell(barrel, 102136);
-                            me->CastSpell(barrel, _spell);
-                        }
-                    }
-                    m_events.ScheduleEvent(EVENT_CHECK_VISIBLE_BUNNY, 250);
+           
                     break;
                 }
                 }
             }
-        }
-
-        std::list<Creature*> GetBunnys()
-        {
-            std::list<Creature*> cList;
-            GetCreatureListWithEntryInGrid(cList, me, 54444, 20.0f);
-            GetCreatureListWithEntryInGrid(cList, me, 54466, 20.0f);
-            GetCreatureListWithEntryInGrid(cList, me, 54549, 20.0f);
-            return cList;
-        }
-
-        bool HasBonnyAura(Creature* barrel)
-        {
-            if (barrel->HasAura(102036))
-                return true;
-            else if (barrel->HasAura(102043))
-                return true;
-            else if (barrel->HasAura(102044))
-                return true;
-
-            return false;
         }
     };
 
