@@ -193,11 +193,11 @@ public:
         void Reset() override
         {
             m_events.Reset();
-            m_playerGUID = NULL;
-            m_garroshGUID = NULL;
-            m_cromushGUID = NULL;
-            m_sylvanasGUID = NULL;
-            m_agathaGUID = NULL;
+            m_playerGUID = 0;
+            m_garroshGUID = 0;
+            m_cromushGUID = 0;
+            m_sylvanasGUID = 0;
+            m_agathaGUID = 0;
             m_animPhase = 0;
             spawnedList.clear();
             portalList.clear();
@@ -1029,7 +1029,7 @@ public:
 
         void Initialize()
         {
-            m_playerGUID = NULL;
+            m_playerGUID = 0;
             m_events.Reset();
         }
 
@@ -1091,7 +1091,7 @@ public:
                         return;
                     }
 
-            m_playerGUID = NULL;
+            m_playerGUID = 0;
         }
 
         void EnterEvadeMode() override {}
@@ -1211,8 +1211,8 @@ public:
 
         void Initialize()
         {
-            m_playerGUID = NULL;
-            m_bloodfangGUID = NULL;
+            m_playerGUID = 0;
+            m_bloodfangGUID = 0;
             m_events.Reset();
         }
 
@@ -1393,10 +1393,10 @@ public:
         
         void Initialize()
         {
-            m_playerGUID = NULL;
-            m_raneGUID = NULL;
-            m_crowleyGUID = NULL;
-            m_bloodfangGUID = NULL;
+            m_playerGUID = 0;
+            m_raneGUID = 0;
+            m_crowleyGUID = 0;
+            m_bloodfangGUID = 0;
             m_events.Reset();
         }
 
@@ -1431,7 +1431,7 @@ public:
                 me->DespawnOrUnsummon(1000);
             }
 
-            m_playerGUID = NULL;
+            m_playerGUID = 0;
         }
 
         void SetGUID(uint64 guid, int32 id) override
@@ -1758,9 +1758,9 @@ public:
         void Initialize()
         {
             m_events.Reset();
-            m_playerGUID = NULL;
-            m_armoireGUID = NULL;
-            m_bloodfangGUID = NULL;
+            m_playerGUID = 0;
+            m_armoireGUID = 0;
+            m_bloodfangGUID = 0;
         }
 
         void Reset() override
@@ -1866,7 +1866,7 @@ public:
 
         void Initialize()
         {
-            m_playerGUID = NULL;
+            m_playerGUID = 0;
         }
 
         void Reset() override
@@ -1981,7 +1981,7 @@ public:
 
         void Initialize()
         {
-            m_playerGUID = NULL;
+            m_playerGUID = 0;
             m_IsFull = false;
         }
 
@@ -2151,8 +2151,8 @@ public:
 
         void Initialize()
         {
-            m_playerGUID = NULL;
-            m_torokGUID = NULL;
+            m_playerGUID = 0;
+            m_torokGUID = 0;
         }
 
         void Reset() override
@@ -2181,7 +2181,7 @@ public:
                     }
                     else
                     {
-                        m_playerGUID = NULL;
+                        m_playerGUID = 0;
                         m_events.ScheduleEvent(EVENT_CHECK_TALK, 1000);
                     }
                     break;
@@ -2264,7 +2264,7 @@ public:
 
         void Initialize()
         {           
-            m_gorgarGUID = NULL;
+            m_gorgarGUID = 0;
         }
 
         void Reset() override
@@ -2293,7 +2293,7 @@ public:
                     }
                     else
                     {
-                        m_playerGUID = NULL;
+                        m_playerGUID = 0;
                         m_events.ScheduleEvent(EVENT_CHECK_TALK, 1000);
                     }
                     break;
@@ -2505,7 +2505,7 @@ public:
 
         void Initialize()
         {
-            m_playerGUID = NULL;
+            m_playerGUID = 0;
         }
 
         void JustDied(Unit* killer) override
@@ -2549,7 +2549,7 @@ public:
 
         void Initialize()
         {
-            m_playerGUID = NULL;
+            m_playerGUID = 0;
             m_events.Reset();
         }
 
@@ -2628,8 +2628,8 @@ public:
 
         void Reset() override
         {
-            m_playerGUID = NULL;
-            m_chickenGUID = NULL;
+            m_playerGUID = 0;
+            m_chickenGUID = 0;
             isChickenFollower = false;
             isChickenRideOnEttin = false;
             m_events.Reset();
@@ -2686,7 +2686,7 @@ public:
                     }
                     else
                     {
-                        m_chickenGUID = NULL;
+                        m_chickenGUID = 0;
                         isChickenFollower = false;
                         isChickenRideOnEttin = false;
                     }
@@ -2855,8 +2855,8 @@ public:
         
         void Initialize()
         {
-            m_playerGUID = NULL;
-            m_targetGUID = NULL;
+            m_playerGUID = 0;
+            m_targetGUID = 0;
             m_doomhoulDone = false;
             m_events.Reset();
             m_events.ScheduleEvent(EVENT_CHAT_TO_PLAYER, 60000);
@@ -3155,15 +3155,15 @@ public:
 
         void Reset() override
         {
-            m_playerGUID = NULL;
-            m_bloodfangGUID = NULL;
-            m_crowleyGUID = NULL;
-            m_phinOdelicGUID = NULL;
-            m_bartoloGinsettiGUID = NULL;
-            m_loremasterDibbsGUID = NULL;
-            m_henryMalebGUID = NULL;
-            m_caretakersSmithersGUID = NULL;
-            m_sophiaGUID = NULL;
+            m_playerGUID = 0;
+            m_bloodfangGUID = 0;
+            m_crowleyGUID = 0;
+            m_phinOdelicGUID = 0;
+            m_bartoloGinsettiGUID = 0;
+            m_loremasterDibbsGUID = 0;
+            m_henryMalebGUID = 0;
+            m_caretakersSmithersGUID = 0;
+            m_sophiaGUID = 0;
             m_events.Reset();
             m_events.ScheduleEvent(EVENT_CHECK_QUEST, 1000);
             m_animatonIsStarted = false;
@@ -3343,7 +3343,7 @@ public:
 
         void Initialize()
         {
-            m_playerGUID = NULL;
+            m_playerGUID = 0;
         }
 
         void Reset() override
@@ -3448,7 +3448,7 @@ public:
 
         void Initialize()
         {
-            m_playerGUID = NULL;
+            m_playerGUID = 0;
         }
 
         void Reset() override
@@ -3527,7 +3527,7 @@ public:
 
         void Initialize()
         {
-            m_playerGUID = NULL;
+            m_playerGUID = 0;
         }
 
         void Reset() override
@@ -3606,7 +3606,7 @@ public:
 
         void Initialize()
         {
-            m_playerGUID = NULL;
+            m_playerGUID = 0;
         }
 
         void Reset() override
@@ -3685,7 +3685,7 @@ public:
 
         void Initialize()
         {
-            m_playerGUID = NULL;
+            m_playerGUID = 0;
         }
 
         void Reset() override
@@ -3787,7 +3787,7 @@ public:
 
         void Initialize()
         {
-            m_playerGUID = NULL;
+            m_playerGUID = 0;
         }
 
         void Reset() override
@@ -3866,7 +3866,7 @@ public:
 
         void Initialize()
         {
-            m_playerGUID = NULL;
+            m_playerGUID = 0;
         }
 
         void Reset() override
@@ -3950,7 +3950,7 @@ public:
 
         void Initialize()
         {
-            m_playerGUID = NULL;
+            m_playerGUID = 0;
         }
 
         void Reset() override

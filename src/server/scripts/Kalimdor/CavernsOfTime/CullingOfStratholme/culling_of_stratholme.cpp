@@ -398,7 +398,7 @@ public:
             m_events.Reset();
             _arthasTime[0] = 0;
             _arthasTime[1] = 0;
-            playerGUID = NULL;
+            playerGUID = 0;
         }
 
         void Reset() override

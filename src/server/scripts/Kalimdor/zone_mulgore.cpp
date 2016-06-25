@@ -364,7 +364,7 @@ public:
         {
             m_phase = 0;
             m_cd81305 = 0;
-            m_playerGUID = NULL;
+            m_playerGUID = 0;
         }
 
         void EnterCombat(Unit* victim) 

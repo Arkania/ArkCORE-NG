@@ -683,15 +683,15 @@ public:
         void Reset() override
         {
             m_events.Reset();
-            playerGUID = NULL;
-            adarrahGUID = NULL;
-            harnishGUID = NULL;
-            lady_humpsGUID = NULL;
-            pack_muleGUID = NULL;
-            budds_camelGUID = NULL;
-            samirs_camelGUID = NULL;
-            macks_camelGUID = NULL;
-            adarrahs_camelGUID = NULL;
+            playerGUID = 0;
+            adarrahGUID = 0;
+            harnishGUID = 0;
+            lady_humpsGUID = 0;
+            pack_muleGUID = 0;
+            budds_camelGUID = 0;
+            samirs_camelGUID = 0;
+            macks_camelGUID = 0;
+            adarrahs_camelGUID = 0;
 
             for (int32 i = 0; i < 6; i++)
                 sandPugmy[i] = NULL;
@@ -939,14 +939,14 @@ public:
             if (Creature* npc = sObjectAccessor->GetCreature(*me, adarrahs_camelGUID))
                 npc->DespawnOrUnsummon();
 
-            adarrahGUID = NULL;
-            harnishGUID = NULL;
-            lady_humpsGUID = NULL;
-            pack_muleGUID = NULL;
-            budds_camelGUID = NULL;
-            samirs_camelGUID = NULL;
-            macks_camelGUID = NULL;
-            adarrahs_camelGUID = NULL;
+            adarrahGUID = 0;
+            harnishGUID = 0;
+            lady_humpsGUID = 0;
+            pack_muleGUID = 0;
+            budds_camelGUID = 0;
+            samirs_camelGUID = 0;
+            macks_camelGUID = 0;
+            adarrahs_camelGUID = 0;
 
             for (int32 i = 0; i < 6; i++)
                 if (Creature* npc = sObjectAccessor->GetCreature(*me, sandPugmy[i]))
@@ -1030,7 +1030,7 @@ public:
 
         void Reset() override
         {
-            target_bunnyGUID = NULL;
+            target_bunnyGUID = 0;
             angle = 0;
             m_events.Reset();
         }
@@ -1167,7 +1167,7 @@ public:
 
         void Reset() override
         {
-            target_bunnyGUID = NULL;            
+            target_bunnyGUID = 0;            
         }
 
         void IsSummonedBy(Unit* summoner) override
@@ -1217,12 +1217,12 @@ public:
         void Reset() override
         {
             m_events.Reset();
-            bunnyGUID = NULL;
-            kodoGUID = NULL;
-            kurzelGUID = NULL;
-            turgoreGUID = NULL;
-            tanzarGUID = NULL;
-            harkorGUID = NULL;
+            bunnyGUID = 0;
+            kodoGUID = 0;
+            kurzelGUID = 0;
+            turgoreGUID = 0;
+            tanzarGUID = 0;
+            harkorGUID = 0;
             hasChains = false;
         }
 

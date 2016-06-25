@@ -106,7 +106,7 @@ public:
         {
             m_events.Reset();
             m_events.ScheduleEvent(EVENT_CHECK_PLAYER_NEAR, 1000);
-            m_playerGUID = NULL;
+            m_playerGUID = 0;
             me->SetStandState(UNIT_STAND_STATE_SLEEP);
             if (!me->HasAura(SPELL_IRRIDATION))
                 DoCast(me, SPELL_IRRIDATION, true);

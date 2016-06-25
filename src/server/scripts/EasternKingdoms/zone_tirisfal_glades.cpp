@@ -1625,7 +1625,7 @@ public:
 
         void Reset()  override
         {
-            uint64 m_playerGUID = NULL;
+            uint64 m_playerGUID = 0;
         }
 
         void DamageTaken(Unit* attacker, uint32& damage) 
@@ -1667,7 +1667,7 @@ public:
 
         void Reset()  override
         {
-            uint64 m_playerGUID = NULL;
+            uint64 m_playerGUID = 0;
         }
 
         void DamageTaken(Unit* attacker, uint32& damage) override
@@ -1793,7 +1793,7 @@ public:
         {
             m_events.Reset();
             m_events.ScheduleEvent(EVENT_CHECK_PLAYER, 1000);
-            uint64 m_playerGUID = NULL;
+            uint64 m_playerGUID = 0;
         }
 
         void IsSummonedBy(Unit* summoner) override 
@@ -1838,7 +1838,7 @@ public:
         {
             m_events.Reset();
             m_events.ScheduleEvent(EVENT_CHECK_PLAYER, 1000);
-            uint64 m_playerGUID = NULL;
+            uint64 m_playerGUID = 0;
         }
 
         void IsSummonedBy(Unit* summoner) override
@@ -2000,7 +2000,7 @@ public:
         void Reset() override
         {
             m_events.Reset();
-            m_playerGUID = NULL;
+            m_playerGUID = 0;
             m_spiritAgamand = NULL;
             m_shadowAgamand1 = NULL;
             m_shadowAgamand2 = NULL;
@@ -2280,8 +2280,8 @@ public:
         void Initialize()
         {
             m_events.Reset();
-            m_playerGUID = NULL;
-            m_fatherGUID = NULL;
+            m_playerGUID = 0;
+            m_fatherGUID = 0;
             cd_73308 = false;
             cd_73309 = false;
             m_targets.push_back(NPC_SCARLET_FRIAR);

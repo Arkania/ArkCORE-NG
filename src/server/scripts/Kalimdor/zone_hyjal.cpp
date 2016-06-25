@@ -138,7 +138,7 @@ public:
             if (!m_isAnimStarted)
             {
                 m_events.Reset();
-                m_playerGUID = NULL;
+                m_playerGUID = 0;
                 m_phase = 0;
             }
         }

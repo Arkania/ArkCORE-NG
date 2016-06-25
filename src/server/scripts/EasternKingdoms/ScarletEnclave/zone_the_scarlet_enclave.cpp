@@ -1634,7 +1634,7 @@ public:
         {
             m_timer = 1000;
             m_phase = 0;
-            m_darkriderGUID = NULL;
+            m_darkriderGUID = 0;
             if (me->FindNearestCreature(28653, 15.0f))
                 me->DespawnOrUnsummon();
         }

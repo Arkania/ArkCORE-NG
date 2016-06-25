@@ -269,9 +269,9 @@ public:
         void Reset() override
         {           
             m_enrage = false;
-            m_doorGUID = NULL;
-            m_liamGUID = NULL;
-            m_citizenGUID = NULL;
+            m_doorGUID = 0;
+            m_liamGUID = 0;
+            m_citizenGUID = 0;
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
         }
 
@@ -451,7 +451,7 @@ public:
         void Initialize()
         {
             m_events.ScheduleEvent(EVENT_START_NEXT_SHOWFIGHT, 60000);
-            m_worgenGUID = NULL;
+            m_worgenGUID = 0;
         }
 
         void Reset() override
@@ -476,7 +476,7 @@ public:
 
         void SummonedCreatureDies(Creature* summon, Unit* /*killer*/) override
         { 
-            m_worgenGUID = NULL;
+            m_worgenGUID = 0;
             if (summon->GetEntry() == NPC_RAMPAGING_WORGEN)
                 m_events.ScheduleEvent(EVENT_START_NEXT_SHOWFIGHT, 20000);
         }
@@ -725,8 +725,8 @@ public:
 
         void Reset() override
         {
-            m_playerGUID = NULL;
-            m_doorGUID = NULL;
+            m_playerGUID = 0;
+            m_doorGUID = 0;
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
         }
 
@@ -868,8 +868,8 @@ public:
 
         void Reset() override
         {
-            m_playerGUID = NULL;
-            m_doorGUID = NULL;
+            m_playerGUID = 0;
+            m_doorGUID = 0;
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
         }
 
@@ -1282,7 +1282,7 @@ public:
             m_worgenList.push_back(NPC_RAMPAGING_WORGEN_35660);
             m_theKingIsNear = false;
             m_isShowFight = true;
-            m_kingGUID = NULL;
+            m_kingGUID = 0;
             m_minHealthPct = frand(30.0f, 85.0f);
         }
 
@@ -2370,9 +2370,9 @@ public:
         // Evade or Respawn
         void Reset() override
         {
-            m_playerGUID = NULL;
-            m_badAveryGUID = NULL;
-            m_triggerGUID = NULL;
+            m_playerGUID = 0;
+            m_badAveryGUID = 0;
+            m_triggerGUID = 0;
             m_events.Reset();
             m_events.ScheduleEvent(EVENT_SAY_JOSIAH_AVERY, DELAY_SAY_JOSIAH_AVERY);
             m_currentSayCounter = 0;
@@ -2523,9 +2523,9 @@ public:
 
         void Reset() override
         {
-            m_playerGUID = NULL;
-            m_badAveryGUID = NULL;
-            m_lornaGUID = NULL;
+            m_playerGUID = 0;
+            m_badAveryGUID = 0;
+            m_lornaGUID = 0;
             m_events.Reset();
             Position pos = Position(-1792.37f, 1427.35f, 12.46f, 3.152f);
             me->MovePosition(pos, 0, 0);
@@ -2684,8 +2684,8 @@ public:
 
         void Initialize()
         {
-            m_playerGUID = NULL;
-            m_lurkerGUID = NULL;
+            m_playerGUID = 0;
+            m_lurkerGUID = 0;
         }
 
         void Reset() override
@@ -2959,7 +2959,7 @@ public:
         void Initialize()
         {
             m_counter = 0;
-            m_playerGUID = NULL;
+            m_playerGUID = 0;
         }
 
         void Reset() override
@@ -3090,9 +3090,9 @@ public:
         void Reset() override
         {
             m_events.Reset();
-            m_playerGUID = NULL; 
-            m_krennanHorseGUID = NULL;
-            m_krennanTreeGUID = NULL;
+            m_playerGUID = 0; 
+            m_krennanHorseGUID = 0;
+            m_krennanTreeGUID = 0;
             me->GetMotionMaster()->MoveIdle();
             m_events.ScheduleEvent(EVENT_SAY_KRENNAN_HELP, 500);
         }
@@ -3409,9 +3409,9 @@ public:
 
         void Initialize()
         {
-            m_kingGUID = NULL;
-            m_princeGUID = NULL;
-            m_playerGUID = NULL;
+            m_kingGUID = 0;
+            m_princeGUID = 0;
+            m_playerGUID = 0;
         }
 
         void Reset() override
@@ -3603,8 +3603,8 @@ public:
 
         void Reset() override
         {
-            m_playerGUID = NULL;
-            m_dariusGUID = NULL;
+            m_playerGUID = 0;
+            m_dariusGUID = 0;
             m_movePart = 0;
         }
 
@@ -3833,8 +3833,8 @@ public:
 
         void Reset() override
         {
-            m_horseGUID = NULL;
-            m_playerGUID = NULL;
+            m_horseGUID = 0;
+            m_playerGUID = 0;
             m_movePart = 0;
         }
 

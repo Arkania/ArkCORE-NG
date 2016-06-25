@@ -116,9 +116,9 @@ public:
         void Reset() override
         {
             m_videoStarted = false;
-            m_playerGUID = NULL;
-            m_kingGUID = NULL;
-            m_godfreyGUID = NULL;
+            m_playerGUID = 0;
+            m_kingGUID = 0;
+            m_godfreyGUID = 0;
             m_events.Reset();
             m_events.ScheduleEvent(EVENT_CHECK_ARRIVEL_PLAYER, 1000);
         }
@@ -488,9 +488,9 @@ public:
         void Reset() override
         {
             m_events.Reset();
-            m_playerGUID = NULL;
-            m_forsakenGUID = NULL;
-            m_targetGUID = NULL;
+            m_playerGUID = 0;
+            m_forsakenGUID = 0;
+            m_targetGUID = 0;
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
             me->SetReactState(REACT_PASSIVE);
             me->setFaction(1735);
@@ -522,7 +522,7 @@ public:
                 }
                 else if (Creature* npc = passenger->ToCreature())
                 {
-                    m_forsakenGUID = NULL;
+                    m_forsakenGUID = 0;
                     npc->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
                     m_events.CancelEvent(EVENT_CAST_BOULDER);
                     m_events.CancelEvent(EVENT_CHECK_PLAYER);
@@ -592,7 +592,7 @@ public:
                         if (Creature* t = sObjectAccessor->GetCreature(*me, m_targetGUID))
                             player->NearTeleportTo(t->GetPositionX(), t->GetPositionY(), t->GetPositionZ(), player->GetOrientation());
 
-                    m_playerGUID = NULL;
+                    m_playerGUID = 0;
                     break;
                 }
                 }
@@ -644,12 +644,12 @@ public:
     {
         PrepareSpellScript(spell_launch_68659_SpellScript);
 
-        uint64 m_playerGUID = NULL;
+        uint64 m_playerGUID = 0;
         Position pos = Position();
 
         void HandleBeforeCast()
         {
-            m_playerGUID = NULL;
+            m_playerGUID = 0;
             if (Creature* catapult = GetCaster()->ToCreature())
                 if (Vehicle* vehicle = catapult->GetVehicleKit())
                     if (Unit* unit = vehicle->GetPassenger(0))
@@ -802,8 +802,8 @@ public:
 
         void Reset() override
         {
-            m_thyalaGUID = NULL;
-            m_player_GUID = NULL;
+            m_thyalaGUID = 0;
+            m_player_GUID = 0;
             m_mastiff_counter = 0;
             m_events.ScheduleEvent(EVENT_CHECK_ATTACK, 500);
             m_events.ScheduleEvent(EVENT_SEND_MORE_MASTIFF, 250);
@@ -937,8 +937,8 @@ public:
             me->SetWalk(true);
             me->SetSpeed(MOVE_RUN, true);
             me->SetReactState(REACT_AGGRESSIVE);
-            m_thyalaGUID = NULL;
-            m_player_GUID = NULL;
+            m_thyalaGUID = 0;
+            m_player_GUID = 0;
             m_events.RescheduleEvent(EVENT_CHECK_ATTACK, 1000);
         }
 
@@ -1105,8 +1105,8 @@ public:
         {
             m_events.Reset();
             m_events.ScheduleEvent(EVENT_CHECK_PLAYER, 1000);
-            m_luciusGUID = NULL;
-            m_playerGUID = NULL;
+            m_luciusGUID = 0;
+            m_playerGUID = 0;
             m_isLucisKilled = false;
         }
 
@@ -1119,7 +1119,7 @@ public:
         void SummonedCreatureDies(Creature* summon, Unit* killer) override 
         { 
             m_isLucisKilled = true;
-            m_luciusGUID = NULL;
+            m_luciusGUID = 0;
         }
 
         void UpdateAI(uint32 diff) override
@@ -1261,8 +1261,8 @@ public:
         void Reset() override
         {
             m_events.Reset();
-            m_playerGUID = NULL;
-            m_lornaGUID = NULL;
+            m_playerGUID = 0;
+            m_lornaGUID = 0;
             m_isLornaNear = false;
             m_isPlayerMounted = false;
             m_hasPlayerRope = false;
@@ -1469,7 +1469,7 @@ public:
         void Reset() override
         {
             m_events.Reset();
-            m_playerGUID = NULL;
+            m_playerGUID = 0;
         }
 
         void MovementInform(uint32 type, uint32 id) override
@@ -1653,8 +1653,8 @@ public:
         void Reset() override
         {
             m_events.Reset();
-            m_playerGUID = NULL;
-            m_carriageGUID = NULL;           
+            m_playerGUID = 0;
+            m_carriageGUID = 0;           
         }
 
         void IsSummonedBy(Unit* summoner) override 
@@ -1780,8 +1780,8 @@ public:
 
         void Reset() override
         {
-            m_playerGUID = NULL;
-            m_lornaGUID = NULL;
+            m_playerGUID = 0;
+            m_lornaGUID = 0;
         }
 
         void JustSummoned(Creature* summon) override
@@ -1900,7 +1900,7 @@ public:
         void Reset() override
         {
             m_events.Reset();
-            m_playerGUID = NULL;
+            m_playerGUID = 0;
         }
 
         void IsSummonedBy(Unit* summoner) override

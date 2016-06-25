@@ -130,7 +130,8 @@ public:
     {
         if (Unit* target = obj->ToUnit()) 
         {
-            float angle = _caster->GetAngle(&target->GetPosition());
+            Position pos = target->GetPosition();
+            float angle = _caster->GetAngle(&pos);
             if (angle > _minAngle && angle < _maxAngle)
                 return false;
         }
@@ -290,7 +291,7 @@ public:
 
 private:
     std::list<WorldObject*> _targets;
-    uint64 _targetGUID = NULL;
+    uint64 _targetGUID = 0;
     uint32 _targetEntry = 0;
 };
 

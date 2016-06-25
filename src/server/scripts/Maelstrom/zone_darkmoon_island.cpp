@@ -800,7 +800,7 @@ public:
         void Reset() override
         {
             m_events.Reset();
-            m_jessicaGUID = NULL;
+            m_jessicaGUID = 0;
         }
 
         void MoveInLineOfSight(Unit* who) override
@@ -893,9 +893,9 @@ public:
         void Reset() override
         {
             m_events.Reset();
-            m_playerGUID = NULL;
-            m_jubjubGUID = NULL;
-            m_aleGUID = NULL;
+            m_playerGUID = 0;
+            m_jubjubGUID = 0;
+            m_aleGUID = 0;
             m_phase = PHASE_WAIT;
             m_max_move = 0;
             m_searching_cooldown = false;
