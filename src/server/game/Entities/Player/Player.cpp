@@ -194,8 +194,14 @@ void PlayerTaxi::InitTaxiNodesForLevel(uint32 race, uint32 chrClass, uint8 level
     // new continent starting masks (It will be accessible only at new map)
     switch (Player::TeamForRace(race))
     {
-        case ALLIANCE: SetTaximaskNode(100); break;
-        case HORDE:    SetTaximaskNode(99);  break;
+        case ALLIANCE: 
+            SetTaximaskNode(100);
+            if (level >= 68)
+                SetTaximaskNode(245); // Valiance
+            break;
+        case HORDE:    
+            SetTaximaskNode(99);  
+            break;
     }
     // level dependent taxi hubs
     if (level >= 68)

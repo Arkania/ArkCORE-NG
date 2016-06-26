@@ -2571,6 +2571,72 @@ public:
     }
 };
 
+// 26879
+class npc_tomas_riverwell_26879 : public CreatureScript
+{
+public:
+    npc_tomas_riverwell_26879() : CreatureScript("npc_tomas_riverwell_26879") { }
+
+    enum eNPC
+    {
+        QUEST_ALLIES_IN_DALARAN = 29608,
+        TAXINODE_DALARAN = 310,
+        NPC_ENRAGED_GRYPHON = 9526,
+    };
+
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) 
+    { 
+        if (quest->GetQuestId() == QUEST_ALLIES_IN_DALARAN)
+            player->m_taxi.SetTaximaskNode(TAXINODE_DALARAN);
+
+        return false; 
+    }
+
+    struct npc_tomas_riverwell_26879AI : public ScriptedAI
+    {
+        npc_tomas_riverwell_26879AI(Creature* creature) : ScriptedAI(creature) { }
+
+        void EnterCombat(Unit* victim) override 
+        { 
+            Talk(1);
+            Position pos = victim->GetNearPosition(frand(4.0f, 5.0f), frand(0.0f, 6.28f));
+            me->SummonCreature(NPC_ENRAGED_GRYPHON, pos, TEMPSUMMON_TIMED_DESPAWN, 60000);
+        }
+
+        void DamageTaken(Unit* attacker, uint32& damage) override
+        {
+            Position pos = attacker->GetNearPosition(frand(4.0f, 5.0f), frand(0.0f, 6.28f));
+            me->SummonCreature(NPC_ENRAGED_GRYPHON, pos, TEMPSUMMON_TIMED_DESPAWN, 60000);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_tomas_riverwell_26879AI(creature);
+    }
+};
+
+// 23736
+class npc_pricilla_winterwind_23736 : public CreatureScript
+{
+public:
+    npc_pricilla_winterwind_23736() : CreatureScript("npc_pricilla_winterwind_23736") { }
+
+    enum eNPC
+    {
+        QUEST_ALLIES_IN_DALARAN = 29608,
+        TAXINODE_DALARAN = 310,        
+    };
+
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    {
+        if (quest->GetQuestId() == QUEST_ALLIES_IN_DALARAN)
+            player->m_taxi.SetTaximaskNode(TAXINODE_DALARAN);
+
+        return false;
+    }
+};
+
 void AddSC_borean_tundra()
 {
     new npc_sinkhole_kill_credit();
@@ -2600,4 +2666,6 @@ void AddSC_borean_tundra()
     new npc_warmage_coldarra();
     new npc_hidden_cultist();
     new spell_windsoul_totem_aura();
+    new npc_tomas_riverwell_26879();
+    new npc_pricilla_winterwind_23736();
 }
