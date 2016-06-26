@@ -200,7 +200,7 @@ void PlayerTaxi::InitTaxiNodesForLevel(uint32 race, uint32 chrClass, uint8 level
                 SetTaximaskNode(245); // Valiance
             break;
         case HORDE:    
-            SetTaximaskNode(99);  
+            SetTaximaskNode(99);            
             break;
     }
     // level dependent taxi hubs

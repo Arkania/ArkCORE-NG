@@ -2598,7 +2598,7 @@ public:
 
         void EnterCombat(Unit* victim) override 
         { 
-            Talk(1);
+            Talk(0);
             Position pos = victim->GetNearPosition(frand(4.0f, 5.0f), frand(0.0f, 6.28f));
             me->SummonCreature(NPC_ENRAGED_GRYPHON, pos, TEMPSUMMON_TIMED_DESPAWN, 60000);
         }
