@@ -764,7 +764,7 @@ public:
 
 void AddSC_dustwallow_marsh()
 {
-    new npc_stinky();
+    //new npc_stinky(); // imported as smart_script..
     new spell_ooze_zap();
     new spell_ooze_zap_channel_end();
     new spell_energize_aoe();
