@@ -906,6 +906,7 @@ enum FleshGiant
     SAY_OLAKIN_PAY = 0
 };
 
+// 31306
 class npc_margrave_dhakar : public CreatureScript
 {
     public:
@@ -1036,6 +1037,7 @@ class npc_margrave_dhakar : public CreatureScript
     }
 };
 
+// 30698
 class npc_morbidus : public CreatureScript
 {
     public:
@@ -1072,6 +1074,6 @@ void AddSC_icecrown()
     new npc_tournament_training_dummy;
     new npc_blessed_banner();
     new npc_frostbrood_skytalon();
-    new npc_margrave_dhakar();
-    new npc_morbidus();
+    //new npc_margrave_dhakar(); // imported as smart_script, not shure what is more blizz..
+    //new npc_morbidus();  // this to..
 }
