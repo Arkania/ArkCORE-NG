@@ -31,6 +31,8 @@ npc_wounded_blood_elf
 npc_fel_guard_hound
 EndContentData */
 
+#include "GameObjectAI.h"
+#include "GameObject.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
