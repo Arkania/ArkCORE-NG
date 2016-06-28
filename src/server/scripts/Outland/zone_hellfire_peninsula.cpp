@@ -515,6 +515,102 @@ public:
     }
 };
 
+// 16896 
+class npc_honor_hold_archer_16896 : public CreatureScript
+{
+public:
+    npc_honor_hold_archer_16896() : CreatureScript("npc_honor_hold_archer_16896") { }
+
+    enum eNPC
+    {
+        NPC_ARCHER = 16896,
+        NPC_TARGET_MIDDLE = 16897,
+        NPC_TARGET_RIGHT = 16898,
+        NPC_TARGET_LEFT = 16899,
+        SPELL_SHOOT_MIDDLE = 29121, // shoot is invisible
+        SPELL_SHOOT_RIGHT = 29122,
+        SPELL_SHOOT_LEFT = 29120,
+        EVENT_START_SHOOT = 100,
+        EVENT_SHOOT = 101,
+    };
+
+    struct npc_honor_hold_archer_16896AI : public ScriptedAI
+    {
+        npc_honor_hold_archer_16896AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+        EventMap m_events;
+        uint64   m_targetGUID;
+        uint32   m_shoot;
+
+        void Initialize()
+        {
+            m_events.ScheduleEvent(EVENT_START_SHOOT, 5000);
+            m_targetGUID = 0;
+            m_shoot = 0;
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_START_SHOOT:
+                {
+                    float dist = 20.0f;
+                    Creature* target;
+                    if (Creature* npc = me->FindNearestCreature(NPC_TARGET_MIDDLE, dist))
+                        if (npc->GetDistance2d(me) < dist)
+                        {
+                            dist = npc->GetDistance2d(me);
+                            target = npc;
+                            m_shoot = RAND(SPELL_SHOOT_LEFT, SPELL_SHOOT_RIGHT);
+                        }
+                    if (Creature* npc = me->FindNearestCreature(NPC_TARGET_RIGHT, dist))
+                        if (npc->GetDistance2d(me) < dist)
+                        {
+                            dist = npc->GetDistance2d(me);
+                            target = npc;
+                            m_shoot = SPELL_SHOOT_RIGHT;
+                        }
+                    if (Creature* npc = me->FindNearestCreature(NPC_TARGET_LEFT, dist))
+                        if (npc->GetDistance2d(me) < dist)
+                        {
+                            dist = npc->GetDistance2d(me);
+                            target = npc;
+                            m_shoot = SPELL_SHOOT_LEFT;
+                        }
+                    if (dist < 19.0f && target)
+                    {
+                        m_targetGUID = target->GetGUID();
+                        m_events.ScheduleEvent(EVENT_SHOOT, 5000);
+                    }
+                    break;
+                }
+                case EVENT_SHOOT:
+                {
+                    if (Creature* npc = sObjectAccessor->GetCreature(*me, m_targetGUID))
+                        me->CastSpell(npc, m_shoot, true);
+                    m_events.ScheduleEvent(EVENT_SHOOT, urand(5000, 10000));
+                    break;
+                }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_honor_hold_archer_16896AI(creature);
+    }
+};
 
 void AddSC_hellfire_peninsula()
 {
@@ -524,4 +620,5 @@ void AddSC_hellfire_peninsula()
     new npc_fel_guard_hound();
     new npc_vlagga_freyfeather_18930();
     new npc_amish_wildhammer_18931();
+    new npc_honor_hold_archer_16896();
 }

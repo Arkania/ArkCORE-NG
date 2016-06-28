@@ -36,7 +36,11 @@ enum CreatureIds
     NPC_VAZRUDEN_HERALD           = 17307,
     NPC_VAZRUDEN                  = 17537,
     NPC_NAZAN                     = 17536,
-    NPC_LIQUID_FIRE               = 22515
+    NPC_LIQUID_FIRE               = 22515,
+    NPC_ADVANCE_SCOUT_CHADWICK    = 54603,
+    NPC_STONE_GUARD_STOKTON       = 54606,
+    NPC_THRALLMAR_INVADER         = 54607,
+    NPC_HONOR_HOLD_RECON          = 54746
 };
 
 enum GameobjectIds
@@ -44,5 +48,22 @@ enum GameobjectIds
     GO_FEL_IRON_CHEST_NORMAL      = 185168,
     GO_FEL_IRON_CHECT_HEROIC      = 185169
 };
+
+template<class AI>
+CreatureAI* GetDeadminesAI(Creature* creature)
+{
+    if (InstanceMap* instance = creature->GetMap()->ToInstanceMap())
+        if (instance->GetInstanceScript())
+            if (instance->GetScriptId() == sObjectMgr->GetScriptId(DMScriptName))
+                return new AI(creature);
+
+    return NULL;
+}
+
+template<class AI, class T>
+AI* GetDeadminesAI(T* obj)
+{
+    return GetInstanceAI<AI, T>(obj, DMScriptName);
+}
 
 #endif

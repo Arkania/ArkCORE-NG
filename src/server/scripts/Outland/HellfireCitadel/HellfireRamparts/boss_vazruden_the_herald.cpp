@@ -498,6 +498,7 @@ class npc_hellfire_sentry : public CreatureScript
             return new npc_hellfire_sentryAI(creature);
         }
 };
+
 void AddSC_boss_vazruden_the_herald()
 {
     new boss_vazruden_the_herald();
