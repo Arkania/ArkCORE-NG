@@ -20,7 +20,17 @@
 #ifndef DEF_RAMPARTS_H
 #define DEF_RAMPARTS_H
 
+#define HRScriptName "instance_ramparts"
+
 uint32 const EncounterCount       = 4;
+
+enum Bosses
+{
+    BOSS_WATCHKEEPER_GARGOLMAR = 0,
+    BOSS_OMOR_THE_UNSCARRED = 1,
+    BOSS_VAZRUDEN_THE_HEROLD = 2,
+    BOSS_NAZAN = 3
+};
 
 enum DataTypes
 {
@@ -50,20 +60,20 @@ enum GameobjectIds
 };
 
 template<class AI>
-CreatureAI* GetDeadminesAI(Creature* creature)
+CreatureAI* GetHellfireRampartsAI(Creature* creature)
 {
     if (InstanceMap* instance = creature->GetMap()->ToInstanceMap())
         if (instance->GetInstanceScript())
-            if (instance->GetScriptId() == sObjectMgr->GetScriptId(DMScriptName))
+            if (instance->GetScriptId() == sObjectMgr->GetScriptId(HRScriptName))
                 return new AI(creature);
 
     return NULL;
 }
 
 template<class AI, class T>
-AI* GetDeadminesAI(T* obj)
+AI* GetHellfireRampartsAI(T* obj)
 {
-    return GetInstanceAI<AI, T>(obj, DMScriptName);
+    return GetInstanceAI<AI, T>(obj, HRScriptName);
 }
 
 #endif
