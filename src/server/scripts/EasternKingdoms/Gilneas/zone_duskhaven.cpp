@@ -1678,15 +1678,9 @@ public:
             if (type == WAYPOINT_MOTION_TYPE)
                 switch (id)
             {
-                case 1:
+                case 3:
                 {
-                    if (GameObject* door = me->FindNearestGameObject(196401, 15.0f))
-                        door->UseDoorOrButton(5000);
-                    break;
-                }
-                case 2:
-                {
-                    if (GameObject* door = me->FindNearestGameObject(196401, 15.0f))
+                    if (GameObject* door = me->FindNearestGameObject(196401, 50.0f))
                         door->ResetDoorOrButton();
                     break;
                 }
@@ -1744,6 +1738,8 @@ public:
                 }
                 case EVENT_START_MOVEMENT:
                 {
+                    if (GameObject* door = me->FindNearestGameObject(196401, 25.0f))
+                        door->UseDoorOrButton(5000);
                     me->GetMotionMaster()->MovePath(WAYPOINT_ID, false);
                     break;
                 }
