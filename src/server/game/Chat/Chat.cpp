@@ -377,12 +377,12 @@ bool ChatHandler::ExecuteCommandInTable(ChatCommand* table, const char* text, st
                         targetDBGuid = creature->GetDBTableGUIDLow();
                     targetName = target->GetName().c_str();
 
-                    sLog->outCommand(m_session->GetAccountId(), "Command: %s [Player: %s (Guid: %u) (Account: %u) X: %f Y: %f Z: %f O: %f Map: %u (%s) Area: %u (%s) Zone: %s]",
+                    sLog->outCommand(m_session->GetAccountId(), "Command: %s [Player: %s (Guid: %u) (Account: %u) X: %f Y: %f Z: %f O: %f Map: %u (%s) Area: %u (%s) Zone: %s]\n[Target: %s (Guid: %u Entry: %u DBGuid: %u)]",
                         fullcmd.c_str(), player->GetName().c_str(), GUID_LOPART(player->GetGUID()), m_session->GetAccountId(),
                         player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetOrientation(), player->GetMapId(),
                         player->GetMap() ? player->GetMap()->GetMapName() : "Unknown",
                         areaId, areaName.c_str(), zoneName.c_str(),
-                        GetLogNameForGuid(targetGuid), targetName.c_str(), targetEntry, targetDBGuid);
+                        targetName.c_str(), GetLogNameForGuid(targetGuid), targetEntry, targetDBGuid);
                 }
                 else // player
                 {

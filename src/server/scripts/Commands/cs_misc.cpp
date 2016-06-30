@@ -202,7 +202,7 @@ public:
             else if (const Player* player = transport->ToPlayer())
             {/* prepared */}
 
-            handler->PSendSysMessage("Transport: Named: %s, with %u passenger and %u crewmember.\n", name, pList.size(), cList.size());
+            handler->PSendSysMessage("Transport: Named: %s, with %u passenger and %u crewmember.\n", name, pList.size(), (uint32)cList.size());
             handler->PSendSysMessage("RelPos: X: %f, Y: %f, Z: %f, O: %f, Map: %u\n", relX, relY, relZ, relO, relMap);
         }
 
