@@ -350,7 +350,7 @@ public:
             if (me->GetEntry() != 68 && me->GetEntry() != 1756 && me->GetEntry() != 1976)
                 return;
             Player* player = me->FindNearestPlayer(10.0f);
-            if (!player || player->GetQuestStatus(13188) != QUEST_STATE_COMPLETE)
+            if (!player || player->GetQuestStatus(13188) != QUEST_STATUS_COMPLETE)
                 return;
             switch (urand(1,25))
             {
@@ -387,7 +387,7 @@ public:
             if (me->GetZoneId() != 1637 || me->GetEntry() != 14304)
                 return;
             Player* player = me->FindNearestPlayer(10.0f);
-            if (!player || player->GetQuestStatus(13189) != QUEST_STATE_COMPLETE)
+            if (!player || player->GetQuestStatus(13189) != QUEST_STATUS_COMPLETE)
                 return;
             switch (urand(1, 25))
             {

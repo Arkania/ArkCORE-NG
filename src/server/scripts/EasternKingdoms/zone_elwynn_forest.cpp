@@ -1032,7 +1032,7 @@ public:
                             std::list<Player*> players = me->FindNearestPlayers(35.0f);
 
                             for (std::list<Player*>::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                                (*itr)->KilledMonsterCredit(448, NULL);
+                                (*itr)->KilledMonsterCredit(448);
 
                             phase = 0;
                             break;

@@ -1925,8 +1925,8 @@ public:
             m_phase = 0;
             m_is_anim_started = false;
             m_playerGUID = 0;
-            m_kodoLeader = NULL;
-            m_kodoPack = NULL;
+            m_kodoLeader = 0;
+            m_kodoPack = 0;
         }
 
         void JustSummoned(Creature* summon) 

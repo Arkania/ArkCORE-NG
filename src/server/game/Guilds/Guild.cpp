@@ -4453,7 +4453,7 @@ void Guild::GiveXP(uint32 xp, Player* source, bool challenge)
     else if (GetLevel() < GUILD_EXPERIENCE_UNCAPPED_LEVEL && uint32(_todayExperience) > sWorld->getIntConfig(CONFIG_GUILD_DAILY_XP_CAP))
     {
         uint64 newXp = sWorld->getIntConfig(CONFIG_GUILD_DAILY_XP_CAP) - uint64(_todayExperience);
-        TC_LOG_INFO("misc", "Guild (guid:%u) gets %u experience but todayExperience is %u. Experence was set to %u", GetGUID(), xp, _todayExperience, newXp);
+        TC_LOG_INFO("misc", "Guild (guid:%ull) gets %u experience but todayExperience is %ull. Experence was set to %ull", GetGUID(), xp, _todayExperience, newXp);
         xp = 0; //Set XP to 0 for while debugging...
     }
 

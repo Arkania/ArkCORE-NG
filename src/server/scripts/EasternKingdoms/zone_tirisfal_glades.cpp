@@ -2001,9 +2001,9 @@ public:
         {
             m_events.Reset();
             m_playerGUID = 0;
-            m_spiritAgamand = NULL;
-            m_shadowAgamand1 = NULL;
-            m_shadowAgamand2 = NULL;
+            m_spiritAgamand = 0;
+            m_shadowAgamand1 = 0;
+            m_shadowAgamand2 = 0;
             m_animStarted = 0;
             m_phase = 0;
             m_sayPriestess = 0;

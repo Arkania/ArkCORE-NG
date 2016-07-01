@@ -296,7 +296,7 @@ public:
 
             if (GetData(DATA_ZEVRIM_THORNHOOF) == DONE)
             {
-                printf("");
+                printf("Data is done");
             }
 
         }
@@ -324,7 +324,7 @@ public:
         {
             if (GetData(DATA_ZEVRIM_THORNHOOF) == DONE)
             {
-                printf("");
+                printf("Data is done");
             }
         }
         EncounterState GetExtraState(uint32 id) const

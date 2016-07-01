@@ -887,7 +887,7 @@ public:
 
         void Initialize()
         {
-            m_playerGUID2 = NULL;
+            m_playerGUID2 = 0;
         }
 
         void Reset() override

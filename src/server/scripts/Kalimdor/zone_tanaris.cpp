@@ -693,8 +693,8 @@ public:
             macks_camelGUID = 0;
             adarrahs_camelGUID = 0;
 
-            for (int32 i = 0; i < 6; i++)
-                sandPugmy[i] = NULL;
+            for (uint32 i = 0; i < 6; i++)
+                sandPugmy[i] = 0;
             sandPugmyCount = 0;
 
             isVideo2 = false;
@@ -948,11 +948,11 @@ public:
             macks_camelGUID = 0;
             adarrahs_camelGUID = 0;
 
-            for (int32 i = 0; i < 6; i++)
+            for (uint32 i = 0; i < 6; i++)
                 if (Creature* npc = sObjectAccessor->GetCreature(*me, sandPugmy[i]))
                 {
                     npc->DespawnOrUnsummon();
-                    sandPugmy[i] = NULL;
+                    sandPugmy[i] = 0;
                 }
             sandPugmyCount = 0;
         }

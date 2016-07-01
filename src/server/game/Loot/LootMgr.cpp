@@ -275,7 +275,7 @@ void LootStore::ReportUnusedIds(LootIdSet const& lootIdSet) const
         if (GetName() == "gameobject_template")
         {
             TC_LOG_ERROR("sql.sql", "Possible failure: Missing loot_id in data1 of the gameobject.");
-            TC_LOG_ERROR("sql.sql", "Possible solution: UPDATE gameobject_template SET data1=%u WHERE entry=%u;", *itr);
+            TC_LOG_ERROR("sql.sql", "Possible solution: UPDATE gameobject_template SET data1=%u WHERE entry=%u;", *itr, *itr);
         }
     }
 }
