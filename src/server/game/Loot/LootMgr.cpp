@@ -277,6 +277,11 @@ void LootStore::ReportUnusedIds(LootIdSet const& lootIdSet) const
             TC_LOG_ERROR("sql.sql", "Possible failure: Missing loot_id in data1 of the gameobject.");
             TC_LOG_ERROR("sql.sql", "Possible solution: UPDATE gameobject_template SET data1=%u WHERE entry=%u;", *itr, *itr);
         }
+		else if (GetName() == "item_template")
+		{
+			TC_LOG_ERROR("sql.sql", "Possible failure: Missing flag ITEM_PROTO_FLAG_OPENABLE = 4");
+			TC_LOG_ERROR("sql.sql", "Possible solution: UPDATE item_template SET Flags|=4 WHERE entry=%u;", *itr);
+		}
     }
 }
 
