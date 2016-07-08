@@ -1367,9 +1367,9 @@ public:
         EVENT_START_FOLLOWING = 101,
     };
 
-    struct npc_mountain_horse_36540AI : public VehicleAI
+    struct npc_mountain_horse_36540AI : public ScriptedAI
     {
-        npc_mountain_horse_36540AI(Creature* creature) : VehicleAI(creature) { }
+        npc_mountain_horse_36540AI(Creature* creature) : ScriptedAI(creature) { }
 
         EventMap m_events;
         uint64   m_playerGUID;
@@ -1582,16 +1582,6 @@ public:
         }
 
         return true;
-    }
-
-    bool OnQuestReward(Player* player, Creature* /*creature*/, Quest const* quest, uint32 /*opt*/)
-    {
-        if (quest->GetQuestId() == QUEST_ALAS_GILNEAS)
-        {
-
-        }
-
-        return false;
     }
 };
 
@@ -1887,9 +1877,9 @@ public:
         EVENT_MELEE_ATTACK,
     };
 
-    struct npc_dark_scout_37953AI : public VehicleAI
+    struct npc_dark_scout_37953AI : public ScriptedAI
     {
-        npc_dark_scout_37953AI(Creature* creature) : VehicleAI(creature) { }
+        npc_dark_scout_37953AI(Creature* creature) : ScriptedAI(creature) { }
 
         EventMap m_events;
         uint64 m_playerGUID;
@@ -2038,9 +2028,9 @@ public:
 		EVENT_START_TALK = 102,
 	};
 
-	struct npc_tobias_mistmantle_38051AI : public VehicleAI
+	struct npc_tobias_mistmantle_38051AI : public ScriptedAI
 	{
-		npc_tobias_mistmantle_38051AI(Creature* creature) : VehicleAI(creature) { }
+		npc_tobias_mistmantle_38051AI(Creature* creature) : ScriptedAI(creature) { }
 
 		EventMap m_events;
 		uint64   m_dariusGUID;
@@ -2122,6 +2112,243 @@ public:
 	}
 };
 
+// 37876
+class npc_king_genn_greymane_37876 : public CreatureScript
+{
+public:
+	npc_king_genn_greymane_37876() : CreatureScript("npc_king_genn_greymane_37876") { }
+
+	enum eNpc
+	{
+		QUEST_BETRAYAL_AT_TEMPESTS_REACH = 24592,
+		NPC_LORD_GODFREY = 37875,
+		SPELL_FORCE_REACTION_1 = 61899,
+		EVENT_START_ANIM = 101,
+	};
+
+	bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*opt*/)
+	{
+		if (quest->GetQuestId() == QUEST_BETRAYAL_AT_TEMPESTS_REACH)
+		{
+			player->CastSpell(player, SPELL_FORCE_REACTION_1);
+			creature->AI()->DoAction(1);
+		}
+
+		return false;
+	}
+
+	struct npc_king_genn_greymane_37876AI : public ScriptedAI
+	{
+		npc_king_genn_greymane_37876AI(Creature* creature) : ScriptedAI(creature) { }
+
+		EventMap m_events;
+		uint64 m_godfreyGUID;
+
+		void Reset() override
+		{
+			m_events.Reset();
+			m_godfreyGUID = 0;
+			if (Creature* godfrey = me->FindNearestCreature(NPC_LORD_GODFREY, 20.0f))
+				m_godfreyGUID = godfrey->GetGUID();
+		}
+
+		void DoAction(int32 /*param*/) override
+		{
+			if (!m_godfreyGUID)
+				if (Creature* godfrey = me->FindNearestCreature(NPC_LORD_GODFREY, 20.0f))
+					m_godfreyGUID = godfrey->GetGUID();
+
+			m_events.ScheduleEvent(EVENT_START_ANIM, 100);
+		}
+
+		void MovementInform(uint32 type, uint32 id) override
+		{
+			if (type == WAYPOINT_MOTION_TYPE)
+				switch (id)
+				{
+				case 4:
+				{
+					if (Creature* godfrey = sObjectAccessor->GetCreature(*me, m_godfreyGUID))
+					{
+						godfrey->SetDisableGravity(false);
+						godfrey->DespawnOrUnsummon(5000);
+					}
+					break;
+				}
+				}
+		}
+
+		void UpdateAI(uint32 diff) override
+		{
+			m_events.Update(diff);
+
+			while (uint32 eventId = m_events.ExecuteEvent())
+			{
+				switch (eventId)
+				{
+				case EVENT_START_ANIM:
+				{
+					if (Creature* godfrey = sObjectAccessor->GetCreature(*me, m_godfreyGUID))
+						m_events.ScheduleEvent(EVENT_START_ANIM+1, 100);
+					break;
+				}
+				case EVENT_START_ANIM+1:
+				{
+					Talk(0);
+					m_events.ScheduleEvent(EVENT_START_ANIM + 2, 5000);
+					break;
+				}
+				case EVENT_START_ANIM + 2:
+				{
+					if (Creature* godfrey = sObjectAccessor->GetCreature(*me, m_godfreyGUID))
+						godfrey->AI()->Talk(0);
+					m_events.ScheduleEvent(EVENT_START_ANIM + 3, 3000);
+					break;
+				}
+				case EVENT_START_ANIM + 3:
+				{
+					if (Creature* godfrey = sObjectAccessor->GetCreature(*me, m_godfreyGUID))
+					{
+						godfrey->GetMotionMaster()->MovePath(godfrey->GetDBTableGUIDLow(), false);
+						godfrey->SetDisableGravity(true);
+					}
+
+					break;
+				}
+				}
+			}
+
+			if (!UpdateVictim())
+				return;
+			else
+				DoMeleeAttackIfReady();
+		}
+	};
+
+	CreatureAI* GetAI(Creature* creature) const override
+	{
+		return new npc_king_genn_greymane_37876AI(creature);
+	}
+};
+
+// 38764
+class npc_lord_hewell_38764 : public CreatureScript
+{
+public:
+	npc_lord_hewell_38764() : CreatureScript("npc_lord_hewell_38764") { }
+
+	enum eNpc
+	{
+		QUEST_FLANK_THE_FORSAKEN = 24677,
+	};
+
+	bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 /*action*/) 
+	{
+		if (player->GetQuestStatus(QUEST_FLANK_THE_FORSAKEN) == QUEST_STATUS_COMPLETE)
+		{
+			player->CastSpell(player, 72773);
+		}
+
+		return false; 
+	}
+};
+
+// from here only phase 131072
+
+// 38765
+class npc_stout_mountain_horse_38765 : public CreatureScript
+{
+public:
+	npc_stout_mountain_horse_38765() : CreatureScript("npc_stout_mountain_horse_38765") { }
+
+	enum eNpc
+	{
+		QUEST_FLANK_THE_FORSAKEN = 24677,
+		PATH_ID = 3876500,
+		SPELL_DANS_EJECT_ALL_PASSENGERS = 51254,
+		SPELL_FORCE_REACTION_1 = 61899,
+		SPELL_PHASE_QUEST_ZONE_SPECIFIC_09 = 69077,
+		EVENT_START_WAYPOINTS = 101,
+		EVENT_STOP_WAYPOINTS = 102,
+	};
+
+	struct npc_stout_mountain_horse_38765AI : public VehicleAI
+	{
+		npc_stout_mountain_horse_38765AI(Creature* creature) : VehicleAI(creature) { }
+
+		EventMap m_events;
+		uint64 m_playerGUID;
+
+		void Reset() override
+		{
+			m_events.Reset();
+			m_playerGUID=0;
+		}
+
+		void IsSummonedBy(Unit* summoner) override
+		{
+			if (Player* player = summoner->ToPlayer())
+			{
+				m_playerGUID = summoner->GetGUID();				
+				m_events.ScheduleEvent(EVENT_START_WAYPOINTS, 100);
+			}
+		}
+
+		void MovementInform(uint32 type, uint32 id) override
+		{
+			if (type == WAYPOINT_MOTION_TYPE)
+				switch (id)
+				{
+				case 41:
+				{
+					m_events.ScheduleEvent(EVENT_STOP_WAYPOINTS, 1000);
+					break;
+				}
+				}
+		}
+
+		void UpdateAI(uint32 diff) override
+		{
+			m_events.Update(diff);
+
+			while (uint32 eventId = m_events.ExecuteEvent())
+			{
+				switch (eventId)
+				{
+				case EVENT_START_WAYPOINTS:
+				{
+					me->GetMotionMaster()->MovePath(PATH_ID, false);
+					break;
+				}
+				case EVENT_STOP_WAYPOINTS:
+				{
+					me->CastSpell(me, SPELL_DANS_EJECT_ALL_PASSENGERS);
+					me->DespawnOrUnsummon(3000);
+					if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+					{
+						if (player->HasAura(SPELL_FORCE_REACTION_1))
+							player->RemoveAura(SPELL_FORCE_REACTION_1);
+						if (player->HasAura(SPELL_PHASE_QUEST_ZONE_SPECIFIC_09))
+							player->RemoveAura(SPELL_PHASE_QUEST_ZONE_SPECIFIC_09);
+					}
+					break;
+				}
+				}
+			}
+
+			if (!UpdateVictim())
+				return;
+			else
+				DoMeleeAttackIfReady();
+		}
+	};
+
+	CreatureAI* GetAI(Creature* creature) const override
+	{
+		return new npc_stout_mountain_horse_38765AI(creature);
+	}
+};
+
 void AddSC_zone_gilneas_duskhaven()
 {	
     new npc_krennan_aranas_36331();
@@ -2156,4 +2383,7 @@ void AddSC_zone_gilneas_duskhaven()
     new npc_dark_scout_37953();
     new item_belysras_talisman_49944();
 	new npc_tobias_mistmantle_38051();
+	new npc_king_genn_greymane_37876();
+	new npc_lord_hewell_38764();
+	new npc_stout_mountain_horse_38765();
 };
