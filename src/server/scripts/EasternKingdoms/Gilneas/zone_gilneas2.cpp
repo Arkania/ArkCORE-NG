@@ -26,8 +26,6 @@
 #include "CreatureGroups.h"
 
 
-
-
 // 68903
 class spell_round_up_horse_68903 : public SpellScriptLoader
 {
@@ -1202,7 +1200,7 @@ public:
 };
 
 
-void AddSC_zone_gilneas_city2()
+void AddSC_zone_gilneas2()
 {
     new npc_admiral_nightwind_36616();
 

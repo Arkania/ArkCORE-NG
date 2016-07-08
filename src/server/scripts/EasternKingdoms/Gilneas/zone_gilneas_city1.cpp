@@ -4595,7 +4595,7 @@ public:
 
 // next part in script zone_duskhaven
 
-void AddSC_zone_gilneas_city()
+void AddSC_zone_gilneas_city1()
 {
     new npc_gilneas_city_guard_gate_34864();
     new npc_prince_liam_greymane_34850();
