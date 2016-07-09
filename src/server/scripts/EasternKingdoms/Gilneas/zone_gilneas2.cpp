@@ -182,106 +182,6 @@ public:
     }
 };
 
-// 38553
-class npc_krennan_aranas_38553 : public CreatureScript
-{
-public:
-    npc_krennan_aranas_38553() : CreatureScript("npc_krennan_aranas_38553") { }
-
-    enum eNpc
-    {
-        QUEST_THE_BATTLE_FOR_GILNEAS_CITY = 24904,
-        NPC_PRINCE_LIAM_GREYMANE_BATTLE = 38218,
-        ACTION_START_EVENT = 101,
-    };
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 uiAction)
-    {
-        player->PlayerTalkClass->ClearMenus();
-        switch (uiAction)
-        {
-        case GOSSIP_ACTION_INFO_DEF+1:
-            player->CLOSE_GOSSIP_MENU();
-            CAST_AI(npc_krennan_aranas_38553::npc_krennan_aranas_38553AI, creature->AI())->StartBattle(player);
-            break;
-
-        case GOSSIP_ACTION_INFO_DEF+2:
-            player->CLOSE_GOSSIP_MENU();
-            CAST_AI(npc_krennan_aranas_38553::npc_krennan_aranas_38553AI, creature->AI())->EndBattle();
-            break;
-        }
-        return true;
-    }
-
-    bool OnGossipHello(Player* player, Creature* creature)
-    {
-        if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
-
-        if (player->GetQuestStatus(QUEST_THE_BATTLE_FOR_GILNEAS_CITY) == QUEST_STATUS_INCOMPLETE)
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "start battle !", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
-
-        if (player->IsGameMaster())
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "(GM ONLY) RESET EVENT!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
-
-        player->SEND_GOSSIP_MENU(2474, creature->GetGUID());
-
-        return true;
-    }
-
-    struct npc_krennan_aranas_38553AI : public ScriptedAI
-    {
-        npc_krennan_aranas_38553AI(Creature *c) : ScriptedAI(c) {}
-
-        uint64 princeGUID;
-
-        void Reset()
-        {
-            princeGUID = 0;
-            if (Creature* newPrince = me->SummonCreature(NPC_PRINCE_LIAM_GREYMANE_BATTLE, -1408.661f, 1260.017f, 36.51123f, 1.79f, TEMPSUMMON_DEAD_DESPAWN, 180000))
-                princeGUID = newPrince->GetGUID();
-        }
-
-        void StartBattle(Player* player)
-        {
-			if (Creature* prince = ObjectAccessor::GetCreature(*me, princeGUID))
-            {
-                if (me->GetDistance2d(prince->GetPositionX(), prince->GetPositionY()) > 50)
-                    me->MonsterSay("event already started please wait a minute.", LANG_UNIVERSAL, 0);
-                else
-                {
-                    prince->AI()->DoAction(ACTION_START_EVENT);
-                    Talk(0, player);
-                }
-            }
-            else
-            {
-                princeGUID = 0;
-                if (Creature* newPrince = me->SummonCreature(NPC_PRINCE_LIAM_GREYMANE_BATTLE, -1408.661f, 1260.017f, 36.51123f, 1.79f, TEMPSUMMON_DEAD_DESPAWN, 180000))
-                {
-                    princeGUID = newPrince->GetGUID();
-                    prince->AI()->DoAction(ACTION_START_EVENT);
-                    Talk(0, player);
-                }
-            }
-        }
-
-        void EndBattle()
-        {
-			if (Creature* prince = ObjectAccessor::GetCreature(*me, princeGUID))
-                prince->DespawnOrUnsummon();
-            princeGUID = 0;
-            if (Creature* newPrince = me->SummonCreature(NPC_PRINCE_LIAM_GREYMANE_BATTLE, -1408.661f, 1260.017f, 36.51123f, 1.79f, TEMPSUMMON_DEAD_DESPAWN, 180000))
-                princeGUID = newPrince->GetGUID();
-        }
-    };
-
-    CreatureAI* GetAI(Creature* pCreature) const
-    {
-        return new npc_krennan_aranas_38553AI(pCreature);
-    }
-};
-
 /*######
 ## npc_prince_liam_greymane_gilneas ??? 38474
 ######*/
@@ -679,102 +579,6 @@ public:
     }
 };
 
-// 38221
-class npc_gilnean_militia_38221 : public CreatureScript
-{
-public:
-    npc_gilnean_militia_38221() : CreatureScript("npc_gilnean_militia_38221") { }
-
-    enum eNpc
-    {
-        DATA_GROUP = 101,
-        GROUP_1,
-    };
-
-    struct npc_gilnean_militia_38221AI : public ScriptedAI
-    {
-        npc_gilnean_militia_38221AI(Creature* pCreature) : ScriptedAI(pCreature) { }
-
-        void Reset()
-        {
-            mui_spell1 = urand(1200, 5100);
-            mui_spell2 = urand(2100, 5400);
-            me->AddUnitState(UNIT_STATE_IGNORE_PATHFINDING);
-        }
-
-        void AttackStart(Unit* who)
-        {
-            if (me->Attack(who, true))
-                DoStartNoMovement(who);
-        }
-
-        void SetData(uint32 uiType, uint32 uiData)
-        {
-            if (uiType == DATA_GROUP)
-                group = uiData;
-        }
-
-        uint32 GetData(uint32 uiType) const
-        {
-            if (uiType == DATA_GROUP)
-                return group;
-			return 0;
-        }
-
-        void JustReachedHome()
-        {
-            if (group == GROUP_1)
-                if (!UpdateVictim())
-                    if (me->ToTempSummon())
-                        if (Unit *p = me->ToTempSummon()->GetSummoner())
-                        {
-                            float distance = urand(7, 15);
-                            float angle = frand(-3 * M_PI / 4, 3 * M_PI / 2);
-                            float x, y, z;
-                            me->GetNearPoint(p, x, y, z, p->GetObjectSize(), distance, angle);
-                            me->GetMotionMaster()->MoveFollow(p, distance, angle, MOTION_SLOT_ACTIVE);
-                        }
-        }
-
-        void UpdateAI(uint32 diff)
-        {
-            if (!UpdateVictim())
-                return;
-            if (mui_spell1 <= diff)
-            {
-                DoCastVictim(15572);
-                mui_spell1 = 10000 + urand(1200, 5100);
-            }
-            else
-                mui_spell1 -= diff;
-
-            if (mui_spell2 <= diff)
-            {
-                DoCastVictim(47168);
-                mui_spell2 = 10000 + urand(2100, 5400);
-            }
-            else
-                mui_spell2 -= diff;
-
-            victim = me->GetVictim();
-            if (victim && me->GetDistance2d(victim->GetPositionX(), victim->GetPositionY()) > 7)
-                DoSpellAttackIfReady(6660);
-            else
-                DoMeleeAttackIfReady();
-        }
-
-    private :
-        uint32 mui_spell1;
-        uint32 mui_spell2;
-        Unit *victim;
-        uint32 group;
-    };
-
-    CreatureAI* GetAI(Creature* pCreature) const
-    {
-        return new npc_gilnean_militia_38221AI(pCreature);
-    }
-};
 
 // 38415
 class npc_lord_darius_crowley_38415 : public CreatureScript
@@ -850,38 +654,6 @@ public:
     }
 };
 
-// 38348
-class npc_worgen_warrior_38348 : public CreatureScript
-{
-public:
-    npc_worgen_warrior_38348() : CreatureScript("npc_worgen_warrior_38348") { }
-
-    struct npc_worgen_warrior_38348AI : public ScriptedAI
-    {
-        npc_worgen_warrior_38348AI(Creature* pCreature) : ScriptedAI(pCreature) { }
-
-        void EnterCombat(Unit* pWho)
-        {
-            if (pWho->GetEntry() == 38348)
-            {
-                me->CastSpell(pWho, 71921, true);
-            }
-        }
-
-        void UpdateAI(uint32 diff)
-        {
-            if (!UpdateVictim())
-                return;
-
-            DoMeleeAttackIfReady();
-        }
-    };
-
-    CreatureAI* GetAI(Creature* pCreature) const
-    {
-        return new npc_worgen_warrior_38348AI(pCreature);
-    }
-};
 
 /*######
 ## npc_lady_sylvanas_gilneas
@@ -1212,11 +984,10 @@ void AddSC_zone_gilneas2()
     new spell_round_up_horse_68903();
     new npc_trigger_quest_24616();
 
-    new npc_krennan_aranas_38553();
     //new npc_prince_liam_greymane_gilneas();
-    new npc_gilnean_militia_38221();
+    
     new npc_lord_darius_crowley_38415();
-    new npc_worgen_warrior_38348();
+    
     //new npc_lady_sylvanas_gilneas();
     new npc_lorna_crowley_38611();
 

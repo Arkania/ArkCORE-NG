@@ -2349,6 +2349,32 @@ public:
 	}
 };
 
+// 37783
+class npc_lorna_crowley_37783 : public CreatureScript
+{
+public:
+	npc_lorna_crowley_37783() : CreatureScript("npc_lorna_crowley_37783") { }
+
+	enum eNpc
+	{
+		QUEST_PUSH_THEM_OUT = 24676,
+		SPELL_PHASE_QUEST_ZONE_SPECIFIC_12 = 69485,
+	};
+
+	bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*opt*/)
+	{
+		if (quest->GetQuestId() == QUEST_PUSH_THEM_OUT)
+		{
+			if (!player->HasAura(SPELL_PHASE_QUEST_ZONE_SPECIFIC_12))
+				player->AddAura(SPELL_PHASE_QUEST_ZONE_SPECIFIC_12, player);
+		}
+
+		return false;
+	}
+};
+
+// from here phase 262144 is active.. battle for gilneas in zone_gilneas_city3
+
 void AddSC_zone_gilneas_duskhaven()
 {	
     new npc_krennan_aranas_36331();
@@ -2386,4 +2412,5 @@ void AddSC_zone_gilneas_duskhaven()
 	new npc_king_genn_greymane_37876();
 	new npc_lord_hewell_38764();
 	new npc_stout_mountain_horse_38765();
+	new npc_lorna_crowley_37783();
 };
