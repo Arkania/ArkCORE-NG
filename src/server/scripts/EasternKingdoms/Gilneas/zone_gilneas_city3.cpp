@@ -35,7 +35,7 @@ enum eBattleForGilneas
 	NPC_MYRIAM_SPELLWAKER = 38465,
 	NPC_GILNEAN_MILITIA = 38221,
 	NPC_PRINCE_LIAM_GREYMANE_BATTLE = 38218,
-	NPC_LORNA_CROWLEY=38426,
+	NPC_LORNA_CROWLEY = 38426,
 	NPC_DAMAGED_CATAPULT = 38377,
 	NPC_GOREROT = 38331,
 	NPC_KING_GENN_GRAYMANE = 38470,
@@ -47,15 +47,48 @@ enum eBattleForGilneas
 	NPC_DARK_RANGER_ELITE = 38464,
 	NPC_VILE_ABOMINATION = 38420,
 
+	SPELL_GILNEAS_MILITIA_SHOOT = 6660,
+
 	ACTION_START_EVENT = 101,
+	ACTION_PERFORM_RESET,
 	ACTION_SEND_DATA,
+	ACTION_INITIALIZE_DONE,
 	ACTION_CHECK_READY_FOR_BATTLE,
+	ACTION_START_MOTIVATION,
+	ACTION_MOTIVATION_DONE,
+	ACTION_MOVE_TO_WAVE_POSION_1,
+	ACTION_MOVE_TO_WAVE_POSION_2,
+	ACTION_LIAM_ARRIVED,
+	ACTION_MYRIAM_ARRIVED,
+	ACTION_LORNA_ARRIVED,
+	ACTION_GENN_ARRIVED,
+	ACTION_SYLVANAS_ARRIVED,
 
 	EVENT_GLOBAL_RESET = 201,
 	EVENT_CHECK_PLAYER_FOR_PHASE,
+	EVENT_CHECK_PLAYER_FOR_INVITE,
+	EVENT_PLAYER_INVITE_COOLDOWN,
 	EVENT_INITIALISE,
-	EVENT_BATTLE_IS_STARTED,
+	EVENT_START_LIAMS_FIRST_ANIM,
+	EVENT_MOTIVATION_0,
+	EVENT_MOTIVATION_1,
+	EVENT_MOTIVATION_2,
+	EVENT_MOTIVATION_3,
+	EVENT_MOTIVATION_4,
+	EVENT_MOTIVATION_5,
+	EVENT_MOTIVATION_6,
+	EVENT_MOTIVATION_DONE,
+	EVENT_MOVE_WAVE1,
+	EVENT_FIGHT_WAVE1,
+	EVENT_SYNC_BEFORE_WAVE2,
+	EVENT_MOVE_WAVE2,
+	EVENT_FIGHT_WAVE2,
+	EVENT_SYNC_BEFORE_WAVE3,
 
+	DATA_IS_BATTLE_STARTED = 99991,
+
+	StepByStepDelay = 1000,
+	ShootCoolDown = 4000,
 };
 
 // 38221 -- gilneas militia... first 3 groups
@@ -288,24 +321,12 @@ Position const SpawnPosDamagedCatapult[5] =
 	{-1683.16f, 1401.89f, 21.7520f, 3.01942f}
 };
 
-// 38469 -- Lady Sylvanas Windrunner
-Position const SpawnPosLadySylvanasWindrunner[1] =
-{
-	{-1678.06f, 1611.81f, 20.5728f, 2.44346f}
-};
-
 // 38473 -- Soultethered Banshee
 Position const SpawnPosSoultetheredBanshee[3] =
 {
 	{-1683.02f, 1602.66f, 20.5689f, 1.55334f},
 	{-1674.49f, 1607.05f, 20.5689f, 2.30383f},
 	{-1670.25f, 1617.54f, 20.5728f, 3.31613f}
-};
-
-// 38470 -- King Genn Greymane
-Position const SpawnPosKingGennGreymane[1] =
-{
-	{-1750.84f, 1670.42f, 22.1580f, 5.60220f}
 };
 
 // 38221 -- gilneas militia... group 4f,  leader is king greymane
@@ -338,7 +359,7 @@ Position const SpawnPosGroup4[25] =
 	{-1761.40f, 1684.49f, 22.158f, 5.64862f}
 };
 
- // 38553
+// 38553
 class npc_krennan_aranas_38553 : public CreatureScript
 {
 public:
@@ -369,11 +390,16 @@ public:
 		if (creature->IsQuestGiver())
 			player->PrepareQuestMenu(creature->GetGUID());
 
+		bool ok = false;
 		if (player->GetQuestStatus(QUEST_THE_BATTLE_FOR_GILNEAS_CITY) == QUEST_STATUS_INCOMPLETE)
-			if (Creature* liam = creature->FindNearestCreature(NPC_PRINCE_LIAM_GREYMANE_BATTLE, 50.0f))
-				player->ADD_GOSSIP_ITEM_DB(11061, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-			else
-				player->ADD_GOSSIP_ITEM_DB(11061, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+			if (!creature->AI()->GetData(DATA_IS_BATTLE_STARTED))
+				if (Creature* liam = creature->FindNearestCreature(NPC_PRINCE_LIAM_GREYMANE_BATTLE, 50.0f))
+					if (Creature* almyra = creature->FindNearestCreature(NPC_SISTER_ALMYRA, 50.0f))
+						ok = true;
+		if (ok)
+			player->ADD_GOSSIP_ITEM_DB(11061, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+		else
+			player->ADD_GOSSIP_ITEM_DB(11061, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
 
 		player->SEND_GOSSIP_MENU(2474, creature->GetGUID());
 
@@ -387,6 +413,7 @@ public:
 		EventMap m_events;
 		uint64   m_almyraGUID;
 		bool	 m_battleIsStarted;
+		bool     m_playerIsInvited;
 
 		void Reset()
 		{
@@ -394,6 +421,7 @@ public:
 			m_events.ScheduleEvent(EVENT_CHECK_PLAYER_FOR_PHASE, 2500);
 			m_almyraGUID = 0;
 			m_battleIsStarted = false;
+			m_playerIsInvited = false;
 		}
 
 		void SetGUID(uint64 guid, int32 id) override
@@ -406,27 +434,29 @@ public:
 			}
 		}
 
-		uint64 GetGUID(int32 id) const override 
-		{ 
-			return 0; 
-		}
-
-		void SetData(uint32 id, uint32 value) override
+		uint32 GetData(uint32 id) const
 		{
 			switch (id)
 			{
-			case 1:
-			{
+			case DATA_IS_BATTLE_STARTED:
+				return m_battleIsStarted ? 1 : 0;
+			}
+			return 0;
+		}
 
+		void DoAction(int32 param) override
+		{
+			switch (param)
+			{
+			case ACTION_START_EVENT:
+			{
+				m_events.Reset();
+				m_events.ScheduleEvent(EVENT_GLOBAL_RESET, 15 * 60000);
+				m_battleIsStarted = true;
+				m_playerIsInvited = true;
 				break;
 			}
 			}
-		}
-
-		uint32 GetData(uint32 id) const 
-		{ 
-
-			return 0; 
 		}
 
 		void UpdateAI(uint32 diff) override
@@ -437,11 +467,6 @@ public:
 			{
 				switch (eventId)
 				{
-				case EVENT_BATTLE_IS_STARTED:
-				{
-					m_battleIsStarted = false;
-					break;
-				}
 				case EVENT_CHECK_PLAYER_FOR_PHASE:
 				{
 					std::list<Player*> playerList = me->FindNearestPlayers(200.0f, true);
@@ -450,7 +475,30 @@ public:
 							if ((*itr)->GetPhaseMask() != 262144)
 								(*itr)->SetPhaseMask(262144, true);
 
+					if (playerList.size() && !m_playerIsInvited && !m_battleIsStarted)
+					{
+						m_playerIsInvited = true;
+						m_events.ScheduleEvent(EVENT_CHECK_PLAYER_FOR_INVITE, 120000);
+						m_events.ScheduleEvent(EVENT_PLAYER_INVITE_COOLDOWN, 300000);
+					}
+
 					m_events.ScheduleEvent(EVENT_CHECK_PLAYER_FOR_PHASE, 2500);
+					break;
+				}
+				case EVENT_GLOBAL_RESET:
+				{
+					Reset();
+					break;
+				}
+				case EVENT_PLAYER_INVITE_COOLDOWN:
+				{
+					m_playerIsInvited = false;
+					break;
+				}
+				case EVENT_CHECK_PLAYER_FOR_INVITE:
+				{
+					if (!m_battleIsStarted)
+						Talk(0);
 					break;
 				}
 				}
@@ -464,14 +512,10 @@ public:
 
 		void StartBattle(Player* player)
 		{
-			if (Creature* almyra = ObjectAccessor::GetCreature(*me, m_almyraGUID))
-				if (almyra->IsAlive() && me->GetDistance2d(almyra->GetPositionX(), almyra->GetPositionY()) > 50)
-					if (m_battleIsStarted)
-						Talk(1);
-					else
+			if (Creature* almyra = sObjectAccessor->GetCreature(*me, m_almyraGUID))
+				if (almyra->IsAlive())
+					if (me->GetDistance2d(almyra) < 50)
 					{
-						m_battleIsStarted = true;
-						m_events.ScheduleEvent(EVENT_BATTLE_IS_STARTED, 300000);
 						almyra->AI()->DoAction(ACTION_START_EVENT);
 						Talk(0, player);
 					}
@@ -546,6 +590,35 @@ public:
 	{
 		npc_sister_almyra_38466AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
 
+		Position Wave1Pos[9] =
+		{
+			{-1437.389526f, 1393.817383f, 35.555603f, 1.539162f},
+			{-1437.941650f, 1404.163208f, 35.555603f, 1.613774f},
+			{-1438.317627f, 1412.905151f, 35.555603f, 1.613774f},
+			{-1447.051880f, 1417.736816f, 35.555603f, 2.532691f},
+			{-1454.315796f, 1423.748657f, 35.555603f, 2.450224f},
+			{-1461.147217f, 1428.819946f, 35.555603f, 2.516983f},
+			{-1469.281494f, 1430.770996f, 35.555603f, 2.909682f},
+			{-1477.451416f, 1432.033936f, 35.555603f, 2.988222f},
+			{-1489.788818f, 1433.395752f, 35.667927f, 3.086396f}
+		};
+
+		Position Wave2Pos[12] =
+		{
+			{-1500.655762f, 1431.993408f, 35.555920f, 3.227764f},
+			{-1510.405518f, 1431.151978f, 35.555920f, 3.223837f},
+			{-1518.777100f, 1430.461914f, 35.555920f, 3.223837f},
+			{-1529.313232f, 1428.540039f, 35.555920f, 3.322012f},
+			{-1538.028564f, 1424.058594f, 35.555920f, 3.616536f},
+			{-1549.109619f, 1413.449829f, 35.555920f, 4.091701f},
+			{-1550.101563f, 1402.547119f, 35.555920f, 4.617918f},
+			{-1552.053833f, 1387.908203f, 35.567951f, 4.594353f},
+			{-1553.567261f, 1375.145630f, 35.621307f, 4.594353f},
+			{-1556.383667f, 1365.015869f, 35.597328f, 4.441201f},
+			{-1560.907715f, 1350.764893f, 35.556774f, 4.421566f},
+			{-1564.754028f, 1337.536743f, 35.652534f, 4.429420f}
+		};
+
 		EventMap m_events;
 		bool     m_isInitialised;
 		uint64   m_krennanGUID;
@@ -554,7 +627,10 @@ public:
 		uint64   m_lornaGUID;
 		uint64   m_kingGUID;
 		uint64   m_sylvanaGUID;
-		std::list<uint64> my_summonList;
+		std::list<uint64> my_victimList;
+		std::list<uint64> my_followerList;
+		uint32   m_point;
+		uint32   m_arrivedMask;
 
 		void Initialize()
 		{
@@ -567,16 +643,39 @@ public:
 			m_sylvanaGUID = 0;
 			m_isInitialised = false;
 			m_events.ScheduleEvent(EVENT_INITIALISE, 1000);
-			SummonMyMember();
 		}
 
 		void Reset() override
 		{
+			me->SetReactState(REACT_PASSIVE);
+			if (my_followerList.empty())
+				SummonMyMember();
 		}
 
 		void JustSummoned(Creature* summon) override
 		{
-			my_summonList.push_back(summon->GetGUID());
+			if (summon->GetEntry() == NPC_GILNEAN_MILITIA)
+				my_followerList.push_back(summon->GetGUID());
+			else
+				my_victimList.push_back(summon->GetGUID());
+		}
+
+		void MovementInform(uint32 type, uint32 id) override
+		{
+			if (type == POINT_MOTION_TYPE)
+				switch (id)
+				{
+				case 2001:
+				{
+					m_events.ScheduleEvent(EVENT_FIGHT_WAVE1, 250);
+					break;
+				}
+				case 2002:
+				{
+					m_events.ScheduleEvent(EVENT_FIGHT_WAVE2, 250);
+					break;
+				}
+				}
 		}
 
 		void DoAction(int32 param) override
@@ -585,9 +684,43 @@ public:
 			{
 			case ACTION_START_EVENT:
 			{
-
+				m_events.ScheduleEvent(EVENT_GLOBAL_RESET, 15 * 60000);
+				m_events.ScheduleEvent(EVENT_START_LIAMS_FIRST_ANIM, 15000);
+				if (Creature* liam = sObjectAccessor->GetCreature(*me, m_princeGUID))
+					liam->AI()->DoAction(ACTION_START_EVENT);
+				if (Creature* myriam = sObjectAccessor->GetCreature(*me, m_myriamGUID))
+					myriam->AI()->DoAction(ACTION_START_EVENT);
+				if (Creature* lorna = sObjectAccessor->GetCreature(*me, m_lornaGUID))
+					lorna->AI()->DoAction(ACTION_START_EVENT);
+				if (Creature* krennan = sObjectAccessor->GetCreature(*me, m_krennanGUID))
+					krennan->AI()->DoAction(ACTION_START_EVENT);
 				break;
 			}
+			case ACTION_MOTIVATION_DONE:
+			{
+				MoveToWavePosition1();
+				if (Creature* liam = sObjectAccessor->GetCreature(*me, m_princeGUID))
+					liam->AI()->DoAction(ACTION_MOVE_TO_WAVE_POSION_1);
+				if (Creature* myriam = sObjectAccessor->GetCreature(*me, m_myriamGUID))
+					myriam->AI()->DoAction(ACTION_MOVE_TO_WAVE_POSION_1);
+				break;
+			}
+			case ACTION_LIAM_ARRIVED:
+				m_arrivedMask |=2;
+				break;
+			case ACTION_MYRIAM_ARRIVED:
+				m_arrivedMask |= 4;
+				break;
+			case ACTION_LORNA_ARRIVED:
+				m_arrivedMask |= 8;
+				break;
+			case ACTION_GENN_ARRIVED:
+				m_arrivedMask |= 16;
+				break;
+			case ACTION_SYLVANAS_ARRIVED:
+				m_arrivedMask |= 32;
+				break;
+
 			}
 		}
 
@@ -596,20 +729,55 @@ public:
 			switch (id)
 			{
 			case NPC_PRINCE_LIAM_GREYMANE_BATTLE:
-				m_princeGUID = guid;
+			{
+				if (m_princeGUID != guid)
+					if (Creature* check = sObjectAccessor->GetCreature(*me, guid))
+					{
+						check->AI()->DoAction(ACTION_INITIALIZE_DONE);
+						m_princeGUID = guid;
+					}
 				break;
+			}
 			case NPC_MYRIAM_SPELLWAKER:
-				m_myriamGUID = guid;
+			{
+				if (m_myriamGUID != guid)
+					if (Creature* check = sObjectAccessor->GetCreature(*me, guid))
+					{
+						check->AI()->DoAction(ACTION_INITIALIZE_DONE);
+						m_myriamGUID = guid;
+					}
 				break;
+			}
 			case NPC_LORNA_CROWLEY:
-				m_lornaGUID = guid;
+			{
+				if (m_lornaGUID != guid)
+					if (Creature* check = sObjectAccessor->GetCreature(*me, guid))
+					{
+						check->AI()->DoAction(ACTION_INITIALIZE_DONE);
+						m_lornaGUID = guid;
+					}
 				break;
+			}
 			case NPC_KING_GENN_GRAYMANE:
-				m_kingGUID = guid;
+			{
+				if (m_kingGUID != guid)
+					if (Creature* check = sObjectAccessor->GetCreature(*me, guid))
+					{
+						check->AI()->DoAction(ACTION_INITIALIZE_DONE);
+						m_kingGUID = guid;
+					}
 				break;
+			}
 			case NPC_LADY_SYLVANAS_WINDRUNNER:
-				m_sylvanaGUID = guid;
+			{
+				if (m_sylvanaGUID != guid)
+					if (Creature* check = sObjectAccessor->GetCreature(*me, guid))
+					{
+						check->AI()->DoAction(ACTION_INITIALIZE_DONE);
+						m_sylvanaGUID = guid;
+					}
 				break;
+			}
 			}
 		}
 
@@ -653,10 +821,105 @@ public:
 						if (Creature* krennan = sObjectAccessor->GetCreature(*me, m_krennanGUID))
 						{
 							krennan->AI()->SetGUID(me->GetGUID(), me->GetEntry());
+							m_isInitialised = true;
 							break;
 						}
+
 						m_events.ScheduleEvent(EVENT_INITIALISE, 1000);
 					}
+					break;
+				}
+				case EVENT_GLOBAL_RESET:
+				{
+					RemoveMyMember();
+					me->DespawnOrUnsummon();
+					break;
+				}
+				case EVENT_START_LIAMS_FIRST_ANIM:
+				{
+					if (Creature* liam = sObjectAccessor->GetCreature(*me, m_princeGUID))
+						liam->AI()->DoAction(ACTION_START_MOTIVATION);
+					break;
+				}
+				case EVENT_MOVE_WAVE1:
+				{
+					if (m_point < 9)
+					{
+						me->GetMotionMaster()->MovePoint(2001, Wave1Pos[m_point]);
+						m_point += 1;
+					}
+					else
+					{
+						m_arrivedMask |= 1;
+						m_events.ScheduleEvent(EVENT_SYNC_BEFORE_WAVE2, 2500);
+					}
+					break;
+				}
+				case EVENT_FIGHT_WAVE1:
+				{
+					if (Creature* target = me->FindNearestCreature(NPC_FORSAKEN_CROSSBOWMAN, 15.0f))
+					{
+						for (std::list<uint64>::const_iterator itr = my_followerList.begin(); itr != my_followerList.end(); ++itr)
+							if (Creature* follower = sObjectAccessor->GetCreature(*me, (*itr)))
+								follower->CastSpell(target, SPELL_GILNEAS_MILITIA_SHOOT);
+						m_events.ScheduleEvent(EVENT_FIGHT_WAVE1, ShootCoolDown);
+					}
+					else
+						m_events.ScheduleEvent(EVENT_MOVE_WAVE1, StepByStepDelay);
+
+					break;
+				}
+				case EVENT_SYNC_BEFORE_WAVE2:
+				{
+					if ((m_arrivedMask & 7) == 7)
+						MoveToWavePosition2();
+					else
+						m_events.ScheduleEvent(EVENT_SYNC_BEFORE_WAVE2, 2500);
+					break;
+				}
+				case EVENT_MOVE_WAVE2:
+				{
+					if (m_point < 12)
+					{
+						me->GetMotionMaster()->MovePoint(2002, Wave2Pos[m_point]);
+						m_point += 1;
+					}
+					else
+					{
+						m_arrivedMask |= 1;
+						m_events.ScheduleEvent(EVENT_SYNC_BEFORE_WAVE3, 2500);
+					}
+					break;
+				}
+				case EVENT_FIGHT_WAVE2:
+				{
+					if (Creature* target = me->FindNearestCreature(NPC_DARK_RANGER_ELITE, 15.0f))
+					{
+						for (std::list<uint64>::const_iterator itr = my_followerList.begin(); itr != my_followerList.end(); ++itr)
+							if (Creature* follower = sObjectAccessor->GetCreature(*me, (*itr)))
+								follower->CastSpell(target, SPELL_GILNEAS_MILITIA_SHOOT);
+						m_events.ScheduleEvent(EVENT_FIGHT_WAVE2, ShootCoolDown);
+					}
+					else if (Creature* target = me->FindNearestCreature(NPC_FORSAKEN_CROSSBOWMAN, 15.0f))
+					{
+						for (std::list<uint64>::const_iterator itr = my_followerList.begin(); itr != my_followerList.end(); ++itr)
+							if (Creature* follower = sObjectAccessor->GetCreature(*me, (*itr)))
+								follower->CastSpell(target, SPELL_GILNEAS_MILITIA_SHOOT);
+						m_events.ScheduleEvent(EVENT_FIGHT_WAVE2, ShootCoolDown);
+					}
+					else
+						m_events.ScheduleEvent(EVENT_MOVE_WAVE2, StepByStepDelay);
+
+					break;
+				}
+				case EVENT_SYNC_BEFORE_WAVE3:
+				{
+					if ((m_arrivedMask & 7) == 7)
+					{
+						printf("First 3 Groups are arrived target point \n");
+					}
+					else
+						m_events.ScheduleEvent(EVENT_SYNC_BEFORE_WAVE3, 2500);
 					break;
 				}
 				}
@@ -677,7 +940,49 @@ public:
 			for (uint32 i = 0; i < 32; ++i)
 				if (Creature* summon = DoSummon(NPC_FORSAKEN_CROSSBOWMAN, SpawnPosForsakenCrossbowman[i], 0, TEMPSUMMON_DEAD_DESPAWN))
 					summon->SetReactState(REACT_PASSIVE);
-			
+
+		}
+
+		void RemoveMyMember()
+		{
+			for (std::list<uint64>::const_iterator itr = my_followerList.begin(); itr != my_followerList.end(); ++itr)
+				if (Creature* follower = sObjectAccessor->GetCreature(*me, (*itr)))
+					follower->DespawnOrUnsummon();
+			for (std::list<uint64>::const_iterator itr = my_victimList.begin(); itr != my_victimList.end(); ++itr)
+				if (Creature* victim = sObjectAccessor->GetCreature(*me, (*itr)))
+					victim->DespawnOrUnsummon();
+			my_followerList.clear();
+			my_victimList.clear();
+		}
+
+		void BuildFollowerGroup()
+		{
+			for (std::list<uint64>::const_iterator itr = my_followerList.begin(); itr != my_followerList.end(); ++itr)
+				if (Creature* follower = sObjectAccessor->GetCreature(*me, (*itr)))
+				{
+					float dist = frand(1.0f, 3.0f);
+					float angl = frand(0.0f, M_PI * 2);
+					follower->GetMotionMaster()->MoveFollow(me, dist, angl);
+				}
+		}
+
+		void MoveToWavePosition1()
+		{
+			BuildFollowerGroup();
+			m_point = 0;
+			m_arrivedMask = 0;
+			m_events.ScheduleEvent(EVENT_MOVE_WAVE1, 250);
+		}
+
+		void MoveToWavePosition2()
+		{
+			m_point = 0;
+			m_arrivedMask = 0;
+			if (Creature* liam = sObjectAccessor->GetCreature(*me, m_princeGUID))
+				liam->AI()->DoAction(ACTION_MOVE_TO_WAVE_POSION_2);
+			if (Creature* myriam = sObjectAccessor->GetCreature(*me, m_myriamGUID))
+				myriam->AI()->DoAction(ACTION_MOVE_TO_WAVE_POSION_2);
+			m_events.ScheduleEvent(EVENT_MOVE_WAVE2, 250);
 		}
 	};
 
@@ -697,10 +1002,39 @@ public:
 	{
 		npc_prince_liam_greymane_38218AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
 
+		Position Wave1Pos[8] =
+		{
+			{-1437.231934f, 1371.772461f, 35.555882f, 1.711943f},
+			{-1443.534302f, 1384.691772f, 35.555882f, 2.092861f},
+			{-1449.132690f, 1392.529663f, 35.555882f, 2.191036f},
+			{-1458.036621f, 1394.339233f, 35.555882f, 2.941092f},
+			{-1471.946533f, 1396.155151f, 35.555882f, 3.011778f},
+			{-1486.640137f, 1396.526489f, 35.556095f, 3.125660f},
+			{-1498.510620f, 1396.715576f, 35.576904f, 3.125660f},
+			{-1501.070557f, 1389.945435f, 35.556374f, 4.350883f}
+		};
+
+		Position Wave2Pos[12] =
+		{
+			{-1507.374756f, 1393.394043f, 35.556316f, 2.980361f},
+			{-1517.214600f, 1397.292480f, 35.556316f, 2.764377f},
+			{-1529.041870f, 1399.841675f, 35.556122f, 2.929310f},
+			{-1542.405151f, 1401.980225f, 35.556122f, 3.600830f},
+			{-1555.046631f, 1391.780396f, 35.589314f, 3.946405f},
+			{-1551.008301f, 1376.774292f, 35.564800f, 4.967419f},
+			{-1551.504395f, 1370.156860f, 35.577396f, 4.688603f},
+			{-1552.440918f, 1354.336548f, 35.556656f, 4.645407f},
+			{-1555.453125f, 1340.044067f, 35.556656f, 4.409791f},
+			{-1561.170898f, 1328.073853f, 35.556656f, 4.193810f},
+			{-1567.528931f, 1321.278809f, 35.556656f, 4.072073f},
+			{-1573.618164f, 1313.105835f, 35.556656f, 4.072073f}
+		};
+
 		EventMap m_events;
 		bool     m_isInitialised;
 		uint64   m_almyraGUID;
-		std::list<uint64> my_summonList;
+		std::list<uint64> my_followerList;
+		uint32   m_point;
 
 		void Initialize()
 		{
@@ -709,7 +1043,6 @@ public:
 			m_events.ScheduleEvent(EVENT_INITIALISE, 1000);
 			m_almyraGUID = 0;
 			m_isInitialised = false;
-			SummonMyMember();
 		}
 
 		void Reset() override
@@ -718,20 +1051,62 @@ public:
 				me->AddAura(458, me);
 			if (!me->HasAura(72069))
 				me->AddAura(72069, me);
+			me->SetReactState(REACT_PASSIVE);
+			if (my_followerList.empty())
+				SummonMyMember();
+			me->SetSpeed(MOVE_RUN, 1.0f, true);
 		}
 
-		void JustSummoned(Creature* summon) override 
-		{ 
-			my_summonList.push_back(summon->GetGUID());
+		void JustSummoned(Creature* summon) override
+		{
+			my_followerList.push_back(summon->GetGUID());
+		}
+
+		void MovementInform(uint32 type, uint32 id) override
+		{
+			if (type == POINT_MOTION_TYPE)
+				switch (id)
+				{
+				case 2001:
+				{
+					m_events.ScheduleEvent(EVENT_FIGHT_WAVE1, 250);
+					break;
+				}
+				case 2002:
+				{
+					m_events.ScheduleEvent(EVENT_FIGHT_WAVE2, 250);
+					break;
+				}
+				}
 		}
 
 		void DoAction(int32 param) override
-		{			
+		{
 			switch (param)
 			{
-			case 1:
+			case ACTION_INITIALIZE_DONE:
 			{
-				
+				m_isInitialised = true;
+				break;
+			}
+			case ACTION_START_EVENT:
+			{
+				m_events.ScheduleEvent(EVENT_GLOBAL_RESET, 15 * 60000);
+				break;
+			}
+			case ACTION_START_MOTIVATION:
+			{
+				m_events.ScheduleEvent(EVENT_MOTIVATION_0, 1000);
+				break;
+			}
+			case ACTION_MOVE_TO_WAVE_POSION_1:
+			{
+				MoveToWavePosition1();
+				break;
+			}
+			case ACTION_MOVE_TO_WAVE_POSION_2:
+			{
+				MoveToWavePosition2();
 				break;
 			}
 			}
@@ -767,12 +1142,123 @@ public:
 								m_almyraGUID = almyra->GetGUID();
 
 						if (Creature* almyra = sObjectAccessor->GetCreature(*me, m_almyraGUID))
-						{
 							almyra->AI()->SetGUID(me->GetGUID(), me->GetEntry());
-							break;
-						}
+
 						m_events.ScheduleEvent(EVENT_INITIALISE, 1000);
 					}
+					break;
+				}
+				case EVENT_GLOBAL_RESET:
+				{
+					RemoveMyMember();
+					me->DespawnOrUnsummon();
+					break;
+				}
+				case EVENT_MOTIVATION_0:
+				{
+					Talk(0);
+					m_events.ScheduleEvent(EVENT_MOTIVATION_1, 10000);
+					break;
+				}
+				case EVENT_MOTIVATION_1:
+				{
+					Talk(1);
+					m_events.ScheduleEvent(EVENT_MOTIVATION_2, 10000);
+					break;
+				}
+				case EVENT_MOTIVATION_2:
+				{
+					Talk(2);
+					m_events.ScheduleEvent(EVENT_MOTIVATION_3, 11000);
+					break;
+				}
+				case EVENT_MOTIVATION_3:
+				{
+					Talk(3);
+					m_events.ScheduleEvent(EVENT_MOTIVATION_4, 9000);
+					break;
+				}
+				case EVENT_MOTIVATION_4:
+				{
+					Talk(4);
+					m_events.ScheduleEvent(EVENT_MOTIVATION_5, 11000);
+					break;
+				}
+				case EVENT_MOTIVATION_5:
+				{
+					Talk(5);
+					m_events.ScheduleEvent(EVENT_MOTIVATION_6, 5000);
+					break;
+				}
+				case EVENT_MOTIVATION_6:
+				{
+					Talk(6);
+					m_events.ScheduleEvent(EVENT_MOTIVATION_DONE, 500);
+					break;
+				}
+				case EVENT_MOTIVATION_DONE:
+				{
+					if (Creature* almyra = sObjectAccessor->GetCreature(*me, m_almyraGUID))
+						almyra->AI()->DoAction(ACTION_MOTIVATION_DONE);
+					break;
+				}
+				case EVENT_MOVE_WAVE1:
+				{
+					if (m_point < 8)
+					{
+						me->GetMotionMaster()->MovePoint(2001, Wave1Pos[m_point]);
+						m_point += 1;
+						break;
+					}
+					if (Creature* almyra = sObjectAccessor->GetCreature(*me, m_almyraGUID))
+						almyra->AI()->DoAction(ACTION_LIAM_ARRIVED);
+
+					break;
+				}
+				case EVENT_FIGHT_WAVE1:
+				{
+					if (Creature* target = me->FindNearestCreature(NPC_FORSAKEN_CROSSBOWMAN, 15.0f))
+					{
+						for (std::list<uint64>::const_iterator itr = my_followerList.begin(); itr != my_followerList.end(); ++itr)
+							if (Creature* follower = sObjectAccessor->GetCreature(*me, (*itr)))
+								follower->CastSpell(target, SPELL_GILNEAS_MILITIA_SHOOT);
+						m_events.ScheduleEvent(EVENT_FIGHT_WAVE1, ShootCoolDown);
+					}
+					else
+						m_events.ScheduleEvent(EVENT_MOVE_WAVE1, StepByStepDelay);
+					break;
+				}
+				case EVENT_MOVE_WAVE2:
+				{
+					if (m_point < 12)
+					{
+						me->GetMotionMaster()->MovePoint(2002, Wave2Pos[m_point]);
+						m_point += 1;
+						break;
+					}
+					if (Creature* almyra = sObjectAccessor->GetCreature(*me, m_almyraGUID))
+						almyra->AI()->DoAction(ACTION_LIAM_ARRIVED);
+
+					break;
+				}
+				case EVENT_FIGHT_WAVE2:
+				{
+					if (Creature* target = me->FindNearestCreature(NPC_DARK_RANGER_ELITE, 15.0f))
+					{
+						for (std::list<uint64>::const_iterator itr = my_followerList.begin(); itr != my_followerList.end(); ++itr)
+							if (Creature* follower = sObjectAccessor->GetCreature(*me, (*itr)))
+								follower->CastSpell(target, SPELL_GILNEAS_MILITIA_SHOOT);
+						m_events.ScheduleEvent(EVENT_FIGHT_WAVE2, ShootCoolDown);
+					}
+					else if (Creature* target = me->FindNearestCreature(NPC_FORSAKEN_CROSSBOWMAN, 15.0f))
+					{
+						for (std::list<uint64>::const_iterator itr = my_followerList.begin(); itr != my_followerList.end(); ++itr)
+							if (Creature* follower = sObjectAccessor->GetCreature(*me, (*itr)))
+								follower->CastSpell(target, SPELL_GILNEAS_MILITIA_SHOOT);
+						m_events.ScheduleEvent(EVENT_FIGHT_WAVE2, ShootCoolDown);
+					}
+					else
+						m_events.ScheduleEvent(EVENT_MOVE_WAVE2, StepByStepDelay);
 					break;
 				}
 				}
@@ -783,7 +1269,7 @@ public:
 			else
 				DoMeleeAttackIfReady();
 		}
-		 
+
 		void SummonMyMember()
 		{
 			for (uint32 i = 0; i < 19; ++i)
@@ -791,9 +1277,36 @@ public:
 					summon->SetReactState(REACT_PASSIVE);
 		}
 
-		void CheckForIsGroupReady()
+		void RemoveMyMember()
 		{
+			for (std::list<uint64>::const_iterator itr = my_followerList.begin(); itr != my_followerList.end(); ++itr)
+				if (Creature* follower = sObjectAccessor->GetCreature(*me, (*itr)))
+					follower->DespawnOrUnsummon();
+			my_followerList.clear();
+		}
 
+		void BuildFollowerGroup()
+		{
+			for (std::list<uint64>::const_iterator itr = my_followerList.begin(); itr != my_followerList.end(); ++itr)
+				if (Creature* follower = sObjectAccessor->GetCreature(*me, (*itr)))
+				{
+					float dist = frand(1.0f, 3.0f);
+					float angl = frand(0.0f, M_PI * 2);
+					follower->GetMotionMaster()->MoveFollow(me, dist, angl);
+				}
+		}
+
+		void MoveToWavePosition1()
+		{
+			BuildFollowerGroup();
+			m_point = 0;
+			m_events.ScheduleEvent(EVENT_MOVE_WAVE1, 250);
+		}
+
+		void MoveToWavePosition2()
+		{
+			m_point = 0;
+			m_events.ScheduleEvent(EVENT_MOVE_WAVE2, 250);
 		}
 	};
 
@@ -813,10 +1326,37 @@ public:
 	{
 		npc_myriam_spellwaker_38465AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
 
+		Position  Wave1Pos[8] =
+		{
+			{-1438.375122f, 1357.833984f, 35.555393f, 2.827223f},
+			{-1450.322998f, 1356.605225f, 35.555393f, 3.263119f},
+			{-1464.221680f, 1353.181885f, 35.555931f, 3.388775f},
+			{-1478.260376f, 1351.074341f, 35.555931f, 3.290600f},
+			{-1491.284058f, 1348.592896f, 35.555931f, 3.329870f},
+			{-1502.223022f, 1347.533447f, 35.555931f, 3.121739f},
+			{-1503.380859f, 1362.383057f, 35.555931f, 1.660898f},
+			{-1503.456055f, 1372.238770f, 35.555931f, 1.578432f}
+		};
+
+		Position Wave2Pos[10] =
+		{
+			{-1503.550049f, 1367.337036f, 35.556229f, 4.727871f},
+			{-1504.166138f, 1356.396729f, 35.556229f, 4.594356f},
+			{-1504.506592f, 1347.779419f, 35.556229f, 4.672894f},
+			{-1511.895508f, 1341.676025f, 35.556229f, 3.860008f},
+			{-1519.750366f, 1335.448242f, 35.556229f, 3.722564f},
+			{-1526.749634f, 1333.446167f, 35.556229f, 3.424112f},
+			{-1533.222656f, 1331.539551f, 35.556229f, 3.428039f},
+			{-1541.016724f, 1329.213257f, 35.556229f, 3.420185f},
+			{-1547.694580f, 1327.309448f, 35.556229f, 3.420185f},
+			{-1555.790405f, 1324.435913f, 35.556229f, 3.428039f},
+		};
+
 		EventMap m_events;
 		bool     m_isInitialised;
 		uint64   m_almyraGUID;
-		std::list<uint64> my_summonList;
+		std::list<uint64> my_followerList;
+		uint32   m_point;
 
 		void Initialize()
 		{
@@ -824,21 +1364,63 @@ public:
 			m_almyraGUID = 0;
 			m_isInitialised = false;
 			m_events.ScheduleEvent(EVENT_INITIALISE, 1000);
-			SummonMyMember();
 		}
 
 		void Reset() override
 		{
-
+			me->SetReactState(REACT_PASSIVE);
+			if (my_followerList.empty())
+				SummonMyMember();
 		}
 
 		void JustSummoned(Creature* summon) override
 		{
-			my_summonList.push_back(summon->GetGUID());
+			my_followerList.push_back(summon->GetGUID());
+		}
+
+		void MovementInform(uint32 type, uint32 id) override
+		{
+			if (type == POINT_MOTION_TYPE)
+				switch (id)
+				{
+				case 2001:
+				{
+					m_events.ScheduleEvent(EVENT_FIGHT_WAVE1, 250);
+					break;
+				}
+				case 2002:
+				{
+					m_events.ScheduleEvent(EVENT_FIGHT_WAVE2, 250);
+					break;
+				}
+				}
 		}
 
 		void DoAction(int32 param) override
 		{
+			switch (param)
+			{
+			case ACTION_INITIALIZE_DONE:
+			{
+				m_isInitialised = true;
+				break;
+			}
+			case ACTION_START_EVENT:
+			{
+				m_events.ScheduleEvent(EVENT_GLOBAL_RESET, 15 * 60000);
+				break;
+			}
+			case ACTION_MOVE_TO_WAVE_POSION_1:
+			{
+				MoveToWavePosition1();
+				break;
+			}
+			case ACTION_MOVE_TO_WAVE_POSION_2:
+			{
+				MoveToWavePosition2();
+				break;
+			}
+			}
 		}
 
 		void EnterEvadeMode() override { }
@@ -860,12 +1442,79 @@ public:
 								m_almyraGUID = almyra->GetGUID();
 
 						if (Creature* almyra = sObjectAccessor->GetCreature(*me, m_almyraGUID))
-						{
 							almyra->AI()->SetGUID(me->GetGUID(), me->GetEntry());
-							break;
-						}
+
 						m_events.ScheduleEvent(EVENT_INITIALISE, 1000);
 					}
+					break;
+				}
+				case EVENT_GLOBAL_RESET:
+				{
+					RemoveMyMember();
+					me->DespawnOrUnsummon();
+					break;
+				}
+				case EVENT_MOVE_WAVE1:
+				{
+					if (m_point < 8)
+					{
+						me->GetMotionMaster()->MovePoint(2001, Wave1Pos[m_point]);
+						m_point += 1;
+						break;
+					}
+					if (Creature* almyra = sObjectAccessor->GetCreature(*me, m_almyraGUID))
+						almyra->AI()->DoAction(ACTION_MYRIAM_ARRIVED);
+
+					break;
+				}
+				case EVENT_FIGHT_WAVE1:
+				{
+					if (Creature* target = me->FindNearestCreature(NPC_FORSAKEN_CROSSBOWMAN, 15.0f))
+					{
+						for (std::list<uint64>::const_iterator itr = my_followerList.begin(); itr != my_followerList.end(); ++itr)
+							if (Creature* follower = sObjectAccessor->GetCreature(*me, (*itr)))
+								follower->CastSpell(target, SPELL_GILNEAS_MILITIA_SHOOT);
+
+						m_events.ScheduleEvent(EVENT_FIGHT_WAVE1, ShootCoolDown);
+					}
+					else
+						m_events.ScheduleEvent(EVENT_MOVE_WAVE1, StepByStepDelay);
+
+					break;
+				}
+				case EVENT_MOVE_WAVE2:
+				{
+					if (m_point < 10)
+					{
+						me->GetMotionMaster()->MovePoint(2002, Wave2Pos[m_point]);
+						m_point += 1;
+						break;
+					}
+					if (Creature* almyra = sObjectAccessor->GetCreature(*me, m_almyraGUID))
+						almyra->AI()->DoAction(ACTION_MYRIAM_ARRIVED);
+
+					break;
+				}
+				case EVENT_FIGHT_WAVE2:
+				{
+					if (Creature* target = me->FindNearestCreature(NPC_DARK_RANGER_ELITE, 15.0f))
+					{
+						for (std::list<uint64>::const_iterator itr = my_followerList.begin(); itr != my_followerList.end(); ++itr)
+							if (Creature* follower = sObjectAccessor->GetCreature(*me, (*itr)))
+								follower->CastSpell(target, SPELL_GILNEAS_MILITIA_SHOOT);
+						m_events.ScheduleEvent(EVENT_FIGHT_WAVE2, ShootCoolDown);
+					}
+					else if (Creature* target = me->FindNearestCreature(NPC_FORSAKEN_CROSSBOWMAN, 15.0f))
+					{
+						for (std::list<uint64>::const_iterator itr = my_followerList.begin(); itr != my_followerList.end(); ++itr)
+							if (Creature* follower = sObjectAccessor->GetCreature(*me, (*itr)))
+								follower->CastSpell(target, SPELL_GILNEAS_MILITIA_SHOOT);
+
+						m_events.ScheduleEvent(EVENT_FIGHT_WAVE2, ShootCoolDown);
+					}
+					else
+						m_events.ScheduleEvent(EVENT_MOVE_WAVE2, StepByStepDelay);
+
 					break;
 				}
 				}
@@ -882,6 +1531,38 @@ public:
 			for (uint32 i = 0; i < 19; ++i)
 				if (Creature* summon = DoSummon(NPC_GILNEAN_MILITIA, SpawnPosGroup3[i], 0, TEMPSUMMON_DEAD_DESPAWN))
 					summon->SetReactState(REACT_PASSIVE);
+		}
+
+		void RemoveMyMember()
+		{
+			for (std::list<uint64>::const_iterator itr = my_followerList.begin(); itr != my_followerList.end(); ++itr)
+				if (Creature* follower = sObjectAccessor->GetCreature(*me, (*itr)))
+					follower->DespawnOrUnsummon();
+			my_followerList.clear();
+		}
+
+		void BuildFollowerGroup()
+		{
+			for (std::list<uint64>::const_iterator itr = my_followerList.begin(); itr != my_followerList.end(); ++itr)
+				if (Creature* follower = sObjectAccessor->GetCreature(*me, (*itr)))
+				{
+					float dist = frand(1.0f, 3.0f);
+					float angl = frand(0.0f, M_PI * 2);
+					follower->GetMotionMaster()->MoveFollow(me, dist, angl);
+				}
+		}
+
+		void MoveToWavePosition1()
+		{
+			BuildFollowerGroup();
+			m_point = 0;
+			m_events.ScheduleEvent(EVENT_MOVE_WAVE1, 250);
+		}
+
+		void MoveToWavePosition2()
+		{
+			m_point = 0;
+			m_events.ScheduleEvent(EVENT_MOVE_WAVE2, 250);
 		}
 	};
 
@@ -904,33 +1585,56 @@ public:
 		EventMap m_events;
 		bool     m_isInitialised;
 		uint64   m_almyraGUID;
-		std::list<uint64> my_summonList;
+		std::list<uint64> my_followerList;
+		std::list<uint64> my_cannonList;
+		std::list<uint64> my_victimList;
 
 		void Initialize()
 		{
 			m_events.Reset();
-			m_almyraGUID=0;
+			m_almyraGUID = 0;
 			m_isInitialised = false;
 			m_events.ScheduleEvent(EVENT_INITIALISE, 1000);
-			SummonMyMember();
 		}
 
 		void Reset() override
 		{
-			
+			me->SetReactState(REACT_PASSIVE);
+			if (my_followerList.empty())
+				SummonMyMember();
 		}
 
 		void JustSummoned(Creature* summon) override
 		{
-			my_summonList.push_back(summon->GetGUID());
+			switch (summon->GetEntry())
+			{
+			case NPC_FREED_EMBERSTONE_VILLAGER:
+				my_followerList.push_back(summon->GetGUID());
+				break;
+			case NPC_EMBERSTONE_CANNON:
+				my_cannonList.push_back(summon->GetGUID());
+				break;
+			default:
+				my_victimList.push_back(summon->GetGUID());
+				break;
+			}
+
 		}
 
 		void DoAction(int32 param) override
 		{
 			switch (param)
 			{
-			case 1:
+			case ACTION_INITIALIZE_DONE:
+			{
+				m_isInitialised = true;
 				break;
+			}
+			case ACTION_START_EVENT:
+			{
+				m_events.ScheduleEvent(EVENT_GLOBAL_RESET, 15 * 60000);
+				break;
+			}
 			}
 		}
 
@@ -949,17 +1653,20 @@ public:
 					if (!m_isInitialised)
 					{
 						if (!m_almyraGUID)
-							if (Creature* almyra = me->FindNearestCreature(NPC_SISTER_ALMYRA,250.0f))
-								m_almyraGUID =almyra->GetGUID();
+							if (Creature* almyra = me->FindNearestCreature(NPC_SISTER_ALMYRA, 250.0f))
+								m_almyraGUID = almyra->GetGUID();
 
 						if (Creature* almyra = sObjectAccessor->GetCreature(*me, m_almyraGUID))
-						{
 							almyra->AI()->SetGUID(me->GetGUID(), me->GetEntry());
-							m_isInitialised=true;
-							break;
-						}
+
 						m_events.ScheduleEvent(EVENT_INITIALISE, 1000);
 					}
+					break;
+				}
+				case EVENT_GLOBAL_RESET:
+				{
+					RemoveMyMember();
+					me->DespawnOrUnsummon();
 					break;
 				}
 				}
@@ -988,7 +1695,7 @@ public:
 			for (uint32 i = 0; i < 34; ++i)
 				if (Creature* summon = DoSummon(NPC_FORSAKEN_CROSSBOWMAN, SpawnPosForsakenCrossbowMilitiaArea[i], 0, TEMPSUMMON_DEAD_DESPAWN))
 					summon->SetReactState(REACT_PASSIVE);
-		
+
 			for (uint32 i = 0; i < 5; ++i)
 				if (Creature* summon = DoSummon(NPC_DAMAGED_CATAPULT, SpawnPosDamagedCatapult[i], 0, TEMPSUMMON_DEAD_DESPAWN))
 					summon->SetReactState(REACT_PASSIVE);
@@ -997,6 +1704,22 @@ public:
 				if (Creature* summon = DoSummon(NPC_DARK_RANGER_ELITE, SpawnPosDarkRangerElite[i], 0, TEMPSUMMON_DEAD_DESPAWN))
 					summon->SetReactState(REACT_PASSIVE);
 
+		}
+
+		void RemoveMyMember()
+		{
+			for (std::list<uint64>::const_iterator itr = my_followerList.begin(); itr != my_followerList.end(); ++itr)
+				if (Creature* follower = sObjectAccessor->GetCreature(*me, (*itr)))
+					follower->DespawnOrUnsummon();
+			for (std::list<uint64>::const_iterator itr = my_cannonList.begin(); itr != my_cannonList.end(); ++itr)
+				if (Creature* cannon = sObjectAccessor->GetCreature(*me, (*itr)))
+					cannon->DespawnOrUnsummon();
+			for (std::list<uint64>::const_iterator itr = my_victimList.begin(); itr != my_victimList.end(); ++itr)
+				if (Creature* victim = sObjectAccessor->GetCreature(*me, (*itr)))
+					victim->DespawnOrUnsummon();
+			my_followerList.clear();
+			my_cannonList.clear();
+			my_victimList.clear();
 		}
 	};
 
@@ -1019,7 +1742,7 @@ public:
 		EventMap m_events;
 		bool     m_isInitialised;
 		uint64   m_almyraGUID;
-		std::list<uint64> my_summonList;
+		std::list<uint64> my_followerList;
 
 		void Initialize()
 		{
@@ -1027,112 +1750,27 @@ public:
 			m_almyraGUID = 0;
 			m_isInitialised = false;
 			m_events.ScheduleEvent(EVENT_INITIALISE, 1000);
-			SummonMyMember();
 		}
 
 		void Reset() override
 		{
+			me->SetReactState(REACT_PASSIVE);
+			if (my_followerList.empty())
+				SummonMyMember();
 		}
 
 		void JustSummoned(Creature* summon) override
 		{
-			my_summonList.push_back(summon->GetGUID());
-		}
-
-		void DoAction(int32 param) override
-		{
-		}
-
-		void EnterEvadeMode() override { }
-
-		void UpdateAI(uint32 diff) override
-		{
-			m_events.Update(diff);
-
-			while (uint32 eventId = m_events.ExecuteEvent())
-			{
-				switch (eventId)
-				{
-				case EVENT_INITIALISE:
-				{
-					if (!m_isInitialised)
-					{
-						if (!m_almyraGUID)
-							if (Creature* almyra = me->FindNearestCreature(NPC_SISTER_ALMYRA, 500.0f))
-								m_almyraGUID = almyra->GetGUID();
-
-						if (Creature* almyra = sObjectAccessor->GetCreature(*me, m_almyraGUID))
-						{
-							almyra->AI()->SetGUID(me->GetGUID(), me->GetEntry());
-							break;
-						}
-						m_events.ScheduleEvent(EVENT_INITIALISE, 1000);
-					}
-					break;
-				}
-				}
-			}
-
-			if (!UpdateVictim())
-				return;
-			else
-				DoMeleeAttackIfReady();
-		}
-
-		void SummonMyMember()
-		{
-			for (uint32 i = 0; i < 25; ++i)
-				if (Creature* summon = DoSummon(NPC_GILNEAN_MILITIA, SpawnPosGroup4[i], 0, TEMPSUMMON_DEAD_DESPAWN))
-					summon->SetReactState(REACT_PASSIVE);
-		}
-	};
-
-	CreatureAI* GetAI(Creature* creature) const override
-	{
-		return new npc_king_genn_greymane_38470AI(creature);
-	}
-};
-
-// 38469
-class npc_lady_sylvanas_windrunner_38469 : public CreatureScript
-{
-public:
-	npc_lady_sylvanas_windrunner_38469() : CreatureScript("npc_lady_sylvanas_windrunner_38469") { }
-
-	struct npc_lady_sylvanas_windrunner_38469AI : public ScriptedAI
-	{
-		npc_lady_sylvanas_windrunner_38469AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
-
-		EventMap m_events;
-		bool     m_isInitialised;
-		uint64   m_almyraGUID;
-		std::list<uint64> my_summonList;
-
-		void Initialize()
-		{
-			m_events.Reset();
-			m_almyraGUID = 0;
-			m_isInitialised = false;
-			m_events.ScheduleEvent(EVENT_INITIALISE, 1000);
-			SummonMyMember();
-		}
-
-		void Reset() override
-		{
-
-		}
-
-		void JustSummoned(Creature* summon) override
-		{
-			my_summonList.push_back(summon->GetGUID());
+			my_followerList.push_back(summon->GetGUID());
 		}
 
 		void DoAction(int32 param) override
 		{
 			switch (param)
 			{
-			case 1:
+			case ACTION_INITIALIZE_DONE:
 			{
+				m_isInitialised = true;
 				break;
 			}
 			}
@@ -1157,10 +1795,111 @@ public:
 								m_almyraGUID = almyra->GetGUID();
 
 						if (Creature* almyra = sObjectAccessor->GetCreature(*me, m_almyraGUID))
-						{
 							almyra->AI()->SetGUID(me->GetGUID(), me->GetEntry());
-							break;
-						}
+
+						m_events.ScheduleEvent(EVENT_INITIALISE, 1000);
+					}
+					break;
+				}
+				}
+			}
+
+			if (!UpdateVictim())
+				return;
+			else
+				DoMeleeAttackIfReady();
+		}
+
+		void SummonMyMember()
+		{
+			for (uint32 i = 0; i < 25; ++i)
+				if (Creature* summon = DoSummon(NPC_GILNEAN_MILITIA, SpawnPosGroup4[i], 0, TEMPSUMMON_DEAD_DESPAWN))
+					summon->SetReactState(REACT_PASSIVE);
+		}
+
+		void RemoveMyMember()
+		{
+			for (std::list<uint64>::const_iterator itr = my_followerList.begin(); itr != my_followerList.end(); ++itr)
+				if (Creature* follower = sObjectAccessor->GetCreature(*me, (*itr)))
+					follower->DespawnOrUnsummon();
+			my_followerList.clear();
+		}
+	};
+
+	CreatureAI* GetAI(Creature* creature) const override
+	{
+		return new npc_king_genn_greymane_38470AI(creature);
+	}
+};
+
+// 38469
+class npc_lady_sylvanas_windrunner_38469 : public CreatureScript
+{
+public:
+	npc_lady_sylvanas_windrunner_38469() : CreatureScript("npc_lady_sylvanas_windrunner_38469") { }
+
+	struct npc_lady_sylvanas_windrunner_38469AI : public ScriptedAI
+	{
+		npc_lady_sylvanas_windrunner_38469AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+		EventMap m_events;
+		bool     m_isInitialised;
+		uint64   m_almyraGUID;
+		std::list<uint64> my_followerList;
+
+		void Initialize()
+		{
+			m_events.Reset();
+			m_almyraGUID = 0;
+			m_isInitialised = false;
+			m_events.ScheduleEvent(EVENT_INITIALISE, 1000);
+		}
+
+		void Reset() override
+		{
+			me->SetReactState(REACT_PASSIVE);
+			if (my_followerList.empty())
+				SummonMyMember();
+		}
+
+		void JustSummoned(Creature* summon) override
+		{
+			my_followerList.push_back(summon->GetGUID());
+		}
+
+		void DoAction(int32 param) override
+		{
+			switch (param)
+			{
+			case ACTION_INITIALIZE_DONE:
+			{
+				m_isInitialised = true;
+				break;
+			}
+			}
+		}
+
+		void EnterEvadeMode() override { }
+
+		void UpdateAI(uint32 diff) override
+		{
+			m_events.Update(diff);
+
+			while (uint32 eventId = m_events.ExecuteEvent())
+			{
+				switch (eventId)
+				{
+				case EVENT_INITIALISE:
+				{
+					if (!m_isInitialised)
+					{
+						if (!m_almyraGUID)
+							if (Creature* almyra = me->FindNearestCreature(NPC_SISTER_ALMYRA, 500.0f))
+								m_almyraGUID = almyra->GetGUID();
+
+						if (Creature* almyra = sObjectAccessor->GetCreature(*me, m_almyraGUID))
+							almyra->AI()->SetGUID(me->GetGUID(), me->GetEntry());
+
 						m_events.ScheduleEvent(EVENT_INITIALISE, 1000);
 					}
 					break;
@@ -1179,7 +1918,15 @@ public:
 			for (uint32 i = 0; i < 3; ++i)
 				if (Creature* summon = DoSummon(NPC_SOULTETHERED_BANSHEE, SpawnPosSoultetheredBanshee[i], 0, TEMPSUMMON_DEAD_DESPAWN))
 					summon->SetReactState(REACT_PASSIVE);
-			
+
+		}
+
+		void RemoveMyMember()
+		{
+			for (std::list<uint64>::const_iterator itr = my_followerList.begin(); itr != my_followerList.end(); ++itr)
+				if (Creature* follower = sObjectAccessor->GetCreature(*me, (*itr)))
+					follower->DespawnOrUnsummon();
+			my_followerList.clear();
 		}
 	};
 
@@ -1208,7 +1955,7 @@ public:
 
 		void Reset() override
 		{
-			
+			me->SetSheath(SHEATH_STATE_RANGED);
 		}
 
 		void DoAction(int32 param) override
@@ -1248,17 +1995,11 @@ public:
 
 // old contend
 
-// 38221
+// 38221 
 class npc_gilnean_militia_38221 : public CreatureScript
 {
 public:
 	npc_gilnean_militia_38221() : CreatureScript("npc_gilnean_militia_38221") { }
-
-	enum eNpc
-	{
-		DATA_GROUP = 101,
-		GROUP_1,
-	};
 
 	struct npc_gilnean_militia_38221AI : public ScriptedAI
 	{
@@ -1266,81 +2007,18 @@ public:
 
 		void Reset()
 		{
-			mui_spell1 = urand(1200, 5100);
-			mui_spell2 = urand(2100, 5400);
 			me->AddUnitState(UNIT_STATE_IGNORE_PATHFINDING);
 		}
 
-		void AttackStart(Unit* who)
-		{
-			if (me->Attack(who, true))
-				DoStartNoMovement(who);
-		}
-
-		void SetData(uint32 uiType, uint32 uiData)
-		{
-			if (uiType == DATA_GROUP)
-				group = uiData;
-		}
-
-		uint32 GetData(uint32 uiType) const
-		{
-			if (uiType == DATA_GROUP)
-				return group;
-			return 0;
-		}
-
-		void JustReachedHome()
-		{
-			if (group == GROUP_1)
-				if (!UpdateVictim())
-					if (me->ToTempSummon())
-						if (Unit *p = me->ToTempSummon()->GetSummoner())
-						{
-							float distance = urand(7, 15);
-							float angle = frand(-3 * M_PI / 4, 3 * M_PI / 2);
-							float x, y, z;
-							me->GetNearPoint(p, x, y, z, p->GetObjectSize(), distance, angle);
-							me->GetMotionMaster()->MoveFollow(p, distance, angle, MOTION_SLOT_ACTIVE);
-						}
-		}
+		void EnterEvadeMode() override { }
 
 		void UpdateAI(uint32 diff)
 		{
 			if (!UpdateVictim())
-				return;
-			if (mui_spell1 <= diff)
-			{
-				// 15572 Rüstung zerreißen. Hackt auf die Rüstung des Gegners ein und verringert sie pro Einsatz von 'Rüstung zerreißen'. 
-				// Kann bis zu 5-mal angewendet werden. Hält $d lang an.
-				DoCastVictim(15572); 
-				mui_spell1 = 10000 + urand(1200, 5100);
-			}
-			else
-				mui_spell1 -= diff;
-
-			if (mui_spell2 <= diff)
-			{
-				// 47168 Verbessertes Zurechtstutzen. Description: Macht das Ziel $d lang bewegungsunfähig.
-				DoCastVictim(47168);
-				mui_spell2 = 10000 + urand(2100, 5400);
-			}
-			else
-				mui_spell2 -= diff;
-
-			// 3te fähigkeit: 6660 Schießen.  Description: Schießt auf den Feind und fügt körperlichen Schaden zu
-			victim = me->GetVictim();
-			if (victim && me->GetDistance2d(victim->GetPositionX(), victim->GetPositionY()) > 7)
-				DoSpellAttackIfReady(6660);
+				return;			
 			else
 				DoMeleeAttackIfReady();
 		}
-
-	private:
-		uint32 mui_spell1;
-		uint32 mui_spell2;
-		Unit *victim;
-		uint32 group;
 	};
 
 	CreatureAI* GetAI(Creature* pCreature) const
