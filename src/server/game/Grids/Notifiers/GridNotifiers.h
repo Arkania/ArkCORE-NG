@@ -1396,7 +1396,7 @@ namespace Trinity
         AllUnfriendlyCreaturesInRange(Unit const* obj, float maxRange) : m_unit(obj), m_fRange(maxRange) { }
         bool operator() (Unit* unit)
         {
-            if (unit->IsAlive() && unit->IsVisible() && !unit->IsFriendlyTo(m_unit) && unit->IsWithinDist(m_unit, m_fRange, false))
+            if (unit->IsAlive() && unit->IsVisible() && unit->IsHostileTo(m_unit) && unit->IsWithinDist(m_unit, m_fRange, false))
                 return true;
 
             return false;
