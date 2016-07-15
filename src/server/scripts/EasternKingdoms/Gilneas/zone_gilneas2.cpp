@@ -580,81 +580,6 @@ public:
 };
 
 
-// 38415
-class npc_lord_darius_crowley_38415 : public CreatureScript
-{
-public:
-    npc_lord_darius_crowley_38415() : CreatureScript("npc_lord_darius_crowley_38415") { }
-
-    struct npc_lord_darius_crowley_38415AI : public ScriptedAI
-    {
-        npc_lord_darius_crowley_38415AI(Creature* pCreature) : ScriptedAI(pCreature) { }
-
-        void Reset()
-        {
-            float angle = 0;
-            for (int i = 0; i < 30; i++)
-            {
-                if (Creature *summon = me->SummonCreature(38348, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0, TEMPSUMMON_MANUAL_DESPAWN))
-                {
-                    summon->GetMotionMaster()->MovePoint(0, -1710.466f + cos(angle) * 15, 1407.905f + sin(angle) * 15, 21.75196f);
-                    if (i >= 0 && i <= 3)
-                        worgenGUID[i] = summon->GetGUID();
-                }
-                angle += M_PI / 15;
-            }
-            me->GetMotionMaster()->MovePoint(0, -1710.466f, 1407.905f, 21.75196f);
-            aboGUID = 0;
-            mui_jumpBoss = 3000;
-            moveJumpBoss = true;
-        }
-
-        void SetGUID(uint64 guid, int32 type = 0)
-        {
-            aboGUID = guid;
-        }
-
-        void EnterCombat(Unit* pWho)
-        {
-            if (pWho->GetEntry() == 38348)
-                me->CastSpell(pWho, 71921, true);
-            Talk(0);
-        }
-
-        void UpdateAI(uint32 diff)
-        {
-            if (moveJumpBoss)
-            {
-                if (mui_jumpBoss <= diff)
-                {
-					if (Creature *abo = ObjectAccessor::GetCreature(*me, aboGUID))
-                        for (int i = 0; i <= 3; i++)
-							if (Creature *worgen = ObjectAccessor::GetCreature(*me, worgenGUID[i]))
-                                worgen->CastCustomSpell(VEHICLE_SPELL_RIDE_HARDCODED, SPELLVALUE_BASE_POINT0, i + 1, abo, false);
-                    moveJumpBoss = false;
-                    mui_jumpBoss = 3600000;
-                }
-                else mui_jumpBoss -= diff;
-            }
-            if (!UpdateVictim())
-                return;
-            DoMeleeAttackIfReady();
-        }
-
-    private:
-        uint64 aboGUID;
-        uint32 mui_jumpBoss;
-        bool moveJumpBoss;
-        uint64 worgenGUID[4];
-    };
-
-    CreatureAI* GetAI(Creature* pCreature) const
-    {
-        return new npc_lord_darius_crowley_38415AI(pCreature);
-    }
-};
-
-
 /*######
 ## npc_lady_sylvanas_gilneas
 ######*/
@@ -986,8 +911,7 @@ void AddSC_zone_gilneas2()
 
     //new npc_prince_liam_greymane_gilneas();
     
-    new npc_lord_darius_crowley_38415();
-    
+   
     //new npc_lady_sylvanas_gilneas();
     new npc_lorna_crowley_38611();
 
