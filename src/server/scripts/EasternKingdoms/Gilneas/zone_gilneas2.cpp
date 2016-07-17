@@ -717,56 +717,6 @@ public:
     }
 };
 
-// 38611
-class npc_lorna_crowley_38611 : public CreatureScript
-{
-public:
-    npc_lorna_crowley_38611() : CreatureScript("npc_lorna_crowley_38611") { }
-
-    enum eNpc
-    {
-        NPC_TOBIAS_MISTMANTLE = 38507,
-        MAP_GILNEAS = 654,
-    };
-
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
-    {
-        if (quest->GetQuestId() == 24902)
-            CAST_AI(npc_lorna_crowley_38611::npc_lorna_crowley_38611AI, creature->AI())->StartEncounter(player);
-        return true;
-    }
-
-    struct npc_lorna_crowley_38611AI : public ScriptedAI
-    {
-        npc_lorna_crowley_38611AI(Creature *c) : ScriptedAI(c) {}
-
-        uint64 tobiasGUID;
-
-        void Reset()
-        {
-            tobiasGUID = 0;
-        }
-
-        void StartEncounter(Player* pl)
-        {
-			if (Creature* tobias = ObjectAccessor::GetCreature(*me, tobiasGUID))
-                pl->TeleportTo(MAP_GILNEAS, tobias->GetPositionX(), tobias->GetPositionY(), tobias->GetPositionZ(), 5.42f);
-            else
-            {
-                if (Creature* newTobias = me->SummonCreature(NPC_TOBIAS_MISTMANTLE, -1662.616f, 1591.453f, 23.20896f, 3.740811f, TEMPSUMMON_DEAD_DESPAWN, 180000))
-                {
-                    newTobias->SetPhaseMask(pl->GetPhaseMask(), true);
-                    tobiasGUID = newTobias->GetGUID();
-                }
-            }
-        }
-    };
-
-    CreatureAI* GetAI(Creature* pCreature) const
-    {
-        return new npc_lorna_crowley_38611AI(pCreature);
-    }
-};
 
 // 38615
 class npc_captured_riding_bat_38615 : public CreatureScript
@@ -913,7 +863,7 @@ void AddSC_zone_gilneas2()
     
    
     //new npc_lady_sylvanas_gilneas();
-    new npc_lorna_crowley_38611();
+   
 
     //new npc_lorna_crowley_event();
     new npc_captured_riding_bat_38615();
