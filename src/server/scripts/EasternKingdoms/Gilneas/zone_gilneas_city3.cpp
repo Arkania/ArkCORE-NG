@@ -1024,10 +1024,7 @@ public:
 						{
 							m_ai_counter += 1;
 							if (m_ai_counter > 30)
-							{
-								printf("AI has lost event sync \n");
-								// m_events.RescheduleEvent(EVENT_FIGHT_WAVE, m_shootCoolDown);
-							}
+								m_events.RescheduleEvent(EVENT_FIGHT_WAVE, m_shootCoolDown);
 						}
 
 					}
@@ -1045,7 +1042,7 @@ public:
 					else
 					{
 						m_arrivedMask |= 1;
-						m_events.ScheduleEvent(EVENT_SYNC_BEFORE_NEXT_WAVE, 2500);
+						m_events.RescheduleEvent(EVENT_SYNC_BEFORE_NEXT_WAVE, 2500);
 					}
 					break;
 				}
@@ -1543,7 +1540,7 @@ public:
 				case 2006:
 				case 2007:
 				{
-					m_events.ScheduleEvent(EVENT_FIGHT_WAVE, 250);
+					m_events.RescheduleEvent(EVENT_FIGHT_WAVE, 250);
 					break;
 				}
 				}
@@ -1758,10 +1755,7 @@ public:
 						{
 							m_ai_counter += 1;
 							if (m_ai_counter > 30)
-							{
-								printf("AI has lost event sync \n");
-								// m_events.RescheduleEvent(EVENT_FIGHT_WAVE, m_shootCoolDown);
-							}
+								m_events.RescheduleEvent(EVENT_FIGHT_WAVE, m_shootCoolDown);
 						}
 					}
 					m_events.ScheduleEvent(EVENT_CHECK_FOR_TIMER, 1000);
@@ -1790,12 +1784,12 @@ public:
 					{
 						if (GetWavePosition().GetExactDist2d(&me->GetPosition()) > 3.0f)
 						{
-							m_events.ScheduleEvent(EVENT_MOVE_WAVE, 500);
+							m_events.RescheduleEvent(EVENT_MOVE_WAVE, 500);
 						}
 						else if (m_nearestDistance > m_checkDistance)
 						{
 							m_point += 1;
-							m_events.ScheduleEvent(EVENT_MOVE_WAVE, 500);
+							m_events.RescheduleEvent(EVENT_MOVE_WAVE, 500);
 						}
 						else
 						{
@@ -1809,13 +1803,13 @@ public:
 									else
 										follower->Attack(m_nearestTarget, true);
 								}
-							m_events.ScheduleEvent(EVENT_FIGHT_WAVE, m_shootCoolDown);
+							m_events.RescheduleEvent(EVENT_FIGHT_WAVE, m_shootCoolDown);
 						}
 					}
 					else
 					{
 						m_point += 1;
-						m_events.ScheduleEvent(EVENT_MOVE_WAVE, 10);
+						m_events.RescheduleEvent(EVENT_MOVE_WAVE, 10);
 					}
 					break;
 				}
@@ -2098,7 +2092,7 @@ public:
 				case 2006:
 				case 2007:
 				{
-					m_events.ScheduleEvent(EVENT_FIGHT_WAVE, 250);
+					m_events.RescheduleEvent(EVENT_FIGHT_WAVE, 250);
 					break;
 				}
 				}
@@ -2244,10 +2238,7 @@ public:
 						{
 							m_ai_counter += 1;
 							if (m_ai_counter > 30)
-							{
-								printf("AI has lost event sync \n");
-								// m_events.RescheduleEvent(EVENT_FIGHT_WAVE, m_shootCoolDown);
-							}
+								m_events.RescheduleEvent(EVENT_FIGHT_WAVE, m_shootCoolDown);
 						}
 					}
 					m_events.ScheduleEvent(EVENT_CHECK_FOR_TIMER, 1000);
@@ -2273,12 +2264,12 @@ public:
 					{
 						if (GetWavePosition().GetExactDist2d(&me->GetPosition()) > 3.0f)
 						{
-							m_events.ScheduleEvent(EVENT_MOVE_WAVE, 500);
+							m_events.RescheduleEvent(EVENT_MOVE_WAVE, 500);
 						}
 						else if (m_nearestDistance > m_checkDistance)
 						{
 							m_point += 1;
-							m_events.ScheduleEvent(EVENT_MOVE_WAVE, 500);
+							m_events.RescheduleEvent(EVENT_MOVE_WAVE, 500);
 						}
 						else
 						{
@@ -2292,13 +2283,13 @@ public:
 									else
 										follower->Attack(m_nearestTarget, true);
 								}
-							m_events.ScheduleEvent(EVENT_FIGHT_WAVE, m_shootCoolDown);
+							m_events.RescheduleEvent(EVENT_FIGHT_WAVE, m_shootCoolDown);
 						}
 					}
 					else
 					{
 						m_point += 1;
-						m_events.ScheduleEvent(EVENT_MOVE_WAVE, 10);
+						m_events.RescheduleEvent(EVENT_MOVE_WAVE, 10);
 					}
 					break;
 				}
@@ -2552,7 +2543,7 @@ public:
 				case 2006:
 				case 2007:
 				{
-					m_events.ScheduleEvent(EVENT_FIGHT_WAVE, 250);
+					m_events.RescheduleEvent(EVENT_FIGHT_WAVE, 250);
 					break;
 				}
 				}
@@ -2678,10 +2669,7 @@ public:
 						{
 							m_ai_counter += 1;
 							if (m_ai_counter > 30)
-							{
-								printf("AI has lost event sync \n");
-								// m_events.RescheduleEvent(EVENT_FIGHT_WAVE, m_shootCoolDown);
-							}
+								m_events.RescheduleEvent(EVENT_FIGHT_WAVE, m_shootCoolDown);
 						}
 					}
 					m_events.ScheduleEvent(EVENT_CHECK_FOR_TIMER, 1000);
@@ -2708,12 +2696,12 @@ public:
 					{
 						if (GetWavePosition().GetExactDist2d(&me->GetPosition()) > 3.0f)
 						{
-							m_events.ScheduleEvent(EVENT_MOVE_WAVE, 500);
+							m_events.RescheduleEvent(EVENT_MOVE_WAVE, 500);
 						}
 						else if (m_nearestDistance > m_checkDistance)
 						{
 							m_point += 1;
-							m_events.ScheduleEvent(EVENT_MOVE_WAVE, 500);
+							m_events.RescheduleEvent(EVENT_MOVE_WAVE, 500);
 						}
 						else
 						{
@@ -2727,13 +2715,13 @@ public:
 									else
 										follower->Attack(m_nearestTarget, true);
 								}
-							m_events.ScheduleEvent(EVENT_FIGHT_WAVE, m_shootCoolDown);
+							m_events.RescheduleEvent(EVENT_FIGHT_WAVE, m_shootCoolDown);
 						}
 					}
 					else
 					{
 						m_point += 1;
-						m_events.ScheduleEvent(EVENT_MOVE_WAVE, 10);
+						m_events.RescheduleEvent(EVENT_MOVE_WAVE, 10);
 					}
 					break;
 				}
@@ -3024,7 +3012,7 @@ public:
 				case 2006:
 				case 2007:
 				{
-					m_events.ScheduleEvent(EVENT_FIGHT_WAVE, 250);
+					m_events.RescheduleEvent(EVENT_FIGHT_WAVE, 250);
 					break;
 				}
 				}
@@ -3141,10 +3129,7 @@ public:
 						{
 							m_ai_counter += 1;
 							if (m_ai_counter > 30)
-							{
-								printf("AI has lost event sync \n");
-								// m_events.RescheduleEvent(EVENT_FIGHT_WAVE, m_shootCoolDown);
-							}
+								m_events.RescheduleEvent(EVENT_FIGHT_WAVE, m_shootCoolDown);
 						}
 					}
 					m_events.ScheduleEvent(EVENT_CHECK_FOR_TIMER, 1000);
@@ -3170,12 +3155,12 @@ public:
 					{
 						if (GetWavePosition().GetExactDist2d(&me->GetPosition()) > 3.0f)
 						{
-							m_events.ScheduleEvent(EVENT_MOVE_WAVE, 500);
+							m_events.RescheduleEvent(EVENT_MOVE_WAVE, 500);
 						}
 						else if (m_nearestDistance > m_checkDistance)
 						{
 							m_point += 1;
-							m_events.ScheduleEvent(EVENT_MOVE_WAVE, 500);
+							m_events.RescheduleEvent(EVENT_MOVE_WAVE, 500);
 						}
 						else
 						{
@@ -3186,13 +3171,13 @@ public:
 									follower->SetFacingToObject(m_nearestTarget);
 									follower->Attack(m_nearestTarget, true);
 								}
-							m_events.ScheduleEvent(EVENT_FIGHT_WAVE, m_shootCoolDown);
+							m_events.RescheduleEvent(EVENT_FIGHT_WAVE, m_shootCoolDown);
 						}
 					}
 					else
 					{
 						m_point += 1;
-						m_events.ScheduleEvent(EVENT_MOVE_WAVE, 10);
+						m_events.RescheduleEvent(EVENT_MOVE_WAVE, 10);
 					}
 					break;
 				}
@@ -3378,7 +3363,7 @@ public:
 					break;
 				case 2007:
 				{
-					m_events.ScheduleEvent(EVENT_FIGHT_WAVE, 250);
+					m_events.RescheduleEvent(EVENT_FIGHT_WAVE, 250);
 					break;
 				}
 				}
@@ -3470,10 +3455,7 @@ public:
 						{
 							m_ai_counter += 1;
 							if (m_ai_counter > 30)
-							{
-								printf("AI has lost event sync \n");
-								// m_events.RescheduleEvent(EVENT_FIGHT_WAVE, m_shootCoolDown);
-							}
+								m_events.RescheduleEvent(EVENT_FIGHT_WAVE, m_shootCoolDown);
 						}
 					}
 					m_events.ScheduleEvent(EVENT_CHECK_FOR_TIMER, 1000);
@@ -3499,12 +3481,12 @@ public:
 					{
 						if (GetWavePosition().GetExactDist2d(&me->GetPosition()) > 3.0f)
 						{
-							m_events.ScheduleEvent(EVENT_MOVE_WAVE, 500);
+							m_events.RescheduleEvent(EVENT_MOVE_WAVE, 500);
 						}
 						else if (m_nearestDistance > m_checkDistance)
 						{
 							m_point += 1;
-							m_events.ScheduleEvent(EVENT_MOVE_WAVE, 500);
+							m_events.RescheduleEvent(EVENT_MOVE_WAVE, 500);
 						}
 						else
 						{
@@ -3518,13 +3500,13 @@ public:
 									else
 										follower->Attack(m_nearestTarget, true);
 								}
-							m_events.ScheduleEvent(EVENT_FIGHT_WAVE, m_shootCoolDown);
+							m_events.RescheduleEvent(EVENT_FIGHT_WAVE, m_shootCoolDown);
 						}
 					}
 					else
 					{
 						m_point += 1;
-						m_events.ScheduleEvent(EVENT_MOVE_WAVE, 10);
+						m_events.RescheduleEvent(EVENT_MOVE_WAVE, 10);
 					}
 					break;
 				}
@@ -3717,13 +3699,15 @@ public:
 			case ACTION_SHOOT_AT_KING:
 			{
 				if (Creature* liam = sObjectAccessor->GetCreature(*me, m_liamGUID))
-					liam->CastSpell(liam, SPELL_SHOOT_LIAM);
+				{
+					me->CastSpell(liam, SPELL_SHOOT_LIAM, true);
+				}
 
 				break;
 			}
 			case ACTION_LIAM_IS_DEATH:
 			{
-				m_events.ScheduleEvent(EVENT_LIAM_IS_DEATH, 4000);
+				m_events.ScheduleEvent(EVENT_LIAM_IS_DEATH, 7000);
 				break;
 			}
 			case ACTION_QUEST_REWARDED:
@@ -3804,6 +3788,7 @@ public:
 							(*itr)->KilledMonsterCredit(38854);
 						}
 
+					BuildFollowerGroup();
 					me->GetMotionMaster()->MovePath(3846901, false);
 					break;
 				}
@@ -3831,11 +3816,99 @@ public:
 					follower->DespawnOrUnsummon(10);
 			my_followerList.clear();
 		}
+
+		void BuildFollowerGroup()
+		{
+			for (std::list<uint64>::const_iterator itr = my_followerList.begin(); itr != my_followerList.end(); ++itr)
+				if (Creature* follower = sObjectAccessor->GetCreature(*me, (*itr)))
+				{
+					float dist = frand(3.0f, 5.0f);
+					float angl = frand(2.14f, 4.14f);
+					follower->GetMotionMaster()->MoveFollow(me, dist, angl);
+				}
+		}
 	};
 
 	CreatureAI* GetAI(Creature* creature) const override
 	{
 		return new npc_lady_sylvanas_windrunner_38469AI(creature);
+	}
+};
+
+// 38473
+class npc_soultethered_banshee_38473 : public CreatureScript
+{
+public:
+	npc_soultethered_banshee_38473() : CreatureScript("npc_soultethered_banshee_38473") { }
+
+	enum eNPC
+	{
+		EVENT_FOLLOW_LEADER = 300,
+	};
+
+	struct npc_soultethered_banshee_38473AI : public ScriptedAI
+	{
+		npc_soultethered_banshee_38473AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+		EventMap m_events;
+		uint64 m_leaderGUID;
+
+		void Initialize()
+		{
+			m_leaderGUID = 0;
+			m_events.Reset();
+		}
+
+		void Reset() override
+		{
+			me->SetReactState(REACT_PASSIVE);
+			me->AddUnitState(UNIT_STATE_IGNORE_PATHFINDING);
+		}
+
+		void IsSummonedBy(Unit* summoner) override
+		{
+			if (summoner->GetEntry() == NPC_LADY_SYLVANAS_WINDRUNNER)
+				m_leaderGUID = summoner->GetGUID();
+		}
+
+		void DoAction(int32 param) override
+		{
+			switch (param)
+			{
+			case 1:
+			{
+				break;
+			}
+			}
+		}
+
+		void EnterEvadeMode() override { }
+
+		void UpdateAI(uint32 diff) override
+		{
+			m_events.Update(diff);
+
+			while (uint32 eventId = m_events.ExecuteEvent())
+			{
+				switch (eventId)
+				{
+				case 1:
+				{
+					break;
+				}
+				}
+			}
+
+			if (!UpdateVictim())
+				return;
+			else
+				DoMeleeAttackIfReady();
+		}
+	};
+
+	CreatureAI* GetAI(Creature* creature) const override
+	{
+		return new npc_soultethered_banshee_38473AI(creature);
 	}
 };
 
@@ -3898,11 +3971,9 @@ public:
 			if (type == WAYPOINT_MOTION_TYPE)
 				switch (id)
 				{
-				case 1:
-					Talk(0);
-					break;
 				case 2:
 				{
+					Talk(0);
 					if (Creature* sylvana = sObjectAccessor->GetCreature(*me, m_sylvanaGUID))
 						sylvana->AI()->DoAction(ACTION_AIM_AT_KING);
 					break;
@@ -4002,10 +4073,11 @@ public:
 	{
 		if (quest->GetQuestId() == 24902)
 			CAST_AI(npc_lorna_crowley_38611::npc_lorna_crowley_38611AI, creature->AI())->StartEncounter(player);
+
 		return true;
 	}
 
-	bool OnQuestReward(Player* /*player*/, Creature* creature, Quest const* /*quest*/, uint32 /*opt*/)
+	bool OnQuestReward(Player* player, Creature* creature, Quest const* /*quest*/, uint32 /*opt*/)
 	{
 		if (Creature* almyra = creature->FindNearestCreature(NPC_SISTER_ALMYRA, 50.0f))
 			almyra->AI()->DoAction(ACTION_QUEST_REWARDED);
@@ -4080,7 +4152,7 @@ public:
 				{
 				case EVENT_FORSAKEN_CROSSBOW_SHOOT:
 				{
-					if (Creature* target = me->FindNearestCreature(NPC_GILNEAN_MILITIA, 25.0f))
+					if (Unit* target = FindNearestTarget(25))
 					{
 						me->CastSpell(target, SPELL_FORSAKEN_CROSSBOW_SHOOT);
 						me->SetFacingToObject(target);
@@ -4098,6 +4170,32 @@ public:
 				return;
 			else
 				DoMeleeAttackIfReady();
+		}
+
+		Unit* FindNearestTarget(float range)
+		{
+			Unit* target = nullptr;
+			float dist = range;
+			std::list<Creature*> targetList = me->FindAllUnfriendlyCreaturesInRange(range);
+			Player* player = me->FindNearestPlayer(range);
+			if (!targetList.empty())
+			{
+				for (std::list<Creature*>::const_iterator itr = targetList.begin(); itr != targetList.end(); ++itr)
+				{
+					float d = (*itr)->GetDistance2d(me);
+					if (d < dist)
+					{
+						dist = d;
+						target = (*itr);
+					}
+				}
+			}
+			if (player)
+			{
+				if (player->GetDistance2d(me) < dist)
+					target = player;
+			}
+			return target;
 		}
 	};
 
@@ -4155,8 +4253,7 @@ public:
 				}
 				case EVENT_FORSAKEN_KNOCKBACK:
 				{
-					std::list<Creature*> unfriendlyList = me->FindAllUnfriendlyCreaturesInRange(4.5f);
-					if (!unfriendlyList.empty())
+					if (Creature* target = me->FindNearestCreature(NPC_GILNEAN_MILITIA, 4.5f))
 					{
 						me->CastSpell(me, SPELL_KNOCKBACK);
 						m_events.ScheduleEvent(EVENT_FORSAKEN_KNOCKBACK, 5000);
@@ -4172,6 +4269,32 @@ public:
 				return;
 			else
 				DoMeleeAttackIfReady();
+		}
+
+		Unit* FindNearestTarget(float range)
+		{
+			Unit* target = nullptr;
+			float dist = range;
+			std::list<Creature*> targetList = me->FindAllUnfriendlyCreaturesInRange(range);
+			Player* player = me->FindNearestPlayer(range);
+			if (!targetList.empty())
+			{
+				for (std::list<Creature*>::const_iterator itr = targetList.begin(); itr != targetList.end(); ++itr)
+				{
+					float d = (*itr)->GetDistance2d(me);
+					if (d < dist)
+					{
+						dist = d;
+						target = (*itr);
+					}
+				}
+			}
+			if (player)
+			{
+				if (player->GetDistance2d(me) < dist)
+					target = player;
+			}
+			return target;
 		}
 	};
 
@@ -4203,6 +4326,14 @@ public:
 			me->SetSheath(SHEATH_STATE_MELEE);
 		}
 
+		void SpellHit(Unit* caster, SpellInfo const* spell) override
+		{
+			if (Unit* target = FindNearestTarget(5.0f))
+			{
+				me->Attack(target, true);
+			}
+		}
+
 		void EnterEvadeMode() override { }
 
 		void UpdateAI(uint32 diff) override
@@ -4224,6 +4355,32 @@ public:
 				return;
 			else
 				DoMeleeAttackIfReady();
+		}
+
+		Unit* FindNearestTarget(float range)
+		{
+			Unit* target = nullptr;
+			float dist = range;
+			std::list<Creature*> targetList = me->FindAllUnfriendlyCreaturesInRange(range);
+			Player* player = me->FindNearestPlayer(range);
+			if (!targetList.empty())
+			{
+				for (std::list<Creature*>::const_iterator itr = targetList.begin(); itr != targetList.end(); ++itr)
+				{
+					float d = (*itr)->GetDistance2d(me);
+					if (d < dist)
+					{
+						dist = d;
+						target = (*itr);
+					}
+				}
+			}
+			if (player)
+			{
+				if (player->GetDistance2d(me) < dist)
+					target = player;
+			}
+			return target;
 		}
 	};
 
@@ -4249,7 +4406,7 @@ public:
 		npc_gilnean_militia_38221AI(Creature* pCreature) : ScriptedAI(pCreature) { Initialize(); }
 
 		EventMap m_events;
-		uint64 m_leaderGUID;
+		uint64   m_leaderGUID;
 
 		void Initialize()
 		{
@@ -4427,6 +4584,15 @@ class npc_gorerot_38331 : public CreatureScript
 public:
 	npc_gorerot_38331() : CreatureScript("npc_gorerot_38331") { }
 
+	enum eNpc
+	{
+		SPELL_SMASH = 71774,
+		SPELL_THUNDERCLAP = 8078,
+		EVENT_SMASH = 301,
+		EVENT_THUNDERCLAP = 302,
+		EVENT_SAY1 = 303,
+	};
+
 	struct npc_gorerot_38331AI : public ScriptedAI
 	{
 		npc_gorerot_38331AI(Creature* pCreature) : ScriptedAI(pCreature) { }
@@ -4437,7 +4603,9 @@ public:
 		{
 			me->SetReactState(REACT_PASSIVE);
 			me->PlayDirectSound(23530);
-			m_events.ScheduleEvent(1, 10000);
+			m_events.ScheduleEvent(EVENT_SAY1, 10000);
+			m_events.ScheduleEvent(EVENT_SMASH, 13000);
+			m_events.ScheduleEvent(EVENT_THUNDERCLAP, 21000);
 		}
 
 		void UpdateAI(uint32 diff)
@@ -4448,9 +4616,26 @@ public:
 			{
 				switch (eventId)
 				{
-				case 1:
+				case EVENT_SAY1:
 					Talk(0);
 					break;
+				case EVENT_SMASH:
+				{
+					std::list<Unit*> targetList = FindNearestTarget(5.0f, 5);
+					if (!targetList.empty())
+						for (std::list<Unit*>::const_iterator itr = targetList.begin(); itr != targetList.end(); ++itr)
+							me->CastSpell((*itr), SPELL_SMASH);
+
+					m_events.ScheduleEvent(EVENT_SMASH, 13000);
+					break;
+				}
+				case EVENT_THUNDERCLAP:
+				{
+					Position p = me->GetPosition();
+					me->CastSpell(p.GetPositionX(), p.GetPositionY(), p.GetPositionZ(), SPELL_THUNDERCLAP, true);
+					m_events.ScheduleEvent(EVENT_THUNDERCLAP, 21000);
+					break;
+				}
 				}
 			}
 
@@ -4458,6 +4643,28 @@ public:
 				return;
 
 			DoMeleeAttackIfReady();
+		}
+
+		std::list<Unit*> FindNearestTarget(float range, uint8 maxCount)
+		{
+			std::list<Unit*> returnList;
+			std::list<Creature*> targetList = me->FindAllUnfriendlyCreaturesInRange(range);
+			Player* player = me->FindNearestPlayer(range);
+			if (player)
+			{
+				if (player->GetDistance2d(me) < range)
+					returnList.push_back(player);
+			}
+			if (!targetList.empty())
+			{
+				for (std::list<Creature*>::const_iterator itr = targetList.begin(); itr != targetList.end(); ++itr)
+				{
+					if ((*itr)->GetDistance2d(me) < range && returnList.size() < maxCount)
+						returnList.push_back((*itr));
+				}
+			}
+
+			return returnList;
 		}
 	};
 
@@ -4467,7 +4674,100 @@ public:
 	}
 };
 
+// 72050
+class spell_fiery_boulder_72050 : public SpellScriptLoader
+{
+public:
+	spell_fiery_boulder_72050() : SpellScriptLoader("spell_fiery_boulder_72050") { }
 
+	class IsFriendly
+	{
+	public:
+		explicit IsFriendly(Unit const* caster) : _caster(caster) { }
+
+		bool operator()(WorldObject* obj) const
+		{
+			if (Unit* unit = obj->ToUnit())
+				return _caster->IsFriendlyTo(unit);
+
+			return false;
+		}
+
+	private:
+		Unit const* _caster;
+	};
+
+	class spell_fiery_boulder_72050_SpellScript : public SpellScript
+	{
+		PrepareSpellScript(spell_fiery_boulder_72050_SpellScript);
+
+		void FilterTargets(std::list<WorldObject*>& unitList)
+		{
+			if (!unitList.empty())
+				printf("spell_fiery_boulder_72050_SpellScript %u \n", unitList.size());
+
+			unitList.remove_if(IsFriendly(GetCaster()));
+		}
+		
+		void Register() override
+		{
+			OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_fiery_boulder_72050_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_DEST_AREA_ENEMY);
+			OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_fiery_boulder_72050_SpellScript::FilterTargets, EFFECT_1, TARGET_UNIT_DEST_AREA_ENEMY);
+		}
+	};
+
+	SpellScript* GetSpellScript() const override
+	{
+		return new spell_fiery_boulder_72050_SpellScript();
+	}
+};
+
+// 71388
+class spell_rapier_of_the_gilnean_patriots_71388 : public SpellScriptLoader
+{
+public:
+	spell_rapier_of_the_gilnean_patriots_71388() : SpellScriptLoader("spell_rapier_of_the_gilnean_patriots_71388") { }
+
+	class IsHostile
+	{
+	public:
+		explicit IsHostile(Unit const* caster) : _caster(caster) { }
+
+		bool operator()(WorldObject* obj) const
+		{
+			if (Unit* unit = obj->ToUnit())
+				return _caster->IsHostileTo(unit);
+
+			return false;
+		}
+
+	private:
+		Unit const* _caster;
+	};
+
+	class spell_rapier_of_the_gilnean_patriots_71388_SpellScript : public SpellScript
+	{
+		PrepareSpellScript(spell_rapier_of_the_gilnean_patriots_71388_SpellScript);
+
+		void FilterTargets(std::list<WorldObject*>& unitList)
+		{
+			unitList.remove_if(IsHostile(GetCaster()));
+		}
+
+		void Register() override
+		{
+			OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_rapier_of_the_gilnean_patriots_71388_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_DEST_AREA_ENTRY);
+			OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_rapier_of_the_gilnean_patriots_71388_SpellScript::FilterTargets, EFFECT_1, TARGET_UNIT_DEST_AREA_ENTRY);
+		}
+	};
+
+	SpellScript* GetSpellScript() const override
+	{
+		return new spell_rapier_of_the_gilnean_patriots_71388_SpellScript();
+	}
+};
+
+// phase 262144 ending with quest 24904, then phase 190 (2097152) is active.. 
 
 void AddSC_zone_gilneas_city3()
 {
@@ -4478,6 +4778,7 @@ void AddSC_zone_gilneas_city3()
 	new npc_sister_almyra_38466();
 	new npc_king_genn_greymane_38470();
 	new npc_lady_sylvanas_windrunner_38469();
+	new npc_soultethered_banshee_38473();
 	new npc_lorna_crowley_38426();
 	new npc_lord_darius_crowley_38415();
 	new npc_gilnean_militia_38221();
@@ -4489,5 +4790,7 @@ void AddSC_zone_gilneas_city3()
 	new npc_gorerot_38331();
 	new npc_prince_liam_greymane_38474();
 	new npc_lorna_crowley_38611();
+	new spell_rapier_of_the_gilnean_patriots_71388();
+	new spell_fiery_boulder_72050();
 }
 

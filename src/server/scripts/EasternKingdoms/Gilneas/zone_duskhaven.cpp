@@ -2366,7 +2366,10 @@ public:
 		if (quest->GetQuestId() == QUEST_PUSH_THEM_OUT)
 		{
 			if (!player->HasAura(SPELL_PHASE_QUEST_ZONE_SPECIFIC_12))
-				player->AddAura(SPELL_PHASE_QUEST_ZONE_SPECIFIC_12, player);
+			{
+				// done by phase_definition and phase_area
+				// player->AddAura(SPELL_PHASE_QUEST_ZONE_SPECIFIC_12, player);
+			}
 		}
 
 		return false;
