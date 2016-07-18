@@ -1278,14 +1278,14 @@ public:
 };
 
 // 53420
-class npc_sulfuras : public CreatureScript
+class npc_sulfuras_hand_of_ragnaros_53420 : public CreatureScript
 {
 public:
-    npc_sulfuras() : CreatureScript("npc_sulfuras") { }
+	npc_sulfuras_hand_of_ragnaros_53420() : CreatureScript("npc_sulfuras_hand_of_ragnaros_53420") { }
 
-    struct npc_sulfurasAI : public ScriptedAI
+    struct npc_sulfuras_hand_of_ragnaros_53420AI : public ScriptedAI
     {
-        npc_sulfurasAI(Creature* creature) : ScriptedAI(creature)
+		npc_sulfuras_hand_of_ragnaros_53420AI(Creature* creature) : ScriptedAI(creature)
         {
             instance = creature->GetInstanceScript();
         }
@@ -1322,7 +1322,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_sulfurasAI(creature);
+        return new npc_sulfuras_hand_of_ragnaros_53420AI(creature);
     }
 };
 
@@ -2125,7 +2125,7 @@ void AddSC_boss_ragnaros_firelands()
     new npc_sulfuras_smash();
     new npc_magma_trap();
     new npc_splitting_blow();
-    new npc_sulfuras();
+    new npc_sulfuras_hand_of_ragnaros_53420();
     new npc_engulfing_flames();
     new npc_molten_seed();
     new npc_living_meteor();

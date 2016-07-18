@@ -937,6 +937,7 @@ class ExactDistanceCheck
         float _dist;
 };
 
+// 70346 72456 72868 72869
 class spell_putricide_slime_puddle : public SpellScriptLoader
 {
     public:
