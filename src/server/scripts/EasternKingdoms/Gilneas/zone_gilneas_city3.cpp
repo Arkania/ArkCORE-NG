@@ -1308,7 +1308,8 @@ public:
 
 					if (m_nearestTarget)
 					{
-						if (GetWavePosition().GetExactDist2d(&me->GetPosition()) > 3.0f)
+						Position pos = me->GetPosition();
+						if (GetWavePosition().GetExactDist2d(&pos) > 3.0f)
 						{
 							// redo the move, if my distance are growing..
 							m_events.RescheduleEvent(EVENT_MOVE_WAVE, 500);
@@ -1978,7 +1979,8 @@ public:
 
 					if (m_nearestTarget)
 					{
-						if (GetWavePosition().GetExactDist2d(&me->GetPosition()) > 3.0f)
+						Position pos = me->GetPosition();
+						if (GetWavePosition().GetExactDist2d(&pos) > 3.0f)
 						{
 							m_events.RescheduleEvent(EVENT_MOVE_WAVE, 500);
 						}
@@ -2383,7 +2385,8 @@ public:
 
 					if (m_nearestTarget)
 					{
-						if (GetWavePosition().GetExactDist2d(&me->GetPosition()) > 3.0f)
+						Position pos = me->GetPosition();
+						if (GetWavePosition().GetExactDist2d(&pos) > 3.0f)
 						{
 							m_events.RescheduleEvent(EVENT_MOVE_WAVE, 500);
 						}
@@ -2757,7 +2760,8 @@ public:
 
 					if (m_nearestTarget)
 					{
-						if (GetWavePosition().GetExactDist2d(&me->GetPosition()) > 3.0f)
+						Position pos = me->GetPosition();
+						if (GetWavePosition().GetExactDist2d(&pos) > 3.0f)
 						{
 							m_events.RescheduleEvent(EVENT_MOVE_WAVE, 500);
 						}
@@ -3199,7 +3203,8 @@ public:
 
 					if (m_nearestTarget)
 					{
-						if (GetWavePosition().GetExactDist2d(&me->GetPosition()) > 3.0f)
+						Position pos = me->GetPosition();
+						if (GetWavePosition().GetExactDist2d(&pos) > 3.0f)
 						{
 							m_events.RescheduleEvent(EVENT_MOVE_WAVE, 500);
 						}
@@ -3522,7 +3527,8 @@ public:
 
 					if (m_nearestTarget)
 					{
-						if (GetWavePosition().GetExactDist2d(&me->GetPosition()) > 3.0f)
+						Position pos = me->GetPosition();
+						if (GetWavePosition().GetExactDist2d(&pos) > 3.0f)
 						{
 							m_events.RescheduleEvent(EVENT_MOVE_WAVE, 500);
 						}
