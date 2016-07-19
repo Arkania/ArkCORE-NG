@@ -813,6 +813,11 @@ public:
 				my_victimList.push_back(summon->GetGUID());
 		}
 
+		void DamageTaken(Unit* attacker, uint32& damage) override
+		{
+			damage = 0;
+		}
+
 		void MovementInform(uint32 type, uint32 id) override
 		{
 			if (type == POINT_MOTION_TYPE)
@@ -1081,6 +1086,12 @@ public:
 					}
 					else
 					{
+						if (m_wave == 4 && m_point == 16 && !IsPlayerNear(20.0f))
+						{
+							m_events.RescheduleEvent(EVENT_FIGHT_WAVE, 1000);
+							break;
+						}
+
 						m_point += 1;
 						m_events.RescheduleEvent(EVENT_MOVE_WAVE, 10);
 					}
@@ -1097,17 +1108,19 @@ public:
 						mask = 7;
 						break;
 					case 3:
-						mask = 15;
+						mask = 15 + 128;
 						break;
 					case 4:
 					case 5:
 					case 6:
-						mask = 31;
+						mask = 31 + 128;
 						break;
 					case 7:
-						mask = 63;
+						mask = 63 + 128;
 						break;
 					}
+					if (IsPlayerNear(25.0f))
+						m_arrivedMask |= 128;
 
 					if ((m_arrivedMask & mask) == mask)
 					{
@@ -1388,6 +1401,11 @@ public:
 
 
 		}
+
+		bool IsPlayerNear(float range)
+		{
+			return (me->FindNearestPlayer(range)) ? true : false;
+		}
 	};
 
 	CreatureAI* GetAI(Creature* creature) const override
@@ -1520,6 +1538,11 @@ public:
 			if (my_followerList.empty())
 				SummonMyMember();
 			me->SetSpeed(MOVE_RUN, 1.0f, true);
+		}
+
+		void DamageTaken(Unit* attacker, uint32& damage) override
+		{
+			damage = 0;
 		}
 
 		void JustSummoned(Creature* summon) override
@@ -2074,6 +2097,11 @@ public:
 				SummonMyMember();
 		}
 
+		void DamageTaken(Unit* attacker, uint32& damage) override
+		{
+			damage = 0;
+		}
+
 		void JustSummoned(Creature* summon) override
 		{
 			my_followerList.push_back(summon->GetGUID());
@@ -2511,6 +2539,11 @@ public:
 			me->SetReactState(REACT_PASSIVE);
 			if (my_followerList.empty())
 				SummonMyMember();
+		}
+
+		void DamageTaken(Unit* attacker, uint32& damage) override
+		{
+			damage = 0;
 		}
 
 		void JustSummoned(Creature* summon) override
@@ -2996,6 +3029,11 @@ public:
 				SummonMyMember();
 		}
 
+		void DamageTaken(Unit* attacker, uint32& damage) override
+		{
+			damage = 0;
+		}
+
 		void JustSummoned(Creature* summon) override
 		{
 			my_followerList.push_back(summon->GetGUID());
@@ -3346,6 +3384,11 @@ public:
 			me->SetReactState(REACT_PASSIVE);
 			if (my_followerList.empty())
 				SummonMyMember();
+		}
+
+		void DamageTaken(Unit* attacker, uint32& damage) override
+		{
+			damage = 0;
 		}
 
 		void JustSummoned(Creature* summon) override
@@ -3806,7 +3849,6 @@ public:
 			for (uint32 i = 0; i < 3; ++i)
 				if (Creature* summon = DoSummon(NPC_SOULTETHERED_BANSHEE, SpawnPosSoultetheredBanshee[i], 0, TEMPSUMMON_DEAD_DESPAWN))
 					summon->SetReactState(REACT_PASSIVE);
-
 		}
 
 		void RemoveMyMember()
@@ -3951,19 +3993,20 @@ public:
 
 		void SpellHit(Unit* caster, SpellInfo const* spell) override
 		{
-			if (spell->Id == SPELL_SHOOT_LIAM)
-			{
-				me->CastSpell(me, SPELL_LIAM_SLAIN_DUMMY);
-
-				if (Creature* sylvana = sObjectAccessor->GetCreature(*me, m_sylvanaGUID))
-					sylvana->AI()->DoAction(ACTION_LIAM_IS_DEATH);
-
-				if (Creature* king = sObjectAccessor->GetCreature(*me, m_kingGUID))
+			if (caster->GetEntry() == NPC_LADY_SYLVANAS_WINDRUNNER)
+				if (spell->Id == SPELL_SHOOT_LIAM)
 				{
-					king->GetMotionMaster()->MovePoint(1002, -1680.864f, 1619.74f, 20.48808f);
-					king->AI()->Talk(1);
+					me->CastSpell(me, SPELL_LIAM_SLAIN_DUMMY);
+
+					if (Creature* sylvana = sObjectAccessor->GetCreature(*me, m_sylvanaGUID))
+						sylvana->AI()->DoAction(ACTION_LIAM_IS_DEATH);
+
+					if (Creature* king = sObjectAccessor->GetCreature(*me, m_kingGUID))
+					{
+						king->GetMotionMaster()->MovePoint(1002, -1680.864f, 1619.74f, 20.48808f);
+						king->AI()->Talk(1);
+					}
 				}
-			}
 		}
 
 		void MovementInform(uint32 type, uint32 id) override
@@ -4703,12 +4746,9 @@ public:
 
 		void FilterTargets(std::list<WorldObject*>& unitList)
 		{
-			if (!unitList.empty())
-				printf("spell_fiery_boulder_72050_SpellScript %u \n", unitList.size());
-
 			unitList.remove_if(IsFriendly(GetCaster()));
 		}
-		
+
 		void Register() override
 		{
 			OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_fiery_boulder_72050_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_DEST_AREA_ENEMY);
@@ -4767,6 +4807,36 @@ public:
 	}
 };
 
+// 72116
+class spell_shoot_liam_72116 : public SpellScriptLoader
+{
+public:
+	spell_shoot_liam_72116() : SpellScriptLoader("spell_shoot_liam_72116") { }
+
+	class spell_shoot_liam_72116_SpellScript : public SpellScript
+	{
+		PrepareSpellScript(spell_shoot_liam_72116_SpellScript);
+
+		void CheckTarget(WorldObject*& target)
+		{
+			if (target)
+				if (target->GetEntry() != 38474)
+					target = target->FindNearestCreature(38474, 25.0f);
+		}
+
+		void Register() override
+		{
+			OnObjectTargetSelect += SpellObjectTargetSelectFn(spell_shoot_liam_72116_SpellScript::CheckTarget, EFFECT_0, TARGET_UNIT_NEARBY_ENTRY);
+		}
+	};
+
+	SpellScript* GetSpellScript() const override
+	{
+		return new spell_shoot_liam_72116_SpellScript();
+	}
+};
+
+
 // phase 262144 ending with quest 24904, then phase 190 (2097152) is active.. 
 
 void AddSC_zone_gilneas_city3()
@@ -4792,5 +4862,6 @@ void AddSC_zone_gilneas_city3()
 	new npc_lorna_crowley_38611();
 	new spell_rapier_of_the_gilnean_patriots_71388();
 	new spell_fiery_boulder_72050();
+	new spell_shoot_liam_72116();
 }
 
