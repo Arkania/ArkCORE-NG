@@ -61,9 +61,9 @@ public:
 
 SmartScript::SmartScript()
 {
-    go = NULL;
-    me = NULL;
-    trigger = NULL;
+    go = nullptr;
+    me = nullptr;
+    trigger = nullptr;
     mEventPhase = 0;
     mPathId = 0;
     mTargetStorage = new ObjectListMap();
@@ -147,7 +147,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
     {
         ObjectList* targets = GetTargets(e, unit);
         Creature* talker = me;
-        Player* targetPlayer = NULL;
+        Player* targetPlayer = nullptr;
         if (targets)
         {
             for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
@@ -173,7 +173,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         mTalkerEntry = talker->GetEntry();
         mLastTextID = e.action.talk.textGroupID;
         mTextTimer = e.action.talk.duration;
-        Unit* talkTarget = NULL;
+        Unit* talkTarget = nullptr;
         if (IsPlayer(GetLastInvoker())) // used for $vars in texts and whisper target
             talkTarget = GetLastInvoker();
         else if (targetPlayer)
@@ -1485,7 +1485,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         if (!IsSmart())
             break;
 
-        WorldObject* target = NULL;
+        WorldObject* target = nullptr;
 
         if (e.GetTargetType() == SMART_TARGET_CREATURE_RANGE || e.GetTargetType() == SMART_TARGET_CREATURE_GUID ||
             e.GetTargetType() == SMART_TARGET_CREATURE_DISTANCE || e.GetTargetType() == SMART_TARGET_GAMEOBJECT_RANGE ||
@@ -1638,7 +1638,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     meOrigGUID = me ? me->GetGUID() : 0;
                 if (!goOrigGUID)
                     goOrigGUID = go ? go->GetGUID() : 0;
-                go = NULL;
+                go = nullptr;
                 me = (*itr)->ToCreature();
                 break;
             }
@@ -1649,7 +1649,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 if (!goOrigGUID)
                     goOrigGUID = go ? go->GetGUID() : 0;
                 go = (*itr)->ToGameObject();
-                me = NULL;
+                me = nullptr;
                 break;
             }
         }
@@ -2516,7 +2516,7 @@ SmartScriptHolder SmartScript::CreateEvent(SMART_EVENT e, uint32 event_flags, ui
 
 ObjectList* SmartScript::GetTargets(SmartScriptHolder const& e, Unit* invoker /*= NULL*/)
 {
-    Unit* scriptTrigger = NULL;
+    Unit* scriptTrigger = nullptr;
     if (invoker)
         scriptTrigger = invoker;
     else if (Unit* tempLastInvoker = GetLastInvoker())
@@ -2571,7 +2571,7 @@ ObjectList* SmartScript::GetTargets(SmartScriptHolder const& e, Unit* invoker /*
             {
                 if (Group* group = player->GetGroup())
                 {
-                    for (GroupReference* groupRef = group->GetFirstMember(); groupRef != NULL; groupRef = groupRef->next())
+                    for (GroupReference* groupRef = group->GetFirstMember(); groupRef != nullptr; groupRef = groupRef->next())
                         if (Player* member = groupRef->GetSource())
                             l->push_back(member);
                 }
@@ -2661,7 +2661,7 @@ ObjectList* SmartScript::GetTargets(SmartScriptHolder const& e, Unit* invoker /*
     }
     case SMART_TARGET_CREATURE_GUID:
     {
-        Creature* target = NULL;
+        Creature* target = nullptr;
         if (!scriptTrigger && !baseObject)
         {
             TC_LOG_ERROR("sql.sql", "SMART_TARGET_CREATURE_GUID can not be used without invoker");
@@ -2676,7 +2676,7 @@ ObjectList* SmartScript::GetTargets(SmartScriptHolder const& e, Unit* invoker /*
     }
     case SMART_TARGET_GAMEOBJECT_GUID:
     {
-        GameObject* target = NULL;
+        GameObject* target = nullptr;
         if (!scriptTrigger && !baseObject)
         {
             TC_LOG_ERROR("sql.sql", "SMART_TARGET_GAMEOBJECT_GUID can not be used without invoker");
@@ -2797,7 +2797,7 @@ ObjectList* SmartScript::GetTargets(SmartScriptHolder const& e, Unit* invoker /*
     if (l->empty())
     {
         delete l;
-        l = NULL;
+        l = nullptr;
     }
 
     return l;
@@ -3238,7 +3238,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
         if (!me || !me->IsInCombat())
             return;
 
-        ObjectList* _targets = NULL;
+        ObjectList* _targets = nullptr;
 
         switch (e.GetTargetType())
         {
@@ -3258,7 +3258,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
         if (!_targets)
             return;
 
-        Unit* target = NULL;
+        Unit* target = nullptr;
 
         for (ObjectList::const_iterator itr = _targets->begin(); itr != _targets->end(); ++itr)
         {
@@ -3287,7 +3287,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
         if (!me)
             return;
 
-        WorldObject* creature = NULL;
+        WorldObject* creature = nullptr;
 
         if (e.event.distance.guid != 0)
         {
@@ -3318,7 +3318,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
         if (!me)
             return;
 
-        WorldObject* gameobject = NULL;
+        WorldObject* gameobject = nullptr;
 
         if (e.event.distance.guid != 0)
         {
@@ -3681,7 +3681,7 @@ Unit* SmartScript::DoSelectLowestHpFriendly(float range, uint32 MinHPDiff)
     Cell cell(p);
     cell.SetNoCreate();
 
-    Unit* unit = NULL;
+    Unit* unit = nullptr;
 
     Trinity::MostHPMissingInRange u_check(me, range, MinHPDiff);
     Trinity::UnitLastSearcher<Trinity::MostHPMissingInRange> searcher(me, unit, u_check);
@@ -3731,7 +3731,7 @@ Unit* SmartScript::DoFindClosestFriendlyInRange(float range, bool playerOnly)
     if (!me)
         return NULL;
 
-    Unit* unit = NULL;
+    Unit* unit = nullptr;
     Trinity::AnyFriendlyUnitInObjectRangeCheck u_check(me, me, range, playerOnly);
     Trinity::UnitLastSearcher<Trinity::AnyFriendlyUnitInObjectRangeCheck> searcher(me, unit, u_check);
     me->VisitNearbyObject(range, searcher);

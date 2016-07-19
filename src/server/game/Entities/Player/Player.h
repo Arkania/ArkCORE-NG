@@ -1885,7 +1885,7 @@ class Player : public Unit, public GridObject<Player>
         void ClearResurrectRequestData()
         {
             delete _resurrectionData;
-            _resurrectionData = NULL;
+            _resurrectionData = nullptr;
         }
 
         bool IsRessurectRequestedBy(uint64 guid) const
@@ -1896,7 +1896,7 @@ class Player : public Unit, public GridObject<Player>
             return _resurrectionData->GUID == guid;
         }
 
-        bool IsRessurectRequested() const { return _resurrectionData != NULL; }
+        bool IsRessurectRequested() const { return _resurrectionData != nullptr; }
         void ResurectUsingRequestData();
 
         uint8 getCinematic() { return m_cinematic; }

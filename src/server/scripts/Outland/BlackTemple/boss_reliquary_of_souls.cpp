@@ -256,7 +256,7 @@ public:
                 return;
             }
 
-            Creature* Essence = NULL;
+            Creature* Essence = nullptr;
             if (EssenceGUID)
             {
                 Essence = ObjectAccessor::GetCreature(*me, EssenceGUID);

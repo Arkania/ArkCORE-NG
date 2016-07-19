@@ -79,7 +79,7 @@ Object::Object() : m_PackGUID(sizeof(uint64)+1)
     m_objectType        = TYPEMASK_OBJECT;
     m_updateFlag        = UPDATEFLAG_NONE;
 
-    m_uint32Values      = NULL;
+    m_uint32Values      = nullptr;
     m_valuesCount       = 0;
     _fieldNotifyFlags   = UF_FLAG_DYNAMIC;
 
@@ -345,7 +345,7 @@ uint16 Object::GetUInt16Value(uint16 index, uint8 offset) const
 
 void Object::BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
 {
-    Unit const* self = NULL;
+    Unit const* self = nullptr;
     ObjectGuid guid = GetGUID();
     uint32 movementFlags = 0;
     uint16 movementFlagsExtra = 0;
@@ -678,7 +678,7 @@ void Object::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* targe
     UpdateMask updateMask;
     updateMask.SetCount(m_valuesCount);
 
-    uint32* flags = NULL;
+    uint32* flags = nullptr;
     uint32 visibleFlag = GetUpdateFieldData(target, flags);
 
     for (uint16 index = 0; index < m_valuesCount; ++index)
@@ -2284,7 +2284,7 @@ void WorldObject::ResetMap()
     ASSERT(!IsInWorld());
     if (IsWorldObject())
         m_currMap->RemoveWorldObject(this);
-    m_currMap = NULL;
+    m_currMap = nullptr;
     //maybe not for corpse
     //m_mapId = 0;
     //m_InstanceId = 0;
@@ -2369,7 +2369,7 @@ TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropert
             team = summoner->ToPlayer()->GetTeam();
     }
 
-    TempSummon* summon = NULL;
+    TempSummon* summon = nullptr;
     switch (mask)
     {
         case UNIT_MASK_SUMMON:
@@ -2551,7 +2551,7 @@ void WorldObject::SummonCreatureGroup(uint8 group, std::list<TempSummon*>* list 
 
 Creature* WorldObject::FindNearestCreature(uint32 entry, float range, bool alive) const
 {
-    Creature* creature = NULL;
+    Creature* creature = nullptr;
     Trinity::NearestCreatureEntryWithLiveStateInObjectRangeCheck checker(*this, entry, alive, range);
     Trinity::CreatureLastSearcher<Trinity::NearestCreatureEntryWithLiveStateInObjectRangeCheck> searcher(this, creature, checker);
     VisitNearbyObject(range, searcher);
@@ -2560,7 +2560,7 @@ Creature* WorldObject::FindNearestCreature(uint32 entry, float range, bool alive
 
 Creature* WorldObject::FindNearestCreature(std::list<uint32> entrys, float range, bool alive) const
 {
-    Creature* creature = NULL;
+    Creature* creature = nullptr;
     float dist = range;
     for (std::list<uint32>::iterator itr = entrys.begin(); itr != entrys.end(); ++itr)
         if (Creature* npc = FindNearestCreature((*itr), range, alive))
@@ -2604,7 +2604,7 @@ std::vector<Creature*> WorldObject::FindNearestCreatures(uint32 entry, float ran
 
 Creature* WorldObject::FindRandomCreatureInRange(uint32 entry, float range, bool alive)
 {
-    Creature* creature = NULL;
+    Creature* creature = nullptr;
     std::list<Creature*> creatureList = FindNearestCreatures(entry, range);
     if (creatureList.empty())
         return NULL;
@@ -2623,7 +2623,7 @@ Creature* WorldObject::FindRandomCreatureInRange(uint32 entry, float range, bool
 
 GameObject* WorldObject::FindNearestGameObject(uint32 entry, float range) const
 {
-    GameObject* go = NULL;
+    GameObject* go = nullptr;
     Trinity::NearestGameObjectEntryInObjectRangeCheck checker(*this, entry, range);
     Trinity::GameObjectLastSearcher<Trinity::NearestGameObjectEntryInObjectRangeCheck> searcher(this, go, checker);
     VisitNearbyGridObject(range, searcher);
@@ -2632,7 +2632,7 @@ GameObject* WorldObject::FindNearestGameObject(uint32 entry, float range) const
 
 GameObject* WorldObject::FindNearestGameObjectOfType(GameobjectTypes type, float range) const
 {
-    GameObject* go = NULL;
+    GameObject* go = nullptr;
     Trinity::NearestGameObjectTypeInObjectRangeCheck checker(*this, type, range);
     Trinity::GameObjectLastSearcher<Trinity::NearestGameObjectTypeInObjectRangeCheck> searcher(this, go, checker);
     VisitNearbyGridObject(range, searcher);
@@ -2641,7 +2641,7 @@ GameObject* WorldObject::FindNearestGameObjectOfType(GameobjectTypes type, float
 
 Player* WorldObject::FindNearestPlayer(float range, bool alive)
 {
-    Player* player = NULL;
+    Player* player = nullptr;
     Trinity::AnyPlayerInObjectRangeCheck checker(this, range, alive);
     Trinity::PlayerSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(this, player, checker);
     VisitNearbyWorldObject(range, searcher);
@@ -2659,7 +2659,7 @@ std::list<Player*> WorldObject::FindNearestPlayers(float range, bool alive)
 
 Player* WorldObject::FindRandomPlayerInRange(float range, bool alive)
 {
-    Player* player = NULL;
+    Player* player = nullptr;
     std::list<Player*> PlayerList = FindNearestPlayers(range, alive);
     if (PlayerList.empty())
         return NULL;
@@ -3128,7 +3128,7 @@ struct WorldObjectChangeAccumulator
     WorldObjectChangeAccumulator(WorldObject &obj, UpdateDataMapType &d) : i_updateDatas(d), i_object(obj) { }
     void Visit(PlayerMapType &m)
     {
-        Player* source = NULL;
+        Player* source = nullptr;
         for (PlayerMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
         {
             source = iter->GetSource();
@@ -3146,7 +3146,7 @@ struct WorldObjectChangeAccumulator
 
     void Visit(CreatureMapType &m)
     {
-        Creature* source = NULL;
+        Creature* source = nullptr;
         for (CreatureMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
         {
             source = iter->GetSource();
@@ -3161,7 +3161,7 @@ struct WorldObjectChangeAccumulator
 
     void Visit(DynamicObjectMapType &m)
     {
-        DynamicObject* source = NULL;
+        DynamicObject* source = nullptr;
         for (DynamicObjectMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
         {
             source = iter->GetSource();

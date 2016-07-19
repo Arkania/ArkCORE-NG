@@ -306,7 +306,7 @@ class spell_dk_blood_gorged : public SpellScriptLoader
 
             bool Load() override
             {
-                _procTarget = NULL;
+                _procTarget = nullptr;
                 return true;
             }
 
@@ -542,7 +542,7 @@ class spell_dk_death_pact : public SpellScriptLoader
 
             void FilterTargets(std::list<WorldObject*>& targetList)
             {
-                Unit* target = NULL;
+                Unit* target = nullptr;
                 for (std::list<WorldObject*>::iterator itr = targetList.begin(); itr != targetList.end(); ++itr)
                 {
                     if (Unit* unit = (*itr)->ToUnit())
@@ -1167,7 +1167,7 @@ class spell_dk_raise_dead : public SpellScriptLoader
             {
                 // Don't add caster to target map, if we found a corpse to raise dead
                 if (_corpse)
-                    target = NULL;
+                    target = nullptr;
             }
 
             void ConsumeReagents()
@@ -1890,7 +1890,7 @@ public:
         {
             Unit* caster = GetCaster();
             Unit* target = GetHitUnit();
-            Aura* aura = NULL;
+            Aura* aura = nullptr;
             int32 newDuration = GetSpellInfo()->Effects[EFFECT_2].BasePoints * 1000;
             // Increase chains of ice
             if (aura = target->GetAura(45524, caster->GetGUID()))

@@ -26,7 +26,7 @@ namespace MMAP
 {
     // ######################## MMapFactory ########################
     // our global singleton copy
-    MMapManager* g_MMapManager = NULL;
+    MMapManager* g_MMapManager = nullptr;
 
     MMapManager* MMapFactory::createOrGetMMapManager()
     {
@@ -47,7 +47,7 @@ namespace MMAP
         if (g_MMapManager)
         {
             delete g_MMapManager;
-            g_MMapManager = NULL;
+            g_MMapManager = nullptr;
         }
     }
 }

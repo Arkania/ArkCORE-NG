@@ -302,7 +302,7 @@ public:
         }
         void SpawnHordeNpcs()
         {
-            GameObject* door = NULL;
+            GameObject* door = nullptr;
             if (m_ListOfGUID[0] > 0)
                 if (door = instance->GetGameObject(m_ListOfGUID[0]))
                 {
@@ -312,7 +312,7 @@ public:
         }
         void SpawnAllyNpcs()
         {
-            GameObject* door = NULL;
+            GameObject* door = nullptr;
             if (m_ListOfGUID[0] > 0)
                 if (door = instance->GetGameObject(m_ListOfGUID[0]))
                 {

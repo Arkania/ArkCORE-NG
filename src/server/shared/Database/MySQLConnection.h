@@ -90,7 +90,7 @@ class MySQLConnection
         void CommitTransaction();
         bool ExecuteTransaction(SQLTransaction& transaction);
 
-        operator bool () const { return m_Mysql != NULL; }
+        operator bool () const { return m_Mysql != nullptr; }
         void Ping() { mysql_ping(m_Mysql); }
 
         uint32 GetLastError() { return mysql_errno(m_Mysql); }

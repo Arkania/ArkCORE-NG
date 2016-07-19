@@ -887,7 +887,7 @@ public:
 
         bool DoUpdate(const uint32 time_diff)
         {
-            Unit* target = NULL;
+            Unit* target = nullptr;
 
             if (instance)
                 target = Unit::GetCreature(*me, instance->GetData64(DATA_HARBINGER));

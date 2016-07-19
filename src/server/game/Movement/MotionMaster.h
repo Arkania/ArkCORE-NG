@@ -91,7 +91,7 @@ class MotionMaster //: private std::stack<MovementGenerator *>
             if (empty())
                 return;
 
-            Impl[_top] = NULL;
+            Impl[_top] = nullptr;
             while (!empty() && !top())
                 --_top;
         }
@@ -110,7 +110,7 @@ class MotionMaster //: private std::stack<MovementGenerator *>
         {
             for (uint8 i = 0; i < MAX_MOTION_SLOT; ++i)
             {
-                Impl[i] = NULL;
+                Impl[i] = nullptr;
                 _needInit[i] = true;
             }
         }

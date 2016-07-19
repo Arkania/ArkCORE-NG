@@ -1219,7 +1219,7 @@ void SmartAIMgr::LoadHelperStores()
 {
     uint32 oldMSTime = getMSTime();
 
-    SpellInfo const* spellInfo = NULL;
+    SpellInfo const* spellInfo = nullptr;
     for (uint32 i = 0; i < sSpellMgr->GetSpellInfoStoreSize(); ++i)
     {
         spellInfo = sSpellMgr->GetSpellInfo(i);

@@ -383,7 +383,7 @@ public:
 
     void ResetSlots(uint32 team)
     {
-        _transport = NULL;
+        _transport = nullptr;
         memset(_controlledSlots, 0, sizeof(uint64)* MAX_SLOTS);
         memset(_respawnCooldowns, 0, sizeof(time_t)* MAX_SLOTS);
         _spawnPoint = team == HORDE ? &OrgrimsHammerAddsSpawnPos : &SkybreakerAddsSpawnPos;

@@ -655,7 +655,7 @@ public:
             if (Heal_Timer <= diff)
             {
                 // It can be cast on any of the mobs
-                Unit* unit = NULL;
+                Unit* unit = nullptr;
 
                 while (unit == NULL || !unit->IsAlive())
                     unit = selectAdvisorUnit();
@@ -672,7 +672,7 @@ public:
 
         Unit* selectAdvisorUnit()
         {
-            Unit* unit = NULL;
+            Unit* unit = nullptr;
             switch (rand()%4)
             {
             case 0:

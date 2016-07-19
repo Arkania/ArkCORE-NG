@@ -547,7 +547,7 @@ class spell_mage_focus_magic : public SpellScriptLoader
 
             bool Load() override
             {
-                _procTarget = NULL;
+                _procTarget = nullptr;
                 return true;
             }
 
@@ -1072,7 +1072,7 @@ class spell_mage_polymorph : public SpellScriptLoader
 
             bool Load() override
             {
-                _caster = NULL;
+                _caster = nullptr;
                 return true;
             }
 
@@ -1232,7 +1232,7 @@ class spell_mage_ring_of_frost : public SpellScriptLoader
 
             bool Load() override
             {
-                ringOfFrost = NULL;
+                ringOfFrost = nullptr;
                 return true;
             }
 

@@ -371,7 +371,7 @@ void WorldSession::HandleSetEveryoneIsAssistant(WorldPacket& recvData)
 
     if (active)
     {
-        for (GroupReference *itr = group->GetFirstMember(); itr != NULL; itr = itr->next()) // Loop through all members
+        for (GroupReference *itr = group->GetFirstMember(); itr != nullptr; itr = itr->next()) // Loop through all members
             if (Player *player = itr->GetSource())
                 group->SetGroupMemberFlag(player->GetGUID(), active, MEMBER_FLAG_ASSISTANT);
 
@@ -379,7 +379,7 @@ void WorldSession::HandleSetEveryoneIsAssistant(WorldPacket& recvData)
     }
     else
     {
-        for (GroupReference *itr = group->GetFirstMember(); itr != NULL; itr = itr->next()) // Loop through all members
+        for (GroupReference *itr = group->GetFirstMember(); itr != nullptr; itr = itr->next()) // Loop through all members
             if (Player *player = itr->GetSource())
                 group->SetGroupMemberFlag(player->GetGUID(), !active, MEMBER_FLAG_ASSISTANT);
 

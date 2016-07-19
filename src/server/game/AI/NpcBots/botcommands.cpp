@@ -337,7 +337,7 @@ public:
             Group* gr = owner->GetGroup();
             if (gr && owner->GetMap()->Instanceable() && /*gr->isRaidGroup() &&*/ gr->IsLeader(owner->GetGUID()))
             {
-                for (GroupReference* itr = gr->GetFirstMember(); itr != NULL; itr = itr->next())
+                for (GroupReference* itr = gr->GetFirstMember(); itr != nullptr; itr = itr->next())
                 {
                     Player* pl = itr->GetSource();
                     if (pl && pl->IsInWorld() && pl->GetMap() == owner->GetMap())
@@ -458,7 +458,7 @@ public:
     static bool HandleNpcBotResetCommand(ChatHandler* handler, const char* /*args*/)
     {
         Player* owner = handler->GetSession()->GetPlayer();
-        Player* master = NULL;
+        Player* master = nullptr;
         bool all = false;
         uint64 guid = owner->GetSelection();
         if (!guid)

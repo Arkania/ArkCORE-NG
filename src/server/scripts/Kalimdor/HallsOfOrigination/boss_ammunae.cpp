@@ -115,8 +115,8 @@ class boss_ammunae : public CreatureScript
                 i = 0;
                 for(uint8 p=0; p<10; p++)
                 {
-                    seedling[p] = NULL;
-                    blossom[p] = NULL;
+                    seedling[p] = nullptr;
+                    blossom[p] = nullptr;
                 }
             }
 
@@ -139,8 +139,8 @@ class boss_ammunae : public CreatureScript
                 i = 0;
                 for(uint8 p=0; p<10; p++)
                 {
-                    seedling[p] = NULL;
-                    blossom[p] = NULL;
+                    seedling[p] = nullptr;
+                    blossom[p] = nullptr;
                 }
                 Talk(SAY_AGGRO);
             }
@@ -200,7 +200,7 @@ class boss_ammunae : public CreatureScript
 
                 if (m_uiLife_Drain_Timer <= uiDiff)
                 {
-                    Unit *pTarget = NULL;
+                    Unit *pTarget = nullptr;
 
                     uint8 i = 0;
                     while (i < 5)                                   // max 5 tries to get a random target with power_mana
@@ -222,7 +222,7 @@ class boss_ammunae : public CreatureScript
 
                 if (m_uiLife_Drain2_Timer <= uiDiff)
                 {
-                    Unit *pTarget = NULL;
+                    Unit *pTarget = nullptr;
 
                     uint8 i = 0;
                     while (i < 5)                                   // max 5 tries to get a random target with power_energy
@@ -243,7 +243,7 @@ class boss_ammunae : public CreatureScript
 
                 if (m_uiLife_Drain3_Timer <= uiDiff)
                 {
-                    Unit *pTarget = NULL;
+                    Unit *pTarget = nullptr;
 
                     uint8 i = 0;
                     while (i < 5)                                   // max 5 tries to get a random target with power_runic
@@ -264,7 +264,7 @@ class boss_ammunae : public CreatureScript
 
                 if (m_uiLife_Drain4_Timer <= uiDiff)
                 {
-                    Unit *pTarget = NULL;
+                    Unit *pTarget = nullptr;
 
                     uint8 i = 0;
                     while (i < 5)                                   // max 5 tries to get a random target with power_rage
@@ -285,7 +285,7 @@ class boss_ammunae : public CreatureScript
 
                 if (m_uiLife_Drain5_Timer <= uiDiff)
                 {
-                    Unit *pTarget = NULL;
+                    Unit *pTarget = nullptr;
 
                     uint8 i = 0;
                     while (i < 5)                                   // max 5 tries to get a random target with power_focus
@@ -351,8 +351,8 @@ class boss_ammunae : public CreatureScript
                         }
                     for(uint8 p=0; p<10; p++)
                     {
-                        seedling[p] = NULL;
-                        blossom[p] = NULL;
+                        seedling[p] = nullptr;
+                        blossom[p] = nullptr;
                     }
                     i = 0;
                     m_uiBoomTimer = 0;

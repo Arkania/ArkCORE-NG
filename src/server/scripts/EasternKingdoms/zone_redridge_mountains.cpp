@@ -183,8 +183,8 @@ public:
         void Reset() override
         {
             m_timer = 1000;
-            m_dumpy = NULL;
-            m_keeshan = NULL;
+            m_dumpy = nullptr;
+            m_keeshan = nullptr;
             m_FightStatus = eFightStatus::None;
             m_FightStatusOld = eFightStatus::None;
         }
@@ -508,7 +508,7 @@ public:
             {
             case 0:
             {
-                Player* player = NULL;
+                Player* player = nullptr;
                 if (Unit* unit = me->GetOwner())
                     if (player = unit->ToPlayer())
                         if (player->IsInCombat())
@@ -941,7 +941,7 @@ public:
         {
             m_timer = 0;
             m_phase = 0;
-            m_player = NULL;
+            m_player = nullptr;
         }
 
         void StartAnim(Player* player)
@@ -1124,7 +1124,7 @@ public:
         {
             m_timer = 0;
             m_phase = 0;
-            m_player = NULL;
+            m_player = nullptr;
         }
 
         void StartAnim(Player* player)
@@ -2731,7 +2731,7 @@ public:
         {
             m_timer = 0;
             m_phase = 0;
-            m_player = NULL;
+            m_player = nullptr;
         }
 
         void StartAnimTrotman(Player* player)

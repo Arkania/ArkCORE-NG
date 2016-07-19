@@ -86,7 +86,7 @@ public:
         if (!guidLow)
             return false;
 
-        GameObject* object = NULL;
+        GameObject* object = nullptr;
 
         // by DB guid
         if (GameObjectData const* goData = sObjectMgr->GetGOData(guidLow))
@@ -355,7 +355,7 @@ public:
         if (!guidLow)
             return false;
 
-        GameObject* object = NULL;
+        GameObject* object = nullptr;
 
         // by DB guid
         if (GameObjectData const* gameObjectData = sObjectMgr->GetGOData(guidLow))
@@ -403,7 +403,7 @@ public:
         if (!guidLow)
             return false;
 
-        GameObject* object = NULL;
+        GameObject* object = nullptr;
 
         // by DB guid
         if (GameObjectData const* gameObjectData = sObjectMgr->GetGOData(guidLow))
@@ -452,7 +452,7 @@ public:
         if (!guidLow)
             return false;
 
-        GameObject* object = NULL;
+        GameObject* object = nullptr;
 
         // by DB guid
         if (GameObjectData const* gameObjectData = sObjectMgr->GetGOData(guidLow))
@@ -517,7 +517,7 @@ public:
         if (!guidLow)
             return false;
 
-        GameObject* object = NULL;
+        GameObject* object = nullptr;
 
         // by DB guid
         if (GameObjectData const* gameObjectData = sObjectMgr->GetGOData(guidLow))
@@ -640,7 +640,7 @@ public:
         if (!guidLow)
             return false;
 
-        GameObject* object = NULL;
+        GameObject* object = nullptr;
 
         if (GameObjectData const* gameObjectData = sObjectMgr->GetGOData(guidLow))
             object = handler->GetObjectGlobalyWithGuidOrNearWithDbGuid(guidLow, gameObjectData->id);

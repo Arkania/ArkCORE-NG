@@ -57,7 +57,7 @@ public:
 
         SpellCastResult CheckCast()
         {
-            Player* player = NULL;
+            Player* player = nullptr;
             player = GetCaster()->ToPlayer();
             if (!player)
                 player = GetOriginalCaster()->ToPlayer();

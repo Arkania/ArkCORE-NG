@@ -80,7 +80,7 @@ m_length(NULL)
         m_rBind[i].buffer_length = size;
         m_rBind[i].length = &m_length[i];
         m_rBind[i].is_null = &m_isNull[i];
-        m_rBind[i].error = NULL;
+        m_rBind[i].error = nullptr;
         m_rBind[i].is_unsigned = field->flags & UNSIGNED_FLAG;
 
         ++i;
@@ -203,13 +203,13 @@ void ResultSet::CleanUp()
     if (_currentRow)
     {
         delete [] _currentRow;
-        _currentRow = NULL;
+        _currentRow = nullptr;
     }
 
     if (_result)
     {
         mysql_free_result(_result);
-        _result = NULL;
+        _result = nullptr;
     }
 }
 

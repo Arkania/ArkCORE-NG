@@ -79,7 +79,7 @@ public:
     static bool HandleWpAddCommand(ChatHandler* handler, const char* args)
     {
         // optional
-        char* path_number = NULL;
+        char* path_number = nullptr;
         uint32 pathid = 0;
 
         if (*args)
@@ -145,7 +145,7 @@ public:
             return false;
 
         // optional
-        char* path_number = NULL;
+        char* path_number = nullptr;
 
         if (*args)
             path_number = strtok((char*)args, " ");
@@ -573,7 +573,7 @@ public:
         }
 
         // Next arg is: <PATHID> <WPNUM> <ARGUMENT>
-        char* arg_str = NULL;
+        char* arg_str = nullptr;
 
         // Did user provide a GUID
         // or did the user select a creature?
@@ -699,7 +699,7 @@ public:
                     {
                         handler->PSendSysMessage(LANG_WAYPOINT_VP_NOTCREATED, VISUAL_WAYPOINT);
                         delete wcreature2;
-                        wcreature2 = NULL;
+                        wcreature2 = nullptr;
                         return false;
                     }
 
@@ -710,7 +710,7 @@ public:
                     {
                         handler->PSendSysMessage(LANG_WAYPOINT_VP_NOTCREATED, VISUAL_WAYPOINT);
                         delete wcreature2;
-                        wcreature2 = NULL;
+                        wcreature2 = nullptr;
                         return false;
                     }
                     //sMapMgr->GetMap(npcCreature->GetMapId())->Add(wcreature2);

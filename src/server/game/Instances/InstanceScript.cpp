@@ -222,7 +222,7 @@ bool InstanceScript::SetBossState(uint32 id, EncounterState state)
         // call method to check wether a guild challenge can be completed
         if(bossInfo == &bosses.back() && state == DONE)
         {
-            Guild* guild = NULL;
+            Guild* guild = nullptr;
 
             for(Map::PlayerList::const_iterator itr = instance->GetPlayers().begin(); itr != instance->GetPlayers().end();++itr)
             {

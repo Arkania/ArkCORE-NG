@@ -51,7 +51,7 @@ public:
             m_LoadingInstanceTimer = 3000;
             m_IsHeroicMode = false;
             m_TeamInInstance = 0;
-            m_TeamGroup = NULL;
+            m_TeamGroup = nullptr;
             m_GroupSize = 0;
             m_SpecialNpcSpawned = false;
             m_TeamMinLevel = 0;
@@ -398,7 +398,7 @@ public:
             m_TeamMinLevel = 255;
             m_TeamMaxLevel = 0;
             if (m_GroupSize > 1)
-                for (GroupReference* itr = m_TeamGroup->GetFirstMember(); itr != NULL; itr = itr->next())
+                for (GroupReference* itr = m_TeamGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
                     if (Player* player = itr->GetSource())
                     {
                         if (player->getLevel() < m_TeamMinLevel)

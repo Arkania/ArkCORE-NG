@@ -1574,7 +1574,7 @@ public:
 
         void Reset() override
         {
-            _summoner = NULL;
+            _summoner = nullptr;
         }
 
         void IsSummonedBy(Unit* summoner) override
@@ -2037,7 +2037,7 @@ class spell_scion_of_eternity_arcane_barrage : public SpellScriptLoader
 
             bool Load() override
             {
-                return GetCaster()->GetTypeId() == TYPEID_UNIT && GetCaster()->GetInstanceScript() != NULL;
+                return GetCaster()->GetTypeId() == TYPEID_UNIT && GetCaster()->GetInstanceScript() != nullptr;
             }
 
             void FilterMeleeHoverDiskPassangers(std::list<WorldObject*>& targets)

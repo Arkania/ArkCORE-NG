@@ -359,10 +359,10 @@ public:
         void CheckTarget(WorldObject*& target)
         {
             if (target->ToPlayer())
-                target = NULL;
+                target = nullptr;
             else if (Creature* npc = target->ToCreature())
                 if (npc->GetEntry() != NPC_HORRID_ABOMINATION)
-                    target = NULL;
+                    target = nullptr;
         }
 
         void Register() override
@@ -665,7 +665,7 @@ public:
             targets.remove_if(IsNotEntry(NPC_GENERIC_TRIGGER_LAB_MP));
             if (targets.empty())
                 return;
-            WorldObject* target = NULL;
+            WorldObject* target = nullptr;
             float target_orientation = 6.28f;
             float ori = GetCaster()->GetOrientation();
             for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)

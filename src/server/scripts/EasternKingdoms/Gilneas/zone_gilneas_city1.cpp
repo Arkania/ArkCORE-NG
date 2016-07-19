@@ -1574,7 +1574,7 @@ public:
                 {
                     if (!me->IsInCombat())
                     {
-                        Creature* creature = NULL;
+                        Creature* creature = nullptr;
                         creature = me->FindNearestCreature(NPC_WORGEN_RUNT_C1, 5.0f);
                         if (!creature)
                             creature = me->FindNearestCreature(NPC_WORGEN_RUNT_C2, 5.0f);

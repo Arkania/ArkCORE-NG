@@ -776,7 +776,7 @@ class spell_gen_cannibalize : public SpellScriptLoader
             {
                 Unit* caster = GetCaster();
                 float max_range = GetSpellInfo()->GetMaxRange(false);
-                WorldObject* result = NULL;
+                WorldObject* result = nullptr;
                 // search for nearby enemy corpse in range
                 Trinity::AnyDeadUnitSpellTargetInRangeCheck check(caster, max_range, GetSpellInfo(), TARGET_CHECK_ENEMY);
                 Trinity::WorldObjectSearcher<Trinity::AnyDeadUnitSpellTargetInRangeCheck> searcher(caster, result, check);
@@ -4269,7 +4269,7 @@ public:
         {
             if (Unit* caster = GetCaster())
             {
-                Aura* stacks = NULL;
+                Aura* stacks = nullptr;
                 switch (GetId())
                 {
                 case 91041:

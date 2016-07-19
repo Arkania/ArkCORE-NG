@@ -363,7 +363,7 @@ public:
 
         uint32 lowGuid = atoi((char*)guidStr);
 
-        Creature* creature = NULL;
+        Creature* creature = nullptr;
 
         /* FIXME: impossible without entry
         if (lowguid)
@@ -500,7 +500,7 @@ public:
 
     static bool HandleNpcDeleteCommand(ChatHandler* handler, char const* args)
     {
-        Creature* unit = NULL;
+        Creature* unit = nullptr;
 
         if (*args)
         {
@@ -971,7 +971,7 @@ public:
             return false;
 
         uint32 lowguid = 0;
-        Creature* creature = NULL;
+        Creature* creature = nullptr;
 
         if (dontdel_str)
         {
@@ -997,7 +997,7 @@ public:
                 {
                     //TC_LOG_ERROR("misc", "DEBUG: type_str, NODEL ");
                     doNotDelete = true;
-                    type_str = NULL;
+                    type_str = nullptr;
                 }
             }
         }

@@ -135,7 +135,7 @@ public:
 
     static bool HandleGPSCommand(ChatHandler* handler, char const* args)
     {
-        WorldObject* object = NULL;
+        WorldObject* object = nullptr;
         if (*args)
         {
             uint64 guid = handler->extractGuidFromLink((char*)args);
@@ -756,7 +756,7 @@ public:
 
     static bool HandleGetDistanceCommand(ChatHandler* handler, char const* args)
     {
-        WorldObject* obj = NULL;
+        WorldObject* obj = nullptr;
 
         if (*args)
         {
@@ -849,7 +849,7 @@ public:
     // kick player
     static bool HandleKickPlayerCommand(ChatHandler* handler, char const* args)
     {
-        Player* target = NULL;
+        Player* target = nullptr;
         std::string playerName;
         if (!handler->extractPlayerTarget((char*)args, &target, NULL, &playerName))
             return false;
@@ -905,7 +905,7 @@ public:
         if (char const* loc = strtok(NULL, " "))
             location_str = loc;
 
-        Player* player = NULL;
+        Player* player = nullptr;
         if (!handler->extractPlayerTarget(player_str, &player))
             return false;
 
@@ -2023,7 +2023,7 @@ public:
                     break;
                 case CHASE_MOTION_TYPE:
                 {
-                    Unit* target = NULL;
+                    Unit* target = nullptr;
                     if (unit->GetTypeId() == TYPEID_PLAYER)
                         target = static_cast<ChaseMovementGenerator<Player> const*>(movementGenerator)->GetTarget();
                     else
@@ -2039,7 +2039,7 @@ public:
                 }
                 case FOLLOW_MOTION_TYPE:
                 {
-                    Unit* target = NULL;
+                    Unit* target = nullptr;
                     if (unit->GetTypeId() == TYPEID_PLAYER)
                         target = static_cast<FollowMovementGenerator<Player> const*>(movementGenerator)->GetTarget();
                     else
@@ -2154,7 +2154,7 @@ public:
 
             if (Player* player = handler->GetSession()->GetPlayer())
             {
-                GameObject* go = NULL;
+                GameObject* go = nullptr;
 
                 if (GameObjectData const* goData = sObjectMgr->GetGOData(guid))
                     go = handler->GetObjectGlobalyWithGuidOrNearWithDbGuid(guid, goData->id);
@@ -2259,8 +2259,8 @@ public:
 
     static bool HandleCombatStopCommand(ChatHandler* handler, char const* args)
     {
-        Player* target = NULL;
-        Unit* victim = NULL;
+        Player* target = nullptr;
+        Unit* victim = nullptr;
 
         if (args && strlen(args) > 0)
         {

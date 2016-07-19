@@ -340,7 +340,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvPacket)
 
                 if (!foundNewTransport)
                 {
-                    plrMover->m_transport = NULL;
+                    plrMover->m_transport = nullptr;
                     movementInfo.ResetTransport();
                 }
             }
@@ -356,7 +356,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvPacket)
     else if (plrMover && plrMover->GetTransport())                // if we were on a transport, leave
     {
         plrMover->m_transport->RemovePassenger(plrMover);
-        plrMover->m_transport = NULL;
+        plrMover->m_transport = nullptr;
         movementInfo.ResetTransport();
     }
 

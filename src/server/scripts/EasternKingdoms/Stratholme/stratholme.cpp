@@ -59,7 +59,7 @@ public:
 
         if (Group* group = player->GetGroup())
         {
-            for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
+            for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
             {
                 Player* pGroupie = itr->GetSource();
                 if (!pGroupie)

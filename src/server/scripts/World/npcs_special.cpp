@@ -124,7 +124,7 @@ public:
     {
         npc_air_force_botsAI(Creature* creature) : ScriptedAI(creature)
         {
-            SpawnAssoc = NULL;
+            SpawnAssoc = nullptr;
             SpawnedGUID = 0;
 
             // find the correct spawnhandling
@@ -148,7 +148,7 @@ public:
                 if (!spawnedTemplate)
                 {
                     TC_LOG_ERROR("sql.sql", "TCSR: Creature template entry %u does not exist in DB, which is required by npc_air_force_bots", SpawnAssoc->spawnedCreatureEntry);
-                    SpawnAssoc = NULL;
+                    SpawnAssoc = nullptr;
                     return;
                 }
             }
@@ -168,7 +168,7 @@ public:
             else
             {
                 TC_LOG_ERROR("sql.sql", "TCSR: npc_air_force_bots: wasn't able to spawn Creature %u", SpawnAssoc->spawnedCreatureEntry);
-                SpawnAssoc = NULL;
+                SpawnAssoc = nullptr;
             }
 
             return summoned;
@@ -723,7 +723,7 @@ public:
         void Reset() override
         {
             DoctorGUID = 0;
-            Coord = NULL;
+            Coord = nullptr;
 
             //no select
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -2078,7 +2078,7 @@ public:
 
         GameObject* FindNearestLauncher()
         {
-            GameObject* launcher = NULL;
+            GameObject* launcher = nullptr;
 
             if (isCluster())
             {
@@ -3224,7 +3224,7 @@ public:
         
         void Reset() override
         {
-            m_player = NULL;
+            m_player = nullptr;
             m_events.ScheduleEvent(EVENT_GO_INVISIBLE, 6000);
             m_events.ScheduleEvent(EVENT_CHECK_OWNER, 500);            
         }
@@ -3299,7 +3299,7 @@ public:
 
         void Reset() override
         {
-            m_player = NULL;
+            m_player = nullptr;
         }
 
         void IsSummonedBy(Unit* summoner)

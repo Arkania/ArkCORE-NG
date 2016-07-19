@@ -283,7 +283,7 @@ public:
                 {
                     case EVENT_MOVE_RESCUE:
                     {
-                        Creature* mount = NULL;
+                        Creature* mount = nullptr;
                         if (m_isFlying)
                         {
                             Position pos = me->GetPosition();

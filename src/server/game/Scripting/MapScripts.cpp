@@ -102,7 +102,7 @@ void Map::ScriptCommandStart(ScriptInfo const& script, uint32 delay, Object* sou
 // Helpers for ScriptProcess method.
 inline Player* Map::_GetScriptPlayerSourceOrTarget(Object* source, Object* target, const ScriptInfo* scriptInfo) const
 {
-    Player* player = NULL;
+    Player* player = nullptr;
     if (!source && !target)
         TC_LOG_ERROR("scripts", "%s source and target objects are NULL.", scriptInfo->GetDebugInfo().c_str());
     else
@@ -124,7 +124,7 @@ inline Player* Map::_GetScriptPlayerSourceOrTarget(Object* source, Object* targe
 
 inline Creature* Map::_GetScriptCreatureSourceOrTarget(Object* source, Object* target, const ScriptInfo* scriptInfo, bool bReverse) const
 {
-    Creature* creature = NULL;
+    Creature* creature = nullptr;
     if (!source && !target)
         TC_LOG_ERROR("scripts", "%s source and target objects are NULL.", scriptInfo->GetDebugInfo().c_str());
     else
@@ -157,7 +157,7 @@ inline Creature* Map::_GetScriptCreatureSourceOrTarget(Object* source, Object* t
 
 inline Unit* Map::_GetScriptUnit(Object* obj, bool isSource, const ScriptInfo* scriptInfo) const
 {
-    Unit* unit = NULL;
+    Unit* unit = nullptr;
     if (!obj)
         TC_LOG_ERROR("scripts", "%s %s object is NULL.", scriptInfo->GetDebugInfo().c_str(), isSource ? "source" : "target");
     else if (!obj->isType(TYPEMASK_UNIT))
@@ -175,7 +175,7 @@ inline Unit* Map::_GetScriptUnit(Object* obj, bool isSource, const ScriptInfo* s
 
 inline Player* Map::_GetScriptPlayer(Object* obj, bool isSource, const ScriptInfo* scriptInfo) const
 {
-    Player* player = NULL;
+    Player* player = nullptr;
     if (!obj)
         TC_LOG_ERROR("scripts", "%s %s object is NULL.", scriptInfo->GetDebugInfo().c_str(), isSource ? "source" : "target");
     else
@@ -190,7 +190,7 @@ inline Player* Map::_GetScriptPlayer(Object* obj, bool isSource, const ScriptInf
 
 inline Creature* Map::_GetScriptCreature(Object* obj, bool isSource, const ScriptInfo* scriptInfo) const
 {
-    Creature* creature = NULL;
+    Creature* creature = nullptr;
     if (!obj)
         TC_LOG_ERROR("scripts", "%s %s object is NULL.", scriptInfo->GetDebugInfo().c_str(), isSource ? "source" : "target");
     else
@@ -205,7 +205,7 @@ inline Creature* Map::_GetScriptCreature(Object* obj, bool isSource, const Scrip
 
 inline WorldObject* Map::_GetScriptWorldObject(Object* obj, bool isSource, const ScriptInfo* scriptInfo) const
 {
-    WorldObject* pWorldObject = NULL;
+    WorldObject* pWorldObject = nullptr;
     if (!obj)
         TC_LOG_ERROR("scripts", "%s %s object is NULL.",
             scriptInfo->GetDebugInfo().c_str(), isSource ? "source" : "target");
@@ -270,7 +270,7 @@ inline void Map::_ScriptProcessDoor(Object* source, Object* target, const Script
 
 inline GameObject* Map::_FindGameObject(WorldObject* searchObject, uint32 guid) const
 {
-    GameObject* gameobject = NULL;
+    GameObject* gameobject = nullptr;
 
     CellCoord p(Trinity::ComputeCellCoord(searchObject->GetPositionX(), searchObject->GetPositionY()));
     Cell cell(p);
@@ -297,7 +297,7 @@ void Map::ScriptsProcess()
     {
         ScriptAction const& step = iter->second;
 
-        Object* source = NULL;
+        Object* source = nullptr;
         if (step.sourceGUID)
         {
             switch (GUID_HIPART(step.sourceGUID))
@@ -336,7 +336,7 @@ void Map::ScriptsProcess()
             }
         }
 
-        WorldObject* target = NULL;
+        WorldObject* target = nullptr;
         if (step.targetGUID)
         {
             switch (GUID_HIPART(step.targetGUID))
@@ -681,8 +681,8 @@ void Map::ScriptsProcess()
                     break;
                 }
 
-                Unit* uSource = NULL;
-                Unit* uTarget = NULL;
+                Unit* uSource = nullptr;
+                Unit* uTarget = nullptr;
                 // source/target cast spell at target/source (script->datalong2: 0: s->t 1: s->s 2: t->t 3: t->s
                 switch (step.script->CastSpell.Flags)
                 {
@@ -732,7 +732,7 @@ void Map::ScriptsProcess()
                 if (WorldObject* object = _GetScriptWorldObject(source, true, step.script))
                 {
                     // PlaySound.Flags bitmask: 0/1=anyone/target
-                    Player* player = NULL;
+                    Player* player = nullptr;
                     if (step.script->PlaySound.Flags & SF_PLAYSOUND_TARGET_PLAYER)
                     {
                         // Target must be Player.
@@ -795,7 +795,7 @@ void Map::ScriptsProcess()
                     break;
                 }
 
-                Creature* cTarget = NULL;
+                Creature* cTarget = nullptr;
                 if (source) //using grid searcher
                 {
                     WorldObject* wSource = dynamic_cast <WorldObject*> (source);

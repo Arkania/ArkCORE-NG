@@ -249,7 +249,7 @@ class Field
 
         bool IsNull() const
         {
-            return data.value == NULL;
+            return data.value == nullptr;
         }
 
     protected:
@@ -280,7 +280,7 @@ class Field
         void CleanUp()
         {
             delete[] ((char*)data.value);
-            data.value = NULL;
+            data.value = nullptr;
         }
 
         static size_t SizeForType(MYSQL_FIELD* field)

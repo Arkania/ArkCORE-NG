@@ -160,7 +160,7 @@ public:
 
         void Reset() override
         {
-            ryga = NULL;
+            ryga = nullptr;
             DoCast(me, SPELL_ANCESTRAL_WOLF_BUFF, true);
         }
 

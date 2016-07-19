@@ -662,7 +662,7 @@ class npc_stillpine_captive : public CreatureScript
                     cage->SetGoState(GO_STATE_READY);
                 }
                 _events.Reset();
-                _player = NULL;
+                _player = nullptr;
                 _movementComplete = false;
             }
 

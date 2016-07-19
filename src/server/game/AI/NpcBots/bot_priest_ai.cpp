@@ -68,7 +68,7 @@ public:
             {
                 Group* gr = player->GetGroup();
                 uint8 LHPcount = 0;
-                for (GroupReference* itr = gr->GetFirstMember(); itr != NULL; itr = itr->next())
+                for (GroupReference* itr = gr->GetFirstMember(); itr != nullptr; itr = itr->next())
                 {
                     Player* tPlayer = itr->GetSource();
                     if (!tPlayer || !tPlayer->IsInWorld() || me->GetMap() != tPlayer->FindMap() ||
@@ -102,9 +102,9 @@ public:
             if (PRAYER_OF_HEALING)
             {
                 Group* gr = player->GetGroup();
-                Unit* castTarget = NULL;
+                Unit* castTarget = nullptr;
                 uint8 LHPcount = 0;
-                for (GroupReference* itr = gr->GetFirstMember(); itr != NULL; itr = itr->next())
+                for (GroupReference* itr = gr->GetFirstMember(); itr != nullptr; itr = itr->next())
                 {
                     uint8 lowestPCT = 100;
                     Player* tPlayer = itr->GetSource();

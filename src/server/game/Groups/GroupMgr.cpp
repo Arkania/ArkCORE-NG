@@ -72,7 +72,7 @@ void GroupMgr::FreeGroupDbStoreId(Group* group)
     if (storageId < NextGroupDbStoreId)
         NextGroupDbStoreId = storageId;
 
-    GroupDbStore[storageId] = NULL;
+    GroupDbStore[storageId] = nullptr;
 }
 
 Group* GroupMgr::GetGroupByDbStoreId(uint32 storageId) const

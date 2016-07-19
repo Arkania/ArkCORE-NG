@@ -1232,7 +1232,7 @@ public:
 			m_targetList = me->FindAllUnfriendlyCreaturesInRange(21.0f);
 			if (m_targetList.empty())
 			{
-				m_nearestTarget = NULL;
+				m_nearestTarget = nullptr;
 				m_nearestDistance = 0;
 			}
 			else
@@ -1878,7 +1878,7 @@ public:
 			m_targetList = me->FindAllUnfriendlyCreaturesInRange(25.0f);
 			if (m_targetList.empty())
 			{
-				m_nearestTarget = NULL;
+				m_nearestTarget = nullptr;
 				m_nearestDistance = 0;
 			}
 			else
@@ -2362,7 +2362,7 @@ public:
 			m_targetList = me->FindAllUnfriendlyCreaturesInRange(25.0f);
 			if (m_targetList.empty())
 			{
-				m_nearestTarget = NULL;
+				m_nearestTarget = nullptr;
 				m_nearestDistance = 0;
 			}
 			else
@@ -2875,7 +2875,7 @@ public:
 			m_targetList = me->FindAllUnfriendlyCreaturesInRange(25.0f);
 			if (m_targetList.empty())
 			{
-				m_nearestTarget = NULL;
+				m_nearestTarget = nullptr;
 				m_nearestDistance = 0;
 			}
 			else
@@ -3265,7 +3265,7 @@ public:
 			m_targetList = me->FindAllUnfriendlyCreaturesInRange(25.0f);
 			if (m_targetList.empty())
 			{
-				m_nearestTarget = NULL;
+				m_nearestTarget = nullptr;
 				m_nearestDistance = 0;
 			}
 			else
@@ -3608,7 +3608,7 @@ public:
 			m_targetList = me->FindAllUnfriendlyCreaturesInRange(25.0f);
 			if (m_targetList.empty())
 			{
-				m_nearestTarget = NULL;
+				m_nearestTarget = nullptr;
 				m_nearestDistance = 0;
 			}
 			else

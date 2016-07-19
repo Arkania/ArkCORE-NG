@@ -78,7 +78,7 @@ class DBCStorage
         explicit DBCStorage(char const* f)
             : fmt(f), nCount(0), fieldCount(0), dataTable(NULL)
         {
-            indexTable.asT = NULL;
+            indexTable.asT = nullptr;
         }
 
         ~DBCStorage() { Clear(); }
@@ -106,7 +106,7 @@ class DBCStorage
 
             uint32 sqlRecordCount = 0;
             uint32 sqlHighestIndex = 0;
-            Field* fields = NULL;
+            Field* fields = nullptr;
             QueryResult result = QueryResult(NULL);
             // Load data from sql
             if (sql)
@@ -136,7 +136,7 @@ class DBCStorage
                 }
             }
 
-            char* sqlDataTable = NULL;
+            char* sqlDataTable = nullptr;
             fieldCount = dbc.GetCols();
 
             dataTable = reinterpret_cast<T*>(dbc.AutoProduceData(fmt, nCount, indexTable.asChar,
@@ -242,14 +242,14 @@ class DBCStorage
                             return false;
                         }
 
-                        fields = NULL;
+                        fields = nullptr;
                         ++rowIndex;
                     } while (result->NextRow());
                 }
             }
 
             // error in dbc file at loading if NULL
-            return indexTable.asT != NULL;
+            return indexTable.asT != nullptr;
         }
 
         bool LoadStringsFrom(char const* fn)
@@ -274,9 +274,9 @@ class DBCStorage
                 return;
 
             delete[] reinterpret_cast<char*>(indexTable.asT);
-            indexTable.asT = NULL;
+            indexTable.asT = nullptr;
             delete[] reinterpret_cast<char*>(dataTable);
-            dataTable = NULL;
+            dataTable = nullptr;
 
             while (!stringPoolList.empty())
             {

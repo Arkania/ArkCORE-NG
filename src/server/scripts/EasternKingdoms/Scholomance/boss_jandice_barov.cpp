@@ -116,7 +116,7 @@ public:
                 DoModifyThreatPercent(me->GetVictim(), -99);
 
                 //Summon 10 Illusions attacking random gamers
-                Unit* target = NULL;
+                Unit* target = nullptr;
                 for (uint8 i = 0; i < 10; ++i)
                 {
                     target = SelectTarget(SELECT_TARGET_RANDOM, 0);

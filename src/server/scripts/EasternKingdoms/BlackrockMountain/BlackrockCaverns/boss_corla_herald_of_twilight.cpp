@@ -78,10 +78,10 @@ public:
             instance = creature->GetInstanceScript();
 
             for (uint8 i = 0; i <= RAID_MODE(1, 2); i++)
-                NetherEssenceTrigger[i] = NULL;
+                NetherEssenceTrigger[i] = nullptr;
 
             for (uint8 i = 0; i <= RAID_MODE(1, 2); i++)
-                TwilightZealotsList[i] = NULL;
+                TwilightZealotsList[i] = nullptr;
         }
 
         InstanceScript* instance;
@@ -181,7 +181,7 @@ public:
             {
                 TwilightZealotsList[i]->DespawnOrUnsummon();
 
-                TwilightZealotsList[i] = NULL;
+                TwilightZealotsList[i] = nullptr;
             }
 
             Talk(2);
@@ -288,9 +288,9 @@ public:
     {
         npc_corla_netheressence_triggerAI(Creature* creature) : ScriptedAI(creature)
         {
-            channelTarget = NULL;
-            lastTarget = NULL;
-            zealot = NULL;
+            channelTarget = nullptr;
+            lastTarget = nullptr;
+            zealot = nullptr;
         }
 
         Unit* zealot;
@@ -382,7 +382,7 @@ public:
 
             case ACTION_TRIGGER_STOP_CHANNELING:
                 me->RemoveAllAuras();
-                lastTarget = channelTarget = NULL;
+                lastTarget = channelTarget = nullptr;
                 break;
             }
         }

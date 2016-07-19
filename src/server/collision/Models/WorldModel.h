@@ -83,7 +83,7 @@ namespace VMAP
 
             //! pass mesh data to object and create BIH. Passed vectors get get swapped with old geometry!
             void setMeshData(std::vector<G3D::Vector3> &vert, std::vector<MeshTriangle> &tri);
-            void setLiquidData(WmoLiquid*& liquid) { iLiquid = liquid; liquid = NULL; }
+            void setLiquidData(WmoLiquid*& liquid) { iLiquid = liquid; liquid = nullptr; }
             bool IntersectRay(const G3D::Ray &ray, float &distance, bool stopAtFirstHit) const;
             bool IsInsideObject(const G3D::Vector3 &pos, const G3D::Vector3 &down, float &z_dist) const;
             bool GetLiquidLevel(const G3D::Vector3 &pos, float &liqHeight) const;

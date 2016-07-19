@@ -364,7 +364,7 @@ public:
         {
             m_timer = urand(30000, 45000);
             m_phase = 0;
-            m_npc = NULL;
+            m_npc = nullptr;
         }
 
         void UpdateAI(uint32 diff) override
@@ -869,7 +869,7 @@ public:
         {
             m_timer = 0;
             m_phase = 0;
-            m_player = NULL;
+            m_player = nullptr;
         }
 
         void StartAnim(Player* player)
@@ -974,7 +974,7 @@ public:
         {
             m_timer = 0;
             m_phase = 0;
-            m_player = NULL;
+            m_player = nullptr;
         }
 
         void StartAnim(Player* player)
@@ -1079,7 +1079,7 @@ public:
         {
             m_timer = 0;
             m_phase = 0;
-            m_player = NULL;
+            m_player = nullptr;
         }
 
         void StartAnim(Player* player)
@@ -1235,7 +1235,7 @@ public:
         {
             m_timer = 0;
             m_modus = 0;
-            m_player = NULL;
+            m_player = nullptr;
         }
 
         void SpellHit(Unit* caster, SpellInfo const* spell) 
@@ -1315,7 +1315,7 @@ public:
         {
             m_timer = 0;
             m_phase = 0;
-            m_player = NULL;
+            m_player = nullptr;
         }
 
         void StartAnim(Player* player)
@@ -1738,7 +1738,7 @@ public:
                 if (npc->GetEntry() == NPC_PUDDLEJUMPER || npc->GetEntry() == NPC_MINOR_ORACLE)
                     if (npc->GetHealthPct() < 80.0f)
                         return;
-            target = NULL;
+            target = nullptr;
         }
 
         void ApplyBeforeCast()

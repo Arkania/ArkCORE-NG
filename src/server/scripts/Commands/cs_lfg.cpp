@@ -64,7 +64,7 @@ public:
 
     static bool HandleLfgPlayerInfoCommand(ChatHandler* handler, char const* args)
     {
-        Player* target = NULL;
+        Player* target = nullptr;
         std::string playerName;
         if (!handler->extractPlayerTarget((char*)args, &target, NULL, &playerName))
             return false;
@@ -75,7 +75,7 @@ public:
 
     static bool HandleLfgGroupInfoCommand(ChatHandler* handler, char const* args)
     {
-        Player* target = NULL;
+        Player* target = nullptr;
         std::string playerName;
         if (!handler->extractPlayerTarget((char*)args, &target, NULL, &playerName))
             return false;
@@ -92,7 +92,7 @@ public:
         handler->PSendSysMessage(LANG_LFG_GROUP_INFO, grp->isLFGGroup(),
             state.c_str(), sLFGMgr->GetDungeon(guid));
 
-        for (GroupReference* itr = grp->GetFirstMember(); itr != NULL; itr = itr->next())
+        for (GroupReference* itr = grp->GetFirstMember(); itr != nullptr; itr = itr->next())
             GetPlayerInfo(handler, itr->GetSource());
 
         return true;

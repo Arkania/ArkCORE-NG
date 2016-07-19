@@ -1162,7 +1162,7 @@ class spell_warl_soul_swap_override : public SpellScriptLoader
 
             bool Load() override
             {
-                _swapCaster = NULL;
+                _swapCaster = nullptr;
                 return true;
             }
 
@@ -1208,7 +1208,7 @@ class spell_warl_soul_swap_dot_marker : public SpellScriptLoader
                 flag96 classMask = GetSpellInfo()->Effects[effIndex].SpellClassMask;
 
                 Unit::AuraApplicationMap const& appliedAuras = swapVictim->GetAppliedAuras();
-                SoulSwapOverrideAuraScript* swapSpellScript = NULL;
+                SoulSwapOverrideAuraScript* swapSpellScript = nullptr;
                 if (Aura* swapOverrideAura = warlock->GetAura(SPELL_WARLOCK_SOUL_SWAP_OVERRIDE))
                     swapSpellScript = dynamic_cast<SoulSwapOverrideAuraScript*>(swapOverrideAura->GetScriptByName("spell_warl_soul_swap_override"));
 
@@ -1259,7 +1259,7 @@ public:
         SpellCastResult CheckCast()
         {
             Unit* currentTarget = GetExplTargetUnit();
-            Unit* swapTarget = NULL;
+            Unit* swapTarget = nullptr;
             if (Aura const* swapOverride = GetCaster()->GetAura(SPELL_WARLOCK_SOUL_SWAP_OVERRIDE))
                 if (SoulSwapOverrideAuraScript* swapScript = dynamic_cast<SoulSwapOverrideAuraScript*>(swapOverride->GetScriptByName("spell_warl_soul_swap_override")))
                     swapTarget = swapScript->GetOriginalSwapSource();
@@ -1277,7 +1277,7 @@ public:
             bool hasGlyph = GetCaster()->HasAura(SPELL_WARLOCK_GLYPH_OF_SOUL_SWAP);
 
             std::list<uint32> dotList;
-            Unit* swapSource = NULL;
+            Unit* swapSource = nullptr;
             if (Aura const* swapOverride = GetCaster()->GetAura(SPELL_WARLOCK_SOUL_SWAP_OVERRIDE))
             {
                 SoulSwapOverrideAuraScript* swapScript = dynamic_cast<SoulSwapOverrideAuraScript*>(swapOverride->GetScriptByName("spell_warl_soul_swap_override"));

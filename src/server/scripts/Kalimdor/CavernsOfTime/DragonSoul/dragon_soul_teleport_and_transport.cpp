@@ -78,7 +78,7 @@ public:
         void Reset() override
         {
             m_events.Reset();
-            m_player = NULL;
+            m_player = nullptr;
             m_vehicleGuid = 0;
             m_counter = 0;
         }
@@ -305,7 +305,7 @@ public:
        
         void Reset() override
         {
-            m_player = NULL;
+            m_player = nullptr;
         }
 
         void JustSummoned(Creature* summon) override

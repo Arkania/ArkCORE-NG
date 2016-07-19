@@ -64,14 +64,14 @@ public:
 
             if (Group* pGroup = pTarget->GetGroup())
             {
-                for (GroupReference* itr = pGroup->GetFirstMember(); itr != NULL; itr = itr->next())
+                for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
                 {
                     Player* tPlayer = itr->GetSource();
                     if (!tPlayer) continue;
                     if (HOFTarget(tPlayer, diff))
                         return;
                 }
-                for (GroupReference* itr = pGroup->GetFirstMember(); itr != NULL; itr = itr->next())
+                for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
                 {
                     Player* tPlayer = itr->GetSource();
                     if (!tPlayer || !tPlayer->HaveBot()) continue;
@@ -139,7 +139,7 @@ public:
             {
                 bool bots = false;
                 float threat;
-                for (GroupReference* itr = pGroup->GetFirstMember(); itr != NULL; itr = itr->next())
+                for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
                 {
                     Player* HOSPlayer = itr->GetSource();
                     if (!HOSPlayer) continue;
@@ -165,7 +165,7 @@ public:
                     }//end for
                 }//end for
                 if (!bots) return;
-                for (GroupReference* itr = pGroup->GetFirstMember(); itr != NULL; itr = itr->next())
+                for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
                 {
                     Player* pl = itr->GetSource();
                     if (!pl) continue;

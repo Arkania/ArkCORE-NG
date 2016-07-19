@@ -443,7 +443,7 @@ bool AuctionHouseObject::RemoveAuction(AuctionEntry* auction, uint32 /*itemEntry
 
     // we need to delete the entry, it is not referenced any more
     delete auction;
-    auction = NULL;
+    auction = nullptr;
 
     return wasInMap;
 }

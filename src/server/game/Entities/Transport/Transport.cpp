@@ -393,7 +393,7 @@ TempSummon* Transport::SummonPassenger(uint32 entry, Position const& pos, TempSu
             team = summoner->ToPlayer()->GetTeam();
     }
 
-    TempSummon* summon = NULL;
+    TempSummon* summon = nullptr;
     switch (mask)
     {
         case UNIT_MASK_SUMMON:

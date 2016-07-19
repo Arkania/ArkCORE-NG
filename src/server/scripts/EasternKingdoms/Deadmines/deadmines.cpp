@@ -477,7 +477,7 @@ public:
                     {
                         m_PlayerGUID = player->GetGUID();
                         m_BunnyGUID = bunny->GetGUID();
-                        Creature* worker = NULL;
+                        Creature* worker = nullptr;
                         if (oger && kobold)
                             worker = RAND(oger, kobold);
                         else if (oger)

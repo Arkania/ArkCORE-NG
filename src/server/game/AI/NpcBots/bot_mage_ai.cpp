@@ -505,7 +505,7 @@ public:
                 }
                 else
                 {
-                    for (GroupReference* itr = pGroup->GetFirstMember(); itr != NULL; itr = itr->next())
+                    for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
                     {
                         Player* pPlayer = itr->GetSource();
                         if (!pPlayer || pPlayer->IsInWorld() || pPlayer->IsDead()) continue;
@@ -519,7 +519,7 @@ public:
                     }
                     if (!target)
                     {
-                        for (GroupReference* itr = pGroup->GetFirstMember(); itr != NULL; itr = itr->next())
+                        for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
                         {
                             Player* pPlayer = itr->GetSource();
                             if (!pPlayer || !pPlayer->IsInWorld() || !pPlayer->HaveBot()) continue;

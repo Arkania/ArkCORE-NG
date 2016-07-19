@@ -71,7 +71,7 @@ public:
         {
             if (FlyBackTimer <= diff)
             {
-                Player* player = NULL;
+                Player* player = nullptr;
                 if (me->IsSummon())
                     if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                         player = summoner->ToPlayer();
@@ -217,10 +217,10 @@ public:
         {
             m_phase = 0;
             m_timer = 0;
-            m_npc = NULL;
-            m_ghoul1 = NULL;
-            m_ghoul2 = NULL;
-            m_ghoul3 = NULL;
+            m_npc = nullptr;
+            m_ghoul1 = nullptr;
+            m_ghoul2 = nullptr;
+            m_ghoul3 = nullptr;
             m_entry = 0;
             m_dress = 0;
             m_command = WORK_DONE;
@@ -1048,7 +1048,7 @@ public:
                         TC_LOG_ERROR("scripts", "npc_unworthy_initiateAI: unable to find anchor!");
 
                     float dist = 99.0f;
-                    GameObject* prison = NULL;
+                    GameObject* prison = nullptr;
 
                     for (uint8 i = 0; i < 12; ++i)
                     {

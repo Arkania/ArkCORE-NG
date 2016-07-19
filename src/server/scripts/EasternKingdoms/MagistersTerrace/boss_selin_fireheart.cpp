@@ -143,12 +143,12 @@ public:
 
             //float ShortestDistance = 0;
             CrystalGUID = 0;
-            Unit* pCrystal = NULL;
-            Unit* CrystalChosen = NULL;
+            Unit* pCrystal = nullptr;
+            Unit* CrystalChosen = nullptr;
             //for (uint8 i =  0; i < CRYSTALS_NUMBER; ++i)
             for (std::list<uint64>::const_iterator itr = Crystals.begin(); itr != Crystals.end(); ++itr)
             {
-                pCrystal = NULL;
+                pCrystal = nullptr;
                 //pCrystal = ObjectAccessor::GetUnit(*me, FelCrystals[i]);
                 pCrystal = ObjectAccessor::GetUnit(*me, *itr);
                 if (pCrystal && pCrystal->IsAlive())
