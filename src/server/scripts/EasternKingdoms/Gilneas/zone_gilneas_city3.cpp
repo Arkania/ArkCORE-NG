@@ -2158,7 +2158,7 @@ public:
 	struct npc_myriam_spellwaker_38465AI : public ScriptedAI
 	{
 		npc_myriam_spellwaker_38465AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
-	
+
 		EventMap m_events;
 		bool     m_isInitialised;
 		uint64   m_almyraGUID;
@@ -4114,14 +4114,14 @@ public:
 
 	enum eNpc
 	{
-		NPC_TOBIAS_MISTMANTLE = 38507,
-		MAP_GILNEAS = 654,
+		QUEST_THE_HUNT_FOR_SYLVANAS = 24902,
+		SPELL_FORCECAST_SUMMON_TOBIAS = 72471,
 	};
 
 	bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
 	{
-		if (quest->GetQuestId() == 24902)
-			CAST_AI(npc_lorna_crowley_38611::npc_lorna_crowley_38611AI, creature->AI())->StartEncounter(player);
+		if (quest->GetQuestId() == QUEST_THE_HUNT_FOR_SYLVANAS)
+			creature->CastSpell(player, SPELL_FORCECAST_SUMMON_TOBIAS);
 
 		return true;
 	}
@@ -4132,37 +4132,6 @@ public:
 			almyra->AI()->DoAction(ACTION_QUEST_REWARDED);
 
 		return false;
-	}
-
-	struct npc_lorna_crowley_38611AI : public ScriptedAI
-	{
-		npc_lorna_crowley_38611AI(Creature *c) : ScriptedAI(c) {}
-
-		uint64 tobiasGUID;
-
-		void Reset()
-		{
-			tobiasGUID = 0;
-		}
-
-		void StartEncounter(Player* pl)
-		{
-			if (Creature* tobias = ObjectAccessor::GetCreature(*me, tobiasGUID))
-				pl->TeleportTo(MAP_GILNEAS, tobias->GetPositionX(), tobias->GetPositionY(), tobias->GetPositionZ(), 5.42f);
-			else
-			{
-				if (Creature* newTobias = me->SummonCreature(NPC_TOBIAS_MISTMANTLE, -1662.616f, 1591.453f, 23.20896f, 3.740811f, TEMPSUMMON_DEAD_DESPAWN, 180000))
-				{
-					newTobias->SetPhaseMask(pl->GetPhaseMask(), true);
-					tobiasGUID = newTobias->GetGUID();
-				}
-			}
-		}
-	};
-
-	CreatureAI* GetAI(Creature* pCreature) const
-	{
-		return new npc_lorna_crowley_38611AI(pCreature);
 	}
 };
 
@@ -4842,8 +4811,465 @@ public:
 	}
 };
 
+// phase 262144 ending with quest 24904, then phase 190 (2097152) is active.. starting with quest 24902 
 
-// phase 262144 ending with quest 24904, then phase 190 (2097152) is active.. 
+enum eQuest24902
+{
+	NPC_TOBIAS_MISTMANTLE = 38507,
+	NPC_LADY_SYLVANAS_WINDRUNNER_38530 = 38530,
+	NPC_GENERAL_WARHOWL = 38533,
+	NPC_HIGH_EXECUTOR_CRENSHAW = 38537,
+	ACTION_SYLVANAS_START = 501,
+	PLAYER_GUID = 99999,
+};
+
+// 38507
+class npc_tobias_mistmantle_38507 : public CreatureScript
+{
+public:
+	npc_tobias_mistmantle_38507() : CreatureScript("npc_tobias_mistmantle_38507") { }
+
+	enum eNpc
+	{
+		NPC_FORSAKEN_GENERAL = 38617,
+		NPC_FORSAKEN_SERGANT = 38618,
+		SPELL_AI_CAST_HFS_MASTER = 72476,
+		SPELL_SUMMON_GENERAL_WARHOWL = 72236,
+		SPELL_SUMMON_SYLVANAS = 72238,
+		SPELL_SUMMON_MASTER = 72239,
+		SPELL_SUMMON_CRENSHAW = 72245,
+		EVENT_MOVEMENT_START_PATH_1 = 301,
+		EVENT_MOVEMENT_START_PATH_2,
+		EVENT_MOVEMENT_START_PATH_3,
+		EVENT_MOVEMENT_START_PATH_4,
+		EVENT_MOVEMENT_START_PATH_5,
+		EVENT_MOVEMENT_START_PATH_6,
+		EVENT_MOVEMENT_START_SYLVANAS_AI,
+		EVENT_WAIT_FOR_PLAYER_1,
+		EVENT_WAIT_FOR_PLAYER_2,
+		EVENT_WAIT_FOR_PLAYER_3,
+		EVENT_WAIT_FOR_PLAYER_4,
+		EVENT_WAIT_FOR_OUTSIDE_EVENT,
+		EVENT_WAIT_FOR_OUTSIDE_EVENT1,
+	};
+
+	struct npc_tobias_mistmantle_38507AI : public ScriptedAI
+	{
+		npc_tobias_mistmantle_38507AI(Creature* pCreature) : ScriptedAI(pCreature) { }
+
+		EventMap m_events;
+		uint64   m_playerGUID;
+		uint64   m_sylvanasGUID;
+		uint64   m_warhowlGUID;
+		uint64   m_crenshawGUID;
+		uint32   m_eventPhase;
+
+		void Reset() override
+		{
+			m_playerGUID = 0;
+			m_eventPhase = 0;
+			m_sylvanasGUID = 0;
+			m_warhowlGUID = 0;
+			m_crenshawGUID = 0;
+		}
+
+		void IsSummonedBy(Unit* summoner) override
+		{
+			m_playerGUID = summoner->GetGUID();
+			m_eventPhase = 1;
+			m_events.ScheduleEvent(EVENT_WAIT_FOR_PLAYER_1, 3000);
+		}
+
+		void JustSummoned(Creature* summon) override
+		{
+			summon->SetWalk(true);
+			switch (summon->GetEntry())
+			{
+			case NPC_LADY_SYLVANAS_WINDRUNNER_38530:
+				m_sylvanasGUID = summon->GetGUID();
+				me->SetFacingToObject(summon);
+				summon->AI()->SetGUID(me->GetGUID(), me->GetEntry());
+				summon->AI()->SetGUID(m_playerGUID, PLAYER_GUID);
+				summon->AI()->DoAction(ACTION_SYLVANAS_START);
+				summon->GetMotionMaster()->MovePoint(2005, -1600.11f, 1518.04f, 29.24f);
+				break;
+			case NPC_GENERAL_WARHOWL:
+				m_warhowlGUID = summon->GetGUID();
+				summon->GetMotionMaster()->MovePoint(2006, -1593.35f, 1531.32f, 29.24f);
+				break;
+			case NPC_HIGH_EXECUTOR_CRENSHAW:
+				m_crenshawGUID = summon->GetGUID();
+				summon->GetMotionMaster()->MovePoint(2007, -1587.55f, 1519.32f, 29.24f);
+				break;
+			}
+		}
+
+		void MovementInform(uint32 type, uint32 id) override
+		{
+			switch (type)
+			{
+			case WAYPOINT_MOTION_TYPE:
+			{
+				if (m_eventPhase == 1 && id == 0)
+					Talk(0);
+				else if (m_eventPhase == 1 && id == 1)
+					m_events.ScheduleEvent(EVENT_MOVEMENT_START_PATH_1, 1000);
+				else if (m_eventPhase == 2 && id == 0)
+					Talk(1);
+				else if (m_eventPhase == 2 && id == 1)
+					m_events.ScheduleEvent(EVENT_WAIT_FOR_PLAYER_2, 1000); // on open gate
+				else if (m_eventPhase == 3 && id == 3)
+					m_events.ScheduleEvent(EVENT_WAIT_FOR_PLAYER_3, 1000); // on wall 1
+				else if (m_eventPhase == 4 && id == 5)
+					m_events.ScheduleEvent(EVENT_WAIT_FOR_OUTSIDE_EVENT, 1000);
+				else if (m_eventPhase == 5 && id == 23)
+					m_events.ScheduleEvent(EVENT_WAIT_FOR_PLAYER_4, 1000); // inside water
+				break;
+			}
+			case EFFECT_MOTION_TYPE: // jump
+			{
+				if (m_eventPhase == 1 && id == 2001)
+					m_events.ScheduleEvent(EVENT_MOVEMENT_START_PATH_2, 1000);
+				else if (m_eventPhase == 3 && id == 2003)
+					m_events.ScheduleEvent(EVENT_MOVEMENT_START_PATH_4, 1000);
+				else if (m_eventPhase == 5 && id == 2004)
+				{
+					me->SetFacingTo(5.6f);					
+					m_events.ScheduleEvent(EVENT_MOVEMENT_START_PATH_6, 10);
+					m_events.ScheduleEvent(EVENT_MOVEMENT_START_SYLVANAS_AI, 1000);
+				}
+				break;
+			}
+			}
+		}
+
+		void EnterEvadeMode() {};
+
+		uint64 GetGUID(int32 id) const override
+		{
+			switch (id)
+			{
+			case NPC_TOBIAS_MISTMANTLE:
+				return me->GetGUID();
+			case NPC_LADY_SYLVANAS_WINDRUNNER_38530:
+				return m_sylvanasGUID;
+			case NPC_GENERAL_WARHOWL:
+				return m_warhowlGUID;
+			case NPC_HIGH_EXECUTOR_CRENSHAW:
+				return m_crenshawGUID;
+			case PLAYER_GUID:
+				return m_playerGUID;
+			}
+			return 0;
+		}
+
+		void UpdateAI(uint32 diff)
+		{
+			m_events.Update(diff);
+
+			while (uint32 eventId = m_events.ExecuteEvent())
+			{
+				switch (eventId)
+				{
+				case EVENT_WAIT_FOR_PLAYER_1:
+				{
+					if (IsPlayerNear(20.0f))
+						me->GetMotionMaster()->MovePath(3850701, false);
+					else
+						m_events.ScheduleEvent(EVENT_WAIT_FOR_PLAYER_1, 1000);
+					break;
+				}
+				case EVENT_MOVEMENT_START_PATH_1:
+				{
+					me->GetMotionMaster()->MoveJump(-1601.925f, 1607.654f, 20.11606f, 20.0f, 20.0f, 2001);
+					break;
+				}
+				case EVENT_MOVEMENT_START_PATH_2:
+				{
+					m_eventPhase = 2;
+					me->GetMotionMaster()->MovePath(3850702, false);
+					break;
+				}
+				case EVENT_WAIT_FOR_PLAYER_2:
+				{
+					if (IsPlayerNear(8.0f))
+					{
+						m_eventPhase = 3;
+						me->GetMotionMaster()->MovePath(3850703, false);
+					}
+					else
+						m_events.ScheduleEvent(EVENT_WAIT_FOR_PLAYER_2, 1000);
+					break;
+				}
+				case EVENT_WAIT_FOR_PLAYER_3:
+				{
+					if (IsPlayerNear(8.0f))
+						me->GetMotionMaster()->MoveJump(-1548.65f, 1618.41f, 23.1788f, 20.0f, 5.0f, 2003);
+					else
+						m_events.ScheduleEvent(EVENT_WAIT_FOR_PLAYER_3, 1000);
+					break;
+				}
+				case EVENT_MOVEMENT_START_PATH_4:
+				{
+					m_eventPhase = 4;
+					me->GetMotionMaster()->MovePath(3850704, false);
+					break;
+				}
+				case EVENT_WAIT_FOR_OUTSIDE_EVENT:
+				{
+					if (Creature* general = me->FindNearestCreature(NPC_FORSAKEN_GENERAL, 25.0f))
+						general->AI()->Talk(0);
+					m_events.ScheduleEvent(EVENT_WAIT_FOR_OUTSIDE_EVENT1, 6000);
+					break;
+				}
+				case EVENT_WAIT_FOR_OUTSIDE_EVENT1:
+				{
+					Talk(2);
+					m_events.ScheduleEvent(EVENT_MOVEMENT_START_PATH_5, 6000);
+					break;
+				}
+				case EVENT_MOVEMENT_START_PATH_5:
+				{
+					m_eventPhase = 5;
+					me->GetMotionMaster()->MovePath(3850705, false);
+					break;
+				}
+				case EVENT_WAIT_FOR_PLAYER_4:
+				{
+					if (IsPlayerNear(8.0f))
+					{
+						Talk(3);
+						me->GetMotionMaster()->MoveJump(-1614.5f, 1533.9f, 27.26f, 20.0f, 5.0f, 2004);
+					}
+					else
+						m_events.ScheduleEvent(EVENT_WAIT_FOR_PLAYER_4, 1000);
+					break;
+				}
+				case EVENT_MOVEMENT_START_PATH_6:
+				{
+					me->SetSwim(true);
+					me->GetMotionMaster()->MovePoint(2008, -1613.95f, 1536.012f, 27.4f);
+					break;
+				}
+				case EVENT_MOVEMENT_START_SYLVANAS_AI:
+				{
+					// there are several summon spell, but all have the summoner position as spawnpoint.. 72476, 72239, 72236, 72238, 72245
+					me->SummonCreature(NPC_GENERAL_WARHOWL, -1566.053f, 1557.191f, 29.36808f, 4.273f, TEMPSUMMON_TIMED_DESPAWN, 180000);
+					me->SummonCreature(NPC_LADY_SYLVANAS_WINDRUNNER_38530, -1567.477f, 1554.569f, 29.36808f, 0.88f, TEMPSUMMON_TIMED_DESPAWN, 180000);
+					me->SummonCreature(NPC_HIGH_EXECUTOR_CRENSHAW, -1566.795f, 1555.300f, 29.36808f, 3.275f, TEMPSUMMON_TIMED_DESPAWN, 180000);
+					break;
+				}
+				}
+			}
+
+			if (!UpdateVictim())
+				return;
+
+			DoMeleeAttackIfReady();
+		}
+
+		bool IsPlayerNear(float range)
+		{
+			if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+				if (player->GetDistance2d(me) < range)
+					return true;
+			return false;
+		}
+	};
+
+	CreatureAI* GetAI(Creature* pCreature) const
+	{
+		return new npc_tobias_mistmantle_38507AI(pCreature);
+	}
+};
+
+// 38530
+class npc_lady_sylvanas_windrunner_38530 : public CreatureScript
+{
+public:
+	npc_lady_sylvanas_windrunner_38530() : CreatureScript("npc_lady_sylvanas_windrunner_38530") { }
+
+	enum eNpc
+	{
+		EVENT_START_TALK = 401,
+		EVENT_TALK_2,
+		EVENT_TALK_3,
+		EVENT_TALK_4,
+		EVENT_TALK_5,
+		EVENT_TALK_6,
+		EVENT_TALK_7,
+		EVENT_TALK_8,
+		EVENT_END,
+		EVENT_DESPAWN_WARHOWL,
+		EVENT_DESPAWN,
+	};
+
+	struct npc_lady_sylvanas_windrunner_38530AI : public ScriptedAI
+	{
+		npc_lady_sylvanas_windrunner_38530AI(Creature* pCreature) : ScriptedAI(pCreature) { }
+
+		EventMap m_events;
+		uint64   m_playerGUID;
+		uint64   m_tobiasGUID;
+		uint64   m_sylvanasGUID;
+		uint64   m_warhowlGUID;
+		uint64   m_crenshawGUID;
+
+		void Reset() override
+		{
+			m_playerGUID = 0;
+			m_tobiasGUID = 0;
+			m_sylvanasGUID = 0;
+			m_warhowlGUID = 0;
+			m_crenshawGUID = 0;
+		}
+
+		void IsSummonedBy(Unit* summoner) override
+		{
+			if (summoner->GetEntry() == NPC_TOBIAS_MISTMANTLE)
+				m_tobiasGUID = summoner->GetGUID();
+		}
+
+		void MovementInform(uint32 type, uint32 id) override
+		{
+			if (type == POINT_MOTION_TYPE)
+				if (id == 2005)
+				{
+					me->SetFacingTo(5.6f);
+					m_events.ScheduleEvent(EVENT_START_TALK, 1000);
+				}
+		}
+
+		void EnterEvadeMode() {};
+
+		void SetGUID(uint64 guid, int32 id) override
+		{
+			switch (id)
+			{
+			case PLAYER_GUID:
+				m_playerGUID = guid;
+				break;
+			case NPC_TOBIAS_MISTMANTLE:
+				m_tobiasGUID = guid;
+				break;
+			}
+		}
+
+		void UpdateAI(uint32 diff)
+		{
+			m_events.Update(diff);
+
+			while (uint32 eventId = m_events.ExecuteEvent())
+			{
+				switch (eventId)
+				{
+				case EVENT_START_TALK:
+				{
+					if (Creature* tobias = sObjectAccessor->GetCreature(*me, m_tobiasGUID))
+					{
+						m_playerGUID = tobias->AI()->GetGUID(PLAYER_GUID);
+						m_warhowlGUID = tobias->AI()->GetGUID(NPC_GENERAL_WARHOWL);
+						m_crenshawGUID = tobias->AI()->GetGUID(NPC_HIGH_EXECUTOR_CRENSHAW);
+					}
+					if (Creature* warhowl = sObjectAccessor->GetCreature(*me, m_warhowlGUID))
+						warhowl->AI()->Talk(0);
+					m_events.ScheduleEvent(EVENT_TALK_2, 10000);
+					break;
+				}
+				case EVENT_TALK_2:
+				{
+					if (Creature* warhowl = sObjectAccessor->GetCreature(*me, m_warhowlGUID))
+						me->SetFacingToObject(warhowl);
+					Talk(0);
+					m_events.ScheduleEvent(EVENT_TALK_3, 8000);
+					break;
+				}
+				case EVENT_TALK_3:
+				{
+					if (Creature* warhowl = sObjectAccessor->GetCreature(*me, m_warhowlGUID))
+						warhowl->AI()->Talk(1);
+					m_events.ScheduleEvent(EVENT_TALK_4, 11000);
+					break;
+				}
+				case EVENT_TALK_4:
+				{
+					Talk(1);
+					m_events.ScheduleEvent(EVENT_TALK_5, 14000);
+					break;
+				}
+				case EVENT_TALK_5:
+				{
+					if (Creature* warhowl = sObjectAccessor->GetCreature(*me, m_warhowlGUID))
+						warhowl->AI()->Talk(2);
+					m_events.ScheduleEvent(EVENT_TALK_6, 8000);
+					break;
+				}
+				case EVENT_TALK_6:
+				{
+					if (Creature* warhowl = sObjectAccessor->GetCreature(*me, m_warhowlGUID))
+						warhowl->GetMotionMaster()->MovePoint(2010, -1566.053f, 1557.191f, 29.36808f);
+					Talk(2);
+					m_events.ScheduleEvent(EVENT_DESPAWN_WARHOWL,8000);
+					m_events.ScheduleEvent(EVENT_TALK_7, 5000);
+					break;
+				}
+				case EVENT_TALK_7:
+				{
+					if (Creature* crenshaw = sObjectAccessor->GetCreature(*me, m_crenshawGUID))
+					{
+						crenshaw->AI()->Talk(0);
+						me->SetFacingToObject(crenshaw);
+					}
+					m_events.ScheduleEvent(EVENT_TALK_8, 10000);
+					break;
+				}
+				case EVENT_TALK_8:
+				{
+					Talk(3);
+					m_events.ScheduleEvent(EVENT_END, 8000);
+					break;
+				}
+				case EVENT_END:
+				{
+					if (Creature* crenshaw = sObjectAccessor->GetCreature(*me, m_crenshawGUID))
+						crenshaw->GetMotionMaster()->MovePoint(2010, -1566.053f, 1557.191f, 29.36808f);
+					me->GetMotionMaster()->MovePoint(2010, -1566.053f, 1557.191f, 29.36808f);
+					if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+						player->KilledMonsterCredit(38530);
+					m_events.ScheduleEvent(EVENT_DESPAWN, 8000);
+					break;
+				}
+				case EVENT_DESPAWN_WARHOWL:
+				{
+					if (Creature* warhowl = sObjectAccessor->GetCreature(*me, m_warhowlGUID))
+						warhowl->DespawnOrUnsummon(10);
+					break;
+				}
+				case EVENT_DESPAWN:
+				{
+					if (Creature* crenshaw = sObjectAccessor->GetCreature(*me, m_crenshawGUID))
+						crenshaw->DespawnOrUnsummon(10);
+					if (Creature* tobias = sObjectAccessor->GetCreature(*me, m_tobiasGUID))
+						tobias->DespawnOrUnsummon(10);
+					me->DespawnOrUnsummon(10);
+					break;
+				}
+				}
+			}
+
+			if (!UpdateVictim())
+				return;
+
+			DoMeleeAttackIfReady();
+		}
+	};
+
+	CreatureAI* GetAI(Creature* pCreature) const
+	{
+		return new npc_lady_sylvanas_windrunner_38530AI(pCreature);
+	}
+};
+
 
 void AddSC_zone_gilneas_city3()
 {
@@ -4869,5 +5295,7 @@ void AddSC_zone_gilneas_city3()
 	new spell_rapier_of_the_gilnean_patriots_71388();
 	new spell_fiery_boulder_72050();
 	new spell_shoot_liam_72116();
+	new npc_tobias_mistmantle_38507();
+	new npc_lady_sylvanas_windrunner_38530();
 }
 
