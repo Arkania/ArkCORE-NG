@@ -174,116 +174,6 @@ public:
     }
 };
 
-// 38615
-class npc_captured_riding_bat_38615 : public CreatureScript
-{
-public:
-    npc_captured_riding_bat_38615() : CreatureScript("npc_captured_riding_bat_38615") { }
-
-    struct npc_captured_riding_bat_38615AI : public npc_escortAI
-    {
-        npc_captured_riding_bat_38615AI(Creature* creature) : npc_escortAI(creature) {}
-
-        void AttackStart(Unit* /*who*/) {}
-        void EnterCombat(Unit* /*who*/) {}
-        void EnterEvadeMode() {}
-
-        void Reset()
-        {
-            _checkQuest = 1000;
-            _checkDespawn = 1000;
-            isBoarded = false;
-            isBoarded2 = false;
-        }
-
-        void PassengerBoarded(Unit* who, int8 /*seatId*/, bool apply)
-        {
-            if (apply)
-            {
-                if (who->GetTypeId() == TYPEID_PLAYER)
-                    if (who->ToPlayer()->GetQuestStatus(24920) != QUEST_STATUS_INCOMPLETE)
-                    {
-                        me->GetVehicleKit()->RemoveAllPassengers();
-                        return ;
-                    }
-                me->SetCanFly(true);
-                me->SetSpeed(MOVE_FLIGHT, 3.0f);
-                isBoarded = true;
-                Start(false, true, who->GetGUID(), NULL, false, true);
-            }
-        }
-
-        void WaypointReached(uint32 i)
-        {
-            me->SetCanFly(true);
-        }
-
-        void JustDied(Unit* /*killer*/)
-        {
-        }
-
-        void OnCharmed(bool /*apply*/)
-        {
-        }
-
-
-        void UpdateAI(uint32 diff)
-        {
-            npc_escortAI::UpdateAI(diff);
-        }
-
-        void UpdateEscortAI(const uint32 diff)
-        {
-            if (isBoarded)
-            {
-                if (isBoarded2)
-                {
-                    if (_checkDespawn <= diff)
-                    {
-                        me->GetVehicleKit()->RemoveAllPassengers();
-                        me->DespawnOrUnsummon();
-                        _checkDespawn = 1000;
-                    }
-                    else
-                        _checkDespawn -= diff;
-                }
-                else
-                {
-                    if (_checkQuest <= diff)
-                    {
-                        if (me->GetVehicleKit())
-                            if (Unit *u = me->GetVehicleKit()->GetPassenger(0))
-                                if (u->GetTypeId() == TYPEID_PLAYER)
-                                {
-                                    Player *player = u->ToPlayer();
-                                    if (player->GetQuestStatus(24920) == QUEST_STATUS_COMPLETE)
-                                    {
-                                        isBoarded2 = true;
-                                        _checkDespawn = 70000;
-                                        SetEscortPaused(true);
-                                        me->GetMotionMaster()->MovePoint(4242, me->GetHomePosition());
-                                    }
-                                }
-                        _checkQuest = 1000;
-                    }
-                    else
-                        _checkQuest -= diff;
-                }
-            }
-        }
-
-    private :
-        uint32 _checkQuest;
-        uint32 _checkDespawn;
-        bool isBoarded;
-        bool isBoarded2;
-    };
-
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new npc_captured_riding_bat_38615AI(creature);
-    }
-};
 
 // 36616
 class npc_admiral_nightwind_36616 : public CreatureScript
@@ -310,6 +200,6 @@ void AddSC_zone_gilneas2()
 	new npc_trigger_quest_24616();
 
 	new npc_admiral_nightwind_36616();
-	new npc_captured_riding_bat_38615();
+	
 }
 
