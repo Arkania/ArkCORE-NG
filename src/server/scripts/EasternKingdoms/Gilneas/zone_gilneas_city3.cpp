@@ -5369,7 +5369,7 @@ public:
     }
 };
 
-// spell=72849/fly-back
+// 72849
 class spell_fly_back_72849 : public SpellScriptLoader
 {
 public:
@@ -5398,6 +5398,49 @@ public:
     SpellScript* GetSpellScript() const override
     {
         return new spell_fly_back_72849_SpellScript();
+    }
+};
+
+// 72247
+class spell_iron_bomb_72247 : public SpellScriptLoader
+{
+public:
+    spell_iron_bomb_72247() : SpellScriptLoader("spell_iron_bomb_72247") { }
+
+    class IsFriendly
+    {
+    public:
+        IsFriendly(Unit* caster) : _caster(caster) { }
+
+        bool operator()(WorldObject* object) const
+        {
+            if (Unit* unit = object->ToUnit())
+                return _caster->IsFriendlyTo(unit);
+            return true;
+        }
+
+    private:
+        Unit* _caster;
+    };
+
+    class spell_iron_bomb_72247_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_iron_bomb_72247_SpellScript);
+
+        void FilterTargets(std::list<WorldObject*>& targets)
+        {
+            targets.remove_if(IsFriendly(GetCaster())); 
+        }
+
+        void Register() override
+        {
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_iron_bomb_72247_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_DEST_AREA_ENTRY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_iron_bomb_72247_SpellScript();
     }
 };
 
@@ -5430,5 +5473,6 @@ void AddSC_zone_gilneas_city3()
     new npc_lady_sylvanas_windrunner_38530();
     new npc_captured_riding_bat_38540();
     new spell_fly_back_72849();
+    new spell_iron_bomb_72247();
 }
 
