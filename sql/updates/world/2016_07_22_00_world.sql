@@ -35,7 +35,7 @@ delete from npc_spellclick_spells where npc_entry=43747 and spell_id=81877;
 insert into npc_spellclick_spells value 
 (43747, 81877, 1, 0);
 
-UPDATE creature_template SET npcflag=16777216, VehicleId=0 WHERE entry=43747;
+UPDATE creature_template SET npcflag=0, VehicleId=0 WHERE entry=43747;
 
 UPDATE creature SET phaseMask=14155776 WHERE guid=253070;
 
@@ -52,13 +52,12 @@ DELETE FROM creature_text WHERE entry=43749;
 INSERT INTO creature_text VALUES 
 (43749, 0, 0, "Time to go!", 12, 0, 100, 0, 0, 0, "Tobias Mistmantle", 43813),
 (43749, 0, 1, "Hop on a hippogryph, now's our chance!", 12, 0, 100, 0, 0, 0, "Tobias Mistmantle", 43814),
-(43749, 0, 2, "We must wait for the right time to strike!", 12, 0, 100, 0, 0, 0, "Tobias Mistmantle", 43815),
-(43749, 0, 3, "We must bide our time.  They won't know what hit them.", 12, 0, 100, 0, 0, 0, "Tobias Mistmantle", 43816),
 (43749, 1, 0, "We'll set flight once everyone is ready.", 12, 0, 100, 0, 0, 0, "Tobias Mistmantle", 43837),
 (43749, 1, 1, "Patience, friends.  We will strike soon.", 12, 0, 100, 0, 0, 0, "Tobias Mistmantle", 43838),
 (43749, 1, 2, "Hold your horses, friend.  We'll hit them when we're all ready.", 12, 0, 100, 0, 0, 0, "Tobias Mistmantle", 43839),
-(43749, 1, 3, "Let's give everyone time to gather.  We'll need a handful of people to come with us.", 12, 0, 100, 0, 0, 0, "Tobias Mistmantle", 43840);
-
+(43749, 1, 3, "Let's give everyone time to gather.  We'll need a handful of people to come with us.", 12, 0, 100, 0, 0, 0, "Tobias Mistmantle", 43840),
+(43749, 1, 4, "We must wait for the right time to strike!", 12, 0, 100, 0, 0, 0, "Tobias Mistmantle", 43815),
+(43749, 1, 5, "We must bide our time.  They won't know what hit them.", 12, 0, 100, 0, 0, 0, "Tobias Mistmantle", 43816);
 
 DELETE FROM creature_text WHERE entry=43566;
 INSERT INTO creature_text VALUES 

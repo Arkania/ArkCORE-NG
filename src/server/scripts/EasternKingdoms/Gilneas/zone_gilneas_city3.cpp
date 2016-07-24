@@ -5448,11 +5448,20 @@ public:
 
 enum eEndGame
 {
+    QUEST_ENDGAME = 26706,
+
+    NPC_HIPPOGRYPH = 43747,
     NPC_WORGEN_WARRIOR = 43651,
     NPC_GILNEAN_SHARPSHOOTER = 43703,
     NPC_GUNSHIP_GRUNT = 42141,
-    GO_WORGEN_GUNSHIP = 203428,
     NPC_TOBIAS_MISTMANTLE_43749 = 43749,
+
+    GO_WORGEN_GUNSHIP = 203428,
+
+    ACTION_30_SEC_BEFORE_FIGHT = 25663,
+    ACTION_15_SEC_BEFORE_FIGHT = 25727,
+    ACTION_SHIP_ON_THE_WAY = 25664,
+    ACTION_START_FEIGHTING_180_SEC = 25670,
 };
 
 // 43749
@@ -5464,6 +5473,8 @@ public:
     enum eNPC
     {
         EVENT_INIT_GUNSHIP = 201,
+        EVENTS_TALK_WAITING_COOLDOWN,
+        EVENTS_TALK_WAITING,
     };
 
     struct npc_tobias_mistmantle_43749AI : public ScriptedAI
@@ -5472,11 +5483,15 @@ public:
 
         EventMap m_events;
         uint64   m_gunshipGUID;
+        bool     m_talkWaiting;
+        std::list<uint64> m_hippoList;
 
         void Initialize()
         {
             m_events.ScheduleEvent(EVENT_INIT_GUNSHIP, 2500);
+            m_events.ScheduleEvent(EVENTS_TALK_WAITING, 10000);
             m_gunshipGUID = 0;
+            m_talkWaiting = false;
         }
 
         void Reset() override
@@ -5484,19 +5499,32 @@ public:
 
         }
 
-        void DoAction(int32 param) override 
-        { 
-            switch (param)
+        void DoAction(int32 param) override
+        {
+            if (!CheckPlayerForQuest())
+                SetHippoSpellClick(false);
+            else
             {
-            case 25664: // 85 sek before 25663, ship is on the way..
-                break;
-            case 25663: // 30 sek before explosion
-                break;
-            case 25727: // 16 sek before explosion.. we can enter hippo
-                break;
-            case 25670: // ship is waiting 180 sec...
-                break;
-            
+                switch (param)
+                {
+                case ACTION_30_SEC_BEFORE_FIGHT:
+                    Talk(0);
+                    SetHippoSpellClick(true);
+                    break;
+                case ACTION_15_SEC_BEFORE_FIGHT:
+                    Talk(0);
+                    SetHippoSpellClick(true);
+                    break;
+                case ACTION_START_FEIGHTING_180_SEC:
+                    m_talkWaiting = true;
+                    m_events.RescheduleEvent(EVENTS_TALK_WAITING_COOLDOWN, 240000);
+                    SetHippoSpellClick(false);
+                    break;
+                case ACTION_SHIP_ON_THE_WAY:
+                    //Talk(0);
+                    //SetHippoSpellClick(false);
+                    break;
+                }
             }
         }
 
@@ -5510,15 +5538,38 @@ public:
                 {
                 case EVENT_INIT_GUNSHIP:
                 {
+                    if (m_hippoList.empty())
+                        FindNearestHippogryphs();
+
                     if (!m_gunshipGUID)
-                        if (GameObject* ship = me->FindNearestGameObject(GO_WORGEN_GUNSHIP, 250.0f))
-                        {
-                            m_gunshipGUID = ship->GetGUID();
-                            ship->AI()->SetGUID(me->GetGUID(), me->GetEntry());
-                            break;
-                        }
+                        FindWorgenGunshipWorldwide();
+
+                    if (GameObject* ship = sObjectAccessor->GetGameObject(*me, m_gunshipGUID))
+                    {
+                        m_gunshipGUID = ship->GetGUID();
+                        ship->AI()->SetGUID(me->GetGUID(), me->GetEntry());
+                    }
+
+                    if (!m_hippoList.empty() && m_gunshipGUID)
+                        break;
 
                     m_events.ScheduleEvent(EVENT_INIT_GUNSHIP, 2500);
+                    break;
+                }
+                case EVENTS_TALK_WAITING_COOLDOWN:
+                {
+                    m_talkWaiting = false;
+                    break;
+                }
+                case EVENTS_TALK_WAITING:
+                {
+                    if (m_talkWaiting)
+                    {
+                        Talk(1);
+                        m_events.ScheduleEvent(EVENTS_TALK_WAITING, urand(20000, 30000));
+                    }
+                    else
+                        m_events.ScheduleEvent(EVENTS_TALK_WAITING, urand(8000, 12000));
                     break;
                 }
                 }
@@ -5528,6 +5579,44 @@ public:
                 return;
             else
                 DoMeleeAttackIfReady();
+        }
+
+        void FindNearestHippogryphs()
+        {
+            m_hippoList.clear();
+            std::list<Creature*> hippoList = me->FindNearestCreatures(NPC_HIPPOGRYPH, 25.0f);
+            for (std::list<Creature*>::iterator itr = hippoList.begin(); itr != hippoList.end(); ++itr)
+                m_hippoList.push_back((*itr)->GetGUID());
+        }
+
+        void SetHippoSpellClick(bool value)
+        {
+            for (std::list<uint64>::iterator itr = m_hippoList.begin(); itr != m_hippoList.end(); ++itr)
+                if (Creature* hippo = sObjectAccessor->GetCreature(*me, (*itr)))
+                    if (value)
+                        hippo->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
+                    else
+                        hippo->SetUInt32Value(UNIT_NPC_FLAGS, 0);
+        }
+
+        bool CheckPlayerForQuest()
+        {
+            std::list<Player*> playerList = me->FindNearestPlayers(25.0f);
+            if (playerList.empty())
+                return false;
+            for (std::list<Player*>::iterator itr = playerList.begin(); itr != playerList.end(); ++itr)
+                if ((*itr)->GetQuestStatus(QUEST_ENDGAME) == QUEST_STATUS_INCOMPLETE)
+                    return true;
+            return false;
+        }
+
+        void FindWorgenGunshipWorldwide()
+        {
+            TRINITY_READ_GUARD(HashMapHolder<GameObject>::LockType, *HashMapHolder<GameObject>::GetLock());
+            HashMapHolder<GameObject>::MapType const& m = ObjectAccessor::GetGameObjects();
+            for (HashMapHolder<GameObject>::MapType::const_iterator iter = m.begin(); iter != m.end(); ++iter)
+                if (iter->second->IsInWorld() && iter->second->GetEntry() == GO_WORGEN_GUNSHIP)
+                    m_gunshipGUID = iter->second->GetGUID();
         }
     };
 
