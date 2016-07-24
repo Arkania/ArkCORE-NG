@@ -5297,23 +5297,23 @@ public:
         void Reset()
         {
             m_events.Reset();
-            m_gamePhase=0;
+            m_gamePhase = 0;
         }
 
-        void MovementInform(uint32 type, uint32 id) override 
-        { 
+        void MovementInform(uint32 type, uint32 id) override
+        {
             if (type == WAYPOINT_MOTION_TYPE)
-            if (m_gamePhase == 1 && id == 3)
-            {
-                m_events.ScheduleEvent(EVENT_START_WORK_AREA, 10);
-                m_events.ScheduleEvent(EVENT_TIMEOUT, 120000);
-            }
-            else if (m_gamePhase == 3 && id == 3)
-            {
-                if (Vehicle* bat = me->GetVehicleKit())
-                    bat->RemoveAllPassengers();
-                me->DespawnOrUnsummon(10);
-            }
+                if (m_gamePhase == 1 && id == 3)
+                {
+                    m_events.ScheduleEvent(EVENT_START_WORK_AREA, 10);
+                    m_events.ScheduleEvent(EVENT_TIMEOUT, 120000);
+                }
+                else if (m_gamePhase == 3 && id == 3)
+                {
+                    if (Vehicle* bat = me->GetVehicleKit())
+                        bat->RemoveAllPassengers();
+                    me->DespawnOrUnsummon(10);
+                }
         }
 
         void PassengerBoarded(Unit* who, int8 /*seatId*/, bool apply)
@@ -5330,7 +5330,7 @@ public:
                 me->SetDisableGravity(true);
                 me->SetSpeed(MOVE_FLIGHT, 6.0f);
                 me->GetMotionMaster()->MovePath(3854001, false);
-                m_gamePhase=1;
+                m_gamePhase = 1;
             }
         }
 
@@ -5352,7 +5352,7 @@ public:
                 }
                 case EVENT_TIMEOUT:
                 {
-                    m_gamePhase=3;
+                    m_gamePhase = 3;
                     me->SetSpeed(MOVE_FLIGHT, 6.0f);
                     me->GetMotionMaster()->Clear();
                     me->GetMotionMaster()->MovePath(3854003, false);
@@ -5429,7 +5429,7 @@ public:
 
         void FilterTargets(std::list<WorldObject*>& targets)
         {
-            targets.remove_if(IsFriendly(GetCaster())); 
+            targets.remove_if(IsFriendly(GetCaster()));
         }
 
         void Register() override
@@ -5441,6 +5441,373 @@ public:
     SpellScript* GetSpellScript() const override
     {
         return new spell_iron_bomb_72247_SpellScript();
+    }
+};
+
+// the endgame is in phase 4194304
+
+enum eEndGame
+{
+    NPC_WORGEN_WARRIOR = 43651,
+    NPC_GILNEAN_SHARPSHOOTER = 43703,
+    NPC_GUNSHIP_GRUNT = 42141,
+    GO_WORGEN_GUNSHIP = 203428,
+    NPC_TOBIAS_MISTMANTLE_43749 = 43749,
+};
+
+// 43749
+class npc_tobias_mistmantle_43749 : public CreatureScript
+{
+public:
+    npc_tobias_mistmantle_43749() : CreatureScript("npc_tobias_mistmantle_43749") { }
+
+    enum eNPC
+    {
+        EVENT_INIT_GUNSHIP = 201,
+    };
+
+    struct npc_tobias_mistmantle_43749AI : public ScriptedAI
+    {
+        npc_tobias_mistmantle_43749AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+        EventMap m_events;
+        uint64   m_gunshipGUID;
+
+        void Initialize()
+        {
+            m_events.ScheduleEvent(EVENT_INIT_GUNSHIP, 2500);
+            m_gunshipGUID = 0;
+        }
+
+        void Reset() override
+        {
+
+        }
+
+        void DoAction(int32 param) override 
+        { 
+            switch (param)
+            {
+            case 25664: // 85 sek before 25663, ship is on the way..
+                break;
+            case 25663: // 30 sek before explosion
+                break;
+            case 25727: // 16 sek before explosion.. we can enter hippo
+                break;
+            case 25670: // ship is waiting 180 sec...
+                break;
+            
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_INIT_GUNSHIP:
+                {
+                    if (!m_gunshipGUID)
+                        if (GameObject* ship = me->FindNearestGameObject(GO_WORGEN_GUNSHIP, 250.0f))
+                        {
+                            m_gunshipGUID = ship->GetGUID();
+                            ship->AI()->SetGUID(me->GetGUID(), me->GetEntry());
+                            break;
+                        }
+
+                    m_events.ScheduleEvent(EVENT_INIT_GUNSHIP, 2500);
+                    break;
+                }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_tobias_mistmantle_43749AI(creature);
+    }
+};
+
+// GO 203428
+class go_worgen_gunship_203428 : public GameObjectScript
+{
+public:
+    go_worgen_gunship_203428() : GameObjectScript("go_worgen_gunship_203428") { }
+
+    struct go_worgen_gunship_203428AI : public GameObjectAI
+    {
+        go_worgen_gunship_203428AI(GameObject* gameobject) : GameObjectAI(gameobject) { }
+
+        EventMap m_events;
+        uint64   m_tobiasGUID;
+
+        uint32 m_zone, m_area;
+
+        void Reset() override
+        {
+            m_events.Reset();
+            m_tobiasGUID = 0;
+        }
+
+        void OnGameEvent(bool start, uint16 eventId)
+        {
+        }
+
+        void EventInform(uint32 eventId)
+        {
+            if (Creature* tobias = sObjectAccessor->GetCreature(*go, m_tobiasGUID))
+                tobias->AI()->DoAction(eventId);
+        }
+
+        void SetGUID(uint64 guid, int32 id) override
+        {
+            switch (id)
+            {
+            case NPC_TOBIAS_MISTMANTLE_43749:
+                m_tobiasGUID = guid;
+                break;
+            }
+        }
+
+    };
+
+    GameObjectAI* GetAI(GameObject* gameobject) const override
+    {
+        return new go_worgen_gunship_203428AI(gameobject);
+    }
+};
+
+// 43651
+class npc_worgen_warrior_43651 : public CreatureScript
+{
+public:
+    npc_worgen_warrior_43651() : CreatureScript("npc_worgen_warrior_43651") { }
+
+    enum eNPC
+    {
+    };
+
+    struct npc_worgen_warrior_43651AI : public ScriptedAI
+    {
+        npc_worgen_warrior_43651AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+        EventMap m_events;
+
+        void Initialize()
+        {
+        }
+
+        void Reset() override
+        {
+            me->SetReactState(REACT_PASSIVE);
+        }
+
+        void DamageTaken(Unit* attacker, uint32& damage) override
+        {
+            if (attacker->GetEntry() == NPC_GUNSHIP_GRUNT)
+                damage = 0;
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_worgen_warrior_43651AI(creature);
+    }
+};
+
+// 43703
+class npc_gilnean_sharpshooter_43703 : public CreatureScript
+{
+public:
+    npc_gilnean_sharpshooter_43703() : CreatureScript("npc_gilnean_sharpshooter_43703") { }
+
+    enum eNPC
+    {
+    };
+
+    struct npc_gilnean_sharpshooter_43703AI : public ScriptedAI
+    {
+        npc_gilnean_sharpshooter_43703AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+        EventMap m_events;
+
+        void Initialize()
+        {
+        }
+
+        void Reset() override
+        {
+            me->SetReactState(REACT_PASSIVE);
+        }
+
+        void DamageTaken(Unit* attacker, uint32& damage) override
+        {
+            if (attacker->GetEntry() == NPC_GUNSHIP_GRUNT)
+                damage = 0;
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_gilnean_sharpshooter_43703AI(creature);
+    }
+};
+
+// 42141
+class npc_gunship_grunt_42141 : public CreatureScript
+{
+public:
+    npc_gunship_grunt_42141() : CreatureScript("npc_gunship_grunt_42141") { }
+
+    enum eNPC
+    {
+    };
+
+    struct npc_gunship_grunt_42141AI : public ScriptedAI
+    {
+        npc_gunship_grunt_42141AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+        EventMap m_events;
+
+        void Initialize()
+        {
+        }
+
+        void Reset() override
+        {
+            me->SetReactState(REACT_PASSIVE);
+        }
+
+        void DamageTaken(Unit* attacker, uint32& damage) override
+        {
+            if (attacker->GetEntry() == NPC_WORGEN_WARRIOR || attacker->GetEntry() == NPC_GILNEAN_SHARPSHOOTER)
+                damage = 0;
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_gunship_grunt_42141AI(creature);
+    }
+};
+
+// 43566
+class npc_lorna_crowley_43566 : public CreatureScript
+{
+public:
+    npc_lorna_crowley_43566() : CreatureScript("npc_lorna_crowley_43566") { }
+
+    enum eNPC
+    {
+    };
+
+    struct npc_lorna_crowley_43566AI : public ScriptedAI
+    {
+        npc_lorna_crowley_43566AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+        EventMap m_events;
+
+        void Initialize()
+        {
+        }
+
+        void Reset() override
+        {
+            me->SetReactState(REACT_PASSIVE);
+        }
+
+        void DamageTaken(Unit* attacker, uint32& damage) override
+        {
+            switch (attacker->GetEntry())
+            {
+            case NPC_WORGEN_WARRIOR:
+            case NPC_GILNEAN_SHARPSHOOTER:
+                damage = 0;
+                break;
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_lorna_crowley_43566AI(creature);
     }
 };
 
@@ -5474,5 +5841,11 @@ void AddSC_zone_gilneas_city3()
     new npc_captured_riding_bat_38540();
     new spell_fly_back_72849();
     new spell_iron_bomb_72247();
+    new npc_tobias_mistmantle_43749();
+    new go_worgen_gunship_203428();
+    new npc_worgen_warrior_43651();
+    new npc_gilnean_sharpshooter_43703();
+    new npc_gunship_grunt_42141();
+    new npc_lorna_crowley_43566();
 }
 
