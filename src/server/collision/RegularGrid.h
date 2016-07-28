@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2011-2016 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -18,6 +19,7 @@
 
 #ifndef _REGULAR_GRID_H
 #define _REGULAR_GRID_H
+
 
 #include <G3D/Ray.h>
 #include <G3D/Table.h>
@@ -176,8 +178,8 @@ public:
         //int Cycles = std::max((int)ceilf(max_dist/tMaxX),(int)ceilf(max_dist/tMaxY));
         //int i = 0;
 
-        float tDeltaX = voxel * std::fabs(kx_inv);
-        float tDeltaY = voxel * std::fabs(ky_inv);
+        float tDeltaX = voxel * fabs(kx_inv);
+        float tDeltaY = voxel * fabs(ky_inv);
         do
         {
             if (Node* node = nodes[cell.x][cell.y])

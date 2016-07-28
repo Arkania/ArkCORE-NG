@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2016 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -17,7 +17,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <limits.h>
 #include "PathCommon.h"
 #include "MapBuilder.h"
 
@@ -28,7 +27,14 @@
 #include "DetourNavMesh.h"
 #include "DetourCommon.h"
 
+#include "DisableMgr.h"
 #include <ace/OS_NS_unistd.h>
+
+uint32 GetLiquidFlags(uint32 /*liquidType*/) { return 0; }
+namespace DisableMgr
+{
+    bool IsDisabledFor(DisableType /*type*/, uint32 /*entry*/, Unit const* /*unit*/, uint8 /*flags*/ /*= 0*/) { return false; }
+}
 
 #define MMAP_MAGIC 0x4d4d4150   // 'MMAP'
 #define MMAP_VERSION 5
@@ -72,8 +78,8 @@ namespace MMAP
     {
         for (TileList::iterator it = m_tiles.begin(); it != m_tiles.end(); ++it)
         {
-            (*it).m_tiles->clear();
-            delete (*it).m_tiles;
+            (*it).second->clear();
+            delete (*it).second;
         }
 
         delete m_terrainBuilder;
@@ -92,9 +98,9 @@ namespace MMAP
         for (uint32 i = 0; i < files.size(); ++i)
         {
             mapID = uint32(atoi(files[i].substr(0,3).c_str()));
-            if (std::find(m_tiles.begin(), m_tiles.end(), mapID) == m_tiles.end())
+            if (m_tiles.find(mapID) == m_tiles.end())
             {
-                m_tiles.emplace_back(MapTiles(mapID, new std::set<uint32>));
+                m_tiles.insert(std::pair<uint32, std::set<uint32>*>(mapID, new std::set<uint32>));
                 count++;
             }
         }
@@ -103,12 +109,9 @@ namespace MMAP
         getDirContents(files, "vmaps", "*.vmtree");
         for (uint32 i = 0; i < files.size(); ++i)
         {
-            mapID = uint32(atoi(files[i].substr(0, 3).c_str()));
-            if (std::find(m_tiles.begin(), m_tiles.end(), mapID) == m_tiles.end())
-            {
-                m_tiles.emplace_back(MapTiles(mapID, new std::set<uint32>));
-                count++;
-            }
+            mapID = uint32(atoi(files[i].substr(0,3).c_str()));
+            m_tiles.insert(std::pair<uint32, std::set<uint32>*>(mapID, new std::set<uint32>));
+            count++;
         }
         printf("found %u.\n", count);
 
@@ -116,8 +119,8 @@ namespace MMAP
         printf("Discovering tiles... ");
         for (TileList::iterator itr = m_tiles.begin(); itr != m_tiles.end(); ++itr)
         {
-            std::set<uint32>* tiles = (*itr).m_tiles;
-            mapID = (*itr).m_mapId;
+            std::set<uint32>* tiles = (*itr).second;
+            mapID = (*itr).first;
 
             sprintf(filter, "%03u*.vmtile", mapID);
             files.clear();
@@ -151,12 +154,12 @@ namespace MMAP
     /**************************************************************************/
     std::set<uint32>* MapBuilder::getTileList(uint32 mapID)
     {
-        TileList::iterator itr = std::find(m_tiles.begin(), m_tiles.end(), mapID);
+        TileList::iterator itr = m_tiles.find(mapID);
         if (itr != m_tiles.end())
-            return (*itr).m_tiles;
+            return (*itr).second;
 
         std::set<uint32>* tiles = new std::set<uint32>();
-        m_tiles.emplace_back(MapTiles(mapID, tiles));
+        m_tiles.insert(std::pair<uint32, std::set<uint32>*>(mapID, tiles));
         return tiles;
     }
 
@@ -169,7 +172,7 @@ namespace MMAP
 
         for (TileList::iterator it = m_tiles.begin(); it != m_tiles.end(); ++it)
         {
-            uint32 mapID = it->m_mapId;
+            uint32 mapID = it->first;
             if (!shouldSkipMap(mapID))
             {
                 if (threads > 0)
@@ -338,9 +341,7 @@ namespace MMAP
     /**************************************************************************/
     void MapBuilder::buildMap(uint32 mapID)
     {
-#ifndef __APPLE__
         printf("[Thread %u] Building map %03u:\n", uint32(ACE_Thread::self()), mapID);
-#endif
 
         std::set<uint32>* tiles = getTileList(mapID);
 
@@ -551,6 +552,7 @@ namespace MMAP
         config.borderSize = config.walkableRadius + 3;
         config.maxEdgeLen = VERTEX_PER_TILE + 1;        // anything bigger than tileSize
         config.walkableHeight = m_bigBaseUnit ? 3 : 6;
+        // config.walkableClimb = m_bigBaseUnit ? 2 : 4;   // keep less than walkableHeight
         // a value >= 3|6 allows npcs to walk over some fences
         // a value >= 4|8 allows npcs to walk over all fences
         config.walkableClimb = m_bigBaseUnit ? 4 : 8;
