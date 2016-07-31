@@ -1683,6 +1683,22 @@ bool Position::HasInArc(float arc, const Position* obj, float border) const
     return ((angle >= lborder) && (angle <= rborder));
 }
 
+bool WorldObject::IsInBetween(const Position* obj1, const Position* obj2, float size) const
+{
+    if (!obj1 || !obj2)
+        return false;
+
+    float dist = GetExactDist2d(obj1->GetPositionX(), obj1->GetPositionY());
+    if ((dist * dist) >= obj1->GetExactDist2dSq(obj2->GetPositionX(), obj2->GetPositionY()))
+        return false;
+
+    if (!size)
+        size = GetObjectSize() / 2;
+
+    float angle = obj1->GetAngle(obj2);
+    return (size * size) >= GetExactDist2dSq(obj1->GetPositionX() + cos(angle) * dist, obj1->GetPositionY() + sin(angle) * dist);
+}
+
 bool WorldObject::IsInBetween(const WorldObject* obj1, const WorldObject* obj2, float size) const
 {
     if (!obj1 || !obj2)
@@ -1746,6 +1762,32 @@ void WorldObject::UpdateGroundPositionZ(float x, float y, float &z) const
     float new_z = GetMap()->GetHeight(GetPhaseMask(), x, y, z + 2.0f, true);
     if (new_z > INVALID_HEIGHT)
         z = new_z + 0.05f;                                   // just to be sure that we are not a few pixel under the surface
+}
+
+// @todo: replace with WorldObject::UpdateAllowedPositionZ
+float NormalizeZforCollision(const WorldObject* obj, float x, float y, float z)
+{
+    float ground = obj->GetMap()->GetHeight(obj->GetPhaseMask(), x, y, MAX_HEIGHT, true);
+    float floor = obj->GetMap()->GetHeight(obj->GetPhaseMask(), x, y, z + 2.0f, true);
+    float helper = fabs(ground - z) <= fabs(floor - z) ? ground : floor;
+    if (z > helper) // must be above ground
+    {
+        if (const Unit* unit = obj->ToUnit())
+        {
+            if (unit->CanFly())
+                return z;
+        }
+        LiquidData liquid_status;
+        ZLiquidStatus res = obj->GetMap()->getLiquidStatus(x, y, z, MAP_ALL_LIQUIDS, &liquid_status);
+        if (res && liquid_status.level > helper) // water must be above ground
+        {
+            if (liquid_status.level > z) // z is underwater
+                return z;
+            else
+                return fabs(liquid_status.level - z) <= fabs(helper - z) ? liquid_status.level : helper;
+        }
+    }
+    return helper;
 }
 
 void WorldObject::UpdateAllowedPositionZ(float x, float y, float &z) const
@@ -2630,6 +2672,13 @@ GameObject* WorldObject::FindNearestGameObject(uint32 entry, float range) const
     return go;
 }
 
+std::list<GameObject*> WorldObject::FindNearestGameObjects(uint32 entry, float range) const
+{
+    std::list<GameObject*> goList;
+    GetGameObjectListWithEntryInGrid(goList, entry, range);
+    return goList;
+}
+
 GameObject* WorldObject::FindNearestGameObjectOfType(GameobjectTypes type, float range) const
 {
     GameObject* go = nullptr;
@@ -2943,19 +2992,17 @@ void WorldObject::MovePosition(Position &pos, float dist, float angle)
     float destx, desty, destz, ground, floor;
     destx = pos.m_positionX + dist * std::cos(angle);
     desty = pos.m_positionY + dist * std::sin(angle);
-
-    // Prevent invalid coordinates here, position is unchanged
-    if (!Trinity::IsValidMapCoord(destx, desty, pos.m_positionZ))
+    destz = pos.m_positionZ;
+    
+    // Prevent invalid coordinates here, position Z is unchanged
+    if (!Trinity::IsValidMapCoord(destx, desty, destz))
     {
         TC_LOG_FATAL("misc", "WorldObject::MovePosition: Object (TypeId: %u Entry: %u GUID: %u) has invalid coordinates X: %f and Y: %f were passed!",
             GetTypeId(), GetEntry(), GetGUIDLow(), destx, desty);
         return;
     }
 
-    ground = GetMap()->GetHeight(GetPhaseMask(), destx, desty, MAX_HEIGHT, true);
-    floor = GetMap()->GetHeight(GetPhaseMask(), destx, desty, pos.m_positionZ, true);
-    destz = fabs(ground - pos.m_positionZ) <= fabs(floor - pos.m_positionZ) ? ground : floor;
-
+    UpdateAllowedPositionZ(destx, desty, destz); 
     float step = dist/10.0f;
 
     for (uint8 j = 0; j < 10; ++j)
@@ -2965,9 +3012,7 @@ void WorldObject::MovePosition(Position &pos, float dist, float angle)
         {
             destx -= step * std::cos(angle);
             desty -= step * std::sin(angle);
-            ground = GetMap()->GetHeight(GetPhaseMask(), destx, desty, MAX_HEIGHT, true);
-            floor = GetMap()->GetHeight(GetPhaseMask(), destx, desty, pos.m_positionZ, true);
-            destz = fabs(ground - pos.m_positionZ) <= fabs(floor - pos.m_positionZ) ? ground : floor;
+            destz = NormalizeZforCollision(this, destx, desty, pos.GetPositionZ());
         }
         // we have correct destz now
         else
@@ -2979,17 +3024,17 @@ void WorldObject::MovePosition(Position &pos, float dist, float angle)
 
     Trinity::NormalizeMapCoord(pos.m_positionX);
     Trinity::NormalizeMapCoord(pos.m_positionY);
-    UpdateGroundPositionZ(pos.m_positionX, pos.m_positionY, pos.m_positionZ);
+    UpdateAllowedPositionZ(pos.m_positionX, pos.m_positionY, pos.m_positionZ);
     pos.SetOrientation(GetOrientation());
 }
 
 void WorldObject::MovePositionToFirstCollision(Position &pos, float dist, float angle)
 {
     angle += GetOrientation();
-    float destx, desty, destz, ground, floor;
-    pos.m_positionZ += 2.0f;
+    float destx, desty, destz;
     destx = pos.m_positionX + dist * std::cos(angle);
     desty = pos.m_positionY + dist * std::sin(angle);
+    destz = pos.m_positionZ;
 
     // Prevent invalid coordinates here, position is unchanged
     if (!Trinity::IsValidMapCoord(destx, desty))
@@ -2998,10 +3043,7 @@ void WorldObject::MovePositionToFirstCollision(Position &pos, float dist, float 
         return;
     }
 
-    ground = GetMap()->GetHeight(GetPhaseMask(), destx, desty, MAX_HEIGHT, true);
-    floor = GetMap()->GetHeight(GetPhaseMask(), destx, desty, pos.m_positionZ, true);
-    destz = fabs(ground - pos.m_positionZ) <= fabs(floor - pos.m_positionZ) ? ground : floor;
-
+    UpdateAllowedPositionZ(destx, desty, destz);
     bool col = VMAP::VMapFactory::createOrGetVMapManager()->getObjectHitPos(GetMapId(), pos.m_positionX, pos.m_positionY, pos.m_positionZ+0.5f, destx, desty, destz+0.5f, destx, desty, destz, -0.5f);
 
     // collision occured
@@ -3033,9 +3075,7 @@ void WorldObject::MovePositionToFirstCollision(Position &pos, float dist, float 
         {
             destx -= step * std::cos(angle);
             desty -= step * std::sin(angle);
-            ground = GetMap()->GetHeight(GetPhaseMask(), destx, desty, MAX_HEIGHT, true);
-            floor = GetMap()->GetHeight(GetPhaseMask(), destx, desty, pos.m_positionZ, true);
-            destz = fabs(ground - pos.m_positionZ) <= fabs(floor - pos.m_positionZ) ? ground : floor;
+            destz = NormalizeZforCollision(this, destx, desty, pos.GetPositionZ());
         }
         // we have correct destz now
         else

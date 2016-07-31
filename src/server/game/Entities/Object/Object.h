@@ -722,6 +722,7 @@ class WorldObject : public Object, public WorldLocation
         bool isInFront(WorldObject const* target, float arc = M_PI) const;
         bool isInBack(WorldObject const* target, float arc = M_PI) const;
 
+        bool IsInBetween(const Position* obj1, const Position* obj2, float size) const;
         bool IsInBetween(WorldObject const* obj1, WorldObject const* obj2, float size = 0) const;
 
         virtual void CleanupsBeforeDelete(bool finalCleanup = true);  // used in destructor or explicitly before mass creature delete to remove cross-references to already deleted units
@@ -791,6 +792,7 @@ class WorldObject : public Object, public WorldLocation
         std::vector<Creature*> FindNearestCreatures(uint32 entry, float range, bool alive) const;
         Creature*   FindRandomCreatureInRange(uint32 entry, float range, bool alive);
         GameObject* FindNearestGameObject(uint32 entry, float range) const;
+        std::list<GameObject*> FindNearestGameObjects(uint32 entry, float range) const;
         GameObject* FindNearestGameObjectOfType(GameobjectTypes type, float range) const;
         Player*     FindNearestPlayer(float range, bool alive = true);
         std::list<Player*> FindNearestPlayers(float range, bool alive = true);
