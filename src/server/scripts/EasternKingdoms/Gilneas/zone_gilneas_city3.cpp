@@ -26,6 +26,8 @@
 #include "GameObject.h"
 #include "GameObjectAI.h"
 #include "CreatureGroups.h"
+#include "Transport.h"
+#include "TransportMgr.h"
 
 #include "ObjectMgr.h"
 #include "ScriptMgr.h"
@@ -36,6 +38,9 @@
 #include "CellImpl.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
+#include "MapManager.h"
+#include "Map.h"
+#include "MapReference.h"
 #include "CreatureTextMgr.h"
 
 enum eBattleForGilneas
@@ -5471,6 +5476,8 @@ enum eEndGame
     EVENT_START_SHOWFIGHT,
     EVENT_IS_BRIDGE_CLEAN,
     EVENT_START_ROPE_PART,
+    EVENT_CHECK_SPAWN_PASSENGERS,
+    EVENT_SPAWN_PASSENGERS,
 
     SPELL_FOR_GILNEAS = 81790,
 };
@@ -5505,11 +5512,6 @@ public:
             m_talkWaiting = false;
         }
 
-        void Reset() override
-        {
-
-        }
-
         void DoAction(int32 param) override
         {
             if (!CheckPlayerForQuest())
@@ -5529,10 +5531,6 @@ public:
                     m_talkWaiting = true;
                     m_events.RescheduleEvent(EVENTS_TALK_WAITING_COOLDOWN, 240000);
                     SetHippoSpellClick(false);
-                    break;
-                case ACTION_SHIP_ON_THE_WAY:
-                    //Talk(0);
-                    //SetHippoSpellClick(false);
                     break;
                 }
             }
@@ -5689,7 +5687,9 @@ public:
             case POINT_MOTION_TYPE:
             {
                 if (id == 1002)
+                {
                     m_events.ScheduleEvent(EVENT_EJECT_ALL_PASSENGER, 10);
+                }
                 break;
             }
             }
@@ -5738,11 +5738,12 @@ public:
                 {
                     if (Vehicle* hippo = me->GetVehicleKit())
                         hippo->RemoveAllPassengers();
-                  
+
                     if (Creature* lorna = sObjectAccessor->GetCreature(*me, m_lornaGUID))
                         lorna->AI()->Talk(2);
 
                     m_playerGUID = 0;
+                    me->DespawnOrUnsummon(2000);
                     break;
                 }
                 }
@@ -5779,21 +5780,36 @@ public:
 
         EventMap m_events;
         uint64   m_tobiasGUID;
-
-        uint32 m_zone, m_area;
+        uint64   m_transportGUID;
+        uint32   m_zone, m_area;
+        bool     m_spawnPassengers;
+        std::list<uint64> m_passengerList;
 
         void Reset() override
         {
             m_events.Reset();
             m_tobiasGUID = 0;
-        }
-
-        void OnGameEvent(bool start, uint16 eventId)
-        {
+            m_transportGUID = 0;
+            if (Transport* transport = go->ToTransport())
+                m_transportGUID = transport->GetGUID();
+            m_events.ScheduleEvent(EVENT_CHECK_SPAWN_PASSENGERS, 1000);
         }
 
         void EventInform(uint32 eventId)
         {
+            switch (eventId)
+            {
+            case ACTION_15_SEC_BEFORE_FIGHT:
+                RemoveAllPassenger();
+            case ACTION_30_SEC_BEFORE_FIGHT:
+            case ACTION_SHIP_ON_THE_WAY:
+                m_spawnPassengers = false;
+                break;
+            case ACTION_START_FEIGHTING_180_SEC:
+                m_spawnPassengers = true;
+                break;
+            }
+
             if (Creature* tobias = sObjectAccessor->GetCreature(*go, m_tobiasGUID))
                 tobias->AI()->DoAction(eventId);
         }
@@ -5808,6 +5824,87 @@ public:
             }
         }
 
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_CHECK_SPAWN_PASSENGERS:
+                {
+                    if (m_spawnPassengers)
+                    {
+                        m_events.ScheduleEvent(EVENT_SPAWN_PASSENGERS, 10000);
+                        m_spawnPassengers = false;
+                    }
+                    m_events.ScheduleEvent(EVENT_CHECK_SPAWN_PASSENGERS, 1000);
+                    break;
+                }
+                case EVENT_SPAWN_PASSENGERS:
+                {
+                    SpawnAllPassenger();
+                    break;
+                }
+                }
+            }
+        }
+
+        void SpawnAllPassenger()
+        {
+            if (!m_passengerList.empty())
+                RemoveAllPassenger();
+            AddPassenger(43764, 749, 4194304, 53.9098f, 0.689094f, 30.1788f, 3.35103f);
+            AddPassenger(43767, 749, 4194304, 53.5231f, -2.70909f, 30.1788f, 2.75762f);
+            AddPassenger(42141, 749, 4194304, 2.52693f, 8.763f, 84.8803f, 2.86234f);
+            AddPassenger(42141, 749, 4194304, 13.197f, 24.5043f, 89.9376f, 3.64774f);
+            AddPassenger(42141, 749, 4194304, -8.64439f, -27.1678f, 90.0169f, 2.86234f);
+            AddPassenger(42141, 749, 4194304, 0.115611f, 25.2395f, 89.9887f, 2.86234f);
+            AddPassenger(42141, 749, 4194304, 4.20127f, -9.64648f, 85.2608f, 2.86234f);
+            AddPassenger(42141, 749, 4194304, 10.6788f, -25.0886f, 89.9489f, 4.24115f);
+            AddPassenger(42141, 749, 4194304, 30.6456f, -30.7163f, 89.8455f, 4.57276f);
+            AddPassenger(42141, 749, 4194304, -44.9259f, 6.98739f, 12.4255f, 0.0f);
+            AddPassenger(42141, 749, 4194304, -2.08453f, 23.9422f, 89.9943f, 1.69297f);
+            AddPassenger(43651, 749, 4194304, 4.02112f, -4.07849f, 84.797f, 0.0f);
+            AddPassenger(43566, 749, 4194304, 6.8365f, 0.0783f, 84.797f, 0.0f);
+            AddPassenger(43703, 749, 4194304, 9.85322f, -26.5856f, 89.9511f, 1.53589f);
+            AddPassenger(43703, 749, 4194304, 11.1976f, 24.1545f, 89.9475f, 4.79965f);
+            AddPassenger(43651, 749, 4194304, -2.6075f, 26.4231f, 89.998f, 0.0523599f);
+            AddPassenger(43651, 749, 4194304, -12.8653f, -26.705f, 90.0293f, 0.0523599f);
+            AddPassenger(43651, 749, 4194304, 4.24837f, 4.02432f, 84.797f, 0.0523599f);
+            AddPassenger(43651, 749, 4194304, 29.7026f, -32.698f, 89.8496f, 2.60054f);
+            AddPassenger(43703, 749, 4194304, -0.689404f, -4.44034f, 84.797f, 0.0f);
+            AddPassenger(43703, 749, 4194304, -0.132851f, 4.12238f, 84.797f, 0.0f);
+        }
+
+        void AddPassenger(uint32 entry, uint32 mapId, uint32 phaseMask, float x, float y, float z, float o)
+        {
+            if (Transport* transport = sObjectAccessor->GetTransport(*go, m_transportGUID))
+            {
+                uint32 guid = sObjectMgr->GenerateLowGuid(HIGHGUID_UNIT);
+                CreatureData& data = sObjectMgr->NewOrExistCreatureData(guid);
+                data.id = entry;
+                data.phaseMask = phaseMask;
+                data.posX = x;
+                data.posY = y;
+                data.posZ = z;
+                data.orientation = o;
+                data.mapid = mapId;
+
+                if (Creature* creature = transport->CreateNPCPassenger(guid, &data))
+                    m_passengerList.push_back(creature->GetGUID());
+            }
+        }
+
+        void RemoveAllPassenger()
+        {
+            for (std::list<uint64>::iterator itr = m_passengerList.begin(); itr != m_passengerList.end(); ++itr)
+                if (Creature* npc = sObjectAccessor->GetCreature(*go, (*itr)))
+                    if (npc->IsInWorld() && npc->IsAlive())
+                        npc->DespawnOrUnsummon(10);
+            m_passengerList.clear();
+        }
     };
 
     GameObjectAI* GetAI(GameObject* gameobject) const override

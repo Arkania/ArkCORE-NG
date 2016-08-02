@@ -259,6 +259,7 @@ public:
             data.posY = chr->GetTransOffsetY();
             data.posZ = chr->GetTransOffsetZ();
             data.orientation = chr->GetTransOffsetO();
+            data.mapid =chr->GetMapId();
 
             Creature* creature = trans->CreateNPCPassenger(guid, &data);
 
