@@ -108,8 +108,6 @@ void Transport::CleanupsBeforeDelete(bool finalCleanup /*= true*/)
     while (!_passengers.empty())
     {
         WorldObject* obj = *_passengers.begin();
-        obj->m_movementInfo.transport.Reset();
-        obj->SetTransport(NULL);
         RemovePassenger(obj);
     }
 
@@ -225,6 +223,8 @@ void Transport::AddPassenger(WorldObject* passenger)
 
     if (_passengers.insert(passenger).second)
     {
+        passenger->SetTransport(this);
+        passenger->m_movementInfo.transport.guid = GetGUID();
         TC_LOG_DEBUG("entities.transport", "Object %s boarded transport %s.", passenger->GetName().c_str(), GetName().c_str());
 
         if (Player* plr = passenger->ToPlayer())
@@ -236,6 +236,8 @@ void Transport::RemovePassenger(WorldObject* passenger)
 {
     if (_passengers.erase(passenger) || _staticPassengers.erase(passenger)) // static passenger can remove itself in case of grid unload
     {
+        passenger->SetTransport(NULL);
+        passenger->m_movementInfo.transport.Reset();
         TC_LOG_DEBUG("entities.transport", "Object %s removed from transport %s.", passenger->GetName().c_str(), GetName().c_str());
 
         if (Player* plr = passenger->ToPlayer())
@@ -455,6 +457,7 @@ TempSummon* Transport::SummonPassenger(uint32 entry, Position const& pos, TempSu
 void Transport::UpdatePosition(float x, float y, float z, float o)
 {
     bool newActive = GetMap()->IsGridLoaded(x, y);
+    Cell oldCell(GetPositionX(), GetPositionY());
 
     Relocate(x, y, z, o);
     UpdateModelPosition();

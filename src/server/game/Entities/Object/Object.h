@@ -541,6 +541,7 @@ struct MovementInfo
     void RemoveExtraMovementFlag(uint16 flag) { flags2 &= ~flag; }
     bool HasExtraMovementFlag(uint16 flag) const { return flags2 & flag; }
 
+    uint32 GetFallTime() const { return jump.fallTime; }
     void SetFallTime(uint32 time) { jump.fallTime = time; }
 
     void ResetTransport()
