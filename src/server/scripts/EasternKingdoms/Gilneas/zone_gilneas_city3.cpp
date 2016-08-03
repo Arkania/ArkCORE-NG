@@ -5783,7 +5783,6 @@ public:
         uint64   m_transportGUID;
         uint32   m_zone, m_area;
         bool     m_spawnPassengers;
-        std::list<uint64> m_passengerList;
 
         void Reset() override
         {
@@ -5853,8 +5852,7 @@ public:
 
         void SpawnAllPassenger()
         {
-            if (!m_passengerList.empty())
-                RemoveAllPassenger();
+            RemoveAllPassenger();
             AddPassenger(43764, 749, 4194304, 53.9098f, 0.689094f, 30.1788f, 3.35103f);
             AddPassenger(43767, 749, 4194304, 53.5231f, -2.70909f, 30.1788f, 2.75762f);
             AddPassenger(42141, 749, 4194304, 2.52693f, 8.763f, 84.8803f, 2.86234f);
@@ -5891,19 +5889,20 @@ public:
                 data.posZ = z;
                 data.orientation = o;
                 data.mapid = mapId;
-
-                if (Creature* creature = transport->CreateNPCPassenger(guid, &data))
-                    m_passengerList.push_back(creature->GetGUID());
+                transport->CreateNPCPassenger(guid, &data);
             }
         }
 
         void RemoveAllPassenger()
         {
-            for (std::list<uint64>::iterator itr = m_passengerList.begin(); itr != m_passengerList.end(); ++itr)
-                if (Creature* npc = sObjectAccessor->GetCreature(*go, (*itr)))
-                    if (npc->IsInWorld() && npc->IsAlive())
-                        npc->DespawnOrUnsummon(10);
-            m_passengerList.clear();
+            if (Transport* transport = sObjectAccessor->GetTransport(*go, m_transportGUID))
+            {
+                std::set<WorldObject*> npcList = transport->GetStaticPassengers();
+                for (std::set<WorldObject*>::const_iterator itr = npcList.begin(); itr != npcList.end(); ++itr)
+                    if (Creature* npc = (*itr)->ToCreature())
+                        if (npc->IsInWorld() && npc->IsAlive())
+                            npc->DespawnOrUnsummon(10);
+            }
         }
     };
 
