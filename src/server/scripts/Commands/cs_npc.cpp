@@ -723,13 +723,31 @@ public:
         uint32 displayid = target->GetDisplayId();
         uint32 nativeid = target->GetNativeDisplayId();
         uint32 Entry = target->GetEntry();
-
+        Transport* transport = target->GetTransport();
+        Position position1 = target->GetPosition();
+        Position position2 = Position();
         int64 curRespawnDelay = target->GetRespawnTimeEx()-time(NULL);
         if (curRespawnDelay < 0)
             curRespawnDelay = 0;
+        uint32   relMap = 0;
         std::string curRespawnDelayStr = secsToTimeString(uint64(curRespawnDelay), true);
         std::string defRespawnDelayStr = secsToTimeString(target->GetRespawnDelay(), true);
-
+        if (transport)
+        {
+            position1 = transport->GetPosition();
+            position2 = target->m_movementInfo.transport.pos;
+            std::set<WorldObject*> pList = transport->GetPassengers();
+            std::set<WorldObject*> cList = transport->GetStaticPassengers();            
+            uint32 mapid = transport->GetMapId();
+            const char* name = transport->GetName().c_str();
+            if (const GameObject* gObject = transport->ToGameObject())
+            {
+                if (const GameObjectTemplate* info = gObject->GetGOInfo())
+                    relMap = info->raw.data[6];
+            }           
+            handler->PSendSysMessage("Transport: Name: %s, with %u passenger and %u crewmember.\n", name, pList.size(), (uint32)cList.size());
+            handler->PSendSysMessage("RelPos: X: %f, Y: %f, Z: %f, O: %f, Map: %u\n", position2.m_positionX, position2.m_positionY, position2.m_positionZ, position2.m_orientation, relMap);
+        }
         handler->PSendSysMessage(LANG_NPCINFO_CHAR,  target->GetDBTableGUIDLow(), target->GetGUIDLow(), faction, npcflags, Entry, displayid, nativeid);
         handler->PSendSysMessage(LANG_NPCINFO_LEVEL, target->getLevel());
         handler->PSendSysMessage(LANG_NPCINFO_EQUIPMENT, target->GetCurrentEquipmentId(), target->GetOriginalEquipmentId());
@@ -746,7 +764,7 @@ public:
         handler->PSendSysMessage(LANG_NPCINFO_DUNGEON_ID, target->GetInstanceId());
         handler->PSendSysMessage(LANG_NPCINFO_PHASEMASK, target->GetPhaseMask());
         handler->PSendSysMessage(LANG_NPCINFO_ARMOR, target->GetArmor());
-        handler->PSendSysMessage(LANG_NPCINFO_POSITION, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ());
+        handler->PSendSysMessage(LANG_NPCINFO_POSITION, position1.GetPositionX(), position1.GetPositionY(), position1.GetPositionZ(), position1.GetOrientation());
         handler->PSendSysMessage(LANG_NPCINFO_AIINFO, target->GetAIName().c_str(), target->GetScriptName().c_str());
 
         for (uint8 i = 0; i < NPCFLAG_COUNT; i++)

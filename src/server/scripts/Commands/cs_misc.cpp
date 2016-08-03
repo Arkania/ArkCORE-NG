@@ -178,18 +178,15 @@ public:
         Map2ZoneCoordinates(zoneX, zoneY, zoneId);
 
         const Transport* transport = object->GetTransport();
-        float relX = object->GetTransOffsetX(); // m_movementInfo.transport.pos.GetPositionX()
-        float relY = object->GetTransOffsetY();
-        float relZ = object->GetTransOffsetZ();
-        float relO = object->GetTransOffsetO();
-        Position relPos = Position(relX, relY, relZ, relO);
+        Position position1 = object->GetPosition();
+        Position position2 = Position();
         uint32   relMap = 0;
-        std::set<WorldObject*> pList;
-        std::set<WorldObject*> cList;
         if (transport)
         {
-            pList = transport->GetPassengers();
-            cList = transport->GetStaticPassengers();
+            position1 = transport->GetPosition();
+            position2 = object->m_movementInfo.transport.pos;
+            std::set<WorldObject*> pList = transport->GetPassengers();
+            std::set<WorldObject*> cList = transport->GetStaticPassengers();
             uint32 mapid = transport->GetMapId();
             const char* name = transport->GetName().c_str();            
             if (const GameObject* gObject = transport->ToGameObject())
@@ -202,8 +199,8 @@ public:
             else if (const Player* player = transport->ToPlayer())
             {/* prepared */}
 
-            handler->PSendSysMessage("Transport: Named: %s, with %u passenger and %u crewmember.\n", name, pList.size(), (uint32)cList.size());
-            handler->PSendSysMessage("RelPos: X: %f, Y: %f, Z: %f, O: %f, Map: %u\n", relX, relY, relZ, relO, relMap);
+            handler->PSendSysMessage("Transport: Name: %s, with %u passenger and %u crewmember.\n", name, pList.size(), (uint32)cList.size());
+            handler->PSendSysMessage("RelPos: X: %f, Y: %f, Z: %f, O: %f, Map: %u\n", position2.m_positionX , position2.m_positionY , position2.m_positionZ , position2.m_orientation , relMap);
         }
 
         Map const* map = object->GetMap();
@@ -235,12 +232,12 @@ public:
             zoneId, (zoneEntry ? zoneEntry->area_name : "<unknown>"),
             areaId, (areaEntry ? areaEntry->area_name : "<unknown>"),
             object->GetPhaseMask(),
-            object->GetPositionX(), object->GetPositionY(), object->GetPositionZ(), object->GetOrientation(),
+            position1.GetPositionX(), position1.GetPositionY(), position1.GetPositionZ(), position1.GetOrientation(),
             cell.GridX(), cell.GridY(), cell.CellX(), cell.CellY(), object->GetInstanceId(),
             zoneX, zoneY, groundZ, floorZ, haveMap, haveVMap, haveMMap);
 
         LiquidData liquidStatus;
-        ZLiquidStatus status = map->getLiquidStatus(object->GetPositionX(), object->GetPositionY(), object->GetPositionZ(), MAP_ALL_LIQUIDS, &liquidStatus);
+        ZLiquidStatus status = map->getLiquidStatus(position1.GetPositionX(), position1.GetPositionY(), position1.GetPositionZ(), MAP_ALL_LIQUIDS, &liquidStatus);
 
         if (status)
             handler->PSendSysMessage(LANG_LIQUID_STATUS, liquidStatus.level, liquidStatus.depth_level, liquidStatus.entry, liquidStatus.type_flags, status);
