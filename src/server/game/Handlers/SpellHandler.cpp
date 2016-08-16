@@ -294,7 +294,7 @@ void WorldSession::HandleGameObjectUseOpcode(WorldPacket& recvData)
 
     if (GameObject* obj = GetPlayer()->GetMap()->GetGameObject(guid))
     {
-        if (!obj->IsWithinDistInMap(GetPlayer(), obj->GetInteractionDistance()))
+        if (!(obj->IsWithinDistInMap(GetPlayer(), obj->GetInteractionDistance())))
             return;
 
         // ignore for remote control state

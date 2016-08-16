@@ -97,6 +97,7 @@ class Transport : public GameObject, public TransportBase
 
         TransportTemplate const* GetTransportTemplate() const { return _transportInfo; }
 
+        uint32 GetMoTransportMapId();
     private:
         void MoveToNextWaypoint();
         float CalculateSegmentPos(float perc);

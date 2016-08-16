@@ -18935,7 +18935,6 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
             {
                 Relocate(x, y, z, o);
                 mapId = m_transport->GetMapId();
-
                 m_transport->AddPassenger(this);
             }
         }

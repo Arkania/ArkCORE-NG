@@ -35,8 +35,8 @@
 #include "Totem.h"
 
 Transport::Transport() : GameObject(),
-    _transportInfo(NULL), _isMoving(true), _pendingStop(false),
-    _triggeredArrivalEvent(false), _triggeredDepartureEvent(false)
+_transportInfo(NULL), _isMoving(true), _pendingStop(false),
+_triggeredArrivalEvent(false), _triggeredDepartureEvent(false)
 {
     m_updateFlag = UPDATEFLAG_TRANSPORT | UPDATEFLAG_LOWGUID | UPDATEFLAG_STATIONARY_POSITION | UPDATEFLAG_ROTATION;
 }
@@ -208,8 +208,16 @@ void Transport::Update(uint32 diff)
               3. transport moves from active to inactive grid
               4. the grid that transport is currently in unloads
             */
-            if (_staticPassengers.empty() && GetMap()->IsGridLoaded(GetPositionX(), GetPositionY())) // 2.
+            bool gridActive = GetMap()->IsGridLoaded(GetPositionX(), GetPositionY());
+
+            if (_staticPassengers.empty() && gridActive) // 2.
                 LoadStaticPassengers();
+            else if (!_staticPassengers.empty() && !gridActive)
+                // 4. - if transports stopped on grid edge, some passengers can remain in active grids
+                //      unload all static passengers otherwise passengers won't load correctly when the grid that transport is currently in becomes active
+                UnloadStaticPassengers();
+            else if (!_passengers.empty())
+                UpdatePosition(GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation());
         }
     }
 
@@ -263,9 +271,12 @@ Creature* Transport::CreateNPCPassenger(uint32 guid, CreatureData const* data)
 
     creature->SetTransport(this);
     creature->m_movementInfo.transport.guid = GetGUID();
-    creature->m_movementInfo.transport.pos.Relocate(x, y, z, o);
-    CalculatePassengerPosition(x, y, z, &o);
-    creature->Relocate(x, y, z, o);
+    creature->m_movementInfo.transport.pos.Relocate(x, y, z, o);    // m_movementInfo.transport.pos.m_positionX  x=offset
+    CalculatePassengerPosition(x, y, z, &o);                        // This method transforms supplied transport offsets into global coordinates offset > worldpos
+
+    GetMap()->CreatureRelocation(creature, x, y, z, o, false);
+    //creature->Relocate(x, y, z, o);                                 // me->m_positionX  x=worldpos
+
     creature->SetHomePosition(creature->GetPositionX(), creature->GetPositionY(), creature->GetPositionZ(), creature->GetOrientation());
     creature->SetTransportHomePosition(creature->m_movementInfo.transport.pos);
 
@@ -275,7 +286,7 @@ Creature* Transport::CreateNPCPassenger(uint32 guid, CreatureData const* data)
 
     if (!creature->IsPositionValid())
     {
-        TC_LOG_ERROR("entities.transport", "Creature (guidlow %d, entry %d) not created. Suggested coordinates aren't valid (X: %f Y: %f)",creature->GetGUIDLow(),creature->GetEntry(),creature->GetPositionX(),creature->GetPositionY());
+        TC_LOG_ERROR("entities.transport", "Creature (guidlow %d, entry %d) not created. Suggested coordinates aren't valid (X: %f Y: %f)", creature->GetGUIDLow(), creature->GetEntry(), creature->GetPositionX(), creature->GetPositionY());
         delete creature;
         return NULL;
     }
@@ -309,11 +320,12 @@ GameObject* Transport::CreateGOPassenger(uint32 guid, GameObjectData const* data
 
     go->SetTransport(this);
     go->m_movementInfo.transport.guid = GetGUID();
-    go->m_movementInfo.transport.pos.Relocate(x, y, z, o);
-    CalculatePassengerPosition(x, y, z, &o);
-    go->Relocate(x, y, z, o);
-    go->RelocateStationaryPosition(x, y, z, o);
-	go->m_updateFlag |= UPDATEFLAG_GO_TRANSPORT_POSITION;
+    go->m_movementInfo.transport.pos.Relocate(x, y, z, o);  // m_movementInfo.transport.pos.m_positionX = offset
+    go->m_movementInfo.transport.seat = -1;
+    CalculatePassengerPosition(x, y, z, &o);                // This method transforms supplied transport offsets into global coordinates offset > worldpos
+    go->Relocate(x, y, z, o);                               // me->m_positionX = worldpos
+    go->RelocateStationaryPosition(x, y, z, o);             // this->gameobject->m_stationaryPosition  x=worldpos
+    go->m_updateFlag |= UPDATEFLAG_GO_TRANSPORT_POSITION;
 
     if (!go->IsPositionValid())
     {
@@ -343,46 +355,46 @@ TempSummon* Transport::SummonPassenger(uint32 entry, Position const& pos, TempSu
     {
         switch (properties->Category)
         {
-            case SUMMON_CATEGORY_PET:
+        case SUMMON_CATEGORY_PET:
+            mask = UNIT_MASK_GUARDIAN;
+            break;
+        case SUMMON_CATEGORY_PUPPET:
+            mask = UNIT_MASK_PUPPET;
+            break;
+        case SUMMON_CATEGORY_VEHICLE:
+            mask = UNIT_MASK_MINION;
+            break;
+        case SUMMON_CATEGORY_WILD:
+        case SUMMON_CATEGORY_ALLY:
+        case SUMMON_CATEGORY_UNK:
+        {
+            switch (properties->Type)
+            {
+            case SUMMON_TYPE_MINION:
+            case SUMMON_TYPE_GUARDIAN:
+            case SUMMON_TYPE_GUARDIAN2:
                 mask = UNIT_MASK_GUARDIAN;
                 break;
-            case SUMMON_CATEGORY_PUPPET:
-                mask = UNIT_MASK_PUPPET;
+            case SUMMON_TYPE_TOTEM:
+            case SUMMON_TYPE_LIGHTWELL:
+                mask = UNIT_MASK_TOTEM;
                 break;
-            case SUMMON_CATEGORY_VEHICLE:
+            case SUMMON_TYPE_VEHICLE:
+            case SUMMON_TYPE_VEHICLE2:
+                mask = UNIT_MASK_SUMMON;
+                break;
+            case SUMMON_TYPE_MINIPET:
                 mask = UNIT_MASK_MINION;
                 break;
-            case SUMMON_CATEGORY_WILD:
-            case SUMMON_CATEGORY_ALLY:
-            case SUMMON_CATEGORY_UNK:
-            {
-                switch (properties->Type)
-                {
-                    case SUMMON_TYPE_MINION:
-                    case SUMMON_TYPE_GUARDIAN:
-                    case SUMMON_TYPE_GUARDIAN2:
-                        mask = UNIT_MASK_GUARDIAN;
-                        break;
-                    case SUMMON_TYPE_TOTEM:
-                    case SUMMON_TYPE_LIGHTWELL:
-                        mask = UNIT_MASK_TOTEM;
-                        break;
-                    case SUMMON_TYPE_VEHICLE:
-                    case SUMMON_TYPE_VEHICLE2:
-                        mask = UNIT_MASK_SUMMON;
-                        break;
-                    case SUMMON_TYPE_MINIPET:
-                        mask = UNIT_MASK_MINION;
-                        break;
-                    default:
-                        if (properties->Flags & 512) // Mirror Image, Summon Gargoyle
-                            mask = UNIT_MASK_GUARDIAN;
-                        break;
-                }
+            default:
+                if (properties->Flags & 512) // Mirror Image, Summon Gargoyle
+                    mask = UNIT_MASK_GUARDIAN;
                 break;
             }
-            default:
-                return NULL;
+            break;
+        }
+        default:
+            return NULL;
         }
     }
 
@@ -398,21 +410,21 @@ TempSummon* Transport::SummonPassenger(uint32 entry, Position const& pos, TempSu
     TempSummon* summon = nullptr;
     switch (mask)
     {
-        case UNIT_MASK_SUMMON:
-            summon = new TempSummon(properties, summoner, false);
-            break;
-        case UNIT_MASK_GUARDIAN:
-            summon = new Guardian(properties, summoner, false);
-            break;
-        case UNIT_MASK_PUPPET:
-            summon = new Puppet(properties, summoner);
-            break;
-        case UNIT_MASK_TOTEM:
-            summon = new Totem(properties, summoner);
-            break;
-        case UNIT_MASK_MINION:
-            summon = new Minion(properties, summoner, false);
-            break;
+    case UNIT_MASK_SUMMON:
+        summon = new TempSummon(properties, summoner, false);
+        break;
+    case UNIT_MASK_GUARDIAN:
+        summon = new Guardian(properties, summoner, false);
+        break;
+    case UNIT_MASK_PUPPET:
+        summon = new Puppet(properties, summoner);
+        break;
+    case UNIT_MASK_TOTEM:
+        summon = new Totem(properties, summoner);
+        break;
+    case UNIT_MASK_MINION:
+        summon = new Minion(properties, summoner, false);
+        break;
     }
 
     float x, y, z, o;
@@ -494,8 +506,8 @@ void Transport::LoadStaticPassengers()
 
             // GameObjects on transport
             guidEnd = cellItr->second.gameobjects.end();
-			for (CellGuidSet::const_iterator guidItr = cellItr->second.gameobjects.begin(); guidItr != guidEnd; ++guidItr)
-				CreateGOPassenger(*guidItr, sObjectMgr->GetGOData(*guidItr));
+            for (CellGuidSet::const_iterator guidItr = cellItr->second.gameobjects.begin(); guidItr != guidEnd; ++guidItr)
+                CreateGOPassenger(*guidItr, sObjectMgr->GetGOData(*guidItr));
         }
     }
 }
@@ -534,8 +546,8 @@ float Transport::CalculateSegmentPos(float now)
     KeyFrame const& frame = *_currentFrame;
     const float speed = float(m_goInfo->moTransport.moveSpeed);
     const float accel = float(m_goInfo->moTransport.accelRate);
-    float timeSinceStop = frame.TimeFrom + (now - (1.0f/IN_MILLISECONDS) * frame.DepartureTime);
-    float timeUntilStop = frame.TimeTo - (now - (1.0f/IN_MILLISECONDS) * frame.DepartureTime);
+    float timeSinceStop = frame.TimeFrom + (now - (1.0f / IN_MILLISECONDS) * frame.DepartureTime);
+    float timeUntilStop = frame.TimeTo - (now - (1.0f / IN_MILLISECONDS) * frame.DepartureTime);
     float segmentPos, dist;
     float accelTime = _transportInfo->accelTime;
     float accelDist = _transportInfo->accelDist;
@@ -581,28 +593,28 @@ bool Transport::TeleportTransport(uint32 newMapid, float x, float y, float z, fl
 
             switch (obj->GetTypeId())
             {
-                case TYPEID_UNIT:
-                    if (!IS_PLAYER_GUID(obj->ToUnit()->GetOwnerGUID()))  // pets should be teleported with player
-                        obj->ToCreature()->FarTeleportTo(newMap, destX, destY, destZ, destO);
-                    break;
-                case TYPEID_GAMEOBJECT:
-                {
-                    GameObject* go = obj->ToGameObject();
-                    go->GetMap()->RemoveFromMap(go, false);
-                    go->Relocate(destX, destY, destZ, destO);
-                    go->SetMap(newMap);
-                    newMap->AddToMap(go);
-                    break;
-                }
-                case TYPEID_PLAYER:
-                    if (!obj->ToPlayer()->TeleportTo(newMapid, destX, destY, destZ, destO, TELE_TO_NOT_LEAVE_TRANSPORT))
-                        _passengers.erase(obj);
-                    break;
-                case TYPEID_DYNAMICOBJECT:
-                    obj->AddObjectToRemoveList();
-                    break;
-                default:
-                    break;
+            case TYPEID_UNIT:
+                if (!IS_PLAYER_GUID(obj->ToUnit()->GetOwnerGUID()))  // pets should be teleported with player
+                    obj->ToCreature()->FarTeleportTo(newMap, destX, destY, destZ, destO);
+                break;
+            case TYPEID_GAMEOBJECT:
+            {
+                GameObject* go = obj->ToGameObject();
+                go->GetMap()->RemoveFromMap(go, false);
+                go->Relocate(destX, destY, destZ, destO);
+                go->SetMap(newMap);
+                newMap->AddToMap(go);
+                break;
+            }
+            case TYPEID_PLAYER:
+                if (!obj->ToPlayer()->TeleportTo(newMapid, destX, destY, destZ, destO, TELE_TO_NOT_LEAVE_TRANSPORT))
+                    _passengers.erase(obj);
+                break;
+            case TYPEID_DYNAMICOBJECT:
+                obj->AddObjectToRemoveList();
+                break;
+            default:
+                break;
             }
         }
 
@@ -653,28 +665,29 @@ void Transport::UpdatePassengerPositions(std::set<WorldObject*>& passengers)
         CalculatePassengerPosition(x, y, z, &o);
         switch (passenger->GetTypeId())
         {
-            case TYPEID_UNIT:
-            {
-                Creature* creature = passenger->ToCreature();
-                GetMap()->CreatureRelocation(creature, x, y, z, o, false);
-                creature->GetTransportHomePosition(x, y, z, o);
-                CalculatePassengerPosition(x, y, z, &o);
-                creature->SetHomePosition(x, y, z, o);
-                break;
-            }
-            case TYPEID_PLAYER:
-                //relocate only passengers in world and skip any player that might be still logging in/teleporting
-                if (passenger->IsInWorld())
-                    GetMap()->PlayerRelocation(passenger->ToPlayer(), x, y, z, o);
-                break;
-            case TYPEID_GAMEOBJECT:
-                GetMap()->GameObjectRelocation(passenger->ToGameObject(), x, y, z, o, false);
-                break;
-            case TYPEID_DYNAMICOBJECT:
-                GetMap()->DynamicObjectRelocation(passenger->ToDynObject(), x, y, z, o);
-                break;
-            default:
-                break;
+        case TYPEID_UNIT:
+        {
+            Creature* creature = passenger->ToCreature();
+            GetMap()->CreatureRelocation(creature, x, y, z, o, false);
+
+            creature->GetTransportHomePosition(x, y, z, o);
+            CalculatePassengerPosition(x, y, z, &o);
+            creature->SetHomePosition(x, y, z, o); // worldposition
+            break;
+        }
+        case TYPEID_PLAYER:
+            //relocate only passengers in world and skip any player that might be still logging in/teleporting
+            if (passenger->IsInWorld())
+                GetMap()->PlayerRelocation(passenger->ToPlayer(), x, y, z, o);
+            break;
+        case TYPEID_GAMEOBJECT:
+            GetMap()->GameObjectRelocation(passenger->ToGameObject(), x, y, z, o, false);
+            break;
+        case TYPEID_DYNAMICOBJECT:
+            GetMap()->DynamicObjectRelocation(passenger->ToDynObject(), x, y, z, o);
+            break;
+        default:
+            break;
         }
 
         if (Unit* unit = passenger->ToUnit())
@@ -703,4 +716,9 @@ void Transport::BuildUpdate(UpdateDataMapType& data_map)
         BuildFieldsUpdate(itr->GetSource(), data_map);
 
     ClearUpdateMask(true);
+}
+
+uint32 Transport::GetMoTransportMapId()
+{
+    return    m_goInfo->moTransport.mapID;
 }

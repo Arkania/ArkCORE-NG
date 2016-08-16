@@ -67,7 +67,7 @@ namespace Movement
         // there is a big chance that current position is unknown if current state is not finalized, need compute it
         // this also allows calculate spline position and update map position in much greater intervals
         // Don't compute for transport movement if the unit is in a motion between two transports
-        if (!move_spline.Finalized() && move_spline.onTransport == (unit->GetTransGUID() != 0))
+        if (!move_spline.Finalized() && move_spline.onTransport == transport)
             real_position = move_spline.ComputePosition();
         else
         {
@@ -119,7 +119,7 @@ namespace Movement
 
         WorldPacket data(SMSG_MONSTER_MOVE, 64);
         data.append(unit->GetPackGUID());
-        if (unit->GetTransGUID())
+        if (transport)
         {
             data.SetOpcode(SMSG_MONSTER_MOVE_TRANSPORT);
             data.appendPackGUID(unit->GetTransGUID());

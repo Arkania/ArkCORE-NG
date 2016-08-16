@@ -729,7 +729,7 @@ public:
         int64 curRespawnDelay = target->GetRespawnTimeEx()-time(NULL);
         if (curRespawnDelay < 0)
             curRespawnDelay = 0;
-        uint32   relMap = 0;
+        uint32 relMap = 0;
         std::string curRespawnDelayStr = secsToTimeString(uint64(curRespawnDelay), true);
         std::string defRespawnDelayStr = secsToTimeString(target->GetRespawnDelay(), true);
         if (transport)
@@ -740,11 +740,7 @@ public:
             std::set<WorldObject*> cList = transport->GetStaticPassengers();            
             uint32 mapid = transport->GetMapId();
             const char* name = transport->GetName().c_str();
-            if (const GameObject* gObject = transport->ToGameObject())
-            {
-                if (const GameObjectTemplate* info = gObject->GetGOInfo())
-                    relMap = info->raw.data[6];
-            }           
+            relMap = transport->GetMoTransportMapId();
             handler->PSendSysMessage("Transport: Name: %s, with %u passenger and %u crewmember.\n", name, pList.size(), (uint32)cList.size());
             handler->PSendSysMessage("RelPos: X: %f, Y: %f, Z: %f, O: %f, Map: %u\n", position2.m_positionX, position2.m_positionY, position2.m_positionZ, position2.m_orientation, relMap);
         }
