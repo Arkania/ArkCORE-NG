@@ -72,6 +72,7 @@ enum eBattleForGilneas
     SPELL_GILNEAS_MILITIA_SHOOT = 6660,
     SPELL_FORSAKEN_CROSSBOW_SHOOT = 6660,
     SPELL_KNOCKBACK = 68683,
+    SPELL_CLEAVE = 15496,
 
     SOUND_GILNEAN_MILITIA = 22584,
 
@@ -5455,6 +5456,7 @@ public:
 enum eEndGame
 {
     QUEST_ENDGAME = 26706,
+    QUEST_RUTTHERAN = 14434,
 
     NPC_HIPPOGRYPH = 43747,
     NPC_HIPPOGRYPH_AIR = 43751,
@@ -5463,6 +5465,7 @@ enum eEndGame
     NPC_GUNSHIP_GRUNT = 42141,
     NPC_TOBIAS_MISTMANTLE_43749 = 43749,
     NPC_LORNA_CRAWLEY_43566 = 43566,
+    NPC_GILNEAS_VEHICLE_ROPE = 43793,
 
     GO_WORGEN_GUNSHIP = 203428,
     GO_ROPE = 204428,
@@ -5471,15 +5474,17 @@ enum eEndGame
     ACTION_15_SEC_BEFORE_FIGHT = 25727,
     ACTION_SHIP_ON_THE_WAY = 25664,
     ACTION_START_FEIGHTING_180_SEC = 25670,
+    ACTION_START_LORNA_TALK = 401,
 
     EVENT_MAKE_SHOWFIGHT = 301,
     EVENT_START_SHOWFIGHT,
     EVENT_IS_BRIDGE_CLEAN,
     EVENT_START_ROPE_PART,
-    EVENT_CHECK_SPAWN_PASSENGERS,
-    EVENT_SPAWN_PASSENGERS,
+    EVENT_MASTER_RESET,
 
     SPELL_FOR_GILNEAS = 81790,
+    SPELL_ROPE1 = 81974,
+    SPELL_JUMP1 = 81421,
 };
 
 // 43749
@@ -5490,9 +5495,9 @@ public:
 
     enum eNPC
     {
-        EVENT_INIT_GUNSHIP = 201,
-        EVENTS_TALK_WAITING_COOLDOWN,
-        EVENTS_TALK_WAITING,
+        EVENTS_CHECK_TALKING_WAIT = 201,
+        EVENTS_CHECK_TALKING_HIPPO,
+        EVENTS_GET_INITIAL_VALUES,
     };
 
     struct npc_tobias_mistmantle_43749AI : public ScriptedAI
@@ -5501,38 +5506,28 @@ public:
 
         EventMap m_events;
         uint64   m_gunshipGUID;
-        bool     m_talkWaiting;
+        uint32   m_gunshipEventId;
         std::list<uint64> m_hippoList;
 
         void Initialize()
         {
-            m_events.ScheduleEvent(EVENT_INIT_GUNSHIP, 2500);
-            m_events.ScheduleEvent(EVENTS_TALK_WAITING, 10000);
             m_gunshipGUID = 0;
-            m_talkWaiting = false;
+            m_gunshipEventId = 0;
+            m_events.ScheduleEvent(EVENTS_GET_INITIAL_VALUES, 1000);
         }
 
         void DoAction(int32 param) override
         {
-            if (!CheckPlayerForQuest())
-                SetHippoSpellClick(false);
-            else
+            switch (param)
             {
-                switch (param)
-                {
-                case ACTION_30_SEC_BEFORE_FIGHT:
-                    Talk(0);
-                    SetHippoSpellClick(true);
-                    break;
-                case ACTION_15_SEC_BEFORE_FIGHT:
-                    Talk(0);
-                    break;
-                case ACTION_START_FEIGHTING_180_SEC:
-                    m_talkWaiting = true;
-                    m_events.RescheduleEvent(EVENTS_TALK_WAITING_COOLDOWN, 240000);
-                    SetHippoSpellClick(false);
-                    break;
-                }
+            case ACTION_30_SEC_BEFORE_FIGHT:
+            case ACTION_15_SEC_BEFORE_FIGHT:
+                m_events.ScheduleEvent(EVENTS_CHECK_TALKING_HIPPO, 10);
+                break;
+            case ACTION_SHIP_ON_THE_WAY:
+            case ACTION_START_FEIGHTING_180_SEC:
+                m_events.ScheduleEvent(EVENTS_CHECK_TALKING_WAIT, 10);
+                break;
             }
         }
 
@@ -5544,40 +5539,37 @@ public:
             {
                 switch (eventId)
                 {
-                case EVENT_INIT_GUNSHIP:
+                case EVENTS_GET_INITIAL_VALUES:
                 {
-                    if (m_hippoList.empty())
-                        FindNearestHippogryphs();
-
-                    if (!m_gunshipGUID)
-                        FindWorgenGunshipWorldwide();
-
                     if (GameObject* ship = sObjectAccessor->GetGameObject(*me, m_gunshipGUID))
                     {
                         m_gunshipGUID = ship->GetGUID();
                         ship->AI()->SetGUID(me->GetGUID(), me->GetEntry());
+                        break;
                     }
 
-                    if (!m_hippoList.empty() && m_gunshipGUID)
-                        break;
-
-                    m_events.ScheduleEvent(EVENT_INIT_GUNSHIP, 2500);
+                    FindWorgenGunshipWorldwide();
+                    m_events.ScheduleEvent(EVENTS_GET_INITIAL_VALUES, 1000);
                     break;
                 }
-                case EVENTS_TALK_WAITING_COOLDOWN:
+                case EVENTS_CHECK_TALKING_WAIT:
                 {
-                    m_talkWaiting = false;
+                    Talk(1);
+                    SetHippoSpellClick(false);
                     break;
                 }
-                case EVENTS_TALK_WAITING:
+                case EVENTS_CHECK_TALKING_HIPPO:
                 {
-                    if (m_talkWaiting)
+                    if (CheckPlayerForQuest() && CheckIsGunshipReady())
                     {
-                        Talk(1);
-                        m_events.ScheduleEvent(EVENTS_TALK_WAITING, urand(20000, 30000));
+                        SetHippoSpellClick(true);
+                        Talk(0);
                     }
                     else
-                        m_events.ScheduleEvent(EVENTS_TALK_WAITING, urand(8000, 12000));
+                    {
+                        SetHippoSpellClick(false);
+                        Talk(1);
+                    }
                     break;
                 }
                 }
@@ -5599,21 +5591,27 @@ public:
 
         void SetHippoSpellClick(bool value)
         {
+            if (m_hippoList.empty())
+            {
+                std::list<Creature*> hippoList = me->FindNearestCreatures(NPC_HIPPOGRYPH, 15.0f);
+                for (std::list<Creature*>::const_iterator itr = hippoList.begin(); itr != hippoList.end(); ++itr)
+                    if (Creature* hippo = (*itr))
+                        m_hippoList.push_back(hippo->GetGUID());
+            }
+
             for (std::list<uint64>::iterator itr = m_hippoList.begin(); itr != m_hippoList.end(); ++itr)
                 if (Creature* hippo = sObjectAccessor->GetCreature(*me, (*itr)))
                 {
                     if (value)
-                        hippo->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
+                        hippo->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
                     else
-                        hippo->SetUInt32Value(UNIT_NPC_FLAGS, 0);
+                        hippo->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
                 }
         }
 
         bool CheckPlayerForQuest()
         {
             std::list<Player*> playerList = me->FindNearestPlayers(25.0f);
-            if (playerList.empty())
-                return false;
             for (std::list<Player*>::iterator itr = playerList.begin(); itr != playerList.end(); ++itr)
                 if ((*itr)->GetQuestStatus(QUEST_ENDGAME) == QUEST_STATUS_INCOMPLETE)
                     return true;
@@ -5627,6 +5625,18 @@ public:
             for (HashMapHolder<GameObject>::MapType::const_iterator iter = m.begin(); iter != m.end(); ++iter)
                 if (iter->second->IsInWorld() && iter->second->GetEntry() == GO_WORGEN_GUNSHIP)
                     m_gunshipGUID = iter->second->GetGUID();
+        }
+
+        bool CheckIsGunshipReady()
+        {
+            if (GameObject* ship = sObjectAccessor->GetGameObject(*me, m_gunshipGUID))
+                if (Transport* transport = ship->ToTransport())
+                {
+                    uint32 count = transport->GetStaticPassengers().size();
+                    return (count >= 39) ? true : false;
+                }
+
+            return false;
         }
     };
 
@@ -5648,7 +5658,7 @@ public:
         EVENT_MOVEMENT_START = 201,
         EVENT_MOVE_LAST_POINT,
         EVENT_EJECT_ALL_PASSENGER,
-        EVENT_TELEPORT,
+        EVENT_JUMP_TO_LORNA,
     };
 
     struct npc_hippogryph_43751AI : public VehicleAI
@@ -5699,8 +5709,17 @@ public:
         {
             if (apply)
             {
-                m_events.ScheduleEvent(EVENT_MOVEMENT_START, 2500);
-                m_playerGUID = who->GetGUID();
+                if (Player* player = who->ToPlayer())
+                    if (player->GetQuestStatus(QUEST_ENDGAME) == QUEST_STATUS_INCOMPLETE)
+                    {
+                        m_events.ScheduleEvent(EVENT_MOVEMENT_START, 2500);
+                        m_playerGUID = who->GetGUID();
+                        return;
+                    }
+
+                m_playerGUID = 0;
+                if (Vehicle* hippo = me->GetVehicleKit())
+                    hippo->RemoveAllPassengers();
             }
             else
                 me->DespawnOrUnsummon(1000);
@@ -5739,8 +5758,21 @@ public:
                     if (Vehicle* hippo = me->GetVehicleKit())
                         hippo->RemoveAllPassengers();
 
-                    if (Creature* lorna = sObjectAccessor->GetCreature(*me, m_lornaGUID))
-                        lorna->AI()->Talk(2);
+                    m_events.ScheduleEvent(EVENT_JUMP_TO_LORNA, 10);
+                    break;
+                }
+                case EVENT_JUMP_TO_LORNA:
+                {
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                        if (Creature* lorna = sObjectAccessor->GetCreature(*me, m_lornaGUID))
+                        {
+                            lorna->AI()->DoAction(ACTION_START_LORNA_TALK);
+                            player->JumpTo(lorna, 0.5f);
+                        }
+                        else
+                        {
+                            player->GetMotionMaster()->MoveJump(-1472.0f, 3250.0f, 180.0f, 20.0f, 0.4f);
+                        }
 
                     m_playerGUID = 0;
                     me->DespawnOrUnsummon(2000);
@@ -5774,41 +5806,33 @@ class go_worgen_gunship_203428 : public GameObjectScript
 public:
     go_worgen_gunship_203428() : GameObjectScript("go_worgen_gunship_203428") { }
 
+    enum eObject
+    {
+        EVENT_CHECK_POSITIONS = 201,
+    };
+
     struct go_worgen_gunship_203428AI : public GameObjectAI
     {
         go_worgen_gunship_203428AI(GameObject* gameobject) : GameObjectAI(gameobject) { }
 
         EventMap m_events;
         uint64   m_tobiasGUID;
-        uint64   m_transportGUID;
-        uint32   m_zone, m_area;
-        bool     m_spawnPassengers;
+        uint64   m_playerGUID;
+        uint64   m_lornaGUID;
+        uint64   m_ropeGUID;
 
         void Reset() override
         {
             m_events.Reset();
             m_tobiasGUID = 0;
-            m_transportGUID = 0;
-            if (Transport* transport = go->ToTransport())
-                m_transportGUID = transport->GetGUID();
-            m_events.ScheduleEvent(EVENT_CHECK_SPAWN_PASSENGERS, 1000);
+            m_playerGUID = 0;
+            m_lornaGUID = 0;
+            m_ropeGUID = 0;
+            m_events.ScheduleEvent(EVENT_CHECK_POSITIONS, 2500);
         }
 
         void EventInform(uint32 eventId)
         {
-            switch (eventId)
-            {
-            case ACTION_15_SEC_BEFORE_FIGHT:
-                RemoveAllPassenger();
-            case ACTION_30_SEC_BEFORE_FIGHT:
-            case ACTION_SHIP_ON_THE_WAY:
-                m_spawnPassengers = false;
-                break;
-            case ACTION_START_FEIGHTING_180_SEC:
-                m_spawnPassengers = true;
-                break;
-            }
-
             if (Creature* tobias = sObjectAccessor->GetCreature(*go, m_tobiasGUID))
                 tobias->AI()->DoAction(eventId);
         }
@@ -5831,77 +5855,16 @@ public:
             {
                 switch (eventId)
                 {
-                case EVENT_CHECK_SPAWN_PASSENGERS:
+                case EVENT_CHECK_POSITIONS:
                 {
-                    if (m_spawnPassengers)
-                    {
-                        m_events.ScheduleEvent(EVENT_SPAWN_PASSENGERS, 10000);
-                        m_spawnPassengers = false;
-                    }
-                    m_events.ScheduleEvent(EVENT_CHECK_SPAWN_PASSENGERS, 1000);
-                    break;
-                }
-                case EVENT_SPAWN_PASSENGERS:
-                {
-                    SpawnAllPassenger();
+                    if (!m_playerGUID)
+                        if (Player* player = go->FindNearestPlayer(100.0f))
+                            m_playerGUID = player->GetGUID();
+
+                     m_events.ScheduleEvent(EVENT_CHECK_POSITIONS, 2500);
                     break;
                 }
                 }
-            }
-        }
-
-        void SpawnAllPassenger()
-        {
-            RemoveAllPassenger();
-            AddPassenger(43764, 749, 4194304, 53.9098f, 0.689094f, 30.1788f, 3.35103f);
-            AddPassenger(43767, 749, 4194304, 53.5231f, -2.70909f, 30.1788f, 2.75762f);
-            AddPassenger(42141, 749, 4194304, 2.52693f, 8.763f, 84.8803f, 2.86234f);
-            AddPassenger(42141, 749, 4194304, 13.197f, 24.5043f, 89.9376f, 3.64774f);
-            AddPassenger(42141, 749, 4194304, -8.64439f, -27.1678f, 90.0169f, 2.86234f);
-            AddPassenger(42141, 749, 4194304, 0.115611f, 25.2395f, 89.9887f, 2.86234f);
-            AddPassenger(42141, 749, 4194304, 4.20127f, -9.64648f, 85.2608f, 2.86234f);
-            AddPassenger(42141, 749, 4194304, 10.6788f, -25.0886f, 89.9489f, 4.24115f);
-            AddPassenger(42141, 749, 4194304, 30.6456f, -30.7163f, 89.8455f, 4.57276f);
-            AddPassenger(42141, 749, 4194304, -44.9259f, 6.98739f, 12.4255f, 0.0f);
-            AddPassenger(42141, 749, 4194304, -2.08453f, 23.9422f, 89.9943f, 1.69297f);
-            AddPassenger(43651, 749, 4194304, 4.02112f, -4.07849f, 84.797f, 0.0f);
-            AddPassenger(43566, 749, 4194304, 6.8365f, 0.0783f, 84.797f, 0.0f);
-            AddPassenger(43703, 749, 4194304, 9.85322f, -26.5856f, 89.9511f, 1.53589f);
-            AddPassenger(43703, 749, 4194304, 11.1976f, 24.1545f, 89.9475f, 4.79965f);
-            AddPassenger(43651, 749, 4194304, -2.6075f, 26.4231f, 89.998f, 0.0523599f);
-            AddPassenger(43651, 749, 4194304, -12.8653f, -26.705f, 90.0293f, 0.0523599f);
-            AddPassenger(43651, 749, 4194304, 4.24837f, 4.02432f, 84.797f, 0.0523599f);
-            AddPassenger(43651, 749, 4194304, 29.7026f, -32.698f, 89.8496f, 2.60054f);
-            AddPassenger(43703, 749, 4194304, -0.689404f, -4.44034f, 84.797f, 0.0f);
-            AddPassenger(43703, 749, 4194304, -0.132851f, 4.12238f, 84.797f, 0.0f);
-        }
-
-        void AddPassenger(uint32 entry, uint32 mapId, uint32 phaseMask, float x, float y, float z, float o)
-        {
-            if (Transport* transport = sObjectAccessor->GetTransport(*go, m_transportGUID))
-            {
-                uint32 guid = sObjectMgr->GenerateLowGuid(HIGHGUID_UNIT);
-                CreatureData& data = sObjectMgr->NewOrExistCreatureData(guid);
-                data.id = entry;
-                data.phaseMask = phaseMask;
-                data.posX = x;
-                data.posY = y;
-                data.posZ = z;
-                data.orientation = o;
-                data.mapid = mapId;
-                transport->CreateNPCPassenger(guid, &data);
-            }
-        }
-
-        void RemoveAllPassenger()
-        {
-            if (Transport* transport = sObjectAccessor->GetTransport(*go, m_transportGUID))
-            {
-                std::set<WorldObject*> npcList = transport->GetStaticPassengers();
-                for (std::set<WorldObject*>::const_iterator itr = npcList.begin(); itr != npcList.end(); ++itr)
-                    if (Creature* npc = (*itr)->ToCreature())
-                        if (npc->IsInWorld() && npc->IsAlive())
-                            npc->DespawnOrUnsummon(10);
             }
         }
     };
@@ -5918,40 +5881,55 @@ class npc_lorna_crowley_43566 : public CreatureScript
 public:
     npc_lorna_crowley_43566() : CreatureScript("npc_lorna_crowley_43566") { }
 
-    enum eNPC
-    {
-    };
-
     struct npc_lorna_crowley_43566AI : public ScriptedAI
     {
         npc_lorna_crowley_43566AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
 
         EventMap  m_events;
-        Creature* m_target;
+        uint64    m_targetGUID;
         bool      m_doneA;
+        bool      m_anim_is_started;
         std::list<Creature*>victimList;
 
         void Initialize()
         {
+            m_anim_is_started = false;
+            m_targetGUID = 0;
         }
 
         void Reset() override
         {
             me->SetReactState(REACT_PASSIVE);
-            m_target = nullptr;
             m_doneA = false;
-            m_events.ScheduleEvent(EVENT_MAKE_SHOWFIGHT, 5000);
-            m_events.ScheduleEvent(EVENT_IS_BRIDGE_CLEAN, 2500);
             if (!me->HasAura(SPELL_FOR_GILNEAS))
-                me->CastSpell(me, SPELL_FOR_GILNEAS, true);
+                me->AddAura(SPELL_FOR_GILNEAS, me);
         }
 
         void DamageTaken(Unit* attacker, uint32& damage) override
         {
+            if (attacker->GetGUID() != m_targetGUID)
+                m_targetGUID = attacker->GetGUID();
+
             switch (attacker->GetEntry())
             {
             case NPC_GUNSHIP_GRUNT:
                 damage = 0;
+                break;
+            }
+        }
+
+        void DoAction(int32 param) override
+        {
+            switch (param)
+            {
+            case ACTION_START_LORNA_TALK:
+                Talk(2);
+                m_anim_is_started = true;
+                SetRopeNotSelectableFlag(true);
+                if (Transport* transport = me->GetTransport())
+                    transport->EnableMovement(false);
+                m_events.ScheduleEvent(EVENT_IS_BRIDGE_CLEAN, 2500);
+                m_events.ScheduleEvent(EVENT_MASTER_RESET, 180000);
                 break;
             }
         }
@@ -5964,13 +5942,10 @@ public:
             {
                 switch (eventId)
                 {
-                case EVENT_MAKE_SHOWFIGHT:
+                case EVENT_MASTER_RESET:
                 {
-                    if (!me->IsInCombat())
-                        if (FindTarget())
-                            me->Attack(m_target, true);
-
-                    m_events.ScheduleEvent(EVENT_MAKE_SHOWFIGHT, urand(900, 1200));
+                    Initialize();
+                    me->DespawnOrUnsummon(10);
                     break;
                 }
                 case EVENT_IS_BRIDGE_CLEAN:
@@ -5980,17 +5955,14 @@ public:
                     {
                         m_doneA = true;
                         Talk(3);
-                        m_events.ScheduleEvent(EVENT_IS_BRIDGE_CLEAN, 6000);
+                        m_events.ScheduleEvent(EVENT_IS_BRIDGE_CLEAN, 5000);
                         break;
                     }
                     else if (!count)
                     {
                         Talk(4);
-                        std::list<GameObject*> goList = me->FindNearestGameObjects(GO_ROPE, 30.0f);
-                        for (std::list<GameObject*>::const_iterator itr = goList.begin(); itr != goList.end(); ++itr)
-                            (*itr)->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
-
-                        m_events.ScheduleEvent(EVENT_START_ROPE_PART, 9000);
+                        SetRopeNotSelectableFlag(false);
+                        m_events.ScheduleEvent(EVENT_START_ROPE_PART, 7000);
                         break;
                     }
 
@@ -5999,8 +5971,13 @@ public:
                 }
                 case EVENT_START_ROPE_PART:
                 {
-                    UseRopeOnUpperBridge();
+                    SpawnGunshipOrcsWave2();
+                    std::vector<Creature*> friendsList = FindFriendlyCreatureList();
+                    std::vector<Creature*> jumpTargetList = FindJumpTargetPositions();
+                    for (int i = 0; i < friendsList.size(); i++)
+                        friendsList[i]->JumpTo(jumpTargetList[i], 0.4f);
 
+                    m_events.ScheduleEvent(11, 2000);
                     break;
                 }
                 case 11:
@@ -6019,26 +5996,40 @@ public:
 
         bool FindTarget()
         {
-            m_target = nullptr;
-            std::list<Creature*>m_targetList = me->FindAllUnfriendlyCreaturesInRange(5.0f);
+            m_targetGUID = 0;
+            if (!IsPlayerInRange())
+                return false;
+            std::list<Creature*>m_targetList = me->FindAllUnfriendlyCreaturesInRange(40.0f);
             if (!m_targetList.empty())
             {
                 Creature* m_nearestTarget = *m_targetList.begin();
                 float m_nearestDistance = m_nearestTarget->GetDistance(me);
                 for (std::list<Creature*>::const_iterator itr = m_targetList.begin(); itr != m_targetList.end(); ++itr)
-                {
-                    float dist2 = (*itr)->GetDistance(me);
-                    if (dist2 < m_nearestDistance)
+                    if (isInSameHeight((*itr)->GetPosition()))
                     {
-                        m_nearestTarget = (*itr);
-                        m_nearestDistance = dist2;
+                        float dist2 = (*itr)->GetDistance(me);
+                        if (dist2 < m_nearestDistance)
+                        {
+                            m_nearestTarget = (*itr);
+                            m_nearestDistance = dist2;
+                        }
                     }
-                }
-                if (m_nearestDistance < 5.0f)
-                    m_target = m_nearestTarget;
+                m_targetGUID = m_nearestTarget->GetGUID();
             }
 
-            return (m_target) ? true : false;
+            return (m_targetGUID) ? true : false;
+        }
+
+        bool IsPlayerInRange()
+        {
+            Player* player = me->FindNearestPlayer(50.0f);
+            return player ? true : false;
+        }
+
+        bool isInSameHeight(Position pos)
+        {
+            float diff = abs(me->GetPositionZ() - pos.GetPositionZ());
+            return (diff < 5) ? true : false;
         }
 
         uint32 IsBridgeClean()
@@ -6052,13 +6043,61 @@ public:
             return count;
         }
 
-        void UseRopeOnUpperBridge()
+        void SetRopeNotSelectableFlag(bool value)
         {
-            victimList.clear();
-            std::list<Creature*>m_targetList = me->FindAllFriendlyCreaturesInRange(75.0f);
-            for (std::list<Creature*>::iterator itr = m_targetList.begin(); itr != m_targetList.end(); ++itr)
-                if ((*itr)->GetTransOffsetZ() > 75.0f)
-                    victimList.push_back((*itr));
+            std::list<GameObject*> goList = me->FindNearestGameObjects(GO_ROPE, 30.0f); // there are 2 rope on bridge
+            for (std::list<GameObject*>::const_iterator itr = goList.begin(); itr != goList.end(); ++itr)
+                if (value)
+                    (*itr)->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                else
+                    (*itr)->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+        }
+
+        std::vector<Creature*> FindFriendlyCreatureList()
+        {
+            std::vector<Creature*> rList;
+            std::list<Creature*> tList = me->FindAllCreaturesInRange(12.0f);
+            for (std::list<Creature*>::iterator itr = tList.begin(); itr != tList.end(); ++itr)
+                if (Creature* target = (*itr))
+                    if (isInSameHeight(target->GetPosition()) && target->IsAlive())
+                        rList.push_back(target);
+
+            return rList;
+        }
+
+        std::vector<Creature*> FindJumpTargetPositions()
+        {
+            std::vector<Creature*> rList;
+            std::list<Creature*> tList = me->FindNearestCreatures(NPC_GILNEAS_VEHICLE_ROPE, 50.0f);
+            for (std::list<Creature*>::iterator itr = tList.begin(); itr != tList.end(); ++itr)
+                if (Creature* target = (*itr))
+                    if (!isInSameHeight(target->GetPosition()))
+                        rList.push_back(target);
+            return rList;
+        }
+
+        void SpawnGunshipOrcsWave2()
+        {
+            // AddPassenger(42141, );
+        }
+
+        void AddPassenger(uint32 entry, float x, float y, float z, float o)
+        {
+            uint32 guid = sObjectMgr->GenerateLowGuid(HIGHGUID_UNIT);
+            CreatureData& data = sObjectMgr->NewOrExistCreatureData(guid);
+            data.id = entry;
+            data.phaseMask = 4194304;
+            data.posX = x;
+            data.posY = y;
+            data.posZ = z;
+            data.orientation = o;
+            data.mapid = 749;
+
+            if (Transport* transport = me->GetTransport())
+                if (Creature* creature = transport->CreateNPCPassenger(guid, &data))
+                {
+                    creature->SetReactState(REACT_AGGRESSIVE);
+                }
         }
     };
 
@@ -6078,28 +6117,28 @@ public:
     {
         npc_worgen_warrior_43651AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
 
-        EventMap m_events;
-        Creature* m_target;
-        uint64 m_playerGUID;
+        EventMap  m_events;
+        uint64    m_targetGUID;
+        float     m_targetDistance;
+        uint64    m_playerGUID;
 
         void Initialize()
         {
+            me->SetReactState(REACT_PASSIVE);
             m_playerGUID = 0;
+            m_targetGUID = 0;
+            m_targetDistance = 0;
+            m_events.ScheduleEvent(EVENT_START_SHOWFIGHT, 5000);
         }
 
         void Reset() override
         {
-            me->SetReactState(REACT_PASSIVE);
-            m_target = nullptr;
-            m_events.ScheduleEvent(EVENT_START_SHOWFIGHT, 5000);
+            DoStartNoMovement(me);
         }
 
         void DamageTaken(Unit* attacker, uint32& damage) override
         {
-            CheckPlayer();
-            if (!m_playerGUID)
-                if (attacker->GetEntry() == NPC_GUNSHIP_GRUNT)
-                    damage = 0;
+            damage = 0;
         }
 
         void UpdateAI(uint32 diff) override
@@ -6112,15 +6151,21 @@ public:
                 {
                 case EVENT_START_SHOWFIGHT:
                 {
-                    me->SetReactState(REACT_AGGRESSIVE);
                     m_events.ScheduleEvent(EVENT_MAKE_SHOWFIGHT, 1000);
                     break;
                 }
                 case EVENT_MAKE_SHOWFIGHT:
                 {
-                    if (!me->IsInCombat())
-                        if (FindTarget())
-                            me->Attack(m_target, true);
+                    if (me->IsInCombat())
+                    {
+                        if (Creature* target = sObjectAccessor->GetCreature(*me, m_targetGUID))
+                            if (m_targetDistance < 5.0f)
+                                me->CastSpell(target, SPELL_CLEAVE);
+                    }
+                    else if (FindTarget())
+                        if (Creature* target = sObjectAccessor->GetCreature(*me, m_targetGUID))
+                            if (m_targetDistance < 5.0f)
+                                me->CastSpell(target, SPELL_CLEAVE);
 
                     m_events.ScheduleEvent(EVENT_MAKE_SHOWFIGHT, urand(900, 1200));
                     break;
@@ -6136,7 +6181,9 @@ public:
 
         bool FindTarget()
         {
-            m_target = nullptr;
+            m_targetGUID = 0;
+            if (!IsPlayerInRange())
+                return false;
             std::list<Creature*>m_targetList = me->FindAllUnfriendlyCreaturesInRange(5.0f);
             if (!m_targetList.empty())
             {
@@ -6152,13 +6199,19 @@ public:
                     }
                 }
                 if (m_nearestDistance < 5.0f)
-                    m_target = m_nearestTarget;
+                    m_targetGUID = m_nearestTarget->GetGUID();
             }
 
-            return (m_target) ? true : false;
+            return (m_targetGUID) ? true : false;
         }
 
-        void CheckPlayer()
+        bool IsPlayerInRange()
+        {
+            Player* player = me->FindNearestPlayer(50.0f);
+            return player ? true : false;
+        }
+
+        bool CheckPlayer()
         {
             if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
                 if (player->GetDistance(me) > 20.0f)
@@ -6166,6 +6219,7 @@ public:
             if (!m_playerGUID)
                 if (Player* player = me->FindNearestPlayer(20.0f))
                     m_playerGUID = player->GetGUID();
+            return (m_playerGUID) ? true : false;
         }
     };
 
@@ -6185,28 +6239,29 @@ public:
     {
         npc_gilnean_sharpshooter_43703AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
 
-        EventMap m_events;
-        Creature* m_target;
-        uint64 m_playerGUID;
+        EventMap  m_events;
+        uint64    m_targetGUID;
+        float     m_targetDistance;
+        uint64    m_playerGUID;
 
         void Initialize()
         {
+
             m_playerGUID = 0;
+            m_targetGUID = 0;
+            m_targetDistance = 0;
+            m_events.ScheduleEvent(EVENT_START_SHOWFIGHT, 5000);
         }
 
         void Reset() override
         {
             me->SetReactState(REACT_PASSIVE);
-            m_target = nullptr;
-            m_events.ScheduleEvent(EVENT_START_SHOWFIGHT, 5000);
+            DoStartNoMovement(me);
         }
 
         void DamageTaken(Unit* attacker, uint32& damage) override
         {
-            CheckPlayer();
-            if (!m_playerGUID)
-                if (attacker->GetEntry() == NPC_GUNSHIP_GRUNT)
-                    damage = 0;
+            damage = 0;
         }
 
         void UpdateAI(uint32 diff) override
@@ -6219,15 +6274,35 @@ public:
                 {
                 case EVENT_START_SHOWFIGHT:
                 {
-                    me->SetReactState(REACT_AGGRESSIVE);
                     m_events.ScheduleEvent(EVENT_MAKE_SHOWFIGHT, 1000);
                     break;
                 }
                 case EVENT_MAKE_SHOWFIGHT:
                 {
-                    if (!me->IsInCombat())
+                    if (me->IsInCombat())
+                    {
+                        if (Creature* target = sObjectAccessor->GetCreature(*me, m_targetGUID))
+                            if (m_targetDistance > 5.0f)
+                                me->CastSpell(target, SPELL_GILNEAS_MILITIA_SHOOT);
+                            else
+                            {
+                                me->CastSpell(target, SPELL_CLEAVE);
+                                if (!target->IsInCombat())
+                                    target->Attack(me, true);
+                            }
+                    }
+                    else
                         if (FindTarget())
-                            me->Attack(m_target, true);
+                            if (Creature* target = sObjectAccessor->GetCreature(*me, m_targetGUID))
+                                if (m_targetDistance > 5.0f)
+                                    me->CastSpell(target, SPELL_GILNEAS_MILITIA_SHOOT);
+                                else
+                                {
+                                    me->SetReactState(REACT_AGGRESSIVE);
+                                    me->CastSpell(target, SPELL_CLEAVE);
+                                    if (!target->IsInCombat())
+                                        target->Attack(me, true);
+                                }
 
                     m_events.ScheduleEvent(EVENT_MAKE_SHOWFIGHT, urand(900, 1200));
                     break;
@@ -6243,29 +6318,47 @@ public:
 
         bool FindTarget()
         {
-            m_target = nullptr;
-            std::list<Creature*>m_targetList = me->FindAllUnfriendlyCreaturesInRange(5.0f);
+            m_targetGUID = 0;
+            if (!IsPlayerInRange())
+                return false;
+            std::list<Creature*>m_targetList = me->FindAllUnfriendlyCreaturesInRange(40.0f);
             if (!m_targetList.empty())
             {
                 Creature* m_nearestTarget = *m_targetList.begin();
-                float m_nearestDistance = m_nearestTarget->GetDistance2d(me);
+                float m_nearestDistance = m_nearestTarget->GetDistance(me);
                 for (std::list<Creature*>::const_iterator itr = m_targetList.begin(); itr != m_targetList.end(); ++itr)
-                {
-                    float dist2 = (*itr)->GetDistance2d(me);
-                    if (dist2 < m_nearestDistance)
+                    if (isInSameHeight((*itr)->GetPosition()))
                     {
-                        m_nearestTarget = (*itr);
-                        m_nearestDistance = dist2;
+                        float dist2 = (*itr)->GetDistance(me);
+                        if (dist2 < m_nearestDistance)
+                        {
+                            m_nearestTarget = (*itr);
+                            m_nearestDistance = dist2;
+                        }
                     }
+                if (m_nearestDistance < 40.0f)
+                {
+                    m_targetGUID = m_nearestTarget->GetGUID();
+                    m_targetDistance = m_nearestDistance;
                 }
-                if (m_nearestDistance < 5.0f)
-                    m_target = m_nearestTarget;
             }
 
-            return (m_target) ? true : false;
+            return (m_targetGUID) ? true : false;
         }
 
-        void CheckPlayer()
+        bool IsPlayerInRange()
+        {
+            Player* player = me->FindNearestPlayer(50.0f);
+            return player ? true : false;
+        }
+
+        bool isInSameHeight(Position pos)
+        {
+            float diff = abs(me->GetPositionZ() - pos.GetPositionZ());
+            return (diff < 5) ? true : false;
+        }
+
+        bool CheckPlayer()
         {
             if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
                 if (player->GetDistance(me) > 20.0f)
@@ -6273,6 +6366,7 @@ public:
             if (!m_playerGUID)
                 if (Player* player = me->FindNearestPlayer(20.0f))
                     m_playerGUID = player->GetGUID();
+            return (m_playerGUID) ? true : false;
         }
     };
 
@@ -6305,77 +6399,20 @@ public:
         {
             me->SetReactState(REACT_PASSIVE);
             m_target = nullptr;
-            m_events.ScheduleEvent(EVENT_START_SHOWFIGHT, 5000);
+            DoStartNoMovement(me);
         }
 
         void DamageTaken(Unit* attacker, uint32& damage) override
         {
-            CheckPlayer();
-            if (!m_playerGUID)
-                if (attacker->GetEntry() == NPC_WORGEN_WARRIOR || attacker->GetEntry() == NPC_GILNEAN_SHARPSHOOTER)
-                    damage = 0;
+            if (IsPlayerInRange() && me->GetReactState() != REACT_AGGRESSIVE)
+                me->SetReactState(REACT_AGGRESSIVE);
+            damage *= 2;
         }
 
-        void UpdateAI(uint32 diff) override
+        bool IsPlayerInRange()
         {
-            m_events.Update(diff);
-
-            while (uint32 eventId = m_events.ExecuteEvent())
-            {
-                switch (eventId)
-                {
-                case EVENT_START_SHOWFIGHT:
-                {
-                    me->SetReactState(REACT_AGGRESSIVE);
-                    m_events.ScheduleEvent(EVENT_MAKE_SHOWFIGHT, 1000);
-                    break;
-                }
-                case EVENT_MAKE_SHOWFIGHT:
-                {
-                    if (!me->IsInCombat())
-                        if (FindTarget())
-                            me->Attack(m_target, true);
-
-                    m_events.ScheduleEvent(EVENT_MAKE_SHOWFIGHT, urand(900, 1200));
-                    break;
-                }
-                }
-            }
-
-            if (!UpdateVictim())
-                return;
-            else
-                DoMeleeAttackIfReady();
-        }
-
-        bool FindTarget()
-        {
-            m_target = nullptr;
-            float dist = 5.0f;
-            std::list<Creature*>m_targetList = me->FindAllUnfriendlyCreaturesInRange(dist);
-            if (!m_targetList.empty())
-            {
-                Creature* m_nearestTarget = *m_targetList.begin();
-                float m_nearestDistance = m_nearestTarget->GetDistance2d(me);
-                for (std::list<Creature*>::const_iterator itr = m_targetList.begin(); itr != m_targetList.end(); ++itr)
-                {
-                    float dist2 = (*itr)->GetDistance2d(me);
-                    if (dist2 < m_nearestDistance)
-                    {
-                        m_nearestTarget = (*itr);
-                        m_nearestDistance = dist2;
-                    }
-                }
-                if (m_nearestDistance < 5.0f)
-                {
-                    m_target = m_nearestTarget->ToUnit();
-                    dist = m_nearestDistance;
-                }
-            }
-            if (Player* player = me->FindNearestPlayer(dist))
-                m_target = player->ToUnit();
-
-            return (m_target) ? true : false;
+            Player* player = me->FindNearestPlayer(50.0f);
+            return player ? true : false;
         }
 
         void CheckPlayer()
@@ -6395,7 +6432,66 @@ public:
     }
 };
 
+// GO 204428
+class go_rope_204428 : public GameObjectScript
+{
+public:
+    go_rope_204428() : GameObjectScript("go_rope_204428") { }
 
+    bool OnGossipHello(Player* player, GameObject* go) override
+    {
+        if (Creature* target = FindRandomJumpTargetPosition(player))
+            player->JumpTo(target, 0.4f);
+
+        return true;
+    }
+
+    Creature* FindRandomJumpTargetPosition(Player* player)
+    {
+        float zHeight = player->GetPositionZ() - 10.0f;
+        std::vector<Creature*> rList;
+        std::list<Creature*> tList = player->FindNearestCreatures(NPC_GILNEAS_VEHICLE_ROPE, 50.0f);
+        for (std::list<Creature*>::iterator itr = tList.begin(); itr != tList.end(); ++itr)
+            if (Creature* target = (*itr))
+                if (target->GetPositionZ() < zHeight)
+                    rList.push_back(target);
+
+        return (!rList.empty()) ? rList[urand(0, rList.size() - 1)] : nullptr;
+    }
+};
+
+// 43727
+class npc_lorna_crowley_43727 : public CreatureScript
+{
+public:
+    npc_lorna_crowley_43727() : CreatureScript("npc_lorna_crowley_43727") { }
+
+    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*opt*/)
+    {
+        if (quest->GetQuestId() == QUEST_ENDGAME)
+        {
+            creature->AI()->Talk(0);
+        }
+        return true;
+    }
+};
+
+// 36616
+class npc_admiral_nightwind_36616 : public CreatureScript
+{
+public:
+    npc_admiral_nightwind_36616() : CreatureScript("npc_admiral_nightwind_36616") { }
+
+    bool OnQuestReward(Player* player, Creature* /*creature*/, Quest const* quest, uint32 /*opt*/)
+    {
+        if (quest->GetQuestId() == QUEST_RUTTHERAN)
+        {
+            player->RemoveAllAuras();
+            player->TeleportTo(1, 8343, 801, 4, 4.19f);
+        }
+        return true;
+    }
+};
 
 void AddSC_zone_gilneas_city3()
 {
@@ -6433,5 +6529,8 @@ void AddSC_zone_gilneas_city3()
     new npc_worgen_warrior_43651();
     new npc_gilnean_sharpshooter_43703();
     new npc_gunship_grunt_42141();
+    // new go_rope_204428();
+    new npc_lorna_crowley_43727();
+    new npc_admiral_nightwind_36616();
 }
 

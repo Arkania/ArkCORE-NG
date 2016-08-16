@@ -175,31 +175,10 @@ public:
 };
 
 
-// 36616
-class npc_admiral_nightwind_36616 : public CreatureScript
-{
-public:
-    npc_admiral_nightwind_36616() : CreatureScript("npc_admiral_nightwind_36616") { }
-
-	bool OnQuestReward(Player* player, Creature* /*creature*/, Quest const* quest, uint32 /*opt*/)
-	{		
-        if (quest->GetQuestId() == 14434)
-            {
-				player->RemoveAllAuras();
-				player->TeleportTo(1,8343,801,4,4);
-			}
-		return true;
-	}
-};
-
-
 void AddSC_zone_gilneas2()
 {
     new spell_round_up_horse_68903();
 	new spell_rescue_drowning_watchman_68735();
 	new npc_trigger_quest_24616();
-
-	new npc_admiral_nightwind_36616();
-	
 }
 
