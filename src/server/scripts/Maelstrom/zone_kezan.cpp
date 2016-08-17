@@ -28,6 +28,9 @@
 enum eKezanEnumerate
 {
     QUEST_TAKING_CARE_OF_BUSINESS = 14138,
+    QUEST_GOOD_HELP_IS_HARD_TO_FIND = 14069,
+    QUEST_TROUBLE_IN_THE_MINES = 14075,
+    QUEST_KAJA_COLA = 25473,
     QUEST_ROLLING_WITH_MY_HOMIES = 14071,
     QUEST_LIFE_SAVINGS = 14126,
 };
@@ -235,7 +238,7 @@ public:
 
     enum eNPC
     {
-
+        QUEST_KAJA_COLA
     };
 
     bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
@@ -249,6 +252,13 @@ public:
         return false;
     }
 
+    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*opt*/)
+    {
+        if (quest->GetQuestId() == QUEST_TAKING_CARE_OF_BUSINESS)
+            creature->AI()->Talk(3);
+
+        return false;
+    }
 
     struct npc_sassy_hardwrench_34668AI : public ScriptedAI
     {
@@ -310,6 +320,9 @@ public:
     {
         if (quest->GetQuestId() == QUEST_TAKING_CARE_OF_BUSINESS)
             creature->GetAI()->DoAction(ACTION_DELIVER_BUMM_PACKET);
+
+        if (player->GetQuestStatus(QUEST_GOOD_HELP_IS_HARD_TO_FIND) == QUEST_STATUS_REWARDED && player->GetQuestStatus(QUEST_TROUBLE_IN_THE_MINES) == QUEST_STATUS_REWARDED)
+            creature->AI()->Talk(5);
 
         return false;
     }
@@ -612,6 +625,101 @@ public:
     }
 };
 
+// 70478
+class spell_kaja_cola_70478 : public SpellScriptLoader
+{
+public:
+    spell_kaja_cola_70478() : SpellScriptLoader("spell_kaja_cola_70478") { }
+
+    class spell_kaja_cola_70478_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_kaja_cola_70478_AuraScript);
+
+        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            if (Unit* owner = GetOwner()->ToUnit())
+                if (Unit* target = GetTarget())
+                    target->Talk(urand(37326, 37365), CHAT_MSG_MONSTER_SAY, 15.0f, target);
+        }
+
+        void Register() override
+        {
+            OnEffectApply += AuraEffectApplyFn(spell_kaja_cola_70478_AuraScript::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_kaja_cola_70478_AuraScript();
+    }
+};
+
+// 35304
+class npc_brute_enforcer_35304 : public CreatureScript
+{
+public:
+    npc_brute_enforcer_35304() : CreatureScript("npc_brute_enforcer_35304") { }
+
+    enum eNPC
+    {
+        EVENTS_TALK_COOLDOWN = 201,
+    };
+
+    struct npc_brute_enforcer_35304AI : public ScriptedAI
+    {
+        npc_brute_enforcer_35304AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap m_events;
+        bool     m_talk_cd_active;
+
+        void Reset() override
+        {
+            m_talk_cd_active = false;
+        }
+
+        void MoveInLineOfSight(Unit* who) override
+        {
+            if (!m_talk_cd_active)
+                if (Player* player = who->ToPlayer())
+                    if (player->GetQuestStatus(QUEST_ROLLING_WITH_MY_HOMIES) != QUEST_STATUS_REWARDED)
+                        if (urand(0, 100) < 25)
+                        {
+                            Talk(0);
+                            m_talk_cd_active = true;
+                            m_events.ScheduleEvent(EVENTS_TALK_COOLDOWN, urand(10000, 15000));
+                        }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENTS_TALK_COOLDOWN:
+                {
+                    m_talk_cd_active = false;
+                    break;
+                }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_brute_enforcer_35304AI(creature);
+    }
+};
+
+
 
 void AddSC_zone_kezan()
 {
@@ -624,6 +732,7 @@ void AddSC_zone_kezan()
     new npc_candy_cane_35053();
     new npc_hobart_grapplehammer_48494();
     new npc_subject_nine_49150();
-
+    new spell_kaja_cola_70478();
+    new npc_brute_enforcer_35304();
 }
 
