@@ -1616,8 +1616,8 @@ void ObjectMgr::LoadCreatures()
 
     //                                               0              1   2    3        4             5           6           7           8            9              10
     QueryResult result = WorldDatabase.Query("SELECT creature.guid, id, map, modelid, equipment_id, position_x, position_y, position_z, orientation, spawntimesecs, spawndist, "
-    //   11               12         13       14            15         16         17          18          19                20                   21
-        "currentwaypoint, curhealth, curmana, MovementType, spawnMask, phaseMask, eventEntry, pool_entry, creature.npcflag, creature.unit_flags, creature.dynamicflags "
+    //   11               12         13       14            15         16         17          18          19                20                   21                     22                23
+        "currentwaypoint, curhealth, curmana, MovementType, spawnMask, phaseMask, eventEntry, pool_entry, creature.npcflag, creature.unit_flags, creature.dynamicflags, creature.phaseid, creature.phasegroup "
         "FROM creature "
         "LEFT OUTER JOIN game_event_creature ON creature.guid = game_event_creature.guid "
         "LEFT OUTER JOIN pool_creature ON creature.guid = pool_creature.guid");
@@ -1674,6 +1674,8 @@ void ObjectMgr::LoadCreatures()
         data.npcflag        = fields[19].GetUInt32();
         data.unit_flags     = fields[20].GetUInt32();
         data.dynamicflags   = fields[21].GetUInt32();
+        data.phaseId        = fields[22].GetUInt16();
+        data.phaseGroup     = fields[23].GetUInt16();
 
         MapEntry const* mapEntry = sMapStore.LookupEntry(data.mapid);
         if (!mapEntry)
@@ -1740,11 +1742,42 @@ void ObjectMgr::LoadCreatures()
             }
         }
 
-        if (data.phaseMask == 0)
+        bool _loop;
+        do
         {
-            TC_LOG_ERROR("sql.sql", "Table `creature` have creature (GUID: %u Entry: %u) with `phaseMask`=0 (not visible for anyone), set to 1.", guid, data.id);
-            data.phaseMask = 1;
-        }
+            _loop = false;
+            if (data.phaseGroup)
+            {
+                if (GetPhasesForGroup(data.phaseGroup).empty())
+                {
+                    TC_LOG_ERROR("sql.sql", "Table `creature` has creature (GUID: %u Entry: %u) with non-existing `phaseGroup` (%u) set, `phaseGroup` set to 0", guid, data.id, data.phaseGroup);
+                    {data.phaseGroup = 0; _loop = true; }
+                }
+                if (data.phaseGroup && data.phaseId)
+                {
+                    TC_LOG_ERROR("sql.sql", "Table `creature` have creature (GUID: %u Entry: %u) with both `phaseId` and `phaseGroup` set, `phaseId` set to 0", guid, data.id);
+                    { data.phaseId = 0; _loop = true; }
+                }
+                if (data.phaseGroup && data.phaseMask)
+                {
+                    TC_LOG_ERROR("sql.sql", "Table `creature` have creature (GUID: %u Entry: %u) with both `phaseMask` and `phaseGroup` set, `phaseMask` set to 0", guid, data.id);
+                    { data.phaseMask = 0; _loop = true; }
+                }
+            }
+            else if (data.phaseId)
+            {
+                if (data.phaseMask)
+                {
+                    TC_LOG_ERROR("sql.sql", "Table `creature` have creature (GUID: %u Entry: %u) with both `phaseMask` and `phaseId` set, `phaseMask` set to 0", guid, data.id);
+                    { data.phaseMask = 0; _loop = true; }
+                }
+            }
+            else if (!data.phaseMask)
+            {
+                TC_LOG_ERROR("sql.sql", "Table `creature` have creature (GUID: %u Entry: %u) with `phaseMask`=0 (not visible for anyone), set to 1.", guid, data.id);
+                data.phaseMask = 1;
+            }
+        } while (_loop);
 
         // Add to grid if not managed by the game event or pool system
         if (gameEvent == 0 && PoolId == 0)
@@ -1929,8 +1962,8 @@ void ObjectMgr::LoadGameobjects()
 
     //                                                0                1   2    3           4           5           6
     QueryResult result = WorldDatabase.Query("SELECT gameobject.guid, id, map, position_x, position_y, position_z, orientation, "
-    //   7          8          9          10         11             12            13     14         15         16          17
-        "rotation0, rotation1, rotation2, rotation3, spawntimesecs, animprogress, state, spawnMask, phaseMask, eventEntry, pool_entry "
+    //   7          8          9          10         11             12            13     14         15         16          17          18       19
+        "rotation0, rotation1, rotation2, rotation3, spawntimesecs, animprogress, state, spawnMask, phaseMask, eventEntry, pool_entry, phaseid, phasegroup "
         "FROM gameobject LEFT OUTER JOIN game_event_gameobject ON gameobject.guid = game_event_gameobject.guid "
         "LEFT OUTER JOIN pool_gameobject ON gameobject.guid = pool_gameobject.guid");
 
@@ -2030,6 +2063,8 @@ void ObjectMgr::LoadGameobjects()
         data.phaseMask      = fields[15].GetUInt32();
         int16 gameEvent     = fields[16].GetInt8();
         uint32 PoolId       = fields[17].GetUInt32();
+        data.phaseId        = fields[18].GetUInt16();
+        data.phaseGroup     = fields[19].GetUInt16();
 
         if (data.rotation2 < -1.0f || data.rotation2 > 1.0f)
         {
@@ -2049,11 +2084,42 @@ void ObjectMgr::LoadGameobjects()
             continue;
         }
 
-        if (data.phaseMask == 0)
+        bool _loop;
+        do
         {
-            TC_LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: %u Entry: %u) with `phaseMask`=0 (not visible for anyone), set to 1.", guid, data.id);
-            data.phaseMask = 1;
-        }
+            _loop = false;
+            if (data.phaseGroup)
+            {
+                if (GetPhasesForGroup(data.phaseGroup).empty())
+                {
+                    TC_LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: %u Entry: %u) with non-existing `phaseGroup` (%u) set, `phaseGroup` set to 0", guid, data.id, data.phaseGroup);
+                    {data.phaseGroup = 0; _loop = true; }
+                }
+                if (data.phaseGroup && data.phaseId)
+                {
+                    TC_LOG_ERROR("sql.sql", "Table `gameobject` have gameobject (GUID: %u Entry: %u) with both `phaseId` and `phaseGroup` set, `phaseId` set to 0", guid, data.id);
+                    { data.phaseId = 0; _loop = true; }
+                }
+                if (data.phaseGroup && data.phaseMask)
+                {
+                    TC_LOG_ERROR("sql.sql", "Table `gameobject` have gameobject (GUID: %u Entry: %u) with both `phaseMask` and `phaseGroup` set, `phaseMask` set to 0", guid, data.id);
+                    { data.phaseMask = 0; _loop = true; }
+                }
+            }
+            else if (data.phaseId)
+            {
+                if (data.phaseMask)
+                {
+                    TC_LOG_ERROR("sql.sql", "Table `gameobject` have gameobject (GUID: %u Entry: %u) with both `phaseMask` and `phaseId` set, `phaseMask` set to 0", guid, data.id);
+                    { data.phaseMask = 0; _loop = true; }
+                }
+            }
+            else if (!data.phaseMask)
+            {
+                TC_LOG_ERROR("sql.sql", "Table `gameobject` have gameobject (GUID: %u Entry: %u) with `phaseMask`=0 (not visible for anyone), set to 1.", guid, data.id);
+                data.phaseMask = 1;
+            }
+        } while (_loop);
 
         if (gameEvent == 0 && PoolId == 0)                      // if not this is to be managed by GameEvent System or Pool system
             AddGameobjectToGrid(guid, &data);
@@ -9247,8 +9313,8 @@ void ObjectMgr::LoadPhaseDefinitions()
 
     uint32 oldMSTime = getMSTime();
 
-    //                                                 0       1       2         3            4                 5           6
-    QueryResult result = WorldDatabase.Query("SELECT zoneId, entry, phasemask, phaseId, terrainswapmap, worldMapAreaSwap, flags FROM `phase_definitions` ORDER BY `entry` ASC");
+    //                                                 0       1       2         3            4                 5           6          7
+    QueryResult result = WorldDatabase.Query("SELECT zoneId, entry, phasemask, phaseId, phaseGroup, terrainswapmap, worldMapAreaSwap, flags FROM `phase_definitions` ORDER BY `entry` ASC");
 
     if (!result)
     {
@@ -9268,9 +9334,10 @@ void ObjectMgr::LoadPhaseDefinitions()
         PhaseDefinition.entry                 = fields[1].GetUInt16();
         PhaseDefinition.phasemask             = fields[2].GetUInt64();
         PhaseDefinition.phaseId               = fields[3].GetUInt16();
-        PhaseDefinition.terrainswapmap        = fields[4].GetUInt16();
-        PhaseDefinition.worldMapAreaSwap      = fields[5].GetUInt16();
-        PhaseDefinition.flags                 = fields[6].GetUInt8();
+        PhaseDefinition.phaseGroup            = fields[4].GetUInt16();
+        PhaseDefinition.terrainswapmap        = fields[5].GetUInt16();
+        PhaseDefinition.worldMapAreaSwap      = fields[6].GetUInt16();
+        PhaseDefinition.flags                 = fields[7].GetUInt8();
 
         // Checks
         if ((PhaseDefinition.flags & PHASE_FLAG_OVERWRITE_EXISTING) && (PhaseDefinition.flags & PHASE_FLAG_NEGATE_PHASE))

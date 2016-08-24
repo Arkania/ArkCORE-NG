@@ -238,10 +238,10 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS]=
     &Spell::EffectRemoveAura,                               //164 SPELL_EFFECT_REMOVE_AURA
     &Spell::EffectDamageFromMaxHealthPCT,                   //165 SPELL_EFFECT_DAMAGE_FROM_MAX_HEALTH_PCT
     &Spell::EffectGiveCurrency,                             //166 SPELL_EFFECT_GIVE_CURRENCY
-    &Spell::EffectNULL,                                     //167 SPELL_EFFECT_167
+    &Spell::EffectUpdatePlayerPhase,                        //167 SPELL_EFFECT_UPDATE_PLAYER_PHASE
     &Spell::EffectNULL,                                     //168 SPELL_EFFECT_168
     &Spell::EffectNULL,                                     //169 SPELL_EFFECT_DESTROY_ITEM
-    &Spell::EffectNULL,                                     //170 SPELL_EFFECT_170
+    &Spell::EffectUpdateZoneAurasAndPhases,                 //170 SPELL_EFFECT_UPDATE_ZONE_AURAS_AND_PHASES
     &Spell::EffectNULL,                                     //171 SPELL_EFFECT_171
     &Spell::EffectResurrectWithAura,                        //172 SPELL_EFFECT_RESURRECT_WITH_AURA
     &Spell::EffectUnlockGuildVaultTab,                      //173 SPELL_EFFECT_UNLOCK_GUILD_VAULT_TAB
@@ -7591,31 +7591,60 @@ void Spell::EffectCreateAreaTrigger(SpellEffIndex effIndex)
 // gpn39f: workaround and test..
 void Spell::EffectTriggerSpell_160(SpellEffIndex effIndex)
 {
-    if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT)
+    if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
         return;
 
-    if (!m_caster || !m_caster->IsAlive() || !m_caster->IsInWorld())
+    if (!unitTarget)
         return;
 
-    // has always to trigger a spell
-    uint32 triggered_spell_id = m_spellInfo->Effects[effIndex].TriggerSpell;
+    SpellEffectInfo effectInfo = m_spellInfo->Effects[effIndex];
+
+    uint32 triggered_spell_id = effectInfo.TriggerSpell;
+
+    // normal case
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(triggered_spell_id);
+
     if (!spellInfo)
     {
-        TC_LOG_ERROR("spells", "Spell::EffectTriggerSpell_160 of spell %u: triggering unknown spell id %i", m_spellInfo->Id, triggered_spell_id);
+        TC_LOG_ERROR("spells", "Spell::EffectForceCast of spell %u: triggering unknown spell id %i.", m_spellInfo->Id, triggered_spell_id);
         return;
     }
 
-    if (unitTarget)
-        m_caster->CastSpell(unitTarget, spellInfo, TRIGGERED_FULL_MASK);
-    else
+    CustomSpellValues values;
+    // set basepoints for trigger with value effect
+    if (effectInfo.Effect == SPELL_EFFECT_FORCE_CAST_WITH_VALUE)
     {
-    /* 
-        TODO:
-        if targets of triggered spell are (23, 0) == TARGET_GAMEOBJECT_TARGET (used in quest 14098, spells 66639/67869)
-        then unitTarget is empty.
-        i can't find the used GameObject. (Door) to insert as target..
-        (doing nothing = i cancel here triggering of spell to prevent crash.)
-    */
+        // maybe need to set value only when basepoints == 0?
+        values.AddSpellMod(SPELLVALUE_BASE_POINT0, damage);
+        values.AddSpellMod(SPELLVALUE_BASE_POINT1, damage);
+        values.AddSpellMod(SPELLVALUE_BASE_POINT2, damage);
     }
+
+    SpellCastTargets targets;
+    targets.SetUnitTarget(m_caster);
+
+    unitTarget->CastSpell(targets, spellInfo, &values, TRIGGERED_FULL_MASK);
+}
+
+
+void Spell::EffectUpdatePlayerPhase(SpellEffIndex /*effIndex*/)
+{
+    if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
+        return;
+
+    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
+        return;
+
+    // unitTarget->UpdateAreaAndZonePhase(); // gpn39f
+}
+
+void Spell::EffectUpdateZoneAurasAndPhases(SpellEffIndex /*effIndex*/)
+{
+    if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
+        return;
+
+    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
+        return;
+
+    unitTarget->ToPlayer()->UpdateAreaDependentAuras(unitTarget->GetAreaId());
 }
