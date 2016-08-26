@@ -226,6 +226,9 @@ public:
             position1.GetPositionX(), position1.GetPositionY(), position1.GetPositionZ(), position1.GetOrientation(),
             cell.GridX(), cell.GridY(), cell.CellX(), cell.CellY(), object->GetInstanceId(),
             zoneX, zoneY, groundZ, floorZ, haveMap, haveVMap, haveMMap);
+        
+        if (!object->GetPhases().empty())
+            handler->PSendSysMessage("%s", object->PhaseToString().c_str());
 
         LiquidData liquidStatus;
         ZLiquidStatus status = map->getLiquidStatus(position1.GetPositionX(), position1.GetPositionY(), position1.GetPositionZ(), MAP_ALL_LIQUIDS, &liquidStatus);

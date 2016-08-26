@@ -686,6 +686,11 @@ class WorldObject : public Object, public WorldLocation
         bool InSamePhase(WorldObject const* obj) const;
         bool InSamePhase(uint32 phasemask) const { return (GetPhaseMask() & phasemask); }
 
+        std::set<uint32> const& GetPhases() const { return m_phaseIds; }
+        std::set<uint32> const& GetTerrainSwaps() const { return m_terrainSwaps; }
+        std::set<uint32> const& GetWorldMapAreaSwaps() const { return m_worldMapAreaSwaps; }
+        std::string PhaseToString();
+
         uint32 GetZoneId() const;
         uint32 GetAreaId() const;
         void GetZoneAndAreaId(uint32& zoneid, uint32& areaid) const;
@@ -882,7 +887,11 @@ class WorldObject : public Object, public WorldLocation
 
         //uint32 m_mapId;                                     // object at map with map_id
         uint32 m_InstanceId;                                // in map copy with instance id
+        
         uint32 m_phaseMask;                                 // in area phase state
+        std::set<uint32> m_phaseIds;
+        std::set<uint32> m_terrainSwaps;
+        std::set<uint32> m_worldMapAreaSwaps;
 
         uint16 m_notifyflags;
         uint16 m_executed_notifies;

@@ -3113,6 +3113,28 @@ bool WorldObject::InSamePhase(WorldObject const* obj) const
     return InSamePhase(obj->GetPhaseMask());
 }
 
+std::string WorldObject::PhaseToString()
+{
+    std::stringstream sstr;
+    if (m_phaseMask)
+    {
+        sstr << "PhaseMask: " << m_phaseMask << "\n";
+    }
+    if (!m_phaseIds.empty())
+    {
+        bool ko = false;
+        sstr << "PhaseId: ";
+        for (uint32 ph : m_phaseIds)
+        {
+            if (ko) sstr << ", ";
+            ko = true;
+            sstr << ph;
+        }
+        sstr << "\n";
+    }
+    return sstr.str();
+}
+
 void WorldObject::PlayDistanceSound(uint32 sound_id, Player* target /*= NULL*/)
 {
     WorldPacket data(SMSG_PLAY_OBJECT_SOUND, 4 + 8);

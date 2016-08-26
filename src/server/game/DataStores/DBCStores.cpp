@@ -51,7 +51,7 @@ struct WMOAreaTableTripple
 
 typedef std::map<WMOAreaTableTripple, WMOAreaTableEntry const*> WMOAreaInfoByTripple;
 
-DBCStorage <AreaTableEntry> sAreaStore(AreaTableEntryfmt);
+DBCStorage <AreaTableEntry> sAreaTableStore(AreaTableEntryfmt);
 DBCStorage <AreaGroupEntry> sAreaGroupStore(AreaGroupEntryfmt);
 DBCStorage <AreaPOIEntry> sAreaPOIStore(AreaPOIEntryfmt);
 static AreaFlagByAreaID sAreaFlagByAreaID;
@@ -331,12 +331,12 @@ void LoadDBCStores(const std::string& dataPath)
     StoreProblemList bad_dbc_files;
     uint32 availableDbcLocales = 0xFFFFFFFF;
 
-    LoadDBC(availableDbcLocales, bad_dbc_files, sAreaStore,                   dbcPath, "AreaTable.dbc");
+    LoadDBC(availableDbcLocales, bad_dbc_files, sAreaTableStore,                   dbcPath, "AreaTable.dbc");
 
-    // must be after sAreaStore loading
-    for (uint32 i = 0; i < sAreaStore.GetNumRows(); ++i)           // areaflag numbered from 0
+    // must be after sAreaTableStore loading
+    for (uint32 i = 0; i < sAreaTableStore.GetNumRows(); ++i)           // areaflag numbered from 0
     {
-        if (AreaTableEntry const* area = sAreaStore.LookupEntry(i))
+        if (AreaTableEntry const* area = sAreaTableStore.LookupEntry(i))
         {
             // fill AreaId->DBC records
             sAreaFlagByAreaID.insert(AreaFlagByAreaID::value_type(uint16(area->ID), area->exploreFlag));
@@ -816,7 +816,7 @@ void LoadDBCStores(const std::string& dataPath)
     }
 
     // Check loaded DBC files proper version
-    if (!sAreaStore.LookupEntry(4713)          ||     // last area (areaflag) added in 4.3.4 (15595)
+    if (!sAreaTableStore.LookupEntry(4713)          ||     // last area (areaflag) added in 4.3.4 (15595)
         !sCharTitlesStore.LookupEntry(287)     ||     // last char title added in 4.3.4 (15595)
         !sGemPropertiesStore.LookupEntry(2250) ||     // last gem property added in 4.3.4 (15595)
         !sMapStore.LookupEntry(980)            ||     // last map added in 4.3.4 (15595)
@@ -896,13 +896,13 @@ AreaTableEntry const* GetAreaEntryByAreaID(uint32 area_id)
     if (areaflag < 0)
         return NULL;
 
-    return sAreaStore.LookupEntry(areaflag);
+    return sAreaTableStore.LookupEntry(areaflag);
 }
 
 AreaTableEntry const* GetAreaEntryByAreaFlagAndMap(uint32 area_flag, uint32 map_id)
 {
     if (area_flag)
-        return sAreaStore.LookupEntry(area_flag);
+        return sAreaTableStore.LookupEntry(area_flag);
 
     if (MapEntry const* mapEntry = sMapStore.LookupEntry(map_id))
         return GetAreaEntryByAreaID(mapEntry->linked_zone);
