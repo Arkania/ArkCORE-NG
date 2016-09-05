@@ -7626,7 +7626,6 @@ void Spell::EffectTriggerSpell_160(SpellEffIndex effIndex)
     unitTarget->CastSpell(targets, spellInfo, &values, TRIGGERED_FULL_MASK);
 }
 
-
 void Spell::EffectUpdatePlayerPhase(SpellEffIndex /*effIndex*/)
 {
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
@@ -7635,7 +7634,7 @@ void Spell::EffectUpdatePlayerPhase(SpellEffIndex /*effIndex*/)
     if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
         return;
 
-    // unitTarget->UpdateAreaAndZonePhase(); // gpn39f
+    unitTarget->PhaseUpdate(); // gpn39f // not shure.. 
 }
 
 void Spell::EffectUpdateZoneAurasAndPhases(SpellEffIndex /*effIndex*/)

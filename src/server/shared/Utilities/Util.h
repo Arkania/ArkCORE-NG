@@ -359,6 +359,10 @@ std::string GetAddressString(ACE_INET_Addr const& addr);
 uint32 CreatePIDFile(const std::string& filename);
 
 std::string ByteArrayToHexStr(uint8 const* bytes, uint32 length, bool reverse = false);
+
+std::set<uint32> GetUIntegerList(std::string storedString);
+std::string GetUintegerString(std::set<uint32> uint32List);
+
 #endif
 
 //handler for operations on large flags

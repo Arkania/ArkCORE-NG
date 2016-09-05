@@ -1395,7 +1395,7 @@ public:
         if (unit && unit->GetTypeId() == TYPEID_PLAYER)
             player = unit->ToPlayer();
 
-        player->GetPhaseMgr().SendDebugReportToPlayer(handler->GetSession()->GetPlayer());
+        player->SendDebugReportToPlayer();
         return true;
     }
 };

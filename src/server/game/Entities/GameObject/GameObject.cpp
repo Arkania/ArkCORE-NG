@@ -187,10 +187,18 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map* map, uint32 phaseMa
         TC_LOG_ERROR("misc", "Gameobject (GUID: %u Entry: %u) not created. Suggested coordinates isn't valid (X: %f Y: %f)", guidlow, name_id, x, y);
         return false;
     }
+    
+    if (phaseMask)
+    {
+        for (uint32 i = 0; i < 32; i++)
+            if (((1 << i) & phaseMask) > 0)
+                SetInPhase(i + DEFAULT_PHASE, false, true);
+    }
 
     SetPhaseMask(phaseMask, false);
 
     SetZoneScript();
+
     if (m_zoneScript)
     {
         name_id = m_zoneScript->GetGameObjectEntry(guidlow, name_id);
@@ -815,6 +823,20 @@ bool GameObject::LoadGameObjectFromDB(uint32 guid, Map* map, bool addToMap)
 
     if (!Create(guid, entry, map, phaseMask, x, y, z, ang, rotation0, rotation1, rotation2, rotation3, animprogress, go_state, artKit))
         return false;
+
+    if (data->phaseId)
+        SetInPhase(data->phaseId, false, true);
+
+    if (!data->phaseGroups.empty())
+    {
+        SetPhaseGroups(data->phaseGroups);
+        for (auto phGroup : data->phaseGroups)
+            for (auto ph : GetPhasesForGroup(phGroup))
+                SetInPhase(ph, false, true);
+    }
+
+    if (GetPhaseIds().empty())
+        SetInPhase(DEFAULT_PHASE, false, true);
 
     if (data->spawntimesecs >= 0)
     {
@@ -2073,6 +2095,15 @@ void GameObject::SetPhaseMask(uint32 newPhaseMask, bool update)
     WorldObject::SetPhaseMask(newPhaseMask, update);
     if (m_model && m_model->isEnabled())
         EnableCollision(true);
+}
+
+bool GameObject::SetInPhase(uint32 id, bool update, bool apply)
+{
+    bool res = WorldObject::SetInPhase(id, update, apply);
+    if (m_model && m_model->isEnabled())
+        EnableCollision(true);
+
+    return res;
 }
 
 void GameObject::EnableCollision(bool enable)

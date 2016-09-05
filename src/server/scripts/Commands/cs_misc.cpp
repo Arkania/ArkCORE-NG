@@ -227,7 +227,7 @@ public:
             cell.GridX(), cell.GridY(), cell.CellX(), cell.CellY(), object->GetInstanceId(),
             zoneX, zoneY, groundZ, floorZ, haveMap, haveVMap, haveMMap);
         
-        if (!object->GetPhases().empty())
+        if (!object->GetPhaseIds().empty())
             handler->PSendSysMessage("%s", object->PhaseToString().c_str());
 
         LiquidData liquidStatus;

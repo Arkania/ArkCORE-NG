@@ -1951,7 +1951,9 @@ class Unit : public WorldObject
         void SetVisible(bool x);
 
         // common function for visibility checks for player/creatures with detection code
-        void SetPhaseMask(uint32 newPhaseMask, bool update);// overwrite WorldObject::SetPhaseMask
+        void SetPhaseMask(uint32 newPhaseMask, bool update);
+        bool SetInPhase(uint32 id, bool update, bool apply);
+        // overwrite WorldObject::SetPhaseMask
         void UpdateObjectVisibility(bool forced = true);
 
         SpellImmuneList m_spellImmune[MAX_SPELL_IMMUNITY];
@@ -2229,6 +2231,10 @@ class Unit : public WorldObject
         void Yell(uint32 textId, WorldObject const* target = nullptr);
         void TextEmote(uint32 textId, WorldObject const* target = nullptr, bool isBossEmote = false);
         void Whisper(uint32 textId, Player* target, bool isBossWhisper = false);
+
+        // Aura phase effects
+        void RegisterPhasingAuraEffect(AuraEffect const* auraEffect);
+        void UnRegisterPhasingAuraEffect(AuraEffect const* auraEffect);
 
     protected:
         explicit Unit (bool isWorldObject);

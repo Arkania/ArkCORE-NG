@@ -43,7 +43,6 @@
 #include <limits>
 #include "ConditionMgr.h"
 #include <functional>
-#include "PhaseMgr.h"
 #include "DB2Stores.h"
 
 class Item;
@@ -769,6 +768,8 @@ class ObjectMgr
         ItemTemplate const* GetItemTemplate(uint32 entry);
         ItemTemplateContainer const* GetItemTemplateStore() const { return &_itemTemplateStore; }
         uint32 GetCreatureDisplay(int32 modelid) const;
+
+        static bool IsConditionTypeSupported(ConditionTypes conditionType);
 
         InstanceTemplate const* GetInstanceTemplate(uint32 mapId);
 

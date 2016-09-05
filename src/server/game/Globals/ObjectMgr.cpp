@@ -1617,7 +1617,7 @@ void ObjectMgr::LoadCreatures()
     //                                               0              1   2    3        4             5           6           7           8            9              10
     QueryResult result = WorldDatabase.Query("SELECT creature.guid, id, map, modelid, equipment_id, position_x, position_y, position_z, orientation, spawntimesecs, spawndist, "
     //   11               12         13       14            15         16         17          18          19                20                   21                     22                23
-        "currentwaypoint, curhealth, curmana, MovementType, spawnMask, phaseMask, eventEntry, pool_entry, creature.npcflag, creature.unit_flags, creature.dynamicflags, creature.phaseid, creature.phasegroup "
+        "currentwaypoint, curhealth, curmana, MovementType, spawnMask, phaseMask, eventEntry, pool_entry, creature.npcflag, creature.unit_flags, creature.dynamicflags, creature.phaseId, creature.phaseGroups "
         "FROM creature "
         "LEFT OUTER JOIN game_event_creature ON creature.guid = game_event_creature.guid "
         "LEFT OUTER JOIN pool_creature ON creature.guid = pool_creature.guid");
@@ -1675,7 +1675,9 @@ void ObjectMgr::LoadCreatures()
         data.unit_flags     = fields[20].GetUInt32();
         data.dynamicflags   = fields[21].GetUInt32();
         data.phaseId        = fields[22].GetUInt16();
-        data.phaseGroup     = fields[23].GetUInt16();
+
+        std::string phaseGroups = fields[23].GetCString();
+        data.phaseGroups = GetUIntegerList(phaseGroups);
 
         MapEntry const* mapEntry = sMapStore.LookupEntry(data.mapid);
         if (!mapEntry)
@@ -1742,42 +1744,23 @@ void ObjectMgr::LoadCreatures()
             }
         }
 
-        bool _loop;
-        do
+        if (!data.phaseGroups.empty())
+            for (uint32 phGroup : data.phaseGroups)
+            {
+                std::set<uint32> phaseIds = GetPhasesForGroup(phGroup);
+                if (phaseIds.empty())
+                {
+                    TC_LOG_ERROR("sql.sql", "Table `creature` has creature (GUID: %u Entry: %u) with non-existing `phaseGroup` (%u) set, `phaseGroup` set to 0", guid, data.id, phGroup);
+                    data.phaseGroups .erase(phGroup);
+                    break;
+                }
+            }
+
+        if (!data.phaseMask && !data.phaseId && data.phaseGroups.empty())
         {
-            _loop = false;
-            if (data.phaseGroup)
-            {
-                if (GetPhasesForGroup(data.phaseGroup).empty())
-                {
-                    TC_LOG_ERROR("sql.sql", "Table `creature` has creature (GUID: %u Entry: %u) with non-existing `phaseGroup` (%u) set, `phaseGroup` set to 0", guid, data.id, data.phaseGroup);
-                    {data.phaseGroup = 0; _loop = true; }
-                }
-                if (data.phaseGroup && data.phaseId)
-                {
-                    TC_LOG_ERROR("sql.sql", "Table `creature` have creature (GUID: %u Entry: %u) with both `phaseId` and `phaseGroup` set, `phaseId` set to 0", guid, data.id);
-                    { data.phaseId = 0; _loop = true; }
-                }
-                if (data.phaseGroup && data.phaseMask)
-                {
-                    TC_LOG_ERROR("sql.sql", "Table `creature` have creature (GUID: %u Entry: %u) with both `phaseMask` and `phaseGroup` set, `phaseMask` set to 0", guid, data.id);
-                    { data.phaseMask = 0; _loop = true; }
-                }
-            }
-            else if (data.phaseId)
-            {
-                if (data.phaseMask)
-                {
-                    TC_LOG_ERROR("sql.sql", "Table `creature` have creature (GUID: %u Entry: %u) with both `phaseMask` and `phaseId` set, `phaseMask` set to 0", guid, data.id);
-                    { data.phaseMask = 0; _loop = true; }
-                }
-            }
-            else if (!data.phaseMask)
-            {
-                TC_LOG_ERROR("sql.sql", "Table `creature` have creature (GUID: %u Entry: %u) with `phaseMask`=0 (not visible for anyone), set to 1.", guid, data.id);
-                data.phaseMask = 1;
-            }
-        } while (_loop);
+            TC_LOG_ERROR("sql.sql", "Table `creature` have creature (GUID: %u Entry: %u) with `phaseMask`=0 (not visible for anyone), set to 1.", guid, data.id);
+            data.phaseMask = 1;
+        }
 
         // Add to grid if not managed by the game event or pool system
         if (gameEvent == 0 && PoolId == 0)
@@ -1963,7 +1946,7 @@ void ObjectMgr::LoadGameobjects()
     //                                                0                1   2    3           4           5           6
     QueryResult result = WorldDatabase.Query("SELECT gameobject.guid, id, map, position_x, position_y, position_z, orientation, "
     //   7          8          9          10         11             12            13     14         15         16          17          18       19
-        "rotation0, rotation1, rotation2, rotation3, spawntimesecs, animprogress, state, spawnMask, phaseMask, eventEntry, pool_entry, phaseid, phasegroup "
+        "rotation0, rotation1, rotation2, rotation3, spawntimesecs, animprogress, state, spawnMask, phaseMask, eventEntry, pool_entry, phaseId, phaseGroups "
         "FROM gameobject LEFT OUTER JOIN game_event_gameobject ON gameobject.guid = game_event_gameobject.guid "
         "LEFT OUTER JOIN pool_gameobject ON gameobject.guid = pool_gameobject.guid");
 
@@ -2064,7 +2047,10 @@ void ObjectMgr::LoadGameobjects()
         int16 gameEvent     = fields[16].GetInt8();
         uint32 PoolId       = fields[17].GetUInt32();
         data.phaseId        = fields[18].GetUInt16();
-        data.phaseGroup     = fields[19].GetUInt16();
+
+        std::string phaseGroups = fields[19].GetCString();
+        data.phaseGroups = GetUIntegerList(phaseGroups);
+
 
         if (data.rotation2 < -1.0f || data.rotation2 > 1.0f)
         {
@@ -2084,42 +2070,23 @@ void ObjectMgr::LoadGameobjects()
             continue;
         }
 
-        bool _loop;
-        do
+        if (!data.phaseGroups.empty())
+            for (uint32 phGroup : data.phaseGroups)
+            {
+                std::set<uint32> phaseIds = GetPhasesForGroup(phGroup);
+                if (phaseIds.empty())
+                {
+                    TC_LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: %u Entry: %u) with non-existing `phaseGroup` (%u) set, `phaseGroup` set to 0", guid, data.id, phGroup);
+                    data.phaseGroups.erase(phGroup);
+                    break;
+                }
+            }
+
+        if (!data.phaseMask && !data.phaseId && data.phaseGroups.empty())
         {
-            _loop = false;
-            if (data.phaseGroup)
-            {
-                if (GetPhasesForGroup(data.phaseGroup).empty())
-                {
-                    TC_LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: %u Entry: %u) with non-existing `phaseGroup` (%u) set, `phaseGroup` set to 0", guid, data.id, data.phaseGroup);
-                    {data.phaseGroup = 0; _loop = true; }
-                }
-                if (data.phaseGroup && data.phaseId)
-                {
-                    TC_LOG_ERROR("sql.sql", "Table `gameobject` have gameobject (GUID: %u Entry: %u) with both `phaseId` and `phaseGroup` set, `phaseId` set to 0", guid, data.id);
-                    { data.phaseId = 0; _loop = true; }
-                }
-                if (data.phaseGroup && data.phaseMask)
-                {
-                    TC_LOG_ERROR("sql.sql", "Table `gameobject` have gameobject (GUID: %u Entry: %u) with both `phaseMask` and `phaseGroup` set, `phaseMask` set to 0", guid, data.id);
-                    { data.phaseMask = 0; _loop = true; }
-                }
-            }
-            else if (data.phaseId)
-            {
-                if (data.phaseMask)
-                {
-                    TC_LOG_ERROR("sql.sql", "Table `gameobject` have gameobject (GUID: %u Entry: %u) with both `phaseMask` and `phaseId` set, `phaseMask` set to 0", guid, data.id);
-                    { data.phaseMask = 0; _loop = true; }
-                }
-            }
-            else if (!data.phaseMask)
-            {
-                TC_LOG_ERROR("sql.sql", "Table `gameobject` have gameobject (GUID: %u Entry: %u) with `phaseMask`=0 (not visible for anyone), set to 1.", guid, data.id);
-                data.phaseMask = 1;
-            }
-        } while (_loop);
+            TC_LOG_ERROR("sql.sql", "Table `gameobject` have gameobject (GUID: %u Entry: %u) with `phaseMask`=0 (not visible for anyone), set to 1.", guid, data.id);
+            data.phaseMask = 1;
+        }
 
         if (gameEvent == 0 && PoolId == 0)                      // if not this is to be managed by GameEvent System or Pool system
             AddGameobjectToGrid(guid, &data);
@@ -3709,39 +3676,39 @@ void ObjectMgr::LoadQuests()
     mExclusiveQuestGroups.clear();
 
     QueryResult result = WorldDatabase.Query("SELECT "
-        //0     1      2        3        4           5       6            7             8              9               10             11                 12
-        "Id, Method, Level, MinLevel, MaxLevel, ZoneOrSort, Type, SuggestedPlayers, LimitTime, RequiredClasses, RequiredRaces, RequiredSkillId, RequiredSkillPoints, "
-        //         13                 14                    15                   16                      17                  18                         19                  20
+        //0  1       2      3         4         5           6     7                 8          9                10             11              12               13
+        "Id, Method, Level, MinLevel, MaxLevel, ZoneOrSort, Type, SuggestedPlayers, LimitTime, RequiredClasses, RequiredRaces, RequiredGender, RequiredSkillId, RequiredSkillPoints, "
+        // 14                15                  16                     17                     18                     19                     20                   21
         "RequiredFactionId1, RequiredFactionId2, RequiredFactionValue1, RequiredFactionValue2, RequiredMinRepFaction, RequiredMaxRepFaction, RequiredMinRepValue, RequiredMaxRepValue, "
-        //     21         22             23                24             25              26                    27                28            29              30              31
+        // 22         23           24              25                26          27                     28                   29           30              31            32
         "PrevQuestId, NextQuestId, ExclusiveGroup, NextQuestIdChain, RewardXPId, RewardOrRequiredMoney, RewardMoneyMaxLevel, RewardSpell, RewardSpellCast, RewardHonor, RewardHonorMultiplier, "
-        //         32                  33            34             35               36         37         38            39                40                41               42                 43
+        // 33                  34               35            36               37             38     39            40                 41             42                   43             44  
         "RewardMailTemplateId, RewardMailDelay, SourceItemId, SourceItemCount, SourceSpellId, Flags, SpecialFlags, MinimapTargetMark, RewardTitleId, RequiredPlayerKills, RewardTalents, RewardArenaPoints, "
-        //      44            45                    46                    47                  48               49             50              51             52                53                54                55               56
+        // 45           46                 47                    48                  49                   50             51             52             53             54                55                56                57  
         "RewardSkillId, RewardSkillPoints, RewardReputationMask, QuestGiverPortrait, QuestTurnInPortrait, RewardItemId1, RewardItemId2, RewardItemId3, RewardItemId4, RewardItemCount1, RewardItemCount2, RewardItemCount3, RewardItemCount4, "
-        //         57                  58                  59                    60                    61                   62                      63                  64                        65                       66                      67                      68
+        // 58                 59                   60                   61                   62                   63                   64                      65                      66                      67                      68                      69
         "RewardChoiceItemId1, RewardChoiceItemId2, RewardChoiceItemId3, RewardChoiceItemId4, RewardChoiceItemId5, RewardChoiceItemId6, RewardChoiceItemCount1, RewardChoiceItemCount2, RewardChoiceItemCount3, RewardChoiceItemCount4, RewardChoiceItemCount5, RewardChoiceItemCount6, "
-        //        69                70                71                72             73                   74                      75                     76                    77                      78
+        // 70              71                72                73                74                75                     76                    77                      78                     79
         "RewardFactionId1, RewardFactionId2, RewardFactionId3, RewardFactionId4, RewardFactionId5, RewardFactionValueId1, RewardFactionValueId2, RewardFactionValueId3, RewardFactionValueId4, RewardFactionValueId5, "
-        //                79                          80                           81                              82                           83
+        // 80                           81                             82                             83                             84
         "RewardFactionValueIdOverride1, RewardFactionValueIdOverride2, RewardFactionValueIdOverride3, RewardFactionValueIdOverride4, RewardFactionValueIdOverride5, "
-        //    84        85      86      87          88       89        90      91          92             93              94
+        // 85        86      87      88           89     90          91       92       93             94               95
         "PointMapId, PointX, PointY, PointOption, Title, Objectives, Details, EndText, CompletedText, OfferRewardText, RequestItemsText, "
-        //        95              96               97               98                  99                     100                      101                  102
+        // 96              97                98                99                100                    101                    102                    103
         "RequiredNpcOrGo1, RequiredNpcOrGo2, RequiredNpcOrGo3, RequiredNpcOrGo4, RequiredNpcOrGoCount1, RequiredNpcOrGoCount2, RequiredNpcOrGoCount3, RequiredNpcOrGoCount4, "
-        //         103                     104                    105                   106                     107                       108                     109                       110
+        // 104                  105                    106                    107                    108                       109                       110                       111
         "RequiredSourceItemId1, RequiredSourceItemId2, RequiredSourceItemId3, RequiredSourceItemId4, RequiredSourceItemCount1, RequiredSourceItemCount2, RequiredSourceItemCount3, RequiredSourceItemCount4, "
-        //       111               112             113             114              115             116                 117                   118               119               120                 121                 122
+        // 112            113              114              115              116              117              118                 119                 120                 121                 122                 123
         "RequiredItemId1, RequiredItemId2, RequiredItemId3, RequiredItemId4, RequiredItemId5, RequiredItemId6, RequiredItemCount1, RequiredItemCount2, RequiredItemCount3, RequiredItemCount4, RequiredItemCount5, RequiredItemCount6, "
-        //      123         124             125             126             127             128                 129                 130                 131             132                     133                 134                 135
+        // 124          125             126             127             128              129                130                131                132                133                   134                   135                   136
         "RequiredSpell, ObjectiveText1, ObjectiveText2, ObjectiveText3, ObjectiveText4,  RewardCurrencyId1, RewardCurrencyId2, RewardCurrencyId3, RewardCurrencyId4, RewardCurrencyCount1, RewardCurrencyCount2, RewardCurrencyCount3, RewardCurrencyCount4, "
-        //      136                  137                 138                   139                    140                    141                     142                   143
+        // 137                138                  139                  140                  141                     142                     143                     144
         "RequiredCurrencyId1, RequiredCurrencyId2, RequiredCurrencyId3, RequiredCurrencyId4, RequiredCurrencyCount1, RequiredCurrencyCount2, RequiredCurrencyCount3, RequiredCurrencyCount4, "
-        //      144                  145                 146                   147               148          149
+        // 145                 146                   147                  148                  149          150
         "QuestGiverTextWindow, QuestGiverTargetName, QuestTurnTextWindow, QuestTurnTargetName, SoundAccept, SoundTurnIn, "
-        //      150          151            152            153               154                155                  156                  157                158             159
+        // 151          152            153            154            155                 156                 157                 158                 159                160
         "DetailsEmote1, DetailsEmote2, DetailsEmote3, DetailsEmote4, DetailsEmoteDelay1, DetailsEmoteDelay2, DetailsEmoteDelay3, DetailsEmoteDelay4, EmoteOnIncomplete, EmoteOnComplete, "
-        //      160                 161               162                163                   164                       165                     166                  167               168
+        // 161              162                163                164                165                     166                     167                     168                     169
         "OfferRewardEmote1, OfferRewardEmote2, OfferRewardEmote3, OfferRewardEmote4, OfferRewardEmoteDelay1, OfferRewardEmoteDelay2, OfferRewardEmoteDelay3, OfferRewardEmoteDelay4, WDBVerified"
         " FROM quest_template");
     if (!result)
@@ -3886,6 +3853,15 @@ void ObjectMgr::LoadQuests()
                     TC_LOG_ERROR("sql.sql", "Quest %u does not contain any playable races in `RequiredRaces` (%u), value set to 0 (all races).", qinfo->GetQuestId(), qinfo->RequiredRaces);
                     qinfo->RequiredRaces = 0;
                 }
+        }
+        // RequiredGender, male=0, female=1, both or none=2
+        if (qinfo->RequiredGender)
+        {
+            if (qinfo->RequiredGender > GENDER_NONE)
+            {
+                TC_LOG_ERROR("sql.sql", "Quest %u does not contain any playable gender in `RequiredGender` (%u), value set to 0 (both gender).", qinfo->GetQuestId(), qinfo->RequiredGender);
+                qinfo->RequiredGender = 0;
+            }
         }
         // RequiredSkillId, can be 0
         if (qinfo->RequiredSkillId)
@@ -6808,7 +6784,7 @@ uint64 ObjectMgr::GenerateVoidStorageItemId()
 void ObjectMgr::LoadCorpses()
 {
     //        0     1     2     3            4      5          6          7       8       9      10        11    12          13          14          15         16
-    // SELECT posX, posY, posZ, orientation, mapId, displayId, itemCache, bytes1, bytes2, flags, dynFlags, time, corpseType, instanceId, phaseMask, corpseGuid, guid FROM corpse WHERE corpseType <> 0
+    // SELECT posX, posY, posZ, orientation, mapId, displayId, itemCache, bytes1, bytes2, flags, dynFlags, time, corpseType, instanceId, phaseId, corpseGuid, guid FROM corpse WHERE corpseType <> 0
 
     uint32 oldMSTime = getMSTime();
 
@@ -9502,4 +9478,22 @@ uint32 ObjectMgr::GetCreatureDisplay(int32 modelid) const
     return it->second.displayId;
 }
 
+bool ObjectMgr::IsConditionTypeSupported(ConditionTypes conditionType)
+{
+    switch (conditionType)
+    {
+    case CONDITION_QUESTREWARDED:
+    case CONDITION_QUESTTAKEN:
+    case CONDITION_QUEST_COMPLETE:
+    case CONDITION_QUEST_NONE:
+    case CONDITION_TEAM:
+    case CONDITION_CLASS:
+    case CONDITION_RACE:
+    case CONDITION_INSTANCE_INFO:
+    case CONDITION_LEVEL:
+        return true;
+    default:
+        return false;
+    }
+}
 

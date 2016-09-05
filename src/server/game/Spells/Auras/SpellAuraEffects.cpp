@@ -1464,12 +1464,17 @@ void AuraEffect::HandlePhaseGroup(AuraApplication const* aurApp, uint8 mode, boo
 
     Unit* target = aurApp->GetTarget();
 
+    std::set<uint32> const& oldPhases = target->GetPhaseIds();
+    std::set<uint32> const& phases = GetPhasesForGroup(GetMiscValueB());
+    for (auto phase : phases)
+        target->SetInPhase(phase, false, apply);
+
     if (Player* player = target->ToPlayer())
     {
         if (apply)
-            player->GetPhaseMgr().RegisterPhasingAuraEffect(this);
+            player->RegisterPhasingAuraEffect(this);
         else
-            player->GetPhaseMgr().UnRegisterPhasingAuraEffect(this);
+            player->UnRegisterPhasingAuraEffect(this);
     }
 
     // call functions which may have additional effects after chainging state of unit
@@ -1716,12 +1721,15 @@ void AuraEffect::HandlePhase(AuraApplication const* aurApp, uint8 mode, bool app
 
     Unit* target = aurApp->GetTarget();
 
+    std::set<uint32> const& oldPhases = target->GetPhaseIds();
+    target->SetInPhase(GetMiscValueB(), false, apply);
+
     if (Player* player = target->ToPlayer())
     {
         if (apply)
-            player->GetPhaseMgr().RegisterPhasingAuraEffect(this);
+            player->RegisterPhasingAuraEffect(this);
         else
-            player->GetPhaseMgr().UnRegisterPhasingAuraEffect(this);
+            player->UnRegisterPhasingAuraEffect(this);
     }
     else
     {
@@ -1740,6 +1748,13 @@ void AuraEffect::HandlePhase(AuraApplication const* aurApp, uint8 mode, bool app
         }
 
         target->SetPhaseMask(newPhase, false);
+    }
+
+    if (Player* player = target->ToPlayer())
+    {
+        if (player->IsInWorld())
+            player->GetMap()->SendUpdateTransportVisibility(player, oldPhases);
+        player->SendUpdatePhasing();
     }
 
     // call functions which may have additional effects after chainging state of unit

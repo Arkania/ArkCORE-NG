@@ -1019,8 +1019,11 @@ void Aura::UnregisterSingleTarget()
     Unit* caster = GetCaster();
     /// @todo find a better way to do this.
     if (!caster)
+    {
         caster = ObjectAccessor::GetObjectInOrOutOfWorld(GetCasterGUID(), (Unit*)NULL);
-    ASSERT(caster);
+        if (!caster) 
+            return; // maybe player has re-logged to server, with other char.. and a old triggered aura is not finished..
+    }
     caster->GetSingleCastAuras().remove(this);
     SetIsSingleTarget(false);
 }

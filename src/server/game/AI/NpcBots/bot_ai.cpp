@@ -1108,8 +1108,10 @@ void bot_minion_ai::setStats(uint8 myclass, uint8 myrace, uint8 mylevel, bool fo
     }
 
     //PHASE
-    if (master->GetPhaseMask() != me->GetPhaseMask())
-        me->SetPhaseMask(master->GetPhaseMask(), true);
+    me->CopyPhaseFrom(master, true);
+    //if (master->GetPhaseMask() != me->GetPhaseMask())
+    //    me->SetPhaseMask(master->GetPhaseMask(), true);
+
     //INIT STATS
     //partially receive master's stats and get base class stats, we'll need all this later
     uint8 tempclass = myclass == DRUID_BEAR_FORM || myclass == DRUID_CAT_FORM ? CLASS_DRUID : myclass;
@@ -1480,8 +1482,9 @@ void bot_pet_ai::setStats(uint8 mylevel, uint8 petType, bool force)
         InitSpells();
 
     //PHASE
-    if (master->GetPhaseMask() != me->GetPhaseMask())
-        me->SetPhaseMask(master->GetPhaseMask(), true);
+    me->CopyPhaseFrom(master, true);
+    //if (master->GetPhaseMask() != me->GetPhaseMask())
+    //    me->SetPhaseMask(master->GetPhaseMask(), true);
 
     ////INIT STATS
     //uint8 botclass = m_creatureOwner->GetBotClass();

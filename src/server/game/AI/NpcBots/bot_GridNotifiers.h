@@ -665,24 +665,24 @@ private:
 template<class Check>
 struct UnitListSearcher
 {
-    uint32 i_phaseMask;
+    WorldObject const* _searcher;
     std::list<uint64> &i_objects;
     Check& i_check;
 
     UnitListSearcher(WorldObject const* searcher, std::list<uint64> &objects, Check &check)
-        : i_phaseMask(searcher->GetPhaseMask()), i_objects(objects), i_check(check) { }
+        : _searcher(searcher), i_objects(objects), i_check(check) { }
 
     void Visit(PlayerMapType &m)
     {
         for (PlayerMapType::iterator itr = m.begin(); itr != m.end(); ++itr)
-            if (itr->GetSource()->InSamePhase(i_phaseMask))
+            if (itr->GetSource()->InSamePhase(_searcher))
                 if (i_check(itr->GetSource()))
                     i_objects.push_back(itr->GetSource()->GetGUID());
     }
     void Visit(CreatureMapType &m)
     {
         for (CreatureMapType::iterator itr = m.begin(); itr != m.end(); ++itr)
-            if (itr->GetSource()->InSamePhase(i_phaseMask))
+            if (itr->GetSource()->InSamePhase(_searcher))
                 if (i_check(itr->GetSource()))
                     i_objects.push_back(itr->GetSource()->GetGUID());
     }

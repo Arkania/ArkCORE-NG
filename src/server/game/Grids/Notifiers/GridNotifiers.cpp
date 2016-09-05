@@ -262,7 +262,7 @@ void MessageDistDeliverer::Visit(PlayerMapType &m)
     for (PlayerMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
     {
         Player* target = iter->GetSource();
-        if (!target->InSamePhase(i_phaseMask))
+        if (!target->InSamePhase(i_source))
             continue;
 
         if (target->GetExactDist2dSq(i_source) > i_distSq)
@@ -287,7 +287,7 @@ void MessageDistDeliverer::Visit(CreatureMapType &m)
     for (CreatureMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
     {
         Creature* target = iter->GetSource();
-        if (!target->InSamePhase(i_phaseMask))
+        if (!target->InSamePhase(i_source))
             continue;
 
         if (target->GetExactDist2dSq(i_source) > i_distSq)
@@ -309,7 +309,7 @@ void MessageDistDeliverer::Visit(DynamicObjectMapType &m)
     for (DynamicObjectMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
     {
         DynamicObject* target = iter->GetSource();
-        if (!target->InSamePhase(i_phaseMask))
+        if (!target->InSamePhase(i_source))
             continue;
 
         if (target->GetExactDist2dSq(i_source) > i_distSq)

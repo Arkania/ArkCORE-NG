@@ -27,6 +27,8 @@
 #include "Battleground.h"
 #include "Vehicle.h"
 
+#include "SpellAuraEffects.h"
+
 uint32 GetTargetFlagMask(SpellTargetObjectTypes objType)
 {
     switch (objType)

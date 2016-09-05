@@ -291,6 +291,15 @@ Creature* Transport::CreateNPCPassenger(uint32 guid, CreatureData const* data)
         return NULL;
     }
 
+    if (data->phaseId)
+        creature->SetInPhase(data->phaseId, false, true);
+    else if (!data->phaseGroups.empty())
+        for (auto phGroup : data->phaseGroups)
+            for (auto phase : GetPhasesForGroup(phGroup))
+                creature->SetInPhase(phase, false, true);
+    else
+        creature->CopyPhaseFrom(this);
+
     if (!map->AddToMap(creature))
     {
         delete creature;
@@ -399,6 +408,12 @@ TempSummon* Transport::SummonPassenger(uint32 entry, Position const& pos, TempSu
     }
 
     uint32 phase = PHASEMASK_NORMAL;
+    std::set<uint32> phases;
+    if (summoner)
+        phases = summoner->GetPhaseIds();
+    else
+        phases = GetPhaseIds(); // If there was no summoner, try to use the transport phases
+
     uint32 team = 0;
     if (summoner)
     {
@@ -436,6 +451,9 @@ TempSummon* Transport::SummonPassenger(uint32 entry, Position const& pos, TempSu
         delete summon;
         return NULL;
     }
+
+    for (uint32 phase : phases)
+        summon->SetInPhase(phase, false, true);
 
     summon->SetUInt32Value(UNIT_CREATED_BY_SPELL, spellId);
 

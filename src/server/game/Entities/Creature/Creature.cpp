@@ -764,6 +764,31 @@ bool Creature::Create(uint32 guidlow, Map* map, uint32 phaseMask, uint32 Entry, 
 {
     ASSERT(map);
     SetMap(map);
+
+    if (data)
+    {
+        if (data->phaseGroups.empty() && !data->phaseId && phaseMask)
+            for (uint32 i = 0; i < 32; i++)
+                if (((1 << i) & phaseMask) > 0)
+                    SetInPhase(i + DEFAULT_PHASE, false, true);
+
+        if (data->phaseId)
+            SetInPhase(data->phaseId, false, true);
+
+        if (!data->phaseGroups.empty())
+        {
+            SetPhaseGroups(data->phaseGroups);
+            for (auto phGroup : data->phaseGroups)
+                for (auto ph : GetPhasesForGroup(phGroup))
+                    SetInPhase(ph, false, true);
+        }
+
+        if (GetPhaseIds().empty())
+            SetInPhase(DEFAULT_PHASE, false, true);
+
+        phaseMask = 0;
+    }
+
     SetPhaseMask(phaseMask, false);
 
     CreatureTemplate const* cinfo = sObjectMgr->GetCreatureTemplate(Entry);

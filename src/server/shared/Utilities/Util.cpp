@@ -554,3 +554,31 @@ std::string ByteArrayToHexStr(uint8 const* bytes, uint32 arrayLen, bool reverse 
 
     return ss.str();
 }
+
+std::set<uint32> GetUIntegerList(std::string storedString)
+{
+    std::set<uint32> r;
+
+    if (storedString.empty())
+        return r;
+
+    uint32 i;
+    std::istringstream data(storedString);
+    do
+    {
+        i=0;
+        data >> i;
+        if (i) r.insert(i);
+    } while (i);
+    return r;
+}
+
+std::string GetUintegerString(std::set<uint32> uint32List)
+{
+    std::ostringstream ss;
+    ss << uint32List.size() << ' ';
+    for (uint16 i : uint32List)
+        ss << i << ' ';
+    return ss.str();
+}
+

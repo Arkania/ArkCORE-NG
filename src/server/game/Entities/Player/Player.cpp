@@ -691,7 +691,7 @@ void KillRewarder::Reward()
 #ifdef _MSC_VER
 #pragma warning(disable:4355)
 #endif
-Player::Player(WorldSession* session) : Unit(true), phaseMgr(this)
+Player::Player(WorldSession* session) : Unit(true)
 {
 #ifdef _MSC_VER
 #pragma warning(default:4355)
@@ -4031,8 +4031,8 @@ void Player::SetGameMaster(bool on)
         getHostileRefManager().setOnlineOfflineState(true);
         m_serverSideVisibilityDetect.SetValue(SERVERSIDE_VISIBILITY_GM, SEC_PLAYER);
 
-        phaseMgr.AddUpdateFlag(PHASE_UPDATE_FLAG_SERVERSIDE_CHANGED);
-        phaseMgr.Update();
+        AddUpdateFlag(PHASE_UPDATE_FLAG_SERVERSIDE_CHANGED);
+        PhaseUpdate();
     }
 
     UpdateObjectVisibility();
@@ -4329,7 +4329,7 @@ void Player::GiveLevel(uint8 level)
     PhaseUpdateData phaseUpdateData;
     phaseUpdateData.AddConditionType(CONDITION_LEVEL);
 
-    phaseMgr.NotifyConditionChanged(phaseUpdateData);
+    NotifyConditionChanged(phaseUpdateData);
 
     // Refer-A-Friend
     if (GetSession()->GetRecruiterId())
@@ -9110,7 +9110,7 @@ void Player::UpdateArea(uint32 newArea)
     // so apply them accordingly
     m_areaUpdateId = newArea;
 
-    phaseMgr.AddUpdateFlag(PHASE_UPDATE_FLAG_AREA_UPDATE);
+    AddUpdateFlag(PHASE_UPDATE_FLAG_AREA_UPDATE);
 
     AreaTableEntry const* area = GetAreaEntryByAreaID(newArea);
     pvpInfo.IsInFFAPvPArea = area && (area->flags & AREA_FLAG_ARENA);
@@ -9130,12 +9130,12 @@ void Player::UpdateArea(uint32 newArea)
     else
         RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_SANCTUARY);
 
-    phaseMgr.RemoveUpdateFlag(PHASE_UPDATE_FLAG_AREA_UPDATE);
+    RemoveUpdateFlag(PHASE_UPDATE_FLAG_AREA_UPDATE);
 }
 
 void Player::UpdateZone(uint32 newZone, uint32 newArea)
 {
-    phaseMgr.AddUpdateFlag(PHASE_UPDATE_FLAG_ZONE_UPDATE);
+    AddUpdateFlag(PHASE_UPDATE_FLAG_ZONE_UPDATE);
 
     if (m_zoneUpdateId != newZone)
     {
@@ -9241,7 +9241,9 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea)
 
     UpdateZoneDependentAuras(newZone);
 
-    phaseMgr.RemoveUpdateFlag(PHASE_UPDATE_FLAG_ZONE_UPDATE);
+    RemoveUpdateFlag(PHASE_UPDATE_FLAG_ZONE_UPDATE);
+
+    PhaseUpdate();
 }
 
 //If players are too far away from the duel flag... they lose the duel
@@ -16873,7 +16875,7 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
 
     PhaseUpdateData phaseUpdateData;
     phaseUpdateData.AddQuestUpdate(quest_id);
-    phaseMgr.NotifyConditionChanged(phaseUpdateData);
+    NotifyConditionChanged(phaseUpdateData);
 
     // StoreNewItem, mail reward, etc. save data directly to the database
     // to prevent exploitable data desynchronisation we save the quest status to the database too
@@ -17154,6 +17156,25 @@ bool Player::SatisfyQuestRace(Quest const* qInfo, bool msg)
         {
             SendCanTakeQuestResponse(INVALIDREASON_QUEST_FAILED_WRONG_RACE);
             TC_LOG_DEBUG("misc", "SatisfyQuestRace: Sent INVALIDREASON_QUEST_FAILED_WRONG_RACE (questId: %u) because player does not have required race.", qInfo->GetQuestId());
+
+        }
+        return false;
+    }
+    return true;
+}
+
+bool Player::SatisfyQuestGender(Quest const* qInfo, bool msg)
+{
+    Gender reqGender = Gender(qInfo->GetRequiredGender());
+    if (reqGender == GENDER_NONE)
+        return true;
+    
+    if (reqGender != Gender(getGender()))
+    {
+        if (msg)
+        {
+            SendCanTakeQuestResponse(INVALIDREASON_DONT_HAVE_REQ);
+            TC_LOG_DEBUG("misc", "SatisfyQuestGender: Sent INVALIDREASON_DONT_HAVE_REQ (questId: %u) because player does not have required gender.", qInfo->GetQuestId());
 
         }
         return false;
@@ -17531,7 +17552,7 @@ void Player::SetQuestStatus(uint32 questId, QuestStatus status, bool update /*= 
     PhaseUpdateData phaseUpdateData;
     phaseUpdateData.AddQuestUpdate(questId);
 
-    phaseMgr.NotifyConditionChanged(phaseUpdateData);
+    NotifyConditionChanged(phaseUpdateData);
 
     if (update)
         SendQuestUpdate(questId);
@@ -17550,7 +17571,7 @@ void Player::RemoveActiveQuest(uint32 questId, bool update /*= true*/)
         PhaseUpdateData phaseUpdateData;
         phaseUpdateData.AddQuestUpdate(questId);
 
-        phaseMgr.NotifyConditionChanged(phaseUpdateData);
+        NotifyConditionChanged(phaseUpdateData);
     }
 
     if (update)
@@ -17569,7 +17590,7 @@ void Player::RemoveRewardedQuest(uint32 questId, bool update /*= true*/)
         PhaseUpdateData phaseUpdateData;
         phaseUpdateData.AddQuestUpdate(questId);
 
-        phaseMgr.NotifyConditionChanged(phaseUpdateData);
+        NotifyConditionChanged(phaseUpdateData);
     }
 
     if (update)
@@ -29683,3 +29704,13 @@ void Player::ReadMovementInfo(WorldPacket& data, MovementInfo* mi, Movement::Ext
 
 #undef REMOVE_VIOLATING_FLAGS
 }
+
+void Player::SendUpdatePhasing()
+{
+    if (!IsInWorld())
+        return;
+
+    PhaseUpdate(); // gpn39f // not shure
+    // GetSession()->SendSetPhaseShift(GetPhaseIds(), GetTerrainSwaps(), GetWorldMapAreaSwaps());
+}
+

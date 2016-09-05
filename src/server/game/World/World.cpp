@@ -3325,7 +3325,7 @@ void World::UpdatePhaseDefinitions()
     SessionMap::const_iterator itr;
     for (itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
         if (itr->second && itr->second->GetPlayer() && itr->second->GetPlayer()->IsInWorld())
-            itr->second->GetPlayer()->GetPhaseMgr().NotifyStoresReloaded();
+            itr->second->GetPlayer()->NotifyStoresReloaded();
 }
 
 void World::ReloadRBAC()

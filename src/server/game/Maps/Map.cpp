@@ -2558,6 +2558,26 @@ void Map::SendRemoveTransports(Player* player)
     player->GetSession()->SendPacket(&packet);
 }
 
+void Map::SendUpdateTransportVisibility(Player* player, std::set<uint32> const& previousPhases)
+{
+    // Hack to send out transports
+    UpdateData transData(player->GetMapId());
+    for (TransportsContainer::const_iterator i = _transports.begin(); i != _transports.end(); ++i)
+    {
+        if (*i == player->GetTransport())
+            continue;
+
+        if (player->IsInPhase(*i) && !Trinity::Containers::Intersects(previousPhases.begin(), previousPhases.end(), (*i)->GetPhaseIds().begin(), (*i)->GetPhaseIds().end()))
+            (*i)->BuildCreateUpdateBlockForPlayer(&transData, player);
+        else if (!player->IsInPhase(*i))
+            (*i)->BuildOutOfRangeUpdateBlock(&transData);
+    }
+
+    WorldPacket packet;
+    transData.BuildPacket(&packet);
+    player->GetSession()->SendPacket(&packet);
+}
+
 inline void Map::setNGrid(NGridType *grid, uint32 x, uint32 y)
 {
     if (x >= MAX_NUMBER_OF_GRIDS || y >= MAX_NUMBER_OF_GRIDS)

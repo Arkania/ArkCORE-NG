@@ -53,6 +53,7 @@
 #include "Battlefield.h"
 #include "BattlefieldMgr.h"
 #include "Chat.h"
+#include "Language.h"
 
 uint32 GuidHigh2TypeId(uint32 guid_hi)
 {
@@ -1284,7 +1285,7 @@ void MovementInfo::OutDebug()
 WorldObject::WorldObject(bool isWorldObject) : WorldLocation(), LastUsedScriptID(0),
 m_name(""), m_isActive(false), m_isWorldObject(isWorldObject), m_zoneScript(NULL),
 m_transport(NULL), m_currMap(NULL), m_InstanceId(0),
-m_phaseMask(PHASEMASK_NORMAL), m_notifyflags(0), m_executed_notifies(0)
+m_phaseMask(PHASEMASK_NORMAL), m_notifyflags(0), m_executed_notifies(0), phaseData(nullptr), m_phaseUpdateFlags(0)
 {
     m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE | GHOST_VISIBILITY_GHOST);
     m_serverSideVisibilityDetect.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE);
@@ -2182,7 +2183,7 @@ namespace Trinity
             Language i_language;
             WorldObject const* i_target;
     };
-}                                                           // namespace Trinity
+}  // namespace Trinity
 
 void WorldObject::MonsterSay(const char* text, uint32 language, WorldObject const* target)
 {
@@ -3100,41 +3101,6 @@ void WorldObject::MovePositionToFirstCollision(Position &pos, float dist, float 
     pos.SetOrientation(GetOrientation());
 }
 
-void WorldObject::SetPhaseMask(uint32 newPhaseMask, bool update)
-{
-    m_phaseMask = newPhaseMask;
-
-    if (update && IsInWorld())
-        UpdateObjectVisibility();
-}
-
-bool WorldObject::InSamePhase(WorldObject const* obj) const
-{
-    return InSamePhase(obj->GetPhaseMask());
-}
-
-std::string WorldObject::PhaseToString()
-{
-    std::stringstream sstr;
-    if (m_phaseMask)
-    {
-        sstr << "PhaseMask: " << m_phaseMask << "\n";
-    }
-    if (!m_phaseIds.empty())
-    {
-        bool ko = false;
-        sstr << "PhaseId: ";
-        for (uint32 ph : m_phaseIds)
-        {
-            if (ko) sstr << ", ";
-            ko = true;
-            sstr << ph;
-        }
-        sstr << "\n";
-    }
-    return sstr.str();
-}
-
 void WorldObject::PlayDistanceSound(uint32 sound_id, Player* target /*= NULL*/)
 {
     WorldPacket data(SMSG_PLAY_OBJECT_SOUND, 4 + 8);
@@ -3282,3 +3248,642 @@ uint64 WorldObject::GetTransGUID() const
     return 0;
 }
 
+
+std::string WorldObject::GetPhaseString() 
+{
+    std::ostringstream ss;
+    ss << GetPhaseIds().size() << ' ';
+    for (uint16 ph : GetPhaseIds())
+        ss << ph << ' ';
+    return ss.str();
+}
+
+void WorldObject::SetPhaseString(std::string phaseId)
+{
+    if (phaseId.empty())
+        return;
+
+    std::istringstream data(phaseId);
+    uint32 size;
+    data >> size;
+    for (uint32 i = 0; i < size; i++)
+    {
+        uint32 ph;
+        data >> ph;
+        SetInPhase(ph, false, true);
+    }
+}
+
+// new phase system
+
+void WorldObject::AddPhaseGroup(uint32 phaseGroup)
+{
+    if (m_phaseGroups.find(phaseGroup) != m_phaseGroups.end())
+        m_phaseGroups.insert(phaseGroup);
+}
+
+void WorldObject::SetPhaseMask(uint32 newPhaseMask, bool update)
+{
+    m_phaseMask = newPhaseMask;
+
+    if (update && IsInWorld())
+        UpdateObjectVisibility();
+}
+
+bool WorldObject::InSamePhase(WorldObject const* obj) const
+{
+    if (!m_phaseGroups.empty() && !obj->m_phaseGroups.empty())
+        return Trinity::Containers::Intersects(m_phaseGroups.begin(), m_phaseGroups.end(), obj->m_phaseGroups.begin(), obj->m_phaseGroups.end());
+
+    if (GetPhaseIds().empty() && obj->GetPhaseIds().empty())
+        return InSamePhase(obj->GetPhaseMask());
+
+   return IsInPhase(obj);
+}
+
+bool WorldObject::InSamePhase(uint32 phasemask) const
+{ 
+    if (GetPhaseMask() && phasemask)
+        if (GetPhaseMask() & phasemask)
+            return true;
+
+    if (!phasemask)
+        phasemask = 1;
+
+    for (uint32 i = 0; i < 32; i++)
+        if (((1 << i) & phasemask) > 0)
+            if (IsInPhase(i + DEFAULT_PHASE))
+                return true;
+
+    return false;
+}
+
+std::string WorldObject::PhaseToString()
+{
+    std::stringstream sstr;
+    if (m_phaseMask)
+    {
+        sstr << "PhaseMask: " << m_phaseMask << "\n";
+    }
+    if (!m_phaseIds.empty())
+    {
+        bool ko = false;
+        sstr << "PhaseId: ";
+        for (uint32 ph : m_phaseIds)
+        {
+            if (ko) sstr << ", ";
+            ko = true;
+            sstr << ph;
+        }
+        sstr << "\n";
+    }
+    return sstr.str();
+}
+
+bool WorldObject::HasInPhaseList(uint32 phase) const
+{
+    return (m_phaseIds.find(phase) != m_phaseIds.end());
+}
+
+bool WorldObject::IsInPhase(uint32 phaseId) const
+{
+    return (m_phaseIds.find(phaseId) != m_phaseIds.end());
+}
+
+bool WorldObject::IsInPhase(WorldObject const* obj) const
+{
+    // PhaseId 169 is the default fallback phase
+    if (!m_phaseGroups.empty() && !obj->m_phaseGroups.empty())
+        return Trinity::Containers::Intersects(m_phaseGroups.begin(), m_phaseGroups.end(), obj->m_phaseGroups.begin(), obj->m_phaseGroups.end());
+
+    if (m_phaseIds.empty() && obj->GetPhaseIds().empty())
+        return true;
+
+    if (m_phaseIds.empty() && obj->IsInPhase(DEFAULT_PHASE))
+        return true;
+
+    if (obj->GetPhaseIds().empty() && IsInPhase(DEFAULT_PHASE))
+        return true;
+
+    if (GetTypeId() == TYPEID_PLAYER && ToPlayer()->IsGameMaster())
+        return true;
+
+    return Trinity::Containers::Intersects(m_phaseIds.begin(), m_phaseIds.end(), obj->GetPhaseIds().begin(), obj->GetPhaseIds().end());
+}
+
+bool WorldObject::IsInTerrainSwap(uint32 terrainSwap)
+{ 
+    return m_terrainSwaps.find(terrainSwap) != m_terrainSwaps.end(); 
+}
+
+void WorldObject::CopyPhaseFrom(WorldObject* obj, bool update)
+{
+    if (!obj)
+        return;
+
+    for (uint32 phase : obj->GetPhaseIds())
+        SetInPhase(phase, false, true);
+
+    if (update && IsInWorld())
+        UpdateObjectVisibility();
+}
+
+void WorldObject::ClearPhases(bool update)
+{
+    m_phaseIds.clear();
+
+    // RebuildTerrainSwaps();
+
+    if (update && IsInWorld())
+        UpdateObjectVisibility();
+}
+
+bool WorldObject::SetInPhase(uint32 id, bool update, bool apply)
+{
+    if (id)
+    {
+        if (apply) // add this phase
+        {
+            if (HasInPhaseList(id)) // do not run the updates if we are already in this phase
+                return false;
+
+            if (id >= 169 && id <= 200)
+                m_phaseMask |= 1 << (id - 169);
+
+            m_phaseIds.insert(id);
+        }
+        else      // erase this phase
+        {
+            if (!HasInPhaseList(id)) // do not run the updates if we are not in this phase
+                return false;
+
+            if (id >= 169 && id <= 200)
+                m_phaseMask &= ~(1 << (id - 169));
+
+            m_phaseIds.erase(id);
+        }
+    }
+
+    // RebuildTerrainSwaps();
+
+    if (update && IsInWorld())
+        UpdateObjectVisibility();
+
+    return true;
+}
+
+//////////////////////////////////////////////////////////////////
+// Phase Data
+
+void PhaseData::SetPlayer(Player* _player)
+{
+    player = _player;
+}
+
+uint32 PhaseData::GetCurrentPhasemask() const
+{
+    if (player->IsGameMaster())
+        return uint32(PHASEMASK_ANYWHERE);
+
+    if (_CustomPhasemask)
+        return _CustomPhasemask;
+
+    return GetPhaseMaskForSpawn();
+}
+
+uint32 PhaseData::GetPhaseMaskForSpawn() const
+{
+    uint32 const phase = (_PhasemaskThroughDefinitions | _PhasemaskThroughAuras);
+    return (phase ? phase : PHASEMASK_NORMAL);
+}
+
+void PhaseData::SendPhaseMaskToPlayer()
+{
+    // Server side update
+    uint32 const phasemask = GetCurrentPhasemask();
+    if (player->GetPhaseMask() == phasemask)
+        return;
+
+    player->SetPhaseMask(phasemask, false);
+
+    if (player->IsVisible())
+        player->UpdateObjectVisibility();
+}
+
+void PhaseData::SendPhaseshiftToPlayer()
+{
+    // Client side update
+    std::set<uint32> phaseIds;
+    std::set<uint32> phaseGroups;
+    std::set<uint32> terrainswaps;
+    std::set<uint32> worldAreaSwaps;
+
+    for (PhaseInfoContainer::const_iterator itr = spellPhaseInfo.begin(); itr != spellPhaseInfo.end(); ++itr)
+    {
+        std::list<PhaseInfo> pi = (itr)->second;
+        for (auto ph = pi.begin(); ph != pi.end(); ++ph)
+        {
+            if (ph->phaseId)
+                phaseIds.insert(ph->phaseId);
+
+            if (ph->phaseGroup)
+                phaseGroups.insert(ph->phaseGroup);
+
+            if (ph->terrainswapmap)
+                terrainswaps.insert(ph->terrainswapmap);
+
+            if (ph->worldMapAreaSwap)
+                worldAreaSwaps.insert(ph->worldMapAreaSwap);
+        }
+    }
+
+    // Phase Definitions
+    for (std::list<PhaseDefinition>::const_iterator itr = activePhaseDefinitions.begin(); itr != activePhaseDefinitions.end(); ++itr)
+    {
+        if ((itr)->phaseId)
+            phaseIds.insert((itr)->phaseId);
+
+        if ((itr)->phaseGroup)
+            phaseGroups.insert((itr)->phaseGroup);
+        
+        if ((itr)->terrainswapmap)
+            terrainswaps.insert((itr)->terrainswapmap);
+
+        if ((itr)->worldMapAreaSwap)
+            worldAreaSwaps.insert((itr)->worldMapAreaSwap);
+    }
+
+    if (phaseGroups.empty())
+        player->GetSession()->SendSetPhaseShift(phaseIds, terrainswaps, worldAreaSwaps);
+    else
+        player->GetSession()->SendSetPhaseShift(phaseGroups, terrainswaps, worldAreaSwaps);
+}
+
+void PhaseData::GetActivePhases(std::set<uint32>& phases) const
+{
+    for (PhaseInfoContainer::const_iterator itr = spellPhaseInfo.begin(); itr != spellPhaseInfo.end(); ++itr)
+        for (auto phase = itr->second.begin(); phase != itr->second.end(); ++phase)
+            if (phase->phaseId)
+                phases.insert(phase->phaseId);
+
+    // Phase Definitions
+    for (std::list<PhaseDefinition>::const_iterator itr = activePhaseDefinitions.begin(); itr != activePhaseDefinitions.end(); ++itr)
+        if ((itr)->phaseId)
+            phases.insert((itr)->phaseId);
+}
+
+void PhaseData::AddPhaseDefinition(PhaseDefinition phaseDefinition)
+{
+    if (phaseDefinition.IsOverwritingExistingPhases())
+    {
+        // old phaseMask
+        activePhaseDefinitions.clear();
+        _PhasemaskThroughDefinitions = phaseDefinition.phasemask;
+        // new phaseId
+        player->ClearPhases(false);
+        if (phaseDefinition.phaseId)
+            player->SetInPhase(phaseDefinition.phaseId, false, true);
+        if (phaseDefinition.phaseGroup)
+        {
+            player->AddPhaseGroup(phaseDefinition.phaseGroup);
+            for (auto ph : GetPhasesForGroup(phaseDefinition.phaseGroup))
+                player->SetInPhase(ph, false, true);
+        }
+    }
+    else
+    {
+        // old phaseMask
+        if (phaseDefinition.IsNegatingPhasemask())
+            _PhasemaskThroughDefinitions &= ~phaseDefinition.phasemask;
+        else
+            _PhasemaskThroughDefinitions |= phaseDefinition.phasemask;
+        // new phaseId
+        if (phaseDefinition.phaseId)
+            player->SetInPhase(phaseDefinition.phaseId, false, !phaseDefinition.IsNegatingPhasemask());
+        if (phaseDefinition.phaseGroup)
+        {
+            player->AddPhaseGroup(phaseDefinition.phaseGroup);
+            for (auto ph : GetPhasesForGroup(phaseDefinition.phaseGroup))
+                player->SetInPhase(ph, false, !phaseDefinition.IsNegatingPhasemask());
+        }
+    }
+
+    activePhaseDefinitions.push_back(phaseDefinition);
+}
+
+void PhaseData::AddAuraInfo(uint32 spellId, PhaseInfo const& phaseInfo)
+{
+    if (phaseInfo.phasemask)
+        _PhasemaskThroughAuras |= phaseInfo.phasemask;
+
+    spellPhaseInfo[spellId].push_back(phaseInfo);
+}
+
+uint32 PhaseData::RemoveAuraInfo(uint32 spellId)
+{
+    PhaseInfoContainer::const_iterator rAura = spellPhaseInfo.find(spellId);
+    if (rAura != spellPhaseInfo.end())
+    {
+        uint32 updateflag = 0;
+
+        for (auto phase = rAura->second.begin(); phase != rAura->second.end(); ++phase)
+        {
+            if (phase->NeedsClientSideUpdate())
+                updateflag |= PHASE_UPDATE_FLAG_CLIENTSIDE_CHANGED;
+
+            if (phase->NeedsServerSideUpdate())
+            {
+                _PhasemaskThroughAuras = 0;
+                updateflag |= PHASE_UPDATE_FLAG_SERVERSIDE_CHANGED;
+            }
+        }
+
+        if (updateflag & PHASE_UPDATE_FLAG_SERVERSIDE_CHANGED)
+        {
+            spellPhaseInfo.erase(rAura);
+
+            for (PhaseInfoContainer::const_iterator itr = spellPhaseInfo.begin(); itr != spellPhaseInfo.end(); ++itr)
+                for (auto ph = itr->second.begin(); ph != itr->second.end(); ++ph)
+                    _PhasemaskThroughAuras |= ph->phasemask;
+        }
+
+        return updateflag;
+    }
+
+    return 0;
+}
+
+//////////////////////////////////////////////////////////////////
+// Phase Update Data
+
+void PhaseUpdateData::AddQuestUpdate(uint32 questId)
+{
+    AddConditionType(CONDITION_QUESTREWARDED);
+    AddConditionType(CONDITION_QUESTTAKEN);
+    AddConditionType(CONDITION_QUEST_COMPLETE);
+    AddConditionType(CONDITION_QUEST_NONE);
+
+    _questId = questId;
+}
+
+bool PhaseUpdateData::IsConditionRelated(Condition const* condition) const
+{
+    switch (condition->ConditionType)
+    {
+    case CONDITION_QUESTREWARDED:
+    case CONDITION_QUESTTAKEN:
+    case CONDITION_QUEST_COMPLETE:
+    case CONDITION_QUEST_NONE:
+        return condition->ConditionValue1 == _questId && ((1 << condition->ConditionType) & _conditionTypeFlags);
+    default:
+        return (1 << condition->ConditionType) & _conditionTypeFlags;
+    }
+}
+
+/////////////////////////////////////////////////////////////////
+// Notifier
+
+void WorldObject::NotifyConditionChanged(PhaseUpdateData const& updateData)
+{
+    if (NeedsPhaseUpdateWithData(updateData))
+    {
+        Recalculate();
+        PhaseUpdate();
+    }
+}
+
+void WorldObject::NotifyStoresReloaded()
+{ 
+    Recalculate(); 
+    PhaseUpdate(); 
+}
+
+void WorldObject::PhaseUpdate()
+{
+    if (IsUpdateInProgress())
+        return;
+
+    if (Player* player = ToPlayer())
+    {
+        if (m_phaseUpdateFlags & PHASE_UPDATE_FLAG_CLIENTSIDE_CHANGED)
+        {
+                phaseData.SendPhaseshiftToPlayer();
+                player->SetGroupUpdateFlag(GROUP_UPDATE_FLAG_PHASE);
+        }
+
+        if (m_phaseUpdateFlags & PHASE_UPDATE_FLAG_SERVERSIDE_CHANGED)
+            phaseData.SendPhaseMaskToPlayer();
+    }
+
+    m_phaseUpdateFlags = 0;
+}
+
+void WorldObject::AddUpdateFlag(PhaseUpdateFlag updateFlag) 
+{ 
+    m_phaseUpdateFlags |= updateFlag; 
+}
+
+void WorldObject::RemoveUpdateFlag(PhaseUpdateFlag updateFlag)
+{
+    m_phaseUpdateFlags &= ~updateFlag;
+
+    if (Player* player = ToPlayer())
+        if (updateFlag == PHASE_UPDATE_FLAG_ZONE_UPDATE)
+        {
+            // Update zone changes
+            if (phaseData.HasActiveDefinitions())
+            {
+                phaseData.ResetDefinitions();
+                m_phaseUpdateFlags |= (PHASE_UPDATE_FLAG_CLIENTSIDE_CHANGED | PHASE_UPDATE_FLAG_SERVERSIDE_CHANGED);
+            }
+
+            PhaseDefinitionStore const* _PhaseDefinitionStore = sObjectMgr->GetPhaseDefinitionStore();
+            if (_PhaseDefinitionStore->find(player->GetZoneId()) != _PhaseDefinitionStore->end())
+                Recalculate();
+        }
+
+    PhaseUpdate();
+}
+
+bool WorldObject::IsUpdateInProgress() const
+{ 
+    return (m_phaseUpdateFlags & PHASE_UPDATE_FLAG_ZONE_UPDATE) || (m_phaseUpdateFlags & PHASE_UPDATE_FLAG_AREA_UPDATE); 
+}
+
+//////////////////////////////////////////////////////////////////
+// Phasing Definitions
+
+void WorldObject::Recalculate()
+{
+    PhaseDefinitionContainer phaseDefCon = GetPhaseDefinitionContainer(ToPlayer()->GetZoneId());
+    PhaseAreaContainer phaseAreaCon = GetPhaseAreaContainer(ToPlayer()->GetZoneId());
+
+    if (!phaseDefCon.empty())
+        for (PhaseDefinitionContainer::const_iterator itr = phaseDefCon.begin(); itr != phaseDefCon.end(); ++itr)
+        {
+            PhaseDefinition phaseDef = *itr;
+            ePhaseUpdateStatus checkDef = CheckDefinition(phaseDef); //     PHASE_UPDATE_NOT_NEEDED, PHASE_UPDATE_NEEDED, EMPTY_DATABASE,
+            ePhaseUpdateStatus checkArea = CheckArea(phaseDef, phaseAreaCon);
+
+            if ((checkDef == EMPTY_DATABASE && checkArea == EMPTY_DATABASE) || checkDef == PHASE_UPDATE_NEEDED || checkArea == PHASE_UPDATE_NEEDED)
+            {
+                phaseData.AddPhaseDefinition(phaseDef);
+
+                if (phaseDef.phasemask)
+                    m_phaseUpdateFlags |= PHASE_UPDATE_FLAG_SERVERSIDE_CHANGED;
+
+                if (phaseDef.phaseId || phaseDef.phaseGroup || phaseDef.terrainswapmap || phaseDef.worldMapAreaSwap)
+                    m_phaseUpdateFlags |= PHASE_UPDATE_FLAG_CLIENTSIDE_CHANGED;
+
+                if (phaseDef.IsLastDefinition())
+                    break;
+            }
+        }
+}
+
+ePhaseUpdateStatus WorldObject::CheckDefinition(PhaseDefinition phaseDefinition)
+{
+    ConditionList const* conditions = sConditionMgr->GetConditionsForPhaseDefinition(phaseDefinition.zoneId, phaseDefinition.entry);
+    if (!conditions || conditions->empty())
+        return EMPTY_DATABASE;
+
+    ConditionSourceInfo srcInfo(ToPlayer());
+    return (sConditionMgr->IsObjectMeetToConditions(srcInfo, *conditions)) ? PHASE_UPDATE_NEEDED : PHASE_UPDATE_NOT_NEEDED;
+}
+
+ePhaseUpdateStatus WorldObject::CheckArea(PhaseDefinition phaseDefinition, PhaseAreaContainer pac)
+{
+    if (pac.empty())
+        return EMPTY_DATABASE;
+
+    for (PhaseAreaContainer::const_iterator area = pac.begin(); area != pac.end(); ++area)
+        if (phaseDefinition.zoneId == area->areaId && phaseDefinition.entry == area->entry)
+        {
+            if (area->quest_start)                              // not in expected required quest state
+                if (!ToPlayer() || (((1 << ToPlayer()->GetQuestStatus(area->quest_start)) & area->quest_start_status) == 0))
+                    continue;
+
+            if (area->quest_end)                                // not in expected forbidden quest state
+                if (!ToPlayer() || (((1 << ToPlayer()->GetQuestStatus(area->quest_end)) & area->quest_end_status) == 0))
+                    continue;
+
+            return PHASE_UPDATE_NEEDED;
+        }
+
+    return PHASE_UPDATE_NOT_NEEDED;
+}
+
+PhaseAreaContainer WorldObject::GetPhaseAreaContainer(uint32 zoneId) const
+{
+    PhaseAreaContainer pac;
+    PhaseAreaStore const* _PhaseAreaStore = sObjectMgr->GetPhaseAreaStore();
+    PhaseAreaStore::const_iterator itr = _PhaseAreaStore->find(zoneId);
+    if (itr != _PhaseAreaStore->end())
+        pac = itr->second;
+
+    return pac;
+}
+
+PhaseDefinitionContainer WorldObject::GetPhaseDefinitionContainer(uint32 zoneId) const
+{
+    PhaseDefinitionContainer pdc;
+    PhaseDefinitionStore const* _PhaseDefinitionStore = sObjectMgr->GetPhaseDefinitionStore();
+    PhaseDefinitionStore::const_iterator itr = _PhaseDefinitionStore->find(zoneId);
+    if (itr != _PhaseDefinitionStore->end())
+        pdc = itr->second;
+
+    return pdc;
+}
+
+bool WorldObject::NeedsPhaseUpdateWithData(PhaseUpdateData const& updateData) const
+{
+    PhaseDefinitionContainer pdc = GetPhaseDefinitionContainer(ToPlayer()->GetZoneId());
+    PhaseAreaContainer pac = GetPhaseAreaContainer(ToPlayer()->GetZoneId());
+    bool ret = false;
+
+    if (!pdc.empty())
+        for (PhaseDefinitionContainer::const_iterator phase = pdc.begin(); phase != pdc.end(); ++phase)
+            if (IsConditionRelated(updateData, phase->zoneId, phase->entry))
+            {
+                ret = true;
+                break;
+            }
+
+    if (!pac.empty())
+        ret = true;
+
+    return ret;
+}
+
+bool WorldObject::IsConditionRelated(PhaseUpdateData const& updateData, uint32 zoneId, uint32 entry) const
+{
+    ConditionList const* conditionList = sConditionMgr->GetConditionsForPhaseDefinition(zoneId, entry);
+    if (conditionList)
+        for (ConditionList::const_iterator condition = conditionList->begin(); condition != conditionList->end(); ++condition)
+            if (updateData.IsConditionRelated(*condition))
+                return true;
+
+    return false;
+}
+
+//////////////////////////////////////////////////////////////////
+// Commands
+
+void WorldObject::SendDebugReportToPlayer()
+{
+    if (Player* player = ToPlayer())
+    {
+        ChatHandler(player->GetSession()).PSendSysMessage(LANG_PHASING_REPORT_STATUS, player->GetName().c_str(), player->GetZoneId(), player->getLevel(), player->GetTeamId(), m_phaseUpdateFlags);
+
+        PhaseDefinitionStore const* _PhaseDefinitionStore = sObjectMgr->GetPhaseDefinitionStore();
+        PhaseDefinitionStore::const_iterator itr = _PhaseDefinitionStore->find(player->GetZoneId());
+        if (itr == _PhaseDefinitionStore->end())
+            ChatHandler(player->GetSession()).PSendSysMessage(LANG_PHASING_NO_DEFINITIONS, player->GetZoneId());
+        else
+        {
+            for (PhaseDefinitionContainer::const_iterator phase = itr->second.begin(); phase != itr->second.end(); ++phase)
+            {
+                if (CheckDefinition(*phase))
+                    ChatHandler(player->GetSession()).PSendSysMessage(LANG_PHASING_SUCCESS, phase->entry, phase->IsNegatingPhasemask() ? "negated Phase" : "Phase", phase->phasemask);
+                else
+                    ChatHandler(player->GetSession()).PSendSysMessage(LANG_PHASING_FAILED, phase->phasemask, phase->entry, phase->zoneId);
+
+                if (phase->IsLastDefinition())
+                {
+                    ChatHandler(player->GetSession()).PSendSysMessage(LANG_PHASING_LAST_PHASE, phase->phasemask, phase->entry, phase->zoneId);
+                    break;
+                }
+            }
+        }
+
+        ChatHandler(player->GetSession()).PSendSysMessage(LANG_PHASING_LIST, phaseData._PhasemaskThroughDefinitions, phaseData._PhasemaskThroughAuras, phaseData._CustomPhasemask);
+
+        ChatHandler(player->GetSession()).PSendSysMessage(LANG_PHASING_PHASEMASK, phaseData.GetPhaseMaskForSpawn(), player->GetPhaseMask());
+    }
+}
+
+void WorldObject::SetCustomPhase(uint32 phaseMask)
+{
+    phaseData._CustomPhasemask = phaseMask;
+
+    m_phaseUpdateFlags |= PHASE_UPDATE_FLAG_SERVERSIDE_CHANGED;
+
+    PhaseUpdate();
+}
+
+uint32 WorldObject::GetCurrentPhasemask()
+{ 
+    return phaseData.GetCurrentPhasemask(); 
+};
+
+uint32 WorldObject::GetPhaseMaskForSpawn()
+{ 
+    return phaseData.GetCurrentPhasemask(); 
+}
+
+void WorldObject::GetActivePhases(std::set<uint32>& phases) const
+{
+    phaseData.GetActivePhases(phases);
+}
+
+// end new phase system

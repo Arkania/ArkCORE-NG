@@ -3868,7 +3868,7 @@ void Unit::RemoveAurasWithAttribute(uint32 flags)
     }
 }
 
-void Unit::RemoveNotOwnSingleTargetAuras(uint32 newPhase)
+void Unit::RemoveNotOwnSingleTargetAuras(uint32 newPhase) // later with flag as phaseId??
 {
     // single target auras from other casters
     for (AuraApplicationMap::iterator iter = m_appliedAuras.begin(); iter != m_appliedAuras.end();)
@@ -3884,7 +3884,7 @@ void Unit::RemoveNotOwnSingleTargetAuras(uint32 newPhase)
             {
                 Unit* caster = aura->GetCaster();
                 if (!caster || !caster->InSamePhase(newPhase))
-                    RemoveAura(iter);
+                    RemoveAura(iter);               
                 else
                     ++iter;
             }
@@ -16587,6 +16587,58 @@ void Unit::SetPhaseMask(uint32 newPhaseMask, bool update)
                 summon->SetPhaseMask(newPhaseMask, true);
 }
 
+bool Unit::SetInPhase(uint32 id, bool update, bool apply)
+{
+    bool res = WorldObject::SetInPhase(id, update, apply);
+
+    if (!IsInWorld())
+        return res;
+
+    if (GetTypeId() == TYPEID_UNIT || (!ToPlayer()->IsGameMaster() && !ToPlayer()->GetSession()->PlayerLogout()))
+    {
+        HostileRefManager& refManager = getHostileRefManager();
+        HostileReference* ref = refManager.getFirst();
+
+        while (ref)
+        {
+            if (Unit* unit = ref->GetSource()->GetOwner())
+                if (Creature* creature = unit->ToCreature())
+                    refManager.setOnlineOfflineState(creature, creature->IsInPhase(this));
+
+            ref = ref->next();
+        }
+
+        // modify threat lists for new phasemask
+        if (GetTypeId() != TYPEID_PLAYER)
+        {
+            std::list<HostileReference*> threatList = getThreatManager().getThreatList();
+            std::list<HostileReference*> offlineThreatList = getThreatManager().getOfflineThreatList();
+
+            // merge expects sorted lists
+            threatList.sort();
+            offlineThreatList.sort();
+            threatList.merge(offlineThreatList);
+
+            for (std::list<HostileReference*>::const_iterator itr = threatList.begin(); itr != threatList.end(); ++itr)
+                if (Unit* unit = (*itr)->getTarget())
+                    unit->getHostileRefManager().setOnlineOfflineState(ToCreature(), unit->IsInPhase(this));
+        }
+    }
+
+    for (ControlList::const_iterator itr = m_Controlled.begin(); itr != m_Controlled.end(); ++itr)
+        if ((*itr)->GetTypeId() == TYPEID_UNIT)
+            (*itr)->SetInPhase(id, true, apply);
+
+    for (uint8 i = 0; i < MAX_SUMMON_SLOT; ++i)
+        if (m_SummonSlot[i])
+            if (Creature* summon = GetMap()->GetCreature(m_SummonSlot[i]))
+                summon->SetInPhase(id, true, apply);
+
+    RemoveNotOwnSingleTargetAuras(0);
+
+    return res;
+}
+
 void Unit::UpdateObjectVisibility(bool forced)
 {
     if (!forced)
@@ -18851,3 +18903,80 @@ void Unit::Whisper(uint32 textId, Player* target, bool isBossWhisper /*= false*/
     ChatHandler::BuildChatPacket(data, isBossWhisper ? CHAT_MSG_RAID_BOSS_WHISPER : CHAT_MSG_MONSTER_WHISPER, LANG_UNIVERSAL, this, target, bct->GetText(locale, getGender()), 0, "", locale);
     target->SendDirectMessage(&data);
 }
+
+//////////////////////////////////////////////////////////////////
+// Auras
+
+void Unit::RegisterPhasingAuraEffect(AuraEffect const* auraEffect)
+{
+    std::list<PhaseInfo> phaseInfos;
+
+    if (auraEffect->GetAuraType() == SPELL_AURA_PHASE)
+    {
+        PhaseInfo phaseInfo;
+        SpellPhaseStore const* _SpellPhaseStore = sObjectMgr->GetSpellPhaseStore();
+        SpellPhaseStore::const_iterator itr = _SpellPhaseStore->find(auraEffect->GetId());
+        if (itr != _SpellPhaseStore->end())
+        {
+            if (itr->second.phasemask)
+            {
+                m_phaseUpdateFlags |= PHASE_UPDATE_FLAG_SERVERSIDE_CHANGED;
+                phaseInfo.phasemask = itr->second.phasemask;
+            }
+            if (itr->second.terrainswapmap)
+            {
+                m_phaseUpdateFlags |= PHASE_UPDATE_FLAG_CLIENTSIDE_CHANGED;
+                phaseInfo.terrainswapmap = itr->second.terrainswapmap;
+            }
+            if (itr->second.worldmapareaswap)
+            {
+                m_phaseUpdateFlags |= PHASE_UPDATE_FLAG_CLIENTSIDE_CHANGED;
+                phaseInfo.worldMapAreaSwap = itr->second.worldmapareaswap;
+            }
+        }
+
+        if (auraEffect->GetMiscValue())
+        {
+            m_phaseUpdateFlags |= PHASE_UPDATE_FLAG_SERVERSIDE_CHANGED;
+            phaseInfo.phasemask = auraEffect->GetMiscValue();
+        }
+        if (auraEffect->GetMiscValueB())
+        {
+            m_phaseUpdateFlags |= PHASE_UPDATE_FLAG_SERVERSIDE_CHANGED;
+            phaseInfo.phaseId = auraEffect->GetMiscValueB();
+        }
+
+        if (phaseInfo.NeedsClientSideUpdate())
+            m_phaseUpdateFlags |= PHASE_UPDATE_FLAG_CLIENTSIDE_CHANGED;
+
+        phaseInfos.push_back(phaseInfo);
+    }
+    else if (auraEffect->GetAuraType() == SPELL_AURA_PHASE_GROUP)
+    {
+        uint32 group = auraEffect->GetMiscValueB();
+        std::set<uint32> const& groupPhases = GetPhasesForGroup(group);
+        for (auto itr = groupPhases.begin(); itr != groupPhases.end(); ++itr)
+        {
+            PhaseInfo phaseInfo;
+            phaseInfo.phaseId = auraEffect->GetMiscValueB();
+            if (phaseInfo.NeedsClientSideUpdate())
+                m_phaseUpdateFlags |= PHASE_UPDATE_FLAG_CLIENTSIDE_CHANGED;
+            phaseInfos.push_back(phaseInfo);
+        }
+    }
+
+    for (auto itr = phaseInfos.begin(); itr != phaseInfos.end(); ++itr)
+        phaseData.AddAuraInfo(auraEffect->GetId(), *itr);
+
+    PhaseUpdate();
+}
+
+void Unit::UnRegisterPhasingAuraEffect(AuraEffect const* auraEffect)
+{
+    m_phaseUpdateFlags |= phaseData.RemoveAuraInfo(auraEffect->GetId());
+
+    PhaseUpdate();
+}
+
+
+
