@@ -33,6 +33,11 @@ enum eKezanEnumerate
     QUEST_KAJA_COLA = 25473,
     QUEST_ROLLING_WITH_MY_HOMIES = 14071,
     QUEST_LIFE_SAVINGS = 14126,
+
+    NPC_ROD_HOT_34840 = 34840,
+    NPC_ACE_34957 = 34957,
+    NPC_GOBBER_34958 = 34958,
+    NPC_IZZY_34959 = 34959,
 };
 
 // 34689 Mage Trainer, 
@@ -64,19 +69,19 @@ public:
         }
 
         // Called when hit by a spell
-        void SpellHit(Unit* /*caster*/, SpellInfo const* /*spell*/) override
+        void SpellHit(Unit* caster, SpellInfo const* /*spell*/) override
         {
             if (urand(0, 100) < 5)
-                Talk(1);
+                Talk(1, caster);
             m_events.RescheduleEvent(EVENT_SPELLCAST, 3000);
         }
 
         // Called when spell hits a target
-        void SpellHitTarget(Unit* /*target*/, SpellInfo const* spell) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_FIREBALL)
                 if (urand(0, 100) < 5)
-                    Talk(0);
+                    Talk(0, target);
         }
 
         void UpdateAI(uint32 diff) override
@@ -139,10 +144,11 @@ public:
         }
 
         // Called when hit by a spell
-        void SpellHit(Unit* /*caster*/, SpellInfo const* /*spell*/) override
+        void SpellHit(Unit* caster, SpellInfo const* /*spell*/) override
         {
             if (urand(0, 100) < 5)
-                Talk(0);
+                Talk(0, caster);
+
             m_events.RescheduleEvent(EVENT_SPELLCAST, 3000);
         }
 
@@ -244,18 +250,18 @@ public:
     bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
     {
         if (quest->GetQuestId() == QUEST_TAKING_CARE_OF_BUSINESS)
-            creature->AI()->Talk(0);
+            creature->AI()->Talk(0, player);
         else if (quest->GetQuestId() == QUEST_ROLLING_WITH_MY_HOMIES)
-            creature->AI()->Talk(1);
+            creature->AI()->Talk(1, player);
         else if (quest->GetQuestId() == QUEST_LIFE_SAVINGS)
-            creature->AI()->Talk(2);
+            creature->AI()->Talk(2, player);
         return false;
     }
 
     bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*opt*/)
     {
         if (quest->GetQuestId() == QUEST_TAKING_CARE_OF_BUSINESS)
-            creature->AI()->Talk(3);
+            creature->AI()->Talk(3, player);
 
         return false;
     }
@@ -322,7 +328,7 @@ public:
             creature->GetAI()->DoAction(ACTION_DELIVER_BUMM_PACKET);
 
         if (player->GetQuestStatus(QUEST_GOOD_HELP_IS_HARD_TO_FIND) == QUEST_STATUS_REWARDED && player->GetQuestStatus(QUEST_TROUBLE_IN_THE_MINES) == QUEST_STATUS_REWARDED)
-            creature->AI()->Talk(5);
+            creature->AI()->Talk(5, player);
 
         return false;
     }
@@ -436,7 +442,7 @@ public:
                     me->AddAura(SPELL_POWER_WORD_FORTITUDE, player);
                     if (!m_talk_cd_active)
                     {
-                        Talk(0);
+                        Talk(0, who);
                         m_talk_cd_active = true;
                         m_events.ScheduleEvent(EVENTS_TALK_COOLDOWN, 6000);
                     }
@@ -469,6 +475,93 @@ public:
     CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_sister_goldskimmer_34692AI(creature);
+    }
+};
+
+// 34673
+class npc_bamm_megabomb_34673 : public CreatureScript
+{
+public:
+    npc_bamm_megabomb_34673() : CreatureScript("npc_bamm_megabomb_34673") { }
+
+    enum eNPC
+    {
+        NPC_TRAININGS_DUMMY = 48304,
+        SPELL_SHOOT_GUN = 69509,
+        EVENT_SHOOT_ON_DUMMY = 201,
+    };
+
+    struct npc_bamm_megabomb_34673AI : public ScriptedAI
+    {
+        npc_bamm_megabomb_34673AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap m_events;
+        uint64   m_dummy;
+
+        void Reset() override
+        {
+            m_events.Reset();
+            m_events.ScheduleEvent(EVENT_SHOOT_ON_DUMMY, 5000);
+            m_dummy = 0;
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_SHOOT_ON_DUMMY:
+                {
+                    if (Creature* dummy = me->FindRandomCreatureInRange(NPC_TRAININGS_DUMMY, 15.0f, true))
+                    {
+                        m_dummy = dummy->GetGUID();
+                        me->SetFacingToObject(dummy);
+                    }
+                    m_events.ScheduleEvent(EVENT_SHOOT_ON_DUMMY + 1, 1000);
+                    break;
+                }
+                case EVENT_SHOOT_ON_DUMMY + 1:
+                {
+                    if (Creature* dummy = sObjectAccessor->GetCreature(*me, m_dummy))
+                        me->CastSpell(dummy, SPELL_SHOOT_GUN);
+                    m_events.ScheduleEvent(EVENT_SHOOT_ON_DUMMY, urand(7000, 10000));
+                    break;
+                }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_bamm_megabomb_34673AI(creature);
+    }
+};
+
+// 34874
+class npc_megs_dreadshredder_34874 : public CreatureScript
+{
+public:
+    npc_megs_dreadshredder_34874() : CreatureScript("npc_megs_dreadshredder_34874") { }
+
+    enum eNPC
+    {
+        BROADCASTTEXT_USE_KEY_FOR_HOT_RED = 48504,
+    };
+
+    bool OnQuestAccept(Player* player, Creature* /*creature*/, Quest const* quest)
+    {
+        if (quest->GetQuestId() == QUEST_ROLLING_WITH_MY_HOMIES)
+            player->ToUnit()->Talk(BROADCASTTEXT_USE_KEY_FOR_HOT_RED, CHAT_MSG_RAID_BOSS_WHISPER, 25.0f, player);
+        return false;
     }
 };
 
@@ -684,7 +777,7 @@ public:
                     if (player->GetQuestStatus(QUEST_ROLLING_WITH_MY_HOMIES) != QUEST_STATUS_REWARDED)
                         if (urand(0, 100) < 25)
                         {
-                            Talk(0);
+                            Talk(0, who);
                             m_talk_cd_active = true;
                             m_events.ScheduleEvent(EVENTS_TALK_COOLDOWN, urand(10000, 15000));
                         }
@@ -719,6 +812,223 @@ public:
     }
 };
 
+// 5497
+class at_kezan_ace_5497 : public AreaTriggerScript
+{
+public:
+    at_kezan_ace_5497() : AreaTriggerScript("at_kezan_ace_5497") { }
+
+    enum npc
+    {
+        SPELL_SUMMON_ACE = 66597,
+    };
+
+    bool OnTrigger(Player* player, AreaTriggerEntry const* trigger)
+    {
+        if (player->GetQuestStatus(QUEST_ROLLING_WITH_MY_HOMIES) == QUEST_STATUS_INCOMPLETE)
+            if (Creature* ace = player->FindNearestCreature(NPC_ACE_34957, 20.0f))
+                player->CastSpell(-8068.13f, 1482.03f, 9.014693f, SPELL_SUMMON_ACE, false);
+        return true;
+    }
+};
+
+// 5498
+class at_kezan_gobber_5498 : public AreaTriggerScript
+{
+public:
+    at_kezan_gobber_5498() : AreaTriggerScript("at_kezan_gobber_5498") { }
+
+    enum npc
+    {
+        SPELL_SUMMON_GOBBER = 66598,
+    };
+
+    bool OnTrigger(Player* player, AreaTriggerEntry const* trigger)
+    {
+        if (player->GetQuestStatus(QUEST_ROLLING_WITH_MY_HOMIES) == QUEST_STATUS_INCOMPLETE)
+            if (Creature* gobber = player->FindNearestCreature(NPC_GOBBER_34958, 20.0f))
+                player->CastSpell(-8179.48f, 1321.38f, 27.68263f, SPELL_SUMMON_GOBBER, false);
+        return true;
+    }
+};
+
+// 5499
+class at_kezan_izzy_5499 : public AreaTriggerScript
+{
+public:
+    at_kezan_izzy_5499() : AreaTriggerScript("at_kezan_izzy_5499") { }
+    enum npc
+    {
+        SPELL_SUMMON_IZZY = 66599,
+    };
+
+    bool OnTrigger(Player* player, AreaTriggerEntry const* trigger)
+    {
+        if (player->GetQuestStatus(QUEST_ROLLING_WITH_MY_HOMIES) == QUEST_STATUS_INCOMPLETE)
+            if (Creature* izzy = player->FindNearestCreature(NPC_IZZY_34959, 20.0f))
+                player->CastSpell(-8179.48f, 1321.38f, 27.68263f, SPELL_SUMMON_IZZY, false);
+        return true;
+    }
+};
+
+// 34957
+class npc_ace_34957 : public CreatureScript
+{
+public:
+    npc_ace_34957() : CreatureScript("npc_ace_34957") { }
+
+    enum eNPC
+    {
+    };
+
+    struct npc_ace_34957AI : public ScriptedAI
+    {
+        npc_ace_34957AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap m_events;
+        uint64   m_playerGUID;
+
+        void Reset() override
+        {
+            m_playerGUID = 0;
+            me->SetOrientation(3.819579f);
+        }
+
+        void IsSummonedBy(Unit* summoner) override
+        {
+            if (Player* player = summoner->ToPlayer())
+                m_playerGUID = player->GetGUID();
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_ace_34957AI(creature);
+    }
+};
+
+// 34958
+class npc_gobber_34958 : public CreatureScript
+{
+public:
+    npc_gobber_34958() : CreatureScript("npc_gobber_34958") { }
+
+    enum eNPC
+    {
+    };
+
+    struct npc_gobber_34958AI : public ScriptedAI
+    {
+        npc_gobber_34958AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap m_events;
+        uint64   m_playerGUID;
+
+        void Reset() override
+        {
+            m_playerGUID = 0;
+            me->SetOrientation(4.120008f);
+        }
+
+        void IsSummonedBy(Unit* summoner) override
+        {
+            if (Player* player = summoner->ToPlayer())
+                m_playerGUID = player->GetGUID();
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_gobber_34958AI(creature);
+    }
+};
+
+// 34959
+class npc_izzy_34959 : public CreatureScript
+{
+public:
+    npc_izzy_34959() : CreatureScript("npc_izzy_34959") { }
+
+    enum eNPC
+    {
+    };
+
+    struct npc_izzy_34959AI : public ScriptedAI
+    {
+        npc_izzy_34959AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap m_events;
+        uint64   m_playerGUID;
+
+        void Reset() override
+        {
+            m_playerGUID = 0;
+            me->SetOrientation(6.265732f);
+        }
+
+        void IsSummonedBy(Unit* summoner) override
+        {
+            if (Player* player = summoner->ToPlayer())
+                m_playerGUID = player->GetGUID();
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_izzy_34959AI(creature);
+    }
+};
 
 
 void AddSC_zone_kezan()
@@ -729,10 +1039,19 @@ void AddSC_zone_kezan()
     new npc_sassy_hardwrench_34668();
     new npc_foreman_dampwick_34872();
     new npc_sister_goldskimmer_34692();
+    new npc_bamm_megabomb_34673();
+    new npc_megs_dreadshredder_34874();
     new npc_candy_cane_35053();
     new npc_hobart_grapplehammer_48494();
     new npc_subject_nine_49150();
     new spell_kaja_cola_70478();
     new npc_brute_enforcer_35304();
+    new at_kezan_ace_5497();
+    new at_kezan_gobber_5498();
+    new at_kezan_izzy_5499();
+    new npc_ace_34957();
+    new npc_gobber_34958();
+    new npc_izzy_34959();
+
 }
 
