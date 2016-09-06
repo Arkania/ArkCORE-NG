@@ -979,13 +979,11 @@ class WorldObject : public Object, public WorldLocation
         virtual float GetStationaryZ() const { return GetPositionZ(); }
         virtual float GetStationaryO() const { return GetOrientation(); }
 
-        std::string GetPhaseString();
-        void SetPhaseString(std::string phaseId);
-
         // phase system
         virtual void SetPhaseMask(uint32 newPhaseMask, bool update);
         uint32 GetPhaseMask() const { return m_phaseMask; }
-        virtual void AddPhaseGroup(uint32 phaseGroup);
+        void ClearPhaseGroups();
+        virtual void AddPhaseGroup(uint32 phaseGroup, bool apply = true);
         virtual void SetPhaseGroups(std::set<uint32> phaseGroups) { m_phaseGroups = phaseGroups; }
         std::set<uint32> GetPhaseGroups() const { return m_phaseGroups; }
         bool InSamePhase(WorldObject const* obj) const;

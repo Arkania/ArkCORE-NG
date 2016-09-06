@@ -1751,7 +1751,7 @@ void ObjectMgr::LoadCreatures()
                 if (phaseIds.empty())
                 {
                     TC_LOG_ERROR("sql.sql", "Table `creature` has creature (GUID: %u Entry: %u) with non-existing `phaseGroup` (%u) set, `phaseGroup` set to 0", guid, data.id, phGroup);
-                    data.phaseGroups .erase(phGroup);
+                    data.phaseGroups.erase(phGroup);
                     break;
                 }
             }

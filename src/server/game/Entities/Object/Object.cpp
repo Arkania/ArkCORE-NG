@@ -3248,38 +3248,23 @@ uint64 WorldObject::GetTransGUID() const
     return 0;
 }
 
-
-std::string WorldObject::GetPhaseString() 
-{
-    std::ostringstream ss;
-    ss << GetPhaseIds().size() << ' ';
-    for (uint16 ph : GetPhaseIds())
-        ss << ph << ' ';
-    return ss.str();
-}
-
-void WorldObject::SetPhaseString(std::string phaseId)
-{
-    if (phaseId.empty())
-        return;
-
-    std::istringstream data(phaseId);
-    uint32 size;
-    data >> size;
-    for (uint32 i = 0; i < size; i++)
-    {
-        uint32 ph;
-        data >> ph;
-        SetInPhase(ph, false, true);
-    }
-}
-
 // new phase system
 
-void WorldObject::AddPhaseGroup(uint32 phaseGroup)
+void WorldObject::ClearPhaseGroups()
 {
-    if (m_phaseGroups.find(phaseGroup) != m_phaseGroups.end())
-        m_phaseGroups.insert(phaseGroup);
+    m_phaseGroups.clear();
+}
+
+void WorldObject::AddPhaseGroup(uint32 phaseGroup, bool apply)
+{
+    if (phaseGroup)
+        if (apply)
+        {
+            if (!(m_phaseGroups.find(phaseGroup) != m_phaseGroups.end()))
+                m_phaseGroups.insert(phaseGroup);
+        }
+        else
+            m_phaseGroups.erase(phaseGroup);
 }
 
 void WorldObject::SetPhaseMask(uint32 newPhaseMask, bool update)
@@ -3321,14 +3306,22 @@ bool WorldObject::InSamePhase(uint32 phasemask) const
 std::string WorldObject::PhaseToString()
 {
     std::stringstream sstr;
-    if (m_phaseMask)
+    if (!m_phaseGroups.empty())
     {
-        sstr << "PhaseMask: " << m_phaseMask << "\n";
+        bool ko = false;
+        sstr << "PhaseGroups: ";
+        for (uint32 ph : m_phaseGroups)
+        {
+            if (ko) sstr << ", ";
+            ko = true;
+            sstr << ph;
+        }
+        sstr << "\n";
     }
     if (!m_phaseIds.empty())
     {
         bool ko = false;
-        sstr << "PhaseId: ";
+        sstr << "PhaseIds: ";
         for (uint32 ph : m_phaseIds)
         {
             if (ko) sstr << ", ";
@@ -3336,6 +3329,10 @@ std::string WorldObject::PhaseToString()
             sstr << ph;
         }
         sstr << "\n";
+    }
+    if (m_phaseMask)
+    {
+        sstr << "PhaseMask: " << m_phaseMask << "\n";
     }
     return sstr.str();
 }
@@ -3540,6 +3537,7 @@ void PhaseData::AddPhaseDefinition(PhaseDefinition phaseDefinition)
         activePhaseDefinitions.clear();
         _PhasemaskThroughDefinitions = phaseDefinition.phasemask;
         // new phaseId
+        player->ClearPhaseGroups();
         player->ClearPhases(false);
         if (phaseDefinition.phaseId)
             player->SetInPhase(phaseDefinition.phaseId, false, true);
