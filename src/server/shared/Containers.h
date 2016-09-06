@@ -21,6 +21,26 @@
 
 #include "Define.h"
 #include <list>
+#include <random>
+
+ // Ugly, horrible, i don't even..., hack for VS2013 to work around missing discrete_distribution(iterator, iterator) constructor
+#if COMPILER == COMPILER_MICROSOFT && _MSC_VER <= 1800
+template<typename T>
+struct discrete_distribution_param : public std::discrete_distribution<T>::param_type
+{
+    typedef typename std::discrete_distribution<T>::param_type base;
+
+    template<typename InIt>
+    discrete_distribution_param(InIt begin, InIt end) : base(_Noinit())
+    {
+        this->_Pvec.assign(begin, end);
+        this->_Init();
+    }
+};
+#else
+template<typename T>
+using discrete_distribution_param = typename std::discrete_distribution<T>::param_type;
+#endif
 
 //! Because circular includes are bad
 extern uint32 urand(uint32 min, uint32 max);
@@ -83,7 +103,7 @@ namespace Trinity
         template <class C>
         typename C::const_iterator SelectRandomWeightedContainerElement(C const& container, std::vector<double> weights)
         {
-            Trinity::discrete_distribution_param<uint32> ddParam(weights.begin(), weights.end());
+            discrete_distribution_param<uint32> ddParam(weights.begin(), weights.end());
             std::discrete_distribution<uint32> dd(ddParam);
             typename C::const_iterator it = container.begin();
             std::advance(it, dd(SFMTEngine::Instance()));
