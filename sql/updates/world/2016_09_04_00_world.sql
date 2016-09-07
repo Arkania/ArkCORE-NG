@@ -1,6 +1,6 @@
 
-update creature set phaseMask=0, phaseId=0, phaseGroup='378' where map=648;
-update gameobject set phaseMask=0, phaseId=0, phaseGroup='378' where map=648;
+update creature set phaseMask=0, phaseId=0, phaseGroups='378' where map=648;
+update gameobject set phaseMask=0, phaseId=0, phaseGroups='378' where map=648;
 
 delete from conditions where SourceTypeOrReferenceId=25 and SourceGroup=4737;
 
