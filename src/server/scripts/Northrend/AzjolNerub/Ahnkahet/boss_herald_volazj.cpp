@@ -127,7 +127,8 @@ public:
                         // clone
                         player->CastSpell(summon, SPELL_CLONE_PLAYER, true);
                         // set phase
-                        summon->SetPhaseMask((1<<(4+insanityHandled)), true);
+                        uint32 phase = 1 << (4 + insanityHandled);
+                        summon->SetPhaseMask(phase, true);
                     }
                 }
                 ++insanityHandled;

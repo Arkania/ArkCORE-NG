@@ -291,12 +291,16 @@ Creature* Transport::CreateNPCPassenger(uint32 guid, CreatureData const* data)
         return NULL;
     }
 
-    if (data->phaseId)
-        creature->SetInPhase(data->phaseId, false, true);
+    if (!data->phaseIds.empty())
+    {
+        for (uint16 ph : data->phaseIds)
+            creature->SetInPhase(ph, false, true);
+    }
     else if (!data->phaseGroups.empty())
-        for (auto phGroup : data->phaseGroups)
-            for (auto phase : GetPhasesForGroup(phGroup))
-                creature->SetInPhase(phase, false, true);
+    {
+        for (uint16 phGroup : data->phaseGroups)
+            creature->SetInPhase(phGroup, false, true);
+    }
     else
         creature->CopyPhaseFrom(this);
 
@@ -407,17 +411,17 @@ TempSummon* Transport::SummonPassenger(uint32 entry, Position const& pos, TempSu
         }
     }
 
-    uint32 phase = PHASEMASK_NORMAL;
-    std::set<uint32> phases;
+    uint64 phaseMask = PHASEMASK_NORMAL;
+    std::set<uint16> phaseIds;
     if (summoner)
-        phases = summoner->GetPhaseIds();
+        phaseIds = summoner->GetPhaseIds();
     else
-        phases = GetPhaseIds(); // If there was no summoner, try to use the transport phases
+        phaseIds = GetPhaseIds(); // If there was no summoner, try to use the transport phases
 
     uint32 team = 0;
     if (summoner)
     {
-        phase = summoner->GetPhaseMask();
+        phaseMask = summoner->GetPhaseMask();
         if (summoner->GetTypeId() == TYPEID_PLAYER)
             team = summoner->ToPlayer()->GetTeam();
     }
@@ -446,13 +450,13 @@ TempSummon* Transport::SummonPassenger(uint32 entry, Position const& pos, TempSu
     pos.GetPosition(x, y, z, o);
     CalculatePassengerPosition(x, y, z, &o);
 
-    if (!summon->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_UNIT), map, phase, entry, vehId, team, x, y, z, o))
+    if (!summon->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_UNIT), map, phaseMask, entry, vehId, team, x, y, z, o))
     {
         delete summon;
         return NULL;
     }
 
-    for (uint32 phase : phases)
+    for (uint16 phase : phaseIds)
         summon->SetInPhase(phase, false, true);
 
     summon->SetUInt32Value(UNIT_CREATED_BY_SPELL, spellId);

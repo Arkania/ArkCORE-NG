@@ -1617,7 +1617,7 @@ void ObjectMgr::LoadCreatures()
     //                                               0              1   2    3        4             5           6           7           8            9              10
     QueryResult result = WorldDatabase.Query("SELECT creature.guid, id, map, modelid, equipment_id, position_x, position_y, position_z, orientation, spawntimesecs, spawndist, "
     //   11               12         13       14            15         16         17          18          19                20                   21                     22                23
-        "currentwaypoint, curhealth, curmana, MovementType, spawnMask, phaseMask, eventEntry, pool_entry, creature.npcflag, creature.unit_flags, creature.dynamicflags, creature.phaseId, creature.phaseGroups "
+        "currentwaypoint, curhealth, curmana, MovementType, spawnMask, phaseMask, eventEntry, pool_entry, creature.npcflag, creature.unit_flags, creature.dynamicflags, creature.phaseIds, creature.phaseGroups "
         "FROM creature "
         "LEFT OUTER JOIN game_event_creature ON creature.guid = game_event_creature.guid "
         "LEFT OUTER JOIN pool_creature ON creature.guid = pool_creature.guid");
@@ -1674,10 +1674,12 @@ void ObjectMgr::LoadCreatures()
         data.npcflag        = fields[19].GetUInt32();
         data.unit_flags     = fields[20].GetUInt32();
         data.dynamicflags   = fields[21].GetUInt32();
-        data.phaseId        = fields[22].GetUInt16();
+
+        std::string phaseIds = fields[22].GetCString();
+        data.phaseIds = GetUInt16List(phaseIds);
 
         std::string phaseGroups = fields[23].GetCString();
-        data.phaseGroups = GetUIntegerList(phaseGroups);
+        data.phaseGroups = GetUInt16List(phaseGroups);
 
         MapEntry const* mapEntry = sMapStore.LookupEntry(data.mapid);
         if (!mapEntry)
@@ -1745,9 +1747,9 @@ void ObjectMgr::LoadCreatures()
         }
 
         if (!data.phaseGroups.empty())
-            for (uint32 phGroup : data.phaseGroups)
+            for (uint16 phGroup : data.phaseGroups)
             {
-                std::set<uint32> phaseIds = GetPhasesForGroup(phGroup);
+                std::set<uint16> phaseIds = GetPhasesForGroup(phGroup);
                 if (phaseIds.empty())
                 {
                     TC_LOG_ERROR("sql.sql", "Table `creature` has creature (GUID: %u Entry: %u) with non-existing `phaseGroup` (%u) set, `phaseGroup` set to 0", guid, data.id, phGroup);
@@ -1756,10 +1758,10 @@ void ObjectMgr::LoadCreatures()
                 }
             }
 
-        if (!data.phaseMask && !data.phaseId && data.phaseGroups.empty())
+        if (!data.phaseMask && data.phaseIds.empty() && data.phaseGroups.empty())
         {
             TC_LOG_ERROR("sql.sql", "Table `creature` have creature (GUID: %u Entry: %u) with `phaseMask`=0 (not visible for anyone), set to 1.", guid, data.id);
-            data.phaseMask = 1;
+            data.phaseIds.insert(DEFAULT_PHASE);
         }
 
         // Add to grid if not managed by the game event or pool system
@@ -1828,6 +1830,7 @@ uint32 ObjectMgr::AddGOData(uint32 entry, uint32 mapId, float x, float y, float 
     data.spawnMask      = 1;
     data.go_state       = GO_STATE_READY;
     data.phaseMask      = PHASEMASK_NORMAL;
+    data.phaseIds.insert(DEFAULT_PHASE);
     data.artKit         = goinfo->type == GAMEOBJECT_TYPE_CAPTURE_POINT ? 21 : 0;
     data.dbData = false;
 
@@ -1911,6 +1914,7 @@ uint32 ObjectMgr::AddCreData(uint32 entry, uint32 /*team*/, uint32 mapId, float 
     data.movementType = cInfo->MovementType;
     data.spawnMask = 1;
     data.phaseMask = PHASEMASK_NORMAL;
+    data.phaseIds.insert(DEFAULT_PHASE);
     data.dbData = false;
     data.npcflag = cInfo->npcflag;
     data.unit_flags = cInfo->unit_flags;
@@ -1946,7 +1950,7 @@ void ObjectMgr::LoadGameobjects()
     //                                                0                1   2    3           4           5           6
     QueryResult result = WorldDatabase.Query("SELECT gameobject.guid, id, map, position_x, position_y, position_z, orientation, "
     //   7          8          9          10         11             12            13     14         15         16          17          18       19
-        "rotation0, rotation1, rotation2, rotation3, spawntimesecs, animprogress, state, spawnMask, phaseMask, eventEntry, pool_entry, phaseId, phaseGroups "
+        "rotation0, rotation1, rotation2, rotation3, spawntimesecs, animprogress, state, spawnMask, phaseMask, eventEntry, pool_entry, phaseIds, phaseGroups "
         "FROM gameobject LEFT OUTER JOIN game_event_gameobject ON gameobject.guid = game_event_gameobject.guid "
         "LEFT OUTER JOIN pool_gameobject ON gameobject.guid = pool_gameobject.guid");
 
@@ -2046,10 +2050,12 @@ void ObjectMgr::LoadGameobjects()
         data.phaseMask      = fields[15].GetUInt32();
         int16 gameEvent     = fields[16].GetInt8();
         uint32 PoolId       = fields[17].GetUInt32();
-        data.phaseId        = fields[18].GetUInt16();
+
+        std::string phaseIds = fields[18].GetCString();
+        data.phaseIds = GetUInt16List(phaseIds);
 
         std::string phaseGroups = fields[19].GetCString();
-        data.phaseGroups = GetUIntegerList(phaseGroups);
+        data.phaseGroups = GetUInt16List(phaseGroups);
 
 
         if (data.rotation2 < -1.0f || data.rotation2 > 1.0f)
@@ -2071,9 +2077,9 @@ void ObjectMgr::LoadGameobjects()
         }
 
         if (!data.phaseGroups.empty())
-            for (uint32 phGroup : data.phaseGroups)
+            for (uint16 phGroup : data.phaseGroups)
             {
-                std::set<uint32> phaseIds = GetPhasesForGroup(phGroup);
+                std::set<uint16> phaseIds = GetPhasesForGroup(phGroup);
                 if (phaseIds.empty())
                 {
                     TC_LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: %u Entry: %u) with non-existing `phaseGroup` (%u) set, `phaseGroup` set to 0", guid, data.id, phGroup);
@@ -2082,10 +2088,10 @@ void ObjectMgr::LoadGameobjects()
                 }
             }
 
-        if (!data.phaseMask && !data.phaseId && data.phaseGroups.empty())
+        if (!data.phaseMask && data.phaseIds.empty() && data.phaseGroups.empty())
         {
             TC_LOG_ERROR("sql.sql", "Table `gameobject` have gameobject (GUID: %u Entry: %u) with `phaseMask`=0 (not visible for anyone), set to 1.", guid, data.id);
-            data.phaseMask = 1;
+            data.phaseIds.insert(DEFAULT_PHASE);
         }
 
         if (gameEvent == 0 && PoolId == 0)                      // if not this is to be managed by GameEvent System or Pool system

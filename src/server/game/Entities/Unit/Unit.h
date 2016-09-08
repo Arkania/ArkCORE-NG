@@ -1951,8 +1951,8 @@ class Unit : public WorldObject
         void SetVisible(bool x);
 
         // common function for visibility checks for player/creatures with detection code
-        void SetPhaseMask(uint32 newPhaseMask, bool update);
-        bool SetInPhase(uint32 id, bool update, bool apply);
+        void SetPhaseMask(uint64 newPhaseMask, bool update);
+        bool SetInPhase(uint16 id, bool update, bool apply);
         // overwrite WorldObject::SetPhaseMask
         void UpdateObjectVisibility(bool forced = true);
 

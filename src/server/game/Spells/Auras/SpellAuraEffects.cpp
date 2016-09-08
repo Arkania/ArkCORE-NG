@@ -1464,10 +1464,11 @@ void AuraEffect::HandlePhaseGroup(AuraApplication const* aurApp, uint8 mode, boo
 
     Unit* target = aurApp->GetTarget();
 
-    std::set<uint32> const& oldPhases = target->GetPhaseIds();
-    std::set<uint32> const& phases = GetPhasesForGroup(GetMiscValueB());
-    for (auto phase : phases)
-        target->SetInPhase(phase, false, apply);
+    std::set<uint16> const& oldPhases = target->GetPhaseIds();
+    std::set<uint16> const& phaseIds = GetPhasesForGroup((uint16)GetMiscValueB());
+    // GPN39F not shure.. SetInPhase GroupId, not each result as phaseId
+    for (uint16 phaseId : phaseIds)
+        target->SetInPhase(phaseId, false, apply);
 
     if (Player* player = target->ToPlayer())
     {
@@ -1721,8 +1722,8 @@ void AuraEffect::HandlePhase(AuraApplication const* aurApp, uint8 mode, bool app
 
     Unit* target = aurApp->GetTarget();
 
-    std::set<uint32> const& oldPhases = target->GetPhaseIds();
-    target->SetInPhase(GetMiscValueB(), false, apply);
+    std::set<uint16> const& oldPhases = target->GetPhaseIds();
+    target->SetInPhase((uint16)GetMiscValueB(), false, apply);
 
     if (Player* player = target->ToPlayer())
     {

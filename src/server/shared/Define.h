@@ -65,10 +65,16 @@
 #  define ATTR_NORETURN __attribute__((noreturn))
 #  define ATTR_PRINTF(F, V) __attribute__ ((format (printf, F, V)))
 #  define ATTR_DEPRECATED __attribute__((deprecated))
+#  define TRINITY_CONSTEXPR constexpr
 #else //COMPILER != COMPILER_GNU
 #  define ATTR_NORETURN
 #  define ATTR_PRINTF(F, V)
 #  define ATTR_DEPRECATED
+#if _MSC_VER >= 1900
+#  define TRINITY_CONSTEXPR constexpr
+#else
+#  define TRINITY_CONSTEXPR
+#endif
 #endif //COMPILER == COMPILER_GNU
 
 #if COMPILER_HAS_CPP11_SUPPORT

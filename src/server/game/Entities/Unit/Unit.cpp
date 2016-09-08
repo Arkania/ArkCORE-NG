@@ -16530,7 +16530,7 @@ float Unit::MeleeSpellMissChance(const Unit* victim, WeaponAttackType attType, u
     return missChance;
 }
 
-void Unit::SetPhaseMask(uint32 newPhaseMask, bool update)
+void Unit::SetPhaseMask(uint64 newPhaseMask, bool update)
 {
     if (newPhaseMask == GetPhaseMask())
         return;
@@ -16587,7 +16587,7 @@ void Unit::SetPhaseMask(uint32 newPhaseMask, bool update)
                 summon->SetPhaseMask(newPhaseMask, true);
 }
 
-bool Unit::SetInPhase(uint32 id, bool update, bool apply)
+bool Unit::SetInPhase(uint16 id, bool update, bool apply)
 {
     bool res = WorldObject::SetInPhase(id, update, apply);
 
@@ -18938,12 +18938,12 @@ void Unit::RegisterPhasingAuraEffect(AuraEffect const* auraEffect)
         if (auraEffect->GetMiscValue())
         {
             m_phaseUpdateFlags |= PHASE_UPDATE_FLAG_SERVERSIDE_CHANGED;
-            phaseInfo.phasemask = auraEffect->GetMiscValue();
+            phaseInfo.phasemask = (uint64)auraEffect->GetMiscValue();
         }
         if (auraEffect->GetMiscValueB())
         {
             m_phaseUpdateFlags |= PHASE_UPDATE_FLAG_SERVERSIDE_CHANGED;
-            phaseInfo.phaseId = auraEffect->GetMiscValueB();
+            phaseInfo.phaseId = (uint16)auraEffect->GetMiscValueB();
         }
 
         if (phaseInfo.NeedsClientSideUpdate())
@@ -18953,12 +18953,12 @@ void Unit::RegisterPhasingAuraEffect(AuraEffect const* auraEffect)
     }
     else if (auraEffect->GetAuraType() == SPELL_AURA_PHASE_GROUP)
     {
-        uint32 group = auraEffect->GetMiscValueB();
-        std::set<uint32> const& groupPhases = GetPhasesForGroup(group);
+        uint16 group = (uint16)auraEffect->GetMiscValueB();
+        std::set<uint16> const& groupPhases = GetPhasesForGroup(group);
         for (auto itr = groupPhases.begin(); itr != groupPhases.end(); ++itr)
         {
             PhaseInfo phaseInfo;
-            phaseInfo.phaseId = auraEffect->GetMiscValueB();
+            phaseInfo.phaseId = (uint16)auraEffect->GetMiscValueB();
             if (phaseInfo.NeedsClientSideUpdate())
                 m_phaseUpdateFlags |= PHASE_UPDATE_FLAG_CLIENTSIDE_CHANGED;
             phaseInfos.push_back(phaseInfo);

@@ -123,7 +123,7 @@ void Corpse::SaveToDB()
     stmt->setUInt32(index++, uint32(m_time));                                         // time
     stmt->setUInt8 (index++, GetType());                                              // corpseType
     stmt->setUInt32(index++, GetInstanceId());                                        // instanceId
-    stmt->setString(index++, GetUintegerString(GetPhaseIds()));                       // phaseIds
+    stmt->setString(index++, GetUInt16String(GetPhaseIds()));                         // phaseIds
     trans->Append(stmt);
 
     CharacterDatabase.CommitTransaction(trans);
@@ -215,8 +215,8 @@ bool Corpse::IsExpired(time_t t) const
 
 void Corpse::SetPhaseString(std::string phaseStr)
 {
-    std::set<uint32> phaseIds = GetUIntegerList(phaseStr);    
-    for (uint32 ph : phaseIds)
+    std::set<uint16> phaseIds = GetUInt16List(phaseStr);    
+    for (uint16 ph : phaseIds)
         SetInPhase(ph, false, true);
 }
 

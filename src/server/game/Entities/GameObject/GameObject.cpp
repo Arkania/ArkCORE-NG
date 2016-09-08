@@ -824,18 +824,18 @@ bool GameObject::LoadGameObjectFromDB(uint32 guid, Map* map, bool addToMap)
     if (!Create(guid, entry, map, phaseMask, x, y, z, ang, rotation0, rotation1, rotation2, rotation3, animprogress, go_state, artKit))
         return false;
 
-    if (data->phaseId)
-        SetInPhase(data->phaseId, false, true);
+    if (!data->phaseIds.empty())
+        for (uint16 ph : data->phaseIds)
+            SetInPhase(ph, false, true);
 
     if (!data->phaseGroups.empty())
     {
         SetPhaseGroups(data->phaseGroups);
-        for (auto phGroup : data->phaseGroups)
-            for (auto ph : GetPhasesForGroup(phGroup))
-                SetInPhase(ph, false, true);
+        for (uint16 phGroup : data->phaseGroups)            
+            SetInPhase(phGroup, false, true);
     }
 
-    if (GetPhaseIds().empty())
+    if (GetPhaseIds().empty() && GetPhaseGroups().empty())
         SetInPhase(DEFAULT_PHASE, false, true);
 
     if (data->spawntimesecs >= 0)
@@ -2090,7 +2090,7 @@ void GameObject::SetDisplayId(uint32 displayid)
     UpdateModel();
 }
 
-void GameObject::SetPhaseMask(uint32 newPhaseMask, bool update)
+void GameObject::SetPhaseMask(uint64 newPhaseMask, bool update)
 {
     WorldObject::SetPhaseMask(newPhaseMask, update);
     if (m_model && m_model->isEnabled())

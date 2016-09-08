@@ -2452,6 +2452,7 @@ TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropert
         return NULL;
     }
 
+    summon->CopyPhaseFrom (summoner, false);
     summon->SetUInt32Value(UNIT_CREATED_BY_SPELL, spellId);
 
     summon->SetHomePosition(pos);
@@ -2466,7 +2467,9 @@ TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropert
             summoner->ToCreature()->OnBotSummon(summon);
     //end npc_bot
 
-    //ObjectAccessor::UpdateObjectVisibility(summon);
+    // ObjectAccessor::UpdateObjectVisibility(summon);
+    Trinity::AIRelocationNotifier notifier(*summon);
+    summon->VisitNearbyObject(GetVisibilityRange(), notifier);
 
     return summon;
 }
@@ -3255,7 +3258,7 @@ void WorldObject::ClearPhaseGroups()
     m_phaseGroups.clear();
 }
 
-void WorldObject::AddPhaseGroup(uint32 phaseGroup, bool apply)
+void WorldObject::AddPhaseGroup(uint16 phaseGroup, bool apply)
 {
     if (phaseGroup)
         if (apply)
@@ -3267,7 +3270,7 @@ void WorldObject::AddPhaseGroup(uint32 phaseGroup, bool apply)
             m_phaseGroups.erase(phaseGroup);
 }
 
-void WorldObject::SetPhaseMask(uint32 newPhaseMask, bool update)
+void WorldObject::SetPhaseMask(uint64 newPhaseMask, bool update)
 {
     m_phaseMask = newPhaseMask;
 
@@ -3286,7 +3289,7 @@ bool WorldObject::InSamePhase(WorldObject const* obj) const
    return IsInPhase(obj);
 }
 
-bool WorldObject::InSamePhase(uint32 phasemask) const
+bool WorldObject::InSamePhase(uint64 phasemask) const
 { 
     if (GetPhaseMask() && phasemask)
         if (GetPhaseMask() & phasemask)
@@ -3295,10 +3298,14 @@ bool WorldObject::InSamePhase(uint32 phasemask) const
     if (!phasemask)
         phasemask = 1;
 
-    for (uint32 i = 0; i < 32; i++)
-        if (((1 << i) & phasemask) > 0)
+    for (uint16 i = 0; i < 32; i++)
+    {
+        uint32 pMask = 1 << i;
+        if ((pMask & phasemask) > 0)
             if (IsInPhase(i + DEFAULT_PHASE))
                 return true;
+    }
+       
 
     return false;
 }
@@ -3337,12 +3344,12 @@ std::string WorldObject::PhaseToString()
     return sstr.str();
 }
 
-bool WorldObject::HasInPhaseList(uint32 phase) const
+bool WorldObject::HasInPhaseList(uint16 phase) const
 {
     return (m_phaseIds.find(phase) != m_phaseIds.end());
 }
 
-bool WorldObject::IsInPhase(uint32 phaseId) const
+bool WorldObject::IsInPhase(uint16 phaseId) const
 {
     return (m_phaseIds.find(phaseId) != m_phaseIds.end());
 }
@@ -3368,7 +3375,7 @@ bool WorldObject::IsInPhase(WorldObject const* obj) const
     return Trinity::Containers::Intersects(m_phaseIds.begin(), m_phaseIds.end(), obj->GetPhaseIds().begin(), obj->GetPhaseIds().end());
 }
 
-bool WorldObject::IsInTerrainSwap(uint32 terrainSwap)
+bool WorldObject::IsInTerrainSwap(uint16 terrainSwap)
 { 
     return m_terrainSwaps.find(terrainSwap) != m_terrainSwaps.end(); 
 }
@@ -3378,7 +3385,7 @@ void WorldObject::CopyPhaseFrom(WorldObject* obj, bool update)
     if (!obj)
         return;
 
-    for (uint32 phase : obj->GetPhaseIds())
+    for (uint16 phase : obj->GetPhaseIds())
         SetInPhase(phase, false, true);
 
     if (update && IsInWorld())
@@ -3395,7 +3402,7 @@ void WorldObject::ClearPhases(bool update)
         UpdateObjectVisibility();
 }
 
-bool WorldObject::SetInPhase(uint32 id, bool update, bool apply)
+bool WorldObject::SetInPhase(uint16 id, bool update, bool apply)
 {
     if (id)
     {
@@ -3404,8 +3411,11 @@ bool WorldObject::SetInPhase(uint32 id, bool update, bool apply)
             if (HasInPhaseList(id)) // do not run the updates if we are already in this phase
                 return false;
 
-            if (id >= 169 && id <= 200)
-                m_phaseMask |= 1 << (id - 169);
+            if (id >= DEFAULT_PHASE && id <= DEFAULT_MAX_PHASE)
+            {
+                uint32 pMask = 1 << (id - DEFAULT_PHASE);
+                m_phaseMask |= pMask;
+            }
 
             m_phaseIds.insert(id);
         }
@@ -3414,8 +3424,8 @@ bool WorldObject::SetInPhase(uint32 id, bool update, bool apply)
             if (!HasInPhaseList(id)) // do not run the updates if we are not in this phase
                 return false;
 
-            if (id >= 169 && id <= 200)
-                m_phaseMask &= ~(1 << (id - 169));
+            if (id >= DEFAULT_PHASE && id <= DEFAULT_MAX_PHASE)
+                m_phaseMask &= ~(1 << (id - DEFAULT_PHASE));
 
             m_phaseIds.erase(id);
         }
@@ -3437,7 +3447,7 @@ void PhaseData::SetPlayer(Player* _player)
     player = _player;
 }
 
-uint32 PhaseData::GetCurrentPhasemask() const
+uint64 PhaseData::GetCurrentPhasemask() const
 {
     if (player->IsGameMaster())
         return uint32(PHASEMASK_ANYWHERE);
@@ -3448,7 +3458,7 @@ uint32 PhaseData::GetCurrentPhasemask() const
     return GetPhaseMaskForSpawn();
 }
 
-uint32 PhaseData::GetPhaseMaskForSpawn() const
+uint64 PhaseData::GetPhaseMaskForSpawn() const
 {
     uint32 const phase = (_PhasemaskThroughDefinitions | _PhasemaskThroughAuras);
     return (phase ? phase : PHASEMASK_NORMAL);
@@ -3516,7 +3526,7 @@ void PhaseData::SendPhaseshiftToPlayer()
         player->GetSession()->SendSetPhaseShift(phaseGroups, terrainswaps, worldAreaSwaps);
 }
 
-void PhaseData::GetActivePhases(std::set<uint32>& phases) const
+void PhaseData::GetActivePhases(std::set<uint16>& phases) const
 {
     for (PhaseInfoContainer::const_iterator itr = spellPhaseInfo.begin(); itr != spellPhaseInfo.end(); ++itr)
         for (auto phase = itr->second.begin(); phase != itr->second.end(); ++phase)
@@ -3860,7 +3870,7 @@ void WorldObject::SendDebugReportToPlayer()
     }
 }
 
-void WorldObject::SetCustomPhase(uint32 phaseMask)
+void WorldObject::SetCustomPhase(uint64 phaseMask)
 {
     phaseData._CustomPhasemask = phaseMask;
 
@@ -3869,17 +3879,17 @@ void WorldObject::SetCustomPhase(uint32 phaseMask)
     PhaseUpdate();
 }
 
-uint32 WorldObject::GetCurrentPhasemask()
+uint64 WorldObject::GetCurrentPhasemask()
 { 
     return phaseData.GetCurrentPhasemask(); 
 };
 
-uint32 WorldObject::GetPhaseMaskForSpawn()
+uint64 WorldObject::GetPhaseMaskForSpawn()
 { 
     return phaseData.GetCurrentPhasemask(); 
 }
 
-void WorldObject::GetActivePhases(std::set<uint32>& phases) const
+void WorldObject::GetActivePhases(std::set<uint16>& phases) const
 {
     phaseData.GetActivePhases(phases);
 }

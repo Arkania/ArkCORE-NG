@@ -47,6 +47,7 @@
 #define NOMINAL_MELEE_RANGE         5.0f
 #define MELEE_RANGE                 (NOMINAL_MELEE_RANGE - MIN_MELEE_REACH * 2) //center to center for players
 #define DEFAULT_PHASE               169
+#define DEFAULT_MAX_PHASE           200
 
 enum TypeMask
 {
@@ -176,11 +177,11 @@ struct PhaseInfo
 {
     PhaseInfo() : phasemask(0), phaseId(0), phaseGroup(0), terrainswapmap(0), worldMapAreaSwap(0) {}
 
-    uint32 phasemask;
-    uint32 phaseId;
-    uint32 phaseGroup;
-    uint32 terrainswapmap;
-    uint32 worldMapAreaSwap;
+    uint64 phasemask;
+    uint16 phaseId;
+    uint16 phaseGroup;
+    uint16 terrainswapmap;
+    uint16 worldMapAreaSwap;
 
     bool NeedsServerSideUpdate() const { return phasemask; }
     bool NeedsClientSideUpdate() const { return phaseId || phaseGroup || terrainswapmap || worldMapAreaSwap; }
@@ -193,12 +194,12 @@ struct PhaseData
     PhaseData(Player* _player) : _PhasemaskThroughDefinitions(0), _PhasemaskThroughAuras(0), _CustomPhasemask(0), player(_player) { }
 
     void   SetPlayer(Player* player);
-    uint32 _PhasemaskThroughDefinitions;
-    uint32 _PhasemaskThroughAuras;
-    uint32 _CustomPhasemask;
+    uint64 _PhasemaskThroughDefinitions;
+    uint64 _PhasemaskThroughAuras;
+    uint64 _CustomPhasemask;
 
-    uint32 GetCurrentPhasemask() const;
-    uint32 GetPhaseMaskForSpawn() const;
+    uint64 GetCurrentPhasemask() const;
+    uint64 GetPhaseMaskForSpawn() const;
 
     void ResetDefinitions() { _PhasemaskThroughDefinitions = 0; activePhaseDefinitions.clear(); }
     void AddPhaseDefinition(PhaseDefinition phaseDefinition);
@@ -210,7 +211,7 @@ struct PhaseData
     void SendPhaseMaskToPlayer();
     void SendPhaseshiftToPlayer();
 
-    void GetActivePhases(std::set<uint32>& phases) const;
+    void GetActivePhases(std::set<uint16>& phases) const;
 
 private:
     Player* player;
@@ -980,32 +981,32 @@ class WorldObject : public Object, public WorldLocation
         virtual float GetStationaryO() const { return GetOrientation(); }
 
         // phase system
-        virtual void SetPhaseMask(uint32 newPhaseMask, bool update);
-        uint32 GetPhaseMask() const { return m_phaseMask; }
+        virtual void SetPhaseMask(uint64 newPhaseMask, bool update);
+        uint64 GetPhaseMask() const { return m_phaseMask; }
         void ClearPhaseGroups();
-        virtual void AddPhaseGroup(uint32 phaseGroup, bool apply = true);
-        virtual void SetPhaseGroups(std::set<uint32> phaseGroups) { m_phaseGroups = phaseGroups; }
-        std::set<uint32> GetPhaseGroups() const { return m_phaseGroups; }
+        virtual void AddPhaseGroup(uint16 phaseGroup, bool apply = true);
+        virtual void SetPhaseGroups(std::set<uint16> phaseGroups) { m_phaseGroups = phaseGroups; }
+        std::set<uint16> GetPhaseGroups() const { return m_phaseGroups; }
         bool InSamePhase(WorldObject const* obj) const;
-        bool InSamePhase(uint32 phasemask) const;
+        bool InSamePhase(uint64 phasemask) const;
 
-        std::set<uint32> const& GetPhaseIds() const { return m_phaseIds; }
-        std::set<uint32> const& GetTerrainSwaps() const { return m_terrainSwaps; }
-        std::set<uint32> const& GetWorldMapAreaSwaps() const { return m_worldMapAreaSwaps; }
+        std::set<uint16> const& GetPhaseIds() const { return m_phaseIds; }
+        std::set<uint16> const& GetTerrainSwaps() const { return m_terrainSwaps; }
+        std::set<uint16> const& GetWorldMapAreaSwaps() const { return m_worldMapAreaSwaps; }
         std::string PhaseToString();
 
-        bool HasInPhaseList(uint32 phase) const;
-        bool IsInPhase(uint32 phaseId) const;
+        bool HasInPhaseList(uint16 phase) const;
+        bool IsInPhase(uint16 phaseId) const;
         bool IsInPhase(WorldObject const* obj) const;
-        bool IsInTerrainSwap(uint32 terrainSwap);
+        bool IsInTerrainSwap(uint16 terrainSwap);
         void CopyPhaseFrom(WorldObject* obj, bool update = false);
         void ClearPhases(bool update);
-        bool SetInPhase(uint32 id, bool update, bool apply);
+        bool SetInPhase(uint16 id, bool update, bool apply);
 
         void NotifyConditionChanged(PhaseUpdateData const& updateData);
         void NotifyStoresReloaded();
         void PhaseUpdate();
-        void GetActivePhases(std::set<uint32>& phases) const;
+        void GetActivePhases(std::set<uint16>& phases) const;
        
         // Update flags (delayed phasing)
         void AddUpdateFlag(PhaseUpdateFlag updateFlag);
@@ -1014,10 +1015,10 @@ class WorldObject : public Object, public WorldLocation
         // Debug
         void SendDebugReportToPlayer();
         // Needed for modify phase command
-        void SetCustomPhase(uint32 phaseMask);
+        void SetCustomPhase(uint64 phaseMask);
         //
-        uint32 GetCurrentPhasemask();
-        uint32 GetPhaseMaskForSpawn();
+        uint64 GetCurrentPhasemask();
+        uint64 GetPhaseMaskForSpawn();
 
         uint8 m_phaseUpdateFlags;
         PhaseData phaseData;
@@ -1048,11 +1049,11 @@ class WorldObject : public Object, public WorldLocation
         //uint32 m_mapId;                                     // object at map with map_id
         uint32 m_InstanceId;                                // in map copy with instance id
         
-        uint32 m_phaseMask;                                 // in area phase state
-        std::set<uint32> m_phaseIds;
-        std::set<uint32> m_phaseGroups;
-        std::set<uint32> m_terrainSwaps;
-        std::set<uint32> m_worldMapAreaSwaps;
+        uint64 m_phaseMask;                                 // in area phase state
+        std::set<uint16> m_phaseIds;
+        std::set<uint16> m_phaseGroups;
+        std::set<uint16> m_terrainSwaps;
+        std::set<uint16> m_worldMapAreaSwaps;
 
         uint16 m_notifyflags;
         uint16 m_executed_notifies;

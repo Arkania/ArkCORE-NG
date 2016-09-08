@@ -767,26 +767,19 @@ bool Creature::Create(uint32 guidlow, Map* map, uint32 phaseMask, uint32 Entry, 
 
     if (data)
     {
-        if (data->phaseGroups.empty() && !data->phaseId && phaseMask)
-            for (uint32 i = 0; i < 32; i++)
-                if (((1 << i) & phaseMask) > 0)
-                    SetInPhase(i + DEFAULT_PHASE, false, true);
-
-        if (data->phaseId)
-            SetInPhase(data->phaseId, false, true);
+        if (!data->phaseIds.empty())
+            for (uint16 ph : data->phaseIds)
+                SetInPhase(ph, false, true);
 
         if (!data->phaseGroups.empty())
         {
             SetPhaseGroups(data->phaseGroups);
-            for (auto phGroup : data->phaseGroups)
-                for (auto ph : GetPhasesForGroup(phGroup))
-                    SetInPhase(ph, false, true);
+            for (uint16 phGroup : data->phaseGroups)
+                SetInPhase(phGroup, false, true);
         }
 
-        if (GetPhaseIds().empty())
-            SetInPhase(DEFAULT_PHASE, false, true);
-
-        phaseMask = 0;
+        if (GetPhaseIds().empty() && GetPhaseGroups().empty())
+            SetInPhase(DEFAULT_PHASE, false, true);        
     }
 
     SetPhaseMask(phaseMask, false);

@@ -512,7 +512,7 @@ class Map : public GridRefManager<NGridType>
 
         void SendInitTransports(Player* player);
         void SendRemoveTransports(Player* player);
-        void SendUpdateTransportVisibility(Player * player, std::set<uint32> const & previousPhases);
+        void SendUpdateTransportVisibility(Player * player, std::set<uint16> const & previousPhaseIds);
         void SendZoneDynamicInfo(Player* player);
 
         void SetZoneMusic(uint32 zoneId, uint32 musicId);
