@@ -294,7 +294,7 @@ void WorldSession::HandleGameObjectUseOpcode(WorldPacket& recvData)
 
     if (GameObject* obj = GetPlayer()->GetMap()->GetGameObject(guid))
     {
-        if (!obj->IsWithinDistInMap(GetPlayer(), obj->GetInteractionDistance()))
+        if (!(obj->IsWithinDistInMap(GetPlayer(), obj->GetInteractionDistance())))
             return;
 
         // ignore for remote control state
@@ -718,7 +718,7 @@ void WorldSession::HandleMirrorImageDataRequest(WorldPacket& recvData)
     if (creator->GetTypeId() == TYPEID_PLAYER)
     {
         Player* player = creator->ToPlayer();
-        Guild* guild = NULL;
+        Guild* guild = nullptr;
 
         if (uint32 guildId = player->GetGuildId())
             guild = sGuildMgr->GetGuildById(guildId);

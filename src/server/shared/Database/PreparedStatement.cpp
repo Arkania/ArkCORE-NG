@@ -232,9 +232,9 @@ void MySQLPreparedStatement::ClearParameters()
     for (uint32 i=0; i < m_paramCount; ++i)
     {
         delete m_bind[i].length;
-        m_bind[i].length = NULL;
+        m_bind[i].length = nullptr;
         delete[] (char*) m_bind[i].buffer;
-        m_bind[i].buffer = NULL;
+        m_bind[i].buffer = nullptr;
         m_paramsSet[i] = false;
     }
 }
@@ -364,11 +364,11 @@ void MySQLPreparedStatement::setNull(const uint8 index)
     MYSQL_BIND* param = &m_bind[index];
     param->buffer_type = MYSQL_TYPE_NULL;
     delete [] static_cast<char *>(param->buffer);
-    param->buffer = NULL;
+    param->buffer = nullptr;
     param->buffer_length = 0;
     param->is_null_value = 1;
     delete param->length;
-    param->length = NULL;
+    param->length = nullptr;
 }
 
 void MySQLPreparedStatement::setValue(MYSQL_BIND* param, enum_field_types type, const void* value, uint32 len, bool isUnsigned)
@@ -378,7 +378,7 @@ void MySQLPreparedStatement::setValue(MYSQL_BIND* param, enum_field_types type, 
     param->buffer = new char[len];
     param->buffer_length = 0;
     param->is_null_value = 0;
-    param->length = NULL;               // Only != NULL for strings
+    param->length = nullptr;               // Only != NULL for strings
     param->is_unsigned = isUnsigned;
 
     memcpy(param->buffer, value, len);

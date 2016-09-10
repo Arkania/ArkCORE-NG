@@ -56,7 +56,7 @@ class SmartScript
         uint32 GetPathId() const { return mPathId; }
         WorldObject* GetBaseObject()
         {
-            WorldObject* obj = NULL;
+            WorldObject* obj = nullptr;
             if (me)
                 obj = me;
             else if (go)
@@ -178,7 +178,7 @@ class SmartScript
 
         GameObject* FindGameObjectNear(WorldObject* searchObject, uint32 guid) const
         {
-            GameObject* gameObject = NULL;
+            GameObject* gameObject = nullptr;
 
             CellCoord p(Trinity::ComputeCellCoord(searchObject->GetPositionX(), searchObject->GetPositionY()));
             Cell cell(p);
@@ -194,7 +194,7 @@ class SmartScript
 
         Creature* FindCreatureNear(WorldObject* searchObject, uint32 guid) const
         {
-            Creature* creature = NULL;
+            Creature* creature = nullptr;
             CellCoord p(Trinity::ComputeCellCoord(searchObject->GetPositionX(), searchObject->GetPositionY()));
             Cell cell(p);
 
@@ -217,14 +217,14 @@ class SmartScript
                 if (Creature* m = HashMapHolder<Creature>::Find(meOrigGUID))
                 {
                     me = m;
-                    go = NULL;
+                    go = nullptr;
                 }
             }
             if (goOrigGUID)
             {
                 if (GameObject* o = HashMapHolder<GameObject>::Find(goOrigGUID))
                 {
-                    me = NULL;
+                    me = nullptr;
                     go = o;
                 }
             }

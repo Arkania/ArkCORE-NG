@@ -52,7 +52,7 @@ void ArchaeologyMgr::Initialize()
 void ArchaeologyMgr::RemovePlayerProfession()
 {
     SQLTransaction trans = CharacterDatabase.BeginTransaction();
-    PreparedStatement* stmt = NULL;
+    PreparedStatement* stmt = nullptr;
 
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PLAYER_SURVEY_DATA);
     stmt->setUInt32(0, m_player->GetGUIDLow());
@@ -718,7 +718,7 @@ void ArchaeologyMgr::LoadCurrentProjects()
     InitCurrentProjects();
     m_isProjectChanged = false;
 
-    PreparedStatement* stmt = NULL;
+    PreparedStatement* stmt = nullptr;
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PLAYER_CURRENT_PROJECT);
     stmt->setUInt32(0, m_player->GetGUIDLow());
     PreparedQueryResult result = CharacterDatabase.Query(stmt);
@@ -766,7 +766,7 @@ void ArchaeologyMgr::SaveCurrentProjects()
         return;
 
     SQLTransaction trans = CharacterDatabase.BeginTransaction();
-    PreparedStatement* stmt = NULL;
+    PreparedStatement* stmt = nullptr;
 
     for (uint16 slot = 0; slot < MAX_RESEARCH_PROJECTS; slot++)
     {
@@ -829,7 +829,7 @@ void ArchaeologyMgr::LoadCompletedProjects()
 {
     completedProjects.clear();
 
-    PreparedStatement* stmt = NULL;
+    PreparedStatement* stmt = nullptr;
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PLAYER_COMPLETED_PROJECT);
     stmt->setUInt32(0, m_player->GetGUIDLow());
     PreparedQueryResult result = CharacterDatabase.Query(stmt);
@@ -1097,7 +1097,7 @@ void sCharacterDigsite::SaveToDB(uint32 guid, PreparedStatement* &stmt)
 void sCharacterDigsite::UpdateToDB(uint32 guid)
 {
     SQLTransaction trans = CharacterDatabase.BeginTransaction();
-    PreparedStatement* stmt = NULL;
+    PreparedStatement* stmt = nullptr;
     
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PLAYER_DIGGING);
     stmt->setUInt16(0, slot);
@@ -1296,7 +1296,7 @@ void sCurrentProject::DeleteFromDB(uint32 guid)
 void sCurrentProject::SaveToDB(uint32 guid)
 {
     SQLTransaction trans = CharacterDatabase.BeginTransaction();
-    PreparedStatement* stmt = NULL;
+    PreparedStatement* stmt = nullptr;
 
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PLAYER_CURRENT_PROJECT);
     stmt->setUInt32(0, guid);

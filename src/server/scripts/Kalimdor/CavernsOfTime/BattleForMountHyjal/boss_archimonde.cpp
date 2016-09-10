@@ -49,7 +49,7 @@ enum Spells
     SPELL_PROTECTION_OF_ELUNE   = 38528,
 
     SPELL_DRAIN_WORLD_TREE      = 39140,
-    SPELL_DRAIN_WORLD_TREE_2    = 39141,
+	SPELL_DRAIN_WORLD_TREE_TRIGGERED = 39141,
 
     SPELL_FINGER_OF_DEATH       = 31984,
     SPELL_HAND_OF_DEATH         = 35354,
@@ -499,7 +499,7 @@ public:
 
                     if (Unit* Nordrassil = ObjectAccessor::GetUnit(*me, WorldTreeGUID))
                     {
-                        Nordrassil->CastSpell(me, SPELL_DRAIN_WORLD_TREE_2, true);
+                        Nordrassil->CastSpell(me, SPELL_DRAIN_WORLD_TREE_TRIGGERED, true);
                         DrainNordrassilTimer = 1000;
                     }
                 } else DrainNordrassilTimer -= diff;

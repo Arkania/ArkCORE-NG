@@ -158,7 +158,7 @@ public:
             {
                 uint8 LHPcount = 0;
                 uint8 DIScount = 0;
-                for (GroupReference* itr = pGroup->GetFirstMember(); itr != NULL; itr = itr->next())
+                for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
                 {
                     Player* tPlayer = itr->GetSource();
                     if (!tPlayer || tPlayer->IsDead()) continue;
@@ -379,8 +379,8 @@ public:
             if (!pGroup) return false;
             uint8 LHPcount = 0;
             uint8 pct = 100;
-            Unit* healTarget = NULL;
-            for (GroupReference* itr = pGroup->GetFirstMember(); itr != NULL; itr = itr->next())
+            Unit* healTarget = nullptr;
+            for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
             {
                 Player* tPlayer = itr->GetSource();
                 if (!tPlayer || !tPlayer->IsInWorld() || tPlayer->GetMapId() != me->GetMapId() ||
@@ -710,7 +710,7 @@ public:
             if (!INNERVATE || Innervate_Timer > diff || GC_Timer > diff || Rand() > 15) return;
             if (me->GetShapeshiftForm() != FORM_NONE && (tank == me || me->getAttackers().size() > 3)) return;
 
-            Unit* iTarget = NULL;
+            Unit* iTarget = nullptr;
 
             if (master->IsInCombat() && master->getPowerType() == POWER_MANA &&
                 GetManaPCT(master) < 20 && !master->HasAura(INNERVATE))
@@ -737,7 +737,7 @@ public:
             }
             if (!iTarget && group) //cycle through player members...
             {
-                for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
+                for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
                 {
                     Player* tPlayer = itr->GetSource();
                     if (tPlayer == NULL || !tPlayer->IsInWorld() || !tPlayer->IsInCombat() || tPlayer->IsDead()) continue;
@@ -754,7 +754,7 @@ public:
             }
             if (!iTarget && group) //... and their bots.
             {
-                for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
+                for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
                 {
                     Player* tPlayer = itr->GetSource();
                     if (tPlayer == NULL || !tPlayer->HaveBot()) continue;
@@ -836,7 +836,7 @@ public:
                 }
                 return;
             }
-            for (GroupReference* itr = gr->GetFirstMember(); itr != NULL; itr = itr->next())
+            for (GroupReference* itr = gr->GetFirstMember(); itr != nullptr; itr = itr->next())
             {
                 Player* tPlayer = itr->GetSource();
                 Unit* target = tPlayer;

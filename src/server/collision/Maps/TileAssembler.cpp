@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2011-2016 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -89,7 +89,7 @@ namespace VMAP
                 }
                 else if (entry->second.flags & MOD_WORLDSPAWN) // WMO maps and terrain maps use different origin, so we need to adapt :/
                 {
-                    /// @todo remove extractor hack and uncomment below line:
+                    // TODO: remove extractor hack and uncomment below line:
                     //entry->second.iPos += Vector3(533.33333f*32, 533.33333f*32, 0.f);
                     entry->second.iBound = entry->second.iBound + Vector3(533.33333f*32, 533.33333f*32, 0.f);
                 }
@@ -99,16 +99,7 @@ namespace VMAP
 
             printf("Creating map tree for map %u...\n", map_iter->first);
             BIH pTree;
-
-            try
-            {
-                pTree.build(mapSpawns, BoundsTrait<ModelSpawn*>::getBounds);
-            }
-            catch (std::exception& e)
-            {
-                printf("Exception ""%s"" when calling pTree.build", e.what());
-                return false;
-            }
+            pTree.build(mapSpawns, BoundsTrait<ModelSpawn*>::getBounds);
 
             // ===> possibly move this code to StaticMapTree class
             std::map<uint32, uint32> modelNodeIdx;
@@ -162,25 +153,23 @@ namespace VMAP
                 uint32 x, y;
                 StaticMapTree::unpackTileID(tile->first, x, y);
                 tilefilename << std::setw(2) << x << '_' << std::setw(2) << y << ".vmtile";
-                if (FILE* tilefile = fopen(tilefilename.str().c_str(), "wb"))
+                FILE* tilefile = fopen(tilefilename.str().c_str(), "wb");
+                // file header
+                if (success && fwrite(VMAP_MAGIC, 1, 8, tilefile) != 8) success = false;
+                // write number of tile spawns
+                if (success && fwrite(&nSpawns, sizeof(uint32), 1, tilefile) != 1) success = false;
+                // write tile spawns
+                for (uint32 s=0; s<nSpawns; ++s)
                 {
-                    // file header
-                    if (success && fwrite(VMAP_MAGIC, 1, 8, tilefile) != 8) success = false;
-                    // write number of tile spawns
-                    if (success && fwrite(&nSpawns, sizeof(uint32), 1, tilefile) != 1) success = false;
-                    // write tile spawns
-                    for (uint32 s=0; s<nSpawns; ++s)
-                    {
-                        if (s)
-                            ++tile;
-                        const ModelSpawn &spawn2 = map_iter->second->UniqueEntries[tile->second];
-                        success = success && ModelSpawn::writeToFile(tilefile, spawn2);
-                        // MapTree nodes to update when loading tile:
-                        std::map<uint32, uint32>::iterator nIdx = modelNodeIdx.find(spawn2.ID);
-                        if (success && fwrite(&nIdx->second, sizeof(uint32), 1, tilefile) != 1) success = false;
-                    }
-                    fclose(tilefile);
+                    if (s)
+                        ++tile;
+                    const ModelSpawn &spawn2 = map_iter->second->UniqueEntries[tile->second];
+                    success = success && ModelSpawn::writeToFile(tilefile, spawn2);
+                    // MapTree nodes to update when loading tile:
+                    std::map<uint32, uint32>::iterator nIdx = modelNodeIdx.find(spawn2.ID);
+                    if (success && fwrite(&nIdx->second, sizeof(uint32), 1, tilefile) != 1) success = false;
                 }
+                fclose(tilefile);
             }
             // break; //test, extract only first map; TODO: remvoe this line
         }
@@ -237,7 +226,7 @@ namespace VMAP
             MapData::iterator map_iter = mapData.find(mapID);
             if (map_iter == mapData.end())
             {
-                printf("spawning Map %u\n", mapID);
+                printf("spawning Map %d\n", mapID);
                 mapData[mapID] = current = new MapSpawns();
             }
             else current = (*map_iter).second;
@@ -357,13 +346,10 @@ namespace VMAP
 
         uint32 name_length, displayId;
         char buff[500];
-        while (true)
+        while (!feof(model_list))
         {
-            if (fread(&displayId, sizeof(uint32), 1, model_list) != 1)
-                if (feof(model_list))   // EOF flag is only set after failed reading attempt
-                    break;
-
-            if (fread(&name_length, sizeof(uint32), 1, model_list) != 1
+            if (fread(&displayId, sizeof(uint32), 1, model_list) != 1
+                || fread(&name_length, sizeof(uint32), 1, model_list) != 1
                 || name_length >= sizeof(buff)
                 || fread(&buff, sizeof(char), name_length, model_list) != name_length)
             {
@@ -374,7 +360,7 @@ namespace VMAP
             std::string model_name(buff, name_length);
 
             WorldModel_Raw raw_model;
-            if (!raw_model.Read((iSrcDir + "/" + model_name).c_str()) )
+            if ( !raw_model.Read((iSrcDir + "/" + model_name).c_str()) )
                 continue;
 
             spawnedModelFiles.insert(model_name);
@@ -405,14 +391,13 @@ namespace VMAP
         fclose(model_list);
         fclose(model_list_copy);
     }
-
-// temporary use defines to simplify read/check code (close file and return at fail)
-#define READ_OR_RETURN(V, S) if (fread((V), (S), 1, rf) != 1) { \
-                                fclose(rf); printf("readfail, op = %i\n", readOperation); return(false); }
-#define READ_OR_RETURN_WITH_DELETE(V, S) if (fread((V), (S), 1, rf) != 1) { \
-                                fclose(rf); printf("readfail, op = %i\n", readOperation); delete[] V; return(false); };
-#define CMP_OR_RETURN(V, S)  if (strcmp((V), (S)) != 0)        { \
-                                fclose(rf); printf("cmpfail, %s!=%s\n", V, S);return(false); }
+        // temporary use defines to simplify read/check code (close file and return at fail)
+        #define READ_OR_RETURN(V, S) if (fread((V), (S), 1, rf) != 1) { \
+                                        fclose(rf); printf("readfail, op = %i\n", readOperation); return(false); }
+        #define READ_OR_RETURN_WITH_DELETE(V, S) if (fread((V), (S), 1, rf) != 1) { \
+                                        fclose(rf); printf("readfail, op = %i\n", readOperation); delete[] V; return(false); };
+        #define CMP_OR_RETURN(V, S)  if (strcmp((V), (S)) != 0)        { \
+                                        fclose(rf); printf("cmpfail, %s!=%s\n", V, S);return(false); }
 
     bool GroupModel_Raw::Read(FILE* rf)
     {
@@ -513,8 +498,7 @@ namespace VMAP
             return false;
         }
 
-        char ident[9];
-        ident[8] = '\0';
+        char ident[8];
         int readOperation = 0;
 
         READ_OR_RETURN(&ident, 8);
@@ -533,8 +517,7 @@ namespace VMAP
         for (uint32 g = 0; g < groups && succeed; ++g)
             succeed = groupsArray[g].Read(rf);
 
-        if (succeed) /// rf will be freed inside Read if the function had any errors.
-            fclose(rf);
+        fclose(rf);
         return succeed;
     }
 

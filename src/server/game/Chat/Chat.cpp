@@ -35,6 +35,7 @@
 #include "UpdateMask.h"
 #include "SpellMgr.h"
 #include "ScriptMgr.h"
+#include "Transport.h"
 #include "ChatLink.h"
 
 bool ChatHandler::load_command_table = true;
@@ -64,7 +65,7 @@ ChatCommand* ChatHandler::getCommandTable()
     // cache for commands, needed because some commands are loaded dynamically through ScriptMgr
     // cache is never freed and will show as a memory leak in diagnostic tools
     // can't use vector as vector storage is implementation-dependent, eg, there can be alignment gaps between elements
-    static ChatCommand* commandTableCache = NULL;
+    static ChatCommand* commandTableCache = nullptr;
 
     if (LoadCommandTable())
     {
@@ -128,7 +129,7 @@ bool ChatHandler::isAvailable(ChatCommand const& cmd) const
 
 bool ChatHandler::HasLowerSecurity(Player* target, uint64 guid, bool strong)
 {
-    WorldSession* target_session = NULL;
+    WorldSession* target_session = nullptr;
     uint32 target_account = 0;
 
     if (target)
@@ -293,7 +294,7 @@ bool ChatHandler::ExecuteCommandInTable(ChatCommand* table, const char* text, st
 
     while (*text == ' ') ++text;
 
-    for (uint32 i = 0; table[i].Name != NULL; ++i)
+    for (uint32 i = 0; table[i].Name != nullptr; ++i)
     {
         if (!hasStringAbbr(table[i].Name, cmd.c_str()))
             continue;
@@ -301,7 +302,7 @@ bool ChatHandler::ExecuteCommandInTable(ChatCommand* table, const char* text, st
         bool match = false;
         if (strlen(table[i].Name) > cmd.length())
         {
-            for (uint32 j = 0; table[j].Name != NULL; ++j)
+            for (uint32 j = 0; table[j].Name != nullptr; ++j)
             {
                 if (!hasStringAbbr(table[j].Name, cmd.c_str()))
                     continue;
@@ -346,6 +347,8 @@ bool ChatHandler::ExecuteCommandInTable(ChatCommand* table, const char* text, st
             Player* player = m_session->GetPlayer();
             if (!AccountMgr::IsPlayerAccount(m_session->GetSecurity()))
             {
+                const Transport* transport = player->GetTransport();
+                Position relPos;
                 Unit* target = player->GetSelectedUnit();
                 uint32 areaId = player->GetAreaId();
                 std::string areaName = "Unknown";
@@ -354,15 +357,6 @@ bool ChatHandler::ExecuteCommandInTable(ChatCommand* table, const char* text, st
                 uint32 targetEntry = 0;
                 uint32 targetDBGuid = 0;
                 std::string targetName = "";
-                if (target)
-                {
-                    targetGuid = target->GetGUID();
-                    targetEntry = target->GetEntry();
-                    targetDBGuid = target->GetGUIDLow();
-                    if (Creature* creature = target->ToCreature())
-                        targetDBGuid = creature->GetDBTableGUIDLow();
-                    targetName = target->GetName().c_str();
-                }
 
                 if (AreaTableEntry const* area = GetAreaEntryByAreaID(areaId))
                 {
@@ -372,13 +366,45 @@ bool ChatHandler::ExecuteCommandInTable(ChatCommand* table, const char* text, st
                         zoneName = zone->area_name;
                 }
 
-                sLog->outCommand(m_session->GetAccountId(), "Command: %s [Player: %s (Guid: %u) (Account: %u) X: %f Y: %f Z: %f O: %f Map: %u (%s) Area: %u (%s) Zone: %s Selected %s: %s (Entry: %u, GUID: %u)]",
-                    fullcmd.c_str(), player->GetName().c_str(), GUID_LOPART(player->GetGUID()),
-                    m_session->GetAccountId(), player->GetPositionX(), player->GetPositionY(),
-					player->GetPositionZ(), player->GetOrientation(), player->GetMapId(),
-                    player->GetMap() ? player->GetMap()->GetMapName() : "Unknown",
-                    areaId, areaName.c_str(), zoneName.c_str(), 
-                    GetLogNameForGuid(targetGuid), targetName.c_str(), targetEntry, targetDBGuid);
+                if (target) // selected target
+                {
+                    transport = target->GetTransport();
+                    relPos = Position(target->GetTransOffsetX(), target->GetTransOffsetY(), target->GetTransOffsetZ(), target->GetTransOffsetO());
+                    targetGuid = target->GetGUID();
+                    targetEntry = target->GetEntry();
+                    targetDBGuid = target->GetGUIDLow();
+                    if (Creature* creature = target->ToCreature())
+                        targetDBGuid = creature->GetDBTableGUIDLow();
+                    targetName = target->GetName().c_str();
+
+                    sLog->outCommand(m_session->GetAccountId(), "Command: %s [Player: %s (Guid: %u) (Account: %u) X: %f Y: %f Z: %f O: %f Map: %u (%s) Area: %u (%s) Zone: %s]\n[Target: %s (Guid: %u Entry: %u DBGuid: %u)]",
+                        fullcmd.c_str(), player->GetName().c_str(), GUID_LOPART(player->GetGUID()), m_session->GetAccountId(),
+                        player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetOrientation(), player->GetMapId(),
+                        player->GetMap() ? player->GetMap()->GetMapName() : "Unknown",
+                        areaId, areaName.c_str(), zoneName.c_str(),
+                        targetName.c_str(), GetLogNameForGuid(targetGuid), targetEntry, targetDBGuid);
+                }
+                else // player
+                {
+                    relPos = Position(player->GetTransOffsetX(), player->GetTransOffsetY(), player->GetTransOffsetZ(), player->GetTransOffsetO());
+                   
+                    sLog->outCommand(m_session->GetAccountId(), "Command: %s [Player: %s (Guid: %u) (Account: %u) X: %f Y: %f Z: %f O: %f Map: %u (%s) Area: %u (%s) Zone: %s]",
+                        fullcmd.c_str(), player->GetName().c_str(), GUID_LOPART(player->GetGUID()), m_session->GetAccountId(),
+                        player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetOrientation(), player->GetMapId(),
+                        player->GetMap() ? player->GetMap()->GetMapName() : "Unknown",
+                        areaId, areaName.c_str(), zoneName.c_str());
+                }
+
+                if (transport && (cmd == "gps" || cmd == "info"))
+                {
+                    uint32 relMapId = 0;
+                    if (const GameObject* gObject = transport->ToGameObject())
+                        if (const GameObjectTemplate* info = gObject->GetGOInfo())
+                            relMapId = info->raw.data[6];
+
+                    sLog->outCommand(m_session->GetAccountId(), "TransportPosition: X: %f Y: %f Z: %f O: %f Map: %u",
+                        relPos.GetPositionX(), relPos.GetPositionY(), relPos.GetPositionZ(), relPos.GetOrientation(), relMapId);
+                }
             }
         }
         // some commands have custom error messages. Don't send the default one in these cases.
@@ -408,7 +434,7 @@ bool ChatHandler::SetDataForCommandInTable(ChatCommand* table, char const* text,
 
     while (*text == ' ') ++text;
 
-    for (uint32 i = 0; table[i].Name != NULL; i++)
+    for (uint32 i = 0; table[i].Name != nullptr; i++)
     {
         // for data fill use full explicit command names
         if (table[i].Name != cmd)
@@ -551,7 +577,7 @@ Valid examples:
 bool ChatHandler::ShowHelpForSubCommands(ChatCommand* table, char const* cmd, char const* subcmd)
 {
     std::string list;
-    for (uint32 i = 0; table[i].Name != NULL; ++i)
+    for (uint32 i = 0; table[i].Name != nullptr; ++i)
     {
         // must be available (ignore handler existence for show command with possible available subcommands)
         if (!isAvailable(table[i]))
@@ -590,7 +616,7 @@ bool ChatHandler::ShowHelpForCommand(ChatCommand* table, const char* cmd)
 {
     if (*cmd)
     {
-        for (uint32 i = 0; table[i].Name != NULL; ++i)
+        for (uint32 i = 0; table[i].Name != nullptr; ++i)
         {
             // must be available (ignore handler existence for show command with possible available subcommands)
             if (!isAvailable(table[i]))
@@ -620,7 +646,7 @@ bool ChatHandler::ShowHelpForCommand(ChatCommand* table, const char* cmd)
     }
     else
     {
-        for (uint32 i = 0; table[i].Name != NULL; ++i)
+        for (uint32 i = 0; table[i].Name != nullptr; ++i)
         {
             // must be available (ignore handler existence for show command with possible available subcommands)
             if (!isAvailable(table[i]))
@@ -951,7 +977,7 @@ GameObject* ChatHandler::GetNearbyGameObject()
         return NULL;
 
     Player* pl = m_session->GetPlayer();
-    GameObject* obj = NULL;
+    GameObject* obj = nullptr;
     Trinity::NearestGameObjectCheck check(*pl);
     Trinity::GameObjectLastSearcher<Trinity::NearestGameObjectCheck> searcher(pl, obj, check);
     pl->VisitNearbyGridObject(SIZE_OF_GRIDS, searcher);
@@ -1010,7 +1036,7 @@ uint32 ChatHandler::extractSpellIdFromLink(char* text)
     // number or [name] Shift-click form |color|Htalent:talent_id, rank|h[name]|h|r
     // number or [name] Shift-click form |color|Htrade:spell_id, skill_id, max_value, cur_value|h[name]|h|r
     int type = 0;
-    char* param1_str = NULL;
+    char* param1_str = nullptr;
     char* idS = extractKeyFromLink(text, spellKeys, &type, &param1_str);
     if (!idS)
         return 0;
@@ -1209,7 +1235,7 @@ void ChatHandler::extractOptFirstArg(char* args, char** arg1, char** arg2)
     if (!p2)
     {
         p2 = p1;
-        p1 = NULL;
+        p1 = nullptr;
     }
 
     if (arg1)
@@ -1309,7 +1335,7 @@ bool CliHandler::needReportToTarget(Player* /*chr*/) const
 
 bool ChatHandler::GetPlayerGroupAndGUIDByName(const char* cname, Player* &player, Group* &group, uint64 &guid, bool offline)
 {
-    player  = NULL;
+    player  = nullptr;
     guid = 0;
 
     if (cname)

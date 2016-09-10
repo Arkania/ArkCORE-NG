@@ -296,13 +296,13 @@ public:
 
             if (GetData(DATA_ZEVRIM_THORNHOOF) == DONE)
             {
-                printf("");
+                printf("Data is done");
             }
 
         }
         void SpawnHordeNpcs()
         {
-            GameObject* door = NULL;
+            GameObject* door = nullptr;
             if (m_ListOfGUID[0] > 0)
                 if (door = instance->GetGameObject(m_ListOfGUID[0]))
                 {
@@ -312,7 +312,7 @@ public:
         }
         void SpawnAllyNpcs()
         {
-            GameObject* door = NULL;
+            GameObject* door = nullptr;
             if (m_ListOfGUID[0] > 0)
                 if (door = instance->GetGameObject(m_ListOfGUID[0]))
                 {
@@ -324,7 +324,7 @@ public:
         {
             if (GetData(DATA_ZEVRIM_THORNHOOF) == DONE)
             {
-                printf("");
+                printf("Data is done");
             }
         }
         EncounterState GetExtraState(uint32 id) const

@@ -21,7 +21,7 @@
 
 inline bool ItemExists(uint32 id)
 {
-    return sObjectMgr->GetItemTemplate(id) != NULL;
+    return sObjectMgr->GetItemTemplate(id) != nullptr;
 }
 
 bool DB2Utilities::HasItemEntry(DB2Storage<ItemEntry> const& /*store*/, uint32 id)

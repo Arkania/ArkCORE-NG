@@ -20,7 +20,17 @@
 #ifndef DEF_RAMPARTS_H
 #define DEF_RAMPARTS_H
 
+#define HRScriptName "instance_ramparts"
+
 uint32 const EncounterCount       = 4;
+
+enum Bosses
+{
+    BOSS_WATCHKEEPER_GARGOLMAR = 0,
+    BOSS_OMOR_THE_UNSCARRED = 1,
+    BOSS_VAZRUDEN_THE_HEROLD = 2,
+    BOSS_NAZAN = 3
+};
 
 enum DataTypes
 {
@@ -36,7 +46,11 @@ enum CreatureIds
     NPC_VAZRUDEN_HERALD           = 17307,
     NPC_VAZRUDEN                  = 17537,
     NPC_NAZAN                     = 17536,
-    NPC_LIQUID_FIRE               = 22515
+    NPC_LIQUID_FIRE               = 22515,
+    NPC_ADVANCE_SCOUT_CHADWICK    = 54603,
+    NPC_STONE_GUARD_STOKTON       = 54606,
+    NPC_THRALLMAR_INVADER         = 54607,
+    NPC_HONOR_HOLD_RECON          = 54746
 };
 
 enum GameobjectIds
@@ -44,5 +58,22 @@ enum GameobjectIds
     GO_FEL_IRON_CHEST_NORMAL      = 185168,
     GO_FEL_IRON_CHECT_HEROIC      = 185169
 };
+
+template<class AI>
+CreatureAI* GetHellfireRampartsAI(Creature* creature)
+{
+    if (InstanceMap* instance = creature->GetMap()->ToInstanceMap())
+        if (instance->GetInstanceScript())
+            if (instance->GetScriptId() == sObjectMgr->GetScriptId(HRScriptName))
+                return new AI(creature);
+
+    return NULL;
+}
+
+template<class AI, class T>
+AI* GetHellfireRampartsAI(T* obj)
+{
+    return GetInstanceAI<AI, T>(obj, HRScriptName);
+}
 
 #endif

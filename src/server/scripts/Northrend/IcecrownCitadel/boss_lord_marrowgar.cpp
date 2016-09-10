@@ -493,6 +493,7 @@ class npc_bone_spike : public CreatureScript
         }
 };
 
+// 69140 69146 70823 70824 70825 72705
 class spell_marrowgar_coldflame : public SpellScriptLoader
 {
     public:
@@ -690,6 +691,7 @@ class spell_marrowgar_bone_storm : public SpellScriptLoader
         }
 };
 
+// 69055 70814
 class spell_marrowgar_bone_slice : public SpellScriptLoader
 {
     public:

@@ -871,7 +871,7 @@ class spell_putricide_ooze_channel : public SpellScriptLoader
             // this will let use safely use ToCreature() casts in entire script
             bool Load() override
             {
-                _target = NULL;
+                _target = nullptr;
                 return GetCaster()->GetTypeId() == TYPEID_UNIT;
             }
 
@@ -937,6 +937,7 @@ class ExactDistanceCheck
         float _dist;
 };
 
+// 70346 72456 72868 72869
 class spell_putricide_slime_puddle : public SpellScriptLoader
 {
     public:
@@ -1012,7 +1013,7 @@ class spell_putricide_unstable_experiment : public SpellScriptLoader
                 uint32 stage = creature->AI()->GetData(DATA_EXPERIMENT_STAGE);
                 creature->AI()->SetData(DATA_EXPERIMENT_STAGE, stage ^ true);
 
-                Creature* target = NULL;
+                Creature* target = nullptr;
                 std::list<Creature*> creList;
                 GetCreatureListWithEntryInGrid(creList, GetCaster(), NPC_ABOMINATION_WING_MAD_SCIENTIST_STALKER, 200.0f);
                 // 2 of them are spawned at green place - weird trick blizz

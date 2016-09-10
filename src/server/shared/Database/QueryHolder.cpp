@@ -35,7 +35,7 @@ bool SQLQueryHolder::SetQuery(size_t index, const char *sql)
     element.element.query = strdup(sql);
 
     SQLResultSetUnion result;
-    result.qresult = NULL;
+    result.qresult = nullptr;
 
     m_queries[index] = SQLResultPair(element, result);
     return true;
@@ -78,7 +78,7 @@ bool SQLQueryHolder::SetPreparedQuery(size_t index, PreparedStatement* stmt)
     element.element.stmt = stmt;
 
     SQLResultSetUnion result;
-    result.presult = NULL;
+    result.presult = nullptr;
 
     m_queries[index] = SQLResultPair(element, result);
     return true;
@@ -119,7 +119,7 @@ void SQLQueryHolder::SetResult(size_t index, ResultSet* result)
     if (result && !result->GetRowCount())
     {
         delete result;
-        result = NULL;
+        result = nullptr;
     }
 
     /// store the result in the holder
@@ -132,7 +132,7 @@ void SQLQueryHolder::SetPreparedResult(size_t index, PreparedResultSet* result)
     if (result && !result->GetRowCount())
     {
         delete result;
-        result = NULL;
+        result = nullptr;
     }
 
     /// store the result in the holder

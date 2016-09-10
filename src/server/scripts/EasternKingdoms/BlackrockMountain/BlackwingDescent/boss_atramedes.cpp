@@ -629,19 +629,14 @@ public:
 };
 
 // 49740
-class npc_obnoxious_fiend : public CreatureScript
+class npc_obnoxious_fiend_49740 : public CreatureScript
 {
 public:
-    npc_obnoxious_fiend() : CreatureScript("npc_obnoxious_fiend") { }
+    npc_obnoxious_fiend_49740() : CreatureScript("npc_obnoxious_fiend_49740") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    struct npc_obnoxious_fiend_49740AI : public ScriptedAI
     {
-        return new npc_obnoxious_fiendAI (creature);
-    }
-
-    struct npc_obnoxious_fiendAI : public ScriptedAI
-    {
-        npc_obnoxious_fiendAI(Creature* creature) : ScriptedAI(creature) 
+        npc_obnoxious_fiend_49740AI(Creature* creature) : ScriptedAI(creature)
         {
             DoCast(me, SPELL_PHASESHIFT);
             timerCast = 10000;
@@ -665,6 +660,11 @@ public:
             } else timerRemoveAura -= diff;
         }
     };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_obnoxious_fiend_49740AI(creature);
+    }
 };
 
 // 42121 // Air phase
@@ -953,38 +953,6 @@ public:
     }
 };
 
-// 78075
-class spell_atramedes_sonic_breath : public SpellScriptLoader
-{
-    public:
-        spell_atramedes_sonic_breath() : SpellScriptLoader("spell_atramedes_sonic_breath") { }
-
-        class spell_atramedes_sonic_breath_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_atramedes_sonic_breath_SpellScript);
-
-            void CalculateDamage(SpellEffIndex /*effIndex*/)
-            {
-                if (!GetHitUnit())
-                    return;
-
-                if (!GetHitUnit()->isInFront(GetCaster(), GetCaster()->GetObjectSize() / 3))
-                    SetHitDamage(0);
-            }
-
-            void Register()
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_atramedes_sonic_breath_SpellScript::CalculateDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
-                OnEffectHitTarget += SpellEffectFn(spell_atramedes_sonic_breath_SpellScript::CalculateDamage, EFFECT_1, SPELL_EFFECT_ENERGIZE);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_atramedes_sonic_breath_SpellScript();
-        }
-};
-
 void AddSC_boss_atramedes()
 {
     new boss_atramedes();
@@ -993,8 +961,7 @@ void AddSC_boss_atramedes()
     new npc_roaring_flame();
     new npc_roaring_flame_target();
     new npc_searing_flame();
-    new npc_obnoxious_fiend();
+    new npc_obnoxious_fiend_49740();
 
-    new npc_maloriak_atramedes_event();
-    new spell_atramedes_sonic_breath();
+    new npc_maloriak_atramedes_event();    
 }

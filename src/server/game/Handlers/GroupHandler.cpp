@@ -34,6 +34,8 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 
+#include "SpellAuraEffects.h"
+
 class Aura;
 
 /* differeces from off:
@@ -371,7 +373,7 @@ void WorldSession::HandleSetEveryoneIsAssistant(WorldPacket& recvData)
 
     if (active)
     {
-        for (GroupReference *itr = group->GetFirstMember(); itr != NULL; itr = itr->next()) // Loop through all members
+        for (GroupReference *itr = group->GetFirstMember(); itr != nullptr; itr = itr->next()) // Loop through all members
             if (Player *player = itr->GetSource())
                 group->SetGroupMemberFlag(player->GetGUID(), active, MEMBER_FLAG_ASSISTANT);
 
@@ -379,7 +381,7 @@ void WorldSession::HandleSetEveryoneIsAssistant(WorldPacket& recvData)
     }
     else
     {
-        for (GroupReference *itr = group->GetFirstMember(); itr != NULL; itr = itr->next()) // Loop through all members
+        for (GroupReference *itr = group->GetFirstMember(); itr != nullptr; itr = itr->next()) // Loop through all members
             if (Player *player = itr->GetSource())
                 group->SetGroupMemberFlag(player->GetGUID(), !active, MEMBER_FLAG_ASSISTANT);
 
@@ -1027,8 +1029,8 @@ void WorldSession::BuildPartyMemberStatsChangedPacket(Player* player, WorldPacke
     if (mask == GROUP_UPDATE_FLAG_NONE)
         return;
 
-    std::set<uint32> phases;
-    player->GetPhaseMgr().GetActivePhases(phases);
+    std::set<uint16> phases;
+    player->GetActivePhases(phases);
 
     if (mask & GROUP_UPDATE_FLAG_POWER_TYPE)                // if update power type, update current/max power also
         mask |= (GROUP_UPDATE_FLAG_CUR_POWER | GROUP_UPDATE_FLAG_MAX_POWER);
@@ -1254,7 +1256,7 @@ void WorldSession::BuildPartyMemberStatsChangedPacket(Player* player, WorldPacke
     {
         *data << uint32(phases.empty() ? 8 : 0);
         *data << uint32(phases.size());
-        for (std::set<uint32>::const_iterator itr = phases.begin(); itr != phases.end(); ++itr)
+        for (std::set<uint16>::const_iterator itr = phases.begin(); itr != phases.end(); ++itr)
             *data << uint16(*itr);
     }
 }
@@ -1280,8 +1282,8 @@ void WorldSession::HandleRequestPartyMemberStatsOpcode(WorldPacket& recvData)
 
     Pet* pet = player->GetPet();
     Powers powerType = player->getPowerType();
-    std::set<uint32> phases;
-    player->GetPhaseMgr().GetActivePhases(phases);
+    std::set<uint16> phaseIds;
+    player->GetActivePhases(phaseIds);
 
     WorldPacket data(SMSG_PARTY_MEMBER_STATS_FULL, 4+2+2+2+1+2*6+8+1+8);
     data << uint8(0);                                       // only for SMSG_PARTY_MEMBER_STATS_FULL, probably arena/bg related
@@ -1302,7 +1304,7 @@ void WorldSession::HandleRequestPartyMemberStatsOpcode(WorldPacket& recvData)
     if (player->GetVehicle())
         updateFlags |= GROUP_UPDATE_FLAG_VEHICLE_SEAT;
 
-    if (!phases.empty())
+    if (!phaseIds.empty())
         updateFlags |= GROUP_UPDATE_FLAG_PHASE;
 
     uint16 playerStatus = MEMBER_STATUS_ONLINE;
@@ -1431,9 +1433,9 @@ void WorldSession::HandleRequestPartyMemberStatsOpcode(WorldPacket& recvData)
 
     if (updateFlags & GROUP_UPDATE_FLAG_PHASE)
     {
-        data << uint32(phases.empty() ? 8 : 0);
-        data << uint32(phases.size());
-        for (std::set<uint32>::const_iterator itr = phases.begin(); itr != phases.end(); ++itr)
+        data << uint32(phaseIds.empty() ? 8 : 0);
+        data << uint32(phaseIds.size());
+        for (std::set<uint16>::const_iterator itr = phaseIds.begin(); itr != phaseIds.end(); ++itr)
             data << uint16(*itr);
     }
 

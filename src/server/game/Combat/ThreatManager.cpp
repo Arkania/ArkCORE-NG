@@ -317,7 +317,7 @@ void ThreatContainer::update()
 
 HostileReference* ThreatContainer::selectNextVictim(Creature* attacker, HostileReference* currentVictim) const
 {
-    HostileReference* currentRef = NULL;
+    HostileReference* currentRef = nullptr;
     bool found = false;
     bool noPriorityTargetFound = false;
 
@@ -338,7 +338,7 @@ HostileReference* ThreatContainer::selectNextVictim(Creature* attacker, HostileR
             {
                 // current victim is a second choice target, so don't compare threat with it below
                 if (currentRef == currentVictim)
-                    currentVictim = NULL;
+                    currentVictim = nullptr;
                 ++iter;
                 continue;
             }
@@ -382,7 +382,7 @@ HostileReference* ThreatContainer::selectNextVictim(Creature* attacker, HostileR
         ++iter;
     }
     if (!found)
-        currentRef = NULL;
+        currentRef = nullptr;
 
     return currentRef;
 }
@@ -399,7 +399,7 @@ void ThreatManager::clearReferences()
 {
     iThreatContainer.clearReferences();
     iThreatOfflineContainer.clearReferences();
-    iCurrentVictim = NULL;
+    iCurrentVictim = nullptr;
     iUpdateTimer = THREAT_UPDATE_INTERVAL;
 }
 

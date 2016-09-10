@@ -210,7 +210,7 @@ public:
                 return;
 
             tubbersInRange.sort(DistanceOrder(me));
-            GameObject* nearestTubber = NULL;
+            GameObject* nearestTubber = nullptr;
 
             for (std::list<GameObject*>::const_iterator itr = tubbersInRange.begin(); itr != tubbersInRange.end(); ++itr)
             {

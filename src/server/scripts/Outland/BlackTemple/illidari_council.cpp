@@ -249,7 +249,7 @@ public:
 
             DeathCount = 0;
 
-            Creature* pMember = NULL;
+            Creature* pMember = nullptr;
             for (uint8 i = 0; i < 4; ++i)
             {
                 pMember = ObjectAccessor::GetCreature((*me), Council[i]);

@@ -1281,12 +1281,12 @@ public:
         if (target)
         {
             if (target->GetTypeId() == TYPEID_PLAYER)
-                target->ToPlayer()->GetPhaseMgr().SetCustomPhase(phasemask);
+                target->ToPlayer()->SetCustomPhase(phasemask);
             else
                 target->SetPhaseMask(phasemask, true);
         }
         else
-            handler->GetSession()->GetPlayer()->GetPhaseMgr().SetCustomPhase(phasemask);
+            handler->GetSession()->GetPlayer()->SetCustomPhase(phasemask);
 
         return true;
     }

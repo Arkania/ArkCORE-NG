@@ -48,19 +48,15 @@ const Position RopeBeamPos[8]=
 
 const uint32 SpellRopBeam[4] = {84168, 84167, 84171, 84172};
 
-class npc_enslaved_bandit_tv : public CreatureScript
+// 45001  // 45007
+class npc_enslaved_bandit_45001 : public CreatureScript
 {
 public:
-    npc_enslaved_bandit_tv() : CreatureScript("npc_enslaved_bandit_tv") { }
+    npc_enslaved_bandit_45001() : CreatureScript("npc_enslaved_bandit_45001") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    struct npc_enslaved_bandit_45001AI : public ScriptedAI
     {
-        return new npc_enslaved_bandit_tvAI (creature);
-    }
-
-    struct npc_enslaved_bandit_tvAI : public ScriptedAI
-    {
-        npc_enslaved_bandit_tvAI(Creature* creature) : ScriptedAI(creature)
+        npc_enslaved_bandit_45001AI(Creature* creature) : ScriptedAI(creature)
         {
             RopeBeam();
         }
@@ -113,21 +109,22 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-};
-
-class npc_pygmy_brute_tv : public CreatureScript
-{
-public:
-    npc_pygmy_brute_tv() : CreatureScript("npc_pygmy_brute_tv") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_pygmy_brute_tvAI (creature);
+        return new npc_enslaved_bandit_45001AI(creature);
     }
+};
 
-    struct npc_pygmy_brute_tvAI : public ScriptedAI
+// 44896
+class npc_pygmy_brute_44896 : public CreatureScript
+{
+public:
+    npc_pygmy_brute_44896() : CreatureScript("npc_pygmy_brute_44896") { }
+
+    struct npc_pygmy_brute_44896AI : public ScriptedAI
     {
-        npc_pygmy_brute_tvAI(Creature* creature) : ScriptedAI(creature){ }
+        npc_pygmy_brute_44896AI(Creature* creature) : ScriptedAI(creature){ }
 
         uint32 uiSummonTimer;
         uint32 uiImpaleTimer;
@@ -205,6 +202,11 @@ public:
             DoMeleeAttackIfReady();
         }
     };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_pygmy_brute_44896AI(creature);
+    }
 };
 
 struct SlipstreamPlayer
@@ -217,11 +219,6 @@ class npc_wind_tunnel : public CreatureScript
 {
 public:
     npc_wind_tunnel() : CreatureScript("npc_wind_tunnel") { }
-
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new npc_wind_tunnelAI (creature);
-    }
 
     struct npc_wind_tunnelAI : public ScriptedAI
     {
@@ -287,11 +284,16 @@ public:
             }
         }
     };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_wind_tunnelAI(creature);
+    }
 };
 
 void AddSC_lost_city_of_the_tolvir()
 {
-    new npc_enslaved_bandit_tv();
-    new npc_pygmy_brute_tv();
+    new npc_enslaved_bandit_45001();
+    new npc_pygmy_brute_44896();
     new npc_wind_tunnel();
 }

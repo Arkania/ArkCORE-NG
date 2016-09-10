@@ -90,8 +90,8 @@ public:
         uint32 accountId = 0;
         std::string accountName;
         uint32 id = 0;
-        RBACCommandData* data = NULL;
-        rbac::RBACData* rdata = NULL;
+        RBACCommandData* data = nullptr;
+        rbac::RBACData* rdata = nullptr;
         bool useSelectedPlayer = false;
 
         if (checkParams)

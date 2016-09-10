@@ -106,7 +106,7 @@ public:
         {
             m_events.Reset();
             m_events.ScheduleEvent(EVENT_CHECK_PLAYER_NEAR, 1000);
-            m_playerGUID = NULL;
+            m_playerGUID = 0;
             me->SetStandState(UNIT_STAND_STATE_SLEEP);
             if (!me->HasAura(SPELL_IRRIDATION))
                 DoCast(me, SPELL_IRRIDATION, true);
@@ -662,7 +662,7 @@ class npc_stillpine_captive : public CreatureScript
                     cage->SetGoState(GO_STATE_READY);
                 }
                 _events.Reset();
-                _player = NULL;
+                _player = nullptr;
                 _movementComplete = false;
             }
 
@@ -737,18 +737,15 @@ class go_bristlelimb_cage : public GameObjectScript
         }
 };
 
-/*######
-## npc_nestlewood_owlkin
-######*/
-
-class npc_nestlewood_owlkin : public CreatureScript
+// 16518
+class npc_nestlewood_owlkin_16518 : public CreatureScript
 {
     public:
-        npc_nestlewood_owlkin() : CreatureScript("npc_nestlewood_owlkin") { }
+        npc_nestlewood_owlkin_16518() : CreatureScript("npc_nestlewood_owlkin_16518") { }
 
-        struct npc_nestlewood_owlkinAI : public ScriptedAI
+        struct npc_nestlewood_owlkin_16518AI : public ScriptedAI
         {
-            npc_nestlewood_owlkinAI(Creature* creature) : ScriptedAI(creature) { }
+            npc_nestlewood_owlkin_16518AI(Creature* creature) : ScriptedAI(creature) { }
 
             void SpellHit(Unit * Hitter, SpellInfo const* spell)
             {
@@ -770,7 +767,7 @@ class npc_nestlewood_owlkin : public CreatureScript
 
         CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_nestlewood_owlkinAI(creature);
+            return new npc_nestlewood_owlkin_16518AI(creature);
         }
 };
 
@@ -784,5 +781,5 @@ void AddSC_azuremyst_isle()
     new go_ravager_cage();
     new npc_stillpine_captive();
     new go_bristlelimb_cage();
-    new npc_nestlewood_owlkin();
+    new npc_nestlewood_owlkin_16518();
 }

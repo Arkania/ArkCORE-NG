@@ -222,7 +222,7 @@ bool InstanceScript::SetBossState(uint32 id, EncounterState state)
         // call method to check wether a guild challenge can be completed
         if(bossInfo == &bosses.back() && state == DONE)
         {
-            Guild* guild = NULL;
+            Guild* guild = nullptr;
 
             for(Map::PlayerList::const_iterator itr = instance->GetPlayers().begin(); itr != instance->GetPlayers().end();++itr)
             {
@@ -509,6 +509,28 @@ void InstanceScript::UpdateEncounterState(EncounterCreditType type, uint32 credi
     }
 }
 
+std::string InstanceScript::GetBossStateName(uint8 state)
+{
+	// See enum EncounterState in InstanceScript.h
+	switch (state)
+	{
+	case NOT_STARTED:
+		return "NOT_STARTED";
+	case IN_PROGRESS:
+		return "IN_PROGRESS";
+	case FAIL:
+		return "FAIL";
+	case DONE:
+		return "DONE";
+	case SPECIAL:
+		return "SPECIAL";
+	case TO_BE_DECIDED:
+		return "TO_BE_DECIDED";
+	default:
+		return "INVALID";
+	}
+}
+
 void InstanceScript::UpdatePhasing()
 {
     PhaseUpdateData phaseUdateData;
@@ -517,5 +539,5 @@ void InstanceScript::UpdatePhasing()
     Map::PlayerList const& players = instance->GetPlayers();
     for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
         if (Player* player = itr->GetSource())
-            player->GetPhaseMgr().NotifyConditionChanged(phaseUdateData);
+            player->NotifyConditionChanged(phaseUdateData);
 }

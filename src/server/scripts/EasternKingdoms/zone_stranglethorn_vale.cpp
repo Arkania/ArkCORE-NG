@@ -315,9 +315,9 @@ public:
         void Reset() override
         {
             m_events.Reset();
-            m_playerGUID = NULL;
-            m_baronGUID = NULL;
-            m_headGUID = NULL;
+            m_playerGUID = 0;
+            m_baronGUID = 0;
+            m_headGUID = 0;
         }
 
         void DoAction(int32 param) 

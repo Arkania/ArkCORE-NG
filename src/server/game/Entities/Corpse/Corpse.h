@@ -80,6 +80,8 @@ class Corpse : public WorldObject, public GridObject<Corpse>
 
         bool IsExpired(time_t t) const;
 
+        void SetPhaseString(std::string phaseStr);
+
     private:
         CorpseType m_type;
         time_t m_time;

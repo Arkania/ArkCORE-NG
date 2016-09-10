@@ -16,10 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "MoveSplineInit.h"
+#include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "Player.h"
+#include "SpellScript.h"
+#include "Transport.h"
 #include "halls_of_reflection.h"
 
 enum Text
@@ -293,6 +296,7 @@ const Position LichKingFinalPos         = {5283.742188f, 1706.335693f, 783.29351
 const Position ChestPos                 = {5246.187500f, 1649.079468f, 784.301758f, 0.901268f}; // Chest position
 const Position FinalPortalPos           = {5270.634277f ,1639.101196f, 784.303040f, 1.682743f}; // Final portal position
 
+// 37223 37221
 class npc_jaina_or_sylvanas_hor : public CreatureScript
 {
     public:
@@ -707,6 +711,7 @@ class npc_jaina_or_sylvanas_hor : public CreatureScript
     }
 };
 
+// 37554 36955
 class npc_jaina_or_sylvanas_escape_hor : public CreatureScript
 {
     public:
@@ -1107,6 +1112,238 @@ class npc_jaina_or_sylvanas_escape_hor : public CreatureScript
     }
 };
 
+// 36954
+class npc_the_lich_king_escape_hor : public CreatureScript
+{
+public:
+	npc_the_lich_king_escape_hor() : CreatureScript("npc_the_lich_king_escape_hor") { }
+
+	enum npc
+	{
+		EVENT_REMORSELESS_WINTER,
+		EVENT_ESCAPE_SUMMON_GHOULS,
+		EVENT_ESCAPE_SUMMON_WITCH_DOCTOR,
+		EVENT_ESCAPE_SUMMON_LUMBERING_ABOMINATION,
+
+		SAY_LK_ESCAPE_1 = 0,
+		SAY_LK_ESCAPE_2 = 1,
+		SAY_LK_ESCAPE_ICEWALL_SUMMONED_1 = 2,
+		SAY_LK_ESCAPE_ICEWALL_SUMMONED_2 = 3,
+		SAY_LK_ESCAPE_ICEWALL_SUMMONED_3 = 4,
+		SAY_LK_ESCAPE_ICEWALL_SUMMONED_4 = 5,
+		SAY_LK_ESCAPE_GHOULS = 6,
+		SAY_LK_ESCAPE_ABOMINATION = 7,
+		SAY_LK_ESCAPE_WINTER = 8,
+		SAY_LK_ESCAPE_HARVEST_SOUL = 9,
+
+		SOUND_LK_SLAY_1 = 17214,
+		SOUND_LK_SLAY_2 = 17215,
+		SOUND_LK_FURY_OF_FROSTMOURNE = 17224,
+	};
+
+	struct npc_the_lich_king_escape_horAI : public ScriptedAI
+	{
+		npc_the_lich_king_escape_horAI(Creature* creature) : ScriptedAI(creature)
+		{
+			_instance = me->GetInstanceScript();
+			_instance->SetBossState(DATA_LICHKING_EVENT, NOT_STARTED);
+			_summonsCount = 0;
+			_icewall = 0;
+			_despawn = false;
+		}
+
+		void DamageTaken(Unit* /*attacker*/, uint32& damage) override
+		{
+			if (damage >= me->GetHealth())
+				damage = me->GetHealth() - 1;
+		}
+
+		void MovementInform(uint32 type, uint32 pointId) override
+		{
+			if (type == POINT_MOTION_TYPE)
+			{
+				switch (pointId)
+				{
+				case 1:
+					if (Creature* target = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_ESCAPE_LEADER)))
+						me->GetMotionMaster()->MoveChase(target);
+					break;
+				case 2:
+					Talk(SAY_LK_ESCAPE_HARVEST_SOUL);
+
+					if (Creature* target = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_ESCAPE_LEADER)))
+						DoCast(target, SPELL_HARVEST_SOUL);
+
+					if (Transport* gunship = ObjectAccessor::GetTransport(*me, _instance->GetData64(DATA_GUNSHIP)))
+						gunship->EnableMovement(true);
+					break;
+				default:
+					break;
+				}
+			}
+		}
+
+		void JustSummoned(Creature* /*summon*/) override
+		{
+			++_summonsCount;
+		}
+
+		void SummonedCreatureDies(Creature* /*summon*/, Unit* /*killer*/) override
+		{
+			// should never happen
+			if (!_summonsCount)
+				return;
+
+			--_summonsCount;
+
+			// All summons dead and no summon events scheduled
+			if (!_summonsCount && _events.Empty())
+			{
+				if (Creature* jainaOrSylvanas = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_ESCAPE_LEADER)))
+					jainaOrSylvanas->AI()->DoAction(ACTION_WALL_BROKEN);
+			}
+		}
+
+		void KilledUnit(Unit* who) override
+		{
+			if (who->GetTypeId() == TYPEID_PLAYER)
+				DoPlaySoundToSet(me, RAND(SOUND_LK_SLAY_1, SOUND_LK_SLAY_2));
+		}
+
+		void SetData(uint32 type, uint32 data) override
+		{
+			if (type != DATA_ICEWALL)
+				return;
+
+			_icewall = data;
+
+			switch (_icewall)
+			{
+			case 0: // 6 Ghouls, 1 Witch Doctor
+				DoZoneInCombat();
+				_events.ScheduleEvent(EVENT_REMORSELESS_WINTER, 0);
+				_events.ScheduleEvent(EVENT_ESCAPE_SUMMON_GHOULS, 8000);
+				_events.ScheduleEvent(EVENT_ESCAPE_SUMMON_WITCH_DOCTOR, 14000);
+				Talk(SAY_LK_ESCAPE_ICEWALL_SUMMONED_1);
+				break;
+			case 1: // 6 Ghouls, 2 Witch Doctor, 1 Lumbering Abomination
+				_events.ScheduleEvent(EVENT_ESCAPE_SUMMON_GHOULS, 8000);
+				_events.ScheduleEvent(EVENT_ESCAPE_SUMMON_LUMBERING_ABOMINATION, 13000);
+				_events.ScheduleEvent(EVENT_ESCAPE_SUMMON_WITCH_DOCTOR, 16000);
+				_events.ScheduleEvent(EVENT_ESCAPE_SUMMON_WITCH_DOCTOR, 18000);
+				Talk(SAY_LK_ESCAPE_ICEWALL_SUMMONED_2);
+				break;
+			case 2: // 6 Ghouls, 2 Witch Doctor, 2 Lumbering Abomination
+				_events.ScheduleEvent(EVENT_ESCAPE_SUMMON_GHOULS, 9000);
+				_events.ScheduleEvent(EVENT_ESCAPE_SUMMON_LUMBERING_ABOMINATION, 14000);
+				_events.ScheduleEvent(EVENT_ESCAPE_SUMMON_WITCH_DOCTOR, 17000);
+				_events.ScheduleEvent(EVENT_ESCAPE_SUMMON_LUMBERING_ABOMINATION, 19000);
+				_events.ScheduleEvent(EVENT_ESCAPE_SUMMON_WITCH_DOCTOR, 39000);
+				Talk(SAY_LK_ESCAPE_ICEWALL_SUMMONED_3);
+				break;
+			case 3: // 12 Ghouls, 4 Witch Doctor, 3 Lumbering Abomination
+				_events.ScheduleEvent(EVENT_ESCAPE_SUMMON_GHOULS, 9000);
+				_events.ScheduleEvent(EVENT_ESCAPE_SUMMON_WITCH_DOCTOR, 17000);
+				_events.ScheduleEvent(EVENT_ESCAPE_SUMMON_WITCH_DOCTOR, 19000);
+				_events.ScheduleEvent(EVENT_ESCAPE_SUMMON_LUMBERING_ABOMINATION, 40000);
+				_events.ScheduleEvent(EVENT_ESCAPE_SUMMON_LUMBERING_ABOMINATION, 46000);
+				_events.ScheduleEvent(EVENT_ESCAPE_SUMMON_GHOULS, 55000);
+				_events.ScheduleEvent(EVENT_ESCAPE_SUMMON_WITCH_DOCTOR, 62000);
+				_events.ScheduleEvent(EVENT_ESCAPE_SUMMON_WITCH_DOCTOR, 66000);
+				_events.ScheduleEvent(EVENT_ESCAPE_SUMMON_LUMBERING_ABOMINATION, 14000);
+				Talk(SAY_LK_ESCAPE_ICEWALL_SUMMONED_4);
+				break;
+			default:
+				break;
+			}
+		}
+
+		void EnterEvadeMode() override
+		{
+			if (_despawn)
+				return;
+
+			_instance->SetBossState(DATA_LICHKING_EVENT, FAIL);
+			me->StopMoving();
+			DoPlaySoundToSet(me, SOUND_LK_FURY_OF_FROSTMOURNE);
+			DoCastAOE(SPELL_FURY_OF_FROSTMOURNE);
+			me->DespawnOrUnsummon(12000);
+			_despawn = true;
+		}
+
+		void UpdateAI(uint32 diff) override
+		{
+			if (!SelectVictim())
+				return;
+
+			_events.Update(diff);
+
+			if (me->HasUnitState(UNIT_STATE_CASTING))
+				return;
+
+			while (uint32 event = _events.ExecuteEvent())
+			{
+				switch (event)
+				{
+				case EVENT_REMORSELESS_WINTER:
+					me->StopMoving();
+					Talk(SAY_LK_ESCAPE_WINTER);
+					DoCast(me, SPELL_REMORSELESS_WINTER);
+					break;
+				case EVENT_ESCAPE_SUMMON_GHOULS:
+					me->StopMoving();
+					Talk(SAY_LK_ESCAPE_GHOULS);
+					DoCast(me, SPELL_RAISE_DEAD);
+					break;
+				case EVENT_ESCAPE_SUMMON_WITCH_DOCTOR:
+					DoCast(me, SPELL_SUMMON_RISEN_WITCH_DOCTOR);
+					break;
+				case EVENT_ESCAPE_SUMMON_LUMBERING_ABOMINATION:
+					Talk(SAY_LK_ESCAPE_ABOMINATION);
+					DoCast(me, SPELL_SUMMON_LUMBERING_ABOMINATION);
+					break;
+				default:
+					break;
+				}
+			}
+
+			DoMeleeAttackIfReady();
+		}
+
+	private:
+		bool SelectVictim()
+		{
+			if (!me->IsInCombat())
+				return false;
+
+			if (!me->HasReactState(REACT_PASSIVE))
+			{
+				if (Unit* victim = me->SelectVictim())
+					AttackStart(victim);
+				return me->GetVictim() != nullptr;
+			}
+			else if (me->getThreatManager().getThreatList().size() < 2 && me->HasAura(SPELL_REMORSELESS_WINTER))
+			{
+				EnterEvadeMode();
+				return false;
+			}
+
+			return true;
+		}
+
+		InstanceScript* _instance;
+		EventMap _events;
+		uint8 _icewall;
+		uint32 _summonsCount;
+		bool _despawn;
+	};
+
+	CreatureAI* GetAI(Creature* creature) const override
+	{
+		return GetHallsOfReflectionAI<npc_the_lich_king_escape_horAI>(creature);
+	}
+};
+
 enum TrashSpells
 {
     // Ghostly Priest
@@ -1221,6 +1458,7 @@ protected:
     uint32 InternalWaveId;
 };
 
+// 38175
 class npc_ghostly_priest : public CreatureScript
 {
 public:
@@ -1290,6 +1528,7 @@ public:
     }
 };
 
+// 38172
 class npc_phantom_mage : public CreatureScript
 {
 public:
@@ -1362,6 +1601,7 @@ public:
     }
 };
 
+// 38567
 class npc_phantom_hallucination : public CreatureScript
 {
 public:
@@ -1396,6 +1636,7 @@ public:
     }
 };
 
+// 38177
 class npc_shadowy_mercenary : public CreatureScript
 {
 public:
@@ -1454,6 +1695,7 @@ public:
     }
 };
 
+// 38173
 class npc_spectral_footman : public CreatureScript
 {
 public:
@@ -1506,6 +1748,7 @@ public:
     }
 };
 
+// 38176
 class npc_tortured_rifleman : public CreatureScript
 {
 public:
@@ -1565,7 +1808,6 @@ public:
     }
 };
 
-
 enum GeneralEvents
 {
     //General
@@ -1588,14 +1830,15 @@ enum GeneralEvents
     SPELL_SPIRIT_BURST           = 69900, // 73046 on hc
 };
 
-class npc_frostworn_general : public CreatureScript
+// 36723
+class npc_frostsworn_general_36723 : public CreatureScript
 {
 public:
-    npc_frostworn_general() : CreatureScript("npc_frostworn_general") { }
+    npc_frostsworn_general_36723() : CreatureScript("npc_frostsworn_general_36723") { }
 
-    struct npc_frostworn_generalAI : public ScriptedAI
+    struct npc_frostsworn_general_36723AI : public ScriptedAI
     {
-        npc_frostworn_generalAI(Creature* creature) : ScriptedAI(creature)
+        npc_frostsworn_general_36723AI(Creature* creature) : ScriptedAI(creature)
         {
             _instance = me->GetInstanceScript();
             Reset();
@@ -1677,10 +1920,11 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_frostworn_generalAI>(creature);
+        return GetInstanceAI<npc_frostsworn_general_36723AI>(creature);
     }
 };
 
+// 37068
 class npc_spiritual_reflection : public CreatureScript
 {
 public:
@@ -1738,6 +1982,7 @@ public:
     }
 };
 
+// 5632
 class at_hor_intro_start : public AreaTriggerScript
 {
 public:
@@ -1757,6 +2002,7 @@ public:
     }
 };
 
+// 5697
 class at_hor_waves_restarter : public AreaTriggerScript
 {
 public:
@@ -1791,10 +2037,31 @@ public:
     }
 };
 
-class at_shadow_throne : public AreaTriggerScript
+// 5740
+class at_hor_impenetrable_door : public AreaTriggerScript
 {
 public:
-    at_shadow_throne() : AreaTriggerScript("at_shadow_throne") { }
+	at_hor_impenetrable_door() : AreaTriggerScript("at_hor_impenetrable_door") { }
+
+	bool OnTrigger(Player* player, AreaTriggerEntry const* /*at*/) override
+	{
+		if (player->IsGameMaster())
+			return true;
+
+		InstanceScript* _instance = player->GetInstanceScript();
+		if (_instance->GetBossState(DATA_MARWYN_EVENT) == DONE)
+			return true;
+
+		/// return false to handle teleport by db
+		return false;
+	}
+};
+
+// 5605
+class at_hor_shadow_throne : public AreaTriggerScript
+{
+public:
+	at_hor_shadow_throne() : AreaTriggerScript("at_hor_shadow_throne") { }
 
     bool OnTrigger(Player* player, const AreaTriggerEntry* /*at*/) override
     {
@@ -1810,6 +2077,7 @@ public:
     }
 };
 
+// 36940
 class npc_raging_ghoul : public CreatureScript
 {
 public:
@@ -1906,6 +2174,7 @@ public:
     }
 };
 
+// 36941
 class npc_risen_witch_doctor : public CreatureScript
 {
 public:
@@ -2023,7 +2292,7 @@ public:
     }
 };
 
-
+// 37069
 class npc_lumbering_abomination : public CreatureScript
 {
 public:
@@ -2108,13 +2377,497 @@ public:
     }
 };
 
+enum QuelDelarUther
+{
+	ACTION_UTHER_START_SCREAM = 1,
+	ACTION_UTHER_OUTRO = 2,
+
+	EVENT_UTHER_1 = 1,
+	EVENT_UTHER_2 = 2,
+	EVENT_UTHER_3 = 3,
+	EVENT_UTHER_4 = 4,
+	EVENT_UTHER_5 = 5,
+	EVENT_UTHER_6 = 6,
+	EVENT_UTHER_7 = 7,
+	EVENT_UTHER_8 = 8,
+	EVENT_UTHER_9 = 9,
+	EVENT_UTHER_10 = 10,
+	EVENT_UTHER_11 = 11,
+	EVENT_UTHER_FACING = 12,
+	EVENT_UTHER_KNEEL = 13,
+
+	SAY_UTHER_QUEL_DELAR_1 = 16,
+	SAY_UTHER_QUEL_DELAR_2 = 17,
+	SAY_UTHER_QUEL_DELAR_3 = 18,
+	SAY_UTHER_QUEL_DELAR_4 = 19,
+	SAY_UTHER_QUEL_DELAR_5 = 20,
+	SAY_UTHER_QUEL_DELAR_6 = 21,
+
+	SPELL_ESSENCE_OF_CAPTURED_1 = 73036
+};
+
+enum QuelDelarSword
+{
+	SPELL_WHIRLWIND_VISUAL = 70300,
+	SPELL_HEROIC_STRIKE = 29426,
+	SPELL_WHIRLWIND = 67716,
+	SPELL_BLADESTORM = 67541,
+
+	NPC_QUEL_DELAR = 37158,
+	POINT_TAKE_OFF = 1,
+
+	EVENT_QUEL_DELAR_INIT = 1,
+	EVENT_QUEL_DELAR_FLIGHT_INIT = 2,
+	EVENT_QUEL_DELAR_FLIGHT = 3,
+	EVENT_QUEL_DELAR_LAND = 4,
+	EVENT_QUEL_DELAR_FIGHT = 5,
+	EVENT_QUEL_DELAR_BLADESTORM = 6,
+	EVENT_QUEL_DELAR_HEROIC_STRIKE = 7,
+	EVENT_QUEL_DELAR_WHIRLWIND = 8,
+
+	SAY_QUEL_DELAR_SWORD = 0
+};
+
+enum QuelDelarMisc
+{
+	SAY_FROSTMOURNE_BUNNY = 0,
+	SPELL_QUEL_DELAR_WILL = 70698
+};
+
+Position const QuelDelarCenterPos = {5309.259f, 2006.390f, 718.046f, 0.0f};
+Position const QuelDelarSummonPos = {5298.473f, 1994.852f, 709.424f, 3.979351f};
+Position const QuelDelarMovement[] =
+{
+	{5292.870f, 1998.950f, 718.046f, 0.0f},
+	{5295.819f, 1991.912f, 707.707f, 0.0f},
+	{5295.301f, 1989.782f, 708.696f, 0.0f}
+};
+
+Position const UtherQuelDelarMovement[] =
+{
+	{5336.830f, 1981.700f, 709.319f, 0.0f},
+	{5314.350f, 1993.440f, 707.726f, 0.0f}
+};
+
+// 37225
+class npc_uther_quel_delar : public CreatureScript
+{
+public:
+	npc_uther_quel_delar() : CreatureScript("npc_uther_quel_delar") { }
+
+	struct npc_uther_quel_delarAI : public ScriptedAI
+	{
+		npc_uther_quel_delarAI(Creature* creature) : ScriptedAI(creature)
+		{
+			_instance = me->GetInstanceScript();
+		}
+
+		void Reset() override
+		{
+			// Prevent to break Uther in intro event during instance encounter
+			if (_instance->GetData(DATA_QUEL_DELAR_EVENT) != IN_PROGRESS && _instance->GetData(DATA_QUEL_DELAR_EVENT) != SPECIAL)
+				return;
+
+			_events.Reset();
+			_events.ScheduleEvent(EVENT_UTHER_1, 1);
+		}
+
+		void DamageTaken(Unit* /*attacker*/, uint32& damage) override
+		{
+			if (damage >= me->GetHealth())
+				damage = me->GetHealth() - 1;
+		}
+
+		void DoAction(int32 action) override
+		{
+			switch (action)
+			{
+			case ACTION_UTHER_START_SCREAM:
+				_instance->SetData(DATA_QUEL_DELAR_EVENT, SPECIAL);
+				_events.ScheduleEvent(EVENT_UTHER_2, 0);
+				break;
+			case ACTION_UTHER_OUTRO:
+				_events.ScheduleEvent(EVENT_UTHER_6, 0);
+				break;
+			default:
+				break;
+			}
+		}
+
+		void MovementInform(uint32 /*type*/, uint32 pointId) override
+		{
+			switch (pointId)
+			{
+			case 1:
+				_events.ScheduleEvent(EVENT_UTHER_FACING, 1000);
+				break;
+			default:
+				break;
+			}
+		}
+
+		void UpdateAI(uint32 diff) override
+		{
+			// Prevent to break Uther in intro event during instance encounter
+			if (_instance->GetData(DATA_QUEL_DELAR_EVENT) != IN_PROGRESS && _instance->GetData(DATA_QUEL_DELAR_EVENT) != SPECIAL)
+				return;
+
+			_events.Update(diff);
+
+			while (uint32 eventId = _events.ExecuteEvent())
+			{
+				switch (eventId)
+				{
+				case EVENT_UTHER_1:
+					Talk(SAY_UTHER_QUEL_DELAR_1);
+					break;
+				case EVENT_UTHER_2:
+					if (Creature* bunny = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_FROSTMOURNE_ALTAR_BUNNY)))
+						if (Unit* target = ObjectAccessor::GetPlayer(*me, _instance->GetData64(DATA_QUEL_DELAR_INVOKER)))
+							bunny->CastSpell(target, SPELL_QUEL_DELAR_WILL, true);
+					_events.ScheduleEvent(EVENT_UTHER_3, 2000);
+					break;
+				case EVENT_UTHER_3:
+					me->SummonCreature(NPC_QUEL_DELAR, QuelDelarSummonPos);
+					_events.ScheduleEvent(EVENT_UTHER_4, 2000);
+					break;
+				case EVENT_UTHER_4:
+					Talk(SAY_UTHER_QUEL_DELAR_2);
+					_events.ScheduleEvent(EVENT_UTHER_5, 8000);
+					break;
+				case EVENT_UTHER_5:
+					me->GetMotionMaster()->MovePoint(1, UtherQuelDelarMovement[0]);
+					break;
+				case EVENT_UTHER_6:
+					me->SetWalk(true);
+					me->GetMotionMaster()->MovePoint(0, UtherQuelDelarMovement[1]);
+					_events.ScheduleEvent(EVENT_UTHER_7, 5000);
+					break;
+				case EVENT_UTHER_7:
+					Talk(SAY_UTHER_QUEL_DELAR_3);
+					_events.ScheduleEvent(EVENT_UTHER_8, 12000);
+					break;
+				case EVENT_UTHER_8:
+					Talk(SAY_UTHER_QUEL_DELAR_4);
+					_events.ScheduleEvent(EVENT_UTHER_9, 7000);
+					break;
+				case EVENT_UTHER_9:
+					Talk(SAY_UTHER_QUEL_DELAR_5);
+					_events.ScheduleEvent(EVENT_UTHER_10, 10000);
+					break;
+				case EVENT_UTHER_10:
+					Talk(SAY_UTHER_QUEL_DELAR_6);
+					_events.ScheduleEvent(EVENT_UTHER_11, 5000);
+					break;
+				case EVENT_UTHER_11:
+					DoCast(me, SPELL_ESSENCE_OF_CAPTURED_1, true);
+					me->DespawnOrUnsummon(3000);
+					_instance->SetData(DATA_QUEL_DELAR_EVENT, DONE);
+					break;
+				case EVENT_UTHER_FACING:
+					if (Creature* bunny = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_FROSTMOURNE_ALTAR_BUNNY)))
+						me->SetFacingToObject(bunny);
+					_events.ScheduleEvent(EVENT_UTHER_KNEEL, 1000);
+					break;
+				case EVENT_UTHER_KNEEL:
+					me->HandleEmoteCommand(EMOTE_STATE_KNEEL);
+					break;
+				default:
+					break;
+				}
+			}
+		}
+
+	private:
+		EventMap _events;
+		InstanceScript* _instance;
+	};
+
+	CreatureAI* GetAI(Creature* creature) const override
+	{
+		return GetHallsOfReflectionAI<npc_uther_quel_delarAI>(creature);
+	}
+};
+
+// 37158
+class npc_quel_delar_sword : public CreatureScript
+{
+public:
+	npc_quel_delar_sword() : CreatureScript("npc_quel_delar_sword") { }
+
+	struct npc_quel_delar_swordAI : public ScriptedAI
+	{
+		npc_quel_delar_swordAI(Creature* creature) : ScriptedAI(creature)
+		{
+			_instance = me->GetInstanceScript();
+			me->SetDisplayId(me->GetCreatureTemplate()->Modelid2);
+			_intro = true;
+		}
+
+		void Reset() override
+		{
+			_events.Reset();
+			me->SetSpeed(MOVE_FLIGHT, 4.5f, true);
+			DoCast(SPELL_WHIRLWIND_VISUAL);
+			if (_intro)
+				_events.ScheduleEvent(EVENT_QUEL_DELAR_INIT, 0);
+			else
+				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+		}
+
+		void EnterCombat(Unit* /*victim*/) override
+		{
+			_events.ScheduleEvent(EVENT_QUEL_DELAR_HEROIC_STRIKE, 4000);
+			_events.ScheduleEvent(EVENT_QUEL_DELAR_BLADESTORM, 6000);
+			_events.ScheduleEvent(EVENT_QUEL_DELAR_WHIRLWIND, 6000);
+		}
+
+		void JustDied(Unit* /*killer*/) override
+		{
+			if (Creature* uther = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_UTHER_QUEL_DELAR)))
+				uther->AI()->DoAction(ACTION_UTHER_OUTRO);
+		}
+
+		void MovementInform(uint32 type, uint32 pointId) override
+		{
+			if (type != EFFECT_MOTION_TYPE)
+				return;
+
+			switch (pointId)
+			{
+			case POINT_TAKE_OFF:
+				_events.ScheduleEvent(EVENT_QUEL_DELAR_FLIGHT, 0);
+				break;
+			default:
+				break;
+			}
+		}
+
+		void UpdateAI(uint32 diff) override
+		{
+			_events.Update(diff);
+
+			if (me->HasUnitState(UNIT_STATE_CASTING))
+				return;
+
+			if (!UpdateVictim())
+			{
+				while (uint32 eventId = _events.ExecuteEvent())
+				{
+					switch (eventId)
+					{
+					case EVENT_QUEL_DELAR_INIT:
+						if (Creature* bunny = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_FROSTMOURNE_ALTAR_BUNNY)))
+							bunny->AI()->Talk(SAY_FROSTMOURNE_BUNNY);
+						_intro = false;
+						_events.ScheduleEvent(EVENT_QUEL_DELAR_FLIGHT_INIT, 2500);
+						break;
+					case EVENT_QUEL_DELAR_FLIGHT_INIT:
+						me->GetMotionMaster()->MoveTakeoff(POINT_TAKE_OFF, QuelDelarMovement[0]);
+						break;
+					case EVENT_QUEL_DELAR_FLIGHT:
+					{
+						me->GetMotionMaster()->MoveCirclePath(QuelDelarCenterPos.GetPositionX(), QuelDelarCenterPos.GetPositionY(), 718.046f, 18.0f, true, 16);
+						_events.ScheduleEvent(EVENT_QUEL_DELAR_LAND, 15000);
+						break;
+					}
+					case EVENT_QUEL_DELAR_LAND:
+						me->StopMoving();
+						me->GetMotionMaster()->Clear();
+						me->GetMotionMaster()->MoveLand(0, QuelDelarMovement[1]);
+						_events.ScheduleEvent(EVENT_QUEL_DELAR_FIGHT, 6000);
+						break;
+					case EVENT_QUEL_DELAR_FIGHT:
+						Talk(SAY_QUEL_DELAR_SWORD);
+						me->GetMotionMaster()->MovePoint(0, QuelDelarMovement[2]);
+						me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+						break;
+					default:
+						break;
+					}
+				}
+			}
+			else
+			{
+				while (uint32 eventId = _events.ExecuteEvent())
+				{
+					switch (eventId)
+					{
+					case EVENT_QUEL_DELAR_BLADESTORM:
+						DoCast(me, SPELL_BLADESTORM);
+						_events.ScheduleEvent(EVENT_QUEL_DELAR_BLADESTORM, 10000);
+						break;
+					case EVENT_QUEL_DELAR_HEROIC_STRIKE:
+						DoCastVictim(SPELL_HEROIC_STRIKE);
+						_events.ScheduleEvent(EVENT_QUEL_DELAR_HEROIC_STRIKE, 6000);
+						break;
+					case EVENT_QUEL_DELAR_WHIRLWIND:
+						DoCastAOE(SPELL_WHIRLWIND);
+						_events.ScheduleEvent(EVENT_QUEL_DELAR_WHIRLWIND, 1000);
+						break;
+					default:
+						break;
+					}
+				}
+
+				DoMeleeAttackIfReady();
+			}
+		}
+
+	private:
+		EventMap _events;
+		InstanceScript* _instance;
+		bool _intro;
+	};
+
+	CreatureAI* GetAI(Creature* creature) const override
+	{
+		return GetHallsOfReflectionAI<npc_quel_delar_swordAI>(creature);
+	}
+};
+
+// 5660
+class at_hor_uther_quel_delar_start : public AreaTriggerScript
+{
+public:
+	at_hor_uther_quel_delar_start() : AreaTriggerScript("at_hor_uther_quel_delar_start") { }
+
+	bool OnTrigger(Player* player, AreaTriggerEntry const* /*trigger*/) override
+	{
+		if (player->IsGameMaster())
+			return true;
+
+		InstanceScript* _instance = player->GetInstanceScript();
+
+		if (_instance->GetData(DATA_QUEL_DELAR_EVENT) == IN_PROGRESS)
+			if (Creature* uther = ObjectAccessor::GetCreature(*player, _instance->GetData64(DATA_UTHER_QUEL_DELAR)))
+				uther->AI()->DoAction(ACTION_UTHER_START_SCREAM);
+
+		return true;
+	}
+};
+
+// 72900 - Start Halls of Reflection Quest AE
+class spell_hor_start_halls_of_reflection_quest_ae : public SpellScriptLoader
+{
+public:
+	spell_hor_start_halls_of_reflection_quest_ae() : SpellScriptLoader("spell_hor_start_halls_of_reflection_quest_ae") { }
+
+	class spell_hor_start_halls_of_reflection_quest_ae_SpellScript : public SpellScript
+	{
+		PrepareSpellScript(spell_hor_start_halls_of_reflection_quest_ae_SpellScript);
+
+		void StartQuests(SpellEffIndex /*effIndex*/)
+		{
+			if (Player* target = GetHitPlayer())
+			{
+				// CanTakeQuest and CanAddQuest checks done in spell effect execution
+				if (target->GetTeam() == ALLIANCE)
+					target->CastSpell(target, SPELL_START_HALLS_OF_REFLECTION_QUEST_A, true);
+				else
+					target->CastSpell(target, SPELL_START_HALLS_OF_REFLECTION_QUEST_H, true);
+			}
+		}
+
+		void Register() override
+		{
+			OnEffectHitTarget += SpellEffectFn(spell_hor_start_halls_of_reflection_quest_ae_SpellScript::StartQuests, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+		}
+	};
+
+	SpellScript* GetSpellScript() const override
+	{
+		return new spell_hor_start_halls_of_reflection_quest_ae_SpellScript();
+	}
+};
+
+// 70190 - Evasion
+class spell_hor_evasion : public SpellScriptLoader
+{
+public:
+	spell_hor_evasion() : SpellScriptLoader("spell_hor_evasion") { }
+
+	class spell_hor_evasion_SpellScript : public SpellScript
+	{
+		PrepareSpellScript(spell_hor_evasion_SpellScript);
+
+		bool Load() override
+		{
+			return GetCaster()->GetTypeId() == TYPEID_UNIT;
+		}
+
+		void SetDest(SpellDestination& dest)
+		{
+			WorldObject* target = GetExplTargetWorldObject();
+			Position pos(*target);
+			Position home = GetCaster()->ToCreature()->GetHomePosition();
+
+			// prevent evasion outside the room
+			if (pos.IsInDist2d(&home, 15.0f))
+				return;
+
+			float angle = pos.GetAngle(&home);
+			float dist = GetSpellInfo()->Effects[EFFECT_0].CalcRadius(GetCaster());
+			target->MovePosition(pos, dist, angle);
+
+			dest.Relocate(pos);
+		}
+
+		void Register() override
+		{
+			OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_hor_evasion_SpellScript::SetDest, EFFECT_0, TARGET_DEST_TARGET_RADIUS);
+		}
+	};
+
+	SpellScript* GetSpellScript() const override
+	{
+		return new spell_hor_evasion_SpellScript();
+	}
+};
+
+// 70017 - Gunship Cannon Fire
+class spell_hor_gunship_cannon_fire : public SpellScriptLoader
+{
+public:
+	spell_hor_gunship_cannon_fire() : SpellScriptLoader("spell_hor_gunship_cannon_fire") { }
+
+	class spell_hor_gunship_cannon_fire_AuraScript : public AuraScript
+	{
+		PrepareAuraScript(spell_hor_gunship_cannon_fire_AuraScript);
+
+		void HandlePeriodic(AuraEffect const* /*aurEff*/)
+		{
+			if (!urand(0, 2))
+			{
+				if (GetTarget()->GetEntry() == NPC_GUNSHIP_CANNON_HORDE)
+					GetTarget()->CastSpell((Unit*)NULL, SPELL_GUNSHIP_CANNON_FIRE_MISSILE_HORDE, true);
+				else
+					GetTarget()->CastSpell((Unit*)NULL, SPELL_GUNSHIP_CANNON_FIRE_MISSILE_ALLIANCE, true);
+			}
+		}
+
+		void Register() override
+		{
+			OnEffectPeriodic += AuraEffectPeriodicFn(spell_hor_gunship_cannon_fire_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+		}
+	};
+
+	AuraScript* GetAuraScript() const override
+	{
+		return new spell_hor_gunship_cannon_fire_AuraScript();
+	}
+};
+
 void AddSC_halls_of_reflection()
 {
     new at_hor_intro_start();
     new at_hor_waves_restarter();
-    new at_shadow_throne();
+	new at_hor_impenetrable_door();
+    new at_hor_shadow_throne();
+	new at_hor_uther_quel_delar_start();
     new npc_jaina_or_sylvanas_hor();
     new npc_jaina_or_sylvanas_escape_hor();
+	new npc_the_lich_king_escape_hor();
     new npc_ghostly_priest();
     new npc_phantom_mage();
     new npc_phantom_hallucination();
@@ -2124,6 +2877,11 @@ void AddSC_halls_of_reflection()
     new npc_raging_ghoul();
     new npc_risen_witch_doctor();
     new npc_lumbering_abomination();
-    new npc_frostworn_general();
+    new npc_frostsworn_general_36723();
     new npc_spiritual_reflection();
+	new npc_uther_quel_delar();
+	new npc_quel_delar_sword();
+	new spell_hor_start_halls_of_reflection_quest_ae();
+	new spell_hor_evasion();
+	new spell_hor_gunship_cannon_fire();
 }

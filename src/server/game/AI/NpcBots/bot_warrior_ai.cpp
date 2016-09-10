@@ -277,7 +277,7 @@ public:
                         return;
                     }
                 }
-                Unit* fearTarget = NULL;
+                Unit* fearTarget = nullptr;
                 bool triggered = false;
                 uint8 tCount = 0;
                 //fear master's attackers
@@ -313,7 +313,7 @@ public:
                 if (b_attackers.size() > 1)
                 {
                     tCount = 0;
-                    fearTarget = NULL;
+                    fearTarget = nullptr;
                     triggered = false;
                     for(AttackerSet::iterator iter = b_attackers.begin(); iter != b_attackers.end(); ++iter)
                     {
@@ -597,7 +597,7 @@ public:
                 {
                     bool Bots = false;
                     float dist;
-                    for (GroupReference* itr = gr->GetFirstMember(); itr != NULL; itr = itr->next())
+                    for (GroupReference* itr = gr->GetFirstMember(); itr != nullptr; itr = itr->next())
                     {
                         Player* tPlayer = itr->GetSource();
                         if (!tPlayer) continue;
@@ -621,7 +621,7 @@ public:
                         }
                     }
                     if (!Bots) return;
-                    for (GroupReference* itr = gr->GetFirstMember(); itr != NULL; itr = itr->next())
+                    for (GroupReference* itr = gr->GetFirstMember(); itr != nullptr; itr = itr->next())
                     {
                         Player* tPlayer = itr->GetSource();
                         if (!tPlayer || !tPlayer->HaveBot()) continue;

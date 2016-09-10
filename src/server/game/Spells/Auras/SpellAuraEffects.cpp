@@ -1394,7 +1394,7 @@ void AuraEffect::HandleShapeshiftBoosts(Unit* target, bool apply) const
             target->RemoveOwnedAura(spellId2, target->GetGUID());
 
         Unit::AuraEffectList const& shapeshifts = target->GetAuraEffectsByType(SPELL_AURA_MOD_SHAPESHIFT);
-        AuraEffect* newAura = NULL;
+        AuraEffect* newAura = nullptr;
         // Iterate through all the shapeshift auras that the target has, if there is another aura with SPELL_AURA_MOD_SHAPESHIFT, then this aura is being removed due to that one being applied
         for (Unit::AuraEffectList::const_iterator itr = shapeshifts.begin(); itr != shapeshifts.end(); ++itr)
         {
@@ -1464,12 +1464,18 @@ void AuraEffect::HandlePhaseGroup(AuraApplication const* aurApp, uint8 mode, boo
 
     Unit* target = aurApp->GetTarget();
 
+    std::set<uint16> const& oldPhases = target->GetPhaseIds();
+    std::set<uint16> const& phaseIds = GetPhasesForGroup((uint16)GetMiscValueB());
+    // GPN39F not shure.. SetInPhase GroupId, not each result as phaseId
+    for (uint16 phaseId : phaseIds)
+        target->SetInPhase(phaseId, false, apply);
+
     if (Player* player = target->ToPlayer())
     {
         if (apply)
-            player->GetPhaseMgr().RegisterPhasingAuraEffect(this);
+            player->RegisterPhasingAuraEffect(this);
         else
-            player->GetPhaseMgr().UnRegisterPhasingAuraEffect(this);
+            player->UnRegisterPhasingAuraEffect(this);
     }
 
     // call functions which may have additional effects after chainging state of unit
@@ -1716,12 +1722,15 @@ void AuraEffect::HandlePhase(AuraApplication const* aurApp, uint8 mode, bool app
 
     Unit* target = aurApp->GetTarget();
 
+    std::set<uint16> const& oldPhases = target->GetPhaseIds();
+    target->SetInPhase((uint16)GetMiscValueB(), false, apply);
+
     if (Player* player = target->ToPlayer())
     {
         if (apply)
-            player->GetPhaseMgr().RegisterPhasingAuraEffect(this);
+            player->RegisterPhasingAuraEffect(this);
         else
-            player->GetPhaseMgr().UnRegisterPhasingAuraEffect(this);
+            player->UnRegisterPhasingAuraEffect(this);
     }
     else
     {
@@ -1740,6 +1749,13 @@ void AuraEffect::HandlePhase(AuraApplication const* aurApp, uint8 mode, bool app
         }
 
         target->SetPhaseMask(newPhase, false);
+    }
+
+    if (Player* player = target->ToPlayer())
+    {
+        if (player->IsInWorld())
+            player->GetMap()->SendUpdateTransportVisibility(player, oldPhases);
+        player->SendUpdatePhasing();
     }
 
     // call functions which may have additional effects after chainging state of unit
@@ -6104,7 +6120,7 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
             case 65922:
             case 65923:
             {
-                Unit* permafrostCaster = NULL;
+                Unit* permafrostCaster = nullptr;
                 Aura* permafrostAura = target->GetAura(66193);
                 if (!permafrostAura)
                     permafrostAura = target->GetAura(67855);

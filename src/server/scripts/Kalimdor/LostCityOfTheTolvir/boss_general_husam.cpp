@@ -257,19 +257,15 @@ public:
     };
 };
 
-class npc_land_mine : public CreatureScript
+// 44840
+class npc_tolvir_land_mine_44840 : public CreatureScript
 {
 public:
-    npc_land_mine() : CreatureScript("npc_land_mine") { }
+    npc_tolvir_land_mine_44840() : CreatureScript("npc_tolvir_land_mine_44840") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    struct npc_tolvir_land_mine_44840AI : public ScriptedAI
     {
-        return new npc_land_mineAI (creature);
-    }
-
-    struct npc_land_mineAI : public ScriptedAI
-    {
-        npc_land_mineAI(Creature* creature) : ScriptedAI(creature)
+        npc_tolvir_land_mine_44840AI(Creature* creature) : ScriptedAI(creature)
         {
             uiState = LAND_MINE_STATE_JUSTADDED;
             uiDespawnTimer = 1000;
@@ -375,21 +371,22 @@ public:
             }
         }
     };
-};
-
-class npc_shockwave_stalker : public CreatureScript
-{
-public:
-    npc_shockwave_stalker() : CreatureScript("npc_shockwave_stalker") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_shockwave_stalkerAI (creature);
+        return new npc_tolvir_land_mine_44840AI(creature);
     }
+};
 
-    struct npc_shockwave_stalkerAI : public ScriptedAI
+// 44711
+class npc_shockwave_stalker_44711 : public CreatureScript
+{
+public:
+    npc_shockwave_stalker_44711() : CreatureScript("npc_shockwave_stalker_44711") { }
+
+    struct npc_shockwave_stalker_44711AI : public ScriptedAI
     {
-        npc_shockwave_stalkerAI(Creature* creature) : ScriptedAI(creature)
+        npc_shockwave_stalker_44711AI(Creature* creature) : ScriptedAI(creature)
         {
             lSummonedGUID.clear();
             CanCheck = true;
@@ -470,21 +467,22 @@ public:
             }
         }
     };
-};
-
-class npc_bad_intentios_target : public CreatureScript
-{
-public:
-    npc_bad_intentios_target() : CreatureScript("npc_bad_intentios_target") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_bad_intentios_targetAI (creature);
+        return new npc_shockwave_stalker_44711AI(creature);
     }
+};
 
-    struct npc_bad_intentios_targetAI : public ScriptedAI
+// 44586
+class npc_bad_intentions_target_44586 : public CreatureScript
+{
+public:
+    npc_bad_intentions_target_44586() : CreatureScript("npc_bad_intentions_target_44586") { }
+
+    struct npc_bad_intentions_target_44586AI : public ScriptedAI
     {
-        npc_bad_intentios_targetAI(Creature* creature) : ScriptedAI(creature){ }
+        npc_bad_intentions_target_44586AI(Creature* creature) : ScriptedAI(creature){ }
 
         uint32 uiExitTimer;
         bool Passenger;
@@ -518,6 +516,11 @@ public:
             }
         }
     };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_bad_intentions_target_44586AI(creature);
+    }
 };
 
 class spell_bad_intentions : public SpellScriptLoader
@@ -552,6 +555,7 @@ class spell_bad_intentions : public SpellScriptLoader
         }
 };
 
+// 83236
 class spell_hurl : public SpellScriptLoader
 {
     public:
@@ -589,9 +593,9 @@ class spell_hurl : public SpellScriptLoader
 void AddSC_boss_general_husam()
 {
     new boss_general_husam();
-    new npc_land_mine();
-    new npc_shockwave_stalker();
-    new npc_bad_intentios_target();
+    new npc_tolvir_land_mine_44840();
+    new npc_shockwave_stalker_44711();
+    new npc_bad_intentions_target_44586();
 
     new spell_bad_intentions();
     new spell_hurl();

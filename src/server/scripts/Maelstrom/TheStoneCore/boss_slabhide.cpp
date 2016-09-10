@@ -338,5 +338,5 @@ public:
 void AddSC_boss_slabhide()
 {
     new boss_slabhide();
-    new npc_stalactite();
+    //new npc_stalactite();
 }

@@ -65,7 +65,7 @@ Vehicle::~Vehicle()
     for (SeatMap::const_iterator itr = Seats.begin(); itr != Seats.end(); ++itr)
     {
         if (itr->second.Passenger.Guid)
-            TC_LOG_ERROR("entities.vehicle", "Vehicle::~Vehicle (Entry: %u) has passenger %u in seat %u during destroy.", GetBase()->GetEntry(), itr->second.Passenger, itr->first);
+            TC_LOG_ERROR("entities.vehicle", "Vehicle::~Vehicle (Entry: %u) has passenger %u in seat %u during destroy.", GetBase()->GetEntry(), (!itr->second.Passenger.Guid ? 0 : 1), itr->first);
 
         ASSERT(itr->second.IsEmpty()); // ASSERT(!itr->second.Passenger.Guid);
     }

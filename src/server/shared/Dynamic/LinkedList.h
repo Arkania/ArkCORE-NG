@@ -55,7 +55,7 @@ class LinkedListElement
         {
             if (isInList())
             {
-                iNext->iPrev = iPrev; iPrev->iNext = iNext; iNext = NULL; iPrev = NULL;
+                iNext->iPrev = iPrev; iPrev->iNext = iNext; iNext = nullptr; iPrev = nullptr;
             }
         }
 

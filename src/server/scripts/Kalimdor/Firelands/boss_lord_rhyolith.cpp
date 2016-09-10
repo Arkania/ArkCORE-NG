@@ -1298,23 +1298,15 @@ public:
     };
 };
 
-/*######
-##liquid obsidian
-######*/
-
-class npc_liquid_obsidian : public CreatureScript
+// 52619
+class npc_liquid_obsidian_52619 : public CreatureScript
 {
 public:
-    npc_liquid_obsidian() : CreatureScript("npc_liquid_obsidian"){ }
+    npc_liquid_obsidian_52619() : CreatureScript("npc_liquid_obsidian_52619"){ }
 
-    CreatureAI* GetAI(Creature* creature) const
+    struct npc_liquid_obsidian_52619AI : public ScriptedAI
     {
-        return new npc_liquid_obsidianAI(creature);
-    }
-
-    struct npc_liquid_obsidianAI : public ScriptedAI
-    {
-        npc_liquid_obsidianAI(Creature* creature) : ScriptedAI(creature)
+        npc_liquid_obsidian_52619AI(Creature* creature) : ScriptedAI(creature)
         {
             instance = me->GetInstanceScript();
         }
@@ -1357,6 +1349,11 @@ public:
             } 
         }
     };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_liquid_obsidian_52619AI(creature);
+    }
 };
 
 /*######
@@ -1431,7 +1428,7 @@ void AddSC_boss_lord_rhyolith()
     new boss_lord_rhyolith();
     new npc_left_leg();
     new npc_right_leg();
-    new npc_liquid_obsidian();
+    new npc_liquid_obsidian_52619();
     new npc_rhyolith_volcano();
     new npc_rhyolith_crater();
     new npc_spark_of_rhyolith();

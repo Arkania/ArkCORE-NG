@@ -32,7 +32,7 @@ bool DBCFileLoader::Load(const char* filename, const char* fmt)
     if (data)
     {
         delete [] data;
-        data = NULL;
+        data = nullptr;
     }
 
     FILE* f = fopen(filename, "rb");
@@ -244,7 +244,7 @@ char* DBCFileLoader::AutoProduceData(const char* format, uint32& records, char**
                     offset += sizeof(uint8);
                     break;
                 case FT_STRING:
-                    *((char**)(&dataTable[offset])) = NULL;   // will replace non-empty or "" strings in AutoProduceStrings
+                    *((char**)(&dataTable[offset])) = nullptr;   // will replace non-empty or "" strings in AutoProduceStrings
                     offset += sizeof(char*);
                     break;
                 case FT_NA:

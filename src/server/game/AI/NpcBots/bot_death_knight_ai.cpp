@@ -292,7 +292,7 @@ public:
                 _runes.runes[i].BaseRune = runeSlotTypes[i];
                 _runes.runes[i].CurrentRune = _runes.runes[i].BaseRune;
                 _runes.runes[i].Cooldown = 0;
-                //_runes.runes[i].ConvertAura = NULL; //UNUSED
+                //_runes.runes[i].ConvertAura = nullptr; //UNUSED
                 //_runes.SetRuneState(i, true);       //UNUSED
             }
         }
@@ -376,7 +376,7 @@ public:
             if (!HYSTERIA || Hysteria_cd > diff || GC_Timer > diff || IsCasting() || Rand() > 15)
                 return;
 
-            Unit* target = NULL;
+            Unit* target = nullptr;
 
             if (master->IsAlive() && isMeleeClass(master->getClass()) && master->IsInCombat() &&
                 GetHealthPCT(master) > 80 && me->GetDistance(master) < 30 &&
@@ -400,7 +400,7 @@ public:
                 Group* gr = master->GetGroup();
                 if (gr)
                 {
-                    for (GroupReference* itr = gr->GetFirstMember(); itr != NULL; itr = itr->next())
+                    for (GroupReference* itr = gr->GetFirstMember(); itr != nullptr; itr = itr->next())
                     {
                         Player* tPlayer = itr->GetSource();
                         if (tPlayer == master) continue;

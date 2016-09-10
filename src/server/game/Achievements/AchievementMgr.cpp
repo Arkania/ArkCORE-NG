@@ -2200,7 +2200,7 @@ void AchievementMgr<Guild>::CompletedAchievement(AchievementEntry const* achieve
             ca.guids.insert(referencePlayer->GetGUID());
 
         if (Group const* group = referencePlayer->GetGroup())
-            for (GroupReference const* ref = group->GetFirstMember(); ref != NULL; ref = ref->next())
+            for (GroupReference const* ref = group->GetFirstMember(); ref != nullptr; ref = ref->next())
                 if (Player const* groupMember = ref->GetSource())
                     if (groupMember->GetGuildId() == GetOwner()->GetId())
                         ca.guids.insert(groupMember->GetGUID());

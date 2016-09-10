@@ -28,7 +28,7 @@ struct CreatureData;
 
 class Transport : public GameObject, public TransportBase
 {
-        friend Transport* TransportMgr::CreateTransport(uint32, uint32, Map*);
+        friend Transport* TransportMgr::CreateTransport(uint32, uint32, Map*, uint32, uint32);
 
         Transport();
     public:
@@ -44,6 +44,7 @@ class Transport : public GameObject, public TransportBase
         void AddPassenger(WorldObject* passenger);
         void RemovePassenger(WorldObject* passenger);
         std::set<WorldObject*> const& GetPassengers() const { return _passengers; }
+        std::set<WorldObject*> const& GetStaticPassengers() const { return _staticPassengers; }
 
         Creature* CreateNPCPassenger(uint32 guid, CreatureData const* data);
         GameObject* CreateGOPassenger(uint32 guid, GameObjectData const* data);
@@ -96,6 +97,7 @@ class Transport : public GameObject, public TransportBase
 
         TransportTemplate const* GetTransportTemplate() const { return _transportInfo; }
 
+        uint32 GetMoTransportMapId();
     private:
         void MoveToNextWaypoint();
         float CalculateSegmentPos(float perc);

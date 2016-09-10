@@ -510,7 +510,7 @@ class spell_rotface_mutated_infection : public SpellScriptLoader
 
             bool Load() override
             {
-                _target = NULL;
+                _target = nullptr;
                 return true;
             }
 

@@ -86,7 +86,7 @@ inline Logger const* Log::GetLoggerByType(std::string const& originalType)
     if (itCached != cachedLoggers.end())
         return itCached->second;
 
-    Logger const* logger = NULL;
+    Logger const* logger = nullptr;
     std::string type(originalType);
 
     do

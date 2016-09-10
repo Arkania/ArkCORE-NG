@@ -408,22 +408,16 @@ static SpawnSpells SpawnCast[4] =
     {58000, 300000, 35871},  // Frost Debuff (need correct spell)
     {80950, 300000, 42075},  // Fire Explosion (need correct spell however this one looks cool)
 };
-/*#####
-# npc_anachronos_the_ancient
-######*/
-class npc_anachronos_the_ancient : public CreatureScript
+
+// 15381
+class npc_anachronos_the_ancient_15381 : public CreatureScript
 {
 public:
-    npc_anachronos_the_ancient() : CreatureScript("npc_anachronos_the_ancient") { }
+    npc_anachronos_the_ancient_15381() : CreatureScript("npc_anachronos_the_ancient_15381") { }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    struct npc_anachronos_the_ancient_15381AI : public ScriptedAI
     {
-        return new npc_anachronos_the_ancientAI(creature);
-    }
-
-    struct npc_anachronos_the_ancientAI : public ScriptedAI
-    {
-        npc_anachronos_the_ancientAI(Creature* creature) : ScriptedAI(creature) { }
+        npc_anachronos_the_ancient_15381AI(Creature* creature) : ScriptedAI(creature) { }
 
         uint32 AnimationTimer;
         uint8 AnimationCount;
@@ -647,7 +641,7 @@ public:
                     case 51:
                     {
                         uint32 entries[4] = { 15423, 15424, 15414, 15422 };
-                        Unit* mob = NULL;
+                        Unit* mob = nullptr;
                         for (uint8 i = 0; i < 4; ++i)
                         {
                             mob = player->FindNearestCreature(entries[i], 50);
@@ -733,25 +727,27 @@ public:
         }
     };
 
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_anachronos_the_ancient_15381AI(creature);
+    }
 };
 
-/*######
-# npc_qiraj_war_spawn
-######*/
 
-class npc_qiraj_war_spawn : public CreatureScript
+// 15414 //15422 // 15423 // 15424
+class npc_qiraj_guard_15423 : public CreatureScript
 {
 public:
-    npc_qiraj_war_spawn() : CreatureScript("npc_qiraj_war_spawn") { }
+    npc_qiraj_guard_15423() : CreatureScript("npc_qiraj_guard_15423") { }
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_qiraj_war_spawnAI(creature);
+        return new npc_qiraj_guard_15423AI(creature);
     }
 
-    struct npc_qiraj_war_spawnAI : public ScriptedAI
+    struct npc_qiraj_guard_15423AI : public ScriptedAI
     {
-        npc_qiraj_war_spawnAI(Creature* creature) : ScriptedAI(creature) { }
+        npc_qiraj_guard_15423AI(Creature* creature) : ScriptedAI(creature) { }
 
         uint64 MobGUID;
         uint64 PlayerGUID;
@@ -815,7 +811,7 @@ public:
             }
             if (!hasTarget)
             {
-                Unit* target = NULL;
+                Unit* target = nullptr;
                 if (me->GetEntry() == 15424 || me->GetEntry() == 15422 || me->GetEntry() == 15414)
                     target = me->FindNearestCreature(15423, 20, true);
                 if (me->GetEntry() == 15423)
@@ -848,9 +844,6 @@ public:
 
 };
 
-/*#####
-# npc_anachronos_quest_trigger
-#####*/
 
 class npc_anachronos_quest_trigger : public CreatureScript
 {
@@ -914,7 +907,7 @@ public:
 
                     if (WaveCount < 5) //1-4 Wave
                     {
-                        if (npc_qiraj_war_spawn::npc_qiraj_war_spawnAI* spawnAI = CAST_AI(npc_qiraj_war_spawn::npc_qiraj_war_spawnAI, spawn->AI()))
+                        if (npc_qiraj_guard_15423::npc_qiraj_guard_15423AI* spawnAI = CAST_AI(npc_qiraj_guard_15423::npc_qiraj_guard_15423AI, spawn->AI()))
                         {
                             spawnAI->MobGUID = me->GetGUID();
                             spawnAI->PlayerGUID = PlayerGUID;
@@ -935,7 +928,7 @@ public:
 
             if (Group* EventGroup = player->GetGroup())
             {
-                Player* groupMember = NULL;
+                Player* groupMember = nullptr;
 
                 uint8 GroupMemberCount = 0;
                 uint8 DeadMemberCount = 0;
@@ -996,7 +989,7 @@ public:
 
 };
 
-void npc_qiraj_war_spawn::npc_qiraj_war_spawnAI::JustDied(Unit* /*slayer*/)
+void npc_qiraj_guard_15423::npc_qiraj_guard_15423AI::JustDied(Unit* /*slayer*/)
 {
     me->RemoveCorpse();
 
@@ -1056,7 +1049,7 @@ public:
 
                 if (Anachronos)
                 {
-                    if (npc_anachronos_the_ancient::npc_anachronos_the_ancientAI* anachronosAI = CAST_AI(npc_anachronos_the_ancient::npc_anachronos_the_ancientAI, Anachronos->AI()))
+                    if (npc_anachronos_the_ancient_15381::npc_anachronos_the_ancient_15381AI* anachronosAI = CAST_AI(npc_anachronos_the_ancient_15381::npc_anachronos_the_ancient_15381AI, Anachronos->AI()))
                         anachronosAI->PlayerGUID = player->GetGUID();
 
                     if (npc_anachronos_quest_trigger::npc_anachronos_quest_triggerAI* triggerAI = CAST_AI(npc_anachronos_quest_trigger::npc_anachronos_quest_triggerAI, trigger->AI()))
@@ -1432,9 +1425,9 @@ class go_wind_stone : public GameObjectScript
 void AddSC_silithus()
 {
     new go_crystalline_tear();
-    new npc_anachronos_quest_trigger();
-    new npc_anachronos_the_ancient();
-    new npc_qiraj_war_spawn();
+    // new npc_anachronos_quest_trigger();
+    new npc_anachronos_the_ancient_15381();
+    new npc_qiraj_guard_15423();
     new npcs_rutgar_and_frankal();
     new go_wind_stone();
 }

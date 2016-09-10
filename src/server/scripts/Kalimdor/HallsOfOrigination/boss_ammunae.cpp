@@ -115,8 +115,8 @@ class boss_ammunae : public CreatureScript
                 i = 0;
                 for(uint8 p=0; p<10; p++)
                 {
-                    seedling[p] = NULL;
-                    blossom[p] = NULL;
+                    seedling[p] = nullptr;
+                    blossom[p] = nullptr;
                 }
             }
 
@@ -139,8 +139,8 @@ class boss_ammunae : public CreatureScript
                 i = 0;
                 for(uint8 p=0; p<10; p++)
                 {
-                    seedling[p] = NULL;
-                    blossom[p] = NULL;
+                    seedling[p] = nullptr;
+                    blossom[p] = nullptr;
                 }
                 Talk(SAY_AGGRO);
             }
@@ -200,7 +200,7 @@ class boss_ammunae : public CreatureScript
 
                 if (m_uiLife_Drain_Timer <= uiDiff)
                 {
-                    Unit *pTarget = NULL;
+                    Unit *pTarget = nullptr;
 
                     uint8 i = 0;
                     while (i < 5)                                   // max 5 tries to get a random target with power_mana
@@ -222,7 +222,7 @@ class boss_ammunae : public CreatureScript
 
                 if (m_uiLife_Drain2_Timer <= uiDiff)
                 {
-                    Unit *pTarget = NULL;
+                    Unit *pTarget = nullptr;
 
                     uint8 i = 0;
                     while (i < 5)                                   // max 5 tries to get a random target with power_energy
@@ -243,7 +243,7 @@ class boss_ammunae : public CreatureScript
 
                 if (m_uiLife_Drain3_Timer <= uiDiff)
                 {
-                    Unit *pTarget = NULL;
+                    Unit *pTarget = nullptr;
 
                     uint8 i = 0;
                     while (i < 5)                                   // max 5 tries to get a random target with power_runic
@@ -264,7 +264,7 @@ class boss_ammunae : public CreatureScript
 
                 if (m_uiLife_Drain4_Timer <= uiDiff)
                 {
-                    Unit *pTarget = NULL;
+                    Unit *pTarget = nullptr;
 
                     uint8 i = 0;
                     while (i < 5)                                   // max 5 tries to get a random target with power_rage
@@ -285,7 +285,7 @@ class boss_ammunae : public CreatureScript
 
                 if (m_uiLife_Drain5_Timer <= uiDiff)
                 {
-                    Unit *pTarget = NULL;
+                    Unit *pTarget = nullptr;
 
                     uint8 i = 0;
                     while (i < 5)                                   // max 5 tries to get a random target with power_focus
@@ -351,8 +351,8 @@ class boss_ammunae : public CreatureScript
                         }
                     for(uint8 p=0; p<10; p++)
                     {
-                        seedling[p] = NULL;
-                        blossom[p] = NULL;
+                        seedling[p] = nullptr;
+                        blossom[p] = nullptr;
                     }
                     i = 0;
                     m_uiBoomTimer = 0;
@@ -430,19 +430,15 @@ class npc_seedling : public CreatureScript
         };
 };
 
-class npc_blossom : public CreatureScript
+// 40620
+class npc_bloodpetal_blossom_40620 : public CreatureScript
 {
     public:
-        npc_blossom() : CreatureScript("npc_blossom") { }
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new npc_blossomAI(creature);
-        }
+        npc_bloodpetal_blossom_40620() : CreatureScript("npc_bloodpetal_blossom_40620") { }
             
-        struct npc_blossomAI : public ScriptedAI
+        struct npc_bloodpetal_blossom_40620AI : public ScriptedAI
         {
-            npc_blossomAI(Creature* creature) : ScriptedAI(creature)
+            npc_bloodpetal_blossom_40620AI(Creature* creature) : ScriptedAI(creature)
             {
                 m_pInstance = creature->GetInstanceScript();
             }
@@ -478,6 +474,11 @@ class npc_blossom : public CreatureScript
                 DoMeleeAttackIfReady();
             }
         };
+
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return new npc_bloodpetal_blossom_40620AI(creature);
+        }
 };
 
 class npc_spore : public CreatureScript
@@ -525,6 +526,6 @@ void AddSC_boss_ammunae()
 {
     new boss_ammunae();
     new npc_seedling();
-    new npc_blossom();
+    new npc_bloodpetal_blossom_40620();
     new npc_spore();
 }

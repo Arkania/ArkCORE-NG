@@ -254,28 +254,29 @@ public:
             uint32 guid = sObjectMgr->GenerateLowGuid(HIGHGUID_UNIT);
             CreatureData& data = sObjectMgr->NewOrExistCreatureData(guid);
             data.id = id;
-            data.phaseMask = chr->GetPhaseMgr().GetPhaseMaskForSpawn();
+            data.phaseMask = chr->GetPhaseMaskForSpawn();
             data.posX = chr->GetTransOffsetX();
             data.posY = chr->GetTransOffsetY();
             data.posZ = chr->GetTransOffsetZ();
             data.orientation = chr->GetTransOffsetO();
+            data.mapid =chr->GetMapId();
 
             Creature* creature = trans->CreateNPCPassenger(guid, &data);
 
-            creature->SaveToDB(trans->GetGOInfo()->moTransport.mapID, 1 << map->GetSpawnMode(), chr->GetPhaseMgr().GetPhaseMaskForSpawn());
+            creature->SaveToDB(trans->GetGOInfo()->moTransport.mapID, 1 << map->GetSpawnMode(), chr->GetPhaseMaskForSpawn());
 
             sObjectMgr->AddCreatureToGrid(guid, &data);
             return true;
         }
 
         Creature* creature = new Creature();
-        if (!creature->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_UNIT), map, chr->GetPhaseMgr().GetPhaseMaskForSpawn(), id, 0, (uint32)teamval, x, y, z, o))
+        if (!creature->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_UNIT), map, chr->GetPhaseMaskForSpawn(), id, 0, (uint32)teamval, x, y, z, o))
         {
             delete creature;
             return false;
         }
 
-        creature->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()), chr->GetPhaseMgr().GetPhaseMaskForSpawn());
+        creature->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()), chr->GetPhaseMaskForSpawn());
 
         uint32 db_guid = creature->GetDBTableGUIDLow();
 
@@ -363,7 +364,7 @@ public:
 
         uint32 lowGuid = atoi((char*)guidStr);
 
-        Creature* creature = NULL;
+        Creature* creature = nullptr;
 
         /* FIXME: impossible without entry
         if (lowguid)
@@ -500,7 +501,7 @@ public:
 
     static bool HandleNpcDeleteCommand(ChatHandler* handler, char const* args)
     {
-        Creature* unit = NULL;
+        Creature* unit = nullptr;
 
         if (*args)
         {
@@ -722,13 +723,27 @@ public:
         uint32 displayid = target->GetDisplayId();
         uint32 nativeid = target->GetNativeDisplayId();
         uint32 Entry = target->GetEntry();
-
+        Transport* transport = target->GetTransport();
+        Position position1 = target->GetPosition();
+        Position position2 = Position();
         int64 curRespawnDelay = target->GetRespawnTimeEx()-time(NULL);
         if (curRespawnDelay < 0)
             curRespawnDelay = 0;
+        uint32 relMap = 0;
         std::string curRespawnDelayStr = secsToTimeString(uint64(curRespawnDelay), true);
         std::string defRespawnDelayStr = secsToTimeString(target->GetRespawnDelay(), true);
-
+        if (transport)
+        {
+            position1 = transport->GetPosition();
+            position2 = target->m_movementInfo.transport.pos;
+            std::set<WorldObject*> pList = transport->GetPassengers();
+            std::set<WorldObject*> cList = transport->GetStaticPassengers();            
+            uint32 mapid = transport->GetMapId();
+            const char* name = transport->GetName().c_str();
+            relMap = transport->GetMoTransportMapId();
+            handler->PSendSysMessage("Transport: Name: %s, with %u passenger and %u crewmember.\n", name, pList.size(), (uint32)cList.size());
+            handler->PSendSysMessage("RelPos: X: %f, Y: %f, Z: %f, O: %f, Map: %u\n", position2.m_positionX, position2.m_positionY, position2.m_positionZ, position2.m_orientation, relMap);
+        }
         handler->PSendSysMessage(LANG_NPCINFO_CHAR,  target->GetDBTableGUIDLow(), target->GetGUIDLow(), faction, npcflags, Entry, displayid, nativeid);
         handler->PSendSysMessage(LANG_NPCINFO_LEVEL, target->getLevel());
         handler->PSendSysMessage(LANG_NPCINFO_EQUIPMENT, target->GetCurrentEquipmentId(), target->GetOriginalEquipmentId());
@@ -743,9 +758,9 @@ public:
         handler->PSendSysMessage(LANG_COMMAND_RAWPAWNTIMES, defRespawnDelayStr.c_str(), curRespawnDelayStr.c_str());
         handler->PSendSysMessage(LANG_NPCINFO_LOOT,  cInfo->lootid, cInfo->pickpocketLootId, cInfo->SkinLootId);
         handler->PSendSysMessage(LANG_NPCINFO_DUNGEON_ID, target->GetInstanceId());
-        handler->PSendSysMessage(LANG_NPCINFO_PHASEMASK, target->GetPhaseMask());
+        handler->PSendSysMessage("%s", target->PhaseToString().c_str());
         handler->PSendSysMessage(LANG_NPCINFO_ARMOR, target->GetArmor());
-        handler->PSendSysMessage(LANG_NPCINFO_POSITION, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ());
+        handler->PSendSysMessage(LANG_NPCINFO_POSITION, position1.GetPositionX(), position1.GetPositionY(), position1.GetPositionZ(), position1.GetOrientation());
         handler->PSendSysMessage(LANG_NPCINFO_AIINFO, target->GetAIName().c_str(), target->GetScriptName().c_str());
 
         for (uint8 i = 0; i < NPCFLAG_COUNT; i++)
@@ -971,7 +986,7 @@ public:
             return false;
 
         uint32 lowguid = 0;
-        Creature* creature = NULL;
+        Creature* creature = nullptr;
 
         if (dontdel_str)
         {
@@ -997,7 +1012,7 @@ public:
                 {
                     //TC_LOG_ERROR("misc", "DEBUG: type_str, NODEL ");
                     doNotDelete = true;
-                    type_str = NULL;
+                    type_str = nullptr;
                 }
             }
         }

@@ -51,6 +51,7 @@ enum Spells
     SPELL_SUMMON_FIENDISH_HOUND  = 30707
 };
 
+// 17308
 class boss_omor_the_unscarred : public CreatureScript
 {
     public:
@@ -61,13 +62,16 @@ class boss_omor_the_unscarred : public CreatureScript
         {
             boss_omor_the_unscarredAI(Creature* creature) : BossAI(creature, DATA_OMOR_THE_UNSCARRED)
             {
+                m_instance = creature->GetInstanceScript();
                 SetCombatMovement(false);
             }
 
+            InstanceScript* m_instance;
+
             void Reset() override
             {
-                Talk(SAY_WIPE);
-
+                m_instance->SetData(BOSS_OMOR_THE_UNSCARRED, NOT_STARTED);
+                Talk(SAY_WIPE); 
                 OrbitalStrike_Timer = 25000;
                 ShadowWhip_Timer = 2000;
                 Aura_Timer = 10000;
@@ -83,6 +87,7 @@ class boss_omor_the_unscarred : public CreatureScript
 
             void EnterCombat(Unit* /*who*/) override
             {
+                m_instance->SetData(BOSS_OMOR_THE_UNSCARRED, IN_PROGRESS);
                 _EnterCombat();
                 Talk(SAY_AGGRO);
             }
@@ -107,6 +112,7 @@ class boss_omor_the_unscarred : public CreatureScript
 
             void JustDied(Unit* /*killer*/) override
             {
+                m_instance->SetData(BOSS_OMOR_THE_UNSCARRED, DONE);
                 Talk(SAY_DIE);
                 _JustDied();
             }
@@ -152,7 +158,7 @@ class boss_omor_the_unscarred : public CreatureScript
                 else
                     if (OrbitalStrike_Timer <= diff)
                     {
-                        Unit* temp = NULL;
+                        Unit* temp = nullptr;
                         if (me->IsWithinMeleeRange(me->GetVictim()))
                             temp = me->GetVictim();
                         else temp = SelectTarget(SELECT_TARGET_RANDOM, 0);
@@ -225,7 +231,7 @@ class boss_omor_the_unscarred : public CreatureScript
 
         CreatureAI* GetAI(Creature* creature) const override
         {
-            return GetInstanceAI<boss_omor_the_unscarredAI>(creature);
+            return GetHellfireRampartsAI<boss_omor_the_unscarredAI>(creature);
         }
 };
 

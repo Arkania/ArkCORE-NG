@@ -2680,5 +2680,5 @@ typedef std::vector<TaxiPathNodeList> TaxiPathNodesByPath;
 
 #define TaxiMaskSize 114
 typedef uint8 TaxiMask[TaxiMaskSize];
-typedef std::unordered_map<uint32, std::set<uint32>> PhaseGroupContainer;
+typedef std::unordered_map<uint16, std::set<uint16>> PhaseGroupContainer;
 #endif

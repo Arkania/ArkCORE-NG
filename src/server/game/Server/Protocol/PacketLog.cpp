@@ -31,7 +31,7 @@ PacketLog::~PacketLog()
     if (_file)
         fclose(_file);
 
-    _file = NULL;
+    _file = nullptr;
 }
 
 void PacketLog::Initialize()

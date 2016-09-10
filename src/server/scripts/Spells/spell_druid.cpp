@@ -2391,7 +2391,7 @@ public:
 
         Unit* SelectFriendlyTarget() const
         {
-            Unit* unit = NULL;
+            Unit* unit = nullptr;
             Unit* const target = GetTarget();
 
             Trinity::MostHPMissingInRange check(target, 15.0f, 1);

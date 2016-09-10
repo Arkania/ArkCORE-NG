@@ -26,7 +26,6 @@
 
 #include "Item.h"
 #include "PetDefines.h"
-#include "PhaseMgr.h"
 #include "QuestDef.h"
 #include "SpellMgr.h"
 #include "Unit.h"
@@ -1341,8 +1340,6 @@ class Player : public Unit, public GridObject<Player>
         Pet* SummonPet(uint32 entry, float x, float y, float z, float ang, PetType petType, uint32 despwtime);
         void RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent = false);
 
-        PhaseMgr& GetPhaseMgr() { return phaseMgr; }
-
         /// Handles said message in regular chat based on declared language and in config pre-defined Range.
         void Say(std::string const& text, Language language, WorldObject const* = nullptr) override;
         /// Handles yelled message in regular chat based on declared language and in config pre-defined Range.
@@ -1562,6 +1559,7 @@ class Player : public Unit, public GridObject<Player>
         bool SatisfyQuestPreviousQuest(Quest const* qInfo, bool msg);
         bool SatisfyQuestClass(Quest const* qInfo, bool msg) const;
         bool SatisfyQuestRace(Quest const* qInfo, bool msg);
+        bool SatisfyQuestGender(Quest const * qInfo, bool msg);
         bool SatisfyQuestReputation(Quest const* qInfo, bool msg);
         bool SatisfyQuestStatus(Quest const* qInfo, bool msg);
         bool SatisfyQuestConditions(Quest const* qInfo, bool msg);
@@ -1885,7 +1883,7 @@ class Player : public Unit, public GridObject<Player>
         void ClearResurrectRequestData()
         {
             delete _resurrectionData;
-            _resurrectionData = NULL;
+            _resurrectionData = nullptr;
         }
 
         bool IsRessurectRequestedBy(uint64 guid) const
@@ -1896,7 +1894,7 @@ class Player : public Unit, public GridObject<Player>
             return _resurrectionData->GUID == guid;
         }
 
-        bool IsRessurectRequested() const { return _resurrectionData != NULL; }
+        bool IsRessurectRequested() const { return _resurrectionData != nullptr; }
         void ResurectUsingRequestData();
 
         uint8 getCinematic() { return m_cinematic; }
@@ -2574,6 +2572,8 @@ class Player : public Unit, public GridObject<Player>
 
         void ReadMovementInfo(WorldPacket& data, MovementInfo* mi, Movement::ExtraMovementStatusElement* extras = NULL);
 
+        void SendUpdatePhasing();
+
         /*! These methods send different packets to the client in apply and unapply case.
             These methods are only sent to the current unit.
         */
@@ -3020,8 +3020,6 @@ class Player : public Unit, public GridObject<Player>
 
         uint32 _activeCheats;
         uint32 _maxPersonalArenaRate;
-
-        PhaseMgr phaseMgr;
 
         uint32 m_ratedBGLoose;
         uint32 m_ratedBGWins;

@@ -631,5 +631,5 @@ void AddSC_boss_ozumat()
     new npc_unyielding_behemoth();
     new npc_faceless_sapper();
     new npc_blight_of_ozumat();
-    new at_tott_ozumat();
+   // new at_tott_ozumat();
 }

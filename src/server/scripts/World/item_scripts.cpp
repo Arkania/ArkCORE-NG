@@ -226,7 +226,7 @@ public:
 
     bool OnUse(Player* player, Item* /*item*/, SpellCastTargets const & /*targets*/) override
     {
-        GameObject* go = NULL;
+        GameObject* go = nullptr;
         for (uint8 i = 0; i < CaribouTrapsNum; ++i)
         {
             go = player->FindNearestGameObject(CaribouTraps[i], 5.0f);
@@ -342,7 +342,7 @@ public:
         if (!pMammoth)
             return false;
 
-        GameObject* pTrap = NULL;
+        GameObject* pTrap = nullptr;
         for (uint8 i = 0; i < MammothTrapsNum; ++i)
         {
             pTrap = player->FindNearestGameObject(MammothTraps[i], 11.0f);

@@ -168,20 +168,20 @@ m_originalEntry(0), m_homePosition(), m_transportHomePosition(), m_creatureInfo(
     ResetLootMode(); // restore default loot mode
     TriggerJustRespawned = false;
     m_isTempWorldObject = false;
-    _focusSpell = NULL;
+    _focusSpell = nullptr;
     // npc_bot
-    m_bot_owner = NULL;
-    m_creature_owner = NULL;
-    m_bots_pet = NULL;
+    m_bot_owner = nullptr;
+    m_creature_owner = nullptr;
+    m_bots_pet = nullptr;
     m_bot_class = CLASS_NONE;
-    bot_AI = NULL;
+    bot_AI = nullptr;
     m_canUpdate = true;
 }
 
 Creature::~Creature()
 {
     delete i_AI;
-    i_AI = NULL;
+    i_AI = nullptr;
 
     //if (m_uint32Values)
     //    TC_LOG_ERROR("entities.unit", "Deconstruct Creature Entry = %u", GetEntry());
@@ -698,7 +698,7 @@ void Creature::DoFleeToGetAssistance()
     float radius = sWorld->getFloatConfig(CONFIG_CREATURE_FAMILY_FLEE_ASSISTANCE_RADIUS);
     if (radius >0)
     {
-        Creature* creature = NULL;
+        Creature* creature = nullptr;
 
         CellCoord p(Trinity::ComputeCellCoord(GetPositionX(), GetPositionY()));
         Cell cell(p);
@@ -764,6 +764,24 @@ bool Creature::Create(uint32 guidlow, Map* map, uint32 phaseMask, uint32 Entry, 
 {
     ASSERT(map);
     SetMap(map);
+
+    if (data)
+    {
+        if (!data->phaseIds.empty())
+            for (uint16 ph : data->phaseIds)
+                SetInPhase(ph, false, true);
+
+        if (!data->phaseGroups.empty())
+        {
+            SetPhaseGroups(data->phaseGroups);
+            for (uint16 phGroup : data->phaseGroups)
+                SetInPhase(phGroup, false, true);
+        }
+
+        if (GetPhaseIds().empty() && GetPhaseGroups().empty())
+            SetInPhase(DEFAULT_PHASE, false, true);        
+    }
+
     SetPhaseMask(phaseMask, false);
 
     CreatureTemplate const* cinfo = sObjectMgr->GetCreatureTemplate(Entry);
@@ -1802,7 +1820,7 @@ Unit* Creature::SelectNearestTarget(float dist, bool playerOnly /* = false */) c
     Cell cell(p);
     cell.SetNoCreate();
 
-    Unit* target = NULL;
+    Unit* target = nullptr;
 
     {
         if (dist == 0.0f)
@@ -1828,7 +1846,7 @@ Unit* Creature::SelectNearestTargetInAttackDistance(float dist) const
     Cell cell(p);
     cell.SetNoCreate();
 
-    Unit* target = NULL;
+    Unit* target = nullptr;
 
     if (dist > MAX_VISIBILITY_DISTANCE)
     {
@@ -1852,7 +1870,7 @@ Unit* Creature::SelectNearestTargetInAttackDistance(float dist) const
 
 Player* Creature::SelectNearestPlayer(float distance) const
 {
-    Player* target = NULL;
+    Player* target = nullptr;
 
     Trinity::NearestPlayerInObjectRangeCheck checker(this, distance);
     Trinity::PlayerLastSearcher<Trinity::NearestPlayerInObjectRangeCheck> searcher(this, target, checker);
@@ -2555,7 +2573,7 @@ Unit* Creature::SelectNearestHostileUnitInAggroRange(bool useLOS) const
     // Selects nearest hostile target within creature's aggro range. Used primarily by
     //  pets set to aggressive. Will not return neutral or friendly targets.
 
-    Unit* target = NULL;
+    Unit* target = nullptr;
 
     {
         Trinity::NearestHostileUnitInAggroRangeCheck u_check(this, useLOS);
@@ -2655,7 +2673,7 @@ void Creature::SetIAmABot(bool bot)
          {
         bot_AI->UnsummonAll();
         IsAIEnabled = false;
-        bot_AI = NULL;
+        bot_AI = nullptr;
         SetUInt64Value(UNIT_FIELD_CREATEDBY, 0);
         }
     }
@@ -2672,7 +2690,7 @@ void Creature::SetBotsPetDied()
     m_bot_owner->SetMinion((Minion*)m_bots_pet, false);
     m_bots_pet->CleanupsBeforeDelete();
     m_bots_pet->AddObjectToRemoveList();
-    m_bots_pet = NULL;
+    m_bots_pet = nullptr;
     }
 
 void Creature::SetBotTank(Unit* newtank)
@@ -2861,7 +2879,7 @@ void Creature::ReleaseFocus(Spell const* focusSpell)
     if (focusSpell != _focusSpell)
         return;
 
-    _focusSpell = NULL;
+    _focusSpell = nullptr;
     if (Unit* victim = GetVictim())
         SetUInt64Value(UNIT_FIELD_TARGET, victim->GetGUID());
     else

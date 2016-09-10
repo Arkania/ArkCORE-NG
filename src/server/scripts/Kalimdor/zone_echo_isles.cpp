@@ -649,7 +649,7 @@ public:
         {
             m_timer = 0;
             m_phase = 0;
-            m_player = NULL;
+            m_player = nullptr;
         }
 
         void SpellHit(Unit* caster, SpellInfo const* spell)

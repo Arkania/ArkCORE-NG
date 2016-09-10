@@ -593,7 +593,7 @@ public:
         {
             Timer[EVENT_TALK_SEQUENCE] = Conversation[count].timer;
 
-            Creature* creature = NULL;
+            Creature* creature = nullptr;
             if (Conversation[count].creature == ILLIDAN_STORMRAGE)
                 creature = me;
             else if (Conversation[count].creature == AKAMA)
@@ -1585,7 +1585,7 @@ public:
 
         void HandleChannelSequence()
         {
-            Unit* Channel = NULL;
+            Unit* Channel = nullptr;
             Unit* Spirit[2] = { NULL, NULL };
             if (ChannelCount <= 5)
             {

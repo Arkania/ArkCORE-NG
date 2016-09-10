@@ -364,7 +364,7 @@ public:
         {
             m_timer = urand(30000, 45000);
             m_phase = 0;
-            m_npc = NULL;
+            m_npc = nullptr;
         }
 
         void UpdateAI(uint32 diff) override
@@ -869,7 +869,7 @@ public:
         {
             m_timer = 0;
             m_phase = 0;
-            m_player = NULL;
+            m_player = nullptr;
         }
 
         void StartAnim(Player* player)
@@ -974,7 +974,7 @@ public:
         {
             m_timer = 0;
             m_phase = 0;
-            m_player = NULL;
+            m_player = nullptr;
         }
 
         void StartAnim(Player* player)
@@ -1079,7 +1079,7 @@ public:
         {
             m_timer = 0;
             m_phase = 0;
-            m_player = NULL;
+            m_player = nullptr;
         }
 
         void StartAnim(Player* player)
@@ -1235,7 +1235,7 @@ public:
         {
             m_timer = 0;
             m_modus = 0;
-            m_player = NULL;
+            m_player = nullptr;
         }
 
         void SpellHit(Unit* caster, SpellInfo const* spell) 
@@ -1315,7 +1315,7 @@ public:
         {
             m_timer = 0;
             m_phase = 0;
-            m_player = NULL;
+            m_player = nullptr;
         }
 
         void StartAnim(Player* player)
@@ -1625,7 +1625,7 @@ public:
 
         void Reset()  override
         {
-            uint64 m_playerGUID = NULL;
+            uint64 m_playerGUID = 0;
         }
 
         void DamageTaken(Unit* attacker, uint32& damage) 
@@ -1667,7 +1667,7 @@ public:
 
         void Reset()  override
         {
-            uint64 m_playerGUID = NULL;
+            uint64 m_playerGUID = 0;
         }
 
         void DamageTaken(Unit* attacker, uint32& damage) override
@@ -1738,7 +1738,7 @@ public:
                 if (npc->GetEntry() == NPC_PUDDLEJUMPER || npc->GetEntry() == NPC_MINOR_ORACLE)
                     if (npc->GetHealthPct() < 80.0f)
                         return;
-            target = NULL;
+            target = nullptr;
         }
 
         void ApplyBeforeCast()
@@ -1793,7 +1793,7 @@ public:
         {
             m_events.Reset();
             m_events.ScheduleEvent(EVENT_CHECK_PLAYER, 1000);
-            uint64 m_playerGUID = NULL;
+            uint64 m_playerGUID = 0;
         }
 
         void IsSummonedBy(Unit* summoner) override 
@@ -1838,7 +1838,7 @@ public:
         {
             m_events.Reset();
             m_events.ScheduleEvent(EVENT_CHECK_PLAYER, 1000);
-            uint64 m_playerGUID = NULL;
+            uint64 m_playerGUID = 0;
         }
 
         void IsSummonedBy(Unit* summoner) override
@@ -2000,10 +2000,10 @@ public:
         void Reset() override
         {
             m_events.Reset();
-            m_playerGUID = NULL;
-            m_spiritAgamand = NULL;
-            m_shadowAgamand1 = NULL;
-            m_shadowAgamand2 = NULL;
+            m_playerGUID = 0;
+            m_spiritAgamand = 0;
+            m_shadowAgamand1 = 0;
+            m_shadowAgamand2 = 0;
             m_animStarted = 0;
             m_phase = 0;
             m_sayPriestess = 0;
@@ -2280,8 +2280,8 @@ public:
         void Initialize()
         {
             m_events.Reset();
-            m_playerGUID = NULL;
-            m_fatherGUID = NULL;
+            m_playerGUID = 0;
+            m_fatherGUID = 0;
             cd_73308 = false;
             cd_73309 = false;
             m_targets.push_back(NPC_SCARLET_FRIAR);

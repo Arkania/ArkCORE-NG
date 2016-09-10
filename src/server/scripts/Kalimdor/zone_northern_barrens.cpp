@@ -80,9 +80,9 @@ public:
             {
                 m_events.Reset();
                 m_killCount = 0;
-                m_kolkarGUID = NULL;
-                m_kurakGUID = NULL;
-                m_playerGUID = NULL;
+                m_kolkarGUID = 0;
+                m_kurakGUID = 0;
+                m_playerGUID = 0;
             }
         }
 
@@ -562,7 +562,7 @@ public:
             m_phase = 0;
             m_timer = 0;
             m_isRiding = false;
-            m_kodoPackGUID = NULL;
+            m_kodoPackGUID = 0;
             me->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
         }
 
@@ -659,7 +659,7 @@ public:
         {
             m_phase = 0;
             m_timer = 0;
-            m_playerGUID = NULL;
+            m_playerGUID = 0;
         }
 
         void JustSummoned(Creature* summon) override
@@ -715,11 +715,11 @@ public:
             m_phase = 1;
             m_timer = 1000;
             m_IsArrived = false;
-            m_halgaGUID = NULL;
-            m_playerGUID = NULL;
-            m_gunnerGUID = NULL;
-            m_balgorGUID = NULL;
-            m_kodoPackGUID = NULL;
+            m_halgaGUID = 0;
+            m_playerGUID = 0;
+            m_gunnerGUID = 0;
+            m_balgorGUID = 0;
+            m_kodoPackGUID = 0;
             me->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
         }
 
@@ -928,7 +928,7 @@ public:
 
         void Reset() override
         {
-            m_kodoLeaderGUID = NULL;
+            m_kodoLeaderGUID = 0;
         }
 
         void SetGUID(uint64 guid, int32 id = 0) 
@@ -1069,7 +1069,7 @@ public:
         {
             m_timer = 0;
             m_phase = 0;
-            m_playerGUID = NULL;
+            m_playerGUID = 0;
         }
 
         void SpellHit(Unit* caster, SpellInfo const* spell) override
@@ -1203,7 +1203,7 @@ public:
         {
             m_timer = 0;
             m_phase = 0;
-            m_playerGUID = NULL;
+            m_playerGUID = 0;
         }
 
         void IsSummonedBy(Unit* summoner) override
@@ -1412,8 +1412,8 @@ public:
             m_events.Reset();
             m_phase = 0;
             m_action_id = 0;
-            m_playerGUID = NULL;
-            m_razorGUID = NULL;
+            m_playerGUID = 0;
+            m_razorGUID = 0;
         }
 
         void SetData(uint32 id, uint32 value)
@@ -1598,13 +1598,13 @@ public:
             m_events.Reset();
             m_phase = 0;
             m_action_id = 0;
-            m_playerGUID = NULL;
-            m_togrikGUID = NULL;
+            m_playerGUID = 0;
+            m_togrikGUID = 0;
 
             if (Creature* bunny = me->FindNearestCreature(NPC_DAVES_INDUSTRIAL_LIGHT_AND_MAGIC_BUNNY, 25.0f))
                 m_bunnyGUID = bunny->GetGUID();
             else
-                m_bunnyGUID = NULL;
+                m_bunnyGUID = 0;
         }
 
         void JustDied(Unit* /*killer*/) 
@@ -1924,9 +1924,9 @@ public:
             m_events.Reset();
             m_phase = 0;
             m_is_anim_started = false;
-            m_playerGUID = NULL;
-            m_kodoLeader = NULL;
-            m_kodoPack = NULL;
+            m_playerGUID = 0;
+            m_kodoLeader = 0;
+            m_kodoPack = 0;
         }
 
         void JustSummoned(Creature* summon) 
@@ -2099,11 +2099,11 @@ public:
             m_phase = 1;
             m_events.Reset();
             m_IsArrived = false;
-            m_playerGUID = NULL;
-            m_roccoGUID = NULL;
-            m_balgorGUID = NULL;
-            m_kodo2GUID = NULL;
-            m_hotseatGUID = NULL;
+            m_playerGUID = 0;
+            m_roccoGUID = 0;
+            m_balgorGUID = 0;
+            m_kodo2GUID = 0;
+            m_hotseatGUID = 0;
             me->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
         }
 
@@ -2449,7 +2449,7 @@ public:
         void Reset()
         {
             m_timer = 3000;
-            m_playerGUID = NULL;
+            m_playerGUID = 0;
         }
 
         void SetGUID(uint64 guid, int32 id = 0)

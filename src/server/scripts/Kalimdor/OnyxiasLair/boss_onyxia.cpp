@@ -337,7 +337,7 @@ public:
                         {
                             DoCastVictim(SPELL_BELLOWING_ROAR);
                             // Eruption
-                            GameObject* Floor = NULL;
+                            GameObject* Floor = nullptr;
                             Trinity::GameObjectInRangeCheck check(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 15);
                             Trinity::GameObjectLastSearcher<Trinity::GameObjectInRangeCheck> searcher(me, Floor, check);
                             me->VisitNearbyGridObject(30, searcher);

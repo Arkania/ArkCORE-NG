@@ -106,6 +106,7 @@ const uint32 SummonRandomAugh[3]=
     SPELL_SUMMON_AUGH_BLOW_DART
 };
 
+// 43614
 class boss_lockmaw : public CreatureScript
 {
 public:
@@ -276,19 +277,15 @@ public:
     };
 };
 
-class npc_frenzied_croc : public CreatureScript
+// 43658
+class npc_frenzied_crocolisk_43658 : public CreatureScript
 {
 public:
-    npc_frenzied_croc() : CreatureScript("npc_frenzied_croc") { }
+    npc_frenzied_crocolisk_43658() : CreatureScript("npc_frenzied_crocolisk_43658") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    struct npc_frenzied_crocolisk_43658AI : public ScriptedAI
     {
-        return new npc_frenzied_crocAI (creature);
-    }
-
-    struct npc_frenzied_crocAI : public ScriptedAI
-    {
-        npc_frenzied_crocAI(Creature* creature) : ScriptedAI(creature)
+        npc_frenzied_crocolisk_43658AI(Creature* creature) : ScriptedAI(creature)
         {
             me->SetInCombatWithZone();
             UpdateThreat();
@@ -356,21 +353,22 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-};
-
-class npc_augh_intro : public CreatureScript
-{
-public:
-    npc_augh_intro() : CreatureScript("npc_augh_intro") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_augh_introAI (creature);
+        return new npc_frenzied_crocolisk_43658AI(creature);
     }
+};
 
-    struct npc_augh_introAI : public ScriptedAI
+// 48104 ???
+class npc_augh_intro_48104 : public CreatureScript
+{
+public:
+    npc_augh_intro_48104() : CreatureScript("npc_augh_intro_48104") { }
+
+    struct npc_augh_intro_48104AI : public ScriptedAI
     {
-        npc_augh_introAI(Creature* creature) : ScriptedAI(creature)
+        npc_augh_intro_48104AI(Creature* creature) : ScriptedAI(creature)
         {
             Active = true;
             instance = creature->GetInstanceScript();
@@ -405,21 +403,22 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-};
-
-class npc_augh_blow_dart : public CreatureScript
-{
-public:
-    npc_augh_blow_dart() : CreatureScript("npc_augh_blow_dart") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_augh_blow_dartAI (creature);
+        return new npc_augh_intro_48104AI(creature);
     }
+};
 
-    struct npc_augh_blow_dartAI : public CasterAI
+// 45379
+class npc_augh_blow_dart_45379 : public CreatureScript
+{
+public:
+    npc_augh_blow_dart_45379() : CreatureScript("npc_augh_blow_dart_45379") { }
+
+    struct npc_augh_blow_dart_45379AI : public CasterAI
     {
-        npc_augh_blow_dartAI(Creature* creature) : CasterAI(creature)
+        npc_augh_blow_dart_45379AI(Creature* creature) : CasterAI(creature)
         {
             me->AddAura(SPELL_STEALTHED, me);
             me->SetInCombatWithZone();
@@ -469,21 +468,22 @@ public:
             }
         }
     };
-};
-
-class npc_augh_whirlwind : public CreatureScript
-{
-public:
-    npc_augh_whirlwind() : CreatureScript("npc_augh_whirlwind") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_augh_whirlwindAI (creature);
+        return new npc_augh_blow_dart_45379AI(creature);
     }
+};
 
-    struct npc_augh_whirlwindAI : public ScriptedAI
+// 45378
+class npc_augh_whirlwind_45378 : public CreatureScript
+{
+public:
+    npc_augh_whirlwind_45378() : CreatureScript("npc_augh_whirlwind_45378") { }
+
+    struct npc_augh_whirlwind_45378AI : public ScriptedAI
     {
-        npc_augh_whirlwindAI(Creature* creature) : ScriptedAI(creature)
+        npc_augh_whirlwind_45378AI(Creature* creature) : ScriptedAI(creature)
         {
             me->AddAura(SPELL_STEALTHED, me);
             me->SetInCombatWithZone();
@@ -541,21 +541,22 @@ public:
             }
         }
     };
-};
-
-class npc_augh_dragons_breath : public CreatureScript
-{
-public:
-    npc_augh_dragons_breath() : CreatureScript("npc_augh_dragons_breath") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_augh_dragons_breathAI (creature);
+        return new npc_augh_whirlwind_45378AI(creature);
     }
+};
 
-    struct npc_augh_dragons_breathAI : public ScriptedAI
+// 44892
+class npc_frenzied_crocolisk_44892 : public CreatureScript
+{
+public:
+    npc_frenzied_crocolisk_44892() : CreatureScript("npc_frenzied_crocolisk_44892") { }
+
+    struct npc_frenzied_crocolisk_44892AI : public ScriptedAI
     {
-        npc_augh_dragons_breathAI(Creature* creature) : ScriptedAI(creature)
+        npc_frenzied_crocolisk_44892AI(Creature* creature) : ScriptedAI(creature)
         {
             uiEventTimer = 300;
             uiPhase = AUGH_PHASE_NONE;
@@ -628,21 +629,22 @@ public:
                 uiEventTimer -= diff;
         }
     };
-};
-
-class boss_augh : public CreatureScript
-{
-public:
-    boss_augh() : CreatureScript("boss_augh") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new boss_aughAI (creature);
+        return new npc_frenzied_crocolisk_44892AI(creature);
     }
+};
 
-    struct boss_aughAI : public ScriptedAI
+// 49045
+class boss_augh_49045 : public CreatureScript
+{
+public:
+    boss_augh_49045() : CreatureScript("boss_augh_49045") { }
+
+    struct boss_augh_49045AI : public ScriptedAI
     {
-        boss_aughAI(Creature* creature) : ScriptedAI(creature)
+        boss_augh_49045AI(Creature* creature) : ScriptedAI(creature)
         {
             instance = creature->GetInstanceScript();
             me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
@@ -806,8 +808,14 @@ public:
             DoMeleeAttackIfReady();
         }
     };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new boss_augh_49045AI(creature);
+    }
 };
 
+// 81642
 class spell_dust_flail : public SpellScriptLoader
 {
     public:
@@ -839,12 +847,11 @@ class spell_dust_flail : public SpellScriptLoader
 void AddSC_boss_lockmaw_augh()
 {
     new boss_lockmaw();
-    new npc_frenzied_croc();
-    new npc_augh_intro();
-    new npc_augh_blow_dart();
-    new npc_augh_whirlwind();
-    new npc_augh_dragons_breath();
-    new boss_augh();
+    new npc_frenzied_crocolisk_43658();
+    new npc_augh_blow_dart_45379();
+    new npc_augh_whirlwind_45378();
+    new npc_frenzied_crocolisk_44892();
+    new boss_augh_49045();
     
     new spell_dust_flail();
 }

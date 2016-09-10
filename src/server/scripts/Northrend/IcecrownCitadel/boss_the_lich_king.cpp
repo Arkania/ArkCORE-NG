@@ -2273,7 +2273,7 @@ class spell_the_lich_king_quake : public SpellScriptLoader
 
             bool Load() override
             {
-                return GetCaster()->GetInstanceScript() != NULL;
+                return GetCaster()->GetInstanceScript() != nullptr;
             }
 
             void FilterTargets(std::list<WorldObject*>& targets)
@@ -2523,7 +2523,7 @@ class spell_the_lich_king_valkyr_target_search : public SpellScriptLoader
 
             bool Load() override
             {
-                _target = NULL;
+                _target = nullptr;
                 return true;
             }
 
@@ -2708,7 +2708,7 @@ class spell_the_lich_king_vile_spirit_move_target_search : public SpellScriptLoa
 
             bool Load() override
             {
-                _target = NULL;
+                _target = nullptr;
                 return GetCaster()->GetTypeId() == TYPEID_UNIT;
             }
 
@@ -2800,7 +2800,7 @@ class spell_the_lich_king_harvest_soul : public SpellScriptLoader
 
             bool Load() override
             {
-                return GetOwner()->GetInstanceScript() != NULL;
+                return GetOwner()->GetInstanceScript() != nullptr;
             }
 
             void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -2903,7 +2903,7 @@ class spell_the_lich_king_restore_soul : public SpellScriptLoader
             bool Load() override
             {
                 _instance = GetCaster()->GetInstanceScript();
-                return _instance != NULL;
+                return _instance != nullptr;
             }
 
             void HandleScript(SpellEffIndex /*effIndex*/)
@@ -2992,7 +2992,7 @@ class spell_the_lich_king_in_frostmourne_room : public SpellScriptLoader
 
             bool Load() override
             {
-                return GetOwner()->GetInstanceScript() != NULL;
+                return GetOwner()->GetInstanceScript() != nullptr;
             }
 
             void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)

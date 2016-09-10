@@ -486,7 +486,7 @@ void WorldSession::HandleBuyItemInSlotOpcode(WorldPacket& recvData)
         return;                                             // cheating
 
     uint8 bag = NULL_BAG;                                   // init for case invalid bagGUID
-    Item* bagItem = NULL;
+    Item* bagItem = nullptr;
     // find bag slot by bag guid
     if (bagguid == _player->GetGUID())
         bag = INVENTORY_SLOT_BAG_0;
@@ -1433,7 +1433,7 @@ void WorldSession::HandleTransmogrifyItems(WorldPacket& recvData)
             }
         }
 
-        Item* itemTransmogrifier = NULL;
+        Item* itemTransmogrifier = nullptr;
         // guid of the transmogrifier item, if it's not 0
         if (itemGuids[i])
         {

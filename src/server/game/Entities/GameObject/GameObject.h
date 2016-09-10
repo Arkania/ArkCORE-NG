@@ -610,6 +610,8 @@ struct GameObjectData
     GOState go_state;
     uint8 spawnMask;
     uint8 artKit;
+    std::set<uint16> phaseIds;
+    std::set<uint16> phaseGroups;
     bool dbData;
 };
 
@@ -726,7 +728,8 @@ class GameObject : public WorldObject, public GridObject<GameObject>, public Map
         void SetGoAnimProgress(uint8 animprogress) { SetByteValue(GAMEOBJECT_BYTES_1, 3, animprogress); }
         static void SetGoArtKit(uint8 artkit, GameObject* go, uint32 lowguid = 0);
 
-        void SetPhaseMask(uint32 newPhaseMask, bool update);
+        void SetPhaseMask(uint64 newPhaseMask, bool update);
+        bool SetInPhase(uint32 id, bool update, bool apply);
         void EnableCollision(bool enable);
 
         void Use(Unit* user);
@@ -793,6 +796,7 @@ class GameObject : public WorldObject, public GridObject<GameObject>, public Map
 
         GameObject* LookupFishingHoleAround(float range);
 
+		void TeleportToNearestChairSeat(Position pos, GameObjectTemplate const* info, Player* player);
         void CastSpell(Unit* target, uint32 spell, bool triggered = true);
         void SendCustomAnim(uint32 anim);
         bool IsInRange(float x, float y, float z, float radius) const;
@@ -832,6 +836,7 @@ class GameObject : public WorldObject, public GridObject<GameObject>, public Map
         float GetStationaryY() const { if (GetGOInfo()->type != GAMEOBJECT_TYPE_MO_TRANSPORT) return m_stationaryPosition.GetPositionY(); return GetPositionY(); }
         float GetStationaryZ() const { if (GetGOInfo()->type != GAMEOBJECT_TYPE_MO_TRANSPORT) return m_stationaryPosition.GetPositionZ(); return GetPositionZ(); }
         float GetStationaryO() const { if (GetGOInfo()->type != GAMEOBJECT_TYPE_MO_TRANSPORT) return m_stationaryPosition.GetOrientation(); return GetOrientation(); }
+        void RelocateStationaryPosition(float x, float y, float z, float o) { m_stationaryPosition.Relocate(x, y, z, o); }
 
         float GetInteractionDistance() const;
 

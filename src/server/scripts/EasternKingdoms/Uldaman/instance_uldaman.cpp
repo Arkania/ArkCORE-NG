@@ -335,7 +335,7 @@ class instance_uldaman : public InstanceMapScript
             }
             void SpawnHordeNpcs()
             {
-                GameObject* door = NULL;
+                GameObject* door = nullptr;
                 if (m_ListOfGUID[DATA_TEMPLE_DOOR_3] > 0)
                     if (door = instance->GetGameObject(m_ListOfGUID[DATA_TEMPLE_DOOR_3]))
                     {
@@ -357,7 +357,7 @@ class instance_uldaman : public InstanceMapScript
             }
             void SpawnAllyNpcs()
             {
-                GameObject* door = NULL;
+                GameObject* door = nullptr;
                 if (m_ListOfGUID[DATA_TEMPLE_DOOR_3 ] > 0)
                     if (door = instance->GetGameObject(m_ListOfGUID[DATA_TEMPLE_DOOR_3]))
                     {

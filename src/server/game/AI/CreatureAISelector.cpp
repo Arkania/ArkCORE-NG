@@ -31,7 +31,7 @@ namespace FactorySelector
 {
     CreatureAI* selectAI(Creature* creature)
     {
-        const CreatureAICreator* ai_factory = NULL;
+        const CreatureAICreator* ai_factory = nullptr;
         CreatureAIRegistry& ai_registry(*CreatureAIRepository::instance());
 
         if (creature->IsPet())
@@ -130,7 +130,7 @@ namespace FactorySelector
 
     GameObjectAI* SelectGameObjectAI(GameObject* go)
     {
-        const GameObjectAICreator* ai_factory = NULL;
+        const GameObjectAICreator* ai_factory = nullptr;
         GameObjectAIRegistry& ai_registry(*GameObjectAIRepository::instance());
 
         // scriptname in db

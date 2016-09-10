@@ -954,19 +954,15 @@ public:
     };
 };
 
-class npc_tornado : public CreatureScript // 46207
+// 46207
+class npc_tornado_46207 : public CreatureScript // 46207
 {
 public:
-    npc_tornado() : CreatureScript("npc_tornado") { }
+    npc_tornado_46207() : CreatureScript("npc_tornado_46207") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    struct npc_tornado_46207AI : public ScriptedAI
     {
-        return new npc_tornadoAI (creature);
-    }
-
-    struct npc_tornadoAI : public ScriptedAI
-    {
-        npc_tornadoAI(Creature* creature) : ScriptedAI(creature)
+        npc_tornado_46207AI(Creature* creature) : ScriptedAI(creature)
         {
             TargetSelectTimer = 2000;
             creature->SetReactState(REACT_PASSIVE);
@@ -986,6 +982,11 @@ public:
             } else TargetSelectTimer -= diff;
         }
     };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_tornado_46207AI(creature);
+    }
 };
 
 class npc_creeper_trigger : public CreatureScript // 45813
@@ -1021,15 +1022,15 @@ public:
     };
 };
 
-//hurricane will also act as the end trigger for the ultimates 
-class npc_hurricane : public CreatureScript
+// 46419 hurricane will also act as the end trigger for the ultimates 
+class npc_hurricane_46419 : public CreatureScript
 {
     public:
-        npc_hurricane() : CreatureScript("npc_hurricane") { }
+        npc_hurricane_46419() : CreatureScript("npc_hurricane_46419") { }
 
-        struct npc_hurricaneAI : public ScriptedAI
+        struct npc_hurricane_46419AI : public ScriptedAI
         {
-            npc_hurricaneAI(Creature* creature) : ScriptedAI(creature),
+            npc_hurricane_46419AI(Creature* creature) : ScriptedAI(creature),
                 grabbedPlayer(0), instance(creature->GetInstanceScript()) { }
 
             void Reset()
@@ -1098,7 +1099,7 @@ class npc_hurricane : public CreatureScript
 
         CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_hurricaneAI(creature);
+            return new npc_hurricane_46419AI(creature);
         }
 };
 
@@ -1143,8 +1144,8 @@ void AddSC_boss_conclave_of_wind()
     new boss_anshal();
     new boss_nezir();
     new boss_rohash();
-    new npc_hurricane();
-    new npc_tornado();
+    new npc_hurricane_46419();
+    new npc_tornado_46207();
     new npc_creeper_trigger();
-    new spell_hurricane();
+    //new spell_hurricane();
 }

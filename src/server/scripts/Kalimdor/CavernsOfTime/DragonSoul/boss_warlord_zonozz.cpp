@@ -138,14 +138,15 @@ Position const ShpereMaw[4] =
     { -1775.798f, -1926.559f, -226.353f }
 };
 
-class boss_warlord : public CreatureScript
+// 55308
+class boss_warlord_zonozz_55308 : public CreatureScript
 {
 public:
-    boss_warlord() : CreatureScript("boss_warlord") { }
+    boss_warlord_zonozz_55308() : CreatureScript("boss_warlord_zonozz_55308") { }
 
-    struct boss_warlordAI : public BossAI
+    struct boss_warlord_zonozz_55308AI : public BossAI
     {
-        boss_warlordAI(Creature* creature) : BossAI(creature, BOSS_WARLORD)
+        boss_warlord_zonozz_55308AI(Creature* creature) : BossAI(creature, BOSS_WARLORD)
         {
             instance = creature->GetInstanceScript();
         }
@@ -307,10 +308,11 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return GetDragonSoulAI<boss_warlordAI>(creature); // GetInstanceAI
+        return GetDragonSoulAI<boss_warlord_zonozz_55308AI>(creature); // GetInstanceAI
     }
 };
 
+// 55334
 class npc_sphere : public CreatureScript
 {
 public:
@@ -364,7 +366,7 @@ public:
                 }
             }
 
-            if (Creature* cmaw = me->FindNearestCreature(55544, 100.0f, true))
+            if (Creature* cmaw = me->FindNearestCreature(55544, 100.0f, true)) // Maw of Shu'ma 
             {
                 if (cmaw->GetDistance(me) >= 40.0f && !maw)
                 {
@@ -421,15 +423,16 @@ public:
     }
 };
 
-enum EyeSpells
-{
-    SPELL_SHADOW_GAZE = 109391
-};
-
+// 57875
 class npc_eye_of_gorath : public CreatureScript
 {
 public:
     npc_eye_of_gorath() : CreatureScript("npc_eye_of_gorath") { }
+
+    enum EyeSpells
+    {
+        SPELL_SHADOW_GAZE = 109391
+    };
 
     struct npc_eye_of_gorathAI : public ScriptedAI
     {
@@ -470,21 +473,19 @@ public:
     }
 };
 
-enum EyeSSpells
-{
-    SPELL_SHADOW_GAZE_S = 104347
-};
-
 class npc_eye_of_gorath_s : public CreatureScript
 {
 public:
     npc_eye_of_gorath_s() : CreatureScript("npc_eye_of_gorath_s") { }
 
+    enum EyeSSpells
+    {
+        SPELL_SHADOW_GAZE_S = 104347
+    };
+
     struct npc_eye_of_gorath_sAI : public ScriptedAI
     {
-        npc_eye_of_gorath_sAI(Creature* creature) : ScriptedAI(creature)
-        {
-        }
+        npc_eye_of_gorath_sAI(Creature* creature) : ScriptedAI(creature) { }
 
         EventMap events;
 
@@ -523,22 +524,20 @@ public:
     }
 };
 
-enum ScourgeSpells
-{
-    SPELL_SLUDHE_SPEW = 110102,
-    SPELL_WILD_FLAIL = 109199
-};
-
 class npc_scourge_of_gorath : public CreatureScript
 {
 public:
     npc_scourge_of_gorath() : CreatureScript("npc_scourge_of_gorath") { }
 
+    enum ScourgeSpells
+    {
+        SPELL_SLUDHE_SPEW = 110102,
+        SPELL_WILD_FLAIL = 109199
+    };
+
     struct npc_scourge_of_gorathAI : public ScriptedAI
     {
-        npc_scourge_of_gorathAI(Creature* creature) : ScriptedAI(creature)
-        {
-        }
+        npc_scourge_of_gorathAI(Creature* creature) : ScriptedAI(creature) { }
 
         EventMap events;
 
@@ -585,22 +584,20 @@ public:
     }
 };
 
-enum ScourheSSpells
-{
-    SPELL_SLUDHE_SPEW_S = 110297,
-    SPELL_WILD_FLAIL_S = 109199
-};
-
 class npc_scourge_of_gorath_s : public CreatureScript
 {
 public:
     npc_scourge_of_gorath_s() : CreatureScript("npc_scourge_of_gorath_s") { }
 
+    enum ScourheSSpells
+    {
+        SPELL_SLUDHE_SPEW_S = 110297,
+        SPELL_WILD_FLAIL_S = 109199
+    };
+
     struct npc_scourge_of_gorath_sAI : public ScriptedAI
     {
-        npc_scourge_of_gorath_sAI(Creature* creature) : ScriptedAI(creature)
-        {
-        }
+        npc_scourge_of_gorath_sAI(Creature* creature) : ScriptedAI(creature) {}
 
         EventMap events;
 
@@ -658,16 +655,16 @@ public:
     }
 };
 
-enum ClawSpells
-{
-    SPELL_OOZE_SPIT = 109396,
-    SPELL_TENTACLE_TOSS = 109243
-};
-
 class npc_claw_of_gorath : public CreatureScript
 {
 public:
     npc_claw_of_gorath() : CreatureScript("npc_claw_of_gorath") { }
+
+    enum ClawSpells
+    {
+        SPELL_OOZE_SPIT = 109396,
+        SPELL_TENTACLE_TOSS = 109243
+    };
 
     struct npc_claw_of_gorathAI : public ScriptedAI
     {
@@ -764,21 +761,19 @@ public:
     }
 };
 
-enum ClawSSpells
-{
-    SPELL_OOZE_SPIT_S = 109396
-};
-
 class npc_claw_of_gorath_s : public CreatureScript
 {
 public:
     npc_claw_of_gorath_s() : CreatureScript("npc_claw_of_gorath_s") { }
 
+    enum ClawSSpells
+    {
+        SPELL_OOZE_SPIT_S = 109396
+    };
+
     struct npc_claw_of_gorath_sAI : public ScriptedAI
     {
-        npc_claw_of_gorath_sAI(Creature* creature) : ScriptedAI(creature)
-        {
-        }
+        npc_claw_of_gorath_sAI(Creature* creature) : ScriptedAI(creature) { }
 
         EventMap events;
 
@@ -828,12 +823,12 @@ public:
 
 void AddSC_boss_warlord()
 {
-    new boss_warlord();
+    new boss_warlord_zonozz_55308();
     new npc_sphere();
     new npc_eye_of_gorath();
-    new npc_scourge_of_gorath();
-    new npc_claw_of_gorath();
-    new npc_eye_of_gorath_s();
-    new npc_scourge_of_gorath_s();
-    new npc_claw_of_gorath_s();
+    //new npc_scourge_of_gorath();
+    //new npc_claw_of_gorath();
+    //new npc_eye_of_gorath_s();
+    //new npc_scourge_of_gorath_s();
+    //new npc_claw_of_gorath_s();
 }

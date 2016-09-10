@@ -187,8 +187,8 @@ public:
 
         void Initialize()
         {
-            m_hulkGUID = NULL;
-            m_playerGUID = NULL;            
+            m_hulkGUID = 0;
+            m_playerGUID = 0;            
             FillHulkPositionList();
         }
 
@@ -447,10 +447,10 @@ public:
             m_events.Reset();
             m_events.ScheduleEvent(EVENT_CHECK_POSITION, 1000);
             m_phase = PHASE_START_TO_EAST;
-            m_playerGUID = NULL;
-            m_shinGUID = NULL;
-            m_kodo1GUID = NULL;
-            m_kodo2GUID = NULL;
+            m_playerGUID = 0;
+            m_shinGUID = 0;
+            m_kodo1GUID = 0;
+            m_kodo2GUID = 0;
             FindShinStonepillar();
         }
 
@@ -466,7 +466,7 @@ public:
                 if (apply)
                     m_playerGUID = player->GetGUID();
                 else
-                    m_playerGUID = NULL;
+                    m_playerGUID = 0;
             
             FindShinStonepillar();
         }

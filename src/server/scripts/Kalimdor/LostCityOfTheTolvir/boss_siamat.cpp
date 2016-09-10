@@ -107,19 +107,15 @@ const uint32 StaticShock[3]=
 
 #define    FLOR_COORD_Z    36.0f
 
-class boss_siamat : public CreatureScript
+// 44819
+class boss_siamat_44819 : public CreatureScript
 {
 public:
-    boss_siamat() : CreatureScript("boss_siamat") { }
+    boss_siamat_44819() : CreatureScript("boss_siamat_44819") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    struct boss_siamat_44819AI : public ScriptedAI
     {
-        return new boss_siamatAI (creature);
-    }
-
-    struct boss_siamatAI : public ScriptedAI
-    {
-        boss_siamatAI(Creature* creature) : ScriptedAI(creature), lSummons(me)
+        boss_siamat_44819AI(Creature* creature) : ScriptedAI(creature), lSummons(me)
         {
             instance = creature->GetInstanceScript();
             me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
@@ -285,21 +281,22 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-};
-
-class npc_servant_of_siamat : public CreatureScript
-{
-public:
-    npc_servant_of_siamat() : CreatureScript("npc_servant_of_siamat") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_servant_of_siamatAI (creature);
+        return new boss_siamat_44819AI(creature);
     }
+};
 
-    struct npc_servant_of_siamatAI : public ScriptedAI
+// 45269
+class npc_servant_of_siamat_45269 : public CreatureScript
+{
+public:
+    npc_servant_of_siamat_45269() : CreatureScript("npc_servant_of_siamat_45269") { }
+
+    struct npc_servant_of_siamat_45269AI : public ScriptedAI
     {
-        npc_servant_of_siamatAI(Creature* creature) : ScriptedAI(creature)
+        npc_servant_of_siamat_45269AI(Creature* creature) : ScriptedAI(creature)
         {
             instance = creature->GetInstanceScript();
             me->SetInCombatWithZone();
@@ -384,21 +381,22 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-};
-
-class npc_siamat_minion : public CreatureScript
-{
-public:
-    npc_siamat_minion() : CreatureScript("npc_siamat_minion") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_siamat_minionAI (creature);
+        return new npc_servant_of_siamat_45269AI(creature);
     }
+};
 
-    struct npc_siamat_minionAI : public ScriptedAI
+// 44704
+class npc_minion_of_siamat_44704 : public CreatureScript
+{
+public:
+    npc_minion_of_siamat_44704() : CreatureScript("npc_minion_of_siamat_44704") { }
+
+    struct npc_minion_of_siamat_44704AI : public ScriptedAI
     {
-        npc_siamat_minionAI(Creature* creature) : ScriptedAI(creature)
+        npc_minion_of_siamat_44704AI(Creature* creature) : ScriptedAI(creature)
         {
             me->SetInCombatWithZone();
         }
@@ -475,21 +473,22 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-};
-
-class npc_cloud_burst : public CreatureScript
-{
-public:
-    npc_cloud_burst() : CreatureScript("npc_cloud_burst") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_cloud_burstAI (creature);
+        return new npc_minion_of_siamat_44704AI(creature);
     }
+};
 
-    struct npc_cloud_burstAI : public ScriptedAI
+// 44541
+class npc_cloud_burst_44541 : public CreatureScript
+{
+public:
+    npc_cloud_burst_44541() : CreatureScript("npc_cloud_burst_44541") { }
+
+    struct npc_cloud_burst_44541AI : public ScriptedAI
     {
-        npc_cloud_burstAI(Creature* creature) : ScriptedAI(creature)
+        npc_cloud_burst_44541AI(Creature* creature) : ScriptedAI(creature)
         {
             uiTickCount = 0;
             me->SetInCombatWithZone();
@@ -515,8 +514,14 @@ public:
             }
         }
     };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_cloud_burst_44541AI(creature);
+    }
 };
 
+// 83089
 class spell_wailing_winds : public SpellScriptLoader
 {
     public:
@@ -556,7 +561,7 @@ class spell_wailing_winds : public SpellScriptLoader
 
             void Register()
             {
-                OnEffectHitTarget += SpellEffectFn(spell_wailing_winds_SpellScript::RandomJump, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+                OnEffectHitTarget += SpellEffectFn(spell_wailing_winds_SpellScript::RandomJump, EFFECT_2, SPELL_EFFECT_KNOCK_BACK);
             }
         };
 
@@ -566,6 +571,7 @@ class spell_wailing_winds : public SpellScriptLoader
         }
 };
 
+// 84982
 class spell_gathered_storms : public SpellScriptLoader
 {
     public:
@@ -604,6 +610,7 @@ class spell_gathered_storms : public SpellScriptLoader
         }
 };
 
+// 5292
 class achievement_headed_south : public AchievementCriteriaScript
 {
     public:
@@ -621,10 +628,10 @@ class achievement_headed_south : public AchievementCriteriaScript
 
 void AddSC_boss_siamat()
 {
-    new boss_siamat();
-    new npc_servant_of_siamat();
-    new npc_siamat_minion();
-    new npc_cloud_burst();
+    new boss_siamat_44819();
+    new npc_servant_of_siamat_45269();
+    new npc_minion_of_siamat_44704();
+    new npc_cloud_burst_44541();
 
     new spell_wailing_winds();
     new spell_gathered_storms();

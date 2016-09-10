@@ -24,48 +24,6 @@
 #include "Errors.h" // for ASSERT
 #include <ace/TSS_T.h>
 
-typedef ACE_TSS<SFMTRand> SFMTRandTSS;
-static SFMTRandTSS sfmtRand;
-
-int32 irand(int32 min, int32 max)
-{
-    ASSERT(max >= min);
-    return int32(sfmtRand->IRandom(min, max));
-}
-
-uint32 urand(uint32 min, uint32 max)
-{
-    ASSERT(max >= min);
-    return sfmtRand->URandom(min, max);
-}
-
-float frand(float min, float max)
-{
-    ASSERT(max >= min);
-    return float(sfmtRand->Random() * (max - min) + min);
-}
-
-int32 rand32()
-{
-    return int32(sfmtRand->BRandom());
-}
-
-double rand_norm(void)
-{
-    return sfmtRand->Random();
-}
-
-double rand_chance(void)
-{
-    return sfmtRand->Random() * 100.0;
-}
-
-bool rand_chance(uint8 percent)
-{    
-    uint8 rol = urand(0, 100);
-    return percent > rol ? true : false;
-}
-
 Tokenizer::Tokenizer(const std::string &src, const char sep, uint32 vectorReserve)
 {
     m_str = new char[src.length() + 1];
@@ -554,3 +512,59 @@ std::string ByteArrayToHexStr(uint8 const* bytes, uint32 arrayLen, bool reverse 
 
     return ss.str();
 }
+
+std::set<uint32> GetUIntegerList(std::string storedString)
+{
+    std::set<uint32> r;
+
+    if (storedString.empty())
+        return r;
+
+    uint32 i;
+    std::istringstream data(storedString);
+    do
+    {
+        i=0;
+        data >> i;
+        if (i) r.insert(i);
+    } while (i);
+    return r;
+}
+
+std::string GetUIntegerString(std::set<uint32> uint32List)
+{
+    std::ostringstream ss;
+    ss << uint32List.size() << ' ';
+    for (uint16 i : uint32List)
+        ss << i << ' ';
+    return ss.str();
+}
+
+std::set<uint16> GetUInt16List(std::string storedString)
+{
+    std::set<uint16> r;
+
+    if (storedString.empty())
+        return r;
+
+    uint32 i;
+    std::istringstream data(storedString);
+    do
+    {
+        i = 0;
+        data >> i;
+        if (i) r.insert(i);
+    } while (i);
+    return r;
+}
+
+std::string GetUInt16String(std::set<uint16> uint16List)
+{
+    std::ostringstream ss;
+    ss << uint16List.size() << ' ';
+    for (uint16 i : uint16List)
+        ss << i << ' ';
+    return ss.str();
+}
+
+

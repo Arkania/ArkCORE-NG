@@ -1072,7 +1072,7 @@ void AddSC_npc_trash_sdo()
     new npc_glisseur_venimeux();
     new npc_horreur_os_poussiere();
     new npc_tourmenteur_os_poussiere();
-    new npc_chercheur_du_vide();
+    //new npc_chercheur_du_vide();
     new npc_seigneur_du_vide();
     new npc_anomalie_spatiale();
     new npc_animateur_de_flux();

@@ -110,19 +110,15 @@ enum Models
     INVISIBLE_CREATURE_MODEL                   = 11686
 };
 
-class boss_high_prophet_barim : public CreatureScript
+// 43612
+class boss_high_prophet_barim_43612 : public CreatureScript
 {
 public:
-    boss_high_prophet_barim() : CreatureScript("boss_high_prophet_barim") { }
+    boss_high_prophet_barim_43612() : CreatureScript("boss_high_prophet_barim_43612") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    struct boss_high_prophet_barim_43612AI : public ScriptedAI
     {
-        return new boss_high_prophet_barimAI (creature);
-    }
-
-    struct boss_high_prophet_barimAI : public ScriptedAI
-    {
-        boss_high_prophet_barimAI(Creature* creature) : ScriptedAI(creature), lSummons(me)
+        boss_high_prophet_barim_43612AI(Creature* creature) : ScriptedAI(creature), lSummons(me)
         {
             instance = creature->GetInstanceScript();
             me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
@@ -362,21 +358,22 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-};
-
-class npc_blaze_of_the_heavens : public CreatureScript
-{
-public:
-    npc_blaze_of_the_heavens() : CreatureScript("npc_blaze_of_the_heavens") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_blaze_of_the_heavensAI (creature);
+        return new boss_high_prophet_barim_43612AI(creature);
     }
+};
 
-    struct npc_blaze_of_the_heavensAI : public ScriptedAI
+// 48904
+class npc_blaze_of_the_heavens_48904 : public CreatureScript
+{
+public:
+    npc_blaze_of_the_heavens_48904() : CreatureScript("npc_blaze_of_the_heavens_48904") { }
+
+    struct npc_blaze_of_the_heavens_48904AI : public ScriptedAI
     {
-        npc_blaze_of_the_heavensAI(Creature* creature) : ScriptedAI(creature), lSummons(me)
+        npc_blaze_of_the_heavens_48904AI(Creature* creature) : ScriptedAI(creature), lSummons(me)
         {
             me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
             me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
@@ -554,21 +551,22 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-};
-
-class npc_repentance_mirror : public CreatureScript
-{
-public:
-    npc_repentance_mirror() : CreatureScript("npc_repentance_mirror") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_repentance_mirrorAI (creature);
+        return new npc_blaze_of_the_heavens_48904AI(creature);
     }
+};
 
-    struct npc_repentance_mirrorAI : public ScriptedAI
+// 43817
+class npc_repentance_mirror_43817 : public CreatureScript
+{
+public:
+    npc_repentance_mirror_43817() : CreatureScript("npc_repentance_mirror_43817") { }
+
+    struct npc_repentance_mirror_43817AI : public ScriptedAI
     {
-        npc_repentance_mirrorAI(Creature* creature) : ScriptedAI(creature)
+        npc_repentance_mirror_43817AI(Creature* creature) : ScriptedAI(creature)
         {
             InstanceScript* instance = creature->GetInstanceScript();
             uiBirthTimer = 250;
@@ -628,21 +626,22 @@ public:
             }
         }
     };
-};
-
-class npc_harbinger_of_darkness : public CreatureScript
-{
-public:
-    npc_harbinger_of_darkness() : CreatureScript("npc_harbinger_of_darkness") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_harbinger_of_darknessAI (creature);
+        return new npc_repentance_mirror_43817AI(creature);
     }
+};
 
-    struct npc_harbinger_of_darknessAI : public ScriptedAI
+// 43927 
+class npc_harbinger_of_darkness_43927 : public CreatureScript
+{
+public:
+    npc_harbinger_of_darkness_43927() : CreatureScript("npc_harbinger_of_darkness_43927") { }
+
+    struct npc_harbinger_of_darkness_43927AI : public ScriptedAI
     {
-        npc_harbinger_of_darknessAI(Creature* creature) : ScriptedAI(creature)
+        npc_harbinger_of_darkness_43927AI(Creature* creature) : ScriptedAI(creature)
         {
             me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
             me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
@@ -772,21 +771,22 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-};
-
-class npc_soul_fragment : public CreatureScript
-{
-public:
-    npc_soul_fragment() : CreatureScript("npc_soul_fragment") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_soul_fragmentAI (creature);
+        return new npc_harbinger_of_darkness_43927AI(creature);
     }
+};
 
-    struct npc_soul_fragmentAI : public ScriptedAI
+// 43934
+class npc_soul_fragment_43934 : public CreatureScript
+{
+public:
+    npc_soul_fragment_43934() : CreatureScript("npc_soul_fragment_43934") { }
+
+    struct npc_soul_fragment_43934AI : public ScriptedAI
     {
-        npc_soul_fragmentAI(Creature* creature) : ScriptedAI(creature)
+        npc_soul_fragment_43934AI(Creature* creature) : ScriptedAI(creature)
         {
             instance = creature->GetInstanceScript();
             me->SetReactState(REACT_PASSIVE);
@@ -887,7 +887,7 @@ public:
 
         bool DoUpdate(const uint32 time_diff)
         {
-            Unit* target = NULL;
+            Unit* target = nullptr;
 
             if (instance)
                 target = Unit::GetCreature(*me, instance->GetData64(DATA_HARBINGER));
@@ -955,8 +955,14 @@ public:
             //DoUpdate(diff);
         }
     };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_soul_fragment_43934AI(creature);
+    }
 };
 
+// 82168
 class spell_repentance_pull_player : public SpellScriptLoader
 {
     public:
@@ -1084,8 +1090,8 @@ class spell_copy_melee_weapon : public SpellScriptLoader
 
             void Register()
             {
-                OnEffectApply += AuraEffectApplyFn(spell_copy_melee_weapon_AuraScript::ApplyEffect, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
-                OnEffectRemove += AuraEffectRemoveFn(spell_copy_melee_weapon_AuraScript::RemoveEffect, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
+                OnEffectApply += AuraEffectApplyFn(spell_copy_melee_weapon_AuraScript::ApplyEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT, AURA_EFFECT_HANDLE_REAL);
+                OnEffectRemove += AuraEffectRemoveFn(spell_copy_melee_weapon_AuraScript::RemoveEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT, AURA_EFFECT_HANDLE_REAL);
             }
         };
 
@@ -1095,6 +1101,7 @@ class spell_copy_melee_weapon : public SpellScriptLoader
         }
 };
 
+// 81947
 class spell_repentance_player_kneel : public SpellScriptLoader
 {
     public:
@@ -1121,6 +1128,7 @@ class spell_repentance_player_kneel : public SpellScriptLoader
         }
 };
 
+// 82009
 class spell_repentance_player_summon_mirror : public SpellScriptLoader
 {
     public:
@@ -1162,15 +1170,15 @@ class spell_repentance_player_summon_mirror : public SpellScriptLoader
 
 void AddSC_boss_high_prophet_barim()
 {
-    new boss_high_prophet_barim();
-    new npc_blaze_of_the_heavens();
-    new npc_repentance_mirror();
-    new npc_harbinger_of_darkness();
-    new npc_soul_fragment();
+    new boss_high_prophet_barim_43612();
+    new npc_blaze_of_the_heavens_48904();
+    new npc_repentance_mirror_43817();
+    new npc_harbinger_of_darkness_43927();
+    new npc_soul_fragment_43934();
 
     new spell_repentance_pull_player();
-    new spell_repentance_trigger_clone_spell();
-    new spell_copy_melee_weapon();
+    // new spell_repentance_trigger_clone_spell();
+    // new spell_copy_melee_weapon();
     new spell_repentance_player_kneel();
-    new spell_repentance_player_summon_mirror();
+    // new spell_repentance_player_summon_mirror();
 }

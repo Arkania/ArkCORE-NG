@@ -186,7 +186,7 @@ int Master::Run()
     ACE_Based::Thread worldThread(new WorldRunnable);
     worldThread.setPriority(ACE_Based::Highest);
 
-    ACE_Based::Thread* cliThread = NULL;
+    ACE_Based::Thread* cliThread = nullptr;
 
 #ifdef _WIN32
     if (sConfigMgr->GetBoolDefault("Console.Enable", true) && (m_ServiceStatus == -1)/* need disable console in service mode*/)
@@ -269,7 +269,7 @@ int Master::Run()
 #endif
 
     //Start soap serving thread
-    ACE_Based::Thread* soapThread = NULL;
+    ACE_Based::Thread* soapThread = nullptr;
 
     if (sConfigMgr->GetBoolDefault("SOAP.Enabled", false))
     {
@@ -303,7 +303,9 @@ int Master::Run()
 
     TC_LOG_INFO("server.worldserver", "%s (worldserver-daemon) ready...", _FULLVERSION);
 
-    // ASSERT(false);  // my debugging stop
+#ifdef _DEBUG
+    ASSERT(false);  // my debugging stop
+#endif
 
     // when the main thread closes the singletons get unloaded
     // since worldrunnable uses them, it will crash if unloaded after master

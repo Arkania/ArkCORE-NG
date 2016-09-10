@@ -1437,6 +1437,7 @@ class OrderWhelpTargetSelector
         Creature* _owner;
 };
 
+// 71357
 class spell_frostwarden_handler_order_whelp : public SpellScriptLoader
 {
     public:

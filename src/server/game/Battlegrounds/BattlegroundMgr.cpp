@@ -96,7 +96,7 @@ void BattlegroundMgr::Update(uint32 diff)
             bg->Update(diff);
             if (bg->ToBeDeleted())
             {
-                itrDelete->second = NULL;
+                itrDelete->second = nullptr;
                 bgs.erase(itrDelete);
                 BattlegroundClientIdsContainer& clients = itr1->second.m_ClientBattlegroundIds[bg->GetBracketId()];
                 if (!clients.empty())
@@ -857,7 +857,7 @@ Battleground* BattlegroundMgr::CreateNewBattleground(BattlegroundTypeId original
         return NULL;
     }
 
-    Battleground* bg = NULL;
+    Battleground* bg = nullptr;
     // create a copy of the BG template
     switch (bgTypeId)
     {
@@ -948,7 +948,7 @@ Battleground* BattlegroundMgr::CreateNewBattleground(BattlegroundTypeId original
 bool BattlegroundMgr::CreateBattleground(CreateBattlegroundData& data)
 {
     // Create the BG
-    Battleground* bg = NULL;
+    Battleground* bg = nullptr;
     switch (data.bgTypeId)
     {
         case BATTLEGROUND_AV:

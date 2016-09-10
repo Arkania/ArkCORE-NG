@@ -375,13 +375,13 @@ void Log::SetRealmId(uint32 id)
 void Log::Close()
 {
     delete worker;
-    worker = NULL;
+    worker = nullptr;
     loggers.clear();
     cachedLoggers.clear();
     for (AppenderMap::iterator it = appenders.begin(); it != appenders.end(); ++it)
     {
         delete it->second;
-        it->second = NULL;
+        it->second = nullptr;
     }
     appenders.clear();
 }

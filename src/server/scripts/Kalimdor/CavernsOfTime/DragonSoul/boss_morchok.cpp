@@ -907,6 +907,8 @@ public:
     }
 };
 
+// http://www.wowhead.com/spell=103785/black-blood-of-the-earth
+// http://www.wowhead.com/spell=103180/black-blood-of-the-earth
 // 55267
 class npc_black_blood_of_the_earth : public CreatureScript 
 {
@@ -1178,7 +1180,7 @@ void AddSC_boss_morchok()
     new npc_minor_resonating_crystal();
     new spell_morchok_stomp();
     new spell_morchok_black_blood();
-    new npc_black_blood_of_the_earth();
+    //new npc_black_blood_of_the_earth();
 
     new boss_morchok2();
     new npc_kohcrom2();

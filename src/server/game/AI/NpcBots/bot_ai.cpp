@@ -78,9 +78,9 @@ bot_ai::bot_ai(Creature* creature) : ScriptedAI(creature)
     hit = 0.f;
     regen_mp5 = 0.f;
     m_TankGuid = 0;
-    tank = NULL;
-    extank = NULL;
-    info = NULL;
+    tank = nullptr;
+    extank = nullptr;
+    info = nullptr;
     clear_cd = 2;
     temptimer = 0;
     wait = 15;
@@ -528,7 +528,7 @@ Unit* bot_ai::_GetBotGroupMainTank(Group* group)
     //QueryResult result = CharacterDatabase.PQuery("SELECT memberGuid, memberFlags FROM `group_member` WHERE `guid`='%u'", group->GetGUID());
     if (!result)
         return NULL;
-    Unit* unit = NULL;
+    Unit* unit = nullptr;
     do
     {
         Field* field = result->Fetch();
@@ -574,7 +574,7 @@ void bot_minion_ai::BuffAndHealGroup(Player* gPlayer, uint32 diff)
         return;
     }
     bool Bots = false;
-    for (GroupReference* itr = pGroup->GetFirstMember(); itr != NULL; itr = itr->next())
+    for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
     {
         Player* tPlayer = itr->GetSource();
         if (tPlayer == NULL) continue;
@@ -589,7 +589,7 @@ void bot_minion_ai::BuffAndHealGroup(Player* gPlayer, uint32 diff)
     }
     if (Bots)
     {
-        for (GroupReference* itr = pGroup->GetFirstMember(); itr != NULL; itr = itr->next())
+        for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
         {
             Player* tPlayer = itr->GetSource();
             if (tPlayer == NULL || tPlayer->m_Controlled.empty()) continue;
@@ -663,7 +663,7 @@ void bot_minion_ai::RezGroup(uint32 REZZ, Player* gPlayer)
         }
         return;
     }
-    for (GroupReference* itr = pGroup->GetFirstMember(); itr != NULL; itr = itr->next())
+    for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
     {
         Player* tPlayer = itr->GetSource();
         Unit* target = tPlayer;
@@ -723,7 +723,7 @@ void bot_minion_ai::CureGroup(Player* pTarget, uint32 cureSpell, uint32 diff)
     else
     {
         bool Bots = false;
-        for (GroupReference* itr = pGroup->GetFirstMember(); itr != NULL; itr = itr->next())
+        for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
         {
             Player* tPlayer = itr->GetSource();
             if (!tPlayer || (tPlayer->IsDead() && !tPlayer->HaveBot())) continue;
@@ -736,7 +736,7 @@ void bot_minion_ai::CureGroup(Player* pTarget, uint32 cureSpell, uint32 diff)
                 return;
         }
         if (!Bots) return;
-        for (GroupReference* itr = pGroup->GetFirstMember(); itr != NULL; itr = itr->next())
+        for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
         {
             Player* tPlayer = itr->GetSource();
             if (tPlayer == NULL || !tPlayer->HaveBot()) continue;
@@ -991,7 +991,7 @@ void bot_ai::listAuras(Player* player, Unit* unit) const
         ch.PSendSysMessage("haste: %u *10 pct", haste);
         for (uint8 i = SPELL_SCHOOL_HOLY; i != MAX_SPELL_SCHOOL; ++i)
         {
-            const char* resist = NULL;
+            const char* resist = nullptr;
             switch (i)
             {
                 case 1: resist = "holy";   break;
@@ -1108,8 +1108,10 @@ void bot_minion_ai::setStats(uint8 myclass, uint8 myrace, uint8 mylevel, bool fo
     }
 
     //PHASE
-    if (master->GetPhaseMask() != me->GetPhaseMask())
-        me->SetPhaseMask(master->GetPhaseMask(), true);
+    me->CopyPhaseFrom(master, true);
+    //if (master->GetPhaseMask() != me->GetPhaseMask())
+    //    me->SetPhaseMask(master->GetPhaseMask(), true);
+
     //INIT STATS
     //partially receive master's stats and get base class stats, we'll need all this later
     uint8 tempclass = myclass == DRUID_BEAR_FORM || myclass == DRUID_CAT_FORM ? CLASS_DRUID : myclass;
@@ -1480,8 +1482,9 @@ void bot_pet_ai::setStats(uint8 mylevel, uint8 petType, bool force)
         InitSpells();
 
     //PHASE
-    if (master->GetPhaseMask() != me->GetPhaseMask())
-        me->SetPhaseMask(master->GetPhaseMask(), true);
+    me->CopyPhaseFrom(master, true);
+    //if (master->GetPhaseMask() != me->GetPhaseMask())
+    //    me->SetPhaseMask(master->GetPhaseMask(), true);
 
     ////INIT STATS
     //uint8 botclass = m_creatureOwner->GetBotClass();
@@ -2047,7 +2050,7 @@ Unit* bot_ai::getTarget(bool byspell, bool ranged, bool &reset) const
     }
     else
     {
-        for (GroupReference* ref = gr->GetFirstMember(); ref != NULL; ref = ref->next())
+        for (GroupReference* ref = gr->GetFirstMember(); ref != nullptr; ref = ref->next())
         {
             Player* pl = ref->GetSource();
             if (!pl || !pl->IsInWorld() || pl->IsBeingTeleported()) continue;
@@ -2092,7 +2095,7 @@ Unit* bot_ai::getTarget(bool byspell, bool ranged, bool &reset) const
     }
 
     //check targets around
-    Unit* t = NULL;
+    Unit* t = nullptr;
     float maxdist = InitAttackRange(float(followdist), ranged);
     //first cycle we search non-cced target, then, if not found, check all
     for (uint8 i = 0; i != 2; ++i)
@@ -2471,7 +2474,7 @@ Unit* bot_minion_ai::FindHostileDispelTarget(float dist, bool stealable) const
     Cell cell(p);
     cell.SetNoCreate();
 
-    Unit* unit = NULL;
+    Unit* unit = nullptr;
 
     HostileDispelTargetCheck check(me, dist, stealable, this);
     Trinity::UnitLastSearcher <HostileDispelTargetCheck> searcher(me, unit, check);
@@ -2500,7 +2503,7 @@ Unit* bot_minion_ai::FindAffectedTarget(uint32 spellId, uint64 caster, float dis
     Cell cell(p);
     cell.SetNoCreate();
 
-    Unit* unit = NULL;
+    Unit* unit = nullptr;
 
     AffectedTargetCheck check(caster, dist, spellId, master, hostile);
     Trinity::UnitLastSearcher <AffectedTargetCheck> searcher(master, unit, check);
@@ -2523,7 +2526,7 @@ Unit* bot_minion_ai::FindPolyTarget(float dist, Unit* currTarget) const
     Cell cell(p);
     cell.SetNoCreate();
 
-    Unit* unit = NULL;
+    Unit* unit = nullptr;
 
     PolyUnitCheck check(me, dist, currTarget);
     Trinity::UnitLastSearcher <PolyUnitCheck> searcher(me, unit, check);
@@ -2543,7 +2546,7 @@ Unit* bot_minion_ai::FindFearTarget(float dist) const
     Cell cell(p);
     cell.SetNoCreate();
 
-    Unit* unit = NULL;
+    Unit* unit = nullptr;
 
     FearUnitCheck check(me, dist);
     Trinity::UnitLastSearcher <FearUnitCheck> searcher(me, unit, check);
@@ -2563,7 +2566,7 @@ Unit* bot_minion_ai::FindStunTarget(float dist) const
     Cell cell(p);
     cell.SetNoCreate();
 
-    Unit* unit = NULL;
+    Unit* unit = nullptr;
 
     StunUnitCheck check(me, dist);
     Trinity::UnitLastSearcher <StunUnitCheck> searcher(me, unit, check);
@@ -2583,7 +2586,7 @@ Unit* bot_minion_ai::FindUndeadCCTarget(float dist, uint32 spellId/* = 0*/) cons
     Cell cell(p);
     cell.SetNoCreate();
 
-    Unit* unit = NULL;
+    Unit* unit = nullptr;
 
     UndeadCCUnitCheck check(me, dist, spellId);
     Trinity::UnitLastSearcher <UndeadCCUnitCheck> searcher(me, unit, check);
@@ -2603,7 +2606,7 @@ Unit* bot_minion_ai::FindRootTarget(float dist, uint32 spellId) const
     Cell cell(p);
     cell.SetNoCreate();
 
-    Unit* unit = NULL;
+    Unit* unit = nullptr;
 
     RootUnitCheck check(me, me->GetVictim(), dist, spellId);
     Trinity::UnitLastSearcher <RootUnitCheck> searcher(me, unit, check);
@@ -2623,7 +2626,7 @@ Unit* bot_minion_ai::FindCastingTarget(float maxdist, float mindist, bool isFrie
     Cell cell(p);
     cell.SetNoCreate();
 
-    Unit* unit = NULL;
+    Unit* unit = nullptr;
 
     CastingUnitCheck check(me, mindist, maxdist, isFriend, spellId);
     Trinity::UnitLastSearcher <CastingUnitCheck> searcher(me, unit, check);
@@ -2644,7 +2647,7 @@ Unit* bot_minion_ai::FindAOETarget(float dist, bool checkbots, bool targetfriend
     if (IsCasting())
         return NULL;
 
-    Unit* unit = NULL;
+    Unit* unit = nullptr;
     Group* pGroup = master->GetGroup();
     if (!pGroup)
     {
@@ -2704,7 +2707,7 @@ Unit* bot_minion_ai::FindAOETarget(float dist, bool checkbots, bool targetfriend
         return unit;
     }
     bool Bots = false;
-    for (GroupReference* itr = pGroup->GetFirstMember(); itr != NULL; itr = itr->next())
+    for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
     {
         Player* tPlayer = itr->GetSource();
         if (!tPlayer) continue;
@@ -2737,7 +2740,7 @@ Unit* bot_minion_ai::FindAOETarget(float dist, bool checkbots, bool targetfriend
         if (unit) return unit;
     }//end for
     if (!Bots) return NULL;
-    for (GroupReference* itr = pGroup->GetFirstMember(); itr != NULL; itr = itr->next())
+    for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
     {
         Player* tPlayer = itr->GetSource();
         if (tPlayer == NULL || !tPlayer->HaveBot()) continue;
@@ -2790,7 +2793,7 @@ Unit* bot_minion_ai::FindSplashTarget(float dist, Unit* To, float splashdist) co
     Cell cell(p);
     cell.SetNoCreate();
 
-    Unit* unit = NULL;
+    Unit* unit = nullptr;
 
     SecondEnemyCheck check(me, dist, splashdist, To, this);
     Trinity::UnitLastSearcher <SecondEnemyCheck> searcher(me, unit, check);
@@ -2810,7 +2813,7 @@ Unit* bot_minion_ai::FindTranquilTarget(float mindist, float maxdist) const
     Cell cell(p);
     cell.SetNoCreate();
 
-    Unit* unit = NULL;
+    Unit* unit = nullptr;
 
     TranquilTargetCheck check(me, mindist, maxdist, this);
     Trinity::UnitLastSearcher <TranquilTargetCheck> searcher(me, unit, check);

@@ -1,0 +1,6 @@
+
+DROP DATABASE IF EXISTS `ng_world`;
+
+DROP DATABASE IF EXISTS `ng_characters`;
+
+DROP DATABASE IF EXISTS `ng_auth`;

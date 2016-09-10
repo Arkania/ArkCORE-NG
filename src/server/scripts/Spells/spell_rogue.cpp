@@ -565,7 +565,7 @@ class spell_rog_blade_flurry : public SpellScriptLoader
 
             bool Load() override
             {
-                _procTarget = NULL;
+                _procTarget = nullptr;
                 return true;
             }
 
@@ -1083,7 +1083,7 @@ public:
 
         bool Load() override
         {
-            _redirectTarget = NULL;
+            _redirectTarget = nullptr;
             return true;
         }
 

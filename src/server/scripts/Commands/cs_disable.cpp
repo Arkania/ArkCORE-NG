@@ -190,7 +190,7 @@ public:
                 break;
         }
 
-        PreparedStatement* stmt = NULL;
+        PreparedStatement* stmt = nullptr;
         stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_DISABLES);
         stmt->setUInt32(0, entry);
         stmt->setUInt8(1, disableType);
@@ -316,7 +316,7 @@ public:
                 break;
         }
 
-        PreparedStatement* stmt = NULL;
+        PreparedStatement* stmt = nullptr;
         stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_DISABLES);
         stmt->setUInt32(0, entry);
         stmt->setUInt8(1, disableType);

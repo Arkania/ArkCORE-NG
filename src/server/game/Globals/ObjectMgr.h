@@ -43,7 +43,6 @@
 #include <limits>
 #include "ConditionMgr.h"
 #include <functional>
-#include "PhaseMgr.h"
 #include "DB2Stores.h"
 
 class Item;
@@ -770,6 +769,8 @@ class ObjectMgr
         ItemTemplateContainer const* GetItemTemplateStore() const { return &_itemTemplateStore; }
         uint32 GetCreatureDisplay(int32 modelid) const;
 
+        static bool IsConditionTypeSupported(ConditionTypes conditionType);
+
         InstanceTemplate const* GetInstanceTemplate(uint32 mapId);
 
         PetLevelInfo const* GetPetLevelInfo(uint32 creature_id, uint8 level) const;
@@ -1337,6 +1338,8 @@ class ObjectMgr
         void LoadFactionChangeReputations();
         void LoadFactionChangeSpells();
         void LoadFactionChangeTitles();
+
+        bool IsTransportMap(uint32 mapId) const { return _transportMaps.count(mapId) != 0; }
 
         void LoadHotfixData();
         HotfixData const& GetHotfixData() const { return _hotfixData; }

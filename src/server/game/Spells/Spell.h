@@ -213,6 +213,8 @@ enum SpellEffectHandleMode
     SPELL_EFFECT_HANDLE_HIT_TARGET
 };
 
+static const uint32 SPELL_INTERRUPT_NONPLAYER = 32747;
+
 class Spell
 {
     friend void Unit::SetCurrentCastSpell(Spell* pSpell);
@@ -352,6 +354,8 @@ class Spell
         void EffectResurrectWithAura(SpellEffIndex effIndex);
         void EffectCreateAreaTrigger(SpellEffIndex effIndex);
         void EffectTriggerSpell_160(SpellEffIndex effIndex);
+        void EffectUpdatePlayerPhase(SpellEffIndex effIndex);
+        void EffectUpdateZoneAurasAndPhases(SpellEffIndex effIndex);
 
         typedef std::set<Aura*> UsedSpellMods;
 

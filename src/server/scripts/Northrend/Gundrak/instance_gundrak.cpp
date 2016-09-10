@@ -486,7 +486,7 @@ public:
                  else
                  {
                      uint32 spell = 0;
-                     GameObject* altar = NULL;
+                     GameObject* altar = nullptr;
                      if (toActivate == sladRanStatueGUID)
                      {
                          spell = 57071;

@@ -25,8 +25,8 @@
 
 DB2FileLoader::DB2FileLoader()
 {
-    data = NULL;
-    fieldsOffset = NULL;
+    data = nullptr;
+    fieldsOffset = nullptr;
 }
 
 bool DB2FileLoader::Load(const char *filename, const char *fmt)
@@ -34,7 +34,7 @@ bool DB2FileLoader::Load(const char *filename, const char *fmt)
     if (data)
     {
         delete [] data;
-        data = NULL;
+        data = nullptr;
     }
 
     FILE* f = fopen(filename, "rb");
@@ -296,7 +296,7 @@ char* DB2FileLoader::AutoProduceData(const char* format, uint32& records, char**
                     offset += 1;
                     break;
                 case FT_STRING:
-                    *((char**)(&dataTable[offset])) = NULL;   // will be replaces non-empty or "" strings in AutoProduceStrings
+                    *((char**)(&dataTable[offset])) = nullptr;   // will be replaces non-empty or "" strings in AutoProduceStrings
                     offset += sizeof(char*);
                     break;
             }

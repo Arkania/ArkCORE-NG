@@ -655,7 +655,7 @@ public:
 		void Reset() override
 		{
 			me->GetMotionMaster()->MoveRandom(2.0f);
-			m_timer = urand(2000, 8000); m_phase = 0; npc = NULL;
+			m_timer = urand(2000, 8000); m_phase = 0; npc = nullptr;
 		}
 
 		void IsSummonedBy(Unit* summoner) override
@@ -792,7 +792,7 @@ public:
 		{
 			_timer = 0;
 			_phase = 0;
-			_player = NULL;
+			_player = nullptr;
 		}
 
 		void IsSummonedBy(Unit* summoner) override
@@ -936,7 +936,7 @@ public:
 		void Reset() override
 		{
 			m_timer = 0; m_phase = 0; m_event = 1000;
-			m_player = NULL; m_thug1 = NULL; m_thug2 = NULL; m_thug3 = NULL;
+			m_player = nullptr; m_thug1 = nullptr; m_thug2 = nullptr; m_thug3 = nullptr;
 		}
 
         void JustDied(Unit* killer) override
@@ -1038,7 +1038,7 @@ public:
 			if (list.size() != 4)
 				return false;
 
-			Creature* target = NULL;
+			Creature* target = nullptr;
 			uint32 tmpGuid = 0;
 			for (std::list<Creature*>::iterator itr = list.begin(); itr != list.end(); ++itr)
 			{
@@ -1099,7 +1099,7 @@ public:
 		void Reset() override
 		{
 			m_timer = 0; m_phase = 0; m_cooldown = 0;
-			m_player = NULL;
+			m_player = nullptr;
 		}
 
 		void MoveInLineOfSight(Unit* who) override
@@ -1460,8 +1460,8 @@ public:
 		void Reset() override
 		{
 			_phaseHomeless = 0;
-			_homeless = NULL;
-			_defias = NULL;
+			_homeless = nullptr;
+			_defias = nullptr;
 			_events.ScheduleEvent(EVENT_HOMELESS, 10000);
 			_events.ScheduleEvent(EVENT_SHOWFIGHT, 10000);
 		}
@@ -1646,7 +1646,7 @@ public:
 
 		void Reset() override
 		{
-			_guard = NULL;
+			_guard = nullptr;
 			_timer = 1000;
 		}
 
@@ -1710,7 +1710,7 @@ public:
 
 		void Reset() override
 		{
-			_guard = NULL;
+			_guard = nullptr;
 			_timer = 1000;
 		}
 
@@ -1773,7 +1773,7 @@ public:
 
 		void Reset() override
 		{
-			_guard = NULL;
+			_guard = nullptr;
 			_timer = 1000;
 		}
 
@@ -2117,7 +2117,7 @@ public:
         {
             _timer = 0;
             _phase = 0;
-            _player = NULL;
+            _player = nullptr;
         }
 
         void StartAnim(Player* player) 
@@ -2213,7 +2213,7 @@ public:
                 if (_player)
                     _player->CastSpell(_player, SPELL_QUEST_CREDIT_26290);
 
-                _player = NULL;
+                _player = nullptr;
                 _timer = 60000; _phase = 12;
                 break;
             case 12:
@@ -2278,8 +2278,8 @@ public:
         {
             _timer = 1000;
             _phase = 0;
-            _player = NULL;
-            _shadowy = NULL;
+            _player = nullptr;
+            _shadowy = nullptr;
         }
 
         void JustSummoned(Creature* summon) 

@@ -52,9 +52,9 @@ GameObject::GameObject() : WorldObject(false), MapObject(),
     m_usetimes = 0;
     m_spellId = 0;
     m_cooldownTime = 0;
-    m_goInfo = NULL;
+    m_goInfo = nullptr;
     m_ritualOwnerGUID = 0;
-    m_goData = NULL;
+    m_goData = nullptr;
 
     m_DBTableGuid = 0;
     m_rotation = 0;
@@ -187,10 +187,18 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map* map, uint32 phaseMa
         TC_LOG_ERROR("misc", "Gameobject (GUID: %u Entry: %u) not created. Suggested coordinates isn't valid (X: %f Y: %f)", guidlow, name_id, x, y);
         return false;
     }
+    
+    if (phaseMask)
+    {
+        for (uint32 i = 0; i < 32; i++)
+            if (((1 << i) & phaseMask) > 0)
+                SetInPhase(i + DEFAULT_PHASE, false, true);
+    }
 
     SetPhaseMask(phaseMask, false);
 
     SetZoneScript();
+
     if (m_zoneScript)
     {
         name_id = m_zoneScript->GetGameObjectEntry(guidlow, name_id);
@@ -481,7 +489,7 @@ void GameObject::Update(uint32 diff)
                         radius = goInfo->trap.diameter / 2.f;
 
                     // Pointer to appropriate target if found any
-                    Unit* target = NULL;
+                    Unit* target = nullptr;
 
                     /// @todo this hack with search required until GO casting not implemented
                     if (Unit* owner = GetOwner())
@@ -496,7 +504,7 @@ void GameObject::Update(uint32 diff)
                     else
                     {
                         // Environmental trap: Any player
-                        Player* player = NULL;
+                        Player* player = nullptr;
                         Trinity::AnyPlayerInObjectRangeCheck checker(this, radius);
                         Trinity::PlayerSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(this, player, checker);
                         VisitNearbyWorldObject(radius, searcher);
@@ -816,6 +824,20 @@ bool GameObject::LoadGameObjectFromDB(uint32 guid, Map* map, bool addToMap)
     if (!Create(guid, entry, map, phaseMask, x, y, z, ang, rotation0, rotation1, rotation2, rotation3, animprogress, go_state, artKit))
         return false;
 
+    if (!data->phaseIds.empty())
+        for (uint16 ph : data->phaseIds)
+            SetInPhase(ph, false, true);
+
+    if (!data->phaseGroups.empty())
+    {
+        SetPhaseGroups(data->phaseGroups);
+        for (uint16 phGroup : data->phaseGroups)            
+            SetInPhase(phGroup, false, true);
+    }
+
+    if (GetPhaseIds().empty() && GetPhaseGroups().empty())
+        SetInPhase(DEFAULT_PHASE, false, true);
+
     if (data->spawntimesecs >= 0)
     {
         m_spawnedByDefault = true;
@@ -1050,7 +1072,7 @@ void GameObject::TriggeringLinkedGameObject(uint32 trapEntry, Unit* target)
     float range = float(target->GetSpellMaxRangeForTarget(GetOwner(), trapSpell));
 
     // search nearest linked GO
-    GameObject* trapGO = NULL;
+    GameObject* trapGO = nullptr;
     {
         // using original GO distance
         CellCoord p(Trinity::ComputeCellCoord(GetPositionX(), GetPositionY()));
@@ -1070,7 +1092,7 @@ void GameObject::TriggeringLinkedGameObject(uint32 trapEntry, Unit* target)
 
 GameObject* GameObject::LookupFishingHoleAround(float range)
 {
-    GameObject* ok = NULL;
+    GameObject* ok = nullptr;
 
     CellCoord p(Trinity::ComputeCellCoord(GetPositionX(), GetPositionY()));
     Cell cell(p);
@@ -1117,7 +1139,7 @@ void GameObject::SetGoArtKit(uint8 kit)
 
 void GameObject::SetGoArtKit(uint8 artkit, GameObject* go, uint32 lowguid)
 {
-    const GameObjectData* data = NULL;
+    const GameObjectData* data = nullptr;
     if (go)
     {
         go->SetGoArtKit(artkit);
@@ -1222,65 +1244,12 @@ void GameObject::Use(Unit* user)
 
             // a chair may have n slots. we have to calculate their positions and teleport the player to the nearest one
 
-            float lowestDist = DEFAULT_VISIBILITY_DISTANCE;
+			if ((ToGameObject()->m_updateFlag & UPDATEFLAG_GO_TRANSPORT_POSITION) == 0)
+				TeleportToNearestChairSeat(GetPosition(), info, player);
+			else
+				TeleportToNearestChairSeat(m_movementInfo.transport.pos, info, player);				
 
-            uint32 nearest_slot = 0;
-            float x_lowest = GetPositionX();
-            float y_lowest = GetPositionY();
-
-            // the object orientation + 1/2 pi
-            // every slot will be on that straight line
-            float orthogonalOrientation = GetOrientation()+M_PI*0.5f;
-            // find nearest slot
-            bool found_free_slot = false;
-            for (ChairSlotAndUser::iterator itr = ChairListSlots.begin(); itr != ChairListSlots.end(); ++itr)
-            {
-                // the distance between this slot and the center of the go - imagine a 1D space
-                float relativeDistance = (info->size*itr->first)-(info->size*(info->chair.slots-1)/2.0f);
-
-                float x_i = GetPositionX() + relativeDistance * std::cos(orthogonalOrientation);
-                float y_i = GetPositionY() + relativeDistance * std::sin(orthogonalOrientation);
-
-                if (itr->second)
-                {
-                    if (Player* ChairUser = ObjectAccessor::FindPlayer(itr->second))
-                    {
-                        if (ChairUser->IsSitState() && ChairUser->getStandState() != UNIT_STAND_STATE_SIT && ChairUser->GetExactDist2d(x_i, y_i) < 0.1f)
-                            continue;        // This seat is already occupied by ChairUser. NOTE: Not sure if the ChairUser->getStandState() != UNIT_STAND_STATE_SIT check is required.
-                        else
-                            itr->second = 0; // This seat is unoccupied.
-                    }
-                    else
-                        itr->second = 0;     // The seat may of had an occupant, but they're offline.
-                }
-
-                found_free_slot = true;
-
-                // calculate the distance between the player and this slot
-                float thisDistance = player->GetDistance2d(x_i, y_i);
-
-                if (thisDistance <= lowestDist)
-                {
-                    nearest_slot = itr->first;
-                    lowestDist = thisDistance;
-                    x_lowest = x_i;
-                    y_lowest = y_i;
-                }
-            }
-
-            if (found_free_slot)
-            {
-                ChairSlotAndUser::iterator itr = ChairListSlots.find(nearest_slot);
-                if (itr != ChairListSlots.end())
-                {
-                    itr->second = player->GetGUID(); //this slot in now used by player
-                    player->TeleportTo(GetMapId(), x_lowest, y_lowest, GetPositionZ(), GetOrientation(), TELE_TO_NOT_LEAVE_TRANSPORT | TELE_TO_NOT_LEAVE_COMBAT | TELE_TO_NOT_UNSUMMON_PET);
-                    player->SetStandState(UNIT_STAND_STATE_SIT_LOW_CHAIR+info->chair.height);
-                    return;
-                }
-            }
-
-            return;
+			return;
         }
         //big gun, its a spell/aura
         case GAMEOBJECT_TYPE_GOOBER:                        //10
@@ -1335,7 +1304,7 @@ void GameObject::Use(Unit* user)
 
             // cast this spell later if provided
             spellId = info->goober.spellId;
-            spellCaster = NULL;
+            spellCaster = nullptr;
 
             break;
         }
@@ -1453,7 +1422,7 @@ void GameObject::Use(Unit* user)
 
             GameObjectTemplate const* info = GetGOInfo();
 
-            Player* m_ritualOwner = NULL;
+            Player* m_ritualOwner = nullptr;
             if (m_ritualOwnerGUID)
                 m_ritualOwner = ObjectAccessor::FindPlayer(m_ritualOwnerGUID);
 
@@ -1735,6 +1704,68 @@ void GameObject::Use(Unit* user)
         spellCaster->CastSpell(user, spellInfo, triggered);
     else
         CastSpell(user, spellId);
+}
+
+void GameObject::TeleportToNearestChairSeat(Position pos, GameObjectTemplate const* info, Player* player)
+{
+	uint32 nearest_slot = 0;
+	float lowestDist = DEFAULT_VISIBILITY_DISTANCE;
+	float pos_x = pos.GetPositionX();
+	float pos_y = pos.GetPositionY();
+	float pos_z = pos.GetPositionZ();
+	float pos_o = pos.GetOrientation();
+
+	// the object orientation + 1/2 pi
+	// every slot will be on that straight line
+	float orthogonalOrientation = pos_o + M_PI * 0.5f;
+	// find nearest slot
+	bool found_free_slot = false;
+	for (ChairSlotAndUser::iterator itr = ChairListSlots.begin(); itr != ChairListSlots.end(); ++itr)
+	{
+		// the distance between this slot and the center of the go - imagine a 1D space
+		float relativeDistance = (info->size*itr->first) - (info->size*(info->chair.slots - 1) / 2.0f);
+
+		float x_i = pos.GetPositionX() + relativeDistance * std::cos(orthogonalOrientation);
+		float y_i = pos.GetPositionY() + relativeDistance * std::sin(orthogonalOrientation);
+
+		if (itr->second)
+		{
+			if (Player* ChairUser = ObjectAccessor::FindPlayer(itr->second))
+			{
+				if (ChairUser->IsSitState() && ChairUser->getStandState() != UNIT_STAND_STATE_SIT && ChairUser->GetExactDist2d(x_i, y_i) < 0.1f)
+					continue;        // This seat is already occupied by ChairUser. NOTE: Not sure if the ChairUser->getStandState() != UNIT_STAND_STATE_SIT check is required.
+				else
+					itr->second = 0; // This seat is unoccupied.
+			}
+			else
+				itr->second = 0;     // The seat may of had an occupant, but they're offline.
+		}
+
+		found_free_slot = true;
+
+		// calculate the distance between the player and this slot
+		float thisDistance = player->GetDistance2d(x_i, y_i);
+
+		if (thisDistance <= lowestDist)
+		{
+			nearest_slot = itr->first;
+			lowestDist = thisDistance;
+			pos_x = x_i;
+			pos_y = y_i;
+		}
+	}
+
+	if (found_free_slot)
+	{
+		ChairSlotAndUser::iterator itr = ChairListSlots.find(nearest_slot);
+		if (itr != ChairListSlots.end())
+		{
+			itr->second = player->GetGUID(); //this slot in now used by player
+			player->TeleportTo(GetMapId(), pos_x, pos_y, pos_z, pos_o, TELE_TO_NOT_LEAVE_TRANSPORT | TELE_TO_NOT_LEAVE_COMBAT | TELE_TO_NOT_UNSUMMON_PET);
+			player->SetStandState(UNIT_STAND_STATE_SIT_LOW_CHAIR + info->chair.height);
+			return;
+		}
+	}
 }
 
 void GameObject::CastSpell(Unit* target, uint32 spellId, bool triggered /*= true*/)
@@ -2059,11 +2090,20 @@ void GameObject::SetDisplayId(uint32 displayid)
     UpdateModel();
 }
 
-void GameObject::SetPhaseMask(uint32 newPhaseMask, bool update)
+void GameObject::SetPhaseMask(uint64 newPhaseMask, bool update)
 {
     WorldObject::SetPhaseMask(newPhaseMask, update);
     if (m_model && m_model->isEnabled())
         EnableCollision(true);
+}
+
+bool GameObject::SetInPhase(uint32 id, bool update, bool apply)
+{
+    bool res = WorldObject::SetInPhase(id, update, apply);
+    if (m_model && m_model->isEnabled())
+        EnableCollision(true);
+
+    return res;
 }
 
 void GameObject::EnableCollision(bool enable)

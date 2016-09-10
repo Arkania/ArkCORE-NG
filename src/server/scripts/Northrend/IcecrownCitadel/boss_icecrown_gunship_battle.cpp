@@ -383,7 +383,7 @@ public:
 
     void ResetSlots(uint32 team)
     {
-        _transport = NULL;
+        _transport = nullptr;
         memset(_controlledSlots, 0, sizeof(uint64)* MAX_SLOTS);
         memset(_respawnCooldowns, 0, sizeof(time_t)* MAX_SLOTS);
         _spawnPoint = team == HORDE ? &OrgrimsHammerAddsSpawnPos : &SkybreakerAddsSpawnPos;
@@ -2455,14 +2455,14 @@ class achievement_im_on_a_boat : public AchievementCriteriaScript
 
 void AddSC_boss_icecrown_gunship_battle()
 {
-    new npc_gunship();
-    new npc_high_overlord_saurfang_igb();
-    new npc_muradin_bronzebeard_igb();
+    //new npc_gunship();
+    //new npc_high_overlord_saurfang_igb();
+    //new npc_muradin_bronzebeard_igb();
     new npc_zafod_boombox();
-    new npc_gunship_boarding_leader();
-    new npc_gunship_boarding_add();
-    new npc_gunship_gunner();
-    new npc_gunship_rocketeer();
+    //new npc_gunship_boarding_leader();
+    //new npc_gunship_boarding_add();
+    //new npc_gunship_gunner();
+    //new npc_gunship_rocketeer();
     new npc_gunship_mage();
     new npc_gunship_cannon();
     new spell_igb_rocket_pack();
@@ -2481,5 +2481,5 @@ void AddSC_boss_icecrown_gunship_battle()
     new spell_igb_gunship_fall_teleport();
     new spell_igb_check_for_players();
     new spell_igb_teleport_players_on_victory();
-    new achievement_im_on_a_boat();
+    //new achievement_im_on_a_boat();
 }

@@ -21,10 +21,11 @@
 #define _OBJECT_H
 
 #include "Common.h"
-#include "UpdateMask.h"
+#include "ConditionMgr.h"
 #include "GridReference.h"
-#include "ObjectDefines.h"
 #include "Map.h"
+#include "ObjectDefines.h"
+#include "UpdateMask.h"
 
 #include <set>
 #include <string>
@@ -46,6 +47,7 @@
 #define NOMINAL_MELEE_RANGE         5.0f
 #define MELEE_RANGE                 (NOMINAL_MELEE_RANGE - MIN_MELEE_REACH * 2) //center to center for players
 #define DEFAULT_PHASE               169
+#define DEFAULT_MAX_PHASE           200
 
 enum TypeMask
 {
@@ -102,6 +104,132 @@ enum NotifyFlags
     NOTIFY_AI_RELOCATION            = 0x01,
     NOTIFY_VISIBILITY_CHANGED       = 0x02,
     NOTIFY_ALL                      = 0xFF
+};
+
+enum PhasingFlags
+{
+    PHASE_FLAG_OVERWRITE_EXISTING = 0x01,       // don't stack with existing phases, overwrites existing phases
+    PHASE_FLAG_NO_MORE_PHASES = 0x02,       // stop calculating phases after this phase was applied (no more phases will be applied)
+    PHASE_FLAG_NEGATE_PHASE = 0x04        // negate instead to add the phasemask
+};
+
+enum PhaseUpdateFlag
+{
+    PHASE_UPDATE_FLAG_ZONE_UPDATE = 0x01,
+    PHASE_UPDATE_FLAG_AREA_UPDATE = 0x02,
+
+    // Internal flags
+    PHASE_UPDATE_FLAG_CLIENTSIDE_CHANGED = 0x08,
+    PHASE_UPDATE_FLAG_SERVERSIDE_CHANGED = 0x10,
+};
+
+enum ePhaseUpdateStatus
+{
+    PHASE_UPDATE_NOT_NEEDED,
+    PHASE_UPDATE_NEEDED,
+    EMPTY_DATABASE,
+};
+
+struct PhaseArea
+{
+    uint32 areaId;
+    uint32 entry;
+    uint32 quest_start;
+    uint32 quest_end;
+    uint32 quest_start_status;
+    uint32 quest_end_status;
+    uint32 flags;
+};
+
+typedef std::list<PhaseArea> PhaseAreaContainer;
+typedef std::unordered_map<uint32 /*areaId*/, PhaseAreaContainer> PhaseAreaStore;
+
+struct PhaseDefinition
+{
+    uint32 zoneId;
+    uint32 entry;
+    uint64 phasemask;
+    uint16 phaseId;
+    uint16 phaseGroup;
+    uint16 terrainswapmap;
+    uint16 worldMapAreaSwap;
+    uint8 flags;
+
+    bool IsOverwritingExistingPhases() const { return flags & PHASE_FLAG_OVERWRITE_EXISTING; }
+    bool IsLastDefinition() const { return flags & PHASE_FLAG_NO_MORE_PHASES; }
+    bool IsNegatingPhasemask() const { return flags & PHASE_FLAG_NEGATE_PHASE; }
+};
+
+typedef std::list<PhaseDefinition> PhaseDefinitionContainer;
+typedef std::unordered_map<uint32 /*zoneId*/, PhaseDefinitionContainer> PhaseDefinitionStore;
+
+struct SpellPhaseInfo
+{
+    uint32 spellId;
+    uint32 phasemask;
+    uint32 terrainswapmap;
+    uint32 worldmapareaswap;
+};
+
+typedef std::unordered_map<uint32 /*spellId*/, SpellPhaseInfo> SpellPhaseStore;
+
+struct PhaseInfo
+{
+    PhaseInfo() : phasemask(0), phaseId(0), phaseGroup(0), terrainswapmap(0), worldMapAreaSwap(0) {}
+
+    uint64 phasemask;
+    uint16 phaseId;
+    uint16 phaseGroup;
+    uint16 terrainswapmap;
+    uint16 worldMapAreaSwap;
+
+    bool NeedsServerSideUpdate() const { return phasemask; }
+    bool NeedsClientSideUpdate() const { return phaseId || phaseGroup || terrainswapmap || worldMapAreaSwap; }
+};
+
+typedef std::unordered_map<uint32 /*spellId*/, std::list<PhaseInfo>> PhaseInfoContainer;
+
+struct PhaseData
+{
+    PhaseData(Player* _player) : _PhasemaskThroughDefinitions(0), _PhasemaskThroughAuras(0), _CustomPhasemask(0), player(_player) { }
+
+    void   SetPlayer(Player* player);
+    uint64 _PhasemaskThroughDefinitions;
+    uint64 _PhasemaskThroughAuras;
+    uint64 _CustomPhasemask;
+
+    uint64 GetCurrentPhasemask() const;
+    uint64 GetPhaseMaskForSpawn() const;
+
+    void ResetDefinitions() { _PhasemaskThroughDefinitions = 0; activePhaseDefinitions.clear(); }
+    void AddPhaseDefinition(PhaseDefinition phaseDefinition);
+    bool HasActiveDefinitions() const { return !activePhaseDefinitions.empty(); }
+
+    void AddAuraInfo(uint32 spellId, PhaseInfo const& phaseInfo);
+    uint32 RemoveAuraInfo(uint32 spellId);
+
+    void SendPhaseMaskToPlayer();
+    void SendPhaseshiftToPlayer();
+
+    void GetActivePhases(std::set<uint16>& phases) const;
+
+private:
+    Player* player;
+    std::list<PhaseDefinition> activePhaseDefinitions;
+    PhaseInfoContainer spellPhaseInfo;
+};
+
+struct PhaseUpdateData
+{
+    PhaseUpdateData() : _conditionTypeFlags(0), _questId(0) { }
+    void AddConditionType(ConditionTypes const conditionType) { _conditionTypeFlags |= (1 << conditionType); }
+    void AddQuestUpdate(uint32 const questId);
+
+    bool IsConditionRelated(Condition const* condition) const;
+
+private:
+    uint32 _conditionTypeFlags;
+    uint32 _questId;
 };
 
 class Corpse;
@@ -232,7 +360,7 @@ class Object
 
         void ApplyModUInt32Value(uint16 index, int32 val, bool apply);
         void ApplyModInt32Value(uint16 index, int32 val, bool apply);
-        void ApplyModUInt64Value(uint16 index, int32 val, bool apply);
+        void ApplyModUInt16Value(uint16 index, uint8 offset, int16 val, bool apply);
         void ApplyModPositiveFloatValue(uint16 index, float val, bool apply);
         void ApplyModSignedFloatValue(uint16 index, float val, bool apply);
         void ApplyPercentModFloatValue(uint16 index, float val, bool apply);
@@ -290,6 +418,8 @@ class Object
         AreaTrigger* ToAreaTrigger() { if (GetTypeId() == TYPEID_AREATRIGGER) return reinterpret_cast<AreaTrigger*>(this); else return NULL; }
         AreaTrigger const* ToAreaTrigger() const { if (GetTypeId() == TYPEID_AREATRIGGER) return reinterpret_cast<AreaTrigger const*>(this); else return NULL; }
 
+		uint16 m_updateFlag;
+
     protected:
         Object();
 
@@ -306,7 +436,7 @@ class Object
         uint16 m_objectType = 0;
 
         TypeID m_objectTypeId;
-        uint16 m_updateFlag;
+        //
 
         union
         {
@@ -539,6 +669,7 @@ struct MovementInfo
     void RemoveExtraMovementFlag(uint16 flag) { flags2 &= ~flag; }
     bool HasExtraMovementFlag(uint16 flag) const { return flags2 & flag; }
 
+    uint32 GetFallTime() const { return jump.fallTime; }
     void SetFallTime(uint32 time) { jump.fallTime = time; }
 
     void ResetTransport()
@@ -678,11 +809,6 @@ class WorldObject : public Object, public WorldLocation
 
         uint32 GetInstanceId() const { return m_InstanceId; }
 
-        virtual void SetPhaseMask(uint32 newPhaseMask, bool update);
-        uint32 GetPhaseMask() const { return m_phaseMask; }
-        bool InSamePhase(WorldObject const* obj) const;
-        bool InSamePhase(uint32 phasemask) const { return (GetPhaseMask() & phasemask); }
-
         uint32 GetZoneId() const;
         uint32 GetAreaId() const;
         void GetZoneAndAreaId(uint32& zoneid, uint32& areaid) const;
@@ -720,6 +846,7 @@ class WorldObject : public Object, public WorldLocation
         bool isInFront(WorldObject const* target, float arc = M_PI) const;
         bool isInBack(WorldObject const* target, float arc = M_PI) const;
 
+        bool IsInBetween(const Position* obj1, const Position* obj2, float size) const;
         bool IsInBetween(WorldObject const* obj1, WorldObject const* obj2, float size = 0) const;
 
         virtual void CleanupsBeforeDelete(bool finalCleanup = true);  // used in destructor or explicitly before mass creature delete to remove cross-references to already deleted units
@@ -789,6 +916,7 @@ class WorldObject : public Object, public WorldLocation
         std::vector<Creature*> FindNearestCreatures(uint32 entry, float range, bool alive) const;
         Creature*   FindRandomCreatureInRange(uint32 entry, float range, bool alive);
         GameObject* FindNearestGameObject(uint32 entry, float range) const;
+        std::list<GameObject*> FindNearestGameObjects(uint32 entry, float range) const;
         GameObject* FindNearestGameObjectOfType(GameobjectTypes type, float range) const;
         Player*     FindNearestPlayer(float range, bool alive = true);
         std::list<Player*> FindNearestPlayers(float range, bool alive = true);
@@ -852,6 +980,49 @@ class WorldObject : public Object, public WorldLocation
         virtual float GetStationaryZ() const { return GetPositionZ(); }
         virtual float GetStationaryO() const { return GetOrientation(); }
 
+        // phase system
+        virtual void SetPhaseMask(uint64 newPhaseMask, bool update);
+        uint64 GetPhaseMask() const { return m_phaseMask; }
+        void ClearPhaseGroups();
+        virtual void AddPhaseGroup(uint16 phaseGroup, bool apply = true);
+        virtual void SetPhaseGroups(std::set<uint16> phaseGroups) { m_phaseGroups = phaseGroups; }
+        std::set<uint16> GetPhaseGroups() const { return m_phaseGroups; }
+        bool InSamePhase(WorldObject const* obj) const;
+        bool InSamePhase(uint64 phasemask) const;
+
+        std::set<uint16> const& GetPhaseIds() const { return m_phaseIds; }
+        std::set<uint16> const& GetTerrainSwaps() const { return m_terrainSwaps; }
+        std::set<uint16> const& GetWorldMapAreaSwaps() const { return m_worldMapAreaSwaps; }
+        std::string PhaseToString();
+
+        bool HasInPhaseList(uint16 phase) const;
+        bool IsInPhase(uint16 phaseId) const;
+        bool IsInPhase(WorldObject const* obj) const;
+        bool IsInTerrainSwap(uint16 terrainSwap);
+        void CopyPhaseFrom(WorldObject* obj, bool update = false);
+        void ClearPhases(bool update);
+        bool SetInPhase(uint16 id, bool update, bool apply);
+
+        void NotifyConditionChanged(PhaseUpdateData const& updateData);
+        void NotifyStoresReloaded();
+        void PhaseUpdate();
+        void GetActivePhases(std::set<uint16>& phases) const;
+       
+        // Update flags (delayed phasing)
+        void AddUpdateFlag(PhaseUpdateFlag updateFlag);
+        void RemoveUpdateFlag(PhaseUpdateFlag updateFlag);
+
+        // Debug
+        void SendDebugReportToPlayer();
+        // Needed for modify phase command
+        void SetCustomPhase(uint64 phaseMask);
+        //
+        uint64 GetCurrentPhasemask();
+        uint64 GetPhaseMaskForSpawn();
+
+        uint8 m_phaseUpdateFlags;
+        PhaseData phaseData;
+
     protected:
         std::string m_name;
         bool m_isActive;
@@ -877,7 +1048,12 @@ class WorldObject : public Object, public WorldLocation
 
         //uint32 m_mapId;                                     // object at map with map_id
         uint32 m_InstanceId;                                // in map copy with instance id
-        uint32 m_phaseMask;                                 // in area phase state
+        
+        uint64 m_phaseMask;                                 // in area phase state
+        std::set<uint16> m_phaseIds;
+        std::set<uint16> m_phaseGroups;
+        std::set<uint16> m_terrainSwaps;
+        std::set<uint16> m_worldMapAreaSwaps;
 
         uint16 m_notifyflags;
         uint16 m_executed_notifies;
@@ -888,6 +1064,17 @@ class WorldObject : public Object, public WorldLocation
         bool CanDetect(WorldObject const* obj, bool ignoreStealth) const;
         bool CanDetectInvisibilityOf(WorldObject const* obj) const;
         bool CanDetectStealthOf(WorldObject const* obj) const;
+
+        void Recalculate();
+        ePhaseUpdateStatus CheckDefinition(PhaseDefinition phaseDefinition);
+        ePhaseUpdateStatus CheckArea(PhaseDefinition phaseDefinition, PhaseAreaContainer pac);
+        PhaseAreaContainer GetPhaseAreaContainer(uint32 zoneId) const;
+        PhaseDefinitionContainer GetPhaseDefinitionContainer(uint32 zoneId) const;
+        bool NeedsPhaseUpdateWithData(PhaseUpdateData const& updateData) const;
+        bool IsConditionRelated(PhaseUpdateData const& updateData, uint32 zoneId, uint32 entry) const;
+        bool IsUpdateInProgress() const;
+        
+        
 };
 
 namespace Trinity
