@@ -585,6 +585,7 @@ class WorldSession
         void HandleGroupInviteOpcode(WorldPacket& recvPacket);
         //void HandleGroupCancelOpcode(WorldPacket& recvPacket);
         void HandleGroupInviteResponseOpcode(WorldPacket& recvPacket);
+		void HandleGroupClearMarker(WorldPacket& recvPacket);
         void HandleGroupUninviteOpcode(WorldPacket& recvPacket);
         void HandleGroupUninviteGuidOpcode(WorldPacket& recvPacket);
         void HandleGroupSetLeaderOpcode(WorldPacket& recvPacket);

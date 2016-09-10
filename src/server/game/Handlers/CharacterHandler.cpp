@@ -1060,6 +1060,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
     {
         //pCurrChar->groupInfo.group->SendInit(this); // useless
         group->SendUpdate();
+		group->SendRaidMarkerUpdateToPlayer(playerGuid);
         group->ResetMaxEnchantingLevel();
     }
 

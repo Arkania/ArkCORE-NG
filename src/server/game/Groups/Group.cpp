@@ -449,6 +449,7 @@ bool Group::AddMember(Player* player)
     }
 
     SendUpdate();
+	SendRaidMarkerUpdateToPlayer(player->GetGUID());
     sScriptMgr->OnGroupAddMember(this, player->GetGUID());
 
     if (IS_PLAYER_GUID(player->GetGUID()))
@@ -643,7 +644,8 @@ bool Group::RemoveMember(uint64 guid, const RemoveMethod& method /*= GROUP_REMOV
         }
 
         SendUpdate();
-
+        SendRaidMarkerUpdateToPlayer(guid, true);
+		
         if (isLFGGroup() && GetMembersCount() == 1)
         {
             Player* leader = ObjectAccessor::FindPlayer(GetLeaderGUID());
@@ -791,7 +793,14 @@ void Group::Disband(bool hideDestroy /* = false */)
         }
 
         _homebindIfInstance(player);
+		
     }
+
+    SetGroupMarkerMask(0x20);
+    SendRaidMarkerUpdate();
+    RemoveMarker();
+    RemoveAllMarkerFromList();
+
     RollId.clear();
     m_memberSlots.clear();
 
@@ -1539,6 +1548,69 @@ void Group::SendTargetIconList(WorldSession* session)
     }
 
     session->SendPacket(&data);
+}
+
+void Group::SendRaidMarkerUpdate()
+{
+    WorldPacket data(SMSG_RAID_MARKERS_CHANGED, 4);
+    data << uint32(m_markerMask);
+
+    for (member_witerator itr = m_memberSlots.begin(); itr != m_memberSlots.end(); ++itr)
+    {
+        Player* player = ObjectAccessor::FindPlayer(itr->guid);
+        if (!player || !player->GetSession())
+            continue;
+
+        player->GetSession()->SendPacket(&data);
+    }
+}
+
+void Group::SendRaidMarkerUpdateToPlayer(uint64 playerGUID, bool remove)
+{
+    Player* player = ObjectAccessor::FindPlayer(playerGUID);
+    if (!player || !player->GetSession())
+        return;
+
+    WorldPacket data(SMSG_RAID_MARKERS_CHANGED, 4);
+    data << uint32(remove ? 0 : m_markerMask);
+    player->GetSession()->SendPacket(&data);
+}
+
+DynamicObject* Group::GetMarkerGuidBySpell(uint32 spell)
+{
+    if (!m_dynObj.empty())
+    {
+        for (DynObjectList::const_iterator i = m_dynObj.begin(); i != m_dynObj.end(); ++i)
+        {
+            DynamicObject* dynObj = ObjectAccessor::GetObjectInWorld(*i, (DynamicObject*)NULL);
+            if (!dynObj)
+                continue;
+
+            if (dynObj->GetEntry() == spell)
+                return dynObj;
+        }
+    }
+
+    return NULL;
+}
+
+void Group::RemoveMarker()
+{
+    for (uint32 spell = 0; spell < 5; ++spell)
+    {
+        uint32 mask = 1 << spell;
+        uint32 spellId = 84996 + spell;
+
+        if (HasMarker(mask))
+            continue;
+
+        DynamicObject* dynObject = GetMarkerGuidBySpell(spellId);
+        if (!dynObject)
+            continue;
+
+        RemoveMarkerFromList(dynObject->GetGUID());
+        dynObject->RemoveFromWorld();
+    }
 }
 
 void Group::SendUpdate()
