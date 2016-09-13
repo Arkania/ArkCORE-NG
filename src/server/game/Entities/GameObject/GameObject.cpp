@@ -187,15 +187,6 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map* map, uint32 phaseMa
         TC_LOG_ERROR("misc", "Gameobject (GUID: %u Entry: %u) not created. Suggested coordinates isn't valid (X: %f Y: %f)", guidlow, name_id, x, y);
         return false;
     }
-    
-    if (phaseMask)
-    {
-        for (uint32 i = 0; i < 32; i++)
-            if (((1 << i) & phaseMask) > 0)
-                SetInPhase(i + DEFAULT_PHASE, false, true);
-    }
-
-    SetPhaseMask(phaseMask, false);
 
     SetZoneScript();
 
@@ -774,7 +765,8 @@ void GameObject::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
     stmt->setUInt32(index++, GetEntry());
     stmt->setUInt16(index++, uint16(mapid));
     stmt->setUInt8(index++, spawnMask);
-    stmt->setUInt32(index++, GetPhaseMask());
+    stmt->setString(index++, GetUInt16String(GetPhaseIds()));
+    stmt->setString(index++, GetUInt16String(GetPhaseGroups()));
     stmt->setFloat(index++, GetPositionX());
     stmt->setFloat(index++, GetPositionY());
     stmt->setFloat(index++, GetPositionZ());
@@ -824,19 +816,7 @@ bool GameObject::LoadGameObjectFromDB(uint32 guid, Map* map, bool addToMap)
     if (!Create(guid, entry, map, phaseMask, x, y, z, ang, rotation0, rotation1, rotation2, rotation3, animprogress, go_state, artKit))
         return false;
 
-    if (!data->phaseIds.empty())
-        for (uint16 ph : data->phaseIds)
-            SetInPhase(ph, false, true);
-
-    if (!data->phaseGroups.empty())
-    {
-        SetPhaseGroups(data->phaseGroups);
-        for (uint16 phGroup : data->phaseGroups)            
-            SetInPhase(phGroup, false, true);
-    }
-
-    if (GetPhaseIds().empty() && GetPhaseGroups().empty())
-        SetInPhase(DEFAULT_PHASE, false, true);
+    SetPhaseBaseValues(data);
 
     if (data->spawntimesecs >= 0)
     {
@@ -874,6 +854,29 @@ bool GameObject::LoadGameObjectFromDB(uint32 guid, Map* map, bool addToMap)
         return false;
 
     return true;
+}
+
+void GameObject::SetPhaseBaseValues(const GameObjectData* data)
+{
+    if (data)
+    {
+        if (data->phaseMask > 1)
+            SetPhaseMask(data->phaseMask, false);
+
+        if (!data->phaseIds.empty())
+            for (uint16 ph : data->phaseIds)
+                SetInPhase(ph, false, true);
+
+        if (!data->phaseGroups.empty())
+        {
+            AddPhaseGroups(data->phaseGroups, true);
+            for (uint16 phGroup : data->phaseGroups)
+                SetInPhase(phGroup, false, true);
+        }
+
+        if (GetPhaseIds().empty())
+            SetInPhase(DEFAULT_PHASE, false, true);
+    }
 }
 
 void GameObject::DeleteFromDB()

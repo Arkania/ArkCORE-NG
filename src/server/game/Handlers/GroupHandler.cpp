@@ -33,7 +33,6 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-
 #include "SpellAuraEffects.h"
 
 class Aura;
@@ -1014,8 +1013,7 @@ void WorldSession::BuildPartyMemberStatsChangedPacket(Player* player, WorldPacke
     if (mask == GROUP_UPDATE_FLAG_NONE)
         return;
 
-    std::set<uint16> phases;
-    player->GetActivePhases(phases);
+    std::set<uint16> phases = player->GetPhaseIds();;
 
     if (mask & GROUP_UPDATE_FLAG_POWER_TYPE)                // if update power type, update current/max power also
         mask |= (GROUP_UPDATE_FLAG_CUR_POWER | GROUP_UPDATE_FLAG_MAX_POWER);
@@ -1267,8 +1265,7 @@ void WorldSession::HandleRequestPartyMemberStatsOpcode(WorldPacket& recvData)
 
     Pet* pet = player->GetPet();
     Powers powerType = player->getPowerType();
-    std::set<uint16> phaseIds;
-    player->GetActivePhases(phaseIds);
+    std::set<uint16> phaseIds = player->GetPhaseIds();
 
     WorldPacket data(SMSG_PARTY_MEMBER_STATS_FULL, 4+2+2+2+1+2*6+8+1+8);
     data << uint8(0);                                       // only for SMSG_PARTY_MEMBER_STATS_FULL, probably arena/bg related

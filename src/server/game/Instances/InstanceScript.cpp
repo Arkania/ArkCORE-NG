@@ -533,11 +533,8 @@ std::string InstanceScript::GetBossStateName(uint8 state)
 
 void InstanceScript::UpdatePhasing()
 {
-    PhaseUpdateData phaseUdateData;
-    phaseUdateData.AddConditionType(CONDITION_INSTANCE_INFO);
-
     Map::PlayerList const& players = instance->GetPlayers();
     for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
         if (Player* player = itr->GetSource())
-            player->NotifyConditionChanged(phaseUdateData);
+            player->SendUpdatePhasing();
 }

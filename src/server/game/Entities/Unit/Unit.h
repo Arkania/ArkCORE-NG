@@ -1782,7 +1782,7 @@ class Unit : public WorldObject
         void RemoveAurasDueToSpellBySteal(uint32 spellId, uint64 casterGUID, Unit* stealer);
         void RemoveAurasDueToItemSpell(uint32 spellId, uint64 castItemGuid);
         void RemoveAurasByType(AuraType auraType, uint64 casterGUID = 0, Aura* except = NULL, bool negative = true, bool positive = true);
-        void RemoveNotOwnSingleTargetAuras(uint32 newPhase = 0x0);
+        void RemoveNotOwnSingleTargetAuras(uint32 newPhase = 0x0, bool phaseid = false);
         void RemoveAurasWithInterruptFlags(uint32 flag, uint32 except = 0);
         void RemoveAurasWithAttribute(uint32 flags);
         void RemoveAurasWithFamily(SpellFamilyNames family, uint32 familyFlag1, uint32 familyFlag2, uint32 familyFlag3, uint64 casterGUID);
@@ -1951,7 +1951,6 @@ class Unit : public WorldObject
         void SetVisible(bool x);
 
         // common function for visibility checks for player/creatures with detection code
-        void SetPhaseMask(uint64 newPhaseMask, bool update);
         bool SetInPhase(uint16 id, bool update, bool apply);
         // overwrite WorldObject::SetPhaseMask
         void UpdateObjectVisibility(bool forced = true);
@@ -2231,10 +2230,6 @@ class Unit : public WorldObject
         void Yell(uint32 textId, WorldObject const* target = nullptr);
         void TextEmote(uint32 textId, WorldObject const* target = nullptr, bool isBossEmote = false);
         void Whisper(uint32 textId, Player* target, bool isBossWhisper = false);
-
-        // Aura phase effects
-        void RegisterPhasingAuraEffect(AuraEffect const* auraEffect);
-        void UnRegisterPhasingAuraEffect(AuraEffect const* auraEffect);
 
     protected:
         explicit Unit (bool isWorldObject);

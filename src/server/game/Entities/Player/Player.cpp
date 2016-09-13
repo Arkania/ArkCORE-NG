@@ -4005,7 +4005,6 @@ void Player::SetGameMaster(bool on)
         getHostileRefManager().setOnlineOfflineState(false);
         CombatStopWithPets();
 
-        SetPhaseMask(uint32(PHASEMASK_ANYWHERE), false);    // see and visible in all phases
         m_serverSideVisibilityDetect.SetValue(SERVERSIDE_VISIBILITY_GM, GetSession()->GetSecurity());
     }
     else
@@ -4030,9 +4029,6 @@ void Player::SetGameMaster(bool on)
 
         getHostileRefManager().setOnlineOfflineState(true);
         m_serverSideVisibilityDetect.SetValue(SERVERSIDE_VISIBILITY_GM, SEC_PLAYER);
-
-        AddUpdateFlag(PHASE_UPDATE_FLAG_SERVERSIDE_CHANGED);
-        PhaseUpdate();
     }
 
     UpdateObjectVisibility();
@@ -4325,11 +4321,6 @@ void Player::GiveLevel(uint8 level)
     }
 
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_LEVEL);
-
-    PhaseUpdateData phaseUpdateData;
-    phaseUpdateData.AddConditionType(CONDITION_LEVEL);
-
-    NotifyConditionChanged(phaseUpdateData);
 
     // Refer-A-Friend
     if (GetSession()->GetRecruiterId())
@@ -9110,13 +9101,12 @@ void Player::UpdateArea(uint32 newArea)
     // so apply them accordingly
     m_areaUpdateId = newArea;
 
-    AddUpdateFlag(PHASE_UPDATE_FLAG_AREA_UPDATE);
-
     AreaTableEntry const* area = GetAreaEntryByAreaID(newArea);
     pvpInfo.IsInFFAPvPArea = area && (area->flags & AREA_FLAG_ARENA);
     UpdatePvPState(true);
 
     UpdateAreaDependentAuras(newArea);
+    UpdatePhaseForQuestAreaOrZoneChange();
 
     // previously this was in UpdateZone (but after UpdateArea) so nothing will break
     pvpInfo.IsInNoPvPArea = false;
@@ -9129,14 +9119,10 @@ void Player::UpdateArea(uint32 newArea)
     }
     else
         RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_SANCTUARY);
-
-    RemoveUpdateFlag(PHASE_UPDATE_FLAG_AREA_UPDATE);
 }
 
 void Player::UpdateZone(uint32 newZone, uint32 newArea)
 {
-    AddUpdateFlag(PHASE_UPDATE_FLAG_ZONE_UPDATE);
-
     if (m_zoneUpdateId != newZone)
     {
         sOutdoorPvPMgr->HandlePlayerLeaveZone(this, m_zoneUpdateId);
@@ -9240,10 +9226,7 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea)
     UpdateLocalChannels(newZone);
 
     UpdateZoneDependentAuras(newZone);
-
-    RemoveUpdateFlag(PHASE_UPDATE_FLAG_ZONE_UPDATE);
-
-    PhaseUpdate();
+    UpdatePhaseForQuestAreaOrZoneChange();
 }
 
 //If players are too far away from the duel flag... they lose the duel
@@ -16873,10 +16856,6 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     m_RewardedQuests.insert(quest_id);
     m_RewardedQuestsSave[quest_id] = true;
 
-    PhaseUpdateData phaseUpdateData;
-    phaseUpdateData.AddQuestUpdate(quest_id);
-    NotifyConditionChanged(phaseUpdateData);
-
     // StoreNewItem, mail reward, etc. save data directly to the database
     // to prevent exploitable data desynchronisation we save the quest status to the database too
     // (to prevent rewarding this quest another time while rewards were already given out)
@@ -17549,11 +17528,6 @@ void Player::SetQuestStatus(uint32 questId, QuestStatus status, bool update /*= 
         m_QuestStatusSave[questId] = true;
     }
 
-    PhaseUpdateData phaseUpdateData;
-    phaseUpdateData.AddQuestUpdate(questId);
-
-    NotifyConditionChanged(phaseUpdateData);
-
     if (update)
         SendQuestUpdate(questId);
 }
@@ -17567,11 +17541,6 @@ void Player::RemoveActiveQuest(uint32 questId, bool update /*= true*/)
     {
         m_QuestStatus.erase(itr);
         m_QuestStatusSave[questId] = false;
-
-        PhaseUpdateData phaseUpdateData;
-        phaseUpdateData.AddQuestUpdate(questId);
-
-        NotifyConditionChanged(phaseUpdateData);
     }
 
     if (update)
@@ -17586,11 +17555,6 @@ void Player::RemoveRewardedQuest(uint32 questId, bool update /*= true*/)
     {
         m_RewardedQuests.erase(rewItr);
         m_RewardedQuestsSave[questId] = false;
-
-        PhaseUpdateData phaseUpdateData;
-        phaseUpdateData.AddQuestUpdate(questId);
-
-        NotifyConditionChanged(phaseUpdateData);
     }
 
     if (update)
@@ -17729,6 +17693,7 @@ void Player::SendQuestUpdate(uint32 questId)
     }
 
     UpdateForQuestWorldObjects();
+    SendUpdatePhasing();
 }
 
 
@@ -24678,6 +24643,10 @@ template void Player::UpdateVisibilityOf(AreaTrigger*   target, UpdateData& data
 
 void Player::UpdateObjectVisibility(bool forced)
 {
+    // Prevent updating visibility if player is not in world (example: LoadFromDB sets drunkstate which updates invisibility while player is not in map)
+    if (!IsInWorld())
+        return;
+
     if (!forced)
         AddToNotify(NOTIFY_VISIBILITY_CHANGED);
     else
@@ -29709,8 +29678,7 @@ void Player::SendUpdatePhasing()
 {
     if (!IsInWorld())
         return;
-
-    PhaseUpdate(); // gpn39f // not shure
-    // GetSession()->SendSetPhaseShift(GetPhaseIds(), GetTerrainSwaps(), GetWorldMapAreaSwaps());
+    
+    UpdatePhaseForQuestAreaOrZoneChange();
 }
 

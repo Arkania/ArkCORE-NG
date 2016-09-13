@@ -483,6 +483,7 @@ bool Map::AddPlayerToMap(Player* player)
 
     player->m_clientGUIDs.clear();
     player->UpdateObjectVisibility(false);
+    player->SendUpdatePhasing();
 
     sScriptMgr->OnPlayerEnterMap(this, player);
     return true;
@@ -541,6 +542,8 @@ bool Map::AddToMap(T* obj)
 
     if (obj->isActiveObject())
         AddToActive(obj);
+
+    obj->UpdatePhaseForQuestAreaOrZoneChange();
 
     //something, such as vehicle, needs to be update immediately
     //also, trigger needs to cast spell, if not update, cannot see visual
@@ -2421,7 +2424,7 @@ void Map::GetZoneAndAreaIdByAreaFlag(uint32& zoneid, uint32& areaid, uint16 area
 bool Map::isInLineOfSight(float x1, float y1, float z1, float x2, float y2, float z2, uint32 phasemask) const
 {
     bool los1 = VMAP::VMapFactory::createOrGetVMapManager()->isInLineOfSight(GetId(), x1, y1, z1, x2, y2, z2);
-    bool los2 = true; // _dynamicTree.isInLineOfSight(x1, y1, z1, x2, y2, z2, phasemask); //       Return value is sometimes wrong. please help to fix this..
+    bool los2 = _dynamicTree.isInLineOfSight(x1, y1, z1, x2, y2, z2, phasemask);
     return los1 && los2;
 }
 

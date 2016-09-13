@@ -326,6 +326,9 @@ std::string GetUIntegerString(std::set<uint32> uint32List);
 
 std::set<uint16> GetUInt16List(std::string storedString);
 std::string GetUInt16String(std::set<uint16> uint16List);
+std::set<uint16> CopyUInt16List(std::set<uint16> original);
+
+uint64 ComputePhaseIdToMask(uint16 id);
 
 #endif
 

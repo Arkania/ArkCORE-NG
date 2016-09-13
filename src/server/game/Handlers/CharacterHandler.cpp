@@ -1028,7 +1028,6 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
             pCurrChar->TeleportTo(pCurrChar->m_homebindMapId, pCurrChar->m_homebindX, pCurrChar->m_homebindY, pCurrChar->m_homebindZ, pCurrChar->GetOrientation());
     }
 
-    pCurrChar->phaseData.SetPlayer(pCurrChar);
     sObjectAccessor->AddObject(pCurrChar);
     //TC_LOG_DEBUG("Player %s added to Map.", pCurrChar->GetName().c_str());
 

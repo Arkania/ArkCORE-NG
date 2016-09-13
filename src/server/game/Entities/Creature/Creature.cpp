@@ -765,25 +765,9 @@ bool Creature::Create(uint32 guidlow, Map* map, uint32 phaseMask, uint32 Entry, 
     ASSERT(map);
     SetMap(map);
 
-    if (data)
-    {
-        if (!data->phaseIds.empty())
-            for (uint16 ph : data->phaseIds)
-                SetInPhase(ph, false, true);
-
-        if (!data->phaseGroups.empty())
-        {
-            SetPhaseGroups(data->phaseGroups);
-            for (uint16 phGroup : data->phaseGroups)
-                SetInPhase(phGroup, false, true);
-        }
-
-        if (GetPhaseIds().empty() && GetPhaseGroups().empty())
-            SetInPhase(DEFAULT_PHASE, false, true);        
-    }
-
     SetPhaseMask(phaseMask, false);
-
+    SetPhaseBaseValues(data);
+  
     CreatureTemplate const* cinfo = sObjectMgr->GetCreatureTemplate(Entry);
     if (!cinfo)
     {
@@ -857,6 +841,29 @@ bool Creature::Create(uint32 guidlow, Map* map, uint32 phaseMask, uint32 Entry, 
         SetVisible(false);
 
     return true;
+}
+
+void Creature::SetPhaseBaseValues(const CreatureData* data)
+{
+    if (data)
+    {
+        if (data->phaseMask > 1)
+            SetPhaseMask(data->phaseMask, false);
+
+        if (!data->phaseIds.empty())
+            for (uint16 ph : data->phaseIds)
+                SetInPhase(ph, false, true);
+
+        if (!data->phaseGroups.empty())
+        {
+            AddPhaseGroups(data->phaseGroups, true);
+            for (uint16 phGroup : data->phaseGroups)
+                SetInPhase(phGroup, false, true);
+        }
+
+        if (GetPhaseIds().empty())
+            SetInPhase(DEFAULT_PHASE, false, true);
+    }
 }
 
 void Creature::InitializeReactState()
@@ -1057,7 +1064,8 @@ void Creature::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
     stmt->setUInt32(index++, GetEntry());
     stmt->setUInt16(index++, uint16(mapid));
     stmt->setUInt8(index++, spawnMask);
-    stmt->setUInt32(index++, GetPhaseMask());
+    stmt->setString(index++, GetUInt16String(GetPhaseIds()));
+    stmt->setString(index++, GetUInt16String(GetPhaseGroups()));
     stmt->setUInt32(index++, displayId);
     stmt->setInt32(index++, int32(GetCurrentEquipmentId()));
     stmt->setFloat(index++, GetPositionX());
@@ -1566,8 +1574,7 @@ void Creature::SetDeathState(DeathState s)
         SetMeleeDamageSchool(SpellSchools(cinfo->dmgschool));
         LoadCreaturesAddon(true);
         Motion_Initialize();
-        if (GetCreatureData() && GetPhaseMask() != GetCreatureData()->phaseMask)
-            SetPhaseMask(GetCreatureData()->phaseMask, false);
+        SetPhaseBaseValues(GetCreatureData());
         Unit::SetDeathState(ALIVE);
     }
 }

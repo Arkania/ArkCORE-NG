@@ -7634,7 +7634,7 @@ void Spell::EffectUpdatePlayerPhase(SpellEffIndex /*effIndex*/)
     if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
         return;
 
-    unitTarget->PhaseUpdate(); // gpn39f // not shure.. 
+    unitTarget->UpdatePhaseForQuestAreaOrZoneChange();
 }
 
 void Spell::EffectUpdateZoneAurasAndPhases(SpellEffIndex /*effIndex*/)

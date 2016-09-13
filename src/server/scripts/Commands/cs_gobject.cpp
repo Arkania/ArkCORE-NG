@@ -153,11 +153,13 @@ public:
         GameObject* object = new GameObject;
         uint32 guidLow = sObjectMgr->GenerateLowGuid(HIGHGUID_GAMEOBJECT);
 
-        if (!object->Create(guidLow, objectInfo->entry, map, player->GetPhaseMaskForSpawn(), x, y, z, o, 0.0f, 0.0f, 0.0f, 0.0f, 0, GO_STATE_READY))
+        if (!object->Create(guidLow, objectInfo->entry, map, 0, x, y, z, o, 0.0f, 0.0f, 0.0f, 0.0f, 0, GO_STATE_READY))
         {
             delete object;
             return false;
         }
+
+        object->CopyPhaseFrom(player);
 
         if (spawntimeSecs)
         {
@@ -166,7 +168,7 @@ public:
         }
 
         // fill the gameobject data and save to the db
-        object->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()), player->GetPhaseMaskForSpawn());
+        object->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()), player->GetPhaseMask());
         // delete the old object and do a clean load from DB with a fresh new GameObject instance.
         // this is required to avoid weird behavior and memory leaks
         delete object;
@@ -242,14 +244,14 @@ public:
             uint32 objectId = atoul(id);
 
             if (objectId)
-                result = WorldDatabase.PQuery("SELECT guid, id, position_x, position_y, position_z, orientation, map, phaseMask, (POW(position_x - '%f', 2) + POW(position_y - '%f', 2) + POW(position_z - '%f', 2)) AS order_ FROM gameobject WHERE map = '%i' AND id = '%u' ORDER BY order_ ASC LIMIT 1",
+                result = WorldDatabase.PQuery("SELECT guid, id, position_x, position_y, position_z, orientation, map, phaseIds, phaseGroups, (POW(position_x - '%f', 2) + POW(position_y - '%f', 2) + POW(position_z - '%f', 2)) AS order_ FROM gameobject WHERE map = '%i' AND id = '%u' ORDER BY order_ ASC LIMIT 1",
                 player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetMapId(), objectId);
             else
             {
                 std::string name = id;
                 WorldDatabase.EscapeString(name);
                 result = WorldDatabase.PQuery(
-                    "SELECT guid, id, position_x, position_y, position_z, orientation, map, phaseMask, (POW(position_x - %f, 2) + POW(position_y - %f, 2) + POW(position_z - %f, 2)) AS order_ "
+                    "SELECT guid, id, position_x, position_y, position_z, orientation, map, phaseIds, phaseGroups, (POW(position_x - %f, 2) + POW(position_y - %f, 2) + POW(position_z - %f, 2)) AS order_ "
                     "FROM gameobject, gameobject_template WHERE gameobject_template.entry = gameobject.id AND map = %i AND name " _LIKE_ " " _CONCAT3_ ("'%%'", "'%s'", "'%%'")" ORDER BY order_ ASC LIMIT 1",
                     player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetMapId(), name.c_str());
             }
@@ -276,7 +278,7 @@ public:
             else
                 eventFilter << ')';
 
-            result = WorldDatabase.PQuery("SELECT gameobject.guid, id, position_x, position_y, position_z, orientation, map, phaseMask, "
+            result = WorldDatabase.PQuery("SELECT gameobject.guid, id, position_x, position_y, position_z, orientation, map, phaseIds, phaseGroups, "
                 "(POW(position_x - %f, 2) + POW(position_y - %f, 2) + POW(position_z - %f, 2)) AS order_ FROM gameobject "
                 "LEFT OUTER JOIN game_event_gameobject on gameobject.guid = game_event_gameobject.guid WHERE map = '%i' %s ORDER BY order_ ASC LIMIT 10",
                 handler->GetSession()->GetPlayer()->GetPositionX(), handler->GetSession()->GetPlayer()->GetPositionY(), handler->GetSession()->GetPlayer()->GetPositionZ(),
@@ -291,10 +293,11 @@ public:
 
         bool found = false;
         float x, y, z, o;
-        uint32 guidLow, id, phase;
+        uint32 guidLow, id;
         uint16 mapId;
         uint32 poolId;
-
+        std::set<uint16> phaseIds;
+        std::set<uint16> phaseGroups;
         do
         {
             Field* fields = result->Fetch();
@@ -305,7 +308,9 @@ public:
             z =       fields[4].GetFloat();
             o =       fields[5].GetFloat();
             mapId =   fields[6].GetUInt16();
-            phase =   fields[7].GetUInt32();
+            phaseIds = GetUInt16List(fields[7].GetCString());
+            phaseGroups = GetUInt16List(fields[8].GetCString());
+
             poolId =  sPoolMgr->IsPartOfAPool<GameObject>(guidLow);
             if (!poolId || sPoolMgr->IsSpawnedObject<GameObject>(guidLow))
                 found = true;
@@ -327,7 +332,8 @@ public:
 
         GameObject* target = handler->GetSession()->GetPlayer()->GetMap()->GetGameObject(MAKE_NEW_GUID(guidLow, id, HIGHGUID_GAMEOBJECT));
 
-        handler->PSendSysMessage(LANG_GAMEOBJECT_DETAIL, guidLow, objectInfo->name.c_str(), guidLow, id, x, y, z, mapId, o, phase);
+        // GPN39F ToDo: expand last 0 to show phaseIds and PhaseGroups
+        handler->PSendSysMessage(LANG_GAMEOBJECT_DETAIL, guidLow, objectInfo->name.c_str(), guidLow, id, x, y, z, mapId, o, 0);
 
         if (target)
         {
@@ -530,16 +536,17 @@ public:
             return false;
         }
 
-        char* phase = strtok (NULL, " ");
-        uint32 phaseMask = phase ? atoi(phase) : 0;
-        if (phaseMask == 0)
+        char* phaseStr = strtok (NULL, " ");
+        uint16 phaseId = phaseStr ? atoi(phaseStr) : 0;
+        if (phaseId == 0)
         {
             handler->SendSysMessage(LANG_BAD_VALUE);
             handler->SetSentErrorMessage(true);
             return false;
         }
 
-        object->SetPhaseMask(phaseMask, true);
+        object->AddPhaseId(phaseId, true);
+
         object->SaveToDB();
         return true;
     }

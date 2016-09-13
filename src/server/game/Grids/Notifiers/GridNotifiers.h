@@ -250,7 +250,7 @@ namespace Trinity
             if (!(i_mapTypeMask & GRID_MAP_TYPE_MASK_GAMEOBJECT))
                 return;
             for (GameObjectMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
-                if (itr->GetSource()->InSamePhase(_searcher))
+                if (itr->GetSource()->IsInPhase(_searcher))
                     i_do(itr->GetSource());
         }
 
@@ -259,7 +259,7 @@ namespace Trinity
             if (!(i_mapTypeMask & GRID_MAP_TYPE_MASK_PLAYER))
                 return;
             for (PlayerMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
-                if (itr->GetSource()->InSamePhase(_searcher))
+                if (itr->GetSource()->IsInPhase(_searcher))
                     i_do(itr->GetSource());
         }
         void Visit(CreatureMapType &m)
@@ -267,7 +267,7 @@ namespace Trinity
             if (!(i_mapTypeMask & GRID_MAP_TYPE_MASK_CREATURE))
                 return;
             for (CreatureMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
-                if (itr->GetSource()->InSamePhase(_searcher))
+                if (itr->GetSource()->IsInPhase(_searcher))
                     i_do(itr->GetSource());
         }
 
@@ -276,7 +276,7 @@ namespace Trinity
             if (!(i_mapTypeMask & GRID_MAP_TYPE_MASK_CORPSE))
                 return;
             for (CorpseMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
-                if (itr->GetSource()->InSamePhase(_searcher))
+                if (itr->GetSource()->IsInPhase(_searcher))
                     i_do(itr->GetSource());
         }
 
@@ -285,7 +285,7 @@ namespace Trinity
             if (!(i_mapTypeMask & GRID_MAP_TYPE_MASK_DYNAMICOBJECT))
                 return;
             for (DynamicObjectMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
-                if (itr->GetSource()->InSamePhase(_searcher))
+                if (itr->GetSource()->IsInPhase(_searcher))
                     i_do(itr->GetSource());
         }
 
@@ -294,7 +294,7 @@ namespace Trinity
             if (!(i_mapTypeMask & GRID_MAP_TYPE_MASK_AREATRIGGER))
                 return;
             for (AreaTriggerMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
-                if (itr->GetSource()->InSamePhase(_searcher))
+                if (itr->GetSource()->IsInPhase(_searcher))
                     i_do(itr->GetSource());
         }
 
@@ -358,7 +358,7 @@ namespace Trinity
         void Visit(GameObjectMapType& m)
         {
             for (GameObjectMapType::iterator itr = m.begin(); itr != m.end(); ++itr)
-                if (itr->GetSource()->InSamePhase(_searcher))
+                if (itr->GetSource()->IsInPhase(_searcher))
                     _func(itr->GetSource());
         }
 
@@ -482,7 +482,7 @@ namespace Trinity
         void Visit(CreatureMapType &m)
         {
             for (CreatureMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
-                if (itr->GetSource()->InSamePhase(_searcher))
+                if (itr->GetSource()->IsInPhase(_searcher))
                     i_do(itr->GetSource());
         }
 
@@ -549,7 +549,7 @@ namespace Trinity
         void Visit(PlayerMapType &m)
         {
             for (PlayerMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
-                if (itr->GetSource()->InSamePhase(_searcher))
+                if (itr->GetSource()->IsInPhase(_searcher))
                     i_do(itr->GetSource());
         }
 
@@ -569,7 +569,7 @@ namespace Trinity
         void Visit(PlayerMapType &m)
         {
             for (PlayerMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
-                if (itr->GetSource()->InSamePhase(i_searcher) && itr->GetSource()->IsWithinDist(i_searcher, i_dist))
+                if (itr->GetSource()->IsInPhase(i_searcher) && itr->GetSource()->IsWithinDist(i_searcher, i_dist))
                     i_do(itr->GetSource());
         }
 
@@ -1445,7 +1445,7 @@ namespace Trinity
         AllWorldObjectsInRange(const WorldObject* object, float maxRange) : m_pObject(object), m_fRange(maxRange) { }
         bool operator() (WorldObject* go)
         {
-            return m_pObject->IsWithinDist(go, m_fRange, false) && m_pObject->InSamePhase(go);
+            return m_pObject->IsWithinDist(go, m_fRange, false) && m_pObject->IsInPhase(go);
         }
     private:
         const WorldObject* m_pObject;

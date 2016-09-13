@@ -5041,6 +5041,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                     if (DynamicObject* dynObj = m_caster->GetDynObject(m_triggeredByAuraSpell->Id))
                         losTarget = dynObj;
 
+                bool los3 = target->IsWithinLOSInMap(losTarget);
                 if (!(m_spellInfo->AttributesEx2 & SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS) && !DisableMgr::IsDisabledFor(DISABLE_TYPE_SPELL, m_spellInfo->Id, NULL, SPELL_DISABLE_LOS) && !target->IsWithinLOSInMap(losTarget))
                     return SPELL_FAILED_LINE_OF_SIGHT;
             }

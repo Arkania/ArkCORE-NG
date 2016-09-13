@@ -456,6 +456,7 @@ class Creature : public Unit, public GridObject<Creature>, public MapObject
         void DisappearAndDie();
 
         bool Create(uint32 guidlow, Map* map, uint32 phaseMask, uint32 Entry, uint32 vehId, uint32 team, float x, float y, float z, float ang, const CreatureData* data = NULL);
+        void SetPhaseBaseValues(const CreatureData * data);
         bool LoadCreaturesAddon(bool reload = false);
         void SelectLevel();
         void LoadEquipment(int8 id = 1, bool force = false);

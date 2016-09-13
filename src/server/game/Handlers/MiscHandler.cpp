@@ -1832,7 +1832,7 @@ void WorldSession::HandleReadyForAccountDataTimes(WorldPacket& /*recvData*/)
     SendAccountDataTimes(GLOBAL_CACHE_MASK);
 }
 
-void WorldSession::SendSetPhaseShift(std::set<uint32> const& phaseIds, std::set<uint32> const& terrainswaps, std::set<uint32> const& worldMapAreaSwaps)
+void WorldSession::SendSetPhaseShift(std::set<uint16> const& phaseIds, std::set<uint16> const& terrainswaps, std::set<uint16> const& worldMapAreaSwaps)
 {
     ObjectGuid guid = _player->GetGUID();
 
@@ -1856,7 +1856,7 @@ void WorldSession::SendSetPhaseShift(std::set<uint32> const& phaseIds, std::set<
     data.WriteByteSeq(guid[1]);
 
     uint32 flag = uint32(phaseIds.size() ? 0 : 8);
-    for (std::set<uint32>::const_iterator itr = phaseIds.begin(); itr != phaseIds.end(); ++itr)
+    for (std::set<uint16>::const_iterator itr = phaseIds.begin(); itr != phaseIds.end(); ++itr)
         if (PhaseEntry const* phaseEntry = sPhaseStore.LookupEntry(*itr))
             flag |= phaseEntry->flag;
 
@@ -1870,14 +1870,14 @@ void WorldSession::SendSetPhaseShift(std::set<uint32> const& phaseIds, std::set<
     //    data << uint16(0);
 
     data << uint32(phaseIds.size()) * 2;        // Phase.dbc ids
-    for (std::set<uint32>::const_iterator itr = phaseIds.begin(); itr != phaseIds.end(); ++itr)
+    for (std::set<uint16>::const_iterator itr = phaseIds.begin(); itr != phaseIds.end(); ++itr)
         data << uint16(*itr);
 
     data.WriteByteSeq(guid[3]);
     data.WriteByteSeq(guid[0]);
 
     data << uint32(terrainswaps.size()) * 2;    // Active terrain swaps
-    for (std::set<uint32>::const_iterator itr = terrainswaps.begin(); itr != terrainswaps.end(); ++itr)
+    for (std::set<uint16>::const_iterator itr = terrainswaps.begin(); itr != terrainswaps.end(); ++itr)
         data << uint16(*itr);
 
     data.WriteByteSeq(guid[5]);
