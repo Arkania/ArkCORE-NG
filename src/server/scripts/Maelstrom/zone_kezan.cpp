@@ -24,6 +24,8 @@
 #include "ScriptedGossip.h"
 #include "ScriptedEscortAI.h"
 #include "SpellMgr.h"
+#include "Transport.h"
+#include "Vehicle.h"
 
 enum eKezanEnumerate
 {
@@ -33,11 +35,14 @@ enum eKezanEnumerate
     QUEST_KAJA_COLA = 25473,
     QUEST_ROLLING_WITH_MY_HOMIES = 14071,
     QUEST_LIFE_SAVINGS = 14126,
-
-    NPC_ROD_HOT_34840 = 34840,
+    QUEST_MEGS_IN_MARKETING = 28349,
+    NPC_HOT_ROD_34840 = 34840,
     NPC_ACE_34957 = 34957,
     NPC_GOBBER_34958 = 34958,
     NPC_IZZY_34959 = 34959,
+    PLAYER_GUID = 99991,
+    ACTION_ENTER_CAR = 101,
+    EVENT_ENTER_CAR,
 };
 
 // 34689 Mage Trainer, 
@@ -563,6 +568,14 @@ public:
             player->ToUnit()->Talk(BROADCASTTEXT_USE_KEY_FOR_HOT_RED, CHAT_MSG_RAID_BOSS_WHISPER, 25.0f, player);
         return false;
     }
+
+    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*opt*/)
+    {
+        if (quest->GetQuestId() == QUEST_MEGS_IN_MARKETING)
+            creature->AI()->Talk(0, player);
+
+        return false;
+    }
 };
 
 // 35053
@@ -826,8 +839,12 @@ public:
     bool OnTrigger(Player* player, AreaTriggerEntry const* trigger)
     {
         if (player->GetQuestStatus(QUEST_ROLLING_WITH_MY_HOMIES) == QUEST_STATUS_INCOMPLETE)
-            if (Creature* ace = player->FindNearestCreature(NPC_ACE_34957, 20.0f))
-                player->CastSpell(-8068.13f, 1482.03f, 9.014693f, SPELL_SUMMON_ACE, false);
+            if (player->GetReqKillOrCastCurrentCount(QUEST_ROLLING_WITH_MY_HOMIES, NPC_ACE_34957) == 0)
+            {
+                player->CastSpell(player, SPELL_SUMMON_ACE, true);
+                player->KilledMonsterCredit(NPC_ACE_34957);
+            }
+
         return true;
     }
 };
@@ -840,14 +857,18 @@ public:
 
     enum npc
     {
-        SPELL_SUMMON_GOBBER = 66598,
+        SPELL_SUMMON_GOBBER = 66599,
     };
 
     bool OnTrigger(Player* player, AreaTriggerEntry const* trigger)
     {
         if (player->GetQuestStatus(QUEST_ROLLING_WITH_MY_HOMIES) == QUEST_STATUS_INCOMPLETE)
-            if (Creature* gobber = player->FindNearestCreature(NPC_GOBBER_34958, 20.0f))
-                player->CastSpell(-8179.48f, 1321.38f, 27.68263f, SPELL_SUMMON_GOBBER, false);
+            if (player->GetReqKillOrCastCurrentCount(QUEST_ROLLING_WITH_MY_HOMIES, NPC_GOBBER_34958) == 0)
+            {
+                player->CastSpell(player, SPELL_SUMMON_GOBBER, true);
+                player->KilledMonsterCredit(NPC_GOBBER_34958);
+            }
+
         return true;
     }
 };
@@ -859,55 +880,183 @@ public:
     at_kezan_izzy_5499() : AreaTriggerScript("at_kezan_izzy_5499") { }
     enum npc
     {
-        SPELL_SUMMON_IZZY = 66599,
+        SPELL_SUMMON_IZZY = 66600,
     };
 
     bool OnTrigger(Player* player, AreaTriggerEntry const* trigger)
     {
         if (player->GetQuestStatus(QUEST_ROLLING_WITH_MY_HOMIES) == QUEST_STATUS_INCOMPLETE)
-            if (Creature* izzy = player->FindNearestCreature(NPC_IZZY_34959, 20.0f))
-                player->CastSpell(-8179.48f, 1321.38f, 27.68263f, SPELL_SUMMON_IZZY, false);
+            if (player->GetReqKillOrCastCurrentCount(QUEST_ROLLING_WITH_MY_HOMIES, NPC_IZZY_34959) == 0)
+            {
+                player->CastSpell(player, SPELL_SUMMON_IZZY, true);
+                player->KilledMonsterCredit(NPC_IZZY_34959);
+            }
+            
         return true;
     }
 };
 
-// 34957
-class npc_ace_34957 : public CreatureScript
+// 34840
+class npc_rod_hot_34840 : public CreatureScript
 {
 public:
-    npc_ace_34957() : CreatureScript("npc_ace_34957") { }
+    npc_rod_hot_34840() : CreatureScript("npc_rod_hot_34840") { }
 
     enum eNPC
     {
+        SPELL_RESUMMON_IZZY = 66646,
+        SPELL_RESUMMON_GOBBER = 66645,
+        SPELL_RESUMMON_ACE = 66644,
+        EVENT_IZZY_ENTER_THE_CAR = 902,
+        EVENT_GOBBER_ENTER_THE_CAR = 903,
+        EVENT_ACE_ENTER_THE_CAR = 904,
     };
 
-    struct npc_ace_34957AI : public ScriptedAI
+    struct npc_rod_hot_34840AI : public VehicleAI
     {
-        npc_ace_34957AI(Creature* creature) : ScriptedAI(creature) { }
+        npc_rod_hot_34840AI(Creature* creature) : VehicleAI(creature) { }
 
         EventMap m_events;
         uint64   m_playerGUID;
+        uint64   m_izzyGUID;
+        uint64   m_gobberGUID;
+        uint64   m_aceGUID;
 
         void Reset() override
         {
             m_playerGUID = 0;
-            me->SetOrientation(3.819579f);
+            m_izzyGUID = 0;
+            m_gobberGUID = 0;
+            m_aceGUID = 0;
         }
 
         void IsSummonedBy(Unit* summoner) override
         {
             if (Player* player = summoner->ToPlayer())
+            {
                 m_playerGUID = player->GetGUID();
+                for (std::set<Unit*>::iterator itr = player->m_Controlled.begin(); itr != player->m_Controlled.end(); ++itr)
+                    if ((*itr)->GetEntry() == NPC_IZZY_34959)
+                        m_izzyGUID = (*itr)->GetGUID();
+                    else if ((*itr)->GetEntry() == NPC_GOBBER_34958)
+                        m_gobberGUID = (*itr)->GetGUID();
+                    else if ((*itr)->GetEntry() == NPC_ACE_34957)
+                        m_aceGUID = (*itr)->GetGUID();
+
+                if (player->GetQuestStatus(QUEST_ROLLING_WITH_MY_HOMIES) == QUEST_STATUS_INCOMPLETE)
+                {
+                    if (!m_izzyGUID)
+                        if (player->GetReqKillOrCastCurrentCount(QUEST_ROLLING_WITH_MY_HOMIES, NPC_IZZY_34959) > 0)
+                            player->CastSpell(player, SPELL_RESUMMON_IZZY);
+                    if (!m_gobberGUID)
+                        if (player->GetReqKillOrCastCurrentCount(QUEST_ROLLING_WITH_MY_HOMIES, NPC_GOBBER_34958) > 0)
+                            player->CastSpell(player, SPELL_RESUMMON_GOBBER);
+                    if (!m_aceGUID)
+                        if (player->GetReqKillOrCastCurrentCount(QUEST_ROLLING_WITH_MY_HOMIES, NPC_ACE_34957) > 0)
+                            player->CastSpell(player, SPELL_RESUMMON_ACE);
+                    if (m_izzyGUID)
+                        if (player->GetReqKillOrCastCurrentCount(QUEST_ROLLING_WITH_MY_HOMIES, NPC_IZZY_34959) == 0)
+                            player->KilledMonsterCredit(NPC_IZZY_34959);
+                    if (m_gobberGUID)
+                        if (player->GetReqKillOrCastCurrentCount(QUEST_ROLLING_WITH_MY_HOMIES, NPC_GOBBER_34958) == 0)
+                            player->KilledMonsterCredit(NPC_GOBBER_34958);
+                    if (m_aceGUID)
+                        if (player->GetReqKillOrCastCurrentCount(QUEST_ROLLING_WITH_MY_HOMIES, NPC_ACE_34957) == 0)
+                            player->KilledMonsterCredit(NPC_ACE_34957);
+                }
+                else if (player->GetQuestStatus(QUEST_ROLLING_WITH_MY_HOMIES) == QUEST_STATUS_REWARDED)
+                {
+                    if (!m_izzyGUID)
+                        player->CastSpell(player, SPELL_RESUMMON_IZZY);
+                    if (!m_gobberGUID)
+                        player->CastSpell(player, SPELL_RESUMMON_GOBBER);
+                    if (!m_aceGUID)
+                        player->CastSpell(player, SPELL_RESUMMON_ACE);
+                }
+
+                if (Vehicle* car = me->GetVehicleKit())
+                    for (std::set<Unit*>::iterator itr = player->m_Controlled.begin(); itr != player->m_Controlled.end(); ++itr)
+                        if ((*itr)->GetEntry() == NPC_IZZY_34959)
+                            m_events.ScheduleEvent(EVENT_IZZY_ENTER_THE_CAR, 500);
+                        else if ((*itr)->GetEntry() == NPC_GOBBER_34958)
+                            m_events.ScheduleEvent(EVENT_GOBBER_ENTER_THE_CAR, 500);
+                        else if ((*itr)->GetEntry() == NPC_ACE_34957)
+                            m_events.ScheduleEvent(EVENT_ACE_ENTER_THE_CAR, 500);
+            }
+        }
+
+        void PassengerBoarded(Unit* unit, int8 /*seat*/, bool apply) override
+        {
+            if (apply)
+            {
+                if (Player* player = unit->ToPlayer())
+                {
+                    if (!m_playerGUID)
+                        m_playerGUID = player->GetGUID();
+                }
+                else if (Creature* npc = unit->ToCreature())
+                {
+                    if (!m_izzyGUID)
+                        if (npc->GetEntry() == NPC_IZZY_34959)
+                            m_izzyGUID = npc->GetGUID();
+                    if (!m_gobberGUID)
+                        if (npc->GetEntry() == NPC_GOBBER_34958)
+                            m_gobberGUID = npc->GetGUID();
+                    if (!m_aceGUID)
+                        if (npc->GetEntry() == NPC_ACE_34957)
+                            m_aceGUID = npc->GetGUID();
+                }
+            }
         }
 
         void UpdateAI(uint32 diff) override
         {
             m_events.Update(diff);
+            VehicleAI::UpdateAI(diff);
 
             while (uint32 eventId = m_events.ExecuteEvent())
             {
                 switch (eventId)
                 {
+                case EVENT_IZZY_ENTER_THE_CAR:
+                {
+                    if (!m_izzyGUID)
+                        if (Creature* npc = me->FindNearestCreature(NPC_IZZY_34959, 15.0f))
+                            m_izzyGUID = npc->GetGUID();
+                    if (Creature* npc = ObjectAccessor::GetCreature(*me, m_izzyGUID))
+                    {
+                        npc->AI()->SetGUID(m_playerGUID, PLAYER_GUID);
+                        npc->AI()->SetGUID(me->GetGUID(), me->GetEntry());
+                        npc->AI()->DoAction(ACTION_ENTER_CAR);
+                    }
+                    break;
+                }
+                case EVENT_GOBBER_ENTER_THE_CAR:
+                {
+                    if (!m_gobberGUID)
+                        if (Creature* npc = me->FindNearestCreature(NPC_GOBBER_34958, 15.0f))
+                            m_gobberGUID = npc->GetGUID();
+                    if (Creature* npc = ObjectAccessor::GetCreature(*me, m_gobberGUID))
+                    {
+                        npc->AI()->SetGUID(m_playerGUID, PLAYER_GUID);
+                        npc->AI()->SetGUID(me->GetGUID(), me->GetEntry());
+                        npc->AI()->DoAction(ACTION_ENTER_CAR);
+                    }
+                    break;
+                }
+                case EVENT_ACE_ENTER_THE_CAR:
+                {
+                    if (!m_aceGUID)
+                        if (Creature* npc = me->FindNearestCreature(NPC_ACE_34957, 15.0f))
+                            m_aceGUID = npc->GetGUID();
+                    if (Creature* npc = ObjectAccessor::GetCreature(*me, m_aceGUID))
+                    {
+                        npc->AI()->SetGUID(m_playerGUID, PLAYER_GUID);
+                        npc->AI()->SetGUID(me->GetGUID(), me->GetEntry());
+                        npc->AI()->DoAction(ACTION_ENTER_CAR);
+                    }
+                    break;
+                }
                 }
             }
 
@@ -920,37 +1069,77 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_ace_34957AI(creature);
+        return new npc_rod_hot_34840AI(creature);
     }
 };
 
-// 34958
-class npc_gobber_34958 : public CreatureScript
+// 34959
+class npc_izzy_34959 : public CreatureScript
 {
 public:
-    npc_gobber_34958() : CreatureScript("npc_gobber_34958") { }
+    npc_izzy_34959() : CreatureScript("npc_izzy_34959") { }
 
-    enum eNPC
+    struct npc_izzy_34959AI : public ScriptedAI
     {
-    };
-
-    struct npc_gobber_34958AI : public ScriptedAI
-    {
-        npc_gobber_34958AI(Creature* creature) : ScriptedAI(creature) { }
+        npc_izzy_34959AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
 
         EventMap m_events;
         uint64   m_playerGUID;
+        uint64   m_hotrodGUID;
+
+        void Initialize()
+        {
+            m_playerGUID = 0;
+            m_hotrodGUID = 0;
+        }
 
         void Reset() override
         {
-            m_playerGUID = 0;
-            me->SetOrientation(4.120008f);
+            me->SetOrientation(6.265732f);
         }
 
         void IsSummonedBy(Unit* summoner) override
         {
             if (Player* player = summoner->ToPlayer())
+            {
                 m_playerGUID = player->GetGUID();
+                if (Creature* car = player->GetVehicleCreatureBase())
+                    if (car->GetEntry() == NPC_HOT_ROD_34840)
+                    {
+                        m_hotrodGUID = car->GetGUID();
+                        m_events.ScheduleEvent(EVENT_ENTER_CAR, 500);
+                    }
+            }
+        }
+
+        void SetGUID(uint64 guid, int32 id) override
+        {
+            switch (id)
+            {
+            case PLAYER_GUID:
+            {
+                m_playerGUID = guid;
+                break;
+            }
+            case NPC_HOT_ROD_34840:
+            {
+                m_hotrodGUID = guid;
+                break;
+            }
+            }
+        }
+
+        void DoAction(int32 param) override
+        {
+            switch (param)
+            {
+            case ACTION_ENTER_CAR:
+            {
+                m_events.ScheduleEvent(EVENT_ENTER_CAR, 500);
+                break;
+            }
+            }
+
         }
 
         void UpdateAI(uint32 diff) override
@@ -961,6 +1150,117 @@ public:
             {
                 switch (eventId)
                 {
+                case EVENT_ENTER_CAR:
+                {
+                    if (Creature* car = ObjectAccessor::GetCreature(*me, m_hotrodGUID))
+                        if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                            if (Vehicle* hotrod = car->GetVehicleKit())
+                                if (!hotrod->HasEmptySeat(0))    // player is passenger
+                                    if (hotrod->HasEmptySeat(3)) // my seat is free
+                                        hotrod->AddPassenger(me, 3);
+                    break;
+                }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_izzy_34959AI(creature);
+    }
+};
+
+// 34958
+class npc_gobber_34958 : public CreatureScript
+{
+public:
+    npc_gobber_34958() : CreatureScript("npc_gobber_34958") { }
+
+    struct npc_gobber_34958AI : public ScriptedAI
+    {
+        npc_gobber_34958AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+        EventMap m_events;
+        uint64   m_playerGUID;
+        uint64   m_hotrodGUID;
+
+        void Initialize()
+        {
+            m_playerGUID = 0;
+            m_hotrodGUID = 0;
+        }
+
+        void Reset() override
+        {
+            me->SetOrientation(4.120008f);
+        }
+
+        void IsSummonedBy(Unit* summoner) override
+        {
+            if (Player* player = summoner->ToPlayer())
+            {
+                m_playerGUID = player->GetGUID();
+                if (Creature* car = player->GetVehicleCreatureBase())
+                    if (car->GetEntry() == NPC_HOT_ROD_34840)
+                    {
+                        m_hotrodGUID = car->GetGUID();
+                        m_events.ScheduleEvent(EVENT_ENTER_CAR, 500);
+                    }
+            }
+        }
+
+        void SetGUID(uint64 guid, int32 id) override
+        {
+            switch (id)
+            {
+            case PLAYER_GUID:
+            {
+                m_playerGUID = guid;
+                break;
+            }
+            case NPC_HOT_ROD_34840:
+            {
+                m_hotrodGUID = guid;
+                break;
+            }
+            }
+        }
+
+        void DoAction(int32 param) override
+        {
+            switch (param)
+            {
+            case ACTION_ENTER_CAR:
+            {
+                m_events.ScheduleEvent(EVENT_ENTER_CAR, 500);
+                break;
+            }
+            }
+
+        }
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_ENTER_CAR:
+                {
+                    if (Creature* car = ObjectAccessor::GetCreature(*me, m_hotrodGUID))
+                        if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                            if (Vehicle* hotrod = car->GetVehicleKit())
+                                if (!hotrod->HasEmptySeat(0))    // player is passenger
+                                    if (hotrod->HasEmptySeat(2)) // my seat is free
+                                        hotrod->AddPassenger(me, 2);
+                }
                 }
             }
 
@@ -977,33 +1277,73 @@ public:
     }
 };
 
-// 34959
-class npc_izzy_34959 : public CreatureScript
+// 34957
+class npc_ace_34957 : public CreatureScript
 {
 public:
-    npc_izzy_34959() : CreatureScript("npc_izzy_34959") { }
+    npc_ace_34957() : CreatureScript("npc_ace_34957") { }
 
-    enum eNPC
+    struct npc_ace_34957AI : public ScriptedAI
     {
-    };
-
-    struct npc_izzy_34959AI : public ScriptedAI
-    {
-        npc_izzy_34959AI(Creature* creature) : ScriptedAI(creature) { }
+        npc_ace_34957AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
 
         EventMap m_events;
         uint64   m_playerGUID;
+        uint64   m_hotrodGUID;
+
+        void Initialize()
+        {
+            m_playerGUID = 0;
+            m_hotrodGUID = 0;
+        }
 
         void Reset() override
         {
-            m_playerGUID = 0;
-            me->SetOrientation(6.265732f);
+            me->SetOrientation(3.819579f);
         }
 
         void IsSummonedBy(Unit* summoner) override
         {
             if (Player* player = summoner->ToPlayer())
+            {
                 m_playerGUID = player->GetGUID();
+                if (Creature* car = player->GetVehicleCreatureBase())
+                    if (car->GetEntry() == NPC_HOT_ROD_34840)
+                    {
+                        m_hotrodGUID = car->GetGUID();
+                        m_events.ScheduleEvent(EVENT_ENTER_CAR, 500);
+                    }
+            }
+        }
+
+        void SetGUID(uint64 guid, int32 id) override
+        {
+            switch (id)
+            {
+            case PLAYER_GUID:
+            {
+                m_playerGUID = guid;
+                break;
+            }
+            case NPC_HOT_ROD_34840:
+            {
+                m_hotrodGUID = guid;
+                break;
+            }
+            }
+        }
+
+        void DoAction(int32 param) override
+        {
+            switch (param)
+            {
+            case ACTION_ENTER_CAR:
+            {
+                m_events.ScheduleEvent(EVENT_ENTER_CAR, 500);
+                break;
+            }
+            }
+
         }
 
         void UpdateAI(uint32 diff) override
@@ -1014,6 +1354,15 @@ public:
             {
                 switch (eventId)
                 {
+                case EVENT_ENTER_CAR:
+                {
+                    if (Creature* car = ObjectAccessor::GetCreature(*me, m_hotrodGUID))
+                        if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                            if (Vehicle* hotrod = car->GetVehicleKit())
+                                if (!hotrod->HasEmptySeat(0))    // player is passenger
+                                    if (hotrod->HasEmptySeat(1)) // my seat is free
+                                        hotrod->AddPassenger(me, 1);
+                }
                 }
             }
 
@@ -1026,7 +1375,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_izzy_34959AI(creature);
+        return new npc_ace_34957AI(creature);
     }
 };
 
@@ -1049,6 +1398,7 @@ void AddSC_zone_kezan()
     new at_kezan_ace_5497();
     new at_kezan_gobber_5498();
     new at_kezan_izzy_5499();
+    new npc_rod_hot_34840();
     new npc_ace_34957();
     new npc_gobber_34958();
     new npc_izzy_34959();
