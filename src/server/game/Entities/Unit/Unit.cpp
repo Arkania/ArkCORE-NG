@@ -15942,7 +15942,8 @@ void Unit::SetFeared(bool apply)
     }
 
     if (Player* player = ToPlayer())
-        player->SetClientControl(this, !apply);
+        if (!player->HasUnitState(UNIT_STATE_POSSESSED))
+            player->SetClientControl(this, !apply);
 }
 
 void Unit::SetConfused(bool apply)
@@ -15964,7 +15965,8 @@ void Unit::SetConfused(bool apply)
     }
 
     if (Player* player = ToPlayer())
-        player->SetClientControl(this, !apply);
+        if (!player->HasUnitState(UNIT_STATE_POSSESSED))
+            player->SetClientControl(this, !apply);
 }
 
 bool Unit::SetCharmedBy(Unit* charmer, CharmType type, AuraApplication const* aurApp)
@@ -16049,11 +16051,17 @@ bool Unit::SetCharmedBy(Unit* charmer, CharmType type, AuraApplication const* au
         ToCreature()->AI()->OnCharmed(true);
         GetMotionMaster()->MoveIdle();
     }
-    else
+    else if (Player* player = ToPlayer())
     {
-        Player* player = ToPlayer();
         if (player->isAFK())
             player->ToggleAFK();
+
+        if (charmer->GetTypeId() == TYPEID_UNIT) // we are charmed by a creature
+        {
+            // change AI to charmed AI on next Update tick
+            NeedChangeAI = true;
+            IsAIEnabled = false;
+        }
         player->SetClientControl(this, false);
     }
 
@@ -16062,7 +16070,7 @@ bool Unit::SetCharmedBy(Unit* charmer, CharmType type, AuraApplication const* au
     if (aurApp && aurApp->GetRemoveMode())
         return false;
     
-    if (type != CHARM_TYPE_VEHICLE)
+    if (type != CHARM_TYPE_VEHICLE && !GetCharmInfo())
     {
         InitCharmInfo();
         if (type == CHARM_TYPE_POSSESS)
@@ -16210,7 +16218,14 @@ void Unit::RemoveCharmedBy(Unit* charmer)
     }
 
     if (Player* player = ToPlayer())
+    {
+        if (charmer->GetTypeId() == TYPEID_UNIT) // charmed by a creature, this means we had PlayerAI
+        {
+            NeedChangeAI = true;
+            IsAIEnabled = false;
+        }
         player->SetClientControl(this, true);
+    }
 
     // a guardian should always have charminfo
     if (playerCharmer && this != charmer->GetFirstControlled())

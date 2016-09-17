@@ -3051,7 +3051,15 @@ void AuraEffect::HandleAuraControlVehicle(AuraApplication const* aurApp, uint8 m
         // Current formula about m_amount: effect base points + dieside - 1
         // TO DO: Reasearch more about 0/0 and fix it.
         // // correct amount is already calculated adding one more -1 meant calculated amount - 1
-        caster->_EnterVehicle(target->GetVehicleKit(), m_amount - 1, aurApp);
+        switch (target->GetEntry())
+        {
+        case 34840: // kezan, hot rod
+            caster->_EnterVehicle(target->GetVehicleKit(), 0, aurApp);
+            break;
+        default:
+            caster->_EnterVehicle(target->GetVehicleKit(), m_amount - 1, aurApp);
+            break;
+        }        
     }
     else
     {

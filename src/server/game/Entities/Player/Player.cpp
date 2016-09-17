@@ -4321,6 +4321,7 @@ void Player::GiveLevel(uint8 level)
     }
 
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_LEVEL);
+    SendUpdatePhasing();
 
     // Refer-A-Friend
     if (GetSession()->GetRecruiterId())
