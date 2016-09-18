@@ -3054,6 +3054,7 @@ void AuraEffect::HandleAuraControlVehicle(AuraApplication const* aurApp, uint8 m
         switch (target->GetEntry())
         {
         case 34840: // kezan, hot rod
+            caster->SetDisableGravity(true);
             caster->_EnterVehicle(target->GetVehicleKit(), 0, aurApp);
             break;
         default:

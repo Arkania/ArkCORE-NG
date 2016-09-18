@@ -16,6 +16,8 @@
  */
 
 #include "Creature.h"
+#include "GameObjectAI.h"
+#include "GameObject.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Player.h"
@@ -40,9 +42,13 @@ enum eKezanEnumerate
     NPC_ACE_34957 = 34957,
     NPC_GOBBER_34958 = 34958,
     NPC_IZZY_34959 = 34959,
+    NPC_KEZAN_CITIZEN_35063 = 35063,
+    NPC_KEZAN_CITIZEN_35075 = 35075,
+    SPELL_BORE_32738 = 32738,
     PLAYER_GUID = 99991,
     ACTION_ENTER_CAR = 101,
     EVENT_ENTER_CAR,
+    EVENT_TALK_PERIODIC,
 };
 
 // 34689 Mage Trainer, 
@@ -907,9 +913,10 @@ public:
         SPELL_RESUMMON_IZZY = 66646,
         SPELL_RESUMMON_GOBBER = 66645,
         SPELL_RESUMMON_ACE = 66644,
-        EVENT_IZZY_ENTER_THE_CAR = 902,
-        EVENT_GOBBER_ENTER_THE_CAR = 903,
-        EVENT_ACE_ENTER_THE_CAR = 904,
+        EVENT_IZZY_ENTER_THE_CAR = 901,
+        EVENT_GOBBER_ENTER_THE_CAR,
+        EVENT_ACE_ENTER_THE_CAR,
+        EVENT_GOBBER_COOLDOWN,
     };
 
     struct npc_rod_hot_34840AI : public VehicleAI
@@ -921,6 +928,7 @@ public:
         uint64   m_izzyGUID;
         uint64   m_gobberGUID;
         uint64   m_aceGUID;
+        bool     m_gobberEmoteCD;
 
         void Reset() override
         {
@@ -928,6 +936,7 @@ public:
             m_izzyGUID = 0;
             m_gobberGUID = 0;
             m_aceGUID = 0;
+            m_gobberEmoteCD = false;
         }
 
         void IsSummonedBy(Unit* summoner) override
@@ -964,7 +973,7 @@ public:
                         if (player->GetReqKillOrCastCurrentCount(QUEST_ROLLING_WITH_MY_HOMIES, NPC_ACE_34957) == 0)
                             player->KilledMonsterCredit(NPC_ACE_34957);
                 }
-                else if (player->GetQuestStatus(QUEST_ROLLING_WITH_MY_HOMIES) == QUEST_STATUS_REWARDED)
+                else if (player->GetQuestStatus(QUEST_ROLLING_WITH_MY_HOMIES) == QUEST_STATUS_COMPLETE || player->GetQuestStatus(QUEST_ROLLING_WITH_MY_HOMIES) == QUEST_STATUS_REWARDED)
                 {
                     if (!m_izzyGUID)
                         player->CastSpell(player, SPELL_RESUMMON_IZZY);
@@ -1007,6 +1016,21 @@ public:
                             m_aceGUID = npc->GetGUID();
                 }
             }
+        }
+
+        void MoveInLineOfSight(Unit* who) override
+        {
+            if (!m_gobberEmoteCD)
+                if (Vehicle* vehicle = me->GetVehicleKit())
+                    if (Unit* gobber = vehicle->GetPassenger(2))
+                        if (who->GetEntry() == NPC_KEZAN_CITIZEN_35063 || who->GetEntry() == NPC_KEZAN_CITIZEN_35075)
+                            if (who->GetDistance2d(me) < 15.0f)
+                                if (urand(0, 100) < 25)
+                                {
+                                    gobber->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
+                                    m_gobberEmoteCD = true;
+                                    m_events.ScheduleEvent(EVENT_GOBBER_COOLDOWN, 5000);
+                                }
         }
 
         void UpdateAI(uint32 diff) override
@@ -1055,6 +1079,11 @@ public:
                         npc->AI()->SetGUID(me->GetGUID(), me->GetEntry());
                         npc->AI()->DoAction(ACTION_ENTER_CAR);
                     }
+                    break;
+                }
+                case EVENT_GOBBER_COOLDOWN:
+                {
+                    m_gobberEmoteCD = false;
                     break;
                 }
                 }
@@ -1157,7 +1186,9 @@ public:
                             if (Vehicle* hotrod = car->GetVehicleKit())
                                 if (!hotrod->HasEmptySeat(0))    // player is passenger
                                     if (hotrod->HasEmptySeat(3)) // my seat is free
-                                        hotrod->AddPassenger(me, 3);
+                                    {
+                                        //hotrod->AddPassenger(me, 3);
+                                    }
                     break;
                 }
                 }
@@ -1259,7 +1290,9 @@ public:
                             if (Vehicle* hotrod = car->GetVehicleKit())
                                 if (!hotrod->HasEmptySeat(0))    // player is passenger
                                     if (hotrod->HasEmptySeat(2)) // my seat is free
-                                        hotrod->AddPassenger(me, 2);
+                                    {
+                                        //hotrod->AddPassenger(me, 2);
+                                    }
                 }
                 }
             }
@@ -1361,7 +1394,9 @@ public:
                             if (Vehicle* hotrod = car->GetVehicleKit())
                                 if (!hotrod->HasEmptySeat(0))    // player is passenger
                                     if (hotrod->HasEmptySeat(1)) // my seat is free
-                                        hotrod->AddPassenger(me, 1);
+                                    {
+                                        // hotrod->AddPassenger(me, 1);
+                                    }
                 }
                 }
             }
@@ -1376,6 +1411,118 @@ public:
     CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_ace_34957AI(creature);
+    }
+};
+
+// 201591
+class go_disco_ball_201591 : public GameObjectScript
+{
+public:
+    go_disco_ball_201591() : GameObjectScript("go_disco_ball_201591") { }
+
+    struct go_disco_ball_201591AI : public GameObjectAI
+    {
+        go_disco_ball_201591AI(GameObject* go) : GameObjectAI(go) { }
+
+        EventMap m_events;
+
+        void Reset() override
+        {
+           m_events.RescheduleEvent(EVENT_TALK_PERIODIC, 3000);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_TALK_PERIODIC:
+                {
+                    go->PlayDirectSound(12924);
+                    m_events.ScheduleEvent(EVENT_TALK_PERIODIC, urand(2600,5200));
+                    break;
+                }
+                }
+            }
+        }
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_disco_ball_201591AI(go);
+    }
+};
+
+// 34865
+class npc_tunneling_worm_34865 : public CreatureScript
+{
+public:
+    npc_tunneling_worm_34865() : CreatureScript("npc_tunneling_worm_34865") { }
+
+    struct npc_tunneling_worm_34865AI : public ScriptedAI
+    {
+        npc_tunneling_worm_34865AI(Creature* creature) : ScriptedAI(creature) { }
+
+        void EnterCombat(Unit* victim) override
+        {
+            me->CastSpell(victim, SPELL_BORE_32738);
+            me->PlayDirectSound(5038);
+            me->HandleEmoteCommand(EMOTE_ONESHOT_ATTACK_UNARMED);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_tunneling_worm_34865AI(creature);
+    }
+};
+
+// 34697
+class npc_warrior_matic_nx__34697 : public CreatureScript
+{
+public:
+    npc_warrior_matic_nx__34697() : CreatureScript("npc_warrior_matic_nx__34697") { }
+
+    struct npc_warrior_matic_nx__34697AI : public ScriptedAI
+    {
+        npc_warrior_matic_nx__34697AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap m_events;
+
+        void Reset() override
+        {
+            m_events.RescheduleEvent(EVENT_TALK_PERIODIC, 3000);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_TALK_PERIODIC:
+                {
+                    me->PlayDirectSound(2304);
+                    m_events.ScheduleEvent(EVENT_TALK_PERIODIC, urand(25000, 35000));
+                    break;
+                }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_warrior_matic_nx__34697AI(creature);
     }
 };
 
@@ -1402,6 +1549,8 @@ void AddSC_zone_kezan()
     new npc_ace_34957();
     new npc_gobber_34958();
     new npc_izzy_34959();
-
+    new go_disco_ball_201591();
+    new npc_tunneling_worm_34865();
+    new npc_warrior_matic_nx__34697();
 }
 
