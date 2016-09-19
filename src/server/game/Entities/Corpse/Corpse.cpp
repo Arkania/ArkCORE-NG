@@ -26,7 +26,7 @@
 #include "Opcodes.h"
 #include "GossipDef.h"
 #include "World.h"
-#include "util.h"
+#include "Util.h"
 
 Corpse::Corpse(CorpseType type) : WorldObject(type != CORPSE_BONES), m_type(type)
 {
