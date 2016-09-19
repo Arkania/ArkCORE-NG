@@ -495,7 +495,7 @@ class WorldSession
 
         // Knockback
         void HandleMoveKnockBackAck(WorldPacket& recvPacket);
-
+        void HandleGravityAckMessage(WorldPacket & recvData);
         void HandleMoveTeleportAck(WorldPacket& recvPacket);
         void HandleForceSpeedChangeAck(WorldPacket& recvData);
         void HandleSetCollisionHeightAck(WorldPacket& recvPacket);
