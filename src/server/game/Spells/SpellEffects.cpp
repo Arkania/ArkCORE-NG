@@ -1035,7 +1035,12 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
     switch (m_spellInfo->SpellFamilyName)
     {
         case SPELLFAMILY_GENERIC:
-
+            // spell Hot Rod - Radio
+            if (m_spellInfo->Id == 66299 && !effIndex)
+            {
+                m_caster->PlayDirectSound(23406);
+                break;
+            }
             // Quest teritorial fetish
             if (m_spellInfo->Id == 72070)
             {

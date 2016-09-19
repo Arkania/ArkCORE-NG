@@ -802,6 +802,9 @@ void WorldSession::HandlePetCastSpellOpcode(WorldPacket& recvPacket)
     targets.Read(recvPacket, caster);
     HandleClientCastFlags(recvPacket, castFlags, targets);
 
+    if (spellId == 66298)
+        targets.SetUnitTarget(_player);
+
     caster->ClearUnitState(UNIT_STATE_FOLLOW);
 
     Spell* spell = new Spell(caster, spellInfo, TRIGGERED_NONE);
