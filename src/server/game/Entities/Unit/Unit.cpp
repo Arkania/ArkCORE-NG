@@ -13652,10 +13652,7 @@ int32 Unit::GetCreatePowers(Powers power) const
 void Unit::AddToWorld()
 {
     if (!IsInWorld())
-    {
         WorldObject::AddToWorld();
-    }
-    UpdatePhaseForQuestAreaOrZoneChange();
 }
 
 void Unit::RemoveFromWorld()
