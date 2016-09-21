@@ -1269,22 +1269,38 @@ public:
         return true;
     }
 
-    //set temporary phase mask for player
+    //set temporary #phaseId and #phaseGroup for selected object / self
     static bool HandleModifyPhaseCommand(ChatHandler* handler, const char* args)
     {
         if (!*args)
             return false;
 
-        uint16 phaseId = (uint32)atoi((char*)args);
+        char* pId = strtok((char*)args, " ");
+        char* pGroup = strtok((char*)NULL, "");
+        uint16 phaseId = 0;
+        uint16 phaseGroup = 0;
+
+        if (pId)
+            phaseId = (uint16)atoi(pId);
+        if (pGroup)
+            phaseGroup = (uint16)atoi(pGroup);
+
+        if (!phaseId && phaseGroup)
+            phaseId = phaseGroup;
+
+        if (!phaseId)
+        {
+            handler->PSendSysMessage(LANG_PHASING_INVALID_VALUE, phaseId);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
 
         Unit* target = handler->getSelectedUnit();
         if (!target)
             target = handler->GetSession()->GetPlayer();
 
+        target->ClearAllPhases(false);
         target->SetInPhase(phaseId, true, !target->IsInPhase(phaseId));
-
-        if (target->GetTypeId() == TYPEID_PLAYER)
-            target->ToPlayer()->SendUpdatePhasing();
 
         return true;
     }

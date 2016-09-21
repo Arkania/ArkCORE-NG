@@ -253,8 +253,10 @@ public:
         {
             uint32 guid = sObjectMgr->GenerateLowGuid(HIGHGUID_UNIT);
             CreatureData& data = sObjectMgr->NewOrExistCreatureData(guid);
-            data.id = id;
+            data.id = id;            
             data.phaseMask = chr->GetPhaseMask();
+            data.phaseIds = chr->GetPhaseIds();
+            data.phaseGroups = chr->GetPhaseGroups();
             data.posX = chr->GetTransOffsetX();
             data.posY = chr->GetTransOffsetY();
             data.posZ = chr->GetTransOffsetZ();
@@ -263,7 +265,7 @@ public:
 
             Creature* creature = trans->CreateNPCPassenger(guid, &data);
 
-            creature->SaveToDB(trans->GetGOInfo()->moTransport.mapID, 1 << map->GetSpawnMode(), chr->GetPhaseMask());
+            creature->SaveToDB(trans->GetGOInfo()->moTransport.mapID, &data);
 
             sObjectMgr->AddCreatureToGrid(guid, &data);
             return true;
@@ -276,7 +278,11 @@ public:
             return false;
         }
 
-        creature->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()), chr->GetPhaseMask());
+        CreatureData* tmpData = &sObjectMgr->NewOrExistCreatureData(creature->GetDBTableGUIDLow());
+        tmpData->spawnMask = (1 << map->GetSpawnMode());
+        tmpData->phaseMask = chr->GetPhaseMask();
+        tmpData->phaseIds = chr->GetPhaseIds();
+        creature->SaveToDB(map->GetId(), tmpData);
 
         uint32 db_guid = creature->GetDBTableGUIDLow();
 

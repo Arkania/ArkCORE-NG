@@ -168,7 +168,12 @@ public:
         }
 
         // fill the gameobject data and save to the db
-        object->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()), player->GetPhaseMask());
+        GameObjectData* tmpData = &sObjectMgr->NewGOData(guidLow);
+        tmpData->id = object->GetEntry();
+        tmpData->spawnMask = (1 << map->GetSpawnMode());
+        tmpData->phaseMask = player->GetPhaseMask();
+        tmpData->phaseIds = player->GetPhaseIds();
+        object->SaveToDB(map->GetId(), tmpData);
         // delete the old object and do a clean load from DB with a fresh new GameObject instance.
         // this is required to avoid weird behavior and memory leaks
         delete object;
@@ -511,41 +516,53 @@ public:
         return true;
     }
 
-    //set phasemask for selected object
+    //set phase for selected object
     static bool HandleGameObjectSetPhaseCommand(ChatHandler* handler, char const* args)
     {
         // number or [name] Shift-click form |color|Hgameobject:go_id|h[name]|h|r
-        char* id = handler->extractKeyFromLink((char*)args, "Hgameobject");
-        if (!id)
-            return false;
+        //char* id = handler->extractKeyFromLink((char*)args, "Hgameobject");
+        //if (!id)
+        //    return false;
 
-        uint32 guidLow = atoi(id);
-        if (!guidLow)
-            return false;
+        char* pGuid = strtok((char*)args, " ");
+        char* pId = strtok((char*)args, " ");
+        char* pGroup = strtok((char*)NULL, "");
 
+        uint32 objectGuid = 0;
+        uint16 phaseId = 0;
+        uint16 phaseGroup = 0;
+        if (pGuid)
+            objectGuid = atoi(pGuid);
+        if (pId)
+            phaseId = atoi(pId);
+        if (pGroup)
+            phaseGroup = atoi(pGroup);
+
+        GameObjectData const* gameObjectData = nullptr;
         GameObject* object = nullptr;
 
         // by DB guid
-        if (GameObjectData const* gameObjectData = sObjectMgr->GetGOData(guidLow))
-            object = handler->GetObjectGlobalyWithGuidOrNearWithDbGuid(guidLow, gameObjectData->id);
+        if (gameObjectData = sObjectMgr->GetGOData(objectGuid))
+            object = handler->GetObjectGlobalyWithGuidOrNearWithDbGuid(objectGuid, gameObjectData->id);
 
         if (!object)
         {
-            handler->PSendSysMessage(LANG_COMMAND_OBJNOTFOUND, guidLow);
+            handler->PSendSysMessage(LANG_COMMAND_OBJNOTFOUND, objectGuid);
             handler->SetSentErrorMessage(true);
             return false;
         }
 
-        char* phaseStr = strtok (NULL, " ");
-        uint16 phaseId = phaseStr ? atoi(phaseStr) : 0;
-        if (phaseId == 0)
+        if (!phaseId && !phaseGroup)
         {
-            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->PSendSysMessage(LANG_PHASING_INVALID_VALUE, 0);
             handler->SetSentErrorMessage(true);
             return false;
         }
 
-        object->AddPhaseId(phaseId, true);
+        if (phaseId)
+            object->AddPhaseId(phaseId, true);
+        if (phaseGroup)
+            object->AddPhaseGroup(phaseGroup, true);
 
         object->SaveToDB();
         return true;
