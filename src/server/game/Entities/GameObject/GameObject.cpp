@@ -718,10 +718,10 @@ void GameObject::SaveToDB()
         return;
     }
 
-    SaveToDB(GetMapId(), data->spawnMask, data->phaseMask);
+    SaveToDB(GetMapId(), data);
 }
 
-void GameObject::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
+void GameObject::SaveToDB(uint32 mapid, GameObjectData const* tmpData)
 {
     const GameObjectTemplate* goI = GetGOInfo();
 
@@ -736,7 +736,12 @@ void GameObject::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
     // data->guid = guid must not be updated at save
     data.id = GetEntry();
     data.mapid = mapid;
-    data.phaseMask = phaseMask;
+    data.zoneId = GetZoneId();
+    data.areaId = GetAreaId();
+    data.phaseMask = tmpData->phaseMask;
+    data.spawnMask = tmpData->spawnMask;
+    data.phaseIds = GetPhaseIds();
+    data.phaseGroups = GetPhaseGroups();
     data.posX = GetPositionX();
     data.posY = GetPositionY();
     data.posZ = GetPositionZ();
@@ -748,7 +753,6 @@ void GameObject::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
     data.spawntimesecs = m_spawnedByDefault ? m_respawnDelayTime : -(int32)m_respawnDelayTime;
     data.animprogress = GetGoAnimProgress();
     data.go_state = GetGoState();
-    data.spawnMask = spawnMask;
     data.artKit = GetGoArtKit();
 
     // Update in DB
@@ -766,7 +770,7 @@ void GameObject::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
     stmt->setUInt16(index++, uint16(mapid));
     stmt->setUInt16(index++, uint16(GetZoneId()));
     stmt->setUInt16(index++, uint16(GetAreaId()));
-    stmt->setUInt8(index++, spawnMask);
+    stmt->setUInt8(index++, tmpData->spawnMask);
     stmt->setString(index++, GetUInt16String(GetPhaseIds()));
     stmt->setString(index++, GetUInt16String(GetPhaseGroups()));
     stmt->setFloat(index++, GetPositionX());

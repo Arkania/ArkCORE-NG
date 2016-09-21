@@ -938,6 +938,7 @@ class WorldObject : public Object, public WorldLocation
         std::set<uint16> const& GetPhaseGroups() const { return m_phaseGroups; }
         std::set<uint16> const& GetTerrainSwaps() const { return m_terrainSwaps; }
         std::set<uint16> const& GetWorldMapAreaSwaps() const { return m_worldMapAreaSwaps; }
+        std::string PhaseIdToString();
         std::string PhaseToString();
 
         void ClearAllPhases(bool update);

@@ -177,7 +177,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
 
     Map* map = owner->GetMap();
     uint32 guid = sObjectMgr->GenerateLowGuid(HIGHGUID_PET);
-    if (!Create(guid, map, owner->GetPhaseMask(), petEntry, petId))
+    if (!Create(guid, map, owner, petEntry, petId))
         return false;
 
     setPetType(petType);
@@ -543,83 +543,84 @@ void Pet::Update(uint32 diff)
 
     switch (m_deathState)
     {
-        case CORPSE:
+    case CORPSE:
+    {
+        if (getPetType() != HUNTER_PET || m_corpseRemoveTime <= time(NULL))
         {
-            if (getPetType() != HUNTER_PET || m_corpseRemoveTime <= time(NULL))
-            {
-                Remove(PET_SAVE_NOT_IN_SLOT);               //hunters' pets never get removed because of death, NEVER!
-                return;
-            }
-            break;
+            Remove(PET_SAVE_NOT_IN_SLOT);               //hunters' pets never get removed because of death, NEVER!
+            return;
         }
-        case ALIVE:
-        {
-            // unsummon pet that lost owner
-            Player* owner = GetOwner();
-            if (!owner || (!IsWithinDistInMap(owner, GetMap()->GetVisibilityRange()) && !IsPossessed()) || (isControlled() && !owner->GetPetGUID()))
+        break;
+    }
+    case ALIVE:
+    {
+        Player* owner = GetOwner();
+      
+        // unsummon pet that lost owner
+        if (!owner || (!IsWithinDistInMap(owner, GetMap()->GetVisibilityRange()) && !IsPossessed()) || (isControlled() && !owner->GetPetGUID()))
             //if (!owner || (!IsWithinDistInMap(owner, GetMap()->GetVisibilityDistance()) && (owner->GetCharmGUID() && (owner->GetCharmGUID() != GetGUID()))) || (isControlled() && !owner->GetPetGUID()))
+        {
+            Remove(PET_SAVE_NOT_IN_SLOT, true);
+            return;
+        }
+
+        if (isControlled())
+        {
+            if (owner->GetPetGUID() != GetGUID())
             {
-                Remove(PET_SAVE_NOT_IN_SLOT, true);
+                TC_LOG_ERROR("entities.pet", "Pet %u is not pet of owner %s, removed", GetEntry(), GetOwner()->GetName().c_str());
+                Remove(getPetType() == HUNTER_PET ? PET_SAVE_AS_DELETED : PET_SAVE_NOT_IN_SLOT);
                 return;
             }
-
-            if (isControlled())
-            {
-                if (owner->GetPetGUID() != GetGUID())
-                {
-                    TC_LOG_ERROR("entities.pet", "Pet %u is not pet of owner %s, removed", GetEntry(), GetOwner()->GetName().c_str());
-                    Remove(getPetType() == HUNTER_PET?PET_SAVE_AS_DELETED:PET_SAVE_NOT_IN_SLOT);
-                    return;
-                }
-            }
-
-            if (m_duration > 0)
-            {
-                if (uint32(m_duration) > diff)
-                    m_duration -= diff;
-                else
-                {
-                    Remove(getPetType() != SUMMON_PET ? PET_SAVE_AS_DELETED:PET_SAVE_NOT_IN_SLOT);
-                    return;
-                }
-            }
-
-            //regenerate focus for hunter pets or energy for deathknight's ghoul
-            if (m_regenTimer)
-            {
-                if (m_regenTimer > diff)
-                    m_regenTimer -= diff;
-                else
-                {
-                    switch (getPowerType())
-                    {
-                        case POWER_FOCUS:
-                            Regenerate(POWER_FOCUS);
-                            m_regenTimer += PET_FOCUS_REGEN_INTERVAL - diff;
-                            if (!m_regenTimer) ++m_regenTimer;
-
-                            // Reset if large diff (lag) causes focus to get 'stuck'
-                            if (m_regenTimer > PET_FOCUS_REGEN_INTERVAL)
-                                m_regenTimer = PET_FOCUS_REGEN_INTERVAL;
-
-                            break;
-
-                        // in creature::update
-                        //case POWER_ENERGY:
-                        //    Regenerate(POWER_ENERGY);
-                        //    m_regenTimer += CREATURE_REGEN_INTERVAL - diff;
-                        //    if (!m_regenTimer) ++m_regenTimer;
-                        //    break;
-                        default:
-                            m_regenTimer = 0;
-                            break;
-                    }
-                }
-            }
-            break;
         }
-        default:
-            break;
+
+        if (m_duration > 0)
+        {
+            if (uint32(m_duration) > diff)
+                m_duration -= diff;
+            else
+            {
+                Remove(getPetType() != SUMMON_PET ? PET_SAVE_AS_DELETED : PET_SAVE_NOT_IN_SLOT);
+                return;
+            }
+        }
+
+        //regenerate focus for hunter pets or energy for deathknight's ghoul
+        if (m_regenTimer)
+        {
+            if (m_regenTimer > diff)
+                m_regenTimer -= diff;
+            else
+            {
+                switch (getPowerType())
+                {
+                case POWER_FOCUS:
+                    Regenerate(POWER_FOCUS);
+                    m_regenTimer += PET_FOCUS_REGEN_INTERVAL - diff;
+                    if (!m_regenTimer) ++m_regenTimer;
+
+                    // Reset if large diff (lag) causes focus to get 'stuck'
+                    if (m_regenTimer > PET_FOCUS_REGEN_INTERVAL)
+                        m_regenTimer = PET_FOCUS_REGEN_INTERVAL;
+
+                    break;
+
+                    // in creature::update
+                    //case POWER_ENERGY:
+                    //    Regenerate(POWER_ENERGY);
+                    //    m_regenTimer += CREATURE_REGEN_INTERVAL - diff;
+                    //    if (!m_regenTimer) ++m_regenTimer;
+                    //    break;
+                default:
+                    m_regenTimer = 0;
+                    break;
+                }
+            }
+        }
+        break;
+    }
+    default:
+        break;
     }
     Creature::Update(diff);
 }
@@ -725,7 +726,7 @@ bool Pet::CreateBaseAtCreature(Creature* creature)
 {
     ASSERT(creature);
 
-    if (!CreateBaseAtTamed(creature->GetCreatureTemplate(), creature->GetMap(), creature->GetPhaseMask()))
+    if (!CreateBaseAtTamed(creature->GetCreatureTemplate(), creature->GetMap(), creature))
         return false;
 
     Relocate(creature->GetPositionX(), creature->GetPositionY(), creature->GetPositionZ(), creature->GetOrientation());
@@ -756,7 +757,7 @@ bool Pet::CreateBaseAtCreature(Creature* creature)
 
 bool Pet::CreateBaseAtCreatureInfo(CreatureTemplate const* cinfo, Unit* owner)
 {
-    if (!CreateBaseAtTamed(cinfo, owner->GetMap(), owner->GetPhaseMask()))
+    if (!CreateBaseAtTamed(cinfo, owner->GetMap(), owner))
         return false;
 
     if (CreatureFamilyEntry const* cFamily = sCreatureFamilyStore.LookupEntry(cinfo->family))
@@ -767,12 +768,12 @@ bool Pet::CreateBaseAtCreatureInfo(CreatureTemplate const* cinfo, Unit* owner)
     return true;
 }
 
-bool Pet::CreateBaseAtTamed(CreatureTemplate const* cinfo, Map* map, uint32 phaseMask)
+bool Pet::CreateBaseAtTamed(CreatureTemplate const* cinfo, Map* map, Unit* owner)
 {
     TC_LOG_DEBUG("entities.pet", "Pet::CreateBaseForTamed");
     uint32 guid=sObjectMgr->GenerateLowGuid(HIGHGUID_PET);
     uint32 petId = sObjectMgr->GeneratePetNumber();
-    if (!Create(guid, map, phaseMask, cinfo->Entry, petId))
+    if (!Create(guid, map, owner, cinfo->Entry, petId))
         return false;
 
     setPowerType(POWER_FOCUS);
@@ -1905,12 +1906,12 @@ bool Pet::IsPermanentPetFor(Player* owner) const
     }
 }
 
-bool Pet::Create(uint32 guidlow, Map* map, uint32 phaseMask, uint32 Entry, uint32 petId)
+bool Pet::Create(uint32 guidlow, Map* map, Unit* owner, uint32 Entry, uint32 petId)
 {
     ASSERT(map);
     SetMap(map);
 
-    SetPhaseMask(phaseMask, false);
+    CopyPhaseFrom(owner);
     Object::_Create(guidlow, petId, HIGHGUID_PET);
 
     m_DBTableGuid = guidlow;

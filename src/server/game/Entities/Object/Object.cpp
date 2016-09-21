@@ -3304,7 +3304,12 @@ void WorldObject::UpdatePhaseForQuestAreaOrZoneChange()
     {
         // only update visibility and send packets if there was a change in the phase list
         if (isPlayer)
-            ToPlayer()->GetSession()->SendSetPhaseShift(GetPhaseIds(), GetTerrainSwaps(), GetWorldMapAreaSwaps());
+        {
+            ToPlayer()->GetSession()->SendSetPhaseShift(GetPhaseIds(), GetTerrainSwaps(), GetWorldMapAreaSwaps());            
+            for (std::set<Unit*>::iterator itr = ToPlayer()->m_Controlled.begin(); itr != ToPlayer()->m_Controlled.end(); ++itr)
+                (*itr)->CopyPhaseFrom(ToPlayer());
+        }
+
 
         // only update visibilty once, to prevent objects appearing for a moment while adding in multiple phases
         UpdateObjectVisibility();
@@ -3361,25 +3366,25 @@ void WorldObject::AddPhaseGroups(std::set<uint16> phaseGroups, bool apply)
         AddPhaseGroup(ph,apply);
 }
 
+std::string WorldObject::PhaseIdToString()
+{
+    std::stringstream sstr;
+    if (m_phaseIds.empty())
+        sstr << "169 ";
+    else
+        for (uint32 ph : m_phaseIds)
+            sstr << ph << " ";
+
+    return sstr.str();
+}
+
 std::string WorldObject::PhaseToString()
 {
     std::stringstream sstr;    
     if (!m_phaseIds.empty())
-    {
-        bool ko = false;
-        sstr << "PhaseIds: ";
-        for (uint32 ph : m_phaseIds)
-        {
-            if (ko) sstr << ", ";
-            ko = true;
-            sstr << ph;
-        }
-        sstr << "\n";
-    }
+        sstr << "PhaseIds: " << PhaseIdToString() << "\n";
     if (m_phaseMask > 2)
-    {
         sstr << "PhaseMask: " << m_phaseMask << "\n";
-    }
     return sstr.str();
 }
 
@@ -3660,8 +3665,8 @@ void WorldObject::RebuildPhaseFromAuraEffect(bool &updateNeeded)
         {
             bool update = false;
             uint16 phaseGroup = uint32((*itr)->GetMiscValueB());
-            std::set<uint16> const& phases = GetPhasesForGroup(phaseGroup);
-            for (uint16 phase : phases)
+            std::set<uint16> const& phaseIds = GetXPhasesForGroup(phaseGroup);
+            for (uint16 phase : phaseIds)
                 update = SetInPhase(phase, false, true);
             if (!updateNeeded && update)
                 updateNeeded = true;
