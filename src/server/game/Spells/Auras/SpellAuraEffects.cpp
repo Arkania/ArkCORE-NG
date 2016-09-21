@@ -1466,7 +1466,7 @@ void AuraEffect::HandlePhaseGroup(AuraApplication const* aurApp, uint8 mode, boo
 
     std::set<uint16> const& oldPhases = target->GetPhaseIds();
     uint16 phGroupValue = GetMiscValueB();
-    // std::set<uint16> const& phaseIds = GetPhasesForGroup(phGroupValue);    
+    // std::set<uint16> const& phaseIds = GetXPhasesForGroup(phGroupValue);    
     target->SetInPhase(phGroupValue, false, apply);
 
     // call functions which may have additional effects after chainging state of unit

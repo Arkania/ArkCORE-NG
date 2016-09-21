@@ -1748,7 +1748,7 @@ void ObjectMgr::LoadCreatures()
         if (!data.phaseGroups.empty())
             for (uint16 phGroup : data.phaseGroups)
             {
-                std::set<uint16> phaseIds = GetPhasesForGroup(phGroup);
+                std::set<uint16> phaseIds = GetXPhasesForGroup(phGroup);
                 if (phaseIds.empty())
                 {
                     TC_LOG_ERROR("sql.sql", "Table `creature` has creature (GUID: %u Entry: %u) with non-existing `phaseGroup` (%u) set, `phaseGroup` erased.", guid, data.id, phGroup);
@@ -2079,7 +2079,7 @@ void ObjectMgr::LoadGameobjects()
         if (!data.phaseGroups.empty())
             for (uint16 phGroup : data.phaseGroups)
             {
-                std::set<uint16> phaseIds = GetPhasesForGroup(phGroup);
+                std::set<uint16> phaseIds = GetXPhasesForGroup(phGroup);
                 if (phaseIds.empty())
                 {
                     TC_LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: %u Entry: %u) with non-existing `phaseGroup` (%u) set, `phaseGroup` is erased.", guid, data.id, phGroup);

@@ -393,7 +393,7 @@ Transport* TransportMgr::CreateTransport(uint32 entry, uint32 guid /*= 0*/, Map*
         trans->SetInPhase(phaseid, false, true);
 
     if (phasegroup)
-        for (auto ph : GetPhasesForGroup(phasegroup))
+        for (auto ph : GetXPhasesForGroup(phasegroup))
             trans->SetInPhase(ph, false, true);
 
     if (MapEntry const* mapEntry = sMapStore.LookupEntry(mapId))
