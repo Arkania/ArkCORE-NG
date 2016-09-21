@@ -157,6 +157,8 @@ public:
         EVENT_TALK_TO_GUARD_1,
         EVENT_TALK_TO_GUARD_2,
         EVENT_TALK_TO_GUARD_3,
+        EVENT_COUNT_COOLDOWN,
+        EVENT_MASTER_RESET,
     };
 
     bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
@@ -170,13 +172,24 @@ public:
 
     struct npc_prince_liam_greymane_34850AI : public ScriptedAI
     {
-        npc_prince_liam_greymane_34850AI(Creature *c) : ScriptedAI(c) {}
+        npc_prince_liam_greymane_34850AI(Creature *c) : ScriptedAI(c) { m_playerGUID = 0; }
 
         EventMap m_events;
+        std::map<uint64, int32> cdList;
+        uint64 m_playerGUID;
 
         void Reset() override
+        {            
+            m_events.RescheduleEvent(EVENT_COUNT_COOLDOWN, 1000);
+        }
+
+        void MoveInLineOfSight(Unit* who) override
         {
-            m_events.ScheduleEvent(EVENT_START_TALK_TO_GUARD, 60000);
+            if (Player* player = who->ToPlayer())
+                if (player->GetDistance2d(me) < 15.0f)
+                    if (cdList.find(player->GetGUID()) == cdList.end())
+                        if (player->GetQuestStatus(QUEST_LOCKDOWN) != QUEST_STATUS_REWARDED)
+                            cdList.insert(std::make_pair(player->GetGUID(), 70));
         }
 
         void UpdateAI(uint32 diff) override
@@ -187,30 +200,65 @@ public:
             {
                 switch (eventId)
                 {
-                    case EVENT_START_TALK_TO_GUARD:
-                    {
-                        Talk(0);
-                        m_events.ScheduleEvent(EVENT_TALK_TO_GUARD_1, 15000);
-                        break;
-                    }
-                    case EVENT_TALK_TO_GUARD_1:
-                    {
-                        Talk(1);
-                        m_events.ScheduleEvent(EVENT_TALK_TO_GUARD_2, 18000);
-                        break;
-                    }
-                    case EVENT_TALK_TO_GUARD_2:
-                    {
-                        Talk(2);
-                        m_events.ScheduleEvent(EVENT_TALK_TO_GUARD_3, 25000);
-                        break;
-                    }
-                    case EVENT_TALK_TO_GUARD_3:
-                    {
-                        Talk(0);
-                        m_events.ScheduleEvent(EVENT_START_TALK_TO_GUARD, urand(45000, 60000));
-                        break;
-                    }
+                case EVENT_COUNT_COOLDOWN:
+                {
+                    for (std::map<uint64, int32>::iterator itr = cdList.begin(); itr != cdList.end(); ++itr)
+                        if ((itr)->second > 0)
+                            --(itr)->second;
+
+                    if (!m_playerGUID)
+                        for (std::map<uint64, int32>::iterator itr = cdList.begin(); itr != cdList.end(); ++itr)
+                            if ((itr)->second == 0)
+                                if (Player* player = sObjectAccessor->GetPlayer(*me, (itr)->first))
+                                    if (player->GetDistance2d(me) < 15.0f)
+                                    {
+                                        --(itr)->second;
+                                        m_playerGUID = player->GetGUID();
+                                        m_events.ScheduleEvent(EVENT_MASTER_RESET, 120000);
+                                        m_events.ScheduleEvent(EVENT_START_TALK_TO_GUARD, 1000);
+                                    }
+
+                    for (std::map<uint64, int32>::iterator itr = cdList.begin(); itr != cdList.end();)
+                        if (ToBeDeleted(itr))
+                            cdList.erase(itr++);
+                        else
+                            itr++;
+
+                    m_events.ScheduleEvent(EVENT_COUNT_COOLDOWN, 1000);
+                    break;
+                }
+                case EVENT_START_TALK_TO_GUARD:
+                {
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                        Talk(0, player);
+                    m_events.ScheduleEvent(EVENT_TALK_TO_GUARD_1, 15000);
+                    break;
+                }
+                case EVENT_TALK_TO_GUARD_1:
+                {
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                    Talk(1, player);
+                    m_events.ScheduleEvent(EVENT_TALK_TO_GUARD_2, 18000);
+                    break;
+                }
+                case EVENT_TALK_TO_GUARD_2:
+                {
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                    Talk(2, player);
+                    m_events.ScheduleEvent(EVENT_TALK_TO_GUARD_3, 25000);
+                    break;
+                }
+                case EVENT_TALK_TO_GUARD_3:
+                {
+                    m_events.ScheduleEvent(EVENT_MASTER_RESET, 1000);
+                    break;
+                }
+                case EVENT_MASTER_RESET:
+                {
+                    m_playerGUID = 0;
+                    Reset();
+                    break;
+                }
                 }
             }
 
@@ -218,6 +266,15 @@ public:
                 return;
 
             DoMeleeAttackIfReady();
+        }
+
+        bool ToBeDeleted(std::map<uint64, int32>::iterator itr)
+        {
+            if (itr->second < 0)
+                if (Player* player = sObjectAccessor->GetPlayer(*me, (itr)->first))
+                    if (player->GetQuestStatus(QUEST_LOCKDOWN) == QUEST_STATUS_REWARDED)
+                        return true;
+            return false;
         }
     };
 
