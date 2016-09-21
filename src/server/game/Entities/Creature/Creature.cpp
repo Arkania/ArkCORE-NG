@@ -1063,6 +1063,8 @@ void Creature::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
     stmt->setUInt32(index++, m_DBTableGuid);
     stmt->setUInt32(index++, GetEntry());
     stmt->setUInt16(index++, uint16(mapid));
+    stmt->setUInt16(index++, uint16(GetZoneId()));
+    stmt->setUInt16(index++, uint16(GetAreaId()));
     stmt->setUInt8(index++, spawnMask);
     stmt->setString(index++, GetUInt16String(GetPhaseIds()));
     stmt->setString(index++, GetUInt16String(GetPhaseGroups()));

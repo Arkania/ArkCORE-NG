@@ -526,7 +526,8 @@ std::set<uint32> GetUIntegerList(std::string storedString)
     {
         i=0;
         data >> i;
-        if (i) r.insert(i);
+        if (i) 
+            r.insert(i);
     } while (i);
     return r;
 }
@@ -534,9 +535,9 @@ std::set<uint32> GetUIntegerList(std::string storedString)
 std::string GetUIntegerString(std::set<uint32> uint32List)
 {
     std::ostringstream ss;
-    ss << uint32List.size() << ' ';
     for (uint16 i : uint32List)
-        ss << i << ' ';
+        if (i)
+            ss << i << ' ';
     return ss.str();
 }
 
@@ -553,7 +554,8 @@ std::set<uint16> GetUInt16List(std::string storedString)
     {
         i = 0;
         data >> i;
-        if (i) r.insert(i);
+        if (i) 
+            r.insert(i);
     } while (i);
     return r;
 }
@@ -561,9 +563,9 @@ std::set<uint16> GetUInt16List(std::string storedString)
 std::string GetUInt16String(std::set<uint16> uint16List)
 {
     std::ostringstream ss;
-    ss << uint16List.size() << ' ';
     for (uint16 i : uint16List)
-        ss << i << ' ';
+        if (i)
+            ss << i << ' ';
     return ss.str();
 }
 
@@ -571,14 +573,15 @@ std::set<uint16> CopyUInt16List(std::set<uint16> original)
 {
     std::set<uint16> r;
     for (auto value : original)
-        r.insert(value);
+        if (value)
+            r.insert(value);
     return r;
 }
 
 uint64 ComputePhaseIdToMask(uint16 id)
 {
     if (id >= 169 && id <= 201)
-        return (1 << (id - 169));
+        return (uint64(1) << (id - 169));
     else
         switch (id)
         {
