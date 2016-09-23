@@ -1616,8 +1616,8 @@ void ObjectMgr::LoadCreatures()
 
     //                                               0              1   2    3        4             5           6           7           8            9              10
     QueryResult result = WorldDatabase.Query("SELECT creature.guid, id, map, modelid, equipment_id, position_x, position_y, position_z, orientation, spawntimesecs, spawndist, "
-    //   11               12         13       14            15         16          17          18                19                   20                     21                 22             
-        "currentwaypoint, curhealth, curmana, MovementType, spawnMask, eventEntry, pool_entry, creature.npcflag, creature.unit_flags, creature.dynamicflags, creature.phaseIds, creature.phaseGroups "
+    //   11               12         13       14            15         16          17          18                19                   20                     21                             
+        "currentwaypoint, curhealth, curmana, MovementType, spawnMask, eventEntry, pool_entry, creature.npcflag, creature.unit_flags, creature.dynamicflags, creature.phaseIds "
         "FROM creature "
         "LEFT OUTER JOIN game_event_creature ON creature.guid = game_event_creature.guid "
         "LEFT OUTER JOIN pool_creature ON creature.guid = pool_creature.guid");
@@ -1676,9 +1676,6 @@ void ObjectMgr::LoadCreatures()
 
         std::string phaseIds = fields[21].GetCString();
         data.phaseIds = GetUInt16List(phaseIds);
-
-        std::string phaseGroups = fields[22].GetCString();
-        data.phaseGroups = GetUInt16List(phaseGroups);
 
         MapEntry const* mapEntry = sMapStore.LookupEntry(data.mapid);
         if (!mapEntry)
@@ -1745,19 +1742,7 @@ void ObjectMgr::LoadCreatures()
             }
         }
 
-        if (!data.phaseGroups.empty())
-            for (uint16 phGroup : data.phaseGroups)
-            {
-                std::set<uint16> phaseIds = GetXPhasesForGroup(phGroup);
-                if (phaseIds.empty())
-                {
-                    TC_LOG_ERROR("sql.sql", "Table `creature` has creature (GUID: %u Entry: %u) with non-existing `phaseGroup` (%u) set, `phaseGroup` erased.", guid, data.id, phGroup);
-                    data.phaseGroups.erase(phGroup);
-                    break;
-                }
-            }
-
-        if (data.phaseIds.empty() && data.phaseGroups.empty())
+        if (data.phaseIds.empty())
         {
             TC_LOG_ERROR("sql.sql", "Table `creature` have creature (GUID: %u Entry: %u) with no `phaseId` (not visible for anyone), set to DEFAULT_PHASE.", guid, data.id);
             data.phaseIds.insert(DEFAULT_PHASE);
@@ -1950,8 +1935,8 @@ void ObjectMgr::LoadGameobjects()
 
     //                                                0                1   2    3           4           5           6
     QueryResult result = WorldDatabase.Query("SELECT gameobject.guid, id, map, position_x, position_y, position_z, orientation, "
-    //   7          8          9          10         11             12            13     14         15          16          17        18       
-        "rotation0, rotation1, rotation2, rotation3, spawntimesecs, animprogress, state, spawnMask, eventEntry, pool_entry, phaseIds, phaseGroups "
+    //   7          8          9          10         11             12            13     14         15          16          17               
+        "rotation0, rotation1, rotation2, rotation3, spawntimesecs, animprogress, state, spawnMask, eventEntry, pool_entry, phaseIds "
         "FROM gameobject LEFT OUTER JOIN game_event_gameobject ON gameobject.guid = game_event_gameobject.guid "
         "LEFT OUTER JOIN pool_gameobject ON gameobject.guid = pool_gameobject.guid");
 
@@ -2054,10 +2039,6 @@ void ObjectMgr::LoadGameobjects()
         std::string phaseIds = fields[17].GetCString();
         data.phaseIds = GetUInt16List(phaseIds);
 
-        std::string phaseGroups = fields[18].GetCString();
-        data.phaseGroups = GetUInt16List(phaseGroups);
-
-
         if (data.rotation2 < -1.0f || data.rotation2 > 1.0f)
         {
             TC_LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: %u Entry: %u) with invalid rotation2 (%f) value, skip", guid, data.id, data.rotation2);
@@ -2076,19 +2057,7 @@ void ObjectMgr::LoadGameobjects()
             continue;
         }
 
-        if (!data.phaseGroups.empty())
-            for (uint16 phGroup : data.phaseGroups)
-            {
-                std::set<uint16> phaseIds = GetXPhasesForGroup(phGroup);
-                if (phaseIds.empty())
-                {
-                    TC_LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: %u Entry: %u) with non-existing `phaseGroup` (%u) set, `phaseGroup` is erased.", guid, data.id, phGroup);
-                    data.phaseGroups.erase(phGroup);
-                    break;
-                }
-            }
-
-        if (data.phaseIds.empty() && data.phaseGroups.empty())
+        if (data.phaseIds.empty())
         {
             TC_LOG_ERROR("sql.sql", "Table `gameobject` have gameobject (GUID: %u Entry: %u) with no `phaseIds` (not visible for anyone), set to DEFAULT_PHASE.", guid, data.id);
             data.phaseIds.insert(DEFAULT_PHASE);
@@ -9297,8 +9266,8 @@ void ObjectMgr::LoadPhaseAreaDefinitions()
 
     uint32 oldMSTime = getMSTime();
 
-    //                                               0       1      2       3            4               5                 6     
-    QueryResult result = WorldDatabase.Query("SELECT zoneId, entry, phaseId, phaseGroup, terrainswapmap, worldMapAreaSwap, flags FROM `phase_definitions` ORDER BY `entry` ASC");
+    //                                               0       1      2        3               4                 5                      
+    QueryResult result = WorldDatabase.Query("SELECT zoneId, entry, phaseId, terrainswapmap, worldMapAreaSwap, flags FROM `phase_definitions` ORDER BY `entry` ASC");
 
     if (!result)
     {
@@ -9317,10 +9286,9 @@ void ObjectMgr::LoadPhaseAreaDefinitions()
         m_phaseAreaDefinition.zoneId                = fields[0].GetUInt32();
         m_phaseAreaDefinition.entry                 = fields[1].GetUInt16();
         m_phaseAreaDefinition.phaseId               = fields[2].GetUInt16();
-        m_phaseAreaDefinition.phaseGroup            = fields[3].GetUInt16();
-        m_phaseAreaDefinition.terrainswapmap        = fields[4].GetUInt16();
-        m_phaseAreaDefinition.worldMapAreaSwap      = fields[5].GetUInt16();
-        m_phaseAreaDefinition.flags                 = fields[6].GetUInt8();
+        m_phaseAreaDefinition.terrainswapmap        = fields[3].GetUInt16();
+        m_phaseAreaDefinition.worldMapAreaSwap      = fields[4].GetUInt16();
+        m_phaseAreaDefinition.flags                 = fields[5].GetUInt8();
 
         // Checks
         if ((m_phaseAreaDefinition.flags & PHASE_FLAG_OVERWRITE_EXISTING) && (m_phaseAreaDefinition.flags & PHASE_FLAG_NEGATE_PHASE))

@@ -613,7 +613,6 @@ struct GameObjectData
     uint8 spawnMask;
     uint8 artKit;
     std::set<uint16> phaseIds;
-    std::set<uint16> phaseGroups;
     bool dbData;
 };
 

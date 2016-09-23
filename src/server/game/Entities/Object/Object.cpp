@@ -1285,7 +1285,7 @@ void MovementInfo::OutDebug()
 WorldObject::WorldObject(bool isWorldObject) : WorldLocation(), LastUsedScriptID(0),
 m_name(""), m_isActive(false), m_isWorldObject(isWorldObject), m_zoneScript(NULL),
 m_transport(NULL), m_currMap(NULL), m_InstanceId(0),
-m_phaseMask(PHASEMASK_NORMAL), m_notifyflags(0), m_executed_notifies(0)
+m_phaseMask(PHASEMASK_NORMAL), m_notifyflags(0), m_executed_notifies(0), m_phaseUpdateNeeded(true) 
 {
     m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE | GHOST_VISIBILITY_GHOST);
     m_serverSideVisibilityDetect.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE);
@@ -3288,7 +3288,7 @@ uint64 WorldObject::GetTransGUID() const
     and at end, only sending it, if there are changed phases. */
 void WorldObject::UpdatePhaseForQuestAreaOrZoneChange()
 {
-    bool updateNeeded = false;
+    bool updateNeeded = m_phaseUpdateNeeded;
     bool isPlayer = (GetTypeId() == TYPEID_PLAYER && IsInWorld()) ? true : false;
 
     if (isPlayer)
@@ -3306,14 +3306,15 @@ void WorldObject::UpdatePhaseForQuestAreaOrZoneChange()
         if (isPlayer)
         {
             ToPlayer()->GetSession()->SendSetPhaseShift(GetPhaseIds(), GetTerrainSwaps(), GetWorldMapAreaSwaps());            
+            // send phaseupdate to comtrolled objects, as Pet.
             for (std::set<Unit*>::iterator itr = ToPlayer()->m_Controlled.begin(); itr != ToPlayer()->m_Controlled.end(); ++itr)
                 (*itr)->CopyPhaseFrom(ToPlayer());
         }
 
-
         // only update visibilty once, to prevent objects appearing for a moment while adding in multiple phases
         UpdateObjectVisibility();
     }
+    m_phaseUpdateNeeded = false;
 }
 
 void WorldObject::SetPhaseMask(uint64 newPhaseMask, bool update)
@@ -3328,9 +3329,9 @@ void WorldObject::ClearAllPhases(bool update)
 {
     m_phaseMask = 0;
     m_phaseIds.clear();
-    m_phaseGroups.clear();
     m_terrainSwaps.clear();
     m_worldMapAreaSwaps.clear();
+    m_phaseUpdateNeeded = true;
 
     if (update && IsInWorld())
         UpdateObjectVisibility();
@@ -3346,24 +3347,6 @@ void WorldObject::AddPhaseId(uint16 phaseId, bool apply)
         }
         else
             m_phaseIds.erase(phaseId);
-}
-
-void WorldObject::AddPhaseGroup(uint16 phaseGroup, bool apply)
-{
-    if (phaseGroup)
-        if (apply)
-        {
-            if (!(m_phaseGroups.find(phaseGroup) != m_phaseGroups.end()))
-                m_phaseGroups.insert(phaseGroup);
-        }
-        else
-            m_phaseGroups.erase(phaseGroup);
-}
-
-void WorldObject::AddPhaseGroups(std::set<uint16> phaseGroups, bool apply)
-{
-    for (auto ph : phaseGroups)
-        AddPhaseGroup(ph,apply);
 }
 
 std::string WorldObject::PhaseIdToString()
@@ -3468,6 +3451,9 @@ bool WorldObject::SetInPhase(uint16 id, bool update, bool apply)
         }
     }
 
+    if (ToPlayer())
+        m_phaseUpdateNeeded = true;
+
     if (update && IsInWorld())
         UpdateObjectVisibility();
 
@@ -3482,7 +3468,7 @@ void WorldObject::SendDebugReportToPlayer()
     }
 }
 
-ePhaseUpdateStatus WorldObject::CheckDefinition(PhaseAreaDefinition phaseAreaDefinition)
+ePhaseUpdateStatus WorldObject::CheckPhaseConditions(PhaseAreaDefinition phaseAreaDefinition)
 {
     ConditionList const* conditions = sConditionMgr->GetConditionsForPhaseDefinition(phaseAreaDefinition.zoneId, phaseAreaDefinition.entry);
     if (!conditions || conditions->empty())
@@ -3548,10 +3534,10 @@ void WorldObject::RebuildPhaseFromPhaseAreaDefinition(bool &updateNeeded)
             for (PhaseAreaDefinitionContainer::const_iterator itr = phaseDefCon.begin(); itr != phaseDefCon.end(); ++itr)
             {
                 PhaseAreaDefinition phaseDef = *itr;
-                ePhaseUpdateStatus checkDef = CheckDefinition(phaseDef); 
+                ePhaseUpdateStatus checkCond = CheckPhaseConditions(phaseDef);
                 ePhaseUpdateStatus checkArea = CheckArea(phaseDef, phaseAreaCon);
 
-                if ((checkDef == EMPTY_DATABASE && checkArea == EMPTY_DATABASE) || checkDef == PHASE_UPDATE_NEEDED || checkArea == PHASE_UPDATE_NEEDED)
+                if ((checkCond == EMPTY_DATABASE && checkArea == EMPTY_DATABASE) || checkCond == PHASE_UPDATE_NEEDED || checkArea == PHASE_UPDATE_NEEDED)
                 {
                     if (phaseDef.IsOverwritingExistingPhases())
                     {
@@ -3559,16 +3545,6 @@ void WorldObject::RebuildPhaseFromPhaseAreaDefinition(bool &updateNeeded)
                         if (phaseDef.phaseId)
                         {
                             bool up = SetInPhase(phaseDef.phaseId, false, true);
-                            if (phaseDef.terrainswapmap)
-                                m_terrainSwaps.insert(phaseDef.terrainswapmap);
-                            if (phaseDef.worldMapAreaSwap)
-                                m_worldMapAreaSwaps.insert(phaseDef.worldMapAreaSwap);
-                            if (!updateNeeded && up)
-                                updateNeeded = true;
-                        }
-                        if (phaseDef.phaseGroup)
-                        {
-                            bool up = SetInPhase(phaseDef.phaseGroup, false, true);
                             if (phaseDef.terrainswapmap)
                                 m_terrainSwaps.insert(phaseDef.terrainswapmap);
                             if (phaseDef.worldMapAreaSwap)
@@ -3589,60 +3565,11 @@ void WorldObject::RebuildPhaseFromPhaseAreaDefinition(bool &updateNeeded)
                             if (!updateNeeded && up)
                                 updateNeeded = true;
                         }
-                        if (phaseDef.phaseGroup)
-                        {
-                            bool up = SetInPhase(phaseDef.phaseGroup, false, !phaseDef.IsNegatingPhasemask());
-                            if (phaseDef.terrainswapmap)
-                                m_terrainSwaps.insert(phaseDef.terrainswapmap);
-                            if (phaseDef.worldMapAreaSwap)
-                                m_worldMapAreaSwaps.insert(phaseDef.worldMapAreaSwap);
-                            if (!updateNeeded && up)
-                                updateNeeded = true;
-                        }
                     }
 
                     if (phaseDef.IsLastDefinition())
                         break;
                 }
-
-                // next part is to check phase definition with conditions..
-                for (PhaseAreaSelectorContainer::const_iterator area = phaseAreaCon.begin(); area != phaseAreaCon.end(); ++area)
-                    if (phaseDef.zoneId == area->areaId && phaseDef.entry == area->entry)
-                    {
-                        ConditionList const* conditionList = sConditionMgr->GetConditionsForPhaseDefinition(phaseDef.zoneId, phaseDef.entry);
-                        if (conditionList)
-                            for (ConditionList::const_iterator itr = conditionList->begin(); itr != conditionList->end(); ++itr)
-                            {
-                                Condition* condition = (*itr);
-                                switch (condition->ConditionType)
-                                {
-                                case CONDITION_QUESTREWARDED:
-                                {
-                                    TC_LOG_DEBUG("misc", "Unwanted CONDITION_QUESTREWARDED in UpdateAreaAndZonePhase.");
-                                    break;
-                                }
-                                case CONDITION_QUESTTAKEN:
-                                {
-                                    TC_LOG_DEBUG("misc", "Unwanted CONDITION_QUESTTAKEN in UpdateAreaAndZonePhase.");
-                                    break;
-                                }
-                                case CONDITION_QUEST_COMPLETE:
-                                {
-                                    TC_LOG_DEBUG("misc", "Unwanted CONDITION_QUEST_COMPLETE in UpdateAreaAndZonePhase.");
-                                    break;
-                                }
-                                case CONDITION_QUEST_NONE:
-                                {
-                                    TC_LOG_DEBUG("misc", "Unwanted CONDITION_QUEST_NONE in UpdateAreaAndZonePhase.");
-                                    break;
-                                }
-                                default:
-                                {
-                                    TC_LOG_DEBUG("misc", "Unwanted default: in UpdateAreaAndZonePhase.");                            }
-                                break;
-                                }
-                            }
-                    }
             }
     }
 }

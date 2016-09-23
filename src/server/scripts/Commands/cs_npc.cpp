@@ -256,7 +256,6 @@ public:
             data.id = id;            
             data.phaseMask = chr->GetPhaseMask();
             data.phaseIds = chr->GetPhaseIds();
-            data.phaseGroups = chr->GetPhaseGroups();
             data.posX = chr->GetTransOffsetX();
             data.posY = chr->GetTransOffsetY();
             data.posZ = chr->GetTransOffsetZ();
@@ -1104,15 +1103,27 @@ public:
         return true;
     }
 
-    //npc phasemask handling
-    //change phasemask of creature or pet
+    //change phase of creature or pet
     static bool HandleNpcSetPhaseCommand(ChatHandler* handler, char const* args)
     {
         if (!*args)
             return false;
 
-        uint32 phasemask = (uint32) atoi((char*)args);
-        if (phasemask == 0)
+        Tokenizer tokens(std::string(args), ' ');
+        if (tokens.size() < 1)
+        {
+            handler->PSendSysMessage(LANG_IMPROPER_VALUE, 0);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        std::list<uint16> phaseIds;
+
+        for (int32 i = 1; i < tokens.size(); i++)
+            if (atoi(tokens[i]))
+                phaseIds.push_back(atoi(tokens[i]));
+
+        if (phaseIds.empty())
         {
             handler->SendSysMessage(LANG_BAD_VALUE);
             handler->SetSentErrorMessage(true);
@@ -1127,7 +1138,9 @@ public:
             return false;
         }
 
-        creature->SetPhaseMask(phasemask, true);
+        creature->ClearAllPhases(false);
+        for (auto ph : phaseIds)
+            creature->SetInPhase(ph, false, true);
 
         if (!creature->IsPet())
             creature->SaveToDB();

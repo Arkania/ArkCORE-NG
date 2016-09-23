@@ -854,13 +854,6 @@ void Creature::SetPhaseBaseValues(const CreatureData* data)
             for (uint16 ph : data->phaseIds)
                 SetInPhase(ph, false, true);
 
-        if (!data->phaseGroups.empty())
-        {
-            AddPhaseGroups(data->phaseGroups, true);
-            for (uint16 phGroup : data->phaseGroups)
-                SetInPhase(phGroup, false, true);
-        }
-
         if (GetPhaseIds().empty())
             SetInPhase(DEFAULT_PHASE, false, true);
     }
@@ -1067,7 +1060,6 @@ void Creature::SaveToDB(uint32 mapid, CreatureData const* tmpData)
     stmt->setUInt16(index++, uint16(GetAreaId()));
     stmt->setUInt8(index++, tmpData->spawnMask);
     stmt->setString(index++, GetUInt16String(GetPhaseIds()));
-    stmt->setString(index++, GetUInt16String(GetPhaseGroups()));
     stmt->setUInt32(index++, displayId);
     stmt->setInt32(index++, int32(GetCurrentEquipmentId()));
     stmt->setFloat(index++, GetPositionX());

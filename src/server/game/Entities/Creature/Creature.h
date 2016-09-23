@@ -284,7 +284,6 @@ struct CreatureData
     uint32 unit_flags;                                      // enum UnitFlags mask values
     uint32 dynamicflags;
     std::set<uint16> phaseIds;
-    std::set<uint16> phaseGroups;
     bool dbData;
 };
 

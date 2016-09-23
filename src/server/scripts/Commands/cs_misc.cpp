@@ -222,7 +222,6 @@ public:
             mapId, (mapEntry ? mapEntry->name : "<unknown>"),
             zoneId, (zoneEntry ? zoneEntry->area_name : "<unknown>"),
             areaId, (areaEntry ? areaEntry->area_name : "<unknown>"),
-            object->GetPhaseMask(),
             position1.GetPositionX(), position1.GetPositionY(), position1.GetPositionZ(), position1.GetOrientation(),
             cell.GridX(), cell.GridY(), cell.CellX(), cell.CellY(), object->GetInstanceId(),
             zoneX, zoneY, groundZ, floorZ, haveMap, haveVMap, haveMMap);
@@ -418,7 +417,7 @@ public:
             target->GetContactPoint(_player, x, y, z);
 
             _player->TeleportTo(target->GetMapId(), x, y, z, _player->GetAngle(target), TELE_TO_GM_MODE);
-            _player->SetPhaseMask(target->GetPhaseMask(), true);
+            _player->CopyPhaseFrom(target, true);
         }
         else
         {
@@ -542,7 +541,7 @@ public:
             float x, y, z;
             handler->GetSession()->GetPlayer()->GetClosePoint(x, y, z, target->GetObjectSize());
             target->TeleportTo(handler->GetSession()->GetPlayer()->GetMapId(), x, y, z, target->GetOrientation());
-            target->SetPhaseMask(handler->GetSession()->GetPlayer()->GetPhaseMask(), true);
+            target->CopyPhaseFrom(handler->GetSession()->GetPlayer());
         }
         else
         {
@@ -1517,7 +1516,7 @@ public:
         // Position data print
         uint32 mapId;
         uint32 areaId;
-        uint32 phase = 0;
+        std::string phaseIds = "";
         std::string areaName = "<unknown>";
         std::string zoneName = "<unknown>";
 
@@ -1549,7 +1548,7 @@ public:
             areaId = target->GetAreaId();
             alive = target->IsAlive() ? "Yes" : "No";
             gender = target->getGender();
-            phase = target->GetPhaseMask();
+            phaseIds = GetUInt16String(target->GetPhaseIds());
         }
         // get additional information from DB
         else
@@ -1745,7 +1744,7 @@ public:
 
         // Output XIII. LANG_PINFO_CHR_PHASE if player is not in GM mode (GM is in every phase)
         if (target && !target->IsGameMaster())                            // IsInWorld() returns false on loadingscreen, so it's more
-            handler->PSendSysMessage(LANG_PINFO_CHR_PHASE, phase);        // precise than just target (safer ?).
+            handler->PSendSysMessage(LANG_PINFO_CHR_PHASE, phaseIds.c_str());     // precise than just target (safer ?).
                                                                           // However, as we usually just require a target here, we use target instead.
         // Output XIV. LANG_PINFO_CHR_MONEY
         uint32 gold = money / GOLD;

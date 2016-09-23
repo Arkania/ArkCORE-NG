@@ -653,5 +653,14 @@ uint64 ComputePhaseIdToMask(uint16 id)
 
 }
 
+char* GetCopyOfChars(const char * source)
+{
+    const size_t len = strlen(source);
+    char * tmp_source = new char[len + 1];
+    strncpy(tmp_source, source, len);
+    tmp_source[len] = '\0'; // I'm paranoid, maybe someone has changed something in _filename :-)
+    return tmp_source;
+}
+
 
 

@@ -330,6 +330,8 @@ std::set<uint16> CopyUInt16List(std::set<uint16> original);
 
 uint64 ComputePhaseIdToMask(uint16 id);
 
+char* GetCopyOfChars(const char * tmp);
+
 #endif
 
 //handler for operations on large flags

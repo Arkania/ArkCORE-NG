@@ -48,9 +48,9 @@ public:
         };
         static ChatCommand gobjectSetCommandTable[] =
         {
-            { "phase", rbac::RBAC_PERM_COMMAND_GOBJECT_SET_PHASE, false, &HandleGameObjectSetPhaseCommand,  "", NULL },
-            { "state", rbac::RBAC_PERM_COMMAND_GOBJECT_SET_STATE, false, &HandleGameObjectSetStateCommand,  "", NULL },
-            { NULL,    0,                                   false, NULL,                              "", NULL }
+            { "phase",       rbac::RBAC_PERM_COMMAND_GOBJECT_SET_PHASE, false, &HandleGameObjectSetPhaseIdCommand,  "", NULL },
+            { "state",       rbac::RBAC_PERM_COMMAND_GOBJECT_SET_STATE, false, &HandleGameObjectSetStateCommand,    "", NULL },
+            { NULL,          0,                                         false, NULL,                                "", NULL }
         };
         static ChatCommand gobjectCommandTable[] =
         {
@@ -516,54 +516,54 @@ public:
         return true;
     }
 
-    //set phase for selected object
-    static bool HandleGameObjectSetPhaseCommand(ChatHandler* handler, char const* args)
+    //set phaseIds for selected object
+    static bool HandleGameObjectSetPhaseIdCommand(ChatHandler* handler, char const* args)
     {
-        // number or [name] Shift-click form |color|Hgameobject:go_id|h[name]|h|r
-        //char* id = handler->extractKeyFromLink((char*)args, "Hgameobject");
-        //if (!id)
-        //    return false;
+        Tokenizer tokens(std::string(args), ' ');
+        if (tokens.size() < 2)
+        {
+            handler->PSendSysMessage(LANG_IMPROPER_VALUE, 0);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
 
-        char* pGuid = strtok((char*)args, " ");
-        char* pId = strtok((char*)args, " ");
-        char* pGroup = strtok((char*)NULL, "");
+        // number or [name] Shift-click form |color|Hgameobject:go_id|h[name]|h|r
+        char* idGuid = handler->extractKeyFromLink(GetCopyOfChars(tokens[0]), "Hgameobject");
 
         uint32 objectGuid = 0;
-        uint16 phaseId = 0;
-        uint16 phaseGroup = 0;
-        if (pGuid)
-            objectGuid = atoi(pGuid);
-        if (pId)
-            phaseId = atoi(pId);
-        if (pGroup)
-            phaseGroup = atoi(pGroup);
+        std::list<uint16> phaseIds;
+
+        if (idGuid && atoi(idGuid))
+            objectGuid = atoi(idGuid);
+        if (atoi(tokens[0]) && !objectGuid)
+            objectGuid = atoi(tokens[0]);
+        for (int32 i = 1; i < tokens.size(); i++)
+            if (atoi(tokens[i]))
+                phaseIds.push_back(atoi(tokens[i]));
 
         GameObjectData const* gameObjectData = nullptr;
         GameObject* object = nullptr;
 
         // by DB guid
         if (gameObjectData = sObjectMgr->GetGOData(objectGuid))
-            object = handler->GetObjectGlobalyWithGuidOrNearWithDbGuid(objectGuid, gameObjectData->id);
+            if (!(object = handler->GetObjectGlobalyWithGuidOrNearWithDbGuid(objectGuid, gameObjectData->id)))
+            {
+                handler->PSendSysMessage(LANG_COMMAND_OBJNOTFOUND, objectGuid);
+                handler->SetSentErrorMessage(true);
+                return false;
+            }
 
-        if (!object)
-        {
-            handler->PSendSysMessage(LANG_COMMAND_OBJNOTFOUND, objectGuid);
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-
-        if (!phaseId && !phaseGroup)
+        if (phaseIds.empty())
         {
             handler->PSendSysMessage(LANG_PHASING_INVALID_VALUE, 0);
             handler->SetSentErrorMessage(true);
             return false;
         }
 
-        if (phaseId)
-            object->AddPhaseId(phaseId, true);
-        if (phaseGroup)
-            object->AddPhaseGroup(phaseGroup, true);
-
+        object->ClearAllPhases(false);
+        for (auto ph : phaseIds)
+           object->AddPhaseId(ph, true);
+       
         object->SaveToDB();
         return true;
     }

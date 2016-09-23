@@ -18860,4 +18860,3 @@ void Unit::Whisper(uint32 textId, Player* target, bool isBossWhisper /*= false*/
     target->SendDirectMessage(&data);
 }
 
-

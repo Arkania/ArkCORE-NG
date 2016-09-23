@@ -28,7 +28,7 @@ struct CreatureData;
 
 class Transport : public GameObject, public TransportBase
 {
-        friend Transport* TransportMgr::CreateTransport(uint32, uint32, Map*, uint32, uint32);
+        friend Transport* TransportMgr::CreateTransport(uint32, uint32, Map*, uint32);
 
         Transport();
     public:

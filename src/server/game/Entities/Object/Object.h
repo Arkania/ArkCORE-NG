@@ -149,7 +149,6 @@ struct PhaseAreaDefinition
     uint32 zoneId;
     uint32 entry;
     uint16 phaseId;
-    uint16 phaseGroup;
     uint16 terrainswapmap;
     uint16 worldMapAreaSwap;
     uint8 flags;
@@ -929,13 +928,9 @@ class WorldObject : public Object, public WorldLocation
         virtual void SetPhaseMask(uint64 newPhaseMask, bool update);
 
         virtual void AddPhaseId(uint16 phaseId, bool apply);
-        void SetPhaseGroups(std::set<uint16> phaseGroups) { m_phaseGroups = phaseGroups; }
-        void AddPhaseGroup(uint16 phaseGroup, bool apply = true);
-        void AddPhaseGroups(std::set<uint16> phaseGroups, bool apply);
 
         uint64 GetPhaseMask() const { return m_phaseMask; }
         std::set<uint16> const& GetPhaseIds() const { return m_phaseIds; }
-        std::set<uint16> const& GetPhaseGroups() const { return m_phaseGroups; }
         std::set<uint16> const& GetTerrainSwaps() const { return m_terrainSwaps; }
         std::set<uint16> const& GetWorldMapAreaSwaps() const { return m_worldMapAreaSwaps; }
         std::string PhaseIdToString();
@@ -981,9 +976,9 @@ class WorldObject : public Object, public WorldLocation
         // phase system
         uint64 m_phaseMask;                                 // in area phase state
         std::set<uint16> m_phaseIds;
-        std::set<uint16> m_phaseGroups;
         std::set<uint16> m_terrainSwaps;
         std::set<uint16> m_worldMapAreaSwaps;
+        bool m_phaseUpdateNeeded;
         // end phase system
 
         uint16 m_notifyflags;
@@ -996,7 +991,7 @@ class WorldObject : public Object, public WorldLocation
         bool CanDetectInvisibilityOf(WorldObject const* obj) const;
         bool CanDetectStealthOf(WorldObject const* obj) const;
 
-        ePhaseUpdateStatus CheckDefinition(PhaseAreaDefinition phaseAreaDefinition);
+        ePhaseUpdateStatus CheckPhaseConditions(PhaseAreaDefinition phaseAreaDefinition);
         ePhaseUpdateStatus CheckArea(PhaseAreaDefinition phaseAreaDefinition, PhaseAreaSelectorContainer pac);
         PhaseAreaSelectorContainer GetPhaseAreaSelectorContainer(uint32 zoneId) const;
         PhaseAreaDefinitionContainer GetPhaseAreaDefinitionContainer(uint32 zoneId) const;

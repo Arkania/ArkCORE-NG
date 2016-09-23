@@ -284,9 +284,9 @@ void Vehicle::RemoveAllPassengers()
 
     // Following the above logic, this assertion should NEVER fail.
     // Even in 'hacky' cases, there should at least be VEHICLE_SPELL_RIDE_HARDCODED on us.
-    // SeatMap::const_iterator itr;
-    // for (itr = Seats.begin(); itr != Seats.end(); ++itr)
-    //    ASSERT(!itr->second.passenger);
+    for (SeatMap::const_iterator itr = Seats.begin(); itr != Seats.end(); ++itr)
+        if (Unit* unit = GetPassenger((itr)->first))
+            RemovePassenger(unit);
 }
 
 /**
@@ -790,7 +790,7 @@ bool VehicleJoinEvent::Execute(uint64, uint32)
 {
     ASSERT(Passenger->IsInWorld());
     ASSERT(Target && Target->GetBase()->IsInWorld());
-    ASSERT(Target->GetBase()->HasAuraTypeWithCaster(SPELL_AURA_CONTROL_VEHICLE, Passenger->GetGUID()));
+    bool IsController = Target->GetBase()->HasAuraTypeWithCaster(SPELL_AURA_CONTROL_VEHICLE, Passenger->GetGUID());
 
     Target->RemovePendingEventsForSeat(Seat->first);
     Target->RemovePendingEventsForPassenger(Passenger);
@@ -843,8 +843,11 @@ bool VehicleJoinEvent::Execute(uint64, uint32)
         Seat->second.SeatInfo->m_flags & VEHICLE_SEAT_FLAG_CAN_CONTROL)
         ASSERT(Target->GetBase()->SetCharmedBy(Passenger, CHARM_TYPE_VEHICLE));  // SMSG_CLIENT_CONTROL
 
-    Passenger->SendClearTarget();                            // SMSG_BREAK_TARGET
-    Passenger->SetControlled(true, UNIT_STATE_ROOT);         // SMSG_FORCE_ROOT - In some cases we send SMSG_SPLINE_MOVE_ROOT here (for creatures)
+    if (IsController)
+    {
+        Passenger->SendClearTarget();                            // SMSG_BREAK_TARGET
+        Passenger->SetControlled(true, UNIT_STATE_ROOT);         // SMSG_FORCE_ROOT - In some cases we send SMSG_SPLINE_MOVE_ROOT here (for creatures)
+    }
 
     Movement::MoveSplineInit init(Passenger);
     init.DisableTransportPathTransformations();

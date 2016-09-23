@@ -741,7 +741,6 @@ void GameObject::SaveToDB(uint32 mapid, GameObjectData const* tmpData)
     data.phaseMask = tmpData->phaseMask;
     data.spawnMask = tmpData->spawnMask;
     data.phaseIds = GetPhaseIds();
-    data.phaseGroups = GetPhaseGroups();
     data.posX = GetPositionX();
     data.posY = GetPositionY();
     data.posZ = GetPositionZ();
@@ -772,7 +771,6 @@ void GameObject::SaveToDB(uint32 mapid, GameObjectData const* tmpData)
     stmt->setUInt16(index++, uint16(GetAreaId()));
     stmt->setUInt8(index++, tmpData->spawnMask);
     stmt->setString(index++, GetUInt16String(GetPhaseIds()));
-    stmt->setString(index++, GetUInt16String(GetPhaseGroups()));
     stmt->setFloat(index++, GetPositionX());
     stmt->setFloat(index++, GetPositionY());
     stmt->setFloat(index++, GetPositionZ());
@@ -872,13 +870,6 @@ void GameObject::SetPhaseBaseValues(const GameObjectData* data)
         if (!data->phaseIds.empty())
             for (uint16 ph : data->phaseIds)
                 SetInPhase(ph, false, true);
-
-        if (!data->phaseGroups.empty())
-        {
-            AddPhaseGroups(data->phaseGroups, true);
-            for (uint16 phGroup : data->phaseGroups)
-                SetInPhase(phGroup, false, true);
-        }
 
         if (GetPhaseIds().empty())
             SetInPhase(DEFAULT_PHASE, false, true);
