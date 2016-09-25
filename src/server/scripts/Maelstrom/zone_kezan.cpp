@@ -44,12 +44,36 @@ enum eKezanEnumerate
     NPC_IZZY_34959 = 34959,
     NPC_KEZAN_CITIZEN_35063 = 35063,
     NPC_KEZAN_CITIZEN_35075 = 35075,
+    NPC_BRUNO_FLAMERETARDANT = 34835,
+    NPC_FRANKIE_GEARSLIPPER = 34876,
+    NPC_JACK_THE_HAMMER = 34877,
+    NPC_SUDSY_MAGEE = 34878,
     SPELL_BORE_32738 = 32738,
     PLAYER_GUID = 99991,
     ACTION_ENTER_CAR = 101,
+    ACTION_HELP_PLAYER,
+    ACTION_STOP_HELP_PLAYER,
     EVENT_ENTER_CAR,
     EVENT_TALK_PERIODIC,
+    EVENT_GIVE_UP,
+    EVENT_COMBAT_STOP,
+    EVENT_RESET_TARGET,
+    EVENT_OWNER_IS_ATTACKED,
 };
+
+void SetCombatAllowed(Creature* npc)
+{
+    npc->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+}
+
+void SetCombatNotAllowed(Player* player, Creature* npc)
+{
+    npc->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+    npc->AttackStop();
+    npc->ClearInCombat();
+    player->AttackStop();
+    player->ClearInCombat();
+}
 
 // 34689 Mage Trainer, 
 class npc_fizz_lighter_34689 : public CreatureScript
@@ -1115,16 +1139,23 @@ public:
         EventMap m_events;
         uint64   m_playerGUID;
         uint64   m_hotrodGUID;
+        uint64   m_targetGUID;
+        bool     m_IsAttackingTarget;
 
         void Initialize()
         {
             m_playerGUID = 0;
             m_hotrodGUID = 0;
+            m_targetGUID = 0;
+            m_IsAttackingTarget = false;
+            me->SetOrientation(6.265732f);
         }
 
         void Reset() override
         {
-            me->SetOrientation(6.265732f);
+            m_targetGUID = 0;
+            m_IsAttackingTarget = false;
+            me->setFaction(2204);
         }
 
         void IsSummonedBy(Unit* summoner) override
@@ -1155,6 +1186,14 @@ public:
                 m_hotrodGUID = guid;
                 break;
             }
+            case NPC_BRUNO_FLAMERETARDANT:
+            case NPC_FRANKIE_GEARSLIPPER:
+            case NPC_JACK_THE_HAMMER:
+            case NPC_SUDSY_MAGEE:
+            {
+                m_targetGUID = guid;
+                break;
+            }
             }
         }
 
@@ -1163,12 +1202,17 @@ public:
             switch (param)
             {
             case ACTION_ENTER_CAR:
-            {
                 m_events.ScheduleEvent(EVENT_ENTER_CAR, 500);
                 break;
+            case ACTION_HELP_PLAYER:
+                if (!m_IsAttackingTarget)
+                    m_events.ScheduleEvent(EVENT_OWNER_IS_ATTACKED, 100);
+                break;
+            case ACTION_STOP_HELP_PLAYER:
+                me->AttackStop();
+                me->GetMotionMaster()->MoveIdle();
+                break;
             }
-            }
-
         }
 
         void UpdateAI(uint32 diff) override
@@ -1186,9 +1230,20 @@ public:
                             if (Vehicle* hotrod = car->GetVehicleKit())
                                 if (!hotrod->HasEmptySeat(0))    // player is passenger
                                     if (hotrod->HasEmptySeat(3)) // my seat is free
-                                    {
-                                        //hotrod->AddPassenger(me, 3);
-                                    }
+                                        me->EnterVehicle(car, 3); //hotrod->AddPassenger(me, 3);
+                    break;
+                }
+                case EVENT_OWNER_IS_ATTACKED:
+                {
+                    if (Creature* target = ObjectAccessor::GetCreature(*me, m_targetGUID))
+                    {
+                        m_IsAttackingTarget = true;
+                        me->SetReactState(REACT_AGGRESSIVE); //            
+                        AttackStart(target);
+                        me->GetMotionMaster()->MoveChase(target, 3.0f);
+                    }
+                    if (uint32 rol = urand(0, 100) < 60)
+                        Talk(1, me->GetOwner());
                     break;
                 }
                 }
@@ -1220,16 +1275,23 @@ public:
         EventMap m_events;
         uint64   m_playerGUID;
         uint64   m_hotrodGUID;
+        uint64   m_targetGUID;
+        bool     m_IsAttackingTarget;
 
         void Initialize()
         {
             m_playerGUID = 0;
             m_hotrodGUID = 0;
+            m_targetGUID = 0;
+            m_IsAttackingTarget = false;
+            me->SetOrientation(4.120008f);
         }
 
         void Reset() override
         {
-            me->SetOrientation(4.120008f);
+            m_targetGUID = 0;
+            m_IsAttackingTarget = false;
+            me->setFaction(2204);
         }
 
         void IsSummonedBy(Unit* summoner) override
@@ -1260,6 +1322,14 @@ public:
                 m_hotrodGUID = guid;
                 break;
             }
+            case NPC_BRUNO_FLAMERETARDANT:
+            case NPC_FRANKIE_GEARSLIPPER:
+            case NPC_JACK_THE_HAMMER:
+            case NPC_SUDSY_MAGEE:
+            {
+                m_targetGUID = guid;
+                break;
+            }
             }
         }
 
@@ -1268,13 +1338,19 @@ public:
             switch (param)
             {
             case ACTION_ENTER_CAR:
-            {
                 m_events.ScheduleEvent(EVENT_ENTER_CAR, 500);
                 break;
+            case ACTION_HELP_PLAYER:
+                if (!m_IsAttackingTarget)
+                    m_events.ScheduleEvent(EVENT_OWNER_IS_ATTACKED, 100);
+                break;
+            case ACTION_STOP_HELP_PLAYER:
+                me->AttackStop();
+                me->GetMotionMaster()->MoveIdle();
+                break;
             }
-            }
-
         }
+
         void UpdateAI(uint32 diff) override
         {
             m_events.Update(diff);
@@ -1290,9 +1366,17 @@ public:
                             if (Vehicle* hotrod = car->GetVehicleKit())
                                 if (!hotrod->HasEmptySeat(0))    // player is passenger
                                     if (hotrod->HasEmptySeat(2)) // my seat is free
-                                    {
-                                        //hotrod->AddPassenger(me, 2);
-                                    }
+                                       me->EnterVehicle(car, 2); //  hotrod->AddPassenger(me, 2);
+                }
+                case EVENT_OWNER_IS_ATTACKED:
+                {
+                    if (Creature* target = ObjectAccessor::GetCreature(*me, m_targetGUID))
+                    {
+                        m_IsAttackingTarget = true;
+                        me->SetReactState(REACT_AGGRESSIVE); //            
+                        AttackStart(target);
+                        me->GetMotionMaster()->MoveChase(target, 3.0f);
+                    }
                 }
                 }
             }
@@ -1323,16 +1407,23 @@ public:
         EventMap m_events;
         uint64   m_playerGUID;
         uint64   m_hotrodGUID;
+        uint64   m_targetGUID;
+        bool     m_IsAttackingTarget;
 
         void Initialize()
         {
             m_playerGUID = 0;
             m_hotrodGUID = 0;
+            m_targetGUID = 0;
+            m_IsAttackingTarget = false;
+            me->SetOrientation(3.819579f);
         }
 
         void Reset() override
         {
-            me->SetOrientation(3.819579f);
+            m_targetGUID = 0;
+            m_IsAttackingTarget = false;
+            me->setFaction(2204);
         }
 
         void IsSummonedBy(Unit* summoner) override
@@ -1363,6 +1454,14 @@ public:
                 m_hotrodGUID = guid;
                 break;
             }
+            case NPC_BRUNO_FLAMERETARDANT:
+            case NPC_FRANKIE_GEARSLIPPER:
+            case NPC_JACK_THE_HAMMER:
+            case NPC_SUDSY_MAGEE:
+            {
+                m_targetGUID = guid;
+                break;
+            }
             }
         }
 
@@ -1371,12 +1470,17 @@ public:
             switch (param)
             {
             case ACTION_ENTER_CAR:
-            {
                 m_events.ScheduleEvent(EVENT_ENTER_CAR, 500);
                 break;
+            case ACTION_HELP_PLAYER:
+                if (!m_IsAttackingTarget)
+                    m_events.ScheduleEvent(EVENT_OWNER_IS_ATTACKED, 100);
+                break;
+            case ACTION_STOP_HELP_PLAYER:
+                me->AttackStop();
+                me->GetMotionMaster()->MoveIdle();
+                break;
             }
-            }
-
         }
 
         void UpdateAI(uint32 diff) override
@@ -1394,9 +1498,19 @@ public:
                             if (Vehicle* hotrod = car->GetVehicleKit())
                                 if (!hotrod->HasEmptySeat(0))    // player is passenger
                                     if (hotrod->HasEmptySeat(1)) // my seat is free
-                                    {
-                                        // hotrod->AddPassenger(me, 1);
-                                    }
+                                        me->EnterVehicle(car, 1); //hotrod->AddPassenger(me, 1);
+                }
+                case EVENT_OWNER_IS_ATTACKED:
+                {
+                    if (Creature* target = ObjectAccessor::GetCreature(*me, m_targetGUID))
+                    {
+                        m_IsAttackingTarget = true;
+                        me->SetReactState(REACT_AGGRESSIVE); //            
+                        AttackStart(target);
+                        me->GetMotionMaster()->MoveChase(target, 3.0f);
+                    }
+                    if (uint32 rol = urand(0, 100) < 60)
+                        Talk(1, me->GetOwner());
                 }
                 }
             }
@@ -1526,6 +1640,473 @@ public:
     }
 };
 
+// 34835
+class npc_bruno_flameretardant_34835 : public CreatureScript
+{
+public:
+    npc_bruno_flameretardant_34835() : CreatureScript("npc_bruno_flameretardant_34835") { }
+
+    enum eNpc
+    {
+        SPELL_THROW_GEARS = 75775,
+    };
+
+    struct npc_bruno_flameretardant_34835AI : public ScriptedAI
+    {
+        npc_bruno_flameretardant_34835AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+        EventMap m_events;
+        std::list<uint64> tList;
+        uint64   m_playerGUID;
+        bool     m_give_up;
+
+        void Initialize() 
+        {
+            tList.clear();
+            m_playerGUID = 0;
+            m_give_up = false;
+            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+        }
+
+        void JustDied(Unit* killer) override
+        {
+            Initialize();
+        }
+
+        void DamageTaken(Unit* attacker, uint32& damage) override 
+        { 
+            if (!m_give_up)
+            {
+                if (me->GetHealthPct() < 50.0f)
+                    m_events.ScheduleEvent(EVENT_GIVE_UP, 100);
+            }
+            else
+                me->AttackStop();
+        }
+
+        void EnterCombat(Unit* victim) override 
+        { 
+            tList.clear();
+            if (Player* player = victim->ToPlayer())
+            {
+                m_playerGUID = player->GetGUID();
+                Talk(1, player);
+                if (!player->m_Controlled.empty())
+                    for (auto minion : player->m_Controlled)
+                    {
+                        tList.push_back(minion->GetGUID());
+                        minion->GetAI()->SetGUID(me->GetGUID(), me->GetEntry());
+                        minion->GetAI()->DoAction(ACTION_HELP_PLAYER);
+                    }
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_GIVE_UP:
+                {
+                    if (!m_give_up)
+                        if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        {
+                            player->KilledMonsterCredit(NPC_BRUNO_FLAMERETARDANT);
+                            Talk(0, player);
+                            SetCombatNotAllowed(player, me);
+                            m_give_up = true;
+                            m_events.ScheduleEvent(EVENT_COMBAT_STOP, 6000);
+                            if (!player->m_Controlled.empty())
+                                for (auto minion : player->m_Controlled)
+                                    minion->GetAI()->DoAction(ACTION_STOP_HELP_PLAYER);
+                        }
+                    
+                    break;
+                }
+                case EVENT_COMBAT_STOP:
+                {
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        SetCombatNotAllowed(player, me);
+                    me->AI()->EnterEvadeMode();
+                    m_events.ScheduleEvent(EVENT_RESET_TARGET, 4000);
+                    break;
+                }
+                case EVENT_RESET_TARGET:
+                {
+                    me->AI()->EnterEvadeMode();
+                    Initialize();
+                    break;
+                }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_bruno_flameretardant_34835AI(creature);
+    }
+};
+
+// 34876
+class npc_frankie_gearslipper_34876 : public CreatureScript
+{
+public:
+    npc_frankie_gearslipper_34876() : CreatureScript("npc_frankie_gearslipper_34876") { }
+
+    enum eNpc
+    {
+        SPELL_THROW_GEARS = 75775,
+    };
+
+    struct npc_frankie_gearslipper_34876AI : public ScriptedAI
+    {
+        npc_frankie_gearslipper_34876AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+        EventMap m_events;
+        std::list<uint64> tList;
+        uint64   m_playerGUID;
+        bool     m_give_up;
+
+        void Initialize()
+        {
+            tList.clear();
+            m_playerGUID = 0;
+            m_give_up = false;
+            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+        }
+
+        void JustDied(Unit* killer) override
+        {
+            Initialize();
+        }
+
+        void DamageTaken(Unit* attacker, uint32& damage) override
+        {
+            if (!m_give_up)
+            {
+                if (me->GetHealthPct() < 50.0f)
+                    m_events.ScheduleEvent(EVENT_GIVE_UP, 100);
+            }
+            else
+                me->AttackStop();
+        }
+
+        void EnterCombat(Unit* victim) override
+        {
+            tList.clear();
+            if (Player* player = victim->ToPlayer())
+            {
+                m_playerGUID = player->GetGUID();
+                Talk(1, player);
+                if (!player->m_Controlled.empty())
+                    for (auto minion : player->m_Controlled)
+                    {
+                        tList.push_back(minion->GetGUID());
+                        minion->GetAI()->SetGUID(me->GetGUID(), me->GetEntry());
+                        minion->GetAI()->DoAction(ACTION_HELP_PLAYER);
+                    }
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_GIVE_UP:
+                {
+                    if (!m_give_up)
+                        if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        {
+                            player->KilledMonsterCredit(NPC_FRANKIE_GEARSLIPPER);
+                            Talk(0, player);
+                            SetCombatNotAllowed(player, me);
+                            m_give_up = true;
+                            m_events.ScheduleEvent(EVENT_COMBAT_STOP, 6000);
+                            if (!player->m_Controlled.empty())
+                                for (auto minion : player->m_Controlled)
+                                    minion->GetAI()->DoAction(ACTION_STOP_HELP_PLAYER);
+                        }
+
+                    break;
+                }
+                case EVENT_COMBAT_STOP:
+                {
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        SetCombatNotAllowed(player, me);
+                    me->AI()->EnterEvadeMode();
+                    m_events.ScheduleEvent(EVENT_RESET_TARGET, 4000);
+                    break;
+                }
+                case EVENT_RESET_TARGET:
+                {
+                    me->AI()->EnterEvadeMode();
+                    Initialize();
+                    break;
+                }             
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_frankie_gearslipper_34876AI(creature);
+    }
+};
+
+// 34877
+class npc_jack_the_hammer_34877 : public CreatureScript
+{
+public:
+    npc_jack_the_hammer_34877() : CreatureScript("npc_jack_the_hammer_34877") { }
+
+    enum eNpc
+    {
+        SPELL_KNOCKBACK = 75986,
+        SPELL_ACIDIC_SWEAT = 76136,
+    };
+
+    struct npc_jack_the_hammer_34877AI : public ScriptedAI
+    {
+        npc_jack_the_hammer_34877AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+        EventMap m_events;
+        std::list<uint64> tList;
+        uint64   m_playerGUID;
+        bool     m_give_up;
+
+        void Initialize()
+        {
+            tList.clear();
+            m_playerGUID = 0;
+            m_give_up = false;
+            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+        }
+
+        void JustDied(Unit* killer) override
+        {
+            Initialize();
+        }
+
+        void DamageTaken(Unit* attacker, uint32& damage) override
+        {
+            if (!m_give_up)
+            {
+                if (me->GetHealthPct() < 50.0f)
+                    m_events.ScheduleEvent(EVENT_GIVE_UP, 100);
+            }
+            else
+                me->AttackStop();
+        }
+
+        void EnterCombat(Unit* victim) override
+        {
+            tList.clear();
+            if (Player* player = victim->ToPlayer())
+            {
+                m_playerGUID = player->GetGUID();
+                Talk(1, player);
+                if (!player->m_Controlled.empty())
+                    for (auto minion : player->m_Controlled)
+                    {
+                        tList.push_back(minion->GetGUID());
+                        minion->GetAI()->SetGUID(me->GetGUID(), me->GetEntry());
+                        minion->GetAI()->DoAction(ACTION_HELP_PLAYER);
+                    }
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_GIVE_UP:
+                {
+                    if (!m_give_up)
+                        if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        {
+                            player->KilledMonsterCredit(NPC_JACK_THE_HAMMER);
+                            Talk(0, player);
+                            SetCombatNotAllowed(player, me);
+                            m_give_up = true;
+                            m_events.ScheduleEvent(EVENT_COMBAT_STOP, 6000);
+                            if (!player->m_Controlled.empty())
+                                for (auto minion : player->m_Controlled)
+                                    minion->GetAI()->DoAction(ACTION_STOP_HELP_PLAYER);
+                        }
+
+                    break;
+                }
+                case EVENT_COMBAT_STOP:
+                {
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        SetCombatNotAllowed(player, me);
+                    me->AI()->EnterEvadeMode();
+                    m_events.ScheduleEvent(EVENT_RESET_TARGET, 4000);
+                    break;
+                }
+                case EVENT_RESET_TARGET:
+                {
+                    me->AI()->EnterEvadeMode();
+                    Initialize();
+                    break;
+                }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_jack_the_hammer_34877AI(creature);
+    }
+};
+
+// 34878
+class npc_sudsy_magee_34878 : public CreatureScript
+{
+public:
+    npc_sudsy_magee_34878() : CreatureScript("npc_sudsy_magee_34878") { }
+
+    enum eNpc
+    {
+        SPELL_BUBBLE_BLAST = 75761,
+        SPELL_FROSTBOLT = 9672,
+    };
+
+    struct npc_sudsy_magee_34878AI : public ScriptedAI
+    {
+        npc_sudsy_magee_34878AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+        EventMap m_events;
+        std::list<uint64> tList;
+        uint64   m_playerGUID;
+        bool     m_give_up;
+
+        void Initialize()
+        {
+            tList.clear();
+            m_playerGUID = 0;
+            m_give_up = false;
+            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+        }
+
+        void JustDied(Unit* killer) override 
+        {
+            Initialize();
+        }
+
+        void DamageTaken(Unit* attacker, uint32& damage) override
+        {
+            if (!m_give_up)
+            {
+                if (me->GetHealthPct() < 50.0f)
+                    m_events.ScheduleEvent(EVENT_GIVE_UP, 100);
+            }
+            else
+                me->AttackStop();
+        }
+
+        void EnterCombat(Unit* victim) override
+        {
+            tList.clear();
+            if (Player* player = victim->ToPlayer())
+            {
+                m_playerGUID = player->GetGUID();
+                Talk(0, player);
+                if (!player->m_Controlled.empty())
+                    for (auto minion : player->m_Controlled)
+                    {
+                        tList.push_back(minion->GetGUID());
+                        minion->GetAI()->SetGUID(me->GetGUID(), me->GetEntry());
+                        minion->GetAI()->DoAction(ACTION_HELP_PLAYER);
+                    }
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_GIVE_UP:
+                {
+                    if (!m_give_up)
+                        if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        {
+                            player->KilledMonsterCredit(NPC_SUDSY_MAGEE);
+                            Talk(1, player);
+                            SetCombatNotAllowed(player, me);
+                            m_give_up = true;
+                            m_events.ScheduleEvent(EVENT_COMBAT_STOP, 6000);
+                            if (!player->m_Controlled.empty())
+                                for (auto minion : player->m_Controlled)
+                                    minion->GetAI()->DoAction(ACTION_STOP_HELP_PLAYER);
+                        }
+
+                    break;
+                }
+                case EVENT_COMBAT_STOP:
+                {
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        SetCombatNotAllowed(player, me);
+                    me->AI()->EnterEvadeMode();
+                    m_events.ScheduleEvent(EVENT_RESET_TARGET, 4000);
+                    break;
+                }
+                case EVENT_RESET_TARGET:
+                {
+                    me->AI()->EnterEvadeMode();
+                    Initialize();
+                    break;
+                }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_sudsy_magee_34878AI(creature);
+    }
+};
+
+
 
 void AddSC_zone_kezan()
 {
@@ -1552,5 +2133,10 @@ void AddSC_zone_kezan()
     new go_disco_ball_201591();
     new npc_tunneling_worm_34865();
     new npc_warrior_matic_nx__34697();
+    new npc_bruno_flameretardant_34835();
+    new npc_frankie_gearslipper_34876();
+    new npc_jack_the_hammer_34877();
+    new npc_sudsy_magee_34878();
+
 }
 
