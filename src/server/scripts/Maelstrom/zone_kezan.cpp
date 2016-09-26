@@ -38,6 +38,8 @@ enum eKezanEnumerate
     QUEST_ROLLING_WITH_MY_HOMIES = 14071,
     QUEST_LIFE_SAVINGS = 14126,
     QUEST_MEGS_IN_MARKETING = 28349,
+    QUEST_THE_REPLACEMENTS = 24488,
+    QUEST_NECCASSARY_ROUGHNESS = 24502,
     NPC_HOT_ROD_34840 = 34840,
     NPC_ACE_34957 = 34957,
     NPC_GOBBER_34958 = 34958,
@@ -48,7 +50,11 @@ enum eKezanEnumerate
     NPC_FRANKIE_GEARSLIPPER = 34876,
     NPC_JACK_THE_HAMMER = 34877,
     NPC_SUDSY_MAGEE = 34878,
+    NPC_STEAMWHEEDLE_SHARK = 37114,
+    NPC_BILGEWATER_BUCCANEER = 37179,
+    NPC_NECESSARY_ROUGHNESS_KILL_CREDIT = 48271,
     SPELL_BORE_32738 = 32738,
+    SPELL_PERMANENT_FEIGN_DEATH = 29266,
     PLAYER_GUID = 99991,
     ACTION_ENTER_CAR = 101,
     ACTION_HELP_PLAYER,
@@ -1690,7 +1696,8 @@ public:
             if (Player* player = victim->ToPlayer())
             {
                 m_playerGUID = player->GetGUID();
-                Talk(1, player);
+                Talk(0, player);
+                m_events.ScheduleEvent(EVENT_TALK_PERIODIC, 5000);
                 if (!player->m_Controlled.empty())
                     for (auto minion : player->m_Controlled)
                     {
@@ -1709,13 +1716,19 @@ public:
             {
                 switch (eventId)
                 {
+                case EVENT_TALK_PERIODIC:
+                {
+                    if (me->GetHealthPct() > 70.0f)
+                        Talk(1);
+                    break;
+                }
                 case EVENT_GIVE_UP:
                 {
                     if (!m_give_up)
                         if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
                         {
                             player->KilledMonsterCredit(NPC_BRUNO_FLAMERETARDANT);
-                            Talk(0, player);
+                            Talk(2, player);                            
                             SetCombatNotAllowed(player, me);
                             m_give_up = true;
                             m_events.ScheduleEvent(EVENT_COMBAT_STOP, 6000);
@@ -1806,7 +1819,8 @@ public:
             if (Player* player = victim->ToPlayer())
             {
                 m_playerGUID = player->GetGUID();
-                Talk(1, player);
+                Talk(0, player);
+                m_events.ScheduleEvent(EVENT_TALK_PERIODIC, 5000);
                 if (!player->m_Controlled.empty())
                     for (auto minion : player->m_Controlled)
                     {
@@ -1825,13 +1839,19 @@ public:
             {
                 switch (eventId)
                 {
+                case EVENT_TALK_PERIODIC:
+                {
+                    if (me->GetHealthPct() > 70.0f)
+                        Talk(1);
+                    break;
+                }
                 case EVENT_GIVE_UP:
                 {
                     if (!m_give_up)
                         if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
                         {
                             player->KilledMonsterCredit(NPC_FRANKIE_GEARSLIPPER);
-                            Talk(0, player);
+                            Talk(2, player);
                             SetCombatNotAllowed(player, me);
                             m_give_up = true;
                             m_events.ScheduleEvent(EVENT_COMBAT_STOP, 6000);
@@ -1923,7 +1943,8 @@ public:
             if (Player* player = victim->ToPlayer())
             {
                 m_playerGUID = player->GetGUID();
-                Talk(1, player);
+                Talk(0, player);
+                m_events.ScheduleEvent(EVENT_TALK_PERIODIC, 5000);
                 if (!player->m_Controlled.empty())
                     for (auto minion : player->m_Controlled)
                     {
@@ -1942,13 +1963,19 @@ public:
             {
                 switch (eventId)
                 {
+                case EVENT_TALK_PERIODIC:
+                {
+                    if (me->GetHealthPct() > 70.0f)
+                        Talk(1);
+                    break;
+                }
                 case EVENT_GIVE_UP:
                 {
                     if (!m_give_up)
                         if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
                         {
                             player->KilledMonsterCredit(NPC_JACK_THE_HAMMER);
-                            Talk(0, player);
+                            Talk(2, player);
                             SetCombatNotAllowed(player, me);
                             m_give_up = true;
                             m_events.ScheduleEvent(EVENT_COMBAT_STOP, 6000);
@@ -2041,6 +2068,7 @@ public:
             {
                 m_playerGUID = player->GetGUID();
                 Talk(0, player);
+                m_events.ScheduleEvent(EVENT_TALK_PERIODIC, 5000);
                 if (!player->m_Controlled.empty())
                     for (auto minion : player->m_Controlled)
                     {
@@ -2059,13 +2087,19 @@ public:
             {
                 switch (eventId)
                 {
+                case EVENT_TALK_PERIODIC:
+                {
+                    if (me->GetHealthPct() > 70.0f)
+                        Talk(1);
+                    break;
+                }
                 case EVENT_GIVE_UP:
                 {
                     if (!m_give_up)
                         if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
                         {
                             player->KilledMonsterCredit(NPC_SUDSY_MAGEE);
-                            Talk(1, player);
+                            Talk(2, player);
                             SetCombatNotAllowed(player, me);
                             m_give_up = true;
                             m_events.ScheduleEvent(EVENT_COMBAT_STOP, 6000);
@@ -2106,6 +2140,270 @@ public:
     }
 };
 
+// 37106
+class npc_coach_crosscheck_37106 : public CreatureScript
+{
+public:
+    npc_coach_crosscheck_37106() : CreatureScript("npc_coach_crosscheck_37106") { }
+
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    {
+       if (quest->GetQuestId() == QUEST_THE_REPLACEMENTS)
+           creature->AI()->Talk(0, player);
+       else if (quest->GetQuestId() == QUEST_NECCASSARY_ROUGHNESS)
+           creature->AI()->Talk(1, player);
+        return false;
+    }
+
+};
+
+// 37179
+class npc_bilgewater_buccaneer_37179 : public CreatureScript
+{
+public:
+    npc_bilgewater_buccaneer_37179() : CreatureScript("npc_bilgewater_buccaneer_37179") { }
+
+    enum eNpc
+    {
+        SPELL_SUMMON_STEAMWHEEDLE_SHARK = 69971,
+        EVENT_PLAY_SOUND = 901,
+        EVENT_START_PLAY_GAME,
+        EVENT_OBSERVER_CHEERING,
+    };
+
+    struct npc_bilgewater_buccaneer_37179AI : public VehicleAI
+    {
+        npc_bilgewater_buccaneer_37179AI(Creature* creature) : VehicleAI(creature) { }
+
+        EventMap m_events;
+        uint64 m_playerGUID;
+        std::list<uint64> sList;
+        std::list<uint64> zList;
+
+        void Reset() override
+        {
+            m_playerGUID = 0;
+        }
+
+        void JustSummoned(Creature* summon) override
+        {
+            if (summon->GetEntry() == NPC_STEAMWHEEDLE_SHARK)
+            {
+                sList.push_back(summon->GetGUID());
+                summon->AI()->SetGUID(m_playerGUID, PLAYER_GUID);
+            }
+        }
+
+        void PassengerBoarded(Unit* unit, int8 /*seat*/, bool apply) override
+        {
+            if (apply)
+            {
+                if (Player* player = unit->ToPlayer())
+                {
+                    m_playerGUID = player->GetGUID();
+                    player->KilledMonsterCredit(NPC_NECESSARY_ROUGHNESS_KILL_CREDIT);
+                    m_events.ScheduleEvent(EVENT_PLAY_SOUND, 1000);
+                    m_events.ScheduleEvent(EVENT_START_PLAY_GAME, 4000);
+                    m_events.ScheduleEvent(EVENT_OBSERVER_CHEERING, 250);
+                }
+            }
+            else
+            {
+                StopPlayGame();
+            }
+        }
+
+        void MoveInLineOfSight_Safe(Unit* who)
+        {
+            if (who->GetEntry() == NPC_STEAMWHEEDLE_SHARK)
+                if (who->GetDistance2d(me) < 3.0f)
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                    {
+                        player->SetQuestStatus(QUEST_NECCASSARY_ROUGHNESS, QUEST_STATUS_FAILED);
+                        if (Vehicle* vehicle = me->GetVehicleKit())
+                            vehicle->RemoveAllPassengers();
+                    }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+            VehicleAI::UpdateAI(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_PLAY_SOUND:
+                {
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                    {
+                        player->PlayDirectSound(17466, player);
+                        m_events.ScheduleEvent(EVENT_PLAY_SOUND, 1000);
+                    }
+                    break;
+                }
+                case EVENT_START_PLAY_GAME:
+                {
+                    StartPlayGame();
+                    break;
+                }
+                case EVENT_OBSERVER_CHEERING:
+                {
+                    for (uint32 i = 0; i < urand(3, 10); i++)
+                        if (Creature* npc = GetRandomObserver())
+                            npc->HandleEmoteCommand(GetRandomEmote());
+
+                    m_events.ScheduleEvent(EVENT_OBSERVER_CHEERING, 500);
+                    break;
+                }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+
+        void StartPlayGame()
+        {
+            me->CastSpell(-8291.62f, 1479.97f, 43.8908f, SPELL_SUMMON_STEAMWHEEDLE_SHARK + 0, true);
+            me->CastSpell(-8285.75f, 1484.46f, 42.9395f, SPELL_SUMMON_STEAMWHEEDLE_SHARK + 5, true);
+            me->CastSpell(-8291.08f, 1487.72f, 43.8463f, SPELL_SUMMON_STEAMWHEEDLE_SHARK + 6, true);
+            me->CastSpell(-8288.04f, 1477.49f, 43.3046f, SPELL_SUMMON_STEAMWHEEDLE_SHARK + 7, true);
+            me->CastSpell(-8288.33f, 1490.41f, 43.4756f, SPELL_SUMMON_STEAMWHEEDLE_SHARK + 8, true);
+            me->CastSpell(-8295.10f, 1484.91f, 44.3231f, SPELL_SUMMON_STEAMWHEEDLE_SHARK + 9, true);
+            me->CastSpell(-8294.66f, 1474.68f, 44.2946f, SPELL_SUMMON_STEAMWHEEDLE_SHARK + 10, true);
+            me->CastSpell(-8294.61f, 1493.67f, 44.6239f, SPELL_SUMMON_STEAMWHEEDLE_SHARK + 11, true);
+        }
+
+        void StopPlayGame()
+        {
+            for (auto guid : sList)
+                if (Creature* shark = ObjectAccessor::GetCreature(*me, guid))
+                    shark->DespawnOrUnsummon(1);
+            m_playerGUID = 0;
+            m_events.Reset();
+            sList.clear();
+        }
+
+        void LoadObserver()
+        {
+            std::list<Creature*> crList = me->FindNearestCreatures(NPC_KEZAN_CITIZEN_35063, 50.0f);
+            for (auto npc : crList)
+                zList.push_back(npc->GetGUID());
+        }
+
+        uint32 GetRandomEmote()
+        {
+            return RAND(1, 4, 5, 6, 11, 14, 15, 25, 92, 94, 274);
+        }
+
+        Creature* GetRandomObserver()
+        {
+            if (zList.size() == 0)
+                LoadObserver();
+            else
+            {
+                uint32 rol2 = urand(0, zList.size() - 1);
+                std::list<uint64>::iterator itr = zList.begin();
+                std::advance(itr, rol2);
+                return ObjectAccessor::GetCreature(*me, *itr);
+            }
+            return nullptr;
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_bilgewater_buccaneer_37179AI(creature);
+    }
+};
+
+// 37114
+class npc_steamwheedle_shark_37114 : public CreatureScript
+{
+public:
+    npc_steamwheedle_shark_37114() : CreatureScript("npc_steamwheedle_shark_37114") { }
+
+    enum eNpc
+    {
+        EVENT_WE_ARE_KILLED = 901,
+    };
+
+    struct npc_steamwheedle_shark_37114AI : public ScriptedAI
+    {
+        npc_steamwheedle_shark_37114AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap m_events;
+        uint64   m_playerGUID;
+        uint64   m_buccaneerGUID;
+
+        void Reset() override
+        {
+            m_playerGUID = 0;
+            m_buccaneerGUID = 0;
+        }
+
+        void IsSummonedBy(Unit* summoner) override 
+        { 
+            if (Creature* npc = summoner->ToCreature())
+                if (npc->GetEntry() == NPC_BILGEWATER_BUCCANEER)
+                    m_buccaneerGUID = npc->GetGUID();
+        }
+
+        void SpellHit(Unit* caster, SpellInfo const* spell) override 
+        { 
+            me->GetMotionMaster()->Clear();
+            me->GetMotionMaster()->MoveIdle();
+            m_events.ScheduleEvent(EVENT_WE_ARE_KILLED, 10);
+        }
+
+        void SetGUID(uint64 guid, int32 id) override
+        {
+            switch (id)
+            {
+            case PLAYER_GUID:
+                m_playerGUID = guid;
+                break;
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_WE_ARE_KILLED:
+                {
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                    {
+                        player->Kill(me);
+                        me->AddAura(SPELL_PERMANENT_FEIGN_DEATH, me);
+                        player->KilledMonsterCredit(NPC_STEAMWHEEDLE_SHARK);
+                    }
+                    break;
+                }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_steamwheedle_shark_37114AI(creature);
+    }
+};
+
 
 
 void AddSC_zone_kezan()
@@ -2137,6 +2435,8 @@ void AddSC_zone_kezan()
     new npc_frankie_gearslipper_34876();
     new npc_jack_the_hammer_34877();
     new npc_sudsy_magee_34878();
-
+    new npc_coach_crosscheck_37106();
+    new npc_bilgewater_buccaneer_37179();
+    new npc_steamwheedle_shark_37114();
 }
 

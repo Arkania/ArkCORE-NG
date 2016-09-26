@@ -656,6 +656,11 @@ void Spell::InitExplicitTargets(SpellCastTargets const& targets)
     // this also makes sure that we correctly send explicit targets to client (removes redundant data)
     uint32 neededTargets = m_spellInfo->GetExplicitTargetMask();
 
+    if (!neededTargets && (m_targets.GetTargetMask() & TARGET_FLAG_DEST_LOCATION))
+        if (m_targets.GetDstPos()->IsPositionValid())
+            if (m_targets.GetDstPos()->GetPositionX() != 0.0f || m_targets.GetDstPos()->GetPositionY() != 0.0f)
+                neededTargets |= TARGET_FLAG_DEST_LOCATION;
+
     if (WorldObject* target = m_targets.GetObjectTarget())
     {
         // check if object target is valid with needed target flags
@@ -1117,8 +1122,13 @@ void Spell::SelectImplicitNearbyTargets(SpellEffIndex effIndex, SpellImplicitTar
             }
             break;
         case TARGET_OBJECT_TYPE_DEST:
-            m_targets.SetDst(*target);
-            break;
+        {
+            if (m_targets.GetTargetMask() & TARGET_FLAG_DEST_LOCATION)
+                m_targets.SetDst(*m_targets.GetDst());
+            else
+                m_targets.SetDst(*target);
+            break; 
+        }
         default:
             ASSERT(false && "Spell::SelectImplicitNearbyTargets: received not implemented target object type");
             break;
