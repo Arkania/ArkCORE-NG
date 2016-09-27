@@ -1146,22 +1146,21 @@ public:
         uint64   m_playerGUID;
         uint64   m_hotrodGUID;
         uint64   m_targetGUID;
-        bool     m_IsAttackingTarget;
 
         void Initialize()
         {
             m_playerGUID = 0;
             m_hotrodGUID = 0;
             m_targetGUID = 0;
-            m_IsAttackingTarget = false;
             me->SetOrientation(6.265732f);
         }
 
         void Reset() override
         {
             m_targetGUID = 0;
-            m_IsAttackingTarget = false;
-            me->setFaction(2204);
+            me->setFaction(2204); 
+            me->SetReactState(REACT_DEFENSIVE);
+            me->GetMotionMaster()->MoveIdle();
         }
 
         void IsSummonedBy(Unit* summoner) override
@@ -1176,6 +1175,17 @@ public:
                         m_events.ScheduleEvent(EVENT_ENTER_CAR, 500);
                     }
             }
+        }
+
+        void EnterCombat(Unit* victim) override
+        {
+            if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                if (urand(0, 100) < 60)
+                    Talk(0, player);
+            //me->SetReactState(REACT_AGGRESSIVE);            
+            me->GetMotionMaster()->Clear();
+            me->GetMotionMaster()->MoveChase(victim, 2.0f);
+            m_targetGUID = victim->GetGUID();
         }
 
         void SetGUID(uint64 guid, int32 id) override
@@ -1210,14 +1220,6 @@ public:
             case ACTION_ENTER_CAR:
                 m_events.ScheduleEvent(EVENT_ENTER_CAR, 500);
                 break;
-            case ACTION_HELP_PLAYER:
-                if (!m_IsAttackingTarget)
-                    m_events.ScheduleEvent(EVENT_OWNER_IS_ATTACKED, 100);
-                break;
-            case ACTION_STOP_HELP_PLAYER:
-                me->AttackStop();
-                me->GetMotionMaster()->MoveIdle();
-                break;
             }
         }
 
@@ -1237,19 +1239,6 @@ public:
                                 if (!hotrod->HasEmptySeat(0))    // player is passenger
                                     if (hotrod->HasEmptySeat(3)) // my seat is free
                                         me->EnterVehicle(car, 3); //hotrod->AddPassenger(me, 3);
-                    break;
-                }
-                case EVENT_OWNER_IS_ATTACKED:
-                {
-                    if (Creature* target = ObjectAccessor::GetCreature(*me, m_targetGUID))
-                    {
-                        m_IsAttackingTarget = true;
-                        me->SetReactState(REACT_AGGRESSIVE); //            
-                        AttackStart(target);
-                        me->GetMotionMaster()->MoveChase(target, 3.0f);
-                    }
-                    if (uint32 rol = urand(0, 100) < 60)
-                        Talk(1, me->GetOwner());
                     break;
                 }
                 }
@@ -1282,22 +1271,21 @@ public:
         uint64   m_playerGUID;
         uint64   m_hotrodGUID;
         uint64   m_targetGUID;
-        bool     m_IsAttackingTarget;
 
         void Initialize()
         {
             m_playerGUID = 0;
             m_hotrodGUID = 0;
             m_targetGUID = 0;
-            m_IsAttackingTarget = false;
             me->SetOrientation(4.120008f);
         }
 
         void Reset() override
         {
             m_targetGUID = 0;
-            m_IsAttackingTarget = false;
             me->setFaction(2204);
+            me->SetReactState(REACT_DEFENSIVE);
+            me->GetMotionMaster()->MoveIdle();
         }
 
         void IsSummonedBy(Unit* summoner) override
@@ -1314,6 +1302,16 @@ public:
             }
         }
 
+        void EnterCombat(Unit* victim) override
+        {
+            if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                if (urand(0, 100) < 60)
+                    Talk(0, player);
+            //me->SetReactState(REACT_AGGRESSIVE);
+            me->GetMotionMaster()->Clear();
+            me->GetMotionMaster()->MoveChase(victim, 2.0f);
+            m_targetGUID = victim->GetGUID();
+        }
         void SetGUID(uint64 guid, int32 id) override
         {
             switch (id)
@@ -1346,14 +1344,6 @@ public:
             case ACTION_ENTER_CAR:
                 m_events.ScheduleEvent(EVENT_ENTER_CAR, 500);
                 break;
-            case ACTION_HELP_PLAYER:
-                if (!m_IsAttackingTarget)
-                    m_events.ScheduleEvent(EVENT_OWNER_IS_ATTACKED, 100);
-                break;
-            case ACTION_STOP_HELP_PLAYER:
-                me->AttackStop();
-                me->GetMotionMaster()->MoveIdle();
-                break;
             }
         }
 
@@ -1373,16 +1363,6 @@ public:
                                 if (!hotrod->HasEmptySeat(0))    // player is passenger
                                     if (hotrod->HasEmptySeat(2)) // my seat is free
                                        me->EnterVehicle(car, 2); //  hotrod->AddPassenger(me, 2);
-                }
-                case EVENT_OWNER_IS_ATTACKED:
-                {
-                    if (Creature* target = ObjectAccessor::GetCreature(*me, m_targetGUID))
-                    {
-                        m_IsAttackingTarget = true;
-                        me->SetReactState(REACT_AGGRESSIVE); //            
-                        AttackStart(target);
-                        me->GetMotionMaster()->MoveChase(target, 3.0f);
-                    }
                 }
                 }
             }
@@ -1414,22 +1394,21 @@ public:
         uint64   m_playerGUID;
         uint64   m_hotrodGUID;
         uint64   m_targetGUID;
-        bool     m_IsAttackingTarget;
 
         void Initialize()
         {
             m_playerGUID = 0;
             m_hotrodGUID = 0;
             m_targetGUID = 0;
-            m_IsAttackingTarget = false;
             me->SetOrientation(3.819579f);
         }
 
         void Reset() override
         {
             m_targetGUID = 0;
-            m_IsAttackingTarget = false;
             me->setFaction(2204);
+            me->SetReactState(REACT_DEFENSIVE);
+            me->GetMotionMaster()->MoveIdle();
         }
 
         void IsSummonedBy(Unit* summoner) override
@@ -1444,6 +1423,17 @@ public:
                         m_events.ScheduleEvent(EVENT_ENTER_CAR, 500);
                     }
             }
+        }
+
+        void EnterCombat(Unit* victim) override
+        {
+            if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                if (urand(0, 100) < 60)
+                    Talk(0, player);
+            //me->SetReactState(REACT_AGGRESSIVE);
+            me->GetMotionMaster()->Clear();
+            me->GetMotionMaster()->MoveChase(victim, 2.0f);
+            m_targetGUID = victim->GetGUID();
         }
 
         void SetGUID(uint64 guid, int32 id) override
@@ -1478,14 +1468,6 @@ public:
             case ACTION_ENTER_CAR:
                 m_events.ScheduleEvent(EVENT_ENTER_CAR, 500);
                 break;
-            case ACTION_HELP_PLAYER:
-                if (!m_IsAttackingTarget)
-                    m_events.ScheduleEvent(EVENT_OWNER_IS_ATTACKED, 100);
-                break;
-            case ACTION_STOP_HELP_PLAYER:
-                me->AttackStop();
-                me->GetMotionMaster()->MoveIdle();
-                break;
             }
         }
 
@@ -1505,18 +1487,6 @@ public:
                                 if (!hotrod->HasEmptySeat(0))    // player is passenger
                                     if (hotrod->HasEmptySeat(1)) // my seat is free
                                         me->EnterVehicle(car, 1); //hotrod->AddPassenger(me, 1);
-                }
-                case EVENT_OWNER_IS_ATTACKED:
-                {
-                    if (Creature* target = ObjectAccessor::GetCreature(*me, m_targetGUID))
-                    {
-                        m_IsAttackingTarget = true;
-                        me->SetReactState(REACT_AGGRESSIVE); //            
-                        AttackStart(target);
-                        me->GetMotionMaster()->MoveChase(target, 3.0f);
-                    }
-                    if (uint32 rol = urand(0, 100) < 60)
-                        Talk(1, me->GetOwner());
                 }
                 }
             }
@@ -1662,13 +1632,11 @@ public:
         npc_bruno_flameretardant_34835AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
 
         EventMap m_events;
-        std::list<uint64> tList;
         uint64   m_playerGUID;
         bool     m_give_up;
 
         void Initialize() 
         {
-            tList.clear();
             m_playerGUID = 0;
             m_give_up = false;
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
@@ -1692,19 +1660,11 @@ public:
 
         void EnterCombat(Unit* victim) override 
         { 
-            tList.clear();
             if (Player* player = victim->ToPlayer())
             {
                 m_playerGUID = player->GetGUID();
                 Talk(0, player);
                 m_events.ScheduleEvent(EVENT_TALK_PERIODIC, 5000);
-                if (!player->m_Controlled.empty())
-                    for (auto minion : player->m_Controlled)
-                    {
-                        tList.push_back(minion->GetGUID());
-                        minion->GetAI()->SetGUID(me->GetGUID(), me->GetEntry());
-                        minion->GetAI()->DoAction(ACTION_HELP_PLAYER);
-                    }
             }
         }
 
@@ -1732,9 +1692,6 @@ public:
                             SetCombatNotAllowed(player, me);
                             m_give_up = true;
                             m_events.ScheduleEvent(EVENT_COMBAT_STOP, 6000);
-                            if (!player->m_Controlled.empty())
-                                for (auto minion : player->m_Controlled)
-                                    minion->GetAI()->DoAction(ACTION_STOP_HELP_PLAYER);
                         }
                     
                     break;
@@ -1785,13 +1742,11 @@ public:
         npc_frankie_gearslipper_34876AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
 
         EventMap m_events;
-        std::list<uint64> tList;
         uint64   m_playerGUID;
         bool     m_give_up;
 
         void Initialize()
         {
-            tList.clear();
             m_playerGUID = 0;
             m_give_up = false;
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
@@ -1815,19 +1770,11 @@ public:
 
         void EnterCombat(Unit* victim) override
         {
-            tList.clear();
             if (Player* player = victim->ToPlayer())
             {
                 m_playerGUID = player->GetGUID();
                 Talk(0, player);
                 m_events.ScheduleEvent(EVENT_TALK_PERIODIC, 5000);
-                if (!player->m_Controlled.empty())
-                    for (auto minion : player->m_Controlled)
-                    {
-                        tList.push_back(minion->GetGUID());
-                        minion->GetAI()->SetGUID(me->GetGUID(), me->GetEntry());
-                        minion->GetAI()->DoAction(ACTION_HELP_PLAYER);
-                    }
             }
         }
 
@@ -1855,9 +1802,6 @@ public:
                             SetCombatNotAllowed(player, me);
                             m_give_up = true;
                             m_events.ScheduleEvent(EVENT_COMBAT_STOP, 6000);
-                            if (!player->m_Controlled.empty())
-                                for (auto minion : player->m_Controlled)
-                                    minion->GetAI()->DoAction(ACTION_STOP_HELP_PLAYER);
                         }
 
                     break;
@@ -1909,13 +1853,11 @@ public:
         npc_jack_the_hammer_34877AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
 
         EventMap m_events;
-        std::list<uint64> tList;
         uint64   m_playerGUID;
         bool     m_give_up;
 
         void Initialize()
         {
-            tList.clear();
             m_playerGUID = 0;
             m_give_up = false;
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
@@ -1939,19 +1881,11 @@ public:
 
         void EnterCombat(Unit* victim) override
         {
-            tList.clear();
             if (Player* player = victim->ToPlayer())
             {
                 m_playerGUID = player->GetGUID();
                 Talk(0, player);
                 m_events.ScheduleEvent(EVENT_TALK_PERIODIC, 5000);
-                if (!player->m_Controlled.empty())
-                    for (auto minion : player->m_Controlled)
-                    {
-                        tList.push_back(minion->GetGUID());
-                        minion->GetAI()->SetGUID(me->GetGUID(), me->GetEntry());
-                        minion->GetAI()->DoAction(ACTION_HELP_PLAYER);
-                    }
             }
         }
 
@@ -1979,9 +1913,6 @@ public:
                             SetCombatNotAllowed(player, me);
                             m_give_up = true;
                             m_events.ScheduleEvent(EVENT_COMBAT_STOP, 6000);
-                            if (!player->m_Controlled.empty())
-                                for (auto minion : player->m_Controlled)
-                                    minion->GetAI()->DoAction(ACTION_STOP_HELP_PLAYER);
                         }
 
                     break;
@@ -2033,13 +1964,11 @@ public:
         npc_sudsy_magee_34878AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
 
         EventMap m_events;
-        std::list<uint64> tList;
         uint64   m_playerGUID;
         bool     m_give_up;
 
         void Initialize()
         {
-            tList.clear();
             m_playerGUID = 0;
             m_give_up = false;
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
@@ -2063,19 +1992,11 @@ public:
 
         void EnterCombat(Unit* victim) override
         {
-            tList.clear();
             if (Player* player = victim->ToPlayer())
             {
                 m_playerGUID = player->GetGUID();
                 Talk(0, player);
                 m_events.ScheduleEvent(EVENT_TALK_PERIODIC, 5000);
-                if (!player->m_Controlled.empty())
-                    for (auto minion : player->m_Controlled)
-                    {
-                        tList.push_back(minion->GetGUID());
-                        minion->GetAI()->SetGUID(me->GetGUID(), me->GetEntry());
-                        minion->GetAI()->DoAction(ACTION_HELP_PLAYER);
-                    }
             }
         }
 
@@ -2103,9 +2024,6 @@ public:
                             SetCombatNotAllowed(player, me);
                             m_give_up = true;
                             m_events.ScheduleEvent(EVENT_COMBAT_STOP, 6000);
-                            if (!player->m_Controlled.empty())
-                                for (auto minion : player->m_Controlled)
-                                    minion->GetAI()->DoAction(ACTION_STOP_HELP_PLAYER);
                         }
 
                     break;
