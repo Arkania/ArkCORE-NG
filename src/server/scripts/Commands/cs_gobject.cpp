@@ -534,7 +534,7 @@ public:
             objectGuid = atoi(idGuid);
         if (atoi(tokens[0]) && !objectGuid)
             objectGuid = atoi(tokens[0]);
-        for (int32 i = 1; i < tokens.size(); i++)
+        for (uint32 i = 1; i < tokens.size(); i++)
             if (atoi(tokens[i]))
                 phaseIds.push_back(atoi(tokens[i]));
 
