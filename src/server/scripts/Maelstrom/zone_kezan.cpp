@@ -40,6 +40,9 @@ enum eKezanEnumerate
     QUEST_MEGS_IN_MARKETING = 28349,
     QUEST_THE_REPLACEMENTS = 24488,
     QUEST_NECCASSARY_ROUGHNESS = 24502,
+    QUEST_FOURTH_AND_GOAL = 24503,
+    QUEST_REPORT_FOR_TRYOUTS = 24567,
+    QUEST_GIVE_SASSY_THE_NEWS = 24520,
     NPC_HOT_ROD_34840 = 34840,
     NPC_ACE_34957 = 34957,
     NPC_GOBBER_34958 = 34958,
@@ -53,18 +56,49 @@ enum eKezanEnumerate
     NPC_STEAMWHEEDLE_SHARK = 37114,
     NPC_BILGEWATER_BUCCANEER = 37179,
     NPC_NECESSARY_ROUGHNESS_KILL_CREDIT = 48271,
+    NPC_FOURTH_AND_GOAL_TARGET = 37203,
     SPELL_BORE_32738 = 32738,
     SPELL_PERMANENT_FEIGN_DEATH = 29266,
+    SPELL_INVISIBILITY_DETECTION_4 = 90161,
+    SPELL_INVISIBILITY_DETECTION_5 = 94566,
+    SPELL_INVISIBILITY_DETECTION_6 = 94567,
+    SPELL_INVISIBILITY_DETECTION_7 = 94568,
+    SPELL_QUEST_INVISIBILITY_5 = 88195,
+    SPELL_QUEST_INVISIBILITY_6 = 82358,
+    SPELL_QUEST_INVISIBILITY_7 = 85096,
+    SPELL_SIGNAL_BACK_TO_SHREDDER = 70062,
+    SPELL_INCREASED_MOD_DETECTED_RANGE = 76651,
+    SPELL_DEATHWINGS_ATTACK = 66858,
+    SPELL_DEATHWING_SOUND_4 = 69988,
     PLAYER_GUID = 99991,
     ACTION_ENTER_CAR = 101,
     ACTION_HELP_PLAYER,
     ACTION_STOP_HELP_PLAYER,
     EVENT_ENTER_CAR,
     EVENT_TALK_PERIODIC,
+    EVENT_TALK,
     EVENT_GIVE_UP,
     EVENT_COMBAT_STOP,
     EVENT_RESET_TARGET,
     EVENT_OWNER_IS_ATTACKED,
+    EVENT_PLAY_SOUND1,
+    EVENT_PLAY_SOUND2,
+    EVENT_CAST_SPELL,
+    EVENT_EXIT_VEHICLE,
+    EVENT_EARTHQUAKE,
+    EVENT_SAY_EARTHQUAKE,
+    EVENT_ATTACK_SPELL,
+    EVENT_WAIT_TO_MOVE,
+    EVENT_MOVE_PART1,
+    EVENT_MOVE_PART2,
+    EVENT_MOVE_PART3,
+    EVENT_MOVE_PART4,
+    EVENT_MOVE_PART5,
+    EVENT_MOVE_PART6,
+    EVENT_MOVE_PART7,
+    EVENT_MOVE_PART8,
+    EVENT_MOVE_PART9,
+    EVENT_WAIT_FOR_NEW_SPEED,
 };
 
 void SetCombatAllowed(Creature* npc)
@@ -301,9 +335,15 @@ public:
 
     bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*opt*/)
     {
-        if (quest->GetQuestId() == QUEST_TAKING_CARE_OF_BUSINESS)
+        switch (quest->GetQuestId())
+        {
+        case QUEST_TAKING_CARE_OF_BUSINESS:
             creature->AI()->Talk(3, player);
-
+            break;
+        case QUEST_GIVE_SASSY_THE_NEWS:
+            player->RemoveAura(SPELL_INVISIBILITY_DETECTION_4);
+            break;
+        }
         return false;
     }
 
@@ -600,16 +640,26 @@ public:
 
     bool OnQuestAccept(Player* player, Creature* /*creature*/, Quest const* quest)
     {
-        if (quest->GetQuestId() == QUEST_ROLLING_WITH_MY_HOMIES)
+        switch (quest->GetQuestId())
+        {
+        case QUEST_ROLLING_WITH_MY_HOMIES:
             player->ToUnit()->Talk(BROADCASTTEXT_USE_KEY_FOR_HOT_RED, CHAT_MSG_RAID_BOSS_WHISPER, 25.0f, player);
+            player->AddAura(SPELL_INVISIBILITY_DETECTION_4, player);
+            break;
+        }
         return false;
     }
 
     bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*opt*/)
     {
-        if (quest->GetQuestId() == QUEST_MEGS_IN_MARKETING)
+        switch (quest->GetQuestId())
+        {
+        case QUEST_MEGS_IN_MARKETING:
             creature->AI()->Talk(0, player);
-
+            break;
+        case QUEST_ROLLING_WITH_MY_HOMIES:
+            player->AddAura(SPELL_INVISIBILITY_DETECTION_4, player);
+        }
         return false;
     }
 };
@@ -2066,13 +2116,46 @@ public:
 
     bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
     {
-       if (quest->GetQuestId() == QUEST_THE_REPLACEMENTS)
-           creature->AI()->Talk(0, player);
-       else if (quest->GetQuestId() == QUEST_NECCASSARY_ROUGHNESS)
-           creature->AI()->Talk(1, player);
+        switch (quest->GetQuestId())
+        {
+        case QUEST_THE_REPLACEMENTS:
+            creature->AI()->Talk(0, player);
+            player->AddAura(SPELL_INVISIBILITY_DETECTION_4, player);
+            break;
+        case QUEST_NECCASSARY_ROUGHNESS:
+            player->RemoveAura(SPELL_INVISIBILITY_DETECTION_5);
+            creature->AI()->Talk(1, player);
+            player->AddAura(SPELL_INVISIBILITY_DETECTION_4, player);
+            break;
+        case QUEST_FOURTH_AND_GOAL:
+            player->RemoveAura(SPELL_INVISIBILITY_DETECTION_5);
+            player->RemoveAura(SPELL_INVISIBILITY_DETECTION_6);
+            player->RemoveAura(SPELL_INVISIBILITY_DETECTION_7);
+            player->AddAura(SPELL_INVISIBILITY_DETECTION_4, player);
+            break;
+        case QUEST_GIVE_SASSY_THE_NEWS:
+            player->RemoveAura(SPELL_INVISIBILITY_DETECTION_6);
+            player->RemoveAura(SPELL_INVISIBILITY_DETECTION_7);
+            player->AddAura(SPELL_INVISIBILITY_DETECTION_4, player);
+            break;
+        }
+
         return false;
     }
 
+    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*opt*/)
+    {
+        switch (quest->GetQuestId())
+        {
+        case QUEST_REPORT_FOR_TRYOUTS:
+        case QUEST_THE_REPLACEMENTS:
+        case QUEST_NECCASSARY_ROUGHNESS:
+        case QUEST_FOURTH_AND_GOAL:
+            player->AddAura(SPELL_INVISIBILITY_DETECTION_4, player);
+            break;
+        }
+        return false;
+    }
 };
 
 // 37179
@@ -2084,8 +2167,7 @@ public:
     enum eNpc
     {
         SPELL_SUMMON_STEAMWHEEDLE_SHARK = 69971,
-        EVENT_PLAY_SOUND = 901,
-        EVENT_START_PLAY_GAME,
+        EVENT_START_PLAY_GAME = 901,
         EVENT_OBSERVER_CHEERING,
     };
 
@@ -2101,6 +2183,8 @@ public:
         void Reset() override
         {
             m_playerGUID = 0;
+            me->AddAura(SPELL_QUEST_INVISIBILITY_5, me);
+            me->SetOrientation(3.14f);
         }
 
         void JustSummoned(Creature* summon) override
@@ -2119,14 +2203,24 @@ public:
                 if (Player* player = unit->ToPlayer())
                 {
                     m_playerGUID = player->GetGUID();
-                    player->KilledMonsterCredit(NPC_NECESSARY_ROUGHNESS_KILL_CREDIT);
-                    m_events.ScheduleEvent(EVENT_PLAY_SOUND, 1000);
-                    m_events.ScheduleEvent(EVENT_START_PLAY_GAME, 4000);
-                    m_events.ScheduleEvent(EVENT_OBSERVER_CHEERING, 250);
+                    player->RemoveAura(SPELL_INVISIBILITY_DETECTION_4);
+                    player->AddAura(SPELL_INVISIBILITY_DETECTION_5, player);
+                    if (player->GetQuestStatus(QUEST_NECCASSARY_ROUGHNESS) == QUEST_STATUS_INCOMPLETE)
+                    {
+                        player->KilledMonsterCredit(NPC_NECESSARY_ROUGHNESS_KILL_CREDIT);
+                        m_events.ScheduleEvent(EVENT_PLAY_SOUND1, 1000);
+                        m_events.ScheduleEvent(EVENT_START_PLAY_GAME, 4000);
+                        m_events.ScheduleEvent(EVENT_OBSERVER_CHEERING, 250);
+                    }
                 }
             }
             else
             {
+                if (Player* player = unit->ToPlayer())
+                {
+                    player->RemoveAura(SPELL_INVISIBILITY_DETECTION_5);
+                    player->AddAura(SPELL_INVISIBILITY_DETECTION_4, player);
+                }
                 StopPlayGame();
             }
         }
@@ -2152,12 +2246,12 @@ public:
             {
                 switch (eventId)
                 {
-                case EVENT_PLAY_SOUND:
+                case EVENT_PLAY_SOUND1:
                 {
                     if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
                     {
                         player->PlayDirectSound(17466, player);
-                        m_events.ScheduleEvent(EVENT_PLAY_SOUND, 1000);
+                        m_events.ScheduleEvent(EVENT_PLAY_SOUND1, 1000);
                     }
                     break;
                 }
@@ -2322,7 +2416,378 @@ public:
     }
 };
 
+// 37213
+class npc_bilgewater_buccaneer_37213 : public CreatureScript
+{
+public:
+    npc_bilgewater_buccaneer_37213() : CreatureScript("npc_bilgewater_buccaneer_37213") { }
 
+    enum eNpc
+    {
+        SPELL_SUMMON_DEATHWING = 66322,
+        EVENT_SUMMON_DEATHWING = 901,
+    };
+
+    struct npc_bilgewater_buccaneer_37213AI : public VehicleAI
+    {
+        npc_bilgewater_buccaneer_37213AI(Creature* creature) : VehicleAI(creature) { }
+
+        EventMap m_events;
+        uint64 m_playerGUID;
+        bool   m_DeathwingSummoned;
+        uint32 m_counter;
+
+        void Reset() override
+        {
+            m_DeathwingSummoned = false;
+            m_playerGUID = 0;
+            m_counter=0;
+            me->AddAura(SPELL_QUEST_INVISIBILITY_6, me);
+            me->AddAura(SPELL_QUEST_INVISIBILITY_7, me);
+            me->SetOrientation(3.14f);
+        }
+
+        void IsSummonedBy(Unit* summoner) override
+        {
+            if (Player* player = summoner->ToPlayer())
+            {
+                m_playerGUID = player->GetGUID();
+                player->RemoveAura(SPELL_INVISIBILITY_DETECTION_4);
+                player->AddAura(SPELL_INVISIBILITY_DETECTION_7, player);
+                player->EnterVehicle(me, 0);
+                m_events.ScheduleEvent(EVENT_PLAY_SOUND1, 1000);
+            }
+        }
+
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
+        {
+            if (!m_DeathwingSummoned)
+                if (spell->Id == SPELL_SIGNAL_BACK_TO_SHREDDER)
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                    {
+                        player->PlayDirectSound(8574, player);
+                        m_events.ScheduleEvent(EVENT_SUMMON_DEATHWING, 100);
+                    }
+        }
+
+        void PassengerBoarded(Unit* unit, int8 /*seat*/, bool apply) override
+        {
+            if (apply)
+            {
+                me->CastSpell(me, SPELL_INCREASED_MOD_DETECTED_RANGE, true);
+                if (Player* player = unit->ToPlayer())
+                    if (Creature* npc = me->FindNearestCreature(NPC_FOURTH_AND_GOAL_TARGET, 50.0f))
+                        player->ToUnit()->Talk(37050, CHAT_MSG_RAID_BOSS_WHISPER, 50.0f, player);
+            }
+            else
+            {
+                if (Player* player = unit->ToPlayer())
+                {
+                    player->RemoveAura(SPELL_INVISIBILITY_DETECTION_7);
+                    player->AddAura(SPELL_INVISIBILITY_DETECTION_4, player);
+                }
+                me->RemoveAura(SPELL_INCREASED_MOD_DETECTED_RANGE);
+                me->DespawnOrUnsummon(100);
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+            VehicleAI::UpdateAI(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_PLAY_SOUND1:
+                {
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        player->PlayDirectSound(17466, player);
+                    m_events.ScheduleEvent(EVENT_PLAY_SOUND1, 1000);
+                    break;
+                }
+                case EVENT_PLAY_SOUND2:
+                {
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        player->PlayDirectSound(RAND(14556, 14557, 14558), player);
+                    m_counter += 1;
+                    if (m_counter < 3)
+                        m_events.ScheduleEvent(EVENT_PLAY_SOUND2, 3000);
+                    break;
+                }
+                case EVENT_SUMMON_DEATHWING:
+                {
+                    if (!m_DeathwingSummoned)
+                        if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        {
+                            m_DeathwingSummoned = true;
+                            player->RemoveAura(SPELL_INVISIBILITY_DETECTION_7);
+                            player->AddAura(SPELL_INVISIBILITY_DETECTION_6, player);
+                            player->SummonCreature(48572, -8230.59f, 1482.14f, 110.9156f, TEMPSUMMON_MANUAL_DESPAWN);
+                            player->KilledMonsterCredit(NPC_FOURTH_AND_GOAL_TARGET);
+                            m_events.CancelEvent(EVENT_PLAY_SOUND1);
+                            player->PlayDirectSound(17467, player);
+                            m_events.ScheduleEvent(EVENT_PLAY_SOUND2, 3000);
+                        }
+                    break;
+                }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_bilgewater_buccaneer_37213AI(creature);
+    }
+};
+
+// 37203
+class npc_fourth_and_goal_target_37203 : public CreatureScript
+{
+public:
+    npc_fourth_and_goal_target_37203() : CreatureScript("npc_fourth_and_goal_target_37203") { }
+
+    struct npc_fourth_and_goal_target_37203AI : public ScriptedAI
+    {
+        npc_fourth_and_goal_target_37203AI(Creature* creature) : ScriptedAI(creature) { }
+
+        void Reset() override
+        {
+            me->CastSpell(me, 70086, true);
+            me->AddAura(SPELL_QUEST_INVISIBILITY_7, me);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_fourth_and_goal_target_37203AI(creature);
+    }
+};
+
+// 70052
+class spell_kick_footbomb_70052 : public SpellScriptLoader
+{
+public:
+    spell_kick_footbomb_70052() : SpellScriptLoader("spell_kick_footbomb_70052") { }
+
+    class spell_kick_footbomb_70052_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_kick_footbomb_70052_SpellScript);
+
+        void SelectDest()
+        {
+            if (Position* dest = const_cast<WorldLocation*>(GetExplTargetDest()))
+            {
+                if (dest->GetPositionY() > 1450.0f && dest->GetPositionY() < 1525.0f)
+                    if (dest->GetPositionZ() > 100.0f && dest->GetPositionZ() < 300.0f)
+                        GetCaster()->CastSpell(GetCaster(), SPELL_SIGNAL_BACK_TO_SHREDDER);
+            }
+        }
+
+        void Register() override
+        {
+            BeforeCast += SpellCastFn(spell_kick_footbomb_70052_SpellScript::SelectDest);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_kick_footbomb_70052_SpellScript();
+    }
+};
+
+// 48572
+class npc_deathwing_48572 : public CreatureScript
+{
+public:
+    npc_deathwing_48572() : CreatureScript("npc_deathwing_48572") { }
+
+    struct npc_deathwing_48572AI : public ScriptedAI
+    {
+        npc_deathwing_48572AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap m_events;
+        uint64 m_playerGUID;
+        uint32 m_nextPoint;
+        float  m_newSpeed;
+
+        void Reset() override
+        {
+            me->AddAura(SPELL_QUEST_INVISIBILITY_6, me);
+            me->SetDisableGravity(true);
+            me->SetObjectScale(0.6f);
+            me->GetMotionMaster()->MovePoint(2001, -8320.0f, 1473.0f, 110.0f);
+            m_nextPoint=0;
+            m_newSpeed=0;
+        }
+
+        void IsSummonedBy(Unit* summoner) override 
+        { 
+            if (Player* player = summoner->ToPlayer())
+            {
+                m_playerGUID = player->GetGUID();
+                player->PlayDirectSound(8574, player);
+            }
+        }
+
+        void MovementInform(uint32 type, uint32 id) override
+        {
+            if (type != POINT_MOTION_TYPE)
+                return;
+
+            switch (id)
+            {
+            case 2001:
+                m_events.ScheduleEvent(EVENT_MOVE_PART1, 10);
+                break;
+            case 2002:
+                m_events.ScheduleEvent(EVENT_MOVE_PART2, 10);
+                break;
+            case 2003:
+                m_events.ScheduleEvent(EVENT_MOVE_PART3, 10);
+                break;
+            case 2004:
+                m_events.ScheduleEvent(EVENT_MOVE_PART4, 10);
+                break;
+            case 2005:
+                m_events.ScheduleEvent(EVENT_MOVE_PART5, 10);
+                break;
+            case 2006:
+                m_events.ScheduleEvent(EVENT_MOVE_PART6, 10);
+                break;
+            case 2007:
+                m_events.ScheduleEvent(EVENT_MOVE_PART7, 10);
+                break;
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_WAIT_TO_MOVE:
+                {
+                    if (m_newSpeed)
+                        me->SetSpeed(MOVE_RUN, m_newSpeed);
+                    switch (m_nextPoint)
+                    {
+                    case 2004:
+                        me->GetMotionMaster()->MovePoint(2004, -8330.0f, 1460.0f, 110.0f);
+                        break;
+                    }
+                    m_nextPoint = 0;
+                    m_newSpeed = 0;
+                    break;
+                }
+                case EVENT_WAIT_FOR_NEW_SPEED:
+                    if (m_newSpeed)
+                        me->SetSpeed(MOVE_RUN, m_newSpeed);
+                    m_newSpeed = 0;
+                    break;
+                case EVENT_MOVE_PART1:
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        player->PlayDirectSound(23227, player);
+                    me->SetObjectScale(0.4f);
+                    me->GetMotionMaster()->MovePoint(2002, -8320.0f, 1480.0f, 110.0f);
+                    break;
+                case EVENT_MOVE_PART2:
+                    me->SetSpeed(MOVE_RUN, 0.2f);
+                    m_events.ScheduleEvent(EVENT_TALK, 2000);
+                    me->GetMotionMaster()->MovePoint(2003, -8330.0f, 1500.0f, 110.0f);
+                    break;
+                case EVENT_MOVE_PART3:                    
+                    m_events.ScheduleEvent(EVENT_ATTACK_SPELL, 3000);
+                    m_nextPoint = 2004;
+                    m_newSpeed = 1.0f;
+                    m_events.ScheduleEvent(EVENT_WAIT_TO_MOVE, 6500);
+                    break;
+                case EVENT_MOVE_PART4:
+                    me->GetMotionMaster()->MovePoint(2005, -8320.0f, 1500.0f, 110.0f);
+                    break;
+                case EVENT_MOVE_PART5:
+                    m_events.ScheduleEvent(EVENT_PLAY_SOUND1, 2000);
+                    me->SetObjectScale(0.6f);
+                    me->GetMotionMaster()->MovePoint(2006, -8250.0f, 1480.0f, 90.0f);
+                    break;
+                case EVENT_MOVE_PART6:
+                    me->SetObjectScale(0.8f);
+                    m_events.ScheduleEvent(EVENT_EXIT_VEHICLE, 2000);
+                    m_events.ScheduleEvent(EVENT_EARTHQUAKE, 6000);
+                    me->GetMotionMaster()->MovePoint(2007, -7900.0f, 1460.0f, 90.0f);
+                    break;
+                case EVENT_MOVE_PART7:
+                    me->GetMotionMaster()->MovePoint(2008, -7900.0f, 1460.0f, 90.0f);
+                    break;
+                case EVENT_TALK:
+                {
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                    {
+                        Talk(0, player);
+                        player->PlayDirectSound(23228, player);
+                    }
+                    break;
+                }
+                case EVENT_ATTACK_SPELL:
+                {
+                    if (Creature* target = me->FindNearestCreature(42196, 250.0f))
+                    {
+                        me->SetFacingToObject(target);
+                        me->CastSpell(target, SPELL_DEATHWINGS_ATTACK, true);
+                    }
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        player->PlayDirectSound(23229, player);
+                    break;
+                }
+                case EVENT_PLAY_SOUND1:
+                {
+                    me->CastSpell(me, SPELL_DEATHWING_SOUND_4, true);
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                    {
+                        player->PlayDirectSound(23230, player);
+                        player->ToUnit()->Talk(37041, CHAT_MSG_RAID_BOSS_WHISPER, 25.0f, player);
+                    }
+                    break;
+                }
+                case EVENT_EXIT_VEHICLE:
+                {
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                    {
+                        player->ExitVehicle();
+                        player->PlayDirectSound(14559, player);
+                    }
+                    break;
+                }
+                case EVENT_EARTHQUAKE:
+                {
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                    {
+                        // player->CastSpell(player, 90615, true); // Earthquake used many unknown quest..
+                        player->CastSpell(player, 68707, true); // This Earthquake is taken drom Duskhaven..
+                    }
+                    break;
+                }
+                }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_deathwing_48572AI(creature);
+    }
+};
 
 void AddSC_zone_kezan()
 {
@@ -2356,5 +2821,10 @@ void AddSC_zone_kezan()
     new npc_coach_crosscheck_37106();
     new npc_bilgewater_buccaneer_37179();
     new npc_steamwheedle_shark_37114();
+    new npc_bilgewater_buccaneer_37213();
+    new npc_fourth_and_goal_target_37203();
+    new spell_kick_footbomb_70052();
+    new npc_deathwing_48572();
+
 }
 
