@@ -43,6 +43,8 @@ enum eKezanEnumerate
     QUEST_FOURTH_AND_GOAL = 24503,
     QUEST_REPORT_FOR_TRYOUTS = 24567,
     QUEST_GIVE_SASSY_THE_NEWS = 24520,
+    QUEST_LIFE_OF_THE_PARTY_M = 14153,
+    QUEST_LIFE_OF_THE_PARTY_F = 14113,
     NPC_HOT_ROD_34840 = 34840,
     NPC_ACE_34957 = 34957,
     NPC_GOBBER_34958 = 34958,
@@ -70,12 +72,16 @@ enum eKezanEnumerate
     SPELL_INCREASED_MOD_DETECTED_RANGE = 76651,
     SPELL_DEATHWINGS_ATTACK = 66858,
     SPELL_DEATHWING_SOUND_4 = 69988,
+    SPELL_OUTFIT_FEMALE = 66927,
+    SPELL_OUTFIT_MALE = 66928,
+    SPELL_AWESOME_PARTY_ENSEMBLE = 66908, 
     PLAYER_GUID = 99991,
     ACTION_ENTER_CAR = 101,
     ACTION_HELP_PLAYER,
     ACTION_STOP_HELP_PLAYER,
     EVENT_ENTER_CAR,
     EVENT_TALK_PERIODIC,
+    EVENT_MUSIC_PERIODIC,
     EVENT_TALK,
     EVENT_GIVE_UP,
     EVENT_COMBAT_STOP,
@@ -216,6 +222,8 @@ public:
         {
             m_events.Reset();
             m_targetGuid = 0;
+            if (!me->m_Controlled.size())
+                me->SummonCreature(12922, -8396.887f, 1347.801f, 102.5915f, 5.183628f);
         }
 
         // Called when hit by a spell
@@ -342,6 +350,14 @@ public:
             break;
         case QUEST_GIVE_SASSY_THE_NEWS:
             player->RemoveAura(SPELL_INVISIBILITY_DETECTION_4);
+            break;
+        case QUEST_LIFE_OF_THE_PARTY_M:
+            player->RemoveAura(SPELL_OUTFIT_MALE);
+            player->RemoveAura(SPELL_AWESOME_PARTY_ENSEMBLE);
+            break;
+        case QUEST_LIFE_OF_THE_PARTY_F:
+            player->RemoveAura(SPELL_OUTFIT_FEMALE);
+            player->RemoveAura(SPELL_AWESOME_PARTY_ENSEMBLE);
             break;
         }
         return false;
@@ -672,43 +688,48 @@ public:
 
     enum eNPC
     {
+
     };
 
-    struct npc_candy_cane_35053AI : public ScriptedAI
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
     {
-        npc_candy_cane_35053AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
-
-        EventMap m_events;
-
-        void Initialize()
+        switch (quest->GetQuestId())
         {
+        case QUEST_LIFE_OF_THE_PARTY_F:
+            player->RemoveAura(SPELL_AWESOME_PARTY_ENSEMBLE);
+            player->CastSpell(player, SPELL_OUTFIT_FEMALE);
+            player->CastSpell(player, SPELL_AWESOME_PARTY_ENSEMBLE);
+            player->ToUnit()->Talk(35444, CHAT_MSG_RAID_BOSS_EMOTE, 25.0f, player);
+            creature->AI()->Talk(1, player);
+            break;
         }
+        return false;
+    }
+};
 
-        void Reset() override
-        {
-        }
+// 35054
+class npc_chip_endale_35054 : public CreatureScript
+{
+public:
+    npc_chip_endale_35054() : CreatureScript("npc_chip_endale_35054") { }
 
-        void UpdateAI(uint32 diff) override
-        {
-            m_events.Update(diff);
-
-            while (uint32 eventId = m_events.ExecuteEvent())
-            {
-                switch (eventId)
-                {
-                }
-            }
-
-            if (!UpdateVictim())
-                return;
-            else
-                DoMeleeAttackIfReady();
-        }
+    enum eNPC
+    {
     };
 
-    CreatureAI* GetAI(Creature* creature) const override
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
     {
-        return new npc_candy_cane_35053AI(creature);
+        switch (quest->GetQuestId())
+        {
+        case QUEST_LIFE_OF_THE_PARTY_M:
+            player->RemoveAura(SPELL_AWESOME_PARTY_ENSEMBLE);
+            player->CastSpell(player, SPELL_OUTFIT_MALE);
+            player->CastSpell(player, SPELL_AWESOME_PARTY_ENSEMBLE);
+            player->ToUnit()->Talk(35444, CHAT_MSG_RAID_BOSS_EMOTE, 25.0f, player);
+            creature->AI()->Talk(1, player);
+            break;
+        }
+        return false;
     }
 };
 
@@ -2789,6 +2810,98 @@ public:
     }
 };
 
+// 24110
+class npc_elm_general_purpose_bunny_large_24110 : public CreatureScript
+{
+public:
+    npc_elm_general_purpose_bunny_large_24110() : CreatureScript("npc_elm_general_purpose_bunny_large_24110") { }
+
+    enum eNpc
+    {
+    };
+
+    struct npc_elm_general_purpose_bunny_large_24110AI : public ScriptedAI
+    {
+        npc_elm_general_purpose_bunny_large_24110AI(Creature* creature) : ScriptedAI(creature) {  }
+
+        EventMap m_events;
+        uint64   m_playerGUID;        
+
+        void Reset() override
+        {
+            m_events.ScheduleEvent(EVENT_MUSIC_PERIODIC, 2500);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_MUSIC_PERIODIC:
+                {
+                    std::list<Player*> pList = me->FindNearestPlayers(50.0f);
+                    for (auto player : pList)
+                        if (player->GetQuestStatus(QUEST_LIFE_OF_THE_PARTY_M) == QUEST_STATUS_INCOMPLETE || player->GetQuestStatus(QUEST_LIFE_OF_THE_PARTY_F) == QUEST_STATUS_INCOMPLETE)
+                            player->PlayDirectSound(15978, player);
+
+                    m_events.ScheduleEvent(EVENT_MUSIC_PERIODIC, 2500);
+                    break;
+                }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_elm_general_purpose_bunny_large_24110AI(creature);
+    }
+};
+
+// 195488
+class go_kajamite_deposit_195488 : public GameObjectScript
+{
+public:
+    go_kajamite_deposit_195488() : GameObjectScript("go_kajamite_deposit_195488") { }
+
+    struct go_kajamite_deposit_195488AI : public GameObjectAI
+    {
+        go_kajamite_deposit_195488AI(GameObject* go) : GameObjectAI(go) { }
+
+        void OnStateChanged(uint32 state, Unit* unit) override
+        {
+            if (unit)
+                if (Player* player = unit->ToPlayer())
+                    if (player->GetQuestStatus(14120) == QUEST_STATUS_INCOMPLETE)
+                    {
+                        uint8 rol = urand(2, 3);
+                        for (uint8 i = 0; i < rol; i++)
+                        {
+                            Position pos = go->GetNearPosition(0.4f, frand(0, 6.24f));
+                            go->SummonGameObject(195492, pos.m_positionX, pos.m_positionY, pos.m_positionZ + 0.3f, pos.m_orientation, 0, 0, 0, 0, 60000);
+                        }
+                        go->Delete();
+                    }
+        }
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_kajamite_deposit_195488AI(go);
+    }
+
+};
+
+
+
 void AddSC_zone_kezan()
 {
     new npc_fizz_lighter_34689();
@@ -2800,6 +2913,7 @@ void AddSC_zone_kezan()
     new npc_bamm_megabomb_34673();
     new npc_megs_dreadshredder_34874();
     new npc_candy_cane_35053();
+    new npc_chip_endale_35054();
     new npc_hobart_grapplehammer_48494();
     new npc_subject_nine_49150();
     new spell_kaja_cola_70478();
@@ -2825,6 +2939,7 @@ void AddSC_zone_kezan()
     new npc_fourth_and_goal_target_37203();
     new spell_kick_footbomb_70052();
     new npc_deathwing_48572();
-
+    new npc_elm_general_purpose_bunny_large_24110();
+    new go_kajamite_deposit_195488();
 }
 
