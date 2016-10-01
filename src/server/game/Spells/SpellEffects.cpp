@@ -5636,6 +5636,7 @@ void Spell::EffectDuel(SpellEffIndex effIndex)
         return;
     }
 
+    pGameObj->CopyPhaseFrom(m_caster);
     pGameObj->SetUInt32Value(GAMEOBJECT_FACTION, m_caster->getFaction());
     pGameObj->SetUInt32Value(GAMEOBJECT_LEVEL, m_caster->getLevel()+1);
     int32 duration = m_spellInfo->GetDuration();
@@ -6699,6 +6700,7 @@ void Spell::EffectTransmitted(SpellEffIndex effIndex)
         return;
     }
 
+    pGameObj->CopyPhaseFrom(m_caster);
     int32 duration = m_spellInfo->GetDuration();
 
     switch (goinfo->type)

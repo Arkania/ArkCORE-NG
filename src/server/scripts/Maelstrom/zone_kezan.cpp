@@ -59,6 +59,8 @@ enum eKezanEnumerate
     NPC_BILGEWATER_BUCCANEER = 37179,
     NPC_NECESSARY_ROUGHNESS_KILL_CREDIT = 48271,
     NPC_FOURTH_AND_GOAL_TARGET = 37203,
+    NPC_KEZAN_PARTYGOER_35175 = 35175,
+    NPC_KEZAN_PARTYGOER_35186 = 35186,
     SPELL_BORE_32738 = 32738,
     SPELL_PERMANENT_FEIGN_DEATH = 29266,
     SPELL_INVISIBILITY_DETECTION_4 = 90161,
@@ -2866,6 +2868,77 @@ public:
     }
 };
 
+// 35175, 35186
+class npc_kezan_partygoer_35175_86 : public CreatureScript
+{
+public:
+    npc_kezan_partygoer_35175_86() : CreatureScript("npc_kezan_partygoer_35175_86") { }
+
+    enum eNpc
+    {
+        TYPE_BUBBLY = 1,
+        TYPE_BUCKET = 2,
+        TYPE_DANCE = 3,
+        TYPE_FIREWORKS = 4,
+        TYPE_HORS_DOEUVRES = 5,
+        SPELL_LOTP_BUBBLY = 75122,
+        SPELL_LOTP_BUCKET = 66931,
+        SPELL_LOTP_DANCE = 75123,
+        SPELL_LOTP_FIREWORKS_BLUE = 66917,
+        SPELL_LOTP_FIREWORKS_GREEN = 66918,
+        SPELL_LOTP_FIREWORKS_RED = 66919,
+        SPELL_LOTP_HORS_DOEUVRES = 75124,
+        SPELL_LOTP_PAPARAZZI = 66929,
+        SPELL_LOTP_SUMMON_DISCO_BALL = 66930,
+        SPELL_LOTP_SUMMON_BUCKET = 75044,
+        SPELL_LOTP_VOMIT = 43391,
+        SPELL_LOTP_HAPPY_PARTYGOER = 66916,
+    };
+
+    struct npc_kezan_partygoer_35175_86AI : public ScriptedAI
+    {
+        npc_kezan_partygoer_35175_86AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+        EventMap m_events;
+        uint64   m_playerGUID;
+        uint32   m_partyTyp;
+
+        void Initialize()
+        {
+
+        }
+
+        void Reset() override
+        {
+            m_events.ScheduleEvent(EVENT_MUSIC_PERIODIC, 2500);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+               
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_kezan_partygoer_35175_86AI(creature);
+    }
+};
+
+
 // 195488
 class go_kajamite_deposit_195488 : public GameObjectScript
 {
@@ -2888,7 +2961,6 @@ public:
                             Position pos = go->GetNearPosition(0.4f, frand(0, 6.24f));
                             go->SummonGameObject(195492, pos.m_positionX, pos.m_positionY, pos.m_positionZ + 0.3f, pos.m_orientation, 0, 0, 0, 0, 60000);
                         }
-                        go->Delete();
                     }
         }
     };
@@ -2941,5 +3013,7 @@ void AddSC_zone_kezan()
     new npc_deathwing_48572();
     new npc_elm_general_purpose_bunny_large_24110();
     new go_kajamite_deposit_195488();
+    new npc_kezan_partygoer_35175_86();
+
 }
 

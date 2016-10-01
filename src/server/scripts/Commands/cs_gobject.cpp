@@ -159,8 +159,6 @@ public:
             return false;
         }
 
-        object->CopyPhaseFrom(player);
-
         if (spawntimeSecs)
         {
             uint32 value = atoi((char*)spawntimeSecs);
