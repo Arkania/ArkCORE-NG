@@ -79,6 +79,9 @@ enum eKezanEnumerate
     SPELL_OUTFIT_SECONDARY = 66985,
     SPELL_AWESOME_PARTY_ENSEMBLE = 66908,
     SPELL_LOTP_HAPPY_PARTYGOER = 66916,
+    SPELL_TORCH_TOSS = 6257,
+    SPELL_HOT_ROD_KNOCKBACK = 70330,
+    SPELL_CREATE_STOLEN_LOOT = 67041,
     PLAYER_GUID = 99991,
     ACTION_ENTER_CAR = 101,
     ACTION_HELP_PLAYER,
@@ -87,6 +90,7 @@ enum eKezanEnumerate
     EVENT_TALK_PERIODIC,
     EVENT_MUSIC_PERIODIC,
     EVENT_TALK,
+    EVENT_TALK_COOLDOWN,
     EVENT_GIVE_UP,
     EVENT_COMBAT_STOP,
     EVENT_RESET_TARGET,
@@ -3133,24 +3137,28 @@ public:
         void Reset() override
         {
            me->SetCurrentEquipmentId(1);
+           m_playerGUID = 0;
         }
 
-        void MoveInLineOfSight(Unit* who) override
+        void EnterCombat(Unit* victim) override
         {
-            if (Creature* npc = who->ToCreature())
-                if (npc->GetEntry() == NPC_HOT_ROD_34840)
-                    if (me->GetDistance2d(npc) < 1.0f)
+            if (!m_torchCoolDown)
+            {
+                me->CastSpell(victim, SPELL_TORCH_TOSS);
+                m_torchCoolDown = true;
+                m_events.ScheduleEvent(EVENT_TORCH_COOLDOWN, urand(7800, 21300));
+            }
+
+        }
+
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
+        {
+            if (spell->Id == SPELL_HOT_ROD_KNOCKBACK)
+                if (Player* player = caster->ToPlayer())
+                    if (player->GetDistance2d(me) < 20.0f)
                     {
-                        if (Vehicle* car = npc->GetVehicleKit())
-                            if (Unit* unit = car->GetPassenger(0))
-                                if (Player* player = unit->ToPlayer())
-                                    player->DealDamage(me, me->GetHealth() + 1);
-                    }
-                    else if (!m_torchCoolDown && me->GetDistance2d(npc) > 10.0f && me->GetDistance2d(npc) < 15.0f)
-                    {
-                        me->CastSpell(npc, 6257);
-                        m_torchCoolDown = true;
-                        m_events.ScheduleEvent(EVENT_TORCH_COOLDOWN, 10000);
+                        me->CastSpell(player, SPELL_CREATE_STOLEN_LOOT, true);
+                        me->DespawnOrUnsummon(100);
                     }
         }
 
@@ -3180,6 +3188,64 @@ public:
     CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_hired_looter_35234AI(creature);
+    }
+};
+
+// 35063
+class npc_kezan_citizen_35063 : public CreatureScript
+{
+public:
+    npc_kezan_citizen_35063() : CreatureScript("npc_kezan_citizen_35063") { }
+
+    struct npc_kezan_citizen_35063AI : public ScriptedAI
+    {
+        npc_kezan_citizen_35063AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap m_events;
+        bool m_talkCoolDown;
+
+        void Reset()
+        {
+            m_talkCoolDown = false;
+        }
+
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
+        {
+            if (spell->Id == SPELL_HOT_ROD_KNOCKBACK)
+                if (Player* player = caster->ToPlayer())
+                {
+                    Talk(0, player);
+                    m_talkCoolDown = true;
+                    m_events.ScheduleEvent(EVENT_TALK_COOLDOWN, 20000);
+                }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_TALK_COOLDOWN:
+                {
+                    m_talkCoolDown = false;
+                    break;
+                }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_kezan_citizen_35063AI(creature);
     }
 };
 
@@ -3438,7 +3504,8 @@ void AddSC_zone_kezan()
     new npc_elm_general_purpose_bunny_large_24110();
     new go_kajamite_deposit_195488();
     new npc_kezan_partygoer_35175_86();
-    new npc_hired_looter_35234();
+    // new npc_hired_looter_35234();
+    // new npc_kezan_citizen_35063();
     new npc_first_bank_of_kezan_vault_35486();
 
 }
