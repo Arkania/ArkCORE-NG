@@ -625,7 +625,7 @@ void Creature::RegenerateMana()
 
     if (curValue >= maxValue)
         return;
-
+   
     uint32 addvalue = 0;
 
     // Combat and any controlled creature
@@ -646,6 +646,13 @@ void Creature::RegenerateMana()
     for (AuraEffectList::const_iterator i = ModPowerRegenPCTAuras.begin(); i != ModPowerRegenPCTAuras.end(); ++i)
         if ((*i)->GetMiscValue() == POWER_MANA)
             AddPct(addvalue, (*i)->GetAmount());
+
+    /* Hack for Kezan Quest 14122, creature 35476, the piggy bank for robbing money,
+    The progressbar is shown with using mana, value 0-100.
+    There is no properties in creature to enable/disable the regenerate of Mana,
+    or set a new (lower) regenerate amount value, for this type of creature  */
+    if (GetEntry() == 35486)
+        addvalue = 2;
 
     ModifyPower(POWER_MANA, addvalue);
 }

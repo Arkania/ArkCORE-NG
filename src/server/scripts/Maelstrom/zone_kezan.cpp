@@ -76,7 +76,9 @@ enum eKezanEnumerate
     SPELL_DEATHWING_SOUND_4 = 69988,
     SPELL_OUTFIT_FEMALE = 66927,
     SPELL_OUTFIT_MALE = 66928,
-    SPELL_AWESOME_PARTY_ENSEMBLE = 66908, 
+    SPELL_OUTFIT_SECONDARY = 66985,
+    SPELL_AWESOME_PARTY_ENSEMBLE = 66908,
+    SPELL_LOTP_HAPPY_PARTYGOER = 66916,
     PLAYER_GUID = 99991,
     ACTION_ENTER_CAR = 101,
     ACTION_HELP_PLAYER,
@@ -224,8 +226,7 @@ public:
         {
             m_events.Reset();
             m_targetGuid = 0;
-            if (!me->m_Controlled.size())
-                me->SummonCreature(12922, -8396.887f, 1347.801f, 102.5915f, 5.183628f);
+            me->CastSpell(me, 11939); // me->SummonCreature(12922, -8396.887f, 1347.801f, 102.5915f, 5.183628f);
         }
 
         // Called when hit by a spell
@@ -356,11 +357,15 @@ public:
         case QUEST_LIFE_OF_THE_PARTY_M:
             player->RemoveAura(SPELL_OUTFIT_MALE);
             player->RemoveAura(SPELL_AWESOME_PARTY_ENSEMBLE);
+            player->RemoveAura(SPELL_LOTP_HAPPY_PARTYGOER);
+            player->RemoveAura(SPELL_OUTFIT_SECONDARY);
             break;
         case QUEST_LIFE_OF_THE_PARTY_F:
             player->RemoveAura(SPELL_OUTFIT_FEMALE);
             player->RemoveAura(SPELL_AWESOME_PARTY_ENSEMBLE);
-            break;
+            player->RemoveAura(SPELL_LOTP_HAPPY_PARTYGOER);
+            player->RemoveAura(SPELL_OUTFIT_SECONDARY);
+            break;        
         }
         return false;
     }
@@ -2881,6 +2886,13 @@ public:
         TYPE_DANCE = 3,
         TYPE_FIREWORKS = 4,
         TYPE_HORS_DOEUVRES = 5,
+        SPELL_BUBBLY = 75042,
+        SPELL_BUCKET = 75044,
+        SPELL_DANCE = 75046,
+        SPELL_FIREWORKS = 75048,
+        SPELL_HORS_DOEUVRES = 75050,
+        SPELL_COSMETIC_STUN = 46957,
+        SPELL_COSMETIC_DRUNKEN_INTOXICATION = 55664,
         SPELL_LOTP_BUBBLY = 75122,
         SPELL_LOTP_BUCKET = 66931,
         SPELL_LOTP_DANCE = 75123,
@@ -2892,7 +2904,14 @@ public:
         SPELL_LOTP_SUMMON_DISCO_BALL = 66930,
         SPELL_LOTP_SUMMON_BUCKET = 75044,
         SPELL_LOTP_VOMIT = 43391,
-        SPELL_LOTP_HAPPY_PARTYGOER = 66916,
+        SPELL_PLAYER_BUBBLY = 66909,
+        SPELL_PLAYER_BUCKET = 66910,
+        SPELL_PLAYER_DANCE = 66911,
+        SPELL_PLAYER_FIREWORKS = 66912,
+        SPELL_PLAYER_HORS_DOEUVRES = 66913,
+        EVENT_CHECK_START_PARTY = 901,
+        EVENT_START_PARTY,
+        EVENT_PARTY_START_COOLDOWN,
     };
 
     struct npc_kezan_partygoer_35175_86AI : public ScriptedAI
@@ -2902,15 +2921,91 @@ public:
         EventMap m_events;
         uint64   m_playerGUID;
         uint32   m_partyTyp;
+        bool     m_doing;
+        bool     m_cooldown;
 
         void Initialize()
         {
-
+            m_partyTyp = urand(1, 5);
+            m_doing = false;
+            m_cooldown = false;
         }
 
         void Reset() override
         {
-            m_events.ScheduleEvent(EVENT_MUSIC_PERIODIC, 2500);
+            switch (m_partyTyp)
+            {
+            case 0:
+                me->AddAura(SPELL_BUBBLY, me);
+                break;
+            case 1:
+                me->AddAura(SPELL_BUCKET, me);
+                me->AddAura(SPELL_COSMETIC_STUN, me);
+                me->AddAura(SPELL_COSMETIC_DRUNKEN_INTOXICATION, me);
+                break;
+            case 2:
+                me->AddAura(SPELL_DANCE, me);
+                break;
+            case 3:
+                me->AddAura(SPELL_FIREWORKS, me);
+                break;
+            case 4:
+                me->AddAura(SPELL_HORS_DOEUVRES, me);
+                break;
+            }
+            m_events.RescheduleEvent(EVENT_CHECK_START_PARTY, 1000);
+        }
+
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
+        {
+            uint32 m_playerQuest = 0;
+            if (Player* player = caster->ToPlayer())
+            {
+                if (player->GetQuestStatus(QUEST_LIFE_OF_THE_PARTY_F) == QUEST_STATUS_INCOMPLETE)
+                    m_playerQuest = QUEST_LIFE_OF_THE_PARTY_F;
+                else if (player->GetQuestStatus(QUEST_LIFE_OF_THE_PARTY_M) == QUEST_STATUS_INCOMPLETE)
+                    m_playerQuest = QUEST_LIFE_OF_THE_PARTY_M;
+
+                if (m_playerQuest > 0)
+                    if (m_partyTyp = 1 && spell->Id == SPELL_PLAYER_BUBBLY)
+                    {
+                        me->CastSpell(me, SPELL_LOTP_BUBBLY);
+                        player->KilledMonsterCredit(35175);
+                    }
+                    else if (m_partyTyp = 2 && spell->Id == SPELL_PLAYER_BUCKET)
+                    {
+                        me->CastSpell(me, SPELL_LOTP_BUCKET);
+                        me->CastSpell(me, SPELL_LOTP_SUMMON_BUCKET);
+                        player->KilledMonsterCredit(35175);
+                    }
+                    else if (m_partyTyp = 3 && spell->Id == SPELL_PLAYER_DANCE)
+                    {
+                        me->CastSpell(me, SPELL_LOTP_DANCE);
+                        me->CastSpell(me, SPELL_LOTP_SUMMON_DISCO_BALL);
+                        player->KilledMonsterCredit(35175);
+                    }
+                    else if (m_partyTyp = 4 && spell->Id == SPELL_PLAYER_FIREWORKS)
+                    {
+                        switch (urand(1, 3))
+                        {
+                        case 1:
+                            me->CastSpell(me, SPELL_LOTP_FIREWORKS_BLUE);
+                            break;
+                        case 2:
+                            me->CastSpell(me, SPELL_LOTP_FIREWORKS_GREEN);
+                            break;
+                        case 3:
+                            me->CastSpell(me, SPELL_LOTP_FIREWORKS_RED);
+                            break;
+                        }
+                        player->KilledMonsterCredit(35175);
+                    }
+                    else if (m_partyTyp = 5 && spell->Id == SPELL_PLAYER_HORS_DOEUVRES)
+                    {
+                        me->CastSpell(me, SPELL_LOTP_HORS_DOEUVRES);
+                        player->KilledMonsterCredit(35175);
+                    }
+            }
         }
 
         void UpdateAI(uint32 diff) override
@@ -2921,7 +3016,46 @@ public:
             {
                 switch (eventId)
                 {
-               
+                case EVENT_CHECK_START_PARTY:
+                {
+                    if (!m_doing && !m_cooldown)
+                        if (Player* player = me->FindNearestPlayer(15.0f))
+                        {
+                            uint32 m_playerQuest = 0;
+                            if (player->GetQuestStatus(QUEST_LIFE_OF_THE_PARTY_F) == QUEST_STATUS_INCOMPLETE)
+                                m_playerQuest = QUEST_LIFE_OF_THE_PARTY_F;
+                            else if (player->GetQuestStatus(QUEST_LIFE_OF_THE_PARTY_M) == QUEST_STATUS_INCOMPLETE)
+                                m_playerQuest = QUEST_LIFE_OF_THE_PARTY_M;
+                            if (urand(0, 100) < 30 && m_playerQuest)
+                            {
+                                m_playerGUID = player->GetGUID();
+                                Talk(m_partyTyp, player);
+                                m_doing = true;
+                                m_cooldown = true;
+                                m_events.ScheduleEvent(EVENT_PARTY_START_COOLDOWN, 120000);
+                            }
+                            else
+                            {
+                                m_cooldown = true;
+                                m_events.ScheduleEvent(EVENT_PARTY_START_COOLDOWN, urand(30000, 60000));
+                            }
+                        }
+
+                    m_events.ScheduleEvent(EVENT_CHECK_START_PARTY, 1000);
+                    break;
+                }
+                case EVENT_PARTY_START_COOLDOWN:
+                {
+                    m_doing = false;
+                    m_cooldown = false;
+                    me->RemoveAura(SPELL_LOTP_HAPPY_PARTYGOER);
+                    break;
+                }
+                case EVENT_START_PARTY:
+                {
+
+                    break;
+                }
                 }
             }
 
@@ -2938,7 +3072,6 @@ public:
     }
 };
 
-
 // 195488
 class go_kajamite_deposit_195488 : public GameObjectScript
 {
@@ -2953,7 +3086,7 @@ public:
         {
             if (unit)
                 if (Player* player = unit->ToPlayer())
-                    if (player->GetQuestStatus(14120) == QUEST_STATUS_INCOMPLETE)
+                    if (player->GetQuestStatus(14124) == QUEST_STATUS_INCOMPLETE)
                     {
                         uint8 rol = urand(2, 3);
                         for (uint8 i = 0; i < rol; i++)
@@ -2961,6 +3094,7 @@ public:
                             Position pos = go->GetNearPosition(0.4f, frand(0, 6.24f));
                             go->SummonGameObject(195492, pos.m_positionX, pos.m_positionY, pos.m_positionZ + 0.3f, pos.m_orientation, 0, 0, 0, 0, 60000);
                         }
+                        go->Delete();
                     }
         }
     };
@@ -2970,6 +3104,296 @@ public:
         return new go_kajamite_deposit_195488AI(go);
     }
 
+};
+
+// 35234
+class npc_hired_looter_35234 : public CreatureScript
+{
+public:
+    npc_hired_looter_35234() : CreatureScript("npc_hired_looter_35234") { }
+
+    enum eNpc
+    {
+        EVENT_TORCH_COOLDOWN = 901,
+    };
+
+    struct npc_hired_looter_35234AI : public ScriptedAI
+    {
+        npc_hired_looter_35234AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+        EventMap m_events;
+        uint64   m_playerGUID;
+        bool     m_torchCoolDown;
+
+        void Initialize()
+        {
+            m_torchCoolDown=false;
+        }
+
+        void Reset() override
+        {
+           me->SetCurrentEquipmentId(1);
+        }
+
+        void MoveInLineOfSight(Unit* who) override
+        {
+            if (Creature* npc = who->ToCreature())
+                if (npc->GetEntry() == NPC_HOT_ROD_34840)
+                    if (me->GetDistance2d(npc) < 1.0f)
+                    {
+                        if (Vehicle* car = npc->GetVehicleKit())
+                            if (Unit* unit = car->GetPassenger(0))
+                                if (Player* player = unit->ToPlayer())
+                                    player->DealDamage(me, me->GetHealth() + 1);
+                    }
+                    else if (!m_torchCoolDown && me->GetDistance2d(npc) > 10.0f && me->GetDistance2d(npc) < 15.0f)
+                    {
+                        me->CastSpell(npc, 6257);
+                        m_torchCoolDown = true;
+                        m_events.ScheduleEvent(EVENT_TORCH_COOLDOWN, 10000);
+                    }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_TORCH_COOLDOWN:
+                {
+                    m_torchCoolDown = false;
+                    break;
+                }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_hired_looter_35234AI(creature);
+    }
+};
+
+// 35486
+class npc_first_bank_of_kezan_vault_35486 : public CreatureScript
+{
+public:
+    npc_first_bank_of_kezan_vault_35486() : CreatureScript("npc_first_bank_of_kezan_vault_35486") { }
+
+    enum eNpc
+    {
+        SPELL_SUMMON_BUNNY_VEHICLE = 67488,
+        SPELL_POWER_CORRECT = 67493,
+        SPELL_POWER_INCORRECT = 67494,
+        SPELL_DRILL_AURA = 67495,
+        SPELL_EXPLOSIV_AURA = 67496,
+        SPELL_LISTEN_AURA = 67497,
+        SPELL_LOCKPICK_AURA = 67498,
+        SPELL_G_RAY_AURA = 67499,
+        SPELL_VAULT_INTERACT = 67555,
+        SPELL_VAULT_CRACKING_TOOLSET = 67476,
+        SPELL_VEHICLE_EXIT_SPELL = 67579,
+        SPELL_VAULT_CRACKED = 67492,
+        EVENT_START_PLAY = 901,
+        EVENT_PLAYING,
+        EVENTS_PLAY_COOLDOWN,
+        EVENT_CHECK_TIMEOUT,
+        EVENT_MASTER_RESET,
+        EVENT_PLAYER_EXIT,
+    };
+
+    struct npc_first_bank_of_kezan_vault_35486AI : public VehicleAI
+    {
+        npc_first_bank_of_kezan_vault_35486AI(Creature* creature) : VehicleAI(creature) { Initialize(); }
+
+        EventMap m_events;
+        uint64   m_playerGUID;
+        uint32   m_count;
+        int32    m_playRol;
+        int32    m_playSpell;
+
+        void Initialize()
+        {
+            m_playerGUID = 0;
+            m_count = 0;
+            m_playRol = 0;
+            m_playSpell = 0;
+        }
+
+        void Reset() override
+        {
+            me->SetMaxPower(POWER_MANA, 100);
+            me->SetPower(POWER_MANA, 0);
+            m_events.ScheduleEvent(EVENT_MASTER_RESET, 120000);
+        }
+
+        void MoveInLineOfSight(Unit* who) override
+        {
+            if (Player* player = who->ToPlayer())
+                if (who->GetUInt32Value(UNIT_NPC_EMOTESTATE))
+                    player->HandleEmoteState(0);
+        }
+
+        void PassengerBoarded(Unit* passenger, int8 seatId, bool apply) override
+        {
+            if (apply)
+            {
+                if (Player* player = passenger->ToPlayer())
+                {
+                    m_playerGUID = player->GetGUID();
+                    player->KilledMonsterCredit(me->GetEntry());
+                    m_events.ScheduleEvent(EVENT_START_PLAY, 100);
+                }
+            }
+            else
+            {
+                Initialize();
+                if (passenger->HasAura(SPELL_VAULT_CRACKING_TOOLSET))
+                    passenger->RemoveAura(SPELL_VAULT_CRACKING_TOOLSET);
+            }
+        }
+
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
+        {
+            bool good = false;
+            bool bad = false;
+            switch (spell->Id)
+            {
+            case 67526:
+                if (m_playSpell == SPELL_G_RAY_AURA) good = true; else bad = true;
+                break;
+            case 67525:
+                if (m_playSpell == SPELL_LOCKPICK_AURA) good = true; else bad = true;
+                break;
+            case 67524:
+                if (m_playSpell == SPELL_LISTEN_AURA) good = true; else bad = true;
+                break;
+            case 67508:
+                if (m_playSpell == SPELL_EXPLOSIV_AURA) good = true; else bad = true;
+                break;
+            case 67522:
+                if (m_playSpell == SPELL_DRILL_AURA) good = true; else bad = true;
+                break;
+            }
+            if (good || bad)
+                if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                {
+                    if (good)
+                    {
+                        me->PlayDirectSound(11595, player);
+                        me->CastSpell(me, SPELL_POWER_CORRECT, true);
+                        Talk(9, player);
+                    }
+                    else 
+                    {
+                        me->PlayDirectSound(11596, player);
+                        me->CastSpell(me, SPELL_POWER_INCORRECT, true);
+                        Talk(10, player);
+                    }
+                    Talk(12, player);
+                    m_events.RescheduleEvent(EVENT_PLAYING, 1000);
+                }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_START_PLAY:
+                {
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                    {
+                        Talk(m_count, player);
+                        Talk(12, player);
+                    }
+                    m_count += 1;
+                    if (m_count < 4)
+                        m_events.ScheduleEvent(EVENT_START_PLAY, 6000);
+                    else
+                    {
+                        m_events.ScheduleEvent(EVENT_PLAYING, 6000);
+                        m_events.RescheduleEvent(EVENT_MASTER_RESET, 60000);
+                    }
+                    break;
+                }
+                case EVENT_PLAYING:
+                {
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        if (me->GetPower(POWER_MANA) < 100.0f)
+                        {
+                            m_playRol = urand(0, 4);
+                            m_playSpell = SPELL_DRILL_AURA + m_playRol;
+                            me->CastSpell(me, m_playSpell, true);
+                            me->CastSpell(me, 67502), true;
+                            me->AddAura(67502, player);
+                            Talk(m_playRol + 4, player);
+                            Talk(12, player);
+                        }
+                        else
+                        {
+                            Talk(11, player);
+                            Talk(12, player);
+                            player->CastSpell(player, SPELL_VAULT_CRACKED, true);
+                            player->CastSpell(player, SPELL_VEHICLE_EXIT_SPELL, true);
+                            m_events.ScheduleEvent(EVENT_PLAYER_EXIT, 2000);
+                            player->ExitVehicle();
+                            break;
+                        }
+                    m_events.ScheduleEvent(EVENT_CHECK_TIMEOUT, 2000);
+                    break;
+                }
+                case EVENT_CHECK_TIMEOUT:
+                {
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        if (player->HasAura(67502))
+                            m_events.ScheduleEvent(EVENT_CHECK_TIMEOUT, 250);
+                        else
+                        {
+                            me->PlayDirectSound(11596, player);
+                            me->CastSpell(me, SPELL_POWER_INCORRECT, true);
+                            m_events.ScheduleEvent(EVENT_PLAYING, 1000);
+                        }
+                    break;
+                }
+                case EVENT_MASTER_RESET:
+                {
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        player->CastSpell(player, SPELL_VEHICLE_EXIT_SPELL, true);
+                    // nobreak;
+                }
+                case EVENT_PLAYER_EXIT:
+                {
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        player->ExitVehicle();
+                    break;
+                }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_first_bank_of_kezan_vault_35486AI(creature);
+    }
 };
 
 
@@ -3014,6 +3438,8 @@ void AddSC_zone_kezan()
     new npc_elm_general_purpose_bunny_large_24110();
     new go_kajamite_deposit_195488();
     new npc_kezan_partygoer_35175_86();
+    new npc_hired_looter_35234();
+    new npc_first_bank_of_kezan_vault_35486();
 
 }
 
