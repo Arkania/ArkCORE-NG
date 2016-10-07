@@ -63,6 +63,7 @@ enum eKezanEnumerate
     NPC_KEZAN_PARTYGOER_35186 = 35186,
     SPELL_BORE_32738 = 32738,
     SPELL_PERMANENT_FEIGN_DEATH = 29266,
+    SPELL_INVISIBILITY_DETECTION_1 = 49416,
     SPELL_INVISIBILITY_DETECTION_4 = 90161,
     SPELL_INVISIBILITY_DETECTION_5 = 94566,
     SPELL_INVISIBILITY_DETECTION_6 = 94567,
@@ -89,6 +90,7 @@ enum eKezanEnumerate
     EVENT_ENTER_CAR,
     EVENT_TALK_PERIODIC,
     EVENT_MUSIC_PERIODIC,
+    EVENT_CHECK_FOR_PLAYER,
     EVENT_TALK,
     EVENT_TALK_COOLDOWN,
     EVENT_GIVE_UP,
@@ -3462,6 +3464,219 @@ public:
     }
 };
 
+// 37598
+class npc_gasbot_37598 : public CreatureScript
+{
+public:
+    npc_gasbot_37598() : CreatureScript("npc_gasbot_37598") { }
+
+    enum eNpc
+    {
+      
+    };
+
+    struct npc_gasbot_37598AI : public VehicleAI
+    {
+        npc_gasbot_37598AI(Creature* creature) : VehicleAI(creature) { }
+
+        EventMap m_events;
+        uint32   m_count;
+        uint64   m_consoleGUID;
+
+        void Reset() override
+        {
+            m_count = 0;
+            m_consoleGUID = 0;
+            me->SetWalk(true);
+            if (GameObject* go = me->FindNearestGameObject(201736, 25.0f))
+                m_consoleGUID = go->GetGUID();
+        }
+
+        void PassengerBoarded(Unit* passenger, int8 seatId, bool apply) override
+        {
+            if (apply)
+            {
+               m_count += 1;
+               if (m_count == 4)
+                   m_events.ScheduleEvent(2000, 100);
+            }         
+        }
+
+        void MovementInform(uint32 type, uint32 id) override 
+        { 
+            if (type == POINT_MOTION_TYPE)
+                switch (id)
+                {               
+                case 2001:
+                    m_events.ScheduleEvent(2001, 100);
+                    break;
+                case 2002:
+                    m_events.ScheduleEvent(2002, 100);
+                    break;
+                case 2003:
+                    m_events.ScheduleEvent(2003, 100);
+                    break;
+                case 2004:
+                    me->DespawnOrUnsummon(10);
+                    break;
+                }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case 2000:
+                    me->CastSpell(me, 70256, true);
+                    me->GetMotionMaster()->MovePoint(2001, -8424.21f, 1342.95f, 102.41f);
+                    break;
+                case 2001:
+                    me->GetMotionMaster()->MovePoint(2002, -8424.27f, 1346.94f, 104.66f);
+                    break;
+                case 2002:
+                    me->GetMotionMaster()->MovePoint(2003, -8423.88f, 1365.72f, 104.68f);
+                    break;
+                case 2003:
+                    if (GameObject* go = ObjectAccessor::GetGameObject(*me, m_consoleGUID))
+                        go->AI()->DoAction(998);
+                    me->GetMotionMaster()->MovePoint(2004, -8412.07f, 1364.56f, 104.71f);
+                    break;
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+     };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_gasbot_37598AI(creature);
+    }
+};
+
+// 201745
+class go_447_fire_201745 : public GameObjectScript
+{
+public:
+    go_447_fire_201745() : GameObjectScript("go_447_fire_201745") { }
+
+    struct go_447_fire_201745AI : public GameObjectAI
+    {
+        go_447_fire_201745AI(GameObject* go) : GameObjectAI(go) { }
+
+        EventMap m_events;
+
+        void Reset() override
+        {
+            m_events.RescheduleEvent(EVENT_CHECK_FOR_PLAYER, 2500);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_CHECK_FOR_PLAYER:
+                {
+                    bool fire = false;
+                    std::list<Player*> pList = go->FindNearestPlayers(50.0f);
+                    for (std::list<Player*>::iterator itr = pList.begin(); itr != pList.end(); ++itr)
+                        if ((*itr)->GetQuestStatus(14125) || (*itr)->GetQuestStatus(14126))
+                            fire = true;
+
+                    if (!fire)
+                        go->Delete();
+                    m_events.ScheduleEvent(EVENT_TALK_PERIODIC, 2500);
+                    break;
+                }
+                }
+            }
+        }
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_447_fire_201745AI(go);
+    }
+};
+
+// 201736
+class go_gasbot_control_panel_201736 : public GameObjectScript
+{
+public:
+    go_gasbot_control_panel_201736() : GameObjectScript("go_gasbot_control_panel_201736") { }
+
+    struct go_gasbot_control_panel_201736AI : public GameObjectAI
+    {
+        go_gasbot_control_panel_201736AI(GameObject* go) : GameObjectAI(go) { }
+
+        EventMap m_events;
+        uint64   m_playerGUID;
+
+        void Reset() override
+        {
+            m_playerGUID = 0;
+        }
+
+        bool GossipHello(Player* player) override
+        { 
+            m_playerGUID = player->GetGUID();
+            return false; 
+        }
+
+        void DoAction(int32 param = 0) 
+        { 
+            if (param == 998)
+                SpawnAllFireBunnys();
+        }
+
+        void SpawnAllFireBunnys()
+        {
+            go->SummonGameObject(201745, -8406.05f, 1363.66f, 117.270f, 0, 0, 0, 0, 0, 0);
+            go->SummonGameObject(201745, -8424.22f, 1352.51f, 131.307f, 0, 0, 0, 0, 0, 0);
+            go->SummonGameObject(201745, -8405.66f, 1362.58f, 129.059f, 0, 0, 0, 0, 0, 0);
+            go->SummonGameObject(201745, -8425.50f, 1372.17f, 114.000f, 0, 0, 0, 0, 0, 0);
+            go->SummonGameObject(201745, -8423.73f, 1359.31f, 117.705f, 0, 0, 0, 0, 0, 0);
+            go->SummonGameObject(201745, -8407.38f, 1364.28f, 104.021f, 0, 0, 0, 0, 0, 0);
+            go->SummonGameObject(201745, -8434.33f, 1357.26f, 112.397f, 0, 0, 0, 0, 0, 0);
+            go->SummonGameObject(201745, -8423.97f, 1365.49f, 104.676f, 0, 0, 0, 0, 0, 0);
+            go->SummonGameObject(201745, -8423.71f, 1374.99f, 125.630f, 0, 0, 0, 0, 0, 0);
+            go->SummonGameObject(201745, -8425.45f, 1348.56f, 114.783f, 0, 0, 0, 0, 0, 0);
+            go->SummonGameObject(201745, -8431.05f, 1356.36f, 133.902f, 0, 0, 0, 0, 0, 0);
+            go->SummonGameObject(201745, -8424.32f, 1350.47f, 104.663f, 0, 0, 0, 0, 0, 0);
+            go->SummonGameObject(201745, -8399.95f, 1364.21f, 124.004f, 0, 0, 0, 0, 0, 0);
+            go->SummonGameObject(201745, -8435.67f, 1355.82f, 104.663f, 0, 0, 0, 0, 0, 0);
+            go->SummonGameObject(201745, -8417.77f, 1374.51f, 134.562f, 0, 0, 0, 0, 0, 0);
+            go->SummonGameObject(201745, -8410.71f, 1352.56f, 108.080f, 0, 0, 0, 0, 0, 0);
+            go->SummonGameObject(201745, -8427.00f, 1377.48f, 148.793f, 0, 0, 0, 0, 0, 0);
+            go->SummonGameObject(201745, -8404.12f, 1374.84f, 108.255f, 0, 0, 0, 0, 0, 0);
+            go->SummonGameObject(201745, -8417.58f, 1356.24f, 134.550f, 0, 0, 0, 0, 0, 0);
+            go->SummonGameObject(201745, -8428.97f, 1380.37f, 112.364f, 0, 0, 0, 0, 0, 0);
+            go->SummonGameObject(201745, -8424.03f, 1358.39f, 125.108f, 0, 0, 0, 0, 0, 0);
+            go->SummonGameObject(201745, -8419.53f, 1364.07f, 116.869f, 0, 0, 0, 0, 0, 0);
+            go->SummonGameObject(201745, -8423.84f, 1376.50f, 130.335f, 0, 0, 0, 0, 0, 0);
+            
+            std::list<Player*> pList = go->FindNearestPlayers(50.0f);
+            for (std::list<Player*>::iterator itr = pList.begin(); itr != pList.end(); ++itr)
+                if ((*itr)->GetQuestStatus(14125) == QUEST_STATUS_COMPLETE)
+                    (*itr)->AddAura(SPELL_INVISIBILITY_DETECTION_1, (*itr));
+        }
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_gasbot_control_panel_201736AI(go);
+    }
+};
 
 
 void AddSC_zone_kezan()
@@ -3507,6 +3722,9 @@ void AddSC_zone_kezan()
     // new npc_hired_looter_35234();
     // new npc_kezan_citizen_35063();
     new npc_first_bank_of_kezan_vault_35486();
+    new npc_gasbot_37598();
+    new go_447_fire_201745();
+    new go_gasbot_control_panel_201736();
 
 }
 

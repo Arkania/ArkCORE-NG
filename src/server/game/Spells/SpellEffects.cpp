@@ -4768,11 +4768,26 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
         {
             switch (m_spellInfo->Id)
             {
+                case 70253: // Kezan quest 14125
+                {
+                    if (Player* player = m_caster->ToPlayer())
+                    {
+                        if (player->GetQuestStatus(14125) == QUEST_STATUS_INCOMPLETE)
+                            player->KilledMonsterCredit(37598);
+                        if (player->GetQuestStatus(14125) == QUEST_STATUS_COMPLETE)
+                        {
+                            player->CastSpell(player, 70254, true);
+                            player->CastSpell(player, 70252, true);
+                        }
+                    }
+                    break;
+                }
                 case 67555: // Kezan Quest 14122: The Great Bank Heist: Vault Interact
                 {
                     if (Player* player = m_caster->ToPlayer())
                         if (player->GetQuestStatus(14122) == QUEST_STATUS_INCOMPLETE)
                             player->CastSpell(player, 67488, true);  // player->CastCustomSpell(67488, SPELLVALUE_BASE_POINT0, 0, player, true, 0, 0,  player->GetGUID()); //player->CastSpell(player, 67488, true);
+                    break;
                 }
                 case 23853: // jubling-cooldown (spell is triggered from 23852)
                 {
