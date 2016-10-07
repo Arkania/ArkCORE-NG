@@ -37,6 +37,7 @@ enum eKezanEnumerate
     QUEST_KAJA_COLA = 25473,
     QUEST_ROLLING_WITH_MY_HOMIES = 14071,
     QUEST_LIFE_SAVINGS = 14126,
+    QUEST_SASSY_447 = 14125,
     QUEST_MEGS_IN_MARKETING = 28349,
     QUEST_THE_REPLACEMENTS = 24488,
     QUEST_NECCASSARY_ROUGHNESS = 24502,
@@ -45,6 +46,8 @@ enum eKezanEnumerate
     QUEST_GIVE_SASSY_THE_NEWS = 24520,
     QUEST_LIFE_OF_THE_PARTY_M = 14153,
     QUEST_LIFE_OF_THE_PARTY_F = 14113,
+    NPC_CANDY_CANE = 35053,
+    NPC_CHIP_ENDALE = 35054,
     NPC_HOT_ROD_34840 = 34840,
     NPC_ACE_34957 = 34957,
     NPC_GOBBER_34958 = 34958,
@@ -336,7 +339,10 @@ public:
 
     enum eNPC
     {
-        QUEST_KAJA_COLA
+        // QUEST_KAJA_COLA
+        ACTION_START_RESCUE_LIVE = 902,
+        EVENT_START_RESCUE_LIVE,
+        EVENT_ENTER_THE_HOTROD,
     };
 
     bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
@@ -346,7 +352,11 @@ public:
         else if (quest->GetQuestId() == QUEST_ROLLING_WITH_MY_HOMIES)
             creature->AI()->Talk(1, player);
         else if (quest->GetQuestId() == QUEST_LIFE_SAVINGS)
+        {
             creature->AI()->Talk(2, player);
+            creature->AI()->SetGUID(player->GetGUID(), PLAYER_GUID);
+            creature->AI()->DoAction(992);
+        }
         return false;
     }
 
@@ -381,15 +391,36 @@ public:
         npc_sassy_hardwrench_34668AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
 
         EventMap m_events;
+        uint64   m_playerGUID;
 
         void Initialize()
         {
+            m_playerGUID=0;
         }
 
         void Reset() override
         {
         }
 
+        void DoAction(int32 param) override
+        {
+            if (param == 992)
+            {
+                m_events.ScheduleEvent (EVENT_START_RESCUE_LIVE, 100);
+            }
+        }
+
+        void SetGUID(uint64 guid, int32 id) override
+        {
+            switch (id)
+            {
+            case PLAYER_GUID:
+            {
+                m_playerGUID = guid;
+                break;
+            }
+            }
+        }
         void UpdateAI(uint32 diff) override
         {
             m_events.Update(diff);
@@ -398,6 +429,15 @@ public:
             {
                 switch (eventId)
                 {
+                case EVENT_START_RESCUE_LIVE:
+                {
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                    {
+                        player->DestroyItemCount(46856, 1, true);
+                        player->CastSpell(player, 70321, true);                        
+                    }
+                    break;
+                }
                 }
             }
 
@@ -3590,7 +3630,7 @@ public:
                     bool fire = false;
                     std::list<Player*> pList = go->FindNearestPlayers(50.0f);
                     for (std::list<Player*>::iterator itr = pList.begin(); itr != pList.end(); ++itr)
-                        if ((*itr)->GetQuestStatus(14125) || (*itr)->GetQuestStatus(14126))
+                        if ((*itr)->GetQuestStatus(QUEST_SASSY_447) || (*itr)->GetQuestStatus(QUEST_LIFE_SAVINGS))
                             fire = true;
 
                     if (!fire)
@@ -3667,7 +3707,7 @@ public:
             
             std::list<Player*> pList = go->FindNearestPlayers(50.0f);
             for (std::list<Player*>::iterator itr = pList.begin(); itr != pList.end(); ++itr)
-                if ((*itr)->GetQuestStatus(14125) == QUEST_STATUS_COMPLETE)
+                if ((*itr)->GetQuestStatus(QUEST_SASSY_447) == QUEST_STATUS_COMPLETE)
                     (*itr)->AddAura(SPELL_INVISIBILITY_DETECTION_1, (*itr));
         }
     };
@@ -3675,6 +3715,136 @@ public:
     GameObjectAI* GetAI(GameObject* go) const override
     {
         return new go_gasbot_control_panel_201736AI(go);
+    }
+};
+
+// 37676
+class npc_hot_rod_37676 : public CreatureScript
+{
+public:
+    npc_hot_rod_37676() : CreatureScript("npc_hot_rod_37676") { }
+
+    enum eNpc
+    {
+        SPELL_SASSYS_DRIVING = 66724,
+        SPELL_HAND_OVER_THE_KEYS = 70318,
+        SPELL_KNOCKBACK_TRIGGER = 70329,
+        PATH_WAYPOINT_HOT_ROD = 37676,
+    };
+
+    struct npc_hot_rod_37676AI : public VehicleAI
+    {
+        npc_hot_rod_37676AI(Creature* creature) : VehicleAI(creature) { }
+
+        EventMap m_events;
+        uint64   m_playerGUID;
+        uint64   m_sassyGUID;
+
+        void Reset() override
+        {
+            m_playerGUID = 0;
+            m_sassyGUID = 0;
+            me->SetSpeed(MOVE_RUN, 2.4f);
+        }
+
+        void PassengerBoarded(Unit* passenger, int8 seatId, bool apply) override
+        {
+            if (apply)
+            {
+                if (Player* player = passenger->ToPlayer())
+                {
+                    m_playerGUID = passenger->GetGUID();
+                    player->CastSpell(me, SPELL_SASSYS_DRIVING, true);
+                    player->CastSpell(player, SPELL_HAND_OVER_THE_KEYS, true);
+                    me->CastSpell(me, SPELL_KNOCKBACK_TRIGGER, true);
+                }
+                else if (Creature* npc = passenger->ToCreature())
+                    if (npc->GetEntry() == 37680)
+                        m_sassyGUID = npc->GetGUID();
+
+                if (m_playerGUID && m_sassyGUID)
+                    me->GetMotionMaster()->MovePath(PATH_WAYPOINT_HOT_ROD, false);
+            }
+        }
+
+        void MovementInform(uint32 type, uint32 id) override
+        {
+            if (type == WAYPOINT_MOTION_TYPE)
+                switch (id)
+                {
+                case 30:
+                    me->RemoveAura(SPELL_KNOCKBACK_TRIGGER);
+                    break;
+                case 31:
+                    me->SetSpeed(MOVE_FLIGHT, 6.0f);
+                    me->SetCanFly(true);
+                    me->SetDisableGravity(true);
+                    break;
+                case 32:
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        if (Creature* sassy = ObjectAccessor:: GetCreature(*me, m_sassyGUID))
+                            sassy->AI()->Talk(2, player);
+                case 34:
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        if (player->getGender() == GENDER_MALE)
+                        {
+                            if (Creature* candy = me->FindNearestCreature(NPC_CANDY_CANE, 25.0f))
+                                candy->AI()->Talk(2, player);
+                        }
+                        else
+                        {
+                            if (Creature* chip = me->FindNearestCreature(NPC_CHIP_ENDALE, 25.0f))
+                                chip->AI()->Talk(2, player);
+                        }
+                    me->DespawnOrUnsummon(1000);
+                    break;
+                }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_hot_rod_37676AI(creature);
+    }
+};
+
+// 35222
+class npc_trade_prince_gallywix_35222 : public CreatureScript
+{
+public:
+    npc_trade_prince_gallywix_35222() : CreatureScript("npc_trade_prince_gallywix_35222") { }
+
+    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*opt*/) override 
+    {
+        switch (quest->GetQuestId())
+        {
+        case QUEST_LIFE_SAVINGS:
+            // player->CastSpell(player, 91847, true); video 22 is not avaible
+            WorldLocation wloc(648, 534.835f, 3272.92f, 0.171872f, 0);
+            player->TeleportTo(wloc);
+            player->SetHomebind(wloc, 4721);
+            player->SaveToDB();
+            break;
+        }
+        return false;     
     }
 };
 
@@ -3725,6 +3895,8 @@ void AddSC_zone_kezan()
     new npc_gasbot_37598();
     new go_447_fire_201745();
     new go_gasbot_control_panel_201736();
+    new npc_hot_rod_37676();
+    new npc_trade_prince_gallywix_35222();
 
 }
 
