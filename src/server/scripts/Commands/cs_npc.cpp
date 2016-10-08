@@ -1119,7 +1119,7 @@ public:
 
         std::list<uint16> phaseIds;
 
-        for (uint32 i = 1; i < tokens.size(); i++)
+        for (uint32 i = 0; i < tokens.size(); i++)
             if (atoi(tokens[i]))
                 phaseIds.push_back(atoi(tokens[i]));
 

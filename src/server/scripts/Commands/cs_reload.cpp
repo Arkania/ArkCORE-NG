@@ -1223,7 +1223,7 @@ public:
         TC_LOG_INFO("misc", "Reloading Phase Areas...");
         sObjectMgr->LoadPhaseAreaSelector();
         sWorld->UpdatePhaseDefinitions();
-        handler->SendGlobalGMSysMessage("Phase Definitions reloaded.");
+        handler->SendGlobalGMSysMessage("PhaseArea and PhaseDefinitions reloaded.");
         return true;
     }
 

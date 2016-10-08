@@ -1269,28 +1269,29 @@ public:
         return true;
     }
 
-    //set temporary #phaseId and #phaseGroup for selected object / self
+    //set temporary #phaseId for selected object / self
     static bool HandleModifyPhaseCommand(ChatHandler* handler, const char* args)
     {
         if (!*args)
             return false;
 
-        char* pId = strtok((char*)args, " ");
-        char* pGroup = strtok((char*)NULL, "");
-        uint16 phaseId = 0;
-        uint16 phaseGroup = 0;
-
-        if (pId)
-            phaseId = (uint16)atoi(pId);
-        if (pGroup)
-            phaseGroup = (uint16)atoi(pGroup);
-
-        if (!phaseId && phaseGroup)
-            phaseId = phaseGroup;
-
-        if (!phaseId)
+        Tokenizer tokens(std::string(args), ' ');
+        if (tokens.size() < 1)
         {
-            handler->PSendSysMessage(LANG_PHASING_INVALID_VALUE, phaseId);
+            handler->PSendSysMessage(LANG_IMPROPER_VALUE, 0);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        std::list<uint16> phaseIds;
+
+        for (uint32 i = 0; i < tokens.size(); i++)
+            if (atoi(tokens[i]))
+                phaseIds.push_back(atoi(tokens[i]));
+
+        if (phaseIds.empty())
+        {
+            handler->SendSysMessage(LANG_BAD_VALUE);
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -1300,7 +1301,8 @@ public:
             target = handler->GetSession()->GetPlayer();
 
         target->ClearAllPhases(false);
-        target->SetInPhase(phaseId, true, !target->IsInPhase(phaseId));
+        for (auto ph : phaseIds)
+            target->SetInPhase(ph, true, true);
 
         return true;
     }
