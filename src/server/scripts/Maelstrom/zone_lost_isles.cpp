@@ -15,17 +15,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Creature.h"
+#include "GameObjectAI.h"
+#include "GameObject.h"
+#include "ObjectAccessor.h"
+#include "ObjectMgr.h"
+#include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "SpellMgr.h"
-#include "Player.h"
-#include "Creature.h"
+#include "Vehicle.h"
 
 enum Zone_zone_lost_isles
 {
     NPC_GEARGRINDER_GIZMO = 36600,
     NPC_DOC_ZAPNOZZLE = 36608,
+    NPC_GOBLIN_SURVIVOR = 34748,
     QUEST_DONT_GO_INTO_THE_LIGHT = 14239,
     QUEST_GOBLIN_ESCAPE_PODS_F = 14001,
     QUEST_GOBLIN_ESCAPE_PODS_M = 14474,
@@ -35,6 +41,11 @@ enum Zone_zone_lost_isles
     SPELL_THERMOHYDRAULIC_FLIPPERS = 68258,
     SPELL_QUEST_14239_COMPLETE = 69013,
     SPELL_JUMPER_CABLES = 69022,
+    SPELL_TRADE_PRINCE_CONTROLLER_AURA = 67433,
+    SPELL_SUMMON_TRADE_PRINCE_GALLYWIX = 67845,
+    SPELL_SUMMON_LIVE_GOBLIN_SURVIVOR = 66137,
+    SPELL_SUMMONS_CONTROLLER = 66136,
+    SPELL_SWIM = 37744,
     EVENT_MASTER_RESET = 101,
     EVENT_TALK_PART_00,
     EVENT_TALK_PART_01,
@@ -61,15 +72,6 @@ public:
         EVENT_START_NEW_WELCOME,
         ACTION_PLAYER_LIFE,
     };
-
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) 
-    { 
-        switch (quest->GetQuestId())
-        {
-           
-        }
-        return false; 
-    }
 
     bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*opt*/) 
     { 
@@ -282,8 +284,10 @@ public:
         case QUEST_GOBLIN_ESCAPE_PODS_F:
         case QUEST_GOBLIN_ESCAPE_PODS_M:
         {
-            player->CastSpell(player, SPELL_THERMOHYDRAULIC_FLIPPERS_VISUAL);
-            player->CastSpell(player, SPELL_THERMOHYDRAULIC_FLIPPERS);
+            player->CastSpell(player, SPELL_THERMOHYDRAULIC_FLIPPERS_VISUAL, true);
+            player->CastSpell(player, SPELL_THERMOHYDRAULIC_FLIPPERS, true);
+            player->CastSpell(player, SPELL_TRADE_PRINCE_CONTROLLER_AURA, true);
+            creature->AI()->Talk(1, player);
             break;
         }
         }
@@ -302,19 +306,74 @@ public:
         }
         return false;
     }
+};
 
-    struct npc_geargrinder_gizmo_36600AI : public ScriptedAI
+// 195188
+class go_goblin_escape_pod_195188 : public GameObjectScript
+{
+public:
+    go_goblin_escape_pod_195188() : GameObjectScript("go_goblin_escape_pod_195188") { }
+
+    struct go_goblin_escape_pod_195188AI : public GameObjectAI
     {
-        npc_geargrinder_gizmo_36600AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+        go_goblin_escape_pod_195188AI(GameObject* go) : GameObjectAI(go) { }
 
         EventMap m_events;
 
-        void Initialize()
+        void OnStateChanged(uint32 state, Unit* unit) override
         {
+            if (unit)
+                if (Player* player = unit->ToPlayer())
+                    if (player->GetQuestStatus(QUEST_GOBLIN_ESCAPE_PODS_M) == QUEST_STATUS_INCOMPLETE || player->GetQuestStatus(QUEST_GOBLIN_ESCAPE_PODS_F) == QUEST_STATUS_INCOMPLETE)
+                    {
+                        Position p = go->GetNearPosition(1, frand(0, 6.28f));
+                        if (player->HasAura(SPELL_TRADE_PRINCE_CONTROLLER_AURA))
+                        {
+                            player->RemoveAura(SPELL_TRADE_PRINCE_CONTROLLER_AURA);
+                            player->CastSpell(player, SPELL_SUMMON_TRADE_PRINCE_GALLYWIX, true);
+                        }
+                        else
+                            player->CastSpell(player, SPELL_SUMMON_LIVE_GOBLIN_SURVIVOR, true);
+
+                        player->CastSpell(player, SPELL_SUMMONS_CONTROLLER, true);
+                        player->KilledMonsterCredit(NPC_GOBLIN_SURVIVOR);
+                        go->Delete();
+                    }
+        }
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_goblin_escape_pod_195188AI(go);
+    }
+};
+
+// 35649
+class npc_trade_prince_gallywix_35649 : public CreatureScript
+{
+public:
+    npc_trade_prince_gallywix_35649() : CreatureScript("npc_trade_prince_gallywix_35649") { }
+
+    struct npc_trade_prince_gallywix_35649AI : public ScriptedAI
+    {
+        npc_trade_prince_gallywix_35649AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap m_events;
+        uint64   m_playerGUID;
+
+        void Reset()
+        {
+            me->SetDisableGravity(true);
         }
 
-        void Reset() override
+        void IsSummonedBy(Unit* summoner) override
         {
+            if (Player* player = summoner->ToPlayer())
+            {
+                me->CastSpell(me, SPELL_SWIM, true);
+                m_playerGUID = player->GetGUID();
+                m_events.ScheduleEvent(EVENT_TALK_PART_00, 2000);
+            }
         }
 
         void UpdateAI(uint32 diff) override
@@ -325,6 +384,24 @@ public:
             {
                 switch (eventId)
                 {
+                case EVENT_TALK_PART_00:
+                {
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        Talk(0, player);
+                    m_events.ScheduleEvent(EVENT_TALK_PART_01, 2000);
+                    break;
+                }
+                case EVENT_TALK_PART_01:
+                {
+                    me->GetMotionMaster()->MovePoint(1001, 600, 3125, -1, false);
+                    m_events.ScheduleEvent(EVENT_TALK_PART_02, 7000);
+                    break;
+                }
+                case EVENT_TALK_PART_02:
+                {
+                    me->DespawnOrUnsummon(10);
+                    break;
+                }
                 }
             }
 
@@ -337,7 +414,77 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_geargrinder_gizmo_36600AI(creature);
+        return new npc_trade_prince_gallywix_35649AI(creature);
+    }
+};
+
+// 34748
+class npc_goblin_survivor_34748 : public CreatureScript
+{
+public:
+    npc_goblin_survivor_34748() : CreatureScript("npc_goblin_survivor_34748") { }
+
+    struct npc_goblin_survivor_34748AI : public ScriptedAI
+    {
+        npc_goblin_survivor_34748AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap m_events;
+        uint64   m_playerGUID;
+
+        void Reset()
+        {
+            me->SetDisableGravity(true);
+        }
+
+        void IsSummonedBy(Unit* summoner) override
+        {
+            if (Player* player = summoner->ToPlayer())
+            {
+                me->CastSpell(me, SPELL_SWIM, true);
+                m_playerGUID = player->GetGUID();
+                m_events.ScheduleEvent(EVENT_TALK_PART_00, 2000);               
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_TALK_PART_00:
+                {
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        Talk(0, player);   
+                    m_events.ScheduleEvent(EVENT_TALK_PART_01, 2000);
+                    break;
+                }
+                case EVENT_TALK_PART_01:
+                {
+                    me->GetMotionMaster()->MovePoint(1001, 600, 3125, -1, false);
+                    m_events.ScheduleEvent(EVENT_TALK_PART_02, 7000);
+                    break;
+                }
+                case EVENT_TALK_PART_02:
+                {
+                    me->DespawnOrUnsummon(10);
+                    break;
+                }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_goblin_survivor_34748AI(creature);
     }
 };
 
@@ -347,5 +494,8 @@ void AddSC_zone_lost_isles()
 {
     new npc_doc_zapnozzle_36608();
     new npc_geargrinder_gizmo_36600();
+    new go_goblin_escape_pod_195188();
+    new npc_trade_prince_gallywix_35649();
+    new npc_goblin_survivor_34748();
 
 }
