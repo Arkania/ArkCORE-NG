@@ -32,6 +32,7 @@ enum Zone_zone_lost_isles
     NPC_GEARGRINDER_GIZMO = 36600,
     NPC_DOC_ZAPNOZZLE = 36608,
     NPC_GOBLIN_SURVIVOR = 34748,
+    NPC_MONKEY_BUSINESS_KILL_CREDIT = 35760,
     QUEST_DONT_GO_INTO_THE_LIGHT = 14239,
     QUEST_GOBLIN_ESCAPE_PODS_F = 14001,
     QUEST_GOBLIN_ESCAPE_PODS_M = 14474,
@@ -46,6 +47,9 @@ enum Zone_zone_lost_isles
     SPELL_SUMMON_LIVE_GOBLIN_SURVIVOR = 66137,
     SPELL_SUMMONS_CONTROLLER = 66136,
     SPELL_SWIM = 37744,
+    SPELL_COSMETIC_THROW_BOMB = 66142,
+    SPELL_NITRO_POTASSIUM_BANANAS = 67917,
+    SPELL_EXPLODING_BANANAS = 67919,
     EVENT_MASTER_RESET = 101,
     EVENT_TALK_PART_00,
     EVENT_TALK_PART_01,
@@ -488,6 +492,82 @@ public:
     }
 };
 
+// 34699
+class npc_bomb_throwing_monkey_34699 : public CreatureScript
+{
+public:
+    npc_bomb_throwing_monkey_34699() : CreatureScript("npc_bomb_throwing_monkey_34699") { }
+
+    enum eNpc
+    {
+        EVENT_CAST_BOMB = 901,
+        EVENT_ROCKET_MONKEY,
+        EVENT_EXPLODE_BOMB,
+    };
+
+    struct npc_bomb_throwing_monkey_34699AI : public ScriptedAI
+    {
+        npc_bomb_throwing_monkey_34699AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap m_events;
+
+        void Reset()
+        {
+            m_events.RescheduleEvent(EVENT_CAST_BOMB, urand(30000, 45000));
+        }
+
+        void SpellHit(Unit* caster, SpellInfo const* spell) override 
+        { 
+            if (spell->Id == SPELL_NITRO_POTASSIUM_BANANAS)
+            {
+                me->HandleEmote(EMOTE_ONESHOT_EAT);
+                m_events.ScheduleEvent(EVENT_ROCKET_MONKEY, 1000);
+                if (Player* player = caster->ToPlayer())
+                    player->KilledMonsterCredit(NPC_MONKEY_BUSINESS_KILL_CREDIT);
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_CAST_BOMB:
+                {
+                    if (Player* player = me->FindNearestPlayer(frand(10.0, 25.0f)))
+                        me->CastSpell(me, SPELL_COSMETIC_THROW_BOMB);
+                    m_events.ScheduleEvent(EVENT_CAST_BOMB, urand(30000, 45000));
+                    break;
+                }
+                case EVENT_ROCKET_MONKEY:
+                {
+                    me->CastSpell(me, SPELL_EXPLODING_BANANAS, true);
+                    m_events.ScheduleEvent(EVENT_EXPLODE_BOMB, 8000);
+                    break;
+                }
+                case EVENT_EXPLODE_BOMB:
+                {
+                    me->DealDamage(me, 500);
+                    break;
+                }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_bomb_throwing_monkey_34699AI(creature);
+    }
+};
 
 
 void AddSC_zone_lost_isles()
@@ -497,5 +577,6 @@ void AddSC_zone_lost_isles()
     new go_goblin_escape_pod_195188();
     new npc_trade_prince_gallywix_35649();
     new npc_goblin_survivor_34748();
+    new npc_bomb_throwing_monkey_34699();
 
 }
