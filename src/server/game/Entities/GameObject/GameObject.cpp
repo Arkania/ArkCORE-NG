@@ -1048,7 +1048,10 @@ bool GameObject::ActivateToQuest(Player* target) const
         }
         case GAMEOBJECT_TYPE_GOOBER:
         {
-            if (GetGOInfo()->goober.questId == -1 || target->GetQuestStatus(GetGOInfo()->goober.questId) == QUEST_STATUS_INCOMPLETE)
+            if (GetGOInfo()->goober.questId == -1 
+                || target->GetQuestStatus(GetGOInfo()->goober.questId) == QUEST_STATUS_INCOMPLETE 
+                || target->GetQuestStatus(GetGOInfo()->goober.questId_male) == QUEST_STATUS_INCOMPLETE 
+                || target->GetQuestStatus(GetGOInfo()->goober.questId_female) == QUEST_STATUS_INCOMPLETE)
                 return true;
             break;
         }

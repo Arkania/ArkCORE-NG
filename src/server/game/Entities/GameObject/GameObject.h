@@ -170,7 +170,7 @@ struct GameObjectTemplate
         struct
         {
             uint32 lockId;                                  //0 -> Lock.dbc
-            int32 questId;                                  //1
+            int32  questId;                                 //1
             uint32 eventId;                                 //2
             uint32 autoCloseTime;                           //3
             uint32 customAnim;                              //4
@@ -190,6 +190,11 @@ struct GameObjectTemplate
             uint32 floatingTooltip;                         //18
             uint32 gossipID;                                //19
             uint32 WorldStateSetsState;                     //20
+            int32  unk21;                                   //21 unknown data found in sniff
+            int32  unk22;                                   //22 unknown data found in sniff
+            int32  unk23;                                   //23 unknown data found in sniff
+            int32  questId_male;                            //24 creates only glitter, for gender quest 
+            int32  questId_female;                          //25 creates only glitter, for gender quest
         } goober;
         //11 GAMEOBJECT_TYPE_TRANSPORT
         struct

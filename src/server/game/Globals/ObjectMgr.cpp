@@ -7678,11 +7678,12 @@ void ObjectMgr::LoadGameObjectForQuests()
             }
             case GAMEOBJECT_TYPE_GOOBER:
             {
-                if (itr->second.goober.questId > 0)              //quests objects
+                if (itr->second.goober.questId > 0 || itr->second.goober.questId_male > 0 || itr->second.goober.questId_female > 0)   //quests objects
                 {
                     _gameObjectForQuestStore.insert(itr->second.entry);
                     ++count;
                 }
+
                 break;
             }
             default:
