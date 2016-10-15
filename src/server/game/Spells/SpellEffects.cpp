@@ -6364,6 +6364,19 @@ void Spell::EffectKnockBack(SpellEffIndex effIndex)
     if (speedxy < 0.1f && speedz < 0.1f)
         return;
 
+    if (!speedxy)
+        if (unitTarget->GetTypeId() != TYPEID_PLAYER)
+            switch (m_spellInfo->Id)
+            {
+            case 67919:
+            case 70413:
+                speedxy = 6.0f;
+                break;
+            default:
+                speedxy = 2.5f;
+                break;
+            }
+
     float x, y;
     if (m_spellInfo->Effects[effIndex].Effect == SPELL_EFFECT_KNOCK_BACK_DEST)
     {
