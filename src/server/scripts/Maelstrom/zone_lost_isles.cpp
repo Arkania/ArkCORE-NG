@@ -502,7 +502,8 @@ public:
     {
         EVENT_CAST_BOMB = 901,
         EVENT_ROCKET_MONKEY,
-        EVENT_EXPLODE_BOMB,
+        EVENT_MONKEY_FALLING,
+        EVENT_MONKEY_DIE,
     };
 
     struct npc_bomb_throwing_monkey_34699AI : public ScriptedAI
@@ -513,6 +514,8 @@ public:
 
         void Reset()
         {
+            me->RemoveAura(29266);
+            me->RemoveFlag(UNIT_NPC_EMOTESTATE, EMOTE_STATE_SLEEP);
             m_events.RescheduleEvent(EVENT_CAST_BOMB, urand(30000, 45000));
         }
 
@@ -545,12 +548,19 @@ public:
                 case EVENT_ROCKET_MONKEY:
                 {
                     me->CastSpell(me, SPELL_EXPLODING_BANANAS, true);
-                    m_events.ScheduleEvent(EVENT_EXPLODE_BOMB, 8000);
+                    m_events.ScheduleEvent(EVENT_MONKEY_FALLING, 8000);
                     break;
                 }
-                case EVENT_EXPLODE_BOMB:
+                case EVENT_MONKEY_FALLING:
                 {
-                    me->DealDamage(me, 500);
+                    me->SetFlag(UNIT_NPC_EMOTESTATE, EMOTE_STATE_SLEEP);
+                    m_events.ScheduleEvent(EVENT_MONKEY_DIE, 2000);
+                    break;
+                }
+                case EVENT_MONKEY_DIE:
+                {
+                    me->AddAura(29266, me);
+                    me->DespawnOrUnsummon(15000);
                     break;
                 }
                 }
