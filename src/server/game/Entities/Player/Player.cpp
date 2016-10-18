@@ -15782,6 +15782,11 @@ void Player::PrepareGossipMenu(WorldObject* source, uint32 menuId /*= 0*/, bool 
     for (GossipMenuItemsContainer::const_iterator itr = menuItemBounds.first; itr != menuItemBounds.second; ++itr)
     {
         bool canTalk = true;
+        bool trainerFlag = false;
+
+        ConditionSourceInfo srcInfo = ConditionSourceInfo(this, source);
+        if (!itr->second.Conditions.empty())
+
         if (!sConditionMgr->IsObjectMeetToConditions(this, source, itr->second.Conditions))
             continue;
 
@@ -15837,14 +15842,13 @@ void Player::PrepareGossipMenu(WorldObject* source, uint32 menuId /*= 0*/, bool 
                 canTalk = false;
                 break;
             case GOSSIP_OPTION_TRAINER:
-                if (getClass() != creature->GetCreatureTemplate()->trainer_class && creature->GetCreatureTemplate()->trainer_type == TRAINER_TYPE_CLASS)
+                if (creature->GetCreatureTemplate()->trainer_type == TRAINER_TYPE_CLASS)
                 {
-                    TC_LOG_ERROR("sql.sql", "GOSSIP_OPTION_TRAINER:: Player %s (GUID: %u) request wrong gossip menu: %u with wrong class: %u at Creature: %s (Entry: %u, Trainer Class: %u)",
-                        GetName().c_str(), GetGUIDLow(), menu->GetGossipMenu().GetMenuId(), getClass(), creature->GetName().c_str(), creature->GetEntry(), creature->GetCreatureTemplate()->trainer_class);
-                    if (itr->first == 0)
+                    trainerFlag = true;
+                    if (getClass() != creature->GetCreatureTemplate()->trainer_class)
                         canTalk = false;
                 }
-                // no break;
+                break;
             case GOSSIP_OPTION_GOSSIP:
             case GOSSIP_OPTION_SPIRITGUIDE:
             case GOSSIP_OPTION_INNKEEPER:
@@ -15879,6 +15883,13 @@ void Player::PrepareGossipMenu(WorldObject* source, uint32 menuId /*= 0*/, bool 
 
         if (canTalk)
         {
+            if (trainerFlag)
+                if (Creature* creature = source->ToCreature())
+                    if (getClass() != creature->GetCreatureTemplate()->trainer_class)
+                        TC_LOG_ERROR("sql.sql", "GOSSIP_OPTION_TRAINER:: Player %s (GUID: %u) requested wrong gossip menu: %u with wrong class: %u at Creature: %s (Entry: %u, Trainer Class: %u)",
+                            GetName().c_str(), GUID_LOPART(GetGUID()), menu->GetGossipMenu().GetMenuId(), getClass(), creature->GetName().c_str(),
+                            creature->GetEntry(), creature->GetCreatureTemplate()->trainer_class);
+
             std::string strOptionText, strBoxText;
             BroadcastText const* optionBroadcastText = sObjectMgr->GetBroadcastText(itr->second.OptionBroadcastTextId);
             BroadcastText const* boxBroadcastText = sObjectMgr->GetBroadcastText(itr->second.BoxBroadcastTextId);
@@ -15945,9 +15956,8 @@ void Player::SendPreparedGossip(WorldObject* source)
     // (quest entries from quest menu will be included in list)
 
     uint32 textId = GetGossipTextId(source);
-    uint32 menuId = PlayerTalkClass->GetGossipMenu().GetMenuId();
 
-    if (menuId > 0)
+    if (uint32 menuId = PlayerTalkClass->GetGossipMenu().GetMenuId())
         textId = GetGossipTextId(menuId, source);
 
     PlayerTalkClass->SendGossipMenu(textId, source->GetGUID());
