@@ -579,6 +579,314 @@ public:
     }
 };
 
+// 35769
+class npc_foreman_dampwick_35769 : public CreatureScript
+{
+public:
+    npc_foreman_dampwick_35769() : CreatureScript("npc_foreman_dampwick_35769") { }
+
+    enum eNPC
+    {
+        SPELL_FRIGHTENED_MINER_CONTROLLER_AURA = 68062, // Trigger: spell 68059 Summon Frightened Miner 35813 
+    };
+
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) 
+    { 
+        switch (quest->GetQuestId())
+        {
+        case 14021:
+        {
+            creature->AI()->Talk(0, player);
+            player->CastSpell(player, SPELL_FRIGHTENED_MINER_CONTROLLER_AURA, true);
+            break;
+        }
+        case 14031:
+        {
+            player->CastSpell(player, 70661, true);
+            player->CastSpell(player, 70678, true);
+            player->CastSpell(player, 70680, true);
+            player->CastSpell(player, 70681, true);
+            break;
+        }
+        }
+        return false; 
+    }
+
+
+    };
+
+// 35813
+class npc_frightened_miner_35813 : public CreatureScript
+{
+public:
+    npc_frightened_miner_35813() : CreatureScript("npc_frightened_miner_35813") { }
+
+    enum eNPC
+    {
+        NPC_ORE_CART_35814 = 35814,
+        SPELL_SUMMON_ORE_CART = 68064,
+        SPELL_ORE_CART_TRANSFORM = 68065,
+        SPELL_ORE_CART_CHAIN = 68122,        
+        EVENT_SPAWN_POINT = 901,
+        EVENT_SPAWN_CHAIN,
+        EVENT_START_FOLLOWING,
+        EVENT_START_TO_NEXT_ORE,
+    };
+
+    struct npc_frightened_miner_35813AI : public ScriptedAI
+    {
+        npc_frightened_miner_35813AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap m_events;
+        uint64   m_playerGUID;
+        uint64   m_cartGUID;
+        uint64   m_dampwickGUID;
+        uint32   m_move;
+
+        void Reset() override
+        {
+            m_move = 0;
+            m_playerGUID = me->GetOwnerGUID();
+            m_dampwickGUID = 0;
+            me->SetWalk(true);
+            me->GetMotionMaster()->MovePoint(1001, 492.4184f, 2976.321f, 8.040207f);
+            m_events.RescheduleEvent(EVENT_SPAWN_POINT, 3000);
+            if (Creature* npc = me->FindNearestCreature(35769, 10.0f))
+                m_dampwickGUID = npc->GetGUID();
+        }
+
+        void JustSummoned(Creature* summon) override 
+        { 
+            m_cartGUID = summon->GetGUID();
+        }
+
+        void MovementInform(uint32 type, uint32 id) override
+        {
+            if (type == WAYPOINT_MOTION_TYPE && m_move == 1 && id == 3)
+            {
+                if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                    if (Creature* dampwick = ObjectAccessor::GetCreature(*me, m_dampwickGUID))
+                        if (Quest const* quest = sObjectMgr->GetQuestTemplate(14031))
+                        {
+                            player->AddQuest(quest, dampwick);
+                            m_events.ScheduleEvent(EVENT_START_TO_NEXT_ORE, 8000);
+                        }
+            }
+            else if (type == WAYPOINT_MOTION_TYPE && m_move == 2 && id == 5)
+            {
+                me->HandleEmote(EMOTE_STATE_WORK_MINING);
+                m_events.ScheduleEvent(EVENT_START_TO_NEXT_ORE, 5000);
+            }
+            else if (type == WAYPOINT_MOTION_TYPE && m_move == 3 && id == 4)
+            {
+                me->HandleEmote(EMOTE_STATE_WORK_MINING);
+                m_events.ScheduleEvent(EVENT_START_TO_NEXT_ORE, 5000);
+            }
+            else if (type == WAYPOINT_MOTION_TYPE && m_move == 4 && id == 6)
+            {
+                me->HandleEmote(EMOTE_STATE_WORK_MINING);
+                m_events.ScheduleEvent(EVENT_START_TO_NEXT_ORE, 5000);
+            }
+            else if (type == WAYPOINT_MOTION_TYPE && m_move == 5 && id == 4)
+            {
+                me->HandleEmote(EMOTE_STATE_WORK_MINING);
+                m_events.ScheduleEvent(EVENT_START_TO_NEXT_ORE, 5000);
+            }
+            else if (type == WAYPOINT_MOTION_TYPE && m_move == 6 && id == 15)
+                m_events.ScheduleEvent(EVENT_START_TO_NEXT_ORE, 1000);
+        }
+
+        void EnterEvadeMode() override { }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_SPAWN_POINT:
+                {
+                    me->CastSpell(me, SPELL_SUMMON_ORE_CART, true);
+                    m_events.ScheduleEvent(EVENT_SPAWN_CHAIN, 100);
+                    break;
+                }
+                case EVENT_SPAWN_CHAIN:
+                {
+                    if (Creature* car = ObjectAccessor::GetCreature(*me, m_cartGUID))
+                    {
+                        car->CastSpell(car, SPELL_ORE_CART_TRANSFORM, true);
+                        me->CastSpell(car, SPELL_ORE_CART_CHAIN, true);
+                        m_events.ScheduleEvent(EVENT_START_FOLLOWING, 100);
+                    }
+                    break;
+                }
+                case EVENT_START_FOLLOWING:
+                {
+                    if (Creature* car = ObjectAccessor::GetCreature(*me, m_cartGUID))
+                        if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        {
+                            Talk(0, player);
+                            m_move = 1;
+                            car->GetMotionMaster()->MoveFollow(me, 1.5f, 3.14f);
+                            me->GetMotionMaster()->MovePath(3581301, false);
+                        }
+                    break;
+                }
+                case EVENT_START_TO_NEXT_ORE:
+                {
+                    if (m_move < 6)
+                    {
+                        if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        {
+                            Talk(m_move, player);
+                            m_move += 1;
+                            me->HandleEmote(EMOTE_ONESHOT_NONE);
+                            me->GetMotionMaster()->MovePath(3581300 + m_move, false);
+                            if (m_move == 6)
+                                player->KilledMonsterCredit(35816);
+                        }
+                    }
+                    else
+                        me->DespawnOrUnsummon(10);
+                    break;
+                }
+                }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_frightened_miner_35813AI(creature);
+    }
+};
+
+// bunny 1-4
+class npc_capturing_the_unknown_bunny : public CreatureScript
+{
+public:
+    npc_capturing_the_unknown_bunny() : CreatureScript("npc_capturing_the_unknown_bunny") { }
+
+    enum eNPC
+    {
+        EVENT_CAST_SPELL = 901,
+    };
+
+    struct npc_capturing_the_unknown_bunnyAI : public ScriptedAI
+    {
+        npc_capturing_the_unknown_bunnyAI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+        EventMap m_events;
+        uint64   m_playerGUID;
+
+        void Initialize()
+        {
+            m_playerGUID=0;
+        }
+
+        void Reset() override
+        {
+        }
+
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
+        {
+            if (!m_playerGUID)
+            {
+                m_events.RescheduleEvent(EVENT_MASTER_RESET, 5000);
+                if (spell->Id == 68280)
+                {
+                    if (Player* player = caster->ToPlayer())
+                    {
+                        m_playerGUID = player->GetGUID();
+                        me->CastSpell(caster, 68279, true);
+                        m_events.RescheduleEvent(EVENT_CAST_SPELL, 400);
+                    }
+                }
+            }
+            else
+            {
+                switch (spell->Id)
+                {
+                case 68281:
+                {
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                    {
+                        player->CastSpell(player, 70641, true);
+                    }
+                    break;
+                }
+                case 68296:
+                {
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                    {
+                        player->RemoveAura(70649);
+                        switch (me->GetEntry())
+                        {
+                        case 37872:
+                            player->RemoveAura(70661);
+                            break;
+                        case 37895:
+                            player->RemoveAura(70678);
+                            break;
+                        case 37896:
+                            player->RemoveAura(70680);
+                            break;
+                        case 37897:
+                            player->RemoveAura(70681);
+                            break;
+                        }
+                        me->CastSpell(player, 68936, true);
+                        player->KilledMonsterCredit(me->GetEntry());
+                    }
+                    m_playerGUID = 0;
+                    break;
+                }
+                }
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_CAST_SPELL:
+                {
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                    {
+                        player->CastSpell(player, 70649, true);
+                        player->CastSpell(player, 70641, true);
+                        player->CastSpell(me, 68281, true);
+                    }
+                    break;
+                }
+                case EVENT_MASTER_RESET:
+                {
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        player->RemoveAura(70649);
+                    m_playerGUID = 0;
+                    break;
+                }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_capturing_the_unknown_bunnyAI(creature);
+    }
+};
 
 void AddSC_zone_lost_isles()
 {
@@ -588,5 +896,8 @@ void AddSC_zone_lost_isles()
     new npc_trade_prince_gallywix_35649();
     new npc_goblin_survivor_34748();
     new npc_bomb_throwing_monkey_34699();
+    new npc_foreman_dampwick_35769();
+    new npc_frightened_miner_35813();
+    new npc_capturing_the_unknown_bunny();
 
 }
