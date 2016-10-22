@@ -62,6 +62,7 @@ enum Zone_zone_lost_isles
     EVENT_TALK_PART_08,
     EVENT_TALK_PART_09,
     EVENT_TALK_PART_10,
+    EVENT_SHOW_FIGHT,
 };
 
 // 36608
@@ -888,6 +889,411 @@ public:
     }
 };
 
+// 35894
+class npc_orc_scout_35894 : public CreatureScript
+{
+public:
+    npc_orc_scout_35894() : CreatureScript("npc_orc_scout_35894") { }
+
+    enum eNPC
+    {
+    };
+
+    struct npc_orc_scout_35894AI : public ScriptedAI
+    {
+        npc_orc_scout_35894AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+        EventMap  m_events;
+        Creature* m_target;
+
+        void Initialize()
+        {
+            m_target=nullptr;
+        }
+
+        void Reset() override
+        {
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+            me->SetReactState(REACT_PASSIVE);
+            m_events.RescheduleEvent(EVENT_SHOW_FIGHT, urand(20000, 60000));
+        }
+
+        void EnterCombat(Unit* victim) override 
+        { 
+            if (victim->GetEntry() == 35896 || victim->GetEntry() == 35897)
+                me->SetReactState(REACT_PASSIVE);
+        }
+
+        void DamageTaken(Unit* attacker, uint32& damage) override
+        {
+            if (attacker->GetEntry() == 35896 || attacker->GetEntry() == 35897)
+                damage = 0;
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_SHOW_FIGHT:
+                {
+                    FillTargetList();
+                    if (m_target)
+                        me->CastSpell(m_target, 15620);
+
+                    m_events.ScheduleEvent(EVENT_SHOW_FIGHT, urand(20000, 60000));
+                    break;
+                }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+
+        void FillTargetList()
+        {
+            m_target=nullptr;
+            std::list<Creature*> tList = me->FindNearestCreatures(RAND(35896, 35897, 35995), 25.0f);
+            if (tList.size() > 0)
+            {
+                uint32 rol = urand(0, tList.size() - 1);
+                std::list<Creature*>::const_iterator itr = tList.begin();
+                std::advance(itr, rol);
+                m_target = (*itr);
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_orc_scout_35894AI(creature);
+    }
+};
+
+// 35893
+class npc_kilag_gorefang_35893 : public CreatureScript
+{
+public:
+    npc_kilag_gorefang_35893() : CreatureScript("npc_kilag_gorefang_35893") { }
+
+    enum eNPC
+    {
+    };
+
+    struct npc_kilag_gorefang_35893AI : public ScriptedAI
+    {
+        npc_kilag_gorefang_35893AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+        EventMap  m_events;
+        Creature* m_target;
+
+        void Initialize()
+        {
+            m_target = nullptr;
+        }
+
+        void Reset() override
+        {
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+            me->SetReactState(REACT_PASSIVE);
+            m_events.RescheduleEvent(EVENT_SHOW_FIGHT, urand(20000, 60000));
+        }
+
+        void EnterCombat(Unit* victim) override
+        {
+            if (victim->GetEntry() == 35896 || victim->GetEntry() == 35897)
+                me->SetReactState(REACT_PASSIVE);
+        }
+
+        void DamageTaken(Unit* attacker, uint32& damage) override
+        {
+            if (attacker->GetEntry() == 35896 || attacker->GetEntry() == 35897)
+                damage = 0;
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_SHOW_FIGHT:
+                {
+                    FillTargetList();
+                    if (m_target)
+                        me->CastSpell(m_target, 15620);
+
+                    m_events.ScheduleEvent(EVENT_SHOW_FIGHT, urand(20000, 60000));
+                    break;
+                }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+
+        void FillTargetList()
+        {
+            m_target = nullptr;
+            std::list<Creature*> tList = me->FindNearestCreatures(RAND(35896, 35897, 35995), 25.0f);
+            if (tList.size() > 0)
+            {
+                uint32 rol = urand(0, tList.size() - 1);
+                std::list<Creature*>::const_iterator itr = tList.begin();
+                std::advance(itr, rol);
+                m_target = (*itr);
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_kilag_gorefang_35893AI(creature);
+    }
+};
+
+// 35896
+class npc_poison_spitter_35896 : public CreatureScript
+{
+public:
+    npc_poison_spitter_35896() : CreatureScript("npc_poison_spitter_35896") { }
+
+    enum eNPC
+    {
+    };
+
+    struct npc_poison_spitter_35896AI : public ScriptedAI
+    {
+        npc_poison_spitter_35896AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+        EventMap  m_events;
+        Creature* m_target;
+
+        void Initialize()
+        {
+            m_target = nullptr;
+        }
+
+        void Reset() override
+        {
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+            me->SetReactState(REACT_PASSIVE);
+            m_events.RescheduleEvent(EVENT_SHOW_FIGHT, urand(20000, 120000));
+        }
+
+        void EnterCombat(Unit* victim) override
+        {
+            if (victim->GetEntry() == 35893 || victim->GetEntry() == 35894)
+                me->SetReactState(REACT_PASSIVE);
+        }
+
+        void DamageTaken(Unit* attacker, uint32& damage) override
+        {
+            if (attacker->GetEntry() == 35893 || attacker->GetEntry() == 35894)
+                damage = 0;
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_SHOW_FIGHT:
+                {
+                    FillTargetList();
+                    if (m_target)
+                        me->CastSpell(m_target, RAND(68207, 68208));
+
+                    m_events.ScheduleEvent(EVENT_SHOW_FIGHT, urand(40000, 180000));
+                    break;
+                }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+
+        void FillTargetList()
+        {
+            m_target = nullptr;
+            std::list<Creature*> tList = me->FindNearestCreatures(RAND(35893, 35894), 25.0f);
+            if (tList.size() > 0)
+            {
+                uint32 rol = urand(0, tList.size() - 1);
+                std::list<Creature*>::const_iterator itr = tList.begin();
+                std::advance(itr, rol);
+                m_target = (*itr);
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_poison_spitter_35896AI(creature);
+    }
+};
+
+// 35897
+class npc_freezya_35897 : public CreatureScript
+{
+public:
+    npc_freezya_35897() : CreatureScript("npc_freezya_35897") { }
+
+    enum eNPC
+    {
+    };
+
+    struct npc_freezya_35897AI : public ScriptedAI
+    {
+        npc_freezya_35897AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+        EventMap  m_events;
+        Creature* m_target;
+
+        void Initialize()
+        {
+            m_target = nullptr;
+        }
+
+        void Reset() override
+        {
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+            me->SetReactState(REACT_PASSIVE);
+            m_events.RescheduleEvent(EVENT_SHOW_FIGHT, urand(20000, 120000));
+        }
+
+        void EnterCombat(Unit* victim) override
+        {
+            if (victim->GetEntry() == 35893 || victim->GetEntry() == 35894)
+                me->SetReactState(REACT_PASSIVE);
+        }
+
+        void DamageTaken(Unit* attacker, uint32& damage) override 
+        { 
+            if (attacker->GetEntry() == 35893 || attacker->GetEntry() == 35894)
+                damage=0;
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_SHOW_FIGHT:
+                {
+                    FillTargetList();
+                    if (m_target)
+                        me->CastSpell(m_target, 68209);
+
+                    m_events.ScheduleEvent(EVENT_SHOW_FIGHT, urand(40000, 180000));
+                    break;
+                }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+
+        void FillTargetList()
+        {
+            m_target = nullptr;
+            std::list<Creature*> tList = me->FindNearestCreatures(RAND(35893, 35894), 25.0f);
+            if (tList.size() > 0)
+            {
+                uint32 rol = urand(0, tList.size() - 1);
+                std::list<Creature*>::const_iterator itr = tList.begin();
+                std::advance(itr, rol);
+                m_target = (*itr);
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_freezya_35897AI(creature);
+    }
+};
+
+// 35995
+class npc_strangle_vine_35995 : public CreatureScript
+{
+public:
+    npc_strangle_vine_35995() : CreatureScript("npc_strangle_vine_35995") { }
+
+    enum eNPC
+    {
+    };
+
+    struct npc_strangle_vine_35995AI : public ScriptedAI
+    {
+        npc_strangle_vine_35995AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+        EventMap  m_events;
+
+        void Initialize()
+        {
+        }
+
+        void Reset() override
+        {
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+            me->SetReactState(REACT_PASSIVE);
+        }
+
+        void DamageTaken(Unit* attacker, uint32& damage) override 
+        { 
+            if (Player* player = attacker->ToPlayer())
+                me->CastSpell(me, 60603);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_strangle_vine_35995AI(creature);
+    }
+};
+
+
 void AddSC_zone_lost_isles()
 {
     new npc_doc_zapnozzle_36608();
@@ -899,5 +1305,10 @@ void AddSC_zone_lost_isles()
     new npc_foreman_dampwick_35769();
     new npc_frightened_miner_35813();
     new npc_capturing_the_unknown_bunny();
+    new npc_orc_scout_35894();
+    new npc_kilag_gorefang_35893();
+    new npc_poison_spitter_35896();
+    new npc_freezya_35897();
+    new npc_strangle_vine_35995();
 
 }
