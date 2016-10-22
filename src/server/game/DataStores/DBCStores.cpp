@@ -1317,7 +1317,7 @@ uint32 GetDefaultMapLight(uint32 mapId)
     return 0;
 }
 
-std::set<uint16> const& GetPhasesForGroup(uint16 group)
+std::set<uint16> const& GetXPhasesForGroup(uint16 group)
 {
     return sPhasesByGroup[group];
 }

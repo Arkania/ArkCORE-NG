@@ -170,7 +170,7 @@ struct GameObjectTemplate
         struct
         {
             uint32 lockId;                                  //0 -> Lock.dbc
-            int32 questId;                                  //1
+            int32  questId;                                 //1
             uint32 eventId;                                 //2
             uint32 autoCloseTime;                           //3
             uint32 customAnim;                              //4
@@ -190,6 +190,11 @@ struct GameObjectTemplate
             uint32 floatingTooltip;                         //18
             uint32 gossipID;                                //19
             uint32 WorldStateSetsState;                     //20
+            int32  unk21;                                   //21 unknown data found in sniff
+            int32  unk22;                                   //22 unknown data found in sniff
+            int32  unk23;                                   //23 unknown data found in sniff
+            int32  questId_male;                            //24 creates only glitter, for gender quest 
+            int32  questId_female;                          //25 creates only glitter, for gender quest
         } goober;
         //11 GAMEOBJECT_TYPE_TRANSPORT
         struct
@@ -591,11 +596,13 @@ enum GOState
 // from `gameobject`
 struct GameObjectData
 {
-    explicit GameObjectData() : id(0), mapid(0), phaseMask(0), posX(0.0f), posY(0.0f), posZ(0.0f), orientation(0.0f),
+    explicit GameObjectData() : id(0), mapid(0), zoneId(0), areaId(0), phaseMask(0), posX(0.0f), posY(0.0f), posZ(0.0f), orientation(0.0f),
                                 rotation0(0.0f), rotation1(0.0f), rotation2(0.0f), rotation3(0.0f), spawntimesecs(0),
                                 animprogress(0), go_state(GO_STATE_ACTIVE), spawnMask(0), artKit(0), dbData(true) { }
     uint32 id;                                              // entry in gamobject_template
     uint16 mapid;
+    uint16 zoneId;
+    uint16 areaId;
     uint32 phaseMask;
     float posX;
     float posY;
@@ -611,7 +618,6 @@ struct GameObjectData
     uint8 spawnMask;
     uint8 artKit;
     std::set<uint16> phaseIds;
-    std::set<uint16> phaseGroups;
     bool dbData;
 };
 
@@ -664,9 +670,10 @@ class GameObject : public WorldObject, public GridObject<GameObject>, public Map
         std::string const& GetNameForLocaleIdx(LocaleConstant locale_idx) const;
 
         void SaveToDB();
-        void SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask);
+        void SaveToDB(uint32 mapid, GameObjectData const* tmpData);
         bool LoadFromDB(uint32 guid, Map* map) { return LoadGameObjectFromDB(guid, map, false); }
         bool LoadGameObjectFromDB(uint32 guid, Map* map, bool addToMap = true);
+        void SetPhaseBaseValues(const GameObjectData * data);
         void DeleteFromDB();
 
         void SetOwnerGUID(uint64 owner)

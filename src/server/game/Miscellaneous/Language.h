@@ -211,9 +211,11 @@ enum TrinityStrings
     LANG_PHASING_FAILED                 = 179,
     LANG_PHASING_LAST_PHASE             = 180,
     LANG_PHASING_LIST                   = 181,
-    LANG_PHASING_PHASEMASK              = 182,
+    LANG_PHASING_PHASEID                = 182,
     LANG_PHASING_REPORT_STATUS          = 183,
-    LANG_PHASING_NO_DEFINITIONS         = 184,              // Phasing
+    LANG_PHASING_NO_DEFINITIONS         = 184,
+    LANG_CURRENT_FOCUS                  = 185,
+    LANG_PHASING_INVALID_VALUE          = 186,
     // Room for more level 1              185-199 not used
 
     // level 2 chat

@@ -1269,24 +1269,40 @@ public:
         return true;
     }
 
-    //set temporary phase mask for player
+    //set temporary #phaseId for selected object / self
     static bool HandleModifyPhaseCommand(ChatHandler* handler, const char* args)
     {
         if (!*args)
             return false;
 
-        uint32 phasemask = (uint32)atoi((char*)args);
+        Tokenizer tokens(std::string(args), ' ');
+        if (tokens.size() < 1)
+        {
+            handler->PSendSysMessage(LANG_IMPROPER_VALUE, 0);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        std::list<uint16> phaseIds;
+
+        for (uint32 i = 0; i < tokens.size(); i++)
+            if (atoi(tokens[i]))
+                phaseIds.push_back(atoi(tokens[i]));
+
+        if (phaseIds.empty())
+        {
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
 
         Unit* target = handler->getSelectedUnit();
-        if (target)
-        {
-            if (target->GetTypeId() == TYPEID_PLAYER)
-                target->ToPlayer()->SetCustomPhase(phasemask);
-            else
-                target->SetPhaseMask(phasemask, true);
-        }
-        else
-            handler->GetSession()->GetPlayer()->SetCustomPhase(phasemask);
+        if (!target)
+            target = handler->GetSession()->GetPlayer();
+
+        target->ClearAllPhases(false);
+        for (auto ph : phaseIds)
+            target->SetInPhase(ph, true, true);
 
         return true;
     }

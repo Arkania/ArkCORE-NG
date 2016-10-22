@@ -1476,9 +1476,6 @@ void World::SetInitialWorldSettings()
     TC_LOG_INFO("server.loading", "Loading Spell Group Stack Rules...");
     sSpellMgr->LoadSpellGroupStackRules();
 
-    TC_LOG_INFO("server.loading", "Loading Spell Phase Dbc Info...");
-    sObjectMgr->LoadSpellPhaseInfo();
-
     TC_LOG_INFO("server.loading", "Loading NPC Texts...");
     sObjectMgr->LoadGossipText();
 
@@ -1497,7 +1494,7 @@ void World::SetInitialWorldSettings()
     TC_LOG_INFO("server.loading", "Loading Item set names...");                // must be after LoadItemPrototypes
     sObjectMgr->LoadItemTemplateAddon();
 
-    TC_LOG_INFO("misc", "Loading Item Scripts...");                 // must be after LoadItemPrototypes
+    TC_LOG_INFO("misc", "Loading Item Scripts...");                            // must be after LoadItemPrototypes
     sObjectMgr->LoadItemScriptNames();
 
     TC_LOG_INFO("server.loading", "Loading Creature Model Based Info Data...");
@@ -1739,10 +1736,10 @@ void World::SetInitialWorldSettings()
     LoadWorldStates();
 
     TC_LOG_INFO("server.loading", "Loading Phase definitions...");
-    sObjectMgr->LoadPhaseDefinitions();
+    sObjectMgr->LoadPhaseAreaDefinitions();
 
     TC_LOG_INFO("server.loading", "Loading Phase Areas...");
-    sObjectMgr->LoadPhaseArea();
+    sObjectMgr->LoadPhaseAreaSelector();
 
     TC_LOG_INFO("server.loading", "Loading Conditions...");
     sConditionMgr->LoadConditions();
@@ -3325,7 +3322,7 @@ void World::UpdatePhaseDefinitions()
     SessionMap::const_iterator itr;
     for (itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
         if (itr->second && itr->second->GetPlayer() && itr->second->GetPlayer()->IsInWorld())
-            itr->second->GetPlayer()->NotifyStoresReloaded();
+            itr->second->GetPlayer()->UpdatePhaseForQuestAreaOrZoneChange();
 }
 
 void World::ReloadRBAC()

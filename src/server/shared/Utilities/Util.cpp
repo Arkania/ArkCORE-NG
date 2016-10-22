@@ -526,7 +526,8 @@ std::set<uint32> GetUIntegerList(std::string storedString)
     {
         i=0;
         data >> i;
-        if (i) r.insert(i);
+        if (i) 
+            r.insert(i);
     } while (i);
     return r;
 }
@@ -534,9 +535,9 @@ std::set<uint32> GetUIntegerList(std::string storedString)
 std::string GetUIntegerString(std::set<uint32> uint32List)
 {
     std::ostringstream ss;
-    ss << uint32List.size() << ' ';
     for (uint16 i : uint32List)
-        ss << i << ' ';
+        if (i)
+            ss << i << ' ';
     return ss.str();
 }
 
@@ -553,7 +554,8 @@ std::set<uint16> GetUInt16List(std::string storedString)
     {
         i = 0;
         data >> i;
-        if (i) r.insert(i);
+        if (i) 
+            r.insert(i);
     } while (i);
     return r;
 }
@@ -561,10 +563,104 @@ std::set<uint16> GetUInt16List(std::string storedString)
 std::string GetUInt16String(std::set<uint16> uint16List)
 {
     std::ostringstream ss;
-    ss << uint16List.size() << ' ';
     for (uint16 i : uint16List)
-        ss << i << ' ';
+        if (i)
+            ss << i << ' ';
     return ss.str();
 }
+
+std::set<uint16> CopyUInt16List(std::set<uint16> original)
+{
+    std::set<uint16> r;
+    for (auto value : original)
+        if (value)
+            r.insert(value);
+    return r;
+}
+
+uint64 ComputePhaseIdToMask(uint16 id)
+{
+    if (id >= 169 && id <= 201)
+        return (uint64(1) << (id - 169));
+    else
+        switch (id)
+        {
+        case 223:
+            return (uint64(1) << uint64(33));
+        case 224:
+            return (uint64(1) << uint64(34));
+        case 309:
+            return (uint64(1) << uint64(35));
+        case 311:
+            return (uint64(1) << uint64(36));
+        case 313:
+            return (uint64(1) << uint64(37));
+        case 315:
+            return (uint64(1) << uint64(38));
+        case 318:
+            return (uint64(1) << uint64(39));
+        case 319:
+            return (uint64(1) << uint64(40));
+        case 320:
+            return (uint64(1) << uint64(41));
+        case 321:
+            return (uint64(1) << uint64(42));
+        case 322:
+            return (uint64(1) << uint64(43));
+        case 324:
+            return (uint64(1) << uint64(44));
+        case 325:
+            return (uint64(1) << uint64(45));
+        case 328:
+            return (uint64(1) << uint64(46));
+        case 332:
+            return (uint64(1) << uint64(47));
+        case 333:
+            return (uint64(1) << uint64(48));
+        case 334:
+            return (uint64(1) << uint64(49));
+        case 335:
+            return (uint64(1) << uint64(50));
+        case 337:
+            return (uint64(1) << uint64(51));
+        case 347:
+            return (uint64(1) << uint64(52));
+        case 351:
+            return (uint64(1) << uint64(53));
+        case 352:
+            return (uint64(1) << uint64(54));
+        case 353:
+            return (uint64(1) << uint64(55));
+        case 358:
+            return (uint64(1) << uint64(56));
+        case 359:
+            return (uint64(1) << uint64(57));
+        case 360:
+            return (uint64(1) << uint64(58));
+        case 361:
+            return (uint64(1) << uint64(59));
+        case 362:
+            return (uint64(1) << uint64(60));
+        case 366:
+            return (uint64(1) << uint64(61));
+        case 368:
+            return (uint64(1) << uint64(62));
+        case 371:
+            return (uint64(1) << uint64(63));
+        default:
+            return 1;
+        }
+
+}
+
+char* GetCopyOfChars(const char * source)
+{
+    const size_t len = strlen(source);
+    char * tmp_source = new char[len + 1];
+    strncpy(tmp_source, source, len);
+    tmp_source[len] = '\0'; // I'm paranoid, maybe someone has changed something in _filename :-)
+    return tmp_source;
+}
+
 
 

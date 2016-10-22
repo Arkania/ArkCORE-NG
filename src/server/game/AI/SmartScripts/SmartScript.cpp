@@ -1084,9 +1084,9 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
         {
             if (IsUnit(*itr))
-                (*itr)->ToUnit()->SetPhaseMask(e.action.ingamePhaseMask.mask, true);
+                (*itr)->ToUnit()->SetPhaseMask(e.action.ingamePhaseMask.mask, true); // ToDo: gpn39f
             else if (IsGameObject(*itr))
-                (*itr)->ToGameObject()->SetPhaseMask(e.action.ingamePhaseMask.mask, true);
+                (*itr)->ToGameObject()->SetPhaseMask(e.action.ingamePhaseMask.mask, true); // ToDo: gpn39f
         }
 
         delete targets;

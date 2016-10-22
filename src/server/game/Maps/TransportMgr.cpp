@@ -349,7 +349,7 @@ void TransportMgr::AddPathNodeToTransport(uint32 transportEntry, uint32 timeSeg,
     animNode.Path[timeSeg] = node;
 }
 
-Transport* TransportMgr::CreateTransport(uint32 entry, uint32 guid /*= 0*/, Map* map /*= NULL*/, uint32 phaseid /*= 0*/, uint32 phasegroup /*= 0*/)
+Transport* TransportMgr::CreateTransport(uint32 entry, uint32 guid /*= 0*/, Map* map /*= NULL*/, uint32 phaseid /*= 0*/)
 {
     // instance case, execute GetGameObjectEntry hook
     if (map)
@@ -391,10 +391,6 @@ Transport* TransportMgr::CreateTransport(uint32 entry, uint32 guid /*= 0*/, Map*
 
     if (phaseid)
         trans->SetInPhase(phaseid, false, true);
-
-    if (phasegroup)
-        for (auto ph : GetPhasesForGroup(phasegroup))
-            trans->SetInPhase(ph, false, true);
 
     if (MapEntry const* mapEntry = sMapStore.LookupEntry(mapId))
     {

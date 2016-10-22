@@ -48,9 +48,9 @@ public:
         };
         static ChatCommand gobjectSetCommandTable[] =
         {
-            { "phase", rbac::RBAC_PERM_COMMAND_GOBJECT_SET_PHASE, false, &HandleGameObjectSetPhaseCommand,  "", NULL },
-            { "state", rbac::RBAC_PERM_COMMAND_GOBJECT_SET_STATE, false, &HandleGameObjectSetStateCommand,  "", NULL },
-            { NULL,    0,                                   false, NULL,                              "", NULL }
+            { "phase",       rbac::RBAC_PERM_COMMAND_GOBJECT_SET_PHASE, false, &HandleGameObjectSetPhaseIdCommand,  "", NULL },
+            { "state",       rbac::RBAC_PERM_COMMAND_GOBJECT_SET_STATE, false, &HandleGameObjectSetStateCommand,    "", NULL },
+            { NULL,          0,                                         false, NULL,                                "", NULL }
         };
         static ChatCommand gobjectCommandTable[] =
         {
@@ -153,7 +153,7 @@ public:
         GameObject* object = new GameObject;
         uint32 guidLow = sObjectMgr->GenerateLowGuid(HIGHGUID_GAMEOBJECT);
 
-        if (!object->Create(guidLow, objectInfo->entry, map, player->GetPhaseMaskForSpawn(), x, y, z, o, 0.0f, 0.0f, 0.0f, 0.0f, 0, GO_STATE_READY))
+        if (!object->Create(guidLow, objectInfo->entry, map, 0, x, y, z, o, 0.0f, 0.0f, 0.0f, 0.0f, 0, GO_STATE_READY))
         {
             delete object;
             return false;
@@ -166,7 +166,12 @@ public:
         }
 
         // fill the gameobject data and save to the db
-        object->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()), player->GetPhaseMaskForSpawn());
+        GameObjectData* tmpData = &sObjectMgr->NewGOData(guidLow);
+        tmpData->id = object->GetEntry();
+        tmpData->spawnMask = (1 << map->GetSpawnMode());
+        tmpData->phaseMask = player->GetPhaseMask();
+        tmpData->phaseIds = player->GetPhaseIds();
+        object->SaveToDB(map->GetId(), tmpData);
         // delete the old object and do a clean load from DB with a fresh new GameObject instance.
         // this is required to avoid weird behavior and memory leaks
         delete object;
@@ -242,14 +247,14 @@ public:
             uint32 objectId = atoul(id);
 
             if (objectId)
-                result = WorldDatabase.PQuery("SELECT guid, id, position_x, position_y, position_z, orientation, map, phaseMask, (POW(position_x - '%f', 2) + POW(position_y - '%f', 2) + POW(position_z - '%f', 2)) AS order_ FROM gameobject WHERE map = '%i' AND id = '%u' ORDER BY order_ ASC LIMIT 1",
+                result = WorldDatabase.PQuery("SELECT guid, id, position_x, position_y, position_z, orientation, map, phaseIds, (POW(position_x - '%f', 2) + POW(position_y - '%f', 2) + POW(position_z - '%f', 2)) AS order_ FROM gameobject WHERE map = '%i' AND id = '%u' ORDER BY order_ ASC LIMIT 1",
                 player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetMapId(), objectId);
             else
             {
                 std::string name = id;
                 WorldDatabase.EscapeString(name);
                 result = WorldDatabase.PQuery(
-                    "SELECT guid, id, position_x, position_y, position_z, orientation, map, phaseMask, (POW(position_x - %f, 2) + POW(position_y - %f, 2) + POW(position_z - %f, 2)) AS order_ "
+                    "SELECT guid, id, position_x, position_y, position_z, orientation, map, phaseIds, (POW(position_x - %f, 2) + POW(position_y - %f, 2) + POW(position_z - %f, 2)) AS order_ "
                     "FROM gameobject, gameobject_template WHERE gameobject_template.entry = gameobject.id AND map = %i AND name " _LIKE_ " " _CONCAT3_ ("'%%'", "'%s'", "'%%'")" ORDER BY order_ ASC LIMIT 1",
                     player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetMapId(), name.c_str());
             }
@@ -276,7 +281,7 @@ public:
             else
                 eventFilter << ')';
 
-            result = WorldDatabase.PQuery("SELECT gameobject.guid, id, position_x, position_y, position_z, orientation, map, phaseMask, "
+            result = WorldDatabase.PQuery("SELECT gameobject.guid, id, position_x, position_y, position_z, orientation, map, phaseIds, "
                 "(POW(position_x - %f, 2) + POW(position_y - %f, 2) + POW(position_z - %f, 2)) AS order_ FROM gameobject "
                 "LEFT OUTER JOIN game_event_gameobject on gameobject.guid = game_event_gameobject.guid WHERE map = '%i' %s ORDER BY order_ ASC LIMIT 10",
                 handler->GetSession()->GetPlayer()->GetPositionX(), handler->GetSession()->GetPlayer()->GetPositionY(), handler->GetSession()->GetPlayer()->GetPositionZ(),
@@ -291,10 +296,10 @@ public:
 
         bool found = false;
         float x, y, z, o;
-        uint32 guidLow, id, phase;
+        uint32 guidLow, id;
         uint16 mapId;
         uint32 poolId;
-
+        std::set<uint16> phaseIds;
         do
         {
             Field* fields = result->Fetch();
@@ -305,7 +310,8 @@ public:
             z =       fields[4].GetFloat();
             o =       fields[5].GetFloat();
             mapId =   fields[6].GetUInt16();
-            phase =   fields[7].GetUInt32();
+            phaseIds = GetUInt16List(fields[7].GetCString());
+
             poolId =  sPoolMgr->IsPartOfAPool<GameObject>(guidLow);
             if (!poolId || sPoolMgr->IsSpawnedObject<GameObject>(guidLow))
                 found = true;
@@ -327,7 +333,7 @@ public:
 
         GameObject* target = handler->GetSession()->GetPlayer()->GetMap()->GetGameObject(MAKE_NEW_GUID(guidLow, id, HIGHGUID_GAMEOBJECT));
 
-        handler->PSendSysMessage(LANG_GAMEOBJECT_DETAIL, guidLow, objectInfo->name.c_str(), guidLow, id, x, y, z, mapId, o, phase);
+        handler->PSendSysMessage(LANG_GAMEOBJECT_DETAIL, guidLow, objectInfo->name.c_str(), guidLow, id, x, y, z, mapId, o, GetUInt16String(phaseIds).c_str());
 
         if (target)
         {
@@ -505,41 +511,54 @@ public:
         return true;
     }
 
-    //set phasemask for selected object
-    static bool HandleGameObjectSetPhaseCommand(ChatHandler* handler, char const* args)
+    //set phaseIds for selected object
+    static bool HandleGameObjectSetPhaseIdCommand(ChatHandler* handler, char const* args)
     {
+        Tokenizer tokens(std::string(args), ' ');
+        if (tokens.size() < 2)
+        {
+            handler->PSendSysMessage(LANG_IMPROPER_VALUE, 0);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
         // number or [name] Shift-click form |color|Hgameobject:go_id|h[name]|h|r
-        char* id = handler->extractKeyFromLink((char*)args, "Hgameobject");
-        if (!id)
-            return false;
+        char* idGuid = handler->extractKeyFromLink(GetCopyOfChars(tokens[0]), "Hgameobject");
 
-        uint32 guidLow = atoi(id);
-        if (!guidLow)
-            return false;
+        uint32 objectGuid = 0;
+        std::list<uint16> phaseIds;
 
+        if (idGuid && atoi(idGuid))
+            objectGuid = atoi(idGuid);
+        if (atoi(tokens[0]) && !objectGuid)
+            objectGuid = atoi(tokens[0]);
+        for (uint32 i = 1; i < tokens.size(); i++)
+            if (atoi(tokens[i]))
+                phaseIds.push_back(atoi(tokens[i]));
+
+        GameObjectData const* gameObjectData = nullptr;
         GameObject* object = nullptr;
 
         // by DB guid
-        if (GameObjectData const* gameObjectData = sObjectMgr->GetGOData(guidLow))
-            object = handler->GetObjectGlobalyWithGuidOrNearWithDbGuid(guidLow, gameObjectData->id);
+        if (gameObjectData = sObjectMgr->GetGOData(objectGuid))
+            if (!(object = handler->GetObjectGlobalyWithGuidOrNearWithDbGuid(objectGuid, gameObjectData->id)))
+            {
+                handler->PSendSysMessage(LANG_COMMAND_OBJNOTFOUND, objectGuid);
+                handler->SetSentErrorMessage(true);
+                return false;
+            }
 
-        if (!object)
+        if (phaseIds.empty())
         {
-            handler->PSendSysMessage(LANG_COMMAND_OBJNOTFOUND, guidLow);
+            handler->PSendSysMessage(LANG_PHASING_INVALID_VALUE, 0);
             handler->SetSentErrorMessage(true);
             return false;
         }
 
-        char* phase = strtok (NULL, " ");
-        uint32 phaseMask = phase ? atoi(phase) : 0;
-        if (phaseMask == 0)
-        {
-            handler->SendSysMessage(LANG_BAD_VALUE);
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-
-        object->SetPhaseMask(phaseMask, true);
+        object->ClearAllPhases(false);
+        for (auto ph : phaseIds)
+           object->AddPhaseId(ph, true);
+       
         object->SaveToDB();
         return true;
     }

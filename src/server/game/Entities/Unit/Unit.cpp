@@ -480,7 +480,7 @@ float Unit::GetMeleeReach() const
 
 bool Unit::IsWithinCombatRange(const Unit* obj, float dist2compare) const
 {
-    if (!obj || !IsInMap(obj) || !InSamePhase(obj))
+    if (!obj || !IsInMap(obj) || !IsInPhase(obj))
         return false;
 
     float dx = GetPositionX() - obj->GetPositionX();
@@ -496,7 +496,7 @@ bool Unit::IsWithinCombatRange(const Unit* obj, float dist2compare) const
 
 bool Unit::IsWithinMeleeRange(const Unit* obj, float dist) const
 {
-    if (!obj || !IsInMap(obj) || !InSamePhase(obj))
+    if (!obj || !IsInMap(obj) || !IsInPhase(obj))
         return false;
 
     float dx = GetPositionX() - obj->GetPositionX();
@@ -512,7 +512,7 @@ bool Unit::IsWithinMeleeRange(const Unit* obj, float dist) const
 
 bool Unit::IsWithinBoundaryRadius(const Unit* obj) const
 {
-    if (!obj || !IsInMap(obj) || !InSamePhase(obj))
+    if (!obj || !IsInMap(obj) || !IsInPhase(obj))
         return false;
 
     float objBoundaryRadius = std::max(obj->GetBoundaryRadius(), MIN_MELEE_REACH);
@@ -3868,7 +3868,7 @@ void Unit::RemoveAurasWithAttribute(uint32 flags)
     }
 }
 
-void Unit::RemoveNotOwnSingleTargetAuras(uint32 newPhase) // later with flag as phaseId??
+void Unit::RemoveNotOwnSingleTargetAuras(uint32 newPhase, bool phaseid) 
 {
     // single target auras from other casters
     for (AuraApplicationMap::iterator iter = m_appliedAuras.begin(); iter != m_appliedAuras.end();)
@@ -3878,12 +3878,12 @@ void Unit::RemoveNotOwnSingleTargetAuras(uint32 newPhase) // later with flag as 
 
         if (aura->GetCasterGUID() != GetGUID() && aura->GetSpellInfo()->IsSingleTarget())
         {
-            if (!newPhase)
+            if (!newPhase && !phaseid)
                 RemoveAura(iter);
             else
             {
                 Unit* caster = aura->GetCaster();
-                if (!caster || !caster->InSamePhase(newPhase))
+                if (!caster || (newPhase && !caster->IsInPhase(newPhase)) || (!newPhase && !caster->IsInPhase(this)))
                     RemoveAura(iter);               
                 else
                     ++iter;
@@ -3898,7 +3898,7 @@ void Unit::RemoveNotOwnSingleTargetAuras(uint32 newPhase) // later with flag as 
     for (AuraList::iterator iter = scAuras.begin(); iter != scAuras.end();)
     {
         Aura* aura = *iter;
-        if (aura->GetUnitOwner() != this && !aura->GetUnitOwner()->InSamePhase(newPhase))
+        if (aura->GetUnitOwner() != this && !aura->GetUnitOwner()->IsInPhase(newPhase))
         {
             aura->Remove();
             iter = scAuras.begin();
@@ -13652,9 +13652,7 @@ int32 Unit::GetCreatePowers(Powers power) const
 void Unit::AddToWorld()
 {
     if (!IsInWorld())
-    {
         WorldObject::AddToWorld();
-    }
 }
 
 void Unit::RemoveFromWorld()
@@ -15941,7 +15939,8 @@ void Unit::SetFeared(bool apply)
     }
 
     if (Player* player = ToPlayer())
-        player->SetClientControl(this, !apply);
+        if (!player->HasUnitState(UNIT_STATE_POSSESSED))
+            player->SetClientControl(this, !apply);
 }
 
 void Unit::SetConfused(bool apply)
@@ -15963,7 +15962,8 @@ void Unit::SetConfused(bool apply)
     }
 
     if (Player* player = ToPlayer())
-        player->SetClientControl(this, !apply);
+        if (!player->HasUnitState(UNIT_STATE_POSSESSED))
+            player->SetClientControl(this, !apply);
 }
 
 bool Unit::SetCharmedBy(Unit* charmer, CharmType type, AuraApplication const* aurApp)
@@ -16048,11 +16048,17 @@ bool Unit::SetCharmedBy(Unit* charmer, CharmType type, AuraApplication const* au
         ToCreature()->AI()->OnCharmed(true);
         GetMotionMaster()->MoveIdle();
     }
-    else
+    else if (Player* player = ToPlayer())
     {
-        Player* player = ToPlayer();
         if (player->isAFK())
             player->ToggleAFK();
+
+        if (charmer->GetTypeId() == TYPEID_UNIT) // we are charmed by a creature
+        {
+            // change AI to charmed AI on next Update tick
+            NeedChangeAI = true;
+            IsAIEnabled = false;
+        }
         player->SetClientControl(this, false);
     }
 
@@ -16061,7 +16067,7 @@ bool Unit::SetCharmedBy(Unit* charmer, CharmType type, AuraApplication const* au
     if (aurApp && aurApp->GetRemoveMode())
         return false;
     
-    if (type != CHARM_TYPE_VEHICLE)
+    if (type != CHARM_TYPE_VEHICLE && !GetCharmInfo())
     {
         InitCharmInfo();
         if (type == CHARM_TYPE_POSSESS)
@@ -16209,7 +16215,14 @@ void Unit::RemoveCharmedBy(Unit* charmer)
     }
 
     if (Player* player = ToPlayer())
+    {
+        if (charmer->GetTypeId() == TYPEID_UNIT) // charmed by a creature, this means we had PlayerAI
+        {
+            NeedChangeAI = true;
+            IsAIEnabled = false;
+        }
         player->SetClientControl(this, true);
+    }
 
     // a guardian should always have charminfo
     if (playerCharmer && this != charmer->GetFirstControlled())
@@ -16528,63 +16541,6 @@ float Unit::MeleeSpellMissChance(const Unit* victim, WeaponAttackType attType, u
     if (missChance > 60.0f)
         return 60.0f;
     return missChance;
-}
-
-void Unit::SetPhaseMask(uint64 newPhaseMask, bool update)
-{
-    if (newPhaseMask == GetPhaseMask())
-        return;
-
-    if (IsInWorld())
-    {
-        RemoveNotOwnSingleTargetAuras(newPhaseMask);            // we can lost access to caster or target
-
-        // modify hostile references for new phasemask, some special cases deal with hostile references themselves
-        if (GetTypeId() == TYPEID_UNIT || (!ToPlayer()->IsGameMaster() && !ToPlayer()->GetSession()->PlayerLogout()))
-        {
-            HostileRefManager& refManager = getHostileRefManager();
-            HostileReference* ref = refManager.getFirst();
-
-            while (ref)
-            {
-                if (Unit* unit = ref->GetSource()->GetOwner())
-                    if (Creature* creature = unit->ToCreature())
-                        refManager.setOnlineOfflineState(creature, creature->InSamePhase(newPhaseMask));
-
-                ref = ref->next();
-            }
-
-            // modify threat lists for new phasemask
-            if (GetTypeId() != TYPEID_PLAYER)
-            {
-                std::list<HostileReference*> threatList = getThreatManager().getThreatList();
-                std::list<HostileReference*> offlineThreatList = getThreatManager().getOfflineThreatList();
-
-                // merge expects sorted lists
-                threatList.sort();
-                offlineThreatList.sort();
-                threatList.merge(offlineThreatList);
-
-                for (std::list<HostileReference*>::const_iterator itr = threatList.begin(); itr != threatList.end(); ++itr)
-                    if (Unit* unit = (*itr)->getTarget())
-                        unit->getHostileRefManager().setOnlineOfflineState(ToCreature(), unit->InSamePhase(newPhaseMask));
-            }
-        }
-    }
-
-    WorldObject::SetPhaseMask(newPhaseMask, update);
-
-    if (!IsInWorld())
-        return;
-
-    for (ControlList::const_iterator itr = m_Controlled.begin(); itr != m_Controlled.end(); ++itr)
-        if ((*itr)->GetTypeId() == TYPEID_UNIT)
-            (*itr)->SetPhaseMask(newPhaseMask, true);
-
-    for (uint8 i = 0; i < MAX_SUMMON_SLOT; ++i)
-        if (m_SummonSlot[i])
-            if (Creature* summon = GetMap()->GetCreature(m_SummonSlot[i]))
-                summon->SetPhaseMask(newPhaseMask, true);
 }
 
 bool Unit::SetInPhase(uint16 id, bool update, bool apply)
@@ -18903,80 +18859,4 @@ void Unit::Whisper(uint32 textId, Player* target, bool isBossWhisper /*= false*/
     ChatHandler::BuildChatPacket(data, isBossWhisper ? CHAT_MSG_RAID_BOSS_WHISPER : CHAT_MSG_MONSTER_WHISPER, LANG_UNIVERSAL, this, target, bct->GetText(locale, getGender()), 0, "", locale);
     target->SendDirectMessage(&data);
 }
-
-//////////////////////////////////////////////////////////////////
-// Auras
-
-void Unit::RegisterPhasingAuraEffect(AuraEffect const* auraEffect)
-{
-    std::list<PhaseInfo> phaseInfos;
-
-    if (auraEffect->GetAuraType() == SPELL_AURA_PHASE)
-    {
-        PhaseInfo phaseInfo;
-        SpellPhaseStore const* _SpellPhaseStore = sObjectMgr->GetSpellPhaseStore();
-        SpellPhaseStore::const_iterator itr = _SpellPhaseStore->find(auraEffect->GetId());
-        if (itr != _SpellPhaseStore->end())
-        {
-            if (itr->second.phasemask)
-            {
-                m_phaseUpdateFlags |= PHASE_UPDATE_FLAG_SERVERSIDE_CHANGED;
-                phaseInfo.phasemask = itr->second.phasemask;
-            }
-            if (itr->second.terrainswapmap)
-            {
-                m_phaseUpdateFlags |= PHASE_UPDATE_FLAG_CLIENTSIDE_CHANGED;
-                phaseInfo.terrainswapmap = itr->second.terrainswapmap;
-            }
-            if (itr->second.worldmapareaswap)
-            {
-                m_phaseUpdateFlags |= PHASE_UPDATE_FLAG_CLIENTSIDE_CHANGED;
-                phaseInfo.worldMapAreaSwap = itr->second.worldmapareaswap;
-            }
-        }
-
-        if (auraEffect->GetMiscValue())
-        {
-            m_phaseUpdateFlags |= PHASE_UPDATE_FLAG_SERVERSIDE_CHANGED;
-            phaseInfo.phasemask = (uint64)auraEffect->GetMiscValue();
-        }
-        if (auraEffect->GetMiscValueB())
-        {
-            m_phaseUpdateFlags |= PHASE_UPDATE_FLAG_SERVERSIDE_CHANGED;
-            phaseInfo.phaseId = (uint16)auraEffect->GetMiscValueB();
-        }
-
-        if (phaseInfo.NeedsClientSideUpdate())
-            m_phaseUpdateFlags |= PHASE_UPDATE_FLAG_CLIENTSIDE_CHANGED;
-
-        phaseInfos.push_back(phaseInfo);
-    }
-    else if (auraEffect->GetAuraType() == SPELL_AURA_PHASE_GROUP)
-    {
-        uint16 group = (uint16)auraEffect->GetMiscValueB();
-        std::set<uint16> const& groupPhases = GetPhasesForGroup(group);
-        for (auto itr = groupPhases.begin(); itr != groupPhases.end(); ++itr)
-        {
-            PhaseInfo phaseInfo;
-            phaseInfo.phaseId = (uint16)auraEffect->GetMiscValueB();
-            if (phaseInfo.NeedsClientSideUpdate())
-                m_phaseUpdateFlags |= PHASE_UPDATE_FLAG_CLIENTSIDE_CHANGED;
-            phaseInfos.push_back(phaseInfo);
-        }
-    }
-
-    for (auto itr = phaseInfos.begin(); itr != phaseInfos.end(); ++itr)
-        phaseData.AddAuraInfo(auraEffect->GetId(), *itr);
-
-    PhaseUpdate();
-}
-
-void Unit::UnRegisterPhasingAuraEffect(AuraEffect const* auraEffect)
-{
-    m_phaseUpdateFlags |= phaseData.RemoveAuraInfo(auraEffect->GetId());
-
-    PhaseUpdate();
-}
-
-
 

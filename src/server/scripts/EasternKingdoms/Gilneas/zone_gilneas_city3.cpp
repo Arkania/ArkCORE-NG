@@ -5974,7 +5974,7 @@ public:
                     SpawnGunshipOrcsWave2();
                     std::vector<Creature*> friendsList = FindFriendlyCreatureList();
                     std::vector<Creature*> jumpTargetList = FindJumpTargetPositions();
-                    for (int i = 0; i < friendsList.size(); i++)
+                    for (uint32 i = 0; i < friendsList.size(); i++)
                         friendsList[i]->JumpTo(jumpTargetList[i], 0.4f);
 
                     m_events.ScheduleEvent(11, 2000);

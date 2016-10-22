@@ -656,6 +656,11 @@ void Spell::InitExplicitTargets(SpellCastTargets const& targets)
     // this also makes sure that we correctly send explicit targets to client (removes redundant data)
     uint32 neededTargets = m_spellInfo->GetExplicitTargetMask();
 
+    if (!neededTargets && (m_targets.GetTargetMask() & TARGET_FLAG_DEST_LOCATION))
+        if (m_targets.GetDstPos()->IsPositionValid())
+            if (m_targets.GetDstPos()->GetPositionX() != 0.0f || m_targets.GetDstPos()->GetPositionY() != 0.0f)
+                neededTargets |= TARGET_FLAG_DEST_LOCATION;
+
     if (WorldObject* target = m_targets.GetObjectTarget())
     {
         // check if object target is valid with needed target flags
@@ -933,7 +938,7 @@ void Spell::SelectEffectImplicitTargets(SpellEffIndex effIndex, SpellImplicitTar
             }
             break;
         case TARGET_SELECT_CATEGORY_NYI:
-            TC_LOG_DEBUG("spells", "SPELL: target type %u, found in spellID %u, effect %u is not implemented yet!", m_spellInfo->Id, effIndex, targetType.GetTarget());
+            TC_LOG_DEBUG("spells", "SPELL: target type %u, found in spellID %u, effect %u is not implemented yet!", targetType.GetTarget(), m_spellInfo->Id, effIndex);
             break;
         default:
             ASSERT(false && "Spell::SelectEffectImplicitTargets: received not implemented select target category");
@@ -1117,8 +1122,13 @@ void Spell::SelectImplicitNearbyTargets(SpellEffIndex effIndex, SpellImplicitTar
             }
             break;
         case TARGET_OBJECT_TYPE_DEST:
-            m_targets.SetDst(*target);
-            break;
+        {
+            if (m_targets.GetTargetMask() & TARGET_FLAG_DEST_LOCATION)
+                m_targets.SetDst(*m_targets.GetDst());
+            else
+                m_targets.SetDst(*target);
+            break; 
+        }
         default:
             ASSERT(false && "Spell::SelectImplicitNearbyTargets: received not implemented target object type");
             break;
@@ -1440,6 +1450,15 @@ void Spell::SelectImplicitCasterObjectTargets(SpellEffIndex effIndex, SpellImpli
         case TARGET_UNIT_PASSENGER_7:
             if (m_caster->GetTypeId() == TYPEID_UNIT && m_caster->ToCreature()->IsVehicle())
                 target = m_caster->GetVehicleKit()->GetPassenger(targetType.GetTarget() - TARGET_UNIT_PASSENGER_0);
+            break;
+        case TARGET_UNIT_UNK_105: // spell 70256
+            target = m_caster;
+            checkIfValid = false;
+            if (m_caster->GetTypeId() == TYPEID_UNIT && m_caster->ToCreature()->IsVehicle())
+                if (Vehicle* vehicle = m_caster->GetVehicleKit())
+                    for (SeatMap::iterator itr = vehicle->Seats.begin(); itr != vehicle->Seats.end(); ++itr)
+                        if (Unit* passenger = ObjectAccessor::GetUnit(*m_caster, itr->second.Passenger.Guid))
+                            AddUnitTarget(passenger, 1 << effIndex, checkIfValid);
             break;
         default:
             break;
@@ -5041,6 +5060,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                     if (DynamicObject* dynObj = m_caster->GetDynObject(m_triggeredByAuraSpell->Id))
                         losTarget = dynObj;
 
+                bool los3 = target->IsWithinLOSInMap(losTarget);
                 if (!(m_spellInfo->AttributesEx2 & SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS) && !DisableMgr::IsDisabledFor(DISABLE_TYPE_SPELL, m_spellInfo->Id, NULL, SPELL_DISABLE_LOS) && !target->IsWithinLOSInMap(losTarget))
                     return SPELL_FAILED_LINE_OF_SIGHT;
             }

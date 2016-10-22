@@ -187,15 +187,6 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map* map, uint32 phaseMa
         TC_LOG_ERROR("misc", "Gameobject (GUID: %u Entry: %u) not created. Suggested coordinates isn't valid (X: %f Y: %f)", guidlow, name_id, x, y);
         return false;
     }
-    
-    if (phaseMask)
-    {
-        for (uint32 i = 0; i < 32; i++)
-            if (((1 << i) & phaseMask) > 0)
-                SetInPhase(i + DEFAULT_PHASE, false, true);
-    }
-
-    SetPhaseMask(phaseMask, false);
 
     SetZoneScript();
 
@@ -727,10 +718,10 @@ void GameObject::SaveToDB()
         return;
     }
 
-    SaveToDB(GetMapId(), data->spawnMask, data->phaseMask);
+    SaveToDB(GetMapId(), data);
 }
 
-void GameObject::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
+void GameObject::SaveToDB(uint32 mapid, GameObjectData const* tmpData)
 {
     const GameObjectTemplate* goI = GetGOInfo();
 
@@ -745,7 +736,11 @@ void GameObject::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
     // data->guid = guid must not be updated at save
     data.id = GetEntry();
     data.mapid = mapid;
-    data.phaseMask = phaseMask;
+    data.zoneId = GetZoneId();
+    data.areaId = GetAreaId();
+    data.phaseMask = tmpData->phaseMask;
+    data.spawnMask = tmpData->spawnMask;
+    data.phaseIds = GetPhaseIds();
     data.posX = GetPositionX();
     data.posY = GetPositionY();
     data.posZ = GetPositionZ();
@@ -757,7 +752,6 @@ void GameObject::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
     data.spawntimesecs = m_spawnedByDefault ? m_respawnDelayTime : -(int32)m_respawnDelayTime;
     data.animprogress = GetGoAnimProgress();
     data.go_state = GetGoState();
-    data.spawnMask = spawnMask;
     data.artKit = GetGoArtKit();
 
     // Update in DB
@@ -773,8 +767,10 @@ void GameObject::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
     stmt->setUInt32(index++, m_DBTableGuid);
     stmt->setUInt32(index++, GetEntry());
     stmt->setUInt16(index++, uint16(mapid));
-    stmt->setUInt8(index++, spawnMask);
-    stmt->setUInt32(index++, GetPhaseMask());
+    stmt->setUInt16(index++, uint16(GetZoneId()));
+    stmt->setUInt16(index++, uint16(GetAreaId()));
+    stmt->setUInt8(index++, tmpData->spawnMask);
+    stmt->setString(index++, GetUInt16String(GetPhaseIds()));
     stmt->setFloat(index++, GetPositionX());
     stmt->setFloat(index++, GetPositionY());
     stmt->setFloat(index++, GetPositionZ());
@@ -824,19 +820,7 @@ bool GameObject::LoadGameObjectFromDB(uint32 guid, Map* map, bool addToMap)
     if (!Create(guid, entry, map, phaseMask, x, y, z, ang, rotation0, rotation1, rotation2, rotation3, animprogress, go_state, artKit))
         return false;
 
-    if (!data->phaseIds.empty())
-        for (uint16 ph : data->phaseIds)
-            SetInPhase(ph, false, true);
-
-    if (!data->phaseGroups.empty())
-    {
-        SetPhaseGroups(data->phaseGroups);
-        for (uint16 phGroup : data->phaseGroups)            
-            SetInPhase(phGroup, false, true);
-    }
-
-    if (GetPhaseIds().empty() && GetPhaseGroups().empty())
-        SetInPhase(DEFAULT_PHASE, false, true);
+    SetPhaseBaseValues(data);
 
     if (data->spawntimesecs >= 0)
     {
@@ -874,6 +858,22 @@ bool GameObject::LoadGameObjectFromDB(uint32 guid, Map* map, bool addToMap)
         return false;
 
     return true;
+}
+
+void GameObject::SetPhaseBaseValues(const GameObjectData* data)
+{
+    if (data)
+    {
+        if (data->phaseMask > 1)
+            SetPhaseMask(data->phaseMask, false);
+
+        if (!data->phaseIds.empty())
+            for (uint16 ph : data->phaseIds)
+                SetInPhase(ph, false, true);
+
+        if (GetPhaseIds().empty())
+            SetInPhase(DEFAULT_PHASE, false, true);
+    }
 }
 
 void GameObject::DeleteFromDB()
@@ -1048,7 +1048,10 @@ bool GameObject::ActivateToQuest(Player* target) const
         }
         case GAMEOBJECT_TYPE_GOOBER:
         {
-            if (GetGOInfo()->goober.questId == -1 || target->GetQuestStatus(GetGOInfo()->goober.questId) == QUEST_STATUS_INCOMPLETE)
+            if (GetGOInfo()->goober.questId == -1 
+                || target->GetQuestStatus(GetGOInfo()->goober.questId) == QUEST_STATUS_INCOMPLETE 
+                || target->GetQuestStatus(GetGOInfo()->goober.questId_male) == QUEST_STATUS_INCOMPLETE 
+                || target->GetQuestStatus(GetGOInfo()->goober.questId_female) == QUEST_STATUS_INCOMPLETE)
                 return true;
             break;
         }

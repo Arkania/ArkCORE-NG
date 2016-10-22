@@ -273,9 +273,9 @@ Creature* Transport::CreateNPCPassenger(uint32 guid, CreatureData const* data)
     creature->m_movementInfo.transport.guid = GetGUID();
     creature->m_movementInfo.transport.pos.Relocate(x, y, z, o);    // m_movementInfo.transport.pos.m_positionX  x=offset
     CalculatePassengerPosition(x, y, z, &o);                        // This method transforms supplied transport offsets into global coordinates offset > worldpos
-
+    creature->m_movementInfo.transport.seat = -1;
     GetMap()->CreatureRelocation(creature, x, y, z, o, false);
-    //creature->Relocate(x, y, z, o);                                 // me->m_positionX  x=worldpos
+    creature->Relocate(x, y, z, o);                                 // me->m_positionX  x=worldpos
 
     creature->SetHomePosition(creature->GetPositionX(), creature->GetPositionY(), creature->GetPositionZ(), creature->GetOrientation());
     creature->SetTransportHomePosition(creature->m_movementInfo.transport.pos);
@@ -295,11 +295,6 @@ Creature* Transport::CreateNPCPassenger(uint32 guid, CreatureData const* data)
     {
         for (uint16 ph : data->phaseIds)
             creature->SetInPhase(ph, false, true);
-    }
-    else if (!data->phaseGroups.empty())
-    {
-        for (uint16 phGroup : data->phaseGroups)
-            creature->SetInPhase(phGroup, false, true);
     }
     else
         creature->CopyPhaseFrom(this);
@@ -704,6 +699,7 @@ void Transport::UpdatePassengerPositions(std::set<WorldObject*>& passengers)
             break;
         case TYPEID_GAMEOBJECT:
             GetMap()->GameObjectRelocation(passenger->ToGameObject(), x, y, z, o, false);
+            passenger->ToGameObject()->RelocateStationaryPosition(x, y, z, o);
             break;
         case TYPEID_DYNAMICOBJECT:
             GetMap()->DynamicObjectRelocation(passenger->ToDynObject(), x, y, z, o);

@@ -1109,8 +1109,6 @@ void bot_minion_ai::setStats(uint8 myclass, uint8 myrace, uint8 mylevel, bool fo
 
     //PHASE
     me->CopyPhaseFrom(master, true);
-    //if (master->GetPhaseMask() != me->GetPhaseMask())
-    //    me->SetPhaseMask(master->GetPhaseMask(), true);
 
     //INIT STATS
     //partially receive master's stats and get base class stats, we'll need all this later
@@ -1483,8 +1481,6 @@ void bot_pet_ai::setStats(uint8 mylevel, uint8 petType, bool force)
 
     //PHASE
     me->CopyPhaseFrom(master, true);
-    //if (master->GetPhaseMask() != me->GetPhaseMask())
-    //    me->SetPhaseMask(master->GetPhaseMask(), true);
 
     ////INIT STATS
     //uint8 botclass = m_creatureOwner->GetBotClass();
@@ -2027,7 +2023,7 @@ Unit* bot_ai::getTarget(bool byspell, bool ranged, bool &reset) const
         for (uint8 i = 0; i != master->GetMaxNpcBots(); ++i)
         {
             Creature* bot = master->GetBotMap(i)->_Cre();
-            if (!bot || !bot->InSamePhase(me) || bot == me) continue;
+            if (!bot || !bot->IsInPhase(me) || bot == me) continue;
             u = bot->GetVictim();
             if (u && CanBotAttack(u, byspell) &&
                 (bot->IsInCombat() || u->IsInCombat()) &&
@@ -2037,7 +2033,7 @@ Unit* bot_ai::getTarget(bool byspell, bool ranged, bool &reset) const
                 return u;
             }
             Creature* pet = bot->GetIAmABot() ? bot->GetBotsPet() : NULL;
-            if (!pet || !pet->InSamePhase(me)) continue;
+            if (!pet || !pet->IsInPhase(me)) continue;
             u = pet->GetVictim();
             if (u && CanBotAttack(u, byspell) &&
                 (pet->IsInCombat() || u->IsInCombat()) &&
@@ -2054,7 +2050,7 @@ Unit* bot_ai::getTarget(bool byspell, bool ranged, bool &reset) const
         {
             Player* pl = ref->GetSource();
             if (!pl || !pl->IsInWorld() || pl->IsBeingTeleported()) continue;
-            if (me->GetMap() != pl->FindMap() || !pl->InSamePhase(me)) continue;
+            if (me->GetMap() != pl->FindMap() || !pl->IsInPhase(me)) continue;
             u = pl->GetVictim();
             if (u && pl != master && CanBotAttack(u, byspell) &&
                 (pl->IsInCombat() || u->IsInCombat()) &&
@@ -2067,7 +2063,7 @@ Unit* bot_ai::getTarget(bool byspell, bool ranged, bool &reset) const
             for (uint8 i = 0; i != pl->GetMaxNpcBots(); ++i)
             {
                 Creature* bot = pl->GetBotMap(i)->_Cre();
-                if (!bot || !bot->InSamePhase(me) || bot == me) continue;
+                if (!bot || !bot->IsInPhase(me) || bot == me) continue;
                 if (!bot->IsInWorld()) continue;
                 if (me->GetMap() != bot->FindMap()) continue;
                 u = bot->GetVictim();
@@ -2079,7 +2075,7 @@ Unit* bot_ai::getTarget(bool byspell, bool ranged, bool &reset) const
                     return u;
                 }
                 Creature* pet = bot->GetIAmABot() ? bot->GetBotsPet() : NULL;
-                if (!pet || !pet->InSamePhase(me)) continue;
+                if (!pet || !pet->IsInPhase(me)) continue;
                 if (!pet->IsInWorld()) continue;
                 if (me->GetMap() != pet->FindMap()) continue;
                 u = pet->GetVictim();
@@ -3289,7 +3285,7 @@ void bot_minion_ai::_OnEvade()
                     for (std::set<Unit*>::const_iterator i = Set.begin(); i != Set.end(); ++i)
                     {
                         Unit* unit = (*i);
-                        if (!unit->InSamePhase(me)) continue;
+                        if (!unit->IsInPhase(me)) continue;
                         if (/*unit->IsFriendlyTo(master)*/IsInBotParty(unit) || !unit->IsInCombat())
                         {
                             //ch.PSendSysMessage("_OnEvade(): %s's hostile reference is removed from %s!", unit->GetName().c_str(), cre->GetName().c_str());
@@ -3324,7 +3320,7 @@ void bot_minion_ai::_OnEvade()
                 for (std::set<Unit*>::const_iterator i = Set.begin(); i != Set.end(); ++i)
                 {
                     Unit* unit = (*i);
-                    if (!unit->InSamePhase(me)) continue;
+                    if (!unit->IsInPhase(me)) continue;
                     if (/*unit->IsFriendlyTo(master)*/IsInBotParty(unit) || !unit->IsInCombat())
                     {
                         //ch.PSendSysMessage("_OnEvade(): %s's hostile reference is removed from %s!", unit->GetName().c_str(), m_botsPet->GetName().c_str());

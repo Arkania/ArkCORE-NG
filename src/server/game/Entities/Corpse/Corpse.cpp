@@ -26,7 +26,7 @@
 #include "Opcodes.h"
 #include "GossipDef.h"
 #include "World.h"
-#include "util.h"
+#include "Util.h"
 
 Corpse::Corpse(CorpseType type) : WorldObject(type != CORPSE_BONES), m_type(type)
 {
@@ -87,14 +87,12 @@ bool Corpse::Create(uint32 guidlow, Player* owner)
     //in other way we will get a crash in Corpse::SaveToDB()
     SetMap(owner->GetMap());
 
-    WorldObject::_Create(guidlow, HIGHGUID_CORPSE, owner->GetPhaseMask());
+    WorldObject::_Create(guidlow, HIGHGUID_CORPSE, owner);
 
     SetObjectScale(1);
     SetUInt64Value(CORPSE_FIELD_OWNER, owner->GetGUID());
 
     _gridCoord = Trinity::ComputeGridCoord(GetPositionX(), GetPositionY());
-
-    CopyPhaseFrom(owner);
 
     return true;
 }
@@ -186,12 +184,13 @@ bool Corpse::LoadCorpseFromDB(uint32 guid, Field* fields)
     m_time = time_t(fields[11].GetUInt32());
 
     uint32 instanceId    = fields[13].GetUInt32();
-    std::string phaseStr = fields[14].GetCString();
+    std::set<uint16> phaseIds = GetUInt16List( fields[14].GetCString());
 
     // place
     SetLocationInstanceId(instanceId);
     SetLocationMapId(mapId);
-    SetPhaseString(phaseStr);
+    for (auto ph : phaseIds)
+        SetInPhase(ph,false,true);
     Relocate(posX, posY, posZ, o);
 
     if (!IsPositionValid())
@@ -211,12 +210,5 @@ bool Corpse::IsExpired(time_t t) const
         return m_time < t - 60 * MINUTE;
     else
         return m_time < t - 3 * DAY;
-}
-
-void Corpse::SetPhaseString(std::string phaseStr)
-{
-    std::set<uint16> phaseIds = GetUInt16List(phaseStr);    
-    for (uint16 ph : phaseIds)
-        SetInPhase(ph, false, true);
 }
 

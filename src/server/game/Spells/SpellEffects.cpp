@@ -1035,7 +1035,12 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
     switch (m_spellInfo->SpellFamilyName)
     {
         case SPELLFAMILY_GENERIC:
-
+            // spell Hot Rod - Radio
+            if (m_spellInfo->Id == 66299 && !effIndex)
+            {
+                m_caster->PlayDirectSound(23406);
+                break;
+            }
             // Quest teritorial fetish
             if (m_spellInfo->Id == 72070)
             {
@@ -4710,6 +4715,7 @@ void Spell::EffectSummonObjectWild(SpellEffIndex effIndex)
         return;
     }
 
+    pGameObj->CopyPhaseFrom(m_caster);
     int32 duration = m_spellInfo->GetDuration();
 
     pGameObj->SetRespawnTime(duration > 0 ? duration/IN_MILLISECONDS : 0);
@@ -4731,6 +4737,7 @@ void Spell::EffectSummonObjectWild(SpellEffIndex effIndex)
         if (linkedGO->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_GAMEOBJECT), linkedEntry, map,
             m_caster->GetPhaseMask(), x, y, z, target->GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 100, GO_STATE_READY))
         {
+            linkedGO->CopyPhaseFrom(m_caster);
             linkedGO->SetRespawnTime(duration > 0 ? duration/IN_MILLISECONDS : 0);
             linkedGO->SetSpellId(m_spellInfo->Id);
 
@@ -4761,6 +4768,27 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
         {
             switch (m_spellInfo->Id)
             {
+                case 70253: // Kezan quest 14125
+                {
+                    if (Player* player = m_caster->ToPlayer())
+                    {
+                        if (player->GetQuestStatus(14125) == QUEST_STATUS_INCOMPLETE)
+                            player->KilledMonsterCredit(37598);
+                        if (player->GetQuestStatus(14125) == QUEST_STATUS_COMPLETE)
+                        {
+                            player->CastSpell(player, 70254, true);
+                            player->CastSpell(player, 70252, true);
+                        }
+                    }
+                    break;
+                }
+                case 67555: // Kezan Quest 14122: The Great Bank Heist: Vault Interact
+                {
+                    if (Player* player = m_caster->ToPlayer())
+                        if (player->GetQuestStatus(14122) == QUEST_STATUS_INCOMPLETE)
+                            player->CastSpell(player, 67488, true);  // player->CastCustomSpell(67488, SPELLVALUE_BASE_POINT0, 0, player, true, 0, 0,  player->GetGUID()); //player->CastSpell(player, 67488, true);
+                    break;
+                }
                 case 23853: // jubling-cooldown (spell is triggered from 23852)
                 {
                     if (Player* player = unitTarget->ToPlayer())
@@ -5629,6 +5657,7 @@ void Spell::EffectDuel(SpellEffIndex effIndex)
         return;
     }
 
+    pGameObj->CopyPhaseFrom(m_caster);
     pGameObj->SetUInt32Value(GAMEOBJECT_FACTION, m_caster->getFaction());
     pGameObj->SetUInt32Value(GAMEOBJECT_LEVEL, m_caster->getLevel()+1);
     int32 duration = m_spellInfo->GetDuration();
@@ -6014,6 +6043,7 @@ void Spell::EffectSummonObject(SpellEffIndex effIndex)
         }
     }
 
+    go->CopyPhaseFrom(m_caster);
     //go->SetUInt32Value(GAMEOBJECT_LEVEL, m_caster->getLevel());
     int32 duration = m_spellInfo->GetDuration();
     go->SetRespawnTime(duration > 0 ? duration/IN_MILLISECONDS : 0);
@@ -6386,6 +6416,19 @@ void Spell::EffectKnockBack(SpellEffIndex effIndex)
     if (speedxy < 0.1f && speedz < 0.1f)
         return;
 
+    if (!speedxy)
+        if (unitTarget->GetTypeId() != TYPEID_PLAYER)
+            switch (m_spellInfo->Id)
+            {
+            case 67919:
+            case 70413:
+                speedxy = 6.0f;
+                break;
+            default:
+                speedxy = 2.5f;
+                break;
+            }
+
     float x, y;
     if (m_spellInfo->Effects[effIndex].Effect == SPELL_EFFECT_KNOCK_BACK_DEST)
     {
@@ -6743,6 +6786,7 @@ void Spell::EffectTransmitted(SpellEffIndex effIndex)
         return;
     }
 
+    pGameObj->CopyPhaseFrom(m_caster);
     int32 duration = m_spellInfo->GetDuration();
 
     switch (goinfo->type)
@@ -7686,7 +7730,7 @@ void Spell::EffectUpdatePlayerPhase(SpellEffIndex /*effIndex*/)
     if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
         return;
 
-    unitTarget->PhaseUpdate(); // gpn39f // not shure.. 
+    unitTarget->UpdatePhaseForQuestAreaOrZoneChange();
 }
 
 void Spell::EffectUpdateZoneAurasAndPhases(SpellEffIndex /*effIndex*/)

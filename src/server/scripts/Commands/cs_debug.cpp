@@ -961,14 +961,14 @@ public:
         if (!t)
             return false;
 
-        std::set<uint32> terrainswap;
-        std::set<uint32> phaseId;
-        std::set<uint32> worldMapSwap;
+        std::set<uint16> terrainswap;
+        std::set<uint16> phaseId;
+        std::set<uint16> worldMapSwap;
 
-        terrainswap.insert((uint32)atoi(t));
+        terrainswap.insert((uint16)atoi(t));
 
         if (p)
-            phaseId.insert((uint32)atoi(p));
+            phaseId.insert((uint16)atoi(p));
 
         handler->GetSession()->SendSetPhaseShift(phaseId, terrainswap, worldMapSwap);
         return true;
@@ -1390,12 +1390,26 @@ public:
 
     static bool HandleDebugPhaseCommand(ChatHandler* handler, char const* /*args*/)
     {
-        Unit* unit = handler->getSelectedUnit();
+        Unit* target = handler->getSelectedUnit();
         Player* player = handler->GetSession()->GetPlayer();
-        if (unit && unit->GetTypeId() == TYPEID_PLAYER)
-            player = unit->ToPlayer();
+        bool ok = false;
+        if (target)
+        {
+            std::string phaseString = target->PhaseIdToString();
+            handler->PSendSysMessage("Selected target's PhaseId: %s", phaseString.c_str());
+        }
+        else if (player)
+        {
+            std::string phaseString = player->PhaseIdToString();
+            handler->PSendSysMessage("Selected player's PhaseId: %s", phaseString.c_str());
+        }
+        else
+        {
+            handler->SendSysMessage(LANG_SELECT_CREATURE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
 
-        player->SendDebugReportToPlayer();
         return true;
     }
 };

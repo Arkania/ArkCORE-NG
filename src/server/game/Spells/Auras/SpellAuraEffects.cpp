@@ -515,8 +515,8 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
     switch (GetAuraType())
     {
         case SPELL_AURA_CONTROL_VEHICLE:
-        //    m_amount = m_baseAmount;
-        //    break;
+            m_amount = m_baseAmount;
+            break;
         // crowd control auras
         case SPELL_AURA_MOD_CONFUSE:
         case SPELL_AURA_MOD_FEAR:
@@ -1465,18 +1465,9 @@ void AuraEffect::HandlePhaseGroup(AuraApplication const* aurApp, uint8 mode, boo
     Unit* target = aurApp->GetTarget();
 
     std::set<uint16> const& oldPhases = target->GetPhaseIds();
-    std::set<uint16> const& phaseIds = GetPhasesForGroup((uint16)GetMiscValueB());
-    // GPN39F not shure.. SetInPhase GroupId, not each result as phaseId
-    for (uint16 phaseId : phaseIds)
-        target->SetInPhase(phaseId, false, apply);
-
-    if (Player* player = target->ToPlayer())
-    {
-        if (apply)
-            player->RegisterPhasingAuraEffect(this);
-        else
-            player->UnRegisterPhasingAuraEffect(this);
-    }
+    uint16 phGroupValue = GetMiscValueB();
+    // std::set<uint16> const& phaseIds = GetXPhasesForGroup(phGroupValue);    
+    target->SetInPhase(phGroupValue, false, apply);
 
     // call functions which may have additional effects after chainging state of unit
     // phase auras normally not expected at BG but anyway better check
@@ -1484,6 +1475,14 @@ void AuraEffect::HandlePhaseGroup(AuraApplication const* aurApp, uint8 mode, boo
     {
         // drop flag at invisibiliy in bg
         target->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_IMMUNE_OR_LOST_SELECTION);
+    }
+
+    if (Player* player = target->ToPlayer())
+    {
+        if (player->IsInWorld())
+            player->GetMap()->SendUpdateTransportVisibility(player, oldPhases);
+
+        player->SendUpdatePhasing();
     }
 
     // need triggering visibility update base at phase update of not GM invisible (other GMs anyway see in any phases)
@@ -1725,45 +1724,19 @@ void AuraEffect::HandlePhase(AuraApplication const* aurApp, uint8 mode, bool app
     std::set<uint16> const& oldPhases = target->GetPhaseIds();
     target->SetInPhase((uint16)GetMiscValueB(), false, apply);
 
-    if (Player* player = target->ToPlayer())
-    {
-        if (apply)
-            player->RegisterPhasingAuraEffect(this);
-        else
-            player->UnRegisterPhasingAuraEffect(this);
-    }
-    else
-    {
-        uint32 newPhase = 0;
-        Unit::AuraEffectList const& phases = target->GetAuraEffectsByType(SPELL_AURA_PHASE);
-        if (!phases.empty())
-            for (Unit::AuraEffectList::const_iterator itr = phases.begin(); itr != phases.end(); ++itr)
-                newPhase |= (*itr)->GetMiscValue();
-
-        if (!newPhase)
-        {
-            newPhase = PHASEMASK_NORMAL;
-            if (Creature* creature = target->ToCreature())
-                if (CreatureData const* data = sObjectMgr->GetCreatureData(creature->GetDBTableGUIDLow()))
-                    newPhase = data->phaseMask;
-        }
-
-        target->SetPhaseMask(newPhase, false);
-    }
-
-    if (Player* player = target->ToPlayer())
-    {
-        if (player->IsInWorld())
-            player->GetMap()->SendUpdateTransportVisibility(player, oldPhases);
-        player->SendUpdatePhasing();
-    }
-
     // call functions which may have additional effects after chainging state of unit
     // phase auras normally not expected at BG but anyway better check
     if (apply)
     {
         // drop flag at invisibiliy in bg
         target->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_IMMUNE_OR_LOST_SELECTION);
+    }
+    
+    if (Player* player = target->ToPlayer())
+    {
+        if (player->IsInWorld())
+            player->GetMap()->SendUpdateTransportVisibility(player, oldPhases);
+        player->SendUpdatePhasing();
     }
 
     // need triggering visibility update base at phase update of not GM invisible (other GMs anyway see in any phases)

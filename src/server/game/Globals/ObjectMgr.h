@@ -46,7 +46,6 @@
 #include "DB2Stores.h"
 
 class Item;
-class PhaseMgr;
 struct AccessRequirement;
 struct PlayerInfo;
 struct PlayerLevelInfo;
@@ -610,9 +609,11 @@ struct GossipMenus
     ConditionList   conditions;
 };
 
+/* gossip menu */
 typedef std::multimap<uint32, GossipMenus> GossipMenusContainer;
 typedef std::pair<GossipMenusContainer::const_iterator, GossipMenusContainer::const_iterator> GossipMenusMapBounds;
 typedef std::pair<GossipMenusContainer::iterator, GossipMenusContainer::iterator> GossipMenusMapBoundsNonConst;
+/* gossip menu options*/
 typedef std::multimap<uint32, GossipMenuItems> GossipMenuItemsContainer;
 typedef std::pair<GossipMenuItemsContainer::const_iterator, GossipMenuItemsContainer::const_iterator> GossipMenuItemsMapBounds;
 typedef std::pair<GossipMenuItemsContainer::iterator, GossipMenuItemsContainer::iterator> GossipMenuItemsMapBoundsNonConst;
@@ -1051,13 +1052,11 @@ class ObjectMgr
         void LoadTrainerSpell();
         void AddSpellToTrainer(uint32 entry, uint32 spell, uint32 spellCost, uint32 reqSkill, uint32 reqSkillValue, uint32 reqLevel);
 
-        void LoadPhaseDefinitions();
-        void LoadSpellPhaseInfo();
-        void LoadPhaseArea();
+        void LoadPhaseAreaDefinitions();
+        void LoadPhaseAreaSelector();
 
-        PhaseDefinitionStore const* GetPhaseDefinitionStore() { return &_PhaseDefinitionStore; }
-        SpellPhaseStore const* GetSpellPhaseStore() { return &_SpellPhaseStore; }
-        PhaseAreaStore const* GetPhaseAreaStore() { return &_PhaseAreaStore; }
+        PhaseAreaDefinitionStore const* GetPhaseAreaDefinitionStore() { return &m_phaseAreaDefinitionStore; }
+        PhaseAreaSelectorStore const* GetPhaseAreaSelectorStore() { return &m_phaseAreaSelectorStore; }
 
         std::string GeneratePetName(uint32 entry);
         uint32 GetBaseXP(uint8 level);
@@ -1430,9 +1429,8 @@ class ObjectMgr
 
         CreatureOutfitContainer _creatureOutfitStore;
 
-        PhaseDefinitionStore _PhaseDefinitionStore;
-        SpellPhaseStore _SpellPhaseStore;
-        PhaseAreaStore _PhaseAreaStore;
+        PhaseAreaDefinitionStore m_phaseAreaDefinitionStore;
+        PhaseAreaSelectorStore m_phaseAreaSelectorStore;
 
     private:
         void LoadScripts(ScriptsType type);

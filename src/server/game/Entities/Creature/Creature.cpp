@@ -625,7 +625,7 @@ void Creature::RegenerateMana()
 
     if (curValue >= maxValue)
         return;
-
+   
     uint32 addvalue = 0;
 
     // Combat and any controlled creature
@@ -646,6 +646,13 @@ void Creature::RegenerateMana()
     for (AuraEffectList::const_iterator i = ModPowerRegenPCTAuras.begin(); i != ModPowerRegenPCTAuras.end(); ++i)
         if ((*i)->GetMiscValue() == POWER_MANA)
             AddPct(addvalue, (*i)->GetAmount());
+
+    /* Hack for Kezan Quest 14122, creature 35476, the piggy bank for robbing money,
+    The progressbar is shown with using mana, value 0-100.
+    There is no properties in creature to enable/disable the regenerate of Mana,
+    or set a new (lower) regenerate amount value, for this type of creature  */
+    if (GetEntry() == 35486)
+        addvalue = 2;
 
     ModifyPower(POWER_MANA, addvalue);
 }
@@ -765,25 +772,9 @@ bool Creature::Create(uint32 guidlow, Map* map, uint32 phaseMask, uint32 Entry, 
     ASSERT(map);
     SetMap(map);
 
-    if (data)
-    {
-        if (!data->phaseIds.empty())
-            for (uint16 ph : data->phaseIds)
-                SetInPhase(ph, false, true);
-
-        if (!data->phaseGroups.empty())
-        {
-            SetPhaseGroups(data->phaseGroups);
-            for (uint16 phGroup : data->phaseGroups)
-                SetInPhase(phGroup, false, true);
-        }
-
-        if (GetPhaseIds().empty() && GetPhaseGroups().empty())
-            SetInPhase(DEFAULT_PHASE, false, true);        
-    }
-
     SetPhaseMask(phaseMask, false);
-
+    SetPhaseBaseValues(data);
+  
     CreatureTemplate const* cinfo = sObjectMgr->GetCreatureTemplate(Entry);
     if (!cinfo)
     {
@@ -857,6 +848,22 @@ bool Creature::Create(uint32 guidlow, Map* map, uint32 phaseMask, uint32 Entry, 
         SetVisible(false);
 
     return true;
+}
+
+void Creature::SetPhaseBaseValues(const CreatureData* data)
+{
+    if (data)
+    {
+        if (data->phaseMask > 1)
+            SetPhaseMask(data->phaseMask, false);
+
+        if (!data->phaseIds.empty())
+            for (uint16 ph : data->phaseIds)
+                SetInPhase(ph, false, true);
+
+        if (GetPhaseIds().empty())
+            SetInPhase(DEFAULT_PHASE, false, true);
+    }
 }
 
 void Creature::InitializeReactState()
@@ -975,10 +982,10 @@ void Creature::SaveToDB()
     }
 
     uint32 mapId = GetTransport() ? GetTransport()->GetGOInfo()->moTransport.mapID : GetMapId();
-    SaveToDB(mapId, data->spawnMask, GetPhaseMask());
+    SaveToDB(mapId, data);
 }
 
-void Creature::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
+void Creature::SaveToDB(uint32 mapid, CreatureData const* tmpData)
 {
     // update in loaded data
     if (!m_DBTableGuid)
@@ -1011,7 +1018,7 @@ void Creature::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
     // data->guid = guid must not be updated at save
     data.id = GetEntry();
     data.mapid = mapid;
-    data.phaseMask = phaseMask;
+    data.phaseMask = tmpData->phaseMask;
     data.displayid = displayId;
     data.equipmentId = GetCurrentEquipmentId();
     if (!GetTransport())
@@ -1038,7 +1045,7 @@ void Creature::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
     // prevent add data integrity problems
     data.movementType = !m_respawnradius && GetDefaultMovementType() == RANDOM_MOTION_TYPE
         ? IDLE_MOTION_TYPE : GetDefaultMovementType();
-    data.spawnMask = spawnMask;
+    data.spawnMask = tmpData->spawnMask;
     data.npcflag = npcflag;
     data.unit_flags = unit_flags;
     data.dynamicflags = dynamicflags;
@@ -1056,8 +1063,10 @@ void Creature::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
     stmt->setUInt32(index++, m_DBTableGuid);
     stmt->setUInt32(index++, GetEntry());
     stmt->setUInt16(index++, uint16(mapid));
-    stmt->setUInt8(index++, spawnMask);
-    stmt->setUInt32(index++, GetPhaseMask());
+    stmt->setUInt16(index++, uint16(GetZoneId()));
+    stmt->setUInt16(index++, uint16(GetAreaId()));
+    stmt->setUInt8(index++, tmpData->spawnMask);
+    stmt->setString(index++, GetUInt16String(GetPhaseIds()));
     stmt->setUInt32(index++, displayId);
     stmt->setInt32(index++, int32(GetCurrentEquipmentId()));
     stmt->setFloat(index++, GetPositionX());
@@ -1566,8 +1575,7 @@ void Creature::SetDeathState(DeathState s)
         SetMeleeDamageSchool(SpellSchools(cinfo->dmgschool));
         LoadCreaturesAddon(true);
         Motion_Initialize();
-        if (GetCreatureData() && GetPhaseMask() != GetCreatureData()->phaseMask)
-            SetPhaseMask(GetCreatureData()->phaseMask, false);
+        SetPhaseBaseValues(GetCreatureData());
         Unit::SetDeathState(ALIVE);
     }
 }

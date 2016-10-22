@@ -120,6 +120,7 @@ public:
             { "npc_trainer",                   rbac::RBAC_PERM_COMMAND_RELOAD_NPC_TRAINER,                      true,  &HandleReloadNpcTrainerCommand,                 "", NULL },
             { "npc_vendor",                    rbac::RBAC_PERM_COMMAND_RELOAD_NPC_VENDOR,                       true,  &HandleReloadNpcVendorCommand,                  "", NULL },
             { "page_text",                     rbac::RBAC_PERM_COMMAND_RELOAD_PAGE_TEXT,                        true,  &HandleReloadPageTextsCommand,                  "", NULL },
+            { "phase_definition",              rbac::RBAC_PERM_COMMAND_NPC_SET_PHASE,                           true,  &HandleReloadPhaseDefinitionsCommand,           "", NULL },
             { "pickpocketing_loot_template",   rbac::RBAC_PERM_COMMAND_RELOAD_PICKPOCKETING_LOOT_TEMPLATE,      true,  &HandleReloadLootTemplatesPickpocketingCommand, "", NULL },
             { "points_of_interest",            rbac::RBAC_PERM_COMMAND_RELOAD_POINTS_OF_INTEREST,               true,  &HandleReloadPointsOfInterestCommand,           "", NULL },
             { "prospecting_loot_template",     rbac::RBAC_PERM_COMMAND_RELOAD_PROSPECTING_LOOT_TEMPLATE,        true,  &HandleReloadLootTemplatesProspectingCommand,   "", NULL },
@@ -1215,15 +1216,14 @@ public:
         return true;
     }
 
-
     static bool HandleReloadPhaseDefinitionsCommand(ChatHandler* handler, const char* /*args*/)
     {
         TC_LOG_INFO("misc", "Reloading phase_definitions table...");
-        sObjectMgr->LoadPhaseDefinitions();
+        sObjectMgr->LoadPhaseAreaDefinitions();
         TC_LOG_INFO("misc", "Reloading Phase Areas...");
-        sObjectMgr->LoadPhaseArea();
+        sObjectMgr->LoadPhaseAreaSelector();
         sWorld->UpdatePhaseDefinitions();
-        handler->SendGlobalGMSysMessage("Phase Definitions reloaded.");
+        handler->SendGlobalGMSysMessage("PhaseArea and PhaseDefinitions reloaded.");
         return true;
     }
 
