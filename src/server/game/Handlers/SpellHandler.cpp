@@ -378,7 +378,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
         caster = _player;
     }
 
-    if (caster->GetTypeId() == TYPEID_PLAYER && !caster->ToPlayer()->HasActiveSpell(spellId))
+    if (caster->GetTypeId() == TYPEID_PLAYER && !caster->ToPlayer()->HasActiveSpell(spellId) && !spellInfo->IsRaidMarker())
     {
         // Archaeology: craft artifacts
         if (caster->ToPlayer()->HasSkill(SKILL_ARCHAEOLOGY))
