@@ -1365,6 +1365,7 @@ void AddKalimdorScripts()
     AddSC_boss_asaad();
     AddSC_instance_the_vortex_pinnacle();
     AddSC_throne_of_the_four_winds();       //Throne of the Four Winds
+	AddSC_boss_alakir();
     AddSC_boss_conclave_of_wind();
     AddSC_instance_throne_of_the_four_winds();
     AddSC_wailing_caverns();                //Wailing caverns
