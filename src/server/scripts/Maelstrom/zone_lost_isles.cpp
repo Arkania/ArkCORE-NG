@@ -65,6 +65,8 @@ enum Zone_zone_lost_isles
     EVENT_SHOW_FIGHT,
 };
 
+/*  phase 170  */
+
 // 36608
 class npc_doc_zapnozzle_36608 : public CreatureScript
 {
@@ -493,6 +495,213 @@ public:
     }
 };
 
+// 35650
+class npc_sassy_hardwrench_35650 : public CreatureScript
+{
+public:
+    npc_sassy_hardwrench_35650() : CreatureScript("npc_sassy_hardwrench_35650") { }
+
+    enum eNPC
+    {        
+    };
+
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    {
+        switch (quest->GetQuestId())
+        {
+        case 14014:
+            creature->AI()->Talk(1, player);
+            break;
+        case 14234:
+            creature->AI()->Talk(2, player);
+            break;
+        case 14248:
+            creature->AI()->Talk(0, player);
+            break;
+        }
+        return false;
+    }
+
+    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*opt*/)
+    {
+        switch (quest->GetQuestId())
+        {
+        
+        }
+        return false;
+    }
+
+ 
+};
+
+// 38738
+class npc_coach_crosscheck_38738 : public CreatureScript
+{
+public:
+    npc_coach_crosscheck_38738() : CreatureScript("npc_coach_crosscheck_38738") { }
+
+    struct npc_coach_crosscheck_38738AI : public ScriptedAI
+    {
+        npc_coach_crosscheck_38738AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap m_events;
+
+        void Reset()
+        {
+            m_events.RescheduleEvent(EVENT_TALK_PART_00, urand(45000, 60000));
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_TALK_PART_00:
+                {
+                    if (Player* player = me->FindNearestPlayer(25.0f))
+                        Talk(1, player);
+
+                    m_events.ScheduleEvent(EVENT_TALK_PART_00, urand(45000, 60000));
+                    break;
+                }               
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_coach_crosscheck_38738AI(creature);
+    }
+};
+
+// 35786
+class npc_maxx_avalanche_35786 : public CreatureScript
+{
+public:
+    npc_maxx_avalanche_35786() : CreatureScript("npc_maxx_avalanche_35786") { }
+
+    enum eNPC
+    {
+    };
+
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    {
+        switch (quest->GetQuestId())
+        {
+        case 14473:
+            creature->AI()->Talk(0, player);
+            break;       
+        }
+        return false;
+    }
+
+    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*opt*/)
+    {
+        switch (quest->GetQuestId())
+        {
+        case 14473:
+            creature->AI()->Talk(1, player);
+            break;
+        }
+        return false;
+    }
+
+
+};
+
+// 35758
+class npc_bamm_megabomb_35758 : public CreatureScript
+{
+public:
+    npc_bamm_megabomb_35758() : CreatureScript("npc_bamm_megabomb_35758") { }
+
+    enum eNPC
+    {
+    };
+
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    {
+        switch (quest->GetQuestId())
+        {
+        case 14019:
+            creature->AI()->Talk(0, player);
+            break;
+        }
+        return false;
+    }
+
+    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*opt*/)
+    {
+        switch (quest->GetQuestId())
+        {
+        case 14019:
+            creature->AI()->Talk(1, player);
+            break;
+        }
+        return false;
+    }
+
+
+};
+
+// 36403
+class npc_trade_prince_gallywix_36403 : public CreatureScript
+{
+public:
+    npc_trade_prince_gallywix_36403() : CreatureScript("npc_trade_prince_gallywix_36403") { }
+
+    struct npc_trade_prince_gallywix_36403AI : public ScriptedAI
+    {
+        npc_trade_prince_gallywix_36403AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap m_events;
+        
+        void Reset()
+        {
+            m_events.RescheduleEvent(EVENT_TALK_PART_00, urand(45000, 60000));
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_TALK_PART_00:
+                {
+                    if (Player* player = me->FindNearestPlayer(25.0f))
+                        Talk(0, player);
+
+                    m_events.ScheduleEvent(EVENT_TALK_PART_00, urand(45000, 60000));
+                    break;
+                }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_trade_prince_gallywix_36403AI(creature);
+    }
+};
+
 // 34699
 class npc_bomb_throwing_monkey_34699 : public CreatureScript
 {
@@ -591,8 +800,8 @@ public:
         SPELL_FRIGHTENED_MINER_CONTROLLER_AURA = 68062, // Trigger: spell 68059 Summon Frightened Miner 35813 
     };
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) 
-    { 
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    {
         switch (quest->GetQuestId())
         {
         case 14021:
@@ -610,11 +819,20 @@ public:
             break;
         }
         }
-        return false; 
+        return false;
     }
 
-
-    };
+    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*opt*/)
+    {
+        switch (quest->GetQuestId())
+        {
+        case 14021:
+            creature->AI()->Talk(1, player);
+            break;
+        }
+        return false;
+    }
+};
 
 // 35813
 class npc_frightened_miner_35813 : public CreatureScript
@@ -670,6 +888,7 @@ public:
                         if (Quest const* quest = sObjectMgr->GetQuestTemplate(14031))
                         {
                             player->AddQuest(quest, dampwick);
+                            Talk(1, player);
                             m_events.ScheduleEvent(EVENT_START_TO_NEXT_ORE, 8000);
                         }
             }
@@ -741,12 +960,18 @@ public:
                     {
                         if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
                         {
-                            Talk(m_move, player);
                             m_move += 1;
-                            me->HandleEmote(EMOTE_ONESHOT_NONE);
-                            me->GetMotionMaster()->MovePath(3581300 + m_move, false);
-                            if (m_move == 6)
+                            if (m_move < 6)
+                            {
+                                Talk(2, player);
+                                me->HandleEmote(EMOTE_ONESHOT_NONE);
+                                me->GetMotionMaster()->MovePath(3581300 + m_move, false);
+                            }
+                            else if (m_move == 6)
+                            {
+                                Talk(3, player);
                                 player->KilledMonsterCredit(35816);
+                            }
                         }
                     }
                     else
@@ -889,6 +1114,80 @@ public:
     }
 };
 
+// 35838
+class npc_pygmy_witchdoctor_35838 : public CreatureScript
+{
+public:
+    npc_pygmy_witchdoctor_35838() : CreatureScript("npc_pygmy_witchdoctor_35838") { }
+
+    struct npc_pygmy_witchdoctor_35838AI : public ScriptedAI
+    {
+        npc_pygmy_witchdoctor_35838AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap m_events;
+
+        void Reset()
+        {
+            m_events.RescheduleEvent(EVENT_TALK_PART_00, urand(15000, 20000));
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_TALK_PART_00:
+                {
+                    if (Player* player = me->FindNearestPlayer(25.0f))
+                        Talk(0, player);
+
+                    m_events.ScheduleEvent(EVENT_TALK_PART_00, urand(15000, 20000));
+                    break;
+                }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_pygmy_witchdoctor_35838AI(creature);
+    }
+};
+
+// 35875
+class npc_aggra_35875 : public CreatureScript
+{
+public:
+    npc_aggra_35875() : CreatureScript("npc_aggra_35875") { }
+
+    enum eNPC
+    {
+    };
+
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    {
+        switch (quest->GetQuestId())
+        {
+        case 14235:
+            creature->AI()->Talk(0, player);
+            break;
+        case 14237:
+            creature->AI()->Talk(1, player);
+            break;
+        }
+        return false;
+    }
+};
+
 // 35894
 class npc_orc_scout_35894 : public CreatureScript
 {
@@ -985,6 +1284,17 @@ public:
     enum eNPC
     {
     };
+
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    {
+        switch (quest->GetQuestId())
+        {
+        case 14303:
+            creature->AI()->Talk(1, player);
+            break;
+        }
+        return false;
+    }
 
     struct npc_kilag_gorefang_35893AI : public ScriptedAI
     {
@@ -1247,14 +1557,16 @@ public:
     {
     };
 
-    struct npc_strangle_vine_35995AI : public ScriptedAI
+    struct npc_strangle_vine_35995AI : public VehicleAI
     {
-        npc_strangle_vine_35995AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+        npc_strangle_vine_35995AI(Creature* creature) : VehicleAI(creature) { Initialize(); }
 
         EventMap  m_events;
+        uint64    m_playerGUID;
 
         void Initialize()
         {
+            m_playerGUID = 0;
         }
 
         void Reset() override
@@ -1266,7 +1578,18 @@ public:
         void DamageTaken(Unit* attacker, uint32& damage) override 
         { 
             if (Player* player = attacker->ToPlayer())
+            {
                 me->CastSpell(me, 60603);
+                m_playerGUID = player->GetGUID();
+            }
+        }
+
+        void PassengerBoarded(Unit* passenger, int8 seatId, bool apply) override 
+        { 
+            if (Creature* orc = passenger->ToCreature())
+                if (orc->GetEntry() == 36042 && !apply)
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        orc->AI()->Talk(0, player);
         }
 
         void UpdateAI(uint32 diff) override
@@ -1293,6 +1616,69 @@ public:
     }
 };
 
+// 35918
+class npc_orc_scout_35918 : public CreatureScript
+{
+public:
+    npc_orc_scout_35918() : CreatureScript("npc_orc_scout_35918") { }
+
+    enum eNPC
+    {
+    };
+
+    struct npc_orc_scout_35918AI : public ScriptedAI
+    {
+        npc_orc_scout_35918AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+        EventMap  m_events;
+        uint64    m_playerGUID;
+        Position  m_position;
+
+        void Initialize()
+        {
+            m_playerGUID = 0;
+            m_position = Position(656.1f, 2819.3f, 84.96f);
+        }
+
+        void Reset() override
+        {
+            CharmInfo* ci = me->GetCharmInfo();
+            CharmSpellInfo* csi = ci->GetCharmSpell(0);
+            m_events.RescheduleEvent(EVENT_TALK_PART_00, 2000);
+        }
+
+        void IsSummonedBy(Unit* summoner) override 
+        { 
+            if (Player* player = summoner->ToPlayer())
+                m_playerGUID = player->GetGUID();
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_TALK_PART_00:
+                {
+
+                    break;
+                }
+                }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_orc_scout_35918AI(creature);
+    }
+};
+
+/*  phase 171  */
+
 
 void AddSC_zone_lost_isles()
 {
@@ -1301,14 +1687,22 @@ void AddSC_zone_lost_isles()
     new go_goblin_escape_pod_195188();
     new npc_trade_prince_gallywix_35649();
     new npc_goblin_survivor_34748();
+    new npc_sassy_hardwrench_35650();
+    new npc_coach_crosscheck_38738();
+    new npc_maxx_avalanche_35786();
+    new npc_bamm_megabomb_35758();
+    new npc_trade_prince_gallywix_36403();
     new npc_bomb_throwing_monkey_34699();
     new npc_foreman_dampwick_35769();
     new npc_frightened_miner_35813();
     new npc_capturing_the_unknown_bunny();
+    new npc_pygmy_witchdoctor_35838();
+    new npc_aggra_35875();
     new npc_orc_scout_35894();
     new npc_kilag_gorefang_35893();
     new npc_poison_spitter_35896();
     new npc_freezya_35897();
     new npc_strangle_vine_35995();
+    new npc_orc_scout_35918();
 
 }
