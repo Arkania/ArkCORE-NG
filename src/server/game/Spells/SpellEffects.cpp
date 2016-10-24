@@ -1035,6 +1035,17 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
     switch (m_spellInfo->SpellFamilyName)
     {
         case SPELLFAMILY_GENERIC:
+            // spell  HGK Schnappblitz
+            if (m_spellInfo->Id == 68280)
+                if (m_caster->GetTypeId() == TYPEID_PLAYER)
+                {
+                    Creature* bunny = m_caster->FindNearestCreature(37872, 5.0f);
+                    if (!bunny) bunny = m_caster->FindNearestCreature(37895, 13.0f);
+                    if (!bunny) bunny = m_caster->FindNearestCreature(37896, 5.0f);
+                    if (!bunny) bunny = m_caster->FindNearestCreature(37897, 5.0f);
+                    if (bunny)
+                        m_caster->CastSpell(bunny, 68281, true);                    
+                }
             // spell Hot Rod - Radio
             if (m_spellInfo->Id == 66299 && !effIndex)
             {

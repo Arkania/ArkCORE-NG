@@ -63,6 +63,8 @@ enum Zone_zone_lost_isles
     EVENT_TALK_PART_09,
     EVENT_TALK_PART_10,
     EVENT_SHOW_FIGHT,
+    EVENT_CAST_SPELL_00,
+    EVENT_CAST_SPELL_01,
 };
 
 /*  phase 170  */
@@ -517,21 +519,12 @@ public:
             break;
         case 14248:
             creature->AI()->Talk(0, player);
+            player->RemoveAura(68256);
+            player->RemoveAura(68258);
             break;
         }
         return false;
     }
-
-    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*opt*/)
-    {
-        switch (quest->GetQuestId())
-        {
-        
-        }
-        return false;
-    }
-
- 
 };
 
 // 38738
@@ -812,10 +805,6 @@ public:
         }
         case 14031:
         {
-            player->CastSpell(player, 70661, true);
-            player->CastSpell(player, 70678, true);
-            player->CastSpell(player, 70680, true);
-            player->CastSpell(player, 70681, true);
             break;
         }
         }
@@ -828,6 +817,7 @@ public:
         {
         case 14021:
             creature->AI()->Talk(1, player);
+            player->RemoveAura(SPELL_FRIGHTENED_MINER_CONTROLLER_AURA);
             break;
         }
         return false;
@@ -876,7 +866,12 @@ public:
 
         void JustSummoned(Creature* summon) override 
         { 
-            m_cartGUID = summon->GetGUID();
+            if (Creature* cart = summon->ToCreature())
+            {
+                m_cartGUID = cart->GetGUID();
+                cart->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                cart->SetReactState(REACT_PASSIVE);
+            }
         }
 
         void MovementInform(uint32 type, uint32 id) override
@@ -888,14 +883,19 @@ public:
                         if (Quest const* quest = sObjectMgr->GetQuestTemplate(14031))
                         {
                             player->AddQuest(quest, dampwick);
+                            player->CastSpell(player, 68920, true);
+                            player->CastSpell(player, 70661, true);
+                            player->CastSpell(player, 70678, true);
+                            player->CastSpell(player, 70680, true);
+                            player->CastSpell(player, 70681, true);
                             Talk(1, player);
-                            m_events.ScheduleEvent(EVENT_START_TO_NEXT_ORE, 8000);
+                            m_events.ScheduleEvent(EVENT_START_TO_NEXT_ORE, 10000);
                         }
             }
             else if (type == WAYPOINT_MOTION_TYPE && m_move == 2 && id == 5)
             {
                 me->HandleEmote(EMOTE_STATE_WORK_MINING);
-                m_events.ScheduleEvent(EVENT_START_TO_NEXT_ORE, 5000);
+                m_events.ScheduleEvent(EVENT_START_TO_NEXT_ORE, 8000);
             }
             else if (type == WAYPOINT_MOTION_TYPE && m_move == 3 && id == 4)
             {
@@ -962,16 +962,14 @@ public:
                         {
                             m_move += 1;
                             if (m_move < 6)
-                            {
                                 Talk(2, player);
-                                me->HandleEmote(EMOTE_ONESHOT_NONE);
-                                me->GetMotionMaster()->MovePath(3581300 + m_move, false);
-                            }
                             else if (m_move == 6)
                             {
                                 Talk(3, player);
                                 player->KilledMonsterCredit(35816);
                             }
+                            me->HandleEmote(EMOTE_ONESHOT_NONE);
+                            me->GetMotionMaster()->MovePath(3581300 + m_move, false);
                         }
                     }
                     else
@@ -995,51 +993,41 @@ class npc_capturing_the_unknown_bunny : public CreatureScript
 public:
     npc_capturing_the_unknown_bunny() : CreatureScript("npc_capturing_the_unknown_bunny") { }
 
-    enum eNPC
-    {
-        EVENT_CAST_SPELL = 901,
-    };
-
     struct npc_capturing_the_unknown_bunnyAI : public ScriptedAI
     {
         npc_capturing_the_unknown_bunnyAI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
 
         EventMap m_events;
         uint64   m_playerGUID;
+        uint64   m_bunnyGUID;
 
         void Initialize()
         {
-            m_playerGUID=0;
-        }
-
-        void Reset() override
-        {
+            m_playerGUID = 0;
+            m_bunnyGUID = 0;
         }
 
         void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
+            if (!m_bunnyGUID)
+                if (Creature* bunny = me->FindNearestCreature(23837, 10.0f))
+                    m_bunnyGUID = bunny->GetGUID();
             if (!m_playerGUID)
-            {
-                m_events.RescheduleEvent(EVENT_MASTER_RESET, 5000);
-                if (spell->Id == 68280)
-                {
-                    if (Player* player = caster->ToPlayer())
-                    {
-                        m_playerGUID = player->GetGUID();
-                        me->CastSpell(caster, 68279, true);
-                        m_events.RescheduleEvent(EVENT_CAST_SPELL, 400);
-                    }
-                }
-            }
-            else
-            {
+                if (Player* player = caster->ToPlayer())
+                    m_playerGUID = player->GetGUID();
+
+            if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
                 switch (spell->Id)
                 {
                 case 68281:
                 {
+                    m_events.ScheduleEvent(EVENT_CAST_SPELL_00, 200);
+                    m_events.RescheduleEvent(EVENT_MASTER_RESET, 5000);
                     if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
                     {
-                        player->CastSpell(player, 70641, true);
+                        me->CastSpell(player, 68279, true);
+                        if (Creature* bunny = ObjectAccessor::GetCreature(*me, m_bunnyGUID))
+                            player->CastSpell(bunny, 70641, true);
                     }
                     break;
                 }
@@ -1047,7 +1035,6 @@ public:
                 {
                     if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
                     {
-                        player->RemoveAura(70649);
                         switch (me->GetEntry())
                         {
                         case 37872:
@@ -1063,14 +1050,11 @@ public:
                             player->RemoveAura(70681);
                             break;
                         }
-                        me->CastSpell(player, 68936, true);
-                        player->KilledMonsterCredit(me->GetEntry());
                     }
-                    m_playerGUID = 0;
+                    m_events.ScheduleEvent(EVENT_CAST_SPELL_01, 2000);
                     break;
                 }
                 }
-            }
         }
 
         void UpdateAI(uint32 diff) override
@@ -1081,15 +1065,24 @@ public:
             {
                 switch (eventId)
                 {
-                case EVENT_CAST_SPELL:
+                case EVENT_CAST_SPELL_00:
                 {
                     if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
                     {
-                        player->CastSpell(player, 70649, true);
                         player->CastSpell(player, 70641, true);
-                        player->CastSpell(me, 68281, true);
+                        player->CastSpell(player, 70649, true);
                     }
                     break;
+                }
+                case EVENT_CAST_SPELL_01:
+                {
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                    {
+                        me->CastSpell(player, 68936, true);
+                        player->KilledMonsterCredit(me->GetEntry());
+                        m_events.CancelEvent(EVENT_MASTER_RESET);
+                    }
+                    /* no break here */
                 }
                 case EVENT_MASTER_RESET:
                 {
@@ -1590,23 +1583,6 @@ public:
                 if (orc->GetEntry() == 36042 && !apply)
                     if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
                         orc->AI()->Talk(0, player);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            m_events.Update(diff);
-
-            while (uint32 eventId = m_events.ExecuteEvent())
-            {
-                switch (eventId)
-                {
-                }
-            }
-
-            if (!UpdateVictim())
-                return;
-            else
-                DoMeleeAttackIfReady();
         }
     };
 
