@@ -799,7 +799,6 @@ bool GameObject::LoadGameObjectFromDB(uint32 guid, Map* map, bool addToMap)
 
     uint32 entry = data->id;
     //uint32 map_id = data->mapid;                          // already used before call
-    uint32 phaseMask = data->phaseMask;
     float x = data->posX;
     float y = data->posY;
     float z = data->posZ;
@@ -817,10 +816,12 @@ bool GameObject::LoadGameObjectFromDB(uint32 guid, Map* map, bool addToMap)
     m_DBTableGuid = guid;
     if (map->GetInstanceId() != 0) guid = sObjectMgr->GenerateLowGuid(HIGHGUID_GAMEOBJECT);
 
-    if (!Create(guid, entry, map, phaseMask, x, y, z, ang, rotation0, rotation1, rotation2, rotation3, animprogress, go_state, artKit))
+    if (!Create(guid, entry, map, data->phaseMask, x, y, z, ang, rotation0, rotation1, rotation2, rotation3, animprogress, go_state, artKit))
         return false;
 
-    SetPhaseBaseValues(data);
+    std::set<uint16> phaseIds = MergePhases(data->phaseMask, data->phaseIds, GetXPhasesForGroup(data->phaseGroup));
+    for (uint16 ph : phaseIds)
+        SetInPhase(ph, false, true);
 
     if (data->spawntimesecs >= 0)
     {
@@ -858,22 +859,6 @@ bool GameObject::LoadGameObjectFromDB(uint32 guid, Map* map, bool addToMap)
         return false;
 
     return true;
-}
-
-void GameObject::SetPhaseBaseValues(const GameObjectData* data)
-{
-    if (data)
-    {
-        if (data->phaseMask > 1)
-            SetPhaseMask(data->phaseMask, false);
-
-        if (!data->phaseIds.empty())
-            for (uint16 ph : data->phaseIds)
-                SetInPhase(ph, false, true);
-
-        if (GetPhaseIds().empty())
-            SetInPhase(DEFAULT_PHASE, false, true);
-    }
 }
 
 void GameObject::DeleteFromDB()

@@ -291,10 +291,12 @@ Creature* Transport::CreateNPCPassenger(uint32 guid, CreatureData const* data)
         return NULL;
     }
 
-    if (!data->phaseIds.empty())
+    std::set<uint16> phaseIds = MergePhases(data->phaseMask, data->phaseIds, GetXPhasesForGroup(data->phaseGroup));
+   
+    if (!phaseIds.empty())
     {
-        for (uint16 ph : data->phaseIds)
-            creature->SetInPhase(ph, false, true);
+        for (uint16 ph : phaseIds)
+            SetInPhase(ph, false, true);
     }
     else
         creature->CopyPhaseFrom(this);

@@ -261,7 +261,7 @@ struct CreatureData
     CreatureData() : id(0), mapid(0), zoneId(0), areaId(0), phaseMask(0), displayid(0), equipmentId(0),
                      posX(0.0f), posY(0.0f), posZ(0.0f), orientation(0.0f), spawntimesecs(0),
                      spawndist(0.0f), currentwaypoint(0), curhealth(0), curmana(0), movementType(0),
-                     spawnMask(0), npcflag(0), unit_flags(0), dynamicflags(0), dbData(true) { }
+                     spawnMask(0), npcflag(0), unit_flags(0), dynamicflags(0), phaseGroup(0), dbData(true) { }
     uint32 id;                                              // entry in creature_template
     uint16 mapid;
     uint16 zoneId;
@@ -284,6 +284,7 @@ struct CreatureData
     uint32 unit_flags;                                      // enum UnitFlags mask values
     uint32 dynamicflags;
     std::set<uint16> phaseIds;
+    uint16 phaseGroup;
     bool dbData;
 };
 
@@ -457,7 +458,6 @@ class Creature : public Unit, public GridObject<Creature>, public MapObject
         void DisappearAndDie();
 
         bool Create(uint32 guidlow, Map* map, uint32 phaseMask, uint32 Entry, uint32 vehId, uint32 team, float x, float y, float z, float ang, const CreatureData* data = NULL);
-        void SetPhaseBaseValues(const CreatureData * data);
         bool LoadCreaturesAddon(bool reload = false);
         void SelectLevel();
         void LoadEquipment(int8 id = 1, bool force = false);

@@ -1617,7 +1617,7 @@ void ObjectMgr::LoadCreatures()
     //                                               0              1   2    3        4             5           6           7           8            9              10
     QueryResult result = WorldDatabase.Query("SELECT creature.guid, id, map, modelid, equipment_id, position_x, position_y, position_z, orientation, spawntimesecs, spawndist, "
     //   11               12         13       14            15         16          17          18                19                   20                     21                             
-        "currentwaypoint, curhealth, curmana, MovementType, spawnMask, eventEntry, pool_entry, creature.npcflag, creature.unit_flags, creature.dynamicflags, creature.phaseIds "
+        "currentwaypoint, curhealth, curmana, MovementType, spawnMask, eventEntry, pool_entry, creature.npcflag, creature.unit_flags, creature.dynamicflags, creature.phaseIds, creature.phaseGroup "
         "FROM creature "
         "LEFT OUTER JOIN game_event_creature ON creature.guid = game_event_creature.guid "
         "LEFT OUTER JOIN pool_creature ON creature.guid = pool_creature.guid");
@@ -1675,7 +1675,8 @@ void ObjectMgr::LoadCreatures()
         data.dynamicflags   = fields[20].GetUInt32();
 
         std::string phaseIds = fields[21].GetCString();
-        data.phaseIds = GetUInt16List(phaseIds);
+        data.phaseIds        = GetUInt16List(phaseIds);
+        data.phaseGroup      = fields[22].GetUInt16();
 
         MapEntry const* mapEntry = sMapStore.LookupEntry(data.mapid);
         if (!mapEntry)
@@ -1742,13 +1743,11 @@ void ObjectMgr::LoadCreatures()
             }
         }
 
-        if (data.phaseIds.empty())
+        if (!data.phaseMask && data.phaseIds.empty() && !data.phaseGroup)
         {
             TC_LOG_ERROR("sql.sql", "Table `creature` have creature (GUID: %u Entry: %u) with no `phaseId` (not visible for anyone), set to DEFAULT_PHASE.", guid, data.id);
             data.phaseIds.insert(DEFAULT_PHASE);
         }
-        
-        data.phaseMask = PHASEMASK_NORMAL;
 
         // Add to grid if not managed by the game event or pool system
         if (gameEvent == 0 && PoolId == 0)
@@ -1936,7 +1935,7 @@ void ObjectMgr::LoadGameobjects()
     //                                                0                1   2    3           4           5           6
     QueryResult result = WorldDatabase.Query("SELECT gameobject.guid, id, map, position_x, position_y, position_z, orientation, "
     //   7          8          9          10         11             12            13     14         15          16          17               
-        "rotation0, rotation1, rotation2, rotation3, spawntimesecs, animprogress, state, spawnMask, eventEntry, pool_entry, phaseIds "
+        "rotation0, rotation1, rotation2, rotation3, spawntimesecs, animprogress, state, spawnMask, eventEntry, pool_entry, phaseIds, phaseGroup "
         "FROM gameobject LEFT OUTER JOIN game_event_gameobject ON gameobject.guid = game_event_gameobject.guid "
         "LEFT OUTER JOIN pool_gameobject ON gameobject.guid = pool_gameobject.guid");
 
@@ -2038,6 +2037,7 @@ void ObjectMgr::LoadGameobjects()
 
         std::string phaseIds = fields[17].GetCString();
         data.phaseIds = GetUInt16List(phaseIds);
+        data.phaseGroup = fields[18].GetUInt16();
 
         if (data.rotation2 < -1.0f || data.rotation2 > 1.0f)
         {
@@ -2057,13 +2057,11 @@ void ObjectMgr::LoadGameobjects()
             continue;
         }
 
-        if (data.phaseIds.empty())
+        if (!data.phaseMask && data.phaseIds.empty() && !data.phaseGroup)
         {
             TC_LOG_ERROR("sql.sql", "Table `gameobject` have gameobject (GUID: %u Entry: %u) with no `phaseIds` (not visible for anyone), set to DEFAULT_PHASE.", guid, data.id);
             data.phaseIds.insert(DEFAULT_PHASE);
         }
-
-        data.phaseMask = PHASEMASK_NORMAL;
 
         if (gameEvent == 0 && PoolId == 0)                      // if not this is to be managed by GameEvent System or Pool system
             AddGameobjectToGrid(guid, &data);

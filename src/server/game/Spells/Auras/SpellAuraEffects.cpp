@@ -1466,8 +1466,10 @@ void AuraEffect::HandlePhaseGroup(AuraApplication const* aurApp, uint8 mode, boo
 
     std::set<uint16> const& oldPhases = target->GetPhaseIds();
     uint16 phGroupValue = GetMiscValueB();
-    // std::set<uint16> const& phaseIds = GetXPhasesForGroup(phGroupValue);    
-    target->SetInPhase(phGroupValue, false, apply);
+    std::set<uint16> phaseIds = GetXPhasesForGroup(phGroupValue);
+    phaseIds.insert(phGroupValue); // i'm not shure: should the phaseGroup be added to visible phases or shoult not 
+    for (auto phase : phaseIds)
+        target->SetInPhase(phase, false, apply);
 
     // call functions which may have additional effects after chainging state of unit
     // phase auras normally not expected at BG but anyway better check

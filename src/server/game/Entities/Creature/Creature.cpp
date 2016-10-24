@@ -772,8 +772,12 @@ bool Creature::Create(uint32 guidlow, Map* map, uint32 phaseMask, uint32 Entry, 
     ASSERT(map);
     SetMap(map);
 
-    SetPhaseMask(phaseMask, false);
-    SetPhaseBaseValues(data);
+    std::set<uint16> phaseIds = ComputePhaseMaskToIds(phaseMask);
+    if (data)
+        phaseIds = MergePhases(phaseMask, data->phaseIds, GetXPhasesForGroup(data->phaseGroup));
+
+    for (uint16 ph : phaseIds)
+        SetInPhase(ph, false, true);
   
     CreatureTemplate const* cinfo = sObjectMgr->GetCreatureTemplate(Entry);
     if (!cinfo)
@@ -848,22 +852,6 @@ bool Creature::Create(uint32 guidlow, Map* map, uint32 phaseMask, uint32 Entry, 
         SetVisible(false);
 
     return true;
-}
-
-void Creature::SetPhaseBaseValues(const CreatureData* data)
-{
-    if (data)
-    {
-        if (data->phaseMask > 1)
-            SetPhaseMask(data->phaseMask, false);
-
-        if (!data->phaseIds.empty())
-            for (uint16 ph : data->phaseIds)
-                SetInPhase(ph, false, true);
-
-        if (GetPhaseIds().empty())
-            SetInPhase(DEFAULT_PHASE, false, true);
-    }
 }
 
 void Creature::InitializeReactState()
@@ -1561,22 +1549,40 @@ void Creature::SetDeathState(DeathState s)
     }
     else if (s == JUST_RESPAWNED)
     {
-        //if (IsPet())
-        //    setActive(true);
-        SetFullHealth();
-        SetLootRecipient(NULL);
+        if (IsPet())
+            SetFullHealth();
+        else
+            SetFullHealth();
+        
+        SetLootRecipient(nullptr);
         ResetPlayerDamageReq();
-
         UpdateMovementFlags();
-
-        CreatureTemplate const* cinfo = GetCreatureTemplate();
-        SetUInt32Value(UNIT_NPC_FLAGS, cinfo->npcflag);
         ClearUnitState(uint32(UNIT_STATE_ALL_STATE & ~UNIT_STATE_IGNORE_PATHFINDING));
-        SetMeleeDamageSchool(SpellSchools(cinfo->dmgschool));
-        LoadCreaturesAddon(true);
+
+        if (!IsPet())
+        {
+            CreatureData const* creatureData = GetCreatureData();
+            CreatureTemplate const* cinfo = GetCreatureTemplate();
+
+            uint32 npcflag, unit_flags, dynamicflags;
+            ObjectMgr::ChooseCreatureFlags(cinfo, npcflag, unit_flags, dynamicflags, creatureData);
+
+            SetUInt32Value(UNIT_NPC_FLAGS, npcflag);
+            SetUInt32Value(UNIT_FIELD_FLAGS, unit_flags);
+            SetUInt32Value(UNIT_DYNAMIC_FLAGS, dynamicflags);
+
+            RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT);
+
+            SetMeleeDamageSchool(SpellSchools(cinfo->dmgschool));
+            
+            std::set<uint16> phaseIds = MergePhases(creatureData->phaseMask, creatureData->phaseIds, GetXPhasesForGroup(creatureData->phaseGroup));
+            for (uint16 ph : phaseIds)
+                SetInPhase(ph, false, true);
+        }
+
         Motion_Initialize();
-        SetPhaseBaseValues(GetCreatureData());
         Unit::SetDeathState(ALIVE);
+        LoadCreaturesAddon(true);
     }
 }
 

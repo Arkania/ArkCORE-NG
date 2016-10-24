@@ -653,6 +653,38 @@ uint64 ComputePhaseIdToMask(uint16 id)
 
 }
 
+std::set<uint16> ComputePhaseMaskToIds(uint64 phaseMask)
+{
+    std::set<uint16> phases;
+    for (uint64 i = 1; i < 32; i++)
+    {
+        uint64 mask = (uint64(2) ^ i) & phaseMask;
+        if (mask)
+            phases.insert(169 + i);
+    }
+    return phases;
+}
+
+std::set<uint16> MergePhases(uint64 phaseMask, std::set<uint16> phaseIds, std::set<uint16> phaseGroupIds)
+{
+    std::set<uint16> phases = ComputePhaseMaskToIds(phaseMask);
+    
+    if (phaseIds.size())
+        for (auto ph : phaseIds)
+            if (phases.find(ph) == phases.end())
+                phases.insert(ph);
+
+    if (phaseGroupIds.size())
+        for (auto ph : phaseGroupIds)
+            if (phases.find(ph) == phases.end())
+                phases.insert(ph);
+
+    if (phases.empty())
+        phases.insert(169);
+
+    return phases;
+}
+
 char* GetCopyOfChars(const char * source)
 {
     const size_t len = strlen(source);
