@@ -3394,7 +3394,18 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
                     {
                         Position pos;
                         if (count == 0)
-                            pos = *destTarget;
+                            switch (m_spellInfo->Id)
+                            {
+                            case 68286:
+                                pos = Position(600.61f, 2781.36f, 89.1749f, 1.1527f);
+                                break;
+                            case 68287:
+                                pos = Position(602.79f, 2778.63f, 89.2229f, 1.0152f);
+                                break;
+                            default:
+                                pos = *destTarget;
+                                break;
+                            }
                         else
                             // randomize position for multiple summons
                             pos = m_caster->GetRandomPoint(*destTarget, radius);

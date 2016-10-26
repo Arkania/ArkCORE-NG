@@ -1033,7 +1033,7 @@ float SpellEffectInfo::CalcRadius(bool positive, Unit* caster, Spell* spell) con
             case 103414: // Morchok Stomp.
                 return 25.0f;
             case 103785: // Morchok Black Blood.
-                return 150.0f;            
+                return 150.0f;
         }
     }
 
