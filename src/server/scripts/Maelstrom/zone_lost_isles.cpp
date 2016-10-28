@@ -64,10 +64,12 @@ enum Zone_zone_lost_isles
     EVENT_TALK_PART_09,
     EVENT_TALK_PART_10,
     EVENT_SHOW_FIGHT,
+    EVENT_CHECK_FIGHT,
     EVENT_CAST_SPELL_00,
     EVENT_CAST_SPELL_01,
     EVENT_CAST_COOLDOWN_01,
     EVENT_CAST_COOLDOWN_02,
+    EVENT_START_WALK,
 };
 
 /*  phase 170  */
@@ -1779,15 +1781,62 @@ public:
     }
 };
 
+// 35917
+class npc_kilag_gorefang_35917 : public CreatureScript
+{
+public:
+    npc_kilag_gorefang_35917() : CreatureScript("npc_kilag_gorefang_35917") { }
+
+    enum eNPC
+    {
+    };
+
+    bool OnGossipHello(Player* player, Creature* creature)
+    {
+        if (player->HasAura(69303))
+            if (player->GetQuestStatus(14238) != QUEST_STATUS_INCOMPLETE)
+            {
+                player->RemoveAura(69303);
+                player->RemoveAura(68376);
+            }
+        return false;
+    }
+
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    {
+        switch (quest->GetQuestId())
+        {
+        case 14238:
+            creature->AI()->Talk(0, player);
+            creature->CastSpell(player, 68344);
+            break;
+        case 14240:
+            creature->AI()->Talk(1, player);
+            player->CastSpell(player, 68973);
+            break;
+        }
+        return false;
+    }
+
+    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*opt*/)
+    {
+        switch (quest->GetQuestId())
+        {
+        case 14238:
+            player->CastSpell(player, 68337);
+            player->CastSpell(player, 68371);
+            player->RemoveAura(68338);
+            break;
+        }
+        return false;
+    }
+};
+
 // 36100
 class npc_orc_scout_36100 : public CreatureScript
 {
 public:
     npc_orc_scout_36100() : CreatureScript("npc_orc_scout_36100") { }
-
-    enum eNPC
-    {
-    };
 
     struct npc_orc_scout_36100AI : public ScriptedAI
     {
@@ -1803,8 +1852,11 @@ public:
 
         void Reset() override
         {
-            m_playerGUID = me->GetOwnerGUID();
-            m_events.RescheduleEvent(EVENT_TALK_PART_00, 1000);
+            if (!m_playerGUID)
+            {
+                m_playerGUID = me->GetOwnerGUID();
+                m_events.RescheduleEvent(EVENT_TALK_PART_00, 1000);
+            }
         }
 
         void UpdateAI(uint32 diff) override
@@ -1823,6 +1875,10 @@ public:
                 }
                 }
             }
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
         }
     };
 
@@ -1832,6 +1888,80 @@ public:
     }
 };
 
+// 36585
+class npc_bastia_36585 : public CreatureScript
+{
+public:
+    npc_bastia_36585() : CreatureScript("npc_bastia_36585") { }
+
+    enum eNPC
+    {
+    };
+
+    struct npc_bastia_36585AI : public VehicleAI
+    {
+        npc_bastia_36585AI(Creature* creature) : VehicleAI(creature) { Initialize(); }
+
+        EventMap  m_events;
+        uint64    m_playerGUID;
+
+        void Initialize()
+        {
+            m_playerGUID = 0;
+        }
+
+        void Reset() override
+        {
+        }
+
+        void PassengerBoarded(Unit* passenger, int8 seatId, bool apply) override
+        {
+            if (apply)
+            {
+                if (Player* player = passenger->ToPlayer())
+                {
+                    m_playerGUID = player->GetGUID();
+                    m_events.ScheduleEvent(EVENT_START_WALK, 3000);
+                }
+            }
+        }
+
+        void MovementInform(uint32 type, uint32 id) override 
+        { 
+            if (type == WAYPOINT_MOTION_TYPE)
+                if (id == 27)
+                    me->DespawnOrUnsummon(10);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_START_WALK:
+                {
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        player->SetClientControl(me, false);
+                    me->GetMotionMaster()->MovePath(3658500, false);
+                    break;
+                }
+                }
+            }
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_bastia_36585AI(creature);
+    }
+};
 
 
 void AddSC_zone_lost_isles()
@@ -1862,5 +1992,7 @@ void AddSC_zone_lost_isles()
     new item_weed_whacker_49108();
     /*  phase 171  */
     new item_infrared_heat_focals_49611();
+    new npc_kilag_gorefang_35917();
     new npc_orc_scout_36100();
+    new npc_bastia_36585();
 }
