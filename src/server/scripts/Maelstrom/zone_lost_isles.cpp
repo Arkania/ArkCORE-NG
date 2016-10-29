@@ -1963,6 +1963,9 @@ public:
     }
 };
 
+/*  phase 172  */
+
+
 
 void AddSC_zone_lost_isles()
 {
@@ -1995,4 +1998,7 @@ void AddSC_zone_lost_isles()
     new npc_kilag_gorefang_35917();
     new npc_orc_scout_36100();
     new npc_bastia_36585();
+    /*  phase 172  */
+
+
 }
