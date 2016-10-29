@@ -772,9 +772,11 @@ bool Creature::Create(uint32 guidlow, Map* map, uint32 phaseMask, uint32 Entry, 
     ASSERT(map);
     SetMap(map);
 
-    std::set<uint16> phaseIds = ComputePhaseMaskToIds(phaseMask);
+    std::set<uint16> phaseIds;
     if (data)
         phaseIds = MergePhases(phaseMask, data->phaseIds, GetXPhasesForGroup(data->phaseGroup));
+    else
+        phaseIds = ComputePhaseMaskToIds(phaseMask);
 
     for (uint16 ph : phaseIds)
         SetInPhase(ph, false, true);
