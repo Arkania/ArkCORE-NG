@@ -54,8 +54,6 @@ REPLACE INTO spell_script_names VALUES
 
 UPDATE `creature_template` SET `ScriptName` = 'boss_alakir' WHERE `entry` =46753;
 
-REPLACE INTO `creature_template` VALUES ('8777000', '0', '0', '0', '0', '0', '11686', '11686', '0', '0', 'Wind Burst Trigger', '', '', '0', '60', '60', '0', '0', '35', '35', '0', '1', '1.14286', '1', '0', '2', '2', '0', '24', '1', '0', '0', '1', '33554436', '0', '0', '0', '0', '0', '0', '0', '1', '1', '0', '10', '16778240', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '', '0', '3', '1', '1.35', '1', '1', '1', '0', '0', '0', '0', '0', '0', '0', '0', '1', '0', '0', '0', 'npc_wind_burst_trigger', '1');
-
 UPDATE `creature_template` SET  `ScriptName` =  'npc_soothing_breeze' WHERE `entry` = 46246;
 UPDATE `creature_template` SET  `ScriptName` =  'npc_ice_patch' WHERE `entry` = 46186;
 UPDATE `creature_template` SET  `ScriptName` =  'npc_tornado_rohash' WHERE `entry` = 46207;
@@ -66,7 +64,6 @@ UPDATE `creature_template` SET  `ScriptName` =  'npc_ice_storm_rain' WHERE `entr
 UPDATE `creature_template` SET  `ScriptName` =  'npc_stormling_pre_effect' WHERE `entry` = 47177;
 UPDATE `creature_template` SET  `ScriptName` =  'npc_stormling' WHERE `entry` = 47175;
 UPDATE `creature_template` SET  `ScriptName` =  'npc_stormling' WHERE `entry` = 47177;
-UPDATE `creature_template` SET  `ScriptName` =  'npc_wind_burst_trigger' WHERE `entry` = 8777000;
 UPDATE `creature_template` SET  `ScriptName` =  'npc_relentless_storm_initial_vehicle' WHERE `entry` = 47806;
 UPDATE `creature_template` SET  `ScriptName` =  'npc_lightning_coulds' WHERE `entry` = 48190;
 UPDATE `creature_template` SET  `ScriptName` =  'npc_lightning_coulds' WHERE `entry` = 48196;
