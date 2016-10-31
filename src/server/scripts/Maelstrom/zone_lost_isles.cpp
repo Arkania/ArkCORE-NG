@@ -70,6 +70,7 @@ enum Zone_zone_lost_isles
     EVENT_CAST_COOLDOWN_01,
     EVENT_CAST_COOLDOWN_02,
     EVENT_START_WALK,
+    EVENT_START_FLYING,
 };
 
 /*  phase 170  */
@@ -1965,6 +1966,250 @@ public:
 
 /*  phase 172  */
 
+// 36112
+class npc_scout_brax_36112 : public CreatureScript
+{
+public:
+    npc_scout_brax_36112() : CreatureScript("npc_scout_brax_36112") { }
+
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    {
+        switch (quest->GetQuestId())
+        {
+        case QUEST_GOBLIN_ESCAPE_PODS_F:
+        case 14241:
+        {
+            creature->AI()->Talk(0, player);
+            break;
+        }
+        }
+        return false;
+    }
+};
+
+// 36129
+class npc_gyrochoppa_pilot_36129 : public CreatureScript
+{
+public:
+    npc_gyrochoppa_pilot_36129() : CreatureScript("npc_gyrochoppa_pilot_36129") { }
+
+    enum eNPC
+    {
+    };
+
+    struct npc_gyrochoppa_pilot_36129AI : public ScriptedAI
+    {
+        npc_gyrochoppa_pilot_36129AI(Creature* creature) : ScriptedAI(creature) { }
+
+        void EnterCombat(Unit* victim) override 
+        { 
+            if (Player* player = victim->ToPlayer())
+                Talk(0, player);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_gyrochoppa_pilot_36129AI(creature);
+    }
+};
+
+// 36127
+class npc_gyrochoppa_36127 : public CreatureScript
+{
+public:
+    npc_gyrochoppa_36127() : CreatureScript("npc_gyrochoppa_36127") { }
+
+    enum eNPC
+    {
+    };
+
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    {
+        switch (quest->GetQuestId())
+        {
+        case 14242:
+            player->PlayDirectSound(16422, player);
+            player->CastSpell(player, 68386, true);
+            break;
+        }
+        return false;
+    }
+};
+
+// 36143
+class npc_gyrochoppa_36143 : public CreatureScript
+{
+public:
+    npc_gyrochoppa_36143() : CreatureScript("npc_gyrochoppa_36143") { }
+
+    enum eNPC
+    {
+    };
+
+    struct npc_gyrochoppa_36143AI : public VehicleAI
+    {
+        npc_gyrochoppa_36143AI(Creature* creature) : VehicleAI(creature) { Initialize(); }
+
+        EventMap  m_events;
+        uint64    m_playerGUID;
+
+        void Initialize()
+        {
+            m_playerGUID = 0;
+        }
+
+        void Reset() override
+        {
+        }
+
+        void PassengerBoarded(Unit* passenger, int8 seatId, bool apply) override
+        {
+            if (apply)
+            {
+                if (Player* player = passenger->ToPlayer())
+                {
+                    m_playerGUID = player->GetGUID();
+                    m_events.ScheduleEvent(EVENT_START_FLYING, 3000);
+                }
+            }
+            else
+                if (Player* player = passenger->ToPlayer())
+                    Talk(0, player);
+        }
+
+        void MovementInform(uint32 type, uint32 id) override 
+        { 
+            if (type == WAYPOINT_MOTION_TYPE)
+                switch (id)
+                {
+                case 5:
+                    me->CastSpell(me, 68576, true);
+                    me->CastSpell(me, 66127, true);
+                    me->DespawnOrUnsummon(100);
+                    break;
+                }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_START_FLYING:
+                {
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        player->SetClientControl(me, false);
+                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                    me->SetSpeed(MOVE_RUN, 2.5f);
+                    me->SetDisableGravity(true);
+                    me->SetCanFly(true);
+                    me->GetMotionMaster()->MovePath(3614300, false);
+                    break;
+                }
+                }
+            }
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_gyrochoppa_36143AI(creature);
+    }
+};
+
+// 36145
+class npc_thrall_36145 : public CreatureScript
+{
+public:
+    npc_thrall_36145() : CreatureScript("npc_thrall_36145") { }
+
+    enum eNPC
+    {
+    };
+
+    bool OnGossipHello(Player* player, Creature* creature) 
+    { 
+        if (player->GetQuestStatus(14242) == QUEST_STATUS_INCOMPLETE)
+            player->KilledMonsterCredit(36145);
+
+        return false; 
+    }
+
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    {
+       
+        return false;
+    }
+
+    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*opt*/)
+    {
+        switch (quest->GetQuestId())
+        {
+        case 14242:
+            player->PlayDirectSound(16423, player);
+            break;
+        }
+        return false;
+    }
+};
+
+// 36161
+class npc_thrall_36161 : public CreatureScript
+{
+public:
+    npc_thrall_36161() : CreatureScript("npc_thrall_36161") { }
+
+    enum eNPC
+    {
+    };
+
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    {
+
+        return false;
+    }
+
+    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*opt*/)
+    {
+
+        return false;
+    }
+};
+
+/*  phase 179  */
+
+// 36622
+class npc_thrall_36622 : public CreatureScript
+{
+public:
+    npc_thrall_36622() : CreatureScript("npc_thrall_36622") { }
+
+    enum eNPC
+    {
+    };
+
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    {
+
+        return false;
+    }
+
+    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*opt*/)
+    {
+
+        return false;
+    }
+};
+
+
 
 
 void AddSC_zone_lost_isles()
@@ -1999,6 +2244,13 @@ void AddSC_zone_lost_isles()
     new npc_orc_scout_36100();
     new npc_bastia_36585();
     /*  phase 172  */
-
+    new npc_scout_brax_36112();
+    new npc_gyrochoppa_pilot_36129();
+    new npc_gyrochoppa_36127();
+    new npc_gyrochoppa_36143();
+    new npc_thrall_36145();
+    /*  phase 179  */
+    new npc_thrall_36161();
+    new npc_thrall_36622();
 
 }
