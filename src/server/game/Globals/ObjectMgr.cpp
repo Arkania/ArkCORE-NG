@@ -9265,8 +9265,8 @@ void ObjectMgr::LoadPhaseAreaDefinitions()
 
     uint32 oldMSTime = getMSTime();
 
-    //                                               0       1      2        3               4                 5                      
-    QueryResult result = WorldDatabase.Query("SELECT zoneId, entry, phaseId, terrainswapmap, worldMapAreaSwap, flags FROM `phase_definitions` ORDER BY `entry` ASC");
+    //                                               0       1      2        3           4               5                 6     
+    QueryResult result = WorldDatabase.Query("SELECT zoneId, entry, phaseId, phaseGroup, terrainswapmap, worldMapAreaSwap, flags FROM `phase_definitions` ORDER BY `entry` ASC");
 
     if (!result)
     {
@@ -9285,9 +9285,10 @@ void ObjectMgr::LoadPhaseAreaDefinitions()
         m_phaseAreaDefinition.zoneId                = fields[0].GetUInt32();
         m_phaseAreaDefinition.entry                 = fields[1].GetUInt16();
         m_phaseAreaDefinition.phaseId               = fields[2].GetUInt16();
-        m_phaseAreaDefinition.terrainswapmap        = fields[3].GetUInt16();
-        m_phaseAreaDefinition.worldMapAreaSwap      = fields[4].GetUInt16();
-        m_phaseAreaDefinition.flags                 = fields[5].GetUInt8();
+        m_phaseAreaDefinition.phaseGroup            = fields[3].GetUInt16();
+        m_phaseAreaDefinition.terrainswapmap        = fields[4].GetUInt16();
+        m_phaseAreaDefinition.worldMapAreaSwap      = fields[5].GetUInt16();
+        m_phaseAreaDefinition.flags                 = fields[6].GetUInt8();
 
         // Checks
         if ((m_phaseAreaDefinition.flags & PHASE_FLAG_OVERWRITE_EXISTING) && (m_phaseAreaDefinition.flags & PHASE_FLAG_NEGATE_PHASE))

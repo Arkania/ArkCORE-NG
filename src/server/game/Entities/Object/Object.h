@@ -149,6 +149,7 @@ struct PhaseAreaDefinition
     uint32 zoneId;
     uint32 entry;
     uint16 phaseId;
+    uint16 phaseGroup;
     uint16 terrainswapmap;
     uint16 worldMapAreaSwap;
     uint8 flags;

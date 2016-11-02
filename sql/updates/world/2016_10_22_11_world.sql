@@ -29,6 +29,9 @@ UPDATE creature_template SET ScriptName="npc_gyrochoppa_36127" WHERE entry=36127
 delete from creature where guid in (248081, 248082, 248084, 248085, 248086, 248088, 248089, 248090, 248092);
 
 delete from creature_questender where id=36145 and quest=14242;
+insert into creature_questender values 
+(36145, 14242);
+delete from creature_queststarter where id=36145 and quest=14242;
 
 DELETE FROM phase_definitions WHERE zoneId=4720 and entry in (3, 4, 5, 6, 7, 8, 9, 10);
 INSERT INTO phase_definitions VALUES 

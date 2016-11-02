@@ -3289,6 +3289,7 @@ uint64 WorldObject::GetTransGUID() const
     and at end, only sending it, if there are changed phases. */
 void WorldObject::UpdatePhaseForQuestAreaOrZoneChange()
 {
+    uint32 OldPhaseCount = GetPhaseIds().size();
     bool updateNeeded = m_phaseUpdateNeeded;
     bool isPlayer = (GetTypeId() == TYPEID_PLAYER && IsInWorld()) ? true : false;
 
@@ -3301,13 +3302,16 @@ void WorldObject::UpdatePhaseForQuestAreaOrZoneChange()
     if (isPlayer)
         RebuildWorldMapAreaSwaps(updateNeeded);
 
+    if (GetPhaseIds().size() != OldPhaseCount)
+        updateNeeded = true;
+
     if (updateNeeded && IsInWorld())
     {
         // only update visibility and send packets if there was a change in the phase list
         if (isPlayer)
         {
             ToPlayer()->GetSession()->SendSetPhaseShift(GetPhaseIds(), GetTerrainSwaps(), GetWorldMapAreaSwaps());            
-            // send phaseupdate to comtrolled objects, as Pet.
+            // send phaseupdate to controled objects, as Pet.
             for (std::set<Unit*>::iterator itr = ToPlayer()->m_Controlled.begin(); itr != ToPlayer()->m_Controlled.end(); ++itr)
                 (*itr)->CopyPhaseFrom(ToPlayer());
         }
@@ -3488,11 +3492,11 @@ ePhaseUpdateStatus WorldObject::CheckArea(PhaseAreaDefinition phaseAreaDefinitio
         if (phaseAreaDefinition.zoneId == area->areaId && phaseAreaDefinition.entry == area->entry)
         {
             if (area->quest_start)                              // not in expected required quest state
-                if (!ToPlayer() || (((1 << ToPlayer()->GetQuestStatus(area->quest_start)) & area->quest_start_status) == 0))
+                if (!ToPlayer() || (((1 << ToPlayer()->GetQuestStatus(area->quest_start))) & area->quest_start_status) == 0)
                     continue;
 
             if (area->quest_end)                                // not in expected forbidden quest state
-                if (!ToPlayer() || (((1 << ToPlayer()->GetQuestStatus(area->quest_end)) & area->quest_end_status) == 0))
+                if (!ToPlayer() || (((1 << ToPlayer()->GetQuestStatus(area->quest_end))) & area->quest_end_status) == 0)
                     continue;
 
             return PHASE_UPDATE_NEEDED;
@@ -3541,31 +3545,25 @@ void WorldObject::RebuildPhaseFromPhaseAreaDefinition(bool &updateNeeded)
                 if ((checkCond == EMPTY_DATABASE && checkArea == EMPTY_DATABASE) || checkCond == PHASE_UPDATE_NEEDED || checkArea == PHASE_UPDATE_NEEDED)
                 {
                     if (phaseDef.IsOverwritingExistingPhases())
-                    {
                         ClearAllPhases(false);
-                        if (phaseDef.phaseId)
-                        {
-                            bool up = SetInPhase(phaseDef.phaseId, false, true);
-                            if (phaseDef.terrainswapmap)
-                                m_terrainSwaps.insert(phaseDef.terrainswapmap);
-                            if (phaseDef.worldMapAreaSwap)
-                                m_worldMapAreaSwaps.insert(phaseDef.worldMapAreaSwap);
-                            if (!updateNeeded && up)
-                                updateNeeded = true;
-                        }
-                    }
-                    else
+
+                    if (phaseDef.phaseGroup)
                     {
-                        if (phaseDef.phaseId)
-                        {
-                            bool up = SetInPhase(phaseDef.phaseId, false, !phaseDef.IsNegatingPhasemask());
-                            if (phaseDef.terrainswapmap)
-                                m_terrainSwaps.insert(phaseDef.terrainswapmap);
-                            if (phaseDef.worldMapAreaSwap)
-                                m_worldMapAreaSwaps.insert(phaseDef.worldMapAreaSwap);
-                            if (!updateNeeded && up)
-                                updateNeeded = true;
-                        }
+                        for (auto ph : GetXPhasesForGroup(phaseDef.phaseGroup))
+                            updateNeeded |= SetInPhase(ph, false, true);
+
+                        if (phaseDef.terrainswapmap)
+                            m_terrainSwaps.insert(phaseDef.terrainswapmap);
+                        if (phaseDef.worldMapAreaSwap)
+                            m_worldMapAreaSwaps.insert(phaseDef.worldMapAreaSwap);
+                    }
+                    else if (phaseDef.phaseId)
+                    {
+                        updateNeeded |= SetInPhase(phaseDef.phaseId, false, true);
+                        if (phaseDef.terrainswapmap)
+                            m_terrainSwaps.insert(phaseDef.terrainswapmap);
+                        if (phaseDef.worldMapAreaSwap)
+                            m_worldMapAreaSwaps.insert(phaseDef.worldMapAreaSwap);
                     }
 
                     if (phaseDef.IsLastDefinition())

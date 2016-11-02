@@ -38,6 +38,14 @@ enum Zone_zone_lost_isles
     QUEST_GOBLIN_ESCAPE_PODS_F = 14001,
     QUEST_GOBLIN_ESCAPE_PODS_M = 14474,
     SPELL_QUEST_PHASE_01 = 67851,
+    SPELL_QUEST_PHASE_02 = 67852,
+    SPELL_QUEST_PHASE_03 = 67853,
+    SPELL_QUEST_PHASE_04 = 67854,
+    SPELL_QUEST_PHASE_05 = 68750,
+    SPELL_QUEST_PHASE_06 = 72157,
+    SPELL_QUEST_PHASE_07 = 72676,
+    SPELL_QUEST_PHASE_08 = 73065,
+    SPELL_QUEST_PHASE_09 = 73756,
     SPELL_COSMETIC_STATE_DEATH = 81238,
     SPELL_THERMOHYDRAULIC_FLIPPERS_VISUAL = 68256,
     SPELL_THERMOHYDRAULIC_FLIPPERS = 68258,
@@ -65,6 +73,7 @@ enum Zone_zone_lost_isles
     EVENT_TALK_PART_10,
     EVENT_SHOW_FIGHT,
     EVENT_CHECK_FIGHT,
+    EVENT_CHECK_PLAYER,
     EVENT_CAST_SPELL_00,
     EVENT_CAST_SPELL_01,
     EVENT_CAST_COOLDOWN_01,
@@ -120,24 +129,18 @@ public:
 
         void Reset() override
         {
-            m_activePlayerForWelcome=0;
+            m_activePlayerForWelcome = 0;
             me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
-            m_events.RescheduleEvent (EVENT_CHECK_PLAYER_WELCOME, 1000);
+            m_events.RescheduleEvent(EVENT_CHECK_PLAYER_WELCOME, 1000);
+            m_events.RescheduleEvent(EVENT_CHECK_PLAYER, 2500);
         }
 
         void MoveInLineOfSight(Unit* who) override
         {
-        if (Player* player = who->ToPlayer())
-            if (!player->hasQuest(QUEST_DONT_GO_INTO_THE_LIGHT))
-                if (player->GetQuestStatus(QUEST_DONT_GO_INTO_THE_LIGHT) == QUEST_STATE_NONE)
-                {
-                    if (!player->HasAura(SPELL_QUEST_PHASE_01))
-                        player->CastSpell(player, SPELL_QUEST_PHASE_01, true);
-                    if (!player->HasAura(SPELL_COSMETIC_STATE_DEATH))
-                        player->CastSpell(player, SPELL_COSMETIC_STATE_DEATH, true);
-                    if (playerList.find(player->GetGUID()) == playerList.end())
-                        playerList.insert(player->GetGUID());
-                }
+            if (Player* player = who->ToPlayer())
+                if (CheckFirstPlayerArrival(player))
+                        if (playerList.find(player->GetGUID()) == playerList.end())
+                            playerList.insert(player->GetGUID());
         }
 
         void DoAction(int32 param) override
@@ -156,6 +159,15 @@ public:
             {
                 switch (eventId)
                 {
+                case EVENT_CHECK_PLAYER:
+                {
+                    std::list<Player*> pList = me->FindNearestPlayers(35.0f);
+                    for (std::list<Player*>::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
+                        CheckFirstPlayerArrival(*itr);
+
+                    m_events.ScheduleEvent(EVENT_CHECK_PLAYER, 2500);
+                    break;
+                }
                 case EVENT_CHECK_PLAYER_WELCOME:
                 {
                     if (!m_activePlayerForWelcome)
@@ -244,8 +256,9 @@ public:
                     if (Player* player = ObjectAccessor::GetPlayer(*me, m_activePlayerForWelcome))
                     {
                         me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
-                        if (Quest const* quest = sObjectMgr->GetQuestTemplate(QUEST_DONT_GO_INTO_THE_LIGHT))
-                            player->AddQuestAndCheckCompletion(quest, me);
+                        if (player->GetQuestStatus(QUEST_DONT_GO_INTO_THE_LIGHT) == QUEST_STATE_NONE)
+                            if (Quest const* quest = sObjectMgr->GetQuestTemplate(QUEST_DONT_GO_INTO_THE_LIGHT))
+                                player->AddQuestAndCheckCompletion(quest, me);
                     }
                     break;
                 }
@@ -260,7 +273,8 @@ public:
                 {
                     if (Player* player = ObjectAccessor::GetPlayer(*me, m_activePlayerForWelcome))
                     {
-                        me->RemoveAura(SPELL_COSMETIC_STATE_DEATH);
+                        player->RemoveAura(SPELL_COSMETIC_STATE_DEATH);
+                        player->ClearUnitState(UNIT_STATE_STUNNED);
                     }
                     me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
                     m_activePlayerForWelcome = 0;
@@ -273,6 +287,21 @@ public:
                 return;
             else
                 DoMeleeAttackIfReady();
+        }
+
+        bool CheckFirstPlayerArrival(Player* player)
+        {
+            if (!player->hasQuest(QUEST_DONT_GO_INTO_THE_LIGHT))
+                if (player->GetQuestStatus(QUEST_DONT_GO_INTO_THE_LIGHT) == QUEST_STATE_NONE)
+                    if (!player->HasUnitState(UNIT_STATE_STUNNED))
+                    {
+                        player->NearTeleportTo(533.97f, 3274.55f, 0.21f, 5.015f);
+                        player->AddUnitState(UNIT_STATE_STUNNED);
+                        player->CastSpell(player, SPELL_QUEST_PHASE_01, true);
+                        player->CastSpell(player, SPELL_COSMETIC_STATE_DEATH, true);
+                        return true;
+                    }
+            return false;
         }
     };
 
@@ -1185,6 +1214,18 @@ public:
         }
         return false;
     }
+
+    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*opt*/)
+    {
+        switch (quest->GetQuestId())
+        {
+        case 14303:           
+            player->RemoveAura(SPELL_QUEST_PHASE_01);
+            player->CastSpell(player, SPELL_QUEST_PHASE_02);
+            break;
+        }
+        return false;
+    }
 };
 
 // 35894
@@ -1976,12 +2017,23 @@ public:
     {
         switch (quest->GetQuestId())
         {
-        case QUEST_GOBLIN_ESCAPE_PODS_F:
         case 14241:
         {
             creature->AI()->Talk(0, player);
             break;
         }
+        }
+        return false;
+    }
+
+    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*opt*/)
+    {
+        switch (quest->GetQuestId())
+        {
+        case 14240:
+            player->RemoveAura(SPELL_QUEST_PHASE_02);
+            player->CastSpell(player, SPELL_QUEST_PHASE_03);
+            break;
         }
         return false;
     }
@@ -2138,14 +2190,29 @@ public:
     bool OnGossipHello(Player* player, Creature* creature) 
     { 
         if (player->GetQuestStatus(14242) == QUEST_STATUS_INCOMPLETE)
+        {
             player->KilledMonsterCredit(36145);
+            if (GameObject* go = creature->FindNearestGameObject(195704, 10.0f))
+            {
+                go->UseDoorOrButton();
+                player->CLOSE_GOSSIP_MENU();
+                return true;
+            }
+        }
 
         return false; 
     }
 
     bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
     {
-       
+        switch (quest->GetQuestId())
+        {
+        case 14326:
+            player->RemoveAura(SPELL_QUEST_PHASE_03);
+            player->CastSpell(player, SPELL_QUEST_PHASE_04);
+            player->SendUpdatePhasing();
+            break;
+        }
         return false;
     }
 
