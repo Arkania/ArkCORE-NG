@@ -37,6 +37,7 @@ enum Zone_zone_lost_isles
     QUEST_DONT_GO_INTO_THE_LIGHT = 14239,
     QUEST_GOBLIN_ESCAPE_PODS_F = 14001,
     QUEST_GOBLIN_ESCAPE_PODS_M = 14474,
+    QUEST_MEET_ME_UP_TOP = 14326,
     SPELL_QUEST_PHASE_01 = 67851,
     SPELL_QUEST_PHASE_02 = 67852,
     SPELL_QUEST_PHASE_03 = 67853,
@@ -74,12 +75,15 @@ enum Zone_zone_lost_isles
     EVENT_SHOW_FIGHT,
     EVENT_CHECK_FIGHT,
     EVENT_CHECK_PLAYER,
+    EVENT_CHECK_FIRE,
     EVENT_CAST_SPELL_00,
     EVENT_CAST_SPELL_01,
     EVENT_CAST_COOLDOWN_01,
     EVENT_CAST_COOLDOWN_02,
     EVENT_START_WALK,
     EVENT_START_FLYING,
+    EVENT_COOLDOWN_00,
+    EVENT_COOLDOWN_01,
 };
 
 /*  phase 170  */
@@ -2210,7 +2214,8 @@ public:
         case 14326:
             player->RemoveAura(SPELL_QUEST_PHASE_03);
             player->CastSpell(player, SPELL_QUEST_PHASE_04);
-            player->SendUpdatePhasing();
+            player->CastSpell(993.1458f, 3852.019f, 3.2269f, 69079, true);
+            player->CastSpell(player, 68421, true);
             break;
         }
         return false;
@@ -2225,6 +2230,78 @@ public:
             break;
         }
         return false;
+    }
+};
+
+/*  phase 179  */
+
+// 36622
+class npc_thrall_36622 : public CreatureScript
+{
+public:
+    npc_thrall_36622() : CreatureScript("npc_thrall_36622") { }
+
+    enum eNPC
+    {
+    };
+
+    struct npc_thrall_36622AI : public ScriptedAI
+    {
+        npc_thrall_36622AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+        EventMap  m_events;
+        uint64   m_playerGUID;
+
+        void Initialize()
+        {
+            m_playerGUID = 0;
+        }
+
+        void Reset() override
+        {
+            m_events.RescheduleEvent(EVENT_START_WALK, 2000);
+        }
+
+        void IsSummonedBy(Unit* summoner) override 
+        { 
+            if (Player* player = summoner->ToPlayer())
+                m_playerGUID = player->GetGUID();
+        }
+
+        void MovementInform(uint32 type, uint32 id) override 
+        { 
+            if (type == WAYPOINT_MOTION_TYPE && id == 8)
+                me->DespawnOrUnsummon(10);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_START_WALK:
+                {
+                    me->GetMotionMaster()->MovePath(3662200, false);
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        Talk(0, player);
+                    break;
+                }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_thrall_36622AI(creature);
     }
 };
 
@@ -2249,33 +2326,140 @@ public:
 
         return false;
     }
+
+    struct npc_thrall_36161AI : public ScriptedAI
+    {
+        npc_thrall_36161AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+        EventMap  m_events;
+        uint64   m_playerGUID;
+        bool     m_startTalkCD;
+        uint8    m_rolTalk;
+
+        void Initialize()
+        {
+            m_playerGUID = 0;
+            m_startTalkCD = false;
+            m_rolTalk = 0;
+        }
+
+        void Reset() override
+        {
+            m_events.RescheduleEvent(EVENT_CHECK_PLAYER, 1000);
+        }
+         
+        void MoveInLineOfSight(Unit* who) override
+        {
+            if (!m_startTalkCD)
+                if (Player* player = who->ToPlayer())
+                    if (player->GetQuestStatus(QUEST_MEET_ME_UP_TOP) == QUEST_STATUS_COMPLETE)
+                    {
+                        m_startTalkCD = true;
+                        m_playerGUID = player->GetGUID();
+                        m_events.ScheduleEvent(EVENT_COOLDOWN_00, 90000);
+                        m_events.ScheduleEvent(EVENT_TALK_PART_01, 100);
+                    }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_COOLDOWN_00:
+                    m_startTalkCD = false;
+                    break;
+                case EVENT_TALK_PART_01:
+                {
+                    m_rolTalk += 1;
+                    if (m_rolTalk > 2)
+                        m_rolTalk = 0;
+
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        Talk(m_rolTalk * 2 + 1, player);
+                    m_events.ScheduleEvent(EVENT_TALK_PART_02, 8000);
+                    break;
+                }
+                case EVENT_TALK_PART_02:
+                {
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        Talk(m_rolTalk * 2 + 2, player);
+                    m_events.ScheduleEvent(EVENT_TALK_PART_03, 8000);
+                    break;
+                }
+                case EVENT_TALK_PART_03:
+                {
+
+                    break;
+                }
+                case EVENT_CHECK_PLAYER:
+                {
+
+                    break;
+                }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_thrall_36161AI(creature);
+    }
 };
 
-/*  phase 179  */
-
-// 36622
-class npc_thrall_36622 : public CreatureScript
+// 36177
+class npc_invisible_stalker_quest_phase4_36177 : public CreatureScript
 {
 public:
-    npc_thrall_36622() : CreatureScript("npc_thrall_36622") { }
+    npc_invisible_stalker_quest_phase4_36177() : CreatureScript("npc_invisible_stalker_quest_phase4_36177") { }
 
     enum eNPC
     {
     };
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    struct npc_invisible_stalker_quest_phase4_36177AI : public ScriptedAI
     {
+        npc_invisible_stalker_quest_phase4_36177AI(Creature* creature) : ScriptedAI(creature) { }
 
-        return false;
-    }
+        EventMap  m_events;
 
-    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*opt*/)
+        void Reset() override
+        {
+            m_events.RescheduleEvent(EVENT_CHECK_FIRE, 1000);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_CHECK_FIRE:
+                    if (urand(0, 100) < 15)
+                        me->CastSpell(me, 42345);
+                    m_events.ScheduleEvent(EVENT_CHECK_FIRE, urand(80000, 100000));
+                    break;
+                }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
     {
-
-        return false;
+        return new npc_invisible_stalker_quest_phase4_36177AI(creature);
     }
 };
-
 
 
 
@@ -2319,5 +2503,6 @@ void AddSC_zone_lost_isles()
     /*  phase 179  */
     new npc_thrall_36161();
     new npc_thrall_36622();
+    new npc_invisible_stalker_quest_phase4_36177();
 
 }
