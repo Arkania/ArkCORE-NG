@@ -1224,6 +1224,7 @@ class spell_algalon_big_bang : public SpellScriptLoader
         }
 };
 
+// 64445
 class spell_algalon_remove_phase : public SpellScriptLoader
 {
     public:

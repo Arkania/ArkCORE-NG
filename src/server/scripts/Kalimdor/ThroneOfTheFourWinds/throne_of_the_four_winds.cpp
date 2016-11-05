@@ -68,10 +68,10 @@ public:
         GameObject* linkedSlipstreamObject;
         Unit* linkedBoss;
 
-        void Reset()
+        void Reset() override
         { }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (SlipstreamPosition >= DIR_ERROR || (who->GetTypeId() != TYPEID_PLAYER && !who->IsPet()) || !isActive)
                 return;
@@ -93,7 +93,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 const diff)
+        void UpdateAI(uint32 diff) override
         {
 
             if (linkedSlipstreamObject && linkedBoss)
@@ -139,10 +139,10 @@ public:
 
         InstanceScript* instance;
 
-        void Reset()
+        void Reset() override
         { }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             ScriptedAI::MoveInLineOfSight(who);
             if (instance)
@@ -202,6 +202,7 @@ public:
     };
 };
 
+// 46045
 class npc_slipstream_alakir : public CreatureScript
 {
 public:
@@ -217,6 +218,6 @@ public:
 void AddSC_throne_of_the_four_winds()
 {
     new npc_slipstream_raid();
-    new npc_wind_bridge();
-    new npc_slipstream_alakir();
+    // new npc_wind_bridge();
+    // new npc_slipstream_alakir();
 }

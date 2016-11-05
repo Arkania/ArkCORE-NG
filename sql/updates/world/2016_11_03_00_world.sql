@@ -247,8 +247,6 @@ update creature_addon set bytes2=1, auras="29266" where guid in
 
 UPDATE creature_template SET unit_flags=32768, unit_flags2=2048, dynamicflags=0 WHERE entry=36176;
 
-update creature set position_z=0.30 where id=36161 and position_z<0.3;
-
 update creature set position_x=919.90, position_y=3847.70 where guid=250782;
 
 -- sitting 

@@ -476,6 +476,7 @@ public:
     };
 };
 
+// 6281
 class AreaTrigger_at_return_wind : public AreaTriggerScript
 {
 public:

@@ -1180,6 +1180,7 @@ public:
     }
 };
 
+// 37408
 class spell_oscillating_field : public SpellScriptLoader
 {
     public:

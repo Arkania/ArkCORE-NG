@@ -200,7 +200,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 const diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!instance)
                 return;
@@ -395,7 +395,7 @@ public:
             uiCheckAgroo = 5000;
         }
 
-        void UpdateAI(uint32 const diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -535,7 +535,7 @@ public:
             instance->DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, 88835);
         }
 
-        void UpdateAI(uint32 const diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!instance)
                 return;
@@ -685,7 +685,7 @@ public:
             DespawnTimer = 30000;
         }
 
-        void UpdateAI(uint32 const diff)
+        void UpdateAI(uint32 diff) override
         {
             if (DespawnTimer <= diff)
             {
@@ -723,7 +723,7 @@ public:
             DespawnTimer = 30000;
         }
 
-        void UpdateAI(uint32 const diff)
+        void UpdateAI(uint32 diff) override
         {
             if (DespawnTimer <= diff)
             {
@@ -759,7 +759,7 @@ public:
             uiPathTimer = 2000;
         }
 
-        void UpdateAI(uint32 const diff)
+        void UpdateAI(uint32 diff) override
         {
             if (uiPathTimer <= diff)
             {
@@ -948,7 +948,7 @@ public:
                 me->SetTarget(temp->GetGUID());
         }
 
-        void UpdateAI(uint32 const diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!instance)
                 return;
@@ -1106,6 +1106,7 @@ public:
     };
 };
 
+// 85422 
 class spell_nurture_aura : public SpellScriptLoader
 {
 public:
@@ -1128,8 +1129,8 @@ public:
 
         void Register()
         {
-            DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_nurture_aura_AuraScript::HandleEffectCalcPeriodic, EFFECT_0, SPELL_AURA_DUMMY);
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_nurture_aura_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_DUMMY);
+            DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_nurture_aura_AuraScript::HandleEffectCalcPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_nurture_aura_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
         }
     };
 
@@ -1189,6 +1190,7 @@ public:
     Unit* caster;
 };
 
+// 85483 93138 93139 93140 
 class spell_wind_blast : public SpellScriptLoader
 {
 public:
@@ -1206,7 +1208,7 @@ public:
         void Register()
         {
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_wind_blast_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_CONE_ENEMY_104);
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_wind_blast_SpellScript::FilterTargets, EFFECT_0, TARGET_DEST_UNK_110);
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_wind_blast_SpellScript::FilterTargets, EFFECT_1, TARGET_DEST_UNK_110);
         }
 
     protected:

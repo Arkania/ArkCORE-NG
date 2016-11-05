@@ -2723,8 +2723,12 @@ public:
     }
 };
 
+// 101056
 class spell_item_dragonwrath_tarecgosas_rest final : public SpellScriptLoader
 {
+public:
+    spell_item_dragonwrath_tarecgosas_rest() : SpellScriptLoader("spell_item_dragonwrath_tarecgosas_rest") { }
+
     class script_impl final : public AuraScript
     {
         PrepareAuraScript(script_impl)
@@ -2787,14 +2791,9 @@ class spell_item_dragonwrath_tarecgosas_rest final : public SpellScriptLoader
         void Register() final
         {
             DoCheckProc += AuraCheckProcFn(script_impl::CheckProc);
-            OnEffectProc += AuraEffectProcFn(script_impl::OnProc, EFFECT_0, SPELL_AURA_DUMMY);
+            OnEffectProc += AuraEffectProcFn(script_impl::OnProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL_COPY);
         }
     };
-
-public:
-    spell_item_dragonwrath_tarecgosas_rest()
-        : SpellScriptLoader("spell_item_dragonwrath_tarecgosas_rest")
-    { }
 
     AuraScript * GetAuraScript() const final
     {
