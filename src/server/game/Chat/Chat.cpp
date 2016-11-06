@@ -351,6 +351,7 @@ bool ChatHandler::ExecuteCommandInTable(ChatCommand* table, const char* text, st
                 Position relPos;
                 Unit* target = player->GetSelectedUnit();
                 uint32 areaId = player->GetAreaId();
+                uint32 zoneId = player->GetZoneId();
                 std::string areaName = "Unknown";
                 std::string zoneName = "Unknown";
                 uint64 targetGuid = 0;
@@ -377,22 +378,22 @@ bool ChatHandler::ExecuteCommandInTable(ChatCommand* table, const char* text, st
                         targetDBGuid = creature->GetDBTableGUIDLow();
                     targetName = target->GetName().c_str();
 
-                    sLog->outCommand(m_session->GetAccountId(), "Command: %s [Player: %s (Guid: %u) (Account: %u) X: %f Y: %f Z: %f O: %f Map: %u (%s) Area: %u (%s) Zone: %s]\n[Target: %s (Guid: %u Entry: %u DBGuid: %u)]",
+                    sLog->outCommand(m_session->GetAccountId(), "Command: %s [Player: %s (Guid: %u) (Account: %u) X: %f Y: %f Z: %f O: %f Map: %u (%s) Area: %u (%s) Zone: %u (%s)]\n[Target: %s (Guid: %u Entry: %u DBGuid: %u)]",
                         fullcmd.c_str(), player->GetName().c_str(), GUID_LOPART(player->GetGUID()), m_session->GetAccountId(),
                         player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetOrientation(), player->GetMapId(),
                         player->GetMap() ? player->GetMap()->GetMapName() : "Unknown",
-                        areaId, areaName.c_str(), zoneName.c_str(),
+                        areaId, areaName.c_str(), zoneId, zoneName.c_str(),
                         targetName.c_str(), GetLogNameForGuid(targetGuid), targetEntry, targetDBGuid);
                 }
                 else // player
                 {
                     relPos = Position(player->GetTransOffsetX(), player->GetTransOffsetY(), player->GetTransOffsetZ(), player->GetTransOffsetO());
                    
-                    sLog->outCommand(m_session->GetAccountId(), "Command: %s [Player: %s (Guid: %u) (Account: %u) X: %f Y: %f Z: %f O: %f Map: %u (%s) Area: %u (%s) Zone: %s]",
+                    sLog->outCommand(m_session->GetAccountId(), "Command: %s [Player: %s (Guid: %u) (Account: %u) X: %f Y: %f Z: %f O: %f Map: %u (%s) Area: %u (%s) Zone: %u (%s)]",
                         fullcmd.c_str(), player->GetName().c_str(), GUID_LOPART(player->GetGUID()), m_session->GetAccountId(),
                         player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetOrientation(), player->GetMapId(),
                         player->GetMap() ? player->GetMap()->GetMapName() : "Unknown",
-                        areaId, areaName.c_str(), zoneName.c_str());
+                        areaId, areaName.c_str(), zoneId, zoneName.c_str());
                 }
 
                 if (transport && (cmd == "gps" || cmd == "info"))
