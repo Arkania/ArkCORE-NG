@@ -76,6 +76,7 @@ enum Zone_zone_lost_isles
     EVENT_CHECK_FIGHT,
     EVENT_CHECK_PLAYER,
     EVENT_CHECK_FIRE,
+    EVENT_CHECK_BOAT,
     EVENT_CAST_SPELL_00,
     EVENT_CAST_SPELL_01,
     EVENT_CAST_COOLDOWN_01,
@@ -2317,13 +2318,13 @@ public:
 
     bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
     {
-
-        return false;
-    }
-
-    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*opt*/)
-    {
-
+        switch (quest->GetQuestId())
+        {
+        case 14243:
+            creature->PlayDirectSound(16424, player);
+            player->CastSpell(player, 68408, true);
+            break;
+        }
         return false;
     }
 
@@ -2345,7 +2346,6 @@ public:
 
         void Reset() override
         {
-            m_events.RescheduleEvent(EVENT_CHECK_PLAYER, 1000);
         }
          
         void MoveInLineOfSight(Unit* who) override
@@ -2392,12 +2392,6 @@ public:
                 }
                 case EVENT_TALK_PART_03:
                 {
-
-                    break;
-                }
-                case EVENT_CHECK_PLAYER:
-                {
-
                     break;
                 }
                 }
@@ -2461,6 +2455,161 @@ public:
     }
 };
 
+// 36176
+class npc_alliance_sailor_36176 : public CreatureScript
+{
+public:
+    npc_alliance_sailor_36176() : CreatureScript("npc_alliance_sailor_36176") { }
+
+    enum eNPC
+    {
+    };
+
+    struct npc_alliance_sailor_36176AI : public ScriptedAI
+    {
+        npc_alliance_sailor_36176AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap  m_events;
+
+        void Reset() override
+        {
+            m_events.RescheduleEvent(EVENT_CHECK_BOAT, 2000);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_CHECK_BOAT:
+                    if (me->GetPositionZ() < me->GetHomePosition().GetPositionZ() + 0.2f)
+                        me->GetMotionMaster()->MoveTargetedHome();
+                    break;
+                }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_alliance_sailor_36176AI(creature);
+    }
+};
+
+// 36178
+class npc_cyclone_of_the_elements_36178 : public CreatureScript
+{
+public:
+    npc_cyclone_of_the_elements_36178() : CreatureScript("npc_cyclone_of_the_elements_36178") { }
+
+    enum eNPC
+    {
+    };
+
+    struct npc_cyclone_of_the_elements_36178AI : public VehicleAI
+    {
+        npc_cyclone_of_the_elements_36178AI(Creature* creature) : VehicleAI(creature) { Initialize(); }
+
+        EventMap  m_events;
+        uint64    m_playerGUID;
+        bool      m_backToLostIsland;
+
+        void Initialize()
+        {
+            m_playerGUID = 0;
+            m_backToLostIsland = false;
+        }
+
+        void Reset() override
+        {
+            
+        }
+
+        void IsSummonedBy(Unit* summoner) override 
+        { 
+            if (Player* player = summoner->ToPlayer())
+            {
+                m_playerGUID = player->GetGUID();
+                player->CastSpell(me, 68436, true);
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                me->SetDisableGravity(true);
+                me->SetCanFly(true);
+            }
+        }
+
+        void PassengerBoarded(Unit* passenger, int8 seatId, bool apply) override
+        {
+            if (Player* player = passenger->ToPlayer())
+                if (apply)
+                {
+                    me->GetMotionMaster()->MovePath(3617801, true);
+                }
+                else
+                {
+                    player->RemoveAura(68436);
+                    player->RemoveAura(68421);
+                }
+        }
+
+        void KilledUnit(Unit* victim) override 
+        { 
+            if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                if (player->GetReqKillOrCastCurrentCount(14243, 36176) >= 50)
+                {
+                    me->GetMotionMaster()->MoveIdle();
+                    me->SetSpeed(MOVE_RUN, 3.5f);
+                    m_backToLostIsland = true;
+                    me->GetMotionMaster()->MovePath(3617802, false);
+                }
+        }
+
+        void MovementInform(uint32 type, uint32 id) override 
+        { 
+            if (m_backToLostIsland && type==WAYPOINT_MOTION_TYPE && id == 11)
+                me->DespawnOrUnsummon(10);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_cyclone_of_the_elements_36178AI(creature);
+    }
+};
+
+// 68445
+class spell_lightning_strike_68445 : public SpellScriptLoader
+{
+public:
+    spell_lightning_strike_68445() : SpellScriptLoader("spell_lightning_strike_68445") { }
+
+    class spell_lightning_strike_68445_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_lightning_strike_68445_SpellScript);
+
+        void FilterTargets(std::list<WorldObject*>& unitList)
+        {
+            float range = 5.0f;
+            const WorldLocation* pos = GetExplTargetDest();
+            uint32 typeMask = GRID_MAP_TYPE_MASK_PLAYER | GRID_MAP_TYPE_MASK_CREATURE;
+            Trinity::WorldObjectSpellAreaTargetCheck check(range, pos, GetCaster(), GetCaster(), GetSpellInfo(), TARGET_CHECK_DEFAULT, NULL);
+            Trinity::WorldObjectListSearcher<Trinity::WorldObjectSpellAreaTargetCheck> searcher(GetCaster(), unitList, check, typeMask);
+            GetCaster()->GetMap()->VisitAll(pos->m_positionX, pos->m_positionY, range, searcher);
+        }
+
+        void Register()
+        {
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_lightning_strike_68445_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_DEST_AREA_ENEMY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_lightning_strike_68445_SpellScript();
+    }
+};
 
 
 void AddSC_zone_lost_isles()
@@ -2504,5 +2653,8 @@ void AddSC_zone_lost_isles()
     new npc_thrall_36161();
     new npc_thrall_36622();
     new npc_invisible_stalker_quest_phase4_36177();
+    new npc_alliance_sailor_36176();
+    new npc_cyclone_of_the_elements_36178();
+    new spell_lightning_strike_68445();
 
 }
