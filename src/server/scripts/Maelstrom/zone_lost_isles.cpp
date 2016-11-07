@@ -85,6 +85,8 @@ enum Zone_zone_lost_isles
     EVENT_START_FLYING,
     EVENT_COOLDOWN_00,
     EVENT_COOLDOWN_01,
+    EVENT_PLAY_PERIODIC_SOUND,
+    EVENT_PLAY_PERIODIC_EMOTE,
 };
 
 /*  phase 170  */
@@ -2611,6 +2613,392 @@ public:
     }
 };
 
+// 23837
+class npc_elm_general_purpose_bunny_23837 : public CreatureScript
+{
+public:
+    npc_elm_general_purpose_bunny_23837() : CreatureScript("npc_elm_general_purpose_bunny_23837") { }
+
+    struct npc_elm_general_purpose_bunny_23837AI : public ScriptedAI
+    {
+        npc_elm_general_purpose_bunny_23837AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap  m_events;
+
+        void Reset() override
+        {
+            if (abs(me->GetPositionX() - 876.2f) < 5 && abs(me->GetPositionY() - 2747.1f) < 5)
+                m_events.RescheduleEvent(EVENT_PLAY_PERIODIC_SOUND, 7250);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_PLAY_PERIODIC_SOUND:
+                {
+                    me->PlayDirectSound(16459);
+                    m_events.ScheduleEvent(EVENT_PLAY_PERIODIC_SOUND, 7250);
+                    break;
+                }
+                }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_elm_general_purpose_bunny_23837AI(creature);
+    }
+};
+
+// 36525
+class npc_warrior_matic_nx__36525 : public CreatureScript
+{
+public:
+    npc_warrior_matic_nx__36525() : CreatureScript("npc_warrior_matic_nx__36525") { }
+
+    struct npc_warrior_matic_nx__36525AI : public ScriptedAI
+    {
+        npc_warrior_matic_nx__36525AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap  m_events;
+
+        void Reset() override
+        {
+            m_events.RescheduleEvent(EVENT_PLAY_PERIODIC_SOUND, 30000);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_PLAY_PERIODIC_SOUND:
+                {
+                    me->PlayDirectSound(2304);
+                    me->HandleEmote(33);
+                    m_events.ScheduleEvent(EVENT_PLAY_PERIODIC_SOUND, 30000);
+                    break;
+                }
+                }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_warrior_matic_nx__36525AI(creature);
+    }
+};
+
+// 36425 
+class npc_sassy_hardwrench_36425 : public CreatureScript
+{
+public:
+    npc_sassy_hardwrench_36425() : CreatureScript("npc_sassy_hardwrench_36425") { }
+
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    {
+        switch (quest->GetQuestId())
+        {
+        case 14244:
+            creature->AI()->Talk(0, player);
+            player->CastSpell(player, 68815, true);
+            break;
+        }
+        return false;
+    }
+};
+
+// 36421 
+class npc_orc_survivor_36421 : public CreatureScript
+{
+public:
+    npc_orc_survivor_36421() : CreatureScript("npc_orc_survivor_36421") { }
+
+    struct npc_orc_survivor_36421AI : public ScriptedAI
+    {
+        npc_orc_survivor_36421AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap  m_events;
+
+        void Reset() override
+        {
+            m_events.RescheduleEvent(EVENT_PLAY_PERIODIC_EMOTE, 5000);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_PLAY_PERIODIC_SOUND:
+                {
+                    me->HandleEmote(1);
+                    m_events.ScheduleEvent(EVENT_PLAY_PERIODIC_EMOTE, urand(5000, 10000));
+                    break;
+                }
+                }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_orc_survivor_36421AI(creature);
+    }
+};
+
+// 36513 
+class npc_trade_prince_gallywix_36513 : public CreatureScript
+{
+public:
+    npc_trade_prince_gallywix_36513() : CreatureScript("npc_trade_prince_gallywix_36513") { }
+
+    struct npc_trade_prince_gallywix_36513AI : public ScriptedAI
+    {
+        npc_trade_prince_gallywix_36513AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap  m_events;
+        uint64    m_playerGUID;
+        bool      m_talkIsStarted;
+
+        void Reset() override
+        {
+            m_playerGUID = 0;
+            m_talkIsStarted = false;
+            m_events.RescheduleEvent(EVENT_MASTER_RESET, 120000);
+            m_events.RescheduleEvent(EVENT_PLAY_PERIODIC_EMOTE, 1000);
+        }
+
+        void MoveInLineOfSight(Unit* who) override
+        {
+            if (!m_talkIsStarted)
+                if (Player* player = who->ToPlayer())
+                    if (player->GetQuestStatus(14244) == QUEST_STATUS_INCOMPLETE)
+                        if (player->GetPosition().GetExactDist2d(me) < 10.0f)
+                        {
+                            m_talkIsStarted = true;
+                            m_playerGUID = player->GetGUID();
+                            m_events.ScheduleEvent(EVENT_TALK_PART_00, 100);
+                            m_events.RescheduleEvent(EVENT_MASTER_RESET, 120000);
+                        }
+        }
+
+        void MovementInform(uint32 type, uint32 id) override
+        {
+            if (type == POINT_MOTION_TYPE && id == 1025)
+                if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                {
+                    me->CastSpell(player, 68819, true);
+                    me->DespawnOrUnsummon(100);
+                    m_playerGUID = 0;
+                    m_talkIsStarted = false;
+                }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_MASTER_RESET:
+                    me->DespawnOrUnsummon(10);
+                    break;
+                case EVENT_PLAY_PERIODIC_EMOTE:
+                {
+                    if (!m_talkIsStarted)
+                        me->HandleEmote(RAND(5, 14, 15));
+
+                    m_events.RescheduleEvent(EVENT_PLAY_PERIODIC_EMOTE, urand(4000, 8000));
+                    break;
+                }
+                case EVENT_TALK_PART_00:
+                {
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        Talk(0, player);
+                    m_events.ScheduleEvent(EVENT_TALK_PART_01, 10000);
+                    break;
+                }
+                case EVENT_TALK_PART_01:
+                {
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        Talk(1, player);
+                    m_events.ScheduleEvent(EVENT_TALK_PART_02, 12000);
+                    break;
+                }
+                case EVENT_TALK_PART_02:
+                {
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        Talk(2, player);
+                    m_events.ScheduleEvent(EVENT_TALK_PART_03, 5000);
+                    break;
+                }
+                case EVENT_TALK_PART_03:
+                {
+                    me->SetWalk(true);
+                    me->GetMotionMaster()->MovePoint(1025, 872.27f, 2743.14f, 122.82f);
+                    break;
+                }
+                }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_trade_prince_gallywix_36513AI(creature);
+    }
+};
+
+// 36514
+class npc_sling_rocket_36514 : public CreatureScript
+{
+public:
+    npc_sling_rocket_36514() : CreatureScript("npc_sling_rocket_36514") { }
+
+    struct npc_sling_rocket_36514AI : public VehicleAI
+    {
+        npc_sling_rocket_36514AI(Creature* creature) : VehicleAI(creature) { Initialize(); }
+
+        EventMap  m_events;
+        uint64    m_playerGUID;
+
+        void Initialize()
+        {
+            m_playerGUID = 0;
+        }
+
+        void Reset() override
+        {
+
+        }
+
+        void IsSummonedBy(Unit* summoner) override
+        {
+            if (Player* player = summoner->ToPlayer())
+            {
+                m_playerGUID = player->GetGUID();
+                me->CastSpell(me, 66110);
+                me->SetDisableGravity(true);
+                me->SetCanFly(true);
+                me->SetSpeed(MOVE_RUN, 3.0f);
+                me->GetMotionMaster()->MovePath(3651401, true);
+            }
+        }
+
+        void MovementInform(uint32 type, uint32 id) override
+        {
+            if (type == WAYPOINT_MOTION_TYPE && id == 3)
+                me->DespawnOrUnsummon(10);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_sling_rocket_36514AI(creature);
+    }
+};
+
+// 196439  
+class go_rocket_sling_196439 : public GameObjectScript
+{
+public:
+    go_rocket_sling_196439() : GameObjectScript("go_rocket_sling_196439") { }
+
+    bool OnGossipSelect(Player* player, GameObject* go, uint32 sender, uint32 action) override
+    {
+        if (player->GetQuestStatus(14244) == QUEST_STATUS_INCOMPLETE)
+        {
+            player->CastSpell(player, 68806, true);
+            player->CLOSE_GOSSIP_MENU();
+            return true;
+        }
+        
+        return false;
+    }
+};
+
+// 36505
+class npc_sling_rocket_36505 : public CreatureScript
+{
+public:
+    npc_sling_rocket_36505() : CreatureScript("npc_sling_rocket_36505") { }
+
+    enum eNPC
+    {
+    };
+
+    struct npc_sling_rocket_36505AI : public VehicleAI
+    {
+        npc_sling_rocket_36505AI(Creature* creature) : VehicleAI(creature) { Initialize(); }
+
+        EventMap  m_events;
+        uint64    m_playerGUID;
+
+        void Initialize()
+        {
+            m_playerGUID = 0;
+        }
+
+        void Reset() override
+        {
+        }
+
+        void IsSummonedBy(Unit* summoner) override
+        {
+            if (Player* player = summoner->ToPlayer())
+            {
+                m_playerGUID = player->GetGUID();
+                player->CastSpell(me, 68805, true);
+                me->CastSpell(me, 66110);
+            }
+        }
+
+        void PassengerBoarded(Unit* passenger, int8 seatId, bool apply) override
+        {
+            if (Player* player = passenger->ToPlayer())
+                if (apply)
+                {
+                    me->SetDisableGravity(true);
+                    me->SetCanFly(true);
+                    //me->SetSpeed(MOVE_RUN, 3.5f);
+                    me->GetMotionMaster()->MovePath(3650501, true);
+                }
+                else
+                {
+                    me->CastSpell(me, 66127, true);
+                    player->KilledMonsterCredit(50046);
+                }
+        }
+
+        void MovementInform(uint32 type, uint32 id) override
+        {
+            if (type == WAYPOINT_MOTION_TYPE && id == 8)
+                me->DespawnOrUnsummon(10);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_sling_rocket_36505AI(creature);
+    }
+};
+
 
 void AddSC_zone_lost_isles()
 {
@@ -2656,5 +3044,13 @@ void AddSC_zone_lost_isles()
     new npc_alliance_sailor_36176();
     new npc_cyclone_of_the_elements_36178();
     new spell_lightning_strike_68445();
+    new npc_elm_general_purpose_bunny_23837();
+    new npc_warrior_matic_nx__36525();
+    new npc_sassy_hardwrench_36425();
+    new npc_orc_survivor_36421();
+    new npc_trade_prince_gallywix_36513();
+    new go_rocket_sling_196439();
+    new npc_sling_rocket_36514();
+    new npc_sling_rocket_36505();
 
 }

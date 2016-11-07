@@ -252,7 +252,7 @@ public:
                     if (player)
                     {
                         player->CastSpell(player, SPELL_EYE_OF_THE_STORM, true);
-                        if (Creature* storm = player->SummonCreature(NPC_RELENTLESS_STORM_VEHICLE, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetOrientation(), TEMPSUMMON_MANUAL_DESPAWN))
+                        // if (Creature* storm = player->SummonCreature(NPC_RELENTLESS_STORM_VEHICLE, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetOrientation(), TEMPSUMMON_MANUAL_DESPAWN))
                             /*player->EnterVehicle(storm)*/;
                     }
                 }
@@ -333,7 +333,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 const diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -607,7 +607,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 const diff)
+        void UpdateAI(uint32 diff) override
         {
             if (mounted)
             {
@@ -666,7 +666,7 @@ public:
             me->DespawnOrUnsummon(20000);
         }
 
-        void UpdateAI(uint32 const diff)
+        void UpdateAI(uint32 diff) override
         { }
     };
 };
@@ -733,7 +733,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 const diff)
+        void UpdateAI(uint32 diff) override
         {
             if (changeAngelRainTimer <= diff)
             {
@@ -784,7 +784,7 @@ public:
             me->CastSpell(me, SPELL_STORMLING_PRE_AURA, true);
         }
 
-        void UpdateAI(uint32 const diff)
+        void UpdateAI(uint32 diff) override
         {
             if (summonTimmer <= diff)
             {
@@ -838,7 +838,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 const diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!me->GetVictim())
                 return;
@@ -946,7 +946,7 @@ public:
                 playerGUID = summoner->GetGUID();
         }
 
-        void UpdateAI(uint32 const diff)
+        void UpdateAI(uint32 diff) override
         {
             if (playerReturnTimer <= diff)
             {
@@ -1058,7 +1058,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 const diff)
+        void UpdateAI(uint32 diff) override
         {
             if (lightningVisual <= diff)
             {
@@ -1140,7 +1140,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 const diff)
+        void UpdateAI(uint32 diff) override
         {
             if (changeAngelTimer <= diff)
             {
@@ -1304,7 +1304,7 @@ void AddSC_boss_alakir()
     new npc_stormling();
     new spell_electrocute();
     new spell_wind_burst();
-    new npc_wind_burst_trigger();
+    // new npc_wind_burst_trigger();
     new npc_relentless_storm_initial_vehicle();
     new npc_lightning_coulds();
     new npc_relentless_storm();
