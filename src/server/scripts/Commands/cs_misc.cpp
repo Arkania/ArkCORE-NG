@@ -164,7 +164,8 @@ public:
         CellCoord cellCoord = Trinity::ComputeCellCoord(object->GetPositionX(), object->GetPositionY());
         Cell cell(cellCoord);
 
-        uint32 zoneId, areaId;
+        uint32 zoneId = object->GetZoneId();
+        uint32 areaId = object->GetAreaId();
         object->GetZoneAndAreaId(zoneId, areaId);
         uint32 mapId = object->GetMapId();
 

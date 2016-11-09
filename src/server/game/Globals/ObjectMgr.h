@@ -1054,9 +1054,11 @@ class ObjectMgr
 
         void LoadPhaseAreaDefinitions();
         void LoadPhaseAreaSelector();
+        void LoadSpellPhaseInfo();
 
         PhaseAreaDefinitionStore const* GetPhaseAreaDefinitionStore() { return &m_phaseAreaDefinitionStore; }
         PhaseAreaSelectorStore const* GetPhaseAreaSelectorStore() { return &m_phaseAreaSelectorStore; }
+        SpellPhaseDefinitionStore const* GetSpellPhaseDefinitionStore() { return &m_spellPhaseStore; }
 
         std::string GeneratePetName(uint32 entry);
         uint32 GetBaseXP(uint8 level);
@@ -1431,6 +1433,7 @@ class ObjectMgr
 
         PhaseAreaDefinitionStore m_phaseAreaDefinitionStore;
         PhaseAreaSelectorStore m_phaseAreaSelectorStore;
+        SpellPhaseDefinitionStore m_spellPhaseStore;
 
     private:
         void LoadScripts(ScriptsType type);

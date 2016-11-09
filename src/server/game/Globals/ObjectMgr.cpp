@@ -9345,6 +9345,55 @@ void ObjectMgr::LoadPhaseAreaSelector()
     TC_LOG_INFO("server.loading", ">> Loaded %u phase areas in %u ms.", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
+void ObjectMgr::LoadSpellPhaseInfo()
+{
+    m_spellPhaseStore.clear();
+    uint32 oldMSTime = getMSTime();
+
+    //                                               0         1   2        3           4               5                 6
+    QueryResult result = WorldDatabase.Query("SELECT spell_id, id, phaseId, phaseGroup, terrainswapmap, worldmapareaswap, comment FROM `spell_phase`");
+
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 spell dbc infos. DB table `spell_phase` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        SpellPhaseDefinition spellPhaseInfo;
+        spellPhaseInfo.spellId = fields[0].GetUInt32();
+        spellPhaseInfo.id = fields[1].GetUInt16();
+
+        SpellInfo const* spell = sSpellMgr->GetSpellInfo(spellPhaseInfo.spellId);
+        if (!spell)
+        {
+            TC_LOG_ERROR("sql.sql", "Spell %u defined in `spell_phase` does not exists, skipped.", spellPhaseInfo.spellId);
+            continue;
+        }
+
+        if (!spell->HasAura(SPELL_AURA_PHASE))
+        {
+            TC_LOG_ERROR("sql.sql", "Spell %u defined in `spell_phase` does not have aura effect type SPELL_AURA_PHASE, useless value.", spellPhaseInfo.spellId);
+            continue;
+        }
+
+        spellPhaseInfo.phaseId          = fields[2].GetUInt16();
+        spellPhaseInfo.phaseGroup       = fields[3].GetUInt16();
+        spellPhaseInfo.terrainswapmap   = fields[4].GetUInt16();
+        spellPhaseInfo.worldmapareaswap = fields[5].GetUInt16();
+        spellPhaseInfo.comment          = fields[6].GetString();
+
+        m_spellPhaseStore[spellPhaseInfo.spellId].push_back(spellPhaseInfo);
+
+        ++count;
+    } while (result->NextRow());
+    TC_LOG_INFO("server.loading", ">> Loaded %u spell dbc infos in %u ms.", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
 GameObjectTemplate const* ObjectMgr::GetGameObjectTemplate(uint32 entry)
 {
     GameObjectTemplateContainer::const_iterator itr = _gameObjectTemplateStore.find(entry);

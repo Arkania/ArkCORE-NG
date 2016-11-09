@@ -165,13 +165,16 @@ typedef std::unordered_map<uint32 /*zoneId*/, PhaseAreaDefinitionContainer> Phas
 struct SpellPhaseDefinition
 {
     uint32 spellId;
-    uint64 phaseMask;
+    uint16 id;
     uint16 phaseId;
+    uint16 phaseGroup;
     uint16 terrainswapmap;
     uint16 worldmapareaswap;
+    std::string comment;
 };
 
-typedef std::unordered_map<uint32 /*spellId*/, SpellPhaseDefinition> SpellPhaseDefinitionStore;
+typedef std::list<SpellPhaseDefinition> SpellPhaseDefinitionContainer;
+typedef std::unordered_map<uint32 /*spellId*/, SpellPhaseDefinitionContainer> SpellPhaseDefinitionStore;
 
 class Corpse;
 class Creature;
@@ -929,6 +932,8 @@ class WorldObject : public Object, public WorldLocation
         virtual void SetPhaseMask(uint64 newPhaseMask, bool update);
 
         virtual void AddPhaseId(uint16 phaseId, bool apply);
+        void AddTerrainSwapMap(uint16 mapId, bool apply);
+        void AddWorldMapAreaSwap(uint16 mapId, bool apply);
 
         uint64 GetPhaseMask() const { return m_phaseMask; }
         std::set<uint16> const& GetPhaseIds() const { return m_phaseIds; }
