@@ -1009,6 +1009,8 @@ void Creature::SaveToDB(uint32 mapid, CreatureData const* tmpData)
     data.id = GetEntry();
     data.mapid = mapid;
     data.phaseMask = tmpData->phaseMask;
+    data.phaseIds = tmpData->phaseIds;
+    data.phaseGroup = tmpData->phaseGroup;
     data.displayid = displayId;
     data.equipmentId = GetCurrentEquipmentId();
     if (!GetTransport())
@@ -1056,7 +1058,8 @@ void Creature::SaveToDB(uint32 mapid, CreatureData const* tmpData)
     stmt->setUInt16(index++, uint16(GetZoneId()));
     stmt->setUInt16(index++, uint16(GetAreaId()));
     stmt->setUInt8(index++, tmpData->spawnMask);
-    stmt->setString(index++, GetUInt16String(GetPhaseIds()));
+    stmt->setString(index++, GetUInt16String(tmpData->phaseIds));
+    stmt->setUInt16(index++, tmpData->phaseGroup);
     stmt->setUInt32(index++, displayId);
     stmt->setInt32(index++, int32(GetCurrentEquipmentId()));
     stmt->setFloat(index++, GetPositionX());

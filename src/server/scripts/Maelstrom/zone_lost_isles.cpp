@@ -33,6 +33,9 @@ enum Zone_zone_lost_isles
     NPC_DOC_ZAPNOZZLE = 36608,
     NPC_GOBLIN_SURVIVOR = 34748,
     NPC_MONKEY_BUSINESS_KILL_CREDIT = 35760,
+    NPC_RAPTOR_38187 = 38187,
+    NPC_WILD_CLUCKER_EGG_38195 = 38195,
+    GO_TRAP_201972 = 201972,
     PLAYER_GUID = 99991,
     QUEST_DONT_GO_INTO_THE_LIGHT = 14239,
     QUEST_GOBLIN_ESCAPE_PODS_F = 14001,
@@ -83,8 +86,15 @@ enum Zone_zone_lost_isles
     EVENT_CAST_COOLDOWN_02,
     EVENT_START_WALK,
     EVENT_START_FLYING,
+    EVENT_TRIGGER_TRAP,
+    EVENT_BEGIN_LANDING,
+    EVENT_FIND_TARGET,
+    EVENT_BEGIN_FLYING,
     EVENT_COOLDOWN_00,
     EVENT_COOLDOWN_01,
+    EVENT_DESPAWN,
+    EVENT_SPAWN_OBJECT,
+    EVENT_INVISIBLE_OBJECT,
     EVENT_PLAY_PERIODIC_SOUND,
     EVENT_PLAY_PERIODIC_EMOTE,
 };
@@ -2999,6 +3009,389 @@ public:
     }
 };
 
+/*  phase 180  */
+
+// 38111
+class npc_wild_clucker_38111 : public CreatureScript
+{
+public:
+    npc_wild_clucker_38111() : CreatureScript("npc_wild_clucker_38111") { }
+
+    bool OnGossipHello(Player* player, Creature* creature)
+    {
+        if (player->GetQuestStatus(24671) == QUEST_STATUS_INCOMPLETE)
+        {
+           creature->CastSpell(creature, 74177, true);
+           player->CLOSE_GOSSIP_MENU();
+           return true;
+        }
+
+        return false;
+    }
+
+    struct npc_wild_clucker_38111AI : public ScriptedAI
+    {
+        npc_wild_clucker_38111AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap  m_events;
+        uint64    m_playerGUID;
+
+        void Reset() override
+        {
+            me->RemoveAura(74177);
+            m_playerGUID = 0;
+        }
+
+        void SpellHit(Unit* caster, SpellInfo const* spell) override 
+        { 
+            if (Player* player = caster->ToPlayer())
+                if (spell->Id == 71170)
+                    if (me->HasAura(74177))
+                    {
+                        m_playerGUID = player->GetGUID();
+                        me->GetMotionMaster()->Clear(true);                       
+                        m_events.ScheduleEvent(EVENT_START_FLYING, 100);
+                    }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_START_FLYING:
+                {
+                    // need here the correct part for 'chicken flying home'
+                    me->SetDisableGravity(true);
+                    me->SetCanFly(true);
+                    me->SetWalk(false);                    
+                    me->CastSpell(me, 74172, true);
+                    m_events.ScheduleEvent(EVENT_BEGIN_LANDING, 4000);
+                    break;
+                }
+                case EVENT_BEGIN_LANDING:
+                {
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        player->KilledMonsterCredit(38117);
+                    m_events.ScheduleEvent(EVENT_DESPAWN, 1000);
+                    break;
+                }
+                case EVENT_DESPAWN:
+                {
+                    me->DespawnOrUnsummon(10);
+                    me->RemoveAura(74177);
+                    break;
+                }
+                }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_wild_clucker_38111AI(creature);
+    }
+};
+
+// 201972  
+class go_raptor_trap_201972 : public GameObjectScript
+{
+public:
+    go_raptor_trap_201972() : GameObjectScript("go_raptor_trap_201972") { }
+
+    struct go_raptor_trap_201972AI : public GameObjectAI
+    {
+        go_raptor_trap_201972AI(GameObject* go) : GameObjectAI(go) { }
+
+        EventMap m_events;
+        uint64   m_playerGUID;
+        uint64   m_raptorGUID;
+
+        void Reset() override
+        {
+            m_playerGUID = 0;
+            m_raptorGUID = 0;
+        }
+
+        void SetGUID(uint64 guid, int32 id) override
+        {
+            switch (id)
+            {
+            case PLAYER_GUID:
+            {
+                m_playerGUID = guid;
+                break;
+            }
+            case NPC_RAPTOR_38187:
+            {
+                m_raptorGUID = guid;
+                break;
+            }
+            }
+        }
+
+        void OnStateChanged(uint32 state, Unit* unit) override
+        {
+            switch (state)
+            {
+            case GO_STATE_ACTIVE_ALTERNATIVE:
+            {
+                if (Player* player = ObjectAccessor::GetPlayer(*go, m_playerGUID))
+                    if (Creature* raptor = ObjectAccessor::GetCreature(*go, m_raptorGUID))
+                    {
+                        raptor->CastSpell(raptor, 35309, true);
+                        raptor->CastSpell(raptor, 29266, true);
+                        raptor->AddUnitState(UNIT_STATE_STUNNED);
+                        raptor->CastSpell(raptor, 66723, true);
+                        m_events.ScheduleEvent(EVENT_CAST_COOLDOWN_01, 30000);
+                    }
+                break;
+            }
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_CAST_COOLDOWN_01:
+                {
+                    if (Creature* raptor = ObjectAccessor::GetCreature(*go, m_raptorGUID))
+                        raptor->DealDamage(raptor, raptor->GetHealth() + 1);
+                    go->ResetDoorOrButton();
+                    break;
+                }
+                }
+            }
+        }
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_raptor_trap_201972AI(go);
+    }
+};
+
+// 38195
+class npc_wild_clucker_egg_38195 : public CreatureScript
+{
+public:
+    npc_wild_clucker_egg_38195() : CreatureScript("npc_wild_clucker_egg_38195") { }
+
+    struct npc_wild_clucker_egg_38195AI : public ScriptedAI
+    {
+        npc_wild_clucker_egg_38195AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap  m_events;
+        uint64    m_playerGUID;
+        uint64    m_raptorGUID;
+        uint64    m_trapGUID;
+
+        void Reset() override
+        {
+            m_playerGUID = me->GetOwnerGUID();
+            me->AddUnitState(UNIT_STATE_STUNNED);
+            m_events.ScheduleEvent(EVENT_FIND_TARGET, 500);
+        }
+
+        void DoAction(int32 param) override
+        {
+            if (param)
+                m_events.ScheduleEvent(EVENT_SPAWN_OBJECT, 500);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);            
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_FIND_TARGET:
+                {
+                    GetOrCreateRaptorTarget();
+                    GetTrapTarget();
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        if (Creature* raptor = ObjectAccessor::GetCreature(*me, m_raptorGUID))
+                            if (GameObject* trap = ObjectAccessor::GetGameObject(*me, m_trapGUID))
+                            {
+                                raptor->AI()->SetGUID(m_playerGUID, PLAYER_GUID);
+                                raptor->AI()->SetGUID(m_trapGUID, GO_TRAP_201972);
+                                raptor->AI()->SetGUID(me->GetGUID(), me->GetEntry());
+                                raptor->AI()->DoAction(1);
+                                trap->AI()->SetGUID(m_playerGUID, PLAYER_GUID);
+                                trap->AI()->SetGUID(m_raptorGUID, NPC_RAPTOR_38187);
+                            }
+
+                    break;
+                }
+                case EVENT_SPAWN_OBJECT:
+                {
+                    me->CastSpell(me, 66726, true);
+                    m_events.ScheduleEvent(EVENT_DESPAWN, 100);
+                    break;
+                }
+                case EVENT_DESPAWN:
+                {
+                    me->DespawnOrUnsummon();
+                    break;
+                }
+                }
+            }
+        }
+
+        void GetOrCreateRaptorTarget()
+        {
+            m_raptorGUID = 0;
+            Creature* raptor = me->FindNearestCreature(38187, 30.0f);
+            if (!raptor)
+                if (raptor = me->FindNearestCreature(38187, 30.0f, false))
+                    raptor->Respawn();
+            if (raptor)
+            {
+                m_raptorGUID = raptor->GetGUID();
+                raptor->RemoveAura(29266);
+                raptor->ClearUnitState(UNIT_STATE_STUNNED);
+            }
+        }
+
+        void GetTrapTarget()
+        {
+            m_trapGUID = 0;
+            if (GameObject* trap = me->FindNearestGameObject(201972, 3.0f))
+                m_trapGUID = trap->GetGUID();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_wild_clucker_egg_38195AI(creature);
+    }
+};
+
+// 38187
+class npc_spiny_raptor_38187 : public CreatureScript
+{
+public:
+    npc_spiny_raptor_38187() : CreatureScript("npc_spiny_raptor_38187") { }
+
+    struct npc_spiny_raptor_38187AI : public ScriptedAI
+    {
+        npc_spiny_raptor_38187AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+        EventMap  m_events;
+        uint64    m_playerGUID;
+        uint64    m_trapGUID;
+        uint64    m_cluckEggGUID;
+
+        void Initialize()
+        {
+            m_playerGUID = 0;
+            m_trapGUID = 0;
+            m_cluckEggGUID = 0;
+        }
+
+        void Reset() override
+        {
+            me->ClearUnitState(UNIT_STATE_STUNNED);
+            me->RemoveAura(29266);
+            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetReactState(REACT_AGGRESSIVE);
+        }
+
+        void SetGUID(uint64 guid, int32 id) override
+        {
+            switch (id)
+            {
+            case PLAYER_GUID:
+                m_playerGUID = guid;
+                break;
+            case GO_TRAP_201972:
+                m_trapGUID = guid;
+                break;
+            case NPC_WILD_CLUCKER_EGG_38195:
+                m_cluckEggGUID = guid;
+                break;
+            }
+        }
+
+        void DoAction(int32 param) override 
+        { 
+            if (m_playerGUID && m_trapGUID && param)
+            {
+                m_events.ScheduleEvent(EVENT_START_WALK, 100);
+                m_events.ScheduleEvent(EVENT_MASTER_RESET, 15000);
+            }
+        }
+
+        void MovementInform(uint32 type, uint32 id) override
+        {
+            if (type == POINT_MOTION_TYPE && id == 1027)
+                if (GameObject* trap = ObjectAccessor::GetGameObject(*me, m_trapGUID))
+                    trap->UseDoorOrButton();
+        }
+
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
+        {
+            if (spell->Id == 66723)
+                m_events.ScheduleEvent(EVENT_TRIGGER_TRAP, 2500);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_MASTER_RESET:
+                {
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    me->GetMotionMaster()->MoveTargetedHome();
+                    break;
+                }
+                case EVENT_START_WALK:
+                {
+                    me->SetReactState(REACT_PASSIVE);
+                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                    if (GameObject* trap = ObjectAccessor::GetGameObject(*me, m_trapGUID))
+                        me->GetMotionMaster()->MovePoint(1027, trap->GetPosition());
+                    break;
+                }
+                case EVENT_TRIGGER_TRAP:
+                {
+                    if (Creature* egg = ObjectAccessor::GetCreature(*me, m_cluckEggGUID))
+                        egg->AI()->DoAction(2);
+                    m_events.ScheduleEvent(EVENT_DESPAWN, 500);
+                    break;
+                }
+                case EVENT_DESPAWN:
+                {
+                    me->DespawnOrUnsummon(10);
+                    break;
+                }
+                }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_spiny_raptor_38187AI(creature);
+    }
+};
+
+
 
 void AddSC_zone_lost_isles()
 {
@@ -3052,5 +3445,10 @@ void AddSC_zone_lost_isles()
     new go_rocket_sling_196439();
     new npc_sling_rocket_36514();
     new npc_sling_rocket_36505();
+    /*  phase 180  */
+    new npc_wild_clucker_38111();
+    new go_raptor_trap_201972();
+    new npc_wild_clucker_egg_38195();
+    new npc_spiny_raptor_38187();
 
 }
