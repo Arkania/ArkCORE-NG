@@ -3009,25 +3009,126 @@ public:
     }
 };
 
+// 36470
+class npc_foreman_dampwick_36470 : public CreatureScript
+{
+public:
+    npc_foreman_dampwick_36470() : CreatureScript("npc_foreman_dampwick_36470") { }
+
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    {
+        switch (quest->GetQuestId())
+        {
+        case 14245:
+        {           
+            creature->AI()->Talk(0, player);
+            break;
+        }
+        }
+        return false;
+    }
+};
+
 /*  phase 180  */
+
+// 36471
+class npc_foreman_dampwick_36471 : public CreatureScript
+{
+public:
+    npc_foreman_dampwick_36471() : CreatureScript("npc_foreman_dampwick_36471") { }
+
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    {
+        switch (quest->GetQuestId())
+        {
+        case 27139:
+        {
+            creature->AI()->Talk(0, player);
+            break;
+        }
+        }
+        return false;
+    }
+};
+
+// 38120
+class npc_hobart_grapplehammer_38120 : public CreatureScript
+{
+public:
+    npc_hobart_grapplehammer_38120() : CreatureScript("npc_hobart_grapplehammer_38120") { }
+
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    {
+        switch (quest->GetQuestId())
+        {
+        case 24671:
+        {
+            creature->AI()->Talk(3, player);
+            break;
+        }
+        case 24744:
+        {
+            creature->AI()->Talk(4, player);
+            break;
+        }
+        }
+        return false;
+    }
+
+    bool OnQuestComplete(Player* player, Creature* creature, Quest const* quest) 
+    { 
+        switch (quest->GetQuestId())
+        {
+        case 24671:
+        {
+            if (Creature* bamm = creature->FindNearestCreature(38122, 30.0f))
+                bamm->AI()->Talk(0, player);
+            break;
+        }
+        }
+        return false; 
+    }
+};
+
+// 38122
+class npc_bamm_megabomb_38122 : public CreatureScript
+{
+public:
+    npc_bamm_megabomb_38122() : CreatureScript("npc_bamm_megabomb_38122") { }
+
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    {
+        switch (quest->GetQuestId())
+        {
+        case 24741:
+        {
+            creature->AI()->Talk(1, player);
+            break;
+        }
+        }
+        return false;
+    }
+
+    bool OnQuestComplete(Player* player, Creature* creature, Quest const* quest)
+    {
+        switch (quest->GetQuestId())
+        {
+        case 24741:
+        {
+            if (Creature* hobart = creature->FindNearestCreature(38120, 30.0f))
+                hobart->AI()->Talk(2, player);
+            break;
+        }
+        }
+        return false;
+    }
+};
 
 // 38111
 class npc_wild_clucker_38111 : public CreatureScript
 {
 public:
     npc_wild_clucker_38111() : CreatureScript("npc_wild_clucker_38111") { }
-
-    bool OnGossipHello(Player* player, Creature* creature)
-    {
-        if (player->GetQuestStatus(24671) == QUEST_STATUS_INCOMPLETE)
-        {
-           creature->CastSpell(creature, 74177, true);
-           player->CLOSE_GOSSIP_MENU();
-           return true;
-        }
-
-        return false;
-    }
 
     struct npc_wild_clucker_38111AI : public ScriptedAI
     {
@@ -3038,55 +3139,20 @@ public:
 
         void Reset() override
         {
-            me->RemoveAura(74177);
+            me->RemoveAllAuras();
             m_playerGUID = 0;
         }
 
-        void SpellHit(Unit* caster, SpellInfo const* spell) override 
+        void OnSpellClick(Unit* clicker, bool& /*result*/) 
         { 
-            if (Player* player = caster->ToPlayer())
-                if (spell->Id == 71170)
-                    if (me->HasAura(74177))
-                    {
-                        m_playerGUID = player->GetGUID();
-                        me->GetMotionMaster()->Clear(true);                       
-                        m_events.ScheduleEvent(EVENT_START_FLYING, 100);
-                    }
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            m_events.Update(diff);
-
-            while (uint32 eventId = m_events.ExecuteEvent())
-            {
-                switch (eventId)
+            if (Player* player = clicker->ToPlayer())
+                if (player->GetQuestStatus(24671) == QUEST_STATUS_INCOMPLETE)
                 {
-                case EVENT_START_FLYING:
-                {
-                    // need here the correct part for 'chicken flying home'
-                    me->SetDisableGravity(true);
-                    me->SetCanFly(true);
-                    me->SetWalk(false);                    
-                    me->CastSpell(me, 74172, true);
-                    m_events.ScheduleEvent(EVENT_BEGIN_LANDING, 4000);
-                    break;
+                    m_playerGUID = player->GetGUID();
+                    me->CastSpell(me, 74177, true);
+                    player->KilledMonsterCredit(38117);
+                    me->DespawnOrUnsummon(3000);
                 }
-                case EVENT_BEGIN_LANDING:
-                {
-                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
-                        player->KilledMonsterCredit(38117);
-                    m_events.ScheduleEvent(EVENT_DESPAWN, 1000);
-                    break;
-                }
-                case EVENT_DESPAWN:
-                {
-                    me->DespawnOrUnsummon(10);
-                    me->RemoveAura(74177);
-                    break;
-                }
-                }
-            }
         }
     };
 
@@ -3445,7 +3511,11 @@ void AddSC_zone_lost_isles()
     new go_rocket_sling_196439();
     new npc_sling_rocket_36514();
     new npc_sling_rocket_36505();
+    new npc_foreman_dampwick_36470();
     /*  phase 180  */
+    new npc_foreman_dampwick_36471();
+    new npc_hobart_grapplehammer_38120();
+    new npc_bamm_megabomb_38122();
     new npc_wild_clucker_38111();
     new go_raptor_trap_201972();
     new npc_wild_clucker_egg_38195();
