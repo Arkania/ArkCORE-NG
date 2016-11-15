@@ -86,6 +86,7 @@ enum Zone_zone_lost_isles
     EVENT_CAST_COOLDOWN_02,
     EVENT_START_WALK,
     EVENT_START_FLYING,
+    EVENT_START_TALK,
     EVENT_TRIGGER_TRAP,
     EVENT_BEGIN_LANDING,
     EVENT_FIND_TARGET,
@@ -3085,8 +3086,192 @@ public:
                 bamm->AI()->Talk(0, player);
             break;
         }
+        case 24744:
+        {
+            creature->AI()->SetGUID(player->GetGUID(), PLAYER_GUID);
+            creature->AI()->DoAction(1);
+            break;
+        }
         }
         return false; 
+    }
+
+    struct npc_hobart_grapplehammer_38120AI : public ScriptedAI
+    {
+        npc_hobart_grapplehammer_38120AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap  m_events;
+        uint64    m_playerGUID;
+        uint64    m_greelyGUID;
+        uint64    m_bunnyGUID;
+
+        void Reset() override
+        {
+            m_playerGUID = 0;
+            m_greelyGUID = 0;
+            m_bunnyGUID = 0;
+        }
+
+        void DoAction(int32 param) override
+        {
+            switch (param)
+            {
+            case 1:
+                m_events.RescheduleEvent(EVENT_START_TALK, 2000);
+                break;
+            }
+        }
+
+        void SetGUID(uint64 guid, int32 id) override
+        {
+            switch (id)
+            {
+            case PLAYER_GUID:
+                m_playerGUID = guid;
+                break;
+            }
+        }
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_START_TALK:
+                {
+                    if (!m_greelyGUID)
+                        if (Creature* greely = me->FindNearestCreature(38124, 30.0f))
+                            m_greelyGUID = greely->GetGUID();
+
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        Talk(0, player);
+                    m_events.ScheduleEvent(EVENT_TALK_PART_01, 2000);
+                    break;
+                }
+                case EVENT_TALK_PART_01:
+                {
+                    if (Creature* greely = ObjectAccessor::GetCreature(*me, m_greelyGUID))
+                        if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                            greely->AI()->Talk(0, player);
+
+                    m_events.ScheduleEvent(EVENT_TALK_PART_02, 7000);
+                    break;
+                }
+                case EVENT_TALK_PART_02:
+                {
+                    if (Creature* greely = ObjectAccessor::GetCreature(*me, m_greelyGUID))
+                        if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                            greely->AI()->Talk(1, player);
+
+                    m_events.ScheduleEvent(EVENT_TALK_PART_03, 7000);
+                    break;
+                }
+                case EVENT_TALK_PART_03:
+                {
+                    if (Creature* greely = ObjectAccessor::GetCreature(*me, m_greelyGUID))
+                        if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                            greely->AI()->Talk(2, player);
+
+                    m_events.ScheduleEvent(EVENT_TALK_PART_04, 3000);
+                    break;
+                }
+                case EVENT_TALK_PART_04:
+                {
+                    if (!m_bunnyGUID)
+                        if (Creature* greely = ObjectAccessor::GetCreature(*me, m_greelyGUID))
+                            if (Creature* bunny = greely->FindNearestCreature(24021, 15.0f))
+                                m_bunnyGUID = bunny->GetGUID();
+
+                    if (Creature* bunny = ObjectAccessor::GetCreature(*me, m_bunnyGUID))
+                    {
+                        bunny->CastSpell(bunny, 71608);
+                        bunny->CastSpell(bunny, 71608);
+                        bunny->CastSpell(bunny, 71608);
+                        bunny->CastSpell(bunny, 71608);
+                        bunny->CastSpell(bunny, 71608);
+                    }
+                    m_events.ScheduleEvent(EVENT_TALK_PART_05, 1000);
+                    break;
+                }
+                case EVENT_TALK_PART_05:
+                {
+                    if (Creature* bunny = ObjectAccessor::GetCreature(*me, m_bunnyGUID))
+                    {
+                        bunny->CastSpell(bunny, 71608);
+                        bunny->CastSpell(bunny, 71608);
+                        bunny->CastSpell(bunny, 71608);
+                    }
+
+                    m_events.ScheduleEvent(EVENT_TALK_PART_06, 1000);
+                    break;
+                }
+                case EVENT_TALK_PART_06:
+                {
+                    if (Creature* bunny = ObjectAccessor::GetCreature(*me, m_bunnyGUID))
+                    {
+                        bunny->CastSpell(bunny, 71608);
+                        bunny->CastSpell(bunny, 71608);
+                        bunny->CastSpell(bunny, 71608);
+                    }
+
+                    m_events.ScheduleEvent(EVENT_TALK_PART_07, 1000);
+                    break;
+                }
+                case EVENT_TALK_PART_07:
+                {
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        Talk(1, player);
+                    if (Creature* bunny = ObjectAccessor::GetCreature(*me, m_bunnyGUID))
+                    {
+                        bunny->CastSpell(bunny, 71608);
+                        bunny->CastSpell(bunny, 71608);
+                        bunny->CastSpell(bunny, 71608);
+                    }
+
+                    m_events.ScheduleEvent(EVENT_TALK_PART_08, 1000);
+                    break;
+                }
+                case EVENT_TALK_PART_08:
+                {
+                    if (Creature* bunny = ObjectAccessor::GetCreature(*me, m_bunnyGUID))
+                    {
+                        bunny->CastSpell(bunny, 71608);
+                        bunny->CastSpell(bunny, 71608);
+                    }
+                    m_events.ScheduleEvent(EVENT_TALK_PART_09, 1000);
+                    break;
+                }
+                case EVENT_TALK_PART_09:
+                {
+                    if (Creature* bunny = ObjectAccessor::GetCreature(*me, m_bunnyGUID))
+                    {
+                        bunny->CastSpell(bunny, 71608);
+                        bunny->CastSpell(bunny, 71608);
+                    }
+
+                    m_events.ScheduleEvent(EVENT_TALK_PART_10, 1000);
+                    break;
+                }
+                case EVENT_TALK_PART_10:
+                {
+                    if (Creature* bunny = ObjectAccessor::GetCreature(*me, m_bunnyGUID))
+                        bunny->CastSpell(bunny, 71608);
+
+                    break;
+                }
+                }
+            }
+        }
+
+
+
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_hobart_grapplehammer_38120AI(creature);
     }
 };
 
@@ -3324,7 +3509,7 @@ public:
             if (raptor)
             {
                 m_raptorGUID = raptor->GetGUID();
-                raptor->RemoveAura(29266);
+                raptor->RemoveAllAuras();
                 raptor->ClearUnitState(UNIT_STATE_STUNNED);
             }
         }
@@ -3421,8 +3606,7 @@ public:
                 {
                 case EVENT_MASTER_RESET:
                 {
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
-                    me->SetReactState(REACT_AGGRESSIVE);
+                    Reset();
                     me->GetMotionMaster()->MoveTargetedHome();
                     break;
                 }
@@ -3443,6 +3627,7 @@ public:
                 }
                 case EVENT_DESPAWN:
                 {
+                    m_events.Reset();
                     me->DespawnOrUnsummon(10);
                     break;
                 }
@@ -3457,6 +3642,141 @@ public:
     }
 };
 
+// 38224
+class npc_mechachicken_38224 : public CreatureScript
+{
+public:
+    npc_mechachicken_38224() : CreatureScript("npc_mechachicken_38224") { }
+
+    struct npc_mechachicken_38224AI : public ScriptedAI
+    {
+        npc_mechachicken_38224AI(Creature* creature) : ScriptedAI(creature) { }
+
+        void JustDied(Unit* killer) override 
+        { 
+            if (Player* player = killer->ToPlayer())
+                if (player->GetQuestStatus(24744) == QUEST_STATUS_INCOMPLETE)
+                    me->CastSpell(me, 71422, true);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_mechachicken_38224AI(creature);
+    }
+};
+
+// 38227
+class npc_the_biggest_egg_ever_spell_visual_38227 : public CreatureScript
+{
+public:
+    npc_the_biggest_egg_ever_spell_visual_38227() : CreatureScript("npc_the_biggest_egg_ever_spell_visual_38227") { }
+
+    struct npc_the_biggest_egg_ever_spell_visual_38227AI : public ScriptedAI
+    {
+        npc_the_biggest_egg_ever_spell_visual_38227AI(Creature* creature) : ScriptedAI(creature) { }
+
+        void Reset() override
+        {
+            me->SummonGameObject(201977, me->m_positionX, me->m_positionY, me->m_positionZ, me->m_orientation, 0, 0, 0, 0, 0);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_the_biggest_egg_ever_spell_visual_38227AI(creature);
+    }
+};
+
+// 38124
+class npc_assistant_greely_38124 : public CreatureScript
+{
+public:
+    npc_assistant_greely_38124() : CreatureScript("npc_assistant_greely_38124") { }
+
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    {
+        switch (quest->GetQuestId())
+        {
+        case 24817:
+        {
+            creature->AI()->Talk(3, player);
+            break;
+        }
+        }
+        return false;
+    }
+};
+
+// 38432
+class npc_megs_dreadshredder_38432 : public CreatureScript
+{
+public:
+    npc_megs_dreadshredder_38432() : CreatureScript("npc_megs_dreadshredder_38432") { }
+
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    {
+        switch (quest->GetQuestId())
+        {
+        case 24858:
+        {
+            creature->AI()->Talk(0, player);
+            break;
+        }
+        }
+        return false;
+    }
+};
+
+// 38381
+class npc_brett_coins_mcquid_38381 : public CreatureScript
+{
+public:
+    npc_brett_coins_mcquid_38381() : CreatureScript("npc_brett_coins_mcquid_38381") { }
+
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    {
+        switch (quest->GetQuestId())
+        {
+        case 24859:
+        {
+            creature->AI()->Talk(0, player);
+            break;
+        }
+        }
+        return false;
+    }
+};
+
+// 202133  
+class go_naga_banner_202133 : public GameObjectScript
+{
+public:
+    go_naga_banner_202133() : GameObjectScript("go_naga_banner_202133") { }
+
+    struct go_naga_banner_202133AI : public GameObjectAI
+    {
+        go_naga_banner_202133AI(GameObject* go) : GameObjectAI(go) { }
+
+        void OnStateChanged(uint32 state, Unit* unit) override
+        {
+            switch (state)
+            {
+            case GO_STATE_ACTIVE_ALTERNATIVE:
+            {
+                if (Player* player = unit->ToPlayer())
+                    player->CastSpell(go->m_positionX, go->m_positionY, go->m_positionZ, 71857, true, 0, 0, player->GetGUID());
+                break;
+            }
+            }
+        }
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_naga_banner_202133AI(go);
+    }
+};
 
 
 void AddSC_zone_lost_isles()
@@ -3520,5 +3840,11 @@ void AddSC_zone_lost_isles()
     new go_raptor_trap_201972();
     new npc_wild_clucker_egg_38195();
     new npc_spiny_raptor_38187();
+    new npc_mechachicken_38224();
+    new npc_the_biggest_egg_ever_spell_visual_38227();
+    new npc_assistant_greely_38124();
+    new npc_megs_dreadshredder_38432();
+    new npc_brett_coins_mcquid_38381();
+    new go_naga_banner_202133();
 
 }
