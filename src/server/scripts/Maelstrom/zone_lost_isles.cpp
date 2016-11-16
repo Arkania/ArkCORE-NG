@@ -75,6 +75,10 @@ enum Zone_zone_lost_isles
     EVENT_TALK_PART_08,
     EVENT_TALK_PART_09,
     EVENT_TALK_PART_10,
+    EVENT_FIGHT_PART_00,
+    EVENT_FIGHT_PART_01,
+    EVENT_FIGHT_PART_02,
+    EVENT_FIGHT_PART_03,
     EVENT_SHOW_FIGHT,
     EVENT_CHECK_FIGHT,
     EVENT_CHECK_PLAYER,
@@ -3723,6 +3727,16 @@ public:
             creature->AI()->Talk(0, player);
             break;
         }
+        case 24864:
+        {
+            creature->AI()->Talk(1, player);
+            break;
+        }
+        case 24868:
+        {
+            player->CastSpell(player, 72001, true);
+            break;
+        }
         }
         return false;
     }
@@ -3775,6 +3789,239 @@ public:
     GameObjectAI* GetAI(GameObject* go) const override
     {
         return new go_naga_banner_202133AI(go);
+    }
+};
+
+// 38359
+class npc_vashj_elan_warrior_38359 : public CreatureScript
+{
+public:
+    npc_vashj_elan_warrior_38359() : CreatureScript("npc_vashj_elan_warrior_38359") { }
+
+    struct npc_vashj_elan_warrior_38359AI : public ScriptedAI
+    {
+        npc_vashj_elan_warrior_38359AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap m_events;
+        bool m_spellCastRage;
+
+        void Reset()
+        {
+            m_spellCastRage = false;
+        }
+
+        void DamageTaken(Unit* attacker, uint32& damage) override 
+        { 
+            if (!m_spellCastRage)
+                if (me->GetHealthPct() < 40.0f)
+                {
+                    m_spellCastRage = true;
+                    Talk(0, attacker);
+                    me->CastSpell(me, 8599, true);
+                }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_vashj_elan_warrior_38359AI(creature);
+    }
+};
+
+// 38360
+class npc_vashj_elan_siren_38360 : public CreatureScript
+{
+public:
+    npc_vashj_elan_siren_38360() : CreatureScript("npc_vashj_elan_siren_38360") { }
+
+    struct npc_vashj_elan_siren_38360AI : public ScriptedAI
+    {
+        npc_vashj_elan_siren_38360AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap m_events;
+        bool m_spellCastNova;
+        bool m_spellCastBolt;
+
+        void Reset()
+        {
+            m_spellCastNova = false;
+            m_spellCastBolt = false;
+            CheckForMiniNaga();
+        }
+
+        void EnterCombat(Unit* victim) override
+        {
+            if (!m_spellCastNova)
+            {
+                me->CastSpell(victim, 11831);
+                m_spellCastNova = true;
+                m_events.ScheduleEvent(EVENT_CAST_COOLDOWN_01, 7000);
+            }
+        }
+
+        void DamageTaken(Unit* attacker, uint32& damage) override
+        {
+            if (!m_spellCastNova)
+                if (urand(0, 100) < 30)
+                {
+                    me->CastSpell(attacker, 11831);
+                    m_spellCastNova = true;
+                    m_events.ScheduleEvent(EVENT_CAST_COOLDOWN_01, 7000);
+                    return;
+                }
+            if (!m_spellCastBolt)
+                if (urand(0, 100) < 50)
+                {
+                    me->CastSpell(attacker, 9672);
+                    m_spellCastBolt = true;
+                    m_events.ScheduleEvent(EVENT_CAST_COOLDOWN_02, 9000);
+                    return;
+                }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_CAST_COOLDOWN_01:
+                    m_spellCastNova = false;
+                    break;
+                case EVENT_CAST_COOLDOWN_02:
+                    m_spellCastBolt = false;
+                    break;
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+
+        void CheckForMiniNaga()
+        {
+            if (me->GetAreaId() != 4877 || me->m_positionZ > -5.0f)
+                return;
+            for (uint32 i = 0; i < urand(3, 6); i++)
+                if (Creature* naga = me->SummonCreature(44579, me->GetPosition(), TEMPSUMMON_MANUAL_DESPAWN))
+                    naga->GetMotionMaster()->MoveFollow(me, frand(4.0f, 6.0f), frand(0.0f, 6.28f));
+            me->GetMotionMaster()->MoveRandom(10.0f);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_vashj_elan_siren_38360AI(creature);
+    }
+};
+
+// 44579
+class npc_naga_hatchling_44579 : public CreatureScript
+{
+public:
+    npc_naga_hatchling_44579() : CreatureScript("npc_naga_hatchling_44579") { }
+
+    bool OnGossipHello(Player* player, Creature* creature)
+    {
+        if (player->GetQuestStatus(24864) == QUEST_STATUS_INCOMPLETE)
+        {
+            creature->AI()->SetGUID(player->GetGUID(), PLAYER_GUID);
+            creature->AI()->DoAction(1);
+        }
+        player->CLOSE_GOSSIP_MENU();
+        return false;
+    }
+
+    struct npc_naga_hatchling_44579AI : public ScriptedAI
+    {
+        npc_naga_hatchling_44579AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap m_events;
+        uint64   m_playerGUID;
+
+        void Reset()
+        {
+            m_playerGUID = 0;
+        }
+
+        void SetGUID(uint64 guid, int32 id) override
+        {
+            switch (id)
+            {
+            case PLAYER_GUID:
+            {
+                m_playerGUID = guid;
+                break;
+            }
+            }
+        }
+
+        void DoAction(int32 param) override
+        {
+            if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                if (param == 1)
+                {
+                    std::list<Creature*>cList = me->FindNearestCreatures(44579, 5.0f);
+                    if (!cList.empty())
+                    {
+                        for (std::list<Creature*>::iterator itr = cList.begin(); itr != cList.end(); itr++)
+                        {
+                            Creature* naga = *itr;
+                            naga->PlayDirectSound(3437);
+                            player->CastSpell(naga->m_positionX, naga->m_positionY, naga->m_positionZ, RAND(71918, 71919, 83115, 83116), true);
+                            naga->DespawnOrUnsummon(10);
+                        }
+                    }
+                    me->DespawnOrUnsummon(10);
+                }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_naga_hatchling_44579AI(creature);
+    }
+};
+
+// 44588, 44589, 44590, 44591
+class npc_naga_hatchling_44588 : public CreatureScript
+{
+public:
+    npc_naga_hatchling_44588() : CreatureScript("npc_naga_hatchling_44588") { }
+
+    struct npc_naga_hatchling_44588AI : public ScriptedAI
+    {
+        npc_naga_hatchling_44588AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap m_events;
+        uint64   m_playerGUID;
+
+        void Reset()
+        {
+            m_playerGUID = 0;
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+        }
+
+        void IsSummonedBy(Unit* summoner) override 
+        { 
+            if (Player* player = summoner->ToPlayer())
+            {
+                m_playerGUID = player->GetGUID();
+                me->GetMotionMaster()->MoveFollow(player, 4.0f, frand(1.65f, 4.63f));
+                player->KilledMonsterCredit(38413);
+            }
+
+            me->CastSpell(me, 71917, true);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_naga_hatchling_44588AI(creature);
     }
 };
 
@@ -3846,5 +4093,9 @@ void AddSC_zone_lost_isles()
     new npc_megs_dreadshredder_38432();
     new npc_brett_coins_mcquid_38381();
     new go_naga_banner_202133();
+    new npc_vashj_elan_warrior_38359();
+    new npc_vashj_elan_siren_38360();
+    new npc_naga_hatchling_44579();
+    new npc_naga_hatchling_44588();
 
 }
