@@ -85,6 +85,7 @@ LFGDungeonEntry const* GetLFGDungeon(uint32 mapId, Difficulty difficulty);
 uint32 GetDefaultMapLight(uint32 mapId);
 
 std::set<uint16> const& GetXPhasesForGroup(uint16 group);
+uint16 const ComputePhaseGroup(std::set<uint16> phaseIds);
 
 extern DBCStorage <AchievementEntry>             sAchievementStore;
 extern DBCStorage <AchievementCriteriaEntry>     sAchievementCriteriaStore;

@@ -774,7 +774,7 @@ bool Creature::Create(uint32 guidlow, Map* map, uint32 phaseMask, uint32 Entry, 
 
     std::set<uint16> phaseIds;
     if (data)
-        phaseIds = MergePhases(phaseMask, data->phaseIds, GetXPhasesForGroup(data->phaseGroup));
+        phaseIds = MergePhases(phaseMask, data->phaseIds, data->phaseGroup);
     else
         phaseIds = ComputePhaseMaskToIds(phaseMask);
 
@@ -1580,7 +1580,7 @@ void Creature::SetDeathState(DeathState s)
 
             SetMeleeDamageSchool(SpellSchools(cinfo->dmgschool));
             
-            std::set<uint16> phaseIds = MergePhases(creatureData->phaseMask, creatureData->phaseIds, GetXPhasesForGroup(creatureData->phaseGroup));
+            std::set<uint16> phaseIds = MergePhases(creatureData->phaseMask, creatureData->phaseIds, creatureData->phaseGroup);
             for (uint16 ph : phaseIds)
                 SetInPhase(ph, false, true);
         }

@@ -153,7 +153,7 @@ public:
         GameObject* object = new GameObject;
         uint32 guidLow = sObjectMgr->GenerateLowGuid(HIGHGUID_GAMEOBJECT);
 
-        if (!object->Create(guidLow, objectInfo->entry, map, 0, x, y, z, o, 0.0f, 0.0f, 0.0f, 0.0f, 0, GO_STATE_READY))
+        if (!object->Create(guidLow, objectInfo->entry, map, 1, x, y, z, o, 0.0f, 0.0f, 0.0f, 0.0f, 0, GO_STATE_READY))
         {
             delete object;
             return false;
@@ -169,8 +169,10 @@ public:
         GameObjectData* tmpData = &sObjectMgr->NewGOData(guidLow);
         tmpData->id = object->GetEntry();
         tmpData->spawnMask = (1 << map->GetSpawnMode());
-        tmpData->phaseMask = player->GetPhaseMask();
+        tmpData->phaseMask = 1;
         tmpData->phaseIds = player->GetPhaseIds();
+        tmpData->zoneId = player->GetZoneId();
+        tmpData->areaId = player->GetAreaId();
         object->SaveToDB(map->GetId(), tmpData);
         // delete the old object and do a clean load from DB with a fresh new GameObject instance.
         // this is required to avoid weird behavior and memory leaks

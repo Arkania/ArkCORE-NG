@@ -620,6 +620,9 @@ struct GameObjectData
     std::set<uint16> phaseIds;
     uint16 phaseGroup;
     bool dbData;
+
+private:
+    void UpdatePhaseXGroup(std::set<uint16>&idList, uint16& phaseGroup);
 };
 
 // For containers:  [GO_NOT_READY]->GO_READY (close)->GO_ACTIVATED (open) ->GO_JUST_DEACTIVATED->GO_READY        -> ...

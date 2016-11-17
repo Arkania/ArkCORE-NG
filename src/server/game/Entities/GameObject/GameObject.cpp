@@ -738,17 +738,19 @@ void GameObject::SaveToDB(uint32 mapid, GameObjectData const* tmpData)
     data.mapid = mapid;
     data.zoneId = GetZoneId();
     data.areaId = GetAreaId();
-    data.phaseMask = tmpData->phaseMask;
     data.spawnMask = tmpData->spawnMask;
-    data.phaseIds = GetPhaseIds();
+    data.phaseMask = tmpData->phaseMask;
+    data.phaseIds = tmpData->phaseIds;
+    data.phaseGroup = tmpData->phaseGroup;
+    ComputePhaseXGroup(data.phaseIds, data.phaseGroup);
     data.posX = GetPositionX();
     data.posY = GetPositionY();
     data.posZ = GetPositionZ();
     data.orientation = GetOrientation();
-    data.rotation0 = GetFloatValue(GAMEOBJECT_PARENTROTATION+0);
-    data.rotation1 = GetFloatValue(GAMEOBJECT_PARENTROTATION+1);
-    data.rotation2 = GetFloatValue(GAMEOBJECT_PARENTROTATION+2);
-    data.rotation3 = GetFloatValue(GAMEOBJECT_PARENTROTATION+3);
+    data.rotation0 = GetFloatValue(GAMEOBJECT_PARENTROTATION + 0);
+    data.rotation1 = GetFloatValue(GAMEOBJECT_PARENTROTATION + 1);
+    data.rotation2 = GetFloatValue(GAMEOBJECT_PARENTROTATION + 2);
+    data.rotation3 = GetFloatValue(GAMEOBJECT_PARENTROTATION + 3);
     data.spawntimesecs = m_spawnedByDefault ? m_respawnDelayTime : -(int32)m_respawnDelayTime;
     data.animprogress = GetGoAnimProgress();
     data.go_state = GetGoState();
@@ -766,22 +768,23 @@ void GameObject::SaveToDB(uint32 mapid, GameObjectData const* tmpData)
     stmt = WorldDatabase.GetPreparedStatement(WORLD_INS_GAMEOBJECT);
     stmt->setUInt32(index++, m_DBTableGuid);
     stmt->setUInt32(index++, GetEntry());
-    stmt->setUInt16(index++, uint16(mapid));
-    stmt->setUInt16(index++, uint16(GetZoneId()));
-    stmt->setUInt16(index++, uint16(GetAreaId()));
-    stmt->setUInt8(index++, tmpData->spawnMask);
-    stmt->setString(index++, GetUInt16String(GetPhaseIds()));
-    stmt->setFloat(index++, GetPositionX());
-    stmt->setFloat(index++, GetPositionY());
-    stmt->setFloat(index++, GetPositionZ());
-    stmt->setFloat(index++, GetOrientation());
-    stmt->setFloat(index++, GetFloatValue(GAMEOBJECT_PARENTROTATION));
-    stmt->setFloat(index++, GetFloatValue(GAMEOBJECT_PARENTROTATION+1));
-    stmt->setFloat(index++, GetFloatValue(GAMEOBJECT_PARENTROTATION+2));
-    stmt->setFloat(index++, GetFloatValue(GAMEOBJECT_PARENTROTATION+3));
-    stmt->setInt32(index++, int32(m_respawnDelayTime));
-    stmt->setUInt8(index++, GetGoAnimProgress());
-    stmt->setUInt8(index++, uint8(GetGoState()));
+    stmt->setUInt16(index++, data.mapid);
+    stmt->setUInt16(index++, data.zoneId);
+    stmt->setUInt16(index++, data.areaId);
+    stmt->setUInt8(index++, data.spawnMask);
+    stmt->setString(index++, GetUInt16String(data.phaseIds));
+    stmt->setUInt16(index++, data.phaseGroup);
+    stmt->setFloat(index++, data.posX );
+    stmt->setFloat(index++, data.posY );
+    stmt->setFloat(index++, data.posZ );
+    stmt->setFloat(index++, data.orientation );
+    stmt->setFloat(index++, data.rotation0);
+    stmt->setFloat(index++, data.rotation1);
+    stmt->setFloat(index++, data.rotation2);
+    stmt->setFloat(index++, data.rotation3);
+    stmt->setInt32(index++, data.spawntimesecs);
+    stmt->setUInt8(index++, data.animprogress);
+    stmt->setUInt8(index++, uint8(data.go_state));
     trans->Append(stmt);
 
     WorldDatabase.CommitTransaction(trans);
@@ -819,7 +822,7 @@ bool GameObject::LoadGameObjectFromDB(uint32 guid, Map* map, bool addToMap)
     if (!Create(guid, entry, map, data->phaseMask, x, y, z, ang, rotation0, rotation1, rotation2, rotation3, animprogress, go_state, artKit))
         return false;
 
-    std::set<uint16> phaseIds = MergePhases(data->phaseMask, data->phaseIds, GetXPhasesForGroup(data->phaseGroup));
+    std::set<uint16> phaseIds = MergePhases(data->phaseMask, data->phaseIds, data->phaseGroup);
     for (uint16 ph : phaseIds)
         SetInPhase(ph, false, true);
 
@@ -2297,5 +2300,20 @@ void GameObject::UpdateModelPosition()
         GetMap()->RemoveGameObjectModel(*m_model);
         m_model->Relocate(*this);
         GetMap()->InsertGameObjectModel(*m_model);
+    }
+}
+
+void GameObjectData::UpdatePhaseXGroup(std::set<uint16>&idList, uint16& phaseGroup)
+{
+    if (!idList.size() && !phaseGroup)
+    {
+        idList.insert(169);
+        return;
+    }
+    else if (!idList.size() == 1)
+        return; 
+    else
+    {
+
     }
 }

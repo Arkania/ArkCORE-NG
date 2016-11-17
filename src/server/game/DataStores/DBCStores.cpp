@@ -1322,3 +1322,13 @@ std::set<uint16> const& GetXPhasesForGroup(uint16 group)
     return sPhasesByGroup[group];
 }
 
+uint16 const ComputePhaseGroup(std::set<uint16> phaseIds)
+{
+    for (uint32 groupId = 0; groupId < sPhasesByGroup.size(); ++groupId)
+    {
+        std::set<uint16> xGroup = GetXPhasesForGroup(groupId);
+        if (xGroup == phaseIds)
+            return groupId;
+    }
+    return 0;
+}

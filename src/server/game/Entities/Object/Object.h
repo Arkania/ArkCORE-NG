@@ -930,7 +930,6 @@ class WorldObject : public Object, public WorldLocation
         void UpdatePhaseForQuestAreaOrZoneChange();
         
         virtual void SetPhaseMask(uint64 newPhaseMask, bool update);
-
         virtual void AddPhaseId(uint16 phaseId, bool apply);
         void AddTerrainSwapMap(uint16 mapId, bool apply);
         void AddWorldMapAreaSwap(uint16 mapId, bool apply);
@@ -951,6 +950,8 @@ class WorldObject : public Object, public WorldLocation
         bool SetInPhase(uint16 id, bool update, bool apply);
 
         void SendDebugReportToPlayer();
+        std::set<uint16> MergePhases(uint64 phaseMask, std::set<uint16> phaseIds, uint16 phaseGroup);
+        void ComputePhaseXGroup(std::set<uint16> &phaseIds, uint16 &phaseGroup);
         // end phase system
 
     protected:

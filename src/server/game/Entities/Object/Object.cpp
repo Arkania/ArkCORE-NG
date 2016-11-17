@@ -3647,4 +3647,32 @@ void WorldObject::RebuildWorldMapAreaSwaps(bool &updateNeeded)
     //preparing for furure use of additional WorldMapAreaSwaps-tables  
 }
 
+std::set<uint16> WorldObject::MergePhases(uint64 phaseMask, std::set<uint16> phaseIds, uint16 phaseGroup)
+{
+    if (phaseGroup)
+        for (auto ph : GetXPhasesForGroup (phaseGroup))
+            if (phaseIds.find(ph) == phaseIds.end())
+                phaseIds.insert(ph);
+
+    if (phaseIds.empty())
+        phaseIds = ComputePhaseMaskToIds(phaseMask);
+
+    if (phaseIds.empty())
+        phaseIds.insert(169);
+
+    return phaseIds;
+}
+
+void WorldObject::ComputePhaseXGroup(std::set<uint16> &phaseIds, uint16 &phaseGroup)
+{
+    if (phaseIds.size() < 2)
+        return;
+
+    if (uint16 pGroup = ComputePhaseGroup(phaseIds))
+    {
+        phaseGroup=pGroup;
+        phaseIds.clear();
+    }
+}
+
 // end new phase system
