@@ -1153,6 +1153,34 @@ public:
 
         return false; 
     }
+
+    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*opt*/) 
+    {
+        switch (quest->GetQuestId())
+        {
+        case 26800:
+        { 
+            if (Creature* darnell = GetDarnell(player))
+                if (Vehicle* npc = darnell->GetVehicleKit())
+                {
+                    npc->RemoveAllPassengers();
+                    darnell->DespawnOrUnsummon(1000);
+                }
+
+            break; 
+        }
+        }
+        return false; 
+    }
+
+    Creature* GetDarnell(Player* player)
+    {
+        for (Unit::ControlList::const_iterator itr = player->m_Controlled.begin(); itr != player->m_Controlled.end(); ++itr)
+            if ((*itr)->GetEntry() == 49337)
+                return (*itr)->ToCreature();
+
+        return nullptr;
+    }
 };
 
 // npc_darnell 49337
@@ -1161,53 +1189,58 @@ class npc_darnell_49337 : public CreatureScript
 public:
     npc_darnell_49337() : CreatureScript("npc_darnell_49337") { }
 
-    struct npc_darnell_49337AI : public ScriptedAI
+    enum eQuest
     {
-        npc_darnell_49337AI(Creature *c) : ScriptedAI(c) {}
+        NPC_SCARLET_CORPSE_49340 = 49340,
+    };
 
-        uint32 m_timer;
+    struct npc_darnell_49337AI : public VehicleAI
+    {
+        npc_darnell_49337AI(Creature *c) : VehicleAI(c) { }
+
         uint8 m_seat;
+        uint64 m_scarletGUID;
 
         void Reset()  override
         {
-            m_timer = 1000;
             m_seat = 0;
+            m_scarletGUID = 0;
         }
 
-        void StartAnim(Unit* caster, Creature* corpse)
+        void PassengerBoarded(Unit* passenger, int8 seatId, bool apply) override 
+        { 
+            if (!apply)
+                if (Creature* scarlet = passenger->ToCreature())
+                {
+                    scarlet->SetDisableGravity(false);
+                    scarlet->DespawnOrUnsummon(500);
+                }
+        }
+
+        void SetGUID(uint64 guid, int32 id) override
         {
-            if (caster->GetGUID() == me->GetCharmerOrOwnerGUID() && m_seat < 7)
+            switch (id)
             {
-                me->CastSpell(corpse, 91945, true);
-                corpse->AddAura(46598, corpse);
-                corpse->SetDisableGravity(true);
-                corpse->EnterVehicle(me, m_seat);
-                m_seat++;
-                me->CastSpell(corpse, 91935, true);
+            case NPC_SCARLET_CORPSE_49340:
+            {
+                m_scarletGUID = guid;
+                break;
+            }
             }
         }
 
-        void UpdateAI(uint32 diff) override
-        {
-            if (m_timer <= diff)
-            {
-                m_timer = 1000;
-                DoWork();
-            }
-            else m_timer -= diff;
-        }
-
-        void DoWork()
-        {
-            if (Unit* unit = me->GetCharmerOrOwner())
-                if (Player* player = unit->ToPlayer())
-                    if (player->GetQuestStatus(26800) == QUEST_STATUS_REWARDED)
-                    {
-                        if (Vehicle* vehicle = me->GetVehicleKit())
-                            vehicle->RemoveAllPassengers();
-                        
-                        me->DespawnOrUnsummon(5000);
-                    }
+        void DoAction(int32 param) override 
+        { 
+            if (param == 1)
+                if (Creature* scarlet = ObjectAccessor::GetCreature(*me, m_scarletGUID))
+                {
+                    me->CastSpell(scarlet, 91945, true);
+                    scarlet->AddAura(46598, scarlet);
+                    scarlet->SetDisableGravity(true);
+                    scarlet->EnterVehicle(me, m_seat);
+                    m_seat++;
+                    me->CastSpell(scarlet, 91935, true);
+                }
         }
     };
 
@@ -1227,53 +1260,24 @@ public:
     {
         npc_scarlet_corpse_49340AI(Creature *c) : ScriptedAI(c) {}
 
-        uint32 m_timer;
-        uint8 m_modus;
-        Player* m_player;
-
-        void Reset()  override
-        {
-            m_timer = 0;
-            m_modus = 0;
-            m_player = nullptr;
-        }
-
         void SpellHit(Unit* caster, SpellInfo const* spell) 
         { 
             if (Player* player = caster->ToPlayer())
-                if (player->GetQuestStatus(26800) == QUEST_STATUS_INCOMPLETE && m_modus == 0)
-                {
-                    m_modus = 1;
-                    m_player = player;
-                    std::list<Creature*> darnells = me->FindNearestCreatures(49337, 10.0f);
-
-                    if (!darnells.empty())
-                        for (std::list<Creature*>::const_iterator itr = darnells.begin(); itr != darnells.end(); ++itr)
-                            if ((*itr)->GetOwner() == caster && *itr != me)
-                                CAST_AI(npc_darnell_49337::npc_darnell_49337AI, (*itr)->GetAI())->StartAnim(caster, me);
-                }
+                if (player->GetQuestStatus(26800) == QUEST_STATUS_INCOMPLETE)
+                    if (Creature* darnell = GetDarnell(player))
+                    {
+                        darnell->AI()->SetGUID(me->GetGUID(), me->GetEntry());
+                        darnell->AI()->DoAction(1);
+                    }
         }
 
-        void UpdateAI(uint32 diff) override
+        Creature* GetDarnell(Player* player)
         {
-            if (m_timer <= diff)
-            {
-                m_timer = 1000;
-                DoWork();
-            }
-            else m_timer -= diff;
-        }
+            for (Unit::ControlList::const_iterator itr = player->m_Controlled.begin(); itr != player->m_Controlled.end(); ++itr)
+                if ((*itr)->GetEntry() == 49337)
+                    return (*itr)->ToCreature();
 
-        void DoWork()
-        {
-            if (m_modus == 1)
-            {
-                if (m_player && m_player->GetQuestStatus(26800) == QUEST_STATUS_REWARDED)
-                    me->DespawnOrUnsummon(5000);
-
-                if (!m_player)
-                    me->DespawnOrUnsummon(5000);
-            }
+            return nullptr;
         }
     };
 
