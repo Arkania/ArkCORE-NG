@@ -35,6 +35,7 @@ enum Zone_zone_lost_isles
     NPC_MONKEY_BUSINESS_KILL_CREDIT = 35760,
     NPC_RAPTOR_38187 = 38187,
     NPC_WILD_CLUCKER_EGG_38195 = 38195,
+    NPC_ACE_38455 = 38455,
     GO_TRAP_201972 = 201972,
     PLAYER_GUID = 99991,
     QUEST_DONT_GO_INTO_THE_LIGHT = 14239,
@@ -88,6 +89,8 @@ enum Zone_zone_lost_isles
     EVENT_CAST_SPELL_01,
     EVENT_CAST_COOLDOWN_01,
     EVENT_CAST_COOLDOWN_02,
+    EVENT_CAST_COOLDOWN_03,
+    EVENT_CAST_COOLDOWN_04,
     EVENT_START_WALK,
     EVENT_START_FLYING,
     EVENT_START_TALK,
@@ -102,6 +105,8 @@ enum Zone_zone_lost_isles
     EVENT_INVISIBLE_OBJECT,
     EVENT_PLAY_PERIODIC_SOUND,
     EVENT_PLAY_PERIODIC_EMOTE,
+    ACTION_START_TALK,
+    ACTION_RUN_AWAY,
 };
 
 /*  phase 170  */
@@ -3808,6 +3813,17 @@ public:
         void Reset()
         {
             m_spellCastRage = false;
+            me->setFaction(1771);
+        }
+
+        void MoveInLineOfSight(Unit* who) override
+        {
+            if (Player* player = who->ToPlayer())
+                if (player->GetQuestStatus(24868) == QUEST_STATUS_INCOMPLETE || player->GetQuestStatus(24868) == QUEST_STATUS_COMPLETE)
+                {
+                    me->setFaction(7);
+                    m_events.RescheduleEvent (EVENT_CAST_COOLDOWN_01, 15000);
+                }
         }
 
         void DamageTaken(Unit* attacker, uint32& damage) override 
@@ -3819,6 +3835,26 @@ public:
                     Talk(0, attacker);
                     me->CastSpell(me, 8599, true);
                 }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_CAST_COOLDOWN_01:
+                    me->setFaction(1771);
+                    break;
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
         }
     };
 
@@ -3847,6 +3883,7 @@ public:
             m_spellCastNova = false;
             m_spellCastBolt = false;
             CheckForMiniNaga();
+            me->setFaction(1771);
         }
 
         void EnterCombat(Unit* victim) override
@@ -3879,6 +3916,16 @@ public:
                 }
         }
 
+        void MoveInLineOfSight(Unit* who) override
+        {
+            if (Player* player = who->ToPlayer())
+                if (player->GetQuestStatus(24868) == QUEST_STATUS_INCOMPLETE || player->GetQuestStatus(24868) == QUEST_STATUS_COMPLETE)
+                {
+                    me->setFaction(7);
+                    m_events.RescheduleEvent(EVENT_CAST_COOLDOWN_03, 15000);
+                }
+        }
+
         void UpdateAI(uint32 diff) override
         {
             m_events.Update(diff);
@@ -3892,6 +3939,9 @@ public:
                     break;
                 case EVENT_CAST_COOLDOWN_02:
                     m_spellCastBolt = false;
+                    break;
+                case EVENT_CAST_COOLDOWN_03:
+                    me->setFaction(1771);
                     break;
                 }
             }
@@ -4025,6 +4075,330 @@ public:
     }
 };
 
+// 38455
+class npc_ace_38455 : public CreatureScript
+{
+public:
+    npc_ace_38455() : CreatureScript("npc_ace_38455") { }
+
+    struct npc_ace_38455AI : public ScriptedAI
+    {
+        npc_ace_38455AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap m_events;
+        uint64   m_playerGUID;
+        uint32   m_movePart;
+
+        void Reset()
+        {
+            m_movePart = 0;
+            m_playerGUID = 0;
+            me->CastSpell(me, 72077, true);
+            m_events.RescheduleEvent(EVENT_MASTER_RESET, 150000);
+        }
+
+        void IsSummonedBy(Unit* summoner) override
+        {
+            if (Player* player = summoner->ToPlayer())
+            {
+                m_playerGUID = player->GetGUID();
+                m_movePart = 1;
+                me->GetMotionMaster()->MovePath(3845501, false);
+                m_events.ScheduleEvent(EVENT_TALK_PART_00, 1000);
+            }
+        }
+
+        void MovementInform(uint32 type, uint32 id) override
+        {
+            if (type==WAYPOINT_MOTION_TYPE)
+                switch (m_movePart)
+                {
+                case 2:
+                    if (id == 7)
+                        m_events.ScheduleEvent(EVENT_TALK_PART_02, 100);
+                    break;
+                case 3:
+                    if (id == 1)
+                        me->DespawnOrUnsummon(10);
+                    break;
+                }
+        }
+
+        void DoAction(int32 param) override
+        {
+            if (m_playerGUID && param == ACTION_RUN_AWAY)
+                m_events.ScheduleEvent(EVENT_TALK_PART_04, 1000);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_MASTER_RESET:
+                    me->DespawnOrUnsummon(10);
+                    break;
+                case EVENT_TALK_PART_00:
+                {
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        Talk(0, player);
+                    m_events.ScheduleEvent(EVENT_TALK_PART_01, 5000);
+                    break;
+                }
+                case EVENT_TALK_PART_01:
+                {
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        Talk(1, player);
+                    m_movePart=2;
+                    me->GetMotionMaster()->MovePath(3845502, false);
+                    break;
+                }                
+                case EVENT_TALK_PART_02: // wait until faceless and player are present and near together..
+                {
+                    if (Creature* face = me->FindNearestCreature(38448, 50.0f))
+                        if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                            if (player->GetPosition().GetExactDist2d(face) < 47.0f)
+                            {
+                                face->AI()->SetGUID(me->GetGUID(), me->GetEntry());
+                                face->AI()->DoAction(ACTION_START_TALK);
+                                m_events.ScheduleEvent(EVENT_TALK_PART_03, 100);
+                                break;
+                            }
+                    m_events.ScheduleEvent(EVENT_TALK_PART_02, 1000);
+                    break;
+                }
+                case EVENT_TALK_PART_03:
+                {
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        Talk(4, player);
+                    break;
+                }
+                case EVENT_TALK_PART_04:
+                {
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        Talk(5, player);
+                    m_events.ScheduleEvent(EVENT_TALK_PART_05, 2000);
+                    break;
+                }
+                case EVENT_TALK_PART_05:
+                {
+                    m_movePart = 3;
+                    me->GetMotionMaster()->MovePath(3845503, false);
+                    break;
+                }
+                }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_ace_38455AI(creature);
+    }
+};
+
+// 38448 
+class npc_faceless_of_the_deep_38448 : public CreatureScript
+{
+public:
+    npc_faceless_of_the_deep_38448() : CreatureScript("npc_faceless_of_the_deep_38448") { }
+
+    enum eNpc
+    {
+        EVENT_PLAYER_IS_NEAR_COOLDOWN = 901,
+        EVENT_CHECK_MY_POSITION,
+    };
+
+    struct npc_faceless_of_the_deep_38448AI : public ScriptedAI
+    {
+        npc_faceless_of_the_deep_38448AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap m_events;
+        uint64   m_playerGUID;
+        uint64   m_aceGUID;
+        bool     m_playerIsNear;
+        bool     m_fight;
+        float    m_maxDistance;
+        float    m_hoover;
+
+        void Reset()
+        {
+            m_hoover = 9;
+            m_maxDistance = 47.0f;
+            m_playerGUID = 0;
+            m_aceGUID = 0;
+            me->SetReactState(REACT_PASSIVE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+            m_playerIsNear = false;
+            m_fight = false;
+            me->SetSpeed(MOVE_WALK, 0.15f);
+            m_events.RescheduleEvent(EVENT_CHECK_MY_POSITION, 1000);
+        }
+
+        void JustDied(Unit* killer) override 
+        { 
+            me->CastSpell(me, 72035, true);
+        }
+
+        void SetGUID(uint64 guid, int32 id) override
+        {
+            switch (id)
+            {
+            case NPC_ACE_38455:
+                m_aceGUID = guid;
+                break;
+            }
+        }
+
+        void DoAction(int32 param) override
+        {
+            if (m_playerGUID && param == ACTION_START_TALK)
+            {
+                m_events.ScheduleEvent(EVENT_START_TALK, 100);
+                m_events.RescheduleEvent(EVENT_MASTER_RESET, 75000);
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            CastBarricade();
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_MASTER_RESET:
+                    me->DespawnOrUnsummon(10);
+                    break;
+                case EVENT_PLAYER_IS_NEAR_COOLDOWN:
+                    m_playerIsNear = false;
+                    break;
+                case EVENT_CHECK_MY_POSITION:
+                    CheckPlayerNear();
+                    m_events.ScheduleEvent(EVENT_CHECK_MY_POSITION, 100);
+                    break;
+                case EVENT_START_TALK:
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                    {
+                        Talk(1, player);
+                        m_events.ScheduleEvent(EVENT_TALK_PART_02, 6000);
+                    }
+                    break;
+                case EVENT_TALK_PART_02:
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                    {
+                        Talk(2, player);
+                        m_events.ScheduleEvent(EVENT_TALK_PART_03, 6000);
+                    }
+                    break;
+                case EVENT_TALK_PART_03:
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                    {
+                        Talk(3, player);
+                        m_events.ScheduleEvent(EVENT_TALK_PART_04, 6000);
+                    }
+                    break;
+                case EVENT_TALK_PART_04:
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        if (Creature* ace = ObjectAccessor::GetCreature(*me, m_aceGUID))
+                        {
+                            Talk(4, player);
+                            ace->AI()->DoAction(ACTION_RUN_AWAY);
+
+                            for (Unit::ControlList::iterator itr = player->m_Controlled.begin(); itr != player->m_Controlled.end(); ++itr)
+                                if ((*itr)->GetEntry() == 38457)
+                                    (*itr)->ToCreature()->DespawnOrUnsummon(100);
+
+                            m_events.ScheduleEvent(EVENT_TALK_PART_05, 4000);
+                        }
+                    break;
+                case EVENT_TALK_PART_05:
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                    {
+                        me->RemoveAllAuras();
+                        me->SetHover(false);
+                        me->SetFloatValue(UNIT_FIELD_HOVERHEIGHT, 0);
+                        me->SetSpeed(MOVE_WALK, 1.0f);
+                        me->JumpTo(player, 10.0f);
+                        m_fight = true;
+                    }
+                    m_events.ScheduleEvent(EVENT_TALK_PART_06, 500);
+                    break;
+                case EVENT_TALK_PART_06:
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        me->Attack(player, true);
+                    break;
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+
+        void CastBarricade()
+        {
+            if (!m_playerIsNear || m_fight)
+                return;
+
+            Position p = me->GetNearPosition(frand(9.5f, 11.0f), frand(0.0f, 6.28f));
+            me->CastSpell(p.m_positionX, p.m_positionY, p.m_positionZ, 72076, true);
+            p = me->GetNearPosition(frand(9.5f, 10.5f), frand(0.0f, 6.28f));
+            me->CastSpell(p.m_positionX, p.m_positionY, p.m_positionZ, 72076, true);
+        }
+
+        void CheckPlayerNear()
+        {
+            if (m_fight)
+                return;
+
+            bool pNear = false;
+            if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                if (player->GetQuestStatus(24868) == QUEST_STATUS_INCOMPLETE)
+                    if (player->GetPosition().GetExactDist2d(me) < m_maxDistance)
+                        pNear = true;
+                   
+            if (!pNear)
+            {
+                std::list<Player*> pList = me->FindNearestPlayers(m_maxDistance * 0.85f);
+                for (std::list<Player*>::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
+                    if ((*itr)->GetQuestStatus(24868) == QUEST_STATUS_INCOMPLETE)
+                    {
+                        m_playerGUID = (*itr)->GetGUID();
+                        pNear = true;
+                    }
+            }
+
+            m_playerIsNear = pNear;
+            me->SetHover(pNear);
+
+            if (pNear)
+            {
+                me->SetFloatValue(UNIT_FIELD_HOVERHEIGHT, m_hoover);
+                m_events.RescheduleEvent(EVENT_PLAYER_IS_NEAR_COOLDOWN, 30000);
+            }
+            else
+            {
+                m_playerGUID = 0;
+                me->SetFloatValue(UNIT_FIELD_HOVERHEIGHT, 0);
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_faceless_of_the_deep_38448AI(creature);
+    }
+};
+
 
 void AddSC_zone_lost_isles()
 {
@@ -4097,5 +4471,7 @@ void AddSC_zone_lost_isles()
     new npc_vashj_elan_siren_38360();
     new npc_naga_hatchling_44579();
     new npc_naga_hatchling_44588();
+    new npc_ace_38455();
+    new npc_faceless_of_the_deep_38448();
 
 }

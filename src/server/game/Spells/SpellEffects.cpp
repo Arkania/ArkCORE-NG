@@ -3297,6 +3297,9 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
         case 3097:
             numSummons = (damage > 0) ? damage : 1;
             break;
+        case 2907:
+            numSummons = m_spellInfo->Effects[effIndex].BasePoints;
+            break;
         default:
             numSummons = 1;
             break;
