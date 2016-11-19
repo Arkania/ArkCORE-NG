@@ -3742,6 +3742,12 @@ public:
             player->CastSpell(player, 72001, true);
             break;
         }
+        case 24897:
+        {
+            player->CastSpell(player, 66987, true);
+            creature->AI()->Talk(2, player);
+            break;
+        }
         }
         return false;
     }

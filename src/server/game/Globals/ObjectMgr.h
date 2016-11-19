@@ -1058,7 +1058,7 @@ class ObjectMgr
 
         PhaseAreaDefinitionStore const* GetPhaseAreaDefinitionStore() { return &m_phaseAreaDefinitionStore; }
         PhaseAreaSelectorStore const* GetPhaseAreaSelectorStore() { return &m_phaseAreaSelectorStore; }
-        SpellPhaseDefinitionStore const* GetSpellPhaseDefinitionStore() { return &m_spellPhaseStore; }
+        SpellPhaseDefinitionStore const GetSpellPhaseDefinitionStore() { return m_spellPhaseStore; }
 
         std::string GeneratePetName(uint32 entry);
         uint32 GetBaseXP(uint8 level);

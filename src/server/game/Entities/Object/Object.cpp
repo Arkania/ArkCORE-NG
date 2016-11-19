@@ -3604,17 +3604,22 @@ void WorldObject::RebuildPhaseFromAuraEffect(bool &updateNeeded)
         for (Unit::AuraEffectList::const_iterator itr = auraPhaseList.begin(); itr != auraPhaseList.end(); ++itr)
         {
             uint16 phase = uint16((*itr)->GetMiscValueB());
-            updateNeeded |= SetInPhase(phase, false, true); 
+            updateNeeded |= SetInPhase(phase, false, true);
 
             uint32 spellId = (*itr)->GetId();
-            SpellPhaseDefinitionStore::const_iterator iStore = sObjectMgr->GetSpellPhaseDefinitionStore()->find(spellId);
-            for (SpellPhaseDefinitionContainer::const_iterator iCon = iStore->second.begin(); iCon != iStore->second.end(); iCon++)
-                if (iCon->phaseId == phase)
-                    if (sConditionMgr->IsObjectMeetingNotGroupedConditions(CONDITION_SOURCE_TYPE_TERRAIN_SWAP, iCon->terrainswapmap, this, nullptr, nullptr))
-                    {
-                        AddTerrainSwapMap(iCon->terrainswapmap, true);
-                        AddWorldMapAreaSwap(iCon->worldmapareaswap, true);
-                    }
+            SpellPhaseDefinitionStore const pdStore = sObjectMgr->GetSpellPhaseDefinitionStore();
+            SpellPhaseDefinitionStore::const_iterator iStore = pdStore.find(spellId);
+            if (iStore != pdStore.end())
+            {
+                SpellPhaseDefinitionContainer pdc = iStore->second;
+                for (SpellPhaseDefinitionContainer::const_iterator iCon = pdc.begin(); iCon != pdc.end(); iCon++)
+                    if (iCon->phaseId == phase)
+                        if (sConditionMgr->IsObjectMeetingNotGroupedConditions(CONDITION_SOURCE_TYPE_TERRAIN_SWAP, iCon->terrainswapmap, this, nullptr, nullptr))
+                        {
+                            AddTerrainSwapMap(iCon->terrainswapmap, true);
+                            AddWorldMapAreaSwap(iCon->worldmapareaswap, true);
+                        }
+            }
         }
         Unit::AuraEffectList const& auraPhaseGroupList = unit->GetAuraEffectsByType(SPELL_AURA_PHASE_GROUP);
         for (Unit::AuraEffectList::const_iterator itr = auraPhaseGroupList.begin(); itr != auraPhaseGroupList.end(); ++itr)
@@ -3625,14 +3630,19 @@ void WorldObject::RebuildPhaseFromAuraEffect(bool &updateNeeded)
                 updateNeeded |= SetInPhase(phase, false, true);
 
             uint32 spellId = (*itr)->GetId();
-            SpellPhaseDefinitionStore::const_iterator iStore = sObjectMgr->GetSpellPhaseDefinitionStore()->find(spellId);
-            for (SpellPhaseDefinitionContainer::const_iterator iCon = iStore->second.begin(); iCon != iStore->second.end(); iCon++)
-                if (iCon->phaseGroup == phaseGroup)
-                    if (sConditionMgr->IsObjectMeetingNotGroupedConditions(CONDITION_SOURCE_TYPE_TERRAIN_SWAP, iCon->terrainswapmap, this, nullptr, nullptr))
-                    {
-                        AddTerrainSwapMap(iCon->terrainswapmap, true);
-                        AddWorldMapAreaSwap(iCon->worldmapareaswap, true);
-                    }
+            SpellPhaseDefinitionStore const pdStore = sObjectMgr->GetSpellPhaseDefinitionStore();
+            SpellPhaseDefinitionStore::const_iterator iStore = pdStore.find(spellId);
+            if (iStore != pdStore.end())
+            {
+                SpellPhaseDefinitionContainer pdc = iStore->second;
+                for (SpellPhaseDefinitionContainer::const_iterator iCon = pdc.begin(); iCon != pdc.end(); iCon++)
+                    if (iCon->phaseGroup == phaseGroup)
+                        if (sConditionMgr->IsObjectMeetingNotGroupedConditions(CONDITION_SOURCE_TYPE_TERRAIN_SWAP, iCon->terrainswapmap, this, nullptr, nullptr))
+                        {
+                            AddTerrainSwapMap(iCon->terrainswapmap, true);
+                            AddWorldMapAreaSwap(iCon->worldmapareaswap, true);
+                        }
+            }
         }
     }
 }
