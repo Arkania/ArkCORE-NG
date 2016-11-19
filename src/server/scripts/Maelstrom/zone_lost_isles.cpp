@@ -3745,6 +3745,18 @@ public:
         }
         return false;
     }
+
+    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*opt*/)
+    {
+        switch (quest->GetQuestId())
+        {
+        case 24868:
+            player->RemoveAura(SPELL_QUEST_PHASE_05);
+            player->AddAura(SPELL_QUEST_PHASE_06, player);
+            break;
+        }
+        return false;
+    }
 };
 
 // 38381
@@ -4399,6 +4411,7 @@ public:
     }
 };
 
+/*  phase 181  */
 
 void AddSC_zone_lost_isles()
 {
@@ -4473,5 +4486,6 @@ void AddSC_zone_lost_isles()
     new npc_naga_hatchling_44588();
     new npc_ace_38455();
     new npc_faceless_of_the_deep_38448();
+    /*  phase 181  */
 
 }
