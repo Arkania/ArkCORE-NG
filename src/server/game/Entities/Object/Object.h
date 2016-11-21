@@ -875,6 +875,8 @@ class WorldObject : public Object, public WorldLocation
         std::list<Creature*> FindAllCreaturesInRange(float range);
         std::list<Creature*> FindAllFriendlyCreaturesInRange(float range);
         std::list<Creature*> FindAllUnfriendlyCreaturesInRange(float range);
+        Creature * GetRandomCreature(std::list<Creature*> cList);
+        Player * GetRandomPlayer(std::list<Player*> pList);
 
         void DestroyForNearbyPlayers();
         virtual void UpdateObjectVisibility(bool forced = true);

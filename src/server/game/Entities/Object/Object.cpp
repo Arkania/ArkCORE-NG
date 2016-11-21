@@ -2691,20 +2691,14 @@ std::vector<Creature*> WorldObject::FindNearestCreatures(uint32 entry, float ran
 Creature* WorldObject::FindRandomCreatureInRange(uint32 entry, float range, bool alive)
 {
     Creature* creature = nullptr;
-    std::list<Creature*> creatureList = FindNearestCreatures(entry, range);
-    if (creatureList.empty())
+    std::list<Creature*> cList = FindNearestCreatures(entry, range);
+    if (cList.empty())
         return NULL;
 
-    int32 r1 = urand(0, creatureList.size() - 1);
-    int32 r2 = -1;
-    for (std::list<Creature*>::iterator itr = creatureList.begin(); itr != creatureList.end(); ++itr)
-    {
-        r2++;
-        if (r1 == r2)
-            return *itr;
-    }
-
-    return NULL;
+    uint32 rol = urand(0, cList.size() - 1);
+    std::list<Creature*>::const_iterator itr = cList.begin();
+    std::advance(itr, rol);
+    return *itr;
 }
 
 GameObject* WorldObject::FindNearestGameObject(uint32 entry, float range) const
@@ -2753,20 +2747,14 @@ std::list<Player*> WorldObject::FindNearestPlayers(float range, bool alive)
 Player* WorldObject::FindRandomPlayerInRange(float range, bool alive)
 {
     Player* player = nullptr;
-    std::list<Player*> PlayerList = FindNearestPlayers(range, alive);
-    if (PlayerList.empty())
+    std::list<Player*> pList = FindNearestPlayers(range, alive);
+    if (pList.empty())
         return NULL;
 
-    int32 r1 = urand(0, PlayerList.size() - 1);
-    int32 r2 = -1;
-    for (std::list<Player*>::iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
-    {
-        r2++;
-        if (r1 == r2)
-            return *itr;
-    }
-
-    return NULL;
+    uint32 rol = urand(0, pList.size() - 1);
+    std::list<Player*>::const_iterator itr = pList.begin();
+    std::advance(itr, rol);
+    return *itr;
 }
 
 bool WorldObject::IsPlayerInRange(float range)
@@ -2859,6 +2847,28 @@ std::list<Creature*> WorldObject::FindAllUnfriendlyCreaturesInRange(float range)
         cell.Visit(pair, cSearcher, *(unit->GetMap()), *unit, unit->GetGridActivationRange());
     }
     return templist;
+}
+
+Creature* WorldObject::GetRandomCreature(std::list<Creature*> cList)
+{
+    if (cList.empty())
+        return nullptr;
+
+    uint32 rol = urand(0, cList.size() - 1);
+    std::list<Creature*>::const_iterator itr = cList.begin();
+    std::advance(itr, rol);
+    return *itr;
+}
+
+Player* WorldObject::GetRandomPlayer(std::list<Player*> pList)
+{
+    if (pList.empty())
+        return nullptr;
+
+    uint32 rol = urand(0, pList.size() - 1);
+    std::list<Player*>::const_iterator itr = pList.begin();
+    std::advance(itr, rol);
+    return *itr;
 }
 
 /*
