@@ -25,21 +25,16 @@ public:
 
     enum eAradne
     {
-        RAISE_UNDEAD = 93446,
+        SPELL_RAISE_UNDEAD = 93446,
+        EVENT_RISE_DEAD = 901,
+        EVENT_START_TALK,
     };
 
     struct npc_aradne_50372AI : public ScriptedAI
     {
         npc_aradne_50372AI(Creature *c) : ScriptedAI(c) { }
 
-        uint32 m_timer;
-        uint32 m_phase;
-
-        void Reset()  override
-        {
-            m_timer = 0;
-            m_phase = 0;
-        }
+        EventMap m_events;
 
         void MovementInform(uint32 type, uint32 id) override
         {
@@ -47,60 +42,34 @@ public:
                 switch (id)
                 {
                 case 5:
-                    m_phase = 1;
-                    m_timer = 100;
-                    break;
                 case 7:
-                    m_phase = 1;
-                    m_timer = 100;
-                    break;
                 case 12:
-                    m_phase = 1;
-                    m_timer = 100;
-                    break;
                 case 17:
-                    m_phase = 1;
-                    m_timer = 100;
-                    break;
                 case 22:
-                    m_phase = 1;
-                    m_timer = 100;
-                    break;
                 case 25:
-                    m_phase = 1;
-                    m_timer = 100;
+                    m_events.ScheduleEvent(EVENT_RISE_DEAD, 100);
                     break;
             }
         }
 
         void UpdateAI(uint32 diff) override
         {
-            if (m_timer <= diff)
-            {
-                m_timer = 1000;
-                DoWork();
-            }
-            else m_timer -= diff;
-        }
+            m_events.Update(diff);
 
-        void DoWork()
-        {
-            switch (m_phase)
+            while (uint32 eventId = m_events.ExecuteEvent())
             {
-            case 1:
-                if (Creature* npc = me->FindNearestCreature(50373, 15.0f))
-                    npc->CastSpell(npc, 93446, true);
+                switch (eventId)
+                {
+                case EVENT_RISE_DEAD:
+                    if (Creature* npc = me->FindNearestCreature(50373, 15.0f))
+                        npc->CastSpell(npc, SPELL_RAISE_UNDEAD, true);
 
-                m_phase = 2;
-                break;
-            case 2:
-                Talk(0);
-                m_phase = 3;
-                break;
-            default:
-                m_timer = 0;
-                m_phase = 0;
-                break;
+                    m_events.ScheduleEvent(EVENT_START_TALK, 1000);
+                    break;
+                case EVENT_START_TALK:
+                    Talk(0);
+                    break;
+                }
             }
         }
     };
@@ -119,8 +88,9 @@ public:
 
     enum eRisenDead
     {
-        DIRT_EXPLOSION = 89199,
-        CHURNING_DIRT = 92788,
+        SPELL_DIRT_EXPLOSION = 89199,
+        SPELL_CHURNING_DIRT = 92788,
+        SPELL_RIDE_UNDEAD = 93446,
     };
 
     struct npc_deathknell_grave_targetAI : public ScriptedAI
@@ -138,7 +108,7 @@ public:
 
         void SpellHit(Unit* caster, SpellInfo const* spell) 
         { 
-            if (spell->Id == 93446)
+            if (spell->Id == SPELL_RIDE_UNDEAD)
             {
                 m_timer = 100;
                 m_phase = 1;
@@ -160,8 +130,8 @@ public:
             switch (m_phase)
             {
                 case 1:
-                    me->AddAura(DIRT_EXPLOSION, me);
-                    DoCast(me, CHURNING_DIRT);
+                    me->AddAura(SPELL_DIRT_EXPLOSION, me);
+                    DoCast(me, SPELL_CHURNING_DIRT);
                     m_phase = 2;
                     break;
                 case 2:
@@ -196,135 +166,106 @@ class npc_risen_dead : public CreatureScript
 public:
     npc_risen_dead() : CreatureScript("npc_risen_dead") { }
 
+    enum eNpc
+    {
+        EVENT_START_ANIM = 901,
+        EVENT_SHOW_DEAD,
+        EVENT_SHOW_LIFE,
+        EVENT_SHOW_RUNNING,
+        EVENT_SHOW_DEAD1,
+        EVENT_SHOW_DEAD2,
+        EVENT_SHOW_DEAD3,
+        EVENT_SHOW_DEAD4,
+        EVENT_SHOW_LIFE1,
+        EVENT_SHOW_LIFE2,
+        EVENT_SHOW_LIFE3,
+        EVENT_SHOW_RUNNING1,
+        EVENT_SHOW_RUNNING2,
+        EVENT_SHOW_RUNNING3,
+    };
+
     struct npc_risen_deadAI : public ScriptedAI
     {
         npc_risen_deadAI(Creature *c) : ScriptedAI(c) {}
 
-        uint32 m_timer;
-        uint32 m_phase;
+        EventMap m_events;
         uint32 m_WishToBeDead;
 
         void Reset()  override
-        {
-            m_timer = 2000;
-            m_phase = 0;
+        {           
             m_WishToBeDead = urand(0, 100);
+            m_events.RescheduleEvent(EVENT_START_ANIM, 1000);
         }
-
+     
         void UpdateAI(uint32 diff) override
         {
-            if (m_timer <= diff)
-            {
-                m_timer = 1000;
-                DoWork();
-            }
-            else m_timer -= diff;
-        }
+            m_events.Update(diff);
 
-        void DoWork()
-        {
-            if (m_WishToBeDead < 33)
-                ShowDead();
-            else if (m_WishToBeDead < 66)
-                ShowLife();
-            else
-                ShowRunning();
-        }
-
-        void ShowDead()
-        {
-            switch (m_phase)
+            while (uint32 eventId = m_events.ExecuteEvent())
             {
-                case 0:
+                switch (eventId)
+                {
+                case EVENT_START_ANIM:
+                    if (m_WishToBeDead < 33)
+                        m_events.ScheduleEvent(EVENT_SHOW_DEAD, 1000);
+                    else if (m_WishToBeDead < 66)
+                        m_events.ScheduleEvent(EVENT_SHOW_LIFE, 1000);
+                    else
+                       m_events.ScheduleEvent(EVENT_SHOW_RUNNING, 1000);
+                    break;
+                case EVENT_SHOW_DEAD:
                     me->HandleEmote(EMOTE_ONESHOT_QUESTION);
-                    m_timer = 200;
-                    m_phase = 1;
+                    m_events.ScheduleEvent(EVENT_SHOW_DEAD1, 100);
                     break;
-                case 1:
+                case EVENT_SHOW_DEAD1:
                     Talk(0);
-                    m_timer = 5000;
-                    m_phase = 2;
+                    m_events.ScheduleEvent(EVENT_SHOW_DEAD2, 6000);
                     break;
-                case 2:
+                case EVENT_SHOW_DEAD2:
                     Talk(1);
-                    m_timer = 5000;
-                    m_phase = 3;
+                    m_events.ScheduleEvent(EVENT_SHOW_DEAD3, 6000);
                     break;
-                case 3:
+                case EVENT_SHOW_DEAD3:
                     Talk(8);
+                    m_events.ScheduleEvent(EVENT_SHOW_DEAD4, 6000);
+                    break;
+                case EVENT_SHOW_DEAD4:
                     me->Kill(me);
-                    m_timer = 5000;
-                    m_phase = 4;
                     break;
-                case 4:
-                    m_timer = 0;
-                    m_phase = 5;
+                case EVENT_SHOW_LIFE:
+                    me->HandleEmote(EMOTE_ONESHOT_QUESTION);
+                    m_events.ScheduleEvent(EVENT_SHOW_LIFE1, 100);
                     break;
-            }
-        }
-
-        void ShowLife()
-        {
-            switch (m_phase)
-            {
-            case 0:
-                me->HandleEmote(EMOTE_ONESHOT_QUESTION);
-                m_timer = 200;
-                m_phase = 1;
-                break;
-            case 1:
-                Talk(4);
-                m_timer = 5000;
-                m_phase = 2;
-                break;
-            case 2:
-                Talk(5);
-                m_timer = 5000;
-                m_phase = 3;
-                break;
-            case 3:
-                Talk(9);
-                me->GetMotionMaster()->MovePath(5037401, false);
-                m_timer = 20000;
-                m_phase = 4;
-                break;
-            case 4:
-                m_timer = 0;
-                m_phase = 5;
-                break;
-            }
-        }
-
-        void ShowRunning()
-        {
-            switch (m_phase)
-            {
-            case 0:
-                me->HandleEmote(EMOTE_ONESHOT_QUESTION);
-                m_timer = 200;
-                m_phase = 1;
-                break;
-            case 1:
-                Talk(2);
-                m_timer = 5000;
-                m_phase = 2;
-                break;
-            case 2:
-                Talk(3);
-                m_timer = 5000;
-                m_phase = 3;
-                break;
-            case 3:
-                Talk(7);
-                me->HandleEmote(44427);
-                me->GetMotionMaster()->MovePath(5037402, false);
-                m_timer = 5000;
-                m_phase = 4;
-                break;
-            case 4:
-                m_timer = 0;
-                m_phase = 5;
-                break;
+                case EVENT_SHOW_LIFE1:
+                    Talk(4);
+                    m_events.ScheduleEvent(EVENT_SHOW_LIFE2, 6000);
+                    break;
+                case EVENT_SHOW_LIFE2:
+                    Talk(5);
+                    m_events.ScheduleEvent(EVENT_SHOW_LIFE3, 6000);
+                    break;
+                case EVENT_SHOW_LIFE3:
+                    Talk(9);
+                    me->GetMotionMaster()->MovePath(5037401, false);
+                    break;
+                case EVENT_SHOW_RUNNING:
+                    me->HandleEmote(EMOTE_ONESHOT_QUESTION);
+                    m_events.ScheduleEvent(EVENT_SHOW_RUNNING1, 100);
+                    break;
+                case EVENT_SHOW_RUNNING1:
+                    Talk(2);
+                    m_events.ScheduleEvent(EVENT_SHOW_RUNNING2, 6000);
+                    break;
+                case EVENT_SHOW_RUNNING2:
+                    Talk(3);
+                    m_events.ScheduleEvent(EVENT_SHOW_RUNNING3, 6000);
+                    break;
+                case EVENT_SHOW_RUNNING3:
+                    Talk(7);
+                    me->HandleEmote(EMOTE_ONESHOT_CRY);
+                    me->GetMotionMaster()->MovePath(5037402, false);
+                    break;
+                }
             }
         }
     };
@@ -341,6 +282,23 @@ class npc_undertaker_mordo : public CreatureScript
 public:
     npc_undertaker_mordo() : CreatureScript("npc_undertaker_mordo") { }
 
+    enum eNpc
+    {
+        EVENT_START_ANIM = 901,
+        EVENT_MASTER_RESET,
+        EVENT_START_TALK,
+        EVENT_ANIM_PART_01,
+        EVENT_ANIM_PART_02,
+        EVENT_ANIM_PART_03,
+        EVENT_ANIM_PART_04,
+        EVENT_ANIM_PART_05,
+        EVENT_ANIM_PART_06,
+        EVENT_ANIM_PART_07,
+        EVENT_ANIM_PART_08,
+        EVENT_ANIM_PART_09,
+        EVENT_ANIM_PART_10,
+    };
+
     bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) 
     { 
         if (!player->hasQuest(28608))
@@ -356,119 +314,128 @@ public:
     {
         npc_undertaker_mordoAI(Creature *c) : ScriptedAI(c) {}
 
-        uint32 m_timer;
-        uint32 m_phase;
-        Creature* m_npc;
+        EventMap m_events;
+        uint64   m_targetGUID;
 
         void Reset()  override
         {
-            m_timer = urand(30000, 45000);
-            m_phase = 0;
-            m_npc = nullptr;
+            m_targetGUID = 0;
+            m_events.RescheduleEvent(EVENT_START_ANIM, urand(50000, 70000));
+            m_events.RescheduleEvent(EVENT_MASTER_RESET, 150000);
         }
 
         void UpdateAI(uint32 diff) override
         {
-            if (m_timer <= diff)
-            {
-                m_timer = 1000;
-                DoWork();
-            }
-            else m_timer -= diff;
-        }
+            m_events.Update(diff);
 
-        void DoWork()
-        {
-            switch (m_phase)
+            while (uint32 eventId = m_events.ExecuteEvent())
             {
-            case 0: // Time: 07/03/2015 11:08:09.619
-                if (Creature* npc_trigger = me->FindNearestCreature(50373, 20.0f))
-                    if (m_npc = me->SummonCreature(50414, npc_trigger->GetPosition(), TEMPSUMMON_TIMED_DESPAWN, 40000))
+                switch (eventId)
+                {
+                case EVENT_START_ANIM:
+                {
+                    if (Creature* npc_trigger = me->FindNearestCreature(50373, 20.0f))
+                        if (Creature* target = me->SummonCreature(50414, npc_trigger->GetPosition(), TEMPSUMMON_TIMED_DESPAWN, 40000))
+                        {
+                            m_targetGUID = target->GetGUID();
+                            Position pos = me->GetNearPosition(1.5f, 1.72f);
+                            target->GetMotionMaster()->MovePoint(0, pos, true);
+                            m_events.ScheduleEvent(EVENT_START_TALK, 1000);
+                        }
+                    break;
+                }
+                case EVENT_START_TALK:
+                {
+                    Talk(0);
+                    m_events.ScheduleEvent(EVENT_ANIM_PART_01, 3000);
+                    m_events.RescheduleEvent(EVENT_MASTER_RESET, 150000);
+                    break;
+                }
+                case EVENT_ANIM_PART_01:
+                {
+                    if (Creature* target = ObjectAccessor::GetCreature(*me, m_targetGUID))
                     {
-                        Position pos = me->GetNearPosition(1.5f, 1.72f);
-                        m_npc->GetMotionMaster()->MovePoint(0, pos, true);
+                        target->SetUInt32Value(UNIT_FIELD_BYTES_1, UNIT_STAND_STATE_KNEEL);
+                        target->SetFacingToObject(me);
+                        m_events.ScheduleEvent(EVENT_ANIM_PART_02, 750);
                     }
-
-                m_phase = 1;
-                break;
-            case 1: // Time: 07/03/2015 11:08:10.539
-                Talk(0);
-                m_timer = 3000;
-                m_phase = 2;
-                break;
-            case 2: // Time: 07/03/2015 11:08:13.253 Number: 5796
-                if (m_npc && m_npc->IsAlive())
-                {
-                    m_npc->SetUInt32Value(UNIT_FIELD_BYTES_1, UNIT_STAND_STATE_KNEEL);
-                    m_npc->SetFacingToObject(me);
+                    break;
                 }
-
-                m_timer = 750;
-                m_phase = 3;
-                break;
-            case 3: // Time: 07/03/2015 11:08:14.080 Number: 5805
-                me->HandleEmoteState(EMOTE_STATE_USE_STANDING);
-                m_timer = 6000;
-                m_phase = 4;
-                break;
-            case 4: // Time: 07/03/2015 11:08:20.133 Number: 5875
-                me->HandleEmoteState(EMOTE_ONESHOT_NONE);
-                m_timer = 750;
-                m_phase = 5;
-                break;
-            case 5: // Time: 07/03/2015 11:08:21.350 Number: 5891
-                me->HandleEmote(EMOTE_ONESHOT_POINT);
-                m_timer = 2500;
-                m_phase = 6;
-                break;
-            case 6: // Time: 07/03/2015 11:08:23.908 Number: 5934
-                Talk(1);
-                m_timer = 250;
-                m_phase = 7;
-                break;
-            case 7: // 07/03/2015 11:08:24.189 Number: 5935
-                if (m_npc && m_npc->IsAlive())
+                case EVENT_ANIM_PART_02:
                 {
-                    m_npc->AddAura(93460, m_npc);
-                    m_npc->CastSpell(m_npc, 93460);
-                    m_npc->SetDisplayId(36775);
-                    m_npc->SetUInt32Value(UNIT_FIELD_BYTES_1, UNIT_STAND_STATE_STAND);
+                    me->HandleEmoteState(EMOTE_STATE_USE_STANDING);
+                    m_events.ScheduleEvent(EVENT_ANIM_PART_03, 6000);
+                    break;
                 }
-
-                m_timer = 2500;
-                m_phase = 8;
-                break;
-            case 8: // Time: 07/03/2015 11:08:26.607 Number: 5967
-                if (m_npc && m_npc->IsAlive())
+                case EVENT_ANIM_PART_03:
                 {
-                    m_npc->HandleEmote(EMOTE_ONESHOT_TALK);
-                    m_npc->AI()->Talk(0);
+                    me->HandleEmoteState(EMOTE_ONESHOT_NONE);
+                    m_events.ScheduleEvent(EVENT_ANIM_PART_04, 750);
+                    break;
                 }
-
-                m_timer = 3750;
-                m_phase = 9;
-                break;
-            case 9: // Time: 07/03/2015 11:08:30.257 Number: 6015
-                if (m_npc && m_npc->IsAlive())
-                    m_npc->HandleEmote(EMOTE_ONESHOT_SALUTE);
-
-                m_timer = 2500;
-                m_phase = 10;
-                break;
-            case 10: // Time: 07/03/2015 11:08:32.691 Number: 6043
-                if (m_npc && m_npc->IsAlive())
-                    m_npc->GetMotionMaster()->MovePath(5041401, false);
-
-                m_timer = 45000;
-                m_phase = 11;
-                break;
-            case 11: // Time: 07/03/2015 11:09:15.139 Number: 6405
-                if (m_npc && m_npc->IsAlive())
-                    m_npc->DespawnOrUnsummon();
-
-                m_timer = urand(15000, 45000);;
-                m_phase = 0;
-                break;
+                case EVENT_ANIM_PART_04:
+                {
+                    me->HandleEmote(EMOTE_ONESHOT_POINT);
+                    m_events.ScheduleEvent(EVENT_ANIM_PART_05, 2500);
+                    break;
+                }
+                case EVENT_ANIM_PART_05:
+                {
+                    Talk(1);
+                    m_events.ScheduleEvent(EVENT_ANIM_PART_06, 250);
+                    break;
+                }
+                case EVENT_ANIM_PART_06:
+                {
+                    if (Creature* target = ObjectAccessor::GetCreature(*me, m_targetGUID))
+                    {
+                        target->AddAura(93460, target);
+                        target->CastSpell(target, 93460);
+                        target->SetDisplayId(36775);
+                        target->SetUInt32Value(UNIT_FIELD_BYTES_1, UNIT_STAND_STATE_STAND);
+                        m_events.ScheduleEvent(EVENT_ANIM_PART_07, 2500);
+                    }
+                    break;
+                }
+                case EVENT_ANIM_PART_07:
+                {
+                    if (Creature* target = ObjectAccessor::GetCreature(*me, m_targetGUID))
+                    {
+                        target->HandleEmote(EMOTE_ONESHOT_TALK);
+                        target->AI()->Talk(0);
+                        m_events.ScheduleEvent(EVENT_ANIM_PART_08, 3750);
+                    }
+                    break;
+                }
+                case EVENT_ANIM_PART_08:
+                {
+                    if (Creature* target = ObjectAccessor::GetCreature(*me, m_targetGUID))
+                    {
+                        target->HandleEmote(EMOTE_ONESHOT_SALUTE);
+                        m_events.ScheduleEvent(EVENT_ANIM_PART_09, 2500);
+                    }
+                    break;
+                }
+                case EVENT_ANIM_PART_09:
+                {
+                    if (Creature* target = ObjectAccessor::GetCreature(*me, m_targetGUID))
+                    {
+                        target->GetMotionMaster()->MovePath(5041401, false);
+                        m_events.ScheduleEvent(EVENT_ANIM_PART_10, 45000);
+                    }
+                    break;
+                }
+                case EVENT_ANIM_PART_10:
+                {
+                    if (Creature* target = ObjectAccessor::GetCreature(*me, m_targetGUID))
+                    {
+                        target->DespawnOrUnsummon();
+                        m_events.RescheduleEvent(EVENT_START_ANIM, urand(50000, 70000));
+                        m_events.RescheduleEvent(EVENT_MASTER_RESET, 150000);
+                    }
+                    break;
+                }
+                }
             }
         }
     };
