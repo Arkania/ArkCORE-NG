@@ -4419,6 +4419,168 @@ public:
 
 /*  phase 181  */
 
+// 38526
+class npc_bc_eliminator_38526 : public CreatureScript
+{
+public:
+    npc_bc_eliminator_38526() : CreatureScript("npc_bc_eliminator_38526") { }
+
+    enum eNPC
+    {
+        EVENT_SUMMON_WARRIOR_A = 901,
+        EVENT_SUMMON_WARRIOR_B,
+    };
+
+    struct npc_bc_eliminator_38526AI : public VehicleAI
+    {
+        npc_bc_eliminator_38526AI(Creature* creature) : VehicleAI(creature) { Initialize(); }
+
+        EventMap  m_events;
+        uint64    m_playerGUID;
+        uint32    m_count;
+
+        void Initialize()
+        {
+            m_playerGUID = 0;
+            m_count=0;
+        }
+
+        void Reset() override
+        {
+            if (me->m_positionZ > 14.0f)
+                m_events.RescheduleEvent(EVENT_SUMMON_WARRIOR_A, 500);
+        }
+
+        void PassengerBoarded(Unit* passenger, int8 seatId, bool apply) override
+        {
+            if (apply)
+            {
+                m_events.RescheduleEvent(EVENT_SUMMON_WARRIOR_B, 1000);
+            }
+            else
+            {
+                m_events.CancelEvent(EVENT_SUMMON_WARRIOR_B);
+            }
+        }
+
+        void JustSummoned(Creature* summon) override
+        {
+            m_count += 1;
+        }
+
+        void SummonedCreatureDies(Creature* summon, Unit* killer) override
+        {
+            if (m_count > 0)
+                m_count -= 1;
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_SUMMON_WARRIOR_A: // 38531
+                {
+                    if (m_count < 5)
+                    {
+                        me->SummonCreature(38531, 899.25f, 2193.13f, 51.37f, 0, TEMPSUMMON_TIMED_DESPAWN, 75000);
+                        me->SummonCreature(38531, 920.37f, 2200.84f, 44.05f, 0, TEMPSUMMON_TIMED_DESPAWN, 75000);
+                    }
+                    m_events.ScheduleEvent(EVENT_SUMMON_WARRIOR_A, 500);
+                    break;
+                }
+                case EVENT_SUMMON_WARRIOR_B:
+                {
+                    
+                    break;
+                }
+                }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_bc_eliminator_38526AI(creature);
+    }
+};
+
+// 38531
+class npc_oomlot_warrior_38531 : public CreatureScript
+{
+public:
+    npc_oomlot_warrior_38531() : CreatureScript("npc_oomlot_warrior_38531") { }
+
+    enum eNPC
+    {
+        EVENT_SUMMON_WARRIOR_A = 901,
+        EVENT_SUMMON_WARRIOR_B,
+    };
+
+    struct npc_oomlot_warrior_38531AI : public ScriptedAI
+    {
+        npc_oomlot_warrior_38531AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+        EventMap  m_events;
+        uint64    m_TargetGUID;
+        Position  m_TargetPos;
+
+
+        void Initialize()
+        {
+            m_TargetGUID = 0;
+        }
+
+        void Reset() override
+        {
+            m_events.RescheduleEvent(EVENT_START_WALK, 1000);
+        }
+
+        void IsSummonedBy(Unit* summoner) override 
+        { 
+            me->RemoveAllAuras();
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_START_WALK:
+                {
+                    FindTargetPosition();
+                    me->GetMotionMaster()->MovePoint(1024, m_TargetPos);
+                    break;
+                }
+                }
+            }
+        }
+
+        void FindTargetPosition()
+        {
+            std::list<Creature*> cList = me->FindAllUnfriendlyCreaturesInRange(80.0f);
+            if (Creature* target = me->GetRandomCreature(cList))
+            {
+                m_TargetGUID = target->GetGUID();
+                m_TargetPos = target->GetNearPosition(5.0f, -target->m_orientation);
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_oomlot_warrior_38531AI(creature);
+    }
+};
+
+
+
 void AddSC_zone_lost_isles()
 {
     /*  phase 170  */
@@ -4493,5 +4655,6 @@ void AddSC_zone_lost_isles()
     new npc_ace_38455();
     new npc_faceless_of_the_deep_38448();
     /*  phase 181  */
-
+    new npc_bc_eliminator_38526();
+    new npc_oomlot_warrior_38531();
 }
