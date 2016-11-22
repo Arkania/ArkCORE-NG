@@ -486,7 +486,7 @@ public:
                         m_OldPosition = m_player->GetPosition();
                         m_player_pos = m_player->GetPosition();
                         m_player_area = m_player->GetAreaId();
-                        Talk(0);
+                        Talk(0, m_player);
                     }
         }
 
@@ -864,7 +864,7 @@ public:
             switch (m_phase)
             {
             case 1:
-                Talk(1);
+                Talk(1, m_player);
                 m_timer = 2000;
                 m_phase = 2;
                 break;
@@ -969,7 +969,7 @@ public:
             switch (m_phase)
             {
             case 1:
-                Talk(1);
+                Talk(1, m_player);
                 m_timer = 2000;
                 m_phase = 2;
                 break;
@@ -1074,7 +1074,7 @@ public:
             switch (m_phase)
             {
             case 1:
-                Talk(1);
+                Talk(1, m_player);
                 m_timer = 2000;
                 m_phase = 2;
                 break;
