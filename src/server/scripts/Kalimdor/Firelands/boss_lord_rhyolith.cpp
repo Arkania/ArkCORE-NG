@@ -87,7 +87,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_kar_the_everburningAI (creature);
+        return new npc_kar_the_everburningAI(creature);
     }
 
     struct npc_kar_the_everburningAI : public ScriptedAI
@@ -102,7 +102,7 @@ public:
 
         EventMap events;
         uint8 phase;
-        uint32 timerMove,timerElem;
+        uint32 timerMove, timerElem;
         InstanceScript* instance;
 
         void Reset() { }
@@ -119,8 +119,8 @@ public:
                 {
                     switch (eventId)
                     {
-                        case EVENT_MOVE_NEXT_POS:
-                            break;
+                    case EVENT_MOVE_NEXT_POS:
+                        break;
                     }
                 }
             }
@@ -135,7 +135,7 @@ public:
 
                 if (timerElem <= diff)
                 {
-                    me->CastSpell(me->GetPositionX() + urand(0,10) + urand(-10,0),me->GetPositionY() + urand(0,10) + urand(-10,0), me->GetPositionZ(),SUMMON_ELEMENTALS,true);
+                    me->CastSpell(me->GetPositionX() + irand(0, 10) + irand(-10, 0), me->GetPositionY() + irand(0, 10) + irand(-10, 0), me->GetPositionZ(), SUMMON_ELEMENTALS, true);
                     timerElem = 1200;
                 }
                 else timerElem -= diff;
@@ -145,11 +145,11 @@ public:
             {
                 if (timerMove <= diff)
                 {
-                   phase = 2;
-                   me->SetFacingTo(0.931584f);
-                   me->SetReactState(REACT_AGGRESSIVE);
-                   me->SetHomePosition(me->GetPositionX(),me->GetPositionY(),me->GetPositionZ(),me->GetOrientation());
-                   me->AI()->Reset();
+                    phase = 2;
+                    me->SetFacingTo(0.931584f);
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
+                    me->AI()->Reset();
                 }
                 else timerMove -= diff;
             }
