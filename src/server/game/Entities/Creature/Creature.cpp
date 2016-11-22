@@ -1580,9 +1580,12 @@ void Creature::SetDeathState(DeathState s)
 
             SetMeleeDamageSchool(SpellSchools(cinfo->dmgschool));
             
-            std::set<uint16> phaseIds = MergePhases(creatureData->phaseMask, creatureData->phaseIds, creatureData->phaseGroup);
-            for (uint16 ph : phaseIds)
-                SetInPhase(ph, false, true);
+            if (creatureData)
+            {
+                std::set<uint16> phaseIds = MergePhases(creatureData->phaseMask, creatureData->phaseIds, creatureData->phaseGroup);
+                for (uint16 ph : phaseIds)
+                    SetInPhase(ph, false, true);
+            }
         }
 
         Motion_Initialize();
