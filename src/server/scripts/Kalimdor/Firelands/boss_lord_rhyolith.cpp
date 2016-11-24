@@ -389,7 +389,7 @@ class boss_lord_rhyolith : public CreatureScript
                 instance = me->GetInstanceScript();
                 LeftSet = false;
                 RightSet = false;
-                Reset();
+                Initialize();
             }
  
             InstanceScript* instance;
@@ -400,55 +400,22 @@ class boss_lord_rhyolith : public CreatureScript
 
             bool phaseTwo, LeftSet, RightSet, lavaFlow, drinkMagma;
 
-            void SummonAndSetLegsInBoss()
+            void Initialize()
             {
-                if (!me || !me->IsAlive())
-                    return;
-
-                if (GetRightLeg())
-                {
-                    if (!GetRightLeg()->IsAlive())
-                        GetRightLeg()->Respawn(true);
-
-                    if (Vehicle* pVehicle = me->GetVehicleKit())
-                        if (!pVehicle->GetPassenger(1))
-                        {
-                            RightSet = true;
-                            GetRightLeg()->EnterVehicle(me,1);
-                            GetLeftLeg()->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                        }
-                }
-
-                if (GetLeftLeg())
-                {
-                    if (!GetLeftLeg()->IsAlive())
-                        GetLeftLeg()->Respawn(true);
-
-                    if (Vehicle* pVehicle = me->GetVehicleKit())
-                        if (!pVehicle->GetPassenger(0))
-                        {
-                            LeftSet = true;
-                            GetLeftLeg()->EnterVehicle(me,0);
-                            GetLeftLeg()->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                        }
-                }
+                events.Reset();
+                Phase = PHASE_0;
+                phaseTwo = false;
+                lavaFlow = false;
+                drinkMagma = false;
             }
 
             void Reset()
             {
-                events.Reset();
-                Phase = PHASE_0;
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                phaseTwo = false;
-                lavaFlow = false;
-                drinkMagma = false;
-                summons.DespawnAll();
-                me->SetReactState(REACT_PASSIVE);
                 me->SetDisplayId(MODEL_DEFAULT);
-                me->GetVehicleKit();
-                SummonAndSetLegsInBoss();
+                me->SetReactState(REACT_PASSIVE);
                 instance->SetBossState(DATA_LORD_RHYOLITH, NOT_STARTED);
-                
+
                 _Reset();
             }
 
@@ -520,8 +487,6 @@ class boss_lord_rhyolith : public CreatureScript
 
             void EnterEvadeMode()
             {
-                Reset();
-            
                 DespawnCreatures(53585);
 
                 RemoveEncounterAuras();
@@ -788,6 +753,41 @@ class boss_lord_rhyolith : public CreatureScript
             {
                 return (me->FindNearestCreature(53087, 5000.0f, true)  == NULL) ? me->FindNearestCreature(53087, 5000.0f, false) : me->FindNearestCreature(53087, 5000.0f, true);
             }
+
+            void SummonAndSetLegsInBoss()
+            {
+                if (!me || !me->IsAlive())
+                    return;
+
+                if (GetRightLeg())
+                {
+                    if (!GetRightLeg()->IsAlive())
+                        GetRightLeg()->Respawn(true);
+
+                    if (Vehicle* pVehicle = me->GetVehicleKit())
+                        if (!pVehicle->GetPassenger(1))
+                        {
+                            RightSet = true;
+                            GetRightLeg()->EnterVehicle(me, 1);
+                            GetLeftLeg()->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        }
+                }
+
+                if (GetLeftLeg())
+                {
+                    if (!GetLeftLeg()->IsAlive())
+                        GetLeftLeg()->Respawn(true);
+
+                    if (Vehicle* pVehicle = me->GetVehicleKit())
+                        if (!pVehicle->GetPassenger(0))
+                        {
+                            LeftSet = true;
+                            GetLeftLeg()->EnterVehicle(me, 0);
+                            GetLeftLeg()->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        }
+                }
+            }
+
         };
 };
 
