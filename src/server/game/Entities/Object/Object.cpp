@@ -1192,6 +1192,62 @@ bool Object::PrintIndexError(uint32 index, bool set) const
     return false;
 }
 
+std::string Object::ToInfoString()
+{
+    uint32 _dbGuid = GetGUIDLow();
+    std::stringstream sstr;
+    switch (GetTypeId())
+    {
+    case TYPEID_OBJECT:
+        TC_LOG_INFO("misc", "ToString: ToDo: GetName: TYPEID_OBJECT");
+        sstr << "Unknown Name for Object";
+        break;
+    case TYPEID_ITEM:
+        TC_LOG_INFO("misc", "ToString: ToDo: GetName: TYPEID_ITEM");
+        sstr << "Unknown Name for Item";
+        break;
+    case TYPEID_CONTAINER:
+        TC_LOG_INFO("misc", "ToString: ToDo: GetName: TYPEID_CONTAINER");
+        sstr << "Unknown Name for Container";
+        break;
+    case TYPEID_UNIT:        
+        if (Creature* npc = ToCreature())
+        {
+            sstr << "Creature Name: " << npc->GetName();
+            _dbGuid = npc->GetDBTableGUIDLow();
+        }
+        else if (Unit* unit = ToUnit())
+            sstr << "Unit Name: " << unit->GetName();
+        break;
+    case TYPEID_PLAYER:
+        if (Player* player = ToPlayer())
+            sstr << "Player Name: " << player->GetName();
+        break;
+    case TYPEID_GAMEOBJECT:
+        if (GameObject* go = ToGameObject())
+        {
+            sstr << "GameObject Name: " << go->GetName();
+            _dbGuid = go->GetDBTableGUIDLow();
+        }
+        break;
+    case TYPEID_DYNAMICOBJECT:
+        if (DynamicObject* dyn = ToDynObject())
+            sstr << "DynamicObject Name: " << dyn->GetName();
+        break;
+    case TYPEID_CORPSE:
+        if (Corpse* cor = ToCorpse())
+            sstr << "Corpse Name: " << cor->GetName();
+        break;
+    case TYPEID_AREATRIGGER:
+        if (AreaTrigger* at = ToAreaTrigger())
+            sstr << "AreaTrigger Name: " << at->GetName();
+        break;
+    }
+    sstr << " (Entry: " << GetEntry() << " GetDbGuid: " << _dbGuid << ")";
+
+    return sstr.str();
+}
+
 bool Position::operator==(Position const &a)
 {
     return (G3D::fuzzyEq(a.m_positionX, m_positionX) &&

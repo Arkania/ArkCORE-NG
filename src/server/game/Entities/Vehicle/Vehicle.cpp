@@ -271,6 +271,8 @@ void Vehicle::RemoveAllPassengers()
         while (!_pendingJoinEvents.empty())
         {
             VehicleJoinEvent* e = _pendingJoinEvents.front();
+            if (e->CheckVehicle())
+                TC_LOG_ERROR("entities.vehicle", "Vehicle::RemoveAllPassengers::Target. TargetVehicle pointer is not valid. Passenger: %s", e->Passenger->ToInfoString().c_str());
             e->to_Abort = true;
             e->Target = eventVehicle;
             _pendingJoinEvents.pop_front();
@@ -765,10 +767,21 @@ void Vehicle::RemovePendingEventsForPassenger(Unit* passenger)
     }
 }
 
+bool Vehicle::CheckVehicle()
+{
+        if (UsableSeatNum < 50)
+            if (Unit* unit = GetBase())
+                if (unit->IsInWorld() && unit->IsAlive())
+                    return true;
+    return false;
+}
+
 VehicleJoinEvent::~VehicleJoinEvent()
 {
-    if (Target)
+    if (CheckVehicle())
         Target->RemovePendingEvent(this);
+    else
+        TC_LOG_ERROR("entities.vehicle", "Destructor VehicleJoinEvent Target pointer is not valid. Passenger: %s", Passenger->ToInfoString().c_str());
 }
 
 /**
@@ -884,6 +897,9 @@ bool VehicleJoinEvent::Execute(uint64, uint32)
 
 void VehicleJoinEvent::Abort(uint64)
 {
+    if (Target && Target->UsableSeatNum > 50)
+        TC_LOG_ERROR("entities.vehicle", "VehicleJoinEvent::Abort is called: But target pointer is not valid. %s", Passenger->ToInfoString().c_str());
+
     /// Check if the Vehicle was already uninstalled, in which case all auras were removed already
     if (Target)
     {
@@ -901,4 +917,12 @@ void VehicleJoinEvent::Abort(uint64)
 
     if (Passenger->IsInWorld() && Passenger->HasUnitTypeMask(UNIT_MASK_ACCESSORY))
         Passenger->ToCreature()->DespawnOrUnsummon();
+}
+
+bool VehicleJoinEvent::CheckVehicle()
+{
+    if (Target)
+        return Target->CheckVehicle();
+
+    return false;
 }
