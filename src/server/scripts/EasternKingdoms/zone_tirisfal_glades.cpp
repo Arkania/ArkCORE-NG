@@ -344,6 +344,9 @@ public:
                         }
                     break;
                 }
+                case EVENT_MASTER_RESET:
+                    Reset();
+                    break;
                 case EVENT_START_TALK:
                 {
                     Talk(0);
@@ -422,6 +425,8 @@ public:
                     {
                         target->GetMotionMaster()->MovePath(5041401, false);
                         m_events.ScheduleEvent(EVENT_ANIM_PART_10, 45000);
+                        m_events.RescheduleEvent(EVENT_START_ANIM, urand(50000, 70000));
+                        m_events.RescheduleEvent(EVENT_MASTER_RESET, 150000);
                     }
                     break;
                 }
@@ -429,9 +434,7 @@ public:
                 {
                     if (Creature* target = ObjectAccessor::GetCreature(*me, m_targetGUID))
                     {
-                        target->DespawnOrUnsummon();
-                        m_events.RescheduleEvent(EVENT_START_ANIM, urand(50000, 70000));
-                        m_events.RescheduleEvent(EVENT_MASTER_RESET, 150000);
+                        target->DespawnOrUnsummon();                        
                     }
                     break;
                 }
