@@ -2406,10 +2406,9 @@ public:
         if (quest->GetQuestId() == QUEST_THE_REBEL_LORDS_ARSENAL)
         {
             creature->GetAI()->SetGUID(player->GetGUID(), PLAYER_GUID);
-            creature->AddAura(SPELL_WORGEN_BITE, player);
             player->RemoveAura(SPELL_PHASE_QUEST_ZONE_SPECIFIC_01);
+            creature->AddAura(SPELL_WORGEN_BITE, player);
             creature->CastSpell(creature, SPELL_FORCE_CAST_SUMMON_JOSIAH, true);
-            player->SetPhaseMask(4, true);
         }
         return true;
     }

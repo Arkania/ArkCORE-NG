@@ -139,9 +139,9 @@ public:
                 {
                     case EVENT_CHECK_ARRIVEL_PLAYER:
                     {
-                        if (!m_videoStarted)
-                            if (Player* player = me->FindNearestPlayer(10.0f))
-                                if (player->GetQuestStatus(QUEST_LAST_STAND) == QUEST_STATUS_REWARDED && player->GetQuestStatus(QUEST_LAST_CHANCE_AT_HUMANITY) == QUEST_STATUS_NONE)
+                        if (Player* player = me->FindNearestPlayer(10.0f))
+                            if (player->GetQuestStatus(QUEST_LAST_STAND) == QUEST_STATUS_REWARDED && player->GetQuestStatus(QUEST_LAST_CHANCE_AT_HUMANITY) == QUEST_STATUS_NONE)
+                                if (!m_videoStarted)
                                 {
                                     player->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_DISABLE_TURN);
                                     m_playerGUID = player->GetGUID();
@@ -156,39 +156,49 @@ public:
                                     m_events.ScheduleEvent(EVENT_TALK_0, 4000);
                                     return;
                                 }
+
+                        m_videoStarted = false;
+
                         m_events.ScheduleEvent(EVENT_CHECK_ARRIVEL_PLAYER, 1000);
                         break;
                     }
                     case EVENT_TALK_0:
                     {
+                        if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                            Talk(0, player);
                         m_events.ScheduleEvent(EVENT_TALK_1, 14000);
-                        Talk(0);
                         break;
                     }
                     case EVENT_TALK_1:
                     {
                         if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
-                            player->CastSpell(player, SPELL_CATACLYSM_1);
-                        if (Creature* lord = sObjectAccessor->GetCreature(*me, m_godfreyGUID))
-                            lord->AI()->Talk(0);
+                            if (Creature* lord = sObjectAccessor->GetCreature(*me, m_godfreyGUID))
+                            {
+                                player->CastSpell(player, SPELL_CATACLYSM_1);
+                                lord->AI()->Talk(0, player);
+                            }
                         m_events.ScheduleEvent(EVENT_TALK_2, 8000);
                         break;
                     }
                     case EVENT_TALK_2:
                     {
                         if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
-                            player->CastSpell(player, SPELL_CATACLYSM_2);
-                        if (Creature* king = sObjectAccessor->GetCreature(*me, m_kingGUID))
-                            king->AI()->Talk(0);
+                            if (Creature* king = sObjectAccessor->GetCreature(*me, m_kingGUID))
+                            {
+                                player->CastSpell(player, SPELL_CATACLYSM_2);
+                                king->AI()->Talk(0, player);
+                            }
                         m_events.ScheduleEvent(EVENT_TALK_3, 9000);
                         break;
                     }
                     case EVENT_TALK_3:
                     {
                         if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
-                            player->CastSpell(player, SPELL_CATACLYSM_3);
-                        if (Creature* king = sObjectAccessor->GetCreature(*me, m_kingGUID))
-                            king->AI()->Talk(1);
+                            if (Creature* king = sObjectAccessor->GetCreature(*me, m_kingGUID))
+                            {
+                                player->CastSpell(player, SPELL_CATACLYSM_3);
+                                king->AI()->Talk(1, player);
+                            }
                         m_events.ScheduleEvent(EVENT_TALK_4, 8000);
                         break;
                     }
@@ -197,21 +207,10 @@ public:
                         if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
                             player->CastSpell(player, SPELL_LAST_STAND_COMPLETE_2);
 
-                        m_events.ScheduleEvent(EVENT_RESTART, 30000);
-                        break;
-                    }
-                    case EVENT_RESTART:
-                    {
-                        Reset();
                         break;
                     }
                 }
             }
-
-            if (!UpdateVictim())
-                return;
-            else
-                DoMeleeAttackIfReady();
         }
 
         bool CheckPlayerIsInvalid()
@@ -358,11 +357,8 @@ public:
 
         void CheckTarget(WorldObject*& target)
         {
-            if (target->ToPlayer())
-                target = nullptr;
-            else if (Creature* npc = target->ToCreature())
-                if (npc->GetEntry() != NPC_HORRID_ABOMINATION)
-                    target = nullptr;
+            if (target->GetEntry() != NPC_HORRID_ABOMINATION)
+                target = target->FindNearestCreature(NPC_HORRID_ABOMINATION, 25.0f);           
         }
 
         void Register() override
@@ -1028,12 +1024,14 @@ public:
         QUEST_AS_THE_LAND_SHATTERS = 14396,
         SPELL_PHASE_QUEST_ZONE_SPECIFIC_07 = 68482,
         SPELL_PHASE_QUEST_ZONE_SPECIFIC_08 = 68483,
+        SPELL_FORCECAST_CATACLYSM_I = 69027,
     };
 
     bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
     {
         if (quest->GetQuestId() == 14396)
         {
+            creature->CastSpell(player, SPELL_FORCECAST_CATACLYSM_I, true);
             player->RemoveAura(SPELL_PHASE_QUEST_ZONE_SPECIFIC_07);
             player->CastSpell(player, SPELL_PHASE_QUEST_ZONE_SPECIFIC_08);
         }
@@ -1053,20 +1051,78 @@ public:
     enum eNpc
     {
         QUEST_GASPING_FOR_BREATH = 14395,
-        NPC_DROWNING_WATCHMAN_CREDIT = 36450,
+        NPC_PRINCE_LIAM_GREYMANE = 36451,
+        NPC_DROWNING_WATCHMANN_CREDIT = 36450,
         SPELL_PARACHUTE = 45472,
+        SPELL_RESCUE_DROWNING_WATCHMANN = 68735,
+        SPELL_SAVE_DROWNING_MILITIA_EFFECT = 68737,
+        SPELL_EXIT_VEHICLE = 68741,
+        EVENT_MASTER_RESET = 201,
+        EVENT_CHECK_NEAR_GREYMANE,
+        EVENT_DESPAWN,
     };
 
     struct npc_drowning_watchman_36440AI : public ScriptedAI
     {
         npc_drowning_watchman_36440AI(Creature* creature) : ScriptedAI(creature) { }
 
+        EventMap m_events;
+        uint64   m_playerGUID;
+        bool     m_isOnPlayer;
+
+        void Reset() override
+        {
+            m_playerGUID = 0;
+            m_isOnPlayer = false;
+        }
+
         void SpellHit(Unit* caster, SpellInfo const* spell) override 
         { 
-            if (Player* player = caster->ToPlayer())
-                if (player->GetQuestStatus(QUEST_GASPING_FOR_BREATH) == QUEST_STATUS_INCOMPLETE)
-                    if (spell->Id == SPELL_PARACHUTE)
-                        player->KilledMonsterCredit(NPC_DROWNING_WATCHMAN_CREDIT);
+            if (!m_isOnPlayer)
+                if (spell->Id == SPELL_RESCUE_DROWNING_WATCHMANN)
+                    if (Player* player = caster->ToPlayer())
+                        if (player->GetQuestStatus(QUEST_GASPING_FOR_BREATH) == QUEST_STATUS_INCOMPLETE)
+                        {
+                            m_isOnPlayer = true;
+                            m_playerGUID = player->GetGUID();
+                            m_events.ScheduleEvent(EVENT_MASTER_RESET, 60000);
+                            m_events.ScheduleEvent(EVENT_CHECK_NEAR_GREYMANE, 1000);
+                        }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_MASTER_RESET:
+                    me->DespawnOrUnsummon(10);
+                    break;
+                case EVENT_CHECK_NEAR_GREYMANE:
+                    if (m_isOnPlayer)
+                        if (Creature* liam = me->FindNearestCreature(NPC_PRINCE_LIAM_GREYMANE, 15.0f))
+                            if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                                if (me->m_positionZ > 0.75f)
+                                {
+                                    player->KilledMonsterCredit(NPC_DROWNING_WATCHMANN_CREDIT);
+                                    player->CastSpell(me, SPELL_SAVE_DROWNING_MILITIA_EFFECT, true);
+                                    player->CastSpell(me, SPELL_EXIT_VEHICLE, true);
+                                    Talk(0, player);
+                                    //me->ExitVehicle();
+                                    m_events.ScheduleEvent(EVENT_DESPAWN, 3000);                                    
+                                    break;
+                                }
+
+                    m_events.ScheduleEvent(EVENT_CHECK_NEAR_GREYMANE, 1000);
+                    break;
+                case EVENT_DESPAWN:
+                    me->DespawnOrUnsummon(10);
+                    break;
+                }
+            }
         }
     };
 
@@ -1276,7 +1332,6 @@ public:
             {
                 m_playerGUID = summoner->GetGUID();
                 me->CastSpell(player, SPELL_ROPE_CHANNEL, true);
-                me->SetPhaseMask(player->GetPhaseMask(), true);
                 m_dist = frand(3.0f, 5.0f);
                 m_angle = frand(2.59f, 3.53f);
                 m_size = me->GetObjectSize();
@@ -1325,11 +1380,6 @@ public:
                 }
                 }
             }
-
-            if (!UpdateVictim())
-                return;
-            else
-                DoMeleeAttackIfReady();
         }
 
         void CheckLornaRelated(Player* player)
@@ -1365,14 +1415,16 @@ public:
         SPELL_ROPE_IN_HORSE = 68908,
         SPELL_ROPE_CHANNEL = 68940,
         EVENT_START_FOLLOWING = 101,
+        EVENT_CHECK_HEALTH_AND_LORNA,
     };
 
-    struct npc_mountain_horse_36540AI : public ScriptedAI
+    struct npc_mountain_horse_36540AI : public VehicleAI
     {
-        npc_mountain_horse_36540AI(Creature* creature) : ScriptedAI(creature) { }
+        npc_mountain_horse_36540AI(Creature* creature) : VehicleAI(creature) { }
 
         EventMap m_events;
         uint64   m_playerGUID;
+        uint64   m_lornaGUID;
         float    m_dist;
         float    m_angle;
         float    m_size;
@@ -1382,15 +1434,9 @@ public:
         void Reset() override
         {
             m_events.Reset();
+            m_playerGUID = 0;
+            m_lornaGUID = 0;
             m_lornaIsNear = false;
-        }
-
-        void MoveInLineOfSight(Unit* who) override
-        {
-            if (Creature* lorna = who->ToCreature())
-                if (lorna->GetEntry() == NPC_LORNA_CROWLEY)
-                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
-                        m_lornaIsNear = (player->GetDistance(who) < 7.0f);
         }
 
         void PassengerBoarded(Unit* passenger, int8 seatId, bool apply) override
@@ -1400,8 +1446,9 @@ public:
                 if (Player* player = passenger->ToPlayer())
                 {
                     m_playerGUID = player->GetGUID();
-                    me->SetPhaseMask(player->GetPhaseMask(), true);
+                    me->SetMaxHealth(250);
                 }
+                m_events.ScheduleEvent(EVENT_CHECK_HEALTH_AND_LORNA, 1000);
             }
             else if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
             {
@@ -1409,6 +1456,32 @@ public:
                 {
                     player->KilledMonsterCredit(36560);
                     me->DespawnOrUnsummon(1000);
+                }
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_CHECK_HEALTH_AND_LORNA:
+                    me->SetHealth(me->GetMaxHealth());
+
+                    if (!m_lornaGUID)
+                        if (Creature* lorna = me->FindNearestCreature(NPC_LORNA_CROWLEY, 100.0f))
+                            m_lornaGUID = lorna->GetGUID();
+
+                    if (!m_lornaIsNear)
+                        if (Creature* lorna = ObjectAccessor::GetCreature(*me, m_lornaGUID))
+                            if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                                m_lornaIsNear = (player->GetDistance(lorna) < 7.0f);
+
+                    m_events.ScheduleEvent(EVENT_CHECK_HEALTH_AND_LORNA, 1000);
+                    break;
                 }
             }
         }
