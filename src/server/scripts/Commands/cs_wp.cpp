@@ -703,11 +703,9 @@ public:
                         return false;
                     }
 
-                    CreatureData* tmpData = &sObjectMgr->NewOrExistCreatureData(wcreature2->GetDBTableGUIDLow());
-                    tmpData->spawnMask = (1 << map->GetSpawnMode());
-                    tmpData->phaseMask = chr->GetPhaseMask();
-                    tmpData->phaseIds = chr->GetPhaseIds();
-                    wcreature2->SaveToDB(map->GetId(), tmpData);
+                    wcreature2->CopyPhaseFrom(chr);
+                    wcreature2->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()), chr->GetPhaseMask());
+
                     // To call _LoadGoods(); _LoadQuests(); CreateTrainerSpells();
                     /// @todo Should we first use "Create" then use "LoadFromDB"?
                     if (!wcreature2->LoadCreatureFromDB(wcreature2->GetDBTableGUIDLow(), map))
@@ -939,11 +937,9 @@ public:
 
                 WorldDatabase.Execute(stmt);
 
-                CreatureData* tmpData = &sObjectMgr->NewOrExistCreatureData(wcreature->GetDBTableGUIDLow());
-                tmpData->spawnMask = (1 << map->GetSpawnMode());
-                tmpData->phaseMask = chr->GetPhaseMask();
-                tmpData->phaseIds = chr->GetPhaseIds();
-                wcreature->SaveToDB(map->GetId(), tmpData);
+                wcreature->CopyPhaseFrom(chr);
+                wcreature->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()), chr->GetPhaseMask());
+
                 // To call _LoadGoods(); _LoadQuests(); CreateTrainerSpells();
                 if (!wcreature->LoadCreatureFromDB(wcreature->GetDBTableGUIDLow(), map))
                 {
@@ -998,11 +994,9 @@ public:
                 return false;
             }
 
-            CreatureData* tmpData = &sObjectMgr->NewOrExistCreatureData(creature->GetDBTableGUIDLow());
-            tmpData->spawnMask = (1 << map->GetSpawnMode());
-            tmpData->phaseMask = chr->GetPhaseMask();
-            tmpData->phaseIds = chr->GetPhaseIds();
-            creature->SaveToDB(map->GetId(), tmpData);
+            creature->CopyPhaseFrom(chr);
+            creature->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()), chr->GetPhaseMask());
+
             if (!creature->LoadCreatureFromDB(creature->GetDBTableGUIDLow(), map))
             {
                 handler->PSendSysMessage(LANG_WAYPOINT_VP_NOTCREATED, id);
@@ -1051,11 +1045,9 @@ public:
                 return false;
             }
 
-            CreatureData* tmpData = &sObjectMgr->NewOrExistCreatureData(creature->GetDBTableGUIDLow());
-            tmpData->spawnMask = (1 << map->GetSpawnMode());
-            tmpData->phaseMask = chr->GetPhaseMask();
-            tmpData->phaseIds = chr->GetPhaseIds();
-            creature->SaveToDB(map->GetId(), tmpData);
+            creature->CopyPhaseFrom(chr);
+            creature->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()), chr->GetPhaseMask());
+
             if (!creature->LoadCreatureFromDB(creature->GetDBTableGUIDLow(), map))
             {
                 handler->PSendSysMessage(LANG_WAYPOINT_NOTCREATED, id);

@@ -328,9 +328,6 @@ std::set<uint16> GetUInt16List(std::string storedString);
 std::string GetUInt16String(std::set<uint16> uint16List);
 std::set<uint16> CopyUInt16List(std::set<uint16> original);
 
-uint64 ComputePhaseIdToMask(uint16 id);
-std::set<uint16> ComputePhaseMaskToIds(uint64 phaseMask);
-
 char* GetCopyOfChars(const char * tmp);
 
 #endif

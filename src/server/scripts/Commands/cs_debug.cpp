@@ -957,6 +957,7 @@ public:
 
         char* t = strtok((char*)args, " ");
         char* p = strtok(NULL, " ");
+        char* m = strtok(NULL, " ");
 
         if (!t)
             return false;
@@ -965,10 +966,16 @@ public:
         std::set<uint16> phaseId;
         std::set<uint16> worldMapSwap;
 
-        terrainswap.insert((uint16)atoi(t));
+        if (uint16 ut = (uint16)atoi(t))
+            terrainswap.insert(ut);
 
         if (p)
-            phaseId.insert((uint16)atoi(p));
+            if (uint16 up = (uint16)atoi(p))
+                phaseId.insert(up);
+
+        if (m)
+            if (uint16 um = (uint16)atoi(m))
+                worldMapSwap.insert(um);
 
         handler->GetSession()->SendSetPhaseShift(phaseId, terrainswap, worldMapSwap);
         return true;
@@ -1392,7 +1399,15 @@ public:
     {
         Unit* target = handler->getSelectedUnit();
         Player* player = handler->GetSession()->GetPlayer();
-        bool ok = false;
+        
+        if (target->GetTypeId() == TYPEID_UNIT)
+        {
+            if (target->ToCreature()->GetDBPhase() > 0)
+                handler->PSendSysMessage("Target creature's PhaseId in DB: %d", target->ToCreature()->GetDBPhase());
+            else if (target->ToCreature()->GetDBPhase() < 0)
+                handler->PSendSysMessage("Target creature's PhaseGroup in DB: %d", abs(target->ToCreature()->GetDBPhase()));
+        }
+
         if (target)
         {
             std::string phaseString = target->PhaseIdToString();

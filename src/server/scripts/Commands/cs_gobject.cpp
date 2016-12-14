@@ -159,6 +159,8 @@ public:
             return false;
         }
 
+        object->CopyPhaseFrom(player);
+
         if (spawntimeSecs)
         {
             uint32 value = atoi((char*)spawntimeSecs);
@@ -166,14 +168,7 @@ public:
         }
 
         // fill the gameobject data and save to the db
-        GameObjectData* tmpData = &sObjectMgr->NewGOData(guidLow);
-        tmpData->id = object->GetEntry();
-        tmpData->spawnMask = (1 << map->GetSpawnMode());
-        tmpData->phaseMask = 1;
-        tmpData->phaseIds = player->GetPhaseIds();
-        tmpData->zoneId = player->GetZoneId();
-        tmpData->areaId = player->GetAreaId();
-        object->SaveToDB(map->GetId(), tmpData);
+        object->SaveToDB(map->GetId(), 1 << map->GetSpawnMode(), player->GetPhaseMask());
         // delete the old object and do a clean load from DB with a fresh new GameObject instance.
         // this is required to avoid weird behavior and memory leaks
         delete object;

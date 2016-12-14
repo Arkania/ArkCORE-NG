@@ -718,10 +718,10 @@ void GameObject::SaveToDB()
         return;
     }
 
-    SaveToDB(GetMapId(), data);
+    SaveToDB(GetMapId(), data->spawnMask, data->phaseMask);
 }
 
-void GameObject::SaveToDB(uint32 mapid, GameObjectData const* tmpData)
+void GameObject::SaveToDB(uint32 mapid, uint32 spawnMask, uint32 phaseMask)
 {
     const GameObjectTemplate* goI = GetGOInfo();
 
@@ -736,13 +736,6 @@ void GameObject::SaveToDB(uint32 mapid, GameObjectData const* tmpData)
     // data->guid = guid must not be updated at save
     data.id = GetEntry();
     data.mapid = mapid;
-    data.zoneId = GetZoneId();
-    data.areaId = GetAreaId();
-    data.spawnMask = tmpData->spawnMask;
-    data.phaseMask = tmpData->phaseMask;
-    data.phaseIds = tmpData->phaseIds;
-    data.phaseGroup = tmpData->phaseGroup;
-    ComputePhaseXGroup(data.phaseIds, data.phaseGroup);
     data.posX = GetPositionX();
     data.posY = GetPositionY();
     data.posZ = GetPositionZ();
@@ -754,7 +747,11 @@ void GameObject::SaveToDB(uint32 mapid, GameObjectData const* tmpData)
     data.spawntimesecs = m_spawnedByDefault ? m_respawnDelayTime : -(int32)m_respawnDelayTime;
     data.animprogress = GetGoAnimProgress();
     data.go_state = GetGoState();
+    data.spawnMask = spawnMask;
     data.artKit = GetGoArtKit();
+
+    data.phaseId = GetDBPhase() > 0 ? GetDBPhase() : 0;
+    data.phaseGroup = GetDBPhase() < 0 ? abs(GetDBPhase()) : 0;
 
     // Update in DB
     SQLTransaction trans = WorldDatabase.BeginTransaction();
@@ -767,12 +764,12 @@ void GameObject::SaveToDB(uint32 mapid, GameObjectData const* tmpData)
 
     stmt = WorldDatabase.GetPreparedStatement(WORLD_INS_GAMEOBJECT);
     stmt->setUInt32(index++, m_DBTableGuid);
-    stmt->setUInt32(index++, GetEntry());
+    stmt->setUInt32(index++, data.id);
     stmt->setUInt16(index++, data.mapid);
     stmt->setUInt16(index++, data.zoneId);
     stmt->setUInt16(index++, data.areaId);
-    stmt->setUInt8(index++, data.spawnMask);
-    stmt->setString(index++, GetUInt16String(data.phaseIds));
+    stmt->setUInt8(index++, spawnMask);
+    stmt->setUInt16(index++, data.phaseId);
     stmt->setUInt16(index++, data.phaseGroup);
     stmt->setFloat(index++, data.posX );
     stmt->setFloat(index++, data.posY );
@@ -822,9 +819,15 @@ bool GameObject::LoadGameObjectFromDB(uint32 guid, Map* map, bool addToMap)
     if (!Create(guid, entry, map, data->phaseMask, x, y, z, ang, rotation0, rotation1, rotation2, rotation3, animprogress, go_state, artKit))
         return false;
 
-    std::set<uint16> phaseIds = MergePhases(data->phaseMask, data->phaseIds, data->phaseGroup);
-    for (uint16 ph : phaseIds)
-        SetInPhase(ph, false, true);
+    if (data->phaseId)
+        SetInPhase(data->phaseId, false, true);
+
+    if (data->phaseGroup)
+    {
+        // Set the gameobject in all the phases of the phasegroup
+        for (auto ph : GetXPhasesForGroup(data->phaseGroup))
+            SetInPhase(ph, false, true);
+    }
 
     if (data->spawntimesecs >= 0)
     {

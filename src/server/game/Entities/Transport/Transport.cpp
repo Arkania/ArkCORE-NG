@@ -272,8 +272,8 @@ Creature* Transport::CreateNPCPassenger(uint32 guid, CreatureData const* data)
     creature->SetTransport(this);
     creature->m_movementInfo.transport.guid = GetGUID();
     creature->m_movementInfo.transport.pos.Relocate(x, y, z, o);    // m_movementInfo.transport.pos.m_positionX  x=offset
-    CalculatePassengerPosition(x, y, z, &o);                        // This method transforms supplied transport offsets into global coordinates offset > worldpos
     creature->m_movementInfo.transport.seat = -1;
+    CalculatePassengerPosition(x, y, z, &o);                        // This method transforms supplied transport offsets into global coordinates offset > worldpos
     GetMap()->CreatureRelocation(creature, x, y, z, o, false);
     creature->Relocate(x, y, z, o);                                 // me->m_positionX  x=worldpos
 
@@ -291,13 +291,11 @@ Creature* Transport::CreateNPCPassenger(uint32 guid, CreatureData const* data)
         return NULL;
     }
 
-    std::set<uint16> phaseIds = MergePhases(data->phaseMask, data->phaseIds, data->phaseGroup);
-   
-    if (!phaseIds.empty())
-    {
-        for (uint16 ph : phaseIds)
-            SetInPhase(ph, false, true);
-    }
+    if (data->phaseId)
+        creature->SetInPhase(data->phaseId, false, true);
+    else if (data->phaseGroup)
+        for (auto phase : GetXPhasesForGroup(data->phaseGroup))
+            creature->SetInPhase(phase, false, true);
     else
         creature->CopyPhaseFrom(this);
 

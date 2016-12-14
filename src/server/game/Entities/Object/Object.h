@@ -953,9 +953,11 @@ class WorldObject : public Object, public WorldLocation
         void CopyPhaseFrom(WorldObject* obj, bool update = false);
         bool SetInPhase(uint16 id, bool update, bool apply);
 
+        // if negative it is used as PhaseGroupId
+        int32 GetDBPhase() const { return _dbPhase; }
+        void SetDBPhase(int32 p) { _dbPhase = p; }
+
         void SendDebugReportToPlayer();
-        std::set<uint16> MergePhases(uint64 phaseMask, std::set<uint16> phaseIds, uint16 phaseGroup);
-        void ComputePhaseXGroup(std::set<uint16> &phaseIds, uint16 &phaseGroup);
         // end phase system
 
     protected:
@@ -990,6 +992,7 @@ class WorldObject : public Object, public WorldLocation
         std::set<uint16> m_terrainSwaps;
         std::set<uint16> m_worldMapAreaSwaps;
         bool m_phaseUpdateNeeded;
+        int32 _dbPhase;
         // end phase system
 
         uint16 m_notifyflags;

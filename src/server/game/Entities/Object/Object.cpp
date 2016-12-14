@@ -1341,7 +1341,7 @@ void MovementInfo::OutDebug()
 WorldObject::WorldObject(bool isWorldObject) : WorldLocation(), LastUsedScriptID(0),
 m_name(""), m_isActive(false), m_isWorldObject(isWorldObject), m_zoneScript(NULL),
 m_transport(NULL), m_currMap(NULL), m_InstanceId(0),
-m_phaseMask(PHASEMASK_NORMAL), m_notifyflags(0), m_executed_notifies(0), m_phaseUpdateNeeded(true) 
+m_phaseMask(PHASEMASK_NORMAL), _dbPhase(0), m_notifyflags(0), m_executed_notifies(0), m_phaseUpdateNeeded(true)
 {
     m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE | GHOST_VISIBILITY_GHOST);
     m_serverSideVisibilityDetect.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE);
@@ -3529,16 +3529,12 @@ bool WorldObject::SetInPhase(uint16 id, bool update, bool apply)
             if (HasInPhaseList(id)) // do not run the updates if we are already in this phase
                 return false;
 
-            m_phaseMask |= ComputePhaseIdToMask(id);
-
             m_phaseIds.insert(id);
         }
         else      // erase this phase
         {
             if (!HasInPhaseList(id)) // do not run the updates if we are not in this phase
                 return false;
-
-            m_phaseMask &= ~ComputePhaseIdToMask(id);
 
             m_phaseIds.erase(id);
         }
@@ -3721,34 +3717,6 @@ void WorldObject::RebuildTerrainSwaps(bool &updateNeeded)
 void WorldObject::RebuildWorldMapAreaSwaps(bool &updateNeeded)
 {
     //preparing for furure use of additional WorldMapAreaSwaps-tables  
-}
-
-std::set<uint16> WorldObject::MergePhases(uint64 phaseMask, std::set<uint16> phaseIds, uint16 phaseGroup)
-{
-    if (phaseGroup)
-        for (auto ph : GetXPhasesForGroup (phaseGroup))
-            if (phaseIds.find(ph) == phaseIds.end())
-                phaseIds.insert(ph);
-
-    if (phaseIds.empty())
-        phaseIds = ComputePhaseMaskToIds(phaseMask);
-
-    if (phaseIds.empty())
-        phaseIds.insert(169);
-
-    return phaseIds;
-}
-
-void WorldObject::ComputePhaseXGroup(std::set<uint16> &phaseIds, uint16 &phaseGroup)
-{
-    if (phaseIds.size() < 2)
-        return;
-
-    if (uint16 pGroup = ComputePhaseGroup(phaseIds))
-    {
-        phaseGroup=pGroup;
-        phaseIds.clear();
-    }
 }
 
 // end new phase system
