@@ -46,6 +46,11 @@ enum eKezanEnumerate
     QUEST_GIVE_SASSY_THE_NEWS = 24520,
     QUEST_LIFE_OF_THE_PARTY_M = 14153,
     QUEST_LIFE_OF_THE_PARTY_F = 14113,
+    QUEST_THE_NEW_YOU_M = 14110,
+    QUEST_THE_NEW_YOU_F = 14109,
+    QUEST_PIRATE_PARTY_CRASHERS = 14115,
+    QUEST_ROBBING_HOODS = 14121,
+    ITEMS_STACK_OF_MACAROONS = 47044,
     NPC_CANDY_CANE = 35053,
     NPC_CHIP_ENDALE = 35054,
     NPC_HOT_ROD_34840 = 34840,
@@ -54,6 +59,7 @@ enum eKezanEnumerate
     NPC_IZZY_34959 = 34959,
     NPC_KEZAN_CITIZEN_35063 = 35063,
     NPC_KEZAN_CITIZEN_35075 = 35075,
+    NPC_HIRED_LOOTER_35234 = 35234,
     NPC_BRUNO_FLAMERETARDANT = 34835,
     NPC_FRANKIE_GEARSLIPPER = 34876,
     NPC_JACK_THE_HAMMER = 34877,
@@ -84,8 +90,10 @@ enum eKezanEnumerate
     SPELL_AWESOME_PARTY_ENSEMBLE = 66908,
     SPELL_LOTP_HAPPY_PARTYGOER = 66916,
     SPELL_TORCH_TOSS = 6257,
-    SPELL_HOT_ROD_KNOCKBACK = 70330,
+    SPELL_HOT_ROD_KNOCKBACK_1 = 66301,
+    SPELL_HOT_ROD_KNOCKBACK_2 = 70330,
     SPELL_CREATE_STOLEN_LOOT = 67041,
+    SPELL_EARTHQUAKE_CAMERA_SHAKE = 96274,
     PLAYER_GUID = 99991,
     ACTION_ENTER_CAR = 101,
     ACTION_HELP_PLAYER,
@@ -94,11 +102,14 @@ enum eKezanEnumerate
     EVENT_TALK_PERIODIC,
     EVENT_MUSIC_PERIODIC,
     EVENT_CHECK_FOR_PLAYER,
+    EVENT_CHECK_FOR_CREATURE,
     EVENT_TALK,
     EVENT_TALK_COOLDOWN,
+    EVENT_CAST_COOLDOWN,
     EVENT_GIVE_UP,
     EVENT_COMBAT_STOP,
     EVENT_RESET_TARGET,
+    EVENT_KILL_TARGET,
     EVENT_OWNER_IS_ATTACKED,
     EVENT_PLAY_SOUND1,
     EVENT_PLAY_SOUND2,
@@ -117,6 +128,7 @@ enum eKezanEnumerate
     EVENT_MOVE_PART7,
     EVENT_MOVE_PART8,
     EVENT_MOVE_PART9,
+    EVENT_MOVE_HOME,
     EVENT_WAIT_FOR_NEW_SPEED,
 };
 
@@ -347,16 +359,24 @@ public:
 
     bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
     {
-        if (quest->GetQuestId() == QUEST_TAKING_CARE_OF_BUSINESS)
-            creature->AI()->Talk(0, player);
-        else if (quest->GetQuestId() == QUEST_ROLLING_WITH_MY_HOMIES)
-            creature->AI()->Talk(1, player);
-        else if (quest->GetQuestId() == QUEST_LIFE_SAVINGS)
+        switch (quest->GetQuestId())
         {
+        case QUEST_TAKING_CARE_OF_BUSINESS:
+            creature->AI()->Talk(0, player);
+            break;
+        case QUEST_ROLLING_WITH_MY_HOMIES:
+            creature->AI()->Talk(1, player);
+            break;
+        case QUEST_LIFE_SAVINGS:
             creature->AI()->Talk(2, player);
             creature->AI()->SetGUID(player->GetGUID(), PLAYER_GUID);
             creature->AI()->DoAction(992);
+            break;
+        case QUEST_PIRATE_PARTY_CRASHERS:
+            player->CastSpell(player, SPELL_EARTHQUAKE_CAMERA_SHAKE, true);
+            break;
         }
+
         return false;
     }
 
@@ -1057,10 +1077,10 @@ public:
 };
 
 // 34840
-class npc_rod_hot_34840 : public CreatureScript
+class npc_hot_rod_34840 : public CreatureScript
 {
 public:
-    npc_rod_hot_34840() : CreatureScript("npc_rod_hot_34840") { }
+    npc_hot_rod_34840() : CreatureScript("npc_hot_rod_34840") { }
 
     enum eNPC
     {
@@ -1073,9 +1093,33 @@ public:
         EVENT_GOBBER_COOLDOWN,
     };
 
-    struct npc_rod_hot_34840AI : public VehicleAI
+    class IfNotInRange
     {
-        npc_rod_hot_34840AI(Creature* creature) : VehicleAI(creature) { }
+    public:
+        explicit IfNotInRange(Unit* _caster) : caster(_caster) { }
+
+        bool operator() (WorldObject* unit)
+        {
+            if (unit->GetPosition().GetExactDist(&caster->GetPosition()) > 10.0f)
+                return true;
+            if (unit->GetEntry() != NPC_KEZAN_CITIZEN_35063 && unit->GetEntry() != NPC_KEZAN_CITIZEN_35075 && unit->GetEntry() != NPC_HIRED_LOOTER_35234)
+                return true;
+            if (Creature* npc = unit->ToCreature())
+                if (!npc->IsAlive())
+                    return true; 
+            if (unit->GetPosition().GetExactDist(&caster->GetPosition()) < 3.0f)
+                return false;
+            if (caster->isInFront(unit))
+                return false;
+
+            return true;
+        }
+        Unit* caster;
+    };
+
+    struct npc_hot_rod_34840AI : public VehicleAI
+    {
+        npc_hot_rod_34840AI(Creature* creature) : VehicleAI(creature) { }
 
         EventMap m_events;
         uint64   m_playerGUID;
@@ -1091,6 +1135,8 @@ public:
             m_gobberGUID = 0;
             m_aceGUID = 0;
             m_gobberEmoteCD = false;
+            m_events.RescheduleEvent (EVENT_CHECK_FOR_CREATURE, 1000);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
         }
 
         void IsSummonedBy(Unit* summoner) override
@@ -1159,6 +1205,7 @@ public:
                 }
                 else if (Creature* npc = unit->ToCreature())
                 {
+                    unit->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
                     if (!m_izzyGUID)
                         if (npc->GetEntry() == NPC_IZZY_34959)
                             m_izzyGUID = npc->GetGUID();
@@ -1170,22 +1217,11 @@ public:
                             m_aceGUID = npc->GetGUID();
                 }
             }
+            else
+                unit->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
         }
 
-        void MoveInLineOfSight(Unit* who) override
-        {
-            if (!m_gobberEmoteCD)
-                if (Vehicle* vehicle = me->GetVehicleKit())
-                    if (Unit* gobber = vehicle->GetPassenger(2))
-                        if (who->GetEntry() == NPC_KEZAN_CITIZEN_35063 || who->GetEntry() == NPC_KEZAN_CITIZEN_35075)
-                            if (who->GetDistance2d(me) < 15.0f)
-                                if (urand(0, 100) < 25)
-                                {
-                                    gobber->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
-                                    m_gobberEmoteCD = true;
-                                    m_events.ScheduleEvent(EVENT_GOBBER_COOLDOWN, 5000);
-                                }
-        }
+        void EnterCombat(Unit* /*who*/) override  {  }
 
         void UpdateAI(uint32 diff) override
         {
@@ -1240,19 +1276,31 @@ public:
                     m_gobberEmoteCD = false;
                     break;
                 }
+                case EVENT_CHECK_FOR_CREATURE:
+                {
+                    std::list<Creature*> cList = me->FindAllCreaturesInRange(10.0f);
+                    cList.remove_if(IfNotInRange(me));
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        for (auto npc : cList)
+                            player->CastSpell(npc, SPELL_HOT_ROD_KNOCKBACK_1);
+
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        if (player->GetQuestStatus(QUEST_ROBBING_HOODS) == QUEST_STATUS_INCOMPLETE)
+                        {
+                            m_events.ScheduleEvent(EVENT_CHECK_FOR_CREATURE, 500);
+                            break;
+                        }
+                    m_events.ScheduleEvent(EVENT_CHECK_FOR_CREATURE, 1000);
+                    break;
+                }
                 }
             }
-
-            if (!UpdateVictim())
-                return;
-            else
-                DoMeleeAttackIfReady();
         }
     };
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_rod_hot_34840AI(creature);
+        return new npc_hot_rod_34840AI(creature);
     }
 };
 
@@ -1428,10 +1476,6 @@ public:
 
         void EnterCombat(Unit* victim) override
         {
-            if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
-                if (urand(0, 100) < 60)
-                    Talk(0, player);
-            //me->SetReactState(REACT_AGGRESSIVE);
             me->GetMotionMaster()->Clear();
             me->GetMotionMaster()->MoveChase(victim, 2.0f);
             m_targetGUID = victim->GetGUID();
@@ -1625,6 +1669,29 @@ public:
     CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_ace_34957AI(creature);
+    }
+};
+
+// 35120
+class npc_fbok_bank_teller_35120 : public CreatureScript
+{
+public:
+    npc_fbok_bank_teller_35120() : CreatureScript("npc_fbok_bank_teller_35120") { }
+
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    {
+        switch (quest->GetQuestId())
+        {
+        case QUEST_THE_NEW_YOU_M:
+        case QUEST_THE_NEW_YOU_F:
+        {
+            uint32 amount = 10 - player->GetItemCount(ITEMS_STACK_OF_MACAROONS);
+            if (amount > 0)
+                player->AddItem(ITEMS_STACK_OF_MACAROONS, amount);
+            break;
+        }
+        }
+        return false;
     }
 };
 
@@ -3170,39 +3237,47 @@ public:
         EventMap m_events;
         uint64   m_playerGUID;
         bool     m_torchCoolDown;
+        bool     m_markToKill;
 
         void Initialize()
         {
             m_torchCoolDown=false;
+            m_markToKill=false;
         }
 
         void Reset() override
         {
-           me->SetCurrentEquipmentId(1);
            m_playerGUID = 0;
+           me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
+           me->ClearUnitState(UNIT_STATE_STUNNED);
         }
 
         void EnterCombat(Unit* victim) override
         {
-            if (!m_torchCoolDown)
-            {
-                me->CastSpell(victim, SPELL_TORCH_TOSS);
-                m_torchCoolDown = true;
-                m_events.ScheduleEvent(EVENT_TORCH_COOLDOWN, urand(7800, 21300));
-            }
-
+            if (!m_markToKill)
+                if (!m_torchCoolDown)
+                {
+                    me->CastSpell(victim, SPELL_TORCH_TOSS);
+                    m_torchCoolDown = true;
+                    m_events.ScheduleEvent(EVENT_TORCH_COOLDOWN, urand(7800, 21300));
+                }
         }
 
         void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
-            if (spell->Id == SPELL_HOT_ROD_KNOCKBACK)
-                if (Player* player = caster->ToPlayer())
-                    if (player->GetDistance2d(me) < 20.0f)
+            if (!m_markToKill)
+                if (spell->Id == SPELL_HOT_ROD_KNOCKBACK_1)
+                    if (Player* player = GetPlayer(caster))
                     {
-                        me->CastSpell(player, SPELL_CREATE_STOLEN_LOOT, true);
-                        me->DespawnOrUnsummon(100);
+                        me->AddUnitState(UNIT_STATE_STUNNED);
+                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
+                        m_playerGUID = player->GetGUID();                        
+                        m_markToKill = true;
+                        m_events.ScheduleEvent(EVENT_KILL_TARGET, 1000);
                     }
         }
+
+        void EnterEvadeMode() override { }
 
         void UpdateAI(uint32 diff) override
         {
@@ -3217,6 +3292,16 @@ public:
                     m_torchCoolDown = false;
                     break;
                 }
+                case EVENT_KILL_TARGET:
+                {
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                    {
+                        if (player->GetQuestStatus(QUEST_ROBBING_HOODS) == QUEST_STATUS_INCOMPLETE)
+                            me->CastSpell(player, SPELL_CREATE_STOLEN_LOOT, true);
+                        player->Kill(me);
+                    }
+                    break;
+                }
                 }
             }
 
@@ -3224,6 +3309,17 @@ public:
                 return;
             else
                 DoMeleeAttackIfReady();
+        }
+
+        Player* GetPlayer(Unit* caster)
+        {
+            if (Player* player = caster->ToPlayer())
+                return player;
+            else if (Vehicle* hot = caster->GetVehicleKit())
+                if (Unit* pass = hot->GetPassenger(0))
+                    if (Player* player = pass->ToPlayer())
+                        return player;
+            return nullptr;
         }
     };
 
@@ -3233,11 +3329,11 @@ public:
     }
 };
 
-// 35063
+// 35063 35073
 class npc_kezan_citizen_35063 : public CreatureScript
 {
 public:
-    npc_kezan_citizen_35063() : CreatureScript("npc_kezan_citizen_35063") { }
+    npc_kezan_citizen_35063() : CreatureScript("npc_kezan_citizen_35063_35075") { }
 
     struct npc_kezan_citizen_35063AI : public ScriptedAI
     {
@@ -3253,13 +3349,15 @@ public:
 
         void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
-            if (spell->Id == SPELL_HOT_ROD_KNOCKBACK)
-                if (Player* player = caster->ToPlayer())
-                {
-                    Talk(0, player);
-                    m_talkCoolDown = true;
-                    m_events.ScheduleEvent(EVENT_TALK_COOLDOWN, 20000);
-                }
+            if (!m_talkCoolDown)
+                if (spell->Id == SPELL_HOT_ROD_KNOCKBACK_1 || spell->Id == SPELL_HOT_ROD_KNOCKBACK_2)
+                    if (Player* player = GetPlayer(caster))
+                    {
+                        Talk(0, player); // 1411, 18500 (5)
+                        m_talkCoolDown = true;
+                        m_events.ScheduleEvent(EVENT_TALK_COOLDOWN, 20000);
+                        m_events.ScheduleEvent(EVENT_MOVE_HOME, 10000);
+                    }
         }
 
         void UpdateAI(uint32 diff) override
@@ -3275,6 +3373,11 @@ public:
                     m_talkCoolDown = false;
                     break;
                 }
+                case EVENT_MOVE_HOME:
+                {
+                    me->GetMotionMaster()->MoveTargetedHome();
+                    break;
+                }
                 }
             }
 
@@ -3282,6 +3385,17 @@ public:
                 return;
             else
                 DoMeleeAttackIfReady();
+        }
+
+        Player* GetPlayer(Unit* caster)
+        {
+            if (Player* player = caster->ToPlayer())
+                return player;
+            else if (Vehicle* hot = caster->GetVehicleKit())
+                if (Unit* pass = hot->GetPassenger(0))
+                    if (Player* player = pass->ToPlayer())
+                        return player;
+            return nullptr;
         }
     };
 
@@ -3501,6 +3615,93 @@ public:
     CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_first_bank_of_kezan_vault_35486AI(creature);
+    }
+};
+
+// 35200
+class npc_pirate_party_crasher_35200 : public CreatureScript
+{
+public:
+    npc_pirate_party_crasher_35200() : CreatureScript("npc_pirate_party_crasher_35200") { }
+
+    struct npc_pirate_party_crasher_35200AI : public ScriptedAI
+    {
+        npc_pirate_party_crasher_35200AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap m_events;
+        bool m_castCooldown;
+
+        void Reset()
+        {
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+            m_castCooldown = false;
+        }
+
+        void DamageTaken(Unit* attacker, uint32& damage) override
+        {
+            if (!m_castCooldown)
+            {
+                m_castCooldown = true;
+                m_events.ScheduleEvent(EVENT_CAST_COOLDOWN, urand(11000, 17800));
+                me->CastSpell(attacker, 75361);
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_CAST_COOLDOWN:
+                    m_castCooldown = false;
+                    break;
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_pirate_party_crasher_35200AI(creature);
+    }
+};
+
+// 35202
+class npc_kezan_partygoer_35202 : public CreatureScript
+{
+public:
+    npc_kezan_partygoer_35202() : CreatureScript("npc_kezan_partygoer_35202") { }
+
+    struct npc_kezan_partygoer_35202AI : public ScriptedAI
+    {
+        npc_kezan_partygoer_35202AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap m_events;
+        bool m_castCooldown;
+
+        void Reset()
+        {
+            me->SetReactState(REACT_PASSIVE);
+        }
+
+        void DamageTaken(Unit* attacker, uint32& damage) override
+        {
+            if (attacker->GetEntry() == 35200)
+                me->SetReactState(REACT_AGGRESSIVE);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_kezan_partygoer_35202AI(creature);
     }
 };
 
@@ -3826,6 +4027,73 @@ public:
     }
 };
 
+// 70330
+class spell_knock_back_70330 : public SpellScriptLoader
+{
+public:
+    spell_knock_back_70330() : SpellScriptLoader("spell_knock_back_70330") { }
+
+    class IsNotInEntryList
+    {
+    public:
+        explicit IsNotInEntryList(std::list<uint32>entrys) : _entrys(entrys) { }
+
+        bool operator()(WorldObject* obj) const
+        {
+            if (Creature* target = obj->ToCreature())
+                for (std::list<uint32>::const_iterator itr = _entrys.begin(); itr != _entrys.end(); ++itr)
+                    if (target->GetEntry() == *itr)
+                        return false;
+
+            return true;
+        }
+
+    private:
+        std::list<uint32> _entrys;
+    };
+
+    class TargetNotInRangeCheck
+    {
+    public:
+        explicit TargetNotInRangeCheck(Unit* _caster) : caster(_caster) { }
+
+        bool operator() (WorldObject* unit)
+        {
+            if (unit->GetPosition().GetExactDist(&caster->GetPosition()) < 5.0f)
+                return false;
+
+            return true;
+        }
+        Unit* caster;
+    };
+
+    class spell_knock_back_70330_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_knock_back_70330_SpellScript);
+
+        void FilterTargets(std::list<WorldObject*>& targets)
+        {
+            std::list<uint32>entrys;
+            entrys.push_back(NPC_HOT_ROD_34840); // wrong.. shold only be: 37676
+            entrys.push_back(NPC_HIRED_LOOTER_35234);
+            entrys.push_back(NPC_KEZAN_CITIZEN_35063);
+            entrys.push_back(NPC_KEZAN_CITIZEN_35075);
+            targets.remove_if(IsNotInEntryList(entrys));
+            targets.remove_if(TargetNotInRangeCheck(GetCaster()));
+        }
+
+        void Register() override
+        {
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_knock_back_70330_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_CONE_ENTRY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_knock_back_70330_SpellScript();
+    }
+};
+
 // 35222
 class npc_trade_prince_gallywix_35222 : public CreatureScript
 {
@@ -3868,10 +4136,11 @@ void AddSC_zone_kezan()
     new at_kezan_ace_5497();
     new at_kezan_gobber_5498();
     new at_kezan_izzy_5499();
-    new npc_rod_hot_34840();
+    new npc_hot_rod_34840();
     new npc_ace_34957();
     new npc_gobber_34958();
     new npc_izzy_34959();
+    new npc_fbok_bank_teller_35120();
     new go_disco_ball_201591();
     new npc_tunneling_worm_34865();
     new npc_warrior_matic_nx__34697();
@@ -3889,13 +4158,16 @@ void AddSC_zone_kezan()
     new npc_elm_general_purpose_bunny_large_24110();
     new go_kajamite_deposit_195488();
     new npc_kezan_partygoer_35175_86();
-    // new npc_hired_looter_35234();
-    // new npc_kezan_citizen_35063();
+    new npc_hired_looter_35234();
+    new npc_kezan_citizen_35063();
     new npc_first_bank_of_kezan_vault_35486();
+    new npc_pirate_party_crasher_35200();
+    new npc_kezan_partygoer_35202();
     new npc_gasbot_37598();
     new go_447_fire_201745();
     new go_gasbot_control_panel_201736();
     new npc_hot_rod_37676();
+    new spell_knock_back_70330();
     new npc_trade_prince_gallywix_35222();
 
 }
