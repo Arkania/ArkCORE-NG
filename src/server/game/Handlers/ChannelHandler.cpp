@@ -53,8 +53,10 @@ void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
     if (channelName.empty())
         return;
 
-    if (isdigit(channelName[0]))
-        return;
+    // the std::string channelName[0] are stored as signed byte value. function isdigit allow only ASCII and crash with negativ values.. (chinese letters have such neg. values..)
+    if (channelName[0] >= 0)
+        if (isdigit(channelName[0]))
+            return;
 
     if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeam()))
     {
