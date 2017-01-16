@@ -153,14 +153,17 @@ enum QuestFlags
     QUEST_FLAGS_DISPLAY_ITEM_IN_TRACKER = 0x00020000,   // Displays usable item in quest tracker
     QUEST_FLAGS_OBJ_TEXT                = 0x00040000,   // use Objective text as Complete text
     QUEST_FLAGS_AUTO_ACCEPT             = 0x00080000,   // The client recognizes this flag as auto-accept. However, NONE of the current quests (3.3.5a) have this flag. Maybe blizz used to use it, or will use it in the future.
-    QUEST_FLAGS_AUTO_SUBMIT             = 0x00100000,   // Quests with this flag player submit automatically by special button in player gui
-    QUEST_FLAGS_AUTO_TAKE               = 0x00200000,   // Automatically suggestion of accepting quest. Not from npc. Player cast reward spell on complete
-    QUEST_FLAGS_UNK22                   = 0x00400000,
-    QUEST_FLAGS_PORTRAIT                = 0x00800000,   // Found in quest 14069, Portrait in quest log
-    QUEST_FLAGS_UNK24                   = 0x01000000,   // 
+    QUEST_FLAGS_AUTO_SUBMIT             = 0x00100000,   // (WPP: PlayerCastOnAccept) Quests with this flag player submit automatically by special button in player gui
+    QUEST_FLAGS_AUTO_TAKE               = 0x00200000,   // (WPP: PlayerCastOnComplete) Automatically suggestion of accepting quest. Not from npc. Player cast reward spell on complete
+    QUEST_FLAGS_UPDATE_PHASE_SHIFT      = 0x00400000,   // (WPP: UpdatePhaseShift)
+    QUEST_FLAGS_SOR_WHITE_LIST          = 0x00800000,   // (WPP: SoRWhitelist) 
+    QUEST_FLAGS_LAUNCH_GOSSIP_COMPLETE  = 0x01000000,   // (WPP: LaunchGossipComplete)
     QUEST_FLAGS_UNK25                   = 0x02000000,   // 
     QUEST_FLAGS_UNK26                   = 0x04000000,   //    
-    // ... 4.x added flags up to 0x80000000 - all unknown for now
+    QUEST_FLAGS_PORTRAIT_IN_QUEST_LOG   = 0x08000000,   // (WPP: PortraitInQuestLog) Found in quest 14069, Portrait in quest log
+    QUEST_FLAGS_UNK28                   = 0x10000000,   //    
+    QUEST_FLAGS_UNK29                   = 0x20000000,   //    
+    QUEST_FLAGS_ITEMS_GLOW_WHEN_DONE    = 0x40000000,   // (WPP: ItemsGlowWhenDone) Found in quest 14126, last quest in kezan
 };
 
 enum QuestSpecialFlags
