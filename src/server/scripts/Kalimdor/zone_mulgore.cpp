@@ -428,7 +428,47 @@ public:
         return new npc_agitated_earth_spirit_36845AI(creature);
     }
 };
+//FIX THE QUEST 27066 MULGORE priest quest 
+enum eQuest27066
+{
+	NPC_WOUNDED_BRAVE = 45199,
+	SPELL_FLASH_HEAL_2061 = 2061,
+	NPC_KILLCREDIT = 44175,
+};
 
+class npc_wounded_brave : public CreatureScript
+{
+public:
+	npc_wounded_brave() : CreatureScript("npc_wounded_brave") { }
+
+	struct npc_wounded_braveAI : public ScriptedAI
+	{
+		npc_wounded_braveAI(Creature *c) : ScriptedAI(c) { }
+
+		void SpellHit(Unit* caster, SpellInfo const* spell)
+		{
+			if (Player* player = caster->ToPlayer())
+				if (spell->Id == SPELL_FLASH_HEAL_2061)
+				{
+					player->KilledMonsterCredit(NPC_KILLCREDIT, 0);
+					me->DespawnOrUnsummon();
+				}
+		}
+
+		void UpdateAI(uint32 diff) override
+		{
+			if (!UpdateVictim())
+				return;
+
+			DoMeleeAttackIfReady();
+		}
+	};
+
+	CreatureAI* GetAI(Creature* creature) const
+	{
+		return new npc_wounded_braveAI(creature);
+	}
+};
 
 void AddSC_mulgore()
 {
@@ -439,5 +479,6 @@ void AddSC_mulgore()
     new item_water_pitcher_50465();
     new npc_eagle_spirit_36790();
     new npc_agitated_earth_spirit_36845();
+    new npc_wounded_brave();
 
 }
