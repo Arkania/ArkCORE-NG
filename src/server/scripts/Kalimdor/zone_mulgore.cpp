@@ -428,6 +428,40 @@ public:
         return new npc_agitated_earth_spirit_36845AI(creature);
     }
 };
+//FIX THE QUEST 27066 MULGORE priest quest and druid quest 27067
+// 45199
+
+class npc_wounded_brave_45199 : public CreatureScript
+{
+public:
+	npc_wounded_brave_45199() : CreatureScript("npc_wounded_brave_45199") {}
+
+	enum eNpc
+	{
+		QUEST_A_REJUVENATING_TOUCH_27067 = 27067,
+		QUEST_FLASH_HEAL_27066 = 27066,
+		NPC_HEALING_CREDIT_44175 = 44175,
+	};
+
+	struct npc_wounded_brave_45199AI : public ScriptedAI
+	{
+		npc_wounded_brave_45199AI(Creature* creature) : ScriptedAI(creature) {}
+
+		void SpellHit(Unit* caster, SpellInfo const* spell) override
+		{
+			if (Player* player = caster->ToPlayer())
+				if (player->GetQuestStatus(QUEST_A_REJUVENATING_TOUCH_27067) == QUEST_STATUS_INCOMPLETE)
+					player->KilledMonsterCredit(NPC_HEALING_CREDIT_44175);
+				else if (player->GetQuestStatus(QUEST_FLASH_HEAL_27066) == QUEST_STATUS_INCOMPLETE)
+					player->KilledMonsterCredit(NPC_HEALING_CREDIT_44175);
+		}
+	};
+
+	CreatureAI* GetAI(Creature* creature) const
+	{
+		return new npc_wounded_brave_45199AI(creature);
+	}
+};
 
 
 void AddSC_mulgore()
@@ -439,5 +473,6 @@ void AddSC_mulgore()
     new item_water_pitcher_50465();
     new npc_eagle_spirit_36790();
     new npc_agitated_earth_spirit_36845();
+    new npc_wounded_brave_45199();
 
 }
