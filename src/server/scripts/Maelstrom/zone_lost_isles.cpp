@@ -3085,7 +3085,7 @@ public:
         return false;
     }
 
-    bool OnQuestComplete(Player* player, Creature* creature, Quest const* quest) 
+    bool OnQuestObjectiveComplete(Player* player, Creature* creature, Quest const* quest) 
     { 
         switch (quest->GetQuestId())
         {
@@ -3303,7 +3303,7 @@ public:
         return false;
     }
 
-    bool OnQuestComplete(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestObjectiveComplete(Player* player, Creature* creature, Quest const* quest)
     {
         switch (quest->GetQuestId())
         {

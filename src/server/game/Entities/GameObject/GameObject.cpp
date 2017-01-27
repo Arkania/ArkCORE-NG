@@ -945,6 +945,12 @@ bool GameObject::IsDestructibleBuilding() const
     return gInfo->type == GAMEOBJECT_TYPE_DESTRUCTIBLE_BUILDING;
 }
 
+bool GameObject::IsQuestGiver() const
+{
+    QuestRelationBounds qr = sObjectMgr->GetGOQuestRelationBounds(GetEntry());
+    return qr.first != qr.second;
+}
+
 Unit* GameObject::GetOwner() const
 {
     return ObjectAccessor::GetUnit(*this, GetOwnerGUID());

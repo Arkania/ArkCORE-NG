@@ -683,6 +683,17 @@ bool ScriptMgr::OnQuestAccept(Player* player, Item* item, Quest const* quest)
     return tmpscript->OnQuestAccept(player, item, quest);
 }
 
+bool ScriptMgr::OnQuestObjectiveComplete(Player* player, Item* item, Quest const* quest)
+{
+    ASSERT(player);
+    ASSERT(item);
+    ASSERT(quest);
+
+    GET_SCRIPT_RET(ItemScript, item->GetScriptId(), tmpscript, false);
+    player->PlayerTalkClass->ClearMenus();
+    return tmpscript->OnQuestObjectiveComplete(player, item, quest);
+}
+
 bool ScriptMgr::OnItemUse(Player* player, Item* item, SpellCastTargets const& targets)
 {
     ASSERT(player);
@@ -770,7 +781,7 @@ bool ScriptMgr::OnQuestSelect(Player* player, Creature* creature, Quest const* q
     return tmpscript->OnQuestSelect(player, creature, quest);
 }
 
-bool ScriptMgr::OnQuestComplete(Player* player, Creature* creature, Quest const* quest)
+bool ScriptMgr::OnQuestObjectiveComplete(Player* player, Creature* creature, Quest const* quest)
 {
     ASSERT(player);
     ASSERT(creature);
@@ -778,7 +789,7 @@ bool ScriptMgr::OnQuestComplete(Player* player, Creature* creature, Quest const*
 
     GET_SCRIPT_RET(CreatureScript, creature->GetScriptId(), tmpscript, false);
     player->PlayerTalkClass->ClearMenus();
-    return tmpscript->OnQuestComplete(player, creature, quest);
+    return tmpscript->OnQuestObjectiveComplete(player, creature, quest);
 }
 
 bool ScriptMgr::OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 opt)
@@ -864,6 +875,17 @@ bool ScriptMgr::OnQuestAccept(Player* player, GameObject* go, Quest const* quest
     GET_SCRIPT_RET(GameObjectScript, go->GetScriptId(), tmpscript, false);
     player->PlayerTalkClass->ClearMenus();
     return tmpscript->OnQuestAccept(player, go, quest);
+}
+
+bool ScriptMgr::OnQuestObjectiveComplete(Player* player, GameObject* go, Quest const* quest)
+{
+    ASSERT(player);
+    ASSERT(go);
+    ASSERT(quest);
+
+    GET_SCRIPT_RET(GameObjectScript, go->GetScriptId(), tmpscript, false);
+    player->PlayerTalkClass->ClearMenus();
+    return tmpscript->OnQuestObjectiveComplete(player, go, quest);
 }
 
 bool ScriptMgr::OnQuestReward(Player* player, GameObject* go, Quest const* quest, uint32 opt)

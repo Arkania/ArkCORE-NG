@@ -333,7 +333,7 @@ void PlayerMenu::SendQuestGiverQuestList(QEmote const& eEmote, const std::string
     data << uint32(eEmote._Emote);                         // NPC emote
 
     size_t count_pos = data.wpos();
-    data << uint8 (0);
+    data << uint8 (_questMenu.GetMenuItemCount());
     uint32 count = 0;
 
     // Store this instead of checking the Singleton every loop iteration
@@ -413,8 +413,9 @@ void PlayerMenu::SendQuestGiverQuestDetails(Quest const* quest, uint64 npcGUID, 
         AddQuestLevelToTitle(questTitle, quest->GetQuestLevel());
     
     uint8 ExtraQuestWindow = 0;
-    if (quest->HasFlag(QUEST_FLAGS_AUTO_ACCEPT) && !quest->HasSpecialFlag(QUEST_SPECIAL_FLAGS_AUTO_ACCEPT))
-        ExtraQuestWindow = 1;
+    if (!(quest->HasFlag(QUEST_FLAGS_AUTO_TAKE) || quest->HasFlag(QUEST_FLAGS_AUTO_SUBMIT)))
+        if (quest->HasFlag(QUEST_FLAGS_AUTO_ACCEPT) && !quest->HasSpecialFlag(QUEST_SPECIAL_FLAGS_AUTO_ACCEPT))
+            ExtraQuestWindow = 1;
 
     WorldPacket data(SMSG_QUESTGIVER_QUEST_DETAILS, 100);   // guess size
     data << uint64(npcGUID);

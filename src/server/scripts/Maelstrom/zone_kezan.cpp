@@ -836,9 +836,9 @@ public:
 
             while (uint32 eventId = m_events.ExecuteEvent())
             {
-                switch (eventId)
+               /* switch (eventId)
                 {
-                }
+                }*/
             }
 
             if (!UpdateVictim())
@@ -4008,10 +4008,9 @@ public:
 
             while (uint32 eventId = m_events.ExecuteEvent())
             {
-                switch (eventId)
+                /* switch (eventId)
                 {
-
-                }
+                }*/
             }
 
             if (!UpdateVictim())
