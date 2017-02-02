@@ -241,13 +241,14 @@ public:
             summoned->AI()->AttackStart(me);
         }
 
-        void sQuestAccept(Player* player, Quest const* quest)
+        bool sQuestAccept(Player* player, Quest const* quest)
         {
             if (quest->GetQuestId() == QUEST_ROAD_TO_FALCON_WATCH)
             {
                 me->setFaction(FACTION_FALCON_WATCH_QUEST);
                 npc_escortAI::Start(true, false, player->GetGUID());
             }
+            return false;
         }
 
         void WaypointReached(uint32 waypointId) override

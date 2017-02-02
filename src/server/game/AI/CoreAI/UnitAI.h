@@ -257,10 +257,10 @@ class UnitAI
         virtual void sGossipHello(Player* /*player*/) { }
         virtual void sGossipSelect(Player* /*player*/, uint32 /*sender*/, uint32 /*action*/) { }
         virtual void sGossipSelectCode(Player* /*player*/, uint32 /*sender*/, uint32 /*action*/, char const* /*code*/) { }
-        virtual void sQuestAccept(Player* /*player*/, Quest const* /*quest*/) { }
-        virtual void sQuestSelect(Player* /*player*/, Quest const* /*quest*/) { }
-        virtual void sQuestComplete(Player* /*player*/, Quest const* /*quest*/) { }
-        virtual void sQuestReward(Player* /*player*/, Quest const* /*quest*/, uint32 /*opt*/) { }
+        virtual bool sQuestAccept(Player* /*player*/, Quest const* /*quest*/) { return false; }
+        virtual bool sQuestSelect(Player* /*player*/, Quest const* /*quest*/) { return false; }
+        virtual bool sQuestObjectiveComplete(Player* /*player*/, Quest const* /*quest*/) { return false; }
+        virtual bool sQuestReward(Player* /*player*/, Quest const* /*quest*/, uint32 /*opt*/) { return false; }
         virtual bool sOnDummyEffect(Unit* /*caster*/, uint32 /*spellId*/, SpellEffIndex /*effIndex*/) { return false; }
         virtual void sOnGameEvent(bool /*start*/, uint16 /*eventId*/) { }
 

@@ -50,7 +50,9 @@ enum eKezanEnumerate
     QUEST_THE_NEW_YOU_F = 14109,
     QUEST_PIRATE_PARTY_CRASHERS = 14115,
     QUEST_ROBBING_HOODS = 14121,
+    QUEST_LEARNING_THE_WORD = 14009, 
     ITEMS_STACK_OF_MACAROONS = 47044,
+    ITEM_KEY_OF_HOT_ROD = 46856,
     NPC_CANDY_CANE = 35053,
     NPC_CHIP_ENDALE = 35054,
     NPC_HOT_ROD_34840 = 34840,
@@ -94,6 +96,8 @@ enum eKezanEnumerate
     SPELL_HOT_ROD_KNOCKBACK_2 = 70330,
     SPELL_CREATE_STOLEN_LOOT = 67041,
     SPELL_EARTHQUAKE_CAMERA_SHAKE = 96274,
+    SPELL_FLASH_HEAL_2061 = 2061,
+    SPELL_SUMMON_HOT_ROD_37676 = 70321,
     PLAYER_GUID = 99991,
     ACTION_ENTER_CAR = 101,
     ACTION_HELP_PLAYER,
@@ -113,6 +117,7 @@ enum eKezanEnumerate
     EVENT_OWNER_IS_ATTACKED,
     EVENT_PLAY_SOUND1,
     EVENT_PLAY_SOUND2,
+    EVENT_RANDOM_EMOTE,
     EVENT_CAST_SPELL,
     EVENT_EXIT_VEHICLE,
     EVENT_EARTHQUAKE,
@@ -291,6 +296,118 @@ public:
     }
 };
 
+// 37761 
+class npc_sally_salvager_sandscrew_37761 : public CreatureScript
+{
+public:
+    npc_sally_salvager_sandscrew_37761() : CreatureScript("npc_sally_salvager_sandscrew_37761") { }
+
+
+    struct npc_sally_salvager_sandscrew_37761AI : public ScriptedAI
+    {
+        npc_sally_salvager_sandscrew_37761AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap m_events;
+
+        void Reset() override
+        {
+            m_events.RescheduleEvent(EVENT_RANDOM_EMOTE, urand(5000, 10000));
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_RANDOM_EMOTE:
+                    me->HandleEmote(RAND(1, 5, 6, 25, 273, 274));
+                    m_events.ScheduleEvent(EVENT_RANDOM_EMOTE, urand(6000, 10000));
+                    break;
+                }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_sally_salvager_sandscrew_37761AI(creature);
+    }
+};
+
+// 37762  
+class npc_brett_coins_mcquid_37762 : public CreatureScript
+{
+public:
+    npc_brett_coins_mcquid_37762() : CreatureScript("npc_brett_coins_mcquid_37762") { }
+
+    struct npc_brett_coins_mcquid_37762AI : public ScriptedAI
+    {
+        npc_brett_coins_mcquid_37762AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap m_events;
+
+        void Reset() override
+        {
+            m_events.RescheduleEvent(EVENT_RANDOM_EMOTE, urand(5000, 10000));
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_RANDOM_EMOTE:
+                    me->HandleEmote(RAND(1, 5, 6, 25, 273, 274));
+                    m_events.ScheduleEvent(EVENT_RANDOM_EMOTE, urand(5000, 9000));
+                    break;
+                }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_brett_coins_mcquid_37762AI(creature);
+    }
+};
+
+// 48305 
+class npc_injured_employee_48305 : public CreatureScript
+{
+public:
+    npc_injured_employee_48305() : CreatureScript("npc_injured_employee_48305") { }
+
+    struct npc_injured_employee_48305AI : public ScriptedAI
+    {
+        npc_injured_employee_48305AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap m_events;
+
+        // Called when hit by a spell
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
+        {
+            if (Player* player = caster->ToPlayer())
+                if (player->GetQuestStatus(QUEST_LEARNING_THE_WORD) == QUEST_STATUS_INCOMPLETE)
+                    if (spell->Id == SPELL_FLASH_HEAL_2061)
+                    {
+                        player->KilledMonsterCredit(44175);
+                        me->DespawnOrUnsummon(500);
+                    }
+        }
+};
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_injured_employee_48305AI(creature);
+    }
+};
+
 // 37804
 class npc_kaja_cola_balloon_37804 : public CreatureScript
 {
@@ -453,8 +570,8 @@ public:
                 {
                     if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
                     {
-                        player->DestroyItemCount(46856, 1, true);
-                        player->CastSpell(player, 70321, true);                        
+                        player->DestroyItemCount(ITEM_KEY_OF_HOT_ROD, 1, true);
+                        player->CastSpell(player, SPELL_SUMMON_HOT_ROD_37676, true);  // Summon the Hot Rod 37676, trigger spell 66724 Sassy fährt
                     }
                     break;
                 }
@@ -726,6 +843,15 @@ public:
     {
         BROADCASTTEXT_USE_KEY_FOR_HOT_RED = 48504,
     };
+
+    bool OnGossipSelect(Player* player, Creature* /*creature*/, uint32 sender, uint32 action) 
+    { 
+        uint32 amount = player->GetItemCount(ITEM_KEY_OF_HOT_ROD);
+        if (player->GetQuestStatus(QUEST_ROLLING_WITH_MY_HOMIES) == QUEST_STATUS_REWARDED)
+            if (!amount)
+                player->AddItem(ITEM_KEY_OF_HOT_ROD, 1);
+        return false; 
+    }
 
     bool OnQuestAccept(Player* player, Creature* /*creature*/, Quest const* quest)
     {
@@ -1090,7 +1216,9 @@ public:
         EVENT_IZZY_ENTER_THE_CAR = 901,
         EVENT_GOBBER_ENTER_THE_CAR,
         EVENT_ACE_ENTER_THE_CAR,
-        EVENT_GOBBER_COOLDOWN,
+        EVENT_GOBBER_EMOTE,
+        EVENT_IZZY_EMOTE,
+        EVENT_ACE_EMOTE,
     };
 
     class IfNotInRange
@@ -1126,7 +1254,6 @@ public:
         uint64   m_izzyGUID;
         uint64   m_gobberGUID;
         uint64   m_aceGUID;
-        bool     m_gobberEmoteCD;
 
         void Reset() override
         {
@@ -1134,7 +1261,6 @@ public:
             m_izzyGUID = 0;
             m_gobberGUID = 0;
             m_aceGUID = 0;
-            m_gobberEmoteCD = false;
             m_events.RescheduleEvent (EVENT_CHECK_FOR_CREATURE, 1000);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
         }
@@ -1206,22 +1332,40 @@ public:
                 else if (Creature* npc = unit->ToCreature())
                 {
                     unit->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                    npc->SetReactState(REACT_PASSIVE);
                     if (!m_izzyGUID)
                         if (npc->GetEntry() == NPC_IZZY_34959)
+                        {
                             m_izzyGUID = npc->GetGUID();
+                            m_events.RescheduleEvent(EVENT_IZZY_EMOTE, urand(2000, 10000));
+                        }
                     if (!m_gobberGUID)
                         if (npc->GetEntry() == NPC_GOBBER_34958)
+                        {
                             m_gobberGUID = npc->GetGUID();
+                            m_events.RescheduleEvent(EVENT_GOBBER_EMOTE, urand(2000, 10000));
+                        }
                     if (!m_aceGUID)
                         if (npc->GetEntry() == NPC_ACE_34957)
+                        {
                             m_aceGUID = npc->GetGUID();
+                            m_events.RescheduleEvent(EVENT_ACE_EMOTE, urand(2000, 10000));
+                        }
                 }
             }
             else
-                unit->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+            {
+                if (Creature* npc = unit->ToCreature())
+                {
+                    npc->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                    npc->SetReactState(REACT_DEFENSIVE);
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        npc->GetMotionMaster()->MoveChase(player, frand(3.0f, 5.0f), frand(2.0f, 4.2f));
+                }
+            }
         }
 
-        void EnterCombat(Unit* /*who*/) override  {  }
+       // void EnterCombat(Unit* /*who*/) override  {  }
 
         void UpdateAI(uint32 diff) override
         {
@@ -1271,9 +1415,25 @@ public:
                     }
                     break;
                 }
-                case EVENT_GOBBER_COOLDOWN:
+                case EVENT_IZZY_EMOTE:
                 {
-                    m_gobberEmoteCD = false;
+                    if (Creature* npc = ObjectAccessor::GetCreature(*me, m_izzyGUID))
+                        npc->HandleEmote(RAND(1, 5, 6, 11, 25, 273, 274));
+                    m_events.ScheduleEvent(EVENT_IZZY_EMOTE, urand(6000, 11000));
+                    break;
+                }
+                case EVENT_GOBBER_EMOTE:
+                {
+                    if (Creature* npc = ObjectAccessor::GetCreature(*me, m_gobberGUID))
+                        npc->HandleEmote(RAND(1, 3, 11, 15, 20, 94, 440, 463));
+                    m_events.ScheduleEvent(EVENT_GOBBER_EMOTE, urand(8000, 13000));
+                    break;
+                }
+                case EVENT_ACE_EMOTE:
+                {
+                    if (Creature* npc = ObjectAccessor::GetCreature(*me, m_aceGUID))
+                        npc->HandleEmote(RAND(1, 5, 6, 11, 25, 273, 274));
+                    m_events.ScheduleEvent(EVENT_ACE_EMOTE, urand(7000, 12000));
                     break;
                 }
                 case EVENT_CHECK_FOR_CREATURE:
@@ -1284,17 +1444,16 @@ public:
                         for (auto npc : cList)
                             player->CastSpell(npc, SPELL_HOT_ROD_KNOCKBACK_1);
 
-                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
-                        if (player->GetQuestStatus(QUEST_ROBBING_HOODS) == QUEST_STATUS_INCOMPLETE)
-                        {
-                            m_events.ScheduleEvent(EVENT_CHECK_FOR_CREATURE, 500);
-                            break;
-                        }
-                    m_events.ScheduleEvent(EVENT_CHECK_FOR_CREATURE, 1000);
+                    m_events.ScheduleEvent(EVENT_CHECK_FOR_CREATURE, 250);
                     break;
                 }
                 }
             }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
         }
     };
 
@@ -1329,10 +1488,7 @@ public:
 
         void Reset() override
         {
-            m_targetGUID = 0;
-            me->setFaction(2204); 
-            me->SetReactState(REACT_DEFENSIVE);
-            me->GetMotionMaster()->MoveIdle();
+
         }
 
         void IsSummonedBy(Unit* summoner) override
@@ -1354,9 +1510,6 @@ public:
             if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
                 if (urand(0, 100) < 60)
                     Talk(0, player);
-            //me->SetReactState(REACT_AGGRESSIVE);            
-            me->GetMotionMaster()->Clear();
-            me->GetMotionMaster()->MoveChase(victim, 2.0f);
             m_targetGUID = victim->GetGUID();
         }
 
@@ -1393,6 +1546,12 @@ public:
                 m_events.ScheduleEvent(EVENT_ENTER_CAR, 500);
                 break;
             }
+        }
+
+        void EnterEvadeMode() override
+        {
+            if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                me->GetMotionMaster()->MoveChase(player, frand(3.0f, 5.0f), frand(2.0f, 4.2f));
         }
 
         void UpdateAI(uint32 diff) override
@@ -1454,10 +1613,7 @@ public:
 
         void Reset() override
         {
-            m_targetGUID = 0;
-            me->setFaction(2204);
-            me->SetReactState(REACT_DEFENSIVE);
-            me->GetMotionMaster()->MoveIdle();
+
         }
 
         void IsSummonedBy(Unit* summoner) override
@@ -1476,10 +1632,9 @@ public:
 
         void EnterCombat(Unit* victim) override
         {
-            me->GetMotionMaster()->Clear();
-            me->GetMotionMaster()->MoveChase(victim, 2.0f);
             m_targetGUID = victim->GetGUID();
         }
+
         void SetGUID(uint64 guid, int32 id) override
         {
             switch (id)
@@ -1513,6 +1668,12 @@ public:
                 m_events.ScheduleEvent(EVENT_ENTER_CAR, 500);
                 break;
             }
+        }
+
+        void EnterEvadeMode() override
+        {
+            if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                me->GetMotionMaster()->MoveChase(player, frand(3.0f, 5.0f), frand(2.0f, 4.2f));
         }
 
         void UpdateAI(uint32 diff) override
@@ -1573,10 +1734,7 @@ public:
 
         void Reset() override
         {
-            m_targetGUID = 0;
-            me->setFaction(2204);
-            me->SetReactState(REACT_DEFENSIVE);
-            me->GetMotionMaster()->MoveIdle();
+
         }
 
         void IsSummonedBy(Unit* summoner) override
@@ -1598,9 +1756,6 @@ public:
             if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
                 if (urand(0, 100) < 60)
                     Talk(0, player);
-            //me->SetReactState(REACT_AGGRESSIVE);
-            me->GetMotionMaster()->Clear();
-            me->GetMotionMaster()->MoveChase(victim, 2.0f);
             m_targetGUID = victim->GetGUID();
         }
 
@@ -1637,6 +1792,12 @@ public:
                 m_events.ScheduleEvent(EVENT_ENTER_CAR, 500);
                 break;
             }
+        }
+
+        void EnterEvadeMode() override 
+        { 
+            if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                me->GetMotionMaster()->MoveChase(player, frand(3.0f, 5.0f), frand(2.0f, 4.2f));
         }
 
         void UpdateAI(uint32 diff) override
@@ -2288,9 +2449,14 @@ public:
     {
         switch (quest->GetQuestId())
         {
+        case QUEST_NECCASSARY_ROUGHNESS:
+        {
+            player->ExitVehicle();
+            player->AddAura(SPELL_INVISIBILITY_DETECTION_4, player);
+            return true;
+        }
         case QUEST_REPORT_FOR_TRYOUTS:
         case QUEST_THE_REPLACEMENTS:
-        case QUEST_NECCASSARY_ROUGHNESS:
         case QUEST_FOURTH_AND_GOAL:
             player->AddAura(SPELL_INVISIBILITY_DETECTION_4, player);
             break;
@@ -2325,7 +2491,6 @@ public:
         {
             m_playerGUID = 0;
             me->AddAura(SPELL_QUEST_INVISIBILITY_5, me);
-            me->SetOrientation(3.14f);
         }
 
         void JustSummoned(Creature* summon) override
@@ -2343,6 +2508,7 @@ public:
             {
                 if (Player* player = unit->ToPlayer())
                 {
+                    me->SetOrientation(3.14f);
                     m_playerGUID = player->GetGUID();
                     player->RemoveAura(SPELL_INVISIBILITY_DETECTION_4);
                     player->AddAura(SPELL_INVISIBILITY_DETECTION_5, player);
@@ -4001,23 +4167,6 @@ public:
                     break;
                 }
         }
-
-        void UpdateAI(uint32 diff) override
-        {
-            m_events.Update(diff);
-
-            while (uint32 eventId = m_events.ExecuteEvent())
-            {
-                /* switch (eventId)
-                {
-                }*/
-            }
-
-            if (!UpdateVictim())
-                return;
-            else
-                DoMeleeAttackIfReady();
-        }
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -4120,6 +4269,9 @@ void AddSC_zone_kezan()
 {
     new npc_fizz_lighter_34689();
     new npc_evol_fingers_34696();
+    new npc_sally_salvager_sandscrew_37761();
+    new npc_brett_coins_mcquid_37762();
+    new npc_injured_employee_48305();
     new npc_kaja_cola_balloon_37804();
     new npc_sassy_hardwrench_34668();
     new npc_foreman_dampwick_34872();

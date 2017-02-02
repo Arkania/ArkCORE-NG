@@ -75,7 +75,7 @@ public:
             summoned->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
         }
 
-        void sQuestAccept(Player* player, Quest const* quest)
+        bool sQuestAccept(Player* player, Quest const* quest)
         {
             if (quest->GetQuestId() == QUEST_RESQUE_OOX_09)
             {
@@ -84,6 +84,7 @@ public:
                 Talk(SAY_OOX_START, player);
                 npc_escortAI::Start(false, false, player->GetGUID(), quest);
             }
+            return false;
         }
 
         void WaypointReached(uint32 waypointId)

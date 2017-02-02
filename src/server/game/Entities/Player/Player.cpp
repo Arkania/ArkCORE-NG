@@ -16485,7 +16485,7 @@ bool Player::CanCompleteRepeatableQuest(Quest const* quest)
 bool Player::CanRewardQuest(Quest const* quest, bool msg)
 {
     // not auto complete quest and not completed quest (only cheating case, then ignore without message)
-    if (!quest->IsDFQuest() && !quest->IsAutoComplete() && !(quest->GetFlags() & QUEST_FLAGS_AUTO_COMPLETE) && GetQuestStatus(quest->GetQuestId()) != QUEST_STATUS_COMPLETE)
+    if (!quest->IsDFQuest() && !quest->IsAutoComplete() && GetQuestStatus(quest->GetQuestId()) != QUEST_STATUS_COMPLETE)
         return false;
 
     // daily quest can't be rewarded (25 daily quest already completed)
@@ -16529,46 +16529,23 @@ void Player::AddQuestAndCheckCompletion(Quest const* quest, Object* questGiver)
     if (CanCompleteQuest(quest->GetQuestId()))
         CompleteQuest(quest->GetQuestId());
 
-    if (!questGiver)
-        return;
-
-    switch (questGiver->GetTypeId())
-    {
-    case TYPEID_UNIT:
-        sScriptMgr->OnQuestAccept(this, questGiver->ToCreature(), quest);
-        questGiver->ToCreature()->AI()->sQuestAccept(this, quest);
-        break;
-    case TYPEID_ITEM:
-    case TYPEID_CONTAINER:
-    {
-        Item* item = (Item*)questGiver;
-        sScriptMgr->OnQuestAccept(this, item, quest);
-
-        // destroy not required for quest finish quest starting item
-        bool destroyItem = true;
-        for (int i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; ++i)
+    if (questGiver)
+        if (Item* item = questGiver->ToItem())
         {
-            if (quest->RequiredItemId[i] == item->GetEntry() && item->GetTemplate()->MaxCount > 0)
+            // destroy not required for quest finish quest starting item
+            bool destroyItem = true;
+            for (int i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; ++i)
             {
-                destroyItem = false;
-                break;
+                if (quest->RequiredItemId[i] == item->GetEntry() && item->GetTemplate()->MaxCount > 0)
+                {
+                    destroyItem = false;
+                    break;
+                }
             }
+
+            if (destroyItem)
+                DestroyItem(item->GetBagSlot(), item->GetSlot(), true);
         }
-
-        if (destroyItem)
-            DestroyItem(item->GetBagSlot(), item->GetSlot(), true);
-
-        break;
-    }
-    case TYPEID_GAMEOBJECT:
-
-        sScriptMgr->OnQuestAccept(this, questGiver->ToGameObject(), quest);
-        questGiver->ToGameObject()->AI()->QuestAccept(this, quest);
-
-        break;
-    default:
-        break;
-    }
 }
 
 bool Player::CanRewardQuest(Quest const* quest, uint32 reward, bool msg)
@@ -16680,27 +16657,53 @@ void Player::AddQuest(Quest const* quest, Object* questGiver)
 
     StartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_QUEST, quest_id);
 
+    InformQuestGiverAccept(quest, questGiver);
+
     SendQuestUpdate(quest_id);
 }
 
-void Player::CompleteQuest(uint32 quest_id, Object* questGiver)
+void Player::CompleteQuest(uint32 quest_id)
 {
     if (quest_id)
-    {
-        SetQuestStatus(quest_id, QUEST_STATUS_COMPLETE);
-
-        uint16 log_slot = FindQuestSlot(quest_id);
-        if (log_slot < MAX_QUEST_LOG_SIZE)
-            SetQuestSlotState(log_slot, QUEST_STATE_COMPLETE);
-
         if (Quest const* qInfo = sObjectMgr->GetQuestTemplate(quest_id))
         {
+            SetQuestStatus(quest_id, QUEST_STATUS_COMPLETE);
+
+            uint16 log_slot = FindQuestSlot(quest_id);
+            if (log_slot < MAX_QUEST_LOG_SIZE)
+                SetQuestSlotState(log_slot, QUEST_STATE_COMPLETE);
+
+            uint64 guid = GetQuestGiverGUID(quest_id);
+            if (guid != GetGUID())
+                printf("");
+
+            Object* questGiver = ObjectAccessor::GetObjectByTypeMask(*this, guid, TYPEMASK_UNIT | TYPEMASK_GAMEOBJECT | TYPEMASK_ITEM);
+            InformQuestGiverObjectiveComplete(qInfo, questGiver);
+
             if (qInfo->HasFlag(QUEST_FLAGS_AUTO_REWARDED))
+            {
                 RewardQuest(qInfo, 0, this, false);
+                
+                if (!InformQuestGiverReward(qInfo, questGiver, 0))
+                {
+                    if (Quest const* nextQuest = GetNextQuest(guid, qInfo))
+                    {
+                        if (CanAddQuest(nextQuest, true) && CanTakeQuest(nextQuest, true, true) && (nextQuest->HasFlag(QUEST_FLAGS_AUTO_SUBMIT) || nextQuest->HasFlag(QUEST_FLAGS_AUTO_TAKE)))
+                        {
+                            if (nextQuest->IsAutoAccept())
+                            {
+                                AddQuest(nextQuest, this);
+                                if (CanCompleteQuest(nextQuest->GetQuestId()))
+                                    CompleteQuest(nextQuest->GetQuestId());
+                            }
+                            PlayerTalkClass->SendQuestGiverQuestDetails(nextQuest, GetGUID(), true);
+                        }
+                    }
+                }
+            }
             else
                 SendQuestComplete(qInfo);
         }
-    }
 }
 
 void Player::IncompleteQuest(uint32 quest_id)
@@ -17541,6 +17544,8 @@ void Player::SetQuestStatus(uint32 questId, QuestStatus status, bool update /*= 
 
     if (update)
         SendQuestUpdate(questId);
+
+    sScriptMgr->OnQuestStatusChange(this, questId, status);
 }
 
 
@@ -18482,6 +18487,120 @@ bool Player::HasPvPForcingQuest() const
             return true;
     }
 
+    return false;
+}
+
+uint64 Player::GetQuestGiverGUID(uint32 quest_id)
+{
+    std::map<uint32, uint64>::iterator it = _questGiverList.find(quest_id);
+    return it != _questGiverList.end() ? it->second : 0;
+}
+
+void Player::AddQuestGiverQuest(uint32 quest_id, uint64 guid)
+{
+    _questGiverList[quest_id] = guid;
+}
+
+bool Player::InformQuestGiverAccept(Quest const* quest, Object* questGiver)
+{
+    if (!questGiver)
+    {
+        uint64 guid = GetQuestGiverGUID(quest->GetQuestId());
+        questGiver = ObjectAccessor::GetWorldObject(*this, guid);
+    }
+
+    bool r = false;
+    if (questGiver)
+        if (Creature* creature = questGiver->ToCreature())
+        {
+            r = sScriptMgr->OnQuestAccept(this, creature, quest);
+            r |= creature->AI()->sQuestAccept(this, quest);
+        }
+        else if (GameObject* go = questGiver->ToGameObject())
+        {
+            r = sScriptMgr->OnQuestAccept(this, go, quest);
+            r |= go->AI()->QuestAccept(this, quest);
+        }
+        else if (Item* item = questGiver->ToItem())
+            r = sScriptMgr->OnQuestAccept(this, item, quest);
+
+    return r;
+}
+
+bool Player::InformQuestGiverSelect(Quest const* quest, Object* questGiver)
+{
+    if (!questGiver)
+    {
+        uint64 guid = GetQuestGiverGUID(quest->GetQuestId());
+        questGiver = ObjectAccessor::GetWorldObject(*this, guid);
+    }
+
+    bool r = false;
+    if (questGiver)
+        if (Creature* creature = questGiver->ToCreature())
+        {
+            r = sScriptMgr->OnQuestSelect(this, creature, quest);
+            r |= creature->AI()->sQuestSelect(this, quest);
+        }
+
+    return r;
+}
+
+bool Player::InformQuestGiverObjectiveComplete(Quest const* quest, Object* questGiver)
+{
+    if (!questGiver)
+    {
+        uint64 guid = GetQuestGiverGUID(quest->GetQuestId());
+        questGiver = ObjectAccessor::GetWorldObject(*this, guid);
+    }
+
+    bool r = false;
+    if (questGiver)
+        if (Creature* creature = questGiver->ToCreature())
+        {
+            r = sScriptMgr->OnQuestObjectiveComplete(this, creature, quest);
+            r |= creature->AI()->sQuestObjectiveComplete(this, quest);
+        }
+        else if (GameObject* go = questGiver->ToGameObject())
+        {
+            r = sScriptMgr->OnQuestObjectiveComplete(this, go, quest);
+            r |= go->AI()->QuestObjectiveComplete(this, quest);
+        }
+        else if (Item* item = questGiver->ToItem())
+            r = sScriptMgr->OnQuestObjectiveComplete(this, item, quest);
+
+    return r;
+}
+
+bool Player::InformQuestGiverReward(Quest const* quest, Object* questGiver, uint32 opt)
+{
+    if (!questGiver || questGiver->GetTypeId() == TYPEID_PLAYER)
+    {
+        uint64 guid = GetQuestGiverGUID(quest->GetQuestId());
+        questGiver = ObjectAccessor::GetWorldObject(*this, guid);
+    }
+
+    bool r = false;
+    if (questGiver)
+        if (Creature* creature = questGiver->ToCreature())
+        {
+            r = sScriptMgr->OnQuestReward(this, creature, quest, opt);
+            r |= creature->AI()->sQuestReward(this, quest, opt);
+        }
+        else if (GameObject* go = questGiver->ToGameObject())
+        {
+            r = sScriptMgr->OnQuestReward(this, go, quest, opt);
+            r |= go->AI()->QuestReward(this, quest, opt);
+        }
+        else if (Item* item = questGiver->ToItem())
+            r |= sScriptMgr->OnQuestReward(this, item, quest, opt);
+
+    return r;
+}
+
+bool Player::InformQuestGiverCancel(Quest const* quest, Object* questGiver)
+{
+    /* ToDo */
     return false;
 }
 

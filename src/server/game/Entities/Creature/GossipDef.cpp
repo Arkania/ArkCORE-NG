@@ -782,3 +782,5 @@ void PlayerMenu::AddQuestLevelToTitle(std::string &title, int32 level)
     questTitlePretty << "[" << level << "] " << title;
     title = questTitlePretty.str();
 }
+
+

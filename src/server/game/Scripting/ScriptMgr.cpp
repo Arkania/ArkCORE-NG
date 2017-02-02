@@ -674,10 +674,11 @@ bool ScriptMgr::OnDummyEffect(Unit* caster, uint32 spellId, SpellEffIndex effInd
 
 bool ScriptMgr::OnQuestAccept(Player* player, Item* item, Quest const* quest)
 {
-    ASSERT(player);
+    ASSERT(player); 
     ASSERT(item);
     ASSERT(quest);
 
+    player->AddQuestGiverQuest(quest->GetQuestId(), item->GetGUID());
     GET_SCRIPT_RET(ItemScript, item->GetScriptId(), tmpscript, false);
     player->PlayerTalkClass->ClearMenus();
     return tmpscript->OnQuestAccept(player, item, quest);
@@ -692,6 +693,17 @@ bool ScriptMgr::OnQuestObjectiveComplete(Player* player, Item* item, Quest const
     GET_SCRIPT_RET(ItemScript, item->GetScriptId(), tmpscript, false);
     player->PlayerTalkClass->ClearMenus();
     return tmpscript->OnQuestObjectiveComplete(player, item, quest);
+}
+
+bool ScriptMgr::OnQuestReward(Player* player, Item* item, Quest const* quest, uint32 opt)
+{
+    ASSERT(player); printf("ScriptMgr: OnQuestReward: item: %u quest: %u \n", item->GetEntry(), quest->GetQuestId());
+    ASSERT(item);
+    ASSERT(quest);
+
+    GET_SCRIPT_RET(ItemScript, item->GetScriptId(), tmpscript, false);
+    player->PlayerTalkClass->ClearMenus();
+    return tmpscript->OnQuestReward(player, item, quest, opt);
 }
 
 bool ScriptMgr::OnItemUse(Player* player, Item* item, SpellCastTargets const& targets)
@@ -761,10 +773,11 @@ bool ScriptMgr::OnGossipSelectCode(Player* player, Creature* creature, uint32 se
 
 bool ScriptMgr::OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
 {
-    ASSERT(player);
+    ASSERT(player); printf("ScriptMgr: OnQuestAccept: creature: %u (%s) quest: %u  \n", creature->GetEntry(), creature->GetName().c_str(),  quest->GetQuestId());
     ASSERT(creature);
     ASSERT(quest);
 
+    player->AddQuestGiverQuest(quest->GetQuestId(), creature->GetGUID());
     GET_SCRIPT_RET(CreatureScript, creature->GetScriptId(), tmpscript, false);
     player->PlayerTalkClass->ClearMenus();
     return tmpscript->OnQuestAccept(player, creature, quest);
@@ -772,7 +785,7 @@ bool ScriptMgr::OnQuestAccept(Player* player, Creature* creature, Quest const* q
 
 bool ScriptMgr::OnQuestSelect(Player* player, Creature* creature, Quest const* quest)
 {
-    ASSERT(player);
+    ASSERT(player); printf("ScriptMgr: OnQuestSelect: creature: %u (%s) quest: %u \n", creature->GetEntry(), creature->GetName().c_str(), quest->GetQuestId());
     ASSERT(creature);
     ASSERT(quest);
 
@@ -783,7 +796,7 @@ bool ScriptMgr::OnQuestSelect(Player* player, Creature* creature, Quest const* q
 
 bool ScriptMgr::OnQuestObjectiveComplete(Player* player, Creature* creature, Quest const* quest)
 {
-    ASSERT(player);
+    ASSERT(player); printf("ScriptMgr: OnQuestObjectiveComplete: creature: %u (%s) quest: %u \n", creature->GetEntry(), creature->GetName().c_str(), quest->GetQuestId());
     ASSERT(creature);
     ASSERT(quest);
 
@@ -794,7 +807,7 @@ bool ScriptMgr::OnQuestObjectiveComplete(Player* player, Creature* creature, Que
 
 bool ScriptMgr::OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 opt)
 {
-    ASSERT(player);
+    ASSERT(player); printf("ScriptMgr: OnQuestReward: creature: %u (%s) quest: %u \n", creature->GetEntry(), creature->GetName().c_str(), quest->GetQuestId());
     ASSERT(creature);
     ASSERT(quest);
 
@@ -872,6 +885,7 @@ bool ScriptMgr::OnQuestAccept(Player* player, GameObject* go, Quest const* quest
     ASSERT(go);
     ASSERT(quest);
 
+    player->AddQuestGiverQuest(quest->GetQuestId(), go->GetGUID());
     GET_SCRIPT_RET(GameObjectScript, go->GetScriptId(), tmpscript, false);
     player->PlayerTalkClass->ClearMenus();
     return tmpscript->OnQuestAccept(player, go, quest);
@@ -1312,6 +1326,11 @@ void ScriptMgr::OnPlayerBindToInstance(Player* player, Difficulty difficulty, ui
 void ScriptMgr::OnPlayerUpdateZone(Player* player, uint32 newZone, uint32 newArea)
 {
     FOREACH_SCRIPT(PlayerScript)->OnUpdateZone(player, newZone, newArea);
+}
+
+void ScriptMgr::OnQuestStatusChange(Player* player, uint32 questId, QuestStatus status)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnQuestStatusChange(player, questId, status);
 }
 
 // Guild

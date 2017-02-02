@@ -16057,11 +16057,7 @@ bool Unit::SetCharmedBy(Unit* charmer, CharmType type, AuraApplication const* au
         {
             // change AI to charmed AI on next Update tick
             NeedChangeAI = true;
-            if (IsAIEnabled)
-            {
-                IsAIEnabled = false;
-                player->GetAI()->OnCharmed(true);
-            }
+            IsAIEnabled = false;
         }
         player->SetClientControl(this, false);
     }

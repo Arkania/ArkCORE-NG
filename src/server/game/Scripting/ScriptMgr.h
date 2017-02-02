@@ -388,6 +388,9 @@ class ItemScript : public ScriptObject
         // Called when a player completes all quest-objectives with the item.
         virtual bool OnQuestObjectiveComplete(Player* /*player*/, Item* /*item*/, Quest const* /*quest*/) { return false; }
         
+        // Called when a player reward a quest from the item.
+        virtual bool OnQuestReward(Player* /*player*/, Item* /*item*/, Quest const* /*quest*/, uint32 /*opt*/) { return false; }
+
         // Called when a player uses the item.
         virtual bool OnUse(Player* /*player*/, Item* /*item*/, SpellCastTargets const& /*targets*/) { return false; }
 
@@ -777,6 +780,9 @@ class PlayerScript : public UnitScript
 
         // Called when a player changes to a new map (after moving to new map)
         virtual void OnMapChanged(Player* /*player*/) { }
+
+        // Called after a player's quest status has been changed
+        virtual void OnQuestStatusChange(Player* /*player*/, uint32 /*questId*/, QuestStatus /*status*/) { }
 };
 
 class GuildScript : public ScriptObject
@@ -933,6 +939,7 @@ class ScriptMgr
         bool OnDummyEffect(Unit* caster, uint32 spellId, SpellEffIndex effIndex, Item* target);
         bool OnQuestAccept(Player* player, Item* item, Quest const* quest);
         bool OnQuestObjectiveComplete(Player* player, Item* item, Quest const* quest);
+        bool OnQuestReward(Player* player, Item* item, Quest const* quest, uint32 opt);
         bool OnItemUse(Player* player, Item* item, SpellCastTargets const& targets);
         bool OnItemExpire(Player* player, ItemTemplate const* proto);
         bool OnItemRemove(Player* player, Item* item);
@@ -1055,6 +1062,7 @@ class ScriptMgr
         void OnPlayerSave(Player* player);
         void OnPlayerBindToInstance(Player* player, Difficulty difficulty, uint32 mapid, bool permanent);
         void OnPlayerUpdateZone(Player* player, uint32 newZone, uint32 newArea);
+        void OnQuestStatusChange(Player* player, uint32 questId, QuestStatus status);
 
     public: /* GuildScript */
 

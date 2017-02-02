@@ -85,16 +85,17 @@ public:
             Summons.DespawnAll();
         }
 
-        void sQuestReward(Player* /*player*/, Quest const* quest, uint32 /*opt*/) override
+        bool sQuestReward(Player* /*player*/, Quest const* quest, uint32 /*opt*/) override
         {
             if (quest->GetQuestId() == QUEST_CORRUPTED_SOIL)
             {
                 me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
                 events.ScheduleEvent(EVENT_TALK, 2000);
             }
+            return false;
         }
 
-        void sQuestAccept(Player* player, Quest const* quest) override
+        bool sQuestAccept(Player* player, Quest const* quest) override
         {
             if (quest->GetQuestId() == QUEST_UNEXPECTED_RESULT)
             {
@@ -103,6 +104,7 @@ public:
                 events.ScheduleEvent(EVENT_SUMMON, 1000);
                 PlayerGUID = player->GetGUID();
             }
+            return false;
         }
 
         void EnterCombat(Unit* /*who*/) override

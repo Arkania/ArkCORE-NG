@@ -347,13 +347,14 @@ public:
             Talk(SAY_AGGRO, who);
         }
 
-        void sQuestAccept(Player* player, Quest const* quest)
+        bool sQuestAccept(Player* player, Quest const* quest)
         {
             if (quest->GetQuestId() == QUEST_A_CRY_FOR_SAY_HELP)
             {
                 me->setFaction(FACTION_QUEST);
                 npc_escortAI::Start(true, false, player->GetGUID());
             }
+            return false;
         }
 
         void WaypointReached(uint32 waypointId) override

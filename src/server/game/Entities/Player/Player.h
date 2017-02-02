@@ -1549,7 +1549,7 @@ class Player : public Unit, public GridObject<Player>
         bool CanRewardQuest(Quest const* quest, uint32 reward, bool msg);
         void AddQuestAndCheckCompletion(Quest const* quest, Object* questGiver);
         void AddQuest(Quest const* quest, Object* questGiver);
-        void CompleteQuest(uint32 quest_id, Object* questGiver = nullptr);
+        void CompleteQuest(uint32 quest_id);
         void IncompleteQuest(uint32 quest_id);
         void RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, bool announce = true);
         void FailQuest(uint32 quest_id);
@@ -1652,6 +1652,14 @@ class Player : public Unit, public GridObject<Player>
         }
 
         bool HasPvPForcingQuest() const;
+
+        uint64 GetQuestGiverGUID(uint32 quest_id);
+        void AddQuestGiverQuest(uint32 quest_id, uint64 guid);
+        bool InformQuestGiverAccept(Quest const* quest, Object* questGiver);
+        bool InformQuestGiverSelect(Quest const* quest, Object* questGiver);
+        bool InformQuestGiverObjectiveComplete(Quest const* quest, Object* questGiver = nullptr);
+        bool InformQuestGiverReward(Quest const* quest, Object* questGiver, uint32 opt);
+        bool InformQuestGiverCancel(Quest const* quest, Object* questGiver);
 
         /*********************************************************/
         /***                   LOAD SYSTEM                     ***/
@@ -2681,6 +2689,10 @@ class Player : public Unit, public GridObject<Player>
 
         uint64 m_divider;
         uint32 m_ingametime;
+
+        // holds a list for all questgiver the player have started a quest. used for new AUTO_ACCEPT, AUTO_TAKE, AUTO_SUBMIT
+        // ToDo: store this table to database
+        std::map<uint32, uint64> _questGiverList;
 
         /*********************************************************/
         /***                   LOAD SYSTEM                     ***/
