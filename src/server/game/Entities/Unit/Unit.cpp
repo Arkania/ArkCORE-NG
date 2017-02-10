@@ -3176,7 +3176,7 @@ bool Unit::IsUnderWater() const
 
 void Unit::UpdateUnderwaterState(Map* m, float x, float y, float z)
 {
-    if (!IsPet() && !IsVehicle())
+    if (IsFlying() || (!IsPet() && !IsVehicle()))
         return;
 
     LiquidData liquid_status;
