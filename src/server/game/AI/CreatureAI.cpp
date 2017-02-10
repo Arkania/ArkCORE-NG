@@ -141,6 +141,11 @@ void CreatureAI::MoveInLineOfSight(Unit* who)
     //    me->GetMotionMaster()->MoveChase(who->GetVictim());
 }
 
+void CreatureAI::CreatureMoveInLineOfSight(Unit* who)
+{
+    TC_LOG_DEBUG("entities.unit", "Creature %u MoveInLineOfSight of %u.", who->GetEntry(), me->GetEntry());
+}
+
 void CreatureAI::EnterEvadeMode()
 {
     if (!_EnterEvadeMode())
