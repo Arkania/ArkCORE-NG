@@ -1921,7 +1921,29 @@ void Spell::EffectTriggerMissileSpell(SpellEffIndex effIndex)
 
 void Spell::EffectForceCast(SpellEffIndex effIndex)
 {
-    if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
+    if (effectHandleMode == SPELL_EFFECT_HANDLE_HIT)
+    {
+        if (m_originalCaster && m_caster && destTarget && destTarget->IsPositionValid())
+        {
+            uint32 triggered_spell_id = m_spellInfo->Effects[effIndex].TriggerSpell;
+
+            // normal case
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(triggered_spell_id);
+
+            if (!spellInfo)
+            {
+                TC_LOG_ERROR("spells", "Spell::EffectForceCast of spell %u: triggering unknown spell id %i", m_spellInfo->Id, triggered_spell_id);
+                return;
+            }
+
+            float x, y, z;
+            destTarget->GetPosition(x, y, z);
+            m_originalCaster->CastSpell(x, y, z, triggered_spell_id, true, NULL, NULL, m_originalCasterGUID);
+        }
+
+        return;
+    }
+    else if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
         return;
 
     if (!unitTarget)
@@ -3404,6 +3426,12 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
                                 break;
                             case 68287:
                                 pos = Position(602.79f, 2778.63f, 89.2229f, 1.0152f);
+                                break;
+                            case 68815:
+                                pos = Position(856.168f, 2751.02f, 118.867f, 2.395519f);
+                                break;
+                            case 68817:
+                                pos = Position(877.42f, 2741.98f, 126.55f, 4.91261f);
                                 break;
                             default:
                                 pos = *destTarget;
