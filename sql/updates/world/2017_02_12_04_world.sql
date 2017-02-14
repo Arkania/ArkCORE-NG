@@ -1,0 +1,92 @@
+
+
+update smart_scripts set action_type=11, action_param1=14252, action_param2=2,  action_param3=0 where action_type=12 and action_param1=9521 and action_param2=4;
+update smart_scripts set action_type=11, action_param1=14307, action_param2=2,  action_param3=0 where action_type=12 and action_param1=9297 and action_param2=4;
+update smart_scripts set action_type=11, action_param1=14313, action_param2=2,  action_param3=0 where action_type=12 and action_param1=9526 and action_param2=4;
+update smart_scripts set action_type=11, action_param1=31995, action_param2=2,  action_param3=0 where action_type=12 and action_param1=18181 and action_param2=4;
+update smart_scripts set action_type=11, action_param1=34064, action_param2=2,  action_param3=0 where action_type=12 and action_param1=19480 and action_param2=3;
+update smart_scripts set action_type=11, action_param1=36595, action_param2=2,  action_param3=0 where action_type=12 and action_param1=21328 and action_param2=1;
+update smart_scripts set action_type=11, action_param1=14313, action_param2=2,  action_param3=0 where action_type=12 and action_param1=9526 and action_param2=1;
+update smart_scripts set action_type=11, action_param1=14307, action_param2=2,  action_param3=0 where action_type=12 and action_param1=9297 and action_param2=1;
+
+UPDATE smart_scripts SET action_type=11, action_param1=37903, action_param2=2,  action_param3=0 WHERE entryorguid=20635 AND source_type=0 AND id=3 AND action_type=33;
+UPDATE smart_scripts SET action_type=11, action_param1=37829, action_param2=2,  action_param3=0 WHERE entryorguid=20749 AND source_type=0 AND id=1 AND action_type=33;
+UPDATE smart_scripts SET action_type=11, action_param1=37903, action_param2=2,  action_param3=0 WHERE entryorguid=20771 AND source_type=0 AND id=3 AND action_type=33;
+UPDATE smart_scripts SET action_type=11, action_param1=37903, action_param2=2,  action_param3=0 WHERE entryorguid=21926 AND source_type=0 AND id=4 AND action_type=33;
+
+UPDATE smart_scripts SET action_type=11, action_param1=28920, action_param2=2,  action_param3=0 WHERE entryorguid=14902 AND source_type=0 AND id=0 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=28919, action_param2=2,  action_param3=0 WHERE entryorguid=14902 AND source_type=0 AND id=1 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=28909, action_param2=2,  action_param3=0 WHERE entryorguid=14902 AND source_type=0 AND id=2 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=24010, action_param2=2,  action_param3=0 WHERE entryorguid=14902 AND source_type=0 AND id=3 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=24007, action_param2=2,  action_param3=0 WHERE entryorguid=14902 AND source_type=0 AND id=4 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=24008, action_param2=2,  action_param3=0 WHERE entryorguid=14902 AND source_type=0 AND id=5 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=24009, action_param2=2,  action_param3=0 WHERE entryorguid=14902 AND source_type=0 AND id=6 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=28908, action_param2=2,  action_param3=0 WHERE entryorguid=14902 AND source_type=0 AND id=14 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=28886, action_param2=2,  action_param3=0 WHERE entryorguid=14902 AND source_type=0 AND id=15 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=28885, action_param2=2,  action_param3=0 WHERE entryorguid=14902 AND source_type=0 AND id=16 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=24001, action_param2=2,  action_param3=0 WHERE entryorguid=14902 AND source_type=0 AND id=17 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=23998, action_param2=2,  action_param3=0 WHERE entryorguid=14902 AND source_type=0 AND id=18 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=23999, action_param2=2,  action_param3=0 WHERE entryorguid=14902 AND source_type=0 AND id=19 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=24000, action_param2=2,  action_param3=0 WHERE entryorguid=14902 AND source_type=0 AND id=20 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=28945, action_param2=2,  action_param3=0 WHERE entryorguid=14903 AND source_type=0 AND id=0 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=28943, action_param2=2,  action_param3=0 WHERE entryorguid=14903 AND source_type=0 AND id=1 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=28946, action_param2=2,  action_param3=0 WHERE entryorguid=14903 AND source_type=0 AND id=2 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=24015, action_param2=2,  action_param3=0 WHERE entryorguid=14903 AND source_type=0 AND id=3 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=24012, action_param2=2,  action_param3=0 WHERE entryorguid=14903 AND source_type=0 AND id=4 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=24013, action_param2=2,  action_param3=0 WHERE entryorguid=14903 AND source_type=0 AND id=5 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=24014, action_param2=2,  action_param3=0 WHERE entryorguid=14903 AND source_type=0 AND id=6 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=28956, action_param2=2,  action_param3=0 WHERE entryorguid=14903 AND source_type=0 AND id=14 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=28954, action_param2=2,  action_param3=0 WHERE entryorguid=14903 AND source_type=0 AND id=15 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=28958, action_param2=2,  action_param3=0 WHERE entryorguid=14903 AND source_type=0 AND id=16 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=24047, action_param2=2,  action_param3=0 WHERE entryorguid=14903 AND source_type=0 AND id=17 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=24044, action_param2=2,  action_param3=0 WHERE entryorguid=14903 AND source_type=0 AND id=18 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=24045, action_param2=2,  action_param3=0 WHERE entryorguid=14903 AND source_type=0 AND id=19 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=24046, action_param2=2,  action_param3=0 WHERE entryorguid=14903 AND source_type=0 AND id=20 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=28951, action_param2=2,  action_param3=0 WHERE entryorguid=14903 AND source_type=0 AND id=28 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=28949, action_param2=2,  action_param3=0 WHERE entryorguid=14903 AND source_type=0 AND id=29 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=28952, action_param2=2,  action_param3=0 WHERE entryorguid=14903 AND source_type=0 AND id=30 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=24041, action_param2=2,  action_param3=0 WHERE entryorguid=14903 AND source_type=0 AND id=31 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=24038, action_param2=2,  action_param3=0 WHERE entryorguid=14903 AND source_type=0 AND id=32 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=24039, action_param2=2,  action_param3=0 WHERE entryorguid=14903 AND source_type=0 AND id=33 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=24040, action_param2=2,  action_param3=0 WHERE entryorguid=14903 AND source_type=0 AND id=34 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=28923, action_param2=2,  action_param3=0 WHERE entryorguid=14904 AND source_type=0 AND id=0 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=28926, action_param2=2,  action_param3=0 WHERE entryorguid=14904 AND source_type=0 AND id=1 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=28959, action_param2=2,  action_param3=0 WHERE entryorguid=14904 AND source_type=0 AND id=2 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=24070, action_param2=2,  action_param3=0 WHERE entryorguid=14904 AND source_type=0 AND id=3 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=24067, action_param2=2,  action_param3=0 WHERE entryorguid=14904 AND source_type=0 AND id=4 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=24068, action_param2=2,  action_param3=0 WHERE entryorguid=14904 AND source_type=0 AND id=5 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=24069, action_param2=2,  action_param3=0 WHERE entryorguid=14904 AND source_type=0 AND id=6 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=28941, action_param2=2,  action_param3=0 WHERE entryorguid=14904 AND source_type=0 AND id=14 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=28942, action_param2=2,  action_param3=0 WHERE entryorguid=14904 AND source_type=0 AND id=15 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=28940, action_param2=2,  action_param3=0 WHERE entryorguid=14904 AND source_type=0 AND id=16 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=24060, action_param2=2,  action_param3=0 WHERE entryorguid=14904 AND source_type=0 AND id=17 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=24055, action_param2=2,  action_param3=0 WHERE entryorguid=14904 AND source_type=0 AND id=18 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=24056, action_param2=2,  action_param3=0 WHERE entryorguid=14904 AND source_type=0 AND id=19 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=24059, action_param2=2,  action_param3=0 WHERE entryorguid=14904 AND source_type=0 AND id=20 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=28939, action_param2=2,  action_param3=0 WHERE entryorguid=14905 AND source_type=0 AND id=0 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=28937, action_param2=2,  action_param3=0 WHERE entryorguid=14905 AND source_type=0 AND id=1 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=28935, action_param2=2,  action_param3=0 WHERE entryorguid=14905 AND source_type=0 AND id=2 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=24075, action_param2=2,  action_param3=0 WHERE entryorguid=14905 AND source_type=0 AND id=3 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=24072, action_param2=2,  action_param3=0 WHERE entryorguid=14905 AND source_type=0 AND id=4 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=24073, action_param2=2,  action_param3=0 WHERE entryorguid=14905 AND source_type=0 AND id=5 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=24074, action_param2=2,  action_param3=0 WHERE entryorguid=14905 AND source_type=0 AND id=6 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=28929, action_param2=2,  action_param3=0 WHERE entryorguid=14905 AND source_type=0 AND id=14 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=28930, action_param2=2,  action_param3=0 WHERE entryorguid=14905 AND source_type=0 AND id=15 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=28921, action_param2=2,  action_param3=0 WHERE entryorguid=14905 AND source_type=0 AND id=16 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=24079, action_param2=2,  action_param3=0 WHERE entryorguid=14905 AND source_type=0 AND id=17 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=24076, action_param2=2,  action_param3=0 WHERE entryorguid=14905 AND source_type=0 AND id=18 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=24077, action_param2=2,  action_param3=0 WHERE entryorguid=14905 AND source_type=0 AND id=19 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=24078, action_param2=2,  action_param3=0 WHERE entryorguid=14905 AND source_type=0 AND id=20 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=25600, action_param2=2,  action_param3=0 WHERE entryorguid=15481 AND source_type=0 AND id=0 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=37064, action_param2=2,  action_param3=0 WHERE entryorguid=21293 AND source_type=0 AND id=2 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=38255, action_param2=2,  action_param3=0 WHERE entryorguid=21460 AND source_type=0 AND id=0 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=24807, action_param2=2,  action_param3=0 WHERE entryorguid=180453 AND source_type=1 AND id=1 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=24806, action_param2=2,  action_param3=0 WHERE entryorguid=180454 AND source_type=1 AND id=1 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=24805, action_param2=2,  action_param3=0 WHERE entryorguid=180455 AND source_type=1 AND id=1 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=25764, action_param2=2,  action_param3=0 WHERE entryorguid=180665 AND source_type=1 AND id=0 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=25765, action_param2=2,  action_param3=0 WHERE entryorguid=180666 AND source_type=1 AND id=0 AND action_type=56;
+UPDATE smart_scripts SET action_type=11, action_param1=25763, action_param2=2,  action_param3=0 WHERE entryorguid=180667 AND source_type=1 AND id=0 AND action_type=56;
+
+
+
+

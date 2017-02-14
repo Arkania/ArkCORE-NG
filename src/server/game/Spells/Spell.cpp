@@ -2995,9 +2995,13 @@ void Spell::prepare(SpellCastTargets const* targets, AuraEffect const* triggered
     if (((m_spellInfo->IsChanneled() || m_casttime) && m_caster->GetTypeId() == TYPEID_PLAYER && m_caster->isMoving() &&
         m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_MOVEMENT) && !m_caster->HasAuraTypeWithAffectMask(SPELL_AURA_CAST_WHILE_WALKING, m_spellInfo))
     {
-        SendCastResult(SPELL_FAILED_MOVING);
-        finish(false);
-        return;
+        // 1. Has casttime, 2. Or doesn't have flag to allow movement during channel
+        if (m_casttime || !m_spellInfo->IsMoveAllowedChannel())
+        {
+            SendCastResult(SPELL_FAILED_MOVING);
+            finish(false);
+            return;
+        }
     }
 
     // set timer base at cast time
@@ -3534,8 +3538,14 @@ void Spell::update(uint32 difftime)
         !m_caster->HasAuraTypeWithAffectMask(SPELL_AURA_CAST_WHILE_WALKING, m_spellInfo))
     {
         // don't cancel for melee, autorepeat, triggered and instant spells
-        if (!IsNextMeleeSwingSpell() && !IsAutoRepeat() && !IsTriggered() && !m_caster->CanCastWhileWalking(m_spellInfo->Id))
-            cancel();
+        if (!IsNextMeleeSwingSpell() && !IsAutoRepeat() && !IsTriggered() && !m_caster->CanCastWhileWalking(m_spellInfo->Id) && m_spellInfo->IsMoveAllowedChannel())
+        {
+            // if charmed by creature, trust the AI not to cheat and allow the cast to proceed
+            // @todo this is a hack, "creature" movesplines don't differentiate turning/moving right now
+            // however, checking what type of movement the spline is for every single spline would be really expensive
+            if (!IS_CRE_OR_VEH_OR_PET_GUID(m_caster->GetCharmerGUID()))
+                cancel();
+        }
     }
 
     switch (m_spellState)

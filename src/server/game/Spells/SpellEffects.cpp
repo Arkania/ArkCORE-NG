@@ -3302,7 +3302,6 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
     // so here's a list of MiscValueB values, which is currently most generic check
     switch (properties->Id)
     {
-        case 64:
         case 61:
         case 1101:
         case 66:
@@ -3319,6 +3318,7 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
         case 3097:
             numSummons = (damage > 0) ? damage : 1;
             break;
+        case 64:
         case 2907:
             numSummons = m_spellInfo->Effects[effIndex].BasePoints;
             break;

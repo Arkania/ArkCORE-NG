@@ -53,6 +53,11 @@ class DB2FileLoader
             assert(field < file.fieldCount);
             return *reinterpret_cast<uint8*>(offset+file.GetOffset(field));
         }
+        uint64 getUInt64(size_t field) const
+        {
+            assert(field < file.fieldCount);
+            return *reinterpret_cast<uint64*>(offset + file.GetOffset(field));
+        }
 
         const char *getString(size_t field) const
         {

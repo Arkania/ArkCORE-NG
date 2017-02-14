@@ -16684,7 +16684,7 @@ void Player::CompleteQuest(uint32 quest_id)
             {
                 RewardQuest(qInfo, 0, this, false);
                 
-                if (!InformQuestGiverReward(qInfo, questGiver, 0))
+                if (questGiver && !InformQuestGiverReward(qInfo, questGiver, 0))
                 {
                     if (Quest const* nextQuest = GetNextQuest(guid, qInfo))
                     {

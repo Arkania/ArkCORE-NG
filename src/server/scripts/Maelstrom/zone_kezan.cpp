@@ -2532,7 +2532,7 @@ public:
             }
         }
 
-        void MoveInLineOfSight_Safe(Unit* who)
+        void CreatureMoveInLineOfSight(Unit* who) override
         {
             if (who->GetEntry() == NPC_STEAMWHEEDLE_SHARK)
                 if (who->GetDistance2d(me) < 3.0f)
@@ -4002,7 +4002,7 @@ public:
 
                     if (!fire)
                         go->Delete();
-                    m_events.ScheduleEvent(EVENT_TALK_PERIODIC, 2500);
+                    m_events.ScheduleEvent(EVENT_CHECK_FOR_PLAYER, 2500);
                     break;
                 }
                 }

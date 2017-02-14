@@ -36,6 +36,12 @@
 template<>
 void RandomMovementGenerator<Creature>::_setRandomLocation(Creature* creature)
 {
+    if (creature->IsMovementPreventedByCasting())
+    {
+        creature->CastStop();
+        return;
+    }
+
     float respX, respY, respZ, respO, destX, destY, destZ, travelDistZ;
     creature->GetHomePosition(respX, respY, respZ, respO);
     Map const* map = creature->GetBaseMap();
@@ -127,6 +133,8 @@ void RandomMovementGenerator<Creature>::_setRandomLocation(Creature* creature)
 
     if (is_air_ok)
         i_nextMoveTime.Reset(0);
+    else if (is_water_ok) 
+        i_nextMoveTime.Reset(urand(5000, 10000));
     else
         i_nextMoveTime.Reset(urand(500, 10000));
 
@@ -171,10 +179,17 @@ void RandomMovementGenerator<Creature>::DoFinalize(Creature* creature)
 template<>
 bool RandomMovementGenerator<Creature>::DoUpdate(Creature* creature, const uint32 diff)
 {
+    if (!creature || !creature->IsAlive())
+        return false;
+
     if (creature->HasUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED | UNIT_STATE_DISTRACTED))
     {
-        i_nextMoveTime.Reset(0);  // Expire the timer
-        creature->ClearUnitState(UNIT_STATE_ROAMING_MOVE);
+        i_nextMoveTime.Reset(diff * 2);  // Expire the timer
+        if (!creature->IsStopped()) 
+        {
+            creature->ClearUnitState(UNIT_STATE_ROAMING_MOVE);
+            creature->StopMoving();
+        }
         return true;
     }
 
