@@ -317,6 +317,11 @@ bool ChatHandler::ExecuteCommandInTable(ChatCommand* table, const char* text, st
         if (match)
             continue;
 
+        // commands are executes before printing log. then target info are lost.
+        Unit* tmpTarget = nullptr;
+        if (Player* tmpPlayer = m_session->GetPlayer())
+            tmpTarget = tmpPlayer->GetSelectedUnit();
+
         // select subcommand from child commands list
         if (table[i].ChildCommands != NULL)
         {
@@ -350,6 +355,8 @@ bool ChatHandler::ExecuteCommandInTable(ChatCommand* table, const char* text, st
                 const Transport* transport = player->GetTransport();
                 Position relPos;
                 Unit* target = player->GetSelectedUnit();
+                if (!target && tmpTarget)
+                    target = tmpTarget;
                 uint32 areaId = player->GetAreaId();
                 uint32 zoneId = player->GetZoneId();
                 std::string areaName = "Unknown";
