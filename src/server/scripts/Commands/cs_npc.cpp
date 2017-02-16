@@ -536,7 +536,7 @@ public:
         unit->DeleteFromDB();
         unit->AddObjectToRemoveList();
 
-        handler->SendSysMessage(LANG_COMMAND_DELCREATMESSAGE);
+        handler->PSendSysMessage(LANG_COMMAND_CREATURE_DELETE, unit->GetEntry(), unit->GetDBTableGUIDLow());
 
         return true;
     }
