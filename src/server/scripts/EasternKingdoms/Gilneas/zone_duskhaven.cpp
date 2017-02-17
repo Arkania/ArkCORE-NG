@@ -1031,9 +1031,9 @@ public:
     {
         if (quest->GetQuestId() == 14396)
         {
-            creature->CastSpell(player, SPELL_FORCECAST_CATACLYSM_I, true);
+            // creature->CastSpell(player, SPELL_FORCECAST_CATACLYSM_I, true);
             player->RemoveAura(SPELL_PHASE_QUEST_ZONE_SPECIFIC_07);
-            player->CastSpell(player, SPELL_PHASE_QUEST_ZONE_SPECIFIC_08);
+            player->AddAura(SPELL_PHASE_QUEST_ZONE_SPECIFIC_08, player);
         }
 
         return true;
