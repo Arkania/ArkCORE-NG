@@ -1228,14 +1228,15 @@ public:
 
         bool operator() (WorldObject* unit)
         {
-            if (unit->GetPosition().GetExactDist(&caster->GetPosition()) > 10.0f)
+            Position pos = caster->GetPosition();
+            if (unit->GetPosition().GetExactDist(&pos) > 10.0f)
                 return true;
             if (unit->GetEntry() != NPC_KEZAN_CITIZEN_35063 && unit->GetEntry() != NPC_KEZAN_CITIZEN_35075 && unit->GetEntry() != NPC_HIRED_LOOTER_35234)
                 return true;
             if (Creature* npc = unit->ToCreature())
                 if (!npc->IsAlive())
                     return true; 
-            if (unit->GetPosition().GetExactDist(&caster->GetPosition()) < 3.0f)
+            if (unit->GetPosition().GetExactDist(&pos) < 3.0f)
                 return false;
             if (caster->isInFront(unit))
                 return false;
@@ -4207,7 +4208,8 @@ public:
 
         bool operator() (WorldObject* unit)
         {
-            if (unit->GetPosition().GetExactDist(&caster->GetPosition()) < 5.0f)
+            Position pos = caster->GetPosition();
+            if (unit->GetPosition().GetExactDist(&pos) < 5.0f)
                 return false;
 
             return true;
