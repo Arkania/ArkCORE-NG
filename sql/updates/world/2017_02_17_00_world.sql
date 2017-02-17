@@ -1,3 +1,3 @@
 
 
-UPDATE `arkania_world`.`quest_template` SET `RewardSpellCast` = '0' WHERE `quest_template`.`Id` = 14396;
+UPDATE `quest_template` SET `RewardSpellCast` = '0' WHERE `quest_template`.`Id` = 14396;
