@@ -2116,12 +2116,13 @@ public:
 
         void HandleDummy(SpellEffIndex /*effIndex*/)
         {
-            if (Player* player = GetCaster()->GetCharmerOrOwner()->ToPlayer())
-            {
-                player->StopCastingCharm();
-                player->StopCastingBindSight();
-                player->RemoveAura(THE_EYE_OF_ACHERUS);
-            }
+            if (Unit* unit = GetCaster()->GetCharmerOrOwner())
+                if (Player* player = unit->ToPlayer())
+                {
+                    player->StopCastingCharm();
+                    player->StopCastingBindSight();
+                    player->RemoveAura(THE_EYE_OF_ACHERUS);
+                }
         }
 
         void Register() override
