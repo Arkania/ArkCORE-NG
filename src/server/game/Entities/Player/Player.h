@@ -1540,6 +1540,7 @@ class Player : public Unit, public GridObject<Player>
         void SendPreparedQuest(uint64 guid);
         bool IsActiveQuest(uint32 quest_id) const;
         Quest const* GetNextQuest(uint64 guid, Quest const* quest);
+        Quest const * GetMoreCompletedQuest(Object* questgiver);
         bool CanSeeStartQuest(Quest const* quest);
         bool CanTakeQuest(Quest const* quest, bool msg, bool prevQuestAutoReward = false);
         bool CanAddQuest(Quest const* quest, bool msg);

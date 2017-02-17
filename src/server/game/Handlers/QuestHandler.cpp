@@ -304,33 +304,44 @@ void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPacket& recvData)
         return;
     }
 
-    if (_player->CanRewardQuest(quest, reward, true))
+    while (quest)
     {
-        _player->RewardQuest(quest, reward, object);
-
-        if (!_player->InformQuestGiverReward(quest, object, reward))
+        if (_player->CanRewardQuest(quest, reward, true))
         {
-            if (Quest const* nextQuest = _player->GetNextQuest(guid, quest))
+            _player->RewardQuest(quest, reward, object);
+
+            if (_player->InformQuestGiverReward(quest, object, reward))
+                return;
+
+            if (Quest const* compQuest = _player->GetMoreCompletedQuest(object))
             {
-                if (nextQuest->IsAutoAccept() && _player->CanAddQuest(nextQuest, true) && _player->CanTakeQuest(nextQuest, true))
-                {
-                    if (nextQuest->IsAutoAccept() && _player->CanAddQuest(nextQuest, true) && _player->CanTakeQuest(nextQuest, true))
-                        _player->AddQuestAndCheckCompletion(nextQuest, object);
-
-                    _player->PlayerTalkClass->SendQuestGiverQuestDetails(nextQuest, guid, true);
-                }
-
-                _player->PlayerTalkClass->SendQuestGiverQuestDetails(nextQuest, guid, true);
+                quest = compQuest;
             }
             else
             {
-                // Don't forget to close window.
-                _player->SendQuestWindowClose(quest->GetQuestId());
+                if (Quest const* nextQuest = _player->GetNextQuest(guid, quest))
+                {
+                    if (_player->CanAddQuest(nextQuest, true) && _player->CanTakeQuest(nextQuest, true) && (nextQuest->HasFlag(QUEST_FLAGS_AUTO_SUBMIT) || nextQuest->HasFlag(QUEST_FLAGS_AUTO_TAKE)))
+                        if (nextQuest->IsAutoAccept())
+                            _player->AddQuestAndCheckCompletion(nextQuest, object);
+
+                    _player->PlayerTalkClass->SendQuestGiverQuestDetails(nextQuest, guid, true);
+                    return;
+                }
+                else
+                {
+                    // Don't forget to close window.
+                    _player->SendQuestWindowClose(quest->GetQuestId());
+                    return;
+                }
             }
         }
+        else
+        {
+            _player->PlayerTalkClass->SendQuestGiverOfferReward(quest, guid, true);
+            return;
+        }
     }
-    else
-        _player->PlayerTalkClass->SendQuestGiverOfferReward(quest, guid, true);
 }
 
 void WorldSession::HandleQuestgiverRequestRewardOpcode(WorldPacket& recvData)

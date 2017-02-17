@@ -958,12 +958,14 @@ class ObjectMgr
             return &_creatureQuestRelations;
         }
 
-        QuestRelationBounds GetCreatureQuestRelationBounds(uint32 creature_entry)
+        // quest-starter
+        QuestRelationBounds GetCreatureQuestRelationBounds(uint32 creature_entry) 
         {
             return _creatureQuestRelations.equal_range(creature_entry);
         }
 
-        QuestRelationBounds GetCreatureQuestInvolvedRelationBounds(uint32 creature_entry)
+        // quest-ender
+        QuestRelationBounds GetCreatureQuestInvolvedRelationBounds(uint32 creature_entry) 
         {
             return _creatureQuestInvolvedRelations.equal_range(creature_entry);
         }

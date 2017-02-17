@@ -16342,6 +16342,21 @@ Quest const* Player::GetNextQuest(uint64 guid, Quest const* quest)
     return NULL;
 }
 
+Quest const* Player::GetMoreCompletedQuest(Object* questgiver)
+{
+    QuestRelationBounds objectQR;
+    if (questgiver->isType(TYPEMASK_UNIT))
+        objectQR = sObjectMgr->GetCreatureQuestRelationBounds(questgiver->GetEntry());
+    else if (questgiver->isType(TYPEMASK_GAMEOBJECT))
+        objectQR = sObjectMgr->GetGOQuestRelationBounds(questgiver->GetEntry());
+    
+    for (QuestRelations::const_iterator itr = objectQR.first; itr != objectQR.second; ++itr)
+        if (Quest const* quest = sObjectMgr->GetQuestTemplate(itr->second))
+            if (CanRewardQuest(quest, false))
+                return quest;
+    return nullptr;
+}
+
 bool Player::CanSeeStartQuest(Quest const* quest)
 {
     if (!DisableMgr::IsDisabledFor(DISABLE_TYPE_QUEST, quest->GetQuestId(), this) && SatisfyQuestClass(quest, false) && SatisfyQuestRace(quest, false) && SatisfyQuestGender(quest, false) &&
