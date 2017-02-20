@@ -3105,6 +3105,10 @@ public:
 
     enum eNpc
     {
+        NPC_OOMLOT_WARRIER_38531 = 38531,
+        EVENT_CREATE_OOMLOT_WARRIER = 900,
+        EVENT_CHECK_POSITION,
+        EVENT_COOLDOWN_PLAYER_NEAR,
     };
 
     struct npc_elm_general_purpose_bunny_large_24110AI : public ScriptedAI
@@ -3112,11 +3116,66 @@ public:
         npc_elm_general_purpose_bunny_large_24110AI(Creature* creature) : ScriptedAI(creature) {  }
 
         EventMap m_events;
-        uint64   m_playerGUID;        
+        uint64   m_playerGUID;
+        uint32   m_oomlot_counter;
+        uint32   m_chain_position;
+        uint64   m_nearestChainGUID;
+        bool     m_validPlayerNear;
 
         void Reset() override
         {
-            m_events.ScheduleEvent(EVENT_MUSIC_PERIODIC, 2500);
+            m_oomlot_counter = 0;
+            m_chain_position = 0;
+            m_nearestChainGUID = 0;
+            m_validPlayerNear = false;
+            if (me->GetMapId() == 648)
+                if (me->HasInPhaseList(379)) // kezan, play musik on party
+                    m_events.ScheduleEvent(EVENT_MUSIC_PERIODIC, 2500);
+                else if (me->HasInPhaseList(181)) // lost isles.. create oomlot warrier..
+                    m_events.RescheduleEvent(EVENT_CHECK_POSITION, 1000);
+        }
+
+        void JustSummoned(Creature* summon) override
+        {
+            switch (summon->GetEntry())
+            {
+            case NPC_OOMLOT_WARRIER_38531:
+                m_oomlot_counter += 1;
+                break;
+            }
+        }
+
+        void SummonedCreatureDies(Creature* summon, Unit* killer) override
+        {
+            switch (summon->GetEntry())
+            {
+            case NPC_OOMLOT_WARRIER_38531:
+                if (m_oomlot_counter > 0)
+                    m_oomlot_counter -= 1;
+                break;
+            }
+        }
+
+        void SummonedCreatureDespawn(Creature* summon) override
+        {
+            switch (summon->GetEntry())
+            {
+            case NPC_OOMLOT_WARRIER_38531:
+                if (m_oomlot_counter > 0)
+                    m_oomlot_counter -= 1;
+                break;
+            }
+        }
+
+        void DoAction(int32 param) override 
+        { 
+            switch (param)
+            {
+            case 5:
+                m_validPlayerNear = true;
+                m_events.RescheduleEvent(EVENT_COOLDOWN_PLAYER_NEAR, 150000);
+                break;
+            }
         }
 
         void UpdateAI(uint32 diff) override
@@ -3137,13 +3196,61 @@ public:
                     m_events.ScheduleEvent(EVENT_MUSIC_PERIODIC, 2500);
                     break;
                 }
+                case EVENT_CHECK_POSITION:
+                {
+                    if (m_chain_position == 0)
+                    {
+                        if (Creature* sassy = me->FindNearestCreature(38387, 90.0f))
+                        {
+                            float dist = me->GetDistance(sassy);
+                            if (dist < 40.0f)
+                                m_chain_position = 1; // to near.. no spawn of oomlot warrier
+                            else
+                                m_chain_position = 2; // cannon area.. spawn of oomlot warrier: if player has entered cannon
+                            m_events.RescheduleEvent(EVENT_CHECK_POSITION, 1000);
+                        }
+                        else
+                        {
+                            m_chain_position = 3; // far spawn of oomlot warrier  to populate the way..
+                            m_events.RescheduleEvent(EVENT_CHECK_POSITION, 1000);
+                            m_events.RescheduleEvent(EVENT_CREATE_OOMLOT_WARRIER, 2500);
+                        }
+                    }
+                    break;
+                }
+                case EVENT_CREATE_OOMLOT_WARRIER:
+                {
+                    if (m_validPlayerNear == false)
+                        m_events.RescheduleEvent(EVENT_COOLDOWN_PLAYER_NEAR, 1000);
+                    else if (m_oomlot_counter < 2)
+                    {
+                        Position pos = me->GetNearPosition(3.0f, frand(0, 6.28f));
+                        me->SummonCreature(38531, pos, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 250000);
+                    }
+
+                    m_events.RescheduleEvent(EVENT_CREATE_OOMLOT_WARRIER, 2500);
+                    break;
+                }
+                case EVENT_COOLDOWN_PLAYER_NEAR:
+                {
+                    bool check = false;
+                    std::list<Player*> pList = me->FindNearestPlayers(100.0f);
+                    for (auto player : pList)
+                        if (player->HasInPhaseList(181))
+                            check = true;
+                    if (check)
+                    {
+                        std::list<Creature*> cList = me->FindNearestCreatures(24110, 100.0f);
+                        for (auto npc : cList)
+                            npc->AI()->DoAction(5);
+                    }
+
+                    m_validPlayerNear = check;
+                    m_events.RescheduleEvent(EVENT_COOLDOWN_PLAYER_NEAR, 150000);
+                    break;
+                }
                 }
             }
-
-            if (!UpdateVictim())
-                return;
-            else
-                DoMeleeAttackIfReady();
         }
     };
 

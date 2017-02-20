@@ -2102,7 +2102,8 @@ public:
 // 52694 - Recall Eye of Acherus
 enum Recall_Eye_of_Acherus
 {
-    THE_EYE_OF_ACHERUS = 51852
+    THE_EYE_OF_ACHERUS = 51852,
+    EYE_OF_ACHERUS_FLIGHT = 51923
 };
 
 class spell_q12641_recall_eye_of_acherus : public SpellScriptLoader
@@ -2122,6 +2123,7 @@ public:
                     player->StopCastingCharm();
                     player->StopCastingBindSight();
                     player->RemoveAura(THE_EYE_OF_ACHERUS);
+                    player->RemoveAura(EYE_OF_ACHERUS_FLIGHT);
                 }
         }
 

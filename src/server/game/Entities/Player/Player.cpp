@@ -16690,7 +16690,7 @@ void Player::CompleteQuest(uint32 quest_id)
 
             uint64 guid = GetQuestGiverGUID(quest_id);
             if (guid != GetGUID())
-                printf("");
+                printf("test: stored questGiverGuid != playerGuid\n");
 
             Object* questGiver = ObjectAccessor::GetObjectByTypeMask(*this, guid, TYPEMASK_UNIT | TYPEMASK_GAMEOBJECT | TYPEMASK_ITEM);
             InformQuestGiverObjectiveComplete(qInfo, questGiver);
@@ -16701,6 +16701,9 @@ void Player::CompleteQuest(uint32 quest_id)
                 
                 if (questGiver && !InformQuestGiverReward(qInfo, questGiver, 0))
                 {
+                    if (Quest const* compQuest = GetMoreCompletedQuest(questGiver))
+                        printf("found Player::GetMoreCompletedQuest.. \n");
+
                     if (Quest const* nextQuest = GetNextQuest(guid, qInfo))
                     {
                         if (CanAddQuest(nextQuest, true) && CanTakeQuest(nextQuest, true, true) && (nextQuest->HasFlag(QUEST_FLAGS_AUTO_SUBMIT) || nextQuest->HasFlag(QUEST_FLAGS_AUTO_TAKE)))
