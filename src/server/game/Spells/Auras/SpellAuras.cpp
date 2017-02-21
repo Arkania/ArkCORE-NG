@@ -190,38 +190,33 @@ void AuraApplication::BuildUpdatePacket(ByteBuffer& data, bool remove) const
         data << uint32(0);
         return;
     }
-    else
+    ASSERT(_target->GetVisibleAura(_slot));
+
+    Aura const* aura = GetBase();
+    data << uint32(aura->GetId());
+    uint32 flags = _flags;
+    if (aura->GetMaxDuration() > 0 && !(aura->GetSpellInfo()->AttributesEx5 & SPELL_ATTR5_HIDE_DURATION))
+        flags |= AFLAG_DURATION;
+    data << uint16(flags);
+    data << uint8(aura->GetCasterLevel());
+    // send stack amount for aura which could be stacked (never 0 - causes incorrect display) or charges
+    // stack amount has priority over charges (checked on retail with spell 50262)
+    data << uint8(aura->GetSpellInfo()->StackAmount ? aura->GetStackAmount() : aura->GetCharges());
+
+    if (!(flags & AFLAG_CASTER))
+        data.appendPackGUID(aura->GetCasterGUID());
+
+    if (flags & AFLAG_DURATION)
     {
-        ASSERT(_target->GetVisibleAura(_slot));
-
-        Aura const* aura = GetBase();
-        data << uint32(aura->GetId());
-        uint32 flags = _flags;
-        if (aura->GetMaxDuration() > 0 && !(aura->GetSpellInfo()->AttributesEx5 & SPELL_ATTR5_HIDE_DURATION))
-            flags |= AFLAG_DURATION;
-        if (!aura->IsPassive())
-            flags |= AFLAG_ANY_EFFECT_AMOUNT_SENT;
-        data << uint16(flags);
-        data << uint8(aura->GetCasterLevel());
-        // send stack amount for aura which could be stacked (never 0 - causes incorrect display) or charges
-        // stack amount has priority over charges (checked on retail with spell 50262)
-        data << uint8(aura->GetSpellInfo()->StackAmount ? aura->GetStackAmount() : aura->GetCharges());
-
-        if (!(flags & AFLAG_CASTER))
-            data.appendPackGUID(aura->GetCasterGUID());
-
-        if (flags & AFLAG_DURATION)
-        {
-            data << uint32(aura->GetMaxDuration());
-            data << uint32(aura->GetDuration());
-        }
-
-        if (flags & AFLAG_ANY_EFFECT_AMOUNT_SENT)
-            for (uint32 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-                if (AuraEffect const* eff = aura->GetEffect(i))
-                    if (HasEffect(i))       // Not all of aura's effects have to be applied on every target
-                        data << int32(eff->GetAmount());
+        data << uint32(aura->GetMaxDuration());
+        data << uint32(aura->GetDuration());
     }
+
+    if (flags & AFLAG_ANY_EFFECT_AMOUNT_SENT)
+        for (uint32 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+            if (AuraEffect const* eff = aura->GetEffect(i))
+                if (HasEffect(i))       // Not all of aura's effects have to be applied on every target
+                    data << int32(eff->GetAmount());
 }
 
 void AuraApplication::ClientUpdate(bool remove)
