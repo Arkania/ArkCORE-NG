@@ -316,6 +316,8 @@ bool ChatHandler::ExecuteCommandInTable(ChatCommand* table, const char* text, st
         }
         if (match)
             continue;
+        if (!m_session)
+            continue;
 
         // commands are executes before printing log. then target info are lost.
         Unit* tmpTarget = nullptr;
@@ -395,7 +397,7 @@ bool ChatHandler::ExecuteCommandInTable(ChatCommand* table, const char* text, st
                 else // player
                 {
                     relPos = Position(player->GetTransOffsetX(), player->GetTransOffsetY(), player->GetTransOffsetZ(), player->GetTransOffsetO());
-                   
+
                     sLog->outCommand(m_session->GetAccountId(), "Command: %s [Player: %s (Guid: %u) (Account: %u) X: %f Y: %f Z: %f O: %f Map: %u (%s) Area: %u (%s) Zone: %u (%s)]",
                         fullcmd.c_str(), player->GetName().c_str(), GUID_LOPART(player->GetGUID()), m_session->GetAccountId(),
                         player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetOrientation(), player->GetMapId(),
