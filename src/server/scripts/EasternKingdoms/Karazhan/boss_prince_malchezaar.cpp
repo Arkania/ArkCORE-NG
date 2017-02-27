@@ -556,13 +556,13 @@ public:
                 if (me->isAttackReady() && me->GetVictim())
                 {
                     me->AttackerStateUpdate(me->GetVictim());
-                    me->resetAttackTimer();
+                    me->ResetAttackTimer();
                 }
                 //Check for offhand attack
                 if (me->isAttackReady(OFF_ATTACK) && me->GetVictim())
                 {
                     me->AttackerStateUpdate(me->GetVictim(), OFF_ATTACK);
-                    me->resetAttackTimer(OFF_ATTACK);
+                    me->ResetAttackTimer(OFF_ATTACK);
                 }
             }
         }

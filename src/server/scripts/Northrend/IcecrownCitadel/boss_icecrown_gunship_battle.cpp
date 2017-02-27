@@ -1079,7 +1079,7 @@ class npc_high_overlord_saurfang_igb : public CreatureScript
                 else if (me->isAttackReady())
                 {
                     DoCastVictim(SPELL_RENDING_THROW);
-                    me->resetAttackTimer();
+                    me->ResetAttackTimer();
                 }
             }
 
@@ -1352,7 +1352,7 @@ class npc_muradin_bronzebeard_igb : public CreatureScript
                 else if (me->isAttackReady())
                 {
                     DoCastVictim(SPELL_RENDING_THROW);
-                    me->resetAttackTimer();
+                    me->ResetAttackTimer();
                 }
             }
 

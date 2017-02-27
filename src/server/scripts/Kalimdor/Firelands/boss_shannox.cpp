@@ -736,7 +736,7 @@ public:
             if (me->isAttackReady() && me->IsWithinMeleeRange(victim))
             {
                 me->AttackerStateUpdate(victim);
-                me->resetAttackTimer();
+                me->ResetAttackTimer();
 
                 if (me->GetMap()->IsHeroic())
                     me->AddAura(SPELL_FEEDING_FRENZY_H, me);
@@ -916,7 +916,7 @@ public:
             if (me->isAttackReady() && me->IsWithinMeleeRange(victim))
             {
                 me->AttackerStateUpdate(victim);
-                me->resetAttackTimer();
+                me->ResetAttackTimer();
 
                 if (me->GetMap()->IsHeroic())
                     me->AddAura(SPELL_FEEDING_FRENZY_H, me);

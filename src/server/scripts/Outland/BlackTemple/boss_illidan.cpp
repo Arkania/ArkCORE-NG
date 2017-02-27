@@ -2162,7 +2162,7 @@ public:
                             me->CastSpell(me->GetVictim(), SPELL_PARASITIC_SHADOWFIEND2, true, 0, 0, IllidanGUID); // do not stack
                 }
                 me->AttackerStateUpdate(me->GetVictim());
-                me->resetAttackTimer();
+                me->ResetAttackTimer();
             }
         }
 

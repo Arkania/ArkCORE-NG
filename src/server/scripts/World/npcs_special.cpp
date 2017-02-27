@@ -1128,7 +1128,7 @@ public:
             if (me->isAttackReady())
             {
                 DoCastVictim(SPELL_DEATHTOUCH, true);
-                me->resetAttackTimer();
+                me->ResetAttackTimer();
             }
         }
     };

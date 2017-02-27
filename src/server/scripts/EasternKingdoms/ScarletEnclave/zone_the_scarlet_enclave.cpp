@@ -1843,7 +1843,7 @@ public:
                     if (me->IsWithinMeleeRange(me->GetVictim()))
                     {
                         me->AttackerStateUpdate(me->GetVictim());
-                        me->resetAttackTimer();
+                        me->ResetAttackTimer();
                     }
                 }
             }

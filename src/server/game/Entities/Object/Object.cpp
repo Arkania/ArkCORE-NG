@@ -2857,7 +2857,7 @@ std::list<Creature*> WorldObject::FindAllCreaturesInRange(float range)
     Cell cell(pair);
     cell.SetNoCreate();
 
-    Trinity::AllCreaturesInRange check(this, 100);
+    Trinity::AllCreaturesInRange check(this, range);
     Trinity::CreatureListSearcher<Trinity::AllCreaturesInRange> searcher(this, templist, check);
     TypeContainerVisitor<Trinity::CreatureListSearcher<Trinity::AllCreaturesInRange>, GridTypeMapContainer> cSearcher(searcher);
     cell.Visit(pair, cSearcher, *(this->GetMap()), *this, this->GetGridActivationRange());
@@ -2877,7 +2877,7 @@ std::list<Creature*> WorldObject::FindAllFriendlyCreaturesInRange(float range)
         Cell cell(pair);
         cell.SetNoCreate();
 
-        Trinity::AllFriendlyCreaturesInRange check(unit, 100);
+        Trinity::AllFriendlyCreaturesInRange check(unit, range);
         Trinity::CreatureListSearcher<Trinity::AllFriendlyCreaturesInRange> searcher(unit, templist, check);
         TypeContainerVisitor<Trinity::CreatureListSearcher<Trinity::AllFriendlyCreaturesInRange>, GridTypeMapContainer> cSearcher(searcher);
         cell.Visit(pair, cSearcher, *(unit->GetMap()), *unit, unit->GetGridActivationRange());
@@ -2897,7 +2897,7 @@ std::list<Creature*> WorldObject::FindAllUnfriendlyCreaturesInRange(float range)
         Cell cell(pair);
         cell.SetNoCreate();
 
-        Trinity::AllUnfriendlyCreaturesInRange check(unit, 100);
+        Trinity::AllUnfriendlyCreaturesInRange check(unit, range);
         Trinity::CreatureListSearcher<Trinity::AllUnfriendlyCreaturesInRange> searcher(unit, templist, check);
         TypeContainerVisitor<Trinity::CreatureListSearcher<Trinity::AllUnfriendlyCreaturesInRange>, GridTypeMapContainer> cSearcher(searcher);
         cell.Visit(pair, cSearcher, *(unit->GetMap()), *unit, unit->GetGridActivationRange());

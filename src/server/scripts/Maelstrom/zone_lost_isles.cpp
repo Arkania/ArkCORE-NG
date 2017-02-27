@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2016 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2017 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "script_helper.h"
 #include "Creature.h"
 #include "GameObjectAI.h"
 #include "GameObject.h"
@@ -52,8 +53,8 @@ enum Zone_zone_lost_isles
     NPC_GAAHL_38808 = 38808,
     NPC_MALMO_38809 = 38809,
     NPC_TELOCH_38810 = 38810,
+    NPC_ZOMBIE_KILL_CREDIT_38807 = 38807,
     GO_TRAP_201972 = 201972,
-    PLAYER_GUID = 99991,
     QUEST_DONT_GO_INTO_THE_LIGHT = 14239,
     QUEST_GOBLIN_ESCAPE_PODS_F = 14001,
     QUEST_GOBLIN_ESCAPE_PODS_M = 14474,
@@ -89,58 +90,25 @@ enum Zone_zone_lost_isles
     SPELL_EXPLODING_BANANAS = 67919,
     SPELL_FROST_NOVA = 11831,
     SPELL_FROST_BOLD = 9672,
-    EVENT_MASTER_RESET = 101,
-    EVENT_TALK_PART_00,
-    EVENT_TALK_PART_01,
-    EVENT_TALK_PART_02,
-    EVENT_TALK_PART_03,
-    EVENT_TALK_PART_04,
-    EVENT_TALK_PART_05,
-    EVENT_TALK_PART_06,
-    EVENT_TALK_PART_07,
-    EVENT_TALK_PART_08,
-    EVENT_TALK_PART_09,
-    EVENT_TALK_PART_10,
-    EVENT_FIGHT_PART_00,
-    EVENT_FIGHT_PART_01,
-    EVENT_FIGHT_PART_02,
-    EVENT_FIGHT_PART_03,
-    EVENT_SHOW_FIGHT,
-    EVENT_CHECK_FIGHT,
-    EVENT_CHECK_PLAYER,
-    EVENT_CHECK_FIRE,
-    EVENT_CHECK_BOAT,
-    EVENT_CHECK_FOLLOWING,
-    EVENT_CAST_SPELL_00,
-    EVENT_CAST_SPELL_01,
-    EVENT_CAST_COOLDOWN_01,
-    EVENT_CAST_COOLDOWN_02,
-    EVENT_CAST_COOLDOWN_03,
-    EVENT_CAST_COOLDOWN_04,
-    EVENT_START_WALK,
-    EVENT_START_FLYING,
-    EVENT_START_TALK,
-    EVENT_START_FOLLOW,
-    EVENT_TRIGGER_TRAP,
-    EVENT_BEGIN_LANDING,
-    EVENT_FIND_TARGET,
-    EVENT_BEGIN_FLYING,
-    EVENT_COOLDOWN_00,
-    EVENT_COOLDOWN_01,
-    EVENT_DESPAWN,
-    EVENT_SPAWN_OBJECT,
-    EVENT_INVISIBLE_OBJECT,
-    EVENT_PLAY_PERIODIC_SOUND,
-    EVENT_PLAY_PERIODIC_EMOTE,
-    ACTION_START_TALK,
-    ACTION_RUN_AWAY,
-    EVENT_MOVE_ATTACK,
-    ACTION_FOLLOW,
-    ACTION_INSERT,
-    ACTION_ERASE,
-    ACTION_SIZE_OF_LIST,
-    ACTION_MASTER_KILLED,
+    SPELL_ROCKETS_BOOTS_DAMAGE_EFFECT_72886 = 72886,
 };
+
+
+Creature* FindNearestEntry(std::list<Creature*>cList, Position currentPos)
+{
+    float dist = 1000;
+    Creature* cDist = nullptr;
+    for (auto npc : cList)
+    {
+        float d1 = currentPos.GetExactDist(npc);
+        if (d1 < dist)
+        {
+            dist = d1;
+            cDist = npc;
+        }
+    }
+    return cDist;
+}
 
 /*  phase 170  */
 
@@ -636,6 +604,9 @@ public:
         {
         case 24942:
             creature->AI()->Talk(0, player);
+            break;
+        case 24952:
+            creature->AI()->Talk(2, player);
             break;
         }
         return false;
@@ -2750,6 +2721,7 @@ public:
         npc_elm_general_purpose_bunny_23837AI(Creature* creature) : ScriptedAI(creature) { }
 
         EventMap  m_events;
+        std::set<uint64> m_zombieList;
 
         void Reset() override
         {
@@ -2757,6 +2729,24 @@ public:
                 m_events.RescheduleEvent(EVENT_PLAY_PERIODIC_SOUND, 7250);
             else if (me->GetAreaId() == 4886)
                 m_events.RescheduleEvent(EVENT_CAST_SPELL_00, 1000);
+            else if (me->GetAreaId() == 4899)
+                m_events.RescheduleEvent(EVENT_SPAWN_OBJECT, 1000);
+        }
+
+        void JustSummoned(Creature* summon) override
+        {
+            if (m_zombieList.find(summon->GetGUID()) == m_zombieList.end())
+                m_zombieList.insert(summon->GetGUID());
+        }
+
+        void SummonedCreatureDespawn(Creature* summon) override
+        {
+            m_zombieList.erase(summon->GetGUID());
+        }
+
+        void SummonedCreatureDies(Creature* summon, Unit* killer) override
+        {
+            m_zombieList.erase(summon->GetGUID());
         }
 
         void UpdateAI(uint32 diff) override
@@ -2777,6 +2767,16 @@ public:
                 {
                     me->CastSpell(me, 72382, true);
                         m_events.ScheduleEvent(EVENT_CAST_SPELL_00, 15500);
+                    break;
+                }
+                case EVENT_SPAWN_OBJECT:
+                {
+                    if (m_zombieList.size() < 4)
+                    {
+                        Position pos = Position(frand(1471.4f, 1479.4f), frand(1971.5f, 1979.5f), 238.076904f, 1.490936f);
+                        me->SummonCreature(RAND(38813, 38816), pos, TEMPSUMMON_TIMED_DESPAWN, 180000);
+                    }
+                    m_events.ScheduleEvent(EVENT_SPAWN_OBJECT, urand(10000, 15000));
                     break;
                 }
                 }
@@ -3268,8 +3268,15 @@ public:
 
         void Reset()
         {
-            DoStartNoMovement(me);
-            me->SetReactState(REACT_DEFENSIVE);
+            if (me->GetAreaId() == 4909)
+            {
+
+            }
+            else
+            {
+                DoStartNoMovement(me);
+                me->SetReactState(REACT_DEFENSIVE);
+            }
         }
 
         void CreatureMoveInLineOfSight(Unit* who) override
@@ -5624,7 +5631,12 @@ public:
 
         void Reset() override
         {
-
+            if (me->GetAreaId() == 4909)
+            {
+                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
+                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->SetReactState(REACT_AGGRESSIVE);
+            }
         }
 
         void UpdateAI(uint32 diff) override
@@ -6018,8 +6030,22 @@ public:
             me->SetSpeed(MOVE_RUN, 0.3f);
             me->CastSpell(me, 72866, true);
             me->CastSpell(me, 72778, true);
-            m_events.RescheduleEvent(EVENT_START_WALK, 1000);
-            m_events.RescheduleEvent(EVENT_COOLDOWN_00, 30000);
+            if (me->GetAreaId() == 4899)
+            { // show world live: 
+                m_events.RescheduleEvent(EVENT_SHOW_FIGHT, 1000);
+            }
+            else
+            { // part of quest: three little pygmies
+                m_events.RescheduleEvent(EVENT_START_WALK, 1000);
+                m_events.RescheduleEvent(EVENT_COOLDOWN_00, 30000);
+            }
+        }
+
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
+        {
+            if (spell->Id == SPELL_ROCKETS_BOOTS_DAMAGE_EFFECT_72886)
+                if (Player* player = caster->ToPlayer())
+                    player->KilledMonsterCredit(NPC_ZOMBIE_KILL_CREDIT_38807);
         }
 
         void SetGUID(uint64 guid, int32 id) override
@@ -6061,6 +6087,11 @@ public:
                         me->DespawnOrUnsummon(10);
 
                     break;
+                case EVENT_SHOW_FIGHT:
+                {
+                    me->GetMotionMaster()->MovePath(2383701, true);
+                    break;
+                }
                 }
             }
 
@@ -6245,8 +6276,15 @@ public:
             me->SetSpeed(MOVE_RUN, 0.3f);
             me->CastSpell(me, 72866, true);
             me->CastSpell(me, 72778, true);
-            m_events.RescheduleEvent(EVENT_START_WALK, 1000);
-            m_events.RescheduleEvent(EVENT_COOLDOWN_00, 30000);
+            if (me->GetAreaId() == 4899)
+            { // show world live: 
+                m_events.RescheduleEvent(EVENT_SHOW_FIGHT, 1000);
+            }
+            else
+            { // part of quest: three little pygmies
+                m_events.RescheduleEvent(EVENT_START_WALK, 1000);
+                m_events.RescheduleEvent(EVENT_COOLDOWN_00, 30000);
+            }
         }
 
         void SetGUID(uint64 guid, int32 id) override
@@ -6260,6 +6298,13 @@ public:
                 m_malmoGUID = guid;
                 break;
             }
+        }
+
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
+        {
+            if (spell->Id == SPELL_ROCKETS_BOOTS_DAMAGE_EFFECT_72886)
+                if (Player* player = caster->ToPlayer())
+                    player->KilledMonsterCredit(NPC_ZOMBIE_KILL_CREDIT_38807);
         }
 
         void UpdateAI(uint32 diff) override
@@ -6288,6 +6333,11 @@ public:
                         me->DespawnOrUnsummon(10);
 
                     break;
+                case EVENT_SHOW_FIGHT:
+                {
+                    me->GetMotionMaster()->MovePath(2383701, true);
+                    break;
+                }
                 }
             }
 
@@ -6489,6 +6539,13 @@ public:
             }
         }
 
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
+        {
+            if (spell->Id == SPELL_ROCKETS_BOOTS_DAMAGE_EFFECT_72886)
+                if (Player* player = caster->ToPlayer())
+                    player->KilledMonsterCredit(NPC_ZOMBIE_KILL_CREDIT_38807);
+        }
+
         void UpdateAI(uint32 diff) override
         {
             m_events.Update(diff);
@@ -6526,6 +6583,311 @@ public:
     CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_goblin_zombie_38815AI(creature);
+    }
+};
+
+// 72886
+class spell_rocket_boots_damage_effect_72886 : public SpellScriptLoader
+{
+public:
+    spell_rocket_boots_damage_effect_72886() : SpellScriptLoader("spell_rocket_boots_damage_effect_72886") { }
+
+    class ZombieCheck
+    {
+    public:
+        bool operator()(const WorldObject* target) const
+        {
+            switch (target->GetEntry())
+            {
+            case 38753:
+            case 38813:
+            case 38815:
+            case 38816:
+                return false;
+            }
+
+            return true;
+        }
+    };
+
+    class spell_rocket_boots_damage_effect_72886_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_rocket_boots_damage_effect_72886_SpellScript);
+
+        void FilterTargets(std::list<WorldObject*>& targets)
+        {
+           targets.remove_if(ZombieCheck());
+        }
+
+        void Register()
+        {
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_rocket_boots_damage_effect_72886_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_rocket_boots_damage_effect_72886_SpellScript();
+    }
+};
+
+// 38753
+class npc_goblin_zombie_38753 : public CreatureScript
+{
+public:
+    npc_goblin_zombie_38753() : CreatureScript("npc_goblin_zombie_38753") { }
+
+    struct npc_goblin_zombie_38753AI : public ScriptedAI
+    {
+        npc_goblin_zombie_38753AI(Creature* creature) : ScriptedAI(creature) { }
+
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
+        {
+            if (spell->Id == SPELL_ROCKETS_BOOTS_DAMAGE_EFFECT_72886)
+                if (Player* player = caster->ToPlayer())
+                    player->KilledMonsterCredit(NPC_ZOMBIE_KILL_CREDIT_38807);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_goblin_zombie_38753AI(creature);
+    }
+};
+
+// 38409
+class npc_goblin_survivor_38409 : public CreatureScript
+{
+public:
+    npc_goblin_survivor_38409() : CreatureScript("npc_goblin_survivor_38409") { }
+
+    struct npc_goblin_survivor_38409AI : public ScriptedAI
+    {
+        npc_goblin_survivor_38409AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+        EventMap m_events;
+
+        void Initialize() 
+        {
+            switch (me->GetAreaId())
+            {
+            case 4899:
+                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->SetReactState(REACT_PASSIVE);
+                break;
+            case 4909:
+                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
+                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->SetReactState(REACT_AGGRESSIVE);
+                break;
+            }
+        }
+
+        void CreatureMoveInLineOfSight(Unit* who) override
+        {
+            if (who->GetEntry() == 38813 || who->GetEntry() == 38816 || who->GetEntry() == 38753)
+                if (who->GetDistance2d(me) < 15.0f)
+                    me->CastSpell(who, 72944, true);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_goblin_survivor_38409AI(creature);
+    }
+};
+
+// 38745
+class npc_kezan_citizen_38745 : public CreatureScript
+{
+public:
+    npc_kezan_citizen_38745() : CreatureScript("npc_kezan_citizen_38745") { }
+
+    struct npc_kezan_citizen_38745AI : public ScriptedAI
+    {
+        npc_kezan_citizen_38745AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+        EventMap m_events;
+
+        void Initialize()
+        {
+            switch (me->GetAreaId())
+            {
+            case 4899:
+                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->SetReactState(REACT_PASSIVE);
+                break;
+            case 4909:
+                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
+                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->SetReactState(REACT_AGGRESSIVE);
+                break;
+            }
+        }
+
+        void CreatureMoveInLineOfSight(Unit* who) override
+        {
+            if (who->GetEntry() == 38813 || who->GetEntry() == 38816 || who->GetEntry() == 38753)
+                if (who->GetDistance2d(me) < 15.0f)
+                    me->CastSpell(who, 72944, true);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_kezan_citizen_38745AI(creature);
+    }
+};
+
+// 72944
+class spell_shoot_72944 : public SpellScriptLoader
+{
+public:
+    spell_shoot_72944() : SpellScriptLoader("spell_shoot_72944") { }
+
+    class ZombieCheck
+    {
+    public:
+        bool operator()(const WorldObject* target) const
+        {
+            switch (target->GetEntry())
+            {
+            case 38753:
+            case 38813:
+            case 38815:
+            case 38816:
+                return false;
+            }
+
+            return true;
+        }
+    };
+
+    class spell_shoot_72944_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_shoot_72944_SpellScript);
+
+        void FilterTargets(std::list<WorldObject*>& targets)
+        {
+            targets.remove_if(ZombieCheck());
+        }
+
+        void Register()
+        {
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_shoot_72944_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_shoot_72944_SpellScript();
+    }
+};
+
+// 38850
+class npc_volcanoth_champion_38850 : public CreatureScript
+{
+public:
+    npc_volcanoth_champion_38850() : CreatureScript("npc_volcanoth_champion_38850") { }
+
+    struct npc_volcanoth_champion_38850AI : public ScriptedAI
+    {
+        npc_volcanoth_champion_38850AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap m_events;
+
+        void Reset() override
+        {
+            m_events.RescheduleEvent(EVENT_CHECK_FIGHT, urand(1000, 2000));
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_CHECK_FIGHT:
+                {
+                    if (!me->IsInCombat())
+                        if (Creature* target = FindNewTarget())
+                        {
+                            DoStartMovement(target);
+                            me->Attack(target, true);
+                            target->Attack(me, true);
+                        }
+
+                    m_events.ScheduleEvent(EVENT_CHECK_FIGHT, urand(9000, 10000));
+                    break;
+                }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+
+        Creature* FindNewTarget()
+        {
+            std::list<Creature*> cList = me->FindAllUnfriendlyCreaturesInRange(10.0f);
+            GetCreatureListWithEntryInGrid(cList, me, 38409, 10.0f);
+            GetCreatureListWithEntryInGrid(cList, me, 38745, 10.0f);
+
+           return FindNearestEntry(cList, me->GetPosition());
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_volcanoth_champion_38850AI(creature);
+    }
+};
+
+// 36615
+class npc_doc_zapnozzle_36615 : public CreatureScript
+{
+public:
+    npc_doc_zapnozzle_36615() : CreatureScript("npc_doc_zapnozzle_36615") { }
+
+    struct npc_doc_zapnozzle_36615AI : public ScriptedAI
+    {
+        npc_doc_zapnozzle_36615AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap m_events;
+
+        void Reset() override
+        {
+
+        }
+
+        void MovementInform(uint32 type, uint32 id) override 
+        { 
+            if (type == WAYPOINT_MOTION_TYPE)
+                switch (id)
+                {
+                case 0:
+                case 8:
+                {
+                    std::list<Creature*> cList = me->FindAllFriendlyCreaturesInRange(15.0f);
+                    for (auto npc : cList)
+                        if (npc->GetHealthPct() < 50.0f)
+                        {
+                            me->CastSpell(npc, 72996, true);
+                            break;
+                        }
+                    break;
+                }
+                }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_doc_zapnozzle_36615AI(creature);
     }
 };
 
@@ -6629,4 +6991,11 @@ void AddSC_zone_lost_isles()
     new npc_teloch_38810();
     new npc_goblin_captive_50310();
     new npc_goblin_zombie_38815();
+    new spell_rocket_boots_damage_effect_72886();
+    new npc_goblin_zombie_38753();
+    new npc_goblin_survivor_38409();
+    new npc_kezan_citizen_38745();
+    new spell_shoot_72944();
+    new npc_volcanoth_champion_38850();
+    new npc_doc_zapnozzle_36615();
 }

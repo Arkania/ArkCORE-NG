@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2016 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2017 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "script_helper.h"
 #include "Creature.h"
 #include "GameObjectAI.h"
 #include "GameObject.h"
@@ -98,43 +99,7 @@ enum eKezanEnumerate
     SPELL_EARTHQUAKE_CAMERA_SHAKE = 96274,
     SPELL_FLASH_HEAL_2061 = 2061,
     SPELL_SUMMON_HOT_ROD_37676 = 70321,
-    PLAYER_GUID = 99991,
-    ACTION_ENTER_CAR = 101,
-    ACTION_HELP_PLAYER,
-    ACTION_STOP_HELP_PLAYER,
-    EVENT_ENTER_CAR,
-    EVENT_TALK_PERIODIC,
-    EVENT_MUSIC_PERIODIC,
-    EVENT_CHECK_FOR_PLAYER,
-    EVENT_CHECK_FOR_CREATURE,
-    EVENT_TALK,
-    EVENT_TALK_COOLDOWN,
-    EVENT_CAST_COOLDOWN,
-    EVENT_GIVE_UP,
-    EVENT_COMBAT_STOP,
-    EVENT_RESET_TARGET,
-    EVENT_KILL_TARGET,
-    EVENT_OWNER_IS_ATTACKED,
-    EVENT_PLAY_SOUND1,
-    EVENT_PLAY_SOUND2,
-    EVENT_RANDOM_EMOTE,
-    EVENT_CAST_SPELL,
-    EVENT_EXIT_VEHICLE,
-    EVENT_EARTHQUAKE,
-    EVENT_SAY_EARTHQUAKE,
-    EVENT_ATTACK_SPELL,
-    EVENT_WAIT_TO_MOVE,
-    EVENT_MOVE_PART1,
-    EVENT_MOVE_PART2,
-    EVENT_MOVE_PART3,
-    EVENT_MOVE_PART4,
-    EVENT_MOVE_PART5,
-    EVENT_MOVE_PART6,
-    EVENT_MOVE_PART7,
-    EVENT_MOVE_PART8,
-    EVENT_MOVE_PART9,
-    EVENT_MOVE_HOME,
-    EVENT_WAIT_FOR_NEW_SPEED,
+ 
 };
 
 void SetCombatAllowed(Creature* npc)
@@ -159,7 +124,6 @@ public:
 
     enum eNpc
     {
-        EVENT_SPELLCAST = 1,
         SPELL_SHADOW_BOLD = 69607,
         SPELL_FIREBALL = 69608,
         NPC_EVOL_FINGERS = 34696,
@@ -235,7 +199,6 @@ public:
 
     enum eNpc
     {
-        EVENT_SPELLCAST = 1,
         SPELL_SHADOW_BOLD = 69607,
         SPELL_FIREBALL = 69608,
         NPC_FIZZ_LIGHTER = 34689,
@@ -414,11 +377,6 @@ class npc_kaja_cola_balloon_37804 : public CreatureScript
 public:
     npc_kaja_cola_balloon_37804() : CreatureScript("npc_kaja_cola_balloon_37804") { }
 
-    enum eNPC
-    {
-        EVENTS_BALLON_MESSAGE = 201,
-    };
-
     struct npc_kaja_cola_balloon_37804AI : public ScriptedAI
     {
         npc_kaja_cola_balloon_37804AI(Creature* creature) : ScriptedAI(creature) { }
@@ -427,7 +385,7 @@ public:
 
         void Reset() override
         {
-            m_events.ScheduleEvent(EVENTS_BALLON_MESSAGE, 10000);
+            m_events.ScheduleEvent(EVENT_BALLON_MESSAGE, 10000);
         }
 
         void UpdateAI(uint32 diff) override
@@ -438,10 +396,10 @@ public:
             {
                 switch (eventId)
                 {
-                case EVENTS_BALLON_MESSAGE:
+                case EVENT_BALLON_MESSAGE:
                 {
                     Talk(0);
-                    m_events.ScheduleEvent(EVENTS_BALLON_MESSAGE, urand(30000, 45000));
+                    m_events.ScheduleEvent(EVENT_BALLON_MESSAGE, urand(30000, 45000));
                     break;
                 }
                 }
@@ -465,14 +423,6 @@ class npc_sassy_hardwrench_34668 : public CreatureScript
 {
 public:
     npc_sassy_hardwrench_34668() : CreatureScript("npc_sassy_hardwrench_34668") { }
-
-    enum eNPC
-    {
-        // QUEST_KAJA_COLA
-        ACTION_START_RESCUE_LIVE = 902,
-        EVENT_START_RESCUE_LIVE,
-        EVENT_ENTER_THE_HOTROD,
-    };
 
     bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
     {
@@ -600,19 +550,12 @@ public:
     enum eNPC
     {
         SPELL_SASSYS_INCENTIVE = 82025,
-
-        ACTION_DELIVER_BUMM_PACKET = 201,
-        EVENT_START_ANIM_BUMM_PACKET,
-        EVENT_MASTER_RESET,
-        EVENT_PACKET_EXPLODE,
-        EVENT_SAY_OUTCH,
-        EVENT_SAY_HAVE_UNDERSTAND,
     };
 
     bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*opt*/)
     {
         if (quest->GetQuestId() == QUEST_TAKING_CARE_OF_BUSINESS)
-            creature->GetAI()->DoAction(ACTION_DELIVER_BUMM_PACKET);
+            creature->GetAI()->DoAction(ACTION_DELIVER_PACKET);
 
         if (player->GetQuestStatus(QUEST_GOOD_HELP_IS_HARD_TO_FIND) == QUEST_STATUS_REWARDED && player->GetQuestStatus(QUEST_TROUBLE_IN_THE_MINES) == QUEST_STATUS_REWARDED)
             creature->AI()->Talk(5, player);
@@ -636,9 +579,9 @@ public:
         void DoAction(int32 param) override
         {
             if (!m_anim_is_started)
-                if (param == ACTION_DELIVER_BUMM_PACKET)
+                if (param == ACTION_DELIVER_PACKET)
                 {
-                    m_events.ScheduleEvent(EVENT_START_ANIM_BUMM_PACKET, 500);
+                    m_events.ScheduleEvent(EVENT_START_ANIMATION_PACKET, 500);
                     m_events.ScheduleEvent(EVENT_MASTER_RESET, 30000);
                 }
         }
@@ -656,7 +599,7 @@ public:
                     Reset();
                     break;
                 }
-                case EVENT_START_ANIM_BUMM_PACKET:
+                case EVENT_START_ANIMATION_PACKET:
                 {
                     Talk(0);
                     m_events.ScheduleEvent(EVENT_PACKET_EXPLODE, 4000);
@@ -706,7 +649,6 @@ public:
     enum eNPC
     {
         SPELL_POWER_WORD_FORTITUDE = 74973,
-        EVENTS_TALK_COOLDOWN = 201,
     };
 
     struct npc_sister_goldskimmer_34692AI : public ScriptedAI
@@ -731,7 +673,7 @@ public:
                     {
                         Talk(0, who);
                         m_talk_cd_active = true;
-                        m_events.ScheduleEvent(EVENTS_TALK_COOLDOWN, 6000);
+                        m_events.ScheduleEvent(EVENT_TALK_COOLDOWN, 6000);
                     }
                 }
         }
@@ -744,7 +686,7 @@ public:
             {
                 switch (eventId)
                 {
-                case EVENTS_TALK_COOLDOWN:
+                case EVENT_TALK_COOLDOWN:
                 {
                     m_talk_cd_active = false;
                     break;
@@ -775,7 +717,6 @@ public:
     {
         NPC_TRAININGS_DUMMY = 48304,
         SPELL_SHOOT_GUN = 69509,
-        EVENT_SHOOT_ON_DUMMY = 201,
     };
 
     struct npc_bamm_megabomb_34673AI : public ScriptedAI
@@ -885,11 +826,6 @@ class npc_candy_cane_35053 : public CreatureScript
 public:
     npc_candy_cane_35053() : CreatureScript("npc_candy_cane_35053") { }
 
-    enum eNPC
-    {
-
-    };
-
     bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
     {
         switch (quest->GetQuestId())
@@ -912,10 +848,6 @@ class npc_chip_endale_35054 : public CreatureScript
 public:
     npc_chip_endale_35054() : CreatureScript("npc_chip_endale_35054") { }
 
-    enum eNPC
-    {
-    };
-
     bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
     {
         switch (quest->GetQuestId())
@@ -937,10 +869,6 @@ class npc_hobart_grapplehammer_48494 : public CreatureScript
 {
 public:
     npc_hobart_grapplehammer_48494() : CreatureScript("npc_hobart_grapplehammer_48494") { }
-
-    enum eNPC
-    {
-    };
 
     struct npc_hobart_grapplehammer_48494AI : public ScriptedAI
     {
@@ -989,8 +917,6 @@ public:
     enum eNPC
     {
         SPELL_GIZMO_HELMET = 91603,
-
-        EVENT_ANIM_SUBJECT_NINE = 201,
     };
 
     struct npc_subject_nine_49150AI : public ScriptedAI
@@ -1001,7 +927,7 @@ public:
 
         void Reset() override
         {
-            m_events.ScheduleEvent(EVENT_ANIM_SUBJECT_NINE, 10000);
+            m_events.ScheduleEvent(EVENT_ANIMATION_SUBJECT, 10000);
             if (!me->HasAura(SPELL_GIZMO_HELMET))
                 me->CastSpell(me, SPELL_GIZMO_HELMET, true);
         }
@@ -1014,11 +940,11 @@ public:
             {
                 switch (eventId)
                 {
-                case EVENT_ANIM_SUBJECT_NINE:
+                case EVENT_ANIMATION_SUBJECT:
                 {
                     me->SendPlaySound(18178, false);
                     me->HandleEmoteCommand(RAND(33, 35, 377));
-                    m_events.ScheduleEvent(EVENT_ANIM_SUBJECT_NINE, urand(15000, 18000));
+                    m_events.ScheduleEvent(EVENT_ANIMATION_SUBJECT, urand(15000, 18000));
                     break;
                 }
                 }
@@ -1072,11 +998,6 @@ class npc_brute_enforcer_35304 : public CreatureScript
 public:
     npc_brute_enforcer_35304() : CreatureScript("npc_brute_enforcer_35304") { }
 
-    enum eNPC
-    {
-        EVENTS_TALK_COOLDOWN = 201,
-    };
-
     struct npc_brute_enforcer_35304AI : public ScriptedAI
     {
         npc_brute_enforcer_35304AI(Creature* creature) : ScriptedAI(creature) { }
@@ -1098,7 +1019,7 @@ public:
                         {
                             Talk(0, who);
                             m_talk_cd_active = true;
-                            m_events.ScheduleEvent(EVENTS_TALK_COOLDOWN, urand(10000, 15000));
+                            m_events.ScheduleEvent(EVENT_TALK_COOLDOWN, urand(10000, 15000));
                         }
         }
 
@@ -1110,7 +1031,7 @@ public:
             {
                 switch (eventId)
                 {
-                case EVENTS_TALK_COOLDOWN:
+                case EVENT_TALK_COOLDOWN:
                 {
                     m_talk_cd_active = false;
                     break;
@@ -2475,8 +2396,6 @@ public:
     enum eNpc
     {
         SPELL_SUMMON_STEAMWHEEDLE_SHARK = 69971,
-        EVENT_START_PLAY_GAME = 901,
-        EVENT_OBSERVER_CHEERING,
     };
 
     struct npc_bilgewater_buccaneer_37179AI : public VehicleAI
@@ -2518,7 +2437,7 @@ public:
                         player->KilledMonsterCredit(NPC_NECESSARY_ROUGHNESS_KILL_CREDIT);
                         m_events.ScheduleEvent(EVENT_PLAY_SOUND1, 1000);
                         m_events.ScheduleEvent(EVENT_START_PLAY_GAME, 4000);
-                        m_events.ScheduleEvent(EVENT_OBSERVER_CHEERING, 250);
+                        m_events.ScheduleEvent(EVENT_PERIODIC_CHEERING, 250);
                     }
                 }
             }
@@ -2568,13 +2487,13 @@ public:
                     StartPlayGame();
                     break;
                 }
-                case EVENT_OBSERVER_CHEERING:
+                case EVENT_PERIODIC_CHEERING:
                 {
                     for (uint32 i = 0; i < urand(3, 10); i++)
                         if (Creature* npc = GetRandomObserver())
                             npc->HandleEmoteCommand(GetRandomEmote());
 
-                    m_events.ScheduleEvent(EVENT_OBSERVER_CHEERING, 500);
+                    m_events.ScheduleEvent(EVENT_PERIODIC_CHEERING, 500);
                     break;
                 }
                 }
@@ -2646,11 +2565,6 @@ class npc_steamwheedle_shark_37114 : public CreatureScript
 {
 public:
     npc_steamwheedle_shark_37114() : CreatureScript("npc_steamwheedle_shark_37114") { }
-
-    enum eNpc
-    {
-        EVENT_WE_ARE_KILLED = 901,
-    };
 
     struct npc_steamwheedle_shark_37114AI : public ScriptedAI
     {
@@ -2733,7 +2647,6 @@ public:
     enum eNpc
     {
         SPELL_SUMMON_DEATHWING = 66322,
-        EVENT_SUMMON_DEATHWING = 901,
     };
 
     struct npc_bilgewater_buccaneer_37213AI : public VehicleAI
@@ -3106,9 +3019,6 @@ public:
     enum eNpc
     {
         NPC_OOMLOT_WARRIER_38531 = 38531,
-        EVENT_CREATE_OOMLOT_WARRIER = 900,
-        EVENT_CHECK_POSITION,
-        EVENT_COOLDOWN_PLAYER_NEAR,
     };
 
     struct npc_elm_general_purpose_bunny_large_24110AI : public ScriptedAI
@@ -3213,12 +3123,12 @@ public:
                         {
                             m_chain_position = 3; // far spawn of oomlot warrier  to populate the way..
                             m_events.RescheduleEvent(EVENT_CHECK_POSITION, 1000);
-                            m_events.RescheduleEvent(EVENT_CREATE_OOMLOT_WARRIER, 2500);
+                            m_events.RescheduleEvent(EVENT_CREATE_WARRIER, 2500);
                         }
                     }
                     break;
                 }
-                case EVENT_CREATE_OOMLOT_WARRIER:
+                case EVENT_CREATE_WARRIER:
                 {
                     if (m_validPlayerNear == false)
                         m_events.RescheduleEvent(EVENT_COOLDOWN_PLAYER_NEAR, 1000);
@@ -3228,7 +3138,7 @@ public:
                         me->SummonCreature(38531, pos, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 250000);
                     }
 
-                    m_events.RescheduleEvent(EVENT_CREATE_OOMLOT_WARRIER, 2500);
+                    m_events.RescheduleEvent(EVENT_CREATE_WARRIER, 2500);
                     break;
                 }
                 case EVENT_COOLDOWN_PLAYER_NEAR:
@@ -3296,9 +3206,6 @@ public:
         SPELL_PLAYER_DANCE = 66911,
         SPELL_PLAYER_FIREWORKS = 66912,
         SPELL_PLAYER_HORS_DOEUVRES = 66913,
-        EVENT_CHECK_START_PARTY = 901,
-        EVENT_START_PARTY,
-        EVENT_PARTY_START_COOLDOWN,
     };
 
     struct npc_kezan_partygoer_35175_86AI : public ScriptedAI
@@ -3419,19 +3326,19 @@ public:
                                 Talk(m_partyTyp, player);
                                 m_doing = true;
                                 m_cooldown = true;
-                                m_events.ScheduleEvent(EVENT_PARTY_START_COOLDOWN, 120000);
+                                m_events.ScheduleEvent(EVENT_PARTY_COOLDOWN, 120000);
                             }
                             else
                             {
                                 m_cooldown = true;
-                                m_events.ScheduleEvent(EVENT_PARTY_START_COOLDOWN, urand(30000, 60000));
+                                m_events.ScheduleEvent(EVENT_PARTY_COOLDOWN, urand(30000, 60000));
                             }
                         }
 
                     m_events.ScheduleEvent(EVENT_CHECK_START_PARTY, 1000);
                     break;
                 }
-                case EVENT_PARTY_START_COOLDOWN:
+                case EVENT_PARTY_COOLDOWN:
                 {
                     m_doing = false;
                     m_cooldown = false;
@@ -3498,11 +3405,6 @@ class npc_hired_looter_35234 : public CreatureScript
 {
 public:
     npc_hired_looter_35234() : CreatureScript("npc_hired_looter_35234") { }
-
-    enum eNpc
-    {
-        EVENT_TORCH_COOLDOWN = 901,
-    };
 
     struct npc_hired_looter_35234AI : public ScriptedAI
     {
@@ -3699,12 +3601,6 @@ public:
         SPELL_VAULT_CRACKING_TOOLSET = 67476,
         SPELL_VEHICLE_EXIT_SPELL = 67579,
         SPELL_VAULT_CRACKED = 67492,
-        EVENT_START_PLAY = 901,
-        EVENT_PLAYING,
-        EVENTS_PLAY_COOLDOWN,
-        EVENT_CHECK_TIMEOUT,
-        EVENT_MASTER_RESET,
-        EVENT_PLAYER_EXIT,
     };
 
     struct npc_first_bank_of_kezan_vault_35486AI : public VehicleAI
@@ -3984,11 +3880,6 @@ class npc_gasbot_37598 : public CreatureScript
 {
 public:
     npc_gasbot_37598() : CreatureScript("npc_gasbot_37598") { }
-
-    enum eNpc
-    {
-      
-    };
 
     struct npc_gasbot_37598AI : public VehicleAI
     {

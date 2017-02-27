@@ -29,6 +29,7 @@ EndScriptData */
 
 /* ContentData */
 
+#include "script_helper.h"
 #include "CreatureTextMgr.h"
 #include "PassiveAI.h"
 #include "Player.h"

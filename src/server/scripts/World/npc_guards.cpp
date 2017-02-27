@@ -226,7 +226,7 @@ public:
                     else
                         me->AttackerStateUpdate(me->GetVictim());
 
-                    me->resetAttackTimer();
+                    me->ResetAttackTimer();
                 }
             }
             else

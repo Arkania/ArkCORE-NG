@@ -546,7 +546,7 @@ class boss_flame_leviathan : public CreatureScript
                         if (me->IsWithinCombatRange(target, 30.0f))
                         {
                             DoCast(target, SPELL_BATTERING_RAM);
-                            me->resetAttackTimer();
+                            me->ResetAttackTimer();
                         }
                     }
                 }

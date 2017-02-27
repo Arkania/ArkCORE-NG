@@ -1746,7 +1746,7 @@ void Player::Update(uint32 p_time)
 
                     // do attack
                     AttackerStateUpdate(victim, BASE_ATTACK);
-                    resetAttackTimer(BASE_ATTACK);
+                    ResetAttackTimer(BASE_ATTACK);
                 }
             }
 
@@ -1764,7 +1764,7 @@ void Player::Update(uint32 p_time)
 
                     // do attack
                     AttackerStateUpdate(victim, OFF_ATTACK);
-                    resetAttackTimer(OFF_ATTACK);
+                    ResetAttackTimer(OFF_ATTACK);
                 }
             }
 
@@ -16689,7 +16689,7 @@ void Player::CompleteQuest(uint32 quest_id)
                 SetQuestSlotState(log_slot, QUEST_STATE_COMPLETE);
 
             uint64 guid = GetQuestGiverGUID(quest_id);
-            if (guid != GetGUID())
+            if (guid && guid != GetGUID())
                 printf("test: stored questGiverGuid != playerGuid\n");
 
             Object* questGiver = ObjectAccessor::GetObjectByTypeMask(*this, guid, TYPEMASK_UNIT | TYPEMASK_GAMEOBJECT | TYPEMASK_ITEM);
