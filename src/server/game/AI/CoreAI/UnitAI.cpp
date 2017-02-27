@@ -53,15 +53,57 @@ void UnitAI::DoMeleeAttackIfReady()
     //Make sure our attack is ready and we aren't currently casting before checking distance
     if (me->isAttackReady())
     {
-        me->AttackerStateUpdate(victim);
-        me->resetAttackTimer();
+        if (IsFakeAttack(me, victim))
+        {
+            me->FakeAttackerStateUpdate(victim);
+            me->ResetFakeAttackTimer();
+        }
+        else
+        {
+            me->AttackerStateUpdate(victim);
+            me->ResetAttackTimer();
+        }
     }
 
     if (me->haveOffhandWeapon() && me->isAttackReady(OFF_ATTACK))
     {
-        me->AttackerStateUpdate(victim, OFF_ATTACK);
-        me->resetAttackTimer(OFF_ATTACK);
+        if (IsFakeAttack(me, victim))
+        {
+            me->FakeAttackerStateUpdate(victim, OFF_ATTACK);
+            me->ResetFakeAttackTimer();
+        }
+        else
+        {
+            me->AttackerStateUpdate(victim, OFF_ATTACK);
+            me->ResetAttackTimer(OFF_ATTACK);
+        }
     }
+}
+
+/* the FactionTemplate.dbc has a column 'flags'. this flags value, has bit 2^4, 2^5 and 2^6 that are involved (i guess) in ShowFight 
+between alliance- and horde- soldiers. On update, each creature are checked for MeleeAttack with his selected target. Here we detect 
+this fight-pair as FakeAttackers when one of them have set one of the 'Fake' bits. If so, then we replace the function AttackerStateUpdate()
+with the new FakeAttackerStateUpdate(), this returns zero damage between both of the sparring partners. */
+bool UnitAI::IsFakeAttack(Unit* npcA, Unit* npcB)
+{
+    if (!npcA || !npcB)
+        return false;
+    if (npcA->IsDead() || npcB->IsDead())
+        return false;
+    
+    FactionTemplateEntry const* meFEntry = npcA->GetFactionTemplateEntry();
+    FactionTemplateEntry const* vicFEntry = npcB->GetFactionTemplateEntry();
+
+    uint32 meFlags = meFEntry->factionFlags;
+    uint32 vicFlags = vicFEntry->factionFlags;
+
+    if (meFEntry->IsHostileTo(*vicFEntry) || vicFEntry->IsHostileTo(*meFEntry))
+        if ((meFlags & FACTION_TEMPLATE_ENEMY_SPARRING) && (!(vicFlags & FACTION_TEMPLATE_ENEMY_SPARRING)))
+            return true;
+        else if ((vicFlags & FACTION_TEMPLATE_ENEMY_SPARRING) && (!(meFlags & FACTION_TEMPLATE_ENEMY_SPARRING)))
+            return true;
+
+    return false;
 }
 
 bool UnitAI::DoSpellAttackIfReady(uint32 spell)
@@ -74,7 +116,7 @@ bool UnitAI::DoSpellAttackIfReady(uint32 spell)
         if (me->IsWithinCombatRange(me->GetVictim(), spellInfo->GetMaxRange(false)))
         {
             me->CastSpell(me->GetVictim(), spell, false);
-            me->resetAttackTimer();
+            me->ResetAttackTimer();
             return true;
         }
     }

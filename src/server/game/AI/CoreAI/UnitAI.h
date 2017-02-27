@@ -249,6 +249,7 @@ class UnitAI
         float DoGetSpellMaxRange(uint32 spellId, bool positive = false);
 
         void DoMeleeAttackIfReady();
+        bool IsFakeAttack(Unit* npcA, Unit* npcB);
         bool DoSpellAttackIfReady(uint32 spell);
 
         static AISpellInfoType* AISpellInfo;

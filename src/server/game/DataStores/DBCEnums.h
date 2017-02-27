@@ -371,9 +371,14 @@ enum SpawnMask
 
 enum FactionTemplateFlags
 {
-    FACTION_TEMPLATE_FLAG_PVP               = 0x00000800,   // flagged for PvP
-    FACTION_TEMPLATE_FLAG_CONTESTED_GUARD   = 0x00001000,   // faction will attack players that were involved in PvP combats
-    FACTION_TEMPLATE_FLAG_HOSTILE_BY_DEFAULT= 0x00002000
+    FACTION_TEMPLATE_ENEMY_SPARRING_0               = 0x00000010,   // guessed, sparring with enemies?
+    FACTION_TEMPLATE_ENEMY_SPARRING_1               = 0x00000020,   // guessed, sparring with enemies?
+    FACTION_TEMPLATE_ENEMY_SPARRING_2               = 0x00000040,   // guessed, sparring with enemies?
+    FACTION_TEMPLATE_FLAG_PVP                       = 0x00000800,   // flagged for PvP
+    FACTION_TEMPLATE_FLAG_CONTESTED_GUARD           = 0x00001000,   // faction will attack players that were involved in PvP combats
+    FACTION_TEMPLATE_FLAG_HOSTILE_BY_DEFAULT        = 0x00002000,
+
+    FACTION_TEMPLATE_ENEMY_SPARRING = FACTION_TEMPLATE_ENEMY_SPARRING_0 | FACTION_TEMPLATE_ENEMY_SPARRING_1 | FACTION_TEMPLATE_ENEMY_SPARRING_2,
 };
 
 enum FactionMasks
