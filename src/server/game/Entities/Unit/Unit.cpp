@@ -11735,6 +11735,10 @@ void Unit::Dismount()
 
     if (Player* thisPlayer = ToPlayer())
         thisPlayer->SendMovementSetCollisionHeight(thisPlayer->GetCollisionHeight(false));
+	
+	// for dismount inside Vashj'ir
+	if(ToPlayer()->HasAura(86510))
+		ToPlayer()->RemoveAura(86510);
 
     WorldPacket data(SMSG_DISMOUNT, 8);
     data.appendPackGUID(GetGUID());
