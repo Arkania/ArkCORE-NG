@@ -104,6 +104,7 @@ class ChatHandler
 
         char*     extractKeyFromLink(char* text, char const* linkType, char** something1 = NULL);
         char*     extractKeyFromLink(char* text, char const* const* linkTypes, int* found_idx, char** something1 = NULL);
+        std::string GetKeyFromLink(std::string text, std::string linkTypes);
 
         // if args have single value then it return in arg2 and arg1 == NULL
         void      extractOptFirstArg(char* args, char** arg1, char** arg2);
