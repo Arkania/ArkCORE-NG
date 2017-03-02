@@ -450,10 +450,8 @@ public:
 		void SpellHit(Unit* caster, SpellInfo const* spell) override
 		{
 			if (Player* player = caster->ToPlayer())
-				if (player->GetQuestStatus(QUEST_A_REJUVENATING_TOUCH_27067) == QUEST_STATUS_INCOMPLETE)
-					player->KilledMonsterCredit(NPC_HEALING_CREDIT_44175);
-				else if (player->GetQuestStatus(QUEST_FLASH_HEAL_27066) == QUEST_STATUS_INCOMPLETE)
-					player->KilledMonsterCredit(NPC_HEALING_CREDIT_44175);
+				if (player->GetQuestStatus(QUEST_FLASH_HEAL_27066) == QUEST_STATUS_INCOMPLETE)
+					player->KilledMonsterCredit(45199);
 		}
 	};
 
