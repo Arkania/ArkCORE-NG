@@ -37,6 +37,7 @@
 #include "ScriptMgr.h"
 #include "Transport.h"
 #include "ChatLink.h"
+#include <cctype>
 
 bool ChatHandler::load_command_table = true;
 
@@ -58,6 +59,57 @@ static size_t appendCommandTable(ChatCommand* target, const ChatCommand* source)
     if (count)
         memcpy(target, source, count * sizeof(ChatCommand));
     return count;
+}
+
+// replace: string.replace(&baseString, fromString, toString)
+void replace_all(std::string& str, const std::string& from, const std::string& to) {
+    if (from.empty())
+        return;
+    size_t start_pos = 0;
+    while ((start_pos = str.find(from, start_pos)) != std::string::npos) {
+        str.replace(start_pos, from.length(), to);
+        start_pos += to.length(); 
+    }
+}
+
+std::vector<std::string> str_split(std::string text, char delimiter)
+{
+    std::vector<std::string> tokens;
+    std::stringstream ss(text);
+    std::string item;
+    while (std::getline(ss, item, delimiter))
+    {
+        tokens.push_back(item);
+    }
+    return tokens;
+}
+
+std::string str_tolower(std::string text)
+{
+   std::transform(text.begin(), text.end(), text.begin(), std::tolower);
+   return text;
+}
+
+// trim from start
+std::string str_ltrim(std::string &s) 
+{
+    s.erase(s.begin(), std::find_if(s.begin(), s.end(),
+        std::not1(std::ptr_fun<int, int>(std::isspace))));
+    return s;
+}
+
+// trim from end
+std::string str_rtrim(std::string &s) 
+{
+    s.erase(std::find_if(s.rbegin(), s.rend(),
+        std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
+    return s;
+}
+
+// trim from both ends
+std::string str_trim(std::string &text) 
+{
+    return str_ltrim(str_rtrim(text));
 }
 
 ChatCommand* ChatHandler::getCommandTable()
@@ -96,8 +148,10 @@ ChatCommand* ChatHandler::getCommandTable()
             {
                 Field* fields = result->Fetch();
                 std::string name = fields[0].GetString();
-
-                SetDataForCommandInTable(commandTableCache, name.c_str(), fields[1].GetUInt16(), fields[2].GetString(), name);
+                std::string help = fields[2].GetString();
+                replace_all(help, "\x0D\x0A" , "\n");
+                
+                SetDataForCommandInTable(commandTableCache, name.c_str(), fields[1].GetUInt16(), help, name);
             }
             while (result->NextRow());
         }
@@ -979,6 +1033,26 @@ char* ChatHandler::extractKeyFromLink(char* text, char const* const* linkTypes, 
     strtok(NULL, " ");                                      // skip link tail (to allow continue strtok(NULL, s) use after return from function
     SendSysMessage(LANG_WRONG_LINK_TYPE);
     return NULL;
+}
+
+std::string ChatHandler::GetKeyFromLink(std::string text, std::string linkTypes)
+{
+    if (text.length() == 0)
+        return "";
+    if (linkTypes.length() == 0)
+        return "";
+    if (text.length() < linkTypes.length())
+        return "";
+    std::vector<std::string> tokens = str_split(text, '|');
+    for (auto s1 : tokens)
+    {
+        std::vector<std::string> tok1 = str_split(s1, ':');
+        if (tok1.size() > 1)
+            if (str_trim(str_tolower(tok1[0])) == str_trim(str_tolower(linkTypes)))
+                return str_trim(tok1[1]);
+    }
+
+    return "";
 }
 
 GameObject* ChatHandler::GetNearbyGameObject()
