@@ -5668,7 +5668,7 @@ SpellCastResult Spell::CheckCast(bool strict)
             {
                  // Fix for the Vashj'ir Mounts.
                 if (m_caster->IsInWater() && !(m_spellInfo->Id == 98718 || m_spellInfo->Id == 75207))
-					return SPELL_FAILED_ONLY_ABOVEWATER;
+				    return SPELL_FAILED_ONLY_ABOVEWATER;
 
                 // Ignore map check if spell have AreaId. AreaId already checked and this prevent special mount spells
                 bool allowMount = !m_caster->GetMap()->IsDungeon() || m_caster->GetMap()->IsBattlegroundOrArena();
