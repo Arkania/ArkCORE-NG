@@ -1152,10 +1152,11 @@ public:
         {
             // number or [name] Shift-click form |color|Hcreature:dbGuid|h[name]|h|r
             std::string guid = handler->GetKeyFromLink(fullcmd, "Hcreature");
-            if (dbGuid = stoi(guid))
-                if (CreatureData const* cr_data = sObjectMgr->GetCreatureData(dbGuid))
-                    creature = handler->GetSession()->GetPlayer()->GetMap()->GetCreature(MAKE_NEW_GUID(dbGuid, cr_data->id, HIGHGUID_UNIT));
-        }
+            if (guid.size() > 0)
+                if (dbGuid = stoi(guid))
+                    if (CreatureData const* cr_data = sObjectMgr->GetCreatureData(dbGuid))
+                        creature = handler->GetSession()->GetPlayer()->GetMap()->GetCreature(MAKE_NEW_GUID(dbGuid, cr_data->id, HIGHGUID_UNIT));
+            }
 
         if (!creature || creature->IsPet())
         {
@@ -1219,9 +1220,10 @@ public:
         {
             // number or [name] Shift-click form |color|Hcreature:dbGuid|h[name]|h|r
             std::string guid = handler->GetKeyFromLink(fullcmd, "Hcreature");
-            if (dbGuid = stoi(guid))
-                if (CreatureData const* cr_data = sObjectMgr->GetCreatureData(dbGuid))
-                    creature = handler->GetSession()->GetPlayer()->GetMap()->GetCreature(MAKE_NEW_GUID(dbGuid, cr_data->id, HIGHGUID_UNIT));
+            if (guid.size() > 0)
+                if (dbGuid = stoi(guid))
+                    if (CreatureData const* cr_data = sObjectMgr->GetCreatureData(dbGuid))
+                        creature = handler->GetSession()->GetPlayer()->GetMap()->GetCreature(MAKE_NEW_GUID(dbGuid, cr_data->id, HIGHGUID_UNIT));
         }
 
         if (!creature || creature->IsPet())

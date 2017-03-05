@@ -93,20 +93,23 @@ enum Zone_zone_lost_isles
     SPELL_ROCKETS_BOOTS_DAMAGE_EFFECT_72886 = 72886,
 };
 
-
-Creature* FindNearestEntry(std::list<Creature*>cList, Position currentPos)
+Creature* FindNearestTarget(std::list<Creature*>cList, Unit* source)
 {
+
     float dist = 1000;
     Creature* cDist = nullptr;
-    for (auto npc : cList)
-    {
-        float d1 = currentPos.GetExactDist(npc);
-        if (d1 < dist)
-        {
-            dist = d1;
-            cDist = npc;
-        }
-    }
+    if (Creature* attacker = source->ToCreature())
+        for (auto npc : cList)
+            if (npc->IsInCombat() == false)
+                if (attacker->CanStartAttack(npc, false))
+                {
+                    float d1 = source->GetExactDist(npc);
+                    if (d1 < dist)
+                    {
+                        dist = d1;
+                        cDist = npc;
+                    }
+                }
     return cDist;
 }
 
@@ -3376,6 +3379,11 @@ public:
         case 24744:
         {
             creature->AI()->Talk(4, player);
+            break;
+        }
+        case 24958:
+        {
+            creature->AI()->Talk(7, player);
             break;
         }
         }
@@ -6811,7 +6819,13 @@ public:
                 {
                 case EVENT_CHECK_FIGHT:
                 {
-                    if (!me->IsInCombat())
+                    Position pos = me->GetHomePosition();
+                    if (pos.GetExactDist(me) > 15.0f)
+                    {
+                        me->CombatStop();
+                        me->GetMotionMaster()->MoveTargetedHome();
+                    }
+                    else if (!me->IsInCombat())
                         if (Creature* target = FindNewTarget())
                         {
                             DoStartMovement(target);
@@ -6837,7 +6851,7 @@ public:
             GetCreatureListWithEntryInGrid(cList, me, 38409, 10.0f);
             GetCreatureListWithEntryInGrid(cList, me, 38745, 10.0f);
 
-           return FindNearestEntry(cList, me->GetPosition());
+           return FindNearestTarget(cList, me);
         }
     };
 
@@ -6888,6 +6902,312 @@ public:
     CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_doc_zapnozzle_36615AI(creature);
+    }
+};
+
+// 38855
+class npc_volcanoth_38855 : public CreatureScript
+{
+public:
+    npc_volcanoth_38855() : CreatureScript("npc_volcanoth_38855") { }
+
+    struct npc_volcanoth_38855AI : public ScriptedAI
+    {
+        npc_volcanoth_38855AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap m_events;
+
+        void Reset() override
+        {
+            if (me->IsInPhase(182))
+            {
+                m_events.RescheduleEvent(EVENT_CAST_SPELL_00, 5000);
+                m_events.RescheduleEvent(EVENT_CAST_SPELL_01, 40000);
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_CAST_SPELL_00:
+                {
+                    me->CastSpell(me, 73016, true);
+                    m_events.ScheduleEvent(EVENT_CAST_SPELL_00, urand(35000, 45000));
+                    break;
+                }
+                case EVENT_CAST_SPELL_01:
+                {
+                    me->CastSpell(me, 73097, true);
+                    m_events.ScheduleEvent(EVENT_CAST_SPELL_01, urand(4100, 7000));
+                    break;
+                }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_volcanoth_38855AI(creature);
+    }
+};
+
+/*  phase 183  */
+
+// 38928
+class npc_sassy_hardwrench_38928 : public CreatureScript
+{
+public:
+    npc_sassy_hardwrench_38928() : CreatureScript("npc_sassy_hardwrench_38928") { }
+
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    {
+        switch (quest->GetQuestId())
+        {
+        case 25023:
+        {
+            creature->CastSpell(player, 73135, true);
+            player->CastSpell(player, 72993, true);
+            creature->AI()->SetGUID(player->GetGUID(), PLAYER_GUID);
+            creature->AI()->DoAction(73105);
+            break;
+        }
+        }
+        return false;
+    }
+
+    struct npc_sassy_hardwrench_38928AI : public ScriptedAI
+    {
+        npc_sassy_hardwrench_38928AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap m_events;
+        uint64   m_playerGUID;
+
+        void Reset() override
+        {
+            m_playerGUID = 0;
+        }
+
+        void DoAction(int32 param) override 
+        { 
+            switch (param)
+            {
+            case 73105:
+            {
+                if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                {
+                    player->CastSpell(player, 73105);
+                    player->PlayDirectSound(73722);
+                }
+                break;
+            }
+            case 73156:
+            {
+                m_events.RescheduleEvent(EVENT_START_TALK, 10);
+                break; 
+            }
+            }
+        }
+        
+        void SetGUID(uint64 guid, int32 id) override
+        {
+            switch (id)
+            {
+            case PLAYER_GUID:
+            {
+                m_playerGUID = guid;
+                break;
+            }
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_START_TALK:
+                {
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        if (player->GetDistance(me) > 30.0f)
+                        {
+                            Talk(1, player);
+                            m_events.ScheduleEvent(EVENT_START_TALK, 8000);
+                        }
+                    break;
+                }
+                }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_sassy_hardwrench_38928AI(creature);
+    }
+};
+
+// player
+class player_lost_isles : public PlayerScript
+{
+public:
+    player_lost_isles() : PlayerScript("player_lost_isles") { }
+
+    void OnQuestStatusChange(Player* player, uint32 questId, QuestStatus status) override
+    {
+        switch (questId)
+        {
+        case 24958:
+        {
+            if (!player->IsQuestRewarded(24958))
+                if (status == QUEST_STATUS_COMPLETE)
+                {
+                    player->CastSpell(player, 73156, true); // Volcanoth!: Dummy to Sassy Hardwrench
+                    player->CastSpell(player, 73090, true); // Imminent Death! The volcano is blowing! Get to Sassy and get the heck out of here!!!
+                    player->CastSpell(player, 73194, true); // Volcanoth!: Summon Volcanoth Dead Explosion Bunny: summon 38985
+                }
+            break;
+        }
+        }
+    }
+};
+
+// 38985
+class npc_volcanoth_dead_explosion_bunny_38985 : public CreatureScript
+{
+public:
+    npc_volcanoth_dead_explosion_bunny_38985() : CreatureScript("npc_volcanoth_dead_explosion_bunny_38985") { }
+
+    struct npc_volcanoth_dead_explosion_bunny_38985AI : public ScriptedAI
+    {
+        npc_volcanoth_dead_explosion_bunny_38985AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap m_events;
+
+        void Reset() override
+        {
+            m_events.RescheduleEvent(EVENT_CAST_SPELL_00, 500);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_CAST_SPELL_00:
+                {
+                    me->CastSpell(me, 73193, true);
+                    break;
+                }               
+                }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_volcanoth_dead_explosion_bunny_38985AI(creature);
+    }
+};
+
+// 38918
+class npc_flying_bomber_38918 : public CreatureScript
+{
+public:
+    npc_flying_bomber_38918() : CreatureScript("npc_flying_bomber_38918") { }
+
+    struct npc_flying_bomber_38918AI : public VehicleAI
+    {
+        npc_flying_bomber_38918AI(Creature* creature) : VehicleAI(creature) { Initialize(); }
+
+        EventMap  m_events;
+        uint64    m_playerGUID;
+        uint64    m_sassyGUID;
+
+        void Initialize()
+        {
+            m_playerGUID = 0;
+            m_sassyGUID = 0;
+        }
+
+        void Reset() override
+        {
+            if (!me->HasAura(73149))
+                me->CastSpell(me, 73149, true);
+            m_events.RescheduleEvent(EVENT_START_FLY, 2000);
+        }
+
+        void IsSummonedBy(Unit* summoner) override
+        {
+            if (Player* player = summoner->ToPlayer())
+                m_playerGUID = player->GetGUID();
+        }
+
+        void PassengerBoarded(Unit* passenger, int8 seatId, bool apply) override
+        {
+                if (apply)
+                {
+                    if (Creature* sassy = passenger->ToCreature())
+                        m_sassyGUID = sassy->GetGUID();
+                    if (Player* player = passenger->ToPlayer())
+                        m_playerGUID = player->GetGUID();
+                }
+                else
+                {
+                    me->DespawnOrUnsummon(10);
+                }
+        }
+     
+        void MovementInform(uint32 type, uint32 id) override
+        {
+            if (type == WAYPOINT_MOTION_TYPE)
+                if (id == 26)
+                    me->DespawnOrUnsummon(10);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_START_FLY:
+                {
+                    if (Creature* sassy = ObjectAccessor::GetCreature(*me, m_sassyGUID))
+                        if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        {
+                            sassy->AI()->Talk(0, player);
+                            me->SetSpeed(MOVE_RUN, 3.5f);
+                            me->GetMotionMaster()->MovePath(3891800, false);
+                        }
+                    break;
+                }
+                }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_flying_bomber_38918AI(creature);
     }
 };
 
@@ -6998,4 +7318,10 @@ void AddSC_zone_lost_isles()
     new spell_shoot_72944();
     new npc_volcanoth_champion_38850();
     new npc_doc_zapnozzle_36615();
+    new npc_volcanoth_38855();
+    /*  phase 183  */
+    new npc_sassy_hardwrench_38928();
+    new player_lost_isles();
+    new npc_volcanoth_dead_explosion_bunny_38985();
+    new npc_flying_bomber_38918();
 }

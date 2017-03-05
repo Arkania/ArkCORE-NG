@@ -1035,8 +1035,53 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
     switch (m_spellInfo->SpellFamilyName)
     {
         case SPELLFAMILY_GENERIC:
-            // spell  HGK Schnappblitz
-            if (m_spellInfo->Id == 68280)
+            switch (m_spellInfo->Id)
+            {
+            case 47468: // Claw
+            {
+                if (m_caster->HasAura(63560))
+                    m_caster->CastSpell(unitTarget, 91778, true);
+                else
+                    m_caster->CastSpell(unitTarget, 91776, true);
+                break;
+            }
+            case 47482: // Leap
+            {
+                if (m_caster->HasAura(63560))
+                    m_caster->CastSpell(unitTarget, 91802, true);
+                else
+                    m_caster->CastSpell(unitTarget, 91809, true);
+                break;
+            }
+            case 47484: // Huddle
+            {
+                if (m_caster->HasAura(63560))
+                    m_caster->CastSpell(unitTarget, 91837, true);
+                else
+                    m_caster->CastSpell(unitTarget, 91838, true);
+                break;
+            }
+            case 45226: // Zul'aman gong
+            {
+                if (unitTarget->GetTypeId() == TYPEID_PLAYER)
+                    unitTarget->CastSpell(unitTarget, 47730, true);
+                if (GameObject * gong = unitTarget->FindNearestGameObject(187359, 15.0f))
+                    if (gong->GetGoState() == GO_STATE_ACTIVE)
+                        if (Creature * voljin = unitTarget->FindNearestCreature(52924, 15.0f))
+                            voljin->GetAI()->DoAction(1);
+                break;
+            }
+            case 73156: // Volcanoth!: Dummy to Sassy Hardwrench
+            {
+                if (Creature * sassy = m_caster->FindNearestCreature(38928, 200.0f))
+                {
+                    sassy->AI()->SetGUID(m_caster->GetGUID(), 99991);
+                    sassy->AI()->DoAction(m_spellInfo->Id);
+                }
+                break;
+            }
+            case 68280: // spell  HGK Schnappblitz
+            {
                 if (m_caster->GetTypeId() == TYPEID_PLAYER)
                 {
                     Creature* bunny = m_caster->FindNearestCreature(37872, 5.0f);
@@ -1044,72 +1089,39 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                     if (!bunny) bunny = m_caster->FindNearestCreature(37896, 5.0f);
                     if (!bunny) bunny = m_caster->FindNearestCreature(37897, 5.0f);
                     if (bunny)
-                        m_caster->CastSpell(bunny, 68281, true);                    
+                        m_caster->CastSpell(bunny, 68281, true);
                 }
-            // spell Hot Rod - Radio
-            if (m_spellInfo->Id == 66299 && !effIndex)
-            {
-                m_caster->PlayDirectSound(23406);
                 break;
             }
-            // Quest teritorial fetish
-            if (m_spellInfo->Id == 72070)
+            case 66299: // spell Hot Rod - Radio
             {
-                if (Creature * fetish = unitTarget->FindNearestCreature(38003, 5.0f))
-                    if (!fetish->HasAura(72072))
-                        fetish->AddAura(72072, fetish);
+                if (!effIndex)
+                    m_caster->PlayDirectSound(23406);
+                break;
             }
-            // Zul'aman gong
-            if (m_spellInfo->Id == 45226 && unitTarget->GetTypeId() == TYPEID_PLAYER)
-            {
-                unitTarget->CastSpell(unitTarget,47730,true);
-                if (GameObject * gong = unitTarget->FindNearestGameObject(187359, 15.0f))
-                    if (gong->GetGoState() == GO_STATE_ACTIVE)
-                        if (Creature * voljin = unitTarget->FindNearestCreature(52924, 15.0f))
-                            voljin->GetAI()->DoAction(1);
-            }
-            // Two worgen form
-            if (m_spellInfo->Id == 68996)
+            case 68996: // Two worgen form
             {
                 if (m_caster->HasAura(97709))
                     m_caster->RemoveAura(97709);
                 else
-                    m_caster->AddAura(97709,m_caster);
-
-                return;
+                    m_caster->AddAura(97709, m_caster);
+                break;
             }
-            if (m_spellInfo->Id == 47482)
+            case 72070: // Quest teritorial fetish
             {
-                if (m_caster->HasAura(63560))
-                    m_caster->CastSpell(unitTarget, 91802, true);
-                else
-                    m_caster->CastSpell(unitTarget, 91809, true);
-
-                return;
+                if (Creature * fetish = unitTarget->FindNearestCreature(38003, 5.0f))
+                    if (!fetish->HasAura(72072))
+                        fetish->AddAura(72072, fetish);
+                break;
             }
-            if (m_spellInfo->Id == 47484)
+            case 77762: // Lava surge
             {
-                if (m_caster->HasAura(63560))
-                    m_caster->CastSpell(unitTarget, 91837, true);
-                else
-                    m_caster->CastSpell(unitTarget, 91838, true);
-
-                return;
+                if (m_spellInfo->Id == 77762)
+                    if (m_caster->GetTypeId() == TYPEID_PLAYER && m_caster->ToPlayer()->HasSpellCooldown(51505))
+                        m_caster->ToPlayer()->RemoveSpellCooldown(51505, true);
+                break;
             }
-            if (m_spellInfo->Id == 47468)
-            {
-                if (m_caster->HasAura(63560))
-                    m_caster->CastSpell(unitTarget, 91778, true);
-                else
-                    m_caster->CastSpell(unitTarget, 91776, true);
-
-                return;
             }
-
-            // Lava surge
-            if (m_spellInfo->Id == 77762)
-                if (m_caster->GetTypeId() == TYPEID_PLAYER && m_caster->ToPlayer()->HasSpellCooldown(51505))
-                    m_caster->ToPlayer()->RemoveSpellCooldown(51505, true);
             break;
         case SPELLFAMILY_PALADIN:
             // Judgement (seal trigger)
@@ -3433,6 +3445,9 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
                             case 68817:
                                 pos = Position(877.42f, 2741.98f, 126.55f, 4.91261f);
                                 break;
+                            case 73194:
+                                pos = Position(1271.87f, 1158.394f, 117.5009f, 3.5043f);
+                                break;
                             default:
                                 pos = *destTarget;
                                 break;
@@ -3467,7 +3482,14 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
         case SUMMON_CATEGORY_VEHICLE:
             // Summoning spells (usually triggered by npc_spellclick) that spawn a vehicle and that cause the clicker
             // to cast a ride vehicle spell on the summoned unit.
-            summon = m_originalCaster->GetMap()->SummonCreature(entry, *destTarget, properties, duration, m_caster, m_spellInfo->Id);
+            Position pos = *destTarget;
+            switch (m_spellInfo->Id)
+            {
+            case 73105:
+                pos = Position(1159.168f, 1104.536f, 126.8035f, 2.2863f);
+                break;
+            }
+            summon = m_originalCaster->GetMap()->SummonCreature(entry, pos, properties, duration, m_caster, m_spellInfo->Id);
             if (!summon || !summon->IsVehicle())
                 return;
 

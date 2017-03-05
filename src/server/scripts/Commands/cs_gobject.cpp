@@ -560,9 +560,10 @@ public:
         {
             // number or [name] Shift-click form |color|Hgameobject:go_id|h[name]|h|r
             std::string guid = handler->GetKeyFromLink(fullcmd, "Hgameobject");
-            if (dbGuid = stoi(guid))
-                if (gameObjectData = sObjectMgr->GetGOData(dbGuid))
-                    gameobject = handler->GetObjectGlobalyWithGuidOrNearWithDbGuid(dbGuid, gameObjectData->id);
+            if (guid.size() > 0)
+                if (dbGuid = stoi(guid))
+                    if (gameObjectData = sObjectMgr->GetGOData(dbGuid))
+                        gameobject = handler->GetObjectGlobalyWithGuidOrNearWithDbGuid(dbGuid, gameObjectData->id);
         }
     
         if (!gameobject)
@@ -634,9 +635,10 @@ public:
         {
             // number or [name] Shift-click form |color|Hgameobject:go_id|h[name]|h|r
             std::string guid = handler->GetKeyFromLink(fullcmd, "Hgameobject");
-            if (dbGuid = stoi(guid))
-                if (gameObjectData = sObjectMgr->GetGOData(dbGuid))
-                    gameobject = handler->GetObjectGlobalyWithGuidOrNearWithDbGuid(dbGuid, gameObjectData->id);
+            if (guid.size() > 0)
+                if (dbGuid = stoi(guid))
+                    if (gameObjectData = sObjectMgr->GetGOData(dbGuid))
+                        gameobject = handler->GetObjectGlobalyWithGuidOrNearWithDbGuid(dbGuid, gameObjectData->id);
         }
 
         if (!gameobject)

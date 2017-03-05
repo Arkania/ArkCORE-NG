@@ -337,11 +337,34 @@ public:
     }
 };
 
+// 44857
+class npc_wounded_outrunner_44857 : public CreatureScript
+{
+public:
+    npc_wounded_outrunner_44857() : CreatureScript("npc_wounded_outrunner_44857") {}
+
+    struct npc_wounded_outrunner_44857AI : public ScriptedAI
+    {
+        npc_wounded_outrunner_44857AI(Creature* creature) : ScriptedAI(creature) {}
+
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
+        {
+            if (Player* player = caster->ToPlayer())
+                if (player->GetQuestStatus(10072) == QUEST_STATUS_INCOMPLETE)
+                    player->KilledMonsterCredit(44857);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_wounded_outrunner_44857AI(creature);
+    }
+};
 
 void AddSC_eversong_woods()
 {
     new npc_apprentice_mirveda();
     new npc_infused_crystal();
     new npc_mana_wyrm_15274();
-
+    new npc_wounded_outrunner_44857();
 }
