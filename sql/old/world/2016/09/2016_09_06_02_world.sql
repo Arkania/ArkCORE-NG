@@ -1,0 +1,43 @@
+
+
+UPDATE phase_definitions SET phaseMask=0, phaseId=0, phaseGroup=375 WHERE zoneId=1519 AND entry=1;
+UPDATE phase_definitions SET phaseMask=0, phaseId=0, phaseGroup=370 WHERE zoneId=1519 AND entry=2;
+UPDATE phase_definitions SET phaseMask=0, phaseId=0, phaseGroup=377 WHERE zoneId=1519 AND entry=3;
+UPDATE phase_definitions SET phaseMask=0, phaseId=0, phaseGroup=445 WHERE zoneId=1519 AND entry=4;
+UPDATE phase_definitions SET phaseMask=0, phaseId=0, phaseGroup=398 WHERE zoneId=1519 AND entry=5;
+UPDATE phase_definitions SET phaseMask=0, phaseId=0, phaseGroup=375 WHERE zoneId=1637 AND entry=1;
+UPDATE phase_definitions SET phaseMask=0, phaseId=0, phaseGroup=370 WHERE zoneId=1637 AND entry=2;
+UPDATE phase_definitions SET phaseMask=0, phaseId=0, phaseGroup=377 WHERE zoneId=1637 AND entry=3;
+UPDATE phase_definitions SET phaseMask=0, phaseId=0, phaseGroup=445 WHERE zoneId=1637 AND entry=4;
+UPDATE phase_definitions SET phaseMask=0, phaseId=0, phaseGroup=398 WHERE zoneId=1637 AND entry=5;
+UPDATE phase_definitions SET phaseMask=0 WHERE zoneId=616 AND entry=0;
+UPDATE phase_definitions SET phaseMask=0 WHERE zoneId=5736 AND entry=2;
+UPDATE phase_definitions SET phaseMask=0 WHERE zoneId=5736 AND entry=3;
+UPDATE phase_definitions SET phaseMask=0, phaseId=169, phaseGroup=0 WHERE zoneId=5736 AND entry=1;
+UPDATE phase_definitions SET phaseMask=0, phaseId=170, phaseGroup=0 WHERE zoneId=4714 AND entry=1;
+UPDATE phase_definitions SET phaseMask=0 WHERE zoneId=616 AND entry=1;
+UPDATE phase_definitions SET phaseMask=0 WHERE zoneId=616 AND entry=2;
+UPDATE phase_definitions SET phaseMask=0 WHERE zoneId=616 AND entry=3;
+UPDATE phase_definitions SET phaseMask=0, phaseId=170, phaseGroup=0 WHERE zoneId=5420 AND entry=0;
+UPDATE phase_definitions SET phaseMask=0, phaseId=191, phaseGroup=0 WHERE zoneId=4755 AND entry=6;
+UPDATE phase_definitions SET phaseMask=0, phaseId=169, phaseGroup=0 WHERE zoneId=4714 AND entry=0;
+UPDATE phase_definitions SET phaseMask=0, phaseId=190, phaseGroup=0 WHERE zoneId=4755 AND entry=5;
+UPDATE phase_definitions SET phaseMask=0, phaseId=189, phaseGroup=0 WHERE zoneId=4714 AND entry=4;
+UPDATE phase_definitions SET phaseMask=0, phaseId=187, phaseGroup=0 WHERE zoneId=4714 AND entry=2;
+UPDATE phase_definitions SET phaseMask=0, phaseId=189, phaseGroup=0 WHERE zoneId=4755 AND entry=4;
+UPDATE phase_definitions SET phaseMask=0, phaseId=188, phaseGroup=0 WHERE zoneId=4755 AND entry=3;
+UPDATE phase_definitions SET phaseMask=0, phaseId=170, phaseGroup=0 WHERE zoneId=4755 AND entry=1;
+UPDATE phase_definitions SET phaseMask=0, phaseId=187, phaseGroup=0 WHERE zoneId=4755 AND entry=2;
+UPDATE phase_definitions SET phaseMask=0, phaseId=188, phaseGroup=0 WHERE zoneId=4714 AND entry=3;
+UPDATE phase_definitions SET phaseMask=0, phaseId=169, phaseGroup=0 WHERE zoneId=4755 AND entry=0;
+UPDATE phase_definitions SET phaseMask=0, phaseId=191, phaseGroup=0 WHERE zoneId=4714 AND entry=6;
+UPDATE phase_definitions SET phaseMask=0, phaseId=181, phaseGroup=0 WHERE zoneId=4714 AND entry=7;
+UPDATE phase_definitions SET phaseMask=0, phaseId=0, phaseGroup=378 WHERE zoneId=4737 AND entry=0;
+UPDATE phase_definitions SET phaseMask=0, phaseId=0, phaseGroup=379 WHERE zoneId=4737 AND entry=1;
+UPDATE phase_definitions SET phaseMask=0, phaseId=0, phaseGroup=380 WHERE zoneId=4737 AND entry=2;
+UPDATE phase_definitions SET phaseMask=0, phaseId=0, phaseGroup=381 WHERE zoneId=4737 AND entry=3;
+UPDATE phase_definitions SET phaseMask=0, phaseId=0, phaseGroup=372 WHERE zoneId=4737 AND entry=4;
+UPDATE phase_definitions SET phaseMask=0, phaseId=0, phaseGroup=383 WHERE zoneId=4737 AND entry=5;
+UPDATE phase_definitions SET phaseMask=0, phaseId=0, phaseGroup=384 WHERE zoneId=4737 AND entry=6;
+UPDATE phase_definitions SET phaseMask=0 WHERE zoneId=4720 AND entry=0;
+

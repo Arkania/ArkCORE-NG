@@ -1,0 +1,117 @@
+
+update creature set spawndist=5, MovementType=1 where id in (422,424,548,4462);
+update creature set spawndist=10, MovementType=1 where id in (441,442,505,547,43083,43106,423,426,712);
+
+delete from creature where id=422 and curhealth<>417;
+delete from creature where id=442 and curhealth=300;
+delete from creature where id=43173 and modelid=0;
+delete from creature where id=428 and curhealth=417;
+delete from creature where guid=44398 and id=379;
+delete from creature where id=712 and curhealth=328;
+delete from creature where id=426 and curhealth=386;
+delete from creature where id=423 and curhealth=356;
+delete from creature where id=547 and curhealth=356;
+delete from creature where guid=60851 and id=850;
+delete from creature where id=43222 and modelid=0;
+delete from creature where guid=60849 and id=849;
+delete from creature where guid=60850 and id=847;
+delete from creature where guid=44401 and id=936;
+delete from creature where id=446 and curhealth<>417;
+delete from creature where id=430 and curhealth<>354;
+delete from creature where guid=48519 and id=6093;
+delete from creature where id=11328 and curhealth=137;
+delete from creature where guid=48896 and id=3937;
+delete from creature where id=299 and guid>46000;
+delete from creature where guid=60400 and id=7384;
+delete from creature where guid=45358 and id=3520;
+delete from creature where guid=42279 and id=1366;
+delete from creature where guid=1162 and id=1367;
+delete from creature where guid in(25019,45400) and id=15659;
+delete from creature where guid=25020 and id=8719;
+delete from creature where guid=25016 and id=8670;
+delete from creature where guid=45324 and id=2457;
+delete from creature where guid=45412 and id=2456;
+delete from creature where guid=45410 and id=2455;
+delete from creature where guid=66352 and id=1351;
+delete from creature where guid=45379 and id=1478;
+delete from creature where guid=45378 and id=1477;
+delete from creature where guid=69357 and id=284;
+delete from creature where guid=45369 and id=1328;
+delete from creature where guid=45361 and id=13283;
+delete from creature where guid=48206 and id=1327;
+delete from creature where guid=49585 and id=340;
+delete from creature where guid=45376 and id=5483;
+delete from creature where guid=45362 and id=1325;
+delete from creature where guid=45366 and id=7207;
+delete from creature where guid=45367 and id=7208;
+delete from creature where guid=45364 and id=1326;
+delete from creature where guid=69792 and id=14439;
+delete from creature where guid=49447 and id=796;
+delete from creature where guid=66196 and id=1472;
+delete from creature where guid=57529 and id=5510;
+delete from creature where guid=44185 and id=518;
+delete from creature where guid=61893 and id=6328;
+delete from creature where guid=61035 and id=1692;
+delete from creature where guid=62880 and id=14552;
+delete from creature where guid=61073 and id=14553;
+delete from creature where guid=61111 and id=2790;
+delete from creature where id=454 and curhealth<>247;
+delete from creature where id=126 and curhealth=247;
+delete from creature where id=456 and curhealth=417;
+update creature set position_y=1188.79,position_z=41.0622 where guid=43469 and id=1065;
+update creature set position_y=1198.84,position_z=41.0622 where guid=7025 and id=1065;
+delete from creature where id=832 and curhealth=276;
+delete from creature where id=113 and modelid=503;
+delete from creature where id=47325 and modelid=0;
+delete from creature where id=47324 and modelid=0;
+delete from creature where id=578 and curhealth<>449;
+delete from creature where id=422 and curhealth<>417;
+delete from creature where id=616 and guid>656;
+delete from creature where id=445 and curhealth=458;
+delete from creature where id=4463 and curhealth<>472;
+delete from creature where id=615 and curhealth=363;
+delete from creature where id=580 and guid>44260;
+delete from creature where id=4064 and curhealth=484;
+delete from creature where id=4463 and curhealth<>531;
+delete from creature where id=437 and guid>44316;
+delete from creature where id=545 and curhealth=404;
+delete from creature where id=584 and guid>648;
+delete from creature where id=424 and guid>44449;
+delete from creature where id=548 and curhealth=390;
+delete from creature where id=1083 and guid<44226;
+delete from creature where id=14269 and id<57969;
+update creature set position_x=-9449.896,position_y=-3301.545,position_z=3.656668 where guid=57969 and id=14269;
+delete from creature where id=385 and modelid=0;
+delete from creature where id=43300 and guid<26527; -- spawn from script
+update creature set spawndist=0,MovementType=0 where id=43150;
+delete from creature where id=43644; -- spawn from script
+delete from creature where id=43643; -- spawn from script
+delete from creature where id=43642; -- spawn from script
+delete from creature where id=43639; -- spawn from script
+delete from creature where id=9691 and position_y<-1500.0;
+delete from creature where id=7028 and position_y<-800.0;
+delete from creature where id=9700 and guid>36395;
+delete from creature where id=5858 and curhealth<>2488;
+delete from creature where id=24818 and curhealth<>2576;
+delete from creature where id=24819 and curhealth<>2672;
+delete from creature where id=5854 and curhealth<>2488;
+delete from creature where id=8566 and curhealth<>2488;
+delete from creature where id=8996; -- spawn from script
+delete from creature where id=433 and guid<44402;
+delete from creature where id=434 and curhealth<>531;
+delete from creature where id=568 and curhealth<>664;
+delete from creature where id=429 and guid<60842;
+delete from creature where id=431 and curhealth<>734;
+delete from creature where id=432 and curhealth<>617;
+delete from creature where id=61 and guid<49004;
+update creature set position_x=-9863.99, position_y=-223.059, position_z=36.0931, orientation=0.890118, spawndist=0, MovementType=0 where guid=49004 and id=61;
+delete from creature where id=6927 and guid<49059;
+delete from creature where id=100 and guid>774;
+update creature set spawndist=15 where guid=774 and id=100;
+delete from creature where id=833 and guid>7162;
+delete from creature where id=876 and guid=42943;
+delete from creature where id=488 and guid=43458;
+delete from creature where id=874 and guid<6989;
+delete from creature where id=870 and guid<6993;
+
+

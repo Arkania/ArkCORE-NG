@@ -1,0 +1,18 @@
+SET @GUID=147223;
+
+UPDATE creature SET spawndist=0, MovementType = 2 WHERE guid=@GUID;
+
+INSERT IGNORE INTO creature_addon (guid) VALUE (@GUID);
+UPDATE creature_addon SET path_id=@GUID WHERE guid=@GUID;
+
+DELETE FROM waypoint_data WHERE id=@GUID;
+INSERT INTO waypoint_data (id, point, position_x, position_y, position_z, orientation, delay) values
+(147223, 0, -77.77615, 203.5153, -49.71654, 4.025092, 3000),
+(147223, 1, -67.20316, 219.0509, -49.71087, 0.675367, 0),
+(147223, 2, -66.0342, 219.0417, -49.71087, 6.275257, 3000),
+(147223, 3, -79.11469, 237.5085, -49.73487, 2.524981, 0),
+(147223, 4, -87.51892, 239.655, -49.72233, 2.843067, 0),
+(147223, 5, -88.98249, 243.7283, -49.71379, 1.578575, 0),
+(147223, 6, -86.91119, 229.5159, -49.74419, 4.869398, 3000),
+(147223, 7, -74.95186, 218.4939, -49.70814, 5.403469, 0),
+(147223, 8, -74.88104, 208.6872, -49.73182, 4.716247, 0);
