@@ -370,13 +370,6 @@ bool ChatHandler::ExecuteCommandInTable(ChatCommand* table, const char* text, st
         }
         if (match)
             continue;
-        if (!m_session)
-            continue;
-
-        // commands are executes before printing log. then target info are lost.
-        Unit* tmpTarget = nullptr;
-        if (Player* tmpPlayer = m_session->GetPlayer())
-            tmpTarget = tmpPlayer->GetSelectedUnit();
 
         // select subcommand from child commands list
         if (table[i].ChildCommands != NULL)
@@ -406,6 +399,7 @@ bool ChatHandler::ExecuteCommandInTable(ChatCommand* table, const char* text, st
                 return true;
 
             Player* player = m_session->GetPlayer();
+            Unit* tmpTarget = player->GetSelectedUnit();
             if (!AccountMgr::IsPlayerAccount(m_session->GetSecurity()))
             {
                 const Transport* transport = player->GetTransport();
