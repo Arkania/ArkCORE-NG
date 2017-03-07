@@ -1,8 +1,8 @@
-
 UPDATE creature_template SET ScriptName="npc_wounded_outrunner_44857" WHERE entry=44857;
 
 UPDATE quest_template SET RequiredNpcOrGo1=44857 WHERE Id=10072;
 
+DELETE FROM `conditions` WHERE `SourceEntry`=72886;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`,`SourceGroup`,`SourceEntry`,`SourceId`,`ElseGroup`,`ConditionTypeOrReference`,`ConditionTarget`,`ConditionValue1`,`ConditionValue2`,`ConditionValue3`,`NegativeCondition`,`ErrorType`,`ErrorTextId`,`ScriptName`,`Comment`) VALUES 
 (13,1,72886,0,0,31,0,3,38753,0,0,0,0,'',NULL);
 
@@ -25,6 +25,3 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`,`SourceGroup`,`SourceEntry`,
 (13,1,87293,0,0,31,0,3,46881,0,0,0,0,'',NULL);
 
 UPDATE `quest_template` SET `CompletedText`="Return to Well Watcher Solanian on Sunstrider Isle." WHERE `Id`=10072;
-
-
-
