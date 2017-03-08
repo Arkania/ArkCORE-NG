@@ -120,7 +120,7 @@ public:
 	{
 		QUEST_A_REJUVENATING_TOUCH_26948 = 26948,
 		QUEST_FLASH_HEAL_26949 = 26949,
-		NPC_HEALING_CREDIT_44175 = 44175,
+        NPC_HEALING_CREDIT_44617 = 44617,
 	};
 
 	struct npc_wounded_sentinel_44617AI : public ScriptedAI
@@ -130,10 +130,16 @@ public:
 		void SpellHit(Unit* caster, SpellInfo const* spell) override
 		{
 			if (Player* player = caster->ToPlayer())
-				if (player->GetQuestStatus(QUEST_A_REJUVENATING_TOUCH_26948) == QUEST_STATUS_INCOMPLETE)
-					player->KilledMonsterCredit(NPC_HEALING_CREDIT_44175);
-				else if (player->GetQuestStatus(QUEST_FLASH_HEAL_26949) == QUEST_STATUS_INCOMPLETE)
-					player->KilledMonsterCredit(NPC_HEALING_CREDIT_44175);
+                if (player->GetQuestStatus(QUEST_A_REJUVENATING_TOUCH_26948) == QUEST_STATUS_INCOMPLETE)
+                {
+                    player->KilledMonsterCredit(NPC_HEALING_CREDIT_44617);
+                    me->DespawnOrUnsummon();
+                }
+                else if (player->GetQuestStatus(QUEST_FLASH_HEAL_26949) == QUEST_STATUS_INCOMPLETE)
+                {
+                    player->KilledMonsterCredit(NPC_HEALING_CREDIT_44617);
+                    me->DespawnOrUnsummon();
+                }
 		}
 	};
 

@@ -791,6 +791,37 @@ public:
     }
 };
 
+// 44405
+class npc_wounded_militia_44405 : public CreatureScript
+{
+public:
+    npc_wounded_militia_44405() : CreatureScript("npc_wounded_militia_44405") {}
+
+    enum eNpc
+    {
+        QUEST_FLASH_HEAL_24533 = 24533,
+        NPC_HEALING_CREDIT_44405 = 44405, // Correct NPC Value. Old Value 44175.
+    };
+
+    struct npc_wounded_militia_44405AI : public ScriptedAI
+    {
+        npc_wounded_militia_44405AI(Creature* creature) : ScriptedAI(creature) {}
+
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
+        {
+            if (Player* player = caster->ToPlayer())
+                if (player->GetQuestStatus(QUEST_FLASH_HEAL_24533) == QUEST_STATUS_INCOMPLETE)
+                    player->KilledMonsterCredit(NPC_HEALING_CREDIT_44405);
+            me->DespawnOrUnsummon(500);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_wounded_militia_44405AI(creature);
+    }
+};
+
 
 void AddSC_coldridge_valley()
 {
@@ -807,5 +838,6 @@ void AddSC_coldridge_valley()
     new npc_mountaineer_dunstan();
     new npc_mountaineer_lewin();
     new npc_mountaineer_valgrum();
+    new npc_wounded_militia_44405();
 }
 

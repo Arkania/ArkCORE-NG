@@ -3,6 +3,7 @@ UPDATE creature_template SET ScriptName="npc_wounded_outrunner_44857" WHERE entr
 
 UPDATE quest_template SET RequiredNpcOrGo1=44857 WHERE Id=10072;
 
+delete from conditions where SourceTypeOrReferenceId=13 and SourceGroup=1 and SourceEntry=72886;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`,`SourceGroup`,`SourceEntry`,`SourceId`,`ElseGroup`,`ConditionTypeOrReference`,`ConditionTarget`,`ConditionValue1`,`ConditionValue2`,`ConditionValue3`,`NegativeCondition`,`ErrorType`,`ErrorTextId`,`ScriptName`,`Comment`) VALUES 
 (13,1,72886,0,0,31,0,3,38753,0,0,0,0,'',NULL);
 

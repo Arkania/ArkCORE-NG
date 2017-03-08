@@ -351,7 +351,10 @@ public:
         {
             if (Player* player = caster->ToPlayer())
                 if (player->GetQuestStatus(10072) == QUEST_STATUS_INCOMPLETE)
+                {
                     player->KilledMonsterCredit(44857);
+                    me->DespawnOrUnsummon(500);
+                }
         }
     };
 
