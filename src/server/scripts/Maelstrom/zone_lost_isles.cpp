@@ -7139,11 +7139,15 @@ public:
         EventMap  m_events;
         uint64    m_playerGUID;
         uint64    m_sassyGUID;
+        uint64    m_bunnyGUID;
+        uint32    m_sound;
 
         void Initialize()
         {
             m_playerGUID = 0;
             m_sassyGUID = 0;
+            m_bunnyGUID = 0;
+            m_sound = 23722;
         }
 
         void Reset() override
@@ -7153,10 +7157,19 @@ public:
             m_events.RescheduleEvent(EVENT_START_FLY, 2000);
         }
 
+        void JustSummoned(Creature* summon) override 
+        { 
+            if (Creature* bunny = summon->ToCreature())
+                m_bunnyGUID = bunny->GetGUID();
+        }
+
         void IsSummonedBy(Unit* summoner) override
         {
             if (Player* player = summoner->ToPlayer())
+            {
                 m_playerGUID = player->GetGUID();
+                m_events.RescheduleEvent(EVENT_PLAY_SOUND1, 1000);
+            }
         }
 
         void PassengerBoarded(Unit* passenger, int8 seatId, bool apply) override
@@ -7177,8 +7190,51 @@ public:
         void MovementInform(uint32 type, uint32 id) override
         {
             if (type == WAYPOINT_MOTION_TYPE)
-                if (id == 26)
+                switch (id)
+                {
+                case 2:
+                    break;
+                case 4:
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        if (Creature* sassy = ObjectAccessor::GetCreature(*me, m_sassyGUID))
+                        {
+                            me->CastSpell(1072.83f, 1174.958f, 141.9254f, 73127, true);
+                            player->CastSpell(player, 73112, true);
+                            sassy->AI()->Talk(1, player);
+                            m_sound = 23723;
+                            m_events.ScheduleEvent(EVENT_PLAY_PERIODIC_SOUND, 1000);
+                        }
+                    break;
+                case 8:
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        if (Creature* sassy = ObjectAccessor::GetCreature(*me, m_sassyGUID))
+                        {
+                            player->CastSpell(player, 73185, true);
+                            player->CastSpell(player, 73191, true);
+                            sassy->AI()->Talk(2, player);
+                            m_sound = 23725;
+                        }
+                    break;
+                case 22:
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        if (Creature* sassy = ObjectAccessor::GetCreature(*me, m_sassyGUID))
+                        {
+                            player->CastSpell(player, 73201, true); // trigger 73200 73202 73203
+                            sassy->AI()->Talk(3, player);
+                            m_sound = 23724;
+                        }
+                    break;
+                case 26:
+                    m_sound = 0;                    
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                    {
+                        me->PlayDirectSound(m_sound, player);
+                        player->CastSpell(player, 90247);
+                        m_events.CancelEvent(EVENT_PLAY_PERIODIC_SOUND);
+                    }
                     me->DespawnOrUnsummon(10);
+                    break;
+                }
         }
 
         void UpdateAI(uint32 diff) override
@@ -7200,6 +7256,22 @@ public:
                         }
                     break;
                 }
+                case EVENT_PLAY_SOUND1:
+                {
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        me->PlayDirectSound(m_sound, player);
+
+                    break;
+                }
+                case EVENT_PLAY_PERIODIC_SOUND:
+                {
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        me->PlayDirectSound(m_sound, player);
+
+                    if (m_sound)
+                        m_events.ScheduleEvent(EVENT_PLAY_PERIODIC_SOUND, 1000);
+                    break;
+                }
                 }
             }
         }
@@ -7208,6 +7280,205 @@ public:
     CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_flying_bomber_38918AI(creature);
+    }
+};
+
+// 43359
+class npc_elm_general_purpose_bunny_infinite_hide_body_43359 : public CreatureScript
+{
+public:
+    npc_elm_general_purpose_bunny_infinite_hide_body_43359() : CreatureScript("npc_elm_general_purpose_bunny_infinite_hide_body_43359") { }
+
+    struct npc_elm_general_purpose_bunny_infinite_hide_body_43359AI : public ScriptedAI
+    {
+        npc_elm_general_purpose_bunny_infinite_hide_body_43359AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+        EventMap m_events;
+        std::list<Position> pList;
+
+        void Initialize()
+        {
+            // our core can not handle this bunny_43359. it's to far away from player. 
+            // i delete no data, maybe it's usefull for future use..
+            //InsertTargetPositions();  
+        }
+
+        void Reset() override
+        {
+            //m_events.RescheduleEvent(EVENT_RANDOM_CAST, 1000);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_RANDOM_CAST:
+                {
+                    //if (urand(0, 100) < 50)
+                    //    me->CastSpell(me, RAND(74070, 74072, 74076, 74085));
+                    
+                    Position pos = GetRandomTargetPosition();
+                    uint32 spellId = RAND(74070, 74072, 74076, 74085);
+                    me->CastSpell(pos.m_positionX, pos.m_positionY, pos.m_positionZ, spellId, true);
+
+                    m_events.ScheduleEvent(EVENT_RANDOM_CAST, urand(4000, 5000));
+                    break;
+                }
+                }
+            }
+        }
+
+        Position GetRandomTargetPosition()
+        {
+            if (pList.empty())
+                return Position(0, 0, 0);
+           
+            int32 rol = urand(0, pList.size() - 1);
+            std::list<Position>::const_iterator itr = pList.begin();
+            std::advance(itr, rol);
+            return *itr;
+        }
+
+        void InsertTargetPositions()
+        {
+            pList.clear();
+            pList.push_back(Position(1394.021f, 265.211f, -24.82532f));
+                pList.push_back(Position(1746.308f, 2750.487f, 72.70672f));
+                pList.push_back(Position(1127.153f, 445.2521f, 95.34599f));
+                pList.push_back(Position(1375.492f, 540.5469f, 142.1257f));
+                pList.push_back(Position(2580.765f, 2320.996f, -7.52829f));
+                pList.push_back(Position(1008.834f, 1243.877f, 222.115f));
+                pList.push_back(Position(2040.008f, 2053.955f, 110.8633f));
+                pList.push_back(Position(1268.849f, 2600.016f, 48.51329f));
+                pList.push_back(Position(833.9003f, 993.89f, 137.3346f));
+                pList.push_back(Position(656.973f, 1746.658f, 107.0542f));
+                pList.push_back(Position(2186.604f, 2061.612f, 40.88118f));
+                pList.push_back(Position(991.3453f, 182.1427f, -10.96202f));
+                pList.push_back(Position(1736.114f, 2748.587f, 73.51421f));
+                pList.push_back(Position(1432.881f, 3017.047f, -33.88331f));
+                pList.push_back(Position(1371.48f, 464.8078f, 112.1118f));
+                pList.push_back(Position(1665.023f, 2363.871f, 182.496f));
+                pList.push_back(Position(2249.08f, 2569.786f, -0.7347901f));
+                pList.push_back(Position(1847.685f, 2620.169f, 84.2216f));
+                pList.push_back(Position(2574.388f, 2307.996f, -8.2883f));
+                pList.push_back(Position(2275.37f, 2269.22f, 27.88316f));
+                pList.push_back(Position(486.7486f, 1675.822f, -16.46047f));
+                pList.push_back(Position(2483.624f, 1921.613f, 0.4846237f));
+                pList.push_back(Position(2139.563f, 601.3396f, 148.2256f));
+                pList.push_back(Position(756.5989f, 1164.384f, 42.36192f));
+                pList.push_back(Position(421.3554f, 2077.722f, -0.09303093f));
+                pList.push_back(Position(2003.873f, 1795.207f, 171.0459f));
+                pList.push_back(Position(1950.905f, 1968.725f, 175.1599f));
+                pList.push_back(Position(762.4387f, 1117.865f, 126.1768f));
+                pList.push_back(Position(826.5689f, 1093.372f, 118.7464f));
+                pList.push_back(Position(1251.501f, 484.3697f, 101.8722f));
+                pList.push_back(Position(1399.815f, 440.8916f, 118.4765f));
+                pList.push_back(Position(404.7482f, 1448.357f, -27.65089f));
+                pList.push_back(Position(2369.986f, 2144.816f, 5.248497f));
+                pList.push_back(Position(1412.05f, 427.0219f, 118.4765f));
+                pList.push_back(Position(1711.007f, 487.3984f, 115.8521f));
+                pList.push_back(Position(1565.919f, 142.0312f, -10.96202f));
+                pList.push_back(Position(1176.379f, 283.5713f, -24.80992f));
+                pList.push_back(Position(1757.383f, 2622.928f, 91.35134f));
+                pList.push_back(Position(2412.076f, 2618.906f, -21.38659f));
+                pList.push_back(Position(804.0764f, 1597.448f, 152.8327f));
+                pList.push_back(Position(2183.344f, 1945.925f, 82.07567f));
+                pList.push_back(Position(1947.221f, 2202.213f, 118.3656f));
+                pList.push_back(Position(533.3586f, 1925.779f, 32.45287f));
+                pList.push_back(Position(828.9863f, 2216.282f, 61.32046f));
+                pList.push_back(Position(1038.639f, 1981.718f, 181.4062f));
+                pList.push_back(Position(226.0688f, 1991.825f, -0.2057024f));
+                pList.push_back(Position(586.1387f, 729.2018f, -10.87155f));
+                pList.push_back(Position(2385.209f, 454.3485f, -10.96195f));
+                pList.push_back(Position(318.7612f, 2238.885f, -10.01094f));
+                pList.push_back(Position(880.2772f, 1399.718f, 208.9504f));
+                pList.push_back(Position(2513.989f, 2495.113f, -18.40865f));
+                pList.push_back(Position(895.8293f, 855.7269f, 160.9014f));
+                pList.push_back(Position(1750.542f, 2619.87f, 92.66262f));
+                pList.push_back(Position(1300.08f, 2859.218f, -32.98334f));
+                pList.push_back(Position(1696.898f, 2632.841f, 94.16725f));
+                pList.push_back(Position(2354.573f, 2542.292f, 1.150147f));
+                pList.push_back(Position(2230.84f, 1466.899f, 163.4754f));
+                pList.push_back(Position(2535.257f, 1088.405f, 126.7964f));
+                pList.push_back(Position(1693.448f, 2235.815f, 206.9441f));
+                pList.push_back(Position(1849.298f, 2078.572f, 173.4192f));
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_elm_general_purpose_bunny_infinite_hide_body_43359AI(creature);
+    }
+};
+
+// 38979
+class npc_giant_fireball_bunny_38979 : public CreatureScript
+{
+public:
+    npc_giant_fireball_bunny_38979() : CreatureScript("npc_giant_fireball_bunny_38979") { }
+
+    struct npc_giant_fireball_bunny_38979AI : public ScriptedAI
+    {
+        npc_giant_fireball_bunny_38979AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap m_events;
+
+        void Reset() override
+        {
+            me->SetSpeed(MOVE_RUN, 3.5f);
+            me->GetMotionMaster()->MovePath(3897900, false);
+        }
+
+        void DoAction(int32 param) override 
+        { 
+            switch (param)
+            {
+            case 1:
+                me->CastSpell(me, 73111, true); // trigger 73181
+                break;
+            case 2:
+                me->CastSpell(me, 73182, true);
+                break;
+            }
+        }
+
+        void MovementInform(uint32 type, uint32 id) override
+        {
+            if (type == WAYPOINT_MOTION_TYPE)
+                switch (id)
+                {
+                case 1:
+                    me->CastSpell(me, 73111, true); 
+                    me->CastSpell(me, 73182, true);
+                    break;
+                }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_RANDOM_CAST:
+                {
+                    
+                    break;
+                }
+                }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_giant_fireball_bunny_38979AI(creature);
     }
 };
 
@@ -7324,4 +7595,6 @@ void AddSC_zone_lost_isles()
     new player_lost_isles();
     new npc_volcanoth_dead_explosion_bunny_38985();
     new npc_flying_bomber_38918();
+    new npc_elm_general_purpose_bunny_infinite_hide_body_43359();
+    new npc_giant_fireball_bunny_38979();
 }
