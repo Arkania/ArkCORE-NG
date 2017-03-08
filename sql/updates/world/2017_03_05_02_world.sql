@@ -8,8 +8,8 @@ UPDATE `quest_template` SET `QuestGiverPortrait`=34003,`QuestGiverTextWindow`="W
 UPDATE `npc_trainer` SET reqlevel=8 WHERE  spell=122;
 UPDATE `npc_trainer` SET reqskill=8 WHERE  spell=2136;
 UPDATE `npc_trainer` SET reqlevel=5 WHERE  spell=2136;
-UPDATE `npc_trainer` SET reqlevel=3,reqskill=26 WHERE spell=100
-UPDATE `npc_trainer` SET reqlevel=26,reqskill=26 WHERE spell=7384
+UPDATE `npc_trainer` SET reqlevel=3,reqskill=26 WHERE spell=100;
+UPDATE `npc_trainer` SET reqlevel=26,reqskill=26 WHERE spell=7384;
 UPDATE `npc_trainer` SET reqlevel=7,reqskill=6 WHERE spell=116;
 UPDATE `npc_trainer` SET reqlevel=14,reqskill=237 WHERE spell=118;
 UPDATE `npc_trainer` SET reqlevel=18,reqskill=6 WHERE spell=120;

@@ -19,7 +19,7 @@ LIMIT 0, 10000
  
 -- Date: 2017-03-06 23:17
 */
-DELETE FROM `gossip_menu_option` WHERE `nenu_id` IN(4688,4680,2383,4609,3921);
+DELETE FROM `gossip_menu_option` WHERE `menu_id` IN(4688,4680,2383,4609,3921);
 INSERT INTO `gossip_menu_option` (`menu_id`,`id`,`option_icon`,`option_text`,`OptionBroadcastTextID`,`option_id`,`npc_option_npcflag`,`action_menu_id`,`action_poi_id`,`action_script_id`,`box_coded`,`box_money`,`box_text`,`BoxBroadcastTextID`) VALUES 
 (2383,0,3,'I am interested in warlock training.',2544,5,16,0,0,0,0,0,'',0),
 (2383,1,0,'I wish to unlearn my talents.',62295,16,16,0,0,0,0,0,'',0),
