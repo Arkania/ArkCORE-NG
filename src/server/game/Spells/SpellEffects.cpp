@@ -667,9 +667,9 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                 // Ferocious Bite
                 if (m_caster->GetTypeId() == TYPEID_PLAYER && (m_spellInfo->SpellFamilyFlags[0] & 0x000800000) && m_spellInfo->SpellVisual[0] == 6587)
                 {
-                    // converts each extra point of energy ( up to 25 energy ) into additional damage
-                    int32 energy = -(m_caster->ModifyPower(POWER_ENERGY, -25));
-                    // 25 energy = 100% more damage
+                    // converts each extra point of energy ( up to 35 energy ) into additional damage
+                    int32 energy = -(m_caster->ModifyPower(POWER_ENERGY, -35));
+                    // 35 energy = 100% more damage
                     AddPct(damage, energy * 4);
                     // AP coefficient
                     damage += int32(m_caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.109f * m_caster->ToPlayer()->GetComboPoints());
