@@ -820,7 +820,7 @@ Player::Player(WorldSession* session) : Unit(true)
     inn_pos_y = 0;
     inn_pos_z = 0;
     m_rest_bonus = 0;
-    rest_type = REST_TYPE_NO;
+    rest_flag = REST_FLAG_NONE;
     ////////////////////Rest System/////////////////////
 
     m_mailsLoaded = false;
@@ -3982,6 +3982,28 @@ void Player::SetInWater(bool apply)
     RemoveAurasWithInterruptFlags(apply ? AURA_INTERRUPT_FLAG_NOT_ABOVEWATER : AURA_INTERRUPT_FLAG_NOT_UNDERWATER);
 
     getHostileRefManager().updateThreatTables();
+}
+
+bool Player::IsInAreaTriggerRadius(const AreaTriggerEntry* trigger) const
+{
+    if (!trigger || GetMapId() != trigger->mapid)
+        return false;
+
+    if (trigger->radius > 0.f)
+    {
+        // if we have radius check it
+        float dist = GetDistance(trigger->x, trigger->y, abs(trigger->z));
+        if (dist > trigger->radius)
+            return false;
+    }
+    else
+    {
+        Position center(trigger->x, trigger->y, trigger->z, trigger->box_orientation);
+        if (!IsWithinBox(center, trigger->box_x / 2.f, trigger->box_y / 2.f, trigger->box_z / 2.f))
+            return false;
+    }
+
+    return true;
 }
 
 void Player::SetGameMaster(bool on)
@@ -9111,15 +9133,61 @@ void Player::UpdateArea(uint32 newArea)
 
     // previously this was in UpdateZone (but after UpdateArea) so nothing will break
     pvpInfo.IsInNoPvPArea = false;
-    if (area && area->IsSanctuary())    // in sanctuary
+    if (area)
     {
-        SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_SANCTUARY);
-        pvpInfo.IsInNoPvPArea = true;
-        if (!duel)
-            CombatStopWithPets();
+        if (area->IsSanctuary())    // in sanctuary
+        {
+            SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_SANCTUARY);
+            pvpInfo.IsInNoPvPArea = true;
+            if (!duel)
+                CombatStopWithPets();
+        }
+        else
+            RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_SANCTUARY);
+
+        /* on enter tavern, our core are waiting for client sending a CMSG_AREA_CHANGE Opcode. but he dosn't in goldshire. why??
+        sniffing show, that if player comes from a zone and enter the tavern, the client send CMSG_AREA_CHANGE... fine... But:
+        when player comes from an area, as in goldshire, the client send a CMSG_ZONE_CHANGE. (and our core set none RESTING_FLAGS)
+        On this place we need the triggerId. Know someone how to switch between triggerId <> areaId by DBC files?*/
+
+        uint32 triggerId = 0;
+        switch (newArea)
+        {
+        case 2102:
+            triggerId = 710;
+            break;
+        case 5637:
+            triggerId = 562;
+            break;
+        }
+
+        if (triggerId)
+        {
+            if (sObjectMgr->IsTavernAreaTrigger(triggerId))
+            {
+                AreaTriggerEntry const* atEntry = sAreaTriggerStore.LookupEntry(triggerId);
+                if (IsInAreaTriggerRadius(atEntry))
+                {
+                    // set resting flag we are in the inn
+                    SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING);
+                    InnEnter(time(NULL), GetMapId(), GetPositionX(), GetPositionY(), GetPositionZ());
+                    SetRestFlag(REST_FLAG_IN_TAVERN);
+                    SetInnTriggerId(triggerId);
+
+                    if (sWorld->IsFFAPvPRealm())
+                        RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
+
+                    return;
+                }
+            }
+        }
+        else
+        {
+            RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING);
+            SetRestFlag(REST_FLAG_NONE);
+            SetInnTriggerId(0);
+        }
     }
-    else
-        RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_SANCTUARY);
 }
 
 void Player::UpdateZone(uint32 newZone, uint32 newArea)
@@ -9187,7 +9255,7 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea)
         if (!pvpInfo.IsHostile || zone->IsSanctuary())
         {
             SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING);
-            SetRestType(REST_TYPE_IN_CITY);
+            SetRestFlag(REST_FLAG_IN_CITY);
             InnEnter(time(0), GetMapId(), 0, 0, 0);
         }
         pvpInfo.IsInNoPvPArea = true;
@@ -9196,19 +9264,20 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea)
     {
         if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING))
         {
-            if (GetRestType() == REST_TYPE_IN_TAVERN)        // Still inside a tavern or has recently left
+            if (GetRestFlag() == REST_FLAG_IN_TAVERN)        // Still inside a tavern or has recently left
             {
                 // Remove rest state if we have recently left a tavern.
-                if (GetMapId() != GetInnPosMapId() || GetExactDist(GetInnPosX(), GetInnPosY(), GetInnPosZ()) > 1.0f)
+                AreaTriggerEntry const* atEntry = sAreaTriggerStore.LookupEntry(GetInnTriggerId());
+                if (!IsInAreaTriggerRadius(atEntry))
                 {
                     RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING);
-                    SetRestType(REST_TYPE_NO);
+                    SetRestFlag(REST_FLAG_NONE);
                 }
             }
             else                                             // Recently left a capital city
             {
                 RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING);
-                SetRestType(REST_TYPE_NO);
+                SetRestFlag(REST_FLAG_NONE);
             }
         }
     }
@@ -16689,8 +16758,8 @@ void Player::CompleteQuest(uint32 quest_id)
                 SetQuestSlotState(log_slot, QUEST_STATE_COMPLETE);
 
             uint64 guid = GetQuestGiverGUID(quest_id);
-            if (guid && guid != GetGUID())
-                printf("test: stored questGiverGuid != playerGuid\n");
+            if (guid && guid == GetGUID())
+                printf("test: stored questGiverGuid(%llu) != GetGuid(%llu) \n", guid, GetGUID());
 
             Object* questGiver = ObjectAccessor::GetObjectByTypeMask(*this, guid, TYPEMASK_UNIT | TYPEMASK_GAMEOBJECT | TYPEMASK_ITEM);
             InformQuestGiverObjectiveComplete(qInfo, questGiver);
@@ -29829,4 +29898,3 @@ void Player::SendUpdatePhasing()
     
     UpdatePhaseForQuestAreaOrZoneChange();
 }
-

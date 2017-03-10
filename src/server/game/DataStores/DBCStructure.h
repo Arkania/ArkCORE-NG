@@ -710,9 +710,9 @@ struct AreaTriggerEntry
     float   x;                                              // 2        m_x
     float   y;                                              // 3        m_y
     float   z;                                              // 4        m_z
-    //uint32                                                // 5
-    //uint32                                                // 6
-    //uint32                                                // 7
+    uint32  unk;                                            // 5 seen values are 0, 1 or 2
+    uint32  phaseId;                                        // 6
+    uint32  phaseGroup;                                     // 7
     float   radius;                                         // 8        m_radius
     float   box_x;                                          // 9        m_box_length
     float   box_y;                                          // 10       m_box_width

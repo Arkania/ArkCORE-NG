@@ -809,11 +809,12 @@ enum ArenaTeamInfoType
 
 class InstanceSave;
 
-enum RestType
+enum RestFlag
 {
-    REST_TYPE_NO        = 0,
-    REST_TYPE_IN_TAVERN = 1,
-    REST_TYPE_IN_CITY   = 2
+    REST_FLAG_NONE              = 0,
+    REST_FLAG_IN_TAVERN         = 1,
+    REST_FLAG_IN_CITY           = 2,
+    REST_FLAG_IN_FACTION_AREA   = 4
 };
 
 enum TeleportToOptions
@@ -1258,6 +1259,7 @@ class Player : public Unit, public GridObject<Player>
         static bool BuildEnumData(PreparedQueryResult result, ByteBuffer* dataBuffer, ByteBuffer* bitBuffer);
 
         void SetInWater(bool apply);
+        bool IsInAreaTriggerRadius(const AreaTriggerEntry* trigger) const;
 
         bool IsInWater() const { return m_isInWater; }
         bool IsUnderWater() const;
@@ -1325,9 +1327,12 @@ class Player : public Unit, public GridObject<Player>
         float GetRestBonus() const { return m_rest_bonus; }
         void SetRestBonus(float rest_bonus_new);
 
-        RestType GetRestType() const { return rest_type; }
-        void SetRestType(RestType n_r_type) { rest_type = n_r_type; }
-
+        bool HasRestFlag(RestFlag restFlag) const { return (rest_flag & restFlag) != 0; }
+        RestFlag GetRestFlag() const { return rest_flag; }
+        void SetRestFlag(RestFlag n_r_type) { rest_flag = n_r_type; }
+        
+        uint32 GetInnTriggerId() const { return inn_triggerId; }
+        void SetInnTriggerId(uint32 triggerId) { inn_triggerId = triggerId; }
         uint32 GetInnPosMapId() const { return inn_pos_mapid; }
         float GetInnPosX() const { return inn_pos_x; }
         float GetInnPosY() const { return inn_pos_y; }
@@ -2895,8 +2900,9 @@ class Player : public Unit, public GridObject<Player>
         float  inn_pos_x;
         float  inn_pos_y;
         float  inn_pos_z;
+        float  inn_triggerId;
         float m_rest_bonus;
-        RestType rest_type;
+        RestFlag rest_flag;
         ////////////////////Rest System/////////////////////
 
         // Social
