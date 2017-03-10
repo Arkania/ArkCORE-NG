@@ -902,10 +902,8 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket& recvData)
     if (sObjectMgr->IsTavernAreaTrigger(triggerId))
     {
         // set resting flag we are in the inn
-        player->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING);
-        player->InnEnter(time(NULL), atEntry->mapid, atEntry->x, atEntry->y, atEntry->z);
-        player->SetRestFlag(REST_FLAG_IN_TAVERN);
-        player->SetInnTriggerId(triggerId);
+        player->SetRestingFlag(RESTING_FLAG_IN_TAVERN, triggerId);
+
         if (sWorld->IsFFAPvPRealm())
             player->RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
 
