@@ -330,6 +330,7 @@ void AddSC_blasted_lands();
 void AddSC_burning_steppes();
 void AddSC_coldridge_valley();
 void AddSC_dun_morogh();
+void AddSC_gnomeregan();
 void AddSC_duskwood();
 void AddSC_eastern_plaguelands();
 void AddSC_elwynn_forest();
@@ -1198,6 +1199,7 @@ void AddEasternKingdomsScripts()
     AddSC_burning_steppes();
     AddSC_coldridge_valley();
     AddSC_dun_morogh();
+    AddSC_gnomeregan();
     AddSC_duskwood();
     AddSC_eastern_plaguelands();
     AddSC_elwynn_forest();

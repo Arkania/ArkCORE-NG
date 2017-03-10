@@ -276,6 +276,7 @@ set(scripts_STAT_SRCS
   EasternKingdoms/zone_coldridge_valley.cpp
   EasternKingdoms/zone_dun_morogh.cpp
   EasternKingdoms/zone_northern_stranglethorn.cpp
+  EasternKingdoms/zone_gnomeregan.cpp
 )
 
 message("  -> Prepared: Eastern Kingdoms")
