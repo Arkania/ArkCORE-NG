@@ -86,12 +86,12 @@ std::vector<std::string> str_split(std::string text, char delimiter)
 
 std::string str_tolower(std::string text)
 {
-   std::transform(text.begin(), text.end(), text.begin(), std::tolower);
+   std::transform(text.begin(), text.end(), text.begin(), ::tolower);
    return text;
 }
 
 // trim from start
-std::string str_ltrim(std::string &s) 
+std::string str_ltrim(std::string s) 
 {
     s.erase(s.begin(), std::find_if(s.begin(), s.end(),
         std::not1(std::ptr_fun<int, int>(std::isspace))));
@@ -99,7 +99,7 @@ std::string str_ltrim(std::string &s)
 }
 
 // trim from end
-std::string str_rtrim(std::string &s) 
+std::string str_rtrim(std::string s) 
 {
     s.erase(std::find_if(s.rbegin(), s.rend(),
         std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
@@ -107,9 +107,10 @@ std::string str_rtrim(std::string &s)
 }
 
 // trim from both ends
-std::string str_trim(std::string &text) 
+std::string str_trim(std::string text) 
 {
-    return str_ltrim(str_rtrim(text));
+    text = str_rtrim(text);
+    return str_ltrim(text);
 }
 
 ChatCommand* ChatHandler::getCommandTable()
