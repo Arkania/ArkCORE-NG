@@ -823,7 +823,7 @@ public:
 };
 
 
-void AddSC_coldridge_valley()
+void AddSC_zone_coldridge_valley()
 {
     new npc_rockjaw_invader();
     new npc_coldridge_defender();

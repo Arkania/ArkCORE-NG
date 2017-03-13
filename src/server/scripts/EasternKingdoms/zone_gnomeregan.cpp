@@ -24,22 +24,64 @@ SDComment: Quest Support:
 SDCategory: Gnomeregan
 EndScriptData */
 
-/* ContentData
-
-EndContentData */
 
 #include "script_helper.h"
+#include "Creature.h"
+#include "GameObjectAI.h"
+#include "GameObject.h"
+#include "ObjectAccessor.h"
+#include "ObjectMgr.h"
+#include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "Player.h"
+#include "Vehicle.h"
+#include "MovementGenerator.h"
+#include "TargetedMovementGenerator.h"
 
-
-
-
-void AddSC_gnomeregan()
+// 42501
+class npc_wounded_infantry_42501 : public CreatureScript
 {
-   
+public:
+    npc_wounded_infantry_42501() : CreatureScript("npc_wounded_infantry_42501") { }
+
+    enum Dun_Morogh
+    {
+        //support quest 24533
+        QUEST_ARTS_OF_A_PRIEST_26200 = 26200,
+        //credt NPC
+        NPC_HEALING_CREDIT_42501 = 42501
+    };
+
+    struct npc_wounded_infantry_42501AI : public ScriptedAI
+    {
+        npc_wounded_infantry_42501AI(Creature* creature) : ScriptedAI(creature) { }
+
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
+        {
+            if (Player* player = caster->ToPlayer())
+                if (player->GetQuestStatus(QUEST_ARTS_OF_A_PRIEST_26200) == QUEST_STATUS_INCOMPLETE)
+                    player->KilledMonsterCredit(NPC_HEALING_CREDIT_42501);// New NPC ID
+            me->DespawnOrUnsummon(500);
+        }
+
+
+        void EnterCombat(Unit* /*who*/) override { }
+
+        void MoveInLineOfSight(Unit* /*who*/) override { }
+
+        void UpdateAI(uint32 /*diff*/) override { }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_wounded_infantry_42501AI(creature);
+    }
+};
+
+void AddSC_zone_gnomeregan()
+{
+    new npc_wounded_infantry_42501();
 }
 

@@ -36,12 +36,9 @@ EndContentData */
 
 
 
-/*######
-## AddSC
-######*/
 
-void AddSC_dun_morogh()
+void AddSC_zone_dun_morogh()
 {
-   
+    
 }
 

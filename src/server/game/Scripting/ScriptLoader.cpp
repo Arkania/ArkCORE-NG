@@ -328,9 +328,9 @@ void AddSC_zone_northern_stranglethorn();
 void AddSC_arathi_highlands();
 void AddSC_blasted_lands();
 void AddSC_burning_steppes();
-void AddSC_coldridge_valley();
-void AddSC_dun_morogh();
-void AddSC_gnomeregan();
+void AddSC_zone_coldridge_valley();
+void AddSC_zone_dun_morogh();
+void AddSC_zone_gnomeregan();
 void AddSC_duskwood();
 void AddSC_eastern_plaguelands();
 void AddSC_elwynn_forest();
@@ -505,7 +505,7 @@ void AddSC_boss_bazzalan();
 
 void AddSC_ashenvale();
 void AddSC_azshara();
-void AddSC_azuremyst_isle();
+void AddSC_zone_azuremyst_isle();
 void AddSC_bloodmyst_isle();
 void AddSC_darkshore();
 void AddSC_desolace();
@@ -1197,9 +1197,9 @@ void AddEasternKingdomsScripts()
     AddSC_arathi_highlands();
     AddSC_blasted_lands();
     AddSC_burning_steppes();
-    AddSC_coldridge_valley();
-    AddSC_dun_morogh();
-    AddSC_gnomeregan();
+    AddSC_zone_coldridge_valley();
+    AddSC_zone_dun_morogh();
+    AddSC_zone_gnomeregan();
     AddSC_duskwood();
     AddSC_eastern_plaguelands();
     AddSC_elwynn_forest();
@@ -1384,7 +1384,7 @@ void AddKalimdorScripts()
 
     AddSC_ashenvale();
     AddSC_azshara();
-    AddSC_azuremyst_isle();
+    AddSC_zone_azuremyst_isle();
     AddSC_bloodmyst_isle();
     AddSC_darkshore();
     AddSC_desolace();
