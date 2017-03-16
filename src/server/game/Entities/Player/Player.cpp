@@ -16394,15 +16394,15 @@ Quest const* Player::GetNextQuest(uint64 guid, Quest const* quest)
 
 Quest const* Player::GetMoreCompletedQuest(Object* questgiver)
 {
-    QuestRelationBounds objectQR;
+    QuestRelationBounds objectQIR;
     if (questgiver->isType(TYPEMASK_UNIT))
-        objectQR = sObjectMgr->GetCreatureQuestRelationBounds(questgiver->GetEntry());
+        objectQIR = sObjectMgr->GetCreatureQuestInvolvedRelationBounds(questgiver->GetEntry());
     else if (questgiver->isType(TYPEMASK_GAMEOBJECT))
-        objectQR = sObjectMgr->GetGOQuestRelationBounds(questgiver->GetEntry());
+        objectQIR = sObjectMgr->GetGOQuestInvolvedRelationBounds(questgiver->GetEntry());
     
-    for (QuestRelations::const_iterator itr = objectQR.first; itr != objectQR.second; ++itr)
+    for (QuestRelations::const_iterator itr = objectQIR.first; itr != objectQIR.second; ++itr)
         if (Quest const* quest = sObjectMgr->GetQuestTemplate(itr->second))
-            if (CanRewardQuest(quest, false))
+            if (GetQuestStatus(quest->GetQuestId()) == QUEST_STATUS_COMPLETE)
                 return quest;
     return nullptr;
 }

@@ -413,8 +413,8 @@ void PlayerMenu::SendQuestGiverQuestDetails(Quest const* quest, uint64 npcGUID, 
         AddQuestLevelToTitle(questTitle, quest->GetQuestLevel());
     
     uint8 ExtraQuestWindow = 0;
-    if (!(quest->HasFlag(QUEST_FLAGS_AUTO_TAKE) || quest->HasFlag(QUEST_FLAGS_AUTO_SUBMIT)))
-        if (quest->HasFlag(QUEST_FLAGS_AUTO_ACCEPT) && !quest->HasSpecialFlag(QUEST_SPECIAL_FLAGS_AUTO_ACCEPT))
+    if (!(quest->HasFlag(QUEST_FLAGS_AUTO_TAKE) || quest->HasFlag(QUEST_FLAGS_AUTO_SUBMIT) || quest->HasSpecialFlag(QUEST_SPECIAL_FLAGS_AUTO_ACCEPT)))
+        if (quest->HasFlag(QUEST_FLAGS_AUTO_COMPLETE))
             ExtraQuestWindow = 1;
 
     WorldPacket data(SMSG_QUESTGIVER_QUEST_DETAILS, 100);   // guess size

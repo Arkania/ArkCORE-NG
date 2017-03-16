@@ -316,14 +316,18 @@ void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPacket& recvData)
             if (Quest const* compQuest = _player->GetMoreCompletedQuest(object))
             {
                 quest = compQuest;
+                if (quest->GetReqItemsCount())                  // some items required
+                    _player->PlayerTalkClass->SendQuestGiverRequestItems(quest, guid, _player->CanRewardQuest(quest, false), false);
+                else                                            // no items required
+                    _player->PlayerTalkClass->SendQuestGiverOfferReward(quest, guid, true);
+                return;
             }
             else
             {
                 if (Quest const* nextQuest = _player->GetNextQuest(guid, quest))
                 {
-                    if (_player->CanAddQuest(nextQuest, true) && _player->CanTakeQuest(nextQuest, true) && (nextQuest->HasFlag(QUEST_FLAGS_AUTO_SUBMIT) || nextQuest->HasFlag(QUEST_FLAGS_AUTO_TAKE)))
-                        if (nextQuest->IsAutoAccept())
-                            _player->AddQuestAndCheckCompletion(nextQuest, object);
+                    if (_player->CanAddQuest(nextQuest, true) && _player->CanTakeQuest(nextQuest, true) && (nextQuest->HasFlag(QUEST_FLAGS_AUTO_SUBMIT) || nextQuest->HasFlag(QUEST_FLAGS_AUTO_TAKE) || nextQuest->IsAutoAccept()))
+                        _player->AddQuestAndCheckCompletion(nextQuest, object);
 
                     _player->PlayerTalkClass->SendQuestGiverQuestDetails(nextQuest, guid, true);
                     return;
