@@ -22,11 +22,17 @@ SD%Complete: 0
 SDComment:
 Script Data End */
 
+#include "script_helper.h"
+#include "Creature.h"
+#include "GameObjectAI.h"
+#include "GameObject.h"
+#include "ObjectAccessor.h"
+#include "ObjectMgr.h"
+#include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
-#include "Player.h"
-#include "GameObjectAI.h"
+#include "SpellMgr.h"
 #include "Vehicle.h"
 
 enum eAnimRedridgeCity
@@ -85,6 +91,7 @@ enum eAnimRedridgeCity
     SPELL_KEESHANS_HEADBAND = 81234,
     QUEST_JOHN_J_KEESHAN = 26567,
     QUEST_THIS_AINT_MY_WAR = 26568,
+    QUEST_WE_MUST_PREPARE = 26510,
     QUEST_TUNING_THE_GNOMECORDER = 26512,
     QUEST_BREAKING_OUT_IS_HARD_TO_DO = 26587,
     QUEST_JORGENSEN = 26560,
@@ -94,10 +101,44 @@ enum eAnimRedridgeCity
     AREA_CAMP_EVERSTILL = 5326,
 };
 
+// 344
+class npc_magistrate_solomon_344 : public CreatureScript
+{
+public:
+    npc_magistrate_solomon_344() : CreatureScript("npc_magistrate_solomon_344") { }
+
+    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*opt*/)
+    {
+        switch (quest->GetQuestId())
+        {
+        case QUEST_JOHN_J_KEESHAN:
+        {
+            player->AddAura(SPELL_GNOMECORDER, player);
+            break;
+        }
+        }
+        return false;
+    }
+};
+
 class npc_marshal_marris : public CreatureScript
 {
 public:
     npc_marshal_marris() : CreatureScript("npc_marshal_marris") { }
+
+    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*opt*/)
+    {
+        switch (quest->GetQuestId())
+        {
+        case QUEST_WE_MUST_PREPARE:
+        case QUEST_TUNING_THE_GNOMECORDER:
+        {
+            player->AddAura(SPELL_GNOMECORDER, player);
+            break;
+        }
+        }
+        return false;
+    }
 
     struct npc_marshal_marrisAI : public ScriptedAI
     {
@@ -3650,6 +3691,7 @@ public:
 
 void AddSC_redridge_mountains()
 {
+    new npc_magistrate_solomon_344();
     new npc_marshal_marris();
     new npc_dumpy_43249();
     new npc_big_earl_43248();
