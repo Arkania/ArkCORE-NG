@@ -1335,7 +1335,6 @@ class Unit : public WorldObject
         uint32 getAttackTimer(WeaponAttackType type) const { return m_attackTimer[type]; }
         void setAttackTimer(WeaponAttackType type, uint32 time) { m_attackTimer[type] = time; }
         void ResetAttackTimer(WeaponAttackType type = BASE_ATTACK);
-        void ResetFakeAttackTimer(WeaponAttackType type = BASE_ATTACK);
         bool isAttackReady(WeaponAttackType type = BASE_ATTACK) const { return m_attackTimer[type] == 0; }
         bool haveOffhandWeapon() const;
         bool CanDualWield() const { return m_canDualWield; }
@@ -1456,6 +1455,12 @@ class Unit : public WorldObject
         bool IsHostileToPlayers() const;
         bool IsFriendlyTo(Unit const* unit) const;
         bool IsNeutralToAll() const;
+        uint32 GetFakeAttackFlag();
+        bool IsFakeAttack(Unit* victim);
+        uint32 GetRangedFakeAttackSpell();
+        uint32 IsRangedFakeAttackPossible();
+        bool IsMeleeFakeAttackPossible();
+
         bool IsInPartyWith(Unit const* unit) const;
         bool IsInRaidWith(Unit const* unit) const;
         void GetPartyMembers(std::list<Unit*> &units);
@@ -2361,6 +2366,7 @@ class Unit : public WorldObject
         bool _isWalkingBeforeCharm;     ///< Are we walking before we were charmed?
 
         time_t _lastDamagedTime; // Part of Evade mechanics
+        int32 m_SparringAttackFlag;
 };
 
 namespace Trinity

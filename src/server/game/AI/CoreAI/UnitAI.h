@@ -39,6 +39,13 @@ enum SelectAggroTarget
     SELECT_TARGET_FARTHEST
 };
 
+enum SparringFlags
+{
+    SPARRING_AGAINST_NEUTRAL = 1,
+    SPARRING_AGAINST_SPARRING = 2,
+    SPARRING_AGAINST_HATED = 4
+};
+
 // default predicate function to select target based on distance, player and/or aura criteria
 struct DefaultTargetSelector : public std::unary_function<Unit*, bool>
 {
@@ -249,9 +256,7 @@ class UnitAI
         float DoGetSpellMaxRange(uint32 spellId, bool positive = false);
 
         void DoMeleeAttackIfReady();
-        bool IsFakeAttack(Unit* npcA, Unit* npcB);
         bool DoSpellAttackIfReady(uint32 spell);
-
         static AISpellInfoType* AISpellInfo;
         static void FillAISpellInfo();
 

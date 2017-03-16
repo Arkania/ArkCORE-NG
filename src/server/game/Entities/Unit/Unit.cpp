@@ -262,6 +262,7 @@ Unit::Unit(bool isWorldObject) :
 
     _oldFactionId = 0;
     _isWalkingBeforeCharm = false;
+    m_SparringAttackFlag = -1;
 }
 
 ////////////////////////////////////////////////////////////
@@ -468,11 +469,6 @@ void Unit::DisableSpline()
 }
 
 void Unit::ResetAttackTimer(WeaponAttackType type)
-{
-    m_attackTimer[type] = uint32(GetAttackTime(type) * m_modAttackSpeedPct[type]);
-}
-
-void Unit::ResetFakeAttackTimer(WeaponAttackType type)
 {
     m_attackTimer[type] = uint32(GetAttackTime(type) * m_modAttackSpeedPct[type] * frand(0.9f, 1.1f));
 }
@@ -9089,6 +9085,104 @@ bool Unit::IsNeutralToAll() const
         return false;
 
     return my_faction->IsNeutralToAll();
+}
+
+/* the FactionTemplate.dbc has a column 'flags'. this flags value, has bit 2^4, 2^5 and 2^6 that are involved (i guess) in ShowFight
+between members of 2 different factions. On update, each creature are checked for Attack with his selected target. Here we detect
+this fight-pair as FakeAttackers when one/both of them have set one of the 3 'Fake' bits. If so, then we replace the function AttackerStateUpdate()
+with the new FakeAttackerStateUpdate(), basicly this returns zero damage for both of the sparring partners. */
+uint32 Unit::GetFakeAttackFlag() 
+{
+    if (IsDead() || !IsInWorld() || GetTypeId() == TYPEID_PLAYER)
+        return 0;
+
+    if (m_SparringAttackFlag < 0)
+    {
+        FactionTemplateEntry const* meFEntry = GetFactionTemplateEntry();
+        uint32 meFlags = meFEntry->factionFlags;
+        m_SparringAttackFlag = ((meFlags & (FACTION_TEMPLATE_ENEMY_SPARRING_1 & FACTION_TEMPLATE_ENEMY_SPARRING_2 & FACTION_TEMPLATE_ENEMY_SPARRING_4)) >> 3) & 7;
+    }
+
+    return m_SparringAttackFlag;
+}
+
+bool Unit::IsFakeAttack(Unit* victim)
+{
+    uint32 flagA = GetFakeAttackFlag();
+    uint32 flagB = victim->GetFakeAttackFlag();
+
+    if (flagA || flagB)
+    {
+        ReputationRank rrA = GetReactionTo(victim);
+        ReputationRank rrB = victim->GetReactionTo(this);
+        return (rrA >= REP_FRIENDLY || rrB >= REP_FRIENDLY) ? false : true;
+    }
+
+    return false;
+}
+
+uint32 Unit::GetRangedFakeAttackSpell()
+{
+    if (!GetFakeAttackFlag())
+        return 0;
+
+    // check has ranged weapon equipped
+
+    uint32 equippedRangedWeapon = GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + RANGED_ATTACK);
+
+    if (equippedRangedWeapon)  // if not, check has ranged weapon in slot
+    {
+        int8 index = 1;
+        EquipmentInfo const* einfo = sObjectMgr->GetEquipmentInfo(GetEntry(), index);
+        uint32 possibleRangedWeapon = einfo->ItemEntry[RANGED_ATTACK];
+
+        if (!possibleRangedWeapon)
+            return 0;
+    }
+
+    Creature* caster = ToCreature(); // check creature_template->spells for ranged spells
+    for (uint8 i = 0; i < CREATURE_MAX_SPELLS; ++i)
+        if (caster->m_spells[i])
+        {
+            uint32 spellId = caster->m_spells[i];
+            if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId))
+                if (spellInfo->DmgClass == SPELL_DAMAGE_CLASS_RANGED)
+                    if (spellInfo->RangeEntry && spellInfo->RangeEntry->maxRangeHostile > 15.0f)
+                        return spellId;
+        }
+
+    return 0;
+}
+
+bool Unit::IsMeleeFakeAttackPossible()
+{
+    if (!GetFakeAttackFlag())
+        return false;
+
+    if (Unit* victim = GetVictim())
+    {
+        float dist = GetPosition().GetExactDist(victim);
+        if (dist > 5.0f)
+            return false;
+    }
+
+    return true;
+}
+
+uint32 Unit::IsRangedFakeAttackPossible()
+{
+    uint32 spellId = GetRangedFakeAttackSpell();
+    if (!spellId)
+        return 0;
+
+    if (Unit* victim = GetVictim())
+    {
+        float dist = GetPosition().GetExactDist(victim);
+        if (dist < 5.0f)
+            return 0;
+    }
+
+    return spellId;
 }
 
 void Unit::_addAttacker(Unit* pAttacker)
