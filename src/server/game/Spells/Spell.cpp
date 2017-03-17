@@ -2436,7 +2436,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
         // Fill base damage struct (unitTarget - is real spell target)
         SpellNonMeleeDamage damageInfo(caster, unitTarget, m_spellInfo->Id, m_spellSchoolMask);
 
-        if (caster->IsFakeAttack(caster->GetVictim()))
+        if (caster->IsFakeAttack(unitTarget))
             damageInfo.damage = 0;
         else
         {
