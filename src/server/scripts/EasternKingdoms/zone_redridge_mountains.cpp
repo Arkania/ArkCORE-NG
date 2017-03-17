@@ -64,6 +64,15 @@ enum eAnimRedridgeCity
     SPELL_APPLY_QUEST_INVIS_5 = 81003,
     SPELL_APPLY_QUEST_INVIS_9 = 81201,
     SPELL_APPLY_QUEST_INVIS_10 = 81240,
+    SPELL_APPLY_QUEST_INVIS_11 = 81266,
+    SPELL_APPLY_QUEST_INVIS_12 = 81496,
+    SPELL_APPLY_QUEST_INVIS_13 = 81580,
+    SPELL_APPLY_QUEST_INVIS_14 = 81583,
+    SPELL_APPLY_QUEST_INVIS_15 = 81795,
+    SPELL_APPLY_QUEST_INVIS_16 = 81805,
+    SPELL_APPLY_QUEST_INVIS_17 = 81897,
+    SPELL_APPLY_QUEST_INVIS_18 = 82059,
+    SPELL_APPLY_QUEST_INVIS_19 = 82099,
     SPELL_DETECT_QUEST_INVIS_1 = 80695,
     SPELL_DETECT_QUEST_INVIS_2 = 80696,
     SPELL_DETECT_QUEST_INVIS_3 = 80817,
@@ -74,6 +83,15 @@ enum eAnimRedridgeCity
     SPELL_DETECT_QUEST_INVIS_8 = 81080,
     SPELL_DETECT_QUEST_INVIS_9 = 81202,
     SPELL_DETECT_QUEST_INVIS_10 = 81241,
+    SPELL_DETECT_QUEST_INVIS_11 = 81267,
+    SPELL_DETECT_QUEST_INVIS_12 = 81497,
+    SPELL_DETECT_QUEST_INVIS_13 = 81581,
+    SPELL_DETECT_QUEST_INVIS_14 = 81584,
+    SPELL_DETECT_QUEST_INVIS_15 = 81794,
+    SPELL_DETECT_QUEST_INVIS_16 = 81804,
+    SPELL_DETECT_QUEST_INVIS_17 = 81898,
+    SPELL_DETECT_QUEST_INVIS_18 = 82060,
+    SPELL_DETECT_QUEST_INVIS_19 = 82100,
     SPELL_SUMMON_MESSNER = 80893,
     SPELL_SUMMON_JORGENSEN = 80940,
     SPELL_SUMMON_KRAKAUER = 80941,
@@ -91,6 +109,7 @@ enum eAnimRedridgeCity
     SPELL_KEESHANS_HEADBAND = 81234,
     QUEST_JOHN_J_KEESHAN = 26567,
     QUEST_THIS_AINT_MY_WAR = 26568,
+    QUEST_IN_SEARCH_OF_BRAVO_COMPANY = 26586,
     QUEST_WE_MUST_PREPARE = 26510,
     QUEST_TUNING_THE_GNOMECORDER = 26512,
     QUEST_BREAKING_OUT_IS_HARD_TO_DO = 26587,
@@ -111,9 +130,12 @@ public:
     {
         switch (quest->GetQuestId())
         {
-        case QUEST_JOHN_J_KEESHAN:
+        case QUEST_WE_MUST_PREPARE:
+        case QUEST_TUNING_THE_GNOMECORDER:
         {
             player->AddAura(SPELL_GNOMECORDER, player);
+            player->AddAura(SPELL_DETECT_QUEST_INVIS_1, player);
+            player->AddAura(SPELL_DETECT_QUEST_INVIS_3, player);
             break;
         }
         }
@@ -125,20 +147,6 @@ class npc_marshal_marris : public CreatureScript
 {
 public:
     npc_marshal_marris() : CreatureScript("npc_marshal_marris") { }
-
-    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*opt*/)
-    {
-        switch (quest->GetQuestId())
-        {
-        case QUEST_WE_MUST_PREPARE:
-        case QUEST_TUNING_THE_GNOMECORDER:
-        {
-            player->AddAura(SPELL_GNOMECORDER, player);
-            break;
-        }
-        }
-        return false;
-    }
 
     struct npc_marshal_marrisAI : public ScriptedAI
     {
@@ -696,14 +704,17 @@ class npc_colonel_troteman_43221 : public CreatureScript
 {
 public:
     npc_colonel_troteman_43221() : CreatureScript("npc_colonel_troteman_43221") { }
-
+    
     bool OnQuestReward(Player* player, Creature* /*creature*/, Quest const* quest, uint32 /*opt*/) 
     { 
-        if (quest->GetQuestId() == QUEST_THIS_AINT_MY_WAR)
+        switch (quest->GetQuestId())
+        {
+        case QUEST_THIS_AINT_MY_WAR:
         {
             player->RemoveAura(SPELL_DETECT_QUEST_INVIS_4);
+            break;
         }
-        if (quest->GetQuestId() == QUEST_RETURN_OF_THE_BRAVO_COMPANY)
+        case QUEST_RETURN_OF_THE_BRAVO_COMPANY:
         {
             if (Creature* messner = player->FindNearestCreature(NPC_MESSNER_43300, 300.0f))
                 messner->DespawnOrUnsummon();
@@ -725,15 +736,29 @@ public:
             player->RemoveAura(SPELL_DETECT_QUEST_INVIS_6);
             player->RemoveAura(SPELL_DETECT_QUEST_INVIS_7);
             player->RemoveAura(SPELL_DETECT_QUEST_INVIS_8);
+            break;
+        }
         }
         return false; 
     }
 
     bool OnQuestAccept(Player* player, Creature* /*creature*/, Quest const* quest) 
     { 
-        if (quest->GetQuestId() == QUEST_THEY_DREW_FIRST_BLOOD)
+        switch (quest->GetQuestId())
+        {
+        case QUEST_JOHN_J_KEESHAN:
+        case QUEST_IN_SEARCH_OF_BRAVO_COMPANY:
+        {
+            player->AddAura(SPELL_GNOMECORDER, player);
+            player->AddAura(SPELL_DETECT_QUEST_INVIS_1, player);
+            player->AddAura(SPELL_DETECT_QUEST_INVIS_3, player);
+            break;
+        }
+        case QUEST_THEY_DREW_FIRST_BLOOD:
         {
             player->AddAura(SPELL_DETECT_QUEST_INVIS_9, player);
+            break;
+        }
         }
         return false; 
     }
@@ -1548,10 +1573,6 @@ enum eAnimBoot
     SPELL_RIVERBOAT_TRIGGER_03 = 81263,
     SPELL_RIVERBOAT_TRIGGER_04 = 81254,
     SPELL_MESSNER_BOAT_ENGINE = 81260,
-    SPELL_DETECT_QUEST_INVIS_11 = 81267,
-    SPELL_DETECT_QUEST_INVIS_12 = 81497,
-    SPELL_APPLY_QUEST_INVIS_11 = 81266,
-    SPELL_APPLY_QUEST_INVIS_12 = 81496,
     SPELL_RIVERBOAT_QUEST_CREDIT = 81265,
 };
 
@@ -1870,7 +1891,6 @@ enum eCompanieBravo
     SPELL_DISTRACTION_VISUAL = 81370,
     SPELL_DEADLY_POISEN = 10022,
     SPELL_CAMOUFLAGE = 82577,
-    SPELL_DETECT_QUEST_INVIS_13 = 81581,
 };
 
 class npc_john_j_keeshan_43458 : public CreatureScript
@@ -2057,13 +2077,10 @@ public:
         void AttackStart(Unit* target) override
         {
             if (target->HasAura(SPELL_CHLOROFORM))
-                return; 
-               
-            if (Creature* npc = me->GetCharmerOrOwner()->ToPlayer()->getAttackerForHelper()->ToCreature())
-            {
-                me->Attack(npc, true);
-                me->GetMotionMaster()->MoveChase(npc);
-            }
+                return;
+
+            me->Attack(target, true);
+            me->GetMotionMaster()->MoveChase(target);
         }
 
         void UpdateAI(uint32 diff) override
@@ -2691,8 +2708,6 @@ enum eJohnKeeshan
     QUEST_THE_GRAND_MAGUS_DOANE = 26694,
     SPELL_RENDERS_VALLEY_CAMERA = 81607,
     SPELL_PARACHUTE_81793 = 81793,
-    SPELL_APPLY_QUEST_INVIS_16 = 81805,
-    SPELL_DETECT_QUEST_INVIS_16 = 81804, // duration 30 sec 
     SAY_PAYLOAD = 1,
     SAY_DANFORTH_DEVEL = 0,
     SAY_JOHN_TROTEMAN = 2,
@@ -2713,8 +2728,6 @@ enum eGrandMagus
     SPELL_MINION_OF_DOANE = 3611,
     SPELL_UNLOCKING_WARD_OF_ILGALAR = 81776,
     SPELL_DOANE_CREDIT = 81791,
-    SPELL_APPLY_QUEST_INVIS_15 = 81795,
-    SPELL_DETECT_QUEST_INVIS_15 = 81794,
     SPELL_EJECT_PASSENGER_1 = 80743,
     SAY_DAN_WHERE = 0,
     SAY_JOHN_TROTE = 2,
@@ -3110,10 +3123,6 @@ enum eQuest26708
     NPN_JOHN_J_KEESHAN_43744 = 43744,
     NPC_KEESHANS_GUN = 43745,
     SPELL_SUMMON_BRAVO_COMPANY_SIEGE_TANK = 81808,
-    SPELL_APPLY_QUEST_INVIS_17 = 81897,
-    SPELL_DETECT_QUEST_INVIS_17 = 81898,
-    SPELL_APPLY_QUEST_INVIS_18 = 82059,
-    SPELL_DETECT_QUEST_INVIS_18 = 82060,
     SPELL_SUMMON_PERSONAL_GUARDIAN_KEESHAN = 82002,
     SPELL_SUMMON_PERSONAL_GUARDIAN_MESSNER = 82004,
     SPELL_SUMMON_PERSONAL_GUARDIAN_JORGENSEN = 82005,
