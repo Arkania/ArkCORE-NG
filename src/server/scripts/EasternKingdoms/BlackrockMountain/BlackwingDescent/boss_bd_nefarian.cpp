@@ -84,8 +84,8 @@ Intro
 20071 - My dearest sibling... do you hunger? THEN FEAST UPON OUR ENEMIES!
 */
     SAY_INTRO_1                     = 0,
-    SAY_INTRO_2                     = 1,
-    SAY_INTRO_3                     = 2,
+    SAY_INTRO_2                     = 2,
+    SAY_INTRO_3                     = 3,
 };
 
 enum Spells
