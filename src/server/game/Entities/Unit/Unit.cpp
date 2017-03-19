@@ -16756,7 +16756,7 @@ bool Unit::SetInPhase(uint16 id, bool update, bool apply)
             if (Creature* summon = GetMap()->GetCreature(m_SummonSlot[i]))
                 summon->SetInPhase(id, true, apply);
 
-    RemoveNotOwnSingleTargetAuras(0);
+    RemoveNotOwnSingleTargetAuras(id, true);
 
     return res;
 }
