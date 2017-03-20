@@ -1,7 +1,7 @@
 /*
 Navicat MySQL Data Transfer
 
-Source Server         : WoW
+Source Server         : Arkania-NG
 Source Server Version : 50505
 Source Host           : localhost:3306
 Source Database       : ng_characters
@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50505
 File Encoding         : 65001
 
-Date: 2016-03-15 13:25:41
+Date: 2017-03-20 21:49:24
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -1150,7 +1150,7 @@ CREATE TABLE `corpse` (
   `posZ` float NOT NULL DEFAULT '0',
   `orientation` float NOT NULL DEFAULT '0',
   `mapId` smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT 'Map Identifier',
-  `phaseMask` smallint(5) unsigned NOT NULL DEFAULT '1',
+  `phaseIds` text NOT NULL,
   `displayId` int(10) unsigned NOT NULL DEFAULT '0',
   `itemCache` text NOT NULL,
   `bytes1` int(10) unsigned NOT NULL DEFAULT '0',
@@ -1720,111 +1720,6 @@ CREATE TABLE `instance_reset` (
 -- ----------------------------
 -- Records of instance_reset
 -- ----------------------------
-INSERT INTO `instance_reset` VALUES ('33', '1', '1458100800');
-INSERT INTO `instance_reset` VALUES ('36', '1', '1458100800');
-INSERT INTO `instance_reset` VALUES ('249', '0', '1458619200');
-INSERT INTO `instance_reset` VALUES ('249', '1', '1458619200');
-INSERT INTO `instance_reset` VALUES ('269', '1', '1458100800');
-INSERT INTO `instance_reset` VALUES ('409', '0', '1458619200');
-INSERT INTO `instance_reset` VALUES ('469', '0', '1458619200');
-INSERT INTO `instance_reset` VALUES ('509', '0', '1458273600');
-INSERT INTO `instance_reset` VALUES ('531', '0', '1458619200');
-INSERT INTO `instance_reset` VALUES ('532', '0', '1458619200');
-INSERT INTO `instance_reset` VALUES ('533', '0', '1458619200');
-INSERT INTO `instance_reset` VALUES ('533', '1', '1458619200');
-INSERT INTO `instance_reset` VALUES ('534', '0', '1458619200');
-INSERT INTO `instance_reset` VALUES ('540', '1', '1458100800');
-INSERT INTO `instance_reset` VALUES ('542', '1', '1458100800');
-INSERT INTO `instance_reset` VALUES ('543', '1', '1458100800');
-INSERT INTO `instance_reset` VALUES ('544', '0', '1458619200');
-INSERT INTO `instance_reset` VALUES ('545', '1', '1458100800');
-INSERT INTO `instance_reset` VALUES ('546', '1', '1458100800');
-INSERT INTO `instance_reset` VALUES ('547', '1', '1458100800');
-INSERT INTO `instance_reset` VALUES ('548', '0', '1458619200');
-INSERT INTO `instance_reset` VALUES ('550', '0', '1458619200');
-INSERT INTO `instance_reset` VALUES ('552', '1', '1458100800');
-INSERT INTO `instance_reset` VALUES ('553', '1', '1458100800');
-INSERT INTO `instance_reset` VALUES ('554', '1', '1458100800');
-INSERT INTO `instance_reset` VALUES ('555', '1', '1458100800');
-INSERT INTO `instance_reset` VALUES ('556', '1', '1458100800');
-INSERT INTO `instance_reset` VALUES ('557', '1', '1458100800');
-INSERT INTO `instance_reset` VALUES ('558', '1', '1458100800');
-INSERT INTO `instance_reset` VALUES ('560', '1', '1458100800');
-INSERT INTO `instance_reset` VALUES ('564', '0', '1458619200');
-INSERT INTO `instance_reset` VALUES ('565', '0', '1458619200');
-INSERT INTO `instance_reset` VALUES ('568', '1', '1458100800');
-INSERT INTO `instance_reset` VALUES ('574', '1', '1458100800');
-INSERT INTO `instance_reset` VALUES ('575', '1', '1458100800');
-INSERT INTO `instance_reset` VALUES ('576', '1', '1458100800');
-INSERT INTO `instance_reset` VALUES ('578', '1', '1458100800');
-INSERT INTO `instance_reset` VALUES ('580', '0', '1458619200');
-INSERT INTO `instance_reset` VALUES ('585', '1', '1458100800');
-INSERT INTO `instance_reset` VALUES ('595', '1', '1458100800');
-INSERT INTO `instance_reset` VALUES ('598', '1', '1458100800');
-INSERT INTO `instance_reset` VALUES ('599', '1', '1458100800');
-INSERT INTO `instance_reset` VALUES ('600', '1', '1458100800');
-INSERT INTO `instance_reset` VALUES ('601', '1', '1458100800');
-INSERT INTO `instance_reset` VALUES ('602', '1', '1458100800');
-INSERT INTO `instance_reset` VALUES ('603', '0', '1458619200');
-INSERT INTO `instance_reset` VALUES ('603', '1', '1458619200');
-INSERT INTO `instance_reset` VALUES ('604', '1', '1458100800');
-INSERT INTO `instance_reset` VALUES ('608', '1', '1458100800');
-INSERT INTO `instance_reset` VALUES ('615', '0', '1458619200');
-INSERT INTO `instance_reset` VALUES ('615', '1', '1458619200');
-INSERT INTO `instance_reset` VALUES ('616', '0', '1458619200');
-INSERT INTO `instance_reset` VALUES ('616', '1', '1458619200');
-INSERT INTO `instance_reset` VALUES ('619', '1', '1458100800');
-INSERT INTO `instance_reset` VALUES ('624', '0', '1458619200');
-INSERT INTO `instance_reset` VALUES ('624', '1', '1458619200');
-INSERT INTO `instance_reset` VALUES ('631', '0', '1458619200');
-INSERT INTO `instance_reset` VALUES ('631', '1', '1458619200');
-INSERT INTO `instance_reset` VALUES ('631', '2', '1458619200');
-INSERT INTO `instance_reset` VALUES ('631', '3', '1458619200');
-INSERT INTO `instance_reset` VALUES ('632', '1', '1458100800');
-INSERT INTO `instance_reset` VALUES ('643', '1', '1458100800');
-INSERT INTO `instance_reset` VALUES ('644', '1', '1458100800');
-INSERT INTO `instance_reset` VALUES ('645', '1', '1458100800');
-INSERT INTO `instance_reset` VALUES ('649', '0', '1458619200');
-INSERT INTO `instance_reset` VALUES ('649', '1', '1458619200');
-INSERT INTO `instance_reset` VALUES ('649', '2', '1458619200');
-INSERT INTO `instance_reset` VALUES ('649', '3', '1458619200');
-INSERT INTO `instance_reset` VALUES ('650', '1', '1458100800');
-INSERT INTO `instance_reset` VALUES ('657', '1', '1458100800');
-INSERT INTO `instance_reset` VALUES ('658', '1', '1458100800');
-INSERT INTO `instance_reset` VALUES ('668', '1', '1458100800');
-INSERT INTO `instance_reset` VALUES ('669', '0', '1458619200');
-INSERT INTO `instance_reset` VALUES ('669', '1', '1458619200');
-INSERT INTO `instance_reset` VALUES ('669', '2', '1458619200');
-INSERT INTO `instance_reset` VALUES ('669', '3', '1458619200');
-INSERT INTO `instance_reset` VALUES ('670', '1', '1458100800');
-INSERT INTO `instance_reset` VALUES ('671', '0', '1458619200');
-INSERT INTO `instance_reset` VALUES ('671', '1', '1458619200');
-INSERT INTO `instance_reset` VALUES ('671', '2', '1458619200');
-INSERT INTO `instance_reset` VALUES ('671', '3', '1458619200');
-INSERT INTO `instance_reset` VALUES ('720', '0', '1458619200');
-INSERT INTO `instance_reset` VALUES ('720', '1', '1458619200');
-INSERT INTO `instance_reset` VALUES ('720', '2', '1458619200');
-INSERT INTO `instance_reset` VALUES ('720', '3', '1458619200');
-INSERT INTO `instance_reset` VALUES ('724', '0', '1458619200');
-INSERT INTO `instance_reset` VALUES ('724', '1', '1458619200');
-INSERT INTO `instance_reset` VALUES ('724', '2', '1458619200');
-INSERT INTO `instance_reset` VALUES ('724', '3', '1458619200');
-INSERT INTO `instance_reset` VALUES ('725', '1', '1458100800');
-INSERT INTO `instance_reset` VALUES ('754', '0', '1458619200');
-INSERT INTO `instance_reset` VALUES ('754', '1', '1458619200');
-INSERT INTO `instance_reset` VALUES ('754', '2', '1458619200');
-INSERT INTO `instance_reset` VALUES ('754', '3', '1458619200');
-INSERT INTO `instance_reset` VALUES ('755', '1', '1458100800');
-INSERT INTO `instance_reset` VALUES ('757', '0', '1458619200');
-INSERT INTO `instance_reset` VALUES ('757', '1', '1458619200');
-INSERT INTO `instance_reset` VALUES ('859', '1', '1458100800');
-INSERT INTO `instance_reset` VALUES ('938', '1', '1458100800');
-INSERT INTO `instance_reset` VALUES ('939', '1', '1458100800');
-INSERT INTO `instance_reset` VALUES ('940', '1', '1458100800');
-INSERT INTO `instance_reset` VALUES ('967', '0', '1458619200');
-INSERT INTO `instance_reset` VALUES ('967', '1', '1458619200');
-INSERT INTO `instance_reset` VALUES ('967', '2', '1458619200');
-INSERT INTO `instance_reset` VALUES ('967', '3', '1458619200');
 
 -- ----------------------------
 -- Table structure for item_instance
@@ -2146,3 +2041,12 @@ CREATE TABLE `worldstates` (
 -- ----------------------------
 -- Records of worldstates
 -- ----------------------------
+INSERT INTO `worldstates` VALUES ('3781', '600000', null);
+INSERT INTO `worldstates` VALUES ('3801', '0', null);
+INSERT INTO `worldstates` VALUES ('3802', '0', null);
+INSERT INTO `worldstates` VALUES ('20001', '1488171600', null);
+INSERT INTO `worldstates` VALUES ('20002', '1488206181', null);
+INSERT INTO `worldstates` VALUES ('20003', '1487653200', null);
+INSERT INTO `worldstates` VALUES ('20006', '1487653200', null);
+INSERT INTO `worldstates` VALUES ('20007', '1488322800', null);
+INSERT INTO `worldstates` VALUES ('20050', '1', null);

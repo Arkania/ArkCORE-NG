@@ -1,6 +1,16 @@
 /*
 Navicat MySQL Data Transfer
-Date: 2015-06-17 19:16:27
+
+Source Server         : Arkania-NG
+Source Server Version : 50505
+Source Host           : localhost:3306
+Source Database       : ng_auth
+
+Target Server Type    : MYSQL
+Target Server Version : 50505
+File Encoding         : 65001
+
+Date: 2017-03-20 21:41:04
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -24,7 +34,7 @@ CREATE TABLE `account` (
   `failed_logins` int(10) unsigned NOT NULL DEFAULT '0',
   `locked` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `lock_country` varchar(2) NOT NULL DEFAULT '00',
-  `last_login` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `last_login` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `online` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `expansion` tinyint(3) unsigned NOT NULL DEFAULT '3',
   `mutetime` bigint(20) NOT NULL DEFAULT '0',
@@ -37,7 +47,12 @@ CREATE TABLE `account` (
   `trial_end` int(10) unsigned NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_username` (`username`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8 COMMENT='Account System';
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='Account System';
+
+-- ----------------------------
+-- Records of account
+-- ----------------------------
+INSERT INTO `account` VALUES ('1', 'ADMIN', 'unknown', '', '', '', '', '', '', '2014-06-30 04:04:59', '192.168.178.79', '0', '0', '00', '2016-08-09 10:18:56', '0', '3', '0', '', '', '3', 'Win', '0', '0', '1');
 
 -- ----------------------------
 -- Table structure for account_access
@@ -53,8 +68,6 @@ CREATE TABLE `account_access` (
 -- ----------------------------
 -- Records of account_access
 -- ----------------------------
-INSERT INTO `account_access` VALUES ('1', '3', '-1');
-INSERT INTO `account_access` VALUES ('3', '3', '-1');
 
 -- ----------------------------
 -- Table structure for account_banned
@@ -191,10 +204,10 @@ CREATE TABLE `rbac_default_permissions` (
 -- ----------------------------
 -- Records of rbac_default_permissions
 -- ----------------------------
-INSERT INTO `rbac_default_permissions` VALUES ('3', '192');
-INSERT INTO `rbac_default_permissions` VALUES ('2', '193');
-INSERT INTO `rbac_default_permissions` VALUES ('1', '194');
 INSERT INTO `rbac_default_permissions` VALUES ('0', '195');
+INSERT INTO `rbac_default_permissions` VALUES ('1', '194');
+INSERT INTO `rbac_default_permissions` VALUES ('2', '193');
+INSERT INTO `rbac_default_permissions` VALUES ('3', '192');
 
 -- ----------------------------
 -- Table structure for rbac_linked_permissions
@@ -234,6 +247,17 @@ INSERT INTO `rbac_linked_permissions` VALUES ('192', '790');
 INSERT INTO `rbac_linked_permissions` VALUES ('192', '791');
 INSERT INTO `rbac_linked_permissions` VALUES ('192', '792');
 INSERT INTO `rbac_linked_permissions` VALUES ('192', '793');
+INSERT INTO `rbac_linked_permissions` VALUES ('192', '794');
+INSERT INTO `rbac_linked_permissions` VALUES ('192', '795');
+INSERT INTO `rbac_linked_permissions` VALUES ('192', '796');
+INSERT INTO `rbac_linked_permissions` VALUES ('192', '797');
+INSERT INTO `rbac_linked_permissions` VALUES ('192', '798');
+INSERT INTO `rbac_linked_permissions` VALUES ('192', '799');
+INSERT INTO `rbac_linked_permissions` VALUES ('192', '800');
+INSERT INTO `rbac_linked_permissions` VALUES ('192', '801');
+INSERT INTO `rbac_linked_permissions` VALUES ('192', '802');
+INSERT INTO `rbac_linked_permissions` VALUES ('192', '803');
+INSERT INTO `rbac_linked_permissions` VALUES ('192', '804');
 INSERT INTO `rbac_linked_permissions` VALUES ('193', '48');
 INSERT INTO `rbac_linked_permissions` VALUES ('193', '194');
 INSERT INTO `rbac_linked_permissions` VALUES ('193', '197');
@@ -1468,6 +1492,17 @@ INSERT INTO `rbac_permissions` VALUES ('790', 'Command: ahbot ratio neutral');
 INSERT INTO `rbac_permissions` VALUES ('791', 'Command: ahbot rebuild');
 INSERT INTO `rbac_permissions` VALUES ('792', 'Command: ahbot reload');
 INSERT INTO `rbac_permissions` VALUES ('793', 'Command: ahbot status');
+INSERT INTO `rbac_permissions` VALUES ('794', 'npcbot');
+INSERT INTO `rbac_permissions` VALUES ('795', 'npcbot add');
+INSERT INTO `rbac_permissions` VALUES ('796', 'npcbot remove');
+INSERT INTO `rbac_permissions` VALUES ('797', 'npcbot reset');
+INSERT INTO `rbac_permissions` VALUES ('798', 'npcbot command');
+INSERT INTO `rbac_permissions` VALUES ('799', 'npcbot distance');
+INSERT INTO `rbac_permissions` VALUES ('800', 'npcbot info');
+INSERT INTO `rbac_permissions` VALUES ('801', 'npcbot helper');
+INSERT INTO `rbac_permissions` VALUES ('802', 'npcbot revive');
+INSERT INTO `rbac_permissions` VALUES ('803', 'maintank (mt)');
+INSERT INTO `rbac_permissions` VALUES ('804', 'npcbot test');
 
 -- ----------------------------
 -- Table structure for realmcharacters
@@ -1484,6 +1519,7 @@ CREATE TABLE `realmcharacters` (
 -- ----------------------------
 -- Records of realmcharacters
 -- ----------------------------
+INSERT INTO `realmcharacters` VALUES ('1', '1', '2');
 
 -- ----------------------------
 -- Table structure for realmlist
@@ -1509,7 +1545,7 @@ CREATE TABLE `realmlist` (
 -- ----------------------------
 -- Records of realmlist
 -- ----------------------------
-INSERT INTO `realmlist` VALUES ('1', 'ArkCORE4-NG', '127.0.0.1', '127.0.0.1', '255.255.255.0', '8085', '0', '0', '9', '0', '0', '15595');
+INSERT INTO `realmlist` VALUES ('1', 'ArkCORE4-NG', 'localhost', '127.0.0.1', '255.255.255.0', '8085', '0', '0', '9', '0', '0', '15595');
 
 -- ----------------------------
 -- Table structure for uptime
@@ -1527,4 +1563,3 @@ CREATE TABLE `uptime` (
 -- ----------------------------
 -- Records of uptime
 -- ----------------------------
-
