@@ -72,7 +72,7 @@ UPDATE creature_addon SET auras="" WHERE guid in (42964,43102,43107,43122,43318,
 
 UPDATE creature SET position_x=-9889.144, position_y=1306.617, position_z=41.96542, MovementType=2 WHERE guid=43380;
 
-UPDATE creature_addon SET path_id=43002 WHERE guid=43380;
+UPDATE creature_addon SET path_id=43380 WHERE guid=43380;
 
 DELETE FROM waypoint_data WHERE id=43380;
 INSERT INTO waypoint_data VALUES 
@@ -89,7 +89,7 @@ INSERT INTO waypoint_data VALUES
 
 UPDATE creature SET position_x=-9867.97, position_y=1280.193, position_z=40.71181, MovementType=2 WHERE guid=42606;
 
-UPDATE creature_addon SET path_id=43002 WHERE guid=42606;
+UPDATE creature_addon SET path_id=42606 WHERE guid=42606;
 
 DELETE FROM waypoint_data WHERE id=42606;
 INSERT INTO waypoint_data VALUES 
@@ -107,7 +107,7 @@ INSERT INTO waypoint_data VALUES
 
 UPDATE creature SET position_x=-9820.496, position_y=1292.49, position_z=40.45046, MovementType=2 WHERE guid=42368;
 
-UPDATE creature_addon SET path_id=43002 WHERE guid=42368;
+UPDATE creature_addon SET path_id=42368 WHERE guid=42368;
 
 DELETE FROM waypoint_data WHERE id=42368;
 INSERT INTO waypoint_data VALUES 
