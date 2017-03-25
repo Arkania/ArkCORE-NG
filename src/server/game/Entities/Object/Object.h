@@ -125,9 +125,72 @@ enum PhaseUpdateFlag
 
 enum ePhaseUpdateStatus
 {
-    PHASE_UPDATE_NOT_NEEDED,
-    PHASE_UPDATE_NEEDED,
+    PHASE_CHECK_NOT_MEET,
+    PHASE_CHECK_MEET,
     EMPTY_DATABASE,
+};
+
+struct sPhaseState
+{
+    std::set<uint16> m_phaseIds;
+    std::set<uint16> m_terrainSwaps;
+    std::set<uint16> m_worldMapAreaSwaps;
+
+    void Clear()
+    {
+        m_phaseIds.clear();
+        m_terrainSwaps.clear();
+        m_worldMapAreaSwaps.clear();
+    }
+    bool IsEqual(WorldObject const* obj);
+    bool SetInPhase(uint16 phaseId, bool apply)
+    {
+        if (phaseId)
+        {
+            if (apply) // add this phase
+            {
+                if (HasInPhaseList(phaseId)) // do not run the updates if we are already in this phase
+                    return false;
+
+                m_phaseIds.insert(phaseId);
+            }
+            else      // erase this phase
+            {
+                if (!HasInPhaseList(phaseId)) // do not run the updates if we are not in this phase
+                    return false;
+
+                m_phaseIds.erase(phaseId);
+            }
+        }
+        return true;
+    }
+    bool HasInPhaseList(uint16 phase) const
+    {
+        return (m_phaseIds.find(phase) != m_phaseIds.end());
+    }
+    void AddTerrainSwapMap(uint16 mapId, bool apply)
+    {
+        if (mapId)
+            if (apply)
+            {
+                if (!(m_terrainSwaps.find(mapId) != m_terrainSwaps.end()))
+                    m_terrainSwaps.insert(mapId);
+            }
+            else
+                m_terrainSwaps.erase(mapId);
+    }
+    void AddWorldMapAreaSwap(uint16 mapId, bool apply)
+    {
+        if (mapId)
+            if (apply)
+            {
+                if (!(m_worldMapAreaSwaps.find(mapId) != m_worldMapAreaSwaps.end()))
+                    m_worldMapAreaSwaps.insert(mapId);
+            }
+            else
+                m_worldMapAreaSwaps.erase(mapId);
+    }
+ 
 };
 
 struct PhaseAreaSelector
@@ -943,6 +1006,8 @@ class WorldObject : public Object, public WorldLocation
         void AddTerrainSwapMap(uint16 mapId, bool apply);
         void AddWorldMapAreaSwap(uint16 mapId, bool apply);
 
+        sPhaseState m_tmp_phaseState;
+
         uint64 GetPhaseMask() const { return m_phaseMask; }
         std::set<uint16> const& GetPhaseIds() const { return m_phaseIds; }
         std::set<uint16> const& GetTerrainSwaps() const { return m_terrainSwaps; }
@@ -956,6 +1021,7 @@ class WorldObject : public Object, public WorldLocation
         bool IsInPhase(WorldObject const* obj) const;
         bool IsInTerrainSwap(uint16 terrainSwap);
         void CopyPhaseFrom(WorldObject* obj, bool update = false);
+        void CopyPhaseFromTmp();
         bool SetInPhase(uint16 id, bool update, bool apply);
 
         // if negative it is used as PhaseGroupId
@@ -1015,10 +1081,10 @@ class WorldObject : public Object, public WorldLocation
         PhaseAreaSelectorContainer GetPhaseAreaSelectorContainer(uint32 zoneId) const;
         PhaseAreaDefinitionContainer GetPhaseAreaDefinitionContainer(uint32 zoneId) const;
 
-        void RebuildPhaseFromPhaseAreaDefinition(bool &updateNeeded);
-        void RebuildPhaseFromAuraEffect(bool &updateNeeded);
-        void RebuildTerrainSwaps(bool &updateNeeded);
-        void RebuildWorldMapAreaSwaps(bool &updateNeeded);
+        void RebuildPhaseFromPhaseAreaDefinition();
+        void RebuildPhaseFromAuraEffect();
+        void RebuildTerrainSwaps();
+        void RebuildWorldMapAreaSwaps();
 };
 
 namespace Trinity

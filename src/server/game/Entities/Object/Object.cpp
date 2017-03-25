@@ -3378,32 +3378,30 @@ uint64 WorldObject::GetTransGUID() const
 
 // new phase system
 
-/*  called if player state has changed quest, Area or Zone
-    ToDo: maybe we should save network traffic, and rebuild phases in temporary variables,
-    and at end, only sending it, if there are changed phases. */
+/*  called if player state has changed quest, Area or Zone    */
 void WorldObject::UpdatePhaseForQuestAreaOrZoneChange()
 {
-    uint32 OldPhaseCount = GetPhaseIds().size();
-    bool updateNeeded = m_phaseUpdateNeeded;
+    m_tmp_phaseState.Clear();
+    
     bool isPlayer = (GetTypeId() == TYPEID_PLAYER && IsInWorld()) ? true : false;
 
     if (isPlayer)
-        RebuildPhaseFromPhaseAreaDefinition(updateNeeded);
+        RebuildPhaseFromPhaseAreaDefinition();
 
-    RebuildPhaseFromAuraEffect(updateNeeded);
-    RebuildTerrainSwaps(updateNeeded);
+    RebuildPhaseFromAuraEffect();
+    RebuildTerrainSwaps();
 
     if (isPlayer)
-        RebuildWorldMapAreaSwaps(updateNeeded);
+        RebuildWorldMapAreaSwaps();
 
-    if (GetPhaseIds().size() != OldPhaseCount)
-        updateNeeded = true;
+    bool updateNeeded = !m_tmp_phaseState.IsEqual(this);
 
     if (updateNeeded && IsInWorld())
     {
         // only update visibility and send packets if there was a change in the phase list
         if (isPlayer)
         {
+            CopyPhaseFromTmp();
             ToPlayer()->GetSession()->SendSetPhaseShift(GetPhaseIds(), GetTerrainSwaps(), GetWorldMapAreaSwaps());            
             // send phaseupdate to controled objects, as Pet.
             for (std::set<Unit*>::iterator itr = ToPlayer()->m_Controlled.begin(); itr != ToPlayer()->m_Controlled.end(); ++itr)
@@ -3548,6 +3546,19 @@ void WorldObject::CopyPhaseFrom(WorldObject* obj, bool update)
         UpdateObjectVisibility();
 }
 
+void WorldObject::CopyPhaseFromTmp()
+{
+    m_phaseIds.clear();
+    m_terrainSwaps.clear();
+    m_worldMapAreaSwaps.clear();
+    for (auto phase : m_tmp_phaseState.m_phaseIds)
+        SetInPhase(phase, false, true);
+    for (auto swap : m_tmp_phaseState.m_terrainSwaps)
+        AddTerrainSwapMap(swap, true);
+    for (auto swap : m_tmp_phaseState.m_worldMapAreaSwaps)
+        AddWorldMapAreaSwap(swap, true);
+}
+
 bool WorldObject::SetInPhase(uint16 id, bool update, bool apply)
 {
     if (id)
@@ -3592,7 +3603,7 @@ ePhaseUpdateStatus WorldObject::CheckPhaseConditions(PhaseAreaDefinition phaseAr
         return EMPTY_DATABASE;
 
     ConditionSourceInfo srcInfo(ToPlayer());
-    return (sConditionMgr->IsObjectMeetToConditions(srcInfo, *conditions)) ? PHASE_UPDATE_NEEDED : PHASE_UPDATE_NOT_NEEDED;
+    return (sConditionMgr->IsObjectMeetToConditions(srcInfo, *conditions)) ? PHASE_CHECK_MEET : PHASE_CHECK_NOT_MEET;
 }
 
 ePhaseUpdateStatus WorldObject::CheckArea(PhaseAreaDefinition phaseAreaDefinition, PhaseAreaSelectorContainer pac)
@@ -3611,10 +3622,10 @@ ePhaseUpdateStatus WorldObject::CheckArea(PhaseAreaDefinition phaseAreaDefinitio
                 if (!ToPlayer() || (((1 << ToPlayer()->GetQuestStatus(area->quest_end))) & area->quest_end_status) == 0)
                     continue;
 
-            return PHASE_UPDATE_NEEDED;
+            return PHASE_CHECK_MEET;
         }
 
-    return PHASE_UPDATE_NOT_NEEDED;
+    return PHASE_CHECK_NOT_MEET;
 }
 
 PhaseAreaSelectorContainer WorldObject::GetPhaseAreaSelectorContainer(uint32 zoneId) const
@@ -3639,7 +3650,7 @@ PhaseAreaDefinitionContainer WorldObject::GetPhaseAreaDefinitionContainer(uint32
     return pdc;
 }
 
-void WorldObject::RebuildPhaseFromPhaseAreaDefinition(bool &updateNeeded)
+void WorldObject::RebuildPhaseFromPhaseAreaDefinition()
 {
     if (Player* player = ToPlayer())
     {
@@ -3654,38 +3665,38 @@ void WorldObject::RebuildPhaseFromPhaseAreaDefinition(bool &updateNeeded)
                 ePhaseUpdateStatus checkCond = CheckPhaseConditions(phaseDef);
                 ePhaseUpdateStatus checkArea = CheckArea(phaseDef, phaseAreaCon);
 
-                if ((checkCond == EMPTY_DATABASE && checkArea == EMPTY_DATABASE) || checkCond == PHASE_UPDATE_NEEDED || checkArea == PHASE_UPDATE_NEEDED)
+                if ((checkCond == EMPTY_DATABASE && checkArea == EMPTY_DATABASE) || checkCond == PHASE_CHECK_MEET || checkArea == PHASE_CHECK_MEET)
                 {
-                    if (phaseDef.IsOverwritingExistingPhases())
-                        ClearAllPhases(false);
+                    if (phaseDef.IsOverwritingExistingPhases()) // flag bit 1 set
+                        m_tmp_phaseState.Clear();
 
                     if (phaseDef.phaseGroup)
                     {
                         for (auto ph : GetXPhasesForGroup(phaseDef.phaseGroup))
-                            updateNeeded |= SetInPhase(ph, false, true);
+                            m_tmp_phaseState.SetInPhase(ph, true);
 
                         if (phaseDef.terrainswapmap)
-                            m_terrainSwaps.insert(phaseDef.terrainswapmap);
+                            m_tmp_phaseState.m_terrainSwaps.insert(phaseDef.terrainswapmap);
                         if (phaseDef.worldMapAreaSwap)
-                            m_worldMapAreaSwaps.insert(phaseDef.worldMapAreaSwap);
+                            m_tmp_phaseState.m_worldMapAreaSwaps.insert(phaseDef.worldMapAreaSwap);
                     }
                     else if (phaseDef.phaseId)
                     {
-                        updateNeeded |= SetInPhase(phaseDef.phaseId, false, true);
+                        m_tmp_phaseState.SetInPhase(phaseDef.phaseId, true);
                         if (phaseDef.terrainswapmap)
-                            m_terrainSwaps.insert(phaseDef.terrainswapmap);
+                            m_tmp_phaseState.m_terrainSwaps.insert(phaseDef.terrainswapmap);
                         if (phaseDef.worldMapAreaSwap)
-                            m_worldMapAreaSwaps.insert(phaseDef.worldMapAreaSwap);
+                            m_tmp_phaseState.m_worldMapAreaSwaps.insert(phaseDef.worldMapAreaSwap);
                     }
 
-                    if (phaseDef.IsLastDefinition())
+                    if (phaseDef.IsLastDefinition()) // flag bit 2 set
                         break;
                 }
             }
     }
 }
 
-void WorldObject::RebuildPhaseFromAuraEffect(bool &updateNeeded)
+void WorldObject::RebuildPhaseFromAuraEffect()
 {
     // do not remove a phase if it would be removed by an area but we have the same phase from an aura
     if (Unit* unit = ToUnit())
@@ -3694,7 +3705,7 @@ void WorldObject::RebuildPhaseFromAuraEffect(bool &updateNeeded)
         for (Unit::AuraEffectList::const_iterator itr = auraPhaseList.begin(); itr != auraPhaseList.end(); ++itr)
         {
             uint16 phase = uint16((*itr)->GetMiscValueB());
-            updateNeeded |= SetInPhase(phase, false, true);
+            m_tmp_phaseState.SetInPhase(phase, true);
 
             uint32 spellId = (*itr)->GetId();
             SpellPhaseDefinitionStore const pdStore = sObjectMgr->GetSpellPhaseDefinitionStore();
@@ -3706,8 +3717,8 @@ void WorldObject::RebuildPhaseFromAuraEffect(bool &updateNeeded)
                     if (iCon->phaseId == phase)
                         if (sConditionMgr->IsObjectMeetingNotGroupedConditions(CONDITION_SOURCE_TYPE_TERRAIN_SWAP, iCon->terrainswapmap, this, nullptr, nullptr))
                         {
-                            AddTerrainSwapMap(iCon->terrainswapmap, true);
-                            AddWorldMapAreaSwap(iCon->worldmapareaswap, true);
+                            m_tmp_phaseState.AddTerrainSwapMap(iCon->terrainswapmap, true);
+                            m_tmp_phaseState.AddWorldMapAreaSwap(iCon->worldmapareaswap, true);
                         }
             }
         }
@@ -3717,7 +3728,7 @@ void WorldObject::RebuildPhaseFromAuraEffect(bool &updateNeeded)
             uint16 phaseGroup = uint16((*itr)->GetMiscValueB());
             std::set<uint16> const& phaseIds = GetXPhasesForGroup(phaseGroup);
             for (uint16 phase : phaseIds)
-                updateNeeded |= SetInPhase(phase, false, true);
+                m_tmp_phaseState.SetInPhase(phase, true);
 
             uint32 spellId = (*itr)->GetId();
             SpellPhaseDefinitionStore const pdStore = sObjectMgr->GetSpellPhaseDefinitionStore();
@@ -3729,22 +3740,40 @@ void WorldObject::RebuildPhaseFromAuraEffect(bool &updateNeeded)
                     if (iCon->phaseGroup == phaseGroup)
                         if (sConditionMgr->IsObjectMeetingNotGroupedConditions(CONDITION_SOURCE_TYPE_TERRAIN_SWAP, iCon->terrainswapmap, this, nullptr, nullptr))
                         {
-                            AddTerrainSwapMap(iCon->terrainswapmap, true);
-                            AddWorldMapAreaSwap(iCon->worldmapareaswap, true);
+                            m_tmp_phaseState.AddTerrainSwapMap(iCon->terrainswapmap, true);
+                            m_tmp_phaseState.AddWorldMapAreaSwap(iCon->worldmapareaswap, true);
                         }
             }
         }
     }
 }
 
-void WorldObject::RebuildTerrainSwaps(bool &updateNeeded)
+void WorldObject::RebuildTerrainSwaps()
 {
     //preparing for furure use of additional TerrainSwaps-tables  
 }
 
-void WorldObject::RebuildWorldMapAreaSwaps(bool &updateNeeded)
+void WorldObject::RebuildWorldMapAreaSwaps()
 {
     //preparing for furure use of additional WorldMapAreaSwaps-tables  
 }
 
+bool sPhaseState::IsEqual(const WorldObject* obj)
+{
+    if (m_phaseIds.size() != obj->GetPhaseIds().size())
+        return false;
+    if (m_phaseIds != obj->GetPhaseIds())
+        return false;
+    if (m_terrainSwaps.size() != obj->GetTerrainSwaps().size())
+        return false;
+    if (m_terrainSwaps != obj->GetTerrainSwaps())
+        return false;
+    if (m_worldMapAreaSwaps.size() != obj->GetWorldMapAreaSwaps().size())
+        return false;
+    if (m_worldMapAreaSwaps != obj->GetWorldMapAreaSwaps())
+        return false;
+
+    return true;
+}
 // end new phase system
+
