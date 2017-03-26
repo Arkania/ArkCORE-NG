@@ -530,12 +530,17 @@ public:
             return false;
         }
 
+        uint32 entry = unit->GetEntry();
+        uint32 dbGuid = unit->GetDBTableGUIDLow();
+
         // Delete the creature
         unit->CombatStop();
         unit->DeleteFromDB();
         unit->AddObjectToRemoveList();
 
-        handler->PSendSysMessage(LANG_COMMAND_CREATURE_DELETE, unit->GetEntry(), unit->GetDBTableGUIDLow());
+        handler->PSendSysMessage(LANG_COMMAND_CREATURE_DELETE, entry, dbGuid);
+
+        sLog->outCommand(handler->GetSession()->GetAccountId(), "Command: .npc delete Creature (Entry: %u, DbGuid: %u) Deleted", entry, dbGuid);
 
         return true;
     }
