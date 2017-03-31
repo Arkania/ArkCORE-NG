@@ -166,7 +166,7 @@ public:
             player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_TORASTRASZA2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 22);
             break;
         case 23704: // Dustwallow Marsh - Cassa Crimsonwing
-            if (player->GetQuestStatus(11142) == QUEST_STATUS_INCOMPLETE)
+            if (player->GetQuestStatus(26257) == QUEST_STATUS_INCOMPLETE)
                 player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_CRIMSONWING, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+25);
             break;
         case 17209:
