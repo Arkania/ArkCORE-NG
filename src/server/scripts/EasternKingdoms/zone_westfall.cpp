@@ -70,8 +70,7 @@ enum eQuest26209
     SPELL_DETECT_QUEST_INVIS_1 = 79229,
     SPELL_DETECT_QUEST_INVIS_2 = 79341,
     SPELL_DETECT_QUEST_INVIS_3 = 79498,
-    SPELL_DETECT_QUEST_INVIS_4 = 101419,
-    SPELL_COSMETIC_SLEEP_ZZZ = 78677,
+    SPELL_DETECT_QUEST_INVIS_4 = 101419, SPELL_COSMETIC_SLEEP_ZZZ = 78677,
 };
 
 // 42308
@@ -101,8 +100,11 @@ public:
             m_invest_horseGUID = 0;
             m_horseGUID = 0;
             m_story_started = false;
-            me->SetWalk(true);
-            me->GetMotionMaster()->MovePoint(1030, m_homePosition);
+            if (me->GetAreaId() == 916)
+            {
+                me->SetWalk(true);
+                me->GetMotionMaster()->MovePoint(1030, m_homePosition);
+            }
         }
 
         void MoveInLineOfSight(Unit* who) override
@@ -121,28 +123,29 @@ public:
         }
 
         void MovementInform(uint32 type, uint32 id) override 
-        { 
-            if (type == POINT_MOTION_TYPE)
-                switch (id)
-                {
-                case 1030:
-                {
-                    me->SetFacingTo(3.95f);
-                    break;
-                }
-                case 1031:
-                {
-                    m_events.ScheduleEvent(EVENT_TALK_PART_03, 1000);
-                    break;
-                }
-                case 1032:
-                {
-                    me->HandleEmoteCommand(EMOTE_STATE_STAND);
-                    me->SetFacingTo(3.95f);
-                    m_events.ScheduleEvent(EVENT_TALK_PART_06, 1000);
-                    break;
-                }
-                }
+        {
+            if (m_story_started)
+                if (type == POINT_MOTION_TYPE)
+                    switch (id)
+                    {
+                    case 1030:
+                    {
+                        me->SetFacingTo(3.95f);
+                        break;
+                    }
+                    case 1031:
+                    {
+                        m_events.ScheduleEvent(EVENT_TALK_PART_03, 1000);
+                        break;
+                    }
+                    case 1032:
+                    {
+                        me->HandleEmoteCommand(EMOTE_STATE_STAND);
+                        me->SetFacingTo(3.95f);
+                        m_events.ScheduleEvent(EVENT_TALK_PART_06, 1000);
+                        break;
+                    }
+                    }
         }
 
         void UpdateAI(uint32 diff) override
@@ -157,7 +160,6 @@ public:
                 {
                     Reset();
                     break;
-
                 }
                 case EVENT_START_TALK:
                 {
@@ -383,7 +385,9 @@ public:
 								me->HandleEmoteCommand(EMOTE_STATE_USE_STANDING);
 								// Talk(11, player);
 								me->DespawnOrUnsummon(5000);
+                                break;
 							}
+                    m_events.ScheduleEvent(EVENT_CHECK_FOR_PLAYER, 1000);
 					break;
 				}
 				}
@@ -530,7 +534,9 @@ public:
                                 me->HandleEmoteCommand(EMOTE_STATE_USE_STANDING);
                                 Talk(11, player);
                                 me->DespawnOrUnsummon(5000);
+                                break;
                             }
+                    m_events.ScheduleEvent(EVENT_CHECK_FOR_PLAYER, 1000);
                     break;
                 }
                 }
@@ -678,7 +684,9 @@ public:
                                 me->HandleEmoteCommand(EMOTE_STATE_USE_STANDING);
                                 Talk(11, player);
                                 me->DespawnOrUnsummon(5000);
+                                break;
                             }
+                    m_events.ScheduleEvent(EVENT_CHECK_FOR_PLAYER, 1000);
                     break;
                 }
                 }
@@ -825,7 +833,9 @@ public:
                                 me->HandleEmoteCommand(EMOTE_STATE_USE_STANDING);
                                 Talk(11, player);
                                 me->DespawnOrUnsummon(5000);
+                                break;
                             }
+                    m_events.ScheduleEvent(EVENT_CHECK_FOR_PLAYER, 1000);
                     break;
                 }
                 }
@@ -1158,8 +1168,6 @@ public:
             {
                 player->KilledMonsterCredit(NPC_FURLBROW_MURDER_INFO_004);
                 player->PlayDistanceSound(SOUND_WOMAN_SCREAM);
-                player->RemoveAura(SPELL_DETECT_QUEST_INVIS_1);
-                player->AddAura(SPELL_DETECT_QUEST_INVIS_2, player);
             }
         }
 
@@ -1420,6 +1428,7 @@ enum eQuest26257
     SPELL_ROCKET_BOOST = 79430,
 };
 
+// 42381
 class npc_overloaded_harvest_golem_42381 : public CreatureScript
 {
 public:
@@ -1469,6 +1478,33 @@ public:
     }
 };
 
+// 79084
+class spell_unbound_energy_79084 : public SpellScriptLoader
+{
+public:
+    spell_unbound_energy_79084() : SpellScriptLoader("spell_unbound_energy_79084") { }
+
+    class spell_unbound_energy_79084_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_unbound_energy_79084_SpellScript);
+
+        void FilterTargets(std::list<WorldObject*>& targets)
+        {
+            targets.remove_if(RandomCheck(7.0f));
+        }
+
+        void Register() override
+        {
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_unbound_energy_79084_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_unbound_energy_79084_SpellScript();
+    }
+};
+
 // #############################################  quest = 26236, 26241, 26266   Saldean's
 
 enum eQuest26236
@@ -1480,42 +1516,30 @@ enum eQuest26236
 	QUEST_SHAKEDOWN_AT_THE_SALDEANS = 26236,
 	QUEST_WESTFALL_STEW = 26241,
 	QUEST_HOPE_FOR_THE_PEOPLE = 26266,
-	SPELL_QUEST_PHASEMASK_2 = 59073,
-	SPELL_QUEST_PHASEMASK_4 = 59074,
-	SPELL_QUEST_PHASEMASK_8 = 59087,
-
 };
 
-class npc_salma_saldean : public CreatureScript
+// 235
+class npc_salma_saldean_235 : public CreatureScript
 {
 public:
-    npc_salma_saldean() : CreatureScript("npc_salma_saldean") { }
-
-    bool OnQuestAccept(Player* player, Creature* /*creature*/, Quest const* quest)
-    {
-        if (quest->GetQuestId() == QUEST_HOPE_FOR_THE_PEOPLE)
-        {
-            player->AddAura(SPELL_DETECT_QUEST_INVIS_3, player);
-        }
-
-        return false;
-    }
+    npc_salma_saldean_235() : CreatureScript("npc_salma_saldean_235") { }
 
     bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*opt*/)
     {
         if (quest->GetQuestId() == QUEST_WESTFALL_STEW)
         {
             creature->AI()->Talk(0, player);
-            CAST_AI(npc_salma_saldeanAI, creature->AI())->StartAnimation();
+            CAST_AI(npc_salma_saldean_235AI, creature->AI())->StartAnimation();
+            return true;
         }
 
         return false;
     }
 
 
-    struct npc_salma_saldeanAI : public ScriptedAI
+    struct npc_salma_saldean_235AI : public ScriptedAI
     {
-        npc_salma_saldeanAI(Creature* creature) : ScriptedAI(creature) { }
+        npc_salma_saldean_235AI(Creature* creature) : ScriptedAI(creature) { }
 
         uint32  _timer;
         uint32  _phase;
@@ -1621,7 +1645,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_salma_saldeanAI(creature);
+        return new npc_salma_saldean_235AI(creature);
     }
 };
 
@@ -1650,10 +1674,12 @@ enum eSentinellHill
     SPELL_SPIT = 58519,
     EVENT_HOMELESS = 1,
     EVENT_SHOWFIGHT = 2,
+    QUEST_FEEDING_THE_HUNGRY_AND_THE_HOPELESS = 26271,
     QUEST_IN_DEFENCE_OF_WESTFALL = 26286,
     QUEST_SECRETS_REVEALED = 26319,
 };
 
+// 42407  51915
 class npc_sentinel_hill_guard : public CreatureScript
 {
 public:
@@ -1673,8 +1699,9 @@ public:
             _phaseHomeless = 0;
             _homeless = nullptr;
             _defias = nullptr;
-            _events.ScheduleEvent(EVENT_HOMELESS, 10000);
-            _events.ScheduleEvent(EVENT_SHOWFIGHT, 10000);
+            _events.ScheduleEvent(EVENT_HOMELESS, 2000);
+            if (me->GetAreaId() == 108)
+                _events.ScheduleEvent(EVENT_SHOWFIGHT, 1500);
         }
 
         void DamageTaken(Unit* attacker, uint32& damage) override
@@ -1682,8 +1709,6 @@ public:
             if (IsShowfight(attacker) && me->GetHealthPct() < 70.0f)
                 damage = 0;
         }
-
-
 
         void UpdateAI(uint32 diff) override
         {
@@ -1712,12 +1737,14 @@ public:
                         _events.ScheduleEvent(EVENT_HOMELESS, 1000);
                         break;
                     case 2:
-                        CastRandomEmote();
+                        if (_homeless)
+                            _homeless->HandleEmoteCommand(RAND(EMOTE_ONESHOT_TALK, EMOTE_ONESHOT_EXCLAMATION, EMOTE_ONESHOT_QUESTION, EMOTE_ONESHOT_RUDE, EMOTE_ONESHOT_ROAR, EMOTE_ONESHOT_POINT, EMOTE_ONESHOT_TALK_NO_SHEATHE, EMOTE_ONESHOT_POINT_NO_SHEATHE));
                         _phaseHomeless = 3;
                         _events.ScheduleEvent(EVENT_HOMELESS, 1000);
                         break;
                     case 3:
-                        CastRandomAbility();
+                        if (_homeless)
+                            _homeless->CastSpell(me, RAND(SPELL_DIRT_TOSS, SPELL_ROTTEN_APPLE_AROMA, SPELL_ROTTEN_BANANA_AROMA, SPELL_SPIT), true);
                         _phaseHomeless = 0;
                         _events.ScheduleEvent(EVENT_HOMELESS, urand(45000, 75000));
                         break;
@@ -1728,10 +1755,10 @@ public:
                     }
                     break;
                 case EVENT_SHOWFIGHT:
-                    if (me->GetAreaId() == 108 && !me->IsInCombat())
-                    {
+                    if (!me->IsInCombat())
+                        if (Unit* target = me->SelectNearestTarget(5.0f))
+                            me->Attack(target, true);
 
-                    }
                     _events.ScheduleEvent(EVENT_SHOWFIGHT, 10000);
                     break;
                 }
@@ -1753,85 +1780,29 @@ public:
             GetCreatureListWithEntryInGrid(creatureList, me, NPC_WEST_PLAINS_DRIFTER, 10.0f);
 
             if (creatureList.empty())
-                false;
+                return false;
 
-            uint32 count = urand(0, creatureList.size() - 1);
-            int32 r2 = -1;
-            for (std::list<Creature*>::iterator itr = creatureList.begin(); itr != creatureList.end(); ++itr)
-            {
-                r2++;
-                if (count == r2)
-                {
-                    _homeless = *itr;
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        void CastRandomEmote()
-        {
-            if (!_homeless)
-                return;
-
-            switch (urand(0, 7))
-            {
-            case 0:
-                _homeless->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
-            case 1:
-                _homeless->HandleEmoteCommand(EMOTE_ONESHOT_EXCLAMATION);
-            case 2:
-                _homeless->HandleEmoteCommand(EMOTE_ONESHOT_QUESTION);
-            case 3:
-                _homeless->HandleEmoteCommand(EMOTE_ONESHOT_RUDE);
-            case 4:
-                _homeless->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
-            case 5:
-                _homeless->HandleEmoteCommand(EMOTE_ONESHOT_POINT);
-            case 6:
-                _homeless->HandleEmoteCommand(EMOTE_ONESHOT_TALK_NO_SHEATHE);
-            case 7:
-                _homeless->HandleEmoteCommand(EMOTE_ONESHOT_POINT_NO_SHEATHE);
-            default:
-                _homeless->HandleEmoteCommand(EMOTE_ONESHOT_RUDE);
-            }
-        }
-
-        void CastRandomAbility()
-        {
-            if (!_homeless)
-                return;
-
-            switch (urand(0, 3))
-            {
-            case 0:
-                _homeless->CastSpell(me, SPELL_DIRT_TOSS, true);
-                break;
-            case 1:
-                _homeless->AddAura(SPELL_ROTTEN_APPLE_AROMA, me);
-                break;
-            case 2:
-                _homeless->AddAura(SPELL_ROTTEN_BANANA_AROMA, me);
-                break;
-            case 3:
-                _homeless->AddAura(SPELL_SPIT, me);
-                break;
-            }
+            uint32 rol = urand(0, creatureList.size() - 1);
+            std::list<Creature*>::const_iterator itr = creatureList.begin();
+            std::advance(itr, rol);
+            _homeless = (*itr);
+            return true;
         }
 
         bool IsShowfight(Unit* attacker)
         {
-            if (Creature* creature = attacker->ToCreature())
+            switch (attacker->GetEntry())
             {
-                if (creature->GetEntry() == NPC_DEFIAS_KNUCKLEDUSTER) return true;
-                if (creature->GetEntry() == NPC_DEFIAS_PILLAGER) return true;
-                if (creature->GetEntry() == NPC_DEFIAS_HENCHMAN) return true;
-                if (creature->GetEntry() == NPC_RIVERPAW_BANDIT_54371) return true;
-                if (creature->GetEntry() == NPC_RIVERPAW_BRUTE_54372) return true;
-                if (creature->GetEntry() == NPC_RIVERPAW_HERBALIST_54373) return true;
-                if (creature->GetEntry() == NPC_RIVERPAW_BANDIT_452) return true;
-                if (creature->GetEntry() == NPC_RIVERPAW_BRUTE_124) return true;
-                if (creature->GetEntry() == NPC_RIVERPAW_HERBALIST_501) return true;
+            case NPC_DEFIAS_KNUCKLEDUSTER:
+            case NPC_DEFIAS_PILLAGER:
+            case NPC_DEFIAS_HENCHMAN:
+            case NPC_RIVERPAW_BANDIT_54371:
+            case NPC_RIVERPAW_BRUTE_54372:
+            case NPC_RIVERPAW_HERBALIST_54373:
+            case NPC_RIVERPAW_BANDIT_452:
+            case NPC_RIVERPAW_BRUTE_124:
+            case NPC_RIVERPAW_HERBALIST_501:
+                return true;
             }
             return false;
         }
@@ -1843,6 +1814,7 @@ public:
     }
 };
 
+// 54371  54372  54373
 class npc_riverpaw_sentinel_hill : public CreatureScript
 {
 public:
@@ -1852,35 +1824,10 @@ public:
     {
         npc_riverpaw_sentinel_hillAI(Creature *c) : ScriptedAI(c) { }
 
-        uint32      _timer;
-        Creature*   _guard;
-
-        void Reset() override
-        {
-            _guard = nullptr;
-            _timer = 1000;
-        }
-
         void DamageTaken(Unit* attacker, uint32& damage) override
         {
             if (IsShowfight(attacker) && me->GetHealthPct() < 70.0f)
                 damage = 0;
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (_timer <= diff)
-            {
-                _timer = 1000;
-                DoWork();
-            }
-            else
-                _timer -= diff;
-
-            if (!UpdateVictim())
-                return;
-
-            DoMeleeAttackIfReady();
         }
 
         bool IsShowfight(Unit* attacker)
@@ -1892,13 +1839,6 @@ public:
             }
             return false;
         }
-
-        void DoWork()
-        {
-            if (me->IsInCombat())
-                return;
-
-        }
     };
 
     CreatureAI* GetAI(Creature* creature) const
@@ -1907,6 +1847,7 @@ public:
     }
 };
 
+// 449  589  594
 class npc_defias_sentinel_hill : public CreatureScript
 {
 public:
@@ -1916,35 +1857,10 @@ public:
     {
         npc_defias_sentinel_hillAI(Creature *c) : ScriptedAI(c) { }
 
-        uint32      _timer;
-        Creature*   _guard;
-
-        void Reset() override
-        {
-            _guard = nullptr;
-            _timer = 1000;
-        }
-
         void DamageTaken(Unit* attacker, uint32& damage) override
         {
             if (IsShowfight(attacker) && me->GetHealthPct() < 70.0f)
                 damage = 0;
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (_timer <= diff)
-            {
-                _timer = 1000;
-                DoWork();
-            }
-            else
-                _timer -= diff;
-
-            if (!UpdateVictim())
-                return;
-
-            DoMeleeAttackIfReady();
         }
 
         bool IsShowfight(Unit* attacker)
@@ -1956,12 +1872,6 @@ public:
             }
             return false;
         }
-
-        void DoWork()
-        {
-            if (me->IsInCombat())
-                return;
-        }
     };
 
     CreatureAI* GetAI(Creature* creature) const
@@ -1970,6 +1880,7 @@ public:
     }
 };
 
+// 124  452  501
 class npc_riverpaw_westfall : public CreatureScript
 {
 public:
@@ -1979,35 +1890,10 @@ public:
     {
         npc_riverpaw_westfallAI(Creature *c) : ScriptedAI(c) { }
 
-        uint32      _timer;
-        Creature*   _guard;
-
-        void Reset() override
-        {
-            _guard = nullptr;
-            _timer = 1000;
-        }
-
         void DamageTaken(Unit* attacker, uint32& damage) override
         {
             if (IsShowfight(attacker) && me->GetHealthPct() < 70.0f)
                 damage = 0;
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (_timer <= diff)
-            {
-                _timer = 1000;
-                DoWork();
-            }
-            else
-                _timer -= diff;
-
-            if (!UpdateVictim())
-                return;
-
-            DoMeleeAttackIfReady();
         }
 
         bool IsShowfight(Unit* attacker)
@@ -2019,13 +1905,6 @@ public:
             }
             return false;
         }
-
-        void DoWork()
-        {
-            if (me->IsInCombat())
-                return;
-
-        }
     };
 
     CreatureAI* GetAI(Creature* creature) const
@@ -2034,17 +1913,19 @@ public:
     }
 };
 
-class npc_ripsnarl_sentinel_hill : public CreatureScript
+// 42635
+class npc_ripsnarl_sentinel_hill_42635 : public CreatureScript
 {
 public:
-    npc_ripsnarl_sentinel_hill() : CreatureScript("npc_ripsnarl_sentinel_hill") { }
+    npc_ripsnarl_sentinel_hill_42635() : CreatureScript("npc_ripsnarl_sentinel_hill_42635") { }
 
-    struct npc_ripsnarl_sentinel_hillAI : public ScriptedAI
+    struct npc_ripsnarl_sentinel_hill_42635AI : public ScriptedAI
     {
-        npc_ripsnarl_sentinel_hillAI(Creature *c) : ScriptedAI(c) { }
+        npc_ripsnarl_sentinel_hill_42635AI(Creature *c) : ScriptedAI(c) { }
 
         std::list<uint64> _playerList1;
         std::list<uint64> _playerList2;
+        uint64      m_playerGUID;
         uint32      _timer;
         uint32      _phase;
 
@@ -2052,7 +1933,10 @@ public:
         {
             _timer = 1000;
             _phase = 0;
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
+            m_playerGUID = 0;
+            me->AddUnitState(UNIT_STATE_STUNNED | UNIT_STATE_ROOT);
+            //me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_STUNNED);
+            me->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_DISABLE_TURN);
         }
 
         void UpdateAI(uint32 diff) override
@@ -2078,14 +1962,14 @@ public:
             case 0:
                 if (Player* player = me->FindNearestPlayer(10.0f, true))
                 {
+                    m_playerGUID = player->GetGUID();
                     if (!HasPlayerSeenVideo1(player->GetGUID()))
                     {
-                        if (player->HasAura(SPELL_DETECT_QUEST_INVIS_3) && player->GetQuestStatus(QUEST_IN_DEFENCE_OF_WESTFALL) == QUEST_STATUS_INCOMPLETE)
-                            if (!player->HasAura(SPELL_DETECT_QUEST_INVIS_4))
-                            {
-                                _playerList1.push_back(player->GetGUID());
-                                _phase = 1;
-                            }
+                        if (player->GetQuestStatus(QUEST_HOPE_FOR_THE_PEOPLE) == QUEST_STATUS_COMPLETE || player->GetQuestStatus(QUEST_FEEDING_THE_HUNGRY_AND_THE_HOPELESS) == QUEST_STATUS_INCOMPLETE)
+                        {
+                            _playerList1.push_back(player->GetGUID());
+                            _phase = 1;
+                        }
                     }
                     else if (!HasPlayerSeenVideo2(player->GetGUID()))
                     {
@@ -2096,40 +1980,44 @@ public:
                         }
                     }
                 }
-
                 break;
             case 1:
-                if (Creature* marshal = me->FindNearestCreature(NPC_MARSHAL_GRYAN_STOUTMANTLE_234, 15.0f))
-                    marshal->AI()->Talk(10);
+                if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                    if (Creature* marshal = me->FindNearestCreature(NPC_MARSHAL_GRYAN_STOUTMANTLE_234, 15.0f))
+                        marshal->AI()->Talk(10, player);
 
                 _timer = 7000; _phase = 2;
                 break;
             case 2:
-                if (Creature* horatio = me->FindNearestCreature(NPC_HORATIO_LANE_42308, 15.0f))
-                {
-                    horatio->AI()->Talk(10);
-                    horatio->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
-                }
+                if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                    if (Creature* horatio = me->FindNearestCreature(NPC_HORATIO_LANE_42308, 15.0f))
+                    {
+                        horatio->AI()->Talk(10, player);
+                        horatio->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
+                    }
 
                 _timer = 7000; _phase = 3;
                 break;
             case 3:
-                if (Creature* horatio = me->FindNearestCreature(NPC_HORATIO_LANE_42308, 15.0f))
-                {
-                    horatio->AI()->Talk(11);
-                    horatio->HandleEmoteCommand(EMOTE_ONESHOT_QUESTION);
-                }
+                if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                    if (Creature* horatio = me->FindNearestCreature(NPC_HORATIO_LANE_42308, 15.0f))
+                    {
+                        horatio->AI()->Talk(11, player);
+                        horatio->HandleEmoteCommand(EMOTE_ONESHOT_QUESTION);
+                    }
 
                 _timer = 7000; _phase = 4;
                 break;
             case 4:
-                if (Creature* marshal = me->FindNearestCreature(NPC_MARSHAL_GRYAN_STOUTMANTLE_234, 15.0f))
-                    marshal->AI()->Talk(11);
+                if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                    if (Creature* marshal = me->FindNearestCreature(NPC_MARSHAL_GRYAN_STOUTMANTLE_234, 15.0f))
+                        marshal->AI()->Talk(11, player);
 
                 _timer = 7000; _phase = 5;
                 break;
             case 5:
-                Talk(10);
+                if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                    Talk(10, player);
                 _timer = 7000; _phase = 6;
                 break;
             case 6:
@@ -2140,28 +2028,31 @@ public:
                 _timer = 4000; _phase = 7;
                 break;
             case 7:
-                if (Creature* horatio = me->FindNearestCreature(NPC_HORATIO_LANE_42308, 15.0f))
-                {
-                    horatio->AI()->Talk(12);
-                    horatio->CastSpell(horatio, 78935);
-                }
+                if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                    if (Creature* horatio = me->FindNearestCreature(NPC_HORATIO_LANE_42308, 15.0f))
+                    {
+                        horatio->AI()->Talk(12, player);
+                        horatio->CastSpell(horatio, 78935);
+                    }
 
                 _timer = 5000; _phase = 8;
                 break;
             case 8:
-                if (Creature* horatio = me->FindNearestCreature(NPC_HORATIO_LANE_42308, 15.0f))
-                {
-                    horatio->AI()->Talk(13);
-                    horatio->CastSpell(horatio, 78935);
-                }
+                if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                    if (Creature* horatio = me->FindNearestCreature(NPC_HORATIO_LANE_42308, 15.0f))
+                    {
+                        horatio->AI()->Talk(13, player);
+                        horatio->CastSpell(horatio, 78935);
+                    }
 
                 _timer = 5000; _phase = 9;
                 break;
             case 9:
-                if (Creature* horatio = me->FindNearestCreature(NPC_HORATIO_LANE_42308, 15.0f))
-                {
-                    horatio->AI()->Talk(14);
-                }
+                if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                    if (Creature* horatio = me->FindNearestCreature(NPC_HORATIO_LANE_42308, 15.0f))
+                    {
+                        horatio->AI()->Talk(14, player);
+                    }
 
                 _timer = 4000; _phase = 10;
                 break;
@@ -2170,7 +2061,7 @@ public:
                 {
                     horatio->GetMotionMaster()->MovePath(423082, false);
                 }
-                _timer = 2000; _phase = 11;
+                _timer = 3000; _phase = 11;
                 break;
             case 11:
                 if (Creature* horatio = me->FindNearestCreature(NPC_HORATIO_LANE_42308, 15.0f))
@@ -2182,8 +2073,9 @@ public:
                 _phase = 0;
                 break;
             case 20:
-                if (Creature* marshal = me->FindNearestCreature(NPC_MARSHAL_GRYAN_STOUTMANTLE_234, 15.0f))
-                    marshal->AI()->Talk(12);
+                if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                    if (Creature* marshal = me->FindNearestCreature(NPC_MARSHAL_GRYAN_STOUTMANTLE_234, 15.0f))
+                        marshal->AI()->Talk(12, player);
 
                 _timer = 7000; _phase = 21;
                 break;
@@ -2192,8 +2084,9 @@ public:
                 _timer = 7000; _phase = 22;
                 break;
             case 22:
-                if (Creature* marshal = me->FindNearestCreature(NPC_MARSHAL_GRYAN_STOUTMANTLE_234, 15.0f))
-                    marshal->AI()->Talk(13);
+                if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                    if (Creature* marshal = me->FindNearestCreature(NPC_MARSHAL_GRYAN_STOUTMANTLE_234, 15.0f))
+                        marshal->AI()->Talk(13, player);
 
                 _phase = 0;
                 break;
@@ -2220,7 +2113,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_ripsnarl_sentinel_hillAI(creature);
+        return new npc_ripsnarl_sentinel_hill_42635AI(creature);
     }
 };
 
@@ -2298,7 +2191,7 @@ public:
                     {
                         if (player->GetDistance2d(me) < 10.0f)
                         {
-                            Talk(1);
+                            Talk(1, player);
                             _timer = 30000;
                         }
                     }
@@ -3141,6 +3034,7 @@ enum eQuest26322
     NPC_HELIX_GEARBREAKER_42753 = 42753,
     NPC_DEFIAS_BLACKGUARD_42769 = 42769,
     NPC_SENTINEL_HILL_FIRE_TRIGGER = 42793,
+    SPELL_SUMMON_All_ACTORS = 79679,
     SPELL_GENERIC_TRIGGER_1_GRYAN = 79785,
     SPELL_GENERIC_TRIGGER_1_HOPE = 79786,
     SPELL_GENERIC_TRIGGER_1_RIPSNARL = 79787,
@@ -3178,7 +3072,7 @@ public:
     {
         if (quest->GetQuestId() == QUEST_RISE_OF_THE_BROTHERHOOD)
         {
-            player->CastSpell(player, 79679); // ID - 79679 Summon All Actors
+            player->CastSpell(player, SPELL_SUMMON_All_ACTORS); 
         }
 
         return true;
@@ -3575,6 +3469,7 @@ public:
     }
 };
 
+// 42749
 class npc_hope_saldean_42749 : public CreatureScript
 {
 public:
@@ -3596,11 +3491,20 @@ public:
 
         void SpellHit(Unit* caster, SpellInfo const* spell)
         {
-            if (spell->Id == SPELL_GENERIC_TRIGGER_1_HOPE)
+            switch (spell->Id)
+            {
+            case SPELL_GENERIC_TRIGGER_1_GRYAN:
+            {
+                printf("\noooooohhhh...hallo hope????\nich bin getroffen...\n");
+                break;
+            }
+            case SPELL_GENERIC_TRIGGER_1_HOPE:
             {
                 _phase = 1;
                 _timer = 1000;
+                break;
             }
+            }           
         }
 
         void UpdateAI(uint32 diff) override
@@ -3795,10 +3699,11 @@ public:
                 me->GetMotionMaster()->MovePoint(0, -10512.44f, 1044.438f, 60.51799f);
 
                 if (Player* player = me->FindNearestPlayer(25.0f, true))
+                {
                     me->SetFacingToObject(player);
-
-                me->HandleEmoteCommand(25);
-                Talk(6);
+                    me->HandleEmoteCommand(25);
+                    Talk(6, player);
+                }
 
                 _timer = 7000; _phase = 18;
                 break;
@@ -3898,6 +3803,7 @@ public:
     }
 };
 
+// 42750
 class npc_marshal_gryan_stoutmantle_42750 : public CreatureScript
 {
 public:
@@ -3919,10 +3825,19 @@ public:
 
         void SpellHit(Unit* caster, SpellInfo const* spell)
         {
-            if (spell->Id == SPELL_GENERIC_TRIGGER_2_GRYAN)
+            switch (spell->Id)
+            {
+            case SPELL_GENERIC_TRIGGER_1_GRYAN:
+            {
+                printf("\noooooohhhh...hallo gryan????\nich bin getroffen...\n");
+                break;
+            }
+            case SPELL_GENERIC_TRIGGER_2_GRYAN:
             {
                 _phase = 4;
                 _timer = 1000;
+                break;
+            }
             }
         }
 
@@ -3950,7 +3865,8 @@ public:
                 _timer = 3000; _phase = 1;
                 break;
             case 1:
-                Talk(4);
+                if (Player* player = me->FindNearestPlayer(25.0f, true))
+                    Talk(4, player);
                 _timer = 1000; _phase = 2;
                 break;
             case 2:
@@ -3966,9 +3882,8 @@ public:
                 {
                     me->CastSpell(player, SPELL_QUEST_CREDIT_DEFIAS_FINALE_EVENT, false);
                     player->RemoveAura(SPELL_TIED_UP);
+                    Talk(6, player);
                 }
-
-                Talk(6);
 
                 _timer = 1000; _phase = 5;
                 break;
@@ -4160,12 +4075,13 @@ void AddSC_westfall()
     new npc_thug();
     new npc_horatio_lane_42558();
     new npc_overloaded_harvest_golem_42381();
-    new npc_salma_saldean();
+    new spell_unbound_energy_79084();
+    new npc_salma_saldean_235();
     new npc_sentinel_hill_guard();
     new npc_riverpaw_sentinel_hill();
     new npc_defias_sentinel_hill();
     new npc_riverpaw_westfall();
-    new npc_ripsnarl_sentinel_hill();
+    new npc_ripsnarl_sentinel_hill_42635();
     new npc_agent_kearnen();
     new item_potion_of_shrouding();
     new npc_helix_gearbreaker();

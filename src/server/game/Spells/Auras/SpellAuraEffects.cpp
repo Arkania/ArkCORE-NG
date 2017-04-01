@@ -6157,6 +6157,12 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
                     caster->CastSpell(target, triggerSpellId, false);
                 return;
             }
+            case 79425:
+            {
+                if (Unit* unit = ObjectAccessor::GetUnit(*target, caster->GetTarget()))
+                    target = unit;
+                break;
+            }
         }
     }
 

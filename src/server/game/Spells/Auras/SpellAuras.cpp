@@ -2916,9 +2916,9 @@ void UnitAura::FillTargetMap(std::map<Unit*, uint8> & targets, Unit* caster)
         {
             std::map<Unit*, uint8>::iterator existing = targets.find(*itr);
             if (existing != targets.end())
-                existing->second |= 1<<effIndex;
+                existing->second |= 1 << effIndex;
             else
-                targets[*itr] = 1<<effIndex;
+                targets[*itr] = 1 << effIndex;
         }
     }
 }
