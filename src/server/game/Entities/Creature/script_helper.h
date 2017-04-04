@@ -132,6 +132,11 @@ enum Events
     EVENT_TALK_PART_18,
     EVENT_TALK_PART_19,
     EVENT_TALK_PART_20,
+    EVENT_TALK_PART_21,
+    EVENT_TALK_PART_22,
+    EVENT_TALK_PART_23,
+    EVENT_TALK_PART_24,
+    EVENT_TALK_PART_25,
     EVENT_TALK_PERIODIC,
     EVENT_TORCH_COOLDOWN,
     EVENT_TRIGGER_TRAP,
@@ -494,6 +499,28 @@ private:
     float const m_pct;
 };
 
+class RemoveFromList
+{
+public:
+    explicit RemoveFromList(std::list<uint32> cList, bool RemoveWhenInList, bool RemovePlayer) : m_cList(cList), m_removeWhenInList(RemoveWhenInList), m_removePlayer(RemovePlayer) { }
+
+    bool operator()(WorldObject* obj) const
+    {
+        if (Player* player = obj->ToPlayer())
+            return m_removePlayer;
+        else if (Creature* npc = obj->ToCreature())
+            for (auto entry : m_cList)
+                if (entry == obj->GetEntry())
+                    return m_removeWhenInList;
+
+        return true;
+    }
+
+private:
+    std::list<uint32> m_cList;
+    bool m_removeWhenInList;
+    bool m_removePlayer;
+};
 // end beta test area
 
 

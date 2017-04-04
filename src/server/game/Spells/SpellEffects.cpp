@@ -5501,20 +5501,6 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                         player->KilledMonsterCredit(42601);
                     break;
                 }
-                // ID - 79672 Despawn ROB Actors
-                case 79672:
-                {
-                    if (effIndex == EFFECT_0)
-                    {
-
-                    }
-                    else if (effIndex == EFFECT_1)
-                    {
-
-                    }
-
-                    break;
-                }
                 // ID - 79679 Summon All Actors
                 case 79679:
                 {
@@ -5530,12 +5516,6 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                         player->CastSpell(player, 79670); // ID - 79670 Summon Ripsnarl 42748 (2979)
                         player->CastSpell(player, 79785); // ID - 79785 General Trigger: 1 Gryan
                     }
-                    break;
-                }
-                // ID - 79680 Run Action Set
-                case 79680:
-                {
-
                     break;
                 }
                 default:
