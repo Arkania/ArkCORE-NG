@@ -2104,6 +2104,29 @@ public:
                     player->KilledMonsterCredit(qInfo->RequiredNpcOrGo[0], 0);
             }
         }
+		
+		void SpellHit(Unit* /*caster*/, const SpellInfo* spell) override
+		{
+			if(spell->Id == 51912)
+			{
+				aura = urand(0, 3);
+				switch (aura)
+				{
+					case 0:
+						DoCast(me, SPELL_AURA_NOTSOBIG_1);
+						break;
+					case 1:
+						DoCast(me, SPELL_AURA_NOTSOBIG_2);
+						break;
+					case 2:
+						DoCast(me, SPELL_AURA_NOTSOBIG_3);
+						break;
+					case 3:
+						DoCast(me, SPELL_AURA_NOTSOBIG_4);
+						break;
+				}
+			}
+		}
     };
 
     CreatureAI* GetAI(Creature* creature) const override

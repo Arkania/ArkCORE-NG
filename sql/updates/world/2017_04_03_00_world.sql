@@ -31,4 +31,3 @@ INSERT INTO conditions (SourceTypeOrReferenceId, SourceGroup, SourceEntry, Condi
 (15, 4106, 1, 28, 26322, 0);
 
 update creature set id=234, phaseId=226 WHERE id=42750 AND guid=6716;
-
