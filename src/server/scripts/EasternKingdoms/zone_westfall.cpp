@@ -2537,7 +2537,7 @@ enum eQuest26320
 
     QUEST_VISION_OF_THE_PAST = 26320,
     SPELL_VISION_OF_THE_PAST1 = 79586,
-    SPELL_VISION_OF_THE_PAST2 = 79587,
+    SPELL_VISION_OF_THE_PAST2 = 79587,  // give us the aura for phaseId 231
     SPELL_VISION_OF_THE_PAST_FINISH = 79620,
 };
 
@@ -3034,6 +3034,7 @@ enum eQuest26322
     NPC_HELIX_GEARBREAKER_42753 = 42753,
     NPC_DEFIAS_BLACKGUARD_42769 = 42769,
     NPC_SENTINEL_HILL_FIRE_TRIGGER = 42793,
+    SPELL_DESPAWN_ROB_ACTORS = 79672,
     SPELL_SUMMON_All_ACTORS = 79679,
     SPELL_GENERIC_TRIGGER_1_GRYAN = 79785,
     SPELL_GENERIC_TRIGGER_1_HOPE = 79786,
@@ -3063,40 +3064,105 @@ enum eQuest26322
     SPELL_CLIFFWALKER_FIRE = 78573,
 };
 
+// 234
 class npc_marshal_gryan_stoutmantle_234 : public CreatureScript
 {
 public:
     npc_marshal_gryan_stoutmantle_234() : CreatureScript("npc_marshal_gryan_stoutmantle_234") { }
 
-    bool OnQuestAccept(Player* player, Creature* /*creature*/, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
     {
         if (quest->GetQuestId() == QUEST_RISE_OF_THE_BROTHERHOOD)
         {
-            player->CastSpell(player, SPELL_SUMMON_All_ACTORS); 
+            creature->AI()->SetGUID(player->GetGUID(), PLAYER_GUID);
+            creature->AI()->DoAction(1);
         }
 
         return true;
     }
+
+    struct npc_marshal_gryan_stoutmantle_234AI : public ScriptedAI
+    {
+        npc_marshal_gryan_stoutmantle_234AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap  m_events;
+        uint64    m_playerGUID;
+
+        void Reset() override
+        {
+            m_playerGUID = 0;
+        }
+
+        void DoAction(int32 /*param*/) override 
+        { 
+            m_events.ScheduleEvent(EVENT_START_PLAY, 250);
+        }
+
+        void SetGUID(uint64 guid, int32 id) override
+        {
+            switch (id)
+            {
+            case PLAYER_GUID:
+            {
+                switch (id)
+                {
+                case PLAYER_GUID:
+                    m_playerGUID = guid;
+                }
+                break;
+            }
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_START_PLAY:
+                {
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        player->CastSpell(player, SPELL_SUMMON_All_ACTORS);
+                    break;
+                }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_marshal_gryan_stoutmantle_234AI(creature);
+    }
 };
 
+// 523
 class npc_thor_523 : public CreatureScript
 {
 public:
     npc_thor_523() : CreatureScript("npc_thor_523") { }
 
-    bool OnGossipHello(Player* player, Creature* /*creature*/)
+    bool OnGossipHello(Player* player, Creature* creature)
     {
         if (player->GetQuestStatus(QUEST_RISE_OF_THE_BROTHERHOOD) == QUEST_STATUS_COMPLETE)
         {
             player->RemoveAllAuras();
-            return true;
+            creature->CastSpell(creature, SPELL_DESPAWN_ROB_ACTORS);
         }
 
         return false;
     }
-
 };
 
+// 42744
 class npc_lieutenant_horatio_laine_42744 : public CreatureScript
 {
 public:
@@ -3116,10 +3182,17 @@ public:
 
         void SpellHit(Unit* caster, SpellInfo const* spell)
         {
-            if (spell->Id == SPELL_GENERIC_TRIGGER_1_HORATIO)
+            switch (spell->Id)
+            {
+            case SPELL_DESPAWN_ROB_ACTORS:
+                me->DespawnOrUnsummon(10);
+                break;
+            case SPELL_GENERIC_TRIGGER_1_HORATIO:
             {
                 _phase = 1;
                 _timer = 1500;
+                break;
+            }
             }
         }
 
@@ -3171,24 +3244,33 @@ public:
     }
 };
 
-class npc_Ripsnarl_42748 : public CreatureScript
+// 42748
+class npc_ripsnarl_42748 : public CreatureScript
 {
 public:
-    npc_Ripsnarl_42748() : CreatureScript("npc_Ripsnarl_42748") { }
+    npc_ripsnarl_42748() : CreatureScript("npc_Ripsnarl_42748") { }
 
-    struct npc_Ripsnarl_42748AI : public ScriptedAI
+    struct npc_ripsnarl_42748AI : public ScriptedAI
     {
-        npc_Ripsnarl_42748AI(Creature* creature) : ScriptedAI(creature) { }
+        npc_ripsnarl_42748AI(Creature* creature) : ScriptedAI(creature) { }
 
         uint32  _phase;
         uint32  _timer;
+        uint64  m_playerGUID;
 
         void Reset() override
         {
+            m_playerGUID = 0;
             _phase = 0;
             _timer = 0;
             me->SetOrientation(0.489f);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
+        }
+
+        void IsSummonedBy(Unit* summoner) override
+        {
+            if (Player* player = summoner->ToPlayer())
+                m_playerGUID = player->GetGUID();
         }
 
         void SpellHit(Unit* caster, SpellInfo const* spell)
@@ -3200,8 +3282,21 @@ public:
             }
             else if (spell->Id == SPELL_GENERIC_TRIGGER_10_RIPSNARL)
             {
-                me->GetMotionMaster()->MovePoint(0, -10516.03f, 1062.179f, 55.78939f);
+                me->GetMotionMaster()->MovePoint(1201, -10516.03f, 1062.179f, 55.78939f);
             }
+        }
+
+        void MovementInform(uint32 type, uint32 id) override 
+        { 
+            if (type == POINT_MOTION_TYPE)
+                switch (id)
+                {
+                case 1201:
+                {
+                    me->DespawnOrUnsummon(1000);
+                    break;
+                }
+                }
         }
 
         void UpdateAI(uint32 diff) override
@@ -3227,24 +3322,24 @@ public:
             case 0:
                 break;
             case 1:
-                me->CastSpell(me, SPELL_RIPSNARL_TRANSFORM_HUMAN, false); // 51:07
+                me->CastSpell(me, SPELL_RIPSNARL_TRANSFORM_HUMAN, true); 
+                //me->SetDisplayId(33062);
 
                 _timer = 3700; _phase = 2;
                 break;
-            case 2: //  51:10
+            case 2: 
                 me->GetMotionMaster()->MovePoint(0, -10514.8f, 1045.6f, 60.80753f);
-                me->HandleEmoteCommand(1);
                 Talk(0);
 
                 _timer = 3000; _phase = 3;
                 break;
-            case 3: // 51:13
+            case 3: 
                 me->GetMotionMaster()->MovePath(427481, false);
 
                 _timer = 2000; _phase = 4;
                 break;
-            case 4: // 51:15
-                me->CastSpell(me, SPELL_ADMIRALS_HAT);
+            case 4: 
+                me->CastSpell(me, SPELL_ADMIRALS_HAT, true);
 
                 _timer = 5000; _phase = 5;
                 break;
@@ -3256,10 +3351,11 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_Ripsnarl_42748AI(creature);
+        return new npc_ripsnarl_42748AI(creature);
     }
 };
 
+// 42751
 class npc_captain_danuvin_42751 : public CreatureScript
 {
 public:
@@ -3273,6 +3369,16 @@ public:
         {
             me->SetOrientation(1.920f);
         }
+
+        void SpellHit(Unit* caster, SpellInfo const* spell)
+        {
+            switch (spell->Id)
+            {
+            case SPELL_DESPAWN_ROB_ACTORS:
+                me->DespawnOrUnsummon(10);
+                break;
+            }
+        }
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -3281,6 +3387,7 @@ public:
     }
 };
 
+// 42752
 class npc_scout_galiaan_42752 : public CreatureScript
 {
 public:
@@ -3294,6 +3401,17 @@ public:
         {
             me->SetOrientation(1.920f);
         }
+
+        void SpellHit(Unit* caster, SpellInfo const* spell)
+        {
+            switch (spell->Id)
+            {
+            case SPELL_DESPAWN_ROB_ACTORS:
+                me->DespawnOrUnsummon(10);
+                break;
+            }
+        }
+
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -3302,6 +3420,7 @@ public:
     }
 };
 
+// 42745
 class npc_stormwind_investigator_42745 : public CreatureScript
 {
 public:
@@ -3315,6 +3434,16 @@ public:
         {
             me->SetOrientation(4.555f);
         }
+
+        void SpellHit(Unit* caster, SpellInfo const* spell)
+        {
+            switch (spell->Id)
+            {
+            case SPELL_DESPAWN_ROB_ACTORS:
+                me->DespawnOrUnsummon(10);
+                break;
+            }
+        }
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -3323,6 +3452,7 @@ public:
     }
 };
 
+// 42753
 class npc_helix_gearbreaker_42753 : public CreatureScript
 {
 public:
@@ -3341,8 +3471,21 @@ public:
         {
             if (spell->Id == SPELL_GENERIC_TRIGGER_10_HELIX)
             {
-                me->GetMotionMaster()->MovePoint(0, -10519.46f, 1061.701f, 55.5351f);
+                me->GetMotionMaster()->MovePoint(1201, -10519.46f, 1061.701f, 55.5351f);
             }
+        }
+
+        void MovementInform(uint32 type, uint32 id) override
+        {
+            if (type == POINT_MOTION_TYPE)
+                switch (id)
+                {
+                case 1201:
+                {
+                    me->DespawnOrUnsummon(1000);
+                    break;
+                }
+                }
         }
     };
 
@@ -3352,6 +3495,7 @@ public:
     }
 };
 
+// 42755
 class npc_glubtok_42755 : public CreatureScript
 {
 public:
@@ -3373,6 +3517,19 @@ public:
                 me->GetMotionMaster()->MovePath(427551, false);
             }
         }
+
+        void MovementInform(uint32 type, uint32 id) override
+        {
+            if (type == WAYPOINT_MOTION_TYPE)
+                switch (id)
+                {
+                case 3:
+                {
+                    me->DespawnOrUnsummon(1000);
+                    break;
+                }
+                }
+        }
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -3381,6 +3538,7 @@ public:
     }
 };
 
+// 42769
 class npc_defias_blackguard_42769 : public CreatureScript
 {
 public:
@@ -3390,82 +3548,105 @@ public:
     {
         npc_defias_blackguard_42769AI(Creature* creature) : ScriptedAI(creature) { }
 
-        uint32  _phase;
-        uint32  _timer;
+        EventMap m_events;
 
         void Reset() override
         {
-            _phase = 0;
-            _timer = 0;
+            me->CastSpell(me, 79705, true); // ID - 79705 Spawn Smoke (Defias Blackguard)
         }
 
         void MovementInform(uint32 type, uint32 id) override
         {
             if (type == 2)
             {
-                _phase = 3;
-                _timer = 200;
+                m_events.RescheduleEvent(EVENT_START_FIGHT, 250);
             }
         }
 
         void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
-            if (spell->Id == SPELL_GENERIC_TRIGGER_10_BLACKGUARDS)
+            switch (spell->Id)
+            {
+            case SPELL_GENERIC_TRIGGER_10_BLACKGUARDS:
             {
                 me->GetMotionMaster()->MovePath(4276901 + urand(0, 13), false);
+                break;
             }
-            else if (spell->Id == SPELL_GENERIC_TORCH_TOSS_TRIGGER)
+            case SPELL_GENERIC_TORCH_TOSS_TRIGGER:
             {
-                _phase = 1;
-                _timer = 500;
+                m_events.RescheduleEvent(EVENT_START_WALK, 250);
+                break;
+            }
+            case SPELL_DESPAWN_ROB_ACTORS:
+            {
+                me->DespawnOrUnsummon(10);
+                break;
+            }
             }
         }
 
         void UpdateAI(uint32 diff) override
         {
-            if (_timer <= diff)
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
             {
-                _timer = 1000;
-                DoWork();
+                switch (eventId)
+                {
+                case EVENT_START_WALK:
+                {
+                    me->RemoveAura(SPELL_TOSS_TORCH);
+                    me->GetMotionMaster()->MovePath(4276901 + urand(0, 13), false);
+                    break;
+                }
+                case EVENT_START_FIGHT:
+                {
+                    if (Creature* npc = me->FindNearestCreature(NPC_SENTINEL_HILL_FIRE_TRIGGER, 50.0f))
+                        npc->CastSpell(npc, SPELL_CLIFFWALKER_FIRE, true);
+                    break;
+                }
+                }
             }
-            else
-                _timer -= diff;
 
             if (!UpdateVictim())
                 return;
 
             DoMeleeAttackIfReady();
         }
+    };
 
-        void DoWork()
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_defias_blackguard_42769AI(creature);
+    }
+};
+
+// 42771
+class npc_rise_of_the_brotherhood_event_dummy_42771 : public CreatureScript
+{
+public:
+    npc_rise_of_the_brotherhood_event_dummy_42771() : CreatureScript("npc_rise_of_the_brotherhood_event_dummy_42771") { }
+
+    struct npc_rise_of_the_brotherhood_event_dummy_42771AI : public ScriptedAI
+    {
+        npc_rise_of_the_brotherhood_event_dummy_42771AI(Creature* creature) : ScriptedAI(creature) { }
+
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
-            switch (_phase)
+            switch (spell->Id)
             {
-            case 0:
+            case 79708:
+            {
+                me->CastSpell(me, 79712, true);
                 break;
-            case 1:
-                me->RemoveAura(SPELL_TOSS_TORCH);
-                me->GetMotionMaster()->MovePath(4276901 + urand(0, 13), false);
-
-                _timer = 60000; _phase = 2;
-                break;
-            case 2:
-                break;
-            case 3:
-                if (Creature* npc = me->FindNearestCreature(NPC_SENTINEL_HILL_FIRE_TRIGGER, 50.0f))
-                    npc->CastSpell(npc, SPELL_CLIFFWALKER_FIRE, true);
-
-                _timer = 60000; _phase = 1;
-                break;
-            case 4:
-                break;
+            }
             }
         }
     };
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_defias_blackguard_42769AI(creature);
+        return new npc_rise_of_the_brotherhood_event_dummy_42771AI(creature);
     }
 };
 
@@ -3479,29 +3660,76 @@ public:
     {
         npc_hope_saldean_42749AI(Creature* creature) : ScriptedAI(creature) { }
 
-        uint32  _phase;
-        uint32  _timer;
+        EventMap m_events;
+        uint64   m_playerGUID;
+        uint64   m_gryanGUID;
+        uint64   m_glubtokGUID;
+        uint64   m_ripsnarlGUID;
+        uint32   m_point;
 
         void Reset() override
         {
-            _phase = 0;
-            _timer = 0;
+            m_playerGUID = 0;
+            m_gryanGUID = 0;
+            m_glubtokGUID = 0;
+            m_ripsnarlGUID = 0;
+            m_point = 0;
             me->SetOrientation(2.024f);
+        }
+
+        void IsSummonedBy(Unit* summoner) override 
+        { 
+            if (Player* player = summoner->ToPlayer())
+                m_playerGUID = player->GetGUID();
+        }
+
+        void MovementInform(uint32 type, uint32 id) override
+        {
+            if (type == WAYPOINT_MOTION_TYPE)
+            {
+                if (m_point == 1204 && id == 3)
+                    m_events.ScheduleEvent(EVENT_TALK_PART_15, 100);
+            }
+            else if (type == POINT_MOTION_TYPE)
+                switch (id)
+                {
+                case 1201:
+                {
+                    Talk(0);
+                    m_events.ScheduleEvent(EVENT_TALK_PART_00, 5000);
+                    break;
+                }
+                case 1202:
+                {
+                    me->HandleEmoteCommand(54);
+                    m_events.ScheduleEvent(EVENT_TALK_PART_10, 2000);
+                    break;
+                }
+                case 1203:
+                {
+                    m_events.ScheduleEvent(EVENT_TALK_PART_13, 1000);
+                    break;
+                }
+                case 1205:
+                {
+                    m_events.ScheduleEvent(EVENT_TALK_PART_20, 1000);
+                    break;
+                }
+                }
         }
 
         void SpellHit(Unit* caster, SpellInfo const* spell)
         {
             switch (spell->Id)
             {
-            case SPELL_GENERIC_TRIGGER_1_GRYAN:
-            {
-                printf("\noooooohhhh...hallo hope????\nich bin getroffen...\n");
-                break;
-            }
             case SPELL_GENERIC_TRIGGER_1_HOPE:
             {
-                _phase = 1;
-                _timer = 1000;
+                m_events.RescheduleEvent(EVENT_START_WALK, 1000);
+                break;
+            }
+            case SPELL_GENERIC_TRIGGER_10_HOPE:
+            {
+                me->DespawnOrUnsummon(2000);
                 break;
             }
             }           
@@ -3509,13 +3737,183 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (_timer <= diff)
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
             {
-                _timer = 1000;
-                DoWork();
+                switch (eventId)
+                {
+                case EVENT_START_WALK:
+                {
+                    me->GetMotionMaster()->MovePoint(1201, -10507.4f, 1042.33f, 60.518f);
+                    break;
+                }
+                case EVENT_TALK_PART_00:
+                {
+                    if (Creature* gryan = GetGryan())
+                    {
+                        gryan->SetFacingToObject(me);
+                        gryan->AI()->Talk(5);
+                    }
+                    m_events.ScheduleEvent(EVENT_TALK_PART_01, 4000);
+                    break;
+                }
+                case EVENT_TALK_PART_01:
+                {
+                    Talk(1);
+                    m_events.ScheduleEvent(EVENT_TALK_PART_02, 5000);
+                    break;
+                }
+                case EVENT_TALK_PART_02:
+                {
+                    Talk(2);
+                    m_events.ScheduleEvent(EVENT_TALK_PART_03, 7000);
+                    break;
+                }
+                case EVENT_TALK_PART_03:
+                {
+                    me->CastSpell(me, SPELL_VANESSA_TRANSFORM, true);
+                    m_events.ScheduleEvent(EVENT_TALK_PART_04, 2000);
+                    break;
+                }
+                case EVENT_TALK_PART_04:
+                {
+                    Talk(3);
+                    m_events.ScheduleEvent(EVENT_TALK_PART_05, 2000);
+                    break;
+                }
+                case EVENT_TALK_PART_05:
+                {
+                    if (Player* player = me->FindNearestPlayer(25.0f, true))
+                    {
+                        player->CastSpell(player, SPELL_SUMMON_DEFIAS_BLACKGUARD1);
+                        player->CastSpell(player, SPELL_SUMMON_GLUBTOK_42755);
+                        player->CastSpell(player, SPELL_SUMMON_HELIX_42753);
+                    }
+                    m_events.ScheduleEvent(EVENT_TALK_PART_06, 1000);
+                    break;
+                }
+                case EVENT_TALK_PART_06:
+                {
+                    if (Creature* glubtok = GetGlubtok())
+                        glubtok->CastSpell(glubtok, SPELL_SIMPLE_TELEPORT);
+                    m_events.ScheduleEvent(EVENT_TALK_PART_07, 5000);
+                    break;
+                }
+                case EVENT_TALK_PART_07:
+                {
+                    Talk(4); // tie them
+                    m_events.ScheduleEvent(EVENT_TALK_PART_08, 2000);
+                    break;
+                }
+                case EVENT_TALK_PART_08:
+                {
+                    me->CastSpell(me, SPELL_TIE_UP_GOOD_GUYS2);
+                    m_events.ScheduleEvent(EVENT_TALK_PART_09, 1000);
+                    break;
+                }
+                case EVENT_TALK_PART_09:
+                {
+                    me->GetMotionMaster()->MovePoint(1202, -10512.44f, 1044.438f, 60.51799f);
+                    break;
+                }
+                case EVENT_TALK_PART_10:
+                {
+                    Talk(5);
+                    m_events.ScheduleEvent(EVENT_TALK_PART_11, 1000);
+                    break;
+                }
+                case EVENT_TALK_PART_11:
+                {
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                        if (Creature* npc = GetRipsnarl())
+                            player->CastSpell(npc, SPELL_GENERIC_TRIGGER_1_RIPSNARL, true);
+                    m_events.ScheduleEvent(EVENT_TALK_PART_12, 6500);
+                    break;
+                }
+                case EVENT_TALK_PART_12:
+                {
+                    me->GetMotionMaster()->MovePoint(1203, -10512.44f, 1044.438f, 60.51799f);
+                    break;
+                }
+                case EVENT_TALK_PART_13:
+                {
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                    {
+                        me->SetFacingToObject(player);
+                        Talk(6, player);
+                    }
+                    m_events.ScheduleEvent(EVENT_TALK_PART_14, 7000);
+                    break;
+                }
+                case EVENT_TALK_PART_14:
+                {
+                    m_point = 1204;
+                    me->GetMotionMaster()->MovePath(427491, false); // 4 points
+                    break;
+                }
+                case EVENT_TALK_PART_15:
+                {
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                        if (Creature* horatio = me->FindNearestCreature(NPC_HORATIO_LANE_42744, 25.0f))
+                        {
+                            me->SetFacingToObject(horatio);
+                            player->CastSpell(player, SPELL_GENERIC_TRIGGER_1_HORATIO);
+                        }
+                    m_events.ScheduleEvent(EVENT_TALK_PART_16, 6000);
+                    break;
+                }
+                case EVENT_TALK_PART_16:
+                {
+                    Talk(7);
+                    m_events.ScheduleEvent(EVENT_TALK_PART_17, 10000);
+                    break;
+                }
+                case EVENT_TALK_PART_17:
+                {
+                    Talk(8);
+                    m_events.ScheduleEvent(EVENT_TALK_PART_18, 5000);
+                    break;
+                }
+                case EVENT_TALK_PART_18:
+                {
+                    Talk(9);
+                    m_events.ScheduleEvent(EVENT_TALK_PART_19, 6000);
+                    break;
+                }
+                case EVENT_TALK_PART_19:
+                {
+                    me->GetMotionMaster()->MovePoint(1205, -10518.14f, 1067.859f, 54.86662f);
+                    break;
+                }
+                case EVENT_TALK_PART_20:
+                {
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                    {
+                        player->CastSpell(player, SPELL_GENERIC_TRIGGER_10_BLACKGUARDS, true);
+                        player->CastSpell(player, SPELL_GENERIC_TRIGGER_2_GRYAN, true);
+                        player->CastSpell(player, SPELL_GENERIC_TRIGGER_10_HELIX, true);
+                        player->CastSpell(player, SPELL_GENERIC_TRIGGER_10_RIPSNARL, true);
+                        player->CastSpell(player, SPELL_GENERIC_TRIGGER_10_GLUBTOK, true);
+                        player->CastSpell(player, SPELL_GENERIC_TRIGGER_10_HOPE, true);
+                    }
+                    m_events.ScheduleEvent(EVENT_TALK_PART_21, 5000);
+                    break;
+                }
+                case EVENT_TALK_PART_21:
+                {
+                    std::list<Creature*> npcList = me->FindNearestCreatures(NPC_DEFIAS_BLACKGUARD_42769, 50.0f);
+                    for (auto npc : npcList)
+                        npc->CastSpell(npc, SPELL_GENERIC_TORCH_TOSS_TRIGGER);
+                    m_events.ScheduleEvent(EVENT_TALK_PART_22, 5000);
+                    break;
+                }
+                case EVENT_TALK_PART_22:
+                {
+                    break;
+                }
+                }
             }
-            else
-                _timer -= diff;
 
             if (!UpdateVictim())
                 return;
@@ -3523,276 +3921,40 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void DoWork()
+        Creature* GetGryan()
         {
-            switch (_phase)
+            if (Creature* gryan = ObjectAccessor::GetCreature(*me, m_gryanGUID))
+                return gryan;
+            if (Creature* gryan = me->FindNearestCreature(NPC_MARSHAL_GRYAN_STOUTMANTLE_42750, 50.0f))
             {
-            case 0:
-                break;
-            case 1:
-                me->GetMotionMaster()->MovePoint(0, -10507.4f, 1042.33f, 60.518f);
-                _timer = 3000; _phase = 2;
-                break;
-            case 2:
-                me->HandleEmoteCommand(25);
-                Talk(0);
-                _timer = 5000; _phase = 3;
-                break;
-            case 3:
-                if (Creature* gryan = me->FindNearestCreature(NPC_MARSHAL_GRYAN_STOUTMANTLE_42750, 25.0f))
-                {
-                    gryan->SetFacingToObject(me);
-                    gryan->HandleEmoteCommand(5);
-                    gryan->AI()->Talk(5);
-                }
+                m_gryanGUID = gryan->GetGUID();
+                return gryan;
+            }
+            return nullptr;
+        }
 
-                _timer = 4000; _phase = 4;
-                break;
-            case 4:
-                Talk(1);
-
-                _timer = 5000; _phase = 5;
-                break;
-            case 5:
-                Talk(2);
-
-                _timer = 7000; _phase = 6;
-                break;
-            case 6:
-                me->CastSpell(me, SPELL_VANESSA_TRANSFORM, true);
-                _timer = 1000; _phase = 7;
-                break;
-            case 7:
-                me->HandleEmoteCommand(22);
-
-                _timer = 1000; _phase = 8;
-                break;
-            case 8:
-                Talk(3);
-
-                _timer = 2000; _phase = 9;
-                break;
-            case 9:
-                if (Player* player = me->FindNearestPlayer(25.0f, true))
-                {
-                    player->CastSpell(player, SPELL_SUMMON_DEFIAS_BLACKGUARD1);
-                    player->CastSpell(player, SPELL_SUMMON_GLUBTOK_42755);
-                    player->CastSpell(player, SPELL_SUMMON_HELIX_42753);
-                    Creature* defia;
-                    if (defia = me->SummonCreature(NPC_DEFIAS_BLACKGUARD_42769, -10510.16f, 1052.729f, 59.49126f, 4.892217f))
-                        defia->CastSpell(defia, 79705, false);
-                    if (defia = me->SummonCreature(NPC_DEFIAS_BLACKGUARD_42769, -10501.51f, 1046.292f, 60.60131f, 3.286149f))
-                        defia->CastSpell(defia, 79705, false);
-                    if (defia = me->SummonCreature(NPC_DEFIAS_BLACKGUARD_42769, -10512.69f, 1038.826f, 60.60131f, 1.024716f))
-                        defia->CastSpell(defia, 79705, false);
-                    if (defia = me->SummonCreature(NPC_DEFIAS_BLACKGUARD_42769, -10514.43f, 1049.165f, 60.17525f, 5.67358f))
-                        defia->CastSpell(defia, 79705, false);
-                    if (defia = me->SummonCreature(NPC_DEFIAS_BLACKGUARD_42769, -10505.78f, 1040.786f, 60.60131f, 2.167208f))
-                        defia->CastSpell(defia, 79705, false);
-                    if (defia = me->SummonCreature(NPC_DEFIAS_BLACKGUARD_42769, -10507.73f, 1039.929f, 60.60131f, 1.769489f))
-                        defia->CastSpell(defia, 79705, false);
-                    if (defia = me->SummonCreature(NPC_DEFIAS_BLACKGUARD_42769, -10512.3f, 1042.028f, 60.60131f, 0.7404307f))
-                        defia->CastSpell(defia, 79705, false);
-                    if (defia = me->SummonCreature(NPC_DEFIAS_BLACKGUARD_42769, -10516.88f, 1048.599f, 60.03143f, 5.888236f))
-                        defia->CastSpell(defia, 79705, false);
-                    if (defia = me->SummonCreature(NPC_DEFIAS_BLACKGUARD_42769, -10507.99f, 1051.469f, 60.25721f, 4.58273f))
-                        defia->CastSpell(defia, 79705, false);
-                    if (defia = me->SummonCreature(NPC_DEFIAS_BLACKGUARD_42769, -10504.66f, 1050.417f, 60.60131f, 4.038786f))
-                        defia->CastSpell(defia, 79705, false);
-                    if (defia = me->SummonCreature(NPC_DEFIAS_BLACKGUARD_42769, -10515.77f, 1040.724f, 60.60131f, 0.5737885f))
-                        defia->CastSpell(defia, 79705, false);
-                    if (defia = me->SummonCreature(NPC_DEFIAS_BLACKGUARD_42769, -10505.0f, 1053.427f, 59.97273f, 4.278519f))
-                        defia->CastSpell(defia, 79705, false);
-                    if (defia = me->SummonCreature(NPC_DEFIAS_BLACKGUARD_42769, -10511.16f, 1050.486f, 60.16436f, 5.134159f))
-                        defia->CastSpell(defia, 79705, false);
-                    if (defia = me->SummonCreature(NPC_DEFIAS_BLACKGUARD_42769, -10501.6f, 1042.736f, 60.60131f, 2.808118f))
-                        defia->CastSpell(defia, 79705, false);
-                    if (defia = me->SummonCreature(NPC_DEFIAS_BLACKGUARD_42769, -10514.06f, 1052.134f, 59.15881f, 5.363449f))
-                        defia->CastSpell(defia, 79705, false);
-                }
-
-                _timer = 1000; _phase = 10;
-                break;
-            case 10:
-                if (Creature* glubtok = me->FindNearestCreature(NPC_GLUBTOK_42755, 25.0))
-                    glubtok->CastSpell(glubtok, SPELL_SIMPLE_TELEPORT);
-
-
-                _timer = 5000; _phase = 11;
-                break;
-            case 11:
-                me->HandleEmoteCommand(25);
-                Talk(4); // tie them
-
-                _timer = 2000; _phase = 12;
-                break;
-            case 12:
+        Creature* GetGlubtok()
+        {
+            if (Creature* glubtok = ObjectAccessor::GetCreature(*me, m_glubtokGUID))
+                return glubtok;
+            if (Creature* glubtok = me->FindNearestCreature(NPC_GLUBTOK_THE_FOREMAN, 50.0f))
             {
-                me->CastSpell(me, SPELL_TIE_UP_GOOD_GUYS2);
-                if (Player* player = me->FindNearestPlayer(25.0f, true))
-                    player->CastSpell(player, SPELL_TIE_UP_GOOD_GUYS1);
-
-                if (Creature* npc = me->FindNearestCreature(NPC_HORATIO_LANE_42744, 25.0f))
-                    npc->CastSpell(npc, SPELL_TIE_UP_GOOD_GUYS1);
-
-                if (Creature* npc = me->FindNearestCreature(NPC_MARSHAL_GRYAN_STOUTMANTLE_42750, 25.0f))
-                    npc->CastSpell(npc, SPELL_TIE_UP_GOOD_GUYS1);
-
-                if (Creature* npc = me->FindNearestCreature(NPC_CAPTAIN_DANUVIN, 25.0f))
-                    npc->CastSpell(npc, SPELL_TIE_UP_GOOD_GUYS1);
-
-                if (Creature* npc = me->FindNearestCreature(NPC_SCOUT_GALIAAN, 25.0f))
-                    npc->CastSpell(npc, SPELL_TIE_UP_GOOD_GUYS1);
-
-                std::list<Creature*> npcList;
-                npcList = me->FindNearestCreatures(NPC_STORMWIND_INVESTIGATOR_42745, 25.0f);
-                for (std::list<Creature*>::iterator itr = npcList.begin(); itr != npcList.end(); ++itr)
-                {
-                    Creature* npc = *itr;
-                    npc->CastSpell(npc, SPELL_TIE_UP_GOOD_GUYS1);
-                }
-
-                if (Player* player = me->FindNearestPlayer(25.0f, true))
-                    player->CastSpell(player, SPELL_TIED_UP);
-
-                if (Creature* npc = me->FindNearestCreature(NPC_HORATIO_LANE_42744, 25.0f))
-                    npc->CastSpell(npc, SPELL_TIED_UP);
-
-                if (Creature* npc = me->FindNearestCreature(NPC_MARSHAL_GRYAN_STOUTMANTLE_42750, 25.0f))
-                    npc->CastSpell(npc, SPELL_TIED_UP);
-
-                if (Creature* npc = me->FindNearestCreature(NPC_CAPTAIN_DANUVIN, 25.0f))
-                    npc->CastSpell(npc, SPELL_TIED_UP);
-
-                if (Creature* npc = me->FindNearestCreature(NPC_SCOUT_GALIAAN, 25.0f))
-                    npc->CastSpell(npc, SPELL_TIED_UP);
-
-                npcList = me->FindNearestCreatures(NPC_STORMWIND_INVESTIGATOR_42745, 25.0f);
-                for (std::list<Creature*>::iterator itr = npcList.begin(); itr != npcList.end(); ++itr)
-                {
-                    Creature* npc = *itr;
-                    npc->CastSpell(npc, SPELL_TIED_UP);
-                }
-                _timer = 1000; _phase = 13;
+                m_glubtokGUID = glubtok->GetGUID();
+                return glubtok;
             }
-            break;
-            case 13:
-                me->GetMotionMaster()->MovePoint(0, -10512.44f, 1044.438f, 60.51799f);
-                _timer = 3000; _phase = 14;
-                break;
-            case 14:
-                me->HandleEmoteCommand(54);
-                _timer = 2000; _phase = 15;
-                break;
-            case 15:
-                me->HandleEmoteCommand(1);
-                Talk(5);
-                _timer = 1000; _phase = 16;
-                break;
-            case 16:  // 51:06
-                if (Creature* npc = me->FindNearestCreature(NPC_RIPSNARL_42748, 25.0f))
-                    npc->CastSpell(npc, SPELL_GENERIC_TRIGGER_1_RIPSNARL, false);
+            return nullptr;
+        }
 
-                _timer = 6500; _phase = 17;
-                break;
-            case 17: // 51 : 13
-                me->GetMotionMaster()->MovePoint(0, -10512.44f, 1044.438f, 60.51799f);
-
-                if (Player* player = me->FindNearestPlayer(25.0f, true))
-                {
-                    me->SetFacingToObject(player);
-                    me->HandleEmoteCommand(25);
-                    Talk(6, player);
-                }
-
-                _timer = 7000; _phase = 18;
-                break;
-            case 18: // 51:20
-                me->GetMotionMaster()->MovePath(427491, false);
-
-                _timer = 2000; _phase = 19;
-                break;
-            case 19: // 51:22
-                if (Creature* horatio = me->FindNearestCreature(NPC_HORATIO_LANE_42744, 25.0f))
-                    horatio->CastSpell(horatio, SPELL_GENERIC_TRIGGER_1_HORATIO);
-
-                _timer = 6000; _phase = 20;
-                break;
-            case 20: // 51:28
-                Talk(7);
-
-                _timer = 9000; _phase = 21;
-                break;
-            case 21: // 51:37
-                me->HandleEmoteCommand(1);
-
-                _timer = 1000; _phase = 22;
-                break;
-            case 22: // 51:38
-                Talk(8);
-
-                _timer = 5000; _phase = 23;
-                break;
-            case 23: // 51:43
-                me->HandleEmoteCommand(22);
-                Talk(9);
-
-                _timer = 6000; _phase = 24;
-                break;
-            case 24: // 51:49
-                me->GetMotionMaster()->MovePoint(0, -10518.14f, 1067.859f, 54.86662f);
-
-                _timer = 5000; _phase = 25;
-                break;
-            case 25:// 51:52
+        Creature* GetRipsnarl()
+        {
+            if (Creature* ripsnarl = ObjectAccessor::GetCreature(*me, m_ripsnarlGUID))
+                return ripsnarl;
+            if (Creature* ripsnarl = me->FindNearestCreature(NPC_RIPSNARL_42748, 50.0f))
             {
-                std::list<Creature*> npcList;
-                npcList = me->FindNearestCreatures(NPC_DEFIAS_BLACKGUARD_42769, 25.0f);
-                for (std::list<Creature*>::iterator itr = npcList.begin(); itr != npcList.end(); ++itr)
-                {
-                    Creature* npc = *itr;
-                    npc->CastSpell(npc, SPELL_GENERIC_TRIGGER_10_BLACKGUARDS);
-                }
+                m_ripsnarlGUID = ripsnarl->GetGUID();
+                return ripsnarl;
             }
-
-            if (Creature* horatio = me->FindNearestCreature(NPC_MARSHAL_GRYAN_STOUTMANTLE_42750, 25.0f))
-                horatio->CastSpell(horatio, SPELL_GENERIC_TRIGGER_2_GRYAN);
-
-            if (Creature* horatio = me->FindNearestCreature(NPC_HELIX_GEARBREAKER_42753, 25.0f))
-                horatio->CastSpell(horatio, SPELL_GENERIC_TRIGGER_10_HELIX);
-
-            if (Creature* horatio = me->FindNearestCreature(NPC_RIPSNARL_42748, 25.0f))
-                horatio->CastSpell(horatio, SPELL_GENERIC_TRIGGER_10_RIPSNARL);
-
-            if (Creature* horatio = me->FindNearestCreature(NPC_GLUBTOK_42755, 25.0f))
-                horatio->CastSpell(horatio, SPELL_GENERIC_TRIGGER_10_GLUBTOK);
-
-            if (Creature* horatio = me->FindNearestCreature(NPC_HOPE_SALDEAN_42749, 25.0f))
-                horatio->CastSpell(horatio, SPELL_GENERIC_TRIGGER_10_HOPE);
-
-            _timer = 5000; _phase = 26;
-            break;
-            case 26:// 51:53
-            {
-                std::list<Creature*> npcList = me->FindNearestCreatures(NPC_DEFIAS_BLACKGUARD_42769, 25.0f);
-                for (std::list<Creature*>::iterator itr = npcList.begin(); itr != npcList.end(); ++itr)
-                {
-                    Creature* npc = *itr;
-                    npc->CastSpell(npc, SPELL_GENERIC_TORCH_TOSS_TRIGGER);
-                }
-            }
-
-            _timer = 5000; _phase = 27;
-            break;
-            case 27:// 
-
-                _timer = 5000; _phase = 28;
-                break;
-            case 28:// 
-
-                _timer = 5000; _phase = 29;
-                break;
-            }
+            return nullptr;
         }
 
     };
@@ -3813,29 +3975,38 @@ public:
     {
         npc_marshal_gryan_stoutmantle_42750AI(Creature* creature) : ScriptedAI(creature) { }
 
-        uint32  _phase;
-        uint32  _timer;
+        EventMap m_events;
+        uint64   m_playerGUID;
 
         void Reset() override
         {
-            _phase = 0;
-            _timer = 1000;
+            m_playerGUID = 0;
             me->SetOrientation(1.204f);
         }
 
-        void SpellHit(Unit* caster, SpellInfo const* spell)
+        void IsSummonedBy(Unit* summoner) override
+        {
+            if (Player* player = summoner->ToPlayer())
+                m_playerGUID = player->GetGUID();
+        }
+
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
             switch (spell->Id)
             {
-            case SPELL_GENERIC_TRIGGER_1_GRYAN:
+            case SPELL_GENERIC_TRIGGER_1_GRYAN: // tic 0
             {
-                printf("\noooooohhhh...hallo gryan????\nich bin getroffen...\n");
+                m_events.RescheduleEvent(EVENT_START_TALK, 1000);
                 break;
             }
-            case SPELL_GENERIC_TRIGGER_2_GRYAN:
+            case SPELL_GENERIC_TRIGGER_2_GRYAN: // tic 101
             {
-                _phase = 4;
-                _timer = 1000;
+                m_events.RescheduleEvent(EVENT_START_WALK, 1000);
+                break;
+            }
+            case SPELL_DESPAWN_ROB_ACTORS:
+            {
+                me->DespawnOrUnsummon(10);
                 break;
             }
             }
@@ -3843,59 +4014,90 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (_timer <= diff)
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
             {
-                _timer = 1000;
-                DoWork();
+                switch (eventId)
+                {
+                // video start. 
+                case EVENT_START_TALK:
+                {
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                        Talk(4, player); // tic 1
+                    m_events.ScheduleEvent(EVENT_TALK_PART_00, 2000);
+                    break;
+                }
+                case EVENT_TALK_PART_00 :
+                {
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                        player->CastSpell(player, SPELL_GENERIC_TRIGGER_1_HOPE, false); // tic 3
+                    break;
+                }
+                // video end part
+                case EVENT_START_WALK:
+                {
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                    {
+                        me->CastSpell(player, SPELL_QUEST_CREDIT_DEFIAS_FINALE_EVENT, false); // tic 102
+                        player->RemoveAura(SPELL_TIED_UP);
+                        Talk(6, player);
+                    }
+                    break;
+                }
+                }
             }
-            else
-                _timer -= diff;
 
             if (!UpdateVictim())
                 return;
 
             DoMeleeAttackIfReady();
         }
-
-        void DoWork()
-        {
-            switch (_phase)
-            {
-            case 0:
-                _timer = 3000; _phase = 1;
-                break;
-            case 1:
-                if (Player* player = me->FindNearestPlayer(25.0f, true))
-                    Talk(4, player);
-                _timer = 1000; _phase = 2;
-                break;
-            case 2:
-                if (Creature* hope = me->FindNearestCreature(NPC_HOPE_SALDEAN_42749, 25.0f))
-                    hope->CastSpell(hope, SPELL_GENERIC_TRIGGER_1_HOPE, false);
-
-                _timer = 300000; _phase = 3;
-                break;
-            case 3: // empty phase, waiting on next trigger
-                break;
-            case 4: // 51:53                
-                if (Player* player = me->FindNearestPlayer(25.0f, true))
-                {
-                    me->CastSpell(player, SPELL_QUEST_CREDIT_DEFIAS_FINALE_EVENT, false);
-                    player->RemoveAura(SPELL_TIED_UP);
-                    Talk(6, player);
-                }
-
-                _timer = 1000; _phase = 5;
-                break;
-            case 5:
-                break;
-            }
-        }
     };
 
     CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_marshal_gryan_stoutmantle_42750AI(creature);
+    }
+};
+
+// 79723
+class spell_tie_up_good_guys_79723 : public SpellScriptLoader
+{
+public:
+    spell_tie_up_good_guys_79723() : SpellScriptLoader("spell_tie_up_good_guys_79723") { }
+
+    class spell_tie_up_good_guys_79723_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_tie_up_good_guys_79723_SpellScript);
+
+        std::list<uint32> ggList;
+
+        bool Load() override
+        {
+            ggList.clear();
+            ggList.push_back(42750);
+            ggList.push_back(42744);
+            ggList.push_back(42745);
+            ggList.push_back(42751);
+            ggList.push_back(42752);
+            return true;
+        }
+
+        void FilterTargets(std::list<WorldObject*>& targets)
+        {
+            targets.remove_if(RemoveFromList(ggList, false, false));
+        }
+
+        void Register() override
+        {
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_tie_up_good_guys_79723_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_tie_up_good_guys_79723_SpellScript();
     }
 };
 
@@ -4091,7 +4293,7 @@ void AddSC_westfall()
     new npc_marshal_gryan_stoutmantle_234();
     new npc_lieutenant_horatio_laine_42744();
     new npc_stormwind_investigator_42745();
-    new npc_Ripsnarl_42748();
+    new npc_ripsnarl_42748();
     new npc_hope_saldean_42749();
     new npc_marshal_gryan_stoutmantle_42750();
     new npc_captain_danuvin_42751();
@@ -4099,5 +4301,7 @@ void AddSC_westfall()
     new npc_helix_gearbreaker_42753();
     new npc_glubtok_42755();
     new npc_defias_blackguard_42769();
+    new npc_rise_of_the_brotherhood_event_dummy_42771();
+    new spell_tie_up_good_guys_79723();
     new npc_thor_523;
 }
