@@ -16,6 +16,28 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+ // 2708
+class npc_archmage_malin_2708 : public CreatureScript
+{
+public:
+    npc_archmage_malin_2708() : CreatureScript("npc_archmage_malin_2708") { }
+
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action) override
+    {
+        player->PlayerTalkClass->ClearMenus();
+        if (action == 1)
+        {
+            player->CLOSE_GOSSIP_MENU();
+            player->TeleportTo(1, -3752.51f, -4456.33f, 64.97f, 0.7286f);
+            return true;
+        }
+        return false;
+    }
+};
+
+
+
 void AddSC_stormwind_city()
 {
+    new npc_archmage_malin_2708();
 }
