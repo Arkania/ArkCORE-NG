@@ -17,16 +17,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Westfall
-SD%Complete: 90
-SDComment: Quest support: 1651
-SDCategory: Westfall
-EndScriptData */
+ /* ScriptData
+ SDName: Westfall
+ SD%Complete: 90
+ SDComment: Quest support: 1651
+ SDCategory: Westfall
+ EndScriptData */
 
-/* ContentData
-npc_daphne_stilwell
-EndContentData */
+ /* ContentData
+ npc_daphne_stilwell
+ EndContentData */
 
 #include "script_helper.h"
 #include "Creature.h"
@@ -41,7 +41,7 @@ EndContentData */
 #include "Vehicle.h"
 
 
-// #############################################  quest 26209: Murder Was The Case That They Gave Me
+ // #############################################  quest 26209: Murder Was The Case That They Gave Me
 
 enum eQuest26209
 {
@@ -122,7 +122,7 @@ public:
                         }
         }
 
-        void MovementInform(uint32 type, uint32 id) override 
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (m_story_started)
                 if (type == POINT_MOTION_TYPE)
@@ -192,7 +192,7 @@ public:
                 {
                     if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
                         Talk(0, player);
-                    me->GetMotionMaster()->MovePoint(1031, m_investigationPosition);                    
+                    me->GetMotionMaster()->MovePoint(1031, m_investigationPosition);
                     break;
                 }
                 case EVENT_TALK_PART_03:
@@ -201,7 +201,7 @@ public:
                         Talk(1, player);
                     me->SetFacingTo(5.083f);
                     me->HandleEmoteCommand(EMOTE_ONESHOT_KNEEL);
-                    
+
                     m_events.ScheduleEvent(EVENT_TALK_PART_04, 5000);
                     break;
                 }
@@ -220,7 +220,7 @@ public:
                 case EVENT_TALK_PART_06:
                 {
                     // generate a cooldown before video shows again.
-                    m_events.ScheduleEvent(EVENT_TALK_PART_07, 60000); 
+                    m_events.ScheduleEvent(EVENT_TALK_PART_07, 60000);
                     break;
                 }
                 case EVENT_TALK_PART_07:
@@ -236,7 +236,7 @@ public:
         {
             if (!m_vernaGUID)
                 if (Creature* verna = me->FindNearestCreature(NPC_VERNA_FURLBROW, 20.0f))
-                 m_vernaGUID = verna->GetGUID();
+                    m_vernaGUID = verna->GetGUID();
             if (!m_invest_vernaGUID)
                 if (Creature* verna = ObjectAccessor::GetCreature(*me, m_vernaGUID))
                     if (Creature* invest = verna->FindNearestCreature(NPC_INVESTIGATOR_42309, 10.0f))
@@ -265,18 +265,18 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
-		if (player->GetAreaId() == 916)
-			if (!creature->HasAura(SPELL_COSMETIC_SLEEP_ZZZ))
-				if (!creature->IsInCombat())
-					if (player->GetQuestStatus(QUEST_MURDER_WAS_THE_CASE_THAT_THEY_GAVE_ME) == QUEST_STATUS_INCOMPLETE)
-					{
-						player->ADD_GOSSIP_ITEM_DB(11635, 0, GOSSIP_SENDER_MAIN, 1001);
-						player->ADD_GOSSIP_ITEM_DB(11635, 1, GOSSIP_SENDER_MAIN, 1002);
-						player->SEND_GOSSIP_MENU(16250, creature->GetGUID());
-						return true;
-					}
+        if (player->GetAreaId() == 916)
+            if (!creature->HasAura(SPELL_COSMETIC_SLEEP_ZZZ))
+                if (!creature->IsInCombat())
+                    if (player->GetQuestStatus(QUEST_MURDER_WAS_THE_CASE_THAT_THEY_GAVE_ME) == QUEST_STATUS_INCOMPLETE)
+                    {
+                        player->ADD_GOSSIP_ITEM_DB(11635, 0, GOSSIP_SENDER_MAIN, 1001);
+                        player->ADD_GOSSIP_ITEM_DB(11635, 1, GOSSIP_SENDER_MAIN, 1002);
+                        player->SEND_GOSSIP_MENU(16250, creature->GetGUID());
+                        return true;
+                    }
 
-		return false;
+        return false;
     }
 
     bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action) override
@@ -334,30 +334,30 @@ public:
     {
         npc_west_plains_driftersAI(Creature *c) : ScriptedAI(c) { }
 
-		EventMap m_events;
+        EventMap m_events;
 
         void Reset() override
         {
-			switch (me->GetAreaId())
-			{
-			case 108: // sentinel hill
-			{
-				if (me->HasAura(SPELL_COSMETIC_SLEEP_ZZZ))
-					m_events.RescheduleEvent(EVENT_CHECK_FOR_PLAYER, 1000);
-				break;
-			}
-			case 916: // jansens stead
-			{
+            switch (me->GetAreaId())
+            {
+            case 108: // sentinel hill
+            {
+                if (me->HasAura(SPELL_COSMETIC_SLEEP_ZZZ))
+                    m_events.RescheduleEvent(EVENT_CHECK_FOR_PLAYER, 1000);
+                break;
+            }
+            case 916: // jansens stead
+            {
                 if (!me->HasAura(SPELL_COSMETIC_SLEEP_ZZZ))
                     me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-				break;
-			}
-			}
+                break;
+            }
+            }
         }
 
         void JustDied(Unit* killer) override
         {
-            Position pos = me->GetNearPosition(frand(1.5f,2.5f), 0);
+            Position pos = me->GetNearPosition(frand(1.5f, 2.5f), 0);
             me->SummonCreature(NPC_RAGMUFFIN, pos, TEMPSUMMON_TIMED_DESPAWN, 20000);
             pos = me->GetNearPosition(frand(1.5f, 2.5f), 2);
             me->SummonCreature(NPC_RAGMUFFIN, pos, TEMPSUMMON_TIMED_DESPAWN, 20000);
@@ -367,31 +367,31 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-			m_events.Update(diff);
+            m_events.Update(diff);
 
-			while (uint32 eventId = m_events.ExecuteEvent())
-			{
-				switch (eventId)
-				{
-				case EVENT_CHECK_FOR_PLAYER:
-				{
-					if (Creature* feed = me->FindNearestCreature(NPC_WESTFALL_STEW, 10.0f, true))
-						if (Unit* charm = feed->GetCharmerOrOwner())
-							if (Player* player = charm->ToPlayer())
-							{
-								player->KilledMonsterCredit(NPC_WESTFALL_STEW);
-								me->RemoveAllAuras();
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_CHECK_FOR_PLAYER:
+                {
+                    if (Creature* feed = me->FindNearestCreature(NPC_WESTFALL_STEW, 10.0f, true))
+                        if (Unit* charm = feed->GetCharmerOrOwner())
+                            if (Player* player = charm->ToPlayer())
+                            {
+                                player->KilledMonsterCredit(NPC_WESTFALL_STEW);
+                                me->RemoveAllAuras();
                                 //me->SetByteValue(UNIT_FIELD_BYTES_1, 0, UNIT_STAND_STATE_STAND);
-								me->HandleEmoteCommand(EMOTE_STATE_USE_STANDING);
-								// Talk(11, player);
-								me->DespawnOrUnsummon(5000);
+                                me->HandleEmoteCommand(EMOTE_STATE_USE_STANDING);
+                                // Talk(11, player);
+                                me->DespawnOrUnsummon(5000);
                                 break;
-							}
+                            }
                     m_events.ScheduleEvent(EVENT_CHECK_FOR_PLAYER, 1000);
-					break;
-				}
-				}
-			}
+                    break;
+                }
+                }
+            }
 
             if (!UpdateVictim())
                 return;
@@ -412,21 +412,21 @@ class npc_transient : public CreatureScript
 public:
     npc_transient() : CreatureScript("npc_transient") { }
 
-	bool OnGossipHello(Player* player, Creature* creature) override
-	{
-		if (player->GetAreaId() == 916)
-			if (!creature->HasAura(SPELL_COSMETIC_SLEEP_ZZZ))
-				if (!creature->IsInCombat())
-					if (player->GetQuestStatus(QUEST_MURDER_WAS_THE_CASE_THAT_THEY_GAVE_ME) == QUEST_STATUS_INCOMPLETE)
-					{
-						player->ADD_GOSSIP_ITEM_DB(11635, 0, GOSSIP_SENDER_MAIN, 1001);
-						player->ADD_GOSSIP_ITEM_DB(11635, 1, GOSSIP_SENDER_MAIN, 1002);
-						player->SEND_GOSSIP_MENU(16250, creature->GetGUID());
-						return true;
-					}
+    bool OnGossipHello(Player* player, Creature* creature) override
+    {
+        if (player->GetAreaId() == 916)
+            if (!creature->HasAura(SPELL_COSMETIC_SLEEP_ZZZ))
+                if (!creature->IsInCombat())
+                    if (player->GetQuestStatus(QUEST_MURDER_WAS_THE_CASE_THAT_THEY_GAVE_ME) == QUEST_STATUS_INCOMPLETE)
+                    {
+                        player->ADD_GOSSIP_ITEM_DB(11635, 0, GOSSIP_SENDER_MAIN, 1001);
+                        player->ADD_GOSSIP_ITEM_DB(11635, 1, GOSSIP_SENDER_MAIN, 1002);
+                        player->SEND_GOSSIP_MENU(16250, creature->GetGUID());
+                        return true;
+                    }
 
-		return false;
-	}
+        return false;
+    }
 
     bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action) override
     {
@@ -561,21 +561,21 @@ class npc_homeless_stormwind_citizen_42386 : public CreatureScript
 public:
     npc_homeless_stormwind_citizen_42386() : CreatureScript("npc_homeless_stormwind_citizen_42386") { }
 
-	bool OnGossipHello(Player* player, Creature* creature) override
-	{
-		if (player->GetAreaId() == 916)
-			if (!creature->HasAura(SPELL_COSMETIC_SLEEP_ZZZ))
-				if (!creature->IsInCombat())
-					if (player->GetQuestStatus(QUEST_MURDER_WAS_THE_CASE_THAT_THEY_GAVE_ME) == QUEST_STATUS_INCOMPLETE)
-					{
-						player->ADD_GOSSIP_ITEM_DB(11635, 0, GOSSIP_SENDER_MAIN, 1001);
-						player->ADD_GOSSIP_ITEM_DB(11635, 1, GOSSIP_SENDER_MAIN, 1002);
-						player->SEND_GOSSIP_MENU(16250, creature->GetGUID());
-						return true;
-					}
+    bool OnGossipHello(Player* player, Creature* creature) override
+    {
+        if (player->GetAreaId() == 916)
+            if (!creature->HasAura(SPELL_COSMETIC_SLEEP_ZZZ))
+                if (!creature->IsInCombat())
+                    if (player->GetQuestStatus(QUEST_MURDER_WAS_THE_CASE_THAT_THEY_GAVE_ME) == QUEST_STATUS_INCOMPLETE)
+                    {
+                        player->ADD_GOSSIP_ITEM_DB(11635, 0, GOSSIP_SENDER_MAIN, 1001);
+                        player->ADD_GOSSIP_ITEM_DB(11635, 1, GOSSIP_SENDER_MAIN, 1002);
+                        player->SEND_GOSSIP_MENU(16250, creature->GetGUID());
+                        return true;
+                    }
 
-		return false;
-	}
+        return false;
+    }
 
     bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action) override
     {
@@ -711,72 +711,72 @@ class npc_homeless_stormwind_citizen_42384 : public CreatureScript
 public:
     npc_homeless_stormwind_citizen_42384() : CreatureScript("npc_homeless_stormwind_citizen_42384") { }
 
-	bool OnGossipHello(Player* player, Creature* creature) override
-	{
-		if (player->GetAreaId() == 916)
-			if (!creature->HasAura(SPELL_COSMETIC_SLEEP_ZZZ))
-				if (!creature->IsInCombat())
-					if (player->GetQuestStatus(QUEST_MURDER_WAS_THE_CASE_THAT_THEY_GAVE_ME) == QUEST_STATUS_INCOMPLETE)
-					{
-						player->ADD_GOSSIP_ITEM_DB(11635, 0, GOSSIP_SENDER_MAIN, 1001);
-						player->ADD_GOSSIP_ITEM_DB(11635, 1, GOSSIP_SENDER_MAIN, 1002);
-						player->SEND_GOSSIP_MENU(16250, creature->GetGUID());
-						return true;
-					}
+    bool OnGossipHello(Player* player, Creature* creature) override
+    {
+        if (player->GetAreaId() == 916)
+            if (!creature->HasAura(SPELL_COSMETIC_SLEEP_ZZZ))
+                if (!creature->IsInCombat())
+                    if (player->GetQuestStatus(QUEST_MURDER_WAS_THE_CASE_THAT_THEY_GAVE_ME) == QUEST_STATUS_INCOMPLETE)
+                    {
+                        player->ADD_GOSSIP_ITEM_DB(11635, 0, GOSSIP_SENDER_MAIN, 1001);
+                        player->ADD_GOSSIP_ITEM_DB(11635, 1, GOSSIP_SENDER_MAIN, 1002);
+                        player->SEND_GOSSIP_MENU(16250, creature->GetGUID());
+                        return true;
+                    }
 
-		return false;
-	}
+        return false;
+    }
 
-	bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action) override
-	{
-		switch (action)
-		{
-		case 1001:
-			creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-			creature->Attack(player, true);
-			player->Attack(creature, true);
-			creature->AI()->Talk(0, player);
-			break;
-		case 1002:
-			if (urand(0, 1) == 0)
-			{
-				creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-				creature->Attack(player, true);
-				player->Attack(creature, true);
-				creature->AI()->Talk(0, player);
-				break;
-			}
-			uint32 a1 = player->GetReqKillOrCastCurrentCount(QUEST_MURDER_WAS_THE_CASE_THAT_THEY_GAVE_ME, 42414);
-			uint32 a2 = player->GetReqKillOrCastCurrentCount(QUEST_MURDER_WAS_THE_CASE_THAT_THEY_GAVE_ME, 42415);
-			uint32 a3 = player->GetReqKillOrCastCurrentCount(QUEST_MURDER_WAS_THE_CASE_THAT_THEY_GAVE_ME, 42416);
-			uint32 a4 = player->GetReqKillOrCastCurrentCount(QUEST_MURDER_WAS_THE_CASE_THAT_THEY_GAVE_ME, 42417);
-			if (a1 == 0)
-			{
-				player->KilledMonsterCredit(42414);
-				creature->AI()->Talk(1, player);
-			}
-			else if (a2 == 0)
-			{
-				player->KilledMonsterCredit(42415);
-				creature->AI()->Talk(2, player);
-			}
-			else if (a3 == 0)
-			{
-				player->KilledMonsterCredit(42416);
-				creature->AI()->Talk(3, player);
-			}
-			else if (a4 == 0)
-			{
-				player->KilledMonsterCredit(42417);
-				creature->AI()->Talk(4, player);
-			}
-			creature->GetMotionMaster()->MoveRandom(10);
-			break;
-		}
-		player->CLOSE_GOSSIP_MENU();
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action) override
+    {
+        switch (action)
+        {
+        case 1001:
+            creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+            creature->Attack(player, true);
+            player->Attack(creature, true);
+            creature->AI()->Talk(0, player);
+            break;
+        case 1002:
+            if (urand(0, 1) == 0)
+            {
+                creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                creature->Attack(player, true);
+                player->Attack(creature, true);
+                creature->AI()->Talk(0, player);
+                break;
+            }
+            uint32 a1 = player->GetReqKillOrCastCurrentCount(QUEST_MURDER_WAS_THE_CASE_THAT_THEY_GAVE_ME, 42414);
+            uint32 a2 = player->GetReqKillOrCastCurrentCount(QUEST_MURDER_WAS_THE_CASE_THAT_THEY_GAVE_ME, 42415);
+            uint32 a3 = player->GetReqKillOrCastCurrentCount(QUEST_MURDER_WAS_THE_CASE_THAT_THEY_GAVE_ME, 42416);
+            uint32 a4 = player->GetReqKillOrCastCurrentCount(QUEST_MURDER_WAS_THE_CASE_THAT_THEY_GAVE_ME, 42417);
+            if (a1 == 0)
+            {
+                player->KilledMonsterCredit(42414);
+                creature->AI()->Talk(1, player);
+            }
+            else if (a2 == 0)
+            {
+                player->KilledMonsterCredit(42415);
+                creature->AI()->Talk(2, player);
+            }
+            else if (a3 == 0)
+            {
+                player->KilledMonsterCredit(42416);
+                creature->AI()->Talk(3, player);
+            }
+            else if (a4 == 0)
+            {
+                player->KilledMonsterCredit(42417);
+                creature->AI()->Talk(4, player);
+            }
+            creature->GetMotionMaster()->MoveRandom(10);
+            break;
+        }
+        player->CLOSE_GOSSIP_MENU();
 
-		return true;
-	}
+        return true;
+    }
 
     struct npc_homeless_stormwind_citizen_42384AI : public ScriptedAI
     {
@@ -890,7 +890,7 @@ public:
                 case EVENT_START_TALK:
                 {
                     if (Creature* homeless = ObjectAccessor::GetCreature(*me, m_homelessGUID))
-                    Talk(0, homeless);
+                        Talk(0, homeless);
                     break;
                 }
                 }
@@ -1131,10 +1131,10 @@ public:
 
 enum eQuest26232
 {
-	NPC_THUG = 42387,
-	NPC_JIMB = 42498,
-	QUEST_LOUS_PARTING_THOUGHTS = 26232,
-	SOUND_WOMAN_SCREAM = 17852,
+    NPC_THUG = 42387,
+    NPC_JIMB = 42498,
+    QUEST_LOUS_PARTING_THOUGHTS = 26232,
+    SOUND_WOMAN_SCREAM = 17852,
 };
 
 class npc_thug : public CreatureScript
@@ -1509,13 +1509,13 @@ public:
 
 enum eQuest26236
 {
-	NPC_FARMER_SALDEAN = 233,
-	NPC_SALMA_SALDEAN = 235,
-	NPC_HOPE_SALDEAN = 42575,
-	NPC_ORPHAN = 42385,
-	QUEST_SHAKEDOWN_AT_THE_SALDEANS = 26236,
-	QUEST_WESTFALL_STEW = 26241,
-	QUEST_HOPE_FOR_THE_PEOPLE = 26266,
+    NPC_FARMER_SALDEAN = 233,
+    NPC_SALMA_SALDEAN = 235,
+    NPC_HOPE_SALDEAN = 42575,
+    NPC_ORPHAN = 42385,
+    QUEST_SHAKEDOWN_AT_THE_SALDEANS = 26236,
+    QUEST_WESTFALL_STEW = 26241,
+    QUEST_HOPE_FOR_THE_PEOPLE = 26266,
 };
 
 // 235
@@ -2361,8 +2361,8 @@ enum eQuest26297
 {
     NPC_SHADOWY_FIGURE_42680 = 42680,
     QUEST_THE_DAWNING_OF_A_NEW_DAY = 26297,
-    SPELL_SUMMON_SHADOWY_FIGURE1 = 79552,  
-    SPELL_SUMMON_SHADOWY_FIGURE2 = 79551,  
+    SPELL_SUMMON_SHADOWY_FIGURE1 = 79552,
+    SPELL_SUMMON_SHADOWY_FIGURE2 = 79551,
 };
 
 class npc_van_cleef_dummy : public CreatureScript
@@ -2387,8 +2387,8 @@ public:
             _shadowy = nullptr;
         }
 
-        void JustSummoned(Creature* summon) 
-        { 
+        void JustSummoned(Creature* summon)
+        {
             summon->CastSpell(summon, 79192);
             _shadowy = summon;
         }
@@ -2511,7 +2511,7 @@ public:
                 Creature* creature = (*itr);
                 creature->AddAura(SPELL_COSMETIC_SLEEP_ZZZ, creature);
                 creature->SetByteValue(UNIT_FIELD_BYTES_1, 0, UNIT_STAND_STATE_SLEEP);
-            } 
+            }
         }
     };
 
@@ -2578,15 +2578,15 @@ public:
             me->SetDisplayId(11686);
         }
 
-        void IsSummonedBy(Unit* summoner) override 
-        { 
+        void IsSummonedBy(Unit* summoner) override
+        {
             if (Player* player = summoner->ToPlayer())
                 if (player->GetQuestStatus(QUEST_VISION_OF_THE_PAST) == QUEST_STATUS_INCOMPLETE)
                     m_playerGUID = player->GetGUID();
         }
 
-        void JustSummoned(Creature* summon) override 
-        { 
+        void JustSummoned(Creature* summon) override
+        {
             switch (summon->GetEntry())
             {
             case NPC_EDWIN_VAN_CLEEF:
@@ -2619,8 +2619,8 @@ public:
             }
         }
 
-        void PassengerBoarded(Unit* passenger, int8 seatId, bool apply) override 
-        { 
+        void PassengerBoarded(Unit* passenger, int8 seatId, bool apply) override
+        {
             if (Player* player = passenger->ToPlayer())
                 if (apply)
                 {
@@ -2716,7 +2716,7 @@ public:
                 {
                     if (Creature* cleef = ObjectAccessor::GetCreature(*me, m_edwinGUID))
                         cleef->AI()->Talk(1); /* %s calls more of his allies out of the shadows */
-                    
+
                     SpawnBlackguards();
 
                     m_events.ScheduleEvent(EVENT_TALK_PART_04, 2000);
@@ -2788,9 +2788,9 @@ public:
                 }
                 case EVENT_START_FIGHT:
                 {
-                    
+
                     /* ToDo: fight until edwin & guards are death*/
-                    
+
                     if (Creature* warrier = ObjectAccessor::GetCreature(*me, m_warrierGUID))
                     {
                         if (Creature* cleef = ObjectAccessor::GetCreature(*me, m_edwinGUID))
@@ -3005,7 +3005,7 @@ public:
             if (pList.size() > 0)
                 if (pList.find(playerGUID) != pList.end())
                     return false;
-                    
+
             return true;
         }
     };
@@ -3093,8 +3093,8 @@ public:
             m_playerGUID = 0;
         }
 
-        void DoAction(int32 /*param*/) override 
-        { 
+        void DoAction(int32 /*param*/) override
+        {
             m_events.ScheduleEvent(EVENT_START_PLAY, 250);
         }
 
@@ -3286,8 +3286,8 @@ public:
             }
         }
 
-        void MovementInform(uint32 type, uint32 id) override 
-        { 
+        void MovementInform(uint32 type, uint32 id) override
+        {
             if (type == POINT_MOTION_TYPE)
                 switch (id)
                 {
@@ -3322,23 +3322,23 @@ public:
             case 0:
                 break;
             case 1:
-                me->CastSpell(me, SPELL_RIPSNARL_TRANSFORM_HUMAN, true); 
+                me->CastSpell(me, SPELL_RIPSNARL_TRANSFORM_HUMAN, true);
                 //me->SetDisplayId(33062);
 
                 _timer = 3700; _phase = 2;
                 break;
-            case 2: 
+            case 2:
                 me->GetMotionMaster()->MovePoint(0, -10514.8f, 1045.6f, 60.80753f);
                 Talk(0);
 
                 _timer = 3000; _phase = 3;
                 break;
-            case 3: 
+            case 3:
                 me->GetMotionMaster()->MovePath(427481, false);
 
                 _timer = 2000; _phase = 4;
                 break;
-            case 4: 
+            case 4:
                 me->CastSpell(me, SPELL_ADMIRALS_HAT, true);
 
                 _timer = 5000; _phase = 5;
@@ -3677,8 +3677,8 @@ public:
             me->SetOrientation(2.024f);
         }
 
-        void IsSummonedBy(Unit* summoner) override 
-        { 
+        void IsSummonedBy(Unit* summoner) override
+        {
             if (Player* player = summoner->ToPlayer())
                 m_playerGUID = player->GetGUID();
         }
@@ -3732,7 +3732,7 @@ public:
                 me->DespawnOrUnsummon(2000);
                 break;
             }
-            }           
+            }
         }
 
         void UpdateAI(uint32 diff) override
@@ -4020,7 +4020,7 @@ public:
             {
                 switch (eventId)
                 {
-                // video start. 
+                    // video start. 
                 case EVENT_START_TALK:
                 {
                     if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
@@ -4028,7 +4028,7 @@ public:
                     m_events.ScheduleEvent(EVENT_TALK_PART_00, 2000);
                     break;
                 }
-                case EVENT_TALK_PART_00 :
+                case EVENT_TALK_PART_00:
                 {
                     if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
                         player->CastSpell(player, SPELL_GENERIC_TRIGGER_1_HOPE, false); // tic 3
@@ -4106,16 +4106,16 @@ public:
 
 enum DaphneStilwell
 {
-	SAY_DS_START = 0,
-	SAY_DS_DOWN_1 = 1,
-	SAY_DS_DOWN_2 = 2,
-	SAY_DS_DOWN_3 = 3,
-	SAY_DS_PROLOGUE = 4,
+    SAY_DS_START = 0,
+    SAY_DS_DOWN_1 = 1,
+    SAY_DS_DOWN_2 = 2,
+    SAY_DS_DOWN_3 = 3,
+    SAY_DS_PROLOGUE = 4,
 
-	SPELL_SHOOT = 6660,
-	QUEST_TOME_VALOR = 1651,
-	NPC_DEFIAS_RAIDER = 6180,
-	EQUIP_ID_RIFLE = 2511
+    SPELL_SHOOT = 6660,
+    QUEST_TOME_VALOR = 1651,
+    NPC_DEFIAS_RAIDER = 6180,
+    EQUIP_ID_RIFLE = 2511
 };
 
 class npc_daphne_stilwell : public CreatureScript

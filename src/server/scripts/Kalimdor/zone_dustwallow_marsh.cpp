@@ -26,7 +26,7 @@
 #include "Player.h"
 #include "WorldSession.h"
 
-// 4968
+ // 4968
 class npc_lady_jaina_proudmoore_4968 : public CreatureScript
 {
 public:
@@ -43,8 +43,8 @@ public:
         return false;
     }
 
-    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*opt*/) 
-    { 
+    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*opt*/)
+    {
         switch (quest->GetQuestId())
         {
         case 27239:
@@ -55,7 +55,7 @@ public:
         }
         }
 
-        return false; 
+        return false;
     }
 
     struct npc_lady_jaina_proudmoore_4968AI : public ScriptedAI
@@ -130,8 +130,8 @@ public:
             return ObjectAccessor::GetPlayer(*me, m_playerGUID);
         }
 
-        void EnterCombat(Unit* victim) override 
-        { 
+        void EnterCombat(Unit* victim) override
+        {
             float dist = me->GetDistance(victim);
             if (dist > 30.0f)
                 CastBall(victim);
@@ -149,8 +149,8 @@ public:
             }
         }
 
-        void DamageTaken(Unit* attacker, uint32& damage) override 
-        { 
+        void DamageTaken(Unit* attacker, uint32& damage) override
+        {
             float m_healthPct = me->GetHealthPct();
             float m_manaPct = (100.0f / me->GetMaxPower(POWER_MANA)) * me->GetPower(POWER_MANA);
             float dist = me->GetDistance(attacker);
@@ -178,8 +178,8 @@ public:
             }
         }
 
-        void EnterEvadeMode() override 
-        { 
+        void EnterEvadeMode() override
+        {
             StartMovingHome();
         }
 
@@ -399,7 +399,7 @@ public:
     bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action) override
     {
         player->PlayerTalkClass->ClearMenus();
-        if (action == 1) 
+        if (action == 1)
         {
             player->CLOSE_GOSSIP_MENU();
             player->CastSpell(player, 42295, true);
@@ -483,151 +483,151 @@ public:
 // 42485
 class spell_ooze_zap : public SpellScriptLoader
 {
-    public:
-        spell_ooze_zap() : SpellScriptLoader("spell_ooze_zap") { }
+public:
+    spell_ooze_zap() : SpellScriptLoader("spell_ooze_zap") { }
 
-        enum SpellScripts
+    enum SpellScripts
+    {
+        SPELL_OOZE_ZAP = 42489,
+    };
+
+    class spell_ooze_zap_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_ooze_zap_SpellScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            SPELL_OOZE_ZAP = 42489,
-        };
-
-        class spell_ooze_zap_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_ooze_zap_SpellScript);
-
-            bool Validate(SpellInfo const* /*spellInfo*/) override
-            {
-                if (!sSpellMgr->GetSpellInfo(SPELL_OOZE_ZAP))
-                    return false;
-                return true;
-            }
-
-            SpellCastResult CheckRequirement()
-            {
-                if (!GetCaster()->HasAura(GetSpellInfo()->Effects[EFFECT_1].CalcValue()))
-                    return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW; // This is actually correct
-
-                if (!GetExplTargetUnit())
-                    return SPELL_FAILED_BAD_TARGETS;
-
-                return SPELL_CAST_OK;
-            }
-
-            void HandleDummy(SpellEffIndex effIndex)
-            {
-                PreventHitDefaultEffect(effIndex);
-                if (GetHitUnit())
-                    GetCaster()->CastSpell(GetHitUnit(), uint32(GetEffectValue()), true);
-            }
-
-            void Register() override
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_ooze_zap_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-                OnCheckCast += SpellCheckCastFn(spell_ooze_zap_SpellScript::CheckRequirement);
-            }
-        };
-
-        SpellScript* GetSpellScript() const override
-        {
-            return new spell_ooze_zap_SpellScript();
+            if (!sSpellMgr->GetSpellInfo(SPELL_OOZE_ZAP))
+                return false;
+            return true;
         }
+
+        SpellCastResult CheckRequirement()
+        {
+            if (!GetCaster()->HasAura(GetSpellInfo()->Effects[EFFECT_1].CalcValue()))
+                return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW; // This is actually correct
+
+            if (!GetExplTargetUnit())
+                return SPELL_FAILED_BAD_TARGETS;
+
+            return SPELL_CAST_OK;
+        }
+
+        void HandleDummy(SpellEffIndex effIndex)
+        {
+            PreventHitDefaultEffect(effIndex);
+            if (GetHitUnit())
+                GetCaster()->CastSpell(GetHitUnit(), uint32(GetEffectValue()), true);
+        }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_ooze_zap_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+            OnCheckCast += SpellCheckCastFn(spell_ooze_zap_SpellScript::CheckRequirement);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_ooze_zap_SpellScript();
+    }
 };
 
 // 42489
 class spell_ooze_zap_channel_end : public SpellScriptLoader
 {
-    public:
-        spell_ooze_zap_channel_end() : SpellScriptLoader("spell_ooze_zap_channel_end") { }
+public:
+    spell_ooze_zap_channel_end() : SpellScriptLoader("spell_ooze_zap_channel_end") { }
 
-        enum SpellScripts
+    enum SpellScripts
+    {
+        SPELL_OOZE_ZAP_CHANNEL_END = 42485,
+        SPELL_OOZE_CHANNEL_CREDIT = 42486,
+    };
+
+    class spell_ooze_zap_channel_end_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_ooze_zap_channel_end_SpellScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            SPELL_OOZE_ZAP_CHANNEL_END = 42485,
-            SPELL_OOZE_CHANNEL_CREDIT = 42486,
-        };
-
-        class spell_ooze_zap_channel_end_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_ooze_zap_channel_end_SpellScript);
-
-            bool Validate(SpellInfo const* /*spellInfo*/) override
-            {
-                if (!sSpellMgr->GetSpellInfo(SPELL_OOZE_ZAP_CHANNEL_END))
-                    return false;
-                return true;
-            }
-
-            void HandleDummy(SpellEffIndex effIndex)
-            {
-                PreventHitDefaultEffect(effIndex);
-                if (Player* player = GetCaster()->ToPlayer())
-                    player->CastSpell(player, SPELL_OOZE_CHANNEL_CREDIT, true);
-                GetHitUnit()->Kill(GetHitUnit());
-            }
-
-            void Register() override
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_ooze_zap_channel_end_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-            }
-        };
-
-        SpellScript* GetSpellScript() const override
-        {
-            return new spell_ooze_zap_channel_end_SpellScript();
+            if (!sSpellMgr->GetSpellInfo(SPELL_OOZE_ZAP_CHANNEL_END))
+                return false;
+            return true;
         }
+
+        void HandleDummy(SpellEffIndex effIndex)
+        {
+            PreventHitDefaultEffect(effIndex);
+            if (Player* player = GetCaster()->ToPlayer())
+                player->CastSpell(player, SPELL_OOZE_CHANNEL_CREDIT, true);
+            GetHitUnit()->Kill(GetHitUnit());
+        }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_ooze_zap_channel_end_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_ooze_zap_channel_end_SpellScript();
+    }
 };
 
 // 42492
 class spell_energize_aoe : public SpellScriptLoader
 {
-    public:
-        spell_energize_aoe() : SpellScriptLoader("spell_energize_aoe") { }
+public:
+    spell_energize_aoe() : SpellScriptLoader("spell_energize_aoe") { }
 
-        enum SpellScripts
+    enum SpellScripts
+    {
+        SPELL_ENERGIZED = 42492,
+    };
+
+    class spell_energize_aoe_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_energize_aoe_SpellScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            SPELL_ENERGIZED = 42492,
-        };
-
-        class spell_energize_aoe_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_energize_aoe_SpellScript);
-
-            bool Validate(SpellInfo const* /*spellInfo*/) override
-            {
-                if (!sSpellMgr->GetSpellInfo(SPELL_ENERGIZED))
-                    return false;
-                return true;
-            }
-
-            void FilterTargets(std::list<WorldObject*>& targets)
-            {
-                for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end();)
-                {
-                    if ((*itr)->GetTypeId() == TYPEID_PLAYER && (*itr)->ToPlayer()->GetQuestStatus(GetSpellInfo()->Effects[EFFECT_1].CalcValue()) == QUEST_STATUS_INCOMPLETE)
-                        ++itr;
-                    else
-                        targets.erase(itr++);
-                }
-                targets.push_back(GetCaster());
-            }
-
-            void HandleScript(SpellEffIndex effIndex)
-            {
-                PreventHitDefaultEffect(effIndex);
-                GetCaster()->CastSpell(GetCaster(), uint32(GetEffectValue()), true);
-            }
-
-            void Register() override
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_energize_aoe_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_energize_aoe_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
-                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_energize_aoe_SpellScript::FilterTargets, EFFECT_1, TARGET_UNIT_SRC_AREA_ENTRY);
-            }
-        };
-
-        SpellScript* GetSpellScript() const override
-        {
-            return new spell_energize_aoe_SpellScript();
+            if (!sSpellMgr->GetSpellInfo(SPELL_ENERGIZED))
+                return false;
+            return true;
         }
+
+        void FilterTargets(std::list<WorldObject*>& targets)
+        {
+            for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end();)
+            {
+                if ((*itr)->GetTypeId() == TYPEID_PLAYER && (*itr)->ToPlayer()->GetQuestStatus(GetSpellInfo()->Effects[EFFECT_1].CalcValue()) == QUEST_STATUS_INCOMPLETE)
+                    ++itr;
+                else
+                    targets.erase(itr++);
+            }
+            targets.push_back(GetCaster());
+        }
+
+        void HandleScript(SpellEffIndex effIndex)
+        {
+            PreventHitDefaultEffect(effIndex);
+            GetCaster()->CastSpell(GetCaster(), uint32(GetEffectValue()), true);
+        }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_energize_aoe_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_energize_aoe_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_energize_aoe_SpellScript::FilterTargets, EFFECT_1, TARGET_UNIT_SRC_AREA_ENTRY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_energize_aoe_SpellScript();
+    }
 };
 
 // 186287

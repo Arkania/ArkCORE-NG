@@ -43,7 +43,8 @@ EndScriptData */
 #include "Vehicle.h"
 #include "zone_gilneas.h"
 
-// Phase 1
+// Phase 1/169
+// Phase 4096/181 is used from reward quest 14222 and forward
 
 // 36332
 class npc_king_genn_greymane_36332 : public CreatureScript
@@ -54,7 +55,7 @@ public:
     enum e14375
     {
         QUEST_LAST_CHANCE_AT_HUMANITY = 14375,
-        SPELL_PHASE_QUEST_ZONE_SPECIFIC_06 = 68481,
+        SPELL_PHASE_QUEST_ZONE_SPECIFIC_06 = 68481, // phaseId 181
         SPELL_FADE_BACK = 94053,
         SPELL_LAST_STAND_COMPLETE = 72799,
         NPC_LORD_GODFREY_36330 = 36330,
@@ -94,7 +95,9 @@ public:
         SPELL_CATACLYSM_1 = 68953,
         SPELL_CATACLYSM_2 = 80134,
         SPELL_CATACLYSM_3 = 80133,
-        SPELL_LAST_STAND_COMPLETE_2 = 72799,
+        //SPELL_LAST_STAND_COMPLETE_2 = 72799,
+        SPELL_IN_STOCKS = 69169,
+        SPELL_SELF_ROOT = 42716,
         EVENT_CHECK_ARRIVEL_PLAYER = 101,
         EVENT_TALK_0,
         EVENT_TALK_1,
@@ -106,33 +109,31 @@ public:
 
     struct npc_krennan_aranas_36331AI : public ScriptedAI
     {
-        npc_krennan_aranas_36331AI(Creature* creature) : ScriptedAI(creature) { }
+        npc_krennan_aranas_36331AI(Creature* creature) : ScriptedAI(creature) { Initialize();  }
 
         EventMap  m_events;
         bool      m_videoStarted;
         uint64    m_playerGUID;
         uint64    m_kingGUID;
         uint64    m_godfreyGUID;
+        std::set<uint64> pList;
 
-        void Reset() override
+        void Initialize()
         {
             m_videoStarted = false;
             m_playerGUID = 0;
+        }
+
+        void Reset() override
+        {
             m_kingGUID = 0;
             m_godfreyGUID = 0;
-            m_events.Reset();
-            m_events.ScheduleEvent(EVENT_CHECK_ARRIVEL_PLAYER, 1000);
+            m_events.RescheduleEvent(EVENT_CHECK_ARRIVEL_PLAYER, 1000);
         }
 
         void UpdateAI(uint32 diff) override
         {
             m_events.Update(diff);
-
-            if (CheckPlayerIsInvalid())
-            {
-                Reset();
-                return;
-            }
 
             while (uint32 eventId = m_events.ExecuteEvent())
             {
@@ -140,26 +141,21 @@ public:
                 {
                     case EVENT_CHECK_ARRIVEL_PLAYER:
                     {
-                        if (Player* player = me->FindNearestPlayer(10.0f))
-                            if (player->GetQuestStatus(QUEST_LAST_STAND) == QUEST_STATUS_REWARDED && player->GetQuestStatus(QUEST_LAST_CHANCE_AT_HUMANITY) == QUEST_STATUS_NONE)
-                                if (!m_videoStarted)
-                                {
-                                    player->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_DISABLE_TURN);
-                                    m_playerGUID = player->GetGUID();
-                                    m_videoStarted = true;
-                                    if (!m_kingGUID)
-                                        if (Creature* king = me->FindNearestCreature(NPC_KING_GREYMANE, 25.0f))
-                                            m_kingGUID = king->GetGUID();
-                                    if (!m_godfreyGUID)
-                                        if (Creature* lord = me->FindNearestCreature(NPC_LORD_GODFREY, 25.0f))
-                                            m_godfreyGUID = lord->GetGUID();
+                        CheckVideoMember();
+                        if (!m_videoStarted)
+                            if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                            {
+                                player->CastSpell(player, SPELL_IN_STOCKS, true);
+                                player->CastSpell(player, SPELL_SELF_ROOT, true);
+                                player->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_DISABLE_TURN);
+                                m_videoStarted = true;
 
-                                    m_events.ScheduleEvent(EVENT_TALK_0, 4000);
-                                    return;
-                                }
+                                m_events.ScheduleEvent(EVENT_TALK_0, 4000);
+                                return;
+                            }
 
                         m_videoStarted = false;
-
+                        m_playerGUID = 0;
                         m_events.ScheduleEvent(EVENT_CHECK_ARRIVEL_PLAYER, 1000);
                         break;
                     }
@@ -167,6 +163,9 @@ public:
                     {
                         if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
                             Talk(0, player);
+                        if (Creature* king = sObjectAccessor->GetCreature(*me, m_kingGUID))
+                            king->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+
                         m_events.ScheduleEvent(EVENT_TALK_1, 14000);
                         break;
                     }
@@ -206,24 +205,60 @@ public:
                     case EVENT_TALK_4:
                     {
                         if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
-                            player->CastSpell(player, SPELL_LAST_STAND_COMPLETE_2);
+                        {
+                            //player->CastSpell(player, SPELL_LAST_STAND_COMPLETE_2);
+                            AddPlayer();
+                        }
+                        if (Creature* king = sObjectAccessor->GetCreature(*me, m_kingGUID))
+                            king->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
 
+                        m_videoStarted = false;
+                        m_playerGUID = 0;
+                        m_events.ScheduleEvent(EVENT_CHECK_ARRIVEL_PLAYER, 1000);
                         break;
                     }
                 }
             }
         }
 
-        bool CheckPlayerIsInvalid()
+        void CheckVideoMember()
         {
-            if (!m_playerGUID)
-                return false;
+            if (!m_kingGUID)
+                if (Creature* king = me->FindNearestCreature(NPC_KING_GREYMANE, 25.0f))
+                    m_kingGUID = king->GetGUID();
+            if (!m_godfreyGUID)
+                if (Creature* lord = me->FindNearestCreature(NPC_LORD_GODFREY, 25.0f))
+                    m_godfreyGUID = lord->GetGUID();
 
-            if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
-                if (player->IsAlive() && player->IsInWorld())
-                    if (player->GetDistance2d(me) < 10.0f)
-                        return false;
-            return true;
+            if (m_videoStarted)
+                return;
+
+            uint32 zoneId = 0;
+            uint32 areaId = 0;
+            if (Player* player = me->FindNearestPlayer(10.0f))
+                if (!HasPlayer(player->GetGUID()))
+                    if (player->GetQuestStatus(QUEST_LAST_STAND) == QUEST_STATUS_REWARDED && player->GetQuestStatus(QUEST_LAST_CHANCE_AT_HUMANITY) == QUEST_STATUS_NONE)
+                    {
+                        player->GetZoneAndAreaId(zoneId, areaId);
+                        if (areaId == 4786)
+                        {
+                            m_playerGUID = player->GetGUID();
+                            return;
+                        }
+
+                    }
+            m_playerGUID = 0;
+        }
+
+        void AddPlayer()
+        {
+            if (!HasPlayer(m_playerGUID))
+                pList.insert(m_playerGUID);
+        }
+
+        bool HasPlayer(uint64 guid)
+        {
+            return (pList.find(guid) != pList.end());
         }
     };
 
@@ -232,8 +267,6 @@ public:
         return new npc_krennan_aranas_36331AI(creature);
     }
 };
-
-// Phase 4096
 
 // 34571
 class npc_gwen_armstead_34571 : public CreatureScript
@@ -244,8 +277,8 @@ public:
     enum eNpc
     {
         QUEST_KILL_OR_BE_KILLED = 14336,
-        SPELL_PHASE_QUEST_ZONE_SPECIFIC_06 = 68481,
-        SPELL_PHASE_QUEST_ZONE_SPECIFIC_07 = 68482,
+        SPELL_PHASE_QUEST_ZONE_SPECIFIC_06 = 68481, // 181
+        SPELL_PHASE_QUEST_ZONE_SPECIFIC_07 = 68482, // 182
     };
 
     bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
@@ -254,8 +287,9 @@ public:
         {
             player->RemoveAura(SPELL_PHASE_QUEST_ZONE_SPECIFIC_06);
             player->CastSpell(player, SPELL_PHASE_QUEST_ZONE_SPECIFIC_07);
+            return true;
         }
-        return true;
+        return false;
     }
 };
 
@@ -273,12 +307,13 @@ public:
             WorldPacket data(SMSG_PLAY_SOUND, 4);
             data << uint32(23676);
             player->GetSession()->SendPacket(&data);
+            return true;
         }
-        return true;
+        return false;
     }
 };
 
-// Phase 8192
+// Phase 8192/182
 
 // 36231  // Quest - You Can't Take 'Em Alone - 14348
 class npc_horrid_abomination_36231 : public CreatureScript

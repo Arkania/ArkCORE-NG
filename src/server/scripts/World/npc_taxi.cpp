@@ -17,13 +17,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Npc_Taxi
-SD%Complete: 0%
-SDComment: To be used for taxi NPCs that are located globally.
-SDCategory: NPCs
-EndScriptData
-*/
+ /* ScriptData
+ SDName: Npc_Taxi
+ SD%Complete: 0%
+ SDComment: To be used for taxi NPCs that are located globally.
+ SDCategory: NPCs
+ EndScriptData
+ */
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
@@ -342,33 +342,33 @@ public:
             {
                 switch (eventId)
                 {
-                    case EVENT_CHECK_FOR_PLAYER:
+                case EVENT_CHECK_FOR_PLAYER:
+                {
+                    go->GetZoneAndAreaId(m_zone, m_area);
+                    switch (m_area)
                     {
-                        go->GetZoneAndAreaId(m_zone, m_area);
-                            switch (m_area)
-                            {
-                                case 4999:
-                                {
-                                    if (Player* player = go->FindNearestPlayer(3.0f))
-                                        player->TeleportTo(1, 5033.43f, -2029.12f, 1148.98f, 0.2322f);
-                                    break;
-                                }
-                                case 5050:
-                                {
-                                    if (Player* player = go->FindNearestPlayer(3.0f))
-                                        player->TeleportTo(1, 4554.59f, -2602.04f, 1124.29f, 8.4632f);
-                                    break;
-                                }
-                                case 5064:
-                                {
-                                    if (Player* player = go->FindNearestPlayer(3.0f))
-                                        player->TeleportTo(1, 5037.18f, -2044.26f, 1368.80f, 2.1910f);
-                                    break;
-                                }
-                            }
-                        m_events.ScheduleEvent(EVENT_CHECK_FOR_PLAYER, 1000);
+                    case 4999:
+                    {
+                        if (Player* player = go->FindNearestPlayer(3.0f))
+                            player->TeleportTo(1, 5033.43f, -2029.12f, 1148.98f, 0.2322f);
                         break;
                     }
+                    case 5050:
+                    {
+                        if (Player* player = go->FindNearestPlayer(3.0f))
+                            player->TeleportTo(1, 4554.59f, -2602.04f, 1124.29f, 8.4632f);
+                        break;
+                    }
+                    case 5064:
+                    {
+                        if (Player* player = go->FindNearestPlayer(3.0f))
+                            player->TeleportTo(1, 5037.18f, -2044.26f, 1368.80f, 2.1910f);
+                        break;
+                    }
+                    }
+                    m_events.ScheduleEvent(EVENT_CHECK_FOR_PLAYER, 1000);
+                    break;
+                }
                 }
             }
         }
