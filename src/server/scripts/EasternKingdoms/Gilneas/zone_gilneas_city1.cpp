@@ -3020,7 +3020,7 @@ public:
         {
             creature->GetAI()->SetGUID(player->GetGUID(), PLAYER_GUID);
             player->CastSpell(player, SPELL_GENERIC_QUEST_INVISIBILITY_DETECTION_1);
-            player->CastSpell(player, SPELL_FORCECAST_SUMMON_GRAYMANE_HORSE, true);
+            creature->CastSpell(player, SPELL_FORCECAST_SUMMON_GRAYMANE_HORSE, true);
         }
         return true;
     }
