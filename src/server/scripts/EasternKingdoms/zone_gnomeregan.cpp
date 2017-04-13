@@ -40,6 +40,171 @@ EndScriptData */
 #include "MovementGenerator.h"
 #include "TargetedMovementGenerator.h"
 
+// 45847
+class npc_safe_operative_45847 : public CreatureScript
+{
+public:
+    npc_safe_operative_45847() : CreatureScript("npc_safe_operative_45847") { }
+
+    struct npc_safe_operative_45847AI : public ScriptedAI
+    {
+        npc_safe_operative_45847AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+        EventMap m_events;
+        FakeAttackMembers m_fakeAttack;
+
+        void Initialize()
+        {
+            m_fakeAttack = FakeAttackMembers(me);
+        }
+
+        void Reset() override
+        {
+            me->GetMotionMaster()->MoveIdle();
+            me->SetReactState(REACT_DEFENSIVE);
+            m_events.RescheduleEvent(EVENT_CHECK_FOR_CREATURE, 1000);
+        }
+
+        void DamageTaken(Unit* attacker, uint32& damage) override 
+        { 
+            if (m_fakeAttack.IsSparringPartner(attacker))
+                damage = 0;
+        }
+
+        void AttackStart(Unit* who) override
+        {
+            if (m_fakeAttack.IsSparringPartner(who))
+                AttackStartNoMove(who);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            if (!m_fakeAttack.m_hasInit)
+            {
+                std::list<uint32> sList;
+                sList.push_back(46391);
+                m_fakeAttack.Initialize(sList);
+            }
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_CHECK_FOR_CREATURE:
+                {
+                    if (Creature* creature = m_fakeAttack.GetSparringPartner())
+                    {
+                        if (!me->IsInCombat())
+                            me->Attack(creature, true);
+                    }
+                    else if (Creature* creature = m_fakeAttack.GetRangedPartner())
+                    {
+                        me->SetFacingToObject(creature);
+                        if (uint32 spellId = m_fakeAttack.GetRangedSpellId())
+                            me->CastSpell(creature, spellId, true);
+                        me->GetMotionMaster()->MoveIdle();
+                    }
+
+                    m_events.ScheduleEvent(EVENT_CHECK_FOR_CREATURE, urand(900, 1200));
+                    break;
+                }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_safe_operative_45847AI(creature);
+    }
+};
+
+// 46391
+class npc_crazed_leper_gnome_46391 : public CreatureScript
+{
+public:
+    npc_crazed_leper_gnome_46391() : CreatureScript("npc_crazed_leper_gnome_46391") { }
+
+    struct npc_crazed_leper_gnome_46391AI : public ScriptedAI
+    {
+        npc_crazed_leper_gnome_46391AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+        EventMap m_events;
+        FakeAttackMembers m_fakeAttack;
+
+        void Initialize()
+        {
+            m_fakeAttack = FakeAttackMembers(me);
+        }
+
+        void Reset() override
+        {
+            me->GetMotionMaster()->MoveIdle();
+            me->SetReactState(REACT_DEFENSIVE);
+            m_events.RescheduleEvent(EVENT_CHECK_FOR_CREATURE, 1000);
+        }
+
+        void DamageTaken(Unit* attacker, uint32& damage) override
+        {
+            if (m_fakeAttack.IsSparringPartner(attacker))
+                damage = 0;
+        }
+
+        void AttackStart(Unit* who) override
+        {
+            if (m_fakeAttack.IsSparringPartner(who))
+                AttackStartNoMove(who);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            if (!m_fakeAttack.m_hasInit)
+            {
+                std::list<uint32> sList;
+                sList.push_back(45847);
+                m_fakeAttack.Initialize(sList);
+            }
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_CHECK_FOR_CREATURE:
+                {
+                    if (Creature* creature = m_fakeAttack.GetSparringPartner())
+                    {
+                        if (!me->IsInCombat())
+                            me->Attack(creature, true);
+                    }
+
+                    m_events.ScheduleEvent(EVENT_CHECK_FOR_CREATURE, urand(900, 1200));
+                    break;
+                }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            
+            DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_crazed_leper_gnome_46391AI(creature);
+    }
+};
+
 // 42501
 class npc_wounded_infantry_42501 : public CreatureScript
 {
@@ -135,7 +300,7 @@ public:
     {
         QUEST_WITHDRAW_TO_THE_LOADING_ROOM = 28169,
         NPC_IMUN_AGENT = 47836,
-        MOVE_IMUN_AGENT = 15459904
+        MOVE_IMUN_AGENT = 4783600
     };
 
     bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
@@ -960,6 +1125,8 @@ public:
 
 void AddSC_zone_gnomeregan()
 {
+    new npc_safe_operative_45847();
+    new npc_crazed_leper_gnome_46391();
     new npc_wounded_infantry_42501();
     new npc_nevin_twistwrench_45966();
     new npc_carvo_blastbolt_47250();
