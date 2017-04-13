@@ -1933,29 +1933,7 @@ void Spell::EffectTriggerMissileSpell(SpellEffIndex effIndex)
 
 void Spell::EffectForceCast(SpellEffIndex effIndex)
 {
-    if (effectHandleMode == SPELL_EFFECT_HANDLE_HIT)
-    {
-        if (m_originalCaster && m_caster && destTarget && destTarget->IsPositionValid())
-        {
-            uint32 triggered_spell_id = m_spellInfo->Effects[effIndex].TriggerSpell;
-
-            // normal case
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(triggered_spell_id);
-
-            if (!spellInfo)
-            {
-                TC_LOG_ERROR("spells", "Spell::EffectForceCast of spell %u: triggering unknown spell id %i", m_spellInfo->Id, triggered_spell_id);
-                return;
-            }
-
-            float x, y, z;
-            destTarget->GetPosition(x, y, z);
-            m_originalCaster->CastSpell(x, y, z, triggered_spell_id, true, NULL, NULL, m_originalCasterGUID);
-        }
-
-        return;
-    }
-    else if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
+    if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
         return;
 
     if (!unitTarget)
@@ -1972,10 +1950,12 @@ void Spell::EffectForceCast(SpellEffIndex effIndex)
         return;
     }
 
-    if (m_spellInfo->Effects[effIndex].Effect == SPELL_EFFECT_FORCE_CAST && damage)
+    if (m_spellInfo->Effects[effIndex].Effect == SPELL_EFFECT_FORCE_CAST)
     {
-        switch (m_spellInfo->Id)
+        if (damage)
         {
+            switch (m_spellInfo->Id)
+            {
             case 52588: // Skeletal Gryphon Escape
             case 48598: // Ride Flamebringer Cue
                 unitTarget->RemoveAura(damage);
@@ -1987,6 +1967,18 @@ void Spell::EffectForceCast(SpellEffIndex effIndex)
             case 72299: // Malleable Goo Summon Trigger
                 unitTarget->CastSpell(unitTarget, spellInfo->Id, true, NULL, NULL, m_originalCasterGUID);
                 return;
+            }
+        }
+        else
+        {
+            switch (m_spellInfo->Id)
+            {
+            case 57405: // should forecast 61698
+                float horizontalSpeed = 20.0f + (40.0f - unitTarget->GetDistance(m_caster));
+                float verticalSpeed = 8.0f;
+                unitTarget->KnockbackFrom(m_caster->GetPositionX(), unitTarget->GetPositionY(), horizontalSpeed, verticalSpeed);
+                return;
+            }
         }
     }
 
