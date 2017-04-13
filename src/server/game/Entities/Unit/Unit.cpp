@@ -9097,13 +9097,16 @@ uint32 Unit::GetFakeAttackFlag()
         return 0;
 
     if (m_SparringAttackFlag < 0)
-    {
-        FactionTemplateEntry const* meFEntry = GetFactionTemplateEntry();
-        uint32 meFlags = meFEntry->factionFlags;
-        m_SparringAttackFlag = ((meFlags & (FACTION_TEMPLATE_ENEMY_SPARRING_1 & FACTION_TEMPLATE_ENEMY_SPARRING_2 & FACTION_TEMPLATE_ENEMY_SPARRING_4)) >> 3) & 7;
-    }
+        m_SparringAttackFlag = GetInitFakeAttackFlag();
 
     return m_SparringAttackFlag;
+}
+
+uint32 Unit::GetInitFakeAttackFlag()
+{
+    FactionTemplateEntry const* meFEntry = GetFactionTemplateEntry();
+    uint32 meFlags = meFEntry->factionFlags;
+    return((meFlags & (FACTION_TEMPLATE_ENEMY_SPARRING_1 & FACTION_TEMPLATE_ENEMY_SPARRING_2 & FACTION_TEMPLATE_ENEMY_SPARRING_4)) >> 3) & 7;
 }
 
 bool Unit::IsFakeAttack(Unit* victim)
@@ -9126,30 +9129,39 @@ uint32 Unit::GetRangedFakeAttackSpell()
     if (!GetFakeAttackFlag())
         return 0;
 
-    // check has ranged weapon equipped
+    // check has ranged weapon and/or equipped
+    uint32 weapon = GetRangedAttackWeapon();
+    if (!weapon)
+        return 0;
 
-    uint32 equippedRangedWeapon = GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + RANGED_ATTACK);
+    return GetRangedAttackSpell();
+}
 
-    if (equippedRangedWeapon)  // if not, check has ranged weapon in slot
-    {
-        int8 index = 1;
-        EquipmentInfo const* einfo = sObjectMgr->GetEquipmentInfo(GetEntry(), index);
-        uint32 possibleRangedWeapon = einfo->ItemEntry[RANGED_ATTACK];
+uint32 Unit::GetRangedAttackWeapon()
+{
+    if (uint32 equippedRangedWeapon = GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + RANGED_ATTACK))
+        return equippedRangedWeapon;
 
-        if (!possibleRangedWeapon)
-            return 0;
-    }
+    int8 id = 1;
+    EquipmentInfo const* einfo = sObjectMgr->GetEquipmentInfo(GetEntry(), id);
+    if (uint32 possibleRangedWeapon = einfo->ItemEntry[RANGED_ATTACK])
+        return possibleRangedWeapon;
 
-    Creature* caster = ToCreature(); // check creature_template->spells for ranged spells
-    for (uint8 i = 0; i < CREATURE_MAX_SPELLS; ++i)
-        if (caster->m_spells[i])
-        {
-            uint32 spellId = caster->m_spells[i];
-            if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId))
-                if (spellInfo->DmgClass == SPELL_DAMAGE_CLASS_RANGED)
-                    if (spellInfo->RangeEntry && spellInfo->RangeEntry->maxRangeHostile > 15.0f)
-                        return spellId;
-        }
+    return 0;
+}
+
+uint32 Unit::GetRangedAttackSpell()
+{
+    if (Creature* caster = ToCreature())
+        for (uint8 i = 0; i < CREATURE_MAX_SPELLS; ++i)
+            if (caster->m_spells[i])
+            {
+                uint32 spellId = caster->m_spells[i];
+                if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId))
+                    if (spellInfo->DmgClass == SPELL_DAMAGE_CLASS_RANGED)
+                        if (spellInfo->RangeEntry && spellInfo->RangeEntry->maxRangeHostile > 5.0f)
+                            return spellId;
+            }
 
     return 0;
 }

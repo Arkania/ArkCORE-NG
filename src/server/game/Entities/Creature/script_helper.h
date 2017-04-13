@@ -530,6 +530,174 @@ private:
 };
 // end beta test area
 
+class FakeAttackMembers
+{
+public:
+    FakeAttackMembers::FakeAttackMembers() : m_hasInit(false) {}
+    FakeAttackMembers::FakeAttackMembers(Creature* me) : m_me(me), m_hasInit(false) {}
 
+    void Initialize(std::list<uint32> allowedSparrList)
+    {
+        m_allowedSparrList = allowedSparrList;
+
+        m_meleeWeaponId = m_me->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + BASE_ATTACK);
+        m_rangedWeaponId = m_me->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + RANGED_ATTACK);
+
+        int8 id = 1;
+        EquipmentInfo const* einfo = sObjectMgr->GetEquipmentInfo(m_me->GetEntry(), id);
+        if (!m_meleeWeaponId)
+            m_meleeWeaponId = einfo->ItemEntry[BASE_ATTACK];
+        if (!m_rangedWeaponId)
+            m_rangedWeaponId = einfo->ItemEntry[RANGED_ATTACK];
+
+        for (uint8 i = 0; i < CREATURE_MAX_SPELLS; ++i)
+            if (m_me->m_spells[i])
+            {
+                uint32 spellId = m_me->m_spells[i];
+                if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId))
+                    if (spellInfo->RangeEntry)
+                        if (spellInfo->RangeEntry->maxRangeHostile < 5.0f && spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MELEE)
+                            m_meeleeSpellInfo.push_back(spellInfo);
+                        else if (spellInfo->RangeEntry->maxRangeHostile >= 5.0f && spellInfo->DmgClass == SPELL_DAMAGE_CLASS_RANGED)
+                            m_rangedSpellInfo.push_back(spellInfo);
+            }
+
+        m_sparrGUID = 0;
+        m_shootGUID = 0;
+        m_nearestGUID = 0;
+        std::list<Creature*> cList = m_me->FindAllCreaturesInRange(30.0f);
+        float dist = 30.0f;
+        for (auto npc : cList)
+            if (IsSparringPartner(npc))
+            {
+                float d = m_me->GetDistance(npc);
+                if (d < 5.0f)
+                {
+                    if (d < dist)
+                    {
+                        dist = d;
+                        m_nearestGUID = npc->GetGUID();
+                    }
+                    sparrList.push_back(npc->GetGUID());
+                }
+                else
+                    shootList.push_back(npc->GetGUID());
+            }
+        m_hasInit = true;
+    }
+
+    bool IsSparringPartner(Unit* attacker)
+    {
+        if (Creature* creature = attacker->ToCreature())
+        {
+            uint32 entry = creature->GetEntry();
+                if (m_me->IsWithinLOSInMap(creature))
+                    for (auto e : m_allowedSparrList)
+                        if (e == entry)
+                            return true;
+        }
+
+        return false;
+    }
+
+    bool IsMeeleAttack()
+    {
+        return sparrList.size() ? true : false;
+    }
+
+    Creature* GetSparringPartner()
+    {
+        if (!m_sparrGUID && m_nearestGUID)
+            m_sparrGUID = m_nearestGUID;
+
+
+        if (!m_sparrGUID)
+        {
+            std::list<Creature*> cList;
+            for (auto npc : sparrList)
+                if (Creature* target = ObjectAccessor::GetCreature(*m_me, npc))
+                    if (!target->IsDead())
+                        cList.push_back(target);
+
+            if (cList.size() > 0)
+            {
+                uint32 rol = urand(0, cList.size() - 1);
+                std::list<Creature*>::const_iterator itr = cList.begin();
+                std::advance(itr, rol);
+                m_sparrGUID = (*itr)->GetGUID();
+            }
+        }
+
+        if (Creature* creature = ObjectAccessor::GetCreature(*m_me, m_sparrGUID))
+            if (!creature->IsDead())
+                return creature;
+
+        m_sparrGUID = 0;
+        return nullptr;
+    }
+
+    Creature* GetRangedPartner()
+    {
+        if (Creature* creature = ObjectAccessor::GetCreature(*m_me, m_shootGUID))
+            if (creature->IsDead())
+                m_shootGUID = 0;
+
+        if (shootList.size() && m_rangedSpellInfo.size() & m_rangedWeaponId)
+        {
+            if (!m_shootGUID)
+            {
+                std::list<Creature*> cList;
+                for (auto npc : shootList)
+                    if (Creature* target = ObjectAccessor::GetCreature(*m_me, npc))
+                        if (!target->IsDead())
+                            cList.push_back(target);
+
+                if (cList.size() > 0)
+                {
+                    uint32 rol = urand(0, cList.size() - 1);
+                    std::list<Creature*>::const_iterator itr = cList.begin();
+                    std::advance(itr, rol);
+                    m_shootGUID = (*itr)->GetGUID();
+                }
+            }
+
+            if (Creature* creature = ObjectAccessor::GetCreature(*m_me, m_shootGUID))
+                if (!creature->IsDead())
+                    return creature;
+        }
+
+        m_shootGUID = 0;
+        return nullptr;
+    }
+
+    uint32 GetRangedSpellId()
+    {
+        switch (m_rangedSpellInfo.size())
+        {
+        case 0:
+            return 0;
+        default:
+            uint32 rol = urand(0, m_rangedSpellInfo.size() - 1);
+            std::list<const SpellInfo*>::const_iterator itr = m_rangedSpellInfo.begin();
+            std::advance(itr, rol);
+            return (*itr)->Id;
+        }
+        return 0;
+    }
+
+    bool m_hasInit;
+private:
+    Creature* m_me;
+    std::list<uint32> m_allowedSparrList;
+    uint64   m_nearestGUID;
+    uint64   m_sparrGUID;
+    uint64   m_shootGUID;
+    std::list<uint64> sparrList;
+    std::list<uint64> shootList;
+    uint32 m_meleeWeaponId;
+    std::list<const SpellInfo*> m_meeleeSpellInfo;
+    uint32 m_rangedWeaponId;
+    std::list<const SpellInfo*>  m_rangedSpellInfo;
+};
 
 #endif

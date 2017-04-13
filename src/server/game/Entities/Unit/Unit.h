@@ -1456,8 +1456,11 @@ class Unit : public WorldObject
         bool IsFriendlyTo(Unit const* unit) const;
         bool IsNeutralToAll() const;
         uint32 GetFakeAttackFlag();
+        uint32 GetInitFakeAttackFlag();
         bool IsFakeAttack(Unit* victim);
         uint32 GetRangedFakeAttackSpell();
+        uint32 GetRangedAttackSpell();
+        uint32 GetRangedAttackWeapon();
         uint32 IsRangedFakeAttackPossible();
         bool IsMeleeFakeAttackPossible();
 
