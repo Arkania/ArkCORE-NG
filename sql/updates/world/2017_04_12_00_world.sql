@@ -35,7 +35,7 @@ INSERT INTO creature_text VALUES
 
 delete from creature_equip_template where entry=47836;
 insert into creature_equip_template values 
-(47836, 0, 0, 0, 52355);
+(47836, 1, 0, 0, 52355);
 
 DELETE FROM waypoint_data WHERE id=4783600;
 INSERT INTO waypoint_data VALUES 
