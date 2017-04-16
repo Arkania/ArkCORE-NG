@@ -17753,28 +17753,26 @@ QuestGiverStatus Player::GetQuestDialogStatus(Object* questgiver)
 void Player::SendQuestUpdate(uint32 questId)
 {
     uint32 zone = 0, area = 0;
+    GetZoneAndAreaId(zone, area);
 
-    SpellAreaForQuestMapBounds saBounds = sSpellMgr->GetSpellAreaForQuestMapBounds(questId /*false*/);
-    if (saBounds.first != saBounds.second)
-    {
-        GetZoneAndAreaId(zone, area);
+    SpellAreaForQuestAreaMapBounds zoneBounds = sSpellMgr->GetSpellAreaForQuestAreaMapBounds(zone, questId);
+    SpellAreaForQuestAreaMapBounds areaBounds = sSpellMgr->GetSpellAreaForQuestAreaMapBounds(area, questId);
 
-        for (SpellAreaForAreaMap::const_iterator itr = saBounds.first; itr != saBounds.second; ++itr)
-            if (itr->second->autocast && itr->second->IsFitToRequirements(this, zone, area))
-                if (!HasAura(itr->second->spellId))
-                    CastSpell(this, itr->second->spellId, true);
-    }
-
-    saBounds = sSpellMgr->GetSpellAreaForQuestEndMapBounds(questId);
-    if (saBounds.first != saBounds.second)
-    {
-        if (!zone || !area)
-            GetZoneAndAreaId(zone, area);
-
-        for (SpellAreaForAreaMap::const_iterator itr = saBounds.first; itr != saBounds.second; ++itr)
+    if (zoneBounds.first != zoneBounds.second)
+        for (SpellAreaForQuestAreaMap::const_iterator itr = zoneBounds.first; itr != zoneBounds.second; ++itr)
             if (!itr->second->IsFitToRequirements(this, zone, area))
                 RemoveAurasDueToSpell(itr->second->spellId);
-    }
+            else if (itr->second->autocast)
+                if (!HasAura(itr->second->spellId))
+                    CastSpell(this, itr->second->spellId, true);
+
+    if (areaBounds.first != areaBounds.second)
+        for (SpellAreaForQuestAreaMap::const_iterator itr = areaBounds.first; itr != areaBounds.second; ++itr)
+            if (!itr->second->IsFitToRequirements(this, zone, area))
+                RemoveAurasDueToSpell(itr->second->spellId);
+            else if (itr->second->autocast)
+                if (!HasAura(itr->second->spellId))
+                    CastSpell(this, itr->second->spellId, true);
 
     UpdateForQuestWorldObjects();
     SendUpdatePhasing();
