@@ -17,6 +17,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "script_helper.h"
 #include "ScriptPCH.h"
 #include "Unit.h"
 #include "ScriptedCreature.h"
@@ -1095,6 +1096,7 @@ public:
 
         void DoAction(int32 param) override
         {
+            SetActiveMode();
             switch (param)
             {
             case ACTION_START_EVENT:
@@ -1244,6 +1246,11 @@ public:
             {
                 switch (eventId)
                 {
+                case EVENT_ACTIVE_OBJECT_CD:
+                {
+                    me->setActive(false);
+                    break;
+                }
                 case EVENT_INITIALISE:
                 {
                     if (!m_isInitialised)
@@ -1663,6 +1670,13 @@ public:
         {
             return (me->FindNearestPlayer(range)) ? true : false;
         }
+
+        void SetActiveMode()
+        {
+            m_events.RescheduleEvent(EVENT_ACTIVE_OBJECT_CD, 15 * 60000);
+            if (!me->isActiveObject())
+                me->setActive(true);
+        }
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -1752,6 +1766,7 @@ public:
 
         void DoAction(int32 param) override
         {
+            SetActiveMode();
             switch (param)
             {
             case ACTION_INITIALIZE_DONE:
@@ -1851,6 +1866,11 @@ public:
             {
                 switch (eventId)
                 {
+                case EVENT_ACTIVE_OBJECT_CD:
+                {
+                    me->setActive(false);
+                    break;
+                }
                 case EVENT_CHECK_PLAYER_FOR_PHASE:
                 {
                     std::list<Player*> playerList = me->FindNearestPlayers(200.0f, true);
@@ -2148,6 +2168,13 @@ public:
             }
             }
         }
+
+        void SetActiveMode()
+        {
+            m_events.RescheduleEvent(EVENT_ACTIVE_OBJECT_CD, 15 * 60000);
+            if (!me->isActiveObject())
+                me->setActive(true);
+        }
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -2194,6 +2221,7 @@ public:
 
         void Reset() override
         {
+            me->setActive(true);
             me->SetReactState(REACT_PASSIVE);
             if (my_followerList.empty())
                 SummonMyMember();
@@ -2230,6 +2258,7 @@ public:
 
         void DoAction(int32 param) override
         {
+            SetActiveMode();
             switch (param)
             {
             case ACTION_INITIALIZE_DONE:
@@ -2337,6 +2366,11 @@ public:
             {
                 switch (eventId)
                 {
+                case EVENT_ACTIVE_OBJECT_CD:
+                {
+                    me->setActive(false);
+                    break;
+                }
                 case EVENT_INITIALISE:
                 {
                     if (!m_isInitialised)
@@ -2527,6 +2561,13 @@ public:
             }
             }
         }
+
+        void SetActiveMode()
+        {
+            m_events.RescheduleEvent(EVENT_ACTIVE_OBJECT_CD, 15 * 60000);
+            if (!me->isActiveObject())
+                me->setActive(true);
+        }
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -2576,6 +2617,7 @@ public:
 
         void Reset() override
         {
+            me->setActive(true);
             me->SetReactState(REACT_PASSIVE);
             if (my_followerList.empty())
                 SummonMyMember();
@@ -2624,6 +2666,7 @@ public:
 
         void DoAction(int32 param) override
         {
+            SetActiveMode();
             switch (param)
             {
             case ACTION_INITIALIZE_DONE:
@@ -2711,6 +2754,11 @@ public:
             {
                 switch (eventId)
                 {
+                case EVENT_ACTIVE_OBJECT_CD:
+                {
+                    me->setActive(false);
+                    break;
+                }
                 case EVENT_INITIALISE:
                 {
                     if (!m_isInitialised)
@@ -2995,6 +3043,13 @@ public:
             }
             }
         }
+
+        void SetActiveMode()
+        {
+            m_events.RescheduleEvent(EVENT_ACTIVE_OBJECT_CD, 15 * 60000);
+            if (!me->isActiveObject())
+                me->setActive(true);
+        }
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -3077,6 +3132,7 @@ public:
 
         void DoAction(int32 param) override
         {
+            SetActiveMode();
             switch (param)
             {
             case ACTION_INITIALIZE_DONE:
@@ -3155,6 +3211,11 @@ public:
             {
                 switch (eventId)
                 {
+                case EVENT_ACTIVE_OBJECT_CD:
+                {
+                    me->setActive(false);
+                    break;
+                }
                 case EVENT_INITIALISE:
                 {
                     if (!m_isInitialised)
@@ -3345,6 +3406,13 @@ public:
             }
             }
         }
+
+        void SetActiveMode()
+        {
+            m_events.RescheduleEvent(EVENT_ACTIVE_OBJECT_CD, 15 * 60000);
+            if (!me->isActiveObject())
+                me->setActive(true);
+        }
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -3426,6 +3494,7 @@ public:
 
         void DoAction(int32 param) override
         {
+            SetActiveMode();
             switch (param)
             {
             case ACTION_INITIALIZE_DONE:
@@ -3481,6 +3550,11 @@ public:
             {
                 switch (eventId)
                 {
+                case EVENT_ACTIVE_OBJECT_CD:
+                {
+                    me->setActive(false);
+                    break;
+                }
                 case EVENT_INITIALISE:
                 {
                     if (!m_isInitialised)
@@ -3657,6 +3731,13 @@ public:
             m_ai_counter = 0;
 
         }
+
+        void SetActiveMode()
+        {
+            m_events.RescheduleEvent(EVENT_ACTIVE_OBJECT_CD, 15 * 60000);
+            if (!me->isActiveObject())
+                me->setActive(true);
+        }
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -3727,6 +3808,7 @@ public:
 
         void DoAction(int32 param) override
         {
+            SetActiveMode();
             switch (param)
             {
             case ACTION_INITIALIZE_DONE:
@@ -3785,6 +3867,11 @@ public:
             {
                 switch (eventId)
                 {
+                case EVENT_ACTIVE_OBJECT_CD:
+                {
+                    me->setActive(false);
+                    break;
+                }
                 case EVENT_INITIALISE:
                 {
                     if (!m_almyraGUID || !m_liamGUID || !m_kingGUID)
@@ -3881,6 +3968,13 @@ public:
                     float angl = frand(2.14f, 4.14f);
                     follower->GetMotionMaster()->MoveFollow(me, dist, angl);
                 }
+        }
+
+        void SetActiveMode()
+        {
+            m_events.RescheduleEvent(EVENT_ACTIVE_OBJECT_CD, 15 * 60000);
+            if (!me->isActiveObject())
+                me->setActive(true);
         }
     };
 
@@ -4827,7 +4921,6 @@ enum eQuest24902
     NPC_GENERAL_WARHOWL = 38533,
     NPC_HIGH_EXECUTOR_CRENSHAW = 38537,
     ACTION_SYLVANAS_START = 501,
-    PLAYER_GUID = 99999,
 };
 
 // 38507
@@ -5480,7 +5573,6 @@ enum eEndGame
     EVENT_START_SHOWFIGHT,
     EVENT_IS_BRIDGE_CLEAN,
     EVENT_START_ROPE_PART,
-    EVENT_MASTER_RESET,
 
     SPELL_FOR_GILNEAS = 81790,
     SPELL_ROPE1 = 81974,

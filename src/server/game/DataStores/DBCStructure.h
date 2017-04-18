@@ -643,6 +643,13 @@ struct AchievementCriteriaEntry
     uint32 additionalConditionValue[MAX_ADDITIONAL_CRITERIA_CONDITIONS - 1]; // 21-22 WTF one column was cut off here in 4.3.4
 };
 
+struct AnimKitEntry
+{
+    uint32      ID;                                         // 0
+    //uint32      OneShotDuration;                          // 1
+    //uint32      OneShotStopAnimKitID;                     // 2
+};
+
 struct AreaTableEntry
 {
     uint32  ID;                                             // 0

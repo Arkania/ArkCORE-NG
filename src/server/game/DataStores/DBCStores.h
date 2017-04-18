@@ -88,6 +88,7 @@ std::set<uint16> const& GetXPhasesForGroup(uint16 group);
 uint16 const ComputePhaseGroup(std::set<uint16> phaseIds);
 
 extern DBCStorage <AchievementEntry>             sAchievementStore;
+extern DBCStorage <AnimKitEntry>                 sAnimKitStore;
 extern DBCStorage <AchievementCriteriaEntry>     sAchievementCriteriaStore;
 extern DBCStorage <AreaTableEntry>               sAreaTableStore;// recommend access using functions
 extern DBCStorage <AreaGroupEntry>               sAreaGroupStore;
