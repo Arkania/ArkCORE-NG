@@ -107,11 +107,15 @@ enum eAnimRedridgeCity
     SPELL_CHAINS_OF_CRUELTY_1 = 81081,
     SPELL_CHAINS_OF_CRUELTY_2 = 81085,
     SPELL_KEESHANS_HEADBAND = 81234,
+    SPELL_LOG_SMASH = 88421,
     QUEST_JOHN_J_KEESHAN = 26567,
     QUEST_THIS_AINT_MY_WAR = 26568,
     QUEST_IN_SEARCH_OF_BRAVO_COMPANY = 26586,
     QUEST_WE_MUST_PREPARE = 26510,
     QUEST_TUNING_THE_GNOMECORDER = 26512,
+    QUEST_CANYON_ROMP = 26514,
+    QUEST_SAVING_FOREMAN_OSLOW = 26520,
+    QUEST_YOWLER_MUST_DIE = 26545,
     QUEST_BREAKING_OUT_IS_HARD_TO_DO = 26587,
     QUEST_JORGENSEN = 26560,
     QUEST_RETURN_OF_THE_BRAVO_COMPANY = 26563,
@@ -184,6 +188,7 @@ public:
     }
 };
 
+// 43249
 class npc_dumpy_43249 : public CreatureScript
 {
 public:
@@ -207,144 +212,90 @@ public:
     }
 };
 
+// 43248
 class npc_big_earl_43248 : public CreatureScript
 {
 public:
     npc_big_earl_43248() : CreatureScript("npc_big_earl_43248") { }
 
-    enum eFightStatus
-    {
-        None,
-        Dumpy,
-        Keeshan
-    };
-
     struct npc_big_earl_43248AI : public ScriptedAI
     {
         npc_big_earl_43248AI(Creature *c) : ScriptedAI(c) { }
 
-        uint32 m_timer;
-        Creature* m_dumpy;
-        Creature* m_keeshan;
-        eFightStatus m_FightStatus;
-        eFightStatus m_FightStatusOld;
+        EventMap m_events;
+        uint64 m_targetGUID;
+        FakeAttackMembers m_showFight;
 
         void Reset() override
         {
-            m_timer = 1000;
-            m_dumpy = nullptr;
-            m_keeshan = nullptr;
-            m_FightStatus = eFightStatus::None;
-            m_FightStatusOld = eFightStatus::None;
+            m_events.RescheduleEvent(EVENT_INIT_TARGET, 1000);
+            m_targetGUID = 0;
+            m_showFight = FakeAttackMembers(me);
         }
 
         void DamageTaken(Unit* attacker, uint32& damage) override
         {
-            if (attacker->GetEntry() == NPC_DUMPY)
-                damage = 0;
+            damage = 0;
         }
 
-        void MoveInLineOfSight(Unit* who) override
+        void AttackStart(Unit* who) override
         {
-            if (Player* player = who->ToPlayer())
-                if (player->HasAura(SPELL_DETECT_QUEST_INVIS_9))
-                {
-                    m_FightStatus = eFightStatus::None;
-                }
-                else if (player->HasAura(SPELL_DETECT_QUEST_INVIS_4))
-                {
-                    m_FightStatus = eFightStatus::Keeshan;
-                }
-                else if (player->HasAura(SPELL_DETECT_QUEST_INVIS_3))
-                {
-                    m_FightStatus = eFightStatus::Dumpy;
-                }
+            AttackStartNoMove(who);
         }
 
         void UpdateAI(uint32 diff) override
         {
-            if (m_timer <= diff)
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
             {
-                m_timer = 1000;
-                DoWork();
+                switch (eventId)
+                {
+                case EVENT_INIT_TARGET:
+                {
+                    if (!m_showFight.m_hasInit)
+                    {
+                        std::list<uint32> asList;
+                        if (Creature* npc = me->FindNearestCreature(NPC_DUMPY, 15.0f))
+                        {
+                            asList.push_back(npc->GetEntry());
+                            m_targetGUID = npc->GetGUID();
+                        }
+                        if (Creature* npc = me->FindNearestCreature(NPC_BIG_EARL, 15.0f))
+                        {
+                            asList.push_back(npc->GetEntry());
+                            m_targetGUID = npc->GetGUID();
+                        }
+                        m_showFight.Initialize(asList);
+                    }
+                    m_events.ScheduleEvent(EVENT_CHECK_FIGHT, 1000);
+                    break;
+                }
+                case EVENT_CHECK_FIGHT:
+                {
+                    if (Creature* creature = m_showFight.GetSparringPartner())
+                    {
+                        if (!me->IsInCombat())
+                            me->Attack(creature, true);
+                    }
+                    else if (Creature* creature = m_showFight.GetRangedPartner())
+                    {
+                        me->SetFacingToObject(creature);
+                        if (uint32 spellId = m_showFight.GetRangedSpellId())
+                            me->CastSpell(creature, spellId, true);
+                        me->GetMotionMaster()->MoveIdle();
+                    }
+
+                    m_events.ScheduleEvent(EVENT_CHECK_FIGHT, urand(900, 1200));
+                    break;
+                }
+                }
             }
-            else
-                m_timer -= diff;
 
             if (!UpdateVictim())
                 return;
-
-            DoMeleeAttackIfReady();
-        }
-        
-        void DoWork()
-        {
-            Player* player = me->FindNearestPlayer(20.0f); 
-
-            if (!player)
-                m_FightStatus = eFightStatus::None;
-
-            if (m_FightStatus == m_FightStatusOld)
-                return;
-
-            printf("m_FightStatus= %u \n", m_FightStatus);
-
-            m_dumpy = me->FindNearestCreature(NPC_DUMPY, 5.0f);
-            m_keeshan = me->FindNearestCreature(NPC_JOHN_J_KEESHAN_43184, 5.0f);
-                      
-
-            switch (m_FightStatus)
-            {
-            case eFightStatus::None:
-                me->RemoveAura(SPELL_APPLY_QUEST_INVIS_1);
-                me->RemoveAura(SPELL_APPLY_QUEST_INVIS_4);
-                me->RemoveAura(SPELL_APPLY_QUEST_INVIS_9);
-                me->AttackStop();
-                if (m_dumpy)
-                {
-                    m_dumpy->RemoveAura(SPELL_APPLY_QUEST_INVIS_3);
-                    m_dumpy->AttackStop();
-                }
-                if (m_keeshan)
-                {
-                    m_keeshan->RemoveAura(SPELL_APPLY_QUEST_INVIS_4);
-                    m_keeshan->AttackStop();
-                }
-                break;
-            case eFightStatus::Dumpy:
-                if (m_keeshan && m_FightStatusOld == eFightStatus::Keeshan)
-                {
-                    m_keeshan->RemoveAura(SPELL_APPLY_QUEST_INVIS_4);
-                    me->RemoveAura(SPELL_APPLY_QUEST_INVIS_4);
-                    m_keeshan->AttackStop();
-                    me->AttackStop();
-                }
-                if (m_dumpy)
-                {
-                    m_dumpy->AddAura(SPELL_APPLY_QUEST_INVIS_3, m_dumpy);
-                    me->AddAura(SPELL_APPLY_QUEST_INVIS_3, me);
-                    m_dumpy->Attack(me, true);
-                    me->Attack(m_dumpy, true);
-                }
-                break;
-            case eFightStatus::Keeshan:
-                if (m_dumpy && m_FightStatusOld == eFightStatus::Dumpy)
-                {
-                    m_dumpy->RemoveAura(SPELL_APPLY_QUEST_INVIS_3);
-                    m_dumpy->AttackStop();
-                    me->AttackStop();
-                }
-                if (m_keeshan)
-                {
-                    me->AddAura(SPELL_APPLY_QUEST_INVIS_4, me);
-                    m_keeshan->AddAura(SPELL_APPLY_QUEST_INVIS_4, m_keeshan);
-                    m_keeshan->Attack(me, true);
-                    me->Attack(m_keeshan, true);
-                }
-                break;
-            }
-            
-            m_FightStatusOld = m_FightStatus;
+            else
+                DoMeleeAttackIfReady();
         }
     };
 
@@ -354,6 +305,7 @@ public:
     }
 };
 
+// 43247
 class npc_redrige_citizen_43247 : public CreatureScript
 {
 public:
@@ -440,6 +392,7 @@ public:
     }
 }; 
 
+// 6034
 class at_lakeshire_graveyard : public AreaTriggerScript
 {
 public:
@@ -458,6 +411,84 @@ public:
     }
 };
 
+// 43094
+class npc_canyon_ettin_43094 : public CreatureScript
+{
+
+public:
+    npc_canyon_ettin_43094() : CreatureScript("npc_canyon_ettin_43094") { }
+
+    struct npc_canyon_ettin_43094_AI : public ScriptedAI
+    {
+        npc_canyon_ettin_43094_AI(Creature *c) : ScriptedAI(c) { }
+
+        EventMap m_events;
+
+        void Reset() override
+        {
+            DoAction(1);
+            m_events.RescheduleEvent(EVENT_CHECK_FOR_PLAYER, 1000);
+        }
+
+        void EnterCombat(Unit* victim) override 
+        { 
+            me->CastSpell(victim, SPELL_LOG_SMASH, true);
+        }
+
+        void DoAction(int32 param) override
+        {
+            switch (param)
+            {
+            case 1:
+            {
+                m_events.RescheduleEvent(EVENT_CAST_COOLDOWN, 30 * 60 * 1000); // 30 minutes
+                if (!me->isActiveObject())
+                    me->setActive(true);
+                break;
+            }
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_CAST_COOLDOWN:
+                {
+                    me->setActive(false);
+                    break;
+                }
+                case EVENT_CHECK_FOR_PLAYER:
+                {
+                    std::list<Player*> pList = me->FindNearestPlayers(100.0f);
+                    for (auto player : pList)
+                        if (player->GetQuestStatus(QUEST_SAVING_FOREMAN_OSLOW) == QUEST_STATUS_INCOMPLETE || player->GetQuestStatus(QUEST_CANYON_ROMP) == QUEST_STATUS_INCOMPLETE)
+                            DoAction(1);
+
+                    m_events.RescheduleEvent(EVENT_CHECK_FOR_PLAYER, 1000);
+                    break;
+                }
+                }
+            }
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_canyon_ettin_43094_AI(creature);
+    }
+
+};
+
+// 43197
 class npc_canyon_ettin_43197 : public CreatureScript
 {
     enum eTest
@@ -473,7 +504,6 @@ class npc_canyon_ettin_43197 : public CreatureScript
         SPELL_LIFT_HUGE_BOULDER = 80739,
         SPELL_KILL_CREDIT_ETTIN_QUEST = 80744,
         SPELL_EJECT_PASSENGER_1 = 80743,
-        QUEST_SAVING_FOREMAN_OSLOW = 26520,
         PATH_GO_BACK_TO_MOUNTAIN = 431972,
         PATH_GO_TO_BRIDGE = 431971,
         SAY_OSLOW_JUST_REPAIR_BRIDGE = 0,
@@ -483,66 +513,282 @@ class npc_canyon_ettin_43197 : public CreatureScript
 public:
     npc_canyon_ettin_43197() : CreatureScript("npc_canyon_ettin_43197") { }
 
-    struct npc_canyon_ettin_43197_AI : public ScriptedAI
+    struct npc_canyon_ettin_43197_AI : public VehicleAI
     {
-        npc_canyon_ettin_43197_AI(Creature *c) : ScriptedAI(c) { }
+        npc_canyon_ettin_43197_AI(Creature *c) : VehicleAI(c) { Initialize(); }
 
-        uint32 m_timer;
-        uint32 m_phase;
+        EventMap m_events;
+        uint64 m_playerGUID;
+        uint64 m_oslowGUID;
+        uint64 m_boulderGUID;
+        uint64 m_trentGUID;
+        uint64 m_dmitriGUID;
+        uint64 m_jessGUID;
+        uint64 m_danielGUID;
+        uint64 m_matthewGUID;
+        uint64 m_alexGUID;
+        uint32 m_state;
+
+        void Initialize()
+        {
+            m_playerGUID = 0;
+            m_oslowGUID = 0;
+            m_boulderGUID = 0;
+            m_trentGUID = 0;
+            m_dmitriGUID = 0;
+            m_jessGUID = 0;
+            m_danielGUID = 0;
+            m_matthewGUID = 0;
+            m_alexGUID = 0;
+            m_state = 0;
+        }
 
         void Reset() override
         {
-            m_timer = 1000;
-            m_phase = 0;
+            me->SetReactState(REACT_DEFENSIVE);
+            m_events.RescheduleEvent(EVENT_CHECK_FOLLOWING, 1000);
+        }
+
+        void IsSummonedBy(Unit* summoner) override 
+        {
+            if (Player* player = summoner->ToPlayer())
+            {
+                m_playerGUID = summoner->GetGUID();
+                me->GetMotionMaster()->MoveFollow(player, 8.0f, 3.14f);
+            }
+        }
+
+        void PassengerBoarded(Unit* passenger, int8 seatId, bool apply) override 
+        { 
+            if (apply)
+            {
+                if (Player* player = GetPlayer())
+                    Talk(0, player);
+                m_events.ScheduleEvent(EVENT_TALK_PART_01, 2000);
+            }
+            else
+            {
+                me->HandleEmote(EMOTE_STATE_NONE);
+                m_events.ScheduleEvent(EVENT_TALK_PART_07, 2000);
+            }
         }
 
         void MovementInform(uint32 type, uint32 id) override
-        { 
-            if (type != 2)
-                return;
-
-            if (m_phase < 10)
-            {
-                switch (id)
-                {
-                case 1:
-                    if (Creature* oslow = me->FindNearestCreature(NPC_FOREMAN_OSLOW, 200.0f))
-                        oslow->AI()->Talk(SAY_OSLOW_THANKS);
-
-                    break;
-                case 4:
-                        if (Creature* oslow = me->FindNearestCreature(NPC_FOREMAN_OSLOW, 200.0f))
-                            oslow->DespawnOrUnsummon();
-
-                    break;
-                case 5: // last point in path 1
-                    m_phase = 7; m_timer = 500;
-                    break;
-                }
-            }
-            else if (m_phase > 10)
-            {
-                switch (id)
+        {
+            if (type == WAYPOINT_MOTION_TYPE)
+                switch (m_state)
                 {
                 case 3:
-                    Talk(3);
+                    switch (id)
+                    {
+                    case 1:
+                        if (Player* player = GetPlayer())
+                            if (Creature* oslow = sObjectAccessor->GetCreature(*me, m_oslowGUID))
+                                oslow->AI()->Talk(SAY_OSLOW_THANKS, player);
+                        break;
+                    case 4:
+                        if (Creature* oslow = sObjectAccessor->GetCreature(*me, m_oslowGUID))
+                            oslow->DespawnOrUnsummon();
+                        break;
+                    case 5: // last point in path 1
+                        m_events.ScheduleEvent(EVENT_TALK_PART_06, 10);
+                        break;
+                    }
                     break;
-                case 5: // last point in path 2
-                    m_phase = 12; m_timer = 500;
+                case 4:
+                    switch (id)
+                    {
+                    case 3:
+                        if (Player* player = GetPlayer())
+                            Talk(3, player);
+                        break;
+                    case 5: // last point in path 2
+                        m_events.ScheduleEvent(EVENT_TALK_PART_09, 10);
+                        break;
+                    }
+                    break;
+                case 5:
                     break;
                 }
+              
+        }
+
+        void EnterEvadeMode() override 
+        { 
+            if (m_state == 0)
+            {
+                me->SetReactState(REACT_DEFENSIVE);
+                if (Player* player = GetPlayer())
+                    me->GetMotionMaster()->MoveFollow(player, 8.0f, 3.14f);
             }
         }
 
         void UpdateAI(uint32 diff) override
         {
-            if (m_timer <= diff)
+            VehicleAI::UpdateAI(diff);
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
             {
-                m_timer = 1000;
-                DoWork();
+                switch (eventId)
+                {
+                case EVENT_CHECK_FOLLOWING:
+                {
+                    if (!me->IsInCombat())
+                    if (Player* player = GetPlayer())
+                        if (player->IsInCombat())
+                            if (Unit* target = player->GetSelectedUnit())
+                                if (Creature* victim = target->ToCreature())
+                                {
+                                    me->GetMotionMaster()->Clear(false);
+                                    me->GetMotionMaster()->MoveIdle();
+                                    me->SetReactState(REACT_AGGRESSIVE);
+                                    me->Attack(victim, true);
+                                }
+
+                    if (CheckAllGuids())
+                        if (Creature* boulder = sObjectAccessor->GetCreature(*me, m_boulderGUID))
+                            if (me->GetDistance(boulder) < 8.0f)
+                            {
+                                me->GetMotionMaster()->Clear(false);
+                                me->GetMotionMaster()->MoveIdle();
+                                m_state = 1;
+                                m_events.ScheduleEvent(EVENT_TALK_PART_00, 1000);
+                                break;
+                            }
+
+                    m_events.RescheduleEvent(EVENT_CHECK_FOLLOWING, 500);
+                    break;
+                }
+                case EVENT_TALK_PART_00:
+                {
+                    if (Creature* boulder = sObjectAccessor->GetCreature(*me, m_boulderGUID))
+                        me->CastSpell(boulder, SPELL_LIFT_HUGE_BOULDER, true);
+                    if (Creature* trent = sObjectAccessor->GetCreature(*me, m_trentGUID))
+                        trent->HandleEmoteState(EMOTE_STATE_STAND);
+                    if (Creature* dmitri = sObjectAccessor->GetCreature(*me, m_dmitriGUID))
+                        dmitri->HandleEmoteState(EMOTE_STATE_STAND);
+                    if (Creature* jess = sObjectAccessor->GetCreature(*me, m_jessGUID))
+                        jess->HandleEmoteState(EMOTE_STATE_STAND);
+                    if (Creature* daniel = sObjectAccessor->GetCreature(*me, m_danielGUID))
+                        daniel->HandleEmoteState(EMOTE_STATE_STAND);
+                    if (Creature* matthew = sObjectAccessor->GetCreature(*me, m_matthewGUID))
+                        matthew->HandleEmoteState(EMOTE_STATE_STAND);
+                    if (Creature* alex = sObjectAccessor->GetCreature(*me, m_alexGUID))
+                        alex->HandleEmoteState(EMOTE_STATE_STAND);
+                    
+                    break;
+                }
+                case EVENT_TALK_PART_01:
+                {
+                    if (Creature* oslow = sObjectAccessor->GetCreature(*me, m_oslowGUID))
+                    {
+                        oslow->SetUInt32Value(UNIT_FIELD_BYTES_1, UNIT_STAND_STATE_KNEEL);
+                        oslow->SetWalk(true);
+                        oslow->SetSpeed(MOVE_WALK, 1.0f, true);
+                    }
+                    m_events.ScheduleEvent(EVENT_TALK_PART_02, 2000);
+                    break;
+                }
+                case EVENT_TALK_PART_02:
+                {
+                    if (Player* player = GetPlayer())
+                        Talk(1, player);
+                    m_events.ScheduleEvent(EVENT_TALK_PART_03, 4000);
+                    break;
+                }
+                case EVENT_TALK_PART_03:
+                {
+                    if (Player* player = GetPlayer())
+                    {
+                        if (Creature* trent = sObjectAccessor->GetCreature(*me, m_trentGUID))
+                            trent->AI()->Talk(1, player);
+                        if (Creature* daniel = sObjectAccessor->GetCreature(*me, m_danielGUID))
+                            daniel->AI()->Talk(1, player);
+                        if (Creature* oslow = sObjectAccessor->GetCreature(*me, m_oslowGUID))
+                            oslow->HandleEmoteState(EMOTE_STATE_STAND);
+                    }
+                    m_events.ScheduleEvent(EVENT_TALK_PART_04, 1500);
+                    break;
+                }
+                case EVENT_TALK_PART_04:
+                {
+                    if (Creature* oslow = sObjectAccessor->GetCreature(*me, m_oslowGUID))
+                    {
+                        m_state = 2;
+                        oslow->SetWalk(true);
+                        oslow->GetMotionMaster()->MovePoint(1020, -9273.9f, -2185.4f, 64.09f);
+                    }
+                    m_events.ScheduleEvent(EVENT_TALK_PART_05, 2000);
+                    break;
+                }
+                case EVENT_TALK_PART_05:
+                {
+                    if (Creature* oslow = sObjectAccessor->GetCreature(*me, m_oslowGUID))
+                        oslow->AI()->Talk(SAY_OSLOW_JUST_REPAIR_BRIDGE);
+
+                    if (Player* player = GetPlayer())
+                        Talk(2, player);
+
+                    m_state = 3;
+                    me->SetWalk(true);
+                    me->SetSpeed(MOVE_WALK, 1.2f, true);
+                    me->GetMotionMaster()->MovePath(PATH_GO_TO_BRIDGE, false);  // start path 1
+                    break;
+                }
+                case EVENT_TALK_PART_06:
+                {
+                    me->CastSpell(me, SPELL_EJECT_PASSENGER_1);
+                    break;
+                }
+                case EVENT_TALK_PART_07:
+                {
+                    if (Creature* boulder = sObjectAccessor->GetCreature(*me, m_boulderGUID))
+                        boulder->DespawnOrUnsummon(10);
+                    me->GetMotionMaster()->InitDefault();
+                    me->HandleEmote(EMOTE_STATE_NONE);
+                    m_events.ScheduleEvent(EVENT_TALK_PART_08, 2000);
+                    break;
+                }
+                case EVENT_TALK_PART_08:
+                {
+                    m_state = 4;
+                    me->SetWalk(true);
+                    me->GetMotionMaster()->MovePath(PATH_GO_BACK_TO_MOUNTAIN, false);  // start path 2
+                    break;
+                }
+                case EVENT_TALK_PART_09:
+                {
+                    m_state = 5;
+                    if (Unit* unit = me->GetOwner())
+                        if (Player* player = unit->ToPlayer())
+                        {
+                            player->CastSpell(player, SPELL_KILL_CREDIT_ETTIN_QUEST);
+                            player->KilledMonsterCredit(341);
+                        }
+                    m_events.ScheduleEvent(EVENT_TALK_PART_10, 1000);
+                    break;
+                }
+                case EVENT_TALK_PART_10:
+                {
+                    if (Creature* trent = sObjectAccessor->GetCreature(*me, m_trentGUID))
+                        trent->DespawnOrUnsummon(10);
+                    if (Creature* dmitri = sObjectAccessor->GetCreature(*me, m_dmitriGUID))
+                        dmitri->DespawnOrUnsummon(10);
+                    if (Creature* jess = sObjectAccessor->GetCreature(*me, m_jessGUID))
+                        jess->DespawnOrUnsummon(10);
+                    if (Creature* daniel = sObjectAccessor->GetCreature(*me, m_danielGUID))
+                        daniel->DespawnOrUnsummon(10);
+                    if (Creature* matthew = sObjectAccessor->GetCreature(*me, m_matthewGUID))
+                        matthew->DespawnOrUnsummon(10);
+                    if (Creature* alex = sObjectAccessor->GetCreature(*me, m_alexGUID))
+                        alex->DespawnOrUnsummon();
+
+                    me->DespawnOrUnsummon(10);
+                    break;
+                }                
+                }
             }
-            else
-                m_timer -= diff;
 
             if (!UpdateVictim())
                 return;
@@ -550,146 +796,52 @@ public:
             DoMeleeAttackIfReady();
         }
 
-
-        void DoWork()
+        Player* GetPlayer()
         {
-            switch (m_phase)
-            {
-            case 0:
-            {
-                Player* player = nullptr;
-                if (Unit* unit = me->GetOwner())
-                    if (player = unit->ToPlayer())
-                        if (player->IsInCombat())
-                            if (Unit* target = player->GetSelectedUnit())
-                                if (Creature* victim = target->ToCreature())
-                                    if (me->IsInCombat())
-                                    {
-                                        if (!me->IsHostileTo(target))
-                                            me->Attack(victim, true);
-                                    }
-                                    else
-                                        me->Attack(victim, true);
+            if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                return player;
 
-                if (Creature* boulder = me->FindNearestCreature(NPC_HUGE_BOULDER, 8.0f))
-                {
-                    me->GetMotionMaster()->MoveIdle();
-                    me->GetMotionMaster()->Initialize();
-                    m_phase = 1;
-                }
-                m_timer = 100;
-                break;
-            }
-            case 1:
-                if (Creature* boulder = me->FindNearestCreature(NPC_HUGE_BOULDER, 15.0f))
-                    me->CastSpell(boulder, SPELL_LIFT_HUGE_BOULDER, true);
+            return nullptr;
+        }
+
+        bool CheckAllGuids()
+        {
+            if (!m_oslowGUID)
+                if (Creature* oslow = me->FindNearestCreature(NPC_FOREMAN_OSLOW, 100.0f))
+                    m_oslowGUID = oslow->GetGUID();
+            if (!m_boulderGUID)
+                if (Creature* boulder = me->FindNearestCreature(NPC_HUGE_BOULDER, 50.0f))
+                    m_boulderGUID = boulder->GetGUID();
+            if (!m_trentGUID)
                 if (Creature* trent = me->FindNearestCreature(NPC_BRIDGE_WORKER_TRENT, 50.0f))
-                    trent->HandleEmoteState(EMOTE_STATE_STAND);
+                    m_trentGUID = trent->GetGUID();
+            if (!m_dmitriGUID)
                 if (Creature* dmitri = me->FindNearestCreature(NPC_BRIDGE_WORKER_DMITRI, 50.0f))
-                    dmitri->HandleEmoteState(EMOTE_STATE_STAND);
+                    m_dmitriGUID = dmitri->GetGUID();
+            if (!m_jessGUID)
                 if (Creature* jess = me->FindNearestCreature(NPC_BRIDGE_WORKER_JESS, 50.0f))
-                    jess->HandleEmoteState(EMOTE_STATE_STAND);
+                    m_jessGUID = jess->GetGUID();
+            if (!m_danielGUID)
                 if (Creature* daniel = me->FindNearestCreature(NPC_BRIDGE_WORKER_DANIEL, 50.0f))
-                    daniel->HandleEmoteState(EMOTE_STATE_STAND);
+                    m_danielGUID = daniel->GetGUID();
+            if (!m_matthewGUID)
                 if (Creature* matthew = me->FindNearestCreature(NPC_BRIDGE_WORKER_MATTHEW, 50.0f))
-                    matthew->HandleEmoteState(EMOTE_STATE_STAND);
+                    m_matthewGUID = matthew->GetGUID();
+            if (!m_alexGUID)
                 if (Creature* alex = me->FindNearestCreature(NPC_BRIDGE_WORKER_ALEX, 50.0f))
-                    alex->HandleEmoteState(EMOTE_STATE_STAND);
+                    m_alexGUID = alex->GetGUID();
 
-                Talk(0);
-                m_phase = 2; m_timer = 2000;
-                break;
-            case 2:
-                if (Creature* oslow = me->FindNearestCreature(NPC_FOREMAN_OSLOW, 100.0f))
-                {
-                    oslow->SetUInt32Value(UNIT_FIELD_BYTES_1, UNIT_STAND_STATE_KNEEL);
-                    oslow->SetWalk(true);
-                    oslow->SetSpeed(MOVE_WALK, 1.0f, true);
-                }
+            if (m_oslowGUID)
+                if (m_boulderGUID)
+                    if (m_trentGUID)
+                        if (m_dmitriGUID)
+                            if (m_jessGUID)
+                                if (m_danielGUID)
+                                    if (m_matthewGUID)
+                                        if (m_alexGUID)
+                                            return true;
 
-                m_phase = 3; m_timer = 2000;
-                break;
-            case 3:
-                Talk(1);
-                m_phase = 4; m_timer = 4000;
-                break;
-            case 4:
-                if (Creature* trent = me->FindNearestCreature(NPC_BRIDGE_WORKER_TRENT, 50.0f))
-                    trent->AI()->Talk(1);
-                if (Creature* daniel = me->FindNearestCreature(NPC_BRIDGE_WORKER_DANIEL, 50.0f))
-                    daniel->AI()->Talk(1);
-                if (Creature* oslow = me->FindNearestCreature(NPC_FOREMAN_OSLOW, 100.0f))
-                    oslow->HandleEmoteState(EMOTE_STATE_STAND);
-
-                m_phase = 5; m_timer = 1500;
-                break;
-            case 5:
-                if (Creature* oslow = me->FindNearestCreature(NPC_FOREMAN_OSLOW, 100.0f))
-                {
-                    oslow->SetWalk(true);
-                    oslow->GetMotionMaster()->MovePoint(22, -9273.9f, -2185.4f, 64.09f);
-                }
-
-                m_phase = 6; m_timer = 1500;
-                break;
-            case 6:
-                if (Creature* oslow = me->FindNearestCreature(NPC_FOREMAN_OSLOW, 100.0f))
-                    oslow->AI()->Talk(SAY_OSLOW_JUST_REPAIR_BRIDGE);
-
-                Talk(2);
-                me->SetWalk(true);
-                me->SetSpeed(MOVE_WALK, 1.2f, true);
-                me->GetMotionMaster()->MovePath(PATH_GO_TO_BRIDGE, false);
-                m_phase = 9; m_timer = 120000;
-                break;           
-            case 7:
-                me->CastSpell(me, SPELL_EJECT_PASSENGER_1);
-                m_phase = 8; m_timer = 2000;
-                break;
-            case 8:
-                me->GetMotionMaster()->InitDefault();
-                m_phase = 11; m_timer = 2000;
-                break;
-            case 9: // cooldown phase
-                m_phase = 13; m_timer = 100;
-                break;            
-            case 11:
-                me->SetWalk(true);
-                me->GetMotionMaster()->MovePath(PATH_GO_BACK_TO_MOUNTAIN, false);  // path 2
-
-                m_phase = 13; m_timer = 120000;
-                break;
-            case 12:
-                if (Unit* unit = me->GetOwner())
-                    if (Player* player = unit->ToPlayer())
-                    {
-                        player->CastSpell(player, SPELL_KILL_CREDIT_ETTIN_QUEST);
-                        player->KilledMonsterCredit(341);
-                    }
-
-                m_phase = 13; m_timer = 1000;
-                break;
-            case 13:
-                if (Creature* boulder = me->FindNearestCreature(NPC_HUGE_BOULDER, 200.0f))
-                    boulder->DespawnOrUnsummon();
-                if (Creature* trent = me->FindNearestCreature(NPC_BRIDGE_WORKER_TRENT, 100.0f))
-                    trent->DespawnOrUnsummon();
-                if (Creature* dmitri = me->FindNearestCreature(NPC_BRIDGE_WORKER_DMITRI, 100.0f))
-                    dmitri->DespawnOrUnsummon();
-                if (Creature* jess = me->FindNearestCreature(NPC_BRIDGE_WORKER_JESS, 100.0f))
-                    jess->DespawnOrUnsummon();
-                if (Creature* daniel = me->FindNearestCreature(NPC_BRIDGE_WORKER_DANIEL, 100.0f))
-                    daniel->DespawnOrUnsummon();
-                if (Creature* matthew = me->FindNearestCreature(NPC_BRIDGE_WORKER_MATTHEW, 100.0f))
-                    matthew->DespawnOrUnsummon();
-                if (Creature* alex = me->FindNearestCreature(NPC_BRIDGE_WORKER_ALEX, 100.0f))
-                    alex->DespawnOrUnsummon();
-                
-                me->DespawnOrUnsummon();
-
-                m_phase = 0; m_timer = 1000;
-                break;
-            }
+            return false;
         }
     };
 
@@ -700,6 +852,7 @@ public:
    
 };
 
+// 43221
 class npc_colonel_troteman_43221 : public CreatureScript
 {
 public:
@@ -767,36 +920,146 @@ public:
     {
         npc_colonel_troteman_43221AI(Creature *c) : ScriptedAI(c) { }
 
-        std::list<uint64> m_playerList;
-        uint32 m_timer;
-        uint32 m_phase;
+        EventMap m_events;
+        std::set<uint64> pList;
+        uint64 m_playerGUID;
+        uint64 m_solomonGUID;
+        bool   m_showVideo;
 
         void Reset() override
         {
-            m_timer = 1000;
-            m_phase = 0;
-        }
-
-        void MoveInLineOfSight(Unit* who) override
-        {
-            if (Player* player = who->ToPlayer())
-                if (!HasPlayerSeenVideo(player->GetGUID()))
-                    if (player->HasAura(SPELL_DETECT_QUEST_INVIS_3))
-                        {
-                            m_phase = 1;
-                            m_playerList.push_back(player->GetGUID());
-                        }
+            m_playerGUID = 0;
+            m_solomonGUID = 0;
+            m_showVideo = false;
+            m_events.RescheduleEvent(EVENT_CHECK_PLAYER_NEAR, 1000);
         }
 
         void UpdateAI(uint32 diff) override
         {
-            if (m_timer <= diff)
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
             {
-                m_timer = 1000;
-                DoWork();
+                switch (eventId)
+                {
+                case EVENT_MASTER_RESET:
+                {
+                    m_playerGUID = 0;
+                    m_showVideo = false;
+                    m_events.Reset();
+                    m_events.ScheduleEvent(EVENT_CHECK_PLAYER_NEAR, 1000);
+                    break;
+                }
+                case EVENT_CHECK_PLAYER_NEAR:
+                {
+                    if (!m_showVideo)
+                        if (Player* player = CheckForPlayer())
+                        {
+                            m_playerGUID = player->GetGUID();
+                            m_showVideo = true;
+                            m_events.ScheduleEvent(EVENT_TALK_PART_00, 1000);
+                            m_events.RescheduleEvent(EVENT_MASTER_RESET, 75000);                            
+                            break;
+                        }
+
+                    m_events.ScheduleEvent(EVENT_CHECK_PLAYER_NEAR, 1000);
+                    break;
+                }
+                case EVENT_TALK_PART_00:
+                {
+                    if (Player* player = GetPlayer())
+                        if (Creature* solomon = GetSolomon())
+                            solomon->AI()->Talk(0, player);
+
+                    m_events.ScheduleEvent(EVENT_TALK_PART_01, 6000);
+                    break;
+                }
+                case EVENT_TALK_PART_01:
+                {
+                    if (Player* player = GetPlayer())
+                        if (Creature* solomon = GetSolomon())
+                            solomon->AI()->Talk(1, player);
+
+                    m_events.ScheduleEvent(EVENT_TALK_PART_02, 8000);
+                    break;
+                }
+                case EVENT_TALK_PART_02:
+                {
+                    if (Player* player = GetPlayer())
+                        Talk(0, player);
+
+                    m_events.ScheduleEvent(EVENT_TALK_PART_03, 5000);
+                    break;
+                }
+                case EVENT_TALK_PART_03:
+                {
+                    if (Player* player = GetPlayer())
+                        if (Creature* solomon = GetSolomon())
+                            solomon->AI()->Talk(2, player);
+
+                    m_events.ScheduleEvent(EVENT_TALK_PART_04, 5000);
+                    break;
+                }
+                case EVENT_TALK_PART_04:
+                {
+                    if (Player* player = GetPlayer())
+                        Talk(1, player);
+
+                    m_events.ScheduleEvent(EVENT_TALK_PART_05, 5000);
+                    break;
+                }
+                case EVENT_TALK_PART_05:
+                {
+                    if (Player* player = GetPlayer())
+                        Talk(2, player);
+
+                    m_events.ScheduleEvent(EVENT_TALK_PART_06, 7000);
+                    break;
+                }
+                case EVENT_TALK_PART_06:
+                {
+                    if (Player* player = GetPlayer())
+                        Talk(3, player);
+
+                    m_events.ScheduleEvent(EVENT_TALK_PART_07, 5000);
+                    break;
+                }
+                case EVENT_TALK_PART_07:
+                {
+                    if (Player* player = GetPlayer())
+                        Talk(4, player);
+
+                    m_events.ScheduleEvent(EVENT_TALK_PART_08, 5000);
+                    break;
+                }
+                case EVENT_TALK_PART_08:
+                {
+                    if (Player* player = GetPlayer())
+                        if (Creature* solomon = GetSolomon())
+                            solomon->AI()->Talk(3, player);
+
+                    m_events.ScheduleEvent(EVENT_TALK_PART_09, 7000);
+                    break;
+                }
+                case EVENT_TALK_PART_09:
+                {
+                    if (Player* player = GetPlayer())
+                        Talk(5, player);
+
+                    m_events.ScheduleEvent(EVENT_TALK_PART_10, 7000);
+                    break;
+                }
+                case EVENT_TALK_PART_10:
+                {
+                    AddPlayer();
+                    m_showVideo = false;
+                    m_playerGUID = 0;
+                    m_events.CancelEvent(EVENT_MASTER_RESET);
+                    m_events.ScheduleEvent(EVENT_CHECK_PLAYER_NEAR, 1000);
+                    break;
+                }
+                }
             }
-            else
-                m_timer -= diff;
 
             if (!UpdateVictim())
                 return;
@@ -804,78 +1067,50 @@ public:
             DoMeleeAttackIfReady();
         }
 
-
-        void DoWork()
+        void AddPlayer()
         {
-            switch (m_phase)
-            {
-            case 0:
-
-                break;
-            case 1:
-                if (Creature* solomon = me->FindNearestCreature(NPC_MAGISTRATE_SOLOMON, 10.0f))
-                    solomon->AI()->Talk(0);
-
-                m_timer = 5000; m_phase = 2;
-                break;
-            case 2:
-                if (Creature* solomon = me->FindNearestCreature(NPC_MAGISTRATE_SOLOMON, 10.0f))
-                    solomon->AI()->Talk(1);
-
-                m_timer = 5000; m_phase = 3;
-                break;
-            case 3:
-                Talk(0);
-                m_timer = 5000; m_phase = 4;
-                break;
-            case 4:
-                if (Creature* solomon = me->FindNearestCreature(NPC_MAGISTRATE_SOLOMON, 10.0f))
-                    solomon->AI()->Talk(2);
-
-                m_timer = 5000; m_phase = 5;
-                break;
-            case 5:
-                Talk(1);
-                m_timer = 5000; m_phase = 6;
-                break;
-            case 6:
-                Talk(2);
-                m_timer = 5000; m_phase = 7;
-                break;
-            case 7:
-                Talk(3);
-                m_timer = 5000; m_phase = 8;
-                break;
-            case 8:
-                Talk(4);
-                m_timer = 5000; m_phase = 9;
-                break;
-            case 9:
-                if (Creature* solomon = me->FindNearestCreature(NPC_MAGISTRATE_SOLOMON, 10.0f))
-                    solomon->AI()->Talk(3);
-
-                m_timer = 5000; m_phase = 10;
-                break;
-            case 10:
-                Talk(5);
-                m_timer = 5000; m_phase = 11;
-                break;
-            case 11:
-                m_timer = 60000; m_phase = 12;
-                break;
-            case 12:
-                m_phase = 0;
-                break;
-            }
+            if (!HasPlayer())
+                pList.insert(m_playerGUID);
         }
 
-        bool HasPlayerSeenVideo(uint64 guid)
+        bool HasPlayer()
         {
-            for (std::list<uint64>::iterator itr = m_playerList.begin(); itr != m_playerList.end(); ++itr)
-                if (guid == *itr)
-                    return true;
+            return (pList.find(m_playerGUID) != pList.end());
+        }
 
-            return false;
+        bool HasPlayer(uint64 guid)
+        {
+            return (pList.find(guid) != pList.end());
+        }
+
+        Player* GetPlayer()
+        {
+            return ObjectAccessor::GetPlayer(*me, m_playerGUID);
+        }
+
+        Creature* GetSolomon()
+        {
+            if (Creature* solomon = sObjectAccessor->GetCreature(*me, m_solomonGUID))
+                return solomon;
+
+            if (Creature* solomon = me->FindNearestCreature(NPC_MAGISTRATE_SOLOMON, 10.0f))
+            {
+                m_solomonGUID = solomon->GetGUID();
+                return solomon;
+            }
+
+            return nullptr;
+        }
+
+        Player* CheckForPlayer()
+        {
+            std::list<Player*> cpList = me->FindNearestPlayers(15.0f, true);
+            for (auto player : cpList)
+                if (!HasPlayer(player->GetGUID()))
+                    if (player->GetQuestStatus(QUEST_JOHN_J_KEESHAN) == QUEST_STATUS_NONE && player->GetQuestStatus(QUEST_YOWLER_MUST_DIE) == QUEST_STATUS_REWARDED)
+                        return player;
+
+            return nullptr;
         }
     };
 
@@ -885,6 +1120,7 @@ public:
     }
 };
 
+// 43184
 class npc_john_j_keeshan_43184 : public CreatureScript
 {
 public:
@@ -966,6 +1202,7 @@ public:
     }
 };
 
+// 8962
 class npc_hilary_8962 : public CreatureScript
 {
 public:
@@ -981,6 +1218,7 @@ public:
     }
 };
 
+// 43270
 class npc_messner_43270 : public CreatureScript
 {
 public:
@@ -1061,6 +1299,7 @@ public:
     }
 };
 
+// 43300
 class npc_messner_43300 : public CreatureScript
 {
 public:
@@ -1167,6 +1406,7 @@ public:
     }
 };
 
+// 43272
 class npc_jorgensen_43272 : public CreatureScript
 {
 public:
@@ -1244,6 +1484,7 @@ public:
     }
 };
 
+// 43305
 class npc_jorgensen_43305 : public CreatureScript
 {
 public:
@@ -1306,6 +1547,7 @@ public:
     }
 };
 
+// 43274
 class npc_krakauer_43274 : public CreatureScript
 {
 public:
@@ -1320,6 +1562,7 @@ public:
     }
 };
 
+// 43303
 class npc_krakauer_43303 : public CreatureScript
 {
 public:
@@ -1375,6 +1618,7 @@ public:
     }
 };
 
+// 43275
 class npc_danforth_43275 : public CreatureScript
 {
 public:
@@ -1382,67 +1626,79 @@ public:
 
     bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*opt*/)
     {
+        creature->DespawnOrUnsummon(10);
         player->CastSpell(player, SPELL_SUMMON_DANFORTH);
-        return false;
+        return true;
     }
 
     struct npc_danforth_43275AI : public ScriptedAI
     {
         npc_danforth_43275AI(Creature *c) : ScriptedAI(c) { }
 
-        uint32 m_timer;
-        uint32 m_phase;
+        EventMap m_events;
+        uint64   m_leftDummyGUID, m_rightDummyGUID;
         
         void Reset() override
         {
+            m_leftDummyGUID = 0;
+            m_rightDummyGUID = 0;
             me->SetDisableGravity(true);
-            me->GetMotionMaster()->MoveIdle();
-            me->SetFacingTo(2.3f);
-            m_timer = 1000; 
-            m_phase = 2;
+            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP & UNIT_NPC_FLAG_QUESTGIVER);
+            m_events.RescheduleEvent(EVENT_INIT_TARGET, 500);
         }
 
-        void FreeingDanforth()
+        void DoAction(int32 param) override
         {
-            m_timer = 250; m_phase = 1;
+            switch (param)
+            {
+            case 1:
+            {
+                m_events.ScheduleEvent(EVENT_FINISH, 100);
+                break;
+            }
+            }
         }
 
         void UpdateAI(uint32 diff) override
         {
-            if (m_timer <= diff)
-            {
-                m_timer = 1000;
-                DoWork();
-            }
-            else
-                m_timer -= diff;
+            m_events.Update(diff);
 
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_INIT_TARGET:
+                {
+                    std::list<Creature*> cList = me->FindNearestCreatures(43366, 20.0f);
+                    for (auto creature : cList)
+                        if (creature->m_positionX > -8806.0f)
+                        {
+                            me->AddAura(81081, creature);
+                            m_leftDummyGUID = creature->GetGUID();
+                        }
+                        else
+                        {
+                            me->AddAura(81085, creature);
+                            m_rightDummyGUID = creature->GetGUID();
+                        }
+                    break;
+                }
+                case EVENT_FINISH:
+                {
+                    if (Creature* dummy = ObjectAccessor::GetCreature(*me, m_leftDummyGUID))
+                        dummy->RemoveAura(81081);
+                    if (Creature* dummy = ObjectAccessor::GetCreature(*me, m_rightDummyGUID))
+                        dummy->RemoveAura(81085);
+                    me->SetDisableGravity(false);
+                    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP & UNIT_NPC_FLAG_QUESTGIVER);
+                    break;
+                }
+                }
+            }
             if (!UpdateVictim())
                 return;
 
             DoMeleeAttackIfReady();
-        }
-
-        void DoWork()
-        {
-            switch (m_phase)
-            {
-            case 0:
-                break;
-            case 1:
-                me->GetMotionMaster()->MoveJump(-8805.83f, -2206.83f, 130.9454f, 10.0f, 5.0f);
-                m_timer = 120000; m_phase = 2;
-                break;
-            case 2:
-                me->GetMotionMaster()->MoveJump(-8805.83f, -2206.83f, 144.3343f, 10.0f, 5.0f);
-                me->HandleEmoteState(EMOTE_ONESHOT_NONE);
-                me->SetFacingTo(2.3f);
-               // me->GetMotionMaster()->MoveIdle();
-                m_timer = 0; m_phase = 0;
-                break;
-            case 3:
-                break;
-            }
         }
     };
 
@@ -1452,6 +1708,7 @@ public:
     }
 };
 
+// 43302
 class npc_danforth_43302 : public CreatureScript
 {
 public:
@@ -1524,6 +1781,7 @@ public:
     }
 };
 
+// 80887
 class spell_freeing_danforth : public SpellScriptLoader
 {
 public:
@@ -1537,7 +1795,7 @@ public:
         {
             if (Unit* unit = this->GetCaster())
                 if (Creature* danforth = unit->FindNearestCreature(NPC_DANFORTH_43275, 100.0f))
-                    CAST_AI(npc_danforth_43275::npc_danforth_43275AI, danforth->AI())->FreeingDanforth();
+                    danforth->AI()->DoAction(1);
         }
 
         void Register() override
@@ -1576,6 +1834,7 @@ enum eAnimBoot
     SPELL_RIVERBOAT_QUEST_CREDIT = 81265,
 };
 
+// 43449
 class npc_john_j_keeshan_43449 : public CreatureScript
 {
 public:
@@ -1733,6 +1992,7 @@ public:
     }
 };
 
+// 43450
 class vehicle_keeshans_riverboat_43450 : public VehicleScript
 {
 public:
@@ -1748,6 +2008,7 @@ public:
     }
 };
 
+// 43457
 class npc_john_j_keeshan_43457 : public CreatureScript
 {
 public:
@@ -1893,6 +2154,7 @@ enum eCompanieBravo
     SPELL_CAMOUFLAGE = 82577,
 };
 
+// 43458
 class npc_john_j_keeshan_43458 : public CreatureScript
 {
 public:
@@ -2040,6 +2302,7 @@ public:
     }
 };
 
+// 43546
 class npc_jorgensen_43546 : public CreatureScript
 {
 public:
@@ -2116,6 +2379,7 @@ public:
     }
 };
 
+// 43594
 class npc_bravo_company_trigger : public CreatureScript
 {
 public:
@@ -2250,6 +2514,7 @@ public:
     }
 };
 
+// 440
 class npc_blackrock_grunt : public CreatureScript
 {
 public:
@@ -2328,6 +2593,7 @@ public:
     }
 };
 
+// 485
 class npc_blackrock_outrunner : public CreatureScript
 {
 public:
@@ -2406,6 +2672,7 @@ public:
     }
 };
 
+// 7013
 class npc_blackrock_guard : public CreatureScript
 {
 public:
@@ -2484,6 +2751,7 @@ public:
     }
 };
 
+// 43533
 class npc_blackrock_drake_rider : public CreatureScript
 {
 public:
@@ -2562,6 +2830,7 @@ public:
     }
 };
 
+// 43535
 class npc_blackrock_warden : public CreatureScript
 {
 public:
@@ -2640,6 +2909,7 @@ public:
     }
 };
 
+// 204441  204442  204435
 class go_blackrock_holding_pen : public GameObjectScript
 {
 public:
@@ -2659,6 +2929,7 @@ public:
     }
 };
 
+// 82585
 class spell_plant_seaforium : public SpellScriptLoader
 {
 public:
@@ -2735,6 +3006,7 @@ enum eGrandMagus
     SAY_SERVICE = 0, 
 };
 
+// 43611
 class npc_john_j_keeshan_43611 : public CreatureScript
 {
 public:
@@ -2896,6 +3168,7 @@ public:
     }
 };
 
+// 397
 class npc_grand_magus_doane : public CreatureScript
 {
 public:
@@ -2998,6 +3271,7 @@ enum eRendersValley
     SPELL_DETONATION_NUKE = 81639,
 };
 
+// 43618
 class npc_renders_valley_camera : public CreatureScript
 {
 public:
@@ -3135,6 +3409,7 @@ enum eQuest26708
     QUEST_TRIUMPHANT_RETURN = 26726,
 };
 
+// 43733
 class npc_colonel_troteman_43733 : public CreatureScript
 {
 public:
@@ -3324,6 +3599,7 @@ public:
     }
 };
 
+// 43734
 class npc_bravo_company_siege_tank : public CreatureScript
 {
 public:
@@ -3400,6 +3676,7 @@ enum eQuest26713
     SPELL_SUMMON_PERSONAL_GUARDIAN_KRAKAUER_82087 = 82087,
 };
 
+// 43812
 class npc_john_j_keeshan_43812 : public CreatureScript
 {
 public:
@@ -3462,6 +3739,7 @@ public:
     }
 };
 
+// 43826
 class npc_messner_43826 : public CreatureScript
 {
 public:
@@ -3521,6 +3799,7 @@ public:
     }
 };
 
+// 43827
 class npc_jorgensen_43827 : public CreatureScript
 {
 public:
@@ -3580,6 +3859,7 @@ public:
     }
 };
 
+// 43828
 class npc_danforth_43828 : public CreatureScript
 {
 public:
@@ -3638,6 +3918,7 @@ public:
     }
 };
 
+// 43829
 class npc_krakauer_43829 : public CreatureScript
 {
 public:
@@ -3706,6 +3987,7 @@ void AddSC_redridge_mountains()
     new npc_big_earl_43248();
     new npc_redrige_citizen_43247();
     new at_lakeshire_graveyard();
+    new npc_canyon_ettin_43094();
     new npc_canyon_ettin_43197();
     new npc_colonel_troteman_43221();
     new npc_john_j_keeshan_43184();
