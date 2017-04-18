@@ -538,8 +538,8 @@ private:
 class FakeAttackMembers
 {
 public:
-    FakeAttackMembers::FakeAttackMembers() : m_hasInit(false) {}
-    FakeAttackMembers::FakeAttackMembers(Creature* me) : m_me(me), m_hasInit(false) {}
+    FakeAttackMembers() : m_hasInit(false) {}
+    FakeAttackMembers(Creature* me) : m_me(me), m_hasInit(false) {}
 
     void Initialize(std::list<uint32> allowedSparrList)
     {
