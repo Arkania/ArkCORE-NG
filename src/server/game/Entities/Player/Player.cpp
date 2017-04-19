@@ -813,10 +813,7 @@ Player::Player(WorldSession* session) : Unit(true)
     m_lastpetnumber = 0;
 
     ////////////////////Rest System/////////////////////
-    m_InnEnteredPosition = Position(0, 0, 0, 0);
-    m_InnEnteredMap = 0;
-    m_InnEnteredArea = 0;
-    m_InnEnteredTime = 0;
+
     m_InnTriggerId = 0;
 
     m_resting_bonus = 0;
@@ -1814,7 +1811,7 @@ void Player::Update(uint32 p_time)
             if (HasRestingFlag(RESTING_FLAG_IN_TAVERN))
             {
                 AreaTriggerEntry const* atEntry = sAreaTriggerStore.LookupEntry(GetInnTriggerId());
-                if (!IsInAreaTriggerRadius(atEntry))
+                if (!atEntry || !IsInAreaTriggerRadius(atEntry))
                     RemoveRestingFlag(RESTING_FLAG_IN_TAVERN);
             }
 
@@ -9152,45 +9149,11 @@ void Player::UpdateArea(uint32 newArea)
         else
             RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_SANCTUARY);
 
-        /* on enter tavern, our core are waiting for client sending a CMSG_AREA_CHANGE Opcode. but he dosn't in goldshire. why??
-        sniffing show, that if player comes from a zone and enter the tavern, the client send CMSG_AREA_CHANGE... fine... But:
-        when player comes from an area, as in goldshire, the client send a CMSG_ZONE_CHANGE. (and our core set none RESTING_FLAGS)
-        On this place we need the triggerId. Know someone how to switch between triggerId <> areaId by DBC files?*/
-
-        uint32 triggerId = 0;
-        switch (newArea)
-        {
-        case 2101:
-            triggerId = 712;
-            break;
-        case 2102:
-            triggerId = 710;
-            break;
-        case 5637:
-            triggerId = 562;
-            break;
-        }
-
-        if (triggerId)
-        {
-            if (sObjectMgr->IsTavernAreaTrigger(triggerId))
-            {
-                AreaTriggerEntry const* atEntry = sAreaTriggerStore.LookupEntry(triggerId);
-                if (IsInAreaTriggerRadius(atEntry))
-                {
-                    SetRestingFlag(RESTING_FLAG_IN_TAVERN, triggerId);
-                    if (sWorld->IsFFAPvPRealm())
-                        RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
-                    return;
-                }
-            }
-        }
-        else if (HasRestingFlag(RESTING_FLAG_IN_TAVERN)) // Remove rest state if we have recently left a tavern.
-        {
-            AreaTriggerEntry const* atEntry = sAreaTriggerStore.LookupEntry(GetInnTriggerId());
-            if (GetMapId() != m_InnEnteredMap || GetDistance2d(atEntry->x, atEntry->y) > 10.0f)
-                RemoveRestingFlag(RESTING_FLAG_IN_TAVERN);
-        }
+        uint32 const areaRestFlag = (GetTeam() == ALLIANCE) ? AREA_FLAG_REST_ZONE_ALLIANCE : AREA_FLAG_REST_ZONE_HORDE;
+        if (area->flags & areaRestFlag)
+            SetRestingFlag(RESTING_FLAG_IN_FACTION_AREA);
+        else
+            RemoveRestingFlag(RESTING_FLAG_IN_FACTION_AREA);
     }
 }
 
@@ -29894,13 +29857,7 @@ void Player::SetRestingFlag(RestingFlag restFlag, uint32 triggerId /*= 0*/)
     }
 
     if (triggerId)
-    {
         m_InnTriggerId = triggerId;
-        m_InnEnteredMap = GetMapId();
-        m_InnEnteredArea = GetAreaId();
-        m_InnEnteredPosition = GetPosition();
-        m_InnEnteredTime = time(NULL);
-    }
 }
 
 void Player::RemoveRestingFlag(RestingFlag restFlag)
@@ -29912,11 +29869,6 @@ void Player::RemoveRestingFlag(RestingFlag restFlag)
     {
         RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING);
         m_resting_Time = 0;
-        m_InnTriggerId = 0;
-        m_InnEnteredMap = 0;
-        m_InnEnteredArea = 0;
-        m_InnEnteredPosition = Position(0, 0, 0, 0);
-        m_InnEnteredTime = 0;
     }
 }
 

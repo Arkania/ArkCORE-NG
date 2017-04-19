@@ -2245,7 +2245,8 @@ bool Map::GetAreaInfo(float x, float y, float z, uint32 &flags, int32 &adtId, in
         {
             float _mapheight = gmap->getHeight(x, y);
             // z + 2.0f condition taken from GetHeight(), not sure if it's such a great choice...
-            if (z + 2.0f > _mapheight &&  _mapheight > vmap_z)
+            // gpn39f: vmap_z + 0.2f : on some places, the vmgr->getAreaInfo returns a 'to low' value
+            if (z + 2.0f > _mapheight &&  _mapheight > vmap_z + 0.2f)
                 return false;
         }
         return true;

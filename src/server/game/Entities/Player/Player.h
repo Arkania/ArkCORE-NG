@@ -814,7 +814,7 @@ enum RestingFlag
     RESTING_FLAG_NONE              = 0,
     RESTING_FLAG_IN_TAVERN         = 1,
     RESTING_FLAG_IN_CITY           = 2,
-    RESTING_FLAG_IN_FACTION_AREA   = 4
+    RESTING_FLAG_IN_FACTION_AREA   = 4                      // used with AREA_FLAG_REST_ZONE_*
 };
 
 enum TeleportToOptions
@@ -2884,10 +2884,6 @@ class Player : public Unit, public GridObject<Player>
 
         ////////////////////Rest System/////////////////////
 
-        Position m_InnEnteredPosition;
-        uint32   m_InnEnteredMap;
-        uint32   m_InnEnteredArea;
-        time_t   m_InnEnteredTime;
         uint32   m_InnTriggerId;
 
         time_t m_resting_Time;
