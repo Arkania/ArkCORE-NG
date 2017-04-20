@@ -16,7 +16,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "script_helper.h"
+#include "Creature.h"
+#include "GameObjectAI.h"
+#include "GameObject.h"
+#include "ObjectAccessor.h"
+#include "ObjectMgr.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptMgr.h"
+#include "SpellMgr.h"
+#include "Transport.h"
+#include "TransportMgr.h"
 #include "Vehicle.h"
+
+
+enum eOrgrimmar
+{
+    QUEST_A_PERSONAL_SUMMONS = 28790,
+};
+
 
 // 52514 
 class item_thonks_spyglass_52514 : public ItemScript
@@ -435,6 +455,84 @@ public:
     }
 };
 
+// 4801
+class at_orgrimmar_command_board_1 : public AreaTriggerScript
+{
+public:
+    at_orgrimmar_command_board_1() : AreaTriggerScript("at_orgrimmar_command_board_1") { }
+
+    bool OnTrigger(Player* player, const AreaTriggerEntry* at) override
+    {
+        if (player->getLevel() < 80 || player->GetTeamId() != TEAM_HORDE)
+            return false;
+
+        if (player->GetQuestStatus(28790) != QUEST_STATUS_NONE)
+            return false;
+
+        if (Quest const* quest = sObjectMgr->GetQuestTemplate(QUEST_A_PERSONAL_SUMMONS))
+            if (GameObject* go = player->FindNearestGameObject(206109, 50.0f))
+                if (player->CanTakeQuest(quest, false))
+                {
+                    player->AddQuestAndCheckCompletion(quest, go);
+                    return true;
+                }
+
+        return false;
+    }
+};
+
+// 4802
+class at_orgrimmar_command_board_2 : public AreaTriggerScript
+{
+public:
+    at_orgrimmar_command_board_2() : AreaTriggerScript("at_orgrimmar_command_board_2") { }
+
+    bool OnTrigger(Player* player, const AreaTriggerEntry* at) override
+    {
+        if (player->getLevel() < 80 || player->GetTeamId() != TEAM_HORDE)
+            return false;
+
+        if (player->GetQuestStatus(28790) != QUEST_STATUS_NONE)
+            return false;
+
+        if (Quest const* quest = sObjectMgr->GetQuestTemplate(QUEST_A_PERSONAL_SUMMONS))
+            if (GameObject* go = player->FindNearestGameObject(206116, 50.0f))
+                if (player->CanTakeQuest(quest, false))
+                {
+                    player->AddQuestAndCheckCompletion(quest, go);
+                    return true;
+                }
+
+        return false;
+    }
+};
+
+// 7354
+class at_orgrimmar_teleport_area : public AreaTriggerScript
+{
+public:
+    at_orgrimmar_teleport_area() : AreaTriggerScript("at_orgrimmar_teleport_area") { }
+
+    bool OnTrigger(Player* player, const AreaTriggerEntry* at) override
+    {
+        if (player->getLevel() < 80 || player->GetTeamId() != TEAM_HORDE)
+            return false;
+
+        if (player->GetQuestStatus(28790) != QUEST_STATUS_NONE)
+            return false;
+
+        if (Quest const* quest = sObjectMgr->GetQuestTemplate(QUEST_A_PERSONAL_SUMMONS))
+            if (Creature* npc = player->FindNearestCreature(45244, 50.0f))
+                if (player->CanTakeQuest(quest, false))
+                {
+                    player->AddQuestAndCheckCompletion(quest, npc);
+                    return true;
+                }
+
+        return false;
+    }
+};
+
 
 void AddSC_orgrimmar()
 {
@@ -445,4 +543,8 @@ void AddSC_orgrimmar()
     new npc_durotar_watershed_telescope_39345();
     new npc_durotar_watershed_telescope_39346();
     new npc_durotar_watershed_telescope_39347();
+    new at_orgrimmar_command_board_1();
+    new at_orgrimmar_command_board_2();
+    new at_orgrimmar_teleport_area();
 }
+
