@@ -349,7 +349,7 @@ void TransportMgr::AddPathNodeToTransport(uint32 transportEntry, uint32 timeSeg,
     animNode.Path[timeSeg] = node;
 }
 
-Transport* TransportMgr::CreateTransport(uint32 entry, uint32 guid /*= 0*/, Map* map /*= NULL*/, uint32 phaseid /*= 0*/, uint32 phasegroup /*= 0*/)
+Transport* TransportMgr::CreateTransport(uint32 entry, uint32 guid /*= 0*/, Map* map /*= NULL*/, uint16 phaseId /*= 0*/, uint16 phaseGroup /*= 0*/)
 {
     // instance case, execute GetGameObjectEntry hook
     if (map)
@@ -389,11 +389,11 @@ Transport* TransportMgr::CreateTransport(uint32 entry, uint32 guid /*= 0*/, Map*
         return NULL;
     }
 
-    if (phaseid)
-        trans->SetInPhase(phaseid, false, true);
+    if (phaseId)
+        trans->SetInPhase(phaseId, false, true);
 
-    if (phasegroup)
-        for (auto ph : GetXPhasesForGroup(phasegroup))
+    if (phaseGroup)
+        for (auto ph : GetXPhasesForGroup(phaseGroup))
             trans->SetInPhase(ph, false, true);
 
     if (MapEntry const* mapEntry = sMapStore.LookupEntry(mapId))
@@ -424,7 +424,7 @@ void TransportMgr::SpawnContinentTransports()
 
     uint32 oldMSTime = getMSTime();
 
-    QueryResult result = WorldDatabase.Query("SELECT guid, entry FROM transports");
+    QueryResult result = WorldDatabase.Query("SELECT guid, entry, phaseId, phaseGroup FROM transports");
 
     uint32 count = 0;
     if (result)
@@ -434,10 +434,12 @@ void TransportMgr::SpawnContinentTransports()
             Field* fields = result->Fetch();
             uint32 guid = fields[0].GetUInt32();
             uint32 entry = fields[1].GetUInt32();
+            uint16 phaseId = fields[2].GetUInt16();
+            uint16 phaseGroup = fields[3].GetUInt16();
 
             if (TransportTemplate const* tInfo = GetTransportTemplate(entry))
                 if (!tInfo->inInstance)
-                    if (CreateTransport(entry, guid))
+                    if (CreateTransport(entry, guid, nullptr, phaseId, phaseGroup))
                         ++count;
 
         } while (result->NextRow());
