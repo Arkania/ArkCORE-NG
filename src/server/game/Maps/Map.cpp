@@ -561,7 +561,7 @@ bool Map::AddToMap(Transport* obj)
     CellCoord cellCoord = Trinity::ComputeCellCoord(obj->GetPositionX(), obj->GetPositionY());
     if (!cellCoord.IsCoordValid())
     {
-        TC_LOG_ERROR("maps", "Map::Add: Object " UI64FMTD " has invalid coordinates X:%f Y:%f grid cell [%u:%u]", obj->GetGUID(), obj->GetPositionX(), obj->GetPositionY(), cellCoord.x_coord, cellCoord.y_coord);
+        TC_LOG_ERROR("maps", "Map::Add: Object %llu has invalid coordinates X:%f Y:%f grid cell [%u:%u]", obj->GetGUID(), obj->GetPositionX(), obj->GetPositionY(), cellCoord.x_coord, cellCoord.y_coord);
         return false; //Should delete object
     }
 
@@ -570,19 +570,23 @@ bool Map::AddToMap(Transport* obj)
 
     // Broadcast creation to players
     if (!GetPlayers().isEmpty())
-    {
         for (Map::PlayerList::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
-        {
-            if (itr->GetSource()->GetTransport() != obj)
-            {
-                UpdateData data(GetId());
-                obj->BuildCreateUpdateBlockForPlayer(&data, itr->GetSource());
-                WorldPacket packet;
-                data.BuildPacket(&packet);
-                itr->GetSource()->SendDirectMessage(&packet);
-            }
-        }
-    }
+            if (Player* player = itr->GetSource())
+                if (Transport* trans = player->GetTransport())
+                    if (trans != obj)
+                    {
+                        UpdateData data(GetId());
+                        WorldPacket packet;
+
+                        if (player->CanSeeOrDetect(obj, false, true))
+                            obj->BuildCreateUpdateBlockForPlayer(&data, player);
+                        else
+                            obj->BuildOutOfRangeUpdateBlock(&data);
+
+                        data.BuildPacket(&packet);
+                        itr->GetSource()->SendDirectMessage(&packet);
+                    }
+        
 
     return true;
 }
@@ -658,6 +662,43 @@ void Map::Update(const uint32 t_diff)
         player->Update(t_diff);
 
         VisitNearbyCellsOf(player, grid_object_update, world_object_update);
+
+        // If player is using far sight or mind vision, visit that object too
+        if (WorldObject* viewPoint = player->GetViewpoint())
+            VisitNearbyCellsOf(viewPoint, grid_object_update, world_object_update);
+
+        // Handle updates for creatures in combat with player and are more than 60 yards away
+        if (player->IsInCombat())
+        {
+            std::vector<Creature*> updateList;
+            HostileReference* ref = player->getHostileRefManager().getFirst();
+
+            while (ref)
+            {
+                if (Unit* unit = ref->GetSource()->GetOwner())
+                    if (unit->ToCreature() && unit->GetMapId() == player->GetMapId() && !unit->IsWithinDistInMap(player, GetVisibilityRange(), false))
+                        updateList.push_back(unit->ToCreature());
+
+                ref = ref->next();
+            }
+
+            // Process deferred update list for player
+            for (Creature* c : updateList)
+                VisitNearbyCellsOf(c, grid_object_update, world_object_update);
+        }
+
+        UpdateData udata(player->GetMapId());
+        WorldPacket packet;
+
+        for (auto trans : _transports)
+            if (trans->IsInWorld())
+                if (player->CanSeeOrDetect(trans, false, true))
+                    trans->BuildCreateUpdateBlockForPlayer(&udata, player);
+                else
+                    trans->BuildOutOfRangeUpdateBlock(&udata);
+
+        udata.BuildPacket(&packet);
+        player->SendDirectMessage(&packet);
     }
 
     // non-player active objects, increasing iterator in the loop in case of object removal
@@ -2541,7 +2582,7 @@ void Map::SendInitTransports(Player* player)
     // Hack to send out transports
     UpdateData transData(player->GetMapId());
     for (TransportsContainer::const_iterator i = _transports.begin(); i != _transports.end(); ++i)
-        if (*i != player->GetTransport())
+        if (*i != player->GetTransport() && player->IsInPhase(*i))
             (*i)->BuildCreateUpdateBlockForPlayer(&transData, player);
 
     WorldPacket packet;
