@@ -17592,6 +17592,8 @@ void Player::RemoveActiveQuest(uint32 questId, bool update /*= true*/)
 
     if (update)
         SendQuestUpdate(questId);
+
+    sScriptMgr->OnQuestRemove(this, questId);
 }
 
 void Player::RemoveRewardedQuest(uint32 questId, bool update /*= true*/)

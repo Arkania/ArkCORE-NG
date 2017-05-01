@@ -3431,6 +3431,9 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
                             case 68287:
                                 pos = Position(602.79f, 2778.63f, 89.2229f, 1.0152f);
                                 break;
+                            case 68491:
+                                pos = Position(-1929.161f, 2387.771f, 30.96014f, 1.3116f);
+                                break;
                             case 68815:
                                 pos = Position(856.168f, 2751.02f, 118.867f, 2.395519f);
                                 break;

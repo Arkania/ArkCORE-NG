@@ -781,6 +781,9 @@ class PlayerScript : public UnitScript
         // Called when a player changes to a new map (after moving to new map)
         virtual void OnMapChanged(Player* /*player*/) { }
 
+        // Called when a player remove a quest
+        virtual void OnQuestRemove(Player* /*player*/, uint32 /*questId*/) { }
+
         // Called after a player's quest status has been changed
         virtual void OnQuestStatusChange(Player* /*player*/, uint32 /*questId*/, QuestStatus /*status*/) { }
 };
@@ -1062,6 +1065,7 @@ class ScriptMgr
         void OnPlayerSave(Player* player);
         void OnPlayerBindToInstance(Player* player, Difficulty difficulty, uint32 mapid, bool permanent);
         void OnPlayerUpdateZone(Player* player, uint32 newZone, uint32 newArea);
+        void OnQuestRemove(Player* player, uint32 questId);
         void OnQuestStatusChange(Player* player, uint32 questId, QuestStatus status);
 
     public: /* GuildScript */

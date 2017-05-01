@@ -523,7 +523,6 @@ void GameObject::Update(uint32 diff)
                     }
                 }
             }
-
             break;
         }
         case GO_ACTIVATED:
@@ -2318,20 +2317,5 @@ void GameObject::UpdateModelPosition()
         GetMap()->RemoveGameObjectModel(*m_model);
         m_model->Relocate(*this);
         GetMap()->InsertGameObjectModel(*m_model);
-    }
-}
-
-void GameObjectData::UpdatePhaseXGroup(std::set<uint16>&idList, uint16& phaseGroup)
-{
-    if (!idList.size() && !phaseGroup)
-    {
-        idList.insert(169);
-        return;
-    }
-    else if (!idList.size() == 1)
-        return; 
-    else
-    {
-
     }
 }

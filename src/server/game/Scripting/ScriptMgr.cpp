@@ -1328,6 +1328,11 @@ void ScriptMgr::OnPlayerUpdateZone(Player* player, uint32 newZone, uint32 newAre
     FOREACH_SCRIPT(PlayerScript)->OnUpdateZone(player, newZone, newArea);
 }
 
+void ScriptMgr::OnQuestRemove(Player* player, uint32 questId)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnQuestRemove(player, questId);
+}
+
 void ScriptMgr::OnQuestStatusChange(Player* player, uint32 questId, QuestStatus status)
 {
     FOREACH_SCRIPT(PlayerScript)->OnQuestStatusChange(player, questId, status);

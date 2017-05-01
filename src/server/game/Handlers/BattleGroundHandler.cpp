@@ -394,9 +394,10 @@ void WorldSession::HandleBattlefieldListOpcode(WorldPacket& recvData)
         return;
     }
 
-    WorldPacket data;
+    WorldPacket data(NULL_OPCODE);
     sBattlegroundMgr->BuildBattlegroundListPacket(&data, 0, _player, BattlegroundTypeId(bgTypeId));
-    SendPacket(&data);
+    if (data.GetOpcode() != NULL_OPCODE)
+        SendPacket(&data);
 }
 
 void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recvData)
