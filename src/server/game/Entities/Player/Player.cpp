@@ -3995,10 +3995,21 @@ bool Player::IsInAreaTriggerRadius(const AreaTriggerEntry* trigger) const
         if (trigger->z < 0.f)
             TC_LOG_DEBUG("misc", "Player::IsInAreaTriggerRadius: AreaTrigger.DBC->Position_Z (value: %f) are below 0. Changed to: %f.", trigger->z, abs(trigger->z));
 
-        // if we have radius check it
-        float dist = GetDistance(trigger->x, trigger->y, abs(trigger->z));
-        if (dist > trigger->radius)
-            return false;
+        // if we have radius check it.. sometimes are trigger.z with negative value, but it should be positiv..
+        if (trigger->z < 0)
+        {
+            Position pos = GetPosition();
+            pos.m_positionZ = abs(pos.m_positionZ);
+            float dist = pos.GetExactDist(trigger->x, trigger->y, abs(trigger->z));
+            if (dist > trigger->radius)
+                return false;
+        }
+        else
+        {
+            float dist = GetDistance(trigger->x, trigger->y, trigger->z);
+            if (dist > trigger->radius)
+                return false;
+        }
     }
     else
     {
