@@ -1554,9 +1554,9 @@ void Spell::SelectImplicitTrajTargets(SpellEffIndex effIndex)
     float srcToDestDelta = m_targets.GetDstPos()->m_positionZ - m_targets.GetSrcPos()->m_positionZ;
 
     std::list<WorldObject*> targets;
-    Trinity::WorldObjectSpellTrajTargetCheck check(dist2d, m_targets.GetSrcPos(), m_caster, m_spellInfo);
+    Trinity::WorldObjectSpellTrajTargetCheck check(dist2d, m_targets.GetDstPos(), m_caster, m_spellInfo); 
     Trinity::WorldObjectListSearcher<Trinity::WorldObjectSpellTrajTargetCheck> searcher(m_caster, targets, check, GRID_MAP_TYPE_MASK_ALL);
-    SearchTargets<Trinity::WorldObjectListSearcher<Trinity::WorldObjectSpellTrajTargetCheck> > (searcher, GRID_MAP_TYPE_MASK_ALL, m_caster, m_targets.GetSrcPos(), dist2d);
+    SearchTargets<Trinity::WorldObjectListSearcher<Trinity::WorldObjectSpellTrajTargetCheck> > (searcher, GRID_MAP_TYPE_MASK_ALL, m_caster, m_targets.GetDstPos(), dist2d); 
     if (targets.empty())
         return;
 
