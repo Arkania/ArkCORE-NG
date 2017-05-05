@@ -414,6 +414,8 @@ class Spell
 
         SpellCastResult CheckItems();
         SpellCastResult CheckRange(bool strict);
+        void GetMinMaxRange(bool strict, float &minRange, float &maxRange);
+        void GetEffectsMinMaxRange(float &minRange, float &maxRange);
         SpellCastResult CheckPower();
         SpellCastResult CheckRuneCost(uint32 runeCostID);
         SpellCastResult CheckCasterAuras() const;
