@@ -69,6 +69,7 @@ enum eDuskHaven
     NPC_LUCIUS = 36461,
     NPC_SWIFT_MOUNTAIN_HORSE = 36741,
     NPC_LORD_DARIUS_CROWLEY = 37195,
+    NPC_ENSLAVED_VILLAGER = 37694,
     NPC_KOROTH = 37808,
     NPC_LORD_GODFREY = 37875,
     NPC_DARK_SCOUT = 37953,
@@ -77,6 +78,8 @@ enum eDuskHaven
     NPC_CARRIAGE_43337 = 43337,
     NPC_STAGECOACH_CARRIAGE = 44928,
     NPC_LORNA_CRAWLEY = 51409,
+
+    GO_BALL_AND_CHAIN = 201775,
 
     QUEST_INVASION = 14321,
     QUEST_LAST_CHANCE_AT_HUMANITY = 14375,
@@ -94,6 +97,7 @@ enum eDuskHaven
     QUEST_EXODUS = 24438,
     QUEST_INTRODUCTIONS_ARE_IN_ORDER = 24472,
     QUEST_STORMGLEN = 24483,
+    QUEST_LIBERATION_DAY = 24575,
     QUEST_BETRAYAL_AT_TEMPESTS_REACH = 24592,
     QUEST_LOSING_YOUR_TAIL = 24616,
     QUEST_AT_OUR_DOORSTEP = 24627,
@@ -2666,7 +2670,6 @@ public:
     }
 };
 
-
 // 6687
 class at_the_blackwald_6687 : public AreaTriggerScript
 {
@@ -3044,8 +3047,6 @@ public:
 	}
 };
 
-// from here only phase 131072
-
 // 38765
 class npc_stout_mountain_horse_38765 : public CreatureScript
 {
@@ -3144,15 +3145,125 @@ public:
 	{
 		if (quest->GetQuestId() == QUEST_PUSH_THEM_OUT)
 		{
-			if (!player->HasAura(SPELL_PHASE_QUEST_ZONE_SPECIFIC_12))
-			{
-				// done by phase_definition and phase_area
-				// player->AddAura(SPELL_PHASE_QUEST_ZONE_SPECIFIC_12, player);
-			}
+            player->RemoveAura(SPELL_PHASE_QUEST_ZONE_SPECIFIC_11);
+            player->CastSpell(player, SPELL_PHASE_QUEST_ZONE_SPECIFIC_12, true);
 		}
 
 		return false;
 	}
+};
+
+// 37694
+class npc_enslaved_villager_37694 : public CreatureScript
+{
+public:
+    npc_enslaved_villager_37694() : CreatureScript("npc_enslaved_villager_37694") { }
+
+    struct npc_enslaved_villager_37694AI : public ScriptedAI
+    {
+        npc_enslaved_villager_37694AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap m_events;
+        uint64 m_playerGUID;
+        uint64 m_ballGUID;
+
+        void Reset() override
+        {
+            m_playerGUID = 0;
+            m_ballGUID = 0;
+        }
+
+        void SetGUID(uint64 guid, int32 id) override
+        {
+            switch (id)
+            {
+            case PLAYER_GUID:
+                m_playerGUID = guid;
+                break;
+            case GO_BALL_AND_CHAIN:
+                m_ballGUID = guid;
+                break;
+            }
+        }
+
+        void DoAction(int32 param) override
+        {
+            switch (param)
+            {
+            case EVENT_START_ANIM:
+            {
+                if (GameObject* ball = sObjectAccessor->GetGameObject(*me, m_ballGUID))
+                    ball->DestroyForNearbyPlayers();
+                m_events.ScheduleEvent(EVENT_START_ANIM, 1000);
+                break;
+            }          
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_START_ANIM:
+                {
+                    me->HandleEmote(EMOTE_STATE_NONE);
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                    {
+                        me->SetFacingToObject(player);
+                        Talk(0, player);
+                    }
+
+                    m_events.ScheduleEvent(EVENT_TALK_PART_00, 3000);
+                    break;
+                }
+                case EVENT_TALK_PART_00:
+                {
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                            me->GetMotionMaster()->MoveFleeing(player, 7000);
+
+                    m_events.ScheduleEvent(EVENT_TALK_PART_01, 6000);
+                }
+                case EVENT_TALK_PART_01:
+                    me->DespawnOrUnsummon(10);
+                    break;
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_enslaved_villager_37694AI(creature);
+    }
+};
+
+// 201775
+class go_ball_and_chain_201775 : public GameObjectScript
+{
+public:
+    go_ball_and_chain_201775() : GameObjectScript("go_ball_and_chain_201775") {}
+
+    void OnLootStateChanged(GameObject* go, uint32 state, Unit* unit) override
+    {
+        if (state == 2 && unit)
+            if (Player* player = unit->ToPlayer())
+                if (player->GetQuestStatus(QUEST_LIBERATION_DAY) == QUEST_STATUS_INCOMPLETE || player->GetQuestStatus(QUEST_LIBERATION_DAY) == QUEST_STATUS_COMPLETE)
+                    if (Creature* villager = go->FindNearestCreature(NPC_ENSLAVED_VILLAGER, 5.0f))
+                    {
+                        villager->AI()->SetGUID(go->GetGUID(), go->GetEntry());
+                        villager->AI()->SetGUID(player->GetGUID(), PLAYER_GUID);
+                        villager->AI()->DoAction(EVENT_START_ANIM);
+                    }
+    }
 };
 
 // from here phase 262144 is active.. battle for gilneas in zone_gilneas_city3
@@ -3204,4 +3315,6 @@ void AddSC_zone_gilneas_duskhaven()
 	new npc_lord_hewell_38764();
 	new npc_stout_mountain_horse_38765();
 	new npc_lorna_crowley_37783();
+    new npc_enslaved_villager_37694();
+    new go_ball_and_chain_201775();
 };

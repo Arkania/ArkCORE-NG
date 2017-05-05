@@ -73,6 +73,7 @@ enum eBattleForGilneas
     SPELL_GILNEAS_MILITIA_SHOOT = 6660,
     SPELL_FORSAKEN_CROSSBOW_SHOOT = 6660,
     SPELL_KNOCKBACK = 68683,
+    SPELL_FIERY_BOULDER = 72050,
     SPELL_CLEAVE = 15496,
 
     SOUND_GILNEAN_MILITIA = 22584,
@@ -1051,8 +1052,6 @@ public:
             m_wave = 0;
             m_arrivedMask = 0;
             m_ai_counter = 0;
-            m_events.ScheduleEvent(EVENT_INITIALISE, 1000);
-            m_events.ScheduleEvent(EVENT_CHECK_FOR_TIMER, 1000);
         }
 
         void Reset() override
@@ -1060,6 +1059,9 @@ public:
             me->SetReactState(REACT_PASSIVE);
             if (my_followerList.empty())
                 SummonMyMember();
+            m_events.RescheduleEvent(EVENT_INITIALISE, 1000);
+            m_events.RescheduleEvent(EVENT_CHECK_FOR_TIMER, 1000);
+
         }
 
         void JustSummoned(Creature* summon) override
@@ -1256,7 +1258,7 @@ public:
                     if (!m_isInitialised)
                     {
                         if (!m_krennanGUID)
-                            if (Creature* krennan = me->FindNearestCreature(NPC_KRENNAN_ARANAS, 250.0f))
+                            if (Creature* krennan = me->FindNearestCreature(NPC_KRENNAN_ARANAS, 25.0f))
                                 m_krennanGUID = krennan->GetGUID();
 
                         if (Creature* krennan = sObjectAccessor->GetCreature(*me, m_krennanGUID))
@@ -1350,7 +1352,7 @@ public:
                     }
                     else
                     {
-                        if (m_wave == 4 && m_point == 16 && !IsPlayerNear(20.0f))
+                        if (m_wave == 4 && m_point == 16 && !IsPlayerNearBase() && !IsPlayerNear(20.0f))
                         {
                             m_events.RescheduleEvent(EVENT_FIGHT_WAVE, 1000);
                             break;
@@ -1671,6 +1673,23 @@ public:
             return (me->FindNearestPlayer(range)) ? true : false;
         }
 
+        bool IsPlayerNearBase()
+        {
+            Position pos = Position(-1733.5f, 1389.5f, 20.0f);
+            if (Creature* myriam = sObjectAccessor->GetCreature(*me, m_myriamGUID))
+                if (Creature* liam = sObjectAccessor->GetCreature(*me, m_prince1GUID))
+                {
+                    float d1 = myriam->GetDistance(pos);
+                    float d2 = liam->GetDistance(pos);
+                    Player* p1 = myriam->FindNearestPlayer(25.0f);
+                    Player* p2 = liam->FindNearestPlayer(25.0f);
+                    if (d1 < 25.0f && d2 < 25.0f && (p1 || p2))
+                        return true;
+                }
+
+            return false;
+        }
+
         void SetActiveMode()
         {
             m_events.RescheduleEvent(EVENT_ACTIVE_OBJECT_CD, 15 * 60000);
@@ -1713,10 +1732,6 @@ public:
         void Initialize()
         {
             m_events.Reset();
-            m_events.ScheduleEvent(EVENT_CHECK_PLAYER_FOR_PHASE, 2500);
-            m_events.ScheduleEvent(EVENT_INITIALISE, 1000);
-            m_events.ScheduleEvent(EVENT_RANDOM_TEXT, 30000);
-            m_events.ScheduleEvent(EVENT_CHECK_FOR_TIMER, 1000);
             m_almyraGUID = 0;
             m_isInitialised = false;
             m_shootCoolDown = 4000;
@@ -1733,6 +1748,11 @@ public:
             if (my_followerList.empty())
                 SummonMyMember();
             me->SetSpeed(MOVE_RUN, 1.0f, true);
+            m_events.RescheduleEvent(EVENT_CHECK_PLAYER_FOR_PHASE, 2500);
+            m_events.RescheduleEvent(EVENT_INITIALISE, 1000);
+            m_events.RescheduleEvent(EVENT_RANDOM_TEXT, 30000);
+            m_events.RescheduleEvent(EVENT_CHECK_FOR_TIMER, 1000);
+
         }
 
         void DamageTaken(Unit* attacker, uint32& damage) override
@@ -1887,7 +1907,7 @@ public:
                     if (!m_isInitialised)
                     {
                         if (!m_almyraGUID)
-                            if (Creature* almyra = me->FindNearestCreature(NPC_SISTER_ALMYRA, 250.0f))
+                            if (Creature* almyra = me->FindNearestCreature(NPC_SISTER_ALMYRA, 50.0f))
                                 m_almyraGUID = almyra->GetGUID();
 
                         if (Creature* almyra = sObjectAccessor->GetCreature(*me, m_almyraGUID))
@@ -2215,8 +2235,6 @@ public:
             m_isInitialised = false;
             m_shootCoolDown = 4000;
             m_ai_counter = 0;
-            m_events.ScheduleEvent(EVENT_INITIALISE, 1000);
-            m_events.ScheduleEvent(EVENT_CHECK_FOR_TIMER, 1000);
         }
 
         void Reset() override
@@ -2225,6 +2243,9 @@ public:
             me->SetReactState(REACT_PASSIVE);
             if (my_followerList.empty())
                 SummonMyMember();
+            m_events.RescheduleEvent(EVENT_INITIALISE, 1000);
+            m_events.RescheduleEvent(EVENT_CHECK_FOR_TIMER, 1000);
+
         }
 
         void DamageTaken(Unit* attacker, uint32& damage) override
@@ -2376,7 +2397,7 @@ public:
                     if (!m_isInitialised)
                     {
                         if (!m_almyraGUID)
-                            if (Creature* almyra = me->FindNearestCreature(NPC_SISTER_ALMYRA, 250.0f))
+                            if (Creature* almyra = me->FindNearestCreature(NPC_SISTER_ALMYRA, 50.0f))
                                 m_almyraGUID = almyra->GetGUID();
 
                         if (Creature* almyra = sObjectAccessor->GetCreature(*me, m_almyraGUID))
@@ -2611,8 +2632,6 @@ public:
             m_isInitialised = false;
             m_shootCoolDown = 4000;
             m_ai_counter = 0;
-            m_events.ScheduleEvent(EVENT_INITIALISE, 1000);
-            m_events.ScheduleEvent(EVENT_CHECK_FOR_TIMER, 1000);
         }
 
         void Reset() override
@@ -2621,6 +2640,9 @@ public:
             me->SetReactState(REACT_PASSIVE);
             if (my_followerList.empty())
                 SummonMyMember();
+            m_events.RescheduleEvent(EVENT_INITIALISE, 1000);
+            m_events.RescheduleEvent(EVENT_CHECK_FOR_TIMER, 1000);
+
         }
 
         void DamageTaken(Unit* attacker, uint32& damage) override
@@ -2764,7 +2786,7 @@ public:
                     if (!m_isInitialised)
                     {
                         if (!m_almyraGUID)
-                            if (Creature* almyra = me->FindNearestCreature(NPC_SISTER_ALMYRA, 250.0f))
+                            if (Creature* almyra = me->FindNearestCreature(NPC_SISTER_ALMYRA, 100.0f))
                                 m_almyraGUID = almyra->GetGUID();
 
                         if (Creature* almyra = sObjectAccessor->GetCreature(*me, m_almyraGUID))
@@ -3092,8 +3114,6 @@ public:
             m_ridingWorgen = 0;
             m_shootCoolDown = 4000;
             m_ai_counter = 0;
-            m_events.ScheduleEvent(EVENT_INITIALISE, 1000);
-            m_events.ScheduleEvent(EVENT_CHECK_FOR_TIMER, 1000);
         }
 
         void Reset() override
@@ -3101,6 +3121,9 @@ public:
             me->SetReactState(REACT_PASSIVE);
             if (my_followerList.empty())
                 SummonMyMember();
+            m_events.RescheduleEvent(EVENT_INITIALISE, 1000);
+            m_events.RescheduleEvent(EVENT_CHECK_FOR_TIMER, 1000);
+
         }
 
         void DamageTaken(Unit* attacker, uint32& damage) override
@@ -3221,7 +3244,7 @@ public:
                     if (!m_isInitialised)
                     {
                         if (!m_almyraGUID)
-                            if (Creature* almyra = me->FindNearestCreature(NPC_SISTER_ALMYRA, 250.0f))
+                            if (Creature* almyra = me->FindNearestCreature(NPC_SISTER_ALMYRA, 100.0f))
                                 m_almyraGUID = almyra->GetGUID();
 
                         if (Creature* almyra = sObjectAccessor->GetCreature(*me, m_almyraGUID))
@@ -3455,8 +3478,6 @@ public:
             m_isInitialised = false;
             m_shootCoolDown = 4000;
             m_ai_counter = 0;
-            m_events.ScheduleEvent(EVENT_INITIALISE, 1000);
-            m_events.ScheduleEvent(EVENT_CHECK_FOR_TIMER, 1000);
         }
 
         void Reset() override
@@ -3464,6 +3485,9 @@ public:
             me->SetReactState(REACT_PASSIVE);
             if (my_followerList.empty())
                 SummonMyMember();
+            m_events.RescheduleEvent(EVENT_INITIALISE, 1000);
+            m_events.RescheduleEvent(EVENT_CHECK_FOR_TIMER, 1000);
+
         }
 
         void DamageTaken(Unit* attacker, uint32& damage) override
@@ -3560,7 +3584,7 @@ public:
                     if (!m_isInitialised)
                     {
                         if (!m_almyraGUID)
-                            if (Creature* almyra = me->FindNearestCreature(NPC_SISTER_ALMYRA, 500.0f))
+                            if (Creature* almyra = me->FindNearestCreature(NPC_SISTER_ALMYRA, 100.0f))
                                 m_almyraGUID = almyra->GetGUID();
 
                         if (Creature* almyra = sObjectAccessor->GetCreature(*me, m_almyraGUID))
@@ -3781,7 +3805,6 @@ public:
             m_liamGUID = 0;
             m_kingGUID = 0;
             m_isInitialised = false;
-            m_events.ScheduleEvent(EVENT_INITIALISE, 1000);
         }
 
         void Reset() override
@@ -3789,6 +3812,7 @@ public:
             me->SetReactState(REACT_PASSIVE);
             if (my_followerList.empty())
                 SummonMyMember();
+            m_events.RescheduleEvent(EVENT_INITIALISE, 1000);
         }
 
         void JustSummoned(Creature* summon) override
@@ -3880,7 +3904,7 @@ public:
                     if (!m_isInitialised)
                     {
                         if (!m_almyraGUID)
-                            if (Creature* almyra = me->FindNearestCreature(NPC_SISTER_ALMYRA, 500.0f))
+                            if (Creature* almyra = me->FindNearestCreature(NPC_SISTER_ALMYRA, 100.0f))
                                 m_almyraGUID = almyra->GetGUID();
 
                         if (Creature* almyra = sObjectAccessor->GetCreature(*me, m_almyraGUID))
@@ -4707,6 +4731,7 @@ public:
     {
         SPELL_SMASH = 71774,
         SPELL_THUNDERCLAP = 8078,
+        SPELL_GOREROT_THREAT = 72135,
         EVENT_SMASH = 301,
         EVENT_THUNDERCLAP = 302,
         EVENT_SAY1 = 303,
@@ -4722,9 +4747,9 @@ public:
         {
             me->SetReactState(REACT_PASSIVE);
             me->PlayDirectSound(23530);
-            m_events.ScheduleEvent(EVENT_SAY1, 10000);
-            m_events.ScheduleEvent(EVENT_SMASH, 13000);
-            m_events.ScheduleEvent(EVENT_THUNDERCLAP, 21000);
+            m_events.RescheduleEvent(EVENT_SAY1, 10000);
+            m_events.RescheduleEvent(EVENT_SMASH, 13000);
+            m_events.RescheduleEvent(EVENT_THUNDERCLAP, 21000);
         }
 
         void UpdateAI(uint32 diff)
@@ -4829,12 +4854,41 @@ public:
         {
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_fiery_boulder_72050_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_DEST_AREA_ENEMY);
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_fiery_boulder_72050_SpellScript::FilterTargets, EFFECT_1, TARGET_UNIT_DEST_AREA_ENEMY);
+            
         }
     };
 
     SpellScript* GetSpellScript() const override
     {
         return new spell_fiery_boulder_72050_SpellScript();
+    }
+};
+
+// 72051
+class spell_fiery_boulder_72051 : public SpellScriptLoader
+{
+public:
+    spell_fiery_boulder_72051() : SpellScriptLoader("spell_fiery_boulder_72051") { }
+
+    class spell_fiery_boulder_72051_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_fiery_boulder_72051_SpellScript);
+
+        void SetDest(SpellDestination& dest)
+        {
+            if (WorldLocation* loc = const_cast<WorldLocation*>(GetExplTargetDest()))   
+                dest._position = loc->GetWorldLocation(); 
+        }
+
+        void Register() override
+        {
+            OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_fiery_boulder_72051_SpellScript::SetDest, EFFECT_0, TARGET_DEST_TRAJ);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_fiery_boulder_72051_SpellScript();
     }
 };
 
@@ -5011,11 +5065,17 @@ public:
             case WAYPOINT_MOTION_TYPE:
             {
                 if (m_eventPhase == 1 && id == 0)
-                    Talk(0);
+                {
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                        Talk(0, player);
+                }
                 else if (m_eventPhase == 1 && id == 1)
                     m_events.ScheduleEvent(EVENT_MOVEMENT_START_PATH_1, 1000);
                 else if (m_eventPhase == 2 && id == 0)
-                    Talk(1);
+                {
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                        Talk(1, player);
+                }
                 else if (m_eventPhase == 2 && id == 1)
                     m_events.ScheduleEvent(EVENT_WAIT_FOR_PLAYER_2, 1000); // on open gate
                 else if (m_eventPhase == 3 && id == 3)
@@ -5117,14 +5177,16 @@ public:
                 }
                 case EVENT_WAIT_FOR_OUTSIDE_EVENT:
                 {
-                    if (Creature* general = me->FindNearestCreature(NPC_FORSAKEN_GENERAL, 25.0f))
-                        general->AI()->Talk(0);
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                        if (Creature* general = me->FindNearestCreature(NPC_FORSAKEN_GENERAL, 25.0f))
+                            general->AI()->Talk(0, player);
                     m_events.ScheduleEvent(EVENT_WAIT_FOR_OUTSIDE_EVENT1, 6000);
                     break;
                 }
                 case EVENT_WAIT_FOR_OUTSIDE_EVENT1:
                 {
-                    Talk(2);
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                        Talk(2, player);
                     m_events.ScheduleEvent(EVENT_MOVEMENT_START_PATH_5, 6000);
                     break;
                 }
@@ -5138,7 +5200,8 @@ public:
                 {
                     if (IsPlayerNear(8.0f))
                     {
-                        Talk(3);
+                        if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                            Talk(3, player);
                         me->GetMotionMaster()->MoveJump(-1614.5f, 1533.9f, 27.26f, 20.0f, 5.0f, 2004);
                     }
                     else
@@ -6608,6 +6671,7 @@ void AddSC_zone_gilneas_city3()
     new npc_lorna_crowley_38611();
     new spell_rapier_of_the_gilnean_patriots_71388();
     new spell_fiery_boulder_72050();
+    new spell_fiery_boulder_72051();
     new spell_shoot_liam_72116();
     new npc_tobias_mistmantle_38507();
     new npc_lady_sylvanas_windrunner_38530();
