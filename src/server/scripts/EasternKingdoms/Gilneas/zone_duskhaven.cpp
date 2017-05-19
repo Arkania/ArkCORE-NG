@@ -134,6 +134,7 @@ enum eDuskHaven
     SPELL_IN_STOCKS = 69169,
     SPELL_FORCECAST_SUMMON_SWIFT_MOUNTAIN_HORSE = 69256,
     SPELL_FORCECAST_GILNEAS_TELESCOPE = 69258,
+    SPELL_STEALTH_70456 = 70456,
     SPELL_FREEZING_TRAP_EFFECT = 70794,
     SPELL_AIMED_SHOOT = 70796,
     SPELL_RIDE_VEHICLE_72764 = 72764,
@@ -2925,6 +2926,7 @@ public:
 		if (quest->GetQuestId() == QUEST_BETRAYAL_AT_TEMPESTS_REACH)
 		{
 			player->CastSpell(player, SPELL_FORCE_REACTION_1);
+            player->RemoveAura(SPELL_STEALTH_70456);
 			creature->AI()->DoAction(1);
 		}
 
@@ -3071,7 +3073,7 @@ public:
 			if (Player* player = summoner->ToPlayer())
 			{
 				m_playerGUID = summoner->GetGUID();				
-				m_events.ScheduleEvent(EVENT_START_WAYPOINTS, 100);
+				m_events.ScheduleEvent(EVENT_START_WAYPOINTS, 1500);
 			}
 		}
 
