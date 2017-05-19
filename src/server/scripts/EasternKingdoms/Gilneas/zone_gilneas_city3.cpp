@@ -891,11 +891,13 @@ public:
                 {
                 case EVENT_CHECK_PLAYER_FOR_PHASE:
                 {
-                    std::list<Player*> playerList = me->FindNearestPlayers(200.0f, true);
+                    std::list<Player*> playerList = me->FindNearestPlayers(100.0f, true);
                     for (std::list<Player*>::const_iterator itr = playerList.begin(); itr != playerList.end(); ++itr)
                         if ((*itr)->GetQuestStatus(QUEST_PUSH_THEM_OUT) == QUEST_STATUS_REWARDED)
+                        {
                             if ((*itr)->GetPhaseMask() != 262144)
                                 (*itr)->SetPhaseMask(262144, true);
+                        }
 
                     if (playerList.size() && !m_playerIsInvited && !m_battleIsStarted)
                     {
@@ -920,7 +922,8 @@ public:
                 case EVENT_CHECK_PLAYER_FOR_INVITE:
                 {
                     if (!m_battleIsStarted)
-                        Talk(0);
+                        if (Player* player = me->FindNearestPlayer(25.0f))
+                            Talk(0, player);
                     break;
                 }
                 }
@@ -936,7 +939,7 @@ public:
         {
             if (Creature* almyra = sObjectAccessor->GetCreature(*me, m_almyraGUID))
                 if (almyra->IsAlive())
-                    if (me->GetDistance2d(almyra) < 50)
+                    if (me->GetDistance2d(almyra) < 50.0f)
                     {
                         almyra->AI()->DoAction(ACTION_START_EVENT);
                         Talk(0, player);

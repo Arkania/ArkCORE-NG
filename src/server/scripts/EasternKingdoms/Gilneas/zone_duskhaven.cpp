@@ -3223,6 +3223,7 @@ public:
                             me->GetMotionMaster()->MoveFleeing(player, 7000);
 
                     m_events.ScheduleEvent(EVENT_TALK_PART_01, 6000);
+                    break;
                 }
                 case EVENT_TALK_PART_01:
                     me->DespawnOrUnsummon(10);
