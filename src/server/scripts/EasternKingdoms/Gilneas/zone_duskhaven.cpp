@@ -597,19 +597,20 @@ public:
 
     struct npc_forsaken_catapult_36283AI : public VehicleAI
     {
-        npc_forsaken_catapult_36283AI(Creature* creature) : VehicleAI(creature) { }
+        npc_forsaken_catapult_36283AI(Creature* creature) : VehicleAI(creature) { Initialize(); }
 
         EventMap m_events;
         uint64   m_playerGUID; // guid only set if mounted
         uint64   m_forsakenGUID; // guid only set if mounted
-        uint64   m_targetGUID;
+
+        void Initialize()
+        {
+            m_playerGUID = 0;
+            m_forsakenGUID = 0;
+        }
 
         void Reset() override
         {
-            m_events.Reset();
-            m_playerGUID = 0;
-            m_forsakenGUID = 0;
-            m_targetGUID = 0;
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
             me->SetReactState(REACT_PASSIVE);
             me->setFaction(1735);
@@ -622,12 +623,14 @@ public:
                 if (Player* player = passenger->ToPlayer())
                 {
                     m_playerGUID = player->GetGUID();
+                    if (seatId == 1)
+                        m_events.ScheduleEvent(EVENT_PLAYER_LAUNCH, 2000);
                 }
                 else if (Creature* npc = passenger->ToCreature())
                 {
                     m_forsakenGUID = npc->GetGUID();
                     npc->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
-                    m_events.ScheduleEvent(EVENT_CAST_BOULDER, 100);
+                    m_events.ScheduleEvent(EVENT_CAST_BOULDER, urand(100, 5000));
                     m_events.ScheduleEvent(EVENT_CHECK_PLAYER, 1000);
                     me->setFaction(1735);
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -637,7 +640,8 @@ public:
             {
                 if (Player* player = passenger->ToPlayer())
                 {
-                    m_events.ScheduleEvent(EVENT_CAST_PLAYER, 1000);
+                    if (seatId == 0)
+                        m_playerGUID = 0;
                 }
                 else if (Creature* npc = passenger->ToCreature())
                 {
@@ -647,25 +651,14 @@ public:
                     m_events.CancelEvent(EVENT_CHECK_PLAYER);
                     m_events.ScheduleEvent(EVENT_MASTER_RESET, 180000);
                     me->setFaction(35);
+                    me->RemoveAllAuras();
+                    me->HandleEmote(EMOTE_ONESHOT_NONE);
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 }
             }
         }
 
         void EnterEvadeMode() {}
-
-        void SetGUID(uint64 guid, int32 id) override
-        {
-            switch (id)
-            {
-            case NPC_GENERIC_TRIGGER_LAB_MP:
-            {
-                m_targetGUID = guid;
-                me->GetVehicleKit()->RemoveAllPassengers();
-                break;
-            }
-            }
-        }
 
         void UpdateAI(uint32 diff) override
         {
@@ -679,17 +672,18 @@ public:
                 {
                     if (Creature* target = sObjectAccessor->GetCreature(*me, m_forsakenGUID))
                         if (Player* player = me->FindNearestPlayer(7.0f))
-                            {
-                                target->ExitVehicle();
-                                break;
-                            }
+                        {
+                            target->ExitVehicle();
+                            break;
+                        }
+                
                     m_events.ScheduleEvent(EVENT_CHECK_PLAYER, 1000);
                     break;
                 }
                 case EVENT_CAST_BOULDER:
                 {
                     me->CastSpell(me, SPELL_FIERY_BOULDER, true);
-                    m_events.ScheduleEvent(EVENT_CAST_BOULDER, urand(10000, 15000));
+                    m_events.ScheduleEvent(EVENT_CAST_BOULDER, urand(8000, 15000));
                     break;
                 }
                 case EVENT_MASTER_RESET:
@@ -701,17 +695,26 @@ public:
                         if (Creature* npc = me->SummonCreature(NPC_FORSAKEN_MACHINIST, me->GetPosition()))
                             npc->EnterVehicle(me, 0);
 
-                        Reset();
+                        Reset(); 
                     }
                     break;
                 }
-                case EVENT_CAST_PLAYER:
+                case EVENT_PLAYER_LAUNCH:
                 {
                     if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
-                        if (Creature* t = sObjectAccessor->GetCreature(*me, m_targetGUID))
-                            player->NearTeleportTo(t->GetPositionX(), t->GetPositionY(), t->GetPositionZ(), player->GetOrientation());
+                    {
+                        me->CastSpell(me, 96185, true); // trigger spell 66251 (Aura Id 144 (SPELL_AURA_SAFE_FALL)
+                    }
 
+                    m_events.ScheduleEvent(EVENT_PLAYER_LANDING, 5000);
+                    break;
+                }
+                case EVENT_PLAYER_LANDING:
+                {
+                    
+                    m_events.RescheduleEvent(EVENT_MASTER_RESET, 10000);
                     m_playerGUID = 0;
+                    
                     break;
                 }
                 }
@@ -725,82 +728,41 @@ public:
     }
 };
 
-// 68659
+// 68659 trigger 96114
 class spell_launch_68659 : public SpellScriptLoader
 {
 public:
     spell_launch_68659() : SpellScriptLoader("spell_launch_68659") { }
 
-    class IsNotEntry
-    {
-    public:
-        explicit IsNotEntry(uint32 entry) : _entry(entry) { }
-
-        bool operator()(WorldObject* obj) const
-        {
-            if (Creature* target = obj->ToCreature())
-                return target->GetEntry() != _entry;
-
-            return true;
-        }
-
-    private:
-        uint32 _entry;
-    };
-
     class spell_launch_68659_SpellScript : public SpellScript
     {
         PrepareSpellScript(spell_launch_68659_SpellScript);
 
-        uint64 m_playerGUID = 0;
-        Position pos = Position();
 
-        void HandleBeforeCast()
-        {
-            m_playerGUID = 0;
-            if (Creature* catapult = GetCaster()->ToCreature())
-                if (Vehicle* vehicle = catapult->GetVehicleKit())
-                    if (Unit* unit = vehicle->GetPassenger(0))
-                        if (Player* player = unit->ToPlayer())
-                        {
-                            m_playerGUID = player->GetGUID();
-                            player->EnterVehicle(GetCaster(), 1);
-                        }
-        }
-       
         void CheckTargets(std::list<WorldObject*>& targets)
         {
             targets.remove_if(IsNotEntry(NPC_GENERIC_TRIGGER_LAB_MP));
-            if (targets.empty())
-                return;
-            WorldObject* target = nullptr;
-            float target_orientation = 6.28f;
-            float ori = GetCaster()->GetOrientation();
-            for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
-            {
-                float angle = GetCaster()->GetAngle((*itr));
-                float diff = abs(ori - angle);
-                if (diff < target_orientation)
-                {
-                    target_orientation = diff;
-                    target = (*itr);
-                    pos = target->GetPosition();
-                }
-            }
+            if (targets.size() > 0)
+                if (WorldObject* wo = targets.front())
+                    if (Creature* target = wo->ToCreature())
+                    {
+                        Position t = target->GetPosition();
+                        if (Unit* unit = GetCaster())
+                            if (Vehicle* car = unit->GetVehicleKit())
+                                if (Unit* pas = car->GetPassenger(0))
+                                    if (Player* player = pas->ToPlayer())
+                                    {
+                                        player->NearTeleportTo(t.GetPositionX(), t.GetPositionY(), t.GetPositionZ(), player->GetOrientation());
+                                        return;
+                                    }
+                    }
+
             targets.clear();
-            targets.push_back(target);
-            GetCaster()->GetAI()->SetGUID(target->GetGUID(), target->GetEntry());            
-        }
-
-        void HandleDummy(SpellEffIndex /*effIndex*/)
-        {
-
+            this->FinishCast(SPELL_CAST_OK);
         }
 
         void Register() override
         {
-           // BeforeCast += SpellCastFn(spell_launch_68659_SpellScript::HandleBeforeCast);
-            OnEffectHit += SpellEffectFn(spell_launch_68659_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_launch_68659_SpellScript::CheckTargets, EFFECT_0, TARGET_UNIT_DEST_AREA_ENTRY);
         }
     };
@@ -808,6 +770,39 @@ public:
     SpellScript* GetSpellScript() const override
     {
         return new spell_launch_68659_SpellScript();
+    }
+};
+
+// 96185 trigger 66251
+class spell_launch_96185 : public SpellScriptLoader
+{
+public:
+    spell_launch_96185() : SpellScriptLoader("spell_launch_96185") { }
+
+    class spell_launch_96185_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_launch_96185_SpellScript);
+
+        uint64 m_playerGUID = 0;
+        Position pos = Position();
+
+        void CheckTarget(WorldObject*& target)
+        {
+            if (Vehicle* cat = GetCaster()->GetVehicleKit())
+                if (Unit* pas = cat->GetPassenger(1))
+                    if (Player* player = pas->ToPlayer())
+                        target = player;
+        }
+
+        void Register() override
+        {
+            OnObjectTargetSelect += SpellObjectTargetSelectFn(spell_launch_96185_SpellScript::CheckTarget, EFFECT_0, TARGET_UNIT_CASTER);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_launch_96185_SpellScript();
     }
 };
 
@@ -3284,6 +3279,7 @@ void AddSC_zone_gilneas_duskhaven()
     new npc_forsaken_catapult_36283();
     new spell_launch_68659();
     new spell_fire_boulder_68591();
+    new spell_launch_96185();
     new npc_mastiff_36409();
     new npc_mastiff_36405();
     new npc_lord_godfrey_36290();

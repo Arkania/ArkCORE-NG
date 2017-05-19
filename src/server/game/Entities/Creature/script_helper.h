@@ -100,6 +100,8 @@ enum Events
     EVENT_PLAYING,
     EVENT_PLAYER_ENTER_VEHICLE,
     EVENT_PLAYER_EXIT,
+    EVENT_PLAYER_LANDING,
+    EVENT_PLAYER_LAUNCH,
     EVENT_RANDOM_EMOTE,
     EVENT_RANDOM_CAST,
     EVENT_RESET_TARGET,
@@ -207,6 +209,23 @@ public:
     {
         if (Creature* target = obj->ToCreature())
             return target->GetEntry() != _entry;
+
+        return true;
+    }
+
+private:
+    uint32 _entry;
+};
+
+class IsCreatureEntry
+{
+public:
+    explicit IsCreatureEntry(uint32 entry) : _entry(entry) { }
+
+    bool operator()(WorldObject* obj) const
+    {
+        if (Creature* target = obj->ToCreature())
+            return target->GetEntry() == _entry;
 
         return true;
     }

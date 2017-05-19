@@ -37,6 +37,120 @@
 #include "Unit.h"
 #include "Vehicle.h"
 
+enum eZoneGilneas
+{
+    GO_MERCHANT_DOOR = 195327,
+
+    NPC_PANICKED_CITIZEN = 34851,
+    NPC_RAMPAGING_WORGEN_34884 = 34884,
+    NPC_PRINCE_LIAM = 34913,
+    NPC_FRIGHTENED_CITIZEN_34981 = 34981,
+    NPC_KING_GREYMANE_35112 = 35112,
+    NPC_BLOODFANG_WORGEN_35118 = 35118,
+    NPC_WORGEN_ALPHA_C2 = 35167,
+    NPC_WORGEN_ALPHA_C1 = 35170,
+    NPC_WORGEN_RUNT_C1 = 35188,
+    NPC_BLOODFANG_STALKER = 35229,
+    NPC_DARIUS_CROWLEY = 35230,
+    NPC_CROWLEYS_HORSE = 35231,
+    NPC_JOSIAH_AVERY_35370 = 35370,
+    NPC_LORNA_CROWLEY_35378 = 35378,
+    NPC_WORGEN_RUNT_C2 = 35456,
+    NPC_BLOODFANG_LURKER = 35463,
+    NPC_BLOODFANG_RIPPER_35505 = 35505,
+    NPC_PRINCE_GREYMANE = 35551,
+    NPC_LORD_DARIUS_CROWLEY = 35552,
+    NPC_BLOODFANG_STALKER_CREDIT = 35582,
+    NPC_TOBIAS_MISTMANTLE = 35618,
+    NPC_FRENZIED_STALKER = 35627,
+    NPC_GILNEAN_MASTIFF = 35631,
+    NPC_RAMPAGING_WORGEN_35660 = 35660,
+    NPC_KRENNAN_ARANAS_TREE = 35753,
+    NPC_GILNEAS_EVACUATION_FACING_MARKER_35830 = 35830,
+    NPC_FRIGHTENED_CITIZEN_WORGEN = 35836,
+    NPC_GRAYMANE_HORSE_35905 = 35905,
+    NPC_KRENNAN_ARANAS = 35907,
+    NPC_KING_GREYMANE = 35911,
+    NPC_COMMANDEERED_CANNON = 35914,
+    NPC_NORTHGATE_REBEL_1 = 36057,
+    NPC_PANICKED_CITIZEN_GATE = 44086,
+    NPC_HEALING_CREDIT = 47091,
+    NPC_JOSAIH_AVERY_TRIGGER = 50415,
+
+    QUEST_LOCKDOWN = 14078,
+    QUEST_THE_REBEL_LORDS_ARSENAL = 14159,
+    QUEST_FROM_THE_SHADOWS = 14204,
+    QUEST_SACRIFICES = 14212,
+    QUEST_LAST_STAND = 14222,
+    QUEST_FLASH_HEAL = 14279,
+    QUEST_A_REJUVENATING_TOUCH = 14283,
+    QUEST_SAVE_KRENNAN_ARANAS = 14293,
+
+    SPELL_RENEW = 139,
+    SPELL_SHADOWSTALKER_STEALTH = 5916,
+    SPELL_SHOOT = 6660,
+    SPELL_ENRAGE_8599 = 8599,
+    SPELL_ENRAGE_56646 = 56646,
+    SPELL_BY_THE_SKIN = 66914,
+    SPELL_THROW_TORCH = 67063,
+    SPELL_GET_SHOT = 67349,
+    SPELL_SUMMON_JOSIAH_AVERY = 67350,
+    SPELL_FORCE_CAST_SUMMON_JOSIAH = 67352,
+    SPELL_ATTACK_LURKER = 67805,
+    SPELL_SUMMON_GILNEAN_MASTIFF = 67807,
+    SPELL_RESCUE_KRENNAN = 68219,
+    SPELL_FORCECAST_SUMMON_GRAYMANE_HORSE = 68232,
+    SPELL_CANNON_FIRE = 68235,
+    SPELL_CURSE_OF_THE_WORGEN = 68630, 
+    SPELL_TWO_FORMS = 68996,
+    SPELL_IN_STOCKS = 69196, 
+    SPELL_COSMETIC_COMBAT_ATTACK = 69873,
+    SPELL_TRANSFORMING = 72794, 
+    SPELL_WORGEN_BITE = 72870,
+    SPELL_INFECTED_BITE = 72872,
+    SPELL_FROSTBOLT_VISUAL_ONLY = 74277,
+    SPELL_HIDEOUS_BITE_WOUND = 76642,
+    SPELL_RIDE_BUNNY_SEAT2 = 84275,
+    SPELL_GILNEAS_CANNON_CAMERA = 93555,
+    SPELL_FADE_OF_BLACK = 94053,
+    SPELL_ALTERED_FORM = 94293, 
+    SPELL_ALTERED_FORM2 = 97709, 
+    SPELL_FORCE_WORGEN_ALTERED_FORM = 98274,
+
+    ZONE_DUSKHAVEN = 4786,
+
+    SPELL_GENERIC_QUEST_INVISIBILITY_DETECTION_1 = 49416,
+    SPELL_PHASE_QUEST_ZONE_SPECIFIC_01 = 59073,
+
+};
+
+// player
+class player_zone_gilneas_city1 : public PlayerScript
+{
+public:
+    player_zone_gilneas_city1() : PlayerScript("player_zone_gilneas_city1") { }
+
+    void OnQuestRemove(Player* player, uint32 questId) override
+    {
+        switch (questId)
+        {
+        case QUEST_THE_REBEL_LORDS_ARSENAL:
+            player->RemoveAura(SPELL_WORGEN_BITE);
+            player->AddAura(SPELL_PHASE_QUEST_ZONE_SPECIFIC_01, player);
+            break;
+        }
+    }
+
+    void OnQuestStatusChange(Player* player, uint32 questId, QuestStatus status) override
+    {
+        switch (questId)
+        {
+        case 0:
+            break;
+        }
+    }
+};
+
 // 34864
 class npc_gilneas_city_guard_gate_34864 : public CreatureScript
 {
@@ -45,7 +159,6 @@ public:
 
     enum eNpc
     {
-        NPC_PANICKED_CITIZEN_GATE = 44086,
         EVENT_START_TALK_WITH_CITIZEN = 101,
         EVENT_TALK_WITH_CITIZEN_1,
         EVENT_TALK_WITH_CITIZEN_2,
@@ -151,8 +264,6 @@ public:
 
     enum eNpc
     {
-        QUEST_LOCKDOWN = 14078,
-        NPC_PANICKED_CITIZEN = 34851,
         EVENT_START_TALK_TO_GUARD = 101,
         EVENT_TALK_TO_GUARD_1,
         EVENT_TALK_TO_GUARD_2,
@@ -292,23 +403,15 @@ public:
 
     enum eNpc
     {
-        NPC_PRINCE_LIAM = 34913,
-        NPC_FRIGHTENED_CITIZEN_WORGEN = 35836,
-        GO_MERCHANT_DOOR = 195327,
-        PLAYER_GUID = 99999,
-        SPELL_ENRAGE = 56646,
-
         MOVE_TO_START_POSITION = 101,
         MOVE_TO_PRINCE_LIAM,
         MOVE_TO_DOOR,
-
         EVENT_MOVE_TO_LIAM = 101,
         EVENT_ATTACK_LIAM,
         EVENT_ENRAGE_COOLDOWN,
         EVENT_MOVE_TO_DOOR,
         EVENT_FOLLOW_CITIZEN1,
         EVENT_FOLLOW_CITIZEN2,
-
         ACTION_START_ANIM_MERCANT = 101,
         ACTION_START_ANIM_LIAM = 102,
     };
@@ -364,7 +467,7 @@ public:
         {
             if (!m_enrage && me->GetHealthPct() < 90.0f)
             {
-                me->CastSpell(me, SPELL_ENRAGE);
+                me->CastSpell(me, SPELL_ENRAGE_56646);
                 m_enrage = true;
                 m_events.ScheduleEvent(EVENT_ENRAGE_COOLDOWN, urand(121000, 150000));
             }
@@ -493,7 +596,6 @@ public:
 
     enum eNpc
     {
-        NPC_RAMPAGING_WORGEN = 35660,
         EVENT_START_NEXT_SHOWFIGHT = 101,
         ACTION_START_ATTACK_LIAM = 102,
     };
@@ -523,7 +625,7 @@ public:
 
         void JustSummoned(Creature* summon) override
         {
-            if (summon->GetEntry() == NPC_RAMPAGING_WORGEN)
+            if (summon->GetEntry() == NPC_RAMPAGING_WORGEN_35660)
             {
                 m_worgenGUID = summon->GetGUID();
                 summon->GetAI()->SetGUID(me->GetGUID(), me->GetEntry());
@@ -534,7 +636,7 @@ public:
         void SummonedCreatureDies(Creature* summon, Unit* /*killer*/) override
         {
             m_worgenGUID = 0;
-            if (summon->GetEntry() == NPC_RAMPAGING_WORGEN)
+            if (summon->GetEntry() == NPC_RAMPAGING_WORGEN_35660)
                 m_events.ScheduleEvent(EVENT_START_NEXT_SHOWFIGHT, 20000);
         }
 
@@ -548,7 +650,7 @@ public:
                 {
                 case EVENT_START_NEXT_SHOWFIGHT:
                 {
-                    me->SummonCreature(NPC_RAMPAGING_WORGEN, -1491.9f, 1413.1f, 35.56f, 5.5f, TEMPSUMMON_TIMED_DESPAWN, 120000);
+                    me->SummonCreature(NPC_RAMPAGING_WORGEN_35660, -1491.9f, 1413.1f, 35.56f, 5.5f, TEMPSUMMON_TIMED_DESPAWN, 120000);
                     break;
                 }
                 }
@@ -575,9 +677,6 @@ public:
 
     enum eNpc
     {
-        NPC_RAMPAGING_WORGEN_34884 = 34884,
-        NPC_BLOODFANG_WORGEN_35118 = 35118,
-        NPC_RAMPAGING_WORGEN_35660 = 35660,
         EVENT_CHECK_SHOWFIGHT = 101,
         MOVE_TO_HOMEPOSITION = 101,
     };
@@ -689,7 +788,6 @@ public:
     enum eNpc
     {
         EVENT_ENRAGE_COOLDOWN,
-        SPELL_ENRAGE = 8599,
     };
 
     struct npc_rampaging_worgen_34884AI : public ScriptedAI
@@ -709,7 +807,7 @@ public:
         {
             if (!m_enrage && me->GetHealthPct() < 90.0f)
             {
-                me->CastSpell(me, SPELL_ENRAGE);
+                me->CastSpell(me, SPELL_ENRAGE_8599);
                 m_enrage = true;
                 m_events.ScheduleEvent(EVENT_ENRAGE_COOLDOWN, urand(121000, 150000));
             }
@@ -752,20 +850,11 @@ public:
 
     enum eNpc
     {
-        NPC_FRIGHTENED_CITIZEN_34981 = 34981,
-        NPC_GILNEAS_EVACUATION_FACING_MARKER_35830 = 35830,
-        NPC_FRIGHTENED_CITIZEN_WORGEN = 35836,
-        NPC_RAMPAGING_WORGEN = 35660,
-        GO_MERCHANT_DOOR = 195327,
-        PLAYER_GUID = 99999,
-
         ACTION_START_ANIM_CITIZEN = 103,
-
         EVENT_MOVE_TO_DOOR = 101,
         EVENT_MOVE_TO_PLAYER,
         EVENT_MOVE_TO_MARKER,
         EVENT_MOVE_TO_END,
-
         MOVE_TO_DOOR = 101,
         MOVE_TO_PLAYER,
         MOVE_TO_MARKER,
@@ -895,20 +984,11 @@ public:
 
     enum eNpc
     {
-        NPC_FRIGHTENED_CITIZEN_34981 = 34981,
-        NPC_GILNEAS_EVACUATION_FACING_MARKER_35830 = 35830,
-        NPC_FRIGHTENED_CITIZEN_WORGEN = 35836,
-        NPC_RAMPAGING_WORGEN = 35660,
-        GO_MERCHANT_DOOR = 195327,
-        PLAYER_GUID = 99999,
-
         ACTION_START_ANIM_CITIZEN = 103,
-
         EVENT_MOVE_TO_DOOR = 101,
         EVENT_MOVE_TO_PLAYER,
         EVENT_MOVE_TO_MARKER,
         EVENT_MOVE_TO_END,
-
         MOVE_TO_DOOR = 101,
         MOVE_TO_PLAYER,
         MOVE_TO_MARKER,
@@ -1040,11 +1120,6 @@ public:
 
     enum eDoor
     {
-        NPC_FRIGHTENED_CITIZEN_WORGEN = 35836,
-        NPC_FRIGHTENED_CITIZEN_ALONE = 34981,
-        NPC_RAMPAGING_WORGEN = 35660,
-        PLAYER_GUID = 99999,
-        GO_MERCHANT_DOOR = 195327,
         ACTION_START_ANIM_MERCANT = 101,
         ACTION_START_ANIM_CITIZEN = 103,
     };
@@ -1080,7 +1155,7 @@ private:
     void SummonOnlyCitizen(Player* player, GameObject* go)
     {
         Position posC = GetCitizenPosition(go);
-        if (Creature* citizen = player->SummonCreature(NPC_FRIGHTENED_CITIZEN_ALONE, posC, TEMPSUMMON_TIMED_DESPAWN, 30000))
+        if (Creature* citizen = player->SummonCreature(NPC_FRIGHTENED_CITIZEN_34981, posC, TEMPSUMMON_TIMED_DESPAWN, 30000))
         {
             citizen->GetAI()->SetGUID(go->GetGUID(), go->GetEntry());
             citizen->GetAI()->SetGUID(player->GetGUID(), PLAYER_GUID);
@@ -1093,7 +1168,7 @@ private:
         Position posC = GetCitizenPosition(go);
         Position posW = GetWorgenPosition(go);
         if (Creature* citizen = player->SummonCreature(NPC_FRIGHTENED_CITIZEN_WORGEN, posC, TEMPSUMMON_TIMED_DESPAWN, 30000))
-            if (Creature* worgen = player->SummonCreature(NPC_RAMPAGING_WORGEN, posW, TEMPSUMMON_TIMED_DESPAWN, 30000))
+            if (Creature* worgen = player->SummonCreature(NPC_RAMPAGING_WORGEN_35660, posW, TEMPSUMMON_TIMED_DESPAWN, 30000))
             {
                 citizen->GetAI()->SetGUID(go->GetGUID(), go->GetEntry());
                 citizen->GetAI()->SetGUID(player->GetGUID(), PLAYER_GUID);
@@ -1207,13 +1282,6 @@ class npc_wounded_guard_47091 : public CreatureScript
 public:
     npc_wounded_guard_47091() : CreatureScript("npc_wounded_guard_47091") {}
 
-    enum eNpc
-    {
-        QUEST_A_REJUVENATING_TOUCH = 14283,
-        QUEST_FLASH_HEAL = 14279,
-        NPC_HEALING_CREDIT = 47091,
-    };
-
     struct npc_wounded_guard_47091AI : public ScriptedAI
     {
         npc_wounded_guard_47091AI(Creature* creature) : ScriptedAI(creature) {}
@@ -1242,8 +1310,6 @@ public:
 
     enum eNpc
     {
-        NPC_BLOODFANG_WORGEN = 35118,
-        SPELL_FROSTBOLT_VISUAL_ONLY = 74277,
         EVENT_CHECK_SPELL = 101,
         AI_MIN_HP = 85,
     };
@@ -1276,7 +1342,7 @@ public:
                 case EVENT_CHECK_SPELL:
                 {
                     if ((me->IsAlive()) && (!me->IsInCombat() && (me->GetDistance2d(me->GetHomePosition().GetPositionX(), me->GetHomePosition().GetPositionY()) <= 1.0f)))
-                        if (Creature* enemy = me->FindNearestCreature(NPC_BLOODFANG_WORGEN, 5.0f, true))
+                        if (Creature* enemy = me->FindNearestCreature(NPC_BLOODFANG_WORGEN_35118, 5.0f, true))
                             me->AI()->AttackStart(enemy); // She should really only grab agro when npc Cleese is not there, so we will keep this range small
 
                     m_events.ScheduleEvent(EVENT_CHECK_SPELL, urand(1000, 2000));
@@ -1288,7 +1354,7 @@ public:
             if (!UpdateVictim())
                 return;
 
-            if (me->GetVictim()->GetEntry() == NPC_BLOODFANG_WORGEN)
+            if (me->GetVictim()->GetEntry() == NPC_BLOODFANG_WORGEN_35118)
                 DoSpellAttackIfReady(SPELL_FROSTBOLT_VISUAL_ONLY); //Dummy spell, visual only to prevent getting agro (Blizz-like)
             else
                 DoMeleeAttackIfReady();
@@ -1309,14 +1375,8 @@ public:
 
     enum eNpc
     {
-        NPC_RAMPAGING_WORGEN_34884 = 34884,
-        NPC_BLOODFANG_WORGEN_35118 = 35118,
-        NPC_RAMPAGING_WORGEN_35660 = 35660,
-        NPC_KING_GREYMANE_35112 = 35112,
-
         EVENT_CHECK_SHOWFIGHT = 101,
         EVENT_CHECK_KING_NEAR,
-
         MOVE_TO_HOMEPOSITION = 101,
     };
 
@@ -1445,7 +1505,6 @@ public:
 
     enum eNpc
     {
-        NPC_BLOODFANG_WORGEN = 35118,
         AI_MIN_HP = 85,
     };
 
@@ -1475,7 +1534,7 @@ public:
                 me->AddThreat(who, 1.0f);
                 me->AI()->AttackStart(who);
             }
-            else if (me->HealthBelowPct(AI_MIN_HP) && who->GetEntry() == NPC_BLOODFANG_WORGEN)
+            else if (me->HealthBelowPct(AI_MIN_HP) && who->GetEntry() == NPC_BLOODFANG_WORGEN_35118)
                 damage = 0;
         }
 
@@ -1484,7 +1543,7 @@ public:
             if (tSeek <= diff)
             {
                 if ((me->IsAlive()) && (!me->IsInCombat() && (me->GetDistance2d(me->GetHomePosition().GetPositionX(), me->GetHomePosition().GetPositionY()) <= 1.0f)))
-                    if (Creature* enemy = me->FindNearestCreature(NPC_BLOODFANG_WORGEN, 10.0f, true))
+                    if (Creature* enemy = me->FindNearestCreature(NPC_BLOODFANG_WORGEN_35118, 10.0f, true))
                         me->AI()->AttackStart(enemy);
                 tSeek = urand(1000, 2000); // optimize cpu load, seeking only sometime between 1 and 2 seconds
             }
@@ -1512,7 +1571,6 @@ public:
     enum eNpc
     {
         ACTION_START_EVENT = 101,
-        SPELL_BY_THE_SKIN = 66914,
     };
 
     bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
@@ -1533,11 +1591,6 @@ public:
 
         enum eQ14154
         {
-            NPC_WORGEN_RUNT_C1 = 35188,
-            NPC_WORGEN_RUNT_C2 = 35456,
-            NPC_WORGEN_ALPHA_C1 = 35170,
-            NPC_WORGEN_ALPHA_C2 = 35167,
-
             Event120Secounds = 1,
             EventCheckPlayerIsAlive,
             EventSummonNextWave,
@@ -1837,11 +1890,6 @@ class npc_worgen_runt_35456 : public CreatureScript
 {
 public:
     npc_worgen_runt_35456() : CreatureScript("npc_worgen_runt_35456") { }
-
-    enum eNpc
-    {
-
-    };
 
     struct npc_worgen_runt_35456AI : public ScriptedAI
     {
@@ -2309,7 +2357,6 @@ public:
     enum eNpc
     {
         EVENT_ENRAGE_COOLDOWN = 101,
-        SPELL_ENRAGE = 8599,
     };
 
     struct npc_bloodfang_worgen_35118AI : public ScriptedAI
@@ -2328,7 +2375,7 @@ public:
         {
             if (!m_enrage && me->GetHealthPct() < 50.0f)
             {
-                me->CastSpell(me, SPELL_ENRAGE);
+                me->CastSpell(me, SPELL_ENRAGE_8599);
                 m_enrage = true;
                 m_events.ScheduleEvent(EVENT_ENRAGE_COOLDOWN, 20000);
             }
@@ -2387,28 +2434,19 @@ public:
     npc_josiah_avery_35369() : CreatureScript("npc_josiah_avery_35369") {}
 
     enum eNpc
-    {
-        QUEST_THE_REBEL_LORDS_ARSENAL = 14159,
-        NPC_JOSIAH_AVERY_P4 = 35370,
-        NPC_JOSAIH_AVERY_TRIGGER = 50415,
-        SPELL_WORGEN_BITE = 72870,
-        SPELL_PHASE_QUEST_ZONE_SPECIFIC_01 = 59073,
-        SPELL_SUMMON_JOSIAH_AVERY = 67350,
-        SPELL_FORCE_CAST_SUMMON_JOSIAH = 67352,
+    {        
         DELAY_SAY_JOSIAH_AVERY = 20000,
         EVENT_SAY_JOSIAH_AVERY = 101,
         ACTION_START_ANIM = 102,
-        PLAYER_GUID = 99999,
     };
 
     bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 opt) override
     {
         if (quest->GetQuestId() == QUEST_THE_REBEL_LORDS_ARSENAL)
         {
-            creature->GetAI()->SetGUID(player->GetGUID(), PLAYER_GUID);
-            player->RemoveAura(SPELL_PHASE_QUEST_ZONE_SPECIFIC_01);
             creature->AddAura(SPELL_WORGEN_BITE, player);
-            creature->CastSpell(player, SPELL_FORCE_CAST_SUMMON_JOSIAH, true);
+            creature->GetAI()->SetGUID(player->GetGUID(), PLAYER_GUID);
+            creature->AI()->DoAction(ACTION_START_ANIM);
         }
         return true;
     }
@@ -2434,36 +2472,6 @@ public:
             m_currentSayCounter = 0;
         }
 
-        void JustSummoned(Creature* summon) override
-        {
-            switch (summon->GetEntry())
-            {
-            case NPC_JOSIAH_AVERY_P4:
-            {
-                summon->ClearAllPhases(false);
-                summon->SetInPhase(171, true, true);
-                summon->RemoveAllAuras();
-                m_badAveryGUID = summon->GetGUID();
-                break;
-            }
-            case NPC_JOSAIH_AVERY_TRIGGER:
-            {
-                summon->ClearAllPhases(false);
-                summon->SetInPhase(170, false, true);
-                summon->SetInPhase(171, true, true);
-                m_triggerGUID = summon->GetGUID();
-                break;
-            }
-            }
-            if (PLAYER_GUID && NPC_JOSIAH_AVERY_P4 && NPC_JOSAIH_AVERY_TRIGGER)
-                if (Creature* trigger = sObjectAccessor->GetCreature(*me, m_triggerGUID))
-                {
-                    trigger->AI()->SetGUID(m_playerGUID, PLAYER_GUID);
-                    trigger->AI()->SetGUID(m_badAveryGUID, NPC_JOSIAH_AVERY_P4);
-                    trigger->AI()->DoAction(ACTION_START_ANIM);
-                }
-        }
-
         void SetGUID(uint64 guid, int32 id) override
         {
             switch (id)
@@ -2471,6 +2479,18 @@ public:
             case PLAYER_GUID:
             {
                 m_playerGUID = guid;
+                break;
+            }
+            }
+        }
+
+        void DoAction(int32 param) override
+        {
+            switch (param)
+            {
+            case ACTION_START_ANIM:
+            {
+                m_events.ScheduleEvent(EVENT_START_ANIM, 10);
                 break;
             }
             }
@@ -2495,6 +2515,12 @@ public:
                     TalkToGroup(pList, m_currentSayCounter);
 
                     m_events.ScheduleEvent(EVENT_SAY_JOSIAH_AVERY, DELAY_SAY_JOSIAH_AVERY);
+                    break;
+                }
+                case EVENT_START_ANIM:
+                {
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                        me->CastSpell(player, SPELL_FORCE_CAST_SUMMON_JOSIAH, true);
                     break;
                 }
                 }
@@ -2554,14 +2580,7 @@ public:
 
     enum eNpc
     {
-        NPC_LORNA_CROWLEY_P4 = 35378,
-        NPC_JOSIAH_AVERY_P4 = 35370,
-        SPELL_COSMETIC_COMBAT_ATTACK = 69873,
-        SPELL_GET_SHOT = 67349,
-        SPELL_SHOOT = 6660,
-        SPELL_WORGEN_BITE = 72870,
         SAY_JOSAIH_AVERY_TRIGGER = 1,
-        PLAYER_GUID = 99999,
         ACTION_START_ANIM = 102,
         EVENTS_ANIM_1,
         EVENTS_ANIM_2,
@@ -2579,7 +2598,6 @@ public:
         uint64 m_playerGUID;
         uint64 m_badAveryGUID;
         uint64 m_lornaGUID;
-        bool m_animIsStarted;
 
         void Reset() override
         {
@@ -2590,50 +2608,17 @@ public:
             Position pos = Position(-1792.37f, 1427.35f, 12.46f, 3.152f);
             me->MovePosition(pos, 0, 0);
             me->SetDisplayId(11686);
-            m_animIsStarted = false;
         }
 
         void IsSummonedBy(Unit* summoner) override
         {
-            uint64 guid = summoner->GetGUID();
-            uint32 entry = summoner->GetEntry();
-            printf("");
-        }
-
-
-        void SetGUID(uint64 guid, int32 id) override
-        {
-            switch (id)
-            {
-            case PLAYER_GUID:
-            {
-                m_playerGUID = guid;
-                break;
-            }
-            case NPC_JOSIAH_AVERY_P4:
-            {
-                m_badAveryGUID = guid;
-                break;
-            }
-            }
-        }
-
-        void DoAction(int32 param) override
-        {
-            switch (param)
-            {
-            case ACTION_START_ANIM:
-            {
-                if (Creature* lorna = me->FindNearestCreature(NPC_LORNA_CROWLEY_P4, 60.0f, true))
-                    m_lornaGUID = lorna->GetGUID();
-                if (!m_animIsStarted)
+            if (Player* player = summoner->ToPlayer())
+                if (Creature* lorna = me->FindNearestCreature(NPC_LORNA_CROWLEY_35378, 60.0f, true))
                 {
+                    m_playerGUID = player->GetGUID();
+                    m_lornaGUID = lorna->GetGUID();
                     m_events.RescheduleEvent(EVENTS_START_ANIM, 25);
-                    m_animIsStarted = true;
                 }
-                break;
-            }
-            }
         }
 
         void UpdateAI(uint32 diff) override
@@ -2647,15 +2632,16 @@ public:
                 case EVENTS_START_ANIM:
                 {
                     if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
-                        me->AI()->Talk(SAY_JOSAIH_AVERY_TRIGGER, player); // Tell Player they have been bitten
+                        Talk(SAY_JOSAIH_AVERY_TRIGGER, player); // Tell Player they have been bitten
                     m_events.ScheduleEvent(EVENTS_ANIM_1, 200);
                     break;
                 }
                 case EVENTS_ANIM_1:
                 {
                     if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
-                        if (Creature* badAvery = sObjectAccessor->GetCreature(*me, m_badAveryGUID))
+                        if (Creature* badAvery = me->FindNearestCreature(NPC_JOSIAH_AVERY_35370, 25.0f, true))
                         {
+                            m_badAveryGUID = badAvery->GetGUID();
                             badAvery->SetOrientation(badAvery->GetAngle(player)); // Face Player
                             badAvery->CastSpell(player, SPELL_COSMETIC_COMBAT_ATTACK, true); // Do Cosmetic Attack
                             player->GetMotionMaster()->MoveKnockTo(-1791.94f, 1427.29f, 12.4584f, 22.0f, 8.0f, uint32(m_playerGUID));
@@ -2696,7 +2682,7 @@ public:
                 }
                 case EVENTS_ANIM_5:
                 {
-                    m_animIsStarted = false;
+                    me->DespawnOrUnsummon(10);
                     break;
                 }
                 }
@@ -2716,14 +2702,6 @@ class npc_lorna_crowley_35378 : public CreatureScript
 public:
     npc_lorna_crowley_35378() : CreatureScript("npc_lorna_crowley_35378") {}
 
-    enum eNpc
-    {
-        QUEST_FROM_THE_SHADOWS = 14204,
-        NPC_GILNEAN_MASTIFF = 35631,
-        SPELL_SUMMON_GILNEAN_MASTIFF = 67807,
-        SAY_LORNA_CROWLEY_P4 = 0,
-    };
-
     bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
     {
         if (quest->GetQuestId() == QUEST_FROM_THE_SHADOWS)
@@ -2731,7 +2709,7 @@ public:
             if (Pet* pet = player->GetPet())
                 player->RemovePet(pet, PET_SAVE_AS_CURRENT, true);
             player->CastSpell(player, SPELL_SUMMON_GILNEAN_MASTIFF);
-            creature->AI()->Talk(SAY_LORNA_CROWLEY_P4);
+            creature->AI()->Talk(0);
         }
         return true;
     }
@@ -2745,10 +2723,6 @@ public:
 
     enum eNpc
     {
-        QUEST_FROM_THE_SHADOWS = 14204,
-        NPC_BLOODFANG_LURKER = 35463,
-        SPELL_SHADOWSTALKER_STEALTH = 5916,
-        SPELL_ATTACK_LURKER = 67805,
         EVENT_CHECK_QUEST_REWARDED = 101,
     };
 
@@ -2836,8 +2810,6 @@ public:
 
     enum eNpc
     {
-        SPELL_SHADOWSTALKER_STEALTH = 5916,
-        SPELL_ENRAGE = 8599,
         COOLDOWN_ENRAGE = 121000,
     };
 
@@ -2878,7 +2850,7 @@ public:
             if (tEnrage <= diff && willCastEnrage && me->GetHealthPct() <= 30)
             {
                 me->MonsterTextEmote(-106, 0);
-                DoCast(me, SPELL_ENRAGE);
+                DoCast(me, SPELL_ENRAGE_8599);
                 tEnrage = COOLDOWN_ENRAGE;
             }
             else
@@ -2902,11 +2874,7 @@ public:
 
     enum eNpc
     {
-        NPC_RAMPAGING_WORGEN_35660 = 35660,
-        NPC_BLOODFANG_RIPPER_35505 = 35505,
-
         EVENT_CHECK_SHOWFIGHT = 101,
-
         MOVE_TO_HOMEPOSITION = 101,
     };
 
@@ -3004,14 +2972,8 @@ public:
 
     enum eNpc
     {
-        QUEST_SAVE_KRENNAN_ARANAS = 14293,
-        NPC_BLOODFANG_RIPPER_P4 = 35505,
-        NPC_GRAYMANE_HORSE = 35905,
-        SPELL_FORCECAST_SUMMON_GRAYMANE_HORSE = 68232,
-        SPELL_GENERIC_QUEST_INVISIBILITY_DETECTION_1 = 49416,
         SAY_KING_GENN_GREYMANE = 0,
         MAX_SUMMONED_RIPPER = 20,
-        PLAYER_GUID = 99999,
     };
 
     bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
@@ -3050,7 +3012,7 @@ public:
         {
             switch (summoned->GetEntry())
             {
-            case NPC_BLOODFANG_RIPPER_P4:
+            case NPC_BLOODFANG_RIPPER_35505:
             {
                 m_counter += 1;
                 summoned->GetDefaultMovementType();
@@ -3062,7 +3024,7 @@ public:
 
         void SummonedCreatureDespawn(Creature* summon) override
         {
-            if (summon->GetEntry() == NPC_BLOODFANG_RIPPER_P4 && m_counter)
+            if (summon->GetEntry() == NPC_BLOODFANG_RIPPER_35505 && m_counter)
                 m_counter -= 1;
         }
 
@@ -3102,22 +3064,22 @@ public:
             case (1):
                 for (int i = 0; i < 5; i++)
                     if (m_counter < MAX_SUMMONED_RIPPER)
-                        me->SummonCreature(NPC_BLOODFANG_RIPPER_P4, -1781.173f + irand(-15, 15), 1372.90f + irand(-15, 15), 19.7803f, urand(0, 6), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 15000);
+                        me->SummonCreature(NPC_BLOODFANG_RIPPER_35505, -1781.173f + irand(-15, 15), 1372.90f + irand(-15, 15), 19.7803f, urand(0, 6), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 15000);
                 break;
             case (2):
                 for (int i = 0; i < 5; i++)
                     if (m_counter < MAX_SUMMONED_RIPPER)
-                        me->SummonCreature(NPC_BLOODFANG_RIPPER_P4, -1756.30f + irand(-15, 15), 1380.61f + irand(-15, 15), 19.7652f, urand(0, 6), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 15000);
+                        me->SummonCreature(NPC_BLOODFANG_RIPPER_35505, -1756.30f + irand(-15, 15), 1380.61f + irand(-15, 15), 19.7652f, urand(0, 6), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 15000);
                 break;
             case (3):
                 for (int i = 0; i < 5; i++)
                     if (m_counter < MAX_SUMMONED_RIPPER)
-                        me->SummonCreature(NPC_BLOODFANG_RIPPER_P4, -1739.84f + irand(-15, 15), 1384.87f + irand(-15, 15), 19.841f, urand(0, 6), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 15000);
+                        me->SummonCreature(NPC_BLOODFANG_RIPPER_35505, -1739.84f + irand(-15, 15), 1384.87f + irand(-15, 15), 19.841f, urand(0, 6), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 15000);
                 break;
             case (4):
                 for (int i = 0; i < 5; i++)
                     if (m_counter < MAX_SUMMONED_RIPPER)
-                        me->SummonCreature(NPC_BLOODFANG_RIPPER_P4, -1781.173f + irand(-15, 15), 1372.90f + irand(-15, 15), 19.7803f, urand(0, 6), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 15000);
+                        me->SummonCreature(NPC_BLOODFANG_RIPPER_35505, -1781.173f + irand(-15, 15), 1372.90f + irand(-15, 15), 19.7803f, urand(0, 6), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 15000);
                 break;
             }
         }
@@ -3137,12 +3099,6 @@ public:
 
     enum eHorse
     {
-        QUEST_SAVE_KRENNAN_ARANAS = 14293,
-        NPC_KRENNAN_ARANAS_TREE = 35753,
-        NPC_KRENNAN_ARANAS = 35907,
-        SPELL_RESCUE_KRENNAN = 68219,
-        SPELL_GENERIC_QUEST_INVISIBILITY_DETECTION_1 = 49416,
-        PLAYER_GUID = 99999,
         SAY_KRENNAN_TREE_HELP = 0,
         SAY_HORSE_HOW_DO_HELP = 1,
         SAY_KRENNAN_HORSE_THANKS = 2,
@@ -3306,12 +3262,6 @@ class npc_krennan_aranas_35907 : public CreatureScript
 public:
     npc_krennan_aranas_35907() : CreatureScript("npc_krennan_aranas_35907") { }
 
-    enum eNpc
-    {
-        NPC_GREYMANE_HORSE_P4 = 35905,
-        SPELL_RIDE_BUNNY_SEAT2 = 84275,
-    };
-
     struct npc_krennan_aranas_35907AI : public ScriptedAI
     {
         npc_krennan_aranas_35907AI(Creature* creature) : ScriptedAI(creature) { }
@@ -3322,7 +3272,7 @@ public:
 
         void IsSummonedBy(Unit* summoner) override
         {
-            if (Creature* horse = me->FindNearestCreature(NPC_GREYMANE_HORSE_P4, 20.0f))
+            if (Creature* horse = me->FindNearestCreature(NPC_GRAYMANE_HORSE_35905, 20.0f))
                 DoCast(horse, SPELL_RIDE_BUNNY_SEAT2, true);
         }
 
@@ -3346,8 +3296,6 @@ public:
 
     enum eNpc
     {
-        NPC_BLOODFANG_WORGEN = 35118,
-        SPELL_CANNON_FIRE = 68235,
         ACTION_STARTING_EVENT = 101,
         EVENT_STARTING_EVENT,
         EVENT_STARTING_DO_FIRE,
@@ -3392,14 +3340,14 @@ public:
                 {
                     for (int i = 0; i < 12; i++)
                     {
-                        me->SummonCreature(NPC_BLOODFANG_WORGEN, -1757.65f + irand(-6, 6), 1384.01f + irand(-6, 6), 19.872f, urand(0, 6), TEMPSUMMON_TIMED_DESPAWN, 5000);
+                        me->SummonCreature(NPC_BLOODFANG_WORGEN_35118, -1757.65f + irand(-6, 6), 1384.01f + irand(-6, 6), 19.872f, urand(0, 6), TEMPSUMMON_TIMED_DESPAWN, 5000);
                     }
                     m_events.ScheduleEvent(EVENT_STARTING_DO_FIRE, 400);
                     break;
                 }
                 case EVENT_STARTING_DO_FIRE:
                 {
-                    if (Creature* Worgen = me->FindNearestCreature(NPC_BLOODFANG_WORGEN, 50.0f, true))
+                    if (Creature* Worgen = me->FindNearestCreature(NPC_BLOODFANG_WORGEN_35118, 50.0f, true))
                         me->CastSpell(Worgen, SPELL_CANNON_FIRE, true);
                     break;
                 }
@@ -3422,12 +3370,6 @@ public:
 
     enum eNpc
     {
-        QUEST_SAVE_KRENNAN_ARANAS = 14293,
-        NPC_COMMANDEERED_CANNON = 35914,
-        SPELL_WORGEN_BITE = 72870,         // phase 4
-        SPELL_INFECTED_BITE = 72872,       // phase 8
-        SPELL_HIDEOUS_BITE_WOUND = 76642,  // phase 1024
-        SPELL_GILNEAS_CANNON_CAMERA = 93555,
         SAY_LORD_GODFREY_P4 = 0,
         ACTION_STARTING_EVENT = 101,
     };
@@ -3455,15 +3397,6 @@ class npc_lord_darius_crowley_35552 : public CreatureScript
 {
 public:
     npc_lord_darius_crowley_35552() : CreatureScript("npc_lord_darius_crowley_35552") { }
-
-    enum eNpc
-    {
-        QUEST_SACRIFICES = 14212,
-        NPC_KING_GREYMANE = 35911,
-        NPC_PRINCE_GREYMANE = 35551,
-        NPC_CROWLEY = 35230,
-        NPC_CROWLEYS_HORSE = 35231,
-    };
 
     struct npc_lord_darius_crowley_35552AI : public ScriptedAI
     {
@@ -3618,11 +3551,6 @@ public:
 
     enum eNpc
     {
-        QUEST_SACRIFICES = 14212,
-        NPC_LORD_DARIUS_CROWLEY = 35552,
-        NPC_DARIUS_CROWLEY = 35230,
-        NPC_BLOODFANG_STALKER = 35229,
-        SPELL_THROW_TORCH = 67063,
         EVENT_JUMP_ON_WALL = 950,
         EVENT_JUMP_ON_BRIDGE,
         EVENT_CAST_TORCH,
@@ -3816,11 +3744,6 @@ class spell_throw_torch_67063 : public SpellScriptLoader
 public:
     spell_throw_torch_67063() : SpellScriptLoader("spell_throw_torch_67063") { }
 
-    enum eNpc
-    {
-        NPC_BLOODFANG_STALKER = 35229,
-    };
-
     class FriendlyCheck
     {
     public:
@@ -3884,15 +3807,6 @@ public:
 
     enum eNpc
     {
-        QUEST_SACRIFICES = 14212,
-        NPC_NORTHGATE_REBEL_1 = 36057,
-        NPC_DARIUS_CROWLEY = 35230,
-        NPC_CROWLEY_HORSE = 35231,
-        NPC_BLOODFANG_STALKER_CREDIT = 35582,
-        NPC_TOBIAS_MISTMANTLE = 35618,
-        NPC_BLOODFANG_STALKER = 35229,
-        SPELL_THROW_TORCH = 67063,
-        SPELL_ENRAGE = 8599,
         COOLDOWN_ENRAGE = 30000,
         SOUND_WORGEN_ATTACK = 558,
         EVENT_ENRAGE_COOLDOWN = 101,
@@ -3920,7 +3834,7 @@ public:
         {
             if (!m_isFollowing)
                 if (Creature* horse = who->ToCreature())
-                    if (horse->GetEntry() == NPC_CROWLEY_HORSE)
+                    if (horse->GetEntry() == NPC_CROWLEYS_HORSE)
                         if (horse->GetDistance(me) < 15.0f)
                             if (urand(0, 100) < 30)
                             {
@@ -3935,7 +3849,7 @@ public:
         {
             if (!m_enrage && me->GetHealthPct() < 90.0f)
             {
-                me->CastSpell(me, SPELL_ENRAGE);
+                me->CastSpell(me, SPELL_ENRAGE_8599);
                 m_enrage = true;
                 m_events.ScheduleEvent(EVENT_ENRAGE_COOLDOWN, 60000);
             }
@@ -4003,7 +3917,6 @@ public:
 
     enum eNPC
     {
-        SPELL_RENEW = 139,
         EVENT_CAST_RENEW = 101,
     };
 
@@ -4060,7 +3973,6 @@ public:
 
     enum eNPC
     {
-        NPC_BLOODFANG_STALKER = 35229,
         EVENT_CHECK_STALKER = 102,
     };
 
@@ -4118,7 +4030,6 @@ public:
 
     enum eNPC
     {
-        NPC_BLOODFANG_STALKER = 35229,
         EVENT_CHECK_SHOWFIGHT = 101,
         MOVE_TO_HOMEPOSITION,
     };
@@ -4252,23 +4163,7 @@ class npc_lord_darius_crowley_35566 : public CreatureScript
 public:
     npc_lord_darius_crowley_35566() : CreatureScript("npc_lord_darius_crowley_35566") {}
 
-    enum eNpc
-    {
-        QUEST_LAST_STAND = 14222,
-        NPC_FRENZIED_STALKER = 35627,
-        ZONE_DUSKHAVEN = 4786,
-        SPELL_INFECTED_BITE = 72872,            // phase 8 
-        SPELL_HIDEOUS_BITE_WOUND = 76642,       // phase 1024 
-        SPELL_TWO_FORMS = 68996,                // ability
-        SPELL_IN_STOCKS = 69196,                // aura
-        // ID - 72799 Last Stand Complete (bind 4786) 72788 95758 95759 72792 68992 68975 68978 68976
-        SPELL_TRANSFORMING = 72794,             // trigger spell=72788, 93477, 95759, 72792, 94293, 68992, 68992 (72788 72799)
-        SPELL_FADE_OF_BLACK = 94053,
-        SPELL_ALTERED_FORM = 94293,             // Apply (Aura #352)
-        SPELL_FORCE_WORGEN_ALTERED_FORM = 98274,//* Veränderte Worgenform erzwingen 
-        SPELL_ALTERED_FORM2 = 97709,            //* Alternative Gestalt (Volksfähigkeit)
-        SPELL_CURSE_OF_THE_WORGEN = 68630,      //* (SPELL_EFFECT_TELEPORT_UNITS), Trigger spell (68631, 69123, 94053) (summon 36331)
-    };
+    // ID - 72799 Last Stand Complete (bind 4786) 72788 95758 95759 72792 68992 68975 68978 68976
 
     bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
     {
@@ -4376,9 +4271,6 @@ public:
 
     enum eNpc
     {
-        QUEST_LAST_STAND = 14222,
-        NPC_FRENZIED_STALKER = 35627,
-        SPELL_ENRAGE = 8599,
         EVENT_CHECK_SHOWFIGHT = 101,
         EVENT_ENRAGE_COOLDOWN,
         MOVE_TO_HOMEPOSITION,
@@ -4403,7 +4295,7 @@ public:
         {
             if (!m_enrage && me->GetHealthPct() < 30.0f)
             {
-                me->CastSpell(me, SPELL_ENRAGE);
+                me->CastSpell(me, SPELL_ENRAGE_8599);
                 Talk(1);
                 m_enrage = true;
                 m_events.ScheduleEvent(EVENT_ENRAGE_COOLDOWN, urand(121000, 150000));
@@ -4447,8 +4339,6 @@ public:
 
     enum eNPC
     {
-        QUEST_LAST_STAND = 14222,
-        NPC_FRENZIED_STALKER = 35627,
         EVENT_CHECK_SHOWFIGHT = 101,
         MOVE_TO_HOMEPOSITION,
     };
@@ -4574,6 +4464,7 @@ public:
 
 void AddSC_zone_gilneas_city1()
 {
+    new player_zone_gilneas_city1();
     new npc_gilneas_city_guard_gate_34864();
     new npc_prince_liam_greymane_34850();
     new npc_rampaging_worgen_35660();
