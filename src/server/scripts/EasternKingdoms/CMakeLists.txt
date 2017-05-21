@@ -254,7 +254,7 @@ set(scripts_STAT_SRCS
   EasternKingdoms/TheStockade/instance_the_stockade.cpp
   EasternKingdoms/Gilneas/zone_gilneas.h
   EasternKingdoms/Gilneas/zone_gilneas_city1.cpp
-  EasternKingdoms/Gilneas/zone_gilneas2.cpp
+  EasternKingdoms/Gilneas/zone_gilneas_city2.cpp
   EasternKingdoms/Gilneas/zone_gilneas_city3.cpp
   EasternKingdoms/Gilneas/zone_duskhaven.cpp
   EasternKingdoms/ThroneOfTheTides/boss_lady_nazjar.cpp
