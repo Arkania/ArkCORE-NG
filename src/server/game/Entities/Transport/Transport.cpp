@@ -342,6 +342,14 @@ GameObject* Transport::CreateGOPassenger(uint32 guid, GameObjectData const* data
         return NULL;
     }
 
+    if (data->phaseId)
+        go->SetInPhase(data->phaseId, false, true);
+    else if (data->phaseGroup)
+        for (auto phase : GetXPhasesForGroup(data->phaseGroup))
+            go->SetInPhase(phase, false, true);
+    else
+        go->CopyPhaseFrom(this);
+
     if (!map->AddToMap(go))
     {
         delete go;

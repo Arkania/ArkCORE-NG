@@ -651,10 +651,10 @@ class Creature : public Unit, public GridObject<Creature>, public MapObject
         void GetHomePosition(float& x, float& y, float& z, float& ori) const { m_homePosition.GetPosition(x, y, z, ori); }
         Position const& GetHomePosition() const { return m_homePosition; }
 
-        void SetTransportHomePosition(float x, float y, float z, float o) { m_transportHomePosition.Relocate(x, y, z, o); }
-        void SetTransportHomePosition(const Position &pos) { m_transportHomePosition.Relocate(pos); }
-        void GetTransportHomePosition(float& x, float& y, float& z, float& ori) const { m_transportHomePosition.GetPosition(x, y, z, ori); }
-        Position const& GetTransportHomePosition() const { return m_transportHomePosition; }
+        void SetTransportHomePosition(float x, float y, float z, float o);
+        void SetTransportHomePosition(const Position &pos);
+        void GetTransportHomePosition(float& x, float& y, float& z, float& ori) const;
+        Position const& GetTransportHomePosition() const;
 
         uint32 GetWaypointPath() const { return m_path_id; }
         void LoadPath(uint32 pathid) { m_path_id = pathid; }

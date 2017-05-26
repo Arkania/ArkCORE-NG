@@ -2974,6 +2974,67 @@ Player* WorldObject::GetRandomPlayer(std::list<Player*> pList)
     return *itr;
 }
 
+Creature* WorldObject::FindNearestUnfriendlyCreatureInFloor(float rangeXY, float rangeZ)
+{
+    Position posS = m_movementInfo.transport.pos;
+    Creature* rNpc = nullptr;
+    float rDist = rangeXY;
+    float max = (rangeXY > rangeZ) ? rangeXY : rangeZ;
+    std::list<Creature*> cList = FindAllUnfriendlyCreaturesInRange(max);
+    for (auto creature : cList)
+        if (creature->IsAlive())
+        {
+            Position posT = creature->m_movementInfo.transport.pos;
+            float dist = posS.GetExactDist2d(&posT);
+            if (dist < rDist)
+                if (abs(posS.m_positionZ - posT.m_positionZ) < rangeZ)
+                {
+                    rDist = dist;
+                    rNpc = creature;
+                }
+        }
+    return rNpc;
+}
+
+Creature* WorldObject::FindNearestCreatureInFloor(uint32 entry, float rangeXY, float rangeZ)
+{
+    Position posS = m_movementInfo.transport.pos;
+    Creature* rNpc = nullptr;
+    float rDist = rangeXY;
+    float max = (rangeXY > rangeZ) ? rangeXY : rangeZ;
+    std::list<Creature*> cList = FindNearestCreatures(entry, max);
+    for (auto creature : cList)
+        if (creature->IsAlive())
+        {
+            Position posT = creature->m_movementInfo.transport.pos;
+            float dist = posS.GetExactDist2d(&posT);
+            if (dist < rDist)
+                if (abs(posS.m_positionZ - posT.m_positionZ) < rangeZ)
+                {
+                    rDist = dist;
+                    rNpc = creature;
+                }
+        }
+
+    return rNpc;
+}
+
+bool WorldObject::IsAnyPlayerInSameFloor(float rangeXY, float rangeZ)
+{
+    Position posS = m_movementInfo.transport.pos;
+    float maxZ = (rangeXY > rangeZ) ? rangeXY : rangeZ;
+    std::list<Player*> pList = FindNearestPlayers(maxZ);
+    for (auto player : pList)
+    {
+        Position posP = player->m_movementInfo.transport.pos;
+        float distXY = posS.GetExactDist2d(&posP);
+        float distZ = abs(posS.m_positionZ - posP.m_positionZ);
+        if (distXY < rangeXY && distZ < rangeZ)
+            return true;
+    }
+    return false;
+}
+
 /*
 namespace Trinity
 {
@@ -3386,6 +3447,16 @@ void WorldObject::BuildUpdate(UpdateDataMapType& data_map)
     cell.Visit(p, player_notifier, map, *this, GetVisibilityRange());
 
     ClearUpdateMask(false);
+}
+
+Position const& WorldObject::GetTransportPosition()
+{
+    return m_movementInfo.transport.pos;
+}
+
+uint64 const WorldObject::GetTransportGUID()
+{
+    return m_movementInfo.transport.guid;
 }
 
 uint64 WorldObject::GetTransGUID() const

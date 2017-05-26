@@ -359,7 +359,10 @@ class Object
         void SetFloatValue(uint16 index, float value);
         void SetByteValue(uint16 index, uint8 offset, uint8 value);
         void SetUInt16Value(uint16 index, uint8 offset, uint16 value);
-        void SetInt16Value(uint16 index, uint8 offset, int16 value) { SetUInt16Value(index, offset, (uint16)value); }
+        void SetInt16Value(uint16 index, uint8 offset, int16 value) 
+        { 
+            SetUInt16Value(index, offset, (uint16)value); 
+        }
         void SetStatFloatValue(uint16 index, float value);
         void SetStatInt32Value(uint16 index, int32 value);
 
@@ -399,8 +402,14 @@ class Object
         virtual void BuildUpdate(UpdateDataMapType&) { }
         void BuildFieldsUpdate(Player*, UpdateDataMapType &) const;
 
-        void SetFieldNotifyFlag(uint16 flag) { _fieldNotifyFlags |= flag; }
-        void RemoveFieldNotifyFlag(uint16 flag) { _fieldNotifyFlags &= ~flag; }
+        void SetFieldNotifyFlag(uint16 flag) 
+        { 
+            _fieldNotifyFlags |= flag; 
+        }
+        void RemoveFieldNotifyFlag(uint16 flag) 
+        { 
+            _fieldNotifyFlags &= ~flag; 
+        }
 
         // FG: some hacky helpers
         void ForceValuesUpdateAtIndex(uint32);
@@ -512,18 +521,30 @@ struct Position
     }
 
     void Relocate(float x, float y)
-        { m_positionX = x; m_positionY = y;}
+    { 
+        m_positionX = x; m_positionY = y;
+    }
     void Relocate(float x, float y, float z)
-        { m_positionX = x; m_positionY = y; m_positionZ = z; }
+    { 
+        m_positionX = x; m_positionY = y; m_positionZ = z; 
+    }
     void Relocate(float x, float y, float z, float orientation)
-        { m_positionX = x; m_positionY = y; m_positionZ = z; SetOrientation(orientation); }
+    { 
+        m_positionX = x; m_positionY = y; m_positionZ = z; SetOrientation(orientation); 
+    }
     void Relocate(Position const &pos)
-        { m_positionX = pos.m_positionX; m_positionY = pos.m_positionY; m_positionZ = pos.m_positionZ; SetOrientation(pos.m_orientation); }
+    {
+        m_positionX = pos.m_positionX; m_positionY = pos.m_positionY; m_positionZ = pos.m_positionZ; SetOrientation(pos.m_orientation);
+    }
     void Relocate(Position const* pos)
-        { m_positionX = pos->m_positionX; m_positionY = pos->m_positionY; m_positionZ = pos->m_positionZ; SetOrientation(pos->m_orientation); }
+    { 
+        m_positionX = pos->m_positionX; m_positionY = pos->m_positionY; m_positionZ = pos->m_positionZ; SetOrientation(pos->m_orientation); 
+    }
     void RelocateOffset(Position const &offset);
     void SetOrientation(float orientation)
-    { m_orientation = NormalizeOrientation(orientation); }
+    { 
+        m_orientation = NormalizeOrientation(orientation); 
+    }
 
     float GetPositionX() const { return m_positionX; }
     float GetPositionY() const { return m_positionY; }
@@ -531,11 +552,17 @@ struct Position
     float GetOrientation() const { return m_orientation; }
 
     void GetPosition(float &x, float &y) const
-        { x = m_positionX; y = m_positionY; }
+    { 
+        x = m_positionX; y = m_positionY; 
+    }
     void GetPosition(float &x, float &y, float &z) const
-        { x = m_positionX; y = m_positionY; z = m_positionZ; }
+    { 
+        x = m_positionX; y = m_positionY; z = m_positionZ; 
+    }
     void GetPosition(float &x, float &y, float &z, float &o) const
-        { x = m_positionX; y = m_positionY; z = m_positionZ; o = m_orientation; }
+    { 
+        x = m_positionX; y = m_positionY; z = m_positionZ; o = m_orientation; 
+    }
 
     Position GetPosition() const
     {
@@ -554,39 +581,68 @@ struct Position
     bool IsPositionValid() const;
 
     float GetExactDist2dSq(float x, float y) const
-        { float dx = m_positionX - x; float dy = m_positionY - y; return dx*dx + dy*dy; }
+    { 
+        float dx = m_positionX - x; float dy = m_positionY - y; return dx*dx + dy*dy; 
+    }
     float GetExactDist2d(const float x, const float y) const
-        { return sqrt(GetExactDist2dSq(x, y)); }
+    { 
+        return sqrt(GetExactDist2dSq(x, y)); 
+    }
     float GetExactDist2dSq(Position const* pos) const
-        { float dx = m_positionX - pos->m_positionX; float dy = m_positionY - pos->m_positionY; return dx*dx + dy*dy; }
+    { 
+        float dx = m_positionX - pos->m_positionX; float dy = m_positionY - pos->m_positionY; return dx*dx + dy*dy; 
+    }
     float GetExactDist2d(Position const* pos) const
-        { return sqrt(GetExactDist2dSq(pos)); }
+    { 
+        return sqrt(GetExactDist2dSq(pos)); 
+    }
     float GetExactDistSq(float x, float y, float z) const
-        { float dz = m_positionZ - z; return GetExactDist2dSq(x, y) + dz*dz; }
+    { 
+        float dz = m_positionZ - z; return GetExactDist2dSq(x, y) + dz*dz; 
+    }
     float GetExactDist(float x, float y, float z) const
-        { return sqrt(GetExactDistSq(x, y, z)); }
+    { 
+        return sqrt(GetExactDistSq(x, y, z)); 
+    }
     float GetExactDistSq(Position const* pos) const
-        { float dx = m_positionX - pos->m_positionX; float dy = m_positionY - pos->m_positionY; float dz = m_positionZ - pos->m_positionZ; return dx*dx + dy*dy + dz*dz; }
+    { 
+        float dx = m_positionX - pos->m_positionX; float dy = m_positionY - pos->m_positionY; float dz = m_positionZ - pos->m_positionZ; return dx*dx + dy*dy + dz*dz; 
+    }
     float GetExactDist(Position const* pos) const
-        { return sqrt(GetExactDistSq(pos)); }
+    { 
+        return sqrt(GetExactDistSq(pos)); 
+    }
 
     void GetPositionOffsetTo(Position const & endPos, Position & retOffset) const;
 
     float GetAngle(Position const* pos) const;
     float GetAngle(float x, float y) const;
     float GetRelativeAngle(Position const* pos) const
-        { return GetAngle(pos) - m_orientation; }
-    float GetRelativeAngle(float x, float y) const { return GetAngle(x, y) - m_orientation; }
+    { 
+        return GetAngle(pos) - m_orientation; 
+    }
+    float GetRelativeAngle(float x, float y) const 
+    { 
+        return GetAngle(x, y) - m_orientation; 
+    }
     void GetSinCos(float x, float y, float &vsin, float &vcos) const;
 
     bool IsInDist2d(float x, float y, float dist) const
-        { return GetExactDist2dSq(x, y) < dist * dist; }
+    {
+        return GetExactDist2dSq(x, y) < dist * dist; 
+    }
     bool IsInDist2d(Position const* pos, float dist) const
-        { return GetExactDist2dSq(pos) < dist * dist; }
+    { 
+        return GetExactDist2dSq(pos) < dist * dist; 
+    }
     bool IsInDist(float x, float y, float z, float dist) const
-        { return GetExactDistSq(x, y, z) < dist * dist; }
+    { 
+        return GetExactDistSq(x, y, z) < dist * dist; 
+    }
     bool IsInDist(Position const* pos, float dist) const
-        { return GetExactDistSq(pos) < dist * dist; }
+    { 
+        return GetExactDistSq(pos) < dist * dist; 
+    }
     bool IsWithinBox(const Position& center, float xradius, float yradius, float zradius) const;
     bool HasInArc(float arcangle, Position const* pos, float border = 2.0f) const;
     bool HasInLine(WorldObject const* target, float width) const;
@@ -948,6 +1004,10 @@ class WorldObject : public Object, public WorldLocation
         Creature * GetRandomCreature(std::list<Creature*> cList);
         Player * GetRandomPlayer(std::list<Player*> pList);
 
+        Creature* FindNearestUnfriendlyCreatureInFloor(float rangeXY, float rangeZ);
+        Creature * FindNearestCreatureInFloor(uint32 entry, float rangeXY, float rangeZ);
+        bool IsAnyPlayerInSameFloor(float rangeXY, float rangeZ);
+
         void DestroyForNearbyPlayers();
         virtual void UpdateObjectVisibility(bool forced = true);
         void BuildUpdate(UpdateDataMapType&);
@@ -982,14 +1042,18 @@ class WorldObject : public Object, public WorldLocation
 
         // Transports
         Transport* GetTransport() const { return m_transport; }
+        void SetTransport(Transport* t) { m_transport = t; }
+
+        Position const& GetTransportPosition();
+        uint64 const GetTransportGUID();
         float GetTransOffsetX() const { return m_movementInfo.transport.pos.GetPositionX(); }
         float GetTransOffsetY() const { return m_movementInfo.transport.pos.GetPositionY(); }
         float GetTransOffsetZ() const { return m_movementInfo.transport.pos.GetPositionZ(); }
         float GetTransOffsetO() const { return m_movementInfo.transport.pos.GetOrientation(); }
         uint32 GetTransTime()   const { return m_movementInfo.transport.time; }
         int8 GetTransSeat()     const { return m_movementInfo.transport.seat; }
+
         virtual uint64 GetTransGUID()   const;
-        void SetTransport(Transport* t) { m_transport = t; }
 
         MovementInfo m_movementInfo;
 

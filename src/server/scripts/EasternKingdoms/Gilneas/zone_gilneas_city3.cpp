@@ -65,13 +65,6 @@ enum eBattleForGilneas
     SPELL_FOR_GILNEAS = 81790,
 };
 
-// phase 262144 ending with quest 24904, then phase 190 (2097152) is active.. starting with quest 24902 
-
-enum eQuest24902
-{
-    ACTION_SYLVANAS_START = 501,
-};
-
 // 38507
 class npc_tobias_mistmantle_38507 : public CreatureScript
 {
@@ -132,7 +125,6 @@ public:
                 me->SetFacingToObject(summon);
                 summon->AI()->SetGUID(me->GetGUID(), me->GetEntry());
                 summon->AI()->SetGUID(m_playerGUID, PLAYER_GUID);
-                summon->AI()->DoAction(ACTION_SYLVANAS_START);
                 summon->GetMotionMaster()->MovePoint(2005, -1600.11f, 1518.04f, 29.24f);
                 break;
             case NPC_GENERAL_WARHOWL:
@@ -521,8 +513,7 @@ public:
     }
 };
 
-// phase 2097152 is only for quest 24902, now the phase 524288 is active, startig with quest 24903
-
+// 38540
 class npc_captured_riding_bat_38540 : public CreatureScript
 {
 public:
@@ -695,19 +686,19 @@ public:
     }
 };
 
-// the endgame is in phase 4194304
+// the endgame is in phase 191
 
 enum eEndGame
 {
-    ACTION_30_SEC_BEFORE_FIGHT = 25663,
-    ACTION_15_SEC_BEFORE_FIGHT = 25727,
-    ACTION_SHIP_ON_THE_WAY = 25664,
-    ACTION_START_FEIGHTING_180_SEC = 25670,
-    ACTION_START_LORNA_TALK = 401,
+    ACTION_EVENT_ID_25663 = 25663, // leave the ship
+    ACTION_EVENT_ID_25664 = 25664, // ship start movening
+    ACTION_EVENT_ID_25670 = 25670, // ship spawn
+    ACTION_EVENT_ID_25727 = 25727, // ship on destroy
 
     EVENT_MAKE_SHOWFIGHT = 301,
     EVENT_START_SHOWFIGHT,
-    EVENT_IS_BRIDGE_CLEAN,
+    EVENT_FLOOR_IS_ONE_REMAIN,
+    EVENT_FLOOR_IS_CLEAN,
     EVENT_START_ROPE_PART,
 };
 
@@ -716,13 +707,6 @@ class npc_tobias_mistmantle_43749 : public CreatureScript
 {
 public:
     npc_tobias_mistmantle_43749() : CreatureScript("npc_tobias_mistmantle_43749") { }
-
-    enum eNPC
-    {
-        EVENTS_CHECK_TALKING_WAIT = 201,
-        EVENTS_CHECK_TALKING_HIPPO,
-        EVENTS_GET_INITIAL_VALUES,
-    };
 
     struct npc_tobias_mistmantle_43749AI : public ScriptedAI
     {
@@ -737,20 +721,27 @@ public:
         {
             m_gunshipGUID = 0;
             m_gunshipEventId = 0;
-            m_events.ScheduleEvent(EVENTS_GET_INITIAL_VALUES, 1000);
+            m_events.ScheduleEvent(EVENT_INIT_TARGET, 1000);
         }
 
         void DoAction(int32 param) override
         {
             switch (param)
             {
-            case ACTION_30_SEC_BEFORE_FIGHT:
-            case ACTION_15_SEC_BEFORE_FIGHT:
-                m_events.ScheduleEvent(EVENTS_CHECK_TALKING_HIPPO, 10);
+            case ACTION_EVENT_ID_25663:
+            case ACTION_EVENT_ID_25727:
+                m_events.Reset();
+                m_events.RescheduleEvent(EVENT_TALK_PART_00, 10);
                 break;
-            case ACTION_SHIP_ON_THE_WAY:
-            case ACTION_START_FEIGHTING_180_SEC:
-                m_events.ScheduleEvent(EVENTS_CHECK_TALKING_WAIT, 10);
+            case ACTION_EVENT_ID_25670:
+                m_events.ScheduleEvent(EVENT_TALK_PART_02, 10);
+                m_events.RescheduleEvent(EVENT_TALK_PART_03, 30000);
+                m_events.RescheduleEvent(EVENT_TALK_PART_04, 60000);
+                break;
+            case ACTION_EVENT_ID_25664:
+                m_events.ScheduleEvent(EVENT_TALK_PART_02, 10);
+                m_events.RescheduleEvent(EVENT_TALK_PART_03, 40000);
+                m_events.RescheduleEvent(EVENT_TALK_PART_04, 80000);
                 break;
             }
         }
@@ -763,7 +754,7 @@ public:
             {
                 switch (eventId)
                 {
-                case EVENTS_GET_INITIAL_VALUES:
+                case EVENT_INIT_TARGET:
                 {
                     if (!m_gunshipGUID)
                         FindWorgenGunshipWorldwide();
@@ -774,16 +765,18 @@ public:
                         ship->AI()->SetGUID(me->GetGUID(), me->GetEntry());
                         break;
                     }
-                    m_events.ScheduleEvent(EVENTS_GET_INITIAL_VALUES, 1000);
+                    m_events.ScheduleEvent(EVENT_INIT_TARGET, 1000);
                     break;
                 }
-                case EVENTS_CHECK_TALKING_WAIT:
+                case EVENT_TALK_PART_02:
+                case EVENT_TALK_PART_03:
+                case EVENT_TALK_PART_04:
                 {
                     Talk(1);
                     SetHippoSpellClick(false);
                     break;
                 }
-                case EVENTS_CHECK_TALKING_HIPPO:
+                case EVENT_TALK_PART_00:
                 {
                     if (CheckPlayerForQuest() && CheckIsGunshipReady())
                     {
@@ -879,8 +872,7 @@ public:
 
     enum eNpc
     {
-        EVENT_MOVEMENT_START = 201,
-        EVENT_MOVE_LAST_POINT,
+        EVENT_MOVE_LAST_POINT=201,
         EVENT_EJECT_ALL_PASSENGER,
         EVENT_JUMP_TO_LORNA,
     };
@@ -902,6 +894,8 @@ public:
             m_playerGUID = 0;
             m_lornaGUID = 0;
             m_maxSpeed = 4.9f;
+            if (Creature* wy = me->FindNearestCreature(43747, 10.0f))
+                me->SetOrientation(wy->m_orientation);
         }
 
         void MovementInform(uint32 type, uint32 id) override
@@ -920,13 +914,14 @@ public:
             }
             case POINT_MOTION_TYPE:
             {
-                if (id == 1002)
+                switch (id)
                 {
-                    m_events.ScheduleEvent(EVENT_EJECT_ALL_PASSENGER, 10);
+                case 1002:
+                    m_events.ScheduleEvent(EVENT_JUMP_TO_LORNA, 10);
+                    break;
                 }
-                break;
             }
-            }
+            } // end switch
         }
 
         void PassengerBoarded(Unit* who, int8 /*seatId*/, bool apply)
@@ -936,17 +931,13 @@ public:
                 if (Player* player = who->ToPlayer())
                     if (player->GetQuestStatus(QUEST_ENDGAME) == QUEST_STATUS_INCOMPLETE)
                     {
-                        m_events.ScheduleEvent(EVENT_MOVEMENT_START, 2500);
+                        m_events.ScheduleEvent(EVENT_MOVEMENT_START, 1000);
                         m_playerGUID = who->GetGUID();
                         return;
                     }
-
-                m_playerGUID = 0;
-                if (Vehicle* hippo = me->GetVehicleKit())
-                    hippo->RemoveAllPassengers();
             }
-            else
-                me->DespawnOrUnsummon(1000);
+           
+            me->DespawnOrUnsummon(100);
         }
 
         void UpdateAI(uint32 diff) override
@@ -972,17 +963,9 @@ public:
                     if (Creature* lorna = sObjectAccessor->GetCreature(*me, m_lornaGUID))
                     {
                         Position pos = lorna->GetPosition();
-                        pos.m_positionZ = me->GetPositionZ();
+                        pos.m_positionZ += 15.0f;
                         me->GetMotionMaster()->MovePoint(1002, pos);
                     }
-                    break;
-                }
-                case EVENT_EJECT_ALL_PASSENGER:
-                {
-                    //if (Vehicle* hippo = me->GetVehicleKit())
-                    //    hippo->RemoveAllPassengers();
-
-                    m_events.ScheduleEvent(EVENT_JUMP_TO_LORNA, 10);
                     break;
                 }
                 case EVENT_JUMP_TO_LORNA:
@@ -990,16 +973,12 @@ public:
                     if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
                         if (Creature* lorna = sObjectAccessor->GetCreature(*me, m_lornaGUID))
                         {
-                            lorna->AI()->DoAction(ACTION_START_LORNA_TALK);
-                            player->JumpTo(lorna, 0.5f);
-                        }
-                        else
-                        {
-                            player->GetMotionMaster()->MoveJump(-1472.0f, 3250.0f, 180.0f, 20.0f, 0.4f);
+                            lorna->AI()->SetGUID(player->GetGUID(), PLAYER_GUID);
+                            player->ExitVehicle();
+                            lorna->AI()->DoAction(EVENT_TELEPORT_01);
                         }
 
-                    m_playerGUID = 0;
-                    me->DespawnOrUnsummon(2000);
+                    me->DespawnOrUnsummon(100);
                     break;
                 }
                 }
@@ -1009,12 +988,10 @@ public:
         void FindLornaGuid()
         {
             if (Creature* lorna = sObjectAccessor->GetCreature(*me, m_lornaGUID))
-                if (lorna->GetDistance2d(me) > 50.0f)
-                    m_lornaGUID = 0;
+                return;
 
-            if (!m_lornaGUID)
-                if (Creature* lorna = me->FindNearestCreature(NPC_LORNA_CRAWLEY_43566, 25.0f))
-                    m_lornaGUID = lorna->GetGUID();
+            if (Creature* lorna = me->FindNearestCreature(NPC_LORNA_CRAWLEY_43566, 100.0f))
+                m_lornaGUID = lorna->GetGUID();
         }
     };
 
@@ -1042,11 +1019,13 @@ public:
         EventMap m_events;
         uint64   m_tobiasGUID;
         uint64   m_playerGUID;
+        uint64   m_triggerGUID;
 
         void Reset() override
         {
             m_tobiasGUID = 0;
             m_playerGUID = 0;
+            m_triggerGUID = 0;
             m_events.RescheduleEvent(EVENT_CHECK_POSITIONS, 2500);
         }
 
@@ -1054,6 +1033,17 @@ public:
         {
             if (Creature* tobias = sObjectAccessor->GetCreature(*go, m_tobiasGUID))
                 tobias->AI()->DoAction(eventId);
+
+            if (Creature* trigger = sObjectAccessor->GetCreature(*go, m_triggerGUID))
+                trigger->AI()->DoAction(eventId);
+
+            if (eventId == ACTION_EVENT_ID_25727) // ship is on destroy.. we must leave quickly.. or player char is destroyed in database storing..
+            {
+                WorldLocation wLoc = WorldLocation(654, -1317.54f, 2121.90f, 5.6296f, 0.218f);
+                std::list<Player*> pList = go->FindNearestPlayers(70.0f);
+                for (auto player : pList)
+                    player->TeleportTo(wLoc);
+            }
         }
 
         void SetGUID(uint64 guid, int32 id) override
@@ -1080,6 +1070,10 @@ public:
                         if (Player* player = go->FindNearestPlayer(100.0f))
                             m_playerGUID = player->GetGUID();
 
+                    if (!m_triggerGUID)
+                        if (Creature* trigger = go->FindNearestCreature(40350, 100.0f))
+                            m_triggerGUID = trigger->GetGUID();
+
                      m_events.ScheduleEvent(EVENT_CHECK_POSITIONS, 2500);
                     break;
                 }
@@ -1105,35 +1099,42 @@ public:
         npc_lorna_crowley_43566AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
 
         EventMap  m_events;
-        uint64    m_targetGUID;
-        bool      m_doneA;
-        bool      m_anim_is_started;
-        std::list<Creature*>victimList;
+        uint64    m_bigOrcGUID;
+        uint64    m_playerGUID;
+        bool      m_animStarted;
+        uint32    m_wp_point;
+        std::list<uint64> pList;
 
         void Initialize()
         {
-            m_anim_is_started = false;
-            m_targetGUID = 0;
+            m_bigOrcGUID = 0;
+            m_playerGUID = 0;
+            m_wp_point = 0;
         }
 
         void Reset() override
         {
-            me->SetReactState(REACT_PASSIVE);
-            m_doneA = false;
-            if (!me->HasAura(SPELL_FOR_GILNEAS))
-                me->AddAura(SPELL_FOR_GILNEAS, me);
+            me->SetReactState(REACT_DEFENSIVE);
+            m_animStarted = false;
+            me->AddAura(SPELL_FOR_GILNEAS, me);
+            SetRopeSelectableFlag(false);
+            m_events.RescheduleEvent(EVENT_CHECK_ATTACK, 1000);
         }
 
         void DamageTaken(Unit* attacker, uint32& damage) override
         {
-            if (attacker->GetGUID() != m_targetGUID)
-                m_targetGUID = attacker->GetGUID();
+            damage = 0;
+        }
 
-            switch (attacker->GetEntry())
+        void SetGUID(uint64 guid, int32 id) override
+        {
+            switch (id)
             {
-            case NPC_GUNSHIP_GRUNT:
-                damage = 0;
+            case PLAYER_GUID:
+            {
+                m_playerGUID = guid;
                 break;
+            }
             }
         }
 
@@ -1141,67 +1142,429 @@ public:
         {
             switch (param)
             {
-            case ACTION_START_LORNA_TALK:
-                Talk(2);
-                m_anim_is_started = true;
-                SetRopeNotSelectableFlag(true);
-                if (Transport* transport = me->GetTransport())
-                    transport->EnableMovement(false);
-                m_events.ScheduleEvent(EVENT_IS_BRIDGE_CLEAN, 2500);
-                m_events.ScheduleEvent(EVENT_MASTER_RESET, 180000);
+            case EVENT_TELEPORT_01:
+            {
+                if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                    if (me->GetTransportGUID())
+                    {
+                        pList.push_back(player->GetGUID());
+                        if (!m_animStarted)
+                        {
+                            m_animStarted = true;
+                            m_events.RescheduleEvent(EVENT_ANIMATION_START, 100);
+                        }
+                    }
                 break;
             }
+            }
+        }
+
+        void MovementInform(uint32 type, uint32 id) override
+        {
+            if (type == WAYPOINT_MOTION_TYPE)
+                switch (m_wp_point)
+                {
+                case 1:
+                {
+                    if (id == 4)
+                        m_events.ScheduleEvent(EVENT_TALK_PART_01, 1000);
+                    break;
+                }
+                case 2:
+                {
+                    if (id == 10)
+                        m_events.ScheduleEvent(EVENT_TALK_PART_04, 1000);
+                    break;
+                }
+                case 3:
+                {
+                    if (id == 2)
+                        m_events.ScheduleEvent(EVENT_TALK_PART_05, 1000);
+                    break;
+                }
+                case 4:
+                {
+                    if (id == 2)
+                        m_events.ScheduleEvent(EVENT_TALK_PART_06, 1000);
+                    break;
+                }
+                case 5:
+                {
+                    if (id == 2)
+                        m_events.ScheduleEvent(EVENT_TALK_PART_07, 1000);
+                    break;
+                }
+                case 6:
+                {
+                    if (id == 1)
+                        m_events.ScheduleEvent(EVENT_TALK_PART_09, 1000);
+                    break;
+                }
+                case 7:
+                {
+                    if (id == 1)
+                        m_events.ScheduleEvent(EVENT_TALK_PART_10, 1000);
+                    break;
+                }
+                }
+        }
+
+        void EnterEvadeMode() override 
+        { 
+            me->CombatStop(true);
+            me->SetReactState(REACT_DEFENSIVE);
+            me->SetTransportHomePosition(me->GetTransportPosition());
         }
 
         void UpdateAI(uint32 diff) override
         {
             m_events.Update(diff);
 
+            if (m_animStarted && pList.size())
+                for (auto guid : pList)
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, guid))
+                    {
+                        Position pos = me->GetTransportPosition();
+                        player->MovePosition(pos, 0, 0);
+                        pList.remove(guid);
+                        break;
+                    }
+
             while (uint32 eventId = m_events.ExecuteEvent())
             {
                 switch (eventId)
                 {
-                case EVENT_MASTER_RESET:
+                case EVENT_CHECK_ATTACK:  
                 {
-                    Initialize();
-                    me->DespawnOrUnsummon(10);
+                    if (!me->IsInCombat())
+                        if (Creature* target = me->FindNearestCreatureInFloor(42141, 30.0f, 3.0f))
+                        {
+                            float dist = me->GetTransportPosition().GetExactDist2d(&target->GetTransportPosition());
+                            if (dist < 5.0f)
+                            {
+                                me->CastSpell(target, 15496, true);
+                                me->Attack(target, true);
+                            }
+                            else
+                            {
+                                me->CastSpell(target, 31942, true);
+                                m_events.ScheduleEvent(EVENT_CAST_COOLDOWN, 2000);
+                            }
+                        }
+
+                    m_events.ScheduleEvent(EVENT_CHECK_ATTACK, urand(1500, 1600));
                     break;
                 }
-                case EVENT_IS_BRIDGE_CLEAN:
+                case EVENT_CAST_COOLDOWN:
                 {
-                    uint32 count = IsBridgeClean();
-                    if (count < 2 && !m_doneA)
+                    me->CombatStop(true);
+                    break;
+                }
+                case EVENT_ANIMATION_START:
+                {
+                    Talk(2);
+                    m_events.RescheduleEvent(EVENT_FLOOR_IS_ONE_REMAIN, 3000);
+                    break;
+                }
+                case EVENT_FLOOR_IS_ONE_REMAIN:
+                {
+                    uint32 count = CountGruntOnThisFloorZ(86.0f, 15.0f);
+                    if (count < 2)
                     {
-                        m_doneA = true;
                         Talk(3);
-                        m_events.ScheduleEvent(EVENT_IS_BRIDGE_CLEAN, 5000);
-                        break;
+                        m_events.ScheduleEvent(EVENT_FLOOR_IS_CLEAN, 5000);
                     }
-                    else if (!count)
+                    else
+                        m_events.ScheduleEvent(EVENT_FLOOR_IS_ONE_REMAIN, 1000);
+
+                    break;
+                }
+                case EVENT_FLOOR_IS_CLEAN:
+                {
+                    uint32 count = CountGruntOnThisFloorZ(86.0f, 15.0f);
+                    if (!count)
                     {
                         Talk(4);
-                        SetRopeNotSelectableFlag(false);
                         m_events.ScheduleEvent(EVENT_START_ROPE_PART, 7000);
-                        break;
                     }
-
-                    m_events.ScheduleEvent(EVENT_IS_BRIDGE_CLEAN, 2500);
+                    else
+                        m_events.ScheduleEvent(EVENT_FLOOR_IS_CLEAN, 1000);
                     break;
                 }
                 case EVENT_START_ROPE_PART:
                 {
-                    SpawnGunshipOrcsWave2();
+                    SetRopeSelectableFlag(true);
                     std::vector<Creature*> friendsList = FindFriendlyCreatureList();
-                    std::vector<Creature*> jumpTargetList = FindJumpTargetPositions();
-                    for (uint32 i = 0; i < friendsList.size(); i++)
-                        friendsList[i]->JumpTo(jumpTargetList[i], 0.4f);
+                    std::vector<Creature*> jumpTargetList = FindJumpTargetPositions(34.0f);
+                    for (auto source : friendsList)
+                        if (Creature* target = FindBestJumpTarget(source, 34.0f, jumpTargetList))
+                        {
+                            source->SetTransportHomePosition(target->GetTransportPosition());
+                            source->JumpTo(target, 0.4f);
+                        }
 
-                    m_events.ScheduleEvent(11, 2000);
+                    m_events.ScheduleEvent(EVENT_WAIT_TO_MOVE, 8000);
                     break;
                 }
-                case 11:
+                case EVENT_WAIT_TO_MOVE:
                 {
+                    uint32 count = CountGruntOnThisFloorZ(34.0f, 3.0f);                    
+                    if (count)
+                    {
+                        m_events.ScheduleEvent(EVENT_WAIT_TO_MOVE, 1000);
+                        break;
+                    }
 
+                    if (IsPlayerInRange(15.0f))
+                        m_events.ScheduleEvent(EVENT_TALK_PART_00, 1000); // EVENT_MOVE_ATTACK
+                    else
+                        m_events.ScheduleEvent(EVENT_WAIT_TO_MOVE, 1000);
+                    break;
+                }
+                case EVENT_TALK_PART_00: // lorna goes to captain and talk..
+                {
+                    m_wp_point = 1;
+                    me->GetMotionMaster()->MovePath(4356601, false);
+                    break;
+                }
+                case EVENT_TALK_PART_01:
+                {
+                    Talk(6);
+                    m_events.ScheduleEvent(EVENT_TALK_PART_02, 10000);
+                    break;
+                }
+                case EVENT_TALK_PART_02:
+                {
+                    Talk(7);
+                    m_events.ScheduleEvent(EVENT_TALK_PART_03, 2000);
+                    break;
+                }
+                case EVENT_TALK_PART_03: // walk downstair, to first grunt there
+                {
+                    if (IsPlayerInRange(50.0f))
+                    {
+                        m_wp_point = 2;
+                        me->GetMotionMaster()->MovePath(4356602, false);
+                    }
+                    else
+                        m_events.ScheduleEvent(EVENT_TALK_PART_03, 1000);
+                    break;
+                }
+                case EVENT_TALK_PART_04: // fight to grunt on stair
+                {
+                    if (me->IsInCombat() || IsPlayerInCombat())
+                        m_events.ScheduleEvent(EVENT_TALK_PART_04, 1000); // repeat 04 while grunt near or self in combat
+                    else
+                    { 
+                        if (IsPlayerInRange(15.0f))
+                        {
+                            m_wp_point = 3;
+                            me->GetMotionMaster()->MovePath(4356603, false); // else walk to next position, grunt outsite floor
+                        }
+                        else
+                            m_events.ScheduleEvent(EVENT_TALK_PART_04, 1000);
+                    }
+                    break;
+                }
+                case EVENT_TALK_PART_05: // fight to gunt outside stair
+                {
+                    if (me->IsInCombat() || IsPlayerInCombat())
+                        m_events.ScheduleEvent(EVENT_TALK_PART_05, 1000); // repeat 05 while grunt near or self in combat
+                    else
+                    {
+                        if (IsPlayerInRange(15.0f))
+                        {
+                            m_wp_point = 4;
+                            me->GetMotionMaster()->MovePath(4356604, false); // else walk to middle of ship.. 
+                        }
+                        else
+                            m_events.ScheduleEvent(EVENT_TALK_PART_05, 1000);
+                    }
+                    break;
+                }
+                case EVENT_TALK_PART_06: // fight to gunt inside ship
+                {
+                    if (me->IsInCombat() || IsPlayerInCombat())
+                        m_events.ScheduleEvent(EVENT_TALK_PART_06, 1000); // repeat 06 while grunt near or self in combat
+                    else
+                    {
+                        if (IsPlayerInRange(15.0f))
+                        {
+                            m_wp_point = 5;
+                            me->GetMotionMaster()->MovePath(4356605, false); // else walk to machine room.. 
+                        }
+                        else
+                            m_events.ScheduleEvent(EVENT_TALK_PART_06, 1000);
+                    }
+                    break;
+                }
+                case EVENT_TALK_PART_07: // fight inside machine room
+                {
+                    if (me->IsInCombat() || IsPlayerInCombat() || !IsPlayerInRange(20.0f))
+                    {
+                        m_events.ScheduleEvent(EVENT_TALK_PART_07, 1000); // repeat 06 while grunt near or self in combat
+                    }
+                    else
+                        m_events.ScheduleEvent(EVENT_TALK_PART_08, 1000);
+                    break;
+                }
+                case EVENT_TALK_PART_08: // the machine room is clean.. 
+                {
+                    m_wp_point = 6;
+                    me->GetMotionMaster()->MovePath(4356606, false); // we go to spawn gunpowder position..
+                    break;
+                }
+                case EVENT_TALK_PART_09: // spawn 3 gunpowder's
+                {
+                    if (Transport* trans = me->GetTransport())
+                    {
+                        if (uint32 guid = sObjectMgr->GenerateLowGuid(HIGHGUID_GAMEOBJECT))
+                        {
+                            GameObjectData& data = sObjectMgr->NewGOData(guid);
+                            data.id = 204458;
+                            data.phaseMask = 1;
+                            data.posX = 53.6417f;
+                            data.posY = -0.00663333f;
+                            data.posZ = 10.4467f;
+                            data.orientation = 2.010638f;
+                            GameObject* go = trans->CreateGOPassenger(guid, &data);
+                            go->SetObjectScale(2.0f);
+                            sObjectMgr->AddGameobjectToGrid(guid, &data);
+                        }
+                        if (uint32 guid = sObjectMgr->GenerateLowGuid(HIGHGUID_GAMEOBJECT))
+                        {
+                            GameObjectData& data = sObjectMgr->NewGOData(guid);
+                            data.id = 204458;
+                            data.phaseMask = 1;
+                            data.posX = 53.6808f;
+                            data.posY = -2.18513f;
+                            data.posZ = 10.4467f;
+                            data.orientation = 2.010638f;
+                            GameObject* go = trans->CreateGOPassenger(guid, &data);
+                            go->SetObjectScale(2.0f);
+                            sObjectMgr->AddGameobjectToGrid(guid, &data);
+                        }
+                        //
+                        if (uint32 guid = sObjectMgr->GenerateLowGuid(HIGHGUID_GAMEOBJECT))
+                        {
+                            GameObjectData& data = sObjectMgr->NewGOData(guid);
+                            data.id = 204458;
+                            data.phaseMask = 1;
+                            data.posX = 53.1084f;
+                            data.posY = 2.12947f;
+                            data.posZ = 10.4467f;
+                            data.orientation = 2.010638f;
+                            GameObject* go = trans->CreateGOPassenger(guid, &data);
+                            go->SetObjectScale(2.0f);
+                            sObjectMgr->AddGameobjectToGrid(guid, &data);
+                        }
+                    }
+                    Talk(5);
+                    m_wp_point = 7;
+                    me->GetMotionMaster()->MovePath(4356607, false); // go back to door.. and wait for orc..
+                    m_events.ScheduleEvent(EVENT_SPAWN_OBJECT, 200);
+                    break;
+                }
+                case EVENT_SPAWN_OBJECT: // spawn orc and let him walk to us..
+                {
+                    if (Transport* trans = me->GetTransport())
+                        if (uint32 guid = sObjectMgr->GenerateLowGuid(HIGHGUID_UNIT))
+                        {
+                            CreatureData& data = sObjectMgr->NewOrExistCreatureData(guid);
+                            data.id = 43567;
+                            data.phaseMask = 1;
+                            data.posX = -47.758198f;
+                            data.posY = -11.800224f;
+                            data.posZ = 13.089049f;
+                            data.orientation = 0.549271f;
+                            Creature* npc = trans->CreateNPCPassenger(guid, &data);
+                            sObjectMgr->AddCreatureToGrid(guid, &data);
+                            m_bigOrcGUID = npc->GetGUID();
+                        }
+                    m_events.ScheduleEvent(EVENT_MOVE_PART2, 200);
+                    break;
+                }
+                case EVENT_MOVE_PART2:
+                {
+                    if (Creature* orc = sObjectAccessor->GetCreature(*me, m_bigOrcGUID))
+                    {
+                        orc->SetSpeed(MOVE_WALK, 1.4f);
+                        orc->GetMotionMaster()->MovePath(4356701, false);
+                    }
+                    break;
+                }
+                case EVENT_TALK_PART_10: // finish talk on door position
+                {
+                    Talk(8); // What a big orc
+                    m_events.ScheduleEvent(EVENT_WAIT_FOR_ACTION_00, 4000);
+                    break;
+                }
+                case EVENT_WAIT_FOR_ACTION_00: // wait that orc comes near..
+                {
+                    if (Creature* orc = sObjectAccessor->GetCreature(*me, m_bigOrcGUID))
+                    {
+                        Position posA = me->GetTransportPosition();
+                        Position posB = orc->GetTransportPosition();
+                        if (posA.GetExactDist(&posB) < 15.0f)
+                            m_events.ScheduleEvent(EVENT_TALK_PART_11, 1000);
+                        else
+                            m_events.ScheduleEvent(EVENT_WAIT_FOR_ACTION_00, 1000);
+                    }
+                    break;
+                }
+                case EVENT_TALK_PART_11: // and fight
+                {
+                    Creature* orc = me->FindNearestCreature(43567, 40.0f);
+                    if (orc)
+                        if (me->GetDistance(orc) > 5.0)
+                            me->CastSpell(orc, 50092, true);
+                        else
+                        {
+                            me->CastSpell(orc, 15496, true);
+                            orc->Attack(me, true);
+                        }
+                    
+                    if (orc)
+                        m_events.ScheduleEvent(EVENT_TALK_PART_11, urand(1100, 1300)); // repeat 11 while orc living
+                    else
+                        m_events.ScheduleEvent(EVENT_TALK_PART_12, 1000);
+                    break;
+                }
+                case EVENT_TALK_PART_12: // big orc is death.. 
+                {
+                    me->PlayDirectSound(23498);
+                    m_events.ScheduleEvent(EVENT_TALK_PART_13, 4000);
+                    break;
+                }
+                case EVENT_TALK_PART_13: // 
+                {
+                    Talk(9);
+                    m_events.ScheduleEvent(EVENT_TALK_PART_14, 2000);
+                    break;
+                }
+                // the spell 81780 should now start next: visual fleeing from the gunship with new spawned whyvern.. 
+                // but the triggered spell 95869 is visual damaged.. missing additional phase aura??
+                case EVENT_TALK_PART_14: // 
+                {
+                    std::list<Player*> pList = me->FindNearestPlayers(100.0f);
+                    for (auto player : pList)
+                    {
+                        if (Transport* trans = me->GetTransport())
+                            if (uint32 guid = sObjectMgr->GenerateLowGuid(HIGHGUID_UNIT))
+                            {
+                                CreatureData& data = sObjectMgr->NewOrExistCreatureData(guid);
+                                data.id = 43713;
+                                data.phaseMask = 1;
+                                data.posX = player->GetTransportPosition().GetPositionX();
+                                data.posY = player->GetTransportPosition().GetPositionY();
+                                data.posZ = player->GetTransportPosition().GetPositionZ();
+                                data.orientation = player->GetTransportPosition().GetOrientation();
+                                Creature* npc = trans->CreateNPCPassenger(guid, &data);
+                                sObjectMgr->AddCreatureToGrid(guid, &data);
+                                npc->AI()->SetGUID(player->GetGUID(), PLAYER_GUID);
+                                npc->AI()->DoAction(1); // player EnterVehicle
+                            }
+                    }
                     break;
                 }
                 }
@@ -1213,110 +1576,119 @@ public:
                 DoMeleeAttackIfReady();
         }
 
-        bool FindTarget()
-        {
-            m_targetGUID = 0;
-            if (!IsPlayerInRange())
-                return false;
-            std::list<Creature*>m_targetList = me->FindAllUnfriendlyCreaturesInRange(40.0f);
-            if (!m_targetList.empty())
-            {
-                Creature* m_nearestTarget = *m_targetList.begin();
-                float m_nearestDistance = m_nearestTarget->GetDistance(me);
-                for (std::list<Creature*>::const_iterator itr = m_targetList.begin(); itr != m_targetList.end(); ++itr)
-                    if (isInSameHeight((*itr)->GetPosition()))
-                    {
-                        float dist2 = (*itr)->GetDistance(me);
-                        if (dist2 < m_nearestDistance)
-                        {
-                            m_nearestTarget = (*itr);
-                            m_nearestDistance = dist2;
-                        }
-                    }
-                m_targetGUID = m_nearestTarget->GetGUID();
-            }
+ // ############################
 
-            return (m_targetGUID) ? true : false;
+        Creature* FindBestJumpTarget(Creature* source, float floorZ, std::vector<Creature*> tList)
+        {
+            Position posS = source->GetTransportPosition();
+            float dist = 100.0f;
+            Creature* rTarget = nullptr;
+            for (auto target : tList)
+            {
+                Position posT = target->GetTransportPosition();
+                if (abs(posT.GetPositionZ() - floorZ) < 4.0f)
+                {
+                    float d1 = posS.GetExactDist2d(&posT);
+                    if (d1 < dist)
+                    {
+                        dist = d1;
+                        rTarget = target;
+                    }
+                }
+            }
+            return rTarget;
         }
 
-        bool IsPlayerInRange()
+        void SetGruntReactStateOnThisFloor(float floorZ, float range, ReactStates react)
         {
-            Player* player = me->FindNearestPlayer(50.0f);
+            std::list<Creature*> cList = me->FindNearestCreatures(NPC_GUNSHIP_GRUNT, range);
+            for (auto grunt : cList)
+                if (grunt->IsAlive())
+                    if (abs(grunt->GetTransportPosition().GetPositionZ() - floorZ) < 3.0f)
+                        grunt->SetReactState(react);
+        }
+
+        Creature* FindTargetOnThisFloor(Creature* source, float range)
+        {
+            std::list<Creature*> cList = me->FindNearestCreatures(NPC_GUNSHIP_GRUNT, range);
+            for (auto grunt : cList)
+                if (grunt->IsAlive())
+                    if (abs(source->GetTransportPosition().GetPositionZ() - grunt->GetTransportPosition().GetPositionZ()) < 3.0f)
+                    {
+                        return grunt;
+                    }
+            return nullptr;
+        }
+
+        bool IsPlayerInCombat()
+        {
+            std::list<Player*> pList = me->FindNearestPlayers(20.0f);
+            for (auto player : pList)
+                if (player->IsInCombat())
+                    return true;
+
+            return false;
+        }
+
+        bool IsPlayerInRange(float range)
+        {
+            Player* player = me->FindNearestPlayer(range);
             return player ? true : false;
         }
 
-        bool isInSameHeight(Position pos)
+        bool isInSameTranportFloor(Creature* creature)
         {
-            float diff = abs(me->GetPositionZ() - pos.GetPositionZ());
-            return (diff < 5) ? true : false;
+            float diff = abs(me->GetTransportPosition().GetPositionZ() - creature->GetTransportPosition().GetPositionZ());
+            return (diff < 5.0f) ? true : false;
         }
 
-        uint32 IsBridgeClean()
+        uint32 CountGruntOnThisFloorZ(float posZ, float rangeZ)
         {
             uint32 count = 0;
-            std::list<Creature*>m_targetList = me->FindAllUnfriendlyCreaturesInRange(75.0f);
+            std::list<Creature*>m_targetList = me->FindAllUnfriendlyCreaturesInRange(75.0f); // returns only alive 
             for (std::list<Creature*>::iterator itr = m_targetList.begin(); itr != m_targetList.end(); ++itr)
-                if ((*itr)->GetTransOffsetZ() > 75.0f)
+            {
+                Position pos = (*itr)->GetTransportPosition();
+                if (abs(pos.GetPositionZ() - posZ) < rangeZ)
                     count += 1;
+            } 
 
             return count;
         }
 
-        void SetRopeNotSelectableFlag(bool value)
+        void SetRopeSelectableFlag(bool value)
         {
             std::list<GameObject*> goList = me->FindNearestGameObjects(GO_ROPE, 30.0f); // there are 2 rope on bridge
             for (std::list<GameObject*>::const_iterator itr = goList.begin(); itr != goList.end(); ++itr)
                 if (value)
-                    (*itr)->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
-                else
                     (*itr)->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                else
+                    (*itr)->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
         }
 
         std::vector<Creature*> FindFriendlyCreatureList()
         {
             std::vector<Creature*> rList;
-            std::list<Creature*> tList = me->FindAllCreaturesInRange(12.0f);
+            std::list<Creature*> tList = me->FindAllCreaturesInRange(18.0f);
             for (std::list<Creature*>::iterator itr = tList.begin(); itr != tList.end(); ++itr)
                 if (Creature* target = (*itr))
-                    if (isInSameHeight(target->GetPosition()) && target->IsAlive())
+                    if (isInSameTranportFloor(target) && target->IsAlive())
                         rList.push_back(target);
 
             return rList;
         }
 
-        std::vector<Creature*> FindJumpTargetPositions()
+        std::vector<Creature*> FindJumpTargetPositions(float floorZ)
         {
             std::vector<Creature*> rList;
-            std::list<Creature*> tList = me->FindNearestCreatures(NPC_GILNEAS_VEHICLE_ROPE, 50.0f);
+            std::list<Creature*> tList = me->FindNearestCreatures(NPC_GILNEAS_VEHICLE_ROPE, 75.0f);
             for (std::list<Creature*>::iterator itr = tList.begin(); itr != tList.end(); ++itr)
-                if (Creature* target = (*itr))
-                    if (!isInSameHeight(target->GetPosition()))
-                        rList.push_back(target);
+            {
+                float diff = abs((*itr)->GetTransportPosition().GetPositionZ() - floorZ);
+                if (diff < 5.0f)
+                    rList.push_back((*itr));
+            }
             return rList;
-        }
-
-        void SpawnGunshipOrcsWave2()
-        {
-            // AddPassenger(42141, );
-        }
-
-        void AddPassenger(uint32 entry, float x, float y, float z, float o)
-        {
-            uint32 guid = sObjectMgr->GenerateLowGuid(HIGHGUID_UNIT);
-            CreatureData& data = sObjectMgr->NewOrExistCreatureData(guid);
-            data.id = entry;
-            data.phaseId = 191;
-            data.posX = x;
-            data.posY = y;
-            data.posZ = z;
-            data.orientation = o;
-            data.mapid = 749;
-
-            if (Transport* transport = me->GetTransport())
-                if (Creature* creature = transport->CreateNPCPassenger(guid, &data))
-                {
-                    creature->SetReactState(REACT_AGGRESSIVE);
-                }
         }
     };
 
@@ -1337,27 +1709,29 @@ public:
         npc_worgen_warrior_43651AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
 
         EventMap  m_events;
-        uint64    m_targetGUID;
-        float     m_targetDistance;
-        uint64    m_playerGUID;
 
-        void Initialize()
-        {
-            me->SetReactState(REACT_PASSIVE);
-            m_playerGUID = 0;
-            m_targetGUID = 0;
-            m_targetDistance = 0;
-            m_events.ScheduleEvent(EVENT_START_SHOWFIGHT, 5000);
-        }
+        void Initialize() { }
 
         void Reset() override
         {
-            DoStartNoMovement(me);
+            me->SetReactState(REACT_DEFENSIVE);
+            m_events.RescheduleEvent(EVENT_CHECK_ATTACK, 1200);
+        }
+
+        void EnterCombat(Unit* /*who*/) 
+        {
+            me->GetMotionMaster()->MoveIdle();
         }
 
         void DamageTaken(Unit* attacker, uint32& damage) override
         {
             damage = 0;
+        }
+
+        void EnterEvadeMode() override
+        {
+            me->CombatStop(true);
+            me->SetTransportHomePosition(me->GetTransportPosition());
         }
 
         void UpdateAI(uint32 diff) override
@@ -1368,25 +1742,16 @@ public:
             {
                 switch (eventId)
                 {
-                case EVENT_START_SHOWFIGHT:
+                case EVENT_CHECK_ATTACK:
                 {
-                    m_events.ScheduleEvent(EVENT_MAKE_SHOWFIGHT, 1000);
-                    break;
-                }
-                case EVENT_MAKE_SHOWFIGHT:
-                {
-                    if (me->IsInCombat())
-                    {
-                        if (Creature* target = sObjectAccessor->GetCreature(*me, m_targetGUID))
-                            if (m_targetDistance < 5.0f)
-                                me->CastSpell(target, SPELL_CLEAVE);
-                    }
-                    else if (FindTarget())
-                        if (Creature* target = sObjectAccessor->GetCreature(*me, m_targetGUID))
-                            if (m_targetDistance < 5.0f)
-                                me->CastSpell(target, SPELL_CLEAVE);
+                    if (!me->IsInCombat())
+                        if (Creature* target = me->FindNearestUnfriendlyCreatureInFloor(5, 3))
+                        {
+                            me->GetMotionMaster()->MoveIdle();
+                            me->Attack(target, true);
+                        }
 
-                    m_events.ScheduleEvent(EVENT_MAKE_SHOWFIGHT, urand(900, 1200));
+                    m_events.ScheduleEvent(EVENT_CHECK_ATTACK, urand(900, 1200));
                     break;
                 }
                 }
@@ -1396,49 +1761,6 @@ public:
                 return;
             else
                 DoMeleeAttackIfReady();
-        }
-
-        bool FindTarget()
-        {
-            m_targetGUID = 0;
-            if (!IsPlayerInRange())
-                return false;
-            std::list<Creature*>m_targetList = me->FindAllUnfriendlyCreaturesInRange(5.0f);
-            if (!m_targetList.empty())
-            {
-                Creature* m_nearestTarget = *m_targetList.begin();
-                float m_nearestDistance = m_nearestTarget->GetDistance2d(me);
-                for (std::list<Creature*>::const_iterator itr = m_targetList.begin(); itr != m_targetList.end(); ++itr)
-                {
-                    float dist2 = (*itr)->GetDistance2d(me);
-                    if (dist2 < m_nearestDistance)
-                    {
-                        m_nearestTarget = (*itr);
-                        m_nearestDistance = dist2;
-                    }
-                }
-                if (m_nearestDistance < 5.0f)
-                    m_targetGUID = m_nearestTarget->GetGUID();
-            }
-
-            return (m_targetGUID) ? true : false;
-        }
-
-        bool IsPlayerInRange()
-        {
-            Player* player = me->FindNearestPlayer(50.0f);
-            return player ? true : false;
-        }
-
-        bool CheckPlayer()
-        {
-            if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
-                if (player->GetDistance(me) > 20.0f)
-                    m_playerGUID = 0;
-            if (!m_playerGUID)
-                if (Player* player = me->FindNearestPlayer(20.0f))
-                    m_playerGUID = player->GetGUID();
-            return (m_playerGUID) ? true : false;
         }
     };
 
@@ -1459,28 +1781,31 @@ public:
         npc_gilnean_sharpshooter_43703AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
 
         EventMap  m_events;
-        uint64    m_targetGUID;
-        float     m_targetDistance;
-        uint64    m_playerGUID;
+        uint64    m_oldTargetGuid;
+        uint32    m_count;
 
-        void Initialize()
-        {
-
-            m_playerGUID = 0;
-            m_targetGUID = 0;
-            m_targetDistance = 0;
-            m_events.ScheduleEvent(EVENT_START_SHOWFIGHT, 5000);
-        }
+        void Initialize() { }
 
         void Reset() override
         {
-            me->SetReactState(REACT_PASSIVE);
-            DoStartNoMovement(me);
+            m_oldTargetGuid = 0;
+            m_count = 0;
+            m_events.RescheduleEvent(EVENT_CHECK_ATTACK, 1000);
+            me->SetReactState(REACT_DEFENSIVE);
         }
 
         void DamageTaken(Unit* attacker, uint32& damage) override
         {
             damage = 0;
+        }
+
+        void EnterEvadeMode() override
+        {
+            me->CombatStop(false);
+            if (me->GetTransportPosition().GetPositionZ() < 50.0f)
+                me->SetTransportHomePosition(me->GetTransportPosition());
+            else
+                me->GetMotionMaster()->MoveTargetedHome();
         }
 
         void UpdateAI(uint32 diff) override
@@ -1491,39 +1816,48 @@ public:
             {
                 switch (eventId)
                 {
-                case EVENT_START_SHOWFIGHT:
+                case EVENT_CHECK_ATTACK:
                 {
-                    m_events.ScheduleEvent(EVENT_MAKE_SHOWFIGHT, 1000);
-                    break;
-                }
-                case EVENT_MAKE_SHOWFIGHT:
-                {
-                    if (me->IsInCombat())
+                    if (!me->IsInCombat())
                     {
-                        if (Creature* target = sObjectAccessor->GetCreature(*me, m_targetGUID))
-                            if (m_targetDistance > 5.0f)
-                                me->CastSpell(target, SPELL_GILNEAS_MILITIA_SHOOT);
-                            else
+                        if (Creature* target = me->FindNearestUnfriendlyCreatureInFloor(35, 10))
+                        {
+                            if (me->GetTransportPosition().GetExactDist2d(&target->GetTransportPosition()) < 5.0f)
                             {
-                                me->CastSpell(target, SPELL_CLEAVE);
-                                if (!target->IsInCombat())
-                                    target->Attack(me, true);
+                                me->GetMotionMaster()->MoveIdle();
+                                me->Attack(target, true);
                             }
-                    }
-                    else
-                        if (FindTarget())
-                            if (Creature* target = sObjectAccessor->GetCreature(*me, m_targetGUID))
-                                if (m_targetDistance > 5.0f)
-                                    me->CastSpell(target, SPELL_GILNEAS_MILITIA_SHOOT);
+                            else
+                            {  
+                                Position p = target->GetTransportPosition();
+                                if (me->IsWithinLOS(p.m_positionX, p.m_positionY, p.m_positionZ))
+                                    break;
+                                me->CastSpell(target, 50092, true);
+                                AttackStartNoMove(target);
+                                m_events.ScheduleEvent(EVENT_CAST_COOLDOWN, 2000);
+                                /* this is a workaround: sometimes the core make failure in attack.. on attack the core only report 'escape' and none can kill this target..*/
+                                bool isEvade = target->HasUnitState(UNIT_STATE_EVADE);
+                                if (m_oldTargetGuid == target->GetGUID() && isEvade)
+                                {
+                                    m_count += 1;
+                                    if (m_count > 5)
+                                        target->ClearUnitState(UNIT_STATE_EVADE);
+                                }
                                 else
                                 {
-                                    me->SetReactState(REACT_AGGRESSIVE);
-                                    me->CastSpell(target, SPELL_CLEAVE);
-                                    if (!target->IsInCombat())
-                                        target->Attack(me, true);
+                                    m_count = 0;
+                                    m_oldTargetGuid = target->GetGUID();
                                 }
+                            }
+                        }
+                    }
 
-                    m_events.ScheduleEvent(EVENT_MAKE_SHOWFIGHT, urand(900, 1200));
+                    m_events.RescheduleEvent(EVENT_CHECK_ATTACK, urand(1000, 1100));
+                    break;
+                }
+                case EVENT_CAST_COOLDOWN:
+                {
+                    me->CombatStop(true);
                     break;
                 }
                 }
@@ -1533,59 +1867,6 @@ public:
                 return;
             else
                 DoMeleeAttackIfReady();
-        }
-
-        bool FindTarget()
-        {
-            m_targetGUID = 0;
-            if (!IsPlayerInRange())
-                return false;
-            std::list<Creature*>m_targetList = me->FindAllUnfriendlyCreaturesInRange(40.0f);
-            if (!m_targetList.empty())
-            {
-                Creature* m_nearestTarget = *m_targetList.begin();
-                float m_nearestDistance = m_nearestTarget->GetDistance(me);
-                for (std::list<Creature*>::const_iterator itr = m_targetList.begin(); itr != m_targetList.end(); ++itr)
-                    if (isInSameHeight((*itr)->GetPosition()))
-                    {
-                        float dist2 = (*itr)->GetDistance(me);
-                        if (dist2 < m_nearestDistance)
-                        {
-                            m_nearestTarget = (*itr);
-                            m_nearestDistance = dist2;
-                        }
-                    }
-                if (m_nearestDistance < 40.0f)
-                {
-                    m_targetGUID = m_nearestTarget->GetGUID();
-                    m_targetDistance = m_nearestDistance;
-                }
-            }
-
-            return (m_targetGUID) ? true : false;
-        }
-
-        bool IsPlayerInRange()
-        {
-            Player* player = me->FindNearestPlayer(50.0f);
-            return player ? true : false;
-        }
-
-        bool isInSameHeight(Position pos)
-        {
-            float diff = abs(me->GetPositionZ() - pos.GetPositionZ());
-            return (diff < 5) ? true : false;
-        }
-
-        bool CheckPlayer()
-        {
-            if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
-                if (player->GetDistance(me) > 20.0f)
-                    m_playerGUID = 0;
-            if (!m_playerGUID)
-                if (Player* player = me->FindNearestPlayer(20.0f))
-                    m_playerGUID = player->GetGUID();
-            return (m_playerGUID) ? true : false;
         }
     };
 
@@ -1606,42 +1887,57 @@ public:
         npc_gunship_grunt_42141AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
 
         EventMap m_events;
-        Unit* m_target;
-        uint64 m_playerGUID;
+        uint64   m_playerGUID;
 
-        void Initialize()
-        {
-            m_playerGUID = 0;
-        }
+        void Initialize() { }
 
         void Reset() override
         {
-            me->SetReactState(REACT_PASSIVE);
-            m_target = nullptr;
-            DoStartNoMovement(me);
+            m_playerGUID = 0;
+            me->SetReactState(REACT_DEFENSIVE);
+            m_events.RescheduleEvent(EVENT_CHECK_ATTACK, 1000);
         }
 
         void DamageTaken(Unit* attacker, uint32& damage) override
         {
-            if (IsPlayerInRange() && me->GetReactState() != REACT_AGGRESSIVE)
-                me->SetReactState(REACT_AGGRESSIVE);
-            damage *= 2;
+            if (m_playerGUID)
+            {
+                //damage *= 2;
+            } 
+            else
+                damage = 0;
         }
 
-        bool IsPlayerInRange()
+        void UpdateAI(uint32 diff) override
         {
-            Player* player = me->FindNearestPlayer(50.0f);
-            return player ? true : false;
-        }
+            m_events.Update(diff);
 
-        void CheckPlayer()
-        {
-            if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
-                if (player->GetDistance(me) > 20.0f)
-                    m_playerGUID = 0;
-            if (!m_playerGUID)
-                if (Player* player = me->FindNearestPlayer(20.0f))
-                    m_playerGUID = player->GetGUID();
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_CHECK_ATTACK:
+                {
+                    if (!me->IsInCombat())
+                    {
+                        if (Creature* target = me->FindNearestUnfriendlyCreatureInFloor(5.0f, 3.0f))
+                            me->Attack(target, true);
+                    }
+
+                    if (!m_playerGUID)
+                        if (Player* player = me->FindNearestPlayer(75.0f))
+                            m_playerGUID = player->GetGUID();
+
+                    m_events.RescheduleEvent(EVENT_CHECK_ATTACK, urand(1000, 1100));
+                    break;
+                }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
         }
     };
 
@@ -1676,6 +1972,130 @@ public:
                     rList.push_back(target);
 
         return (!rList.empty()) ? rList[urand(0, rList.size() - 1)] : nullptr;
+    }
+};
+
+// 43713
+class npc_wyvern_43713 : public CreatureScript
+{
+public:
+    npc_wyvern_43713() : CreatureScript("npc_wyvern_43713") { }
+
+    struct npc_wyvern_43713AI : public VehicleAI
+    {
+        npc_wyvern_43713AI(Creature* creature) : VehicleAI(creature) {}
+
+        EventMap m_events;
+        uint64   m_playerGUID;
+        uint32   m_flyPart;
+
+        void EnterEvadeMode() {}
+
+        void Reset()
+        {
+            m_playerGUID = 0;
+            m_flyPart = 0;
+        }
+
+        void MovementInform(uint32 type, uint32 id) override
+        {
+            if(type == WAYPOINT_MOTION_TYPE)
+                switch (m_flyPart)
+                {
+                case 1:
+                {
+                    if (id == 2)
+                        m_events.ScheduleEvent(EVENT_MOVE_PART1, 200);
+                    
+                    break;
+                }
+                }
+        }
+
+        void PassengerBoarded(Unit* who, int8 /*seatId*/, bool apply)
+        {
+            if (Player* player = who->ToPlayer())
+                if (apply)
+                    m_events.ScheduleEvent(EVENT_MOVEMENT_START, 200);
+                else
+                    m_events.ScheduleEvent(EVENT_MOVE_PART2, 200);
+        }
+
+        void SetGUID(uint64 guid, int32 id) override
+        {
+            switch (id)
+            {
+            case PLAYER_GUID:
+            {
+                m_playerGUID = guid;
+                break;
+            }
+            }
+        }
+
+        void DoAction(int32 param) override
+        {
+            switch (param)
+            {
+            case 1:
+            {
+                m_events.ScheduleEvent(EVENT_ENTER_VEHICLE, 200);
+                break;
+            }
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            VehicleAI::UpdateAI(diff);
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_ENTER_VEHICLE:
+                {
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                        if (Vehicle* wyv = me->GetVehicleKit())
+                            wyv->AddPassenger(player, 1);
+
+                    break;
+                }
+                case EVENT_MOVEMENT_START:
+                {
+                    m_flyPart = 1;
+                    me->GetMotionMaster()->MovePath(4371301, false); // fly to the open ship gate..
+                    break;
+                }
+                case EVENT_MOVE_PART1:
+                {
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID)) // now we are outside the ship
+                        if (Vehicle* wyv = me->GetVehicleKit())
+                            wyv->RemoveAllPassengers();
+
+                    break;
+                }
+                case EVENT_MOVE_PART2:
+                {
+                    m_flyPart = 2; 
+                    WorldLocation wLoc = WorldLocation(654, -1317.54f, 2121.90f, 5.6296f, 0.218f); // so we teleport to questtaker..
+                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                    {
+                        player->KilledMonsterCredit(43729);
+                        player->TeleportTo(wLoc);
+                    }
+                    me->DespawnOrUnsummon(200);
+                    break;
+                }
+                }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_wyvern_43713AI(creature);
     }
 };
 
@@ -1727,6 +2147,7 @@ void AddSC_zone_gilneas_city3()
     new npc_gilnean_sharpshooter_43703();
     new npc_gunship_grunt_42141();
     new go_rope_204428();
+    new npc_wyvern_43713();
     new npc_lorna_crowley_43727();
     new npc_admiral_nightwind_36616();
 }
