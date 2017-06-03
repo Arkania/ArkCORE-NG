@@ -1104,6 +1104,7 @@ public:
         bool      m_animStarted;
         uint32    m_wp_point;
         std::list<uint64> pList;
+        std::list<uint64> wList;
 
         void Initialize()
         {
@@ -1546,6 +1547,7 @@ public:
                 // but the triggered spell 95869 is visual damaged.. missing additional phase aura??
                 case EVENT_TALK_PART_14: // 
                 {
+                    wList.clear();
                     std::list<Player*> pList = me->FindNearestPlayers(100.0f);
                     for (auto player : pList)
                     {
@@ -1562,9 +1564,22 @@ public:
                                 Creature* npc = trans->CreateNPCPassenger(guid, &data);
                                 sObjectMgr->AddCreatureToGrid(guid, &data);
                                 npc->AI()->SetGUID(player->GetGUID(), PLAYER_GUID);
-                                npc->AI()->DoAction(1); // player EnterVehicle
+                                wList.push_back(npc->GetGUID());
                             }
                     }
+                    m_events.ScheduleEvent(EVENT_TALK_PART_15, 200);
+                    break;
+                }
+                case EVENT_TALK_PART_15:
+                {
+                    for (auto guid : wList)
+                        if (Creature* wyvern = sObjectAccessor->GetCreature(*me, guid))
+                        {
+                            guid = wyvern->AI()->GetGUID(PLAYER_GUID);
+                            if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
+                                player->EnterVehicle(wyvern, 0);
+                        }
+                    
                     break;
                 }
                 }
@@ -1999,17 +2014,8 @@ public:
 
         void MovementInform(uint32 type, uint32 id) override
         {
-            if(type == WAYPOINT_MOTION_TYPE)
-                switch (m_flyPart)
-                {
-                case 1:
-                {
-                    if (id == 2)
-                        m_events.ScheduleEvent(EVENT_MOVE_PART1, 200);
-                    
-                    break;
-                }
-                }
+            if (m_flyPart == 1 && type == WAYPOINT_MOTION_TYPE && id == 2)
+                m_events.ScheduleEvent(EVENT_MOVE_PART1, 200);
         }
 
         void PassengerBoarded(Unit* who, int8 /*seatId*/, bool apply)
@@ -2033,18 +2039,6 @@ public:
             }
         }
 
-        void DoAction(int32 param) override
-        {
-            switch (param)
-            {
-            case 1:
-            {
-                m_events.ScheduleEvent(EVENT_ENTER_VEHICLE, 200);
-                break;
-            }
-            }
-        }
-
         void UpdateAI(uint32 diff) override
         {
             VehicleAI::UpdateAI(diff);
@@ -2054,32 +2048,24 @@ public:
             {
                 switch (eventId)
                 {
-                case EVENT_ENTER_VEHICLE:
-                {
-                    if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
-                        if (Vehicle* wyv = me->GetVehicleKit())
-                            wyv->AddPassenger(player, 1);
-
-                    break;
-                }
                 case EVENT_MOVEMENT_START:
                 {
                     m_flyPart = 1;
-                    me->GetMotionMaster()->MovePath(4371301, false); // fly to the open ship gate..
+                    me->GetMotionMaster()->MovePath(4371301, false);                    // fly to the open ship gate..
                     break;
                 }
                 case EVENT_MOVE_PART1:
                 {
                     if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID)) // now we are outside the ship
                         if (Vehicle* wyv = me->GetVehicleKit())
-                            wyv->RemoveAllPassengers();
+                            wyv->RemoveAllPassengers();                                 // and leave the wyvern
 
                     break;
                 }
                 case EVENT_MOVE_PART2:
                 {
                     m_flyPart = 2; 
-                    WorldLocation wLoc = WorldLocation(654, -1317.54f, 2121.90f, 5.6296f, 0.218f); // so we teleport to questtaker..
+                    WorldLocation wLoc = WorldLocation(654, -1317.54f, 2121.90f, 5.6296f, 0.218f); // last we teleport to questtaker..
                     if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
                     {
                         player->KilledMonsterCredit(43729);
