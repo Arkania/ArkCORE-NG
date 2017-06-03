@@ -4838,6 +4838,13 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
         {
             switch (m_spellInfo->Id)
             {
+            case 62539: // Eject Passenger 2
+            {
+                if (Vehicle* car = m_caster->GetVehicleKit())
+                    if (Unit* pass = car->GetPassenger(1))
+                        car->RemovePassenger(pass);
+                break;
+            }
                 case 70253: // Kezan quest 14125
                 {
                     if (Player* player = m_caster->ToPlayer())
