@@ -3792,9 +3792,16 @@ void WorldObject::RebuildPhaseFromPhaseAreaDefinition()
 {
     if (Player* player = ToPlayer())
     {
-        // first part is to check phase definition, check with phase_area
-        PhaseAreaDefinitionContainer phaseDefCon = GetPhaseAreaDefinitionContainer(player->GetZoneId());
-        PhaseAreaSelectorContainer phaseAreaCon = GetPhaseAreaSelectorContainer(player->GetZoneId());
+        // first part is to check phase definition, check step-down, first get areaId, when 0 then use zoneId
+        PhaseAreaDefinitionContainer phaseDefCon = GetPhaseAreaDefinitionContainer(player->GetAreaId());
+        PhaseAreaSelectorContainer phaseAreaCon;
+        if (phaseDefCon.size())
+            phaseAreaCon = GetPhaseAreaSelectorContainer(player->GetAreaId());
+        else
+        {
+            phaseDefCon = GetPhaseAreaDefinitionContainer(player->GetZoneId());
+            phaseAreaCon = GetPhaseAreaSelectorContainer(player->GetZoneId());
+        }
 
         if (!phaseDefCon.empty())
             for (PhaseAreaDefinitionContainer::const_iterator itr = phaseDefCon.begin(); itr != phaseDefCon.end(); ++itr)
