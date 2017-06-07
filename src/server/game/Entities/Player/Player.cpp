@@ -25750,7 +25750,7 @@ void Player::UpdateForQuestWorldObjects()
                 ConditionList conds = sConditionMgr->GetConditionsForSpellClickEvent(obj->GetEntry(), _itr->second.spellId);
                 bool buildUpdateBlock = false;
                 for (ConditionList::const_iterator jtr = conds.begin(); jtr != conds.end() && !buildUpdateBlock; ++jtr)
-                    if ((*jtr)->ConditionType == CONDITION_QUESTREWARDED || (*jtr)->ConditionType == CONDITION_QUESTTAKEN)
+                    if ((*jtr)->ConditionType == CONDITION_QUESTREWARDED || (*jtr)->ConditionType == CONDITION_QUESTTAKEN || (*jtr)->ConditionType == CONDITION_QUEST_COMPLETE)
                         buildUpdateBlock = true;
 
                 if (buildUpdateBlock)
@@ -29853,7 +29853,7 @@ void Player::SendUpdatePhasing()
 {
     if (!IsInWorld())
         return;
-    
+
     UpdatePhaseForQuestAreaOrZoneChange();
 }
 
