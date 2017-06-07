@@ -211,7 +211,11 @@ insert into phase_definitions values
 
 delete from phase_definitions where zoneId=5291;
 insert into phase_definitions values 
-(5291, 1, 237, 0, 0, 0, 1, "Deepholm, Jagged Wastes");
+(5291, 0, 237, 0, 0, 0, 1, "Deepholm, Jagged Wastes");
+
+delete from phase_area where areaId=5291 and entry=0;
+insert into phase_area values 
+(5291, 0, 27938, 27003, 64, 11, 1, "Deepholm, Jagged Wastes");
 
 delete from phase_definitions where zoneId=5297;
 insert into phase_definitions values 
@@ -219,8 +223,9 @@ insert into phase_definitions values
 
 delete from phase_definitions where zoneId=5298;
 insert into phase_definitions values 
-(5298, 1, 252, 0, 0, 0, 1, "Deepholm, Twilight Precipice");
+(5298, 0, 252, 0, 0, 0, 1, "Deepholm, Twilight Precipice");
 
 delete from phase_definitions where zoneId=5299;
 insert into phase_definitions values 
-(5299, 2, 252, 0, 0, 0, 1, "Lorthuna's Gate");
+(5299, 0, 252, 0, 0, 0, 1, "Lorthuna's Gate");
+

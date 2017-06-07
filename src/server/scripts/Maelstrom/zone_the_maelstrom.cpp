@@ -88,6 +88,9 @@ public:
                 if (player->GetPositionZ() > 675.0F)
                 {
                     player->SetDisableGravity(true);
+                    player->AddAura(SPELL_SEE_QUEST_INVIS_12, player);
+                    player->AddAura(SPELL_SEE_QUEST_INVIS_16, player);
+                    player->AddAura(SPELL_SEE_QUEST_INVIS_19, player);
                     if (Creature* wyvern = player->SummonCreature(NPC_WYVERN_45024, 1040.91f, 544.69f, 681.94f, 3.98f))
                     {
                         player->EnterVehicle(wyvern, 1);
