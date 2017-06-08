@@ -29854,6 +29854,8 @@ void Player::SendUpdatePhasing()
     if (!IsInWorld())
         return;
 
+    RebuildTerrainSwaps();
+
     UpdatePhaseForQuestAreaOrZoneChange();
 }
 

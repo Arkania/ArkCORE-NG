@@ -3792,52 +3792,54 @@ void WorldObject::RebuildPhaseFromPhaseAreaDefinition()
 {
     if (Player* player = ToPlayer())
     {
-        // first part is to check phase definition, check step-down, first get areaId, when 0 then use zoneId
-        PhaseAreaDefinitionContainer phaseDefCon = GetPhaseAreaDefinitionContainer(player->GetAreaId());
-        PhaseAreaSelectorContainer phaseAreaCon;
-        if (phaseDefCon.size())
-            phaseAreaCon = GetPhaseAreaSelectorContainer(player->GetAreaId());
-        else
+        std::list<uint32> zaList;
+        if (player->GetAreaId() > 0)
+            zaList.push_back(player->GetAreaId());
+        if (player->GetZoneId() > 0)
+            if (player->GetZoneId() != player->GetAreaId())
+                zaList.push_back(player->GetZoneId());
+
+        for (auto areaId : zaList)
         {
-            phaseDefCon = GetPhaseAreaDefinitionContainer(player->GetZoneId());
-            phaseAreaCon = GetPhaseAreaSelectorContainer(player->GetZoneId());
-        }
+            PhaseAreaDefinitionContainer phaseDefCon = GetPhaseAreaDefinitionContainer(areaId);
+            PhaseAreaSelectorContainer phaseAreaCon = GetPhaseAreaSelectorContainer(areaId);
 
-        if (!phaseDefCon.empty())
-            for (PhaseAreaDefinitionContainer::const_iterator itr = phaseDefCon.begin(); itr != phaseDefCon.end(); ++itr)
-            {
-                PhaseAreaDefinition phaseDef = *itr;
-                ePhaseUpdateStatus checkCond = CheckPhaseConditions(phaseDef);
-                ePhaseUpdateStatus checkArea = CheckArea(phaseDef, phaseAreaCon);
-
-                if ((checkCond == EMPTY_DATABASE && checkArea == EMPTY_DATABASE) || checkCond == PHASE_CHECK_MEET || checkArea == PHASE_CHECK_MEET)
+            if (!phaseDefCon.empty())
+                for (PhaseAreaDefinitionContainer::const_iterator itr = phaseDefCon.begin(); itr != phaseDefCon.end(); ++itr)
                 {
-                    if (phaseDef.IsOverwritingExistingPhases()) // flag bit 1 set
-                        m_tmp_phaseState.Clear();
+                    PhaseAreaDefinition phaseDef = *itr;
+                    ePhaseUpdateStatus checkCond = CheckPhaseConditions(phaseDef);
+                    ePhaseUpdateStatus checkArea = CheckArea(phaseDef, phaseAreaCon);
 
-                    if (phaseDef.phaseGroup)
+                    if ((checkCond == EMPTY_DATABASE && checkArea == EMPTY_DATABASE) || checkCond == PHASE_CHECK_MEET || checkArea == PHASE_CHECK_MEET)
                     {
-                        for (auto ph : GetXPhasesForGroup(phaseDef.phaseGroup))
-                            m_tmp_phaseState.SetInPhase(ph, true);
+                        if (phaseDef.IsOverwritingExistingPhases()) // flag bit 1 set
+                            m_tmp_phaseState.Clear();
 
-                        if (phaseDef.terrainswapmap)
-                            m_tmp_phaseState.m_terrainSwaps.insert(phaseDef.terrainswapmap);
-                        if (phaseDef.worldMapAreaSwap)
-                            m_tmp_phaseState.m_worldMapAreaSwaps.insert(phaseDef.worldMapAreaSwap);
-                    }
-                    else if (phaseDef.phaseId)
-                    {
-                        m_tmp_phaseState.SetInPhase(phaseDef.phaseId, true);
-                        if (phaseDef.terrainswapmap)
-                            m_tmp_phaseState.m_terrainSwaps.insert(phaseDef.terrainswapmap);
-                        if (phaseDef.worldMapAreaSwap)
-                            m_tmp_phaseState.m_worldMapAreaSwaps.insert(phaseDef.worldMapAreaSwap);
-                    }
+                        if (phaseDef.phaseGroup)
+                        {
+                            for (auto ph : GetXPhasesForGroup(phaseDef.phaseGroup))
+                                m_tmp_phaseState.SetInPhase(ph, true);
 
-                    if (phaseDef.IsLastDefinition()) // flag bit 2 set
-                        break;
+                            if (phaseDef.terrainswapmap)
+                                m_tmp_phaseState.m_terrainSwaps.insert(phaseDef.terrainswapmap);
+                            if (phaseDef.worldMapAreaSwap)
+                                m_tmp_phaseState.m_worldMapAreaSwaps.insert(phaseDef.worldMapAreaSwap);
+                        }
+                        else if (phaseDef.phaseId)
+                        {
+                            m_tmp_phaseState.SetInPhase(phaseDef.phaseId, true);
+                            if (phaseDef.terrainswapmap)
+                                m_tmp_phaseState.m_terrainSwaps.insert(phaseDef.terrainswapmap);
+                            if (phaseDef.worldMapAreaSwap)
+                                m_tmp_phaseState.m_worldMapAreaSwaps.insert(phaseDef.worldMapAreaSwap);
+                        }
+
+                        if (phaseDef.IsLastDefinition()) // flag bit 2 set
+                            break;
+                    }
                 }
-            }
+        }
     }
 }
 

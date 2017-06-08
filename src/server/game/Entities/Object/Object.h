@@ -1094,6 +1094,7 @@ class WorldObject : public Object, public WorldLocation
         void CopyPhaseFrom(WorldObject* obj, bool update = false);
         void CopyPhaseFromTmp();
         bool SetInPhase(uint16 id, bool update, bool apply);
+        void RebuildTerrainSwaps();
 
         // if negative it is used as PhaseGroupId
         int32 GetDBPhase() const { return _dbPhase; }
@@ -1158,7 +1159,6 @@ class WorldObject : public Object, public WorldLocation
 
         void RebuildPhaseFromPhaseAreaDefinition();
         void RebuildPhaseFromAuraEffect();
-        void RebuildTerrainSwaps();
         void RebuildWorldMapAreaSwaps();
 };
 

@@ -349,9 +349,17 @@ public:
                 {
                 case EVENT_MOVEMENT_START:
                 {
+                    if (Vehicle* wyvern = me->GetVehicleKit())
+                        if (wyvern->GetAvailableSeatCount())
+                        {
+                            me->DespawnOrUnsummon(10);
+                            break;
+                        }
+
                     if (Creature* aggra = sObjectAccessor->GetCreature(*me, m_aggraGUID))
                         if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
                             aggra->AI()->Talk(0, player);
+
                     m_waypointStarted = true;
                     me->SetSpeed(MOVE_RUN, 2.5f);
                     me->SetSpeed(MOVE_WALK, 2.5f);

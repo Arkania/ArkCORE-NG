@@ -27,8 +27,36 @@ enum Zone_zone_deepholm
 
 };
 
+// player
+class player_zone_maelstrom : public PlayerScript
+{
+public:
+    player_zone_maelstrom() : PlayerScript("player_zone_maelstrom") { }
+
+    void OnQuestRemove(Player* player, uint32 questId) override
+    {
+        switch (questId)
+        {
+        case 0:
+            break;
+        }
+    }
+
+    void OnQuestStatusChange(Player* player, uint32 questId, QuestStatus status) override
+    {
+        switch (questId)
+        {
+        case 0:
+            break;
+        }
+    }
+
+};
+
+
 void AddSC_zone_deepholm()
 {
-    
+    new player_zone_maelstrom();
+
 }
 
