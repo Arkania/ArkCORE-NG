@@ -1,6 +1,6 @@
 
 
-UPDATE gameobject_template SET flags=0, data1=15358 WHERE entry=204274; -- 4 15358
+UPDATE gameobject_template SET flags=0, data1=26246 WHERE entry=204274; 
 
 UPDATE creature_template SET npcflag=16777216 WHERE entry=43048;
 
