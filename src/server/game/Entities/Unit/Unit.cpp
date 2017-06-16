@@ -18014,11 +18014,23 @@ void Unit::SendTeleportPacket(Position& pos)
     // This oldPos actually contains the destination position if the Unit is a Player.
     Position oldPos = {GetPositionX(), GetPositionY(), GetPositionZMinusOffset(), GetOrientation()};
 
-    if (GetTypeId() == TYPEID_UNIT)
-        Relocate(&pos); // Relocate the unit to its new position in order to build the packets correctly.
-
     ObjectGuid guid = GetGUID();
     ObjectGuid transGuid = GetTransGUID();
+
+    if (Player* player = ToPlayer())
+    {
+        if (transGuid)
+            pos = player->GetTransportPosition();
+        else
+        {
+            float x, y, z, o;
+            pos.GetPosition(x, y, z, o);
+            if (TransportBase* transportBase = GetDirectTransport())
+                transportBase->CalculatePassengerOffset(x, y, z, &o);
+        }
+    }
+    else
+        Relocate(&pos); // Relocate the unit to its new position in order to build the packets correctly.
 
     WorldPacket data(SMSG_MOVE_UPDATE_TELEPORT, 38);
     WriteMovementInfo(data);
@@ -18051,7 +18063,7 @@ void Unit::SendTeleportPacket(Position& pos)
 
         if (transGuid)
         {
-            data2.WriteByteSeq(transGuid[6]);
+            data2.WriteByteSeq(transGuid[6]); /* WPP has her 5 6 1 7 0 2 4 3 but i see no different.*/
             data2.WriteByteSeq(transGuid[5]);
             data2.WriteByteSeq(transGuid[1]);
             data2.WriteByteSeq(transGuid[7]);
@@ -18066,14 +18078,14 @@ void Unit::SendTeleportPacket(Position& pos)
         data2.WriteByteSeq(guid[2]);
         data2.WriteByteSeq(guid[3]);
         data2.WriteByteSeq(guid[5]);
-        data2 << float(GetPositionX());
+        data2 << float(pos.GetPositionX());
         data2.WriteByteSeq(guid[4]);
-        data2 << float(GetOrientation());
+        data2 << float(pos.GetOrientation());
         data2.WriteByteSeq(guid[7]);
-        data2 << float(GetPositionZMinusOffset());
+        data2 << float(pos.GetPositionZ() /*GetPositionZMinusOffset()*/);
         data2.WriteByteSeq(guid[0]);
         data2.WriteByteSeq(guid[6]);
-        data2 << float(GetPositionY());
+        data2 << float(pos.GetPositionY());
         ToPlayer()->SendDirectMessage(&data2); // Send the MSG_MOVE_TELEPORT packet to self.
     }
 
