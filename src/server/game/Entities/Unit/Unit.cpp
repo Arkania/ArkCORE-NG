@@ -18090,10 +18090,10 @@ void Unit::SendTeleportPacket(Position& pos)
     }
 
     // Relocate the player/creature to its old position, so we can broadcast to nearby players correctly
-    if (GetTypeId() == TYPEID_PLAYER)
+   /* if (GetTypeId() == TYPEID_PLAYER)
         Relocate(&pos);
     else
-        Relocate(&oldPos);
+        Relocate(&oldPos);*/
 
     // Broadcast the packet to everyone except self.
     SendMessageToSet(&data, false);

@@ -687,7 +687,7 @@ void Map::Update(const uint32 t_diff)
                 VisitNearbyCellsOf(c, grid_object_update, world_object_update);
         }
 
-        UpdateData udata(player->GetMapId());
+        /*UpdateData udata(player->GetMapId());
         WorldPacket packet;
 
         for (auto trans : _transports)
@@ -698,7 +698,7 @@ void Map::Update(const uint32 t_diff)
                     trans->BuildOutOfRangeUpdateBlock(&udata);
 
         udata.BuildPacket(&packet);
-        player->SendDirectMessage(&packet);
+        player->SendDirectMessage(&packet);*/
     }
 
     // non-player active objects, increasing iterator in the loop in case of object removal
