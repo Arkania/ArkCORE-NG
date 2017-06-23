@@ -38,6 +38,7 @@ class Transport : public GameObject, public TransportBase
         void CleanupsBeforeDelete(bool finalCleanup = true) override;
 
         void Update(uint32 diff) override;
+        void DelayedUpdate(uint32);
 
         void BuildUpdate(UpdateDataMapType& data_map) override;
 
@@ -102,6 +103,7 @@ class Transport : public GameObject, public TransportBase
         void MoveToNextWaypoint();
         float CalculateSegmentPos(float perc);
         bool TeleportTransport(uint32 newMapid, float x, float y, float z, float o);
+        void TeleportTransportDelayed();
         void UpdatePassengerPositions(std::set<WorldObject*>& passengers);
         void DoEventIfAny(KeyFrame const& node, bool departure);
 
@@ -123,6 +125,9 @@ class Transport : public GameObject, public TransportBase
 
         std::set<WorldObject*> _passengers;
         std::set<WorldObject*> _staticPassengers;
+        
+        bool _isNextTeleportInvolvedInTwoMaps;
+        bool _isNextTeleportDelayed;
 };
 
 #endif

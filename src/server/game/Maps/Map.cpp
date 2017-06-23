@@ -223,9 +223,8 @@ _creatureToMoveLock(false), _gameObjectsToMoveLock(false), _dynamicObjectsToMove
 i_mapEntry(sMapStore.LookupEntry(id)), i_spawnMode(SpawnMode), i_InstanceId(InstanceId),
 m_unloadTimer(0), m_VisibleDistance(DEFAULT_VISIBILITY_DISTANCE),
 m_VisibilityNotifyPeriod(DEFAULT_VISIBILITY_NOTIFY_PERIOD),
-m_activeNonPlayersIter(m_activeNonPlayers.end()), _transportsUpdateIter(_transports.end()),
-i_gridExpiry(expiry),
-i_scriptLock(false), _defaultLight(GetDefaultMapLight(id))
+m_activeNonPlayersIter(m_activeNonPlayers.end()), i_gridExpiry(expiry),
+i_scriptLock(false), _defaultLight(GetDefaultMapLight(id)), _transportLock(false)
 {
     m_parentMap = (_parent ? _parent : this);
     for (unsigned int idx=0; idx < MAX_NUMBER_OF_GRIDS; ++idx)
@@ -713,16 +712,13 @@ void Map::Update(const uint32 t_diff)
         VisitNearbyCellsOf(obj, grid_object_update, world_object_update);
     }
 
-    for (_transportsUpdateIter = _transports.begin(); _transportsUpdateIter != _transports.end();)
-    {
-        WorldObject* obj = *_transportsUpdateIter;
-        ++_transportsUpdateIter;
-
-        if (!obj->IsInWorld())
-            continue;
-
-        obj->Update(t_diff);
-    }
+    ASSERT(!_transportLock); // gpn39f test
+    _transportLock = true;
+    for (auto transport : _transports)
+        if (transport->IsInWorld())
+            transport->Update(t_diff);
+    _transportLock = false;
+    DeleteRemovedTransports();
 
     ///- Process necessary scripts
     if (!m_scriptSchedule.empty())
@@ -739,6 +735,41 @@ void Map::Update(const uint32 t_diff)
         ProcessRelocationNotifies(t_diff);
 
     sScriptMgr->OnMapUpdate(this, t_diff);
+}
+
+void Map::SendSingleTransportUpdate()
+{
+    for (m_mapRefIter = m_mapRefManager.begin(); m_mapRefIter != m_mapRefManager.end(); ++m_mapRefIter)
+    {
+        if (Player* player = m_mapRefIter->GetSource())
+            if (player->IsInWorld())
+            {
+                UpdateData udata(player->GetMapId());
+                WorldPacket packet;
+
+                for (auto transport : _transports)
+                    if (transport->IsInWorld())
+                        if (player->CanSeeOrDetect(transport, false, true))
+                            transport->BuildCreateUpdateBlockForPlayer(&udata, player);
+                        else
+                            transport->BuildOutOfRangeUpdateBlock(&udata);
+
+                udata.BuildPacket(&packet);
+                player->SendDirectMessage(&packet);
+            }
+    }
+}
+
+void Map::DeleteRemovedTransports()
+{
+    while (_transportRemove.size())
+    {
+        if (Transport* obj = _transportRemove.back())
+        {
+            _transports.erase(obj);
+            _transportRemove.pop_back();
+        }
+    }
 }
 
 struct ResetNotifier
@@ -885,15 +916,8 @@ void Map::RemoveFromMap(Transport* obj, bool remove)
                 itr->GetSource()->SendDirectMessage(&packet);
     }
 
-    if (_transportsUpdateIter != _transports.end())
-    {
-        TransportsContainer::iterator itr = _transports.find(obj);
-        if (itr == _transports.end())
-            return;
-        if (itr == _transportsUpdateIter)
-            ++_transportsUpdateIter;
-        _transports.erase(itr);
-    }
+    if (_transportLock)
+        _transportRemove.push_back(obj);
     else
         _transports.erase(obj);
 
@@ -2635,6 +2659,14 @@ inline void Map::setNGrid(NGridType *grid, uint32 x, uint32 y)
 
 void Map::DelayedUpdate(const uint32 t_diff)
 {
+    ASSERT(!_transportLock); // gpn39f test
+    _transportLock = true;
+    for (auto transport : _transports)
+        if (transport->IsInWorld())
+            transport->DelayedUpdate(t_diff);
+    _transportLock = false;
+    DeleteRemovedTransports();
+
     RemoveAllObjectsInRemoveList();
 
     // Don't unload grids if it's battleground, since we may have manually added GOs, creatures, those doesn't load from DB at grid re-load !

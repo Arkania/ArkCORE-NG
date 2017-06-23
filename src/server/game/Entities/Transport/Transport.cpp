@@ -36,7 +36,8 @@
 
 Transport::Transport() : GameObject(),
 _transportInfo(NULL), _isMoving(true), _pendingStop(false),
-_triggeredArrivalEvent(false), _triggeredDepartureEvent(false)
+_triggeredArrivalEvent(false), _triggeredDepartureEvent(false),
+_isNextTeleportInvolvedInTwoMaps(false), _isNextTeleportDelayed(false)
 {
     m_updateFlag = UPDATEFLAG_TRANSPORT | UPDATEFLAG_LOWGUID | UPDATEFLAG_STATIONARY_POSITION | UPDATEFLAG_ROTATION;
 }
@@ -222,6 +223,14 @@ void Transport::Update(uint32 diff)
     }
 
     sScriptMgr->OnTransportUpdate(this, diff);
+}
+
+void Transport::DelayedUpdate(uint32 /*diff*/)
+{
+    if (GetKeyFrames().size() <= 1)
+        return;
+
+    TeleportTransportDelayed();
 }
 
 void Transport::AddPassenger(WorldObject* passenger)
@@ -560,6 +569,9 @@ void Transport::MoveToNextWaypoint()
     _triggeredArrivalEvent = false;
     _triggeredDepartureEvent = false;
 
+    if (_currentFrame->Node->mapid != _nextFrame->Node->mapid)
+        _isNextTeleportInvolvedInTwoMaps = true;
+
     // Set frames
     _currentFrame = _nextFrame++;
     if (_nextFrame == GetKeyFrames().end())
@@ -603,49 +615,8 @@ bool Transport::TeleportTransport(uint32 newMapid, float x, float y, float z, fl
 
     if (oldMap->GetId() != newMapid)
     {
-        Map* newMap = sMapMgr->CreateBaseMap(newMapid);
+        _isNextTeleportDelayed = true;
         UnloadStaticPassengers();
-        GetMap()->RemoveFromMap<Transport>(this, false);
-        SetMap(newMap);
-
-        for (std::set<WorldObject*>::iterator itr = _passengers.begin(); itr != _passengers.end();)
-        {
-            WorldObject* obj = (*itr++);
-
-            float destX, destY, destZ, destO;
-            obj->m_movementInfo.transport.pos.GetPosition(destX, destY, destZ, destO);
-            TransportBase::CalculatePassengerPosition(destX, destY, destZ, &destO, x, y, z, o);
-
-            switch (obj->GetTypeId())
-            {
-            case TYPEID_UNIT:
-                if (!IS_PLAYER_GUID(obj->ToUnit()->GetOwnerGUID()))  // pets should be teleported with player
-                    obj->ToCreature()->FarTeleportTo(newMap, destX, destY, destZ, destO);
-                break;
-            case TYPEID_GAMEOBJECT:
-            {
-                GameObject* go = obj->ToGameObject();
-                go->GetMap()->RemoveFromMap(go, false);
-                go->Relocate(destX, destY, destZ, destO);
-                go->SetMap(newMap);
-                newMap->AddToMap(go);
-                break;
-            }
-            case TYPEID_PLAYER:
-                if (!obj->ToPlayer()->TeleportTo(newMapid, destX, destY, destZ, destO, TELE_TO_NOT_LEAVE_TRANSPORT))
-                    _passengers.erase(obj);
-                break;
-            case TYPEID_DYNAMICOBJECT:
-                obj->AddObjectToRemoveList();
-                break;
-            default:
-                break;
-            }
-        }
-
-        Relocate(x, y, z, o);
-        UpdateModelPosition();
-        GetMap()->AddToMap<Transport>(this);
         return true;
     }
     else
@@ -663,14 +634,62 @@ bool Transport::TeleportTransport(uint32 newMapid, float x, float y, float z, fl
                 float destX, destY, destZ, destO;
                 (*itr)->m_movementInfo.transport.pos.GetPosition(destX, destY, destZ, destO);
                 TransportBase::CalculatePassengerPosition(destX, destY, destZ, &destO, x, y, z, o);
-
                 (*itr)->ToUnit()->NearTeleportTo(destX, destY, destZ, destO);
             }
         }
 
         UpdatePosition(x, y, z, o);
+        GetMap()->SendSingleTransportUpdate();
         return false;
     }
+}
+
+void Transport::TeleportTransportDelayed()
+{
+    if (!_isNextTeleportDelayed || !_isNextTeleportInvolvedInTwoMaps)
+        return;
+
+    GetMap()->RemoveFromMap<Transport>(this, false);
+
+    Map* newMap = sMapMgr->CreateBaseMap(_nextFrame->Node->mapid);
+    SetMap(newMap);
+
+    float x = _nextFrame->Node->x,
+          y = _nextFrame->Node->y,
+          z = _nextFrame->Node->z,
+          o = _nextFrame->InitialOrientation;
+
+    std::vector<WorldObject*> _passengerRemove;
+    for (auto obj : _passengers)
+    {
+        float destX, destY, destZ, destO;
+        obj->m_movementInfo.transport.pos.GetPosition(destX, destY, destZ, destO);
+        TransportBase::CalculatePassengerPosition(destX, destY, destZ, &destO, x, y, z, o);
+
+        switch (obj->GetTypeId())
+        {
+        case TYPEID_PLAYER:
+            if (!obj->ToPlayer()->TeleportTo(_nextFrame->Node->mapid, destX, destY, destZ, destO, TELE_TO_NOT_LEAVE_TRANSPORT))
+                _passengerRemove.push_back(obj);
+            break;
+        case TYPEID_DYNAMICOBJECT:
+            obj->AddObjectToRemoveList();
+            break;
+        default:
+            _passengerRemove.push_back(obj);
+            break;
+        }
+    }
+    for (auto obj : _passengerRemove)
+        RemovePassenger(obj);
+    _passengerRemove.clear();
+    
+    Relocate(x, y, z, o);
+    GetMap()->AddToMap<Transport>(this);
+    GetMap()->SendSingleTransportUpdate();
+
+    _isNextTeleportDelayed = false;
+    _isNextTeleportInvolvedInTwoMaps = false;
 }
 
 void Transport::UpdatePassengerPositions(std::set<WorldObject*>& passengers)
