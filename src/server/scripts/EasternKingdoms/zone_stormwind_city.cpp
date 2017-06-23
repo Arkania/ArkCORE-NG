@@ -32,7 +32,10 @@
 #include "Vehicle.h"
 
 enum eStormwind
-{
+{    
+    SPELL_QUEST_GENERIC_ZONE_SPECIFIC_02 = 59074,
+    SPELL_QUEST_ZONE_SPECIFIC_02 = 78318,
+    QUEST_CALL_OF_DUTY = 14482,
     QUEST_A_PERSONAL_SUMMONS = 28825,
 };
 
@@ -107,10 +110,29 @@ public:
     }
 };
 
+// 36799
+class npc_recruiter_burns_36799 : public CreatureScript
+{
+public:
+    npc_recruiter_burns_36799() : CreatureScript("npc_recruiter_burns_36799") { }
+
+    bool OnQuestAccept(Player* player, Creature* /*creature*/, Quest const* quest) 
+    { 
+        switch (quest->GetQuestId())
+        {
+        case QUEST_CALL_OF_DUTY:
+            player->CastSpell(player, SPELL_QUEST_GENERIC_ZONE_SPECIFIC_02, true);
+            break;
+        }
+        return false; 
+    }
+};
+
 
 void AddSC_stormwind_city()
 {
     new npc_archmage_malin_2708();
     new at_stormwind_command_board();
     new at_stormwind_teleport_area();
+    new npc_recruiter_burns_36799();
 }

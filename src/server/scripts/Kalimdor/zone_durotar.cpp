@@ -21,6 +21,13 @@
 #include "SpellScript.h"
 #include "Player.h"
 
+enum eDurotar
+{
+    SPELL_QUEST_GENERIC_ZONE_SPECIFIC_02 = 59074,
+    SPELL_QUEST_ZONE_SPECIFIC_02 = 78644,
+    QUEST_CALL_OF_DUTY = 25924,
+};
+
 // 10556, Quest 25134:
 class npc_lazy_peon : public CreatureScript
 {
@@ -737,6 +744,24 @@ public:
     }
 };
 
+// 41621
+class npc_commander_thorak_41621 : public CreatureScript
+{
+public:
+    npc_commander_thorak_41621() : CreatureScript("npc_commander_thorak_41621") { }
+
+    bool OnQuestAccept(Player* player, Creature* /*creature*/, Quest const* quest) override 
+    { 
+        switch (quest->GetQuestId())
+        {
+        case QUEST_CALL_OF_DUTY:
+            player->CastSpell(player, SPELL_QUEST_GENERIC_ZONE_SPECIFIC_02, true);
+            break;
+        }
+        return false; 
+    }
+};
+
 void AddSC_durotar()
 {
     new npc_lazy_peon();
@@ -747,6 +772,6 @@ void AddSC_durotar()
     new npc_the_wolf_39364();
     new spell_rumbling_hooves_73868();
     new npc_the_kodo_39365();
-
+    new npc_commander_thorak_41621();
 }
 
