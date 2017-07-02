@@ -520,6 +520,27 @@ struct Position
         return !(operator==(a));
     }
 
+    Position operator+=(Position const& a)
+    {
+        *this = *this + a;
+        return *this;
+    }
+
+    Position operator+(Position const &a)
+    {
+        Position t(*this);
+        t.m_positionX += a.m_positionX;
+        t.m_positionY += a.m_positionY;
+        t.m_positionZ += a.m_positionZ;
+        t.m_orientation += a.m_orientation;
+        float o = 2 * M_PI;
+        if (t.m_orientation > o)
+            t.m_orientation -= o;
+        else if (t.m_orientation < 0)
+            t.m_orientation += o;
+        return t;
+    }
+
     void Relocate(float x, float y)
     { 
         m_positionX = x; m_positionY = y;

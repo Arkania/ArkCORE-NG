@@ -186,6 +186,7 @@ public:
         {
             position1 = transport->GetPosition();
             position2 = object->m_movementInfo.transport.pos;
+            position1 += position2;
             uint32 path = transport->GetKeyFrames().front().Node->path;
             std::set<WorldObject*> pList = transport->GetPassengers();
             std::set<WorldObject*> cList = transport->GetStaticPassengers();

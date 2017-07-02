@@ -971,7 +971,6 @@ void BattlegroundSA::SendTransportInit(Player* player)
     {
         UpdateData transData(player->GetMapId());
         if (BgObjects[BG_SA_BOAT_ONE])
-
             GetBGObject(BG_SA_BOAT_ONE)->BuildCreateUpdateBlockForPlayer(&transData, player);
         if (BgObjects[BG_SA_BOAT_TWO])
             GetBGObject(BG_SA_BOAT_TWO)->BuildCreateUpdateBlockForPlayer(&transData, player);

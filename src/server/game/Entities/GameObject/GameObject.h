@@ -583,6 +583,17 @@ struct GameObjectLocale
     StringVector CastBarCaption;
 };
 
+struct QuaternionData
+{
+    float x, y, z, w;
+
+    QuaternionData() : x(0.0f), y(0.0f), z(0.0f), w(1.0f) {}
+    QuaternionData(float X, float Y, float Z, float W) : x(X), y(Y), z(Z), w(W) {}
+
+    bool isUnit() const;
+    static QuaternionData fromEulerAnglesZYX(float Z, float Y, float X);
+};
+
 // `gameobject_addon` table
 struct GameObjectAddon
 {
@@ -676,6 +687,12 @@ class GameObject : public WorldObject, public GridObject<GameObject>, public Map
         uint32 GetDBTableGUIDLow() const { return m_DBTableGuid; }
 
         void UpdateRotationFields(float rotation2 = 0.0f, float rotation3 = 0.0f);
+
+        // z_rot, y_rot, x_rot - rotation angles around z, y and x axes
+        void SetWorldRotationAngles(float z_rot, float y_rot, float x_rot);
+        void SetWorldRotation(float qx, float qy, float qz, float qw);
+        void SetParentRotation(QuaternionData const& rotation);      // transforms(rotates) transport's path
+        int64 GetPackedWorldRotation() const { return m_packedRotation; }
 
         // overwrite WorldObject function for proper name localization
         std::string const& GetNameForLocaleIdx(LocaleConstant locale_idx) const;
@@ -884,6 +901,9 @@ class GameObject : public WorldObject, public GridObject<GameObject>, public Map
         GameObjectValue m_goValue;
 
         uint64 m_rotation;
+
+        int64 m_packedRotation;
+        QuaternionData m_worldRotation;
         Position m_stationaryPosition;
 
         uint64 m_lootRecipient;
@@ -892,6 +912,7 @@ class GameObject : public WorldObject, public GridObject<GameObject>, public Map
     private:
         void RemoveFromOwner();
         void SwitchDoorOrButton(bool activate, bool alternative = false);
+        void UpdatePackedRotation();
 
         //! Object distance/size - overridden from Object::_IsWithinDist. Needs to take in account proper GO size.
         bool _IsWithinDist(WorldObject const* obj, float dist2compare, bool /*is3D*/) const

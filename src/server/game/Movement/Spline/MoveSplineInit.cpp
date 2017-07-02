@@ -213,11 +213,21 @@ namespace Movement
         {
             PathGenerator path(unit);
             bool result = path.CalculatePath(dest.x, dest.y, dest.z, forceDestination);
-            if (result && !(path.GetPathType() & PATHFIND_NOPATH))
-            {
-                MovebyPath(path.GetPath());
-                return;
-            }
+            if (result)
+                if (unit->GetTransGUID())  
+                {
+                    args.path_Idx_offset = 0;
+                    args.path.resize(2);
+                    Position src = unit->GetTransportPosition();
+                    args.path[0] = Vector3(src.m_positionX, src.m_positionY, src.m_positionZ);
+                    args.path[1] = dest;
+                    return;
+                }
+                else if (!(path.GetPathType() & PATHFIND_NOPATH))
+                {
+                    MovebyPath(path.GetPath());
+                    return;
+                }
         }
 
         args.path_Idx_offset = 0;

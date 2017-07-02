@@ -585,8 +585,6 @@ bool Map::AddToMap(Transport* obj)
                         data.BuildPacket(&packet);
                         itr->GetSource()->SendDirectMessage(&packet);
                     }
-        
-
     return true;
 }
 
@@ -686,7 +684,7 @@ void Map::Update(const uint32 t_diff)
                 VisitNearbyCellsOf(c, grid_object_update, world_object_update);
         }
 
-        /*UpdateData udata(player->GetMapId());
+        UpdateData udata(player->GetMapId()); // test gpn39f
         WorldPacket packet;
 
         for (auto trans : _transports)
@@ -697,7 +695,7 @@ void Map::Update(const uint32 t_diff)
                     trans->BuildOutOfRangeUpdateBlock(&udata);
 
         udata.BuildPacket(&packet);
-        player->SendDirectMessage(&packet);*/
+        player->SendDirectMessage(&packet);
     }
 
     // non-player active objects, increasing iterator in the loop in case of object removal
@@ -2577,24 +2575,16 @@ void Map::SendInitSelf(Player* player)
 
     // attach to player data current transport data
     if (Transport* transport = player->GetTransport())
-    {
         transport->BuildCreateUpdateBlockForPlayer(&data, player);
-    }
 
     // build data for self presence in world at own client (one time for map)
     player->BuildCreateUpdateBlockForPlayer(&data, player);
 
     // build other passengers at transport also (they always visible and marked as visible and will not send at visibility update at add to map
     if (Transport* transport = player->GetTransport())
-    {
         for (std::set<WorldObject*>::const_iterator itr = transport->GetPassengers().begin(); itr != transport->GetPassengers().end(); ++itr)
-        {
             if (player != (*itr) && player->HaveAtClient(*itr))
-            {
                 (*itr)->BuildCreateUpdateBlockForPlayer(&data, player);
-            }
-        }
-    }
 
     WorldPacket packet;
     data.BuildPacket(&packet);
