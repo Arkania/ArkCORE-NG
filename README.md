@@ -1,4 +1,4 @@
-#![logo](https://drive.google.com/open?id=0B8q0yc6MkL0nWFBMSW93dHRFWDg) ArkCORE NG
+#![logo](https://github.com/Arkania/ArkCORE-NG/logo.png) ArkCORE NG
 
 ## Introduction
 
