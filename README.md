@@ -1,5 +1,4 @@
-
-# ![logo]https://drive.google.com/file/d/0B8q0yc6MkL0nWFBMSW93dHRFWDg ArkCORE NG
+# ![logo]https://drive.google.com/open?id=0B8q0yc6MkL0nWFBMSW93dHRFWDg ArkCORE NG
 
 ## Introduction
 
