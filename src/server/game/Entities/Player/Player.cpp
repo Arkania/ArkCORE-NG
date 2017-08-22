@@ -776,6 +776,7 @@ Player::Player(WorldSession* session) : Unit(true)
 
     m_DailyQuestChanged = false;
     m_lastDailyQuestTime = 0;
+    m_questGiverQuestMapChanged = false;
 
     for (uint8 i = 0; i < MAX_TIMERS; i++)
         m_MirrorTimer[i] = DISABLED_MIRROR_TIMER;
@@ -16316,8 +16317,6 @@ bool Player::IsActiveQuest(uint32 quest_id) const
 Quest const* Player::GetNextQuest(uint64 guid, Quest const* quest)
 {
     QuestRelationBounds objectQR;
-    Creature* QuestGiver = ObjectAccessor::GetCreatureOrPetOrVehicle(*this, guid);
-
     uint32 nextQuestID = quest->GetNextQuestInChain();
 
     switch (GUID_HIPART(guid))
@@ -16691,8 +16690,9 @@ void Player::AddQuest(Quest const* quest, Object* questGiver)
 
     StartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_QUEST, quest_id);
 
-    InformQuestGiverAccept(quest, questGiver);
-
+    AddQuestGiverQuest(quest_id, questGiver);
+    sScriptMgr->OnQuestAccept(this, questGiver, quest);
+    sScriptMgr->OnQuestStatusChange(this, quest_id, QUEST_STATUS_INCOMPLETE);
     SendQuestUpdate(quest_id);
 }
 
@@ -16708,17 +16708,14 @@ void Player::CompleteQuest(uint32 quest_id)
                 SetQuestSlotState(log_slot, QUEST_STATE_COMPLETE);
 
             uint64 guid = GetQuestGiverGUID(quest_id);
-            if (guid && guid == GetGUID())
-                printf("test: stored questGiverGuid(%llu) != GetGuid(%llu) \n", guid, GetGUID());
-
             Object* questGiver = ObjectAccessor::GetObjectByTypeMask(*this, guid, TYPEMASK_UNIT | TYPEMASK_GAMEOBJECT | TYPEMASK_ITEM);
-            InformQuestGiverObjectiveComplete(qInfo, questGiver);
+            sScriptMgr->OnQuestObjectiveComplete(this, questGiver, qInfo);
 
             if (qInfo->HasFlag(QUEST_FLAGS_AUTO_REWARDED))
             {
-                RewardQuest(qInfo, 0, this, false);
+                bool result = RewardQuest(qInfo, 0, questGiver, false);
                 
-                if (questGiver && !InformQuestGiverReward(qInfo, questGiver, 0))
+                if (questGiver && !result)
                 {
                     if (Quest const* compQuest = GetMoreCompletedQuest(questGiver))
                         printf("found Player::GetMoreCompletedQuest.. \n");
@@ -16729,9 +16726,7 @@ void Player::CompleteQuest(uint32 quest_id)
                         {
                             if (nextQuest->IsAutoAccept())
                             {
-                                AddQuest(nextQuest, this);
-                                if (CanCompleteQuest(nextQuest->GetQuestId()))
-                                    CompleteQuest(nextQuest->GetQuestId());
+                                AddQuestAndCheckCompletion(nextQuest, this);
                             }
                             PlayerTalkClass->SendQuestGiverQuestDetails(nextQuest, GetGUID(), true);
                         }
@@ -16755,7 +16750,7 @@ void Player::IncompleteQuest(uint32 quest_id)
     }
 }
 
-void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, bool announce)
+bool Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, bool announce)
 {
     //this THING should be here to protect code from quest, which cast on player far teleport as a reward
     //should work fine, cause far teleport will be executed in Player::Update()
@@ -16907,6 +16902,9 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     m_RewardedQuests.insert(quest_id);
     m_RewardedQuestsSave[quest_id] = true;
 
+    m_questGiverQuestMap[quest_id]->is_rewarded = 1;
+    m_questGiverQuestMapChanged = true;
+
     // StoreNewItem, mail reward, etc. save data directly to the database
     // to prevent exploitable data desynchronisation we save the quest status to the database too
     // (to prevent rewarding this quest another time while rewards were already given out)
@@ -16916,14 +16914,16 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     if (announce)
         SendQuestReward(quest, XP);
 
+    // it seem that the quest flag has 2 functions.. "auto take" and "reward cast from player"
+    bool _PlayerCastRewardSpellOnComplete = bool(quest->GetFlags() & QUEST_FLAGS_AUTO_TAKE);
     // cast spells after mark quest complete (some spells have quest completed state requirements in spell_area data)
     if (quest->GetRewSpellCast() > 0)
     {
         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(quest->GetRewSpellCast());
-        if (questGiver->isType(TYPEMASK_UNIT) && !spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL) && !spellInfo->HasEffect(SPELL_EFFECT_CREATE_ITEM))
+        if (questGiver->isType(TYPEMASK_UNIT) && !_PlayerCastRewardSpellOnComplete && !spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL) && !spellInfo->HasEffect(SPELL_EFFECT_CREATE_ITEM))
         {
-            if (Creature* creature = GetMap()->GetCreature(questGiver->GetGUID()))
-                creature->CastSpell(this, quest->GetRewSpellCast(), true);
+            if (Unit* unit = questGiver->ToUnit())
+                unit->CastSpell(this, quest->GetRewSpellCast(), true);
         }
         else
             CastSpell(this, quest->GetRewSpellCast(), true);
@@ -16931,10 +16931,10 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     else if (quest->GetRewSpell() > 0)
     {
         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(quest->GetRewSpell());
-        if (questGiver->isType(TYPEMASK_UNIT) && !spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL) && !spellInfo->HasEffect(SPELL_EFFECT_CREATE_ITEM))
+        if (questGiver->isType(TYPEMASK_UNIT) && !_PlayerCastRewardSpellOnComplete && !spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL) && !spellInfo->HasEffect(SPELL_EFFECT_CREATE_ITEM))
         {
-            if (Creature* creature = GetMap()->GetCreature(questGiver->GetGUID()))
-                creature->CastSpell(this, quest->GetRewSpell(), true);
+            if (Unit* unit = questGiver->ToUnit())
+                unit->CastSpell(this, quest->GetRewSpell(), true);
         }
         else
             CastSpell(this, quest->GetRewSpell(), true);
@@ -16951,10 +16951,11 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
         UpdatePvPState();
     }
 
-    SendQuestUpdate(quest_id);
-
     //lets remove flag for delayed teleports
     SetCanDelayTeleport(false);
+
+    sScriptMgr->OnQuestStatusChange(this, quest_id, QUEST_STATUS_REWARDED);
+    return sScriptMgr->OnQuestReward(this, questGiver, quest, announce);
 }
 
 void Player::FailQuest(uint32 questId)
@@ -17584,7 +17585,6 @@ void Player::SetQuestStatus(uint32 questId, QuestStatus status, bool update /*= 
 
     sScriptMgr->OnQuestStatusChange(this, questId, status);
 }
-
 
 void Player::RemoveActiveQuest(uint32 questId, bool update /*= true*/)
 
@@ -18529,116 +18529,92 @@ bool Player::HasPvPForcingQuest() const
 
 uint64 Player::GetQuestGiverGUID(uint32 quest_id)
 {
-    std::map<uint32, uint64>::iterator it = _questGiverList.find(quest_id);
-    return it != _questGiverList.end() ? it->second : 0;
+    QuestGiverQuestMap::iterator it = m_questGiverQuestMap.find(quest_id);
+    if (it == m_questGiverQuestMap.end())
+        return 0;
+    QuestGiverQuest* q = (it->second);
+    return q->questgiver_guid;
 }
 
-void Player::AddQuestGiverQuest(uint32 quest_id, uint64 guid)
+QuestGiverQuest* Player::GetQuestGiverQuest(uint32 quest_id)
 {
-    _questGiverList[quest_id] = guid;
+    QuestGiverQuestMap::iterator it = m_questGiverQuestMap.find(quest_id);
+    if (it == m_questGiverQuestMap.end())
+        return nullptr;
+    return (it->second);
 }
 
-bool Player::InformQuestGiverAccept(Quest const* quest, Object* questGiver)
+void Player::SetQuestGiverQuestState(uint32 quest_id, bool is_rewarded)
 {
-    if (!questGiver)
+    if (QuestGiverQuest* quest = GetQuestGiverQuest(quest_id))
     {
-        uint64 guid = GetQuestGiverGUID(quest->GetQuestId());
-        questGiver = ObjectAccessor::GetWorldObject(*this, guid);
+        quest->is_rewarded = (is_rewarded) ? 1 : 0;
+        quest->time_change = time(NULL);
+        m_questGiverQuestMapChanged = true;
+        SaveToDB();
+    }
+}
+
+void Player::SetQuestGiverQuestGUID(uint32 quest_id, Object* questgiver)
+{
+    if (QuestGiverQuest* quest = GetQuestGiverQuest(quest_id))
+    {
+        if (quest->questgiver_guid == 0)
+        {
+            quest->questgiver_guid = questgiver->GetGUID();
+            m_questGiverQuestMapChanged = true;
+            SaveToDB();
+        }
+    }
+}
+
+void Player::AddQuestGiverQuest(uint32 quest_id, Object* questgiver)
+{
+    if (!quest_id)
+        return;
+
+    QuestGiverQuest* q = new QuestGiverQuest;
+    if (questgiver)
+        q->questgiver_guid = questgiver->GetGUID();
+    else
+        q->questgiver_guid = 0;
+    q->quest_id = quest_id;
+    q->time_change = time(NULL);
+    q->is_rewarded = false;
+    m_questGiverQuestMap[q->quest_id] = q;
+    m_questGiverQuestMapChanged = true;
+    CleanUpQuestGiverQuest();
+    SaveToDB();
+}
+
+void Player::CleanUpQuestGiverQuest()
+{
+    if (m_questGiverQuestMap.empty())
+        return;
+
+    // find time of newest accept quest
+    time_t newest = 0;
+    for (auto qm : m_questGiverQuestMap)
+    {
+        QuestGiverQuest* q = qm.second;
+        if (!q->is_rewarded && q->time_change > newest)
+            newest = q->time_change;
     }
 
-    bool r = false;
-    if (questGiver)
-        if (Creature* creature = questGiver->ToCreature())
-        {
-            r = sScriptMgr->OnQuestAccept(this, creature, quest);
-            r |= creature->AI()->sQuestAccept(this, quest);
-        }
-        else if (GameObject* go = questGiver->ToGameObject())
-        {
-            r = sScriptMgr->OnQuestAccept(this, go, quest);
-            r |= go->AI()->QuestAccept(this, quest);
-        }
-        else if (Item* item = questGiver->ToItem())
-            r = sScriptMgr->OnQuestAccept(this, item, quest);
-
-    return r;
-}
-
-bool Player::InformQuestGiverSelect(Quest const* quest, Object* questGiver)
-{
-    if (!questGiver)
+    // build list of elements for (older && rewarded)
+    std::list<uint32> qList;
+    for (auto qm : m_questGiverQuestMap)
     {
-        uint64 guid = GetQuestGiverGUID(quest->GetQuestId());
-        questGiver = ObjectAccessor::GetWorldObject(*this, guid);
+        QuestGiverQuest* q = qm.second;
+        if (q->is_rewarded && q->time_change < newest)
+            qList.push_back(qm.first);
     }
 
-    bool r = false;
-    if (questGiver)
-        if (Creature* creature = questGiver->ToCreature())
-        {
-            r = sScriptMgr->OnQuestSelect(this, creature, quest);
-            r |= creature->AI()->sQuestSelect(this, quest);
-        }
+    // delete older elements
+    for (auto id : qList)
+        m_questGiverQuestMap.erase(id);
 
-    return r;
-}
-
-bool Player::InformQuestGiverObjectiveComplete(Quest const* quest, Object* questGiver)
-{
-    if (!questGiver)
-    {
-        uint64 guid = GetQuestGiverGUID(quest->GetQuestId());
-        questGiver = ObjectAccessor::GetWorldObject(*this, guid);
-    }
-
-    bool r = false;
-    if (questGiver)
-        if (Creature* creature = questGiver->ToCreature())
-        {
-            r = sScriptMgr->OnQuestObjectiveComplete(this, creature, quest);
-            r |= creature->AI()->sQuestObjectiveComplete(this, quest);
-        }
-        else if (GameObject* go = questGiver->ToGameObject())
-        {
-            r = sScriptMgr->OnQuestObjectiveComplete(this, go, quest);
-            r |= go->AI()->QuestObjectiveComplete(this, quest);
-        }
-        else if (Item* item = questGiver->ToItem())
-            r = sScriptMgr->OnQuestObjectiveComplete(this, item, quest);
-
-    return r;
-}
-
-bool Player::InformQuestGiverReward(Quest const* quest, Object* questGiver, uint32 opt)
-{
-    if (!questGiver || questGiver->GetTypeId() == TYPEID_PLAYER)
-    {
-        uint64 guid = GetQuestGiverGUID(quest->GetQuestId());
-        questGiver = ObjectAccessor::GetWorldObject(*this, guid);
-    }
-
-    bool r = false;
-    if (questGiver)
-        if (Creature* creature = questGiver->ToCreature())
-        {
-            r = sScriptMgr->OnQuestReward(this, creature, quest, opt);
-            r |= creature->AI()->sQuestReward(this, quest, opt);
-        }
-        else if (GameObject* go = questGiver->ToGameObject())
-        {
-            r = sScriptMgr->OnQuestReward(this, go, quest, opt);
-            r |= go->AI()->QuestReward(this, quest, opt);
-        }
-        else if (Item* item = questGiver->ToItem())
-            r |= sScriptMgr->OnQuestReward(this, item, quest, opt);
-
-    return r;
-}
-
-bool Player::InformQuestGiverCancel(Quest const* quest, Object* questGiver)
-{
-    /* ToDo */
-    return false;
+    m_questGiverQuestMapChanged = true;
 }
 
 /*********************************************************/
@@ -19366,7 +19342,6 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
     // add ghost flag (must be after aura load: PLAYER_FLAGS_GHOST set in aura)
     if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))
         m_deathState = DEAD;
-
     // after spell load, learn rewarded spell if need also
     _LoadQuestStatus(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_QUEST_STATUS));
     _LoadQuestStatusRewarded(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_QUEST_STATUS_REW));
@@ -19374,6 +19349,7 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
     _LoadWeeklyQuestStatus(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_WEEKLY_QUEST_STATUS));
     _LoadSeasonalQuestStatus(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_SEASONAL_QUEST_STATUS));
     _LoadMonthlyQuestStatus(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_MONTHLY_QUEST_STATUS));
+    _LoadQuestGiverQuest(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_QUESTGIVER_QUEST));
     _LoadRandomBGStatus(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_RANDOM_BG));
 
     // after spell and quest load
@@ -20427,6 +20403,31 @@ void Player::_LoadMonthlyQuestStatus(PreparedQueryResult result)
     m_MonthlyQuestChanged = false;
 }
 
+void Player::_LoadQuestGiverQuest(PreparedQueryResult result)
+{
+    m_questGiverQuestMap.clear();
+
+    if (result)
+    {
+        do
+        {
+            Field* fields = result->Fetch();
+
+            QuestGiverQuest* q = new QuestGiverQuest;
+
+            q->questgiver_guid = fields[0].GetUInt64();
+            q->quest_id = fields[1].GetUInt32();
+            q->time_change = time_t(fields[2].GetUInt32());
+            q->is_rewarded = fields[3].GetInt8();
+
+            m_questGiverQuestMap[q->quest_id] = q;
+
+            TC_LOG_DEBUG("entities.player.loading", "Load questgiver_quest for Player: %u, QuestGiver: %u, Quest: %u", GetGUIDLow(), q->questgiver_guid, q->quest_id);
+            
+        } while (result->NextRow());
+    }
+}
+
 void Player::_LoadSpells(PreparedQueryResult result)
 {
     //QueryResult* result = CharacterDatabase.PQuery("SELECT spell, active, disabled FROM character_spell WHERE guid = '%u'", GetGUIDLow());
@@ -21249,6 +21250,7 @@ void Player::SaveToDB(bool create /*=false*/)
     _SaveWeeklyQuestStatus(trans);
     _SaveSeasonalQuestStatus(trans);
     _SaveMonthlyQuestStatus(trans);
+    _SaveQuestGiverQuest(trans);
     _SaveTalents(trans);
     _SaveSpells(trans);
     _SaveSpellCooldowns(trans);
@@ -21845,6 +21847,31 @@ void Player::_SaveMonthlyQuestStatus(SQLTransaction& trans)
     }
 
     m_MonthlyQuestChanged = false;
+}
+
+void Player::_SaveQuestGiverQuest(SQLTransaction& trans)
+{
+    if (!m_questGiverQuestMapChanged)
+        return;
+
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHARACTER_QUESTGIVER_QUEST);
+    stmt->setUInt32(0, GetGUIDLow());
+    trans->Append(stmt);
+
+    for (QuestGiverQuestMap::const_iterator iter = m_questGiverQuestMap.begin(); iter != m_questGiverQuestMap.end(); ++iter)
+    {
+        QuestGiverQuest* q = (iter)->second;
+
+        stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHARACTER_QUESTGIVER_QUEST);
+        stmt->setUInt32(0, GetGUIDLow());
+        stmt->setUInt64(1, q->questgiver_guid);
+        stmt->setUInt32(2, q->quest_id);
+        stmt->setUInt32(3, q->time_change);
+        stmt->setInt8(4, q->is_rewarded);
+        trans->Append(stmt);
+    }
+
+    m_questGiverQuestMapChanged = false;
 }
 
 void Player::_SaveSkills(SQLTransaction& trans)

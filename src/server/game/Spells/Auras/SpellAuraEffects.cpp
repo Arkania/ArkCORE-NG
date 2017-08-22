@@ -3045,6 +3045,22 @@ void AuraEffect::HandleAuraControlVehicle(AuraApplication const* aurApp, uint8 m
     if (!caster || caster == target)
         return;
 
+    int8 seatId = m_amount - 1;
+    // quest 26616 you click on boatA and the npc_spellclick_spells spawn boatB, player receive control for boatB. 
+    // in vehicle::execute the player are spawned by the spell and the 5 npc accessory is spawned LATER. so player with seat -1 receive the first empty place = 0
+    // correct should be: the spell is spawn first the accessory's and then the player ??
+    // Workaround: to overwrite this wrong logic, you can give the player the correct seatId..
+
+    if (caster->ToPlayer())
+        switch (target->GetEntry())
+        {
+        case 43450:
+            seatId = 5;
+            break;
+        default:
+            break;
+        }
+
     if (apply)
     {
         // Currently spells that have base points  0 and DieSides 0 = "0/0" exception are pushed to -1,
@@ -3053,7 +3069,7 @@ void AuraEffect::HandleAuraControlVehicle(AuraApplication const* aurApp, uint8 m
         // Current formula about m_amount: effect base points + dieside - 1
         // TO DO: Reasearch more about 0/0 and fix it.
         // // correct amount is already calculated adding one more -1 meant calculated amount - 1
-        caster->_EnterVehicle(target->GetVehicleKit(), m_amount - 1, aurApp);
+        caster->_EnterVehicle(target->GetVehicleKit(), seatId, aurApp);
     }
     else
     {

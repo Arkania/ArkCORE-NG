@@ -3483,6 +3483,9 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
             case 73105:
                 pos = Position(1159.168f, 1104.536f, 126.8035f, 2.2863f);
                 break;
+            case 81243:
+                pos = Position(-9298.24f, -2360.14f, 56.2107f, 3.42906f);
+                break;
             }
             summon = m_originalCaster->GetMap()->SummonCreature(entry, pos, properties, duration, m_caster, m_spellInfo->Id);
             if (!summon || !summon->IsVehicle())

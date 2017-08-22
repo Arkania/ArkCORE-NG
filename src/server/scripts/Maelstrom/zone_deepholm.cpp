@@ -153,6 +153,8 @@ public:
             {
                 switch (eventId)
                 {
+                case 0:
+                    break;
                 }
             }
 

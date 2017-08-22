@@ -3939,8 +3939,8 @@ void ObjectMgr::LoadQuests()
         {
             if (qinfo->RequiredGender > GENDER_NONE)
             {
-                TC_LOG_ERROR("sql.sql", "Quest %u does not contain any playable gender in `RequiredGender` (%u), value set to 0 (both gender).", qinfo->GetQuestId(), qinfo->RequiredGender);
-                qinfo->RequiredGender = 0;
+                TC_LOG_ERROR("sql.sql", "Quest %u does not contain any playable gender in `RequiredGender` (%u), value set to 2 (both gender).", qinfo->GetQuestId(), qinfo->RequiredGender);
+                qinfo->RequiredGender = 2;
             }
         }
         // RequiredSkillId, can be 0

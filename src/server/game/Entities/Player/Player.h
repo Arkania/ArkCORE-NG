@@ -897,6 +897,7 @@ enum PlayerLoginQueryIndex
     PLAYER_LOGIN_QUERY_LOAD_VOID_STORAGE            = 33,
     PLAYER_LOGIN_QUERY_LOAD_CURRENCY                = 34,
     PLAYER_LOGIN_QUERY_LOAD_CUF_PROFILES            = 35,
+    PLAYER_LOGIN_QUERY_LOAD_QUESTGIVER_QUEST        = 36,
     MAX_PLAYER_LOGIN_QUERY
 };
 
@@ -923,6 +924,14 @@ struct InstancePlayerBind
        that aren't already permanently bound when they are inside when a boss is killed
        or when they enter an instance that the group leader is permanently bound to. */
     InstancePlayerBind() : save(NULL), perm(false) { }
+};
+
+struct QuestGiverQuest
+{
+    uint64 questgiver_guid;
+    uint32 quest_id;
+    time_t time_change;
+    bool   is_rewarded;
 };
 
 struct AccessRequirement
@@ -1546,7 +1555,7 @@ class Player : public Unit, public GridObject<Player>
         void AddQuest(Quest const* quest, Object* questGiver);
         void CompleteQuest(uint32 quest_id);
         void IncompleteQuest(uint32 quest_id);
-        void RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, bool announce = true);
+        bool RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, bool announce = true);
         void FailQuest(uint32 quest_id);
         bool SatisfyQuestSkill(Quest const* qInfo, bool msg) const;
         bool SatisfyQuestLevel(Quest const* qInfo, bool msg);
@@ -1649,12 +1658,11 @@ class Player : public Unit, public GridObject<Player>
         bool HasPvPForcingQuest() const;
 
         uint64 GetQuestGiverGUID(uint32 quest_id);
-        void AddQuestGiverQuest(uint32 quest_id, uint64 guid);
-        bool InformQuestGiverAccept(Quest const* quest, Object* questGiver);
-        bool InformQuestGiverSelect(Quest const* quest, Object* questGiver);
-        bool InformQuestGiverObjectiveComplete(Quest const* quest, Object* questGiver = nullptr);
-        bool InformQuestGiverReward(Quest const* quest, Object* questGiver, uint32 opt);
-        bool InformQuestGiverCancel(Quest const* quest, Object* questGiver);
+        QuestGiverQuest* GetQuestGiverQuest(uint32 quest_id);
+        void SetQuestGiverQuestState(uint32 quest_id, bool is_rewarded);
+        void SetQuestGiverQuestGUID(uint32 quest_id, Object* questgiver);
+        void AddQuestGiverQuest(uint32 quest_id, Object* questgiver);
+        void CleanUpQuestGiverQuest();
 
         /*********************************************************/
         /***                   LOAD SYSTEM                     ***/
@@ -2686,10 +2694,12 @@ class Player : public Unit, public GridObject<Player>
         uint64 m_divider;
         uint32 m_ingametime;
 
-        // holds a list for all questgiver the player have started a quest. used for new AUTO_ACCEPT, AUTO_TAKE, AUTO_SUBMIT
-        // ToDo: store this table to database
-        std::map<uint32, uint64> _questGiverList;
+        typedef std::unordered_map<uint32 /*quest_id*/, QuestGiverQuest*> QuestGiverQuestMap;
 
+        // holds a list for all questgiver the player have started a quest. used for new AUTO_ACCEPT, AUTO_TAKE, AUTO_SUBMIT
+        QuestGiverQuestMap m_questGiverQuestMap;
+        bool m_questGiverQuestMapChanged;
+        
         /*********************************************************/
         /***                   LOAD SYSTEM                     ***/
         /*********************************************************/
@@ -2706,6 +2716,7 @@ class Player : public Unit, public GridObject<Player>
         void _LoadQuestStatus(PreparedQueryResult result);
         void _LoadQuestStatusRewarded(PreparedQueryResult result);
         void _LoadDailyQuestStatus(PreparedQueryResult result);
+        void _LoadQuestGiverQuest(PreparedQueryResult result);
         void _LoadWeeklyQuestStatus(PreparedQueryResult result);
         void _LoadMonthlyQuestStatus(PreparedQueryResult result);
         void _LoadSeasonalQuestStatus(PreparedQueryResult result);
@@ -2738,6 +2749,7 @@ class Player : public Unit, public GridObject<Player>
         void _SaveDailyQuestStatus(SQLTransaction& trans);
         void _SaveWeeklyQuestStatus(SQLTransaction& trans);
         void _SaveMonthlyQuestStatus(SQLTransaction& trans);
+        void _SaveQuestGiverQuest(SQLTransaction & trans);
         void _SaveSeasonalQuestStatus(SQLTransaction& trans);
         void _SaveSkills(SQLTransaction& trans);
         void _SaveSpells(SQLTransaction& trans);

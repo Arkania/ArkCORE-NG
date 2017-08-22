@@ -937,6 +937,11 @@ class ScriptMgr
 
         InstanceScript* CreateInstanceData(InstanceMap* map);
 
+    public: /* CreatureScript GameObjectScript ItemScript */
+        bool OnQuestAccept(Player * player, Object * questGiverObject, Quest const * quest);
+        bool OnQuestObjectiveComplete(Player * player, Object * questGiverObject, Quest const * quest);
+        bool OnQuestReward(Player * player, Object * questGiverObject, Quest const * quest, uint32 opt);
+
     public: /* ItemScript */
 
         bool OnDummyEffect(Unit* caster, uint32 spellId, SpellEffIndex effIndex, Item* target);

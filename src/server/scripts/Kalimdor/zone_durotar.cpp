@@ -34,12 +34,16 @@ enum eDurotar
 {
     ACTION_CREATE_NAZGRIM = 1000,
     ACTION_CREATE_VANGUARD = 1001,
-    
+    ACTION_RECREATE_PASSENGERS = 1002,
+    ACTION_IS_SHIP_VISIBLE_ALLOWED = 1003,
     GO_SHIP_TO_VASHJIR_197195 = 197195,
     GO_SHIP_TO_VASHJIR_203466 = 203466,
 
     NPC_HELLSCREAMS_VANGUARD = 43090,
     NPC_LEGIONNAIRE_NAZGRIM = 43100,
+    NPC_SHIP_TO_VASHJIR_PHASE_CASTER_BUNNY_40559 = 40559,
+    NPC_TOTALLY_GENERIC_BUNNY_PHASE_2 = 43091,
+
 
     SPELL_QUEST_GENERIC_ZONE_SPECIFIC_02 = 59074,
     SPELL_QUEST_ZONE_SPECIFIC_02 = 78644,
@@ -797,22 +801,24 @@ public:
 
 /* Start Quest: Call of Duty.. */
 
-// 43091 bunny, as commander inside ship
-class npc_totally_generic_bunny_phase_43091 : public CreatureScript
+// 40559 bunny (ally & horde), as commander inside ship
+class npc_ship_to_vashjir_phase_caster_bunny_40559 : public CreatureScript
 {
 public:
-    npc_totally_generic_bunny_phase_43091() : CreatureScript("npc_totally_generic_bunny_phase_43091") { }
+    npc_ship_to_vashjir_phase_caster_bunny_40559() : CreatureScript("npc_ship_to_vashjir_phase_caster_bunny_40559") { }
 
-    struct npc_totally_generic_bunny_phase_43091AI : public ScriptedAI
+    struct npc_ship_to_vashjir_phase_caster_bunny_40559AI : public ScriptedAI
     {
-        npc_totally_generic_bunny_phase_43091AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+        npc_ship_to_vashjir_phase_caster_bunny_40559AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
 
         EventMap m_events;
-        uint64   m_hordeShipGUID;
+        uint64   m_vashjirShipGUID;
+        uint32   m_animState;
 
         void Initialize()
         {
-            m_hordeShipGUID = 0;
+            m_vashjirShipGUID = 0;
+            m_animState = 0;
         }
 
         void Reset() override
@@ -823,12 +829,21 @@ public:
         { 
             switch (id)
             {
-            case 1: // data are ship's eventId 
-                switch (value)
-                {
-                case 0:
-                    break;
-                }
+            case 1: 
+                break;
+            }
+        }
+
+        void SetGUID(uint64 guid, int32 id) override
+        {
+            switch (id)
+            {
+            case GO_SHIP_TO_VASHJIR_203466:
+                m_vashjirShipGUID = guid;
+                break;
+            case NPC_HELLSCREAMS_VANGUARD:
+                break;
+            case NPC_LEGIONNAIRE_NAZGRIM:
                 break;
             }
         }
@@ -838,10 +853,39 @@ public:
             switch (param)
             {
             case ACTION_START_ANIM_02:
-            {
-                // ship has started from bridge.. next animation starts now..
+                m_animState = 1;
                 break;
-            }
+            case ACTION_RECREATE_PASSENGERS:
+                printf("ACTION_RECREATE_PASSENGERS \n");
+                break;
+            case ACTION_TEST:
+                printf("ACTION_TEST \n");
+                break;
+            case 26515:
+                printf("abfahrt \n");
+                break;
+            case 25467: // short after Departure
+                printf("mitte erste kurve \n");
+                break;
+            case 25446:
+                printf("ende erste kurve \n");
+                if (m_animState == 1)
+                    me->AddAura(80225, me);
+                break;
+            case 25452: // teleport to map 0
+                printf("teleport to map 0 \n");
+                if (GameObject* go = sObjectAccessor->GetGameObject(*me, m_vashjirShipGUID))
+                    go->AI()->DoAction(ACTION_RECREATE_PASSENGERS);
+                break;
+            case 25489:
+                printf("starte fahrt nach teleport \n");
+                break;
+            case 25448:
+                printf("vashjir \n");
+                break;
+            case 25428:
+                printf("c \n");
+                break;
             }
         }
 
@@ -872,11 +916,11 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_totally_generic_bunny_phase_43091AI(creature);
+        return new npc_ship_to_vashjir_phase_caster_bunny_40559AI(creature);
     }
 };
 
-// 32520  bunny, as commander outside ship, check for player near and active quest...   then starting the animation on bridge...
+// 32520 bunny (ally & horde), as commander outside ship, check for player near and active quest...   then starting the animation on bridge...
 class npc_totally_generic_bunny_all_phase_32520 : public CreatureScript
 {
 public:
@@ -889,7 +933,7 @@ public:
         EventMap m_events;
         uint32   m_areaId;
         uint64   m_vashjirShipGUID;
-        bool     m_animCanBeStarted;
+        bool     m_playerWithActiveQuestIsNear;
         uint32   m_lastShipEventId;
         uint32   m_animState;
         std::map<uint32, uint64> sList;
@@ -898,9 +942,10 @@ public:
         {
             m_vashjirShipGUID = 0;
             m_areaId = 0;
-            m_animCanBeStarted = false;
+            m_playerWithActiveQuestIsNear = false;
             m_lastShipEventId = 0;
             m_animState = 0;
+            sList.clear();
         }
 
         void Reset() override
@@ -923,8 +968,11 @@ public:
         { 
             switch (id)
             {
-            case ACTION_IS_PLAYER_NEAR:
-                return m_animCanBeStarted | m_animState;
+            case ACTION_IS_SHIP_VISIBLE_ALLOWED:
+            {
+                bool ok = sList.size() >= 9;
+                return (m_playerWithActiveQuestIsNear & ok) | bool(m_animState > 1);
+            }
             case 1:
                 return m_lastShipEventId;
             case 2:
@@ -936,10 +984,18 @@ public:
         void DoAction(int32 param) override
         {
             if (m_areaId == 374)
-                printf("EventId: %u \n", param);
+            {
+             //   printf("EventId: %u \n", param);
+            }
 
             if (param > 24000 && param < 27000)
                 m_lastShipEventId = param;
+            
+            if (param == 26605 && m_animState > 1)
+            {
+                m_animState = 0;
+                sList.clear();
+            }
             
             TryStartAnim();
 
@@ -953,30 +1009,40 @@ public:
             case 26605: // ship teleport to map 1
                 if (m_animState == 1)
                     m_events.ScheduleEvent(EVENT_START_ANIM_01, 30000);
-                else if (m_animState >= 5)
-                    m_animState = 0;
                 break;
             case 25447: // inside curve, before bridge                
                 break;
             case 25445: // arrive bridge
                 if (m_animState == 2)
                 {
-                    m_animState = 3;
-                    if (Creature* nazgrim = GetStoredCreature(eVanGuardNaz))
-                        nazgrim->AI()->DoAction(ACTION_START_ANIM_02);
-                    std::list<Creature*> cList = me->FindNearestCreatures(NPC_HELLSCREAMS_VANGUARD, 75.0f);
-                    for (auto orc : cList)
-                    {
-                        orc->AI()->SetGUID(m_vashjirShipGUID, GO_SHIP_TO_VASHJIR_203466);
-                        orc->AI()->DoAction(ACTION_START_WALK_01);
-                    }
+                    if (sList.size() == 9)
+                        if (Creature* nazgrim = GetStoredCreature(eVanGuardNaz))
+                            for (auto guid : sList)
+                                if (Creature* npc = sObjectAccessor->GetCreature(*me, guid.second))
+                                    if (guid.first == eVanGuardNaz)
+                                    {
+                                        npc->AI()->DoAction(ACTION_START_ANIM_02);
+                                        m_animState = 3;
+                                        m_events.Reset();
+                                    }
+                                    else
+                                    {
+                                        npc->AI()->SetGUID(m_vashjirShipGUID, GO_SHIP_TO_VASHJIR_203466);
+                                        npc->AI()->DoAction(ACTION_START_WALK_01);
+                                    }
+                    sList.clear();
                 }
                 break;
             case 26515: // departure horde bridge.. now bunny inside ship are the commander
                 if (m_animState == 3)
+                {
+                    sList.clear();
                     m_animState = 4;
+                }
                 break; 
             case 25467:
+                if (m_animState == 4)
+                    sList.clear();
                 break;
             case 25446:
                 break;
@@ -1014,7 +1080,7 @@ public:
                 switch (m_areaId)
                 {
                 case 374:
-                    switch (1)
+                    switch (m_animState)
                     {
                     case 1:
                         HordeAnimation_smalltalk(eventId);
@@ -1022,7 +1088,7 @@ public:
                     }
                     break;
                 case 4411:
-                    switch (0)
+                    switch (m_animState)
                     {
                     case 1:
                         AllianceAnimation_smalltalk(eventId);
@@ -1040,43 +1106,71 @@ public:
 
         void FindAllMembersWorldwide()
         {
-            TRINITY_READ_GUARD(HashMapHolder<GameObject>::LockType, *HashMapHolder<GameObject>::GetLock());
-            HashMapHolder<GameObject>::MapType const& m = ObjectAccessor::GetGameObjects();
-            for (HashMapHolder<GameObject>::MapType::const_iterator iter = m.begin(); iter != m.end(); ++iter)
-                if (GameObject* ship = iter->second->ToGameObject())
-                    if (ship->IsInWorld())
-                        if ((m_areaId == 374 && ship->GetEntry() == GO_SHIP_TO_VASHJIR_203466) || (m_areaId == 4411 && ship->GetEntry() == GO_SHIP_TO_VASHJIR_197195))
-                        {
-                            m_vashjirShipGUID = ship->GetGUID();
-                            ship->AI()->SetGUID(me->GetGUID(), me->GetEntry());
-                        }
-            std::list<Creature*> cList;
-            cList = me->FindNearestCreatures(NPC_HELLSCREAMS_VANGUARD, 75.0f);
-            for (auto npc : cList)
-                sList[npc->GetDBTableGUIDLow()] = npc->GetGUID();
-            if (Creature* nazgrim = me->FindNearestCreature(NPC_LEGIONNAIRE_NAZGRIM, 80.0f))
-                sList[nazgrim->GetDBTableGUIDLow()] = nazgrim->GetGUID();
+            if (!m_vashjirShipGUID)
+            {
+                TRINITY_READ_GUARD(HashMapHolder<GameObject>::LockType, *HashMapHolder<GameObject>::GetLock());
+                HashMapHolder<GameObject>::MapType const& m = ObjectAccessor::GetGameObjects();
+                for (HashMapHolder<GameObject>::MapType::const_iterator iter = m.begin(); iter != m.end(); ++iter)
+                    if (GameObject* ship = iter->second->ToGameObject())
+                        if (ship->IsInWorld())
+                            if ((m_areaId == 374 && ship->GetEntry() == GO_SHIP_TO_VASHJIR_203466) || (m_areaId == 4411 && ship->GetEntry() == GO_SHIP_TO_VASHJIR_197195))
+                            {
+                                m_vashjirShipGUID = ship->GetGUID();
+                                ship->AI()->SetGUID(me->GetGUID(), me->GetEntry());
+                            }
+            }
+            if (sList.size() < 9)
+            {
+                std::list<Creature*> cList;
+                cList = me->FindNearestCreatures(NPC_HELLSCREAMS_VANGUARD, 75.0f);
+                for (auto npc : cList)
+                    if (npc->IsAlive() && !npc->GetTransGUID())
+                        sList[npc->GetDBTableGUIDLow()] = npc->GetGUID();
+           
+                if (Creature* nazgrim = me->FindNearestCreature(NPC_LEGIONNAIRE_NAZGRIM, 80.0f))
+                    if (nazgrim->IsAlive() && !nazgrim->GetTransGUID())
+                        sList[nazgrim->GetDBTableGUIDLow()] = nazgrim->GetGUID();
+            }
+
+            IsPlayerOnBridgeWithQuestActive();
         }
 
-        uint32 IsPlayerOnBridgeWithQuestActive() const
+        void IsPlayerOnBridgeWithQuestActive()
         {
-            std::list<Player*> pList = me->FindNearestPlayers(75.0f);
+            std::list<Player*> pList = me->FindNearestPlayers(100.0f);
             for (auto player : pList)
                 if (player->GetQuestStatus(QUEST_CALL_OF_DUTY_HORDE) == QUEST_STATUS_INCOMPLETE || player->GetQuestStatus(QUEST_CALL_OF_DUTY_ALLIANCE) == QUEST_STATUS_INCOMPLETE)
-                    return 1;
+                {
+                    m_playerWithActiveQuestIsNear = 1;
+                    return;
+                }
 
-            return 0;
+            m_playerWithActiveQuestIsNear = 0;
         }
 
         void TryStartAnim()
         {
-            m_animCanBeStarted = false;
 
-            if (!m_vashjirShipGUID)
-                FindAllMembersWorldwide();
-            
-            if (CanAnimationBeStarted() == false)
+            FindAllMembersWorldwide();
+         
+            if (m_animState != 0)
                 return;
+
+            if (!m_playerWithActiveQuestIsNear)
+                return;
+
+            if (sList.size() != 9)
+                return;
+
+            switch (m_lastShipEventId)
+            {
+            case 25489:
+            case 25448:
+            case 25428:
+                break;
+            default:
+                return;
+            }
 
             m_animState = 1;
             m_events.ScheduleEvent(EVENT_START_ANIM, 1000);
@@ -1088,41 +1182,6 @@ public:
                 return npc;
 
             return nullptr;
-        }
-
-        uint32 CanAnimationBeStarted()
-        {
-            m_animCanBeStarted = false;
-
-            if (m_animState != 0)
-                return false;
-
-            bool playerOnBridge = IsPlayerOnBridgeWithQuestActive();
-
-            Creature* nazgrim = me->FindNearestCreature(NPC_LEGIONNAIRE_NAZGRIM, 75.0f);
-
-            std::list<Creature*> cList = me->FindNearestCreatures(NPC_HELLSCREAMS_VANGUARD, 75.0f);
-            
-            if (!playerOnBridge)
-                return false;
-
-            if (!nazgrim)
-                return false;
-
-            if (cList.size() != 8)
-                return false;
-            
-            m_animCanBeStarted = true;
-
-            switch (m_lastShipEventId)
-            {
-            case 25489:
-            case 25448:
-            case 25428:                
-                return true;
-                break;
-            }
-            return false;
         }
 
         void HordeAnimation_smalltalk(uint32 eventId)
@@ -1656,7 +1715,7 @@ void AddSC_durotar()
     new spell_rumbling_hooves_73868();
     new npc_the_kodo_39365();
     new npc_commander_thorak_41621();
-    new npc_totally_generic_bunny_phase_43091();
+    new npc_ship_to_vashjir_phase_caster_bunny_40559();
     new npc_totally_generic_bunny_all_phase_32520();
     new npc_legionnaire_nazgrim_43100();
     new npc_hellscreams_vanguard_43090();

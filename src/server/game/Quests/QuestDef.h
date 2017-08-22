@@ -154,7 +154,7 @@ enum QuestFlags
     QUEST_FLAGS_OBJ_TEXT                = 0x00040000,   // use Objective text as Complete text
     QUEST_FLAGS_AUTO_ACCEPT             = 0x00080000,   // The client recognizes this flag as auto-accept. However, NONE of the current quests (3.3.5a) have this flag. Maybe blizz used to use it, or will use it in the future.
     QUEST_FLAGS_AUTO_SUBMIT             = 0x00100000,   // (WPP: PlayerCastOnAccept) Quests with this flag player submit automatically by special button in player gui
-    QUEST_FLAGS_AUTO_TAKE               = 0x00200000,   // (WPP: PlayerCastOnComplete) Automatically suggestion of accepting quest. Not from npc. Player cast reward spell on complete
+    QUEST_FLAGS_AUTO_TAKE               = 0x00200000,   // (WPP: PlayerCastOnComplete) seems to work twice 1.) Automatically suggestion of accepting quest. 2.) Player cast reward spell on complete
     QUEST_FLAGS_UPDATE_PHASE_SHIFT      = 0x00400000,   // (WPP: UpdatePhaseShift)
     QUEST_FLAGS_SOR_WHITE_LIST          = 0x00800000,   // (WPP: SoRWhitelist) 
     QUEST_FLAGS_LAUNCH_GOSSIP_COMPLETE  = 0x01000000,   // (WPP: LaunchGossipComplete)

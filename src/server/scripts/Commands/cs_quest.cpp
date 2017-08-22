@@ -275,7 +275,8 @@ public:
         if (ReqOrRewMoney < 0)
             player->ModifyMoney(-ReqOrRewMoney);
 
-        player->CompleteQuest(entry);
+        if (player->CanCompleteQuest(entry)) // prevent calling CompleteQuest twice (can be done in KilledMonsterCredit)
+            player->CompleteQuest(entry);
         return true;
     }
 

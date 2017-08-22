@@ -129,63 +129,10 @@ public:
     }
 };
 
-// 40559  bunny, inside ship, as commander for quest "call of duty" Alliance
-class npc_ship_to_vashjir_phase_caster_bunny_40559 : public CreatureScript
-{
-public:
-    npc_ship_to_vashjir_phase_caster_bunny_40559() : CreatureScript("npc_ship_to_vashjir_phase_caster_bunny_40559") { }
-
-    enum eNPC
-    {
-    };
-
-    struct npc_ship_to_vashjir_phase_caster_bunny_40559AI : public ScriptedAI
-    {
-        npc_ship_to_vashjir_phase_caster_bunny_40559AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
-
-        EventMap m_events;
-
-        void Initialize()
-        {
-        }
-
-        void Reset() override
-        {
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            m_events.Update(diff);
-
-            while (uint32 eventId = m_events.ExecuteEvent())
-            {
-                switch (eventId)
-                {
-                case 0:
-                {
-                    break; 
-                }
-                }
-            }
-
-            if (!UpdateVictim())
-                return;
-            else
-                DoMeleeAttackIfReady();
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_ship_to_vashjir_phase_caster_bunny_40559AI(creature);
-    }
-};
-
 void AddSC_stormwind_city()
 {
     new npc_archmage_malin_2708();
     new at_stormwind_command_board();
     new at_stormwind_teleport_area();
     new npc_recruiter_burns_36799();
-    new npc_ship_to_vashjir_phase_caster_bunny_40559();
 }
