@@ -1495,6 +1495,26 @@ class Player : public Unit, public GridObject<Player>
         TradeData* GetTradeData() const { return m_trade; }
         void TradeCancel(bool sendback);
 
+        // Visible state (0=unknown or new) (1=visible) (2=not visible or outside range)
+        bool  IsTransportVisibleStateAvaible(uint64 transportId) 
+        { 
+            return m_TransportVisibleState.find(transportId) != m_TransportVisibleState.end(); 
+        }
+        uint8 GetTransportVisibleState(uint64 transportId) 
+        { 
+            if (IsTransportVisibleStateAvaible(transportId))
+                return m_TransportVisibleState[transportId];
+            else
+                return 0;
+        }
+        void  SetTransportVisibleState(uint64 transportId, uint8 state) 
+        { 
+            if (IsTransportVisibleStateAvaible(transportId))
+                m_TransportVisibleState[transportId] = state;
+            else
+                m_TransportVisibleState.insert(std::pair<uint64, uint8>(transportId, state));
+        }
+
         void UpdateEnchantTime(uint32 time);
         void UpdateSoulboundTradeItems();
         void AddTradeableItem(Item* item);
@@ -3041,6 +3061,9 @@ class Player : public Unit, public GridObject<Player>
 
         uint32 m_ratedBGLoose;
         uint32 m_ratedBGWins;
+
+        typedef std::unordered_map<uint64, uint8> m_TransportVisibleStateSet;
+        m_TransportVisibleStateSet m_TransportVisibleState;
 };
 
 void AddItemsSetItem(Player*player, Item* item);

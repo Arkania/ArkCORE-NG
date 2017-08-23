@@ -660,9 +660,14 @@ void Map::Update(const uint32 t_diff)
 
         VisitNearbyCellsOf(player, grid_object_update, world_object_update);
 
-        // If player is using far sight or mind vision, visit that object too
+        // If player is using far sight, visit that object too
         if (WorldObject* viewPoint = player->GetViewpoint())
-            VisitNearbyCellsOf(viewPoint, grid_object_update, world_object_update);
+        {
+            if (Creature* viewCreature = viewPoint->ToCreature())
+                VisitNearbyCellsOf(viewCreature, grid_object_update, world_object_update);
+            else if (DynamicObject* viewObject = viewPoint->ToDynObject())
+                VisitNearbyCellsOf(viewObject, grid_object_update, world_object_update);
+        }
 
         // Handle updates for creatures in combat with player and are more than 60 yards away
         if (player->IsInCombat())
@@ -683,20 +688,8 @@ void Map::Update(const uint32 t_diff)
             for (Creature* c : updateList)
                 VisitNearbyCellsOf(c, grid_object_update, world_object_update);
         }
-
-        UpdateData udata(player->GetMapId()); // test gpn39f
-        WorldPacket packet;
-
-        for (auto trans : _transports)
-            if (trans->IsInWorld())
-                if (player->CanSeeOrDetect(trans, false, true))
-                    trans->BuildCreateUpdateBlockForPlayer(&udata, player);
-                else
-                    trans->BuildOutOfRangeUpdateBlock(&udata);
-
-        udata.BuildPacket(&packet);
-        player->SendDirectMessage(&packet);
     }
+    SendSingleTransportUpdate();
 
     // non-player active objects, increasing iterator in the loop in case of object removal
     for (m_activeNonPlayersIter = m_activeNonPlayers.begin(); m_activeNonPlayersIter != m_activeNonPlayers.end();)
@@ -744,16 +737,32 @@ void Map::SendSingleTransportUpdate()
             {
                 UpdateData udata(player->GetMapId());
                 WorldPacket packet;
+                bool _sendUpdate = false;
 
                 for (auto transport : _transports)
                     if (transport->IsInWorld())
-                        if (player->CanSeeOrDetect(transport, false, true))
-                            transport->BuildCreateUpdateBlockForPlayer(&udata, player);
-                        else
-                            transport->BuildOutOfRangeUpdateBlock(&udata);
+                    {
+                        if (!player->IsTransportVisibleStateAvaible(transport->GetGUID()))
+                            player->SetTransportVisibleState(transport->GetGUID(), 0);
 
-                udata.BuildPacket(&packet);
-                player->SendDirectMessage(&packet);
+                        uint8 state = player->GetTransportVisibleState(transport->GetGUID());
+                        uint8 stateNew = (player->CanSeeOrDetect(transport, false, true)) ? 1 : 2;
+                        if (state != stateNew)
+                        {
+                            player->SetTransportVisibleState(transport->GetGUID(), stateNew);
+                            _sendUpdate = true;
+                            if (stateNew == 1)
+                                transport->BuildCreateUpdateBlockForPlayer(&udata, player);
+                            else
+                                transport->BuildOutOfRangeUpdateBlock(&udata);
+                        }
+                    }
+
+                if (_sendUpdate)
+                {
+                    udata.BuildPacket(&packet);
+                    player->SendDirectMessage(&packet);
+                }
             }
     }
 }
