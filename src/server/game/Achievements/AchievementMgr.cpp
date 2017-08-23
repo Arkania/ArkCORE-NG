@@ -55,14 +55,15 @@ namespace Trinity
                 : i_player(player), i_msgtype(msgtype), i_textId(textId), i_achievementId(ach_id) {}
             void operator()(WorldPacket& data, LocaleConstant loc_idx)
             {
-                char const* text = sObjectMgr->GetTrinityString(i_textId, loc_idx);
+                BroadcastText const* bcText = sObjectMgr->GetBroadcastText(i_textId);
+                std::string text = bcText->GetText(loc_idx, i_player.getGender());
 
                 data << uint8(i_msgtype);
                 data << uint32(LANG_UNIVERSAL);
                 data << uint64(i_player.GetGUID());
                 data << uint32(5);
                 data << uint64(i_player.GetGUID());
-                data << uint32(strlen(text)+1);
+                data << uint32(text.length() + 1);
                 data << text;
                 data << uint8(0);
                 data << uint32(i_achievementId);
