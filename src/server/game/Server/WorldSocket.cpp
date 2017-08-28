@@ -1048,7 +1048,9 @@ int WorldSocket::HandlePing (WorldPacket& recvPacket)
         diff_time -= m_LastPingTime;
         m_LastPingTime = cur_time;
 
-        if (diff_time < ACE_Time_Value (27))
+        int64 diff = diff_time.get_msec() - ACE_Time_Value(27).get_msec();
+        printf("PingPongDiff: %lli \n", diff);
+        if (diff < 0)
         {
             ++m_OverSpeedPings;
 
@@ -1060,8 +1062,8 @@ int WorldSocket::HandlePing (WorldPacket& recvPacket)
 
                 if (m_Session && !m_Session->HasPermission(rbac::RBAC_PERM_SKIP_CHECK_OVERSPEED_PING))
                 {
-                    TC_LOG_ERROR("network", "WorldSocket::HandlePing: %s kicked for over-speed pings (address: %s)",
-                        m_Session->GetPlayerInfo().c_str(), GetRemoteAddress().c_str());
+                    TC_LOG_ERROR("network", "WorldSocket::HandlePing: %s kicked for over-speed pings (address: %s) ping value is: %lli",
+                        m_Session->GetPlayerInfo().c_str(), GetRemoteAddress().c_str(), diff);
 
                     return -1;
                 }
