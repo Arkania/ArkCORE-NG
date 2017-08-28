@@ -37,7 +37,7 @@
 Transport::Transport() : GameObject(),
 _transportInfo(NULL), _isMoving(true), _pendingStop(false),
 _triggeredArrivalEvent(false), _triggeredDepartureEvent(false),
-_isNextTeleportInvolvedInTwoMaps(false), _isNextTeleportDelayed(false)
+_isDelayedTeleportInitated(false),  _isDelayedTeleportExecuted(false), _isNextTeleportInvolvedInTwoMaps(false), _isNextTeleportDelayed(false)
 {
     m_updateFlag = UPDATEFLAG_TRANSPORT | UPDATEFLAG_LOWGUID | UPDATEFLAG_STATIONARY_POSITION | UPDATEFLAG_ROTATION;
 }
@@ -527,6 +527,11 @@ void Transport::UpdatePosition(float x, float y, float z, float o)
 
 void Transport::LoadStaticPassengers()
 {
+    if (_isDelayedTeleportInitated && !_isDelayedTeleportExecuted)
+        return;
+    _isDelayedTeleportExecuted = false;
+    _isDelayedTeleportInitated = false;
+
     if (uint32 mapId = GetGOInfo()->moTransport.mapID)
     {
         CellObjectGuidsMap const& cells = sObjectMgr->GetMapObjectGuids(mapId, GetMap()->GetSpawnMode());
@@ -616,6 +621,7 @@ bool Transport::TeleportTransport(uint32 newMapid, float x, float y, float z, fl
     if (oldMap->GetId() != newMapid)
     {
         _isNextTeleportDelayed = true;
+        _isDelayedTeleportInitated = true;
         UnloadStaticPassengers();
         return true;
     }
@@ -685,9 +691,11 @@ void Transport::TeleportTransportDelayed()
     _passengerRemove.clear();
     
     Relocate(x, y, z, o);
+
     GetMap()->AddToMap<Transport>(this);
     GetMap()->SendSingleTransportUpdate();
 
+    _isDelayedTeleportExecuted = true;
     _isNextTeleportDelayed = false;
     _isNextTeleportInvolvedInTwoMaps = false;
 }

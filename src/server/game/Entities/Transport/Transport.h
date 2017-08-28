@@ -126,6 +126,8 @@ class Transport : public GameObject, public TransportBase
         std::set<WorldObject*> _passengers;
         std::set<WorldObject*> _staticPassengers;
         
+        bool _isDelayedTeleportInitated;
+        bool _isDelayedTeleportExecuted;
         bool _isNextTeleportInvolvedInTwoMaps;
         bool _isNextTeleportDelayed;
 };
