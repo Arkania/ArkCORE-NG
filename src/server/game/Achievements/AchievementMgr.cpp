@@ -3693,8 +3693,8 @@ void AchievementGlobalMgr::LoadRewards()
 
     m_achievementRewards.clear();                           // need for reload case
 
-    //                                               0      1        2        3     4       5        6
-    QueryResult result = WorldDatabase.Query("SELECT entry, title_A, title_H, item, sender, subject, text FROM achievement_reward");
+    //                                               0      1        2        3     4       5        6     7 
+    QueryResult result = WorldDatabase.Query("SELECT entry, title_A, title_H, item, sender, subject, text, mailTemplate FROM achievement_reward");
 
     if (!result)
     {
@@ -3716,12 +3716,13 @@ void AchievementGlobalMgr::LoadRewards()
         }
 
         AchievementReward reward;
-        reward.titleId[0] = fields[1].GetUInt32();
-        reward.titleId[1] = fields[2].GetUInt32();
-        reward.itemId     = fields[3].GetUInt32();
-        reward.sender     = fields[4].GetUInt32();
-        reward.subject    = fields[5].GetString();
-        reward.text       = fields[6].GetString();
+        reward.titleId[0]   = fields[1].GetUInt32();
+        reward.titleId[1]   = fields[2].GetUInt32();
+        reward.itemId       = fields[3].GetUInt32();
+        reward.sender       = fields[4].GetUInt32();
+        reward.subject      = fields[5].GetString();
+        reward.text         = fields[6].GetString();
+        reward.mailTemplate = fields[7].GetUInt32();
 
         // must be title or mail at least
         if (!reward.titleId[0] && !reward.titleId[1] && !reward.sender)

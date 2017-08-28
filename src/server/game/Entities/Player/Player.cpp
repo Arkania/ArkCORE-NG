@@ -20125,13 +20125,13 @@ void Player::_LoadMail()
             m->subject = fields[4].GetString();
             m->body = fields[5].GetString();
             bool has_items = fields[6].GetBool();
-            m->expire_time = time_t(fields[7].GetUInt32());
-            m->deliver_time = time_t(fields[8].GetUInt32());
+            m->expire_time = time_t(fields[7].GetUInt64());
+            m->deliver_time = time_t(fields[8].GetUInt64());
             m->money = fields[9].GetUInt64();
             m->COD = fields[10].GetUInt64();
             m->checked = fields[11].GetUInt8();
-            m->stationery = fields[12].GetUInt8();
-            m->mailTemplateId = fields[13].GetInt16();
+            m->stationery = fields[12].GetInt8();
+            m->mailTemplateId = fields[13].GetUInt16();
 
             if (m->mailTemplateId && !sMailTemplateStore.LookupEntry(m->mailTemplateId))
             {
