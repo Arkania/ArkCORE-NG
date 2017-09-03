@@ -16902,8 +16902,9 @@ bool Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     m_RewardedQuests.insert(quest_id);
     m_RewardedQuestsSave[quest_id] = true;
 
-    m_questGiverQuestMap[quest_id]->is_rewarded = 1;
-    m_questGiverQuestMapChanged = true;
+    if (!GetQuestGiverGUID(quest_id))
+        AddQuestGiverQuest(quest_id, questGiver);
+    SetQuestGiverQuestState(quest_id, true);
 
     // StoreNewItem, mail reward, etc. save data directly to the database
     // to prevent exploitable data desynchronisation we save the quest status to the database too

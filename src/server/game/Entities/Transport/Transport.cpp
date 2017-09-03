@@ -273,6 +273,9 @@ Creature* Transport::CreateNPCPassenger(uint32 guid, CreatureData const* data)
         return NULL;
     }
 
+    if (data->id == 43022)
+        printf("");
+
     float x = data->posX;
     float y = data->posY;
     float z = data->posZ;
@@ -622,7 +625,6 @@ bool Transport::TeleportTransport(uint32 newMapid, float x, float y, float z, fl
     {
         _isNextTeleportDelayed = true;
         _isDelayedTeleportInitated = true;
-        UnloadStaticPassengers();
         return true;
     }
     else
@@ -654,6 +656,8 @@ void Transport::TeleportTransportDelayed()
 {
     if (!_isNextTeleportDelayed || !_isNextTeleportInvolvedInTwoMaps)
         return;
+
+    UnloadStaticPassengers();
 
     GetMap()->RemoveFromMap<Transport>(this, false);
 

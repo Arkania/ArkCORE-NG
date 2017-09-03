@@ -1049,7 +1049,7 @@ int WorldSocket::HandlePing (WorldPacket& recvPacket)
         m_LastPingTime = cur_time;
 
         int64 diff = diff_time.get_msec() - ACE_Time_Value(27).get_msec();
-        printf("PingPongDiff: %lli \n", diff);
+        TC_LOG_DEBUG("network", "WorldSocket::HandlePing TimeDifference: %lli.", diff);
         if (diff < 0)
         {
             ++m_OverSpeedPings;

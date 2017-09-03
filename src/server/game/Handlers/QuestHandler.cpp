@@ -547,7 +547,12 @@ void WorldSession::HandleQuestgiverCompleteQuest(WorldPacket& recvData)
     {
         if (quest->IsRepeatable())
             _player->PlayerTalkClass->SendQuestGiverRequestItems(quest, playerGuid, _player->CanCompleteRepeatableQuest(quest), false);
-        else
+        else if (_player->CanCompleteQuest(questId))
+        {
+            _player->CompleteQuest(questId);
+            _player->PlayerTalkClass->SendQuestGiverRequestItems(quest, playerGuid, true, false);
+        }
+        else 
             _player->PlayerTalkClass->SendQuestGiverRequestItems(quest, playerGuid, _player->CanRewardQuest(quest, false), false);
     }
     else
