@@ -3,6 +3,8 @@
 /**
  *  @file   config-win32-msvc-11.h
  *
+ *  $Id: config-win32-msvc-11.h 97766 2014-06-04 10:08:40Z johnnyw $
+ *
  *  @brief  Microsoft Visual C++ 11.0 configuration file.
  *
  *  This file is the ACE configuration file for Microsoft Visual C++ version 11.
@@ -28,4 +30,3 @@
 
 #include /**/ "ace/post.h"
 #endif /* ACE_CONFIG_WIN32_MSVC_10_H */
-

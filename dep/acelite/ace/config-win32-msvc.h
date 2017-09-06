@@ -2,7 +2,7 @@
 /**
  *  @file   config-win32-msvc.h
  *
- *  $Id: config-win32-msvc.h 95788 2012-05-24 07:59:51Z johnnyw $
+ *  $Id: config-win32-msvc.h 97766 2014-06-04 10:08:40Z johnnyw $
  *
  *  @brief  Microsoft Visual C++ configuration file.
  *
@@ -41,11 +41,11 @@
 
 //FUZZ: disable check_for_msc_ver
 #if (_MSC_VER >= 1900)
-#include "ace/config-win32-msvc-14.h"
-#elif (_MSC_VER >= 1800)  
-#include "ace/config-win32-msvc-12.h"  
-#elif (_MSC_VER >= 1700)  
-# include "ace/config-win32-msvc-11.h"  
+# include "ace/config-win32-msvc-14.h"
+#elif (_MSC_VER >= 1800)
+# include "ace/config-win32-msvc-12.h"
+#elif (_MSC_VER >= 1700)
+# include "ace/config-win32-msvc-11.h"
 #elif (_MSC_VER >= 1600)
 # include "ace/config-win32-msvc-10.h"
 #elif (_MSC_VER >= 1500)
