@@ -44,6 +44,7 @@ class Transport : public GameObject, public TransportBase
 
         void AddPassenger(WorldObject* passenger);
         void RemovePassenger(WorldObject* passenger);
+        void RemoveNpcPassenger(uint64 passengerGuid);
         std::set<WorldObject*> const& GetPassengers() const { return _passengers; }
         std::set<WorldObject*> const& GetStaticPassengers() const { return _staticPassengers; }
 
@@ -98,6 +99,7 @@ class Transport : public GameObject, public TransportBase
 
         TransportTemplate const* GetTransportTemplate() const { return _transportInfo; }
 
+        void SetDelayedAddModelToMap() { _delayedAddModel = true; }
         uint32 GetMoTransportMapId();
     private:
         void MoveToNextWaypoint();
@@ -129,7 +131,9 @@ class Transport : public GameObject, public TransportBase
         bool _isDelayedTeleportInitated;
         bool _isDelayedTeleportExecuted;
         bool _isNextTeleportInvolvedInTwoMaps;
-        bool _isNextTeleportDelayed;
+        
+        bool _delayedAddModel;
+        bool _delayedTeleport;
 };
 
 #endif

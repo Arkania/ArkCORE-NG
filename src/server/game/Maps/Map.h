@@ -289,7 +289,7 @@ class Map : public GridRefManager<NGridType>
         void VisitNearbyCellsOf(WorldObject* obj, TypeContainerVisitor<Trinity::ObjectUpdater, GridTypeMapContainer> &gridVisitor, TypeContainerVisitor<Trinity::ObjectUpdater, WorldTypeMapContainer> &worldVisitor);
         virtual void Update(const uint32);
 
-        void SendSingleTransportUpdate();
+        void SendSingleTransportUpdate(Player * player);
 
         void DeleteRemovedTransports();
 

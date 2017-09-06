@@ -826,6 +826,13 @@ enum TeleportToOptions
     TELE_TO_SPELL               = 0x10
 };
 
+enum eTransportVisibleState
+{
+    TRANS_STATE_NEW = 0,
+    TRANS_STATE_VISIBLE = 1,
+    TRANS_STATE_NOT_VISIBLE = 2
+};
+
 /// Type of environmental damages
 enum EnviromentalDamage
 {
@@ -1495,21 +1502,21 @@ class Player : public Unit, public GridObject<Player>
         TradeData* GetTradeData() const { return m_trade; }
         void TradeCancel(bool sendback);
 
-        // Visible state (0=unknown or new) (1=visible) (2=not visible or outside range)
-        bool  IsTransportVisibleStateAvaible(uint64 transportId) 
+        // Visible state 
+        bool  IsTransportVisibleStateInserted(uint64 transportId) 
         { 
             return m_TransportVisibleState.find(transportId) != m_TransportVisibleState.end(); 
         }
-        uint8 GetTransportVisibleState(uint64 transportId) 
+        eTransportVisibleState GetTransportVisibleState(uint64 transportId)
         { 
-            if (IsTransportVisibleStateAvaible(transportId))
-                return m_TransportVisibleState[transportId];
+            if (IsTransportVisibleStateInserted(transportId))
+                return (eTransportVisibleState)m_TransportVisibleState[transportId];
             else
-                return 0;
+                return TRANS_STATE_NEW;
         }
-        void  SetTransportVisibleState(uint64 transportId, uint8 state) 
+        void  SetTransportVisibleState(uint64 transportId, eTransportVisibleState state)
         { 
-            if (IsTransportVisibleStateAvaible(transportId))
+            if (IsTransportVisibleStateInserted(transportId))
                 m_TransportVisibleState[transportId] = state;
             else
                 m_TransportVisibleState.insert(std::pair<uint64, uint8>(transportId, state));

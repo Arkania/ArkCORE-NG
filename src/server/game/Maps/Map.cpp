@@ -688,8 +688,9 @@ void Map::Update(const uint32 t_diff)
             for (Creature* c : updateList)
                 VisitNearbyCellsOf(c, grid_object_update, world_object_update);
         }
+
+        SendSingleTransportUpdate(player);
     }
-    SendSingleTransportUpdate();
 
     // non-player active objects, increasing iterator in the loop in case of object removal
     for (m_activeNonPlayersIter = m_activeNonPlayers.begin(); m_activeNonPlayersIter != m_activeNonPlayers.end();)
@@ -728,42 +729,35 @@ void Map::Update(const uint32 t_diff)
     sScriptMgr->OnMapUpdate(this, t_diff);
 }
 
-void Map::SendSingleTransportUpdate()
+void Map::SendSingleTransportUpdate(Player* player)
 {
-    for (m_mapRefIter = m_mapRefManager.begin(); m_mapRefIter != m_mapRefManager.end(); ++m_mapRefIter)
+    if (player->IsInWorld() && player->IsAlive())
     {
-        if (Player* player = m_mapRefIter->GetSource())
-            if (player->IsInWorld())
+        UpdateData udata(player->GetMapId());
+        WorldPacket packet;
+        bool _sendUpdate = false;
+
+        for (auto transport : _transports)
+            if (transport->IsInWorld())
             {
-                UpdateData udata(player->GetMapId());
-                WorldPacket packet;
-                bool _sendUpdate = false;
-
-                for (auto transport : _transports)
-                    if (transport->IsInWorld())
-                    {
-                        if (!player->IsTransportVisibleStateAvaible(transport->GetGUID()))
-                            player->SetTransportVisibleState(transport->GetGUID(), 0);
-
-                        uint8 state = player->GetTransportVisibleState(transport->GetGUID());
-                        uint8 stateNew = (player->CanSeeOrDetect(transport, false, true)) ? 1 : 2;
-                        if (state != stateNew)
-                        {
-                            player->SetTransportVisibleState(transport->GetGUID(), stateNew);
-                            _sendUpdate = true;
-                            if (stateNew == 1)
-                                transport->BuildCreateUpdateBlockForPlayer(&udata, player);
-                            else
-                                transport->BuildOutOfRangeUpdateBlock(&udata);
-                        }
-                    }
-
-                if (_sendUpdate)
+                eTransportVisibleState state = player->GetTransportVisibleState(transport->GetGUID());
+                eTransportVisibleState stateNew = (player->CanSeeOrDetect(transport, false, true)) ? TRANS_STATE_VISIBLE : TRANS_STATE_NOT_VISIBLE;
+                if (state != stateNew)
                 {
-                    udata.BuildPacket(&packet);
-                    player->SendDirectMessage(&packet);
+                    player->SetTransportVisibleState(transport->GetGUID(), stateNew);
+                    _sendUpdate = true;
+                    if (stateNew == TRANS_STATE_VISIBLE)
+                        transport->BuildCreateUpdateBlockForPlayer(&udata, player);
+                    else
+                        transport->BuildOutOfRangeUpdateBlock(&udata);
                 }
             }
+
+        if (_sendUpdate)
+        {
+            udata.BuildPacket(&packet);
+            player->SendDirectMessage(&packet);
+        }
     }
 }
 

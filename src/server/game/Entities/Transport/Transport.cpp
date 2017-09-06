@@ -36,8 +36,8 @@
 
 Transport::Transport() : GameObject(),
 _transportInfo(NULL), _isMoving(true), _pendingStop(false),
-_triggeredArrivalEvent(false), _triggeredDepartureEvent(false),
-_isDelayedTeleportInitated(false),  _isDelayedTeleportExecuted(false), _isNextTeleportInvolvedInTwoMaps(false), _isNextTeleportDelayed(false)
+_triggeredArrivalEvent(false), _triggeredDepartureEvent(false), _delayedAddModel(false), _delayedTeleport(false),
+_isDelayedTeleportInitated(false),  _isDelayedTeleportExecuted(false), _isNextTeleportInvolvedInTwoMaps(false)
 {
     m_updateFlag = UPDATEFLAG_TRANSPORT | UPDATEFLAG_LOWGUID | UPDATEFLAG_STATIONARY_POSITION | UPDATEFLAG_ROTATION;
 }
@@ -187,6 +187,25 @@ void Transport::Update(uint32 diff)
             if (TeleportTransport(_nextFrame->Node->mapid, _nextFrame->Node->x, _nextFrame->Node->y, _nextFrame->Node->z, _nextFrame->InitialOrientation))
                 return; // Update more in new map thread
     }
+    
+    // Add model to map after we are fully done with moving maps
+    if (_delayedAddModel)
+    {
+        _delayedAddModel = false;
+        if (m_model)
+            if (Map* map = GetMap())
+            {
+                GetMap()->InsertGameObjectModel(*m_model);
+
+                // find all player in map of the transport and clear the visible-state
+                Map::PlayerList const& players = GetMap()->GetPlayers();
+                
+                for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                    if (Player* player = itr->GetSource())
+                        if (player->IsInPhase(this->ToGameObject()))
+                            player->SetTransportVisibleState(GetGUID(), TRANS_STATE_NEW);
+            }
+    }
 
     // Set position
     _positionChangeTimer.Update(diff);
@@ -260,6 +279,12 @@ void Transport::RemovePassenger(WorldObject* passenger)
         if (Player* plr = passenger->ToPlayer())
             sScriptMgr->OnRemovePassenger(this, plr);
     }
+}
+
+void Transport::RemoveNpcPassenger(uint64 passengerGuid)
+{
+    if (Creature* npc = sObjectAccessor->GetCreature(*this, passengerGuid))
+        RemovePassenger(npc);
 }
 
 Creature* Transport::CreateNPCPassenger(uint32 guid, CreatureData const* data)
@@ -623,7 +648,7 @@ bool Transport::TeleportTransport(uint32 newMapid, float x, float y, float z, fl
 
     if (oldMap->GetId() != newMapid)
     {
-        _isNextTeleportDelayed = true;
+        _delayedTeleport = true;
         _isDelayedTeleportInitated = true;
         return true;
     }
@@ -647,14 +672,13 @@ bool Transport::TeleportTransport(uint32 newMapid, float x, float y, float z, fl
         }
 
         UpdatePosition(x, y, z, o);
-        GetMap()->SendSingleTransportUpdate();
         return false;
     }
 }
 
 void Transport::TeleportTransportDelayed()
 {
-    if (!_isNextTeleportDelayed || !_isNextTeleportInvolvedInTwoMaps)
+    if (!_delayedTeleport || !_isNextTeleportInvolvedInTwoMaps)
         return;
 
     UnloadStaticPassengers();
@@ -697,10 +721,9 @@ void Transport::TeleportTransportDelayed()
     Relocate(x, y, z, o);
 
     GetMap()->AddToMap<Transport>(this);
-    GetMap()->SendSingleTransportUpdate();
 
     _isDelayedTeleportExecuted = true;
-    _isNextTeleportDelayed = false;
+    _delayedTeleport = false;
     _isNextTeleportInvolvedInTwoMaps = false;
 }
 

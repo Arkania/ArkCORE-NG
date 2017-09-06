@@ -256,10 +256,10 @@ MoveSpline::UpdateResult MoveSpline::_updateState(int32& ms_time_diff)
 
     int32 minimal_diff = std::min(ms_time_diff, segment_time_elapsed());
     
-    //sometimes we receive here values < 0 //then the core crash on ASSERT //this is only a first workaround.. // i need help here
+    //sometimes we receive here values < 0 //then the core crash on ASSERT //this is only a first hack.. // i need help here
     if (minimal_diff < 0)
     {
-        TC_LOG_ERROR("misc", "MoveSpline::_updateState (Prevent Core Crash: minimal_diff is < 0) ms_time_diff:%u \n", ms_time_diff);
+        TC_LOG_ERROR("misc", "MoveSpline::_updateState (Prevent Core Crash: minimal_diff is < 0 [%i]) ms_diff: %i,  ms_elapsed: %i \n", minimal_diff, ms_time_diff, segment_time_elapsed());
         _Finalize();
         ms_time_diff = 0;
         return Result_Arrived;
