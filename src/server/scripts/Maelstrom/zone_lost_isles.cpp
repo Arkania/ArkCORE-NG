@@ -3774,7 +3774,7 @@ public:
                     m_isFinished = true;
                     me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
                     player->KilledMonsterCredit(38117);
-                    m_events.RescheduleEvent(EVENT_DESPAWN, 10000);
+                    m_events.RescheduleEvent(EVENT_DESPAWN_PART_00, 10000);
                 }
         }
 
@@ -3795,7 +3795,7 @@ public:
                         }
                     m_events.RescheduleEvent(EVENT_MASTER_RESET, 10000);
                     break;
-                case EVENT_DESPAWN:
+                case EVENT_DESPAWN_PART_00:
                     me->DespawnOrUnsummon();
                     break;
                 }
@@ -3954,10 +3954,10 @@ public:
                 case EVENT_SPAWN_OBJECT:
                 {
                     me->CastSpell(me, 66726, true);
-                    m_events.ScheduleEvent(EVENT_DESPAWN, 100);
+                    m_events.ScheduleEvent(EVENT_DESPAWN_PART_00, 100);
                     break;
                 }
-                case EVENT_DESPAWN:
+                case EVENT_DESPAWN_PART_00:
                 {
                     me->DespawnOrUnsummon();
                     break;
@@ -4089,10 +4089,10 @@ public:
                 {
                     if (Creature* egg = ObjectAccessor::GetCreature(*me, m_cluckEggGUID))
                         egg->AI()->DoAction(2);
-                    m_events.ScheduleEvent(EVENT_DESPAWN, 500);
+                    m_events.ScheduleEvent(EVENT_DESPAWN_PART_00, 500);
                     break;
                 }
-                case EVENT_DESPAWN:
+                case EVENT_DESPAWN_PART_00:
                 {
                     m_events.Reset();
                     me->DespawnOrUnsummon(10);

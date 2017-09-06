@@ -670,7 +670,7 @@ public:
                 _player->KilledMonsterCredit(me->GetEntry(), me->GetGUID());
 
             _movementComplete = true;
-            _events.ScheduleEvent(EVENT_DESPAWN, 3500);
+            _events.ScheduleEvent(EVENT_DESPAWN_PART_00, 3500);
         }
 
         void UpdateAI(uint32 diff) override
@@ -680,7 +680,7 @@ public:
 
             _events.Update(diff);
 
-            if (_events.ExecuteEvent() == EVENT_DESPAWN)
+            if (_events.ExecuteEvent() == EVENT_DESPAWN_PART_00)
                 me->DespawnOrUnsummon();
         }
 

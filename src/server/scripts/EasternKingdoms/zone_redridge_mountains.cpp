@@ -2089,46 +2089,56 @@ public:
     {
         Creature* npc = creature->FindNearestCreature(NPC_JORGENSEN_43546, 100.0f);
 
-        if (quest->GetQuestId() == QUEST_PRISONERS_OF_WAR || quest->GetQuestId() == QUEST_TO_WIN_A_WAR_YOU_GOTTA_BECOME_WAR)
+        switch (quest->GetQuestId())
         {
-           if (!npc)
-              player->CastSpell(player, SPELL_SUMMON_JORGENSEN_43546_81477);
-        }
-       
-        if (quest->GetQuestId() == QUEST_TO_WIN_A_WAR_YOU_GOTTA_BECOME_WAR)
+        case QUEST_PRISONERS_OF_WAR:
         {
+            if (!npc)
+                player->CastSpell(player, SPELL_SUMMON_JORGENSEN_43546_81477);
+            player->CastSpell(player, 81462, true);
+            break;
         }
+        case QUEST_TO_WIN_A_WAR_YOU_GOTTA_BECOME_WAR:
+        {
+            if (!npc)
+                player->CastSpell(player, SPELL_SUMMON_JORGENSEN_43546_81477);
+            player->CastSpell(player, 81462, true);
+            break;
+        }
+        }
+
         return false;
     }
 
     bool OnQuestReward(Player* player, Creature* /*creature*/, Quest const* quest, uint32 /*opt*/)  override
     { 
-        if (Creature* npc = player->FindNearestCreature(NPC_JORGENSEN_43546, 100.0f))
-            npc->DespawnOrUnsummon();
-
         switch (quest->GetQuestId())
         {
         case QUEST_PRISONERS_OF_WAR:
         {
             if (player->HasAura(82580))
-            {
-                player->RemoveAura(81457);
-                player->RemoveAura(81519);
-                player->RemoveAura(82577);
                 player->CastSpell(player, 82591, true);
-            }
-            player->RemoveAura(82580);
             player->RemoveAurasDueToSpell(82580);
             player->DestroyItemCount(60384, 1, true);
-            player->DestroyItemCount(60385, 1, true);
             break;
         }
         case QUEST_TO_WIN_A_WAR_YOU_GOTTA_BECOME_WAR:
         {
-            
+            if (Creature* npc = player->FindNearestCreature(NPC_JORGENSEN_43546, 100.0f))
+                npc->DespawnOrUnsummon();
+            if (player->HasAura(82587))
+                player->CastSpell(player, 82592, true);
+            player->RemoveAura(82577);
+            player->DestroyItemCount(60385, 1, true);
             break;
         }
         }
+
+        player->RemoveAura(81457);
+        player->RemoveAura(81519);
+        player->RemoveAura(81462);
+        player->RemoveAura(82580);
+        player->RemoveAura(82587);
 
         return false; 
     }

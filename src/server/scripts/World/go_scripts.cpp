@@ -49,23 +49,19 @@ go_veil_skith_cage
 EndContentData */
 
 #include "script_helper.h"
+#include "GameObject.h"
+#include "GameObjectAI.h"
+#include "MapManager.h"
+#include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "GameObject.h"
-#include "GameObjectAI.h"
 #include "Spell.h"
-#include "Player.h"
 #include "Transport.h"
 #include "WorldSession.h"
 
 enum eNpcGoScripts
 {
-    ACTION_CREATE_NAZGRIM = 1000,
-    ACTION_CREATE_VANGUARD = 1001,
-    ACTION_RECREATE_PASSENGERS = 1002,
-    ACTION_IS_SHIP_VISIBLE_ALLOWED = 1003,
-
     GO_SHRINE_HAWK = 185551,
     GO_SHRINE_EAGLE = 185547,
     GO_SHRINE_FALCON = 185553,
@@ -99,10 +95,8 @@ enum eNpcGoScripts
     NPC_GJALERBRON_PRISONER = 24035,
     NPC_GOGGEROC = 11920,
     NPC_HAWK_GUARD = 22992,
-    NPC_HELLSCREAMS_VANGUARD = 43090,
     NPC_HIVE_AMBUSHER = 13301,
     NPC_IMAGE_WIND_TRADER = 20518,
-    NPC_LEGIONNAIRE_NAZGRIM = 43100,
     NPC_OUTHOUSE_BUNNY = 27326,
     NPC_PRISONER_PRIEST = 24086,
     NPC_PRISONER_MAGE = 24088,
@@ -168,19 +162,6 @@ const uint32 NpcPrisonEntry[] =
 const uint32 NpcStasisEntry[] =
 {
     22825, 20888, 22827, 22826, 22828
-};
-
-enum eNpcVanGuard
-{
-    eVanGuardAA = 117110,
-    eVanGuardAB = 118845,
-    eVanGuardBA = 117099,
-    eVanGuardBB = 117100,
-    eVanGuardBC = 117096,
-    eVanGuardCA = 118846,
-    eVanGuardCB = 117112,
-    eVanGuardDA = 118847,
-    eVanGuardNaz = 117111,
 };
 
 #define GO_TELE_TO_DALARAN_CRYSTAL_FAILED   "This teleport crystal cannot be used until the teleport crystal in Dalaran has been used at least once."
@@ -1063,381 +1044,6 @@ public:
     }
 };
 
-// 197195
-class go_ship_to_vashjir_197195 : public GameObjectScript
-{
-public:
-    go_ship_to_vashjir_197195() : GameObjectScript("go_ship_to_vashjir_197195") {}
-
-    struct go_ship_to_vashjir_197195AI : public GameObjectAI
-    {
-        go_ship_to_vashjir_197195AI(GameObject* go) : GameObjectAI(go) { }
-
-        EventMap m_events;
-        uint64   m_bunnyControllerGUID;
-        bool     m_playerNearWithActiveQuest;
-
-        void Reset() 
-        { 
-            m_bunnyControllerGUID = 0;
-            m_playerNearWithActiveQuest = false;
-            SetShipVisibleState();
-            m_events.RescheduleEvent(EVENT_CHECK_POSITION, 10000);
-        }
-
-        void EventInform(uint32 eventId)
-        {
-            if (m_bunnyControllerGUID)
-                if (Creature* bunny = sObjectAccessor->GetCreature(*go, m_bunnyControllerGUID))
-                    bunny->AI()->DoAction(eventId);
-
-            switch (eventId)
-            {
-            case 22520:
-                break;
-            case 24009:
-                break;
-            case 24014:
-                break;
-            case 24015:
-                break;
-            case 24036:
-                break;
-            case 24986:
-                break;
-            case 25075:
-                break;
-            case 25769:
-                SetShipVisibleState();
-                break;
-            }
-        }
-
-        void SetGUID(uint64 guid, int32 id) override
-        {
-            switch (id)
-            {
-            case 32520: // alliance bunny controller outside ship
-                m_bunnyControllerGUID = guid;
-                break;
-            }
-        }
-
-        void DoAction(int32 param) override
-        {
-            switch (param)
-            {
-            case 1:
-            {
-                break;
-            }
-            }
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            m_events.Update(diff);
-
-            while (uint32 eventId = m_events.ExecuteEvent())
-            {
-                switch (eventId)
-                {
-                case EVENT_CHECK_POSITION:
-                    m_events.ScheduleEvent(EVENT_CHECK_POSITION, 10000);
-                    break;
-                }
-            }
-        }
-
-        void SetShipVisibleState()
-        {
-            go->SetInPhase(171, false, m_playerNearWithActiveQuest);
-            go->SetInPhase(172, false, !m_playerNearWithActiveQuest);
-        }
-    };
-
-    GameObjectAI* GetAI(GameObject* go) const
-    {
-        return new go_ship_to_vashjir_197195AI(go);
-    }
-};
-
-// 203466
-class go_ship_to_vashjir_203466 : public GameObjectScript
-{
-public:
-    go_ship_to_vashjir_203466() : GameObjectScript("go_ship_to_vashjir_203466") {}
-    
-    struct go_ship_to_vashjir_203466AI : public GameObjectAI
-    {
-        go_ship_to_vashjir_203466AI(GameObject* go) : GameObjectAI(go) { }
-
-        EventMap m_events;
-        uint64   m_bunnyBridgeGUID;
-        uint64   m_nazgrimGUID;
-        uint64   m_vanGuardGUID[7];
-        Position m_nazgrimPos;
-        Position m_vanGuardPosList[7];
-
-        void Reset() 
-        { 
-            m_bunnyBridgeGUID = 0;
-            m_nazgrimGUID = 0;
-            SetShipVisibleState(false);
-            for (int i = 0; i < 8; i++)
-                m_vanGuardGUID[i] = 0;
-        }
-
-        void EventInform(uint32 eventId)
-        {
-            if (Creature* bunny = GetStaticPassenger(NPC_SHIP_TO_VASHJIR_PHASE_CASTER_BUNNY_40559))
-                bunny->AI()->DoAction(eventId);
-
-            if (m_bunnyBridgeGUID)
-                if (Creature* bunny = FindCreatureWorldwide(m_bunnyBridgeGUID))
-                    bunny->AI()->DoAction(eventId);
-
-            switch (eventId)
-            {
-            case 26605: // teleport to map 1
-                if (Creature* bunny = FindCreatureWorldwide(m_bunnyBridgeGUID))
-                {
-                    bool state = bunny->AI()->GetData(ACTION_IS_SHIP_VISIBLE_ALLOWED);
-                    SetShipVisibleState(state);
-                }
-                break;
-            case 25447:
-                if (Creature* bunny = GetStaticPassenger(NPC_SHIP_TO_VASHJIR_PHASE_CASTER_BUNNY_40559))
-                    bunny->RemoveAllAuras();
-                break;
-            case 25445: // arrive bridge
-                break;
-            case 26515: // departure horde bridge.. now bunny inside ship are the commander
-                if (IsPassengerPlayerBoarded())
-                    if (GetPassengerCrewCount() == 13)
-                        if (Creature* bunny = GetStaticPassenger(NPC_SHIP_TO_VASHJIR_PHASE_CASTER_BUNNY_40559))
-                        {
-                            bunny->AI()->SetGUID(go->GetGUID(), go->GetEntry());
-                            bunny->AI()->DoAction(ACTION_START_ANIM_02);
-                        }
-                break;
-            case 25467:
-                break;
-            case 25446:                
-                break;
-            case 25452: // teleport to map 0
-                if (Creature* bunny = FindCreatureWorldwide(m_bunnyBridgeGUID))
-                {
-                    bool state = bunny->AI()->GetData(ACTION_IS_SHIP_VISIBLE_ALLOWED);
-                    SetShipVisibleState(state);
-                }
-                m_events.ScheduleEvent(EVENT_TELEPORT_00, 2000);                
-                break;
-            case 25489:
-                break;
-            case 25448:
-                break;
-            case 25428:
-                if (Creature* bunny = GetStaticPassenger(NPC_SHIP_TO_VASHJIR_PHASE_CASTER_BUNNY_40559))
-                {
-                    printf("");
-                   // bunny->AI()->DoAction(ACTION_RECREATE_PASSENGERS);
-                }
-                m_events.ScheduleEvent(EVENT_TELEPORT_01, 2000);
-                break;
-            }
-        }
-
-        void SetGUID(uint64 guid, int32 id) override
-        {
-            switch (id)
-            {
-            case 32520: // horde bunny controller outside ship
-                m_bunnyBridgeGUID = guid;
-                break;
-            case NPC_LEGIONNAIRE_NAZGRIM:
-                m_nazgrimGUID = guid;
-                break;
-            case eVanGuardAA:
-            case eVanGuardAB:
-            case eVanGuardBA:
-            case eVanGuardBB:
-            case eVanGuardBC:
-            case eVanGuardCA:
-            case eVanGuardCB:
-            case eVanGuardDA:
-                if (Transport* transport = go->ToTransport())
-                    if (Creature* old = sObjectAccessor->GetCreature(*go, guid))
-                    {
-                        uint32 id = old->AI()->GetData(NPC_HELLSCREAMS_VANGUARD);
-                        float x, y, z, o;
-                        old->GetPosition(x, y, z, o);
-                        transport->CalculatePassengerOffset(x, y, z, &o);
-                        (y < 0.0f) ? o = 1.5f : o = 4.9f;
-                        if (Creature* guard = CreateCreatureAsPassenger(NPC_HELLSCREAMS_VANGUARD, x, y, z, o))
-                        {
-                            guard->AI()->SetData(NPC_HELLSCREAMS_VANGUARD, id);
-                            guard->AI()->DoAction(ACTION_CREATE_VANGUARD);
-                            m_vanGuardPosList[id] = guard->GetTransportPosition();
-                        }
-                    }
-                break;
-            }
-        }
-
-        void DoAction(int32 param) override
-        {
-            switch (param)
-            {
-            case ACTION_CREATE_NAZGRIM: 
-                if (Transport* transport = go->ToTransport())
-                    if (Creature* nazgrimOld = sObjectAccessor->GetCreature(*go, m_nazgrimGUID))
-                    {
-                        float x, y, z, o;
-                        nazgrimOld->GetPosition(x, y, z, o);
-                        transport->CalculatePassengerOffset(x, y, z, &o);
-                        if (Creature* nazgrim = CreateCreatureAsPassenger(NPC_LEGIONNAIRE_NAZGRIM, x, y, z, 3.5f))
-                        {
-                            nazgrim->AI()->DoAction(ACTION_CREATE_NAZGRIM);
-                            m_nazgrimPos = nazgrim->GetTransportPosition();
-                        }
-                    }                    
-                break;
-            case ACTION_RECREATE_PASSENGERS:
-            {
-                if (Creature* nazgrim = CreateCreatureAsPassenger(NPC_LEGIONNAIRE_NAZGRIM, m_nazgrimPos.m_positionX, m_nazgrimPos.m_positionY, m_nazgrimPos.m_positionZ, m_nazgrimPos.m_orientation))
-                { }
-                for (int i = 0; i < 6; i++)
-                {
-                    Position p = m_vanGuardPosList[i];
-                    if (Creature* guard = CreateCreatureAsPassenger(NPC_HELLSCREAMS_VANGUARD, p.m_positionX, p.m_positionY, p.m_positionZ, p.m_orientation))
-                    {
-                        guard->AI()->SetData(NPC_HELLSCREAMS_VANGUARD, i);
-                    }
-                }
-                break;
-            }
-            }
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            m_events.Update(diff);
-
-            while (uint32 eventId = m_events.ExecuteEvent())
-            {
-                switch (eventId)
-                {
-                case EVENT_TELEPORT_00:
-                    if (Creature* bunny = GetStaticPassenger(NPC_SHIP_TO_VASHJIR_PHASE_CASTER_BUNNY_40559))
-                    {
-                        bunny->AI()->DoAction(ACTION_RECREATE_PASSENGERS);
-                        break;
-                    }
-                    m_events.ScheduleEvent(EVENT_TELEPORT_00, 1000);
-                    break;
-                case EVENT_TELEPORT_01:
-                    if (Creature* bunny = GetStaticPassenger(NPC_SHIP_TO_VASHJIR_PHASE_CASTER_BUNNY_40559))
-
-                    m_events.ScheduleEvent(EVENT_TELEPORT_00, 1000);
-                    break;
-                }
-            }
-        }
-
-        void SetShipVisibleState(uint32 state)
-        {
-            bool append = bool(state) | IsPassengerPlayerBoarded();
-            go->SetInPhase(171, false, append);
-            go->SetInPhase(173, true, !append);
-        }
-
-        Creature* FindCreatureWorldwide(uint64 guid)
-        {
-            if (Creature* cr = HashMapHolder<Creature>::Find(guid))
-                return cr;
-
-            return nullptr;
-        }
-
-        bool IsPassengerPlayerBoarded()
-        {
-            if (Transport* transport = go->ToTransport())
-            {
-                std::set<WorldObject*> pList = transport->GetPassengers();
-                if (!pList.empty())
-                    return true;
-            }
-            return false;
-        }
-
-        uint32 GetPassengerCrewCount()
-        {
-            if (Transport* transport = go->ToTransport())
-            {
-                std::set<WorldObject*> pList = transport->GetStaticPassengers();
-                return pList.size();
-            }
-            return 0;
-        }
-
-        GameObject* CreateGameObjectAsPassenger(uint32 entry, float x, float y, float z, float o)
-        {
-            if (Transport* transport = go->ToTransport())
-                if (uint32 guid = sObjectMgr->GenerateLowGuid(HIGHGUID_GAMEOBJECT))
-                {
-                    GameObjectData& data = sObjectMgr->NewGOData(guid);
-                    data.id = entry;
-                    data.phaseMask = 1;
-                    data.posX = x;
-                    data.posY = y;
-                    data.posZ = z;
-                    data.orientation = o;
-                    GameObject* g = transport->CreateGOPassenger(guid, &data);
-                    sObjectMgr->AddGameobjectToGrid(guid, &data);
-                    return g;
-                }
-        }
-
-        Creature* CreateCreatureAsPassenger(uint32 entry, float x, float y, float z, float o)
-        {
-            if (Transport* transport = go->ToTransport())
-                if (uint32 guid = sObjectMgr->GenerateLowGuid(HIGHGUID_UNIT))
-                {
-                    CreatureData& data = sObjectMgr->NewOrExistCreatureData(guid);
-                    data.id = entry;
-                    data.phaseMask = 1;
-                    data.posX = x;
-                    data.posY = y;
-                    data.posZ = z;
-                    data.orientation = o;
-                    Creature* c = transport->CreateNPCPassenger(guid, &data);
-                    sObjectMgr->AddCreatureToGrid(guid, &data);
-                    return c;
-                }
-            return nullptr;
-        }
-
-        Creature* GetStaticPassenger(uint32 entry)
-        {
-            if (Transport* transport = go->ToTransport())
-            {
-                const std::set<WorldObject*> spList = transport->GetStaticPassengers();
-                for (auto wo : spList)
-                    if (Creature* npc = wo->ToCreature())
-                        if (npc->GetEntry() == entry)
-                            return npc;
-            }
-            return nullptr;
-        }
-    };
-
-    GameObjectAI* GetAI(GameObject* go) const
-    {
-        return new go_ship_to_vashjir_203466AI(go);
-    }
-};
-
 void AddSC_go_scripts()
 {
     new go_cat_figurine();
@@ -1477,6 +1083,4 @@ void AddSC_go_scripts()
     new go_veil_skith_cage();
     new go_frostblade_shrine();
     new go_midsummer_bonfire();
-    new go_ship_to_vashjir_197195();
-    new go_ship_to_vashjir_203466();
 }

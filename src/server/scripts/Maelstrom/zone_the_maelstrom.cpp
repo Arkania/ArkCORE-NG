@@ -371,10 +371,10 @@ public:
                     if (Creature* aggra = sObjectAccessor->GetCreature(*me, m_aggraGUID))
                         if (Player* player = sObjectAccessor->GetPlayer(*me, m_playerGUID))
                             aggra->AI()->Talk(6, player);
-                    m_events.ScheduleEvent(EVENT_DESPAWN, 7000);
+                    m_events.ScheduleEvent(EVENT_DESPAWN_PART_00, 7000);
                     break;
                 }
-                case EVENT_DESPAWN:
+                case EVENT_DESPAWN_PART_00:
                 {
                     if (Creature* aggra = sObjectAccessor->GetCreature(*me, m_aggraGUID))
                         aggra->ExitVehicle();

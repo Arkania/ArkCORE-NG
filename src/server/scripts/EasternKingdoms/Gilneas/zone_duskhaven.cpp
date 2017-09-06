@@ -1182,13 +1182,13 @@ public:
                                     player->CastSpell(me, SPELL_EXIT_VEHICLE, true);
                                     Talk(0, player);
                                     //me->ExitVehicle();
-                                    m_events.ScheduleEvent(EVENT_DESPAWN, 3000);                                    
+                                    m_events.ScheduleEvent(EVENT_DESPAWN_PART_00, 3000);
                                     break;
                                 }
 
                     m_events.ScheduleEvent(EVENT_CHECK_NEAR_GREYMANE, 1000);
                     break;
-                case EVENT_DESPAWN:
+                case EVENT_DESPAWN_PART_00:
                     me->DespawnOrUnsummon(10);
                     break;
                 }
@@ -2132,7 +2132,7 @@ public:
                 {
                     me->DespawnOrUnsummon(1000);
                     if (Creature* car = sObjectAccessor->GetCreature(*me, m_carriageGUID))
-                        car->GetAI()->DoAction(EVENT_DESPAWN);
+                        car->GetAI()->DoAction(EVENT_DESPAWN_PART_00);
                     break;
                 }
             }
@@ -2232,7 +2232,7 @@ public:
                 if (Creature* lorna = sObjectAccessor->GetCreature(*me, m_lornaGUID))
                     lorna->AI()->Talk(0);
                 break;
-            case EVENT_DESPAWN:
+            case EVENT_DESPAWN_PART_00:
                 me->DespawnOrUnsummon(1000);
                 break;
             case EVENT_EXIT_VEHICLE:
