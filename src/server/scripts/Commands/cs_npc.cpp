@@ -540,7 +540,7 @@ public:
 
         handler->PSendSysMessage(LANG_COMMAND_CREATURE_DELETE, entry, dbGuid);
 
-        sLog->outCommand(handler->GetSession()->GetAccountId(), "Command: .npc delete Creature (Entry: %u, DbGuid: %u) Deleted", entry, dbGuid);
+        sLog->outCommand(handler->GetSession()->GetAccountId(), "GM-Command: DELETE FROM creature WHERE guid=%u AND id=%u;", dbGuid, entry);
 
         return true;
     }
@@ -918,6 +918,12 @@ public:
         WorldDatabase.Execute(stmt);
 
         handler->PSendSysMessage(LANG_COMMAND_CREATUREMOVED);
+
+        if (creature)
+            sLog->outCommand(handler->GetSession()->GetAccountId(), "GM-Command: UPDATE CREATURE SET position_x=f%, position_y=f%, position_z=f%, orientation=f% WHERE guid=%u AND id=%u;",
+                x, y, z, o,
+                creature->GetDBTableGUIDLow(), creature->GetEntry());
+
         return true;
     }
 
