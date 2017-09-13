@@ -219,6 +219,13 @@ bool IsIPAddrInNetwork(ACE_INET_Addr const& net, ACE_INET_Addr const& addr, ACE_
     return false;
 }
 
+uint8_t* GetBytes(std::string txt)
+{
+    uint8_t* array = new uint8_t[txt.size()];
+    memcpy(array, txt.data(), txt.length());
+    return array;
+}
+
 /// create PID file
 uint32 CreatePIDFile(const std::string& filename)
 {

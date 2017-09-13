@@ -106,6 +106,9 @@ class WorldSocket : public WorldHandler
         /// Get address of connected peer.
         const std::string& GetRemoteAddress(void) const;
 
+        /// Get port of connected peer.
+        const u_short GetRemotePort(void) const;
+
         /// Send A packet on the socket, this function is reentrant.
         /// @param pct packet to send
         /// @return -1 of failure
@@ -175,6 +178,9 @@ class WorldSocket : public WorldHandler
 
         /// Address of the remote peer
         std::string m_Address;
+
+        // Port of the remote peer
+        u_short m_Port;
 
         /// Class used for managing encryption of the headers
         AuthCrypt m_Crypt;

@@ -153,6 +153,11 @@ const std::string& WorldSocket::GetRemoteAddress (void) const
     return m_Address;
 }
 
+const u_short WorldSocket::GetRemotePort(void) const
+{
+    return m_Port;
+}
+
 int WorldSocket::SendPacket(WorldPacket const& pct)
 {
     ACE_GUARD_RETURN (LockType, Guard, m_OutBufferLock, -1);
@@ -162,7 +167,7 @@ int WorldSocket::SendPacket(WorldPacket const& pct)
 
     // Dump outgoing packet
     if (sPacketLog->CanLogPacket())
-        sPacketLog->LogPacket(pct, SERVER_TO_CLIENT);
+        sPacketLog->LogPacket(pct, SERVER_TO_CLIENT, GetRemoteAddress(), GetRemotePort());
 
     WorldPacket const* pkt = &pct;
 
@@ -225,9 +230,9 @@ long WorldSocket::RemoveReference (void)
     return static_cast<long> (remove_reference());
 }
 
-int WorldSocket::open (void *a)
+int WorldSocket::open(void *a)
 {
-    ACE_UNUSED_ARG (a);
+    ACE_UNUSED_ARG(a);
 
     // Prevent double call to this func.
     if (m_OutBuffer)
@@ -242,18 +247,19 @@ int WorldSocket::open (void *a)
         return -1;
 
     // Allocate the buffer.
-    ACE_NEW_RETURN (m_OutBuffer, ACE_Message_Block (m_OutBufferSize), -1);
+    ACE_NEW_RETURN(m_OutBuffer, ACE_Message_Block(m_OutBufferSize), -1);
 
     // Store peer address.
     ACE_INET_Addr remote_addr;
 
     if (peer().get_remote_addr(remote_addr) == -1)
     {
-        TC_LOG_ERROR("network", "WorldSocket::open: peer().get_remote_addr errno = %s", ACE_OS::strerror (errno));
+        TC_LOG_ERROR("network", "WorldSocket::open: peer().get_remote_addr errno = %s", ACE_OS::strerror(errno));
         return -1;
     }
 
     m_Address = remote_addr.get_host_addr();
+    m_Port = remote_addr.get_port_number();
 
     // not an opcode. this packet sends raw string WORLD OF WARCRAFT CONNECTION - SERVER TO CLIENT"
     // because of our implementation, bytes "WO" become the opcode
@@ -684,7 +690,7 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
 
     // Dump received packet.
     if (sPacketLog->CanLogPacket())
-        sPacketLog->LogPacket(*new_pct, CLIENT_TO_SERVER);
+        sPacketLog->LogPacket(*new_pct, CLIENT_TO_SERVER, GetRemoteAddress(), GetRemotePort());
 
     std::string opcodeName = GetOpcodeNameForLogging(opcode);
     if (m_Session)

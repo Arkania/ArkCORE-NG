@@ -309,6 +309,8 @@ bool Utf8FitTo(const std::string& str, std::wstring search);
 void utf8printf(FILE* out, const char *str, ...);
 void vutf8printf(FILE* out, const char *str, va_list* ap);
 
+uint8_t* GetBytes(std::string txt);
+
 bool IsIPAddress(char const* ipaddress);
 
 /// Checks if address belongs to the a network with specified submask
