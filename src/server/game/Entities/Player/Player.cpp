@@ -16955,6 +16955,8 @@ bool Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     //lets remove flag for delayed teleports
     SetCanDelayTeleport(false);
 
+    if (Creature* creatureQGiver = questGiver ? questGiver->ToCreature() : nullptr)
+        creatureQGiver->GetAI()->sQuestReward(this, quest, reward);
     sScriptMgr->OnQuestStatusChange(this, quest_id, QUEST_STATUS_REWARDED);
     return sScriptMgr->OnQuestReward(this, questGiver, quest, announce);
 }
