@@ -111,25 +111,26 @@ void WorldSession::HandleQuestgiverAcceptQuestOpcode(WorldPacket& recvData)
 
     Object* object = ObjectAccessor::GetObjectByTypeMask(*_player, guid, TYPEMASK_UNIT|TYPEMASK_GAMEOBJECT|TYPEMASK_ITEM|TYPEMASK_PLAYER);
 
-#define CLOSE_GOSSIP_CLEAR_DIVIDER() \
-    do { \
-        _player->PlayerTalkClass->SendCloseGossip(); \
-        _player->SetDivider(0); \
-    } while (0)
-
     // no or incorrect quest giver
     if (!object)
     {
-        CLOSE_GOSSIP_CLEAR_DIVIDER();
+        _player->SetDivider(0);
+        _player->PlayerTalkClass->SendCloseGossip();
         return;
     }
 
     if (Player* playerQuestObject = object->ToPlayer())
     {
-        if ((_player->GetDivider() && _player->GetDivider() != guid) ||
-           ((object != _player && !playerQuestObject->CanShareQuest(questId))))
+        if ((_player->GetDivider() && _player->GetDivider() != guid) || !playerQuestObject->CanShareQuest(questId))
         {
-            CLOSE_GOSSIP_CLEAR_DIVIDER();
+            _player->SetDivider(0);
+            _player->PlayerTalkClass->SendCloseGossip();
+            return;
+        }
+        if (!_player->IsInSameRaidWith(playerQuestObject))
+        {
+            _player->SetDivider(0);
+            _player->PlayerTalkClass->SendCloseGossip();
             return;
         }
     }
@@ -137,21 +138,27 @@ void WorldSession::HandleQuestgiverAcceptQuestOpcode(WorldPacket& recvData)
     {
         if (!object->hasQuest(questId))
         {
-            CLOSE_GOSSIP_CLEAR_DIVIDER();
+            _player->SetDivider(0);
+            _player->PlayerTalkClass->SendCloseGossip();
             return;
         }
     }
 
     // some kind of WPE protection
     if (!_player->CanInteractWithQuestGiver(object))
+    {
+        _player->SetDivider(0);
+        _player->PlayerTalkClass->SendCloseGossip();
         return;
+    }
 
     if (Quest const* quest = sObjectMgr->GetQuestTemplate(questId))
     {
         // prevent cheating
         if (!GetPlayer()->CanTakeQuest(quest, true))
         {
-            CLOSE_GOSSIP_CLEAR_DIVIDER();
+            _player->SetDivider(0);
+            _player->PlayerTalkClass->SendCloseGossip();
             return;
         }
 
@@ -200,11 +207,9 @@ void WorldSession::HandleQuestgiverAcceptQuestOpcode(WorldPacket& recvData)
 
             return;
         }
-
-        if (_player)
-            _player->SaveToDB(); // Save player.
     }
 
+    _player->SetDivider(0);
     _player->PlayerTalkClass->SendCloseGossip();
 
 #undef CLOSE_GOSSIP_CLEAR_DIVIDER
@@ -228,25 +233,16 @@ void WorldSession::HandleQuestgiverQueryQuestOpcode(WorldPacket& recvData)
 
     if (Quest const* quest = sObjectMgr->GetQuestTemplate(questId))
     {
-        // not sure here what should happen to quests with QUEST_FLAGS_AUTO_COMPLETE
-        // if this breaks them, add && object->GetTypeId() == TYPEID_ITEM to this check
-        // item-started quests never have that flag
         if (!_player->CanTakeQuest(quest, true))
             return;
 
         if (quest->IsAutoAccept() && _player->CanAddQuest(quest, true))
-        {
             _player->AddQuestAndCheckCompletion(quest, object);
-           // _player->PlayerTalkClass->SendCloseGossip();
-        }
 
         if (quest->IsAutoComplete())
             _player->PlayerTalkClass->SendQuestGiverRequestItems(quest, object->GetGUID(), _player->CanCompleteQuest(quest->GetQuestId()), true);
         else
             _player->PlayerTalkClass->SendQuestGiverQuestDetails(quest, object->GetGUID(), quest->IsAutoAccept() ? false : true);
-
-        if (_player)
-            _player->SaveToDB(); // Save player.
     }
 }
 
@@ -282,6 +278,7 @@ void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPacket& recvData)
         return;
 
     Object* object = _player;
+
     if (GUID_HIPART(guid) == HIGHGUID_PLAYER)
         if (uint64 _guid = _player->GetQuestGiverGUID(questId))
             if (Object* _object = ObjectAccessor::GetObjectByTypeMask(*_player, _guid, TYPEMASK_UNIT | TYPEMASK_GAMEOBJECT | TYPEMASK_ITEM))
