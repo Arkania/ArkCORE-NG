@@ -704,7 +704,6 @@ void Map::Update(const uint32 t_diff)
         VisitNearbyCellsOf(obj, grid_object_update, world_object_update);
     }
 
-    ASSERT(!_transportLock); // gpn39f test
     _transportLock = true;
     for (auto transport : _transports)
         if (transport->IsInWorld())
@@ -727,6 +726,19 @@ void Map::Update(const uint32 t_diff)
         ProcessRelocationNotifies(t_diff);
 
     sScriptMgr->OnMapUpdate(this, t_diff);
+}
+
+void Map::SendSingleTransportUpdate()
+{
+    for (m_mapRefIter = m_mapRefManager.begin(); m_mapRefIter != m_mapRefManager.end(); ++m_mapRefIter)
+    {
+        Player* player = m_mapRefIter->GetSource();
+
+        if (!player || !player->IsInWorld())
+            continue;
+
+        SendSingleTransportUpdate(player);
+    }
 }
 
 void Map::SendSingleTransportUpdate(Player* player)
@@ -2490,7 +2502,7 @@ void Map::GetZoneAndAreaIdByAreaFlag(uint32& zoneid, uint32& areaid, uint16 area
 
 bool Map::isInLineOfSight(float x1, float y1, float z1, float x2, float y2, float z2, uint32 phasemask) const
 {
-    bool los1 = VMAP::VMapFactory::createOrGetVMapManager()->isInLineOfSight(GetId(), x1, y1, z1, x2, y2, z2);
+    bool los1 = VMAP::VMapFactory::createOrGetVMapManager()->isInLineOfSight(GetId(), x1, y1, z1, x2, y2, z2); // gpn39f
     bool los2 = _dynamicTree.isInLineOfSight(x1, y1, z1, x2, y2, z2, phasemask);
     return los1 && los2;
 }
@@ -2652,7 +2664,6 @@ inline void Map::setNGrid(NGridType *grid, uint32 x, uint32 y)
 
 void Map::DelayedUpdate(const uint32 t_diff)
 {
-    ASSERT(!_transportLock); // gpn39f test
     _transportLock = true;
     for (auto transport : _transports)
         if (transport->IsInWorld())
