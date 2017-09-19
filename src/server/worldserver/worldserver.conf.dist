@@ -405,9 +405,9 @@ PidFile = ""
 #
 #    PacketLogFile
 #        Description: Binary packet logging file for the world server.
-#                     Filename extension must be .bin to be parsable with WowPacketParser.
+#                     Filename extension must be .bin or .pkt to be parsable with WowPacketParser.
+#                     both Filename extension has a different output format. The pkt 3.1 format store more data and is preferred
 #        Example:     "World.bin" - (Enabled)
-                      Filename extension must be .pkt to be parsable with WowPacketParser. pkt format store more data.
 #        Example:     "World.pkt" - (Enabled)
 #        Default:     ""          - (Disabled)
 

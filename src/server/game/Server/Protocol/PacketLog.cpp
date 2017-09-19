@@ -97,8 +97,6 @@ PacketLog::~PacketLog()
     _file = nullptr;
 }
 
-/* Old Packet.log format .bin */
-
 void PacketLog::Initialize()
 {
     std::string logsDir = sConfigMgr->GetStringDefault("LogsDir", "");
