@@ -83,8 +83,7 @@ struct PacketHeader
     }
 };
 
-PacketLog::PacketLog() : _file(NULL),
-_pktLogType(0)
+PacketLog::PacketLog() : _file(NULL), _pktLogType(0)
 {
     std::call_once(_initializeFlag, &PacketLog::Initialize, this);
 }
@@ -97,6 +96,12 @@ PacketLog::~PacketLog()
     _file = nullptr;
 }
 
+PacketLog* PacketLog::instance()
+{
+    static PacketLog instance;
+    return &instance;
+}
+
 void PacketLog::Initialize()
 {
     std::string logsDir = sConfigMgr->GetStringDefault("LogsDir", "");
@@ -106,13 +111,14 @@ void PacketLog::Initialize()
             logsDir.push_back('/');
 
     std::string logname = sConfigMgr->GetStringDefault("PacketLogFile", "");
+    if (std::size_t found = logname.find(".pkt"))
+        _pktLogType = 1;
 
     if (!logname.empty())
-    {
         _file = fopen((logsDir + logname).c_str(), "wb");
-        if (std::size_t found = logname.find(".pkt"))
-            _pktLogType = 1;
-    }
+
+    if (_file == NULL)
+        perror("Open PacketLog: The following error occurred: ");
 
     if (IsPktLogFormat() && CanLogPacket())
     {

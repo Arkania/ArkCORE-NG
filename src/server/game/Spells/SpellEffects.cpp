@@ -6471,8 +6471,28 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
     }
 }
 
-void Spell::EffectChargeDest(SpellEffIndex /*effIndex*/)
+void Spell::EffectChargeDest(SpellEffIndex effIndex)
 {
+    if (!destTarget)
+        return;
+
+    if (effectHandleMode == SPELL_EFFECT_HANDLE_LAUNCH)
+    {
+        Position pos = destTarget->GetPosition();
+        float angle = m_caster->GetRelativeAngle(pos.GetPositionX(), pos.GetPositionY());
+        float dist = m_caster->GetDistance(pos);
+        pos = m_caster->GetFirstCollisionPosition(dist, angle);
+
+        m_caster->GetMotionMaster()->MoveCharge(pos.m_positionX, pos.m_positionY, pos.m_positionZ);
+    }
+    else if (effectHandleMode == SPELL_EFFECT_HANDLE_HIT)
+    {
+        uint32 tSpell = m_spellInfo->Effects[effIndex].TriggerSpell;
+        if (tSpell)
+            m_caster->CastSpell(destTarget->GetPositionX(), destTarget->GetPositionY(), destTarget->GetPositionZ(), tSpell, true, nullptr, nullptr, m_originalCasterGUID);
+    }
+
+    /* gpn39f 
     if (effectHandleMode != SPELL_EFFECT_HANDLE_LAUNCH)
         return;
 
@@ -6485,6 +6505,7 @@ void Spell::EffectChargeDest(SpellEffIndex /*effIndex*/)
 
         m_caster->GetMotionMaster()->MoveCharge(pos.m_positionX, pos.m_positionY, pos.m_positionZ);
     }
+    */
 }
 
 void Spell::EffectKnockBack(SpellEffIndex effIndex)
@@ -7781,7 +7802,6 @@ void Spell::EffectCreateAreaTrigger(SpellEffIndex effIndex)
         delete areaTrigger;
 }
 
-// gpn39f: workaround and test..
 void Spell::EffectTriggerSpell_160(SpellEffIndex effIndex)
 {
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)

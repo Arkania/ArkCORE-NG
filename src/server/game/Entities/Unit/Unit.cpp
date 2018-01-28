@@ -17563,26 +17563,6 @@ bool Unit::HandleSpellClick(Unit* clicker, int8 seatId)
         SpellInfo const* spellEntry = sSpellMgr->GetSpellInfo(itr->second.spellId);
         // if (!spellEntry) should be checked at npc_spellclick load
 
-        switch (itr->second.castFlags)
-        {
-        case 0:
-            if (!(caster->ToCreature() && target->ToCreature()))
-                continue;
-            break;
-        case 1:
-            if (!(caster->ToPlayer() && target->ToCreature()))
-                continue;
-            break;
-        case 2:
-            if (!(caster->ToCreature() && target->ToPlayer()))
-                continue;
-            break;
-        case 3:
-            if (!(caster->ToPlayer() && target->ToPlayer()))
-                continue;
-            break;
-        }
-
         if (seatId > -1)
         {
             uint8 i = 0;

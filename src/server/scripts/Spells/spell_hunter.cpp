@@ -34,7 +34,7 @@
 enum HunterSpells
 {
     SPELL_HUNTER_ANIMAL_HANDLER = 34453,
-    SPELL_HUNTER_SERPENT_STING                  = 1978,
+    SPELL_HUNTER_SERPENT_STING = 1978,
     SPELL_HUNTER_BESTIAL_WRATH = 19574,
     SPELL_HUNTER_READINESS = 23989,
     SPELL_HUNTER_IMPROVED_MEND_PET = 24406,
@@ -74,7 +74,12 @@ enum HunterSpells
     SPELL_HUNTER_TERMINATION_RANK_2 = 83490,
     SPELL_HUNTER_GLYPH_KILL_SHOT_CD = 90967,
     SPELL_HUNTER_GENERIC_ENERGIZE_FOCUS = 91954,
-    SPELL_HUNTER_INSANITY                           = 95809,
+    SPELL_HUNTER_INSANITY = 95809,
+    SPELL_HUNTER_CAMOUFLAGE = 51755,
+    SPELL_HUNTER_CAMOUFLAGE_STEALTH = 80325,
+    SPELL_HUNTER_CAMOUFLAGE_VISUAL = 80326,
+    SPELL_HUNTER_GLYPH_OF_CAMOUFLAGE = 119449,
+    SPELL_HUNTER_GLYPH_OF_CAMOUFLAGE_VISUAL = 119450,
 
 };
 
@@ -1128,13 +1133,22 @@ public:
     {
         PrepareSpellScript(spell_hun_camouflage_SpellScript);
 
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            if (!sSpellMgr->GetSpellInfo(SPELL_HUNTER_CAMOUFLAGE))
+                return false;
+            return true;
+        }
+
         void HandleDummy(SpellEffIndex /*effIndex*/)
         {
-            Unit* caster = GetCaster();
-            caster->CastSpell(caster, 51755, true);
-            if (caster->ToPlayer())
-                if (Pet* pet = caster->ToPlayer()->GetPet())
-                    pet->CastSpell(pet, 51755, true);
+            if (Unit* caster = GetCaster())
+            {
+                caster->CastSpell(caster, SPELL_HUNTER_CAMOUFLAGE, true);
+                if (Unit* pet = caster->GetGuardianPet())
+                    pet->CastSpell(pet, SPELL_HUNTER_CAMOUFLAGE, true);
+            }
         }
 
         void Register()
@@ -1149,6 +1163,48 @@ public:
     }
 };
 
+// 51755 - Camouflage
+class spell_hun_camouflage_visual : public SpellScriptLoader
+{
+public:
+    spell_hun_camouflage_visual() : SpellScriptLoader("spell_hun_camouflage_visual") { }
+
+    class spell_hun_camouflage_visual_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_hun_camouflage_visual_AuraScript);
+
+        void OnApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+        {
+            if (Unit* target = GetTarget())
+                target->CastSpell(target, SPELL_HUNTER_CAMOUFLAGE_VISUAL, true);
+        }
+
+        void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            if (Unit* caster = GetCaster())
+            {
+                caster->RemoveAura(SPELL_HUNTER_CAMOUFLAGE_VISUAL);
+                caster->RemoveAura(SPELL_HUNTER_GLYPH_OF_CAMOUFLAGE_VISUAL);
+                caster->RemoveAura(SPELL_HUNTER_CAMOUFLAGE_STEALTH);
+
+                if (Unit* pet = caster->GetGuardianPet())
+                    pet->RemoveAura(SPELL_HUNTER_CAMOUFLAGE);
+            }
+        }
+
+        void Register()
+        {
+            AfterEffectApply += AuraEffectApplyFn(spell_hun_camouflage_visual_AuraScript::OnApply, EFFECT_0, SPELL_AURA_INTERFERE_TARGETTING, AURA_EFFECT_HANDLE_REAL);
+            AfterEffectRemove += AuraEffectRemoveFn(spell_hun_camouflage_visual_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_INTERFERE_TARGETTING, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_hun_camouflage_visual_AuraScript();
+    }
+};
+
 // 80326 - Camouflage periodic
 class spell_hun_camouflage_periodic : public SpellScriptLoader
 {
@@ -1159,10 +1215,27 @@ public:
     {
         PrepareAuraScript(spell_hun_camouflage_periodic_AuraScript);
 
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            if (!sSpellMgr->GetSpellInfo(SPELL_HUNTER_CAMOUFLAGE_VISUAL))
+                return false;
+            return true;
+        }
+
         void HandlePeriodic(AuraEffect const* aurEff)
         {
             if (GetUnitOwner()->isMoving())
                 PreventDefaultAction();
+            if (Unit* caster = GetTarget())
+            {
+                if ((caster->isMoving() && !caster->HasAura(SPELL_HUNTER_GLYPH_OF_CAMOUFLAGE)) || caster->HasAura(SPELL_HUNTER_CAMOUFLAGE_STEALTH))
+                    return;
+
+                if (caster->HasAura(SPELL_HUNTER_GLYPH_OF_CAMOUFLAGE))
+                    caster->CastSpell(caster, SPELL_HUNTER_GLYPH_OF_CAMOUFLAGE_VISUAL, true);
+                else
+                    caster->CastSpell(caster, SPELL_HUNTER_CAMOUFLAGE_STEALTH, true);
+            }
         }
 
         void Register()
@@ -2388,6 +2461,7 @@ void AddSC_hunter_spell_scripts()
     new spell_hun_ancient_hysteria();
     new spell_hun_animal_handler();
     new spell_hun_camouflage();
+    new spell_hun_camouflage_visual();
     new spell_hun_camouflage_periodic();
     new spell_hun_chimera_shot();
     new spell_hun_cobra_shot();

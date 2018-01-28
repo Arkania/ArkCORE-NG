@@ -44,7 +44,7 @@ enum eStormwind
 
     SPELL_QUEST_GENERIC_ZONE_SPECIFIC_02 = 59074,
     SPELL_QUEST_ZONE_SPECIFIC_02 = 78318,
-    QUEST_CALL_OF_DUTY = 14482,
+    QUEST_CALL_OF_DUTY_ALLIANCE = 14482,
     QUEST_A_PERSONAL_SUMMONS = 28825,
 };
 
@@ -61,6 +61,23 @@ enum eNpcStormwindSoldier /* List of database guids of all creature involved bri
     eStormSoldTay = 117111,
 };
 
+
+// player
+class player_zone_stormwind_city : public PlayerScript
+{
+public:
+    player_zone_stormwind_city() : PlayerScript("player_zone_stormwind_city") { }
+
+    void OnQuestRemove(Player* player, uint32 questId) override
+    {
+        switch (questId)
+        {
+        case QUEST_CALL_OF_DUTY_ALLIANCE:
+            player->RemoveAura(SPELL_QUEST_GENERIC_ZONE_SPECIFIC_02);
+            break;
+        }
+    }
+};
 
  // 2708
 class npc_archmage_malin_2708 : public CreatureScript
@@ -143,7 +160,7 @@ public:
     { 
         switch (quest->GetQuestId())
         {
-        case QUEST_CALL_OF_DUTY:
+        case QUEST_CALL_OF_DUTY_ALLIANCE:
             player->CastSpell(player, SPELL_QUEST_GENERIC_ZONE_SPECIFIC_02, true);
             break;
         }
@@ -468,6 +485,7 @@ public:
 
 void AddSC_stormwind_city()
 {
+    new player_zone_stormwind_city();
     new npc_archmage_malin_2708();
     new at_stormwind_command_board();
     new at_stormwind_teleport_area();

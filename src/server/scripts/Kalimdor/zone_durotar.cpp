@@ -860,7 +860,8 @@ public:
             {
             case AREA_ALLIANCE_4411:
             case AREA_HORDE_374:
-                m_areaId = me->GetAreaId();
+                if (abs(me->GetPositionZ() - 30.00427f) < 1.0f)
+                    m_areaId = me->GetAreaId();
                 break;
             }
         }
@@ -869,10 +870,10 @@ public:
         {
             if (Player* player = who->ToPlayer())
                 if (m_areaId == AREA_ALLIANCE_4411 || m_areaId == AREA_HORDE_374)
-            {
+                {
                     me->setActive(true);
                     m_events.RescheduleEvent(EVENT_SET_ACTIVE_TO_FALSE, 10 * MINUTE * 1000);
-            }
+                }
 
             if (!m_vashjirShipGUID || m_commanderGUID || m_guardsGUID.size() < 8)
                 FindAllMembersWorldwide();
@@ -1394,8 +1395,8 @@ public:
             printf("Alliance Ship EventID: %u \n", param);
             switch (param) // alliance
             {
-            case 25769:  // 20 sec before teleport, after teleport: 60 sec before arrived on bridge
-                printf("Alliance Ship 20 sec before teleport to startpoint \n");
+            case 25769:  
+                printf("Abfahrt: Tritt mehrfach auf.. \n");
                 if (m_animState == 11)
                 {
                     m_animState = 12;

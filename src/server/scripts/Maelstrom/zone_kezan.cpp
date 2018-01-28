@@ -4120,9 +4120,9 @@ public:
                 if (Player* player = passenger->ToPlayer())
                 {
                     m_playerGUID = passenger->GetGUID();
-                    player->CastSpell(me, SPELL_SASSYS_DRIVING, true);
-                    player->CastSpell(player, SPELL_HAND_OVER_THE_KEYS, true);
-                    me->CastSpell(me, SPELL_KNOCKBACK_TRIGGER, true);
+                    player->CastSpell(me, SPELL_SASSYS_DRIVING, true);          // player receive aura, player cast to car, hit player and car..
+                    player->CastSpell(player, SPELL_HAND_OVER_THE_KEYS, true);  // player cast to self
+                    player->CastSpell(me, SPELL_KNOCKBACK_TRIGGER, true);       // player receive aura, player cast to self
                 }
                 else if (Creature* npc = passenger->ToCreature())
                     if (npc->GetEntry() == 37680)
