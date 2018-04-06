@@ -24,7 +24,6 @@
 #include "WorldPacket.h"
 
 #include <thread>
-#include <mutex>
 
  // Packet logging structures in PKT 3.1 format
 struct LogHeader
