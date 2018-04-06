@@ -21,6 +21,7 @@
 
 #include "Common.h"
 #include <ace/Singleton.h>
+#include <mutex>
 
 enum Direction
 {
