@@ -99,8 +99,110 @@ public:
     }
 };
 
+class npc_feralas_hippogryph_5300 : public CreatureScript
+{
+public:
+    npc_feralas_hippogryph_5300() : CreatureScript("npc_feralas_hippogryph_5300") {}
+
+    enum quest_enums
+    {
+        SPELL_CAST_HIPPOGRYPH_CALL = 74674,
+        SPELL_CAST_NET = 54997,
+        HORDE_POACHER = 40069
+    };
+
+    struct npc_feralas_hippogryph_5300AI : public ScriptedAI
+    {
+        npc_feralas_hippogryph_5300AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+        EventMap  _events;
+        uint64    _playerGUID;
+        bool      _hippo_called, _poacher_check;
+
+        void Initialize()
+        {
+        }
+
+        void Reset() override
+        {
+            _playerGUID = 0;
+            _hippo_called = false;
+        }
+
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
+        {
+            if (Player* player = caster->ToPlayer())
+                if (spell->Id == SPELL_CAST_HIPPOGRYPH_CALL && _hippo_called == false)
+                {
+                    _playerGUID = player->GetGUID();
+                    _hippo_called = true;
+                    me->SetFacingTo(me->GetAngle(player->GetPositionX(), player->GetPositionY()));
+
+                    _events.ScheduleEvent(EVENT_CHECK_FOR_PLAYER, 1000);
+                }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            _events.Update(diff);
+
+            while (uint32 eventId = _events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_CHECK_FOR_PLAYER:
+                {
+                    Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID);
+                    if (player)
+                    {
+                        if (_hippo_called == true)
+                        {
+                            Position front_pos = me->GetNearPositionInFront(18, 0.1f);
+
+                            me->GetMotionMaster()->Clear(true);
+                            me->GetMotionMaster()->MoveJump(Position(front_pos.GetPositionX(), front_pos.GetPositionY(), me->GetPositionZ() + 18), 6.0f, 6.0f);
+                            me->DespawnOrUnsummon(3000);
+
+                            player->KilledMonsterCredit(40072);
+                            _hippo_called = false;
+
+                            _events.ScheduleEvent(EVENT_CHECK_FOR_PLAYER, 1000);
+                        }
+                        else
+                        {
+                            if (urand(0, 100) <= 66)
+                            {
+                                Creature* creature = DoSpawnCreature(HORDE_POACHER, 0, 0, 0, me->GetOrientation(),
+                                    TEMPSUMMON_CORPSE_TIMED_DESPAWN, 0);
+
+                                if (creature)
+                                {
+                                    creature->AddToWorld();
+                                    creature->AddThreat(player, 99999);
+                                    creature->CastSpell(player, SPELL_CAST_NET);
+                                    creature->AI()->AttackStart(player);
+                                }
+                            }
+                        }
+
+                    }
+
+                }
+                }
+            }
+        }
+
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_feralas_hippogryph_5300AI(creature);
+    }
+};
+
 void AddSC_zone_feralas()
 {
     new npc_feralas_wisp_40079();
+    new npc_feralas_hippogryph_5300();
 
 }
