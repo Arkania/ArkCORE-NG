@@ -17,6 +17,7 @@
  */
 
 #include "ScriptMgr.h"
+#include "script_helper.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
@@ -173,8 +174,121 @@ public:
     }
 };
 
+class npc_druid_only_flights : public CreatureScript
+{
+public:
+    npc_druid_only_flights() : CreatureScript("npc_druid_only_flights") {}
+
+    enum script_enums
+    {
+        RUTTHERAN_TAXI_NODE = 315,
+        THUNDER_TAXI_NODE = 316,
+        NPC_SILVA_FILNAVETH = 11800,
+        NPC_BUNTHEN = 11798,
+        MENU_OPT_FLY_RUTTHERAN = 7573,
+        MENU_OPT_FLY_THUNDER_BLUFF = 12804,
+        MENU_OPT_PENDANT = 8035,
+        TEXT_PENDANT_LOCATION_ALLIANCE = 5373,
+        TEXT_PENDANT_LOCATION_HORDE = 5374,
+        TEXT_NOT_A_DRUID = 4916
+    };
+
+
+    struct npc_druid_only_flightsAI : public ScriptedAI
+    {
+        npc_druid_only_flightsAI(Creature* creature) : ScriptedAI(creature) {}
+
+        EventMap _events;
+
+        void Reset() override
+        {
+            _events.Reset();
+        }
+
+        void sGossipHello(Player* player) override
+        {
+            player->PlayerTalkClass->ClearMenus();
+
+            if (player->getClass() == CLASS_DRUID)
+            {
+                LocaleConstant locale = player->GetSession()->GetSessionDbLocaleIndex();
+
+                if (me->GetEntry() == NPC_SILVA_FILNAVETH)
+                {
+                    if (player->GetTeamId() == TEAM_ALLIANCE)
+                    {
+                        player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, sObjectMgr->GetBroadcastText(MENU_OPT_FLY_RUTTHERAN)->GetText(locale), GOSSIP_SENDER_MAIN, 1);
+                        if (player->GetQuestStatus(272) == QUEST_STATUS_INCOMPLETE)
+                            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, sObjectMgr->GetBroadcastText(MENU_OPT_PENDANT)->GetText(locale), GOSSIP_SENDER_MAIN, 2);
+                        player->SEND_GOSSIP_MENU(4914, me->GetGUID());
+                    }
+                    else
+                        player->SEND_GOSSIP_MENU(4915, me->GetGUID());
+
+                }
+                else if (me->GetEntry() == NPC_BUNTHEN)
+                {
+                    if (player->GetTeamId() == TEAM_HORDE)
+                    {
+                        player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, sObjectMgr->GetBroadcastText(MENU_OPT_FLY_THUNDER_BLUFF)->GetText(locale), GOSSIP_SENDER_MAIN, 1);
+                        if (player->GetQuestStatus(30) == QUEST_STATUS_INCOMPLETE)
+                            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, sObjectMgr->GetBroadcastText(MENU_OPT_PENDANT)->GetText(locale), GOSSIP_SENDER_MAIN, 2);
+                        player->SEND_GOSSIP_MENU(4918, me->GetGUID());
+                    }
+                    else
+                        player->SEND_GOSSIP_MENU(4917, me->GetGUID());
+
+                }
+            } else
+                player->SEND_GOSSIP_MENU(TEXT_NOT_A_DRUID, me->GetGUID());
+        }
+
+        void sGossipSelect(Player* player, uint32 sender, uint32 action) override
+        {
+            player->PlayerTalkClass->ClearMenus();
+
+            switch (action)
+            {
+            case 0:
+                player->CLOSE_GOSSIP_MENU();
+                if (player->GetTeamId() == TEAM_ALLIANCE)
+                    player->ActivateTaxiPathTo(RUTTHERAN_TAXI_NODE);
+                else if (player->GetTeamId() == TEAM_HORDE)
+                    player->ActivateTaxiPathTo(THUNDER_TAXI_NODE);
+
+                break;
+            case 1:
+                if (player->GetTeamId() == TEAM_ALLIANCE)
+                    player->SEND_GOSSIP_MENU(TEXT_PENDANT_LOCATION_ALLIANCE, me->GetGUID());
+                else if (player->GetTeamId() == TEAM_HORDE)
+                    player->SEND_GOSSIP_MENU(TEXT_PENDANT_LOCATION_HORDE, me->GetGUID());
+
+                break;
+
+            }
+
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            _events.Update(diff);
+
+            while (uint32 eventId = _events.ExecuteEvent())
+            {
+            }
+        }
+
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_druid_only_flightsAI(creature);
+    }
+};
+
 void AddSC_moonglade()
 {
     new npc_omen();
     new npc_giant_spotlight();
+    new npc_druid_only_flights();
 }
