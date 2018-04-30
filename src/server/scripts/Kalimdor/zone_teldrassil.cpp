@@ -148,8 +148,57 @@ public:
 		return new npc_wounded_sentinel_44617AI(creature);
 	}
 };
+
+class npc_fidellio_40553 : public CreatureScript
+{
+public:
+    npc_fidellio_40553() : CreatureScript("npc_fidellio_40553") {}
+
+    enum script_enums
+    {
+        QUEST_ID = 6341,
+        DARNASSUS_TAXI_NODE = 457,
+    };
+
+
+    struct npc_fidellioAI : public ScriptedAI
+    {
+        npc_fidellioAI(Creature* creature) : ScriptedAI(creature) {}
+
+        EventMap _events;
+
+        void Reset() override
+        {
+            _events.Reset();
+        }
+
+        void sGossipHello(Player* player) override
+        {
+            if (player->GetQuestStatus(QUEST_ID) == QUEST_STATUS_COMPLETE)
+                player->GetSession()->SendDiscoverNewTaxiNode(DARNASSUS_TAXI_NODE);
+        }
+
+
+        void UpdateAI(uint32 diff) override
+        {
+            _events.Update(diff);
+
+            while (uint32 eventId = _events.ExecuteEvent())
+            {
+            }
+        }
+
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_fidellioAI(creature);
+    }
+};
+
 void AddSC_teldrassil()
 {
     new npc_mist();
     new npc_wounded_sentinel_44617();
+    new npc_fidellio_40553();
 }
