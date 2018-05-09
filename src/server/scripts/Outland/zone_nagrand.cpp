@@ -30,6 +30,7 @@ npc_maghar_captive
 npc_creditmarker_visit_with_ancestors
 EndContentData */
 #include "ScriptMgr.h"
+#include "script_helper.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "ScriptedEscortAI.h"
@@ -713,6 +714,153 @@ class go_warmaul_prison : public GameObjectScript
         }
 };
 
+class npc_lump_18351 : public CreatureScript
+{
+public:
+    npc_lump_18351() : CreatureScript("npc_lump_18351") {}
+
+    enum script_enums
+    {
+        QUEST_ID = 9918,
+        QUEST_CREDIT = 18354,
+        SPELL_SHOULDER_CHARGE = 31994,
+        TEXT_LUMP_START_ATTACK = 15278,
+        MENU_I_NEED_ANSWERS = 21290,
+        MENU_WHY_BOULDERFIST_FAR = 21291,
+        MENU_AND_YOU_THINK = 21292,
+        MENU_THIS_MEANS_WAR = 21293,
+        MENU_YOU_BRING_DA_WAR = 21294
+    };
+
+    struct npc_lump_18351AI : public ScriptedAI
+    {
+        npc_lump_18351AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+        EventMap  _events;
+        bool      _in_combat;
+        uint64    _playerGUID;
+        uint8      _gossip_menu_index;
+
+        void Initialize()
+        {
+        }
+
+        void Reset() override
+        {
+            _playerGUID = 0;
+            _gossip_menu_index = 0;
+            _in_combat = false;
+            me->setFaction(38);
+        }
+
+        void sGossipHello(Player* player) override
+        {
+            if (player->GetQuestStatus(QUEST_ID) == QUEST_STATUS_INCOMPLETE)
+            {
+                _gossip_menu_index = 1;
+                player->PrepareGossipMenu(me, MENU_I_NEED_ANSWERS);
+                player->SendPreparedGossip(me);
+            }
+
+        }
+
+        void sGossipSelect(Player* player, uint32 sender, uint32 action) override
+        {
+            if (player->GetQuestStatus(QUEST_ID) == QUEST_STATUS_INCOMPLETE)
+            {
+                switch (_gossip_menu_index)
+                {
+                case 1:
+                    player->PrepareGossipMenu(me, MENU_WHY_BOULDERFIST_FAR);
+                    player->SendPreparedGossip(me);
+                    break;
+                case 2:
+                    player->PrepareGossipMenu(me, MENU_AND_YOU_THINK);
+                    player->SendPreparedGossip(me);
+                    break;
+                case 3:
+                    player->PrepareGossipMenu(me, MENU_THIS_MEANS_WAR);
+                    player->SendPreparedGossip(me);
+                    break;
+                case 4:
+                    player->PrepareGossipMenu(me, MENU_YOU_BRING_DA_WAR);
+                    player->SendPreparedGossip(me);
+                    player->KilledMonsterCredit(QUEST_CREDIT);
+                    break;
+                }
+
+                _gossip_menu_index++;
+            }
+        }
+
+        void EnterCombat(Unit* who) override
+        {
+            if (Player* player = who->ToPlayer())
+            {
+                me->AI()->AttackStart(player);
+                me->Say(TEXT_LUMP_START_ATTACK + urand(0, 1));
+                me->CastSpell(player, SPELL_SHOULDER_CHARGE);
+
+                _playerGUID = player->GetGUID();
+                _in_combat = true;
+                _events.ScheduleEvent(EVENT_CHECK_FOR_PLAYER, 1000);
+            }
+        }
+
+        void DamageTaken(Unit* attacker, uint32& damage)
+        {
+            if (Player* player = attacker->ToPlayer())
+            {
+                if (player->GetQuestStatus(QUEST_ID) == QUEST_STATUS_INCOMPLETE && me->HealthBelowPctDamaged(30.00f, damage))
+                {
+                    me->CombatStop();
+                    me->SetReactState(REACT_PASSIVE);
+                    me->setFaction(1080);
+                    me->SetHealth(me->GetMaxHealth() * 0.30f);
+                    me->DespawnOrUnsummon(30000);
+                    player->ClearInCombat();
+
+                    _in_combat = false;
+                    damage = 0;
+                }
+            }
+        }
+
+
+        void UpdateAI(uint32 diff) override
+        {
+            _events.Update(diff);
+
+            while (uint32 eventId = _events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_CHECK_FOR_PLAYER:
+                {
+                    Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID);
+                    if (player)
+                    {
+                        if (_in_combat == true)
+                        {
+                            me->AI()->DoMeleeAttackIfReady();
+                            _events.ScheduleEvent(EVENT_CHECK_FOR_PLAYER, 1000);
+                        }
+
+                    }
+                }
+                }
+            }
+        }
+
+    };
+
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_lump_18351AI(creature);
+    }
+};
+
 void AddSC_nagrand()
 {
     new npc_greatmother_geyah();
@@ -722,4 +870,5 @@ void AddSC_nagrand()
     new go_corkis_prison();
     new npc_kurenai_captive();
     new go_warmaul_prison();
+    new npc_lump_18351();
 }
