@@ -1,7 +1,7 @@
 
 UPDATE creature_template SET InhabitType=4, speed_run=1.42857, AIName='',ScriptName='npc_feralas_hippogryph_5300' WHERE entry IN (5300, 5304);
 
-UPDATE creature_template SET AIName='',ScriptName='' WHERE entry=7584;
+UPDATE creature_template SET AIName='',ScriptName='npc_wandering_forest_walker_7584' WHERE entry=7584;
 
 UPDATE creature_template SET equipment_id=40069, AIName='',ScriptName='npc_horde_poacher_40069' WHERE entry=40069;
 

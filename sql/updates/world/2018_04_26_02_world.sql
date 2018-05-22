@@ -92,8 +92,8 @@ UPDATE locales_quest SET OfferRewardText_loc3="Gut gemacht, $N! Ich werde dafür
  
 UPDATE locales_quest SET CompletedText_loc3="Kehrt zu Grazle im Teufelswald zurück." WHERE id=28396;
  
-UPDATE quest_template SET PrevQuestId=28100, NextQuestId=0 WHERE id=27989;
-UPDATE quest_template SET PrevQuestId=27989, NextQuestId=0 WHERE id=27994;
+UPDATE quest_template SET PrevQuestId=28100, NextQuestId=0, ExclusiveGroup=0 WHERE id=27989;
+UPDATE quest_template SET PrevQuestId=27989, NextQuestId=0, ExclusiveGroup=0 WHERE id=27994;
 UPDATE quest_template SET PrevQuestId=27994, NextQuestId=0 WHERE id=27995;
 UPDATE quest_template SET PrevQuestId=27995, NextQuestId=0 WHERE id=28150;
  
