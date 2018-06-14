@@ -7572,7 +7572,7 @@ void Player::SetSkill(uint16 id, uint16 step, uint16 newVal, uint16 maxVal)
     SkillStatusMap::iterator itr = mSkillStatus.find(id);
 
     //has skill
-    if (itr != mSkillStatus.end() && itr->second.uState != SKILL_DELETED)
+    if (itr != mSkillStatus.end() && itr->second.uState != SKILL_DELETED && itr->second.uState != SKILL_TEMPORARY)
     {
         uint16 field = itr->second.pos / 2;
         uint8 offset = itr->second.pos & 1; // itr->second.pos % 2
@@ -7630,6 +7630,65 @@ void Player::SetSkill(uint16 id, uint16 step, uint16 newVal, uint16 maxVal)
             else if (GetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1 + 1) == id)
                 SetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1 + 1, 0);
         }
+    }
+    else if (itr->second.uState == SKILL_TEMPORARY)
+    {
+        currVal = 0;
+        uint32 i = itr->second.pos;
+        uint16 field = i / 2;
+        uint8 offset = i & 1; // i % 2
+
+        SkillLineEntry const* skillEntry = sSkillLineStore.LookupEntry(id);
+        if (!skillEntry)
+        {
+            TC_LOG_ERROR("misc", "Skill not found in SkillLineStore: skill #%u", id);
+            return;
+        }
+
+        SetUInt16Value(PLAYER_SKILL_LINEID_0 + field, offset, id);
+        if (skillEntry->categoryId == SKILL_CATEGORY_PROFESSION)
+        {
+            if (!GetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1))
+                SetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1, id);
+            else if (!GetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1 + 1))
+                SetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1 + 1, id);
+        }
+
+        SetUInt16Value(PLAYER_SKILL_STEP_0 + field, offset, step);
+        SetUInt16Value(PLAYER_SKILL_RANK_0 + field, offset, newVal);
+        SetUInt16Value(PLAYER_SKILL_MAX_RANK_0 + field, offset, maxVal);
+
+        UpdateSkillEnchantments(id, currVal, newVal);
+        UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL, id);
+        UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILL_LEVEL, id);
+
+        // insert new entry or update if not deleted old entry yet
+        if (itr != mSkillStatus.end())
+        {
+            itr->second.pos = i;
+            itr->second.uState = SKILL_CHANGED;
+        }
+        else
+            mSkillStatus.insert(SkillStatusMap::value_type(id, SkillStatusData(i, SKILL_NEW)));
+
+        // apply skill bonuses
+        SetUInt16Value(PLAYER_SKILL_MODIFIER_0 + field, offset, 0);
+        SetUInt16Value(PLAYER_SKILL_TALENT_0 + field, offset, 0);
+
+        // temporary bonuses
+        AuraEffectList const& mModSkill = GetAuraEffectsByType(SPELL_AURA_MOD_SKILL);
+        for (AuraEffectList::const_iterator j = mModSkill.begin(); j != mModSkill.end(); ++j)
+            if ((*j)->GetMiscValue() == int32(id))
+                (*j)->HandleEffect(this, AURA_EFFECT_HANDLE_SKILL, true);
+
+        // permanent bonuses
+        AuraEffectList const& mModSkillTalent = GetAuraEffectsByType(SPELL_AURA_MOD_SKILL_TALENT);
+        for (AuraEffectList::const_iterator j = mModSkillTalent.begin(); j != mModSkillTalent.end(); ++j)
+            if ((*j)->GetMiscValue() == int32(id))
+                (*j)->HandleEffect(this, AURA_EFFECT_HANDLE_SKILL, true);
+
+        // Learn all spells for skill
+        learnSkillRewardedSpells(id, newVal);
     }
     else if (newVal)                                        //add
     {
@@ -7704,7 +7763,38 @@ bool Player::HasSkill(uint32 skill) const
         return false;
 
     SkillStatusMap::const_iterator itr = mSkillStatus.find(skill);
-    return (itr != mSkillStatus.end() && itr->second.uState != SKILL_DELETED);
+    return (itr != mSkillStatus.end() && itr->second.uState != SKILL_DELETED && itr->second.uState != SKILL_TEMPORARY);
+}
+
+void Player::AddTemporarySkill(uint32 skill)
+{
+    SkillStatusMap::const_iterator itr = mSkillStatus.find(skill);
+    if (itr != mSkillStatus.end())
+        return;
+
+    for (uint32 i = 0; i < PLAYER_MAX_SKILLS; ++i)
+    {
+        uint16 field = i / 2;
+        uint8 offset = i & 1; // i % 2
+
+        if (!GetUInt16Value(PLAYER_SKILL_LINEID_0 + field, offset))
+        {
+            SkillLineEntry const* skillEntry = sSkillLineStore.LookupEntry(skill);
+            if (!skillEntry)
+            {
+                TC_LOG_ERROR("misc", "Skill not found in SkillLineStore: skill #%u", skill);
+                return;
+            }
+
+            SetUInt16Value(PLAYER_SKILL_LINEID_0 + field, offset, skill);
+            SetUInt16Value(PLAYER_SKILL_STEP_0 + field, offset, 0);
+            SetUInt16Value(PLAYER_SKILL_RANK_0 + field, offset, 0);
+            SetUInt16Value(PLAYER_SKILL_MAX_RANK_0 + field, offset, 0);
+
+            mSkillStatus.insert(SkillStatusMap::value_type(skill, SkillStatusData(i, SKILL_TEMPORARY)));
+            return;
+        }
+    }
 }
 
 uint16 Player::GetSkillStep(uint16 skill) const
@@ -15802,13 +15892,12 @@ void Player::PrepareGossipMenu(WorldObject* source, uint32 menuId /*= 0*/, bool 
     for (GossipMenuItemsContainer::const_iterator itr = menuItemBounds.first; itr != menuItemBounds.second; ++itr)
     {
         bool canTalk = true;
-        bool trainerFlag = false;
 
         ConditionSourceInfo srcInfo = ConditionSourceInfo(this, source);
         if (!itr->second.Conditions.empty())
 
-        if (!sConditionMgr->IsObjectMeetToConditions(this, source, itr->second.Conditions))
-            continue;
+            if (!sConditionMgr->IsObjectMeetToConditions(this, source, itr->second.Conditions))
+                continue;
 
         if (Creature* creature = source->ToCreature())
         {
@@ -15862,13 +15951,18 @@ void Player::PrepareGossipMenu(WorldObject* source, uint32 menuId /*= 0*/, bool 
                 canTalk = false;
                 break;
             case GOSSIP_OPTION_TRAINER:
-                if (creature->GetCreatureTemplate()->trainer_type == TRAINER_TYPE_CLASS)
-                {
-                    trainerFlag = true;
-                    if (getClass() != creature->GetCreatureTemplate()->trainer_class)
-                        canTalk = false;
-                }
+            {
+                if (const CreatureTemplate* ct = creature->GetCreatureTemplate())
+                    if (getClass() != ct->trainer_class && ct->trainer_type == TRAINER_TYPE_CLASS)
+                    {
+                        TC_LOG_ERROR("sql.sql", "GOSSIP_OPTION_TRAINER:: Player %s (GUID: %u) request wrong gossip menu: %u with wrong class: %u at Creature: %s (Entry: %u, Trainer Class: %u)",
+                            GetName().c_str(), GetGUIDLow(), menu->GetGossipMenu().GetMenuId(), getClass(), creature->GetName().c_str(), creature->GetEntry(), ct->trainer_class);
+                    }
+
+                if (TrainerSpellData const* trainer_spells = creature->GetTrainerSpells())
+                    AddTemporarySkill(trainer_spells->GetTrainerSkillID());
                 break;
+            }
             case GOSSIP_OPTION_GOSSIP:
             case GOSSIP_OPTION_SPIRITGUIDE:
             case GOSSIP_OPTION_INNKEEPER:
@@ -15903,13 +15997,6 @@ void Player::PrepareGossipMenu(WorldObject* source, uint32 menuId /*= 0*/, bool 
 
         if (canTalk)
         {
-            if (trainerFlag)
-                if (Creature* creature = source->ToCreature())
-                    if (getClass() != creature->GetCreatureTemplate()->trainer_class)
-                        TC_LOG_ERROR("sql.sql", "GOSSIP_OPTION_TRAINER:: Player %s (GUID: %u) requested wrong gossip menu: %u with wrong class: %u at Creature: %s (Entry: %u, Trainer Class: %u)",
-                            GetName().c_str(), GUID_LOPART(GetGUID()), menu->GetGossipMenu().GetMenuId(), getClass(), creature->GetName().c_str(),
-                            creature->GetEntry(), creature->GetCreatureTemplate()->trainer_class);
-
             std::string strOptionText, strBoxText;
             BroadcastText const* optionBroadcastText = sObjectMgr->GetBroadcastText(itr->second.OptionBroadcastTextId);
             BroadcastText const* boxBroadcastText = sObjectMgr->GetBroadcastText(itr->second.BoxBroadcastTextId);
@@ -27312,6 +27399,23 @@ void Player::_LoadSkills(PreparedQueryResult result)
     // Archaeology: On Main Load, if skill is present, do a init
     if (HasSkill(SKILL_ARCHAEOLOGY))
         GetArchaeologyMgr().Initialize();
+
+    AddTemporarySkill(129);
+    AddTemporarySkill(164);
+    AddTemporarySkill(165);
+    AddTemporarySkill(171);
+    AddTemporarySkill(182);
+    AddTemporarySkill(185);
+    AddTemporarySkill(186);
+    AddTemporarySkill(197);
+    AddTemporarySkill(202);
+    AddTemporarySkill(333);
+    AddTemporarySkill(356);
+    AddTemporarySkill(393);
+    AddTemporarySkill(755);
+    AddTemporarySkill(762);
+    AddTemporarySkill(773);
+    AddTemporarySkill(794);
 }
 
 InventoryResult Player::CanEquipUniqueItem(Item* pItem, uint8 eslot, uint32 limit_count) const

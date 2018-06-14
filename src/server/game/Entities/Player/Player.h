@@ -632,7 +632,8 @@ enum SkillUpdateState
     SKILL_UNCHANGED     = 0,
     SKILL_CHANGED       = 1,
     SKILL_NEW           = 2,
-    SKILL_DELETED       = 3
+    SKILL_DELETED       = 3,
+    SKILL_TEMPORARY     = 4
 };
 
 struct SkillStatusData
@@ -2161,6 +2162,7 @@ class Player : public Unit, public GridObject<Player>
         uint16 GetSkillStep(uint16 skill) const;            // 0...6
         uint32 GetProfessionSkillId(int32 offset) const;
         bool HasSkill(uint32 skill) const;
+        void AddTemporarySkill(uint32 skill);
         void learnSkillRewardedSpells(uint32 id, uint32 value);
 
         WorldLocation& GetTeleportDest() { return m_teleport_dest; }

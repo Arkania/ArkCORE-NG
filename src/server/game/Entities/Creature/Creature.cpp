@@ -66,6 +66,16 @@ TrainerSpell const* TrainerSpellData::Find(uint32 spell_id) const
     return NULL;
 }
 
+// returns the SkillID, Teached from this trainer
+uint32 TrainerSpellData::GetTrainerSkillID() const
+{
+    for (TrainerSpellMap::const_iterator itr = spellList.begin(); itr != spellList.end(); ++itr)
+        if (itr->second.reqSkill)
+            return itr->second.reqSkill;
+
+    return 0;
+}
+
 bool VendorItemData::RemoveItem(uint32 item_id, uint8 type)
 {
     bool found = false;
