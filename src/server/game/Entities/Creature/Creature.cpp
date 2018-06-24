@@ -67,7 +67,7 @@ TrainerSpell const* TrainerSpellData::Find(uint32 spell_id) const
 }
 
 // returns the SkillID, Teached from this trainer
-uint32 TrainerSpellData::GetTrainerSkillID() const
+uint16 TrainerSpellData::GetTrainerSkillID() const
 {
     for (TrainerSpellMap::const_iterator itr = spellList.begin(); itr != spellList.end(); ++itr)
         if (itr->second.reqSkill)

@@ -88,6 +88,8 @@
 
 #define ZONE_UPDATE_INTERVAL (1*IN_MILLISECONDS)
 
+uint16 InitPlayerProfessions[16] = { 129, 164, 165, 171, 182, 185, 186, 197, 202, 333, 356, 393, 755, 762, 773, 794 };
+
 enum CharacterFlags
 {
     CHARACTER_FLAG_NONE = 0x00000000,
@@ -7629,66 +7631,17 @@ void Player::SetSkill(uint16 id, uint16 step, uint16 newVal, uint16 maxVal)
                 SetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1, 0);
             else if (GetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1 + 1) == id)
                 SetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1 + 1, 0);
+
+            // re-init needed player professions
+            for (uint8 i = 0; i < 16; i++)
+                if (InitPlayerProfessions[i] == id)
+                    AddTemporarySkill(id);
         }
     }
     else if (itr->second.uState == SKILL_TEMPORARY)
     {
-        currVal = 0;
         uint32 i = itr->second.pos;
-        uint16 field = i / 2;
-        uint8 offset = i & 1; // i % 2
-
-        SkillLineEntry const* skillEntry = sSkillLineStore.LookupEntry(id);
-        if (!skillEntry)
-        {
-            TC_LOG_ERROR("misc", "Skill not found in SkillLineStore: skill #%u", id);
-            return;
-        }
-
-        SetUInt16Value(PLAYER_SKILL_LINEID_0 + field, offset, id);
-        if (skillEntry->categoryId == SKILL_CATEGORY_PROFESSION)
-        {
-            if (!GetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1))
-                SetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1, id);
-            else if (!GetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1 + 1))
-                SetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1 + 1, id);
-        }
-
-        SetUInt16Value(PLAYER_SKILL_STEP_0 + field, offset, step);
-        SetUInt16Value(PLAYER_SKILL_RANK_0 + field, offset, newVal);
-        SetUInt16Value(PLAYER_SKILL_MAX_RANK_0 + field, offset, maxVal);
-
-        UpdateSkillEnchantments(id, currVal, newVal);
-        UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL, id);
-        UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILL_LEVEL, id);
-
-        // insert new entry or update if not deleted old entry yet
-        if (itr != mSkillStatus.end())
-        {
-            itr->second.pos = i;
-            itr->second.uState = SKILL_CHANGED;
-        }
-        else
-            mSkillStatus.insert(SkillStatusMap::value_type(id, SkillStatusData(i, SKILL_NEW)));
-
-        // apply skill bonuses
-        SetUInt16Value(PLAYER_SKILL_MODIFIER_0 + field, offset, 0);
-        SetUInt16Value(PLAYER_SKILL_TALENT_0 + field, offset, 0);
-
-        // temporary bonuses
-        AuraEffectList const& mModSkill = GetAuraEffectsByType(SPELL_AURA_MOD_SKILL);
-        for (AuraEffectList::const_iterator j = mModSkill.begin(); j != mModSkill.end(); ++j)
-            if ((*j)->GetMiscValue() == int32(id))
-                (*j)->HandleEffect(this, AURA_EFFECT_HANDLE_SKILL, true);
-
-        // permanent bonuses
-        AuraEffectList const& mModSkillTalent = GetAuraEffectsByType(SPELL_AURA_MOD_SKILL_TALENT);
-        for (AuraEffectList::const_iterator j = mModSkillTalent.begin(); j != mModSkillTalent.end(); ++j)
-            if ((*j)->GetMiscValue() == int32(id))
-                (*j)->HandleEffect(this, AURA_EFFECT_HANDLE_SKILL, true);
-
-        // Learn all spells for skill
-        learnSkillRewardedSpells(id, newVal);
+        SetSkillLearnPart(itr, i, id, step, newVal, maxVal);
     }
     else if (newVal)                                        //add
     {
@@ -7700,61 +7653,71 @@ void Player::SetSkill(uint16 id, uint16 step, uint16 newVal, uint16 maxVal)
 
             if (!GetUInt16Value(PLAYER_SKILL_LINEID_0 + field, offset))
             {
-                SkillLineEntry const* skillEntry = sSkillLineStore.LookupEntry(id);
-                if (!skillEntry)
-                {
-                    TC_LOG_ERROR("misc", "Skill not found in SkillLineStore: skill #%u", id);
-                    return;
-                }
-
-                SetUInt16Value(PLAYER_SKILL_LINEID_0 + field, offset, id);
-                if (skillEntry->categoryId == SKILL_CATEGORY_PROFESSION)
-                {
-                    if (!GetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1))
-                        SetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1, id);
-                    else if (!GetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1 + 1))
-                        SetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1 + 1, id);
-                }
-
-                SetUInt16Value(PLAYER_SKILL_STEP_0 + field, offset, step);
-                SetUInt16Value(PLAYER_SKILL_RANK_0 + field, offset, newVal);
-                SetUInt16Value(PLAYER_SKILL_MAX_RANK_0 + field, offset, maxVal);
-
-                UpdateSkillEnchantments(id, currVal, newVal);
-                UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL, id);
-                UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILL_LEVEL, id);
-
-                // insert new entry or update if not deleted old entry yet
-                if (itr != mSkillStatus.end())
-                {
-                    itr->second.pos = i;
-                    itr->second.uState = SKILL_CHANGED;
-                }
-                else
-                    mSkillStatus.insert(SkillStatusMap::value_type(id, SkillStatusData(i, SKILL_NEW)));
-
-                // apply skill bonuses
-                SetUInt16Value(PLAYER_SKILL_MODIFIER_0 + field, offset, 0);
-                SetUInt16Value(PLAYER_SKILL_TALENT_0 + field, offset, 0);
-
-                // temporary bonuses
-                AuraEffectList const& mModSkill = GetAuraEffectsByType(SPELL_AURA_MOD_SKILL);
-                for (AuraEffectList::const_iterator j = mModSkill.begin(); j != mModSkill.end(); ++j)
-                    if ((*j)->GetMiscValue() == int32(id))
-                        (*j)->HandleEffect(this, AURA_EFFECT_HANDLE_SKILL, true);
-
-                // permanent bonuses
-                AuraEffectList const& mModSkillTalent = GetAuraEffectsByType(SPELL_AURA_MOD_SKILL_TALENT);
-                for (AuraEffectList::const_iterator j = mModSkillTalent.begin(); j != mModSkillTalent.end(); ++j)
-                    if ((*j)->GetMiscValue() == int32(id))
-                        (*j)->HandleEffect(this, AURA_EFFECT_HANDLE_SKILL, true);
-
-                // Learn all spells for skill
-                learnSkillRewardedSpells(id, newVal);
+                SetSkillLearnPart(itr, i, id, step, newVal, maxVal);
                 return;
             }
         }
     }
+}
+
+void Player::SetSkillLearnPart(SkillStatusMap::iterator itr, uint16 i, uint16 id, uint16 step, uint16 newVal, uint16 maxVal)
+{
+    uint16 currVal = 0;
+
+    uint16 field = i / 2;
+    uint8 offset = i & 1; // i % 2
+
+    SkillLineEntry const* skillEntry = sSkillLineStore.LookupEntry(id);
+    if (!skillEntry)
+    {
+        TC_LOG_ERROR("misc", "Skill not found in SkillLineStore: skill #%u", id);
+        return;
+    }
+
+    SetUInt16Value(PLAYER_SKILL_LINEID_0 + field, offset, id);
+    if (skillEntry->categoryId == SKILL_CATEGORY_PROFESSION)
+    {
+        if (!GetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1))
+            SetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1, id);
+        else if (!GetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1 + 1))
+            SetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1 + 1, id);
+    }
+
+    SetUInt16Value(PLAYER_SKILL_STEP_0 + field, offset, step);
+    SetUInt16Value(PLAYER_SKILL_RANK_0 + field, offset, newVal);
+    SetUInt16Value(PLAYER_SKILL_MAX_RANK_0 + field, offset, maxVal);
+
+    UpdateSkillEnchantments(id, currVal, newVal);
+    UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL, id);
+    UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILL_LEVEL, id);
+
+    // insert new entry or update if not deleted old entry yet
+    if (itr != mSkillStatus.end())
+    {
+        itr->second.pos = i;
+        itr->second.uState = SKILL_CHANGED;
+    }
+    else
+        mSkillStatus.insert(SkillStatusMap::value_type(id, SkillStatusData(i, SKILL_NEW)));
+
+    // apply skill bonuses
+    SetUInt16Value(PLAYER_SKILL_MODIFIER_0 + field, offset, 0);
+    SetUInt16Value(PLAYER_SKILL_TALENT_0 + field, offset, 0);
+
+    // temporary bonuses
+    AuraEffectList const& mModSkill = GetAuraEffectsByType(SPELL_AURA_MOD_SKILL);
+    for (AuraEffectList::const_iterator j = mModSkill.begin(); j != mModSkill.end(); ++j)
+        if ((*j)->GetMiscValue() == int32(id))
+            (*j)->HandleEffect(this, AURA_EFFECT_HANDLE_SKILL, true);
+
+    // permanent bonuses
+    AuraEffectList const& mModSkillTalent = GetAuraEffectsByType(SPELL_AURA_MOD_SKILL_TALENT);
+    for (AuraEffectList::const_iterator j = mModSkillTalent.begin(); j != mModSkillTalent.end(); ++j)
+        if ((*j)->GetMiscValue() == int32(id))
+            (*j)->HandleEffect(this, AURA_EFFECT_HANDLE_SKILL, true);
+
+    // Learn all spells for skill
+    learnSkillRewardedSpells(id, newVal);
 }
 
 bool Player::HasSkill(uint32 skill) const
@@ -7766,35 +7729,50 @@ bool Player::HasSkill(uint32 skill) const
     return (itr != mSkillStatus.end() && itr->second.uState != SKILL_DELETED && itr->second.uState != SKILL_TEMPORARY);
 }
 
-void Player::AddTemporarySkill(uint32 skill)
+void Player::AddTemporarySkill(uint16 skill)
 {
-    SkillStatusMap::const_iterator itr = mSkillStatus.find(skill);
+    SkillStatusMap::iterator itr = mSkillStatus.find(skill);
     if (itr != mSkillStatus.end())
-        return;
-
-    for (uint32 i = 0; i < PLAYER_MAX_SKILLS; ++i)
     {
-        uint16 field = i / 2;
-        uint8 offset = i & 1; // i % 2
-
-        if (!GetUInt16Value(PLAYER_SKILL_LINEID_0 + field, offset))
+        if (itr->second.uState == SKILL_DELETED)
         {
-            SkillLineEntry const* skillEntry = sSkillLineStore.LookupEntry(skill);
-            if (!skillEntry)
-            {
-                TC_LOG_ERROR("misc", "Skill not found in SkillLineStore: skill #%u", skill);
-                return;
-            }
-
-            SetUInt16Value(PLAYER_SKILL_LINEID_0 + field, offset, skill);
-            SetUInt16Value(PLAYER_SKILL_STEP_0 + field, offset, 0);
-            SetUInt16Value(PLAYER_SKILL_RANK_0 + field, offset, 0);
-            SetUInt16Value(PLAYER_SKILL_MAX_RANK_0 + field, offset, 0);
-
-            mSkillStatus.insert(SkillStatusMap::value_type(skill, SkillStatusData(i, SKILL_TEMPORARY)));
-            return;
+            AddTemporarySkillInsertPart(skill, itr->second.pos);
+            itr->second.uState = SKILL_TEMPORARY;
         }
     }
+    else
+    {
+        for (uint32 i = 0; i < PLAYER_MAX_SKILLS; ++i)
+        {
+            uint16 field = i / 2;
+            uint8 offset = i & 1; // i % 2
+
+            if (!GetUInt16Value(PLAYER_SKILL_LINEID_0 + field, offset))
+            {
+                AddTemporarySkillInsertPart(skill, i);
+                mSkillStatus.insert(SkillStatusMap::value_type(skill, SkillStatusData(i, SKILL_TEMPORARY)));
+                return;
+            }
+        }
+    }
+}
+
+void Player::AddTemporarySkillInsertPart(uint16 skill, uint32 i)
+{
+    uint16 field = i / 2;
+    uint8 offset = i & 1; // i % 2
+
+    SkillLineEntry const* skillEntry = sSkillLineStore.LookupEntry(skill);
+    if (!skillEntry)
+    {
+        TC_LOG_ERROR("misc", "Skill not found in SkillLineStore: skill #%u", skill);
+        return;
+    }
+
+    SetUInt16Value(PLAYER_SKILL_LINEID_0 + field, offset, skill);
+    SetUInt16Value(PLAYER_SKILL_STEP_0 + field, offset, 0);
+    SetUInt16Value(PLAYER_SKILL_RANK_0 + field, offset, 0);
+    SetUInt16Value(PLAYER_SKILL_MAX_RANK_0 + field, offset, 0);
 }
 
 uint16 Player::GetSkillStep(uint16 skill) const
@@ -27400,22 +27378,9 @@ void Player::_LoadSkills(PreparedQueryResult result)
     if (HasSkill(SKILL_ARCHAEOLOGY))
         GetArchaeologyMgr().Initialize();
 
-    AddTemporarySkill(129);
-    AddTemporarySkill(164);
-    AddTemporarySkill(165);
-    AddTemporarySkill(171);
-    AddTemporarySkill(182);
-    AddTemporarySkill(185);
-    AddTemporarySkill(186);
-    AddTemporarySkill(197);
-    AddTemporarySkill(202);
-    AddTemporarySkill(333);
-    AddTemporarySkill(356);
-    AddTemporarySkill(393);
-    AddTemporarySkill(755);
-    AddTemporarySkill(762);
-    AddTemporarySkill(773);
-    AddTemporarySkill(794);
+    // init all possible needed professions with user windows
+    for (uint8 i = 0; i < 16; i++)
+        AddTemporarySkill(InitPlayerProfessions[i]);
 }
 
 InventoryResult Player::CanEquipUniqueItem(Item* pItem, uint8 eslot, uint32 limit_count) const
