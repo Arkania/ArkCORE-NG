@@ -17567,6 +17567,7 @@ bool Unit::HandleSpellClick(Unit* clicker, int8 seatId)
         {
             uint8 i = 0;
             bool valid = false;
+            bool isErr = true;
             while (i < MAX_SPELL_EFFECTS && !valid)
             {
                 if (spellEntry->Effects[i].ApplyAuraName == SPELL_AURA_CONTROL_VEHICLE)
@@ -17574,12 +17575,16 @@ bool Unit::HandleSpellClick(Unit* clicker, int8 seatId)
                     valid = true;
                     break;
                 }
+                else if (spellEntry->Effects[i].ApplyAuraName == SPELL_AURA_SET_VEHICLE_ID) // no failure if this aura is used..
+                    isErr = false;
+
                 ++i;
             }
 
             if (!valid)
             {
-                TC_LOG_ERROR("sql.sql", "Spell %u specified in npc_spellclick_spells is not a valid vehicle enter aura!", itr->second.spellId);
+                if (isErr)
+                    TC_LOG_ERROR("sql.sql", "Spell %u specified in npc_spellclick_spells is not a valid vehicle enter aura!", itr->second.spellId);
                 continue;
             }
 
