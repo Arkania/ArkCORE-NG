@@ -7574,74 +7574,77 @@ void Player::SetSkill(uint16 id, uint16 step, uint16 newVal, uint16 maxVal)
     SkillStatusMap::iterator itr = mSkillStatus.find(id);
 
     //has skill
-    if (itr != mSkillStatus.end() && itr->second.uState != SKILL_DELETED && itr->second.uState != SKILL_TEMPORARY)
+    if (itr != mSkillStatus.end())
     {
-        uint16 field = itr->second.pos / 2;
-        uint8 offset = itr->second.pos & 1; // itr->second.pos % 2
-        currVal = GetUInt16Value(PLAYER_SKILL_RANK_0 + field, offset);
-        if (newVal)
+        if (itr->second.uState == SKILL_TEMPORARY)
         {
-            // if skill value is going down, update enchantments before setting the new value
-            if (newVal < currVal)
-                UpdateSkillEnchantments(id, currVal, newVal);
-
-            // update step
-            SetUInt16Value(PLAYER_SKILL_STEP_0 + field, offset, step);
-            // update value
-            SetUInt16Value(PLAYER_SKILL_RANK_0 + field, offset, newVal);
-            SetUInt16Value(PLAYER_SKILL_MAX_RANK_0 + field, offset, maxVal);
-
-            if (itr->second.uState != SKILL_NEW)
-                itr->second.uState = SKILL_CHANGED;
-
-            learnSkillRewardedSpells(id, newVal);
-            // if skill value is going up, update enchantments after setting the new value
-            if (newVal > currVal)
-                UpdateSkillEnchantments(id, currVal, newVal);
-
-            UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL, id);
-            UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILL_LEVEL, id);
+            uint32 i = itr->second.pos;
+            SetSkillLearnPart(itr, i, id, step, newVal, maxVal);
         }
-        else                                                //remove
+        else if (itr->second.uState != SKILL_DELETED)
         {
-            //remove enchantments needing this skill
-            UpdateSkillEnchantments(id, currVal, 0);
-            // clear skill fields
-            SetUInt16Value(PLAYER_SKILL_LINEID_0 + field, offset, 0);
-            SetUInt16Value(PLAYER_SKILL_STEP_0 + field, offset, 0);
-            SetUInt16Value(PLAYER_SKILL_RANK_0 + field, offset, 0);
-            SetUInt16Value(PLAYER_SKILL_MAX_RANK_0 + field, offset, 0);
-            SetUInt16Value(PLAYER_SKILL_MODIFIER_0 + field, offset, 0);
-            SetUInt16Value(PLAYER_SKILL_TALENT_0 + field, offset, 0);
+            uint16 field = itr->second.pos / 2;
+            uint8 offset = itr->second.pos & 1; // itr->second.pos % 2
+            currVal = GetUInt16Value(PLAYER_SKILL_RANK_0 + field, offset);
+            if (newVal)
+            {
+                // if skill value is going down, update enchantments before setting the new value
+                if (newVal < currVal)
+                    UpdateSkillEnchantments(id, currVal, newVal);
 
-            // mark as deleted or simply remove from map if not saved yet
-            if (itr->second.uState != SKILL_NEW)
-                itr->second.uState = SKILL_DELETED;
-            else
-                mSkillStatus.erase(itr);
+                // update step
+                SetUInt16Value(PLAYER_SKILL_STEP_0 + field, offset, step);
+                // update value
+                SetUInt16Value(PLAYER_SKILL_RANK_0 + field, offset, newVal);
+                SetUInt16Value(PLAYER_SKILL_MAX_RANK_0 + field, offset, maxVal);
 
-            // remove all spells that related to this skill
-            for (uint32 j = 0; j < sSkillLineAbilityStore.GetNumRows(); ++j)
-                if (SkillLineAbilityEntry const* pAbility = sSkillLineAbilityStore.LookupEntry(j))
-                    if (pAbility->skillId == id)
-                        removeSpell(sSpellMgr->GetFirstSpellInChain(pAbility->spellId));
+                if (itr->second.uState != SKILL_NEW)
+                    itr->second.uState = SKILL_CHANGED;
 
-            // Clear profession lines
-            if (GetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1) == id)
-                SetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1, 0);
-            else if (GetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1 + 1) == id)
-                SetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1 + 1, 0);
+                learnSkillRewardedSpells(id, newVal);
+                // if skill value is going up, update enchantments after setting the new value
+                if (newVal > currVal)
+                    UpdateSkillEnchantments(id, currVal, newVal);
 
-            // re-init needed player professions
-            for (uint8 i = 0; i < 16; i++)
-                if (InitPlayerProfessions[i] == id)
-                    AddTemporarySkill(id);
+                UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL, id);
+                UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILL_LEVEL, id);
+            }
+            else                                                //remove
+            {
+                //remove enchantments needing this skill
+                UpdateSkillEnchantments(id, currVal, 0);
+                // clear skill fields
+                SetUInt16Value(PLAYER_SKILL_LINEID_0 + field, offset, 0);
+                SetUInt16Value(PLAYER_SKILL_STEP_0 + field, offset, 0);
+                SetUInt16Value(PLAYER_SKILL_RANK_0 + field, offset, 0);
+                SetUInt16Value(PLAYER_SKILL_MAX_RANK_0 + field, offset, 0);
+                SetUInt16Value(PLAYER_SKILL_MODIFIER_0 + field, offset, 0);
+                SetUInt16Value(PLAYER_SKILL_TALENT_0 + field, offset, 0);
+
+                // mark as deleted or simply remove from map if not saved yet
+                if (itr->second.uState != SKILL_NEW)
+                    itr->second.uState = SKILL_DELETED;
+                else
+                    mSkillStatus.erase(itr);
+
+                // remove all spells that related to this skill
+                for (uint32 j = 0; j < sSkillLineAbilityStore.GetNumRows(); ++j)
+                    if (SkillLineAbilityEntry const* pAbility = sSkillLineAbilityStore.LookupEntry(j))
+                        if (pAbility->skillId == id)
+                            removeSpell(sSpellMgr->GetFirstSpellInChain(pAbility->spellId));
+
+                // Clear profession lines
+                if (GetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1) == id)
+                    SetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1, 0);
+                else if (GetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1 + 1) == id)
+                    SetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1 + 1, 0);
+
+                // re-init needed player professions
+                for (uint8 i = 0; i < 16; i++)
+                    if (InitPlayerProfessions[i] == id)
+                        AddTemporarySkill(id);
+            }
         }
-    }
-    else if (itr->second.uState == SKILL_TEMPORARY)
-    {
-        uint32 i = itr->second.pos;
-        SetSkillLearnPart(itr, i, id, step, newVal, maxVal);
     }
     else if (newVal)                                        //add
     {
