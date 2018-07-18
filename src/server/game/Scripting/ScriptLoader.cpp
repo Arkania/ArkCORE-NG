@@ -840,6 +840,7 @@ void AddSC_zone_echo_isles();
 
 // Events
 void AddSC_event_childrens_week();
+void AddSC_event_midsummer_scripts();
 
 // Pets
 void AddSC_deathknight_pet_scripts();
@@ -1735,6 +1736,7 @@ void AddEventScripts()
 {
 #ifdef SCRIPTS
     AddSC_event_childrens_week();
+    AddSC_event_midsummer_scripts();
 #endif
 }
 
