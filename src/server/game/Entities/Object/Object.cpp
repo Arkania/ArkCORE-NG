@@ -3588,18 +3588,6 @@ void WorldObject::ClearAllPhases(bool update)
         UpdateObjectVisibility();
 }
 
-void WorldObject::AddPhaseId(uint16 phaseId, bool apply)
-{
-    if (phaseId)
-        if (apply)
-        {
-            if (!(m_phaseIds.find(phaseId) != m_phaseIds.end()))
-                m_phaseIds.insert(phaseId);
-        }
-        else
-            m_phaseIds.erase(phaseId);
-}
-
 void WorldObject::AddTerrainSwapMap(uint16 mapId, bool apply)
 {
     if (mapId)
@@ -3651,6 +3639,14 @@ bool WorldObject::HasInPhaseList(uint16 phase) const
 
 bool WorldObject::IsInPhase(uint16 phaseId) const
 {
+    uint32 meCount = m_phaseIds.size();
+
+    if (meCount == 0 && phaseId == DEFAULT_PHASE)
+        return true;
+
+    if (meCount == 1 && m_firstPhaseId == phaseId)
+        return true;
+
     return (m_phaseIds.find(phaseId) != m_phaseIds.end());
 }
 
@@ -3659,21 +3655,39 @@ bool WorldObject::IsInPhase(WorldObject const* obj) const
     if (GetTypeId() == TYPEID_PLAYER && ToPlayer()->IsGameMaster())
         return true;
 
-    if (m_phaseIds.empty() && obj->GetPhaseIds().empty())
-    {
-        if (m_phaseMask > 1 && obj->m_phaseMask > 1)
-            return (m_phaseMask & obj->m_phaseMask);
+    uint32 meCount = m_phaseIds.size();
+    uint32 objCount = obj->GetPhaseIds().size();
 
-        return true;
+    if (!meCount)
+    {
+        if (!objCount)
+        {
+            if (m_phaseMask > 1 && obj->m_phaseMask > 1)
+                return (m_phaseMask & obj->m_phaseMask);
+
+            return true;
+        }
+
+        // PhaseId 169 is the default fallback phase
+        if (obj->IsInPhase(DEFAULT_PHASE))
+            return true;
     }
 
-    // PhaseId 169 is the default fallback phase
-    if (m_phaseIds.empty() && obj->IsInPhase(DEFAULT_PHASE))
+    if (!objCount && IsInPhase(DEFAULT_PHASE))
         return true;
+    
+    if (meCount == 1 && objCount == 1)
+        return m_firstPhaseId == obj->m_firstPhaseId;
 
-    if (obj->GetPhaseIds().empty() && IsInPhase(DEFAULT_PHASE))
-        return true;
+    if (meCount == 1)
+        if (obj->IsInPhase(m_firstPhaseId))
+            return true;
 
+    if (objCount == 1)
+        if (IsInPhase(obj->m_firstPhaseId))
+            return true;
+
+    // this function is slow slow slow.. 
     return Trinity::Containers::Intersects(m_phaseIds.begin(), m_phaseIds.end(), obj->GetPhaseIds().begin(), obj->GetPhaseIds().end());
 }
 
@@ -3723,6 +3737,7 @@ bool WorldObject::SetInPhase(uint16 id, bool update, bool apply)
                 return false;
 
             m_phaseIds.insert(id);
+            m_firstPhaseId = id;
         }
         else      // erase this phase
         {
@@ -3730,6 +3745,10 @@ bool WorldObject::SetInPhase(uint16 id, bool update, bool apply)
                 return false;
 
             m_phaseIds.erase(id);
+            if (m_phaseIds.size() == 0)
+                m_firstPhaseId = 0;
+            else
+                m_firstPhaseId = *m_phaseIds.begin();
         }
     }
 
