@@ -3787,12 +3787,14 @@ ePhaseUpdateStatus WorldObject::CheckArea(PhaseAreaDefinition phaseAreaDefinitio
     for (PhaseAreaSelectorContainer::const_iterator area = pac.begin(); area != pac.end(); ++area)
         if (phaseAreaDefinition.zoneId == area->areaId && phaseAreaDefinition.entry == area->entry)
         {
+            Player* player = ToPlayer();
+
             if (area->quest_start)                              // not in expected required quest state
-                if (!ToPlayer() || (((1 << ToPlayer()->GetQuestStatus(area->quest_start))) & area->quest_start_status) == 0)
+                if (!player || ((1 << player->GetQuestStatus(area->quest_start) & area->quest_start_status) == 0))
                     continue;
 
-            if (area->quest_end)                                // not in expected forbidden quest state
-                if (!ToPlayer() || (((1 << ToPlayer()->GetQuestStatus(area->quest_end))) & area->quest_end_status) == 0)
+            if (area->quest_end) // not in expected forbidden quest state
+                if (!player || ((1 << player->GetQuestStatus(area->quest_end) & area->quest_end_status) == 0))
                     continue;
 
             return PHASE_CHECK_MEET;
