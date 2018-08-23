@@ -253,8 +253,9 @@ set(scripts_STAT_SRCS
   EasternKingdoms/Karazhan/karazhan.h
   EasternKingdoms/TheStockade/instance_the_stockade.cpp
   EasternKingdoms/Gilneas/zone_gilneas.h
-  EasternKingdoms/Gilneas/zone_gilneas.cpp
-  EasternKingdoms/Gilneas/zone_gilneas2.cpp
+  EasternKingdoms/Gilneas/zone_gilneas_city1.cpp
+  EasternKingdoms/Gilneas/zone_gilneas_city2.cpp
+  EasternKingdoms/Gilneas/zone_gilneas_city3.cpp
   EasternKingdoms/Gilneas/zone_duskhaven.cpp
   EasternKingdoms/ThroneOfTheTides/boss_lady_nazjar.cpp
   EasternKingdoms/ThroneOfTheTides/boss_commander_ulthok.cpp
@@ -274,6 +275,8 @@ set(scripts_STAT_SRCS
   EasternKingdoms/zone_elwynn_forest.cpp  
   EasternKingdoms/zone_coldridge_valley.cpp
   EasternKingdoms/zone_dun_morogh.cpp
+  EasternKingdoms/zone_northern_stranglethorn.cpp
+  EasternKingdoms/zone_gnomeregan.cpp
 )
 
 message("  -> Prepared: Eastern Kingdoms")

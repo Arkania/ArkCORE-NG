@@ -296,7 +296,7 @@ void BotHelper::SendBotHelpWhisper(Player* player, uint32 /*action*/)
         bool addComma = false;
         for (uint8 i = 0; i < TARGETICONCOUNT; ++i)
         {
-            uint16 x = 2 ^ i;
+            uint16 x = 2 ^ i; // should be pow(2, i) ???
             if (addComma)
                 msg4 += ", ";
             addComma = true;

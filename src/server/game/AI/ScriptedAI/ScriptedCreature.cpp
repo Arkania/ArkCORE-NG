@@ -199,7 +199,7 @@ SpellInfo const* ScriptedAI::SelectSpell(Unit* target, uint32 school, uint32 mec
 
     uint32 spellCount = 0;
 
-    SpellInfo const* tempSpell = NULL;
+    SpellInfo const* tempSpell = nullptr;
 
     //Check if each spell is viable(set it to null if not)
     for (uint32 i = 0; i < CREATURE_MAX_SPELLS; i++)
@@ -331,7 +331,7 @@ void ScriptedAI::DoTeleportAll(float x, float y, float z, float o)
 
 Unit* ScriptedAI::DoSelectLowestHpFriendly(float range, uint32 minHPDiff)
 {
-    Unit* unit = NULL;
+    Unit* unit = nullptr;
     Trinity::MostHPMissingInRange u_check(me, range, minHPDiff);
     Trinity::UnitLastSearcher<Trinity::MostHPMissingInRange> searcher(me, unit, u_check);
     me->VisitNearbyObject(range, searcher);
@@ -361,7 +361,7 @@ std::list<Creature*> ScriptedAI::DoFindFriendlyMissingBuff(float range, uint32 u
 
 Player* ScriptedAI::GetPlayerAtMinimumRange(float minimumRange)
 {
-    Player* player = NULL;
+    Player* player = nullptr;
 
     CellCoord pair(Trinity::ComputeCellCoord(me->GetPositionX(), me->GetPositionY()));
     Cell cell(pair);
@@ -621,7 +621,11 @@ void BossAI::UpdateAI(uint32 diff)
         return;
 
     while (uint32 eventId = events.ExecuteEvent())
+    {
         ExecuteEvent(eventId);
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+    }
 
     DoMeleeAttackIfReady();
 }
@@ -692,7 +696,11 @@ void WorldBossAI::UpdateAI(uint32 diff)
         return;
 
     while (uint32 eventId = events.ExecuteEvent())
+    {
         ExecuteEvent(eventId);
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+    }
 
     DoMeleeAttackIfReady();
 }

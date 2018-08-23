@@ -423,7 +423,7 @@ void AccountMgr::LoadRBAC()
     }
 
     uint32 permissionId = 0;
-    rbac::RBACPermission* permission = NULL;
+    rbac::RBACPermission* permission = nullptr;
 
     do
     {
@@ -455,7 +455,7 @@ void AccountMgr::LoadRBAC()
     }
 
     uint8 secId = 255;
-    rbac::RBACPermissionContainer* permissions = NULL;
+    rbac::RBACPermissionContainer* permissions = nullptr;
     do
     {
         Field* field = result->Fetch();

@@ -298,12 +298,16 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvPacket)
         return;
     }
 
+    // stop some emotes at player move
+    if (plrMover && (plrMover->GetUInt32Value(UNIT_NPC_EMOTESTATE) != 0))
+        plrMover->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
+
     /* handle special cases */
     if (movementInfo.transport.guid)
     {
         // transports size limited
         // (also received at zeppelin leave by some reason with t_* as absolute in continent coordinates, can be safely skipped)
-        if (movementInfo.transport.pos.GetPositionX() > 50 || movementInfo.transport.pos.GetPositionY() > 50 || movementInfo.transport.pos.GetPositionZ() > 50)
+        if (movementInfo.transport.pos.GetPositionX() > 50 || movementInfo.transport.pos.GetPositionY() > 50 || movementInfo.transport.pos.GetPositionZ() > 100)
         {
             recvPacket.rfinish();                 // prevent warnings spam
             return;
@@ -322,27 +326,15 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvPacket)
             if (!plrMover->GetTransport())
             {
                 if (Transport* transport = plrMover->GetMap()->GetTransport(movementInfo.transport.guid))
-                {
-                    plrMover->m_transport = transport;
                     transport->AddPassenger(plrMover);
-                }
             }
             else if (plrMover->GetTransport()->GetGUID() != movementInfo.transport.guid)
             {
-                bool foundNewTransport = false;
-                plrMover->m_transport->RemovePassenger(plrMover);
+                plrMover->GetTransport()->RemovePassenger(plrMover);
                 if (Transport* transport = plrMover->GetMap()->GetTransport(movementInfo.transport.guid))
-                {
-                    foundNewTransport = true;
-                    plrMover->m_transport = transport;
                     transport->AddPassenger(plrMover);
-                }
-
-                if (!foundNewTransport)
-                {
-                    plrMover->m_transport = NULL;
+                else
                     movementInfo.ResetTransport();
-                }
             }
         }
 
@@ -354,11 +346,8 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvPacket)
         }
     }
     else if (plrMover && plrMover->GetTransport())                // if we were on a transport, leave
-    {
         plrMover->m_transport->RemovePassenger(plrMover);
-        plrMover->m_transport = NULL;
-        movementInfo.ResetTransport();
-    }
+       
 
     // fall damage generation (ignore in flight case that can be triggered also at lags in moment teleportation to another map).
     if (opcode == MSG_MOVE_FALL_LAND && plrMover && !plrMover->IsInFlight())
@@ -576,6 +565,15 @@ void WorldSession::HandleMoveKnockBackAck(WorldPacket& recvData)
     WorldPacket data(SMSG_MOVE_UPDATE_KNOCK_BACK, 66);
     _player->WriteMovementInfo(data);
     _player->SendMessageToSet(&data, false);
+}
+
+void WorldSession::HandleGravityAckMessage(WorldPacket& recvData)
+{
+    MovementInfo movementInfo;
+    GetPlayer()->ReadMovementInfo(recvData, &movementInfo);
+    if (movementInfo.guid != _player->m_mover->GetGUID())
+        TC_LOG_ERROR("network", "HandleGravityAckMessage: incorrect mover guid: mover is " UI64FMTD " (%s - Entry: %u) and should be " UI64FMTD, uint64(movementInfo.guid), GetLogNameForGuid(movementInfo.guid), GUID_ENPART(movementInfo.guid), _player->m_mover->GetGUID());
+
 }
 
 void WorldSession::HandleMoveHoverAck(WorldPacket& recvData)

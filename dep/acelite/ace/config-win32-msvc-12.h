@@ -1,14 +1,16 @@
 /* -*- C++ -*- */
 //=============================================================================
 /**
-*  @file   config-win32-msvc-12.h
-*
-*  @brief  Microsoft Visual C++ 12.0 configuration file.
-*
-*  This file is the ACE configuration file for Microsoft Visual C++ version 12.
-*
-*  @note Do not include this file directly, include config-win32.h instead.
-*/
+ *  @file   config-win32-msvc-12.h
+ *
+ *  $Id: config-win32-msvc-12.h 97766 2014-06-04 10:08:40Z johnnyw $
+ *
+ *  @brief  Microsoft Visual C++ 12.0 configuration file.
+ *
+ *  This file is the ACE configuration file for Microsoft Visual C++ version 12.
+ *
+ *  @note Do not include this file directly, include config-win32.h instead.
+ */
 //=============================================================================
 
 #ifndef ACE_CONFIG_WIN32_MSVC_12_H

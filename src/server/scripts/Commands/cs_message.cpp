@@ -73,7 +73,7 @@ public:
             return false;
 
         Player* player = handler->GetSession()->GetPlayer();
-        Channel* channcel = NULL;
+        Channel* channcel = nullptr;
 
         if (ChannelMgr* cMgr = ChannelMgr::forTeam(player->GetTeam()))
             channcel = cMgr->GetChannel(channelStr, player);

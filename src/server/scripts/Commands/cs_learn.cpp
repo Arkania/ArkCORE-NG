@@ -388,7 +388,7 @@ public:
 
         std::string name;
 
-        SkillLineEntry const* targetSkillInfo = NULL;
+        SkillLineEntry const* targetSkillInfo = nullptr;
         for (uint32 i = 1; i < sSkillLineStore.GetNumRows(); ++i)
         {
             SkillLineEntry const* skillInfo = sSkillLineStore.LookupEntry(i);

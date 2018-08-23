@@ -115,6 +115,37 @@ public:
 
         uint32 entry = atoul(cId);
 
+        if (!entry)
+            if (cId = "all")
+            {
+                // first remove all active quest slot..
+                for (uint8 slot = 0; slot < MAX_QUEST_LOG_SIZE; ++slot)
+                {
+                    entry = player->GetQuestSlotQuestId(slot);
+                    player->SetQuestSlot(slot, 0);
+                    if (Quest const* quest = sObjectMgr->GetQuestTemplate(entry))
+                    {
+                        player->TakeQuestSourceItem(entry, false);
+                        if (quest->HasFlag(QUEST_FLAGS_FLAGS_PVP))
+                        {
+                            player->pvpInfo.IsHostile = player->pvpInfo.IsInHostileArea || player->HasPvPForcingQuest();
+                            player->UpdatePvPState();
+                        }
+                        player->RemoveActiveQuest(entry, false);
+                        player->RemoveRewardedQuest(entry);
+                    }
+                }
+
+                CharacterDatabase.DirectPExecute("DELETE FROM character_queststatus WHERE guid=%u;", player->GetGUID());
+                CharacterDatabase.DirectPExecute("DELETE FROM character_queststatus_daily WHERE guid=%u;", player->GetGUID());
+                CharacterDatabase.DirectPExecute("DELETE FROM character_queststatus_monthly WHERE guid=%u;", player->GetGUID());
+                CharacterDatabase.DirectPExecute("DELETE FROM character_queststatus_rewarded WHERE guid=%u;", player->GetGUID());
+                CharacterDatabase.DirectPExecute("DELETE FROM character_queststatus_seasonal WHERE guid=%u;", player->GetGUID());
+                CharacterDatabase.DirectPExecute("DELETE FROM character_queststatus_weekly WHERE guid=%u;", player->GetGUID());
+
+                return true;
+            }
+
         Quest const* quest = sObjectMgr->GetQuestTemplate(entry);
 
         if (!quest)
@@ -145,6 +176,11 @@ public:
 
         player->RemoveActiveQuest(entry, false);
         player->RemoveRewardedQuest(entry);
+
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_QUESTSTATUS_REWARDED_BY_QUEST);
+        stmt->setUInt32(0, player->GetGUIDLow());
+        stmt->setUInt32(1, entry);
+        CharacterDatabase.Execute(stmt);
 
         handler->SendSysMessage(LANG_COMMAND_QUEST_REMOVED);
         return true;
@@ -239,7 +275,8 @@ public:
         if (ReqOrRewMoney < 0)
             player->ModifyMoney(-ReqOrRewMoney);
 
-        player->CompleteQuest(entry);
+        if (player->CanCompleteQuest(entry)) // prevent calling CompleteQuest twice (can be done in KilledMonsterCredit)
+            player->CompleteQuest(entry);
         return true;
     }
 

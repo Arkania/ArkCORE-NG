@@ -73,6 +73,7 @@ class Vehicle : public TransportBase
         VehicleSeatEntry const* GetSeatForPassenger(Unit const* passenger) const;
 
         void RemovePendingEventsForPassenger(Unit* passenger);
+        bool CheckVehicle();
 
     protected:
         friend class VehicleJoinEvent;
@@ -129,6 +130,8 @@ class VehicleJoinEvent : public BasicEvent
         ~VehicleJoinEvent();
         bool Execute(uint64, uint32) override;
         void Abort(uint64) override;
+        
+        bool CheckVehicle();
 
         Vehicle* Target;
         Unit* Passenger;

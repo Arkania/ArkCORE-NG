@@ -170,7 +170,7 @@ struct GameObjectTemplate
         struct
         {
             uint32 lockId;                                  //0 -> Lock.dbc
-            int32 questId;                                  //1
+            int32  questId;                                 //1
             uint32 eventId;                                 //2
             uint32 autoCloseTime;                           //3
             uint32 customAnim;                              //4
@@ -190,6 +190,11 @@ struct GameObjectTemplate
             uint32 floatingTooltip;                         //18
             uint32 gossipID;                                //19
             uint32 WorldStateSetsState;                     //20
+            int32  unk21;                                   //21 unknown data found in sniff
+            int32  unk22;                                   //22 unknown data found in sniff
+            int32  unk23;                                   //23 unknown data found in sniff
+            int32  questId_male;                            //24 creates only glitter, for gender quest 
+            int32  questId_female;                          //25 creates only glitter, for gender quest
         } goober;
         //11 GAMEOBJECT_TYPE_TRANSPORT
         struct
@@ -578,6 +583,26 @@ struct GameObjectLocale
     StringVector CastBarCaption;
 };
 
+struct QuaternionData
+{
+    float x, y, z, w;
+
+    QuaternionData() : x(0.0f), y(0.0f), z(0.0f), w(1.0f) {}
+    QuaternionData(float X, float Y, float Z, float W) : x(X), y(Y), z(Z), w(W) {}
+
+    bool isUnit() const;
+    static QuaternionData fromEulerAnglesZYX(float Z, float Y, float X);
+};
+
+// `gameobject_addon` table
+struct GameObjectAddon
+{
+    InvisibilityType invisibilityType;
+    uint32 InvisibilityValue;
+};
+
+typedef std::unordered_map<uint32, GameObjectAddon> GameObjectAddonContainer;
+
 // client side GO show states
 enum GOState
 {
@@ -591,11 +616,13 @@ enum GOState
 // from `gameobject`
 struct GameObjectData
 {
-    explicit GameObjectData() : id(0), mapid(0), phaseMask(0), posX(0.0f), posY(0.0f), posZ(0.0f), orientation(0.0f),
+    explicit GameObjectData() : id(0), mapid(0), zoneId(0), areaId(0), phaseMask(0), posX(0.0f), posY(0.0f), posZ(0.0f), orientation(0.0f),
                                 rotation0(0.0f), rotation1(0.0f), rotation2(0.0f), rotation3(0.0f), spawntimesecs(0),
-                                animprogress(0), go_state(GO_STATE_ACTIVE), spawnMask(0), artKit(0), dbData(true) { }
+                                animprogress(0), go_state(GO_STATE_ACTIVE), spawnMask(0), artKit(0), phaseId(0), phaseGroup(0), dbData(true) { }
     uint32 id;                                              // entry in gamobject_template
     uint16 mapid;
+    uint16 zoneId;
+    uint16 areaId;
     uint32 phaseMask;
     float posX;
     float posY;
@@ -610,6 +637,8 @@ struct GameObjectData
     GOState go_state;
     uint8 spawnMask;
     uint8 artKit;
+    uint16 phaseId;
+    uint16 phaseGroup;
     bool dbData;
 };
 
@@ -653,16 +682,23 @@ class GameObject : public WorldObject, public GridObject<GameObject>, public Map
         bool IsTransport() const;
         bool IsDynTransport() const;
         bool IsDestructibleBuilding() const;
+        bool IsQuestGiver() const;
 
         uint32 GetDBTableGUIDLow() const { return m_DBTableGuid; }
 
         void UpdateRotationFields(float rotation2 = 0.0f, float rotation3 = 0.0f);
 
+        // z_rot, y_rot, x_rot - rotation angles around z, y and x axes
+        void SetWorldRotationAngles(float z_rot, float y_rot, float x_rot);
+        void SetWorldRotation(float qx, float qy, float qz, float qw);
+        void SetParentRotation(QuaternionData const& rotation);      // transforms(rotates) transport's path
+        int64 GetPackedWorldRotation() const { return m_packedRotation; }
+
         // overwrite WorldObject function for proper name localization
         std::string const& GetNameForLocaleIdx(LocaleConstant locale_idx) const;
 
         void SaveToDB();
-        void SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask);
+        void SaveToDB(uint32 mapid, uint32 spawnMask, uint32 phaseMask);
         bool LoadFromDB(uint32 guid, Map* map) { return LoadGameObjectFromDB(guid, map, false); }
         bool LoadGameObjectFromDB(uint32 guid, Map* map, bool addToMap = true);
         void DeleteFromDB();
@@ -726,7 +762,8 @@ class GameObject : public WorldObject, public GridObject<GameObject>, public Map
         void SetGoAnimProgress(uint8 animprogress) { SetByteValue(GAMEOBJECT_BYTES_1, 3, animprogress); }
         static void SetGoArtKit(uint8 artkit, GameObject* go, uint32 lowguid = 0);
 
-        void SetPhaseMask(uint32 newPhaseMask, bool update);
+        void SetPhaseMask(uint64 newPhaseMask, bool update);
+        bool SetInPhase(uint32 id, bool update, bool apply);
         void EnableCollision(bool enable);
 
         void Use(Unit* user);
@@ -793,6 +830,7 @@ class GameObject : public WorldObject, public GridObject<GameObject>, public Map
 
         GameObject* LookupFishingHoleAround(float range);
 
+		void TeleportToNearestChairSeat(Position pos, GameObjectTemplate const* info, Player* player);
         void CastSpell(Unit* target, uint32 spell, bool triggered = true);
         void SendCustomAnim(uint32 anim);
         bool IsInRange(float x, float y, float z, float radius) const;
@@ -832,6 +870,7 @@ class GameObject : public WorldObject, public GridObject<GameObject>, public Map
         float GetStationaryY() const { if (GetGOInfo()->type != GAMEOBJECT_TYPE_MO_TRANSPORT) return m_stationaryPosition.GetPositionY(); return GetPositionY(); }
         float GetStationaryZ() const { if (GetGOInfo()->type != GAMEOBJECT_TYPE_MO_TRANSPORT) return m_stationaryPosition.GetPositionZ(); return GetPositionZ(); }
         float GetStationaryO() const { if (GetGOInfo()->type != GAMEOBJECT_TYPE_MO_TRANSPORT) return m_stationaryPosition.GetOrientation(); return GetOrientation(); }
+        void RelocateStationaryPosition(float x, float y, float z, float o) { m_stationaryPosition.Relocate(x, y, z, o); }
 
         float GetInteractionDistance() const;
 
@@ -862,6 +901,9 @@ class GameObject : public WorldObject, public GridObject<GameObject>, public Map
         GameObjectValue m_goValue;
 
         uint64 m_rotation;
+
+        int64 m_packedRotation;
+        QuaternionData m_worldRotation;
         Position m_stationaryPosition;
 
         uint64 m_lootRecipient;
@@ -870,6 +912,7 @@ class GameObject : public WorldObject, public GridObject<GameObject>, public Map
     private:
         void RemoveFromOwner();
         void SwitchDoorOrButton(bool activate, bool alternative = false);
+        void UpdatePackedRotation();
 
         //! Object distance/size - overridden from Object::_IsWithinDist. Needs to take in account proper GO size.
         bool _IsWithinDist(WorldObject const* obj, float dist2compare, bool /*is3D*/) const

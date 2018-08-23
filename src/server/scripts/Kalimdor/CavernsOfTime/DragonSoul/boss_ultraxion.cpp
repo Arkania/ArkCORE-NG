@@ -591,6 +591,7 @@ public:
 
 };
 
+// 56667
 class npc_trall_vs_ultraxion : public CreatureScript
 {
 public:
@@ -642,6 +643,7 @@ public:
     }
 };
 
+// 56666
 class npc_nozdormu : public CreatureScript
 {
 public:
@@ -684,6 +686,7 @@ public:
     }
 };
 
+// 56665
 class npc_ysera : public CreatureScript
 {
 public:
@@ -726,6 +729,7 @@ public:
     }
 };
 
+// 56630
 class npc_alexstrasza : public CreatureScript
 {
 public:
@@ -768,6 +772,7 @@ public:
     }
 };
 
+// 56664
 class npc_aspect_of_magic : public CreatureScript
 {
 public:
@@ -1288,17 +1293,17 @@ public:
 void AddSC_boss_ultraxion()
 {
     new boss_ultraxion();
-    new spell_ultraxion_twilight_instability();
-    new spell_ultraxion_hour_of_twilight_dmg();
-    new spell_ultraxion_fading_light();
-    new spell_ultraxion_last_defender_of_azeroth();
-    new spell_ultraxion_last_defender_of_azeroth_dummy();
-    new spell_ultraxion_heroic_will();
-    new spell_ultraxion_time_loop();
+    //new spell_ultraxion_twilight_instability();
+    //new spell_ultraxion_hour_of_twilight_dmg();
+    //new spell_ultraxion_fading_light();
+    //new spell_ultraxion_last_defender_of_azeroth();
+    //new spell_ultraxion_last_defender_of_azeroth_dummy();
+    //new spell_ultraxion_heroic_will();
+    //new spell_ultraxion_time_loop();
     new npc_trall_vs_ultraxion();
     new npc_nozdormu();
     new npc_ysera();
     new npc_aspect_of_magic();
     new npc_alexstrasza();
-    new achievement_minutes_to_midnight();
+    //new achievement_minutes_to_midnight();
 }

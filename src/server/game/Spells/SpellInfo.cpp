@@ -27,6 +27,8 @@
 #include "Battleground.h"
 #include "Vehicle.h"
 
+#include "SpellAuraEffects.h"
+
 uint32 GetTargetFlagMask(SpellTargetObjectTypes objType)
 {
     switch (objType)
@@ -314,7 +316,7 @@ SpellImplicitTargetInfo::StaticData  SpellImplicitTargetInfo::_data[TOTAL_SPELL_
     {TARGET_OBJECT_TYPE_UNIT, TARGET_REFERENCE_TYPE_CASTER, TARGET_SELECT_CATEGORY_DEFAULT, TARGET_CHECK_DEFAULT,  TARGET_DIR_NONE},        // 102 TARGET_UNIT_PASSENGER_6
     {TARGET_OBJECT_TYPE_UNIT, TARGET_REFERENCE_TYPE_CASTER, TARGET_SELECT_CATEGORY_DEFAULT, TARGET_CHECK_DEFAULT,  TARGET_DIR_NONE},        // 103 TARGET_UNIT_PASSENGER_7
     {TARGET_OBJECT_TYPE_UNIT, TARGET_REFERENCE_TYPE_CASTER, TARGET_SELECT_CATEGORY_CONE,    TARGET_CHECK_ENEMY,    TARGET_DIR_FRONT},       // 104 TARGET_UNIT_CONE_ENEMY_104
-    {TARGET_OBJECT_TYPE_UNIT, TARGET_REFERENCE_TYPE_NONE,   TARGET_SELECT_CATEGORY_NYI,     TARGET_CHECK_DEFAULT,  TARGET_DIR_NONE},        // 105 TARGET_UNIT_UNK_105
+    {TARGET_OBJECT_TYPE_UNIT, TARGET_REFERENCE_TYPE_CASTER, TARGET_SELECT_CATEGORY_DEFAULT, TARGET_CHECK_DEFAULT,  TARGET_DIR_NONE},        // 105 TARGET_UNIT_UNK_105
     {TARGET_OBJECT_TYPE_DEST, TARGET_REFERENCE_TYPE_CASTER, TARGET_SELECT_CATEGORY_CHANNEL, TARGET_CHECK_DEFAULT,  TARGET_DIR_NONE},        // 106 TARGET_DEST_CHANNEL_CASTER
     {TARGET_OBJECT_TYPE_NONE, TARGET_REFERENCE_TYPE_DEST,   TARGET_SELECT_CATEGORY_NYI,     TARGET_CHECK_DEFAULT,  TARGET_DIR_NONE},        // 107 TARGET_UNK_DEST_AREA_UNK_107
     {TARGET_OBJECT_TYPE_GOBJ, TARGET_REFERENCE_TYPE_CASTER, TARGET_SELECT_CATEGORY_CONE,    TARGET_CHECK_DEFAULT,  TARGET_DIR_FRONT},       // 108 TARGET_GAMEOBJECT_CONE
@@ -329,7 +331,7 @@ SpellImplicitTargetInfo::StaticData  SpellImplicitTargetInfo::_data[TOTAL_SPELL_
     {TARGET_OBJECT_TYPE_NONE, TARGET_REFERENCE_TYPE_NONE,   TARGET_SELECT_CATEGORY_NYI,     TARGET_CHECK_DEFAULT,  TARGET_DIR_NONE},        // 117
     {TARGET_OBJECT_TYPE_NONE, TARGET_REFERENCE_TYPE_NONE,   TARGET_SELECT_CATEGORY_NYI,     TARGET_CHECK_DEFAULT,  TARGET_DIR_NONE},        // 118
     {TARGET_OBJECT_TYPE_UNIT, TARGET_REFERENCE_TYPE_CASTER, TARGET_SELECT_CATEGORY_AREA,    TARGET_CHECK_RAID,     TARGET_DIR_NONE},        // 119
-    {TARGET_OBJECT_TYPE_NONE, TARGET_REFERENCE_TYPE_NONE,   TARGET_SELECT_CATEGORY_NYI,     TARGET_CHECK_DEFAULT,  TARGET_DIR_NONE},        // 120
+    {TARGET_OBJECT_TYPE_UNIT, TARGET_REFERENCE_TYPE_CASTER, TARGET_SELECT_CATEGORY_AREA,    TARGET_CHECK_DEFAULT,  TARGET_DIR_NONE},        // 120
     {TARGET_OBJECT_TYPE_NONE, TARGET_REFERENCE_TYPE_NONE,   TARGET_SELECT_CATEGORY_NYI,     TARGET_CHECK_DEFAULT,  TARGET_DIR_NONE},        // 121
     {TARGET_OBJECT_TYPE_NONE, TARGET_REFERENCE_TYPE_NONE,   TARGET_SELECT_CATEGORY_NYI,     TARGET_CHECK_DEFAULT,  TARGET_DIR_NONE},        // 122
     {TARGET_OBJECT_TYPE_NONE, TARGET_REFERENCE_TYPE_NONE,   TARGET_SELECT_CATEGORY_NYI,     TARGET_CHECK_DEFAULT,  TARGET_DIR_NONE},        // 123
@@ -366,7 +368,7 @@ SpellEffectInfo::SpellEffectInfo(SpellEntry const* /*spellEntry*/, SpellInfo con
     ItemType = _effect ? _effect->EffectItemType : 0;
     TriggerSpell = _effect ? _effect->EffectTriggerSpell : 0;
     SpellClassMask = _effect ? _effect->EffectSpellClassMask : flag96(0);
-    ImplicitTargetConditions = NULL;
+    ImplicitTargetConditions = nullptr;
     ScalingMultiplier = scaling ? scaling->Multiplier[_effIndex] : 0.0f;
     DeltaScalingMultiplier = scaling ? scaling->RandomMultiplier[_effIndex] : 0.0f;
     ComboScalingMultiplier = scaling ? scaling->OtherMultiplier[_effIndex] : 0.0f;
@@ -605,98 +607,73 @@ float SpellEffectInfo::CalcDamageMultiplier(Unit* caster, Spell* spell) const
 
 bool SpellEffectInfo::HasRadius() const
 {
-    return RadiusEntry != NULL;
+    return RadiusEntry != nullptr;
 }
 
 bool SpellEffectInfo::HasMaxRadius() const
 {
-    return MaxRadiusEntry != NULL;
+    return MaxRadiusEntry != nullptr;
 }
 
 float SpellEffectInfo::CalcRadius(bool positive, Unit* caster, Spell* spell) const
 {
-    const SpellRadiusEntry* entry = RadiusEntry;
     if (!HasRadius()) // Use for ANY non-radius spell. Define radius here.
     {
         switch(_spellInfo->Id)
         {
-            // PLAYERS / PVP.
-            // Solar beam
-            case 81261:
-                return 5.0f;
-            // Gul'dan aur
-            case 93974: 
+            // PLAYERS / PVP. // DUNGEONS, RAIDS / PVE.
+            
+            case 75117: // Burning Light Anhuur
+            case 93974: // Gul'dan aur
             case 93987:
             case 93986:
             case 93975:
                 return 4.0f;
+            case 76956: //Alpha Beams Anraphet
+            case 81261: // Solar beam
+                return 5.0f;
+            case 75548: // Quicksand Ptah
+            case 75702: // Spore Ammunae
+            case 86261: // Incaster absorb.
+            case 89648:
+                return 6.0f;
+            case 73958: // Lightning Discharge
+            case 77478: // Earthquake
+            case 81297: // Consecration
             case 86041:
-                return 8.0f;
-            // Lightning Discharge
-            case 73958:
-                return 8.0f;
-            // Death and Decay
-            case 52212:
-                return 10.0f;
-            // Blood worms
-            case 81280:
-                return 15.0f;
-            // Fire nova
-            case 8349:
-                return 10.0f;
-            // Serpent Spread
-            case 88453:
+            case 88453: // Serpent Spread
             case 88466:
                 return 8.0f;
-            // Healing Rain
-            case 73921:
+            case 8349:  // Fire nova
+            case 52212: // Death and Decay
+            case 69355:
+            case 73921: // Healing Rain
                 return 10.0f;
-            // Earthquake
-            case 77478:
-                return 8.0f;
-            // Incaster absorb.
-            case 86261:
-                return 6.0f;
-            // Ralling cry
-            case 97463:
-                return 30.0f;
-            // Atonement
-            case 94472: 
+            case 73868: // Rumbling Hooves
+            case 81280: // Blood worms
+            case 94472: // Atonement
                 return 15.0f;
-            // Consecration
-            case 81297:
-                return 8.0f;
-            // DUNGEONS, RAIDS / PVE.
-            // ICC
+            case 73309: // Lilian's Death Grip 
+            case 82676: // Ring of Frost
+            case 83173: // Raise Forsaken            
+            case 97463: // Ralling cry
+                return 30.0f;            
             case 70541: // LK Infest
             case 73779: // LK Infest
             case 73780: // LK Infest
             case 73781: // LK Infest
                 return 60.0f;
-            case 71429: // Mass Ressurection Terenas
-                return 200.0f;
-            // HOO
-            case 75194: // Burning Light Anhuur
-            case 75115: // Burning Light Anhuur
-                return 100.0f;
-            case 75117: // Burning Light Anhuur
-                return 4.0f;
-            case 76956: //Alpha Beams Anraphet
-                return 5.0f; // 5y
-            case 75790: // Rampant Growth Ammunae
-            case 89888: // Rampant Growth Ammunae
-                return 100.0f;
-            case 75702: // Spore Ammunae
-                return 6.0f;            
             case 75540: // Flame Bolt Ptah
                 return 70.0f;
-            case 75548: // Quicksand Ptah
-            case 89648:
-                return 6.0f;
-            case 69355:
-                return 10.0f;
+            case 75194: // Burning Light Anhuur
+            case 75115: // Burning Light Anhuur
+            case 75790: // Rampant Growth Ammunae
             case 76355: // Blessing of the sun Rajh
+            case 89888: // Rampant Growth Ammunae
                 return 100.0f;
+            case 71429: // Mass Ressurection Terenas
+                return 200.0f;
+            
             // TOTT
             case 80564: // Fungal Spores Naz'jar
             case 91470:
@@ -1057,20 +1034,29 @@ float SpellEffectInfo::CalcRadius(bool positive, Unit* caster, Spell* spell) con
                 return 25.0f;
             case 103785: // Morchok Black Blood.
                 return 150.0f;
-            default:
-                return 0.0f;
-            break;
         }
     }
+
+    const SpellRadiusEntry* entry = RadiusEntry;
+    if (!HasRadius() && HasMaxRadius())
+        entry = MaxRadiusEntry;
 
     if (!entry)
         return 0.0f;
 
     float radius;
     if (positive)
-        radius = RadiusEntry->RadiusMax;
+        radius = entry->RadiusMax;
     else
-        radius = RadiusEntry->RadiusMin;
+    {
+        radius = entry->RadiusMin;
+        if (caster)
+        {
+            radius += entry->RadiusPerLevel * caster->getLevel();
+            radius = std::min(radius, entry->RadiusMax);
+        }
+    }
+
     if (caster)
         if (Player* modOwner = caster->GetSpellModOwner())
             modOwner->ApplySpellMod(_spellInfo->Id, SPELLMOD_RADIUS, radius, spell);
@@ -1460,7 +1446,7 @@ SpellInfo::SpellInfo(SpellEntry const* spellEntry, SpellEffectEntry const** effe
     for (uint8 i = 0; i < 2; ++i)
         Totem[i] = _totem ? _totem->Totem[i] : 0;
 
-    ChainEntry = NULL;
+    ChainEntry = nullptr;
 }
 
 SpellInfo::~SpellInfo()
@@ -1670,6 +1656,11 @@ bool SpellInfo::IsPassive() const
     return Attributes & SPELL_ATTR0_PASSIVE;
 }
 
+bool SpellInfo::IsRaidMarker() const
+{
+    return AttributesEx8 & SPELL_ATTR8_RAID_MARKER;
+}
+
 bool SpellInfo::IsAutocastable() const
 {
     if (Attributes & SPELL_ATTR0_PASSIVE)
@@ -1775,6 +1766,11 @@ bool SpellInfo::IsPositiveEffect(uint8 effIndex) const
 bool SpellInfo::IsChanneled() const
 {
     return (AttributesEx & (SPELL_ATTR1_CHANNELED_1 | SPELL_ATTR1_CHANNELED_2));
+}
+
+bool SpellInfo::IsMoveAllowedChannel() const
+{
+    return IsChanneled() && HasAttribute(SPELL_ATTR5_CAN_CHANNEL_WHEN_MOVING);
 }
 
 bool SpellInfo::NeedsComboPoints() const
@@ -1941,7 +1937,7 @@ SpellCastResult SpellInfo::CheckShapeshift(uint32 form) const
         return SPELL_CAST_OK;
 
     bool actAsShifted = false;
-    SpellShapeshiftFormEntry const* shapeInfo = NULL;
+    SpellShapeshiftFormEntry const* shapeInfo = nullptr;
     if (form > 0)
     {
         shapeInfo = sSpellShapeshiftFormStore.LookupEntry(form);
@@ -2895,7 +2891,7 @@ int32 SpellInfo::CalcPowerCost(Unit const* caster, SpellSchoolMask schoolMask) c
 
 bool SpellInfo::IsRanked() const
 {
-    return ChainEntry != NULL;
+    return ChainEntry != nullptr;
 }
 
 uint8 SpellInfo::GetRank() const
@@ -2954,7 +2950,7 @@ SpellInfo const* SpellInfo::GetAuraRankForLevel(uint8 level) const
     if (!needRankSelection)
         return this;
 
-    for (SpellInfo const* nextSpellInfo = this; nextSpellInfo != NULL; nextSpellInfo = nextSpellInfo->GetPrevRankSpell())
+    for (SpellInfo const* nextSpellInfo = this; nextSpellInfo != nullptr; nextSpellInfo = nextSpellInfo->GetPrevRankSpell())
     {
         // if found appropriate level
         if (uint32(level + 10) >= nextSpellInfo->SpellLevel)
@@ -3376,7 +3372,7 @@ void SpellInfo::_UnloadImplicitTargetConditionLists()
         for (uint8 j = i; j < MAX_SPELL_EFFECTS; ++j)
         {
             if (Effects[j].ImplicitTargetConditions == cur)
-                Effects[j].ImplicitTargetConditions = NULL;
+                Effects[j].ImplicitTargetConditions = nullptr;
         }
         delete cur;
     }

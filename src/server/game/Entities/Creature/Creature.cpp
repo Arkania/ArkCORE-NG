@@ -66,6 +66,16 @@ TrainerSpell const* TrainerSpellData::Find(uint32 spell_id) const
     return NULL;
 }
 
+// returns the SkillID, Teached from this trainer
+uint16 TrainerSpellData::GetTrainerSkillID() const
+{
+    for (TrainerSpellMap::const_iterator itr = spellList.begin(); itr != spellList.end(); ++itr)
+        if (itr->second.reqSkill)
+            return itr->second.reqSkill;
+
+    return 0;
+}
+
 bool VendorItemData::RemoveItem(uint32 item_id, uint8 type)
 {
     bool found = false;
@@ -168,20 +178,20 @@ m_originalEntry(0), m_homePosition(), m_transportHomePosition(), m_creatureInfo(
     ResetLootMode(); // restore default loot mode
     TriggerJustRespawned = false;
     m_isTempWorldObject = false;
-    _focusSpell = NULL;
+    _focusSpell = nullptr;
     // npc_bot
-    m_bot_owner = NULL;
-    m_creature_owner = NULL;
-    m_bots_pet = NULL;
+    m_bot_owner = nullptr;
+    m_creature_owner = nullptr;
+    m_bots_pet = nullptr;
     m_bot_class = CLASS_NONE;
-    bot_AI = NULL;
+    bot_AI = nullptr;
     m_canUpdate = true;
 }
 
 Creature::~Creature()
 {
     delete i_AI;
-    i_AI = NULL;
+    i_AI = nullptr;
 
     //if (m_uint32Values)
     //    TC_LOG_ERROR("entities.unit", "Deconstruct Creature Entry = %u", GetEntry());
@@ -625,7 +635,7 @@ void Creature::RegenerateMana()
 
     if (curValue >= maxValue)
         return;
-
+   
     uint32 addvalue = 0;
 
     // Combat and any controlled creature
@@ -646,6 +656,13 @@ void Creature::RegenerateMana()
     for (AuraEffectList::const_iterator i = ModPowerRegenPCTAuras.begin(); i != ModPowerRegenPCTAuras.end(); ++i)
         if ((*i)->GetMiscValue() == POWER_MANA)
             AddPct(addvalue, (*i)->GetAmount());
+
+    /* Hack for Kezan Quest 14122, creature 35476, the piggy bank for robbing money,
+    The progressbar is shown with using mana, value 0-100.
+    There is no properties in creature to enable/disable the regenerate of Mana,
+    or set a new (lower) regenerate amount value, for this type of creature  */
+    if (GetEntry() == 35486)
+        addvalue = 2;
 
     ModifyPower(POWER_MANA, addvalue);
 }
@@ -698,7 +715,7 @@ void Creature::DoFleeToGetAssistance()
     float radius = sWorld->getFloatConfig(CONFIG_CREATURE_FAMILY_FLEE_ASSISTANCE_RADIUS);
     if (radius >0)
     {
-        Creature* creature = NULL;
+        Creature* creature = nullptr;
 
         CellCoord p(Trinity::ComputeCellCoord(GetPositionX(), GetPositionY()));
         Cell cell(p);
@@ -764,8 +781,14 @@ bool Creature::Create(uint32 guidlow, Map* map, uint32 phaseMask, uint32 Entry, 
 {
     ASSERT(map);
     SetMap(map);
-    SetPhaseMask(phaseMask, false);
 
+    if (data && data->phaseId)
+        SetInPhase(data->phaseId, false, true);
+
+    if (data && data->phaseGroup)
+        for (auto ph : GetXPhasesForGroup(data->phaseGroup))
+            SetInPhase(ph, false, true);
+  
     CreatureTemplate const* cinfo = sObjectMgr->GetCreatureTemplate(Entry);
     if (!cinfo)
     {
@@ -960,11 +983,12 @@ void Creature::SaveToDB()
     SaveToDB(mapId, data->spawnMask, GetPhaseMask());
 }
 
-void Creature::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
+void Creature::SaveToDB(uint32 mapid, uint32 spawnMask, uint32 phaseMask)
 {
     // update in loaded data
     if (!m_DBTableGuid)
         m_DBTableGuid = GetGUIDLow();
+
     CreatureData& data = sObjectMgr->NewOrExistCreatureData(m_DBTableGuid);
 
     uint32 displayId = GetNativeDisplayId();
@@ -1025,6 +1049,9 @@ void Creature::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
     data.unit_flags = unit_flags;
     data.dynamicflags = dynamicflags;
 
+    data.phaseId = GetDBPhase() > 0 ? GetDBPhase() : 0;
+    data.phaseGroup = GetDBPhase() < 0 ? abs(GetDBPhase()) : 0;
+
     // update in DB
     SQLTransaction trans = WorldDatabase.BeginTransaction();
 
@@ -1038,8 +1065,11 @@ void Creature::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
     stmt->setUInt32(index++, m_DBTableGuid);
     stmt->setUInt32(index++, GetEntry());
     stmt->setUInt16(index++, uint16(mapid));
+    stmt->setUInt16(index++, uint16(GetZoneId()));
+    stmt->setUInt16(index++, uint16(GetAreaId()));
     stmt->setUInt8(index++, spawnMask);
-    stmt->setUInt32(index++, GetPhaseMask());
+    stmt->setUInt16(index++, data.phaseId);
+    stmt->setUInt16(index++, data.phaseGroup);
     stmt->setUInt32(index++, displayId);
     stmt->setInt32(index++, int32(GetCurrentEquipmentId()));
     stmt->setFloat(index++, GetPositionX());
@@ -1534,23 +1564,38 @@ void Creature::SetDeathState(DeathState s)
     }
     else if (s == JUST_RESPAWNED)
     {
-        //if (IsPet())
-        //    setActive(true);
-        SetFullHealth();
-        SetLootRecipient(NULL);
+        if (IsPet())
+            SetFullHealth();
+        else
+            SetFullHealth();
+        
+        SetLootRecipient(nullptr);
         ResetPlayerDamageReq();
-
         UpdateMovementFlags();
-
-        CreatureTemplate const* cinfo = GetCreatureTemplate();
-        SetUInt32Value(UNIT_NPC_FLAGS, cinfo->npcflag);
         ClearUnitState(uint32(UNIT_STATE_ALL_STATE & ~UNIT_STATE_IGNORE_PATHFINDING));
-        SetMeleeDamageSchool(SpellSchools(cinfo->dmgschool));
-        LoadCreaturesAddon(true);
+
+        if (!IsPet())
+        {
+            CreatureData const* creatureData = GetCreatureData();
+            CreatureTemplate const* cinfo = GetCreatureTemplate();
+
+            uint32 npcflag, unit_flags, dynamicflags;
+            ObjectMgr::ChooseCreatureFlags(cinfo, npcflag, unit_flags, dynamicflags, creatureData);
+
+            SetUInt32Value(UNIT_NPC_FLAGS, npcflag);
+            SetUInt32Value(UNIT_FIELD_FLAGS, unit_flags);
+            SetUInt32Value(UNIT_DYNAMIC_FLAGS, dynamicflags);
+
+            RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT);
+
+            SetMeleeDamageSchool(SpellSchools(cinfo->dmgschool));
+            
+            // phase gpn39f
+        }
+
         Motion_Initialize();
-        if (GetCreatureData() && GetPhaseMask() != GetCreatureData()->phaseMask)
-            SetPhaseMask(GetCreatureData()->phaseMask, false);
         Unit::SetDeathState(ALIVE);
+        LoadCreaturesAddon(true);
     }
 }
 
@@ -1802,7 +1847,7 @@ Unit* Creature::SelectNearestTarget(float dist, bool playerOnly /* = false */) c
     Cell cell(p);
     cell.SetNoCreate();
 
-    Unit* target = NULL;
+    Unit* target = nullptr;
 
     {
         if (dist == 0.0f)
@@ -1828,7 +1873,7 @@ Unit* Creature::SelectNearestTargetInAttackDistance(float dist) const
     Cell cell(p);
     cell.SetNoCreate();
 
-    Unit* target = NULL;
+    Unit* target = nullptr;
 
     if (dist > MAX_VISIBILITY_DISTANCE)
     {
@@ -1852,7 +1897,7 @@ Unit* Creature::SelectNearestTargetInAttackDistance(float dist) const
 
 Player* Creature::SelectNearestPlayer(float distance) const
 {
-    Player* target = NULL;
+    Player* target = nullptr;
 
     Trinity::NearestPlayerInObjectRangeCheck checker(this, distance);
     Trinity::PlayerLastSearcher<Trinity::NearestPlayerInObjectRangeCheck> searcher(this, target, checker);
@@ -2106,6 +2151,10 @@ bool Creature::LoadCreaturesAddon(bool reload)
 
     if (cainfo->emote != 0)
         SetUInt32Value(UNIT_NPC_EMOTESTATE, cainfo->emote);
+
+    SetAIAnimKitId(cainfo->aiAnimKit);
+    SetMovementAnimKitId(cainfo->movementAnimKit);
+    SetMeleeAnimKitId(cainfo->meleeAnimKit);
 
     //Load Path
     if (cainfo->path_id != 0)
@@ -2495,6 +2544,26 @@ void Creature::SetPosition(float x, float y, float z, float o)
         GetVehicleKit()->RelocatePassengers();
 }
 
+void Creature::SetTransportHomePosition(float x, float y, float z, float o)
+{
+    m_transportHomePosition.Relocate(x, y, z, o);
+}
+
+void Creature::SetTransportHomePosition(const Position &pos)
+{
+    m_transportHomePosition.Relocate(pos);
+}
+
+void Creature::GetTransportHomePosition(float& x, float& y, float& z, float& ori) const
+{
+    m_transportHomePosition.GetPosition(x, y, z, ori);
+}
+
+Position const& Creature::GetTransportHomePosition() const
+{
+    return m_transportHomePosition; 
+}
+
 bool Creature::IsDungeonBoss() const
 {
     CreatureTemplate const* cinfo = sObjectMgr->GetCreatureTemplate(GetEntry());
@@ -2555,7 +2624,7 @@ Unit* Creature::SelectNearestHostileUnitInAggroRange(bool useLOS) const
     // Selects nearest hostile target within creature's aggro range. Used primarily by
     //  pets set to aggressive. Will not return neutral or friendly targets.
 
-    Unit* target = NULL;
+    Unit* target = nullptr;
 
     {
         Trinity::NearestHostileUnitInAggroRangeCheck u_check(this, useLOS);
@@ -2655,7 +2724,7 @@ void Creature::SetIAmABot(bool bot)
          {
         bot_AI->UnsummonAll();
         IsAIEnabled = false;
-        bot_AI = NULL;
+        bot_AI = nullptr;
         SetUInt64Value(UNIT_FIELD_CREATEDBY, 0);
         }
     }
@@ -2672,7 +2741,7 @@ void Creature::SetBotsPetDied()
     m_bot_owner->SetMinion((Minion*)m_bots_pet, false);
     m_bots_pet->CleanupsBeforeDelete();
     m_bots_pet->AddObjectToRemoveList();
-    m_bots_pet = NULL;
+    m_bots_pet = nullptr;
     }
 
 void Creature::SetBotTank(Unit* newtank)
@@ -2861,7 +2930,7 @@ void Creature::ReleaseFocus(Spell const* focusSpell)
     if (focusSpell != _focusSpell)
         return;
 
-    _focusSpell = NULL;
+    _focusSpell = nullptr;
     if (Unit* victim = GetVictim())
         SetUInt64Value(UNIT_FIELD_TARGET, victim->GetGUID());
     else

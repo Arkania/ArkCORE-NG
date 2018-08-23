@@ -1,0 +1,8 @@
+
+how can we populate a map as vashjir with new content?
+and do it with better overview, not update each change, as single update with date, as we do now,
+but as one big zone
+so it is more easy to import/export/maintenance data 
+
+if someone has a better idee: our forum is: http://gpn39f.spdns.de/forum1
+ 

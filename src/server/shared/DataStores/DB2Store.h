@@ -45,7 +45,7 @@ class DB2Storage;
 template<class T>
 bool DB2StorageHasEntry(DB2Storage<T> const& store, uint32 id)
 {
-    return store.LookupEntry(id) != NULL;
+    return store.LookupEntry(id) != nullptr;
 }
 
 template<class T>
@@ -108,7 +108,7 @@ public:
     DB2Storage(char const* f, EntryChecker checkEntry = NULL, PacketWriter writePacket = NULL) :
         nCount(0), fieldCount(0), fmt(f), m_dataTable(NULL)
     {
-        indexTable.asT = NULL;
+        indexTable.asT = nullptr;
         CheckEntry = checkEntry ? checkEntry : (EntryChecker)&DB2StorageHasEntry<T>;
         WritePacket = writePacket ? writePacket : (PacketWriter)&WriteDB2RecordToPacket<T>;
     }
@@ -147,7 +147,7 @@ public:
         return entryDst;
     }
 
-    void EraseEntry(uint32 id) { indexTable.asT[id] = NULL; }
+    void EraseEntry(uint32 id) { indexTable.asT[id] = nullptr; }
 
     bool Load(char const* fn, uint32 locale)
     {
@@ -169,7 +169,7 @@ public:
         m_stringPoolList.push_back(db2.AutoProduceStrings(fmt, (char*)m_dataTable, locale));
 
         // error in dbc file at loading if NULL
-        return indexTable.asT != NULL;
+        return indexTable.asT != nullptr;
     }
 
     bool LoadStringsFrom(char const* fn, uint32 locale)
@@ -195,10 +195,10 @@ public:
             return;
 
         delete[] reinterpret_cast<char*>(indexTable.asT);
-        indexTable.asT = NULL;
+        indexTable.asT = nullptr;
 
         delete[] reinterpret_cast<char*>(m_dataTable);
-        m_dataTable = NULL;
+        m_dataTable = nullptr;
 
         for (typename DataTableEx::iterator itr = m_dataTableEx.begin(); itr != m_dataTableEx.end(); ++itr)
             delete *itr;

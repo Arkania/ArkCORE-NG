@@ -1007,7 +1007,7 @@ public:
     uint64 GetExperience() const { return _experience; }
     uint64 GetTodayExperience() const { return _todayExperience; }
     void CompleteChallenge(uint8 challengeType, Player *source);
-    void ResetDailyExperience(); // Reset cap.
+    void ResetDailyGuildXP(); 
     void AddGuildNews(uint8 type, uint64 guid, uint32 flags, uint32 value);
 
     //void MoveRank(uint32 rankId, uint8 direction);

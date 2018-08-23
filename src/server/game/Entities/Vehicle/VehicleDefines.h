@@ -135,9 +135,12 @@ protected:
         float inx = x, iny = y, inz = z;
         if (o)
             *o = Position::NormalizeOrientation(transO + *o);
+        
+        float _cos = std::cos(transO);
+        float _sin = std::sin(transO);
 
-        x = transX + inx * std::cos(transO) - iny * std::sin(transO);
-        y = transY + iny * std::cos(transO) + inx * std::sin(transO);
+        x = transX + inx * _cos - iny * _sin;
+        y = transY + iny * _cos + inx * _sin;
         z = transZ + inz;
     }
 
@@ -149,9 +152,14 @@ protected:
         z -= transZ;
         y -= transY;    // y = searchedY * std::cos(o) + searchedX * std::sin(o)
         x -= transX;    // x = searchedX * std::cos(o) + searchedY * std::sin(o + pi)
+
+        float _cos = std::cos(transO);
+        float _sin = std::sin(transO);
+        float _tan = std::tan(transO);
+
         float inx = x, iny = y;
-        y = (iny - inx * std::tan(transO)) / (std::cos(transO) + std::sin(transO) * std::tan(transO));
-        x = (inx + iny * std::tan(transO)) / (std::cos(transO) + std::sin(transO) * std::tan(transO));
+        y = (iny - inx * _tan) / (_cos + _sin * _tan);
+        x = (inx + iny * _tan) / (_cos + _sin * _tan);
     }
 };
 

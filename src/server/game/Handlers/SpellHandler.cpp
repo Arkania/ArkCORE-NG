@@ -294,7 +294,7 @@ void WorldSession::HandleGameObjectUseOpcode(WorldPacket& recvData)
 
     if (GameObject* obj = GetPlayer()->GetMap()->GetGameObject(guid))
     {
-        if (!obj->IsWithinDistInMap(GetPlayer(), obj->GetInteractionDistance()))
+        if (!(obj->IsWithinDistInMap(GetPlayer(), obj->GetInteractionDistance())))
             return;
 
         // ignore for remote control state
@@ -378,7 +378,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
         caster = _player;
     }
 
-    if (caster->GetTypeId() == TYPEID_PLAYER && !caster->ToPlayer()->HasActiveSpell(spellId))
+    if (caster->GetTypeId() == TYPEID_PLAYER && !caster->ToPlayer()->HasActiveSpell(spellId) && !spellInfo->IsRaidMarker())
     {
         // Archaeology: craft artifacts
         if (caster->ToPlayer()->HasSkill(SKILL_ARCHAEOLOGY))
@@ -718,7 +718,7 @@ void WorldSession::HandleMirrorImageDataRequest(WorldPacket& recvData)
     if (creator->GetTypeId() == TYPEID_PLAYER)
     {
         Player* player = creator->ToPlayer();
-        Guild* guild = NULL;
+        Guild* guild = nullptr;
 
         if (uint32 guildId = player->GetGuildId())
             guild = sGuildMgr->GetGuildById(guildId);

@@ -78,7 +78,7 @@ class DBCStorage
         explicit DBCStorage(char const* f)
             : fmt(f), nCount(0), fieldCount(0), dataTable(NULL)
         {
-            indexTable.asT = NULL;
+            indexTable.asT = nullptr;
         }
 
         ~DBCStorage() { Clear(); }
@@ -106,7 +106,7 @@ class DBCStorage
 
             uint32 sqlRecordCount = 0;
             uint32 sqlHighestIndex = 0;
-            Field* fields = NULL;
+            Field* fields = nullptr;
             QueryResult result = QueryResult(NULL);
             // Load data from sql
             if (sql)
@@ -136,7 +136,7 @@ class DBCStorage
                 }
             }
 
-            char* sqlDataTable = NULL;
+            char* sqlDataTable = nullptr;
             fieldCount = dbc.GetCols();
 
             dataTable = reinterpret_cast<T*>(dbc.AutoProduceData(fmt, nCount, indexTable.asChar,
@@ -192,6 +192,10 @@ class DBCStorage
                                         *reinterpret_cast<uint8*>(&sqlDataTable[offset]) = uint8(0);
                                         offset += 1;
                                         break;
+                                    case FT_LONG:
+                                        *reinterpret_cast<uint64*>(&sqlDataTable[offset]) = uint64(0);
+                                        offset += 8;
+                                        break;
                                     case FT_STRING:
                                         // Beginning of the pool - empty string
                                         *reinterpret_cast<char**>(&sqlDataTable[offset]) = stringPoolList.back();
@@ -216,6 +220,10 @@ class DBCStorage
                                     case FT_BYTE:
                                         *reinterpret_cast<uint8*>(&sqlDataTable[offset]) = fields[sqlColumnNumber].GetUInt8();
                                         offset += 1;
+                                        break;
+                                    case FT_LONG:
+                                        *reinterpret_cast<uint64*>(&sqlDataTable[offset]) = uint64(0);
+                                        offset += 8;
                                         break;
                                     case FT_STRING:
                                         TC_LOG_ERROR("server.loading", "Unsupported data type in table '%s' at char %d", sql->sqlTableName.c_str(), columnNumber);
@@ -242,14 +250,14 @@ class DBCStorage
                             return false;
                         }
 
-                        fields = NULL;
+                        fields = nullptr;
                         ++rowIndex;
                     } while (result->NextRow());
                 }
             }
 
             // error in dbc file at loading if NULL
-            return indexTable.asT != NULL;
+            return indexTable.asT != nullptr;
         }
 
         bool LoadStringsFrom(char const* fn)
@@ -274,9 +282,9 @@ class DBCStorage
                 return;
 
             delete[] reinterpret_cast<char*>(indexTable.asT);
-            indexTable.asT = NULL;
+            indexTable.asT = nullptr;
             delete[] reinterpret_cast<char*>(dataTable);
-            dataTable = NULL;
+            dataTable = nullptr;
 
             while (!stringPoolList.empty())
             {

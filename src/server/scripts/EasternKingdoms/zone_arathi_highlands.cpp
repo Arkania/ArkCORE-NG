@@ -109,7 +109,7 @@ class npc_professor_phizzlethorpe : public CreatureScript
                 Talk(SAY_AGGRO);
             }
 
-            void sQuestAccept(Player* player, Quest const* quest)
+            bool sQuestAccept(Player* player, Quest const* quest)
             {
                 if (quest->GetQuestId() == QUEST_SUNKEN_TREASURE)
                 {
@@ -117,6 +117,7 @@ class npc_professor_phizzlethorpe : public CreatureScript
                     npc_escortAI::Start(false, false, player->GetGUID(), quest);
                     me->setFaction(FACTION_SUNKEN_TREASURE);
                 }
+                return false;
             }
 
             void UpdateAI(uint32 diff) override

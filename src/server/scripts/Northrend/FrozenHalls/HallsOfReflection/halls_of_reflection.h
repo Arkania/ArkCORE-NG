@@ -44,7 +44,15 @@ enum Data
     DATA_ESCAPE_LEADER                          = 10,
     DATA_SUMMONS                                = 11,
     DATA_ICEWALL                                = 12,
-    DATA_CAVE_IN                                = 13
+    DATA_CAVE_IN                                = 13,
+
+	// Quest stuff
+	DATA_QUEL_DELAR_EVENT						= 14,
+	DATA_FROSTMOURNE_ALTAR_BUNNY				= 15,
+	DATA_UTHER_QUEL_DELAR						= 16,
+	DATA_QUEL_DELAR_INVOKER						= 17,
+
+	DATA_GUNSHIP								= 18,
 };
 
 enum Creatures
@@ -76,7 +84,9 @@ enum Creatures
 
     NPC_RAGING_GNOUL                              = 36940,
     NPC_RISEN_WITCH_DOCTOR                        = 36941,
-    NPC_ABON                                      = 37069
+    NPC_ABON                                      = 37069,
+
+	NPC_GUNSHIP_CANNON_HORDE = 37593,
 };
 
 enum GameObjects
@@ -116,19 +126,40 @@ enum Actions
     ACTION_WALL_BROKEN
 };
 
-enum TrashGeneralSpells
-{
-    // General spells
-    SPELL_WELL_OF_SOULS                           = 72630, // cast when spawn(become visible)
-    SPELL_SPIRIT_ACTIVATE                         = 72130, // cast when unit activates
-};
-
 enum InstanceEvents
 {
     EVENT_SPAWN_WAVES                             = 1,
     EVENT_NEXT_WAVE                               = 2,
     EVENT_DO_WIPE                                 = 3,
     EVENT_ADD_WAVE                                = 4,
+};
+
+enum InstanceSpells
+{
+	// Trash
+	SPELL_WELL_OF_SOULS = 72630, // cast when spawn (become visible)
+	SPELL_SPIRIT_ACTIVATE = 72130, // cast when unit activates
+
+
+	SPELL_START_HALLS_OF_REFLECTION_QUEST_A = 71351, // Start Quests
+	SPELL_START_HALLS_OF_REFLECTION_QUEST_H = 71542,
+	SPELL_START_HALLS_OF_REFLECTION_QUEST_AE = 72900,
+
+
+	SPELL_CREDIT_FINDING_SYLVANAS = 71536, // Quest Credits
+	SPELL_CREDIT_FINDING_JAINA = 71538,
+	SPELL_CREDIT_ESCAPING_ARTHAS = 71352,
+
+
+	SPELL_GUNSHIP_CANNON_FIRE = 70017, // Gunship
+	SPELL_GUNSHIP_CANNON_FIRE_MISSILE_ALLIANCE = 70021,
+	SPELL_GUNSHIP_CANNON_FIRE_MISSILE_HORDE = 70246,
+
+
+	SPELL_QUEL_DELAR_COMPULSION = 70013, // Halls of Reflection quest
+	SPELL_ESSENCE_OF_CAPTURED = 70720,
+
+	SPELL_SUMMON_RISEN_WITCH_DOCTOR = 69836,
 };
 
 // Base class for FALRIC and MARWYN

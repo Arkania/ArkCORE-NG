@@ -84,7 +84,7 @@ public:
             if (IsCasting() || Rand() > 35)
                 return;
 
-            Unit* target = NULL;
+            Unit* target = nullptr;
 
             if (SCATTER_SHOT && ScatterShot_cd <= 10000 && Rand() < 40)
             {
@@ -206,7 +206,7 @@ public:
             Unit* target = me->GetVictim();
             if (!(target && me->GetDistance(target) < 6 && me->HasInArc(M_PI, target) &&
                 IsInBotParty(target->GetVictim())))
-                target = NULL;
+                target = nullptr;
             if (!target)
                 target = FindAOETarget(3.f, true);
 
@@ -996,7 +996,7 @@ public:
 
             stingTargetGuid = 0;
 
-            markTarget = NULL;
+            markTarget = nullptr;
 
             Aspect = ASPECT_NONE;
 

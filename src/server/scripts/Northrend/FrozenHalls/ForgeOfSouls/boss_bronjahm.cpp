@@ -368,6 +368,7 @@ class DistanceCheck
         Unit* caster;
 };
 
+// 68921 69049
 class spell_bronjahm_soulstorm_targeting : public SpellScriptLoader
 {
     public:

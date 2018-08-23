@@ -85,16 +85,17 @@ public:
             Summons.DespawnAll();
         }
 
-        void sQuestReward(Player* /*player*/, Quest const* quest, uint32 /*opt*/) override
+        bool sQuestReward(Player* /*player*/, Quest const* quest, uint32 /*opt*/) override
         {
             if (quest->GetQuestId() == QUEST_CORRUPTED_SOIL)
             {
                 me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
                 events.ScheduleEvent(EVENT_TALK, 2000);
             }
+            return false;
         }
 
-        void sQuestAccept(Player* player, Quest const* quest) override
+        bool sQuestAccept(Player* player, Quest const* quest) override
         {
             if (quest->GetQuestId() == QUEST_UNEXPECTED_RESULT)
             {
@@ -103,6 +104,7 @@ public:
                 events.ScheduleEvent(EVENT_SUMMON, 1000);
                 PlayerGUID = player->GetGUID();
             }
+            return false;
         }
 
         void EnterCombat(Unit* /*who*/) override
@@ -302,8 +304,70 @@ public:
     };
 };
 
+// 15274
+class npc_mana_wyrm_15274 : public CreatureScript
+{
+public:
+    npc_mana_wyrm_15274() : CreatureScript("npc_mana_wyrm_15274") { }
+
+    enum eNPC
+    {
+        QUEST_THIRST_UNENDING = 8346,
+        NPC_SUNSTRIDER_MANA_TAP_COUNTER = 15468,
+        SPELL_QUEST_CREDIT_8346 = 61314,
+        SPELL_ARCANE_TORRENT = 28730,
+    };
+
+    struct npc_mana_wyrm_15274AI : public ScriptedAI
+    {
+        npc_mana_wyrm_15274AI(Creature* creature) : ScriptedAI(creature) { }
+
+        void SpellHit(Unit* caster, SpellInfo const* spell) override 
+        { 
+            if (spell->Id == SPELL_ARCANE_TORRENT)
+                if (Player* player = caster->ToPlayer())
+                    if (player->GetQuestStatus(QUEST_THIRST_UNENDING) == QUEST_STATUS_INCOMPLETE)
+                        player->KilledMonsterCredit(NPC_SUNSTRIDER_MANA_TAP_COUNTER);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_mana_wyrm_15274AI(creature);
+    }
+};
+
+// 44857
+class npc_wounded_outrunner_44857 : public CreatureScript
+{
+public:
+    npc_wounded_outrunner_44857() : CreatureScript("npc_wounded_outrunner_44857") {}
+
+    struct npc_wounded_outrunner_44857AI : public ScriptedAI
+    {
+        npc_wounded_outrunner_44857AI(Creature* creature) : ScriptedAI(creature) {}
+
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
+        {
+            if (Player* player = caster->ToPlayer())
+                if (player->GetQuestStatus(10072) == QUEST_STATUS_INCOMPLETE)
+                {
+                    player->KilledMonsterCredit(44857);
+                    me->DespawnOrUnsummon(500);
+                }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_wounded_outrunner_44857AI(creature);
+    }
+};
+
 void AddSC_eversong_woods()
 {
     new npc_apprentice_mirveda();
     new npc_infused_crystal();
+    new npc_mana_wyrm_15274();
+    new npc_wounded_outrunner_44857();
 }

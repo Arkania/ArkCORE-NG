@@ -180,10 +180,10 @@ class SmartAI : public CreatureAI
         void sGossipHello(Player* player);
         void sGossipSelect(Player* player, uint32 sender, uint32 action);
         void sGossipSelectCode(Player* player, uint32 sender, uint32 action, const char* code);
-        void sQuestAccept(Player* player, Quest const* quest);
-        //void sQuestSelect(Player* player, Quest const* quest);
-        //void sQuestComplete(Player* player, Quest const* quest);
-        void sQuestReward(Player* player, Quest const* quest, uint32 opt);
+        bool sQuestAccept(Player* player, Quest const* quest);
+        //bool sQuestSelect(Player* player, Quest const* quest);
+        //bool sQuestObjectiveComplete(Player* player, Quest const* quest);
+        bool sQuestReward(Player* player, Quest const* quest, uint32 opt);
         bool sOnDummyEffect(Unit* caster, uint32 spellId, SpellEffIndex effIndex);
         void sOnGameEvent(bool start, uint16 eventId);
 

@@ -319,15 +319,18 @@ void AddSC_boss_wushoolay();
 void AddSC_boss_zanzil();
 void AddSC_instance_zulgurub();
 void AddSC_zone_gilneas_duskhaven();
-void AddSC_zone_gilneas_city();
+void AddSC_zone_gilneas_city1();
 void AddSC_zone_gilneas_city2();
+void AddSC_zone_gilneas_city3();
+void AddSC_zone_northern_stranglethorn();
 
 //void AddSC_alterac_mountains();
 void AddSC_arathi_highlands();
 void AddSC_blasted_lands();
 void AddSC_burning_steppes();
-void AddSC_coldridge_valley();
-void AddSC_dun_morogh();
+void AddSC_zone_coldridge_valley();
+void AddSC_zone_dun_morogh();
+void AddSC_zone_gnomeregan();
 void AddSC_duskwood();
 void AddSC_eastern_plaguelands();
 void AddSC_elwynn_forest();
@@ -410,7 +413,6 @@ void AddSC_boss_majordomus();
 void AddSC_instance_firelands();
 void AddSC_boss_ammunae();                   //Halls Of Origination
 void AddSC_boss_anraphet();
-//void AddSC_boss_ptah();
 void AddSC_boss_earthrager_ptah();
 void AddSC_boss_isiset();
 void AddSC_boss_rajh();
@@ -503,14 +505,14 @@ void AddSC_boss_bazzalan();
 
 void AddSC_ashenvale();
 void AddSC_azshara();
-void AddSC_azuremyst_isle();
+void AddSC_zone_azuremyst_isle();
 void AddSC_bloodmyst_isle();
 void AddSC_darkshore();
 void AddSC_desolace();
 void AddSC_durotar();
 void AddSC_dustwallow_marsh();
 void AddSC_felwood();
-void AddSC_feralas();
+void AddSC_zone_feralas();
 void AddSC_moonglade();
 void AddSC_mulgore();
 void AddSC_orgrimmar();
@@ -838,6 +840,7 @@ void AddSC_zone_echo_isles();
 
 // Events
 void AddSC_event_childrens_week();
+void AddSC_event_midsummer_scripts();
 
 // Pets
 void AddSC_deathknight_pet_scripts();
@@ -1195,8 +1198,9 @@ void AddEasternKingdomsScripts()
     AddSC_arathi_highlands();
     AddSC_blasted_lands();
     AddSC_burning_steppes();
-    AddSC_coldridge_valley();
-    AddSC_dun_morogh();
+    AddSC_zone_coldridge_valley();
+    AddSC_zone_dun_morogh();
+    AddSC_zone_gnomeregan();
     AddSC_duskwood();
     AddSC_eastern_plaguelands();
     AddSC_elwynn_forest();
@@ -1218,8 +1222,10 @@ void AddEasternKingdomsScripts()
     AddSC_westfall();
     AddSC_wetlands();
     AddSC_zone_gilneas_duskhaven();
-    AddSC_zone_gilneas_city();
+    AddSC_zone_gilneas_city1();
     AddSC_zone_gilneas_city2();
+	AddSC_zone_gilneas_city3();
+    AddSC_zone_northern_stranglethorn();
 
 #endif
 }
@@ -1314,7 +1320,6 @@ void AddKalimdorScripts()
     AddSC_boss_isiset();
     AddSC_boss_rajh();
     AddSC_boss_setesh();
-    //AddSC_boss_ptah();
     AddSC_elementaires_sdo();   
     AddSC_npc_trash_sdo();
     AddSC_instance_halls_of_origination();
@@ -1363,6 +1368,7 @@ void AddKalimdorScripts()
     AddSC_boss_asaad();
     AddSC_instance_the_vortex_pinnacle();
     AddSC_throne_of_the_four_winds();       //Throne of the Four Winds
+	AddSC_boss_alakir();
     AddSC_boss_conclave_of_wind();
     AddSC_instance_throne_of_the_four_winds();
     AddSC_wailing_caverns();                //Wailing caverns
@@ -1379,14 +1385,14 @@ void AddKalimdorScripts()
 
     AddSC_ashenvale();
     AddSC_azshara();
-    AddSC_azuremyst_isle();
+    AddSC_zone_azuremyst_isle();
     AddSC_bloodmyst_isle();
     AddSC_darkshore();
     AddSC_desolace();
     AddSC_durotar();
     AddSC_dustwallow_marsh();
     AddSC_felwood();
-    AddSC_feralas();
+    AddSC_zone_feralas();
     AddSC_moonglade();
     AddSC_mulgore();
     AddSC_orgrimmar();
@@ -1730,6 +1736,7 @@ void AddEventScripts()
 {
 #ifdef SCRIPTS
     AddSC_event_childrens_week();
+    AddSC_event_midsummer_scripts();
 #endif
 }
 

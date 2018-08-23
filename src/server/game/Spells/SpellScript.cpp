@@ -88,7 +88,7 @@ uint8 _SpellScript::EffectHook::GetAffectedEffectsMask(SpellInfo const* spellEnt
 
 bool _SpellScript::EffectHook::IsEffectAffected(SpellInfo const* spellEntry, uint8 effIndex)
 {
-    return GetAffectedEffectsMask(spellEntry) & 1<<effIndex;
+	return (GetAffectedEffectsMask(spellEntry) & 1 << effIndex) != 0;
 }
 
 std::string _SpellScript::EffectHook::EffIndexToString()
@@ -219,8 +219,12 @@ bool SpellScript::TargetHook::CheckEffect(SpellInfo const* spellEntry, uint8 eff
     if (!targetType)
         return false;
 
-    if (spellEntry->Effects[effIndex].TargetA.GetTarget() != targetType &&
-        spellEntry->Effects[effIndex].TargetB.GetTarget() != targetType)
+	SpellEffectInfo const* effect = &spellEntry->Effects[effIndex];
+	if (!effect)
+		return false;
+
+    if (effect->TargetA.GetTarget() != targetType &&
+		effect->TargetB.GetTarget() != targetType)
         return false;
 
     SpellImplicitTargetInfo targetInfo(targetType);

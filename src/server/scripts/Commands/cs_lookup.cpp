@@ -102,9 +102,9 @@ public:
         wstrToLower(wNamePart);
 
         // Search in AreaTable.dbc
-        for (uint32 areaflag = 0; areaflag < sAreaStore.GetNumRows(); ++areaflag)
+        for (uint32 areaflag = 0; areaflag < sAreaTableStore.GetNumRows(); ++areaflag)
         {
-            AreaTableEntry const* areaEntry = sAreaStore.LookupEntry(areaflag);
+            AreaTableEntry const* areaEntry = sAreaTableStore.LookupEntry(areaflag);
             if (areaEntry)
             {
                 std::string name = areaEntry->area_name;

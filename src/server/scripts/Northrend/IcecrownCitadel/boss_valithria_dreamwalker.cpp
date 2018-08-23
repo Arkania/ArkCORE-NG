@@ -1077,7 +1077,7 @@ class npc_dream_cloud : public CreatureScript
                     {
                         case EVENT_CHECK_PLAYER:
                         {
-                            Player* player = NULL;
+                            Player* player = nullptr;
                             Trinity::AnyPlayerInObjectRangeCheck check(me, 5.0f);
                             Trinity::PlayerSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(me, player, check);
                             me->VisitNearbyWorldObject(7.5f, searcher);
@@ -1376,7 +1376,7 @@ class spell_dreamwalker_nightmare_cloud : public SpellScriptLoader
             bool Load() override
             {
                 _instance = GetOwner()->GetInstanceScript();
-                return _instance != NULL;
+                return _instance != nullptr;
             }
 
             void PeriodicTick(AuraEffect const* /*aurEff*/)

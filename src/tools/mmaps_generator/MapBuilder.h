@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2016 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -23,7 +23,6 @@
 #include <vector>
 #include <set>
 #include <map>
-#include <list>
 
 #include "TerrainBuilder.h"
 #include "IntermediateValues.h"
@@ -41,24 +40,7 @@ using namespace VMAP;
 
 namespace MMAP
 {
-    struct MapTiles
-    {
-        MapTiles() : m_mapId(uint32(-1)), m_tiles(NULL) {}
-
-        MapTiles(uint32 id, std::set<uint32>* tiles) : m_mapId(id), m_tiles(tiles) {}
-        ~MapTiles() {}
-
-        uint32 m_mapId;
-        std::set<uint32>* m_tiles;
-
-        bool operator==(uint32 id)
-        {
-            return m_mapId == id;
-        }
-    };
-
-    typedef std::list<MapTiles> TileList;
-
+    typedef std::map<uint32, std::set<uint32>*> TileList;
     struct Tile
     {
         Tile() : chf(NULL), solid(NULL), cset(NULL), pmesh(NULL), dmesh(NULL) {}
@@ -80,7 +62,7 @@ namespace MMAP
     class MapBuilder
     {
         public:
-            MapBuilder(float maxWalkableAngle   = 70.f,
+            MapBuilder(float maxWalkableAngle   = 55.f,
                 bool skipLiquid          = false,
                 bool skipContinents      = false,
                 bool skipJunkMaps        = true,

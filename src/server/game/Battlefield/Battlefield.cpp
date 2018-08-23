@@ -43,7 +43,7 @@ Battlefield::Battlefield()
     m_TypeId = 0;
     m_BattleId = 0;
     m_ZoneId = 0;
-    m_Map = NULL;
+    m_Map = nullptr;
     m_MapId = 0;
     m_MaxPlayer = 0;
     m_MinPlayer = 0;
@@ -490,14 +490,12 @@ void Battlefield::HideNpc(Creature* creature)
     creature->CombatStop();
     creature->SetReactState(REACT_PASSIVE);
     creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
-    creature->SetPhaseMask(2, true);
     creature->DisappearAndDie();
     creature->SetVisible(false);
 }
 
 void Battlefield::ShowNpc(Creature* creature, bool aggressive)
 {
-    creature->SetPhaseMask(1, true);
     creature->SetVisible(true);
     creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
     if (!creature->IsAlive())
@@ -588,7 +586,7 @@ BfGraveyard* Battlefield::GetGraveyardById(uint32 id) const
 
 WorldSafeLocsEntry const* Battlefield::GetClosestGraveYard(Player* player)
 {
-    BfGraveyard* closestGY = NULL;
+    BfGraveyard* closestGY = nullptr;
     float maxdist = -1;
     for (uint8 i = 0; i < m_GraveyardList.size(); i++)
     {
@@ -753,7 +751,7 @@ void BfGraveyard::GiveControlTo(TeamId team)
 
 void BfGraveyard::RelocateDeadPlayers()
 {
-    WorldSafeLocsEntry const* closestGrave = NULL;
+    WorldSafeLocsEntry const* closestGrave = nullptr;
     for (GuidSet::const_iterator itr = m_ResurrectQueue.begin(); itr != m_ResurrectQueue.end(); ++itr)
     {
         Player* player = sObjectAccessor->FindPlayer(*itr);
@@ -982,7 +980,7 @@ bool BfCapturePoint::DelCapturePoint()
         {
             capturePoint->SetRespawnTime(0);                  // not save respawn time
             capturePoint->Delete();
-            capturePoint = NULL;
+            capturePoint = nullptr;
         }
         m_capturePointGUID = 0;
     }

@@ -87,7 +87,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_kar_the_everburningAI (creature);
+        return new npc_kar_the_everburningAI(creature);
     }
 
     struct npc_kar_the_everburningAI : public ScriptedAI
@@ -102,7 +102,7 @@ public:
 
         EventMap events;
         uint8 phase;
-        uint32 timerMove,timerElem;
+        uint32 timerMove, timerElem;
         InstanceScript* instance;
 
         void Reset() { }
@@ -119,8 +119,8 @@ public:
                 {
                     switch (eventId)
                     {
-                        case EVENT_MOVE_NEXT_POS:
-                            break;
+                    case EVENT_MOVE_NEXT_POS:
+                        break;
                     }
                 }
             }
@@ -135,7 +135,7 @@ public:
 
                 if (timerElem <= diff)
                 {
-                    me->CastSpell(me->GetPositionX() + urand(0,10) + urand(-10,0),me->GetPositionY() + urand(0,10) + urand(-10,0), me->GetPositionZ(),SUMMON_ELEMENTALS,true);
+                    me->CastSpell(me->GetPositionX() + irand(0, 10) + irand(-10, 0), me->GetPositionY() + irand(0, 10) + irand(-10, 0), me->GetPositionZ(), SUMMON_ELEMENTALS, true);
                     timerElem = 1200;
                 }
                 else timerElem -= diff;
@@ -145,11 +145,11 @@ public:
             {
                 if (timerMove <= diff)
                 {
-                   phase = 2;
-                   me->SetFacingTo(0.931584f);
-                   me->SetReactState(REACT_AGGRESSIVE);
-                   me->SetHomePosition(me->GetPositionX(),me->GetPositionY(),me->GetPositionZ(),me->GetOrientation());
-                   me->AI()->Reset();
+                    phase = 2;
+                    me->SetFacingTo(0.931584f);
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
+                    me->AI()->Reset();
                 }
                 else timerMove -= diff;
             }
@@ -389,7 +389,7 @@ class boss_lord_rhyolith : public CreatureScript
                 instance = me->GetInstanceScript();
                 LeftSet = false;
                 RightSet = false;
-                Reset();
+                Initialize();
             }
  
             InstanceScript* instance;
@@ -400,55 +400,22 @@ class boss_lord_rhyolith : public CreatureScript
 
             bool phaseTwo, LeftSet, RightSet, lavaFlow, drinkMagma;
 
-            void SummonAndSetLegsInBoss()
+            void Initialize()
             {
-                if (!me || !me->IsAlive())
-                    return;
-
-                if (GetRightLeg())
-                {
-                    if (!GetRightLeg()->IsAlive())
-                        GetRightLeg()->Respawn(true);
-
-                    if (Vehicle* pVehicle = me->GetVehicleKit())
-                        if (!pVehicle->GetPassenger(1))
-                        {
-                            RightSet = true;
-                            GetRightLeg()->EnterVehicle(me,1);
-                            GetLeftLeg()->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                        }
-                }
-
-                if (GetLeftLeg())
-                {
-                    if (!GetLeftLeg()->IsAlive())
-                        GetLeftLeg()->Respawn(true);
-
-                    if (Vehicle* pVehicle = me->GetVehicleKit())
-                        if (!pVehicle->GetPassenger(0))
-                        {
-                            LeftSet = true;
-                            GetLeftLeg()->EnterVehicle(me,0);
-                            GetLeftLeg()->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                        }
-                }
+                events.Reset();
+                Phase = PHASE_0;
+                phaseTwo = false;
+                lavaFlow = false;
+                drinkMagma = false;
             }
 
             void Reset()
             {
-                events.Reset();
-                Phase = PHASE_0;
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                phaseTwo = false;
-                lavaFlow = false;
-                drinkMagma = false;
-                summons.DespawnAll();
-                me->SetReactState(REACT_PASSIVE);
                 me->SetDisplayId(MODEL_DEFAULT);
-                me->GetVehicleKit();
-                SummonAndSetLegsInBoss();
+                me->SetReactState(REACT_PASSIVE);
                 instance->SetBossState(DATA_LORD_RHYOLITH, NOT_STARTED);
-                
+
                 _Reset();
             }
 
@@ -520,8 +487,6 @@ class boss_lord_rhyolith : public CreatureScript
 
             void EnterEvadeMode()
             {
-                Reset();
-            
                 DespawnCreatures(53585);
 
                 RemoveEncounterAuras();
@@ -788,6 +753,41 @@ class boss_lord_rhyolith : public CreatureScript
             {
                 return (me->FindNearestCreature(53087, 5000.0f, true)  == NULL) ? me->FindNearestCreature(53087, 5000.0f, false) : me->FindNearestCreature(53087, 5000.0f, true);
             }
+
+            void SummonAndSetLegsInBoss()
+            {
+                if (!me || !me->IsAlive())
+                    return;
+
+                if (GetRightLeg())
+                {
+                    if (!GetRightLeg()->IsAlive())
+                        GetRightLeg()->Respawn(true);
+
+                    if (Vehicle* pVehicle = me->GetVehicleKit())
+                        if (!pVehicle->GetPassenger(1))
+                        {
+                            RightSet = true;
+                            GetRightLeg()->EnterVehicle(me, 1);
+                            GetLeftLeg()->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        }
+                }
+
+                if (GetLeftLeg())
+                {
+                    if (!GetLeftLeg()->IsAlive())
+                        GetLeftLeg()->Respawn(true);
+
+                    if (Vehicle* pVehicle = me->GetVehicleKit())
+                        if (!pVehicle->GetPassenger(0))
+                        {
+                            LeftSet = true;
+                            GetLeftLeg()->EnterVehicle(me, 0);
+                            GetLeftLeg()->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        }
+                }
+            }
+
         };
 };
 
@@ -1298,23 +1298,15 @@ public:
     };
 };
 
-/*######
-##liquid obsidian
-######*/
-
-class npc_liquid_obsidian : public CreatureScript
+// 52619
+class npc_liquid_obsidian_52619 : public CreatureScript
 {
 public:
-    npc_liquid_obsidian() : CreatureScript("npc_liquid_obsidian"){ }
+    npc_liquid_obsidian_52619() : CreatureScript("npc_liquid_obsidian_52619"){ }
 
-    CreatureAI* GetAI(Creature* creature) const
+    struct npc_liquid_obsidian_52619AI : public ScriptedAI
     {
-        return new npc_liquid_obsidianAI(creature);
-    }
-
-    struct npc_liquid_obsidianAI : public ScriptedAI
-    {
-        npc_liquid_obsidianAI(Creature* creature) : ScriptedAI(creature)
+        npc_liquid_obsidian_52619AI(Creature* creature) : ScriptedAI(creature)
         {
             instance = me->GetInstanceScript();
         }
@@ -1357,6 +1349,11 @@ public:
             } 
         }
     };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_liquid_obsidian_52619AI(creature);
+    }
 };
 
 /*######
@@ -1431,7 +1428,7 @@ void AddSC_boss_lord_rhyolith()
     new boss_lord_rhyolith();
     new npc_left_leg();
     new npc_right_leg();
-    new npc_liquid_obsidian();
+    new npc_liquid_obsidian_52619();
     new npc_rhyolith_volcano();
     new npc_rhyolith_crater();
     new npc_spark_of_rhyolith();

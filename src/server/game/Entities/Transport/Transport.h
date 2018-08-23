@@ -28,7 +28,7 @@ struct CreatureData;
 
 class Transport : public GameObject, public TransportBase
 {
-        friend Transport* TransportMgr::CreateTransport(uint32, uint32, Map*);
+        friend Transport* TransportMgr::CreateTransport(uint32, uint32, Map*, uint16, uint16);
 
         Transport();
     public:
@@ -38,12 +38,15 @@ class Transport : public GameObject, public TransportBase
         void CleanupsBeforeDelete(bool finalCleanup = true) override;
 
         void Update(uint32 diff) override;
+        void DelayedUpdate(uint32);
 
         void BuildUpdate(UpdateDataMapType& data_map) override;
 
         void AddPassenger(WorldObject* passenger);
         void RemovePassenger(WorldObject* passenger);
+        void RemoveNpcPassenger(uint64 passengerGuid);
         std::set<WorldObject*> const& GetPassengers() const { return _passengers; }
+        std::set<WorldObject*> const& GetStaticPassengers() const { return _staticPassengers; }
 
         Creature* CreateNPCPassenger(uint32 guid, CreatureData const* data);
         GameObject* CreateGOPassenger(uint32 guid, GameObjectData const* data);
@@ -96,10 +99,13 @@ class Transport : public GameObject, public TransportBase
 
         TransportTemplate const* GetTransportTemplate() const { return _transportInfo; }
 
+        void SetDelayedAddModelToMap() { _delayedAddModel = true; }
+        uint32 GetMoTransportMapId();
     private:
         void MoveToNextWaypoint();
         float CalculateSegmentPos(float perc);
         bool TeleportTransport(uint32 newMapid, float x, float y, float z, float o);
+        void TeleportTransportDelayed();
         void UpdatePassengerPositions(std::set<WorldObject*>& passengers);
         void DoEventIfAny(KeyFrame const& node, bool departure);
 
@@ -121,6 +127,13 @@ class Transport : public GameObject, public TransportBase
 
         std::set<WorldObject*> _passengers;
         std::set<WorldObject*> _staticPassengers;
+        
+        bool _isDelayedTeleportInitated;
+        bool _isDelayedTeleportExecuted;
+        bool _isNextTeleportInvolvedInTwoMaps;
+        
+        bool _delayedAddModel;
+        bool _delayedTeleport;
 };
 
 #endif

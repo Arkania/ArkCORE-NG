@@ -30,6 +30,7 @@
 #include "GridNotifiers.h"
 #include "Unit.h"
 
+
 enum DruidSpells
 {
     SPELL_DRUID_ECLIPSE_GENERAL_ENERGIZE = 89265,
@@ -2390,7 +2391,7 @@ public:
 
         Unit* SelectFriendlyTarget() const
         {
-            Unit* unit = NULL;
+            Unit* unit = nullptr;
             Unit* const target = GetTarget();
 
             Trinity::MostHPMissingInRange check(target, 15.0f, 1);

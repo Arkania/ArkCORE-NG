@@ -81,7 +81,7 @@ public:
             spawnCrazedTimer = 0;
             m_IsHeroicMode = false;
             m_Team = -1;
-            m_Group = NULL;
+            m_Group = nullptr;
             m_GroupSize = 0;
             m_isSpecialNpcSpawned = false;
         }

@@ -24,14 +24,22 @@ SDComment:
 SDCategory: Hellfire Ramparts
 EndScriptData */
 
+
+#include "ObjectMgr.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "SpellScript.h"
+#include "PassiveAI.h"
+#include "GameObjectAI.h"
+#include "MapManager.h"
+#include "MoveSplineInit.h"
 #include "InstanceScript.h"
 #include "hellfire_ramparts.h"
 
 class instance_ramparts : public InstanceMapScript
 {
     public:
-        instance_ramparts() : InstanceMapScript("instance_ramparts", 543) { }
+        instance_ramparts() : InstanceMapScript(HRScriptName, 543) { }
 
         struct instance_ramparts_InstanceMapScript : public InstanceScript
         {
@@ -41,17 +49,58 @@ class instance_ramparts : public InstanceMapScript
             {
                 SetBossNumber(EncounterCount);
                 felIronChestGUID = 0;
+                m_team = 0;
+                m_chadwickGUID = 0;
+                m_reconGUID = 0;
+                m_stoktonGUID = 0;
+                m_thrallmarGUID = 0;
             }
 
             void OnGameObjectCreate(GameObject* go) override
             {
                 switch (go->GetEntry())
                 {
-                    case GO_FEL_IRON_CHEST_NORMAL:
-                    case GO_FEL_IRON_CHECT_HEROIC:
-                        felIronChestGUID = go->GetGUID();
-                        break;
+                case GO_FEL_IRON_CHEST_NORMAL:
+                case GO_FEL_IRON_CHECT_HEROIC:
+                    felIronChestGUID = go->GetGUID();
+                    break;
                 }
+            }
+
+            void OnCreatureCreate(Creature* creature) override
+            {
+                switch (creature->GetEntry())
+                {
+                case NPC_ADVANCE_SCOUT_CHADWICK:
+                    m_chadwickGUID = creature->GetGUID();
+                    break;
+                case NPC_STONE_GUARD_STOKTON:
+                    m_stoktonGUID = creature->GetGUID();
+                    break;
+                case NPC_THRALLMAR_INVADER:
+                    m_thrallmarGUID = creature->GetGUID();
+                    break;
+                case NPC_HONOR_HOLD_RECON:
+                    m_reconGUID = creature->GetGUID();
+                    break;
+                }
+                switch (creature->GetEntry())
+                {
+                case NPC_ADVANCE_SCOUT_CHADWICK:
+                case NPC_STONE_GUARD_STOKTON:
+                case NPC_THRALLMAR_INVADER:
+                case NPC_HONOR_HOLD_RECON:
+                    creature->SetVisible(false);
+                    creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
+                    CheckVisible(creature);
+                    break;
+                }
+            }
+
+            void OnPlayerEnter(Player* player)
+            {
+                m_team = player->GetTeam();
+                CheckVisible(player);
             }
 
             bool SetBossState(uint32 type, EncounterState state) override
@@ -61,14 +110,14 @@ class instance_ramparts : public InstanceMapScript
 
                 switch (type)
                 {
-                    case DATA_VAZRUDEN:
-                    case DATA_NAZAN:
-                        if (GetBossState(DATA_VAZRUDEN) == DONE && GetBossState(DATA_NAZAN) == DONE && !spawned)
-                        {
-                            DoRespawnGameObject(felIronChestGUID, HOUR*IN_MILLISECONDS);
-                            spawned = true;
-                        }
-                        break;
+                case DATA_VAZRUDEN:
+                case DATA_NAZAN:
+                    if (GetBossState(DATA_VAZRUDEN) == DONE && GetBossState(DATA_NAZAN) == DONE && !spawned)
+                    {
+                        DoRespawnGameObject(felIronChestGUID, HOUR*IN_MILLISECONDS);
+                        spawned = true;
+                    }
+                    break;
                 }
                 return true;
             }
@@ -117,9 +166,34 @@ class instance_ramparts : public InstanceMapScript
                 OUT_LOAD_INST_DATA_COMPLETE;
             }
 
-            protected:
-                uint64 felIronChestGUID;
-                bool spawned;
+            void CheckVisible(Unit* m_char)
+            {
+                switch (m_team)
+                {
+                case 0:
+                    break;
+                case 67: // is Horde
+                    if (Creature* npc = ObjectAccessor::GetCreature(*m_char, m_stoktonGUID))
+                        npc->SetVisible(true);
+                    if (Creature* npc = ObjectAccessor::GetCreature(*m_char, m_thrallmarGUID))
+                        npc->SetVisible(true);
+                    break;
+                case 469:
+                    if (Creature* npc = ObjectAccessor::GetCreature(*m_char, m_chadwickGUID))
+                        npc->SetVisible(true);
+                    if (Creature* npc = ObjectAccessor::GetCreature(*m_char, m_reconGUID))
+                        npc->SetVisible(true);
+                    break;
+                }
+            }
+
+            uint64 felIronChestGUID;
+            bool spawned;
+            uint32 m_team;
+            uint64 m_chadwickGUID;
+            uint64 m_reconGUID;
+            uint64 m_stoktonGUID;
+            uint64 m_thrallmarGUID;
         };
 
         InstanceScript* GetInstanceScript(InstanceMap* map) const override

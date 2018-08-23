@@ -208,10 +208,10 @@ public:
         void Reset() override
         {
             m_events.Reset();
-            m_npc_to_rescueGUID = NULL;
-            m_playerGUID = NULL;
-            m_mountGUID = NULL;
-            m_sentinelGUID = NULL;
+            m_npc_to_rescueGUID = 0;
+            m_playerGUID = 0;
+            m_mountGUID = 0;
+            m_sentinelGUID = 0;
             m_isFlying = false;
             m_isRiding = false;
             m_say0 = 0;
@@ -283,7 +283,7 @@ public:
                 {
                     case EVENT_MOVE_RESCUE:
                     {
-                        Creature* mount = NULL;
+                        Creature* mount = nullptr;
                         if (m_isFlying)
                         {
                             Position pos = me->GetPosition();

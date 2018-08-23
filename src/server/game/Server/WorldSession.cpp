@@ -145,7 +145,7 @@ WorldSession::WorldSession(uint32 id, WorldSocket* sock, AccountTypes sec, uint8
     _compressionStream->zfree = (free_func)NULL;
     _compressionStream->opaque = (voidpf)NULL;
     _compressionStream->avail_in = 0;
-    _compressionStream->next_in = NULL;
+    _compressionStream->next_in = nullptr;
     int32 z_res = deflateInit(_compressionStream, sWorld->getIntConfig(CONFIG_COMPRESSION));
     if (z_res != Z_OK)
         TC_LOG_ERROR("network", "Can't initialize packet compression (zlib: deflateInit) Error code: %i (%s)", z_res, zError(z_res));
@@ -163,14 +163,14 @@ WorldSession::~WorldSession()
     {
         m_Socket->CloseSocket();
         m_Socket->RemoveReference();
-        m_Socket = NULL;
+        m_Socket = nullptr;
     }
 
     delete _warden;
     delete _RBACData;
 
     ///- empty incoming packet queue
-    WorldPacket* packet = NULL;
+    WorldPacket* packet = nullptr;
     while (_recvQueue.next(packet))
         delete packet;
 
@@ -307,11 +307,11 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
 
     ///- Retrieve packets from the receive queue and call the appropriate handlers
     /// not process packets if socket already closed
-    WorldPacket* packet = NULL;
+    WorldPacket* packet = nullptr;
     //! Delete packet after processing by default
     bool deletePacket = true;
     //! To prevent infinite loop
-    WorldPacket* firstDelayedPacket = NULL;
+    WorldPacket* firstDelayedPacket = nullptr;
     //! If _recvQueue.peek() == firstDelayedPacket it means that in this Update call, we've processed all
     //! *properly timed* packets, and we're now at the part of the queue where we find
     //! delayed packets that were re-enqueued due to improper timing. To prevent an infinite
@@ -451,7 +451,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
         if (m_Socket && m_Socket->IsClosed())
         {
             m_Socket->RemoveReference();
-            m_Socket = NULL;
+            m_Socket = nullptr;
         }
 
         if (!m_Socket)
@@ -1210,7 +1210,7 @@ void WorldSession::InvalidateRBACData()
     TC_LOG_DEBUG("rbac", "WorldSession::Invalidaterbac::RBACData [AccountId: %u, Name: %s, realmId: %d]",
                    _RBACData->GetId(), _RBACData->GetName().c_str(), realmID);
     delete _RBACData;
-    _RBACData = NULL;
+    _RBACData = nullptr;
 }
 
 bool WorldSession::DosProtection::EvaluateOpcode(WorldPacket& p) const

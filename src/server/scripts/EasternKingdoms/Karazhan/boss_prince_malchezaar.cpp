@@ -350,7 +350,7 @@ public:
 
         void SummonInfernal(const uint32 /*diff*/)
         {
-            InfernalPoint *point = NULL;
+            InfernalPoint *point = nullptr;
             Position pos;
             if ((me->GetMapId() != 532) || positions.empty())
                 pos = me->GetRandomNearPosition(60);
@@ -518,7 +518,7 @@ public:
             {
                 if (SWPainTimer <= diff)
                 {
-                    Unit* target = NULL;
+                    Unit* target = nullptr;
                     if (phase == 1)
                         target = me->GetVictim();        // the tank
                     else                                          // anyone but the tank
@@ -556,13 +556,13 @@ public:
                 if (me->isAttackReady() && me->GetVictim())
                 {
                     me->AttackerStateUpdate(me->GetVictim());
-                    me->resetAttackTimer();
+                    me->ResetAttackTimer();
                 }
                 //Check for offhand attack
                 if (me->isAttackReady(OFF_ATTACK) && me->GetVictim())
                 {
                     me->AttackerStateUpdate(me->GetVictim(), OFF_ATTACK);
-                    me->resetAttackTimer(OFF_ATTACK);
+                    me->ResetAttackTimer(OFF_ATTACK);
                 }
             }
         }

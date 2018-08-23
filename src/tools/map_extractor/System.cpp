@@ -1,6 +1,6 @@
 /*
+ * Copyright (C) 2011-2016 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2014 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -112,21 +112,17 @@ uint32 const Builds[] = {13164, 13205, 13287, 13329, 13596, 13623, 13914, 14007,
 #define LAST_DBC_IN_DATA_BUILD 13623    // after this build mpqs with dbc are back to locale folder
 #define NEW_BASE_SET_BUILD  15211
 
-#define LOCALES_COUNT 15
-
-char const* Locales[LOCALES_COUNT] =
+char const* Locales[] =
 {
     "enGB", "enUS",
     "deDE", "esES",
     "frFR", "koKR",
     "zhCN", "zhTW",
     "enCN", "enTW",
-    "esMX", "ruRU",
-    "ptBR", "ptPT",
-    "itIT"
+    "esMX", "ruRU"
 };
 
-TCHAR const* LocalesT[LOCALES_COUNT] =
+TCHAR const* LocalesT[] =
 {
     _T("enGB"), _T("enUS"),
     _T("deDE"), _T("esES"),
@@ -134,9 +130,9 @@ TCHAR const* LocalesT[LOCALES_COUNT] =
     _T("zhCN"), _T("zhTW"),
     _T("enCN"), _T("enTW"),
     _T("esMX"), _T("ruRU"),
-    _T("ptBR"), _T("ptPT"),
-    _T("itIT"),
 };
+
+#define LOCALES_COUNT 12
 
 void CreateDir(std::string const& path)
 {
@@ -241,7 +237,7 @@ uint32 ReadBuild(int locale)
     //printf("Read %s file... ", filename.c_str());
 
     HANDLE dbcFile;
-    if (!SFileOpenFileEx(LocaleMpq, filename.c_str(), SFILE_OPEN_PATCHED_FILE, &dbcFile))
+    if (!SFileOpenFileEx(LocaleMpq, filename.c_str(), SFILE_OPEN_FROM_MPQ, &dbcFile))
     {
         printf("Fatal error: Not found %s file!\n", filename.c_str());
         exit(1);
@@ -285,7 +281,7 @@ uint32 ReadMapDBC()
     printf("Read Map.dbc file... ");
 
     HANDLE dbcFile;
-    if (!SFileOpenFileEx(LocaleMpq, "DBFilesClient\\Map.dbc", SFILE_OPEN_PATCHED_FILE, &dbcFile))
+    if (!SFileOpenFileEx(LocaleMpq, "DBFilesClient\\Map.dbc", SFILE_OPEN_FROM_MPQ, &dbcFile))
     {
         printf("Fatal error: Cannot find Map.dbc in archive!\n");
         exit(1);
@@ -315,7 +311,7 @@ void ReadAreaTableDBC()
 {
     printf("Read AreaTable.dbc file...");
     HANDLE dbcFile;
-    if (!SFileOpenFileEx(LocaleMpq, "DBFilesClient\\AreaTable.dbc", SFILE_OPEN_PATCHED_FILE, &dbcFile))
+    if (!SFileOpenFileEx(LocaleMpq, "DBFilesClient\\AreaTable.dbc", SFILE_OPEN_FROM_MPQ, &dbcFile))
     {
         printf("Fatal error: Cannot find AreaTable.dbc in archive!\n");
         exit(1);
@@ -343,7 +339,7 @@ void ReadLiquidTypeTableDBC()
 {
     printf("Read LiquidType.dbc file...");
     HANDLE dbcFile;
-    if (!SFileOpenFileEx(LocaleMpq, "DBFilesClient\\LiquidType.dbc", SFILE_OPEN_PATCHED_FILE, &dbcFile))
+    if (!SFileOpenFileEx(LocaleMpq, "DBFilesClient\\LiquidType.dbc", SFILE_OPEN_FROM_MPQ, &dbcFile))
     {
         printf("Fatal error: Cannot find LiquidType.dbc in archive!\n");
         exit(1);
@@ -1112,7 +1108,7 @@ void ExtractDBCFiles(int l, bool basicLocale)
 
         do
         {
-            if (!SFileOpenFileEx(LocaleMpq, foundFile.cFileName, SFILE_OPEN_PATCHED_FILE, &dbcFile))
+            if (!SFileOpenFileEx(LocaleMpq, foundFile.cFileName, SFILE_OPEN_FROM_MPQ, &dbcFile))
             {
                 printf("Unable to open file %s in the archive\n", foundFile.cFileName);
                 continue;
@@ -1159,7 +1155,7 @@ void ExtractDB2Files(int l, bool basicLocale)
 
         do
         {
-            if (!SFileOpenFileEx(LocaleMpq, foundFile.cFileName, SFILE_OPEN_PATCHED_FILE, &dbcFile))
+            if (!SFileOpenFileEx(LocaleMpq, foundFile.cFileName, SFILE_OPEN_FROM_MPQ, &dbcFile))
             {
                 printf("Unable to open file %s in the archive\n", foundFile.cFileName);
                 continue;

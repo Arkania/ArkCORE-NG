@@ -353,7 +353,7 @@ Corpse* ObjectAccessor::ConvertCorpseForPlayer(uint64 player_guid, bool insignia
     corpse->DeleteFromDB(trans);
     CharacterDatabase.CommitTransaction(trans);
 
-    Corpse* bones = NULL;
+    Corpse* bones = nullptr;
     // create the bones only if the map and the grid is loaded at the corpse's location
     // ignore bones creating option in case insignia
 
@@ -372,7 +372,7 @@ Corpse* ObjectAccessor::ConvertCorpseForPlayer(uint64 player_guid, bool insignia
         // bones->m_time = m_time;                              // don't overwrite time
         // bones->m_type = m_type;                              // don't overwrite type
         bones->Relocate(corpse->GetPositionX(), corpse->GetPositionY(), corpse->GetPositionZ(), corpse->GetOrientation());
-        bones->SetPhaseMask(corpse->GetPhaseMask(), false);
+        bones->CopyPhaseFrom(corpse);
 
         bones->SetUInt32Value(CORPSE_FIELD_FLAGS, CORPSE_FLAG_UNK2 | CORPSE_FLAG_BONES);
         bones->SetUInt64Value(CORPSE_FIELD_OWNER, 0);

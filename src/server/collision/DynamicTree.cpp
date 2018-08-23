@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2011-2016 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -108,7 +108,9 @@ struct DynTreeImpl : public ParentTree/*, public Intersectable*/
     int unbalanced_times;
 };
 
-DynamicMapTree::DynamicMapTree() : impl(new DynTreeImpl()) { }
+DynamicMapTree::DynamicMapTree() : impl(new DynTreeImpl())
+{
+}
 
 DynamicMapTree::~DynamicMapTree()
 {
@@ -149,7 +151,7 @@ struct DynamicTreeIntersectionCallback
 {
     bool did_hit;
     uint32 phase_mask;
-    DynamicTreeIntersectionCallback(uint32 phasemask) : did_hit(false), phase_mask(phasemask) { }
+    DynamicTreeIntersectionCallback(uint32 phasemask) : did_hit(false), phase_mask(phasemask) {}
     bool operator()(const G3D::Ray& r, const GameObjectModel& obj, float& distance)
     {
         did_hit = obj.intersectRay(r, distance, true, phase_mask);
@@ -257,5 +259,5 @@ float DynamicMapTree::getHeight(float x, float y, float z, float maxSearchDist, 
     if (callback.didHit())
         return v.z - maxSearchDist;
     else
-        return -G3D::finf();
+        return -G3D::inf();
 }

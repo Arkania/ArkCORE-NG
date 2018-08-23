@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2016 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2017 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -47,25 +47,22 @@ EndContentData */
 #include "WorldSession.h"
 #include "SpellScript.h"
 
-/*######
-## npc_sinkhole_kill_credit
-######*/
-
-enum Sinkhole
-{
-    GO_EXPLOSIVES_CART            = 188160,
-    NPC_SCOURGED_BURROWER         = 26250,
-    QUEST_PLUG_THE_SINKHOLES      = 11897,
-    SPELL_SET_CART                = 46797,
-    SPELL_EXPLODE_CART            = 46799,
-    SPELL_SUMMON_CART             = 46798,
-    SPELL_SUMMON_WORM             = 46800,
-};
-
+// 26248 26249
 class npc_sinkhole_kill_credit : public CreatureScript
 {
 public:
     npc_sinkhole_kill_credit() : CreatureScript("npc_sinkhole_kill_credit") { }
+
+    enum Sinkhole
+    {
+        GO_EXPLOSIVES_CART = 188160,
+        NPC_SCOURGED_BURROWER = 26250,
+        QUEST_PLUG_THE_SINKHOLES = 11897,
+        SPELL_SET_CART = 46797,
+        SPELL_EXPLODE_CART = 46799,
+        SPELL_SUMMON_CART = 46798,
+        SPELL_SUMMON_WORM = 46800,
+    };
 
     struct npc_sinkhole_kill_creditAI : public ScriptedAI
     {
@@ -169,20 +166,17 @@ public:
     }
 };
 
-/*######
-## npc_khunok_the_behemoth
-######*/
-
-enum Khunok
-{
-    NPC_ORPHANED_MAMMOTH_CALF        = 25861,
-    SPELL_MAMMOTH_CALF_ESCORT_CREDIT = 46231
-};
-
+// 25862
 class npc_khunok_the_behemoth : public CreatureScript
 {
 public:
     npc_khunok_the_behemoth() : CreatureScript("npc_khunok_the_behemoth") { }
+
+    enum Khunok
+    {
+        NPC_ORPHANED_MAMMOTH_CALF = 25861,
+        SPELL_MAMMOTH_CALF_ESCORT_CREDIT = 46231
+    };
 
     struct npc_khunok_the_behemothAI : public ScriptedAI
     {
@@ -216,21 +210,16 @@ public:
     }
 };
 
-/*######
-## npc_keristrasza
-######*/
-
-enum Keristrasza
-{
-    SPELL_TELEPORT_TO_SARAGOSA = 46772
-};
-
-#define GOSSIP_HELLO_KERI   "I am prepared to face Saragosa!"
-
+// 26206
 class npc_keristrasza : public CreatureScript
 {
 public:
     npc_keristrasza() : CreatureScript("npc_keristrasza") { }
+
+    enum Keristrasza
+    {
+        SPELL_TELEPORT_TO_SARAGOSA = 46772
+    };
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
@@ -238,7 +227,7 @@ public:
             player->PrepareQuestMenu(creature->GetGUID());
 
         if (player->GetQuestStatus(11957) == QUEST_STATUS_INCOMPLETE)
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_HELLO_KERI, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            player->ADD_GOSSIP_ITEM_DB(9262, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
         player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
 
@@ -258,25 +247,22 @@ public:
     }
 };
 
-/*######
-## npc_corastrasza
-######*/
+#define GOSSIP_ITEM_C_1 "I... I think so..." // gossip 10204 broadcast 32988
 
-#define GOSSIP_ITEM_C_1 "I... I think so..."
-
-enum Corastrasza
-{
-    SPELL_SUMMON_WYRMREST_SKYTALON               = 61240,
-    SPELL_WYRMREST_SKYTALON_RIDE_PERIODIC        = 61244,
-
-    QUEST_ACES_HIGH_DAILY                        = 13414,
-    QUEST_ACES_HIGH                              = 13413
-};
-
+// 32548
 class npc_corastrasza : public CreatureScript
 {
 public:
     npc_corastrasza() : CreatureScript("npc_corastrasza") { }
+
+    enum Corastrasza
+    {
+        SPELL_SUMMON_WYRMREST_SKYTALON = 61240,
+        SPELL_WYRMREST_SKYTALON_RIDE_PERIODIC = 61244,
+
+        QUEST_ACES_HIGH_DAILY = 13414,
+        QUEST_ACES_HIGH = 13413
+    };
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
@@ -306,23 +292,20 @@ public:
     }
 };
 
-/*######
-## npc_iruk
-######*/
+#define GOSSIP_ITEM_I  "<Search corpse for Issliruk's Totem.>" // gossip 9280 broadcast 25422
 
-#define GOSSIP_ITEM_I  "<Search corpse for Issliruk's Totem.>"
-
-enum Iruk
-{
-    QUEST_SPIRITS_WATCH_OVER_US             = 11961,
-    SPELL_CREATURE_TOTEM_OF_ISSLIRUK        = 46816,
-    GOSSIP_TEXT_I                           = 12585
-};
-
+// 26219
 class npc_iruk : public CreatureScript
 {
 public:
     npc_iruk() : CreatureScript("npc_iruk") { }
+
+    enum Iruk
+    {
+        QUEST_SPIRITS_WATCH_OVER_US = 11961,
+        SPELL_CREATURE_TOTEM_OF_ISSLIRUK = 46816,
+        GOSSIP_TEXT_I = 12585
+    };
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
@@ -348,18 +331,14 @@ public:
     }
 };
 
-/*######
-## npc_nerubar_victim
-######*/
-
 enum Nerubar
 {
-    NPC_WARSONG_PEON                        = 25270,
-    QUEST_TAKEN_BY_THE_SCOURGE              = 11611,
-    SPELL_FREED_WARSONG_MAGE                = 45526,
-    SPELL_FREED_WARSONG_SHAMAN              = 45527,
-    SPELL_FREED_WARSONG_WARRIOR             = 45514,
-    SPELL_FREED_WARSONG_PEON                = 45532
+    NPC_WARSONG_PEON = 25270,
+    QUEST_TAKEN_BY_THE_SCOURGE = 11611,
+    SPELL_FREED_WARSONG_MAGE = 45526,
+    SPELL_FREED_WARSONG_SHAMAN = 45527,
+    SPELL_FREED_WARSONG_WARRIOR = 45514,
+    SPELL_FREED_WARSONG_PEON = 45532
 };
 
 const uint32 nerubarVictims[3] =
@@ -367,6 +346,7 @@ const uint32 nerubarVictims[3] =
     SPELL_FREED_WARSONG_MAGE, SPELL_FREED_WARSONG_SHAMAN, SPELL_FREED_WARSONG_WARRIOR
 };
 
+// 25284
 class npc_nerubar_victim : public CreatureScript
 {
 public:
@@ -406,27 +386,17 @@ public:
     }
 };
 
-/*######
-## npc_jenny
-######*/
-
-enum Jenny
-{
-    QUEST_LOADER_UP             = 11881,
-
-    NPC_FEZZIX_GEARTWIST        = 25849,
-    NPC_JENNY                   = 25969,
-
-    SPELL_GIVE_JENNY_CREDIT     = 46358,
-    SPELL_CRATES_CARRIED        = 46340,
-    SPELL_DROP_CRATE            = 46342
-};
-
+// 25969
 class npc_jenny : public CreatureScript
 {
 public:
     npc_jenny() : CreatureScript("npc_jenny") { }
 
+    enum Jenny
+    {
+        SPELL_CRATES_CARRIED = 46340,
+        SPELL_DROP_CRATE = 46342
+    };
     struct npc_jennyAI : public ScriptedAI
     {
         npc_jennyAI(Creature* creature) : ScriptedAI(creature)
@@ -485,14 +455,19 @@ public:
     }
 };
 
-/*######
-## npc_fezzix_geartwist
-######*/
-
+// 25849
 class npc_fezzix_geartwist : public CreatureScript
 {
 public:
     npc_fezzix_geartwist() : CreatureScript("npc_fezzix_geartwist") { }
+
+    enum Jenny
+    {
+        QUEST_LOADER_UP = 11881,
+        NPC_JENNY = 25969,
+        SPELL_GIVE_JENNY_CREDIT = 46358,
+        SPELL_CRATES_CARRIED = 46340,
+    };
 
     struct npc_fezzix_geartwistAI : public ScriptedAI
     {
@@ -525,10 +500,6 @@ public:
     }
 };
 
-/*######
-## npc_nesingwary_trapper
-######*/
-
 enum NesingwaryTrapper
 {
     GO_HIGH_QUALITY_FUR = 187983,
@@ -560,6 +531,7 @@ const uint32 CaribouTraps[CaribouTrapsNum] =
     GO_CARIBOU_TRAP_11, GO_CARIBOU_TRAP_12, GO_CARIBOU_TRAP_13, GO_CARIBOU_TRAP_14, GO_CARIBOU_TRAP_15,
 };
 
+// 25835
 class npc_nesingwary_trapper : public CreatureScript
 {
 public:
@@ -640,7 +612,7 @@ public:
                         break;
                     case 7:
                     {
-                        GameObject* go_caribou = NULL;
+                        GameObject* go_caribou = nullptr;
                         for (uint8 i = 0; i < CaribouTrapsNum; ++i)
                         {
                             go_caribou = me->FindNearestGameObject(CaribouTraps[i], 5.0f);
@@ -670,29 +642,26 @@ public:
     }
 };
 
-/*######
-## npc_lurgglbr
-######*/
-
-enum Lurgglbr
-{
-    QUEST_ESCAPE_WINTERFIN_CAVERNS      = 11570,
-
-    GO_CAGE                             = 187369,
-
-    FACTION_ESCORTEE_A                  = 774,
-    FACTION_ESCORTEE_H                  = 775,
-
-    SAY_START_1                         = 0,
-    SAY_START_2                         = 1,
-    SAY_END_1                           = 2,
-    SAY_END_2                           = 3
-};
-
+// 25208
 class npc_lurgglbr : public CreatureScript
 {
 public:
     npc_lurgglbr() : CreatureScript("npc_lurgglbr") { }
+
+    enum Lurgglbr
+    {
+        QUEST_ESCAPE_WINTERFIN_CAVERNS = 11570,
+
+        GO_CAGE = 187369,
+
+        FACTION_ESCORTEE_A = 774,
+        FACTION_ESCORTEE_H = 775,
+
+        SAY_START_1 = 0,
+        SAY_START_2 = 1,
+        SAY_END_1 = 2,
+        SAY_END_2 = 3
+    };
 
     struct npc_lurgglbrAI : public npc_escortAI
     {
@@ -817,27 +786,24 @@ public:
     }
 };
 
-/*######
-## npc_nexus_drake_hatchling
-######*/
-
-enum NexusDrakeHatchling
-{
-    SPELL_DRAKE_HARPOON             = 46607,
-    SPELL_RED_DRAGONBLOOD           = 46620,
-    SPELL_DRAKE_HATCHLING_SUBDUED   = 46691,
-    SPELL_SUBDUED                   = 46675,
-
-    NPC_RAELORASZ                   = 26117,
-
-    QUEST_DRAKE_HUNT                = 11919,
-    QUEST_DRAKE_HUNT_D              = 11940
-};
-
+// 26127
 class npc_nexus_drake_hatchling : public CreatureScript
 {
 public:
     npc_nexus_drake_hatchling() : CreatureScript("npc_nexus_drake_hatchling") { }
+
+    enum NexusDrakeHatchling
+    {
+        SPELL_DRAKE_HARPOON = 46607,
+        SPELL_RED_DRAGONBLOOD = 46620,
+        SPELL_DRAKE_HATCHLING_SUBDUED = 46691,
+        SPELL_SUBDUED = 46675,
+
+        NPC_RAELORASZ = 26117,
+
+        QUEST_DRAKE_HUNT = 11919,
+        QUEST_DRAKE_HUNT_D = 11940
+    };
 
     struct npc_nexus_drake_hatchlingAI : public FollowerAI //The spell who makes the npc follow the player is missing, also we can use FollowerAI!
     {
@@ -930,10 +896,6 @@ public:
     }
 };
 
-/*######
-## npc_thassarian
-######*/
-
 enum Thassarian
 {
     QUEST_LAST_RITES        = 12019,
@@ -974,8 +936,9 @@ enum Thassarian
     SAY_LERYSSA_4           = 3
 };
 
-#define GOSSIP_ITEM_T   "Let's do this, Thassarian. It's now or never."
+#define GOSSIP_ITEM_T   "Let's do this, Thassarian. It's now or never." // gossip 9417 broadcast 25840 // same entry in 9418
 
+// 26170
 class npc_thassarian : public CreatureScript
 {
 public:
@@ -1276,10 +1239,7 @@ public:
     }
 };
 
-/*######
-## npc_image_lich_king
-######*/
-
+// 26203
 class npc_image_lich_king : public CreatureScript
 {
 public:
@@ -1311,10 +1271,7 @@ public:
     }
 };
 
-/*######
-## npc_general_arlos
-######*/
-
+// 25250
 class npc_general_arlos : public CreatureScript
 {
 public:
@@ -1343,20 +1300,17 @@ public:
     }
 };
 
-/*######
-## npc_counselor_talbot
-######*/
-
-enum CounselorTalbot
-{
-    SPELL_DEFLECTION    = 51009,
-    SPELL_SOUL_BLAST    = 50992,
-};
-
+// 25301
 class npc_counselor_talbot : public CreatureScript
 {
 public:
     npc_counselor_talbot() : CreatureScript("npc_counselor_talbot") { }
+
+    enum CounselorTalbot
+    {
+        SPELL_DEFLECTION = 51009,
+        SPELL_SOUL_BLAST = 50992,
+    };
 
     struct npc_counselor_talbotAI : public ScriptedAI
     {
@@ -1458,10 +1412,7 @@ public:
     }
 };
 
-/*######
-## npc_leryssa
-######*/
-
+// 25251
 class npc_leryssa : public CreatureScript
 {
 public:
@@ -1587,24 +1538,21 @@ public:
     }
 };
 
-/*######
-## npc_beryl_sorcerer
-######*/
-
-enum BerylSorcerer
-{
-    NPC_CAPTURED_BERLY_SORCERER         = 25474,
-    NPC_LIBRARIAN_DONATHAN              = 25262,
-
-    SPELL_ARCANE_CHAINS                 = 45611,
-    SPELL_COSMETIC_CHAINS               = 54324,
-    SPELL_COSMETIC_ENSLAVE_CHAINS_SELF  = 45631
-};
-
+// 25316
 class npc_beryl_sorcerer : public CreatureScript
 {
 public:
     npc_beryl_sorcerer() : CreatureScript("npc_beryl_sorcerer") { }
+
+    enum BerylSorcerer
+    {
+        NPC_CAPTURED_BERLY_SORCERER = 25474,
+        NPC_LIBRARIAN_DONATHAN = 25262,
+
+        SPELL_ARCANE_CHAINS = 45611,
+        SPELL_COSMETIC_CHAINS = 54324,
+        SPELL_COSMETIC_ENSLAVE_CHAINS_SELF = 45631
+    };
 
     struct npc_beryl_sorcererAI : public FollowerAI
     {
@@ -1668,28 +1616,27 @@ public:
     }
 };
 
-/*######
-## npc_imprisoned_beryl_sorcerer
-######*/
-enum ImprisionedBerylSorcerer
-{
-    SPELL_NEURAL_NEEDLE             = 45634,
-
-    NPC_IMPRISONED_BERYL_SORCERER   = 25478,
-
-    SAY_IMPRISIONED_BERYL_1         = 0,
-    SAY_IMPRISIONED_BERYL_2         = 1,
-    SAY_IMPRISIONED_BERYL_3         = 2,
-    SAY_IMPRISIONED_BERYL_4         = 3,
-    SAY_IMPRISIONED_BERYL_5         = 4,
-    SAY_IMPRISIONED_BERYL_6         = 5,
-    SAY_IMPRISIONED_BERYL_7         = 6
-};
-
+// 25478
 class npc_imprisoned_beryl_sorcerer : public CreatureScript
 {
 public:
     npc_imprisoned_beryl_sorcerer() : CreatureScript("npc_imprisoned_beryl_sorcerer") { }
+
+    enum ImprisionedBerylSorcerer
+    {
+        SPELL_NEURAL_NEEDLE = 45634,
+        SPELL_COSMETIC_ENSLAVE_CHAINS_SELF = 45631,
+
+        NPC_IMPRISONED_BERYL_SORCERER = 25478,
+
+        SAY_IMPRISIONED_BERYL_1 = 0,
+        SAY_IMPRISIONED_BERYL_2 = 1,
+        SAY_IMPRISIONED_BERYL_3 = 2,
+        SAY_IMPRISIONED_BERYL_4 = 3,
+        SAY_IMPRISIONED_BERYL_5 = 4,
+        SAY_IMPRISIONED_BERYL_6 = 5,
+        SAY_IMPRISIONED_BERYL_7 = 6
+    };
 
     struct npc_imprisoned_beryl_sorcererAI : public ScriptedAI
     {
@@ -1778,25 +1725,26 @@ public:
     }
 };
 
-/*######
-## npc_mootoo_the_younger
-######*/
-enum MootooTheYounger
-{
-    SAY_1                       = 0,
-    SAY_2                       = 1,
-    SAY_3                       = 2,
-    SAY_4                       = 3,
-    SAY_5                       = 4,
-
-    NPC_MOOTOO_THE_YOUNGER      = 25504,
-    QUEST_ESCAPING_THE_MIST     = 11664
-};
-
+// 25504
 class npc_mootoo_the_younger : public CreatureScript
 {
 public:
     npc_mootoo_the_younger() : CreatureScript("npc_mootoo_the_younger") { }
+
+    enum MootooTheYounger
+    {
+        SAY_1 = 0,
+        SAY_2 = 1,
+        SAY_3 = 2,
+        SAY_4 = 3,
+        SAY_5 = 4,
+
+        FACTION_ESCORTEE_A = 774,
+        FACTION_ESCORTEE_H = 775,
+
+        NPC_MOOTOO_THE_YOUNGER = 25504,
+        QUEST_ESCAPING_THE_MIST = 11664
+    };
 
     bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
     {
@@ -1870,23 +1818,20 @@ public:
     }
 };
 
-/*######
-## npc_bonker_togglevolt
-######*/
-
-enum BonkerTogglevolt
-{
-    NPC_BONKER_TOGGLEVOLT   = 25589,
-    QUEST_GET_ME_OUTA_HERE  = 11673,
-
-    SAY_BONKER_1            = 0,
-    SAY_BONKER_2            = 1
-};
-
+// 25589
 class npc_bonker_togglevolt : public CreatureScript
 {
 public:
     npc_bonker_togglevolt() : CreatureScript("npc_bonker_togglevolt") { }
+
+    enum BonkerTogglevolt
+    {
+        NPC_BONKER_TOGGLEVOLT = 25589,
+        QUEST_GET_ME_OUTA_HERE = 11673,
+
+        SAY_BONKER_1 = 0,
+        SAY_BONKER_2 = 1
+    };
 
     bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
     {
@@ -1992,6 +1937,7 @@ const uint32 MammothTraps[MammothTrapsNum] =
     GO_MAMMOTH_TRAP_21, GO_MAMMOTH_TRAP_22
 };
 
+// 25850
 class npc_trapped_mammoth_calf : public CreatureScript
 {
 public:
@@ -2009,7 +1955,7 @@ public:
             uiTimer = 1500;
             bStarted = false;
 
-            GameObject* pTrap = NULL;
+            GameObject* pTrap = nullptr;
             for (uint8 i = 0; i < MammothTrapsNum; ++i)
             {
                 pTrap = me->FindNearestGameObject(MammothTraps[i], 11.0f);
@@ -2048,7 +1994,7 @@ public:
 
             me->DisappearAndDie();
 
-            GameObject* pTrap = NULL;
+            GameObject* pTrap = nullptr;
             for (uint8 i = 0; i < MammothTrapsNum; ++i)
             {
                 pTrap = me->FindNearestGameObject(MammothTraps[i], 11.0f);
@@ -2067,23 +2013,20 @@ public:
     }
 };
 
-/*######
-## Quest 11653: Hah... You're Not So Big Now!
-######*/
-
-enum NotSoBig
-{
-    QUEST_YOU_RE_NOT_SO_BIG_NOW                   = 11653,
-    SPELL_AURA_NOTSOBIG_1                         = 45672,
-    SPELL_AURA_NOTSOBIG_2                         = 45673,
-    SPELL_AURA_NOTSOBIG_3                         = 45677,
-    SPELL_AURA_NOTSOBIG_4                         = 45681
-};
-
+// 25434 Quest 11653
 class npc_magmoth_crusher : public CreatureScript
 {
 public:
     npc_magmoth_crusher() : CreatureScript("npc_magmoth_crusher") { }
+
+    enum NotSoBig
+    {
+        QUEST_YOU_RE_NOT_SO_BIG_NOW = 11653,
+        SPELL_AURA_NOTSOBIG_1 = 45672,
+        SPELL_AURA_NOTSOBIG_2 = 45673,
+        SPELL_AURA_NOTSOBIG_3 = 45677,
+        SPELL_AURA_NOTSOBIG_4 = 45681
+    };
 
     struct npc_magmoth_crusherAI : public ScriptedAI
     {
@@ -2104,6 +2047,29 @@ public:
                     player->KilledMonsterCredit(qInfo->RequiredNpcOrGo[0], 0);
             }
         }
+
+        void SpellHit(Unit* /*caster*/, const SpellInfo* spell) override
+        {
+            if (spell->Id == 51912)
+            {
+                uint8 aura = urand(0, 3);
+                switch (aura)
+                {
+                case 0:
+                    DoCast(me, SPELL_AURA_NOTSOBIG_1);
+                    break;
+                case 1:
+                    DoCast(me, SPELL_AURA_NOTSOBIG_2);
+                    break;
+                case 2:
+                    DoCast(me, SPELL_AURA_NOTSOBIG_3);
+                    break;
+                case 3:
+                    DoCast(me, SPELL_AURA_NOTSOBIG_4);
+                    break;
+                }
+            }
+        }
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -2112,24 +2078,21 @@ public:
     }
 };
 
-/*######
-## Quest 11608: Bury Those Cockroaches!
-######*/
-
-enum BuryThoseCockroaches
-{
-    // Quest
-    QUEST_BURY_THOSE_COCKROACHES            = 11608,
-
-    // Spells
-    SPELL_SEAFORIUM_DEPTH_CHARGE_EXPLOSION  = 45502
-
-};
-
+// 25401 Quest 11608
 class npc_seaforium_depth_charge : public CreatureScript
 {
 public:
     npc_seaforium_depth_charge() : CreatureScript("npc_seaforium_depth_charge") { }
+
+    enum BuryThoseCockroaches
+    {
+        // Quest
+        QUEST_BURY_THOSE_COCKROACHES = 11608,
+
+        // Spells
+        SPELL_SEAFORIUM_DEPTH_CHARGE_EXPLOSION = 45502
+
+    };
 
     struct npc_seaforium_depth_chargeAI : public ScriptedAI
     {
@@ -2171,20 +2134,17 @@ public:
     }
 };
 
-/*######
-## Help Those That Cannot Help Themselves, Quest 11876
-######*/
-
-enum Valiancekeepcannons
-{
-    GO_VALIANCE_KEEP_CANNON_1                     = 187560,
-    GO_VALIANCE_KEEP_CANNON_2                     = 188692
-};
-
+// 25306
 class npc_valiance_keep_cannoneer : public CreatureScript
 {
 public:
     npc_valiance_keep_cannoneer() : CreatureScript("npc_valiance_keep_cannoneer") { }
+
+    enum Valiancekeepcannons
+    {
+        GO_VALIANCE_KEEP_CANNON_1 = 187560,
+        GO_VALIANCE_KEEP_CANNON_2 = 188692
+    };
 
     struct npc_valiance_keep_cannoneerAI : public ScriptedAI
     {
@@ -2222,27 +2182,21 @@ public:
     }
 };
 
-/*******************************************************
- * npc_warmage_coldarra
- *******************************************************/
-
-enum Spells
-{
-    SPELL_TRANSITUS_SHIELD_BEAM = 48310
-};
-
-enum NPCs
-{
-    NPC_TRANSITUS_SHIELD_DUMMY   = 27306,
-    NPC_WARMAGE_HOLLISTER        = 27906,
-    NPC_WARMAGE_CALANDRA         = 27173,
-    NPC_WARMAGE_WATKINS          = 27904
-};
-
+// 27173 27904 27906
 class npc_warmage_coldarra : public CreatureScript
 {
 public:
     npc_warmage_coldarra() : CreatureScript("npc_warmage_coldarra") { }
+
+    enum NPCs
+    {
+        SPELL_TRANSITUS_SHIELD_BEAM = 48310,
+
+        NPC_TRANSITUS_SHIELD_DUMMY = 27306,
+        NPC_WARMAGE_HOLLISTER = 27906,
+        NPC_WARMAGE_CALANDRA = 27173,
+        NPC_WARMAGE_WATKINS = 27904
+    };
 
     struct npc_warmage_coldarraAI : public ScriptedAI
     {
@@ -2327,39 +2281,37 @@ public:
     }
 };
 
-/*######
-## npc_hidden_cultist
-######*/
 
-enum HiddenCultist
-{
-    SPELL_SHROUD_OF_THE_DEATH_CULTIST           = 46077, //not working
-    SPELL_RIGHTEOUS_VISION                      = 46078, //player aura
+const char* GOSSIP_ITEM_TOM_HEGGER = "What do you know about the Cult of the Damned?"; // gossip 9217 broadcast 25237
+const char* GOSSIP_ITEM_GUARD_MITCHELLS = "How long have you worked for the Cult of the Damned?"; // gossip 9219 broadcast 25242
+const char* GOSSIP_ITEM_SALTY_JOHN_THORPE = "I have a reason to believe you're involved in the cultist activity"; // gossip 9218 broadcast 25239
 
-    QUEST_THE_HUNT_IS_ON                        = 11794,
-
-    GOSSIP_TEXT_SALTY_JOHN_THORPE               = 12529,
-    GOSSIP_TEXT_GUARD_MITCHELSS                 = 12530,
-    GOSSIP_TEXT_TOM_HEGGER                      = 12528,
-
-    NPC_TOM_HEGGER                              = 25827,
-    NPC_SALTY_JOHN_THORPE                       = 25248,
-    NPC_GUARD_MITCHELLS                         = 25828,
-
-    SAY_HIDDEN_CULTIST_1                        = 0,
-    SAY_HIDDEN_CULTIST_2                        = 1,
-    SAY_HIDDEN_CULTIST_3                        = 2,
-    SAY_HIDDEN_CULTIST_4                        = 3
-};
-
-const char* GOSSIP_ITEM_TOM_HEGGER = "What do you know about the Cult of the Damned?";
-const char* GOSSIP_ITEM_GUARD_MITCHELLS = "How long have you worked for the Cult of the Damned?";
-const char* GOSSIP_ITEM_SALTY_JOHN_THORPE = "I have a reason to believe you're involved in the cultist activity";
-
+// 25827 25248 25828 
 class npc_hidden_cultist : public CreatureScript
 {
 public:
     npc_hidden_cultist() : CreatureScript("npc_hidden_cultist") { }
+
+    enum HiddenCultist
+    {
+        SPELL_SHROUD_OF_THE_DEATH_CULTIST = 46077, //not working
+        SPELL_RIGHTEOUS_VISION = 46078, //player aura
+
+        QUEST_THE_HUNT_IS_ON = 11794,
+
+        GOSSIP_TEXT_SALTY_JOHN_THORPE = 12529,
+        GOSSIP_TEXT_GUARD_MITCHELSS = 12530,
+        GOSSIP_TEXT_TOM_HEGGER = 12528,
+
+        NPC_TOM_HEGGER = 25827,
+        NPC_SALTY_JOHN_THORPE = 25248,
+        NPC_GUARD_MITCHELLS = 25828,
+
+        SAY_HIDDEN_CULTIST_1 = 0,
+        SAY_HIDDEN_CULTIST_2 = 1,
+        SAY_HIDDEN_CULTIST_3 = 2,
+        SAY_HIDDEN_CULTIST_4 = 3
+    };
 
     struct npc_hidden_cultistAI : public ScriptedAI
     {
@@ -2571,6 +2523,72 @@ public:
     }
 };
 
+// 26879
+class npc_tomas_riverwell_26879 : public CreatureScript
+{
+public:
+    npc_tomas_riverwell_26879() : CreatureScript("npc_tomas_riverwell_26879") { }
+
+    enum eNPC
+    {
+        QUEST_ALLIES_IN_DALARAN = 29608,
+        TAXINODE_DALARAN = 310,
+        NPC_ENRAGED_GRYPHON = 9526,
+    };
+
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) 
+    { 
+        if (quest->GetQuestId() == QUEST_ALLIES_IN_DALARAN)
+            player->m_taxi.SetTaximaskNode(TAXINODE_DALARAN);
+
+        return false; 
+    }
+
+    struct npc_tomas_riverwell_26879AI : public ScriptedAI
+    {
+        npc_tomas_riverwell_26879AI(Creature* creature) : ScriptedAI(creature) { }
+
+        void EnterCombat(Unit* victim) override 
+        { 
+            Talk(0);
+            Position pos = victim->GetNearPosition(frand(4.0f, 5.0f), frand(0.0f, 6.28f));
+            me->SummonCreature(NPC_ENRAGED_GRYPHON, pos, TEMPSUMMON_TIMED_DESPAWN, 60000);
+        }
+
+        void DamageTaken(Unit* attacker, uint32& damage) override
+        {
+            Position pos = attacker->GetNearPosition(frand(4.0f, 5.0f), frand(0.0f, 6.28f));
+            me->SummonCreature(NPC_ENRAGED_GRYPHON, pos, TEMPSUMMON_TIMED_DESPAWN, 60000);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_tomas_riverwell_26879AI(creature);
+    }
+};
+
+// 23736
+class npc_pricilla_winterwind_23736 : public CreatureScript
+{
+public:
+    npc_pricilla_winterwind_23736() : CreatureScript("npc_pricilla_winterwind_23736") { }
+
+    enum eNPC
+    {
+        QUEST_ALLIES_IN_DALARAN = 29608,
+        TAXINODE_DALARAN = 310,        
+    };
+
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    {
+        if (quest->GetQuestId() == QUEST_ALLIES_IN_DALARAN)
+            player->m_taxi.SetTaximaskNode(TAXINODE_DALARAN);
+
+        return false;
+    }
+};
+
 void AddSC_borean_tundra()
 {
     new npc_sinkhole_kill_credit();
@@ -2600,4 +2618,6 @@ void AddSC_borean_tundra()
     new npc_warmage_coldarra();
     new npc_hidden_cultist();
     new spell_windsoul_totem_aura();
+    new npc_tomas_riverwell_26879();
+    new npc_pricilla_winterwind_23736();
 }

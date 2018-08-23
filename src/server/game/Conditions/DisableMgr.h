@@ -51,6 +51,14 @@ enum SpellDisableTypes
                                 SPELL_DISABLE_LOS)
 };
 
+enum VmapDisableTypes
+{
+    VMAP_DISABLE_AREAFLAG = 0x1,
+    VMAP_DISABLE_HEIGHT = 0x2,
+    VMAP_DISABLE_LOS = 0x4,
+    VMAP_DISABLE_LIQUIDSTATUS = 0x8
+};
+
 enum MMapDisableTypes
 {
     MMAP_DISABLE_PATHFINDING    = 0x0

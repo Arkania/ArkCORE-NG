@@ -63,7 +63,7 @@ class ChatHandler
         // Builds chat packet and returns receiver guid position in the packet to substitute in whisper builders
         static size_t BuildChatPacket(WorldPacket& data, ChatMsg chatType, Language language, WorldObject const* sender, WorldObject const* receiver, std::string const& message, uint32 achievementId = 0, std::string const& channelName = "", LocaleConstant locale = DEFAULT_LOCALE, std::string const& addonPrefix = "");
 
-        static char* LineFromMessage(char*& pos) { char* start = strtok(pos, "\n"); pos = NULL; return start; }
+        static char* LineFromMessage(char*& pos) { char* start = strtok(pos, "\n"); pos = nullptr; return start; }
 
         // function with different implementation for chat/console
         virtual const char *GetTrinityString(int32 entry) const;
@@ -104,6 +104,7 @@ class ChatHandler
 
         char*     extractKeyFromLink(char* text, char const* linkType, char** something1 = NULL);
         char*     extractKeyFromLink(char* text, char const* const* linkTypes, int* found_idx, char** something1 = NULL);
+        std::string GetKeyFromLink(std::string text, std::string linkTypes);
 
         // if args have single value then it return in arg2 and arg1 == NULL
         void      extractOptFirstArg(char* args, char** arg1, char** arg2);

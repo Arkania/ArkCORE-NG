@@ -484,7 +484,7 @@ class spell_baloroc_countdown_dmg : public SpellScriptLoader
 
             void Register()
             {
-                AfterEffectRemove += AuraEffectRemoveFn(spell_baloroc_countdown_dmg_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
+                AfterEffectRemove += AuraEffectRemoveFn(spell_baloroc_countdown_dmg_AuraScript::OnRemove, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE, AURA_EFFECT_HANDLE_REAL);
             }
         };
 
@@ -512,7 +512,7 @@ class spell_baloroc_countdown_dmg_target : public SpellScriptLoader
 
             void Register()
             {
-                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_baloroc_countdown_dmg_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ALLY);
+                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_baloroc_countdown_dmg_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_TARGET_ANY);
             }
         };
 
@@ -527,6 +527,6 @@ void AddSC_boss_baloroc()
     new boss_baloroc();
     new npc_shard_of_torment();
     new spell_baloroc_countdown();
-    new spell_baloroc_countdown_dmg();
+    // new spell_baloroc_countdown_dmg();
     new spell_baloroc_countdown_dmg_target();
 }

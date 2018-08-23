@@ -37,25 +37,24 @@ EndContentData */
 #include "old_hillsbrad.h"
 #include "Player.h"
 
-enum Erozion
-{
-    QUEST_ENTRY_HILLSBRAD   = 10282,
-    QUEST_ENTRY_DIVERSION   = 10283,
-    QUEST_ENTRY_ESCAPE      = 10284,
-    QUEST_ENTRY_RETURN      = 10285,
-    ITEM_ENTRY_BOMBS        = 25853
-};
-#define GOSSIP_HELLO_EROZION1   "I need a pack of Incendiary Bombs."
 #define GOSSIP_HELLO_EROZION2   "[PH] Teleport please, i'm tired."
 
-/*######
-## npc_erozion
-######*/
-
-class npc_erozion : public CreatureScript
+// 18723
+class npc_erozion_18723 : public CreatureScript
 {
 public:
-    npc_erozion() : CreatureScript("npc_erozion") { }
+    npc_erozion_18723() : CreatureScript("npc_erozion_18723") { }
+
+    enum Erozion
+    {
+        QUEST_ENTRY_HILLSBRAD = 10282,
+        QUEST_ENTRY_DIVERSION = 10283,
+        QUEST_ENTRY_ESCAPE = 10284,
+        QUEST_ENTRY_RETURN = 10285,
+        ITEM_ENTRY_BOMBS = 25853,
+        GOSSIP_HELLO_EROZION1 = 7769,
+
+    };
 
     bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
     {
@@ -84,7 +83,7 @@ public:
 
         InstanceScript* instance = creature->GetInstanceScript();
         if (instance->GetData(TYPE_BARREL_DIVERSION) != DONE && !player->HasItemCount(ITEM_ENTRY_BOMBS))
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_HELLO_EROZION1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+            player->ADD_GOSSIP_ITEM_DB(GOSSIP_HELLO_EROZION1, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
 
         if (player->GetQuestStatus(QUEST_ENTRY_RETURN) == QUEST_STATUS_COMPLETE)
             player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_HELLO_EROZION2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
@@ -95,101 +94,86 @@ public:
     }
 };
 
-/*######
-## npc_thrall_old_hillsbrad
-######*/
-
-//Thrall texts
-enum ThrallOldHillsbrad
-{
-    SAY_TH_START_EVENT_PART1    = 0,
-    SAY_TH_ARMORY               = 1,
-    SAY_TH_SKARLOC_MEET         = 2,
-    SAY_TH_SKARLOC_TAUNT        = 3,
-    SAY_TH_START_EVENT_PART2    = 4,
-    SAY_TH_MOUNTS_UP            = 5,
-    SAY_TH_CHURCH_END           = 6,
-    SAY_TH_MEET_TARETHA         = 7,
-    SAY_TH_EPOCH_WONDER         = 8,
-    SAY_TH_EPOCH_KILL_TARETHA   = 9,
-    SAY_TH_EVENT_COMPLETE       = 10,
-
-    SAY_TH_RANDOM_LOW_HP        = 11,
-    SAY_TH_RANDOM_DIE           = 12,
-    SAY_TH_RANDOM_AGGRO         = 13,
-    SAY_TH_RANDOM_KILL          = 14,
-    SAY_TH_LEAVE_COMBAT         = 15,
-
-    //Taretha texts
-    SAY_TA_FREE                 = 0,
-    SAY_TA_ESCAPED              = 1,
-
-    //Misc for Thrall
-    SPELL_STRIKE                = 14516,
-    SPELL_SHIELD_BLOCK          = 12169,
-    SPELL_SUMMON_EROZION_IMAGE  = 33954,                   //if thrall dies during escort?
-
-    THRALL_WEAPON_ITEM          = 927,
-    THRALL_WEAPON_INFO          = 218169346,
-    THRALL_SHIELD_ITEM          = 2129,
-    THRALL_SHIELD_INFO          = 234948100,
-    THRALL_MODEL_UNEQUIPPED     = 17292,
-    THRALL_MODEL_EQUIPPED       = 18165,
-
-    //Misc Creature entries
-    ENTRY_ARMORER               = 18764,
-    ENTRY_SCARLOC               = 17862,
-
-    NPC_RIFLE                   = 17820,
-    NPC_WARDEN                  = 17833,
-    NPC_VETERAN                 = 17860,
-    NPC_WATCHMAN                = 17814,
-    NPC_SENTRY                  = 17815,
-
-    NPC_BARN_GUARDSMAN          = 18092,
-    NPC_BARN_PROTECTOR          = 18093,
-    NPC_BARN_LOOKOUT            = 18094,
-
-    NPC_CHURCH_GUARDSMAN        = 23175,
-    NPC_CHURCH_PROTECTOR        = 23179,
-    NPC_CHURCH_LOOKOUT          = 23177,
-
-    NPC_INN_GUARDSMAN           = 23176,
-    NPC_INN_PROTECTOR           = 23180,
-    NPC_INN_LOOKOUT             = 23178,
-
-    SKARLOC_MOUNT               = 18798,
-    SKARLOC_MOUNT_MODEL         = 18223,
-    EROZION_ENTRY               = 18723,
-    ENTRY_EPOCH                 = 18096,
-
-    GOSSIP_ID_START             = 9568,
-    GOSSIP_ID_SKARLOC1          = 9614,                        //I'm glad Taretha is alive. We now must find a way to free her...
-    GOSSIP_ID_SKARLOC2          = 9579,                        //What do you mean by this? Is Taretha in danger?
-    GOSSIP_ID_SKARLOC3          = 9580,
-    GOSSIP_ID_TARREN            = 9597,                        //tarren mill is beyond these trees
-    GOSSIP_ID_COMPLETE          = 9578                         //Thank you friends, I owe my freedom to you. Where is Taretha? I hoped to see her
-};
-
-#define SPEED_WALK              (0.5f)
-#define SPEED_RUN               (1.0f)
-#define SPEED_MOUNT             (1.6f)
-
-//gossip items
-#define GOSSIP_ITEM_SKARLOC1    "Taretha cannot see you, Thrall."
-#define GOSSIP_ITEM_SKARLOC2    "The situation is rather complicated, Thrall. It would be best for you to head into the mountains now, before more of Blackmoore's men show up. We'll make sure Taretha is safe."
-#define GOSSIP_ITEM_TARREN      "We're ready, Thrall."
 #define GOSSIP_ITEM_WALKING     "[PH] Start walking."
 
-class npc_thrall_old_hillsbrad : public CreatureScript
+// 17876
+class npc_thrall_old_hillsbrad_17876 : public CreatureScript
 {
 public:
-    npc_thrall_old_hillsbrad() : CreatureScript("npc_thrall_old_hillsbrad") { }
+    npc_thrall_old_hillsbrad_17876() : CreatureScript("npc_thrall_old_hillsbrad_17876") { }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    enum ThrallOldHillsbrad
     {
-        return GetInstanceAI<npc_thrall_old_hillsbradAI>(creature);
-    }
+        SAY_TH_START_EVENT_PART1 = 0,
+        SAY_TH_ARMORY = 1,
+        SAY_TH_SKARLOC_MEET = 2,
+        SAY_TH_SKARLOC_TAUNT = 3,
+        SAY_TH_START_EVENT_PART2 = 4,
+        SAY_TH_MOUNTS_UP = 5,
+        SAY_TH_CHURCH_END = 6,
+        SAY_TH_MEET_TARETHA = 7,
+        SAY_TH_EPOCH_WONDER = 8,
+        SAY_TH_EPOCH_KILL_TARETHA = 9,
+        SAY_TH_EVENT_COMPLETE = 10,
+
+        SAY_TH_RANDOM_LOW_HP = 11,
+        SAY_TH_RANDOM_DIE = 12,
+        SAY_TH_RANDOM_AGGRO = 13,
+        SAY_TH_RANDOM_KILL = 14,
+        SAY_TH_LEAVE_COMBAT = 15,
+
+        //Taretha texts
+        SAY_TA_ESCAPED = 1,
+
+        //Misc for Thrall
+        SPELL_STRIKE = 14516,
+        SPELL_SHIELD_BLOCK = 12169,
+        SPELL_SUMMON_EROZION_IMAGE = 33954,                   //if thrall dies during escort?
+
+        THRALL_WEAPON_ITEM = 927,
+        THRALL_WEAPON_INFO = 218169346,
+        THRALL_SHIELD_ITEM = 2129,
+        THRALL_SHIELD_INFO = 234948100,
+        THRALL_MODEL_UNEQUIPPED = 17292,
+        THRALL_MODEL_EQUIPPED = 18165,
+
+        //Misc Creature entries
+        ENTRY_ARMORER = 18764,
+        ENTRY_SCARLOC = 17862,
+
+        NPC_RIFLE = 17820,
+        NPC_WARDEN = 17833,
+        NPC_VETERAN = 17860,
+        NPC_WATCHMAN = 17814,
+        NPC_SENTRY = 17815,
+
+        NPC_BARN_GUARDSMAN = 18092,
+        NPC_BARN_PROTECTOR = 18093,
+        NPC_BARN_LOOKOUT = 18094,
+
+        NPC_CHURCH_GUARDSMAN = 23175,
+        NPC_CHURCH_PROTECTOR = 23179,
+        NPC_CHURCH_LOOKOUT = 23177,
+
+        NPC_INN_GUARDSMAN = 23176,
+        NPC_INN_PROTECTOR = 23180,
+        NPC_INN_LOOKOUT = 23178,
+
+        SKARLOC_MOUNT = 18798,
+        SKARLOC_MOUNT_MODEL = 18223,
+        EROZION_ENTRY = 18723,
+
+        GOSSIP_ID_START = 9568,
+        GOSSIP_ID_SKARLOC1 = 9614,                        //I'm glad Taretha is alive. We now must find a way to free her...
+        GOSSIP_ID_SKARLOC2 = 9579,                        //What do you mean by this? Is Taretha in danger?
+        GOSSIP_ID_SKARLOC3 = 9580,
+        GOSSIP_ID_TARREN = 9597,                        //tarren mill is beyond these trees
+        GOSSIP_ID_COMPLETE = 9578,                        //Thank you friends, I owe my freedom to you. Where is Taretha? I hoped to see her
+        GOSSIP_ITEM_SKARLOC1 = 7830,                       // "Taretha cannot see you, Thrall."
+        GOSSIP_ITEM_SKARLOC2 = 7829,                       // "The situation is rather complicated, Thrall. It would be best for you to head into the mountains now, before more of Blackmoore's men show up. We'll make sure Taretha is safe."
+        GOSSIP_ITEM_TARREN = 7840,                       // "We're ready, Thrall."
+        GOSSIP_ITEM_WALKING_UNKNOWN = 0,
+    };
 
     bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
     {
@@ -207,7 +191,7 @@ public:
 
                 creature->AI()->Talk(SAY_TH_START_EVENT_PART1);
 
-                if (npc_escortAI* pEscortAI = CAST_AI(npc_thrall_old_hillsbrad::npc_thrall_old_hillsbradAI, creature->AI()))
+                if (npc_escortAI* pEscortAI = CAST_AI(npc_thrall_old_hillsbrad_17876AI, creature->AI()))
                     pEscortAI->Start(true, true, player->GetGUID());
 
                 CAST_AI(npc_escortAI, (creature->AI()))->SetMaxPlayerDistance(100.0f);//not really needed, because it will not despawn if player is too far
@@ -216,7 +200,7 @@ public:
                 break;
 
             case GOSSIP_ACTION_INFO_DEF+2:
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_SKARLOC2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+20);
+                player->ADD_GOSSIP_ITEM_DB(GOSSIP_ITEM_SKARLOC2, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 20);
                 player->SEND_GOSSIP_MENU(GOSSIP_ID_SKARLOC2, creature->GetGUID());
                 break;
 
@@ -228,14 +212,14 @@ public:
 
                 creature->AI()->Talk(SAY_TH_START_EVENT_PART2);
 
-                CAST_AI(npc_thrall_old_hillsbrad::npc_thrall_old_hillsbradAI, creature->AI())->StartWP();
+                CAST_AI(npc_thrall_old_hillsbrad_17876AI, creature->AI())->StartWP();
                 break;
 
             case GOSSIP_ACTION_INFO_DEF+3:
                 player->CLOSE_GOSSIP_MENU();
                 if (instance)
                     instance->SetData(TYPE_THRALL_PART3, IN_PROGRESS);
-                CAST_AI(npc_thrall_old_hillsbrad::npc_thrall_old_hillsbradAI, creature->AI())->StartWP();
+                CAST_AI(npc_thrall_old_hillsbrad_17876AI, creature->AI())->StartWP();
                 break;
         }
         return true;
@@ -260,22 +244,22 @@ public:
 
             if (instance->GetData(TYPE_THRALL_PART1) == DONE && !instance->GetData(TYPE_THRALL_PART2))
             {
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_SKARLOC1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
+                player->ADD_GOSSIP_ITEM_DB(GOSSIP_ITEM_SKARLOC1, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
                 player->SEND_GOSSIP_MENU(GOSSIP_ID_SKARLOC1, creature->GetGUID());
             }
 
             if (instance->GetData(TYPE_THRALL_PART2) == DONE && !instance->GetData(TYPE_THRALL_PART3))
             {
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_TARREN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+3);
+                player->ADD_GOSSIP_ITEM_DB(GOSSIP_ITEM_TARREN, 0,GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+3);
                 player->SEND_GOSSIP_MENU(GOSSIP_ID_TARREN, creature->GetGUID());
             }
         }
         return true;
     }
 
-    struct npc_thrall_old_hillsbradAI : public npc_escortAI
+    struct npc_thrall_old_hillsbrad_17876AI : public npc_escortAI
     {
-        npc_thrall_old_hillsbradAI(Creature* creature) : npc_escortAI(creature)
+        npc_thrall_old_hillsbrad_17876AI(Creature* creature) : npc_escortAI(creature)
         {
             instance = creature->GetInstanceScript();
             HadMount = false;
@@ -548,29 +532,29 @@ public:
         }
     };
 
-};
-
-/*######
-## npc_taretha
-######*/
-enum Taretha
-{
-    GOSSIP_ID_EPOCH1        = 9610,                        //Thank you for helping Thrall escape, friends. Now I only hope
-    GOSSIP_ID_EPOCH2        = 9613                        //Yes, friends. This man was no wizard of
-};
-
-#define GOSSIP_ITEM_EPOCH1      "Strange wizard?"
-#define GOSSIP_ITEM_EPOCH2      "We'll get you out. Taretha. Don't worry. I doubt the wizard would wander too far away."
-
-class npc_taretha : public CreatureScript
-{
-public:
-    npc_taretha() : CreatureScript("npc_taretha") { }
-
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_tarethaAI>(creature);
+        return GetInstanceAI<npc_thrall_old_hillsbrad_17876AI>(creature);
     }
+};
+
+// 18887
+class npc_taretha_18887 : public CreatureScript
+{
+public:
+    npc_taretha_18887() : CreatureScript("npc_taretha_18887") { }
+
+    enum Taretha
+    {
+        ENTRY_EPOCH = 18096,
+        SAY_TA_FREE = 0,
+
+        GOSSIP_ITEM_EPOCH1 = 7849, // "Strange wizard?"
+        GOSSIP_ITEM_EPOCH2 = 7852, // "We'll get you out. Taretha. Don't worry. I doubt the wizard would wander too far away."
+
+        GOSSIP_ID_EPOCH1 = 9610,                        //Thank you for helping Thrall escape, friends. Now I only hope
+        GOSSIP_ID_EPOCH2 = 9613                        //Yes, friends. This man was no wizard of
+    };
 
     bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
     {
@@ -578,7 +562,7 @@ public:
         InstanceScript* instance = creature->GetInstanceScript();
         if (action == GOSSIP_ACTION_INFO_DEF+1)
         {
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_EPOCH2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
+            player->ADD_GOSSIP_ITEM_DB(GOSSIP_ITEM_EPOCH2, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
             player->SEND_GOSSIP_MENU(GOSSIP_ID_EPOCH2, creature->GetGUID());
         }
         if (action == GOSSIP_ACTION_INFO_DEF+2)
@@ -592,7 +576,7 @@ public:
                      creature->SummonCreature(ENTRY_EPOCH, 2639.13f, 698.55f, 65.43f, 4.59f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 120000);
 
                 if (Creature* thrall = (ObjectAccessor::GetCreature(*creature, instance->GetData64(DATA_THRALL))))
-                    CAST_AI(npc_thrall_old_hillsbrad::npc_thrall_old_hillsbradAI, thrall->AI())->StartWP();
+                    CAST_AI(npc_thrall_old_hillsbrad_17876::npc_thrall_old_hillsbrad_17876AI, thrall->AI())->StartWP();
             }
         }
         return true;
@@ -603,15 +587,15 @@ public:
         InstanceScript* instance = creature->GetInstanceScript();
         if (instance->GetData(TYPE_THRALL_PART3) == DONE && instance->GetData(TYPE_THRALL_PART4) == NOT_STARTED)
         {
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_EPOCH1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+            player->ADD_GOSSIP_ITEM_DB(GOSSIP_ITEM_EPOCH1, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
             player->SEND_GOSSIP_MENU(GOSSIP_ID_EPOCH1, creature->GetGUID());
         }
         return true;
     }
 
-    struct npc_tarethaAI : public npc_escortAI
+    struct npc_taretha_18887AI : public npc_escortAI
     {
-        npc_tarethaAI(Creature* creature) : npc_escortAI(creature)
+        npc_taretha_18887AI(Creature* creature) : npc_escortAI(creature)
         {
             instance = creature->GetInstanceScript();
         }
@@ -640,15 +624,16 @@ public:
         }
     };
 
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return GetInstanceAI<npc_taretha_18887AI>(creature);
+    }
 };
 
-/*######
-## AddSC
-######*/
 
 void AddSC_old_hillsbrad()
 {
-    new npc_erozion();
-    new npc_thrall_old_hillsbrad();
-    new npc_taretha();
+    new npc_erozion_18723();
+    new npc_thrall_old_hillsbrad_17876();
+    new npc_taretha_18887();
 }

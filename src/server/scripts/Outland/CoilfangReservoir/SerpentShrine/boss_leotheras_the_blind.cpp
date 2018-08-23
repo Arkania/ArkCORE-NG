@@ -320,7 +320,7 @@ public:
 
                 if (instance->GetData64(DATA_LEOTHERAS_EVENT_STARTER))
                 {
-                    Unit* victim = NULL;
+                    Unit* victim = nullptr;
                     victim = ObjectAccessor::GetUnit(*me, instance->GetData64(DATA_LEOTHERAS_EVENT_STARTER));
                     if (victim)
                         me->getThreatManager().addThreat(victim, 1);
@@ -574,7 +574,7 @@ public:
                 //at this point he divides himself in two parts
                 CastConsumingMadness();
                 DespawnDemon();
-                Creature* Copy = NULL;
+                Creature* Copy = nullptr;
                 Copy = DoSpawnCreature(DEMON_FORM, 0, 0, 0, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 6000);
                 if (Copy)
                  {
@@ -739,7 +739,7 @@ public:
 
             if (!me->IsInCombat() && instance->GetData64(DATA_LEOTHERAS_EVENT_STARTER))
             {
-                Unit* victim = NULL;
+                Unit* victim = nullptr;
                 victim = ObjectAccessor::GetUnit(*me, instance->GetData64(DATA_LEOTHERAS_EVENT_STARTER));
                 if (victim)
                     AttackStart(victim);
@@ -759,7 +759,7 @@ public:
 
             if (Mindblast_Timer <= diff)
             {
-                Unit* target = NULL;
+                Unit* target = nullptr;
                 target = SelectTarget(SELECT_TARGET_RANDOM, 0);
 
                 if (target)DoCast(target, SPELL_MINDBLAST);

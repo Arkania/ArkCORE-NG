@@ -65,6 +65,7 @@ const Position twisterPos[8] =
     {-1219.45f, 68.33f, 734.17f, 0.0f},
 };
 
+// 43873
 class boss_altairus : public CreatureScript
 {
     public:
@@ -225,18 +226,15 @@ class boss_altairus : public CreatureScript
         };
 };
 
-class npc_air_current : public CreatureScript
+// 47305
+class npc_air_current_47305 : public CreatureScript
 {
     public:
-        npc_air_current() : CreatureScript("npc_air_current") { }
-        
-        CreatureAI* GetAI(Creature* creature) const
+        npc_air_current_47305() : CreatureScript("npc_air_current_47305") { }
+
+        struct npc_air_current_47305AI : public ScriptedAI
         {
-            return new npc_air_currentAI(creature);
-        }
-        struct npc_air_currentAI : public ScriptedAI
-        {
-            npc_air_currentAI(Creature* creature) : ScriptedAI(creature)
+            npc_air_current_47305AI(Creature* creature) : ScriptedAI(creature)
             {
                 me->SetReactState(REACT_PASSIVE);
             }
@@ -251,8 +249,14 @@ class npc_air_current : public CreatureScript
 
             void UpdateAI(uint32 /*diff*/) { }
      };
+
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return new npc_air_current_47305AI(creature);
+        }
 };
 
+// 47342
 /*class npc_altairus_twister : public CreatureScript
 {
     public:
@@ -282,7 +286,7 @@ class npc_air_current : public CreatureScript
 void AddSC_boss_altairus()
 {
     new boss_altairus();
-    new npc_air_current();
+    new npc_air_current_47305();
     //new npc_altairus_twister();
 }
 

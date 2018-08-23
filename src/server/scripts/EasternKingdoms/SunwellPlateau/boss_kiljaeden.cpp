@@ -717,7 +717,7 @@ public:
                         case TIMER_LEGION_LIGHTNING:
                             if (!me->IsNonMeleeSpellCast(false))
                             {
-                                Unit* pRandomPlayer = NULL;
+                                Unit* pRandomPlayer = nullptr;
 
                                 me->RemoveAurasDueToSpell(SPELL_SOUL_FLAY);
                                 for (uint8 z = 0; z < 6; ++z)
@@ -812,7 +812,7 @@ public:
                             TimerIsDeactivated[TIMER_ORBS_EMPOWER] = true;
                             break;
                         case TIMER_ARMAGEDDON: //Phase 4
-                            Unit* target = NULL;
+                            Unit* target = nullptr;
                             for (uint8 z = 0; z < 6; ++z)
                             {
                                 target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true);

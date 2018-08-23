@@ -190,38 +190,33 @@ void AuraApplication::BuildUpdatePacket(ByteBuffer& data, bool remove) const
         data << uint32(0);
         return;
     }
-    else
+    ASSERT(_target->GetVisibleAura(_slot));
+
+    Aura const* aura = GetBase();
+    data << uint32(aura->GetId());
+    uint32 flags = _flags;
+    if (aura->GetMaxDuration() > 0 && !(aura->GetSpellInfo()->AttributesEx5 & SPELL_ATTR5_HIDE_DURATION))
+        flags |= AFLAG_DURATION;
+    data << uint16(flags);
+    data << uint8(aura->GetCasterLevel());
+    // send stack amount for aura which could be stacked (never 0 - causes incorrect display) or charges
+    // stack amount has priority over charges (checked on retail with spell 50262)
+    data << uint8(aura->GetSpellInfo()->StackAmount ? aura->GetStackAmount() : aura->GetCharges());
+
+    if (!(flags & AFLAG_CASTER))
+        data.appendPackGUID(aura->GetCasterGUID());
+
+    if (flags & AFLAG_DURATION)
     {
-        ASSERT(_target->GetVisibleAura(_slot));
-
-        Aura const* aura = GetBase();
-        data << uint32(aura->GetId());
-        uint32 flags = _flags;
-        if (aura->GetMaxDuration() > 0 && !(aura->GetSpellInfo()->AttributesEx5 & SPELL_ATTR5_HIDE_DURATION))
-            flags |= AFLAG_DURATION;
-        if (!aura->IsPassive())
-            flags |= AFLAG_ANY_EFFECT_AMOUNT_SENT;
-        data << uint16(flags);
-        data << uint8(aura->GetCasterLevel());
-        // send stack amount for aura which could be stacked (never 0 - causes incorrect display) or charges
-        // stack amount has priority over charges (checked on retail with spell 50262)
-        data << uint8(aura->GetSpellInfo()->StackAmount ? aura->GetStackAmount() : aura->GetCharges());
-
-        if (!(flags & AFLAG_CASTER))
-            data.appendPackGUID(aura->GetCasterGUID());
-
-        if (flags & AFLAG_DURATION)
-        {
-            data << uint32(aura->GetMaxDuration());
-            data << uint32(aura->GetDuration());
-        }
-
-        if (flags & AFLAG_ANY_EFFECT_AMOUNT_SENT)
-            for (uint32 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-                if (AuraEffect const* eff = aura->GetEffect(i))
-                    if (HasEffect(i))       // Not all of aura's effects have to be applied on every target
-                        data << int32(eff->GetAmount());
+        data << uint32(aura->GetMaxDuration());
+        data << uint32(aura->GetDuration());
     }
+
+    if (flags & AFLAG_ANY_EFFECT_AMOUNT_SENT)
+        for (uint32 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+            if (AuraEffect const* eff = aura->GetEffect(i))
+                if (HasEffect(i))       // Not all of aura's effects have to be applied on every target
+                    data << int32(eff->GetAmount());
 }
 
 void AuraApplication::ClientUpdate(bool remove)
@@ -326,7 +321,7 @@ Aura* Aura::Create(SpellInfo const* spellproto, uint8 effMask, WorldObject* owne
             if (casterGUID != owner->GetGUID() && spellproto->IsSingleTarget())
                 return NULL;
 
-    Aura* aura = NULL;
+    Aura* aura = nullptr;
     switch (owner->GetTypeId())
     {
         case TYPEID_UNIT:
@@ -380,7 +375,7 @@ void Aura::_InitEffects(uint8 effMask, Unit* caster, int32 *baseAmount)
         if (effMask & (uint8(1) << i))
             m_effects[i] = new AuraEffect(this, i, baseAmount ? baseAmount + i : NULL, caster);
         else
-            m_effects[i] = NULL;
+            m_effects[i] = nullptr;
     }
 }
 
@@ -650,8 +645,8 @@ void Aura::UpdateOwner(uint32 diff, WorldObject* owner)
     Unit* caster = GetCaster();
     // Apply spellmods for channeled auras
     // used for example when triggered spell of spell:10 is modded
-    Spell* modSpell = NULL;
-    Player* modOwner = NULL;
+    Spell* modSpell = nullptr;
+    Player* modOwner = nullptr;
     if (caster)
     {
         modOwner = caster->GetSpellModOwner();
@@ -730,7 +725,7 @@ void Aura::Update(uint32 diff, Unit* caster)
 
 int32 Aura::CalcMaxDuration(Unit* caster) const
 {
-    Player* modOwner = NULL;
+    Player* modOwner = nullptr;
     int32 maxDuration;
 
     if (caster)
@@ -1019,8 +1014,11 @@ void Aura::UnregisterSingleTarget()
     Unit* caster = GetCaster();
     /// @todo find a better way to do this.
     if (!caster)
+    {
         caster = ObjectAccessor::GetObjectInOrOutOfWorld(GetCasterGUID(), (Unit*)NULL);
-    ASSERT(caster);
+        if (!caster) 
+            return; // maybe player has re-logged to server, with other char.. and a old triggered aura is not finished..
+    }
     caster->GetSingleCastAuras().remove(this);
     SetIsSingleTarget(false);
 }
@@ -2261,7 +2259,7 @@ bool Aura::CanStackWith(Aura const* existingAura) const
 
     if (HasEffectType(SPELL_AURA_CONTROL_VEHICLE) && existingAura->HasEffectType(SPELL_AURA_CONTROL_VEHICLE))
     {
-        Vehicle* veh = NULL;
+        Vehicle* veh = nullptr;
         if (GetOwner()->ToUnit())
             veh = GetOwner()->ToUnit()->GetVehicleKit();
 
@@ -2378,7 +2376,7 @@ bool Aura::IsProcTriggeredOnEvent(AuraApplication* aurApp, ProcEventInfo& eventI
             if (eventInfo.GetDamageInfo())
             {
                 WeaponAttackType attType = eventInfo.GetDamageInfo()->GetAttackType();
-                Item* item = NULL;
+                Item* item = nullptr;
                 if (attType == BASE_ATTACK)
                     item = target->ToPlayer()->GetUseableItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
                 else if (attType == OFF_ATTACK)
@@ -2918,9 +2916,9 @@ void UnitAura::FillTargetMap(std::map<Unit*, uint8> & targets, Unit* caster)
         {
             std::map<Unit*, uint8>::iterator existing = targets.find(*itr);
             if (existing != targets.end())
-                existing->second |= 1<<effIndex;
+                existing->second |= 1 << effIndex;
             else
-                targets[*itr] = 1<<effIndex;
+                targets[*itr] = 1 << effIndex;
         }
     }
 }

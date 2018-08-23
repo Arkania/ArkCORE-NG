@@ -211,9 +211,11 @@ enum TrinityStrings
     LANG_PHASING_FAILED                 = 179,
     LANG_PHASING_LAST_PHASE             = 180,
     LANG_PHASING_LIST                   = 181,
-    LANG_PHASING_PHASEMASK              = 182,
+    LANG_PHASING_PHASEID                = 182,
     LANG_PHASING_REPORT_STATUS          = 183,
-    LANG_PHASING_NO_DEFINITIONS         = 184,              // Phasing
+    LANG_PHASING_NO_DEFINITIONS         = 184,
+    LANG_CURRENT_FOCUS                  = 185,
+    LANG_PHASING_INVALID_VALUE          = 186,
     // Room for more level 1              185-199 not used
 
     // level 2 chat
@@ -385,6 +387,7 @@ enum TrinityStrings
     LANG_COMMAND_CHEAT_POWER            = 361,
     LANG_COMMAND_CHEAT_WW               = 362,
     LANG_COMMAND_WHISPEROFFPLAYER       = 363,
+    LANG_COMMAND_CREATURE_DELETE        = 364,
     // Room for more level 2              364-399 not used
 
     // level 3 chat
@@ -1145,7 +1148,7 @@ enum TrinityStrings
     LANG_GOINFO_NAME                    = 5027,
     LANG_GOINFO_LOOTID                  = 5028,
     LANG_COMMAND_LOOKUP_MAX_RESULTS     = 5029,
-    // unused                           = 5030,
+    LANG_PHASE_NOTFOUND                 = 5030,
     LANG_NPCINFO_AIINFO                 = 5031,
     LANG_COMMAND_NO_BATTLEGROUND_FOUND  = 5032,
     LANG_COMMAND_NO_ACHIEVEMENT_CRITERIA_FOUND = 5033,

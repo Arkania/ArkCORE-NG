@@ -20,54 +20,7 @@
 #include "ScriptMgr.h"
 #include "bastion_of_twilight.h"
 
-class boss_elementiu_monstrosity : public CreatureScript
-{
-public:
-    boss_elementiu_monstrosity() : CreatureScript("boss_elementiu_monstrosity") { }
-
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new boss_elementium_monstrosityAI (creature);
-    }
-
-    struct boss_elementium_monstrosityAI : public ScriptedAI
-    {
-        boss_elementium_monstrosityAI(Creature* creature) : ScriptedAI(creature)
-        {
-            instance = creature->GetInstanceScript();
-        }
-
-        InstanceScript* instance;
-
-        void Reset()
-        {
-            if (instance)
-            instance->SetData(DATA_ASCENDANT_COUNCIL, NOT_STARTED);
-        }
-
-        void EnterCombat(Unit* /*who*/)
-        {
-            if (instance)
-            instance->SetData(DATA_ASCENDANT_COUNCIL, IN_PROGRESS);
-        }
-
-        void JustDied(Unit* /*Killer*/)
-        {
-            if (instance)
-            instance->SetData(DATA_ASCENDANT_COUNCIL, DONE);
-        }
-
-        void UpdateAI(uint32 /*diff*/)
-        {
-            if (!UpdateVictim())
-                return;
-
-            DoMeleeAttackIfReady();
-        }
-    };
-};
-
 void AddSC_boss_assembly_of_ascendents()
 {
-    new boss_elementiu_monstrosity();
+    
 }

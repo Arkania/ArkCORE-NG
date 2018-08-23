@@ -481,7 +481,7 @@ public:
 
         void StartBossEncounter(uint8 uiBoss, bool bForceRespawn = true)
         {
-            Creature* pBoss = NULL;
+            Creature* pBoss = nullptr;
 
             switch (uiBoss)
             {

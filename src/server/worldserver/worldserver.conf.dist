@@ -405,8 +405,10 @@ PidFile = ""
 #
 #    PacketLogFile
 #        Description: Binary packet logging file for the world server.
-#                     Filename extension must be .bin to be parsable with WowPacketParser.
+#                     Filename extension must be .bin or .pkt to be parsable with WowPacketParser.
+#                     both Filename extension has a different output format. The pkt 3.1 format store more data and is preferred
 #        Example:     "World.bin" - (Enabled)
+#        Example:     "World.pkt" - (Enabled)
 #        Default:     ""          - (Disabled)
 
 PacketLogFile = ""
@@ -2622,6 +2624,20 @@ UI.ShowQuestLevelsInDialogs = 0
 #
 
 Livers.Aura.Enable = 1
+
+#
+#     Calculate.Creature.Zone.Area.Data
+#        Description: Calculate at loading creature zoneId / areaId and save in creature table (WARNING: SLOW WORLD SERVER STARTUP)
+#        Default:     0  - (Do not show)
+
+Calculate.Creature.Zone.Area.Data = 0
+
+#
+#     Calculate.Gameoject.Zone.Area.Data
+#        Description: Calculate at loading gameobject zoneId / areaId and save in gameobject table (WARNING: SLOW WORLD SERVER STARTUP)
+#        Default:     0  - (Do not show)
+
+Calculate.Gameoject.Zone.Area.Data = 0
 
 #
 ###################################################################################################

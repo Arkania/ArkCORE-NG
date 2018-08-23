@@ -477,7 +477,7 @@ public:
                     {
                         m_PlayerGUID = player->GetGUID();
                         m_BunnyGUID = bunny->GetGUID();
-                        Creature* worker = NULL;
+                        Creature* worker = nullptr;
                         if (oger && kobold)
                             worker = RAND(oger, kobold);
                         else if (oger)
@@ -571,60 +571,6 @@ public:
     }
 };
 
-// spell 89842 drink tray.. alpha status
-class spell_drink_tray_89842 : public SpellScriptLoader
-{
-public: spell_drink_tray_89842() : SpellScriptLoader("spell_drink_tray_89842") { }
-
-        enum eCannon
-        {
-            NPC_DRINK_TRAY = 48340,
-            NPC_GOBLIN_COCKTAIL1 = 48341,
-            NPC_GOBLIN_COCKTAIL2 = 48342,
-            NPC_GOBLIN_COCKTAIL3 = 48343,
-            SPELL_DRINK_TRAY = 89842,
-        };
-
-
-        class spell_drink_tray_89842_AuraScript : public AuraScript
-        {
-            PrepareAuraScript(spell_drink_tray_89842_AuraScript);
-
-            bool Validate(SpellInfo const* /*spellInfo*/)
-            {
-                return true;
-            }
-
-            void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-            {
-                if (Unit* bunny = GetCaster())
-                    if (Creature* tray = bunny->SummonCreature(NPC_DRINK_TRAY, bunny->GetPosition()))
-                        if (Creature* cock1 = bunny->SummonCreature(NPC_GOBLIN_COCKTAIL1, bunny->GetNearPosition(0.2f, 0.8f)))
-                            if (Creature* cock2 = bunny->SummonCreature(NPC_GOBLIN_COCKTAIL2, bunny->GetNearPosition(0.2f, 1.6f)))
-                                if (Creature* cock3 = bunny->SummonCreature(NPC_GOBLIN_COCKTAIL3, bunny->GetNearPosition(0.2f, 2.4f)))
-                                    if (Vehicle* vehicle = bunny->GetVehicleKit())
-                                        if (!vehicle->IsVehicleInUse())
-                                        {
-                                            // i've tryed different.. but bunny will not accept passengers on heres seat 0-3
-                                            vehicle->InstallAccessory(NPC_DRINK_TRAY, 0, true, TEMPSUMMON_MANUAL_DESPAWN, 0);
-                                            vehicle->InstallAccessory(NPC_GOBLIN_COCKTAIL1, 1, true, TEMPSUMMON_MANUAL_DESPAWN, 0);
-                                            vehicle->InstallAccessory(NPC_GOBLIN_COCKTAIL2, 2, true, TEMPSUMMON_MANUAL_DESPAWN, 0);
-                                            vehicle->InstallAccessory(NPC_GOBLIN_COCKTAIL3, 3, true, TEMPSUMMON_MANUAL_DESPAWN, 0);
-                                        }
-            }
-
-            void Register()
-            {
-                OnEffectApply += AuraEffectApplyFn(spell_drink_tray_89842_AuraScript::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-            }
-        };
-
-        AuraScript* GetAuraScript() const
-        {
-            return new spell_drink_tray_89842_AuraScript();
-        }
-};
-
 void AddSC_deadmines()
 {
     new item_defias_gunpowder();
@@ -638,5 +584,4 @@ void AddSC_deadmines()
     new go_ironclad_door_16397();
     new go_defias_cannon_16398();
     new npc_defias_cannon_48266();
-    new spell_drink_tray_89842();
 }

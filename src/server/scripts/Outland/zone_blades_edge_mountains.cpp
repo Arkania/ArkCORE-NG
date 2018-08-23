@@ -569,14 +569,11 @@ public:
     }
 };
 
-/*######
-## go_thunderspike
-######*/
-
-class go_thunderspike : public GameObjectScript
+// 184729
+class go_the_thunderspike_184729 : public GameObjectScript
 {
     public:
-        go_thunderspike() : GameObjectScript("go_thunderspike") { }
+        go_the_thunderspike_184729() : GameObjectScript("go_the_thunderspike_184729") { }
 
         bool OnGossipHello(Player* player, GameObject* go) override
         {
@@ -1183,6 +1180,7 @@ public:
     }
 };
 
+// 37408
 class spell_oscillating_field : public SpellScriptLoader
 {
     public:
@@ -1218,7 +1216,7 @@ void AddSC_blades_edge_mountains()
     new npc_nether_drake();
     new npc_daranelle();
     new go_legion_obelisk();
-    new go_thunderspike();
+    new go_the_thunderspike_184729();
     new npc_simon_bunny();
     new go_simon_cluster();
     new go_apexis_relic();

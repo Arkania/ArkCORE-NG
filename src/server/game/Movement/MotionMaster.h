@@ -91,7 +91,7 @@ class MotionMaster //: private std::stack<MovementGenerator *>
             if (empty())
                 return;
 
-            Impl[_top] = NULL;
+            Impl[_top] = nullptr;
             while (!empty() && !top())
                 --_top;
         }
@@ -110,7 +110,7 @@ class MotionMaster //: private std::stack<MovementGenerator *>
         {
             for (uint8 i = 0; i < MAX_MOTION_SLOT; ++i)
             {
-                Impl[i] = NULL;
+                Impl[i] = nullptr;
                 _needInit[i] = true;
             }
         }
@@ -187,6 +187,8 @@ class MotionMaster //: private std::stack<MovementGenerator *>
         void MoveJump(float x, float y, float z, float speedXY, float speedZ, uint32 id = EVENT_JUMP);
         void MoveKnockTo(float x, float y, float z, float speedXY, float speedZ, uint32 id);
         void MoveFall(uint32 id = 0);
+		void MoveCirclePath(float x, float y, float z, float radius, bool clockwise, uint8 stepCount);
+		void MoveSmoothPath(uint32 pointId, G3D::Vector3 const* pathPoints, size_t pathSize, bool walk);
 
         void MoveSeekAssistance(float x, float y, float z);
         void MoveSeekAssistanceDistract(uint32 timer);

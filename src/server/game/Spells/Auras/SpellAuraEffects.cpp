@@ -515,8 +515,8 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
     switch (GetAuraType())
     {
         case SPELL_AURA_CONTROL_VEHICLE:
-        //    m_amount = m_baseAmount;
-        //    break;
+            m_amount = m_baseAmount;
+            break;
         // crowd control auras
         case SPELL_AURA_MOD_CONFUSE:
         case SPELL_AURA_MOD_FEAR:
@@ -1394,7 +1394,7 @@ void AuraEffect::HandleShapeshiftBoosts(Unit* target, bool apply) const
             target->RemoveOwnedAura(spellId2, target->GetGUID());
 
         Unit::AuraEffectList const& shapeshifts = target->GetAuraEffectsByType(SPELL_AURA_MOD_SHAPESHIFT);
-        AuraEffect* newAura = NULL;
+        AuraEffect* newAura = nullptr;
         // Iterate through all the shapeshift auras that the target has, if there is another aura with SPELL_AURA_MOD_SHAPESHIFT, then this aura is being removed due to that one being applied
         for (Unit::AuraEffectList::const_iterator itr = shapeshifts.begin(); itr != shapeshifts.end(); ++itr)
         {
@@ -1464,13 +1464,12 @@ void AuraEffect::HandlePhaseGroup(AuraApplication const* aurApp, uint8 mode, boo
 
     Unit* target = aurApp->GetTarget();
 
-    if (Player* player = target->ToPlayer())
-    {
-        if (apply)
-            player->GetPhaseMgr().RegisterPhasingAuraEffect(this);
-        else
-            player->GetPhaseMgr().UnRegisterPhasingAuraEffect(this);
-    }
+    std::set<uint16> const& oldPhases = target->GetPhaseIds();
+    uint16 phGroupValue = GetMiscValueB();
+    std::set<uint16> phaseIds = GetXPhasesForGroup(phGroupValue);
+    phaseIds.insert(phGroupValue); // i'm not shure: should the phaseGroup be added to visible phases or shoult not 
+    for (auto phase : phaseIds)
+        target->SetInPhase(phase, false, apply);
 
     // call functions which may have additional effects after chainging state of unit
     // phase auras normally not expected at BG but anyway better check
@@ -1478,6 +1477,14 @@ void AuraEffect::HandlePhaseGroup(AuraApplication const* aurApp, uint8 mode, boo
     {
         // drop flag at invisibiliy in bg
         target->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_IMMUNE_OR_LOST_SELECTION);
+    }
+
+    if (Player* player = target->ToPlayer())
+    {
+        if (player->IsInWorld())
+            player->GetMap()->SendUpdateTransportVisibility(player, oldPhases);
+
+        player->SendUpdatePhasing();
     }
 
     // need triggering visibility update base at phase update of not GM invisible (other GMs anyway see in any phases)
@@ -1716,31 +1723,8 @@ void AuraEffect::HandlePhase(AuraApplication const* aurApp, uint8 mode, bool app
 
     Unit* target = aurApp->GetTarget();
 
-    if (Player* player = target->ToPlayer())
-    {
-        if (apply)
-            player->GetPhaseMgr().RegisterPhasingAuraEffect(this);
-        else
-            player->GetPhaseMgr().UnRegisterPhasingAuraEffect(this);
-    }
-    else
-    {
-        uint32 newPhase = 0;
-        Unit::AuraEffectList const& phases = target->GetAuraEffectsByType(SPELL_AURA_PHASE);
-        if (!phases.empty())
-            for (Unit::AuraEffectList::const_iterator itr = phases.begin(); itr != phases.end(); ++itr)
-                newPhase |= (*itr)->GetMiscValue();
-
-        if (!newPhase)
-        {
-            newPhase = PHASEMASK_NORMAL;
-            if (Creature* creature = target->ToCreature())
-                if (CreatureData const* data = sObjectMgr->GetCreatureData(creature->GetDBTableGUIDLow()))
-                    newPhase = data->phaseMask;
-        }
-
-        target->SetPhaseMask(newPhase, false);
-    }
+    std::set<uint16> const& oldPhases = target->GetPhaseIds();
+    target->SetInPhase((uint16)GetMiscValueB(), false, apply);
 
     // call functions which may have additional effects after chainging state of unit
     // phase auras normally not expected at BG but anyway better check
@@ -1748,6 +1732,13 @@ void AuraEffect::HandlePhase(AuraApplication const* aurApp, uint8 mode, bool app
     {
         // drop flag at invisibiliy in bg
         target->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_IMMUNE_OR_LOST_SELECTION);
+    }
+    
+    if (Player* player = target->ToPlayer())
+    {
+        if (player->IsInWorld())
+            player->GetMap()->SendUpdateTransportVisibility(player, oldPhases);
+        player->SendUpdatePhasing();
     }
 
     // need triggering visibility update base at phase update of not GM invisible (other GMs anyway see in any phases)
@@ -3054,6 +3045,22 @@ void AuraEffect::HandleAuraControlVehicle(AuraApplication const* aurApp, uint8 m
     if (!caster || caster == target)
         return;
 
+    int8 seatId = m_amount - 1;
+    // quest 26616 you click on boatA and the npc_spellclick_spells spawn boatB, player receive control for boatB. 
+    // in vehicle::execute the player are spawned by the spell and the 5 npc accessory is spawned LATER. so player with seat -1 receive the first empty place = 0
+    // correct should be: the spell is spawn first the accessory's and then the player ??
+    // Workaround: to overwrite this wrong logic, you can give the player the correct seatId..
+
+    if (caster->ToPlayer())
+        switch (target->GetEntry())
+        {
+        case 43450:
+            seatId = 5;
+            break;
+        default:
+            break;
+        }
+
     if (apply)
     {
         // Currently spells that have base points  0 and DieSides 0 = "0/0" exception are pushed to -1,
@@ -3062,7 +3069,7 @@ void AuraEffect::HandleAuraControlVehicle(AuraApplication const* aurApp, uint8 m
         // Current formula about m_amount: effect base points + dieside - 1
         // TO DO: Reasearch more about 0/0 and fix it.
         // // correct amount is already calculated adding one more -1 meant calculated amount - 1
-        caster->_EnterVehicle(target->GetVehicleKit(), m_amount - 1, aurApp);
+        caster->_EnterVehicle(target->GetVehicleKit(), seatId, aurApp);
     }
     else
     {
@@ -6104,7 +6111,7 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
             case 65922:
             case 65923:
             {
-                Unit* permafrostCaster = NULL;
+                Unit* permafrostCaster = nullptr;
                 Aura* permafrostAura = target->GetAura(66193);
                 if (!permafrostAura)
                     permafrostAura = target->GetAura(67855);
@@ -6165,6 +6172,12 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
                 if (caster)
                     caster->CastSpell(target, triggerSpellId, false);
                 return;
+            }
+            case 79425:
+            {
+                if (Unit* unit = ObjectAccessor::GetUnit(*target, caster->GetTarget()))
+                    target = unit;
+                break;
             }
         }
     }

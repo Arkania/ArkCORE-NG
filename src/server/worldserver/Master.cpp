@@ -141,7 +141,7 @@ int Master::Run()
     TC_LOG_INFO("server.worldserver", "   _/_/_/_/  _/_/      _/_/      _/        _/    _/  _/_/_/    _/_/_/      ");
     TC_LOG_INFO("server.worldserver", "  _/    _/  _/        _/  _/    _/        _/    _/  _/    _/  _/           ");
     TC_LOG_INFO("server.worldserver", " _/    _/  _/        _/    _/    _/_/_/    _/_/    _/    _/  _/_/_/_/   NG ");
-    TC_LOG_INFO("server.worldserver", " Arkania Community (c) 2016!                         <http://arkania.net/> ");
+    TC_LOG_INFO("server.worldserver", " Arkania Community (c) 2017!                         <http://arkania.net/> ");
     TC_LOG_INFO("server.worldserver", " ");
     TC_LOG_INFO("server.worldserver", "<Ctrl-C> to stop.\n");
 
@@ -186,7 +186,7 @@ int Master::Run()
     ACE_Based::Thread worldThread(new WorldRunnable);
     worldThread.setPriority(ACE_Based::Highest);
 
-    ACE_Based::Thread* cliThread = NULL;
+    ACE_Based::Thread* cliThread = nullptr;
 
 #ifdef _WIN32
     if (sConfigMgr->GetBoolDefault("Console.Enable", true) && (m_ServiceStatus == -1)/* need disable console in service mode*/)
@@ -269,7 +269,7 @@ int Master::Run()
 #endif
 
     //Start soap serving thread
-    ACE_Based::Thread* soapThread = NULL;
+    ACE_Based::Thread* soapThread = nullptr;
 
     if (sConfigMgr->GetBoolDefault("SOAP.Enabled", false))
     {

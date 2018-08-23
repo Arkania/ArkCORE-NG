@@ -74,7 +74,7 @@ void TotemAI::UpdateAI(uint32 /*diff*/)
         !victim->isTargetableForAttack() || !me->IsWithinDistInMap(victim, max_range) ||
         me->IsFriendlyTo(victim) || !me->CanSeeOrDetect(victim))
     {
-        victim = NULL;
+        victim = nullptr;
         Trinity::NearestAttackableUnitInObjectRangeCheck u_check(me, me, max_range);
         Trinity::UnitLastSearcher<Trinity::NearestAttackableUnitInObjectRangeCheck> checker(me, victim, u_check);
         me->VisitNearbyObject(max_range, checker);

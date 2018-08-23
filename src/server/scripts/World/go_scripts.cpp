@@ -48,23 +48,125 @@ go_large_gjalerbron_cage
 go_veil_skith_cage
 EndContentData */
 
+#include "script_helper.h"
+#include "GameObject.h"
+#include "GameObjectAI.h"
+#include "MapManager.h"
+#include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "GameObjectAI.h"
 #include "Spell.h"
-#include "Player.h"
+#include "Transport.h"
 #include "WorldSession.h"
 
-/*######
-## go_cat_figurine
-######*/
-
-enum CatFigurine
+enum eNpcGoScripts
 {
-    SPELL_SUMMON_GHOST_SABER    = 5968,
+    GO_SHRINE_HAWK = 185551,
+    GO_SHRINE_EAGLE = 185547,
+    GO_SHRINE_FALCON = 185553,
+
+    GOSSIP_OUTHOUSE_INUSE = 12775,
+    GOSSIP_OUTHOUSE_VACANT = 12779,
+    GOSSIP_TABLE_THEKA = 1653,
+
+    ITEM_ANDERHOLS_SLIDER_CIDER = 37247,
+    ITEM_BLUE_PUNCH_CARD = 9282,
+    ITEM_CUERGOS_KEY = 9275,
+    ITEM_PRISMATIC_PUNCH_CARD = 9316,
+    ITEM_RED_PUNCH_CARD = 9281,
+    ITEM_TELEPORTER_POWER_PACK = 28969,
+    ITEM_WHITE_PUNCH_CARD = 9279,
+    ITEM_YELLOW_PUNCH_CARD = 9280,
+
+    MATRIX_PUNCHOGRAPH_3005_A = 142345,
+    MATRIX_PUNCHOGRAPH_3005_B = 142475,
+    MATRIX_PUNCHOGRAPH_3005_C = 142476,
+    MATRIX_PUNCHOGRAPH_3005_D = 142696,
+
+    NPC_ARIKARA = 10882,
+    NPC_CAPTIVE_CHILD = 22314,
+    NPC_EAGLE_GUARD = 22993,
+    NPC_EBON_BLADE_PRISONER_HUMAN = 30186,
+    NPC_EBON_BLADE_PRISONER_NE = 30194,
+    NPC_EBON_BLADE_PRISONER_TROLL = 30196,
+    NPC_EBON_BLADE_PRISONER_ORC = 30195,
+    NPC_FALCON_GUARD = 22994,
+    NPC_GJALERBRON_PRISONER = 24035,
+    NPC_GOGGEROC = 11920,
+    NPC_HAWK_GUARD = 22992,
+    NPC_HIVE_AMBUSHER = 13301,
+    NPC_IMAGE_WIND_TRADER = 20518,
+    NPC_OUTHOUSE_BUNNY = 27326,
+    NPC_PRISONER_PRIEST = 24086,
+    NPC_PRISONER_MAGE = 24088,
+    NPC_PRISONER_WARRIOR = 24089,
+    NPC_PRISONER_PALADIN = 24090,
+    NPC_RIZZLE = 23002,
+    NPC_SHIP_TO_VASHJIR_PHASE_CASTER_BUNNY_40559 = 40559,
+    NPC_SCOURGE_PRISONER = 25610,
+    NPC_STILLBLADE = 17716,
+    NPC_WINTERFIN_TADPOLE = 25201,
+    NPC_ZELEMAR = 17830,
+
+    QUEST_ALLIANCE_OF_KEYS_AND_CAGES = 11231,
+    QUEST_DOING_YOUR_DUTY = 12227,
+    QUEST_HORDE_OF_KEYS_AND_CAGES = 11265,
+    QUEST_LEARN_LEAVE_RETURN = 12790,
+    QUEST_OH_NOES_THE_TADPOLES = 11560,
+    QUEST_HIVE_IN_THE_TOWER = 9544,
+    QUEST_MISSING_FRIENDS = 10852,
+    QUEST_PRISON_BREAK = 11587,
+    QUEST_PRISONERS_OF_WYRMSKULL = 11255,
+    QUEST_SPIDER_GOLD = 2936,
+    QUEST_TELE_CRYSTAL_FLAG = 12845,
+    QUEST_THE_CLEANSING_HORDE = 11317,
+    QUEST_THE_CLEANSING_ALLIANCE = 11322,
+
+    SPELL_ARCANE_PRISONER_KILL_CREDIT = 45456,
+    SPELL_BLACKJACK = 39865, //stuns player
+    SPELL_BLUE_PUNCH_CARD = 11525,
+    SPELL_CLEANSING_SOUL = 43351,
+    SPELL_CREATE_1_FLASK_OF_BEAST = 40964,
+    SPELL_CREATE_5_FLASK_OF_BEAST = 40965,
+    SPELL_CREATE_1_FLASK_OF_SORCERER = 40968,
+    SPELL_CREATE_5_FLASK_OF_SORCERER = 40970,
+    SPELL_CREATE_AMBERSEEDS = 48330, SPELL_PRISMATIC_PUNCH_CARD = 11545,
+    SPELL_INDISPOSED = 53017,
+    SPELL_INDISPOSED_III = 48341,
+    SPELL_RECENT_MEDITATION = 61720,
+    SPELL_RED_PUNCH_CARD = 11528,
+    SPELL_REP_LC = 39456,
+    SPELL_REP_SHAT = 39457,
+    SPELL_REP_CE = 39460,
+    SPELL_REP_CON = 39474,
+    SPELL_REP_KT = 39475,
+    SPELL_REP_SPOR = 39476,
+    SPELL_SUMMON_BLADE_KNIGHT_H = 56207,
+    SPELL_SUMMON_BLADE_KNIGHT_NE = 56209,
+    SPELL_SUMMON_BLADE_KNIGHT_ORC = 56212,
+    SPELL_SUMMON_BLADE_KNIGHT_TROLL = 56214,
+    SPELL_SUMMON_GHOST_SABER = 5968,
+    SPELL_SUMMON_PIRATES_TREASURE_AND_TRIGGER_MOB = 11462,
+    SPELL_SUMMON_RIZZLE = 39866,
+    SPELL_YELLOW_PUNCH_CARD = 11512,
 };
 
+const uint32 NpcPrisonEntry[] =
+{
+    22810, 22811, 22812, 22813, 22814, 22815,               //good guys
+    20783, 20784, 20785, 20786, 20788, 20789, 20790         //bad guys
+};
+
+const uint32 NpcStasisEntry[] =
+{
+    22825, 20888, 22827, 22826, 22828
+};
+
+#define GO_TELE_TO_DALARAN_CRYSTAL_FAILED   "This teleport crystal cannot be used until the teleport crystal in Dalaran has been used at least once."
+#define GO_ANDERHOLS_SLIDER_CIDER_NOT_FOUND "Quest item Anderhol's Slider Cider not found."
+
+// 13873
 class go_cat_figurine : public GameObjectScript
 {
 public:
@@ -77,10 +179,7 @@ public:
     }
 };
 
-/*######
-## go_barov_journal
-######*/
-
+// 180794
 class go_barov_journal : public GameObjectScript
 {
 public:
@@ -95,10 +194,7 @@ public:
     }
 };
 
-/*######
-## go_field_repair_bot_74A
-######*/
-
+// 179552
 class go_field_repair_bot_74A : public GameObjectScript
 {
 public:
@@ -113,15 +209,7 @@ public:
     }
 };
 
-/*######
-## go_gilded_brazier (Paladin First Trail quest (9678))
-######*/
-
-enum GildedBrazier
-{
-    NPC_STILLBLADE  = 17716,
-};
-
+// 181956
 class go_gilded_brazier : public GameObjectScript
 {
 public:
@@ -141,10 +229,7 @@ public:
     }
 };
 
-/*######
-## go_orb_of_command
-######*/
-
+// 179879
 class go_orb_of_command : public GameObjectScript
 {
 public:
@@ -159,10 +244,7 @@ public:
     }
 };
 
-/*######
-## go_tablet_of_madness
-######*/
-
+// 180368
 class go_tablet_of_madness : public GameObjectScript
 {
 public:
@@ -177,10 +259,7 @@ public:
     }
 };
 
-/*######
-## go_tablet_of_the_seven
-######*/
-
+// 169294
 class go_tablet_of_the_seven : public GameObjectScript
 {
 public:
@@ -199,10 +278,7 @@ public:
     }
 };
 
-/*#####
-## go_jump_a_tron
-######*/
-
+// 183146
 class go_jump_a_tron : public GameObjectScript
 {
 public:
@@ -217,26 +293,7 @@ public:
     }
 };
 
-/*######
-## go_ethereum_prison
-######*/
-
-enum EthereumPrison
-{
-    SPELL_REP_LC        = 39456,
-    SPELL_REP_SHAT      = 39457,
-    SPELL_REP_CE        = 39460,
-    SPELL_REP_CON       = 39474,
-    SPELL_REP_KT        = 39475,
-    SPELL_REP_SPOR      = 39476
-};
-
-const uint32 NpcPrisonEntry[] =
-{
-    22810, 22811, 22812, 22813, 22814, 22815,               //good guys
-    20783, 20784, 20785, 20786, 20788, 20789, 20790         //bad guys
-};
-
+// 184418 184419 184420 184421 184422 184423 184424 184425 184426 184427 184428 184429 184430 184431
 class go_ethereum_prison : public GameObjectScript
 {
 public:
@@ -278,15 +335,7 @@ public:
     }
 };
 
-/*######
-## go_ethereum_stasis
-######*/
-
-const uint32 NpcStasisEntry[] =
-{
-    22825, 20888, 22827, 22826, 22828
-};
-
+// 185465 185466 185467 184595 185461 185462 185463 185464 185464 185464 185464 185464 185464 185464
 class go_ethereum_stasis : public GameObjectScript
 {
 public:
@@ -304,15 +353,7 @@ public:
     }
 };
 
-/*######
-## go_resonite_cask
-######*/
-
-enum ResoniteCask
-{
-    NPC_GOGGEROC    = 11920
-};
-
+// 178145
 class go_resonite_cask : public GameObjectScript
 {
 public:
@@ -327,15 +368,7 @@ public:
     }
 };
 
-/*######
-## go_sacred_fire_of_life
-######*/
-
-enum SacredFireOfLife
-{
-    NPC_ARIKARA     = 10882
-};
-
+// 175944
 class go_sacred_fire_of_life : public GameObjectScript
 {
 public:
@@ -350,20 +383,7 @@ public:
     }
 };
 
-/*######
-## go_shrine_of_the_birds
-######*/
-
-enum ShrineOfTheBirds
-{
-    NPC_HAWK_GUARD      = 22992,
-    NPC_EAGLE_GUARD     = 22993,
-    NPC_FALCON_GUARD    = 22994,
-    GO_SHRINE_HAWK      = 185551,
-    GO_SHRINE_EAGLE     = 185547,
-    GO_SHRINE_FALCON    = 185553
-};
-
+// 185547 185553 185551
 class go_shrine_of_the_birds : public GameObjectScript
 {
 public:
@@ -396,17 +416,7 @@ public:
     }
 };
 
-/*######
-## go_southfury_moonstone
-######*/
-
-enum Southfury
-{
-    NPC_RIZZLE                  = 23002,
-    SPELL_BLACKJACK             = 39865, //stuns player
-    SPELL_SUMMON_RIZZLE         = 39866
-};
-
+// 185566
 class go_southfury_moonstone : public GameObjectScript
 {
 public:
@@ -424,18 +434,7 @@ public:
     }
 };
 
-/*######
-## go_tele_to_dalaran_crystal
-######*/
-
-enum DalaranCrystal
-{
-    QUEST_LEARN_LEAVE_RETURN    = 12790,
-    QUEST_TELE_CRYSTAL_FLAG     = 12845
-};
-
-#define GO_TELE_TO_DALARAN_CRYSTAL_FAILED   "This teleport crystal cannot be used until the teleport crystal in Dalaran has been used at least once."
-
+// 191230
 class go_tele_to_dalaran_crystal : public GameObjectScript
 {
 public:
@@ -452,10 +451,7 @@ public:
     }
 };
 
-/*######
-## go_tele_to_violet_stand
-######*/
-
+// 191229
 class go_tele_to_violet_stand : public GameObjectScript
 {
 public:
@@ -470,22 +466,7 @@ public:
     }
 };
 
-/*######
-## go_fel_crystalforge
-######*/
-
-#define GOSSIP_FEL_CRYSTALFORGE_TEXT 31000
-#define GOSSIP_FEL_CRYSTALFORGE_ITEM_TEXT_RETURN 31001
-#define GOSSIP_FEL_CRYSTALFORGE_ITEM_1 "Purchase 1 Unstable Flask of the Beast for the cost of 10 Apexis Shards"
-#define GOSSIP_FEL_CRYSTALFORGE_ITEM_5 "Purchase 5 Unstable Flask of the Beast for the cost of 50 Apexis Shards"
-#define GOSSIP_FEL_CRYSTALFORGE_ITEM_RETURN "Use the fel crystalforge to make another purchase."
-
-enum FelCrystalforge
-{
-    SPELL_CREATE_1_FLASK_OF_BEAST   = 40964,
-    SPELL_CREATE_5_FLASK_OF_BEAST   = 40965,
-};
-
+// 185919
 class go_fel_crystalforge : public GameObjectScript
 {
 public:
@@ -496,10 +477,10 @@ public:
         if (go->GetGoType() == GAMEOBJECT_TYPE_QUESTGIVER) /* != GAMEOBJECT_TYPE_QUESTGIVER) */
             player->PrepareQuestMenu(go->GetGUID()); /* return true*/
 
-        player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_FEL_CRYSTALFORGE_ITEM_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-        player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_FEL_CRYSTALFORGE_ITEM_5, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+        player->ADD_GOSSIP_ITEM_DB(8672, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+        player->ADD_GOSSIP_ITEM_DB(8672, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
-        player->SEND_GOSSIP_MENU(GOSSIP_FEL_CRYSTALFORGE_TEXT, go->GetGUID());
+        player->SEND_GOSSIP_MENU(31000, go->GetGUID());
 
         return true;
     }
@@ -511,40 +492,25 @@ public:
         {
             case GOSSIP_ACTION_INFO_DEF:
                 player->CastSpell(player, SPELL_CREATE_1_FLASK_OF_BEAST, false);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_FEL_CRYSTALFORGE_ITEM_RETURN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
-                player->SEND_GOSSIP_MENU(GOSSIP_FEL_CRYSTALFORGE_ITEM_TEXT_RETURN, go->GetGUID());
+                player->ADD_GOSSIP_ITEM_DB(8673, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
+                player->SEND_GOSSIP_MENU(31001, go->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF + 1:
                 player->CastSpell(player, SPELL_CREATE_5_FLASK_OF_BEAST, false);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_FEL_CRYSTALFORGE_ITEM_RETURN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
-                player->SEND_GOSSIP_MENU(GOSSIP_FEL_CRYSTALFORGE_ITEM_TEXT_RETURN, go->GetGUID());
+                player->ADD_GOSSIP_ITEM_DB(8673, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
+                player->SEND_GOSSIP_MENU(31001, go->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF + 2:
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_FEL_CRYSTALFORGE_ITEM_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_FEL_CRYSTALFORGE_ITEM_5, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                player->SEND_GOSSIP_MENU(GOSSIP_FEL_CRYSTALFORGE_TEXT, go->GetGUID());
+                player->ADD_GOSSIP_ITEM_DB(8672, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+                player->ADD_GOSSIP_ITEM_DB(8672, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                player->SEND_GOSSIP_MENU(31000, go->GetGUID());
                 break;
         }
         return true;
     }
 };
 
-/*######
-## go_bashir_crystalforge
-######*/
-
-#define GOSSIP_BASHIR_CRYSTALFORGE_TEXT 31100
-#define GOSSIP_BASHIR_CRYSTALFORGE_ITEM_TEXT_RETURN 31101
-#define GOSSIP_BASHIR_CRYSTALFORGE_ITEM_1 "Purchase 1 Unstable Flask of the Sorcerer for the cost of 10 Apexis Shards"
-#define GOSSIP_BASHIR_CRYSTALFORGE_ITEM_5 "Purchase 5 Unstable Flask of the Sorcerer for the cost of 50 Apexis Shards"
-#define GOSSIP_BASHIR_CRYSTALFORGE_ITEM_RETURN "Use the bashir crystalforge to make another purchase."
-
-enum BashirCrystalforge
-{
-    SPELL_CREATE_1_FLASK_OF_SORCERER   = 40968,
-    SPELL_CREATE_5_FLASK_OF_SORCERER   = 40970,
-};
-
+// 185921
 class go_bashir_crystalforge : public GameObjectScript
 {
 public:
@@ -555,10 +521,10 @@ public:
         if (go->GetGoType() == GAMEOBJECT_TYPE_QUESTGIVER) /* != GAMEOBJECT_TYPE_QUESTGIVER) */
             player->PrepareQuestMenu(go->GetGUID()); /* return true*/
 
-        player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_BASHIR_CRYSTALFORGE_ITEM_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-        player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_BASHIR_CRYSTALFORGE_ITEM_5, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+        player->ADD_GOSSIP_ITEM_DB(8677, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+        player->ADD_GOSSIP_ITEM_DB(8677, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
-        player->SEND_GOSSIP_MENU(GOSSIP_BASHIR_CRYSTALFORGE_TEXT, go->GetGUID());
+        player->SEND_GOSSIP_MENU(31100, go->GetGUID());
 
         return true;
     }
@@ -570,45 +536,25 @@ public:
         {
             case GOSSIP_ACTION_INFO_DEF:
                 player->CastSpell(player, SPELL_CREATE_1_FLASK_OF_SORCERER, false);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_BASHIR_CRYSTALFORGE_ITEM_RETURN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
-                player->SEND_GOSSIP_MENU(GOSSIP_BASHIR_CRYSTALFORGE_ITEM_TEXT_RETURN, go->GetGUID());
+                player->ADD_GOSSIP_ITEM_DB(8676, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
+                player->SEND_GOSSIP_MENU(31101, go->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF + 1:
                 player->CastSpell(player, SPELL_CREATE_5_FLASK_OF_SORCERER, false);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_BASHIR_CRYSTALFORGE_ITEM_RETURN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
-                player->SEND_GOSSIP_MENU(GOSSIP_BASHIR_CRYSTALFORGE_ITEM_TEXT_RETURN, go->GetGUID());
+                player->ADD_GOSSIP_ITEM_DB(8676, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
+                player->SEND_GOSSIP_MENU(31101, go->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF + 2:
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_BASHIR_CRYSTALFORGE_ITEM_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_BASHIR_CRYSTALFORGE_ITEM_5, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                player->SEND_GOSSIP_MENU(GOSSIP_BASHIR_CRYSTALFORGE_TEXT, go->GetGUID());
+                player->ADD_GOSSIP_ITEM_DB(8677, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+                player->ADD_GOSSIP_ITEM_DB(8677, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                player->SEND_GOSSIP_MENU(31100, go->GetGUID());
                 break;
         }
         return true;
     }
 };
 
-/*######
-## matrix_punchograph
-######*/
-
-enum MatrixPunchograph
-{
-    ITEM_WHITE_PUNCH_CARD = 9279,
-    ITEM_YELLOW_PUNCH_CARD = 9280,
-    ITEM_BLUE_PUNCH_CARD = 9282,
-    ITEM_RED_PUNCH_CARD = 9281,
-    ITEM_PRISMATIC_PUNCH_CARD = 9316,
-    SPELL_YELLOW_PUNCH_CARD = 11512,
-    SPELL_BLUE_PUNCH_CARD = 11525,
-    SPELL_RED_PUNCH_CARD = 11528,
-    SPELL_PRISMATIC_PUNCH_CARD = 11545,
-    MATRIX_PUNCHOGRAPH_3005_A = 142345,
-    MATRIX_PUNCHOGRAPH_3005_B = 142475,
-    MATRIX_PUNCHOGRAPH_3005_C = 142476,
-    MATRIX_PUNCHOGRAPH_3005_D = 142696,
-};
-
+// 142345 142475 142476 142696 
 class go_matrix_punchograph : public GameObjectScript
 {
 public:
@@ -653,15 +599,8 @@ public:
     }
 };
 
-/*######
-## go_scourge_cage
-######*/
-
-enum ScourgeCage
-{
-    NPC_SCOURGE_PRISONER = 25610
-};
-
+// 187854 187855 187856 187857 187858 187859 187860 187862 187863 187864 
+// 187865 187866 187867 187868 187870 187871 187872 187873 187874 187861 190803
 class go_scourge_cage : public GameObjectScript
 {
 public:
@@ -680,16 +619,7 @@ public:
     }
 };
 
-/*######
-## go_arcane_prison
-######*/
-
-enum ArcanePrison
-{
-    QUEST_PRISON_BREAK                  = 11587,
-    SPELL_ARCANE_PRISONER_KILL_CREDIT   = 45456
-};
-
+// 187561
 class go_arcane_prison : public GameObjectScript
 {
 public:
@@ -707,16 +637,7 @@ public:
     }
 };
 
-/*######
-## go_blood_filled_orb
-######*/
-
-enum BloodFilledOrb
-{
-    NPC_ZELEMAR     = 17830
-
-};
-
+// 182024
 class go_blood_filled_orb : public GameObjectScript
 {
 public:
@@ -731,23 +652,7 @@ public:
     }
 };
 
-/*######
-## go_jotunheim_cage
-######*/
-
-enum JotunheimCage
-{
-    NPC_EBON_BLADE_PRISONER_HUMAN   = 30186,
-    NPC_EBON_BLADE_PRISONER_NE      = 30194,
-    NPC_EBON_BLADE_PRISONER_TROLL   = 30196,
-    NPC_EBON_BLADE_PRISONER_ORC     = 30195,
-
-    SPELL_SUMMON_BLADE_KNIGHT_H     = 56207,
-    SPELL_SUMMON_BLADE_KNIGHT_NE    = 56209,
-    SPELL_SUMMON_BLADE_KNIGHT_ORC   = 56212,
-    SPELL_SUMMON_BLADE_KNIGHT_TROLL = 56214
-};
-
+// 192135
 class go_jotunheim_cage : public GameObjectScript
 {
 public:
@@ -791,13 +696,7 @@ public:
     }
 };
 
-enum TableTheka
-{
-    GOSSIP_TABLE_THEKA = 1653,
-
-    QUEST_SPIDER_GOLD = 2936
-};
-
+// 142715
 class go_table_theka : public GameObjectScript
 {
 public:
@@ -814,16 +713,7 @@ public:
     }
 };
 
-/*######
-## go_inconspicuous_landmark
-######*/
-
-enum InconspicuousLandmark
-{
-    SPELL_SUMMON_PIRATES_TREASURE_AND_TRIGGER_MOB    = 11462,
-    ITEM_CUERGOS_KEY                                 = 9275,
-};
-
+// 142189
 class go_inconspicuous_landmark : public GameObjectScript
 {
 public:
@@ -840,16 +730,7 @@ public:
     }
 };
 
-/*######
-## go_ethereal_teleport_pad
-######*/
-
-enum EtherealTeleportPad
-{
-    NPC_IMAGE_WIND_TRADER               = 20518,
-    ITEM_TELEPORTER_POWER_PACK          = 28969,
-};
-
+// 184073
 class go_ethereal_teleport_pad : public GameObjectScript
 {
 public:
@@ -866,10 +747,7 @@ public:
     }
 };
 
-/*######
-## go_soulwell
-######*/
-
+// 181621 193169
 class go_soulwell : public GameObjectScript
 {
     public:
@@ -900,20 +778,7 @@ class go_soulwell : public GameObjectScript
         }
 };
 
-/*######
-## Quest 11255: Prisoners of Wyrmskull
-## go_dragonflayer_cage
-######*/
-
-enum PrisonersOfWyrmskull
-{
-    QUEST_PRISONERS_OF_WYRMSKULL                  = 11255,
-    NPC_PRISONER_PRIEST                           = 24086,
-    NPC_PRISONER_MAGE                             = 24088,
-    NPC_PRISONER_WARRIOR                          = 24089,
-    NPC_PRISONER_PALADIN                          = 24090
-};
-
+// 186566 86567 186568 186569 186570 186571 186572 186573 186574 186575
 class go_dragonflayer_cage : public GameObjectScript
 {
 public:
@@ -951,17 +816,7 @@ public:
     }
 };
 
-/*######
-## Quest 11560: Oh Noes, the Tadpoles!
-## go_tadpole_cage
-######*/
-
-enum Tadpoles
-{
-    QUEST_OH_NOES_THE_TADPOLES                    = 11560,
-    NPC_WINTERFIN_TADPOLE                         = 25201
-};
-
+// 187373
 class go_tadpole_cage : public GameObjectScript
 {
 public:
@@ -984,25 +839,7 @@ public:
     }
 };
 
-/*######
-## go_amberpine_outhouse
-######*/
-
-#define GOSSIP_USE_OUTHOUSE "Use the outhouse."
-#define GO_ANDERHOLS_SLIDER_CIDER_NOT_FOUND "Quest item Anderhol's Slider Cider not found."
-
-enum AmberpineOuthouse
-{
-    ITEM_ANDERHOLS_SLIDER_CIDER     = 37247,
-    NPC_OUTHOUSE_BUNNY              = 27326,
-    QUEST_DOING_YOUR_DUTY           = 12227,
-    SPELL_INDISPOSED                = 53017,
-    SPELL_INDISPOSED_III            = 48341,
-    SPELL_CREATE_AMBERSEEDS         = 48330,
-    GOSSIP_OUTHOUSE_INUSE           = 12775,
-    GOSSIP_OUTHOUSE_VACANT          = 12779
-};
-
+// 188666
 class go_amberpine_outhouse : public GameObjectScript
 {
 public:
@@ -1013,7 +850,7 @@ public:
         QuestStatus status = player->GetQuestStatus(QUEST_DOING_YOUR_DUTY);
         if (status == QUEST_STATUS_INCOMPLETE || status == QUEST_STATUS_COMPLETE || status == QUEST_STATUS_REWARDED)
         {
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_USE_OUTHOUSE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            player->ADD_GOSSIP_ITEM_DB(9492, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
             player->SEND_GOSSIP_MENU(GOSSIP_OUTHOUSE_VACANT, go->GetGUID());
         }
         else
@@ -1048,17 +885,7 @@ public:
     }
 };
 
-/*######
-## Quest 1126: Hive in the Tower
-## go_hive_pod
-######*/
-
-enum Hives
-{
-    QUEST_HIVE_IN_THE_TOWER                       = 9544,
-    NPC_HIVE_AMBUSHER                             = 13301
-};
-
+// 178553
 class go_hive_pod : public GameObjectScript
 {
 public:
@@ -1073,6 +900,7 @@ public:
     }
 };
 
+// 190752
 class go_massive_seaforium_charge : public GameObjectScript
 {
     public:
@@ -1085,22 +913,18 @@ class go_massive_seaforium_charge : public GameObjectScript
         }
 };
 
-/*######
-## go_gjalerbron_cage
-######*/
-
-enum OfKeysAndCages
-{
-    QUEST_ALLIANCE_OF_KEYS_AND_CAGES    = 11231,
-    QUEST_HORDE_OF_KEYS_AND_CAGES       = 11265,
-    NPC_GJALERBRON_PRISONER             = 24035,
-    SAY_FREE                            = 0,
-};
-
+// 186491 186492 186493 186494 186498 186499 186500 186501 186502 186503 186504 186505 186508
+// 186509 186512 186513 186514 186515 186516 186883 186895 186907 186908 186910 186911 186923 
+// 186924 186495 186496 186497 186507 186510 186511 186517 186518 186798 186909 186929 186930
 class go_gjalerbron_cage : public GameObjectScript
 {
     public:
         go_gjalerbron_cage() : GameObjectScript("go_gjalerbron_cage") { }
+
+        enum Cages
+        {
+            SAY_FREE = 0,
+        };
 
         bool OnGossipHello(Player* player, GameObject* go) override
         {
@@ -1120,14 +944,16 @@ class go_gjalerbron_cage : public GameObjectScript
         }
 };
 
-/*########
-## go_large_gjalerbron_cage
-#####*/
-
+// 186490
 class go_large_gjalerbron_cage : public GameObjectScript
 {
     public:
         go_large_gjalerbron_cage() : GameObjectScript("go_large_gjalerbron_cage") { }
+
+        enum Cages
+        {
+            SAY_FREE = 0,
+        };
 
         bool OnGossipHello(Player* player, GameObject* go) override
         {
@@ -1148,21 +974,16 @@ class go_large_gjalerbron_cage : public GameObjectScript
         }
 };
 
-/*########
-#### go_veil_skith_cage
-#####*/
-
-enum MissingFriends
-{
-   QUEST_MISSING_FRIENDS    = 10852,
-   NPC_CAPTIVE_CHILD        = 22314,
-   SAY_FREE_0               = 0,
-};
-
+// 185202 185203 185204 185205
 class go_veil_skith_cage : public GameObjectScript
 {
     public:
        go_veil_skith_cage() : GameObjectScript("go_veil_skith_cage") { }
+
+       enum Cages
+       {
+           SAY_FREE = 0,
+       };
 
        bool OnGossipHello(Player* player, GameObject* go) override
        {
@@ -1176,7 +997,7 @@ class go_veil_skith_cage : public GameObjectScript
                    player->KilledMonsterCredit(NPC_CAPTIVE_CHILD, (*itr)->GetGUID());
                    (*itr)->DespawnOrUnsummon(5000);
                    (*itr)->GetMotionMaster()->MovePoint(1, go->GetPositionX()+5, go->GetPositionY(), go->GetPositionZ());
-                   (*itr)->AI()->Talk(SAY_FREE_0);
+                   (*itr)->AI()->Talk(SAY_FREE);
                    (*itr)->GetMotionMaster()->Clear();
                }
            }
@@ -1184,18 +1005,7 @@ class go_veil_skith_cage : public GameObjectScript
        }
 };
 
-/*######
-## go_frostblade_shrine
-######*/
-
-enum TheCleansing
-{
-   QUEST_THE_CLEANSING_HORDE      = 11317,
-   QUEST_THE_CLEANSING_ALLIANCE   = 11322,
-   SPELL_CLEANSING_SOUL           = 43351,
-   SPELL_RECENT_MEDITATION        = 61720,
-};
-
+// 186649
 class go_frostblade_shrine : public GameObjectScript
 {
 public:
@@ -1211,28 +1021,6 @@ public:
                 player->SetStandState(UNIT_STAND_STATE_SIT);
             }
             return true;
-    }
-};
-
-/*######
-## go_midsummer_bonfire
-######*/
-
-enum MidsummerBonfire
-{
-    STAMP_OUT_BONFIRE_QUEST_COMPLETE    = 45458,
-};
-
-class go_midsummer_bonfire : public GameObjectScript
-{
-public:
-    go_midsummer_bonfire() : GameObjectScript("go_midsummer_bonfire") { }
-
-    bool OnGossipSelect(Player* player, GameObject* /*go*/, uint32 /*sender*/, uint32 /*action*/) override
-    {
-        player->CastSpell(player, STAMP_OUT_BONFIRE_QUEST_COMPLETE, true);
-        player->CLOSE_GOSSIP_MENU();
-        return false;
     }
 };
 
@@ -1274,5 +1062,4 @@ void AddSC_go_scripts()
     new go_large_gjalerbron_cage();
     new go_veil_skith_cage();
     new go_frostblade_shrine();
-    new go_midsummer_bonfire();
 }

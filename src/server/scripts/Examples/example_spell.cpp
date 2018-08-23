@@ -301,7 +301,7 @@ class spell_ex_66244 : public SpellScriptLoader
                 if (spellMod)
                 {
                     delete spellMod;
-                    spellMod = NULL;
+                    spellMod = nullptr;
                 }
                 /*
                 // alternative: we want spellmod for spell which doesn't have it

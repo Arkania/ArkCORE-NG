@@ -20,6 +20,10 @@
 #ifndef DEF_OLD_HILLSBRAD_H
 #define DEF_OLD_HILLSBRAD_H
 
+#define SPEED_WALK              (0.5f)
+#define SPEED_RUN               (1.0f)
+#define SPEED_MOUNT             (1.6f)
+
 enum DataTypes
 {
     TYPE_BARREL_DIVERSION   = 1,

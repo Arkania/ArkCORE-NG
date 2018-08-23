@@ -173,7 +173,7 @@ public:
         Unit* CalculateHatefulStrikeTarget()
         {
             uint32 health = 0;
-            Unit* target = NULL;
+            Unit* target = nullptr;
 
             ThreatContainer::StorageType const &threatlist = me->getThreatManager().getThreatList();
             ThreatContainer::StorageType::const_iterator i = threatlist.begin();

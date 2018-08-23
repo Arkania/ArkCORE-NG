@@ -75,7 +75,10 @@ enum WarlockSpells
     SPELL_WARLOCK_SOUL_SWAP_MOD_COST                = 92794,
     SPELL_WARLOCK_SOUL_SWAP_DOT_MARKER              = 92795,
     SPELL_WARLOCK_UNSTABLE_AFFLICTION               = 30108,
-    SPELL_WARLOCK_UNSTABLE_AFFLICTION_DISPEL        = 31117
+    SPELL_WARLOCK_UNSTABLE_AFFLICTION_DISPEL        = 31117,
+    SPELL_WARLOCK_DRAIN_LIFE_HEALTH                 = 89653,
+    SPELL_WARLOCK_DRAIN_SOUL                        = 79264,
+    SPELL_WARLOCK_SOULSHARD_ADD                     = 87388
 };
 
 enum WarlockSpellIcons
@@ -1162,7 +1165,7 @@ class spell_warl_soul_swap_override : public SpellScriptLoader
 
             bool Load() override
             {
-                _swapCaster = NULL;
+                _swapCaster = nullptr;
                 return true;
             }
 
@@ -1208,7 +1211,7 @@ class spell_warl_soul_swap_dot_marker : public SpellScriptLoader
                 flag96 classMask = GetSpellInfo()->Effects[effIndex].SpellClassMask;
 
                 Unit::AuraApplicationMap const& appliedAuras = swapVictim->GetAppliedAuras();
-                SoulSwapOverrideAuraScript* swapSpellScript = NULL;
+                SoulSwapOverrideAuraScript* swapSpellScript = nullptr;
                 if (Aura* swapOverrideAura = warlock->GetAura(SPELL_WARLOCK_SOUL_SWAP_OVERRIDE))
                     swapSpellScript = dynamic_cast<SoulSwapOverrideAuraScript*>(swapOverrideAura->GetScriptByName("spell_warl_soul_swap_override"));
 
@@ -1259,7 +1262,7 @@ public:
         SpellCastResult CheckCast()
         {
             Unit* currentTarget = GetExplTargetUnit();
-            Unit* swapTarget = NULL;
+            Unit* swapTarget = nullptr;
             if (Aura const* swapOverride = GetCaster()->GetAura(SPELL_WARLOCK_SOUL_SWAP_OVERRIDE))
                 if (SoulSwapOverrideAuraScript* swapScript = dynamic_cast<SoulSwapOverrideAuraScript*>(swapOverride->GetScriptByName("spell_warl_soul_swap_override")))
                     swapTarget = swapScript->GetOriginalSwapSource();
@@ -1277,7 +1280,7 @@ public:
             bool hasGlyph = GetCaster()->HasAura(SPELL_WARLOCK_GLYPH_OF_SOUL_SWAP);
 
             std::list<uint32> dotList;
-            Unit* swapSource = NULL;
+            Unit* swapSource = nullptr;
             if (Aura const* swapOverride = GetCaster()->GetAura(SPELL_WARLOCK_SOUL_SWAP_OVERRIDE))
             {
                 SoulSwapOverrideAuraScript* swapScript = dynamic_cast<SoulSwapOverrideAuraScript*>(swapOverride->GetScriptByName("spell_warl_soul_swap_override"));
@@ -1396,6 +1399,105 @@ class spell_warl_unstable_affliction : public SpellScriptLoader
         }
 };
 
+// 89653 - Drain Life 
+class spell_warl_drain_life : public SpellScriptLoader
+{
+public:
+    spell_warl_drain_life() : SpellScriptLoader("spell_warl_drain_life") { }
+
+    class spell_warl_drain_life_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_warl_drain_life_AuraScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/)
+        {
+            if (!sSpellMgr->GetSpellInfo(SPELL_WARLOCK_DRAIN_LIFE_HEALTH))
+                return false;
+
+            return true;
+        }
+
+        void onPeriodicTick(AuraEffect const* /*aurEff*/)
+        {
+            if (Unit* caster = GetCaster())
+            {
+                int32 baseAmount = caster->CalculateSpellDamage(caster, sSpellMgr->GetSpellInfo(SPELL_WARLOCK_DRAIN_LIFE_HEALTH), 0);
+
+                if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_WARLOCK, 3223, 0))
+                    if (caster->HealthBelowPct(25))
+                        baseAmount += int32(aurEff->GetAmount());
+
+                caster->CastCustomSpell(caster, SPELL_WARLOCK_DRAIN_LIFE_HEALTH, &baseAmount, NULL, NULL, true);
+            }
+        }
+
+        void Register()
+        {
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_warl_drain_life_AuraScript::onPeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_warl_drain_life_AuraScript();
+    }
+};
+
+// 87388 - Drain Soul 
+class spell_warl_drain_soul : public SpellScriptLoader
+{
+public:
+    spell_warl_drain_soul() : SpellScriptLoader("spell_warl_drain_soul") { }
+
+    class spell_warl_drain_soul_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_warl_drain_soul_AuraScript);
+
+        bool Validate(SpellInfo const* spellInfo)
+        {
+            if (!sSpellMgr->GetSpellInfo(SPELL_WARLOCK_SOULSHARD_ADD))
+                return false;
+
+            return true;
+        }
+
+        void onPeriodicTick(AuraEffect const* /*aurEff*/)
+        {
+            Unit* target = GetTarget();
+            Unit* caster = GetCaster();
+            if (!target || !caster)
+                return;
+
+            if (target->HealthBelowPct(25))
+                if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_WARLOCK, 4554, EFFECT_1))
+                    if (Aura *aura = aurEff->GetBase())
+                        if (roll_chance_i(aura->GetSpellInfo()->Effects[EFFECT_0].BasePoints))
+                            caster->CastSpell(target, SPELL_WARLOCK_SOULSHARD_ADD, true);
+
+        }
+
+        void RemoveEffect(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+        {
+            if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_DEATH)
+                if (Player *caster = GetCaster()->ToPlayer())
+                    if (Unit *target = GetTarget())
+                        if (caster->isHonorOrXPTarget(target))
+                            caster->CastSpell(caster, SPELL_WARLOCK_DRAIN_SOUL, true, 0, aurEff);
+        }
+
+        void Register()
+        {
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_warl_drain_soul_AuraScript::onPeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
+            OnEffectRemove += AuraEffectRemoveFn(spell_warl_drain_soul_AuraScript::RemoveEffect, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_warl_drain_soul_AuraScript();
+    }
+};
+
 void AddSC_warlock_spell_scripts()
 {
     new spell_warl_aftermath();
@@ -1427,6 +1529,8 @@ void AddSC_warlock_spell_scripts()
     new spell_warl_soul_swap_override();
     new spell_warl_soulshatter();
     new spell_warl_unstable_affliction();
+    new spell_warl_drain_life();
+    new spell_warl_drain_soul();
 }
 
 /*  found old spells there now are part of core

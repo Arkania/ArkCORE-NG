@@ -55,14 +55,15 @@ namespace Trinity
                 : i_player(player), i_msgtype(msgtype), i_textId(textId), i_achievementId(ach_id) {}
             void operator()(WorldPacket& data, LocaleConstant loc_idx)
             {
-                char const* text = sObjectMgr->GetTrinityString(i_textId, loc_idx);
+                BroadcastText const* bcText = sObjectMgr->GetBroadcastText(i_textId);
+                std::string text = bcText->GetText(loc_idx, i_player.getGender());
 
                 data << uint8(i_msgtype);
                 data << uint32(LANG_UNIVERSAL);
                 data << uint64(i_player.GetGUID());
                 data << uint32(5);
                 data << uint64(i_player.GetGUID());
-                data << uint32(strlen(text)+1);
+                data << uint32(text.length() + 1);
                 data << text;
                 data << uint8(0);
                 data << uint32(i_achievementId);
@@ -2200,7 +2201,7 @@ void AchievementMgr<Guild>::CompletedAchievement(AchievementEntry const* achieve
             ca.guids.insert(referencePlayer->GetGUID());
 
         if (Group const* group = referencePlayer->GetGroup())
-            for (GroupReference const* ref = group->GetFirstMember(); ref != NULL; ref = ref->next())
+            for (GroupReference const* ref = group->GetFirstMember(); ref != nullptr; ref = ref->next())
                 if (Player const* groupMember = ref->GetSource())
                     if (groupMember->GetGuildId() == GetOwner()->GetId())
                         ca.guids.insert(groupMember->GetGUID());
@@ -3555,7 +3556,7 @@ void AchievementGlobalMgr::LoadAchievementCriteriaList()
             m_AchievementCriteriasByTimedType[criteria->timedCriteriaStartType].push_back(criteria);
     }
 
-	TC_LOG_ERROR("sql.sql", ">> Loaded %u achievement criteria and %u guild achievement crieteria in %u ms", criterias, guildCriterias, GetMSTimeDiffToNow(oldMSTime));
+    TC_LOG_INFO("sql.sql", ">> Loaded %u achievement criteria and %u guild achievement crieteria in %u ms", criterias, guildCriterias, GetMSTimeDiffToNow(oldMSTime));
 }
 
 void AchievementGlobalMgr::LoadAchievementReferenceList()
@@ -3584,7 +3585,7 @@ void AchievementGlobalMgr::LoadAchievementReferenceList()
     if (AchievementEntry const* achievement = sAchievementMgr->GetAchievement(4539))
         const_cast<AchievementEntry*>(achievement)->mapID = 631;    // Correct map requirement (currently has Ulduar)
 
-	TC_LOG_ERROR("sql.sql", ">> Loaded %u achievement references in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    TC_LOG_INFO("sql.sql", ">> Loaded %u achievement references in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 void AchievementGlobalMgr::LoadAchievementCriteriaData()
@@ -3646,7 +3647,7 @@ void AchievementGlobalMgr::LoadAchievementCriteriaData()
     }
     while (result->NextRow());
 
-	TC_LOG_ERROR("sql.sql", ">> Loaded %u additional achievement criteria data in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    TC_LOG_INFO("sql.sql", ">> Loaded %u additional achievement criteria data in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 void AchievementGlobalMgr::LoadCompletedAchievements()
@@ -3683,7 +3684,7 @@ void AchievementGlobalMgr::LoadCompletedAchievements()
     }
     while (result->NextRow());
 
-	TC_LOG_ERROR("sql.sql", ">> Loaded %lu realm first completed achievements in %u ms", (unsigned long)m_allCompletedAchievements.size(), GetMSTimeDiffToNow(oldMSTime));
+    TC_LOG_INFO("sql.sql", ">> Loaded %lu realm first completed achievements in %u ms", (unsigned long)m_allCompletedAchievements.size(), GetMSTimeDiffToNow(oldMSTime));
 }
 
 void AchievementGlobalMgr::LoadRewards()
@@ -3692,8 +3693,8 @@ void AchievementGlobalMgr::LoadRewards()
 
     m_achievementRewards.clear();                           // need for reload case
 
-    //                                               0      1        2        3     4       5        6
-    QueryResult result = WorldDatabase.Query("SELECT entry, title_A, title_H, item, sender, subject, text FROM achievement_reward");
+    //                                               0      1        2        3     4       5        6     7 
+    QueryResult result = WorldDatabase.Query("SELECT entry, title_A, title_H, item, sender, subject, text, mailTemplate FROM achievement_reward");
 
     if (!result)
     {
@@ -3715,12 +3716,13 @@ void AchievementGlobalMgr::LoadRewards()
         }
 
         AchievementReward reward;
-        reward.titleId[0] = fields[1].GetUInt32();
-        reward.titleId[1] = fields[2].GetUInt32();
-        reward.itemId     = fields[3].GetUInt32();
-        reward.sender     = fields[4].GetUInt32();
-        reward.subject    = fields[5].GetString();
-        reward.text       = fields[6].GetString();
+        reward.titleId[0]   = fields[1].GetUInt32();
+        reward.titleId[1]   = fields[2].GetUInt32();
+        reward.itemId       = fields[3].GetUInt32();
+        reward.sender       = fields[4].GetUInt32();
+        reward.subject      = fields[5].GetString();
+        reward.text         = fields[6].GetString();
+        reward.mailTemplate = fields[7].GetUInt32();
 
         // must be title or mail at least
         if (!reward.titleId[0] && !reward.titleId[1] && !reward.sender)
@@ -3787,7 +3789,7 @@ void AchievementGlobalMgr::LoadRewards()
     }
     while (result->NextRow());
 
-	TC_LOG_ERROR("sql.sql", ">> Loaded %u achievement rewards in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    TC_LOG_INFO("sql.sql", ">> Loaded %u achievement rewards in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 void AchievementGlobalMgr::LoadRewardLocales()
@@ -3829,7 +3831,7 @@ void AchievementGlobalMgr::LoadRewardLocales()
     }
     while (result->NextRow());
 
-	TC_LOG_ERROR("sql.sql", ">> Loaded %lu achievement reward locale strings in %u ms", (unsigned long)m_achievementRewardLocales.size(), GetMSTimeDiffToNow(oldMSTime));
+    TC_LOG_INFO("sql.sql", ">> Loaded %lu achievement reward locale strings in %u ms", (unsigned long)m_achievementRewardLocales.size(), GetMSTimeDiffToNow(oldMSTime));
 }
 
 AchievementEntry const* AchievementGlobalMgr::GetAchievement(uint32 achievementId) const

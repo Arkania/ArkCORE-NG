@@ -199,7 +199,7 @@ public:
                 if (me->IsWithinMeleeRange(me->GetVictim()))
                 {
                     bool healing = false;
-                    SpellInfo const* info = NULL;
+                    SpellInfo const* info = nullptr;
 
                     //Select a healing spell if less than 30% hp
                     if (me->HealthBelowPct(30))
@@ -226,7 +226,7 @@ public:
                     else
                         me->AttackerStateUpdate(me->GetVictim());
 
-                    me->resetAttackTimer();
+                    me->ResetAttackTimer();
                 }
             }
             else
@@ -235,7 +235,7 @@ public:
                 if (!me->IsNonMeleeSpellCast(false))
                 {
                     bool healing = false;
-                    SpellInfo const* info = NULL;
+                    SpellInfo const* info = nullptr;
 
                     //Select a healing spell if less than 30% hp ONLY 33% of the time
                     if (me->HealthBelowPct(30) && 33 > urand(0, 99))
@@ -350,7 +350,7 @@ public:
             if (me->GetEntry() != 68 && me->GetEntry() != 1756 && me->GetEntry() != 1976)
                 return;
             Player* player = me->FindNearestPlayer(10.0f);
-            if (!player || player->GetQuestStatus(13188) != QUEST_STATE_COMPLETE)
+            if (!player || player->GetQuestStatus(13188) != QUEST_STATUS_COMPLETE)
                 return;
             switch (urand(1,25))
             {
@@ -387,7 +387,7 @@ public:
             if (me->GetZoneId() != 1637 || me->GetEntry() != 14304)
                 return;
             Player* player = me->FindNearestPlayer(10.0f);
-            if (!player || player->GetQuestStatus(13189) != QUEST_STATE_COMPLETE)
+            if (!player || player->GetQuestStatus(13189) != QUEST_STATUS_COMPLETE)
                 return;
             switch (urand(1, 25))
             {

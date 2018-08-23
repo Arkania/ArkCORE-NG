@@ -100,6 +100,6 @@ void AppenderFile::CloseFile()
     if (logfile)
     {
         fclose(logfile);
-        logfile = NULL;
+        logfile = nullptr;
     }
 }

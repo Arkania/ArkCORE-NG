@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2016 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2011-2017 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -17,13 +17,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Npc_Taxi
-SD%Complete: 0%
-SDComment: To be used for taxi NPCs that are located globally.
-SDCategory: NPCs
-EndScriptData
-*/
+ /* ScriptData
+ SDName: Npc_Taxi
+ SD%Complete: 0%
+ SDComment: To be used for taxi NPCs that are located globally.
+ SDCategory: NPCs
+ EndScriptData
+ */
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
@@ -61,7 +61,6 @@ EndScriptData
 #define GOSSIP_TARIOLSTRASZ2    "Can you spare a drake to travel to Lord Of Afrasastrasz, in the middle of the temple?"
 #define GOSSIP_TORASTRASZA1     "I would like to see Lord Of Afrasastrasz, in the middle of the temple."
 #define GOSSIP_TORASTRASZA2     "Yes, Please. I would like to return to the ground floor of the temple."
-#define GOSSIP_CRIMSONWING      "<Ride the gryphons to Survey Alcaz Island>"
 #define GOSSIP_WILLIAMKEILAR1   "Take me to Northpass Tower."
 #define GOSSIP_WILLIAMKEILAR2   "Take me to Eastwall Tower."
 #define GOSSIP_WILLIAMKEILAR3   "Take me to Crown Guard Tower."
@@ -73,6 +72,7 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
+        player->PlayerTalkClass->ClearMenus();
         if (creature->IsQuestGiver())
             player->PrepareQuestMenu(creature->GetGUID());
 
@@ -165,15 +165,13 @@ public:
             // top -> ground
             player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_TORASTRASZA2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 22);
             break;
-        case 23704: // Dustwallow Marsh - Cassa Crimsonwing
-            if (player->GetQuestStatus(11142) == QUEST_STATUS_INCOMPLETE)
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_CRIMSONWING, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+25);
-            break;
         case 17209:
             player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_WILLIAMKEILAR1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 28);
             player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_WILLIAMKEILAR2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 29);
             player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_WILLIAMKEILAR3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 30);
             break;
+        default:
+            return false;
         }
 
         player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
@@ -292,10 +290,6 @@ public:
             //player->ActivateTaxiPathTo(738);
             player->CastSpell(player, 43136, false);
             break;
-        case GOSSIP_ACTION_INFO_DEF + 25:
-            player->CLOSE_GOSSIP_MENU();
-            player->CastSpell(player, 42295, true);
-            break;
         case GOSSIP_ACTION_INFO_DEF + 26:
             player->CLOSE_GOSSIP_MENU();
             player->ActivateTaxiPathTo(494);
@@ -348,33 +342,33 @@ public:
             {
                 switch (eventId)
                 {
-                    case EVENT_CHECK_FOR_PLAYER:
+                case EVENT_CHECK_FOR_PLAYER:
+                {
+                    go->GetZoneAndAreaId(m_zone, m_area);
+                    switch (m_area)
                     {
-                        go->GetZoneAndAreaId(m_zone, m_area);
-                            switch (m_area)
-                            {
-                                case 4999:
-                                {
-                                    if (Player* player = go->FindNearestPlayer(3.0f))
-                                        player->TeleportTo(1, 5033.43f, -2029.12f, 1148.98f, 0.2322f);
-                                    break;
-                                }
-                                case 5050:
-                                {
-                                    if (Player* player = go->FindNearestPlayer(3.0f))
-                                        player->TeleportTo(1, 4554.59f, -2602.04f, 1124.29f, 8.4632f);
-                                    break;
-                                }
-                                case 5064:
-                                {
-                                    if (Player* player = go->FindNearestPlayer(3.0f))
-                                        player->TeleportTo(1, 5037.18f, -2044.26f, 1368.80f, 2.1910f);
-                                    break;
-                                }
-                            }
-                        m_events.ScheduleEvent(EVENT_CHECK_FOR_PLAYER, 1000);
+                    case 4999:
+                    {
+                        if (Player* player = go->FindNearestPlayer(3.0f))
+                            player->TeleportTo(1, 5033.43f, -2029.12f, 1148.98f, 0.2322f);
                         break;
                     }
+                    case 5050:
+                    {
+                        if (Player* player = go->FindNearestPlayer(3.0f))
+                            player->TeleportTo(1, 4554.59f, -2602.04f, 1124.29f, 8.4632f);
+                        break;
+                    }
+                    case 5064:
+                    {
+                        if (Player* player = go->FindNearestPlayer(3.0f))
+                            player->TeleportTo(1, 5037.18f, -2044.26f, 1368.80f, 2.1910f);
+                        break;
+                    }
+                    }
+                    m_events.ScheduleEvent(EVENT_CHECK_FOR_PLAYER, 1000);
+                    break;
+                }
                 }
             }
         }

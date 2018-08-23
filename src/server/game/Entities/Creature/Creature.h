@@ -258,12 +258,14 @@ typedef std::unordered_map<uint32, EquipmentInfoContainerInternal> EquipmentInfo
 // from `creature` table
 struct CreatureData
 {
-    CreatureData() : id(0), mapid(0), phaseMask(0), displayid(0), equipmentId(0),
+    CreatureData() : id(0), mapid(0), zoneId(0), areaId(0), phaseMask(0), displayid(0), equipmentId(0),
                      posX(0.0f), posY(0.0f), posZ(0.0f), orientation(0.0f), spawntimesecs(0),
                      spawndist(0.0f), currentwaypoint(0), curhealth(0), curmana(0), movementType(0),
-                     spawnMask(0), npcflag(0), unit_flags(0), dynamicflags(0), dbData(true) { }
+                     spawnMask(0), npcflag(0), unit_flags(0), dynamicflags(0), phaseId(0), phaseGroup(0), dbData(true) { }
     uint32 id;                                              // entry in creature_template
     uint16 mapid;
+    uint16 zoneId;
+    uint16 areaId;
     uint32 phaseMask;
     uint32 displayid;
     int8 equipmentId;
@@ -281,6 +283,8 @@ struct CreatureData
     uint32 npcflag;
     uint32 unit_flags;                                      // enum UnitFlags mask values
     uint32 dynamicflags;
+    uint16 phaseId;
+    uint16 phaseGroup;
     bool dbData;
 };
 
@@ -331,6 +335,9 @@ struct CreatureAddon
     uint32 bytes1;
     uint32 bytes2;
     uint32 emote;
+    uint16 aiAnimKit;
+    uint16 movementAnimKit;
+    uint16 meleeAnimKit;
     std::vector<uint32> auras;
 };
 
@@ -422,6 +429,7 @@ struct TrainerSpellData
     uint32 trainerType;                                     // trainer type based at trainer spells, can be different from creature_template value.
                                                             // req. for correct show non-prof. trainers like weaponmaster, allowed values 0 and 2.
     TrainerSpell const* Find(uint32 spell_id) const;
+    uint16 GetTrainerSkillID() const;
 };
 
 typedef std::map<uint32, time_t> CreatureSpellCooldowns;
@@ -554,7 +562,7 @@ class Creature : public Unit, public GridObject<Creature>, public MapObject
         bool LoadCreatureFromDB(uint32 guid, Map* map, bool addToMap = true);
         void SaveToDB();
                                                             // overriden in Pet
-        virtual void SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask);
+        virtual void SaveToDB(uint32 mapid, uint32 spawnMask, uint32 phaseMask);
         virtual void DeleteFromDB();                        // overriden in Pet
 
         Loot loot;
@@ -644,10 +652,10 @@ class Creature : public Unit, public GridObject<Creature>, public MapObject
         void GetHomePosition(float& x, float& y, float& z, float& ori) const { m_homePosition.GetPosition(x, y, z, ori); }
         Position const& GetHomePosition() const { return m_homePosition; }
 
-        void SetTransportHomePosition(float x, float y, float z, float o) { m_transportHomePosition.Relocate(x, y, z, o); }
-        void SetTransportHomePosition(const Position &pos) { m_transportHomePosition.Relocate(pos); }
-        void GetTransportHomePosition(float& x, float& y, float& z, float& ori) const { m_transportHomePosition.GetPosition(x, y, z, ori); }
-        Position const& GetTransportHomePosition() const { return m_transportHomePosition; }
+        void SetTransportHomePosition(float x, float y, float z, float o);
+        void SetTransportHomePosition(const Position &pos);
+        void GetTransportHomePosition(float& x, float& y, float& z, float& ori) const;
+        Position const& GetTransportHomePosition() const;
 
         uint32 GetWaypointPath() const { return m_path_id; }
         void LoadPath(uint32 pathid) { m_path_id = pathid; }

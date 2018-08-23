@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2017 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2011-2016 ArkCORE <http://www.arkania.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -72,6 +72,9 @@ void TransportMgr::LoadTransportTemplates()
             TC_LOG_ERROR("sql.sql", "Transport %u (name: %s) has an invalid path specified in `gameobject_template`.`data0` (%u) field, skipped.", entry, goInfo->name.c_str(), goInfo->moTransport.taxiPathId);
             continue;
         }
+
+        if (!goInfo->moTransport.taxiPathId)
+            continue;
 
         // paths are generated per template, saves us from generating it again in case of instanced transports
         TransportTemplate& transport = _transportTemplates[entry];
@@ -349,7 +352,7 @@ void TransportMgr::AddPathNodeToTransport(uint32 transportEntry, uint32 timeSeg,
     animNode.Path[timeSeg] = node;
 }
 
-Transport* TransportMgr::CreateTransport(uint32 entry, uint32 guid /*= 0*/, Map* map /*= NULL*/)
+Transport* TransportMgr::CreateTransport(uint32 entry, uint32 guid /*= 0*/, Map* map /*= NULL*/, uint16 phaseId /*= 0*/, uint16 phaseGroup /*= 0*/)
 {
     // instance case, execute GetGameObjectEntry hook
     if (map)
@@ -389,6 +392,13 @@ Transport* TransportMgr::CreateTransport(uint32 entry, uint32 guid /*= 0*/, Map*
         return NULL;
     }
 
+    if (phaseId)
+        trans->SetInPhase(phaseId, false, true);
+
+    if (phaseGroup)
+        for (auto ph : GetXPhasesForGroup(phaseGroup))
+            trans->SetInPhase(ph, false, true);
+
     if (MapEntry const* mapEntry = sMapStore.LookupEntry(mapId))
     {
         if (mapEntry->Instanceable() != tInfo->inInstance)
@@ -405,7 +415,6 @@ Transport* TransportMgr::CreateTransport(uint32 entry, uint32 guid /*= 0*/, Map*
         trans->m_zoneScript = map->ToInstanceMap()->GetInstanceScript();
 
     // Passengers will be loaded once a player is near
-
     trans->GetMap()->AddToMap<Transport>(trans);
     return trans;
 }
@@ -417,7 +426,7 @@ void TransportMgr::SpawnContinentTransports()
 
     uint32 oldMSTime = getMSTime();
 
-    QueryResult result = WorldDatabase.Query("SELECT guid, entry FROM transports");
+    QueryResult result = WorldDatabase.Query("SELECT guid, entry, phaseId, phaseGroup FROM transports");
 
     uint32 count = 0;
     if (result)
@@ -427,10 +436,12 @@ void TransportMgr::SpawnContinentTransports()
             Field* fields = result->Fetch();
             uint32 guid = fields[0].GetUInt32();
             uint32 entry = fields[1].GetUInt32();
+            uint16 phaseId = fields[2].GetUInt16();
+            uint16 phaseGroup = fields[3].GetUInt16();
 
             if (TransportTemplate const* tInfo = GetTransportTemplate(entry))
                 if (!tInfo->inInstance)
-                    if (CreateTransport(entry, guid))
+                    if (CreateTransport(entry, guid, nullptr, phaseId, phaseGroup))
                         ++count;
 
         } while (result->NextRow());

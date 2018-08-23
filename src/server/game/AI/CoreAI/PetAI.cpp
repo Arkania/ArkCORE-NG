@@ -267,7 +267,7 @@ void PetAI::UpdateAllies()
     if (!owner)
         return;
 
-    Group* group = NULL;
+    Group* group = nullptr;
     if (Player* player = owner->ToPlayer())
         group = player->GetGroup();
 
@@ -283,7 +283,7 @@ void PetAI::UpdateAllies()
     m_AllySet.insert(me->GetGUID());
     if (group)                                              //add group
     {
-        for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
+        for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
         {
             Player* Target = itr->GetSource();
             if (!Target || !group->SameSubGroup(owner->ToPlayer(), Target))
@@ -557,7 +557,7 @@ bool PetAI::CanAttack(Unit* target)
     if (me->GetVictim() && me->GetVictim() != target)
     {
         // Check if our owner selected this target and clicked "attack"
-        Unit* ownerTarget = NULL;
+        Unit* ownerTarget = nullptr;
         if (Player* owner = me->GetCharmerOrOwner()->ToPlayer())
             ownerTarget = owner->GetSelectedUnit();
         else

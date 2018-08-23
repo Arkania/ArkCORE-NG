@@ -29,15 +29,25 @@
 
 void UnitAI::AttackStart(Unit* victim)
 {
-
-    if (victim && me->Attack(victim, true))
-        me->GetMotionMaster()->MoveChase(victim);
+    if (victim)
+        if (me->Attack(victim, true))
+            if (me->IsFakeAttack(victim))
+                if (me->IsRangedFakeAttackPossible())
+                    me->GetMotionMaster()->MoveIdle();
+                else
+                    me->GetMotionMaster()->MoveChase(victim);
+            else
+                me->GetMotionMaster()->MoveChase(victim);
 }
 
 void UnitAI::AttackStartCaster(Unit* victim, float dist)
 {
-    if (victim && me->Attack(victim, false))
-        me->GetMotionMaster()->MoveChase(victim, dist);
+    if (victim)
+        if (me->Attack(victim, false))
+            if (me->IsFakeAttack(victim))
+                me->GetMotionMaster()->MoveIdle();
+            else
+                me->GetMotionMaster()->MoveChase(victim, dist);
 }
 
 void UnitAI::DoMeleeAttackIfReady()
@@ -53,14 +63,22 @@ void UnitAI::DoMeleeAttackIfReady()
     //Make sure our attack is ready and we aren't currently casting before checking distance
     if (me->isAttackReady())
     {
-        me->AttackerStateUpdate(victim);
-        me->resetAttackTimer();
+        if (me->IsFakeAttack(victim))
+            me->FakeAttackerStateUpdate(victim);
+        else
+            me->AttackerStateUpdate(victim);
+
+        me->ResetAttackTimer();
     }
 
     if (me->haveOffhandWeapon() && me->isAttackReady(OFF_ATTACK))
     {
-        me->AttackerStateUpdate(victim, OFF_ATTACK);
-        me->resetAttackTimer(OFF_ATTACK);
+        if (me->IsFakeAttack(victim))
+            me->FakeAttackerStateUpdate(victim, OFF_ATTACK);
+        else
+            me->AttackerStateUpdate(victim, OFF_ATTACK);
+
+        me->ResetAttackTimer();
     }
 }
 
@@ -74,7 +92,7 @@ bool UnitAI::DoSpellAttackIfReady(uint32 spell)
         if (me->IsWithinCombatRange(me->GetVictim(), spellInfo->GetMaxRange(false)))
         {
             me->CastSpell(me->GetVictim(), spell, false);
-            me->resetAttackTimer();
+            me->ResetAttackTimer();
             return true;
         }
     }
@@ -128,7 +146,7 @@ void UnitAI::DoCastToAllHostilePlayers(uint32 spellid, bool triggered)
 
 void UnitAI::DoCast(uint32 spellId)
 {
-    Unit* target = NULL;
+    Unit* target = nullptr;
 
     switch (AISpellInfo[spellId].target)
     {

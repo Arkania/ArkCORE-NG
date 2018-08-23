@@ -174,7 +174,7 @@ bool BattlegroundSA::ResetObjs()
     //Graveyards
     for (uint8 i = 0; i < BG_SA_MAX_GY; i++)
     {
-        WorldSafeLocsEntry const* sg = NULL;
+        WorldSafeLocsEntry const* sg = nullptr;
         sg = sWorldSafeLocsStore.LookupEntry(BG_SA_GYEntries[i]);
 
         if (!sg)
@@ -971,7 +971,6 @@ void BattlegroundSA::SendTransportInit(Player* player)
     {
         UpdateData transData(player->GetMapId());
         if (BgObjects[BG_SA_BOAT_ONE])
-
             GetBGObject(BG_SA_BOAT_ONE)->BuildCreateUpdateBlockForPlayer(&transData, player);
         if (BgObjects[BG_SA_BOAT_TWO])
             GetBGObject(BG_SA_BOAT_TWO)->BuildCreateUpdateBlockForPlayer(&transData, player);

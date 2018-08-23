@@ -441,7 +441,7 @@ public:
         if (isalpha(levelStr[0]))
         {
             nameStr = levelStr;
-            levelStr = NULL;                                    // current level will used
+            levelStr = nullptr;                                    // current level will used
         }
 
         Player* target;
@@ -815,7 +815,7 @@ public:
         if (levelStr && isalpha(levelStr[0]))
         {
             nameStr = levelStr;
-            levelStr = NULL;                                    // current level will used
+            levelStr = nullptr;                                    // current level will used
         }
 
         Player* target;
@@ -885,7 +885,7 @@ public:
             return false;
         }
 
-        char* guidStr = NULL;
+        char* guidStr = nullptr;
         char* nameStr = strtok(NULL, " ");
 
         std::string name;

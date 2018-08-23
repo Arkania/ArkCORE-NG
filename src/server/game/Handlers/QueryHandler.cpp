@@ -508,39 +508,42 @@ void WorldSession::HandleQuestNpcQueryOpcode(WorldPacket& recvData)
     count = recvData.ReadBits(24);
 
     recvData >> unk1;
-    
-    for(uint8 i = 0; i < count; ++i)
+
+    for (uint8 i = 0; i < count; ++i)
     {
         uint32 questId = recvData.ReadBits(24);
-        if(_player->GetQuestStatus(questId) == QUEST_STATUS_COMPLETE)
+        if (_player->GetQuestStatus(questId) == QUEST_STATUS_COMPLETE)
         {
             compleatedQuests.insert(questId);
-            for(QuestRelations::iterator itr = relations->begin(); itr != relations->end(); ++itr)
+            for (QuestRelations::iterator itr = relations->begin(); itr != relations->end(); ++itr)
             {
-                if(itr->second == questId)
+                if (itr->second == questId)
                 {
                     npcEntryIds.insert(itr->first);
                 }
             }
         }
-        TC_LOG_DEBUG("network", "WORLD: Recv CMSG_QUEST_NPC_QUERY with count : %u and questId %u ",count,questId);
+        TC_LOG_DEBUG("network", "WORLD: Recv CMSG_QUEST_NPC_QUERY with count : %u and questId %u ", count, questId);
     }
-        
 
-    WorldPacket sendData(SMSG_QUEST_NPC_QUERY_RESPONSE, 2+4+(4*count));
 
-    sendData.WriteBits<uint8>(compleatedQuests.size(),23);
-    for(uint8 i = 0; i < compleatedQuests.size(); ++i)
+    WorldPacket sendData(SMSG_QUEST_NPC_QUERY_RESPONSE, 2 + 4 + (4 * count));
+
+    sendData.WriteBits<uint8>(compleatedQuests.size(), 23);
+    for (uint8 i = 0; i < compleatedQuests.size(); ++i)
     {
-        sendData.WriteBits<uint8>(compleatedQuests.size(),24);
+        sendData.WriteBits<uint8>(compleatedQuests.size(), 24);
     }
-    
-    for(std::set<uint32>::iterator itr = compleatedQuests.begin(); itr != compleatedQuests.end(); ++itr)
+
+    if (compleatedQuests.begin() == compleatedQuests.end())
+       sendData.FlushBits();
+
+    for (std::set<uint32>::iterator itr = compleatedQuests.begin(); itr != compleatedQuests.end(); ++itr)
     {
-        sendData << uint32 ((*itr));
-        for(std::set<uint32>::iterator citr = npcEntryIds.begin(); citr != npcEntryIds.end(); ++citr)
+        sendData << uint32((*itr));
+        for (std::set<uint32>::iterator citr = npcEntryIds.begin(); citr != npcEntryIds.end(); ++citr)
         {
-            sendData << uint32 ((*itr));
+            sendData << uint32((*itr));
         }
     }
 

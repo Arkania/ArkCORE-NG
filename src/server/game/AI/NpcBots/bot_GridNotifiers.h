@@ -28,7 +28,7 @@ class NearestHostileUnitCheck
                 return false;
             if (!u->IsInCombat())
                 return false;
-            if (!u->InSamePhase(me))
+            if (!u->IsInPhase(me))
                 return false;
             if (!ai->CanBotAttack(u, byspell))
                 return false;
@@ -67,7 +67,7 @@ class HostileDispelTargetCheck
                 return false;
             if (u->IsWithinDistInMap(me, m_range) &&
                 u->IsAlive() &&
-                u->InSamePhase(me) &&
+                u->IsInPhase(me) &&
                 u->IsInCombat() &&
                 u->isTargetableForAttack() &&
                 u->IsVisible() &&
@@ -166,7 +166,7 @@ class PolyUnitCheck
             if (me->GetDistance(u) < 6 || mytar->GetDistance(u) < 5 ||
                 (me->ToCreature()->GetBotClass() == CLASS_MAGE && u->GetHealthPct() < 70))
                 return false;
-            if (!u->InSamePhase(me))
+            if (!u->IsInPhase(me))
                 return false;
             if (!u->isTargetableForAttack())
                 return false;
@@ -213,7 +213,7 @@ class FearUnitCheck
                 return false;
             if (!me->IsWithinDistInMap(u, m_range))
                 return false;
-            if (!u->InSamePhase(me))
+            if (!u->IsInPhase(me))
                 return false;
             if (!u->IsInCombat())
                 return false;
@@ -270,7 +270,7 @@ class StunUnitCheck
                 if (Player* mymaster = me->ToCreature()->GetBotOwner())
                     if (mymaster->GetVictim() == u)
                         return false;
-            if (!u->InSamePhase(me))
+            if (!u->IsInPhase(me))
                 return false;
             if (u->GetReactionTo(me) > REP_NEUTRAL)
                 return false;
@@ -331,7 +331,7 @@ class UndeadCCUnitCheck
                 return false;
             if (!me->IsWithinDistInMap(u, m_range))
                 return false;
-            if (!u->InSamePhase(me))
+            if (!u->IsInPhase(me))
                 return false;
             if (!u->IsInCombat())
                 return false;
@@ -393,7 +393,7 @@ class RootUnitCheck
                 return false;
             if (me->GetDistance(u) < 8)
                 return false;
-            if (!u->InSamePhase(me))
+            if (!u->IsInPhase(me))
                 return false;
             if (!u->IsVisible())
                 return false;
@@ -438,7 +438,7 @@ class CastingUnitCheck
                 return false;
             if (!u->IsAlive())
                 return false;
-            if (!u->InSamePhase(me))
+            if (!u->IsInPhase(me))
                 return false;
             if (!u->IsVisible())
                 return false;
@@ -520,7 +520,7 @@ class TranquilTargetCheck
                 u->IsWithinDistInMap(me, max_range) &&
                 u->GetDistance(me) > min_range &&
                 u->IsAlive() &&
-                u->InSamePhase(me) &&
+                u->IsInPhase(me) &&
                 u->IsInCombat() &&
                 u->isTargetableForAttack() &&
                 u->IsVisible() &&
@@ -566,7 +566,7 @@ class NearbyHostileUnitCheck
                 return false;
             if (!u->IsInCombat())
                 return false;
-            if (!u->InSamePhase(me))
+            if (!u->IsInPhase(me))
                 return false;
             if (!ai->CanBotAttack(u))
                 return false;
@@ -603,7 +603,7 @@ public:
         //    return false;
         if (u->IsTotem() || u->IsSummon())
             return false;
-        if (!u->InSamePhase(me))
+        if (!u->IsInPhase(me))
             return false;
         if (!me->IsWithinDistInMap(u, max_range))
             return false;
@@ -633,7 +633,7 @@ public:
             return false;
         if (u->GetTypeId() != TYPEID_PLAYER && u->GetTypeId() != TYPEID_CORPSE)
             return false;
-        if (!u->InSamePhase(me))
+        if (!u->IsInPhase(me))
             return false;
         if (!me->IsWithinDistInMap(u, max_range))
             return false;
@@ -665,24 +665,24 @@ private:
 template<class Check>
 struct UnitListSearcher
 {
-    uint32 i_phaseMask;
+    WorldObject const* _searcher;
     std::list<uint64> &i_objects;
     Check& i_check;
 
     UnitListSearcher(WorldObject const* searcher, std::list<uint64> &objects, Check &check)
-        : i_phaseMask(searcher->GetPhaseMask()), i_objects(objects), i_check(check) { }
+        : _searcher(searcher), i_objects(objects), i_check(check) { }
 
     void Visit(PlayerMapType &m)
     {
         for (PlayerMapType::iterator itr = m.begin(); itr != m.end(); ++itr)
-            if (itr->GetSource()->InSamePhase(i_phaseMask))
+            if (itr->GetSource()->IsInPhase(_searcher))
                 if (i_check(itr->GetSource()))
                     i_objects.push_back(itr->GetSource()->GetGUID());
     }
     void Visit(CreatureMapType &m)
     {
         for (CreatureMapType::iterator itr = m.begin(); itr != m.end(); ++itr)
-            if (itr->GetSource()->InSamePhase(i_phaseMask))
+            if (itr->GetSource()->IsInPhase(_searcher))
                 if (i_check(itr->GetSource()))
                     i_objects.push_back(itr->GetSource()->GetGUID());
     }

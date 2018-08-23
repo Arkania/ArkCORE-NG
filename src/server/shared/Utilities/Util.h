@@ -22,6 +22,7 @@
 
 #include "Define.h"
 #include "Errors.h"
+#include "Random.h"
 
 #include <algorithm>
 #include <string>
@@ -74,46 +75,6 @@ int64 MoneyStringToMoney(const std::string& moneyString);
 std::string secsToTimeString(uint64 timeInSecs, bool shortText = false, bool hoursOnly = false);
 uint32 TimeStringToSecs(const std::string& timestring);
 std::string TimeToTimestampStr(time_t t);
-
-/* Return a random number in the range min..max; (max-min) must be smaller than 32768. */
-int32 irand(int32 min, int32 max);
-
-/* Return a random number in the range min..max (inclusive). For reliable results, the difference
-* between max and min should be less than RAND32_MAX. */
-uint32 urand(uint32 min, uint32 max);
-
-/* Return a random number in the range 0 .. RAND32_MAX. */
-int32 rand32();
-
-/* Return a random number in the range min..max */
-float frand(float min, float max);
-
-/* Return a random double from 0.0 to 1.0 (exclusive). Floats support only 7 valid decimal digits.
- * A double supports up to 15 valid decimal digits and is used internally (RAND32_MAX has 10 digits).
- * With an FPU, there is usually no difference in performance between float and double.
-*/
-double rand_norm(void);
-
-/* Return a random double from 0.0 to 99.9999999999999. Floats support only 7 valid decimal digits.
- * A double supports up to 15 valid decimal digits and is used internally (RAND32_MAX has 10 digits).
- * With an FPU, there is usually no difference in performance between float and double.
-*/
-double rand_chance(void);
-
-/* return true if the computet chance fits percent chance*/
-bool rand_chance(uint8 percent);
-
-/* Return true if a random roll fits in the specified chance (range 0-100). */
-inline bool roll_chance_f(float chance)
-{
-    return chance > rand_chance();
-}
-
-/* Return true if a random roll fits in the specified chance (range 0-100). */
-inline bool roll_chance_i(int chance)
-{
-    return chance > irand(0, 99);
-}
 
 inline void ApplyPercentModFloatVar(float& var, float val, bool apply)
 {
@@ -348,6 +309,8 @@ bool Utf8FitTo(const std::string& str, std::wstring search);
 void utf8printf(FILE* out, const char *str, ...);
 void vutf8printf(FILE* out, const char *str, va_list* ap);
 
+uint8_t* GetBytes(std::string txt);
+
 bool IsIPAddress(char const* ipaddress);
 
 /// Checks if address belongs to the a network with specified submask
@@ -359,6 +322,16 @@ std::string GetAddressString(ACE_INET_Addr const& addr);
 uint32 CreatePIDFile(const std::string& filename);
 
 std::string ByteArrayToHexStr(uint8 const* bytes, uint32 length, bool reverse = false);
+
+std::set<uint32> GetUIntegerList(std::string storedString);
+std::string GetUIntegerString(std::set<uint32> uint32List);
+
+std::set<uint16> GetUInt16List(std::string storedString);
+std::string GetUInt16String(std::set<uint16> uint16List);
+std::set<uint16> CopyUInt16List(std::set<uint16> original);
+
+char* GetCopyOfChars(const char * tmp);
+
 #endif
 
 //handler for operations on large flags

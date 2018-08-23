@@ -546,7 +546,7 @@ class boss_flame_leviathan : public CreatureScript
                         if (me->IsWithinCombatRange(target, 30.0f))
                         {
                             DoCast(target, SPELL_BATTERING_RAM);
-                            me->resetAttackTimer();
+                            me->ResetAttackTimer();
                         }
                     }
                 }
@@ -1655,7 +1655,7 @@ class spell_pursue : public SpellScriptLoader
 
             bool Load() override
             {
-                _target = NULL;
+                _target = nullptr;
                 return true;
             }
 
@@ -1739,7 +1739,7 @@ class spell_vehicle_throw_passenger : public SpellScriptLoader
                             Trinity::WorldObjectListSearcher<Trinity::WorldObjectSpellAreaTargetCheck> searcher(GetCaster(), targetList, check);
                             GetCaster()->GetMap()->VisitAll(GetCaster()->m_positionX, GetCaster()->m_positionY, 99, searcher);
                             float minDist = 99 * 99;
-                            Unit* target = NULL;
+                            Unit* target = nullptr;
                             for (std::list<WorldObject*>::iterator itr = targetList.begin(); itr != targetList.end(); ++itr)
                             {
                                 if (Unit* unit = (*itr)->ToUnit())

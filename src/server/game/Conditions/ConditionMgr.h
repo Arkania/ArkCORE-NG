@@ -73,7 +73,8 @@ enum ConditionTypes
     CONDITION_ALIVE                 = 36,                   // 0                0              0                  true if unit is alive
     CONDITION_HP_VAL                = 37,                   // hpVal            ComparisonType 0                  true if unit's hp matches given value
     CONDITION_HP_PCT                = 38,                   // hpPct            ComparisonType 0                  true if unit's hp matches given pct
-    CONDITION_MAX                   = 39                    // MAX
+    CONDITION_TERRAIN_SWAP          = 39,                   // terrainSwap      0              0                  true if object is in terrainswap
+    CONDITION_MAX                   = 40                    // MAX
 };
 
 /*! Documentation on implementing a new ConditionSourceType:
@@ -131,7 +132,8 @@ enum ConditionSourceType
     CONDITION_SOURCE_TYPE_NPC_VENDOR                     = 23,
     CONDITION_SOURCE_TYPE_SPELL_PROC                     = 24,
     CONDITION_SOURCE_TYPE_PHASE_DEFINITION               = 25, // only 4.3.4
-    CONDITION_SOURCE_TYPE_MAX                            = 26  // MAX
+    CONDITION_SOURCE_TYPE_TERRAIN_SWAP                   = 26, // only 4.3.4  
+    CONDITION_SOURCE_TYPE_MAX                            = 27  // MAX
 };
 
 enum RelationType
@@ -166,7 +168,7 @@ struct ConditionSourceInfo
         mConditionTargets[0] = target0;
         mConditionTargets[1] = target1;
         mConditionTargets[2] = target2;
-        mLastFailedCondition = NULL;
+        mLastFailedCondition = nullptr;
     }
 };
 
@@ -240,6 +242,8 @@ class ConditionMgr
         bool IsObjectMeetToConditions(WorldObject* object, ConditionList const& conditions);
         bool IsObjectMeetToConditions(WorldObject* object1, WorldObject* object2, ConditionList const& conditions);
         bool IsObjectMeetToConditions(ConditionSourceInfo& sourceInfo, ConditionList const& conditions);
+        bool IsObjectMeetingNotGroupedConditions(ConditionSourceType sourceType, uint16 entry, ConditionSourceInfo& sourceInfo);
+        bool IsObjectMeetingNotGroupedConditions(ConditionSourceType sourceType, uint16 entry, WorldObject* target0, WorldObject* target1 /*= nullptr*/, WorldObject* target2 /*= nullptr*/); 
         bool CanHaveSourceGroupSet(ConditionSourceType sourceType) const;
         bool CanHaveSourceIdSet(ConditionSourceType sourceType) const;
         ConditionList GetConditionsForNotGroupedEntry(ConditionSourceType sourceType, uint32 entry);

@@ -478,6 +478,7 @@ class spell_general_vezax_mark_of_the_faceless : public SpellScriptLoader
         }
 };
 
+// 63278
 class spell_general_vezax_mark_of_the_faceless_leech : public SpellScriptLoader
 {
     public:

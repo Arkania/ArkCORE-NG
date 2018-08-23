@@ -35,6 +35,8 @@
 #include "ScriptMgr.h"
 #include "SocialMgr.h"
 
+#include "SpellInfo.h"
+
 #define MAX_GUILD_BANK_TAB_TEXT_LEN 500
 #define EMBLEM_PRICE 10 * GOLD
 
@@ -544,7 +546,7 @@ void Guild::BankTab::Delete(SQLTransaction& trans, bool removeItemsFromDB)
             if (removeItemsFromDB)
                 pItem->DeleteFromDB(trans);
             delete pItem;
-            pItem = NULL;
+            pItem = nullptr;
         }
 }
 
@@ -965,13 +967,13 @@ bool Guild::PlayerMoveItemData::InitItem()
         if (m_pItem->IsNotEmptyBag())
         {
             m_pPlayer->SendEquipError(EQUIP_ERR_DESTROY_NONEMPTY_BAG, m_pItem);
-            m_pItem = NULL;
+            m_pItem = nullptr;
         }
         // Bound items cannot be put into bank.
         else if (!m_pItem->CanBeTraded())
         {
             m_pPlayer->SendEquipError(EQUIP_ERR_CANT_SWAP, m_pItem);
-            m_pItem = NULL;
+            m_pItem = nullptr;
         }
     }
     return (m_pItem != NULL);
@@ -989,7 +991,7 @@ void Guild::PlayerMoveItemData::RemoveItem(SQLTransaction& trans, MoveItemData* 
     {
         m_pPlayer->MoveItemFromInventory(m_container, m_slotId, true);
         m_pItem->DeleteFromInventoryDB(trans);
-        m_pItem = NULL;
+        m_pItem = nullptr;
     }
 }
 
@@ -1056,7 +1058,7 @@ void Guild::BankMoveItemData::RemoveItem(SQLTransaction& trans, MoveItemData* pO
     else
     {
         m_pGuild->_RemoveItem(trans, m_container, m_slotId);
-        m_pItem = NULL;
+        m_pItem = nullptr;
     }
     // Decrease amount of player's remaining items (if item is moved to different tab or to player)
     if (!pOther->IsBank() || pOther->GetContainer() != m_container)
@@ -1178,7 +1180,7 @@ void Guild::BankMoveItemData::CanStoreItemInTab(Item* pItem, uint8 skipSlotId, b
 
         Item* pItemDest = m_pGuild->_GetItem(m_container, slotId);
         if (pItemDest == pItem)
-            pItemDest = NULL;
+            pItemDest = nullptr;
 
         // If merge skip empty, if not merge skip non-empty
         if ((pItemDest != NULL) != merge)
@@ -1208,7 +1210,7 @@ InventoryResult Guild::BankMoveItemData::CanStore(Item* pItem, bool swap)
         Item* pItemDest = m_pGuild->_GetItem(m_container, m_slotId);
         // Ignore swapped item (this slot will be empty after move)
         if ((pItemDest == pItem) || swap)
-            pItemDest = NULL;
+            pItemDest = nullptr;
 
         if (!_ReserveSpace(m_slotId, pItem, pItemDest, count))
             return EQUIP_ERR_CANT_STACK;
@@ -1577,29 +1579,29 @@ Guild::~Guild()
     // Cleanup
     if (m_eventLog)
         delete m_eventLog;
-    m_eventLog = NULL;
+    m_eventLog = nullptr;
 
     if (m_newsLog)
         delete m_newsLog;
-    m_newsLog = NULL;
+    m_newsLog = nullptr;
 
     if(m_challengesMgr)
     {
         delete m_challengesMgr;
-        m_challengesMgr = NULL;
+        m_challengesMgr = nullptr;
     }
 
     for (uint8 tabId = 0; tabId <= GUILD_BANK_MAX_TABS; ++tabId)
     {
         if (m_bankEventLog[tabId])
             delete m_bankEventLog[tabId];
-        m_bankEventLog[tabId] = NULL;
+        m_bankEventLog[tabId] = nullptr;
     }
 
     for (Members::iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
     {
         delete itr->second;
-        itr->second = NULL;
+        itr->second = nullptr;
     }
 }
 
@@ -3539,8 +3541,8 @@ void Guild::DeleteMember(uint64 guid, bool isDisbanding, bool isKicked)
     // or when he is removed from guild by gm command
     if (m_leaderGuid == guid && !isDisbanding)
     {
-        Member* oldLeader = NULL;
-        Member* newLeader = NULL;
+        Member* oldLeader = nullptr;
+        Member* newLeader = nullptr;
         for (Guild::Members::iterator i = m_members.begin(); i != m_members.end(); ++i)
         {
             if (i->first == lowguid)
@@ -3801,7 +3803,7 @@ void Guild::_DeleteBankItems(SQLTransaction& trans, bool removeItemsFromDB)
     {
         m_bankTabs[tabId]->Delete(trans, removeItemsFromDB);
         delete m_bankTabs[tabId];
-        m_bankTabs[tabId] = NULL;
+        m_bankTabs[tabId] = nullptr;
     }
     m_bankTabs.clear();
 }
@@ -4453,7 +4455,7 @@ void Guild::GiveXP(uint32 xp, Player* source, bool challenge)
     else if (GetLevel() < GUILD_EXPERIENCE_UNCAPPED_LEVEL && uint32(_todayExperience) > sWorld->getIntConfig(CONFIG_GUILD_DAILY_XP_CAP))
     {
         uint64 newXp = sWorld->getIntConfig(CONFIG_GUILD_DAILY_XP_CAP) - uint64(_todayExperience);
-        TC_LOG_INFO("misc", "Guild (guid:%u) gets %u experience but todayExperience is %u. Experence was set to %u", GetGUID(), xp, _todayExperience, newXp);
+        TC_LOG_INFO("misc", "Guild (guid:%llu) gets %u experience but todayExperience is %llu. Experence was set to %llu", GetGUID(), xp, _todayExperience, newXp);
         xp = 0; //Set XP to 0 for while debugging...
     }
 
@@ -4531,7 +4533,7 @@ void Guild::GiveXP(uint32 xp, Player* source, bool challenge)
 
 void Guild::SendGuildXP(WorldSession* session /* = NULL */) const
 {
-    Member const* member = NULL;
+    Member const* member = nullptr;
 
     if (session)
         member = GetMember(session->GetGuidLow());
@@ -4545,7 +4547,7 @@ void Guild::SendGuildXP(WorldSession* session /* = NULL */) const
     BroadcastPacket(&data);
 }
 
-void Guild::ResetDailyExperience()
+void Guild::ResetDailyGuildXP()
 {
     _todayExperience = 0;
     CharacterDatabase.Execute("UPDATE `guild` SET `todayExperience` = 0");
@@ -4564,16 +4566,19 @@ void Guild::ResetTimes(bool weekly)
         CharacterDatabase.Execute(stmt);
     }
 
+    // Reset daily/weekly member based guild/bank values
     for (Members::const_iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
     {
         itr->second->ResetValues(weekly);
-        if (Player* player = itr->second->FindPlayer())
+        if (Player* player = itr->second->FindPlayer()) // player online since last restart?
         {
-            ResetDailyExperience(); // Reset the XP here too.
             WorldPacket data(SMSG_GUILD_MEMBER_DAILY_RESET, 0); // tells the client to request bank withdrawal limit
             player->GetSession()->SendPacket(&data);
         }
     }
+    // Reset daily guild.todayExperience
+    if (GetTodayExperience() > 0)
+        ResetDailyGuildXP();
 }
 
 void Guild::AddGuildNews(uint8 type, uint64 guid, uint32 flags, uint32 value)

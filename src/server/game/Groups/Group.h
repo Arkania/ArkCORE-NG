@@ -207,6 +207,18 @@ class Group
         void   Disband(bool hideDestroy=false);
         void   SetLfgRoles(uint64 guid, const uint8 roles);
 
+        void   SetGroupMarkerMask(uint32 mask) { m_markerMask = mask; }
+        void   AddGroupMarkerMask(uint32 mask) { m_markerMask |= mask; }
+        void   RemoveGroupMarkerMask(uint32 mask) { if (mask == 0x20) m_markerMask = 0x20; m_markerMask &= ~mask; }
+        bool   HasMarker(uint32 mask) { return m_markerMask & mask; }
+        uint32 GetMarkerMask() { return m_markerMask; }
+
+        DynamicObject* GetMarkerGuidBySpell(uint32 spell);
+        void   AddMarkerToList(uint64 guid) { m_dynObj.push_back(guid); }
+        void   RemoveMarkerFromList(uint64 guid) { m_dynObj.remove(guid); }
+        void   RemoveAllMarkerFromList() { m_dynObj.clear(); }
+        void   RemoveMarker();		
+		
         // properties accessories
         bool IsFull() const;
         bool isLFGGroup()  const;
@@ -275,6 +287,8 @@ class Group
         // -no description-
         //void SendInit(WorldSession* session);
         void SendTargetIconList(WorldSession* session);
+		void SendRaidMarkerUpdate();
+		void SendRaidMarkerUpdateToPlayer(uint64 playerGUID, bool remove = false);
         void SendUpdate();
         void SendUpdateToPlayer(uint64 playerGUID, MemberSlot* slot = NULL);
         void UpdatePlayerOutOfRange(Player* player);
@@ -349,6 +363,7 @@ class Group
         uint64              m_leaderGuid;
         std::string         m_leaderName;
         GroupType           m_groupType;
+		uint32              m_markerMask;
         Difficulty          m_dungeonDifficulty;
         Difficulty          m_raidDifficulty;
         Battleground*       m_bgGroup;
@@ -365,5 +380,8 @@ class Group
         uint32              m_counter;                      // used only in SMSG_GROUP_LIST
         uint32              m_maxEnchantingLevel;
         uint32              m_dbStoreId;                    // Represents the ID used in database (Can be reused by other groups if group was disbanded)
+		
+        typedef std::list<uint64> DynObjectList;
+        DynObjectList m_dynObj;
 };
 #endif

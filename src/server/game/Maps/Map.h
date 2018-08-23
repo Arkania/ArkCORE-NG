@@ -289,6 +289,11 @@ class Map : public GridRefManager<NGridType>
         void VisitNearbyCellsOf(WorldObject* obj, TypeContainerVisitor<Trinity::ObjectUpdater, GridTypeMapContainer> &gridVisitor, TypeContainerVisitor<Trinity::ObjectUpdater, WorldTypeMapContainer> &worldVisitor);
         virtual void Update(const uint32);
 
+        void SendSingleTransportUpdate();
+        void SendSingleTransportUpdate(Player * player);
+
+        void DeleteRemovedTransports();
+
         float GetVisibilityRange() const { return m_VisibleDistance; }
         //function for setting up visibility distance for maps on per-type/per-Id basis
         virtual void InitVisibilityDistance();
@@ -512,6 +517,7 @@ class Map : public GridRefManager<NGridType>
 
         void SendInitTransports(Player* player);
         void SendRemoveTransports(Player* player);
+        void SendUpdateTransportVisibility(Player * player, std::set<uint16> const & previousPhaseIds);
         void SendZoneDynamicInfo(Player* player);
 
         void SetZoneMusic(uint32 zoneId, uint32 musicId);
@@ -599,7 +605,8 @@ class Map : public GridRefManager<NGridType>
         // Objects that must update even in inactive grids without activating them
         typedef std::set<Transport*> TransportsContainer;
         TransportsContainer _transports;
-        TransportsContainer::iterator _transportsUpdateIter;
+        std::vector<Transport*> _transportRemove;
+        bool _transportLock;
 
     private:
         Player* _GetScriptPlayerSourceOrTarget(Object* source, Object* target, const ScriptInfo* scriptInfo) const;

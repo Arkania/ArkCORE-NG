@@ -103,7 +103,7 @@ bool DynamicObject::CreateDynamicObject(uint32 guidlow, Unit* caster, SpellInfo 
         return false;
     }
 
-    WorldObject::_Create(guidlow, HIGHGUID_DYNAMICOBJECT, caster->GetPhaseMask());
+    WorldObject::_Create(guidlow, HIGHGUID_DYNAMICOBJECT, caster);
 
     SetEntry(spell->Id);
     SetObjectScale(1);
@@ -119,14 +119,11 @@ bool DynamicObject::CreateDynamicObject(uint32 guidlow, Unit* caster, SpellInfo 
     Transport* transport = caster->GetTransport();
     if (transport)
     {
-        m_movementInfo.transport.guid = GetGUID();
-
         float x, y, z, o;
         pos.GetPosition(x, y, z, o);
         transport->CalculatePassengerOffset(x, y, z, &o);
         m_movementInfo.transport.pos.Relocate(x, y, z, o);
 
-        SetTransport(transport);
         // This object must be added to transport before adding to map for the client to properly display it
         transport->AddPassenger(this);
     }
@@ -219,7 +216,7 @@ void DynamicObject::RemoveAura()
 {
     ASSERT(_aura && !_removedAura);
     _removedAura = _aura;
-    _aura = NULL;
+    _aura = nullptr;
     if (!_removedAura->IsRemoved())
         _removedAura->_Remove(AURA_REMOVE_BY_DEFAULT);
 }
@@ -255,5 +252,5 @@ void DynamicObject::UnbindFromCaster()
 {
     ASSERT(_caster);
     _caster->_UnregisterDynObject(this);
-    _caster = NULL;
+    _caster = nullptr;
 }

@@ -20,7 +20,7 @@
 
 Field::Field()
 {
-    data.value = NULL;
+    data.value = nullptr;
     data.type = MYSQL_TYPE_NULL;
     data.length = 0;
     data.raw = false;

@@ -282,7 +282,7 @@ class spell_shadow_portal_rooms : public SpellScriptLoader
             {
                 // If only one player in threat list fail spell
 
-                Creature* Summoned = NULL;
+                Creature* Summoned = nullptr;
                 Creature* caster = GetCaster()->ToCreature();
 
                 int8 pos_to_summon = 0;

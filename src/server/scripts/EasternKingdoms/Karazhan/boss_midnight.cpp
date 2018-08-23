@@ -284,7 +284,7 @@ void boss_attumen::boss_attumenAI::UpdateAI(uint32 diff)
     {
         if (ChargeTimer <= diff)
         {
-            Unit* target = NULL;
+            Unit* target = nullptr;
             ThreatContainer::StorageType const &t_list = me->getThreatManager().getThreatList();
             std::vector<Unit*> target_list;
             for (ThreatContainer::StorageType::const_iterator itr = t_list.begin(); itr != t_list.end(); ++itr)
@@ -292,7 +292,7 @@ void boss_attumen::boss_attumenAI::UpdateAI(uint32 diff)
                 target = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid());
                 if (target && !target->IsWithinDist(me, ATTACK_DISTANCE, false))
                     target_list.push_back(target);
-                target = NULL;
+                target = nullptr;
             }
             if (!target_list.empty())
                 target = *(target_list.begin()+rand()%target_list.size());

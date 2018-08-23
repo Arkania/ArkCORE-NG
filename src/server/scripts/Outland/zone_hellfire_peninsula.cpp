@@ -31,6 +31,8 @@ npc_wounded_blood_elf
 npc_fel_guard_hound
 EndContentData */
 
+#include "GameObjectAI.h"
+#include "GameObject.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
@@ -158,7 +160,7 @@ public:
 
         void Reset() override
         {
-            ryga = NULL;
+            ryga = nullptr;
             DoCast(me, SPELL_ANCESTRAL_WOLF_BUFF, true);
         }
 
@@ -239,13 +241,14 @@ public:
             summoned->AI()->AttackStart(me);
         }
 
-        void sQuestAccept(Player* player, Quest const* quest)
+        bool sQuestAccept(Player* player, Quest const* quest)
         {
             if (quest->GetQuestId() == QUEST_ROAD_TO_FALCON_WATCH)
             {
                 me->setFaction(FACTION_FALCON_WATCH_QUEST);
                 npc_escortAI::Start(true, false, player->GetGUID());
             }
+            return false;
         }
 
         void WaypointReached(uint32 waypointId) override
@@ -362,10 +365,261 @@ public:
     }
 };
 
+// 18930 horde
+class npc_vlagga_freyfeather_18930 : public CreatureScript
+{
+public:
+    npc_vlagga_freyfeather_18930() : CreatureScript("npc_vlagga_freyfeather_18930") { }
+
+    enum eNPC
+    {
+        QUEST_JOURNEY_TO_THRALLMAR = 10289,
+        TAXINODE_VALIANCE = 565,
+        NPC_ENRAGED_GRYPHON = 9297,
+        GOSSIP_MENU = 7938,
+        NPC_TEXT = 10053,
+        GMO_NORMAL = 0,
+        GMO_QUEST = 1,
+        SPELL_TAXI_FLIGHT = 34924,
+    };
+
+    bool OnGossipHello(Player* player, Creature* creature) 
+    { 
+        player->PrepareQuestMenu(creature->GetGUID());
+        if (player->getLevel() >= 58)
+        {
+            player->ADD_GOSSIP_ITEM_DB(GOSSIP_MENU, GMO_NORMAL, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TAXI);
+
+            if (player->GetQuestStatus(QUEST_JOURNEY_TO_THRALLMAR) == QUEST_STATUS_INCOMPLETE || player->GetQuestStatus(QUEST_JOURNEY_TO_THRALLMAR) == QUEST_STATUS_COMPLETE)
+                player->ADD_GOSSIP_ITEM_DB(GOSSIP_MENU, GMO_QUEST, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 10);
+            
+            player->SEND_GOSSIP_MENU(NPC_TEXT, creature->GetGUID());            
+        }
+        return true;
+    }
+
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action) 
+    { 
+        player->PlayerTalkClass->ClearMenus();
+        switch (action)
+        {
+        case GOSSIP_ACTION_TAXI:
+            player->GetSession()->SendTaxiMenu(creature);
+            break;
+        case GOSSIP_ACTION_INFO_DEF + 10:
+            player->CLOSE_GOSSIP_MENU();
+            player->CastSpell(player, SPELL_TAXI_FLIGHT);
+           break;
+        }
+        return true; 
+    }
+
+    struct npc_vlagga_freyfeather_18930AI : public ScriptedAI
+    {
+        npc_vlagga_freyfeather_18930AI(Creature* creature) : ScriptedAI(creature) { }
+
+        void EnterCombat(Unit* victim) override
+        {
+            Talk(0);
+            Position pos = victim->GetNearPosition(frand(4.0f, 5.0f), frand(0.0f, 6.28f));
+            me->SummonCreature(NPC_ENRAGED_GRYPHON, pos, TEMPSUMMON_TIMED_DESPAWN, 60000);
+        }
+
+        void DamageTaken(Unit* attacker, uint32& damage) override
+        {
+            Position pos = attacker->GetNearPosition(frand(4.0f, 5.0f), frand(0.0f, 6.28f));
+            me->SummonCreature(NPC_ENRAGED_GRYPHON, pos, TEMPSUMMON_TIMED_DESPAWN, 60000);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_vlagga_freyfeather_18930AI(creature);
+    }
+};
+
+// 18931 alliance
+class npc_amish_wildhammer_18931 : public CreatureScript
+{
+public:
+    npc_amish_wildhammer_18931() : CreatureScript("npc_amish_wildhammer_18931") { }
+
+    enum eNPC
+    {
+        QUEST_JOURNEY_TO_HONOR_HOLD = 10140,
+        TAXINODE_DARK_PORTAL = 613,
+        NPC_ENRAGED_GRYPHON = 9526,
+        GOSSIP_MENU = 7939,
+        NPC_TEXT_1 = 9991, 
+        NPC_TEXT_2 = 10052, 
+        GMO_NORMAL = 0,
+        GMO_QUEST = 1,
+        SPELL_TAXI_FLIGHT = 34907,
+    };
+
+    bool OnGossipHello(Player* player, Creature* creature)
+    {
+        player->PrepareQuestMenu(creature->GetGUID());
+        if (player->getLevel() >= 58)
+        {
+            player->ADD_GOSSIP_ITEM_DB(GOSSIP_MENU, GMO_NORMAL, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TAXI);
+
+            if (player->GetQuestStatus(QUEST_JOURNEY_TO_HONOR_HOLD) == QUEST_STATUS_INCOMPLETE || player->GetQuestStatus(QUEST_JOURNEY_TO_HONOR_HOLD) == QUEST_STATUS_COMPLETE)
+            {
+                player->ADD_GOSSIP_ITEM_DB(GOSSIP_MENU, GMO_QUEST, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 10);
+                player->SEND_GOSSIP_MENU(NPC_TEXT_1, creature->GetGUID());
+                return true;
+            }
+
+            player->SEND_GOSSIP_MENU(NPC_TEXT_2, creature->GetGUID());
+        }
+        return true;
+    }
+
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action)
+    {
+        player->PlayerTalkClass->ClearMenus();
+        switch (action)
+        {
+        case GOSSIP_ACTION_TAXI:
+            player->GetSession()->SendTaxiMenu(creature);
+            break;
+        case GOSSIP_ACTION_INFO_DEF + 10:
+            player->CLOSE_GOSSIP_MENU();
+            player->CastSpell(player, SPELL_TAXI_FLIGHT);
+            break;
+        }
+        return true;
+    }
+
+    struct npc_amish_wildhammer_18931AI : public ScriptedAI
+    {
+        npc_amish_wildhammer_18931AI(Creature* creature) : ScriptedAI(creature) { }
+
+        void EnterCombat(Unit* victim) override
+        {
+            Talk(1);
+            Position pos = victim->GetNearPosition(frand(4.0f, 5.0f), frand(0.0f, 6.28f));
+            me->SummonCreature(NPC_ENRAGED_GRYPHON, pos, TEMPSUMMON_TIMED_DESPAWN, 60000);
+        }
+
+        void DamageTaken(Unit* attacker, uint32& damage) override
+        {
+            Position pos = attacker->GetNearPosition(frand(4.0f, 5.0f), frand(0.0f, 6.28f));
+            me->SummonCreature(NPC_ENRAGED_GRYPHON, pos, TEMPSUMMON_TIMED_DESPAWN, 60000);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_amish_wildhammer_18931AI(creature);
+    }
+};
+
+// 16896 
+class npc_honor_hold_archer_16896 : public CreatureScript
+{
+public:
+    npc_honor_hold_archer_16896() : CreatureScript("npc_honor_hold_archer_16896") { }
+
+    enum eNPC
+    {
+        NPC_ARCHER = 16896,
+        NPC_TARGET_MIDDLE = 16897,
+        NPC_TARGET_RIGHT = 16898,
+        NPC_TARGET_LEFT = 16899,
+        SPELL_SHOOT_MIDDLE = 29121, // shoot is invisible
+        SPELL_SHOOT_RIGHT = 29122,
+        SPELL_SHOOT_LEFT = 29120,
+        EVENT_START_SHOOT = 100,
+        EVENT_SHOOT = 101,
+    };
+
+    struct npc_honor_hold_archer_16896AI : public ScriptedAI
+    {
+        npc_honor_hold_archer_16896AI(Creature* creature) : ScriptedAI(creature) { Initialize(); }
+
+        EventMap m_events;
+        uint64   m_targetGUID;
+        uint32   m_shoot;
+
+        void Initialize()
+        {
+            m_events.ScheduleEvent(EVENT_START_SHOOT, 5000);
+            m_targetGUID = 0;
+            m_shoot = 0;
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_START_SHOOT:
+                {
+                    float dist = 20.0f;
+                    Creature* target;
+                    if (Creature* npc = me->FindNearestCreature(NPC_TARGET_MIDDLE, dist))
+                        if (npc->GetDistance2d(me) < dist)
+                        {
+                            dist = npc->GetDistance2d(me);
+                            target = npc;
+                            m_shoot = RAND(SPELL_SHOOT_LEFT, SPELL_SHOOT_RIGHT);
+                        }
+                    if (Creature* npc = me->FindNearestCreature(NPC_TARGET_RIGHT, dist))
+                        if (npc->GetDistance2d(me) < dist)
+                        {
+                            dist = npc->GetDistance2d(me);
+                            target = npc;
+                            m_shoot = SPELL_SHOOT_RIGHT;
+                        }
+                    if (Creature* npc = me->FindNearestCreature(NPC_TARGET_LEFT, dist))
+                        if (npc->GetDistance2d(me) < dist)
+                        {
+                            dist = npc->GetDistance2d(me);
+                            target = npc;
+                            m_shoot = SPELL_SHOOT_LEFT;
+                        }
+                    if (dist < 19.0f && target)
+                    {
+                        m_targetGUID = target->GetGUID();
+                        m_events.ScheduleEvent(EVENT_SHOOT, 5000);
+                    }
+                    break;
+                }
+                case EVENT_SHOOT:
+                {
+                    if (Creature* npc = sObjectAccessor->GetCreature(*me, m_targetGUID))
+                        me->CastSpell(npc, m_shoot, true);
+                    m_events.ScheduleEvent(EVENT_SHOOT, urand(5000, 10000));
+                    break;
+                }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_honor_hold_archer_16896AI(creature);
+    }
+};
+
 void AddSC_hellfire_peninsula()
 {
     new npc_aeranas();
     new npc_ancestral_wolf();
     new npc_wounded_blood_elf();
     new npc_fel_guard_hound();
+    new npc_vlagga_freyfeather_18930();
+    new npc_amish_wildhammer_18931();
+    new npc_honor_hold_archer_16896();
 }

@@ -1,21 +1,24 @@
 /*
-SQLyog Ultimate v11.28 (64 bit)
-MySQL - 5.5.27 : Database - ng_auth
-*********************************************************************
-*/
+Navicat MySQL Data Transfer
 
-/*!40101 SET NAMES utf8 */;
+Source Server         : Arkania-NG
+Source Server Version : 50505
+Source Host           : localhost:3306
+Source Database       : ng_auth
 
-/*!40101 SET SQL_MODE=''*/;
+Target Server Type    : MYSQL
+Target Server Version : 50505
+File Encoding         : 65001
 
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-/*Table structure for table `account` */
+Date: 2017-03-20 21:41:04
+*/
 
+SET FOREIGN_KEY_CHECKS=0;
+
+-- ----------------------------
+-- Table structure for account
+-- ----------------------------
 DROP TABLE IF EXISTS `account`;
-
 CREATE TABLE `account` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Identifier',
   `username` varchar(32) NOT NULL DEFAULT '',
@@ -31,7 +34,7 @@ CREATE TABLE `account` (
   `failed_logins` int(10) unsigned NOT NULL DEFAULT '0',
   `locked` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `lock_country` varchar(2) NOT NULL DEFAULT '00',
-  `last_login` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `last_login` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `online` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `expansion` tinyint(3) unsigned NOT NULL DEFAULT '3',
   `mutetime` bigint(20) NOT NULL DEFAULT '0',
@@ -43,15 +46,18 @@ CREATE TABLE `account` (
   `on_trial` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `trial_end` int(10) unsigned NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `idx_username` (`username`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Account System';
+  UNIQUE KEY `idx_username` (`username`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='Account System';
 
-/*Data for the table `account` */
+-- ----------------------------
+-- Records of account
+-- ----------------------------
+INSERT INTO `account` VALUES ('1', 'ADMIN', 'unknown', '', '', '', '', '', '', '2014-06-30 04:04:59', '192.168.178.79', '0', '0', '00', '2016-08-09 10:18:56', '0', '3', '0', '', '', '3', 'Win', '0', '0', '1');
 
-/*Table structure for table `account_access` */
-
+-- ----------------------------
+-- Table structure for account_access
+-- ----------------------------
 DROP TABLE IF EXISTS `account_access`;
-
 CREATE TABLE `account_access` (
   `id` int(10) unsigned NOT NULL,
   `gmlevel` tinyint(3) unsigned NOT NULL,
@@ -59,12 +65,14 @@ CREATE TABLE `account_access` (
   PRIMARY KEY (`id`,`RealmID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-/*Data for the table `account_access` */
+-- ----------------------------
+-- Records of account_access
+-- ----------------------------
 
-/*Table structure for table `account_banned` */
-
+-- ----------------------------
+-- Table structure for account_banned
+-- ----------------------------
 DROP TABLE IF EXISTS `account_banned`;
-
 CREATE TABLE `account_banned` (
   `id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Account id',
   `bandate` int(10) unsigned NOT NULL DEFAULT '0',
@@ -75,12 +83,14 @@ CREATE TABLE `account_banned` (
   PRIMARY KEY (`id`,`bandate`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Ban List';
 
-/*Data for the table `account_banned` */
+-- ----------------------------
+-- Records of account_banned
+-- ----------------------------
 
-/*Table structure for table `autobroadcast` */
-
+-- ----------------------------
+-- Table structure for autobroadcast
+-- ----------------------------
 DROP TABLE IF EXISTS `autobroadcast`;
-
 CREATE TABLE `autobroadcast` (
   `realmid` int(11) NOT NULL DEFAULT '-1',
   `id` tinyint(3) unsigned NOT NULL AUTO_INCREMENT,
@@ -89,24 +99,28 @@ CREATE TABLE `autobroadcast` (
   PRIMARY KEY (`id`,`realmid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-/*Data for the table `autobroadcast` */
+-- ----------------------------
+-- Records of autobroadcast
+-- ----------------------------
 
-/*Table structure for table `ip2nation` */
-
+-- ----------------------------
+-- Table structure for ip2nation
+-- ----------------------------
 DROP TABLE IF EXISTS `ip2nation`;
-
 CREATE TABLE `ip2nation` (
   `ip` int(11) unsigned NOT NULL DEFAULT '0',
   `country` char(2) NOT NULL DEFAULT '',
-  KEY `ip` (`ip`)
+  KEY `ip` (`ip`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-/*Data for the table `ip2nation` */
+-- ----------------------------
+-- Records of ip2nation
+-- ----------------------------
 
-/*Table structure for table `ip2nationcountries` */
-
+-- ----------------------------
+-- Table structure for ip2nationcountries
+-- ----------------------------
 DROP TABLE IF EXISTS `ip2nationcountries`;
-
 CREATE TABLE `ip2nationcountries` (
   `code` varchar(4) NOT NULL DEFAULT '',
   `iso_code_2` varchar(2) NOT NULL DEFAULT '',
@@ -116,15 +130,17 @@ CREATE TABLE `ip2nationcountries` (
   `lat` float NOT NULL DEFAULT '0',
   `lon` float NOT NULL DEFAULT '0',
   PRIMARY KEY (`code`),
-  KEY `code` (`code`)
+  KEY `code` (`code`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-/*Data for the table `ip2nationcountries` */
+-- ----------------------------
+-- Records of ip2nationcountries
+-- ----------------------------
 
-/*Table structure for table `ip_banned` */
-
+-- ----------------------------
+-- Table structure for ip_banned
+-- ----------------------------
 DROP TABLE IF EXISTS `ip_banned`;
-
 CREATE TABLE `ip_banned` (
   `ip` varchar(15) NOT NULL DEFAULT '127.0.0.1',
   `bandate` int(10) unsigned NOT NULL,
@@ -134,12 +150,14 @@ CREATE TABLE `ip_banned` (
   PRIMARY KEY (`ip`,`bandate`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Banned IPs';
 
-/*Data for the table `ip_banned` */
+-- ----------------------------
+-- Records of ip_banned
+-- ----------------------------
 
-/*Table structure for table `logs` */
-
+-- ----------------------------
+-- Table structure for logs
+-- ----------------------------
 DROP TABLE IF EXISTS `logs`;
-
 CREATE TABLE `logs` (
   `time` int(10) unsigned NOT NULL,
   `realm` int(10) unsigned NOT NULL,
@@ -148,91 +166,1365 @@ CREATE TABLE `logs` (
   `string` text CHARACTER SET latin1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-/*Data for the table `logs` */
+-- ----------------------------
+-- Records of logs
+-- ----------------------------
 
-/*Table structure for table `rbac_account_permissions` */
-
+-- ----------------------------
+-- Table structure for rbac_account_permissions
+-- ----------------------------
 DROP TABLE IF EXISTS `rbac_account_permissions`;
-
 CREATE TABLE `rbac_account_permissions` (
   `accountId` int(10) unsigned NOT NULL COMMENT 'Account id',
   `permissionId` int(10) unsigned NOT NULL COMMENT 'Permission id',
   `granted` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'Granted = 1, Denied = 0',
   `realmId` int(11) NOT NULL DEFAULT '-1' COMMENT 'Realm Id, -1 means all',
   PRIMARY KEY (`accountId`,`permissionId`,`realmId`),
-  KEY `fk__rbac_account_roles__rbac_permissions` (`permissionId`),
-  CONSTRAINT `fk__rbac_account_permissions__account` FOREIGN KEY (`accountId`) REFERENCES `account` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `fk__rbac_account_roles__rbac_permissions` FOREIGN KEY (`permissionId`) REFERENCES `rbac_permissions` (`id`) ON DELETE CASCADE
+  KEY `fk__rbac_account_roles__rbac_permissions` (`permissionId`) USING BTREE,
+  CONSTRAINT `rbac_account_permissions_ibfk_1` FOREIGN KEY (`accountId`) REFERENCES `account` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `rbac_account_permissions_ibfk_2` FOREIGN KEY (`permissionId`) REFERENCES `rbac_permissions` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Account-Permission relation';
 
-/*Data for the table `rbac_account_permissions` */
+-- ----------------------------
+-- Records of rbac_account_permissions
+-- ----------------------------
 
-/*Table structure for table `rbac_default_permissions` */
-
+-- ----------------------------
+-- Table structure for rbac_default_permissions
+-- ----------------------------
 DROP TABLE IF EXISTS `rbac_default_permissions`;
-
 CREATE TABLE `rbac_default_permissions` (
   `secId` int(10) unsigned NOT NULL COMMENT 'Security Level id',
   `permissionId` int(10) unsigned NOT NULL COMMENT 'permission id',
   PRIMARY KEY (`secId`,`permissionId`),
-  KEY `fk__rbac_default_permissions__rbac_permissions` (`permissionId`),
-  CONSTRAINT `fk__rbac_default_permissions__rbac_permissions` FOREIGN KEY (`permissionId`) REFERENCES `rbac_permissions` (`id`)
+  KEY `fk__rbac_default_permissions__rbac_permissions` (`permissionId`) USING BTREE,
+  CONSTRAINT `rbac_default_permissions_ibfk_1` FOREIGN KEY (`permissionId`) REFERENCES `rbac_permissions` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Default permission to assign to different account security levels';
 
-/*Data for the table `rbac_default_permissions` */
+-- ----------------------------
+-- Records of rbac_default_permissions
+-- ----------------------------
+INSERT INTO `rbac_default_permissions` VALUES ('0', '195');
+INSERT INTO `rbac_default_permissions` VALUES ('1', '194');
+INSERT INTO `rbac_default_permissions` VALUES ('2', '193');
+INSERT INTO `rbac_default_permissions` VALUES ('3', '192');
 
-insert  into `rbac_default_permissions`(`secId`,`permissionId`) values (3,192),(2,193),(1,194),(0,195);
-
-/*Table structure for table `rbac_linked_permissions` */
-
+-- ----------------------------
+-- Table structure for rbac_linked_permissions
+-- ----------------------------
 DROP TABLE IF EXISTS `rbac_linked_permissions`;
-
 CREATE TABLE `rbac_linked_permissions` (
   `id` int(10) unsigned NOT NULL COMMENT 'Permission id',
   `linkedId` int(10) unsigned NOT NULL COMMENT 'Linked Permission id',
   PRIMARY KEY (`id`,`linkedId`),
-  KEY `fk__rbac_linked_permissions__rbac_permissions1` (`id`),
-  KEY `fk__rbac_linked_permissions__rbac_permissions2` (`linkedId`),
-  CONSTRAINT `fk__rbac_linked_permissions__rbac_permissions1` FOREIGN KEY (`id`) REFERENCES `rbac_permissions` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `fk__rbac_linked_permissions__rbac_permissions2` FOREIGN KEY (`linkedId`) REFERENCES `rbac_permissions` (`id`) ON DELETE CASCADE
+  KEY `fk__rbac_linked_permissions__rbac_permissions1` (`id`) USING BTREE,
+  KEY `fk__rbac_linked_permissions__rbac_permissions2` (`linkedId`) USING BTREE,
+  CONSTRAINT `rbac_linked_permissions_ibfk_1` FOREIGN KEY (`id`) REFERENCES `rbac_permissions` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `rbac_linked_permissions_ibfk_2` FOREIGN KEY (`linkedId`) REFERENCES `rbac_permissions` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Permission - Linked Permission relation';
 
-/*Data for the table `rbac_linked_permissions` */
+-- ----------------------------
+-- Records of rbac_linked_permissions
+-- ----------------------------
+INSERT INTO `rbac_linked_permissions` VALUES ('192', '21');
+INSERT INTO `rbac_linked_permissions` VALUES ('192', '42');
+INSERT INTO `rbac_linked_permissions` VALUES ('192', '43');
+INSERT INTO `rbac_linked_permissions` VALUES ('192', '193');
+INSERT INTO `rbac_linked_permissions` VALUES ('192', '196');
+INSERT INTO `rbac_linked_permissions` VALUES ('192', '778');
+INSERT INTO `rbac_linked_permissions` VALUES ('192', '779');
+INSERT INTO `rbac_linked_permissions` VALUES ('192', '780');
+INSERT INTO `rbac_linked_permissions` VALUES ('192', '781');
+INSERT INTO `rbac_linked_permissions` VALUES ('192', '782');
+INSERT INTO `rbac_linked_permissions` VALUES ('192', '783');
+INSERT INTO `rbac_linked_permissions` VALUES ('192', '784');
+INSERT INTO `rbac_linked_permissions` VALUES ('192', '785');
+INSERT INTO `rbac_linked_permissions` VALUES ('192', '786');
+INSERT INTO `rbac_linked_permissions` VALUES ('192', '787');
+INSERT INTO `rbac_linked_permissions` VALUES ('192', '788');
+INSERT INTO `rbac_linked_permissions` VALUES ('192', '789');
+INSERT INTO `rbac_linked_permissions` VALUES ('192', '790');
+INSERT INTO `rbac_linked_permissions` VALUES ('192', '791');
+INSERT INTO `rbac_linked_permissions` VALUES ('192', '792');
+INSERT INTO `rbac_linked_permissions` VALUES ('192', '793');
+INSERT INTO `rbac_linked_permissions` VALUES ('192', '794');
+INSERT INTO `rbac_linked_permissions` VALUES ('192', '795');
+INSERT INTO `rbac_linked_permissions` VALUES ('192', '796');
+INSERT INTO `rbac_linked_permissions` VALUES ('192', '797');
+INSERT INTO `rbac_linked_permissions` VALUES ('192', '798');
+INSERT INTO `rbac_linked_permissions` VALUES ('192', '799');
+INSERT INTO `rbac_linked_permissions` VALUES ('192', '800');
+INSERT INTO `rbac_linked_permissions` VALUES ('192', '801');
+INSERT INTO `rbac_linked_permissions` VALUES ('192', '802');
+INSERT INTO `rbac_linked_permissions` VALUES ('192', '803');
+INSERT INTO `rbac_linked_permissions` VALUES ('192', '804');
+INSERT INTO `rbac_linked_permissions` VALUES ('193', '48');
+INSERT INTO `rbac_linked_permissions` VALUES ('193', '194');
+INSERT INTO `rbac_linked_permissions` VALUES ('193', '197');
+INSERT INTO `rbac_linked_permissions` VALUES ('194', '1');
+INSERT INTO `rbac_linked_permissions` VALUES ('194', '2');
+INSERT INTO `rbac_linked_permissions` VALUES ('194', '11');
+INSERT INTO `rbac_linked_permissions` VALUES ('194', '13');
+INSERT INTO `rbac_linked_permissions` VALUES ('194', '14');
+INSERT INTO `rbac_linked_permissions` VALUES ('194', '15');
+INSERT INTO `rbac_linked_permissions` VALUES ('194', '16');
+INSERT INTO `rbac_linked_permissions` VALUES ('194', '17');
+INSERT INTO `rbac_linked_permissions` VALUES ('194', '18');
+INSERT INTO `rbac_linked_permissions` VALUES ('194', '19');
+INSERT INTO `rbac_linked_permissions` VALUES ('194', '20');
+INSERT INTO `rbac_linked_permissions` VALUES ('194', '22');
+INSERT INTO `rbac_linked_permissions` VALUES ('194', '23');
+INSERT INTO `rbac_linked_permissions` VALUES ('194', '25');
+INSERT INTO `rbac_linked_permissions` VALUES ('194', '26');
+INSERT INTO `rbac_linked_permissions` VALUES ('194', '27');
+INSERT INTO `rbac_linked_permissions` VALUES ('194', '28');
+INSERT INTO `rbac_linked_permissions` VALUES ('194', '29');
+INSERT INTO `rbac_linked_permissions` VALUES ('194', '30');
+INSERT INTO `rbac_linked_permissions` VALUES ('194', '31');
+INSERT INTO `rbac_linked_permissions` VALUES ('194', '32');
+INSERT INTO `rbac_linked_permissions` VALUES ('194', '33');
+INSERT INTO `rbac_linked_permissions` VALUES ('194', '34');
+INSERT INTO `rbac_linked_permissions` VALUES ('194', '35');
+INSERT INTO `rbac_linked_permissions` VALUES ('194', '36');
+INSERT INTO `rbac_linked_permissions` VALUES ('194', '37');
+INSERT INTO `rbac_linked_permissions` VALUES ('194', '38');
+INSERT INTO `rbac_linked_permissions` VALUES ('194', '39');
+INSERT INTO `rbac_linked_permissions` VALUES ('194', '40');
+INSERT INTO `rbac_linked_permissions` VALUES ('194', '41');
+INSERT INTO `rbac_linked_permissions` VALUES ('194', '44');
+INSERT INTO `rbac_linked_permissions` VALUES ('194', '46');
+INSERT INTO `rbac_linked_permissions` VALUES ('194', '47');
+INSERT INTO `rbac_linked_permissions` VALUES ('194', '195');
+INSERT INTO `rbac_linked_permissions` VALUES ('194', '198');
+INSERT INTO `rbac_linked_permissions` VALUES ('195', '3');
+INSERT INTO `rbac_linked_permissions` VALUES ('195', '4');
+INSERT INTO `rbac_linked_permissions` VALUES ('195', '5');
+INSERT INTO `rbac_linked_permissions` VALUES ('195', '6');
+INSERT INTO `rbac_linked_permissions` VALUES ('195', '24');
+INSERT INTO `rbac_linked_permissions` VALUES ('195', '49');
+INSERT INTO `rbac_linked_permissions` VALUES ('195', '199');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '200');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '201');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '226');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '227');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '230');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '231');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '233');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '234');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '235');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '238');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '239');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '240');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '241');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '242');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '243');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '244');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '245');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '246');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '247');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '248');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '249');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '250');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '251');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '252');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '253');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '254');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '255');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '256');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '257');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '258');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '259');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '260');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '261');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '262');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '264');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '265');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '266');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '267');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '268');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '269');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '270');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '271');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '272');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '279');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '280');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '283');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '287');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '288');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '289');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '290');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '291');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '292');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '293');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '294');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '295');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '296');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '297');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '298');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '299');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '302');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '303');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '304');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '305');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '306');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '307');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '308');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '309');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '310');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '313');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '314');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '319');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '320');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '321');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '322');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '323');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '324');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '325');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '326');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '327');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '328');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '329');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '330');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '331');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '332');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '333');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '334');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '335');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '336');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '337');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '338');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '339');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '340');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '341');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '342');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '343');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '344');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '345');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '346');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '347');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '348');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '349');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '350');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '351');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '352');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '353');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '354');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '355');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '356');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '357');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '358');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '359');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '360');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '361');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '362');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '363');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '364');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '365');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '366');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '373');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '375');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '400');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '401');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '402');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '403');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '404');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '405');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '406');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '407');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '417');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '418');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '419');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '420');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '421');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '422');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '423');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '424');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '425');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '426');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '427');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '428');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '429');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '434');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '435');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '436');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '437');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '438');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '439');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '440');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '441');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '442');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '443');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '444');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '445');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '446');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '447');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '448');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '449');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '450');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '451');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '452');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '453');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '454');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '455');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '456');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '457');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '458');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '459');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '461');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '463');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '464');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '465');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '472');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '473');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '474');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '475');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '476');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '477');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '478');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '488');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '489');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '491');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '492');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '493');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '495');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '497');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '498');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '499');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '500');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '502');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '503');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '505');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '508');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '511');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '513');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '514');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '516');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '519');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '522');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '523');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '526');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '527');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '529');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '530');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '533');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '535');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '536');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '537');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '538');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '539');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '540');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '541');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '556');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '581');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '582');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '592');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '593');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '596');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '602');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '603');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '604');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '605');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '606');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '607');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '608');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '609');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '610');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '611');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '612');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '613');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '614');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '615');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '616');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '617');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '618');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '619');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '620');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '621');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '622');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '623');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '624');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '625');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '626');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '627');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '628');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '629');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '630');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '633');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '634');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '635');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '636');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '637');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '638');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '639');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '640');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '641');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '642');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '643');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '644');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '645');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '646');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '647');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '648');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '649');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '650');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '651');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '652');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '653');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '654');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '655');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '656');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '657');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '658');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '659');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '660');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '661');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '662');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '663');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '664');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '665');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '666');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '667');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '668');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '669');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '670');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '671');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '672');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '673');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '674');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '675');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '676');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '677');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '678');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '679');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '680');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '681');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '682');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '683');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '684');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '685');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '686');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '687');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '688');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '689');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '690');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '691');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '692');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '693');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '694');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '695');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '696');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '697');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '698');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '699');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '700');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '701');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '702');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '703');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '704');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '705');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '706');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '707');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '708');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '709');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '710');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '711');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '712');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '713');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '714');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '715');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '716');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '717');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '718');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '719');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '721');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '722');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '723');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '724');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '725');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '726');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '727');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '728');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '729');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '730');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '733');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '734');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '735');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '736');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '738');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '739');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '748');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '753');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '757');
+INSERT INTO `rbac_linked_permissions` VALUES ('196', '773');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '232');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '236');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '237');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '273');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '274');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '275');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '276');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '277');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '284');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '285');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '286');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '301');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '311');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '387');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '388');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '389');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '390');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '391');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '392');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '393');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '394');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '395');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '396');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '397');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '398');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '399');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '479');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '480');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '481');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '482');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '485');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '486');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '487');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '494');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '506');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '509');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '510');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '517');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '518');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '521');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '542');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '543');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '550');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '558');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '568');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '571');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '572');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '573');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '574');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '575');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '576');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '577');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '578');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '579');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '580');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '583');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '584');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '585');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '586');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '587');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '588');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '589');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '590');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '591');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '594');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '595');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '601');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '743');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '750');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '758');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '761');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '762');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '763');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '764');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '765');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '766');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '767');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '768');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '769');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '770');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '771');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '772');
+INSERT INTO `rbac_linked_permissions` VALUES ('197', '774');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '218');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '300');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '312');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '315');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '316');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '317');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '318');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '367');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '368');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '369');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '370');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '371');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '372');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '374');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '376');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '377');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '378');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '379');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '380');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '381');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '382');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '383');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '384');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '385');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '386');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '408');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '409');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '410');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '411');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '412');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '413');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '414');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '415');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '416');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '430');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '431');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '432');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '433');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '462');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '466');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '467');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '468');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '469');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '470');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '471');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '483');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '484');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '490');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '504');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '512');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '515');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '520');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '524');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '528');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '531');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '532');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '544');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '545');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '546');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '547');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '548');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '549');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '551');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '552');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '553');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '554');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '555');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '557');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '559');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '560');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '561');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '562');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '563');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '564');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '565');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '566');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '567');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '569');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '570');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '597');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '598');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '599');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '600');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '737');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '740');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '741');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '742');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '744');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '745');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '746');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '747');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '749');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '751');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '752');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '754');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '755');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '756');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '759');
+INSERT INTO `rbac_linked_permissions` VALUES ('198', '760');
+INSERT INTO `rbac_linked_permissions` VALUES ('199', '217');
+INSERT INTO `rbac_linked_permissions` VALUES ('199', '221');
+INSERT INTO `rbac_linked_permissions` VALUES ('199', '222');
+INSERT INTO `rbac_linked_permissions` VALUES ('199', '223');
+INSERT INTO `rbac_linked_permissions` VALUES ('199', '225');
+INSERT INTO `rbac_linked_permissions` VALUES ('199', '263');
+INSERT INTO `rbac_linked_permissions` VALUES ('199', '496');
+INSERT INTO `rbac_linked_permissions` VALUES ('199', '501');
+INSERT INTO `rbac_linked_permissions` VALUES ('199', '507');
+INSERT INTO `rbac_linked_permissions` VALUES ('199', '525');
+INSERT INTO `rbac_linked_permissions` VALUES ('199', '534');
 
-insert  into `rbac_linked_permissions`(`id`,`linkedId`) values (192,21),(192,42),(192,43),(192,193),(192,196),(193,48),(193,194),(193,197),(194,1),(194,2),(194,11),(194,13),(194,14),(194,15),(194,16),(194,17),(194,18),(194,19),(194,20),(194,22),(194,23),(194,25),(194,26),(194,27),(194,28),(194,29),(194,30),(194,31),(194,32),(194,33),(194,34),(194,35),(194,36),(194,37),(194,38),(194,39),(194,40),(194,41),(194,44),(194,46),(194,47),(194,195),(194,198),(195,3),(195,4),(195,5),(195,6),(195,24),(195,49),(195,199),(196,200),(196,201),(196,226),(196,227),(196,230),(196,231),(196,233),(196,234),(196,235),(196,238),(196,239),(196,240),(196,241),(196,242),(196,243),(196,244),(196,245),(196,246),(196,247),(196,248),(196,249),(196,250),(196,251),(196,252),(196,253),(196,254),(196,255),(196,256),(196,257),(196,258),(196,259),(196,260),(196,261),(196,262),(196,264),(196,265),(196,266),(196,267),(196,268),(196,269),(196,270),(196,271),(196,272),(196,279),(196,280),(196,283),(196,287),(196,288),(196,289),(196,290),(196,291),(196,292),(196,293),(196,294),(196,295),(196,296),(196,297),(196,298),(196,299),(196,302),(196,303),(196,304),(196,305),(196,306),(196,307),(196,308),(196,309),(196,310),(196,313),(196,314),(196,319),(196,320),(196,321),(196,322),(196,323),(196,324),(196,325),(196,326),(196,327),(196,328),(196,329),(196,330),(196,331),(196,332),(196,333),(196,334),(196,335),(196,336),(196,337),(196,338),(196,339),(196,340),(196,341),(196,342),(196,343),(196,344),(196,345),(196,346),(196,347),(196,348),(196,349),(196,350),(196,351),(196,352),(196,353),(196,354),(196,355),(196,356),(196,357),(196,358),(196,359),(196,360),(196,361),(196,362),(196,363),(196,364),(196,365),(196,366),(196,373),(196,375),(196,400),(196,401),(196,402),(196,403),(196,404),(196,405),(196,406),(196,407),(196,417),(196,418),(196,419),(196,420),(196,421),(196,422),(196,423),(196,424),(196,425),(196,426),(196,427),(196,428),(196,429),(196,434),(196,435),(196,436),(196,437),(196,438),(196,439),(196,440),(196,441),(196,442),(196,443),(196,444),(196,445),(196,446),(196,447),(196,448),(196,449),(196,450),(196,451),(196,452),(196,453),(196,454),(196,455),(196,456),(196,457),(196,458),(196,459),(196,461),(196,463),(196,464),(196,465),(196,472),(196,473),(196,474),(196,475),(196,476),(196,477),(196,478),(196,488),(196,489),(196,491),(196,492),(196,493),(196,495),(196,497),(196,498),(196,499),(196,500),(196,502),(196,503),(196,505),(196,508),(196,511),(196,513),(196,514),(196,516),(196,519),(196,522),(196,523),(196,526),(196,527),(196,529),(196,530),(196,533),(196,535),(196,536),(196,537),(196,538),(196,539),(196,540),(196,541),(196,556),(196,581),(196,582),(196,592),(196,593),(196,596),(196,602),(196,603),(196,604),(196,605),(196,606),(196,607),(196,608),(196,609),(196,610),(196,611),(196,612),(196,613),(196,614),(196,615),(196,616),(196,617),(196,618),(196,619),(196,620),(196,621),(196,622),(196,623),(196,624),(196,625),(196,626),(196,627),(196,628),(196,629),(196,630),(196,633),(196,634),(196,635),(196,636),(196,637),(196,638),(196,639),(196,640),(196,641),(196,642),(196,643),(196,644),(196,645),(196,646),(196,647),(196,648),(196,649),(196,650),(196,651),(196,652),(196,653),(196,654),(196,655),(196,656),(196,657),(196,658),(196,659),(196,660),(196,661),(196,662),(196,663),(196,664),(196,665),(196,666),(196,667),(196,668),(196,669),(196,670),(196,671),(196,672),(196,673),(196,674),(196,675),(196,676),(196,677),(196,678),(196,679),(196,680),(196,681),(196,682),(196,683),(196,684),(196,685),(196,686),(196,687),(196,688),(196,689),(196,690),(196,691),(196,692),(196,693),(196,694),(196,695),(196,696),(196,697),(196,698),(196,699),(196,700),(196,701),(196,702),(196,703),(196,704),(196,705),(196,706),(196,707),(196,708),(196,709),(196,710),(196,711),(196,712),(196,713),(196,714),(196,715),(196,716),(196,717),(196,718),(196,719),(196,721),(196,722),(196,723),(196,724),(196,725),(196,726),(196,727),(196,728),(196,729),(196,730),(196,733),(196,734),(196,735),(196,736),(196,738),(196,739),(196,748),(196,753),(196,757),(196,773),(197,232),(197,236),(197,237),(197,273),(197,274),(197,275),(197,276),(197,277),(197,284),(197,285),(197,286),(197,301),(197,311),(197,387),(197,388),(197,389),(197,390),(197,391),(197,392),(197,393),(197,394),(197,395),(197,396),(197,397),(197,398),(197,399),(197,479),(197,480),(197,481),(197,482),(197,485),(197,486),(197,487),(197,494),(197,506),(197,509),(197,510),(197,517),(197,518),(197,521),(197,542),(197,543),(197,550),(197,558),(197,568),(197,571),(197,572),(197,573),(197,574),(197,575),(197,576),(197,577),(197,578),(197,579),(197,580),(197,583),(197,584),(197,585),(197,586),(197,587),(197,588),(197,589),(197,590),(197,591),(197,594),(197,595),(197,601),(197,743),(197,750),(197,758),(197,761),(197,762),(197,763),(197,764),(197,765),(197,766),(197,767),(197,768),(197,769),(197,770),(197,771),(197,772),(197,774),(198,218),(198,300),(198,312),(198,315),(198,316),(198,317),(198,318),(198,367),(198,368),(198,369),(198,370),(198,371),(198,372),(198,374),(198,376),(198,377),(198,378),(198,379),(198,380),(198,381),(198,382),(198,383),(198,384),(198,385),(198,386),(198,408),(198,409),(198,410),(198,411),(198,412),(198,413),(198,414),(198,415),(198,416),(198,430),(198,431),(198,432),(198,433),(198,462),(198,466),(198,467),(198,468),(198,469),(198,470),(198,471),(198,483),(198,484),(198,490),(198,504),(198,512),(198,515),(198,520),(198,524),(198,528),(198,531),(198,532),(198,544),(198,545),(198,546),(198,547),(198,548),(198,549),(198,551),(198,552),(198,553),(198,554),(198,555),(198,557),(198,559),(198,560),(198,561),(198,562),(198,563),(198,564),(198,565),(198,566),(198,567),(198,569),(198,570),(198,597),(198,598),(198,599),(198,600),(198,737),(198,740),(198,741),(198,742),(198,744),(198,745),(198,746),(198,747),(198,749),(198,751),(198,752),(198,754),(198,755),(198,756),(198,759),(198,760),(199,217),(199,221),(199,222),(199,223),(199,225),(199,263),(199,496),(199,501),(199,507),(199,525),(199,534);
-
-/*Table structure for table `rbac_permissions` */
-
+-- ----------------------------
+-- Table structure for rbac_permissions
+-- ----------------------------
 DROP TABLE IF EXISTS `rbac_permissions`;
-
 CREATE TABLE `rbac_permissions` (
   `id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Permission id',
   `name` varchar(100) NOT NULL COMMENT 'Permission name',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Permission List';
 
-/*Data for the table `rbac_permissions` */
+-- ----------------------------
+-- Records of rbac_permissions
+-- ----------------------------
+INSERT INTO `rbac_permissions` VALUES ('1', 'Instant logout');
+INSERT INTO `rbac_permissions` VALUES ('2', 'Skip Queue');
+INSERT INTO `rbac_permissions` VALUES ('3', 'Join Normal Battleground');
+INSERT INTO `rbac_permissions` VALUES ('4', 'Join Random Battleground');
+INSERT INTO `rbac_permissions` VALUES ('5', 'Join Arenas');
+INSERT INTO `rbac_permissions` VALUES ('6', 'Join Dungeon Finder');
+INSERT INTO `rbac_permissions` VALUES ('11', 'Log GM trades');
+INSERT INTO `rbac_permissions` VALUES ('13', 'Skip Instance required bosses check');
+INSERT INTO `rbac_permissions` VALUES ('14', 'Skip character creation team mask check');
+INSERT INTO `rbac_permissions` VALUES ('15', 'Skip character creation class mask check');
+INSERT INTO `rbac_permissions` VALUES ('16', 'Skip character creation race mask check');
+INSERT INTO `rbac_permissions` VALUES ('17', 'Skip character creation reserved name check');
+INSERT INTO `rbac_permissions` VALUES ('18', 'Skip character creation heroic min level check');
+INSERT INTO `rbac_permissions` VALUES ('19', 'Skip needed requirements to use channel check');
+INSERT INTO `rbac_permissions` VALUES ('20', 'Skip disable map check');
+INSERT INTO `rbac_permissions` VALUES ('21', 'Skip reset talents when used more than allowed check');
+INSERT INTO `rbac_permissions` VALUES ('22', 'Skip spam chat check');
+INSERT INTO `rbac_permissions` VALUES ('23', 'Skip over-speed ping check');
+INSERT INTO `rbac_permissions` VALUES ('24', 'Two side faction characters on the same account');
+INSERT INTO `rbac_permissions` VALUES ('25', 'Allow say chat between factions');
+INSERT INTO `rbac_permissions` VALUES ('26', 'Allow channel chat between factions');
+INSERT INTO `rbac_permissions` VALUES ('27', 'Two side mail interaction');
+INSERT INTO `rbac_permissions` VALUES ('28', 'See two side who list');
+INSERT INTO `rbac_permissions` VALUES ('29', 'Add friends of other faction');
+INSERT INTO `rbac_permissions` VALUES ('30', 'Save character without delay with .save command');
+INSERT INTO `rbac_permissions` VALUES ('31', 'Use params with .unstuck command');
+INSERT INTO `rbac_permissions` VALUES ('32', 'Can be assigned tickets with .assign ticket command');
+INSERT INTO `rbac_permissions` VALUES ('33', 'Notify if a command was not found');
+INSERT INTO `rbac_permissions` VALUES ('34', 'Check if should appear in list using .gm ingame command');
+INSERT INTO `rbac_permissions` VALUES ('35', 'See all security levels with who command');
+INSERT INTO `rbac_permissions` VALUES ('36', 'Filter whispers');
+INSERT INTO `rbac_permissions` VALUES ('37', 'Use staff badge in chat');
+INSERT INTO `rbac_permissions` VALUES ('38', 'Resurrect with full Health Points');
+INSERT INTO `rbac_permissions` VALUES ('39', 'Restore saved gm setting states');
+INSERT INTO `rbac_permissions` VALUES ('40', 'Allows to add a gm to friend list');
+INSERT INTO `rbac_permissions` VALUES ('41', 'Use Config option START_GM_LEVEL to assign new character level');
+INSERT INTO `rbac_permissions` VALUES ('42', 'Allows to use CMSG_WORLD_TELEPORT opcode');
+INSERT INTO `rbac_permissions` VALUES ('43', 'Allows to use CMSG_WHOIS opcode');
+INSERT INTO `rbac_permissions` VALUES ('44', 'Receive global GM messages/texts');
+INSERT INTO `rbac_permissions` VALUES ('45', 'Join channels without announce');
+INSERT INTO `rbac_permissions` VALUES ('46', 'Change channel settings without being channel moderator');
+INSERT INTO `rbac_permissions` VALUES ('47', 'Enables lower security than target check');
+INSERT INTO `rbac_permissions` VALUES ('48', 'Enable IP, Last Login and EMail output in pinfo');
+INSERT INTO `rbac_permissions` VALUES ('49', 'Forces to enter the email for confirmation on password change');
+INSERT INTO `rbac_permissions` VALUES ('50', 'Allow user to check his own email with .account');
+INSERT INTO `rbac_permissions` VALUES ('192', 'Role: Sec Level Administrator');
+INSERT INTO `rbac_permissions` VALUES ('193', 'Role: Sec Level Gamemaster');
+INSERT INTO `rbac_permissions` VALUES ('194', 'Role: Sec Level Moderator');
+INSERT INTO `rbac_permissions` VALUES ('195', 'Role: Sec Level Player');
+INSERT INTO `rbac_permissions` VALUES ('196', 'Role: Administrator Commands');
+INSERT INTO `rbac_permissions` VALUES ('197', 'Role: Gamemaster Commands');
+INSERT INTO `rbac_permissions` VALUES ('198', 'Role: Moderator Commands');
+INSERT INTO `rbac_permissions` VALUES ('199', 'Role: Player Commands');
+INSERT INTO `rbac_permissions` VALUES ('200', 'Command: rbac');
+INSERT INTO `rbac_permissions` VALUES ('201', 'Command: rbac account');
+INSERT INTO `rbac_permissions` VALUES ('202', 'Command: rbac account list');
+INSERT INTO `rbac_permissions` VALUES ('203', 'Command: rbac account grant');
+INSERT INTO `rbac_permissions` VALUES ('204', 'Command: rbac account deny');
+INSERT INTO `rbac_permissions` VALUES ('205', 'Command: rbac account revoke');
+INSERT INTO `rbac_permissions` VALUES ('206', 'Command: rbac list');
+INSERT INTO `rbac_permissions` VALUES ('217', 'Command: account');
+INSERT INTO `rbac_permissions` VALUES ('218', 'Command: account addon');
+INSERT INTO `rbac_permissions` VALUES ('219', 'Command: account create');
+INSERT INTO `rbac_permissions` VALUES ('220', 'Command: account delete');
+INSERT INTO `rbac_permissions` VALUES ('221', 'Command: account lock');
+INSERT INTO `rbac_permissions` VALUES ('222', 'Command: account lock country');
+INSERT INTO `rbac_permissions` VALUES ('223', 'Command: account lock ip');
+INSERT INTO `rbac_permissions` VALUES ('224', 'Command: account onlinelist');
+INSERT INTO `rbac_permissions` VALUES ('225', 'Command: account password');
+INSERT INTO `rbac_permissions` VALUES ('226', 'Command: account set');
+INSERT INTO `rbac_permissions` VALUES ('227', 'Command: account set addon');
+INSERT INTO `rbac_permissions` VALUES ('228', 'Command: account set gmlevel');
+INSERT INTO `rbac_permissions` VALUES ('229', 'Command: account set password');
+INSERT INTO `rbac_permissions` VALUES ('230', 'Command: achievement');
+INSERT INTO `rbac_permissions` VALUES ('231', 'Command: achievement add');
+INSERT INTO `rbac_permissions` VALUES ('232', 'Command: arena');
+INSERT INTO `rbac_permissions` VALUES ('233', 'Command: arena captain');
+INSERT INTO `rbac_permissions` VALUES ('234', 'Command: arena create');
+INSERT INTO `rbac_permissions` VALUES ('235', 'Command: arena disband');
+INSERT INTO `rbac_permissions` VALUES ('236', 'Command: arena info');
+INSERT INTO `rbac_permissions` VALUES ('237', 'Command: arena lookup');
+INSERT INTO `rbac_permissions` VALUES ('238', 'Command: arena rename');
+INSERT INTO `rbac_permissions` VALUES ('239', 'Command: ban');
+INSERT INTO `rbac_permissions` VALUES ('240', 'Command: ban account');
+INSERT INTO `rbac_permissions` VALUES ('241', 'Command: ban character');
+INSERT INTO `rbac_permissions` VALUES ('242', 'Command: ban ip');
+INSERT INTO `rbac_permissions` VALUES ('243', 'Command: ban playeraccount');
+INSERT INTO `rbac_permissions` VALUES ('244', 'Command: baninfo');
+INSERT INTO `rbac_permissions` VALUES ('245', 'Command: baninfo account');
+INSERT INTO `rbac_permissions` VALUES ('246', 'Command: baninfo character');
+INSERT INTO `rbac_permissions` VALUES ('247', 'Command: baninfo ip');
+INSERT INTO `rbac_permissions` VALUES ('248', 'Command: banlist');
+INSERT INTO `rbac_permissions` VALUES ('249', 'Command: banlist account');
+INSERT INTO `rbac_permissions` VALUES ('250', 'Command: banlist character');
+INSERT INTO `rbac_permissions` VALUES ('251', 'Command: banlist ip');
+INSERT INTO `rbac_permissions` VALUES ('252', 'Command: unban');
+INSERT INTO `rbac_permissions` VALUES ('253', 'Command: unban account');
+INSERT INTO `rbac_permissions` VALUES ('254', 'Command: unban character');
+INSERT INTO `rbac_permissions` VALUES ('255', 'Command: unban ip');
+INSERT INTO `rbac_permissions` VALUES ('256', 'Command: unban playeraccount');
+INSERT INTO `rbac_permissions` VALUES ('257', 'Command: bf');
+INSERT INTO `rbac_permissions` VALUES ('258', 'Command: bf start');
+INSERT INTO `rbac_permissions` VALUES ('259', 'Command: bf stop');
+INSERT INTO `rbac_permissions` VALUES ('260', 'Command: bf switch');
+INSERT INTO `rbac_permissions` VALUES ('261', 'Command: bf timer');
+INSERT INTO `rbac_permissions` VALUES ('262', 'Command: bf enable');
+INSERT INTO `rbac_permissions` VALUES ('263', 'Command: account email');
+INSERT INTO `rbac_permissions` VALUES ('264', 'Command: account set sec');
+INSERT INTO `rbac_permissions` VALUES ('265', 'Command: account set sec email');
+INSERT INTO `rbac_permissions` VALUES ('266', 'Command: account set sec regmail');
+INSERT INTO `rbac_permissions` VALUES ('267', 'Command: cast');
+INSERT INTO `rbac_permissions` VALUES ('268', 'Command: cast back');
+INSERT INTO `rbac_permissions` VALUES ('269', 'Command: cast dist');
+INSERT INTO `rbac_permissions` VALUES ('270', 'Command: cast self');
+INSERT INTO `rbac_permissions` VALUES ('271', 'Command: cast target');
+INSERT INTO `rbac_permissions` VALUES ('272', 'Command: cast dest');
+INSERT INTO `rbac_permissions` VALUES ('273', 'Command: character');
+INSERT INTO `rbac_permissions` VALUES ('274', 'Command: character customize');
+INSERT INTO `rbac_permissions` VALUES ('275', 'Command: character changefaction');
+INSERT INTO `rbac_permissions` VALUES ('276', 'Command: character changerace');
+INSERT INTO `rbac_permissions` VALUES ('277', 'Command: character deleted');
+INSERT INTO `rbac_permissions` VALUES ('279', 'Command: character deleted list');
+INSERT INTO `rbac_permissions` VALUES ('280', 'Command: character deleted restore');
+INSERT INTO `rbac_permissions` VALUES ('283', 'Command: character level');
+INSERT INTO `rbac_permissions` VALUES ('284', 'Command: character rename');
+INSERT INTO `rbac_permissions` VALUES ('285', 'Command: character reputation');
+INSERT INTO `rbac_permissions` VALUES ('286', 'Command: character titles');
+INSERT INTO `rbac_permissions` VALUES ('287', 'Command: levelup');
+INSERT INTO `rbac_permissions` VALUES ('288', 'Command: pdump');
+INSERT INTO `rbac_permissions` VALUES ('289', 'Command: pdump load');
+INSERT INTO `rbac_permissions` VALUES ('290', 'Command: pdump write');
+INSERT INTO `rbac_permissions` VALUES ('291', 'Command: cheat');
+INSERT INTO `rbac_permissions` VALUES ('292', 'Command: cheat casttime');
+INSERT INTO `rbac_permissions` VALUES ('293', 'Command: cheat cooldown');
+INSERT INTO `rbac_permissions` VALUES ('294', 'Command: cheat explore');
+INSERT INTO `rbac_permissions` VALUES ('295', 'Command: cheat god');
+INSERT INTO `rbac_permissions` VALUES ('296', 'Command: cheat power');
+INSERT INTO `rbac_permissions` VALUES ('297', 'Command: cheat status');
+INSERT INTO `rbac_permissions` VALUES ('298', 'Command: cheat taxi');
+INSERT INTO `rbac_permissions` VALUES ('299', 'Command: cheat waterwalk');
+INSERT INTO `rbac_permissions` VALUES ('300', 'Command: debug');
+INSERT INTO `rbac_permissions` VALUES ('301', 'Command: debug anim');
+INSERT INTO `rbac_permissions` VALUES ('302', 'Command: debug areatriggers');
+INSERT INTO `rbac_permissions` VALUES ('303', 'Command: debug arena');
+INSERT INTO `rbac_permissions` VALUES ('304', 'Command: debug bg');
+INSERT INTO `rbac_permissions` VALUES ('305', 'Command: debug entervehicle');
+INSERT INTO `rbac_permissions` VALUES ('306', 'Command: debug getitemstate');
+INSERT INTO `rbac_permissions` VALUES ('307', 'Command: debug getitemvalue');
+INSERT INTO `rbac_permissions` VALUES ('308', 'Command: debug getvalue');
+INSERT INTO `rbac_permissions` VALUES ('309', 'Command: debug hostil');
+INSERT INTO `rbac_permissions` VALUES ('310', 'Command: debug itemexpire');
+INSERT INTO `rbac_permissions` VALUES ('311', 'Command: debug lootrecipient');
+INSERT INTO `rbac_permissions` VALUES ('312', 'Command: debug los');
+INSERT INTO `rbac_permissions` VALUES ('313', 'Command: debug mod32value');
+INSERT INTO `rbac_permissions` VALUES ('314', 'Command: debug moveflags');
+INSERT INTO `rbac_permissions` VALUES ('315', 'Command: debug play');
+INSERT INTO `rbac_permissions` VALUES ('316', 'Command: debug play cinematics');
+INSERT INTO `rbac_permissions` VALUES ('317', 'Command: debug play movie');
+INSERT INTO `rbac_permissions` VALUES ('318', 'Command: debug play sound');
+INSERT INTO `rbac_permissions` VALUES ('319', 'Command: debug send');
+INSERT INTO `rbac_permissions` VALUES ('320', 'Command: debug send buyerror');
+INSERT INTO `rbac_permissions` VALUES ('321', 'Command: debug send channelnotify');
+INSERT INTO `rbac_permissions` VALUES ('322', 'Command: debug send chatmessage');
+INSERT INTO `rbac_permissions` VALUES ('323', 'Command: debug send equiperror');
+INSERT INTO `rbac_permissions` VALUES ('324', 'Command: debug send largepacket');
+INSERT INTO `rbac_permissions` VALUES ('325', 'Command: debug send opcode');
+INSERT INTO `rbac_permissions` VALUES ('326', 'Command: debug send qinvalidmsg');
+INSERT INTO `rbac_permissions` VALUES ('327', 'Command: debug send qpartymsg');
+INSERT INTO `rbac_permissions` VALUES ('328', 'Command: debug send sellerror');
+INSERT INTO `rbac_permissions` VALUES ('329', 'Command: debug send setphaseshift');
+INSERT INTO `rbac_permissions` VALUES ('330', 'Command: debug send spellfail');
+INSERT INTO `rbac_permissions` VALUES ('331', 'Command: debug setaurastate');
+INSERT INTO `rbac_permissions` VALUES ('332', 'Command: debug setbit');
+INSERT INTO `rbac_permissions` VALUES ('333', 'Command: debug setitemvalue');
+INSERT INTO `rbac_permissions` VALUES ('334', 'Command: debug setvalue');
+INSERT INTO `rbac_permissions` VALUES ('335', 'Command: debug setvid');
+INSERT INTO `rbac_permissions` VALUES ('336', 'Command: debug spawnvehicle');
+INSERT INTO `rbac_permissions` VALUES ('337', 'Command: debug threat');
+INSERT INTO `rbac_permissions` VALUES ('338', 'Command: debug update');
+INSERT INTO `rbac_permissions` VALUES ('339', 'Command: debug uws');
+INSERT INTO `rbac_permissions` VALUES ('340', 'Command: wpgps');
+INSERT INTO `rbac_permissions` VALUES ('341', 'Command: deserter');
+INSERT INTO `rbac_permissions` VALUES ('342', 'Command: deserter bg');
+INSERT INTO `rbac_permissions` VALUES ('343', 'Command: deserter bg add');
+INSERT INTO `rbac_permissions` VALUES ('344', 'Command: deserter bg remove');
+INSERT INTO `rbac_permissions` VALUES ('345', 'Command: deserter instance');
+INSERT INTO `rbac_permissions` VALUES ('346', 'Command: deserter instance add');
+INSERT INTO `rbac_permissions` VALUES ('347', 'Command: deserter instance remove');
+INSERT INTO `rbac_permissions` VALUES ('348', 'Command: disable');
+INSERT INTO `rbac_permissions` VALUES ('349', 'Command: disable add');
+INSERT INTO `rbac_permissions` VALUES ('350', 'Command: disable add achievement_criteria');
+INSERT INTO `rbac_permissions` VALUES ('351', 'Command: disable add battleground');
+INSERT INTO `rbac_permissions` VALUES ('352', 'Command: disable add map');
+INSERT INTO `rbac_permissions` VALUES ('353', 'Command: disable add mmap');
+INSERT INTO `rbac_permissions` VALUES ('354', 'Command: disable add outdoorpvp');
+INSERT INTO `rbac_permissions` VALUES ('355', 'Command: disable add quest');
+INSERT INTO `rbac_permissions` VALUES ('356', 'Command: disable add spell');
+INSERT INTO `rbac_permissions` VALUES ('357', 'Command: disable add vmap');
+INSERT INTO `rbac_permissions` VALUES ('358', 'Command: disable remove');
+INSERT INTO `rbac_permissions` VALUES ('359', 'Command: disable remove achievement_criteria');
+INSERT INTO `rbac_permissions` VALUES ('360', 'Command: disable remove battleground');
+INSERT INTO `rbac_permissions` VALUES ('361', 'Command: disable remove map');
+INSERT INTO `rbac_permissions` VALUES ('362', 'Command: disable remove mmap');
+INSERT INTO `rbac_permissions` VALUES ('363', 'Command: disable remove outdoorpvp');
+INSERT INTO `rbac_permissions` VALUES ('364', 'Command: disable remove quest');
+INSERT INTO `rbac_permissions` VALUES ('365', 'Command: disable remove spell');
+INSERT INTO `rbac_permissions` VALUES ('366', 'Command: disable remove vmap');
+INSERT INTO `rbac_permissions` VALUES ('367', 'Command: event');
+INSERT INTO `rbac_permissions` VALUES ('368', 'Command: event activelist');
+INSERT INTO `rbac_permissions` VALUES ('369', 'Command: event start');
+INSERT INTO `rbac_permissions` VALUES ('370', 'Command: event stop');
+INSERT INTO `rbac_permissions` VALUES ('371', 'Command: gm');
+INSERT INTO `rbac_permissions` VALUES ('372', 'Command: gm chat');
+INSERT INTO `rbac_permissions` VALUES ('373', 'Command: gm fly');
+INSERT INTO `rbac_permissions` VALUES ('374', 'Command: gm ingame');
+INSERT INTO `rbac_permissions` VALUES ('375', 'Command: gm list');
+INSERT INTO `rbac_permissions` VALUES ('376', 'Command: gm visible');
+INSERT INTO `rbac_permissions` VALUES ('377', 'Command: go');
+INSERT INTO `rbac_permissions` VALUES ('378', 'Command: go creature');
+INSERT INTO `rbac_permissions` VALUES ('379', 'Command: go graveyard');
+INSERT INTO `rbac_permissions` VALUES ('380', 'Command: go grid');
+INSERT INTO `rbac_permissions` VALUES ('381', 'Command: go object');
+INSERT INTO `rbac_permissions` VALUES ('382', 'Command: go taxinode');
+INSERT INTO `rbac_permissions` VALUES ('383', 'Command: go ticket');
+INSERT INTO `rbac_permissions` VALUES ('384', 'Command: go trigger');
+INSERT INTO `rbac_permissions` VALUES ('385', 'Command: go xyz');
+INSERT INTO `rbac_permissions` VALUES ('386', 'Command: go zonexy');
+INSERT INTO `rbac_permissions` VALUES ('387', 'Command: gobject');
+INSERT INTO `rbac_permissions` VALUES ('388', 'Command: gobject activate');
+INSERT INTO `rbac_permissions` VALUES ('389', 'Command: gobject add');
+INSERT INTO `rbac_permissions` VALUES ('390', 'Command: gobject add temp');
+INSERT INTO `rbac_permissions` VALUES ('391', 'Command: gobject delete');
+INSERT INTO `rbac_permissions` VALUES ('392', 'Command: gobject info');
+INSERT INTO `rbac_permissions` VALUES ('393', 'Command: gobject move');
+INSERT INTO `rbac_permissions` VALUES ('394', 'Command: gobject near');
+INSERT INTO `rbac_permissions` VALUES ('395', 'Command: gobject set');
+INSERT INTO `rbac_permissions` VALUES ('396', 'Command: gobject set phase');
+INSERT INTO `rbac_permissions` VALUES ('397', 'Command: gobject set state');
+INSERT INTO `rbac_permissions` VALUES ('398', 'Command: gobject target');
+INSERT INTO `rbac_permissions` VALUES ('399', 'Command: gobject turn');
+INSERT INTO `rbac_permissions` VALUES ('400', 'debug transport');
+INSERT INTO `rbac_permissions` VALUES ('401', 'Command: guild');
+INSERT INTO `rbac_permissions` VALUES ('402', 'Command: guild create');
+INSERT INTO `rbac_permissions` VALUES ('403', 'Command: guild delete');
+INSERT INTO `rbac_permissions` VALUES ('404', 'Command: guild invite');
+INSERT INTO `rbac_permissions` VALUES ('405', 'Command: guild uninvite');
+INSERT INTO `rbac_permissions` VALUES ('406', 'Command: guild rank');
+INSERT INTO `rbac_permissions` VALUES ('407', 'Command: guild rename');
+INSERT INTO `rbac_permissions` VALUES ('408', 'Command: honor');
+INSERT INTO `rbac_permissions` VALUES ('409', 'Command: honor add');
+INSERT INTO `rbac_permissions` VALUES ('410', 'Command: honor add kill');
+INSERT INTO `rbac_permissions` VALUES ('411', 'Command: honor update');
+INSERT INTO `rbac_permissions` VALUES ('412', 'Command: instance');
+INSERT INTO `rbac_permissions` VALUES ('413', 'Command: instance listbinds');
+INSERT INTO `rbac_permissions` VALUES ('414', 'Command: instance unbind');
+INSERT INTO `rbac_permissions` VALUES ('415', 'Command: instance stats');
+INSERT INTO `rbac_permissions` VALUES ('416', 'Command: instance savedata');
+INSERT INTO `rbac_permissions` VALUES ('417', 'Command: learn');
+INSERT INTO `rbac_permissions` VALUES ('418', 'Command: learn all');
+INSERT INTO `rbac_permissions` VALUES ('419', 'Command: learn all my');
+INSERT INTO `rbac_permissions` VALUES ('420', 'Command: learn all my class');
+INSERT INTO `rbac_permissions` VALUES ('421', 'Command: learn all my pettalents');
+INSERT INTO `rbac_permissions` VALUES ('422', 'Command: learn all my spells');
+INSERT INTO `rbac_permissions` VALUES ('423', 'Command: learn all my talents');
+INSERT INTO `rbac_permissions` VALUES ('424', 'Command: learn all gm');
+INSERT INTO `rbac_permissions` VALUES ('425', 'Command: learn all crafts');
+INSERT INTO `rbac_permissions` VALUES ('426', 'Command: learn all default');
+INSERT INTO `rbac_permissions` VALUES ('427', 'Command: learn all lang');
+INSERT INTO `rbac_permissions` VALUES ('428', 'Command: learn all recipes');
+INSERT INTO `rbac_permissions` VALUES ('429', 'Command: unlearn');
+INSERT INTO `rbac_permissions` VALUES ('430', 'Command: lfg');
+INSERT INTO `rbac_permissions` VALUES ('431', 'Command: lfg player');
+INSERT INTO `rbac_permissions` VALUES ('432', 'Command: lfg group');
+INSERT INTO `rbac_permissions` VALUES ('433', 'Command: lfg queue');
+INSERT INTO `rbac_permissions` VALUES ('434', 'Command: lfg clean');
+INSERT INTO `rbac_permissions` VALUES ('435', 'Command: lfg options');
+INSERT INTO `rbac_permissions` VALUES ('436', 'Command: list');
+INSERT INTO `rbac_permissions` VALUES ('437', 'Command: list creature');
+INSERT INTO `rbac_permissions` VALUES ('438', 'Command: list item');
+INSERT INTO `rbac_permissions` VALUES ('439', 'Command: list object');
+INSERT INTO `rbac_permissions` VALUES ('440', 'Command: list auras');
+INSERT INTO `rbac_permissions` VALUES ('441', 'Command: list mail');
+INSERT INTO `rbac_permissions` VALUES ('442', 'Command: lookup');
+INSERT INTO `rbac_permissions` VALUES ('443', 'Command: lookup area');
+INSERT INTO `rbac_permissions` VALUES ('444', 'Command: lookucreature');
+INSERT INTO `rbac_permissions` VALUES ('445', 'Command: lookup event');
+INSERT INTO `rbac_permissions` VALUES ('446', 'Command: lookup faction');
+INSERT INTO `rbac_permissions` VALUES ('447', 'Command: lookup item');
+INSERT INTO `rbac_permissions` VALUES ('448', 'Command: lookup itemset');
+INSERT INTO `rbac_permissions` VALUES ('449', 'Command: lookup object');
+INSERT INTO `rbac_permissions` VALUES ('450', 'Command: lookup quest');
+INSERT INTO `rbac_permissions` VALUES ('451', 'Command: lookup player');
+INSERT INTO `rbac_permissions` VALUES ('452', 'Command: lookup player ip');
+INSERT INTO `rbac_permissions` VALUES ('453', 'Command: lookup player account');
+INSERT INTO `rbac_permissions` VALUES ('454', 'Command: lookup player email');
+INSERT INTO `rbac_permissions` VALUES ('455', 'Command: lookup skill');
+INSERT INTO `rbac_permissions` VALUES ('456', 'Command: lookup spell');
+INSERT INTO `rbac_permissions` VALUES ('457', 'Command: lookup spell id');
+INSERT INTO `rbac_permissions` VALUES ('458', 'Command: lookup taxinode');
+INSERT INTO `rbac_permissions` VALUES ('459', 'Command: lookup tele');
+INSERT INTO `rbac_permissions` VALUES ('460', 'Command: lookup title');
+INSERT INTO `rbac_permissions` VALUES ('461', 'Command: lookup map');
+INSERT INTO `rbac_permissions` VALUES ('462', 'Command: announce');
+INSERT INTO `rbac_permissions` VALUES ('463', 'Command: channel');
+INSERT INTO `rbac_permissions` VALUES ('464', 'Command: channel set');
+INSERT INTO `rbac_permissions` VALUES ('465', 'Command: channel set ownership');
+INSERT INTO `rbac_permissions` VALUES ('466', 'Command: gmannounce');
+INSERT INTO `rbac_permissions` VALUES ('467', 'Command: gmnameannounce');
+INSERT INTO `rbac_permissions` VALUES ('468', 'Command: gmnotify');
+INSERT INTO `rbac_permissions` VALUES ('469', 'Command: nameannounce');
+INSERT INTO `rbac_permissions` VALUES ('470', 'Command: notify');
+INSERT INTO `rbac_permissions` VALUES ('471', 'Command: whispers');
+INSERT INTO `rbac_permissions` VALUES ('472', 'Command: group');
+INSERT INTO `rbac_permissions` VALUES ('473', 'Command: group leader');
+INSERT INTO `rbac_permissions` VALUES ('474', 'Command: group disband');
+INSERT INTO `rbac_permissions` VALUES ('475', 'Command: group remove');
+INSERT INTO `rbac_permissions` VALUES ('476', 'Command: group join');
+INSERT INTO `rbac_permissions` VALUES ('477', 'Command: group list');
+INSERT INTO `rbac_permissions` VALUES ('478', 'Command: group summon');
+INSERT INTO `rbac_permissions` VALUES ('479', 'Command: pet');
+INSERT INTO `rbac_permissions` VALUES ('480', 'Command: pet create');
+INSERT INTO `rbac_permissions` VALUES ('481', 'Command: pet learn');
+INSERT INTO `rbac_permissions` VALUES ('482', 'Command: pet unlearn');
+INSERT INTO `rbac_permissions` VALUES ('483', 'Command: send');
+INSERT INTO `rbac_permissions` VALUES ('484', 'Command: send items');
+INSERT INTO `rbac_permissions` VALUES ('485', 'Command: send mail');
+INSERT INTO `rbac_permissions` VALUES ('486', 'Command: send message');
+INSERT INTO `rbac_permissions` VALUES ('487', 'Command: send money');
+INSERT INTO `rbac_permissions` VALUES ('488', 'Command: additem');
+INSERT INTO `rbac_permissions` VALUES ('489', 'Command: additemset');
+INSERT INTO `rbac_permissions` VALUES ('490', 'Command: appear');
+INSERT INTO `rbac_permissions` VALUES ('491', 'Command: aura');
+INSERT INTO `rbac_permissions` VALUES ('492', 'Command: bank');
+INSERT INTO `rbac_permissions` VALUES ('493', 'Command: bindsight');
+INSERT INTO `rbac_permissions` VALUES ('494', 'Command: combatstop');
+INSERT INTO `rbac_permissions` VALUES ('495', 'Command: cometome');
+INSERT INTO `rbac_permissions` VALUES ('496', 'Command: commands');
+INSERT INTO `rbac_permissions` VALUES ('497', 'Command: cooldown');
+INSERT INTO `rbac_permissions` VALUES ('498', 'Command: damage');
+INSERT INTO `rbac_permissions` VALUES ('499', 'Command: dev');
+INSERT INTO `rbac_permissions` VALUES ('500', 'Command: die');
+INSERT INTO `rbac_permissions` VALUES ('501', 'Command: dismount');
+INSERT INTO `rbac_permissions` VALUES ('502', 'Command: distance');
+INSERT INTO `rbac_permissions` VALUES ('503', 'Command: flusharenapoints');
+INSERT INTO `rbac_permissions` VALUES ('504', 'Command: freeze');
+INSERT INTO `rbac_permissions` VALUES ('505', 'Command: gps');
+INSERT INTO `rbac_permissions` VALUES ('506', 'Command: guid');
+INSERT INTO `rbac_permissions` VALUES ('507', 'Command: help');
+INSERT INTO `rbac_permissions` VALUES ('508', 'Command: hidearea');
+INSERT INTO `rbac_permissions` VALUES ('509', 'Command: itemmove');
+INSERT INTO `rbac_permissions` VALUES ('510', 'Command: kick');
+INSERT INTO `rbac_permissions` VALUES ('511', 'Command: linkgrave');
+INSERT INTO `rbac_permissions` VALUES ('512', 'Command: listfreeze');
+INSERT INTO `rbac_permissions` VALUES ('513', 'Command: maxskill');
+INSERT INTO `rbac_permissions` VALUES ('514', 'Command: movegens');
+INSERT INTO `rbac_permissions` VALUES ('515', 'Command: mute');
+INSERT INTO `rbac_permissions` VALUES ('516', 'Command: neargrave');
+INSERT INTO `rbac_permissions` VALUES ('517', 'Command: pinfo');
+INSERT INTO `rbac_permissions` VALUES ('518', 'Command: playall');
+INSERT INTO `rbac_permissions` VALUES ('519', 'Command: possess');
+INSERT INTO `rbac_permissions` VALUES ('520', 'Command: recall');
+INSERT INTO `rbac_permissions` VALUES ('521', 'Command: repairitems');
+INSERT INTO `rbac_permissions` VALUES ('522', 'Command: respawn');
+INSERT INTO `rbac_permissions` VALUES ('523', 'Command: revive');
+INSERT INTO `rbac_permissions` VALUES ('524', 'Command: saveall');
+INSERT INTO `rbac_permissions` VALUES ('525', 'Command: save');
+INSERT INTO `rbac_permissions` VALUES ('526', 'Command: setskill');
+INSERT INTO `rbac_permissions` VALUES ('527', 'Command: showarea');
+INSERT INTO `rbac_permissions` VALUES ('528', 'Command: summon');
+INSERT INTO `rbac_permissions` VALUES ('529', 'Command: unaura');
+INSERT INTO `rbac_permissions` VALUES ('530', 'Command: unbindsight');
+INSERT INTO `rbac_permissions` VALUES ('531', 'Command: unfreeze');
+INSERT INTO `rbac_permissions` VALUES ('532', 'Command: unmute');
+INSERT INTO `rbac_permissions` VALUES ('533', 'Command: unpossess');
+INSERT INTO `rbac_permissions` VALUES ('534', 'Command: unstuck');
+INSERT INTO `rbac_permissions` VALUES ('535', 'Command: wchange');
+INSERT INTO `rbac_permissions` VALUES ('536', 'Command: mmap');
+INSERT INTO `rbac_permissions` VALUES ('537', 'Command: mmap loadedtiles');
+INSERT INTO `rbac_permissions` VALUES ('538', 'Command: mmap loc');
+INSERT INTO `rbac_permissions` VALUES ('539', 'Command: mmap path');
+INSERT INTO `rbac_permissions` VALUES ('540', 'Command: mmap stats');
+INSERT INTO `rbac_permissions` VALUES ('541', 'Command: mmap testarea');
+INSERT INTO `rbac_permissions` VALUES ('542', 'Command: morph');
+INSERT INTO `rbac_permissions` VALUES ('543', 'Command: demorph');
+INSERT INTO `rbac_permissions` VALUES ('544', 'Command: modify');
+INSERT INTO `rbac_permissions` VALUES ('545', 'Command: modify arenapoints');
+INSERT INTO `rbac_permissions` VALUES ('546', 'Command: modify bit');
+INSERT INTO `rbac_permissions` VALUES ('547', 'Command: modify drunk');
+INSERT INTO `rbac_permissions` VALUES ('548', 'Command: modify energy');
+INSERT INTO `rbac_permissions` VALUES ('549', 'Command: modify faction');
+INSERT INTO `rbac_permissions` VALUES ('550', 'Command: modify gender');
+INSERT INTO `rbac_permissions` VALUES ('551', 'Command: modify honor');
+INSERT INTO `rbac_permissions` VALUES ('552', 'Command: modify hp');
+INSERT INTO `rbac_permissions` VALUES ('553', 'Command: modify mana');
+INSERT INTO `rbac_permissions` VALUES ('554', 'Command: modify money');
+INSERT INTO `rbac_permissions` VALUES ('555', 'Command: modify mount');
+INSERT INTO `rbac_permissions` VALUES ('556', 'Command: modify phase');
+INSERT INTO `rbac_permissions` VALUES ('557', 'Command: modify rage');
+INSERT INTO `rbac_permissions` VALUES ('558', 'Command: modify reputation');
+INSERT INTO `rbac_permissions` VALUES ('559', 'Command: modify runicpower');
+INSERT INTO `rbac_permissions` VALUES ('560', 'Command: modify scale');
+INSERT INTO `rbac_permissions` VALUES ('561', 'Command: modify speed');
+INSERT INTO `rbac_permissions` VALUES ('562', 'Command: modify speed all');
+INSERT INTO `rbac_permissions` VALUES ('563', 'Command: modify speed backwalk');
+INSERT INTO `rbac_permissions` VALUES ('564', 'Command: modify speed fly');
+INSERT INTO `rbac_permissions` VALUES ('565', 'Command: modify speed walk');
+INSERT INTO `rbac_permissions` VALUES ('566', 'Command: modify speed swim');
+INSERT INTO `rbac_permissions` VALUES ('567', 'Command: modify spell');
+INSERT INTO `rbac_permissions` VALUES ('568', 'Command: modify standstate');
+INSERT INTO `rbac_permissions` VALUES ('569', 'Command: modify talentpoints');
+INSERT INTO `rbac_permissions` VALUES ('570', 'Command: npc');
+INSERT INTO `rbac_permissions` VALUES ('571', 'Command: npc add');
+INSERT INTO `rbac_permissions` VALUES ('572', 'Command: npc add formation');
+INSERT INTO `rbac_permissions` VALUES ('573', 'Command: npc add item');
+INSERT INTO `rbac_permissions` VALUES ('574', 'Command: npc add move');
+INSERT INTO `rbac_permissions` VALUES ('575', 'Command: npc add temp');
+INSERT INTO `rbac_permissions` VALUES ('576', 'Command: npc add delete');
+INSERT INTO `rbac_permissions` VALUES ('577', 'Command: npc add delete item');
+INSERT INTO `rbac_permissions` VALUES ('578', 'Command: npc add follow');
+INSERT INTO `rbac_permissions` VALUES ('579', 'Command: npc add follow stop');
+INSERT INTO `rbac_permissions` VALUES ('580', 'Command: npc set');
+INSERT INTO `rbac_permissions` VALUES ('581', 'Command: npc set allowmove');
+INSERT INTO `rbac_permissions` VALUES ('582', 'Command: npc set entry');
+INSERT INTO `rbac_permissions` VALUES ('583', 'Command: npc set factionid');
+INSERT INTO `rbac_permissions` VALUES ('584', 'Command: npc set flag');
+INSERT INTO `rbac_permissions` VALUES ('585', 'Command: npc set level');
+INSERT INTO `rbac_permissions` VALUES ('586', 'Command: npc set link');
+INSERT INTO `rbac_permissions` VALUES ('587', 'Command: npc set model');
+INSERT INTO `rbac_permissions` VALUES ('588', 'Command: npc set movetype');
+INSERT INTO `rbac_permissions` VALUES ('589', 'Command: npc set phase');
+INSERT INTO `rbac_permissions` VALUES ('590', 'Command: npc set spawndist');
+INSERT INTO `rbac_permissions` VALUES ('591', 'Command: npc set spawntime');
+INSERT INTO `rbac_permissions` VALUES ('592', 'Command: npc set data');
+INSERT INTO `rbac_permissions` VALUES ('593', 'Command: npc info');
+INSERT INTO `rbac_permissions` VALUES ('594', 'Command: npc near');
+INSERT INTO `rbac_permissions` VALUES ('595', 'Command: npc move');
+INSERT INTO `rbac_permissions` VALUES ('596', 'Command: npc playemote');
+INSERT INTO `rbac_permissions` VALUES ('597', 'Command: npc say');
+INSERT INTO `rbac_permissions` VALUES ('598', 'Command: npc textemote');
+INSERT INTO `rbac_permissions` VALUES ('599', 'Command: npc whisper');
+INSERT INTO `rbac_permissions` VALUES ('600', 'Command: npc yell');
+INSERT INTO `rbac_permissions` VALUES ('601', 'Command: npc tame');
+INSERT INTO `rbac_permissions` VALUES ('602', 'Command: quest');
+INSERT INTO `rbac_permissions` VALUES ('603', 'Command: quest add');
+INSERT INTO `rbac_permissions` VALUES ('604', 'Command: quest complete');
+INSERT INTO `rbac_permissions` VALUES ('605', 'Command: quest remove');
+INSERT INTO `rbac_permissions` VALUES ('606', 'Command: quest reward');
+INSERT INTO `rbac_permissions` VALUES ('607', 'Command: reload');
+INSERT INTO `rbac_permissions` VALUES ('608', 'Command: reload access_requirement');
+INSERT INTO `rbac_permissions` VALUES ('609', 'Command: reload achievement_criteria_data');
+INSERT INTO `rbac_permissions` VALUES ('610', 'Command: reload achievement_reward');
+INSERT INTO `rbac_permissions` VALUES ('611', 'Command: reload all');
+INSERT INTO `rbac_permissions` VALUES ('612', 'Command: reload all achievement');
+INSERT INTO `rbac_permissions` VALUES ('613', 'Command: reload all area');
+INSERT INTO `rbac_permissions` VALUES ('614', 'Command: broadcast_text');
+INSERT INTO `rbac_permissions` VALUES ('615', 'Command: reload all gossips');
+INSERT INTO `rbac_permissions` VALUES ('616', 'Command: reload all item');
+INSERT INTO `rbac_permissions` VALUES ('617', 'Command: reload all locales');
+INSERT INTO `rbac_permissions` VALUES ('618', 'Command: reload all loot');
+INSERT INTO `rbac_permissions` VALUES ('619', 'Command: reload all npc');
+INSERT INTO `rbac_permissions` VALUES ('620', 'Command: reload all quest');
+INSERT INTO `rbac_permissions` VALUES ('621', 'Command: reload all scripts');
+INSERT INTO `rbac_permissions` VALUES ('622', 'Command: reload all spell');
+INSERT INTO `rbac_permissions` VALUES ('623', 'Command: reload areatrigger_involvedrelation');
+INSERT INTO `rbac_permissions` VALUES ('624', 'Command: reload areatrigger_tavern');
+INSERT INTO `rbac_permissions` VALUES ('625', 'Command: reload areatrigger_teleport');
+INSERT INTO `rbac_permissions` VALUES ('626', 'Command: reload auctions');
+INSERT INTO `rbac_permissions` VALUES ('627', 'Command: reload autobroadcast');
+INSERT INTO `rbac_permissions` VALUES ('628', 'Command: reload command');
+INSERT INTO `rbac_permissions` VALUES ('629', 'Command: reload conditions');
+INSERT INTO `rbac_permissions` VALUES ('630', 'Command: reload config');
+INSERT INTO `rbac_permissions` VALUES ('633', 'Command: reload creature_linked_respawn');
+INSERT INTO `rbac_permissions` VALUES ('634', 'Command: reload creature_loot_template');
+INSERT INTO `rbac_permissions` VALUES ('635', 'Command: reload creature_onkill_reputation');
+INSERT INTO `rbac_permissions` VALUES ('636', 'Command: reload creature_questender');
+INSERT INTO `rbac_permissions` VALUES ('637', 'Command: reload creature_queststarter');
+INSERT INTO `rbac_permissions` VALUES ('638', 'Command: reload creature_summon_groups');
+INSERT INTO `rbac_permissions` VALUES ('639', 'Command: reload creature_template');
+INSERT INTO `rbac_permissions` VALUES ('640', 'Command: reload creature_text');
+INSERT INTO `rbac_permissions` VALUES ('641', 'Command: reload disables');
+INSERT INTO `rbac_permissions` VALUES ('642', 'Command: reload disenchant_loot_template');
+INSERT INTO `rbac_permissions` VALUES ('643', 'Command: reload event_scripts');
+INSERT INTO `rbac_permissions` VALUES ('644', 'Command: reload fishing_loot_template');
+INSERT INTO `rbac_permissions` VALUES ('645', 'Command: reload game_graveyard_zone');
+INSERT INTO `rbac_permissions` VALUES ('646', 'Command: reload game_tele');
+INSERT INTO `rbac_permissions` VALUES ('647', 'Command: reload gameobject_questender');
+INSERT INTO `rbac_permissions` VALUES ('648', 'Command: reload gameobject_loot_template');
+INSERT INTO `rbac_permissions` VALUES ('649', 'Command: reload gameobject_queststarter');
+INSERT INTO `rbac_permissions` VALUES ('650', 'Command: reload gm_tickets');
+INSERT INTO `rbac_permissions` VALUES ('651', 'Command: reload gossip_menu');
+INSERT INTO `rbac_permissions` VALUES ('652', 'Command: reload gossip_menu_option');
+INSERT INTO `rbac_permissions` VALUES ('653', 'Command: reload item_enchantment_template');
+INSERT INTO `rbac_permissions` VALUES ('654', 'Command: reload item_loot_template');
+INSERT INTO `rbac_permissions` VALUES ('655', 'Command: reload item_set_names');
+INSERT INTO `rbac_permissions` VALUES ('656', 'Command: reload lfg_dungeon_rewards');
+INSERT INTO `rbac_permissions` VALUES ('657', 'Command: reload locales_achievement_reward');
+INSERT INTO `rbac_permissions` VALUES ('658', 'Command: reload locales_creature');
+INSERT INTO `rbac_permissions` VALUES ('659', 'Command: reload locales_creature_text');
+INSERT INTO `rbac_permissions` VALUES ('660', 'Command: reload locales_gameobject');
+INSERT INTO `rbac_permissions` VALUES ('661', 'Command: reload locales_gossip_menu_option');
+INSERT INTO `rbac_permissions` VALUES ('662', 'Command: reload locales_item');
+INSERT INTO `rbac_permissions` VALUES ('663', 'Command: reload locales_item_set_name');
+INSERT INTO `rbac_permissions` VALUES ('664', 'Command: reload locales_npc_text');
+INSERT INTO `rbac_permissions` VALUES ('665', 'Command: reload locales_page_text');
+INSERT INTO `rbac_permissions` VALUES ('666', 'Command: reload locales_points_of_interest');
+INSERT INTO `rbac_permissions` VALUES ('667', 'Command: reload locales_quest');
+INSERT INTO `rbac_permissions` VALUES ('668', 'Command: reload mail_level_reward');
+INSERT INTO `rbac_permissions` VALUES ('669', 'Command: reload mail_loot_template');
+INSERT INTO `rbac_permissions` VALUES ('670', 'Command: reload milling_loot_template');
+INSERT INTO `rbac_permissions` VALUES ('671', 'Command: reload npc_spellclick_spells');
+INSERT INTO `rbac_permissions` VALUES ('672', 'Command: reload npc_trainer');
+INSERT INTO `rbac_permissions` VALUES ('673', 'Command: reload npc_vendor');
+INSERT INTO `rbac_permissions` VALUES ('674', 'Command: reload page_text');
+INSERT INTO `rbac_permissions` VALUES ('675', 'Command: reload pickpocketing_loot_template');
+INSERT INTO `rbac_permissions` VALUES ('676', 'Command: reload points_of_interest');
+INSERT INTO `rbac_permissions` VALUES ('677', 'Command: reload prospecting_loot_template');
+INSERT INTO `rbac_permissions` VALUES ('678', 'Command: reload quest_poi');
+INSERT INTO `rbac_permissions` VALUES ('679', 'Command: reload quest_template');
+INSERT INTO `rbac_permissions` VALUES ('680', 'Command: reload rbac');
+INSERT INTO `rbac_permissions` VALUES ('681', 'Command: reload reference_loot_template');
+INSERT INTO `rbac_permissions` VALUES ('682', 'Command: reload reserved_name');
+INSERT INTO `rbac_permissions` VALUES ('683', 'Command: reload reputation_reward_rate');
+INSERT INTO `rbac_permissions` VALUES ('684', 'Command: reload reputation_spillover_template');
+INSERT INTO `rbac_permissions` VALUES ('685', 'Command: reload skill_discovery_template');
+INSERT INTO `rbac_permissions` VALUES ('686', 'Command: reload skill_extra_item_template');
+INSERT INTO `rbac_permissions` VALUES ('687', 'Command: reload skill_fishing_base_level');
+INSERT INTO `rbac_permissions` VALUES ('688', 'Command: reload skinning_loot_template');
+INSERT INTO `rbac_permissions` VALUES ('689', 'Command: reload smart_scripts');
+INSERT INTO `rbac_permissions` VALUES ('690', 'Command: reload spell_required');
+INSERT INTO `rbac_permissions` VALUES ('691', 'Command: reload spell_area');
+INSERT INTO `rbac_permissions` VALUES ('692', 'Command: reload spell_bonus_data');
+INSERT INTO `rbac_permissions` VALUES ('693', 'Command: reload spell_group');
+INSERT INTO `rbac_permissions` VALUES ('694', 'Command: reload spell_learn_spell');
+INSERT INTO `rbac_permissions` VALUES ('695', 'Command: reload spell_loot_template');
+INSERT INTO `rbac_permissions` VALUES ('696', 'Command: reload spell_linked_spell');
+INSERT INTO `rbac_permissions` VALUES ('697', 'Command: reload spell_pet_auras');
+INSERT INTO `rbac_permissions` VALUES ('698', 'Command: reload spell_proc_event');
+INSERT INTO `rbac_permissions` VALUES ('699', 'Command: reload spell_proc');
+INSERT INTO `rbac_permissions` VALUES ('700', 'Command: reload spell_scripts');
+INSERT INTO `rbac_permissions` VALUES ('701', 'Command: reload spell_target_position');
+INSERT INTO `rbac_permissions` VALUES ('702', 'Command: reload spell_threats');
+INSERT INTO `rbac_permissions` VALUES ('703', 'Command: reload spell_group_stack_rules');
+INSERT INTO `rbac_permissions` VALUES ('704', 'Command: reload trinity_string');
+INSERT INTO `rbac_permissions` VALUES ('705', 'Command: reload warden_action');
+INSERT INTO `rbac_permissions` VALUES ('706', 'Command: reload waypoint_scripts');
+INSERT INTO `rbac_permissions` VALUES ('707', 'Command: reload waypoint_data');
+INSERT INTO `rbac_permissions` VALUES ('708', 'Command: reload vehicle_accessory');
+INSERT INTO `rbac_permissions` VALUES ('709', 'Command: reload vehicle_template_accessory');
+INSERT INTO `rbac_permissions` VALUES ('710', 'Command: reset');
+INSERT INTO `rbac_permissions` VALUES ('711', 'Command: reset achievements');
+INSERT INTO `rbac_permissions` VALUES ('712', 'Command: reset honor');
+INSERT INTO `rbac_permissions` VALUES ('713', 'Command: reset level');
+INSERT INTO `rbac_permissions` VALUES ('714', 'Command: reset spells');
+INSERT INTO `rbac_permissions` VALUES ('715', 'Command: reset stats');
+INSERT INTO `rbac_permissions` VALUES ('716', 'Command: reset talents');
+INSERT INTO `rbac_permissions` VALUES ('717', 'Command: reset all');
+INSERT INTO `rbac_permissions` VALUES ('718', 'Command: server');
+INSERT INTO `rbac_permissions` VALUES ('719', 'Command: server corpses');
+INSERT INTO `rbac_permissions` VALUES ('720', 'Command: server exit');
+INSERT INTO `rbac_permissions` VALUES ('721', 'Command: server idlerestart');
+INSERT INTO `rbac_permissions` VALUES ('722', 'Command: server idlerestart cancel');
+INSERT INTO `rbac_permissions` VALUES ('723', 'Command: server idleshutdown');
+INSERT INTO `rbac_permissions` VALUES ('724', 'Command: server idleshutdown cancel');
+INSERT INTO `rbac_permissions` VALUES ('725', 'Command: server info');
+INSERT INTO `rbac_permissions` VALUES ('726', 'Command: server plimit');
+INSERT INTO `rbac_permissions` VALUES ('727', 'Command: server restart');
+INSERT INTO `rbac_permissions` VALUES ('728', 'Command: server restart cancel');
+INSERT INTO `rbac_permissions` VALUES ('729', 'Command: server set');
+INSERT INTO `rbac_permissions` VALUES ('730', 'Command: server set closed');
+INSERT INTO `rbac_permissions` VALUES ('731', 'Command: server set difftime');
+INSERT INTO `rbac_permissions` VALUES ('732', 'Command: server set loglevel');
+INSERT INTO `rbac_permissions` VALUES ('733', 'Command: server set motd');
+INSERT INTO `rbac_permissions` VALUES ('734', 'Command: server shutdown');
+INSERT INTO `rbac_permissions` VALUES ('735', 'Command: server shutdown cancel');
+INSERT INTO `rbac_permissions` VALUES ('736', 'Command: server motd');
+INSERT INTO `rbac_permissions` VALUES ('737', 'Command: tele');
+INSERT INTO `rbac_permissions` VALUES ('738', 'Command: tele add');
+INSERT INTO `rbac_permissions` VALUES ('739', 'Command: tele del');
+INSERT INTO `rbac_permissions` VALUES ('740', 'Command: tele name');
+INSERT INTO `rbac_permissions` VALUES ('741', 'Command: tele group');
+INSERT INTO `rbac_permissions` VALUES ('742', 'Command: ticket');
+INSERT INTO `rbac_permissions` VALUES ('743', 'Command: ticket assign');
+INSERT INTO `rbac_permissions` VALUES ('744', 'Command: ticket close');
+INSERT INTO `rbac_permissions` VALUES ('745', 'Command: ticket closedlist');
+INSERT INTO `rbac_permissions` VALUES ('746', 'Command: ticket comment');
+INSERT INTO `rbac_permissions` VALUES ('747', 'Command: ticket complete');
+INSERT INTO `rbac_permissions` VALUES ('748', 'Command: ticket delete');
+INSERT INTO `rbac_permissions` VALUES ('749', 'Command: ticket escalate');
+INSERT INTO `rbac_permissions` VALUES ('750', 'Command: ticket escalatedlist');
+INSERT INTO `rbac_permissions` VALUES ('751', 'Command: ticket list');
+INSERT INTO `rbac_permissions` VALUES ('752', 'Command: ticket onlinelist');
+INSERT INTO `rbac_permissions` VALUES ('753', 'Command: ticket reset');
+INSERT INTO `rbac_permissions` VALUES ('754', 'Command: ticket response');
+INSERT INTO `rbac_permissions` VALUES ('755', 'Command: ticket response append');
+INSERT INTO `rbac_permissions` VALUES ('756', 'Command: ticket response appendln');
+INSERT INTO `rbac_permissions` VALUES ('757', 'Command: ticket togglesystem');
+INSERT INTO `rbac_permissions` VALUES ('758', 'Command: ticket unassign');
+INSERT INTO `rbac_permissions` VALUES ('759', 'Command: ticket viewid');
+INSERT INTO `rbac_permissions` VALUES ('760', 'Command: ticket viewname');
+INSERT INTO `rbac_permissions` VALUES ('761', 'Command: titles');
+INSERT INTO `rbac_permissions` VALUES ('762', 'Command: titles add');
+INSERT INTO `rbac_permissions` VALUES ('763', 'Command: titles current');
+INSERT INTO `rbac_permissions` VALUES ('764', 'Command: titles remove');
+INSERT INTO `rbac_permissions` VALUES ('765', 'Command: titles set');
+INSERT INTO `rbac_permissions` VALUES ('766', 'Command: titles set mask');
+INSERT INTO `rbac_permissions` VALUES ('767', 'Command: wp');
+INSERT INTO `rbac_permissions` VALUES ('768', 'Command: wp add');
+INSERT INTO `rbac_permissions` VALUES ('769', 'Command: wp event');
+INSERT INTO `rbac_permissions` VALUES ('770', 'Command: wp load');
+INSERT INTO `rbac_permissions` VALUES ('771', 'Command: wp modify');
+INSERT INTO `rbac_permissions` VALUES ('772', 'Command: wp unload');
+INSERT INTO `rbac_permissions` VALUES ('773', 'Command: wp reload');
+INSERT INTO `rbac_permissions` VALUES ('774', 'Command: wp show');
+INSERT INTO `rbac_permissions` VALUES ('778', 'Command: ahbot');
+INSERT INTO `rbac_permissions` VALUES ('779', 'Command: ahbot items');
+INSERT INTO `rbac_permissions` VALUES ('780', 'Command: ahbot items gray');
+INSERT INTO `rbac_permissions` VALUES ('781', 'Command: ahbot items white');
+INSERT INTO `rbac_permissions` VALUES ('782', 'Command: ahbot items green');
+INSERT INTO `rbac_permissions` VALUES ('783', 'Command: ahbot items blue');
+INSERT INTO `rbac_permissions` VALUES ('784', 'Command: ahbot items purple');
+INSERT INTO `rbac_permissions` VALUES ('785', 'Command: ahbot items orange');
+INSERT INTO `rbac_permissions` VALUES ('786', 'Command: ahbot items yellow');
+INSERT INTO `rbac_permissions` VALUES ('787', 'Command: ahbot ratio');
+INSERT INTO `rbac_permissions` VALUES ('788', 'Command: ahbot ratio alliance');
+INSERT INTO `rbac_permissions` VALUES ('789', 'Command: ahbot ratio horde');
+INSERT INTO `rbac_permissions` VALUES ('790', 'Command: ahbot ratio neutral');
+INSERT INTO `rbac_permissions` VALUES ('791', 'Command: ahbot rebuild');
+INSERT INTO `rbac_permissions` VALUES ('792', 'Command: ahbot reload');
+INSERT INTO `rbac_permissions` VALUES ('793', 'Command: ahbot status');
+INSERT INTO `rbac_permissions` VALUES ('794', 'npcbot');
+INSERT INTO `rbac_permissions` VALUES ('795', 'npcbot add');
+INSERT INTO `rbac_permissions` VALUES ('796', 'npcbot remove');
+INSERT INTO `rbac_permissions` VALUES ('797', 'npcbot reset');
+INSERT INTO `rbac_permissions` VALUES ('798', 'npcbot command');
+INSERT INTO `rbac_permissions` VALUES ('799', 'npcbot distance');
+INSERT INTO `rbac_permissions` VALUES ('800', 'npcbot info');
+INSERT INTO `rbac_permissions` VALUES ('801', 'npcbot helper');
+INSERT INTO `rbac_permissions` VALUES ('802', 'npcbot revive');
+INSERT INTO `rbac_permissions` VALUES ('803', 'maintank (mt)');
+INSERT INTO `rbac_permissions` VALUES ('804', 'npcbot test');
 
-insert  into `rbac_permissions`(`id`,`name`) values (1,'Instant logout'),(2,'Skip Queue'),(3,'Join Normal Battleground'),(4,'Join Random Battleground'),(5,'Join Arenas'),(6,'Join Dungeon Finder'),(11,'Log GM trades'),(13,'Skip Instance required bosses check'),(14,'Skip character creation team mask check'),(15,'Skip character creation class mask check'),(16,'Skip character creation race mask check'),(17,'Skip character creation reserved name check'),(18,'Skip character creation heroic min level check'),(19,'Skip needed requirements to use channel check'),(20,'Skip disable map check'),(21,'Skip reset talents when used more than allowed check'),(22,'Skip spam chat check'),(23,'Skip over-speed ping check'),(24,'Two side faction characters on the same account'),(25,'Allow say chat between factions'),(26,'Allow channel chat between factions'),(27,'Two side mail interaction'),(28,'See two side who list'),(29,'Add friends of other faction'),(30,'Save character without delay with .save command'),(31,'Use params with .unstuck command'),(32,'Can be assigned tickets with .assign ticket command'),(33,'Notify if a command was not found'),(34,'Check if should appear in list using .gm ingame command'),(35,'See all security levels with who command'),(36,'Filter whispers'),(37,'Use staff badge in chat'),(38,'Resurrect with full Health Points'),(39,'Restore saved gm setting states'),(40,'Allows to add a gm to friend list'),(41,'Use Config option START_GM_LEVEL to assign new character level'),(42,'Allows to use CMSG_WORLD_TELEPORT opcode'),(43,'Allows to use CMSG_WHOIS opcode'),(44,'Receive global GM messages/texts'),(45,'Join channels without announce'),(46,'Change channel settings without being channel moderator'),(47,'Enables lower security than target check'),(48,'Enable IP, Last Login and EMail output in pinfo'),(49,'Forces to enter the email for confirmation on password change'),(50,'Allow user to check his own email with .account'),(192,'Role: Sec Level Administrator'),(193,'Role: Sec Level Gamemaster'),(194,'Role: Sec Level Moderator'),(195,'Role: Sec Level Player'),(196,'Role: Administrator Commands'),(197,'Role: Gamemaster Commands'),(198,'Role: Moderator Commands'),(199,'Role: Player Commands'),(200,'Command: rbac'),(201,'Command: rbac account'),(202,'Command: rbac account list'),(203,'Command: rbac account grant'),(204,'Command: rbac account deny'),(205,'Command: rbac account revoke'),(206,'Command: rbac list'),(217,'Command: account'),(218,'Command: account addon'),(219,'Command: account create'),(220,'Command: account delete'),(221,'Command: account lock'),(222,'Command: account lock country'),(223,'Command: account lock ip'),(224,'Command: account onlinelist'),(225,'Command: account password'),(226,'Command: account set'),(227,'Command: account set addon'),(228,'Command: account set gmlevel'),(229,'Command: account set password'),(230,'Command: achievement'),(231,'Command: achievement add'),(232,'Command: arena'),(233,'Command: arena captain'),(234,'Command: arena create'),(235,'Command: arena disband'),(236,'Command: arena info'),(237,'Command: arena lookup'),(238,'Command: arena rename'),(239,'Command: ban'),(240,'Command: ban account'),(241,'Command: ban character'),(242,'Command: ban ip'),(243,'Command: ban playeraccount'),(244,'Command: baninfo'),(245,'Command: baninfo account'),(246,'Command: baninfo character'),(247,'Command: baninfo ip'),(248,'Command: banlist'),(249,'Command: banlist account'),(250,'Command: banlist character'),(251,'Command: banlist ip'),(252,'Command: unban'),(253,'Command: unban account'),(254,'Command: unban character'),(255,'Command: unban ip'),(256,'Command: unban playeraccount'),(257,'Command: bf'),(258,'Command: bf start'),(259,'Command: bf stop'),(260,'Command: bf switch'),(261,'Command: bf timer'),(262,'Command: bf enable'),(263,'Command: account email'),(264,'Command: account set sec'),(265,'Command: account set sec email'),(266,'Command: account set sec regmail'),(267,'Command: cast'),(268,'Command: cast back'),(269,'Command: cast dist'),(270,'Command: cast self'),(271,'Command: cast target'),(272,'Command: cast dest'),(273,'Command: character'),(274,'Command: character customize'),(275,'Command: character changefaction'),(276,'Command: character changerace'),(277,'Command: character deleted'),(279,'Command: character deleted list'),(280,'Command: character deleted restore'),(283,'Command: character level'),(284,'Command: character rename'),(285,'Command: character reputation'),(286,'Command: character titles'),(287,'Command: levelup'),(288,'Command: pdump'),(289,'Command: pdump load'),(290,'Command: pdump write'),(291,'Command: cheat'),(292,'Command: cheat casttime'),(293,'Command: cheat cooldown'),(294,'Command: cheat explore'),(295,'Command: cheat god'),(296,'Command: cheat power'),(297,'Command: cheat status'),(298,'Command: cheat taxi'),(299,'Command: cheat waterwalk'),(300,'Command: debug'),(301,'Command: debug anim'),(302,'Command: debug areatriggers'),(303,'Command: debug arena'),(304,'Command: debug bg'),(305,'Command: debug entervehicle'),(306,'Command: debug getitemstate'),(307,'Command: debug getitemvalue'),(308,'Command: debug getvalue'),(309,'Command: debug hostil'),(310,'Command: debug itemexpire'),(311,'Command: debug lootrecipient'),(312,'Command: debug los'),(313,'Command: debug mod32value'),(314,'Command: debug moveflags'),(315,'Command: debug play'),(316,'Command: debug play cinematics'),(317,'Command: debug play movie'),(318,'Command: debug play sound'),(319,'Command: debug send'),(320,'Command: debug send buyerror'),(321,'Command: debug send channelnotify'),(322,'Command: debug send chatmessage'),(323,'Command: debug send equiperror'),(324,'Command: debug send largepacket'),(325,'Command: debug send opcode'),(326,'Command: debug send qinvalidmsg'),(327,'Command: debug send qpartymsg'),(328,'Command: debug send sellerror'),(329,'Command: debug send setphaseshift'),(330,'Command: debug send spellfail'),(331,'Command: debug setaurastate'),(332,'Command: debug setbit'),(333,'Command: debug setitemvalue'),(334,'Command: debug setvalue'),(335,'Command: debug setvid'),(336,'Command: debug spawnvehicle'),(337,'Command: debug threat'),(338,'Command: debug update'),(339,'Command: debug uws'),(340,'Command: wpgps'),(341,'Command: deserter'),(342,'Command: deserter bg'),(343,'Command: deserter bg add'),(344,'Command: deserter bg remove'),(345,'Command: deserter instance'),(346,'Command: deserter instance add'),(347,'Command: deserter instance remove'),(348,'Command: disable'),(349,'Command: disable add'),(350,'Command: disable add achievement_criteria'),(351,'Command: disable add battleground'),(352,'Command: disable add map'),(353,'Command: disable add mmap'),(354,'Command: disable add outdoorpvp'),(355,'Command: disable add quest'),(356,'Command: disable add spell'),(357,'Command: disable add vmap'),(358,'Command: disable remove'),(359,'Command: disable remove achievement_criteria'),(360,'Command: disable remove battleground'),(361,'Command: disable remove map'),(362,'Command: disable remove mmap'),(363,'Command: disable remove outdoorpvp'),(364,'Command: disable remove quest'),(365,'Command: disable remove spell'),(366,'Command: disable remove vmap'),(367,'Command: event'),(368,'Command: event activelist'),(369,'Command: event start'),(370,'Command: event stop'),(371,'Command: gm'),(372,'Command: gm chat'),(373,'Command: gm fly'),(374,'Command: gm ingame'),(375,'Command: gm list'),(376,'Command: gm visible'),(377,'Command: go'),(378,'Command: go creature'),(379,'Command: go graveyard'),(380,'Command: go grid'),(381,'Command: go object'),(382,'Command: go taxinode'),(383,'Command: go ticket'),(384,'Command: go trigger'),(385,'Command: go xyz'),(386,'Command: go zonexy'),(387,'Command: gobject'),(388,'Command: gobject activate'),(389,'Command: gobject add'),(390,'Command: gobject add temp'),(391,'Command: gobject delete'),(392,'Command: gobject info'),(393,'Command: gobject move'),(394,'Command: gobject near'),(395,'Command: gobject set'),(396,'Command: gobject set phase'),(397,'Command: gobject set state'),(398,'Command: gobject target'),(399,'Command: gobject turn'),(400,'debug transport'),(401,'Command: guild'),(402,'Command: guild create'),(403,'Command: guild delete'),(404,'Command: guild invite'),(405,'Command: guild uninvite'),(406,'Command: guild rank'),(407,'Command: guild rename'),(408,'Command: honor'),(409,'Command: honor add'),(410,'Command: honor add kill'),(411,'Command: honor update'),(412,'Command: instance'),(413,'Command: instance listbinds'),(414,'Command: instance unbind'),(415,'Command: instance stats'),(416,'Command: instance savedata'),(417,'Command: learn'),(418,'Command: learn all'),(419,'Command: learn all my'),(420,'Command: learn all my class'),(421,'Command: learn all my pettalents'),(422,'Command: learn all my spells'),(423,'Command: learn all my talents'),(424,'Command: learn all gm'),(425,'Command: learn all crafts'),(426,'Command: learn all default'),(427,'Command: learn all lang'),(428,'Command: learn all recipes'),(429,'Command: unlearn'),(430,'Command: lfg'),(431,'Command: lfg player'),(432,'Command: lfg group'),(433,'Command: lfg queue'),(434,'Command: lfg clean'),(435,'Command: lfg options'),(436,'Command: list'),(437,'Command: list creature'),(438,'Command: list item'),(439,'Command: list object'),(440,'Command: list auras'),(441,'Command: list mail'),(442,'Command: lookup'),(443,'Command: lookup area'),(444,'Command: lookucreature'),(445,'Command: lookup event'),(446,'Command: lookup faction'),(447,'Command: lookup item'),(448,'Command: lookup itemset'),(449,'Command: lookup object'),(450,'Command: lookup quest'),(451,'Command: lookup player'),(452,'Command: lookup player ip'),(453,'Command: lookup player account'),(454,'Command: lookup player email'),(455,'Command: lookup skill'),(456,'Command: lookup spell'),(457,'Command: lookup spell id'),(458,'Command: lookup taxinode'),(459,'Command: lookup tele'),(460,'Command: lookup title'),(461,'Command: lookup map'),(462,'Command: announce'),(463,'Command: channel'),(464,'Command: channel set'),(465,'Command: channel set ownership'),(466,'Command: gmannounce'),(467,'Command: gmnameannounce'),(468,'Command: gmnotify'),(469,'Command: nameannounce'),(470,'Command: notify'),(471,'Command: whispers'),(472,'Command: group'),(473,'Command: group leader'),(474,'Command: group disband'),(475,'Command: group remove'),(476,'Command: group join'),(477,'Command: group list'),(478,'Command: group summon'),(479,'Command: pet'),(480,'Command: pet create'),(481,'Command: pet learn'),(482,'Command: pet unlearn'),(483,'Command: send'),(484,'Command: send items'),(485,'Command: send mail'),(486,'Command: send message'),(487,'Command: send money'),(488,'Command: additem'),(489,'Command: additemset'),(490,'Command: appear'),(491,'Command: aura'),(492,'Command: bank'),(493,'Command: bindsight'),(494,'Command: combatstop'),(495,'Command: cometome'),(496,'Command: commands'),(497,'Command: cooldown'),(498,'Command: damage'),(499,'Command: dev'),(500,'Command: die'),(501,'Command: dismount'),(502,'Command: distance'),(503,'Command: flusharenapoints'),(504,'Command: freeze'),(505,'Command: gps'),(506,'Command: guid'),(507,'Command: help'),(508,'Command: hidearea'),(509,'Command: itemmove'),(510,'Command: kick'),(511,'Command: linkgrave'),(512,'Command: listfreeze'),(513,'Command: maxskill'),(514,'Command: movegens'),(515,'Command: mute'),(516,'Command: neargrave'),(517,'Command: pinfo'),(518,'Command: playall'),(519,'Command: possess'),(520,'Command: recall'),(521,'Command: repairitems'),(522,'Command: respawn'),(523,'Command: revive'),(524,'Command: saveall'),(525,'Command: save'),(526,'Command: setskill'),(527,'Command: showarea'),(528,'Command: summon'),(529,'Command: unaura'),(530,'Command: unbindsight'),(531,'Command: unfreeze'),(532,'Command: unmute'),(533,'Command: unpossess'),(534,'Command: unstuck'),(535,'Command: wchange'),(536,'Command: mmap'),(537,'Command: mmap loadedtiles'),(538,'Command: mmap loc'),(539,'Command: mmap path'),(540,'Command: mmap stats'),(541,'Command: mmap testarea'),(542,'Command: morph'),(543,'Command: demorph'),(544,'Command: modify'),(545,'Command: modify arenapoints'),(546,'Command: modify bit'),(547,'Command: modify drunk'),(548,'Command: modify energy'),(549,'Command: modify faction'),(550,'Command: modify gender'),(551,'Command: modify honor'),(552,'Command: modify hp'),(553,'Command: modify mana'),(554,'Command: modify money'),(555,'Command: modify mount'),(556,'Command: modify phase'),(557,'Command: modify rage'),(558,'Command: modify reputation'),(559,'Command: modify runicpower'),(560,'Command: modify scale'),(561,'Command: modify speed'),(562,'Command: modify speed all'),(563,'Command: modify speed backwalk'),(564,'Command: modify speed fly'),(565,'Command: modify speed walk'),(566,'Command: modify speed swim'),(567,'Command: modify spell'),(568,'Command: modify standstate'),(569,'Command: modify talentpoints'),(570,'Command: npc'),(571,'Command: npc add'),(572,'Command: npc add formation'),(573,'Command: npc add item'),(574,'Command: npc add move'),(575,'Command: npc add temp'),(576,'Command: npc add delete'),(577,'Command: npc add delete item'),(578,'Command: npc add follow'),(579,'Command: npc add follow stop'),(580,'Command: npc set'),(581,'Command: npc set allowmove'),(582,'Command: npc set entry'),(583,'Command: npc set factionid'),(584,'Command: npc set flag'),(585,'Command: npc set level'),(586,'Command: npc set link'),(587,'Command: npc set model'),(588,'Command: npc set movetype'),(589,'Command: npc set phase'),(590,'Command: npc set spawndist'),(591,'Command: npc set spawntime'),(592,'Command: npc set data'),(593,'Command: npc info'),(594,'Command: npc near'),(595,'Command: npc move'),(596,'Command: npc playemote'),(597,'Command: npc say'),(598,'Command: npc textemote'),(599,'Command: npc whisper'),(600,'Command: npc yell'),(601,'Command: npc tame'),(602,'Command: quest'),(603,'Command: quest add'),(604,'Command: quest complete'),(605,'Command: quest remove'),(606,'Command: quest reward'),(607,'Command: reload'),(608,'Command: reload access_requirement'),(609,'Command: reload achievement_criteria_data'),(610,'Command: reload achievement_reward'),(611,'Command: reload all'),(612,'Command: reload all achievement'),(613,'Command: reload all area'),(614,'Command: broadcast_text'),(615,'Command: reload all gossips'),(616,'Command: reload all item'),(617,'Command: reload all locales'),(618,'Command: reload all loot'),(619,'Command: reload all npc'),(620,'Command: reload all quest'),(621,'Command: reload all scripts'),(622,'Command: reload all spell'),(623,'Command: reload areatrigger_involvedrelation'),(624,'Command: reload areatrigger_tavern'),(625,'Command: reload areatrigger_teleport'),(626,'Command: reload auctions'),(627,'Command: reload autobroadcast'),(628,'Command: reload command'),(629,'Command: reload conditions'),(630,'Command: reload config'),(633,'Command: reload creature_linked_respawn'),(634,'Command: reload creature_loot_template'),(635,'Command: reload creature_onkill_reputation'),(636,'Command: reload creature_questender'),(637,'Command: reload creature_queststarter'),(638,'Command: reload creature_summon_groups'),(639,'Command: reload creature_template'),(640,'Command: reload creature_text'),(641,'Command: reload disables'),(642,'Command: reload disenchant_loot_template'),(643,'Command: reload event_scripts'),(644,'Command: reload fishing_loot_template'),(645,'Command: reload game_graveyard_zone'),(646,'Command: reload game_tele'),(647,'Command: reload gameobject_questender'),(648,'Command: reload gameobject_loot_template'),(649,'Command: reload gameobject_queststarter'),(650,'Command: reload gm_tickets'),(651,'Command: reload gossip_menu'),(652,'Command: reload gossip_menu_option'),(653,'Command: reload item_enchantment_template'),(654,'Command: reload item_loot_template'),(655,'Command: reload item_set_names'),(656,'Command: reload lfg_dungeon_rewards'),(657,'Command: reload locales_achievement_reward'),(658,'Command: reload locales_creature'),(659,'Command: reload locales_creature_text'),(660,'Command: reload locales_gameobject'),(661,'Command: reload locales_gossip_menu_option'),(662,'Command: reload locales_item'),(663,'Command: reload locales_item_set_name'),(664,'Command: reload locales_npc_text'),(665,'Command: reload locales_page_text'),(666,'Command: reload locales_points_of_interest'),(667,'Command: reload locales_quest'),(668,'Command: reload mail_level_reward'),(669,'Command: reload mail_loot_template'),(670,'Command: reload milling_loot_template'),(671,'Command: reload npc_spellclick_spells'),(672,'Command: reload npc_trainer'),(673,'Command: reload npc_vendor'),(674,'Command: reload page_text'),(675,'Command: reload pickpocketing_loot_template'),(676,'Command: reload points_of_interest'),(677,'Command: reload prospecting_loot_template'),(678,'Command: reload quest_poi'),(679,'Command: reload quest_template'),(680,'Command: reload rbac'),(681,'Command: reload reference_loot_template'),(682,'Command: reload reserved_name'),(683,'Command: reload reputation_reward_rate'),(684,'Command: reload reputation_spillover_template'),(685,'Command: reload skill_discovery_template'),(686,'Command: reload skill_extra_item_template'),(687,'Command: reload skill_fishing_base_level'),(688,'Command: reload skinning_loot_template'),(689,'Command: reload smart_scripts'),(690,'Command: reload spell_required'),(691,'Command: reload spell_area'),(692,'Command: reload spell_bonus_data'),(693,'Command: reload spell_group'),(694,'Command: reload spell_learn_spell'),(695,'Command: reload spell_loot_template'),(696,'Command: reload spell_linked_spell'),(697,'Command: reload spell_pet_auras'),(698,'Command: reload spell_proc_event'),(699,'Command: reload spell_proc'),(700,'Command: reload spell_scripts'),(701,'Command: reload spell_target_position'),(702,'Command: reload spell_threats'),(703,'Command: reload spell_group_stack_rules'),(704,'Command: reload trinity_string'),(705,'Command: reload warden_action'),(706,'Command: reload waypoint_scripts'),(707,'Command: reload waypoint_data'),(708,'Command: reload vehicle_accessory'),(709,'Command: reload vehicle_template_accessory'),(710,'Command: reset'),(711,'Command: reset achievements'),(712,'Command: reset honor'),(713,'Command: reset level'),(714,'Command: reset spells'),(715,'Command: reset stats'),(716,'Command: reset talents'),(717,'Command: reset all'),(718,'Command: server'),(719,'Command: server corpses'),(720,'Command: server exit'),(721,'Command: server idlerestart'),(722,'Command: server idlerestart cancel'),(723,'Command: server idleshutdown'),(724,'Command: server idleshutdown cancel'),(725,'Command: server info'),(726,'Command: server plimit'),(727,'Command: server restart'),(728,'Command: server restart cancel'),(729,'Command: server set'),(730,'Command: server set closed'),(731,'Command: server set difftime'),(732,'Command: server set loglevel'),(733,'Command: server set motd'),(734,'Command: server shutdown'),(735,'Command: server shutdown cancel'),(736,'Command: server motd'),(737,'Command: tele'),(738,'Command: tele add'),(739,'Command: tele del'),(740,'Command: tele name'),(741,'Command: tele group'),(742,'Command: ticket'),(743,'Command: ticket assign'),(744,'Command: ticket close'),(745,'Command: ticket closedlist'),(746,'Command: ticket comment'),(747,'Command: ticket complete'),(748,'Command: ticket delete'),(749,'Command: ticket escalate'),(750,'Command: ticket escalatedlist'),(751,'Command: ticket list'),(752,'Command: ticket onlinelist'),(753,'Command: ticket reset'),(754,'Command: ticket response'),(755,'Command: ticket response append'),(756,'Command: ticket response appendln'),(757,'Command: ticket togglesystem'),(758,'Command: ticket unassign'),(759,'Command: ticket viewid'),(760,'Command: ticket viewname'),(761,'Command: titles'),(762,'Command: titles add'),(763,'Command: titles current'),(764,'Command: titles remove'),(765,'Command: titles set'),(766,'Command: titles set mask'),(767,'Command: wp'),(768,'Command: wp add'),(769,'Command: wp event'),(770,'Command: wp load'),(771,'Command: wp modify'),(772,'Command: wp unload'),(773,'Command: wp reload'),(774,'Command: wp show');
-
-/*Table structure for table `realmcharacters` */
-
+-- ----------------------------
+-- Table structure for realmcharacters
+-- ----------------------------
 DROP TABLE IF EXISTS `realmcharacters`;
-
 CREATE TABLE `realmcharacters` (
   `realmid` int(10) unsigned NOT NULL DEFAULT '0',
   `acctid` int(10) unsigned NOT NULL,
   `numchars` tinyint(3) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`realmid`,`acctid`),
-  KEY `acctid` (`acctid`)
+  KEY `acctid` (`acctid`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Realm Character Tracker';
 
-/*Data for the table `realmcharacters` */
+-- ----------------------------
+-- Records of realmcharacters
+-- ----------------------------
+INSERT INTO `realmcharacters` VALUES ('1', '1', '2');
 
-/*Table structure for table `realmlist` */
-
+-- ----------------------------
+-- Table structure for realmlist
+-- ----------------------------
 DROP TABLE IF EXISTS `realmlist`;
-
 CREATE TABLE `realmlist` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(32) NOT NULL DEFAULT '',
@@ -247,17 +1539,18 @@ CREATE TABLE `realmlist` (
   `population` float unsigned NOT NULL DEFAULT '0',
   `gamebuild` int(10) unsigned NOT NULL DEFAULT '15595',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `idx_name` (`name`)
+  UNIQUE KEY `idx_name` (`name`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='Realm System';
 
-/*Data for the table `realmlist` */
+-- ----------------------------
+-- Records of realmlist
+-- ----------------------------
+INSERT INTO `realmlist` VALUES ('1', 'ArkCORE4-NG', 'localhost', '127.0.0.1', '255.255.255.0', '8085', '0', '0', '9', '0', '0', '15595');
 
-insert  into `realmlist`(`id`,`name`,`address`,`localAddress`,`localSubnetMask`,`port`,`icon`,`flag`,`timezone`,`allowedSecurityLevel`,`population`,`gamebuild`) values (1,'ArkCORE4-NG','127.0.0.1','127.0.0.1','255.255.255.0',8085,0,1,1,0,0,15595);
-
-/*Table structure for table `uptime` */
-
+-- ----------------------------
+-- Table structure for uptime
+-- ----------------------------
 DROP TABLE IF EXISTS `uptime`;
-
 CREATE TABLE `uptime` (
   `realmid` int(10) unsigned NOT NULL,
   `starttime` int(10) unsigned NOT NULL DEFAULT '0',
@@ -267,9 +1560,6 @@ CREATE TABLE `uptime` (
   PRIMARY KEY (`realmid`,`starttime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Uptime system';
 
-/*Data for the table `uptime` */
-
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+-- ----------------------------
+-- Records of uptime
+-- ----------------------------

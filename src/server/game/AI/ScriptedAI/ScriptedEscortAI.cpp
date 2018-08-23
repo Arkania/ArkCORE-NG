@@ -85,6 +85,20 @@ bool npc_escortAI::AssistPlayerInCombat(Unit* who)
     if (me->IsFriendlyTo(who))
         return false;
 
+    if (!who->isInAccessiblePlaceFor(me))
+        return false;
+
+    if (!CanAIAttack(who))
+        return false;
+
+    // we cannot attack in evade mode
+    if (me->IsInEvadeMode())
+        return false;
+
+    // or if enemy is in evade mode
+    if (who->GetTypeId() == TYPEID_UNIT && who->ToCreature()->IsInEvadeMode())
+        return false;
+
     //too far away and no free sight?
     if (me->IsWithinDistInMap(who, GetMaxPlayerDistance()) && me->IsWithinLOSInMap(who))
     {
@@ -144,7 +158,7 @@ void npc_escortAI::JustDied(Unit* /*killer*/)
     {
         if (Group* group = player->GetGroup())
         {
-            for (GroupReference* groupRef = group->GetFirstMember(); groupRef != NULL; groupRef = groupRef->next())
+            for (GroupReference* groupRef = group->GetFirstMember(); groupRef != nullptr; groupRef = groupRef->next())
                 if (Player* member = groupRef->GetSource())
                     if (member->GetQuestStatus(m_pQuestForEscort->GetQuestId()) == QUEST_STATUS_INCOMPLETE)
                         member->FailQuest(m_pQuestForEscort->GetQuestId());
@@ -208,7 +222,7 @@ bool npc_escortAI::IsPlayerOrGroupInRange()
     {
         if (Group* group = player->GetGroup())
         {
-            for (GroupReference* groupRef = group->GetFirstMember(); groupRef != NULL; groupRef = groupRef->next())
+            for (GroupReference* groupRef = group->GetFirstMember(); groupRef != nullptr; groupRef = groupRef->next())
                 if (Player* member = groupRef->GetSource())
                     if (me->IsWithinDistInMap(member, GetMaxPlayerDistance()))
                         return true;

@@ -481,8 +481,8 @@ class boss_kaelthas : public CreatureScript
                 {
                     case 1:
                     {
-                        Unit* target = NULL;
-                        Creature* Advisor = NULL;
+                        Unit* target = nullptr;
+                        Creature* Advisor = nullptr;
 
                         //Subphase switch
                         switch (PhaseSubphase)
@@ -1268,7 +1268,7 @@ class boss_grand_astromancer_capernian : public CreatureScript
                 //Conflagration_Timer
                 if (Conflagration_Timer <= diff)
                 {
-                    Unit* target = NULL;
+                    Unit* target = nullptr;
                     target = SelectTarget(SELECT_TARGET_RANDOM, 0);
 
                     if (target && me->IsWithinDistInMap(target, 30))
@@ -1285,7 +1285,7 @@ class boss_grand_astromancer_capernian : public CreatureScript
                 if (ArcaneExplosion_Timer <= diff)
                 {
                     bool InMeleeRange = false;
-                    Unit* target = NULL;
+                    Unit* target = nullptr;
                     ThreatContainer::StorageType const &threatlist = me->getThreatManager().getThreatList();
                     for (ThreatContainer::StorageType::const_iterator i = threatlist.begin(); i!= threatlist.end(); ++i)
                     {

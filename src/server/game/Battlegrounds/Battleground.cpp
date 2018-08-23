@@ -151,7 +151,7 @@ Battleground::Battleground()
     m_MinPlayers        = 0;
 
     m_MapId             = 0;
-    m_Map               = NULL;
+    m_Map               = nullptr;
     m_StartMaxDist      = 0.0f;
     ScriptId            = 0;
 
@@ -176,8 +176,8 @@ Battleground::Battleground()
     m_ArenaTeamMMR[TEAM_ALLIANCE]   = 0;
     m_ArenaTeamMMR[TEAM_HORDE]      = 0;
 
-    m_BgRaids[TEAM_ALLIANCE]         = NULL;
-    m_BgRaids[TEAM_HORDE]            = NULL;
+    m_BgRaids[TEAM_ALLIANCE]         = nullptr;
+    m_BgRaids[TEAM_HORDE]            = nullptr;
 
     m_PlayersCount[TEAM_ALLIANCE]    = 0;
     m_PlayersCount[TEAM_HORDE]       = 0;
@@ -220,7 +220,7 @@ Battleground::~Battleground()
         m_Map->SetUnload();
         //unlink to prevent crash, always unlink all pointer reference before destruction
         m_Map->SetBG(NULL);
-        m_Map = NULL;
+        m_Map = nullptr;
     }
     // remove from bg free slot queue
     RemoveFromBGFreeSlotQueue();
@@ -356,7 +356,7 @@ inline void Battleground::_ProcessRessurect(uint32 diff)
         {
             for (std::map<uint64, std::vector<uint64> >::iterator itr = m_ReviveQueue.begin(); itr != m_ReviveQueue.end(); ++itr)
             {
-                Creature* sh = NULL;
+                Creature* sh = nullptr;
                 for (std::vector<uint64>::const_iterator itr2 = (itr->second).begin(); itr2 != (itr->second).end(); ++itr2)
                 {
                     Player* player = ObjectAccessor::FindPlayer(*itr2);
@@ -616,7 +616,7 @@ inline void Battleground::_ProcessLeave(uint32 diff)
 
 inline Player* Battleground::_GetPlayer(uint64 guid, bool offlineRemove, char const* context) const
 {
-    Player* player = NULL;
+    Player* player = nullptr;
     if (!offlineRemove)
     {
         player = ObjectAccessor::FindPlayer(guid);
@@ -646,7 +646,7 @@ inline Player* Battleground::_GetPlayerForTeam(uint32 teamId, BattlegroundPlayer
         if (!team)
             team = player->GetTeam();
         if (team != teamId)
-            player = NULL;
+            player = nullptr;
     }
     return player;
 }
@@ -760,8 +760,8 @@ void Battleground::EndBattleground(uint32 winner)
 {
     RemoveFromBGFreeSlotQueue();
 
-    ArenaTeam* winnerArenaTeam = NULL;
-    ArenaTeam* loserArenaTeam = NULL;
+    ArenaTeam* winnerArenaTeam = nullptr;
+    ArenaTeam* loserArenaTeam = nullptr;
 
     uint32 loserTeamRating = 0;
     uint32 loserMatchmakerRating = 0;
@@ -1323,6 +1323,7 @@ void Battleground::AddOrSetPlayerToCorrectBgGroup(Player* player, uint32 team)
                 {
                     group->ChangeLeader(playerGuid);
                     group->SendUpdate();
+					group->SendRaidMarkerUpdateToPlayer(playerGuid);
                 }
         }
     }
@@ -1528,7 +1529,7 @@ void Battleground::RelocateDeadPlayers(uint64 queueIndex)
     std::vector<uint64>& ghostList = m_ReviveQueue[queueIndex];
     if (!ghostList.empty())
     {
-        WorldSafeLocsEntry const* closestGrave = NULL;
+        WorldSafeLocsEntry const* closestGrave = nullptr;
         for (std::vector<uint64>::const_iterator itr = ghostList.begin(); itr != ghostList.end(); ++itr)
         {
             Player* player = ObjectAccessor::FindPlayer(*itr);

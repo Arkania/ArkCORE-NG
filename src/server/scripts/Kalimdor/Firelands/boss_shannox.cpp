@@ -736,7 +736,7 @@ public:
             if (me->isAttackReady() && me->IsWithinMeleeRange(victim))
             {
                 me->AttackerStateUpdate(victim);
-                me->resetAttackTimer();
+                me->ResetAttackTimer();
 
                 if (me->GetMap()->IsHeroic())
                     me->AddAura(SPELL_FEEDING_FRENZY_H, me);
@@ -916,7 +916,7 @@ public:
             if (me->isAttackReady() && me->IsWithinMeleeRange(victim))
             {
                 me->AttackerStateUpdate(victim);
-                me->resetAttackTimer();
+                me->ResetAttackTimer();
 
                 if (me->GetMap()->IsHeroic())
                     me->AddAura(SPELL_FEEDING_FRENZY_H, me);
@@ -1038,7 +1038,7 @@ public:
         npc_immolation_trapAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = me->GetInstanceScript();
-            tempTarget = NULL;
+            tempTarget = nullptr;
             me->SetReactState(REACT_PASSIVE);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NOT_SELECTABLE);
             events.Reset();
@@ -1133,8 +1133,8 @@ public:
         npc_crystal_trapAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = me->GetInstanceScript();
-            tempTarget = NULL;
-            myPrison = NULL;
+            tempTarget = nullptr;
+            myPrison = nullptr;
             me->SetReactState(REACT_PASSIVE);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NOT_SELECTABLE);
             events.Reset();

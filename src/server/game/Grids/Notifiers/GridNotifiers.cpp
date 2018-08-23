@@ -130,12 +130,15 @@ void VisibleChangesNotifier::Visit(DynamicObjectMapType &m)
 
 inline void CreatureUnitRelocationWorker(Creature* c, Unit* u)
 {
-    if (!u->IsAlive() || !c->IsAlive() || c == u || u->IsInFlight())
+    if (!u->IsAlive() || !c->IsAlive() || c == u || c->HasUnitState(UNIT_STATE_SIGHTLESS))
         return;
 
-    if (c->HasReactState(REACT_AGGRESSIVE) && !c->HasUnitState(UNIT_STATE_SIGHTLESS))
-        if (c->IsAIEnabled && c->CanSeeOrDetect(u, false, true))
+    if (c->IsAIEnabled && c->CanSeeOrDetect(u, false, true))
+    {
+        c->AI()->CreatureMoveInLineOfSight(u);
+        if (c->HasReactState(REACT_AGGRESSIVE) && !u->IsInFlight())
             c->AI()->MoveInLineOfSight_Safe(u);
+    }
 }
 
 void PlayerRelocationNotifier::Visit(PlayerMapType &m)
@@ -262,7 +265,7 @@ void MessageDistDeliverer::Visit(PlayerMapType &m)
     for (PlayerMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
     {
         Player* target = iter->GetSource();
-        if (!target->InSamePhase(i_phaseMask))
+        if (!target->IsInPhase(i_source))
             continue;
 
         if (target->GetExactDist2dSq(i_source) > i_distSq)
@@ -287,7 +290,7 @@ void MessageDistDeliverer::Visit(CreatureMapType &m)
     for (CreatureMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
     {
         Creature* target = iter->GetSource();
-        if (!target->InSamePhase(i_phaseMask))
+        if (!target->IsInPhase(i_source))
             continue;
 
         if (target->GetExactDist2dSq(i_source) > i_distSq)
@@ -309,7 +312,7 @@ void MessageDistDeliverer::Visit(DynamicObjectMapType &m)
     for (DynamicObjectMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
     {
         DynamicObject* target = iter->GetSource();
-        if (!target->InSamePhase(i_phaseMask))
+        if (!target->IsInPhase(i_source))
             continue;
 
         if (target->GetExactDist2dSq(i_source) > i_distSq)

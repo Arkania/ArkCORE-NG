@@ -1,3 +1,22 @@
+/*
+ * Copyright (C) 2011-2016 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation; either version 2 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include "mpqfile.h"
 #include <deque>
 #include <cstdio>
@@ -10,7 +29,7 @@ MPQFile::MPQFile(HANDLE mpq, const char* filename, bool warnNoExist /*= true*/) 
     size(0)
 {
     HANDLE file;
-    if (!SFileOpenFileEx(mpq, filename, SFILE_OPEN_PATCHED_FILE, &file))
+    if (!SFileOpenFileEx(mpq, filename, SFILE_OPEN_FROM_MPQ, &file))
     {
         if (warnNoExist || GetLastError() != ERROR_FILE_NOT_FOUND)
             fprintf(stderr, "Can't open %s, err=%u!\n", filename, GetLastError());
@@ -39,7 +58,7 @@ MPQFile::MPQFile(HANDLE mpq, const char* filename, bool warnNoExist /*= true*/) 
 
     DWORD read = 0;
     buffer = new char[size];
-    if (!SFileReadFile(file, buffer, size, &read) || size != read)
+    if (!SFileReadFile(file, buffer, size, &read, NULL) || size != read)
     {
         fprintf(stderr, "Can't read %s, size=%u read=%u!\n", filename, uint32(size), uint32(read));
         SFileCloseFile(file);

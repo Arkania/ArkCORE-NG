@@ -101,6 +101,12 @@
 # define ACE_LACKS_PERFECT_MULTICAST_FILTERING 1
 #endif /* ACE_LACKS_PERFECT_MULTICAST_FILTERING */
 
+#if defined (__ia64) || defined (__x86_64__)
+# define ACE_UINT64_FORMAT_SPECIFIER_ASCII "%lu"
+# define ACE_SSIZE_T_FORMAT_SPECIFIER_ASCII "%ld"
+# define ACE_SIZE_T_FORMAT_SPECIFIER_ASCII "%lu"
+#endif /* __ia64 */
+
 //
 // Version specific settings
 //

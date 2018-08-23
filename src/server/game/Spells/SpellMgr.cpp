@@ -1118,6 +1118,11 @@ SpellAreaForAreaMapBounds SpellMgr::GetSpellAreaForAreaMapBounds(uint32 area_id)
     return mSpellAreaForAreaMap.equal_range(area_id);
 }
 
+SpellAreaForQuestAreaMapBounds SpellMgr::GetSpellAreaForQuestAreaMapBounds(uint32 area_id, uint32 quest_id) const
+{
+    return mSpellAreaForQuestAreaMap.equal_range(std::pair<uint32, uint32>(area_id, quest_id));
+}
+
 bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32 newArea) const
 {
     if (gender != GENDER_NONE)                   // not in expected gender
@@ -1211,7 +1216,7 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
 void SpellMgr::UnloadSpellInfoChains()
 {
     for (SpellChainMap::iterator itr = mSpellChains.begin(); itr != mSpellChains.end(); ++itr)
-        mSpellInfoMap[itr->first]->ChainEntry = NULL;
+        mSpellInfoMap[itr->first]->ChainEntry = nullptr;
 
     mSpellChains.clear();
 }
@@ -1227,7 +1232,7 @@ void SpellMgr::LoadSpellTalentRanks()
         if (!talentInfo)
             continue;
 
-        SpellInfo const* lastSpell = NULL;
+        SpellInfo const* lastSpell = nullptr;
         for (uint8 rank = MAX_TALENT_RANK - 1; rank > 0; --rank)
         {
             if (talentInfo->RankID[rank])
@@ -1247,7 +1252,7 @@ void SpellMgr::LoadSpellTalentRanks()
             continue;
         }
 
-        SpellInfo const* prevSpell = NULL;
+        SpellInfo const* prevSpell = nullptr;
         for (uint8 rank = 0; rank < MAX_TALENT_RANK; ++rank)
         {
             uint32 spellId = talentInfo->RankID[rank];
@@ -1380,7 +1385,7 @@ void SpellMgr::LoadSpellRanks()
 
             if (itr == rankChain.end())
             {
-                mSpellChains[addedSpell].next = NULL;
+                mSpellChains[addedSpell].next = nullptr;
                 break;
             }
             else
@@ -2765,6 +2770,12 @@ void SpellMgr::LoadSpellAreas()
         if (spellArea.auraSpell)
             mSpellAreaForAuraMap.insert(SpellAreaForAuraMap::value_type(abs(spellArea.auraSpell), sa));
 
+        if (spellArea.areaId && spellArea.questStart)
+            mSpellAreaForQuestAreaMap.insert(SpellAreaForQuestAreaMap::value_type(std::pair<uint32, uint32>(spellArea.areaId, spellArea.questStart), sa));
+
+        if (spellArea.areaId && spellArea.questEnd)
+            mSpellAreaForQuestAreaMap.insert(SpellAreaForQuestAreaMap::value_type(std::pair<uint32, uint32>(spellArea.areaId, spellArea.questEnd), sa));
+
         ++count;
     } while (result->NextRow());
 
@@ -2776,9 +2787,9 @@ struct SpellEffectArray
 {
     SpellEffectArray()
     {
-        effects[0] = NULL;
-        effects[1] = NULL;
-        effects[2] = NULL;
+        effects[0] = nullptr;
+        effects[1] = nullptr;
+        effects[2] = nullptr;
     }
 
     SpellEffectEntry const* effects[MAX_SPELL_EFFECTS];
@@ -2828,7 +2839,7 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
 {
     uint32 oldMSTime = getMSTime();
     uint32 oldMSTime2 = oldMSTime;
-    SpellInfo* spellInfo = NULL;
+    SpellInfo* spellInfo = nullptr;
 
     QueryResult result = WorldDatabase.Query("SELECT entry, attributes FROM spell_custom_attr");
 
@@ -3001,7 +3012,7 @@ void SpellMgr::LoadSpellInfoCorrections()
 {
     uint32 oldMSTime = getMSTime();
 
-    SpellInfo* spellInfo = NULL;
+    SpellInfo* spellInfo = nullptr;
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         spellInfo = (SpellInfo*)mSpellInfoMap[i];
@@ -3026,7 +3037,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         if (spellInfo->ActiveIconID == 2158)  // flight
             spellInfo->Attributes |= SPELL_ATTR0_PASSIVE;
 
-        switch (spellInfo->Id)
+        switch (spellInfo->Id)//! HACK: This spell break quest complete for alliance
         {
             case 63026: // Force Cast (HACK: Target shouldn't be changed)
             case 63137: // Force Cast (HACK: Target shouldn't be changed; summon position should be untied from spell destination)
@@ -3433,6 +3444,13 @@ void SpellMgr::LoadSpellInfoCorrections()
                 //! HACK: This spell break quest complete for alliance and on retail not used °_O
                 spellInfo->Effects[EFFECT_0].Effect = 0;
                 break;
+			case 47476: // Deathknight - Strangulate
+			case 15487: // Priest - Silence
+			case 5211:  // Druid - Bash  - R1
+			case 6798:  // Druid - Bash  - R2
+			case 8983:  // Druid - Bash  - R3
+				spellInfo->AttributesEx7 |= SPELL_ATTR7_INTERRUPT_ONLY_NONPLAYER;
+				break;
             // ULDUAR SPELLS
             //
             case 62374: // Pursued (Flame Leviathan)

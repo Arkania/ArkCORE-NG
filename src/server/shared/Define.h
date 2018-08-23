@@ -65,10 +65,16 @@
 #  define ATTR_NORETURN __attribute__((noreturn))
 #  define ATTR_PRINTF(F, V) __attribute__ ((format (printf, F, V)))
 #  define ATTR_DEPRECATED __attribute__((deprecated))
+#  define TRINITY_CONSTEXPR constexpr
 #else //COMPILER != COMPILER_GNU
 #  define ATTR_NORETURN
 #  define ATTR_PRINTF(F, V)
 #  define ATTR_DEPRECATED
+#if _MSC_VER >= 1900
+#  define TRINITY_CONSTEXPR constexpr
+#else
+#  define TRINITY_CONSTEXPR
+#endif
 #endif //COMPILER == COMPILER_GNU
 
 #if COMPILER_HAS_CPP11_SUPPORT
@@ -106,8 +112,10 @@ enum DBCFormer
     FT_FLOAT='f',                                           //float
     FT_INT='i',                                             //uint32
     FT_BYTE='b',                                            //uint8
+    FT_LONG = 'l',                                          //uint64
     FT_SORT='d',                                            //sorted by this field, field is not included
     FT_IND='n',                                             //the same, but parsed to data
+    //FT_LOGIC = 'l',                                       //Logical (boolean)
     FT_SQL_PRESENT='p',                                     //Used in sql format to mark column present in sql dbc
     FT_SQL_ABSENT='a'                                       //Used in sql format to mark column absent in sql dbc
 };

@@ -19,20 +19,22 @@
 
 #include "ScriptMgr.h"
 #include "Config.h"
+#include "CreatureAIImpl.h"
 #include "DatabaseEnv.h"
 #include "DBCStores.h"
+#include "GameObject.h"
+#include "GameObjectAI.h"
+#include "GossipDef.h"
+#include "Player.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvPMgr.h"
-#include "ScriptLoader.h"
 #include "sc_npc_teleport.h"
+#include "ScriptLoader.h"
 #include "ScriptSystem.h"
-#include "Transport.h"
-#include "Vehicle.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
-#include "GossipDef.h"
-#include "CreatureAIImpl.h"
-#include "Player.h"
+#include "Transport.h"
+#include "Vehicle.h"
 #include "WorldPacket.h"
 
 /*namespace
@@ -663,6 +665,123 @@ InstanceScript* ScriptMgr::CreateInstanceData(InstanceMap* map)
     return tmpscript->GetInstanceScript(map);
 }
 
+bool ScriptMgr::OnQuestAccept(Player* player, Object* questGiverObject, Quest const* quest)
+{
+    if (!questGiverObject)
+    {
+        ObjectGuid guid = player->GetQuestGiverGUID(quest->GetQuestId());
+        questGiverObject = ObjectAccessor::GetWorldObject(*player, guid);
+    }
+    bool r = false;
+    if (questGiverObject)
+        switch (questGiverObject->GetTypeId())
+        {
+        case TYPEID_UNIT:
+            if (Creature* creature = questGiverObject->ToCreature())
+            {
+                r = sScriptMgr->OnQuestAccept(player, creature, quest);
+                creature->AI()->sQuestAccept(player, quest);
+            }
+            break;
+        case TYPEID_ITEM:
+        case TYPEID_CONTAINER:
+        {
+            if (Item* item = static_cast<Item*>(questGiverObject))
+                r = sScriptMgr->OnQuestAccept(player, item, quest);
+            break;
+        }
+        case TYPEID_GAMEOBJECT:
+            if (GameObject* go = questGiverObject->ToGameObject())
+            {
+                r = sScriptMgr->OnQuestAccept(player, go, quest);
+                go->AI()->QuestAccept(player, quest);
+            }
+            break;
+        default:
+            break;
+        }
+
+    return r;
+}
+
+bool ScriptMgr::OnQuestObjectiveComplete(Player* player, Object* questGiverObject, Quest const* quest)
+{
+    if (!questGiverObject)
+    {
+        ObjectGuid guid = player->GetQuestGiverGUID(quest->GetQuestId());
+        questGiverObject = ObjectAccessor::GetWorldObject(*player, guid);
+    }
+    bool r = false;
+    if (questGiverObject)
+        switch (questGiverObject->GetTypeId())
+        {
+        case TYPEID_UNIT:
+            if (Creature* creature = questGiverObject->ToCreature())
+            {
+                r = sScriptMgr->OnQuestObjectiveComplete(player, creature, quest);
+                creature->AI()->sQuestObjectiveComplete(player, quest);
+            }
+            break;
+        case TYPEID_ITEM:
+        case TYPEID_CONTAINER:
+        {
+            if (Item* item = static_cast<Item*>(questGiverObject))
+                sScriptMgr->OnQuestObjectiveComplete(player, item, quest);
+            break;
+        }
+        case TYPEID_GAMEOBJECT:
+            if (GameObject* go = questGiverObject->ToGameObject())
+            {
+                r = sScriptMgr->OnQuestObjectiveComplete(player, go, quest);
+                go->AI()->QuestObjectiveComplete(player, quest);
+            }
+            break;
+        default:
+            break;
+        }
+
+    return r;
+}
+
+bool ScriptMgr::OnQuestReward(Player* player, Object* questGiverObject, Quest const* quest, uint32 opt)
+{
+    if (!questGiverObject)
+    {
+        ObjectGuid guid = player->GetQuestGiverGUID(quest->GetQuestId());
+        questGiverObject = ObjectAccessor::GetWorldObject(*player, guid);
+    }
+    bool r = false;
+    if (questGiverObject)
+        switch (questGiverObject->GetTypeId())
+        {
+        case TYPEID_UNIT:
+            if (Creature* creature = questGiverObject->ToCreature())
+            {
+                r = sScriptMgr->OnQuestReward(player, creature, quest, opt);
+                creature->AI()->sQuestReward(player, quest, opt);
+            }
+            break;
+        case TYPEID_ITEM:
+        case TYPEID_CONTAINER:
+        {
+            if (Item* item = static_cast<Item*>(questGiverObject))
+                sScriptMgr->OnQuestReward(player, item, quest, opt);
+            break;
+        }
+        case TYPEID_GAMEOBJECT:
+            if (GameObject* go = questGiverObject->ToGameObject())
+            {
+                r = sScriptMgr->OnQuestReward(player, go, quest, opt);
+                go->AI()->QuestReward(player, quest, opt);
+            }
+            break;
+        default:
+            break;
+        }
+
+    return r;
+}
+
 bool ScriptMgr::OnDummyEffect(Unit* caster, uint32 spellId, SpellEffIndex effIndex, Item* target)
 {
     ASSERT(caster);
@@ -674,13 +793,35 @@ bool ScriptMgr::OnDummyEffect(Unit* caster, uint32 spellId, SpellEffIndex effInd
 
 bool ScriptMgr::OnQuestAccept(Player* player, Item* item, Quest const* quest)
 {
-    ASSERT(player);
+    ASSERT(player); 
     ASSERT(item);
     ASSERT(quest);
 
     GET_SCRIPT_RET(ItemScript, item->GetScriptId(), tmpscript, false);
     player->PlayerTalkClass->ClearMenus();
     return tmpscript->OnQuestAccept(player, item, quest);
+}
+
+bool ScriptMgr::OnQuestObjectiveComplete(Player* player, Item* item, Quest const* quest)
+{
+    ASSERT(player);
+    ASSERT(item);
+    ASSERT(quest);
+
+    GET_SCRIPT_RET(ItemScript, item->GetScriptId(), tmpscript, false);
+    player->PlayerTalkClass->ClearMenus();
+    return tmpscript->OnQuestObjectiveComplete(player, item, quest);
+}
+
+bool ScriptMgr::OnQuestReward(Player* player, Item* item, Quest const* quest, uint32 opt)
+{
+    ASSERT(player); 
+    ASSERT(item);
+    ASSERT(quest);
+
+    GET_SCRIPT_RET(ItemScript, item->GetScriptId(), tmpscript, false);
+    player->PlayerTalkClass->ClearMenus();
+    return tmpscript->OnQuestReward(player, item, quest, opt);
 }
 
 bool ScriptMgr::OnItemUse(Player* player, Item* item, SpellCastTargets const& targets)
@@ -750,9 +891,10 @@ bool ScriptMgr::OnGossipSelectCode(Player* player, Creature* creature, uint32 se
 
 bool ScriptMgr::OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
 {
-    ASSERT(player);
+    ASSERT(player); 
     ASSERT(creature);
     ASSERT(quest);
+    printf("ScriptMgr: OnQuestAccept: creature: %u (%s) quest: %u  \n", creature->GetEntry(), creature->GetName().c_str(), quest->GetQuestId());
 
     GET_SCRIPT_RET(CreatureScript, creature->GetScriptId(), tmpscript, false);
     player->PlayerTalkClass->ClearMenus();
@@ -761,24 +903,26 @@ bool ScriptMgr::OnQuestAccept(Player* player, Creature* creature, Quest const* q
 
 bool ScriptMgr::OnQuestSelect(Player* player, Creature* creature, Quest const* quest)
 {
-    ASSERT(player);
+    ASSERT(player); 
     ASSERT(creature);
     ASSERT(quest);
+    printf("ScriptMgr: OnQuestSelect: creature: %u (%s) quest: %u \n", creature->GetEntry(), creature->GetName().c_str(), quest->GetQuestId());
 
     GET_SCRIPT_RET(CreatureScript, creature->GetScriptId(), tmpscript, false);
     player->PlayerTalkClass->ClearMenus();
     return tmpscript->OnQuestSelect(player, creature, quest);
 }
 
-bool ScriptMgr::OnQuestComplete(Player* player, Creature* creature, Quest const* quest)
+bool ScriptMgr::OnQuestObjectiveComplete(Player* player, Creature* creature, Quest const* quest)
 {
-    ASSERT(player);
+    ASSERT(player); 
     ASSERT(creature);
     ASSERT(quest);
+    printf("ScriptMgr: OnQuestObjectiveComplete: creature: %u (%s) quest: %u \n", creature->GetEntry(), creature->GetName().c_str(), quest->GetQuestId());
 
     GET_SCRIPT_RET(CreatureScript, creature->GetScriptId(), tmpscript, false);
     player->PlayerTalkClass->ClearMenus();
-    return tmpscript->OnQuestComplete(player, creature, quest);
+    return tmpscript->OnQuestObjectiveComplete(player, creature, quest);
 }
 
 bool ScriptMgr::OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 opt)
@@ -786,6 +930,7 @@ bool ScriptMgr::OnQuestReward(Player* player, Creature* creature, Quest const* q
     ASSERT(player);
     ASSERT(creature);
     ASSERT(quest);
+    printf("ScriptMgr: OnQuestReward: creature: %u (%s) quest: %u \n", creature->GetEntry(), creature->GetName().c_str(), quest->GetQuestId());
 
     GET_SCRIPT_RET(CreatureScript, creature->GetScriptId(), tmpscript, false);
     player->PlayerTalkClass->ClearMenus();
@@ -864,6 +1009,17 @@ bool ScriptMgr::OnQuestAccept(Player* player, GameObject* go, Quest const* quest
     GET_SCRIPT_RET(GameObjectScript, go->GetScriptId(), tmpscript, false);
     player->PlayerTalkClass->ClearMenus();
     return tmpscript->OnQuestAccept(player, go, quest);
+}
+
+bool ScriptMgr::OnQuestObjectiveComplete(Player* player, GameObject* go, Quest const* quest)
+{
+    ASSERT(player);
+    ASSERT(go);
+    ASSERT(quest);
+
+    GET_SCRIPT_RET(GameObjectScript, go->GetScriptId(), tmpscript, false);
+    player->PlayerTalkClass->ClearMenus();
+    return tmpscript->OnQuestObjectiveComplete(player, go, quest);
 }
 
 bool ScriptMgr::OnQuestReward(Player* player, GameObject* go, Quest const* quest, uint32 opt)
@@ -1290,6 +1446,16 @@ void ScriptMgr::OnPlayerBindToInstance(Player* player, Difficulty difficulty, ui
 void ScriptMgr::OnPlayerUpdateZone(Player* player, uint32 newZone, uint32 newArea)
 {
     FOREACH_SCRIPT(PlayerScript)->OnUpdateZone(player, newZone, newArea);
+}
+
+void ScriptMgr::OnQuestRemove(Player* player, uint32 questId)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnQuestRemove(player, questId);
+}
+
+void ScriptMgr::OnQuestStatusChange(Player* player, uint32 questId, QuestStatus status)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnQuestStatusChange(player, questId, status);
 }
 
 // Guild

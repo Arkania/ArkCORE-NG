@@ -21,6 +21,7 @@
 
 #include "Common.h"
 #include <ace/Singleton.h>
+#include <mutex>
 
 enum Direction
 {
@@ -32,20 +33,23 @@ class WorldPacket;
 
 class PacketLog
 {
-    friend class ACE_Singleton<PacketLog, ACE_Thread_Mutex>;
-
     private:
         PacketLog();
         ~PacketLog();
+        std::once_flag _initializeFlag;
 
     public:
+        static PacketLog* instance();
+
         void Initialize();
         bool CanLogPacket() const { return (_file != NULL); }
-        void LogPacket(WorldPacket const& packet, Direction direction);
+        bool IsPktLogFormat() const { return (_pktLogType == 1); }
+        void LogPacket(WorldPacket const& packet, Direction direction, std::string addr, uint16 port);
 
     private:
         FILE* _file;
+        uint8 _pktLogType = 0;
 };
 
-#define sPacketLog ACE_Singleton<PacketLog, ACE_Thread_Mutex>::instance()
+#define sPacketLog PacketLog::instance()
 #endif

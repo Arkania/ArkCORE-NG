@@ -136,7 +136,7 @@ class DatabaseWorkerPool
             TC_LOG_INFO("sql.driver", "All connections on DatabasePool '%s' closed.", GetDatabaseName());
 
             delete _connectionInfo;
-            _connectionInfo = NULL;
+            _connectionInfo = nullptr;
         }
 
         /**
@@ -495,7 +495,7 @@ class DatabaseWorkerPool
         {
             uint8 i = 0;
             size_t num_cons = _connectionCount[IDX_SYNCH];
-            T* t = NULL;
+            T* t = nullptr;
             //! Block forever until a connection is free
             for (;;)
             {

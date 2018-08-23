@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2011-2016 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -38,7 +38,7 @@ using G3D::AABox;
 struct GameobjectModelData
 {
     GameobjectModelData(const std::string& name_, const AABox& box) :
-        bound(box), name(name_) { }
+        bound(box), name(name_) {}
 
     AABox bound;
     std::string name;
@@ -49,10 +49,7 @@ ModelList model_list;
 
 void LoadGameObjectModelList()
 {
-#ifndef NO_CORE_FUNCS
     uint32 oldMSTime = getMSTime();
-#endif
-
     FILE* model_list_file = fopen((sWorld->GetDataPath() + "vmaps/" + VMAP::GAMEOBJECT_MODELS).c_str(), "rb");
     if (!model_list_file)
     {
@@ -120,7 +117,7 @@ bool GameObjectModel::initialize(const GameObject& go, const GameObjectDisplayIn
     //ID = 0;
     iPos = Vector3(go.GetPositionX(), go.GetPositionY(), go.GetPositionZ());
     phasemask = go.GetPhaseMask();
-    iScale = go.GetObjectScale();
+    iScale = go.GetFloatValue(OBJECT_FIELD_SCALE_X);
     iInvScale = 1.f / iScale;
 
     G3D::Matrix3 iRotation = G3D::Matrix3::fromEulerAnglesZYX(go.GetOrientation(), 0, 0);
@@ -131,17 +128,20 @@ bool GameObjectModel::initialize(const GameObject& go, const GameObjectDisplayIn
     for (int i = 0; i < 8; ++i)
         rotated_bounds.merge(iRotation * mdl_box.corner(i));
 
-    iBound = rotated_bounds + iPos;
+    this->iBound = rotated_bounds + iPos;
 #ifdef SPAWN_CORNERS
     // test:
     for (int i = 0; i < 8; ++i)
     {
         Vector3 pos(iBound.corner(i));
-        go.SummonCreature(1, pos.x, pos.y, pos.z, 0, TEMPSUMMON_MANUAL_DESPAWN);
+        if (Creature* c = const_cast<GameObject&>(go).SummonCreature(24440, pos.x, pos.y, pos.z, 0, TEMPSUMMON_MANUAL_DESPAWN))
+        {
+            c->setFaction(35);
+            c->SetObjectScale(0.1f); 
+        }
     }
 #endif
 
-    owner = &go;
     return true;
 }
 
@@ -163,11 +163,11 @@ GameObjectModel* GameObjectModel::Create(const GameObject& go)
 
 bool GameObjectModel::intersectRay(const G3D::Ray& ray, float& MaxDist, bool StopAtFirstHit, uint32 ph_mask) const
 {
-    if (!(phasemask & ph_mask) || !owner->isSpawned())
+    if (!(phasemask & ph_mask))
         return false;
 
     float time = ray.intersectionTime(iBound);
-    if (time == G3D::finf())
+    if (time == G3D::inf())
         return false;
 
     // child bounds are defined in object space:

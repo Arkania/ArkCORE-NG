@@ -139,7 +139,7 @@ void WorldSession::HandleArenaTeamInviteOpcode(WorldPacket& recvData)
     uint32 arenaTeamId;                                     // arena team id
     std::string invitedName;
 
-    Player* player = NULL;
+    Player* player = nullptr;
 
     recvData >> arenaTeamId >> invitedName;
 

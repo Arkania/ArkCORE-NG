@@ -66,7 +66,7 @@ bool AreaTrigger::CreateAreaTrigger(uint32 guidlow, uint32 triggerEntry, Unit* c
         return false;
     }
 
-    WorldObject::_Create(guidlow, HIGHGUID_AREATRIGGER, caster->GetPhaseMask());
+    WorldObject::_Create(guidlow, HIGHGUID_AREATRIGGER, caster);
 
     SetEntry(triggerEntry);
     SetDuration(spell->GetDuration());
@@ -78,6 +78,8 @@ bool AreaTrigger::CreateAreaTrigger(uint32 guidlow, uint32 triggerEntry, Unit* c
     SetFloatValue(AREATRIGGER_FINAL_POS + 0, pos.GetPositionX());
     SetFloatValue(AREATRIGGER_FINAL_POS + 1, pos.GetPositionY());
     SetFloatValue(AREATRIGGER_FINAL_POS + 2, pos.GetPositionZ());
+
+    CopyPhaseFrom(caster);
 
     if (!GetMap()->AddToMap(this))
         return false;

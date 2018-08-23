@@ -71,7 +71,7 @@ public:
         {
             if (FlyBackTimer <= diff)
             {
-                Player* player = NULL;
+                Player* player = nullptr;
                 if (me->IsSummon())
                     if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                         player = summoner->ToPlayer();
@@ -217,10 +217,10 @@ public:
         {
             m_phase = 0;
             m_timer = 0;
-            m_npc = NULL;
-            m_ghoul1 = NULL;
-            m_ghoul2 = NULL;
-            m_ghoul3 = NULL;
+            m_npc = nullptr;
+            m_ghoul1 = nullptr;
+            m_ghoul2 = nullptr;
+            m_ghoul3 = nullptr;
             m_entry = 0;
             m_dress = 0;
             m_command = WORK_DONE;
@@ -1048,7 +1048,7 @@ public:
                         TC_LOG_ERROR("scripts", "npc_unworthy_initiateAI: unable to find anchor!");
 
                     float dist = 99.0f;
-                    GameObject* prison = NULL;
+                    GameObject* prison = nullptr;
 
                     for (uint8 i = 0; i < 12; ++i)
                     {
@@ -1194,8 +1194,6 @@ public:
 
 };
 
-Position const EyeOFAcherusFallPoint = { 2361.21f, -5660.45f, 496.7444f, 0.0f };
-
 // 28511 eye_of_acherus
 class npc_eye_of_acherus : public CreatureScript
 {
@@ -1207,102 +1205,112 @@ public:
         DISPLAYID_EYE_HUGE = 26320,
         DISPLAYID_EYE_SMALL = 25499,
 
-        SPELL_EYE_PHASEMASK = 70889,
+        SPELL_EYE_PHASE_170 = 70889, 
+        SPELL_UNKNOWN_51860 = 51860,
         SPELL_EYE_VISUAL = 51892,
         SPELL_EYE_FL_BOOST_RUN = 51923,
         SPELL_EYE_FL_BOOST_FLY = 51890,
         SPELL_EYE_CONTROL = 51852,
 
         SAY_EYE_MOVE_START = 0,
-        SAY_EYE_LAUNCHED = 1,
-        SAY_EYE_UNDER_CONTROL = 2,
-        SAY_EYE_CONTROL = 3,
+        SAY_EYE_CONTROL = 1,
 
         EVENT_MOVE_START = 1,
 
-        POINT_EYE_FALL = 1,
-        POINT_EYE_MOVE_END = 3
     };
 
     struct npc_eye_of_acherusAI : public ScriptedAI
     {
-        npc_eye_of_acherusAI(Creature* creature) : ScriptedAI(creature)
+        npc_eye_of_acherusAI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap m_events;
+        uint64   m_playerGUID;
+
+        void Reset()
         {
-            me->SetDisplayId(me->GetCreatureTemplate()->Modelid1);
-            if (Player* owner = me->GetCharmerOrOwner()->ToPlayer())
-                owner->SendAutoRepeatCancel(me);
-
+            m_playerGUID = 0;
+            me->SetDisplayId(DISPLAYID_EYE_HUGE);
+            me->SetHomePosition(2363.970589f, -5659.861328f, 504.316833f, 0);
+            me->GetMotionMaster()->MovePoint(2001, 2341.57f, -5672.8f, 538.394f);         
             me->SetReactState(REACT_PASSIVE);
-
-            me->GetMotionMaster()->MovePoint(POINT_EYE_FALL, EyeOFAcherusFallPoint, false);
-
-            Movement::MoveSplineInit init(me);
-            init.MoveTo(EyeOFAcherusFallPoint.GetPositionX(), EyeOFAcherusFallPoint.GetPositionY(), EyeOFAcherusFallPoint.GetPositionZ(), false);
-            init.SetFall();
-            init.Launch();
+            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_STUNNED);
+            if (CharmInfo* info = me->GetCharmInfo())
+                for (uint32 i=0; i < 8; i++)
+                    info->SetActionBar(i, me->GetCreatureTemplate()->spells[i], ACT_PASSIVE);
         }
 
         void OnCharmed(bool /*apply*/) override { }
 
-        void UpdateAI(uint32 diff) override
-        {
-            _events.Update(diff);
-
-            while (uint32 eventId = _events.ExecuteEvent())
+        void IsSummonedBy(Unit* summoner) override 
+        { 
+            if (Player* player = summoner->ToPlayer())
             {
-                switch (eventId)
-                {
-                case EVENT_MOVE_START:
-                {
-                    DoCast(me, SPELL_EYE_FL_BOOST_RUN);
+                m_playerGUID = player->GetGUID();
+                me->SetLevel(player->getLevel());
+            }
+        }
 
-                    me->SetControlled(false, UNIT_STATE_ROOT);
-                    if (Player* owner = me->GetCharmerOrOwner()->ToPlayer())
-                    {
-                        for (uint8 i = 0; i < MAX_MOVE_TYPE; ++i)
-                            me->SetSpeed(UnitMoveType(i), owner->GetSpeedRate(UnitMoveType(i)), true);
-                        Talk(SAY_EYE_MOVE_START, owner);
-                        Talk(SAY_EYE_LAUNCHED, owner);
-                    }
-                    me->GetMotionMaster()->MovePath(me->GetEntry() * 100, false);
-                    break;
-                }
-                default:
-                    break;
-                }
+        void JustDied(Unit* /*pKiller*/) 
+        {
+            if (Unit* charmer = me->GetCharmer())
+            {
+                charmer->RemoveAurasDueToSpell(SPELL_EYE_CONTROL);
+                charmer->RemoveAura(SPELL_EYE_FL_BOOST_RUN);
             }
         }
 
         void MovementInform(uint32 movementType, uint32 pointId) override
         {
-            if (movementType == WAYPOINT_MOTION_TYPE && pointId == POINT_EYE_MOVE_END - 1)
-            {
-                me->SetByteValue(UNIT_FIELD_BYTES_2, 0, SHEATH_STATE_MELEE);
-                me->RemoveAllAuras();
-
-                if (Player* owner = me->GetCharmerOrOwner()->ToPlayer())
+          
+            if (movementType == POINT_MOTION_TYPE)
+                switch (pointId)
                 {
-                    owner->RemoveAura(SPELL_EYE_FL_BOOST_RUN);
-                    for (uint8 i = 0; i < MAX_MOVE_TYPE; ++i)
-                        me->SetSpeed(UnitMoveType(i), owner->GetSpeedRate(UnitMoveType(i)), true);
-
-                    Talk(SAY_EYE_UNDER_CONTROL, owner);
-                    Talk(SAY_EYE_CONTROL, owner);
+                case 2001:
+                {
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        Talk(SAY_EYE_MOVE_START, player);
+                    me->SetDisableGravity(true);
+                    me->SetControlled(true, UNIT_STATE_ROOT);
+                    m_events.ScheduleEvent(EVENT_MOVE_START, 5000);
+                    break;
                 }
-                me->SetDisableGravity(false);
-                DoCast(me, SPELL_EYE_FL_BOOST_FLY);
-            }
-
-            if (movementType == POINT_MOTION_TYPE && pointId == POINT_EYE_FALL)
-            {
-                me->SetDisableGravity(true);
-                me->SetControlled(true, UNIT_STATE_ROOT);
-                _events.ScheduleEvent(EVENT_MOVE_START, 5000);
-            }
+                case 2002:
+                {
+                    me->SetByteValue(UNIT_FIELD_BYTES_2, 0, SHEATH_STATE_MELEE);
+                    me->SetDisplayId(DISPLAYID_EYE_SMALL);
+                    me->SetDisableGravity(false);
+                    me->CastSpell(me, SPELL_EYE_VISUAL, true);
+                    me->CastSpell(me, SPELL_EYE_FL_BOOST_FLY, true);
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        Talk(SAY_EYE_CONTROL, player);
+                    break;
+                }
+                }
         }
 
-    private:
-        EventMap _events;
+        void EnterEvadeMode() override { }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_MOVE_START:
+                {
+                    me->CastSpell(me, SPELL_UNKNOWN_51860, true);
+                    me->CastSpell(me, SPELL_EYE_PHASE_170, true);
+                    me->CastSpell(me, SPELL_EYE_VISUAL, true);
+                    me->CastSpell(me, SPELL_EYE_FL_BOOST_RUN, true);
+                    me->SetControlled(false, UNIT_STATE_ROOT);
+                    me->GetMotionMaster()->MovePoint(2002, 1752.858276f, -5878.270996f, 145.136444f);
+                    break;
+                }
+                }
+            }
+        }
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -1634,7 +1642,7 @@ public:
         {
             m_timer = 1000;
             m_phase = 0;
-            m_darkriderGUID = NULL;
+            m_darkriderGUID = 0;
             if (me->FindNearestCreature(28653, 15.0f))
                 me->DespawnOrUnsummon();
         }
@@ -1835,7 +1843,7 @@ public:
                     if (me->IsWithinMeleeRange(me->GetVictim()))
                     {
                         me->AttackerStateUpdate(me->GetVictim());
-                        me->resetAttackTimer();
+                        me->ResetAttackTimer();
                     }
                 }
             }

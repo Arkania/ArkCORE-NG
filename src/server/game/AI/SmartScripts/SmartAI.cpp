@@ -35,12 +35,12 @@ SmartAI::SmartAI(Creature* c) : CreatureAI(c)
 {
     // copy script to local (protection for table reload)
 
-    mWayPoints = NULL;
+    mWayPoints = nullptr;
     mEscortState = SMART_ESCORT_NONE;
     mCurrentWPID = 0;//first wp id is 1 !!
     mWPReached = false;
     mWPPauseTimer = 0;
-    mLastWP = NULL;
+    mLastWP = nullptr;
 
     mCanRepeatPath = false;
 
@@ -197,10 +197,10 @@ void SmartAI::EndPath(bool fail)
     GetScript()->ProcessEventsFor(SMART_EVENT_WAYPOINT_ENDED, NULL, mLastWP->id, GetScript()->GetPathId());
 
     RemoveEscortState(SMART_ESCORT_ESCORTING | SMART_ESCORT_PAUSED | SMART_ESCORT_RETURNING);
-    mWayPoints = NULL;
+    mWayPoints = nullptr;
     mCurrentWPID = 0;
     mWPPauseTimer = 0;
-    mLastWP = NULL;
+    mLastWP = nullptr;
 
     if (mCanRepeatPath)
         StartPath(mRun, GetScript()->GetPathId(), true);
@@ -221,7 +221,7 @@ void SmartAI::EndPath(bool fail)
 
             if (Group* group = player->GetGroup())
             {
-                for (GroupReference* groupRef = group->GetFirstMember(); groupRef != NULL; groupRef = groupRef->next())
+                for (GroupReference* groupRef = group->GetFirstMember(); groupRef != nullptr; groupRef = groupRef->next())
                 {
                     Player* groupGuy = groupRef->GetSource();
 
@@ -370,7 +370,7 @@ bool SmartAI::IsEscortInvokerInRange()
 
             if (Group* group = player->GetGroup())
             {
-                for (GroupReference* groupRef = group->GetFirstMember(); groupRef != NULL; groupRef = groupRef->next())
+                for (GroupReference* groupRef = group->GetFirstMember(); groupRef != nullptr; groupRef = groupRef->next())
                 {
                     Player* groupGuy = groupRef->GetSource();
 
@@ -455,7 +455,7 @@ void SmartAI::MoveInLineOfSight(Unit* who)
 
     GetScript()->OnMoveInLineOfSight(who);
 
-    if (me->HasReactState(REACT_PASSIVE) || AssistPlayerInCombat(who))
+    if (me->HasReactState(REACT_PASSIVE) || (AssistPlayerInCombat(who) && HasEscortState(SMART_ESCORT_ESCORTING)))
         return;
 
     if (!CanAIAttack(who))
@@ -505,6 +505,23 @@ bool SmartAI::AssistPlayerInCombat(Unit* who)
 
     //never attack friendly
     if (me->IsFriendlyTo(who))
+        return false;
+
+    if (!who->isInAccessiblePlaceFor(me))
+        return false;
+
+    if (!CanAIAttack(who))
+        return false;
+
+    // we cannot attack in evade mode
+    if (me->IsInEvadeMode())
+        return false;
+
+    // or if enemy is in evade mode
+    if (who->GetTypeId() == TYPEID_UNIT && who->ToCreature()->IsInEvadeMode())
+        return false;
+
+    if (!me->IsValidAssistTarget(who->GetVictim()))
         return false;
 
     //too far away and no free sight?
@@ -731,14 +748,16 @@ void SmartAI::sGossipSelect(Player* player, uint32 sender, uint32 action)
 
 void SmartAI::sGossipSelectCode(Player* /*player*/, uint32 /*sender*/, uint32 /*action*/, const char* /*code*/) { }
 
-void SmartAI::sQuestAccept(Player* player, Quest const* quest)
+bool SmartAI::sQuestAccept(Player* player, Quest const* quest)
 {
     GetScript()->ProcessEventsFor(SMART_EVENT_ACCEPTED_QUEST, player, quest->GetQuestId());
+    return false;
 }
 
-void SmartAI::sQuestReward(Player* player, Quest const* quest, uint32 opt)
+bool SmartAI::sQuestReward(Player* player, Quest const* quest, uint32 opt)
 {
     GetScript()->ProcessEventsFor(SMART_EVENT_REWARD_QUEST, player, quest->GetQuestId(), opt);
+    return false;
 }
 
 bool SmartAI::sOnDummyEffect(Unit* caster, uint32 spellId, SpellEffIndex effIndex)

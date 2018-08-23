@@ -29,19 +29,15 @@ enum Spells
     SPELL_ENVELOPINGWEB                                    = 15471
 };
 
-class boss_anubshiah : public CreatureScript
+// 9031
+class boss_anubshiah_9031 : public CreatureScript
 {
 public:
-    boss_anubshiah() : CreatureScript("boss_anubshiah") { }
+    boss_anubshiah_9031() : CreatureScript("boss_anubshiah_9031") { }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    struct boss_anubshiah_9031AI : public ScriptedAI
     {
-        return new boss_anubshiahAI(creature);
-    }
-
-    struct boss_anubshiahAI : public ScriptedAI
-    {
-        boss_anubshiahAI(Creature* creature) : ScriptedAI(creature) { }
+        boss_anubshiah_9031AI(Creature* creature) : ScriptedAI(creature) { }
 
         uint32 ShadowBolt_Timer;
         uint32 CurseOfTongues_Timer;
@@ -106,9 +102,14 @@ public:
             DoMeleeAttackIfReady();
         }
     };
+    
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new boss_anubshiah_9031AI(creature);
+    }
 };
 
 void AddSC_boss_anubshiah()
 {
-    new boss_anubshiah();
+    new boss_anubshiah_9031();
 }

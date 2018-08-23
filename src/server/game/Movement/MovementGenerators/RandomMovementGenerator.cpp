@@ -36,13 +36,19 @@
 template<>
 void RandomMovementGenerator<Creature>::_setRandomLocation(Creature* creature)
 {
+    if (creature->IsMovementPreventedByCasting())
+    {
+        creature->CastStop();
+        return;
+    }
+
     float respX, respY, respZ, respO, destX, destY, destZ, travelDistZ;
     creature->GetHomePosition(respX, respY, respZ, respO);
     Map const* map = creature->GetBaseMap();
 
     // For 2D/3D system selection
-    //bool is_land_ok  = creature.CanWalk();                // not used?
-    //bool is_water_ok = creature.CanSwim();                // not used?
+    bool is_land_ok = creature->CanWalk();                // not used?
+    bool is_water_ok = creature->CanSwim();                // not used?
     bool is_air_ok = creature->CanFly();
 
     const float angle = float(rand_norm()) * static_cast<float>(M_PI*2.0f);
@@ -50,6 +56,7 @@ void RandomMovementGenerator<Creature>::_setRandomLocation(Creature* creature)
     const float distanceX = range * std::cos(angle);
     const float distanceY = range * std::sin(angle);
 
+    // target position
     destX = respX + distanceX;
     destY = respY + distanceY;
 
@@ -57,28 +64,55 @@ void RandomMovementGenerator<Creature>::_setRandomLocation(Creature* creature)
     Trinity::NormalizeMapCoord(destX);
     Trinity::NormalizeMapCoord(destY);
 
-    travelDistZ = distanceX*distanceX + distanceY*distanceY;
+    travelDistZ = sqrtf(distanceX * distanceX + distanceY * distanceY);
 
-    if (is_air_ok)                                          // 3D system above ground and above water (flying mode)
+    bool isFinished = false;
+    if (is_air_ok)        // 3D system above ground and above water (flying mode)
     {
         // Limit height change
-        const float distanceZ = float(rand_norm()) * sqrtf(travelDistZ)/2.0f;
+        const float distanceZ = float(rand_norm()) * travelDistZ / 2.0f;
         destZ = respZ + distanceZ;
-        float levelZ = map->GetWaterOrGroundLevel(destX, destY, destZ-2.0f);
+        float levelZ = map->GetWaterOrGroundLevel(destX, destY, destZ - 2.0f);
 
-        // Problem here, we must fly above the ground and water, not under. Let's try on next tick
-        if (levelZ >= destZ)
-            return;
+        if (levelZ < destZ) // if false then flying below ground: try move in 2D
+            isFinished = true;
     }
-    //else if (is_water_ok)                                 // 3D system under water and above ground (swimming mode)
-    else                                                    // 2D only
+    else if (is_water_ok)  // 3D system under water and above ground (swimming mode)
+    {
+        // Limit height change
+        const float distanceZ = float(rand_norm()) * travelDistZ / 2.0f;
+        destZ = respZ + distanceZ;
+        float ground = 0.0f;
+        float levelZ = map->GetWaterOrGroundLevel(destX, destY, destZ, &ground);
+        if (ground < levelZ)
+        {
+            if (levelZ - ground < 3)
+                destZ = (ground + levelZ) / 2;
+            else
+            {
+                if (rand32() % 2 == 0)
+                {
+                    destZ = respZ + 2;
+                    if (destZ > levelZ)
+                        destZ = levelZ;
+                }
+                else 
+                    destZ = respZ - 2;
+            }
+            if (destZ >= ground)
+                isFinished = true;
+        }
+    }
+
+    if (!isFinished) // 2D only. used for ground walk and if 3D has failure.
     {
         // 10.0 is the max that vmap high can check (MAX_CAN_FALL_DISTANCE)
-        travelDistZ = travelDistZ >= 100.0f ? 10.0f : sqrtf(travelDistZ);
+        if (travelDistZ > 10.0f)
+            travelDistZ = 10.0f;
 
         // The fastest way to get an accurate result 90% of the time.
         // Better result can be obtained like 99% accuracy with a ray light, but the cost is too high and the code is too long.
-        destZ = map->GetHeight(creature->GetPhaseMask(), destX, destY, respZ+travelDistZ-2.0f, false);
+        destZ = map->GetHeight(creature->GetPhaseMask(), destX, destY, respZ + travelDistZ - 2.0f, false);
 
         if (fabs(destZ - respZ) > travelDistZ)              // Map check
         {
@@ -88,7 +122,7 @@ void RandomMovementGenerator<Creature>::_setRandomLocation(Creature* creature)
             if (fabs(destZ - respZ) > travelDistZ)
             {
                 // Vmap Higher
-                destZ = map->GetHeight(creature->GetPhaseMask(), destX, destY, respZ+travelDistZ-2.0f, true);
+                destZ = map->GetHeight(creature->GetPhaseMask(), destX, destY, respZ + travelDistZ - 2.0f, true);
 
                 // let's forget this bad coords where a z cannot be find and retry at next tick
                 if (fabs(destZ - respZ) > travelDistZ)
@@ -99,6 +133,8 @@ void RandomMovementGenerator<Creature>::_setRandomLocation(Creature* creature)
 
     if (is_air_ok)
         i_nextMoveTime.Reset(0);
+    else if (is_water_ok) 
+        i_nextMoveTime.Reset(urand(5000, 10000));
     else
         i_nextMoveTime.Reset(urand(500, 10000));
 
@@ -143,10 +179,17 @@ void RandomMovementGenerator<Creature>::DoFinalize(Creature* creature)
 template<>
 bool RandomMovementGenerator<Creature>::DoUpdate(Creature* creature, const uint32 diff)
 {
+    if (!creature || !creature->IsAlive())
+        return false;
+
     if (creature->HasUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED | UNIT_STATE_DISTRACTED))
     {
-        i_nextMoveTime.Reset(0);  // Expire the timer
-        creature->ClearUnitState(UNIT_STATE_ROAMING_MOVE);
+        i_nextMoveTime.Reset(diff * 2);  // Expire the timer
+        if (!creature->IsStopped()) 
+        {
+            creature->ClearUnitState(UNIT_STATE_ROAMING_MOVE);
+            creature->StopMoving();
+        }
         return true;
     }
 

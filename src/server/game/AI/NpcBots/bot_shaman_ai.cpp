@@ -339,7 +339,7 @@ public:
 
             uint8 LMPcount = 0;
             uint8 members = group->GetMembersCount();
-            for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
+            for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
             {
                 Player* tPlayer = itr->GetSource();
                 if (!tPlayer || !tPlayer->IsInWorld() || tPlayer->GetMapId() != me->GetMapId() ||
@@ -629,7 +629,7 @@ public:
 
             if (Shielded(me) && Rand() < 25)
             {
-                Aura* shield = NULL;
+                Aura* shield = nullptr;
                 uint32 SHIELD = LIGHTNING_SHIELD;
                 if (SHIELD)
                     shield = me->GetAura(SHIELD);

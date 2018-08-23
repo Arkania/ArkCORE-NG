@@ -324,6 +324,11 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
                 condMeets = creature->GetCreatureTemplate()->type == ConditionValue1;
             break;
         }
+        case CONDITION_TERRAIN_SWAP:
+        {
+            condMeets = object->IsInTerrainSwap(ConditionValue1);
+            break;
+        }
         default:
             condMeets = false;
             break;
@@ -493,6 +498,9 @@ uint32 Condition::GetSearcherTypeMaskForCondition()
         case CONDITION_CREATURE_TYPE:
             mask |= GRID_MAP_TYPE_MASK_CREATURE;
             break;
+        case CONDITION_TERRAIN_SWAP:
+            mask |= GRID_MAP_TYPE_MASK_ALL;
+            break;
         default:
             ASSERT(false && "Condition::GetSearcherTypeMaskForCondition - missing condition handling!");
             break;
@@ -642,6 +650,27 @@ bool ConditionMgr::IsObjectMeetToConditions(ConditionSourceInfo& sourceInfo, Con
 
     TC_LOG_DEBUG("condition", "ConditionMgr::IsObjectMeetToConditions");
     return IsObjectMeetToConditionList(sourceInfo, conditions);
+}
+
+bool ConditionMgr::IsObjectMeetingNotGroupedConditions(ConditionSourceType sourceType, uint16 entry, ConditionSourceInfo& sourceInfo)
+{
+    if (sourceType > CONDITION_SOURCE_TYPE_NONE && sourceType < CONDITION_SOURCE_TYPE_MAX)
+    {
+        ConditionTypeContainer::const_iterator i = ConditionStore[sourceType].find(entry);
+        if (i != ConditionStore[sourceType].end())
+        {
+            TC_LOG_DEBUG("condition", "GetConditionsForNotGroupedEntry: found conditions for type %u and entry %u", uint32(sourceType), entry);
+            return IsObjectMeetToConditions(sourceInfo, i->second);
+        }
+    }
+
+    return true;
+}
+
+bool ConditionMgr::IsObjectMeetingNotGroupedConditions(ConditionSourceType sourceType, uint16 entry, WorldObject* target0, WorldObject* target1 /*= nullptr*/, WorldObject* target2 /*= nullptr*/)
+{
+    ConditionSourceInfo conditionSource(target0, target1, target2);
+    return IsObjectMeetingNotGroupedConditions(sourceType, entry, conditionSource);
 }
 
 bool ConditionMgr::CanHaveSourceGroupSet(ConditionSourceType sourceType) const
@@ -1448,7 +1477,8 @@ bool ConditionMgr::isSourceTypeValid(Condition* cond)
                         break;
                 }
 
-                TC_LOG_ERROR("sql.sql", "SourceEntry %u SourceGroup %u in `condition` table - spell %u does not have implicit targets of types: _AREA_, _CONE_, _NEARBY_ for effect %u, SourceGroup needs correction, ignoring.", cond->SourceEntry, origGroup, cond->SourceEntry, uint32(i));
+                TC_LOG_ERROR("sql.sql", "SourceEntry %u SourceGroup %u in `condition` table - spell %u does not have implicit targets of types: _AREA_, _CONE_, _NEARBY_ for effect %u, SourceGroup needs correction (A: %u B: %u), ignoring.", cond->SourceEntry, origGroup, cond->SourceEntry, uint32(i),
+					spellInfo->Effects[i].TargetA.GetSelectionCategory(), spellInfo->Effects[i].TargetB.GetSelectionCategory());
                 cond->SourceGroup &= ~(1<<i);
             }
             // all effects were removed, no need to add the condition at all
@@ -1520,12 +1550,21 @@ bool ConditionMgr::isSourceTypeValid(Condition* cond)
             }
             break;
         case CONDITION_SOURCE_TYPE_PHASE_DEFINITION:
-            if (!PhaseMgr::IsConditionTypeSupported(cond->ConditionType))
+            if (!sObjectMgr->IsConditionTypeSupported(cond->ConditionType))
             {
                 TC_LOG_ERROR("sql.sql", "Condition source type `CONDITION_SOURCE_TYPE_PHASE_DEFINITION` does not support condition type %u, ignoring.", cond->ConditionType);
                 return false;
             }
             break;
+        case CONDITION_SOURCE_TYPE_TERRAIN_SWAP:
+        {
+            if (!sMapStore.LookupEntry(cond->SourceEntry))
+            {
+                TC_LOG_ERROR("sql.sql", "%s SourceEntry in `condition` table, does not exist in Map.dbc, ignoring.", cond->SourceEntry);
+                return false;
+            }
+            break;
+        }
         case CONDITION_SOURCE_TYPE_NPC_VENDOR:
         {
             if (!sObjectMgr->GetCreatureTemplate(cond->SourceGroup))
@@ -1836,7 +1875,7 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
                 return false;
             }
             if (cond->ConditionValue3)
-                TC_LOG_ERROR("sql.sql", "NearCreature condition has useless data in value3 (%u)!", cond->ConditionValue3);
+                TC_LOG_ERROR("sql.sql", "NearCreature condition has useless data in (value3: %u) (SourceEntry: %u)!", cond->ConditionValue3, cond->SourceEntry);
             break;
         }
         case CONDITION_NEAR_GAMEOBJECT:

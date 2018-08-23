@@ -100,7 +100,7 @@ public:
             Wave = false;
             someplayer = 0;
             goConsole = 0;
-            add = NULL;
+            add = nullptr;
         }
 
         void EnterCombat(Unit* /*who*/) override { }
@@ -320,7 +320,7 @@ public:
             player->SendPreparedQuest(go->GetGUID());
         }
 
-        Creature* manaforge = NULL;
+        Creature* manaforge = nullptr;
 
         switch (go->GetAreaId())
         {

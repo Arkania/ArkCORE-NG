@@ -64,6 +64,7 @@ const float VazrudenRing[2][3] =
     { -1377.0f, 1760.0f, 112.0f }
 };
 
+// 17536
 class boss_nazan : public CreatureScript
 {
     public:
@@ -73,6 +74,7 @@ class boss_nazan : public CreatureScript
         {
             boss_nazanAI(Creature* creature) : BossAI(creature, DATA_NAZAN)
             {
+                m_instance = creature->GetInstanceScript();
                 VazrudenGUID = 0;
                 flight = true;
             }
@@ -180,6 +182,7 @@ class boss_nazan : public CreatureScript
             }
 
             private:
+                InstanceScript* m_instance;
                 uint32 Fireball_Timer;
                 uint32 ConeOfFire_Timer;
                 uint32 BellowingRoar_Timer;
@@ -191,18 +194,24 @@ class boss_nazan : public CreatureScript
 
         CreatureAI* GetAI(Creature* creature) const override
         {
-            return new boss_nazanAI(creature);
+            return GetHellfireRampartsAI<boss_nazanAI>(creature);
         }
 };
 
+// 17537
 class boss_vazruden : public CreatureScript
 {
     public:
         boss_vazruden() : CreatureScript("boss_vazruden") { }
 
+        InstanceScript* m_instance;
+
         struct boss_vazrudenAI : public BossAI
         {
-            boss_vazrudenAI(Creature* creature) : BossAI(creature, DATA_VAZRUDEN) { }
+            boss_vazrudenAI(Creature* creature) : BossAI(creature, DATA_VAZRUDEN) 
+            {
+                m_instance = creature->GetInstanceScript();
+            }
 
             void Reset() override
             {
@@ -262,6 +271,7 @@ class boss_vazruden : public CreatureScript
             }
 
             private:
+                InstanceScript* m_instance;
                 uint32 Revenge_Timer;
                 bool WipeSaid;
                 uint32 UnsummonCheck;
@@ -269,10 +279,11 @@ class boss_vazruden : public CreatureScript
 
         CreatureAI* GetAI(Creature* creature) const override
         {
-            return new boss_vazrudenAI(creature);
+            return GetHellfireRampartsAI<boss_vazrudenAI>(creature);
         }
 };
 
+// 17307
 class boss_vazruden_the_herald : public CreatureScript
 {
     public:
@@ -281,6 +292,12 @@ class boss_vazruden_the_herald : public CreatureScript
         struct boss_vazruden_the_heraldAI : public ScriptedAI
         {
             boss_vazruden_the_heraldAI(Creature* creature) : ScriptedAI(creature)
+            {
+                m_instance = creature->GetInstanceScript();
+                Initialize();
+            }
+
+            void Initialize()
             {
                 summoned = false;
                 sentryDown = false;
@@ -291,6 +308,7 @@ class boss_vazruden_the_herald : public CreatureScript
 
             void Reset() override
             {
+                m_instance->SetData(BOSS_VAZRUDEN_THE_HEROLD, NOT_STARTED);
                 phase = 0;
                 waypoint = 0;
                 check = 0;
@@ -340,12 +358,18 @@ class boss_vazruden_the_herald : public CreatureScript
 
             void EnterCombat(Unit* /*who*/) override
             {
+                m_instance->SetData(BOSS_VAZRUDEN_THE_HEROLD, IN_PROGRESS);
                 if (phase == 0)
                 {
                     phase = 1;
                     check = 0;
                     Talk(SAY_INTRO);
                 }
+            }
+
+            void JustDied(Unit* /*killer*/) override
+            {
+                m_instance->SetData(BOSS_VAZRUDEN_THE_HEROLD, DONE);
             }
 
             void JustSummoned(Creature* summoned) override
@@ -434,6 +458,7 @@ class boss_vazruden_the_herald : public CreatureScript
             }
 
             private:
+                InstanceScript* m_instance;
                 uint32 phase;
                 uint32 waypoint;
                 uint32 check;
@@ -446,10 +471,11 @@ class boss_vazruden_the_herald : public CreatureScript
 
         CreatureAI* GetAI(Creature* creature) const override
         {
-            return new boss_vazruden_the_heraldAI(creature);
+            return GetHellfireRampartsAI<boss_vazruden_the_heraldAI>(creature);
         }
 };
 
+// 17517
 class npc_hellfire_sentry : public CreatureScript
 {
     public:
@@ -457,7 +483,10 @@ class npc_hellfire_sentry : public CreatureScript
 
         struct npc_hellfire_sentryAI : public ScriptedAI
         {
-            npc_hellfire_sentryAI(Creature* creature) : ScriptedAI(creature) { }
+            npc_hellfire_sentryAI(Creature* creature) : ScriptedAI(creature) 
+            { 
+                m_instance = creature->GetInstanceScript();
+            }
 
             void Reset() override
             {
@@ -490,14 +519,16 @@ class npc_hellfire_sentry : public CreatureScript
             }
 
             private:
+                InstanceScript* m_instance;
                 uint32 KidneyShot_Timer;
         };
 
         CreatureAI* GetAI(Creature* creature) const override
         {
-            return new npc_hellfire_sentryAI(creature);
+            return GetHellfireRampartsAI<npc_hellfire_sentryAI>(creature);
         }
 };
+
 void AddSC_boss_vazruden_the_herald()
 {
     new boss_vazruden_the_herald();

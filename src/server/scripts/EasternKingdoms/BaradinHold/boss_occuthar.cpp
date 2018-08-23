@@ -317,7 +317,7 @@ class spell_occuthar_eyes_of_occuthar_vehicle : public SpellScriptLoader
 
             bool Load() override
             {
-                return GetCaster()->GetInstanceScript() != NULL;
+                return GetCaster()->GetInstanceScript() != nullptr;
             }
 
             void HandleScript()

@@ -127,7 +127,7 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
         return;
 
     // get bg instance or bg template if instance not found
-    Battleground* bg = NULL;
+    Battleground* bg = nullptr;
     if (instanceId)
         bg = sBattlegroundMgr->GetBattlegroundThroughClientInstance(instanceId, bgTypeId);
 
@@ -229,7 +229,7 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
         isPremade = (grp->GetMembersCount() >= bg->GetMinPlayersPerTeam());
 
         BattlegroundQueue& bgQueue = sBattlegroundMgr->GetBattlegroundQueue(bgQueueTypeId);
-        GroupQueueInfo* ginfo = NULL;
+        GroupQueueInfo* ginfo = nullptr;
         uint32 avgTime = 0;
 
         if (!err)
@@ -239,7 +239,7 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
             avgTime = bgQueue.GetAverageQueueWaitTime(ginfo, bracketEntry->GetBracketId());
         }
 
-        for (GroupReference* itr = grp->GetFirstMember(); itr != NULL; itr = itr->next())
+        for (GroupReference* itr = grp->GetFirstMember(); itr != nullptr; itr = itr->next())
         {
             Player* member = itr->GetSource();
             if (!member)
@@ -280,8 +280,8 @@ void WorldSession::HandleBattlegroundPlayerPositionsOpcode(WorldPacket& /*recvDa
 
     uint32 acount = 0;
     uint32 hcount = 0;
-    Player* aplr = NULL;
-    Player* hplr = NULL;
+    Player* aplr = nullptr;
+    Player* hplr = nullptr;
 
     if (uint64 guid = bg->GetFlagPickerGUID(TEAM_ALLIANCE))
     {
@@ -394,9 +394,10 @@ void WorldSession::HandleBattlefieldListOpcode(WorldPacket& recvData)
         return;
     }
 
-    WorldPacket data;
+    WorldPacket data(NULL_OPCODE);
     sBattlegroundMgr->BuildBattlegroundListPacket(&data, 0, _player, BattlegroundTypeId(bgTypeId));
-    SendPacket(&data);
+    if (data.GetOpcode() != NULL_OPCODE)
+        SendPacket(&data);
 }
 
 void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recvData)
@@ -610,7 +611,7 @@ void WorldSession::HandleBattlefieldStatusOpcode(WorldPacket & /*recvData*/)
 
     WorldPacket data;
     // we must update all queues here
-    Battleground* bg = NULL;
+    Battleground* bg = nullptr;
     for (uint8 i = 0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
     {
         BattlegroundQueueTypeId bgQueueTypeId = _player->GetBattlegroundQueueTypeId(i);
@@ -740,7 +741,7 @@ void WorldSession::HandleBattlemasterJoinArena(WorldPacket& recvData)
     BattlegroundQueue &bgQueue = sBattlegroundMgr->GetBattlegroundQueue(bgQueueTypeId);
 
     uint32 avgTime = 0;
-    GroupQueueInfo* ginfo = NULL;
+    GroupQueueInfo* ginfo = nullptr;
 
     err = grp->CanJoinBattlegroundQueue(bg, bgQueueTypeId, arenatype, arenatype, true, arenaslot);
     if (!err)
@@ -751,7 +752,7 @@ void WorldSession::HandleBattlemasterJoinArena(WorldPacket& recvData)
         avgTime = bgQueue.GetAverageQueueWaitTime(ginfo, bracketEntry->GetBracketId());
     }
 
-    for (GroupReference* itr = grp->GetFirstMember(); itr != NULL; itr = itr->next())
+    for (GroupReference* itr = grp->GetFirstMember(); itr != nullptr; itr = itr->next())
     {
         Player* member = itr->GetSource();
         if (!member)

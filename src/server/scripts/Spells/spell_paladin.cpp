@@ -1193,6 +1193,37 @@ class spell_pal_seal_of_righteousness : public SpellScriptLoader
         }
 };
 
+// 498
+class spell_pal_divine_protection_498 : public SpellScriptLoader
+{
+public:
+    spell_pal_divine_protection_498() : SpellScriptLoader("spell_pal_divine_protection_498") { }
+
+	class spell_pal_divine_protection_498_AuraScript : public AuraScript
+	{
+		PrepareAuraScript(spell_pal_divine_protection_498_AuraScript);
+
+		void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+		{
+			// Paladin T12 Protection 4P Bonus
+			if (Unit* caster = GetCaster())
+				if (caster->HasAura(99091) && caster->IsAlive())
+					caster->CastSpell(caster, 99090, true);
+		}
+
+
+		void Register()
+		{
+			AfterEffectRemove += AuraEffectRemoveFn(spell_pal_divine_protection_498_AuraScript::OnRemove, EFFECT_1, SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN, AURA_EFFECT_HANDLE_REAL);
+		}
+	};
+
+	AuraScript* GetAuraScript() const
+	{
+		return new spell_pal_divine_protection_498_AuraScript();
+	}
+};
+
 
 void AddSC_paladin_spell_scripts()
 {
@@ -1221,4 +1252,5 @@ void AddSC_paladin_spell_scripts()
     new spell_pal_sacred_shield();
     new spell_pal_templar_s_verdict();
     new spell_pal_seal_of_righteousness();
+    new spell_pal_divine_protection_498();
 }

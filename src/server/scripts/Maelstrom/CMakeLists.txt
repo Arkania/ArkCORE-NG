@@ -11,7 +11,7 @@ set(scripts_STAT_SRCS
   Maelstrom/TheStoneCore/boss_corborus.cpp
   Maelstrom/TheStoneCore/boss_slabhide.cpp
   Maelstrom/TheStoneCore/boss_ozruk.cpp
-  Maelstrom/TheStoneCore/boss_azil.cpp
+  Maelstrom/TheStoneCore/boss_high_priestess_azil.cpp
   Maelstrom/TheStoneCore/stonecore.h
   Maelstrom/TheStoneCore/stonecore.cpp
   Maelstrom/TheStoneCore/instance_stonecore.cpp

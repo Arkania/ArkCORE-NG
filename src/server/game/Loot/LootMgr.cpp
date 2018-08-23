@@ -275,8 +275,13 @@ void LootStore::ReportUnusedIds(LootIdSet const& lootIdSet) const
         if (GetName() == "gameobject_template")
         {
             TC_LOG_ERROR("sql.sql", "Possible failure: Missing loot_id in data1 of the gameobject.");
-            TC_LOG_ERROR("sql.sql", "Possible solution: UPDATE gameobject_template SET data1=%u WHERE entry=%u;", *itr);
+            TC_LOG_ERROR("sql.sql", "Possible solution: UPDATE gameobject_template SET data1=%u WHERE entry=%u;", *itr, *itr);
         }
+		else if (GetName() == "item_template")
+		{
+			TC_LOG_ERROR("sql.sql", "Possible failure: Missing flag ITEM_PROTO_FLAG_OPENABLE = 4");
+			TC_LOG_ERROR("sql.sql", "Possible solution: UPDATE item_template SET Flags|=4 WHERE entry=%u;", *itr);
+		}
     }
 }
 
@@ -481,7 +486,7 @@ bool Loot::FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bo
     {
         roundRobinPlayer = lootOwner->GetGUID();
 
-        for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
+        for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
             if (Player* player = itr->GetSource())   // should actually be looted object instead of lootOwner but looter has to be really close so doesnt really matter
                 FillNotNormalLootFor(player, player->IsAtGroupRewardDistance(lootOwner));
 
@@ -521,7 +526,7 @@ void Loot::FillNotNormalLootFor(Player* player, bool presentAtLooting)
 
     // Process currency items
     uint32 max_slot = GetMaxSlotInLootFor(player);
-    LootItem const* item = NULL;
+    LootItem const* item = nullptr;
     uint32 itemsSize = uint32(items.size());
     for (uint32 i = 0; i < max_slot; ++i)
     {
@@ -754,7 +759,7 @@ void Loot::DeleteLootMoneyFromContainerItemDB()
 
 LootItem* Loot::LootItemInSlot(uint32 lootSlot, Player* player, QuestItem* *qitem, QuestItem* *ffaitem, QuestItem* *conditem)
 {
-    LootItem* item = NULL;
+    LootItem* item = nullptr;
     bool is_looted = true;
     if (lootSlot >= items.size())
     {
@@ -1632,8 +1637,8 @@ void LoadLootTemplates_Fishing()
     uint32 count = LootTemplates_Fishing.LoadAndCollectLootIds(lootIdSet);
 
     // remove real entries and check existence loot
-    for (uint32 i = 1; i < sAreaStore.GetNumRows(); ++i)
-        if (AreaTableEntry const* areaEntry = sAreaStore.LookupEntry(i))
+    for (uint32 i = 1; i < sAreaTableStore.GetNumRows(); ++i)
+        if (AreaTableEntry const* areaEntry = sAreaTableStore.LookupEntry(i))
             if (lootIdSet.find(areaEntry->ID) != lootIdSet.end())
                 lootIdSet.erase(areaEntry->ID);
             else

@@ -343,7 +343,7 @@ public:
             /**    WHAT IS FULLY NECESSARY FOR GOREFIEND TO BE 100% COMPLETE    *****/
             /************************************************************************/
 
-            Unit* ghost = NULL;
+            Unit* ghost = nullptr;
             if (GhostGUID)
                 ghost = ObjectAccessor::GetUnit(*me, GhostGUID);
             if (ghost && ghost->IsAlive() && ghost->HasAura(SPELL_SHADOW_OF_DEATH))
@@ -359,7 +359,7 @@ public:
                 }*/
                 for (uint8 i = 0; i < 4; ++i)
                 {
-                    Creature* Construct = NULL;
+                    Creature* Construct = nullptr;
                     float X = CalculateRandomLocation(ghost->GetPositionX(), 10);
                     float Y = CalculateRandomLocation(ghost->GetPositionY(), 10);
                     Construct = me->SummonCreature(CREATURE_SHADOWY_CONSTRUCT, X, Y, ghost->GetPositionZ(), 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 45000);
@@ -415,7 +415,7 @@ public:
 
                 for (uint8 i = 0; i < 2; ++i)
                 {
-                    Creature* Shadow = NULL;
+                    Creature* Shadow = nullptr;
                     float X = CalculateRandomLocation(me->GetPositionX(), 10);
                     Shadow = me->SummonCreature(CREATURE_SHADOWY_CONSTRUCT, X, me->GetPositionY(), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 0);
                     if (Shadow)

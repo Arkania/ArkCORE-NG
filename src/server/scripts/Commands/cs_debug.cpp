@@ -258,7 +258,7 @@ public:
     static bool HandleDebugSendOpcodeCommand(ChatHandler* handler, char const* /*args*/)
     {
         Unit* unit = handler->getSelectedUnit();
-        Player* player = NULL;
+        Player* player = nullptr;
         if (!unit || (unit->GetTypeId() != TYPEID_PLAYER))
             player = handler->GetSession()->GetPlayer();
         else
@@ -881,7 +881,7 @@ public:
             handler->GetSession()->GetPlayer()->EnterVehicle(target, seatId);
         else
         {
-            Creature* passenger = NULL;
+            Creature* passenger = nullptr;
             Trinity::AllCreaturesOfEntryInRange check(handler->GetSession()->GetPlayer(), entry, 20.0f);
             Trinity::CreatureSearcher<Trinity::AllCreaturesOfEntryInRange> searcher(handler->GetSession()->GetPlayer(), passenger, check);
             handler->GetSession()->GetPlayer()->VisitNearbyObject(30.0f, searcher);
@@ -957,18 +957,25 @@ public:
 
         char* t = strtok((char*)args, " ");
         char* p = strtok(NULL, " ");
+        char* m = strtok(NULL, " ");
 
         if (!t)
             return false;
 
-        std::set<uint32> terrainswap;
-        std::set<uint32> phaseId;
-        std::set<uint32> worldMapSwap;
+        std::set<uint16> terrainswap;
+        std::set<uint16> phaseId;
+        std::set<uint16> worldMapSwap;
 
-        terrainswap.insert((uint32)atoi(t));
+        if (uint16 ut = (uint16)atoi(t))
+            terrainswap.insert(ut);
 
         if (p)
-            phaseId.insert((uint32)atoi(p));
+            if (uint16 up = (uint16)atoi(p))
+                phaseId.insert(up);
+
+        if (m)
+            if (uint16 um = (uint16)atoi(m))
+                worldMapSwap.insert(um);
 
         handler->GetSession()->SendSetPhaseShift(phaseId, terrainswap, worldMapSwap);
         return true;
@@ -1390,12 +1397,34 @@ public:
 
     static bool HandleDebugPhaseCommand(ChatHandler* handler, char const* /*args*/)
     {
-        Unit* unit = handler->getSelectedUnit();
+        Unit* target = handler->getSelectedUnit();
         Player* player = handler->GetSession()->GetPlayer();
-        if (unit && unit->GetTypeId() == TYPEID_PLAYER)
-            player = unit->ToPlayer();
+        
+        if (target->GetTypeId() == TYPEID_UNIT)
+        {
+            if (target->ToCreature()->GetDBPhase() > 0)
+                handler->PSendSysMessage("Target creature's PhaseId in DB: %d", target->ToCreature()->GetDBPhase());
+            else if (target->ToCreature()->GetDBPhase() < 0)
+                handler->PSendSysMessage("Target creature's PhaseGroup in DB: %d", abs(target->ToCreature()->GetDBPhase()));
+        }
 
-        player->GetPhaseMgr().SendDebugReportToPlayer(handler->GetSession()->GetPlayer());
+        if (target)
+        {
+            std::string phaseString = target->PhaseIdToString();
+            handler->PSendSysMessage("Selected target's PhaseId: %s", phaseString.c_str());
+        }
+        else if (player)
+        {
+            std::string phaseString = player->PhaseIdToString();
+            handler->PSendSysMessage("Selected player's PhaseId: %s", phaseString.c_str());
+        }
+        else
+        {
+            handler->SendSysMessage(LANG_SELECT_CREATURE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
         return true;
     }
 };

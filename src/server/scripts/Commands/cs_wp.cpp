@@ -79,7 +79,7 @@ public:
     static bool HandleWpAddCommand(ChatHandler* handler, const char* args)
     {
         // optional
-        char* path_number = NULL;
+        char* path_number = nullptr;
         uint32 pathid = 0;
 
         if (*args)
@@ -145,7 +145,7 @@ public:
             return false;
 
         // optional
-        char* path_number = NULL;
+        char* path_number = nullptr;
 
         if (*args)
             path_number = strtok((char*)args, " ");
@@ -566,14 +566,14 @@ public:
         // Check
         // Remember: "show" must also be the name of a column!
         if ((show != "delay") && (show != "action") && (show != "action_chance")
-            && (show != "move_flag") && (show != "del") && (show != "move") && (show != "wpadd")
+            && (show != "move_type") && (show != "del") && (show != "move") && (show != "wpadd")
             )
         {
             return false;
         }
 
         // Next arg is: <PATHID> <WPNUM> <ARGUMENT>
-        char* arg_str = NULL;
+        char* arg_str = nullptr;
 
         // Did user provide a GUID
         // or did the user select a creature?
@@ -695,22 +695,24 @@ public:
                     }
                     // re-create
                     Creature* wcreature2 = new Creature();
-                    if (!wcreature2->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_UNIT), map, chr->GetPhaseMgr().GetPhaseMaskForSpawn(), VISUAL_WAYPOINT, 0, 0, chr->GetPositionX(), chr->GetPositionY(), chr->GetPositionZ(), chr->GetOrientation()))
+                    if (!wcreature2->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_UNIT), map, chr->GetPhaseMask(), VISUAL_WAYPOINT, 0, 0, chr->GetPositionX(), chr->GetPositionY(), chr->GetPositionZ(), chr->GetOrientation()))
                     {
                         handler->PSendSysMessage(LANG_WAYPOINT_VP_NOTCREATED, VISUAL_WAYPOINT);
                         delete wcreature2;
-                        wcreature2 = NULL;
+                        wcreature2 = nullptr;
                         return false;
                     }
 
-                    wcreature2->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()), chr->GetPhaseMgr().GetPhaseMaskForSpawn());
+                    wcreature2->CopyPhaseFrom(chr);
+                    wcreature2->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()), chr->GetPhaseMask());
+
                     // To call _LoadGoods(); _LoadQuests(); CreateTrainerSpells();
                     /// @todo Should we first use "Create" then use "LoadFromDB"?
                     if (!wcreature2->LoadCreatureFromDB(wcreature2->GetDBTableGUIDLow(), map))
                     {
                         handler->PSendSysMessage(LANG_WAYPOINT_VP_NOTCREATED, VISUAL_WAYPOINT);
                         delete wcreature2;
-                        wcreature2 = NULL;
+                        wcreature2 = nullptr;
                         return false;
                     }
                     //sMapMgr->GetMap(npcCreature->GetMapId())->Add(wcreature2);
@@ -919,7 +921,7 @@ public:
                 float o = chr->GetOrientation();
 
                 Creature* wcreature = new Creature();
-                if (!wcreature->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_UNIT), map, chr->GetPhaseMgr().GetPhaseMaskForSpawn(), id, 0, 0, x, y, z, o))
+                if (!wcreature->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_UNIT), map, chr->GetPhaseMask(), id, 0, 0, x, y, z, o))
                 {
                     handler->PSendSysMessage(LANG_WAYPOINT_VP_NOTCREATED, id);
                     delete wcreature;
@@ -935,7 +937,9 @@ public:
 
                 WorldDatabase.Execute(stmt);
 
-                wcreature->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()), chr->GetPhaseMgr().GetPhaseMaskForSpawn());
+                wcreature->CopyPhaseFrom(chr);
+                wcreature->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()), chr->GetPhaseMask());
+
                 // To call _LoadGoods(); _LoadQuests(); CreateTrainerSpells();
                 if (!wcreature->LoadCreatureFromDB(wcreature->GetDBTableGUIDLow(), map))
                 {
@@ -983,14 +987,16 @@ public:
             Map* map = chr->GetMap();
 
             Creature* creature = new Creature();
-            if (!creature->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_UNIT), map, chr->GetPhaseMgr().GetPhaseMaskForSpawn(), id, 0, 0, x, y, z, o))
+            if (!creature->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_UNIT), map, chr->GetPhaseMask(), id, 0, 0, x, y, z, o))
             {
                 handler->PSendSysMessage(LANG_WAYPOINT_VP_NOTCREATED, id);
                 delete creature;
                 return false;
             }
 
-            creature->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()), chr->GetPhaseMgr().GetPhaseMaskForSpawn());
+            creature->CopyPhaseFrom(chr);
+            creature->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()), chr->GetPhaseMask());
+
             if (!creature->LoadCreatureFromDB(creature->GetDBTableGUIDLow(), map))
             {
                 handler->PSendSysMessage(LANG_WAYPOINT_VP_NOTCREATED, id);
@@ -1032,14 +1038,16 @@ public:
             Map* map = chr->GetMap();
 
             Creature* creature = new Creature();
-            if (!creature->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_UNIT), map, chr->GetPhaseMgr().GetPhaseMaskForSpawn(), id, 0, 0, x, y, z, o))
+            if (!creature->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_UNIT), map, chr->GetPhaseMask(), id, 0, 0, x, y, z, o))
             {
                 handler->PSendSysMessage(LANG_WAYPOINT_NOTCREATED, id);
                 delete creature;
                 return false;
             }
 
-            creature->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()), chr->GetPhaseMgr().GetPhaseMaskForSpawn());
+            creature->CopyPhaseFrom(chr);
+            creature->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()), chr->GetPhaseMask());
+
             if (!creature->LoadCreatureFromDB(creature->GetDBTableGUIDLow(), map))
             {
                 handler->PSendSysMessage(LANG_WAYPOINT_NOTCREATED, id);

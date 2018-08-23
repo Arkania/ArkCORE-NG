@@ -39,6 +39,13 @@ enum SelectAggroTarget
     SELECT_TARGET_FARTHEST
 };
 
+enum SparringFlags
+{
+    SPARRING_AGAINST_NEUTRAL = 1,
+    SPARRING_AGAINST_SPARRING = 2,
+    SPARRING_AGAINST_HATED = 4
+};
+
 // default predicate function to select target based on distance, player and/or aura criteria
 struct DefaultTargetSelector : public std::unary_function<Unit*, bool>
 {
@@ -250,17 +257,16 @@ class UnitAI
 
         void DoMeleeAttackIfReady();
         bool DoSpellAttackIfReady(uint32 spell);
-
         static AISpellInfoType* AISpellInfo;
         static void FillAISpellInfo();
 
         virtual void sGossipHello(Player* /*player*/) { }
         virtual void sGossipSelect(Player* /*player*/, uint32 /*sender*/, uint32 /*action*/) { }
         virtual void sGossipSelectCode(Player* /*player*/, uint32 /*sender*/, uint32 /*action*/, char const* /*code*/) { }
-        virtual void sQuestAccept(Player* /*player*/, Quest const* /*quest*/) { }
-        virtual void sQuestSelect(Player* /*player*/, Quest const* /*quest*/) { }
-        virtual void sQuestComplete(Player* /*player*/, Quest const* /*quest*/) { }
-        virtual void sQuestReward(Player* /*player*/, Quest const* /*quest*/, uint32 /*opt*/) { }
+        virtual bool sQuestAccept(Player* /*player*/, Quest const* /*quest*/) { return false; }
+        virtual bool sQuestSelect(Player* /*player*/, Quest const* /*quest*/) { return false; }
+        virtual bool sQuestObjectiveComplete(Player* /*player*/, Quest const* /*quest*/) { return false; }
+        virtual bool sQuestReward(Player* /*player*/, Quest const* /*quest*/, uint32 /*opt*/) { return false; }
         virtual bool sOnDummyEffect(Unit* /*caster*/, uint32 /*spellId*/, SpellEffIndex /*effIndex*/) { return false; }
         virtual void sOnGameEvent(bool /*start*/, uint16 /*eventId*/) { }
 

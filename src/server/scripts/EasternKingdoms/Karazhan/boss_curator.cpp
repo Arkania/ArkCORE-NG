@@ -138,7 +138,7 @@ public:
                 {
                     //Summon Astral Flare
                     Creature* AstralFlare = DoSpawnCreature(17096, float(rand()%37), float(rand()%37), 0, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000);
-                    Unit* target = NULL;
+                    Unit* target = nullptr;
                     target = SelectTarget(SELECT_TARGET_RANDOM, 0);
 
                     if (AstralFlare && target)

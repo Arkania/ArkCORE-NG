@@ -271,6 +271,7 @@ public:
 
         handler->SendSysMessage(LANG_USE_BOL);
         handler->SetSentErrorMessage(true);
+        _player->GetMap()->SendSingleTransportUpdate(_player);
         return false;
     }
 };

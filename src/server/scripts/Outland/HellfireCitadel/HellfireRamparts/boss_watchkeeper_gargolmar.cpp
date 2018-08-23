@@ -53,6 +53,7 @@ enum Events
     EVENT_RETALIATION      = 3
 };
 
+// 17306
 class boss_watchkeeper_gargolmar : public CreatureScript
 {
     public:
@@ -60,10 +61,16 @@ class boss_watchkeeper_gargolmar : public CreatureScript
 
         struct boss_watchkeeper_gargolmarAI : public BossAI
         {
-            boss_watchkeeper_gargolmarAI(Creature* creature) : BossAI(creature, DATA_WATCHKEEPER_GARGOLMAR) { }
+            boss_watchkeeper_gargolmarAI(Creature* creature) : BossAI(creature, DATA_WATCHKEEPER_GARGOLMAR) 
+            { 
+                m_instance = creature->GetInstanceScript();
+            }
+
+            InstanceScript* m_instance;
 
             void Reset() override
             {
+                m_instance->SetData(BOSS_WATCHKEEPER_GARGOLMAR, NOT_STARTED);
                 hasTaunted    = false;
                 yelledForHeal = false;
                 retaliation   = false;
@@ -72,6 +79,7 @@ class boss_watchkeeper_gargolmar : public CreatureScript
 
             void EnterCombat(Unit* /*who*/) override
             {
+                m_instance->SetData(BOSS_WATCHKEEPER_GARGOLMAR, IN_PROGRESS);
                 Talk(SAY_AGGRO);
                 events.ScheduleEvent(EVENT_MORTAL_WOUND, 5000);
                 events.ScheduleEvent(EVENT_SURGE, 4000);
@@ -107,6 +115,7 @@ class boss_watchkeeper_gargolmar : public CreatureScript
 
             void JustDied(Unit* /*killer*/) override
             {
+                m_instance->SetData(BOSS_WATCHKEEPER_GARGOLMAR, DONE);
                 Talk(SAY_DIE);
                 _JustDied();
             }
@@ -170,7 +179,7 @@ class boss_watchkeeper_gargolmar : public CreatureScript
 
         CreatureAI* GetAI(Creature* creature) const override
         {
-            return new boss_watchkeeper_gargolmarAI(creature);
+            return GetHellfireRampartsAI<boss_watchkeeper_gargolmarAI>(creature);
         }
 };
 

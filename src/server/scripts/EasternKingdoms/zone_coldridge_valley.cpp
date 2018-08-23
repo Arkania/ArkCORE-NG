@@ -614,10 +614,10 @@ enum eQuest24491
 
     NPC_HANDS_SPRINGSPROCKET = 6782,
 
-    SPELL_SEE_COLDRIGE_TUNNEL_ROCKS_SEE_QUEST_INVIS_1 = 70042,
-    SPELL_SEE_MILO_GEARTWINGE_SEE_QUEST_INVIS_2 = 70044,
-    SPELL_MILO_GEARTWINGE_INVISIBILITY_QUEST_INVIS_2 = 70045,
-    SPELL_A_TRIP_TO_IRONFORGE_QUEST_COMLETE = 70046,
+    SPELL_SEE_COLDRIGE_TUNNEL_ROCKS_SEE_QUEST_INVIS_1 = 70042, // invis 7
+    SPELL_SEE_MILO_GEARTWINGE_SEE_QUEST_INVIS_2 = 70044, // triggered from 70047.. invis detect 8
+    SPELL_MILO_GEARTWINGE_INVISIBILITY_QUEST_INVIS_2 = 70045, // invis 8
+    SPELL_A_TRIP_TO_IRONFORGE_QUEST_COMLETE = 70046, // play sound,  trigger to 70042 invis detect 7
 };
 
 // 6782 npc_hands_springsprocket
@@ -791,8 +791,39 @@ public:
     }
 };
 
+// 44405
+class npc_wounded_militia_44405 : public CreatureScript
+{
+public:
+    npc_wounded_militia_44405() : CreatureScript("npc_wounded_militia_44405") {}
 
-void AddSC_coldridge_valley()
+    enum eNpc
+    {
+        QUEST_FLASH_HEAL_24533 = 24533,
+        NPC_HEALING_CREDIT_44405 = 44405, // Correct NPC Value. Old Value 44175.
+    };
+
+    struct npc_wounded_militia_44405AI : public ScriptedAI
+    {
+        npc_wounded_militia_44405AI(Creature* creature) : ScriptedAI(creature) {}
+
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
+        {
+            if (Player* player = caster->ToPlayer())
+                if (player->GetQuestStatus(QUEST_FLASH_HEAL_24533) == QUEST_STATUS_INCOMPLETE)
+                    player->KilledMonsterCredit(NPC_HEALING_CREDIT_44405);
+            me->DespawnOrUnsummon(500);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_wounded_militia_44405AI(creature);
+    }
+};
+
+
+void AddSC_zone_coldridge_valley()
 {
     new npc_rockjaw_invader();
     new npc_coldridge_defender();
@@ -807,5 +838,6 @@ void AddSC_coldridge_valley()
     new npc_mountaineer_dunstan();
     new npc_mountaineer_lewin();
     new npc_mountaineer_valgrum();
+    new npc_wounded_militia_44405();
 }
 

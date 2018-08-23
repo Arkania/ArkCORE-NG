@@ -171,6 +171,7 @@ bool OutdoorPvPSI::HandleDropFlag(Player* player, uint32 spellId)
                             return true;
                         }
 
+                        go->CopyPhaseFrom(player);
                         go->SetRespawnTime(0);
 
                         if (!map->AddToMap(go))
@@ -205,6 +206,7 @@ bool OutdoorPvPSI::HandleDropFlag(Player* player, uint32 spellId)
                             return true;
                         }
 
+                        go->CopyPhaseFrom(player);
                         go->SetRespawnTime(0);
 
                         if (!map->AddToMap(go))

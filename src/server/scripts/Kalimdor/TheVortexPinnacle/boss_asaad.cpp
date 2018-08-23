@@ -88,18 +88,15 @@ const Position starPos[6] =
     {-649.24f, 474.11f, 649.63f, 0.0f},
 };
 
-class boss_asaad : public CreatureScript
+// 43875
+class boss_asaad_43875 : public CreatureScript
 {
     public:
-        boss_asaad() : CreatureScript("boss_asaad") { }
-        
-        CreatureAI* GetAI(Creature* creature) const
+        boss_asaad_43875() : CreatureScript("boss_asaad_43875") { }
+
+        struct boss_asaad_43875AI : public ScriptedAI
         {
-            return new boss_asaadAI(creature);
-        }
-        struct boss_asaadAI : public ScriptedAI
-        {
-            boss_asaadAI(Creature* creature) : ScriptedAI(creature), summons(me)
+            boss_asaad_43875AI(Creature* creature) : ScriptedAI(creature), summons(me)
             {
                 me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
@@ -262,20 +259,22 @@ class boss_asaad : public CreatureScript
                     DoMeleeAttackIfReady();
             }
         };
-};
 
-class npc_unstable_grounding_field : public CreatureScript
-{
-    public:
-        npc_unstable_grounding_field() : CreatureScript("npc_unstable_grounding_field") { }
-        
         CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_unstable_grounding_fieldAI(creature);
+            return new boss_asaad_43875AI(creature);
         }
-        struct npc_unstable_grounding_fieldAI : public ScriptedAI
+};
+
+// 46492
+class npc_unstable_grounding_field_46492 : public CreatureScript
+{
+    public:
+        npc_unstable_grounding_field_46492() : CreatureScript("npc_unstable_grounding_field_46492") { }
+
+        struct npc_unstable_grounding_field_46492AI : public ScriptedAI
         {
-            npc_unstable_grounding_fieldAI(Creature* creature) : ScriptedAI(creature)
+            npc_unstable_grounding_field_46492AI(Creature* creature) : ScriptedAI(creature)
             {
                 me->SetReactState(REACT_PASSIVE);
             }
@@ -284,8 +283,14 @@ class npc_unstable_grounding_field : public CreatureScript
 
             void UpdateAI(uint32 /*diff*/) { }
      };
+
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return new npc_unstable_grounding_field_46492AI(creature);
+        }
 };
 
+// 86930
 class spell_asaad_supremacy_of_the_storm : public SpellScriptLoader
 {
     public:
@@ -320,7 +325,7 @@ class spell_asaad_supremacy_of_the_storm : public SpellScriptLoader
 
 void AddSC_boss_asaad()
 {
-    new boss_asaad();
-    new npc_unstable_grounding_field();
+    new boss_asaad_43875();
+    new npc_unstable_grounding_field_46492();
     new spell_asaad_supremacy_of_the_storm();
 }

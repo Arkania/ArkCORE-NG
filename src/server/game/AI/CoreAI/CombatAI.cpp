@@ -42,7 +42,24 @@ void AggressorAI::UpdateAI(uint32 /*diff*/)
     if (!UpdateVictim())
         return;
 
-    DoMeleeAttackIfReady();
+    if (Unit* unit = me->GetVictim())
+        if (me->IsFakeAttack(unit))
+        {
+            uint32 spellIdA = me->IsRangedFakeAttackPossible();
+            uint32 spellIdB = unit->IsRangedFakeAttackPossible();
+            if (spellIdA || spellIdB)
+            {
+                DoSpellAttackIfReady(spellIdA);
+            }
+            else if (me->IsMeleeFakeAttackPossible())
+            {
+                DoMeleeAttackIfReady();
+            }
+        }
+        else
+        {
+            DoMeleeAttackIfReady();
+        }
 }
 
 /////////////////

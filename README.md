@@ -1,5 +1,4 @@
-# ![logo](http://forums.arkania.net/styles/baisik/xenforo/logo.png) ArkCORE
-
+#![logo](https://github.com/Arkania/ArkCORE-NG/blob/master/logo.png) ArkCORE NG
 
 ## Introduction
 
@@ -71,6 +70,9 @@ Read file [THANKS](THANKS)
 
 ## Links
 
-[Site](http://www.arkania.net)
+[Forum](http://gpn39f.spdns.de/forum1/)
 
-[Forums](http://forums.arkania.net/)
+[Wiki](http://gpn39f.spdns.de/wiki2/)
+
+[Google Drive Monthly Snapshot](https://drive.google.com/drive/folders/0B8q0yc6MkL0naTdpN2xiT2s1bTg)
+

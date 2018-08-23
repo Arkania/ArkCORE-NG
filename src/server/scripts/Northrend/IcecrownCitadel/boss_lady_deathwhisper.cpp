@@ -322,7 +322,7 @@ class boss_lady_deathwhisper : public CreatureScript
                         {
                             if (Group* group = owner->GetGroup())
                             {
-                                for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
+                                for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
                                     if (Player* member = itr->GetSource())
                                         member->KilledMonsterCredit(NPC_DARNAVAN_CREDIT, 0);
                             }
@@ -387,7 +387,7 @@ class boss_lady_deathwhisper : public CreatureScript
                 else
                     summons.Summon(summon);
 
-                Unit* target = NULL;
+                Unit* target = nullptr;
                 if (summon->GetEntry() == NPC_VENGEFUL_SHADE)
                 {
                     target = ObjectAccessor::GetUnit(*me, _nextVengefulShadeTargetGUID);   // Vengeful Shade
@@ -858,7 +858,7 @@ class npc_darnavan : public CreatureScript
                 {
                     if (Group* group = owner->GetGroup())
                     {
-                        for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
+                        for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
                             if (Player* member = itr->GetSource())
                                 member->FailQuest(QUEST_DEPROGRAMMING);
                     }

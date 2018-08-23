@@ -63,7 +63,12 @@ Vehicle::~Vehicle()
     /// @Uninstall must be called before this.
     ASSERT(_status == STATUS_UNINSTALLING);
     for (SeatMap::const_iterator itr = Seats.begin(); itr != Seats.end(); ++itr)
-        ASSERT(itr->second.IsEmpty());
+    {
+        if (itr->second.Passenger.Guid)
+            TC_LOG_ERROR("entities.vehicle", "Vehicle::~Vehicle (Entry: %u) has passenger %u in seat %u during destroy.", GetBase()->GetEntry(), (!itr->second.Passenger.Guid ? 0 : 1), itr->first);
+
+        ASSERT(itr->second.IsEmpty()); // ASSERT(!itr->second.Passenger.Guid);
+    }
 }
 
 /**
@@ -233,6 +238,8 @@ void Vehicle::ApplyAllImmunities()
         case 160: // Strand of the Ancients
         case 244: // Wintergrasp
         case 510: // Isle of Conquest
+        case 452: // Isle of Conquest
+        case 543: // Isle of Conquest
             _me->SetControlled(true, UNIT_STATE_ROOT);
             // why we need to apply this? we can simple add immunities to slow mechanic in DB
             _me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_DECREASE_SPEED, true);
@@ -264,6 +271,8 @@ void Vehicle::RemoveAllPassengers()
         while (!_pendingJoinEvents.empty())
         {
             VehicleJoinEvent* e = _pendingJoinEvents.front();
+            if (e->CheckVehicle())
+                TC_LOG_ERROR("entities.vehicle", "Vehicle::RemoveAllPassengers::Target. TargetVehicle pointer is not valid. Passenger: %s", e->Passenger->ToInfoString().c_str());
             e->to_Abort = true;
             e->Target = eventVehicle;
             _pendingJoinEvents.pop_front();
@@ -277,9 +286,9 @@ void Vehicle::RemoveAllPassengers()
 
     // Following the above logic, this assertion should NEVER fail.
     // Even in 'hacky' cases, there should at least be VEHICLE_SPELL_RIDE_HARDCODED on us.
-    // SeatMap::const_iterator itr;
-    // for (itr = Seats.begin(); itr != Seats.end(); ++itr)
-    //    ASSERT(!itr->second.passenger);
+    for (SeatMap::const_iterator itr = Seats.begin(); itr != Seats.end(); ++itr)
+        if (Unit* unit = GetPassenger((itr)->first))
+            RemovePassenger(unit);
 }
 
 /**
@@ -758,10 +767,21 @@ void Vehicle::RemovePendingEventsForPassenger(Unit* passenger)
     }
 }
 
+bool Vehicle::CheckVehicle()
+{
+        if (UsableSeatNum < 50)
+            if (Unit* unit = GetBase())
+                if (unit->IsInWorld() && unit->IsAlive())
+                    return true;
+    return false;
+}
+
 VehicleJoinEvent::~VehicleJoinEvent()
 {
-    if (Target)
+    if (CheckVehicle())
         Target->RemovePendingEvent(this);
+    else
+        TC_LOG_ERROR("entities.vehicle", "Destructor VehicleJoinEvent Target pointer is not valid. Passenger: %s", Passenger->ToInfoString().c_str());
 }
 
 /**
@@ -783,7 +803,7 @@ bool VehicleJoinEvent::Execute(uint64, uint32)
 {
     ASSERT(Passenger->IsInWorld());
     ASSERT(Target && Target->GetBase()->IsInWorld());
-    ASSERT(Target->GetBase()->HasAuraTypeWithCaster(SPELL_AURA_CONTROL_VEHICLE, Passenger->GetGUID()));
+    bool IsController = Target->GetBase()->HasAuraTypeWithCaster(SPELL_AURA_CONTROL_VEHICLE, Passenger->GetGUID());
 
     Target->RemovePendingEventsForSeat(Seat->first);
     Target->RemovePendingEventsForPassenger(Passenger);
@@ -830,14 +850,17 @@ bool VehicleJoinEvent::Execute(uint64, uint32)
     Passenger->m_movementInfo.transport.time = 0;
     Passenger->m_movementInfo.transport.seat = Seat->first;
     Passenger->m_movementInfo.transport.guid = Target->GetBase()->GetGUID();
-
+    Passenger->m_movementInfo.transport.vehicleId = Target->GetVehicleInfo()->m_ID;
+    
     if (Target->GetBase()->GetTypeId() == TYPEID_UNIT && Passenger->GetTypeId() == TYPEID_PLAYER &&
         Seat->second.SeatInfo->m_flags & VEHICLE_SEAT_FLAG_CAN_CONTROL)
         ASSERT(Target->GetBase()->SetCharmedBy(Passenger, CHARM_TYPE_VEHICLE));  // SMSG_CLIENT_CONTROL
 
-    Passenger->SendClearTarget();                            // SMSG_BREAK_TARGET
-    Passenger->SetControlled(true, UNIT_STATE_ROOT);         // SMSG_FORCE_ROOT - In some cases we send SMSG_SPLINE_MOVE_ROOT here (for creatures)
-    // also adds MOVEMENTFLAG_ROOT
+    if (IsController)
+    {
+        Passenger->SendClearTarget();                            // SMSG_BREAK_TARGET
+        Passenger->SetControlled(true, UNIT_STATE_ROOT);         // SMSG_FORCE_ROOT - In some cases we send SMSG_SPLINE_MOVE_ROOT here (for creatures)
+    }
 
     Movement::MoveSplineInit init(Passenger);
     init.DisableTransportPathTransformations();
@@ -874,6 +897,9 @@ bool VehicleJoinEvent::Execute(uint64, uint32)
 
 void VehicleJoinEvent::Abort(uint64)
 {
+    if (Target && Target->UsableSeatNum > 50)
+        TC_LOG_ERROR("entities.vehicle", "VehicleJoinEvent::Abort is called: But target pointer is not valid. %s", Passenger->ToInfoString().c_str());
+
     /// Check if the Vehicle was already uninstalled, in which case all auras were removed already
     if (Target)
     {
@@ -891,4 +917,12 @@ void VehicleJoinEvent::Abort(uint64)
 
     if (Passenger->IsInWorld() && Passenger->HasUnitTypeMask(UNIT_MASK_ACCESSORY))
         Passenger->ToCreature()->DespawnOrUnsummon();
+}
+
+bool VehicleJoinEvent::CheckVehicle()
+{
+    if (Target)
+        return Target->CheckVehicle();
+
+    return false;
 }

@@ -88,7 +88,7 @@ public:
             return false;
         }
 
-        for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
+        for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
         {
             Player* player = itr->GetSource();
 
@@ -146,8 +146,8 @@ public:
 
     static bool HandleGroupLeaderCommand(ChatHandler* handler, char const* args)
     {
-        Player* player = NULL;
-        Group* group = NULL;
+        Player* player = nullptr;
+        Group* group = nullptr;
         uint64 guid = 0;
         char* nameStr = strtok((char*)args, " ");
 
@@ -172,8 +172,8 @@ public:
 
     static bool HandleGroupDisbandCommand(ChatHandler* handler, char const* args)
     {
-        Player* player = NULL;
-        Group* group = NULL;
+        Player* player = nullptr;
+        Group* group = nullptr;
         uint64 guid = 0;
         char* nameStr = strtok((char*)args, " ");
 
@@ -193,8 +193,8 @@ public:
 
     static bool HandleGroupRemoveCommand(ChatHandler* handler, char const* args)
     {
-        Player* player = NULL;
-        Group* group = NULL;
+        Player* player = nullptr;
+        Group* group = nullptr;
         uint64 guid = 0;
         char* nameStr = strtok((char*)args, " ");
 
@@ -217,10 +217,10 @@ public:
         if (!*args)
             return false;
 
-        Player* playerSource = NULL;
-        Player* playerTarget = NULL;
-        Group* groupSource = NULL;
-        Group* groupTarget = NULL;
+        Player* playerSource = nullptr;
+        Player* playerTarget = nullptr;
+        Group* groupSource = nullptr;
+        Group* groupTarget = nullptr;
         uint64 guidSource = 0;
         uint64 guidTarget = 0;
         char* nameplgrStr = strtok((char*)args, " ");
@@ -283,7 +283,7 @@ public:
             return false;
 
         // Next, we need a group. So we define a group variable.
-        Group* groupTarget = NULL;
+        Group* groupTarget = nullptr;
 
         // We try to extract a group from an online player.
         if (playerTarget)

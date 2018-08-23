@@ -53,6 +53,11 @@ class DBCFileLoader
                     assert(field < file.fieldCount);
                     return *reinterpret_cast<uint8*>(offset+file.GetOffset(field));
                 }
+                uint64 getUInt64(size_t field) const
+                {
+                    assert(field < file.fieldCount);
+                    return *reinterpret_cast<uint64*>(offset + file.GetOffset(field));
+                }
 
                 const char *getString(size_t field) const
                 {
@@ -79,7 +84,7 @@ class DBCFileLoader
         uint32 GetRowSize() const { return recordSize; }
         uint32 GetCols() const { return fieldCount; }
         uint32 GetOffset(size_t id) const { return (fieldsOffset != NULL && id < fieldCount) ? fieldsOffset[id] : 0; }
-        bool IsLoaded() const { return data != NULL; }
+        bool IsLoaded() const { return data != nullptr; }
         char* AutoProduceData(const char* fmt, uint32& count, char**& indexTable, uint32 sqlRecordCount, uint32 sqlHighestIndex, char *& sqlDataTable);
         char* AutoProduceStrings(const char* fmt, char* dataTable);
         static uint32 GetFormatRecordSize(const char * format, int32 * index_pos = NULL);

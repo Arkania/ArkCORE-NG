@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2011-2016 ArkCORE <http://www.arkania.net/>
+ * Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -37,8 +37,8 @@ namespace VMAP
     class MeshTriangle
     {
         public:
-            MeshTriangle() : idx0(0), idx1(0), idx2(0) { }
-            MeshTriangle(uint32 na, uint32 nb, uint32 nc): idx0(na), idx1(nb), idx2(nc) { }
+            MeshTriangle(){};
+            MeshTriangle(uint32 na, uint32 nb, uint32 nc): idx0(na), idx1(nb), idx2(nc) {};
 
             uint32 idx0;
             uint32 idx1;
@@ -60,7 +60,7 @@ namespace VMAP
             bool writeToFile(FILE* wf);
             static bool readFromFile(FILE* rf, WmoLiquid* &liquid);
         private:
-            WmoLiquid() : iTilesX(0), iTilesY(0), iCorner(), iType(0), iHeight(NULL), iFlags(NULL) { }
+            WmoLiquid(): iHeight(0), iFlags(0) {};
             uint32 iTilesX;       //!< number of tiles in x direction, each
             uint32 iTilesY;
             G3D::Vector3 iCorner; //!< the lower corner
@@ -75,10 +75,10 @@ namespace VMAP
     class GroupModel
     {
         public:
-            GroupModel() : iBound(), iMogpFlags(0), iGroupWMOID(0), iLiquid(NULL) { }
+            GroupModel(): iLiquid(0) {}
             GroupModel(const GroupModel &other);
             GroupModel(uint32 mogpFlags, uint32 groupWMOID, const G3D::AABox &bound):
-                        iBound(bound), iMogpFlags(mogpFlags), iGroupWMOID(groupWMOID), iLiquid(NULL) { }
+                        iBound(bound), iMogpFlags(mogpFlags), iGroupWMOID(groupWMOID), iLiquid(0) {}
             ~GroupModel() { delete iLiquid; }
 
             //! pass mesh data to object and create BIH. Passed vectors get get swapped with old geometry!
@@ -108,7 +108,7 @@ namespace VMAP
     class WorldModel
     {
         public:
-            WorldModel(): RootWMOID(0) { }
+            WorldModel(): RootWMOID(0) {}
 
             //! pass group models to WorldModel and create BIH. Passed vector is swapped with old geometry!
             void setGroupModels(std::vector<GroupModel> &models);

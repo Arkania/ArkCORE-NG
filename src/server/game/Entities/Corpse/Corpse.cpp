@@ -26,6 +26,7 @@
 #include "Opcodes.h"
 #include "GossipDef.h"
 #include "World.h"
+#include "Util.h"
 
 Corpse::Corpse(CorpseType type) : WorldObject(type != CORPSE_BONES), m_type(type)
 {
@@ -39,7 +40,7 @@ Corpse::Corpse(CorpseType type) : WorldObject(type != CORPSE_BONES), m_type(type
     m_time = time(NULL);
 
     lootForBody = false;
-    lootRecipient = NULL;
+    lootRecipient = nullptr;
 }
 
 Corpse::~Corpse() { }
@@ -86,7 +87,7 @@ bool Corpse::Create(uint32 guidlow, Player* owner)
     //in other way we will get a crash in Corpse::SaveToDB()
     SetMap(owner->GetMap());
 
-    WorldObject::_Create(guidlow, HIGHGUID_CORPSE, owner->GetPhaseMask());
+    WorldObject::_Create(guidlow, HIGHGUID_CORPSE, owner);
 
     SetObjectScale(1);
     SetUInt64Value(CORPSE_FIELD_OWNER, owner->GetGUID());
@@ -120,7 +121,7 @@ void Corpse::SaveToDB()
     stmt->setUInt32(index++, uint32(m_time));                                         // time
     stmt->setUInt8 (index++, GetType());                                              // corpseType
     stmt->setUInt32(index++, GetInstanceId());                                        // instanceId
-    stmt->setUInt32(index++, GetPhaseMask());                                         // phaseMask
+    stmt->setString(index++, GetUInt16String(GetPhaseIds()));                         // phaseIds
     trans->Append(stmt);
 
     CharacterDatabase.CommitTransaction(trans);
@@ -142,7 +143,7 @@ void Corpse::DeleteBonesFromWorld()
 
 void Corpse::DeleteFromDB(SQLTransaction& trans)
 {
-    PreparedStatement* stmt = NULL;
+    PreparedStatement* stmt = nullptr;
     if (GetType() == CORPSE_BONES)
     {
         // Only specific bones
@@ -161,7 +162,7 @@ void Corpse::DeleteFromDB(SQLTransaction& trans)
 bool Corpse::LoadCorpseFromDB(uint32 guid, Field* fields)
 {
     //        0     1     2     3            4      5          6          7       8       9      10        11    12          13          14          15         16
-    // SELECT posX, posY, posZ, orientation, mapId, displayId, itemCache, bytes1, bytes2, flags, dynFlags, time, corpseType, instanceId, phaseMask, corpseGuid, guid FROM corpse WHERE corpseType <> 0
+    // SELECT posX, posY, posZ, orientation, mapId, displayId, itemCache, bytes1, bytes2, flags, dynFlags, time, corpseType, instanceId, phaseIds, corpseGuid, guid FROM corpse WHERE corpseType <> 0
 
     uint32 ownerGuid = fields[16].GetUInt32();
     float posX   = fields[0].GetFloat();
@@ -182,13 +183,14 @@ bool Corpse::LoadCorpseFromDB(uint32 guid, Field* fields)
 
     m_time = time_t(fields[11].GetUInt32());
 
-    uint32 instanceId  = fields[13].GetUInt32();
-    uint32 phaseMask   = fields[14].GetUInt32();
+    uint32 instanceId    = fields[13].GetUInt32();
+    std::set<uint16> phaseIds = GetUInt16List( fields[14].GetCString());
 
     // place
     SetLocationInstanceId(instanceId);
     SetLocationMapId(mapId);
-    SetPhaseMask(phaseMask, false);
+    for (auto ph : phaseIds)
+        SetInPhase(ph,false,true);
     Relocate(posX, posY, posZ, o);
 
     if (!IsPositionValid())
@@ -209,3 +211,4 @@ bool Corpse::IsExpired(time_t t) const
     else
         return m_time < t - 3 * DAY;
 }
+

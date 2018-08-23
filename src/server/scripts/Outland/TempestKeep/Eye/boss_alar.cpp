@@ -429,11 +429,11 @@ class boss_alar : public CreatureScript
                     if (me->IsWithinMeleeRange(me->GetVictim()))
                     {
                         me->AttackerStateUpdate(me->GetVictim());
-                        me->resetAttackTimer();
+                        me->ResetAttackTimer();
                     }
                     else
                     {
-                        Unit* target = NULL;
+                        Unit* target = nullptr;
                         target = me->SelectNearestTargetInAttackDistance(5);
                         if (target)
                             AttackStart(target);

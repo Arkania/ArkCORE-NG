@@ -63,7 +63,8 @@ public:
             { "mana",         rbac::RBAC_PERM_COMMAND_MODIFY_MANA,         false, &HandleModifyManaCommand,          "", NULL },
             { "money",        rbac::RBAC_PERM_COMMAND_MODIFY_MONEY,        false, &HandleModifyMoneyCommand,         "", NULL },
             { "mount",        rbac::RBAC_PERM_COMMAND_MODIFY_MOUNT,        false, &HandleModifyMountCommand,         "", NULL },
-            { "phase",        rbac::RBAC_PERM_COMMAND_MODIFY_PHASE,        false, &HandleModifyPhaseCommand,         "", NULL },
+            { "phaseid",      rbac::RBAC_PERM_COMMAND_MODIFY_PHASEID,      false, &HandleModifyPhaseIdCommand,       "", NULL },
+            { "phasegroup",   rbac::RBAC_PERM_COMMAND_MODIFY_PHASEGROUP,   false, &HandleModifyPhaseGroupCommand,    "", NULL },
             { "rage",         rbac::RBAC_PERM_COMMAND_MODIFY_RAGE,         false, &HandleModifyRageCommand,          "", NULL },
             { "reputation",   rbac::RBAC_PERM_COMMAND_MODIFY_REPUTATION,   false, &HandleModifyRepCommand,           "", NULL },
             { "runicpower",   rbac::RBAC_PERM_COMMAND_MODIFY_RUNICPOWER,   false, &HandleModifyRunicPowerCommand,    "", NULL },
@@ -1269,24 +1270,166 @@ public:
         return true;
     }
 
-    //set temporary phase mask for player
-    static bool HandleModifyPhaseCommand(ChatHandler* handler, const char* args)
+    //set temporary #phaseId for selected object / self: Syntax: .modify phaseid #id
+    static bool HandleModifyPhaseIdCommand(ChatHandler* handler, const char* args)
     {
         if (!*args)
             return false;
 
-        uint32 phasemask = (uint32)atoi((char*)args);
+        std::string fullcmd((char*)args);
 
-        Unit* target = handler->getSelectedUnit();
-        if (target)
+        uint16 phaseId = 0;
+        uint32 dbGuid = 0;
+
+        Tokenizer tokens(fullcmd, ' ');
+        if (tokens.size() == 0)
         {
-            if (target->GetTypeId() == TYPEID_PLAYER)
-                target->ToPlayer()->GetPhaseMgr().SetCustomPhase(phasemask);
-            else
-                target->SetPhaseMask(phasemask, true);
+            handler->PSendSysMessage(LANG_IMPROPER_VALUE, 0);
+            handler->SetSentErrorMessage(true);
+            return false;
         }
-        else
-            handler->GetSession()->GetPlayer()->GetPhaseMgr().SetCustomPhase(phasemask);
+
+        if (tokens.size() > 0)
+            phaseId = uint16(atoi((tokens[0])));
+
+        if (tokens.size() > 1)
+            dbGuid = uint32(atoi((tokens[1])));
+
+        PhaseEntry const* phaseEntry = sPhaseStore.LookupEntry(phaseId);
+        if (!phaseEntry)
+        {
+            handler->SendSysMessage(LANG_PHASE_NOTFOUND);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        Player* player = handler->GetSession()->GetPlayer();
+        if (!player)
+            return false;
+
+        Creature* creature = handler->getSelectedCreature();
+        Player* selPlayer = handler->getSelectedPlayer();
+
+        if (!creature && dbGuid)
+            if (CreatureData const* cr_data = sObjectMgr->GetCreatureData(dbGuid))
+                creature = handler->GetSession()->GetPlayer()->GetMap()->GetCreature(MAKE_NEW_GUID(dbGuid, cr_data->id, HIGHGUID_UNIT));
+
+        if (!creature)
+        {
+            // number or [name] Shift-click form |color|Hcreature:dbGuid|h[name]|h|r
+            std::string guid = handler->GetKeyFromLink(fullcmd, "Hcreature");
+            if (guid.size() > 0)
+                if (dbGuid = stoi(guid))
+                    if (CreatureData const* cr_data = sObjectMgr->GetCreatureData(dbGuid))
+                        creature = handler->GetSession()->GetPlayer()->GetMap()->GetCreature(MAKE_NEW_GUID(dbGuid, cr_data->id, HIGHGUID_UNIT));
+        }
+
+        if (selPlayer)
+        {
+            selPlayer->ClearAllPhases(false);
+            selPlayer->SetInPhase(phaseId, true, true);
+            selPlayer->SetDBPhase(phaseId);
+        }
+
+        if (!creature || creature->IsPet())
+        {
+            player->ClearAllPhases(false);
+            player->SetInPhase(phaseId, true, true);
+            player->SetDBPhase(phaseId);
+        }
+
+        if (creature && !creature->IsPet())
+        {
+            creature->ClearAllPhases(false);
+            creature->SetInPhase(phaseId, true, true);
+            creature->SetDBPhase(phaseId);
+            creature->SaveToDB();
+        }
+        
+        return true;
+    }
+
+    //set temporary #phaseGroup for selected object / self: Syntax: .modify phasegroup #id
+    static bool HandleModifyPhaseGroupCommand(ChatHandler* handler, const char* args)
+    {
+        if (!*args)
+            return false;
+
+        std::string fullcmd((char*)args);
+
+        uint16 phaseGroupId = 0;
+        uint32 dbGuid = 0;
+
+        Tokenizer tokens(fullcmd, ' ');
+        if (tokens.size() == 0)
+        {
+            handler->PSendSysMessage(LANG_IMPROPER_VALUE, 0);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (tokens.size() > 0)
+            phaseGroupId = uint16(atoi((tokens[0])));
+
+        if (tokens.size() > 1)
+            dbGuid = uint32(atoi((tokens[1])));
+
+        std::set<uint16> group = GetXPhasesForGroup(phaseGroupId);
+        if (!group.size())
+        {
+            handler->SendSysMessage(LANG_PHASE_NOTFOUND);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        Player* player = handler->GetSession()->GetPlayer();
+        if (!player)
+            return false;
+
+        Creature* creature = handler->getSelectedCreature();
+        Player* selPlayer = handler->getSelectedPlayer();
+
+        if (!creature && dbGuid)
+            if (CreatureData const* cr_data = sObjectMgr->GetCreatureData(dbGuid))
+                creature = handler->GetSession()->GetPlayer()->GetMap()->GetCreature(MAKE_NEW_GUID(dbGuid, cr_data->id, HIGHGUID_UNIT));
+
+        if (!creature)
+        {
+            // number or [name] Shift-click form |color|Hcreature:dbGuid|h[name]|h|r
+            std::string guid = handler->GetKeyFromLink(fullcmd, "Hcreature");
+            if (guid.size() > 0)
+                if (dbGuid = stoi(guid))
+                    if (CreatureData const* cr_data = sObjectMgr->GetCreatureData(dbGuid))
+                        creature = handler->GetSession()->GetPlayer()->GetMap()->GetCreature(MAKE_NEW_GUID(dbGuid, cr_data->id, HIGHGUID_UNIT));
+        }
+
+        if (selPlayer)
+        {
+            selPlayer->ClearAllPhases(false);
+            for (uint32 id : group)
+                selPlayer->SetInPhase(id, false, true);
+            selPlayer->SetDBPhase(-int(phaseGroupId));
+            selPlayer->UpdateObjectVisibility();
+        }
+
+        if (!creature || creature->IsPet())
+        {
+            player->ClearAllPhases(false);
+            for (uint32 id : group)
+                player->SetInPhase(id, false, true);
+            player->SetDBPhase(-int(phaseGroupId));
+            player->UpdateObjectVisibility();
+        }
+
+        if (creature && !creature->IsPet())
+        {
+            creature->ClearAllPhases(false);
+            for (uint32 id : group)
+                creature->SetInPhase(id, false, true);
+            creature->SetDBPhase(-int(phaseGroupId));
+            creature->SaveToDB();
+            creature->UpdateObjectVisibility();
+        }
 
         return true;
     }

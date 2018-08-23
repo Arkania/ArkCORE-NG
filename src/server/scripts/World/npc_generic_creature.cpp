@@ -97,7 +97,7 @@ public:
                 if (me->isAttackReady() && !me->IsNonMeleeSpellCast(false))
                 {
                     bool Healing = false;
-                    SpellInfo const* info = NULL;
+                    SpellInfo const* info = nullptr;
 
                     //Select a healing spell if less than 30% hp
                     if (HealthBelowPct(30))
@@ -119,7 +119,7 @@ public:
                     }
                     else me->AttackerStateUpdate(me->GetVictim());
 
-                    me->resetAttackTimer();
+                    me->ResetAttackTimer();
                 }
             }
             else
@@ -128,7 +128,7 @@ public:
                 if (!me->IsNonMeleeSpellCast(false))
                 {
                     bool Healing = false;
-                    SpellInfo const* info = NULL;
+                    SpellInfo const* info = nullptr;
 
                     //Select a healing spell if less than 30% hp ONLY 33% of the time
                     if (HealthBelowPct(30) && rand() % 3 == 0)

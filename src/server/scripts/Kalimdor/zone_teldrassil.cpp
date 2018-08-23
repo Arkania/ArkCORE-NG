@@ -109,8 +109,47 @@ public:
     };
 
 };
+//fix aldrassil priest  Healing for the Wounded 26949  druid quest Rejuvenating Touch 26948
+// npc wounded sentinel 44617
+class npc_wounded_sentinel_44617 : public CreatureScript
+{
+public:
+	npc_wounded_sentinel_44617() : CreatureScript("npc_wounded_sentinel_44617") {}
 
+	enum eNpc
+	{
+		QUEST_A_REJUVENATING_TOUCH_26948 = 26948,
+		QUEST_FLASH_HEAL_26949 = 26949,
+        NPC_HEALING_CREDIT_44617 = 44617,
+	};
+
+	struct npc_wounded_sentinel_44617AI : public ScriptedAI
+	{
+		npc_wounded_sentinel_44617AI(Creature* creature) : ScriptedAI(creature) {}
+
+		void SpellHit(Unit* caster, SpellInfo const* spell) override
+		{
+			if (Player* player = caster->ToPlayer())
+                if (player->GetQuestStatus(QUEST_A_REJUVENATING_TOUCH_26948) == QUEST_STATUS_INCOMPLETE)
+                {
+                    player->KilledMonsterCredit(NPC_HEALING_CREDIT_44617);
+                    me->DespawnOrUnsummon();
+                }
+                else if (player->GetQuestStatus(QUEST_FLASH_HEAL_26949) == QUEST_STATUS_INCOMPLETE)
+                {
+                    player->KilledMonsterCredit(NPC_HEALING_CREDIT_44617);
+                    me->DespawnOrUnsummon();
+                }
+		}
+	};
+
+	CreatureAI* GetAI(Creature* creature) const
+	{
+		return new npc_wounded_sentinel_44617AI(creature);
+	}
+};
 void AddSC_teldrassil()
 {
     new npc_mist();
+    new npc_wounded_sentinel_44617();
 }

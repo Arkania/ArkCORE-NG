@@ -24,48 +24,6 @@
 #include "Errors.h" // for ASSERT
 #include <ace/TSS_T.h>
 
-typedef ACE_TSS<SFMTRand> SFMTRandTSS;
-static SFMTRandTSS sfmtRand;
-
-int32 irand(int32 min, int32 max)
-{
-    ASSERT(max >= min);
-    return int32(sfmtRand->IRandom(min, max));
-}
-
-uint32 urand(uint32 min, uint32 max)
-{
-    ASSERT(max >= min);
-    return sfmtRand->URandom(min, max);
-}
-
-float frand(float min, float max)
-{
-    ASSERT(max >= min);
-    return float(sfmtRand->Random() * (max - min) + min);
-}
-
-int32 rand32()
-{
-    return int32(sfmtRand->BRandom());
-}
-
-double rand_norm(void)
-{
-    return sfmtRand->Random();
-}
-
-double rand_chance(void)
-{
-    return sfmtRand->Random() * 100.0;
-}
-
-bool rand_chance(uint8 percent)
-{    
-    uint8 rol = urand(0, 100);
-    return percent > rol ? true : false;
-}
-
 Tokenizer::Tokenizer(const std::string &src, const char sep, uint32 vectorReserve)
 {
     m_str = new char[src.length() + 1];
@@ -259,6 +217,13 @@ bool IsIPAddrInNetwork(ACE_INET_Addr const& net, ACE_INET_Addr const& addr, ACE_
     if ((net.get_ip_address() & mask) == (addr.get_ip_address() & mask))
         return true;
     return false;
+}
+
+uint8_t* GetBytes(std::string txt)
+{
+    uint8_t* array = new uint8_t[txt.size()];
+    memcpy(array, txt.data(), txt.length());
+    return array;
 }
 
 /// create PID file
@@ -554,3 +519,168 @@ std::string ByteArrayToHexStr(uint8 const* bytes, uint32 arrayLen, bool reverse 
 
     return ss.str();
 }
+
+std::set<uint32> GetUIntegerList(std::string storedString)
+{
+    std::set<uint32> r;
+
+    if (storedString.empty())
+        return r;
+
+    uint32 i;
+    std::istringstream data(storedString);
+    do
+    {
+        i=0;
+        data >> i;
+        if (i) 
+            r.insert(i);
+    } while (i);
+    return r;
+}
+
+std::string GetUIntegerString(std::set<uint32> uint32List)
+{
+    std::ostringstream ss;
+    for (uint16 i : uint32List)
+        if (i)
+            ss << i << ' ';
+    return ss.str();
+}
+
+std::set<uint16> GetUInt16List(std::string storedString)
+{
+    std::set<uint16> r;
+
+    if (storedString.empty())
+        return r;
+
+    uint32 i;
+    std::istringstream data(storedString);
+    do
+    {
+        i = 0;
+        data >> i;
+        if (i) 
+            r.insert(i);
+    } while (i);
+    return r;
+}
+
+std::string GetUInt16String(std::set<uint16> uint16List)
+{
+    std::ostringstream ss;
+    for (uint16 i : uint16List)
+        if (i)
+            ss << i << ' ';
+    return ss.str();
+}
+
+std::set<uint16> CopyUInt16List(std::set<uint16> original)
+{
+    std::set<uint16> r;
+    for (auto value : original)
+        if (value)
+            r.insert(value);
+    return r;
+}
+
+uint64 ComputePhaseIdToMask(uint16 id)
+{
+    if (id >= 169 && id <= 201)
+        return (uint64(1) << (id - 169));
+    else
+        switch (id)
+        {
+        case 223:
+            return (uint64(1) << uint64(33));
+        case 224:
+            return (uint64(1) << uint64(34));
+        case 309:
+            return (uint64(1) << uint64(35));
+        case 311:
+            return (uint64(1) << uint64(36));
+        case 313:
+            return (uint64(1) << uint64(37));
+        case 315:
+            return (uint64(1) << uint64(38));
+        case 318:
+            return (uint64(1) << uint64(39));
+        case 319:
+            return (uint64(1) << uint64(40));
+        case 320:
+            return (uint64(1) << uint64(41));
+        case 321:
+            return (uint64(1) << uint64(42));
+        case 322:
+            return (uint64(1) << uint64(43));
+        case 324:
+            return (uint64(1) << uint64(44));
+        case 325:
+            return (uint64(1) << uint64(45));
+        case 328:
+            return (uint64(1) << uint64(46));
+        case 332:
+            return (uint64(1) << uint64(47));
+        case 333:
+            return (uint64(1) << uint64(48));
+        case 334:
+            return (uint64(1) << uint64(49));
+        case 335:
+            return (uint64(1) << uint64(50));
+        case 337:
+            return (uint64(1) << uint64(51));
+        case 347:
+            return (uint64(1) << uint64(52));
+        case 351:
+            return (uint64(1) << uint64(53));
+        case 352:
+            return (uint64(1) << uint64(54));
+        case 353:
+            return (uint64(1) << uint64(55));
+        case 358:
+            return (uint64(1) << uint64(56));
+        case 359:
+            return (uint64(1) << uint64(57));
+        case 360:
+            return (uint64(1) << uint64(58));
+        case 361:
+            return (uint64(1) << uint64(59));
+        case 362:
+            return (uint64(1) << uint64(60));
+        case 366:
+            return (uint64(1) << uint64(61));
+        case 368:
+            return (uint64(1) << uint64(62));
+        case 371:
+            return (uint64(1) << uint64(63));
+        default:
+            return 1;
+        }
+
+}
+
+std::set<uint16> ComputePhaseMaskToIds(uint64 phaseMask)
+{
+    std::set<uint16> phases;
+    for (uint64 i = 0; i < 32; i++)
+    {
+        uint64 m1 = pow(2, i);
+        uint64 m2 = m1 & phaseMask;
+        if (m2)
+            phases.insert(169 + i);
+    }
+    return phases;
+}
+
+char* GetCopyOfChars(const char * source)
+{
+    const size_t len = strlen(source);
+    char * tmp_source = new char[len + 1];
+    strncpy(tmp_source, source, len);
+    tmp_source[len] = '\0'; // I'm paranoid, maybe someone has changed something in _filename :-)
+    return tmp_source;
+}
+
+
+

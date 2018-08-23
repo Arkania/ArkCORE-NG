@@ -144,13 +144,18 @@ void WorldSocket::CloseSocket (void)
     {
         ACE_GUARD (LockType, Guard, m_SessionLock);
 
-        m_Session = NULL;
+        m_Session = nullptr;
     }
 }
 
 const std::string& WorldSocket::GetRemoteAddress (void) const
 {
     return m_Address;
+}
+
+const u_short WorldSocket::GetRemotePort(void) const
+{
+    return m_Port;
 }
 
 int WorldSocket::SendPacket(WorldPacket const& pct)
@@ -162,7 +167,7 @@ int WorldSocket::SendPacket(WorldPacket const& pct)
 
     // Dump outgoing packet
     if (sPacketLog->CanLogPacket())
-        sPacketLog->LogPacket(pct, SERVER_TO_CLIENT);
+        sPacketLog->LogPacket(pct, SERVER_TO_CLIENT, GetRemoteAddress(), GetRemotePort());
 
     WorldPacket const* pkt = &pct;
 
@@ -225,9 +230,9 @@ long WorldSocket::RemoveReference (void)
     return static_cast<long> (remove_reference());
 }
 
-int WorldSocket::open (void *a)
+int WorldSocket::open(void *a)
 {
-    ACE_UNUSED_ARG (a);
+    ACE_UNUSED_ARG(a);
 
     // Prevent double call to this func.
     if (m_OutBuffer)
@@ -242,18 +247,19 @@ int WorldSocket::open (void *a)
         return -1;
 
     // Allocate the buffer.
-    ACE_NEW_RETURN (m_OutBuffer, ACE_Message_Block (m_OutBufferSize), -1);
+    ACE_NEW_RETURN(m_OutBuffer, ACE_Message_Block(m_OutBufferSize), -1);
 
     // Store peer address.
     ACE_INET_Addr remote_addr;
 
     if (peer().get_remote_addr(remote_addr) == -1)
     {
-        TC_LOG_ERROR("network", "WorldSocket::open: peer().get_remote_addr errno = %s", ACE_OS::strerror (errno));
+        TC_LOG_ERROR("network", "WorldSocket::open: peer().get_remote_addr errno = %s", ACE_OS::strerror(errno));
         return -1;
     }
 
     m_Address = remote_addr.get_host_addr();
+    m_Port = remote_addr.get_port_number();
 
     // not an opcode. this packet sends raw string WORLD OF WARCRAFT CONNECTION - SERVER TO CLIENT"
     // because of our implementation, bytes "WO" become the opcode
@@ -446,7 +452,7 @@ int WorldSocket::handle_close (ACE_HANDLE h, ACE_Reactor_Mask)
     {
         ACE_GUARD_RETURN (LockType, Guard, m_SessionLock, -1);
 
-        m_Session = NULL;
+        m_Session = nullptr;
     }
 
     reactor()->remove_handler(this, ACE_Event_Handler::DONT_CALL | ACE_Event_Handler::ALL_EVENTS_MASK);
@@ -531,7 +537,7 @@ int WorldSocket::handle_input_payload (void)
 
     m_RecvPct.base (NULL, 0);
     m_RecvPct.reset();
-    m_RecvWPct = NULL;
+    m_RecvWPct = nullptr;
     delete m_RecvWPct;
 
     m_Header.reset();
@@ -684,7 +690,7 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
 
     // Dump received packet.
     if (sPacketLog->CanLogPacket())
-        sPacketLog->LogPacket(*new_pct, CLIENT_TO_SERVER);
+        sPacketLog->LogPacket(*new_pct, CLIENT_TO_SERVER, GetRemoteAddress(), GetRemotePort());
 
     std::string opcodeName = GetOpcodeNameForLogging(opcode);
     if (m_Session)
@@ -1048,7 +1054,9 @@ int WorldSocket::HandlePing (WorldPacket& recvPacket)
         diff_time -= m_LastPingTime;
         m_LastPingTime = cur_time;
 
-        if (diff_time < ACE_Time_Value (27))
+        int64 diff = diff_time.get_msec() - ACE_Time_Value(27).get_msec();
+        TC_LOG_DEBUG("network", "WorldSocket::HandlePing TimeDifference: %lli.", diff);
+        if (diff < 0)
         {
             ++m_OverSpeedPings;
 
@@ -1060,8 +1068,8 @@ int WorldSocket::HandlePing (WorldPacket& recvPacket)
 
                 if (m_Session && !m_Session->HasPermission(rbac::RBAC_PERM_SKIP_CHECK_OVERSPEED_PING))
                 {
-                    TC_LOG_ERROR("network", "WorldSocket::HandlePing: %s kicked for over-speed pings (address: %s)",
-                        m_Session->GetPlayerInfo().c_str(), GetRemoteAddress().c_str());
+                    TC_LOG_ERROR("network", "WorldSocket::HandlePing: %s kicked for over-speed pings (address: %s) ping value is: %lli",
+                        m_Session->GetPlayerInfo().c_str(), GetRemoteAddress().c_str(), diff);
 
                     return -1;
                 }

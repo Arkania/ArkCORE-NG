@@ -33,6 +33,7 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include "SpellAuraEffects.h"
 
 class Aura;
 
@@ -371,7 +372,7 @@ void WorldSession::HandleSetEveryoneIsAssistant(WorldPacket& recvData)
 
     if (active)
     {
-        for (GroupReference *itr = group->GetFirstMember(); itr != NULL; itr = itr->next()) // Loop through all members
+        for (GroupReference *itr = group->GetFirstMember(); itr != nullptr; itr = itr->next()) // Loop through all members
             if (Player *player = itr->GetSource())
                 group->SetGroupMemberFlag(player->GetGUID(), active, MEMBER_FLAG_ASSISTANT);
 
@@ -379,7 +380,7 @@ void WorldSession::HandleSetEveryoneIsAssistant(WorldPacket& recvData)
     }
     else
     {
-        for (GroupReference *itr = group->GetFirstMember(); itr != NULL; itr = itr->next()) // Loop through all members
+        for (GroupReference *itr = group->GetFirstMember(); itr != nullptr; itr = itr->next()) // Loop through all members
             if (Player *player = itr->GetSource())
                 group->SetGroupMemberFlag(player->GetGUID(), !active, MEMBER_FLAG_ASSISTANT);
 
@@ -461,6 +462,21 @@ void WorldSession::HandleGroupInviteResponseOpcode(WorldPacket& recvData)
         WorldPacket data(SMSG_GROUP_DECLINE, GetPlayer()->GetName().size());
         data << GetPlayer()->GetName();
         leader->GetSession()->SendPacket(&data);
+    }
+}
+
+void WorldSession::HandleGroupClearMarker(WorldPacket& recv_data)
+{
+    TC_LOG_DEBUG("network", "WORLD: Received CMSG_CLEAR_RAID_MARKER");
+
+    uint8 marker;
+    recv_data >> marker;
+
+    if (Group* group = GetPlayer()->GetGroup())
+    {
+        group->RemoveGroupMarkerMask(1 << marker);
+        group->SendRaidMarkerUpdate();
+        group->RemoveMarker();
     }
 }
 
@@ -1012,8 +1028,7 @@ void WorldSession::BuildPartyMemberStatsChangedPacket(Player* player, WorldPacke
     if (mask == GROUP_UPDATE_FLAG_NONE)
         return;
 
-    std::set<uint32> phases;
-    player->GetPhaseMgr().GetActivePhases(phases);
+    std::set<uint16> phases = player->GetPhaseIds();
 
     if (mask & GROUP_UPDATE_FLAG_POWER_TYPE)                // if update power type, update current/max power also
         mask |= (GROUP_UPDATE_FLAG_CUR_POWER | GROUP_UPDATE_FLAG_MAX_POWER);
@@ -1239,7 +1254,7 @@ void WorldSession::BuildPartyMemberStatsChangedPacket(Player* player, WorldPacke
     {
         *data << uint32(phases.empty() ? 8 : 0);
         *data << uint32(phases.size());
-        for (std::set<uint32>::const_iterator itr = phases.begin(); itr != phases.end(); ++itr)
+        for (std::set<uint16>::const_iterator itr = phases.begin(); itr != phases.end(); ++itr)
             *data << uint16(*itr);
     }
 }
@@ -1265,8 +1280,7 @@ void WorldSession::HandleRequestPartyMemberStatsOpcode(WorldPacket& recvData)
 
     Pet* pet = player->GetPet();
     Powers powerType = player->getPowerType();
-    std::set<uint32> phases;
-    player->GetPhaseMgr().GetActivePhases(phases);
+    std::set<uint16> phaseIds = player->GetPhaseIds();
 
     WorldPacket data(SMSG_PARTY_MEMBER_STATS_FULL, 4+2+2+2+1+2*6+8+1+8);
     data << uint8(0);                                       // only for SMSG_PARTY_MEMBER_STATS_FULL, probably arena/bg related
@@ -1287,7 +1301,7 @@ void WorldSession::HandleRequestPartyMemberStatsOpcode(WorldPacket& recvData)
     if (player->GetVehicle())
         updateFlags |= GROUP_UPDATE_FLAG_VEHICLE_SEAT;
 
-    if (!phases.empty())
+    if (!phaseIds.empty())
         updateFlags |= GROUP_UPDATE_FLAG_PHASE;
 
     uint16 playerStatus = MEMBER_STATUS_ONLINE;
@@ -1416,9 +1430,9 @@ void WorldSession::HandleRequestPartyMemberStatsOpcode(WorldPacket& recvData)
 
     if (updateFlags & GROUP_UPDATE_FLAG_PHASE)
     {
-        data << uint32(phases.empty() ? 8 : 0);
-        data << uint32(phases.size());
-        for (std::set<uint32>::const_iterator itr = phases.begin(); itr != phases.end(); ++itr)
+        data << uint32(phaseIds.empty() ? 8 : 0);
+        data << uint32(phaseIds.size());
+        for (std::set<uint16>::const_iterator itr = phaseIds.begin(); itr != phaseIds.end(); ++itr)
             data << uint16(*itr);
     }
 
