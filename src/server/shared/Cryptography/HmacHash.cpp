@@ -21,40 +21,55 @@
 #include "BigNumber.h"
 #include "Common.h"
 
+#if defined(OPENSSL_VERSION_NUMBER) && OPENSSL_VERSION_NUMBER < 0x10100000L
+HMAC_CTX* HMAC_CTX_new()
+{
+    HMAC_CTX *ctx = new HMAC_CTX();
+    HMAC_CTX_init(ctx);
+    return ctx;
+}
+
+ void HMAC_CTX_free(HMAC_CTX* ctx)
+{
+    HMAC_CTX_cleanup(ctx);
+    delete ctx;
+}
+#endif
+
 HmacHash::HmacHash(uint32 len, uint8 *seed, EVP_MD const* hasher, uint32 digestLength) : _digestLength(digestLength)
 {
-    HMAC_CTX_init(&_ctx);
-    HMAC_Init_ex(&_ctx, seed, len, hasher, NULL);
+    m_ctx = HMAC_CTX_new();
+    HMAC_Init_ex(m_ctx, seed, len, hasher(), nullptr);
     _digest = new uint8[digestLength];
     memset(_digest, 0, digestLength);
 }
 
 HmacHash::~HmacHash()
 {
-    HMAC_CTX_cleanup(&_ctx);
+    HMAC_CTX_free(m_ctx);
     delete[] _digest;
 }
 
-void HmacHash::UpdateData(const std::string &str)
+void HmacHash::UpdateData(std::string const& str)
 {
-    HMAC_Update(&_ctx, (uint8 const*)str.c_str(), str.length());
+    HMAC_Update(m_ctx, reinterpret_cast<uint8 const*>(str.c_str()), str.length());
 }
 
-void HmacHash::UpdateData(const uint8* data, size_t len)
+void HmacHash::UpdateData(uint8 const* data, size_t len)
 {
-    HMAC_Update(&_ctx, data, len);
+    HMAC_Update(m_ctx, data, len);
 }
 
 void HmacHash::Finalize()
 {
     uint32 length = 0;
-    HMAC_Final(&_ctx, _digest, &length);
+    HMAC_Final(m_ctx, _digest, &length);
     ASSERT(length == _digestLength);
 }
 
 uint8* HmacHash::ComputeHash(BigNumber* bn)
 {
-    HMAC_Update(&_ctx, bn->AsByteArray().get(), bn->GetNumBytes());
+    HMAC_Update(m_ctx, bn->AsByteArray().get(), bn->GetNumBytes());
     Finalize();
     return _digest;
 }

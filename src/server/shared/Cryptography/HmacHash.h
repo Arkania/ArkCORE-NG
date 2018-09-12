@@ -34,14 +34,14 @@ class HmacHash
     public:
         HmacHash(uint32 len, uint8 *seed, EVP_MD const* hasher, uint32 digestLength);
         ~HmacHash();
-        void UpdateData(const std::string &str);
-        void UpdateData(const uint8* data, size_t len);
+        void UpdateData(std::string const& str);
+        void UpdateData(uint8 const* data, size_t len);
         void Finalize();
         uint8* ComputeHash(BigNumber* bn);
         uint8* GetDigest() { return _digest; }
         int GetLength() const { return SHA_DIGEST_LENGTH; }
     private:
-        HMAC_CTX _ctx;
+        HMAC_CTX* _ctx;
         uint8* _digest;
         uint32 _digestLength;
 };
