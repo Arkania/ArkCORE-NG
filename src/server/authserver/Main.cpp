@@ -161,7 +161,8 @@ extern int main(int argc, char** argv)
     }
 
     // Launch the listening network socket
-    RealmAcceptor acceptor;
+    RealmAcceptor<AuthSocket> acceptor;
+    RealmAcceptor<Battlenet::Socket> bnetacceptor;
 
     int32 rmport = sConfigMgr->GetIntDefault("RealmServerPort", 3724);
     if (rmport < 0 || rmport > 0xFFFF)
@@ -180,6 +181,13 @@ extern int main(int argc, char** argv)
         return 1;
     }
 
+    bind_addr.set_port_number(1119);
+    if (bnetacceptor.open(bind_addr, ACE_Reactor::instance(), ACE_NONBLOCK) == -1)
+    {
+        TC_LOG_ERROR("server.authserver", "Auth server can not bind to %s:%d", bind_ip.c_str(), 1119);
+        return 1;
+    }
+
     // Initialize the signal handlers
     AuthServerSignalHandler SignalINT, SignalTERM;
 
@@ -189,24 +197,24 @@ extern int main(int argc, char** argv)
     Handler.register_handler(SIGTERM, &SignalTERM);
 
 #if defined(_WIN32) || defined(__linux__)
-    
+
     ///- Handle affinity for multiple processors and process priority
     uint32 affinity = sConfigMgr->GetIntDefault("UseProcessors", 0);
     bool highPriority = sConfigMgr->GetBoolDefault("ProcessPriority", false);
 
 #ifdef _WIN32 // Windows
-    
+
     HANDLE hProcess = GetCurrentProcess();
     if (affinity > 0)
     {
         ULONG_PTR appAff;
         ULONG_PTR sysAff;
-        
+
         if (GetProcessAffinityMask(hProcess, &appAff, &sysAff))
         {
             // remove non accessible processors
             ULONG_PTR currentAffinity = affinity & appAff;
-            
+
             if (!currentAffinity)
                 TC_LOG_ERROR("server.authserver", "Processors marked in UseProcessors bitmask (hex) %x are not accessible for the authserver. Accessible processors bitmask (hex): %x", affinity, appAff);
             else if (SetProcessAffinityMask(hProcess, currentAffinity))
@@ -215,7 +223,7 @@ extern int main(int argc, char** argv)
                 TC_LOG_ERROR("server.authserver", "Can't set used processors (hex): %x", currentAffinity);
         }
     }
-    
+
     if (highPriority)
     {
         if (SetPriorityClass(hProcess, HIGH_PRIORITY_CLASS))
@@ -223,9 +231,9 @@ extern int main(int argc, char** argv)
         else
             TC_LOG_ERROR("server.authserver", "Can't set authserver process priority class.");
     }
-    
+
 #else // Linux
-    
+
     if (affinity > 0)
     {
         cpu_set_t mask;
@@ -252,9 +260,11 @@ extern int main(int argc, char** argv)
         else
             TC_LOG_INFO("server.authserver", "authserver process priority class set to %i", getpriority(PRIO_PROCESS, 0));
     }
-    
+
 #endif
 #endif
+
+    sBattlenetMgr->Load();
 
     // maximum counter for next ping
     uint32 numLoops = (sConfigMgr->GetIntDefault("MaxPingTime", 30) * (MINUTE * 1000000 / 100000));

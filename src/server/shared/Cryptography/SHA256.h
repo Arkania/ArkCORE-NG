@@ -1,7 +1,5 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2016 ArkCORE <http://www.arkania.net/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -17,32 +15,35 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _AUTH_HMAC_H
-#define _AUTH_HMAC_H
+#ifndef SHA256_h__
+#define SHA256_h__
 
 #include "Define.h"
 #include <string>
-#include <openssl/hmac.h>
 #include <openssl/sha.h>
 
 class BigNumber;
 
-#define SEED_KEY_SIZE 16
-
-class HmacHash
+class SHA256Hash
 {
     public:
-        HmacHash(uint32 len, uint8 *seed);
-        ~HmacHash();
-        void UpdateData(const std::string &str);
-        void UpdateData(const uint8* data, size_t len);
-        void Finalize();
-        uint8 *ComputeHash(BigNumber* bn);
-        uint8 *GetDigest() { return (uint8*)m_digest; }
-        int GetLength() const { return SHA_DIGEST_LENGTH; }
-    private:
-        HMAC_CTX m_ctx;
-        uint8 m_digest[SHA_DIGEST_LENGTH];
-};
-#endif
+        SHA256Hash();
+        ~SHA256Hash();
 
+        void UpdateBigNumbers(BigNumber* bn0, ...);
+
+        void UpdateData(const uint8 *dta, int len);
+        void UpdateData(const std::string &str);
+
+        void Initialize();
+        void Finalize();
+
+        uint8 *GetDigest(void) { return mDigest; };
+        int GetLength(void) const { return SHA256_DIGEST_LENGTH; };
+
+    private:
+        SHA256_CTX mC;
+        uint8 mDigest[SHA256_DIGEST_LENGTH];
+};
+
+#endif // SHA256_h__
