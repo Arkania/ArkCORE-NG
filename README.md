@@ -25,7 +25,7 @@ website at [arkania.net](http://www.arkania.net).
 + ACE ≥ 5.8.3 (included for Windows)
 + MySQL ≥ 5.1.0 (included for Windows)
 + CMake ≥ 2.8.0
-+ OpenSSL 1.1
++ OpenSSL ≥ 1.0.x 
 + GCC ≥ 4.7.2 (Linux only)
 + MS Visual Studio ≥ 12 (2013) (Windows only)
 
