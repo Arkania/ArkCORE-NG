@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2016 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -17,27 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _AUTHCRYPT_H
-#define _AUTHCRYPT_H
+#ifndef _WORLDPACKETCRYPT_H
+#define _WORLDPACKETCRYPT_H
 
-#include "Cryptography/ARC4.h"
+#include "PacketCrypt.h"
 
 class BigNumber;
 
-class AuthCrypt
+class WorldPacketCrypt : public PacketCrypt
 {
     public:
-        AuthCrypt();
+        WorldPacketCrypt();
 
-        void Init(BigNumber* K);
-        void DecryptRecv(uint8 *, size_t);
-        void EncryptSend(uint8 *, size_t);
-
-        bool IsInitialized() const { return _initialized; }
-
-    private:
-        ARC4 _clientDecrypt;
-        ARC4 _serverEncrypt;
-        bool _initialized;
+        void Init(BigNumber* K) override;
 };
-#endif
+
+#endif // _WORLDPACKETCRYPT_H

@@ -17,42 +17,33 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "HMACSHA1.h"
-#include "BigNumber.h"
-#include "Common.h"
+#ifndef _AUTH_HMAC_H
+#define _AUTH_HMAC_H
 
-HmacHash::HmacHash(uint32 len, uint8 *seed)
-{
-    HMAC_CTX_init(&m_ctx);
-    HMAC_Init_ex(&m_ctx, seed, len, EVP_sha1(), NULL);
-    memset(m_digest, 0, sizeof(m_digest));
-}
+#include "Define.h"
+#include <string>
+#include <openssl/hmac.h>
+#include <openssl/sha.h>
 
-HmacHash::~HmacHash()
-{
-    HMAC_CTX_cleanup(&m_ctx);
-}
+class BigNumber;
 
-void HmacHash::UpdateData(const std::string &str)
-{
-    HMAC_Update(&m_ctx, (uint8 const*)str.c_str(), str.length());
-}
+#define SEED_KEY_SIZE 16
 
-void HmacHash::UpdateData(const uint8* data, size_t len)
+class HmacHash
 {
-    HMAC_Update(&m_ctx, data, len);
-}
+    public:
+        HmacHash(uint32 len, uint8 *seed, EVP_MD const* hasher, uint32 digestLength);
+        ~HmacHash();
+        void UpdateData(const std::string &str);
+        void UpdateData(const uint8* data, size_t len);
+        void Finalize();
+        uint8* ComputeHash(BigNumber* bn);
+        uint8* GetDigest() { return _digest; }
+        int GetLength() const { return SHA_DIGEST_LENGTH; }
+    private:
+        HMAC_CTX _ctx;
+        uint8* _digest;
+        uint32 _digestLength;
+};
 
-void HmacHash::Finalize()
-{
-    uint32 length = 0;
-    HMAC_Final(&m_ctx, (uint8*)m_digest, &length);
-    ASSERT(length == SHA_DIGEST_LENGTH);
-}
-
-uint8 *HmacHash::ComputeHash(BigNumber* bn)
-{
-    HMAC_Update(&m_ctx, bn->AsByteArray().get(), bn->GetNumBytes());
-    Finalize();
-    return (uint8*)m_digest;
-}
+#endif
