@@ -93,4 +93,9 @@ namespace AuthHelper
 
         return NULL;
     }
+
+    bool IsBuildSupportingBattlenet(int build)
+    {
+        return build >= 15595;
+    }
 };
