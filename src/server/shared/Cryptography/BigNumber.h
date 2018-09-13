@@ -22,6 +22,7 @@
 
 #include "Define.h"
 #include <ace/Auto_Ptr.h>
+#include <string>
 
 struct bignum_st;
 
@@ -90,8 +91,8 @@ class BigNumber
 
         ACE_Auto_Array_Ptr<uint8> AsByteArray(int32 minSize = 0, bool littleEndian = true);
 
-        char * AsHexStr() const;
-        char * AsDecStr() const;
+        std::string AsHexStr() const;
+        std::string AsDecStr() const;
 
     private:
         struct bignum_st *_bn;

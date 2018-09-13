@@ -40,7 +40,7 @@
 #endif /* ACE_LACKS_PRAGMA_ONCE */
 
 #include "Common.h"
-#include "AuthCrypt.h"
+#include "WorldPacketCrypt.h"
 
 class ACE_Message_Block;
 class WorldPacket;
@@ -183,7 +183,7 @@ class WorldSocket : public WorldHandler
         u_short m_Port;
 
         /// Class used for managing encryption of the headers
-        AuthCrypt m_Crypt;
+        WorldPacketCrypt m_Crypt;
 
         /// Mutex lock to protect m_Session
         LockType m_SessionLock;

@@ -16,10 +16,6 @@ jemalloc (a general-purpose scalable concurrent malloc-implementation)
   http://www.canonware.com/jemalloc/
   Version: 3.5.1
   
-MySQL (the world's most popular open source database software)
-  http://www.mysql.com/
-  Version: 5.5.9 (GA)
-
 SFMT (SIMD-oriented Fast Mersenne Twister)
   Based on http://agner.org/random/
   Version: 2010-Aug-03
@@ -30,7 +26,7 @@ utf8-cpp (UTF-8 with C++ in a Portable Way)
 
 zlib (A Massively Spiffy Yet Delicately Unobtrusive Compression Library)
   http://www.zlib.net/
-  Version: 1.2.7
+  Version: 1.2.11
 
 gSOAP (a portable development toolkit for C and C++ XML Web services and XML data bindings)
   http://gsoap2.sourceforge.net/
