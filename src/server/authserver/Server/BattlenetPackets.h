@@ -23,6 +23,7 @@
 #include "BattlenetManager.h"
 #include "Define.h"
 #include "Errors.h"
+#include <ace/INET_Addr.h>
 #include <string>
 
 namespace Battlenet
@@ -32,8 +33,15 @@ namespace Battlenet
     enum Channel
     {
         AUTHENTICATION  = 0,
-        CREEP           = 1,
-        WOW             = 2
+        CONNECTION      = 1,
+        WOW             = 2,
+        FRIEND          = 3,
+        PRESENCE        = 4,
+        CHAT            = 5,
+        SUPPORT         = 7,
+        ACHIEVEMENT     = 8,
+        CACHE           = 11,
+        PROFILE         = 14
     };
 
     enum AuthOpcode
@@ -47,7 +55,7 @@ namespace Battlenet
         SMSG_AUTH_PROOF_REQUEST     = 0x2
     };
 
-    enum CreepOpcodes
+    enum ConnectionOpcodes
     {
         CMSG_PING               = 0x0,
         CMSG_ENABLE_ENCRYPTION  = 0x5,
@@ -208,7 +216,7 @@ namespace Battlenet
     public:
         AuthComplete() : ServerPacket(PacketHeader(SMSG_AUTH_COMPLETE, AUTHENTICATION)),
             Result(AUTH_OK), ErrorType(0), PingTimeout(120000), Threshold(25000000), Rate(1000),
-            FirstName(""), LastName(""), Region(2), GameAccountId(0), GameAccountRegion(2), GameAccountName("")
+            FirstName(""), LastName(""), AccountId(0), Region(2), GameAccountRegion(2), GameAccountName("")
         {
         }
 
@@ -227,8 +235,8 @@ namespace Battlenet
         uint32 Rate;
         std::string FirstName;
         std::string LastName;
+        uint32 AccountId;
         uint8 Region;
-        uint32 GameAccountId;
         uint8 GameAccountRegion;
         std::string GameAccountName;
         uint64 GameAccountFlags;
@@ -260,7 +268,7 @@ namespace Battlenet
     class Pong final : public ServerPacket
     {
     public:
-        Pong() : ServerPacket(PacketHeader(SMSG_PONG, CREEP))
+        Pong() : ServerPacket(PacketHeader(SMSG_PONG, CONNECTION))
         {
         }
 

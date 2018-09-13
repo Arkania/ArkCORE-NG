@@ -111,7 +111,8 @@ namespace Battlenet
     {
         AUTH_OK                         = 0,
         AUTH_INTERNAL_ERROR             = 100,
-        AUTH_CORRUPTED_MODULE           = 102,
+        AUTH_CORRUPTED_MODULE           = 101,
+        AUTH_NO_BATTLETAGS              = 102,
         AUTH_BAD_SERVER_PROOF           = 103,
         AUTH_UNKNOWN_ACCOUNT            = 104,
         AUTH_CLOSED                     = 105,
@@ -183,6 +184,7 @@ namespace AuthHelper
     bool IsAcceptedClientBuild(int build);
     bool IsPostBCAcceptedClientBuild(int build);
     bool IsPreBCAcceptedClientBuild(int build);
+    bool IsBuildSupportingBattlenet(int build);
 };
 
 #endif

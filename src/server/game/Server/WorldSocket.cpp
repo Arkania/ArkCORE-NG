@@ -46,6 +46,7 @@
 #include "PacketLog.h"
 #include "ScriptMgr.h"
 #include "AccountMgr.h"
+#include "BattlenetAccountMgr.h"
 
 #if defined(__GNUC__)
 #pragma pack(1)
@@ -864,9 +865,20 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     // Get the account information from the realmd database
     //         0           1        2       3          4         5       6          7   8
     // SELECT id, sessionkey, last_ip, locked, expansion, mutetime, locale, recruiter, os FROM account WHERE username = ?
-    PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(account.find('#') == std::string::npos ? LOGIN_SEL_ACCOUNT_INFO_BY_NAME : LOGIN_SEL_ACCOUNT_INFO_BY_BNET);
-
-    stmt->setString(0, account);
+    PreparedStatement* stmt;
+    uint32 battlenetAccountId = 0;
+    uint8 battlenetAccountIndex = 0;
+    if (Battlenet::AccountMgr::GetAccountIdAndIndex(account, &battlenetAccountId, &battlenetAccountIndex))
+    {
+        stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_INFO_BY_BNET);
+        stmt->setUInt32(0, battlenetAccountId);
+        stmt->setUInt8(1, battlenetAccountIndex);
+    }
+    else
+    {
+        stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_INFO_BY_NAME);
+        stmt->setString(0, account);
+    }
 
     PreparedQueryResult result = LoginDatabase.Query(stmt);
 
@@ -1015,7 +1027,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     LoginDatabase.Execute(stmt);
 
     // NOTE ATM the socket is single-threaded, have this in mind ...
-    ACE_NEW_RETURN(m_Session, WorldSession(id, this, AccountTypes(security), expansion, mutetime, locale, recruiter, isRecruiter), -1);
+    ACE_NEW_RETURN(m_Session, WorldSession(id, battlenetAccountId, this, AccountTypes(security), expansion, mutetime, locale, recruiter, isRecruiter), -1);
 
     m_Crypt.Init(&k);
 
