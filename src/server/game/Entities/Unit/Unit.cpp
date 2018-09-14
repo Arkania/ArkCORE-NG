@@ -13577,7 +13577,7 @@ Powers Unit::GetPowerTypeByAuraGroup(UnitMods unitMod) const
         case UNIT_MOD_RAGE:        return POWER_RAGE;
         case UNIT_MOD_FOCUS:       return POWER_FOCUS;
         case UNIT_MOD_ENERGY:      return POWER_ENERGY;
-        case UNIT_MOD_UNUSED:      return POWER_UNUSED;
+        case UNIT_MOD_UNUSED:      return POWER_COMBO_POINTS;
         case UNIT_MOD_RUNE:        return POWER_RUNES;
         case UNIT_MOD_RUNIC_POWER: return POWER_RUNIC_POWER;
         case UNIT_MOD_SOUL_SHARDS: return POWER_SOUL_SHARDS;
