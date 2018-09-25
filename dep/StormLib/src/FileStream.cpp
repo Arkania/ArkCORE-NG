@@ -34,14 +34,14 @@
 // Local functions - platform-specific functions
 
 #ifndef PLATFORM_WINDOWS
-static int nLastError = ERROR_SUCCESS;
+static DWORD nLastError = ERROR_SUCCESS;
 
-int GetLastError()
+DWORD GetLastError()
 {
     return nLastError;
 }
 
-void SetLastError(int nError)
+void SetLastError(DWORD nError)
 {
     nLastError = nError;
 }
@@ -156,6 +156,7 @@ static bool BaseFile_Open(TFileStream * pStream, const TCHAR * szFileName, DWORD
         if(fstat64(handle, &fileinfo) == -1)
         {
             nLastError = errno;
+            close(handle);
             return false;
         }
 
@@ -610,8 +611,6 @@ static bool BaseHttp_Open(TFileStream * pStream, const TCHAR * szFileName, DWORD
 
     HINTERNET hRequest;
     DWORD dwTemp = 0;
-    bool bFileAvailable = false;
-    int nError = ERROR_SUCCESS;
 
     // Keep compiler happy
     dwStreamFlags = dwStreamFlags;
@@ -626,11 +625,7 @@ static bool BaseHttp_Open(TFileStream * pStream, const TCHAR * szFileName, DWORD
                                                 NULL,
                                                 NULL,
                                                 0);
-    if(pStream->Base.Http.hInternet == NULL)
-        return false;
-
-    // Connect to the server
-    if(nError == ERROR_SUCCESS)
+    if(pStream->Base.Http.hInternet != NULL)
     {
         TCHAR szServerName[MAX_PATH];
         DWORD dwFlags = INTERNET_FLAG_KEEP_CONNECTION | INTERNET_FLAG_NO_UI | INTERNET_FLAG_NO_CACHE_WRITE;
@@ -645,57 +640,55 @@ static bool BaseHttp_Open(TFileStream * pStream, const TCHAR * szFileName, DWORD
                                                       INTERNET_SERVICE_HTTP,
                                                       dwFlags,
                                                       0);
-        if(pStream->Base.Http.hConnect == NULL)
+        if(pStream->Base.Http.hConnect != NULL)
         {
-            InternetCloseHandle(pStream->Base.Http.hInternet);
-            return false;
-        }
-    }
-
-    // Now try to query the file size
-    if(nError == ERROR_SUCCESS)
-    {
-        // Open HTTP request to the file
-        hRequest = HttpOpenRequest(pStream->Base.Http.hConnect, _T("GET"), szFileName, NULL, NULL, NULL, INTERNET_FLAG_NO_CACHE_WRITE, 0);
-        if(hRequest != NULL)
-        {
-            if(HttpSendRequest(hRequest, NULL, 0, NULL, 0))
+            // Open HTTP request to the file
+            hRequest = HttpOpenRequest(pStream->Base.Http.hConnect, _T("GET"), szFileName, NULL, NULL, NULL, INTERNET_FLAG_NO_CACHE_WRITE, 0);
+            if(hRequest != NULL)
             {
-                ULONGLONG FileTime = 0;
-                DWORD dwFileSize = 0;
-                DWORD dwDataSize;
-                DWORD dwIndex = 0;
-
-                // Check if the MPQ has Last Modified field
-                dwDataSize = sizeof(ULONGLONG);
-                if(HttpQueryInfo(hRequest, HTTP_QUERY_LAST_MODIFIED | HTTP_QUERY_FLAG_SYSTEMTIME, &FileTime, &dwDataSize, &dwIndex))
-                    pStream->Base.Http.FileTime = FileTime;
-
-                // Verify if the server supports random access
-                dwDataSize = sizeof(DWORD);
-                if(HttpQueryInfo(hRequest, HTTP_QUERY_CONTENT_LENGTH | HTTP_QUERY_FLAG_NUMBER, &dwFileSize, &dwDataSize, &dwIndex))
+                if(HttpSendRequest(hRequest, NULL, 0, NULL, 0))
                 {
-                    if(dwFileSize != 0)
+                    ULONGLONG FileTime = 0;
+                    DWORD dwFileSize = 0;
+                    DWORD dwDataSize;
+                    DWORD dwIndex = 0;
+
+                    // Check if the MPQ has Last Modified field
+                    dwDataSize = sizeof(ULONGLONG);
+                    if(HttpQueryInfo(hRequest, HTTP_QUERY_LAST_MODIFIED | HTTP_QUERY_FLAG_SYSTEMTIME, &FileTime, &dwDataSize, &dwIndex))
+                        pStream->Base.Http.FileTime = FileTime;
+
+                    // Verify if the server supports random access
+                    dwDataSize = sizeof(DWORD);
+                    if(HttpQueryInfo(hRequest, HTTP_QUERY_CONTENT_LENGTH | HTTP_QUERY_FLAG_NUMBER, &dwFileSize, &dwDataSize, &dwIndex))
                     {
-                        pStream->Base.Http.FileSize = dwFileSize;
-                        pStream->Base.Http.FilePos = 0;
-                        bFileAvailable = true;
+                        if(dwFileSize != 0)
+                        {
+                            InternetCloseHandle(hRequest);
+                            pStream->Base.Http.FileSize = dwFileSize;
+                            pStream->Base.Http.FilePos = 0;
+                            return true;
+                        }
                     }
                 }
+
+                // Close the request
+                InternetCloseHandle(hRequest);
             }
-            InternetCloseHandle(hRequest);
+
+            // Close the connection handle
+            InternetCloseHandle(pStream->Base.Http.hConnect);
+            pStream->Base.Http.hConnect = NULL;
         }
+
+        // Close the internet handle
+        InternetCloseHandle(pStream->Base.Http.hInternet);
+        pStream->Base.Http.hInternet = NULL;
     }
 
-    // If the file is not there and is not available for random access,
-    // report error
-    if(bFileAvailable == false)
-    {
-        pStream->BaseClose(pStream);
-        return false;
-    }
-
-    return true;
+    // If the file is not there or is not available for random access, report error
+    pStream->BaseClose(pStream);
+    return false;
 
 #else
 
@@ -2833,58 +2826,3 @@ void FileStream_Close(TFileStream * pStream)
         STORM_FREE(pStream);
     }
 }
-
-//-----------------------------------------------------------------------------
-// Utility functions (ANSI)
-
-const char * GetPlainFileName(const char * szFileName)
-{
-    const char * szPlainName = szFileName;
-
-    while(*szFileName != 0)
-    {
-        if(*szFileName == '\\' || *szFileName == '/')
-            szPlainName = szFileName + 1;
-        szFileName++;
-    }
-
-    return szPlainName;
-}
-
-void CopyFileName(char * szTarget, const char * szSource, size_t cchLength)
-{
-    memcpy(szTarget, szSource, cchLength);
-    szTarget[cchLength] = 0;
-}
-
-//-----------------------------------------------------------------------------
-// Utility functions (UNICODE) only exist in the ANSI version of the library
-// In ANSI builds, TCHAR = char, so we don't need these functions implemented
-
-#ifdef _UNICODE
-const TCHAR * GetPlainFileName(const TCHAR * szFileName)
-{
-    const TCHAR * szPlainName = szFileName;
-
-    while(*szFileName != 0)
-    {
-        if(*szFileName == '\\' || *szFileName == '/')
-            szPlainName = szFileName + 1;
-        szFileName++;
-    }
-
-    return szPlainName;
-}
-
-void CopyFileName(TCHAR * szTarget, const char * szSource, size_t cchLength)
-{
-    mbstowcs(szTarget, szSource, cchLength);
-    szTarget[cchLength] = 0;
-}
-
-void CopyFileName(char * szTarget, const TCHAR * szSource, size_t cchLength)
-{
-    wcstombs(szTarget, szSource, cchLength);
-    szTarget[cchLength] = 0;
-}
-#endif

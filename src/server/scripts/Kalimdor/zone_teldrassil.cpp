@@ -28,6 +28,7 @@ EndScriptData */
 npc_mist
 EndContentData */
 
+#include "script_helper.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedFollowerAI.h"
@@ -46,6 +47,7 @@ enum Mist
     FACTION_DARNASSUS       = 79
 };
 
+// 3568
 class npc_mist : public CreatureScript
 {
 public:
@@ -109,6 +111,7 @@ public:
     };
 
 };
+
 //fix aldrassil priest  Healing for the Wounded 26949  druid quest Rejuvenating Touch 26948
 // npc wounded sentinel 44617
 class npc_wounded_sentinel_44617 : public CreatureScript
@@ -148,6 +151,7 @@ public:
 		return new npc_wounded_sentinel_44617AI(creature);
 	}
 };
+
 void AddSC_teldrassil()
 {
     new npc_mist();

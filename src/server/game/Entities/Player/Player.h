@@ -2157,10 +2157,10 @@ class Player : public Unit, public GridObject<Player>
         uint16 GetPureMaxSkillValue(uint32 skill) const;    // max
         uint16 GetSkillValue(uint32 skill) const;           // skill value + perm. bonus + temp bonus
         uint16 GetBaseSkillValue(uint32 skill) const;       // skill value + perm. bonus
+      int16 GetSkillTempBonusValue(uint32 skill) const;
         uint16 GetPureSkillValue(uint32 skill) const;       // skill value
         int16 GetSkillPermBonusValue(uint32 skill) const;
-        int16 GetSkillTempBonusValue(uint32 skill) const;
-        uint16 GetSkillStep(uint16 skill) const;            // 0...6
+          uint16 GetSkillStep(uint16 skill) const;            // 0...6
         uint32 GetProfessionSkillId(int32 offset) const;
         bool HasSkill(uint32 skill) const;
         void AddTemporarySkill(uint16 skill);
