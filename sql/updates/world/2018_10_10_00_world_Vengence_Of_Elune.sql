@@ -6,12 +6,12 @@ MySQL - 5.6.28-log
 /*!40101 SET NAMES utf8 */;
 
 /*
---Quest The Vengance of Elune. https://www.wowhead.com/quest=14005/the-vengeance-of-elune
+-- Quest The Vengance of Elune. https://www.wowhead.com/quest=14005/the-vengeance-of-elune
 
---Enable spell start on quest take, special effects all work.
---Enable Remove *auras due to spell. On quest handin.
---Enable DUMMY spell SpellScript.
---Spell to remove auras is (SPELL_EFFECT_SCRIPT_EFFECT) added script to remove auras after quest hand in.
+-- Enable spell start on quest take, special effects all work.
+-- Enable Remove *auras due to spell. On quest handin.
+-- Enable DUMMY spell SpellScript.
+-- Spell to remove auras is (SPELL_EFFECT_SCRIPT_EFFECT) added script to remove auras after quest hand in.
 */ 
 delete from `spell_scripts` where `id`=66166 and `datalong` in(65602,65626);
 insert into `spell_scripts` (`id`, `effIndex`, `delay`, `command`, `datalong`, `datalong2`, `dataint`, `x`, `y`, `z`, `o`) values('66166','0','0','14','65602','1','0','0','0','0','0');
@@ -174,14 +174,3 @@ UPDATE `gameobject_template` SET `data1`=164798 WHERE `entry` =164798;
 delete from `gameobject_loot_template` where `Entry`=164798 and `item`=11242;
 insert into `gameobject_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) 
 values('164798','11242','0','100','1','1','0','1','1',NULL);
-
-
-
-
-
-
-
-
-
-
-
