@@ -89,11 +89,14 @@ insert into `gameobject_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, 
 values('205094','60738','0','100','1','1','0','1','1',NULL);
 
 -- DEPRECIATED GAME_OBJECT added loot to prevent DBError entry, no objects spawned.
-insert into `gameobject_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) values('204965','60575','0','100','1','1','0','1','1',NULL);
+delete from gameobject_loot_template where entry=204965 and item=60575;
+insert into `gameobject_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) values
+('204965','60575','0','100','1','1','0','1','1',NULL);
 
 -- Mineral Deposit Not Spawned, Added Loot to correct DBError.
 UPDATE `gameobject_template` SET `data1` = 203278 WHERE `entry` = 203278;
 
+delete from gameobject_loot_template where entry=203278 and item in (52177, 52178, 52179, 52180, 52181, 52182, 52327, 52328, 53038);
 insert into `gameobject_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) values('203278','52177','0','0.8','0','1','0','1','1',NULL);
 insert into `gameobject_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) values('203278','52178','0','0.8','0','1','0','1','1',NULL);
 insert into `gameobject_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) values('203278','52179','0','0.8','0','1','0','1','1',NULL);
@@ -106,6 +109,7 @@ insert into `gameobject_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, 
 
 -- Data is placeholder for unkown loot,No Objects spawn https://www.wowhead.com/object=206510/scavenged-treasure-chest  .
 UPDATE `gameobject_template` SET `data1` = 206510 WHERE `entry` = 206510;
+delete from gameobject_loot_template where entry=206510 and item=12973;
 insert into `gameobject_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) 
 values('206510','12973','0','100','0','1','0','1','1','PLACEHOLDER');
 
