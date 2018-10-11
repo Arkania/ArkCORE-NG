@@ -65,20 +65,28 @@ enum PaladinSpells
     SPELL_PALADIN_SANCTIFIED_WRATH_TALENT_R1     = 53375,
     SPELL_PALADIN_SEAL_OF_RIGHTEOUSNESS          = 25742,
     SPELL_PALADIN_SWIFT_RETRIBUTION_R1           = 53379,
-    SPELL_PALADIN_HOLY_POWER_ARMOR              = 28790,
-    SPELL_PALADIN_HOLY_POWER_ATTACK_POWER       = 28791,
-    SPELL_PALADIN_HOLY_POWER_SPELL_POWER        = 28793,
-    SPELL_PALADIN_HOLY_POWER_MP5                = 28795,
-    SPELL_PALADIN_ENDURING_LIGHT                = 40471,
-    SPELL_PALADIN_ENDURING_JUDGEMENT            = 40472,
-    SPELL_PALADIN_BEACON_OF_LIGHT               = 53563,
-    SPELL_PALADIN_HOLY_MENDING                  = 64891,
-    SPELL_PALADIN_EXORCISM                      = 879,
-    SPELL_PALADIN_CONSECRATION_DAMAGE           = 81297,
-    SPELL_PALADIN_ETERNAL_GLORY_PROC            = 88676,
-    SPELL_PALADIN_SELFLESS_HEALER               = 85804,
-    SPELL_PALADIN_ETERNAL_GLORY                 = 87163,
-
+    SPELL_PALADIN_HOLY_POWER_ARMOR               = 28790,
+    SPELL_PALADIN_HOLY_POWER_ATTACK_POWER        = 28791,
+    SPELL_PALADIN_HOLY_POWER_SPELL_POWER         = 28793,
+    SPELL_PALADIN_HOLY_POWER_MP5                 = 28795,
+    SPELL_PALADIN_ENDURING_LIGHT                 = 40471,
+    SPELL_PALADIN_ENDURING_JUDGEMENT             = 40472,
+    SPELL_PALADIN_BEACON_OF_LIGHT                = 53563,
+    SPELL_PALADIN_HOLY_MENDING                   = 64891,
+    SPELL_PALADIN_EXORCISM                       = 879,
+    SPELL_PALADIN_CONSECRATION_DAMAGE            = 81297,
+    SPELL_PALADIN_ETERNAL_GLORY_PROC             = 88676,
+    SPELL_PALADIN_SELFLESS_HEALER                = 85804,
+    SPELL_PALADIN_ETERNAL_GLORY                  = 87163,
+    SPELL_PALADIN_LONG_ARM_OF_THE_LAW            = 87168,
+    SPELL_PALADIN_GOAK_HOLY_SUMMON               = 86669,
+    SPELL_PALADIN_GOAK_ANCIENT_HEALER            = 86674,
+    SPELL_PALADIN_GOAK_PROTECTION_SUMMON         = 86659,
+    SPELL_PALADIN_GOAK_RETRIBUTION_SUMMON        = 86698,
+    SPELL_PALADIN_GOAK_ANCIENT_POWER             = 86700,
+    SPELL_PALADIN_GOAK_ANCIENT_CRUSADER          = 86701,
+    SPELL_PALADIN_GOAK_ANCIENT_CRUSADER_GUARDIAN = 86703,
+    SPELL_PALADIN_GOAK_ANCIENT_FURY              = 86704,
 };
 
 enum MiscSpells
@@ -1841,6 +1849,228 @@ public:
     }
 };
 
+// 84963 - Inquisition
+class spell_pal_inquisition : public SpellScriptLoader
+{
+public:
+    spell_pal_inquisition() : SpellScriptLoader("spell_pal_inquisition") { }
+
+    class spell_pal_inquisition_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_pal_inquisition_SpellScript);
+
+        void ChangeDuration()
+        {
+            Unit* caster = GetCaster();
+            if (!caster)
+                return;
+
+            if (Aura* aura = caster->GetAura(GetSpellInfo()->Id))
+            {
+                uint8 power = caster->HasAura(SPELL_PALADIN_DIVINE_PURPOSE_PROC) ? 2 : caster->GetPower(POWER_HOLY_POWER);
+                int32 duration = aura->GetDuration();
+                duration += duration * power;
+                aura->SetDuration(duration);
+            }
+        }
+
+        void Register()
+        {
+            AfterHit += SpellHitFn(spell_pal_inquisition_SpellScript::ChangeDuration);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_pal_inquisition_SpellScript();
+    }
+};
+
+// -87168 - Long Arm of the Law
+class spell_pal_long_arm_of_the_law : public SpellScriptLoader
+{
+public:
+    spell_pal_long_arm_of_the_law() : SpellScriptLoader("spell_pal_long_arm_of_the_law") { }
+
+    class spell_pal_long_arm_of_the_law_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_pal_long_arm_of_the_law_AuraScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return ValidateSpellInfo({ SPELL_PALADIN_LONG_ARM_OF_THE_LAW });
+        }
+
+        bool CheckProc(ProcEventInfo& eventInfo)
+        {
+            if (roll_chance_i(GetEffect(EFFECT_0)->GetAmount()))
+                if (Spell const* spell = eventInfo.GetProcSpell())
+                    if (Unit* target = spell->m_targets.GetUnitTarget())
+                        return (eventInfo.GetActor()->GetDistance2d(target) > 15.0f);
+
+            return false;
+        }
+
+        void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+        {
+            PreventDefaultAction();
+            GetTarget()->CastSpell(GetTarget(), SPELL_PALADIN_LONG_ARM_OF_THE_LAW, true, nullptr, aurEff);
+        }
+
+        void Register() override
+        {
+            DoCheckProc += AuraCheckProcFn(spell_pal_long_arm_of_the_law_AuraScript::CheckProc);
+            OnEffectProc += AuraEffectProcFn(spell_pal_long_arm_of_the_law_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_pal_long_arm_of_the_law_AuraScript();
+    }
+};
+
+// 86704 - Ancient Fury
+class spell_pal_ancient_fury : public SpellScriptLoader
+{
+public:
+    spell_pal_ancient_fury() : SpellScriptLoader("spell_pal_ancient_fury") { }
+
+    class spell_pal_ancient_fury_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_pal_ancient_fury_SpellScript);
+
+        void CountTargets(std::list<WorldObject*>& targetList)
+        {
+            _targetCount = targetList.size();
+        }
+
+        void ChangeDamage(SpellEffIndex /*effIndex*/)
+        {
+            Unit* caster = GetCaster();
+            Unit* target = GetHitUnit();
+
+            if (caster && target && _targetCount)
+            {
+                int32 damage = GetHitDamage();
+
+                if (Aura* aura = caster->GetAura(SPELL_PALADIN_GOAK_ANCIENT_POWER))
+                {
+                    damage = caster->SpellDamageBonusDone(target, GetSpellInfo(), damage, SPELL_DIRECT_DAMAGE);
+                    damage = (damage * aura->GetStackAmount());
+
+                    // "divided evenly among all targets"
+                    damage /= _targetCount;
+                }
+
+                SetHitDamage(damage);
+            }
+        }
+    private:
+        uint32 _targetCount;
+
+        void Register()
+        {
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_pal_ancient_fury_SpellScript::CountTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+            OnEffectHitTarget += SpellEffectFn(spell_pal_ancient_fury_SpellScript::ChangeDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_pal_ancient_fury_SpellScript();
+    }
+};
+
+// 86698 - Guardian of Ancient Kings Retribution
+class spell_pal_guardian_of_ancient_kings_retri : public SpellScriptLoader
+{
+public:
+    spell_pal_guardian_of_ancient_kings_retri() : SpellScriptLoader("spell_pal_guardian_of_ancient_kings_retri") { }
+
+    class spell_pal_guardian_of_ancient_kings_retri_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_pal_guardian_of_ancient_kings_retri_AuraScript);
+
+        void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            Unit* caster = GetCaster();
+            Unit* target = GetTarget();
+
+            if (caster && target)
+            {
+                if (GetStackAmount())
+                {
+                    caster->CastSpell(target, SPELL_PALADIN_GOAK_ANCIENT_FURY, true);
+                }
+            }
+        }
+
+        void Register()
+        {
+            OnEffectRemove += AuraEffectRemoveFn(spell_pal_guardian_of_ancient_kings_retri_AuraScript::HandleRemove, EFFECT_2, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_pal_guardian_of_ancient_kings_retri_AuraScript();
+    }
+};
+
+// 86150 - Guardian of Ancient Kings action bar spell
+class spell_pal_guardian_of_ancient_kings : public SpellScriptLoader
+{
+public:
+    spell_pal_guardian_of_ancient_kings() : SpellScriptLoader("spell_pal_guardian_of_ancient_kings") { }
+
+    class spell_pal_guardian_of_ancient_kings_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_pal_guardian_of_ancient_kings_SpellScript);
+
+        void HandleDummy(SpellEffIndex /*effIndex*/)
+        {
+            if (Unit* caster = GetCaster())
+            {
+                if (Player* player = caster->ToPlayer())
+                {
+                    switch (player->GetPrimaryTalentTree(player->GetActiveSpec()))
+                    {
+                        // Holy Guardian
+                    case TALENT_TREE_PALADIN_HOLY:
+                        caster->CastSpell(caster, SPELL_PALADIN_GOAK_HOLY_SUMMON, true);
+
+                        // 5 stack buff
+                        caster->CastSpell(caster, SPELL_PALADIN_GOAK_ANCIENT_HEALER, true);
+                        break;
+                        // Protection Guardian
+                    case TALENT_TREE_PALADIN_PROTECTION:
+                        caster->CastSpell(caster, SPELL_PALADIN_GOAK_PROTECTION_SUMMON, true);
+                        break;
+                        // Retribution Guardian
+                    case TALENT_TREE_PALADIN_RETRIBUTION:
+                        caster->CastSpell(caster, SPELL_PALADIN_GOAK_RETRIBUTION_SUMMON, true);
+
+                        // Ancient Power proc buff
+                        caster->CastSpell(caster, SPELL_PALADIN_GOAK_ANCIENT_CRUSADER, true);
+                        break;
+                    }
+                }
+            }
+        }
+
+        void Register()
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_pal_guardian_of_ancient_kings_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_pal_guardian_of_ancient_kings_SpellScript();
+    }
+};
+
 void AddSC_paladin_spell_scripts()
 {
     //new spell_pal_ardent_defender();
@@ -1881,4 +2111,10 @@ void AddSC_paladin_spell_scripts()
     new spell_pal_avenger_shield();
     new spell_pal_flash_of_light();
     new spell_pal_word_of_glory();
+    new spell_pal_inquisition();
+    new spell_pal_long_arm_of_the_law();
+    new spell_pal_guardian_of_ancient_kings_retri();
+    new spell_pal_guardian_of_ancient_kings();
+    new spell_pal_ancient_fury();
+
 }

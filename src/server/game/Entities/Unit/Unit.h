@@ -945,6 +945,8 @@ public:
     DamageInfo* GetDamageInfo() const { return _damageInfo; }
     HealInfo* GetHealInfo() const { return _healInfo; }
 
+    Spell const* GetProcSpell() const { return _spell; }
+
 private:
     Unit* const _actor;
     Unit* const _actionTarget;
