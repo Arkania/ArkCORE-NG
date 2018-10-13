@@ -810,6 +810,7 @@ class npc_anubarak_spike : public CreatureScript
         };
 };
 
+// 65919
 class spell_impale : public SpellScriptLoader
 {
     public:

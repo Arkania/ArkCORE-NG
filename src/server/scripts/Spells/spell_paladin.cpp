@@ -45,6 +45,7 @@ enum PaladinSpells
     SPELL_PALADIN_DIVINE_STORM_DUMMY             = 54171,
     SPELL_PALADIN_DIVINE_STORM_HEAL              = 54172,
     SPELL_PALADIN_EYE_FOR_AN_EYE_RANK_1          = 9799,
+    SPELL_PALADIN_EYE_FOR_AN_EYE_RANK_2          = 25998,
     SPELL_PALADIN_EYE_FOR_AN_EYE_DAMAGE          = 25997,
     SPELL_PALADIN_FORBEARANCE                    = 25771,
     SPELL_PALADIN_GLYPH_OF_SALVATION             = 63225,
@@ -956,12 +957,11 @@ public:
     }
 };
 
-// 20271 - Judgement
-/// Updated 4.3.4
-class spell_pal_judgement : public SpellScriptLoader
+// 20271 - Judgement (based on Seal to judge)
+class spell_pal_judgement_20271 : public SpellScriptLoader
 {
     public:
-        spell_pal_judgement() : SpellScriptLoader("spell_pal_judgement") { }
+        spell_pal_judgement_20271() : SpellScriptLoader("spell_pal_judgement_20271") { }
 
         class spell_pal_judgement_SpellScript : public SpellScript
         {
@@ -1288,7 +1288,6 @@ public:
 };
 
 // 85256 - Templar's Verdict
-/// Updated 4.3.4
 class spell_pal_templar_s_verdict : public SpellScriptLoader
 {
     public:
@@ -1886,7 +1885,7 @@ public:
     }
 };
 
-// -87168 - Long Arm of the Law
+// -87168 - Long Arm of the Law (rang1, rang2=87172)
 class spell_pal_long_arm_of_the_law : public SpellScriptLoader
 {
 public:
@@ -2071,6 +2070,75 @@ public:
     }
 };
 
+// 54158 Judgement (based on Seals for Judgement )
+class spell_pal_judgement_54158 : public SpellScriptLoader
+{
+public:
+    spell_pal_judgement_54158() : SpellScriptLoader("spell_pal_judgement_54158") { }
+
+    class spell_pal_judgement_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_pal_judgement_SpellScript);
+
+        void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+        {
+            Player* caster = GetCaster()->ToPlayer();
+            int32 spellPower = caster->SpellBaseDamageBonusDone(GetSpellInfo()->GetSchoolMask());
+            int32 attackPower = caster->GetTotalAttackPowerValue(BASE_ATTACK);
+            int32 basepoints0 = 0;
+            Unit::AuraApplicationMap & sealAuras = caster->GetAppliedAuras();
+            for (Unit::AuraApplicationMap::iterator iter = sealAuras.begin(); iter != sealAuras.end(); iter++)
+            {
+                Aura* aura = iter->second->GetBase();
+                if (aura->GetSpellInfo()->GetSpellSpecific() == SPELL_SPECIFIC_SEAL)
+                {
+                    switch (aura->GetSpellInfo()->Id)
+                    {
+                    case 20165: // Seal of Insight
+                        basepoints0 = 0.25f * spellPower + 0.16f * attackPower;
+                        break;
+                    case 20154: // Seal of Righteousness
+                        basepoints0 = 0.32f * spellPower + 0.2f * attackPower;
+                        break;
+                    case 20164: // Seal of Justice
+                        basepoints0 = 0.25f * spellPower + 0.16f * attackPower;
+                        break;
+                    case 31801: // Seal of Truth
+                    {
+                        basepoints0 = 0.223f * spellPower + 0.142f * attackPower;
+                        // Damage is increased by 20% per stack
+                        if (Aura* censure = GetHitUnit()->GetAura(31803, caster->GetGUID()))
+                            AddPct(basepoints0, censure->GetStackAmount() * 20);
+                        break;
+                    }
+                    }
+                    break;
+                }
+            }
+            caster->CastCustomSpell(GetHitUnit(), 54158, &basepoints0, NULL, NULL, true);
+            // Long arm of the law
+            if (AuraEffect* aurEff = caster->GetDummyAuraEffect(SPELLFAMILY_PALADIN, 3013, EFFECT_0))
+                if (roll_chance_i(aurEff->GetAmount()))
+                    if (caster->GetDistance(GetHitUnit()) > 15.0f)
+                        caster->CastSpell(caster, 87173, true);
+
+            // Communion
+            if (AuraEffect* communion = caster->GetAuraEffect(31876, EFFECT_1, caster->GetGUID()))
+                caster->CastSpell(caster, 57669, true);
+        }
+
+        void Register()
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_pal_judgement_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_pal_judgement_SpellScript();
+    }
+};
+
 void AddSC_paladin_spell_scripts()
 {
     //new spell_pal_ardent_defender();
@@ -2093,7 +2161,7 @@ void AddSC_paladin_spell_scripts()
     new spell_pal_improved_aura_effect("spell_pal_sanctified_retribution_effect");
     new spell_pal_item_healing_discount();
     new spell_pal_item_t6_trinket();
-    new spell_pal_judgement();
+    new spell_pal_judgement_20271();
     new spell_pal_lay_on_hands();
     new spell_pal_light_s_beacon();
     new spell_pal_righteous_defense();
@@ -2116,5 +2184,5 @@ void AddSC_paladin_spell_scripts()
     new spell_pal_guardian_of_ancient_kings_retri();
     new spell_pal_guardian_of_ancient_kings();
     new spell_pal_ancient_fury();
-
+    new spell_pal_judgement_54158();
 }

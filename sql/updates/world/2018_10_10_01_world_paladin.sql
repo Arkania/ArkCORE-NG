@@ -10,3 +10,11 @@ INSERT INTO spell_script_names VALUES
 DELETE FROM spell_script_names WHERE spell_id=20271 and ScriptName="spell_pal_judgements";
 
 DELETE FROM spell_script_names WHERE spell_id=20271 and ScriptName="spell_pal_long_arm_of_the_law";
+
+DELETE FROM spell_script_names WHERE spell_id=20271 and ScriptName="spell_pal_judgement_20271";
+INSERT INTO spell_script_names VALUES 
+(20271, "spell_pal_judgement_20271");
+
+DELETE FROM spell_script_names WHERE spell_id=54158 and ScriptName="spell_pal_judgement_54158";
+INSERT INTO spell_script_names VALUES 
+(54158, "spell_pal_judgement_54158");
