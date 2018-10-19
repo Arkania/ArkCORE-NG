@@ -632,17 +632,35 @@ enum SkillUpdateState
     SKILL_UNCHANGED     = 0,
     SKILL_CHANGED       = 1,
     SKILL_NEW           = 2,
-    SKILL_DELETED       = 3,
-    SKILL_TEMPORARY     = 4
+    SKILL_DELETED       = 3
+};
+
+enum SkillUpdateStateTemporary
+{
+    SKILL_TEMPORARY = 4  
 };
 
 struct SkillStatusData
 {
-    SkillStatusData(uint8 _pos, SkillUpdateState _uState) : pos(_pos), uState(_uState)
+    SkillStatusData(uint8 _pos, SkillUpdateState _uState, bool _isTemporary = false) : pos(_pos), uState(_uState), isTemporary(_isTemporary) { }
+
+    void SetStatus(SkillUpdateState _state, bool _isTemporary)
     {
+        isTemporary = _isTemporary;
+        uState = _state;
     }
+
+    uint32 GetStatus() const
+    {
+        uint32 r = uState;
+        if (isTemporary)
+            r |= SkillUpdateStateTemporary::SKILL_TEMPORARY;
+        return r;
+    }
+    
     uint8 pos;
     SkillUpdateState uState;
+    bool isTemporary;
 };
 
 typedef std::unordered_map<uint32, SkillStatusData> SkillStatusMap;
@@ -2157,14 +2175,17 @@ class Player : public Unit, public GridObject<Player>
         uint16 GetPureMaxSkillValue(uint32 skill) const;    // max
         uint16 GetSkillValue(uint32 skill) const;           // skill value + perm. bonus + temp bonus
         uint16 GetBaseSkillValue(uint32 skill) const;       // skill value + perm. bonus
-      int16 GetSkillTempBonusValue(uint32 skill) const;
+        int16 GetSkillTempBonusValue(uint32 skill) const;
         uint16 GetPureSkillValue(uint32 skill) const;       // skill value
         int16 GetSkillPermBonusValue(uint32 skill) const;
-          uint16 GetSkillStep(uint16 skill) const;            // 0...6
+        uint16 GetSkillStep(uint16 skill) const;            // 0...6
         uint32 GetProfessionSkillId(int32 offset) const;
+        void InitTemporaryProfessionSkill();
         bool HasSkill(uint32 skill) const;
         void AddTemporarySkill(uint16 skill);
         void AddTemporarySkillInsertPart(uint16 skill, uint32 i);
+        uint32 GetTemporarySkillSlot(uint16 skill);
+        bool IsPlayerProfession(uint16 skillID);
         void learnSkillRewardedSpells(uint32 id, uint32 value);
 
         WorldLocation& GetTeleportDest() { return m_teleport_dest; }
