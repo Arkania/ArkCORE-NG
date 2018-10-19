@@ -1320,25 +1320,30 @@ class spell_pal_templar_s_verdict : public SpellScriptLoader
             {
                 Unit* caster = GetCaster();
                 int32 damage = GetHitDamage();
+                int32 power = caster->GetPower(POWER_HOLY_POWER);
 
                 if (caster->HasAura(SPELL_PALADIN_DIVINE_PURPOSE_PROC))
                     damage *= 7.5;  // 7.5*30% = 225%
                 else
                 {
-                    switch (caster->GetPower(POWER_HOLY_POWER))
+                    switch (power)
                     {
-                        case 0: // 1 Holy Power
+                        case 1: // 1 Holy Power
                             damage = damage;
                             break;
-                        case 1: // 2 Holy Power
+                        case 2: // 2 Holy Power
                             damage *= 3;    // 3*30 = 90%
                             break;
-                        case 2: // 3 Holy Power
+                        case 3: // 3 Holy Power
                             damage *= 7.5;  // 7.5*30% = 225%
+                            break;
+                        default:
+                            TC_LOG_INFO("server.loading", "\n\nDamned.. Result is Default switch..\n\n");
                             break;
                     }
                 }
 
+                TC_LOG_INFO("server.loading", "\n\nThe Paladin SetHitDamage Power: %i Damage: %i\n\n", power, damage);
                 SetHitDamage(damage);
             }
 
