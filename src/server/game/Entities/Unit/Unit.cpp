@@ -12503,6 +12503,13 @@ int32 Unit::ModifyPowerPct(Powers power, float pct, bool apply)
     return ModifyPower(power, (int32)amount - GetMaxPower(power));
 }
 
+int32 Unit::GetHolyPoints() const
+{
+    return HasAura(90174)
+        ? GetMaxPower(POWER_HOLY_POWER)
+        : GetPower(POWER_HOLY_POWER);
+}
+
 uint32 Unit::GetAttackTime(WeaponAttackType att) const
 {
     float f_BaseAttackTime = GetFloatValue(UNIT_FIELD_BASEATTACKTIME+att) / m_modAttackSpeedPct[att];

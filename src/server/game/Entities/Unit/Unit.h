@@ -1438,6 +1438,7 @@ class Unit : public WorldObject
         // returns the change in power
         int32 ModifyPower(Powers power, int32 val);
         int32 ModifyPowerPct(Powers power, float pct, bool apply = true);
+        int32 GetHolyPoints() const;
 
         uint32 GetAttackTime(WeaponAttackType att) const;
         void SetAttackTime(WeaponAttackType att, uint32 val) { SetFloatValue(UNIT_FIELD_BASEATTACKTIME+att, val*m_modAttackSpeedPct[att]); }
