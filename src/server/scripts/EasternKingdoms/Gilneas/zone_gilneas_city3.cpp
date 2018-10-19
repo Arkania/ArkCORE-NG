@@ -695,7 +695,7 @@ enum eEndGame
     ACTION_EVENT_ID_25670 = 25670, // ship spawn
     ACTION_EVENT_ID_25727 = 25727, // ship on destroy
 
-    EVENT_MAKE_SHOWFIGHT = 301,
+    EVENT_MAKE_SHOWFIGHT = 501,
     EVENT_START_SHOWFIGHT,
     EVENT_FLOOR_IS_ONE_REMAIN,
     EVENT_FLOOR_IS_CLEAN,
@@ -1463,10 +1463,10 @@ public:
                     Talk(5);
                     m_wp_point = 7;
                     me->GetMotionMaster()->MovePath(4356607, false); // go back to door.. and wait for orc..
-                    m_events.ScheduleEvent(EVENT_SPAWN_OBJECT, 200);
+                    m_events.ScheduleEvent(EVENT_SPAWN_OBJECT_00, 200);
                     break;
                 }
-                case EVENT_SPAWN_OBJECT: // spawn orc and let him walk to us..
+                case EVENT_SPAWN_OBJECT_00: // spawn orc and let him walk to us..
                 {
                     if (Transport* trans = me->GetTransport())
                         if (uint32 guid = sObjectMgr->GenerateLowGuid(HIGHGUID_UNIT))

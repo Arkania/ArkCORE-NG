@@ -2297,7 +2297,7 @@ public:
 
         void DoAction(int32 /*param*/) override 
         { 
-            m_events.ScheduleEvent(EVENT_SPAWN_OBJECT, 100);
+            m_events.ScheduleEvent(EVENT_SPAWN_OBJECT_00, 100);
         }
 
         void SetGUID(uint64 guid, int32 id) override
@@ -2320,7 +2320,7 @@ public:
             {
                 switch (eventId)
                 {
-                case EVENT_SPAWN_OBJECT:
+                case EVENT_SPAWN_OBJECT_00:
                     if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
                         player->CastSpell(993.1458f, 3852.019f, 3.2269f, 69079, true);
                     break;
@@ -2733,7 +2733,7 @@ public:
             else if (me->GetAreaId() == 4886)
                 m_events.RescheduleEvent(EVENT_CAST_SPELL_00, 1000);
             else if (me->GetAreaId() == 4899)
-                m_events.RescheduleEvent(EVENT_SPAWN_OBJECT, 1000);
+                m_events.RescheduleEvent(EVENT_SPAWN_OBJECT_00, 1000);
         }
 
         void JustSummoned(Creature* summon) override
@@ -2772,14 +2772,14 @@ public:
                         m_events.ScheduleEvent(EVENT_CAST_SPELL_00, 15500);
                     break;
                 }
-                case EVENT_SPAWN_OBJECT:
+                case EVENT_SPAWN_OBJECT_00:
                 {
                     if (m_zombieList.size() < 4)
                     {
                         Position pos = Position(frand(1471.4f, 1479.4f), frand(1971.5f, 1979.5f), 238.076904f, 1.490936f);
                         me->SummonCreature(RAND(38813, 38816), pos, TEMPSUMMON_TIMED_DESPAWN, 180000);
                     }
-                    m_events.ScheduleEvent(EVENT_SPAWN_OBJECT, urand(10000, 15000));
+                    m_events.ScheduleEvent(EVENT_SPAWN_OBJECT_00, urand(10000, 15000));
                     break;
                 }
                 }
@@ -3922,7 +3922,7 @@ public:
         void DoAction(int32 param) override
         {
             if (param)
-                m_events.ScheduleEvent(EVENT_SPAWN_OBJECT, 500);
+                m_events.ScheduleEvent(EVENT_SPAWN_OBJECT_00, 500);
         }
 
         void UpdateAI(uint32 diff) override
@@ -3951,7 +3951,7 @@ public:
 
                     break;
                 }
-                case EVENT_SPAWN_OBJECT:
+                case EVENT_SPAWN_OBJECT_00:
                 {
                     me->CastSpell(me, 66726, true);
                     m_events.ScheduleEvent(EVENT_DESPAWN_PART_00, 100);

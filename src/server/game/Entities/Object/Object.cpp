@@ -2894,6 +2894,22 @@ void WorldObject::GetCreatureListWithEntryInGrid(std::list<Creature*>& creatureL
     cell.Visit(pair, visitor, *(this->GetMap()), *this, maxSearchRange);
 }
 
+void WorldObject::GetCreaturesWithEntryInRange(std::list<Creature*> &creatureList, float radius, uint32 entry)
+{
+    CellCoord pair(Trinity::ComputeCellCoord(this->GetPositionX(), this->GetPositionY()));
+    Cell cell(pair);
+    cell.SetNoCreate();
+
+    Trinity::AllCreaturesOfEntryInRange check(this, entry, radius);
+    Trinity::CreatureListSearcher<Trinity::AllCreaturesOfEntryInRange> searcher(this, creatureList, check);
+
+    TypeContainerVisitor<Trinity::CreatureListSearcher<Trinity::AllCreaturesOfEntryInRange>, WorldTypeMapContainer> world_visitor(searcher);
+    cell.Visit(pair, world_visitor, *(this->GetMap()), *this, radius);
+
+    TypeContainerVisitor<Trinity::CreatureListSearcher<Trinity::AllCreaturesOfEntryInRange>, GridTypeMapContainer> grid_visitor(searcher);
+    cell.Visit(pair, grid_visitor, *(this->GetMap()), *this, radius);
+}
+
 std::list<Creature*> WorldObject::FindAllCreaturesInRange(float range)
 {
     std::list<Creature*> templist;
@@ -3572,18 +3588,6 @@ void WorldObject::ClearAllPhases(bool update)
         UpdateObjectVisibility();
 }
 
-void WorldObject::AddPhaseId(uint16 phaseId, bool apply)
-{
-    if (phaseId)
-        if (apply)
-        {
-            if (!(m_phaseIds.find(phaseId) != m_phaseIds.end()))
-                m_phaseIds.insert(phaseId);
-        }
-        else
-            m_phaseIds.erase(phaseId);
-}
-
 void WorldObject::AddTerrainSwapMap(uint16 mapId, bool apply)
 {
     if (mapId)
@@ -3635,6 +3639,14 @@ bool WorldObject::HasInPhaseList(uint16 phase) const
 
 bool WorldObject::IsInPhase(uint16 phaseId) const
 {
+    uint32 meCount = m_phaseIds.size();
+
+    if (meCount == 0 && phaseId == DEFAULT_PHASE)
+        return true;
+
+    if (meCount == 1 && m_firstPhaseId == phaseId)
+        return true;
+
     return (m_phaseIds.find(phaseId) != m_phaseIds.end());
 }
 
@@ -3643,21 +3655,39 @@ bool WorldObject::IsInPhase(WorldObject const* obj) const
     if (GetTypeId() == TYPEID_PLAYER && ToPlayer()->IsGameMaster())
         return true;
 
-    if (m_phaseIds.empty() && obj->GetPhaseIds().empty())
-    {
-        if (m_phaseMask > 1 && obj->m_phaseMask > 1)
-            return (m_phaseMask & obj->m_phaseMask);
+    uint32 meCount = m_phaseIds.size();
+    uint32 objCount = obj->GetPhaseIds().size();
 
-        return true;
+    if (!meCount)
+    {
+        if (!objCount)
+        {
+            if (m_phaseMask > 1 && obj->m_phaseMask > 1)
+                return (m_phaseMask & obj->m_phaseMask);
+
+            return true;
+        }
+
+        // PhaseId 169 is the default fallback phase
+        if (obj->IsInPhase(DEFAULT_PHASE))
+            return true;
     }
 
-    // PhaseId 169 is the default fallback phase
-    if (m_phaseIds.empty() && obj->IsInPhase(DEFAULT_PHASE))
+    if (!objCount && IsInPhase(DEFAULT_PHASE))
         return true;
+    
+    if (meCount == 1 && objCount == 1)
+        return m_firstPhaseId == obj->m_firstPhaseId;
 
-    if (obj->GetPhaseIds().empty() && IsInPhase(DEFAULT_PHASE))
-        return true;
+    if (meCount == 1)
+        if (obj->IsInPhase(m_firstPhaseId))
+            return true;
 
+    if (objCount == 1)
+        if (IsInPhase(obj->m_firstPhaseId))
+            return true;
+
+    // this function is slow slow slow.. 
     return Trinity::Containers::Intersects(m_phaseIds.begin(), m_phaseIds.end(), obj->GetPhaseIds().begin(), obj->GetPhaseIds().end());
 }
 
@@ -3707,6 +3737,7 @@ bool WorldObject::SetInPhase(uint16 id, bool update, bool apply)
                 return false;
 
             m_phaseIds.insert(id);
+            m_firstPhaseId = id;
         }
         else      // erase this phase
         {
@@ -3714,6 +3745,10 @@ bool WorldObject::SetInPhase(uint16 id, bool update, bool apply)
                 return false;
 
             m_phaseIds.erase(id);
+            if (m_phaseIds.size() == 0)
+                m_firstPhaseId = 0;
+            else
+                m_firstPhaseId = *m_phaseIds.begin();
         }
     }
 
@@ -3752,12 +3787,14 @@ ePhaseUpdateStatus WorldObject::CheckArea(PhaseAreaDefinition phaseAreaDefinitio
     for (PhaseAreaSelectorContainer::const_iterator area = pac.begin(); area != pac.end(); ++area)
         if (phaseAreaDefinition.zoneId == area->areaId && phaseAreaDefinition.entry == area->entry)
         {
+            Player* player = ToPlayer();
+
             if (area->quest_start)                              // not in expected required quest state
-                if (!ToPlayer() || (((1 << ToPlayer()->GetQuestStatus(area->quest_start))) & area->quest_start_status) == 0)
+                if (!player || ((1 << player->GetQuestStatus(area->quest_start) & area->quest_start_status) == 0))
                     continue;
 
-            if (area->quest_end)                                // not in expected forbidden quest state
-                if (!ToPlayer() || (((1 << ToPlayer()->GetQuestStatus(area->quest_end))) & area->quest_end_status) == 0)
+            if (area->quest_end) // not in expected forbidden quest state
+                if (!player || ((1 << player->GetQuestStatus(area->quest_end) & area->quest_end_status) == 0))
                     continue;
 
             return PHASE_CHECK_MEET;

@@ -142,7 +142,6 @@ enum eNpcGoScripts
     SPELL_REP_CON = 39474,
     SPELL_REP_KT = 39475,
     SPELL_REP_SPOR = 39476,
-    SPELL_STAMP_OUT_BONFIRE_QUEST_COMPLETE = 45458,
     SPELL_SUMMON_BLADE_KNIGHT_H = 56207,
     SPELL_SUMMON_BLADE_KNIGHT_NE = 56209,
     SPELL_SUMMON_BLADE_KNIGHT_ORC = 56212,
@@ -1025,25 +1024,6 @@ public:
     }
 };
 
-// 187971 187973 187952 187963 187943 187950 187929 187961 187945 187959 187957 187968 187948
-// 187953 187946 187970 187966 187975 187930 187969 187944 187951 187956 187954 187947 187972
-// 187914 187964 187559 187965 187927 187564 187916 187920 187923 187924 187925 187926 187928
-// 187931 187932 187934 187936 187938 187940 194043 187921 194037 194046 194042 187958 194044
-// 194045 194034 194035 194032 194033 187922 187967 187917 187937 187939 187941 187942 187949
-// 187962 187919 187933 187935 187955 187960 187974 194036 194038 194039 194040 194048 194049
-class go_midsummer_bonfire : public GameObjectScript
-{
-public:
-    go_midsummer_bonfire() : GameObjectScript("go_midsummer_bonfire") { }
-
-    bool OnGossipSelect(Player* player, GameObject* /*go*/, uint32 /*sender*/, uint32 /*action*/) override
-    {
-        player->CastSpell(player, SPELL_STAMP_OUT_BONFIRE_QUEST_COMPLETE, true);
-        player->CLOSE_GOSSIP_MENU();
-        return false;
-    }
-};
-
 void AddSC_go_scripts()
 {
     new go_cat_figurine();
@@ -1082,5 +1062,4 @@ void AddSC_go_scripts()
     new go_large_gjalerbron_cage();
     new go_veil_skith_cage();
     new go_frostblade_shrine();
-    new go_midsummer_bonfire();
 }

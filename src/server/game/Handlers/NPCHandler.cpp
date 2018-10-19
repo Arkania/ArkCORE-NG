@@ -138,6 +138,8 @@ void WorldSession::SendTrainerList(uint64 guid, const std::string& strTitle)
     if (GetPlayer()->HasUnitState(UNIT_STATE_DIED))
         GetPlayer()->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
 
+    GetPlayer()->InitTemporaryProfessionSkill();
+
     CreatureTemplate const* ci = unit->GetCreatureTemplate();
 
     if (!ci)

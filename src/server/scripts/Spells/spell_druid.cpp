@@ -65,6 +65,14 @@ enum DruidSpells
     SPELL_DRUID_SURVIVAL_INSTINCTS = 50322,
     SPELL_DRUID_TIGER_S_FURY_ENERGIZE = 51178,
     SPELL_DRUID_WRATH = 5176,
+
+    SPELL_DRUID_FORMS_TRINKET_BEAR = 37340,
+    SPELL_DRUID_FORMS_TRINKET_CAT = 37341,
+    SPELL_DRUID_FORMS_TRINKET_MOONKIN = 37343,
+    SPELL_DRUID_FORMS_TRINKET_NONE = 37344,
+    SPELL_DRUID_FORMS_TRINKET_TREE = 37342,
+
+
 };
 
 // 1850 - Dash
@@ -887,59 +895,6 @@ class spell_dru_starfall_dummy : public SpellScriptLoader
         SpellScript* GetSpellScript() const override
         {
             return new spell_dru_starfall_dummy_SpellScript();
-        }
-};
-
-// -78892 - Stampede // Disabled: wrong register.. some parts outdated
-class spell_dru_stampede : public SpellScriptLoader
-{
-    public:
-        spell_dru_stampede() : SpellScriptLoader("spell_dru_stampede") { }
-
-        class spell_dru_stampede_AuraScript : public AuraScript
-        {
-            PrepareAuraScript(spell_dru_stampede_AuraScript);
-
-            bool Validate(SpellInfo const* /*spellInfo*/) override
-            {
-                if (!sSpellMgr->GetSpellInfo(SPELL_DRUID_STAMPEDE_BAER_RANK_1) ||
-                    !sSpellMgr->GetSpellInfo(SPELL_DRUID_STAMPEDE_CAT_RANK_1) ||
-                    !sSpellMgr->GetSpellInfo(SPELL_DRUID_STAMPEDE_CAT_STATE) ||
-                    !sSpellMgr->GetSpellInfo(SPELL_DRUID_FERAL_CHARGE_CAT) ||
-                    !sSpellMgr->GetSpellInfo(SPELL_DRUID_FERAL_CHARGE_BEAR))
-                    return false;
-                return true;
-            }
-
-            void HandleEffectCatProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
-            {
-                PreventDefaultAction();
-                if (GetTarget()->GetShapeshiftForm() != FORM_CAT || eventInfo.GetDamageInfo()->GetSpellInfo()->Id != SPELL_DRUID_FERAL_CHARGE_CAT)
-                    return;
-
-                GetTarget()->CastSpell(GetTarget(), sSpellMgr->GetSpellWithRank(SPELL_DRUID_STAMPEDE_CAT_RANK_1, GetSpellInfo()->GetRank()), true, NULL, aurEff);
-                GetTarget()->CastSpell(GetTarget(), SPELL_DRUID_STAMPEDE_CAT_STATE, true, NULL, aurEff);
-            }
-
-            void HandleEffectBearProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
-            {
-                PreventDefaultAction();
-                if (GetTarget()->GetShapeshiftForm() != FORM_BEAR || eventInfo.GetDamageInfo()->GetSpellInfo()->Id != SPELL_DRUID_FERAL_CHARGE_BEAR)
-                    return;
-
-                GetTarget()->CastSpell(GetTarget(), sSpellMgr->GetSpellWithRank(SPELL_DRUID_STAMPEDE_BAER_RANK_1, GetSpellInfo()->GetRank()), true, NULL, aurEff);
-            }
-
-            void Register() override
-            {
-                OnEffectProc += AuraEffectProcFn(spell_dru_stampede_AuraScript::HandleEffectCatProc, EFFECT_0, SPELL_AURA_DUMMY);
-                OnEffectProc += AuraEffectProcFn(spell_dru_stampede_AuraScript::HandleEffectBearProc, EFFECT_1, SPELL_AURA_DUMMY);
-            }
-        };
-
-        AuraScript* GetAuraScript() const override
-        {
-            return new spell_dru_stampede_AuraScript();
         }
 };
 
@@ -2415,6 +2370,122 @@ public:
     }
 };
 
+// 37336 - Druid Forms Trinket
+class spell_dru_forms_trinket : public SpellScriptLoader
+{
+public:
+    spell_dru_forms_trinket() : SpellScriptLoader("spell_dru_forms_trinket") { }
+
+    class spell_dru_forms_trinket_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_dru_forms_trinket_AuraScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            if (!sSpellMgr->GetSpellInfo(SPELL_DRUID_FORMS_TRINKET_BEAR) ||
+                !sSpellMgr->GetSpellInfo(SPELL_DRUID_FORMS_TRINKET_CAT) ||
+                !sSpellMgr->GetSpellInfo(SPELL_DRUID_FORMS_TRINKET_MOONKIN) ||
+                !sSpellMgr->GetSpellInfo(SPELL_DRUID_FORMS_TRINKET_NONE) ||
+                !sSpellMgr->GetSpellInfo(SPELL_DRUID_FORMS_TRINKET_TREE))
+                return false;
+            return true;
+        }
+
+        bool CheckProc(ProcEventInfo& eventInfo)
+        {
+            Unit* target = eventInfo.GetActor();
+
+            switch (target->GetShapeshiftForm())
+            {
+            case FORM_BEAR:
+            case FORM_DIREBEAR:
+            case FORM_CAT:
+            case FORM_MOONKIN:
+            case FORM_NONE:
+            case FORM_TREE:
+                return true;
+            default:
+                break;
+            }
+
+            return false;
+        }
+
+        void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+        {
+            PreventDefaultAction();
+            Unit* target = eventInfo.GetActor();
+            uint32 triggerspell = 0;
+
+            switch (target->GetShapeshiftForm())
+            {
+            case FORM_BEAR:
+            case FORM_DIREBEAR:
+                triggerspell = SPELL_DRUID_FORMS_TRINKET_BEAR;
+                break;
+            case FORM_CAT:
+                triggerspell = SPELL_DRUID_FORMS_TRINKET_CAT;
+                break;
+            case FORM_MOONKIN:
+                triggerspell = SPELL_DRUID_FORMS_TRINKET_MOONKIN;
+                break;
+            case FORM_NONE:
+                triggerspell = SPELL_DRUID_FORMS_TRINKET_NONE;
+                break;
+            case FORM_TREE:
+                triggerspell = SPELL_DRUID_FORMS_TRINKET_TREE;
+                break;
+            default:
+                return;
+            }
+
+            target->CastSpell(target, triggerspell, true, nullptr, aurEff);
+        }
+
+        void Register() override
+        {
+            DoCheckProc += AuraCheckProcFn(spell_dru_forms_trinket_AuraScript::CheckProc);
+            OnEffectProc += AuraEffectProcFn(spell_dru_forms_trinket_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_dru_forms_trinket_AuraScript();
+    }
+};
+
+// -33943 - Flight Form
+class spell_dru_flight_form : public SpellScriptLoader
+{
+public:
+    spell_dru_flight_form() : SpellScriptLoader("spell_dru_flight_form") { }
+
+    class spell_dru_flight_form_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_dru_flight_form_SpellScript);
+
+        SpellCastResult CheckCast()
+        {
+            Unit* caster = GetCaster();
+            if (caster->IsInDisallowedMountForm())
+                return SPELL_FAILED_NOT_SHAPESHIFT;
+
+            return SPELL_CAST_OK;
+        }
+
+        void Register() override
+        {
+            OnCheckCast += SpellCheckCastFn(spell_dru_flight_form_SpellScript::CheckCast);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_dru_flight_form_SpellScript();
+    }
+};
+
 void AddSC_druid_spell_scripts()
 {
     new spell_dru_barkskin();
@@ -2454,7 +2525,6 @@ void AddSC_druid_spell_scripts()
     new spell_dru_savage_roar();
     new spell_dru_shred_maul();
     new spell_dru_skull_bash();
-    // new spell_dru_stampede(); // Disabled: wrong register
     new spell_dru_starfall_dummy();
     new spell_dru_starsurge();
     new spell_dru_survival_instincts();
@@ -2469,12 +2539,9 @@ void AddSC_druid_spell_scripts()
     new spell_dru_wild_mushroom_detonation();
     new spell_dru_wild_mushroom_efflorescence();
     new spell_dru_wild_mushroom_efflorescence_heal();
+
+    new spell_dru_forms_trinket();
+    new spell_dru_flight_form();
+
 }
-
-/*   found old spells there now are part of core
-
-new spell_dru_owlkin_frenzy();
-
-
-*/
 

@@ -27,6 +27,10 @@
 #include "SpellScript.h"
 #include "SpellAuraEffects.h"
 #include "Containers.h"
+#include "SpellAuras.h"
+#include "ObjectMgr.h"
+#include "ScriptedCreature.h"
+#include "Unit.h"
 
 enum DeathKnightSpells
 {
@@ -72,7 +76,9 @@ enum DeathKnightSpells
     SPELL_DK_WILL_OF_THE_NECROPOLIS_TALENT_R1   = 49189,
     SPELL_DK_WILL_OF_THE_NECROPOLIS_AURA_R1     = 52284,
 	SPELL_DK_DEATH_GRIP							= 49560,
+    SPELL_DK_RUNIC_RETURN                       = 61258,
 
+    NPC_DK_DANCING_RUNE_WEAPON                  = 27893,
 };
 
 enum DeathKnightSpellIcons
@@ -2242,6 +2248,154 @@ public:
 	}
 };
 
+// 70656 - Advantage (T10 4P Melee Bonus)
+class spell_dk_advantage_t10_4p : public SpellScriptLoader
+{
+public:
+    spell_dk_advantage_t10_4p() : SpellScriptLoader("spell_dk_advantage_t10_4p") { }
+
+    class spell_dk_advantage_t10_4p_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_dk_advantage_t10_4p_AuraScript);
+
+        bool CheckProc(ProcEventInfo& eventInfo)
+        {
+            if (Unit* caster = eventInfo.GetActor())
+            {
+                Player* player = caster->ToPlayer();
+                if (!player || caster->getClass() != CLASS_DEATH_KNIGHT)
+                    return false;
+
+                for (uint8 i = 0; i < player->GetMaxPower(POWER_RUNES); ++i)
+                    if (player->GetRuneCooldown(i) == 0)
+                        return false;
+
+                return true;
+            }
+
+            return false;
+        }
+
+        void Register() override
+        {
+            DoCheckProc += AuraCheckProcFn(spell_dk_advantage_t10_4p_AuraScript::CheckProc);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_dk_advantage_t10_4p_AuraScript();
+    }
+};
+
+// 49028 - Dancing Rune Weapon
+class spell_dk_dancing_rune_weapon : public SpellScriptLoader
+{
+public:
+    spell_dk_dancing_rune_weapon() : SpellScriptLoader("spell_dk_dancing_rune_weapon") { }
+
+    class spell_dk_dancing_rune_weapon_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_dk_dancing_rune_weapon_AuraScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            if (!sObjectMgr->GetCreatureTemplate(NPC_DK_DANCING_RUNE_WEAPON))
+                return false;
+            return true;
+        }
+
+        // This is a port of the old switch hack in Unit.cpp, it's not correct
+        void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+        {
+            PreventDefaultAction();
+            Unit* caster = GetCaster();
+            if (!caster)
+                return;
+
+            Unit* drw = nullptr;
+            for (Unit* controlled : caster->m_Controlled)
+            {
+                if (controlled->GetEntry() == NPC_DK_DANCING_RUNE_WEAPON)
+                {
+                    drw = controlled;
+                    break;
+                }
+            }
+
+            if (!drw || !drw->GetVictim())
+                return;
+
+            SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+            if (!spellInfo)
+                return;
+
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+            if (!damageInfo || !damageInfo->GetDamage())
+                return;
+
+            int32 amount = static_cast<int32>(damageInfo->GetDamage()) / 2;
+            SpellNonMeleeDamage log(drw, drw->GetVictim(), GetSpellInfo()->Id, GetSpellInfo()->SchoolMask);
+            log.damage = amount;
+            drw->DealDamage(drw->GetVictim(), amount, nullptr, SPELL_DIRECT_DAMAGE, spellInfo->GetSchoolMask(), spellInfo, true);
+            drw->SendSpellNonMeleeDamageLog(&log);
+        }
+
+        void Register() override
+        {
+            OnEffectProc += AuraEffectProcFn(spell_dk_dancing_rune_weapon_AuraScript::HandleProc, EFFECT_1, SPELL_AURA_DUMMY);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_dk_dancing_rune_weapon_AuraScript();
+    }
+};
+
+// 61257 - Runic Power Back on Snare/Root
+class spell_dk_pvp_4p_bonus : public SpellScriptLoader
+{
+public:
+    spell_dk_pvp_4p_bonus() : SpellScriptLoader("spell_dk_pvp_4p_bonus") { }
+
+    class spell_dk_pvp_4p_bonus_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_dk_pvp_4p_bonus_AuraScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return ValidateSpellInfo({ SPELL_DK_RUNIC_RETURN });
+        }
+
+        bool CheckProc(ProcEventInfo& eventInfo)
+        {
+            SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+            if (!spellInfo)
+                return false;
+
+            return (spellInfo->GetAllEffectsMechanicMask() & ((1 << MECHANIC_ROOT) | (1 << MECHANIC_SNARE))) != 0;
+        }
+
+        void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+        {
+            PreventDefaultAction();
+            eventInfo.GetActionTarget()->CastSpell((Unit*)nullptr, SPELL_DK_RUNIC_RETURN, true);
+        }
+
+        void Register() override
+        {
+            DoCheckProc += AuraCheckProcFn(spell_dk_pvp_4p_bonus_AuraScript::CheckProc);
+            OnEffectProc += AuraEffectProcFn(spell_dk_pvp_4p_bonus_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_dk_pvp_4p_bonus_AuraScript();
+    }
+};
+
 void AddSC_deathknight_spell_scripts()
 {
     new spell_dk_anti_magic_shell_raid();
@@ -2286,14 +2440,11 @@ void AddSC_deathknight_spell_scripts()
     new spell_dk_vampiric_blood();
     new spell_dk_will_of_the_necropolis();
 	new spell_dk_death_grip_initial();
+
+    new spell_dk_advantage_t10_4p();
+    new spell_dk_dancing_rune_weapon();
+    new spell_dk_pvp_4p_bonus();
+
 }
-
-/*   found old spells there now are part of core
-
-new spell_dk_glyph_chains_of_ice();
-
-
-*/
-
 
 

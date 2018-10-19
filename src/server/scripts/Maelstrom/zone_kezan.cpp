@@ -574,6 +574,7 @@ public:
         {
             m_events.Reset();
             m_anim_is_started = false;
+            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
         }
 
         void DoAction(int32 param) override
@@ -581,6 +582,7 @@ public:
             if (!m_anim_is_started)
                 if (param == ACTION_DELIVER_PACKET)
                 {
+                    me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
                     m_events.ScheduleEvent(EVENT_START_ANIMATION_PACKET, 500);
                     m_events.ScheduleEvent(EVENT_MASTER_RESET, 30000);
                 }
@@ -621,7 +623,13 @@ public:
                 case EVENT_SAY_HAVE_UNDERSTAND:
                 {
                     Talk(2);
-                    m_events.RescheduleEvent(EVENT_MASTER_RESET, 5000);
+                    m_events.RescheduleEvent(EVENT_COOLDOWN_00, 3000);
+                    break;
+                }
+                case EVENT_COOLDOWN_00:
+                {
+                    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                    m_events.RescheduleEvent(EVENT_MASTER_RESET, 2000);
                     break;
                 }
                 }
@@ -799,9 +807,16 @@ public:
         switch (quest->GetQuestId())
         {
         case QUEST_ROLLING_WITH_MY_HOMIES:
+        {
             player->ToUnit()->Talk(BROADCASTTEXT_USE_KEY_FOR_HOT_RED, CHAT_MSG_RAID_BOSS_WHISPER, 25.0f, player);
             player->AddAura(SPELL_INVISIBILITY_DETECTION_4, player);
             break;
+        }
+        case QUEST_REPORT_FOR_TRYOUTS:
+        {
+            player->AddAura(SPELL_INVISIBILITY_DETECTION_4, player);
+            break;
+        }
         }
         return false;
     }
@@ -914,11 +929,6 @@ class npc_subject_nine_49150 : public CreatureScript
 public:
     npc_subject_nine_49150() : CreatureScript("npc_subject_nine_49150") { }
 
-    enum eNPC
-    {
-        SPELL_GIZMO_HELMET = 91603,
-    };
-
     struct npc_subject_nine_49150AI : public ScriptedAI
     {
         npc_subject_nine_49150AI(Creature* creature) : ScriptedAI(creature) { }
@@ -928,8 +938,6 @@ public:
         void Reset() override
         {
             m_events.ScheduleEvent(EVENT_ANIMATION_SUBJECT, 10000);
-            if (!me->HasAura(SPELL_GIZMO_HELMET))
-                me->CastSpell(me, SPELL_GIZMO_HELMET, true);
         }
 
         void UpdateAI(uint32 diff) override
@@ -2338,52 +2346,157 @@ class npc_coach_crosscheck_37106 : public CreatureScript
 public:
     npc_coach_crosscheck_37106() : CreatureScript("npc_coach_crosscheck_37106") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    struct npc_coach_crosscheck_37106AI : public ScriptedAI
     {
-        switch (quest->GetQuestId())
+        npc_coach_crosscheck_37106AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap  m_events;
+        uint64    m_playerGUID;
+        uint64    m_firstBuccaneerGUID;
+
+        void Reset() override
         {
-        case QUEST_THE_REPLACEMENTS:
-            creature->AI()->Talk(0, player);
-            player->AddAura(SPELL_INVISIBILITY_DETECTION_4, player);
-            break;
-        case QUEST_NECCASSARY_ROUGHNESS:
-            player->RemoveAura(SPELL_INVISIBILITY_DETECTION_5);
-            creature->AI()->Talk(1, player);
-            player->AddAura(SPELL_INVISIBILITY_DETECTION_4, player);
-            break;
-        case QUEST_FOURTH_AND_GOAL:
-            player->RemoveAura(SPELL_INVISIBILITY_DETECTION_5);
-            player->RemoveAura(SPELL_INVISIBILITY_DETECTION_6);
-            player->RemoveAura(SPELL_INVISIBILITY_DETECTION_7);
-            player->AddAura(SPELL_INVISIBILITY_DETECTION_4, player);
-            break;
-        case QUEST_GIVE_SASSY_THE_NEWS:
-            player->RemoveAura(SPELL_INVISIBILITY_DETECTION_6);
-            player->RemoveAura(SPELL_INVISIBILITY_DETECTION_7);
-            player->AddAura(SPELL_INVISIBILITY_DETECTION_4, player);
-            break;
+            m_playerGUID = 0;
+            m_firstBuccaneerGUID = 0;
         }
 
-        return false;
+        bool sQuestAccept(Player* player, Quest const* quest) 
+        { 
+            player->AddAura(SPELL_INVISIBILITY_DETECTION_4, player);
+            m_playerGUID = player->GetGUID();
+            switch (quest->GetQuestId())
+            {
+            case QUEST_THE_REPLACEMENTS:
+                Talk(0, player);
+                break;
+            case QUEST_NECCASSARY_ROUGHNESS:
+                player->RemoveAura(SPELL_INVISIBILITY_DETECTION_6);
+                player->RemoveAura(SPELL_INVISIBILITY_DETECTION_7);
+                Talk(1, player);
+                InitBuccaneer();
+                break;
+            case QUEST_FOURTH_AND_GOAL:
+                player->RemoveAura(SPELL_INVISIBILITY_DETECTION_5);
+                player->RemoveAura(SPELL_INVISIBILITY_DETECTION_6);
+                player->RemoveAura(SPELL_INVISIBILITY_DETECTION_7);
+                break;
+            case QUEST_GIVE_SASSY_THE_NEWS:
+                player->RemoveAura(SPELL_INVISIBILITY_DETECTION_6);
+                player->RemoveAura(SPELL_INVISIBILITY_DETECTION_7);
+                break;
+            }
+            return false; 
+        }
+
+        bool sQuestReward(Player* player, Quest const* quest, uint32 /*opt*/)
+        {
+            switch (quest->GetQuestId())
+            {
+            case QUEST_NECCASSARY_ROUGHNESS:
+            {
+                player->ExitVehicle();
+                player->AddAura(SPELL_INVISIBILITY_DETECTION_4, player);
+                return true;
+            }
+            case QUEST_REPORT_FOR_TRYOUTS:
+            case QUEST_THE_REPLACEMENTS:
+            case QUEST_FOURTH_AND_GOAL:
+                player->AddAura(SPELL_INVISIBILITY_DETECTION_4, player);
+                break;
+            }
+            return false;
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case 0:
+                    break;
+                }
+            }
+        }
+
+        void FindFirstBuccaneer()
+        {
+            if (Creature* buccaneer = sObjectAccessor->GetCreature(*me, m_firstBuccaneerGUID))
+                return;
+
+            if (Creature* buccaneer = me->FindNearestCreature(48526, 30.0f))
+                m_firstBuccaneerGUID = buccaneer->GetGUID();
+        }
+
+        void InitBuccaneer()
+        {
+            FindFirstBuccaneer();
+            if (Creature* buccaneer = sObjectAccessor->GetCreature(*me, m_firstBuccaneerGUID))
+                buccaneer->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_coach_crosscheck_37106AI(creature);
     }
+};
 
-    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*opt*/)
+// 48526
+class npc_bilgewater_buccaneer_48526 : public CreatureScript
+{
+public:
+    npc_bilgewater_buccaneer_48526() : CreatureScript("npc_bilgewater_buccaneer_48526") { }
+
+    struct npc_bilgewater_buccaneer_48526AI : public ScriptedAI
     {
-        switch (quest->GetQuestId())
+        npc_bilgewater_buccaneer_48526AI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap m_events;
+
+        void Reset() override
         {
-        case QUEST_NECCASSARY_ROUGHNESS:
+            m_events.RescheduleEvent(EVENT_CHECK_PLAYER_NEAR, 1000);
+        }
+
+        void UpdateAI(uint32 diff) override
         {
-            player->ExitVehicle();
-            player->AddAura(SPELL_INVISIBILITY_DETECTION_4, player);
-            return true;
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_CHECK_PLAYER_NEAR:
+                {
+                    std::list<Player*> pList = me->FindNearestPlayers(30.0f);
+                    bool ok = false;
+                    for (auto player : pList)
+                        if (player->GetQuestStatus(QUEST_NECCASSARY_ROUGHNESS) == QUEST_STATUS_INCOMPLETE || player->GetQuestStatus(QUEST_FOURTH_AND_GOAL) == QUEST_STATUS_INCOMPLETE)
+                            ok = true;
+                    if (ok)
+                        me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
+                    else
+                        me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
+
+                    m_events.ScheduleEvent(EVENT_CHECK_PLAYER_NEAR, 2500);
+                    break;
+                }
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+            else
+                DoMeleeAttackIfReady();
         }
-        case QUEST_REPORT_FOR_TRYOUTS:
-        case QUEST_THE_REPLACEMENTS:
-        case QUEST_FOURTH_AND_GOAL:
-            player->AddAura(SPELL_INVISIBILITY_DETECTION_4, player);
-            break;
-        }
-        return false;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_bilgewater_buccaneer_48526AI(creature);
     }
 };
 
@@ -2411,6 +2524,7 @@ public:
         {
             m_playerGUID = 0;
             me->AddAura(SPELL_QUEST_INVISIBILITY_5, me);
+            me->SetOrientation(3.19f);
         }
 
         void JustSummoned(Creature* summon) override
@@ -2419,6 +2533,27 @@ public:
             {
                 sList.push_back(summon->GetGUID());
                 summon->AI()->SetGUID(m_playerGUID, PLAYER_GUID);
+            }
+        }
+
+        void SetGUID(uint64 guid, int32 id) override
+        {
+            switch (id)
+            {
+            case PLAYER_GUID:
+            {
+                m_playerGUID = guid;
+                break;
+            }
+            }
+        }
+
+        void DoAction(int32 param) 
+        { 
+            switch (param)
+            {
+            case 0:
+                break;
             }
         }
 
@@ -4027,16 +4162,39 @@ public:
 
         EventMap m_events;
         uint64   m_playerGUID;
+        uint64   m_glitterGUID;
 
         void Reset() override
         {
             m_playerGUID = 0;
+            m_glitterGUID = 0;
         }
 
         bool GossipHello(Player* player) override
-        { 
-            m_playerGUID = player->GetGUID();
-            return false; 
+        {
+            if (m_playerGUID == player->GetGUID())
+                if (GameObject* con = sObjectAccessor->GetGameObject(*go, m_glitterGUID))
+                {
+                    con->RemoveFromWorld();
+                    m_glitterGUID = 0;
+                }
+                else if (GameObject* con = go->FindNearestGameObject(202850, 2.0f))
+                    con->RemoveFromWorld();
+
+            return false;
+        }
+
+        void SetGUID(uint64 guid, int32 id = 0)
+        {
+            switch (id)
+            {
+            case PLAYER_GUID:
+                m_playerGUID = guid;
+                break;
+            case 202850:
+                m_glitterGUID = guid;
+                break;
+            }
         }
 
         void DoAction(int32 param = 0) 
@@ -4081,6 +4239,37 @@ public:
     GameObjectAI* GetAI(GameObject* go) const override
     {
         return new go_gasbot_control_panel_201736AI(go);
+    }
+};
+
+// 201734
+class go_flammable_bed_201734 : public GameObjectScript
+{
+public:
+    go_flammable_bed_201734() : GameObjectScript("go_flammable_bed_201734") { }
+
+    struct go_flammable_bed_201734AI : public GameObjectAI
+    {
+        go_flammable_bed_201734AI(GameObject* go) : GameObjectAI(go) { }
+
+        EventMap m_events;
+
+        void OnStateChanged(uint32 state, Unit* unit)
+        {
+            if (state == GO_STATE_ACTIVE_ALTERNATIVE)
+                if (Player* player = unit->ToPlayer())
+                    if (GameObject* con = go->FindNearestGameObject(201736, 50.0f))
+                        if (GameObject* glitter = con->SummonGameObject(202850, con->GetPositionX(), con->GetPositionY(), con->GetPositionZ(), con->GetOrientation(), 0, 0, 0, 0, 300000))
+                        {
+                            con->AI()->SetGUID(player->GetGUID(), PLAYER_GUID);
+                            con->AI()->SetGUID(glitter->GetGUID(), glitter->GetEntry());
+                        }
+        }
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_flammable_bed_201734AI(go);
     }
 };
 
@@ -4147,10 +4336,31 @@ public:
                     me->SetDisableGravity(true);
                     break;
                 case 32:
-                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
-                        if (Creature* sassy = ObjectAccessor:: GetCreature(*me, m_sassyGUID))
-                            sassy->AI()->Talk(2, player);
+                    m_events.ScheduleEvent(EVENT_TALK_PART_00, 2000);
+                    break;
                 case 34:
+                    m_events.ScheduleEvent(EVENT_TALK_PART_01, 3500);
+                    break;
+                }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            m_events.Update(diff);
+
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_TALK_PART_00:
+                {
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
+                        if (Creature* sassy = ObjectAccessor::GetCreature(*me, m_sassyGUID))
+                            sassy->AI()->Talk(2, player);
+                    break;
+                }
+                case EVENT_TALK_PART_01:
+                {
                     if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
                         if (player->getGender() == GENDER_MALE)
                         {
@@ -4158,13 +4368,14 @@ public:
                                 candy->AI()->Talk(2, player);
                         }
                         else
-                        {
                             if (Creature* chip = me->FindNearestCreature(NPC_CHIP_ENDALE, 25.0f))
                                 chip->AI()->Talk(2, player);
-                        }
+
                     me->DespawnOrUnsummon(1000);
                     break;
                 }
+                }
+            }
         }
     };
 
@@ -4300,6 +4511,7 @@ void AddSC_zone_kezan()
     new npc_jack_the_hammer_34877();
     new npc_sudsy_magee_34878();
     new npc_coach_crosscheck_37106();
+    new npc_bilgewater_buccaneer_48526();
     new npc_bilgewater_buccaneer_37179();
     new npc_steamwheedle_shark_37114();
     new npc_bilgewater_buccaneer_37213();
@@ -4317,9 +4529,9 @@ void AddSC_zone_kezan()
     new npc_gasbot_37598();
     new go_447_fire_201745();
     new go_gasbot_control_panel_201736();
+    new go_flammable_bed_201734();
     new npc_hot_rod_37676();
     new spell_knock_back_70330();
     new npc_trade_prince_gallywix_35222();
-
 }
 

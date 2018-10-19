@@ -1019,6 +1019,8 @@ class WorldObject : public Object, public WorldLocation
         void GetGameObjectListWithEntryInGrid(std::list<GameObject*>& lList, uint32 uiEntry, float fMaxSearchRange) const;
         void GetCreatureListWithEntryInGrid(std::list<Creature*>& lList, uint32 uiEntry, float fMaxSearchRange) const;
 
+        void GetCreaturesWithEntryInRange(std::list<Creature*>& creatureList, float radius, uint32 entry);
+
         std::list<Creature*> FindAllCreaturesInRange(float range);
         std::list<Creature*> FindAllFriendlyCreaturesInRange(float range);
         std::list<Creature*> FindAllUnfriendlyCreaturesInRange(float range);
@@ -1094,7 +1096,6 @@ class WorldObject : public Object, public WorldLocation
         void UpdatePhaseForQuestAreaOrZoneChange();
         
         virtual void SetPhaseMask(uint64 newPhaseMask, bool update);
-        virtual void AddPhaseId(uint16 phaseId, bool apply);
         void AddTerrainSwapMap(uint16 mapId, bool apply);
         void AddWorldMapAreaSwap(uint16 mapId, bool apply);
 
@@ -1152,6 +1153,7 @@ class WorldObject : public Object, public WorldLocation
         
         // phase system
         uint64 m_phaseMask;                                 // in area phase state
+        uint16 m_firstPhaseId;
         std::set<uint16> m_phaseIds;
         std::set<uint16> m_terrainSwaps;
         std::set<uint16> m_worldMapAreaSwaps;

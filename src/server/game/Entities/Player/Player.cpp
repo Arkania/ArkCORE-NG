@@ -155,6 +155,10 @@ uint32 const MasterySpells[MAX_CLASSES] =
     87491,  // Druid
 };
 
+
+#define PLAYER_PROFESSIONS_MAX 16
+uint16 InitPlayerProfessions[PLAYER_PROFESSIONS_MAX] = { 129, 164, 165, 171, 182, 185, 186, 197, 202, 333, 356, 393, 755, 762, 773, 794 };
+
 // == PlayerTaxi ================================================
 
 PlayerTaxi::PlayerTaxi()
@@ -7568,67 +7572,84 @@ void Player::SetSkill(uint16 id, uint16 step, uint16 newVal, uint16 maxVal)
     if (!id)
         return;
 
+    bool _removedSkill = false;
     uint16 currVal;
     SkillStatusMap::iterator itr = mSkillStatus.find(id);
 
     //has skill
-    if (itr != mSkillStatus.end() && itr->second.uState != SKILL_DELETED)
+    if (itr != mSkillStatus.end())
     {
-        uint16 field = itr->second.pos / 2;
-        uint8 offset = itr->second.pos & 1; // itr->second.pos % 2
-        currVal = GetUInt16Value(PLAYER_SKILL_RANK_0 + field, offset);
-        if (newVal)
+        if (itr->second.isTemporary)
         {
-            // if skill value is going down, update enchantments before setting the new value
-            if (newVal < currVal)
-                UpdateSkillEnchantments(id, currVal, newVal);
-
-            // update step
-            SetUInt16Value(PLAYER_SKILL_STEP_0 + field, offset, step);
-            // update value
-            SetUInt16Value(PLAYER_SKILL_RANK_0 + field, offset, newVal);
-            SetUInt16Value(PLAYER_SKILL_MAX_RANK_0 + field, offset, maxVal);
-
-            if (itr->second.uState != SKILL_NEW)
-                itr->second.uState = SKILL_CHANGED;
-
-            learnSkillRewardedSpells(id, newVal);
-            // if skill value is going up, update enchantments after setting the new value
-            if (newVal > currVal)
-                UpdateSkillEnchantments(id, currVal, newVal);
-
-            UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL, id);
-            UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILL_LEVEL, id);
+            uint32 i = itr->second.pos;
+            SetSkillLearnPart(itr, i, id, step, newVal, maxVal);
+            itr->second.isTemporary = false;
         }
-        else                                                //remove
+        else if (itr->second.uState != SKILL_DELETED)
         {
-            //remove enchantments needing this skill
-            UpdateSkillEnchantments(id, currVal, 0);
-            // clear skill fields
-            SetUInt16Value(PLAYER_SKILL_LINEID_0 + field, offset, 0);
-            SetUInt16Value(PLAYER_SKILL_STEP_0 + field, offset, 0);
-            SetUInt16Value(PLAYER_SKILL_RANK_0 + field, offset, 0);
-            SetUInt16Value(PLAYER_SKILL_MAX_RANK_0 + field, offset, 0);
-            SetUInt16Value(PLAYER_SKILL_MODIFIER_0 + field, offset, 0);
-            SetUInt16Value(PLAYER_SKILL_TALENT_0 + field, offset, 0);
+            uint16 field = itr->second.pos / 2;
+            uint8 offset = itr->second.pos & 1; // itr->second.pos % 2
+            currVal = GetUInt16Value(PLAYER_SKILL_RANK_0 + field, offset);
+            if (newVal)
+            {
+                // if skill value is going down, update enchantments before setting the new value
+                if (newVal < currVal)
+                    UpdateSkillEnchantments(id, currVal, newVal);
 
-            // mark as deleted or simply remove from map if not saved yet
-            if (itr->second.uState != SKILL_NEW)
-                itr->second.uState = SKILL_DELETED;
-            else
-                mSkillStatus.erase(itr);
+                // update step
+                SetUInt16Value(PLAYER_SKILL_STEP_0 + field, offset, step);
+                // update value
+                SetUInt16Value(PLAYER_SKILL_RANK_0 + field, offset, newVal);
+                SetUInt16Value(PLAYER_SKILL_MAX_RANK_0 + field, offset, maxVal);
 
-            // remove all spells that related to this skill
-            for (uint32 j = 0; j < sSkillLineAbilityStore.GetNumRows(); ++j)
-                if (SkillLineAbilityEntry const* pAbility = sSkillLineAbilityStore.LookupEntry(j))
-                    if (pAbility->skillId == id)
-                        removeSpell(sSpellMgr->GetFirstSpellInChain(pAbility->spellId));
+                if (itr->second.uState != SKILL_NEW)
+                    itr->second.uState = SKILL_CHANGED;
 
-            // Clear profession lines
-            if (GetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1) == id)
-                SetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1, 0);
-            else if (GetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1 + 1) == id)
-                SetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1 + 1, 0);
+                learnSkillRewardedSpells(id, newVal);
+                // if skill value is going up, update enchantments after setting the new value
+                if (newVal > currVal)
+                    UpdateSkillEnchantments(id, currVal, newVal);
+
+                UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL, id);
+                UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILL_LEVEL, id);
+            }
+            else                                                //remove
+            {
+                //remove enchantments needing this skill
+                UpdateSkillEnchantments(id, currVal, 0);
+                // clear skill fields
+                if (!IsProfessionSkill(id))
+                    SetUInt16Value(PLAYER_SKILL_LINEID_0 + field, offset, 0);
+                SetUInt16Value(PLAYER_SKILL_STEP_0 + field, offset, 0);
+                SetUInt16Value(PLAYER_SKILL_RANK_0 + field, offset, 0);
+                SetUInt16Value(PLAYER_SKILL_MAX_RANK_0 + field, offset, 0);
+                SetUInt16Value(PLAYER_SKILL_MODIFIER_0 + field, offset, 0);
+                SetUInt16Value(PLAYER_SKILL_TALENT_0 + field, offset, 0);
+
+                // mark as deleted or simply remove from map if not saved yet
+                if (IsProfessionSkill(id))
+                {
+                    itr->second.uState = SKILL_CHANGED;
+                    itr->second.isTemporary = true;
+                }
+                else
+                    if (itr->second.uState != SKILL_NEW)
+                        itr->second.uState = SKILL_DELETED;
+                    else
+                        mSkillStatus.erase(itr);
+
+                // remove all spells that related to this skill
+                for (uint32 j = 0; j < sSkillLineAbilityStore.GetNumRows(); ++j)
+                    if (SkillLineAbilityEntry const* pAbility = sSkillLineAbilityStore.LookupEntry(j))
+                        if (pAbility->skillId == id)
+                            removeSpell(sSpellMgr->GetFirstSpellInChain(pAbility->spellId));
+
+                // Clear profession lines
+                if (GetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1) == id)
+                    SetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1, 0);
+                else if (GetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1 + 1) == id)
+                    SetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1 + 1, 0);
+            }
         }
     }
     else if (newVal)                                        //add
@@ -7641,70 +7662,163 @@ void Player::SetSkill(uint16 id, uint16 step, uint16 newVal, uint16 maxVal)
 
             if (!GetUInt16Value(PLAYER_SKILL_LINEID_0 + field, offset))
             {
-                SkillLineEntry const* skillEntry = sSkillLineStore.LookupEntry(id);
-                if (!skillEntry)
-                {
-                    TC_LOG_ERROR("misc", "Skill not found in SkillLineStore: skill #%u", id);
-                    return;
-                }
-
-                SetUInt16Value(PLAYER_SKILL_LINEID_0 + field, offset, id);
-                if (skillEntry->categoryId == SKILL_CATEGORY_PROFESSION)
-                {
-                    if (!GetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1))
-                        SetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1, id);
-                    else if (!GetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1 + 1))
-                        SetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1 + 1, id);
-                }
-
-                SetUInt16Value(PLAYER_SKILL_STEP_0 + field, offset, step);
-                SetUInt16Value(PLAYER_SKILL_RANK_0 + field, offset, newVal);
-                SetUInt16Value(PLAYER_SKILL_MAX_RANK_0 + field, offset, maxVal);
-
-                UpdateSkillEnchantments(id, currVal, newVal);
-                UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL, id);
-                UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILL_LEVEL, id);
-
-                // insert new entry or update if not deleted old entry yet
-                if (itr != mSkillStatus.end())
-                {
-                    itr->second.pos = i;
-                    itr->second.uState = SKILL_CHANGED;
-                }
-                else
-                    mSkillStatus.insert(SkillStatusMap::value_type(id, SkillStatusData(i, SKILL_NEW)));
-
-                // apply skill bonuses
-                SetUInt16Value(PLAYER_SKILL_MODIFIER_0 + field, offset, 0);
-                SetUInt16Value(PLAYER_SKILL_TALENT_0 + field, offset, 0);
-
-                // temporary bonuses
-                AuraEffectList const& mModSkill = GetAuraEffectsByType(SPELL_AURA_MOD_SKILL);
-                for (AuraEffectList::const_iterator j = mModSkill.begin(); j != mModSkill.end(); ++j)
-                    if ((*j)->GetMiscValue() == int32(id))
-                        (*j)->HandleEffect(this, AURA_EFFECT_HANDLE_SKILL, true);
-
-                // permanent bonuses
-                AuraEffectList const& mModSkillTalent = GetAuraEffectsByType(SPELL_AURA_MOD_SKILL_TALENT);
-                for (AuraEffectList::const_iterator j = mModSkillTalent.begin(); j != mModSkillTalent.end(); ++j)
-                    if ((*j)->GetMiscValue() == int32(id))
-                        (*j)->HandleEffect(this, AURA_EFFECT_HANDLE_SKILL, true);
-
-                // Learn all spells for skill
-                learnSkillRewardedSpells(id, newVal);
+                SetSkillLearnPart(itr, i, id, step, newVal, maxVal);
                 return;
             }
         }
     }
 }
 
-bool Player::HasSkill(uint32 skill) const
+void Player::SetSkillLearnPart(SkillStatusMap::iterator itr, uint16 i, uint16 id, uint16 step, uint16 newVal, uint16 maxVal)
 {
-    if (!skill)
+    uint16 currVal = 0;
+
+    uint16 field = i / 2;
+    uint8 offset = i & 1; // i % 2
+
+    SkillLineEntry const* skillEntry = sSkillLineStore.LookupEntry(id);
+    if (!skillEntry)
+    {
+        TC_LOG_ERROR("misc", "Skill not found in SkillLineStore: skill #%u", id);
+        return;
+    }
+
+    SetUInt16Value(PLAYER_SKILL_LINEID_0 + field, offset, id);
+    if (skillEntry->categoryId == SKILL_CATEGORY_PROFESSION)
+    {
+        if (!GetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1))
+            SetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1, id);
+        else if (!GetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1 + 1))
+            SetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1 + 1, id);
+    }
+
+    SetUInt16Value(PLAYER_SKILL_STEP_0 + field, offset, step);
+    SetUInt16Value(PLAYER_SKILL_RANK_0 + field, offset, newVal);
+    SetUInt16Value(PLAYER_SKILL_MAX_RANK_0 + field, offset, maxVal);
+
+    UpdateSkillEnchantments(id, currVal, newVal);
+    UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL, id);
+    UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILL_LEVEL, id);
+
+    // insert new entry or update if not deleted old entry yet
+    if (itr != mSkillStatus.end())
+    {
+        itr->second.pos = i;
+        if (itr->second.isTemporary)
+        {
+            itr->second.uState = SKILL_NEW;
+            itr->second.isTemporary = false;
+        }
+        else
+            itr->second.uState = SKILL_CHANGED;
+    }
+    else
+        mSkillStatus.insert(SkillStatusMap::value_type(id, SkillStatusData(i, SKILL_NEW)));
+
+    // apply skill bonuses
+    SetUInt16Value(PLAYER_SKILL_MODIFIER_0 + field, offset, 0);
+    SetUInt16Value(PLAYER_SKILL_TALENT_0 + field, offset, 0);
+
+    // temporary bonuses
+    AuraEffectList const& mModSkill = GetAuraEffectsByType(SPELL_AURA_MOD_SKILL);
+    for (AuraEffectList::const_iterator j = mModSkill.begin(); j != mModSkill.end(); ++j)
+        if ((*j)->GetMiscValue() == int32(id))
+            (*j)->HandleEffect(this, AURA_EFFECT_HANDLE_SKILL, true);
+
+    // permanent bonuses
+    AuraEffectList const& mModSkillTalent = GetAuraEffectsByType(SPELL_AURA_MOD_SKILL_TALENT);
+    for (AuraEffectList::const_iterator j = mModSkillTalent.begin(); j != mModSkillTalent.end(); ++j)
+        if ((*j)->GetMiscValue() == int32(id))
+            (*j)->HandleEffect(this, AURA_EFFECT_HANDLE_SKILL, true);
+
+    // Learn all spells for skill
+    learnSkillRewardedSpells(id, newVal);
+}
+
+bool Player::HasSkill(uint32 skillID) const
+{
+    if (!skillID)
         return false;
 
-    SkillStatusMap::const_iterator itr = mSkillStatus.find(skill);
-    return (itr != mSkillStatus.end() && itr->second.uState != SKILL_DELETED);
+    SkillStatusMap::const_iterator itr = mSkillStatus.find(skillID);
+    if (itr != mSkillStatus.end())
+        if (!itr->second.isTemporary)
+            return true;
+
+    return false;
+}
+
+void Player::AddTemporarySkill(uint16 skillID)
+{
+    if (!skillID)
+        return;
+
+    SkillLineEntry const* skillEntry = sSkillLineStore.LookupEntry(skillID);
+    if (!skillEntry)
+    {
+        TC_LOG_ERROR("misc", "Skill not found in SkillLineStore: skill #%u", skillID);
+        return;
+    }
+
+    uint32 slot = GetTemporarySkillSlot(skillID);
+    if (!slot)
+        mSkillStatus.insert(SkillStatusMap::value_type(skillID, SkillStatusData(slot, SKILL_UNCHANGED, true)));
+}
+
+void Player::AddTemporarySkillInsertPart(uint16 skillID, uint32 index)
+{
+    if (!skillID || index >= PLAYER_MAX_SKILLS)
+        return;
+
+    uint16 field = index / 2;
+    uint8 offset = index & 1; // i % 2
+
+    SetUInt16Value(PLAYER_SKILL_LINEID_0 + field, offset, skillID);
+    SetUInt16Value(PLAYER_SKILL_STEP_0 + field, offset, 0);
+    SetUInt16Value(PLAYER_SKILL_RANK_0 + field, offset, 0);
+    SetUInt16Value(PLAYER_SKILL_MAX_RANK_0 + field, offset, 0);
+    SetUInt16Value(PLAYER_SKILL_MODIFIER_0 + field, offset, 0);
+    SetUInt16Value(PLAYER_SKILL_TALENT_0 + field, offset, 0);
+}
+
+// returns the slot for this skill. check presents of (data and state) and create temporary professions if not exist 
+uint32 Player::GetTemporarySkillSlot(uint16 skillID)
+{
+    // search slot position stored inside state
+    SkillStatusMap::iterator itr = mSkillStatus.find(skillID);
+    if (itr != mSkillStatus.end())
+        return itr->second.pos;
+
+    // if not found, search inside slots. on loop store the first found empty slot 
+    uint32 freeSlot = 0;
+    for (uint32 i = 0; i < PLAYER_MAX_SKILLS; ++i)
+    {
+        uint16 field = i / 2;
+        uint8 offset = i & 1; // i % 2
+
+        uint32 skill = GetUInt16Value(PLAYER_SKILL_LINEID_0 + field, offset);
+        if (skill == skillID)
+            return i;
+        else if (!skill && !freeSlot)
+            freeSlot = i;
+    }
+
+    if (freeSlot)
+    {
+        AddTemporarySkillInsertPart(skillID, freeSlot);
+        mSkillStatus.insert(SkillStatusMap::value_type(skillID, SkillStatusData(freeSlot, SKILL_UNCHANGED, true)));
+    }
+
+    return freeSlot;
+}
+
+bool Player::IsPlayerProfession(uint16 skillID)
+{
+    for each (uint32 _skillID in InitPlayerProfessions)
+        if (_skillID == skillID)
+            return true;
+
+    return false;
 }
 
 uint16 Player::GetSkillStep(uint16 skill) const
@@ -7844,6 +7958,13 @@ uint32 Player::GetProfessionSkillId(int32 offset) const
     }
 
     return skillId;
+}
+
+void Player::InitTemporaryProfessionSkill()
+{
+    // init all possible needed professions with user windows
+    for (uint8 i = 0; i < PLAYER_PROFESSIONS_MAX; i++)
+        AddTemporarySkill(InitPlayerProfessions[i]);
 }
 
 void Player::SendActionButtons(uint32 state) const
@@ -9947,6 +10068,7 @@ void Player::UpdateEquipSpellsAtFormChange()
         }
     }
 }
+
 void Player::CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 procVictim, uint32 procEx)
 {
     if (!target || !target->IsAlive() || target == this)
@@ -10663,7 +10785,6 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
         SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_LOOTING);
 }
 
-
 void Player::SendLootError(uint64 guid, LootError error)
 {
     WorldPacket data(SMSG_LOOT_RESPONSE, 10);
@@ -10672,6 +10793,7 @@ void Player::SendLootError(uint64 guid, LootError error)
     data << uint8(error);
     SendDirectMessage(&data);
 }
+
 void Player::SendNotifyLootMoneyRemoved()
 {
     WorldPacket data(SMSG_LOOT_CLEAR_MONEY, 0);
@@ -15802,13 +15924,12 @@ void Player::PrepareGossipMenu(WorldObject* source, uint32 menuId /*= 0*/, bool 
     for (GossipMenuItemsContainer::const_iterator itr = menuItemBounds.first; itr != menuItemBounds.second; ++itr)
     {
         bool canTalk = true;
-        bool trainerFlag = false;
 
         ConditionSourceInfo srcInfo = ConditionSourceInfo(this, source);
         if (!itr->second.Conditions.empty())
 
-        if (!sConditionMgr->IsObjectMeetToConditions(this, source, itr->second.Conditions))
-            continue;
+            if (!sConditionMgr->IsObjectMeetToConditions(this, source, itr->second.Conditions))
+                continue;
 
         if (Creature* creature = source->ToCreature())
         {
@@ -15862,13 +15983,18 @@ void Player::PrepareGossipMenu(WorldObject* source, uint32 menuId /*= 0*/, bool 
                 canTalk = false;
                 break;
             case GOSSIP_OPTION_TRAINER:
-                if (creature->GetCreatureTemplate()->trainer_type == TRAINER_TYPE_CLASS)
-                {
-                    trainerFlag = true;
-                    if (getClass() != creature->GetCreatureTemplate()->trainer_class)
-                        canTalk = false;
-                }
+            {
+                if (const CreatureTemplate* ct = creature->GetCreatureTemplate())
+                    if (getClass() != ct->trainer_class && ct->trainer_type == TRAINER_TYPE_CLASS)
+                    {
+                        TC_LOG_ERROR("sql.sql", "GOSSIP_OPTION_TRAINER:: Player %s (GUID: %u) request wrong gossip menu: %u with wrong class: %u at Creature: %s (Entry: %u, Trainer Class: %u)",
+                            GetName().c_str(), GetGUIDLow(), menu->GetGossipMenu().GetMenuId(), getClass(), creature->GetName().c_str(), creature->GetEntry(), ct->trainer_class);
+                    }
+
+                if (TrainerSpellData const* trainer_spells = creature->GetTrainerSpells())
+                    AddTemporarySkill(trainer_spells->GetTrainerSkillID());
                 break;
+            }
             case GOSSIP_OPTION_GOSSIP:
             case GOSSIP_OPTION_SPIRITGUIDE:
             case GOSSIP_OPTION_INNKEEPER:
@@ -15903,13 +16029,6 @@ void Player::PrepareGossipMenu(WorldObject* source, uint32 menuId /*= 0*/, bool 
 
         if (canTalk)
         {
-            if (trainerFlag)
-                if (Creature* creature = source->ToCreature())
-                    if (getClass() != creature->GetCreatureTemplate()->trainer_class)
-                        TC_LOG_ERROR("sql.sql", "GOSSIP_OPTION_TRAINER:: Player %s (GUID: %u) requested wrong gossip menu: %u with wrong class: %u at Creature: %s (Entry: %u, Trainer Class: %u)",
-                            GetName().c_str(), GUID_LOPART(GetGUID()), menu->GetGossipMenu().GetMenuId(), getClass(), creature->GetName().c_str(),
-                            creature->GetEntry(), creature->GetCreatureTemplate()->trainer_class);
-
             std::string strOptionText, strBoxText;
             BroadcastText const* optionBroadcastText = sObjectMgr->GetBroadcastText(itr->second.OptionBroadcastTextId);
             BroadcastText const* boxBroadcastText = sObjectMgr->GetBroadcastText(itr->second.BoxBroadcastTextId);
@@ -20103,7 +20222,7 @@ void Player::_LoadMailInit(PreparedQueryResult resultUnread, PreparedQueryResult
     // store nearest delivery time (it > 0 and if it < current then at next player update SendNewMaill will be called)
     //resultMails = CharacterDatabase.PQuery("SELECT MIN(deliver_time) FROM mail WHERE receiver = '%u' AND (checked & 1)=0", GUID_LOPART(playerGuid));
     if (resultDelivery)
-        m_nextMailDelivereTime = time_t((*resultDelivery)[0].GetUInt32());
+        m_nextMailDelivereTime = time_t((*resultDelivery)[0].GetUInt64());
 }
 
 void Player::_LoadMail()
@@ -21886,7 +22005,7 @@ void Player::_SaveSkills(SQLTransaction& trans)
     // we don't need transactions here.
     for (SkillStatusMap::iterator itr = mSkillStatus.begin(); itr != mSkillStatus.end();)
     {
-        if (itr->second.uState == SKILL_UNCHANGED)
+        if (itr->second.uState == SKILL_UNCHANGED || itr->second.isTemporary)
         {
             ++itr;
             continue;
@@ -21899,7 +22018,15 @@ void Player::_SaveSkills(SQLTransaction& trans)
             stmt->setUInt32(1, itr->first);
             trans->Append(stmt);
 
-            mSkillStatus.erase(itr++);
+            if (IsPlayerProfession(itr->first))
+            {
+                itr->second.isTemporary = true;
+                itr->second.uState = SKILL_CHANGED;
+                AddTemporarySkillInsertPart(itr->first, itr->second.pos);
+            }
+            else
+                mSkillStatus.erase(itr++);
+
             continue;
         }
 
@@ -27312,6 +27439,8 @@ void Player::_LoadSkills(PreparedQueryResult result)
     // Archaeology: On Main Load, if skill is present, do a init
     if (HasSkill(SKILL_ARCHAEOLOGY))
         GetArchaeologyMgr().Initialize();
+
+    InitTemporaryProfessionSkill();
 }
 
 InventoryResult Player::CanEquipUniqueItem(Item* pItem, uint8 eslot, uint32 limit_count) const

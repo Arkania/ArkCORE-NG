@@ -453,6 +453,7 @@ class spell_baloroc_countdown : public SpellScriptLoader
         }
 };
 
+// 99518 
 class spell_baloroc_countdown_dmg : public SpellScriptLoader
 {
     public:
@@ -494,7 +495,7 @@ class spell_baloroc_countdown_dmg : public SpellScriptLoader
         }
 };
 
-
+// 99519
 class spell_baloroc_countdown_dmg_target : public SpellScriptLoader
 {
     public:
