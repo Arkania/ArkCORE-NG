@@ -22,23 +22,131 @@
  * Scriptnames in this file should be prefixed with "spell_#holidayname_".
  */
 
-#include "Player.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SpellScript.h"
-#include "SpellAuraEffects.h"
+#include "CellImpl.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
-#include "CellImpl.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
+#include "Vehicle.h"
 
-enum PilgrimsBountyBuffFood
+enum Spells_Holiday
 {
-    // Pilgrims Bounty Buff Food
+    //SPELL_MEAL_PARTICLE = 45114,
+    EMOTE_TURKEY_DOMINATION = 1,
+    EMOTE_TURKEY_HUNTER = 0,
+    EMOTE_TURKEY_SLAUGHTER = 2,
+    EMOTE_TURKEY_TRIUMPH = 3,
+
+    FEAST_ON_CRANBERRIES = 61785,
+    FEAST_ON_PIE = 61787,
+    FEAST_ON_STUFFING = 61788,
+    FEAST_ON_SWEET_POTATOES = 61786,
+    FEAST_ON_TURKEY = 61784,
+
+    GO_RIBBON_POLE = 181605,
+
+    QUEST_BARK_BARLEYBREW = 11293,
+    QUEST_BARK_FOR_DROHNS_DISTILLERY = 11407,
+    QUEST_BARK_FOR_TCHALIS_VOODOO_BREWERY = 11408,
+    QUEST_BARK_FOR_THUNDERBREWS = 11294,
+
+    SAY_BARLEYBREW_1 = 23464,
+    SAY_BARLEYBREW_2 = 23465,
+    SAY_BARLEYBREW_3 = 23466,
+    SAY_BARLEYBREW_4 = 22941,
+    SAY_DROHN_DISTILLERY_1 = 23520,
+    SAY_DROHN_DISTILLERY_2 = 23521,
+    SAY_DROHN_DISTILLERY_3 = 23522,
+    SAY_DROHN_DISTILLERY_4 = 23523,
+    SAY_TCHALIS_VOODOO_1 = 23524,
+    SAY_TCHALIS_VOODOO_2 = 23525,
+    SAY_TCHALIS_VOODOO_3 = 23526,
+    SAY_TCHALIS_VOODOO_4 = 23527,
+    SAY_THUNDERBREWS_1 = 23467,
+    SAY_THUNDERBREWS_2 = 23468,
+    SAY_THUNDERBREWS_3 = 23469,
+    SAY_THUNDERBREWS_4 = 22942,
+
+    SPELL_BASKET_CHECK = 45119,
+    SPELL_BRAZIERS_HIT = 45724,
+    SPELL_BREWFEST_QUEST_SPEED_BUNNY_GREEN = 43345,
+    SPELL_BREWFEST_QUEST_SPEED_BUNNY_RED = 43347,
+    SPELL_BREWFEST_QUEST_SPEED_BUNNY_YELLOW = 43346,
+    SPELL_BURNING_HOT_POLE_DANCE = 58934,
+    SPELL_CRANBERRY_HELPINS = 61841,
+    SPELL_CREATE_HOLLY = 26207,
+    SPELL_CREATE_MISTLETOE = 26206,
+    SPELL_CREATE_SNOWFLAKES = 45036,
+    SPELL_DRINK_VISUAL = 45121,
+    SPELL_EXHAUSTED_RAM = 43332,
+    SPELL_GHOST_COSTUME_FEMALE = 24736,
+    SPELL_GHOST_COSTUME_MALE = 24735,
+    SPELL_GIDDYUP = 42924,
+    SPELL_HALLOWED_WAND_BAT = 24741,
+    SPELL_HALLOWED_WAND_GHOST = 24737,
+    SPELL_HALLOWED_WAND_LEPER_GNOME = 24719,
+    SPELL_HALLOWED_WAND_NINJA = 24718,
+    SPELL_HALLOWED_WAND_PIRATE = 24717,
+    SPELL_HALLOWED_WAND_RANDOM = 24720,
+    SPELL_HALLOWED_WAND_SKELETON = 24724,
+    SPELL_HALLOWED_WAND_WISP = 24733,
+    SPELL_HALLOWS_END_CANDY_FEMALE_DEFIAS_PIRATE = 44742,
+    SPELL_HALLOWS_END_CANDY_GHOST = 24927,
+    SPELL_HALLOWS_END_CANDY_MALE_DEFIAS_PIRATE = 44743,
+    SPELL_HALLOWS_END_CANDY_ORANGE_GIANT = 24924,
+    SPELL_HALLOWS_END_CANDY_PIRATE = 24926,
+    SPELL_HALLOWS_END_CANDY_SKELETON = 24925,
+    SPELL_HAS_FULL_MIDSUMMER_SET = 58933,
+    SPELL_KILL_COUNTER_VISUAL = 62015,
+    SPELL_KILL_COUNTER_VISUAL_MAX = 62021,
+    SPELL_LEPER_GNOME_COSTUME_FEMALE = 24713,
+    SPELL_LEPER_GNOME_COSTUME_MALE = 24712,
+    SPELL_MEAL_EAT_VISUAL = 45120,
+    SPELL_MEAL_PERIODIC = 45103,
+    SPELL_NINJA_COSTUME_FEMALE = 24711,
+    SPELL_NINJA_COSTUME_MALE = 24710,
+    SPELL_ON_PLATE_EAT_VISUAL = 61826,
+    SPELL_PIE_HELPINS = 61845,
+    SPELL_PIRATE_COSTUME_FEMALE = 24709,
+    SPELL_PIRATE_COSTUME_MALE = 24708,
+    SPELL_PX_238_WINTER_WONDERVOLT_TRANSFORM_1 = 26157,
+    SPELL_PX_238_WINTER_WONDERVOLT_TRANSFORM_2 = 26272,
+    SPELL_PX_238_WINTER_WONDERVOLT_TRANSFORM_3 = 26273,
+    SPELL_PX_238_WINTER_WONDERVOLT_TRANSFORM_4 = 26274,
+    SPELL_RAM_CANTER = 42993,
+    SPELL_RAM_FATIGUE = 43052,
+    SPELL_RAM_GALLOP = 42994,
+    SPELL_RAM_LEVEL_NEUTRAL = 43310,
+    SPELL_RAM_TROT = 42992,
+    SPELL_RENTAL_RACING_RAM = 43883,
+    SPELL_RENTAL_RACING_RAM_AURA = 42146,
+    SPELL_RIBBON_DANCE = 29175,
+    SPELL_RIBBON_DANCE_COSMETIC = 29726,
+    SPELL_SKELETON_COSTUME = 24723,
+    SPELL_STUFFING_HELPINS = 61843,
+    SPELL_SWEET_POTATO_HELPINS = 61844,
+    SPELL_THE_SPIRIT_OF_SHARING = 61849,
+    SPELL_TORCH_TOSSING_PRACTICE = 46630,
+    SPELL_TORCH_TOSSING_TRAINING = 45716,
+    SPELL_TORCH_TOSSING_TRAINING_SUCCESS_ALLIANCE = 45719,
+    SPELL_TORCH_TOSSING_TRAINING_SUCCESS_HORDE = 46651,
+    SPELL_TREAT = 24715,
+    SPELL_TRICK = 24714,
+    SPELL_TRICK_BUFF = 24753,
+    SPELL_TRICKED_OR_TREATED = 24755,
+    SPELL_TRICKY_TREAT_SPEED = 42919,
+    SPELL_TRICKY_TREAT_TRIGGER = 42965,
+    SPELL_TURKEY_HELPINS = 61842,
+    SPELL_UPSET_TUMMY = 42966,
     SPELL_WELL_FED_AP_TRIGGER = 65414,
-    SPELL_WELL_FED_ZM_TRIGGER = 65412,
-    SPELL_WELL_FED_HIT_TRIGGER = 65416,
     SPELL_WELL_FED_HASTE_TRIGGER = 65410,
-    SPELL_WELL_FED_SPIRIT_TRIGGER = 65415
+    SPELL_WELL_FED_HIT_TRIGGER = 65416,
+    SPELL_WELL_FED_SPIRIT_TRIGGER = 65415,
+    SPELL_WELL_FED_ZM_TRIGGER = 65412,
+
 };
 
 // 45102
@@ -123,25 +231,90 @@ class spell_love_is_in_the_air_romantic_picnic : public SpellScriptLoader
         }
 };
 
+// 24930 - Hallow's End Candy
+class spell_hallow_end_candy : public SpellScriptLoader
+{
+public:
+    spell_hallow_end_candy() : SpellScriptLoader("spell_hallow_end_candy") { }
+
+    class spell_hallow_end_candy_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_hallow_end_candy_SpellScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            for (uint32 spellId : {SPELL_HALLOWS_END_CANDY_ORANGE_GIANT, SPELL_HALLOWS_END_CANDY_SKELETON, SPELL_HALLOWS_END_CANDY_PIRATE, SPELL_HALLOWS_END_CANDY_GHOST})
+                if (!sSpellMgr->GetSpellInfo(spellId))
+                    return false;
+            return true;
+        }
+
+        void HandleDummy(SpellEffIndex /*effIndex*/)
+        {
+            GetCaster()->CastSpell(GetCaster(), RAND(SPELL_HALLOWS_END_CANDY_ORANGE_GIANT, SPELL_HALLOWS_END_CANDY_SKELETON, SPELL_HALLOWS_END_CANDY_PIRATE, SPELL_HALLOWS_END_CANDY_GHOST), true);
+        }
+
+        void Register() override
+        {
+            OnEffectHit += SpellEffectFn(spell_hallow_end_candy_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        }
+
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_hallow_end_candy_SpellScript();
+    }
+};
+
+// 24926 - Hallow's End Candy
+class spell_hallow_end_candy_pirate : public SpellScriptLoader
+{
+public:
+    spell_hallow_end_candy_pirate() : SpellScriptLoader("spell_hallow_end_candy_pirate") { }
+
+    class spell_hallow_end_candy_pirate_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_hallow_end_candy_pirate_AuraScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            if (!sSpellMgr->GetSpellInfo(SPELL_HALLOWS_END_CANDY_FEMALE_DEFIAS_PIRATE)
+                || !sSpellMgr->GetSpellInfo(SPELL_HALLOWS_END_CANDY_MALE_DEFIAS_PIRATE))
+                return false;
+            return true;
+        }
+
+        void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            uint32 spell = GetTarget()->getGender() == GENDER_FEMALE ? SPELL_HALLOWS_END_CANDY_FEMALE_DEFIAS_PIRATE : SPELL_HALLOWS_END_CANDY_MALE_DEFIAS_PIRATE;
+            GetTarget()->CastSpell(GetTarget(), spell, true);
+        }
+
+        void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            uint32 spell = GetTarget()->getGender() == GENDER_FEMALE ? SPELL_HALLOWS_END_CANDY_FEMALE_DEFIAS_PIRATE : SPELL_HALLOWS_END_CANDY_MALE_DEFIAS_PIRATE;
+            GetTarget()->RemoveAurasDueToSpell(spell);
+        }
+
+        void Register() override
+        {
+            AfterEffectApply += AuraEffectApplyFn(spell_hallow_end_candy_pirate_AuraScript::HandleApply, EFFECT_0, SPELL_AURA_MOD_INCREASE_SWIM_SPEED, AURA_EFFECT_HANDLE_REAL);
+            AfterEffectRemove += AuraEffectRemoveFn(spell_hallow_end_candy_pirate_AuraScript::HandleRemove, EFFECT_0, SPELL_AURA_MOD_INCREASE_SWIM_SPEED, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_hallow_end_candy_pirate_AuraScript();
+    }
+};
+
 // 24750 
 class spell_hallow_end_trick : public SpellScriptLoader
 {
     public:
         spell_hallow_end_trick() : SpellScriptLoader("spell_hallow_end_trick") { }
-
-        enum TrickSpells
-        {
-            SPELL_PIRATE_COSTUME_MALE = 24708,
-            SPELL_PIRATE_COSTUME_FEMALE = 24709,
-            SPELL_NINJA_COSTUME_MALE = 24710,
-            SPELL_NINJA_COSTUME_FEMALE = 24711,
-            SPELL_LEPER_GNOME_COSTUME_MALE = 24712,
-            SPELL_LEPER_GNOME_COSTUME_FEMALE = 24713,
-            SPELL_SKELETON_COSTUME = 24723,
-            SPELL_GHOST_COSTUME_MALE = 24735,
-            SPELL_GHOST_COSTUME_FEMALE = 24736,
-            SPELL_TRICK_BUFF = 24753,
-        };
 
         class spell_hallow_end_trick_SpellScript : public SpellScript
         {
@@ -206,16 +379,6 @@ class spell_hallow_end_trick_or_treat : public SpellScriptLoader
     public:
         spell_hallow_end_trick_or_treat() : SpellScriptLoader("spell_hallow_end_trick_or_treat") { }
 
-        enum TrickOrTreatSpells
-        {
-            SPELL_TRICK = 24714,
-            SPELL_TREAT = 24715,
-            SPELL_TRICKED_OR_TREATED = 24755,
-            SPELL_TRICKY_TREAT_SPEED = 42919,
-            SPELL_TRICKY_TREAT_TRIGGER = 42965,
-            SPELL_UPSET_TUMMY = 42966
-        };
-
         class spell_hallow_end_trick_or_treat_SpellScript : public SpellScript
         {
             PrepareSpellScript(spell_hallow_end_trick_or_treat_SpellScript);
@@ -255,16 +418,6 @@ class spell_hallow_end_tricky_treat : public SpellScriptLoader
     public:
         spell_hallow_end_tricky_treat() : SpellScriptLoader("spell_hallow_end_tricky_treat") { }
 
-        enum TrickOrTreatSpells
-        {
-            SPELL_TRICK = 24714,
-            SPELL_TREAT = 24715,
-            SPELL_TRICKED_OR_TREATED = 24755,
-            SPELL_TRICKY_TREAT_SPEED = 42919,
-            SPELL_TRICKY_TREAT_TRIGGER = 42965,
-            SPELL_UPSET_TUMMY = 42966
-        };
-
         class spell_hallow_end_tricky_treat_SpellScript : public SpellScript
         {
             PrepareSpellScript(spell_hallow_end_tricky_treat_SpellScript);
@@ -297,6 +450,73 @@ class spell_hallow_end_tricky_treat : public SpellScriptLoader
         {
             return new spell_hallow_end_tricky_treat_SpellScript();
         }
+};
+
+// 24717, 24718, 24719, 24720, 24724, 24733, 24737, 24741
+class spell_hallow_end_wand : public SpellScriptLoader
+{
+public:
+    spell_hallow_end_wand() : SpellScriptLoader("spell_hallow_end_wand") {}
+
+    class spell_hallow_end_wand_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_hallow_end_wand_SpellScript);
+
+        bool Validate(SpellInfo const* /*spellEntry*/) override
+        {
+            if (!sSpellMgr->GetSpellInfo(SPELL_PIRATE_COSTUME_MALE) ||
+                !sSpellMgr->GetSpellInfo(SPELL_PIRATE_COSTUME_FEMALE) ||
+                !sSpellMgr->GetSpellInfo(SPELL_NINJA_COSTUME_MALE) ||
+                !sSpellMgr->GetSpellInfo(SPELL_NINJA_COSTUME_FEMALE) ||
+                !sSpellMgr->GetSpellInfo(SPELL_LEPER_GNOME_COSTUME_MALE) ||
+                !sSpellMgr->GetSpellInfo(SPELL_LEPER_GNOME_COSTUME_FEMALE) ||
+                !sSpellMgr->GetSpellInfo(SPELL_GHOST_COSTUME_MALE) ||
+                !sSpellMgr->GetSpellInfo(SPELL_GHOST_COSTUME_FEMALE))
+                return false;
+            return true;
+        }
+
+        void HandleScriptEffect()
+        {
+            Unit* caster = GetCaster();
+            Unit* target = GetHitUnit();
+
+            uint32 spellId = 0;
+            uint8 gender = target->getGender();
+
+            switch (GetSpellInfo()->Id)
+            {
+            case SPELL_HALLOWED_WAND_LEPER_GNOME:
+                spellId = gender ? SPELL_LEPER_GNOME_COSTUME_FEMALE : SPELL_LEPER_GNOME_COSTUME_MALE;
+                break;
+            case SPELL_HALLOWED_WAND_PIRATE:
+                spellId = gender ? SPELL_PIRATE_COSTUME_FEMALE : SPELL_PIRATE_COSTUME_MALE;
+                break;
+            case SPELL_HALLOWED_WAND_GHOST:
+                spellId = gender ? SPELL_GHOST_COSTUME_FEMALE : SPELL_GHOST_COSTUME_MALE;
+                break;
+            case SPELL_HALLOWED_WAND_NINJA:
+                spellId = gender ? SPELL_NINJA_COSTUME_FEMALE : SPELL_NINJA_COSTUME_MALE;
+                break;
+            case SPELL_HALLOWED_WAND_RANDOM:
+                spellId = RAND(SPELL_HALLOWED_WAND_PIRATE, SPELL_HALLOWED_WAND_NINJA, SPELL_HALLOWED_WAND_LEPER_GNOME, SPELL_HALLOWED_WAND_SKELETON, SPELL_HALLOWED_WAND_WISP, SPELL_HALLOWED_WAND_GHOST, SPELL_HALLOWED_WAND_BAT);
+                break;
+            default:
+                return;
+            }
+            caster->CastSpell(target, spellId, true);
+        }
+
+        void Register() override
+        {
+            AfterHit += SpellHitFn(spell_hallow_end_wand_SpellScript::HandleScriptEffect);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_hallow_end_wand_SpellScript();
+    }
 };
 
 // 65418, 65419, , 65420, 65421, 65422
@@ -346,18 +566,542 @@ class spell_pilgrims_bounty_buff_food : public SpellScriptLoader
         }
 };
 
+// 61784, 61785, 61786, 61787, 61788
+class spell_pilgrims_bounty_feast_on : public SpellScriptLoader
+{
+public:
+    spell_pilgrims_bounty_feast_on() : SpellScriptLoader("spell_pilgrims_bounty_feast_on") { }
+
+    class spell_pilgrims_bounty_feast_on_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_pilgrims_bounty_feast_on_SpellScript);
+
+        void HandleDummy(SpellEffIndex /*effIndex*/)
+        {
+            Unit* caster = GetCaster();
+
+            uint32 _spellId = 0;
+            switch (GetSpellInfo()->Id)
+            {
+            case FEAST_ON_TURKEY:
+                _spellId = SPELL_TURKEY_HELPINS;
+                break;
+            case FEAST_ON_CRANBERRIES:
+                _spellId = SPELL_CRANBERRY_HELPINS;
+                break;
+            case FEAST_ON_SWEET_POTATOES:
+                _spellId = SPELL_SWEET_POTATO_HELPINS;
+                break;
+            case FEAST_ON_PIE:
+                _spellId = SPELL_PIE_HELPINS;
+                break;
+            case FEAST_ON_STUFFING:
+                _spellId = SPELL_STUFFING_HELPINS;
+                break;
+            default:
+                return;
+            }
+
+            if (Vehicle* vehicle = caster->GetVehicleKit())
+                if (Unit* target = vehicle->GetPassenger(0))
+                    if (Player* player = target->ToPlayer())
+                    {
+                        player->CastSpell(player, SPELL_ON_PLATE_EAT_VISUAL, true);
+                        caster->CastSpell(player, _spellId, true, NULL, NULL, player->GetGUID());
+                    }
+
+            if (Aura* aura = caster->GetAura(GetEffectValue()))
+            {
+                if (aura->GetStackAmount() == 1)
+                    //if (SpellEffectInfo const* effect = aura->GetSpellInfo()->GetEffect(EFFECT_0))
+                        //caster->RemoveAurasDueToSpell(effect->CalcValue());
+                aura->ModStackAmount(-1);
+            }
+        }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_pilgrims_bounty_feast_on_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_pilgrims_bounty_feast_on_SpellScript();
+    }
+};
+
+// 61841, 61842, 61843, 61844, 61845 (not shure)
+class spell_pilgrims_bounty_well_fed : public SpellScriptLoader
+{
+private:
+    uint32 _triggeredSpellId;
+
+public:
+    spell_pilgrims_bounty_well_fed(const char* name, uint32 triggeredSpellId) : SpellScriptLoader(name), _triggeredSpellId(triggeredSpellId) { }
+
+    class spell_pilgrims_bounty_well_fed_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_pilgrims_bounty_well_fed_SpellScript);
+    private:
+        uint32 _triggeredSpellId;
+
+    public:
+        spell_pilgrims_bounty_well_fed_SpellScript(uint32 triggeredSpellId) : SpellScript(), _triggeredSpellId(triggeredSpellId) { }
+
+        bool Validate(SpellInfo const* /*spell*/) override
+        {
+            if (!sSpellMgr->GetSpellInfo(_triggeredSpellId))
+                return false;
+            return true;
+        }
+
+        void HandleScript(SpellEffIndex effIndex)
+        {
+            PreventHitDefaultEffect(effIndex);
+            Player* target = GetHitPlayer();
+            if (!target)
+                return;
+
+            if (Aura const* aura = target->GetAura(GetSpellInfo()->Id))
+            {
+                if (aura->GetStackAmount() == 5)
+                    target->CastSpell(target, _triggeredSpellId, true);
+            }
+
+            Aura const* turkey = target->GetAura(SPELL_TURKEY_HELPINS);
+            Aura const* cranberies = target->GetAura(SPELL_CRANBERRY_HELPINS);
+            Aura const* stuffing = target->GetAura(SPELL_STUFFING_HELPINS);
+            Aura const* sweetPotatoes = target->GetAura(SPELL_SWEET_POTATO_HELPINS);
+            Aura const* pie = target->GetAura(SPELL_PIE_HELPINS);
+
+            if ((turkey && turkey->GetStackAmount() == 5) && (cranberies && cranberies->GetStackAmount() == 5) && (stuffing && stuffing->GetStackAmount() == 5)
+                && (sweetPotatoes && sweetPotatoes->GetStackAmount() == 5) && (pie && pie->GetStackAmount() == 5))
+            {
+                target->CastSpell(target, SPELL_THE_SPIRIT_OF_SHARING, true);
+                target->RemoveAurasDueToSpell(SPELL_TURKEY_HELPINS);
+                target->RemoveAurasDueToSpell(SPELL_CRANBERRY_HELPINS);
+                target->RemoveAurasDueToSpell(SPELL_STUFFING_HELPINS);
+                target->RemoveAurasDueToSpell(SPELL_SWEET_POTATO_HELPINS);
+                target->RemoveAurasDueToSpell(SPELL_PIE_HELPINS);
+            }
+        }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_pilgrims_bounty_well_fed_SpellScript::HandleScript, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_pilgrims_bounty_well_fed_SpellScript(_triggeredSpellId);
+    }
+};
+
+// 62014 
+class spell_pilgrims_bounty_turkey_tracker : public SpellScriptLoader
+{
+public:
+    spell_pilgrims_bounty_turkey_tracker() : SpellScriptLoader("spell_pilgrims_bounty_turkey_tracker") { }
+
+    class spell_pilgrims_bounty_turkey_tracker_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_pilgrims_bounty_turkey_tracker_SpellScript);
+
+        bool Validate(SpellInfo const* /*spell*/) override
+        {
+            if (!sSpellMgr->GetSpellInfo(SPELL_KILL_COUNTER_VISUAL) || !sSpellMgr->GetSpellInfo(SPELL_KILL_COUNTER_VISUAL_MAX))
+                return false;
+            return true;
+        }
+
+        void HandleScript(SpellEffIndex /*effIndex*/)
+        {
+            Creature* caster = GetCaster()->ToCreature();
+            Unit* target = GetHitUnit();
+
+            if (!target || !caster)
+                return;
+
+            if (target->HasAura(SPELL_KILL_COUNTER_VISUAL_MAX))
+                return;
+
+            if (Aura const* aura = target->GetAura(GetSpellInfo()->Id))
+            {
+                switch (aura->GetStackAmount())
+                {
+                case 10:
+                    caster->AI()->Talk(EMOTE_TURKEY_HUNTER, target);
+                    break;
+                case 20:
+                    caster->AI()->Talk(EMOTE_TURKEY_DOMINATION, target);
+                    break;
+                case 30:
+                    caster->AI()->Talk(EMOTE_TURKEY_SLAUGHTER, target);
+                    break;
+                case 40:
+                    caster->AI()->Talk(EMOTE_TURKEY_TRIUMPH, target);
+                    target->CastSpell(target, SPELL_KILL_COUNTER_VISUAL_MAX, true);
+                    target->RemoveAurasDueToSpell(GetSpellInfo()->Id);
+                    break;
+                default:
+                    return;
+                }
+                target->CastSpell(target, SPELL_KILL_COUNTER_VISUAL, true);
+            }
+        }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_pilgrims_bounty_turkey_tracker_SpellScript::HandleScript, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_pilgrims_bounty_turkey_tracker_SpellScript();
+    }
+};
+
+// 42924 - Giddyup!
+class spell_brewfest_giddyup : public SpellScriptLoader
+{
+public:
+    spell_brewfest_giddyup() : SpellScriptLoader("spell_brewfest_giddyup") { }
+
+    class spell_brewfest_giddyup_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_brewfest_giddyup_AuraScript);
+
+        void OnChange(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            Unit* target = GetTarget();
+            if (!target->HasAura(SPELL_RENTAL_RACING_RAM))
+            {
+                target->RemoveAura(GetId());
+                return;
+            }
+
+            if (target->HasAura(SPELL_EXHAUSTED_RAM))
+                return;
+
+            switch (GetStackAmount())
+            {
+            case 1: // green
+                target->RemoveAura(SPELL_RAM_LEVEL_NEUTRAL);
+                target->RemoveAura(SPELL_RAM_CANTER);
+                target->CastSpell(target, SPELL_RAM_TROT, true);
+                break;
+            case 6: // yellow
+                target->RemoveAura(SPELL_RAM_TROT);
+                target->RemoveAura(SPELL_RAM_GALLOP);
+                target->CastSpell(target, SPELL_RAM_CANTER, true);
+                break;
+            case 11: // red
+                target->RemoveAura(SPELL_RAM_CANTER);
+                target->CastSpell(target, SPELL_RAM_GALLOP, true);
+                break;
+            default:
+                break;
+            }
+
+            if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_DEFAULT)
+            {
+                target->RemoveAura(SPELL_RAM_TROT);
+                target->CastSpell(target, SPELL_RAM_LEVEL_NEUTRAL, true);
+            }
+        }
+
+        void OnPeriodic(AuraEffect const* /*aurEff*/)
+        {
+            GetTarget()->RemoveAuraFromStack(GetId());
+        }
+
+        void Register() override
+        {
+            AfterEffectApply += AuraEffectApplyFn(spell_brewfest_giddyup_AuraScript::OnChange, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_CHANGE_AMOUNT_MASK);
+            OnEffectRemove += AuraEffectRemoveFn(spell_brewfest_giddyup_AuraScript::OnChange, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_CHANGE_AMOUNT_MASK);
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_brewfest_giddyup_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_brewfest_giddyup_AuraScript();
+    }
+};
+
+// 43310 - Ram Level - Neutral
+// 42992 - Ram - Trot
+// 42993 - Ram - Canter
+// 42994 - Ram - Gallop
+class spell_brewfest_ram : public SpellScriptLoader
+{
+public:
+    spell_brewfest_ram() : SpellScriptLoader("spell_brewfest_ram") { }
+
+    class spell_brewfest_ram_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_brewfest_ram_AuraScript);
+
+        void OnPeriodic(AuraEffect const* aurEff)
+        {
+            Unit* target = GetTarget();
+            if (target->HasAura(SPELL_EXHAUSTED_RAM))
+                return;
+
+            switch (GetId())
+            {
+            case SPELL_RAM_LEVEL_NEUTRAL:
+                if (Aura* aura = target->GetAura(SPELL_RAM_FATIGUE))
+                    aura->ModStackAmount(-4);
+                break;
+            case SPELL_RAM_TROT: // green
+                if (Aura* aura = target->GetAura(SPELL_RAM_FATIGUE))
+                    aura->ModStackAmount(-2);
+                if (aurEff->GetTickNumber() == 4)
+                    target->CastSpell(target, SPELL_BREWFEST_QUEST_SPEED_BUNNY_GREEN, true);
+                break;
+            case SPELL_RAM_CANTER:
+                target->CastCustomSpell(SPELL_RAM_FATIGUE, SPELLVALUE_AURA_STACK, 1, target, TRIGGERED_FULL_MASK);
+                if (aurEff->GetTickNumber() == 8)
+                    target->CastSpell(target, SPELL_BREWFEST_QUEST_SPEED_BUNNY_YELLOW, true);
+                break;
+            case SPELL_RAM_GALLOP:
+                target->CastCustomSpell(SPELL_RAM_FATIGUE, SPELLVALUE_AURA_STACK, target->HasAura(SPELL_RAM_FATIGUE) ? 4 : 5 /*Hack*/, target, TRIGGERED_FULL_MASK);
+                if (aurEff->GetTickNumber() == 8)
+                    target->CastSpell(target, SPELL_BREWFEST_QUEST_SPEED_BUNNY_RED, true);
+                break;
+            default:
+                break;
+            }
+
+        }
+
+        void Register() override
+        {
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_brewfest_ram_AuraScript::OnPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_brewfest_ram_AuraScript();
+    }
+};
+
+// 43052 - Ram Fatigue
+class spell_brewfest_ram_fatigue : public SpellScriptLoader
+{
+public:
+    spell_brewfest_ram_fatigue() : SpellScriptLoader("spell_brewfest_ram_fatigue") { }
+
+    class spell_brewfest_ram_fatigue_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_brewfest_ram_fatigue_AuraScript);
+
+        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            Unit* target = GetTarget();
+
+            if (GetStackAmount() == 101)
+            {
+                target->RemoveAura(SPELL_RAM_LEVEL_NEUTRAL);
+                target->RemoveAura(SPELL_RAM_TROT);
+                target->RemoveAura(SPELL_RAM_CANTER);
+                target->RemoveAura(SPELL_RAM_GALLOP);
+                target->RemoveAura(SPELL_GIDDYUP);
+
+                target->CastSpell(target, SPELL_EXHAUSTED_RAM, true);
+            }
+        }
+
+        void Register() override
+        {
+            AfterEffectApply += AuraEffectApplyFn(spell_brewfest_ram_fatigue_AuraScript::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_brewfest_ram_fatigue_AuraScript();
+    }
+};
+
+// 43450 - Brewfest - apple trap - friendly DND
+class spell_brewfest_apple_trap : public SpellScriptLoader
+{
+public:
+    spell_brewfest_apple_trap() : SpellScriptLoader("spell_brewfest_apple_trap") { }
+
+    class spell_brewfest_apple_trap_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_brewfest_apple_trap_AuraScript);
+
+        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            GetTarget()->RemoveAura(SPELL_RAM_FATIGUE);
+        }
+
+        void Register() override
+        {
+            OnEffectApply += AuraEffectApplyFn(spell_brewfest_apple_trap_AuraScript::OnApply, EFFECT_0, SPELL_AURA_FORCE_REACTION, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_brewfest_apple_trap_AuraScript();
+    }
+};
+
+// 43332 - Exhausted Ram
+class spell_brewfest_exhausted_ram : public SpellScriptLoader
+{
+public:
+    spell_brewfest_exhausted_ram() : SpellScriptLoader("spell_brewfest_exhausted_ram") { }
+
+    class spell_brewfest_exhausted_ram_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_brewfest_exhausted_ram_AuraScript);
+
+        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            Unit* target = GetTarget();
+            target->CastSpell(target, SPELL_RAM_LEVEL_NEUTRAL, true);
+        }
+
+        void Register() override
+        {
+            OnEffectRemove += AuraEffectApplyFn(spell_brewfest_exhausted_ram_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_MOD_DECREASE_SPEED, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_brewfest_exhausted_ram_AuraScript();
+    }
+};
+
+// 43714 - Brewfest - Relay Race - Intro - Force - Player to throw- DND
+class spell_brewfest_relay_race_intro_force_player_to_throw : public SpellScriptLoader
+{
+public:
+    spell_brewfest_relay_race_intro_force_player_to_throw() : SpellScriptLoader("spell_brewfest_relay_race_intro_force_player_to_throw") { }
+
+    class spell_brewfest_relay_race_intro_force_player_to_throw_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_brewfest_relay_race_intro_force_player_to_throw_SpellScript);
+
+        void HandleForceCast(SpellEffIndex effIndex)
+        {
+            PreventHitDefaultEffect(effIndex);
+            // All this spells trigger a spell that requires reagents; if the
+            // triggered spell is cast as "triggered", reagents are not consumed
+            GetHitUnit()->CastSpell((Unit*)NULL, GetSpellInfo()->Effects[effIndex].TriggerSpell, TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_IGNORE_POWER_AND_REAGENT_COST));
+        }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_brewfest_relay_race_intro_force_player_to_throw_SpellScript::HandleForceCast, EFFECT_0, SPELL_EFFECT_FORCE_CAST);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_brewfest_relay_race_intro_force_player_to_throw_SpellScript();
+    }
+};
+
+// 43876 - Dismount Ram
+class spell_brewfest_dismount_ram : public SpellScriptLoader
+{
+public:
+    spell_brewfest_dismount_ram() : SpellScriptLoader("spell_brewfest_dismount_ram") { }
+
+    class spell_brewfest_relay_race_intro_force_player_to_throw_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_brewfest_relay_race_intro_force_player_to_throw_SpellScript);
+
+        void HandleScript(SpellEffIndex /*effIndex*/)
+        {
+            GetCaster()->RemoveAura(SPELL_RENTAL_RACING_RAM);
+        }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_brewfest_relay_race_intro_force_player_to_throw_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_brewfest_relay_race_intro_force_player_to_throw_SpellScript();
+    }
+};
+
+// 43259 Brewfest  - Barker Bunny 1
+// 43260 Brewfest  - Barker Bunny 2
+// 43261 Brewfest  - Barker Bunny 3
+// 43262 Brewfest  - Barker Bunny 4
+class spell_brewfest_barker_bunny : public SpellScriptLoader
+{
+public:
+    spell_brewfest_barker_bunny() : SpellScriptLoader("spell_brewfest_barker_bunny") { }
+
+    class spell_brewfest_barker_bunny_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_brewfest_barker_bunny_AuraScript);
+
+        bool Load() override
+        {
+            return GetUnitOwner()->GetTypeId() == TYPEID_PLAYER;
+        }
+
+        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            Player* target = GetTarget()->ToPlayer();
+
+            uint32 BroadcastTextId = 0;
+
+            if (target->GetQuestStatus(QUEST_BARK_FOR_DROHNS_DISTILLERY) == QUEST_STATUS_INCOMPLETE ||
+                target->GetQuestStatus(QUEST_BARK_FOR_DROHNS_DISTILLERY) == QUEST_STATUS_COMPLETE)
+                BroadcastTextId = RAND(SAY_DROHN_DISTILLERY_1, SAY_DROHN_DISTILLERY_2, SAY_DROHN_DISTILLERY_3, SAY_DROHN_DISTILLERY_4);
+
+            if (target->GetQuestStatus(QUEST_BARK_FOR_TCHALIS_VOODOO_BREWERY) == QUEST_STATUS_INCOMPLETE ||
+                target->GetQuestStatus(QUEST_BARK_FOR_TCHALIS_VOODOO_BREWERY) == QUEST_STATUS_COMPLETE)
+                BroadcastTextId = RAND(SAY_TCHALIS_VOODOO_1, SAY_TCHALIS_VOODOO_2, SAY_TCHALIS_VOODOO_3, SAY_TCHALIS_VOODOO_4);
+
+            if (target->GetQuestStatus(QUEST_BARK_BARLEYBREW) == QUEST_STATUS_INCOMPLETE ||
+                target->GetQuestStatus(QUEST_BARK_BARLEYBREW) == QUEST_STATUS_COMPLETE)
+                BroadcastTextId = RAND(SAY_BARLEYBREW_1, SAY_BARLEYBREW_2, SAY_BARLEYBREW_3, SAY_BARLEYBREW_4);
+
+            if (target->GetQuestStatus(QUEST_BARK_FOR_THUNDERBREWS) == QUEST_STATUS_INCOMPLETE ||
+                target->GetQuestStatus(QUEST_BARK_FOR_THUNDERBREWS) == QUEST_STATUS_COMPLETE)
+                BroadcastTextId = RAND(SAY_THUNDERBREWS_1, SAY_THUNDERBREWS_2, SAY_THUNDERBREWS_3, SAY_THUNDERBREWS_4);
+
+            if (BroadcastTextId)
+                target->Talk(BroadcastTextId, CHAT_MSG_SAY, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), target);
+        }
+
+        void Register() override
+        {
+            OnEffectApply += AuraEffectApplyFn(spell_brewfest_barker_bunny_AuraScript::OnApply, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_brewfest_barker_bunny_AuraScript();
+    }
+};
+
 // 26218
 class spell_winter_veil_mistletoe : public SpellScriptLoader
 {
     public:
         spell_winter_veil_mistletoe() : SpellScriptLoader("spell_winter_veil_mistletoe") { }
-
-        enum Mistletoe
-        {
-            SPELL_CREATE_MISTLETOE = 26206,
-            SPELL_CREATE_HOLLY = 26207,
-            SPELL_CREATE_SNOWFLAKES = 45036
-        };
 
         class spell_winter_veil_mistletoe_SpellScript : public SpellScript
         {
@@ -398,14 +1142,6 @@ class spell_winter_veil_px_238_winter_wondervolt : public SpellScriptLoader
 {
     public:
         spell_winter_veil_px_238_winter_wondervolt() : SpellScriptLoader("spell_winter_veil_px_238_winter_wondervolt") { }
-
-        enum PX238WinterWondervolt
-        {
-            SPELL_PX_238_WINTER_WONDERVOLT_TRANSFORM_1 = 26157,
-            SPELL_PX_238_WINTER_WONDERVOLT_TRANSFORM_2 = 26272,
-            SPELL_PX_238_WINTER_WONDERVOLT_TRANSFORM_3 = 26273,
-            SPELL_PX_238_WINTER_WONDERVOLT_TRANSFORM_4 = 26274
-        };
 
         class spell_winter_veil_px_238_winter_wondervolt_SpellScript : public SpellScript
         {
@@ -464,15 +1200,6 @@ class spell_midsummer_braziers_hit : public SpellScriptLoader
 public:
     spell_midsummer_braziers_hit() : SpellScriptLoader("spell_midsummer_braziers_hit") { }
 
-    enum TorchSpells
-    {
-        SPELL_TORCH_TOSSING_TRAINING = 45716,
-        SPELL_TORCH_TOSSING_PRACTICE = 46630,
-        SPELL_TORCH_TOSSING_TRAINING_SUCCESS_ALLIANCE = 45719,
-        SPELL_TORCH_TOSSING_TRAINING_SUCCESS_HORDE = 46651,
-        SPELL_BRAZIERS_HIT = 45724
-    };
-
     class spell_midsummer_braziers_hit_AuraScript : public AuraScript
     {
         PrepareAuraScript(spell_midsummer_braziers_hit_AuraScript);
@@ -512,24 +1239,101 @@ public:
     }
 };
 
+// 45390 
+class spell_gen_ribbon_pole_dancer_check : public SpellScriptLoader
+{
+public:
+    spell_gen_ribbon_pole_dancer_check() : SpellScriptLoader("spell_gen_ribbon_pole_dancer_check") { }
+
+    class spell_gen_ribbon_pole_dancer_check_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_gen_ribbon_pole_dancer_check_AuraScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            if (!sSpellMgr->GetSpellInfo(SPELL_HAS_FULL_MIDSUMMER_SET)
+                || !sSpellMgr->GetSpellInfo(SPELL_RIBBON_DANCE)
+                || !sSpellMgr->GetSpellInfo(SPELL_BURNING_HOT_POLE_DANCE))
+                return false;
+            return true;
+        }
+
+        void PeriodicTick(AuraEffect const* /*aurEff*/)
+        {
+            Unit* target = GetTarget();
+
+            // check if aura needs to be removed
+            if (!target->FindNearestGameObject(GO_RIBBON_POLE, 8.0f) || !target->HasUnitState(UNIT_STATE_CASTING))
+            {
+                target->InterruptNonMeleeSpells(false);
+                target->RemoveAurasDueToSpell(GetId());
+                target->RemoveAura(SPELL_RIBBON_DANCE_COSMETIC);
+                return;
+            }
+
+            // set xp buff duration
+            if (Aura* aur = target->GetAura(SPELL_RIBBON_DANCE))
+            {
+                aur->SetMaxDuration(std::min(3600000, aur->GetMaxDuration() + 180000));
+                aur->RefreshDuration();
+
+                // reward achievement criteria
+                if (aur->GetMaxDuration() == 3600000 && target->HasAura(SPELL_HAS_FULL_MIDSUMMER_SET))
+                    target->CastSpell(target, SPELL_BURNING_HOT_POLE_DANCE, true);
+            }
+            else
+                target->AddAura(SPELL_RIBBON_DANCE, target);
+        }
+
+        void Register() override
+        {
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_gen_ribbon_pole_dancer_check_AuraScript::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_gen_ribbon_pole_dancer_check_AuraScript();
+    }
+};
 
 void AddSC_holiday_spell_scripts()
 {
     // Love is in the Air
     new spell_love_is_in_the_air_romantic_picnic();
     // Hallow's End
+    new spell_hallow_end_candy();
+    new spell_hallow_end_candy_pirate();
     new spell_hallow_end_trick();
     new spell_hallow_end_trick_or_treat();
     new spell_hallow_end_tricky_treat();
+    new spell_hallow_end_wand();
     // Pilgrims Bounty
     new spell_pilgrims_bounty_buff_food("spell_gen_slow_roasted_turkey", SPELL_WELL_FED_AP_TRIGGER);
     new spell_pilgrims_bounty_buff_food("spell_gen_cranberry_chutney", SPELL_WELL_FED_ZM_TRIGGER);
     new spell_pilgrims_bounty_buff_food("spell_gen_spice_bread_stuffing", SPELL_WELL_FED_HIT_TRIGGER);
     new spell_pilgrims_bounty_buff_food("spell_gen_pumpkin_pie", SPELL_WELL_FED_SPIRIT_TRIGGER);
     new spell_pilgrims_bounty_buff_food("spell_gen_candied_sweet_potato", SPELL_WELL_FED_HASTE_TRIGGER);
+    new spell_pilgrims_bounty_feast_on();
+    new spell_pilgrims_bounty_well_fed("spell_pilgrims_bounty_well_fed_turkey", SPELL_WELL_FED_AP_TRIGGER);
+    new spell_pilgrims_bounty_well_fed("spell_pilgrims_bounty_well_fed_cranberry", SPELL_WELL_FED_ZM_TRIGGER);
+    new spell_pilgrims_bounty_well_fed("spell_pilgrims_bounty_well_fed_stuffing", SPELL_WELL_FED_HIT_TRIGGER);
+    new spell_pilgrims_bounty_well_fed("spell_pilgrims_bounty_well_fed_sweet_potatoes", SPELL_WELL_FED_HASTE_TRIGGER);
+    new spell_pilgrims_bounty_well_fed("spell_pilgrims_bounty_well_fed_pie", SPELL_WELL_FED_SPIRIT_TRIGGER);
+    new spell_pilgrims_bounty_turkey_tracker();
     // Winter Veil
     new spell_winter_veil_mistletoe();
     new spell_winter_veil_px_238_winter_wondervolt();
+    // Brewfest
+    new spell_brewfest_giddyup();
+    new spell_brewfest_ram();
+    new spell_brewfest_ram_fatigue();
+    new spell_brewfest_apple_trap();
+    new spell_brewfest_exhausted_ram();
+    new spell_brewfest_relay_race_intro_force_player_to_throw();
+    new spell_brewfest_dismount_ram();
+    new spell_brewfest_barker_bunny();
     // Midsummer Fire Festival
     new spell_midsummer_braziers_hit();
+    new spell_gen_ribbon_pole_dancer_check();
 }

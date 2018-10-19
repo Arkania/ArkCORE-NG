@@ -301,6 +301,9 @@ private:
     static StaticData _data[TOTAL_SPELL_EFFECTS];
 };
 
+typedef std::vector<SpellEffectInfo const*> SpellEffectInfoVector;
+typedef std::unordered_map<uint32, SpellEffectInfoVector> SpellEffectInfoMap;
+
 class SpellInfo
 {
 public:
@@ -543,6 +546,7 @@ public:
 
     // unloading helpers
     void _UnloadImplicitTargetConditionLists();
+
 };
 
 #endif // _SPELLINFO_H
