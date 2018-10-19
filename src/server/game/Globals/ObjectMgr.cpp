@@ -2793,7 +2793,7 @@ void ObjectMgr::LoadItemTemplates()
             itemTemplate.ItemId                    = itemId;
             itemTemplate.Class                     = uint32(fields[1].GetUInt8());
             itemTemplate.SubClass                  = uint32(fields[2].GetUInt8());
-            itemTemplate.SoundOverrideSubclass     = fields[3].GetInt32();
+            itemTemplate.SoundOverrideSubclass     = fields[3].GetInt8();
             itemTemplate.Name1                     = fields[4].GetString();
             itemTemplate.DisplayInfoID             = fields[5].GetUInt32();
             itemTemplate.Quality                   = uint32(fields[6].GetUInt8());
@@ -7059,9 +7059,9 @@ void ObjectMgr::LoadReputationOnKill()
         repOnKill.ReputationMaxCap2    = fields[7].GetUInt8();
         repOnKill.RepValue2            = fields[8].GetInt32();
         repOnKill.TeamDependent        = fields[9].GetUInt8();
-        repOnKill.currencyid1          = fields[10].GetUInt32();
-        repOnKill.currencyid2          = fields[11].GetUInt32();
-        repOnKill.currencyid3          = fields[12].GetUInt32();
+        repOnKill.currencyid1          = fields[10].GetUInt16();
+        repOnKill.currencyid2          = fields[11].GetUInt16();
+        repOnKill.currencyid3          = fields[12].GetUInt16();
         repOnKill.currencycount1       = fields[13].GetInt32();
         repOnKill.currencycount2       = fields[14].GetInt32();
         repOnKill.currencycount3       = fields[15].GetInt32();
