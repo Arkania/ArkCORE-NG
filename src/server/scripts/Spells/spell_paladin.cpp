@@ -30,7 +30,7 @@
 
 enum PaladinSpells
 {
-    SPELL_PALADIN_AVENGERS_SHIELD               = 31935,
+    SPELL_PALADIN_AVENGERS_SHIELD                = 31935,
     SPELL_PALADIN_AURA_MASTERY_IMMUNE            = 64364,
     SPELL_PALADIN_BEACON_OF_LIGHT_MARKER         = 53563,
     SPELL_PALADIN_BEACON_OF_LIGHT_HEAL           = 53652,
@@ -77,8 +77,11 @@ enum PaladinSpells
     SPELL_PALADIN_EXORCISM                       = 879,
     SPELL_PALADIN_CONSECRATION_DAMAGE            = 81297,
     SPELL_PALADIN_ETERNAL_GLORY_PROC             = 88676,
-    SPELL_PALADIN_SELFLESS_HEALER                = 85804,
-    SPELL_PALADIN_ETERNAL_GLORY                  = 87163,
+    SPELL_PALADIN_SELFLESS_HEALER_R1             = 85803,
+    SPELL_PALADIN_SELFLESS_HEALER_R2             = 85804,
+    SPELL_PALADIN_GUARDED_BY_THE_LIGHT           = 85639,
+    SPELL_PALADIN_GLYPH_OF_LONG_WORD             = 93466,
+    SPELL_PALADIN_ETERNAL_GLORY_R1               = 87163,
     SPELL_PALADIN_LONG_ARM_OF_THE_LAW            = 87168,
     SPELL_PALADIN_GOAK_HOLY_SUMMON               = 86669,
     SPELL_PALADIN_GOAK_ANCIENT_HEALER            = 86674,
@@ -88,6 +91,7 @@ enum PaladinSpells
     SPELL_PALADIN_GOAK_ANCIENT_CRUSADER          = 86701,
     SPELL_PALADIN_GOAK_ANCIENT_CRUSADER_GUARDIAN = 86703,
     SPELL_PALADIN_GOAK_ANCIENT_FURY              = 86704,
+
 };
 
 enum MiscSpells
@@ -1250,28 +1254,25 @@ public:
             if (!player)
                 return;
 
-            uint32 damage = CalculatePct(player->GetTotalAttackPowerValue(BASE_ATTACK), 400);
-            // Because 1 Holy Power (HP) is consumed when casting spell,
-            // GetPower(POWER_HOLY_POWER) will return 0 when player has 1 HP,
-            // return 1 at 2 HP, and 2 at 3 HP
-            uint32 hp = GetCaster()->GetPower(POWER_HOLY_POWER);
+            int32 damage = GetHitDamage();
+            // int32 damage = CalculatePct(player->GetTotalAttackPowerValue(BASE_ATTACK), 400);
+            int32 power = GetCaster()->GetHolyPoints();
 
-            // Holy Power Scaling: 3 times damage at 2 HP, 6 times at 3 HP
-            damage *= 0.5*hp*hp + 1.5*hp + 1;
-
-            /*
-            if (AreaTrigger* areaTrigger = GetCaster()->GetAreaTrigger(26573))
+            switch (power)
             {
-                if (!areaTrigger)
-                    return;
-
-                if (GetCaster()->GetDistance2d(areaTrigger->GetPositionX(), areaTrigger->GetPositionY()) < 8.0f)
-                    damage += CalculatePct(damage, 20); // Consecrated Hammer
+            case 0:
+            case 1:
+                damage *= 1;
+                break;
+            case 2:
+                damage *= 3;
+                break;
+            case 3:
+                damage *= 6;
+                break;
             }
-            */
 
-            player->CastSpell(player, 132403, true);
-
+            TC_LOG_INFO("server.loading", "\n\n spell_pal_shield_of_the_righteous: SetHitDamage Power: %i Damage: %i\n\n", power, damage);
             SetHitDamage(damage);
         }
 
@@ -1320,7 +1321,7 @@ class spell_pal_templar_s_verdict : public SpellScriptLoader
             {
                 Unit* caster = GetCaster();
                 int32 damage = GetHitDamage();
-                int32 power = caster->GetPower(POWER_HOLY_POWER);
+                int32 power = caster->GetHolyPoints();
 
                 if (caster->HasAura(SPELL_PALADIN_DIVINE_PURPOSE_PROC))
                     damage *= 7.5;  // 7.5*30% = 225%
@@ -1328,8 +1329,9 @@ class spell_pal_templar_s_verdict : public SpellScriptLoader
                 {
                     switch (power)
                     {
+                        case 0:
                         case 1: // 1 Holy Power
-                            damage = damage;
+                        //        DoNothing is 1*30 = 30%
                             break;
                         case 2: // 2 Holy Power
                             damage *= 3;    // 3*30 = 90%
@@ -1337,13 +1339,10 @@ class spell_pal_templar_s_verdict : public SpellScriptLoader
                         case 3: // 3 Holy Power
                             damage *= 7.5;  // 7.5*30% = 225%
                             break;
-                        default:
-                            TC_LOG_INFO("server.loading", "\n\nDamned.. Result is Default switch..\n\n");
-                            break;
                     }
                 }
 
-                TC_LOG_INFO("server.loading", "\n\nThe Paladin SetHitDamage Power: %i Damage: %i\n\n", power, damage);
+                TC_LOG_INFO("server.loading", "\n\n spell_pal_templar_s_verdict: SetHitDamage Power: %i Damage: %i\n\n", power, damage);
                 SetHitDamage(damage);
             }
 
@@ -1765,7 +1764,9 @@ public:
             return ValidateSpellInfo(
                 {
                     SPELL_PALADIN_DIVINE_PURPOSE_PROC,
-                    SPELL_PALADIN_ETERNAL_GLORY_PROC
+                    SPELL_PALADIN_ETERNAL_GLORY_PROC,
+                    SPELL_PALADIN_SELFLESS_HEALER_R1,
+                    SPELL_PALADIN_ETERNAL_GLORY_R1
                 });
         }
 
@@ -1776,16 +1777,33 @@ public:
                 return;
 
             int32 heal = GetHitHeal();
+            int32 power = caster->GetHolyPoints();
 
             if (caster->HasAura(SPELL_PALADIN_DIVINE_PURPOSE_PROC))
                 heal += heal * 2;
             else
-                heal += heal * caster->GetPower(POWER_HOLY_POWER);
+            {
+                switch (power)
+                {
+                case 0:
+                case 1: // 1 Holy Power
+                //        DoNothing 
+                    heal += heal * 1;
+                    break;
+                case 2: // 2 Holy Power
+                    heal += heal * 2;
+                    break;
+                case 3: // 3 Holy Power
+                    heal += heal * 3;
+                    break;
+                }
+            }
 
             if (caster != GetHitUnit())
-                if (AuraEffect* aurEff = caster->GetAuraEffect(SPELL_PALADIN_SELFLESS_HEALER, EFFECT_0))
+                if (AuraEffect* aurEff = caster->GetAuraEffect(SPELL_PALADIN_SELFLESS_HEALER_R2, EFFECT_0))
                     heal += CalculatePct(heal, aurEff->GetAmount());
 
+            TC_LOG_INFO("server.loading", "\n\n spell_pal_word_of_glory: SetHitHeal Power: %i Heal: %i\n\n", power, heal);
             SetHitHeal(heal);
         }
 
@@ -1793,7 +1811,7 @@ public:
         {
             if (Unit* caster = GetCaster())
             {
-                if (AuraEffect* aurEff = caster->GetAuraEffect(SPELL_PALADIN_ETERNAL_GLORY, EFFECT_0))
+                if (AuraEffect* aurEff = caster->GetAuraEffect(SPELL_PALADIN_ETERNAL_GLORY_R1, EFFECT_0))
                 {
                     if (roll_chance_i(aurEff->GetAmount()))
                     {
@@ -1823,17 +1841,45 @@ public:
         void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
         {
             Unit* caster = GetCaster();
-            if (!caster)
+            Unit* target = GetTarget();
+            if (!caster || !target)
                 return;
+
+            int32 power = caster->GetHolyPoints();
 
             if (caster->HasAura(SPELL_PALADIN_DIVINE_PURPOSE_PROC))
                 amount += amount * 2;
             else
-                amount += amount * caster->GetPower(POWER_HOLY_POWER);
+            {
+                switch (power)
+                {
+                case 0:
+                case 1: // 1 Holy Power
+                    amount += amount * 1;
+                    break;
+                case 2: // 2 Holy Power
+                    amount += amount * 2;
+                    break;
+                case 3: // 3 Holy Power
+                    amount += amount * 3;
+                    break;
+                }
+            }
 
-            if (caster != GetUnitOwner())
-                if (AuraEffect* aurEff = caster->GetAuraEffect(SPELL_PALADIN_SELFLESS_HEALER, EFFECT_0))
+            if (caster == target)
+            {
+                // Guarded by the Light
+                if (AuraEffect const* const aurEff = caster->GetAuraEffectOfRankedSpell(SPELL_PALADIN_GUARDED_BY_THE_LIGHT, EFFECT_0))
                     amount += CalculatePct(amount, aurEff->GetAmount());
+            }
+            else
+            {
+                // Selfless Healer
+                if (AuraEffect const* const aurEff = caster->GetAuraEffectOfRankedSpell(SPELL_PALADIN_SELFLESS_HEALER_R1, EFFECT_0))
+                    amount += CalculatePct(amount, aurEff->GetAmount());
+            }
+
+            TC_LOG_INFO("server.loading", "\n\n spell_pal_word_of_glory: CalculateAmount Power: %i Amount: %i\n\n", power, amount);
         }
 
         void Register() override
@@ -1871,9 +1917,29 @@ public:
 
             if (Aura* aura = caster->GetAura(GetSpellInfo()->Id))
             {
-                uint8 power = caster->HasAura(SPELL_PALADIN_DIVINE_PURPOSE_PROC) ? 2 : caster->GetPower(POWER_HOLY_POWER);
+                int32 power = caster->GetHolyPoints();
                 int32 duration = aura->GetDuration();
-                duration += duration * power;
+
+                if (caster->HasAura(SPELL_PALADIN_DIVINE_PURPOSE_PROC))
+                    duration *= 2;
+                else
+                {
+                    switch (power)
+                    {
+                    case 0:
+                    case 1: // 1 Holy Power
+                        duration *= 1;
+                        break;
+                    case 2: // 2 Holy Power
+                        duration *= 2;
+                        break;
+                    case 3: // 3 Holy Power
+                        duration *= 3;
+                        break;
+                    }
+                }
+
+                TC_LOG_INFO("server.loading", "\n\n spell_pal_inquisition: ChangeDuration Power: %i Duration: %i\n\n", power, duration);
                 aura->SetDuration(duration);
             }
         }
