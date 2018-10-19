@@ -1985,90 +1985,88 @@ public:
 class spell_pal_guardian_of_ancient_kings_retri : public SpellScriptLoader
 {
 public:
-spell_pal_guardian_of_ancient_kings_retri() : SpellScriptLoader("spell_pal_guardian_of_ancient_kings_retri") { }
+    spell_pal_guardian_of_ancient_kings_retri() : SpellScriptLoader("spell_pal_guardian_of_ancient_kings_retri") { }
 
-class spell_pal_guardian_of_ancient_kings_retri_AuraScript : public AuraScript
-{
-    PrepareAuraScript(spell_pal_guardian_of_ancient_kings_retri_AuraScript);
+    class spell_pal_guardian_of_ancient_kings_retri_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_pal_guardian_of_ancient_kings_retri_AuraScript);
 
-	void Remove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-	{
-		if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE)
-			return;
+                void Remove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+                {
+                        if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE)
+                                return;
 
-		Unit* target = GetTarget();
-		Aura* stacks = target->GetAura(SPELL_PALADIN_GOAK_ANCIENT_POWER, target->GetGUID());
-		if (!stacks)
-			return;
+                        Unit* target = GetTarget();
+                        Aura* stacks = target->GetAura(SPELL_PALADIN_GOAK_ANCIENT_POWER, target->GetGUID());
+                        if (!stacks)
+                                return;
 
-		int32 bp0 = sSpellMgr->GetSpellInfo(SPELL_PALADIN_GOAK_ANCIENT_FURY)->Effects[EFFECT_0].CalcValue(target) * stacks->GetStackAmount();
-		target->CastCustomSpell(target, SPELL_PALADIN_GOAK_ANCIENT_FURY, &bp0, NULL, NULL, true);
-		target->RemoveAurasDueToSpell(SPELL_PALADIN_GOAK_ANCIENT_POWER);
-		target->RemoveAurasDueToSpell(SPELL_PALADIN_GOAK_ANCIENT_CRUSADER);
-	}
+                        int32 bp0 = sSpellMgr->GetSpellInfo(SPELL_PALADIN_GOAK_ANCIENT_FURY)->Effects[EFFECT_0].CalcValue(target) * stacks->GetStackAmount();
+                        target->CastCustomSpell(target, SPELL_PALADIN_GOAK_ANCIENT_FURY, &bp0, NULL, NULL, true);
+                        target->RemoveAurasDueToSpell(SPELL_PALADIN_GOAK_ANCIENT_POWER);
+                        target->RemoveAurasDueToSpell(SPELL_PALADIN_GOAK_ANCIENT_CRUSADER);
+                }
 
-	void Register()
-	{
-		OnEffectRemove += AuraEffectRemoveFn(spell_pal_guardian_of_ancient_kings_retri_AuraScript::Remove, EFFECT_2, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-	}
-};
+                void Register()
+                {
+                        OnEffectRemove += AuraEffectRemoveFn(spell_pal_guardian_of_ancient_kings_retri_AuraScript::Remove, EFFECT_2, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+                }
+    };
 
-  AuraScript* GetAuraScript() const
-  {
-    return new spell_pal_guardian_of_ancient_kings_retri_AuraScript();
-  }
-
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_pal_guardian_of_ancient_kings_retri_AuraScript();
+    }
 };
 
 // 86150 - Guardian of Ancient Kings action bar spell
 class spell_pal_guardian_of_ancient_kings : public SpellScriptLoader
 {
 public:
-spell_pal_guardian_of_ancient_kings() : SpellScriptLoader("spell_pal_guardian_of_ancient_kings") { }
+    spell_pal_guardian_of_ancient_kings() : SpellScriptLoader("spell_pal_guardian_of_ancient_kings") { }
 
-class spell_pal_guardian_of_ancient_kings_SpellScript : public SpellScript
-{
-    PrepareSpellScript(spell_pal_guardian_of_ancient_kings_SpellScript);
-
-	void HandleOnHit()
-	{
-		Unit* caster = GetCaster();
-		if (!caster)
-			return;
-
-		// Choose which guardian to summon based on spec
-		switch (caster->ToPlayer()->GetPrimaryTalentTree(caster->ToPlayer()->GetActiveSpec()))
-		{
-		case TALENT_TREE_PALADIN_HOLY:
-			caster->RemoveAllMinionsByEntry(46499);
-			caster->CastSpell(caster, SPELL_PALADIN_GOAK_HOLY_SUMMON, true);
-			caster->CastSpell(caster, SPELL_PALADIN_GOAK_ANCIENT_HEALER, true);
-			break;
-		case TALENT_TREE_PALADIN_PROTECTION:
-			caster->RemoveAllMinionsByEntry(46490);
-			caster->CastSpell(caster, SPELL_PALADIN_GOAK_PROTECTION_SUMMON, true);
-			break;
-		case TALENT_TREE_PALADIN_RETRIBUTION:
-			caster->RemoveAllMinionsByEntry(46506);
-			caster->CastSpell(caster, SPELL_PALADIN_GOAK_RETRIBUTION_SUMMON, true);
-			caster->CastSpell(caster, SPELL_PALADIN_GOAK_ANCIENT_CRUSADER, true);
-			break;
-		default:
-			return;
-		}
-	}
-
-    void Register()
+    class spell_pal_guardian_of_ancient_kings_SpellScript : public SpellScript
     {
-		OnHit += SpellHitFn(spell_pal_guardian_of_ancient_kings_SpellScript::HandleOnHit);
+        PrepareSpellScript(spell_pal_guardian_of_ancient_kings_SpellScript);
+
+                void HandleOnHit()
+                {
+                        Unit* caster = GetCaster();
+                        if (!caster)
+                                return;
+
+                        // Choose which guardian to summon based on spec
+                        switch (caster->ToPlayer()->GetPrimaryTalentTree(caster->ToPlayer()->GetActiveSpec()))
+                        {
+                        case TALENT_TREE_PALADIN_HOLY:
+                                caster->RemoveAllMinionsByEntry(46499);
+                                caster->CastSpell(caster, SPELL_PALADIN_GOAK_HOLY_SUMMON, true);
+                                caster->CastSpell(caster, SPELL_PALADIN_GOAK_ANCIENT_HEALER, true);
+                                break;
+                        case TALENT_TREE_PALADIN_PROTECTION:
+                                caster->RemoveAllMinionsByEntry(46490);
+                                caster->CastSpell(caster, SPELL_PALADIN_GOAK_PROTECTION_SUMMON, true);
+                                break;
+                        case TALENT_TREE_PALADIN_RETRIBUTION:
+                                caster->RemoveAllMinionsByEntry(46506);
+                                caster->CastSpell(caster, SPELL_PALADIN_GOAK_RETRIBUTION_SUMMON, true);
+                                caster->CastSpell(caster, SPELL_PALADIN_GOAK_ANCIENT_CRUSADER, true);
+                                break;
+                        default:
+                                return;
+                        }
+                }
+
+        void Register()
+        {
+                        OnHit += SpellHitFn(spell_pal_guardian_of_ancient_kings_SpellScript::HandleOnHit);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_pal_guardian_of_ancient_kings_SpellScript();
     }
- };
-
-  SpellScript* GetSpellScript() const
-  {
-    return new spell_pal_guardian_of_ancient_kings_SpellScript();
-  }
-
 };
 
 // 54158 Judgement (based on Seals for Judgement )
