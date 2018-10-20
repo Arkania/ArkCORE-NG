@@ -5,7 +5,7 @@
 -- in client 434 the SoundEntry.db2 has id's upto 26682 
 update broadcast_text set SoundId=0 where SoundId > 26682;
 
-update broadcast_text set SoundId=0 where SoundId = 547;
+update broadcast_text set EmoteId0=0 where EmoteId0 = 547;
 
 update broadcast_text set Language=0 where Language = 42;
 
