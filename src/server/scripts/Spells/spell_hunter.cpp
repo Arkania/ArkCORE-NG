@@ -22,64 +22,75 @@
  * Scriptnames of files in this file should be prefixed with "spell_hun_".
  */
 
-#include "Pet.h"
-#include "ScriptMgr.h"
 #include "Cell.h"
 #include "CellImpl.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
-#include "SpellScript.h"
+#include "Pet.h"
+#include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
+#include "SpellScript.h"
+
 
 enum HunterSpells
 {
-    SPELL_HUNTER_ANIMAL_HANDLER = 34453,
-    SPELL_HUNTER_SERPENT_STING = 1978,
-    SPELL_HUNTER_BESTIAL_WRATH = 19574,
-    SPELL_HUNTER_READINESS = 23989,
-    SPELL_HUNTER_IMPROVED_MEND_PET = 24406,
-    SPELL_HUNTER_THRILL_OF_THE_HUNT = 34720,
-    SPELL_HUNTER_FOCUSED_FIRE_1 = 35029,
-    SPELL_HUNTER_FOCUSED_FIRE_2 = 35030,
-    SPELL_HUNTER_MISDIRECTION_PROC = 35079,
-    SPELL_HUNTER_IMPROVED_STEADY_SHOT = 53220,
-    SPELL_HUNTER_IMPROVED_STEADY_SHOT_RANK_1 = 53221,
-    SPELL_HUNTER_IMPROVED_STEADY_SHOT_RANK_2 = 53222,
-    SPELL_HUNTER_IMPROVED_STEADY_SHOT_RANK_3 = 53224,
-    SPELL_HUNTER_SNIPER_TRAINING_R1 = 53302,
-    SPELL_HUNTER_KILL_SHOT = 53351,
-    SPELL_HUNTER_CHIMERA_SHOT_HEAL = 53353,
-    SPELL_HUNTER_INVIGORATION_TRIGGERED = 53398,
-    SPELL_HUNTER_PET_LAST_STAND_TRIGGERED = 53479,
-    SPELL_HUNTER_PET_CARRION_FEEDER_TRIGGERED = 54045,
+    SPELL_DRAENEI_GIFT_OF_THE_NAARU                 = 59543,
+    SPELL_HUNTER_ANIMAL_HANDLER                     = 34453,
+    SPELL_HUNTER_BESTIAL_WRATH                      = 19574,
+    SPELL_HUNTER_CAMOUFLAGE                         = 51755,
+    SPELL_HUNTER_CAMOUFLAGE_STEALTH                 = 80325,
+    SPELL_HUNTER_CAMOUFLAGE_VISUAL                  = 80326,
+    SPELL_HUNTER_CHIMERA_SHOT_HEAL                  = 53353,
+    SPELL_HUNTER_FIRE                               = 82926,
+    SPELL_HUNTER_FOCUS_ENERGIZE                     = 82716,
+    SPELL_HUNTER_FOCUSED_FIRE_1                     = 35029,
+    SPELL_HUNTER_FOCUSED_FIRE_2                     = 35030,
+    SPELL_HUNTER_GENERIC_ENERGIZE_FOCUS             = 91954,
+    SPELL_HUNTER_GLYPH_KILL_SHOT                    = 63067,
+    SPELL_HUNTER_GLYPH_KILL_SHOT_CD                 = 90967,
+    SPELL_HUNTER_GLYPH_OF_CAMOUFLAGE                = 119449,
+    SPELL_HUNTER_GLYPH_OF_CAMOUFLAGE_VISUAL         = 119450,
+    SPELL_HUNTER_GLYPH_OF_SILENCING_SHOT            = 56836,
+    SPELL_HUNTER_IMPROVED_MEND_PET                  = 24406,
+    SPELL_HUNTER_IMPROVED_STEADY_SHOT               = 53220,
+    SPELL_HUNTER_IMPROVED_STEADY_SHOT_RANK_1        = 53221,
+    SPELL_HUNTER_IMPROVED_STEADY_SHOT_RANK_2        = 53222,
+    SPELL_HUNTER_IMPROVED_STEADY_SHOT_RANK_3        = 53224,
+    SPELL_HUNTER_INSANITY                           = 95809,
+    SPELL_HUNTER_INVIGORATION_TRIGGERED             = 53398,
+    SPELL_HUNTER_KILL_COMMAND_CRIT_10               = 60110,
+    SPELL_HUNTER_KILL_COMMAND_CRIT_20               = 60113,
+    SPELL_HUNTER_KILL_SHOT                          = 53351,
+    SPELL_HUNTER_LOCK_AND_LOAD                      = 56453,
+    SPELL_HUNTER_MASTERS_CALL_TRIGGERED             = 62305,
+    SPELL_HUNTER_MISDIRECTION_PROC                  = 35079,
+    SPELL_HUNTER_PET_CARRION_FEEDER_TRIGGERED       = 54045,
+    SPELL_HUNTER_PET_HEART_OF_THE_PHOENIX           = 55709,
+    SPELL_HUNTER_PET_HEART_OF_THE_PHOENIX_DEBUFF    = 55711,
     SPELL_HUNTER_PET_HEART_OF_THE_PHOENIX_TRIGGERED = 54114,
-    SPELL_HUNTER_PET_HEART_OF_THE_PHOENIX = 55709,
-    SPELL_HUNTER_PET_HEART_OF_THE_PHOENIX_DEBUFF = 55711,
-    SPELL_HUNTER_LOCK_AND_LOAD = 56453,
-    SPELL_HUNTER_GLYPH_OF_SILENCING_SHOT = 56836,
-    SPELL_SHAMAN_EXHAUSTION = 57723,
-    SPELL_SHAMAN_SATED = 57724,
-    SPELL_HUNTER_RAPID_RECUPERATION = 58883,
-    SPELL_DRAENEI_GIFT_OF_THE_NAARU = 59543,
-    SPELL_HUNTER_KILL_COMMAND_CRIT_10 = 60110,
-    SPELL_HUNTER_KILL_COMMAND_CRIT_20 = 60113,
-    SPELL_HUNTER_MASTERS_CALL_TRIGGERED = 62305,
-    SPELL_HUNTER_GLYPH_KILL_SHOT = 63067,
-    SPELL_HUNTER_SNIPER_TRAINING_BUFF_R1 = 64418,
-    SPELL_HUNTER_STEADY_SHOT_FOCUS = 77443,
-    SPELL_MAGE_TEMPORAL_DISPLACEMENT = 80354,
-    SPELL_HUNTER_FOCUS_ENERGIZE = 82716,
-    SPELL_HUNTER_FIRE = 82926,
-    SPELL_HUNTER_TERMINATION_RANK_1 = 83489,
-    SPELL_HUNTER_TERMINATION_RANK_2 = 83490,
-    SPELL_HUNTER_GLYPH_KILL_SHOT_CD = 90967,
-    SPELL_HUNTER_GENERIC_ENERGIZE_FOCUS = 91954,
-    SPELL_HUNTER_INSANITY = 95809,
-    SPELL_HUNTER_CAMOUFLAGE = 51755,
-    SPELL_HUNTER_CAMOUFLAGE_STEALTH = 80325,
-    SPELL_HUNTER_CAMOUFLAGE_VISUAL = 80326,
-    SPELL_HUNTER_GLYPH_OF_CAMOUFLAGE = 119449,
-    SPELL_HUNTER_GLYPH_OF_CAMOUFLAGE_VISUAL = 119450,
+    SPELL_HUNTER_PET_LAST_STAND_TRIGGERED           = 53479,
+    SPELL_HUNTER_RAPID_RECUPERATION                 = 58883,
+    SPELL_HUNTER_READINESS                          = 23989,
+    SPELL_HUNTER_SERPENT_STING                      = 1978,
+    SPELL_HUNTER_SNIPER_TRAINING_BUFF_R1            = 64418,
+    SPELL_HUNTER_SNIPER_TRAINING_R1                 = 53302,
+    SPELL_HUNTER_STEADY_SHOT_FOCUS                  = 77443,
+    SPELL_HUNTER_T9_4P_GREATNESS                    = 68130,
+    SPELL_HUNTER_TERMINATION_RANK_1                 = 83489,
+    SPELL_HUNTER_TERMINATION_RANK_2                 = 83490,
+    SPELL_HUNTER_THRILL_OF_THE_HUNT                 = 34720,
+    SPELL_MAGE_TEMPORAL_DISPLACEMENT                = 80354,
+    SPELL_ROAR_OF_SACRIFICE_TRIGGERED               = 67481,
+    SPELL_SHAMAN_EXHAUSTION                         = 57723,
+    SPELL_SHAMAN_SATED                              = 57724,
+    SPELL_HUNTER_T13_2P_Bonus                       = 105732,
+    SPELL_HUNTER_COBRA_SHOT_LEVEL_85                = 77767,
+    SPELL_HUNTER_FRENZY_EFFECT_RANK_1               = 19615,
+    SPELL_HUNTER_SERPENT_STING_LEVEL_85_88453       = 88453,
+    SPELL_HUNTER_SERPENT_STING_LEVEL_85_88466       = 88466,
+    SPELL_HUNTER_SERPENT_SPREAD_RANK_1              = 87934,
+    SPELL_HUNTER_SERPENT_SPREAD_RANK_2              = 87935,
+    SPELL_HUNTER_STEADY_SHOT                        = 56641,
 
 };
 
@@ -178,8 +189,8 @@ class spell_hun_chimera_shot : public SpellScriptLoader
             {
                 GetCaster()->CastSpell(GetCaster(), SPELL_HUNTER_CHIMERA_SHOT_HEAL, true);
 
-                if (Aura* aur = GetHitUnit()->GetAura(SPELL_HUNTER_SERPENT_STING, GetCaster()->GetGUID()))
-                    aur->SetDuration(aur->GetSpellInfo()->GetMaxDuration(), true);
+                if (Aura* aura = GetHitUnit()->GetAura(SPELL_HUNTER_SERPENT_STING, GetCaster()->GetGUID()))
+                    aura->RefreshDuration();
             }
 
             void Register() override
@@ -259,9 +270,20 @@ class spell_hun_disengage : public SpellScriptLoader
                 return SPELL_CAST_OK;
             }
 
-            void Register() override
+            void HandlePostHaste(SpellEffIndex /*effIndex*/)
+            {
+                Unit* target = GetHitUnit();
+                if (AuraEffect* postHaste = target->GetDummyAuraEffect(SPELLFAMILY_HUNTER, 5094, EFFECT_1))
+                {
+                    int32 bp0 = postHaste->GetAmount();
+                    target->CastCustomSpell(target, 83559, &bp0, NULL, NULL, true);
+                }
+            }
+
+            void Register()
             {
                 OnCheckCast += SpellCheckCastFn(spell_hun_disengage_SpellScript::CheckCast);
+                OnEffectHitTarget += SpellEffectFn(spell_hun_disengage_SpellScript::HandlePostHaste, EFFECT_0, SPELL_EFFECT_LEAP_BACK);
             }
         };
 
@@ -475,6 +497,16 @@ class spell_hun_masters_call : public SpellScriptLoader
                 return true;
             }
 
+            SpellCastResult CheckCast()
+            {
+                if (Player* caster = GetCaster()->ToPlayer())
+                    if (Pet* pet = caster->GetPet())
+                        if (pet->HasUnitState(UNIT_STATE_CONTROLLED))
+                            return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
+
+                return SPELL_CAST_OK;
+            }
+
             void HandleDummy(SpellEffIndex /*effIndex*/)
             {
                 if (Unit* ally = GetHitUnit())
@@ -498,6 +530,7 @@ class spell_hun_masters_call : public SpellScriptLoader
 
             void Register() override
             {
+                OnCheckCast += SpellCheckCastFn(spell_hun_masters_call_SpellScript::CheckCast);
                 OnEffectHitTarget += SpellEffectFn(spell_hun_masters_call_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
                 OnEffectHitTarget += SpellEffectFn(spell_hun_masters_call_SpellScript::HandleScriptEffect, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
             }
@@ -1011,7 +1044,7 @@ class spell_hun_tame_beast : public SpellScriptLoader
         }
 };
 
-//  53434 - Call of the Wild
+// 53434
 class spell_hun_target_only_pet_and_owner : public SpellScriptLoader
 {
     public:
@@ -1121,8 +1154,6 @@ class spell_hun_tnt : public SpellScriptLoader
         }
 };
 
-// new ###############################################
-
 // 51753 - Camouflage
 class spell_hun_camouflage : public SpellScriptLoader
 {
@@ -1146,8 +1177,9 @@ public:
             if (Unit* caster = GetCaster())
             {
                 caster->CastSpell(caster, SPELL_HUNTER_CAMOUFLAGE, true);
-                if (Unit* pet = caster->GetGuardianPet())
-                    pet->CastSpell(pet, SPELL_HUNTER_CAMOUFLAGE, true);
+                if (Player* player = caster->ToPlayer())
+                    if (Unit* pet = player->GetGuardianPet())
+                        pet->CastSpell(pet, SPELL_HUNTER_CAMOUFLAGE, true);
             }
         }
 
@@ -1187,8 +1219,9 @@ public:
                 caster->RemoveAura(SPELL_HUNTER_GLYPH_OF_CAMOUFLAGE_VISUAL);
                 caster->RemoveAura(SPELL_HUNTER_CAMOUFLAGE_STEALTH);
 
-                if (Unit* pet = caster->GetGuardianPet())
-                    pet->RemoveAura(SPELL_HUNTER_CAMOUFLAGE);
+                if (Player* player = caster->ToPlayer())
+                    if (Unit* pet = player->GetGuardianPet())
+                        pet->RemoveAura(SPELL_HUNTER_CAMOUFLAGE);
             }
         }
 
@@ -1289,7 +1322,7 @@ public:
     }
 };
 
-// 56641 - Steady Shot 77767 - Cobra Shot
+// 56641, 77767 - Steady Shot - Cobra Shot
 class spell_hun_energize : public SpellScriptLoader
 {
 public:
@@ -1301,22 +1334,23 @@ public:
 
         void HandleOnHit()
         {
-            uint32 triggeredSpell = 91954;
+            uint32 triggeredSpell = SPELL_HUNTER_GENERIC_ENERGIZE_FOCUS;
             SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(triggeredSpell);
             if (!spellInfo)
                 return;
 
             int32 bp0 = spellInfo->Effects[EFFECT_0].BasePoints;
             Unit* caster = GetCaster();
+            if (caster->HasAura(SPELL_HUNTER_T13_2P_Bonus))
+                bp0 *= 2;
             if (Unit* unitTarget = GetHitUnit())
             {
                 // Refresh serpent sting
-                if (GetSpellInfo()->Id == 77767)
+                if (GetSpellInfo()->Id == SPELL_HUNTER_COBRA_SHOT_LEVEL_85)
                     if (Aura* aura = unitTarget->GetAura(1978, GetCaster()->GetGUID()))
                         aura->SetDuration(std::min(aura->GetDuration() + GetSpellInfo()->Effects[EFFECT_1].BasePoints * 1000, aura->GetMaxDuration()), true);
 
-                // TALENTO Termination 
-                // No estoy seguro de qeu cobrashot use este talento 
+                // I'm not sure what cashes shot use this talent
                 // Termination
                 if (AuraEffect* termination = caster->GetDummyAuraEffect(SPELLFAMILY_HUNTER, 2008, EFFECT_0))
                     if (unitTarget->GetHealthPct() <= 25.0f)
@@ -1324,20 +1358,10 @@ public:
                 caster->CastCustomSpell(caster, triggeredSpell, &bp0, NULL, NULL, true);
 
                 if (caster->HasAura(SPELL_HUNTER_TERMINATION_RANK_1))
-                {
-                    // 3 puntos de FOCO con un punt de TALENTO
                     caster->SetPower(POWER_FOCUS, caster->GetPower(POWER_FOCUS) + 3);
-
-                }
                 else if (caster->HasAura(SPELL_HUNTER_TERMINATION_RANK_2))
-                {
-
-                    // 6 puntos de FOCO con un punt de TALENTO
                     caster->SetPower(POWER_FOCUS, caster->GetPower(POWER_FOCUS) + 6);
-
-                }
             }
-
         }
 
         void Register()
@@ -1376,7 +1400,7 @@ public:
             if (!pet)
                 return SPELL_FAILED_NO_PET;
 
-            if (pet->HasAura(19615))
+            if (pet->HasAura(SPELL_HUNTER_FRENZY_EFFECT_RANK_1))
                 return SPELL_CAST_OK;
             else
                 return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
@@ -1407,7 +1431,7 @@ public:
         void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
         {
             if (Pet* pet = GetCaster()->ToPlayer()->GetPet())
-                if (Aura* aur = pet->GetAura(19615, pet->GetGUID()))
+                if (Aura* aur = pet->GetAura(SPELL_HUNTER_FRENZY_EFFECT_RANK_1, pet->GetGUID()))
                     amount *= aur->GetStackAmount();
         }
 
@@ -1415,7 +1439,7 @@ public:
         {
             int32 basepoints0 = aurEff->GetAmount();
             if (Pet* pet = GetCaster()->ToPlayer()->GetPet())
-                if (Aura* aur = pet->GetAura(19615, pet->GetGUID()))
+                if (Aura* aur = pet->GetAura(SPELL_HUNTER_FRENZY_EFFECT_RANK_1, pet->GetGUID()))
                 {
                     basepoints0 *= aur->GetStackAmount();
                     GetCaster()->CastCustomSpell(pet, 83468, &basepoints0, NULL, NULL, true);
@@ -1521,8 +1545,8 @@ public:
                 if (target && target->GetHealthPct() <= glyph->GetAmount() && !caster->HasAura(90967))
                     if (int32(target->GetHealth()) > damage)
                     {
-                        caster->ToPlayer()->RemoveSpellCooldown(53351, true);
-                        caster->CastSpell(caster, 90967, true);
+                        caster->ToPlayer()->RemoveSpellCooldown(SPELL_HUNTER_KILL_SHOT, true);
+                        caster->CastSpell(caster, SPELL_HUNTER_GLYPH_KILL_SHOT_CD, true);
                     }
         }
 
@@ -1553,7 +1577,7 @@ public:
             if (Unit* caster = GetCaster())
                 if (AuraEffect* aurEff = caster->GetDummyAuraEffect(SPELLFAMILY_HUNTER, 267, EFFECT_0))
                     if (roll_chance_i(aurEff->GetAmount()))
-                        caster->CastSpell(GetTarget(), 24406, true);
+                        caster->CastSpell(GetTarget(), SPELL_HUNTER_IMPROVED_MEND_PET, true);
         }
 
         void Register()
@@ -1568,7 +1592,7 @@ public:
     }
 };
 
-// 83381
+// 16827, 17253, 49966, 83381
 class spell_hun_pet_damage_spells : public SpellScriptLoader
 {
 public:
@@ -1665,39 +1689,6 @@ public:
 };
 
 // 8875
-class spell_hun1_pet_passive_damage_done : public SpellScriptLoader
-{
-public:
-    spell_hun1_pet_passive_damage_done() : SpellScriptLoader("spell_hun_pet_passive_damage_done") { }
-
-    class spell_hun_pet_passive_damage_done_AuraScript : public AuraScript
-    {
-        PrepareAuraScript(spell_hun_pet_passive_damage_done_AuraScript);
-
-        bool Load()
-        {
-            if (!GetCaster() || !GetCaster()->GetOwner() || GetCaster()->GetOwner()->GetTypeId() != TYPEID_PLAYER)
-                return false;
-            return true;
-        }
-
-        void CalculateAmountDamageDone(AuraEffect const* /* aurEff */, int32& amount, bool& /*canBeRecalculated*/)
-        {
-            if (!GetCaster() || !GetCaster()->GetOwner())
-                return;
-        }
-
-        void Register()
-        {
-            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_hun_pet_passive_damage_done_AuraScript::CalculateAmountDamageDone, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
-        }
-    };
-
-    AuraScript* GetAuraScript() const
-    {
-        return new spell_hun_pet_passive_damage_done_AuraScript();
-    }
-};
 class spell_hun_pet_passive_damage_done : public SpellScriptLoader
 {
 public:
@@ -1718,6 +1709,7 @@ public:
         {
             if (!GetCaster() || !GetCaster()->GetOwner())
                 return;
+
             if (GetCaster()->GetOwner()->ToPlayer())
             {
                 // Cobra Reflexes
@@ -2310,10 +2302,10 @@ public:
             if (Unit* unitTarget = GetHitUnit())
             {
                 uint32 triggeredSpell = 0;
-                if (caster->HasSpell(87934))
-                    triggeredSpell = 88453;
-                else if (caster->HasSpell(87935))
-                    triggeredSpell = 88466;
+                if (caster->HasSpell(SPELL_HUNTER_SERPENT_SPREAD_RANK_1))
+                    triggeredSpell = SPELL_HUNTER_SERPENT_STING_LEVEL_85_88453;
+                else if (caster->HasSpell(SPELL_HUNTER_SERPENT_SPREAD_RANK_2))
+                    triggeredSpell = SPELL_HUNTER_SERPENT_STING_LEVEL_85_88466;
 
                 if (triggeredSpell)
                     caster->CastSpell(unitTarget, triggeredSpell, true);
@@ -2455,6 +2447,53 @@ public:
     }
 };
 
+// 53221, 53222, 53224
+class spell_hun_improved_steady_shot : public SpellScriptLoader
+{
+public:
+    spell_hun_improved_steady_shot() : SpellScriptLoader("spell_hun_improved_steady_shot") { }
+
+    class spell_hun_improved_steady_shot_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_hun_improved_steady_shot_AuraScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            if (!sSpellMgr->GetSpellInfo(SPELL_HUNTER_IMPROVED_STEADY_SHOT))
+                return false;
+            return true;
+        }
+
+        void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+        {
+            PreventDefaultAction();
+            int32 basepoint = aurEff->GetAmount();
+
+            if (eventInfo.GetDamageInfo()->GetSpellInfo()->Id == SPELL_HUNTER_STEADY_SHOT)
+            {
+                aurEff->GetBase()->SetCharges(aurEff->GetBase()->GetCharges() + 1);
+
+                if (aurEff->GetBase()->GetCharges() == 2)
+                {
+                    GetTarget()->CastCustomSpell(GetTarget(), SPELL_HUNTER_IMPROVED_STEADY_SHOT, &basepoint, NULL, NULL, true, NULL, aurEff);
+                    aurEff->GetBase()->SetCharges(0);
+                }
+            }
+            else
+                aurEff->GetBase()->SetCharges(0);
+        }
+
+        void Register() override
+        {
+            OnEffectProc += AuraEffectProcFn(spell_hun_improved_steady_shot_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_hun_improved_steady_shot_AuraScript();
+    }
+};
 
 void AddSC_hunter_spell_scripts()
 {
@@ -2507,4 +2546,5 @@ void AddSC_hunter_spell_scripts()
     new spell_hun_target_only_pet_and_owner();
     new spell_hun_thrill_of_the_hunt();
     new spell_hun_tnt();
+    new spell_hun_improved_steady_shot();
 }
