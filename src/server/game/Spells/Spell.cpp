@@ -7356,6 +7356,18 @@ void Spell::CallScriptAfterHitHandlers()
     }
 }
 
+void Spell::CallScriptDispel()
+{
+    for (std::list<SpellScript*>::iterator scritr = m_loadedScripts.begin(); scritr != m_loadedScripts.end(); ++scritr)
+    {
+        (*scritr)->_PrepareScriptCall(SPELL_SCRIPT_HOOK_AFTER_SUCCESSFUL_DISPEL);
+        std::list<SpellScript::DispelHandler>::iterator hookItrEnd = (*scritr)->OnSuccessfulDispel.end(), hookItr = (*scritr)->OnSuccessfulDispel.begin();
+        for (; hookItr != hookItrEnd; ++hookItr)
+            (*hookItr).Call(*scritr);
+        (*scritr)->_FinishScriptCall();
+    }
+}
+
 void Spell::CallScriptObjectAreaTargetSelectHandlers(std::list<WorldObject*>& targets, SpellEffIndex effIndex, SpellImplicitTargetInfo const& targetType)
 {
     for (std::list<SpellScript*>::iterator scritr = m_loadedScripts.begin(); scritr != m_loadedScripts.end(); ++scritr)

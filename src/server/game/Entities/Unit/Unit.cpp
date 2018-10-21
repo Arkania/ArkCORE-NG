@@ -3975,7 +3975,7 @@ void Unit::RemoveAurasDueToItemSpell(uint32 spellId, uint64 castItemGuid)
     }
 }
 
-void Unit::RemoveAurasByType(AuraType auraType, uint64 casterGUID, Aura* except, bool negative, bool positive)
+void Unit::RemoveAurasByType(AuraType auraType, uint64 casterGUID, Aura* except, bool negative, bool positive, SpellFamilyNames SpellFamilyName, uint32 schoolMask)
 {
     for (AuraEffectList::iterator iter = m_modAuras[auraType].begin(); iter != m_modAuras[auraType].end();)
     {
@@ -3984,7 +3984,9 @@ void Unit::RemoveAurasByType(AuraType auraType, uint64 casterGUID, Aura* except,
 
         ++iter;
         if (aura != except && (!casterGUID || aura->GetCasterGUID() == casterGUID)
-            && ((negative && !aurApp->IsPositive()) || (positive && aurApp->IsPositive())))
+            && ((negative && !aurApp->IsPositive()) || (positive && aurApp->IsPositive()))
+            && (!SpellFamilyName || aura->GetSpellInfo()->SpellFamilyName == SpellFamilyName)
+            && (!schoolMask || aura->GetSpellInfo()->SchoolMask & schoolMask))
         {
             uint32 removedAuras = m_removedAurasCount;
             RemoveAura(aurApp);

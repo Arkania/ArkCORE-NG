@@ -178,6 +178,16 @@ void SpellScript::CastHandler::Call(SpellScript* spellScript)
     (spellScript->*pCastHandlerScript)();
 }
 
+SpellScript::DispelHandler::DispelHandler(SpellDispelFnType _pDispelHandlerScript)
+{
+    pDispelHandlerScript = _pDispelHandlerScript;
+}
+
+void SpellScript::DispelHandler::Call(SpellScript* spellScript)
+{
+    (spellScript->*pDispelHandlerScript)();
+}
+
 SpellScript::CheckCastHandler::CheckCastHandler(SpellCheckCastFnType checkCastHandlerScript)
 {
     _checkCastHandlerScript = checkCastHandlerScript;

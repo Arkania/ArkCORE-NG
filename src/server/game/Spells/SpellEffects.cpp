@@ -3655,6 +3655,8 @@ void Spell::EffectDispel(SpellEffIndex effIndex)
         else if (m_caster->HasAura(86962))  // Cleansing Waters Rank 2
             m_caster->CastSpell(unitTarget, 86958, true);
     }
+
+    CallScriptDispel();
 }
 
 void Spell::EffectDualWield(SpellEffIndex /*effIndex*/)

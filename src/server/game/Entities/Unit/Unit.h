@@ -1806,7 +1806,7 @@ class Unit : public WorldObject
         void RemoveAurasDueToSpellByDispel(uint32 spellId, uint32 dispellerSpellId, uint64 casterGUID, Unit* dispeller, uint8 chargesRemoved = 1);
         void RemoveAurasDueToSpellBySteal(uint32 spellId, uint64 casterGUID, Unit* stealer);
         void RemoveAurasDueToItemSpell(uint32 spellId, uint64 castItemGuid);
-        void RemoveAurasByType(AuraType auraType, uint64 casterGUID = 0, Aura* except = NULL, bool negative = true, bool positive = true);
+        void RemoveAurasByType(AuraType auraType, uint64 casterGUID = 0, Aura* except = NULL, bool negative = true, bool positive = true, SpellFamilyNames SpellFamilyName = SPELLFAMILY_GENERIC, uint32 schoolMask = 0);
         void RemoveNotOwnSingleTargetAuras(uint32 newPhase = 0x0, bool phaseid = false);
         void RemoveAurasWithInterruptFlags(uint32 flag, uint32 except = 0);
         void RemoveAurasWithAttribute(uint32 flags);
