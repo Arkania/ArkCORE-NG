@@ -37,7 +37,16 @@ enum GenericData
     SPELL_MECHANICAL_DRAGONLING = 4073,
     SPELL_MITHRIL_MECHANICAL_DRAGONLING = 12749,
     SPELL_GOBLIN_JUMPER_CABLES_FAIL = 8338,
-    SPELL_GOBLIN_JUMPER_CABLES_XL_FAIL = 23055
+    SPELL_GOBLIN_JUMPER_CABLES_XL_FAIL = 23055,
+    SPELL_UNSURPASSED_VIGOR = 25733,
+    SPELL_FLASK_OF_ENHANCEMENT_STR = 79638,
+    SPELL_FLASK_OF_ENHANCEMENT_AP = 79639,
+    SPELL_FLASK_OF_ENHANCEMENT_SP = 79640,
+    SPELL_GROUNDED_PLASMA_SHIELD_SUCCESS = 82627, // Proc 18k absorb
+    SPELL_REVERSED_SHIELD = 82406, // Debuff Side Effect 1
+    SPELL_MAGNETIZED = 82403, // Debuff Side Effect 2
+    SPELL_PAINFUL_SHOCK = 82407, // Debuff Side Effect 3 Active le buff 4
+    SPELL_PLASMA_MISFIRE = 94549, // Debuff Side Effect 4
 };
 
 // 23074 23075 23076 23133 
@@ -2808,7 +2817,7 @@ enum GoladandTiriosh
 	SPELL_GOLADANDTIRIOSH_FOTD_GIVE_CP		= 109950,
 };
 
-//_______________________________Golad and Tiriosh__________________________________
+// 109939
 class spell_item_fangs_of_the_father : public SpellScriptLoader
 {
     public:
@@ -2883,6 +2892,7 @@ class spell_item_fangs_of_the_father : public SpellScriptLoader
         }
 };
 
+// 109949
 class spell_item_fangs_of_the_father_fury_of_the_destroyer : public SpellScriptLoader
 {
     public:
@@ -2916,6 +2926,130 @@ class spell_item_fangs_of_the_father_fury_of_the_destroyer : public SpellScriptL
         }
 };
 
+// 7434 - Fate Rune of Unsurpassed Vigor
+class spell_item_fate_rune_of_unsurpassed_vigor : public SpellScriptLoader
+{
+public:
+    spell_item_fate_rune_of_unsurpassed_vigor() : SpellScriptLoader("spell_item_fate_rune_of_unsurpassed_vigor") { }
+
+    class spell_item_fate_rune_of_unsurpassed_vigor_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_item_fate_rune_of_unsurpassed_vigor_AuraScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            if (!sSpellMgr->GetSpellInfo(SPELL_UNSURPASSED_VIGOR))
+                return false;
+            return true;
+        }
+
+        void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
+        {
+            GetTarget()->CastSpell(GetTarget(), SPELL_UNSURPASSED_VIGOR, true);
+        }
+
+        void Register() override
+        {
+            OnEffectProc += AuraEffectProcFn(spell_item_fate_rune_of_unsurpassed_vigor_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_item_fate_rune_of_unsurpassed_vigor_AuraScript();
+    }
+};
+
+// 79637
+class spell_item_flask_of_enhancement : public SpellScriptLoader
+{
+public:
+    spell_item_flask_of_enhancement() : SpellScriptLoader("spell_item_flask_of_enhancement") { }
+
+    class spell_item_flask_of_enhancement_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_item_flask_of_enhancement_SpellScript);
+
+        bool Validate(SpellInfo const* /*spellEntry*/)
+        {
+            if (!sSpellMgr->GetSpellInfo(SPELL_FLASK_OF_ENHANCEMENT_STR) || !sSpellMgr->GetSpellInfo(SPELL_FLASK_OF_ENHANCEMENT_AP) || !sSpellMgr->GetSpellInfo(SPELL_FLASK_OF_ENHANCEMENT_SP))
+                return false;
+            return true;
+        }
+
+        void HandleDummy(SpellEffIndex /*effIndex*/)
+        {
+            Unit* caster = GetCaster();
+            if (caster->GetStat(STAT_AGILITY) > std::max(caster->GetStat(STAT_INTELLECT), caster->GetStat(STAT_STRENGTH))) // Druid CAC
+            {
+                caster->CastSpell(caster, SPELL_FLASK_OF_ENHANCEMENT_AP, true, NULL);
+            }
+            else
+                if (caster->GetStat(STAT_STRENGTH) > std::max(caster->GetStat(STAT_INTELLECT), caster->GetStat(STAT_AGILITY))) // PALA CAC
+                {
+                    caster->CastSpell(caster, SPELL_FLASK_OF_ENHANCEMENT_STR, true, NULL);
+                }
+                else
+                    if (caster->GetStat(STAT_INTELLECT) > std::max(caster->GetStat(STAT_AGILITY), caster->GetStat(STAT_STRENGTH))) // PALA Heal
+                    {
+                        caster->CastSpell(caster, SPELL_FLASK_OF_ENHANCEMENT_SP, true, NULL);
+                    }
+        }
+
+        void Register()
+        {
+            OnEffectHit += SpellEffectFn(spell_item_flask_of_enhancement_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_item_flask_of_enhancement_SpellScript();
+    }
+};
+
+// 82626
+class spell_item_grounded_plasma_shield : public SpellScriptLoader
+{
+public:
+    spell_item_grounded_plasma_shield() : SpellScriptLoader("spell_item_grounded_plasma_shield") { }
+
+    class spell_item_grounded_plasma_shield_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_item_grounded_plasma_shield_SpellScript);
+
+        bool Load()
+        {
+            if (GetCastItem())
+                return false;
+            return true;
+        }
+
+        bool Validate(SpellInfo const* /*spell*/)
+        {
+            if (!sSpellMgr->GetSpellInfo(SPELL_GROUNDED_PLASMA_SHIELD_SUCCESS) || !sSpellMgr->GetSpellInfo(SPELL_REVERSED_SHIELD) || !sSpellMgr->GetSpellInfo(SPELL_MAGNETIZED) || !sSpellMgr->GetSpellInfo(SPELL_PAINFUL_SHOCK))
+                return false;
+            return true;
+        }
+
+        void HandleDummy(SpellEffIndex /* effIndex */)
+        {
+            Unit* caster = GetCaster();
+            // Need more random 1/4 bad sideeffect spells
+            caster->CastSpell(caster, roll_chance_i(95) ? SPELL_GROUNDED_PLASMA_SHIELD_SUCCESS : SPELL_REVERSED_SHIELD, true, GetCastItem());
+        }
+
+        void Register()
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_item_grounded_plasma_shield_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_item_grounded_plasma_shield_SpellScript();
+    }
+};
 
 void AddSC_item_spell_scripts()
 {
@@ -2978,9 +3112,12 @@ void AddSC_item_spell_scripts()
     new spell_item_unsated_craving();
     new spell_item_unusual_compass();
     new spell_item_vanquished_clutches();
-    
     new spell_magic_eater_food();
-	new spell_item_dragonwrath_tarecgosas_rest();
-		new spell_item_fangs_of_the_father();
-new spell_item_fangs_of_the_father_fury_of_the_destroyer();
+    new spell_item_dragonwrath_tarecgosas_rest();
+    new spell_item_fangs_of_the_father();
+    new spell_item_fangs_of_the_father_fury_of_the_destroyer();
+    new spell_item_fate_rune_of_unsurpassed_vigor();
+    new spell_item_flask_of_enhancement();
+    new spell_item_grounded_plasma_shield();
+
 }

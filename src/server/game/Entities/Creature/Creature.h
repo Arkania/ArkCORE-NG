@@ -486,6 +486,8 @@ class Creature : public Unit, public GridObject<Creature>, public MapObject
         bool HasReactState(ReactStates state) const { return (m_reactState == state); }
         void InitializeReactState();
 
+        bool HasMechanicTemplateImmunity(uint32 mask) const;
+
         /// @todo Rename these properly
         bool isCanInteractWithBattleMaster(Player* player, bool msg) const;
         bool isCanTrainingAndResetTalentsOf(Player* player) const;

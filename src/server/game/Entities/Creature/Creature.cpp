@@ -874,6 +874,11 @@ void Creature::InitializeReactState()
     SetReactState(REACT_DEFENSIVE);*/;
 }
 
+bool Creature::HasMechanicTemplateImmunity(uint32 mask) const
+{
+    return !IS_PLAYER_GUID(GetOwnerGUID()) && (GetCreatureTemplate()->MechanicImmuneMask & mask);
+}
+
 bool Creature::isCanInteractWithBattleMaster(Player* player, bool msg) const
 {
     if (!IsBattleMaster())
