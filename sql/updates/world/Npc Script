@@ -1,0 +1,11 @@
+DELETE FROM spell_script_names WHERE spell_id=88254 and ScriptName="spell_swipe_honey_88254";
+INSERT INTO spell_script_names VALUES 
+(88254, "spell_swipe_honey_88254");
+
+DELETE FROM spell_script_names WHERE spell_id=47558 and ScriptName="npc_ferli_47558";
+INSERT INTO spell_script_names VALUES 
+(47558, "npc_ferli_47558");
+
+DELETE FROM spell_script_names WHERE spell_id=7584 and ScriptName="npc_wandering_forest_walker_7584";
+INSERT INTO spell_script_names VALUES 
+(7584, "npc_wandering_forest_walker_7584");
