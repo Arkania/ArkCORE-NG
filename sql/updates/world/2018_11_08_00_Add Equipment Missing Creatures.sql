@@ -1,5 +1,11 @@
+
 -- ADD EQUIPMENT MISSING CREATURES
-insert into `creature_equip_template` (`entry`, `id`, `itemEntry1`, `itemEntry2`, `itemEntry3`) V
+delete from creature_equip_template where entry in (37694, 42381, 38795, 37716, 38794, 38799, 
+38798, 38797, 38796, 44966, 870, 43433, 43434, 43432, 43435, 30481, 44954, 620, 23721, 39464, 
+40838, 10508, 36797, 36176, 39039, 34692, 43703, 43566, 42141, 36488, 38469, 50570, 14828, 
+38409, 38360, 24110, 234, 491, 39044, 39068, 41621);
+
+insert into `creature_equip_template` (`entry`, `id`, `itemEntry1`, `itemEntry2`, `itemEntry3`) VALUES 
 (37694,1,1905,0,2551),
 (42381,1,1905,0,2551),
 (38795,1,1905,0,2551),
@@ -40,5 +46,4 @@ insert into `creature_equip_template` (`entry`, `id`, `itemEntry1`, `itemEntry2`
 (491,1,1905,0,2551),
 (39044,1,1905,0,2551),
 (39068,1,1905,0,2551),
-(41621,1,1905,0,2551),
 (41621,1,1905,0,2551);
