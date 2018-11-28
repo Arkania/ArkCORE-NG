@@ -19,7 +19,7 @@ insert into `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 delete from `creature` where `id`=23537;
 
 /*
---dumping fire bunny spawns.
+-- dumping fire bunny spawns.
 */
 
 insert into `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseId`, `phaseGroup`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `VerifiedBuild`) values('290877','23537','0','1','1','1','0','0','0','0','-5751.98','-534.932','403.606','2.64025','300','0','0','4140','5502','0','0','0','0','0');
@@ -128,7 +128,7 @@ replace into `game_event_creature` (`eventEntry`, `guid`) values('12','290904');
 delete from `gameobject` where `id` in(186720,186234);
 
 /*
---dumping Fire effigy Gobj spawns.
+-- dumping Fire effigy Gobj spawns.
 */
 insert into `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseId`, `phaseGroup`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `VerifiedBuild`) values('400156','186720','530','3430','3430','1','0','0','9235.05','-6783.4','25.4426','1.5708','0','0','0.707107','0.707107','5','100','1','0');
 insert into `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseId`, `phaseGroup`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `VerifiedBuild`) values('400266','186720','530','3524','3524','1','0','0','-4207.84','-12276.7','3.82085','-0.069813','0','0','0.034899','-0.999391','2','100','1','0');
@@ -164,7 +164,7 @@ REPLACE INTO `game_event_gameobject` (`eventEntry`, `guid`) VALUES('12','400994'
 REPLACE INTO `game_event_gameobject` (`eventEntry`, `guid`) VALUES('12','400995');
 REPLACE INTO `game_event_gameobject` (`eventEntry`, `guid`) VALUES('12','400996');
 /*
---water bucket spawns.
+-- water bucket spawns.
 */
 
 insert into `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseId`, `phaseGroup`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `VerifiedBuild`) values('55128','186234','0','85','159','1','0','0','2232.6','276.236','33.5754','3.34265','0','0','0.994951','-0.100359','180','100','1','0');
@@ -180,7 +180,7 @@ insert into `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, 
 insert into `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseId`, `phaseGroup`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `VerifiedBuild`) values('400983','186234','0','12','79','1','0','0','-9432.36','60.6921','56.6166','1.87362','0','0','0.805671','0.592363','300','0','1','0');
 insert into `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseId`, `phaseGroup`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `VerifiedBuild`) values('400984','186234','530','3430','3665','1','0','0','9511.87','-6816.24','16.4917','1.97398','0','0','0.834371','0.551204','300','0','1','0');
 /*
---water bucket game_event entry
+-- water bucket game_event entry
 */
 
 replace into `game_event_gameobject` (`eventEntry`, `guid`) values('12','55123');
