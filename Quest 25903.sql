@@ -2,7 +2,7 @@
 -- Fix's issue First part where two of each boss is visble.
 update creature set phaseid=378 where guid in (248315,248255,282942);
 
---add some fight flavor to mini boss's.
+-- add some fight flavor to mini boss's.
 UPDATE `creature_template` SET `AIName`='SmartAI' WHERE `entry` IN(39141,39142,39143);
 
 DELETE FROM `smart_scripts` where `entryorguid` IN(39141,39142,39143);
@@ -19,7 +19,7 @@ insert into `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 insert into `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) values('39143','0','2','0','61','0','100','0','0','0','0','0','11','79862','0','0','0','0','0','2','0','0','0','0','0','0','0','Alexi  OnLink. cast backstab.');
 insert into `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) values('39143','0','3','0','0','0','100','0','1000','1000','2000','2000','11','79863','32','0','0','0','0','2','0','0','0','0','0','0','0','Alexi  InCombat. Hemorrhage.');
 
---Enable blizzlike fights to some Lost Isle's, Tranquil Coast npc's.
+-- Enable blizzlike fights to some Lost Isle's, Tranquil Coast npc's.
 
 UPDATE `creature_template` SET `AIName`='SmartAI' WHERE `entry` IN(39042,39044,39068,40785);
 
