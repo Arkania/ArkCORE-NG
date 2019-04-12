@@ -59,8 +59,7 @@ enum WarlockSpells
     SPELL_WARLOCK_IMPROVED_HEALTH_FUNNEL_BUFF_R2    = 60956,
     SPELL_WARLOCK_IMPROVED_HEALTH_FUNNEL_R1         = 18703,
     SPELL_WARLOCK_IMPROVED_HEALTH_FUNNEL_R2         = 18704,
-    SPELL_WARLOCK_IMPROVED_SOUL_FIRE_PCT            = 85383,
-    SPELL_WARLOCK_IMPROVED_SOUL_FIRE_STATE          = 85385,
+    SPELL_WARLOCK_IMPROVED_SOUL_FIRE	            = 85383,
     SPELL_WARLOCK_LIFE_TAP_ENERGIZE                 = 31818,
     SPELL_WARLOCK_LIFE_TAP_ENERGIZE_2               = 32553,
     SPELL_WARLOCK_NETHER_WARD                       = 91711,
@@ -84,7 +83,8 @@ enum WarlockSpells
 enum WarlockSpellIcons
 {
     WARLOCK_ICON_ID_IMPROVED_LIFE_TAP               = 208,
-    WARLOCK_ICON_ID_MANA_FEED                       = 1982
+    WARLOCK_ICON_ID_MANA_FEED                       = 1982,
+	WARLOCK_ICON_SOULFIRE							= 184
 };
 
 enum MiscSpells
@@ -1498,6 +1498,47 @@ public:
     }
 };
 
+// 6353 Soulfire
+// Updated 4.3.4
+class spell_warl_soulfire : public SpellScriptLoader
+{
+public:
+	spell_warl_soulfire() : SpellScriptLoader("spell_warl_soulfire") { }
+
+	class spell_warl_soulfire_SpellScript : public SpellScript
+	{
+		PrepareSpellScript(spell_warl_soulfire_SpellScript);
+
+		bool Validate(SpellInfo const* /*spellInfo*/)
+		{
+			if (!sSpellMgr->GetSpellInfo(SPELL_WARLOCK_IMPROVED_SOUL_FIRE))
+				return false;
+			return true;
+		}
+
+		void HandleDummy(SpellEffIndex /*effIndex*/)
+		{
+			if (Unit* caster = GetCaster())
+				if (AuraEffect* aurEff = caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_WARLOCK, WARLOCK_ICON_SOULFIRE, EFFECT_0))
+				{
+					int32 basepoints = aurEff->GetAmount();
+					caster->CastCustomSpell(caster, SPELL_WARLOCK_IMPROVED_SOUL_FIRE, &basepoints, NULL, NULL, true);
+				}
+		}
+
+		void Register()
+		{
+			OnEffectHitTarget += SpellEffectFn(spell_warl_soulfire_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+		}
+	};
+
+	SpellScript* GetSpellScript() const
+	{
+		return new spell_warl_soulfire_SpellScript();
+	}
+};
+
+
 void AddSC_warlock_spell_scripts()
 {
     new spell_warl_aftermath();
@@ -1531,13 +1572,5 @@ void AddSC_warlock_spell_scripts()
     new spell_warl_unstable_affliction();
     new spell_warl_drain_life();
     new spell_warl_drain_soul();
+	new spell_warl_soulfire();
 }
-
-/*  found old spells there now are part of core
-
-    new spell_warl_improved_soul_fire();
-
-*/
-
-
-
