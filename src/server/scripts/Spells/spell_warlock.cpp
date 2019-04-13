@@ -59,13 +59,11 @@ enum WarlockSpells
     SPELL_WARLOCK_IMPROVED_HEALTH_FUNNEL_BUFF_R2    = 60956,
     SPELL_WARLOCK_IMPROVED_HEALTH_FUNNEL_R1         = 18703,
     SPELL_WARLOCK_IMPROVED_HEALTH_FUNNEL_R2         = 18704,
-    SPELL_WARLOCK_IMPROVED_SOUL_FIRE_PCT            = 85383,
-    SPELL_WARLOCK_IMPROVED_SOUL_FIRE_STATE          = 85385,
+    SPELL_WARLOCK_IMPROVED_SOUL_FIRE	            = 85383,
     SPELL_WARLOCK_LIFE_TAP_ENERGIZE                 = 31818,
     SPELL_WARLOCK_LIFE_TAP_ENERGIZE_2               = 32553,
     SPELL_WARLOCK_NETHER_WARD                       = 91711,
     SPELL_WARLOCK_NETHER_TALENT                     = 91713,
-    SPELL_WARLOCK_RAIN_OF_FIRE                      = 42223,
     SPELL_WARLOCK_SHADOW_TRANCE                     = 17941,
     SPELL_WARLOCK_SIPHON_LIFE_HEAL                  = 63106,
     SPELL_WARLOCK_SHADOW_WARD                       = 6229,
@@ -84,7 +82,8 @@ enum WarlockSpells
 enum WarlockSpellIcons
 {
     WARLOCK_ICON_ID_IMPROVED_LIFE_TAP               = 208,
-    WARLOCK_ICON_ID_MANA_FEED                       = 1982
+    WARLOCK_ICON_ID_MANA_FEED                       = 1982,
+	WARLOCK_ICON_SOULFIRE							= 184
 };
 
 enum MiscSpells
@@ -93,45 +92,6 @@ enum MiscSpells
     SPELL_PRIEST_SHADOW_WORD_DEATH                  = 32409
 };
 
-// -85113 - Aftermath
-class spell_warl_aftermath : public SpellScriptLoader
-{
-    public:
-        spell_warl_aftermath() : SpellScriptLoader("spell_warl_aftermath") { }
-
-        class spell_warl_aftermath_AuraScript : public AuraScript
-        {
-            PrepareAuraScript(spell_warl_aftermath_AuraScript);
-
-            bool Validate(SpellInfo const* /*spellInfo*/) override
-            {
-                if (!sSpellMgr->GetSpellInfo(SPELL_WARLOCK_AFTERMATH_STUN))
-                    return false;
-                return true;
-            }
-
-            void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
-            {
-                if (eventInfo.GetDamageInfo()->GetSpellInfo()->Id == SPELL_WARLOCK_RAIN_OF_FIRE)
-                {
-                    PreventDefaultAction();
-
-                    if (eventInfo.GetProcTarget() && roll_chance_i(aurEff->GetAmount()))
-                        GetTarget()->CastSpell(eventInfo.GetProcTarget(), SPELL_WARLOCK_AFTERMATH_STUN, true, NULL, aurEff);
-                }
-            }
-
-            void Register() override
-            {
-                OnEffectProc += AuraEffectProcFn(spell_warl_aftermath_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
-            }
-        };
-
-        AuraScript* GetAuraScript() const override
-        {
-            return new spell_warl_aftermath_AuraScript();
-        }
-};
 
 // 710 - Banish
 class spell_warl_banish : public SpellScriptLoader
@@ -1498,9 +1458,79 @@ public:
     }
 };
 
+// 6353 Soulfire
+// Updated 4.3.4
+class spell_warl_soulfire : public SpellScriptLoader
+{
+public:
+	spell_warl_soulfire() : SpellScriptLoader("spell_warl_soulfire") { }
+
+	class spell_warl_soulfire_SpellScript : public SpellScript
+	{
+		PrepareSpellScript(spell_warl_soulfire_SpellScript);
+
+		bool Validate(SpellInfo const* /*spellInfo*/)
+		{
+			if (!sSpellMgr->GetSpellInfo(SPELL_WARLOCK_IMPROVED_SOUL_FIRE))
+				return false;
+			return true;
+		}
+
+		void HandleDummy(SpellEffIndex /*effIndex*/)
+		{
+			if (Unit* caster = GetCaster())
+				if (AuraEffect* aurEff = caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_WARLOCK, WARLOCK_ICON_SOULFIRE, EFFECT_0))
+				{
+					int32 basepoints = aurEff->GetAmount();
+					caster->CastCustomSpell(caster, SPELL_WARLOCK_IMPROVED_SOUL_FIRE, &basepoints, NULL, NULL, true);
+				}
+		}
+
+		void Register()
+		{
+			OnEffectHitTarget += SpellEffectFn(spell_warl_soulfire_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+		}
+	};
+
+	SpellScript* GetSpellScript() const
+	{
+		return new spell_warl_soulfire_SpellScript();
+	}
+};
+
+
+// Rain of fire
+class spell_warl_rain_of_fire : public SpellScriptLoader
+{
+public:
+	spell_warl_rain_of_fire() : SpellScriptLoader("spell_warl_rain_of_fire") { }
+
+	class spell_warl_rain_of_fire_SpellScript : public SpellScript
+	{
+		PrepareSpellScript(spell_warl_rain_of_fire_SpellScript);
+
+		void HandleHit(SpellEffIndex /*effIndex*/)
+		{
+			Unit* caster = GetCaster();
+			if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_AURA_PROC_TRIGGER_SPELL, SPELLFAMILY_WARLOCK, 11, EFFECT_0))
+				if (roll_chance_i(aurEff->GetSpellInfo()->Effects[EFFECT_1].BasePoints))
+					caster->CastSpell(GetHitUnit(), SPELL_WARLOCK_AFTERMATH_STUN, true);
+		}
+
+		void Register()
+		{
+			OnEffectHitTarget += SpellEffectFn(spell_warl_rain_of_fire_SpellScript::HandleHit, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+		}
+	};
+
+	SpellScript* GetSpellScript() const
+	{
+		return new spell_warl_rain_of_fire_SpellScript();
+	}
+};
+
 void AddSC_warlock_spell_scripts()
 {
-    new spell_warl_aftermath();
     new spell_warl_bane_of_doom();
     new spell_warl_banish();
     new spell_warl_conflagrate();
@@ -1531,13 +1561,6 @@ void AddSC_warlock_spell_scripts()
     new spell_warl_unstable_affliction();
     new spell_warl_drain_life();
     new spell_warl_drain_soul();
+    new spell_warl_soulfire();
+    new spell_warl_rain_of_fire();
 }
-
-/*  found old spells there now are part of core
-
-    new spell_warl_improved_soul_fire();
-
-*/
-
-
-
