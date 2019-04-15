@@ -6707,6 +6707,30 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     target = victim;
                     break;
                 }
+				// Long Arm of the Law
+				case 87168:
+				case 87172:
+				{
+					if (!target)
+						return false;
+
+					if (GetDistance(target) < 15.0f)
+						return false;
+
+					int32 chance = triggerAmount;
+					if (!roll_chance_i(chance))
+						return false;
+
+					// Only Judgement can enable the proc
+					if (procSpell && procSpell->Id == 54158)
+					{
+						if (procEx & PROC_EX_ABSORB)
+							CastSpell(this, 87173, true);
+						else
+							triggered_spell_id = 87173;
+					}
+					break;
+				}
                 // Item - Icecrown 25 Normal Dagger Proc
                 case 71880:
                 {
