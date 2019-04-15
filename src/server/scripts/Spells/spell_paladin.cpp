@@ -44,9 +44,8 @@ enum PaladinSpells
     SPELL_PALADIN_DIVINE_STORM = 53385,
     SPELL_PALADIN_DIVINE_STORM_DUMMY = 54171,
     SPELL_PALADIN_DIVINE_STORM_HEAL = 54172,
-    SPELL_PALADIN_EYE_FOR_AN_EYE_RANK_1 = 9799,
-    SPELL_PALADIN_EYE_FOR_AN_EYE_RANK_2 = 25998,
     SPELL_PALADIN_EYE_FOR_AN_EYE_DAMAGE = 25997,
+	SPELL_PALADIN_EYE_FOR_AN_EYE_RANK_1 = 9799,
     SPELL_PALADIN_FORBEARANCE = 25771,
     SPELL_PALADIN_GLYPH_OF_SALVATION = 63225,
     SPELL_PALADIN_HAND_OF_SACRIFICE = 6940,
@@ -607,36 +606,34 @@ public:
 class spell_pal_eye_for_an_eye : public SpellScriptLoader
 {
 public:
-    spell_pal_eye_for_an_eye() : SpellScriptLoader("spell_pal_eye_for_an_eye") { }
+	spell_pal_eye_for_an_eye() : SpellScriptLoader("spell_pal_eye_for_an_eye") { }
 
-    class spell_pal_eye_for_an_eye_AuraScript : public AuraScript
-    {
-        PrepareAuraScript(spell_pal_eye_for_an_eye_AuraScript);
+	class spell_pal_eye_for_an_eye_AuraScript : public AuraScript
+	{
+		PrepareAuraScript(spell_pal_eye_for_an_eye_AuraScript);
 
-        bool Validate(SpellInfo const* /*spellInfo*/) override
-        {
-            if (!sSpellMgr->GetSpellInfo(SPELL_PALADIN_EYE_FOR_AN_EYE_DAMAGE))
-                return false;
-            return true;
-        }
+		bool Validate(SpellInfo const* /*spellInfo*/) override
+		{
+			return ValidateSpellInfo({ SPELL_PALADIN_EYE_FOR_AN_EYE_DAMAGE });
+		}
 
-        void HandleEffectProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
-        {
-            PreventDefaultAction();
-            int32 damage = CalculatePct(eventInfo.GetDamageInfo()->GetDamage(), aurEff->GetAmount());
-            GetTarget()->CastCustomSpell(SPELL_PALADIN_EYE_FOR_AN_EYE_DAMAGE, SPELLVALUE_BASE_POINT0, damage, eventInfo.GetProcTarget(), true, NULL, aurEff);
-        }
+		void HandleEffectProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+		{
+			PreventDefaultAction();
+			int32 damage = CalculatePct(eventInfo.GetDamageInfo()->GetDamage(), aurEff->GetAmount());
+			GetTarget()->CastCustomSpell(SPELL_PALADIN_EYE_FOR_AN_EYE_DAMAGE, SPELLVALUE_BASE_POINT0, damage, eventInfo.GetProcTarget(), true, nullptr, aurEff);
+		}
 
-        void Register() override
-        {
-            OnEffectProc += AuraEffectProcFn(spell_pal_eye_for_an_eye_AuraScript::HandleEffectProc, EFFECT_0, m_scriptSpellId == SPELL_PALADIN_EYE_FOR_AN_EYE_RANK_1 ? SPELL_AURA_DUMMY : SPELL_AURA_PROC_TRIGGER_SPELL);
-        }
-    };
+		void Register() override
+		{
+			OnEffectProc += AuraEffectProcFn(spell_pal_eye_for_an_eye_AuraScript::HandleEffectProc, EFFECT_0, m_scriptSpellId == SPELL_PALADIN_EYE_FOR_AN_EYE_RANK_1 ? SPELL_AURA_DUMMY : SPELL_AURA_PROC_TRIGGER_SPELL);
+		}
+	};
 
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_pal_eye_for_an_eye_AuraScript();
-    }
+	AuraScript* GetAuraScript() const override
+	{
+		return new spell_pal_eye_for_an_eye_AuraScript();
+	}
 };
 
 // -75806 - Grand Crusader
