@@ -1,5 +1,5 @@
 # Set build-directive (used in core to tell which buildtype we used)
-add_definitions(-D_BUILD_DIRECTIVE='"${CMAKE_BUILD_TYPE}"')
+add_definitions(-D_BUILD_DIRECTIVE=${CMAKE_BUILD_TYPE})
 
 set(GCC_EXPECTED_VERSION 4.7.2)
 

@@ -25,6 +25,7 @@
 #include "Chat.h"
 #include "Common.h"
 #include "DatabaseEnv.h"
+#include "GitRevision.h"
 #include "Group.h"
 #include "Guild.h"
 #include "GuildFinderMgr.h"
@@ -966,7 +967,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
 
         // send server info
         if (sWorld->getIntConfig(CONFIG_ENABLE_SINFO_LOGIN) == 1)
-            chH.PSendSysMessage(_FULLVERSION);
+            chH.PSendSysMessage(GitRevision::GetFullVersion());
 
         TC_LOG_DEBUG("network", "WORLD: Sent server info");
     }

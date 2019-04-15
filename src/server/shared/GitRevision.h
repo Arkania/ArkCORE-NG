@@ -1,7 +1,5 @@
 /*
- * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2011-2016 ArkCORE <http://www.arkania.net/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2008-2018 TrinityCore <https://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -17,18 +15,28 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// THIS FILE IS DEPRECATED
-
-#ifndef TRINITY_SYSTEMCONFIG_H
-#define TRINITY_SYSTEMCONFIG_H
+#ifndef __GITREVISION_H__
+#define __GITREVISION_H__
 
 #include "Define.h"
-#include "revision.h"
 
-#if TRINITY_ENDIAN == TRINITY_BIGENDIAN
-# define _ENDIAN_STRING "big-endian"
-#else
-# define _ENDIAN_STRING "little-endian"
-#endif
+namespace GitRevision
+{
+    char const* GetHash();
+    char const* GetDate();
+    char const* GetBranch();
+    char const* GetCMakeCommand();
+    char const* GetCMakeVersion();
+    char const* GetHostOSVersion();
+    char const* GetBuildDirectory();
+    char const* GetSourceDirectory();
+    char const* GetMySQLExecutable();
+    char const* GetFullDatabase();
+    char const* GetFullVersion();
+    char const* GetCompanyNameStr();
+    char const* GetLegalCopyrightStr();
+    char const* GetFileVersionStr();
+    char const* GetProductVersionStr();
+}
 
 #endif

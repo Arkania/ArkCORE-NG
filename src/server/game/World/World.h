@@ -766,6 +766,8 @@ class World
         // used World DB version
         void LoadDBVersion();
         char const* GetDBVersion() const { return m_DBVersion.c_str(); }
+        char const* GetCoreVersion() const { return m_CoreVersion.c_str(); }
+        char const* GetCoreRevision() const { return m_CoreRevision.c_str(); }
 
         void RecordTimeDiff(const char * text, ...);
 
@@ -876,6 +878,8 @@ class World
         ACE_Based::LockedQueue<WorldSession*, ACE_Thread_Mutex> addSessQueue;
 
         // used versions
+        std::string m_CoreVersion;
+        std::string m_CoreRevision;
         std::string m_DBVersion;
 
         typedef std::map<uint8, std::string> AutobroadcastsMap;

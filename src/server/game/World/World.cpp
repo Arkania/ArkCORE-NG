@@ -22,6 +22,7 @@
 */
 #include "AuctionHouseBot.h"
 #include "Common.h"
+#include "GitRevision.h"
 #include "Memory.h"
 #include "DatabaseEnv.h"
 #include "Config.h"
@@ -1817,7 +1818,7 @@ void World::SetInitialWorldSettings()
     m_startTime = m_gameTime;
 
     LoginDatabase.PExecute("INSERT INTO uptime (realmid, starttime, uptime, revision) VALUES(%u, %u, 0, '%s')",
-                            realmID, uint32(m_startTime), _FULLVERSION);       // One-time query
+                            realmID, uint32(m_startTime), GitRevision::GetFullVersion());       // One-time query
 
     m_timers[WUPDATE_WEATHERS].SetInterval(1*IN_MILLISECONDS);
     m_timers[WUPDATE_AUCTIONS].SetInterval(MINUTE*IN_MILLISECONDS);
@@ -3131,16 +3132,22 @@ void World::UpdateMaxSessionCounters()
 
 void World::LoadDBVersion()
 {
-    QueryResult result = WorldDatabase.Query("SELECT db_version, cache_id FROM version LIMIT 1");
+    QueryResult result = WorldDatabase.Query("SELECT core_version, core_revision, db_version, cache_id FROM version LIMIT 1");
     if (result)
     {
         Field* fields = result->Fetch();
 
-        m_DBVersion = fields[0].GetString();
+        m_CoreVersion = fields[0].GetString();
+        m_CoreRevision = fields[1].GetString();
+        m_DBVersion = fields[2].GetString();
         // will be overwrite by config values if different and non-0
-        m_int_configs[CONFIG_CLIENTCACHE_VERSION] = fields[1].GetUInt32();
+        m_int_configs[CONFIG_CLIENTCACHE_VERSION] = fields[3].GetUInt32();
     }
 
+    if (m_CoreVersion.empty())
+        m_CoreVersion = "Unknown core version.";
+    if (m_CoreRevision.empty())
+        m_CoreRevision = "Unknown core revision.";
     if (m_DBVersion.empty())
         m_DBVersion = "Unknown world database.";
 }

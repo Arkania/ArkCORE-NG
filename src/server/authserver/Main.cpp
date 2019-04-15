@@ -35,6 +35,7 @@
 #include "Common.h"
 #include "Database/DatabaseEnv.h"
 #include "Configuration/Config.h"
+#include "GitRevision.h"
 #include "Log.h"
 #include "SystemConfig.h"
 #include "Util.h"
@@ -112,7 +113,7 @@ extern int main(int argc, char** argv)
         return 1;
     }
 
-    TC_LOG_INFO("server.authserver", "%s (authserver)", _FULLVERSION);
+    TC_LOG_INFO("server.authserver", "%s (authserver)", GitRevision::GetFullVersion());
     TC_LOG_INFO("server.authserver", " ");
     TC_LOG_INFO("server.authserver", " A World of Warcraft Cataclsym 4.3.4 Emulator    ");
     TC_LOG_INFO("server.authserver", "       _/_/              _/          _/_/_/    _/_/    _/_/_/    _/_/_/_/  ");
