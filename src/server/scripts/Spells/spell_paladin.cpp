@@ -44,9 +44,8 @@ enum PaladinSpells
     SPELL_PALADIN_DIVINE_STORM = 53385,
     SPELL_PALADIN_DIVINE_STORM_DUMMY = 54171,
     SPELL_PALADIN_DIVINE_STORM_HEAL = 54172,
-    SPELL_PALADIN_EYE_FOR_AN_EYE_RANK_1 = 9799,
-    SPELL_PALADIN_EYE_FOR_AN_EYE_RANK_2 = 25998,
     SPELL_PALADIN_EYE_FOR_AN_EYE_DAMAGE = 25997,
+	SPELL_PALADIN_EYE_FOR_AN_EYE_RANK_1 = 9799,
     SPELL_PALADIN_FORBEARANCE = 25771,
     SPELL_PALADIN_GLYPH_OF_SALVATION = 63225,
     SPELL_PALADIN_HAND_OF_SACRIFICE = 6940,
@@ -58,7 +57,6 @@ enum PaladinSpells
     SPELL_PALADIN_IMPROVED_CONCENTRACTION_AURA = 63510,
     SPELL_PALADIN_IMPROVED_DEVOTION_AURA = 63514,
     SPELL_PALADIN_ITEM_HEALING_TRANCE = 37706,
-    SPELL_PALADIN_JUDGEMENT_DAMAGE = 54158,
     SPELL_PALADIN_RIGHTEOUS_DEFENSE_TAUNT = 31790,
     SPELL_PALADIN_SANCTIFIED_RETRIBUTION_AURA = 63531,
     SPELL_PALADIN_SANCTIFIED_RETRIBUTION_R1 = 31869,
@@ -82,8 +80,7 @@ enum PaladinSpells
     SPELL_PALADIN_GUARDED_BY_THE_LIGHT = 85639,
     SPELL_PALADIN_GLYPH_OF_LONG_WORD = 93466,
     SPELL_PALADIN_ETERNAL_GLORY_R1 = 87163,
-    SPELL_PALADIN_LONG_ARM_OF_THE_LAW = 87168,
-    SPELL_PALADIN_GOAK_HOLY_SUMMON = 86669,
+	SPELL_PALADIN_GOAK_HOLY_SUMMON = 86669,
     SPELL_PALADIN_GOAK_ANCIENT_HEALER = 86674,
     SPELL_PALADIN_GOAK_PROTECTION_SUMMON = 86659,
     SPELL_PALADIN_GOAK_RETRIBUTION_SUMMON = 86698,
@@ -607,36 +604,34 @@ public:
 class spell_pal_eye_for_an_eye : public SpellScriptLoader
 {
 public:
-    spell_pal_eye_for_an_eye() : SpellScriptLoader("spell_pal_eye_for_an_eye") { }
+	spell_pal_eye_for_an_eye() : SpellScriptLoader("spell_pal_eye_for_an_eye") { }
 
-    class spell_pal_eye_for_an_eye_AuraScript : public AuraScript
-    {
-        PrepareAuraScript(spell_pal_eye_for_an_eye_AuraScript);
+	class spell_pal_eye_for_an_eye_AuraScript : public AuraScript
+	{
+		PrepareAuraScript(spell_pal_eye_for_an_eye_AuraScript);
 
-        bool Validate(SpellInfo const* /*spellInfo*/) override
-        {
-            if (!sSpellMgr->GetSpellInfo(SPELL_PALADIN_EYE_FOR_AN_EYE_DAMAGE))
-                return false;
-            return true;
-        }
+		bool Validate(SpellInfo const* /*spellInfo*/) override
+		{
+			return ValidateSpellInfo({ SPELL_PALADIN_EYE_FOR_AN_EYE_DAMAGE });
+		}
 
-        void HandleEffectProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
-        {
-            PreventDefaultAction();
-            int32 damage = CalculatePct(eventInfo.GetDamageInfo()->GetDamage(), aurEff->GetAmount());
-            GetTarget()->CastCustomSpell(SPELL_PALADIN_EYE_FOR_AN_EYE_DAMAGE, SPELLVALUE_BASE_POINT0, damage, eventInfo.GetProcTarget(), true, NULL, aurEff);
-        }
+		void HandleEffectProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+		{
+			PreventDefaultAction();
+			int32 damage = CalculatePct(eventInfo.GetDamageInfo()->GetDamage(), aurEff->GetAmount());
+			GetTarget()->CastCustomSpell(SPELL_PALADIN_EYE_FOR_AN_EYE_DAMAGE, SPELLVALUE_BASE_POINT0, damage, eventInfo.GetProcTarget(), true, nullptr, aurEff);
+		}
 
-        void Register() override
-        {
-            OnEffectProc += AuraEffectProcFn(spell_pal_eye_for_an_eye_AuraScript::HandleEffectProc, EFFECT_0, m_scriptSpellId == SPELL_PALADIN_EYE_FOR_AN_EYE_RANK_1 ? SPELL_AURA_DUMMY : SPELL_AURA_PROC_TRIGGER_SPELL);
-        }
-    };
+		void Register() override
+		{
+			OnEffectProc += AuraEffectProcFn(spell_pal_eye_for_an_eye_AuraScript::HandleEffectProc, EFFECT_0, m_scriptSpellId == SPELL_PALADIN_EYE_FOR_AN_EYE_RANK_1 ? SPELL_AURA_DUMMY : SPELL_AURA_PROC_TRIGGER_SPELL);
+		}
+	};
 
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_pal_eye_for_an_eye_AuraScript();
-    }
+	AuraScript* GetAuraScript() const override
+	{
+		return new spell_pal_eye_for_an_eye_AuraScript();
+	}
 };
 
 // -75806 - Grand Crusader
@@ -961,52 +956,61 @@ public:
     }
 };
 
-// 20271 - Judgement (based on Seal to judge)
-class spell_pal_judgement_20271 : public SpellScriptLoader
+// 20271 - Judgement
+class spell_pal_judgement : public SpellScriptLoader
 {
 public:
-    spell_pal_judgement_20271() : SpellScriptLoader("spell_pal_judgement_20271") { }
+	spell_pal_judgement() : SpellScriptLoader("spell_pal_judgement") { }
 
-    class spell_pal_judgement_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_pal_judgement_SpellScript);
+	class spell_pal_judgement_SpellScript : public SpellScript
+	{
+		PrepareSpellScript(spell_pal_judgement_SpellScript)
 
-        bool Validate(SpellInfo const* /*spellInfo*/) override
-        {
-            if (!sSpellMgr->GetSpellInfo(SPELL_PALADIN_JUDGEMENT_DAMAGE))
-                return false;
-            return true;
-        }
+			enum spellId
+		{
+			SPELL_JUDGEMENT_DAMAGE = 54158,
+			TALENT_COMMUNION = 31876,
+			SPELL_REFRESH = 57669,
+			TALENT_JUDGEMENT_BOLD = 89901,
+			SPELL_JUDGEMENT_BOLD = 89906,
+			TALENT_JUDGEMENT_WISE = 31878,
+			SPELL_JUDGEMENT_WISE = 31930,
+		};
 
-        void HandleScriptEffect(SpellEffIndex /*effIndex*/)
-        {
-            uint32 spellId = SPELL_PALADIN_JUDGEMENT_DAMAGE;
+		void HandleDummy(SpellEffIndex indx)
+		{
+			Unit *caster = GetCaster();
+			Unit *target = GetHitUnit();
 
-            // some seals have SPELL_AURA_DUMMY in EFFECT_2
-            Unit::AuraEffectList const& auras = GetCaster()->GetAuraEffectsByType(SPELL_AURA_DUMMY);
-            for (Unit::AuraEffectList::const_iterator i = auras.begin(); i != auras.end(); ++i)
-            {
-                if ((*i)->GetSpellInfo()->GetSpellSpecific() == SPELL_SPECIFIC_SEAL && (*i)->GetEffIndex() == EFFECT_2)
-                    if (sSpellMgr->GetSpellInfo((*i)->GetAmount()))
-                    {
-                        spellId = (*i)->GetAmount();
-                        break;
-                    }
-            }
+			if (!target || !caster)
+				return;
 
-            GetCaster()->CastSpell(GetHitUnit(), spellId, true);
-        }
+			// For paladin quests that require judgement credit
+			if (caster->GetTypeId() == TYPEID_PLAYER && caster->getLevel() < 4)
+				caster->ToPlayer()->KilledMonsterCredit(44420);
 
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_pal_judgement_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
+			caster->CastSpell(target, SPELL_JUDGEMENT_DAMAGE, true);
 
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_pal_judgement_SpellScript();
-    }
+			if (caster->HasAura(TALENT_COMMUNION))
+				caster->CastSpell(caster, SPELL_REFRESH, true);
+
+			if (caster->HasAura(TALENT_JUDGEMENT_BOLD))
+				caster->CastSpell(caster, SPELL_JUDGEMENT_BOLD, true);
+
+			if (caster->HasAura(TALENT_JUDGEMENT_WISE))
+				caster->CastSpell(caster, SPELL_JUDGEMENT_WISE, true);
+		}
+
+		void Register()
+		{
+			OnEffectHitTarget += SpellEffectFn(spell_pal_judgement_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+		}
+	};
+
+	SpellScript* GetSpellScript() const
+	{
+		return new spell_pal_judgement_SpellScript();
+	}
 };
 
 // 633 - Lay on Hands
@@ -1955,49 +1959,6 @@ public:
     }
 };
 
-// -87168 - Long Arm of the Law (rang1, rang2=87172)
-class spell_pal_long_arm_of_the_law : public SpellScriptLoader
-{
-public:
-    spell_pal_long_arm_of_the_law() : SpellScriptLoader("spell_pal_long_arm_of_the_law") { }
-
-    class spell_pal_long_arm_of_the_law_AuraScript : public AuraScript
-    {
-        PrepareAuraScript(spell_pal_long_arm_of_the_law_AuraScript);
-
-        bool Validate(SpellInfo const* /*spellInfo*/) override
-        {
-            return ValidateSpellInfo({ SPELL_PALADIN_LONG_ARM_OF_THE_LAW });
-        }
-
-        bool CheckProc(ProcEventInfo& eventInfo)
-        {
-            if (roll_chance_i(GetEffect(EFFECT_0)->GetAmount()))
-                if (Spell const* spell = eventInfo.GetProcSpell())
-                    if (Unit* target = spell->m_targets.GetUnitTarget())
-                        return (eventInfo.GetActor()->GetDistance2d(target) > 15.0f);
-
-            return false;
-        }
-
-        void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
-        {
-            PreventDefaultAction();
-            GetTarget()->CastSpell(GetTarget(), SPELL_PALADIN_LONG_ARM_OF_THE_LAW, true, nullptr, aurEff);
-        }
-
-        void Register() override
-        {
-            DoCheckProc += AuraCheckProcFn(spell_pal_long_arm_of_the_law_AuraScript::CheckProc);
-            OnEffectProc += AuraEffectProcFn(spell_pal_long_arm_of_the_law_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_pal_long_arm_of_the_law_AuraScript();
-    }
-};
 
 // 86704 - Ancient Fury
 class spell_pal_ancient_fury : public SpellScriptLoader
@@ -2139,73 +2100,57 @@ public:
     }
 };
 
-// 54158 Judgement (based on Seals for Judgement )
-class spell_pal_judgement_54158 : public SpellScriptLoader
+class spell_pal_judgement_damage : public SpellScriptLoader
 {
 public:
-    spell_pal_judgement_54158() : SpellScriptLoader("spell_pal_judgement_54158") { }
+	spell_pal_judgement_damage() : SpellScriptLoader("spell_pal_judgement_damage")
+	{
+	}
 
-    class spell_pal_judgement_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_pal_judgement_SpellScript);
+	class spell_pal_judgement_damage_SpellScript : public SpellScript
+	{
+		PrepareSpellScript(spell_pal_judgement_damage_SpellScript)
 
-        void HandleScriptEffect(SpellEffIndex /*effIndex*/)
-        {
-            Player* caster = GetCaster()->ToPlayer();
-            int32 spellPower = caster->SpellBaseDamageBonusDone(GetSpellInfo()->GetSchoolMask());
-            int32 attackPower = caster->GetTotalAttackPowerValue(BASE_ATTACK);
-            int32 basepoints0 = 0;
-            Unit::AuraApplicationMap & sealAuras = caster->GetAppliedAuras();
-            for (Unit::AuraApplicationMap::iterator iter = sealAuras.begin(); iter != sealAuras.end(); iter++)
-            {
-                Aura* aura = iter->second->GetBase();
-                if (aura->GetSpellInfo()->GetSpellSpecific() == SPELL_SPECIFIC_SEAL)
-                {
-                    switch (aura->GetSpellInfo()->Id)
-                    {
-                    case 20165: // Seal of Insight
-                        basepoints0 = 0.25f * spellPower + 0.16f * attackPower;
-                        break;
-                    case 20154: // Seal of Righteousness
-                        basepoints0 = 0.32f * spellPower + 0.2f * attackPower;
-                        break;
-                    case 20164: // Seal of Justice
-                        basepoints0 = 0.25f * spellPower + 0.16f * attackPower;
-                        break;
-                    case 31801: // Seal of Truth
-                    {
-                        basepoints0 = 0.223f * spellPower + 0.142f * attackPower;
-                        // Damage is increased by 20% per stack
-                        if (Aura* censure = GetHitUnit()->GetAura(31803, caster->GetGUID()))
-                            AddPct(basepoints0, censure->GetStackAmount() * 20);
-                        break;
-                    }
-                    }
-                    break;
-                }
-            }
-            caster->CastCustomSpell(GetHitUnit(), 54158, &basepoints0, NULL, NULL, true);
-            // Long arm of the law
-            if (AuraEffect* aurEff = caster->GetDummyAuraEffect(SPELLFAMILY_PALADIN, 3013, EFFECT_0))
-                if (roll_chance_i(aurEff->GetAmount()))
-                    if (caster->GetDistance(GetHitUnit()) > 15.0f)
-                        caster->CastSpell(caster, 87173, true);
+			enum spellId
+		{
+			SPELL_CENSURE = 31803,
+			SPELL_SEAL_OF_TRUTH = 31801
+		};
 
-            // Communion
-            if (AuraEffect* communion = caster->GetAuraEffect(31876, EFFECT_1, caster->GetGUID()))
-                caster->CastSpell(caster, 57669, true);
-        }
+		void CalculateDamage(SpellEffIndex /*effIndex*/)
+		{
+			Unit* caster = GetCaster();
+			Unit* target = GetHitUnit();
+			if (!caster || !target)
+				return;
 
-        void Register()
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_pal_judgement_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
-        }
-    };
+			uint32 damageOriginal = GetHitDamage();
+			uint32 censureMultiplier = 0;
+			uint32 damageFinal = 0;
 
-    SpellScript* GetSpellScript() const
-    {
-        return new spell_pal_judgement_SpellScript();
-    }
+			// Check for Censure debuff on target
+			if (Aura* censureStack = target->GetAura(SPELL_CENSURE, caster->GetGUID()))
+				censureMultiplier = censureStack->GetStackAmount();
+
+			damageFinal = AddPct(damageOriginal, (20 * censureMultiplier));
+
+			SetHitDamage(uint32(damageFinal));
+
+			// Apply seal of truth only if the damage is not absorbed
+			if (caster->HasAura(SPELL_SEAL_OF_TRUTH))
+				caster->CastSpell(target, SPELL_CENSURE, true);
+		}
+
+		void Register()
+		{
+			OnEffectHitTarget += SpellEffectFn(spell_pal_judgement_damage_SpellScript::CalculateDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+		}
+	};
+
+	SpellScript* GetSpellScript() const
+	{
+		return new spell_pal_judgement_damage_SpellScript();
+	}
 };
 
 void AddSC_paladin_spell_scripts()
@@ -2230,7 +2175,7 @@ void AddSC_paladin_spell_scripts()
     new spell_pal_improved_aura_effect("spell_pal_sanctified_retribution_effect");
     new spell_pal_item_healing_discount();
     new spell_pal_item_t6_trinket();
-    new spell_pal_judgement_20271();
+    new spell_pal_judgement();
     new spell_pal_lay_on_hands();
     new spell_pal_light_s_beacon();
     new spell_pal_righteous_defense();
@@ -2249,9 +2194,8 @@ void AddSC_paladin_spell_scripts()
     new spell_pal_flash_of_light();
     new spell_pal_word_of_glory();
     new spell_pal_inquisition();
-    new spell_pal_long_arm_of_the_law();
     new spell_pal_guardian_of_ancient_kings_retri();
     new spell_pal_guardian_of_ancient_kings();
     new spell_pal_ancient_fury();
-    new spell_pal_judgement_54158();
+    new spell_pal_judgement_damage();
 }
