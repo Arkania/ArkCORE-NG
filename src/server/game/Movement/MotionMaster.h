@@ -134,35 +134,9 @@ class MotionMaster //: private std::stack<MovementGenerator *>
 
         void DirectDelete(_Ty curr);
         void DelayedDelete(_Ty curr);
-
         void UpdateMotion(uint32 diff);
-        void Clear(bool reset = true)
-        {
-            if (_cleanFlag & MMCF_UPDATE)
-            {
-                if (reset)
-                    _cleanFlag |= MMCF_RESET;
-                else
-                    _cleanFlag &= ~MMCF_RESET;
-                DelayedClean();
-            }
-            else
-                DirectClean(reset);
-        }
-        void MovementExpired(bool reset = true)
-        {
-            if (_cleanFlag & MMCF_UPDATE)
-            {
-                if (reset)
-                    _cleanFlag |= MMCF_RESET;
-                else
-                    _cleanFlag &= ~MMCF_RESET;
-                DelayedExpire();
-            }
-            else
-                DirectExpire(reset);
-        }
-
+        void Clear(bool reset = true);
+        void MovementExpired(bool reset = true);
         void MoveIdle();
         void MoveTargetedHome();
         void MoveRandom(float spawndist = 0.0f);
