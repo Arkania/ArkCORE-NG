@@ -3307,7 +3307,7 @@ void Player::CreateNPCBot(uint8 bot_class)
     stmt->setString(index++, classStr.str());
     stmt->setUInt8(index++, bot_class);
 
-    //maybe we should remove this check? ;Ü
+    //maybe we should remove this check? ;ï¿½
     switch (getRace())
     {
     case RACE_NONE:
@@ -7814,8 +7814,8 @@ uint32 Player::GetTemporarySkillSlot(uint16 skillID)
 
 bool Player::IsPlayerProfession(uint16 skillID)
 {
-    for each (uint32 _skillID in InitPlayerProfessions)
-        if (_skillID == skillID)
+    for (uint32 _skillID = 0; _skillID < PLAYER_PROFESSIONS_MAX; ++_skillID)
+        if (InitPlayerProfessions[_skillID] == skillID)
             return true;
 
     return false;
